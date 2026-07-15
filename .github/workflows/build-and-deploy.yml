@@ -36,9 +36,14 @@ jobs:
         run: bun run typecheck
 
       - name: Test
-        # Keep the data-heavy suite deterministic; several tests share imported
-        # authored data and Bun's concurrent scheduler can race on that state.
-        run: bun test --max-concurrency=1
+        # Run each file in a fresh Bun process. Some data-heavy tests import
+        # shared authored objects, so isolating files avoids cross-file state
+        # leaking on hosted runners.
+        shell: bash
+        run: |
+          while IFS= read -r test_file; do
+            bun test "$test_file"
+          done < <(rg --files tests | rg '\.test\.(ts|tsx)$' | sort)
 
   build:
     name: Build container
