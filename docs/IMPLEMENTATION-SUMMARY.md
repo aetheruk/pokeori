@@ -137,7 +137,7 @@
 - Multi-stage build (builder + runner)
 - Non-root user for security
 - Health checks
-- Redis + PostgreSQL dependencies
+- Redis + MongoDB dependencies
 
 ### 21. Package Updates
 **Updated** (patch versions, all passing):

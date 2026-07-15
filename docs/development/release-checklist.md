@@ -11,16 +11,16 @@ changes.
 - Confirm sensitive routes/actions are rate-limited or queued.
 
 ## Data Integrity
-- Run `bun run validate:data`.
+- Run `pnpm run validate:data`.
 - Confirm generated game entries pass schema validation.
 - Review any allowlisted unresolved references in `tests/data-references.test.ts`.
 - Verify new rewards point to real item, currency, and task IDs.
 - Verify `requirements`, `criteria`, `hide`, `overrides`, and daily locks match the intended unlock flow.
 
 ## Quality Gates
-- Run `bun run lint`.
-- Run `bun run typecheck`.
-- Run `bun test`.
+- Run `pnpm run lint`.
+- Run `pnpm run typecheck`.
+- Run `pnpm test`.
 - Run focused manual smoke tests for changed game modes.
 
 ## Gameplay
@@ -30,7 +30,7 @@ changes.
 - Test reward summary and user data refresh after completion.
 
 ## Rollout
-- Back up production Postgres before schema or data migrations.
+- Back up production MongoDB before schema or data migrations.
 - Confirm Redis is reachable and TLS settings match the deployment environment.
 - Deploy to staging first when available.
 - Check server logs for request IDs on API failures.

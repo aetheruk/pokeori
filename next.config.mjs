@@ -43,10 +43,9 @@ const nextConfig = {
   },
   serverExternalPackages: [
     'payload',
-    '@payloadcms/db-postgres',
+    '@payloadcms/db-mongodb',
     '@payloadcms/email-resend',
     'graphql',
-    'pg',
   ],
   // Security headers
   async headers() {

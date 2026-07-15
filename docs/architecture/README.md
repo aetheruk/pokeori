@@ -10,7 +10,7 @@ See [Tech Stack](/docs/architecture/tech-stack.md) for full dependency list.
 | Runtime | Bun 1.3.13 |
 | Frontend | Next.js 16 (App Router), React 19, TypeScript 5 |
 | Backend | Payload CMS 3 (headless CMS) |
-| Database | PostgreSQL (via @payloadcms/db-postgres) |
+| Database | MongoDB (via @payloadcms/db-mongodb) |
 | Cache | Redis (via ioredis) |
 | Styling | Tailwind CSS 4, shadcn/ui, Radix UI |
 | State | Zustand, React Context |

@@ -25,6 +25,8 @@ Pokémon-related names, characters, artwork, sprites, sounds, card designs, and 
 Pokeori is built with and thanks the maintainers of:
 
 - [Bun](https://bun.sh/)
+- [Node.js](https://nodejs.org/)
+- [pnpm](https://pnpm.io/)
 - [Next.js](https://nextjs.org/)
 - [React](https://react.dev/)
 - [Payload CMS](https://payloadcms.com/)

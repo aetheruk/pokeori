@@ -5,7 +5,9 @@ Full dependency list with versions and purposes.
 ## Core Framework
 | Package | Version | Purpose |
 |---------|---------|---------|
-| bun | 1.3.13 | JavaScript runtime |
+| node | 22 | Production JavaScript runtime and build environment |
+| pnpm | 10.24.0 | Package manager |
+| bun | 1.3.13 | Current test runner and legacy data tooling |
 | next | 16.2.9 | React framework (App Router) |
 | react | 19.2.7 | UI library |
 | react-dom | 19.2.7 | React DOM rendering |
@@ -15,12 +17,11 @@ Full dependency list with versions and purposes.
 | Package | Version | Purpose |
 |---------|---------|---------|
 | payload | 3.85.1 | Headless CMS |
-| @payloadcms/db-postgres | 3.85.1 | PostgreSQL adapter |
+| @payloadcms/db-mongodb | 3.85.1 | MongoDB adapter |
 | @payloadcms/next | 3.85.1 | Payload Next.js integration |
 | @payloadcms/richtext-lexical | 3.85.1 | Rich text editor |
 | @payloadcms/email-resend | 3.85.1 | Email service |
 | ioredis | 5.11.1 | Redis client |
-| pg | 8.21.0 | PostgreSQL driver |
 
 ## Styling & UI
 | Package | Version | Purpose |

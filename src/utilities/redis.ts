@@ -7,33 +7,40 @@ const getRedisUrl = () => {
 }
 
 class RedisWrapper {
-  private client!: Redis
+  private client?: Redis
+  private readonly url?: string
 
-constructor(url?: string) {
-    if (url) {
-      if (url.startsWith('rediss://')) {
-        this.client = new Redis(url, {
-          tls: {
-            rejectUnauthorized: true, // Enforce TLS certificate validation
-          },
-        })
-      } else {
-        this.client = new Redis(url)
-      }
+  constructor(url?: string) {
+    this.url = url
+  }
+
+  private getClient(): Redis {
+    if (this.client) return this.client
+
+    if (this.url?.startsWith('rediss://')) {
+      this.client = new Redis(this.url, {
+        tls: {
+          rejectUnauthorized: true, // Enforce TLS certificate validation
+        },
+      })
+    } else if (this.url) {
+      this.client = new Redis(this.url)
     } else {
       this.client = new Redis()
     }
 
-    // Suppress unhandled error events to prevent build crashes
+    // Create the connection only when Redis is actually used. This keeps
+    // Next's build/static-generation process independent of a live Redis host.
     this.client.on('error', (err) => {
-      // Only log if not during build or if critical?
       // For now, log to stderr but don't crash
       console.error('Redis Client Error:', err.message)
     })
+
+    return this.client
   }
 
   async get<T>(key: string): Promise<T | null> {
-    const data = await this.client.get(key)
+    const data = await this.getClient().get(key)
     if (!data) return null
     try {
       return JSON.parse(data) as T
@@ -50,65 +57,65 @@ constructor(url?: string) {
     const stringValue = typeof value === 'object' ? JSON.stringify(value) : String(value)
 
     if (options?.ex && options?.nx) {
-      return await this.client.set(key, stringValue, 'EX', options.ex, 'NX')
+      return await this.getClient().set(key, stringValue, 'EX', options.ex, 'NX')
     }
     if (options?.ex) {
-      return await this.client.set(key, stringValue, 'EX', options.ex)
+      return await this.getClient().set(key, stringValue, 'EX', options.ex)
     }
     if (options?.nx) {
-      return await this.client.set(key, stringValue, 'NX')
+      return await this.getClient().set(key, stringValue, 'NX')
     }
-    return await this.client.set(key, stringValue)
+    return await this.getClient().set(key, stringValue)
   }
 
   async del(key: string): Promise<number> {
-    return await this.client.del(key)
+    return await this.getClient().del(key)
   }
 
   async lpush(key: string, ...elements: (string | number | Buffer)[]): Promise<number> {
-    return await this.client.lpush(key, ...elements)
+    return await this.getClient().lpush(key, ...elements)
   }
 
   async rpush(key: string, ...elements: (string | number | Buffer)[]): Promise<number> {
-    return await this.client.rpush(key, ...elements)
+    return await this.getClient().rpush(key, ...elements)
   }
 
   async expire(key: string, seconds: number): Promise<number> {
-    return await this.client.expire(key, seconds)
+    return await this.getClient().expire(key, seconds)
   }
 
   async sadd(key: string, ...members: (string | number | Buffer)[]): Promise<number> {
-    return await this.client.sadd(key, ...members)
+    return await this.getClient().sadd(key, ...members)
   }
 
   async srem(key: string, ...members: (string | number | Buffer)[]): Promise<number> {
-    return await this.client.srem(key, ...members)
+    return await this.getClient().srem(key, ...members)
   }
 
   async smembers(key: string): Promise<string[]> {
-    return await this.client.smembers(key)
+    return await this.getClient().smembers(key)
   }
 
   async sismember(key: string, member: string | number | Buffer): Promise<number> {
-    return await this.client.sismember(key, member)
+    return await this.getClient().sismember(key, member)
   }
 
   async incr(key: string): Promise<number> {
-    return await this.client.incr(key)
+    return await this.getClient().incr(key)
   }
 
   async decr(key: string): Promise<number> {
-    return await this.client.decr(key)
+    return await this.getClient().decr(key)
   }
 
   async lpop(key: string): Promise<string | null> {
-    return await this.client.lpop(key)
+    return await this.getClient().lpop(key)
   }
 
   async deleteIfValue(key: string, expectedValue: string): Promise<number> {
     const script =
       "if redis.call('GET', KEYS[1]) == ARGV[1] then return redis.call('DEL', KEYS[1]) else return 0 end"
-    const result = await this.client.eval(script, 1, key, expectedValue)
+    const result = await this.getClient().eval(script, 1, key, expectedValue)
     return typeof result === 'number' ? result : Number(result || 0)
   }
 }
