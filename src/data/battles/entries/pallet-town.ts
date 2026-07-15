@@ -176,7 +176,7 @@ export const palletTownBattles: BattleConfig[] = [
     subCategory: 'Pallet Town',
     icon: {
       type: 'local',
-      id: '/sprites/tall_grass.avif',
+      id: '/sprites/tall_grass-v2.png',
     },
     background: '/backgrounds/grassy-route.avif',
     maxPokemon: 1,

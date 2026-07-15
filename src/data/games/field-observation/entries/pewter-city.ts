@@ -9,7 +9,7 @@ export const pewterCityFieldObservationEntries: FieldObservationConfig[] = [
     subCategory: 'Pewter City',
     icon: {
       type: 'local',
-      id: '/sprites/tall_grass.avif',
+      id: '/sprites/tall_grass-v2.png',
     },
     background: '/backgrounds/grassy-route.avif',
     requirements: [
@@ -47,7 +47,7 @@ export const pewterCityFieldObservationEntries: FieldObservationConfig[] = [
     subCategory: 'Pewter City',
     icon: {
       type: 'local',
-      id: '/sprites/tall_grass.avif',
+      id: '/sprites/tall_grass-v2.png',
     },
     background: '/backgrounds/rocky-path.avif',
     requirements: [

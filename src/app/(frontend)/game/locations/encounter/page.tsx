@@ -102,23 +102,8 @@ const LevelUpModal = nextDynamic(
   },
 )
 
-// Dynamic import for TaskExitDialog
-const TaskExitDialog = nextDynamic(
-  () =>
-    import('@/components/game/task-exit-dialog').then(
-      (mod) => mod.TaskExitDialog,
-    ),
-  {
-    loading: () => (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950">
-        <LoadingSpinner size="lg" />
-      </div>
-    ),
-    ssr: false,
-  },
-)
-
 import { GameTimer } from '@/components/game/shared/game-timer'
+import { TaskExitDialog } from '@/components/game/task-exit-dialog'
 import { CaptureScene } from './_components/capture-scene'
 import type { CaptureThrowPayload } from './_components/draggable-pokeball'
 import { EncounterQte } from './_components/encounter-qte'

@@ -28,7 +28,7 @@ export const palletTownFieldObservationEntries: FieldObservationConfig[] = [
     subCategory: 'Pallet Town',
     icon: {
       type: 'local',
-      id: '/sprites/tall_grass.avif',
+      id: '/sprites/tall_grass-v2.png',
     },
     background: '/backgrounds/grassy-route.avif',
     requirements: palletOrientationRequirements,
@@ -56,7 +56,7 @@ export const palletTownFieldObservationEntries: FieldObservationConfig[] = [
     subCategory: 'Pallet Town',
     icon: {
       type: 'local',
-      id: '/sprites/tall_grass.avif',
+      id: '/sprites/tall_grass-v2.png',
     },
     background: '/backgrounds/grassy-route.avif',
     requirements: [

@@ -9,7 +9,7 @@ export const viridianCityLocations: Location[] = [
     subCategory: 'Viridian City',
     icon: {
       type: 'local',
-      id: '/sprites/tall_grass.avif',
+      id: '/sprites/tall_grass-v2.png',
     },
     background: '/backgrounds/rocky-path.avif',
     timer: 20,

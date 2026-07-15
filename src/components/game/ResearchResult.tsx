@@ -3,6 +3,7 @@
 import { Check, X } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import * as React from 'react'
 import { RewardSummaryDisplay } from '@/components/game/reward-summary'
 import { StickyFooter } from '@/components/game/shared/StickyFooter'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
@@ -14,6 +15,38 @@ import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import type { RewardSummary } from '@/utilities/rewards/reward-logic'
 import { ItemSprite } from '../ui/item-sprite'
 import { SectionDivider } from '../ui/section-divider'
+
+type ResultActionButtonProps = Omit<
+  React.ComponentProps<typeof Button>,
+  'size' | 'variant'
+>
+
+export function ResultActionButton({
+  className,
+  type = 'button',
+  asChild = false,
+  children,
+  ...props
+}: ResultActionButtonProps) {
+  const sharedProps = {
+    ...props,
+    type,
+    variant: 'moss' as const,
+    size: 'lg' as const,
+    className: cn('w-full min-w-0 font-bold', className),
+  }
+
+  if (asChild) {
+    return React.cloneElement(
+      React.Children.only(children) as React.ReactElement,
+      sharedProps,
+    )
+  }
+
+  return (
+    <Button {...sharedProps}>{children}</Button>
+  )
+}
 
 function isTaskIcon(icon: any): icon is TaskIcon {
   return (
@@ -210,23 +243,18 @@ export function GameResult({
           >
             {secondaryAction && (
               <div className="min-w-0 flex-1 [&>button]:min-h-11">
-                {secondaryAction}
+                <ResultActionButton asChild>{secondaryAction}</ResultActionButton>
               </div>
             )}
-            <Button
-              type="button"
+            <ResultActionButton
               onClick={handleReturn}
-              size="lg"
               className={cn(
-                'game-accent-button min-w-0 font-bold transition-colors',
+                'transition-colors',
                 secondaryAction ? 'flex-1' : 'w-full',
-                success
-                  ? 'border border-game-clay bg-game-clay !text-game-cream [&_svg]:!text-game-cream hover:bg-game-clay-strong'
-                  : 'border border-game-danger bg-game-danger !text-game-cream [&_svg]:!text-game-cream hover:bg-game-danger/90',
               )}
             >
               {returnText}
-            </Button>
+            </ResultActionButton>
           </div>
         </StickyFooter>
       </main>

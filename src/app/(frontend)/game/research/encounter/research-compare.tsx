@@ -30,7 +30,6 @@ import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverla
 import { Button } from '@/components/ui/button'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { Progress } from '@/components/ui/progress'
-import { SectionDivider } from '@/components/ui/section-divider'
 import { useAudio } from '@/context/AudioContext'
 import type { ResearchConfig } from '@/data/games'
 import pokemonData from '@/data/pokemon-data'
@@ -240,14 +239,14 @@ function DropZone({
         isOver && !feedback
           ? {
               scale: 1.02,
-              backgroundColor: 'rgba(59, 130, 246, 0.1)',
-              borderColor: '#3b82f6',
+              backgroundColor: 'rgba(95, 121, 79, 0.1)',
+              borderColor: '#5f794f',
             }
           : feedback === 'correct'
             ? {
                 scale: 1.05,
-                backgroundColor: 'rgba(34, 197, 94, 0.2)',
-                borderColor: '#22c55e',
+                backgroundColor: 'rgba(95, 121, 79, 0.18)',
+                borderColor: '#5f794f',
               }
             : feedback === 'incorrect'
               ? {
@@ -272,8 +271,8 @@ function DropZone({
         <motion.div
           animate={
             isOver
-              ? { scale: 1.1, color: '#60a5fa' }
-              : { scale: 1, color: '#71717a' }
+              ? { scale: 1.1, color: '#405d3d' }
+              : { scale: 1, color: '#667269' }
           }
           className="px-2 text-center text-[10px] sm:text-xs font-black pointer-events-none uppercase tracking-widest relative z-10"
         >
@@ -594,7 +593,7 @@ export function ResearchCompareGame({
                     pokemon={droppedPokemon}
                     className={cn(
                       feedback === 'correct' &&
-                        'border-green-400 shadow-[0_0_28px_rgba(34,197,94,0.55)]',
+                        'border-game-moss bg-game-moss/10 shadow-md',
                       feedback === 'incorrect' &&
                         'border-red-400 shadow-[0_0_28px_rgba(239,68,68,0.55)]',
                     )}
@@ -604,7 +603,7 @@ export function ResearchCompareGame({
                       className={cn(
                         'absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full border-2 bg-[#0d1820] shadow-lg',
                         feedback === 'correct'
-                          ? 'border-green-400 text-green-300'
+                          ? 'border-game-moss bg-game-surface-raised text-game-moss-strong'
                           : 'border-red-400 text-red-300',
                       )}
                     >
@@ -624,7 +623,7 @@ export function ResearchCompareGame({
                 animate={{ opacity: 1, y: 0 }}
                 className={cn(
                   'text-sm font-black uppercase tracking-widest',
-                  feedback === 'correct' ? 'text-green-300' : 'text-red-300',
+                  feedback === 'correct' ? 'text-game-moss-strong' : 'text-red-300',
                 )}
               >
                 {feedback === 'correct' ? 'Correct!' : 'Incorrect'}
@@ -641,23 +640,23 @@ export function ResearchCompareGame({
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, type: 'spring' }}
-              className="w-full max-w-5xl mb-8"
+              className="mb-6 w-full max-w-md"
             >
-              <SectionDivider>
-                <span className="mr-2 font-light text-game-muted">
-                  Identify:
-                </span>
+              <div className="rounded-xl border border-game-border bg-game-surface-raised px-4 py-3 text-center shadow-sm">
+                <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.16em] text-game-moss-strong">
+                  Compare {STATS[currentStat].label}
+                </p>
                 <motion.span
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3, duration: 0.5 }}
-                  className="inline-block"
+                  className="block font-display text-xl font-bold leading-tight text-game-ink sm:text-2xl"
                 >
                   {isHighest
                     ? STATS[currentStat].questions.highest
                     : STATS[currentStat].questions.lowest}
                 </motion.span>
-              </SectionDivider>
+              </div>
             </motion.div>
           ) : (
             <div className="h-20" /> // Spacer
