@@ -103,8 +103,10 @@ export function PokemonList() {
   const initialTotal = userPokemonData?.totalDocs || initialDocs.length
 
   const [pokemonList, setPokemonList] = useState<Pokemon[]>(initialDocs)
-  const [eggs, setEggs] = useState<{ id: string; foundAt: string; hatchAt: string }[]>([])
+  const [eggs, setEggs] = useState<{ id: string; foundAt: string; hatchAt: string; sourceLocation?: string | null; sourceBackground?: string | null }[]>([])
   const [hatchingEggId, setHatchingEggId] = useState<string | null>(null)
+  const [eggHatchResult, setEggHatchResult] = useState<any | null>(null)
+  const [eggHatchAnimation, setEggHatchAnimation] = useState<any | null>(null)
   const [battleTeam, setBattleTeam] = useState<Pokemon[]>([])
   const [companion, setCompanion] = useState<Pokemon | null>(null)
 
@@ -432,30 +434,47 @@ export function PokemonList() {
         toast.error(result.message)
         return
       }
-      toast.success(result.message)
       setEggs((current) => current.filter((egg) => egg.id !== eggId))
       await refreshUser()
       await handleBoxChange(selectedBoxId)
+      setEggHatchAnimation(result)
     } finally {
       setHatchingEggId(null)
     }
   }
 
-  const renderEggCard = (egg: { id: string; hatchAt: string }) => {
+  const renderEggCard = (egg: { id: string; hatchAt: string; sourceLocation?: string | null }) => {
     const ready = new Date(egg.hatchAt).getTime() <= Date.now()
     return (
-      <Card className="relative aspect-square border-game-moss/45 bg-game-cream p-2 text-center">
-        <Image
-          src="/sprites/pokemon/home/egg.png"
-          alt="Pokemon Egg"
-          width={96}
-          height={96}
-          className="mx-auto mt-1 h-11 w-11 object-contain"
-        />
-        <p className="mt-1 text-xs font-bold text-game-ink">Pokemon Egg</p>
-        <p className="mt-0.5 text-[10px] text-game-muted">{ready ? 'Ready to hatch' : 'Warming up'}</p>
-        {ready && <Button size="sm" className="absolute inset-x-1 bottom-1 h-9 bg-game-moss text-game-cream hover:bg-game-moss-strong" disabled={hatchingEggId === egg.id} onClick={() => hatchBoxEgg(egg.id)}>{hatchingEggId === egg.id ? 'Hatching…' : 'Hatch · 50 Crystals'}</Button>}
-      </Card>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Card className="game-focus-ring group relative aspect-square cursor-pointer border border-game-border bg-game-surface-raised p-1.5 transition-colors hover:border-game-moss/45 hover:bg-game-surface">
+            <Image src="/sprites/pokemon/home/egg.png" alt="Pokemon Egg" width={128} height={128} className="h-full w-full object-contain" />
+          </Card>
+        </DialogTrigger>
+        <DialogContent className="max-w-sm border-game-border bg-game-surface-raised text-game-ink">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-2xl">???</DialogTitle>
+            <DialogDescription className="text-game-muted">An unhatched Pokemon Egg{egg.sourceLocation ? ` found at ${egg.sourceLocation}` : ''}.</DialogDescription>
+          </DialogHeader>
+          <div className="rounded-xl border border-game-border bg-game-canvas p-5 text-center">
+            <Image src="/sprites/pokemon/home/egg.png" alt="Mystery Pokemon Egg" width={192} height={192} className="mx-auto h-40 w-40 object-contain" />
+            <dl className="mt-4 grid grid-cols-2 gap-2 text-left text-sm">
+              <div><dt className="text-game-muted">Species</dt><dd className="font-semibold">???</dd></div>
+              <div><dt className="text-game-muted">Level</dt><dd className="font-semibold">???</dd></div>
+              <div><dt className="text-game-muted">Nature</dt><dd className="font-semibold">???</dd></div>
+              <div><dt className="text-game-muted">Ability</dt><dd className="font-semibold">???</dd></div>
+            </dl>
+          </div>
+          <DialogFooter>
+            {ready ? (
+              <Button className="min-h-11 w-full bg-game-clay text-game-cream hover:bg-game-clay-strong" disabled={hatchingEggId === egg.id} onClick={() => hatchBoxEgg(egg.id)}>{hatchingEggId === egg.id ? 'Preparing hatch…' : 'Hatch · 50 Crystals'}</Button>
+            ) : (
+              <p className="w-full rounded-lg bg-game-moss/10 p-3 text-center font-mono text-sm text-game-moss">Ready {new Date(egg.hatchAt).toLocaleString()}</p>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     )
   }
 
@@ -1459,6 +1478,42 @@ export function PokemonList() {
             : 'Rewards collected together.'
         }
       />
+      {eggHatchAnimation && (
+        <EggHatchOverlay
+          onComplete={() => {
+            setEggHatchResult(eggHatchAnimation)
+            setEggHatchAnimation(null)
+          }}
+        />
+      )}
+      <RewardResultOverlay
+        result={eggHatchResult}
+        onClose={() => setEggHatchResult(null)}
+        icon={eggHatchResult?.summary?.pokemon?.[0] ? { type: 'pokemon', id: eggHatchResult.summary.pokemon[0].speciesId } : undefined}
+        iconAlt="Hatched Pokemon"
+        title="Egg Hatched"
+        message={eggHatchResult?.message}
+      />
     </div>
+  )
+}
+
+function EggHatchOverlay({ onComplete }: { onComplete: () => void }) {
+  const [phase, setPhase] = useState<'warm' | 'flash' | 'reveal'>('warm')
+  useEffect(() => {
+    const flash = setTimeout(() => setPhase('flash'), 1500)
+    const done = setTimeout(() => { setPhase('reveal'); onComplete() }, 2300)
+    return () => { clearTimeout(flash); clearTimeout(done) }
+  }, [onComplete])
+  return (
+    <Dialog open>
+      <DialogContent showCloseButton={false} className="fixed inset-0 z-[100] m-0 flex h-[100dvh] w-screen max-w-none !translate-x-0 !translate-y-0 items-center justify-center rounded-none border-none bg-game-night p-0">
+        <DialogTitle className="sr-only">An Egg is hatching</DialogTitle>
+        <div className={cn('flex flex-col items-center transition-all duration-500', phase === 'flash' && 'scale-125 opacity-20')}>
+          <Image src="/sprites/pokemon/home/egg.png" alt="Hatching Egg" width={320} height={320} className={cn('h-64 w-64 object-contain', phase === 'warm' && 'animate-pulse motion-reduce:animate-none')} />
+          <p className="mt-8 font-serif text-3xl text-game-cream">Oh?</p>
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }

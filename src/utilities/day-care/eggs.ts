@@ -1,5 +1,6 @@
 import type { Payload } from 'payload'
 import pokemonData, { type PokemonData } from '@/data/pokemon-data'
+import { allGames } from '@/data/games'
 import { getPokemonForm, getSpeciesIdForForm } from '@/utilities/pokemon/pokedex'
 import { getResearcherShinyModifier, getSkillLevel } from '@/utilities/skills/unlocks'
 import { getUserCompletedTasksMap, getUserPokedexMap, type PokedexMap } from '@/utilities/user-state'
@@ -10,20 +11,19 @@ export const DAY_CARE_EGG_HATCH_COST_CRYSTALS = 50
 export const DAY_CARE_EGG_HATCH_LEVEL = 5
 export const DAY_CARE_EGG_RESEARCH_XP = 15
 export const FIELD_OBSERVATION_EGG_DENOMINATOR = 26
+export const DAY_CARE_EGG_MAX_OWNED = 10
+export const DAY_CARE_EGG_SHINY_MULTIPLIER = 2
 
 export type EggPool = {
   id: string
   weight: number
-  source: 'caught' | 'seen-uncaught' | 'baby' | 'forms'
-  formIds?: string[]
-  shinyMultiplier: number
+  source: 'caught' | 'seen-uncaught' | 'baby'
 }
 
-// Additional pools can be authored here without changing hatch logic.
 export const DAY_CARE_EGG_POOLS: EggPool[] = [
-  { id: 'caught', weight: 80, source: 'caught', shinyMultiplier: 1.1 },
-  { id: 'baby', weight: 18, source: 'baby', shinyMultiplier: 1 },
-  { id: 'seen-uncaught', weight: 2, source: 'seen-uncaught', shinyMultiplier: 1.1 },
+  { id: 'caught', weight: 74, source: 'caught' },
+  { id: 'baby', weight: 25, source: 'baby' },
+  { id: 'seen-uncaught', weight: 1, source: 'seen-uncaught' },
 ]
 
 export type EggHatchResult = {
@@ -46,10 +46,6 @@ function allEligibleForms(pokedex: PokedexMap, predicate: (entry: any) => boolea
 }
 
 export function getEggPoolCandidates(pool: EggPool, pokedex: PokedexMap): string[] {
-  if (pool.source === 'forms') return (pool.formIds || []).filter((formId) => {
-    const form = getPokemonForm(formId)
-    return !!form && !form.is_legendary && !form.is_mythical
-  })
   if (pool.source === 'caught') return allEligibleForms(pokedex, (entry) => entry.caught)
   if (pool.source === 'seen-uncaught') return allEligibleForms(pokedex, (entry) => entry.seen && !entry.caught)
   return (pokemonData as PokemonData).flatMap((species) =>
@@ -83,7 +79,7 @@ export function rollEggHatch(
   const formId = selected.forms[Math.floor(random() * selected.forms.length)]
   const speciesId = getSpeciesIdForForm(formId)
   if (!speciesId) return null
-  const shinyChance = Math.min(1, (1 / 4096) * getResearcherShinyModifier(researcherLevel) * selected.pool.shinyMultiplier)
+  const shinyChance = Math.min(1, (1 / 4096) * DAY_CARE_EGG_SHINY_MULTIPLIER * getResearcherShinyModifier(researcherLevel))
   return { poolId: selected.pool.id, formId, speciesId, shiny: random() < shinyChance }
 }
 
@@ -98,12 +94,14 @@ export async function getActiveEggCount(payload: Payload, userId: string): Promi
 }
 
 export async function maybeCreateFieldObservationEgg(payload: Payload, user: any, researchId: string) {
-  if (!(await canUseDayCareEggs(payload, user)) || Math.floor(Math.random() * FIELD_OBSERVATION_EGG_DENOMINATOR) !== 0) return null
-  const pokemonCount = (await payload.count({ collection: 'pokemon', where: { user: { equals: user.id } } })).totalDocs
+  if (!(await canUseDayCareEggs(payload, user))) return null
   const eggCount = await getActiveEggCount(payload, user.id)
+  if (eggCount >= DAY_CARE_EGG_MAX_OWNED || Math.floor(Math.random() * FIELD_OBSERVATION_EGG_DENOMINATOR) !== 0) return null
+  const pokemonCount = (await payload.count({ collection: 'pokemon', where: { user: { equals: user.id } } })).totalDocs
   if (pokemonCount + eggCount >= (user.maxPokemon || 50)) return null
   const foundAt = new Date()
-  return payload.create({ collection: 'user-eggs' as any, data: { user: user.id, foundAt: foundAt.toISOString(), hatchAt: new Date(foundAt.getTime() + DAY_CARE_EGG_HATCH_DELAY_MS).toISOString(), sourceResearchId: researchId, status: 'incubating' } })
+  const research = allGames.find((game) => game.id === researchId)
+  return payload.create({ collection: 'user-eggs' as any, data: { user: user.id, foundAt: foundAt.toISOString(), hatchAt: new Date(foundAt.getTime() + DAY_CARE_EGG_HATCH_DELAY_MS).toISOString(), sourceResearchId: researchId, sourceBackground: research?.background, sourceRegion: research?.category, sourceLocation: research?.subCategory || research?.name, status: 'incubating' } })
 }
 
 export async function getEggHatchOutcome(payload: Payload, user: any) {
