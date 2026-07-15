@@ -734,6 +734,9 @@ export interface UserEgg {
   foundAt: string;
   hatchAt: string;
   sourceResearchId?: string | null;
+  sourceBackground?: string | null;
+  sourceRegion?: string | null;
+  sourceLocation?: string | null;
   status: 'incubating' | 'hatched';
   hatchedPokemonId?: string | null;
   hatchPoolId?: string | null;
@@ -1191,6 +1194,9 @@ export interface UserEggsSelect<T extends boolean = true> {
   foundAt?: T;
   hatchAt?: T;
   sourceResearchId?: T;
+  sourceBackground?: T;
+  sourceRegion?: T;
+  sourceLocation?: T;
   status?: T;
   hatchedPokemonId?: T;
   hatchPoolId?: T;

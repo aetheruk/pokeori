@@ -24,7 +24,7 @@ export async function getEggsForBox() {
     pagination: false,
     depth: 0,
   })
-  return docs.map((egg: any) => ({ id: egg.id, foundAt: egg.foundAt, hatchAt: egg.hatchAt }))
+  return docs.map((egg: any) => ({ id: egg.id, foundAt: egg.foundAt, hatchAt: egg.hatchAt, sourceLocation: egg.sourceLocation, sourceBackground: egg.sourceBackground }))
 }
 
 export async function hatchEgg(eggId: string) {
@@ -49,7 +49,7 @@ export async function hatchEgg(eggId: string) {
 
   await payload.update({ collection: 'users', id: user.id, data: { currency: { ...user.currency, crystals: crystals - DAY_CARE_EGG_HATCH_COST_CRYSTALS } } })
   const { summary } = await grantRewards(user.id, [
-    { type: 'pokemon', targetId: result.speciesId, quantity: 1, pokemonData: { level: DAY_CARE_EGG_HATCH_LEVEL, formId: result.formId, shiny: result.shiny, obtainedMethod: 'hatched', obtainedRegion: 'Kanto', obtainedLocation: 'Day Care', obtainedSourceId: `egg:${egg.id}` } },
+    { type: 'pokemon', targetId: result.speciesId, quantity: 1, pokemonData: { level: DAY_CARE_EGG_HATCH_LEVEL, formId: result.formId, shiny: result.shiny, background: egg.sourceBackground, obtainedMethod: 'hatched', obtainedRegion: egg.sourceRegion, obtainedLocation: egg.sourceLocation, obtainedSourceId: `egg:${egg.id}` } },
     { type: 'pokemon_research_xp', targetId: result.formId, quantity: DAY_CARE_EGG_RESEARCH_XP },
   ], { source: 'day-care-egg-hatch', skipDropChance: true })
   await payload.update({ collection: 'user-eggs' as any, id: egg.id, data: { status: 'hatched', hatchPoolId: result.poolId } })

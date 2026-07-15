@@ -1,6 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 import {
+  DAY_CARE_EGG_MAX_OWNED,
   DAY_CARE_EGG_POOLS,
+  DAY_CARE_EGG_SHINY_MULTIPLIER,
   getEggPoolCandidates,
   rollEggHatch,
 } from '@/utilities/day-care/eggs'
@@ -18,6 +20,9 @@ describe('Day Care eggs', () => {
   })
 
   test('uses the configured pool weights and resolves at hatch time', () => {
+    expect(DAY_CARE_EGG_POOLS.map((pool) => pool.weight)).toEqual([74, 25, 1])
+    expect(DAY_CARE_EGG_SHINY_MULTIPLIER).toBe(2)
+    expect(DAY_CARE_EGG_MAX_OWNED).toBe(10)
     const result = rollEggHatch(pokedex, 1, () => 0, DAY_CARE_EGG_POOLS)
     expect(result).toMatchObject({ poolId: 'caught', formId: '1', speciesId: 1 })
   })
