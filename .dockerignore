@@ -1,0 +1,50 @@
+# Dependencies
+node_modules
+bun.lockb
+
+# Build artifacts
+.next
+dist
+build
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Test
+coverage
+
+# Misc
+*.pem
+dump.rdb
+/certificates
+
+# Source data (not needed in Docker)
+source_data/
+
+# Scripts (dev only)
+scripts/
+
+# Tools (dev only)
+tools/
+
+# Docs (optional - can keep for debugging)
+docs/
+README.md

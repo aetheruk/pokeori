@@ -1,0 +1,27 @@
+{
+  "name": "Pokeori",
+  "short_name": "Pokeori",
+  "icons": [
+    {
+      "src": "/app-icon.avif",
+      "sizes": "1254x1254",
+      "type": "image/avif",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/web-app-manifest-192x192.avif",
+      "sizes": "192x192",
+      "type": "image/avif",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/web-app-manifest-512x512.avif",
+      "sizes": "512x512",
+      "type": "image/avif",
+      "purpose": "maskable"
+    }
+  ],
+  "theme_color": "#efe4cf",
+  "background_color": "#efe4cf",
+  "display": "standalone"
+}

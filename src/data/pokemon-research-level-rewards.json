@@ -1,0 +1,5357 @@
+[
+  {
+    "formId": "1",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "1",
+    "level": 1,
+    "itemId": "tm-razor-leaf"
+  },
+  {
+    "formId": "1",
+    "level": 1,
+    "itemId": "tm-vine-whip"
+  },
+  {
+    "formId": "2",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "2",
+    "level": 1,
+    "itemId": "tm-razor-leaf"
+  },
+  {
+    "formId": "2",
+    "level": 1,
+    "itemId": "tm-vine-whip"
+  },
+  {
+    "formId": "3",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "3",
+    "level": 1,
+    "itemId": "tm-razor-leaf"
+  },
+  {
+    "formId": "3",
+    "level": 1,
+    "itemId": "tm-vine-whip"
+  },
+  {
+    "formId": "3",
+    "level": 5,
+    "itemId": "tm-frenzy-plant"
+  },
+  {
+    "formId": "4",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "4",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "4",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "5",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "5",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "5",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "6",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "6",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "6",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "6",
+    "level": 5,
+    "itemId": "tm-blast-burn"
+  },
+  {
+    "formId": "7",
+    "level": 1,
+    "itemId": "tm-bubble"
+  },
+  {
+    "formId": "7",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "7",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "8",
+    "level": 1,
+    "itemId": "tm-bubble"
+  },
+  {
+    "formId": "8",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "8",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "9",
+    "level": 1,
+    "itemId": "tm-bubble"
+  },
+  {
+    "formId": "9",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "9",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "9",
+    "level": 4,
+    "itemId": "tm-hydro-cannon"
+  },
+  {
+    "formId": "10",
+    "level": 1,
+    "itemId": "tm-string-shot"
+  },
+  {
+    "formId": "11",
+    "level": 2,
+    "itemId": "tm-harden"
+  },
+  {
+    "formId": "12",
+    "level": 3,
+    "itemId": "tm-sleep-powder"
+  },
+  {
+    "formId": "13",
+    "level": 2,
+    "itemId": "tm-poison-sting"
+  },
+  {
+    "formId": "14",
+    "level": 2,
+    "itemId": "tm-harden"
+  },
+  {
+    "formId": "15",
+    "level": 2,
+    "itemId": "tm-twineedle"
+  },
+  {
+    "formId": "16",
+    "level": 2,
+    "itemId": "tm-sand-attack"
+  },
+  {
+    "formId": "17",
+    "level": 2,
+    "itemId": "tm-whirlwind"
+  },
+  {
+    "formId": "18",
+    "level": 3,
+    "itemId": "tm-mirror-move"
+  },
+  {
+    "formId": "19",
+    "level": 4,
+    "itemId": "tm-super-fang"
+  },
+  {
+    "formId": "20",
+    "level": 2,
+    "itemId": "tm-hyper-fang"
+  },
+  {
+    "formId": "23",
+    "level": 1,
+    "itemId": "tm-leer"
+  },
+  {
+    "formId": "25",
+    "level": 3,
+    "itemId": "tm-thunder-wave"
+  },
+  {
+    "formId": "25",
+    "level": 5,
+    "itemId": "tm-zippy-zap"
+  },
+  {
+    "formId": "34",
+    "level": 4,
+    "itemId": "tm-fissure"
+  },
+  {
+    "formId": "43",
+    "level": 3,
+    "itemId": "tm-leech-seed"
+  },
+  {
+    "formId": "46",
+    "level": 2,
+    "itemId": "tm-stun-spore"
+  },
+  {
+    "formId": "50",
+    "level": 1,
+    "itemId": "tm-dig"
+  },
+  {
+    "formId": "54",
+    "level": 1,
+    "itemId": "tm-amnesia"
+  },
+  {
+    "formId": "63",
+    "level": 3,
+    "itemId": "tm-confusion"
+  },
+  {
+    "formId": "64",
+    "level": 3,
+    "itemId": "tm-calm-mind"
+  },
+  {
+    "formId": "65",
+    "level": 1,
+    "itemId": "tm-kinesis"
+  },
+  {
+    "formId": "68",
+    "level": 1,
+    "itemId": "tm-seismic-toss"
+  },
+  {
+    "formId": "69",
+    "level": 3,
+    "itemId": "tm-ingrain"
+  },
+  {
+    "formId": "80",
+    "level": 5,
+    "itemId": "tm-focus-punch"
+  },
+  {
+    "formId": "96",
+    "level": 1,
+    "itemId": "tm-dream-eater"
+  },
+  {
+    "formId": "104",
+    "level": 1,
+    "itemId": "tm-bone-rush"
+  },
+  {
+    "formId": "104",
+    "level": 2,
+    "itemId": "tm-bonemerang"
+  },
+  {
+    "formId": "105",
+    "level": 1,
+    "itemId": "tm-frustration"
+  },
+  {
+    "formId": "105",
+    "level": 2,
+    "itemId": "tm-bone-club"
+  },
+  {
+    "formId": "110",
+    "level": 2,
+    "itemId": "tm-poison-gas"
+  },
+  {
+    "formId": "115",
+    "level": 2,
+    "itemId": "tm-mega-punch"
+  },
+  {
+    "formId": "116",
+    "level": 2,
+    "itemId": "tm-bubble-beam"
+  },
+  {
+    "formId": "122",
+    "level": 2,
+    "itemId": "tm-copycat"
+  },
+  {
+    "formId": "127",
+    "level": 3,
+    "itemId": "tm-storm-throw"
+  },
+  {
+    "formId": "130",
+    "level": 2,
+    "itemId": "tm-dragon-rage"
+  },
+  {
+    "formId": "133",
+    "level": 5,
+    "itemId": "tm-baddy-bad"
+  },
+  {
+    "formId": "133",
+    "level": 5,
+    "itemId": "tm-floaty-fall"
+  },
+  {
+    "formId": "133",
+    "level": 5,
+    "itemId": "tm-sappy-seed"
+  },
+  {
+    "formId": "143",
+    "level": 3,
+    "itemId": "tm-rest"
+  },
+  {
+    "formId": "166",
+    "level": 2,
+    "itemId": "tm-u-turn"
+  },
+  {
+    "formId": "200",
+    "level": 2,
+    "itemId": "tm-destiny-bond"
+  },
+  {
+    "formId": "201",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-b",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-c",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-d",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-e",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-exclamation",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-f",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-g",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-h",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-i",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-j",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-k",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-l",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-m",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-n",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-o",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-p",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-q",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-question",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-r",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-s",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-t",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-u",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-v",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-w",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-x",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-y",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "201-z",
+    "level": 3,
+    "itemId": "tm-hidden-power"
+  },
+  {
+    "formId": "7",
+    "level": 3,
+    "itemId": "tm-bubble-beam"
+  },
+  {
+    "formId": "15",
+    "level": 2,
+    "itemId": "tm-poison-sting"
+  },
+  {
+    "formId": "16",
+    "level": 3,
+    "itemId": "tm-quick-attack"
+  },
+  {
+    "formId": "19",
+    "level": 3,
+    "itemId": "tm-quick-attack"
+  },
+  {
+    "formId": "22",
+    "level": 3,
+    "itemId": "tm-drill-peck"
+  },
+  {
+    "formId": "24",
+    "level": 2,
+    "itemId": "tm-glare"
+  },
+  {
+    "formId": "25",
+    "level": 5,
+    "itemId": "tm-pika-papow"
+  },
+  {
+    "formId": "25",
+    "level": 5,
+    "itemId": "tm-splishy-splash"
+  },
+  {
+    "formId": "27",
+    "level": 1,
+    "itemId": "tm-defense-curl"
+  },
+  {
+    "formId": "28",
+    "level": 2,
+    "itemId": "tm-slash"
+  },
+  {
+    "formId": "29",
+    "level": 2,
+    "itemId": "tm-poison-sting"
+  },
+  {
+    "formId": "31",
+    "level": 2,
+    "itemId": "tm-take-down"
+  },
+  {
+    "formId": "32",
+    "level": 2,
+    "itemId": "tm-double-kick"
+  },
+  {
+    "formId": "32",
+    "level": 2,
+    "itemId": "tm-poison-sting"
+  },
+  {
+    "formId": "35",
+    "level": 3,
+    "itemId": "tm-metronome"
+  },
+  {
+    "formId": "36",
+    "level": 4,
+    "itemId": "tm-double-edge"
+  },
+  {
+    "formId": "37",
+    "level": 2,
+    "itemId": "tm-tail-whip"
+  },
+  {
+    "formId": "38",
+    "level": 5,
+    "itemId": "tm-fire-blast"
+  },
+  {
+    "formId": "39",
+    "level": 1,
+    "itemId": "tm-sing"
+  },
+  {
+    "formId": "40",
+    "level": 1,
+    "itemId": "tm-double-slap"
+  },
+  {
+    "formId": "41",
+    "level": 2,
+    "itemId": "tm-supersonic"
+  },
+  {
+    "formId": "42",
+    "level": 2,
+    "itemId": "tm-mean-look"
+  },
+  {
+    "formId": "44",
+    "level": 2,
+    "itemId": "tm-growth"
+  },
+  {
+    "formId": "49",
+    "level": 2,
+    "itemId": "tm-poison-powder"
+  },
+  {
+    "formId": "52",
+    "level": 3,
+    "itemId": "tm-pay-day"
+  },
+  {
+    "formId": "53",
+    "level": 1,
+    "itemId": "tm-fury-swipes"
+  },
+  {
+    "formId": "56",
+    "level": 2,
+    "itemId": "tm-karate-chop"
+  },
+  {
+    "formId": "57",
+    "level": 2,
+    "itemId": "tm-rage"
+  },
+  {
+    "formId": "59",
+    "level": 1,
+    "itemId": "tm-roar"
+  },
+  {
+    "formId": "59",
+    "level": 3,
+    "itemId": "tm-fire-fang"
+  },
+  {
+    "formId": "61",
+    "level": 2,
+    "itemId": "tm-water-pulse"
+  },
+  {
+    "formId": "62",
+    "level": 3,
+    "itemId": "tm-body-slam"
+  },
+  {
+    "formId": "66",
+    "level": 2,
+    "itemId": "tm-mach-punch"
+  },
+  {
+    "formId": "67",
+    "level": 1,
+    "itemId": "tm-bulk-up"
+  },
+  {
+    "formId": "68",
+    "level": 2,
+    "itemId": "tm-wide-guard"
+  },
+  {
+    "formId": "70",
+    "level": 2,
+    "itemId": "tm-growth"
+  },
+  {
+    "formId": "71",
+    "level": 3,
+    "itemId": "tm-swallow"
+  },
+  {
+    "formId": "72",
+    "level": 1,
+    "itemId": "tm-constrict"
+  },
+  {
+    "formId": "72",
+    "level": 2,
+    "itemId": "tm-acid"
+  },
+  {
+    "formId": "73",
+    "level": 3,
+    "itemId": "tm-wring-out"
+  },
+  {
+    "formId": "74",
+    "level": 2,
+    "itemId": "tm-rock-polish"
+  },
+  {
+    "formId": "76",
+    "level": 2,
+    "itemId": "tm-rollout"
+  },
+  {
+    "formId": "78",
+    "level": 5,
+    "itemId": "tm-fire-blast"
+  },
+  {
+    "formId": "79",
+    "level": 3,
+    "itemId": "tm-disable"
+  },
+  {
+    "formId": "79",
+    "level": 4,
+    "itemId": "tm-yawn"
+  },
+  {
+    "formId": "81",
+    "level": 1,
+    "itemId": "tm-sonic-boom"
+  },
+  {
+    "formId": "82",
+    "level": 2,
+    "itemId": "tm-tri-attack"
+  },
+  {
+    "formId": "83",
+    "level": 2,
+    "itemId": "tm-leek-spin"
+  },
+  {
+    "formId": "84",
+    "level": 2,
+    "itemId": "tm-double-hit"
+  },
+  {
+    "formId": "85",
+    "level": 1,
+    "itemId": "tm-fury-attack"
+  },
+  {
+    "formId": "87",
+    "level": 3,
+    "itemId": "tm-flip-turn"
+  },
+  {
+    "formId": "88",
+    "level": 2,
+    "itemId": "tm-minimize"
+  },
+  {
+    "formId": "89",
+    "level": 2,
+    "itemId": "tm-acid-armor"
+  },
+  {
+    "formId": "90",
+    "level": 1,
+    "itemId": "tm-withdraw"
+  },
+  {
+    "formId": "91",
+    "level": 2,
+    "itemId": "tm-spike-cannon"
+  },
+  {
+    "formId": "92",
+    "level": 1,
+    "itemId": "tm-astonish"
+  },
+  {
+    "formId": "93",
+    "level": 1,
+    "itemId": "tm-torment"
+  },
+  {
+    "formId": "94",
+    "level": 1,
+    "itemId": "tm-lick"
+  },
+  {
+    "formId": "95",
+    "level": 3,
+    "itemId": "tm-bide"
+  },
+  {
+    "formId": "97",
+    "level": 1,
+    "itemId": "tm-hypnosis"
+  },
+  {
+    "formId": "99",
+    "level": 4,
+    "itemId": "tm-hammer-arm"
+  },
+  {
+    "formId": "100",
+    "level": 4,
+    "itemId": "tm-self-destruct"
+  },
+  {
+    "formId": "101",
+    "level": 4,
+    "itemId": "tm-explosion"
+  },
+  {
+    "formId": "102",
+    "level": 1,
+    "itemId": "tm-barrage"
+  },
+  {
+    "formId": "103",
+    "level": 4,
+    "itemId": "tm-egg-bomb"
+  },
+  {
+    "formId": "104",
+    "level": 2,
+    "itemId": "tm-headbutt"
+  },
+  {
+    "formId": "106",
+    "level": 3,
+    "itemId": "tm-focus-energy"
+  },
+  {
+    "formId": "106",
+    "level": 3,
+    "itemId": "tm-high-jump-kick"
+  },
+  {
+    "formId": "107",
+    "level": 1,
+    "itemId": "tm-comet-punch"
+  },
+  {
+    "formId": "107",
+    "level": 3,
+    "itemId": "tm-focus-energy"
+  },
+  {
+    "formId": "109",
+    "level": 1,
+    "itemId": "tm-smokescreen"
+  },
+  {
+    "formId": "111",
+    "level": 1,
+    "itemId": "tm-horn-attack"
+  },
+  {
+    "formId": "112",
+    "level": 4,
+    "itemId": "tm-horn-drill"
+  },
+  {
+    "formId": "113",
+    "level": 1,
+    "itemId": "tm-soft-boiled"
+  },
+  {
+    "formId": "120",
+    "level": 1,
+    "itemId": "tm-swift"
+  },
+  {
+    "formId": "121",
+    "level": 2,
+    "itemId": "tm-rapid-spin"
+  },
+  {
+    "formId": "123",
+    "level": 3,
+    "itemId": "tm-double-team"
+  },
+  {
+    "formId": "124",
+    "level": 2,
+    "itemId": "tm-captivate"
+  },
+  {
+    "formId": "125",
+    "level": 1,
+    "itemId": "tm-thunder-shock"
+  },
+  {
+    "formId": "125",
+    "level": 2,
+    "itemId": "tm-thunder-punch"
+  },
+  {
+    "formId": "126",
+    "level": 2,
+    "itemId": "tm-fire-punch"
+  },
+  {
+    "formId": "127",
+    "level": 2,
+    "itemId": "tm-flail"
+  },
+  {
+    "formId": "128",
+    "level": 2,
+    "itemId": "tm-stomp"
+  },
+  {
+    "formId": "129",
+    "level": 1,
+    "itemId": "tm-splash"
+  },
+  {
+    "formId": "131",
+    "level": 2,
+    "itemId": "tm-chilling-water"
+  },
+  {
+    "formId": "132",
+    "level": 1,
+    "itemId": "tm-transform"
+  },
+  {
+    "formId": "133",
+    "level": 3,
+    "itemId": "tm-veevee-volley"
+  },
+  {
+    "formId": "133",
+    "level": 5,
+    "itemId": "tm-bouncy-bubble"
+  },
+  {
+    "formId": "133",
+    "level": 5,
+    "itemId": "tm-buzzy-buzz"
+  },
+  {
+    "formId": "133",
+    "level": 5,
+    "itemId": "tm-freezy-frost"
+  },
+  {
+    "formId": "133",
+    "level": 5,
+    "itemId": "tm-glitzy-glow"
+  },
+  {
+    "formId": "133",
+    "level": 5,
+    "itemId": "tm-sizzly-slide"
+  },
+  {
+    "formId": "133",
+    "level": 5,
+    "itemId": "tm-sparkly-swirl"
+  },
+  {
+    "formId": "134",
+    "level": 2,
+    "itemId": "tm-aqua-tail"
+  },
+  {
+    "formId": "137",
+    "level": 3,
+    "itemId": "tm-conversion"
+  },
+  {
+    "formId": "139",
+    "level": 2,
+    "itemId": "tm-rock-blast"
+  },
+  {
+    "formId": "142",
+    "level": 2,
+    "itemId": "tm-ancient-power"
+  },
+  {
+    "formId": "143",
+    "level": 3,
+    "itemId": "tm-snore"
+  },
+  {
+    "formId": "144",
+    "level": 3,
+    "itemId": "tm-ice-beam"
+  },
+  {
+    "formId": "145",
+    "level": 3,
+    "itemId": "tm-thunderbolt"
+  },
+  {
+    "formId": "146",
+    "level": 3,
+    "itemId": "tm-flamethrower"
+  },
+  {
+    "formId": "147",
+    "level": 1,
+    "itemId": "tm-wrap"
+  },
+  {
+    "formId": "148",
+    "level": 1,
+    "itemId": "tm-slam"
+  },
+  {
+    "formId": "149",
+    "level": 5,
+    "itemId": "tm-hyper-beam"
+  },
+  {
+    "formId": "150",
+    "level": 1,
+    "itemId": "tm-recover"
+  },
+  {
+    "formId": "150",
+    "level": 5,
+    "itemId": "tm-psystrike"
+  },
+  {
+    "formId": "152",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "152",
+    "level": 1,
+    "itemId": "tm-razor-leaf"
+  },
+  {
+    "formId": "152",
+    "level": 1,
+    "itemId": "tm-vine-whip"
+  },
+  {
+    "formId": "153",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "153",
+    "level": 1,
+    "itemId": "tm-razor-leaf"
+  },
+  {
+    "formId": "153",
+    "level": 1,
+    "itemId": "tm-vine-whip"
+  },
+  {
+    "formId": "154",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "154",
+    "level": 1,
+    "itemId": "tm-razor-leaf"
+  },
+  {
+    "formId": "154",
+    "level": 1,
+    "itemId": "tm-vine-whip"
+  },
+  {
+    "formId": "154",
+    "level": 5,
+    "itemId": "tm-frenzy-plant"
+  },
+  {
+    "formId": "155",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "155",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "155",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "156",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "156",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "156",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "157",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "157",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "157",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "157",
+    "level": 5,
+    "itemId": "tm-blast-burn"
+  },
+  {
+    "formId": "158",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "158",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "159",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "159",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "160",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "160",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "161",
+    "level": 2,
+    "itemId": "tm-trick"
+  },
+  {
+    "formId": "164",
+    "level": 3,
+    "itemId": "tm-tailwind"
+  },
+  {
+    "formId": "165",
+    "level": 1,
+    "itemId": "tm-infestation"
+  },
+  {
+    "formId": "167",
+    "level": 3,
+    "itemId": "tm-toxic-thread"
+  },
+  {
+    "formId": "168",
+    "level": 1,
+    "itemId": "tm-spider-web"
+  },
+  {
+    "formId": "169",
+    "level": 2,
+    "itemId": "tm-acrobatics"
+  },
+  {
+    "formId": "171",
+    "level": 1,
+    "itemId": "tm-eerie-impulse"
+  },
+  {
+    "formId": "172",
+    "level": 4,
+    "itemId": "tm-volt-tackle"
+  },
+  {
+    "formId": "176",
+    "level": 2,
+    "itemId": "tm-magic-coat"
+  },
+  {
+    "formId": "177",
+    "level": 1,
+    "itemId": "tm-stored-power"
+  },
+  {
+    "formId": "178",
+    "level": 1,
+    "itemId": "tm-miracle-eye"
+  },
+  {
+    "formId": "179",
+    "level": 1,
+    "itemId": "tm-cotton-spore"
+  },
+  {
+    "formId": "182",
+    "level": 3,
+    "itemId": "tm-mega-drain"
+  },
+  {
+    "formId": "183",
+    "level": 1,
+    "itemId": "tm-return"
+  },
+  {
+    "formId": "185",
+    "level": 2,
+    "itemId": "tm-tearful-look"
+  },
+  {
+    "formId": "188",
+    "level": 3,
+    "itemId": "tm-synthesis"
+  },
+  {
+    "formId": "189",
+    "level": 2,
+    "itemId": "tm-bounce"
+  },
+  {
+    "formId": "190",
+    "level": 1,
+    "itemId": "tm-switcheroo"
+  },
+  {
+    "formId": "190",
+    "level": 2,
+    "itemId": "tm-tail-slap"
+  },
+  {
+    "formId": "191",
+    "level": 2,
+    "itemId": "tm-grass-knot"
+  },
+  {
+    "formId": "192",
+    "level": 1,
+    "itemId": "tm-worry-seed"
+  },
+  {
+    "formId": "193",
+    "level": 1,
+    "itemId": "tm-air-cutter"
+  },
+  {
+    "formId": "198",
+    "level": 4,
+    "itemId": "tm-perish-song"
+  },
+  {
+    "formId": "199",
+    "level": 2,
+    "itemId": "tm-psych-up"
+  },
+  {
+    "formId": "203",
+    "level": 2,
+    "itemId": "tm-twin-beam"
+  },
+  {
+    "formId": "204",
+    "level": 1,
+    "itemId": "tm-spikes"
+  },
+  {
+    "formId": "205",
+    "level": 1,
+    "itemId": "tm-mirror-shot"
+  },
+  {
+    "formId": "206",
+    "level": 4,
+    "itemId": "tm-trump-card"
+  },
+  {
+    "formId": "207",
+    "level": 2,
+    "itemId": "tm-poison-jab"
+  },
+  {
+    "formId": "208",
+    "level": 2,
+    "itemId": "tm-autotomize"
+  },
+  {
+    "formId": "209",
+    "level": 1,
+    "itemId": "tm-growl"
+  },
+  {
+    "formId": "210",
+    "level": 2,
+    "itemId": "tm-taunt"
+  },
+  {
+    "formId": "211",
+    "level": 1,
+    "itemId": "tm-pin-missile"
+  },
+  {
+    "formId": "212",
+    "level": 2,
+    "itemId": "tm-bullet-punch"
+  },
+  {
+    "formId": "213",
+    "level": 1,
+    "itemId": "tm-gastro-acid"
+  },
+  {
+    "formId": "214",
+    "level": 3,
+    "itemId": "tm-megahorn"
+  },
+  {
+    "formId": "215",
+    "level": 2,
+    "itemId": "tm-pursuit"
+  },
+  {
+    "formId": "216",
+    "level": 1,
+    "itemId": "tm-play-nice"
+  },
+  {
+    "formId": "219",
+    "level": 1,
+    "itemId": "tm-incinerate"
+  },
+  {
+    "formId": "221",
+    "level": 3,
+    "itemId": "tm-freeze-dry"
+  },
+  {
+    "formId": "222",
+    "level": 2,
+    "itemId": "tm-aqua-ring"
+  },
+  {
+    "formId": "224",
+    "level": 1,
+    "itemId": "tm-lock-on"
+  },
+  {
+    "formId": "224",
+    "level": 2,
+    "itemId": "tm-octazooka"
+  },
+  {
+    "formId": "225",
+    "level": 2,
+    "itemId": "tm-present"
+  },
+  {
+    "formId": "226",
+    "level": 3,
+    "itemId": "tm-liquidation"
+  },
+  {
+    "formId": "227",
+    "level": 2,
+    "itemId": "tm-steel-wing"
+  },
+  {
+    "formId": "228",
+    "level": 2,
+    "itemId": "tm-snarl"
+  },
+  {
+    "formId": "229",
+    "level": 2,
+    "itemId": "tm-crunch"
+  },
+  {
+    "formId": "232",
+    "level": 2,
+    "itemId": "tm-bulldoze"
+  },
+  {
+    "formId": "233",
+    "level": 2,
+    "itemId": "tm-conversion-2"
+  },
+  {
+    "formId": "234",
+    "level": 3,
+    "itemId": "tm-psyshield-bash"
+  },
+  {
+    "formId": "235",
+    "level": 3,
+    "itemId": "tm-sketch"
+  },
+  {
+    "formId": "236",
+    "level": 1,
+    "itemId": "tm-mind-reader"
+  },
+  {
+    "formId": "237",
+    "level": 1,
+    "itemId": "tm-triple-kick"
+  },
+  {
+    "formId": "237",
+    "level": 2,
+    "itemId": "tm-rolling-kick"
+  },
+  {
+    "formId": "238",
+    "level": 1,
+    "itemId": "tm-lovely-kiss"
+  },
+  {
+    "formId": "239",
+    "level": 3,
+    "itemId": "tm-meditate"
+  },
+  {
+    "formId": "240",
+    "level": 3,
+    "itemId": "tm-flame-wheel"
+  },
+  {
+    "formId": "241",
+    "level": 1,
+    "itemId": "tm-milk-drink"
+  },
+  {
+    "formId": "242",
+    "level": 1,
+    "itemId": "tm-refresh"
+  },
+  {
+    "formId": "243",
+    "level": 3,
+    "itemId": "tm-thunder"
+  },
+  {
+    "formId": "244",
+    "level": 3,
+    "itemId": "tm-flare-blitz"
+  },
+  {
+    "formId": "246",
+    "level": 2,
+    "itemId": "tm-chip-away"
+  },
+  {
+    "formId": "248",
+    "level": 2,
+    "itemId": "tm-lash-out"
+  },
+  {
+    "formId": "249",
+    "level": 1,
+    "itemId": "tm-safeguard"
+  },
+  {
+    "formId": "249",
+    "level": 3,
+    "itemId": "tm-aeroblast"
+  },
+  {
+    "formId": "250",
+    "level": 3,
+    "itemId": "tm-sacred-fire"
+  },
+  {
+    "formId": "252",
+    "level": 1,
+    "itemId": "tm-absorb"
+  },
+  {
+    "formId": "252",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "253",
+    "level": 1,
+    "itemId": "tm-absorb"
+  },
+  {
+    "formId": "253",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "254",
+    "level": 1,
+    "itemId": "tm-absorb"
+  },
+  {
+    "formId": "254",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "254",
+    "level": 5,
+    "itemId": "tm-frenzy-plant"
+  },
+  {
+    "formId": "255",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "255",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "255",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "256",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "256",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "256",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "257",
+    "level": 3,
+    "itemId": "tm-blaze-kick"
+  },
+  {
+    "formId": "257",
+    "level": 5,
+    "itemId": "tm-blast-burn"
+  },
+  {
+    "formId": "258",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "258",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "259",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "259",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "260",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "260",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "260",
+    "level": 4,
+    "itemId": "tm-hydro-cannon"
+  },
+  {
+    "formId": "261",
+    "level": 1,
+    "itemId": "tm-howl"
+  },
+  {
+    "formId": "262",
+    "level": 2,
+    "itemId": "tm-payback"
+  },
+  {
+    "formId": "263",
+    "level": 4,
+    "itemId": "tm-extreme-speed"
+  },
+  {
+    "formId": "265",
+    "level": 1,
+    "itemId": "tm-bug-bite"
+  },
+  {
+    "formId": "269",
+    "level": 1,
+    "itemId": "tm-silver-wind"
+  },
+  {
+    "formId": "272",
+    "level": 2,
+    "itemId": "tm-trailblaze"
+  },
+  {
+    "formId": "273",
+    "level": 3,
+    "itemId": "tm-bullet-seed"
+  },
+  {
+    "formId": "274",
+    "level": 2,
+    "itemId": "tm-leaf-blade"
+  },
+  {
+    "formId": "275",
+    "level": 4,
+    "itemId": "tm-endeavor"
+  },
+  {
+    "formId": "277",
+    "level": 1,
+    "itemId": "tm-aerial-ace"
+  },
+  {
+    "formId": "278",
+    "level": 1,
+    "itemId": "tm-wing-attack"
+  },
+  {
+    "formId": "279",
+    "level": 2,
+    "itemId": "tm-water-sport"
+  },
+  {
+    "formId": "280",
+    "level": 2,
+    "itemId": "tm-magic-room"
+  },
+  {
+    "formId": "281",
+    "level": 1,
+    "itemId": "tm-light-screen"
+  },
+  {
+    "formId": "283",
+    "level": 1,
+    "itemId": "tm-pounce"
+  },
+  {
+    "formId": "284",
+    "level": 3,
+    "itemId": "tm-quiver-dance"
+  },
+  {
+    "formId": "285",
+    "level": 2,
+    "itemId": "tm-spore"
+  },
+  {
+    "formId": "286",
+    "level": 2,
+    "itemId": "tm-force-palm"
+  },
+  {
+    "formId": "288",
+    "level": 1,
+    "itemId": "tm-retaliate"
+  },
+  {
+    "formId": "289",
+    "level": 2,
+    "itemId": "tm-slack-off"
+  },
+  {
+    "formId": "290",
+    "level": 1,
+    "itemId": "tm-struggle-bug"
+  },
+  {
+    "formId": "291",
+    "level": 1,
+    "itemId": "tm-fury-cutter"
+  },
+  {
+    "formId": "292",
+    "level": 1,
+    "itemId": "tm-grudge"
+  },
+  {
+    "formId": "293",
+    "level": 2,
+    "itemId": "tm-disarming-voice"
+  },
+  {
+    "formId": "294",
+    "level": 2,
+    "itemId": "tm-echoed-voice"
+  },
+  {
+    "formId": "295",
+    "level": 3,
+    "itemId": "tm-hyper-voice"
+  },
+  {
+    "formId": "296",
+    "level": 1,
+    "itemId": "tm-arm-thrust"
+  },
+  {
+    "formId": "296",
+    "level": 1,
+    "itemId": "tm-feint"
+  },
+  {
+    "formId": "297",
+    "level": 3,
+    "itemId": "tm-belly-drum"
+  },
+  {
+    "formId": "298",
+    "level": 1,
+    "itemId": "tm-charm"
+  },
+  {
+    "formId": "299",
+    "level": 2,
+    "itemId": "tm-rock-throw"
+  },
+  {
+    "formId": "300",
+    "level": 1,
+    "itemId": "tm-tickle"
+  },
+  {
+    "formId": "302",
+    "level": 1,
+    "itemId": "tm-quash"
+  },
+  {
+    "formId": "303",
+    "level": 2,
+    "itemId": "tm-iron-head"
+  },
+  {
+    "formId": "305",
+    "level": 1,
+    "itemId": "tm-iron-defense"
+  },
+  {
+    "formId": "306",
+    "level": 2,
+    "itemId": "tm-smart-strike"
+  },
+  {
+    "formId": "307",
+    "level": 1,
+    "itemId": "tm-foresight"
+  },
+  {
+    "formId": "308",
+    "level": 2,
+    "itemId": "tm-work-up"
+  },
+  {
+    "formId": "310",
+    "level": 2,
+    "itemId": "tm-thunder-fang"
+  },
+  {
+    "formId": "311",
+    "level": 1,
+    "itemId": "tm-lucky-chant"
+  },
+  {
+    "formId": "311",
+    "level": 2,
+    "itemId": "tm-baton-pass"
+  },
+  {
+    "formId": "312",
+    "level": 1,
+    "itemId": "tm-lucky-chant"
+  },
+  {
+    "formId": "312",
+    "level": 2,
+    "itemId": "tm-baton-pass"
+  },
+  {
+    "formId": "313",
+    "level": 2,
+    "itemId": "tm-tail-glow"
+  },
+  {
+    "formId": "317",
+    "level": 2,
+    "itemId": "tm-spit-up"
+  },
+  {
+    "formId": "319",
+    "level": 1,
+    "itemId": "tm-aqua-jet"
+  },
+  {
+    "formId": "320",
+    "level": 4,
+    "itemId": "tm-water-spout"
+  },
+  {
+    "formId": "321",
+    "level": 1,
+    "itemId": "tm-soak"
+  },
+  {
+    "formId": "322",
+    "level": 4,
+    "itemId": "tm-scorching-sands"
+  },
+  {
+    "formId": "323",
+    "level": 3,
+    "itemId": "tm-lava-plume"
+  },
+  {
+    "formId": "324",
+    "level": 2,
+    "itemId": "tm-smog"
+  },
+  {
+    "formId": "325",
+    "level": 2,
+    "itemId": "tm-psybeam"
+  },
+  {
+    "formId": "327",
+    "level": 3,
+    "itemId": "tm-dizzy-punch"
+  },
+  {
+    "formId": "327",
+    "level": 3,
+    "itemId": "tm-teeter-dance"
+  },
+  {
+    "formId": "327",
+    "level": 4,
+    "itemId": "tm-assist"
+  },
+  {
+    "formId": "328",
+    "level": 2,
+    "itemId": "tm-sand-tomb"
+  },
+  {
+    "formId": "330",
+    "level": 3,
+    "itemId": "tm-dragon-dance"
+  },
+  {
+    "formId": "331",
+    "level": 2,
+    "itemId": "tm-power-trip"
+  },
+  {
+    "formId": "332",
+    "level": 2,
+    "itemId": "tm-spiky-shield"
+  },
+  {
+    "formId": "332",
+    "level": 4,
+    "itemId": "tm-needle-arm"
+  },
+  {
+    "formId": "333",
+    "level": 1,
+    "itemId": "tm-roost"
+  },
+  {
+    "formId": "334",
+    "level": 2,
+    "itemId": "tm-alluring-voice"
+  },
+  {
+    "formId": "335",
+    "level": 1,
+    "itemId": "tm-hone-claws"
+  },
+  {
+    "formId": "336",
+    "level": 1,
+    "itemId": "tm-thief"
+  },
+  {
+    "formId": "337",
+    "level": 2,
+    "itemId": "tm-moonlight"
+  },
+  {
+    "formId": "340",
+    "level": 3,
+    "itemId": "tm-muddy-water"
+  },
+  {
+    "formId": "342",
+    "level": 2,
+    "itemId": "tm-crabhammer"
+  },
+  {
+    "formId": "343",
+    "level": 2,
+    "itemId": "tm-cosmic-power"
+  },
+  {
+    "formId": "344",
+    "level": 3,
+    "itemId": "tm-psyshock"
+  },
+  {
+    "formId": "346",
+    "level": 2,
+    "itemId": "tm-rock-tomb"
+  },
+  {
+    "formId": "348",
+    "level": 2,
+    "itemId": "tm-crush-claw"
+  },
+  {
+    "formId": "350",
+    "level": 2,
+    "itemId": "tm-dragon-tail"
+  },
+  {
+    "formId": "351",
+    "level": 2,
+    "itemId": "tm-weather-ball"
+  },
+  {
+    "formId": "352",
+    "level": 3,
+    "itemId": "tm-camouflage"
+  },
+  {
+    "formId": "353",
+    "level": 1,
+    "itemId": "tm-spite"
+  },
+  {
+    "formId": "354",
+    "level": 1,
+    "itemId": "tm-screech"
+  },
+  {
+    "formId": "355",
+    "level": 1,
+    "itemId": "tm-will-o-wisp"
+  },
+  {
+    "formId": "356",
+    "level": 2,
+    "itemId": "tm-nightmare"
+  },
+  {
+    "formId": "357",
+    "level": 3,
+    "itemId": "tm-leaf-tornado"
+  },
+  {
+    "formId": "358",
+    "level": 2,
+    "itemId": "tm-psychic-noise"
+  },
+  {
+    "formId": "359",
+    "level": 2,
+    "itemId": "tm-dark-pulse"
+  },
+  {
+    "formId": "361",
+    "level": 1,
+    "itemId": "tm-ice-shard"
+  },
+  {
+    "formId": "362",
+    "level": 5,
+    "itemId": "tm-sheer-cold"
+  },
+  {
+    "formId": "363",
+    "level": 1,
+    "itemId": "tm-ice-ball"
+  },
+  {
+    "formId": "365",
+    "level": 2,
+    "itemId": "tm-ice-fang"
+  },
+  {
+    "formId": "366",
+    "level": 2,
+    "itemId": "tm-clamp"
+  },
+  {
+    "formId": "367",
+    "level": 3,
+    "itemId": "tm-coil"
+  },
+  {
+    "formId": "368",
+    "level": 3,
+    "itemId": "tm-coil"
+  },
+  {
+    "formId": "369",
+    "level": 3,
+    "itemId": "tm-magnitude"
+  },
+  {
+    "formId": "370",
+    "level": 2,
+    "itemId": "tm-heal-pulse"
+  },
+  {
+    "formId": "373",
+    "level": 3,
+    "itemId": "tm-dragon-pulse"
+  },
+  {
+    "formId": "375",
+    "level": 2,
+    "itemId": "tm-future-sight"
+  },
+  {
+    "formId": "376",
+    "level": 3,
+    "itemId": "tm-meteor-mash"
+  },
+  {
+    "formId": "377",
+    "level": 3,
+    "itemId": "tm-endure"
+  },
+  {
+    "formId": "378",
+    "level": 2,
+    "itemId": "tm-ice-punch"
+  },
+  {
+    "formId": "379",
+    "level": 3,
+    "itemId": "tm-flash-cannon"
+  },
+  {
+    "formId": "380",
+    "level": 3,
+    "itemId": "tm-mist-ball"
+  },
+  {
+    "formId": "380",
+    "level": 3,
+    "itemId": "tm-twister"
+  },
+  {
+    "formId": "381",
+    "level": 3,
+    "itemId": "tm-luster-purge"
+  },
+  {
+    "formId": "381",
+    "level": 3,
+    "itemId": "tm-twister"
+  },
+  {
+    "formId": "383",
+    "level": 2,
+    "itemId": "tm-eruption"
+  },
+  {
+    "formId": "383",
+    "level": 4,
+    "itemId": "tm-precipice-blades"
+  },
+  {
+    "formId": "384",
+    "level": 3,
+    "itemId": "tm-dragon-ascent"
+  },
+  {
+    "formId": "385",
+    "level": 3,
+    "itemId": "tm-doom-desire"
+  },
+  {
+    "formId": "385",
+    "level": 3,
+    "itemId": "tm-wish"
+  },
+  {
+    "formId": "386",
+    "level": 3,
+    "itemId": "tm-psycho-boost"
+  },
+  {
+    "formId": "387",
+    "level": 1,
+    "itemId": "tm-absorb"
+  },
+  {
+    "formId": "387",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "387",
+    "level": 1,
+    "itemId": "tm-razor-leaf"
+  },
+  {
+    "formId": "388",
+    "level": 1,
+    "itemId": "tm-absorb"
+  },
+  {
+    "formId": "388",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "388",
+    "level": 1,
+    "itemId": "tm-razor-leaf"
+  },
+  {
+    "formId": "389",
+    "level": 1,
+    "itemId": "tm-absorb"
+  },
+  {
+    "formId": "389",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "389",
+    "level": 1,
+    "itemId": "tm-razor-leaf"
+  },
+  {
+    "formId": "389",
+    "level": 5,
+    "itemId": "tm-frenzy-plant"
+  },
+  {
+    "formId": "390",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "390",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "390",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "391",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "391",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "391",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "392",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "392",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "392",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "392",
+    "level": 5,
+    "itemId": "tm-blast-burn"
+  },
+  {
+    "formId": "393",
+    "level": 1,
+    "itemId": "tm-bubble"
+  },
+  {
+    "formId": "393",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "393",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "394",
+    "level": 1,
+    "itemId": "tm-bubble"
+  },
+  {
+    "formId": "394",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "394",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "395",
+    "level": 1,
+    "itemId": "tm-bubble"
+  },
+  {
+    "formId": "395",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "395",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "396",
+    "level": 1,
+    "itemId": "tm-pluck"
+  },
+  {
+    "formId": "398",
+    "level": 3,
+    "itemId": "tm-brave-bird"
+  },
+  {
+    "formId": "403",
+    "level": 2,
+    "itemId": "tm-rising-voltage"
+  },
+  {
+    "formId": "404",
+    "level": 2,
+    "itemId": "tm-volt-switch"
+  },
+  {
+    "formId": "406",
+    "level": 2,
+    "itemId": "tm-life-dew"
+  },
+  {
+    "formId": "407",
+    "level": 2,
+    "itemId": "tm-aromatherapy"
+  },
+  {
+    "formId": "409",
+    "level": 2,
+    "itemId": "tm-thrash"
+  },
+  {
+    "formId": "410",
+    "level": 2,
+    "itemId": "tm-guard-split"
+  },
+  {
+    "formId": "411",
+    "level": 2,
+    "itemId": "tm-block"
+  },
+  {
+    "formId": "411",
+    "level": 2,
+    "itemId": "tm-heavy-slam"
+  },
+  {
+    "formId": "416",
+    "level": 2,
+    "itemId": "tm-attack-order"
+  },
+  {
+    "formId": "416",
+    "level": 2,
+    "itemId": "tm-defend-order"
+  },
+  {
+    "formId": "416",
+    "level": 3,
+    "itemId": "tm-heal-order"
+  },
+  {
+    "formId": "417",
+    "level": 2,
+    "itemId": "tm-spark"
+  },
+  {
+    "formId": "421",
+    "level": 1,
+    "itemId": "tm-morning-sun"
+  },
+  {
+    "formId": "423",
+    "level": 3,
+    "itemId": "tm-brine"
+  },
+  {
+    "formId": "425",
+    "level": 1,
+    "itemId": "tm-ominous-wind"
+  },
+  {
+    "formId": "426",
+    "level": 3,
+    "itemId": "tm-shadow-ball"
+  },
+  {
+    "formId": "427",
+    "level": 1,
+    "itemId": "tm-baby-doll-eyes"
+  },
+  {
+    "formId": "428",
+    "level": 3,
+    "itemId": "tm-mega-kick"
+  },
+  {
+    "formId": "428",
+    "level": 3,
+    "itemId": "tm-play-rough"
+  },
+  {
+    "formId": "433",
+    "level": 4,
+    "itemId": "tm-heal-bell"
+  },
+  {
+    "formId": "434",
+    "level": 2,
+    "itemId": "tm-corrosive-gas"
+  },
+  {
+    "formId": "435",
+    "level": 3,
+    "itemId": "tm-toxic"
+  },
+  {
+    "formId": "436",
+    "level": 2,
+    "itemId": "tm-gyro-ball"
+  },
+  {
+    "formId": "437",
+    "level": 2,
+    "itemId": "tm-hard-press"
+  },
+  {
+    "formId": "439",
+    "level": 2,
+    "itemId": "tm-mimic"
+  },
+  {
+    "formId": "440",
+    "level": 2,
+    "itemId": "tm-sweet-kiss"
+  },
+  {
+    "formId": "441",
+    "level": 2,
+    "itemId": "tm-chatter"
+  },
+  {
+    "formId": "442",
+    "level": 1,
+    "itemId": "tm-memento"
+  },
+  {
+    "formId": "445",
+    "level": 3,
+    "itemId": "tm-dragon-claw"
+  },
+  {
+    "formId": "448",
+    "level": 2,
+    "itemId": "tm-aura-sphere"
+  },
+  {
+    "formId": "449",
+    "level": 2,
+    "itemId": "tm-mud-bomb"
+  },
+  {
+    "formId": "452",
+    "level": 2,
+    "itemId": "tm-cross-poison"
+  },
+  {
+    "formId": "453",
+    "level": 1,
+    "itemId": "tm-vacuum-wave"
+  },
+  {
+    "formId": "454",
+    "level": 1,
+    "itemId": "tm-sucker-punch"
+  },
+  {
+    "formId": "455",
+    "level": 3,
+    "itemId": "tm-magical-leaf"
+  },
+  {
+    "formId": "459",
+    "level": 2,
+    "itemId": "tm-powder-snow"
+  },
+  {
+    "formId": "460",
+    "level": 3,
+    "itemId": "tm-mist"
+  },
+  {
+    "formId": "461",
+    "level": 1,
+    "itemId": "tm-false-swipe"
+  },
+  {
+    "formId": "462",
+    "level": 3,
+    "itemId": "tm-magnet-bomb"
+  },
+  {
+    "formId": "464",
+    "level": 3,
+    "itemId": "tm-drill-run"
+  },
+  {
+    "formId": "465",
+    "level": 3,
+    "itemId": "tm-bind"
+  },
+  {
+    "formId": "468",
+    "level": 2,
+    "itemId": "tm-extrasensory"
+  },
+  {
+    "formId": "469",
+    "level": 1,
+    "itemId": "tm-bug-buzz"
+  },
+  {
+    "formId": "472",
+    "level": 2,
+    "itemId": "tm-sky-uppercut"
+  },
+  {
+    "formId": "473",
+    "level": 4,
+    "itemId": "tm-earthquake"
+  },
+  {
+    "formId": "475",
+    "level": 2,
+    "itemId": "tm-reversal"
+  },
+  {
+    "formId": "476",
+    "level": 4,
+    "itemId": "tm-steel-beam"
+  },
+  {
+    "formId": "477",
+    "level": 3,
+    "itemId": "tm-phantom-force"
+  },
+  {
+    "formId": "478",
+    "level": 3,
+    "itemId": "tm-ice-spinner"
+  },
+  {
+    "formId": "479",
+    "level": 1,
+    "itemId": "tm-electric-terrain"
+  },
+  {
+    "formId": "480",
+    "level": 3,
+    "itemId": "tm-mystical-power"
+  },
+  {
+    "formId": "481",
+    "level": 3,
+    "itemId": "tm-mystical-power"
+  },
+  {
+    "formId": "482",
+    "level": 3,
+    "itemId": "tm-mystical-power"
+  },
+  {
+    "formId": "483",
+    "level": 3,
+    "itemId": "tm-roar-of-time"
+  },
+  {
+    "formId": "484",
+    "level": 3,
+    "itemId": "tm-spacial-rend"
+  },
+  {
+    "formId": "485",
+    "level": 3,
+    "itemId": "tm-magma-storm"
+  },
+  {
+    "formId": "486",
+    "level": 3,
+    "itemId": "tm-facade"
+  },
+  {
+    "formId": "486",
+    "level": 3,
+    "itemId": "tm-protect"
+  },
+  {
+    "formId": "486",
+    "level": 4,
+    "itemId": "tm-crush-grip"
+  },
+  {
+    "formId": "487",
+    "level": 3,
+    "itemId": "tm-shadow-force"
+  },
+  {
+    "formId": "488",
+    "level": 3,
+    "itemId": "tm-lunar-blessing"
+  },
+  {
+    "formId": "488",
+    "level": 3,
+    "itemId": "tm-moonblast"
+  },
+  {
+    "formId": "489",
+    "level": 3,
+    "itemId": "tm-take-heart"
+  },
+  {
+    "formId": "490",
+    "level": 3,
+    "itemId": "tm-heart-swap"
+  },
+  {
+    "formId": "491",
+    "level": 3,
+    "itemId": "tm-dark-void"
+  },
+  {
+    "formId": "492",
+    "level": 3,
+    "itemId": "tm-seed-flare"
+  },
+  {
+    "formId": "493",
+    "level": 1,
+    "itemId": "tm-judgment"
+  },
+  {
+    "formId": "494",
+    "level": 3,
+    "itemId": "tm-searing-shot"
+  },
+  {
+    "formId": "494",
+    "level": 5,
+    "itemId": "tm-v-create"
+  },
+  {
+    "formId": "495",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "495",
+    "level": 1,
+    "itemId": "tm-vine-whip"
+  },
+  {
+    "formId": "496",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "496",
+    "level": 1,
+    "itemId": "tm-vine-whip"
+  },
+  {
+    "formId": "497",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "497",
+    "level": 1,
+    "itemId": "tm-vine-whip"
+  },
+  {
+    "formId": "497",
+    "level": 5,
+    "itemId": "tm-frenzy-plant"
+  },
+  {
+    "formId": "498",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "498",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "498",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "499",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "499",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "499",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "500",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "500",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "500",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "500",
+    "level": 3,
+    "itemId": "tm-heat-crash"
+  },
+  {
+    "formId": "500",
+    "level": 5,
+    "itemId": "tm-blast-burn"
+  },
+  {
+    "formId": "501",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "501",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "502",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "502",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "502",
+    "level": 3,
+    "itemId": "tm-razor-shell"
+  },
+  {
+    "formId": "503",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "503",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "503",
+    "level": 4,
+    "itemId": "tm-aqua-cutter"
+  },
+  {
+    "formId": "506",
+    "level": 1,
+    "itemId": "tm-odor-sleuth"
+  },
+  {
+    "formId": "508",
+    "level": 4,
+    "itemId": "tm-last-resort"
+  },
+  {
+    "formId": "509",
+    "level": 1,
+    "itemId": "tm-feint-attack"
+  },
+  {
+    "formId": "512",
+    "level": 3,
+    "itemId": "tm-grass-pledge"
+  },
+  {
+    "formId": "513",
+    "level": 1,
+    "itemId": "tm-fire-pledge"
+  },
+  {
+    "formId": "516",
+    "level": 3,
+    "itemId": "tm-water-pledge"
+  },
+  {
+    "formId": "517",
+    "level": 1,
+    "itemId": "tm-sleep-talk"
+  },
+  {
+    "formId": "520",
+    "level": 2,
+    "itemId": "tm-razor-wind"
+  },
+  {
+    "formId": "521",
+    "level": 2,
+    "itemId": "tm-air-slash"
+  },
+  {
+    "formId": "522",
+    "level": 2,
+    "itemId": "tm-shock-wave"
+  },
+  {
+    "formId": "524",
+    "level": 2,
+    "itemId": "tm-gravity"
+  },
+  {
+    "formId": "526",
+    "level": 2,
+    "itemId": "tm-stealth-rock"
+  },
+  {
+    "formId": "527",
+    "level": 2,
+    "itemId": "tm-heart-stamp"
+  },
+  {
+    "formId": "528",
+    "level": 2,
+    "itemId": "tm-psycho-cut"
+  },
+  {
+    "formId": "530",
+    "level": 2,
+    "itemId": "tm-metal-claw"
+  },
+  {
+    "formId": "531",
+    "level": 3,
+    "itemId": "tm-bestow"
+  },
+  {
+    "formId": "532",
+    "level": 1,
+    "itemId": "tm-smelling-salts"
+  },
+  {
+    "formId": "533",
+    "level": 3,
+    "itemId": "tm-low-sweep"
+  },
+  {
+    "formId": "534",
+    "level": 2,
+    "itemId": "tm-brick-break"
+  },
+  {
+    "formId": "537",
+    "level": 3,
+    "itemId": "tm-scald"
+  },
+  {
+    "formId": "538",
+    "level": 1,
+    "itemId": "tm-coaching"
+  },
+  {
+    "formId": "538",
+    "level": 2,
+    "itemId": "tm-mat-block"
+  },
+  {
+    "formId": "539",
+    "level": 1,
+    "itemId": "tm-coaching"
+  },
+  {
+    "formId": "540",
+    "level": 3,
+    "itemId": "tm-skitter-smack"
+  },
+  {
+    "formId": "541",
+    "level": 3,
+    "itemId": "tm-grass-whistle"
+  },
+  {
+    "formId": "542",
+    "level": 2,
+    "itemId": "tm-x-scissor"
+  },
+  {
+    "formId": "543",
+    "level": 2,
+    "itemId": "tm-venoshock"
+  },
+  {
+    "formId": "544",
+    "level": 2,
+    "itemId": "tm-steamroller"
+  },
+  {
+    "formId": "545",
+    "level": 2,
+    "itemId": "tm-poison-tail"
+  },
+  {
+    "formId": "546",
+    "level": 2,
+    "itemId": "tm-cotton-guard"
+  },
+  {
+    "formId": "549",
+    "level": 4,
+    "itemId": "tm-petal-dance"
+  },
+  {
+    "formId": "552",
+    "level": 1,
+    "itemId": "tm-swagger"
+  },
+  {
+    "formId": "553",
+    "level": 3,
+    "itemId": "tm-throat-chop"
+  },
+  {
+    "formId": "554",
+    "level": 4,
+    "itemId": "tm-substitute"
+  },
+  {
+    "formId": "555",
+    "level": 4,
+    "itemId": "tm-overheat"
+  },
+  {
+    "formId": "556",
+    "level": 3,
+    "itemId": "tm-acupressure"
+  },
+  {
+    "formId": "557",
+    "level": 5,
+    "itemId": "tm-rock-wrecker"
+  },
+  {
+    "formId": "558",
+    "level": 2,
+    "itemId": "tm-shell-smash"
+  },
+  {
+    "formId": "559",
+    "level": 1,
+    "itemId": "tm-fake-out"
+  },
+  {
+    "formId": "560",
+    "level": 2,
+    "itemId": "tm-revenge"
+  },
+  {
+    "formId": "561",
+    "level": 2,
+    "itemId": "tm-psycho-shift"
+  },
+  {
+    "formId": "562",
+    "level": 2,
+    "itemId": "tm-night-shade"
+  },
+  {
+    "formId": "563",
+    "level": 2,
+    "itemId": "tm-crafty-shield"
+  },
+  {
+    "formId": "567",
+    "level": 2,
+    "itemId": "tm-smack-down"
+  },
+  {
+    "formId": "568",
+    "level": 1,
+    "itemId": "tm-sludge"
+  },
+  {
+    "formId": "569",
+    "level": 2,
+    "itemId": "tm-recycle"
+  },
+  {
+    "formId": "570",
+    "level": 2,
+    "itemId": "tm-assurance"
+  },
+  {
+    "formId": "571",
+    "level": 3,
+    "itemId": "tm-night-daze"
+  },
+  {
+    "formId": "572",
+    "level": 2,
+    "itemId": "tm-wake-up-slap"
+  },
+  {
+    "formId": "573",
+    "level": 3,
+    "itemId": "tm-tidy-up"
+  },
+  {
+    "formId": "575",
+    "level": 2,
+    "itemId": "tm-flatter"
+  },
+  {
+    "formId": "576",
+    "level": 1,
+    "itemId": "tm-psychic-terrain"
+  },
+  {
+    "formId": "577",
+    "level": 2,
+    "itemId": "tm-heal-block"
+  },
+  {
+    "formId": "578",
+    "level": 3,
+    "itemId": "tm-pain-split"
+  },
+  {
+    "formId": "579",
+    "level": 3,
+    "itemId": "tm-psywave"
+  },
+  {
+    "formId": "581",
+    "level": 1,
+    "itemId": "tm-feather-dance"
+  },
+  {
+    "formId": "584",
+    "level": 3,
+    "itemId": "tm-icicle-crash"
+  },
+  {
+    "formId": "585",
+    "level": 2,
+    "itemId": "tm-grassy-glide"
+  },
+  {
+    "formId": "593",
+    "level": 3,
+    "itemId": "tm-dive"
+  },
+  {
+    "formId": "596",
+    "level": 2,
+    "itemId": "tm-electroweb"
+  },
+  {
+    "formId": "596",
+    "level": 2,
+    "itemId": "tm-sticky-web"
+  },
+  {
+    "formId": "599",
+    "level": 2,
+    "itemId": "tm-shift-gear"
+  },
+  {
+    "formId": "600",
+    "level": 2,
+    "itemId": "tm-gear-grind"
+  },
+  {
+    "formId": "601",
+    "level": 2,
+    "itemId": "tm-gear-up"
+  },
+  {
+    "formId": "602",
+    "level": 1,
+    "itemId": "tm-charge-beam"
+  },
+  {
+    "formId": "603",
+    "level": 2,
+    "itemId": "tm-discharge"
+  },
+  {
+    "formId": "604",
+    "level": 4,
+    "itemId": "tm-zap-cannon"
+  },
+  {
+    "formId": "605",
+    "level": 1,
+    "itemId": "tm-barrier"
+  },
+  {
+    "formId": "606",
+    "level": 3,
+    "itemId": "tm-synchronoise"
+  },
+  {
+    "formId": "608",
+    "level": 2,
+    "itemId": "tm-hex"
+  },
+  {
+    "formId": "609",
+    "level": 2,
+    "itemId": "tm-poltergeist"
+  },
+  {
+    "formId": "611",
+    "level": 3,
+    "itemId": "tm-dual-chop"
+  },
+  {
+    "formId": "612",
+    "level": 3,
+    "itemId": "tm-breaking-swipe"
+  },
+  {
+    "formId": "614",
+    "level": 2,
+    "itemId": "tm-avalanche"
+  },
+  {
+    "formId": "615",
+    "level": 2,
+    "itemId": "tm-sharpen"
+  },
+  {
+    "formId": "618",
+    "level": 2,
+    "itemId": "tm-reflect-type"
+  },
+  {
+    "formId": "619",
+    "level": 1,
+    "itemId": "tm-power-up-punch"
+  },
+  {
+    "formId": "620",
+    "level": 3,
+    "itemId": "tm-jump-kick"
+  },
+  {
+    "formId": "622",
+    "level": 2,
+    "itemId": "tm-shadow-punch"
+  },
+  {
+    "formId": "623",
+    "level": 3,
+    "itemId": "tm-dynamic-punch"
+  },
+  {
+    "formId": "624",
+    "level": 2,
+    "itemId": "tm-night-slash"
+  },
+  {
+    "formId": "625",
+    "level": 3,
+    "itemId": "tm-laser-focus"
+  },
+  {
+    "formId": "626",
+    "level": 3,
+    "itemId": "tm-head-charge"
+  },
+  {
+    "formId": "628",
+    "level": 3,
+    "itemId": "tm-dual-wingbeat"
+  },
+  {
+    "formId": "629",
+    "level": 1,
+    "itemId": "tm-fake-tears"
+  },
+  {
+    "formId": "630",
+    "level": 2,
+    "itemId": "tm-foul-play"
+  },
+  {
+    "formId": "630",
+    "level": 2,
+    "itemId": "tm-punishment"
+  },
+  {
+    "formId": "631",
+    "level": 2,
+    "itemId": "tm-flame-burst"
+  },
+  {
+    "formId": "632",
+    "level": 2,
+    "itemId": "tm-metal-burst"
+  },
+  {
+    "formId": "635",
+    "level": 3,
+    "itemId": "tm-dragon-breath"
+  },
+  {
+    "formId": "637",
+    "level": 3,
+    "itemId": "tm-fiery-dance"
+  },
+  {
+    "formId": "640",
+    "level": 4,
+    "itemId": "tm-solar-beam"
+  },
+  {
+    "formId": "641",
+    "level": 3,
+    "itemId": "tm-bleakwind-storm"
+  },
+  {
+    "formId": "642",
+    "level": 3,
+    "itemId": "tm-wildbolt-storm"
+  },
+  {
+    "formId": "643",
+    "level": 3,
+    "itemId": "tm-blue-flare"
+  },
+  {
+    "formId": "643",
+    "level": 3,
+    "itemId": "tm-fusion-flare"
+  },
+  {
+    "formId": "644",
+    "level": 3,
+    "itemId": "tm-bolt-strike"
+  },
+  {
+    "formId": "644",
+    "level": 3,
+    "itemId": "tm-fusion-bolt"
+  },
+  {
+    "formId": "645",
+    "level": 3,
+    "itemId": "tm-sandsear-storm"
+  },
+  {
+    "formId": "646",
+    "level": 3,
+    "itemId": "tm-glaciate"
+  },
+  {
+    "formId": "647",
+    "level": 2,
+    "itemId": "tm-secret-sword"
+  },
+  {
+    "formId": "648",
+    "level": 1,
+    "itemId": "tm-relic-song"
+  },
+  {
+    "formId": "649",
+    "level": 1,
+    "itemId": "tm-techno-blast"
+  },
+  {
+    "formId": "650",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "650",
+    "level": 1,
+    "itemId": "tm-vine-whip"
+  },
+  {
+    "formId": "651",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "651",
+    "level": 1,
+    "itemId": "tm-vine-whip"
+  },
+  {
+    "formId": "652",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "652",
+    "level": 1,
+    "itemId": "tm-vine-whip"
+  },
+  {
+    "formId": "652",
+    "level": 5,
+    "itemId": "tm-frenzy-plant"
+  },
+  {
+    "formId": "653",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "653",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "653",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "654",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "654",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "654",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "655",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "655",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "655",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "655",
+    "level": 3,
+    "itemId": "tm-mystical-fire"
+  },
+  {
+    "formId": "655",
+    "level": 5,
+    "itemId": "tm-blast-burn"
+  },
+  {
+    "formId": "656",
+    "level": 1,
+    "itemId": "tm-bubble"
+  },
+  {
+    "formId": "656",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "657",
+    "level": 1,
+    "itemId": "tm-bubble"
+  },
+  {
+    "formId": "657",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "658",
+    "level": 1,
+    "itemId": "tm-bubble"
+  },
+  {
+    "formId": "658",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "658",
+    "level": 4,
+    "itemId": "tm-water-shuriken"
+  },
+  {
+    "formId": "660",
+    "level": 1,
+    "itemId": "tm-rototiller"
+  },
+  {
+    "formId": "663",
+    "level": 3,
+    "itemId": "tm-heat-wave"
+  },
+  {
+    "formId": "666",
+    "level": 3,
+    "itemId": "tm-powder"
+  },
+  {
+    "formId": "668",
+    "level": 2,
+    "itemId": "tm-noble-roar"
+  },
+  {
+    "formId": "670",
+    "level": 4,
+    "itemId": "tm-petal-blizzard"
+  },
+  {
+    "formId": "671",
+    "level": 2,
+    "itemId": "tm-flower-shield"
+  },
+  {
+    "formId": "673",
+    "level": 2,
+    "itemId": "tm-horn-leech"
+  },
+  {
+    "formId": "674",
+    "level": 3,
+    "itemId": "tm-quick-guard"
+  },
+  {
+    "formId": "675",
+    "level": 1,
+    "itemId": "tm-circle-throw"
+  },
+  {
+    "formId": "675",
+    "level": 1,
+    "itemId": "tm-vital-throw"
+  },
+  {
+    "formId": "678",
+    "level": 4,
+    "itemId": "tm-psychic"
+  },
+  {
+    "formId": "679",
+    "level": 1,
+    "itemId": "tm-metal-sound"
+  },
+  {
+    "formId": "680",
+    "level": 2,
+    "itemId": "tm-power-trick"
+  },
+  {
+    "formId": "681",
+    "level": 1,
+    "itemId": "tm-kings-shield"
+  },
+  {
+    "formId": "681",
+    "level": 1,
+    "itemId": "tm-swords-dance"
+  },
+  {
+    "formId": "681",
+    "level": 2,
+    "itemId": "tm-kings-shield"
+  },
+  {
+    "formId": "683",
+    "level": 1,
+    "itemId": "tm-aromatic-mist"
+  },
+  {
+    "formId": "687",
+    "level": 3,
+    "itemId": "tm-topsy-turvy"
+  },
+  {
+    "formId": "688",
+    "level": 4,
+    "itemId": "tm-cross-chop"
+  },
+  {
+    "formId": "689",
+    "level": 2,
+    "itemId": "tm-rock-slide"
+  },
+  {
+    "formId": "694",
+    "level": 2,
+    "itemId": "tm-parabolic-charge"
+  },
+  {
+    "formId": "695",
+    "level": 2,
+    "itemId": "tm-electrify"
+  },
+  {
+    "formId": "697",
+    "level": 2,
+    "itemId": "tm-stomping-tantrum"
+  },
+  {
+    "formId": "698",
+    "level": 2,
+    "itemId": "tm-haze"
+  },
+  {
+    "formId": "699",
+    "level": 2,
+    "itemId": "tm-aurora-beam"
+  },
+  {
+    "formId": "701",
+    "level": 2,
+    "itemId": "tm-sky-drop"
+  },
+  {
+    "formId": "702",
+    "level": 2,
+    "itemId": "tm-nuzzle"
+  },
+  {
+    "formId": "707",
+    "level": 2,
+    "itemId": "tm-fairy-lock"
+  },
+  {
+    "formId": "708",
+    "level": 1,
+    "itemId": "tm-forests-curse"
+  },
+  {
+    "formId": "709",
+    "level": 2,
+    "itemId": "tm-scary-face"
+  },
+  {
+    "formId": "710",
+    "level": 3,
+    "itemId": "tm-trick-or-treat"
+  },
+  {
+    "formId": "711",
+    "level": 3,
+    "itemId": "tm-energy-ball"
+  },
+  {
+    "formId": "712",
+    "level": 2,
+    "itemId": "tm-frost-breath"
+  },
+  {
+    "formId": "713",
+    "level": 3,
+    "itemId": "tm-skull-bash"
+  },
+  {
+    "formId": "715",
+    "level": 3,
+    "itemId": "tm-hurricane"
+  },
+  {
+    "formId": "716",
+    "level": 3,
+    "itemId": "tm-geomancy"
+  },
+  {
+    "formId": "717",
+    "level": 3,
+    "itemId": "tm-oblivion-wing"
+  },
+  {
+    "formId": "718",
+    "level": 2,
+    "itemId": "tm-lands-wrath"
+  },
+  {
+    "formId": "718",
+    "level": 3,
+    "itemId": "tm-thousand-waves"
+  },
+  {
+    "formId": "718",
+    "level": 4,
+    "itemId": "tm-core-enforcer"
+  },
+  {
+    "formId": "718",
+    "level": 4,
+    "itemId": "tm-lands-wrath"
+  },
+  {
+    "formId": "718",
+    "level": 4,
+    "itemId": "tm-thousand-arrows"
+  },
+  {
+    "formId": "719",
+    "level": 3,
+    "itemId": "tm-dazzling-gleam"
+  },
+  {
+    "formId": "719",
+    "level": 3,
+    "itemId": "tm-diamond-storm"
+  },
+  {
+    "formId": "720",
+    "level": 3,
+    "itemId": "tm-hyperspace-hole"
+  },
+  {
+    "formId": "721",
+    "level": 3,
+    "itemId": "tm-steam-eruption"
+  },
+  {
+    "formId": "722",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "722",
+    "level": 1,
+    "itemId": "tm-razor-leaf"
+  },
+  {
+    "formId": "723",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "723",
+    "level": 1,
+    "itemId": "tm-razor-leaf"
+  },
+  {
+    "formId": "724",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "724",
+    "level": 1,
+    "itemId": "tm-razor-leaf"
+  },
+  {
+    "formId": "724",
+    "level": 3,
+    "itemId": "tm-spirit-shackle"
+  },
+  {
+    "formId": "724",
+    "level": 5,
+    "itemId": "tm-frenzy-plant"
+  },
+  {
+    "formId": "725",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "725",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "725",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "726",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "726",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "726",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "727",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "727",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "727",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "727",
+    "level": 3,
+    "itemId": "tm-temper-flare"
+  },
+  {
+    "formId": "727",
+    "level": 5,
+    "itemId": "tm-blast-burn"
+  },
+  {
+    "formId": "728",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "728",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "729",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "729",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "730",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "730",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "730",
+    "level": 3,
+    "itemId": "tm-sparkling-aria"
+  },
+  {
+    "formId": "733",
+    "level": 3,
+    "itemId": "tm-beak-blast"
+  },
+  {
+    "formId": "735",
+    "level": 3,
+    "itemId": "tm-fling"
+  },
+  {
+    "formId": "737",
+    "level": 1,
+    "itemId": "tm-charge"
+  },
+  {
+    "formId": "738",
+    "level": 2,
+    "itemId": "tm-signal-beam"
+  },
+  {
+    "formId": "739",
+    "level": 3,
+    "itemId": "tm-close-combat"
+  },
+  {
+    "formId": "740",
+    "level": 3,
+    "itemId": "tm-ice-hammer"
+  },
+  {
+    "formId": "741",
+    "level": 2,
+    "itemId": "tm-revelation-dance"
+  },
+  {
+    "formId": "743",
+    "level": 2,
+    "itemId": "tm-fairy-wind"
+  },
+  {
+    "formId": "743",
+    "level": 3,
+    "itemId": "tm-pollen-puff"
+  },
+  {
+    "formId": "745",
+    "level": 2,
+    "itemId": "tm-accelerock"
+  },
+  {
+    "formId": "748",
+    "level": 3,
+    "itemId": "tm-baneful-bunker"
+  },
+  {
+    "formId": "749",
+    "level": 2,
+    "itemId": "tm-mud-slap"
+  },
+  {
+    "formId": "750",
+    "level": 2,
+    "itemId": "tm-mud-sport"
+  },
+  {
+    "formId": "750",
+    "level": 4,
+    "itemId": "tm-high-horsepower"
+  },
+  {
+    "formId": "751",
+    "level": 2,
+    "itemId": "tm-leech-life"
+  },
+  {
+    "formId": "754",
+    "level": 5,
+    "itemId": "tm-leaf-storm"
+  },
+  {
+    "formId": "758",
+    "level": 2,
+    "itemId": "tm-poison-fang"
+  },
+  {
+    "formId": "759",
+    "level": 5,
+    "itemId": "tm-focus-blast"
+  },
+  {
+    "formId": "760",
+    "level": 5,
+    "itemId": "tm-giga-impact"
+  },
+  {
+    "formId": "763",
+    "level": 1,
+    "itemId": "tm-trop-kick"
+  },
+  {
+    "formId": "763",
+    "level": 2,
+    "itemId": "tm-draining-kiss"
+  },
+  {
+    "formId": "764",
+    "level": 1,
+    "itemId": "tm-floral-healing"
+  },
+  {
+    "formId": "765",
+    "level": 3,
+    "itemId": "tm-zen-headbutt"
+  },
+  {
+    "formId": "766",
+    "level": 4,
+    "itemId": "tm-counter"
+  },
+  {
+    "formId": "768",
+    "level": 3,
+    "itemId": "tm-first-impression"
+  },
+  {
+    "formId": "769",
+    "level": 2,
+    "itemId": "tm-shore-up"
+  },
+  {
+    "formId": "771",
+    "level": 2,
+    "itemId": "tm-purify"
+  },
+  {
+    "formId": "773",
+    "level": 1,
+    "itemId": "tm-multi-attack"
+  },
+  {
+    "formId": "775",
+    "level": 5,
+    "itemId": "tm-wood-hammer"
+  },
+  {
+    "formId": "776",
+    "level": 4,
+    "itemId": "tm-shell-trap"
+  },
+  {
+    "formId": "777",
+    "level": 2,
+    "itemId": "tm-zing-zap"
+  },
+  {
+    "formId": "778",
+    "level": 2,
+    "itemId": "tm-misty-terrain"
+  },
+  {
+    "formId": "780",
+    "level": 3,
+    "itemId": "tm-scale-shot"
+  },
+  {
+    "formId": "781",
+    "level": 3,
+    "itemId": "tm-anchor-shot"
+  },
+  {
+    "formId": "784",
+    "level": 2,
+    "itemId": "tm-clanging-scales"
+  },
+  {
+    "formId": "784",
+    "level": 3,
+    "itemId": "tm-clangorous-soul"
+  },
+  {
+    "formId": "785",
+    "level": 3,
+    "itemId": "tm-natures-madness"
+  },
+  {
+    "formId": "786",
+    "level": 3,
+    "itemId": "tm-natures-madness"
+  },
+  {
+    "formId": "787",
+    "level": 3,
+    "itemId": "tm-natures-madness"
+  },
+  {
+    "formId": "788",
+    "level": 3,
+    "itemId": "tm-natures-madness"
+  },
+  {
+    "formId": "791",
+    "level": 3,
+    "itemId": "tm-sunsteel-strike"
+  },
+  {
+    "formId": "792",
+    "level": 3,
+    "itemId": "tm-moongeist-beam"
+  },
+  {
+    "formId": "793",
+    "level": 4,
+    "itemId": "tm-meteor-beam"
+  },
+  {
+    "formId": "794",
+    "level": 3,
+    "itemId": "tm-darkest-lariat"
+  },
+  {
+    "formId": "795",
+    "level": 3,
+    "itemId": "tm-me-first"
+  },
+  {
+    "formId": "796",
+    "level": 2,
+    "itemId": "tm-ion-deluge"
+  },
+  {
+    "formId": "797",
+    "level": 5,
+    "itemId": "tm-steel-roller"
+  },
+  {
+    "formId": "798",
+    "level": 2,
+    "itemId": "tm-sacred-sword"
+  },
+  {
+    "formId": "799",
+    "level": 3,
+    "itemId": "tm-outrage"
+  },
+  {
+    "formId": "800",
+    "level": 3,
+    "itemId": "tm-photon-geyser"
+  },
+  {
+    "formId": "801",
+    "level": 1,
+    "itemId": "tm-fleur-cannon"
+  },
+  {
+    "formId": "802",
+    "level": 3,
+    "itemId": "tm-spectral-thief"
+  },
+  {
+    "formId": "803",
+    "level": 1,
+    "itemId": "tm-venom-drench"
+  },
+  {
+    "formId": "804",
+    "level": 3,
+    "itemId": "tm-gunk-shot"
+  },
+  {
+    "formId": "805",
+    "level": 2,
+    "itemId": "tm-reflect"
+  },
+  {
+    "formId": "806",
+    "level": 3,
+    "itemId": "tm-mind-blown"
+  },
+  {
+    "formId": "807",
+    "level": 3,
+    "itemId": "tm-plasma-fists"
+  },
+  {
+    "formId": "809",
+    "level": 3,
+    "itemId": "tm-double-iron-bash"
+  },
+  {
+    "formId": "810",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "810",
+    "level": 1,
+    "itemId": "tm-razor-leaf"
+  },
+  {
+    "formId": "811",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "811",
+    "level": 1,
+    "itemId": "tm-razor-leaf"
+  },
+  {
+    "formId": "812",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "812",
+    "level": 1,
+    "itemId": "tm-razor-leaf"
+  },
+  {
+    "formId": "812",
+    "level": 3,
+    "itemId": "tm-drum-beating"
+  },
+  {
+    "formId": "812",
+    "level": 3,
+    "itemId": "tm-uproar"
+  },
+  {
+    "formId": "812",
+    "level": 5,
+    "itemId": "tm-frenzy-plant"
+  },
+  {
+    "formId": "813",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "813",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "813",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "814",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "814",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "814",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "815",
+    "level": 1,
+    "itemId": "tm-court-change"
+  },
+  {
+    "formId": "815",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "815",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "815",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "815",
+    "level": 4,
+    "itemId": "tm-pyro-ball"
+  },
+  {
+    "formId": "815",
+    "level": 5,
+    "itemId": "tm-blast-burn"
+  },
+  {
+    "formId": "816",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "816",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "817",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "817",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "818",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "818",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "818",
+    "level": 3,
+    "itemId": "tm-snipe-shot"
+  },
+  {
+    "formId": "819",
+    "level": 1,
+    "itemId": "tm-stockpile"
+  },
+  {
+    "formId": "820",
+    "level": 1,
+    "itemId": "tm-stuff-cheeks"
+  },
+  {
+    "formId": "823",
+    "level": 3,
+    "itemId": "tm-sky-attack"
+  },
+  {
+    "formId": "825",
+    "level": 1,
+    "itemId": "tm-power-swap"
+  },
+  {
+    "formId": "834",
+    "level": 3,
+    "itemId": "tm-head-smash"
+  },
+  {
+    "formId": "836",
+    "level": 3,
+    "itemId": "tm-wild-charge"
+  },
+  {
+    "formId": "839",
+    "level": 1,
+    "itemId": "tm-tar-shot"
+  },
+  {
+    "formId": "839",
+    "level": 3,
+    "itemId": "tm-burn-up"
+  },
+  {
+    "formId": "841",
+    "level": 2,
+    "itemId": "tm-grav-apple"
+  },
+  {
+    "formId": "842",
+    "level": 1,
+    "itemId": "tm-apple-acid"
+  },
+  {
+    "formId": "844",
+    "level": 3,
+    "itemId": "tm-earth-power"
+  },
+  {
+    "formId": "845",
+    "level": 3,
+    "itemId": "tm-belch"
+  },
+  {
+    "formId": "849",
+    "level": 3,
+    "itemId": "tm-overdrive"
+  },
+  {
+    "formId": "849",
+    "level": 4,
+    "itemId": "tm-boomburst"
+  },
+  {
+    "formId": "851",
+    "level": 2,
+    "itemId": "tm-fire-lash"
+  },
+  {
+    "formId": "852",
+    "level": 2,
+    "itemId": "tm-submission"
+  },
+  {
+    "formId": "853",
+    "level": 2,
+    "itemId": "tm-octolock"
+  },
+  {
+    "formId": "855",
+    "level": 1,
+    "itemId": "tm-teatime"
+  },
+  {
+    "formId": "858",
+    "level": 2,
+    "itemId": "tm-magic-powder"
+  },
+  {
+    "formId": "859",
+    "level": 1,
+    "itemId": "tm-confide"
+  },
+  {
+    "formId": "860",
+    "level": 2,
+    "itemId": "tm-false-surrender"
+  },
+  {
+    "formId": "861",
+    "level": 2,
+    "itemId": "tm-spirit-break"
+  },
+  {
+    "formId": "862",
+    "level": 1,
+    "itemId": "tm-obstruct"
+  },
+  {
+    "formId": "864",
+    "level": 1,
+    "itemId": "tm-curse"
+  },
+  {
+    "formId": "865",
+    "level": 2,
+    "itemId": "tm-final-gambit"
+  },
+  {
+    "formId": "865",
+    "level": 3,
+    "itemId": "tm-meteor-assault"
+  },
+  {
+    "formId": "866",
+    "level": 3,
+    "itemId": "tm-role-play"
+  },
+  {
+    "formId": "867",
+    "level": 2,
+    "itemId": "tm-crafty-shield"
+  },
+  {
+    "formId": "869",
+    "level": 3,
+    "itemId": "tm-decorate"
+  },
+  {
+    "formId": "870",
+    "level": 2,
+    "itemId": "tm-no-retreat"
+  },
+  {
+    "formId": "873",
+    "level": 4,
+    "itemId": "tm-aurora-veil"
+  },
+  {
+    "formId": "874",
+    "level": 3,
+    "itemId": "tm-stone-edge"
+  },
+  {
+    "formId": "876",
+    "level": 2,
+    "itemId": "tm-encore"
+  },
+  {
+    "formId": "877",
+    "level": 2,
+    "itemId": "tm-aura-wheel"
+  },
+  {
+    "formId": "878",
+    "level": 2,
+    "itemId": "tm-brutal-swing"
+  },
+  {
+    "formId": "879",
+    "level": 4,
+    "itemId": "tm-superpower"
+  },
+  {
+    "formId": "880",
+    "level": 3,
+    "itemId": "tm-bolt-beak"
+  },
+  {
+    "formId": "881",
+    "level": 3,
+    "itemId": "tm-bolt-beak"
+  },
+  {
+    "formId": "882",
+    "level": 2,
+    "itemId": "tm-fishious-rend"
+  },
+  {
+    "formId": "883",
+    "level": 2,
+    "itemId": "tm-fishious-rend"
+  },
+  {
+    "formId": "884",
+    "level": 3,
+    "itemId": "tm-mirror-coat"
+  },
+  {
+    "formId": "887",
+    "level": 1,
+    "itemId": "tm-dragon-darts"
+  },
+  {
+    "formId": "890",
+    "level": 3,
+    "itemId": "tm-dynamax-cannon"
+  },
+  {
+    "formId": "890",
+    "level": 3,
+    "itemId": "tm-eternabeam"
+  },
+  {
+    "formId": "891",
+    "level": 2,
+    "itemId": "tm-low-kick"
+  },
+  {
+    "formId": "892",
+    "level": 3,
+    "itemId": "tm-wicked-blow"
+  },
+  {
+    "formId": "893",
+    "level": 2,
+    "itemId": "tm-jungle-healing"
+  },
+  {
+    "formId": "894",
+    "level": 1,
+    "itemId": "tm-thunder-cage"
+  },
+  {
+    "formId": "895",
+    "level": 3,
+    "itemId": "tm-draco-meteor"
+  },
+  {
+    "formId": "895",
+    "level": 4,
+    "itemId": "tm-dragon-energy"
+  },
+  {
+    "formId": "898",
+    "level": 1,
+    "itemId": "tm-grassy-terrain"
+  },
+  {
+    "formId": "899",
+    "level": 3,
+    "itemId": "tm-agility"
+  },
+  {
+    "formId": "900",
+    "level": 3,
+    "itemId": "tm-stone-axe"
+  },
+  {
+    "formId": "902",
+    "level": 3,
+    "itemId": "tm-wave-crash"
+  },
+  {
+    "formId": "903",
+    "level": 3,
+    "itemId": "tm-dire-claw"
+  },
+  {
+    "formId": "904",
+    "level": 1,
+    "itemId": "tm-barb-barrage"
+  },
+  {
+    "formId": "904",
+    "level": 2,
+    "itemId": "tm-toxic-spikes"
+  },
+  {
+    "formId": "905",
+    "level": 3,
+    "itemId": "tm-attract"
+  },
+  {
+    "formId": "905",
+    "level": 3,
+    "itemId": "tm-springtide-storm"
+  },
+  {
+    "formId": "906",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "907",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "908",
+    "level": 1,
+    "itemId": "tm-leafage"
+  },
+  {
+    "formId": "908",
+    "level": 3,
+    "itemId": "tm-flower-trick"
+  },
+  {
+    "formId": "908",
+    "level": 5,
+    "itemId": "tm-frenzy-plant"
+  },
+  {
+    "formId": "909",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "909",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "909",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "910",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "910",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "910",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "911",
+    "level": 1,
+    "itemId": "tm-ember"
+  },
+  {
+    "formId": "911",
+    "level": 1,
+    "itemId": "tm-fire-spin"
+  },
+  {
+    "formId": "911",
+    "level": 1,
+    "itemId": "tm-flame-charge"
+  },
+  {
+    "formId": "911",
+    "level": 4,
+    "itemId": "tm-torch-song"
+  },
+  {
+    "formId": "911",
+    "level": 5,
+    "itemId": "tm-blast-burn"
+  },
+  {
+    "formId": "912",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "912",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "913",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "913",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "914",
+    "level": 1,
+    "itemId": "tm-water-gun"
+  },
+  {
+    "formId": "914",
+    "level": 1,
+    "itemId": "tm-whirlpool"
+  },
+  {
+    "formId": "914",
+    "level": 4,
+    "itemId": "tm-aqua-cutter"
+  },
+  {
+    "formId": "914",
+    "level": 4,
+    "itemId": "tm-aqua-step"
+  },
+  {
+    "formId": "918",
+    "level": 1,
+    "itemId": "tm-silk-trap"
+  },
+  {
+    "formId": "920",
+    "level": 2,
+    "itemId": "tm-lunge"
+  },
+  {
+    "formId": "920",
+    "level": 5,
+    "itemId": "tm-axe-kick"
+  },
+  {
+    "formId": "922",
+    "level": 2,
+    "itemId": "tm-upper-hand"
+  },
+  {
+    "formId": "923",
+    "level": 3,
+    "itemId": "tm-double-shock"
+  },
+  {
+    "formId": "923",
+    "level": 3,
+    "itemId": "tm-revival-blessing"
+  },
+  {
+    "formId": "925",
+    "level": 2,
+    "itemId": "tm-population-bomb"
+  },
+  {
+    "formId": "926",
+    "level": 2,
+    "itemId": "tm-sweet-scent"
+  },
+  {
+    "formId": "930",
+    "level": 4,
+    "itemId": "tm-giga-drain"
+  },
+  {
+    "formId": "933",
+    "level": 2,
+    "itemId": "tm-salt-cure"
+  },
+  {
+    "formId": "936",
+    "level": 3,
+    "itemId": "tm-armor-cannon"
+  },
+  {
+    "formId": "937",
+    "level": 2,
+    "itemId": "tm-bitter-blade"
+  },
+  {
+    "formId": "942",
+    "level": 2,
+    "itemId": "tm-jaw-lock"
+  },
+  {
+    "formId": "943",
+    "level": 2,
+    "itemId": "tm-comeuppance"
+  },
+  {
+    "formId": "945",
+    "level": 3,
+    "itemId": "tm-sludge-wave"
+  },
+  {
+    "formId": "946",
+    "level": 3,
+    "itemId": "tm-strength-sap"
+  },
+  {
+    "formId": "947",
+    "level": 1,
+    "itemId": "tm-confuse-ray"
+  },
+  {
+    "formId": "949",
+    "level": 4,
+    "itemId": "tm-power-whip"
+  },
+  {
+    "formId": "952",
+    "level": 2,
+    "itemId": "tm-burning-jealousy"
+  },
+  {
+    "formId": "952",
+    "level": 2,
+    "itemId": "tm-spicy-extract"
+  },
+  {
+    "formId": "954",
+    "level": 3,
+    "itemId": "tm-revival-blessing"
+  },
+  {
+    "formId": "956",
+    "level": 3,
+    "itemId": "tm-lumina-crash"
+  },
+  {
+    "formId": "959",
+    "level": 4,
+    "itemId": "tm-gigaton-hammer"
+  },
+  {
+    "formId": "961",
+    "level": 2,
+    "itemId": "tm-triple-dive"
+  },
+  {
+    "formId": "962",
+    "level": 3,
+    "itemId": "tm-parting-shot"
+  },
+  {
+    "formId": "964",
+    "level": 2,
+    "itemId": "tm-jet-punch"
+  },
+  {
+    "formId": "965",
+    "level": 3,
+    "itemId": "tm-spin-out"
+  },
+  {
+    "formId": "966",
+    "level": 5,
+    "itemId": "tm-blazing-torque"
+  },
+  {
+    "formId": "966",
+    "level": 5,
+    "itemId": "tm-combat-torque"
+  },
+  {
+    "formId": "966",
+    "level": 5,
+    "itemId": "tm-magical-torque"
+  },
+  {
+    "formId": "966",
+    "level": 5,
+    "itemId": "tm-noxious-torque"
+  },
+  {
+    "formId": "966",
+    "level": 5,
+    "itemId": "tm-wicked-torque"
+  },
+  {
+    "formId": "967",
+    "level": 3,
+    "itemId": "tm-dragon-cheer"
+  },
+  {
+    "formId": "968",
+    "level": 3,
+    "itemId": "tm-shed-tail"
+  },
+  {
+    "formId": "970",
+    "level": 2,
+    "itemId": "tm-power-gem"
+  },
+  {
+    "formId": "970",
+    "level": 3,
+    "itemId": "tm-mortal-spin"
+  },
+  {
+    "formId": "971",
+    "level": 2,
+    "itemId": "tm-shadow-sneak"
+  },
+  {
+    "formId": "972",
+    "level": 2,
+    "itemId": "tm-last-respects"
+  },
+  {
+    "formId": "975",
+    "level": 3,
+    "itemId": "tm-body-press"
+  },
+  {
+    "formId": "976",
+    "level": 1,
+    "itemId": "tm-fillet-away"
+  },
+  {
+    "formId": "977",
+    "level": 2,
+    "itemId": "tm-order-up"
+  },
+  {
+    "formId": "977",
+    "level": 4,
+    "itemId": "tm-hydro-pump"
+  },
+  {
+    "formId": "979",
+    "level": 1,
+    "itemId": "tm-rage-fist"
+  },
+  {
+    "formId": "980",
+    "level": 2,
+    "itemId": "tm-mud-shot"
+  },
+  {
+    "formId": "981",
+    "level": 3,
+    "itemId": "tm-psychic-fangs"
+  },
+  {
+    "formId": "982",
+    "level": 2,
+    "itemId": "tm-hyper-drill"
+  },
+  {
+    "formId": "983",
+    "level": 3,
+    "itemId": "tm-kowtow-cleave"
+  },
+  {
+    "formId": "983",
+    "level": 4,
+    "itemId": "tm-guillotine"
+  },
+  {
+    "formId": "984",
+    "level": 4,
+    "itemId": "tm-headlong-rush"
+  },
+  {
+    "formId": "989",
+    "level": 1,
+    "itemId": "tm-magnetic-flux"
+  },
+  {
+    "formId": "992",
+    "level": 5,
+    "itemId": "tm-detect"
+  },
+  {
+    "formId": "998",
+    "level": 3,
+    "itemId": "tm-glaive-rush"
+  },
+  {
+    "formId": "1000",
+    "level": 3,
+    "itemId": "tm-make-it-rain"
+  },
+  {
+    "formId": "1001",
+    "level": 2,
+    "itemId": "tm-ruination"
+  },
+  {
+    "formId": "1002",
+    "level": 2,
+    "itemId": "tm-ruination"
+  },
+  {
+    "formId": "1002",
+    "level": 3,
+    "itemId": "tm-blizzard"
+  },
+  {
+    "formId": "1003",
+    "level": 2,
+    "itemId": "tm-ruination"
+  },
+  {
+    "formId": "1004",
+    "level": 2,
+    "itemId": "tm-ruination"
+  },
+  {
+    "formId": "1004",
+    "level": 4,
+    "itemId": "tm-inferno"
+  },
+  {
+    "formId": "1005",
+    "level": 3,
+    "itemId": "tm-dragon-rush"
+  },
+  {
+    "formId": "1007",
+    "level": 3,
+    "itemId": "tm-collision-course"
+  },
+  {
+    "formId": "1008",
+    "level": 3,
+    "itemId": "tm-electro-drift"
+  },
+  {
+    "formId": "1009",
+    "level": 3,
+    "itemId": "tm-hydro-steam"
+  },
+  {
+    "formId": "1010",
+    "level": 3,
+    "itemId": "tm-psyblade"
+  },
+  {
+    "formId": "1010",
+    "level": 3,
+    "itemId": "tm-solar-blade"
+  },
+  {
+    "formId": "1011",
+    "level": 2,
+    "itemId": "tm-syrup-bomb"
+  },
+  {
+    "formId": "1013",
+    "level": 3,
+    "itemId": "tm-matcha-gotcha"
+  },
+  {
+    "formId": "1017",
+    "level": 3,
+    "itemId": "tm-ivy-cudgel"
+  },
+  {
+    "formId": "1018",
+    "level": 3,
+    "itemId": "tm-electro-shot"
+  },
+  {
+    "formId": "1019",
+    "level": 2,
+    "itemId": "tm-fickle-beam"
+  },
+  {
+    "formId": "1020",
+    "level": 1,
+    "itemId": "tm-burning-bulwark"
+  },
+  {
+    "formId": "1020",
+    "level": 3,
+    "itemId": "tm-raging-fury"
+  },
+  {
+    "formId": "1021",
+    "level": 3,
+    "itemId": "tm-thunderclap"
+  },
+  {
+    "formId": "1022",
+    "level": 3,
+    "itemId": "tm-mighty-cleave"
+  },
+  {
+    "formId": "1023",
+    "level": 3,
+    "itemId": "tm-tachyon-cutter"
+  },
+  {
+    "formId": "1024",
+    "level": 3,
+    "itemId": "tm-tera-blast"
+  },
+  {
+    "formId": "1024",
+    "level": 3,
+    "itemId": "tm-tera-starstorm"
+  },
+  {
+    "formId": "1025",
+    "level": 3,
+    "itemId": "tm-malignant-chain"
+  },
+  {
+    "formId": "10011",
+    "level": 3,
+    "itemId": "tm-defog"
+  },
+  {
+    "formId": "10015",
+    "level": 1,
+    "itemId": "tm-clear-smog"
+  },
+  {
+    "formId": "10018",
+    "level": 2,
+    "itemId": "tm-drain-punch"
+  },
+  {
+    "formId": "10022",
+    "level": 3,
+    "itemId": "tm-freeze-shock"
+  },
+  {
+    "formId": "10023",
+    "level": 3,
+    "itemId": "tm-ice-burn"
+  },
+  {
+    "formId": "10061",
+    "level": 4,
+    "itemId": "tm-light-of-ruin"
+  },
+  {
+    "formId": "10077",
+    "level": 1,
+    "itemId": "tm-origin-pulse"
+  },
+  {
+    "formId": "10084",
+    "level": 1,
+    "itemId": "tm-flying-press"
+  },
+  {
+    "formId": "10086",
+    "level": 3,
+    "itemId": "tm-hyperspace-fury"
+  },
+  {
+    "formId": "10091",
+    "level": 1,
+    "itemId": "tm-embargo"
+  },
+  {
+    "formId": "10092",
+    "level": 2,
+    "itemId": "tm-bite"
+  },
+  {
+    "formId": "10100",
+    "level": 3,
+    "itemId": "tm-expanding-force"
+  },
+  {
+    "formId": "10101",
+    "level": 1,
+    "itemId": "tm-triple-axel"
+  },
+  {
+    "formId": "10102",
+    "level": 2,
+    "itemId": "tm-icicle-spear"
+  },
+  {
+    "formId": "10104",
+    "level": 3,
+    "itemId": "tm-icy-wind"
+  },
+  {
+    "formId": "10107",
+    "level": 2,
+    "itemId": "tm-covet"
+  },
+  {
+    "formId": "10108",
+    "level": 2,
+    "itemId": "tm-snatch"
+  },
+  {
+    "formId": "10111",
+    "level": 3,
+    "itemId": "tm-supercell-slam"
+  },
+  {
+    "formId": "10112",
+    "level": 3,
+    "itemId": "tm-sludge-bomb"
+  },
+  {
+    "formId": "10113",
+    "level": 2,
+    "itemId": "tm-acid-spray"
+  },
+  {
+    "formId": "10114",
+    "level": 3,
+    "itemId": "tm-dragon-hammer"
+  },
+  {
+    "formId": "10114",
+    "level": 4,
+    "itemId": "tm-seed-bomb"
+  },
+  {
+    "formId": "10115",
+    "level": 2,
+    "itemId": "tm-shadow-bone"
+  },
+  {
+    "formId": "10123",
+    "level": 2,
+    "itemId": "tm-revelation-dance"
+  },
+  {
+    "formId": "10124",
+    "level": 2,
+    "itemId": "tm-revelation-dance"
+  },
+  {
+    "formId": "10125",
+    "level": 2,
+    "itemId": "tm-revelation-dance"
+  },
+  {
+    "formId": "10147",
+    "level": 1,
+    "itemId": "tm-fleur-cannon"
+  },
+  {
+    "formId": "10152",
+    "level": 2,
+    "itemId": "tm-accelerock"
+  },
+  {
+    "formId": "10157",
+    "level": 3,
+    "itemId": "tm-prismatic-laser"
+  },
+  {
+    "formId": "10165",
+    "level": 2,
+    "itemId": "tm-nasty-plot"
+  },
+  {
+    "formId": "10165",
+    "level": 3,
+    "itemId": "tm-shell-side-arm"
+  },
+  {
+    "formId": "10167",
+    "level": 1,
+    "itemId": "tm-strange-steam"
+  },
+  {
+    "formId": "10167",
+    "level": 4,
+    "itemId": "tm-misty-explosion"
+  },
+  {
+    "formId": "10169",
+    "level": 3,
+    "itemId": "tm-freezing-glare"
+  },
+  {
+    "formId": "10170",
+    "level": 3,
+    "itemId": "tm-thunderous-kick"
+  },
+  {
+    "formId": "10171",
+    "level": 3,
+    "itemId": "tm-fiery-wrath"
+  },
+  {
+    "formId": "10172",
+    "level": 3,
+    "itemId": "tm-eerie-spell"
+  },
+  {
+    "formId": "10174",
+    "level": 1,
+    "itemId": "tm-knock-off"
+  },
+  {
+    "formId": "10180",
+    "level": 2,
+    "itemId": "tm-snap-trap"
+  },
+  {
+    "formId": "10184",
+    "level": 3,
+    "itemId": "tm-overdrive"
+  },
+  {
+    "formId": "10184",
+    "level": 4,
+    "itemId": "tm-boomburst"
+  },
+  {
+    "formId": "10188",
+    "level": 3,
+    "itemId": "tm-behemoth-bash"
+  },
+  {
+    "formId": "10188",
+    "level": 3,
+    "itemId": "tm-behemoth-blade"
+  },
+  {
+    "formId": "10191",
+    "level": 2,
+    "itemId": "tm-surging-strikes"
+  },
+  {
+    "formId": "10193",
+    "level": 3,
+    "itemId": "tm-glacial-lance"
+  },
+  {
+    "formId": "10194",
+    "level": 3,
+    "itemId": "tm-astral-barrage"
+  },
+  {
+    "formId": "10231",
+    "level": 1,
+    "itemId": "tm-electro-ball"
+  },
+  {
+    "formId": "10232",
+    "level": 3,
+    "itemId": "tm-chloroblast"
+  },
+  {
+    "formId": "10233",
+    "level": 3,
+    "itemId": "tm-infernal-parade"
+  },
+  {
+    "formId": "10234",
+    "level": 2,
+    "itemId": "tm-fell-stinger"
+  },
+  {
+    "formId": "10236",
+    "level": 3,
+    "itemId": "tm-ceaseless-edge"
+  },
+  {
+    "formId": "10237",
+    "level": 1,
+    "itemId": "tm-victory-dance"
+  },
+  {
+    "formId": "10238",
+    "level": 2,
+    "itemId": "tm-shadow-claw"
+  },
+  {
+    "formId": "10239",
+    "level": 2,
+    "itemId": "tm-bitter-malice"
+  },
+  {
+    "formId": "10240",
+    "level": 2,
+    "itemId": "tm-power-shift"
+  },
+  {
+    "formId": "10240",
+    "level": 3,
+    "itemId": "tm-esper-wing"
+  },
+  {
+    "formId": "10241",
+    "level": 2,
+    "itemId": "tm-shelter"
+  },
+  {
+    "formId": "10242",
+    "level": 3,
+    "itemId": "tm-iron-tail"
+  },
+  {
+    "formId": "10243",
+    "level": 2,
+    "itemId": "tm-power-shift"
+  },
+  {
+    "formId": "10243",
+    "level": 3,
+    "itemId": "tm-mountain-gale"
+  },
+  {
+    "formId": "10244",
+    "level": 3,
+    "itemId": "tm-triple-arrows"
+  },
+  {
+    "formId": "10244",
+    "level": 5,
+    "itemId": "tm-frenzy-plant"
+  },
+  {
+    "formId": "10249",
+    "level": 3,
+    "itemId": "tm-springtide-storm"
+  },
+  {
+    "formId": "10250",
+    "level": 2,
+    "itemId": "tm-raging-bull"
+  },
+  {
+    "formId": "10251",
+    "level": 2,
+    "itemId": "tm-raging-bull"
+  },
+  {
+    "formId": "10252",
+    "level": 2,
+    "itemId": "tm-raging-bull"
+  },
+  {
+    "formId": "10256",
+    "level": 2,
+    "itemId": "tm-jet-punch"
+  },
+  {
+    "formId": "10257",
+    "level": 2,
+    "itemId": "tm-beat-up"
+  },
+  {
+    "formId": "10272",
+    "level": 3,
+    "itemId": "tm-blood-moon"
+  },
+  {
+    "formId": "10276",
+    "level": 3,
+    "itemId": "tm-tera-starstorm"
+  },
+  {
+    "formId": "10277",
+    "level": 3,
+    "itemId": "tm-tera-starstorm"
+  }
+]

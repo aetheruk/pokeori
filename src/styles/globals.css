@@ -1,0 +1,1381 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-game-canvas: var(--game-canvas);
+  --color-game-surface: var(--game-surface);
+  --color-game-surface-raised: var(--game-surface-raised);
+  --color-game-border: var(--game-border);
+  --color-game-border-strong: var(--game-border-strong);
+  --color-game-ink: var(--game-ink);
+  --color-game-muted: var(--game-muted);
+  --color-game-moss: var(--game-moss);
+  --color-game-moss-strong: var(--game-moss-strong);
+  --color-game-clay: var(--game-clay);
+  --color-game-clay-strong: var(--game-clay-strong);
+  --color-game-ochre: var(--game-ochre);
+  --color-game-danger: var(--game-danger);
+  --color-game-night-canvas: var(--game-night-canvas);
+  --color-game-night-surface: var(--game-night-surface);
+  --color-game-night-border: var(--game-night-border);
+  --color-game-night-ink: var(--game-night-ink);
+  --color-game-night-muted: var(--game-night-muted);
+  /* Compatibility alias for light-on-accent controls still using cream. */
+  --color-game-cream: var(--game-night-ink);
+  --font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --font-sans: 'Avenir Next', Avenir, 'Segoe UI', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --animate-aurora: aurora 60s linear infinite;
+
+  @keyframes aurora {
+    from {
+      background-position:
+        50% 50%,
+        50% 50%;
+    }
+    to {
+      background-position:
+        350% 50%,
+        350% 50%;
+    }
+  }
+}
+
+:root {
+  --radius: 0.625rem;
+  --game-canvas: #efe4cf;
+  --game-surface: #f7efdf;
+  --game-surface-raised: #fff8e8;
+  --game-border: rgb(103 88 62 / 0.2);
+  --game-border-strong: rgb(103 88 62 / 0.34);
+  --game-ink: #293532;
+  --game-muted: #667269;
+  --game-moss: #5f794f;
+  --game-moss-strong: #405d3d;
+  --game-clay: #b86148;
+  --game-clay-strong: #974837;
+  --game-ochre: #b58a43;
+  --game-danger: #9a4337;
+  --game-night-canvas: #172733;
+  --game-night-surface: #22353d;
+  --game-night-border: rgb(247 236 214 / 0.16);
+  --game-night-ink: #f7ecd6;
+  --game-night-muted: #b2b6a8;
+  --game-accent: var(--game-moss);
+  --background: #efe4cf;
+  --foreground: #293532;
+  --card: #f7efdf;
+  --card-foreground: #293532;
+  --popover: #fff8e8;
+  --popover-foreground: #293532;
+  --primary: #5f794f;
+  --primary-foreground: #fff8e8;
+  --secondary: #e4d7bd;
+  --secondary-foreground: #293532;
+  --muted: #e8dcc5;
+  --muted-foreground: #667269;
+  --accent: #e4d7bd;
+  --accent-foreground: #293532;
+  --destructive: #a9473c;
+  --border: rgb(103 88 62 / 0.2);
+  --input: rgb(103 88 62 / 0.26);
+  --ring: #5f794f;
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: #e6d8bd;
+  --sidebar-foreground: #293532;
+  --sidebar-primary: #5f794f;
+  --sidebar-primary-foreground: #fff8e8;
+  --sidebar-accent: #d7c8a9;
+  --sidebar-accent-foreground: #293532;
+  --sidebar-border: rgb(103 88 62 / 0.2);
+  --sidebar-ring: #5f794f;
+}
+
+@layer components {
+  .game-panel {
+    background: var(--game-surface);
+    border: 1px solid var(--game-border);
+    border-radius: 0.625rem;
+    color: var(--game-ink);
+  }
+
+  .game-panel-raised {
+    background: var(--game-surface-raised);
+    border: 1px solid var(--game-border);
+    border-radius: 0.75rem;
+    color: var(--game-ink);
+    box-shadow: 0 12px 32px rgb(75 62 39 / 0.14);
+  }
+
+  .game-page-scroll {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-color: color-mix(in srgb, var(--game-muted) 42%, transparent) transparent;
+    scrollbar-width: thin;
+  }
+
+  .game-page-scroll::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .game-page-scroll::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--game-muted) 42%, transparent);
+    background-clip: padding-box;
+  }
+
+  .game-page-scroll::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--game-moss) 58%, transparent);
+    background-clip: padding-box;
+  }
+
+  .game-folio-section {
+    position: relative;
+    border: 1px solid var(--game-border);
+    border-radius: 0.625rem;
+    background: color-mix(in srgb, var(--game-surface) 94%, transparent);
+    box-shadow: 0 8px 20px rgb(75 62 39 / 0.07);
+  }
+
+  .game-field-label {
+    color: var(--game-moss-strong);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .game-field-label::before {
+    display: inline-block;
+    width: 0.35rem;
+    height: 0.35rem;
+    margin-right: 0.45rem;
+    border-radius: 1px;
+    background: var(--game-ochre);
+    content: '';
+    transform: rotate(45deg) translateY(-1px);
+  }
+
+  .game-skip-link {
+    position: fixed;
+    top: 0.75rem;
+    left: 50%;
+    z-index: 100;
+    transform: translate(-50%, -150%);
+    border: 1px solid var(--game-border-strong);
+    border-radius: 0.5rem;
+    background: var(--game-surface-raised);
+    color: var(--game-ink);
+    padding: 0.65rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    box-shadow: 0 8px 24px rgb(24 35 39 / 0.2);
+    transition: transform 150ms ease;
+  }
+
+  .game-skip-link:focus {
+    transform: translate(-50%, 0);
+    outline: 2px solid var(--game-moss);
+    outline-offset: 2px;
+  }
+
+  .game-focus-ring:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--game-accent) 70%, transparent);
+    outline-offset: 2px;
+  }
+
+  .game-night {
+    --game-canvas: var(--game-night-canvas);
+    --game-surface: var(--game-night-surface);
+    --game-surface-raised: #2b4248;
+    --game-border: var(--game-night-border);
+    --game-border-strong: rgb(247 236 214 / 0.28);
+    --game-ink: var(--game-night-ink);
+    --game-muted: var(--game-night-muted);
+    --game-moss: #91a96b;
+    --game-moss-strong: #b8c894;
+    --game-clay: #d78467;
+    --game-ochre: #d3ad63;
+    --game-accent: #91a96b;
+    --background: var(--game-night-canvas);
+    --foreground: var(--game-night-ink);
+    --card: var(--game-night-surface);
+    --card-foreground: var(--game-night-ink);
+    --popover: #2b4248;
+    --popover-foreground: var(--game-night-ink);
+    --primary: #91a96b;
+    --primary-foreground: #172733;
+    --secondary: #30474b;
+    --secondary-foreground: var(--game-night-ink);
+    --muted: #30474b;
+    --muted-foreground: var(--game-night-muted);
+    --accent: #30474b;
+    --accent-foreground: var(--game-night-ink);
+    --border: var(--game-night-border);
+    --input: rgb(247 236 214 / 0.22);
+    --ring: #91a96b;
+    background: var(--game-canvas);
+    color: var(--game-ink);
+  }
+
+  /* Filled action controls always use the light journal ink on their accent fill. */
+  .game-accent-button {
+    color: var(--game-night-ink) !important;
+  }
+
+  .game-accent-button :where(svg, span) {
+    color: inherit !important;
+  }
+
+  .game-paper-texture {
+    background-image: url('/ui/pokeori/paper-grain.avif');
+    background-repeat: repeat;
+    background-size: 420px 420px;
+  }
+
+  .game-contour-motif,
+  .game-field-stamps {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    pointer-events: none;
+  }
+
+  .game-contour-motif {
+    background-image: url('/ui/pokeori/contour-map.png');
+  }
+
+  .game-field-stamps {
+    background-image: url('/ui/pokeori/field-stamps.png');
+  }
+
+  .game-rule {
+    border-color: var(--game-border);
+    background-image: linear-gradient(
+      to right,
+      transparent,
+      color-mix(in srgb, var(--game-ochre) 36%, transparent),
+      transparent
+    );
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: 100% 1px;
+  }
+
+  /* Light field-note chrome for focused activities. Scenic boards remain free
+     to use their own environmental palette inside this surrounding frame. */
+  .game-activity-chrome {
+    background: var(--game-canvas);
+    color: var(--game-ink);
+  }
+
+  .game-activity-panel {
+    background: color-mix(in srgb, var(--game-surface-raised) 94%, transparent);
+    border: 1px solid var(--game-border);
+    border-radius: 0.75rem;
+    color: var(--game-ink);
+    box-shadow: 0 10px 24px rgb(75 62 39 / 0.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.dark {
+  --background: #efe4cf;
+  --foreground: #293532;
+  --card: #f7efdf;
+  --card-foreground: #293532;
+  --popover: #fff8e8;
+  --popover-foreground: #293532;
+  --primary: #5f794f;
+  --primary-foreground: #fff8e8;
+  --secondary: #e4d7bd;
+  --secondary-foreground: #293532;
+  --muted: #e8dcc5;
+  --muted-foreground: #667269;
+  --accent: #e4d7bd;
+  --accent-foreground: #293532;
+  --destructive: #a9473c;
+  --border: rgb(103 88 62 / 0.2);
+  --input: rgb(103 88 62 / 0.26);
+  --ring: #5f794f;
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: #e6d8bd;
+  --sidebar-foreground: #293532;
+  --sidebar-primary: #5f794f;
+  --sidebar-primary-foreground: #fff8e8;
+  --sidebar-accent: #d7c8a9;
+  --sidebar-accent-foreground: #293532;
+  --sidebar-border: rgb(103 88 62 / 0.2);
+  --sidebar-ring: #5f794f;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    line-height: 1.5;
+  }
+  html,
+  body {
+    touch-action: manipulation;
+    overscroll-behavior: none;
+  }
+  img {
+    -webkit-user-drag: none;
+  }
+  input,
+  textarea,
+  [data-selectable='true'] {
+    user-select: text;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--game-ochre) 34%, transparent);
+    color: var(--game-ink);
+  }
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+@keyframes bounce-slow {
+  0%,
+  100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 2s infinite;
+}
+
+.shadow-aura {
+  filter: brightness(0.4) contrast(1.3) sepia(100%) hue-rotate(250deg) saturate(400%)
+    drop-shadow(0 0 8px rgba(88, 28, 135, 1)) drop-shadow(0 0 20px rgba(147, 51, 234, 0.8));
+  animation: shadow-aura-pulse 2s infinite ease-in-out;
+}
+
+.radiant-aura {
+  filter: brightness(1.18) contrast(1.12) saturate(170%) hue-rotate(175deg)
+    drop-shadow(0 0 8px rgba(59, 130, 246, 1)) drop-shadow(0 0 22px rgba(14, 165, 233, 0.85));
+  animation: radiant-aura-pulse 2s infinite ease-in-out;
+}
+
+@keyframes shadow-aura-pulse {
+  0%,
+  100% {
+    filter: brightness(0.4) contrast(1.3) sepia(100%) hue-rotate(250deg) saturate(400%)
+      drop-shadow(0 0 8px rgba(88, 28, 135, 1)) drop-shadow(0 0 20px rgba(147, 51, 234, 0.8));
+  }
+  50% {
+    filter: brightness(0.5) contrast(1.4) sepia(100%) hue-rotate(260deg) saturate(500%)
+      drop-shadow(0 0 15px rgba(107, 33, 168, 1)) drop-shadow(0 0 30px rgba(168, 85, 247, 1));
+  }
+}
+
+.radiant-flame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 140%;
+  height: 140%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.radiant-flame::before,
+.radiant-flame::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle,
+    rgba(14, 165, 233, 0) 28%,
+    rgba(59, 130, 246, 0.5) 58%,
+    rgba(0, 0, 0, 0) 80%
+  );
+  filter: blur(12px);
+  border-radius: 50%;
+  animation: radiant-burn 3s infinite linear;
+}
+
+.radiant-flame::after {
+  width: 80%;
+  height: 80%;
+  background: radial-gradient(
+    circle,
+    rgba(96, 165, 250, 0) 20%,
+    rgba(125, 211, 252, 0.65) 50%,
+    rgba(0, 0, 0, 0) 70%
+  );
+  animation: radiant-burn-reverse 2s infinite linear;
+  filter: blur(8px);
+}
+
+@keyframes radiant-aura-pulse {
+  0%,
+  100% {
+    filter: brightness(1.18) contrast(1.12) saturate(170%) hue-rotate(175deg)
+      drop-shadow(0 0 8px rgba(59, 130, 246, 1)) drop-shadow(0 0 22px rgba(14, 165, 233, 0.85));
+  }
+  50% {
+    filter: brightness(1.3) contrast(1.18) saturate(210%) hue-rotate(180deg)
+      drop-shadow(0 0 16px rgba(37, 99, 235, 1)) drop-shadow(0 0 34px rgba(125, 211, 252, 1));
+  }
+}
+
+@keyframes radiant-burn {
+  0% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: 0.55;
+  }
+  33% {
+    transform: translate(-52%, -48%) scale(1.1) rotate(120deg);
+    opacity: 0.8;
+  }
+  66% {
+    transform: translate(-48%, -52%) scale(0.95) rotate(240deg);
+    opacity: 0.55;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1) rotate(360deg);
+    opacity: 0.55;
+  }
+}
+
+@keyframes radiant-burn-reverse {
+  0% {
+    transform: translate(-50%, -50%) scale(1) rotate(360deg);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2) rotate(180deg);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: 0.45;
+  }
+}
+
+.shadow-flame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 140%;
+  height: 140%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.shadow-flame::before,
+.shadow-flame::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle,
+    rgba(88, 28, 135, 0) 30%,
+    rgba(147, 51, 234, 0.5) 60%,
+    rgba(0, 0, 0, 0) 80%
+  );
+  filter: blur(12px);
+  border-radius: 50%;
+  animation: shadow-burn 3s infinite linear;
+}
+
+.shadow-flame::after {
+  width: 80%;
+  height: 80%;
+  background: radial-gradient(
+    circle,
+    rgba(107, 33, 168, 0) 20%,
+    rgba(168, 85, 247, 0.6) 50%,
+    rgba(0, 0, 0, 0) 70%
+  );
+  animation: shadow-burn-reverse 2s infinite linear;
+  filter: blur(8px);
+}
+
+@keyframes shadow-burn {
+  0% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: 0.6;
+  }
+  33% {
+    transform: translate(-52%, -48%) scale(1.1) rotate(120deg);
+    opacity: 0.8;
+  }
+  66% {
+    transform: translate(-48%, -52%) scale(0.95) rotate(240deg);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1) rotate(360deg);
+    opacity: 0.6;
+  }
+}
+
+@keyframes shadow-burn-reverse {
+  0% {
+    transform: translate(-50%, -50%) scale(1) rotate(360deg);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2) rotate(180deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: 0.5;
+  }
+}
+
+/* Float Damage Animation */
+@keyframes float-damage {
+  0% {
+    transform: translateY(0) scale(0.3);
+    opacity: 0;
+  }
+  10% {
+    transform: translateY(-10px) scale(1.3);
+    opacity: 1;
+  }
+  20% {
+    transform: translateY(-15px) scale(1) rotate(-3deg);
+    opacity: 1;
+  }
+  30% {
+    transform: translateY(-20px) scale(1.05) rotate(3deg);
+    opacity: 1;
+  }
+  40% {
+    transform: translateY(-25px) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-60px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+.animate-float-damage {
+  animation: float-damage 1.2s forwards ease-out;
+}
+
+/* Battle type impact animations */
+.battle-type-effect {
+  --effect-primary: #f8fafc;
+  --effect-secondary: #94a3b8;
+  --effect-glow: rgba(248, 250, 252, 0.5);
+  --effect-dark: rgba(15, 23, 42, 0.45);
+  position: absolute;
+  inset: -24%;
+  z-index: 35;
+  pointer-events: none;
+  animation: battle-type-fade 800ms ease-out forwards;
+  filter: drop-shadow(0 0 10px var(--effect-glow));
+}
+
+.battle-type-effect::before,
+.battle-type-effect::after,
+.battle-type-effect span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  content: '';
+  transform: translate(-50%, -50%);
+}
+
+.battle-type-effect::before {
+  width: 84%;
+  height: 84%;
+  border-radius: 999px;
+  background: radial-gradient(circle, var(--effect-glow) 0%, transparent 66%);
+  animation: battle-type-pulse 560ms ease-out forwards;
+}
+
+.battle-type-effect::after {
+  width: 54%;
+  height: 54%;
+  border: 3px solid var(--effect-secondary);
+  border-radius: 999px;
+  opacity: 0.75;
+  animation: battle-type-ring 660ms ease-out forwards;
+}
+
+.battle-type-effect span {
+  --dx: 0px;
+  --dy: -48px;
+  --rot: 0deg;
+  width: 12px;
+  height: 28px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--effect-primary), var(--effect-secondary));
+  animation: battle-type-particle 760ms ease-out forwards;
+}
+
+.battle-type-effect span:nth-child(1) {
+  --dx: -40px;
+  --dy: -30px;
+  --rot: -32deg;
+}
+
+.battle-type-effect span:nth-child(2) {
+  --dx: 36px;
+  --dy: -34px;
+  --rot: 28deg;
+  animation-delay: 35ms;
+}
+
+.battle-type-effect span:nth-child(3) {
+  --dx: -34px;
+  --dy: 24px;
+  --rot: 42deg;
+  animation-delay: 70ms;
+}
+
+.battle-type-effect span:nth-child(4) {
+  --dx: 40px;
+  --dy: 20px;
+  --rot: -42deg;
+  animation-delay: 95ms;
+}
+
+.battle-type-effect span:nth-child(5) {
+  --dx: 0px;
+  --dy: -52px;
+  --rot: 0deg;
+  animation-delay: 45ms;
+}
+
+.battle-type-effect span:nth-child(6) {
+  --dx: 0px;
+  --dy: 46px;
+  --rot: 90deg;
+  animation-delay: 120ms;
+}
+
+.battle-type-effect--normal {
+  --effect-primary: #ffffff;
+  --effect-secondary: #cbd5e1;
+  --effect-glow: rgba(226, 232, 240, 0.68);
+}
+
+.battle-type-effect--fire {
+  --effect-primary: #fde047;
+  --effect-secondary: #f97316;
+  --effect-glow: rgba(249, 115, 22, 0.68);
+}
+
+.battle-type-effect--fire::after {
+  border-color: rgba(251, 146, 60, 0.3);
+}
+
+.battle-type-effect--fire span {
+  width: 16px;
+  height: 30px;
+  border-radius: 70% 30% 70% 30%;
+  background:
+    radial-gradient(circle at 52% 70%, #fff7ed 0 18%, transparent 20%),
+    linear-gradient(180deg, #fde047 0%, #f97316 52%, #dc2626 100%);
+  animation-name: battle-fire-particle;
+}
+
+.battle-type-effect--water {
+  --effect-primary: #7dd3fc;
+  --effect-secondary: #0284c7;
+  --effect-glow: rgba(14, 165, 233, 0.6);
+}
+
+.battle-type-effect--water::after {
+  width: 38%;
+  height: 18%;
+  border-color: rgba(125, 211, 252, 0.72);
+  transform: translate(-50%, -35%) rotate(-8deg);
+  animation-name: battle-water-splash-ring;
+}
+
+.battle-type-effect--water span {
+  width: 13px;
+  height: 13px;
+  border-radius: 999px 999px 999px 4px;
+  background: linear-gradient(135deg, #e0f2fe, #0ea5e9);
+  animation-name: battle-water-droplet;
+}
+
+.battle-type-effect--electric {
+  --effect-primary: #fef08a;
+  --effect-secondary: #facc15;
+  --effect-glow: rgba(250, 204, 21, 0.78);
+}
+
+.battle-type-effect--electric::after {
+  width: 30%;
+  height: 72%;
+  border: 0;
+  border-radius: 0;
+  background: var(--effect-primary);
+  clip-path: polygon(42% 0%, 88% 0%, 56% 40%, 84% 40%, 24% 100%, 42% 54%, 16% 54%);
+  animation: battle-electric-bolt 620ms steps(2, end) forwards;
+}
+
+.battle-type-effect--electric span {
+  width: 7px;
+  height: 38px;
+  border-radius: 2px;
+  background: #fef08a;
+  clip-path: polygon(36% 0%, 100% 0%, 62% 44%, 92% 44%, 24% 100%, 42% 56%, 8% 56%);
+  animation-name: battle-electric-spark;
+}
+
+.battle-type-effect--grass {
+  --effect-primary: #bbf7d0;
+  --effect-secondary: #22c55e;
+  --effect-glow: rgba(34, 197, 94, 0.58);
+}
+
+.battle-type-effect--grass span,
+.battle-type-effect--bug span {
+  width: 18px;
+  height: 28px;
+  border-radius: 100% 0 100% 0;
+  background: linear-gradient(135deg, var(--effect-primary), var(--effect-secondary));
+  animation-name: battle-leaf-cut;
+}
+
+.battle-type-effect--ice {
+  --effect-primary: #ecfeff;
+  --effect-secondary: #22d3ee;
+  --effect-glow: rgba(34, 211, 238, 0.62);
+}
+
+.battle-type-effect--ice span,
+.battle-type-effect--rock span,
+.battle-type-effect--ground span {
+  width: 16px;
+  height: 22px;
+  border-radius: 2px;
+  clip-path: polygon(50% 0%, 100% 34%, 82% 100%, 18% 100%, 0% 34%);
+  animation-name: battle-shard-burst;
+}
+
+.battle-type-effect--fighting {
+  --effect-primary: #fecaca;
+  --effect-secondary: #dc2626;
+  --effect-glow: rgba(220, 38, 38, 0.56);
+}
+
+.battle-type-effect--fighting span,
+.battle-type-effect--steel span,
+.battle-type-effect--normal span {
+  width: 8px;
+  height: 46px;
+  border-radius: 999px;
+  animation-name: battle-slash-burst;
+}
+
+.battle-type-effect--poison {
+  --effect-primary: #e9d5ff;
+  --effect-secondary: #a855f7;
+  --effect-glow: rgba(168, 85, 247, 0.62);
+}
+
+.battle-type-effect--poison span {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--effect-primary);
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(233, 213, 255, 0.7), rgba(168, 85, 247, 0.18));
+  animation-name: battle-bubble-pop;
+}
+
+.battle-type-effect--ground {
+  --effect-primary: #fde68a;
+  --effect-secondary: #a16207;
+  --effect-glow: rgba(217, 119, 6, 0.5);
+}
+
+.battle-type-effect--ground::before {
+  transform: translate(-50%, -20%) scaleX(1.35);
+}
+
+.battle-type-effect--flying {
+  --effect-primary: #e0f2fe;
+  --effect-secondary: #60a5fa;
+  --effect-glow: rgba(147, 197, 253, 0.55);
+}
+
+.battle-type-effect--flying span {
+  width: 36px;
+  height: 12px;
+  border: 3px solid var(--effect-primary);
+  border-left: 0;
+  border-bottom: 0;
+  border-radius: 999px;
+  background: transparent;
+  animation-name: battle-gust-sweep;
+}
+
+.battle-type-effect--psychic {
+  --effect-primary: #fbcfe8;
+  --effect-secondary: #ec4899;
+  --effect-glow: rgba(236, 72, 153, 0.62);
+}
+
+.battle-type-effect--psychic span,
+.battle-type-effect--ghost span,
+.battle-type-effect--dragon span,
+.battle-type-effect--dark span,
+.battle-type-effect--fairy span {
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--effect-secondary);
+  border-radius: 999px;
+  background: transparent;
+  animation-name: battle-orbit-pop;
+}
+
+.battle-type-effect--bug {
+  --effect-primary: #d9f99d;
+  --effect-secondary: #65a30d;
+  --effect-glow: rgba(132, 204, 22, 0.55);
+}
+
+.battle-type-effect--rock {
+  --effect-primary: #fde68a;
+  --effect-secondary: #78716c;
+  --effect-glow: rgba(120, 113, 108, 0.5);
+}
+
+.battle-type-effect--ghost {
+  --effect-primary: #ddd6fe;
+  --effect-secondary: #7c3aed;
+  --effect-glow: rgba(124, 58, 237, 0.58);
+}
+
+.battle-type-effect--dragon {
+  --effect-primary: #c4b5fd;
+  --effect-secondary: #2563eb;
+  --effect-glow: rgba(37, 99, 235, 0.62);
+}
+
+.battle-type-effect--dark {
+  --effect-primary: #cbd5e1;
+  --effect-secondary: #334155;
+  --effect-glow: rgba(15, 23, 42, 0.7);
+}
+
+.battle-type-effect--dark::before {
+  background: radial-gradient(circle, rgba(15, 23, 42, 0.7) 0%, transparent 68%);
+}
+
+.battle-type-effect--steel {
+  --effect-primary: #f8fafc;
+  --effect-secondary: #94a3b8;
+  --effect-glow: rgba(203, 213, 225, 0.66);
+}
+
+.battle-type-effect--steel span {
+  background: linear-gradient(180deg, #ffffff, #94a3b8 45%, #475569);
+}
+
+.battle-type-effect--fairy {
+  --effect-primary: #fce7f3;
+  --effect-secondary: #f472b6;
+  --effect-glow: rgba(244, 114, 182, 0.62);
+}
+
+@keyframes battle-type-fade {
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes battle-type-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.35);
+    opacity: 0;
+  }
+  35% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.35);
+    opacity: 0;
+  }
+}
+
+@keyframes battle-type-ring {
+  0% {
+    transform: translate(-50%, -50%) scale(0.25);
+    opacity: 0;
+  }
+  26% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.7);
+    opacity: 0;
+  }
+}
+
+@keyframes battle-type-particle {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--rot)) scale(0.2);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--rot)) scale(0.85);
+    opacity: 0;
+  }
+}
+
+@keyframes battle-fire-particle {
+  0% {
+    transform: translate(-50%, -35%) rotate(var(--rot)) scale(0.2);
+    opacity: 0;
+  }
+  22% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy) - 20px)) rotate(calc(var(--rot) + 20deg)) scale(0.7);
+    opacity: 0;
+  }
+}
+
+@keyframes battle-water-droplet {
+  0% {
+    transform: translate(-50%, -20%) rotate(45deg) scale(0.2);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(45deg) scale(0.75);
+    opacity: 0;
+  }
+}
+
+@keyframes battle-water-splash-ring {
+  0% {
+    transform: translate(-50%, -35%) rotate(-8deg) scale(0.2);
+    opacity: 0;
+  }
+  32% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate(-50%, -35%) rotate(-8deg) scale(2.1);
+    opacity: 0;
+  }
+}
+
+@keyframes battle-electric-bolt {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3) rotate(-8deg);
+    opacity: 0;
+  }
+  18%,
+  60% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.25) rotate(8deg);
+    opacity: 0;
+  }
+}
+
+@keyframes battle-electric-spark {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--rot)) scale(0.2);
+    opacity: 0;
+  }
+  20%,
+  54% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(calc(var(--rot) + 16deg)) scale(0.85);
+    opacity: 0;
+  }
+}
+
+@keyframes battle-leaf-cut {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--rot)) scale(0.2);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(calc(var(--rot) + 180deg)) scale(0.7);
+    opacity: 0;
+  }
+}
+
+@keyframes battle-shard-burst {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--rot)) scale(0.15);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(calc(var(--rot) + 75deg)) scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes battle-slash-burst {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--rot)) scaleY(0.1);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--rot)) scaleY(0.85);
+    opacity: 0;
+  }
+}
+
+@keyframes battle-bubble-pop {
+  0% {
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 0;
+  }
+  24% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.3);
+    opacity: 0;
+  }
+}
+
+@keyframes battle-gust-sweep {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--rot)) scale(0.15);
+    opacity: 0;
+  }
+  22% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(calc(var(--rot) + 20deg)) scale(1.15);
+    opacity: 0;
+  }
+}
+
+@keyframes battle-orbit-pop {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--rot)) scale(0.15);
+    opacity: 0;
+  }
+  26% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(calc(var(--rot) + 120deg)) scale(1.1);
+    opacity: 0;
+  }
+}
+
+/* Pixelated rendering for pixel art / GIF sprites */
+.pixelated {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/*
+ * Compatibility bridge for older player-facing surfaces.
+ *
+ * The app has a large data-driven UI with many authored rows and dialogs. These
+ * aliases let those surfaces inherit the field-journal tokens while they are
+ * incrementally moved to semantic utility names. They intentionally resolve
+ * through the current paper/night variables, so focused activities remain navy
+ * and management screens remain parchment without changing gameplay code.
+ */
+@layer utilities {
+  /* Wide-screen composition helpers. These only become active at lg so the
+   * touch-first shell below that breakpoint keeps its original rhythm. */
+  .game-desktop-workspace {
+    @media (min-width: 1024px) {
+      width: min(100%, 1440px);
+      margin-inline: auto;
+      padding-inline: 1.25rem;
+    }
+  }
+
+  .game-desktop-inspector {
+    @media (min-width: 1024px) {
+      border-left: 1px solid var(--game-border);
+      background: color-mix(in srgb, var(--game-surface) 88%, transparent);
+      box-shadow: -12px 0 28px rgba(75, 62, 39, 0.08);
+    }
+  }
+
+  .game-desktop-activity-stage {
+    @media (min-width: 1024px) {
+      min-height: 100%;
+      border: 1px solid color-mix(in srgb, var(--game-border) 72%, transparent);
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--game-surface-raised) 92%, var(--game-canvas));
+      box-shadow: 0 18px 40px rgba(24, 35, 39, 0.16);
+      overflow: hidden;
+    }
+  }
+
+  /* Full-screen activities inherit a light journal interface from GameShell.
+   * Individual boards can still use an explicit scene image or deep-ink layer. */
+  .game-activity-chrome .game-night {
+    --game-canvas: #efe4cf;
+    --game-surface: #f7efdf;
+    --game-surface-raised: #fff8e8;
+    --game-border: rgb(103 88 62 / 0.2);
+    --game-border-strong: rgb(103 88 62 / 0.34);
+    --game-ink: #293532;
+    --game-muted: #667269;
+    --game-night-canvas: #efe4cf;
+    --game-night-surface: #f7efdf;
+    --game-night-border: rgb(103 88 62 / 0.2);
+    --game-night-ink: #293532;
+    --game-night-muted: #667269;
+    background: var(--game-canvas);
+    color: var(--game-ink);
+  }
+
+  .game-activity-chrome :is([class~='bg-slate-950'], [class~='bg-slate-900']) {
+    background-color: var(--game-surface);
+  }
+
+  .game-activity-chrome :is([class^='bg-slate-950/'], [class*=' bg-slate-950/'], [class^='bg-slate-900/'], [class*=' bg-slate-900/']) {
+    background-color: color-mix(in srgb, var(--game-surface) 90%, transparent);
+  }
+
+  .game-activity-chrome :is([class~='text-slate-50'], [class~='text-slate-100'], [class~='text-slate-200'], [class~='text-slate-300']) {
+    color: var(--game-ink);
+  }
+
+  :is([class~='bg-zinc-950'], [class~='bg-zinc-900']) {
+    background-color: var(--game-surface);
+  }
+
+  :is([class~='bg-zinc-800']) {
+    background-color: var(--game-surface-raised);
+  }
+
+  :is([class^='bg-zinc-950/'], [class*=' bg-zinc-950/']) {
+    background-color: color-mix(in srgb, var(--game-canvas) 84%, transparent);
+  }
+
+  :is([class^='bg-zinc-900/'], [class*=' bg-zinc-900/']) {
+    background-color: color-mix(in srgb, var(--game-surface) 84%, transparent);
+  }
+
+  :is([class^='bg-zinc-800/'], [class*=' bg-zinc-800/']) {
+    background-color: color-mix(in srgb, var(--game-surface-raised) 84%, transparent);
+  }
+
+  :is([class~='text-zinc-50'], [class~='text-zinc-100'], [class~='text-zinc-200'], [class~='text-zinc-300']) {
+    color: var(--game-ink);
+  }
+
+  :is([class~='text-zinc-400'], [class~='text-zinc-500'], [class~='text-zinc-600'], [class~='text-zinc-700']) {
+    color: var(--game-muted);
+  }
+
+  /* Do not remap white foregrounds globally. They are used deliberately on
+     scene boards, status chips, and clay/destructive actions. */
+
+  :is([class~='bg-black'], [class~='bg-black/20'], [class~='bg-black/25'], [class~='bg-black/50'], [class~='bg-black/60']) {
+    background-color: color-mix(in srgb, var(--game-canvas) 78%, transparent);
+  }
+
+  :is([class~='text-teal-50'], [class~='text-teal-100'], [class~='text-teal-200'], [class~='text-teal-300'], [class~='text-teal-400'], [class~='text-teal-500']) {
+    color: var(--game-moss-strong);
+  }
+
+  :is([class^='text-teal-'], [class*=' text-teal-']) {
+    color: var(--game-moss-strong);
+  }
+
+  :is([class~='bg-teal-400'], [class~='bg-teal-500']) {
+    background-color: var(--game-moss);
+  }
+
+  :is([class~='bg-teal-600'], [class~='bg-teal-700']) {
+    background-color: var(--game-clay);
+  }
+
+  :is([class~='bg-teal-950'], [class~='bg-teal-950/30'], [class~='bg-teal-950/40'], [class~='bg-teal-950/60'], [class~='bg-teal-950/90']) {
+    background-color: color-mix(in srgb, var(--game-moss) 14%, var(--game-surface));
+  }
+
+  :is([class^='bg-teal-400/'], [class*=' bg-teal-400/'], [class^='bg-teal-500/'], [class*=' bg-teal-500/'], [class^='bg-teal-600/'], [class*=' bg-teal-600/']) {
+    background-color: color-mix(in srgb, var(--game-moss) 16%, transparent);
+  }
+
+  :is([class^='border-teal-'], [class*=' border-teal-']) {
+    border-color: color-mix(in srgb, var(--game-moss) 58%, transparent);
+  }
+
+  :is([class^='text-emerald-'], [class*=' text-emerald-'], [class^='text-green-'], [class*=' text-green-']) {
+    color: var(--game-moss-strong);
+  }
+
+  :is([class^='bg-emerald-'], [class*=' bg-emerald-'], [class^='bg-green-'], [class*=' bg-green-']) {
+    background-color: color-mix(in srgb, var(--game-moss) 16%, transparent);
+  }
+
+  :is([class^='border-emerald-'], [class*=' border-emerald-']) {
+    border-color: color-mix(in srgb, var(--game-moss) 45%, transparent);
+  }
+
+  :is([class~='border-white'], [class^='border-white/'], [class*=' border-white/']) {
+    border-color: var(--game-border);
+  }
+
+  :is([class^='bg-white/'], [class*=' bg-white/']) {
+    background-color: color-mix(in srgb, var(--game-ink) 8%, transparent);
+  }
+
+  :is([class~='hover:bg-zinc-900']:hover, [class~='hover:bg-zinc-800']:hover) {
+    background-color: var(--game-surface-raised);
+  }
+
+  :is([class~='hover:border-white/10']:hover, [class~='hover:border-white/15']:hover, [class~='hover:border-white/20']:hover) {
+    border-color: var(--game-border-strong);
+  }
+
+  :is([class~='hover:border-teal-400']:hover, [class~='hover:border-teal-400/35']:hover, [class~='hover:border-teal-400/40']:hover, [class~='hover:border-teal-400/60']:hover, [class~='hover:border-teal-500/30']:hover) {
+    border-color: var(--game-moss);
+  }
+
+  :is([class~='hover:text-teal-100']:hover, [class~='hover:text-teal-200']:hover, [class~='hover:text-teal-300']:hover, [class~='hover:text-teal-400']:hover) {
+    color: var(--game-moss-strong);
+  }
+
+  /* Keep legacy accent buttons readable in night mode. The raised surface
+   * token becomes a dark panel there, but these controls need a light ink
+   * foreground against clay/moss fills. */
+  :is(
+      [class~='bg-game-clay'],
+      [class~='bg-game-clay-strong'],
+      [class~='bg-game-danger'],
+      [class~='bg-game-moss'],
+      [class~='bg-game-moss-strong']
+    )[class~='text-game-surface-raised'] {
+    color: var(--game-night-ink);
+  }
+}

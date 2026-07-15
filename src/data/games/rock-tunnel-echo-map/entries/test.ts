@@ -1,0 +1,58 @@
+import { RockTunnelEchoMapGameConfig } from '../types'
+
+export const testRockTunnelEchoMapEntries: RockTunnelEchoMapGameConfig[] = [
+  {
+    id: 'rock-tunnel-echo-map-test',
+    name: 'Rock Tunnel Echo Map Test',
+    description: 'Test a dark Rock Tunnel memory maze where echoes briefly reveal the path.',
+    category: 'Kanto',
+    subCategory: 'Test',
+    icon: { type: 'pokemon', id: '41' },
+    background: '/backgrounds/cave.avif',
+    requirements: [],
+    rewards: [
+      {
+        type: 'item',
+        targetId: 'escape-rope',
+        quantity: 1,
+        dropChance: 100,
+      },
+    ],
+    settings: {
+      gridSize: { cols: 8, rows: 8 },
+      playerStart: { x: 1, y: 6 },
+      exit: { x: 6, y: 1 },
+      walls: [
+        { x: 2, y: 1 },
+        { x: 2, y: 2 },
+        { x: 2, y: 3 },
+        { x: 4, y: 1 },
+        { x: 4, y: 2 },
+        { x: 4, y: 4 },
+        { x: 4, y: 5 },
+        { x: 5, y: 5 },
+        { x: 6, y: 5 },
+        { x: 1, y: 4 },
+        { x: 2, y: 4 },
+        { x: 6, y: 2 },
+        { x: 6, y: 3 },
+      ],
+      holes: [
+        { x: 5, y: 0 },
+        { x: 6, y: 0 },
+        { x: 7, y: 1 },
+      ],
+      timeLimit: 80,
+      maxMoves: 38,
+      revealDurationMs: 1600,
+      winRate: 1,
+      themeColour: '#818cf8',
+      background: '/backgrounds/cave.avif',
+      floorSprite: '/games/rockpush/floor.avif',
+      barrierSprite: '/games/rockpush/barrier.avif',
+      holeSprite: '/games/rockpush/hole.avif',
+      winTileSprite: '/games/rockpush/win-tile.png',
+      playerSprite: '/games/rockpush/trainer.avif',
+    },
+  },
+]

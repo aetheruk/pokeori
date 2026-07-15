@@ -1,0 +1,4 @@
+interface:
+  display_name: "PokeOri UI Style"
+  short_description: "Field-journal UI rules for PokeOri"
+  default_prompt: "Use $pokeori-ui-style to design or refactor a PokeOri player-facing UI surface."
