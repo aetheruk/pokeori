@@ -72,10 +72,12 @@ export interface Config {
     'expedition-runs': ExpeditionRun;
     'user-inventory-items': UserInventoryItem;
     'user-pokedex-entries': UserPokedexEntry;
+    'user-abilitydex-entries': UserAbilitydexEntry;
     'user-task-progress': UserTaskProgress;
     'user-activity-stats': UserActivityStat;
     'user-tcg-cards': UserTcgCard;
     'user-shop-purchases': UserShopPurchase;
+    'user-eggs': UserEgg;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -92,10 +94,12 @@ export interface Config {
     'expedition-runs': ExpeditionRunsSelect<false> | ExpeditionRunsSelect<true>;
     'user-inventory-items': UserInventoryItemsSelect<false> | UserInventoryItemsSelect<true>;
     'user-pokedex-entries': UserPokedexEntriesSelect<false> | UserPokedexEntriesSelect<true>;
+    'user-abilitydex-entries': UserAbilitydexEntriesSelect<false> | UserAbilitydexEntriesSelect<true>;
     'user-task-progress': UserTaskProgressSelect<false> | UserTaskProgressSelect<true>;
     'user-activity-stats': UserActivityStatsSelect<false> | UserActivityStatsSelect<true>;
     'user-tcg-cards': UserTcgCardsSelect<false> | UserTcgCardsSelect<true>;
     'user-shop-purchases': UserShopPurchasesSelect<false> | UserShopPurchasesSelect<true>;
+    'user-eggs': UserEggsSelect<false> | UserEggsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -467,7 +471,26 @@ export interface Pokemon {
    * Battle type applied by the Tera Orb. Tera Shards set this outside battle.
    */
   teraType?:
-    | ('normal' | 'fire' | 'water' | 'electric' | 'grass' | 'ice' | 'fighting' | 'poison' | 'ground' | 'flying' | 'psychic' | 'bug' | 'rock' | 'ghost' | 'dragon' | 'dark' | 'steel' | 'fairy')
+    | (
+        | 'normal'
+        | 'fire'
+        | 'water'
+        | 'electric'
+        | 'grass'
+        | 'ice'
+        | 'fighting'
+        | 'poison'
+        | 'ground'
+        | 'flying'
+        | 'psychic'
+        | 'bug'
+        | 'rock'
+        | 'ghost'
+        | 'dragon'
+        | 'dark'
+        | 'steel'
+        | 'fairy'
+      )
     | null;
   /**
    * Inventory item currently held by this Pokemon. Held items are assigned from the Pokemon details modal.
@@ -539,7 +562,7 @@ export interface Pokemon {
   /**
    * How this Pokemon was originally obtained.
    */
-  obtainedMethod?: ('caught' | 'trade' | 'gift' | 'starter' | 'purchased' | 'reward') | null;
+  obtainedMethod?: ('caught' | 'trade' | 'gift' | 'starter' | 'purchased' | 'reward' | 'hatched') | null;
   obtainedRegion?: string | null;
   obtainedLocation?: string | null;
   /**
@@ -621,6 +644,20 @@ export interface UserPokedexEntry {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user-abilitydex-entries".
+ */
+export interface UserAbilitydexEntry {
+  id: string;
+  user: string | User;
+  abilityId: string;
+  registered?: boolean | null;
+  source?: string | null;
+  firstRegisteredAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "user-task-progress".
  */
 export interface UserTaskProgress {
@@ -689,6 +726,22 @@ export interface UserShopPurchase {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user-eggs".
+ */
+export interface UserEgg {
+  id: string;
+  user: string | User;
+  foundAt: string;
+  hatchAt: string;
+  sourceResearchId?: string | null;
+  status: 'incubating' | 'hatched';
+  hatchedPokemonId?: string | null;
+  hatchPoolId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -732,6 +785,10 @@ export interface PayloadLockedDocument {
         value: string | UserPokedexEntry;
       } | null)
     | ({
+        relationTo: 'user-abilitydex-entries';
+        value: string | UserAbilitydexEntry;
+      } | null)
+    | ({
         relationTo: 'user-task-progress';
         value: string | UserTaskProgress;
       } | null)
@@ -746,6 +803,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'user-shop-purchases';
         value: string | UserShopPurchase;
+      } | null)
+    | ({
+        relationTo: 'user-eggs';
+        value: string | UserEgg;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1054,6 +1115,19 @@ export interface UserPokedexEntriesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user-abilitydex-entries_select".
+ */
+export interface UserAbilitydexEntriesSelect<T extends boolean = true> {
+  user?: T;
+  abilityId?: T;
+  registered?: T;
+  source?: T;
+  firstRegisteredAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "user-task-progress_select".
  */
 export interface UserTaskProgressSelect<T extends boolean = true> {
@@ -1105,6 +1179,21 @@ export interface UserShopPurchasesSelect<T extends boolean = true> {
   count?: T;
   firstPurchasedAt?: T;
   lastPurchasedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user-eggs_select".
+ */
+export interface UserEggsSelect<T extends boolean = true> {
+  user?: T;
+  foundAt?: T;
+  hatchAt?: T;
+  sourceResearchId?: T;
+  status?: T;
+  hatchedPokemonId?: T;
+  hatchPoolId?: T;
   updatedAt?: T;
   createdAt?: T;
 }

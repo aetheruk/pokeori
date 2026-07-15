@@ -73,6 +73,7 @@ import {
   getFieldObservationResearchXpAmount,
   shouldAwardFieldObservationResearchXp,
 } from '@/utilities/research/research-levels'
+import { maybeCreateFieldObservationEgg } from '@/utilities/day-care/eggs'
 import { getRequiredResearchWins } from '@/utilities/research/required-wins'
 import type { FieldObservationSettings } from '@/data/games/field-observation'
 import {
@@ -2193,6 +2194,10 @@ export async function completeResearchEncounter(
           const { summary } = await grantRewards(user.id, rewardsToGrant, {
             requirementContext: rewardRequirementContext,
           })
+          const egg = await maybeCreateFieldObservationEgg(payload as any, user, validatedEncounterId)
+          if (egg) {
+            summary.eggs = [{ id: egg.id, hatchAt: egg.hatchAt }]
+          }
           rewardSummary = summary
         } else if (
           (encounter.rewards && encounter.rewards.length > 0) ||

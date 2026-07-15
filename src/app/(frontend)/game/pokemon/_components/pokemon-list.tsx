@@ -7,6 +7,7 @@ import {
   ChevronUp,
   Circle,
   Diamond,
+  Egg,
   Heart,
   Loader2,
   Pencil,
@@ -56,9 +57,11 @@ import {
   createBox,
   deleteBox,
   getPokemon,
+  getEggsForBox,
   getPokemonTeamLayout,
   getUserPokemonCount,
   identifyPokemon,
+  hatchEgg,
   releasePokemonBulk,
   renameBox,
   setPokemonRosterRole,
@@ -101,6 +104,8 @@ export function PokemonList() {
   const initialTotal = userPokemonData?.totalDocs || initialDocs.length
 
   const [pokemonList, setPokemonList] = useState<Pokemon[]>(initialDocs)
+  const [eggs, setEggs] = useState<{ id: string; foundAt: string; hatchAt: string }[]>([])
+  const [hatchingEggId, setHatchingEggId] = useState<string | null>(null)
   const [battleTeam, setBattleTeam] = useState<Pokemon[]>([])
   const [companion, setCompanion] = useState<Pokemon | null>(null)
 
@@ -415,6 +420,41 @@ export function PokemonList() {
     didLoadInitialBoxRef.current = true
     handleBoxChange(null)
   }, [handleBoxChange])
+
+  useEffect(() => {
+    getEggsForBox().then(setEggs).catch(console.error)
+  }, [])
+
+  const hatchBoxEgg = async (eggId: string) => {
+    setHatchingEggId(eggId)
+    try {
+      const result = await hatchEgg(eggId)
+      if (!result.success) {
+        toast.error(result.message)
+        return
+      }
+      toast.success(result.message)
+      setEggs((current) => current.filter((egg) => egg.id !== eggId))
+      await refreshUser()
+      await handleBoxChange(selectedBoxId)
+    } finally {
+      setHatchingEggId(null)
+    }
+  }
+
+  const renderEggCard = (egg: { id: string; hatchAt: string }) => {
+    const ready = new Date(egg.hatchAt).getTime() <= Date.now()
+    return (
+      <Card className="relative aspect-square border-game-moss/45 bg-game-cream p-2 text-center">
+        <Egg className="mx-auto mt-2 h-10 w-10 text-game-moss" />
+        <p className="mt-1 text-xs font-bold text-game-ink">Pokemon Egg</p>
+        <p className="mt-0.5 text-[10px] text-game-muted">{ready ? 'Ready to hatch' : 'Warming up'}</p>
+        {ready && <Button size="sm" className="absolute inset-x-1 bottom-1 h-9 bg-game-moss text-game-cream hover:bg-game-moss-strong" disabled={hatchingEggId === egg.id} onClick={() => hatchBoxEgg(egg.id)}>{hatchingEggId === egg.id ? 'Hatching…' : 'Hatch · 50 Crystals'}</Button>}
+      </Card>
+    )
+  }
+
+  const visibleEggs = selectedBoxId === null ? eggs : []
 
   const handleCreateBox = async () => {
     if (!newBoxName.trim()) return
@@ -936,6 +976,9 @@ export function PokemonList() {
           <div className="w-full flex-1">
             <div className="min-h-[40vh] p-4">
               <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6 xl:grid-cols-[repeat(auto-fill,minmax(104px,1fr))]">
+                {visibleEggs.map((egg) => (
+                  <div key={`egg-${egg.id}`} className="relative aspect-square w-full select-none touch-manipulation">{renderEggCard(egg)}</div>
+                ))}
                 {pokemonList.map((p) => (
                   <div
                     key={p.id}
@@ -946,7 +989,7 @@ export function PokemonList() {
                 ))}
               </div>
             </div>
-            {pokemonList.length === 0 && (
+            {pokemonList.length === 0 && visibleEggs.length === 0 && (
               <div
                 className="mx-auto flex max-w-md flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-game-border-strong bg-game-canvas/70 px-6 py-10 text-center text-game-muted"
                 role="status"

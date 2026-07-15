@@ -16,6 +16,7 @@ import {
   buildPokemonReleaseRewards,
   getPokemonReleaseBlockMessage,
 } from '@/utilities/pokemon/release-planning'
+import { getActiveEggCount } from '@/utilities/day-care/eggs'
 
 function formatReleaseRewardItems(summary: RewardSummary): string {
   if (!summary.items.length) return 'nothing'
@@ -238,5 +239,5 @@ export async function getUserPokemonCount() {
     },
   })
 
-  return countResult.totalDocs
+  return countResult.totalDocs + await getActiveEggCount(payload as any, user.id)
 }

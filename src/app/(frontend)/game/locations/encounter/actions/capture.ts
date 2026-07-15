@@ -57,6 +57,7 @@ import {
   getSkillLevel,
 } from '@/utilities/skills/unlocks'
 import { getPokemonResearchLevel } from '@/utilities/research/research-levels'
+import { getActiveEggCount } from '@/utilities/day-care/eggs'
 import {
   buildCaptureEscapeRopeReward,
   buildCaptureHealingBerryRewards,
@@ -151,6 +152,7 @@ export async function attemptCapture(
             limit: 0,
           })
           .then((res) => res.totalDocs)
+    const eggCount = isChronicle ? 0 : await getActiveEggCount(payload as any, user.id)
     // We needed count of pokemon.
     const pokedex = isChronicle
       ? ({} as Record<string, any>)
@@ -173,7 +175,7 @@ export async function attemptCapture(
 
     // Check Max Pokemon
     const maxPokemon = user.maxPokemon || 50
-    if (!isChronicle && pokemon >= maxPokemon) {
+    if (!isChronicle && pokemon + eggCount >= maxPokemon) {
       // Clear Redis
       await redis.del(encounterId)
 

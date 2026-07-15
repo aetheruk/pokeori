@@ -5,6 +5,7 @@ import {
   Package,
   Search,
   Star,
+  Egg,
 } from 'lucide-react'
 import Image from 'next/image'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
@@ -46,6 +47,7 @@ export function RewardSummaryDisplay({
     (summary.notices || []).length > 0 ||
     (summary.researchXp || []).length > 0 ||
     (summary.researchBreakthroughs || []).length > 0 ||
+    (summary.eggs || []).length > 0 ||
     !!summary.levelUp
 
   if (!hasRewards) return null
@@ -57,6 +59,12 @@ export function RewardSummaryDisplay({
       <div className="space-y-4">
         {/* Main Rewards Grid */}
         <div className="grid grid-cols-1 gap-2">
+          {(summary.eggs || []).map((egg) => (
+            <Card key={egg.id} className="h-12 border-game-moss/35 bg-game-moss/10 p-2 flex-row items-center gap-3">
+              <Egg className="h-6 w-6 text-game-moss" />
+              <div><p className="text-sm font-semibold text-game-ink">Egg found</p><p className="text-xs text-game-muted">Ready to hatch in 12 hours</p></div>
+            </Card>
+          ))}
           {/* XP */}
           {xpEntries.map(([skillId, amount]) => {
             const skill = getSkill(skillId)
