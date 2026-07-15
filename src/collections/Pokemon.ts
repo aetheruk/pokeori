@@ -351,6 +351,7 @@ export const Pokemon: CollectionConfig = {
         { label: 'Starter', value: 'starter' },
         { label: 'Purchased', value: 'purchased' },
         { label: 'Reward', value: 'reward' },
+        { label: 'Hatched', value: 'hatched' },
       ],
       admin: {
         description: 'How this Pokemon was originally obtained.',

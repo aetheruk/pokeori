@@ -74,7 +74,7 @@ export interface Reward {
     isRadiant?: boolean
     partner?: boolean
     gender?: 'male' | 'female' | 'genderless'
-    obtainedMethod?: 'caught' | 'trade' | 'gift' | 'starter' | 'purchased' | 'reward'
+    obtainedMethod?: 'caught' | 'trade' | 'gift' | 'starter' | 'purchased' | 'reward' | 'hatched'
     obtainedRegion?: string
     obtainedLocation?: string
     obtainedSourceId?: string

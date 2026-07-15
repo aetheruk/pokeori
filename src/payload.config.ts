@@ -13,6 +13,7 @@ import {
   UserAbilityDexEntries,
   UserInventoryItems,
   UserPokedexEntries,
+  UserEggs,
   UserShopPurchases,
   UserTaskProgress,
   UserTcgCards,
@@ -52,6 +53,7 @@ export default buildConfig({
     UserActivityStats,
     UserTcgCards,
     UserShopPurchases,
+    UserEggs,
   ],
   editor: lexicalEditor(),
   email: resendAdapter({

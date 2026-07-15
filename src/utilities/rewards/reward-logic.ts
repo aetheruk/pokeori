@@ -83,6 +83,7 @@ export interface RewardSummary {
     newLevel: number
     skillXpGranted: number
   }[]
+  eggs?: { id: string; hatchAt: string }[]
   levelUp?: {
     newLevel: number
     oldLevel: number

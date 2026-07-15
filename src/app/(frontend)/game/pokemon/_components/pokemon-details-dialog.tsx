@@ -214,6 +214,11 @@ function formatPokemonOrigin(pokemon: Pokemon) {
           : 'Received as a Reward',
         subtitle: origin.obtainedLocation || undefined,
       }
+    case 'hatched':
+      return {
+        title: 'Hatched from an Egg',
+        subtitle: origin.obtainedLocation || undefined,
+      }
     default:
       return { title: 'Origin Unknown' }
   }

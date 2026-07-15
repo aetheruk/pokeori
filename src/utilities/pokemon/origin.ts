@@ -10,6 +10,7 @@ export type PokemonObtainedMethod =
   | 'starter'
   | 'purchased'
   | 'reward'
+  | 'hatched'
 
 export interface PokemonOriginData {
   obtainedMethod?: PokemonObtainedMethod

@@ -3838,6 +3838,32 @@ export const ceruleanCityTasks: Task[] = [
     },
   },
   {
+    id: 'day-care-egg-program',
+    name: 'Unexpected Eggs',
+    description: 'The Day Care couple have noticed abandoned Pokemon Eggs appearing in unexpected places.',
+    category: 'Kanto',
+    subCategory: 'Cerulean City',
+    background: '/backgrounds/inside-house.avif',
+    icon: { type: 'pokemon', id: '175' },
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Speak to the Couple',
+    requirements: [
+      { type: 'task_completed', targetId: 'day-care-celadon-helpers-gathered' },
+      { type: 'skill_level', targetId: 'researching', count: 32 },
+    ],
+    criteria: [],
+    rewards: [],
+    exitModal: {
+      background: '/backgrounds/inside-house.avif',
+      title: 'Day Care Couple',
+      icon: { type: 'pokemon', id: '175' },
+      message: 'Sometimes Pokemon Eggs are left abandoned in unexpected areas. Keep an eye out while you conduct Field Observations—we will help you hatch any you find.',
+      closeButtonText: 'I will keep watch',
+    },
+  },
+  {
     id: 'route-9-shrub',
     name: 'Roadside Shrub',
     description:
