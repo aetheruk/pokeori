@@ -36,7 +36,9 @@ jobs:
         run: bun run typecheck
 
       - name: Test
-        run: bun test
+        # Keep the data-heavy suite deterministic; several tests share imported
+        # authored data and Bun's concurrent scheduler can race on that state.
+        run: bun test --max-concurrency=1
 
   build:
     name: Build container
