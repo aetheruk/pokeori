@@ -45,6 +45,7 @@
     "@dnd-kit/utilities": "3.2.2",
     "@hookform/resolvers": "5.4.0",
     "@payloadcms/db-mongodb": "3.85.1",
+    "@payloadcms/db-postgres": "3.85.1",
     "@payloadcms/email-resend": "3.85.1",
     "@payloadcms/next": "3.85.1",
     "@payloadcms/richtext-lexical": "3.85.1",
