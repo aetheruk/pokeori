@@ -19,17 +19,20 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_IGNORE_TYPECHECK=true
-# These values are only used while compiling the image. The real runtime
-# values must be configured in Coolify and are not copied into the runner.
-ARG DATABASE_URI=mongodb://127.0.0.1:27017/pokeori
-ARG PAYLOAD_SECRET=pokeori-build-only-placeholder
-ARG RESEND_API_KEY=re_pokeori-build-only-placeholder
-ARG REDIS_URL=redis://127.0.0.1:6379
-ENV DATABASE_URI=${DATABASE_URI}
-ENV PAYLOAD_SECRET=${PAYLOAD_SECRET}
-ENV RESEND_API_KEY=${RESEND_API_KEY}
-ENV REDIS_URL=${REDIS_URL}
-RUN bun next build --webpack
+# These values are only used while compiling the image. Real runtime values
+# are configured in Coolify and are never copied into the runner image. The
+# optional BuildKit mounts allow callers to provide build-time values without
+# persisting them in an image layer; placeholders keep PR builds independent
+# of external services.
+RUN --mount=type=secret,id=DATABASE_URI,required=false \
+    --mount=type=secret,id=PAYLOAD_SECRET,required=false \
+    --mount=type=secret,id=RESEND_API_KEY,required=false \
+    --mount=type=secret,id=REDIS_URL,required=false \
+    export DATABASE_URI="$(cat /run/secrets/DATABASE_URI 2>/dev/null || printf 'mongodb://127.0.0.1:27017/pokeori')" && \
+    export PAYLOAD_SECRET="$(cat /run/secrets/PAYLOAD_SECRET 2>/dev/null || printf 'pokeori-build-only-placeholder')" && \
+    export RESEND_API_KEY="$(cat /run/secrets/RESEND_API_KEY 2>/dev/null || printf 're_pokeori-build-only-placeholder')" && \
+    export REDIS_URL="$(cat /run/secrets/REDIS_URL 2>/dev/null || printf 'redis://127.0.0.1:6379')" && \
+    bun next build --webpack
 
 # Production image, copy all the files and run next
 FROM base AS runner
