@@ -7,7 +7,6 @@ import {
   ChevronUp,
   Circle,
   Diamond,
-  Egg,
   Heart,
   Loader2,
   Pencil,
@@ -446,7 +445,13 @@ export function PokemonList() {
     const ready = new Date(egg.hatchAt).getTime() <= Date.now()
     return (
       <Card className="relative aspect-square border-game-moss/45 bg-game-cream p-2 text-center">
-        <Egg className="mx-auto mt-2 h-10 w-10 text-game-moss" />
+        <Image
+          src="/sprites/pokemon/home/egg.png"
+          alt="Pokemon Egg"
+          width={96}
+          height={96}
+          className="mx-auto mt-1 h-11 w-11 object-contain"
+        />
         <p className="mt-1 text-xs font-bold text-game-ink">Pokemon Egg</p>
         <p className="mt-0.5 text-[10px] text-game-muted">{ready ? 'Ready to hatch' : 'Warming up'}</p>
         {ready && <Button size="sm" className="absolute inset-x-1 bottom-1 h-9 bg-game-moss text-game-cream hover:bg-game-moss-strong" disabled={hatchingEggId === egg.id} onClick={() => hatchBoxEgg(egg.id)}>{hatchingEggId === egg.id ? 'Hatching…' : 'Hatch · 50 Crystals'}</Button>}

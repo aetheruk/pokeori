@@ -5,7 +5,6 @@ import {
   Package,
   Search,
   Star,
-  Egg,
 } from 'lucide-react'
 import Image from 'next/image'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
@@ -61,7 +60,7 @@ export function RewardSummaryDisplay({
         <div className="grid grid-cols-1 gap-2">
           {(summary.eggs || []).map((egg) => (
             <Card key={egg.id} className="h-12 border-game-moss/35 bg-game-moss/10 p-2 flex-row items-center gap-3">
-              <Egg className="h-6 w-6 text-game-moss" />
+              <Image src="/sprites/items/egg.png" alt="Egg" width={28} height={28} className="h-7 w-7 object-contain" />
               <div><p className="text-sm font-semibold text-game-ink">Egg found</p><p className="text-xs text-game-muted">Ready to hatch in 12 hours</p></div>
             </Card>
           ))}
