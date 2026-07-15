@@ -37,12 +37,12 @@ schema validation tests.
 
 ## Running Tests
 ```bash
-bun test              # Run all tests
-bun run validate:data # Run schema, static reference, and source hygiene checks
-bun run typecheck     # Run TypeScript without emitting files
-bun run lint          # Run Biome lint checks
-bun run test:int      # Integration tests
-bun run test:e2e      # E2E tests
+pnpm test              # Run all tests through the Bun-backed test script
+pnpm run validate:data # Run Bun-backed schema, reference, and hygiene checks
+pnpm run typecheck     # Run TypeScript without emitting files
+pnpm run lint          # Run Biome lint checks
+pnpm run test:int      # Integration tests
+pnpm run test:e2e      # E2E tests
 ```
 
 ## CI

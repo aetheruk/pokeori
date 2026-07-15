@@ -15,7 +15,9 @@ Follow the [Setup Guide](/docs/development/getting-started.md) to run the projec
 - [Release Checklist](/docs/development/release-checklist.md) - Pre-deploy validation checklist
 
 ## Prerequisites
-- Bun 1.3.13
+- Node.js 22 or newer
+- pnpm 10.24.0
+- Bun 1.3.13 for the current test runner and data scripts
 - MongoDB database
 - Redis server (for local dev)
 - Git
@@ -23,9 +25,9 @@ Follow the [Setup Guide](/docs/development/getting-started.md) to run the projec
 ## Available Scripts
 | Script | Description |
 |--------|-------------|
-| `bun dev` | Start dev server with Redis + Next.js |
-| `bun run build` | Production build |
-| `bun start` | Start production server |
-| `bun run fetch:pokemon` | Fetch Pokemon data from PokeAPI |
-| `bun run generate:pokemon` | Generate Pokemon data modules |
-| `bun run lint` | Run ESLint |
+| `pnpm run dev` | Start dev server with Redis + Next.js |
+| `pnpm run build` | Production build |
+| `pnpm run start` | Start production server |
+| `pnpm run fetch:pokemon` | Fetch Pokemon data from PokeAPI |
+| `pnpm run generate:pokemon` | Generate Pokemon data modules |
+| `pnpm run lint` | Run Biome linting |

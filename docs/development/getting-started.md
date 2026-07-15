@@ -3,7 +3,9 @@
 Set up Pokeori locally.
 
 ## Prerequisites
-- Bun 1.3.13
+- Node.js 22 or newer
+- pnpm 10.24.0
+- Bun 1.3.13 for the current test runner and data scripts
 - MongoDB database
 - Redis server
 
@@ -16,7 +18,7 @@ Set up Pokeori locally.
 
 2. **Install Dependencies**
    ```bash
-   bun install
+   pnpm install
    ```
 
 3. **Setup Environment**
@@ -36,15 +38,15 @@ Set up Pokeori locally.
 5. **Run Data Scripts**
    Fetch Pokemon and TCG data:
    ```bash
-   bun run fetch:pokemon
-   bun run generate:pokemon
-   bun run fetch:tcg
-   bun run generate:tcg
+   pnpm run fetch:pokemon
+   pnpm run generate:pokemon
+   pnpm run fetch:tcg
+   pnpm run generate:tcg
    ```
 
 6. **Start Dev Server**
    ```bash
-   bun dev
+   pnpm run dev
    ```
    App runs at `https://localhost:3000` (HTTPS enabled)
 

@@ -5,7 +5,9 @@ Full dependency list with versions and purposes.
 ## Core Framework
 | Package | Version | Purpose |
 |---------|---------|---------|
-| bun | 1.3.13 | JavaScript runtime |
+| node | 22 | Production JavaScript runtime and build environment |
+| pnpm | 10.24.0 | Package manager |
+| bun | 1.3.13 | Current test runner and legacy data tooling |
 | next | 16.2.9 | React framework (App Router) |
 | react | 19.2.7 | UI library |
 | react-dom | 19.2.7 | React DOM rendering |

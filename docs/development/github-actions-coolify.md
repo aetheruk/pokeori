@@ -53,7 +53,7 @@ The workflow does not need `DATABASE_URI`, `REDIS_URL`, `PAYLOAD_SECRET`, or `RE
 
 ## What the workflow does
 
-- Pull requests run linting, typechecking, the Bun test suite, and a Docker build without publishing or deploying.
+- Pull requests run Node.js/pnpm linting and typechecking, the existing Bun test suite, and a Node.js/pnpm Docker build without publishing or deploying.
 - A merge to `main` repeats validation, builds a `linux/amd64` image on GitHub’s runner, publishes `latest` and an immutable SHA tag to GHCR, and calls Coolify only after the image push succeeds.
 - `workflow_dispatch` is available for manually rerunning the workflow from `main`.
 

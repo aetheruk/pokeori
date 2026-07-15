@@ -27,7 +27,9 @@ See [ATTRIBUTIONS.md](./ATTRIBUTIONS.md) for source credits and important third-
 
 ## Technology
 
-- [Bun](https://bun.sh/)
+- [Node.js](https://nodejs.org/) 22 (production runtime and builds)
+- [pnpm](https://pnpm.io/) 10 (package manager)
+- [Bun](https://bun.sh/) 1.3.13 (current test runner and legacy data scripts)
 - [Next.js](https://nextjs.org/)
 - [React](https://react.dev/)
 - [Payload CMS](https://payloadcms.com/)
@@ -40,7 +42,9 @@ See [ATTRIBUTIONS.md](./ATTRIBUTIONS.md) for source credits and important third-
 
 ### Requirements
 
-- Bun `1.3.13` or a compatible current Bun release
+- Node.js `22` or newer
+- pnpm `10.24.0`
+- Bun `1.3.13` for the current test runner and legacy data scripts
 - MongoDB
 - Redis
 - A Resend API key if transactional email is enabled
@@ -49,13 +53,13 @@ Copy the example environment file and fill in values for your local services:
 
 ```bash
 cp .env.example .env
-bun install
+pnpm install
 ```
 
 Start the development server:
 
 ```bash
-bun run dev
+pnpm run dev
 ```
 
 The app uses the local MongoDB and Redis connection details from `.env`. See [the development guide](./docs/development/getting-started.md) and [environment variable reference](./docs/development/environment-variables.md) for more detail.
@@ -63,13 +67,13 @@ The app uses the local MongoDB and Redis connection details from `.env`. See [th
 ## Useful commands
 
 ```bash
-bun run dev             # Start the local app and Redis helper
-bun run build           # Create a production build
-bun run start           # Run the production build
-bun run typecheck       # Check TypeScript
-bun run lint            # Run Biome linting
-bun test                # Run the test suite
-bun run validate:data   # Run data and integrity validation tests
+pnpm run dev             # Start the local app and Redis helper
+pnpm run build           # Create a production build
+pnpm run start           # Run the production build
+pnpm run typecheck       # Check TypeScript
+pnpm run lint            # Run Biome linting
+pnpm test                # Run the Bun-backed test suite
+pnpm run validate:data   # Run Bun-backed data and integrity validation tests
 ```
 
 Source-data workflows are documented in [docs/development/scripts.md](./docs/development/scripts.md). They include the commands used to fetch and generate local Pokémon and Pokémon TCG data. Review each upstream service's terms before redistributing generated or cached third-party data.

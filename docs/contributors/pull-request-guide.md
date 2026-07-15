@@ -4,7 +4,7 @@ How to submit a PR for Pokeori.
 
 ## PR Checklist
 - [ ] Code follows [Code Standards](/docs/contributors/code-standards.md)
-- [ ] Lint passes (`bun run lint`)
+- [ ] Lint passes (`pnpm run lint`)
 - [ ] Tests added (if applicable)
 - [ ] Documentation updated (if adding new feature)
 - [ ] Changes tested manually

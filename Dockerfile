@@ -1,15 +1,17 @@
-# Pokeori - Payload CMS + Next.js + Bun
+# Pokeori - Payload CMS + Next.js + Node.js
 # To use this Dockerfile, set `output: 'standalone'` in your next.config.mjs file.
 
-FROM oven/bun:1.3.13-alpine AS base
+FROM node:22-alpine AS base
+
+RUN npm install --global pnpm@10.24.0
 
 # Install dependencies only when needed
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-COPY package.json bun.lock* ./
-RUN bun install --frozen-lockfile
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -32,7 +34,7 @@ RUN --mount=type=secret,id=DATABASE_URI,required=false \
     export PAYLOAD_SECRET="$(cat /run/secrets/PAYLOAD_SECRET 2>/dev/null || printf 'pokeori-build-only-placeholder')" && \
     export RESEND_API_KEY="$(cat /run/secrets/RESEND_API_KEY 2>/dev/null || printf 're_pokeori-build-only-placeholder')" && \
     export REDIS_URL="$(cat /run/secrets/REDIS_URL 2>/dev/null || printf 'redis://127.0.0.1:6379')" && \
-    bun next build --webpack
+    npm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
@@ -41,14 +43,14 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-RUN addgroup -g 1001 -S bunjs && \
-    adduser -S nextjs -u 1001
+RUN addgroup -S nodejs && \
+    adduser -S nextjs -u 1001 -G nodejs
 
 COPY --from=builder /app/public ./public
 
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=builder --chown=nextjs:bunjs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:bunjs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
@@ -56,4 +58,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["bun", "server.js"]
+CMD ["node", "server.js"]
