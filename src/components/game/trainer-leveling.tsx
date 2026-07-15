@@ -511,17 +511,13 @@ export function TrainerLeveling() {
                   }}
                   className="game-focus-ring group flex w-full cursor-pointer items-center gap-4 rounded-lg border border-game-border bg-game-surface p-4 text-left transition-colors hover:border-game-moss/35 hover:bg-game-surface-raised"
                 >
-                  <div>
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
-                      <SkillDisplayIcon
-                        skill={skill}
-                        width={32}
-                        height={32}
-                        className="h-7 w-7 object-contain"
-                        fallbackClassName="h-6 w-6 text-game-muted"
-                      />
-                    </div>
-                  </div>
+                  <SkillDisplayIcon
+                    skill={skill}
+                    width={56}
+                    height={56}
+                    className="h-14 w-14 shrink-0 object-contain"
+                    fallbackClassName="h-10 w-10 shrink-0 text-game-muted"
+                  />
 
                   <div className="flex-1 min-w-0 space-y-2">
                     <div className="flex justify-between items-end">

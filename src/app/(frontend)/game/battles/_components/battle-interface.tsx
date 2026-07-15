@@ -889,7 +889,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
                       Starting…
                     </>
                   ) : (
-                    'Battle More'
+                    'Play Again'
                   )}
                 </Button>
               ) : undefined

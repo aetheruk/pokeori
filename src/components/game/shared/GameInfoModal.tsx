@@ -132,6 +132,7 @@ export function GameInfoModal({
               src={background || '/backgrounds/forest.avif'}
               alt="Background"
               fill
+              priority
               sizes="100vw"
               className="object-cover opacity-65 brightness-[0.62]"
             />
@@ -364,7 +365,7 @@ export function GameInfoModal({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          'w-screen h-[100dvh] max-w-none m-0 flex flex-col gap-0 overflow-hidden rounded-none border-0 bg-game-surface p-0',
+          '!inset-0 !h-[100dvh] !max-h-none !w-screen !max-w-none !translate-x-0 !translate-y-0 m-0 flex flex-col gap-0 overflow-hidden rounded-none border-0 bg-game-surface p-0',
           className,
         )}
       >

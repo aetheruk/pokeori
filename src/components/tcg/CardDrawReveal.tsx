@@ -644,9 +644,9 @@ export function CardDrawReveal({
                     currentTheme.tier === 'ultra' ||
                     currentTheme.tier === 'secret') && (
                     <motion.div
-                      className="absolute -inset-6 rounded-3xl pointer-events-none blur-2xl"
+                      className="pointer-events-none absolute -inset-10 blur-xl"
                       style={{
-                        background: currentTheme.glowColor,
+                        background: `radial-gradient(ellipse at center, ${currentTheme.glowColor} 0%, ${currentTheme.glowColor} 42%, transparent 72%)`,
                         opacity: 0.4,
                       }}
                       initial={{ opacity: 0 }}
@@ -771,6 +771,7 @@ export function CardDrawReveal({
         <div className="px-8 pb-10 pt-4">
           <Button
             onClick={handleReveal}
+            variant={isCurrentRevealed ? 'outline' : 'default'}
             className={cn(
               'h-14 w-full text-xs font-black uppercase tracking-[0.16em] transition-colors',
               isCurrentRevealed

@@ -3,6 +3,7 @@ import nextDynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { GameResult } from '@/components/game/ResearchResult'
+import { TaskExitDialog } from '@/components/game/task-exit-dialog'
 import { Button } from '@/components/ui/button'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import type { TaskExitModal } from '@/data/tasks'
@@ -26,21 +27,6 @@ const LevelUpModal = nextDynamic(
 const CardDrawReveal = nextDynamic(
   () =>
     import('@/components/tcg/CardDrawReveal').then((mod) => mod.CardDrawReveal),
-  {
-    loading: () => (
-      <div className="game-paper-texture fixed inset-0 z-50 flex items-center justify-center bg-game-canvas">
-        <LoadingSpinner size="lg" />
-      </div>
-    ),
-    ssr: false,
-  },
-)
-
-const TaskExitDialog = nextDynamic(
-  () =>
-    import('@/components/game/task-exit-dialog').then(
-      (mod) => mod.TaskExitDialog,
-    ),
   {
     loading: () => (
       <div className="game-paper-texture fixed inset-0 z-50 flex items-center justify-center bg-game-canvas">
@@ -314,7 +300,7 @@ export function EncounterResults({
               variant="outline"
               className="w-full font-bold"
             >
-              Try again
+              Play Again
             </Button>
           ) : undefined
         }

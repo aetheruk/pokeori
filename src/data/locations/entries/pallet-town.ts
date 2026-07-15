@@ -28,7 +28,7 @@ export const palletTownLocations: Location[] = [
     subCategory: 'Pallet Town',
     icon: {
       type: 'local',
-      id: '/sprites/tall_grass.avif',
+      id: '/sprites/tall_grass-v2.png',
     },
     background: '/backgrounds/grassy-route.avif',
     timer: 20,
@@ -61,7 +61,7 @@ export const palletTownLocations: Location[] = [
     subCategory: 'Pallet Town',
     icon: {
       type: 'local',
-      id: '/sprites/tall_grass.avif',
+      id: '/sprites/tall_grass-v2.png',
     },
     background: '/backgrounds/grassy-route.avif',
     timer: 20,

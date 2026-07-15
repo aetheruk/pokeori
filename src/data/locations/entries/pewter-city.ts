@@ -9,7 +9,7 @@ export const pewterCityLocations: Location[] = [
     subCategory: 'Pewter City',
     icon: {
       type: 'local',
-      id: '/sprites/tall_grass.avif',
+      id: '/sprites/tall_grass-v2.png',
     },
     background: '/backgrounds/grassy-route.avif',
     timer: 20,
@@ -69,7 +69,7 @@ export const pewterCityLocations: Location[] = [
     subCategory: 'Pewter City',
     icon: {
       type: 'local',
-      id: '/sprites/tall_grass.avif',
+      id: '/sprites/tall_grass-v2.png',
     },
     background: '/backgrounds/rocky-path.avif',
     timer: 20,

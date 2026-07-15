@@ -1980,7 +1980,7 @@ export function ArtisanPanel() {
                             event.stopPropagation()
                             setSelectedRecipeGroup(group)
                           }}
-                          className="h-10 w-10 rounded-lg border border-game-border bg-game-surface-raised text-game-muted hover:bg-game-surface hover:text-game-ink"
+                          className="h-10 w-10 rounded-lg border border-game-border bg-game-surface-raised text-game-moss hover:bg-game-moss/10 hover:text-game-moss-strong"
                           aria-label={`View ${group.name}`}
                           title={`View ${group.name}`}
                         >
@@ -2053,7 +2053,7 @@ export function ArtisanPanel() {
                           event.stopPropagation()
                           setSelectedRecipe(recipe)
                         }}
-                        className="h-10 w-10 rounded-lg border border-game-border bg-game-surface-raised text-game-muted hover:bg-game-surface hover:text-game-ink"
+                        className="h-10 w-10 rounded-lg border border-game-border bg-game-surface-raised text-game-moss hover:bg-game-moss/10 hover:text-game-moss-strong"
                         aria-label={`View ${recipe.name}`}
                         title={`View ${recipe.name}`}
                       >

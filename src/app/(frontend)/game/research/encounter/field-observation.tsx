@@ -415,10 +415,9 @@ export function FieldObservationGame({
                   if (replay?.success) window.location.reload()
                   else router.push('/game/explore')
                 }}
-                className="w-full border border-game-border-strong bg-game-surface-raised font-bold text-game-ink hover:bg-game-canvas"
               >
                 <RotateCcw className="w-4 h-4 mr-2" />
-                Play again
+                Play Again
               </Button>
             ) : undefined
           }
