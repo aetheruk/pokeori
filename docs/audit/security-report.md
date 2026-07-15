@@ -6,7 +6,7 @@
 **Severity**: 🔴 Critical  
 **Location**: `.env` (lines 1-5)  
 **Description**: The `.env` file contains unencrypted production credentials:
-- `DATABASE_URI`: Full PostgreSQL connection string with credentials, host IP `135.181.32.229`
+- `DATABASE_URI`: Full MongoDB connection string with credentials
 - `PAYLOAD_SECRET`: CMS session signing key
 - `RESEND_API_KEY`: Email service API key
 - `GEMINI_API_KEY`: Google Gemini API key

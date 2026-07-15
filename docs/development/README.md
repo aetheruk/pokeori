@@ -16,7 +16,7 @@ Follow the [Setup Guide](/docs/development/getting-started.md) to run the projec
 
 ## Prerequisites
 - Bun 1.3.13
-- PostgreSQL database
+- MongoDB database
 - Redis server (for local dev)
 - Git
 

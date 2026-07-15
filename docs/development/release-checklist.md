@@ -30,7 +30,7 @@ changes.
 - Test reward summary and user data refresh after completion.
 
 ## Rollout
-- Back up production Postgres before schema or data migrations.
+- Back up production MongoDB before schema or data migrations.
 - Confirm Redis is reachable and TLS settings match the deployment environment.
 - Deploy to staging first when available.
 - Check server logs for request IDs on API failures.

@@ -3,7 +3,7 @@
 Deploy Pokeori to production.
 
 ## Prerequisites
-- PostgreSQL database (hosted, e.g., Supabase, Neon)
+- MongoDB database (hosted, e.g., MongoDB Atlas)
 - Redis instance (hosted, e.g., Upstash)
 - Payload CMS compatible hosting (Vercel, Railway, etc.)
 
@@ -16,7 +16,7 @@ Docker deployments use Bun for dependency installation, the Next build, and the 
 
 ## Environment Setup
 Set all production environment variables:
-- `DATABASE_URI`: Production PostgreSQL connection string
+- `DATABASE_URI`: Production MongoDB connection string
 - `PAYLOAD_SECRET`: Strong random secret (generate with `openssl rand -hex 32`)
 - `RESEND_API_KEY`: Production Resend API key
 - `NEXT_PUBLIC_APP_URL`: Production URL (e.g., `https://pokeori.app`)
@@ -34,7 +34,7 @@ Set all production environment variables:
 2. Run the generated standalone Next server
 
 ## Post-Deployment
-1. Run Payload CMS migrations
+1. Run any intentional MongoDB data migration scripts, such as `bun run migrate:user-state -- --dry-run`, before applying them
 2. Verify API endpoints
 3. Test critical user flows
 4. Monitor error logs

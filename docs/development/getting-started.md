@@ -4,7 +4,7 @@ Set up Pokeori locally.
 
 ## Prerequisites
 - Bun 1.3.13
-- PostgreSQL database
+- MongoDB database
 - Redis server
 
 ## Steps

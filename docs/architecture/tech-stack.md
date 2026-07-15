@@ -15,12 +15,11 @@ Full dependency list with versions and purposes.
 | Package | Version | Purpose |
 |---------|---------|---------|
 | payload | 3.85.1 | Headless CMS |
-| @payloadcms/db-postgres | 3.85.1 | PostgreSQL adapter |
+| @payloadcms/db-mongodb | 3.85.1 | MongoDB adapter |
 | @payloadcms/next | 3.85.1 | Payload Next.js integration |
 | @payloadcms/richtext-lexical | 3.85.1 | Rich text editor |
 | @payloadcms/email-resend | 3.85.1 | Email service |
 | ioredis | 5.11.1 | Redis client |
-| pg | 8.21.0 | PostgreSQL driver |
 
 ## Styling & UI
 | Package | Version | Purpose |
