@@ -28,9 +28,6 @@ const nextConfig = {
   },
   // Optimize package imports to reduce bundle size
   experimental: {
-    // Keep production builds within the memory budget of the deployment host.
-    cpus: 1,
-    webpackMemoryOptimizations: true,
     optimizePackageImports: [
       'lucide-react',
       'react-icons',
