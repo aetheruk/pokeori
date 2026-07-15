@@ -19,6 +19,16 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_IGNORE_TYPECHECK=true
+# These values are only used while compiling the image. The real runtime
+# values must be configured in Coolify and are not copied into the runner.
+ARG DATABASE_URI=mongodb://127.0.0.1:27017/pokeori
+ARG PAYLOAD_SECRET=pokeori-build-only-placeholder
+ARG RESEND_API_KEY=re_pokeori-build-only-placeholder
+ARG REDIS_URL=redis://127.0.0.1:6379
+ENV DATABASE_URI=${DATABASE_URI}
+ENV PAYLOAD_SECRET=${PAYLOAD_SECRET}
+ENV RESEND_API_KEY=${RESEND_API_KEY}
+ENV REDIS_URL=${REDIS_URL}
 RUN bun next build --webpack
 
 # Production image, copy all the files and run next

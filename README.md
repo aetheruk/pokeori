@@ -90,6 +90,10 @@ tests                      Unit, integrity, and mechanics tests
 
 Issues, documentation improvements, tests, accessibility fixes, and code contributions are welcome. Please read the [contributor guide](./docs/contributors/README.md) before opening a pull request. Keep third-party source credits intact and do not add assets that imply official Pokémon affiliation.
 
+## Deployment
+
+Production images are built on GitHub Actions and deployed to Coolify after changes are merged to protected `main`. See the [GitHub Actions and Coolify guide](./docs/development/github-actions-coolify.md).
+
 ## Versioning
 
 Pokeori currently uses the pre-release version `0.0.1`. Until the first stable release, APIs, data formats, and game systems may change without backwards compatibility.
