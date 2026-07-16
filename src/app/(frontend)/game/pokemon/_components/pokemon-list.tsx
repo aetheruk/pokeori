@@ -4,8 +4,6 @@ import {
   Box,
   Check,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   ChevronUp,
   Circle,
   Diamond,
@@ -18,9 +16,26 @@ import {
   Trash2,
   Triangle,
 } from 'lucide-react'
+import {
+  closestCenter,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  type DragEndEvent,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  rectSortingStrategy,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { type PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
 import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
@@ -133,6 +148,10 @@ export function PokemonList() {
     useState<RosterSelection | null>(null)
   const [isAssigningRoster, setIsAssigningRoster] = useState(false)
   const [isReorderingBattleTeam, setIsReorderingBattleTeam] = useState(false)
+  const battleTeamSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
   const [releaseResult, setReleaseResult] = useState<any | null>(null)
   const [releasedPokemonResult, setReleasedPokemonResult] =
     useState<Pokemon | null>(null)
@@ -316,20 +335,8 @@ export function PokemonList() {
     }
   }
 
-  const moveBattleTeamMember = async (pokemonId: string, direction: -1 | 1) => {
+  const saveBattleTeamOrder = async (reordered: Pokemon[]) => {
     if (isReorderingBattleTeam) return
-    const ordered = [...battleTeam].sort(
-      (a, b) => (a.battleTeamPosition || 0) - (b.battleTeamPosition || 0),
-    )
-    const currentIndex = ordered.findIndex((pokemon) => pokemon.id === pokemonId)
-    const targetIndex = currentIndex + direction
-    if (currentIndex < 0 || targetIndex < 0 || targetIndex >= ordered.length) return
-
-    const reordered = [...ordered]
-    ;[reordered[currentIndex], reordered[targetIndex]] = [
-      reordered[targetIndex],
-      reordered[currentIndex],
-    ]
     setIsReorderingBattleTeam(true)
     try {
       const result = await reorderBattleTeam(reordered.map((pokemon) => pokemon.id))
@@ -344,6 +351,17 @@ export function PokemonList() {
     } finally {
       setIsReorderingBattleTeam(false)
     }
+  }
+
+  const handleBattleTeamDragEnd = async ({ active, over }: DragEndEvent) => {
+    if (!over || active.id === over.id) return
+    const ordered = [...battleTeam].sort(
+      (a, b) => (a.battleTeamPosition || 0) - (b.battleTeamPosition || 0),
+    )
+    const oldIndex = ordered.findIndex((pokemon) => pokemon.id === active.id)
+    const newIndex = ordered.findIndex((pokemon) => pokemon.id === over.id)
+    if (oldIndex < 0 || newIndex < 0) return
+    await saveBattleTeamOrder(arrayMove(ordered, oldIndex, newIndex))
   }
 
   const startLongPress = (pokemon: Pokemon) => {
@@ -1126,52 +1144,32 @@ export function PokemonList() {
                           {battleTeam.length}/6
                         </div>
                       </div>
+                      <DndContext
+                        sensors={battleTeamSensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleBattleTeamDragEnd}
+                      >
+                      <SortableContext
+                        items={[...battleTeam]
+                          .sort((a, b) => (a.battleTeamPosition || 0) - (b.battleTeamPosition || 0))
+                          .map((pokemon) => pokemon.id)}
+                        strategy={rectSortingStrategy}
+                      >
                       <div className="grid w-full grid-cols-3 gap-2">
                         {[...Array(6)].map((_, i) => {
                           const p = battleTeam.find(
                             (pokemon) => pokemon.battleTeamPosition === i + 1,
                           )
                           return p ? (
-                            <div
+                            <SortableBattleTeamMember
                               key={p.id}
-                              className="relative aspect-square w-full max-w-[104px]"
+                              pokemonId={p.id}
+                              disabled={isReorderingBattleTeam}
                             >
                               {renderPokemonCard(p, {
                                 showRosterBadge: false,
                               })}
-                              <div className="absolute inset-x-1 bottom-1 z-50 flex justify-between gap-1">
-                                <Button
-                                  type="button"
-                                  size="icon"
-                                  variant="outline"
-                                  className="h-9 w-9 border-game-border bg-game-surface-raised/95 text-game-ink hover:bg-game-moss/10 hover:text-game-moss-strong"
-                                  disabled={i === 0 || isReorderingBattleTeam}
-                                  aria-label={`Move ${p.name} to the previous team position`}
-                                  onClick={(event) => {
-                                    event.preventDefault()
-                                    event.stopPropagation()
-                                    moveBattleTeamMember(p.id, -1)
-                                  }}
-                                >
-                                  <ChevronLeft className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  type="button"
-                                  size="icon"
-                                  variant="outline"
-                                  className="h-9 w-9 border-game-border bg-game-surface-raised/95 text-game-ink hover:bg-game-moss/10 hover:text-game-moss-strong"
-                                  disabled={i === battleTeam.length - 1 || isReorderingBattleTeam}
-                                  aria-label={`Move ${p.name} to the next team position`}
-                                  onClick={(event) => {
-                                    event.preventDefault()
-                                    event.stopPropagation()
-                                    moveBattleTeamMember(p.id, 1)
-                                  }}
-                                >
-                                  <ChevronRight className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </div>
+                            </SortableBattleTeamMember>
                           ) : (
                             <button
                               type="button"
@@ -1192,6 +1190,8 @@ export function PokemonList() {
                           )
                         })}
                       </div>
+                      </SortableContext>
+                      </DndContext>
                     </div>
                   </div>
                   <div className="w-full shrink-0">
@@ -1581,5 +1581,33 @@ function EggHatchOverlay({ onComplete }: { onComplete: () => void }) {
         </div>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function SortableBattleTeamMember({
+  pokemonId,
+  disabled,
+  children,
+}: PropsWithChildren<{ pokemonId: string; disabled: boolean }>) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: pokemonId, disabled })
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        touchAction: 'none',
+      }}
+      className={cn(
+        'relative aspect-square w-full max-w-[104px] cursor-grab active:cursor-grabbing',
+        isDragging && 'z-50 opacity-50',
+      )}
+      {...attributes}
+      {...listeners}
+    >
+      {children}
+    </div>
   )
 }
