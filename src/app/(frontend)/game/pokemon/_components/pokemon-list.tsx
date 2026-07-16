@@ -500,7 +500,7 @@ export function PokemonList() {
     return (
       <Dialog>
         <DialogTrigger asChild>
-          <Card className="game-focus-ring group relative aspect-square cursor-pointer border border-game-border bg-game-surface-raised p-1.5 transition-colors hover:border-game-moss/45 hover:bg-game-surface">
+          <Card className="game-focus-ring group relative h-full w-full aspect-square cursor-pointer border border-game-border bg-game-surface-raised p-1.5 transition-colors hover:border-game-moss/45 hover:bg-game-surface">
             <Image src="/sprites/items/egg.png" alt="Pokemon Egg" width={128} height={128} className="h-full w-full object-contain" />
           </Card>
         </DialogTrigger>
