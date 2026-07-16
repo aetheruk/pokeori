@@ -16,9 +16,26 @@ import {
   Trash2,
   Triangle,
 } from 'lucide-react'
+import {
+  closestCenter,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  type DragEndEvent,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  rectSortingStrategy,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { type PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
 import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
@@ -62,6 +79,7 @@ import {
   identifyPokemon,
   hatchEgg,
   releasePokemonBulk,
+  reorderBattleTeam,
   renameBox,
   setPokemonRosterRole,
 } from '../actions'
@@ -129,6 +147,11 @@ export function PokemonList() {
   const [rosterSelection, setRosterSelection] =
     useState<RosterSelection | null>(null)
   const [isAssigningRoster, setIsAssigningRoster] = useState(false)
+  const [isReorderingBattleTeam, setIsReorderingBattleTeam] = useState(false)
+  const battleTeamSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
   const [releaseResult, setReleaseResult] = useState<any | null>(null)
   const [releasedPokemonResult, setReleasedPokemonResult] =
     useState<Pokemon | null>(null)
@@ -312,6 +335,35 @@ export function PokemonList() {
     }
   }
 
+  const saveBattleTeamOrder = async (reordered: Pokemon[]) => {
+    if (isReorderingBattleTeam) return
+    setIsReorderingBattleTeam(true)
+    try {
+      const result = await reorderBattleTeam(reordered.map((pokemon) => pokemon.id))
+      if (!result.success) {
+        toast.error(result.message || 'Could not reorder the battle team.')
+        return
+      }
+      setBattleTeam(reordered.map((pokemon, index) => ({ ...pokemon, battleTeamPosition: index + 1 })))
+      await refreshUser()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Could not reorder the battle team.')
+    } finally {
+      setIsReorderingBattleTeam(false)
+    }
+  }
+
+  const handleBattleTeamDragEnd = async ({ active, over }: DragEndEvent) => {
+    if (!over || active.id === over.id) return
+    const ordered = [...battleTeam].sort(
+      (a, b) => (a.battleTeamPosition || 0) - (b.battleTeamPosition || 0),
+    )
+    const oldIndex = ordered.findIndex((pokemon) => pokemon.id === active.id)
+    const newIndex = ordered.findIndex((pokemon) => pokemon.id === over.id)
+    if (oldIndex < 0 || newIndex < 0) return
+    await saveBattleTeamOrder(arrayMove(ordered, oldIndex, newIndex))
+  }
+
   const startLongPress = (pokemon: Pokemon) => {
     if (isBulkReleaseMode || isSelectingPokemonForItem || rosterSelection)
       return
@@ -448,7 +500,7 @@ export function PokemonList() {
     return (
       <Dialog>
         <DialogTrigger asChild>
-          <Card className="game-focus-ring group relative h-full w-full aspect-square cursor-pointer border border-game-border bg-game-surface-raised p-1.5 transition-colors hover:border-game-moss/45 hover:bg-game-surface">
+          <Card className="game-focus-ring group relative aspect-square cursor-pointer border border-game-border bg-game-surface-raised p-1.5 transition-colors hover:border-game-moss/45 hover:bg-game-surface">
             <Image src="/sprites/items/egg.png" alt="Pokemon Egg" width={128} height={128} className="h-full w-full object-contain" />
           </Card>
         </DialogTrigger>
@@ -1092,20 +1144,32 @@ export function PokemonList() {
                           {battleTeam.length}/6
                         </div>
                       </div>
+                      <DndContext
+                        sensors={battleTeamSensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleBattleTeamDragEnd}
+                      >
+                      <SortableContext
+                        items={[...battleTeam]
+                          .sort((a, b) => (a.battleTeamPosition || 0) - (b.battleTeamPosition || 0))
+                          .map((pokemon) => pokemon.id)}
+                        strategy={rectSortingStrategy}
+                      >
                       <div className="grid w-full grid-cols-3 gap-2">
                         {[...Array(6)].map((_, i) => {
                           const p = battleTeam.find(
                             (pokemon) => pokemon.battleTeamPosition === i + 1,
                           )
                           return p ? (
-                            <div
+                            <SortableBattleTeamMember
                               key={p.id}
-                              className="aspect-square w-full max-w-[104px]"
+                              pokemonId={p.id}
+                              disabled={isReorderingBattleTeam}
                             >
                               {renderPokemonCard(p, {
                                 showRosterBadge: false,
                               })}
-                            </div>
+                            </SortableBattleTeamMember>
                           ) : (
                             <button
                               type="button"
@@ -1126,6 +1190,8 @@ export function PokemonList() {
                           )
                         })}
                       </div>
+                      </SortableContext>
+                      </DndContext>
                     </div>
                   </div>
                   <div className="w-full shrink-0">
@@ -1515,5 +1581,33 @@ function EggHatchOverlay({ onComplete }: { onComplete: () => void }) {
         </div>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function SortableBattleTeamMember({
+  pokemonId,
+  disabled,
+  children,
+}: PropsWithChildren<{ pokemonId: string; disabled: boolean }>) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: pokemonId, disabled })
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        touchAction: 'none',
+      }}
+      className={cn(
+        'relative aspect-square w-full max-w-[104px] cursor-grab active:cursor-grabbing',
+        isDragging && 'z-50 opacity-50',
+      )}
+      {...attributes}
+      {...listeners}
+    >
+      {children}
+    </div>
   )
 }
