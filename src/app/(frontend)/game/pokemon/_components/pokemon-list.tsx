@@ -4,6 +4,8 @@ import {
   Box,
   Check,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ChevronUp,
   Circle,
   Diamond,
@@ -62,6 +64,7 @@ import {
   identifyPokemon,
   hatchEgg,
   releasePokemonBulk,
+  reorderBattleTeam,
   renameBox,
   setPokemonRosterRole,
 } from '../actions'
@@ -129,6 +132,7 @@ export function PokemonList() {
   const [rosterSelection, setRosterSelection] =
     useState<RosterSelection | null>(null)
   const [isAssigningRoster, setIsAssigningRoster] = useState(false)
+  const [isReorderingBattleTeam, setIsReorderingBattleTeam] = useState(false)
   const [releaseResult, setReleaseResult] = useState<any | null>(null)
   const [releasedPokemonResult, setReleasedPokemonResult] =
     useState<Pokemon | null>(null)
@@ -309,6 +313,36 @@ export function PokemonList() {
     if (success) {
       setRosterSelection(null)
       setIsPanelExpanded(true)
+    }
+  }
+
+  const moveBattleTeamMember = async (pokemonId: string, direction: -1 | 1) => {
+    if (isReorderingBattleTeam) return
+    const ordered = [...battleTeam].sort(
+      (a, b) => (a.battleTeamPosition || 0) - (b.battleTeamPosition || 0),
+    )
+    const currentIndex = ordered.findIndex((pokemon) => pokemon.id === pokemonId)
+    const targetIndex = currentIndex + direction
+    if (currentIndex < 0 || targetIndex < 0 || targetIndex >= ordered.length) return
+
+    const reordered = [...ordered]
+    ;[reordered[currentIndex], reordered[targetIndex]] = [
+      reordered[targetIndex],
+      reordered[currentIndex],
+    ]
+    setIsReorderingBattleTeam(true)
+    try {
+      const result = await reorderBattleTeam(reordered.map((pokemon) => pokemon.id))
+      if (!result.success) {
+        toast.error(result.message || 'Could not reorder the battle team.')
+        return
+      }
+      setBattleTeam(reordered.map((pokemon, index) => ({ ...pokemon, battleTeamPosition: index + 1 })))
+      await refreshUser()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Could not reorder the battle team.')
+    } finally {
+      setIsReorderingBattleTeam(false)
     }
   }
 
@@ -1100,11 +1134,43 @@ export function PokemonList() {
                           return p ? (
                             <div
                               key={p.id}
-                              className="aspect-square w-full max-w-[104px]"
+                              className="relative aspect-square w-full max-w-[104px]"
                             >
                               {renderPokemonCard(p, {
                                 showRosterBadge: false,
                               })}
+                              <div className="absolute inset-x-1 bottom-1 z-50 flex justify-between gap-1">
+                                <Button
+                                  type="button"
+                                  size="icon"
+                                  variant="outline"
+                                  className="h-9 w-9 border-game-border bg-game-surface-raised/95 text-game-ink hover:bg-game-moss/10 hover:text-game-moss-strong"
+                                  disabled={i === 0 || isReorderingBattleTeam}
+                                  aria-label={`Move ${p.name} to the previous team position`}
+                                  onClick={(event) => {
+                                    event.preventDefault()
+                                    event.stopPropagation()
+                                    moveBattleTeamMember(p.id, -1)
+                                  }}
+                                >
+                                  <ChevronLeft className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  type="button"
+                                  size="icon"
+                                  variant="outline"
+                                  className="h-9 w-9 border-game-border bg-game-surface-raised/95 text-game-ink hover:bg-game-moss/10 hover:text-game-moss-strong"
+                                  disabled={i === battleTeam.length - 1 || isReorderingBattleTeam}
+                                  aria-label={`Move ${p.name} to the next team position`}
+                                  onClick={(event) => {
+                                    event.preventDefault()
+                                    event.stopPropagation()
+                                    moveBattleTeamMember(p.id, 1)
+                                  }}
+                                >
+                                  <ChevronRight className="h-4 w-4" />
+                                </Button>
+                              </div>
                             </div>
                           ) : (
                             <button
