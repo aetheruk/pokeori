@@ -44,7 +44,7 @@ export function TrainerSearch() {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="game-paper-first game-paper-texture flex flex-col h-full overflow-hidden bg-game-canvas text-game-ink">
       <div className="relative z-10 mx-auto min-h-0 w-full max-w-3xl flex-1 space-y-6 overflow-y-auto px-4 py-5 md:px-6">
         <div className="space-y-4">
           <div className="flex items-center gap-3 border-b border-game-border pb-4">

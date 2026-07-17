@@ -802,7 +802,7 @@ export function InventoryList() {
   )
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="game-paper-first game-paper-texture flex flex-col h-full overflow-hidden bg-game-canvas text-game-ink">
       <PremiumHeader title="INVENTORY" subtitle="Storage" />
 
       <div className="hidden items-center gap-3 border-b border-game-border bg-game-surface/70 px-6 py-3 xl:flex">
@@ -860,7 +860,7 @@ export function InventoryList() {
                     className="w-9 h-9 object-contain"
                   />
                   <span className="min-w-0">
-                    <span className="block truncate text-sm font-black text-game-ink">
+                    <span className="block truncate text-sm font-semibold italic text-game-ink">
                       {item.details.name}
                     </span>
                     <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-game-moss-strong">
@@ -1467,7 +1467,7 @@ const InventoryItemCard = memo(function InventoryItemCard({
         <span className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-game-muted transition-colors group-hover:text-game-moss-strong">
           {getInventorySubCategoryLabel(item.displaySubCategory)}
         </span>
-        <h3 className="font-black italic tracking-tighter text-base truncate text-game-ink leading-none">
+        <h3 className="font-semibold italic tracking-tighter text-base truncate text-game-ink leading-none">
           {item.details.name}
         </h3>
         {actionLabel && (

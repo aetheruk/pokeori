@@ -335,7 +335,7 @@ function ResearchSection({
         Research Progress
       </SectionDivider>
 
-      <div className="game-paper-texture relative overflow-hidden rounded-2xl border border-game-border bg-game-surface p-5 shadow-sm">
+      <div className="relative overflow-hidden rounded-2xl border border-game-border bg-game-surface-raised p-5 shadow-sm">
         <div className="absolute right-0 top-0 p-3 opacity-[0.07]">
           <FlaskConical className="h-16 w-16 -rotate-12 text-game-moss" />
         </div>
@@ -801,7 +801,7 @@ export function PokemonDetailsDialog({
         desktopWidth="min(42vw, 620px)"
         mobileHeader={false}
         showHandle={false}
-        className="flex max-h-[92dvh] w-full flex-col gap-0 overflow-hidden bg-game-surface p-0 text-game-ink"
+        className="game-paper-first game-paper-texture flex max-h-[92dvh] w-full flex-col gap-0 overflow-hidden bg-game-canvas p-0 text-game-ink"
       >
         {/* Fixed Image at Top */}
         <div className="relative -mt-1 aspect-[2/1] w-full flex-shrink-0 overflow-hidden border-b border-game-border">
@@ -1098,7 +1098,7 @@ export function PokemonDetailsDialog({
                       return (
                         <div
                           key={evo.speciesId}
-                          className="game-paper-texture relative overflow-hidden rounded-2xl border border-game-ochre/40 bg-game-surface p-4 shadow-sm"
+                          className="relative overflow-hidden rounded-2xl border border-game-ochre/40 bg-game-surface-raised p-4 shadow-sm"
                         >
                           <div className="absolute right-0 top-0 p-3 opacity-[0.08]">
                             <Sparkles className="h-12 w-12 rotate-12 text-game-ochre" />
@@ -1149,8 +1149,8 @@ export function PokemonDetailsDialog({
               )
             })()}
 
-            <div className="w-full max-w-sm space-y-4">
-              <div className="game-paper-texture space-y-4 rounded-2xl border border-game-border bg-game-surface p-4 shadow-sm">
+            <div className="w-full max-w-md space-y-4">
+              <div className="space-y-4 rounded-2xl border border-game-border bg-game-surface-raised p-4 shadow-sm">
                 <div className="space-y-1.5">
                   <span className="block px-1 text-[10px] font-bold uppercase tracking-widest text-game-muted">
                     Active Box
@@ -1225,7 +1225,7 @@ export function PokemonDetailsDialog({
             </div>
 
             {/* Status Board */}
-            <div className="w-full max-w-sm space-y-4">
+            <div className="w-full max-w-md space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 {[
                   {
@@ -1321,11 +1321,11 @@ export function PokemonDetailsDialog({
               </div>
             </div>
 
-            <div className="w-full max-w-sm space-y-4">
+            <div className="w-full max-w-md space-y-4">
               <SectionDivider className="uppercase tracking-[0.2em] font-black text-[10px]">
                 Held Item
               </SectionDivider>
-              <div className="game-paper-texture space-y-4 rounded-2xl border border-game-border bg-game-surface p-4 shadow-sm">
+              <div className="space-y-4 rounded-2xl border border-game-border bg-game-surface-raised p-4 shadow-sm">
                 {heldItemsUnlockMessage ? (
                   <div className="rounded-xl border border-game-border bg-game-surface-raised px-4 py-3 text-xs text-game-muted">
                     {heldItemsUnlockMessage}
@@ -1465,11 +1465,11 @@ export function PokemonDetailsDialog({
             </div>
 
             {availablePokemonPowers.length > 0 && (
-              <div className="w-full max-w-sm space-y-4">
+              <div className="w-full max-w-md space-y-4">
                 <SectionDivider className="uppercase tracking-[0.2em] font-black text-[10px]">
                   Pokemon Power
                 </SectionDivider>
-                <div className="game-paper-texture space-y-4 rounded-2xl border border-game-border bg-game-surface p-4 shadow-sm">
+                <div className="space-y-4 rounded-2xl border border-game-border bg-game-surface-raised p-4 shadow-sm">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <div className="text-[10px] font-black uppercase tracking-widest text-game-ochre">
@@ -1542,11 +1542,11 @@ export function PokemonDetailsDialog({
             )}
 
             {/* Battle Moves Section */}
-            <div className="w-full max-w-sm space-y-4">
+            <div className="w-full max-w-md space-y-4">
               <SectionDivider className="uppercase tracking-[0.2em] font-black text-[10px]">
                 Battle Moves
               </SectionDivider>
-              <div className="game-paper-texture space-y-4 rounded-2xl border border-game-border bg-game-surface p-4 shadow-sm">
+              <div className="space-y-4 rounded-2xl border border-game-border bg-game-surface-raised p-4 shadow-sm">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <div className="text-[10px] font-black uppercase tracking-widest text-game-moss-strong">
@@ -1712,11 +1712,11 @@ export function PokemonDetailsDialog({
               if (!ability) return null
               const partnerEffects = getAbilityDexPartnerEffectLines(ability)
               return (
-                <div className="w-full max-w-sm space-y-4">
+                <div className="w-full max-w-md space-y-4">
                   <SectionDivider className="uppercase tracking-[0.2em] font-black text-[10px]">
                     Intrinsic Ability
                   </SectionDivider>
-                  <div className="game-paper-texture relative overflow-hidden rounded-2xl border border-game-border bg-game-surface p-5 shadow-sm">
+                  <div className="relative overflow-hidden rounded-2xl border border-game-border bg-game-surface-raised p-5 shadow-sm">
                     <div className="absolute right-0 top-0 p-4 opacity-[0.07]">
                       <Info className="h-12 w-12 rotate-12 text-game-moss" />
                     </div>
@@ -1753,7 +1753,7 @@ export function PokemonDetailsDialog({
             {/* Stats Carousel */}
             <div className="w-full max-w-md space-y-4">
               <div
-                className="game-paper-texture relative overflow-hidden rounded-3xl border border-game-border bg-game-surface p-6 shadow-sm"
+                className="relative overflow-hidden rounded-3xl border border-game-border bg-game-surface-raised p-6 shadow-sm"
                 data-vaul-no-drag
               >
                 <Carousel className="w-full max-w-[280px] mx-auto">
@@ -2010,7 +2010,7 @@ export function PokemonDetailsDialog({
 
         {/* Fixed Use Item at Bottom */}
         <div className="relative flex-shrink-0 border-t border-game-border bg-game-surface-raised p-6">
-          <div className="w-full max-w-sm mx-auto">
+          <div className="w-full max-w-md mx-auto">
             <UseItemDialog
               pokemon={pokemon}
               onUpdate={onRename}

@@ -303,7 +303,7 @@ export default function TcgExplorerPage() {
   ])
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
+    <div className="game-paper-first game-paper-texture flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
       <PremiumHeader title="Carddex" subtitle="Collection" />
 
       <div className="hidden items-center gap-3 border-b border-game-border bg-game-surface/70 px-6 py-3 xl:flex">

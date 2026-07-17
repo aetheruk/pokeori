@@ -4,16 +4,16 @@ import { ResultActionButton } from '@/components/game/ResearchResult'
 import { Button } from '@/components/ui/button'
 
 describe('result action button', () => {
-  test('uses the moss result treatment and preserves action state', () => {
+  test('uses the clay result treatment and preserves action state', () => {
     const markup = renderToStaticMarkup(
       <ResultActionButton disabled aria-busy="true">
         Play Again
       </ResultActionButton>,
     )
 
-    expect(markup).toContain('bg-game-moss')
+    expect(markup).toContain('bg-game-clay')
     expect(markup).toContain('text-game-cream')
-    expect(markup).toContain('hover:bg-game-moss-strong')
+    expect(markup).toContain('hover:bg-game-clay-strong')
     expect(markup).toContain('disabled=""')
     expect(markup).toContain('aria-busy="true"')
   })
@@ -30,9 +30,9 @@ describe('result action button', () => {
       </ResultActionButton>,
     )
 
-    expect(markup).toContain('bg-game-moss')
+    expect(markup).toContain('bg-game-clay')
     expect(markup).toContain('text-game-cream')
-    expect(markup).not.toContain('bg-game-surface-raised')
+    expect(markup).toContain('hover:bg-game-clay-strong')
     expect(markup).not.toContain('text-game-ink')
   })
 })

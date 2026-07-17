@@ -941,7 +941,7 @@ export function PokemonList() {
   if (!user) return null
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
+    <div className="game-paper-first game-paper-texture flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
       <PremiumHeader
         title="POKEMON BOX"
         subtitle={`${totalPokemonCount} / ${user?.maxPokemon || 50}`}
@@ -1573,7 +1573,7 @@ function EggHatchOverlay({ onComplete }: { onComplete: () => void }) {
   }, [onComplete])
   return (
     <Dialog open>
-      <DialogContent showCloseButton={false} className="fixed inset-0 z-[100] m-0 flex h-[100dvh] w-screen max-w-none !translate-x-0 !translate-y-0 items-center justify-center rounded-none border-none bg-game-night p-0">
+      <DialogContent showCloseButton={false} className="game-night fixed inset-0 z-[100] m-0 flex h-[100dvh] w-screen max-w-none !translate-x-0 !translate-y-0 items-center justify-center rounded-none border-none bg-game-night p-0">
         <DialogTitle className="sr-only">An Egg is hatching</DialogTitle>
         <div className={cn('flex flex-col items-center transition-all duration-500', phase === 'flash' && 'scale-125 opacity-20')}>
           <Image src="/sprites/pokemon/home/egg.png" alt="Hatching Egg" width={320} height={320} className={cn('h-64 w-64 object-contain', phase === 'warm' && 'animate-pulse motion-reduce:animate-none')} />

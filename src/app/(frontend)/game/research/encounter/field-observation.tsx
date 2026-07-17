@@ -296,7 +296,7 @@ export function FieldObservationGame({
               </>
             ) : (
               <div className="absolute inset-0 flex items-center justify-center p-4 pt-16 sm:p-6 sm:pt-16">
-                <div className="flex max-h-full w-full max-w-4xl flex-col overflow-hidden rounded-lg border border-game-border bg-game-surface text-game-ink shadow-lg">
+                <div className="flex max-h-full w-full max-w-4xl flex-col overflow-hidden rounded-lg border border-game-border bg-game-surface-raised text-game-ink shadow-lg">
                   <div className="relative shrink-0 overflow-hidden border-b border-game-border bg-game-surface-raised px-4 py-3">
                     <div className="relative flex min-w-0 items-center gap-3">
                       <Image

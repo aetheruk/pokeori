@@ -44,26 +44,9 @@ export function HighScores({ activeSkill }: { activeSkill: string }) {
   }, [activeSkill])
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      {/* Skill Selector */}
-      <div className="relative z-10 mx-auto w-full max-w-3xl px-4 pt-5 pb-2 md:px-6">
-        <div className="flex items-center gap-3 border-b border-game-border pb-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-game-ochre/35 bg-game-ochre/10 text-game-ochre">
-            <Trophy className="h-6 w-6" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-black uppercase text-game-ochre">
-              League rankings
-            </p>
-            <p className="font-display font-black text-game-ink">
-              Top Trainers
-            </p>
-          </div>
-        </div>
-      </div>
-
+    <div className="game-paper-first game-paper-texture flex flex-col h-full overflow-hidden bg-game-canvas text-game-ink">
       {/* List container */}
-      <div className="relative z-10 mx-auto min-h-0 w-full max-w-3xl flex-1 space-y-4 overflow-y-auto px-4 pt-4 pb-6 md:px-6">
+      <div className="relative z-10 mx-auto min-h-0 w-full max-w-3xl flex-1 space-y-4 overflow-y-auto px-4 pt-5 pb-6 md:px-6">
         {isLoading ? (
           <div
             className="flex flex-col items-center justify-center gap-4 py-20"

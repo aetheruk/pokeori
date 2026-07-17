@@ -54,7 +54,7 @@ export function CaptureScene({
       <div className="text-center space-y-2 w-full px-8">
         <SectionDivider
           className="mb-4 min-h-8 [&>div:first-child]:text-base [&>div:first-child]:font-bold [&>div:first-child]:leading-tight [&>div:first-child]:tracking-[0.04em]"
-          textColor="text-game-cream"
+          textColor="text-game-ink"
         >
           Choose a Poké Ball
         </SectionDivider>
@@ -62,7 +62,7 @@ export function CaptureScene({
 
       {balls.length > 0 ? (
         <div className="relative flex flex-col items-center justify-end gap-6 w-full max-w-sm h-full max-h-[60vh] pb-6">
-          <div className="relative flex w-full items-center justify-between rounded-lg border border-game-border bg-game-surface/95 px-2 py-5 text-game-ink shadow-sm backdrop-blur-xl">
+          <div className="relative flex w-full items-center justify-between rounded-lg border border-game-border bg-game-surface-raised px-2 py-5 text-game-ink shadow-sm backdrop-blur-xl">
             <Button
               type="button"
               variant="ghost"
@@ -136,7 +136,7 @@ export function CaptureScene({
         </div>
       ) : (
         <div className="text-center py-8 space-y-6">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-lg border border-dashed border-game-border bg-game-surface">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-lg border border-dashed border-game-border bg-game-surface-raised">
             <span className="text-4xl">🚫</span>
           </div>
           <div>

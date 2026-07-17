@@ -14,17 +14,17 @@ export const STANCE_ICON_CONFIG: Record<
   power: {
     Icon: BicepsFlexed,
     label: 'Power',
-    tone: 'text-game-danger',
+    tone: 'text-game-clay-strong',
   },
   speed: {
     Icon: FastForward,
     label: 'Speed',
-    tone: 'text-game-moss-strong',
+    tone: 'text-game-stance-blue-strong',
   },
   tech: {
     Icon: Atom,
     label: 'Tech',
-    tone: 'text-game-ochre',
+    tone: 'text-game-moss-strong',
   },
   random: {
     Icon: BadgeQuestionMark,

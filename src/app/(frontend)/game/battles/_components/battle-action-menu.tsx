@@ -82,7 +82,7 @@ export function BattleActionMenu() {
   return (
     <div
       className={cn(
-        'game-paper-texture relative flex min-h-[13rem] flex-[10] flex-col items-center border-t border-game-border bg-game-surface px-3 py-3 text-game-ink transition-opacity',
+        'game-paper-first game-paper-texture relative flex min-h-[13rem] flex-[10] flex-col items-center border-t border-game-border bg-game-canvas px-4 pt-4 pb-6 text-game-ink transition-opacity',
         isWaitingForServer && 'opacity-75',
       )}
       aria-busy={isWaitingForServer || isAnimating}

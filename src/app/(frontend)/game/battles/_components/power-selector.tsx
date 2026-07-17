@@ -305,7 +305,7 @@ export function PowerSelector() {
             </span>
           </SectionDivider>
           {!canUseMove ? (
-            <div className="rounded-md border border-dashed border-game-night-border bg-game-night-canvas/45 px-3 py-4 text-center text-sm text-game-night-muted" role="status" aria-live="polite">
+            <div className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted" role="status" aria-live="polite">
               No move uses remaining this battle
             </div>
           ) : (
@@ -321,7 +321,7 @@ export function PowerSelector() {
                   <Button
                     key={move.id}
                     variant="outline"
-                    className="h-auto min-w-[112px] flex-shrink-0 rounded-xl border border-game-night-border bg-game-night-canvas/55 py-2 px-3 shadow-sm transition-colors hover:border-game-moss/60 hover:bg-game-moss/10"
+                    className="h-auto min-w-[112px] flex-shrink-0 rounded-xl border border-game-border bg-game-surface-raised py-2 px-3 shadow-sm transition-colors hover:border-game-moss/60 hover:bg-game-moss/10"
                     disabled={using !== null}
                     onClick={() => handleUseMove(move.id)}
                   >
@@ -337,19 +337,19 @@ export function PowerSelector() {
                         {move.stance === 'power' && (
                           <StanceIcon
                             stance="power"
-                            className="w-3 h-3 text-game-danger"
+                            className="w-3 h-3 text-game-clay-strong"
                           />
                         )}
                         {move.stance === 'speed' && (
                           <StanceIcon
                             stance="speed"
-                            className="w-3 h-3 text-game-moss"
+                            className="w-3 h-3 text-game-stance-blue-strong"
                           />
                         )}
                         {move.stance === 'tech' && (
                           <StanceIcon
                             stance="tech"
-                            className="w-3 h-3 text-game-ochre"
+                            className="w-3 h-3 text-game-moss-strong"
                           />
                         )}
                         {move.stance === 'random' && (
@@ -382,8 +382,8 @@ export function PowerSelector() {
               variant="outline"
               disabled={disabled || !canUseMove}
               className={cn(
-                'flex-1 h-12 gap-2 rounded-xl border border-game-night-border bg-game-night-surface text-game-night-ink shadow-sm transition-colors',
-                'hover:border-game-moss/60 hover:bg-game-night-surface hover:text-game-night-ink',
+                'flex-1 h-12 gap-2 rounded-xl border border-game-border bg-game-surface-raised text-game-ink shadow-sm transition-colors',
+                'hover:border-game-moss/60 hover:bg-game-surface-raised hover:text-game-ink',
                 !canUseMove && 'opacity-50',
               )}
             >
@@ -394,14 +394,14 @@ export function PowerSelector() {
                 height={22}
                 className="h-5 w-5 object-contain"
               />
-              <span className="rounded-full border border-game-night-border bg-game-night-canvas/60 px-1.5 py-0.5 text-[10px] font-black text-game-night-ink">
+              <span className="rounded-full border border-game-border bg-game-canvas/60 px-1.5 py-0.5 text-[10px] font-black text-game-ink">
                 {Math.max(0, movesUsesRemaining)}/{maxMovesPerBattle}
               </span>
             </Button>
           </DrawerTrigger>
           <DrawerContent
             id={moveDrawerContentId}
-            className="game-night max-h-[70dvh] border-game-night-border bg-game-night-surface"
+            className="game-paper-modal game-paper-texture max-h-[70dvh] border-game-border bg-game-surface-raised"
           >
             {renderMovesContent()}
           </DrawerContent>
@@ -415,8 +415,8 @@ export function PowerSelector() {
               variant="outline"
               disabled={disabled || (!hasAnyPowers && !isBattlePanelLoading)}
               className={cn(
-                'flex-1 h-12 gap-2 rounded-xl border border-game-night-border bg-game-night-surface text-game-night-ink shadow-sm transition-colors',
-                'hover:border-game-moss/60 hover:bg-game-night-surface hover:text-game-night-ink',
+                'flex-1 h-12 gap-2 rounded-xl border border-game-border bg-game-surface-raised text-game-ink shadow-sm transition-colors',
+                'hover:border-game-moss/60 hover:bg-game-surface-raised hover:text-game-ink',
               )}
             >
               <ItemSprite
@@ -426,22 +426,22 @@ export function PowerSelector() {
                 height={22}
                 className="h-5 w-5 object-contain"
               />
-              <span className="rounded-full border border-game-night-border bg-game-night-canvas/60 px-1.5 py-0.5 text-[10px] font-black text-game-night-ink">
+              <span className="rounded-full border border-game-border bg-game-canvas/60 px-1.5 py-0.5 text-[10px] font-black text-game-ink">
                 {powerUsesChip}
               </span>
             </Button>
           </DrawerTrigger>
           <DrawerContent
             id={powerDrawerContentId}
-            className="game-night max-h-[80dvh] border-game-night-border bg-game-night-surface"
+            className="game-paper-modal game-paper-texture max-h-[80dvh] border-game-border bg-game-surface-raised"
           >
             <div className="px-4 pt-4 pb-6 max-w-md mx-auto">
               {isBattlePanelLoading && !powersData ? (
                 <div className="flex items-center justify-center h-40">
-                  <Loader2 className="w-8 h-8 animate-spin text-game-night-muted" />
+                  <Loader2 className="w-8 h-8 animate-spin text-game-muted" />
                 </div>
               ) : !hasAnyPowers ? (
-                <div className="flex flex-col items-center justify-center h-40 text-game-night-muted">
+                <div className="flex flex-col items-center justify-center h-40 text-game-muted">
                   <Zap className="w-12 h-12 mb-2 opacity-50" />
                   <p>
                     {powersData?.selectedPokemonPower
@@ -466,7 +466,7 @@ export function PowerSelector() {
                         </span>
                       </SectionDivider>
                       {!canUseTera ? (
-                        <div className="rounded-md border border-dashed border-game-night-border bg-game-night-canvas/45 px-3 py-4 text-center text-sm text-game-night-muted" role="status" aria-live="polite">
+                        <div className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted" role="status" aria-live="polite">
                           {powersState?.teraUsesRemaining === 0
                             ? 'No Terastallization uses remaining'
                             : isAnyPowerActive
@@ -475,13 +475,13 @@ export function PowerSelector() {
                               : 'This Pokemon has already used Terastallization'}
                         </div>
                       ) : !powersData.teraType ? (
-                        <div className="rounded-md border border-dashed border-game-night-border bg-game-night-canvas/45 px-3 py-4 text-center text-sm text-game-night-muted" role="status" aria-live="polite">
+                        <div className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted" role="status" aria-live="polite">
                           No Tera type set
                         </div>
                       ) : (
                         <Button
                           variant="outline"
-                          className="h-auto w-full py-3 px-4 flex items-center justify-center gap-3 border-game-night-border hover:border-game-moss/60 hover:bg-game-moss/10"
+                          className="h-auto w-full py-3 px-4 flex items-center justify-center gap-3 border-game-border hover:border-game-moss/60 hover:bg-game-moss/10"
                           disabled={using !== null}
                           onClick={handleUseTera}
                         >
@@ -515,20 +515,20 @@ export function PowerSelector() {
                         </div>
                       )}
                       {powersState?.megaEvolved ? (
-                        <div className="rounded-md border border-dashed border-game-night-border bg-game-night-canvas/45 px-3 py-4 text-center text-sm text-game-night-muted" role="status" aria-live="polite">
+                        <div className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted" role="status" aria-live="polite">
                           Mega Evolution active
                         </div>
                       ) : powersState?.megaUsesRemaining === 0 ? (
-                        <div className="rounded-md border border-dashed border-game-night-border bg-game-night-canvas/45 px-3 py-4 text-center text-sm text-game-night-muted" role="status" aria-live="polite">
+                        <div className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted" role="status" aria-live="polite">
                           No Mega Evolution uses remaining
                         </div>
                       ) : isAnyPowerActive ? (
-                        <div className="rounded-md border border-dashed border-game-night-border bg-game-night-canvas/45 px-3 py-4 text-center text-sm text-game-night-muted" role="status" aria-live="polite">
+                        <div className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted" role="status" aria-live="polite">
                           {disabledReason ||
                             'Cannot Evolve while another power is active'}
                         </div>
                       ) : powersData.megaStones.length === 0 ? (
-                        <div className="rounded-md border border-dashed border-game-night-border bg-game-night-canvas/45 px-3 py-4 text-center text-sm text-game-night-muted" role="status" aria-live="polite">
+                        <div className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted" role="status" aria-live="polite">
                           No compatible Evolution items for this Pokémon
                         </div>
                       ) : (
@@ -537,7 +537,7 @@ export function PowerSelector() {
                             <Button
                               key={stone.itemId}
                               variant="outline"
-                              className="h-auto py-3 px-4 flex items-center gap-3 border-game-night-border hover:border-game-moss/60 hover:bg-game-moss/10"
+                              className="h-auto py-3 px-4 flex items-center gap-3 border-game-border hover:border-game-moss/60 hover:bg-game-moss/10"
                               disabled={using !== null}
                               onClick={() => handleUseMega(stone.megaFormId)}
                             >
@@ -550,7 +550,7 @@ export function PowerSelector() {
                               />
                               <div className="flex flex-col items-start">
                                 <span className="text-sm">{stone.name}</span>
-                                <span className="text-[10px] text-game-night-muted">
+                                <span className="text-[10px] text-game-muted">
                                   → {stone.megaFormName}
                                 </span>
                               </div>
@@ -572,7 +572,7 @@ export function PowerSelector() {
                       </SectionDivider>
                       {powersState?.zMoveUsesRemaining !== undefined && (
                         <div className="flex justify-center">
-                          <span className="text-xs text-game-night-muted">
+                          <span className="text-xs text-game-muted">
                             {powersState.zMoveUsesRemaining} use
                             {powersState.zMoveUsesRemaining === 1 ? '' : 's'}{' '}
                             left
@@ -580,18 +580,18 @@ export function PowerSelector() {
                         </div>
                       )}
                       {powersState?.zMoveUsesRemaining === 0 ? (
-                        <div className="rounded-md border border-dashed border-game-night-border bg-game-night-canvas/45 px-3 py-4 text-center text-sm text-game-night-muted" role="status" aria-live="polite">
+                        <div className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted" role="status" aria-live="polite">
                           No Z-Move uses remaining
                         </div>
                       ) : isAnyPowerActive ? (
-                        <div className="text-sm text-game-night-muted py-2">
+                        <div className="text-sm text-game-muted py-2">
                           {disabledReason ||
                             'Cannot use Z-Move while another power is active'}
                         </div>
                       ) : (
                         <Button
                           variant="outline"
-                          className="h-auto w-full rounded-xl border border-game-night-border bg-game-night-canvas/55 py-3 px-4 flex items-center justify-center gap-3 shadow-sm transition-colors hover:border-game-moss/60 hover:bg-game-moss/10"
+                          className="h-auto w-full rounded-xl border border-game-border bg-game-surface-raised py-3 px-4 flex items-center justify-center gap-3 shadow-sm transition-colors hover:border-game-moss/60 hover:bg-game-moss/10"
                           disabled={using !== null}
                           onClick={handleUseZMove}
                         >
@@ -605,7 +605,7 @@ export function PowerSelector() {
                           <span className="text-sm font-semibold">
                             Prepare Z-Move
                           </span>
-                          <span className="text-xs text-game-night-muted">
+                          <span className="text-xs text-game-muted">
                             5x next stance
                           </span>
                         </Button>
@@ -630,20 +630,20 @@ export function PowerSelector() {
                         </div>
                       )}
                       {powersState?.dynamaxActive ? (
-                        <div className="text-sm text-game-night-muted py-2">
+                        <div className="text-sm text-game-muted py-2">
                           Already Dynamaxed
                         </div>
                       ) : powersState?.dynamaxUsesRemaining === 0 ? (
-                        <div className="text-sm text-game-night-muted py-2">
+                        <div className="text-sm text-game-muted py-2">
                           No Dynamax uses remaining
                         </div>
                       ) : isAnyPowerActive ? (
-                        <div className="text-sm text-game-night-muted py-2">
+                        <div className="text-sm text-game-muted py-2">
                           {disabledReason ||
                             'Cannot Dynamax while another power is active'}
                         </div>
                       ) : !powersState?.dynamaxAvailable ? (
-                        <div className="flex items-center gap-2 text-sm text-game-night-muted py-2">
+                        <div className="flex items-center gap-2 text-sm text-game-muted py-2">
                           <Lock className="w-4 h-4" />
                           Win{' '}
                           {DYNAMAX_UNLOCK_TURNS -
@@ -653,7 +653,7 @@ export function PowerSelector() {
                       ) : (
                         <Button
                           variant="outline"
-                          className="w-full h-auto py-4 flex items-center justify-center gap-3 border-game-night-border hover:border-game-moss/60 hover:bg-game-moss/10"
+                          className="w-full h-auto py-4 flex items-center justify-center gap-3 border-game-border hover:border-game-moss/60 hover:bg-game-moss/10"
                           disabled={using !== null}
                           onClick={handleUseDynamax}
                         >
@@ -664,7 +664,7 @@ export function PowerSelector() {
                                 ? 'Gigantamax!'
                                 : 'Dynamax!'}
                             </span>
-                            <span className="text-[10px] text-game-night-muted">
+                            <span className="text-[10px] text-game-muted">
                               {powersData.canGigantamax
                                 ? 'Transform for 3 turns'
                                 : '+20% stats for 3 turns'}
@@ -685,13 +685,13 @@ export function PowerSelector() {
                         </span>
                       </SectionDivider>
                       {!canUseVictory ? (
-                        <div className="text-sm text-game-night-muted py-2">
+                        <div className="text-sm text-game-muted py-2">
                           {powersState?.victoryUsesRemaining === 0
                             ? 'No uses remaining'
                             : 'Cannot use Victory Power now'}
                         </div>
                       ) : powersData.victoryPowers.length === 0 ? (
-                        <div className="text-sm text-game-night-muted py-2">
+                        <div className="text-sm text-game-muted py-2">
                           No valid Victory Powers available
                         </div>
                       ) : (
@@ -700,7 +700,7 @@ export function PowerSelector() {
                             <Button
                               key={vp.itemId}
                               variant="outline"
-                              className="h-auto py-3 px-4 flex items-center gap-3 border-game-night-border hover:border-game-moss/60 hover:bg-game-moss/10"
+                              className="h-auto py-3 px-4 flex items-center gap-3 border-game-border hover:border-game-moss/60 hover:bg-game-moss/10"
                               disabled={using !== null}
                               onClick={() => handleUseVictory(vp.itemId)}
                             >
@@ -739,19 +739,19 @@ export function PowerSelector() {
                         </span>
                       </SectionDivider>
                       {!canUseWeather ? (
-                        <div className="text-sm text-game-night-muted py-2">
+                        <div className="text-sm text-game-muted py-2">
                           {powersState?.weatherUsesRemaining === 0
                             ? 'No Weather Control uses remaining'
                             : 'Cannot use Weather Control now'}
                         </div>
                       ) : powersData.weatherPowers.length === 0 ? (
-                        <div className="text-sm text-game-night-muted py-2">
+                        <div className="text-sm text-game-muted py-2">
                           No Weather Cores available
                         </div>
                       ) : (
                         <div className="space-y-2">
                           {battleState.weather?.label && (
-                            <div className="text-xs text-game-night-muted">
+                            <div className="text-xs text-game-muted">
                               Current weather: {battleState.weather.label}
                             </div>
                           )}
@@ -760,7 +760,7 @@ export function PowerSelector() {
                               <Button
                                 key={weatherPower.itemId}
                                 variant="outline"
-                                className="h-auto py-3 px-4 flex items-center gap-3 border-game-night-border hover:border-game-moss/60 hover:bg-game-moss/10"
+                                className="h-auto py-3 px-4 flex items-center gap-3 border-game-border hover:border-game-moss/60 hover:bg-game-moss/10"
                                 disabled={using !== null}
                                 onClick={() =>
                                   handleUseWeather(weatherPower.weather)
@@ -774,10 +774,10 @@ export function PowerSelector() {
                                   className="w-8 h-8"
                                 />
                                 <div className="flex flex-col items-start">
-                                  <span className="text-sm text-game-night-ink">
+                                  <span className="text-sm text-game-ink">
                                     {weatherPower.label}
                                   </span>
-                                  <span className="text-[10px] text-game-night-muted">
+                                  <span className="text-[10px] text-game-muted">
                                     Battle weather
                                   </span>
                                 </div>
@@ -799,7 +799,7 @@ export function PowerSelector() {
                         </span>
                       </SectionDivider>
                       {!canUseShout ? (
-                        <div className="text-sm text-game-night-muted py-2">
+                        <div className="text-sm text-game-muted py-2">
                           {powersState?.shoutUsesRemaining === 0
                             ? 'No shouts remaining'
                             : 'Cannot shout now'}
@@ -808,43 +808,43 @@ export function PowerSelector() {
                         <div className="grid grid-cols-3 gap-2">
                           <Button
                             variant="outline"
-                            className="h-auto rounded-xl border border-game-night-border bg-game-night-canvas/55 py-3 px-2 flex flex-col items-center gap-1 shadow-sm transition-colors hover:border-game-moss/60 hover:bg-game-moss/10"
+                            className="h-auto rounded-xl border border-game-border bg-game-surface-raised py-3 px-2 flex flex-col items-center gap-1 shadow-sm transition-colors hover:border-game-moss/60 hover:bg-game-moss/10"
                             disabled={using !== null}
                             onClick={() => handleUseShout('power')}
                           >
                             <StanceIcon
                               stance="power"
-                              className="w-6 h-6 text-game-danger mb-1"
+                              className="w-6 h-6 text-game-clay-strong mb-1"
                             />
-                            <span className="text-xs font-medium text-game-danger">
+                            <span className="text-xs font-medium text-game-clay-strong">
                               Power Shout
                             </span>
                           </Button>
                           <Button
                             variant="outline"
-                            className="h-auto rounded-xl border border-game-night-border bg-game-night-canvas/55 py-3 px-2 flex flex-col items-center gap-1 shadow-sm transition-colors hover:border-game-moss/60 hover:bg-game-moss/10"
+                            className="h-auto rounded-xl border border-game-border bg-game-surface-raised py-3 px-2 flex flex-col items-center gap-1 shadow-sm transition-colors hover:border-game-moss/60 hover:bg-game-moss/10"
                             disabled={using !== null}
                             onClick={() => handleUseShout('speed')}
                           >
                             <StanceIcon
                               stance="speed"
-                              className="w-6 h-6 text-game-moss mb-1"
+                              className="w-6 h-6 text-game-stance-blue-strong mb-1"
                             />
-                            <span className="text-xs font-medium text-game-moss">
+                            <span className="text-xs font-medium text-game-stance-blue-strong">
                               Speed Shout
                             </span>
                           </Button>
                           <Button
                             variant="outline"
-                            className="h-auto rounded-xl border border-game-night-border bg-game-night-canvas/55 py-3 px-2 flex flex-col items-center gap-1 shadow-sm transition-colors hover:border-game-ochre/50 hover:bg-game-ochre/10"
+                            className="h-auto rounded-xl border border-game-border bg-game-surface-raised py-3 px-2 flex flex-col items-center gap-1 shadow-sm transition-colors hover:border-game-moss/60 hover:bg-game-moss/10"
                             disabled={using !== null}
                             onClick={() => handleUseShout('tech')}
                           >
                             <StanceIcon
                               stance="tech"
-                              className="w-6 h-6 text-game-ochre mb-1"
+                              className="w-6 h-6 text-game-moss-strong mb-1"
                             />
-                            <span className="text-xs font-medium text-game-ochre">
+                            <span className="text-xs font-medium text-game-moss-strong">
                               Tech Shout
                             </span>
                           </Button>
@@ -863,13 +863,13 @@ export function PowerSelector() {
                         </span>
                       </SectionDivider>
                       {!canUseCircadian ? (
-                        <div className="text-sm text-game-night-muted py-2">
+                        <div className="text-sm text-game-muted py-2">
                           {powersState?.circadianUsesRemaining === 0
                             ? 'No uses remaining'
                             : 'Cannot use Circadian Power now'}
                         </div>
                       ) : (powersState?.turnsPlayedThisBattle ?? 0) < 3 ? (
-                        <div className="flex items-center gap-2 text-sm text-game-night-muted py-2">
+                        <div className="flex items-center gap-2 text-sm text-game-muted py-2">
                           <Lock className="w-4 h-4" />
                           Charge for{' '}
                           {3 - (powersState?.turnsPlayedThisBattle ?? 0)} more
@@ -897,7 +897,7 @@ export function PowerSelector() {
                       </SectionDivider>
 
                       {isAnyPowerActive ? (
-                        <div className="text-sm text-game-night-muted py-2">
+                        <div className="text-sm text-game-muted py-2">
                           {disabledReason ||
                             'Cannot use Dimensional Shift while another power is active'}
                         </div>
@@ -907,7 +907,7 @@ export function PowerSelector() {
                           {powersData.dimensionalShift.time && (
                             <Button
                               variant="outline"
-                              className="h-auto py-3 px-2 flex flex-col items-center gap-1 border-game-night-border hover:border-game-moss/60 hover:bg-game-moss/10"
+                              className="h-auto py-3 px-2 flex flex-col items-center gap-1 border-game-border hover:border-game-moss/60 hover:bg-game-moss/10"
                               disabled={
                                 using !== null ||
                                 (powersState?.dimensionalShift?.charges
@@ -919,7 +919,7 @@ export function PowerSelector() {
                               <span className="text-xs font-medium text-fuchsia-100">
                                 Rewind
                               </span>
-                              <span className="text-[10px] text-game-night-muted">
+                              <span className="text-[10px] text-game-muted">
                                 {powersState?.dimensionalShift?.charges
                                   .losses || 0}
                                 /3 Losses
@@ -931,7 +931,7 @@ export function PowerSelector() {
                           {powersData.dimensionalShift.space && (
                             <Button
                               variant="outline"
-                              className="h-auto py-3 px-2 flex flex-col items-center gap-1 border-game-night-border hover:border-game-moss/60 hover:bg-game-moss/10"
+                              className="h-auto py-3 px-2 flex flex-col items-center gap-1 border-game-border hover:border-game-moss/60 hover:bg-game-moss/10"
                               disabled={
                                 using !== null ||
                                 (powersState?.dimensionalShift?.charges.wins ||
@@ -940,10 +940,10 @@ export function PowerSelector() {
                               onClick={() => handleUseDimensionalShift('space')}
                             >
                               <Maximize2 className="w-6 h-6 text-game-clay-strong mb-1" />
-                              <span className="text-xs font-medium text-game-night-ink">
+                              <span className="text-xs font-medium text-game-ink">
                                 Lock
                               </span>
-                              <span className="text-[10px] text-game-night-muted">
+                              <span className="text-[10px] text-game-muted">
                                 {powersState?.dimensionalShift?.charges.wins ||
                                   0}
                                 /3 Wins
@@ -955,7 +955,7 @@ export function PowerSelector() {
                           {powersData.dimensionalShift.chaos && (
                             <Button
                               variant="outline"
-                              className="h-auto py-3 px-2 flex flex-col items-center gap-1 border-game-night-border hover:border-game-moss/60 hover:bg-game-moss/10"
+                              className="h-auto py-3 px-2 flex flex-col items-center gap-1 border-game-border hover:border-game-moss/60 hover:bg-game-moss/10"
                               disabled={
                                 using !== null ||
                                 (powersState?.dimensionalShift?.charges.draws ||
@@ -963,11 +963,11 @@ export function PowerSelector() {
                               }
                               onClick={() => handleUseDimensionalShift('chaos')}
                             >
-                              <Atom className="w-6 h-6 text-game-night-muted mb-1" />
-                              <span className="text-xs font-medium text-game-night-ink">
+                              <Atom className="w-6 h-6 text-game-muted mb-1" />
+                              <span className="text-xs font-medium text-game-ink">
                                 Oblivion
                               </span>
-                              <span className="text-[10px] text-game-night-muted">
+                              <span className="text-[10px] text-game-muted">
                                 {powersState?.dimensionalShift?.charges.draws ||
                                   0}
                                 /3 Draws
@@ -1031,14 +1031,14 @@ function CircadianButton({
   return (
     <Button
       variant="outline"
-      className="w-full h-auto py-4 flex items-center justify-center gap-3 border-game-night-border hover:border-game-moss/60 hover:bg-game-moss/10"
+      className="w-full h-auto py-4 flex items-center justify-center gap-3 border-game-border hover:border-game-moss/60 hover:bg-game-moss/10"
       disabled={disabled}
       onClick={onClick}
     >
       {icon}
       <div className="flex flex-col items-start">
-        <span className="text-sm font-medium text-game-night-ink">{label}</span>
-        <span className="text-[10px] text-game-night-muted">{desc}</span>
+        <span className="text-sm font-medium text-game-ink">{label}</span>
+        <span className="text-[10px] text-game-muted">{desc}</span>
       </div>
     </Button>
   )

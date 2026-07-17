@@ -274,7 +274,7 @@ export default function Pokedex() {
 
   return (
     <GameErrorBoundary>
-      <div className="flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
+      <div className="game-paper-first game-paper-texture flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
         <PremiumHeader title="Pokédex" subtitle="Specimen index" />
 
         <div className="hidden items-center gap-3 border-b border-game-border bg-game-surface/70 px-6 py-3 xl:flex">
@@ -423,7 +423,7 @@ export default function Pokedex() {
           }
           desktopWidth="min(42vw, 620px)"
           mobileHeader={false}
-          className="flex flex-col gap-0 overflow-x-hidden bg-game-surface p-0 text-game-ink"
+          className="game-paper-first game-paper-texture flex flex-col gap-0 overflow-x-hidden bg-game-canvas p-0 text-game-ink"
         >
           {selectedSpecies && selectedBaseForm && (
             <div className="w-full overflow-y-auto flex-1 min-h-0 custom-scrollbar">
@@ -774,8 +774,9 @@ function getPreferredStanceConfig(stance: BattleStance) {
     speed: {
       Icon: STANCE_ICON_CONFIG.speed.Icon,
       label: 'Speed',
-      className: 'border-game-moss/30 bg-game-moss/10 text-game-moss-strong',
-      barClassName: 'bg-game-moss',
+      className:
+        'border-game-stance-blue/35 bg-game-stance-blue/10 text-game-stance-blue-strong',
+      barClassName: 'bg-game-stance-blue',
     },
     tech: {
       Icon: STANCE_ICON_CONFIG.tech.Icon,

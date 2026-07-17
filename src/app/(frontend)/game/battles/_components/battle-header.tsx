@@ -36,8 +36,8 @@ function TeamBallGrid({
             className={`h-5 w-5 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)] ${
               p.currentHp > 0
                 ? p.currentHp < p.maxHp
-                  ? 'text-game-night-muted'
-                  : 'text-game-night-ink'
+                  ? 'text-game-cream'
+                  : 'text-game-cream'
                 : 'text-game-danger'
             }`}
           />

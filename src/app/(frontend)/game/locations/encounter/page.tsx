@@ -1899,7 +1899,7 @@ export default function EncounterPage() {
                     <div className="space-y-3">
                       <SectionDivider
                         className="min-h-8 [&>div:first-child]:text-sm [&>div:first-child]:font-bold [&>div:first-child]:tracking-[0.04em]"
-                        textColor="text-game-cream"
+                        textColor="text-game-ink"
                       >
                         Type gems
                       </SectionDivider>
@@ -1946,7 +1946,7 @@ export default function EncounterPage() {
                     <div className="space-y-3">
                       <SectionDivider
                         className="min-h-8 [&>div:first-child]:text-sm [&>div:first-child]:font-bold [&>div:first-child]:tracking-[0.04em]"
-                        textColor="text-game-cream"
+                        textColor="text-game-ink"
                       >
                         Other items
                       </SectionDivider>

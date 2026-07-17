@@ -881,7 +881,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
                       setIsReplayLoading(false)
                     }
                   }}
-                  className="game-accent-button w-full border border-game-moss/60 bg-game-moss font-bold shadow-sm transition-colors hover:bg-game-moss-strong"
+                  className="game-accent-button w-full border border-game-clay bg-game-clay font-bold shadow-sm transition-colors hover:bg-game-clay-strong"
                 >
                   {isReplayLoading ? (
                     <>

@@ -38,8 +38,7 @@ export function TaskExitDialog({ data, open, onOpenChange }: TaskExitDialogProps
         <Button
           onClick={() => onOpenChange(false)}
           size="lg"
-          variant="outline"
-          className="w-full border border-game-border bg-game-surface-raised text-game-ink transition-colors hover:border-game-moss/50 hover:bg-game-moss/10"
+          className="w-full bg-game-clay text-game-cream hover:bg-game-clay-strong"
         >
           {data.closeButtonText || 'Close'}
         </Button>

@@ -167,8 +167,8 @@ export function ItemSelector() {
           aria-label={`Items, ${Math.max(0, remainingUses)} of ${maxItemsPerBattle} uses remaining`}
           title="Open battle items"
           className={cn(
-            'flex-1 h-12 gap-2 rounded-xl border border-game-night-border bg-game-night-surface text-game-night-ink shadow-sm transition-colors',
-            'hover:border-game-ochre/60 hover:bg-game-night-surface hover:text-game-night-ink',
+            'flex-1 h-12 gap-2 rounded-xl border border-game-border bg-game-surface-raised text-game-ink shadow-sm transition-colors',
+            'hover:border-game-ochre/60 hover:bg-game-surface-raised hover:text-game-ink',
             !canUseItems && 'opacity-50',
           )}
         >
@@ -179,14 +179,14 @@ export function ItemSelector() {
             height={22}
             className="h-5 w-5 object-contain"
           />
-          <span className="rounded-full border border-game-night-border bg-game-night-canvas/60 px-1.5 py-0.5 text-[10px] font-black text-game-night-ink">
+          <span className="rounded-full border border-game-border bg-game-canvas/60 px-1.5 py-0.5 text-[10px] font-black text-game-ink">
             {Math.max(0, remainingUses)}/{maxItemsPerBattle}
           </span>
         </Button>
       </DrawerTrigger>
       <DrawerContent
         id={itemDrawerContentId}
-        className="game-night max-h-[70dvh] border-game-night-border bg-game-night-surface"
+        className="game-paper-modal game-paper-texture max-h-[70dvh] border-game-border bg-game-surface-raised"
       >
         <div className="px-4 pt-4 pb-6">
           <SectionDivider className="mb-4">
@@ -199,17 +199,17 @@ export function ItemSelector() {
                 className="h-5 w-5 object-contain"
               />
               Battle Items
-              <span className="text-game-night-muted ml-1">
+              <span className="text-game-muted ml-1">
                 ({remainingUses} left)
               </span>
             </span>
           </SectionDivider>
           {loading ? (
             <div className="flex items-center justify-center h-40">
-              <Loader2 className="w-8 h-8 animate-spin text-game-night-muted" />
+              <Loader2 className="w-8 h-8 animate-spin text-game-muted" />
             </div>
           ) : items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-40 text-game-night-muted">
+            <div className="flex flex-col items-center justify-center h-40 text-game-muted">
               <ItemSprite
                 itemId="battle-potion"
                 alt="Items"
@@ -244,10 +244,10 @@ export function ItemSelector() {
                               <Button
                                 variant="outline"
                                 className={cn(
-                                  'game-focus-ring relative w-full h-auto rounded-xl border border-game-night-border bg-game-night-canvas/55 py-3 px-4 flex items-center gap-3',
+                                  'game-focus-ring relative w-full h-auto rounded-xl border border-game-border bg-game-surface-raised py-3 px-4 flex items-center gap-3',
                                   'shadow-sm transition-colors hover:border-game-moss/60 hover:bg-game-moss/10',
                                   !itemApplies &&
-                                    'opacity-50 hover:border-game-night-border',
+                                    'opacity-50 hover:border-game-border',
                                   using === item.itemId &&
                                     'opacity-50 pointer-events-none',
                                 )}
@@ -266,11 +266,11 @@ export function ItemSelector() {
                                     <span className="font-medium text-sm truncate">
                                       {item.name}
                                     </span>
-                                    <span className="text-xs text-game-night-muted flex-shrink-0">
+                                    <span className="text-xs text-game-muted flex-shrink-0">
                                       ×{item.quantity}
                                     </span>
                                   </div>
-                                  <div className="text-xs text-game-night-muted truncate">
+                                  <div className="text-xs text-game-muted truncate">
                                     {itemApplies
                                       ? getEffectDescription(item)
                                       : 'No effect right now'}

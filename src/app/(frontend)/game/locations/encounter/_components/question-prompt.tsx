@@ -49,7 +49,7 @@ export function QuestionPrompt({
       className="flex flex-col max-w-3xl mx-auto w-full h-full justify-center relative z-10"
     >
       {/* Question text — slide per question */}
-      <div className="relative mb-4 flex min-h-[5rem] flex-none shrink-0 items-center justify-center overflow-hidden rounded-lg border border-game-border bg-game-surface/95 px-4 py-5 shadow-sm backdrop-blur-xl">
+      <div className="relative mb-4 flex min-h-[5rem] flex-none shrink-0 items-center justify-center overflow-hidden rounded-lg border border-game-border bg-game-surface-raised px-4 py-5 text-game-ink shadow-sm backdrop-blur-xl">
         <AnimatePresence mode="wait">
           <motion.h2
             key={currentQuestion?.attemptId ?? currentQuestion?.id ?? 'loading'}
@@ -149,7 +149,7 @@ export function QuestionPrompt({
                 disabled={disabled}
                 aria-pressed={selected}
                 className={cn(
-                  'game-focus-ring group relative flex w-full items-center gap-3 overflow-hidden rounded-lg border border-game-border bg-game-surface/95 px-3 py-3 text-left text-game-ink shadow-sm backdrop-blur-xl transition-colors hover:border-game-moss/35 hover:bg-game-surface-raised disabled:pointer-events-none disabled:opacity-50',
+                  'game-focus-ring group relative flex w-full items-center gap-3 overflow-hidden rounded-lg border border-game-border bg-game-surface-raised px-3 py-3 text-left text-game-ink shadow-sm backdrop-blur-xl transition-colors hover:border-game-moss/35 hover:bg-game-surface disabled:pointer-events-none disabled:opacity-50',
                   highlighted && 'border-game-ochre/60 bg-game-ochre/10',
                   selected &&
                     !answerStatus &&

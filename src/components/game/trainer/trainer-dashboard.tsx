@@ -137,7 +137,7 @@ export function TrainerDashboard() {
   const ActiveIcon = tabIcons[activeSection.id]
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
+    <div className="game-paper-first game-paper-texture flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
       {activeTab !== 'profile' && (
         <div className="relative shrink-0 overflow-hidden border-b border-game-border bg-game-canvas px-4 py-3 md:px-6">
           <div className="pointer-events-none absolute inset-y-0 left-0 w-1 bg-game-moss" />
