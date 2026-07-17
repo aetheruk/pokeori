@@ -59,9 +59,10 @@ export function StanceSelector({
       label: 'SPEED',
       value: speedVal,
       icon: STANCE_ICON_CONFIG.speed.Icon,
-      iconTone: 'text-game-moss',
-      valueTone: 'text-game-moss-strong',
-      hoverTone: 'hover:border-game-moss/60 hover:bg-game-moss/8',
+      iconTone: 'text-game-stance-blue',
+      valueTone: 'text-game-stance-blue-strong',
+      hoverTone:
+        'hover:border-game-stance-blue/70 hover:bg-game-stance-blue/10',
     },
     {
       stance: 'power',
@@ -77,9 +78,9 @@ export function StanceSelector({
       label: 'TECH',
       value: techVal,
       icon: STANCE_ICON_CONFIG.tech.Icon,
-      iconTone: 'text-game-ochre',
-      valueTone: 'text-game-ochre-strong',
-      hoverTone: 'hover:border-game-ochre/60 hover:bg-game-ochre/8',
+      iconTone: 'text-game-moss',
+      valueTone: 'text-game-moss-strong',
+      hoverTone: 'hover:border-game-moss/60 hover:bg-game-moss/8',
     },
   ]
 
@@ -115,7 +116,7 @@ export function StanceSelector({
             <Icon
               aria-hidden
               className={cn(
-                'pointer-events-none absolute left-1/2 top-1/2 size-[72%] max-h-[72%] max-w-[72%] -translate-x-1/2 -translate-y-1/2 opacity-10 [&_*]:stroke-[1.35]',
+                'pointer-events-none absolute left-1/2 top-1/2 size-[72%] max-h-[72%] max-w-[72%] -translate-x-1/2 -translate-y-1/2 opacity-20 [&_*]:stroke-[1.35]',
                 isZReady ? 'text-game-ochre' : card.iconTone,
               )}
             />
@@ -134,7 +135,7 @@ export function StanceSelector({
 
               <div
                 className={cn(
-                  'absolute bottom-0 right-0 whitespace-nowrap text-right text-3xl font-semibold leading-none sm:text-4xl',
+                  'absolute bottom-0 right-0 whitespace-nowrap text-right text-3xl font-black leading-none sm:text-4xl',
                   isZReady
                     ? 'text-game-ochre'
                     : isStanceDisabled

@@ -146,13 +146,12 @@ export function TaskEnterDialog({
                 {isValidating ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Submit'}
               </Button>
               <Button
-                variant="outline"
                 onClick={() => {
                   setActivePasswordButton(null)
                   setPasswordInput('')
                 }}
                 disabled={isValidating}
-                className="col-span-2 sm:col-span-1"
+                className="col-span-2 bg-game-clay text-game-cream hover:bg-game-clay-strong sm:col-span-1"
               >
                 Cancel
               </Button>
@@ -167,7 +166,7 @@ export function TaskEnterDialog({
                   key={idx}
                   onClick={() => handleButtonClick(button)}
                   size="lg"
-                  className="w-full border border-game-border bg-game-surface-raised text-game-ink transition-colors hover:border-game-moss/50 hover:bg-game-moss/10"
+                  className="w-full bg-game-clay text-game-cream hover:bg-game-clay-strong"
                 >
                   {parseText(button.text, trainerName)}
                 </Button>

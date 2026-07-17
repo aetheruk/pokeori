@@ -48,7 +48,7 @@ const DrawerContent = React.forwardRef<
     <DrawerPrimitive.Content
       ref={ref}
       className={cn(
-        'pointer-events-auto fixed inset-x-0 bottom-0 z-50 mt-24 flex max-h-[92dvh] h-auto flex-col rounded-t-xl border border-game-border bg-game-surface-raised text-game-ink shadow-2xl shadow-stone-900/15 md:mx-auto md:max-w-[560px]',
+        'game-paper-modal game-paper-texture pointer-events-auto fixed inset-x-0 bottom-0 z-50 mt-24 flex max-h-[92dvh] h-auto flex-col rounded-t-xl border border-game-border bg-game-canvas text-game-ink shadow-2xl shadow-stone-900/15 md:mx-auto md:max-w-[560px]',
         className,
       )}
       {...props}

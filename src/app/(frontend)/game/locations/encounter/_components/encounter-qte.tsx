@@ -236,7 +236,7 @@ export function EncounterQte({
       >
         <SectionDivider
           className="mb-4 min-h-8 [&>div:first-child]:text-base [&>div:first-child]:font-bold [&>div:first-child]:leading-tight [&>div:first-child]:tracking-[0.04em]"
-          textColor="text-game-cream"
+          textColor="text-game-ink"
         >
           Calm with {getItemName(qte.correctBerryId || '')}
         </SectionDivider>
@@ -302,7 +302,7 @@ export function EncounterQte({
     >
       <SectionDivider
         className="mb-4 min-h-8 [&>div:first-child]:text-base [&>div:first-child]:font-bold [&>div:first-child]:leading-tight [&>div:first-child]:tracking-[0.04em]"
-        textColor="text-game-cream"
+        textColor="text-game-ink"
       >
         {qte.type === 'focus'
           ? `Circle the ${pokemonName}`

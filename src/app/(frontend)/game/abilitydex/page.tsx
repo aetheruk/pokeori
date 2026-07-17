@@ -61,14 +61,14 @@ export default function AbilityDexPage() {
   const knownAbilityCount = registeredAbilityIds.size
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
+    <div className="game-paper-first game-paper-texture flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
       <PremiumHeader
         title="AbilityDex"
         subtitle={`${knownAbilityCount} / ${ALL_ABILITY_DEX_ENTRIES.length}`}
       />
 
       <div className="flex-1 min-h-0 overflow-y-auto px-4 pt-4 md:px-6">
-        <div className="grid gap-2 pb-8 lg:grid-cols-2 2xl:grid-cols-3">
+        <div className="grid grid-cols-2 gap-2 pb-8 2xl:grid-cols-3">
           {ALL_ABILITY_DEX_ENTRIES.map((entry) => {
             const isKnown = registeredAbilityIds.has(entry.abilityId)
             return (

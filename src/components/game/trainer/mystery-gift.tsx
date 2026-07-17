@@ -39,7 +39,7 @@ export function MysteryGift() {
   }
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
+    <div className="game-paper-first game-paper-texture flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5 md:px-6">
         <div className="mx-auto flex min-h-full max-w-xl items-center justify-center py-6">
           <div className="w-full overflow-hidden rounded-xl border border-game-border bg-game-surface">

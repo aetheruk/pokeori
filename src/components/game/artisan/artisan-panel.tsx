@@ -1804,7 +1804,7 @@ export function ArtisanPanel() {
     : []
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
+    <div className="game-paper-first game-paper-texture flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
       {qteRecipe?.craftType === 'crush' ? (
         <CrushDialog
           recipe={qteRecipe}

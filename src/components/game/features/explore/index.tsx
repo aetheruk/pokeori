@@ -264,7 +264,7 @@ function ExploreListContent({
   }
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
+    <div className="game-paper-first game-paper-texture flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
       {/* Header */}
       <ExploreHeader
         currentImage={currentImage as any}

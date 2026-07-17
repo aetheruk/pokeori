@@ -103,7 +103,7 @@ export function ResponsivePanel({
         <Dialog open={open} onOpenChange={onOpenChange}>
           <DialogContent
             className={cn(
-              '!left-auto !right-0 !top-0 h-dvh !max-h-none !w-[var(--responsive-panel-width)] !max-w-none !translate-x-0 !translate-y-0 rounded-l-xl rounded-r-none border-y-0 border-r-0 p-0 sm:p-0',
+              'game-paper-modal game-paper-texture !left-auto !right-0 !top-0 h-dvh !max-h-none !w-[var(--responsive-panel-width)] !max-w-none !translate-x-0 !translate-y-0 rounded-l-xl rounded-r-none border-y-0 border-r-0 p-0 sm:p-0',
               'data-[state=open]:slide-in-from-right data-[state=closed]:slide-out-to-right',
               className,
             )}
@@ -141,7 +141,7 @@ export function ResponsivePanel({
       <Drawer open={open} onOpenChange={onOpenChange}>
         <DrawerContent
           showHandle={showHandle}
-          className={cn('relative', className)}
+          className={cn('game-paper-modal game-paper-texture relative', className)}
           style={{ maxHeight: mobileMaxHeight }}
         >
           {showCloseButton && (

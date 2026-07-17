@@ -50,6 +50,8 @@
   --color-game-moss-strong: var(--game-moss-strong);
   --color-game-clay: var(--game-clay);
   --color-game-clay-strong: var(--game-clay-strong);
+  --color-game-stance-blue: var(--game-stance-blue);
+  --color-game-stance-blue-strong: var(--game-stance-blue-strong);
   --color-game-ochre: var(--game-ochre);
   --color-game-danger: var(--game-danger);
   --color-game-night-canvas: var(--game-night-canvas);
@@ -92,6 +94,8 @@
   --game-moss-strong: #405d3d;
   --game-clay: #b86148;
   --game-clay-strong: #974837;
+  --game-stance-blue: #5d83ae;
+  --game-stance-blue-strong: #345f8d;
   --game-ochre: #b58a43;
   --game-danger: #9a4337;
   --game-night-canvas: #172733;
@@ -241,6 +245,8 @@
     --game-moss: #91a96b;
     --game-moss-strong: #b8c894;
     --game-clay: #d78467;
+    --game-stance-blue: #8eb9e2;
+    --game-stance-blue-strong: #b9d8f1;
     --game-ochre: #d3ad63;
     --game-accent: #91a96b;
     --background: var(--game-night-canvas);
@@ -262,6 +268,51 @@
     --ring: #91a96b;
     background: var(--game-canvas);
     color: var(--game-ink);
+  }
+
+  /* Paper-first shells can be nested inside a night activity, so reset the
+     complete semantic palette rather than only the surface and text colors. */
+  .game-paper-first,
+  .game-paper-modal:not(.game-night) {
+    --game-canvas: #efe4cf;
+    --game-surface: #fff8e8;
+    --game-surface-raised: #fff8e8;
+    --game-border: rgb(103 88 62 / 0.2);
+    --game-border-strong: rgb(103 88 62 / 0.34);
+    --game-ink: #293532;
+    --game-muted: #667269;
+    --game-moss: #5f794f;
+    --game-moss-strong: #405d3d;
+    --game-clay: #b86148;
+    --game-clay-strong: #974837;
+    --game-stance-blue: #5d83ae;
+    --game-stance-blue-strong: #345f8d;
+    --game-ochre: #b58a43;
+    --game-danger: #9a4337;
+    --game-accent: #5f794f;
+    --background: #efe4cf;
+    --foreground: #293532;
+    --card: #f7efdf;
+    --card-foreground: #293532;
+    --popover: #fff8e8;
+    --popover-foreground: #293532;
+    --primary: #5f794f;
+    --primary-foreground: #fff8e8;
+    --secondary: #e4d7bd;
+    --secondary-foreground: #293532;
+    --muted: #e8dcc5;
+    --muted-foreground: #667269;
+    --accent: #e4d7bd;
+    --accent-foreground: #293532;
+    --border: rgb(103 88 62 / 0.2);
+    --input: rgb(103 88 62 / 0.26);
+    --ring: #5f794f;
+    background: var(--game-canvas);
+    color: var(--game-ink);
+  }
+
+  .game-paper-modal:not(.game-night) {
+    background-color: var(--game-canvas) !important;
   }
 
   /* Filled action controls keep a cream foreground even in light activity chrome. */

@@ -139,7 +139,7 @@ export default function MoveDexPage() {
   }
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
+    <div className="game-paper-first game-paper-texture flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
       <PremiumHeader
         title="MoveDex"
         subtitle={`${ownedMoveCount} / ${ALL_MOVE_DEX_ENTRIES.length}`}

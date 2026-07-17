@@ -106,9 +106,9 @@ export function TeamSwapper({
           disabled={disabled || availableSwaps === 0}
           className={cn(
             forced
-              ? 'flex-1 h-12 gap-2 rounded-xl border border-game-night-border bg-game-night-surface text-game-night-ink shadow-sm transition-colors'
-              : 'h-12 w-12 rounded-xl border border-game-night-border bg-game-night-surface p-0 text-game-night-ink shadow-sm transition-colors',
-            'hover:border-game-moss/60 hover:bg-game-night-surface hover:text-game-night-ink',
+              ? 'flex-1 h-12 gap-2 rounded-xl border border-game-border bg-game-surface-raised text-game-ink shadow-sm transition-colors'
+              : 'h-12 w-12 rounded-xl border border-game-border bg-game-surface-raised p-0 text-game-ink shadow-sm transition-colors',
+            'hover:border-game-moss/60 hover:bg-game-surface-raised hover:text-game-ink',
             availableSwaps === 0 && 'opacity-50',
           )}
           aria-label={forced ? 'Choose next Pokemon' : 'Switch Pokemon'}
@@ -119,7 +119,7 @@ export function TeamSwapper({
       </DrawerTrigger>
       <DrawerContent
         id={swapDrawerContentId}
-        className="game-night max-h-[60dvh] border-game-night-border bg-game-night-surface"
+        className="game-paper-modal game-paper-texture max-h-[60dvh] border-game-border bg-game-surface-raised"
       >
         <div className="mx-auto min-h-0 w-full max-w-xl overflow-y-auto px-3 pt-3 pb-5 sm:px-4">
           <SectionDivider className="mb-3">
@@ -143,7 +143,7 @@ export function TeamSwapper({
                   key={index}
                   variant="outline"
                   className={cn(
-                    'game-focus-ring relative h-auto min-h-[6.5rem] rounded-xl border border-game-night-border bg-game-night-canvas/55 px-2 py-2 flex items-center gap-2 sm:px-3 sm:py-2.5 sm:gap-3',
+                    'game-focus-ring relative h-auto min-h-[6.5rem] rounded-xl border border-game-border bg-game-canvas/55 px-2 py-2 flex items-center gap-2 sm:px-3 sm:py-2.5 sm:gap-3',
                     'shadow-sm transition-colors',
                     isActive &&
                       !leadSelection &&
@@ -191,7 +191,7 @@ export function TeamSwapper({
                       <span className="truncate text-xs font-semibold sm:text-sm">
                         {pokemon.name}
                       </span>
-                      <span className="shrink-0 text-[10px] text-game-night-muted sm:text-xs">
+                      <span className="shrink-0 text-[10px] text-game-muted sm:text-xs">
                         Lv.{pokemon.level}
                       </span>
                       {isActive && !leadSelection && (
@@ -203,7 +203,7 @@ export function TeamSwapper({
 
                     {/* HP Bar */}
                     <div className="mt-1.5 space-y-1">
-                      <div className="h-1.5 overflow-hidden rounded-full bg-game-night-canvas">
+                      <div className="h-1.5 overflow-hidden rounded-full bg-game-canvas">
                         <div
                           className={cn(
                             'h-full transition-all duration-300',
@@ -216,7 +216,7 @@ export function TeamSwapper({
                           style={{ width: `${hpPercent}%` }}
                         />
                       </div>
-                      <div className="flex items-center justify-between gap-1 text-[10px] text-game-night-muted">
+                      <div className="flex items-center justify-between gap-1 text-[10px] text-game-muted">
                         <span className="flex min-w-0 items-center gap-1">
                           <Heart className="h-3 w-3 shrink-0" />
                           {pokemon.currentHp} / {pokemon.maxHp}
@@ -242,7 +242,7 @@ export function TeamSwapper({
                         ) : (
                           <span
                             key={type}
-                            className="rounded border border-game-night-border bg-game-night-canvas px-1.5 py-0.5 text-[10px] capitalize text-game-night-muted"
+                            className="rounded border border-game-border bg-game-canvas px-1.5 py-0.5 text-[10px] capitalize text-game-muted"
                           >
                             {type}
                           </span>

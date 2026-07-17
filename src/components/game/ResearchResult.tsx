@@ -31,7 +31,7 @@ export function ResultActionButton({
   const sharedProps = {
     ...props,
     type,
-    variant: 'moss' as const,
+    variant: 'default' as const,
     size: 'lg' as const,
     className: cn('w-full min-w-0 font-bold', className),
   }
@@ -134,7 +134,7 @@ export function GameResult({
   return (
     <div
       className={cn(
-        'game-paper-texture relative h-full w-full overflow-hidden pt-[env(safe-area-inset-top)] text-game-ink',
+        'game-paper-first game-paper-texture relative h-full w-full overflow-hidden pt-[env(safe-area-inset-top)] text-game-ink',
         !embedded && 'bg-game-canvas',
       )}
     >
