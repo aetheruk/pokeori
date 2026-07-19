@@ -201,7 +201,7 @@ export function VoyageSelectionModal({
             (!!activeVoyageData && !isFinished)
           }
           className={cn(
-            'h-12 w-full border border-game-clay bg-game-clay text-sm font-black uppercase tracking-widest text-game-cream hover:bg-game-clay/90',
+            'min-h-11 w-full border border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90',
             activeVoyageData &&
               isFinished &&
               'border-game-moss bg-game-moss text-game-cream hover:bg-game-moss-strong',

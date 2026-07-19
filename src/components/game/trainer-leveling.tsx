@@ -373,7 +373,6 @@ function SkillModalContent({
         </SectionDivider>
         <Button
           type="button"
-          variant="outline"
           className="w-full"
           onClick={() => setShowFullGuide((current) => !current)}
         >

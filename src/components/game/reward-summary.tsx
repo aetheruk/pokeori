@@ -139,11 +139,10 @@ export function RewardSummaryDisplay({
                   </span>
                   <span
                     className={`font-bold text-sm ${
-                      curr.quantity < 0 ? 'text-game-danger' : 'text-game-ochre'
+                      curr.quantity < 0 ? 'text-game-danger' : 'text-game-muted'
                     }`}
                   >
-                    {curr.quantity > 0 ? '+' : ''}
-                    {curr.quantity}
+                    {curr.quantity > 0 ? `x${curr.quantity}` : curr.quantity}
                   </span>
                 </div>
               </Card>
@@ -380,10 +379,10 @@ export function RewardSummaryDisplay({
                 />
               </div>
               <div className="flex min-w-0 flex-1 items-center justify-between gap-2 sm:pr-2">
-                <span className="truncate text-xs font-medium text-game-ink sm:text-sm">
+                <span className="truncate text-sm font-medium text-game-ink">
                   {res.formName} Research
                 </span>
-                <span className="shrink-0 whitespace-nowrap text-xs font-bold text-game-moss-strong sm:text-sm">
+                <span className="shrink-0 whitespace-nowrap text-sm font-bold text-game-moss-strong">
                   +{res.amount} XP
                 </span>
               </div>
@@ -405,17 +404,12 @@ export function RewardSummaryDisplay({
                   className="w-full h-full object-contain pixelated"
                 />
               </div>
-              <div className="flex-1 flex flex-col min-w-0">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-game-moss-strong text-xs uppercase tracking-tight">
-                    Breakthrough!
-                  </span>
-                  <span className="font-black text-game-moss-strong text-sm">
-                    LVL {b.newLevel}
-                  </span>
-                </div>
-                <span className="text-[10px] text-game-muted font-medium truncate">
-                  {b.pokemonName} Research Complete
+              <div className="flex min-w-0 flex-1 items-center justify-between gap-2 sm:pr-2">
+                <span className="truncate text-sm font-medium text-game-ink">
+                  {b.pokemonName} Research
+                </span>
+                <span className="shrink-0 whitespace-nowrap text-sm font-bold text-game-moss-strong">
+                  LVL {b.newLevel}
                 </span>
               </div>
             </Card>

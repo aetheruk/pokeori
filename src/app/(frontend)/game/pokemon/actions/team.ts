@@ -25,6 +25,11 @@ import { getPokemonForm, getPokemonSpecies } from '@/utilities/pokemon/pokedex'
 import { items } from '@/data/items'
 import { rollResearchXp } from '@/utilities/research/research-levels'
 import { EVOLUTIONS } from '@/data/evolutions'
+import {
+  isValidBattleTeamPosition,
+  MAX_BATTLE_TEAM_SIZE,
+  validateBattleTeamPlacements,
+} from '@/utilities/pokemon/battle-team'
 import { getUser, serializePokemon, type StatName } from './utils'
 
 export type PokemonRosterRole = 'box' | 'battle-team' | 'companion'
@@ -38,6 +43,32 @@ export async function setPokemonRosterRole(
   const user = await getUser()
   if (!user) throw new Error('Unauthorized')
   const payload = await getPayload({ config })
+
+  if (
+    typeof pokemonId !== 'string' ||
+    pokemonId.trim().length === 0 ||
+    !['box', 'battle-team', 'companion'].includes(role)
+  ) {
+    return { success: false, message: 'Invalid roster assignment' }
+  }
+
+  if (
+    role === 'box' &&
+    targetBoxId !== undefined &&
+    targetBoxId !== null &&
+    (typeof targetBoxId !== 'string' ||
+      !(user.boxes || []).some((box) => box.id === targetBoxId))
+  ) {
+    return { success: false, message: 'Invalid destination box' }
+  }
+
+  if (
+    role === 'battle-team' &&
+    battleTeamPosition !== undefined &&
+    !isValidBattleTeamPosition(battleTeamPosition)
+  ) {
+    return { success: false, message: 'Invalid battle team slot' }
+  }
 
   const pokemon = await payload.findByID({
     collection: 'pokemon',
@@ -71,6 +102,48 @@ export async function setPokemonRosterRole(
       depth: 0,
     })
 
+    let battleTeamPlacements:
+      | { pokemonId: string; position: number }[]
+      | undefined
+
+    if (pokemon.onBattleTeam) {
+      const remainingTeam = await payload.find({
+        collection: 'pokemon',
+        where: {
+          and: [
+            { user: { equals: user.id } },
+            { onBattleTeam: { equals: true } },
+            {
+              or: [
+                { fusedIntoPokemonId: { exists: false } },
+                { fusedIntoPokemonId: { equals: null } },
+                { fusedIntoPokemonId: { equals: '' } },
+              ],
+            },
+          ],
+        },
+        limit: MAX_BATTLE_TEAM_SIZE,
+        depth: 0,
+        sort: 'battleTeamPosition',
+      })
+
+      battleTeamPlacements = remainingTeam.docs.map((member, index) => ({
+        pokemonId: member.id as string,
+        position: index + 1,
+      }))
+
+      await Promise.all(
+        battleTeamPlacements.map(({ pokemonId: memberId, position }) =>
+          payload.update({
+            collection: 'pokemon',
+            id: memberId,
+            data: { battleTeamPosition: position },
+            depth: 0,
+          }),
+        ),
+      )
+    }
+
     revalidatePath('/game/pokemon')
     return {
       success: true,
@@ -79,6 +152,7 @@ export async function setPokemonRosterRole(
       battleTeamPosition: null,
       isCompanion: false,
       boxId: targetBoxId !== undefined ? targetBoxId : (pokemon as any).boxId,
+      battleTeamPlacements,
     }
   }
 
@@ -153,27 +227,47 @@ export async function setPokemonRosterRole(
         },
       ],
     },
-    limit: 6,
+    limit: MAX_BATTLE_TEAM_SIZE,
     depth: 0,
   })
 
   const alreadyOnTeam = !!pokemon.onBattleTeam
-  if (!alreadyOnTeam && team.totalDocs >= 6) {
-    return { success: false, message: 'Battle team is full (max 6)' }
+  if (!alreadyOnTeam && team.totalDocs >= MAX_BATTLE_TEAM_SIZE) {
+    return {
+      success: false,
+      message: `Battle team is full (max ${MAX_BATTLE_TEAM_SIZE})`,
+    }
   }
 
-  const requestedPosition =
-    typeof battleTeamPosition === 'number' &&
-    battleTeamPosition >= 1 &&
-    battleTeamPosition <= 6
-      ? battleTeamPosition
-      : null
-  const positions = team.docs
+  const requestedPosition = battleTeamPosition ?? null
+  const positions = new Set(
+    team.docs
     .filter((p) => p.id !== pokemonId)
-    .map((p) => p.battleTeamPosition || 0)
-  let newPosition = requestedPosition || 1
-  while (positions.includes(newPosition) && !requestedPosition) {
-    newPosition++
+    .map((p) => p.battleTeamPosition)
+    .filter(isValidBattleTeamPosition),
+  )
+
+  if (requestedPosition !== null && positions.has(requestedPosition)) {
+    return {
+      success: false,
+      message: `Battle team slot ${requestedPosition} is already occupied`,
+    }
+  }
+
+  const currentPosition = isValidBattleTeamPosition(pokemon.battleTeamPosition)
+    ? pokemon.battleTeamPosition
+    : null
+  const firstAvailablePosition = Array.from(
+    { length: MAX_BATTLE_TEAM_SIZE },
+    (_, index) => index + 1,
+  ).find((position) => !positions.has(position))
+  const newPosition =
+    requestedPosition ??
+    (alreadyOnTeam ? currentPosition : null) ??
+    firstAvailablePosition
+
+  if (!newPosition) {
+    return { success: false, message: 'No battle team slot is available' }
   }
 
   await payload.update({
@@ -351,14 +445,16 @@ export async function toggleCompanion(
     const isAlreadyCompanion = targetPokemon.isCompanion
 
     if (isAlreadyCompanion) {
-      await setPokemonRosterRole(pokemonId, 'box', targetBoxId)
+      const result = await setPokemonRosterRole(pokemonId, 'box', targetBoxId)
+      if (!result.success) return result
       return {
         success: true,
         isCompanion: false,
         message: 'Companion disabled',
       }
     } else {
-      await setPokemonRosterRole(pokemonId, 'companion')
+      const result = await setPokemonRosterRole(pokemonId, 'companion')
+      if (!result.success) return result
       return { success: true, isCompanion: true, message: 'Companion updated' }
     }
   } catch (error) {
@@ -397,59 +493,107 @@ export async function toggleBattleTeam(
   const team = await payload.find({
     collection: 'pokemon',
     where: {
-      user: { equals: user.id },
-      onBattleTeam: { equals: true },
+      and: [
+        { user: { equals: user.id } },
+        { onBattleTeam: { equals: true } },
+        {
+          or: [
+            { fusedIntoPokemonId: { exists: false } },
+            { fusedIntoPokemonId: { equals: null } },
+            { fusedIntoPokemonId: { equals: '' } },
+          ],
+        },
+      ],
     },
+    limit: MAX_BATTLE_TEAM_SIZE,
+    depth: 0,
   })
 
-  if (team.totalDocs >= 6) {
-    return { success: false, message: 'Battle team is full (max 6)' }
+  if (team.totalDocs >= MAX_BATTLE_TEAM_SIZE) {
+    return {
+      success: false,
+      message: `Battle team is full (max ${MAX_BATTLE_TEAM_SIZE})`,
+    }
   }
 
   // Find first available position
-  const positions = team.docs.map((p) => p.battleTeamPosition || 0)
-  let newPosition = 1
-  while (positions.includes(newPosition)) {
-    newPosition++
+  const positions = new Set(
+    team.docs
+      .map((p) => p.battleTeamPosition)
+      .filter(isValidBattleTeamPosition),
+  )
+  const newPosition = Array.from(
+    { length: MAX_BATTLE_TEAM_SIZE },
+    (_, index) => index + 1,
+  ).find((position) => !positions.has(position))
+
+  if (!newPosition) {
+    return { success: false, message: 'No battle team slot is available' }
   }
 
-  await setPokemonRosterRole(pokemonId, 'battle-team', undefined, newPosition)
-  return { success: true, onBattleTeam: true, battleTeamPosition: newPosition }
+  const result = await setPokemonRosterRole(
+    pokemonId,
+    'battle-team',
+    undefined,
+    newPosition,
+  )
+  if (!result.success) return result
+  return {
+    success: true,
+    onBattleTeam: true,
+    battleTeamPosition: result.battleTeamPosition,
+  }
 }
 
-export async function reorderBattleTeam(orderedPokemonIds: string[]) {
+export async function reorderBattleTeam(placements: unknown) {
   const user = await getUser()
   if (!user) throw new Error('Unauthorized')
   const payload = await getPayload({ config })
 
-  // Verify all pokemon belong to user and are on battle team
+  // Read the complete current team, then require the client to submit the
+  // exact same members with unique, valid positions. This keeps sparse slots
+  // supported without allowing stale or tampered layouts to add a Pokemon.
   const pokemonDocs = await payload.find({
     collection: 'pokemon',
     where: {
-      id: { in: orderedPokemonIds },
-      user: { equals: user.id },
-      onBattleTeam: { equals: true },
+      and: [
+        { user: { equals: user.id } },
+        { onBattleTeam: { equals: true } },
+        {
+          or: [
+            { fusedIntoPokemonId: { exists: false } },
+            { fusedIntoPokemonId: { equals: null } },
+            { fusedIntoPokemonId: { equals: '' } },
+          ],
+        },
+      ],
     },
     limit: 100,
+    depth: 0,
   })
 
-  if (pokemonDocs.totalDocs !== orderedPokemonIds.length) {
-    return { success: false, message: 'Invalid pokemon list' }
+  const validation = validateBattleTeamPlacements(
+    placements,
+    pokemonDocs.docs.map((pokemon) => pokemon.id as string),
+    pokemonDocs.docs.map((pokemon) => pokemon.battleTeamPosition),
+  )
+  if (!validation.valid) {
+    return { success: false, message: validation.message }
   }
 
   // Update positions
   await Promise.all(
-    orderedPokemonIds.map((id, index) =>
+    validation.placements.map(({ pokemonId, position }) =>
       payload.update({
         collection: 'pokemon',
-        id,
+        id: pokemonId,
         data: {
-          battleTeamPosition: index + 1,
+          battleTeamPosition: position,
         },
       }),
     ),
   )
 
   revalidatePath('/game/pokemon')
-  return { success: true }
+  return { success: true, placements: validation.placements }
 }

@@ -312,15 +312,12 @@ function ResearchSection({
 }) {
   const isMaxLevel = researchLevel >= MAX_RESEARCH_LEVEL
 
-  const currentThreshold = RESEARCH_LEVEL_THRESHOLDS[researchLevel] || 0
   const nextThreshold = isMaxLevel
     ? RESEARCH_LEVEL_THRESHOLDS[MAX_RESEARCH_LEVEL]
     : RESEARCH_LEVEL_THRESHOLDS[researchLevel + 1]
-  const xpInLevel = researchXp - currentThreshold
-  const xpNeeded = nextThreshold - currentThreshold
   const xpProgress = isMaxLevel
     ? 100
-    : Math.min(100, (xpInLevel / xpNeeded) * 100)
+    : Math.min(100, Math.max(0, (researchXp / nextThreshold) * 100))
 
   const activeRewards = Object.entries(RESEARCH_LEVEL_REWARDS)
     .filter(([levelStr]) => parseInt(levelStr) <= researchLevel)
@@ -396,24 +393,28 @@ function ResearchSection({
                     align: 'center',
                     loop: true,
                   }}
-                  className="w-full max-w-[200px] mx-auto"
+                  className="mx-auto w-full max-w-[280px]"
                 >
-                  <CarouselContent>
-                    {activeRewards.map(({ level, reward }) => (
-                      <CarouselItem key={`${formId}-${level}`}>
-                        <div className="flex min-h-[60px] flex-col items-center justify-center rounded-xl border border-game-moss/35 bg-game-moss/10 p-3 text-center">
-                          <span className="mb-1 text-[10px] font-black uppercase tracking-[0.08em] text-game-moss-strong">
-                            Level {level}
-                          </span>
-                          <span className="text-[11px] font-bold leading-tight text-game-ink">
-                            {reward}
-                          </span>
-                        </div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="left-[-36px] border-game-border bg-game-surface-raised text-game-muted hover:text-game-moss" />
-                  <CarouselNext className="right-[-36px] border-game-border bg-game-surface-raised text-game-muted hover:text-game-moss" />
+                  <div className="flex items-center gap-2">
+                    <CarouselPrevious className="!static !h-9 !w-9 !shrink-0 !translate-y-0 border-game-border bg-game-surface-raised text-game-muted hover:text-game-moss" />
+                    <div className="min-w-0 flex-1">
+                      <CarouselContent>
+                        {activeRewards.map(({ level, reward }) => (
+                          <CarouselItem key={`${formId}-${level}`}>
+                            <div className="flex min-h-[60px] flex-col items-center justify-center rounded-xl border border-game-moss/35 bg-game-moss/10 p-3 text-center">
+                              <span className="mb-1 text-[10px] font-black uppercase tracking-[0.08em] text-game-moss-strong">
+                                Level {level}
+                              </span>
+                              <span className="text-[11px] font-bold leading-tight text-game-ink">
+                                {reward}
+                              </span>
+                            </div>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                    </div>
+                    <CarouselNext className="!static !h-9 !w-9 !shrink-0 !translate-y-0 border-game-border bg-game-surface-raised text-game-muted hover:text-game-moss" />
+                  </div>
                 </Carousel>
               </div>
             </div>

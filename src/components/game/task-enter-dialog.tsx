@@ -141,7 +141,7 @@ export function TaskEnterDialog({
               <Button
                 onClick={handlePasswordSubmit}
                 disabled={isValidating || !passwordInput.trim()}
-                className="bg-game-clay text-game-cream hover:bg-game-clay/90"
+                className="min-h-11 border border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90"
               >
                 {isValidating ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Submit'}
               </Button>
@@ -151,7 +151,7 @@ export function TaskEnterDialog({
                   setPasswordInput('')
                 }}
                 disabled={isValidating}
-                className="col-span-2 bg-game-clay text-game-cream hover:bg-game-clay-strong sm:col-span-1"
+                className="col-span-2 min-h-11 border border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90 sm:col-span-1"
               >
                 Cancel
               </Button>
@@ -165,8 +165,7 @@ export function TaskEnterDialog({
                 <Button
                   key={idx}
                   onClick={() => handleButtonClick(button)}
-                  size="lg"
-                  className="w-full bg-game-clay text-game-cream hover:bg-game-clay-strong"
+                  className="min-h-11 w-full border border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90"
                 >
                   {parseText(button.text, trainerName)}
                 </Button>

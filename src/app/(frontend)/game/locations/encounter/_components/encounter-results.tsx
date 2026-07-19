@@ -306,7 +306,7 @@ export function EncounterResults({
         }
         additionalContent={
           expeditionUpdateContent || messagesContent ? (
-            <div className="mt-4 space-y-3">
+            <div className={expeditionUpdateContent ? 'space-y-3' : undefined}>
               {expeditionUpdateContent}
               {messagesContent}
             </div>
