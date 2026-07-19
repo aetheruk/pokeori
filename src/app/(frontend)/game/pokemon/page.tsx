@@ -4,7 +4,7 @@ import { Loader2 } from 'lucide-react'
 
 export default function PokemonPage() {
   return (
-    <div className="game-paper-first game-paper-texture flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
+    <div className="game-paper-first game-paper-background flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
       <Suspense
         fallback={
           <div className="flex items-center justify-center h-full">

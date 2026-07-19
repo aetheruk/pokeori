@@ -802,7 +802,7 @@ export function PokemonDetailsDialog({
         desktopWidth="min(42vw, 620px)"
         mobileHeader={false}
         showHandle={false}
-        className="game-paper-first game-paper-texture flex max-h-[92dvh] w-full flex-col gap-0 overflow-hidden bg-game-canvas p-0 text-game-ink"
+        className="game-paper-first game-paper-background flex max-h-[92dvh] w-full flex-col gap-0 overflow-hidden bg-game-canvas p-0 text-game-ink"
       >
         {/* Fixed Image at Top */}
         <div className="relative -mt-1 aspect-[2/1] w-full flex-shrink-0 overflow-hidden border-b border-game-border">

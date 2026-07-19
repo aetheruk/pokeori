@@ -285,7 +285,7 @@ function CraftDialogShell({
   children: ReactNode
 }) {
   return (
-    <div className="game-paper-texture relative overflow-hidden rounded-xl border border-game-border bg-game-surface text-game-ink shadow-sm">
+    <div className="game-paper-background relative overflow-hidden rounded-xl border border-game-border bg-game-surface text-game-ink shadow-sm">
       <button
         type="button"
         onClick={onClose}
@@ -1804,7 +1804,7 @@ export function ArtisanPanel() {
     : []
 
   return (
-    <div className="game-paper-first game-paper-texture flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
+    <div className="game-paper-first game-paper-background flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
       {qteRecipe?.craftType === 'crush' ? (
         <CrushDialog
           recipe={qteRecipe}

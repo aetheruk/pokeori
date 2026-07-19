@@ -40,6 +40,7 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-game-canvas: var(--game-canvas);
+  --color-game-paper-background: var(--game-paper-background);
   --color-game-surface: var(--game-surface);
   --color-game-surface-raised: var(--game-surface-raised);
   --color-game-border: var(--game-border);
@@ -83,6 +84,7 @@
 
 :root {
   --radius: 0.625rem;
+  --game-paper-background: #f4eacf;
   --game-canvas: #efe4cf;
   --game-surface: #f7efdf;
   --game-surface-raised: #fff8e8;
@@ -312,7 +314,7 @@
   }
 
   .game-paper-modal:not(.game-night) {
-    background-color: var(--game-canvas) !important;
+    background-color: var(--game-paper-background) !important;
   }
 
   /* Filled action controls keep a cream foreground even in light activity chrome. */
@@ -324,10 +326,9 @@
     color: inherit !important;
   }
 
-  .game-paper-texture {
-    background-image: url('/ui/pokeori/paper-grain.avif');
-    background-repeat: repeat;
-    background-size: 420px 420px;
+  .game-paper-background {
+    background-color: var(--game-paper-background) !important;
+    background-image: none !important;
   }
 
   .game-contour-motif,

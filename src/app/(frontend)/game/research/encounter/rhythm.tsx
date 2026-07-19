@@ -507,7 +507,7 @@ export function RhythmGame({ encounter, initialState }: RhythmGameProps) {
           </div>
 
           {/* Icon Selection Area (Bottom 60%) */}
-          <div className="game-paper-texture h-[60%] border-t border-game-border bg-game-surface p-6 text-game-ink">
+          <div className="game-paper-background h-[60%] border-t border-game-border bg-game-surface p-6 text-game-ink">
             <div className="h-full flex flex-col">
               <div className="text-center mb-6">
                 <p className="text-xs uppercase tracking-wider text-game-muted">

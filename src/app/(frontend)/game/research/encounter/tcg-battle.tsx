@@ -3225,7 +3225,7 @@ function BenchSheet({
         onClick={onClose}
         aria-label="Close bench"
       />
-      <div className="game-paper-texture absolute inset-x-0 bottom-0 mx-auto max-w-5xl rounded-t-xl border border-game-border bg-game-surface p-4 text-game-ink shadow-2xl">
+      <div className="game-paper-background absolute inset-x-0 bottom-0 mx-auto max-w-5xl rounded-t-xl border border-game-border bg-game-surface p-4 text-game-ink shadow-2xl">
         <div className="mb-3 grid grid-cols-[1fr_auto] items-center gap-3">
           <div className="min-w-0">
             <div className="flex items-center gap-2 text-sm font-black uppercase text-game-ink">

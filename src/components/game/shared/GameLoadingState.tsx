@@ -13,7 +13,7 @@ export function GameLoadingState({
   return (
     <div
       className={cn(
-        'game-paper-texture flex w-full items-center justify-center bg-game-canvas text-game-ink',
+        'game-paper-background flex w-full items-center justify-center bg-game-canvas text-game-ink',
         fullscreen ? 'h-dvh' : 'h-full',
         className,
       )}

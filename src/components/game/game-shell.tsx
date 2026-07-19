@@ -41,7 +41,7 @@ export function GameShell({
     <UserProvider initialUser={user || null}>
       <AudioProvider>
         <GameErrorBoundary>
-          <div className="game-paper-texture fixed inset-0 flex flex-col bg-game-canvas text-game-ink">
+          <div className="game-paper-background fixed inset-0 flex flex-col bg-game-canvas text-game-ink">
             <a href="#game-content" className="game-skip-link">
               Skip to game content
             </a>

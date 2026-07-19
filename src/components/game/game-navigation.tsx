@@ -52,7 +52,7 @@ export function GameNavigation() {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="game-paper-texture fixed left-0 top-0 z-40 hidden h-dvh w-20 flex-col border-r border-game-border bg-sidebar text-game-ink md:flex xl:w-56">
+      <aside className="game-paper-background fixed left-0 top-0 z-40 hidden h-dvh w-20 flex-col border-r border-game-border bg-sidebar text-game-ink md:flex xl:w-56">
         <div className="flex h-[4.5rem] items-center border-b border-game-border px-4 xl:px-5">
           <BrandLockup compact className="xl:hidden" />
           <BrandLockup className="ml-1 hidden w-full max-w-[168px] xl:block" />

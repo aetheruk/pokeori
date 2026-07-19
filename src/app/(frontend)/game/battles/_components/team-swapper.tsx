@@ -119,7 +119,7 @@ export function TeamSwapper({
       </DrawerTrigger>
       <DrawerContent
         id={swapDrawerContentId}
-        className="game-paper-modal game-paper-texture max-h-[60dvh] border-game-border bg-game-surface-raised"
+        className="game-paper-modal game-paper-background max-h-[60dvh] border-game-border bg-game-surface-raised"
       >
         <div className="mx-auto min-h-0 w-full max-w-xl overflow-y-auto px-3 pt-3 pb-5 sm:px-4">
           <SectionDivider className="mb-3">

@@ -38,7 +38,7 @@ export function BattleSurrenderButton() {
       </DialogTrigger>
       <DialogContent
         id={surrenderDialogContentId}
-        className="game-paper-texture border-game-border bg-game-surface text-game-ink"
+        className="game-paper-background border-game-border bg-game-surface text-game-ink"
       >
         <DialogTitle className="sr-only">Surrender Battle</DialogTitle>
         <div className="w-full text-center mt-2">

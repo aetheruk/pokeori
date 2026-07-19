@@ -55,7 +55,7 @@ function PrizesModal({ buckets }: { buckets: any[] }) {
           Prizes
         </Button>
       </DialogTrigger>
-      <DialogContent className="game-paper-texture w-[95%] max-w-md rounded-xl border-game-border bg-game-surface p-6 text-game-ink">
+      <DialogContent className="game-paper-background w-[95%] max-w-md rounded-xl border-game-border bg-game-surface p-6 text-game-ink">
         <DialogHeader>
           <DialogTitle className="sr-only">Bucket Prizes</DialogTitle>
           <SectionDivider>Bucket Prizes</SectionDivider>

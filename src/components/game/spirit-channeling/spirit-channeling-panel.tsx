@@ -509,7 +509,7 @@ function IncensePickerDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="game-paper-modal game-paper-texture max-h-[85vh] max-w-sm overflow-hidden rounded-xl border-game-border bg-game-surface p-0 shadow-xl">
+      <DialogContent className="game-paper-modal game-paper-background max-h-[85vh] max-w-sm overflow-hidden rounded-xl border-game-border bg-game-surface p-0 shadow-xl">
         <div className="px-4 pb-5 pt-5">
           <DialogTitle className="text-left font-display text-lg font-semibold text-game-ink">
             Incense
@@ -576,7 +576,7 @@ function OfferingPickerDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="game-paper-modal game-paper-texture max-h-[85vh] max-w-sm overflow-hidden rounded-xl border-game-border bg-game-surface p-0 shadow-xl">
+      <DialogContent className="game-paper-modal game-paper-background max-h-[85vh] max-w-sm overflow-hidden rounded-xl border-game-border bg-game-surface p-0 shadow-xl">
         <div className="px-4 pb-5 pt-5">
           <DialogTitle className="text-left font-display text-lg font-semibold text-game-ink">
             Offering {slotIndex + 1}
@@ -710,7 +710,7 @@ function PokemonPickerDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="game-paper-modal game-paper-texture max-h-[85vh] max-w-sm overflow-hidden rounded-xl border-game-border bg-game-surface p-0 shadow-xl">
+      <DialogContent className="game-paper-modal game-paper-background max-h-[85vh] max-w-sm overflow-hidden rounded-xl border-game-border bg-game-surface p-0 shadow-xl">
         <div className="px-4 pb-5 pt-5">
           <DialogTitle className="text-left font-display text-lg font-semibold text-game-ink">
             Channeler

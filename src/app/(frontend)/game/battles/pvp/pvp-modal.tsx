@@ -127,7 +127,7 @@ export function PvpModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="game-paper-texture border-game-border bg-game-surface text-game-ink sm:max-w-md">
+      <DialogContent className="game-paper-background border-game-border bg-game-surface text-game-ink sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Friendly Battle</DialogTitle>
           <DialogDescription>

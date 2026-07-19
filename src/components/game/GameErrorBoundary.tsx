@@ -38,7 +38,7 @@ export class GameErrorBoundary extends Component<Props, State> {
 
       return (
         <div
-          className="game-paper-texture flex min-h-[min(400px,70dvh)] flex-col items-center justify-center p-6 text-center text-game-ink"
+          className="game-paper-background flex min-h-[min(400px,70dvh)] flex-col items-center justify-center p-6 text-center text-game-ink"
           role="alert"
         >
           <div className="game-folio-section flex w-full max-w-md flex-col items-center gap-4 p-6">

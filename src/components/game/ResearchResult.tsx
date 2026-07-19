@@ -137,7 +137,7 @@ export function GameResult({
   return (
     <div
       className={cn(
-        'game-paper-first game-paper-texture relative h-full w-full overflow-hidden pt-[env(safe-area-inset-top)] text-game-ink',
+        'game-paper-first game-paper-background relative h-full w-full overflow-hidden pt-[env(safe-area-inset-top)] text-game-ink',
         !embedded && 'bg-game-canvas',
       )}
     >

@@ -684,7 +684,7 @@ export function PokemonSnapGame({
           </div>
 
           {/* Answer Area (Bottom 70%) */}
-          <div className="game-paper-texture h-[70%] overflow-y-auto border-t border-game-border bg-game-surface p-6 text-game-ink">
+          <div className="game-paper-background h-[70%] overflow-y-auto border-t border-game-border bg-game-surface p-6 text-game-ink">
             <div className="h-full flex flex-col">
               <SectionDivider>Take a Photo of</SectionDivider>
               <div className="flex items-center justify-center mb-6">

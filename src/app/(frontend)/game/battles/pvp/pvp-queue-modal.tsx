@@ -97,7 +97,7 @@ export function PvpQueueModal({
         onOpenChange(val)
       }}
     >
-      <DialogContent className="game-paper-texture border-game-border bg-game-surface text-game-ink sm:max-w-sm">
+      <DialogContent className="game-paper-background border-game-border bg-game-surface text-game-ink sm:max-w-sm">
         <DialogHeader>
           <DialogTitle>Ranked Queue</DialogTitle>
           <DialogDescription>

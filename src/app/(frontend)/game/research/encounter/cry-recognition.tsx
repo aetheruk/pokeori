@@ -502,7 +502,7 @@ export function CryRecognitionGame({
           </div>
 
           {/* Answer Area (Bottom 70%) */}
-          <div className="game-paper-texture h-[70%] overflow-y-auto border-t border-game-border bg-game-surface px-4 py-5 text-game-ink">
+          <div className="game-paper-background h-[70%] overflow-y-auto border-t border-game-border bg-game-surface px-4 py-5 text-game-ink">
             <div className="mx-auto flex h-full max-w-md flex-col lg:max-w-2xl">
               <SectionDivider>Identify the Pokemon</SectionDivider>
               <div className="flex items-center justify-center mb-6">
