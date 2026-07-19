@@ -44,7 +44,7 @@ export function HighScores({ activeSkill }: { activeSkill: string }) {
   }, [activeSkill])
 
   return (
-    <div className="game-paper-first game-paper-texture flex flex-col h-full overflow-hidden bg-game-canvas text-game-ink">
+    <div className="game-paper-first game-paper-background flex flex-col h-full overflow-hidden bg-game-canvas text-game-ink">
       {/* List container */}
       <div className="relative z-10 mx-auto min-h-0 w-full max-w-3xl flex-1 space-y-4 overflow-y-auto px-4 pt-5 pb-6 md:px-6">
         {isLoading ? (

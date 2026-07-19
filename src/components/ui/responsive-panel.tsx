@@ -31,6 +31,7 @@ export interface ResponsivePanelProps {
   showHandle?: boolean
   showHeader?: boolean
   showCloseButton?: boolean
+  headerClassName?: string
   className?: string
 }
 
@@ -66,6 +67,7 @@ export function ResponsivePanel({
   showHandle = true,
   showHeader = true,
   showCloseButton = true,
+  headerClassName,
   className,
 }: ResponsivePanelProps) {
   // Keep the inspector in its touch-friendly sheet mode through small desktop
@@ -103,7 +105,7 @@ export function ResponsivePanel({
         <Dialog open={open} onOpenChange={onOpenChange}>
           <DialogContent
             className={cn(
-              'game-paper-modal game-paper-texture !left-auto !right-0 !top-0 h-dvh !max-h-none !w-[var(--responsive-panel-width)] !max-w-none !translate-x-0 !translate-y-0 rounded-l-xl rounded-r-none border-y-0 border-r-0 p-0 sm:p-0',
+              'game-paper-modal game-paper-background !left-auto !right-0 !top-0 h-dvh !max-h-none !w-[var(--responsive-panel-width)] !max-w-none !translate-x-0 !translate-y-0 rounded-l-xl rounded-r-none border-y-0 border-r-0 p-0 sm:p-0',
               'data-[state=open]:slide-in-from-right data-[state=closed]:slide-out-to-right',
               className,
             )}
@@ -115,7 +117,12 @@ export function ResponsivePanel({
             showCloseButton={showCloseButton}
           >
             {header && showHeader ? (
-              <DialogHeader className="border-b border-game-border p-5">
+              <DialogHeader
+                className={cn(
+                  'border-b border-game-border p-5',
+                  headerClassName,
+                )}
+              >
                 {header}
               </DialogHeader>
             ) : (
@@ -141,7 +148,7 @@ export function ResponsivePanel({
       <Drawer open={open} onOpenChange={onOpenChange}>
         <DrawerContent
           showHandle={showHandle}
-          className={cn('game-paper-modal game-paper-texture relative', className)}
+          className={cn('game-paper-modal game-paper-background relative', className)}
           style={{ maxHeight: mobileMaxHeight }}
         >
           {showCloseButton && (
@@ -164,6 +171,7 @@ export function ResponsivePanel({
               className={cn(
                 'border-b border-game-border text-left',
                 !mobileHeader && 'sr-only',
+                headerClassName,
               )}
             >
               {title && <DrawerTitle>{title}</DrawerTitle>}

@@ -61,7 +61,7 @@ export default function AbilityDexPage() {
   const knownAbilityCount = registeredAbilityIds.size
 
   return (
-    <div className="game-paper-first game-paper-texture flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
+    <div className="game-paper-first game-paper-background flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
       <PremiumHeader
         title="AbilityDex"
         subtitle={`${knownAbilityCount} / ${ALL_ABILITY_DEX_ENTRIES.length}`}

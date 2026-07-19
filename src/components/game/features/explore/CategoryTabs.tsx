@@ -32,6 +32,7 @@ export function CategoryTabs({
       description="Open a field journal section to explore."
       desktopWidth="min(38vw, 520px)"
       mobileHeader={false}
+      headerClassName="pr-0 text-center sm:text-center"
       className="flex flex-col bg-game-surface"
     >
       <div className="flex-1 overflow-y-auto px-4 pb-4 pt-4">

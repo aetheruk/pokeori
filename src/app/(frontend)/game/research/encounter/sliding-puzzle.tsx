@@ -278,7 +278,7 @@ export function SlidingPuzzleGame({
             )}
           </div>
           {/* Puzzle Area (Bottom 60%) */}
-          <div className="game-paper-texture relative flex h-[60%] flex-col items-center justify-center border-t border-game-border bg-game-surface p-4 text-game-ink">
+          <div className="game-paper-background relative flex h-[60%] flex-col items-center justify-center border-t border-game-border bg-game-surface p-4 text-game-ink">
             <div
               className="relative overflow-hidden rounded-xl border-4 border-[#40545c] bg-game-night-surface shadow-xl"
               style={{

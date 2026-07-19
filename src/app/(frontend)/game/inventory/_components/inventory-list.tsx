@@ -802,7 +802,7 @@ export function InventoryList() {
   )
 
   return (
-    <div className="game-paper-first game-paper-texture flex flex-col h-full overflow-hidden bg-game-canvas text-game-ink">
+    <div className="game-paper-first game-paper-background flex flex-col h-full overflow-hidden bg-game-canvas text-game-ink">
       <PremiumHeader title="INVENTORY" subtitle="Storage" />
 
       <div className="hidden items-center gap-3 border-b border-game-border bg-game-surface/70 px-6 py-3 xl:flex">

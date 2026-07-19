@@ -187,7 +187,7 @@ export function TcgDecksPanel({
 
   return (
     <div className="h-full overflow-y-auto p-4 md:p-6">
-      <div className="game-paper-texture space-y-4 rounded-xl border border-game-border bg-game-surface p-4 shadow-sm">
+      <div className="game-paper-background space-y-4 rounded-xl border border-game-border bg-game-surface p-4 shadow-sm">
         <SectionDivider className="mb-1">TCG Generation Decks</SectionDivider>
         <PremiumSelect
           label="Battle Energy Card (Activates Turn 15)"

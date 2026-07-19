@@ -1661,7 +1661,7 @@ export default function EncounterPage() {
 
       <div
         className={cn(
-          'game-paper-texture relative flex flex-1 flex-col justify-center border-t border-game-border bg-game-canvas p-4 text-game-ink xl:col-start-2 xl:row-start-1 xl:row-span-2 xl:min-h-0 xl:border-l xl:border-t-0 xl:p-5',
+          'game-paper-background relative flex flex-1 flex-col justify-center border-t border-game-border bg-game-canvas p-4 text-game-ink xl:col-start-2 xl:row-start-1 xl:row-span-2 xl:min-h-0 xl:border-l xl:border-t-0 xl:p-5',
           phase === 'capture'
             ? 'overflow-visible z-20 lg:overflow-y-auto'
             : 'overflow-hidden lg:overflow-y-auto',

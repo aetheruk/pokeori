@@ -18,6 +18,7 @@ The exact CSS variables live in `src/styles/globals.css`. Use semantic roles ins
 | Role | Color direction | Use |
 | --- | --- | --- |
 | Paper canvas | warm parchment `#efe4cf` | ordinary page backgrounds |
+| Paper background | warm cream `#f4eacf` | surfaces that previously carried the paper texture |
 | Raised paper | cream `#fff8e8` | cards, drawers, dialogs, selected panels |
 | Ink | deep charcoal `#293532` | primary text and headings |
 | Muted ink | olive-grey `#667269` | descriptions, metadata, disabled copy |
@@ -47,7 +48,7 @@ Avoid pure black, electric teal, saturated emerald, arbitrary gradient text, and
 - Use clipped, ticket-like, or map-tab shapes for navigation and section selectors when they improve hierarchy.
 - Reserve pill shapes for statuses, filters, compact tags, and counts.
 - Keep touch targets at least 40px, with 44px preferred for primary mobile controls.
-- Use paper texture and map motifs sparingly on page shells, hero headers, empty states, and special detail surfaces. Never texture every row.
+- Use the solid warm cream canvas `#f4eacf` for paper-first surfaces. Keep map motifs and field-note marks restrained; do not add paper grain or texture to routine UI.
 
 ## Component rules
 
@@ -90,7 +91,7 @@ The wide-screen breakpoint is `lg` (1024px). Below it, the app remains touch-fir
 - Use the Pokeori expedition mark for app icons and compact navigation identity.
 - Use the transparent Pokeori wordmark for wide brand lockups; do not put it inside a rectangular color panel unless the surrounding surface requires contrast.
 - Reuse existing route/location artwork as the primary environmental storytelling.
-- Supporting motifs live under `public/ui/pokeori/` and should remain subtle: parchment grain, contour-map lines, and field-note marks.
+- Supporting motifs live under `public/ui/pokeori/` and should remain subtle: contour-map lines and field-note marks.
 - Do not add text into generated decorative images when the text can be rendered as accessible HTML.
 
 ## Review checklist

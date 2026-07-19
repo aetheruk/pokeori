@@ -311,7 +311,7 @@ export function SpellingGame({ encounter, initialState }: SpellingGameProps) {
           </div>
 
           {/* Answer Area (Bottom 60%) */}
-          <div className="game-paper-texture h-[60%] overflow-y-auto border-t border-game-border bg-game-surface px-4 py-5 text-game-ink">
+          <div className="game-paper-background h-[60%] overflow-y-auto border-t border-game-border bg-game-surface px-4 py-5 text-game-ink">
             <div className="h-full flex flex-col max-w-md mx-auto lg:max-w-2xl">
               {/* Name Tiles Section */}
               <SectionDivider>Spell the Name</SectionDivider>

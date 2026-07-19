@@ -633,7 +633,7 @@ export function ResearchCompareGame({
         </div>
 
         {/* Question & Cards Area (Bottom) */}
-        <div className="game-paper-texture flex h-[60%] flex-col items-center border-t border-game-border bg-game-surface p-6 text-game-ink">
+        <div className="game-paper-background flex h-[60%] flex-col items-center border-t border-game-border bg-game-surface p-6 text-game-ink">
           {currentStat ? (
             <motion.div
               key={currentStat + isHighest.toString()}

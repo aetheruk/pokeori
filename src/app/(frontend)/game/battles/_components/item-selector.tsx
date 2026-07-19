@@ -186,7 +186,7 @@ export function ItemSelector() {
       </DrawerTrigger>
       <DrawerContent
         id={itemDrawerContentId}
-        className="game-paper-modal game-paper-texture max-h-[70dvh] border-game-border bg-game-surface-raised"
+        className="game-paper-modal game-paper-background max-h-[70dvh] border-game-border bg-game-surface-raised"
       >
         <div className="px-4 pt-4 pb-6">
           <SectionDivider className="mb-4">

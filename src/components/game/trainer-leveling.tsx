@@ -428,7 +428,7 @@ export function TrainerLeveling() {
   if (!user) return null
 
   return (
-    <div className="game-paper-texture relative flex h-full min-h-0 flex-col overflow-hidden bg-game-canvas text-game-ink">
+    <div className="game-paper-background relative flex h-full min-h-0 flex-col overflow-hidden bg-game-canvas text-game-ink">
       {/* Trainer Profile Header */}
       <div className="relative z-10 w-full shrink-0 flex-col">
         <div className="w-full flex-shrink-0">

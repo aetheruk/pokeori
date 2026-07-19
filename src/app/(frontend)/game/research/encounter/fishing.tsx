@@ -552,7 +552,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
         {/* ROD SELECTION PHASE */}
         {phase === 'select-rod' && (
           <div className="pointer-events-auto absolute inset-x-3 bottom-3 pb-[env(safe-area-inset-bottom)]">
-            <div className="game-paper-texture mx-auto max-w-md animate-in rounded-xl border border-game-border bg-game-surface p-5 text-game-ink shadow-xl fade-in slide-in-from-bottom-6 duration-300 lg:max-w-xl">
+            <div className="game-paper-background mx-auto max-w-md animate-in rounded-xl border border-game-border bg-game-surface p-5 text-game-ink shadow-xl fade-in slide-in-from-bottom-6 duration-300 lg:max-w-xl">
               <SectionDivider className="mb-5">Select your rod</SectionDivider>
 
               {availableRods.length > 0 ? (
@@ -685,7 +685,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
         {/* CATCH RESULT UI (Appears immediately) */}
         {phase === 'hooked' && hookedData && (
           <div className="pointer-events-auto absolute inset-x-3 bottom-3 pb-[env(safe-area-inset-bottom)]">
-            <div className="game-paper-texture mx-auto flex max-w-sm animate-in flex-col items-center gap-4 rounded-xl border border-game-border bg-game-surface p-5 text-game-ink shadow-xl fade-in slide-in-from-bottom-6 duration-300 lg:max-w-lg">
+            <div className="game-paper-background mx-auto flex max-w-sm animate-in flex-col items-center gap-4 rounded-xl border border-game-border bg-game-surface p-5 text-game-ink shadow-xl fade-in slide-in-from-bottom-6 duration-300 lg:max-w-lg">
               {hookedData.type === 'pokemon' && hookedPokemon && (
                 <>
                   <div className="w-full">

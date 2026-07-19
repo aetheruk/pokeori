@@ -517,7 +517,7 @@ export function MiningGame({ encounter, initialState }: MiningGameProps) {
           </div>
 
           {/* Button Area (Bottom 30%) */}
-          <div className="game-paper-texture flex h-[30%] items-center justify-center border-t border-game-border bg-game-surface p-6">
+          <div className="game-paper-background flex h-[30%] items-center justify-center border-t border-game-border bg-game-surface p-6">
             <Button
               size="lg"
               className="h-24 w-24 touch-manipulation select-none rounded-full border-4 border-game-clay bg-game-clay text-game-cream shadow-md hover:bg-game-clay/90"

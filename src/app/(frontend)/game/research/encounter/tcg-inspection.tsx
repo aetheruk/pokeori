@@ -607,7 +607,7 @@ export function TcgInspectionGame({
           )}
         </section>
 
-        <main className="game-paper-texture relative flex flex-1 flex-col justify-center overflow-hidden border-t border-game-border bg-game-surface p-4 text-game-ink">
+        <main className="game-paper-background relative flex flex-1 flex-col justify-center overflow-hidden border-t border-game-border bg-game-surface p-4 text-game-ink">
           {phase === 'question' && currentQuestion && (
             <div className="relative z-10 mx-auto flex h-full min-h-[60dvh] w-full max-w-3xl flex-col justify-center">
               <QuestionPrompt

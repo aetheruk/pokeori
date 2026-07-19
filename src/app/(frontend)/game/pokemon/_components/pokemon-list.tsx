@@ -1106,7 +1106,7 @@ export function PokemonList() {
   if (!user) return null
 
   return (
-    <div className="game-paper-first game-paper-texture flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
+    <div className="game-paper-first game-paper-background flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
       <PremiumHeader
         title="POKEMON BOX"
         subtitle={`${totalPokemonCount} / ${user?.maxPokemon || 50}`}

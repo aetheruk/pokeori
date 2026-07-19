@@ -16,7 +16,7 @@ const LevelUpModal = nextDynamic(
     import('@/components/game/level-up-modal').then((mod) => mod.LevelUpModal),
   {
     loading: () => (
-      <div className="game-paper-texture fixed inset-0 z-50 flex items-center justify-center bg-game-canvas">
+      <div className="game-paper-background fixed inset-0 z-50 flex items-center justify-center bg-game-canvas">
         <LoadingSpinner size="lg" />
       </div>
     ),
@@ -29,7 +29,7 @@ const CardDrawReveal = nextDynamic(
     import('@/components/tcg/CardDrawReveal').then((mod) => mod.CardDrawReveal),
   {
     loading: () => (
-      <div className="game-paper-texture fixed inset-0 z-50 flex items-center justify-center bg-game-canvas">
+      <div className="game-paper-background fixed inset-0 z-50 flex items-center justify-center bg-game-canvas">
         <LoadingSpinner size="lg" />
       </div>
     ),

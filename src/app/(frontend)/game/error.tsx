@@ -11,7 +11,7 @@ interface GameErrorProps {
 export default function GameError({ error, reset }: GameErrorProps) {
   return (
     <main
-      className="game-paper-texture flex min-h-[min(520px,78dvh)] items-center justify-center bg-game-canvas p-6 text-game-ink"
+      className="game-paper-background flex min-h-[min(520px,78dvh)] items-center justify-center bg-game-canvas p-6 text-game-ink"
       role="alert"
       aria-live="assertive"
     >

@@ -401,7 +401,7 @@ export function PowerSelector() {
           </DrawerTrigger>
           <DrawerContent
             id={moveDrawerContentId}
-            className="game-paper-modal game-paper-texture max-h-[70dvh] border-game-border bg-game-surface-raised"
+            className="game-paper-modal game-paper-background max-h-[70dvh] border-game-border bg-game-surface-raised"
           >
             {renderMovesContent()}
           </DrawerContent>
@@ -433,7 +433,7 @@ export function PowerSelector() {
           </DrawerTrigger>
           <DrawerContent
             id={powerDrawerContentId}
-            className="game-paper-modal game-paper-texture max-h-[80dvh] border-game-border bg-game-surface-raised"
+            className="game-paper-modal game-paper-background max-h-[80dvh] border-game-border bg-game-surface-raised"
           >
             <div className="px-4 pt-4 pb-6 max-w-md mx-auto">
               {isBattlePanelLoading && !powersData ? (

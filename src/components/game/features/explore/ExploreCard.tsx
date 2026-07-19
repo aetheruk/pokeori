@@ -101,7 +101,7 @@ function ExploreCardComponent({
         'game-focus-ring group relative flex flex-row items-center gap-4 overflow-hidden rounded-lg border p-4 transition-colors',
         isGrouped ? 'cursor-default' : 'cursor-pointer',
         isHighlighted
-          ? 'border-game-ochre/45 bg-game-ochre/10'
+          ? 'border-game-ochre/45 bg-game-surface-raised'
           : 'border-game-border bg-game-surface hover:border-game-moss/35 hover:bg-game-surface-raised',
       )}
       role={isInteractive ? 'button' : undefined}

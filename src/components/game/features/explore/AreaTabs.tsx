@@ -1,4 +1,4 @@
-import { Check, Lock, Trophy } from 'lucide-react'
+import { Check, Lock } from 'lucide-react'
 import Image from 'next/image'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { subCategories as subCategoryDataMap } from '@/data/sub-region-map'
@@ -36,6 +36,7 @@ export function AreaTabs({
       description="Select a local route or landmark."
       desktopWidth="min(38vw, 520px)"
       mobileHeader={false}
+      headerClassName="pr-0 text-center sm:text-center"
       className="flex flex-col bg-game-surface"
     >
       <div className="flex-1 overflow-y-auto px-4 pb-4 pt-4">
@@ -83,11 +84,6 @@ export function AreaTabs({
                   {!isLocked && activeSubCategory === subCategory && (
                     <div className="absolute top-2 right-2 bg-game-moss rounded-full p-1">
                       <Check className="h-4 w-4 text-game-cream" />
-                    </div>
-                  )}
-                  {!isLocked && status === 'complete' && (
-                    <div className="absolute bottom-2 left-2 bg-game-ochre rounded-full p-1">
-                      <Trophy className="h-4 w-4 text-game-cream" />
                     </div>
                   )}
                 </div>

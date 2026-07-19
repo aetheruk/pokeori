@@ -89,7 +89,7 @@ export function FriendsList() {
   }
 
   return (
-    <div className="game-paper-first game-paper-texture flex flex-col h-full overflow-hidden bg-game-canvas text-game-ink">
+    <div className="game-paper-first game-paper-background flex flex-col h-full overflow-hidden bg-game-canvas text-game-ink">
       <div className="relative z-10 mx-auto min-h-0 w-full max-w-3xl flex-1 space-y-6 overflow-y-auto px-4 py-5 md:px-6">
         <div className="grid grid-cols-2 gap-2">
           <div className="rounded-lg border border-game-moss/30 bg-game-surface-raised p-3">
