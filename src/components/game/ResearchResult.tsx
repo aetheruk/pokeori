@@ -32,8 +32,11 @@ export function ResultActionButton({
     ...props,
     type,
     variant: 'default' as const,
-    size: 'lg' as const,
-    className: cn('w-full min-w-0 font-bold', className),
+    size: 'default' as const,
+    className: cn(
+      'w-full min-w-0 border border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90',
+      className,
+    ),
   }
 
   if (asChild) {
@@ -237,24 +240,28 @@ export function GameResult({
         <StickyFooter>
           <div
             className={cn(
-              'w-full max-w-sm mx-auto flex gap-3',
+              'flex w-full gap-3',
               secondaryAction ? 'flex-row-reverse' : 'flex-col',
             )}
           >
             {secondaryAction && (
-              <div className="min-w-0 flex-1 [&>button]:min-h-11">
+              <div className="min-w-0 flex-1">
                 <ResultActionButton asChild>{secondaryAction}</ResultActionButton>
               </div>
             )}
-            <ResultActionButton
-              onClick={handleReturn}
+            <div
               className={cn(
-                'transition-colors',
+                'min-w-0',
                 secondaryAction ? 'flex-1' : 'w-full',
               )}
             >
-              {returnText}
-            </ResultActionButton>
+              <ResultActionButton
+                onClick={handleReturn}
+                className="transition-colors"
+              >
+                {returnText}
+              </ResultActionButton>
+            </div>
           </div>
         </StickyFooter>
       </main>

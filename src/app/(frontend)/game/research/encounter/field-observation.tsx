@@ -33,7 +33,6 @@ import type {
   FieldObservationPublicCollectibleDrop,
   FieldObservationPublicRoundData,
   FieldObservationSpawn,
-  FieldObservationSurveyFocus,
 } from '@/utilities/research/field-observation'
 import {
   collectFieldObservationDrop,
@@ -239,10 +238,7 @@ export function FieldObservationGame({
     <div className="relative flex h-dvh flex-col overflow-hidden game-night bg-game-night-canvas text-game-night-ink">
       <div className="pointer-events-none absolute left-3 right-3 top-3 z-20 flex items-center justify-between gap-3">
         <div className="flex min-w-0 flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-wide">
-          <span className="rounded-full border border-game-night-border/60 bg-game-night-surface/85 px-3 py-1 text-game-cream">
-            {getSurveyFocusLabel(roundData.surveyFocus)}
-          </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-game-ochre/45 bg-game-night-surface/85 px-2.5 py-1 text-game-cream">
+          <span className="game-paper-first inline-flex items-center gap-1.5 rounded-full border border-game-ochre/45 bg-game-surface-raised px-2.5 py-1 text-[#293532]">
             <Image
               src="/sprites/items/materials/material.avif"
               alt=""
@@ -250,7 +246,7 @@ export function FieldObservationGame({
               height={18}
               className="object-contain"
             />
-            <span>{collectedDropIds.size}</span>
+            <span className="text-game-ink">{collectedDropIds.size}</span>
           </span>
         </div>
         <div className="pointer-events-auto">
@@ -296,7 +292,7 @@ export function FieldObservationGame({
               </>
             ) : (
               <div className="absolute inset-0 flex items-center justify-center p-4 pt-16 sm:p-6 sm:pt-16">
-                <div className="flex max-h-full w-full max-w-4xl flex-col overflow-hidden rounded-lg border border-game-border bg-game-surface-raised text-game-ink shadow-lg">
+                <div className="game-paper-first flex max-h-full w-full max-w-4xl flex-col overflow-hidden rounded-lg border border-game-border bg-game-surface-raised text-[#293532] shadow-lg">
                   <div className="relative shrink-0 overflow-hidden border-b border-game-border bg-game-surface-raised px-4 py-3">
                     <div className="relative flex min-w-0 items-center gap-3">
                       <Image
@@ -314,7 +310,7 @@ export function FieldObservationGame({
                         </div>
                         <div className="mt-1 flex min-w-0 items-center gap-2">
                           <FileQuestion className="h-4 w-4 shrink-0 text-game-ochre" />
-                          <span className="truncate text-sm font-semibold text-game-ink">
+                          <span className="truncate text-sm font-semibold text-[#293532]">
                             {isCountSurvey
                               ? 'Count report'
                               : 'Observation question'}
@@ -326,7 +322,7 @@ export function FieldObservationGame({
                   </div>
 
                   <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-5">
-                    <h2 className="mb-4 text-pretty font-display text-lg font-semibold leading-snug text-game-ink sm:text-xl">
+                    <h2 className="mb-4 text-pretty font-display text-lg font-semibold leading-snug text-[#293532] sm:text-xl">
                       {roundData.question.prompt}
                     </h2>
                     {isCountSurvey ? (
@@ -346,12 +342,13 @@ export function FieldObservationGame({
                             <Button
                               key={option.id}
                               type="button"
+                              variant="outline"
                               disabled={isSubmitting || !!result}
                               aria-pressed={selectedOption === option.id}
                               aria-busy={selectedOption === option.id && isSubmitting}
                               onClick={() => handleAnswer(option.id)}
                               className={cn(
-                                'min-h-12 justify-start gap-3 whitespace-normal border border-game-border bg-game-surface-raised px-3 py-2 text-left text-game-ink shadow-sm hover:border-game-moss/40 hover:bg-game-moss/5 disabled:text-game-muted',
+                                'min-h-12 justify-start gap-3 whitespace-normal border border-game-border bg-game-surface-raised px-3 py-2 text-left text-[#293532] shadow-sm hover:border-game-moss/40 hover:bg-game-moss/5 disabled:text-game-muted',
                                 selectedOption === option.id &&
                                   'border-game-moss bg-game-moss/10 opacity-100 ring-1 ring-game-moss/35',
                               )}
@@ -759,25 +756,6 @@ function FieldDropButton({
       />
     </button>
   )
-}
-
-function getSurveyFocusLabel(focus: FieldObservationSurveyFocus | undefined) {
-  switch (focus) {
-    case 'count-survey':
-      return 'Count'
-    case 'material-survey':
-      return 'Material'
-    case 'berry-survey':
-      return 'Berry'
-    case 'salvage-survey':
-      return 'Salvage'
-    case 'swarm-survey':
-      return 'Swarm'
-    case 'rare-trace':
-      return 'Rare'
-    default:
-      return 'Standard'
-  }
 }
 
 type NotePoint = {

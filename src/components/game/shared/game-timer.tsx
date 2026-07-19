@@ -55,7 +55,13 @@ export function GameTimer({
           r={r}
           stroke="currentColor"
           strokeWidth={width}
-          fill={isLowTime ? 'rgba(169,71,60,0.16)' : tone === 'scene' ? 'rgba(23,39,51,0.76)' : 'rgba(247,239,223,0.92)'}
+          fill={
+            isLowTime
+              ? 'var(--game-danger)'
+              : tone === 'scene'
+                ? 'rgba(23,39,51,0.76)'
+                : 'rgba(247,239,223,0.92)'
+          }
           className={tone === 'scene' ? 'text-white/25' : 'text-game-border-strong'}
         />
         {/* Progress Circle */}
@@ -75,7 +81,11 @@ export function GameTimer({
       <span
         className={cn(
           'absolute font-mono font-semibold',
-          tone === 'scene' ? 'text-game-night-ink' : 'text-game-ink',
+          isLowTime
+            ? 'text-game-cream'
+            : tone === 'scene'
+              ? 'text-game-night-ink'
+              : 'text-game-ink',
           size === 'sm' ? 'text-xs' : size === 'xl' ? 'text-4xl' : 'text-sm',
         )}
       >

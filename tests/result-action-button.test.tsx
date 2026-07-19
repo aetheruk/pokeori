@@ -13,7 +13,7 @@ describe('result action button', () => {
 
     expect(markup).toContain('bg-game-clay')
     expect(markup).toContain('text-game-cream')
-    expect(markup).toContain('hover:bg-game-clay-strong')
+    expect(markup).toContain('hover:bg-game-clay/90')
     expect(markup).toContain('disabled=""')
     expect(markup).toContain('aria-busy="true"')
   })
@@ -32,7 +32,7 @@ describe('result action button', () => {
 
     expect(markup).toContain('bg-game-clay')
     expect(markup).toContain('text-game-cream')
-    expect(markup).toContain('hover:bg-game-clay-strong')
+    expect(markup).toContain('hover:bg-game-clay/90')
     expect(markup).not.toContain('text-game-ink')
   })
 })

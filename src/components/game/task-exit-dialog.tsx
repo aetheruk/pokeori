@@ -37,8 +37,7 @@ export function TaskExitDialog({ data, open, onOpenChange }: TaskExitDialogProps
       actionButton={
         <Button
           onClick={() => onOpenChange(false)}
-          size="lg"
-          className="w-full bg-game-clay text-game-cream hover:bg-game-clay-strong"
+          className="min-h-11 w-full border border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90"
         >
           {data.closeButtonText || 'Close'}
         </Button>

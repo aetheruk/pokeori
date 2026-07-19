@@ -58,11 +58,11 @@ export function TrainerCard({ name, icon, banner, title, className, children }: 
           </div>
         </div>
         {/* Name */}
-        <h2 className="max-w-[calc(100%-1rem)] text-center font-display text-xl font-semibold leading-tight tracking-wide text-game-night-ink drop-shadow-[0_2px_4px_rgb(23_39_51_/_0.95)]">
+        <h2 className="max-w-[calc(100%-1rem)] text-center font-display text-xl font-semibold leading-tight tracking-wide text-game-cream drop-shadow-[0_2px_4px_rgb(23_39_51_/_0.95)]">
           {name}
         </h2>
         {/* Title mark - kept light so the banner remains part of the card */}
-        <div className="mt-2 flex max-w-full items-center gap-2 text-center text-[10px] font-bold uppercase tracking-[0.16em] text-game-night-ink/90 drop-shadow-[0_1px_3px_rgb(23_39_51_/_0.95)] before:h-px before:w-4 before:shrink-0 before:bg-game-ochre after:h-px after:w-4 after:shrink-0 after:bg-game-ochre">
+        <div className="mt-2 flex max-w-full items-center gap-2 text-center text-[10px] font-bold uppercase tracking-[0.16em] text-game-cream/90 drop-shadow-[0_1px_3px_rgb(23_39_51_/_0.95)] before:h-px before:w-4 before:shrink-0 before:bg-game-ochre after:h-px after:w-4 after:shrink-0 after:bg-game-ochre">
           {titleText}
         </div>
       </div>

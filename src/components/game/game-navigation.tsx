@@ -1,6 +1,6 @@
 'use client'
 
-import { Backpack, Coins, Compass, Gem, Hammer, User } from 'lucide-react'
+import { Backpack, Compass, Hammer, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
@@ -9,6 +9,7 @@ import { BrandLockup } from '@/components/game/shared/BrandLockup'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
+import { getCurrency } from '@/data/currencies'
 import { getIcon } from '@/data/user'
 import { cn } from '@/lib/utils'
 import { scheduleBodyPointerEventsRestore } from '@/utilities/ui/pointer-events'
@@ -45,6 +46,8 @@ export function GameNavigation() {
   }
 
   const playSelectSfx = () => playSfx('select')
+  const pokedollars = getCurrency('pokedollars')
+  const crystals = getCurrency('crystals')
 
   return (
     <>
@@ -85,14 +88,14 @@ export function GameNavigation() {
         <div className="mt-auto border-t border-game-border p-3 xl:p-4">
           <div className="mb-2 hidden grid-cols-2 gap-2 xl:grid">
             <ResourceValue
-              icon={Coins}
+              iconId={pokedollars?.iconId}
               value={user?.currency?.pokedollars || 0}
-              label="₽"
+              label={pokedollars?.name || 'PokeDollars'}
             />
             <ResourceValue
-              icon={Gem}
+              iconId={crystals?.iconId}
               value={user?.currency?.crystals || 0}
-              label="Crystals"
+              label={crystals?.name || 'Crystals'}
             />
           </div>
           <Link
@@ -173,11 +176,11 @@ export function GameNavigation() {
 }
 
 function ResourceValue({
-  icon: Icon,
+  iconId,
   value,
   label,
 }: {
-  icon: typeof Coins
+  iconId?: string
   value: number
   label: string
 }) {
@@ -187,7 +190,12 @@ function ResourceValue({
       title={label}
     >
       <div className="flex items-center gap-1.5 text-xs font-semibold text-game-ink">
-        <Icon className="h-3.5 w-3.5 text-game-ochre" />
+        {iconId ? (
+          <TaskIconDisplay
+            icon={{ type: 'item', id: iconId }}
+            className="h-3.5 w-3.5"
+          />
+        ) : null}
         <span className="truncate">{value.toLocaleString()}</span>
       </div>
     </div>

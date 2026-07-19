@@ -1975,16 +1975,17 @@ export function ArtisanPanel() {
                       <div className="relative z-10 flex shrink-0 items-center gap-1">
                         <Button
                           type="button"
+                          variant="outline"
                           size="icon-sm"
                           onClick={(event) => {
                             event.stopPropagation()
                             setSelectedRecipeGroup(group)
                           }}
-                          className="h-10 w-10 rounded-lg border border-game-border bg-game-surface-raised text-game-moss hover:bg-game-moss/10 hover:text-game-moss-strong"
+                          className="h-10 w-10 rounded-lg border border-game-border bg-game-surface-raised text-game-ink hover:bg-game-canvas hover:text-game-ink"
                           aria-label={`View ${group.name}`}
                           title={`View ${group.name}`}
                         >
-                          <Info className="h-4 w-4" />
+                          <Info className="h-4 w-4 text-game-ink" />
                         </Button>
                       </div>
                     </div>
@@ -2048,16 +2049,17 @@ export function ArtisanPanel() {
                     <div className="relative z-10 flex shrink-0 items-center gap-1">
                       <Button
                         type="button"
+                        variant="outline"
                         size="icon-sm"
                         onClick={(event) => {
                           event.stopPropagation()
                           setSelectedRecipe(recipe)
                         }}
-                        className="h-10 w-10 rounded-lg border border-game-border bg-game-surface-raised text-game-moss hover:bg-game-moss/10 hover:text-game-moss-strong"
+                        className="h-10 w-10 rounded-lg border border-game-border bg-game-surface-raised text-game-ink hover:bg-game-canvas hover:text-game-ink"
                         aria-label={`View ${recipe.name}`}
                         title={`View ${recipe.name}`}
                       >
-                        <Info className="h-4 w-4" />
+                        <Info className="h-4 w-4 text-game-ink" />
                       </Button>
                       <Button
                         type="button"

@@ -22,6 +22,8 @@ import {
   KeyboardSensor,
   PointerSensor,
   type DragEndEvent,
+  useDraggable,
+  useDroppable,
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
@@ -64,6 +66,12 @@ import { cn } from '@/lib/utils'
 import type { Pokemon } from '@/payload-types'
 import { getOwnedPokemonGender } from '@/utilities/pokemon/gender'
 import {
+  isValidBattleTeamPosition,
+  MAX_BATTLE_TEAM_SIZE,
+  validateBattleTeamPlacements,
+  type BattleTeamPlacement,
+} from '@/utilities/pokemon/battle-team'
+import {
   getPokemonItemUnavailableReason,
   isPokemonTargetedInventoryItem,
 } from '@/utilities/pokemon/item-usability'
@@ -86,6 +94,8 @@ import {
 import { PokemonDetailsDialog } from './pokemon-details-dialog'
 
 const POKEMON_BOX_PAGE_SIZE = 18
+const BOX_DROP_ZONE_ID = 'pokemon-box-drop-zone'
+const PARTNER_DRAG_PREFIX = 'partner:'
 
 type RosterSelection =
   | { role: 'battle-team'; position: number }
@@ -265,7 +275,7 @@ export function PokemonList() {
   ) => {
     if (
       role === 'battle-team' &&
-      battleTeam.length >= 6 &&
+      battleTeam.length >= MAX_BATTLE_TEAM_SIZE &&
       !pokemon.onBattleTeam
     ) {
       toast.error('Your battle team is full.')
@@ -301,6 +311,33 @@ export function PokemonList() {
             ? result.boxId ?? (selectedBoxId ?? null)
             : pokemon.boxId,
       })
+
+      if (
+        role === 'box' &&
+        'battleTeamPlacements' in result &&
+        result.battleTeamPlacements
+      ) {
+        const positionByPokemonId = new Map(
+          result.battleTeamPlacements.map(({ pokemonId, position }) => [
+            pokemonId,
+            position,
+          ]),
+        )
+        setBattleTeam((current) =>
+          current
+            .map((member) => ({
+              ...member,
+              battleTeamPosition:
+                positionByPokemonId.get(member.id) ??
+                member.battleTeamPosition,
+            }))
+            .sort(
+              (a, b) =>
+                (a.battleTeamPosition || 0) - (b.battleTeamPosition || 0),
+            ),
+        )
+      }
+
       await refreshUser()
       return true
     } catch (error) {
@@ -335,33 +372,154 @@ export function PokemonList() {
     }
   }
 
-  const saveBattleTeamOrder = async (reordered: Pokemon[]) => {
-    if (isReorderingBattleTeam) return
+  const getBattleTeamPlacements = () => {
+    const usedPositions = new Set<number>()
+    const sortedPokemon = [...battleTeam].sort((a, b) => {
+      const aPosition = isValidBattleTeamPosition(a.battleTeamPosition)
+        ? a.battleTeamPosition
+        : Number.MAX_SAFE_INTEGER
+      const bPosition = isValidBattleTeamPosition(b.battleTeamPosition)
+        ? b.battleTeamPosition
+        : Number.MAX_SAFE_INTEGER
+      return aPosition - bPosition
+    })
+
+    return sortedPokemon.map<BattleTeamPlacement>((pokemon) => {
+      const storedPosition = isValidBattleTeamPosition(
+        pokemon.battleTeamPosition,
+      )
+        ? pokemon.battleTeamPosition
+        : null
+      const position =
+        storedPosition && !usedPositions.has(storedPosition)
+          ? storedPosition
+          : Array.from(
+              { length: MAX_BATTLE_TEAM_SIZE },
+              (_, index) => index + 1,
+            ).find((candidate) => !usedPositions.has(candidate))
+
+      if (!position) {
+        throw new Error('Battle team has no valid slot available')
+      }
+
+      usedPositions.add(position)
+      return { pokemonId: pokemon.id, position }
+    })
+  }
+
+  const saveBattleTeamLayout = async (
+    placements: BattleTeamPlacement[],
+    occupiedPositions: readonly number[],
+  ) => {
+    if (isReorderingBattleTeam) return false
+
+    const validation = validateBattleTeamPlacements(
+      placements,
+      battleTeam.map((pokemon) => pokemon.id),
+      occupiedPositions,
+    )
+    if (!validation.valid) {
+      toast.error(validation.message)
+      return false
+    }
+
+    const previousBattleTeam = battleTeam
+    const positionByPokemonId = new Map(
+      validation.placements.map(({ pokemonId, position }) => [
+        pokemonId,
+        position,
+      ]),
+    )
+    const applyPlacements = (current: Pokemon[]) =>
+      current
+        .map((pokemon) => ({
+          ...pokemon,
+          battleTeamPosition:
+            positionByPokemonId.get(pokemon.id) ?? pokemon.battleTeamPosition,
+        }))
+        .sort(
+          (a, b) =>
+            (a.battleTeamPosition || 0) - (b.battleTeamPosition || 0),
+        )
+
+    // Reflect the swap before waiting on the network. The server remains the
+    // authority; this is rolled back if its fresh layout check rejects it.
+    setBattleTeam(applyPlacements(previousBattleTeam))
     setIsReorderingBattleTeam(true)
     try {
-      const result = await reorderBattleTeam(reordered.map((pokemon) => pokemon.id))
+      const result = await reorderBattleTeam(validation.placements)
       if (!result.success) {
+        setBattleTeam(previousBattleTeam)
+        refreshUser()
         toast.error(result.message || 'Could not reorder the battle team.')
-        return
+        return false
       }
-      setBattleTeam(reordered.map((pokemon, index) => ({ ...pokemon, battleTeamPosition: index + 1 })))
-      await refreshUser()
+      refreshUser()
+      return true
     } catch (error) {
+      setBattleTeam(previousBattleTeam)
+      refreshUser()
       toast.error(error instanceof Error ? error.message : 'Could not reorder the battle team.')
+      return false
     } finally {
       setIsReorderingBattleTeam(false)
     }
   }
 
-  const handleBattleTeamDragEnd = async ({ active, over }: DragEndEvent) => {
-    if (!over || active.id === over.id) return
-    const ordered = [...battleTeam].sort(
-      (a, b) => (a.battleTeamPosition || 0) - (b.battleTeamPosition || 0),
+  const handleRosterDragEnd = async ({ active, over }: DragEndEvent) => {
+    if (!over || isReorderingBattleTeam || isAssigningRoster) return
+
+    const activeId = String(active.id)
+    const overId = String(over.id)
+    const isPartnerDrag = activeId.startsWith(PARTNER_DRAG_PREFIX)
+    const pokemonId = isPartnerDrag
+      ? activeId.slice(PARTNER_DRAG_PREFIX.length)
+      : activeId
+
+    if (overId === BOX_DROP_ZONE_ID) {
+      const pokemon = isPartnerDrag
+        ? companion
+        : battleTeam.find((candidate) => candidate.id === pokemonId)
+      if (pokemon) await assignRosterRole(pokemon, 'box')
+      return
+    }
+
+    // A partner can only be dragged back to the box. Battle-team slots are
+    // deliberately not valid destinations for the partner drag source.
+    if (isPartnerDrag) return
+
+    let currentPlacements: BattleTeamPlacement[]
+    try {
+      currentPlacements = getBattleTeamPlacements()
+    } catch {
+      toast.error('Your battle team is out of date. Refreshing it now.')
+      await refreshUser()
+      return
+    }
+    if (overId === activeId) return
+    const oldIndex = currentPlacements.findIndex(
+      ({ pokemonId: currentPokemonId }) => currentPokemonId === pokemonId,
     )
-    const oldIndex = ordered.findIndex((pokemon) => pokemon.id === active.id)
-    const newIndex = ordered.findIndex((pokemon) => pokemon.id === over.id)
+    const newIndex = currentPlacements.findIndex(
+      ({ pokemonId: currentPokemonId }) => currentPokemonId === overId,
+    )
     if (oldIndex < 0 || newIndex < 0) return
-    await saveBattleTeamOrder(arrayMove(ordered, oldIndex, newIndex))
+
+    const reorderedIds = arrayMove(
+      currentPlacements.map(({ pokemonId: currentPokemonId }) =>
+        currentPokemonId,
+      ),
+      oldIndex,
+      newIndex,
+    )
+    const occupiedPositions = currentPlacements.map(({ position }) => position)
+    await saveBattleTeamLayout(
+      reorderedIds.map((reorderedPokemonId, index) => ({
+        pokemonId: reorderedPokemonId,
+        position: occupiedPositions[index],
+      })),
+      occupiedPositions,
+    )
   }
 
   const startLongPress = (pokemon: Pokemon) => {
@@ -659,7 +817,10 @@ export function PokemonList() {
 
   const renderPokemonCard = (
     pokemon: Pokemon,
-    options?: { showRosterBadge?: boolean },
+    options?: {
+      showRosterBadge?: boolean
+      disableHoldMenu?: boolean
+    },
   ) => {
     const species = (pokemonData as PokemonData).find(
       (s) => s.id === pokemon.speciesId,
@@ -706,22 +867,22 @@ export function PokemonList() {
     const markings = [
       {
         key: 'markingSquare',
-        className: 'top-1 left-1 text-game-moss',
+        className: 'top-1.5 left-1.5 text-game-moss',
         Icon: Square,
       },
       {
         key: 'markingCircle',
-        className: 'top-1 right-1 text-game-danger',
+        className: 'top-1.5 right-1.5 text-game-danger',
         Icon: Circle,
       },
       {
         key: 'markingTriangle',
-        className: 'bottom-1 left-1 text-game-moss-strong',
+        className: 'bottom-1.5 left-1.5 text-game-moss-strong',
         Icon: Triangle,
       },
       {
         key: 'markingDiamond',
-        className: 'bottom-1 right-1 text-game-ochre',
+        className: 'bottom-1.5 right-1.5 text-game-ochre',
         Icon: Diamond,
       },
     ] as const
@@ -810,7 +971,11 @@ export function PokemonList() {
             event.currentTarget.click()
           }
         }}
-        onPointerDown={() => startLongPress(pokemon)}
+        onPointerDown={
+          options?.disableHoldMenu
+            ? undefined
+            : () => startLongPress(pokemon)
+        }
         onPointerUp={cancelLongPress}
         onPointerCancel={cancelLongPress}
         onPointerLeave={cancelLongPress}
@@ -849,7 +1014,7 @@ export function PokemonList() {
             <Icon
               key={key}
               className={cn(
-                'pointer-events-none absolute z-40 h-2 w-2 fill-current drop-shadow-[0_0_2px_rgba(0,0,0,0.85)]',
+                'pointer-events-none absolute z-40 h-[9.2px] w-[9.2px] fill-current',
                 className,
               )}
             />
@@ -1047,8 +1212,13 @@ export function PokemonList() {
           </div>
         </div>
       )}
+      <DndContext
+        sensors={battleTeamSensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleRosterDragEnd}
+      >
       <div className="contents xl:grid xl:min-h-0 xl:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4 flex flex-col gap-6 w-full max-w-7xl mx-auto custom-scrollbar xl:min-w-0 xl:max-w-none">
+        <PokemonBoxDropZone className="flex-1 min-h-0 overflow-y-auto px-4 py-4 flex flex-col gap-6 w-full max-w-7xl mx-auto custom-scrollbar xl:min-w-0 xl:max-w-none">
           <div className="w-full flex-1">
             <div className="min-h-[40vh] p-4">
               <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6 xl:grid-cols-[repeat(auto-fill,minmax(104px,1fr))]">
@@ -1097,7 +1267,7 @@ export function PokemonList() {
               </div>
             )}
           </div>
-        </div>
+        </PokemonBoxDropZone>
 
         <div className="z-30 flex w-full shrink-0 flex-col border-t border-game-border bg-game-surface/96 shadow-[0_-10px_30px_rgba(75,62,39,0.14)] backdrop-blur-xl xl:h-full xl:min-w-0 xl:border-l xl:border-t-0 xl:shadow-none">
           <button
@@ -1141,14 +1311,9 @@ export function PokemonList() {
                           </h3>
                         </div>
                         <div className="absolute right-1 font-mono text-[10px] text-game-muted">
-                          {battleTeam.length}/6
+                          {battleTeam.length}/{MAX_BATTLE_TEAM_SIZE}
                         </div>
                       </div>
-                      <DndContext
-                        sensors={battleTeamSensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={handleBattleTeamDragEnd}
-                      >
                       <SortableContext
                         items={[...battleTeam]
                           .sort((a, b) => (a.battleTeamPosition || 0) - (b.battleTeamPosition || 0))
@@ -1156,7 +1321,7 @@ export function PokemonList() {
                         strategy={rectSortingStrategy}
                       >
                       <div className="grid w-full grid-cols-3 gap-2">
-                        {[...Array(6)].map((_, i) => {
+                        {[...Array(MAX_BATTLE_TEAM_SIZE)].map((_, i) => {
                           const p = battleTeam.find(
                             (pokemon) => pokemon.battleTeamPosition === i + 1,
                           )
@@ -1168,12 +1333,13 @@ export function PokemonList() {
                             >
                               {renderPokemonCard(p, {
                                 showRosterBadge: false,
+                                disableHoldMenu: true,
                               })}
                             </SortableBattleTeamMember>
                           ) : (
                             <button
-                              type="button"
                               key={`empty-${i}`}
+                              type="button"
                               onClick={() =>
                                 beginRosterSelection({
                                   role: 'battle-team',
@@ -1191,7 +1357,6 @@ export function PokemonList() {
                         })}
                       </div>
                       </SortableContext>
-                      </DndContext>
                     </div>
                   </div>
                   <div className="w-full shrink-0">
@@ -1204,9 +1369,15 @@ export function PokemonList() {
                       </div>
                       <div className="mx-auto h-24 w-24">
                         {companion ? (
-                          renderPokemonCard(companion, {
-                            showRosterBadge: false,
-                          })
+                          <DraggablePartner
+                            pokemonId={companion.id}
+                            disabled={isAssigningRoster || isReorderingBattleTeam}
+                          >
+                            {renderPokemonCard(companion, {
+                              showRosterBadge: false,
+                              disableHoldMenu: true,
+                            })}
+                          </DraggablePartner>
                         ) : (
                           <button
                             type="button"
@@ -1397,6 +1568,7 @@ export function PokemonList() {
           </div>
         </div>
       </div>
+      </DndContext>
 
       <ResponsivePanel
         open={!!quickMenuPokemon}
@@ -1416,7 +1588,10 @@ export function PokemonList() {
               <Button
                 type="button"
                 variant="outline"
-                disabled={battleTeam.length >= 6 || isAssigningRoster}
+                disabled={
+                  battleTeam.length >= MAX_BATTLE_TEAM_SIZE ||
+                  isAssigningRoster
+                }
                 aria-busy={isAssigningRoster}
                 className="h-12 justify-start border-game-border bg-game-surface-raised text-game-ink hover:border-game-moss/45 hover:bg-game-moss/5"
                 onClick={async () => {
@@ -1606,6 +1781,56 @@ function SortableBattleTeamMember({
       )}
       {...attributes}
       {...listeners}
+    >
+      {children}
+    </div>
+  )
+}
+
+function DraggablePartner({
+  pokemonId,
+  disabled,
+  children,
+}: PropsWithChildren<{ pokemonId: string; disabled: boolean }>) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: `${PARTNER_DRAG_PREFIX}${pokemonId}`,
+      disabled,
+    })
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        touchAction: 'none',
+      }}
+      className={cn(
+        'relative h-full w-full cursor-grab active:cursor-grabbing',
+        isDragging && 'z-50 opacity-50',
+      )}
+      {...attributes}
+      {...listeners}
+    >
+      {children}
+    </div>
+  )
+}
+
+function PokemonBoxDropZone({
+  className,
+  children,
+}: PropsWithChildren<{ className: string }>) {
+  const { setNodeRef, isOver } = useDroppable({ id: BOX_DROP_ZONE_ID })
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={cn(
+        className,
+        'transition-colors',
+        isOver && 'bg-game-moss/5 ring-2 ring-inset ring-game-moss/30',
+      )}
     >
       {children}
     </div>
