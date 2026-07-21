@@ -69,6 +69,7 @@ export function PokemonRaritySprite({
       data-rarity={resolvedRarity}
       style={
         {
+          position: 'relative',
           '--pokemon-rarity-sprite-mask': `url("${imageUrl}")`,
         } as CSSProperties
       }
