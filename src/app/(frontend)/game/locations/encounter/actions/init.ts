@@ -49,6 +49,8 @@ import { isActivityEligibleForReplay } from '@/utilities/activity-replay'
 import { canApplyEncounterAbilityOverride } from '@/utilities/pokemon/encounter-abilities'
 import { getActiveChronicleContext } from '@/utilities/chronicles'
 import { rollPokemonGender } from '@/utilities/pokemon/gender'
+import { resolvePokemonRarity } from '@/utilities/pokemon/rarity-effects'
+import { getShinyChance, rollShiny } from '@/utilities/pokemon/shiny-odds'
 import type { EncounterState } from './types'
 import { rollAbility, getUser } from './utils'
 import { refreshEncounterShield, serializeEncounterShield } from './shield'
@@ -229,6 +231,7 @@ export async function startEncounter(
         success: true,
         pokemonId: existingState.pokemonId,
         isShiny: existingState.isShiny,
+        rarity: existingState.rarity,
         startTime: existingState.startTime,
         expiry: existingState.expiry,
         duration: Math.floor(
@@ -526,37 +529,26 @@ export async function startEncounter(
     )
 
     // Roll for Shiny
-    // Base rate: 1/4096 (~0.024%)
-    // Modified by location modifier
-    const baseShinyRate = 1 / 4096
+    // Base rate: 1/512 (~0.195%), modified by location, Researcher level, and ability.
     const researcherLevel = getSkillLevel(user.skills, 'researching')
-    let shinyChance =
-      baseShinyRate *
-      (location.shinyChanceModifier || 1) *
-      getResearcherShinyModifier(researcherLevel)
-
-    // Ability Shiny Modifier
-    // We need species types for triggers.
-    shinyChance *= getAbilityShinyMultiplier({
-      ability: effectiveAbility,
-      formId,
-      speciesId: pokemonId,
-      sourceFormId: activeAbilitySourceFormId,
-      locationId: location.id,
-      targetTypes: speciesData?.types,
-      isNight: isNightHour(),
+    const shinyChance = getShinyChance({
+      sourceModifier: location.shinyChanceModifier || 1,
+      researcherModifier: getResearcherShinyModifier(researcherLevel),
+      abilityModifier: getAbilityShinyMultiplier({
+        ability: effectiveAbility,
+        formId,
+        speciesId: pokemonId,
+        sourceFormId: activeAbilitySourceFormId,
+        locationId: location.id,
+        targetTypes: speciesData?.types,
+        isNight: isNightHour(),
+      }),
     })
 
     // Research Level 5: Double Roll for Shiny
     const researchFormEntry = pokedexMap[pokemonId.toString()]?.[formId]
     const formResearchLvl = researchFormEntry?.researchLevel || 0
-    let isShiny: boolean
-    if (formResearchLvl >= 5) {
-      // Double roll — success on either
-      isShiny = Math.random() < shinyChance || Math.random() < shinyChance
-    } else {
-      isShiny = Math.random() < shinyChance
-    }
+    let isShiny = rollShiny(shinyChance, formResearchLvl >= 5 ? 2 : 1)
     if (
       !isShiny &&
       shouldUseExtraShinyRoll({
@@ -568,6 +560,11 @@ export async function startEncounter(
     ) {
       isShiny = true
     }
+    const encounterRarity = resolvePokemonRarity({
+      rarity: selectedEncounter.rarity,
+      shiny: isShiny,
+    })
+    isShiny = encounterRarity === 'shiny'
 
     // Timer Modifier
     duration = Math.max(
@@ -593,6 +590,7 @@ export async function startEncounter(
       pokemonId,
       formId,
       isShiny,
+      rarity: encounterRarity,
       gender: rollPokemonGender(pokemonId),
       startTime,
       expiry,
@@ -728,6 +726,7 @@ export async function startEncounter(
       success: true,
       pokemonId,
       isShiny,
+      rarity: encounterRarity,
       gender: state.gender,
       startTime,
       expiry,
@@ -823,6 +822,7 @@ export const getEncounter = cache(async () => {
     formId: state.formId,
     pokemonName,
     isShiny: state.isShiny,
+    rarity: state.rarity,
     gender: state.gender,
     startTime: state.startTime,
     expiry: state.expiry,

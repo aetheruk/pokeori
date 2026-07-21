@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { isPokemonRarityId } from '@/utilities/pokemon/rarity-effects'
 
 const currencyTypeSchema = z.enum([
   'crystals',
@@ -37,6 +38,7 @@ const pokemonCriteriaSchema = z
     maxLevel: z.number().int().min(1).max(100).optional(),
     size: z.enum(['XS', 'S', 'L', 'XL']).optional(),
     shiny: z.boolean().optional(),
+    rarity: z.string().refine(isPokemonRarityId, 'Invalid Pokemon rarity').optional(),
     isShadow: z.boolean().optional(),
     isRadiant: z.boolean().optional(),
     identified: z.boolean().optional(),

@@ -1,5 +1,14 @@
 import type { CollectionConfig } from 'payload'
 import superAdminCheck, { adminOrUserOwned } from '@/utilities/access'
+import {
+  getPokemonRarityLegacyFields,
+  POKEMON_RARITY_OPTIONS,
+  resolvePokemonRarity,
+} from '@/utilities/pokemon/rarity-effects'
+
+function hasOwnField(value: Record<string, unknown>, key: string) {
+  return Object.hasOwn(value, key)
+}
 
 export const Pokemon: CollectionConfig = {
   slug: 'pokemon',
@@ -12,6 +21,34 @@ export const Pokemon: CollectionConfig = {
     read: adminOrUserOwned,
     update: adminOrUserOwned,
     delete: adminOrUserOwned,
+  },
+  hooks: {
+    beforeChange: [
+      ({ data, originalDoc }) => {
+        const incoming = (data || {}) as Record<string, unknown>
+        const existing = (originalDoc || {}) as Record<string, unknown>
+        const hasExplicitRarity = hasOwnField(incoming, 'rarity')
+        const hasLegacyPromotion =
+          incoming.isShadow === true ||
+          incoming.isRadiant === true ||
+          incoming.shiny === true
+        const hasExplicitLegacyReset =
+          (incoming.shiny === false && existing.shiny === true) ||
+          (incoming.isShadow === false && existing.isShadow === true) ||
+          (incoming.isRadiant === false && existing.isRadiant === true)
+
+        const rarity =
+          hasExplicitRarity || hasLegacyPromotion || hasExplicitLegacyReset
+            ? resolvePokemonRarity(incoming)
+            : resolvePokemonRarity(existing)
+
+        return {
+          ...incoming,
+          rarity,
+          ...getPokemonRarityLegacyFields(rarity),
+        }
+      },
+    ],
   },
   fields: [
     {
@@ -271,10 +308,24 @@ export const Pokemon: CollectionConfig = {
       label: 'Identified',
     },
     {
+      name: 'rarity',
+      type: 'select',
+      label: 'Rarity treatment',
+      options: POKEMON_RARITY_OPTIONS,
+      admin: {
+        description:
+          'A Pokémon can have exactly one rarity treatment. This controls its sprite and derives legacy Shiny, Shadow, and Radiant flags.',
+      },
+    },
+    {
       name: 'shiny',
       type: 'checkbox',
       defaultValue: false,
       label: 'Shiny',
+      admin: {
+        readOnly: true,
+        description: 'Derived from the canonical rarity treatment.',
+      },
     },
     {
       name: 'gender',
@@ -292,12 +343,20 @@ export const Pokemon: CollectionConfig = {
       type: 'checkbox',
       defaultValue: false,
       label: 'Shadow Pokemon',
+      admin: {
+        readOnly: true,
+        description: 'Derived from the canonical rarity treatment.',
+      },
     },
     {
       name: 'isRadiant',
       type: 'checkbox',
       defaultValue: false,
       label: 'Radiant Pokemon',
+      admin: {
+        readOnly: true,
+        description: 'Derived from the canonical rarity treatment.',
+      },
     },
     {
       name: 'evolved',

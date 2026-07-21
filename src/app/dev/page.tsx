@@ -58,6 +58,15 @@ export default function DevPage() {
             Inspect and generate encounter, research, and Field Observation ability effects.
           </p>
         </Link>
+        <Link
+          href="/dev/rarities"
+          className="rounded-lg border bg-card text-card-foreground shadow-sm p-6 block hover:bg-card/85"
+        >
+          <h3 className="font-semibold leading-none tracking-tight">Rarities</h3>
+          <p className="text-sm text-muted-foreground mt-2">
+            Compare CSS-only Pokemon rarity treatments across pixel and Home sprites.
+          </p>
+        </Link>
       </div>
 
       <GameDataTools />

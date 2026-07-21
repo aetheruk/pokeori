@@ -1,5 +1,6 @@
 import { BaseGameConfig, TaskIcon } from '../shared'
 import { LocationReward } from '@/data/types'
+import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
 
 export type RodType = 'old' | 'good' | 'super'
 export type FishingWaterStyle = 'ocean' | 'pond' | 'pool' | 'harbor' | 'rocky-lake'
@@ -17,6 +18,7 @@ export interface FishingSceneConfig {
 export interface FishingPokemonEntry {
   speciesId: number
   formId?: string
+  rarity?: PokemonRarityId
   weight: number // Relative weight in pool
   symbol: string // Emoji/icon shown when hooked (e.g., "🐟", "⭐")
   reactionTime: number // MS window to press hook

@@ -18,7 +18,7 @@ import { getPokemonForms } from '../../actions'
 interface FormSelectorProps {
   speciesId?: number
   value?: string
-  onChange: (formId: string) => void
+  onChange: (formId: string, formName: string) => void
 }
 
 export function FormSelector({ speciesId, value, onChange }: FormSelectorProps) {
@@ -70,7 +70,7 @@ export function FormSelector({ speciesId, value, onChange }: FormSelectorProps) 
                   key={f.id}
                   value={f.name}
                   onSelect={() => {
-                    onChange(f.id)
+                    onChange(f.id, f.name)
                     setOpen(false)
                   }}
                 >

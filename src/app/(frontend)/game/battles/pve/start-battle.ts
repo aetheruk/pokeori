@@ -43,6 +43,10 @@ import {
   normalizeChronicleBattleBudgets,
 } from '@/utilities/battle/chronicle-budgets'
 import { getPokemonResearchLevel } from '@/utilities/research/research-levels'
+import {
+  getPokemonRarityLegacyFields,
+  resolvePokemonRarity,
+} from '@/utilities/pokemon/rarity-effects'
 import { initializeTeamMoveUses } from '@/utilities/battle/move-uses'
 import {
   buildRivalBattleRewards,
@@ -386,6 +390,8 @@ export async function startBattleFromConfig(
                   Math.random() * (enemy.level.max - enemy.level.min + 1),
                 ) + enemy.level.min
 
+          const rarity = resolvePokemonRarity(enemy)
+          const rarityLegacyFields = getPokemonRarityLegacyFields(rarity)
           const mockPokemon = {
             speciesId: enemy.speciesId,
             formId: enemy.formId || enemy.speciesId.toString(),
@@ -403,19 +409,18 @@ export async function startBattleFromConfig(
               level,
               isWildBattle: battleConfig.isWildBattle,
             }),
-            shiny: !!enemy.shiny,
-            isShadow: enemy.isShadow,
-            isRadiant: enemy.isRadiant,
+            rarity,
+            ...rarityLegacyFields,
             heldItemId: enemy.heldItemId,
             aiMoves: enemy.aiMoves,
           } as unknown as Pokemon
 
           const initialized = initializeBattlePokemon(mockPokemon)
           initialized.aiMoves = enemy.aiMoves
-          if (enemy.isShadow) {
+          if (rarityLegacyFields.isShadow) {
             initialized.isShadow = true
           }
-          if (enemy.isRadiant) {
+          if (rarityLegacyFields.isRadiant) {
             initialized.isRadiant = true
           }
           if (enemy.initialStatus) {
@@ -709,6 +714,7 @@ function buildChroniclePokemon(
 ): Pokemon {
   const formId = config.formId || String(config.speciesId)
   const now = new Date().toISOString()
+  const rarity = resolvePokemonRarity(config)
 
   return {
     id: `chronicle:${user.id}:${formId}:${index}`,
@@ -718,7 +724,7 @@ function buildChroniclePokemon(
     formId,
     name: config.name || getPokemonForm(formId)?.name || 'Pokemon',
     level: config.level,
-    shiny: !!config.shiny,
+    rarity,
     identified: true,
     ability: config.ability,
     assignedMoves: config.assignedMoves?.map((moveId) => ({ moveId })) || [],
@@ -740,8 +746,7 @@ function buildChroniclePokemon(
       speed: config.evs?.speed ?? 0,
     },
     nature: config.nature,
-    isShadow: config.isShadow,
-    isRadiant: config.isRadiant,
+    ...getPokemonRarityLegacyFields(rarity),
     onBattleTeam: true,
     battleTeamPosition: index,
     createdAt: now,

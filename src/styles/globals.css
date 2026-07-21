@@ -677,6 +677,859 @@
   }
 }
 
+.pokemon-rarity-sprite {
+  position: relative;
+  display: block;
+  isolation: isolate;
+  overflow: visible;
+}
+
+.pokemon-rarity-sprite__image {
+  z-index: 1;
+}
+
+.pokemon-rarity-sprite__aura,
+.pokemon-rarity-sprite__overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mask-image: var(--pokemon-rarity-sprite-mask);
+  mask-mode: alpha;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  -webkit-mask-image: var(--pokemon-rarity-sprite-mask);
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+}
+
+.pokemon-rarity-sprite__aura {
+  z-index: 0;
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+
+.pokemon-rarity-sprite__overlay {
+  z-index: 2;
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+
+.pokemon-rarity-sprite--shadow .pokemon-rarity-sprite__aura {
+  display: none;
+}
+
+.pokemon-rarity-sprite--radiant .pokemon-rarity-sprite__aura {
+  display: none;
+}
+
+.pokemon-rarity-sprite--shadow .pokemon-rarity-sprite__image {
+  filter: brightness(0.4) contrast(1.3) sepia(1) hue-rotate(250deg) saturate(4)
+    drop-shadow(0 0 2px rgba(196, 120, 255, 0.92))
+    drop-shadow(-3px 3px 6px rgba(126, 34, 206, 0.82))
+    drop-shadow(3px -2px 12px rgba(49, 12, 81, 0.86));
+  animation: pokemon-rarity-shadow-smoke 4.8s ease-in-out infinite;
+}
+
+.pokemon-rarity-sprite--radiant .pokemon-rarity-sprite__image {
+  filter: brightness(1.3) contrast(1.12) saturate(1.9) hue-rotate(172deg)
+    drop-shadow(0 0 2px rgba(224, 247, 255, 0.98))
+    drop-shadow(0 0 6px rgba(103, 232, 249, 0.96))
+    drop-shadow(2px -2px 12px rgba(37, 99, 235, 0.82));
+  animation: pokemon-rarity-radiant-burst 3.6s ease-in-out infinite;
+}
+
+.pokemon-rarity-sprite--silver .pokemon-rarity-sprite__image {
+  filter: grayscale(0.92) contrast(1.15) brightness(1.32) sepia(0.05) saturate(0.38);
+}
+
+.pokemon-rarity-sprite--silver .pokemon-rarity-sprite__overlay {
+  opacity: 0.45;
+  background: linear-gradient(118deg, transparent 26%, rgba(255, 255, 255, 0.9) 47%, rgba(196, 199, 204, 0.3) 58%, transparent 76%);
+  background-size: 220% 100%;
+  animation: pokemon-rarity-gleam 9s ease-in-out infinite;
+}
+
+.pokemon-rarity-sprite--gold .pokemon-rarity-sprite__image {
+  filter: sepia(0.96) saturate(2.6) hue-rotate(4deg) brightness(1.3) contrast(1.03);
+}
+
+.pokemon-rarity-sprite--gold .pokemon-rarity-sprite__overlay {
+  opacity: 0.48;
+  background: linear-gradient(122deg, transparent 22%, rgba(255, 255, 221, 0.94) 49%, rgba(255, 225, 98, 0.52) 61%, transparent 78%);
+  background-size: 220% 100%;
+  animation: pokemon-rarity-gleam 10s ease-in-out infinite reverse;
+}
+
+.pokemon-rarity-sprite--emerald .pokemon-rarity-sprite__image {
+  filter: sepia(1) saturate(4.2) hue-rotate(82deg) brightness(0.68) contrast(1.35)
+    drop-shadow(0 0 1px rgba(74, 222, 128, 0.8));
+}
+
+.pokemon-rarity-sprite--emerald .pokemon-rarity-sprite__overlay {
+  opacity: 0.64;
+  background:
+    linear-gradient(142deg, transparent 0 24%, rgba(206, 255, 228, 0.7) 25% 29%, transparent 30% 51%, rgba(0, 68, 46, 0.7) 52% 65%, transparent 66%),
+    linear-gradient(38deg, transparent 0 36%, rgba(80, 243, 163, 0.58) 37% 46%, transparent 47% 68%, rgba(0, 48, 36, 0.72) 69% 79%, transparent 80%),
+    conic-gradient(from 18deg at 43% 45%, rgba(173, 255, 207, 0.46) 0deg 35deg, transparent 36deg 83deg, rgba(4, 92, 61, 0.54) 84deg 144deg, transparent 145deg 210deg, rgba(119, 255, 190, 0.38) 211deg 273deg, transparent 274deg 360deg);
+  background-position: 0 0, 18% 22%, 48% 50%;
+  background-size: 52% 52%, 48% 48%, 60% 60%;
+}
+
+.pokemon-rarity-sprite--ruby .pokemon-rarity-sprite__image {
+  filter: sepia(1) saturate(4.8) hue-rotate(315deg) brightness(0.7) contrast(1.35)
+    drop-shadow(0 0 1px rgba(244, 63, 94, 0.82));
+}
+
+.pokemon-rarity-sprite--ruby .pokemon-rarity-sprite__overlay {
+  opacity: 0.66;
+  background:
+    linear-gradient(138deg, transparent 0 25%, rgba(255, 213, 219, 0.74) 26% 30%, transparent 31% 52%, rgba(111, 9, 27, 0.74) 53% 67%, transparent 68%),
+    linear-gradient(42deg, transparent 0 34%, rgba(244, 71, 96, 0.54) 35% 45%, transparent 46% 68%, rgba(82, 5, 20, 0.75) 69% 79%, transparent 80%),
+    conic-gradient(from 22deg at 42% 47%, rgba(255, 174, 186, 0.48) 0deg 37deg, transparent 38deg 89deg, rgba(145, 12, 38, 0.56) 90deg 152deg, transparent 153deg 218deg, rgba(232, 48, 75, 0.42) 219deg 274deg, transparent 275deg 360deg);
+  background-position: 0 0, 20% 18%, 50% 48%;
+  background-size: 52% 52%, 48% 48%, 60% 60%;
+}
+
+.pokemon-rarity-sprite--sapphire .pokemon-rarity-sprite__image {
+  filter: sepia(1) saturate(4.5) hue-rotate(162deg) brightness(0.72) contrast(1.38)
+    drop-shadow(0 0 1px rgba(59, 130, 246, 0.84));
+}
+
+.pokemon-rarity-sprite--sapphire .pokemon-rarity-sprite__overlay {
+  opacity: 0.66;
+  background:
+    linear-gradient(140deg, transparent 0 24%, rgba(207, 238, 255, 0.74) 25% 29%, transparent 30% 51%, rgba(9, 43, 127, 0.72) 52% 66%, transparent 67%),
+    linear-gradient(38deg, transparent 0 35%, rgba(71, 170, 255, 0.56) 36% 46%, transparent 47% 68%, rgba(5, 28, 93, 0.76) 69% 79%, transparent 80%),
+    conic-gradient(from 16deg at 43% 46%, rgba(164, 220, 255, 0.48) 0deg 34deg, transparent 35deg 84deg, rgba(16, 64, 165, 0.58) 85deg 148deg, transparent 149deg 213deg, rgba(52, 142, 241, 0.42) 214deg 274deg, transparent 275deg 360deg);
+  background-position: 0 0, 16% 22%, 48% 50%;
+  background-size: 52% 52%, 48% 48%, 60% 60%;
+}
+
+.pokemon-rarity-sprite--crystal .pokemon-rarity-sprite__image {
+  filter: grayscale(0.82) sepia(0.12) hue-rotate(150deg) saturate(1.18) brightness(1.4) contrast(1.16)
+    drop-shadow(0 0 1px rgba(186, 230, 253, 0.9));
+}
+
+.pokemon-rarity-sprite--crystal .pokemon-rarity-sprite__overlay {
+  opacity: 0.7;
+  background:
+    linear-gradient(140deg, transparent 0 24%, rgba(255, 255, 255, 0.88) 25% 29%, transparent 30% 51%, rgba(104, 167, 202, 0.46) 52% 66%, transparent 67%),
+    linear-gradient(38deg, transparent 0 35%, rgba(217, 247, 255, 0.7) 36% 46%, transparent 47% 68%, rgba(63, 113, 157, 0.5) 69% 79%, transparent 80%),
+    conic-gradient(from 16deg at 43% 46%, rgba(255, 255, 255, 0.62) 0deg 34deg, transparent 35deg 84deg, rgba(137, 205, 238, 0.48) 85deg 148deg, transparent 149deg 213deg, rgba(224, 250, 255, 0.6) 214deg 274deg, transparent 275deg 360deg);
+  background-position: 0 0, 16% 22%, 48% 50%;
+  background-size: 52% 52%, 48% 48%, 60% 60%;
+}
+
+.pokemon-rarity-sprite--retro .pokemon-rarity-sprite__image {
+  filter: grayscale(0.76) sepia(0.46) contrast(1.46) brightness(0.96) saturate(1.26);
+}
+
+.pokemon-rarity-sprite--retro .pokemon-rarity-sprite__aura {
+  z-index: 2;
+  opacity: 0.52;
+  background-image: var(--pokemon-rarity-sprite-mask);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  mask-image: repeating-linear-gradient(to bottom, #000 0 2px, transparent 2px 7px);
+  mask-repeat: repeat;
+  mask-size: 100% 7px;
+  -webkit-mask-image: repeating-linear-gradient(to bottom, #000 0 2px, transparent 2px 7px);
+  -webkit-mask-repeat: repeat;
+  -webkit-mask-size: 100% 7px;
+  animation: pokemon-rarity-retro-distortion 3.8s steps(7, end) infinite;
+}
+
+.pokemon-rarity-sprite--retro .pokemon-rarity-sprite__overlay {
+  opacity: 0.5;
+  background: repeating-linear-gradient(to bottom, rgba(235, 250, 191, 0.12) 0 1px, rgba(52, 80, 50, 0.34) 1px 3px), linear-gradient(90deg, rgba(209, 244, 163, 0.22), rgba(48, 82, 54, 0.32));
+  background-position: 0 0, 0 0;
+  background-size: 100% 100%, 100% 100%;
+  mix-blend-mode: multiply;
+  animation: pokemon-rarity-retro-scanlines 4s linear infinite;
+}
+
+.pokemon-rarity-sprite--galactic .pokemon-rarity-sprite__image {
+  filter: sepia(1) saturate(3.8) hue-rotate(164deg) brightness(0.5) contrast(1.42)
+    drop-shadow(0 0 2px rgba(147, 197, 253, 0.72))
+    drop-shadow(0 0 6px rgba(59, 130, 246, 0.52))
+    drop-shadow(0 0 12px rgba(67, 56, 202, 0.38));
+}
+
+.pokemon-rarity-sprite--galactic .pokemon-rarity-sprite__aura {
+  display: none;
+}
+
+.pokemon-rarity-sprite--galactic .pokemon-rarity-sprite__overlay {
+  opacity: 1;
+  background:
+    radial-gradient(ellipse at 65% 28%, rgba(54, 116, 255, 0.38) 0 12%, transparent 39%),
+    radial-gradient(ellipse at 31% 72%, rgba(113, 52, 216, 0.42) 0 15%, transparent 44%),
+    linear-gradient(136deg, rgba(5, 18, 70, 0.78), rgba(11, 26, 88, 0.62) 46%, rgba(35, 18, 91, 0.74) 74%, rgba(5, 13, 49, 0.8));
+  mix-blend-mode: normal;
+}
+
+.pokemon-rarity-sprite--galactic .pokemon-rarity-sprite__overlay::before {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background:
+    radial-gradient(circle at 21% 61%, rgba(255, 255, 255, 1) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 68% 34%, rgba(224, 242, 254, 0.96) 0 0.9px, transparent 1.7px),
+    radial-gradient(circle at 76% 78%, rgba(221, 214, 254, 0.94) 0 1.1px, transparent 1.9px),
+    radial-gradient(circle at 38% 16%, rgba(255, 255, 255, 0.9) 0 0.7px, transparent 1.5px),
+    radial-gradient(circle at 46% 49%, rgba(191, 219, 254, 0.9) 0 0.8px, transparent 1.6px);
+  filter: drop-shadow(0 0 2px rgba(191, 219, 254, 0.8));
+  animation: pokemon-rarity-galactic-twinkle 8s ease-in-out infinite;
+}
+
+.pokemon-rarity-sprite--galactic .pokemon-rarity-sprite__overlay::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background:
+    radial-gradient(circle at 18% 23%, rgba(255, 255, 255, 1) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 72% 17%, rgba(191, 219, 254, 0.94) 0 1px, transparent 1.9px),
+    radial-gradient(circle at 84% 46%, rgba(255, 255, 255, 0.9) 0 0.8px, transparent 1.6px),
+    radial-gradient(circle at 57% 68%, rgba(196, 181, 253, 0.96) 0 1.1px, transparent 2px),
+    radial-gradient(circle at 27% 76%, rgba(147, 197, 253, 0.9) 0 0.9px, transparent 1.8px),
+    radial-gradient(circle at 42% 38%, rgba(255, 255, 255, 0.82) 0 0.7px, transparent 1.5px);
+  filter: drop-shadow(0 0 2px rgba(196, 181, 253, 0.7));
+  animation: pokemon-rarity-galactic-twinkle-alt 10s ease-in-out infinite;
+}
+
+.pokemon-rarity-sprite--levin .pokemon-rarity-sprite__image {
+  filter: grayscale(0.3) sepia(0.5) hue-rotate(148deg) saturate(2.55) brightness(1.42) contrast(1.2)
+    drop-shadow(0 0 2px rgba(255, 255, 255, 0.98))
+    drop-shadow(0 0 6px rgba(186, 230, 253, 0.98))
+    drop-shadow(2px -1px 10px rgba(56, 189, 248, 0.72));
+  animation: pokemon-rarity-levin-charge 3.2s steps(2, end) infinite;
+}
+
+.pokemon-rarity-sprite--levin .pokemon-rarity-sprite__overlay {
+  opacity: 0.7;
+  background:
+    radial-gradient(ellipse at 28% 66%, rgba(255, 255, 255, 0.96) 0 2%, rgba(224, 247, 255, 0.6) 7%, transparent 21%),
+    radial-gradient(ellipse at 73% 32%, rgba(255, 255, 255, 0.9) 0 1.5%, rgba(125, 211, 252, 0.56) 6%, transparent 18%),
+    radial-gradient(ellipse at 57% 51%, rgba(186, 230, 253, 0.66) 0 4%, transparent 21%),
+    linear-gradient(122deg, transparent 24%, rgba(224, 247, 255, 0.14) 40%, rgba(255, 255, 255, 0.74) 50%, rgba(125, 211, 252, 0.24) 60%, transparent 76%);
+  background-size: 136% 136%, 150% 150%, 128% 128%, 220% 100%;
+  animation: pokemon-rarity-levin-flashes 2.8s ease-in-out infinite;
+}
+
+.pokemon-rarity-sprite--inferno .pokemon-rarity-sprite__image {
+  filter: sepia(1) hue-rotate(332deg) saturate(4.2) brightness(0.92) contrast(1.34)
+    drop-shadow(0 0 2px rgba(255, 237, 213, 0.9))
+    drop-shadow(0 0 7px rgba(249, 115, 22, 0.9))
+    drop-shadow(-2px 2px 11px rgba(185, 28, 28, 0.72));
+  animation: pokemon-rarity-inferno-heat 3.8s ease-in-out infinite;
+}
+
+.pokemon-rarity-sprite--inferno .pokemon-rarity-sprite__overlay {
+  opacity: 0.78;
+  background:
+    radial-gradient(ellipse at 22% 95%, rgba(255, 245, 157, 0.92) 0 5%, rgba(251, 146, 60, 0.62) 6% 14%, transparent 26%),
+    radial-gradient(ellipse at 62% 104%, rgba(255, 237, 213, 0.92) 0 5%, rgba(239, 68, 68, 0.62) 6% 17%, transparent 30%),
+    radial-gradient(ellipse at 88% 91%, rgba(254, 215, 170, 0.84) 0 4%, rgba(249, 115, 22, 0.56) 5% 13%, transparent 25%),
+    linear-gradient(176deg, transparent 0 38%, rgba(127, 29, 29, 0.3) 70%, rgba(255, 153, 0, 0.46) 100%);
+  background-size: 78% 122%, 94% 144%, 72% 116%, 100% 100%;
+  background-position: 0 8%, 54% 17%, 100% 4%, 0 0;
+  animation: pokemon-rarity-inferno-rise 3.9s ease-in-out infinite;
+}
+
+.pokemon-rarity-sprite--prism .pokemon-rarity-sprite__image {
+  filter: saturate(1.36) brightness(1.16) contrast(1.1)
+    drop-shadow(-2px 2px 5px rgba(244, 114, 182, 0.42))
+    drop-shadow(2px -1px 6px rgba(56, 189, 248, 0.44))
+    drop-shadow(0 0 9px rgba(167, 139, 250, 0.3));
+  animation: pokemon-rarity-prism-glow 4.2s ease-in-out infinite;
+}
+
+.pokemon-rarity-sprite--prism .pokemon-rarity-sprite__overlay {
+  opacity: 0.66;
+  background:
+    linear-gradient(140deg, transparent 0 24%, rgba(255, 255, 255, 0.78) 25% 29%, transparent 30% 51%, rgba(56, 189, 248, 0.44) 52% 66%, transparent 67%),
+    linear-gradient(38deg, transparent 0 35%, rgba(244, 114, 182, 0.54) 36% 46%, transparent 47% 68%, rgba(99, 102, 241, 0.48) 69% 79%, transparent 80%),
+    conic-gradient(from 16deg at 43% 46%, rgba(251, 191, 36, 0.44) 0deg 34deg, transparent 35deg 84deg, rgba(74, 222, 128, 0.42) 85deg 148deg, transparent 149deg 213deg, rgba(167, 139, 250, 0.48) 214deg 274deg, transparent 275deg 360deg);
+  background-position: 0 0, 16% 22%, 48% 50%;
+  background-size: 52% 52%, 48% 48%, 60% 60%;
+}
+
+.pokemon-rarity-sprite--rainbow .pokemon-rarity-sprite__image {
+  filter: grayscale(1) brightness(1.18) contrast(1.16)
+    drop-shadow(-2px 2px 5px rgba(244, 114, 182, 0.38))
+    drop-shadow(2px -1px 6px rgba(56, 189, 248, 0.42));
+}
+
+.pokemon-rarity-sprite--rainbow .pokemon-rarity-sprite__overlay {
+  opacity: 0.94;
+  background: linear-gradient(
+    112deg,
+    rgba(244, 63, 94, 0.96) 0%,
+    rgba(249, 115, 22, 0.94) 18%,
+    rgba(250, 204, 21, 0.95) 34%,
+    rgba(74, 222, 128, 0.95) 50%,
+    rgba(56, 189, 248, 0.96) 67%,
+    rgba(129, 140, 248, 0.96) 83%,
+    rgba(216, 180, 254, 0.96) 100%
+  );
+  background-size: 220% 100%;
+  background-position: 0 0;
+  mix-blend-mode: color;
+  animation: pokemon-rarity-rainbow-flow 9s ease-in-out infinite alternate;
+}
+
+.pokemon-rarity-sprite--rainbow .pokemon-rarity-sprite__overlay::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background: linear-gradient(
+    112deg,
+    transparent 26%,
+    rgba(255, 255, 255, 0.08) 40%,
+    rgba(255, 255, 255, 0.74) 50%,
+    rgba(224, 247, 255, 0.26) 58%,
+    transparent 74%
+  );
+  background-size: 220% 100%;
+  mix-blend-mode: screen;
+  animation: pokemon-rarity-rainbow-gleam 7s ease-in-out infinite alternate;
+}
+
+.pokemon-rarity-sprite--celestial .pokemon-rarity-sprite__image {
+  filter: grayscale(0.42) sepia(0.58) saturate(1.28) brightness(1.36) contrast(1.05)
+    drop-shadow(0 0 2px rgba(255, 255, 241, 0.94))
+    drop-shadow(0 0 7px rgba(253, 230, 138, 0.62));
+}
+
+.pokemon-rarity-sprite--celestial .pokemon-rarity-sprite__aura {
+  z-index: 0;
+  inset: -6%;
+  opacity: 0.56;
+  background:
+    linear-gradient(112deg, transparent 27%, rgba(255, 255, 244, 0.38) 43%, rgba(255, 239, 175, 0.22) 53%, transparent 70%),
+    linear-gradient(68deg, transparent 32%, rgba(255, 250, 218, 0.22) 48%, transparent 64%);
+  background-blend-mode: screen;
+  filter: blur(3px) drop-shadow(0 0 4px rgba(253, 230, 138, 0.4));
+  mask-image: none;
+  -webkit-mask-image: none;
+  animation: pokemon-rarity-celestial-radiance 6s ease-in-out infinite;
+}
+
+.pokemon-rarity-sprite--celestial .pokemon-rarity-sprite__overlay {
+  opacity: 0.58;
+  background:
+    linear-gradient(124deg, transparent 22%, rgba(255, 255, 255, 0.88) 45%, rgba(253, 230, 138, 0.42) 57%, transparent 76%),
+    radial-gradient(circle at 36% 24%, rgba(255, 255, 255, 0.82) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 66% 72%, rgba(255, 242, 185, 0.74) 0 1px, transparent 1.8px);
+  background-size: 210% 100%, 100% 100%, 100% 100%;
+  animation: pokemon-rarity-gleam 9s ease-in-out infinite;
+}
+
+.pokemon-rarity-sprite--black .pokemon-rarity-sprite__image {
+  filter: grayscale(1) brightness(0.48) contrast(1.72)
+    drop-shadow(0 0 1px rgba(255, 255, 255, 0.3));
+}
+
+.pokemon-rarity-sprite--white .pokemon-rarity-sprite__image {
+  filter: grayscale(1) brightness(1.38) contrast(1.68)
+    drop-shadow(0 0 1px rgba(255, 255, 255, 0.72));
+}
+
+.pokemon-rarity-sprite--void .pokemon-rarity-sprite__image {
+  filter: grayscale(1) brightness(0.72) contrast(2.35)
+    drop-shadow(0 0 1px rgba(126, 34, 206, 0.98))
+    drop-shadow(0 0 5px rgba(88, 28, 135, 0.56));
+}
+
+.pokemon-rarity-sprite--void .pokemon-rarity-sprite__aura {
+  z-index: 0;
+  inset: 4%;
+  display: block;
+  opacity: 0.86;
+  border-radius: 50%;
+  background:
+    conic-gradient(from 12deg, transparent 0deg 26deg, rgba(167, 92, 255, 0.62) 48deg, transparent 78deg 118deg, rgba(91, 33, 182, 0.62) 146deg, transparent 177deg 220deg, rgba(126, 34, 206, 0.54) 248deg, transparent 280deg 320deg, rgba(76, 29, 149, 0.5) 344deg, transparent 360deg),
+    radial-gradient(circle, rgba(2, 0, 8, 1) 0 16%, rgba(24, 6, 48, 0.94) 30%, rgba(88, 28, 135, 0.58) 50%, transparent 68%);
+  background-blend-mode: screen;
+  filter: blur(0.6px) drop-shadow(0 0 4px rgba(126, 34, 206, 0.42));
+  mask-image: radial-gradient(circle, #000 0 44%, rgb(0 0 0 / 0.72) 58%, transparent 78%);
+  -webkit-mask-image: radial-gradient(circle, #000 0 44%, rgb(0 0 0 / 0.72) 58%, transparent 78%);
+  animation: pokemon-rarity-void-vortex 10s linear infinite;
+}
+
+.pokemon-rarity-sprite--glitch .pokemon-rarity-sprite__image {
+  filter: saturate(1.16) contrast(1.12);
+  animation: pokemon-rarity-glitch-image 3.9s steps(1, end) infinite;
+}
+
+.pokemon-rarity-sprite--glitch .pokemon-rarity-sprite__overlay {
+  opacity: 0.92;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 9%,
+      rgba(103, 232, 249, 0.58) 9% 13%,
+      transparent 13% 27%,
+      rgba(244, 114, 182, 0.62) 27% 33%,
+      transparent 33% 52%,
+      rgba(192, 132, 252, 0.52) 52% 56%,
+      transparent 56% 74%,
+      rgba(34, 211, 238, 0.46) 74% 78%,
+      transparent 78% 100%
+    ),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.36), transparent 31%, rgba(244, 114, 182, 0.4));
+  background-size: 100% 190%, 170% 100%;
+  background-position: 0 0, 0 0;
+  mix-blend-mode: screen;
+  animation: pokemon-rarity-glitch-scan 3.9s steps(1, end) infinite;
+}
+
+.pokemon-rarity-sprite--glitch .pokemon-rarity-sprite__overlay::before,
+.pokemon-rarity-sprite--glitch .pokemon-rarity-sprite__overlay::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  mix-blend-mode: screen;
+}
+
+.pokemon-rarity-sprite--glitch .pokemon-rarity-sprite__overlay::before {
+  background: rgba(34, 211, 238, 0.72);
+  clip-path: polygon(0 13%, 100% 7%, 100% 24%, 0 31%);
+  animation: pokemon-rarity-glitch-cyan 3.9s steps(1, end) infinite;
+}
+
+.pokemon-rarity-sprite--glitch .pokemon-rarity-sprite__overlay::after {
+  background: rgba(244, 114, 182, 0.68);
+  clip-path: polygon(0 51%, 100% 43%, 100% 71%, 0 80%);
+  animation: pokemon-rarity-glitch-magenta 3.9s steps(1, end) infinite;
+}
+
+.pokemon-rarity-sprite--ancient .pokemon-rarity-sprite__image {
+  filter: grayscale(0.72) sepia(0.94) saturate(0.66) brightness(0.9) contrast(1.32)
+    drop-shadow(0 0 1px rgba(226, 196, 137, 0.72))
+    drop-shadow(1px 2px 4px rgba(65, 42, 24, 0.48));
+}
+
+.pokemon-rarity-sprite--ancient .pokemon-rarity-sprite__overlay {
+  opacity: 0.68;
+  background:
+    radial-gradient(ellipse at 24% 22%, rgba(242, 222, 166, 0.6) 0 5%, transparent 17%),
+    radial-gradient(ellipse at 73% 71%, rgba(57, 39, 25, 0.48) 0 6%, transparent 19%),
+    conic-gradient(from 38deg at 48% 52%, rgba(73, 49, 29, 0.38) 0deg 38deg, transparent 39deg 88deg, rgba(236, 209, 150, 0.28) 89deg 144deg, transparent 145deg 212deg, rgba(65, 43, 26, 0.34) 213deg 264deg, transparent 265deg 360deg);
+  background-size: 88% 88%, 104% 104%, 116% 116%;
+  background-position: 0 0, 100% 100%, 50% 50%;
+  mix-blend-mode: multiply;
+}
+
+.pokemon-rarity-sprite--ancient .pokemon-rarity-sprite__overlay::after {
+  display: none;
+}
+
+.pokemon-rarity-sprite--toxic .pokemon-rarity-sprite__image {
+  filter: sepia(1) saturate(4.8) hue-rotate(66deg) brightness(0.84) contrast(1.4)
+    drop-shadow(0 0 2px rgba(190, 242, 100, 0.84))
+    drop-shadow(0 0 7px rgba(109, 40, 217, 0.78))
+    drop-shadow(0 0 13px rgba(76, 29, 149, 0.72));
+}
+
+.pokemon-rarity-sprite--toxic .pokemon-rarity-sprite__aura {
+  z-index: 0;
+  inset: -9%;
+  display: block;
+  opacity: 0.92;
+  background: rgba(109, 40, 217, 0.92);
+  filter: blur(6px) drop-shadow(0 0 5px rgba(126, 34, 206, 0.94))
+    drop-shadow(0 0 12px rgba(76, 29, 149, 0.82));
+  animation: pokemon-rarity-toxic-aura 3.2s ease-in-out infinite;
+}
+
+.pokemon-rarity-sprite--toxic .pokemon-rarity-sprite__overlay {
+  opacity: 0.76;
+  background:
+    radial-gradient(circle at 23% 67%, rgba(237, 255, 181, 0.92) 0 3%, rgba(163, 230, 53, 0.58) 4% 8%, transparent 9%),
+    radial-gradient(circle at 72% 29%, rgba(226, 255, 170, 0.86) 0 2.5%, rgba(132, 204, 22, 0.55) 3.5% 7%, transparent 8%),
+    radial-gradient(circle at 56% 56%, rgba(233, 213, 255, 0.62) 0 2%, rgba(126, 34, 206, 0.5) 3% 7%, transparent 8%),
+    linear-gradient(137deg, transparent 0 27%, rgba(192, 255, 65, 0.36) 38%, rgba(111, 27, 164, 0.38) 56%, transparent 72%);
+  background-size: 120% 120%, 142% 142%, 110% 110%, 100% 100%;
+  background-position: 0 0, 100% 0, 40% 100%, 0 0;
+  mix-blend-mode: screen;
+  animation: pokemon-rarity-toxic-bubble 4.6s ease-in-out infinite;
+}
+
+.pokemon-rarity-sprite--toxic .pokemon-rarity-sprite__overlay::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background: radial-gradient(circle at 52% 80%, rgba(217, 249, 157, 0.78) 0 3%, rgba(132, 204, 22, 0.45) 4% 9%, transparent 10%);
+  mix-blend-mode: screen;
+  animation: pokemon-rarity-toxic-bubble-rise 3.8s ease-in infinite;
+}
+
+@keyframes pokemon-rarity-gleam {
+  0%,
+  100% {
+    background-position: 130% 0;
+  }
+  50% {
+    background-position: -30% 0;
+  }
+}
+
+@keyframes pokemon-rarity-shadow-smoke {
+  0%,
+  100% {
+    transform: translate(-1px, 1px) scale(0.99);
+  }
+  50% {
+    transform: translate(1px, -1px) scale(1.02);
+  }
+}
+
+@keyframes pokemon-rarity-radiant-burst {
+  from {
+    transform: scale(0.99);
+  }
+  50% {
+    transform: scale(1.035);
+  }
+  to {
+    transform: scale(0.99);
+  }
+}
+
+@keyframes pokemon-rarity-prism-glow {
+  0%,
+  100% {
+    transform: scale(0.99);
+  }
+  50% {
+    transform: scale(1.025);
+  }
+}
+
+@keyframes pokemon-rarity-galactic-twinkle {
+  0%,
+  100% {
+    opacity: 0.12;
+    transform: translate(-3px, 2px);
+  }
+  28% {
+    opacity: 0.78;
+    transform: translate(2px, -2px);
+  }
+  58% {
+    opacity: 0.24;
+    transform: translate(4px, 3px);
+  }
+  78% {
+    opacity: 0.7;
+    transform: translate(-1px, -3px);
+  }
+}
+
+@keyframes pokemon-rarity-galactic-twinkle-alt {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: translate(2px, -2px);
+  }
+  24% {
+    opacity: 0.14;
+    transform: translate(-3px, 3px);
+  }
+  52% {
+    opacity: 0.76;
+    transform: translate(1px, 4px);
+  }
+  76% {
+    opacity: 0.18;
+    transform: translate(-2px, -3px);
+  }
+}
+
+@keyframes pokemon-rarity-void-vortex {
+  from {
+    transform: rotate(0deg) scale(0.96);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.04);
+  }
+  to {
+    transform: rotate(360deg) scale(0.96);
+  }
+}
+
+@keyframes pokemon-rarity-glitch-image {
+  0% {
+    transform: translate(-3px, 1px);
+  }
+  16% {
+    transform: translate(4px, -2px);
+  }
+  31% {
+    transform: translate(-6px, 2px);
+  }
+  48% {
+    transform: translate(5px, 1px);
+  }
+  65% {
+    transform: translate(-7px, -2px);
+  }
+  82% {
+    transform: translate(6px, 2px);
+  }
+  100% {
+    transform: translate(-4px, -1px);
+  }
+}
+
+@keyframes pokemon-rarity-glitch-scan {
+  0% {
+    opacity: 0.62;
+    background-position: 0 28%, -18% 0;
+  }
+  18% {
+    opacity: 0.96;
+    background-position: 0 104%, 26% 0;
+  }
+  36% {
+    opacity: 0.56;
+    background-position: 0 166%, -22% 0;
+  }
+  55% {
+    opacity: 0.9;
+    background-position: 0 72%, 31% 0;
+  }
+  74% {
+    opacity: 0.7;
+    background-position: 0 183%, -29% 0;
+  }
+  100% {
+    opacity: 0.88;
+    background-position: 0 132%, 12% 0;
+  }
+}
+
+@keyframes pokemon-rarity-glitch-cyan {
+  0% {
+    opacity: 0.58;
+    transform: translateX(-8px);
+  }
+  23% {
+    opacity: 0.96;
+    transform: translateX(-10px);
+  }
+  49% {
+    opacity: 0.72;
+    transform: translateX(8px);
+  }
+  76% {
+    opacity: 0.88;
+    transform: translateX(-6px);
+  }
+  100% {
+    opacity: 0.68;
+    transform: translateX(9px);
+  }
+}
+
+@keyframes pokemon-rarity-glitch-magenta {
+  0% {
+    opacity: 0.7;
+    transform: translateX(7px);
+  }
+  21% {
+    opacity: 0.9;
+    transform: translateX(11px);
+  }
+  53% {
+    opacity: 0.74;
+    transform: translateX(-9px);
+  }
+  78% {
+    opacity: 0.82;
+    transform: translateX(6px);
+  }
+  100% {
+    opacity: 0.62;
+    transform: translateX(-8px);
+  }
+}
+
+@keyframes pokemon-rarity-toxic-aura {
+  0%,
+  100% {
+    opacity: 0.76;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes pokemon-rarity-toxic-bubble {
+  0%,
+  100% {
+    background-position: 0 8%, 100% 4%, 40% 100%, 0 0;
+  }
+  50% {
+    background-position: 8% -12%, 88% 20%, 48% 78%, 0 0;
+  }
+}
+
+@keyframes pokemon-rarity-toxic-bubble-rise {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: translate(-5px, 7px) scale(0.78);
+  }
+  50% {
+    opacity: 0.88;
+    transform: translate(4px, -8px) scale(1.16);
+  }
+}
+
+@keyframes pokemon-rarity-celestial-radiance {
+  0%,
+  100% {
+    transform: scale(0.96);
+    opacity: 0.62;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.88;
+  }
+}
+
+@keyframes pokemon-rarity-retro-scanlines {
+  from {
+    background-position: 0 0, 0 0;
+  }
+  to {
+    background-position: 0 -14px, 0 0;
+  }
+}
+
+@keyframes pokemon-rarity-retro-distortion {
+  0%,
+  100% {
+    transform: translateX(-2px);
+  }
+  28% {
+    transform: translateX(2px);
+  }
+  62% {
+    transform: translateX(3px);
+  }
+  76% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes pokemon-rarity-star-drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(2px, -3px);
+  }
+}
+
+@keyframes pokemon-rarity-levin-charge {
+  0%,
+  100% {
+    filter: grayscale(0.3) sepia(0.5) hue-rotate(148deg) saturate(2.55) brightness(1.34)
+      contrast(1.2)
+      drop-shadow(0 0 2px rgba(255, 255, 255, 0.96))
+      drop-shadow(0 0 5px rgba(186, 230, 253, 0.86))
+      drop-shadow(2px -1px 8px rgba(56, 189, 248, 0.62));
+  }
+  48% {
+    filter: grayscale(0.2) sepia(0.48) hue-rotate(148deg) saturate(2.9) brightness(1.62)
+      contrast(1.28)
+      drop-shadow(0 0 3px rgba(255, 255, 255, 1))
+      drop-shadow(0 0 10px rgba(186, 230, 253, 1))
+      drop-shadow(2px -1px 14px rgba(56, 189, 248, 0.88));
+  }
+  58% {
+    filter: grayscale(0.3) sepia(0.5) hue-rotate(148deg) saturate(2.55) brightness(1.38)
+      contrast(1.2)
+      drop-shadow(0 0 2px rgba(255, 255, 255, 0.96))
+      drop-shadow(0 0 6px rgba(186, 230, 253, 0.9))
+      drop-shadow(2px -1px 9px rgba(56, 189, 248, 0.68));
+  }
+}
+
+@keyframes pokemon-rarity-levin-flashes {
+  0%,
+  100% {
+    background-position: 8% 14%, 76% 4%, 36% 70%, 108% 0;
+    opacity: 0.34;
+  }
+  38% {
+    background-position: 18% -8%, 60% 20%, 46% 42%, 48% 0;
+    opacity: 0.92;
+  }
+  54% {
+    background-position: 2% 22%, 86% -8%, 34% 60%, 18% 0;
+    opacity: 0.46;
+  }
+}
+
+@keyframes pokemon-rarity-rainbow-flow {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 100% 0;
+  }
+}
+
+@keyframes pokemon-rarity-rainbow-gleam {
+  0%,
+  100% {
+    background-position: 130% 0;
+    opacity: 0.28;
+  }
+  50% {
+    background-position: -30% 0;
+    opacity: 0.82;
+  }
+}
+
+@keyframes pokemon-rarity-inferno-heat {
+  0%,
+  100% {
+    filter: sepia(1) hue-rotate(332deg) saturate(4.2) brightness(0.88) contrast(1.34)
+      drop-shadow(0 0 2px rgba(255, 237, 213, 0.86))
+      drop-shadow(0 0 6px rgba(249, 115, 22, 0.82))
+      drop-shadow(-2px 2px 9px rgba(185, 28, 28, 0.62));
+  }
+  50% {
+    filter: sepia(1) hue-rotate(332deg) saturate(4.7) brightness(1.08) contrast(1.4)
+      drop-shadow(0 0 3px rgba(255, 237, 213, 0.98))
+      drop-shadow(0 0 10px rgba(249, 115, 22, 1))
+      drop-shadow(-2px 2px 14px rgba(185, 28, 28, 0.8));
+  }
+}
+
+@keyframes pokemon-rarity-inferno-rise {
+  0%,
+  100% {
+    background-position: 0 10%, 54% 20%, 100% 8%, 0 0;
+    opacity: 0.62;
+  }
+  50% {
+    background-position: 4% -12%, 48% -8%, 94% -14%, 0 0;
+    opacity: 0.9;
+  }
+}
+
 /* Float Damage Animation */
 @keyframes float-damage {
   0% {

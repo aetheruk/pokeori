@@ -37,6 +37,7 @@ import { TaskConditionForm } from './TaskConditionForm'
 import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { cn } from '@/lib/utils'
+import { POKEMON_RARITY_OPTIONS } from '@/utilities/pokemon/rarity-effects'
 
 interface RewardFormProps {
   reward: Reward
@@ -500,15 +501,31 @@ export function RewardForm({ reward, onChange, onRemove }: RewardFormProps) {
                       onChange={(id) => handlePokemonDataChange('formId', id)}
                     />
                   </div>
-                  <div className="space-y-2 flex items-center pt-8">
-                    <Switch
-                      id={`shiny-${JSON.stringify(reward)}`}
-                      checked={reward.pokemonData?.shiny}
-                      onCheckedChange={(c) => handlePokemonDataChange('shiny', c)}
-                    />
-                    <Label htmlFor={`shiny-${JSON.stringify(reward)}`} className="ml-2">
-                      Shiny
-                    </Label>
+                  <div className="space-y-2">
+                    <Label>Rarity treatment</Label>
+                    <Select
+                      value={reward.pokemonData?.rarity || 'normal'}
+                      onValueChange={(rarity) =>
+                        handleChange('pokemonData', {
+                          ...reward.pokemonData,
+                          rarity,
+                          shiny: undefined,
+                          isShadow: undefined,
+                          isRadiant: undefined,
+                        })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {POKEMON_RARITY_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
@@ -587,22 +604,6 @@ export function RewardForm({ reward, onChange, onRemove }: RewardFormProps) {
                   </div>
                 </div>
                 <div className="flex space-x-4 pt-2">
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id={`shadow-pkmn-${JSON.stringify(reward)}`}
-                      checked={reward.pokemonData?.isShadow}
-                      onCheckedChange={(c) => handlePokemonDataChange('isShadow', c)}
-                    />
-                    <Label htmlFor={`shadow-pkmn-${JSON.stringify(reward)}`}>Shadow</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id={`radiant-pkmn-${JSON.stringify(reward)}`}
-                      checked={reward.pokemonData?.isRadiant}
-                      onCheckedChange={(c) => handlePokemonDataChange('isRadiant', c)}
-                    />
-                    <Label htmlFor={`radiant-pkmn-${JSON.stringify(reward)}`}>Radiant</Label>
-                  </div>
                   <div className="flex items-center space-x-2">
                     <Switch
                       id={`partner-pkmn-${JSON.stringify(reward)}`}

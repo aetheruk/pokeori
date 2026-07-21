@@ -7,6 +7,7 @@ import {
   Star,
 } from 'lucide-react'
 import Image from 'next/image'
+import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { Card } from '@/components/ui/card'
 import { getCurrency } from '@/data/currencies'
@@ -219,12 +220,13 @@ export function RewardSummaryDisplay({
               className="p-2 bg-game-surface-raised border-game-border flex-row items-center gap-3 h-12"
             >
               <div className="w-8 h-8 relative flex-shrink-0 bg-game-canvas rounded-lg p-0.5">
-                <Image
-                  src={getPokemonImageUrl(p.speciesId, 'sprite', p.shiny)}
+                <PokemonRaritySprite
+                  formId={p.speciesId}
+                  view="front"
+                  rarity={p.rarity}
+                  shiny={p.shiny}
                   alt={p.name}
-                  width={28}
-                  height={28}
-                  className="w-full h-full object-contain pixelated"
+                  className="h-full w-full"
                 />
               </div>
               <div className="flex-1 flex items-center justify-between min-w-0 pr-2">

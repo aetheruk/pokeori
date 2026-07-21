@@ -81,6 +81,7 @@ export function PokemonSpriteDisplay({
               isShadow={activePlayerMon.isShadow}
               isRadiant={activePlayerMon.isRadiant}
               shiny={!!activePlayerMon.shiny}
+              rarity={activePlayerMon.rarity}
               gender={activePlayerMon.gender}
               damageSplat={playerDamageSplat}
               statusDamageSplat={playerStatusDamageSplat}
@@ -111,6 +112,7 @@ export function PokemonSpriteDisplay({
           isShadow={activeEnemyMon.isShadow}
           isRadiant={activeEnemyMon.isRadiant}
           shiny={!!activeEnemyMon.shiny}
+          rarity={activeEnemyMon.rarity}
           gender={activeEnemyMon.gender}
           damageSplat={enemyDamageSplat}
           statusDamageSplat={enemyStatusDamageSplat}

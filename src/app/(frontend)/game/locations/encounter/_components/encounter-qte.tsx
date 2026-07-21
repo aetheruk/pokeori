@@ -6,6 +6,7 @@ import Image from 'next/image'
 import type React from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ItemSprite } from '@/components/ui/item-sprite'
+import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { items } from '@/data/items'
 import { cn } from '@/lib/utils'
@@ -20,11 +21,13 @@ import {
   isFocusCircleProgressComplete,
 } from '@/utilities/pokemon/focus-qte'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
+import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
 
 interface EncounterQteProps {
   qte: PublicEncounterQte
   pokemonName: string
   formId: string
+  rarity?: PokemonRarityId
   shiny?: boolean
   gender?: 'male' | 'female' | 'genderless'
   onComplete: (payload: EncounterQteCompletionPayload) => void
@@ -38,6 +41,7 @@ export function EncounterQte({
   qte,
   pokemonName,
   formId,
+  rarity,
   shiny,
   gender,
   onComplete,
@@ -395,11 +399,15 @@ export function EncounterQte({
             )}
           </svg>
           <div className="relative h-28 w-28 pointer-events-none">
-            <Image
-              src={getPokemonImageUrl(formId, 'home', shiny, gender)}
+            <PokemonRaritySprite
+              formId={formId}
+              view="home"
+              rarity={rarity}
+              shiny={shiny}
+              female={gender === 'female'}
               alt={pokemonName}
-              fill
-              className="object-contain pixelated drop-shadow-2xl"
+              className="h-full w-full"
+              imageClassName="drop-shadow-2xl"
             />
           </div>
           <div className="absolute bottom-5 flex gap-2">
@@ -482,11 +490,15 @@ export function EncounterQte({
             animate={{ x: [-72, 72, -72], y: [8, -12, 8] }}
             transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
           >
-            <Image
-              src={getPokemonImageUrl(formId, 'home', shiny, gender)}
+            <PokemonRaritySprite
+              formId={formId}
+              view="home"
+              rarity={rarity}
+              shiny={shiny}
+              female={gender === 'female'}
               alt={pokemonName}
-              fill
-              className="object-contain pixelated drop-shadow-2xl"
+              className="h-full w-full"
+              imageClassName="drop-shadow-2xl"
             />
           </motion.div>
           <button

@@ -13,7 +13,6 @@ import {
   Users,
   Zap,
 } from 'lucide-react'
-import Image from 'next/image'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -21,6 +20,7 @@ import {
   getFormattedRewards,
 } from '@/components/game/features/explore/ExploreModalHelpers'
 import { GameInfoModal } from '@/components/game/shared/GameInfoModal'
+import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { Button } from '@/components/ui/button'
 import { SectionDivider } from '@/components/ui/section-divider'
@@ -29,7 +29,6 @@ import { useCountdown } from '@/hooks/useCountdown'
 import { cn } from '@/lib/utils'
 import type { Pokemon } from '@/payload-types'
 import { getOwnedPokemonGender } from '@/utilities/pokemon/gender'
-import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import { completeVoyage, startVoyage } from '@/utilities/voyages/actions'
 
 interface VoyageSelectionModalProps {
@@ -386,13 +385,6 @@ export function VoyageSelectionModal({
                 <div className="flex gap-4 overflow-x-auto pb-4 pt-2 custom-scrollbar px-1 min-h-[140px]">
                   {eligiblePokemon.map((p) => {
                     const isSelected = selectedPokemonIds.includes(p.id)
-                    const imageUrl = getPokemonImageUrl(
-                      p.formId,
-                      'sprite',
-                      !!p.shiny,
-                      getOwnedPokemonGender(p),
-                    )
-
                     return (
                       <button
                         type="button"
@@ -408,13 +400,17 @@ export function VoyageSelectionModal({
                         onClick={() => handleToggle(p.id)}
                       >
                         <div className="relative w-16 h-16 flex items-center justify-center z-10">
-                          <Image
-                            src={imageUrl}
+                          <PokemonRaritySprite
+                            formId={p.formId}
+                            view="front"
+                            rarity={p.rarity}
+                            shiny={p.shiny}
+                            isShadow={p.isShadow}
+                            isRadiant={p.isRadiant}
+                            female={getOwnedPokemonGender(p) === 'female'}
                             alt={p.name || ''}
-                            width={64}
-                            height={64}
                             className={cn(
-                              'object-contain pixelated transition-opacity',
+                              'h-16 w-16 transition-opacity',
                               isSelected
                                 ? 'opacity-100'
                                 : 'opacity-70 group-hover:opacity-100',

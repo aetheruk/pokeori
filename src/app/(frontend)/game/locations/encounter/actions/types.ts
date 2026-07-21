@@ -1,5 +1,6 @@
 import type { LocationEncounterShield } from '@/data/locations'
 import type { EncounterQteState } from '@/utilities/pokemon/encounter-qte'
+import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
 import type { WeatherSnapshot } from '@/utilities/weather'
 
 export interface EncounterShieldState {
@@ -18,6 +19,7 @@ export interface EncounterState {
   pokemonId: number
   formId: string
   isShiny: boolean
+  rarity?: PokemonRarityId
   gender?: 'male' | 'female' | 'genderless'
   startTime: number
   expiry: number

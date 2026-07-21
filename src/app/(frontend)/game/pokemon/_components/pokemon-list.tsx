@@ -42,6 +42,7 @@ import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
 import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
 import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
+import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -75,7 +76,6 @@ import {
   getPokemonItemUnavailableReason,
   isPokemonTargetedInventoryItem,
 } from '@/utilities/pokemon/item-usability'
-import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import {
   applyItemToPokemon,
   createBox,
@@ -827,12 +827,6 @@ export function PokemonList() {
     )
     const form = species?.forms.find((f) => f.id === pokemon.formId)
     const name = pokemon.name || form?.name || 'Unknown'
-    const spriteUrl = getPokemonImageUrl(
-      pokemon.formId,
-      'sprite',
-      !!pokemon.shiny,
-      getOwnedPokemonGender(pokemon),
-    )
     const selectedItemUnavailableReason =
       itemToUse &&
       pokemon.identified &&
@@ -1021,20 +1015,21 @@ export function PokemonList() {
           ) : null,
         )}
         <div className="absolute inset-0 flex items-center justify-center p-2">
-          {spriteUrl ? (
-            <Image
-              src={spriteUrl}
-              alt={name}
-              width={64}
-              height={64}
-              className={cn(
-                'w-full h-full object-contain pixelated z-10 relative drop-shadow-md',
-                !pokemon.identified && 'brightness-0 opacity-50',
-              )}
-            />
-          ) : (
-            <div className="text-xl font-bold text-game-muted">?</div>
-          )}
+          <PokemonRaritySprite
+            formId={pokemon.formId}
+            view="front"
+            rarity={pokemon.rarity}
+            shiny={pokemon.shiny}
+            isShadow={pokemon.isShadow}
+            isRadiant={pokemon.isRadiant}
+            female={getOwnedPokemonGender(pokemon) === 'female'}
+            alt={name}
+            className="h-full w-full"
+            imageClassName={cn(
+              'relative z-10 drop-shadow-md',
+              !pokemon.identified && 'brightness-0 opacity-50',
+            )}
+          />
         </div>
         {!pokemon.identified && !isBulkReleaseMode && (
           <div className="absolute bottom-0 z-20 flex w-full justify-center bg-game-ink/70 p-1">

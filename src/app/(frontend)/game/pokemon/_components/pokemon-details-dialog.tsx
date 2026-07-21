@@ -26,6 +26,7 @@ import * as React from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { RewardSummaryDisplay } from '@/components/game/reward-summary'
+import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { StanceIcon } from '@/components/game/shared/stance-icon'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -449,12 +450,6 @@ export function PokemonDetailsDialog({
   const { user, gameData, refreshUser } = useUser()
   const router = useRouter()
   const pokemonGender = getOwnedPokemonGender(pokemon)
-  const imageUrl = getPokemonImageUrl(
-    pokemon.formId,
-    'home',
-    !!pokemon.shiny,
-    pokemonGender,
-  )
   const pokemonOrigin = formatPokemonOrigin(pokemon)
   const evolutionTimeRegion = resolveEvolutionTimeRegion(pokemon)
   const backgroundUrl = normalizePokemonBackgroundPath(
@@ -840,30 +835,19 @@ export function PokemonDetailsDialog({
           {/* Pokemon Image */}
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="relative w-44 h-44 group/sprite">
-              {/* Shadow Flame */}
-              {pokemon.isShadow && <div className="shadow-flame" />}
-              {pokemon.isRadiant && <div className="radiant-flame" />}
-              {imageUrl ? (
-                <Image
-                  src={imageUrl}
-                  alt={pokemon.name || 'Pokemon'}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 176px"
-                  className={cn(
-                    'object-contain drop-shadow-[0_16px_24px_rgba(0,0,0,0.45)] z-10 relative',
-                    pokemon.isShadow && 'shadow-aura',
-                    pokemon.isRadiant && 'radiant-aura',
-                  )}
-                />
-              ) : (
-                <div
-                  className="flex h-full items-center justify-center text-xs font-black uppercase tracking-widest text-game-muted"
-                  role="status"
-                  aria-live="polite"
-                >
-                  No image recorded
-                </div>
-              )}
+              <PokemonRaritySprite
+                formId={pokemon.formId}
+                view="home"
+                rarity={pokemon.rarity}
+                shiny={pokemon.shiny}
+                isShadow={pokemon.isShadow}
+                isRadiant={pokemon.isRadiant}
+                female={pokemonGender === 'female'}
+                alt={pokemon.name || 'Pokemon'}
+                sizes="(max-width: 768px) 100vw, 176px"
+                className="h-full w-full"
+                imageClassName="relative z-10 drop-shadow-[0_16px_24px_rgba(0,0,0,0.45)]"
+              />
             </div>
           </div>
         </div>

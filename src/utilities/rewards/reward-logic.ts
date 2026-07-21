@@ -51,13 +51,23 @@ import {
 import { ensureUserWeatherSlot } from '@/utilities/weather'
 import { registerAbilityDexEntry } from '@/utilities/pokemon/abilitydex'
 import { getPrimaryFormAbilityId, rollNaturalFormAbility } from '@/data/abilities'
+import {
+  getPokemonRarityLegacyFields,
+  resolvePokemonRarity,
+} from '@/utilities/pokemon/rarity-effects'
 
 export type Reward = LocationReward
 
 export interface RewardSummary {
   xp: Record<string, number>
   items: { id: string; name: string; quantity: number }[]
-  pokemon: { speciesId: number; name: string; level: number; shiny: boolean }[]
+  pokemon: {
+    speciesId: number
+    name: string
+    level: number
+    shiny: boolean
+    rarity: string
+  }[]
   currency: { type: string; quantity: number }[]
   cards: {
     id: string
@@ -361,7 +371,9 @@ export async function grantRewards(
         const speciesId = parseInt(reward.targetId.toString())
         const level = reward.pokemonData?.level || 5
         const ballType = reward.pokemonData?.ballType || 'poke-ball'
-        const shiny = reward.pokemonData?.shiny || false
+        const rarity = resolvePokemonRarity(reward.pokemonData || {})
+        const rarityLegacyFields = getPokemonRarityLegacyFields(rarity)
+        const shiny = rarityLegacyFields.shiny
 
         // Determine Nature
         let nature = reward.pokemonData?.nature
@@ -398,8 +410,7 @@ export async function grantRewards(
           nature,
           ivs,
           evs,
-          isShadow: reward.pokemonData?.isShadow, // Shadow bonus relies on this
-          isRadiant: reward.pokemonData?.isRadiant,
+          ...rarityLegacyFields,
         }
 
         const pokemonWithStats = calculateStats(tempPokemon as any)
@@ -419,7 +430,7 @@ export async function grantRewards(
             formId: speciesData.id,
             name: speciesData.name,
             level: level,
-            shiny: shiny,
+            rarity,
             ability: rewardAbilityId,
             gender: reward.pokemonData?.gender || rollPokemonGender(speciesId),
             identified: true,
@@ -429,8 +440,7 @@ export async function grantRewards(
             evs,
             nature,
             background: reward.pokemonData?.background,
-            isShadow: reward.pokemonData?.isShadow,
-            isRadiant: reward.pokemonData?.isRadiant,
+            ...rarityLegacyFields,
             obtainedMethod:
               reward.pokemonData?.obtainedMethod ||
               (options.source === 'mystery-gift' ? 'gift' : 'reward'),
@@ -451,6 +461,7 @@ export async function grantRewards(
           name: speciesData.name,
           level: level,
           shiny: shiny,
+          rarity,
         })
 
         // UPDATE POKEDEX MAP

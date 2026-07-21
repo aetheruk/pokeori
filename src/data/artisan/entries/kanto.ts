@@ -439,7 +439,7 @@ const BALL_RECIPES: ArtisanRecipeDraft[] = [
   {
     id: 'craft-rocket-ball',
     name: 'Craft Rocket Ball',
-    description: 'Craft a dark-aura tactical ball variant.',
+    description: 'Craft a specialised ball for capturing Shadow Pokémon.',
     artisanLevel: 100,
     costs: [
       { id: 'broken-ball-t1', amount: 4 },

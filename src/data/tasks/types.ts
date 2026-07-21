@@ -1,4 +1,5 @@
 import type { Reward } from '../types'
+import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
 
 export type TaskRequirementType =
   | 'user_level'
@@ -61,6 +62,7 @@ export interface PokemonCriteria {
   maxLevel?: number
   size?: 'XS' | 'S' | 'L' | 'XL'
   shiny?: boolean
+  rarity?: PokemonRarityId
   isShadow?: boolean
   isRadiant?: boolean
   identified?: boolean
@@ -82,6 +84,7 @@ export interface BattleTeamCheck {
   locationId?: string | string[]
   isShadow?: boolean
   isRadiant?: boolean
+  rarity?: PokemonRarityId
   stats?: StatRequirements
   qty?: number // Defaults to 1
 }
