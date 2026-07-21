@@ -122,7 +122,7 @@ export function PokemonDisplay({
         isRadiant={isRadiant}
         female={gender === 'female'}
         alt="Pokemon"
-        className="absolute inset-0"
+        className="!absolute inset-0"
         imageClassName="drop-shadow-xl"
       />
 
