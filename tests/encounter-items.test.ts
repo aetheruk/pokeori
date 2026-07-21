@@ -197,6 +197,13 @@ describe('catch rate helpers', () => {
     expect(getHardBallCatchRate({ ballId: 'poke-ball', isUltraBeast: false })).toBeUndefined()
   })
 
+  test('Rocket Ball only catches Shadow Pokemon at the standard Poke Ball rate', () => {
+    expect(getHardBallCatchRate({ ballId: 'rocket-ball', isShadow: false })).toBe(0)
+    expect(getHardBallCatchRate({ ballId: 'poke-ball', isShadow: true })).toBe(0)
+    expect(getHardBallCatchRate({ ballId: 'master-ball', isShadow: true })).toBe(0)
+    expect(getHardBallCatchRate({ ballId: 'rocket-ball', isShadow: true })).toBeUndefined()
+  })
+
   test('type charmer catch abilities apply only to matching encounter types', () => {
     const bugCharmer = {
       type: 'catch',

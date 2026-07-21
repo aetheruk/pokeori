@@ -8,6 +8,7 @@ import { locations } from '../data/locations'
 import { research } from '../data/games'
 import { expeditions } from '../data/expeditions'
 import pokemonData from '../data/pokemon-data'
+import { POKEMON_RARITY_OPTIONS } from '../utilities/pokemon/rarity-effects'
 
 const itemOptions = items.map((item) => ({
   label: item.name,
@@ -434,6 +435,14 @@ export const RewardBlock: Block = {
       fields: [
         { name: 'level', type: 'number' },
         { name: 'formId', type: 'text' },
+        {
+          name: 'rarity',
+          type: 'select',
+          options: POKEMON_RARITY_OPTIONS,
+          admin: {
+            description: 'Mutually exclusive with all other Pokémon rarity treatments.',
+          },
+        },
         { name: 'shiny', type: 'checkbox' },
         { name: 'ballType', type: 'text' },
         { name: 'nature', type: 'text' },

@@ -68,6 +68,10 @@ import {
 import { buildArtisanMaterialRewards } from '@/utilities/artisan/material-drops'
 import { registerAbilityDexEntry } from '@/utilities/pokemon/abilitydex'
 import {
+  getPokemonRarityLegacyFields,
+  resolvePokemonRarity,
+} from '@/utilities/pokemon/rarity-effects'
+import {
   calculatePokemonContentSkillXp,
   resolveSkillXpConfig,
 } from '@/data/skills/xp'
@@ -310,9 +314,15 @@ export async function attemptCapture(
     })
 
     const baseCaptureRate = species?.capture_rate || 100
+    const targetRarity = resolvePokemonRarity({
+      rarity: state.rarity,
+      shiny: state.isShiny,
+    })
+    const isShadow = targetRarity === 'shadow'
     const hardCatchRate = getHardBallCatchRate({
       ballId: ballItemId,
       isUltraBeast,
+      isShadow,
     })
     let finalRate =
       hardCatchRate ??
@@ -351,7 +361,7 @@ export async function attemptCapture(
     let caught = false
     if (state.shield?.active) {
       caught = false
-    } else if (ballItemId === 'master-ball') {
+    } else if (ballItemId === 'master-ball' && hardCatchRate === undefined) {
       caught = true
     } else {
       const roll = Math.random() * 255
@@ -660,6 +670,8 @@ export async function attemptCapture(
       getResearcherHiddenAbilitiesUnlocked(researcherLevel),
     )
 
+    const rarity = targetRarity
+
     await payload.create({
       collection: 'pokemon',
       data: {
@@ -668,7 +680,7 @@ export async function attemptCapture(
         formId: state.formId,
         name: formData?.name || 'Unknown',
         level: level,
-        shiny: state.isShiny,
+        rarity,
         gender: state.gender || rollPokemonGender(state.pokemonId),
         identified: true,
         originalTrainer: user.id,
@@ -693,7 +705,7 @@ export async function attemptCapture(
           speed: pokemonStats.speed,
         },
         ability: abilityId,
-        isShadow: ballItemId === 'rocket-ball',
+        ...getPokemonRarityLegacyFields(rarity),
         ...resolveEncounterOrigin(state.locationId),
       },
     })
@@ -726,8 +738,8 @@ export async function attemptCapture(
           caught: true,
           totalSeen: Math.max(dexEntry.totalSeen || 0, 1),
           totalCaught: (dexEntry.totalCaught || 0) + 1,
-          shinySeen: state.isShiny ? true : dexEntry.shinySeen,
-          shinyCaught: state.isShiny ? true : dexEntry.shinyCaught,
+          shinySeen: rarity === 'shiny' ? true : dexEntry.shinySeen,
+          shinyCaught: rarity === 'shiny' ? true : dexEntry.shinyCaught,
         },
       },
     }

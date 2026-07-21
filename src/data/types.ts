@@ -2,6 +2,7 @@ import { TaskCondition, TaskIcon, TaskCardRewardParams } from './tasks/types'
 import { StatusEffectId } from './moves/types'
 import type { SkillXpConfig } from './skills/xp'
 import type { TrainerClassId } from './trainers'
+import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
 
 export * from './tasks/types'
 export * from './moves/types'
@@ -9,6 +10,7 @@ export * from './moves/types'
 export interface LocationEncounter {
   speciesId: number
   formId?: string
+  rarity?: PokemonRarityId
   chance: number // 0-100 percentage
   requirements?: TaskCondition[]
   secret?: boolean // If true, locked preview does not reveal requirements
@@ -51,6 +53,7 @@ export interface Reward {
     formId?: string
     ability?: string
     shiny?: boolean
+    rarity?: PokemonRarityId
     ivs?: {
       hp?: number
       attack?: number
@@ -147,6 +150,7 @@ export interface BattleEnemy {
     speed?: number
   }
   shiny?: boolean
+  rarity?: PokemonRarityId
   initialStatus?: StatusEffectId
   heldItemId?: string
   aiMoves?: string[]

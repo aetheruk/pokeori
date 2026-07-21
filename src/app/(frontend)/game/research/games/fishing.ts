@@ -6,6 +6,20 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { grantRewards } from '@/utilities/rewards/reward-logic'
 import { getUser, type ResearchState } from '../actions'
+import { ABILITIES } from '@/data/abilities'
+import {
+  getAbilityShinyMultiplier,
+  isNightHour,
+  resolveStartAbilityId,
+  shouldUseExtraShinyRoll,
+} from '@/utilities/pokemon/encounter-ability-runtime'
+import { getPokemonForm } from '@/utilities/pokemon/pokedex'
+import {
+  resolvePokemonRarity,
+  type PokemonRarityId,
+} from '@/utilities/pokemon/rarity-effects'
+import { getShinyChance, rollShiny } from '@/utilities/pokemon/shiny-odds'
+import { getResearcherShinyModifier, getSkillLevel } from '@/utilities/skills/unlocks'
 import type { Reward } from '@/utilities/rewards/reward-logic'
 import type {
   FishingGameConfig,
@@ -26,7 +40,11 @@ import {
   setIdempotentResult,
 } from '@/utilities/game-integrity'
 import { getRegionTimeZone, getTimeZoneClockTime } from '@/utilities/requirements'
-import { getUserInventoryMap, incrementUserActivityResult } from '@/utilities/user-state'
+import {
+  getUserInventoryMap,
+  getUserPokedexMap,
+  incrementUserActivityResult,
+} from '@/utilities/user-state'
 import type { WeatherSnapshot } from '@/utilities/weather'
 import { applySecretFishingPokemonReplacement } from '@/utilities/fishing/secret-pokemon'
 
@@ -41,6 +59,7 @@ export interface FishingState {
     type: 'pokemon' | 'item'
     entry: FishingPokemonEntry | FishingItemEntry
     isShiny?: boolean
+    rarity?: PokemonRarityId
   }
   reactionDeadline?: number // When the hook window ends
   phase: 'idle' | 'waiting' | 'nibble' | 'hooked' | 'missed'
@@ -87,6 +106,7 @@ function buildHookedResponse(fishingState: FishingState) {
     speciesId: pokemonEntry.speciesId,
     formId: pokemonEntry.formId,
     isShiny: result.isShiny,
+    rarity: result.rarity,
     symbol: pokemonEntry.symbol,
   }
 }
@@ -224,10 +244,46 @@ export async function castFishingLine(rodType: RodType) {
 
       // Roll shiny for Pokemon
       let isShiny = false
+      let rarity: PokemonRarityId = 'normal'
       if (resultType === 'pokemon') {
-        const baseShinyRate = 1 / 4096
-        const shinyMod = rodConfig.shinyChanceModifier || 1
-        isShiny = Math.random() < baseShinyRate * shinyMod
+        const pokemonEntry = selectedEntry as FishingPokemonEntry
+        const formId = pokemonEntry.formId || pokemonEntry.speciesId.toString()
+        const speciesData = getPokemonForm(formId)
+        const activeAbilityId = researchState.activeAbilityId
+        const activeAbilitySourceFormId = researchState.activeAbilitySourceFormId
+        const effectiveAbilityId = resolveStartAbilityId(activeAbilityId, formId)
+        const effectiveAbility = effectiveAbilityId ? ABILITIES[effectiveAbilityId] : undefined
+        const researcherLevel = getSkillLevel(user.skills, 'researching')
+        const shinyChance = getShinyChance({
+          sourceModifier: rodConfig.shinyChanceModifier || 1,
+          researcherModifier: getResearcherShinyModifier(researcherLevel),
+          abilityModifier: getAbilityShinyMultiplier({
+            ability: effectiveAbility,
+            formId,
+            speciesId: pokemonEntry.speciesId,
+            sourceFormId: activeAbilitySourceFormId,
+            locationId: encounter.id,
+            targetTypes: speciesData?.types,
+            isNight: isNightHour(),
+          }),
+        })
+        const pokedexMap = await getUserPokedexMap(payload as any, user.id)
+        const researchLevel = pokedexMap[pokemonEntry.speciesId.toString()]?.[formId]?.researchLevel || 0
+
+        isShiny = rollShiny(shinyChance, researchLevel >= 5 ? 2 : 1)
+        if (
+          !isShiny &&
+          shouldUseExtraShinyRoll({
+            ability: effectiveAbility,
+            sourceFormId: activeAbilitySourceFormId,
+            targetFormId: formId,
+            shinyChance,
+          })
+        ) {
+          isShiny = true
+        }
+        rarity = resolvePokemonRarity({ rarity: pokemonEntry.rarity, shiny: isShiny })
+        isShiny = rarity === 'shiny'
       }
 
       // Calculate appear time
@@ -247,6 +303,7 @@ export async function castFishingLine(rodType: RodType) {
           type: resultType,
           entry: selectedEntry,
           isShiny,
+          rarity,
         },
         phase: 'waiting',
         weather: researchState.weather,
@@ -578,6 +635,7 @@ export async function startFishingCatch() {
         pokemonId: speciesId,
         formId,
         isShiny: result.isShiny || false,
+        rarity: result.rarity,
         startTime,
         expiry,
         baseCatchRate: modifiedBaseRate,
@@ -603,6 +661,7 @@ export async function startFishingCatch() {
         pokemonId: speciesId,
         formId,
         isShiny: result.isShiny || false,
+        rarity: result.rarity,
         startTime,
         expiry,
         duration,

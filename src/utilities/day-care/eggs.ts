@@ -4,6 +4,7 @@ import { allGames } from '@/data/games'
 import { getPokemonForm, getSpeciesIdForForm } from '@/utilities/pokemon/pokedex'
 import { getResearcherShinyModifier, getSkillLevel } from '@/utilities/skills/unlocks'
 import { getUserCompletedTasksMap, getUserPokedexMap, type PokedexMap } from '@/utilities/user-state'
+import { getShinyChance, rollShiny } from '@/utilities/pokemon/shiny-odds'
 
 export const DAY_CARE_EGG_UNLOCK_TASK_ID = 'day-care-egg-program'
 export const DAY_CARE_EGG_HATCH_DELAY_MS = 12 * 60 * 60 * 1000
@@ -79,8 +80,11 @@ export function rollEggHatch(
   const formId = selected.forms[Math.floor(random() * selected.forms.length)]
   const speciesId = getSpeciesIdForForm(formId)
   if (!speciesId) return null
-  const shinyChance = Math.min(1, (1 / 4096) * DAY_CARE_EGG_SHINY_MULTIPLIER * getResearcherShinyModifier(researcherLevel))
-  return { poolId: selected.pool.id, formId, speciesId, shiny: random() < shinyChance }
+  const shinyChance = getShinyChance({
+    sourceModifier: DAY_CARE_EGG_SHINY_MULTIPLIER,
+    researcherModifier: getResearcherShinyModifier(researcherLevel),
+  })
+  return { poolId: selected.pool.id, formId, speciesId, shiny: rollShiny(shinyChance, 1, random) }
 }
 
 export async function canUseDayCareEggs(payload: Payload, user: any): Promise<boolean> {

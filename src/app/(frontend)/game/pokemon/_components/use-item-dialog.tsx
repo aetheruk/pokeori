@@ -1,11 +1,11 @@
 'use client'
 
 import { ArrowLeft, Loader2, Package } from 'lucide-react'
-import Image from 'next/image'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { useInventoryStore } from '@/app/(frontend)/store/inventory-store'
 import { Button } from '@/components/ui/button'
+import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import {
   Dialog,
   DialogContent,
@@ -18,7 +18,6 @@ import { useUser } from '@/context/UserContext'
 import type { Pokemon } from '@/payload-types'
 import { getOwnedPokemonGender } from '@/utilities/pokemon/gender'
 import { getPokemonItemEffectLabel } from '@/utilities/pokemon/item-usability'
-import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import {
   applyItemToPokemon,
   getFusionPartnerOptions,
@@ -358,13 +357,6 @@ export function UseItemDialog({
                 <div className="grid grid-cols-1 gap-2">
                   {fusionPartnerOptions.map((option) => {
                     const partner = option.pokemon
-                    const spriteUrl = getPokemonImageUrl(
-                      partner.formId,
-                      'sprite',
-                      !!partner.shiny,
-                      getOwnedPokemonGender(partner),
-                    )
-
                     return (
                       <Button
                         key={partner.id}
@@ -380,13 +372,17 @@ export function UseItemDialog({
                         disabled={!!usingItem}
                       >
                         <div className="flex min-w-0 flex-1 items-center gap-3">
-                          {spriteUrl ? (
-                            <Image
-                              src={spriteUrl}
+                          {partner.formId ? (
+                            <PokemonRaritySprite
+                              formId={partner.formId}
+                              view="front"
+                              rarity={partner.rarity}
+                              shiny={partner.shiny}
+                              isShadow={partner.isShadow}
+                              isRadiant={partner.isRadiant}
+                              female={getOwnedPokemonGender(partner) === 'female'}
                               alt={partner.name || 'Fusion partner'}
-                              width={36}
-                              height={36}
-                              className="h-9 w-9 shrink-0 object-contain pixelated"
+                              className="h-9 w-9 shrink-0"
                             />
                           ) : (
                             <div className="h-9 w-9 shrink-0 rounded-md border border-game-border bg-game-canvas" />

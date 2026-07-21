@@ -1,12 +1,11 @@
 'use client'
 
 import { Check, Circle, Diamond, Square, Triangle, X } from 'lucide-react'
-import Image from 'next/image'
 import React from 'react'
 import { cn } from '@/lib/utils'
 import type { Pokemon } from '@/payload-types'
 import { getOwnedPokemonGender } from '@/utilities/pokemon/gender'
-import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
+import { PokemonRaritySprite } from './PokemonRaritySprite'
 
 interface PokemonSelectionListProps {
   eligiblePokemon: Pokemon[]
@@ -25,13 +24,6 @@ export function PokemonSelectionList({
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
       {eligiblePokemon.map((p) => {
         const isSelected = selectedPokemonIds.includes(p.id)
-        const imageUrl = getPokemonImageUrl(
-          p.formId,
-          'sprite',
-          !!p.shiny,
-          getOwnedPokemonGender(p),
-        )
-
         return (
           <button
             type="button"
@@ -61,11 +53,16 @@ export function PokemonSelectionList({
             </div>
 
             <div className="relative mb-2 h-16 w-16">
-              <Image
-                src={imageUrl}
+              <PokemonRaritySprite
+                formId={p.formId}
+                view="front"
+                rarity={p.rarity}
+                shiny={p.shiny}
+                isShadow={p.isShadow}
+                isRadiant={p.isRadiant}
+                female={getOwnedPokemonGender(p) === 'female'}
                 alt={p.name || 'Pokemon'}
-                fill
-                className="object-contain pixelated"
+                className="h-full w-full"
               />
             </div>
 

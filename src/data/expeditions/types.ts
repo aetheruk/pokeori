@@ -1,5 +1,6 @@
 import type { TaskCondition, TaskIcon } from '@/data/tasks'
 import type { Reward } from '@/data/types'
+import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
 
 export type ExpeditionActivityType = 'battle' | 'location' | 'research' | 'task'
 
@@ -80,6 +81,7 @@ export interface ExpeditionChroniclePokemonConfig {
   name?: string
   level: number
   shiny?: boolean
+  rarity?: PokemonRarityId
   ability?: string
   assignedMoves?: string[]
   heldItemId?: string

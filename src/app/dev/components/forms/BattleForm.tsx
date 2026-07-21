@@ -24,6 +24,7 @@ import { TaskConditionForm } from './TaskConditionForm'
 import { RewardForm } from './RewardForm'
 import { Plus, Trash2 } from 'lucide-react'
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible'
+import { POKEMON_RARITY_OPTIONS } from '@/utilities/pokemon/rarity-effects'
 
 interface BattleFormProps {
   data: Partial<BattleConfig>
@@ -483,23 +484,25 @@ export function BattleForm({ data, onChange }: BattleFormProps) {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="flex items-center gap-4 pt-8">
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id={`shadow-${index}`}
-                      checked={enemy.isShadow}
-                      onCheckedChange={(c) => updateEnemy(index, 'isShadow', c)}
-                    />
-                    <Label htmlFor={`shadow-${index}`}>Is Shadow</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id={`radiant-${index}`}
-                      checked={enemy.isRadiant}
-                      onCheckedChange={(c) => updateEnemy(index, 'isRadiant', c)}
-                    />
-                    <Label htmlFor={`radiant-${index}`}>Is Radiant</Label>
-                  </div>
+                <div className="space-y-2 pt-4">
+                  <Label>Rarity treatment</Label>
+                  <Select
+                    value={enemy.rarity || 'normal'}
+                    onValueChange={(rarity) =>
+                      updateEnemy(index, 'rarity', rarity)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {POKEMON_RARITY_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 

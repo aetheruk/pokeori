@@ -1,8 +1,8 @@
-import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import { getBundledPokemonSpriteUrl } from '@/utilities/pokemon/local-sprites'
 import { cn } from '@/lib/utils'
 import { ItemSprite } from '@/components/ui/item-sprite'
+import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
+import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
 
 interface PokemonDisplayProps {
   formId: string
@@ -22,6 +22,7 @@ interface PokemonDisplayProps {
   isShadow?: boolean
   isRadiant?: boolean
   shiny?: boolean
+  rarity?: PokemonRarityId | null
   gender?: string | null
   damageSplat?: number | null
   statusDamageSplat?: number | null
@@ -74,6 +75,7 @@ export function PokemonDisplay({
   isShadow,
   isRadiant,
   shiny,
+  rarity,
   gender,
   damageSplat,
   statusDamageSplat,
@@ -82,34 +84,6 @@ export function PokemonDisplay({
 }: PokemonDisplayProps) {
   const getTeraShardItemId = (type: string) => {
     return `tera-shard-${type.toLowerCase()}`
-  }
-
-  let imageUrl: string
-
-  if (backSprite) {
-    imageUrl = getBundledPokemonSpriteUrl({
-      formId,
-      family: 'gen-v',
-      direction: 'back',
-      shiny,
-      female: gender === 'female',
-    })
-  } else if (usePixelSprite) {
-    imageUrl = getBundledPokemonSpriteUrl({
-      formId,
-      family: 'gen-v',
-      direction: 'front',
-      shiny,
-      female: gender === 'female',
-    })
-  } else {
-    // Fallback to home sprite
-    imageUrl = getBundledPokemonSpriteUrl({
-      formId,
-      family: 'home',
-      shiny,
-      female: gender === 'female',
-    })
   }
 
   return (
@@ -138,16 +112,18 @@ export function PokemonDisplay({
         <div className="absolute inset-0 rounded-full bg-game-ochre/20 animate-ping" />
       )}
 
-      <Image
+      <PokemonRaritySprite
         key={formId} // Force re-render when formId changes
-        src={imageUrl}
+        formId={formId}
+        view={backSprite ? 'back' : usePixelSprite ? 'front' : 'home'}
+        rarity={rarity}
+        shiny={shiny}
+        isShadow={isShadow}
+        isRadiant={isRadiant}
+        female={gender === 'female'}
         alt="Pokemon"
-        fill
-        className={cn(
-          'object-contain drop-shadow-xl pixelated',
-          isShadow && 'shadow-aura',
-          isRadiant && 'radiant-aura',
-        )}
+        className="absolute inset-0"
+        imageClassName="drop-shadow-xl"
       />
 
       <TypeAttackEffect type={attackEffectType} />
@@ -164,10 +140,6 @@ export function PokemonDisplay({
           />
         </div>
       )}
-
-      {/* Shadow Pokemon Flame Effect */}
-      {isShadow && <div className="shadow-flame" />}
-      {isRadiant && <div className="radiant-flame" />}
 
       {/* Floating Damage Splats */}
       {/* Combat Damage (Center) */}

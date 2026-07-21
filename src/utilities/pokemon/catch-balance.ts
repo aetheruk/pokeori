@@ -98,10 +98,14 @@ export function applyQuestionBonusToCatchRate(
 export function getHardBallCatchRate({
   ballId,
   isUltraBeast,
+  isShadow,
 }: {
   ballId: string
   isUltraBeast?: boolean
+  isShadow?: boolean
 }): number | undefined {
+  if (isShadow) return ballId === 'rocket-ball' ? undefined : 0
+  if (ballId === 'rocket-ball') return 0
   if (ballId === 'master-ball') return undefined
   if (isUltraBeast) return ONE_IN_ONE_THOUSAND_CATCH_RATE
   if (ballId === 'beast-ball') return ONE_IN_ONE_THOUSAND_CATCH_RATE

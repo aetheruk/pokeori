@@ -68,6 +68,12 @@ export default function DevLayout({ children }: { children: React.ReactNode }) {
                     >
                       Abilities
                     </Link>
+                    <Link
+                      href="/dev/rarities"
+                      className="transition-colors hover:text-foreground/80 text-foreground/60"
+                    >
+                      Rarities
+                    </Link>
                   </nav>
                 </div>
               </div>

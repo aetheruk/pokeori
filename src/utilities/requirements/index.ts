@@ -1,4 +1,5 @@
 import type { User, Pokemon } from '@/payload-types'
+import { resolvePokemonRarity } from '@/utilities/pokemon/rarity-effects'
 import { regionCategories } from '@/data/region-map'
 import type {
   TaskCondition,
@@ -230,6 +231,7 @@ export function isPokemonEligible(pokemon: Pokemon, criteria: PokemonCriteria): 
   if (criteria.minLevel && pokemon.level < criteria.minLevel) return false
   if (criteria.maxLevel && pokemon.level > criteria.maxLevel) return false
   if (criteria.size && pokemon.size !== criteria.size) return false
+  if (criteria.rarity && resolvePokemonRarity(pokemon) !== criteria.rarity) return false
   if (criteria.shiny !== undefined && pokemon.shiny !== criteria.shiny) return false
   if (criteria.isShadow !== undefined && pokemon.isShadow !== criteria.isShadow) return false
   if (criteria.isRadiant !== undefined && pokemon.isRadiant !== criteria.isRadiant) return false
@@ -575,6 +577,7 @@ export function getRequirementProgress(
         if (check.locationId !== undefined) criteria.locationId = check.locationId
         if (check.isShadow !== undefined) criteria.isShadow = check.isShadow
         if (check.isRadiant !== undefined) criteria.isRadiant = check.isRadiant
+        if (check.rarity !== undefined) criteria.rarity = check.rarity
         if (check.stats !== undefined) criteria.stats = check.stats
 
         // Check if Pokemon matches criteria

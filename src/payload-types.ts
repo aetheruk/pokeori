@@ -547,9 +547,48 @@ export interface Pokemon {
   };
   nature?: string | null;
   identified?: boolean | null;
+  /**
+   * A Pokémon can have exactly one rarity treatment. This controls its sprite and derives legacy Shiny, Shadow, and Radiant flags.
+   */
+  rarity?:
+    | (
+        | 'normal'
+        | 'shiny'
+        | 'shadow'
+        | 'radiant'
+        | 'silver'
+        | 'gold'
+        | 'emerald'
+        | 'ruby'
+        | 'sapphire'
+        | 'crystal'
+        | 'retro'
+        | 'galactic'
+        | 'levin'
+        | 'inferno'
+        | 'prism'
+        | 'rainbow'
+        | 'celestial'
+        | 'black'
+        | 'white'
+        | 'void'
+        | 'glitch'
+        | 'ancient'
+        | 'toxic'
+      )
+    | null;
+  /**
+   * Derived from the canonical rarity treatment.
+   */
   shiny?: boolean | null;
   gender?: ('male' | 'female' | 'genderless') | null;
+  /**
+   * Derived from the canonical rarity treatment.
+   */
   isShadow?: boolean | null;
+  /**
+   * Derived from the canonical rarity treatment.
+   */
   isRadiant?: boolean | null;
   evolved?: boolean | null;
   height?: number | null;
@@ -1038,6 +1077,7 @@ export interface PokemonSelect<T extends boolean = true> {
       };
   nature?: T;
   identified?: T;
+  rarity?: T;
   shiny?: T;
   gender?: T;
   isShadow?: T;

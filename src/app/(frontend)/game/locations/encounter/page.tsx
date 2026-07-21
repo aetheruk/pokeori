@@ -82,6 +82,7 @@ import type {
   PublicEncounterQte,
 } from '@/utilities/pokemon/encounter-qte'
 import type { FlattenedPokemon } from '@/utilities/pokemon/pokedex'
+import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
 import {
   canUseItemWithSkillRequirements,
   getExplorerEncounterItemLimit,
@@ -103,6 +104,7 @@ const LevelUpModal = nextDynamic(
 )
 
 import { GameTimer } from '@/components/game/shared/game-timer'
+import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { TaskExitDialog } from '@/components/game/task-exit-dialog'
 import { CaptureScene } from './_components/capture-scene'
 import type { CaptureThrowPayload } from './_components/draggable-pokeball'
@@ -115,6 +117,7 @@ interface EncounterData {
   formId: string
   pokemonName: string
   isShiny: boolean
+  rarity?: PokemonRarityId
   gender?: 'male' | 'female' | 'genderless'
   startTime: number
   expiry: number
@@ -185,17 +188,17 @@ function getBallAdjustedCatchRate(
   targetLevel: number,
   userActiveLevel: number | undefined,
   hasCaughtEncounterSpecies: boolean,
+  isShadow: boolean,
   activeAbility?: AbilityConfig,
   sourceFormId?: string,
   extraQuestionBonus = 0,
 ): number {
-  if (ballId === 'master-ball') return 255
-
   const hour = new Date().getHours()
   const baseRate = species?.capture_rate || 100
   const isUltraBeast = ULTRA_BEASTS.includes(pokemonId)
-  const hardCatchRate = getHardBallCatchRate({ ballId, isUltraBeast })
+  const hardCatchRate = getHardBallCatchRate({ ballId, isUltraBeast, isShadow })
   if (hardCatchRate !== undefined) return hardCatchRate
+  if (ballId === 'master-ball') return 255
 
   const questionBonus = getBallQuestionBonus({
     ballId,
@@ -1351,6 +1354,7 @@ export default function EncounterPage() {
           selectedBall.id === 'level-ball' ? levelBallTargetLevel : targetLevel,
           encounter?.companionLevel,
           !!encounter?.hasCaughtEncounterSpecies,
+          encounter?.rarity === 'shadow',
           encounter?.activeAbility,
           encounter?.companionFormId,
           throwDisplayStageBonus,
@@ -1616,21 +1620,19 @@ export default function EncounterPage() {
             ) : captureBallContacted ? null : (
               // Show Pokemon (normal bouncing state)
               <>
-                <Image
-                  src={getPokemonImageUrl(
-                    encounter.formId,
-                    'home',
-                    encounter.isShiny,
-                    encounter.gender,
-                  )}
+                <PokemonRaritySprite
+                  formId={encounter.formId}
+                  view="home"
+                  rarity={encounter.rarity}
+                  shiny={encounter.isShiny}
+                  female={encounter.gender === 'female'}
                   alt="Pokemon"
-                  width={160}
-                  height={160}
-                  priority // LCP image - load with high priority
-                  className={cn(
-                    'w-full h-full object-contain pixelated drop-shadow-2xl',
+                  className="h-full w-full"
+                  imageClassName={cn(
+                    'pixelated drop-shadow-2xl',
                     !hasAttemptedCapture && 'animate-bounce-slow',
                   )}
+                  sizes="160px"
                 />
                 {encounter.isShiny && (
                   <div className="absolute top-0 right-0 animate-pulse text-2xl text-game-ochre">
@@ -1652,6 +1654,7 @@ export default function EncounterPage() {
                 className="flex items-center gap-1 rounded-full border border-game-night-border/60 bg-game-night-surface/85 px-3 py-0.5 text-xs font-semibold text-game-night-ink backdrop-blur-sm"
               >
                 {encounter.isShiny && <span>✨</span>}
+                {encounter.rarity === 'shadow' && <span>Shadow</span>}
                 {encounter.pokemonName}
               </motion.div>
             )}
@@ -1674,6 +1677,7 @@ export default function EncounterPage() {
                 qte={activeQte}
                 pokemonName={encounter.pokemonName}
                 formId={encounter.formId}
+                rarity={encounter.rarity}
                 shiny={encounter.isShiny}
                 gender={encounter.gender}
                 onComplete={handleQteComplete}

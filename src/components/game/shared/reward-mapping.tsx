@@ -19,6 +19,8 @@ import { getSkill } from '@/data/skills'
 import { tasks } from '@/data/tasks'
 import { getBanner, getIcon, getTitle } from '@/data/user'
 import { getPokemonForm, getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
+import { PokemonRaritySprite } from './PokemonRaritySprite'
+import { resolvePokemonRarity } from '@/utilities/pokemon/rarity-effects'
 
 const BACKGROUND_REWARD_SPRITE = '/sprites/items/forest-photo.avif'
 const TITLE_REWARD_SPRITE = '/sprites/items/certificate.avif'
@@ -118,8 +120,22 @@ export function mapRewardToDisplayItem(
       // Look up pokemon data
       const targetId = reward.targetId || '1'
       const pokemon = getPokemonForm(targetId)
+      const pokemonData = reward.pokemonData as
+        | {
+            rarity?: string
+            shiny?: boolean
+            isShadow?: boolean
+            isRadiant?: boolean
+          }
+        | undefined
 
-      const isShiny = reward.shiny || reward.pokemonData?.shiny
+      const rarity = resolvePokemonRarity({
+        rarity: pokemonData?.rarity,
+        shiny: reward.shiny || pokemonData?.shiny,
+        isShadow: pokemonData?.isShadow,
+        isRadiant: pokemonData?.isRadiant,
+      })
+      const isShiny = rarity === 'shiny'
 
       if (pokemon) {
         label = pokemon.name
@@ -138,11 +154,12 @@ export function mapRewardToDisplayItem(
 
       icon = (
         <div className="relative w-8 h-8">
-          <Image
-            src={getPokemonImageUrl(targetId.toString(), 'sprite', isShiny)}
+          <PokemonRaritySprite
+            formId={targetId.toString()}
+            view="front"
+            rarity={rarity}
             alt="Pokemon"
-            fill
-            className="object-contain pixelated"
+            className="h-full w-full"
           />
         </div>
       )
