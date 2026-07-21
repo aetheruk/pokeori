@@ -575,6 +575,7 @@ export interface Pokemon {
         | 'glitch'
         | 'ancient'
         | 'toxic'
+        | 'pixelated'
       )
     | null;
   /**

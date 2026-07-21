@@ -163,6 +163,13 @@ export const POKEMON_RARITY_EFFECTS = [
     group: 'cosmetic',
     sourcePalette: 'normal',
   },
+  {
+    id: 'pixelated',
+    label: 'Pixelated',
+    description: 'Chunky reduced-detail colour blocks with a crisp pixel grid.',
+    group: 'cosmetic',
+    sourcePalette: 'normal',
+  },
 ] as const satisfies readonly {
   id: string
   label: string
