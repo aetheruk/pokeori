@@ -1168,6 +1168,40 @@
   animation: pokemon-rarity-toxic-bubble-rise 3.8s ease-in infinite;
 }
 
+.pokemon-rarity-sprite--pixelated .pokemon-rarity-sprite__image {
+  image-rendering: pixelated;
+}
+
+.pokemon-rarity-sprite--pixelated .pokemon-rarity-sprite__overlay {
+  opacity: 0.82;
+  background:
+    repeating-conic-gradient(
+        from 45deg,
+        rgba(255, 255, 255, 0.28) 0 25%,
+        rgba(11, 25, 35, 0.2) 0 50%
+      )
+      50% / 14px 14px,
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 12px,
+      rgba(18, 32, 42, 0.24) 12px 14px
+    );
+  mix-blend-mode: soft-light;
+}
+
+.pokemon-rarity-sprite--pixelated .pokemon-rarity-sprite__overlay::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0 14px,
+    rgba(255, 255, 255, 0.3) 14px 17px,
+    transparent 17px 28px
+  );
+  mix-blend-mode: hard-light;
+}
+
 @keyframes pokemon-rarity-gleam {
   0%,
   100% {

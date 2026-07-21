@@ -34,6 +34,7 @@ describe('Pokemon rarity effects', () => {
       'glitch',
       'ancient',
       'toxic',
+      'pixelated',
     ])
     expect(new Set(POKEMON_RARITY_EFFECTS.map((effect) => effect.id)).size).toBe(
       POKEMON_RARITY_EFFECTS.length,
@@ -48,6 +49,7 @@ describe('Pokemon rarity effects', () => {
     expect(getPokemonRarityEffect('glitch').sourcePalette).toBe('normal')
     expect(getPokemonRarityEffect('ancient').sourcePalette).toBe('normal')
     expect(getPokemonRarityEffect('toxic').sourcePalette).toBe('normal')
+    expect(getPokemonRarityEffect('pixelated').sourcePalette).toBe('normal')
   })
 
   test('resolves every Pokemon to one canonical rarity and derives legacy flags', () => {
@@ -57,6 +59,7 @@ describe('Pokemon rarity effects', () => {
     expect(resolvePokemonRarity({ rarity: 'glitch' })).toBe('glitch')
     expect(resolvePokemonRarity({ rarity: 'ancient' })).toBe('ancient')
     expect(resolvePokemonRarity({ rarity: 'toxic' })).toBe('toxic')
+    expect(resolvePokemonRarity({ rarity: 'pixelated' })).toBe('pixelated')
     expect(resolvePokemonRarity({ rarity: 'inferno', shiny: true })).toBe('inferno')
     expect(resolvePokemonRarity({ rarity: 'invalid', isRadiant: true })).toBe('radiant')
     expect(getPokemonRarityLegacyFields('rainbow')).toEqual({
