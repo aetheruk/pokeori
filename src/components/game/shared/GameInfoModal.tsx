@@ -30,6 +30,8 @@ interface GameInfoModalProps {
   onOpenChange: (open: boolean) => void
   title: string | ReactNode
   description?: string | ReactNode
+  sourceHint?: string
+  bonusLabel?: string
   category?: string | ReactNode
   icon: ReactNode
   properties?: Array<{
@@ -60,6 +62,8 @@ export function GameInfoModal({
   onOpenChange,
   title,
   description,
+  sourceHint,
+  bonusLabel,
   category,
   icon,
   properties,
@@ -192,6 +196,19 @@ export function GameInfoModal({
                 <p className="text-sm font-medium leading-relaxed text-game-ink md:text-base">
                   {description}
                 </p>
+                {bonusLabel && (
+                  <div className="mt-3 inline-flex rounded-full border border-game-ochre/35 bg-game-ochre/10 px-2.5 py-1 text-xs font-bold text-game-ochre">
+                    {bonusLabel}
+                  </div>
+                )}
+                {sourceHint && (
+                  <div className="mt-3 flex items-start gap-2 border-t border-game-border pt-3 text-sm">
+                    <span className="shrink-0 font-bold uppercase tracking-wide text-game-moss-strong">
+                      Available at
+                    </span>
+                    <span className="text-game-muted">{sourceHint.replace(/^Available (at|from)\s+/i, '')}</span>
+                  </div>
+                )}
               </div>
             </div>
           )}

@@ -257,6 +257,12 @@ export function ExploreDetailsModal({
 
   const title = parseText(item.name, trainerName)
   const description = parseText(item.description, trainerName)
+  const sourceHint = (itemForModal.originalData as any)?.dailyMetadata?.sourceHint as
+    | string
+    | undefined
+  const bonusLabel = (itemForModal.originalData as any)?.dailyMetadata?.isBonus
+    ? 'Daily Bonus · 25 Professor Scrip'
+    : undefined
   const modalIcon = getExploreItemIcon(item, userData)
   const modalBackground = getExploreItemBackground(item, userData)
 
@@ -289,6 +295,8 @@ export function ExploreDetailsModal({
       title={title}
       category={getGameTypeLabel(item)}
       description={description}
+      sourceHint={sourceHint}
+      bonusLabel={bonusLabel}
       background={modalBackground}
       icon={<TaskIconDisplay icon={modalIcon} className="w-8 h-8" />}
       rewards={rewards}

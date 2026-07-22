@@ -50,7 +50,7 @@ Common uses:
 - Require an item or currency for entry.
 - Require selected Pokemon matching species, type, level, team, or companion checks.
 - Mark items or Pokemon with `consume: true` when entry/completion spends them.
-- Track objective progress for tasks and generated daily challenges.
+- Track objective progress for tasks and generated daily challenges. Generated dailies use `daily_activity` for successful activity events and retain the older `daily_*` criteria only for compatibility with already-issued tasks.
 
 For locking and unlocking:
 

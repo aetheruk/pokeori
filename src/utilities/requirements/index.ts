@@ -693,7 +693,8 @@ export function getRequirementProgress(
     case 'daily_catch':
     case 'daily_battle':
     case 'daily_card':
-    case 'daily_crystalize': {
+    case 'daily_crystalize':
+    case 'daily_activity': {
       current = condition.progress || 0
       break
     }

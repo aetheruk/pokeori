@@ -20,6 +20,7 @@ import {
   setUserInventoryMap,
   setUserShopPurchasesRecord,
 } from '@/utilities/user-state'
+import { recordDailyActivityProgress } from '@/utilities/tasks/daily-progress'
 
 export interface PurchaseItemResult {
   success: boolean
@@ -163,6 +164,11 @@ export async function purchaseShopItem(
   }))
 
   const { summary } = await grantRewards(user.id, rewardsToGrant, { skipDropChance: true })
+
+  await recordDailyActivityProgress(user.id, {
+    kind: 'shop_purchase',
+    sourceId: `${shop.id}:${item.id}`,
+  })
 
   revalidatePath('/game')
   revalidatePath('/game/shops')

@@ -39,6 +39,7 @@ import {
 import type { ArtisanCraftSession } from '@/utilities/artisan/types'
 import type { RewardSummary } from '@/utilities/rewards/reward-logic'
 import { getUserInventoryMap, setUserInventoryMap } from '@/utilities/user-state'
+import { recordDailyActivityProgress } from '@/utilities/tasks/daily-progress'
 
 const SESSION_TTL_SECONDS = 20
 const START_DELAY_MS = 650
@@ -357,6 +358,13 @@ export async function completeArtisanCraft(sessionId: string, craftInput?: numbe
       recipeName: recipe.name,
     }
     await setIdempotentResult(idemKey, result, 30)
+
+    if (!failed) {
+      await recordDailyActivityProgress(user.id, {
+        kind: 'craft_success',
+        sourceId: recipe.id,
+      })
+    }
 
     revalidatePath('/game/artisan')
     revalidatePath('/game/inventory')
