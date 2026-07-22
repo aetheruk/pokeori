@@ -17,6 +17,7 @@ import {
   processBattleAbilityWeatherTurnEffects,
   processBattleAbilityWeatherTypeChangesForState,
 } from './abilities'
+import { processBattleRarityTurnEnd } from './rarity-effects'
 
 export function processTurnEnd(state: BattleState): string[] {
   const messages = processEndTurnStatusDamage(state)
@@ -54,6 +55,8 @@ export function processTurnEnd(state: BattleState): string[] {
       enemyName: state.enemyName,
     }),
   )
+  messages.push(...processBattleRarityTurnEnd(playerMon))
+  messages.push(...processBattleRarityTurnEnd(enemyMon))
 
   return messages
 }

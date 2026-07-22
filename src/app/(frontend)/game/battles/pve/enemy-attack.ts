@@ -10,6 +10,7 @@ import type {
   BattleStance,
 } from '@/utilities/battle/types'
 import { finalizeTurn } from '../helpers/turn-finalization'
+import { applyBattleRarityEntryEffects } from '@/utilities/battle/rarity-effects'
 import type { User } from '@/payload-types'
 import {
   applyPveEnemyDamage,
@@ -221,6 +222,7 @@ export async function processEnemyAttackOnly(
       activeEnemy = state.enemyTeam[enemyAction.newIndex]
       activeEnemy.activeTurnStarted = state.turn + 1
       enemySwapped = true
+      const rarityMessages = applyBattleRarityEntryEffects(activeEnemy)
       const suppressionMessages = processBattleAbilitySuppressionForState(state)
       const weatherMessages = processBattleAbilityWeatherSet({
         state,
@@ -234,6 +236,7 @@ export async function processEnemyAttackOnly(
       })
       enemySwapMsg = [
         `\n${state.enemyName || 'Enemy'} withdrew ${oldEnemyName} and sent out ${activeEnemy.name}!`,
+        ...rarityMessages,
         ...suppressionMessages,
         ...weatherMessages,
         ...terrainMessages,
