@@ -31,6 +31,7 @@
 | Diglett Tunnel Tap | `src/data/games/diglett-tunnel-tap` | Reflex tunnel game where Diglett score and Dugtrio punish rushed taps |
 | Magnemite Circuit | `src/data/games/magnemite-circuit` | Rotating circuit puzzle for powering route machinery |
 | Rock Tunnel Echo Map | `src/data/games/rock-tunnel-echo-map` | Dark movement maze with one opening echo reveal and hidden hole traps |
+| Art Academy | `src/data/games/art-academy` | Timed Pokemon sprite-copying study with an extracted artwork palette and server-scored canvas |
 | TCG Memory | `src/data/games/tcg-memory` | Memory match with TCG cards |
 | Voltorb Flip | `src/data/games/voltorb-flip` | Puzzle game |
 | And more... | | |
@@ -116,6 +117,12 @@
 - Rock Tunnel Echo Map entries are authored through `settings.gridSize`, `playerStart`, `exit`, `walls`, optional `holes`, optional `timeLimit`, optional `maxMoves`, opening echo reveal timing, and optional Rock Push-style cave sprites.
 - The maze reveals once at the start, then goes dark except for the tile under the player. Hole tiles are shown during the opening echo and instantly fail the run when stepped on.
 - `rock-tunnel-echo-map-test` is a no-requirement Test sub-region entry for Rock Tunnel memory-maze tuning.
+
+## Art Academy
+- Art Academy entries require `settings.formId`, `timeLimit`, and a 50–100 `successThreshold`; `paletteSize` is optional and defaults to 12 representative opaque HOME-sprite colours.
+- The reference plate and freehand drawing board share a visual 3×3 guide overlay. The guides help with proportion but do not limit the player to cells.
+- At session start, the server normalizes the normal bundled HOME sprite to a fixed 64×64 transparent raster, builds the round palette, and keeps the indexed reference private in Redis. The client submits an indexed 64×64 version of its canvas, and the server scores exact palette matches only at reference-sprite pixels; paint outside the sprite is ignored.
+- `art-academy-test` is a no-requirement Kanto Test entry using Pikachu, a three-minute timer, an 8-colour palette, and a 50% passing threshold. The player sees a live similarity preview until the final 30 seconds, when it is hidden, and can submit at any time.
 
 ## Prize Wheel
 - Prize Wheel entries can require an authored currency cost before a spin starts. Current Chansey wheels spend League Tickets, are available anytime, do not use daily completion gates, and show their ticket cost plus prize pool odds in Explore modals.

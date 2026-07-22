@@ -63,6 +63,12 @@ const collectedRockPushRewardIdsSchema = z
   )
   .max(100)
   .optional()
+const artAcademyDrawingSchema = z
+  .string()
+  .min(1)
+  .max(6000)
+  .regex(/^[A-Za-z0-9_-]+$/)
+  .optional()
 
 const submitAnswerSchemas: Partial<Record<GameType, z.ZodType>> = {
   silhouette: idAnswerSchema,
@@ -154,12 +160,14 @@ export function validateResearchCompletionInput(
   additionalLosses?: unknown,
   collectedEndlessRewards?: unknown,
   collectedRockPushRewardIds?: unknown,
+  artAcademyDrawing?: unknown,
 ): ValidationResult<{
   success: boolean
   finalScore?: number
   additionalLosses?: number
   collectedEndlessRewards?: Record<string, number>
   collectedRockPushRewardIds?: string[]
+  artAcademyDrawing?: string
 }> {
   const successResult = z.boolean().safeParse(success)
   if (!successResult.success) {
@@ -202,6 +210,12 @@ export function validateResearchCompletionInput(
     return { success: false, error: 'Invalid rock push rewards' }
   }
 
+  const artAcademyDrawingResult =
+    artAcademyDrawingSchema.safeParse(artAcademyDrawing)
+  if (!artAcademyDrawingResult.success) {
+    return { success: false, error: 'Invalid art academy drawing' }
+  }
+
   return {
     success: true,
     value: {
@@ -212,6 +226,7 @@ export function validateResearchCompletionInput(
       collectedRockPushRewardIds: rockPushCollectedResult.data
         ? Array.from(new Set(rockPushCollectedResult.data))
         : undefined,
+      artAcademyDrawing: artAcademyDrawingResult.data,
     },
   }
 }

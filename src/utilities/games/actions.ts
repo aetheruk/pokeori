@@ -39,6 +39,7 @@ const gameTypeToResearchType: Record<GameType, string> = {
   'diglett-tunnel-tap': 'diglett-tunnel-tap',
   'magnemite-circuit': 'magnemite-circuit',
   'rock-tunnel-echo-map': 'rock-tunnel-echo-map',
+  'art-academy': 'art-academy',
 } as const
 
 // Get a game config by ID

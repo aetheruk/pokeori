@@ -79,6 +79,26 @@ describe('research input validation', () => {
       validateResearchCompletionInput(true, 100, 0, { '0:0': 10_001 }).success,
     ).toBe(false)
     expect(
+      validateResearchCompletionInput(
+        false,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        'AQ',
+      ).success,
+    ).toBe(true)
+    expect(
+      validateResearchCompletionInput(
+        false,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        'not=base64url',
+      ).success,
+    ).toBe(false)
+    expect(
       validateResearchCompletionInput(true, undefined, undefined, undefined, [
         '../bad',
       ]).success,
