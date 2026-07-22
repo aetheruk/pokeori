@@ -15,7 +15,7 @@ import { grantRewards, type Reward, type RewardSummary } from '@/utilities/rewar
 import { revalidatePath } from 'next/cache'
 import type { Pokemon, User } from '@/payload-types'
 import { getGameUserData } from '@/utilities/game-data'
-import { analyzeRequirements, type GameDataKeys } from '@/utilities/requirements/analysis'
+import { analyzeRequirements } from '@/utilities/requirements/analysis'
 import { recordExpeditionActivityResult } from '@/utilities/expeditions/actions'
 import { resolveTaskPokemonOrigin } from '@/utilities/pokemon/origin'
 import {
@@ -25,6 +25,7 @@ import {
   setUserInventoryMap,
 } from '@/utilities/user-state'
 import { isToday } from '@/utilities/date-utils'
+import { acquireActionLock, releaseActionLock } from '@/utilities/game-integrity'
 
 // Server-side password map: taskId -> accepted passwords
 // Passwords stored here only, never exposed to client
@@ -315,42 +316,56 @@ export async function refreshDailyTasks(): Promise<{ success: boolean; message?:
     return { success: false, message: 'Not authenticated' }
   }
 
-  const payload = await getPayload({ config: payloadConfig })
-  const userRefetched = await payload.findByID({ collection: 'users', id: user.id })
-
-  const completedTasks = await getUserCompletedTasksMap(payload, user.id)
-  const hasTutorial16 = Boolean(completedTasks['tutorial-16'])
-
-  if (!hasTutorial16) {
-    return { success: false, message: 'Daily challenges are locked until tutorial completion' }
+  const refreshLock = await acquireActionLock(`lock:daily-refresh:${user.id}`, 15)
+  if (!refreshLock.acquired) {
+    return { success: false, message: 'Daily challenges are already refreshing' }
   }
 
-  // Check if we already refreshed in the current UTC daily reset window.
-  const lastRefresh = (userRefetched as any).lastDailyRefresh
-    ? ((userRefetched as any).lastDailyRefresh as string)
-    : null
-  const today = new Date()
+  try {
+    const payload = await getPayload({ config: payloadConfig })
+    const userRefetched = await payload.findByID({ collection: 'users', id: user.id })
 
-  if (isToday(lastRefresh, today)) {
-    return { success: false, message: 'Already refreshed today' }
+    const completedTasks = await getUserCompletedTasksMap(payload, user.id)
+    const hasTutorial16 = Boolean(completedTasks['tutorial-16'])
+
+    if (!hasTutorial16) {
+      return { success: false, message: 'Daily challenges are locked until tutorial completion' }
+    }
+
+    // Check if we already refreshed in the current UTC daily reset window.
+    const lastRefresh = (userRefetched as any).lastDailyRefresh
+      ? ((userRefetched as any).lastDailyRefresh as string)
+      : null
+    const today = new Date()
+
+    if (isToday(lastRefresh, today)) {
+      return { success: false, message: 'Already refreshed today' }
+    }
+
+    // A full requirement snapshot is intentional: daily source selection spans
+    // locations, battles, games, shops, recipes, voyages, and TCG state.
+    const { generateDailyTasks } = require('@/utilities/tasks/daily-generator')
+    const userData = await getGameUserData(userRefetched as User)
+    const yesterday = new Date(today)
+    yesterday.setUTCDate(yesterday.getUTCDate() - 1)
+    const previousTasks = isToday(lastRefresh, yesterday)
+      ? (((userRefetched as any).activeDailyTasks as any[]) || [])
+      : undefined
+
+    const newTasks = generateDailyTasks(userData, { previousTasks })
+
+    await payload.update({
+      collection: 'users',
+      id: user.id,
+      data: {
+        lastDailyRefresh: today.toISOString(),
+        activeDailyTasks: newTasks,
+      } as any,
+    })
+
+    revalidatePath('/game/tasks')
+    return { success: true }
+  } finally {
+    await releaseActionLock(refreshLock)
   }
-
-  // Generate new active tasks
-  const { generateDailyTasks } = require('@/utilities/tasks/daily-generator')
-  const requiredKeys: GameDataKeys[] = ['pokemon', 'inventory', 'tcg', 'pokedex', 'battleResults']
-  const userData = await getGameUserData(userRefetched as User, requiredKeys)
-
-  const newTasks = generateDailyTasks(userData)
-
-  await payload.update({
-    collection: 'users',
-    id: user.id,
-    data: {
-      lastDailyRefresh: today.toISOString(),
-      activeDailyTasks: newTasks,
-    } as any,
-  })
-
-  revalidatePath('/game/tasks')
-  return { success: true }
 }

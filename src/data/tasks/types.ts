@@ -37,6 +37,7 @@ export type TaskRequirementType =
   | 'daily_battle'
   | 'daily_card'
   | 'daily_crystalize'
+  | 'daily_activity'
   | 'daily_not_completed'
   | 'rival_selected'
   | 'weather'
@@ -89,6 +90,33 @@ export interface BattleTeamCheck {
   qty?: number // Defaults to 1
 }
 
+export type DailyActivityKind =
+  | 'catch'
+  | 'battle_win'
+  | 'research_win'
+  | 'fishing_catch'
+  | 'craft_success'
+  | 'shop_purchase'
+  | 'voyage_success'
+  | 'card_collected'
+  | 'card_crystalized'
+
+export interface DailyActivityConfig {
+  kind: DailyActivityKind
+  /** Restrict progress to these authored activity IDs when present. */
+  sourceIds?: string[]
+}
+
+export interface DailyTaskMetadata {
+  family: string
+  templateId: string
+  /** Stable per-objective value used for daily rotation. */
+  signature: string
+  sourceHint: string
+  /** The one daily challenge that awards twice the normal Professor Scrip. */
+  isBonus?: boolean
+}
+
 export interface TaskCondition {
   type: TaskRequirementType
   targetId?: string | number | string[]
@@ -112,6 +140,7 @@ export interface TaskCondition {
   }
   powerType?: 'tera' | 'mega' | 'z-move' | 'dynamax' | 'shout' | 'victory' | 'weather' | 'circadian'
   battleType?: 'wild' | 'trainer'
+  dailyActivity?: DailyActivityConfig
   level?: number
   inverse?: boolean
   label?: string
@@ -189,4 +218,5 @@ export interface Task {
   background?: string
   daily?: boolean
   isRandomEvent?: boolean
+  dailyMetadata?: DailyTaskMetadata
 }

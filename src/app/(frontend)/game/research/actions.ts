@@ -24,6 +24,7 @@ import {
   setIdempotentResult,
 } from '@/utilities/game-integrity'
 import { recordExpeditionActivityResult } from '@/utilities/expeditions/actions'
+import { recordDailyActivityProgress } from '@/utilities/tasks/daily-progress'
 import type { ExpeditionProgressSnapshot } from '@/utilities/expeditions/actions'
 import { isActivityEligibleForReplay } from '@/utilities/activity-replay'
 import {
@@ -106,6 +107,8 @@ import {
   shouldApplyResearchAnswerGrace,
   shouldProtectFieldObservationRewards,
 } from '@/utilities/pokemon/encounter-ability-runtime'
+
+const DAILY_EXCLUDED_GAME_TYPES = new Set(['slots', 'pachinko', 'prize-wheel'])
 
 export async function getUser(): Promise<User | null> {
   const payload = await getPayload({ config: configPromise })
@@ -2082,6 +2085,17 @@ export async function completeResearchEncounter(
               : {}),
           },
         )
+      }
+
+      if (
+        (actualSuccess || isEndlessWin) &&
+        encounter.gameType !== 'fishing' &&
+        !DAILY_EXCLUDED_GAME_TYPES.has(encounter.gameType)
+      ) {
+        await recordDailyActivityProgress(user.id, {
+          kind: 'research_win',
+          sourceId: validatedEncounterId,
+        })
       }
 
       // Deduct cost for additional losses (misses) if any

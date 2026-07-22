@@ -2,87 +2,112 @@
 
 import { getPayload } from 'payload'
 import payloadConfig from '@/payload.config'
-import type { Task, TaskCondition } from '@/data/tasks/types'
+import {
+  acquireActionLock,
+  releaseActionLock,
+} from '@/utilities/game-integrity'
+import type { DailyActivityKind } from '@/data/tasks/types'
 
-export type DailyProgressType = 'daily_catch' | 'daily_battle' | 'daily_card' | 'daily_crystalize'
+export type DailyProgressType =
+  | 'daily_catch'
+  | 'daily_battle'
+  | 'daily_card'
+  | 'daily_crystalize'
+
+export type DailyActivityEvent = {
+  kind: DailyActivityKind
+  amount?: number
+  sourceId?: string
+  speciesId?: number
+  types?: string[]
+  isTrainer?: boolean
+  legacyType?: DailyProgressType
+}
+
+export type DailyProgressMetadata = Pick<
+  DailyActivityEvent,
+  'sourceId' | 'speciesId' | 'types' | 'isTrainer'
+>
+
+function matchesCatchCriteria(criterion: any, event: DailyActivityEvent) {
+  if (criterion.pokemonCriteria?.speciesId && criterion.pokemonCriteria.speciesId !== event.speciesId) {
+    return false
+  }
+
+  if (criterion.pokemonCriteria?.type) {
+    const normalizedTypes = (event.types || []).map((type) => type.toLowerCase())
+    if (!normalizedTypes.includes(criterion.pokemonCriteria.type.toLowerCase())) return false
+  }
+
+  return true
+}
+
+function matchesBattleCriteria(criterion: any, event: DailyActivityEvent) {
+  if (criterion.battleType === 'wild' && event.isTrainer) return false
+  if (criterion.battleType === 'trainer' && !event.isTrainer) return false
+  return true
+}
+
+function matchesCriterion(criterion: any, event: DailyActivityEvent) {
+  if (criterion.type === 'daily_activity') {
+    if (criterion.dailyActivity?.kind !== event.kind) return false
+    const sourceIds = criterion.dailyActivity?.sourceIds
+    if (sourceIds?.length && (!event.sourceId || !sourceIds.includes(event.sourceId))) return false
+    if (event.kind === 'catch' || event.kind === 'fishing_catch') {
+      return matchesCatchCriteria(criterion, event)
+    }
+    if (event.kind === 'battle_win') return matchesBattleCriteria(criterion, event)
+    return true
+  }
+
+  if (!event.legacyType || criterion.type !== event.legacyType) return false
+  if (event.legacyType === 'daily_catch') return matchesCatchCriteria(criterion, event)
+  if (event.legacyType === 'daily_battle') return matchesBattleCriteria(criterion, event)
+  return true
+}
 
 /**
- * Increments the explicit progress property for dynamic daily tasks inside the User payload's activeDailyTasks array.
+ * Records a successful player activity against every matching generated daily.
+ * The user-scoped lock prevents simultaneous game actions from overwriting each
+ * other's activeDailyTasks progress snapshot.
  */
-export async function incrementDailyTaskProgress(
+export async function recordDailyActivityProgress(
   userId: string,
-  progressType: DailyProgressType,
-  amount: number = 1,
-  metadata?: {
-    speciesId?: number
-    types?: string[]
-    isTrainer?: boolean
-  },
+  event: DailyActivityEvent,
 ): Promise<{ success: boolean; completedTaskIds?: string[] }> {
+  const lock = await acquireActionLock(`lock:daily-progress:${userId}`, 5)
+  if (!lock.acquired) return { success: false }
+
   try {
     const payload = await getPayload({ config: payloadConfig })
     const user = await payload.findByID({ collection: 'users', id: userId })
-
-    // Using any internally due to payload generic type generation limits
     const activeTasks = ((user as any).activeDailyTasks as any[]) || []
-
     if (activeTasks.length === 0) return { success: false }
 
     let updated = false
-    const completedTaskIds: string[] = []
+    const completedTaskIds = new Set<string>()
+    const amount = Math.max(1, Math.floor(event.amount || 1))
 
-    // Map through the active structure. Tasks contain requirements/criteria arrays
-    // where objects are of type TaskCondition
     const updatedTasks = activeTasks.map((task: any) => {
-      // Create a shallow copy to prevent mutation bugs
-      const t = { ...task }
+      if (task.completed) return task
 
-      const criteria = t.criteria || []
-      const updatedCriteria = criteria.map((crit: any) => {
-        if (crit.type === progressType) {
-          // Filtering logic
-          if (progressType === 'daily_catch' && metadata) {
-            // Check species if required
-            if (
-              crit.pokemonCriteria?.speciesId &&
-              crit.pokemonCriteria.speciesId !== metadata.speciesId
-            ) {
-              return crit
-            }
-            // Check type if required
-            if (crit.pokemonCriteria?.type && metadata.types) {
-              const normalizedTypes = metadata.types.map((ty: string) => ty.toLowerCase())
-              if (!normalizedTypes.includes(crit.pokemonCriteria.type.toLowerCase())) {
-                return crit
-              }
-            }
-          }
+      const criteria = task.criteria || []
+      const updatedCriteria = criteria.map((criterion: any) => {
+        if (!matchesCriterion(criterion, event)) return criterion
 
-          if (progressType === 'daily_battle' && metadata) {
-            if (crit.battleType === 'wild' && metadata.isTrainer) {
-              return crit
-            }
-            if (crit.battleType === 'trainer' && !metadata.isTrainer) {
-              return crit
-            }
-          }
+        const previousProgress = criterion.progress || 0
+        const target = criterion.count || 1
+        const nextProgress = Math.min(target, previousProgress + amount)
+        updated = true
 
-          const newProgress = (crit.progress || 0) + amount
-          const isComplete = newProgress >= (crit.count || 1)
-
-          updated = true
-          // If we just pushed it over the edge to completion on this update event
-          if (isComplete && (crit.progress || 0) < (crit.count || 1)) {
-            completedTaskIds.push(t.id)
-          }
-
-          return { ...crit, progress: newProgress }
+        if (nextProgress >= target && previousProgress < target) {
+          completedTaskIds.add(task.id)
         }
-        return crit
+
+        return { ...criterion, progress: nextProgress }
       })
 
-      t.criteria = updatedCriteria
-      return t
+      return { ...task, criteria: updatedCriteria }
     })
 
     if (!updated) return { success: false }
@@ -90,14 +115,36 @@ export async function incrementDailyTaskProgress(
     await payload.update({
       collection: 'users',
       id: userId,
-      data: {
-        activeDailyTasks: updatedTasks,
-      } as any, // Cast to any due to custom JSON types
+      data: { activeDailyTasks: updatedTasks } as any,
     })
 
-    return { success: true, completedTaskIds }
+    return { success: true, completedTaskIds: Array.from(completedTaskIds) }
   } catch (error) {
-    console.error(`Failed to increment daily task progress for ${progressType}:`, error)
+    console.error(`Failed to record daily activity progress for ${event.kind}:`, error)
     return { success: false }
+  } finally {
+    await releaseActionLock(lock)
   }
+}
+
+/** Backwards-compatible entry point for existing catch, battle, and TCG actions. */
+export async function incrementDailyTaskProgress(
+  userId: string,
+  progressType: DailyProgressType,
+  amount: number = 1,
+  metadata?: DailyProgressMetadata,
+): Promise<{ success: boolean; completedTaskIds?: string[] }> {
+  const kindByLegacyType: Record<DailyProgressType, DailyActivityKind> = {
+    daily_catch: 'catch',
+    daily_battle: 'battle_win',
+    daily_card: 'card_collected',
+    daily_crystalize: 'card_crystalized',
+  }
+
+  return recordDailyActivityProgress(userId, {
+    kind: kindByLegacyType[progressType],
+    legacyType: progressType,
+    amount,
+    ...metadata,
+  })
 }

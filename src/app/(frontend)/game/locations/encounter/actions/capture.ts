@@ -12,7 +12,7 @@ import {
   generatePokemonStats,
   computeStats,
 } from '@/utilities/pokemon/pokemon-mechanics'
-import { incrementDailyTaskProgress } from '@/utilities/tasks/daily-progress'
+import { recordDailyActivityProgress } from '@/utilities/tasks/daily-progress'
 import { grantRewards } from '@/utilities/rewards/reward-logic'
 import { MOON_STONE_EVOLVERS, ULTRA_BEASTS } from '@/data/lists/special-pokemon'
 import { ABILITIES } from '@/data/abilities'
@@ -837,7 +837,14 @@ export async function attemptCapture(
     }
 
     // Daily Tasks Explicit Progress Tracking
-    await incrementDailyTaskProgress(user.id, 'daily_catch', 1, {
+    const fishingEncounterId = state.locationId.startsWith('fishing:')
+      ? state.locationId.replace('fishing:', '')
+      : undefined
+    await recordDailyActivityProgress(user.id, {
+      kind: fishingEncounterId ? 'fishing_catch' : 'catch',
+      legacyType: 'daily_catch',
+      sourceId: fishingEncounterId || state.locationId,
+      amount: 1,
       speciesId: state.pokemonId,
       types: formData?.types || [],
     })

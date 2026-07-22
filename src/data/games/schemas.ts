@@ -104,6 +104,7 @@ export const taskConditionSchema: z.ZodType<any> = z.lazy(() =>
         'daily_battle',
         'daily_card',
         'daily_crystalize',
+        'daily_activity',
         'daily_not_completed',
         'weather',
         'roll',
@@ -126,6 +127,22 @@ export const taskConditionSchema: z.ZodType<any> = z.lazy(() =>
         .enum(['tera', 'mega', 'z-move', 'dynamax', 'shout', 'victory', 'weather', 'circadian'])
         .optional(),
       battleType: z.enum(['wild', 'trainer']).optional(),
+      dailyActivity: z
+        .object({
+          kind: z.enum([
+            'catch',
+            'battle_win',
+            'research_win',
+            'fishing_catch',
+            'craft_success',
+            'shop_purchase',
+            'voyage_success',
+            'card_collected',
+            'card_crystalized',
+          ]),
+          sourceIds: z.array(z.string()).optional(),
+        })
+        .optional(),
       level: z.number().optional(),
       inverse: z.boolean().optional(),
       label: z.string().optional(),

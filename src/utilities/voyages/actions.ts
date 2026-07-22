@@ -11,6 +11,7 @@ import { checkTaskRequirements } from '@/utilities/tasks/task-logic'
 import { RequirementData } from '@/utilities/requirements'
 import { StartVoyageSchema } from '@/utilities/validators'
 import { getExplorerVoyageSlotCount, getSkillLevel } from '@/utilities/skills/unlocks'
+import { recordDailyActivityProgress } from '@/utilities/tasks/daily-progress'
 
 export type VoyageResult = {
   success: boolean
@@ -258,6 +259,13 @@ export async function completeVoyage(voyageId: string): Promise<VoyageResult> {
       voyageStats: newStats,
     },
   })
+
+  if (isSuccess) {
+    await recordDailyActivityProgress(user.id, {
+      kind: 'voyage_success',
+      sourceId: voyage.id,
+    })
+  }
 
   revalidatePath('/game/voyages')
 

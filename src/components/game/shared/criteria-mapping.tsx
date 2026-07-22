@@ -10,10 +10,15 @@ import {
   CloudSnow,
   CloudSun,
   Cloudy,
+  Compass,
+  Fish,
   Flag,
+  Hammer,
   Heart,
+  Microscope,
   Search,
   ShoppingBag,
+  Store,
   Star,
   Sun,
   Swords,
@@ -777,6 +782,61 @@ export function mapCriteriaToDisplayItem(
         icon: <Zap className="w-5 h-5 text-game-moss-strong" />,
         label: `Crystalize ${count} Cards`,
         subLabel: 'TCG Mastery',
+      }
+    }
+    case 'daily_activity': {
+      const kind = condition.dailyActivity?.kind
+      const activityLabels: Record<string, { label: string; subLabel: string; icon: React.ReactNode }> = {
+        catch: {
+          label: `Catch ${count} ${pluralize('Pokemon', count)}`,
+          subLabel: 'Field Research',
+          icon: <MdCatchingPokemon className="w-5 h-5 text-game-moss-strong" />,
+        },
+        battle_win: {
+          label: `Win ${count} ${pluralize('battle', count)}`,
+          subLabel: 'Combat Drill',
+          icon: <Swords className="w-5 h-5 text-game-moss-strong" />,
+        },
+        research_win: {
+          label: `Complete ${count} research ${pluralize('round', count)}`,
+          subLabel: 'Research Assignment',
+          icon: <Microscope className="w-5 h-5 text-game-moss-strong" />,
+        },
+        fishing_catch: {
+          label: `Catch ${count} ${pluralize('Pokemon', count)} while fishing`,
+          subLabel: 'Fishing Assignment',
+          icon: <Fish className="w-5 h-5 text-game-moss-strong" />,
+        },
+        craft_success: {
+          label: `Complete ${count} successful ${pluralize('craft', count)}`,
+          subLabel: 'Artisan Assignment',
+          icon: <Hammer className="w-5 h-5 text-game-moss-strong" />,
+        },
+        shop_purchase: {
+          label: `Make ${count} shop ${pluralize('purchase', count)}`,
+          subLabel: 'Supply Run',
+          icon: <Store className="w-5 h-5 text-game-moss-strong" />,
+        },
+        voyage_success: {
+          label: `Complete ${count} successful ${pluralize('voyage', count)}`,
+          subLabel: 'Expedition Assignment',
+          icon: <Compass className="w-5 h-5 text-game-moss-strong" />,
+        },
+        card_collected: {
+          label: `Collect ${count} ${pluralize('card', count)}`,
+          subLabel: 'TCG Discovery',
+          icon: <Image src="/sprites/card.avif" alt="TCG Card" width={24} height={24} className="w-6 h-6 object-contain" />,
+        },
+        card_crystalized: {
+          label: `Crystalize ${count} ${pluralize('card', count)}`,
+          subLabel: 'TCG Mastery',
+          icon: <Zap className="w-5 h-5 text-game-moss-strong" />,
+        },
+      }
+      return activityLabels[kind || ''] || {
+        icon: <Calendar className="w-5 h-5 text-game-moss-strong" />,
+        label: `Complete ${count} daily activities`,
+        subLabel: 'Daily Challenge',
       }
     }
 
