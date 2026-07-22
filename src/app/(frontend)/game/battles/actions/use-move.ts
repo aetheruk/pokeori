@@ -37,6 +37,10 @@ import { finalizeTurn } from '../helpers/turn-finalization'
 import { processEnemyAttackOnly } from '../pve/enemy-attack'
 import { queuePvpMoveAndResolveTurn } from '../pvp/turn-sync'
 import { applyPveExtraHit } from '@/utilities/battle/engine/pve-turn'
+import {
+  applyBattleRarityEntryEffects,
+  processBattleRarityAttackAttempt,
+} from '@/utilities/battle/rarity-effects'
 import { applyRepeatedHitDamage } from '@/utilities/battle/multi-hit'
 import { getBattleMoveOptions } from '@/utilities/pokemon/pokemon-moves'
 import {
@@ -824,6 +828,7 @@ export async function useMove(
         enemyMon = state.enemyTeam[enemyAction.newIndex]
         enemyMon.activeTurnStarted = state.turn + 1
         enemySwapped = true
+        const rarityMessages = applyBattleRarityEntryEffects(enemyMon)
         const weatherMessages = processBattleAbilityWeatherSet({
           state,
           pokemon: enemyMon,
@@ -836,6 +841,7 @@ export async function useMove(
         })
         enemySwapMsg = [
           `${state.enemyName || 'Enemy'} withdrew ${oldEnemyName} and sent out ${enemyMon.name}!`,
+          ...rarityMessages,
           ...weatherMessages,
           ...terrainMessages,
         ].join('\n')
@@ -1750,6 +1756,13 @@ export async function useMove(
       playerMon.status = undefined
       message += `\n${playerMon.name} resurfaced!`
     }
+    if (!moveFailed) {
+      const rarityMessages = processBattleRarityAttackAttempt({
+        attacker: playerMon,
+        defender: enemyMon,
+      })
+      if (rarityMessages.length) message += `\n${rarityMessages.join('\n')}`
+    }
 
     // Enemy retaliation
     let enemyDamage = 0
@@ -2196,6 +2209,13 @@ export async function useMove(
           enemyDamageResult.usedType,
         )
         if (heldBreakResult.applied) message += `\n${heldBreakResult.message}`
+      }
+      if (!enemyMoveInterrupted && !enemyMoveFailed) {
+        const rarityMessages = processBattleRarityAttackAttempt({
+          attacker: enemyMon,
+          defender: playerMon,
+        })
+        if (rarityMessages.length) message += `\n${rarityMessages.join('\n')}`
       }
 
       const enemyName = state.enemyName || 'Enemy'

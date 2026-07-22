@@ -13,6 +13,7 @@ import {
   applyHeldItemChargeOnHit,
 } from '@/utilities/battle/held-items'
 import { attemptHeldAttackStatus } from '@/utilities/battle/status-effects-logic'
+import { processBattleRarityAttackAttempt } from '@/utilities/battle/rarity-effects'
 import type { WeatherType } from '@/data/weather'
 import { BASE_BATTLE_POWER } from '@/utilities/battle/constants'
 import {
@@ -575,6 +576,13 @@ export function applyPveDamageExchange(params: {
     enemyCanMove && playerMon.currentHp > 0
       ? attemptHeldAttackStatus(enemyMon, playerMon, enemyAttackType)
       : { applied: false, message: '' }
+  const playerRarityMessages = processBattleRarityAttackAttempt({
+    attacker: playerMon,
+    defender: enemyMon,
+  })
+  const enemyRarityMessages = enemyCanMove
+    ? processBattleRarityAttackAttempt({ attacker: enemyMon, defender: playerMon })
+    : []
   const playerBreakResult = applyHeldAttackBreak(playerMon, playerAttackType)
   const enemyBreakResult = enemyCanMove
     ? applyHeldAttackBreak(enemyMon, enemyAttackType)
@@ -603,6 +611,8 @@ export function applyPveDamageExchange(params: {
       enemyChargeResult.message,
       playerChargeResult.message,
       ...playerFaintBondMessages,
+      ...playerRarityMessages,
+      ...enemyRarityMessages,
       ...enemyFaintBondMessages,
       playerHeldStatusResult.message,
       enemyHeldStatusResult.message,
@@ -827,6 +837,9 @@ export function applyPveEnemyDamage(params: {
     enemyCanMove && enemyMon && playerMon.currentHp > 0
       ? attemptHeldAttackStatus(enemyMon, playerMon, enemyAttackType, random)
       : { applied: false, message: '' }
+  const rarityMessages = enemyCanMove
+    ? processBattleRarityAttackAttempt({ attacker: enemyMon, defender: playerMon, random })
+    : []
   const breakResult =
     enemyCanMove && enemyMon
       ? applyHeldAttackBreak(enemyMon, enemyAttackType, random)
@@ -844,6 +857,7 @@ export function applyPveEnemyDamage(params: {
       ...koStatStages,
       chargeResult.message,
       ...faintBondMessages,
+      ...rarityMessages,
       heldStatusResult.message,
       breakResult.message,
     ].filter((message): message is string => Boolean(message)),

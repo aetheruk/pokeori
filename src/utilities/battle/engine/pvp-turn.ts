@@ -42,6 +42,10 @@ import {
   resetBattleTypeChange,
 } from '@/utilities/battle/tera'
 import { clearDynamaxState } from '@/utilities/battle/dynamax'
+import {
+  applyBattleRarityEntryEffects,
+  processBattleRarityAttackAttempt,
+} from '@/utilities/battle/rarity-effects'
 import { BASE_BATTLE_POWER } from '@/utilities/battle/constants'
 import {
   Z_MOVE_DAMAGE_MULTIPLIER,
@@ -1419,6 +1423,14 @@ export function resolvePvpCombat(params: {
     attacker.status = undefined
     effectMessage += `\n${attacker.name} resurfaced!`
   }
+  if (!moveFailed) {
+    const rarityMessages = processBattleRarityAttackAttempt({
+      attacker,
+      defender,
+      random,
+    })
+    if (rarityMessages.length) effectMessage += ` ${rarityMessages.join(' ')}`
+  }
   const endureMessage = ''
   const weatherMessage = damageResult.weatherMessage
     ? ` ${damageResult.weatherMessage}`
@@ -1483,6 +1495,7 @@ export function resolvePvpFaint(
     if (side === 'player') state.activePlayerIndex = nextIndex
     else state.activeEnemyIndex = nextIndex
     team[nextIndex].activeTurnStarted = state.turn + 1
+    const rarityMessages = applyBattleRarityEntryEffects(team[nextIndex])
     const suppressionMessages = processBattleAbilitySuppressionForState(
       state as BattleState,
     )
@@ -1492,6 +1505,7 @@ export function resolvePvpFaint(
     )
     messages.push(
       ...suppressionMessages,
+      ...rarityMessages,
       ...processBattleAbilityWeatherSet({
         state: state as BattleState,
         pokemon: team[nextIndex],

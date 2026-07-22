@@ -19,6 +19,8 @@ import {
   getBattleMaxHpOverride,
   suppressesBattleHeldItemEffectsByAbility,
 } from './abilities'
+import { resolvePokemonRarity } from '@/utilities/pokemon/rarity-effects'
+import { refreshBattleRarityTypes } from './rarity-effects'
 
 export const TYPE_STANCE_PREFERENCES: Record<string, BattleStance> = {
   // Physical types (prefer Power stance)
@@ -324,6 +326,14 @@ export function calculateStats(
     stats.speed = Math.floor(stats.speed * 1.2)
   }
 
+  const rarity = resolvePokemonRarity(pokemon)
+  if (rarity === 'gold' || rarity === 'silver') {
+    stats.hp = Math.floor(stats.hp * 1.1)
+  }
+  if (rarity === 'ancient') {
+    stats.defense = Math.floor(stats.defense * 1.15)
+  }
+
   return stats
 }
 
@@ -442,6 +452,7 @@ export function applyBattleFormChange(
   pokemon.formId = formId
   pokemon.name = formData.name || pokemon.name
   pokemon.types = formData.types || pokemon.types
+  refreshBattleRarityTypes(pokemon)
   const currentHp = pokemon.currentHp
   const hpRatio = pokemon.maxHp > 0 ? currentHp / pokemon.maxHp : 0
   const stats = applyHeldItemStatModifiers(

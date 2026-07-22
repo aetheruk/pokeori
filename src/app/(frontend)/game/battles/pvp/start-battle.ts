@@ -13,6 +13,7 @@ import {
 import { getPokemonResearchLevel } from '@/utilities/research/research-levels'
 import { getUserPokedexMap } from '@/utilities/user-state'
 import { initializeTeamMoveUses } from '@/utilities/battle/move-uses'
+import { applyBattleRarityEntryEffects } from '@/utilities/battle/rarity-effects'
 
 const PVP_BATTLE_PREFIX = 'pvp:battle:'
 const BATTLE_TTL = 3600
@@ -163,6 +164,22 @@ export async function initializeSharedPvpBattle(
       banner: (p2Details as any).banner,
       title: (p2Details as any).title,
     },
+  }
+
+  const rarityMessages = [
+    ...applyBattleRarityEntryEffects(initialState.playerTeam[initialState.activePlayerIndex]),
+    ...applyBattleRarityEntryEffects(initialState.enemyTeam[initialState.activeEnemyIndex]),
+  ]
+  if (rarityMessages.length) {
+    initialState.history.unshift({
+      turn: initialState.turn,
+      playerStance: 'tech',
+      enemyStance: 'tech',
+      result: 'tie',
+      damageDealt: 0,
+      damageTaken: 0,
+      message: rarityMessages.join('\n'),
+    })
   }
 
   // Set NX

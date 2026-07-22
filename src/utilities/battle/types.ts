@@ -71,6 +71,11 @@ export interface BattlePokemon extends Omit<Pokemon, 'stats'> {
   battleTypeOverride?: string[]
   battleTypeOriginalTypes?: string[]
   battleTypeTurnsRemaining?: number
+  rarityBattleState?: {
+    entryApplied?: boolean
+    baseTypes?: string[]
+    extraType?: string
+  }
   zMoveReady?: boolean
   // Mega/Dynamax fields
   isMega?: boolean // Whether this Pokemon is currently Mega Evolved

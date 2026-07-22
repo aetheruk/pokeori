@@ -10,6 +10,7 @@ import {
   applyStatus,
   applyMoveAbsorbHealing,
 } from '@/utilities/battle/status-effects-logic'
+import { applyBattleRarityEntryEffects } from './rarity-effects'
 import { hasOppositeNonGenderlessGenders } from '@/utilities/pokemon/gender'
 import { DEFAULT_STAT_STAGES, clampStatStage } from './stats-calc'
 import { lowerPokemonMoveUses } from './move-uses'
@@ -566,6 +567,8 @@ export function processSecondaryStatusesForSwitch(
   })
   state.secondaryStatuses = battleResult.statuses
   messages.push(...battleResult.messages)
+
+  messages.push(...applyBattleRarityEntryEffects(switchedPokemon, random))
 
   return messages
 }

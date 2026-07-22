@@ -46,6 +46,8 @@ Shadow Pokemon use the `isShadow` flag on Pokemon records and authored battle en
 
 Radiant Pokemon use the `isRadiant` flag on Pokemon records, Pokemon rewards, authored battle enemies, and Pokemon criteria/team checks. They use a blue aura visual treatment and their attacks have a 10% chance to deal 1.1x damage. When this triggers, battle logs include `{pokemon}'s aura burns bright.`
 
+Pokemon rarity now also has battle effects. Gold and Silver receive +10% max HP; Emerald, Ruby, and Sapphire enter with Shield; Crystal gains +2 Attack/Sp. Atk and loses 2 Defense/Sp. Def stages; Retro rolls distinct +3/-3 combat-stat stages; Galactic enters with Mystic Veil; Levin, Inferno, Ancient, and Toxic add Electric, Fire, Rock, and Poison respectively, while Levin/Inferno/Toxic attacks roll 20% Paralysis/Burn/Poison. Prism gains a random extra type and Rainbow rerolls that extra type after each active turn. Celestial enters with Regeneration, Black becomes Dark-only, White becomes Normal-only, Void attacks have a 5% self-Vanish roll, Glitch shuffles its active non-HP combat stats at turn end, and Pixelated gains +1 Evasion. Entry-granted Shield, Regeneration, and Mystic Veil replace the holder's main status; offensive rarity riders otherwise respect normal status immunity and occupied-status rules.
+
 ## Battle Items
 
 Generic battle items are resolved by `src/utilities/battle/item-effects.ts` and orchestrated by `src/app/(frontend)/game/battles/actions/item-usage.ts`.

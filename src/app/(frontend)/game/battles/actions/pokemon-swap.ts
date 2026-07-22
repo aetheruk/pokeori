@@ -31,6 +31,7 @@ import {
 } from '@/utilities/battle/abilities'
 import { resetBattleTypeChange } from '@/utilities/battle/tera'
 import { runBattleActionWithGuard } from '../helpers/action-guard'
+import { applyBattleRarityEntryEffects } from '@/utilities/battle/rarity-effects'
 
 export async function swapPokemon(
   newIndex: number,
@@ -133,6 +134,7 @@ export async function swapPokemon(
       }
       const leadPokemon = state.playerTeam[state.activePlayerIndex]
       leadPokemon.activeTurnStarted = state.turn
+      const rarityMessages = applyBattleRarityEntryEffects(leadPokemon)
       markPlayerPokemonInvolved(state, state.activePlayerIndex)
       state.pendingPlayerSwitch = false
       state.pendingPlayerSwitchReason = undefined
@@ -149,6 +151,7 @@ export async function swapPokemon(
       })
       const message = [
         `${state.playerName} sent out ${leadPokemon.name}!`,
+        ...rarityMessages,
         ...suppressionMessages,
         ...weatherMessages,
         ...terrainMessages,

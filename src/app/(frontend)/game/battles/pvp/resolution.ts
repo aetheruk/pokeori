@@ -55,6 +55,7 @@ import {
   recordSuccessfulMoveUse,
 } from '@/utilities/battle/move-effects'
 import { decrementFaintedPokemonFriendship } from '@/utilities/battle/friendship'
+import { processBattleRarityTurnEnd } from '@/utilities/battle/rarity-effects'
 
 export interface PvpMove {
   stance: BattleStance
@@ -550,6 +551,14 @@ export async function resolvePvpTurn(
   })
   if (abilityTurnEndMessages.length > 0) {
     logMessage += `\n${abilityTurnEndMessages.join('\n')}`
+  }
+
+  const rarityTurnEndMessages = [
+    ...processBattleRarityTurnEnd(state.playerTeam[state.activePlayerIndex]),
+    ...processBattleRarityTurnEnd(state.enemyTeam[state.activeEnemyIndex]),
+  ]
+  if (rarityTurnEndMessages.length > 0) {
+    logMessage += `\n${rarityTurnEndMessages.join('\n')}`
   }
 
   const p1FaintedMon = state.playerTeam[state.activePlayerIndex]

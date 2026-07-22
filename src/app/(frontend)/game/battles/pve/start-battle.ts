@@ -71,6 +71,7 @@ import {
   processBattleAbilityTerrainSet,
   processBattleAbilityWeatherSet,
 } from '@/utilities/battle/abilities'
+import { applyBattleRarityEntryEffects } from '@/utilities/battle/rarity-effects'
 
 export async function startBattle(
   battleId: string,
@@ -558,6 +559,14 @@ export async function startBattleFromConfig(
   normalizeChronicleBattleBudgets(initialState, battleConfig)
   const suppressionMessages = processBattleAbilitySuppressionForState(initialState)
   const initialFieldMessages = [
+    ...(battleConfig.isWildBattle
+      ? []
+      : applyBattleRarityEntryEffects(
+          initialState.playerTeam[initialState.activePlayerIndex],
+        )),
+    ...applyBattleRarityEntryEffects(
+      initialState.enemyTeam[initialState.activeEnemyIndex],
+    ),
     ...suppressionMessages,
     ...(battleConfig.isWildBattle
       ? []
