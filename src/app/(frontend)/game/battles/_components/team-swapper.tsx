@@ -4,11 +4,11 @@ import { Heart, HeartOff, Loader2, RefreshCcw } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { cn } from '@/lib/utils'
 import type { BattlePokemon } from '@/utilities/battle/types'
-import { getBundledPokemonSpriteUrl } from '@/utilities/pokemon/local-sprites'
 import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
 
 const typeIdMap: Record<string, number> = {
@@ -163,20 +163,17 @@ export function TeamSwapper({
                 >
                   {/* Pokemon Sprite */}
                   <div className="relative h-12 w-12 flex-shrink-0 sm:h-14 sm:w-14">
-                    <Image
-                      key={pokemon.formId}
-                      src={getBundledPokemonSpriteUrl({
-                        formId: pokemon.formId,
-                        family: 'gen-v',
-                        female: pokemon.gender === 'female',
-                      })}
+                    <PokemonRaritySprite
+                      formId={pokemon.formId}
+                      view="front"
+                      rarity={pokemon.rarity}
+                      shiny={pokemon.shiny}
+                      isShadow={pokemon.isShadow}
+                      isRadiant={pokemon.isRadiant}
+                      female={pokemon.gender === 'female'}
                       alt={pokemon.name}
-                      width={56}
-                      height={56}
-                      className={cn(
-                        'pixelated object-contain',
-                        isFainted && 'grayscale',
-                      )}
+                      sizes="56px"
+                      className={cn('h-full w-full', isFainted && 'grayscale')}
                     />
                     {isFainted && (
                       <div className="absolute inset-0 flex items-center justify-center">
