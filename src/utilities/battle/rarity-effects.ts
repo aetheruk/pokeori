@@ -139,7 +139,7 @@ export function applyBattleRarityEntryEffects(
     pokemon.statStages.specialAttack = Math.min(6, pokemon.statStages.specialAttack + 2)
     pokemon.statStages.defense = Math.max(-6, pokemon.statStages.defense - 2)
     pokemon.statStages.specialDefense = Math.max(-6, pokemon.statStages.specialDefense - 2)
-    messages.push(`${pokemon.name}'s Crystal rarity sharpened its offense!`)
+    messages.push(`${pokemon.name} sharpened its offense!`)
   }
 
   if (rarity === 'retro') {
@@ -150,13 +150,13 @@ export function applyBattleRarityEntryEffects(
     pokemon.statStages[boosted] = Math.min(6, pokemon.statStages[boosted] + 3)
     pokemon.statStages[lowered] = Math.max(-6, pokemon.statStages[lowered] - 3)
     messages.push(
-      `${pokemon.name}'s Retro rarity raised ${formatStat(boosted)} and lowered ${formatStat(lowered)}!`,
+      `${pokemon.name} raised ${formatStat(boosted)} and lowered ${formatStat(lowered)}!`,
     )
   }
 
   if (rarity === 'pixelated') {
     pokemon.statStages.evasion = Math.min(6, pokemon.statStages.evasion + 1)
-    messages.push(`${pokemon.name}'s Pixelated rarity raised its Evasion!`)
+    messages.push(`${pokemon.name}'s Evasion rose!`)
   }
 
   const entryStatus =
@@ -174,12 +174,12 @@ export function applyBattleRarityEntryEffects(
 
   if (state.extraType) {
     messages.push(
-      `${pokemon.name}'s ${rarity === 'rainbow' ? 'Rainbow' : 'Prism'} rarity added ${formatType(state.extraType)} type!`,
+      `${pokemon.name} added ${formatType(state.extraType)} Type!`,
     )
   } else if (rarity === 'white' || rarity === 'black') {
-    messages.push(`${pokemon.name}'s ${rarity === 'white' ? 'White' : 'Black'} rarity set its type to ${formatType(pokemon.types[0])}!`)
+    messages.push(`${pokemon.name} became ${formatType(pokemon.types[0])} Type!`)
   } else if (addedType) {
-    messages.push(`${pokemon.name}'s ${rarity[0]?.toUpperCase()}${rarity.slice(1)} rarity added ${formatType(addedType)} type!`)
+    messages.push(`${pokemon.name} added ${formatType(addedType)} Type!`)
   }
 
   return messages
@@ -212,7 +212,7 @@ export function processBattleRarityTurnEnd(
     if (next) {
       state.extraType = next
       applyRarityTypes(pokemon, random)
-      messages.push(`${pokemon.name}'s Rainbow rarity changed its extra type to ${formatType(next)}!`)
+      messages.push(`${pokemon.name}'s extra type changed to ${formatType(next)}!`)
     }
   }
 
@@ -225,7 +225,7 @@ export function processBattleRarityTurnEnd(
     RETRO_STATS.forEach((stat, index) => {
       pokemon.stats[stat] = values[index]
     })
-    messages.push(`${pokemon.name}'s Glitch rarity shuffled its stats!`)
+    messages.push(`${pokemon.name}'s stats shuffled!`)
   }
 
   return messages

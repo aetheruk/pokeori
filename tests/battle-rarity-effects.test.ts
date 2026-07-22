@@ -38,12 +38,13 @@ describe('battle rarity effects', () => {
     const levin = makePokemon({ rarity: 'levin' })
 
     applyBattleRarityEntryEffects(white)
-    applyBattleRarityEntryEffects(levin)
+    const levinMessages = applyBattleRarityEntryEffects(levin)
     applyBattleRarityEntryEffects(levin)
 
     expect(white.types).toEqual(['normal'])
     expect(levin.types).toEqual(['grass', 'poison', 'electric'])
     expect(levin.rarityBattleState?.entryApplied).toBe(true)
+    expect(levinMessages).toContain('Testmon added Electric Type!')
   })
 
   test('applies Crystal, Retro, Pixelated, and entry statuses', () => {
