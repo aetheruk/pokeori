@@ -29,12 +29,16 @@ import {
   CircuitBoard,
   MousePointerClick,
   Radar,
+  Paintbrush,
 } from 'lucide-react'
 import { MdCatchingPokemon } from 'react-icons/md'
 import type { ExploreItem } from './types'
 
 export function isChronicleExploreItem(item: ExploreItem | null | undefined) {
-  return item?.type === 'expedition' && Boolean((item.originalData as any)?.chronicle)
+  return (
+    item?.type === 'expedition' &&
+    Boolean((item.originalData as any)?.chronicle)
+  )
 }
 
 export function getExpeditionDisplayName(item: ExploreItem | null | undefined) {
@@ -109,10 +113,12 @@ export const getTypeIcon = (item: ExploreItem) => {
         return <CircuitBoard className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'rock-tunnel-echo-map')
         return <Radar className="w-4 h-4 text-game-moss-strong" />
+      if (gameType === 'art-academy')
+        return <Paintbrush className="w-4 h-4 text-game-moss-strong" />
       return <Microscope className="w-4 h-4 text-game-moss-strong" />
     case 'task':
       if ((item.originalData as any).chat) {
-      return <MessageCircle className="w-4 h-4 text-game-moss-strong" />
+        return <MessageCircle className="w-4 h-4 text-game-moss-strong" />
       }
       const isRepeatable = (item.originalData as any).repeatable
       return (

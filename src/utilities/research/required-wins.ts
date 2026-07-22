@@ -3,7 +3,10 @@ import type { allGames } from '@/data/games'
 type ResearchGameConfig = (typeof allGames)[number]
 
 function hasSnapTarget(encounter: ResearchGameConfig): boolean {
-  return encounter.gameType === 'snap' && typeof (encounter.settings as any).target === 'number'
+  return (
+    encounter.gameType === 'snap' &&
+    typeof (encounter.settings as any).target === 'number'
+  )
 }
 
 export function getRequiredResearchWins(encounter: ResearchGameConfig): number {
@@ -30,8 +33,11 @@ export function getRequiredResearchWins(encounter: ResearchGameConfig): number {
   }
 
   const isScoreCompletionGame =
-    (encounter.gameType === 'match3' || encounter.gameType === 'tcg-inspection') &&
-    typeof (encounter.settings as any).winScore === 'number'
+    ((encounter.gameType === 'match3' ||
+      encounter.gameType === 'tcg-inspection') &&
+      typeof (encounter.settings as any).winScore === 'number') ||
+    (encounter.gameType === 'art-academy' &&
+      typeof (encounter.settings as any).successThreshold === 'number')
 
   if (isScoreCompletionGame) return 1
 

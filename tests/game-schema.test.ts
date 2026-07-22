@@ -11,8 +11,10 @@ import {
   type VoltorbGridGameConfig,
   type VoltorbGridPosition,
   type VoltorbGridVoltorb,
+  type ArtAcademyGameConfig,
 } from '@/data/games'
 import { validateGameItem } from '@/data/games/schemas'
+import { scoreArtAcademyDrawing } from '@/utilities/research/art-academy'
 
 type Direction = 'up' | 'right' | 'down' | 'left'
 
@@ -36,7 +38,10 @@ function gridKey(position: { x: number; y: number }) {
   return `${position.x},${position.y}`
 }
 
-function isSameGridPosition(a: { x: number; y: number }, b: { x: number; y: number }) {
+function isSameGridPosition(
+  a: { x: number; y: number },
+  b: { x: number; y: number },
+) {
   return a.x === b.x && a.y === b.y
 }
 
@@ -44,7 +49,12 @@ function isInsideGrid(
   position: { x: number; y: number },
   gridSize: { cols: number; rows: number },
 ) {
-  return position.x >= 0 && position.x < gridSize.cols && position.y >= 0 && position.y < gridSize.rows
+  return (
+    position.x >= 0 &&
+    position.x < gridSize.cols &&
+    position.y >= 0 &&
+    position.y < gridSize.rows
+  )
 }
 
 function simulateVoltorbGrid(
@@ -65,20 +75,23 @@ function simulateVoltorbGrid(
     y: voltorb.y,
     blastRadius: voltorb.blastRadius || 2,
   }))
-  let protectedPokemon = (settings.protectedPokemon || []).map((pokemon, index) => ({
-    id: pokemon.id || `protected-pokemon-${index}`,
-    speciesId: pokemon.speciesId,
-    formId: pokemon.formId || String(pokemon.speciesId),
-    x: pokemon.x,
-    y: pokemon.y,
-  }))
+  let protectedPokemon = (settings.protectedPokemon || []).map(
+    (pokemon, index) => ({
+      id: pokemon.id || `protected-pokemon-${index}`,
+      speciesId: pokemon.speciesId,
+      formId: pokemon.formId || String(pokemon.speciesId),
+      x: pokemon.x,
+      y: pokemon.y,
+    }),
+  )
   const detonatingVoltorbId = voltorbs[0]?.id
   let moves = 0
   let discharges = 0
   let failed = false
   let reachedExit = false
 
-  const exitOpen = () => initialDebrisKeys.size - debrisKeys.size >= requiredCleared
+  const exitOpen = () =>
+    initialDebrisKeys.size - debrisKeys.size >= requiredCleared
   const voltorbAt = (position: VoltorbGridPosition) =>
     voltorbs.find((voltorb) => isSameGridPosition(voltorb, position))
   const protectedPokemonAt = (position: VoltorbGridPosition) =>
@@ -91,16 +104,21 @@ function simulateVoltorbGrid(
     !protectedPokemonKeys().has(gridKey(position)) &&
     !isSameGridPosition(position, settings.exit) &&
     !voltorbs.some(
-      (voltorb) => voltorb.id !== movingId && isSameGridPosition(voltorb, position),
+      (voltorb) =>
+        voltorb.id !== movingId && isSameGridPosition(voltorb, position),
     )
-  const canProtectedPokemonOccupy = (position: VoltorbGridPosition, movingId: string) =>
+  const canProtectedPokemonOccupy = (
+    position: VoltorbGridPosition,
+    movingId: string,
+  ) =>
     isInsideGrid(position, settings.gridSize) &&
     !wallKeys.has(gridKey(position)) &&
     !debrisKeys.has(gridKey(position)) &&
     !voltorbs.some((voltorb) => isSameGridPosition(voltorb, position)) &&
     !isSameGridPosition(position, settings.exit) &&
     !protectedPokemon.some(
-      (pokemon) => pokemon.id !== movingId && isSameGridPosition(pokemon, position),
+      (pokemon) =>
+        pokemon.id !== movingId && isSameGridPosition(pokemon, position),
     )
   const isPlayerBlocked = (position: VoltorbGridPosition) =>
     !isInsideGrid(position, settings.gridSize) ||
@@ -119,8 +137,12 @@ function simulateVoltorbGrid(
     const destroyed = new Set<string>()
     const triggeredVoltorbIds = new Set<string>()
     let hitProtectedPokemon = false
-    const voltorbByPosition = new Map(voltorbs.map((voltorb) => [gridKey(voltorb), voltorb]))
-    const firstVoltorb = voltorbs.find((voltorb) => voltorb.id === detonatingVoltorbId)
+    const voltorbByPosition = new Map(
+      voltorbs.map((voltorb) => [gridKey(voltorb), voltorb]),
+    )
+    const firstVoltorb = voltorbs.find(
+      (voltorb) => voltorb.id === detonatingVoltorbId,
+    )
     const queue = firstVoltorb ? [firstVoltorb] : []
 
     for (let index = 0; index < queue.length; index += 1) {
@@ -161,13 +183,19 @@ function simulateVoltorbGrid(
 
     discharges += 1
     destroyed.forEach((key) => debrisKeys.delete(key))
-    voltorbs = voltorbs.filter((voltorb) => !triggeredVoltorbIds.has(voltorb.id))
+    voltorbs = voltorbs.filter(
+      (voltorb) => !triggeredVoltorbIds.has(voltorb.id),
+    )
 
     if (blast.has(gridKey(player))) {
       failed = true
     } else if (hitProtectedPokemon) {
       failed = true
-    } else if (settings.maxDischarges && discharges >= settings.maxDischarges && !exitOpen()) {
+    } else if (
+      settings.maxDischarges &&
+      discharges >= settings.maxDischarges &&
+      !exitOpen()
+    ) {
       failed = true
     }
   }
@@ -198,14 +226,18 @@ function simulateVoltorbGrid(
       moves += 1
       player = next
       voltorbs = voltorbs.map((voltorb) =>
-        voltorb.id === pushedVoltorb.id ? { ...voltorb, ...pushedPosition } : voltorb,
+        voltorb.id === pushedVoltorb.id
+          ? { ...voltorb, ...pushedPosition }
+          : voltorb,
       )
     } else if (pushedProtectedPokemon) {
       const pushedPosition = {
         x: pushedProtectedPokemon.x + delta.x,
         y: pushedProtectedPokemon.y + delta.y,
       }
-      if (!canProtectedPokemonOccupy(pushedPosition, pushedProtectedPokemon.id)) {
+      if (
+        !canProtectedPokemonOccupy(pushedPosition, pushedProtectedPokemon.id)
+      ) {
         failed = true
         break
       }
@@ -213,7 +245,9 @@ function simulateVoltorbGrid(
       moves += 1
       player = next
       protectedPokemon = protectedPokemon.map((pokemon) =>
-        pokemon.id === pushedProtectedPokemon.id ? { ...pokemon, ...pushedPosition } : pokemon,
+        pokemon.id === pushedProtectedPokemon.id
+          ? { ...pokemon, ...pushedPosition }
+          : pokemon,
       )
     } else {
       if (isPlayerBlocked(next)) {
@@ -290,12 +324,16 @@ function getMagnemitePoweredTiles(
   return powered
 }
 
-function magnemiteCircuitIsSolved(settings: MagnemiteCircuitGameConfig['settings']) {
+function magnemiteCircuitIsSolved(
+  settings: MagnemiteCircuitGameConfig['settings'],
+) {
   const powered = getMagnemitePoweredTiles(settings.source, settings.tiles)
   return settings.targets.every((target) => powered.has(gridKey(target)))
 }
 
-function magnemiteCircuitHasSolution(settings: MagnemiteCircuitGameConfig['settings']) {
+function magnemiteCircuitHasSolution(
+  settings: MagnemiteCircuitGameConfig['settings'],
+) {
   const unlockedTiles = settings.tiles.filter((tile) => !tile.locked)
   const combinations = 4 ** unlockedTiles.length
 
@@ -308,7 +346,9 @@ function magnemiteCircuitHasSolution(settings: MagnemiteCircuitGameConfig['setti
     })
 
     const candidate = settings.tiles.map((tile) =>
-      rotations.has(gridKey(tile)) ? { ...tile, rotation: rotations.get(gridKey(tile)) } : tile,
+      rotations.has(gridKey(tile))
+        ? { ...tile, rotation: rotations.get(gridKey(tile)) }
+        : tile,
     )
     const powered = getMagnemitePoweredTiles(settings.source, candidate)
     if (settings.targets.every((target) => powered.has(gridKey(target)))) {
@@ -319,7 +359,9 @@ function magnemiteCircuitHasSolution(settings: MagnemiteCircuitGameConfig['setti
   return false
 }
 
-function shortestEchoPathLength(settings: RockTunnelEchoMapGameConfig['settings']) {
+function shortestEchoPathLength(
+  settings: RockTunnelEchoMapGameConfig['settings'],
+) {
   const wallKeys = new Set(settings.walls.map(gridKey))
   const holeKeys = new Set((settings.holes || []).map(gridKey))
   const queue = [{ position: settings.playerStart, distance: 0 }]
@@ -385,6 +427,55 @@ describe('generated game data schemas', () => {
     expect(brokenOverrides).toEqual([])
   })
 
+  test('Art Academy has a configurable Test study entry', () => {
+    const game = allGames.find((entry) => entry.id === 'art-academy-test')
+    const settings = game?.settings as
+      | ArtAcademyGameConfig['settings']
+      | undefined
+
+    expect(game?.gameType).toBe('art-academy')
+    expect(game?.subCategory).toBe('Test')
+    expect(game?.icon).toEqual({ type: 'pokemon', id: '25' })
+    expect(settings).toEqual({
+      formId: '25',
+      timeLimit: 180,
+      successThreshold: 50,
+      paletteSize: 8,
+    })
+
+    const invalidThreshold = JSON.parse(JSON.stringify(game))
+    invalidThreshold.settings.successThreshold = 49
+    expect(validateGameItem(invalidThreshold).success).toBe(false)
+
+    const invalidPalette = JSON.parse(JSON.stringify(game))
+    invalidPalette.settings.paletteSize = 17
+    expect(validateGameItem(invalidPalette).success).toBe(false)
+  })
+
+  test('Art Academy scoring considers only reference sprite pixels', () => {
+    const palette = [
+      { r: 20, g: 20, b: 20 },
+      { r: 240, g: 220, b: 60 },
+    ]
+    const reference = new Uint8Array([1, 1, 0, 0])
+
+    expect(
+      scoreArtAcademyDrawing(reference, new Uint8Array([1, 1, 0, 0]), palette),
+    ).toBe(100)
+    expect(
+      scoreArtAcademyDrawing(reference, new Uint8Array([0, 0, 0, 0]), palette),
+    ).toBe(0)
+    expect(
+      scoreArtAcademyDrawing(reference, new Uint8Array([1, 1, 1, 0]), palette),
+    ).toBe(100)
+    expect(
+      scoreArtAcademyDrawing(reference, new Uint8Array([2, 2, 0, 0]), palette),
+    ).toBe(0)
+    expect(
+      scoreArtAcademyDrawing(reference, new Uint8Array([1, 2, 0, 0]), palette),
+    ).toBe(50)
+  })
+
   test('pachinko validation rejects duplicate bucket ids', () => {
     const pachinko = allGames.find((game) => game.gameType === 'pachinko')
     expect(pachinko).toBeDefined()
@@ -415,8 +506,12 @@ describe('generated game data schemas', () => {
   })
 
   test('Voltorb Grid has a repeatable Test sub-region puzzle entry', () => {
-    const game = allGames.find((entry) => entry.id === 'route-10-voltorb-grid-test')
-    const settings = game?.settings as VoltorbGridGameConfig['settings'] | undefined
+    const game = allGames.find(
+      (entry) => entry.id === 'route-10-voltorb-grid-test',
+    )
+    const settings = game?.settings as
+      | VoltorbGridGameConfig['settings']
+      | undefined
 
     expect(game).toBeDefined()
     expect(game?.gameType).toBe('voltorb-grid')
@@ -426,14 +521,18 @@ describe('generated game data schemas', () => {
     expect(settings?.playerStart).toEqual({ x: 1, y: 6 })
     expect(settings?.exit).toEqual({ x: 6, y: 1 })
     expect(settings?.voltorbs.length).toBeGreaterThanOrEqual(1)
-    expect(settings?.protectedPokemon).toEqual([{ id: 'watcher', speciesId: 25, x: 0, y: 7 }])
+    expect(settings?.protectedPokemon).toEqual([
+      { id: 'watcher', speciesId: 25, x: 0, y: 7 },
+    ])
     expect(settings?.requiredCleared).toBe(3)
     expect(settings?.maxDischarges).toBe(1)
     expect(settings?.winRate).toBe(1)
   })
 
   test('Voltorb Grid validation rejects impossible debris goals and out-of-bounds positions', () => {
-    const game = allGames.find((entry) => entry.id === 'route-10-voltorb-grid-test')
+    const game = allGames.find(
+      (entry) => entry.id === 'route-10-voltorb-grid-test',
+    )
     expect(game).toBeDefined()
 
     const impossibleGoalGame = JSON.parse(JSON.stringify(game))
@@ -442,22 +541,25 @@ describe('generated game data schemas', () => {
 
     const impossibleGoalResult = validateGameItem(impossibleGoalGame)
     expect(impossibleGoalResult.success).toBe(false)
-    expect(impossibleGoalResult.error?.issues.map((issue) => issue.message)).toContain(
-      'requiredCleared cannot exceed authored debris count',
-    )
+    expect(
+      impossibleGoalResult.error?.issues.map((issue) => issue.message),
+    ).toContain('requiredCleared cannot exceed authored debris count')
 
     const outOfBoundsGame = JSON.parse(JSON.stringify(game))
-    outOfBoundsGame.settings.voltorbs[0].x = outOfBoundsGame.settings.gridSize.cols
+    outOfBoundsGame.settings.voltorbs[0].x =
+      outOfBoundsGame.settings.gridSize.cols
 
     const outOfBoundsResult = validateGameItem(outOfBoundsGame)
     expect(outOfBoundsResult.success).toBe(false)
-    expect(outOfBoundsResult.error?.issues.map((issue) => issue.message)).toContain(
-      'Voltorb Grid position must fit inside the board',
-    )
+    expect(
+      outOfBoundsResult.error?.issues.map((issue) => issue.message),
+    ).toContain('Voltorb Grid position must fit inside the board')
   })
 
   test('Voltorb Grid test puzzle requires pushing and chained Voltorb before discharge is solvable', () => {
-    const game = allGames.find((entry) => entry.id === 'route-10-voltorb-grid-test')
+    const game = allGames.find(
+      (entry) => entry.id === 'route-10-voltorb-grid-test',
+    )
     expect(game).toBeDefined()
     const settings = game!.settings as VoltorbGridGameConfig['settings']
 
@@ -512,7 +614,9 @@ describe('generated game data schemas', () => {
     const blockedChain = simulateVoltorbGrid(settings, ['discharge'])
     expect(blockedChain.cleared).toBe(1)
     expect(blockedChain.failed).toBe(true)
-    expect(blockedChain.voltorbs.map((voltorb) => voltorb.id)).toEqual(['chained'])
+    expect(blockedChain.voltorbs.map((voltorb) => voltorb.id)).toEqual([
+      'chained',
+    ])
 
     const linkedChain = simulateVoltorbGrid(
       {
@@ -568,9 +672,15 @@ describe('generated game data schemas', () => {
   })
 
   test('Route 10 Voltorb Grid progression layouts are solvable in order', () => {
-    const primer = allGames.find((entry) => entry.id === 'route-10-voltorb-primer')
-    const relay = allGames.find((entry) => entry.id === 'route-10-voltorb-relay')
-    const landslide = allGames.find((entry) => entry.id === 'route-10-voltorb-landslide')
+    const primer = allGames.find(
+      (entry) => entry.id === 'route-10-voltorb-primer',
+    )
+    const relay = allGames.find(
+      (entry) => entry.id === 'route-10-voltorb-relay',
+    )
+    const landslide = allGames.find(
+      (entry) => entry.id === 'route-10-voltorb-landslide',
+    )
 
     expect(primer?.gameType).toBe('voltorb-grid')
     expect(relay?.gameType).toBe('voltorb-grid')
@@ -663,7 +773,9 @@ describe('generated game data schemas', () => {
       'route-10-voltorb-deep-fault',
       'route-10-voltorb-final-breach',
     ]
-    const demolitionGames = demolitionIds.map((id) => allGames.find((entry) => entry.id === id))
+    const demolitionGames = demolitionIds.map((id) =>
+      allGames.find((entry) => entry.id === id),
+    )
 
     expect(demolitionGames.map((game) => game?.gameType)).toEqual([
       'voltorb-grid',
@@ -687,15 +799,15 @@ describe('generated game data schemas', () => {
     const demolitionSettings = demolitionGames.map(
       (game) => game!.settings as VoltorbGridGameConfig['settings'],
     )
-    expect(demolitionSettings.map((settings) => settings.voltorbs.length)).toEqual([
-      3, 4, 5, 6, 7,
-    ])
-    expect(demolitionSettings.map((settings) => settings.requiredCleared)).toEqual([
-      4, 5, 6, 7, 9,
-    ])
-    expect(demolitionSettings.map((settings) => settings.protectedPokemon?.length)).toEqual([
-      2, 3, 2, 3, 3,
-    ])
+    expect(
+      demolitionSettings.map((settings) => settings.voltorbs.length),
+    ).toEqual([3, 4, 5, 6, 7])
+    expect(
+      demolitionSettings.map((settings) => settings.requiredCleared),
+    ).toEqual([4, 5, 6, 7, 9])
+    expect(
+      demolitionSettings.map((settings) => settings.protectedPokemon?.length),
+    ).toEqual([2, 3, 2, 3, 3])
 
     const discharge = 'discharge' as const
     const solutions: Array<Array<Direction | typeof discharge>> = [
@@ -977,16 +1089,24 @@ describe('generated game data schemas', () => {
   })
 
   test('new route-themed puzzle games have Test sub-region entries', () => {
-    const diglett = allGames.find((entry) => entry.id === 'diglett-tunnel-tap-test')
+    const diglett = allGames.find(
+      (entry) => entry.id === 'diglett-tunnel-tap-test',
+    )
     const diglettSettings = diglett?.settings as
       | DiglettTunnelTapGameConfig['settings']
       | undefined
-    const magnemite = allGames.find((entry) => entry.id === 'magnemite-circuit-test')
+    const magnemite = allGames.find(
+      (entry) => entry.id === 'magnemite-circuit-test',
+    )
     const magnemiteSettings = magnemite?.settings as
       | MagnemiteCircuitGameConfig['settings']
       | undefined
-    const echo = allGames.find((entry) => entry.id === 'rock-tunnel-echo-map-test')
-    const echoSettings = echo?.settings as RockTunnelEchoMapGameConfig['settings'] | undefined
+    const echo = allGames.find(
+      (entry) => entry.id === 'rock-tunnel-echo-map-test',
+    )
+    const echoSettings = echo?.settings as
+      | RockTunnelEchoMapGameConfig['settings']
+      | undefined
 
     expect(diglett?.gameType).toBe('diglett-tunnel-tap')
     expect(diglett?.subCategory).toBe('Test')
@@ -1014,7 +1134,9 @@ describe('generated game data schemas', () => {
   })
 
   test('new route-themed puzzle games have playable Test layouts', () => {
-    const diglett = allGames.find((entry) => entry.id === 'diglett-tunnel-tap-test')
+    const diglett = allGames.find(
+      (entry) => entry.id === 'diglett-tunnel-tap-test',
+    )
     const diglettSettings = diglett?.settings as
       | DiglettTunnelTapGameConfig['settings']
       | undefined
@@ -1022,11 +1144,13 @@ describe('generated game data schemas', () => {
     const conservativeDiglettSpawns = Math.floor(
       (diglettSettings!.timeLimit * 1000) / diglettSettings!.spawnIntervalMs,
     )
-    expect(conservativeDiglettSpawns * (diglettSettings!.diglettScore || 1) * 0.6).toBeGreaterThan(
-      diglettSettings!.targetScore,
-    )
+    expect(
+      conservativeDiglettSpawns * (diglettSettings!.diglettScore || 1) * 0.6,
+    ).toBeGreaterThan(diglettSettings!.targetScore)
 
-    const magnemite = allGames.find((entry) => entry.id === 'magnemite-circuit-test')
+    const magnemite = allGames.find(
+      (entry) => entry.id === 'magnemite-circuit-test',
+    )
     const magnemiteSettings = magnemite?.settings as
       | MagnemiteCircuitGameConfig['settings']
       | undefined
@@ -1034,8 +1158,12 @@ describe('generated game data schemas', () => {
     expect(magnemiteCircuitIsSolved(magnemiteSettings!)).toBe(false)
     expect(magnemiteCircuitHasSolution(magnemiteSettings!)).toBe(true)
 
-    const echo = allGames.find((entry) => entry.id === 'rock-tunnel-echo-map-test')
-    const echoSettings = echo?.settings as RockTunnelEchoMapGameConfig['settings'] | undefined
+    const echo = allGames.find(
+      (entry) => entry.id === 'rock-tunnel-echo-map-test',
+    )
+    const echoSettings = echo?.settings as
+      | RockTunnelEchoMapGameConfig['settings']
+      | undefined
     expect(echoSettings).toBeDefined()
     const echoPathLength = shortestEchoPathLength(echoSettings!)
     expect(echoPathLength).not.toBeNull()
@@ -1048,13 +1176,14 @@ describe('generated game data schemas', () => {
     expect(game).toBeDefined()
 
     const missingSourceTileGame = JSON.parse(JSON.stringify(game))
-    missingSourceTileGame.settings.tiles = missingSourceTileGame.settings.tiles.filter(
-      (tile: { x: number; y: number }) =>
-        !(
-          tile.x === missingSourceTileGame.settings.source.x &&
-          tile.y === missingSourceTileGame.settings.source.y
-        ),
-    )
+    missingSourceTileGame.settings.tiles =
+      missingSourceTileGame.settings.tiles.filter(
+        (tile: { x: number; y: number }) =>
+          !(
+            tile.x === missingSourceTileGame.settings.source.x &&
+            tile.y === missingSourceTileGame.settings.source.y
+          ),
+      )
 
     const result = validateGameItem(missingSourceTileGame)
     expect(result.success).toBe(false)
@@ -1097,7 +1226,9 @@ describe('generated game data schemas', () => {
         game!.settings.slots.map((slot) => {
           const reward = slot.rewards[0]
           if (reward?.type !== 'item' && reward?.type !== 'task_complete') {
-            throw new Error(`${gameId}:${slot.id} must reward an item or task completion`)
+            throw new Error(
+              `${gameId}:${slot.id} must reward an item or task completion`,
+            )
           }
 
           return [reward.targetId, slot.percentage]
@@ -1120,18 +1251,17 @@ describe('generated game data schemas', () => {
               .map((reward) => [reward.targetId, reward.quantity]),
           ),
         )
-        const slotPercentages = game!.settings.slots.reduce<Record<string, number>>(
-          (totals, slot) => {
-            for (const reward of slot.rewards) {
-              if (reward.type !== 'item') continue
-              const targetId = reward.targetId
-              if (!targetId) continue
-              totals[targetId] = (totals[targetId] || 0) + slot.percentage
-            }
-            return totals
-          },
-          {},
-        )
+        const slotPercentages = game!.settings.slots.reduce<
+          Record<string, number>
+        >((totals, slot) => {
+          for (const reward of slot.rewards) {
+            if (reward.type !== 'item') continue
+            const targetId = reward.targetId
+            if (!targetId) continue
+            totals[targetId] = (totals[targetId] || 0) + slot.percentage
+          }
+          return totals
+        }, {})
         expect(materialQuantities).toEqual({
           'psychic-gem': 6,
           'ghost-gem': 6,
@@ -1146,7 +1276,9 @@ describe('generated game data schemas', () => {
         })
         expect(
           game!.settings.slots.some((slot) =>
-            slot.rewards.some((reward) => reward.targetId === 'spell-tag-recipe'),
+            slot.rewards.some(
+              (reward) => reward.targetId === 'spell-tag-recipe',
+            ),
           ),
         ).toBe(false)
       }

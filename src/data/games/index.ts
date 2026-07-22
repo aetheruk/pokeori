@@ -124,6 +124,10 @@ export type {
 } from './rock-tunnel-echo-map'
 export { rockTunnelEchoMapGames } from './rock-tunnel-echo-map'
 
+// Art Academy game
+export type { ArtAcademyGameConfig, ArtAcademySettings } from './art-academy'
+export { artAcademyGames } from './art-academy'
+
 // All games combined (useful for explore-list)
 import { silhouetteEntries as silhouetteGames } from './silhouette'
 import { identifyEntries as identifyGames } from './identify'
@@ -149,6 +153,7 @@ import { voltorbGridGames } from './voltorb-grid'
 import { diglettTunnelTapGames } from './diglett-tunnel-tap'
 import { magnemiteCircuitGames } from './magnemite-circuit'
 import { rockTunnelEchoMapGames } from './rock-tunnel-echo-map'
+import { artAcademyGames } from './art-academy'
 import type { BaseGameConfig } from './shared'
 
 export type GameType =
@@ -176,6 +181,7 @@ export type GameType =
   | 'diglett-tunnel-tap'
   | 'magnemite-circuit'
   | 'rock-tunnel-echo-map'
+  | 'art-academy'
 
 // Unified settings type that covers all game settings
 export interface GameSettings {
@@ -335,6 +341,9 @@ export interface GameSettings {
   maxRotations?: number
   // Rock Tunnel Echo Map specific
   revealDurationMs?: number
+  // Art Academy specific
+  formId?: string
+  paletteSize?: number
 }
 
 export interface GameItem extends BaseGameConfig {
@@ -367,6 +376,7 @@ export const allGames: GameItem[] = [
   ...diglettTunnelTapGames.map((g) => ({ ...g, gameType: 'diglett-tunnel-tap' as const })),
   ...magnemiteCircuitGames.map((g) => ({ ...g, gameType: 'magnemite-circuit' as const })),
   ...rockTunnelEchoMapGames.map((g) => ({ ...g, gameType: 'rock-tunnel-echo-map' as const })),
+  ...artAcademyGames.map((g) => ({ ...g, gameType: 'art-academy' as const })),
 ]
 
 // Backward compatibility aliases

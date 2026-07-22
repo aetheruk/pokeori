@@ -76,12 +76,21 @@ import {
 import { maybeCreateFieldObservationEgg } from '@/utilities/day-care/eggs'
 import { getRequiredResearchWins } from '@/utilities/research/required-wins'
 import type { FieldObservationSettings } from '@/data/games/field-observation'
+import type { ArtAcademySettings } from '@/data/games/art-academy'
+import {
+  createArtAcademyRound,
+  scoreSerializedArtAcademyDrawing,
+  type ArtAcademyPrivateRoundData,
+} from '@/utilities/research/art-academy-server'
 import {
   calculateContentSkillXp,
   calculatePokemonContentSkillXpWithModifier,
   resolveSkillXpConfig,
 } from '@/data/skills/xp'
-import { resolveSubRegionWeather, type WeatherSnapshot } from '@/utilities/weather'
+import {
+  resolveSubRegionWeather,
+  type WeatherSnapshot,
+} from '@/utilities/weather'
 import {
   applyFieldObservationPoolWeightModifiers,
   getFieldObservationCollectibleModifiers,
@@ -129,6 +138,8 @@ export interface ResearchState {
   snapRoundStartTime?: number
   // Field Observation specific
   fieldObservationPrivate?: FieldObservationPrivateRoundData
+  // Art Academy specific
+  artAcademyPrivate?: ArtAcademyPrivateRoundData
   // Endless mode specific
   claimedMilestones?: number[] // Array of milestone scores that have been claimed
   weather?: WeatherSnapshot
@@ -153,9 +164,12 @@ export interface ResearchCompletionResult {
   expeditionProgress?: ExpeditionProgressSnapshot
   error?: string
   message?: string
+  finalScore?: number
 }
 
-function getResearchStateAbility(state: Pick<ResearchState, 'activeAbilityId'>): AbilityConfig | undefined {
+function getResearchStateAbility(
+  state: Pick<ResearchState, 'activeAbilityId'>,
+): AbilityConfig | undefined {
   return state.activeAbilityId ? ABILITIES[state.activeAbilityId] : undefined
 }
 
@@ -239,9 +253,10 @@ function getResearchSessionTimeLimit(encounter: (typeof allGames)[number]) {
 
 function sanitizeResearchState(
   state: ResearchState,
-): Omit<ResearchState, 'fieldObservationPrivate'> {
-  const { fieldObservationPrivate, ...safeState } = state
+): Omit<ResearchState, 'fieldObservationPrivate' | 'artAcademyPrivate'> {
+  const { fieldObservationPrivate, artAcademyPrivate, ...safeState } = state
   void fieldObservationPrivate
+  void artAcademyPrivate
   return safeState
 }
 
@@ -311,7 +326,9 @@ function buildGeneratedResearchSkillXpReward(
   )
 
   const safeFinalXpModifier =
-    Number.isFinite(finalXpModifier) && finalXpModifier > 0 ? finalXpModifier : 1
+    Number.isFinite(finalXpModifier) && finalXpModifier > 0
+      ? finalXpModifier
+      : 1
   const quantity =
     encounter.gameType === 'field-observation'
       ? encounter.skillXp
@@ -326,11 +343,7 @@ function buildGeneratedResearchSkillXpReward(
             outcomeModifier,
             pokemonBaseExperienceModifier,
           )
-      : calculateContentSkillXp(
-          xpConfig.skill,
-          xpConfig.level,
-          outcomeModifier,
-        )
+      : calculateContentSkillXp(xpConfig.skill, xpConfig.level, outcomeModifier)
 
   return {
     type: 'xp',
@@ -622,7 +635,10 @@ export async function startResearchEncounter(
         // Perform Item Consumption
         if (hasConsumption) {
           const payload = await getPayload({ config: configPromise })
-          const currentInventory = await getUserInventoryMap(payload as any, user.id)
+          const currentInventory = await getUserInventoryMap(
+            payload as any,
+            user.id,
+          )
           const newInventory = { ...currentInventory }
 
           for (const [itemId, count] of Object.entries(itemsToConsume)) {
@@ -640,14 +656,22 @@ export async function startResearchEncounter(
       const activePoke = await payload.find({
         collection: 'pokemon',
         where: {
-          and: [{ user: { equals: user.id } }, { isCompanion: { equals: true } }],
+          and: [
+            { user: { equals: user.id } },
+            { isCompanion: { equals: true } },
+          ],
         },
         limit: 1,
       })
       const activeAbilityId = (activePoke.docs[0] as any)?.ability || undefined
-      const activeAbilitySourceFormId = (activePoke.docs[0] as any)?.formId || undefined
-      const activeAbility = activeAbilityId ? ABILITIES[activeAbilityId] : undefined
-      const abilityContext = getResearchAbilityContext(encounter, { weather: weatherSnapshot })
+      const activeAbilitySourceFormId =
+        (activePoke.docs[0] as any)?.formId || undefined
+      const activeAbility = activeAbilityId
+        ? ABILITIES[activeAbilityId]
+        : undefined
+      const abilityContext = getResearchAbilityContext(encounter, {
+        weather: weatherSnapshot,
+      })
 
       // Initialize State variables
       const pokemonPool =
@@ -660,6 +684,7 @@ export async function startResearchEncounter(
       let currentPokemonId: number | undefined
       let currentItemId: string | undefined
       let fieldObservationPrivate: FieldObservationPrivateRoundData | undefined
+      let artAcademyPrivate: ArtAcademyPrivateRoundData | undefined
 
       // Pick first target
       if (encounter.gameType === 'field-observation') {
@@ -855,6 +880,12 @@ export async function startResearchEncounter(
           typeof gridSizeRaw === 'number' ? gridSizeRaw : 4
         const shuffleMoves = encounter.settings.shuffleMoves || 100
         roundData = generateSlidingPuzzleState(gridSize, shuffleMoves)
+      } else if (encounter.gameType === 'art-academy') {
+        const generated = await createArtAcademyRound(
+          encounter.settings as ArtAcademySettings,
+        )
+        roundData = generated.publicRoundData
+        artAcademyPrivate = generated.privateRoundData
       } else if (encounter.gameType === 'field-observation') {
         let eligibleSettings = getEligibleFieldObservationSettings(
           encounter.settings as FieldObservationSettings,
@@ -882,14 +913,18 @@ export async function startResearchEncounter(
               : eligibleSettings.answerTimeLimit,
           }
         }
-        eligibleSettings = applyFieldObservationPoolWeightModifiers(eligibleSettings, {
-          ability: activeAbility,
-          ...abilityContext,
-        })
-        const globalEventMultipliers = getFieldObservationGlobalEventMultipliers({
-          ability: activeAbility,
-          ...abilityContext,
-        })
+        eligibleSettings = applyFieldObservationPoolWeightModifiers(
+          eligibleSettings,
+          {
+            ability: activeAbility,
+            ...abilityContext,
+          },
+        )
+        const globalEventMultipliers =
+          getFieldObservationGlobalEventMultipliers({
+            ability: activeAbility,
+            ...abilityContext,
+          })
         const globalPokemonEvent = rollFieldObservationGlobalPokemonEvent(
           applyFieldObservationPokemonEventMultiplier(
             fieldObservationGlobalPokemonEvents,
@@ -933,12 +968,17 @@ export async function startResearchEncounter(
         const surveyFocusContext = {
           ability: activeAbility,
           ...abilityContext,
-          surveyFocus: normalizeSurveyFocus(generated.privateRoundData.surveyFocus),
+          surveyFocus: normalizeSurveyFocus(
+            generated.privateRoundData.surveyFocus,
+          ),
         }
         const abilityExtraDrops = getFieldObservationExtraCollectibles({
           ...surveyFocusContext,
         })
-          .filter(({ reward }) => reward.type === 'item' && typeof reward.targetId === 'string')
+          .filter(
+            ({ reward }) =>
+              reward.type === 'item' && typeof reward.targetId === 'string',
+          )
           .map(({ reward }, index) => ({
             id: `ability:${activeAbility?.id || 'unknown'}:${index}:${reward.targetId}`,
             itemId: reward.targetId as string,
@@ -953,8 +993,13 @@ export async function startResearchEncounter(
           surveyFocus: generated.privateRoundData.surveyFocus,
           observationDurationMs:
             generated.publicRoundData.observationDurationMs,
-          globalItemEvents: [...globalItemEvents, ...authoredItemDrops, ...abilityExtraDrops],
-          collectibleModifiers: getFieldObservationCollectibleModifiers(surveyFocusContext),
+          globalItemEvents: [
+            ...globalItemEvents,
+            ...authoredItemDrops,
+            ...abilityExtraDrops,
+          ],
+          collectibleModifiers:
+            getFieldObservationCollectibleModifiers(surveyFocusContext),
         })
         generated.privateRoundData.collectibleDrops = collectibleDrops
         generated.publicRoundData.collectibleDrops = collectibleDrops.map(
@@ -1038,6 +1083,7 @@ export async function startResearchEncounter(
           encounter.gameType === 'snap' ? Date.now() : undefined,
         roundData,
         fieldObservationPrivate,
+        artAcademyPrivate,
         weather: weatherSnapshot,
         activeAbilityId,
         activeAbilitySourceFormId,
@@ -1740,6 +1786,7 @@ export async function completeResearchEncounter(
   additionalLosses?: number, // For games that track losses locally (pachinko)
   collectedEndlessRewards?: Record<string, number>,
   collectedRockPushRewardIds?: string[],
+  artAcademyDrawing?: string,
 ): Promise<ResearchCompletionResult> {
   try {
     const user = await getUser()
@@ -1759,6 +1806,7 @@ export async function completeResearchEncounter(
       additionalLosses,
       collectedEndlessRewards,
       collectedRockPushRewardIds,
+      artAcademyDrawing,
     )
     if (!completionInput.success) {
       return { success: false, error: completionInput.error }
@@ -1770,6 +1818,7 @@ export async function completeResearchEncounter(
       completionInput.value?.collectedEndlessRewards
     const validatedCollectedRockPushRewardIds =
       completionInput.value?.collectedRockPushRewardIds
+    const validatedArtAcademyDrawing = completionInput.value?.artAcademyDrawing
 
     const previewState = (await redis.get(
       `research:${user.id}`,
@@ -1854,10 +1903,11 @@ export async function completeResearchEncounter(
         ability: activeAbility,
         ...abilityContext,
       })
-      const fieldObservationResearchXpMultiplier = getFieldObservationResearchXpMultiplier({
-        ability: activeAbility,
-        ...abilityContext,
-      })
+      const fieldObservationResearchXpMultiplier =
+        getFieldObservationResearchXpMultiplier({
+          ability: activeAbility,
+          ...abilityContext,
+        })
 
       if (encounter.gameType === 'tcg-battle') {
         const battleState = (await redis.get(`tcg-battle:${user.id}`)) as {
@@ -1886,13 +1936,32 @@ export async function completeResearchEncounter(
         return cachedResult
       }
 
+      let artAcademyScore: number | null = null
+      if (encounter.gameType === 'art-academy') {
+        if (!validatedArtAcademyDrawing || !state.artAcademyPrivate) {
+          return {
+            success: false,
+            error: 'Art Academy drawing data is missing',
+          }
+        }
+        artAcademyScore = scoreSerializedArtAcademyDrawing({
+          encodedDrawing: validatedArtAcademyDrawing,
+          privateRoundData: state.artAcademyPrivate,
+        })
+        if (artAcademyScore === null) {
+          return { success: false, error: 'Invalid Art Academy drawing data' }
+        }
+      }
+
       // Check if this is an endless mode game
       const isEndlessMode =
         (encounter as any).settings?.endless?.enabled || false
 
       // For endless mode, validate the score with anti-cheat
       // Skip for match3 games - their score comes from matching crystals, not time-based
-      const normalizedFinalScore = normalizeFinalScore(validatedFinalScore)
+      const normalizedFinalScore = normalizeFinalScore(
+        artAcademyScore ?? validatedFinalScore,
+      )
       if (isEndlessMode && normalizedFinalScore !== null) {
         const elapsedTime = (Date.now() - state.startTime) / 1000 // seconds
         const maxPossibleScore = getMaxAllowedEndlessScore(
@@ -1923,9 +1992,11 @@ export async function completeResearchEncounter(
         encounter.gameType === 'pachinko' ||
         encounter.gameType === 'prize-wheel'
       const isScoreCompletionGame =
-        (encounter.gameType === 'match3' ||
+        ((encounter.gameType === 'match3' ||
           encounter.gameType === 'tcg-inspection') &&
-        typeof encounter.settings.winScore === 'number'
+          typeof encounter.settings.winScore === 'number') ||
+        (encounter.gameType === 'art-academy' &&
+          typeof encounter.settings.successThreshold === 'number')
       const isSnapTargetMode = getSnapTargetId(encounter) !== undefined
       const isFieldObservation = encounter.gameType === 'field-observation'
       const requiredWins = getRequiredWins(encounter)
@@ -1939,11 +2010,18 @@ export async function completeResearchEncounter(
       const scoreCompletionSuccess =
         isScoreCompletionGame &&
         normalizedFinalScore !== null &&
-        normalizedFinalScore >= (encounter.settings.winScore as number)
+        normalizedFinalScore >=
+          (encounter.gameType === 'art-academy'
+            ? encounter.settings.successThreshold
+            : encounter.settings.winScore)!
+      const completionWin =
+        encounter.gameType === 'art-academy'
+          ? scoreCompletionSuccess
+          : validatedSuccess || scoreCompletionSuccess
       const currentWins =
         isSnapTargetMode || isFieldObservation
           ? state.wins
-          : state.wins + (validatedSuccess || scoreCompletionSuccess ? 1 : 0)
+          : state.wins + (completionWin ? 1 : 0)
       const actualSuccess = currentWins >= requiredWins
 
       if (validatedSuccess && !actualSuccess && !isEndlessMode) {
@@ -2058,7 +2136,9 @@ export async function completeResearchEncounter(
         !shouldProtectFieldObservationRewards({
           ability: activeAbility,
           ...abilityContext,
-          surveyFocus: normalizeSurveyFocus(state.fieldObservationPrivate?.surveyFocus),
+          surveyFocus: normalizeSurveyFocus(
+            state.fieldObservationPrivate?.surveyFocus,
+          ),
         })
       if (lostCollectedFieldObservationRewards) {
         completionMessage =
@@ -2068,7 +2148,9 @@ export async function completeResearchEncounter(
         ability: activeAbility,
         ...abilityContext,
         trigger: 'complete',
-        surveyFocus: normalizeSurveyFocus(state.fieldObservationPrivate?.surveyFocus),
+        surveyFocus: normalizeSurveyFocus(
+          state.fieldObservationPrivate?.surveyFocus,
+        ),
       })
 
       // Handle rewards
@@ -2167,7 +2249,9 @@ export async function completeResearchEncounter(
             skillXpLevel,
             1,
             getFieldObservationBaseExperienceXpModifier(rewardSubjects),
-            getFieldObservationCollectedItemXpModifier(collectedFieldObservationRewards.length) *
+            getFieldObservationCollectedItemXpModifier(
+              collectedFieldObservationRewards.length,
+            ) *
               researchSkillXpMultiplier *
               fieldObservationResearchXpMultiplier,
           )
@@ -2194,7 +2278,11 @@ export async function completeResearchEncounter(
           const { summary } = await grantRewards(user.id, rewardsToGrant, {
             requirementContext: rewardRequirementContext,
           })
-          const egg = await maybeCreateFieldObservationEgg(payload as any, user, validatedEncounterId)
+          const egg = await maybeCreateFieldObservationEgg(
+            payload as any,
+            user,
+            validatedEncounterId,
+          )
           if (egg) {
             summary.eggs = [{ id: egg.id, hatchAt: egg.hatchAt }]
           }
@@ -2236,7 +2324,9 @@ export async function completeResearchEncounter(
             skillXpLevel,
             0.4,
             getFieldObservationBaseExperienceXpModifier(rewardSubjects),
-            getFieldObservationCollectedItemXpModifier(collectedFieldObservationRewards.length) *
+            getFieldObservationCollectedItemXpModifier(
+              collectedFieldObservationRewards.length,
+            ) *
               researchSkillXpMultiplier *
               fieldObservationResearchXpMultiplier,
           )
@@ -2303,6 +2393,10 @@ export async function completeResearchEncounter(
         summary: summaryWithExpedition,
         expeditionProgress: expeditionResult.expedition,
         message: completionMessage,
+        finalScore:
+          encounter.gameType === 'art-academy'
+            ? normalizedFinalScore || undefined
+            : undefined,
       }
       await setIdempotentResult(resultKey, response, 300)
       await redis.set(

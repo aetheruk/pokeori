@@ -785,6 +785,14 @@ const settingsByGameType: Record<string, z.ZodTypeAny> = {
         'Rock Tunnel Echo Map position must fit inside the board',
       )
     }),
+  'art-academy': z
+    .object({
+      formId: z.string().min(1).max(80),
+      timeLimit: z.number().positive(),
+      successThreshold: z.number().int().min(50).max(100),
+      paletteSize: z.number().int().min(2).max(16).optional(),
+    })
+    .strict(),
 }
 
 export const gameItemSchema = baseGameSchema

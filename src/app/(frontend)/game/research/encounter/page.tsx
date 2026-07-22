@@ -3,7 +3,11 @@ import { WhosThatPokemonGame } from './whos-that-pokemon'
 import { QuickIdentifyGame } from './quick-identify'
 import { PokemonSnapGame } from './pokemon-snap'
 import { CryRecognitionGame } from './cry-recognition'
-import { getResearchState, completeResearchEncounter, type ResearchState } from '../actions'
+import {
+  getResearchState,
+  completeResearchEncounter,
+  type ResearchState,
+} from '../actions'
 import { ResearchCompareGame } from './research-compare'
 import { RockPushGame } from './rock-push'
 import { RunGame } from './run'
@@ -24,6 +28,7 @@ import { VoltorbGridGame } from './voltorb-grid'
 import { DiglettTunnelTapGame } from './diglett-tunnel-tap'
 import { MagnemiteCircuitGame } from './magnemite-circuit'
 import { RockTunnelEchoMapGame } from './rock-tunnel-echo-map'
+import { ArtAcademyGame } from './art-academy'
 import type { ResearchConfig } from '@/data/games'
 
 export const dynamic = 'force-dynamic'
@@ -47,7 +52,8 @@ interface BaseGameComponentProps {
 // Use a more flexible type for GAME_MAP since components have slightly different prop requirements
 // Using unknown as intermediate cast to handle different component prop types
 const GAME_MAP: Record<string, React.FC<BaseGameComponentProps>> = {
-  silhouette: WhosThatPokemonGame as unknown as React.FC<BaseGameComponentProps>,
+  silhouette:
+    WhosThatPokemonGame as unknown as React.FC<BaseGameComponentProps>,
   identify: QuickIdentifyGame as unknown as React.FC<BaseGameComponentProps>,
   snap: PokemonSnapGame as unknown as React.FC<BaseGameComponentProps>,
   cry: CryRecognitionGame as unknown as React.FC<BaseGameComponentProps>,
@@ -61,16 +67,24 @@ const GAME_MAP: Record<string, React.FC<BaseGameComponentProps>> = {
   fishing: FishingGame as unknown as React.FC<BaseGameComponentProps>,
   match3: Match3Game as unknown as React.FC<BaseGameComponentProps>,
   spelling: SpellingGame as unknown as React.FC<BaseGameComponentProps>,
-  'sliding-puzzle': SlidingPuzzleGame as unknown as React.FC<BaseGameComponentProps>,
+  'sliding-puzzle':
+    SlidingPuzzleGame as unknown as React.FC<BaseGameComponentProps>,
   rhythm: RhythmGame as unknown as React.FC<BaseGameComponentProps>,
   mining: MiningGame as unknown as React.FC<BaseGameComponentProps>,
-  'tcg-inspection': TcgInspectionGame as unknown as React.FC<BaseGameComponentProps>,
+  'tcg-inspection':
+    TcgInspectionGame as unknown as React.FC<BaseGameComponentProps>,
   'tcg-battle': TcgBattleGame as unknown as React.FC<BaseGameComponentProps>,
-  'field-observation': FieldObservationGame as unknown as React.FC<BaseGameComponentProps>,
-  'voltorb-grid': VoltorbGridGame as unknown as React.FC<BaseGameComponentProps>,
-  'diglett-tunnel-tap': DiglettTunnelTapGame as unknown as React.FC<BaseGameComponentProps>,
-  'magnemite-circuit': MagnemiteCircuitGame as unknown as React.FC<BaseGameComponentProps>,
-  'rock-tunnel-echo-map': RockTunnelEchoMapGame as unknown as React.FC<BaseGameComponentProps>,
+  'field-observation':
+    FieldObservationGame as unknown as React.FC<BaseGameComponentProps>,
+  'voltorb-grid':
+    VoltorbGridGame as unknown as React.FC<BaseGameComponentProps>,
+  'diglett-tunnel-tap':
+    DiglettTunnelTapGame as unknown as React.FC<BaseGameComponentProps>,
+  'magnemite-circuit':
+    MagnemiteCircuitGame as unknown as React.FC<BaseGameComponentProps>,
+  'rock-tunnel-echo-map':
+    RockTunnelEchoMapGame as unknown as React.FC<BaseGameComponentProps>,
+  'art-academy': ArtAcademyGame as unknown as React.FC<BaseGameComponentProps>,
 }
 
 export default async function ResearchEncounterPage() {
@@ -87,5 +101,7 @@ export default async function ResearchEncounterPage() {
     redirect('/game/explore')
   }
 
-  return <GameComponent encounter={encounter} initialState={state} state={state} />
+  return (
+    <GameComponent encounter={encounter} initialState={state} state={state} />
+  )
 }
