@@ -682,6 +682,15 @@ describe('skill unlock helpers', () => {
     )
     expect(researcherGuide).toContainEqual(
       expect.objectContaining({
+        label: 'Pokemon Eggs',
+        level: 32,
+        category: 'pokemon',
+        source: 'authored',
+        icon: { type: 'local', id: '/sprites/items/egg.png' },
+      }),
+    )
+    expect(researcherGuide).toContainEqual(
+      expect.objectContaining({
         label: 'Study XP x2',
         level: 18,
         source: 'authored',
