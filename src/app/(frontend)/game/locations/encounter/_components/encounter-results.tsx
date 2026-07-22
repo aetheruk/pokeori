@@ -1,7 +1,7 @@
 import { Heart } from 'lucide-react'
 import nextDynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { GameResult } from '@/components/game/ResearchResult'
 import { TaskExitDialog } from '@/components/game/task-exit-dialog'
 import { Button } from '@/components/ui/button'
@@ -105,17 +105,6 @@ export function EncounterResults({
 }: EncounterResultsProps) {
   const router = useRouter()
   const [replayLoading, setReplayLoading] = useState(false)
-
-  const visibleRewardSummary = useMemo(() => {
-    if (!captureResult?.rewards) return captureResult?.rewards
-
-    return {
-      ...captureResult.rewards,
-      researchXp: (captureResult.rewards.researchXp || []).filter(
-        (entry) => !entry.isCompanion,
-      ),
-    }
-  }, [captureResult?.rewards])
 
   if (!captureResult) return null
 
@@ -257,7 +246,7 @@ export function EncounterResults({
               (captureResult as any).message ||
               'The wild Pokemon fled.'
         }
-        rewardSummary={visibleRewardSummary}
+        rewardSummary={captureResult.rewards}
         icon={{
           type: 'pokemon',
           id:

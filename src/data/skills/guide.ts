@@ -390,6 +390,16 @@ export const authoredSkillGuideUnlocks: SkillGuideUnlock[] = [
     source: 'authored',
     icon: itemIcon('tm-flash'),
   },
+  {
+    skillId: 'researching',
+    level: 32,
+    category: 'pokemon',
+    label: 'Pokemon Eggs',
+    description:
+      'Find Pokemon Eggs in Field Observation after completing the Day Care Egg Program.',
+    source: 'authored',
+    icon: { type: 'local', id: '/sprites/items/egg.png' },
+  },
   ...fieldObservationResearchUnlocks,
   ...fieldObservationMaterialUnlocks,
   ...nutUnlocks,
