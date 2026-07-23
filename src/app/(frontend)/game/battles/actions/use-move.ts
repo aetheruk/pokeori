@@ -68,6 +68,7 @@ import {
 import type { MoveConfig } from '@/data/moves'
 import {
   applyEnemyAiMoveEffects,
+  applyEnemyAiPreDamageDefensiveEffects,
   chooseEnemyBattleAction,
   type EnemyAiMoveChoice,
   resolveEnemyAiMoveAccuracy,
@@ -964,6 +965,19 @@ export async function useMove(
       suppressesBattleMoveAddedEffectsByAbility(playerMon, move)
     const secondaryEffectChanceMultiplier =
       getBattleAbilitySecondaryEffectChance(playerMon, move, 100) / 100
+    const enemyPreDamageDefensiveMessages =
+      enemyAiMove &&
+      !enemySwapped &&
+      !enemyRechargeMsg &&
+      !trainerItemResult.skipsEnemyAction &&
+      !enemyMoveFailedFromContest
+        ? applyEnemyAiPreDamageDefensiveEffects({
+            move: enemyAiMove.move,
+            self: enemyMon,
+            opponent: playerMon,
+            state,
+          })
+        : []
 
     // Apply buffs
 	    let message = playerStatusMsg
@@ -984,6 +998,9 @@ export async function useMove(
     }
     if (trainerItemResult.message) {
       message += `${message ? '\n' : ''}${trainerItemResult.message}`
+    }
+    if (enemyPreDamageDefensiveMessages.length) {
+      message += `${message ? '\n' : ''}${enemyPreDamageDefensiveMessages.join(' ')}`
     }
     if (message) {
       message += '\n'
@@ -2187,6 +2204,7 @@ export async function useMove(
           state,
           damageDealt: enemyDamage,
           weather: state.weather?.weather,
+          skipPreDamageDefensiveEffects: true,
         })
       }
       if (
