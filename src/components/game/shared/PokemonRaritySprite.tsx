@@ -1,12 +1,12 @@
 import Image from 'next/image'
-import { useId, type CSSProperties } from 'react'
+import { type CSSProperties } from 'react'
 import { cn } from '@/lib/utils'
+import { getBundledPokemonSpriteUrl } from '@/utilities/pokemon/local-sprites'
 import {
   getPokemonRarityEffect,
-  resolvePokemonRarity,
   type PokemonRarityId,
+  resolvePokemonRarity,
 } from '@/utilities/pokemon/rarity-effects'
-import { getBundledPokemonSpriteUrl } from '@/utilities/pokemon/local-sprites'
 
 export type PokemonRaritySpriteView = 'front' | 'back' | 'home'
 
@@ -37,7 +37,6 @@ export function PokemonRaritySprite({
   imageClassName,
   sizes = '128px',
 }: PokemonRaritySpriteProps) {
-  const pixelateFilterId = `pokemon-rarity-pixelate-${useId().replaceAll(':', '')}`
   const resolvedRarity = resolvePokemonRarity({
     rarity,
     shiny,
@@ -47,9 +46,7 @@ export function PokemonRaritySprite({
   const effect = getPokemonRarityEffect(resolvedRarity)
   const isHomeSprite = view === 'home'
   const imageStyle: CSSProperties | undefined =
-    resolvedRarity === 'pixelated'
-      ? { filter: `url(#${pixelateFilterId})` }
-      : resolvedRarity === 'black'
+    resolvedRarity === 'black'
       ? { filter: 'grayscale(1) brightness(0.48) contrast(1.72)' }
       : resolvedRarity === 'white'
         ? { filter: 'grayscale(1) brightness(1.38) contrast(1.68)' }
@@ -78,9 +75,6 @@ export function PokemonRaritySprite({
       }
     >
       <span className="pokemon-rarity-sprite__aura" aria-hidden="true" />
-      {resolvedRarity === 'pixelated' && (
-        <PixelateSvgFilter id={pixelateFilterId} />
-      )}
       <Image
         src={imageUrl}
         alt={alt}
@@ -95,44 +89,5 @@ export function PokemonRaritySprite({
       />
       <span className="pokemon-rarity-sprite__overlay" aria-hidden="true" />
     </div>
-  )
-}
-
-function PixelateSvgFilter({ id }: { id: string }) {
-  return (
-    <svg
-      className="absolute h-0 w-0 overflow-hidden"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <defs>
-        <filter id={id} x="0" y="0" width="1" height="1">
-          <feConvolveMatrix
-            kernelMatrix="1 1 1 1 1 1 1 1 1"
-            result="pixel-average"
-          />
-          <feFlood x="1" y="1" width="1" height="1" result="pixel-cell" />
-          <feComposite
-            in2="pixel-cell"
-            operator="arithmetic"
-            k2="1"
-            width="8"
-            height="8"
-          />
-          <feTile result="pixel-grid" />
-          <feComposite
-            in="pixel-average"
-            in2="pixel-grid"
-            operator="in"
-            result="pixel-samples"
-          />
-          <feMorphology
-            in="pixel-samples"
-            operator="dilate"
-            radius="4"
-          />
-        </filter>
-      </defs>
-    </svg>
   )
 }
