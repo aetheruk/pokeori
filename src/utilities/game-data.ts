@@ -5,6 +5,7 @@ import type { RequirementData } from '@/utilities/requirements'
 import type { GameDataKeys } from '@/utilities/requirements/analysis'
 import { CHANNELING_POKEMON_SELECT, EXPLORE_POKEMON_SELECT } from '@/utilities/game-data-scopes'
 import { getUserStateData, toSlimUser } from '@/utilities/user-state'
+import { resolvePokemonRarity } from '@/utilities/pokemon/rarity-effects'
 import { ensureUserWeatherSlot } from '@/utilities/weather'
 
 interface ActiveExpeditionData {
@@ -81,6 +82,47 @@ export async function getGameUserData(
 
   const userState = await getUserStateData(payload as any, user, requiredData)
   const weatherState = await ensureUserWeatherSlot(payload as any, user as User)
+
+  // Existing Pokemon predate the canonical Pokedex rarity ledger. Derive their
+  // obtained variants at sync time so long-standing collections immediately
+  // populate the new Pokedex Variants section as well as future captures.
+  if (shouldFetch('pokedex')) {
+    const variantPokemon = pokemonData.length
+      ? pokemonData
+      : ((await payload.find({
+          collection: 'pokemon',
+          where: { user: { equals: user.id } },
+          pagination: false,
+          depth: 0,
+          select: {
+            speciesId: true,
+            formId: true,
+            rarity: true,
+            shiny: true,
+            isShadow: true,
+            isRadiant: true,
+          },
+        } as any)).docs as Pokemon[])
+    const ownedRarities = new Map<string, Set<string>>()
+
+    for (const pokemon of variantPokemon) {
+      const key = `${pokemon.speciesId}:${pokemon.formId}`
+      const rarities = ownedRarities.get(key) ?? new Set<string>()
+      rarities.add(resolvePokemonRarity(pokemon))
+      ownedRarities.set(key, rarities)
+    }
+
+    userState.pokedex = (userState.pokedex as Array<any>).map((entry) => {
+      const owned = ownedRarities.get(`${entry.speciesId}:${entry.formId}`)
+      if (!owned?.size) return entry
+      return {
+        ...entry,
+        raritiesCaught: Array.from(
+          new Set([...(entry.raritiesCaught || []), ...owned]),
+        ),
+      }
+    })
+  }
 
   let activeExpedition: ActiveExpeditionData | null = null
 

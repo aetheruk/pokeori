@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useUser } from '@/context/UserContext'
 import type { BattleStance } from '@/utilities/battle/types'
+import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
 
 // Helper type for the Pokedex entry format in the User document
 export type PokedexEntry = {
@@ -8,6 +9,7 @@ export type PokedexEntry = {
   caught?: boolean | null
   shinySeen?: boolean | null
   shinyCaught?: boolean | null
+  raritiesCaught?: PokemonRarityId[] | null
   formId?: string | null
   totalSeen?: number
   totalCaught?: number

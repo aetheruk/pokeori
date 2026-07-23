@@ -1,5 +1,9 @@
 import type { User } from '@/payload-types'
 import type { BattleStance } from '@/utilities/battle/types'
+import {
+  isPokemonRarityId,
+  type PokemonRarityId,
+} from '@/utilities/pokemon/rarity-effects'
 import type { RequirementData } from '@/utilities/requirements'
 import type { GameDataKeys } from '@/utilities/requirements/analysis'
 
@@ -51,6 +55,7 @@ type PokedexEntry = RequirementData['pokedex'][number] & {
   totalSeen?: number
   shinyCaught?: boolean
   shinySeen?: boolean
+  raritiesCaught?: PokemonRarityId[]
   preferredBattleStance?: BattleStance
 }
 
@@ -268,11 +273,56 @@ export function pokedexRowsToArray(rows: any[]): PokedexEntry[] {
       totalSeen,
       shinyCaught: row.shinyCaught === undefined ? undefined : Boolean(row.shinyCaught),
       shinySeen: row.shinySeen === undefined ? undefined : Boolean(row.shinySeen),
+      raritiesCaught: normalizePokedexRarities(row.raritiesCaught),
       researchXp,
       researchLevel,
       preferredBattleStance: row.preferredBattleStance as BattleStance | undefined,
     }
   })
+}
+
+function normalizePokedexRarities(value: unknown): PokemonRarityId[] {
+  if (!Array.isArray(value)) return []
+  return Array.from(
+    new Set(
+      value
+        .map((entry) =>
+          typeof entry === 'string'
+            ? entry
+            : isObjectRecord(entry)
+              ? entry.rarity
+              : undefined,
+        )
+        .filter(isPokemonRarityId),
+    ),
+  )
+}
+
+/** Records an owned rarity treatment for one Pokedex form. */
+export function addPokedexCaughtRarity<T extends PokedexMapEntry>(
+  entry: T,
+  rarity: PokemonRarityId,
+): T & { raritiesCaught: PokemonRarityId[]; shinyCaught?: boolean; shinySeen?: boolean } {
+  const raritiesCaught = Array.from(
+    new Set([...normalizePokedexRarities(entry.raritiesCaught), rarity]),
+  )
+  return {
+    ...entry,
+    raritiesCaught,
+    ...(rarity === 'shiny'
+      ? { shinyCaught: true, shinySeen: true }
+      : {}),
+  }
+}
+
+export function getPokedexCaughtRarities(
+  entry: PokedexMapEntry | undefined,
+): PokemonRarityId[] {
+  if (!entry) return []
+  const rarities = normalizePokedexRarities(entry.raritiesCaught)
+  if (entry.caught) rarities.push('normal')
+  if (entry.shinyCaught) rarities.push('shiny')
+  return Array.from(new Set(rarities))
 }
 
 export function pokedexArrayToMap(entries: PokedexEntry[] | undefined): PokedexMap {
@@ -343,6 +393,7 @@ function pokedexMapToRows(
           totalCaught: entry.totalCaught ?? 0,
           shinySeen: entry.shinySeen ?? false,
           shinyCaught: entry.shinyCaught ?? false,
+          raritiesCaught: normalizePokedexRarities(entry.raritiesCaught),
           researchXp: entry.researchXp ?? 0,
           researchLevel: entry.researchLevel ?? 0,
           preferredBattleStance: entry.preferredBattleStance ?? null,

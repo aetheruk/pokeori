@@ -100,6 +100,14 @@ export const UserPokedexEntries: CollectionConfig = {
       defaultValue: false,
     },
     {
+      name: 'raritiesCaught',
+      type: 'json',
+      defaultValue: [],
+      admin: {
+        description: 'Canonical rarity treatments obtained for this Pokemon form.',
+      },
+    },
+    {
       name: 'researchXp',
       type: 'number',
       defaultValue: 0,

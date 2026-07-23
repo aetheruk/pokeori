@@ -57,6 +57,7 @@ import {
   getSkillLevel,
 } from '@/utilities/skills/unlocks'
 import { getPokemonResearchLevel } from '@/utilities/research/research-levels'
+import { addPokedexCaughtRarity } from '@/utilities/user-state'
 import { getActiveEggCount } from '@/utilities/day-care/eggs'
 import {
   buildCaptureEscapeRopeReward,
@@ -732,15 +733,13 @@ export async function attemptCapture(
       ...pokedex,
       [speciesKey]: {
         ...speciesData,
-        [formKey]: {
+        [formKey]: addPokedexCaughtRarity({
           ...dexEntry,
           seen: true,
           caught: true,
           totalSeen: Math.max(dexEntry.totalSeen || 0, 1),
           totalCaught: (dexEntry.totalCaught || 0) + 1,
-          shinySeen: rarity === 'shiny' ? true : dexEntry.shinySeen,
-          shinyCaught: rarity === 'shiny' ? true : dexEntry.shinyCaught,
-        },
+        }, rarity),
       },
     }
 

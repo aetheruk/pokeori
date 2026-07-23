@@ -1,6 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 import type { User } from '@/payload-types'
 import {
+  addPokedexCaughtRarity,
+  getPokedexCaughtRarities,
   getUserStateData,
   pokedexRowsToArray,
   toSlimUser,
@@ -48,6 +50,24 @@ describe('user state storage compatibility', () => {
     ).toEqual([
       expect.objectContaining({ formId: '129', seen: true, caught: false }),
       expect.objectContaining({ formId: '19', seen: true, caught: true }),
+    ])
+  })
+
+  test('Pokedex rarity collections retain each obtained variant and legacy shinies', () => {
+    const entry = addPokedexCaughtRarity(
+      {
+        seen: true,
+        caught: true,
+        shinyCaught: true,
+      },
+      'ruby',
+    )
+
+    expect(entry.raritiesCaught).toEqual(['ruby'])
+    expect(getPokedexCaughtRarities(entry).sort()).toEqual([
+      'normal',
+      'ruby',
+      'shiny',
     ])
   })
 
