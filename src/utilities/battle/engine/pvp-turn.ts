@@ -1495,7 +1495,11 @@ export function resolvePvpFaint(
     if (side === 'player') state.activePlayerIndex = nextIndex
     else state.activeEnemyIndex = nextIndex
     team[nextIndex].activeTurnStarted = state.turn + 1
-    const rarityMessages = applyBattleRarityEntryEffects(team[nextIndex])
+    const rarityMessages = applyBattleRarityEntryEffects(
+      team[nextIndex],
+      Math.random,
+      state,
+    )
     const suppressionMessages = processBattleAbilitySuppressionForState(
       state as BattleState,
     )

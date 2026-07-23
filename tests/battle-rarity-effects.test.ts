@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import type { BattlePokemon } from '@/utilities/battle/types'
+import type { BattlePokemon, BattleState } from '@/utilities/battle/types'
 import {
   applyBattleRarityEntryEffects,
   processBattleRarityAttackAttempt,
@@ -30,6 +30,21 @@ function makePokemon(overrides: Partial<BattlePokemon> = {}): BattlePokemon {
     updatedAt: '2026-01-01T00:00:00.000Z',
     ...overrides,
   }
+}
+
+function makeBattleState(weather: BattleState['weather']): BattleState {
+  return {
+    playerTeam: [],
+    enemyTeam: [],
+    activePlayerIndex: 0,
+    activeEnemyIndex: 0,
+    turn: 1,
+    status: 'ongoing',
+    playerName: 'Player',
+    enemyName: 'Enemy',
+    itemsUsedThisBattle: [],
+    weather,
+  } as unknown as BattleState
 }
 
 describe('battle rarity effects', () => {
@@ -67,6 +82,53 @@ describe('battle rarity effects', () => {
     expect(retro.statStages).toMatchObject({ attack: 3, defense: -3 })
     expect(emerald.status?.id).toBe('shield')
     expect(pixelated.statStages?.evasion).toBe(1)
+  })
+
+  test('Ruby, Sapphire, and Emerald set their entry weather', () => {
+    const rubyState = makeBattleState({
+      slot: 1,
+      weather: 'rain',
+      label: 'Rain',
+    })
+    const sapphireState = makeBattleState({
+      slot: 1,
+      weather: 'harsh-sunlight',
+      label: 'Harsh Sunlight',
+    })
+    const emeraldState = makeBattleState({
+      slot: 1,
+      weather: 'sandstorm',
+      label: 'Sandstorm',
+    })
+
+    const rubyMessages = applyBattleRarityEntryEffects(
+      makePokemon({ rarity: 'ruby' }),
+      Math.random,
+      rubyState,
+    )
+    const sapphireMessages = applyBattleRarityEntryEffects(
+      makePokemon({ rarity: 'sapphire' }),
+      Math.random,
+      sapphireState,
+    )
+    const emeraldMessages = applyBattleRarityEntryEffects(
+      makePokemon({ rarity: 'emerald' }),
+      Math.random,
+      emeraldState,
+    )
+
+    expect(rubyState.weather?.weather).toBe('harsh-sunlight')
+    expect(sapphireState.weather?.weather).toBe('rain')
+    expect(emeraldState.weather?.weather).toBe('clear')
+    expect(rubyMessages).toContain(
+      'Testmon\'s Ruby rarity made the weather Harsh Sunlight!',
+    )
+    expect(sapphireMessages).toContain(
+      'Testmon\'s Sapphire rarity made the weather Rain!',
+    )
+    expect(emeraldMessages).toContain(
+      'Testmon\'s Emerald rarity made the weather Clear!',
+    )
   })
 
   test('selects legal Prism types and changes Rainbow types every active turn', () => {

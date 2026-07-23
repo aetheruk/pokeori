@@ -134,7 +134,11 @@ export async function swapPokemon(
       }
       const leadPokemon = state.playerTeam[state.activePlayerIndex]
       leadPokemon.activeTurnStarted = state.turn
-      const rarityMessages = applyBattleRarityEntryEffects(leadPokemon)
+      const rarityMessages = applyBattleRarityEntryEffects(
+        leadPokemon,
+        Math.random,
+        state,
+      )
       markPlayerPokemonInvolved(state, state.activePlayerIndex)
       state.pendingPlayerSwitch = false
       state.pendingPlayerSwitchReason = undefined

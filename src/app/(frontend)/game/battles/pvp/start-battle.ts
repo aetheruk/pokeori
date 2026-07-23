@@ -167,8 +167,16 @@ export async function initializeSharedPvpBattle(
   }
 
   const rarityMessages = [
-    ...applyBattleRarityEntryEffects(initialState.playerTeam[initialState.activePlayerIndex]),
-    ...applyBattleRarityEntryEffects(initialState.enemyTeam[initialState.activeEnemyIndex]),
+    ...applyBattleRarityEntryEffects(
+      initialState.playerTeam[initialState.activePlayerIndex],
+      Math.random,
+      initialState,
+    ),
+    ...applyBattleRarityEntryEffects(
+      initialState.enemyTeam[initialState.activeEnemyIndex],
+      Math.random,
+      initialState,
+    ),
   ]
   if (rarityMessages.length) {
     initialState.history.unshift({

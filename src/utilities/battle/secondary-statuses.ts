@@ -568,7 +568,7 @@ export function processSecondaryStatusesForSwitch(
   state.secondaryStatuses = battleResult.statuses
   messages.push(...battleResult.messages)
 
-  messages.push(...applyBattleRarityEntryEffects(switchedPokemon, random))
+  messages.push(...applyBattleRarityEntryEffects(switchedPokemon, random, state))
 
   return messages
 }
