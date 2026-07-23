@@ -907,25 +907,6 @@ export function PokemonDetailsDialog({
               </div>
             </div>
 
-            <div className="w-full max-w-md space-y-3">
-              <SectionDivider className="text-[10px] font-black uppercase tracking-[0.2em]">
-                Variant
-              </SectionDivider>
-              <div className="rounded-xl border border-game-border bg-game-surface-raised px-4 py-3 shadow-sm">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-xs font-semibold text-game-muted">
-                    Rarity
-                  </span>
-                  <Badge className="border-game-ochre bg-game-ochre/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.08em] text-game-ochre">
-                    {rarityVariant.label}
-                  </Badge>
-                </div>
-                <p className="mt-2 text-xs leading-relaxed text-game-muted">
-                  {rarityVariant.description}
-                </p>
-              </div>
-            </div>
-
             {/* Evolution Section */}
             {(() => {
               const possibleEvolutions = EVOLUTIONS[pokemon.speciesId] || []
@@ -1241,6 +1222,12 @@ export function PokemonDetailsDialog({
                     label: 'Level',
                     value: pokemon.level,
                     icon: Swords,
+                    color: 'game-moss',
+                  },
+                  {
+                    label: 'Variant',
+                    value: rarityVariant.label,
+                    icon: Info,
                     color: 'game-moss',
                   },
                   {
