@@ -222,7 +222,11 @@ export async function processEnemyAttackOnly(
       activeEnemy = state.enemyTeam[enemyAction.newIndex]
       activeEnemy.activeTurnStarted = state.turn + 1
       enemySwapped = true
-      const rarityMessages = applyBattleRarityEntryEffects(activeEnemy)
+      const rarityMessages = applyBattleRarityEntryEffects(
+        activeEnemy,
+        Math.random,
+        state,
+      )
       const suppressionMessages = processBattleAbilitySuppressionForState(state)
       const weatherMessages = processBattleAbilityWeatherSet({
         state,

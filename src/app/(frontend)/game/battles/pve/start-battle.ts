@@ -563,9 +563,13 @@ export async function startBattleFromConfig(
       ? []
       : applyBattleRarityEntryEffects(
           initialState.playerTeam[initialState.activePlayerIndex],
+          Math.random,
+          initialState,
         )),
     ...applyBattleRarityEntryEffects(
       initialState.enemyTeam[initialState.activeEnemyIndex],
+      Math.random,
+      initialState,
     ),
     ...suppressionMessages,
     ...(battleConfig.isWildBattle

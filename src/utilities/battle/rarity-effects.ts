@@ -1,7 +1,8 @@
 import type { StatusEffectId } from '@/data/moves/types'
+import { WEATHER_LABELS, type WeatherType } from '@/data/weather'
 import { resolvePokemonRarity } from '@/utilities/pokemon/rarity-effects'
 import { applyStatus } from './status-effects-logic'
-import type { BattlePokemon } from './types'
+import type { BattlePokemon, BattleState } from './types'
 
 const BATTLE_TYPES = [
   'normal',
@@ -33,6 +34,7 @@ const RETRO_STATS = [
 ] as const
 
 type RarityRandom = () => number
+type RarityWeatherState = Pick<BattleState, 'weather' | 'turn'>
 
 function formatType(type: string) {
   return `${type[0]?.toUpperCase() ?? ''}${type.slice(1)}`
@@ -109,10 +111,42 @@ function forceRarityStatus(
   return result.applied ? result.message : undefined
 }
 
+function getRarityEntryWeather(
+  rarity: ReturnType<typeof resolvePokemonRarity>,
+): WeatherType | undefined {
+  if (rarity === 'ruby') return 'harsh-sunlight'
+  if (rarity === 'sapphire') return 'rain'
+  if (rarity === 'emerald') return 'clear'
+  return undefined
+}
+
+function applyRarityEntryWeather(
+  state: RarityWeatherState | undefined,
+  pokemon: BattlePokemon,
+  rarity: ReturnType<typeof resolvePokemonRarity>,
+): string | undefined {
+  const weather = getRarityEntryWeather(rarity)
+  if (!state || !weather || state.weather?.weather === weather) return undefined
+
+  const previousWeather = state.weather?.weather ?? 'clear'
+  state.weather = {
+    ...(state.weather ?? { slot: 1 }),
+    weather,
+    label: WEATHER_LABELS[weather],
+    source: 'rarity',
+    originalWeather: state.weather?.originalWeather ?? previousWeather,
+    overriddenAtTurn: state.turn,
+    overriddenBy: `${pokemon.name}'s ${formatType(rarity)} rarity`,
+  }
+
+  return `${pokemon.name}'s ${formatType(rarity)} rarity made the weather ${WEATHER_LABELS[weather]}!`
+}
+
 /** Applies one-time effects when a Pokemon first becomes active. */
 export function applyBattleRarityEntryEffects(
   pokemon: BattlePokemon | undefined,
   random: RarityRandom = Math.random,
+  battleState?: RarityWeatherState,
 ): string[] {
   if (!pokemon || pokemon.rarityBattleState?.entryApplied) return []
 
@@ -122,6 +156,8 @@ export function applyBattleRarityEntryEffects(
   applyRarityTypes(pokemon, random)
   const addedType = getRarityAddedType(rarity)
   const messages: string[] = []
+  const weatherMessage = applyRarityEntryWeather(battleState, pokemon, rarity)
+  if (weatherMessage) messages.push(weatherMessage)
 
   pokemon.statStages ??= {
     attack: 0,

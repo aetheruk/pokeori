@@ -829,7 +829,11 @@ export async function useMove(
         enemyMon = state.enemyTeam[enemyAction.newIndex]
         enemyMon.activeTurnStarted = state.turn + 1
         enemySwapped = true
-        const rarityMessages = applyBattleRarityEntryEffects(enemyMon)
+        const rarityMessages = applyBattleRarityEntryEffects(
+          enemyMon,
+          Math.random,
+          state,
+        )
         const weatherMessages = processBattleAbilityWeatherSet({
           state,
           pokemon: enemyMon,
