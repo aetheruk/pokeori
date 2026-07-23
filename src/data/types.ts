@@ -37,6 +37,7 @@ export interface Reward {
     | 'increase_max_pokemon'
     | 'increase_max_boxes'
     | 'pokemon_research_xp'
+    | 'egg'
   targetId?: string | number // Changed: Now used for currency type (e.g. 'crystals')
   skill?: string
   quantity?: number | { min: number; max: number }
@@ -81,6 +82,13 @@ export interface Reward {
     obtainedRegion?: string
     obtainedLocation?: string
     obtainedSourceId?: string
+  }
+  eggData?: {
+    rarity?: PokemonRarityId
+    sourceResearchId?: string
+    sourceBackground?: string
+    sourceRegion?: string
+    sourceLocation?: string
   }
 }
 

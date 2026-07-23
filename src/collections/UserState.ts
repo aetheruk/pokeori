@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { POKEMON_RARITY_OPTIONS } from '@/utilities/pokemon/rarity-effects'
 import superAdminCheck, { adminOrUserOwned } from '@/utilities/access'
 
 const serverOwnedAccess = {
@@ -356,6 +357,13 @@ export const UserEggs: CollectionConfig = {
     { name: 'sourceBackground', type: 'text' },
     { name: 'sourceRegion', type: 'text' },
     { name: 'sourceLocation', type: 'text' },
+    {
+      name: 'rarity',
+      type: 'select',
+      required: true,
+      defaultValue: 'normal',
+      options: POKEMON_RARITY_OPTIONS,
+    },
     { name: 'status', type: 'select', required: true, defaultValue: 'incubating', index: true, options: [{ label: 'Incubating', value: 'incubating' }, { label: 'Hatched', value: 'hatched' }] },
     { name: 'hatchedPokemonId', type: 'text' },
     { name: 'hatchPoolId', type: 'text' },

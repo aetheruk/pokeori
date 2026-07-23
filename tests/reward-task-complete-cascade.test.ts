@@ -8,6 +8,7 @@ let tcgState: Record<string, number>
 
 const payloadMock = {
   find: mock(async () => ({ docs: [] })),
+  count: mock(async () => ({ totalDocs: 0 })),
   findByID: mock(async () => ({
     id: 'user-1',
     skills: {},
@@ -85,6 +86,7 @@ describe('task_complete reward cascading', () => {
     activityStatsState = {}
     tcgState = {}
     payloadMock.find.mockClear()
+    payloadMock.count.mockClear()
     payloadMock.findByID.mockClear()
     payloadMock.update.mockClear()
     payloadMock.create.mockClear()
@@ -176,5 +178,33 @@ describe('task_complete reward cascading', () => {
       formId: '1',
       ability: 'chlorophyll',
     })
+  })
+
+  test('egg rewards create the requested variant egg', async () => {
+    const { grantRewards } = await import('@/utilities/rewards/reward-logic')
+
+    const { summary } = await grantRewards('user-1', [
+      {
+        type: 'egg',
+        eggData: {
+          rarity: 'galactic',
+          sourceLocation: 'Celadon Day Care',
+        },
+      },
+    ])
+
+    const createdEgg = payloadMock.create.mock.calls
+      .map(([args]) => args)
+      .find((args) => args.collection === 'user-eggs')?.data
+
+    expect(createdEgg).toMatchObject({
+      user: 'user-1',
+      rarity: 'galactic',
+      sourceLocation: 'Celadon Day Care',
+      status: 'incubating',
+    })
+    expect(summary.eggs).toContainEqual(
+      expect.objectContaining({ rarity: 'galactic' }),
+    )
   })
 })

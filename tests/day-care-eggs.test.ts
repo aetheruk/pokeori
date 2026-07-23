@@ -2,10 +2,12 @@ import { describe, expect, test } from 'bun:test'
 import {
   DAY_CARE_EGG_MAX_OWNED,
   DAY_CARE_EGG_POOLS,
+  DAY_CARE_EGG_RARITIES,
   DAY_CARE_EGG_SHINY_MULTIPLIER,
   getEggPoolCandidates,
   rollEggHatch,
 } from '@/utilities/day-care/eggs'
+import { POKEMON_RARITY_IDS } from '@/utilities/pokemon/rarity-effects'
 
 describe('Day Care eggs', () => {
   const pokedex = {
@@ -25,5 +27,25 @@ describe('Day Care eggs', () => {
     expect(DAY_CARE_EGG_MAX_OWNED).toBe(10)
     const result = rollEggHatch(pokedex, 1, () => 0, DAY_CARE_EGG_POOLS)
     expect(result).toMatchObject({ poolId: 'caught', formId: '1', speciesId: 1 })
+  })
+
+  test('derives egg variants from every registered Pokemon rarity', () => {
+    expect(DAY_CARE_EGG_RARITIES).toEqual(POKEMON_RARITY_IDS)
+  })
+
+  test('variant eggs always hatch their configured rarity', () => {
+    const result = rollEggHatch(
+      pokedex,
+      1,
+      () => 0,
+      DAY_CARE_EGG_POOLS,
+      'galactic',
+    )
+
+    expect(result).toMatchObject({
+      formId: '1',
+      rarity: 'galactic',
+      shiny: false,
+    })
   })
 })

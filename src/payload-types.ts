@@ -777,6 +777,31 @@ export interface UserEgg {
   sourceBackground?: string | null;
   sourceRegion?: string | null;
   sourceLocation?: string | null;
+  rarity:
+    | 'normal'
+    | 'shiny'
+    | 'shadow'
+    | 'radiant'
+    | 'silver'
+    | 'gold'
+    | 'emerald'
+    | 'ruby'
+    | 'sapphire'
+    | 'crystal'
+    | 'retro'
+    | 'galactic'
+    | 'levin'
+    | 'inferno'
+    | 'prism'
+    | 'rainbow'
+    | 'celestial'
+    | 'black'
+    | 'white'
+    | 'void'
+    | 'glitch'
+    | 'ancient'
+    | 'toxic'
+    | 'pixelated';
   status: 'incubating' | 'hatched';
   hatchedPokemonId?: string | null;
   hatchPoolId?: string | null;
@@ -1238,6 +1263,7 @@ export interface UserEggsSelect<T extends boolean = true> {
   sourceBackground?: T;
   sourceRegion?: T;
   sourceLocation?: T;
+  rarity?: T;
   status?: T;
   hatchedPokemonId?: T;
   hatchPoolId?: T;

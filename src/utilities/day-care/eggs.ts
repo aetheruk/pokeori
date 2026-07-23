@@ -2,6 +2,11 @@ import type { Payload } from 'payload'
 import pokemonData, { type PokemonData } from '@/data/pokemon-data'
 import { allGames } from '@/data/games'
 import { getPokemonForm, getSpeciesIdForForm } from '@/utilities/pokemon/pokedex'
+import {
+  isPokemonRarityId,
+  POKEMON_RARITY_IDS,
+  type PokemonRarityId,
+} from '@/utilities/pokemon/rarity-effects'
 import { getResearcherShinyModifier, getSkillLevel } from '@/utilities/skills/unlocks'
 import { getUserCompletedTasksMap, getUserPokedexMap, type PokedexMap } from '@/utilities/user-state'
 import { getShinyChance, rollShiny } from '@/utilities/pokemon/shiny-odds'
@@ -14,6 +19,8 @@ export const DAY_CARE_EGG_RESEARCH_XP = 15
 export const FIELD_OBSERVATION_EGG_DENOMINATOR = 26
 export const DAY_CARE_EGG_MAX_OWNED = 10
 export const DAY_CARE_EGG_SHINY_MULTIPLIER = 2
+/** Derived from the central rarity registry so new rarities gain an egg variant automatically. */
+export const DAY_CARE_EGG_RARITIES = POKEMON_RARITY_IDS
 
 export type EggPool = {
   id: string
@@ -31,7 +38,22 @@ export type EggHatchResult = {
   poolId: string
   formId: string
   speciesId: number
+  rarity: PokemonRarityId
   shiny: boolean
+}
+
+export type EggGrantData = {
+  rarity?: PokemonRarityId | string | null
+  sourceResearchId?: string
+  sourceBackground?: string
+  sourceRegion?: string
+  sourceLocation?: string
+}
+
+export function resolveEggRarity(
+  rarity?: PokemonRarityId | string | null,
+): PokemonRarityId {
+  return isPokemonRarityId(rarity) ? rarity : 'normal'
 }
 
 function allEligibleForms(pokedex: PokedexMap, predicate: (entry: any) => boolean) {
@@ -62,6 +84,7 @@ export function rollEggHatch(
   researcherLevel: number,
   random: () => number = Math.random,
   pools: EggPool[] = DAY_CARE_EGG_POOLS,
+  eggRarity?: PokemonRarityId | string | null,
 ): EggHatchResult | null {
   const eligible = pools
     .map((pool) => ({ pool, forms: getEggPoolCandidates(pool, pokedex) }))
@@ -84,7 +107,21 @@ export function rollEggHatch(
     sourceModifier: DAY_CARE_EGG_SHINY_MULTIPLIER,
     researcherModifier: getResearcherShinyModifier(researcherLevel),
   })
-  return { poolId: selected.pool.id, formId, speciesId, shiny: rollShiny(shinyChance, 1, random) }
+  const resolvedEggRarity = resolveEggRarity(eggRarity)
+  const rarity =
+    resolvedEggRarity === 'normal'
+      ? rollShiny(shinyChance, 1, random)
+        ? 'shiny'
+        : 'normal'
+      : resolvedEggRarity
+
+  return {
+    poolId: selected.pool.id,
+    formId,
+    speciesId,
+    rarity,
+    shiny: rarity === 'shiny',
+  }
 }
 
 export async function canUseDayCareEggs(payload: Payload, user: any): Promise<boolean> {
@@ -97,17 +134,55 @@ export async function getActiveEggCount(payload: Payload, userId: string): Promi
   return (await payload.count({ collection: 'user-eggs' as any, where: { and: [{ user: { equals: userId } }, { status: { equals: 'incubating' } }] } })).totalDocs
 }
 
+export async function createUserEgg(
+  payload: Payload,
+  userId: string,
+  data: EggGrantData = {},
+) {
+  const foundAt = new Date()
+  return payload.create({
+    collection: 'user-eggs' as any,
+    data: {
+      user: userId,
+      foundAt: foundAt.toISOString(),
+      hatchAt: new Date(
+        foundAt.getTime() + DAY_CARE_EGG_HATCH_DELAY_MS,
+      ).toISOString(),
+      sourceResearchId: data.sourceResearchId,
+      sourceBackground: data.sourceBackground,
+      sourceRegion: data.sourceRegion,
+      sourceLocation: data.sourceLocation,
+      rarity: resolveEggRarity(data.rarity),
+      status: 'incubating',
+    },
+  })
+}
+
 export async function maybeCreateFieldObservationEgg(payload: Payload, user: any, researchId: string) {
   if (!(await canUseDayCareEggs(payload, user))) return null
   const eggCount = await getActiveEggCount(payload, user.id)
   if (eggCount >= DAY_CARE_EGG_MAX_OWNED || Math.floor(Math.random() * FIELD_OBSERVATION_EGG_DENOMINATOR) !== 0) return null
   const pokemonCount = (await payload.count({ collection: 'pokemon', where: { user: { equals: user.id } } })).totalDocs
   if (pokemonCount + eggCount >= (user.maxPokemon || 50)) return null
-  const foundAt = new Date()
   const research = allGames.find((game) => game.id === researchId)
-  return payload.create({ collection: 'user-eggs' as any, data: { user: user.id, foundAt: foundAt.toISOString(), hatchAt: new Date(foundAt.getTime() + DAY_CARE_EGG_HATCH_DELAY_MS).toISOString(), sourceResearchId: researchId, sourceBackground: research?.background, sourceRegion: research?.category, sourceLocation: research?.subCategory || research?.name, status: 'incubating' } })
+  return createUserEgg(payload, user.id, {
+    sourceResearchId: researchId,
+    sourceBackground: research?.background,
+    sourceRegion: research?.category,
+    sourceLocation: research?.subCategory || research?.name,
+  })
 }
 
-export async function getEggHatchOutcome(payload: Payload, user: any) {
-  return rollEggHatch(await getUserPokedexMap(payload as any, user.id), getSkillLevel(user.skills, 'researching'))
+export async function getEggHatchOutcome(
+  payload: Payload,
+  user: any,
+  eggRarity?: PokemonRarityId | string | null,
+) {
+  return rollEggHatch(
+    await getUserPokedexMap(payload as any, user.id),
+    getSkillLevel(user.skills, 'researching'),
+    Math.random,
+    DAY_CARE_EGG_POOLS,
+    eggRarity,
+  )
 }
