@@ -759,6 +759,37 @@ describe('PVE turn engine helpers', () => {
     expect(loadout).toContain('water-gun')
   })
 
+  test('low-tier generated enemy move loadouts exclude broad status moves', () => {
+    const player = makePokemon({
+      id: 'player',
+      name: 'Player',
+      types: ['fire'],
+    })
+    const rattata = makePokemon({
+      id: 'rattata',
+      name: 'Rattata',
+      speciesId: 19,
+      formId: '19',
+      level: 50,
+      types: ['normal'],
+    })
+
+    const generatedLoadout = selectEnemyAiMoveLoadout({
+      enemyMon: rattata,
+      playerTeam: [player],
+      profile: 'wild',
+      maxMoves: 4,
+    })
+    const authoredLoadout = selectEnemyAiMoveLoadout({
+      enemyMon: { ...rattata, aiMoves: ['toxic'] },
+      playerTeam: [player],
+      maxMoves: 4,
+    })
+
+    expect(generatedLoadout).not.toContain('toxic')
+    expect(authoredLoadout).toContain('toxic')
+  })
+
   test('enemy AI generated move pools respect Metronome form authoring', () => {
     const beedrill = makePokemon({
       speciesId: 15,

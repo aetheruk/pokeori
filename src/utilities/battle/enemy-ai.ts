@@ -1300,6 +1300,44 @@ export function selectBattleMoveLoadoutFromCandidates(params: {
   return selected
 }
 
+function isUncuratedOpponentStatusMove(move: MoveConfig): boolean {
+  if (move.damage > 0 || move.damageRule || move.delayedDamage) return false
+
+  const defaultTarget = move.target
+  const statusTargetsOpponent =
+    move.status && (move.status.target ?? defaultTarget) === 'enemy'
+  const additionalStatusTargetsOpponent = move.additionalStatuses?.some(
+    (status) => (status.target ?? defaultTarget) === 'enemy',
+  )
+  const debuffTargetsOpponent = move.debuffs?.some(
+    (debuff) => (debuff.target ?? 'enemy') === 'enemy',
+  )
+
+  return Boolean(
+    statusTargetsOpponent ||
+      additionalStatusTargetsOpponent ||
+      debuffTargetsOpponent,
+  )
+}
+
+function generatedOpponentStatusMoveChance(
+  profile: BattleAiProfileId | undefined,
+  isWildBattle: boolean | undefined,
+): number {
+  if (isWildBattle || profile === 'wild') return 0
+
+  switch (profile ?? 'trainer') {
+    case 'trainer':
+      return 20
+    case 'advanced':
+      return 45
+    case 'boss':
+      return 70
+    default:
+      return 0
+  }
+}
+
 function scoreStance(params: {
   self: BattlePokemon
   opponent: BattlePokemon
@@ -1491,13 +1529,16 @@ export function selectEnemyAiMoveLoadout(params: {
   weather?: WeatherType
 }): string[] {
   const { enemyMon, playerTeam, isWildBattle, maxMoves = 4 } = params
+  const random = params.random ?? Math.random
   const candidates = getEnemyAiMoveIds(enemyMon, {
     isWildBattle,
     profile: params.profile,
   })
   if (!candidates.length || maxMoves <= 0) return []
 
-  const selected: string[] = []
+  const selected = candidates
+    .filter((moveId) => enemyMon.aiMoves?.includes(moveId))
+    .slice(0, maxMoves)
   const selectedStances = new Set<BattleStance>()
   const selectedTypes = new Set<string>()
   const selectedRoles = new Set<string>()
@@ -1515,6 +1556,27 @@ export function selectEnemyAiMoveLoadout(params: {
       if (selected.includes(moveId)) continue
       const move = getMove(moveId)
       if (!move) continue
+      // Broad TM compatibility is useful for player move assignment, but it
+      // should not make every compatible Pokemon an automatic Toxic/Hypnosis
+      // user. Lower-tier AI excludes these moves and higher tiers add at most
+      // one only at a reduced profile-based chance.
+      if (
+        !move.aiUse &&
+        !enemyMon.aiMoves?.includes(moveId) &&
+        isUncuratedOpponentStatusMove(move)
+      ) {
+        const alreadyHasGeneratedStatusMove = selected.some((selectedMoveId) => {
+          const selectedMove = getMove(selectedMoveId)
+          return selectedMove && isUncuratedOpponentStatusMove(selectedMove)
+        })
+        if (
+          alreadyHasGeneratedStatusMove ||
+          random() * 100 >=
+            generatedOpponentStatusMoveChance(params.profile, isWildBattle)
+        ) {
+          continue
+        }
+      }
 
       let totalScore = 0
       let bestStance: BattleStance =
@@ -2202,6 +2264,7 @@ export function applyEnemyAiMoveEffects(params: {
   damageDealt?: number
   weather?: WeatherType
   random?: () => number
+  skipPreDamageDefensiveEffects?: boolean
 }): string[] {
   const { move, self, opponent, weather } = params
   const random = params.random ?? Math.random
@@ -2554,10 +2617,20 @@ export function applyEnemyAiMoveEffects(params: {
     }
   }
 
-  if (move.secondaryStatuses?.length && !skipTargetAddedEffects) {
+  const secondaryStatuses = params.skipPreDamageDefensiveEffects
+    ? move.secondaryStatuses?.filter(
+        (status) =>
+          !(
+            (status.target === 'self-pokemon' || status.target === 'self-side') &&
+            status.effects.some((effect) => effect.type === 'damage-reduction')
+          ),
+      )
+    : move.secondaryStatuses
+
+  if (secondaryStatuses?.length && !skipTargetAddedEffects) {
     messages.push(
       ...applySecondaryStatusesFromMove({
-        move,
+        move: { secondaryStatuses },
         state: params.state,
         attacker: self,
         defender: opponent,
