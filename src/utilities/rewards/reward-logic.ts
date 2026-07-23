@@ -38,6 +38,7 @@ import { rollPokemonGender } from '@/utilities/pokemon/gender'
 import type { ExtendedUser, SkillsData, CurrencyData } from '@/types/user-data'
 import { UserDataConverters } from '@/types/user-data'
 import {
+  addPokedexCaughtRarity,
   getUserActivityStatsMap,
   getUserCompletedTasksMap,
   getUserInventoryMap,
@@ -489,15 +490,13 @@ export async function grantRewards(
 
         pokedex[speciesKey] = {
           ...speciesMap,
-          [formKey]: {
+          [formKey]: addPokedexCaughtRarity({
             ...existing,
             caught: true,
             seen: true,
             totalCaught: (existing.totalCaught || 0) + 1,
             totalSeen: (existing.totalSeen || 0) + 1,
-            shinyCaught: existing.shinyCaught || shiny,
-            shinySeen: existing.shinySeen || shiny,
-          },
+          }, rarity),
         }
         pokedexChanged = true
       }

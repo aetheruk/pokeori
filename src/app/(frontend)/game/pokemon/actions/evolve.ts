@@ -39,8 +39,10 @@ import {
   resolveEvolutionTimeRegion,
 } from '@/utilities/pokemon/evolution-conditions'
 import { getOwnedPokemonGender } from '@/utilities/pokemon/gender'
+import { resolvePokemonRarity } from '@/utilities/pokemon/rarity-effects'
 import { getUser, serializePokemon, type StatName } from './utils'
 import {
+  addPokedexCaughtRarity,
   getUserInventoryMap,
   getUserPokedexMap,
   getUserProfileStats,
@@ -289,17 +291,16 @@ export async function evolvePokemon(
     shinySeen: false,
   }
 
+  const evolvedRarity = resolvePokemonRarity(pokemon)
   pokedex[speciesKey] = {
     ...speciesMap,
-    [formKey]: {
+    [formKey]: addPokedexCaughtRarity({
       ...existing,
       caught: true,
       seen: true,
       totalCaught: (existing.totalCaught || 0) + 1,
       totalSeen: (existing.totalSeen || 0) + 1,
-      shinyCaught: existing.shinyCaught || !!pokemon.shiny,
-      shinySeen: existing.shinySeen || !!pokemon.shiny,
-    },
+    }, evolvedRarity),
   }
 
   // Update Total Evolutions Count

@@ -29,6 +29,7 @@ import { GameErrorBoundary } from '@/components/game/GameErrorBoundary'
 import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
 import { PremiumSearch } from '@/components/game/shared/PremiumSearch'
 import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
+import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
 import { STANCE_ICON_CONFIG } from '@/components/game/shared/stance-icon'
 import { Badge } from '@/components/ui/badge'
@@ -82,6 +83,10 @@ import {
 } from '@/utilities/pokemon/move-display'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
+import {
+  POKEMON_RARITY_EFFECTS,
+  type PokemonRarityId,
+} from '@/utilities/pokemon/rarity-effects'
 import {
   getMaxResearchLevelForXp,
   getPokemonResearchLevelTmUnlocks,
@@ -740,6 +745,12 @@ function PokemonCard({
           />
         )}
 
+        <VariantSection
+          formId={pokemon.id}
+          pokemonName={pokemon.name}
+          progress={progress}
+        />
+
         {/* Special Badges */}
         <div className="flex flex-wrap gap-2 pt-4">
           {species.is_legendary && (
@@ -760,6 +771,74 @@ function PokemonCard({
         </div>
       </div>
     </div>
+  )
+}
+
+function VariantSection({
+  formId,
+  pokemonName,
+  progress,
+}: {
+  formId: string
+  pokemonName: string
+  progress?: PokedexEntry
+}) {
+  const obtainedRarities = new Set<PokemonRarityId>(
+    progress?.raritiesCaught?.filter(
+      (rarity): rarity is PokemonRarityId =>
+        POKEMON_RARITY_EFFECTS.some((effect) => effect.id === rarity),
+    ) || [],
+  )
+  // Keep all historical catches visible even before their Pokedex entry is
+  // rewritten with the canonical rarity collection field.
+  if (progress?.caught) obtainedRarities.add('normal')
+  if (progress?.shinyCaught) obtainedRarities.add('shiny')
+
+  return (
+    <section className="space-y-3">
+      <SectionDivider>Variants</SectionDivider>
+      <p className="text-xs leading-relaxed text-game-muted">
+        Rarity treatments obtained for this form.
+      </p>
+      <div className="grid grid-cols-4 gap-2 sm:grid-cols-5">
+        {POKEMON_RARITY_EFFECTS.map((effect) => {
+          const obtained = obtainedRarities.has(effect.id)
+          return (
+            <div
+              key={effect.id}
+              className={cn(
+                'flex min-h-[76px] flex-col items-center justify-center gap-1 rounded-lg border p-1.5 text-center',
+                obtained
+                  ? 'border-game-ochre/35 bg-game-surface-raised'
+                  : 'border-game-border bg-game-canvas text-game-muted',
+              )}
+              title={obtained ? effect.label : 'Undiscovered variant'}
+            >
+              <div className="relative h-10 w-10">
+                {obtained ? (
+                  <PokemonRaritySprite
+                    formId={formId}
+                    view="home"
+                    rarity={effect.id}
+                    alt={`${effect.label} ${pokemonName}`}
+                    className="h-full w-full"
+                    imageClassName="drop-shadow-none"
+                    sizes="40px"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center rounded-md border border-dashed border-game-border bg-game-surface">
+                    <CircleHelp className="h-4 w-4" aria-label="Undiscovered variant" />
+                  </div>
+                )}
+              </div>
+              <span className="max-w-full truncate text-[9px] font-semibold leading-tight text-game-muted">
+                {obtained ? effect.label : '???'}
+              </span>
+            </div>
+          )
+        })}
+      </div>
+    </section>
   )
 }
 
