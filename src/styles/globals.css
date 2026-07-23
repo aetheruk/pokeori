@@ -1180,33 +1180,24 @@
 }
 
 .pokemon-rarity-sprite--pixelated .pokemon-rarity-sprite__overlay {
-  opacity: 0.9;
+  opacity: 0.38;
   background:
-    repeating-conic-gradient(
-        from 45deg,
-        rgba(255, 255, 255, 0.34) 0 25%,
-        rgba(11, 25, 35, 0.3) 0 50%
-      )
-      50% / 12px 12px,
     repeating-linear-gradient(
       to bottom,
-      transparent 0 10px,
-      rgba(18, 32, 42, 0.34) 10px 12px
+      rgba(255, 255, 255, 0.18) 0 1px,
+      transparent 1px 4px
+    ),
+    repeating-linear-gradient(
+      to right,
+      rgba(18, 32, 42, 0.24) 0 1px,
+      transparent 1px 4px
     );
-  mix-blend-mode: overlay;
+  background-size: 4px 4px;
+  mix-blend-mode: soft-light;
 }
 
 .pokemon-rarity-sprite--pixelated .pokemon-rarity-sprite__overlay::after {
-  position: absolute;
-  inset: 0;
-  content: '';
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0 12px,
-    rgba(255, 255, 255, 0.36) 12px 15px,
-    transparent 15px 24px
-  );
-  mix-blend-mode: overlay;
+  display: none;
 }
 
 @keyframes pokemon-rarity-gleam {
