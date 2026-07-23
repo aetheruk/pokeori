@@ -7,6 +7,7 @@ import {
   type PokemonRarityId,
   resolvePokemonRarity,
 } from '@/utilities/pokemon/rarity-effects'
+import { PixelatedSpriteCanvas } from './PixelatedSpriteCanvas'
 
 export type PokemonRaritySpriteView = 'front' | 'back' | 'home'
 
@@ -75,18 +76,26 @@ export function PokemonRaritySprite({
       }
     >
       <span className="pokemon-rarity-sprite__aura" aria-hidden="true" />
-      <Image
-        src={imageUrl}
-        alt={alt}
-        fill
-        sizes={sizes}
-        style={imageStyle}
-        className={cn(
-          'pokemon-rarity-sprite__image object-contain',
-          !isHomeSprite && 'pixelated',
-          imageClassName,
-        )}
-      />
+      {resolvedRarity === 'pixelated' ? (
+        <PixelatedSpriteCanvas
+          src={imageUrl}
+          alt={alt}
+          className={imageClassName}
+        />
+      ) : (
+        <Image
+          src={imageUrl}
+          alt={alt}
+          fill
+          sizes={sizes}
+          style={imageStyle}
+          className={cn(
+            'pokemon-rarity-sprite__image object-contain',
+            !isHomeSprite && 'pixelated',
+            imageClassName,
+          )}
+        />
+      )}
       <span className="pokemon-rarity-sprite__overlay" aria-hidden="true" />
     </div>
   )
