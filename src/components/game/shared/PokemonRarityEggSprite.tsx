@@ -7,6 +7,7 @@ import {
   type PokemonRarityId,
   resolvePokemonRarity,
 } from '@/utilities/pokemon/rarity-effects'
+import { PixelatedSpriteCanvas } from './PixelatedSpriteCanvas'
 
 const EGG_SPRITE_URL = '/sprites/items/egg.png'
 
@@ -46,16 +47,24 @@ export function PokemonRarityEggSprite({
       }
     >
       <span className="pokemon-rarity-sprite__aura" aria-hidden="true" />
-      <Image
-        src={EGG_SPRITE_URL}
-        alt={alt}
-        fill
-        sizes={sizes}
-        className={cn(
-          'pokemon-rarity-sprite__image object-contain',
-          imageClassName,
-        )}
-      />
+      {resolvedRarity === 'pixelated' ? (
+        <PixelatedSpriteCanvas
+          src={EGG_SPRITE_URL}
+          alt={alt}
+          className={imageClassName}
+        />
+      ) : (
+        <Image
+          src={EGG_SPRITE_URL}
+          alt={alt}
+          fill
+          sizes={sizes}
+          className={cn(
+            'pokemon-rarity-sprite__image object-contain',
+            imageClassName,
+          )}
+        />
+      )}
       <span className="pokemon-rarity-sprite__overlay" aria-hidden="true" />
     </div>
   )
