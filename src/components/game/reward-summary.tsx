@@ -7,6 +7,7 @@ import {
   Star,
 } from 'lucide-react'
 import Image from 'next/image'
+import { PokemonRarityEggSprite } from '@/components/game/shared/PokemonRarityEggSprite'
 import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { Card } from '@/components/ui/card'
@@ -15,6 +16,7 @@ import { items } from '@/data/items'
 import { getSkill } from '@/data/skills'
 import { getIcon } from '@/data/user'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
+import { getPokemonRarityEffect } from '@/utilities/pokemon/rarity-effects'
 import { RewardSummary } from '@/utilities/rewards/reward-logic'
 import { ItemSprite } from '../ui/item-sprite'
 import { SectionDivider } from '../ui/section-divider'
@@ -59,12 +61,21 @@ export function RewardSummaryDisplay({
       <div className="space-y-4">
         {/* Main Rewards Grid */}
         <div className="grid grid-cols-1 gap-2">
-          {(summary.eggs || []).map((egg) => (
-            <Card key={egg.id} className="h-12 border-game-moss/35 bg-game-moss/10 p-2 flex-row items-center gap-3">
-              <Image src="/sprites/items/egg.png" alt="Egg" width={28} height={28} className="h-7 w-7 object-contain" />
-              <div><p className="text-sm font-semibold text-game-ink">Egg found</p><p className="text-xs text-game-muted">Ready to hatch in 12 hours</p></div>
-            </Card>
-          ))}
+          {(summary.eggs || []).map((egg) => {
+            const rarity = getPokemonRarityEffect(egg.rarity)
+            return (
+              <Card key={egg.id} className="h-12 border-game-moss/35 bg-game-moss/10 p-2 flex-row items-center gap-3">
+                <PokemonRarityEggSprite
+                  rarity={egg.rarity}
+                  alt={`${rarity.label} Pokemon Egg`}
+                  className="h-7 w-7 shrink-0"
+                  imageClassName="h-full w-full"
+                  sizes="28px"
+                />
+                <div><p className="text-sm font-semibold text-game-ink">{egg.rarity === 'normal' ? 'Egg found' : `${rarity.label} Egg found`}</p><p className="text-xs text-game-muted">Ready to hatch in 12 hours</p></div>
+              </Card>
+            )
+          })}
           {/* XP */}
           {xpEntries.map(([skillId, amount]) => {
             const skill = getSkill(skillId)

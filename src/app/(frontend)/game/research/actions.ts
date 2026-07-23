@@ -2298,7 +2298,10 @@ export async function completeResearchEncounter(
             validatedEncounterId,
           )
           if (egg) {
-            summary.eggs = [{ id: egg.id, hatchAt: egg.hatchAt }]
+            summary.eggs = [
+              ...(summary.eggs || []),
+              { id: egg.id, hatchAt: egg.hatchAt, rarity: 'normal' },
+            ]
           }
           rewardSummary = summary
         } else if (

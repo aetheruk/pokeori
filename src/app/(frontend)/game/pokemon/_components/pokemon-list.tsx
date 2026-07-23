@@ -42,6 +42,7 @@ import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
 import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
 import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
+import { PokemonRarityEggSprite } from '@/components/game/shared/PokemonRarityEggSprite'
 import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
@@ -66,6 +67,10 @@ import pokemonData from '@/data/pokemon-data'
 import { cn } from '@/lib/utils'
 import type { Pokemon } from '@/payload-types'
 import { getOwnedPokemonGender } from '@/utilities/pokemon/gender'
+import {
+  getPokemonRarityEffect,
+  resolvePokemonRarity,
+} from '@/utilities/pokemon/rarity-effects'
 import {
   isValidBattleTeamPosition,
   MAX_BATTLE_TEAM_SIZE,
@@ -101,6 +106,15 @@ type RosterSelection =
   | { role: 'battle-team'; position: number }
   | { role: 'companion' }
 
+type BoxEgg = {
+  id: string
+  foundAt: string
+  hatchAt: string
+  rarity?: string | null
+  sourceLocation?: string | null
+  sourceBackground?: string | null
+}
+
 export function PokemonList() {
   const { user, gameData, refreshUser } = useUser()
   const router = useRouter()
@@ -131,7 +145,7 @@ export function PokemonList() {
   const initialTotal = userPokemonData?.totalDocs || initialDocs.length
 
   const [pokemonList, setPokemonList] = useState<Pokemon[]>(initialDocs)
-  const [eggs, setEggs] = useState<{ id: string; foundAt: string; hatchAt: string; sourceLocation?: string | null; sourceBackground?: string | null }[]>([])
+  const [eggs, setEggs] = useState<BoxEgg[]>([])
   const [hatchingEggId, setHatchingEggId] = useState<string | null>(null)
   const [eggHatchResult, setEggHatchResult] = useState<any | null>(null)
   const [eggHatchAnimation, setEggHatchAnimation] = useState<any | null>(null)
@@ -636,49 +650,72 @@ export function PokemonList() {
     getEggsForBox().then(setEggs).catch(console.error)
   }, [])
 
-  const hatchBoxEgg = async (eggId: string) => {
-    setHatchingEggId(eggId)
+  const hatchBoxEgg = async (egg: BoxEgg) => {
+    setHatchingEggId(egg.id)
     try {
-      const result = await hatchEgg(eggId)
+      const result = await hatchEgg(egg.id)
       if (!result.success) {
         toast.error(result.message)
         return
       }
-      setEggs((current) => current.filter((egg) => egg.id !== eggId))
+      setEggs((current) => current.filter((entry) => entry.id !== egg.id))
       await refreshUser()
       await handleBoxChange(selectedBoxId)
-      setEggHatchAnimation(result)
+      setEggHatchAnimation({
+        ...result,
+        eggRarity: resolvePokemonRarity({ rarity: egg.rarity }),
+      })
     } finally {
       setHatchingEggId(null)
     }
   }
 
-  const renderEggCard = (egg: { id: string; hatchAt: string; sourceLocation?: string | null }) => {
+  const renderEggCard = (egg: BoxEgg) => {
     const ready = new Date(egg.hatchAt).getTime() <= Date.now()
+    const rarity = resolvePokemonRarity({ rarity: egg.rarity })
+    const rarityEffect = getPokemonRarityEffect(rarity)
+    const isVariantEgg = rarity !== 'normal'
     return (
       <Dialog>
         <DialogTrigger asChild>
           <Card className="game-focus-ring group relative h-full w-full aspect-square cursor-pointer border border-game-border bg-game-surface-raised p-1.5 transition-colors hover:border-game-moss/45 hover:bg-game-surface">
-            <Image src="/sprites/items/egg.png" alt="Pokemon Egg" width={128} height={128} className="h-full w-full object-contain" />
+            <PokemonRarityEggSprite
+              rarity={rarity}
+              alt={isVariantEgg ? `${rarityEffect.label} Pokemon Egg` : 'Pokemon Egg'}
+              className="h-full w-full"
+              imageClassName="h-full w-full"
+            />
           </Card>
         </DialogTrigger>
         <DialogContent className="max-w-sm border-game-border bg-game-surface-raised text-game-ink">
           <DialogHeader>
-            <DialogTitle className="font-serif text-2xl">???</DialogTitle>
-            <DialogDescription className="text-game-muted">An unhatched Pokemon Egg{egg.sourceLocation ? ` found at ${egg.sourceLocation}` : ''}.</DialogDescription>
+            <DialogTitle className="font-serif text-2xl">
+              {isVariantEgg ? `${rarityEffect.label} Egg` : '???'}
+            </DialogTitle>
+            <DialogDescription className="text-game-muted">
+              An unhatched{isVariantEgg ? ` ${rarityEffect.label}` : ''} Pokemon Egg
+              {egg.sourceLocation ? ` found at ${egg.sourceLocation}` : ''}.
+            </DialogDescription>
           </DialogHeader>
           <div className="rounded-xl border border-game-border bg-game-canvas p-5 text-center">
-            <Image src="/sprites/pokemon/home/egg.png" alt="Mystery Pokemon Egg" width={192} height={192} className="mx-auto h-40 w-40 object-contain" />
+            <PokemonRarityEggSprite
+              rarity={rarity}
+              alt={isVariantEgg ? `${rarityEffect.label} Pokemon Egg` : 'Mystery Pokemon Egg'}
+              className="mx-auto h-40 w-40"
+              imageClassName="h-full w-full"
+              sizes="160px"
+            />
             <dl className="mt-4 grid grid-cols-2 gap-2 text-left text-sm">
               <div><dt className="text-game-muted">Species</dt><dd className="font-semibold">???</dd></div>
               <div><dt className="text-game-muted">Level</dt><dd className="font-semibold">???</dd></div>
               <div><dt className="text-game-muted">Nature</dt><dd className="font-semibold">???</dd></div>
               <div><dt className="text-game-muted">Ability</dt><dd className="font-semibold">???</dd></div>
+              {isVariantEgg && <div><dt className="text-game-muted">Variant</dt><dd className="font-semibold">{rarityEffect.label}</dd></div>}
             </dl>
           </div>
           <DialogFooter>
             {ready ? (
-              <Button className="min-h-11 w-full bg-game-clay text-game-cream hover:bg-game-clay-strong" disabled={hatchingEggId === egg.id} onClick={() => hatchBoxEgg(egg.id)}>{hatchingEggId === egg.id ? 'Preparing hatch…' : 'Hatch · 50 Crystals'}</Button>
+              <Button className="min-h-11 w-full bg-game-clay text-game-cream hover:bg-game-clay-strong" disabled={hatchingEggId === egg.id} onClick={() => hatchBoxEgg(egg)}>{hatchingEggId === egg.id ? 'Preparing hatch…' : 'Hatch · 50 Crystals'}</Button>
             ) : (
               <p className="w-full rounded-lg bg-game-moss/10 p-3 text-center font-mono text-sm text-game-moss">Ready {new Date(egg.hatchAt).toLocaleString()}</p>
             )}
@@ -1716,6 +1753,7 @@ export function PokemonList() {
       />
       {eggHatchAnimation && (
         <EggHatchOverlay
+          rarity={eggHatchAnimation.eggRarity}
           onComplete={() => {
             setEggHatchResult(eggHatchAnimation)
             setEggHatchAnimation(null)
@@ -1734,7 +1772,13 @@ export function PokemonList() {
   )
 }
 
-function EggHatchOverlay({ onComplete }: { onComplete: () => void }) {
+function EggHatchOverlay({
+  rarity,
+  onComplete,
+}: {
+  rarity?: string | null
+  onComplete: () => void
+}) {
   const [phase, setPhase] = useState<'warm' | 'flash' | 'reveal'>('warm')
   useEffect(() => {
     const flash = setTimeout(() => setPhase('flash'), 1500)
@@ -1746,7 +1790,16 @@ function EggHatchOverlay({ onComplete }: { onComplete: () => void }) {
       <DialogContent showCloseButton={false} className="game-night fixed inset-0 z-[100] m-0 flex h-[100dvh] w-screen max-w-none !translate-x-0 !translate-y-0 items-center justify-center rounded-none border-none bg-game-night p-0">
         <DialogTitle className="sr-only">An Egg is hatching</DialogTitle>
         <div className={cn('flex flex-col items-center transition-all duration-500', phase === 'flash' && 'scale-125 opacity-20')}>
-          <Image src="/sprites/pokemon/home/egg.png" alt="Hatching Egg" width={320} height={320} className={cn('h-64 w-64 object-contain', phase === 'warm' && 'animate-pulse motion-reduce:animate-none')} />
+          <PokemonRarityEggSprite
+            rarity={rarity}
+            alt="Hatching Egg"
+            className={cn(
+              'h-64 w-64',
+              phase === 'warm' && 'animate-pulse motion-reduce:animate-none',
+            )}
+            imageClassName="h-full w-full"
+            sizes="256px"
+          />
           <p className="mt-8 font-serif text-3xl text-game-cream">Oh?</p>
         </div>
       </DialogContent>

@@ -54,7 +54,14 @@ import { getPrimaryFormAbilityId, rollNaturalFormAbility } from '@/data/abilitie
 import {
   getPokemonRarityLegacyFields,
   resolvePokemonRarity,
+  type PokemonRarityId,
 } from '@/utilities/pokemon/rarity-effects'
+import {
+  createUserEgg,
+  DAY_CARE_EGG_MAX_OWNED,
+  getActiveEggCount,
+  resolveEggRarity,
+} from '@/utilities/day-care/eggs'
 
 export type Reward = LocationReward
 
@@ -93,7 +100,7 @@ export interface RewardSummary {
     newLevel: number
     skillXpGranted: number
   }[]
-  eggs?: { id: string; hatchAt: string }[]
+  eggs?: { id: string; hatchAt: string; rarity: PokemonRarityId }[]
   levelUp?: {
     newLevel: number
     oldLevel: number
@@ -239,6 +246,7 @@ export async function grantRewards(
     notices: [],
     researchXp: [],
     researchBreakthroughs: [],
+    eggs: [],
   }
 
   const xpUpdates: Record<string, number> = {}
@@ -254,6 +262,7 @@ export async function grantRewards(
   let unlockedTitlesChanged = false
   let maxPokemonIncrease = 0
   let maxBoxesIncrease = 0
+  let activeEggCount: number | null = null
 
   // Unlocked cosmetics
   const unlockedBanners = extendedUser.unlockedBanners || ['lab']
@@ -491,6 +500,31 @@ export async function grantRewards(
           },
         }
         pokedexChanged = true
+      }
+    } else if (reward.type === 'egg') {
+      if (activeEggCount === null) {
+        activeEggCount = await getActiveEggCount(payload as any, userId)
+      }
+
+      const maxPokemon = user.maxPokemon || 50
+      const eggData = reward.eggData || {}
+      const rarity = resolveEggRarity(eggData.rarity)
+
+      for (let index = 0; index < quantity; index += 1) {
+        if (
+          activeEggCount >= DAY_CARE_EGG_MAX_OWNED ||
+          pokemonList.length + activeEggCount >= maxPokemon
+        ) {
+          break
+        }
+
+        const egg = await createUserEgg(payload as any, userId, eggData)
+        summary.eggs?.push({
+          id: egg.id,
+          hatchAt: egg.hatchAt,
+          rarity,
+        })
+        activeEggCount += 1
       }
     } else if (reward.type === 'xp') {
       const skill = (

@@ -9,6 +9,7 @@ import {
   DAY_CARE_EGG_HATCH_LEVEL,
   DAY_CARE_EGG_RESEARCH_XP,
   getEggHatchOutcome,
+  resolveEggRarity,
 } from '@/utilities/day-care/eggs'
 import { getUser } from './utils'
 import { acquireActionLock, getIdempotentResult, releaseActionLock, setIdempotentResult } from '@/utilities/game-integrity'
@@ -24,7 +25,14 @@ export async function getEggsForBox() {
     pagination: false,
     depth: 0,
   })
-  return docs.map((egg: any) => ({ id: egg.id, foundAt: egg.foundAt, hatchAt: egg.hatchAt, sourceLocation: egg.sourceLocation, sourceBackground: egg.sourceBackground }))
+  return docs.map((egg: any) => ({
+    id: egg.id,
+    foundAt: egg.foundAt,
+    hatchAt: egg.hatchAt,
+    rarity: resolveEggRarity(egg.rarity),
+    sourceLocation: egg.sourceLocation,
+    sourceBackground: egg.sourceBackground,
+  }))
 }
 
 export async function hatchEgg(eggId: string) {
@@ -44,17 +52,18 @@ export async function hatchEgg(eggId: string) {
   if (new Date(egg.hatchAt).getTime() > Date.now()) return { success: false, message: 'This egg is still warming.' }
   const crystals = (user.currency as any)?.crystals || 0
   if (crystals < DAY_CARE_EGG_HATCH_COST_CRYSTALS) return { success: false, message: `You need ${DAY_CARE_EGG_HATCH_COST_CRYSTALS} Crystals to hatch this egg.` }
-  const result = await getEggHatchOutcome(payload as any, user)
+  const eggRarity = resolveEggRarity(egg.rarity)
+  const result = await getEggHatchOutcome(payload as any, user, eggRarity)
   if (!result) return { success: false, message: 'No eligible Pokemon are available for this egg yet.' }
 
   await payload.update({ collection: 'users', id: user.id, data: { currency: { ...user.currency, crystals: crystals - DAY_CARE_EGG_HATCH_COST_CRYSTALS } } })
   const { summary } = await grantRewards(user.id, [
-    { type: 'pokemon', targetId: result.speciesId, quantity: 1, pokemonData: { level: DAY_CARE_EGG_HATCH_LEVEL, formId: result.formId, shiny: result.shiny, background: egg.sourceBackground, obtainedMethod: 'hatched', obtainedRegion: egg.sourceRegion, obtainedLocation: egg.sourceLocation, obtainedSourceId: `egg:${egg.id}` } },
+    { type: 'pokemon', targetId: result.speciesId, quantity: 1, pokemonData: { level: DAY_CARE_EGG_HATCH_LEVEL, formId: result.formId, rarity: result.rarity, background: egg.sourceBackground, obtainedMethod: 'hatched', obtainedRegion: egg.sourceRegion, obtainedLocation: egg.sourceLocation, obtainedSourceId: `egg:${egg.id}` } },
     { type: 'pokemon_research_xp', targetId: result.formId, quantity: DAY_CARE_EGG_RESEARCH_XP },
   ], { source: 'day-care-egg-hatch', skipDropChance: true })
   await payload.update({ collection: 'user-eggs' as any, id: egg.id, data: { status: 'hatched', hatchPoolId: result.poolId } })
   revalidatePath('/game/pokemon')
-  const response = { success: true, summary, message: `${summary.pokemon[0]?.name || 'A Pokemon'} hatched from the egg!` }
+  const response = { success: true, summary, eggRarity, message: `${summary.pokemon[0]?.name || 'A Pokemon'} hatched from the egg!` }
   await setIdempotentResult(resultKey, response)
   return response
   } finally {

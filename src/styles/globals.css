@@ -716,6 +716,12 @@
   mix-blend-mode: screen;
 }
 
+/* Variant eggs share Pokemon rarity effects; shiny eggs use a distinct blue shell. */
+.pokemon-rarity-egg.pokemon-rarity-sprite--shiny .pokemon-rarity-sprite__image {
+  filter: sepia(0.78) saturate(2.1) hue-rotate(160deg) brightness(1.16)
+    contrast(1.14) drop-shadow(0 0 3px rgba(96, 200, 255, 0.76));
+}
+
 .pokemon-rarity-sprite--shadow .pokemon-rarity-sprite__aura {
   display: none;
 }
