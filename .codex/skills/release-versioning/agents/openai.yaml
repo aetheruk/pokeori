@@ -1,0 +1,4 @@
+interface:
+  display_name: "Release Versioning"
+  short_description: "Version every deploy and verify PWA update refreshes."
+  default_prompt: "Prepare a Pokeori update for release with a new package version and verify the client update flow."
