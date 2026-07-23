@@ -39,6 +39,12 @@ bun run dev
 
 Use targeted tests when possible, then run `typecheck` and `lint` for cross-file TypeScript/UI changes.
 
+## Release Versioning
+
+- Every production update must increment the semantic version in `package.json` before its PR is opened or deployed. Use a patch increment unless the change warrants a minor or major release.
+- Treat the package version as the client release identifier. Do not ship a change without changing it, including hotfixes and content-only releases.
+- Confirm the PWA update check can read the deployed version from `/api/app-version`; an open client must reload when it detects a newer version.
+
 ## Runtime State Patterns
 
 - Research encounters use Redis state under `research:${user.id}` from `src/app/(frontend)/game/research/actions.ts`.

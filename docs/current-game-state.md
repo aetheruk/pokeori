@@ -1,6 +1,6 @@
 # Current Game State
 
-Last reviewed: 2026-07-05
+Last reviewed: 2026-07-23
 
 This document maps the current implemented game progression from the static game data and runtime unlock rules. It is based on the active data in `src/data/**`, the Explore filtering logic in `src/components/game/features/explore/hooks/useExploreData.ts`, and the requirement resolver in `src/utilities/requirements/index.ts`.
 
@@ -8,6 +8,7 @@ This document maps the current implemented game progression from the static game
 
 Recent maintenance touched several stateful game systems:
 
+- Every production update now carries a new semantic `package.json` version. The app exposes it from a no-store `/api/app-version` endpoint; an open PWA checks on launch, focus, tab visibility, and once per minute, then reloads when it sees a newer deployed version. Sprite caching remains service-worker-managed, while current game HTML and client chunks are fetched from the network on that refresh.
 - Pokedex caught-form research notes show authored TM unlocks from `src/data/pokemon-research-level-rewards.json` by research rank, with unreached unlocks masked as `???`.
 - Pokemon detail runtime controls now allow clearing assigned battle moves from the details drawer, which lets players recover Pokemon whose saved move loadout no longer passes current TM/form/level rules. Owned Pokemon ability cards show the canonical ability description plus generated Partner Effect rows for any Capture/Field Observation bonuses. Evolution now preserves the source Pokemon's natural ability slot on the evolved form, so hidden abilities remain hidden abilities and normal slot abilities map to the evolved form's matching slot when available.
 - Wild catch rewards now include one guaranteed base-type gem per qualifying wild battle reward pass, and temporary drop tuning now suppresses all tier-2/3 material or gem rewards in drop-table-style generation (tier-2/3 IDs remain authored but are not emitted by these paths). Catch-focused dowsing random events were also converted from Lure Cache events to Gem Cache events, now yielding seven gems.
