@@ -504,7 +504,14 @@ function ExploreListContent({
         open={actions.isExitModalOpen}
         onOpenChange={(open) => {
           actions.setIsExitModalOpen(open)
-          if (!open) actions.setSelectedItem(null)
+          if (!open) {
+            const expeditionId = getExpeditionReturn()
+            if (expeditionId) {
+              actions.reopenExpeditionPanel(expeditionId)
+            } else {
+              actions.setSelectedItem(null)
+            }
+          }
         }}
       />
 
@@ -593,12 +600,13 @@ function ExploreListContent({
                   : await completeTask(task.id)
               if (result.success) {
                 if (isExpeditionTaskFlow) {
-                  markExpeditionReturn(
+                  actions.reopenExpeditionPanel(
                     (userData as any).activeExpedition?.expeditionId,
                   )
+                } else {
+                  actions.setSelectedItem(null)
                 }
                 actions.setCompletionResult(result)
-                actions.setSelectedItem(null)
                 refreshUser()
               } else {
                 const { toast } = require('sonner')
@@ -633,12 +641,13 @@ function ExploreListContent({
               !!task && actions.expeditionEnterModalTaskId === task.id
 
             if (isExpeditionTaskFlow) {
-              markExpeditionReturn(
+              actions.reopenExpeditionPanel(
                 (userData as any).activeExpedition?.expeditionId,
               )
+            } else {
+              actions.setSelectedItem(null)
             }
 
-            actions.setSelectedItem(null)
             actions.setRivalSelectionTask(null)
             actions.setExpeditionEnterModalTaskId(null)
             refreshUser()
