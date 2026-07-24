@@ -893,11 +893,6 @@ export function PokemonDetailsDialog({
                       </span>
                     )
                   })()}
-                  {pokemon.shiny && (
-                    <Badge className="h-5 border-game-ochre bg-game-ochre/10 px-2 text-[10px] font-black uppercase leading-none tracking-[0.08em] text-game-ochre">
-                      Shiny
-                    </Badge>
-                  )}
                 </div>
                 <span className="h-px w-4 bg-game-border" />
               </div>
@@ -2091,6 +2086,8 @@ function EvolutionOverlay({
   newFormattedEnd: string
   onComplete: () => void
 }) {
+  const displayPokemonName =
+    pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1)
   const [phase, setPhase] = useState<'start' | 'flash' | 'reveal' | 'done'>(
     'start',
   )
@@ -2113,7 +2110,9 @@ function EvolutionOverlay({
         showCloseButton={false}
         className="fixed !left-0 !top-0 inset-0 z-[100] m-0 flex h-[100dvh] w-screen max-w-none !translate-x-0 !translate-y-0 flex-col items-center justify-center gap-0 rounded-none border-none bg-[#0d1820] p-0 data-[state=closed]:slide-out-to-bottom-0 data-[state=open]:slide-in-from-bottom-0"
       >
-        <DialogTitle className="sr-only">{pokemonName} Evolution</DialogTitle>
+        <DialogTitle className="sr-only">
+          {displayPokemonName} Evolution
+        </DialogTitle>
         {/* Background Effects */}
         <div className="absolute inset-0 z-0">
           <Vortex
@@ -2180,7 +2179,7 @@ function EvolutionOverlay({
         <div className="absolute bottom-20 w-full text-center z-30 px-4">
           {phase === 'start' && (
             <p className="font-display text-2xl text-[#f5ead7]">
-              What? {pokemonName} is evolving!
+              What? {displayPokemonName} is evolving!
             </p>
           )}
           {(phase === 'reveal' || phase === 'done') && (
@@ -2190,7 +2189,7 @@ function EvolutionOverlay({
                   Congratulations!
                 </p>
                 <p className="text-xl text-[#f5ead7]">
-                  Your {pokemonName} evolved!
+                  Your {displayPokemonName} evolved!
                 </p>
               </div>
 

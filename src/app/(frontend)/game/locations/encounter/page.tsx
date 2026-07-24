@@ -82,7 +82,10 @@ import type {
   PublicEncounterQte,
 } from '@/utilities/pokemon/encounter-qte'
 import type { FlattenedPokemon } from '@/utilities/pokemon/pokedex'
-import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
+import {
+  getPokemonRarityEffect,
+  type PokemonRarityId,
+} from '@/utilities/pokemon/rarity-effects'
 import {
   canUseItemWithSkillRequirements,
   getExplorerEncounterItemLimit,
@@ -1319,6 +1322,9 @@ export default function EncounterPage() {
     )
   }
 
+  const encounterRarity =
+    encounter.rarity ?? (encounter.isShiny ? 'shiny' : 'normal')
+  const encounterRarityLabel = getPokemonRarityEffect(encounterRarity).label
   const selectedBall =
     phase === 'capture' && balls[selectedBallIndex]
       ? balls[selectedBallIndex]
@@ -1643,7 +1649,7 @@ export default function EncounterPage() {
             )}
           </div>
 
-          {/* Pokemon name pill — revealed after first correct answer */}
+          {/* Reveal the Pokemon name for normal encounters, or its rarity for variants. */}
           <AnimatePresence>
             {hasRevealedName && !isSilphScopeGhostLocked && (
               <motion.div
@@ -1653,9 +1659,9 @@ export default function EncounterPage() {
                 transition={{ duration: 0.3 }}
                 className="flex items-center gap-1 rounded-full border border-game-night-border/60 bg-game-night-surface/85 px-3 py-0.5 text-xs font-semibold text-game-night-ink backdrop-blur-sm"
               >
-                {encounter.isShiny && <span>✨</span>}
-                {encounter.rarity === 'shadow' && <span>Shadow</span>}
-                {encounter.pokemonName}
+                {encounterRarity === 'normal'
+                  ? encounter.pokemonName
+                  : encounterRarityLabel}
               </motion.div>
             )}
           </AnimatePresence>
