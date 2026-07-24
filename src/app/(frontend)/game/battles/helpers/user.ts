@@ -10,10 +10,5 @@ export async function getUser(): Promise<User | null> {
 
   if (!jwtUser) return null
 
-  const user = await payload.findByID({
-    collection: 'users',
-    id: jwtUser.id,
-  })
-
-  return user as User
+  return jwtUser as User
 }

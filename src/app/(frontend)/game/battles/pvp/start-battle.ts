@@ -6,14 +6,16 @@ import { initializeBattlePokemon } from '@/utilities/battle/battle-logic'
 import { createInitialPowersState } from '@/data/powers'
 import type { BattleState } from '@/utilities/battle/types'
 import {
+  getResearcherMoveSlotCount,
   getSkillLevel,
   resolveTrainerBattleItemUseLimit,
   resolveTrainerBattleMoveUseLimit,
 } from '@/utilities/skills/unlocks'
 import { getPokemonResearchLevel } from '@/utilities/research/research-levels'
-import { getUserPokedexMap } from '@/utilities/user-state'
+import { getUserInventoryMap, getUserPokedexMap } from '@/utilities/user-state'
 import { initializeTeamMoveUses } from '@/utilities/battle/move-uses'
 import { applyBattleRarityEntryEffects } from '@/utilities/battle/rarity-effects'
+import { getBattleMoveOptions } from '@/utilities/pokemon/pokemon-moves'
 
 const PVP_BATTLE_PREFIX = 'pvp:battle:'
 const BATTLE_TTL = 3600
@@ -42,15 +44,25 @@ export async function initializeSharedPvpBattle(
     ).docs
   }
 
-  const [p1Docs, p2Docs, p1Details, p2Details, p1Pokedex, p2Pokedex] =
-    await Promise.all([
-      getTeam(matchData.player1),
-      getTeam(matchData.player2),
-      payload.findByID({ collection: 'users', id: matchData.player1 }),
-      payload.findByID({ collection: 'users', id: matchData.player2 }),
-      getUserPokedexMap(payload as any, matchData.player1),
-      getUserPokedexMap(payload as any, matchData.player2),
-    ])
+  const [
+    p1Docs,
+    p2Docs,
+    p1Details,
+    p2Details,
+    p1Pokedex,
+    p2Pokedex,
+    p1Inventory,
+    p2Inventory,
+  ] = await Promise.all([
+    getTeam(matchData.player1),
+    getTeam(matchData.player2),
+    payload.findByID({ collection: 'users', id: matchData.player1 }),
+    payload.findByID({ collection: 'users', id: matchData.player2 }),
+    getUserPokedexMap(payload as any, matchData.player1),
+    getUserPokedexMap(payload as any, matchData.player2),
+    getUserInventoryMap(payload as any, matchData.player1),
+    getUserInventoryMap(payload as any, matchData.player2),
+  ])
 
   if (!p1Details || !p2Details || p1Docs.length === 0 || p2Docs.length === 0)
     return null
@@ -116,6 +128,36 @@ export async function initializeSharedPvpBattle(
   }
   if (p2Team[0]) {
     p2Team[0].activeTurnStarted = 1
+  }
+  const p1ResearcherMoveSlots = getResearcherMoveSlotCount(
+    getSkillLevel(p1Details.skills, 'researching'),
+  )
+  const p2ResearcherMoveSlots = getResearcherMoveSlotCount(
+    getSkillLevel(p2Details.skills, 'researching'),
+  )
+  for (const pokemon of p1Team) {
+    pokemon.battleMoveIds = getBattleMoveOptions({
+      assignedMoves: pokemon.assignedMoves ?? [],
+      pokemonTypes: pokemon.types || [],
+      pokemonFormId: pokemon.formId,
+      pokemonLevel: pokemon.level,
+      inventory: p1Inventory,
+      maxAssignedMoves: p1ResearcherMoveSlots,
+      pokemon,
+      opponents: p2Team,
+    }).map((move) => move.id)
+  }
+  for (const pokemon of p2Team) {
+    pokemon.battleMoveIds = getBattleMoveOptions({
+      assignedMoves: pokemon.assignedMoves ?? [],
+      pokemonTypes: pokemon.types || [],
+      pokemonFormId: pokemon.formId,
+      pokemonLevel: pokemon.level,
+      inventory: p2Inventory,
+      maxAssignedMoves: p2ResearcherMoveSlots,
+      pokemon,
+      opponents: p1Team,
+    }).map((move) => move.id)
   }
 
   const initialState: BattleState = {

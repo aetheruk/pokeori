@@ -15,6 +15,8 @@ import {
   getResearcherMoveSlotCount,
   getSkillLevel,
 } from '@/utilities/skills/unlocks'
+import type { BattleState } from '@/utilities/battle/types'
+import type { User } from '@/payload-types'
 import { getUser } from '../helpers/user'
 import { getActiveBattleState } from '../helpers/state-management'
 import { getUserInventoryMap } from '@/utilities/user-state'
@@ -33,6 +35,7 @@ export async function getAvailableMoves(
   pokemonFormId?: string,
   pokemonLevel?: number,
   assignedMoves?: AssignedMoveInput,
+  context?: { user: User; state: BattleState | null },
 ): Promise<
   {
     id: string
@@ -47,10 +50,26 @@ export async function getAvailableMoves(
     continuous?: MoveContinuousConfig
   }[]
 > {
-  const user = await getUser()
+  const user = context?.user ?? (await getUser())
   if (!user) return []
 
-  const state = await getActiveBattleState(user)
+  const state =
+    context?.state !== undefined
+      ? context.state
+      : await getActiveBattleState(user)
+  const activeMon = state?.playerTeam[state.activePlayerIndex]
+  if (assignedMoves !== undefined && Array.isArray(activeMon?.battleMoveIds)) {
+    return getBattleMoveOptions({
+      assignedMoves: activeMon.battleMoveIds,
+      pokemonTypes: activeMon.types || pokemonTypes,
+      pokemonFormId: activeMon.formId || pokemonFormId,
+      pokemonLevel: activeMon.level ?? pokemonLevel,
+      inventory: {},
+      maxAssignedMoves: activeMon.battleMoveIds.length,
+      allowUnavailableAssignedMoves: true,
+    })
+  }
+
   const userInventory = state?.chronicle
     ? state.chronicleInventory || {}
     : await getUserInventoryMap(
@@ -60,7 +79,6 @@ export async function getAvailableMoves(
 
   if (assignedMoves !== undefined) {
     const researcherLevel = getSkillLevel(user.skills, 'researching')
-    const activeMon = state?.playerTeam[state.activePlayerIndex]
     const battleLevel = activeMon?.level ?? pokemonLevel
     const isChronicle = !!state?.chronicle
 
@@ -70,7 +88,9 @@ export async function getAvailableMoves(
       pokemonFormId: activeMon?.formId || pokemonFormId,
       pokemonLevel: battleLevel,
       inventory: userInventory,
-      maxAssignedMoves: isChronicle ? undefined : getResearcherMoveSlotCount(researcherLevel),
+      maxAssignedMoves: isChronicle
+        ? undefined
+        : getResearcherMoveSlotCount(researcherLevel),
       allowUnavailableAssignedMoves: isChronicle,
       pokemon: activeMon,
       opponents: state?.enemyTeam,

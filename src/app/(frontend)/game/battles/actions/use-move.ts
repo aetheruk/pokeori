@@ -96,11 +96,11 @@ import {
   applyBattleAbilityStatStageDropReflection,
   applyBattleAbilityStatusReflection,
   blocksBattleInterruptByAbility,
-	  blocksBattleStatStageDropByAbility,
-	  applyBattleAbilityOpposingMoveUseDepletion,
-	  getBattleStatStageDropBlockMessage,
-	  resolveBattleAbilityBeforeMove,
-	} from '@/utilities/battle/abilities'
+  blocksBattleStatStageDropByAbility,
+  applyBattleAbilityOpposingMoveUseDepletion,
+  getBattleStatStageDropBlockMessage,
+  resolveBattleAbilityBeforeMove,
+} from '@/utilities/battle/abilities'
 import { resolveHiddenPower } from '@/utilities/battle/hidden-power'
 import {
   consumePokemonMoveUse,
@@ -405,39 +405,60 @@ export async function useMove(
       }
     }
 
-    const userInventory = state.chronicle
+    let userInventory: Record<string, number> = state.chronicle
       ? state.chronicleInventory || {}
-      : await timer.time('loadInventory', async () =>
-          getUserInventoryMap(
-            (await getPayload({ config: configPromise })) as any,
-            user.id,
-          ),
-        )
-    const researcherLevel = getSkillLevel(user.skills, 'researching')
-    const assignedMoves = getBattleMoveOptions({
-      assignedMoves: playerMon.assignedMoves ?? [],
-      pokemonTypes: playerMon.types || [],
-      pokemonFormId: playerMon.formId,
-      pokemonLevel: playerMon.level,
-      inventory: userInventory,
-      maxAssignedMoves: state.chronicle
-        ? undefined
-        : getResearcherMoveSlotCount(researcherLevel),
-      allowUnavailableAssignedMoves: !!state.chronicle,
-      pokemon: playerMon,
-      opponents: state.enemyTeam,
-      profile: state.ai?.profile,
-    })
+      : {}
 
-    if (
-      !isBasicAttack &&
-      !assignedMoves.some(
-        (assignedOption) => assignedOption.id === assignedMove.id,
-      )
-    ) {
-      return {
-        success: false,
-        error: 'Move is not available for this Pokemon in this battle',
+    // Basic stance attacks are internal, no-cost battle actions. They do not
+    // depend on TM ownership or assigned move slots, so avoid a database-backed
+    // inventory query on the most common turn path.
+    if (!isBasicAttack) {
+      const snapshottedMoveIds = playerMon.battleMoveIds
+      if (Array.isArray(snapshottedMoveIds)) {
+        if (!snapshottedMoveIds.includes(assignedMove.id)) {
+          return {
+            success: false,
+            error: 'Move is not available for this Pokemon in this battle',
+          }
+        }
+      } else {
+        // Backward compatibility for battles created before move loadouts were
+        // snapshotted into battle state.
+        if (!state.chronicle) {
+          userInventory = await timer.time('loadInventory', async () =>
+            getUserInventoryMap(
+              (await getPayload({ config: configPromise })) as any,
+              user.id,
+            ),
+          )
+        }
+
+        const researcherLevel = getSkillLevel(user.skills, 'researching')
+        const assignedMoves = getBattleMoveOptions({
+          assignedMoves: playerMon.assignedMoves ?? [],
+          pokemonTypes: playerMon.types || [],
+          pokemonFormId: playerMon.formId,
+          pokemonLevel: playerMon.level,
+          inventory: userInventory,
+          maxAssignedMoves: state.chronicle
+            ? undefined
+            : getResearcherMoveSlotCount(researcherLevel),
+          allowUnavailableAssignedMoves: !!state.chronicle,
+          pokemon: playerMon,
+          opponents: state.enemyTeam,
+          profile: state.ai?.profile,
+        })
+
+        if (
+          !assignedMoves.some(
+            (assignedOption) => assignedOption.id === assignedMove.id,
+          )
+        ) {
+          return {
+            success: false,
+            error: 'Move is not available for this Pokemon in this battle',
+          }
+        }
       }
     }
 
@@ -623,14 +644,14 @@ export async function useMove(
       : { canMove: true, message: '' }
     const playerSecondaryStatusCheck =
       playerStatusCheck.canMove && playerAbilityCheck.canMove
-      ? processBeforeMoveSecondaryStatuses({
-          state,
-          pokemon: playerMon,
-          side: 'player',
-          move,
-          attackType: resolvedMoveType,
-        })
-      : { canMove: true, message: '' }
+        ? processBeforeMoveSecondaryStatuses({
+            state,
+            pokemon: playerMon,
+            side: 'player',
+            move,
+            attackType: resolvedMoveType,
+          })
+        : { canMove: true, message: '' }
     const playerMoveCheck = !playerStatusCheck.canMove
       ? playerStatusCheck
       : !playerAbilityCheck.canMove
@@ -708,15 +729,15 @@ export async function useMove(
         vanishChargeMessage = result.message
       }
 
-	      consumePokemonMoveUse(playerMon, state.powers)
-	      const pressureMessages = applyBattleAbilityOpposingMoveUseDepletion({
-	        state,
-	        attackerSide: 'player',
-	        attacker: playerMon,
-	        defender: enemyMon,
-	        move,
-	      })
-	      const remainingTurns = Math.max(0, Math.floor(move.charged) - 1)
+      consumePokemonMoveUse(playerMon, state.powers)
+      const pressureMessages = applyBattleAbilityOpposingMoveUseDepletion({
+        state,
+        attackerSide: 'player',
+        attacker: playerMon,
+        defender: enemyMon,
+        move,
+      })
+      const remainingTurns = Math.max(0, Math.floor(move.charged) - 1)
       state.playerMoveLock = {
         type: 'charge',
         moveId: move.id,
@@ -731,10 +752,10 @@ export async function useMove(
         enemyMon,
         user,
         [
-	          `${state.playerName}'s ${playerMon.name} begins charging a move.`,
-	          vanishChargeMessage,
-	          ...pressureMessages,
-	        ]
+          `${state.playerName}'s ${playerMon.name} begins charging a move.`,
+          vanishChargeMessage,
+          ...pressureMessages,
+        ]
           .filter(Boolean)
           .join('\n'),
         undefined,
@@ -769,18 +790,18 @@ export async function useMove(
       clearPlayerMoveLockIfActive(state, move.id)
     }
 
-	    let playerMoveUseDepletionMessages: string[] = []
-	    if (consumesMoveUse) {
-	      consumePokemonMoveUse(playerMon, state.powers)
-	      playerMoveUseDepletionMessages =
-	        applyBattleAbilityOpposingMoveUseDepletion({
-	          state,
-	          attackerSide: 'player',
-	          attacker: playerMon,
-	          defender: enemyMon,
-	          move,
-	        })
-	    }
+    let playerMoveUseDepletionMessages: string[] = []
+    if (consumesMoveUse) {
+      consumePokemonMoveUse(playerMon, state.powers)
+      playerMoveUseDepletionMessages =
+        applyBattleAbilityOpposingMoveUseDepletion({
+          state,
+          attackerSide: 'player',
+          attacker: playerMon,
+          defender: enemyMon,
+          move,
+        })
+    }
 
     let enemySwapped = false
     let enemySwapMsg = ''
@@ -959,14 +980,14 @@ export async function useMove(
           ? (activeMoveLock.repeatUses ?? 1)
           : 0,
     })
-    const recoilMoveDamageMultiplier = getBattleAbilityRecoilMoveDamageMultiplier(
+    const recoilMoveDamageMultiplier =
+      getBattleAbilityRecoilMoveDamageMultiplier(playerMon, move)
+    const addedEffectMoveDamageMultiplier =
+      getBattleAbilityAddedEffectMoveDamageMultiplier(playerMon, move)
+    const suppressesAddedEffects = suppressesBattleMoveAddedEffectsByAbility(
       playerMon,
       move,
     )
-    const addedEffectMoveDamageMultiplier =
-      getBattleAbilityAddedEffectMoveDamageMultiplier(playerMon, move)
-    const suppressesAddedEffects =
-      suppressesBattleMoveAddedEffectsByAbility(playerMon, move)
     const secondaryEffectChanceMultiplier =
       getBattleAbilitySecondaryEffectChance(playerMon, move, 100) / 100
     const enemyPreDamageDefensiveMessages =
@@ -984,10 +1005,10 @@ export async function useMove(
         : []
 
     // Apply buffs
-	    let message = playerStatusMsg
-	    if (playerMoveUseDepletionMessages.length) {
-	      message += `${message ? '\n' : ''}${playerMoveUseDepletionMessages.join('\n')}`
-	    }
+    let message = playerStatusMsg
+    if (playerMoveUseDepletionMessages.length) {
+      message += `${message ? '\n' : ''}${playerMoveUseDepletionMessages.join('\n')}`
+    }
     if (calledMoveMessage) {
       message += `${message ? '\n' : ''}${calledMoveMessage}`
     }
@@ -1066,7 +1087,7 @@ export async function useMove(
         }
         const statKey = buff.stat
         targetMon.statStages[statKey] = clampStatStage(
-          targetMon.statStages[statKey] + buff.stages
+          targetMon.statStages[statKey] + buff.stages,
         )
         if (buff.stages < 0) {
           recordStatLoweredThisTurn({
@@ -1167,7 +1188,12 @@ export async function useMove(
                 getEffectiveBattleTypes(enemyMon),
                 Math.random,
                 state.weather?.weather,
-                { forceMaxDamageRange: usesBattleAbilityMaxMultiHitDamage(playerMon, move) },
+                {
+                  forceMaxDamageRange: usesBattleAbilityMaxMultiHitDamage(
+                    playerMon,
+                    move,
+                  ),
+                },
               )
             : undefined
         const moveDamage =
@@ -1179,10 +1205,17 @@ export async function useMove(
             getEffectiveBattleTypes(enemyMon),
             Math.random,
             state.weather?.weather,
-            { forceMaxDamageRange: usesBattleAbilityMaxMultiHitDamage(playerMon, move) },
+            {
+              forceMaxDamageRange: usesBattleAbilityMaxMultiHitDamage(
+                playerMon,
+                move,
+              ),
+            },
           )
         const moveHitCount =
-          !hiddenPower && !move.delayedDamage ? (resolvedMoveDamage?.hitCount ?? 1) : 1
+          !hiddenPower && !move.delayedDamage
+            ? (resolvedMoveDamage?.hitCount ?? 1)
+            : 1
         const basePower = Math.max(
           1,
           Math.round(BASE_BATTLE_POWER * moveDamage),
@@ -1192,7 +1225,8 @@ export async function useMove(
         const typeEffectivenessOverride = move.ignoreTypeEffectiveness
           ? 1
           : undefined
-        const playerEntryMessages = processBattleAbilityEntryCopiesForState(state)
+        const playerEntryMessages =
+          processBattleAbilityEntryCopiesForState(state)
         const playerForecastMessages =
           processBattleAbilityWeatherTypeChangesForState(state)
         if (playerEntryMessages.length || playerForecastMessages.length) {
@@ -1328,7 +1362,8 @@ export async function useMove(
               attackStance: resolvedMoveStance,
               attackType: result.usedType,
               typeEffectiveness: result.typeEffectiveness,
-              typeImmunityBypassAttackTypes: playerTypeImmunityBypassAttackTypes,
+              typeImmunityBypassAttackTypes:
+                playerTypeImmunityBypassAttackTypes,
             })
           : undefined
         if (delayedAbilityResult) {
@@ -1498,7 +1533,8 @@ export async function useMove(
             damageDealt: playerDamage,
           })
         : undefined
-      if (secondaryEffectBlockMessage) message += ` ${secondaryEffectBlockMessage}`
+      if (secondaryEffectBlockMessage)
+        message += ` ${secondaryEffectBlockMessage}`
       const skipTargetAddedEffects = Boolean(
         secondaryEffectBlockMessage || suppressesAddedEffects,
       )
@@ -1556,15 +1592,15 @@ export async function useMove(
           }
           if (!targetMon.statStages) {
             targetMon.statStages = { ...DEFAULT_STAT_STAGES }
-        }
-        const statKey = debuff.stat
-        targetMon.statStages[statKey] = clampStatStage(
-          targetMon.statStages[statKey] + debuff.stages
-        )
-        if (debuff.stages < 0) {
-          recordStatLoweredThisTurn({
-            state,
-            side: targetSide,
+          }
+          const statKey = debuff.stat
+          targetMon.statStages[statKey] = clampStatStage(
+            targetMon.statStages[statKey] + debuff.stages,
+          )
+          if (debuff.stages < 0) {
+            recordStatLoweredThisTurn({
+              state,
+              side: targetSide,
               pokemon: targetMon,
             })
             const triggerMessages = applyBattleAbilityStatStageDropTriggers({
@@ -1706,8 +1742,13 @@ export async function useMove(
         }
       }
 
-      const postDamageSecondaryStatuses = splitSecondaryStatusesForDamageTiming(move).postDamage
-      if (!moveFailed && postDamageSecondaryStatuses.length && !skipTargetAddedEffects) {
+      const postDamageSecondaryStatuses =
+        splitSecondaryStatusesForDamageTiming(move).postDamage
+      if (
+        !moveFailed &&
+        postDamageSecondaryStatuses.length &&
+        !skipTargetAddedEffects
+      ) {
         const secondaryMessages = applySecondaryStatusesFromMove({
           move: { secondaryStatuses: postDamageSecondaryStatuses },
           state,
@@ -1729,7 +1770,10 @@ export async function useMove(
         if (recoilBlockMessage) {
           message += ` ${recoilBlockMessage}`
         } else {
-          const selfDamageResult = applyMoveSelfDamage(playerMon, move.selfDamage)
+          const selfDamageResult = applyMoveSelfDamage(
+            playerMon,
+            move.selfDamage,
+          )
           if (selfDamageResult.applied) {
             message += ` ${selfDamageResult.message}`
           }
@@ -1816,14 +1860,14 @@ export async function useMove(
         : { canMove: true, message: '' }
       const enemySecondaryStatusCheck =
         enemyStatusCheck.canMove && enemyAbilityCheck.canMove
-        ? processBeforeMoveSecondaryStatuses({
-            state,
-            pokemon: enemyMon,
-            side: 'enemy',
-            move: enemyBattleAction.move,
-            attackType: enemyBattleAction.attackType,
-          })
-        : { canMove: true, message: '' }
+          ? processBeforeMoveSecondaryStatuses({
+              state,
+              pokemon: enemyMon,
+              side: 'enemy',
+              move: enemyBattleAction.move,
+              attackType: enemyBattleAction.attackType,
+            })
+          : { canMove: true, message: '' }
       const enemyMoveCheck = !enemyStatusCheck.canMove
         ? enemyStatusCheck
         : !enemyAbilityCheck.canMove
@@ -1867,7 +1911,8 @@ export async function useMove(
       enemyMultiplier *= getTrainerItemZMoveMultiplier(trainerItemResult)
 
       if (enemyBattleAction.isBasicAttack) {
-        const enemyEntryMessages = processBattleAbilityEntryCopiesForState(state)
+        const enemyEntryMessages =
+          processBattleAbilityEntryCopiesForState(state)
         const enemyForecastMessages =
           processBattleAbilityWeatherTypeChangesForState(state)
         if (enemyEntryMessages.length || enemyForecastMessages.length) {
@@ -1900,20 +1945,24 @@ export async function useMove(
         undefined,
         undefined,
         state.weather?.weather,
-	        getSecondaryStatusTypeImmunityBypassAttackTypes({
-	          state,
-	          defender: playerMon,
-	          defenderSide: 'player',
-	        }),
-	        { currentTurn: state.turn, terrain: state.terrain?.terrain },
-	      )
+        getSecondaryStatusTypeImmunityBypassAttackTypes({
+          state,
+          defender: playerMon,
+          defenderSide: 'player',
+        }),
+        { currentTurn: state.turn, terrain: state.terrain?.terrain },
+      )
 
       let enemyAiEffectMessages: string[] = []
       enemyMoveMissed = false
       enemyMoveFailed = enemyMoveFailedFromContest
       const enemyAbilityMoveBlockMessage =
         !enemyMoveFailed && !enemyBattleAction.isBasicAttack
-          ? getBattleAbilityMoveBlockMessage(playerMon, enemyBattleAction.move, enemyMon) ||
+          ? getBattleAbilityMoveBlockMessage(
+              playerMon,
+              enemyBattleAction.move,
+              enemyMon,
+            ) ||
             getTerrainMoveBlockMessage({
               terrain: state.terrain?.terrain,
               move: enemyBattleAction.move,
@@ -1980,19 +2029,21 @@ export async function useMove(
           enemyMoveInterrupted ||
           enemyMoveMissed ||
           enemyMoveFailed ||
-            enemyBattleAction.effectOnly
+          enemyBattleAction.effectOnly
         ) {
           enemyDamageResult = {
             ...enemyDamageResult,
             damage: 0,
-            usedType: enemyBattleAction.attackType ?? enemyDamageResult.usedType,
+            usedType:
+              enemyBattleAction.attackType ?? enemyDamageResult.usedType,
             isCrit: false,
             isRadiantBoost: false,
             weatherMessage: '',
             terrainMultiplier: 1,
           }
         } else {
-          const enemyEntryMessages = processBattleAbilityEntryCopiesForState(state)
+          const enemyEntryMessages =
+            processBattleAbilityEntryCopiesForState(state)
           const enemyForecastMessages =
             processBattleAbilityWeatherTypeChangesForState(state)
           if (enemyEntryMessages.length || enemyForecastMessages.length) {
@@ -2000,7 +2051,9 @@ export async function useMove(
           }
           const enemyBeforeAttack = getBattleAbilityBeforeAttackFormChange({
             pokemon: enemyMon,
-            damage: enemyMultiplier * (enemyBattleAction.basePower ?? BASE_BATTLE_POWER),
+            damage:
+              enemyMultiplier *
+              (enemyBattleAction.basePower ?? BASE_BATTLE_POWER),
           })
           if (applyBattleFormChange(enemyMon, enemyBeforeAttack.formId)) {
             message += `\n${enemyBeforeAttack.messages.join('\n')}`
@@ -2031,13 +2084,14 @@ export async function useMove(
               defender: playerMon,
               defenderSide: 'player',
             }),
-	            {
-	              ignoreDefenderStatStages: enemyBattleAction.ignoreDefenderStatStages,
-	              damageStatSource: enemyBattleAction.damageStatSource,
-	              moveId: enemyBattleAction.specialMoveId,
-	              currentTurn: state.turn,
-	              terrain: state.terrain?.terrain,
-	            },
+            {
+              ignoreDefenderStatStages:
+                enemyBattleAction.ignoreDefenderStatStages,
+              damageStatSource: enemyBattleAction.damageStatSource,
+              moveId: enemyBattleAction.specialMoveId,
+              currentTurn: state.turn,
+              terrain: state.terrain?.terrain,
+            },
           )
           if (enemyBattleAction.fixedDamage !== undefined) {
             enemyDamageResult = {
@@ -2126,7 +2180,9 @@ export async function useMove(
           attacker: enemyMon,
           defender: playerMon,
           defenderSide: 'player',
-          move: enemyBattleAction.isBasicAttack ? undefined : enemyBattleAction.move,
+          move: enemyBattleAction.isBasicAttack
+            ? undefined
+            : enemyBattleAction.move,
           baseDamage: enemyBaseDamage,
           firstDamage: enemyRepeatedHitResult.firstHitDamage,
           attackStance: enemyBattleAction.stance,
@@ -2173,7 +2229,9 @@ export async function useMove(
           targetSide: 'player',
           sourcePokemon: enemyMon,
           targetPokemon: playerMon,
-          move: enemyBattleAction.isBasicAttack ? undefined : enemyBattleAction.move,
+          move: enemyBattleAction.isBasicAttack
+            ? undefined
+            : enemyBattleAction.move,
           damage: enemyDamage,
           attackType: enemyDamageResult.usedType,
         })
@@ -2387,13 +2445,19 @@ export async function useMove(
         move: enemyBattleAction.move,
         attackType: enemyAttackTypeForLog,
       })
-      if (enemyBattleAction.move.recharge && enemyBattleAction.move.recharge > 0) {
+      if (
+        enemyBattleAction.move.recharge &&
+        enemyBattleAction.move.recharge > 0
+      ) {
         state.enemyMoveLock = {
           type: 'recharge',
           moveId: enemyBattleAction.move.id,
           moveName: enemyBattleAction.move.name,
           selectedType: enemyAttackTypeForLog,
-          remainingTurns: Math.max(1, Math.floor(enemyBattleAction.move.recharge)),
+          remainingTurns: Math.max(
+            1,
+            Math.floor(enemyBattleAction.move.recharge),
+          ),
         }
         state.history[0].message += `\n${enemyMon.name} must recharge!`
       }

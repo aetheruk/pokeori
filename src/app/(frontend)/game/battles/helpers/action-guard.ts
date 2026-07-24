@@ -78,14 +78,13 @@ export async function runBattleActionWithGuard<
   }
 
   try {
-    if (pendingActionId) {
-      await redis.set(pendingKey, pendingActionId, {
-        ex: BATTLE_ACTION_LOCK_TTL_SECONDS,
-      })
-    }
-
-    if (resultKey) {
-      const cached = await getIdempotentResult<T>(resultKey)
+    if (pendingActionId && resultKey) {
+      const [, cached] = await Promise.all([
+        redis.set(pendingKey, pendingActionId, {
+          ex: BATTLE_ACTION_LOCK_TTL_SECONDS,
+        }),
+        getIdempotentResult<T>(resultKey),
+      ])
       if (cached) return cached
     }
 
@@ -99,9 +98,11 @@ export async function runBattleActionWithGuard<
     }
     return result
   } finally {
-    if (pendingActionId) {
-      await redis.deleteIfValue(pendingKey, pendingActionId)
-    }
-    await releaseActionLock(lock)
+    await Promise.all([
+      pendingActionId
+        ? redis.deleteIfValue(pendingKey, pendingActionId)
+        : Promise.resolve(),
+      releaseActionLock(lock),
+    ])
   }
 }

@@ -1,5 +1,6 @@
 import type { BattleState, BattleEvent } from './types'
 import type { BattleLogEntry } from '../types'
+import { BATTLE_ANIMATION_TIMINGS } from './timings'
 
 const getTeamPokemon = (team: BattleState['playerTeam'], index: number) => {
   return Array.isArray(team) ? team[index] : undefined
@@ -108,7 +109,9 @@ const getNetExplicitHpChange = (
   afterLineIndex: number,
 ) => {
   return events
-    .filter((event) => event.target === target && event.lineIndex > afterLineIndex)
+    .filter(
+      (event) => event.target === target && event.lineIndex > afterLineIndex,
+    )
     .reduce(
       (total, event) =>
         total + (event.kind === 'damage' ? event.amount : -event.amount),
@@ -299,7 +302,11 @@ export function generateBattleEvents(
             oldPlayerMon.maxHp,
             newState.playerTeam[oldPI].currentHp +
               combatLog.damageTaken +
-              getNetExplicitHpChange(explicitHpEvents, 'player', combatLineIndex),
+              getNetExplicitHpChange(
+                explicitHpEvents,
+                'player',
+                combatLineIndex,
+              ),
           )
         : undefined
     const inferredEnemyHpBeforeDamage =
@@ -311,7 +318,11 @@ export function generateBattleEvents(
             oldEnemyMon.maxHp,
             newState.enemyTeam[oldEI].currentHp +
               combatLog.damageDealt +
-              getNetExplicitHpChange(explicitHpEvents, 'enemy', combatLineIndex),
+              getNetExplicitHpChange(
+                explicitHpEvents,
+                'enemy',
+                combatLineIndex,
+              ),
           )
         : undefined
 
@@ -323,7 +334,7 @@ export function generateBattleEvents(
           matches: preCombatHpEvents,
           logEntry: combatLog,
         },
-        delay: 600,
+        delay: BATTLE_ANIMATION_TIMINGS.statusRecoveryMs,
       })
     }
 
@@ -339,7 +350,7 @@ export function generateBattleEvents(
           index: oldPI,
           hp: inferredPlayerHpBeforeDamage,
         },
-        delay: 250,
+        delay: BATTLE_ANIMATION_TIMINGS.healRecoveryMs,
       })
     }
 
@@ -355,7 +366,7 @@ export function generateBattleEvents(
           index: oldEI,
           hp: inferredEnemyHpBeforeDamage,
         },
-        delay: 250,
+        delay: BATTLE_ANIMATION_TIMINGS.healRecoveryMs,
       })
     }
 
@@ -373,7 +384,7 @@ export function generateBattleEvents(
         logEntry: combatLog,
         // We'll update the HP bars specifically during this sequence
       },
-      delay: 800,
+      delay: BATTLE_ANIMATION_TIMINGS.combatRecoveryMs,
     })
 
     if (postCombatHpEvents.length > 0) {
@@ -384,7 +395,7 @@ export function generateBattleEvents(
           matches: postCombatHpEvents,
           logEntry: combatLog,
         },
-        delay: 600,
+        delay: BATTLE_ANIMATION_TIMINGS.statusRecoveryMs,
       })
     }
   } else if (isNewLatestLog) {
@@ -403,7 +414,7 @@ export function generateBattleEvents(
           matches: explicitHpEvents,
           logEntry: lastLog,
         },
-        delay: 600,
+        delay: BATTLE_ANIMATION_TIMINGS.statusRecoveryMs,
       })
     }
   }
