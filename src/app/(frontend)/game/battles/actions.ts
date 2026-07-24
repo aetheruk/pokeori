@@ -275,12 +275,15 @@ export async function getBattlePanelData(
   const moveLevel = activeMon?.level || level
 
   const [powers, moves] = await Promise.all([
-    fetchPowers(moveFormId),
+    user && state
+      ? fetchPowers(moveFormId, { user, state })
+      : fetchPowers(moveFormId),
     fetchMoves(
       moveTypes,
       moveFormId,
       moveLevel,
       activeMon?.assignedMoves ?? [],
+      user ? { user, state } : undefined,
     ),
   ])
   return { powers, moves }

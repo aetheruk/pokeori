@@ -4,7 +4,9 @@ import type { BattlePokemon, BattleState } from '@/utilities/battle/types'
 import { createInitialPowersState } from '@/data/powers'
 
 const redisStore = new Map<string, unknown>()
-const getPayloadMock = mock(async () => ({}))
+const getPayloadMock = mock(async () => ({
+  auth: async () => ({ user }),
+}))
 const getUserInventoryMapMock = mock(async () => ({}))
 const revalidatePathMock = mock(() => {})
 const actualUserState = await import('@/utilities/user-state')
@@ -21,6 +23,10 @@ mock.module('next/cache', () => ({
   revalidatePath: revalidatePathMock,
 }))
 
+mock.module('next/headers', () => ({
+  headers: mock(async () => new Headers()),
+}))
+
 mock.module('@/utilities/redis', () => ({
   redis: {
     async get<T>(key: string): Promise<T | null> {
@@ -31,6 +37,10 @@ mock.module('@/utilities/redis', () => ({
       return 'OK'
     },
     async del(key: string): Promise<number> {
+      return redisStore.delete(key) ? 1 : 0
+    },
+    async deleteIfValue(key: string, value: unknown): Promise<number> {
+      if (redisStore.get(key) !== value) return 0
       return redisStore.delete(key) ? 1 : 0
     },
   },
@@ -140,12 +150,53 @@ describe('PVE turn latency', () => {
     expect(getUserInventoryMapMock).toHaveBeenCalledTimes(0)
   })
 
+  test('the real basic stance action resolves without loading trainer inventory', async () => {
+    redisStore.set(`battle:${user.id}`, makeState())
+    const { useBasicAttack } = await import(
+      '@/app/(frontend)/game/battles/actions/use-move'
+    )
+
+    const result = await useBasicAttack('power', 'grass', 'basic-stance-action')
+
+    expect(result.success).toBe(true)
+    expect(result.state?.turn).toBe(2)
+    expect(getPayloadMock).toHaveBeenCalledTimes(1)
+    expect(getUserInventoryMapMock).toHaveBeenCalledTimes(0)
+  })
+
+  test('snapshotted authored moves resolve without reloading trainer inventory', async () => {
+    const state = makeState()
+    state.playerTeam[0].assignedMoves = [{ moveId: 'vine-whip' }]
+    state.playerTeam[0].battleMoveIds = ['vine-whip']
+    state.playerTeam[0].pokemonResearchLevel = 1
+    redisStore.set(`battle:${user.id}`, state)
+    const { useMove } = await import(
+      '@/app/(frontend)/game/battles/actions/use-move'
+    )
+
+    const result = await useMove(
+      'vine-whip',
+      'grass',
+      'snapshotted-move-action',
+    )
+
+    expect(result.success).toBe(true)
+    expect(result.state?.turn).toBe(2)
+    expect(getPayloadMock).toHaveBeenCalledTimes(1)
+    expect(getUserInventoryMapMock).toHaveBeenCalledTimes(0)
+  })
+
   test('power commands still load trainer inventory for validation', async () => {
     const { submitPveTurn } = await import(
       '@/app/(frontend)/game/battles/pve/submit-turn'
     )
 
-    const result = await submitPveTurn(user, makeState(), 'power', 'power:mega:3')
+    const result = await submitPveTurn(
+      user,
+      makeState(),
+      'power',
+      'power:mega:3',
+    )
 
     expect(result.success).toBe(false)
     expect(getPayloadMock).toHaveBeenCalledTimes(1)

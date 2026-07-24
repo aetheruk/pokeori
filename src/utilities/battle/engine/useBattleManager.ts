@@ -5,6 +5,7 @@ import { generateBattleEvents } from './event-generator'
 import { useAudio } from '@/context/AudioContext'
 import { tasks } from '@/data/tasks'
 import { prependBattleHistory, trimBattleHistory } from '../history'
+import { BATTLE_ANIMATION_TIMINGS } from './timings'
 
 // Helper for deep cloning battle state to prevent mutation side-effects
 const shallowCloneState = (state: BattleState): BattleState => ({
@@ -263,6 +264,13 @@ export function useBattleManager(initialState: BattleState) {
 
   const delay = useCallback(
     (ms: number) => {
+      if (
+        typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      ) {
+        return Promise.resolve()
+      }
+
       return new Promise<void>((resolve) => {
         const timerId = setTrackedTimeout(resolve, ms)
         if (timerId === null) resolve()
@@ -584,7 +592,7 @@ export function useBattleManager(initialState: BattleState) {
                 if (result === 'win') {
                   safePlaySfx('stance_win')
                   setAnim((prev) => ({ ...prev, playerAttacking: true }))
-                  await delay(300)
+                  await delay(BATTLE_ANIMATION_TIMINGS.combatApproachMs)
                   if (shouldStop()) break
                   setAnim((prev) => ({
                     ...prev,
@@ -594,7 +602,7 @@ export function useBattleManager(initialState: BattleState) {
                 } else if (result === 'loss') {
                   safePlaySfx('stance_loss')
                   setAnim((prev) => ({ ...prev, enemyAttacking: true }))
-                  await delay(300)
+                  await delay(BATTLE_ANIMATION_TIMINGS.combatApproachMs)
                   if (shouldStop()) break
                   setAnim((prev) => ({
                     ...prev,
@@ -608,7 +616,7 @@ export function useBattleManager(initialState: BattleState) {
                     playerAttacking: true,
                     enemyAttacking: true,
                   }))
-                  await delay(300)
+                  await delay(BATTLE_ANIMATION_TIMINGS.combatApproachMs)
                   if (shouldStop()) break
                   setAnim((prev) => ({
                     ...prev,
@@ -669,7 +677,7 @@ export function useBattleManager(initialState: BattleState) {
                   }
                 })
 
-                await delay(400)
+                await delay(BATTLE_ANIMATION_TIMINGS.combatImpactMs)
                 if (shouldStop()) break
                 setAnim((prev) => ({
                   ...prev,
@@ -710,7 +718,9 @@ export function useBattleManager(initialState: BattleState) {
                     setAnim((prev) => ({
                       ...prev,
                       playerStatusDamageSplat:
-                        kind === 'damage' ? amount : prev.playerStatusDamageSplat,
+                        kind === 'damage'
+                          ? amount
+                          : prev.playerStatusDamageSplat,
                     }))
                     setVisualState((prev) => {
                       try {
@@ -732,7 +742,9 @@ export function useBattleManager(initialState: BattleState) {
                     setAnim((prev) => ({
                       ...prev,
                       enemyStatusDamageSplat:
-                        kind === 'damage' ? amount : prev.enemyStatusDamageSplat,
+                        kind === 'damage'
+                          ? amount
+                          : prev.enemyStatusDamageSplat,
                     }))
                     setVisualState((prev) => {
                       try {
@@ -753,7 +765,7 @@ export function useBattleManager(initialState: BattleState) {
                 }
 
                 if (shouldStop()) break
-                await delay(600)
+                await delay(BATTLE_ANIMATION_TIMINGS.statusEffectMs)
                 if (shouldStop()) break
                 setAnim((prev) => ({
                   ...prev,
@@ -937,7 +949,9 @@ export function useBattleManager(initialState: BattleState) {
         state: nextState,
         targetState: targetStateRef.current,
         events: events.map((event) =>
-          event.payload?.type ? `${event.type}:${event.payload.type}` : event.type,
+          event.payload?.type
+            ? `${event.type}:${event.payload.type}`
+            : event.type,
         ),
       })
 

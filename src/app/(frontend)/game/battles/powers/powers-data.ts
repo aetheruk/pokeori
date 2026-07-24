@@ -16,6 +16,8 @@ import {
 import { getUser } from '../helpers/user'
 import { getActiveBattleState } from '../helpers/state-management'
 import { getUserInventoryMap } from '@/utilities/user-state'
+import type { BattleState } from '@/utilities/battle/types'
+import type { User } from '@/payload-types'
 
 /**
  * Mega Stone data for available Mega Evolutions
@@ -77,6 +79,7 @@ export interface BattlePowersData {
  */
 export async function getBattlePowers(
   activeFormId: string,
+  context?: { user: User; state: BattleState },
 ): Promise<{ success: boolean; data: BattlePowersData }> {
   const emptyData: BattlePowersData = {
     selectedPokemonPower: null,
@@ -96,10 +99,10 @@ export async function getBattlePowers(
     dimensionalShift: { time: false, space: false, chaos: false },
   }
 
-  const user = await getUser()
+  const user = context?.user ?? (await getUser())
   if (!user) return { success: false, data: emptyData }
 
-  const state = await getActiveBattleState(user)
+  const state = context?.state ?? (await getActiveBattleState(user))
   if (!state) return { success: false, data: emptyData }
 
   const { items } = await import('@/data/items')
@@ -141,7 +144,9 @@ export async function getBattlePowers(
   const hasVictory =
     hasPowerLevel('victory') && hasKeyItem(POWER_KEY_ITEMS.victory)
   const hasWeather =
-    hasPowerLevel('weather') && hasKeyItem(POWER_KEY_ITEMS.weather) && !state.isPvp
+    hasPowerLevel('weather') &&
+    hasKeyItem(POWER_KEY_ITEMS.weather) &&
+    !state.isPvp
   const hasShouts = hasPowerLevel('shout') && hasKeyItem('book-of-shouts')
   const hasCircadian =
     hasPowerLevel('circadian') && hasKeyItem('circadian-stone')
@@ -221,11 +226,15 @@ export async function getBattlePowers(
 
   const data: BattlePowersData = {
     selectedPokemonPower,
-    hasTera: selectedPokemonPower === 'tera' && hasTera && !!activeMon?.teraType,
+    hasTera:
+      selectedPokemonPower === 'tera' && hasTera && !!activeMon?.teraType,
     hasMega: selectedPokemonPower === 'mega' && hasMega,
     hasZRing: selectedPokemonPower === 'z-move' && hasZRing,
     hasDynamax: selectedPokemonPower === 'dynamax' && hasDynamax,
-    teraType: selectedPokemonPower === 'tera' ? activeMon?.teraType || undefined : undefined,
+    teraType:
+      selectedPokemonPower === 'tera'
+        ? activeMon?.teraType || undefined
+        : undefined,
     megaStones: selectedPokemonPower === 'mega' ? megaStones : [],
     canGigantamax: selectedPokemonPower === 'dynamax' && canGmax,
     gigantamaxFormId:

@@ -89,13 +89,19 @@ export function PokemonDisplay({
   return (
     <div
       className={cn(
-        'relative w-16 h-16 transition-all duration-300',
+        'relative w-16 h-16 transition-all',
         className,
+        isFainting
+          ? 'duration-1000'
+          : isSwitchingOut || isSwitchingIn
+            ? 'duration-300'
+            : 'duration-100',
         isDynamaxed && 'scale-150', // Dynamaxed Pokemon are 50% larger
         isAttacking &&
           (isPlayer ? 'translate-x-12 -translate-y-12' : '-translate-x-12 translate-y-12'),
         isHit && 'animate-shake opacity-80 grayscale-[0.5]',
-        isFainting && 'translate-y-20 opacity-0 grayscale transition-all duration-1000 ease-in',
+        isFainting &&
+          'translate-y-20 opacity-0 grayscale transition-all ease-in',
         isSwitchingOut &&
           (isPlayer
             ? '-translate-x-16 translate-y-8 scale-75 opacity-0'

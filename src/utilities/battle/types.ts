@@ -125,6 +125,7 @@ export interface BattlePokemon extends Omit<Pokemon, 'stats'> {
   secondaryStatuses?: BattleSecondaryStatusInstance[]
   isShadow?: boolean
   isRadiant?: boolean
+  battleMoveIds?: string[]
   aiMoves?: string[]
   aiMoveLoadout?: string[]
   activeTurnStarted?: number

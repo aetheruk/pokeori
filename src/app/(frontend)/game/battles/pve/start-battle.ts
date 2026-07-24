@@ -32,6 +32,7 @@ import { rollPokemonGender } from '@/utilities/pokemon/gender'
 import { getActiveChronicleContext } from '@/utilities/chronicles'
 import type { ExpeditionChroniclePokemonConfig } from '@/data/expeditions'
 import {
+  getResearcherMoveSlotCount,
   getSkillLevel,
   resolveEnemyBattleMoveUseLimit,
   resolveTrainerBattleItemUseLimit,
@@ -72,6 +73,7 @@ import {
   processBattleAbilityWeatherSet,
 } from '@/utilities/battle/abilities'
 import { applyBattleRarityEntryEffects } from '@/utilities/battle/rarity-effects'
+import { getBattleMoveOptions } from '@/utilities/pokemon/pokemon-moves'
 
 export async function startBattle(
   battleId: string,
@@ -346,7 +348,12 @@ export async function startBattleFromConfig(
         battleConfig.movesPerBattle,
       )
   const playerTrainerLevel = chronicleContext ? 100 : trainerLevel
-  const pokedex = await getUserPokedexMap(payload as any, user.id)
+  const [pokedex, playerMoveInventory] = await Promise.all([
+    getUserPokedexMap(payload as any, user.id),
+    chronicleContext
+      ? Promise.resolve(chronicleBattleItems)
+      : getUserInventoryMap(payload as any, user.id),
+  ])
   const playerTeam = initializeTeamMoveUses(
     userPokemonDocs.map((p) =>
       initializeBattlePokemon(
@@ -480,6 +487,23 @@ export async function startBattleFromConfig(
     enemyTeam[0].activeTurnStarted = 1
   }
   const aiProfile = resolveBattleAiProfile(battleConfig)
+  const researcherMoveSlots = chronicleContext
+    ? undefined
+    : getResearcherMoveSlotCount(getSkillLevel(user.skills, 'researching'))
+  for (const pokemon of playerTeam) {
+    pokemon.battleMoveIds = getBattleMoveOptions({
+      assignedMoves: pokemon.assignedMoves ?? [],
+      pokemonTypes: pokemon.types || [],
+      pokemonFormId: pokemon.formId,
+      pokemonLevel: pokemon.level,
+      inventory: playerMoveInventory,
+      maxAssignedMoves: researcherMoveSlots,
+      allowUnavailableAssignedMoves: !!chronicleContext,
+      pokemon,
+      opponents: enemyTeam,
+      profile: aiProfile,
+    }).map((move) => move.id)
+  }
 
   const initialState: BattleState = {
     playerTeam,
@@ -557,7 +581,8 @@ export async function startBattleFromConfig(
   }
   initializeEnemyAiMoveLoadouts({ state: initialState, profile: aiProfile })
   normalizeChronicleBattleBudgets(initialState, battleConfig)
-  const suppressionMessages = processBattleAbilitySuppressionForState(initialState)
+  const suppressionMessages =
+    processBattleAbilitySuppressionForState(initialState)
   const initialFieldMessages = [
     ...(battleConfig.isWildBattle
       ? []

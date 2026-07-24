@@ -17,8 +17,14 @@ export const PVP_TURN_PREFIX = 'pvp:turn:'
 export async function getActiveBattleState(
   user: User,
 ): Promise<BattleState | null> {
+  // PVE is the common path. Start its state read alongside the PVP status
+  // lookup so it does not cost a second network round trip for every turn.
+  const [pvpStatus, pveBattleState] = await Promise.all([
+    checkPvpStatus(user.id),
+    redis.get<BattleState>(`battle:${user.id}`),
+  ])
+
   // 1. Check for PVP Battle
-  const pvpStatus = await checkPvpStatus(user.id)
   if (pvpStatus.battleId) {
     // Fetch shared state
     let sharedState = await redis.get<BattleState>(
@@ -57,7 +63,7 @@ export async function getActiveBattleState(
   }
 
   // 2. Fetch PVE Battle
-  const battleState = await redis.get<BattleState>(`battle:${user.id}`)
+  const battleState = pveBattleState
   if (!battleState) {
     return null
   }

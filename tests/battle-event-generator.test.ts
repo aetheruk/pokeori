@@ -1,5 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 import { generateBattleEvents } from '@/utilities/battle/engine/event-generator'
+import {
+  BATTLE_ANIMATION_TIMINGS,
+  STANDARD_COMBAT_ACTION_LOCK_MS,
+} from '@/utilities/battle/engine/timings'
 import type {
   BattleLogEntry,
   BattlePokemon,
@@ -66,6 +70,11 @@ function makeState(overrides: Partial<BattleState> = {}): BattleState {
 }
 
 describe('battle event generation', () => {
+  test('standard combat releases the action lock within 200ms', () => {
+    expect(STANDARD_COMBAT_ACTION_LOCK_MS).toBeLessThanOrEqual(200)
+    expect(BATTLE_ANIMATION_TIMINGS.combatRecoveryMs).toBe(0)
+  })
+
   test('forced player replacement is not replayed as combat', () => {
     const fainted = makePokemon({ currentHp: 0 })
     const replacement = makePokemon({
@@ -172,7 +181,9 @@ describe('battle event generation', () => {
     })
 
     const events = generateBattleEvents(oldState, newState)
-    const healIndex = events.findIndex((event) => event.payload?.type === 'HEAL')
+    const healIndex = events.findIndex(
+      (event) => event.payload?.type === 'HEAL',
+    )
     const combatIndex = events.findIndex(
       (event) => event.payload?.type === 'COMBAT',
     )
@@ -255,7 +266,9 @@ describe('battle event generation', () => {
     })
 
     const events = generateBattleEvents(oldState, newState)
-    const healIndex = events.findIndex((event) => event.payload?.type === 'HEAL')
+    const healIndex = events.findIndex(
+      (event) => event.payload?.type === 'HEAL',
+    )
     const combatIndex = events.findIndex(
       (event) => event.payload?.type === 'COMBAT',
     )
