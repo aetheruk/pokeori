@@ -1,6 +1,5 @@
 import type { BattleState, BattleEvent } from './types'
 import type { BattleLogEntry } from '../types'
-import { BATTLE_ANIMATION_TIMINGS } from './timings'
 
 const getTeamPokemon = (team: BattleState['playerTeam'], index: number) => {
   return Array.isArray(team) ? team[index] : undefined
@@ -334,7 +333,7 @@ export function generateBattleEvents(
           matches: preCombatHpEvents,
           logEntry: combatLog,
         },
-        delay: BATTLE_ANIMATION_TIMINGS.statusRecoveryMs,
+        delay: 600,
       })
     }
 
@@ -350,7 +349,7 @@ export function generateBattleEvents(
           index: oldPI,
           hp: inferredPlayerHpBeforeDamage,
         },
-        delay: BATTLE_ANIMATION_TIMINGS.healRecoveryMs,
+        delay: 250,
       })
     }
 
@@ -366,7 +365,7 @@ export function generateBattleEvents(
           index: oldEI,
           hp: inferredEnemyHpBeforeDamage,
         },
-        delay: BATTLE_ANIMATION_TIMINGS.healRecoveryMs,
+        delay: 250,
       })
     }
 
@@ -384,7 +383,7 @@ export function generateBattleEvents(
         logEntry: combatLog,
         // We'll update the HP bars specifically during this sequence
       },
-      delay: BATTLE_ANIMATION_TIMINGS.combatRecoveryMs,
+      delay: 800,
     })
 
     if (postCombatHpEvents.length > 0) {
@@ -395,7 +394,7 @@ export function generateBattleEvents(
           matches: postCombatHpEvents,
           logEntry: combatLog,
         },
-        delay: BATTLE_ANIMATION_TIMINGS.statusRecoveryMs,
+        delay: 600,
       })
     }
   } else if (isNewLatestLog) {
@@ -414,7 +413,7 @@ export function generateBattleEvents(
           matches: explicitHpEvents,
           logEntry: lastLog,
         },
-        delay: BATTLE_ANIMATION_TIMINGS.statusRecoveryMs,
+        delay: 600,
       })
     }
   }

@@ -23,20 +23,8 @@ import {
   clearBattleState,
   getBattlePanelData,
   getBattleState,
-  submitTurn,
-  surrenderBattle,
-  swapPokemon,
-  useBattleItem,
-  useCircadian,
-  useDynamax,
-  useMegaEvolution,
-  useMove,
-  useShout,
-  useTeraOrb,
-  useVictoryPower,
-  useWeatherPower,
-  useZMove,
 } from '../actions'
+import { submitBattleActionRequest } from '@/utilities/battle/action-api'
 import { BattleLog } from './battle-log'
 
 const CardDrawReveal = lazy(() =>
@@ -476,7 +464,12 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
         async (clientActionId) => {
           if (!selectedType) return { success: false }
           playSfx('select')
-          return await submitTurn(stance, selectedType, clientActionId)
+          return await submitBattleActionRequest({
+            kind: 'stance',
+            stance,
+            attackType: selectedType,
+            clientActionId,
+          })
         },
         {
           kind: 'stance',
@@ -491,7 +484,12 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
     (id: string) =>
       wrapAction(
         (clientActionId) =>
-          useMove(id, selectedType || undefined, clientActionId),
+          submitBattleActionRequest({
+            kind: 'move',
+            moveId: id,
+            selectedType: selectedType || undefined,
+            clientActionId,
+          }),
         {
           kind: 'move',
           label: availableMoves.find((move) => move.id === id)?.name || 'Move',
@@ -502,68 +500,117 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
   )
   const handleUseItem = useCallback(
     (id: string) =>
-      wrapAction((clientActionId) => useBattleItem(id, clientActionId), {
-        kind: 'item',
-        label: 'Using item',
-        itemId: id,
-      }),
+      wrapAction(
+        (clientActionId) =>
+          submitBattleActionRequest({
+            kind: 'item',
+            itemId: id,
+            clientActionId,
+          }),
+        {
+          kind: 'item',
+          label: 'Using item',
+          itemId: id,
+        },
+      ),
     [wrapAction],
   )
   const handleSwapPokemon = useCallback(
     (idx: number) =>
-      wrapAction((clientActionId) => swapPokemon(idx, clientActionId), {
-        kind: 'swap',
-        label: `Switching to ${battleState.playerTeam[idx]?.name || 'Pokemon'}`,
-        pokemonIndex: idx,
-      }),
+      wrapAction(
+        (clientActionId) =>
+          submitBattleActionRequest({
+            kind: 'swap',
+            pokemonIndex: idx,
+            clientActionId,
+          }),
+        {
+          kind: 'swap',
+          label: `Switching to ${battleState.playerTeam[idx]?.name || 'Pokemon'}`,
+          pokemonIndex: idx,
+        },
+      ),
     [battleState.playerTeam, wrapAction],
   )
   const handleUseTera = useCallback(
     () =>
-      wrapAction((clientActionId) => useTeraOrb(clientActionId), {
-        kind: 'power',
-        label: 'Terastallizing',
-      }),
+      wrapAction(
+        (clientActionId) =>
+          submitBattleActionRequest({ kind: 'tera', clientActionId }),
+        {
+          kind: 'power',
+          label: 'Terastallizing',
+        },
+      ),
     [wrapAction],
   )
   const handleUseMega = useCallback(
     (id: string) =>
-      wrapAction((clientActionId) => useMegaEvolution(id, clientActionId), {
-        kind: 'power',
-        label: 'Mega Evolution',
-      }),
+      wrapAction(
+        (clientActionId) =>
+          submitBattleActionRequest({
+            kind: 'mega',
+            formId: id,
+            clientActionId,
+          }),
+        {
+          kind: 'power',
+          label: 'Mega Evolution',
+        },
+      ),
     [wrapAction],
   )
   const handleUseZMove = useCallback(
     () =>
-      wrapAction((clientActionId) => useZMove(clientActionId), {
-        kind: 'power',
-        label: 'Preparing Z-Move',
-      }),
+      wrapAction(
+        (clientActionId) =>
+          submitBattleActionRequest({ kind: 'z-move', clientActionId }),
+        {
+          kind: 'power',
+          label: 'Preparing Z-Move',
+        },
+      ),
     [wrapAction],
   )
   const handleUseDynamax = useCallback(
     () =>
-      wrapAction((clientActionId) => useDynamax(undefined, clientActionId), {
-        kind: 'power',
-        label: 'Dynamaxing',
-      }),
+      wrapAction(
+        (clientActionId) =>
+          submitBattleActionRequest({ kind: 'dynamax', clientActionId }),
+        {
+          kind: 'power',
+          label: 'Dynamaxing',
+        },
+      ),
     [wrapAction],
   )
   const handleUseVictory = useCallback(
     (id: string) =>
-      wrapAction((clientActionId) => useVictoryPower(id, clientActionId), {
-        kind: 'power',
-        label: 'Victory Power',
-        itemId: id,
-      }),
+      wrapAction(
+        (clientActionId) =>
+          submitBattleActionRequest({
+            kind: 'victory',
+            itemId: id,
+            clientActionId,
+          }),
+        {
+          kind: 'power',
+          label: 'Victory Power',
+          itemId: id,
+        },
+      ),
     [wrapAction],
   )
   const handleUseWeather = useCallback(
     (weather: string) =>
       wrapAction(
         (clientActionId) =>
-          useWeatherPower(battleState.battleId, weather, clientActionId),
+          submitBattleActionRequest({
+            kind: 'weather',
+            battleId: battleState.battleId,
+            weather,
+            clientActionId,
+          }),
         {
           kind: 'power',
           label: 'Weather Control',
@@ -573,17 +620,30 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
   )
   const handleUseShout = useCallback(
     (s: BattleStance) =>
-      wrapAction((clientActionId) => useShout(s, clientActionId), {
-        kind: 'power',
-        label: 'Shout Command',
-        stance: s,
-      }),
+      wrapAction(
+        (clientActionId) =>
+          submitBattleActionRequest({
+            kind: 'shout',
+            stance: s,
+            clientActionId,
+          }),
+        {
+          kind: 'power',
+          label: 'Shout Command',
+          stance: s,
+        },
+      ),
     [wrapAction],
   )
   const handleUseCircadian = useCallback(
     () =>
       wrapAction(
-        (clientActionId) => useCircadian(battleState.battleId, clientActionId),
+        (clientActionId) =>
+          submitBattleActionRequest({
+            kind: 'circadian',
+            battleId: battleState.battleId,
+            clientActionId,
+          }),
         {
           kind: 'power',
           label: 'Circadian Power',
@@ -595,7 +655,11 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
     (type: 'time' | 'space' | 'chaos') =>
       wrapAction(
         (clientActionId) =>
-          submitTurn('tech', `power:dimensional-shift:${type}`, clientActionId),
+          submitBattleActionRequest({
+            kind: 'dimensional-shift',
+            shiftType: type,
+            clientActionId,
+          }),
         {
           kind: 'power',
           label: 'Dimensional Shift',
@@ -607,14 +671,12 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
   const handleSurrender = useCallback(
     () =>
       wrapAction(
-        async () => {
+        async (clientActionId) => {
           playSfx('flee')
-          const result = await surrenderBattle()
-          if (result.success) {
-            const newState = await getBattleState()
-            return { success: true, state: newState }
-          }
-          return result
+          return submitBattleActionRequest({
+            kind: 'surrender',
+            clientActionId,
+          })
         },
         {
           kind: 'surrender',
@@ -780,7 +842,11 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
             >
               <Suspense
                 fallback={
-                  <div className="p-8 text-center" role="status" aria-live="polite">
+                  <div
+                    className="p-8 text-center"
+                    role="status"
+                    aria-live="polite"
+                  >
                     Preparing battle cards…
                   </div>
                 }
@@ -811,7 +877,9 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
             icon={resultIcon}
             iconAlt={battleState.enemyName}
             titleColor={
-              battleState.status === 'won' ? 'text-game-ochre' : 'text-game-danger'
+              battleState.status === 'won'
+                ? 'text-game-ochre'
+                : 'text-game-danger'
             }
             additionalContent={
               expeditionProgress ? (
