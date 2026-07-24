@@ -20,7 +20,6 @@ import { MysteryGift } from '@/components/game/trainer/mystery-gift'
 import { HighScores } from '@/components/game/trainer/high-scores'
 import { FriendsList } from '@/components/game/trainer/friends-list'
 import { TcgDecksPanel, type DeckFormat } from '@/components/game/trainer/tcg-decks-panel'
-import { TrainerCollection } from '@/components/game/trainer/trainer-collection'
 import { useUser } from '@/context/UserContext'
 import {
   Gift,
@@ -41,7 +40,6 @@ import { DesktopSectionEmblem } from '@/components/game/shared/DesktopSectionEmb
 
 type Tab =
   | 'profile'
-  | 'collection'
   | 'decks'
   | 'trainers'
   | 'friends'
@@ -72,11 +70,6 @@ export function TrainerDashboard() {
           <TrainerLeveling />
         </LazyWrapper>
       ),
-    },
-    {
-      id: 'collection' as const,
-      label: 'Collection',
-      component: <TrainerCollection />,
     },
     ...(hasDeckBox
       ? [
@@ -119,7 +112,6 @@ export function TrainerDashboard() {
     TABS.find((tab) => tab.id === activeTab)?.component || TABS[0].component
   const tabIcons: Record<Tab, React.ComponentType<{ className?: string }>> = {
     profile: UserRound,
-    collection: Layers3,
     decks: Layers3,
     trainers: Search,
     friends: UsersRound,
