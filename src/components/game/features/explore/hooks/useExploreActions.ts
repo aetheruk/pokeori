@@ -28,7 +28,10 @@ import type { RequirementData } from '@/utilities/requirements'
 import type { ExploreItem } from '../types'
 import { ShopConfig } from '@/data/shops/types'
 import { VoyageConfig } from '@/data/voyages/types'
-import { markExpeditionReturn } from '../expedition-return'
+import {
+  clearExpeditionReturn,
+  markExpeditionReturn,
+} from '../expedition-return'
 
 export function useExploreActions(
   userData: RequirementData | null,
@@ -150,6 +153,27 @@ export function useExploreActions(
       originalData: taskDefinition,
       fromExpeditionTaskStep,
     } as ExploreItem
+  }
+
+  const reopenExpeditionPanel = (expeditionId?: string | null) => {
+    const targetExpeditionId =
+      expeditionId || getActiveExpeditionRun()?.expeditionId
+    const expedition = targetExpeditionId
+      ? expeditions.find((entry) => entry.id === targetExpeditionId)
+      : undefined
+
+    clearExpeditionReturn()
+
+    if (!expedition) {
+      setSelectedItem(null)
+      return
+    }
+
+    setSelectedItem({
+      ...expedition,
+      type: 'expedition',
+      originalData: expedition,
+    } as ExploreItem)
   }
 
   const handleStartExpedition = async (expeditionId: string) => {
@@ -493,10 +517,11 @@ export function useExploreActions(
             : await completeTask(task.id)
         if (result.success) {
           if (isExpeditionTaskFlow) {
-            markExpeditionReturn(getActiveExpeditionRun()?.expeditionId)
+            reopenExpeditionPanel(getActiveExpeditionRun()?.expeditionId)
+          } else {
+            setSelectedItem(null)
           }
           if (!task.chat) setCompletionResult(result)
-          setSelectedItem(null)
           setLastCompletedTask(task) // Store task object
           refreshUser()
           if (task.chat && task.exitModal) {
@@ -781,10 +806,11 @@ export function useExploreActions(
       const result = await completeTask(task.id, selectedPokemonIds)
       if (result.success) {
         if (shouldClearExpeditionContext) {
-          markExpeditionReturn(getActiveExpeditionRun()?.expeditionId)
+          reopenExpeditionPanel(getActiveExpeditionRun()?.expeditionId)
+        } else {
+          setSelectedItem(null)
         }
         setCompletionResult(result)
-        setSelectedItem(null)
         setLastCompletedTask(task)
         setSelectedTaskForCompletion(null)
         setIsSelectionModalOpen(false)
@@ -903,6 +929,7 @@ export function useExploreActions(
     togglePokemonSelection,
     handleConfirmTaskWithSelection,
     handleConfirmEncounterWithSelection,
+    reopenExpeditionPanel,
     exitModalData,
     setExitModalData,
     isExitModalOpen,
