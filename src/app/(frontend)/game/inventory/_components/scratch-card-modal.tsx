@@ -30,7 +30,7 @@ export function ScratchCardModal(props: ScratchCardModalProps) {
         onOpenChange(val)
       }}
     >
-      <DialogContent className="max-w-sm bg-transparent border-none p-0 flex flex-col items-center justify-center shadow-none focus:outline-none">
+      <DialogContent className="game-night !bg-transparent flex w-auto max-w-none flex-col items-center justify-center gap-4 overflow-visible border-none p-0 shadow-none focus:outline-none">
         <DialogTitle className="sr-only">Scratch card reward</DialogTitle>
         {open && <ScratchCardInterface {...props} />}
       </DialogContent>
@@ -161,7 +161,13 @@ function ScratchCardInterface({
   return (
     <>
       {/* Card Container */}
-      <div className="relative h-[600px] w-[300px] animate-in overflow-hidden rounded-xl border border-game-border bg-game-night-canvas shadow-lg zoom-in-95 duration-300">
+      <div
+        className="relative aspect-[1/2] animate-in overflow-hidden rounded-xl border border-game-border bg-game-night-canvas shadow-lg zoom-in-95 duration-300"
+        style={{
+          width:
+            'min(300px, calc(100vw - 4rem), calc((100dvh - 8rem) / 2))',
+        }}
+      >
         {/* Background Image */}
         {background && (
           <Image
@@ -192,7 +198,7 @@ function ScratchCardInterface({
         </div>
       </div>
 
-      <div className="mt-4 flex flex-col gap-2 items-center">
+      <div className="flex flex-col items-center gap-2">
         <Button
           onClick={() => setShowRewards(true)}
           className={`transition-all duration-300 font-bold ${
