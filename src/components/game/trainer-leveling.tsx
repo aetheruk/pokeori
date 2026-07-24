@@ -16,6 +16,7 @@ import {
   Zap,
 } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { memo, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { updateUserCustomization } from '@/app/(frontend)/game/actions'
@@ -477,6 +478,15 @@ export function TrainerLeveling() {
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col space-y-10 overflow-y-auto px-4 pb-20 pt-6 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-game-border md:px-6 md:pt-8">
+        <div className="flex justify-end">
+          <Button asChild variant="outline">
+            <Link href="/game/inventory">
+              <Package className="h-4 w-4" aria-hidden="true" />
+              Open Bag
+            </Link>
+          </Button>
+        </div>
+
         {/* Skills Section */}
         <div className="space-y-4">
           <SectionDivider>Skills</SectionDivider>

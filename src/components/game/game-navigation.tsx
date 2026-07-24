@@ -1,6 +1,6 @@
 'use client'
 
-import { Backpack, Compass, Hammer, User } from 'lucide-react'
+import { BookOpen, Compass, Hammer, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
@@ -23,10 +23,10 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { name: 'Trainer', href: '/game', icon: User },
-  { name: 'Bag', href: '/game/inventory', icon: Backpack },
   { name: 'Explore', href: '/game/explore', icon: Compass },
   { name: 'Pokemon', href: '/game/pokemon', icon: TbPokeball },
   { name: 'Artisan', href: '/game/artisan', icon: Hammer, mobileName: 'Craft' },
+  { name: 'Dex', href: '/game/dex', icon: BookOpen },
 ]
 
 export function GameNavigation() {

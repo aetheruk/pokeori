@@ -29,6 +29,7 @@ export function GameShell({
     pathname === '/game/spirit-channeling' ||
     pathname === '/game/pokemon' ||
     pathname === '/game/artisan' ||
+    pathname === '/game/dex' ||
     pathname === '/game/tcg' ||
     pathname === '/game/pokedex' ||
     pathname === '/game/movedex' ||
