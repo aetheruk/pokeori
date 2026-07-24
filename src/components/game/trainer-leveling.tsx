@@ -478,13 +478,22 @@ export function TrainerLeveling() {
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col space-y-10 overflow-y-auto px-4 pb-20 pt-6 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-game-border md:px-6 md:pt-8">
-        <div className="flex justify-end">
-          <Button asChild variant="outline">
-            <Link href="/game/inventory">
-              <Package className="h-4 w-4" aria-hidden="true" />
-              Open Bag
-            </Link>
-          </Button>
+        <div className="space-y-4">
+          <SectionDivider>Inventory</SectionDivider>
+          <Link
+            href="/game/inventory"
+            className="game-focus-ring group flex w-full items-center gap-4 rounded-lg border border-game-border bg-game-surface p-4 text-left transition-colors hover:border-game-moss/35 hover:bg-game-surface-raised"
+          >
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-game-moss/30 bg-game-moss/10 text-game-moss-strong">
+              <Package className="h-7 w-7" aria-hidden="true" />
+            </div>
+            <div className="min-w-0 flex-1 space-y-1">
+              <h3 className="text-sm font-semibold text-game-ink">Open Bag</h3>
+              <p className="text-[11px] leading-snug text-game-muted">
+                Manage items, key tools, and materials.
+              </p>
+            </div>
+          </Link>
         </div>
 
         {/* Skills Section */}
