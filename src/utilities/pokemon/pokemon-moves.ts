@@ -1,10 +1,12 @@
 import { items } from '@/data/items'
 import { getAllMoves, getMove } from '@/data/moves'
-import type { MoveConfig, MoveContinuousConfig, MoveStance } from '@/data/moves/types'
+import type {
+  MoveConfig,
+  MoveContinuousConfig,
+  MoveStance,
+} from '@/data/moves/types'
 import type { BattleAiProfileId } from '@/data/types'
-import {
-  selectBattleMoveLoadoutFromCandidates,
-} from '@/utilities/battle/enemy-ai'
+import { selectBattleMoveLoadoutFromCandidates } from '@/utilities/battle/enemy-ai'
 import type { BattlePokemon } from '@/utilities/battle/types'
 import { MAX_RESEARCHER_MOVE_SLOTS } from '@/utilities/skills/unlocks'
 
@@ -55,7 +57,9 @@ export function toAssignedMoveRows(moveIds: string[]): { moveId: string }[] {
   return moveIds.map((moveId) => ({ moveId }))
 }
 
-export function getInventoryMoveIds(inventory: Record<string, number>): string[] {
+export function getInventoryMoveIds(
+  inventory: Record<string, number>,
+): string[] {
   const seen = new Set<string>()
   const moveIds: string[] = []
 
@@ -160,7 +164,6 @@ export function getBattleMoveOptions(params: {
   maxAssignedMoves?: number
   allowUnavailableAssignedMoves?: boolean
   pokemon?: BattlePokemon
-  opponents?: BattlePokemon[]
   profile?: BattleAiProfileId
 }): PokemonMoveOption[] {
   const maxAssignedMoves = params.maxAssignedMoves ?? MAX_ASSIGNED_MOVES
@@ -174,7 +177,7 @@ export function getBattleMoveOptions(params: {
     allowUnavailableMoves: params.allowUnavailableAssignedMoves,
   })
 
-  if (assignedOptions.length >= maxAssignedMoves || !params.pokemon || !params.opponents?.length) {
+  if (assignedOptions.length >= maxAssignedMoves || !params.pokemon) {
     return assignedOptions
   }
 
@@ -190,7 +193,6 @@ export function getBattleMoveOptions(params: {
 
   const fallbackIds = selectBattleMoveLoadoutFromCandidates({
     self: params.pokemon,
-    opponents: params.opponents,
     moveIds: fallbackCandidateIds,
     profile: params.profile,
     maxMoves: maxAssignedMoves - assignedOptions.length,

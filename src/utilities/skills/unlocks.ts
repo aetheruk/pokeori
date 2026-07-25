@@ -87,7 +87,7 @@ export const EXPLORER_VOYAGE_SLOT_UNLOCKS = [
 ] as const
 
 export const BATTLE_POWER_UNLOCK_LEVELS: Record<PokemonPowerId, number> = {
-  shout: 40,
+  shout: 35,
   tera: 70,
   mega: 75,
   'z-move': 80,

@@ -144,7 +144,6 @@ export async function initializeSharedPvpBattle(
       inventory: p1Inventory,
       maxAssignedMoves: p1ResearcherMoveSlots,
       pokemon,
-      opponents: p2Team,
     }).map((move) => move.id)
   }
   for (const pokemon of p2Team) {
@@ -156,7 +155,6 @@ export async function initializeSharedPvpBattle(
       inventory: p2Inventory,
       maxAssignedMoves: p2ResearcherMoveSlots,
       pokemon,
-      opponents: p1Team,
     }).map((move) => move.id)
   }
 

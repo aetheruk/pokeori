@@ -53,14 +53,14 @@ const guideItemsById = new Map(items.map((item) => [item.id, item]))
 const skillTitleIcon = (skillId: CoreSkillId): TaskIcon => {
   const iconId =
     skillId === 'battling'
-      ? 'trainer'
+      ? 'trainer-v2'
       : skillId === 'catching'
-        ? 'explorer'
+        ? 'explorer-v2'
         : skillId === 'researching'
-          ? 'researcher'
-          : 'artisan'
+          ? 'researcher-v2'
+          : 'artisan-v2'
 
-  return { type: 'local', id: `/fallback/skills/${iconId}.avif` }
+  return { type: 'local', id: `/fallback/skills/${iconId}.png` }
 }
 
 const trainerBattleItemUseUnlocks: SkillGuideUnlock[] = TRAINER_BATTLE_ITEM_USE_UNLOCKS.map(

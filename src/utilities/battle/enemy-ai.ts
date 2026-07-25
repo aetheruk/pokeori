@@ -18,7 +18,11 @@ import {
 } from './weather-effects'
 import { applyStanceDisable, getDisabledStanceMessage } from './stance-disable'
 import { getEffectiveBattleTypes } from './tera'
-import { DEFAULT_STAT_STAGES, clampStatStage, getStatStageMultiplier } from './stats-calc'
+import {
+  DEFAULT_STAT_STAGES,
+  clampStatStage,
+  getStatStageMultiplier,
+} from './stats-calc'
 import {
   applyMoveAbsorbHealing,
   applyStatus,
@@ -1210,9 +1214,59 @@ function scoreMove(params: {
   return { score, stance, attackType, effectOnly }
 }
 
+function scoreMoveForNeutralLoadout(params: {
+  move: MoveConfig
+  self: BattlePokemon
+}): { score: number; stance: BattleStance; attackType: string } {
+  const { move, self } = params
+  const stance = move.stance === 'random' ? 'speed' : move.stance
+  const attackType =
+    move.forcedType && move.forcedType !== 'random'
+      ? move.forcedType
+      : self.types?.[0]?.toLowerCase() || 'normal'
+  const accuracy = move.alwaysHits
+    ? 1
+    : Math.max(0, Math.min(1, move.accuracy / 100))
+  const hasDamage =
+    move.damage > 0 || Boolean(move.damageRule) || Boolean(move.delayedDamage)
+  const hasEnemyEffect =
+    move.target === 'enemy' ||
+    Boolean(
+      move.debuffs?.some((buff) => (buff.target ?? 'enemy') === 'enemy'),
+    ) ||
+    (Boolean(move.status) &&
+      (move.status?.target ?? move.target) === 'enemy') ||
+    Boolean(
+      move.additionalStatuses?.some(
+        (status) => (status.target ?? move.target) === 'enemy',
+      ),
+    ) ||
+    Boolean(move.interruptEnemyMove) ||
+    Boolean(move.disableStance) ||
+    Boolean(move.secondaryStatuses?.length)
+  const hasSelfEffect =
+    Boolean(move.heal) ||
+    Boolean(move.buffs?.some((buff) => (buff.target ?? 'self') === 'self')) ||
+    (Boolean(move.status) && (move.status?.target ?? move.target) === 'self')
+
+  let score = hasDamage ? Math.max(24, move.damage * 40) : 0
+  if (move.damageRange)
+    score += ((move.damageRange.min + move.damageRange.max) / 2) * 20
+  if (move.multiHit)
+    score += ((move.multiHit.minHits + move.multiHit.maxHits) / 2 - 1) * 12
+  if (self.types?.some((type) => type.toLowerCase() === attackType)) score += 12
+  if (hasEnemyEffect) score += 18
+  if (hasSelfEffect) score += move.healFull ? 22 : 14
+  if (move.absorb) score += 8
+  if (move.charged) score /= Math.max(2, move.charged + 1)
+  if (move.recharge) score /= Math.max(2, move.recharge + 1)
+  if (move.selfDamage) score -= 18
+
+  return { score: score * accuracy, stance, attackType }
+}
+
 export function selectBattleMoveLoadoutFromCandidates(params: {
   self: BattlePokemon
-  opponents: BattlePokemon[]
   moveIds: string[]
   profile?: BattleAiProfileId
   maxMoves?: number
@@ -1222,9 +1276,6 @@ export function selectBattleMoveLoadoutFromCandidates(params: {
   if (!moveIds.length || maxMoves <= 0) return []
 
   const candidates = Array.from(new Set(moveIds))
-  const opponents = params.opponents.filter((pokemon) => pokemon.currentHp > 0)
-  if (!opponents.length) return []
-
   const selected: string[] = []
   const selectedStances = new Set<BattleStance>()
   const selectedTypes = new Set<string>()
@@ -1244,26 +1295,10 @@ export function selectBattleMoveLoadoutFromCandidates(params: {
       const move = getMove(moveId)
       if (!move) continue
 
-      let totalScore = 0
-      let bestStance: BattleStance =
-        move.stance === 'random' ? 'speed' : move.stance
-      let bestType = self.types?.[0]?.toLowerCase() || 'normal'
-
-      for (const opponent of opponents) {
-        const scored = scoreMove({
-          move,
-          self,
-          opponent,
-          profile: params.profile,
-          weather: params.weather,
-          forLoadout: true,
-        })
-        if (Number.isFinite(scored.score)) {
-          totalScore += scored.score
-          bestStance = scored.stance
-          bestType = scored.attackType
-        }
-      }
+      const scored = scoreMoveForNeutralLoadout({ move, self })
+      let totalScore = scored.score
+      const bestStance = scored.stance
+      const bestType = scored.attackType
 
       const role = move.heal
         ? 'heal'
@@ -1521,14 +1556,13 @@ export function getEnemyAiMoveIds(
 
 export function selectEnemyAiMoveLoadout(params: {
   enemyMon: BattlePokemon
-  playerTeam: BattlePokemon[]
   profile?: BattleAiProfileId
   isWildBattle?: boolean
   maxMoves?: number
   random?: () => number
   weather?: WeatherType
 }): string[] {
-  const { enemyMon, playerTeam, isWildBattle, maxMoves = 4 } = params
+  const { enemyMon, isWildBattle, maxMoves = 4 } = params
   const random = params.random ?? Math.random
   const candidates = getEnemyAiMoveIds(enemyMon, {
     isWildBattle,
@@ -1565,10 +1599,12 @@ export function selectEnemyAiMoveLoadout(params: {
         !enemyMon.aiMoves?.includes(moveId) &&
         isUncuratedOpponentStatusMove(move)
       ) {
-        const alreadyHasGeneratedStatusMove = selected.some((selectedMoveId) => {
-          const selectedMove = getMove(selectedMoveId)
-          return selectedMove && isUncuratedOpponentStatusMove(selectedMove)
-        })
+        const alreadyHasGeneratedStatusMove = selected.some(
+          (selectedMoveId) => {
+            const selectedMove = getMove(selectedMoveId)
+            return selectedMove && isUncuratedOpponentStatusMove(selectedMove)
+          },
+        )
         if (
           alreadyHasGeneratedStatusMove ||
           random() * 100 >=
@@ -1578,28 +1614,10 @@ export function selectEnemyAiMoveLoadout(params: {
         }
       }
 
-      let totalScore = 0
-      let bestStance: BattleStance =
-        move.stance === 'random' ? 'speed' : move.stance
-      let bestType = enemyMon.types?.[0]?.toLowerCase() || 'normal'
-
-      for (const opponent of playerTeam.filter(
-        (pokemon) => pokemon.currentHp > 0,
-      )) {
-        const scored = scoreMove({
-          move,
-          self: enemyMon,
-          opponent,
-          profile: params.profile,
-          weather: params.weather,
-          forLoadout: true,
-        })
-        if (Number.isFinite(scored.score)) {
-          totalScore += scored.score
-          bestStance = scored.stance
-          bestType = scored.attackType
-        }
-      }
+      const scored = scoreMoveForNeutralLoadout({ move, self: enemyMon })
+      let totalScore = scored.score
+      const bestStance = scored.stance
+      const bestType = scored.attackType
 
       const role = move.heal
         ? 'heal'
@@ -1646,7 +1664,6 @@ export function initializeEnemyAiMoveLoadouts(params: {
   for (const enemyMon of params.state.enemyTeam) {
     enemyMon.aiMoveLoadout = selectEnemyAiMoveLoadout({
       enemyMon,
-      playerTeam: params.state.playerTeam,
       profile,
       isWildBattle: params.state.isWildBattle,
       random: params.random,
@@ -1705,32 +1722,45 @@ export function buildEnemyAiMoveChoice(params: {
           getEffectiveBattleTypes(params.opponent),
           params.random,
           params.weather,
-          { forceMaxDamageRange: usesBattleAbilityMaxMultiHitDamage(params.self, resolvedMove) },
+          {
+            forceMaxDamageRange: usesBattleAbilityMaxMultiHitDamage(
+              params.self,
+              resolvedMove,
+            ),
+          },
         )
       : undefined
   const moveDamage = effectOnly
     ? 0
     : (resolvedMove.delayedDamage?.damage ??
-      hiddenPower?.damageMultiplier ??
-      resolvedMoveDamage?.damageMultiplier ??
-      getMoveDamageMultiplier(
+        hiddenPower?.damageMultiplier ??
+        resolvedMoveDamage?.damageMultiplier ??
+        getMoveDamageMultiplier(
+          resolvedMove,
+          getEffectiveBattleTypes(params.opponent),
+          params.random,
+          params.weather,
+          {
+            forceMaxDamageRange: usesBattleAbilityMaxMultiHitDamage(
+              params.self,
+              resolvedMove,
+            ),
+          },
+        )) *
+      getBattleAbilityRecoilMoveDamageMultiplier(params.self, resolvedMove) *
+      getBattleAbilityAddedEffectMoveDamageMultiplier(
+        params.self,
         resolvedMove,
-        getEffectiveBattleTypes(params.opponent),
-        params.random,
-        params.weather,
-        { forceMaxDamageRange: usesBattleAbilityMaxMultiHitDamage(params.self, resolvedMove) },
-      )) *
-        getBattleAbilityRecoilMoveDamageMultiplier(params.self, resolvedMove) *
-        getBattleAbilityAddedEffectMoveDamageMultiplier(params.self, resolvedMove) *
-        getConditionalDamageMultiplier({
-          move: resolvedMove,
-          attacker: params.self,
-          defender: params.opponent,
-          state: params.state,
-          side: 'enemy',
-          attackType: hiddenPower?.attackType ?? attackType,
-          weather: params.weather,
-        })
+      ) *
+      getConditionalDamageMultiplier({
+        move: resolvedMove,
+        attacker: params.self,
+        defender: params.opponent,
+        state: params.state,
+        side: 'enemy',
+        attackType: hiddenPower?.attackType ?? attackType,
+        weather: params.weather,
+      })
   const damageRule = resolveDamageRuleDamage({
     rule: resolvedMove.damageRule,
     attacker: params.self,
@@ -1783,7 +1813,6 @@ function selectEnemyAiMove(params: {
     ? enemyMon.aiMoveLoadout
     : selectEnemyAiMoveLoadout({
         enemyMon,
-        playerTeam: state.playerTeam,
         profile,
         isWildBattle: state.isWildBattle,
         random,
@@ -1991,7 +2020,6 @@ function scorePokemonMatchup(params: {
     ? attacker.aiMoveLoadout
     : selectEnemyAiMoveLoadout({
         enemyMon: attacker,
-        playerTeam: state.playerTeam,
         profile: state.ai?.profile,
         isWildBattle: state.isWildBattle,
         weather: state.weather?.weather,
@@ -2380,7 +2408,10 @@ export function applyEnemyAiMoveEffects(params: {
     damageDealt: params.damageDealt,
   })
   if (secondaryEffectBlockMessage) messages.push(secondaryEffectBlockMessage)
-  const suppressesAddedEffects = suppressesBattleMoveAddedEffectsByAbility(self, move)
+  const suppressesAddedEffects = suppressesBattleMoveAddedEffectsByAbility(
+    self,
+    move,
+  )
   const skipTargetAddedEffects = Boolean(
     secondaryEffectBlockMessage || suppressesAddedEffects,
   )
@@ -2428,7 +2459,11 @@ export function applyEnemyAiMoveEffects(params: {
 
   if (move.debuffs?.length) {
     for (const debuff of move.debuffs) {
-      const chance = getBattleAbilitySecondaryEffectChance(self, move, debuff.chance)
+      const chance = getBattleAbilitySecondaryEffectChance(
+        self,
+        move,
+        debuff.chance,
+      )
       if (random() * 100 >= chance) continue
 
       const target = (debuff.target ?? 'enemy') === 'self' ? self : opponent
@@ -2507,7 +2542,11 @@ export function applyEnemyAiMoveEffects(params: {
 
   if (move.additionalStatuses?.length) {
     for (const status of move.additionalStatuses) {
-      const chance = getBattleAbilitySecondaryEffectChance(self, move, status.chance)
+      const chance = getBattleAbilitySecondaryEffectChance(
+        self,
+        move,
+        status.chance,
+      )
       if (random() * 100 >= chance) continue
       const target =
         status.target ?? (move.target === 'self' ? 'self' : 'enemy')
@@ -2545,7 +2584,11 @@ export function applyEnemyAiMoveEffects(params: {
     if (recoilBlockMessage) {
       messages.push(recoilBlockMessage)
     } else {
-      const selfDamageResult = applyMoveSelfDamage(self, move.selfDamage, random)
+      const selfDamageResult = applyMoveSelfDamage(
+        self,
+        move.selfDamage,
+        random,
+      )
       if (selfDamageResult.applied) messages.push(selfDamageResult.message)
     }
   }
@@ -2571,7 +2614,11 @@ export function applyEnemyAiMoveEffects(params: {
     move.randomStatuses?.options.length &&
     !skipTargetAddedEffects &&
     random() * 100 <
-      getBattleAbilitySecondaryEffectChance(self, move, move.randomStatuses.chance)
+      getBattleAbilitySecondaryEffectChance(
+        self,
+        move,
+        move.randomStatuses.chance,
+      )
   ) {
     const totalChance = move.randomStatuses.options.reduce(
       (sum, option) => sum + (option.chance ?? 1),
@@ -2621,7 +2668,8 @@ export function applyEnemyAiMoveEffects(params: {
     ? move.secondaryStatuses?.filter(
         (status) =>
           !(
-            (status.target === 'self-pokemon' || status.target === 'self-side') &&
+            (status.target === 'self-pokemon' ||
+              status.target === 'self-side') &&
             status.effects.some((effect) => effect.type === 'damage-reduction')
           ),
       )

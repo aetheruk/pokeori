@@ -4,7 +4,9 @@ import { createInitialPowersState } from '@/data/powers'
 import { normalizeChronicleBattleBudgets } from '@/utilities/battle/chronicle-budgets'
 import { getBattleMoveOptions } from '@/utilities/pokemon/pokemon-moves'
 
-function makeBattlePokemon(overrides: Partial<BattlePokemon> = {}): BattlePokemon {
+function makeBattlePokemon(
+  overrides: Partial<BattlePokemon> = {},
+): BattlePokemon {
   return {
     id: 'pokemon-1',
     user: 'user-1',
@@ -50,15 +52,6 @@ describe('chronicle battle moves', () => {
       maxAssignedMoves: 4,
       allowUnavailableAssignedMoves: true,
       pokemon: mrMime,
-      opponents: [
-        makeBattlePokemon({
-          id: 'opponent',
-          speciesId: 19,
-          formId: '19',
-          name: 'Rattata',
-          types: ['Normal'],
-        }),
-      ],
       profile: 'trainer',
     })
 

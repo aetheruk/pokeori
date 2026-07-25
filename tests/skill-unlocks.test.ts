@@ -367,11 +367,11 @@ describe('skill unlock helpers', () => {
   })
 
   test('battle powers have trainer level gates', () => {
-    expect(getBattlePowerUnlockLevel('shout')).toBe(40)
-    expect(validateBattlePowerSkillRequirement('shout', 39)).toContain(
-      'Trainer Level 40',
+    expect(getBattlePowerUnlockLevel('shout')).toBe(35)
+    expect(validateBattlePowerSkillRequirement('shout', 34)).toContain(
+      'Trainer Level 35',
     )
-    expect(validateBattlePowerSkillRequirement('shout', 40)).toBeNull()
+    expect(validateBattlePowerSkillRequirement('shout', 35)).toBeNull()
     expect(validateBattlePowerSkillRequirement('mega', 74)).toContain(
       'Trainer Level 75',
     )
@@ -546,6 +546,7 @@ describe('skill unlock helpers', () => {
     expect(trainerGuide).toContainEqual(
       expect.objectContaining({
         label: 'Battle Shouts',
+        level: 35,
         icon: { type: 'item', id: 'book-of-shouts' },
       }),
     )
@@ -564,6 +565,17 @@ describe('skill unlock helpers', () => {
     expect(trainerGuide).toContainEqual(
       expect.objectContaining({ itemId: 'dire-hit', level: 36 }),
     )
+    for (const itemId of [
+      'x-attack',
+      'x-defense',
+      'x-sp-atk',
+      'x-sp-def',
+      'x-speed',
+    ]) {
+      expect(trainerGuide).toContainEqual(
+        expect.objectContaining({ itemId, level: 32 }),
+      )
+    }
     expect(trainerGuide).toContainEqual(
       expect.objectContaining({ itemId: 'full-heal', level: 37 }),
     )
