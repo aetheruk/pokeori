@@ -15,7 +15,7 @@ There are no GitHub Actions workflows in this repository. Keep `main` protected 
 
 Install Docker Desktop (including Docker Buildx), Node.js 22+, pnpm 10.24.0, Bun 1.3.13, Git, and curl. Sign in to GitHub with an account that can push packages to `ghcr.io/aetheruk/pokeori`.
 
-Create a GitHub personal access token that can write the package (`write:packages`; add `read:packages` if the package is private). Keep it in the shell environment or a password manager; never commit it. Configure the Coolify application as a pre-built Docker image using:
+Authenticate the GitHub CLI with an account that can write packages (`write:packages`; add `read:packages` if the package is private). Configure the Coolify application as a pre-built Docker image using:
 
 ```text
 ghcr.io/aetheruk/pokeori:latest
@@ -31,7 +31,7 @@ RESEND_API_KEY=your-production-resend-key
 NEXT_PUBLIC_APP_URL=https://pokeori.app
 ```
 
-Get the application deploy webhook URL and a Coolify API token with `Deploy` permission. Do not put either value in GitHub repository secrets; GitHub Actions is not part of this release path.
+Get the application deploy webhook URL and a Coolify API token with `Deploy` permission. Store them locally as `COOLIFY_WEBHOOK_URI` and `COOLIFY_WEBHOOK_TOKEN` in the ignored `.env` file (or export the canonical `COOLIFY_WEBHOOK` and `COOLIFY_TOKEN` names). Do not put either value in GitHub repository secrets; GitHub Actions is not part of this release path.
 
 ## Deploy a merged release
 
@@ -41,17 +41,10 @@ Deploy only after the feature pull request has merged to `main`. The command rej
 git switch main
 git pull --ff-only origin main
 pnpm install --frozen-lockfile
-
-export GHCR_USERNAME=aetheruk
-read -rs GHCR_TOKEN && export GHCR_TOKEN
-export COOLIFY_WEBHOOK='https://your-coolify-host/webhooks/deploy/...'
-read -rs COOLIFY_TOKEN && export COOLIFY_TOKEN
-
 pnpm run deploy:production
-unset GHCR_TOKEN COOLIFY_TOKEN
 ```
 
-`deploy:production` runs linting, typechecking, the Bun test suite, and data validation. It then builds and pushes a `linux/amd64` Docker image with these tags:
+`deploy:production` obtains the GHCR token from `gh auth token`, defaults the GHCR username to `aetheruk`, and reads the two Coolify aliases from `.env` when they are not already exported. It runs linting, typechecking, the Bun test suite, and data validation, then builds and pushes a `linux/amd64` Docker image with these tags:
 
 - `ghcr.io/aetheruk/pokeori:latest`
 - `ghcr.io/aetheruk/pokeori:v<package-version>`
