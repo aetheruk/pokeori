@@ -35,6 +35,14 @@ dotenv_value() {
   " "$variable_name"
 }
 
+confirm_main_update() {
+  local prompt="$1"
+  local response
+  [[ -t 0 ]] || fail "$prompt Re-run from an interactive terminal."
+  read -r -p "$prompt [y/N] " response
+  [[ "$response" =~ ^[Yy]([Ee][Ss])?$ ]] || fail "Deployment cancelled."
+}
+
 main() {
   require_command git "Install Git and try again."
   require_command node "Install Node.js 22+ and pnpm 10.24.0, then run pnpm install."
@@ -49,17 +57,29 @@ main() {
   local image_name="${GHCR_IMAGE_NAME:-$DEFAULT_IMAGE_NAME}"
   local image="ghcr.io/${owner}/${image_name}"
 
-  [[ "$(git branch --show-current)" == "$branch" ]] || \
-    fail "Deploy only from '$branch' after its pull request has merged."
   git diff --quiet || fail "Commit or stash working-tree changes before deploying."
   git diff --cached --quiet || fail "Commit or unstage index changes before deploying."
 
   git fetch "$remote" "$branch" --quiet
-  local local_sha remote_sha
-  local_sha="$(git rev-parse HEAD)"
+  local current_branch local_main_sha local_sha remote_sha
+  current_branch="$(git branch --show-current)"
+  local_main_sha="$(git rev-parse "refs/heads/${branch}")" || \
+    fail "Local '$branch' does not exist. Fetch it and try again."
   remote_sha="$(git rev-parse "${remote}/${branch}")"
-  [[ "$local_sha" == "$remote_sha" ]] || \
-    fail "Local '$branch' must exactly match '${remote}/${branch}'. Pull the merged release first."
+
+  if [[ "$local_main_sha" != "$remote_sha" ]]; then
+    git merge-base --is-ancestor "$local_main_sha" "$remote_sha" || \
+      fail "Local '$branch' has commits not on '${remote}/${branch}'. Resolve them before deploying."
+  fi
+
+  if [[ "$current_branch" != "$branch" || "$local_main_sha" != "$remote_sha" ]]; then
+    confirm_main_update "Switch to '$branch' and fast-forward from '${remote}/${branch}' before deploying?"
+    [[ "$current_branch" == "$branch" ]] || git switch "$branch"
+    git merge --ff-only "${remote}/${branch}"
+  fi
+
+  local_sha="$(git rev-parse HEAD)"
+  [[ "$local_sha" == "$remote_sha" ]] || fail "'$branch' must exactly match '${remote}/${branch}'."
 
   if [[ -z "${GHCR_TOKEN:-}" ]]; then
     require_command gh "Authenticate with GitHub CLI or set GHCR_TOKEN."
