@@ -9,7 +9,7 @@ import {
 } from '@/utilities/pokemon/rarity-effects'
 import { PixelatedSpriteCanvas } from './PixelatedSpriteCanvas'
 
-const EGG_SPRITE_URL = '/sprites/items/egg.png'
+const EGG_SPRITE_URL = '/sprites/items/egg.avif'
 
 interface PokemonRarityEggSpriteProps {
   rarity?: PokemonRarityId | string | null
