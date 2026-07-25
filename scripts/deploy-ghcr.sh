@@ -23,6 +23,18 @@ require_env() {
   [[ -n "${!variable_name:-}" ]] || fail "Set $variable_name before deploying."
 }
 
+dotenv_value() {
+  local variable_name="$1"
+  [[ -f .env ]] || return 0
+
+  node --input-type=module -e "
+    import dotenv from 'dotenv'
+    import { readFileSync } from 'node:fs'
+    const values = dotenv.parse(readFileSync('.env'))
+    process.stdout.write(values[process.argv.at(-1)] ?? '')
+  " "$variable_name"
+}
+
 main() {
   require_command git "Install Git and try again."
   require_command node "Install Node.js 22+ and pnpm 10.24.0, then run pnpm install."
@@ -49,8 +61,17 @@ main() {
   [[ "$local_sha" == "$remote_sha" ]] || \
     fail "Local '$branch' must exactly match '${remote}/${branch}'. Pull the merged release first."
 
-  require_env GHCR_TOKEN
-  require_env GHCR_USERNAME
+  if [[ -z "${GHCR_TOKEN:-}" ]]; then
+    require_command gh "Authenticate with GitHub CLI or set GHCR_TOKEN."
+    GHCR_TOKEN="$(gh auth token)" || fail "Unable to read the GitHub CLI token."
+  fi
+  GHCR_USERNAME="${GHCR_USERNAME:-$owner}"
+
+  COOLIFY_WEBHOOK="${COOLIFY_WEBHOOK:-${COOLIFY_WEBHOOK_URI:-}}"
+  COOLIFY_TOKEN="${COOLIFY_TOKEN:-${COOLIFY_WEBHOOK_TOKEN:-}}"
+  COOLIFY_WEBHOOK="${COOLIFY_WEBHOOK:-$(dotenv_value COOLIFY_WEBHOOK_URI)}"
+  COOLIFY_TOKEN="${COOLIFY_TOKEN:-$(dotenv_value COOLIFY_WEBHOOK_TOKEN)}"
+
   require_env COOLIFY_WEBHOOK
   require_env COOLIFY_TOKEN
 
