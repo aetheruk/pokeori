@@ -23,19 +23,15 @@ describe('source hygiene', () => {
     expect(source).not.toContain('new Function')
   })
 
-  test('Payload scripts invoke the CLI binary without recursively calling Bun scripts', () => {
+  test('Payload scripts invoke the CLI binary directly', () => {
     const packageJson = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf-8')) as {
       scripts: Record<string, string>
     }
     const scripts = packageJson.scripts
 
-    expect(scripts.payload).toBe('cross-env NODE_OPTIONS=--no-deprecation payload')
-    expect(scripts['generate:types']).toBe(
-      'cross-env NODE_OPTIONS=--no-deprecation payload generate:types',
-    )
-    expect(scripts['generate:importmap']).toBe(
-      'cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap',
-    )
+    expect(scripts.payload).toBe('payload')
+    expect(scripts['generate:types']).toBe('payload generate:types')
+    expect(scripts['generate:importmap']).toBe('payload generate:importmap')
     expect(scripts.payload).not.toContain('bun payload')
     expect(scripts['generate:types']).not.toContain('bun payload')
     expect(scripts['generate:importmap']).not.toContain('bun payload')

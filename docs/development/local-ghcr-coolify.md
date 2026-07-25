@@ -13,7 +13,7 @@ There are no GitHub Actions workflows in this repository. Keep `main` protected 
 
 ## One-time setup on the release machine
 
-Install Docker Desktop (including Docker Buildx), Node.js 22+, pnpm 10.24.0, Bun 1.3.13, Git, and curl. Sign in to GitHub with an account that can push packages to `ghcr.io/aetheruk/pokeori`.
+Install Docker Desktop (including Docker Buildx), Bun 1.3.10+, Git, and curl. Sign in to GitHub with an account that can push packages to `ghcr.io/aetheruk/pokeori`.
 
 Authenticate the GitHub CLI with an account that can write packages (`write:packages`; add `read:packages` if the package is private). Configure the Coolify application as a pre-built Docker image using:
 
@@ -38,11 +38,11 @@ Get the application deploy webhook URL and a Coolify API token with `Deploy` per
 Deploy only after the feature pull request has merged to `main`. From a clean feature branch or stale `main`, the command prompts once before switching to `main` and fast-forwarding it to `origin/main`; declining leaves the checkout unchanged. It rejects local modifications or a `main` that has unmerged local commits.
 
 ```bash
-pnpm install --frozen-lockfile
-pnpm run deploy:production
+bun install --frozen-lockfile
+bun run deploy:production
 ```
 
-`deploy:production` obtains the GHCR token from `gh auth token`, defaults the GHCR username to `aetheruk`, and reads the two Coolify aliases from `.env` when they are not already exported. It runs linting, typechecking, the Bun test suite, and data validation, then builds and pushes a `linux/amd64` Docker image with these tags:
+`deploy:production` obtains the GHCR token from `gh auth token`, defaults the GHCR username to `aetheruk`, and reads the two Coolify aliases from `.env` when they are not already exported. It runs linting, typechecking, the Bun test suite, and data validation, then builds and pushes a `linux/amd64` Docker image. It reuses Bun package downloads, Next compiler output, and a GHCR-backed BuildKit cache, so subsequent releases rebuild and upload only changed layers.
 
 - `ghcr.io/aetheruk/pokeori:latest`
 - `ghcr.io/aetheruk/pokeori:v<package-version>`
