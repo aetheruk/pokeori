@@ -96,11 +96,11 @@ Issues, documentation improvements, tests, accessibility fixes, and code contrib
 
 ## Deployment
 
-Production images are built on GitHub Actions and deployed to Coolify after changes are merged to protected `main`. See the [GitHub Actions and Coolify guide](./docs/development/github-actions-coolify.md).
+After a pull request is merged to protected `main`, build and publish the production image from the release machine; Coolify then deploys that GHCR image. See the [local GHCR and Coolify guide](./docs/development/local-ghcr-coolify.md).
 
 ## Versioning
 
-Pokeori currently uses the pre-release version `0.0.1`. Until the first stable release, APIs, data formats, and game systems may change without backwards compatibility.
+Pokeori currently uses the pre-release version `0.0.10`. Until the first stable release, APIs, data formats, and game systems may change without backwards compatibility.
 
 ## Credits and sources
 

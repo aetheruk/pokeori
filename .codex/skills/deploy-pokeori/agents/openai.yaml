@@ -1,0 +1,4 @@
+interface:
+  display_name: "Pokeori Deployment"
+  short_description: "Release Pokeori through local GHCR builds"
+  default_prompt: "Use $deploy-pokeori to validate, build, publish, and deploy the current Pokeori main release."

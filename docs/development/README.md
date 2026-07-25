@@ -11,7 +11,7 @@ Follow the [Setup Guide](/docs/development/getting-started.md) to run the projec
 - [Testing](/docs/development/testing.md) - Testing strategy and current checks
 - [Linting](/docs/development/linting.md) - ESLint/Prettier setup
 - [Deployment](/docs/development/deployment.md) - Build and deploy guide
-- [GitHub Actions and Coolify](/docs/development/github-actions-coolify.md) - Pre-built image CI/CD flow
+- [Local GHCR and Coolify](/docs/development/local-ghcr-coolify.md) - Build and deploy the pre-built production image from the release machine
 - [Release Checklist](/docs/development/release-checklist.md) - Pre-deploy validation checklist
 
 ## Prerequisites
