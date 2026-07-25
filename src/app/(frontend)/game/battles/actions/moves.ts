@@ -93,7 +93,6 @@ export async function getAvailableMoves(
         : getResearcherMoveSlotCount(researcherLevel),
       allowUnavailableAssignedMoves: isChronicle,
       pokemon: activeMon,
-      opponents: state?.enemyTeam,
       profile: state?.ai?.profile,
     })
   }

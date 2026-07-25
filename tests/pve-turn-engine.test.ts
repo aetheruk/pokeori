@@ -232,8 +232,10 @@ describe('PVE turn engine helpers', () => {
       "Kangaskhan's Parental Bond struck again! [icon:damage:10]",
     )
     expect(
-      result.messages.filter((message) =>
-        message === "Kangaskhan was hurt by Rough Target's Rough Skin! [icon:damage:12]",
+      result.messages.filter(
+        (message) =>
+          message ===
+          "Kangaskhan was hurt by Rough Target's Rough Skin! [icon:damage:12]",
       ),
     ).toHaveLength(2)
   })
@@ -276,9 +278,7 @@ describe('PVE turn engine helpers', () => {
     expect(state.activeEnemyIndex).toBe(1)
     expect(state.pendingPlayerSwitch).toBe(true)
     expect(state.pendingPlayerSwitchReason).toBe('move')
-    expect(result.messages).toContain(
-      "Enemy's Emergency Exit made it retreat!",
-    )
+    expect(result.messages).toContain("Enemy's Emergency Exit made it retreat!")
     expect(result.messages).toContain(
       'Enemy went back, and Enemy Bench took its place.',
     )
@@ -732,11 +732,6 @@ describe('PVE turn engine helpers', () => {
   })
 
   test('enemy AI move loadouts are capped and can include manual exception moves', () => {
-    const player = makePokemon({
-      id: 'player',
-      name: 'Player',
-      types: ['fire'],
-    })
     const enemy = makePokemon({
       id: 'enemy',
       name: 'Enemy',
@@ -749,7 +744,6 @@ describe('PVE turn engine helpers', () => {
 
     const loadout = selectEnemyAiMoveLoadout({
       enemyMon: enemy,
-      playerTeam: [player],
       profile: 'boss',
       maxMoves: 4,
       random: () => 0.5,
@@ -760,11 +754,6 @@ describe('PVE turn engine helpers', () => {
   })
 
   test('low-tier generated enemy move loadouts exclude broad status moves', () => {
-    const player = makePokemon({
-      id: 'player',
-      name: 'Player',
-      types: ['fire'],
-    })
     const rattata = makePokemon({
       id: 'rattata',
       name: 'Rattata',
@@ -776,13 +765,11 @@ describe('PVE turn engine helpers', () => {
 
     const generatedLoadout = selectEnemyAiMoveLoadout({
       enemyMon: rattata,
-      playerTeam: [player],
       profile: 'wild',
       maxMoves: 4,
     })
     const authoredLoadout = selectEnemyAiMoveLoadout({
       enemyMon: { ...rattata, aiMoves: ['toxic'] },
-      playerTeam: [player],
       maxMoves: 4,
     })
 
@@ -2120,7 +2107,8 @@ describe('PVE turn engine helpers', () => {
         defender: enemy,
       }),
     ).toEqual({
-      failed: 'Electric Terrain failed because Electric Terrain is already active.',
+      failed:
+        'Electric Terrain failed because Electric Terrain is already active.',
       messages: [],
     })
   })

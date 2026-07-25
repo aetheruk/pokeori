@@ -500,7 +500,6 @@ export async function startBattleFromConfig(
       maxAssignedMoves: researcherMoveSlots,
       allowUnavailableAssignedMoves: !!chronicleContext,
       pokemon,
-      opponents: enemyTeam,
       profile: aiProfile,
     }).map((move) => move.id)
   }

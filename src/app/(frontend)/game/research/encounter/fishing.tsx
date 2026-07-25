@@ -24,6 +24,7 @@ import { ItemSprite } from '@/components/ui/item-sprite'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
+import { items } from '@/data/items'
 import type {
   FishingGameConfig,
   FishingSceneConfig,
@@ -48,6 +49,8 @@ import {
   releaseFish,
   startFishingCatch,
 } from '../games/fishing'
+
+const itemNames = new Map(items.map((item) => [item.id, item.name]))
 
 const DEFAULT_SCENE: FishingSceneConfig = {
   portraitBackground: '/backgrounds/fishing-pond-portrait.avif',
@@ -759,7 +762,8 @@ export function FishingGame({ encounter }: FishingGameProps) {
 
                   <div className="flex flex-col items-center gap-1">
                     <h3 className="line-clamp-1 font-display text-lg font-semibold capitalize tracking-wide text-game-ink">
-                      {hookedData.itemId.replace(/-/g, ' ')}
+                      {itemNames.get(hookedData.itemId) ||
+                        hookedData.itemId.replace(/-/g, ' ')}
                     </h3>
                   </div>
 

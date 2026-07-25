@@ -445,7 +445,6 @@ export async function useMove(
             : getResearcherMoveSlotCount(researcherLevel),
           allowUnavailableAssignedMoves: !!state.chronicle,
           pokemon: playerMon,
-          opponents: state.enemyTeam,
           profile: state.ai?.profile,
         })
 

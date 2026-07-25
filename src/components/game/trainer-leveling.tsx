@@ -1,10 +1,10 @@
 'use client'
 
 import {
+  Package,
   BookOpen,
   Loader2,
   Map as MapIcon,
-  Package,
   Pencil,
   Shield,
   Sparkles,
@@ -485,7 +485,14 @@ export function TrainerLeveling() {
             className="game-focus-ring group flex w-full items-center gap-4 rounded-lg border border-game-border bg-game-surface p-4 text-left transition-colors hover:border-game-moss/35 hover:bg-game-surface-raised"
           >
             <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-game-moss/30 bg-game-moss/10 text-game-moss-strong">
-              <Package className="h-7 w-7" aria-hidden="true" />
+              <Image
+                src="/fallback/skills/inventory-v2.png"
+                alt=""
+                width={56}
+                height={56}
+                className="h-14 w-14 object-contain"
+                aria-hidden="true"
+              />
             </div>
             <div className="min-w-0 flex-1 space-y-1">
               <h3 className="text-sm font-semibold text-game-ink">Open Bag</h3>

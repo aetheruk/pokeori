@@ -462,7 +462,7 @@ export const battleItems: Item[] = [
       'Raises the Attack stat of a Pokémon in battle. The effect wears off when the battle ends.',
     category: 'battle',
     spriteId: 'x-attack',
-    skillRequirements: { battling: 31 },
+    skillRequirements: { battling: 32 },
     battleEffect: {
       type: 'buff',
       buffStat: 'attack',
@@ -498,7 +498,7 @@ export const battleItems: Item[] = [
       'Raises the Sp. Atk stat of a Pokémon in battle. The effect wears off when the battle ends.',
     category: 'battle',
     spriteId: 'x-sp-atk',
-    skillRequirements: { battling: 33 },
+    skillRequirements: { battling: 32 },
     battleEffect: {
       type: 'buff',
       buffStat: 'specialAttack',
@@ -516,7 +516,7 @@ export const battleItems: Item[] = [
       'Raises the Sp. Def stat of a Pokémon in battle. The effect wears off when the battle ends.',
     category: 'battle',
     spriteId: 'x-sp-def',
-    skillRequirements: { battling: 34 },
+    skillRequirements: { battling: 32 },
     battleEffect: {
       type: 'buff',
       buffStat: 'specialDefense',
@@ -534,7 +534,7 @@ export const battleItems: Item[] = [
       'Raises the Speed stat of a Pokémon in battle. The effect wears off when the battle ends.',
     category: 'battle',
     spriteId: 'x-speed',
-    skillRequirements: { battling: 35 },
+    skillRequirements: { battling: 32 },
     battleEffect: {
       type: 'buff',
       buffStat: 'speed',

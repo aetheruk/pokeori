@@ -27,9 +27,9 @@ The Trainer menu shows a skill guide for Trainer, Explorer, Researcher, and Arti
 ## Trainer Unlocks
 - Held item assignment unlocks at Trainer level 15. Type boost held items are crafted through recipe-unlock tasks at Artisan 18, 50, and 75 by tier. Training Bands and held berries use the same Trainer 15 held-item unlock instead of individual item-level Trainer gates.
 - Pokemon still roll and store their natural IVs at capture. Trainer level applies an effective IV cap for displayed stats and battle stats: 10 by default, then 15/20/25/30/31 at Trainer levels 10/20/30/40/50.
-- Battle Shouts unlock at Trainer level 40.
+- Battle Shouts unlock at Trainer level 35 and require the Book of Shouts.
 - Higher battle powers unlock from Trainer level 65 onward: Weather Control 65, Tera 70, Mega 75, Z-Move 80, Dynamax 85, Victory Power 90, Circadian Power 95, and Dimensional Shift 95.
-- Potions, status recovery items, X items, and Battle Observer require Trainer levels from their item data. Battle Observer is available from Trainer level 1. Current battle item gates include Potion at 3, Fresh Water at 4, Antidote at 5, Paralyze Heal at 6, Awakening at 7, Burn Heal at 8, Ice Heal at 9, Super Potion at 27, Soda Pop at 29, Lemonade at 34, X items across 31-35, Dire Hit at 36, Full Heal at 37, Hyper Potion at 51, Max Potion at 60, and Full Restore at 81.
+- Potions, status recovery items, X items, and Battle Observer require Trainer levels from their item data. Battle Observer is available from Trainer level 1. Current battle item gates include Potion at 3, Fresh Water at 4, Antidote at 5, Paralyze Heal at 6, Awakening at 7, Burn Heal at 8, Ice Heal at 9, Super Potion at 27, Soda Pop at 29, Lemonade at 34, all X items at 32, Dire Hit at 36, Full Heal at 37, Hyper Potion at 51, Max Potion at 60, and Full Restore at 81.
 
 ## Explorer Unlocks
 - Explorer remains the main level gate for exploration progression and route-style authored criteria.

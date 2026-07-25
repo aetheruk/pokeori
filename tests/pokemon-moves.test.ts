@@ -10,7 +10,9 @@ import {
 } from '@/utilities/pokemon/pokemon-moves'
 import type { BattlePokemon } from '@/utilities/battle/types'
 
-function makeBattlePokemon(overrides: Partial<BattlePokemon> = {}): BattlePokemon {
+function makeBattlePokemon(
+  overrides: Partial<BattlePokemon> = {},
+): BattlePokemon {
   return {
     id: 'pokemon-1',
     user: 'user-1',
@@ -145,14 +147,6 @@ describe('pokemon move assignment helpers', () => {
     const charmander = makeBattlePokemon({
       assignedMoves: [{ moveId: 'mega-punch' }],
     })
-    const opponent = makeBattlePokemon({
-      id: 'opponent',
-      speciesId: 1,
-      formId: '1',
-      name: 'Bulbasaur',
-      types: ['Grass'],
-    })
-
     const moves = getBattleMoveOptions({
       assignedMoves: charmander.assignedMoves,
       pokemonTypes: charmander.types,
@@ -164,7 +158,6 @@ describe('pokemon move assignment helpers', () => {
       },
       maxAssignedMoves: 1,
       pokemon: charmander,
-      opponents: [opponent],
       profile: 'trainer',
     })
 
@@ -251,9 +244,7 @@ describe('pokemon move assignment helpers', () => {
     })
 
     expect(rhydonAvailable.map((move) => move.id)).toContain('rock-slide')
-    expect(normalAvailable.map((move) => move.id)).not.toContain(
-      'rock-slide',
-    )
+    expect(normalAvailable.map((move) => move.id)).not.toContain('rock-slide')
     expect(missingTm.map((move) => move.id)).not.toContain('rock-slide')
   })
 
@@ -275,12 +266,8 @@ describe('pokemon move assignment helpers', () => {
       },
     })
 
-    expect(geodudeAvailable.map((move) => move.id)).toContain(
-      'rock-shield',
-    )
-    expect(rattataAvailable.map((move) => move.id)).not.toContain(
-      'rock-shield',
-    )
+    expect(geodudeAvailable.map((move) => move.id)).toContain('rock-shield')
+    expect(rattataAvailable.map((move) => move.id)).not.toContain('rock-shield')
   })
 
   test('Wave Breaker is restricted to Onix', () => {
@@ -364,12 +351,8 @@ describe('pokemon move assignment helpers', () => {
       },
     })
 
-    expect(squirtleAvailable.map((move) => move.id)).toContain(
-      'bubble-guard',
-    )
-    expect(horseaAvailable.map((move) => move.id)).toContain(
-      'bubble-guard',
-    )
+    expect(squirtleAvailable.map((move) => move.id)).toContain('bubble-guard')
+    expect(horseaAvailable.map((move) => move.id)).toContain('bubble-guard')
     expect(rattataAvailable.map((move) => move.id)).not.toContain(
       'bubble-guard',
     )
@@ -437,9 +420,7 @@ describe('pokemon move assignment helpers', () => {
     expect(waterGunHorsea.map((move) => move.id)).toContain('water-gun')
     expect(bubbleHorsea.map((move) => move.id)).toContain('bubble')
     expect(aquaBlitzKrabby.map((move) => move.id)).toContain('whirlpool')
-    expect(aquaBlitzTentacool.map((move) => move.id)).toContain(
-      'whirlpool',
-    )
+    expect(aquaBlitzTentacool.map((move) => move.id)).toContain('whirlpool')
     expect(aquaBlitzSeel.map((move) => move.id)).toContain('whirlpool')
     expect(randomUnavailable.map((move) => move.id)).not.toContain('whirlpool')
   })
@@ -504,9 +485,7 @@ describe('pokemon move assignment helpers', () => {
 
     expect(vulpixAvailable.map((move) => move.id)).toContain('ember')
     expect(flareonAvailable.map((move) => move.id)).toContain('ember')
-    expect(growlitheAvailable.map((move) => move.id)).toContain(
-      'flame-charge',
-    )
+    expect(growlitheAvailable.map((move) => move.id)).toContain('flame-charge')
     expect(ponytaAvailable.map((move) => move.id)).toContain('fire-spin')
     expect(vaporeonAvailable.map((move) => move.id)).toContain('water-gun')
     expect(vaporeonPressurePumpAvailable.map((move) => move.id)).toContain(
@@ -560,9 +539,7 @@ describe('pokemon move assignment helpers', () => {
     })
 
     expect(tangelaAvailable.map((move) => move.id)).toContain('vine-whip')
-    expect(bellsproutAvailable.map((move) => move.id)).toContain(
-      'vine-whip',
-    )
+    expect(bellsproutAvailable.map((move) => move.id)).toContain('vine-whip')
     expect(oddishAvailable.map((move) => move.id)).toContain('leafage')
     expect(gloomAvailable.map((move) => move.id)).toContain('leafage')
     expect(exeggcuteAvailable.map((move) => move.id)).toContain('absorb')
@@ -594,12 +571,8 @@ describe('pokemon move assignment helpers', () => {
       },
     })
 
-    expect(ekansAvailable.map((move) => move.id)).toContain(
-      'poison-sting',
-    )
-    expect(weedleAvailable.map((move) => move.id)).toContain(
-      'poison-sting',
-    )
+    expect(ekansAvailable.map((move) => move.id)).toContain('poison-sting')
+    expect(weedleAvailable.map((move) => move.id)).toContain('poison-sting')
     expect(rattataAvailable.map((move) => move.id)).not.toContain(
       'poison-sting',
     )
@@ -631,15 +604,9 @@ describe('pokemon move assignment helpers', () => {
       },
     })
 
-    expect(blastoiseAvailable.map((move) => move.id)).toContain(
-      'mega-punch',
-    )
-    expect(electabuzzAvailable.map((move) => move.id)).toContain(
-      'mega-punch',
-    )
-    expect(rattataAvailable.map((move) => move.id)).not.toContain(
-      'mega-punch',
-    )
+    expect(blastoiseAvailable.map((move) => move.id)).toContain('mega-punch')
+    expect(electabuzzAvailable.map((move) => move.id)).toContain('mega-punch')
+    expect(rattataAvailable.map((move) => move.id)).not.toContain('mega-punch')
   })
 
   test('Dig is restricted to its authored form IDs', () => {
@@ -778,9 +745,7 @@ describe('pokemon move assignment helpers', () => {
     expect(gyaradosAvailable.map((move) => move.id)).toContain('surf')
     expect(unownAvailable.map((move) => move.id)).not.toContain('fly')
     expect(unownAvailable.map((move) => move.id)).not.toContain('surf')
-    expect(unownAvailable.map((move) => move.id)).not.toContain(
-      'strength',
-    )
+    expect(unownAvailable.map((move) => move.id)).not.toContain('strength')
   })
 
   test('authored TM and HM move configs omit Pokemon type eligibility', () => {
