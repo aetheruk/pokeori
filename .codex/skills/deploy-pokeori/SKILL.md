@@ -11,9 +11,9 @@ The release boundary is a pull request merged to protected `main`. Never deploy 
 
 1. Confirm the checkout is clean. The deploy command prompts before switching to `main` and fast-forwarding it to `origin/main` when needed.
 2. Apply the `release-versioning` skill: increment `package.json` before the release PR and preserve the `/api/app-version` PWA-refresh check.
-3. Confirm Docker Desktop with Buildx, Node 22+, pnpm 10.24.0, Bun 1.3.13, Git, and curl are available on the release machine.
+3. Confirm Docker Desktop with Buildx, Bun 1.3.10+, Git, and curl are available on the release machine.
 4. Authenticate the GitHub CLI with package-write permission. Store the Coolify webhook and token locally as `COOLIFY_WEBHOOK_URI` and `COOLIFY_WEBHOOK_TOKEN` in ignored `.env`, or export the canonical `COOLIFY_WEBHOOK` and `COOLIFY_TOKEN` names. Never commit them or add them to GitHub Actions secrets.
-5. Run `pnpm run deploy:production`. It validates the project, builds a `linux/amd64` image, pushes `latest`, `v<package-version>`, and immutable `sha-<commit>` tags to GHCR, then triggers Coolify only after a successful push.
+5. Run `bun run deploy:production`. It validates the project, builds a `linux/amd64` image, reuses local and GHCR BuildKit caches, pushes `latest`, `v<package-version>`, and immutable `sha-<commit>` tags to GHCR, then triggers Coolify only after a successful push.
 6. Verify Coolify health, critical gameplay flows, `/api/app-version`, and a refresh of an already-open PWA session.
 
 ## Guardrails

@@ -9,10 +9,10 @@ Deploy Pokeori to production.
 
 ## Build for Production
 ```bash
-pnpm run build
+bun run build
 ```
 
-Docker deployments use Node.js 22 with pnpm for dependency installation, the Next build, and the standalone server runtime.
+Docker deployments use Bun for dependency installation, the Next build, and the standalone server runtime. Dependency, Next compiler, and GHCR registry caches are reused between releases.
 
 ## Environment Setup
 Set all production environment variables:

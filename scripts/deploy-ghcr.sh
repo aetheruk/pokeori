@@ -27,12 +27,7 @@ dotenv_value() {
   local variable_name="$1"
   [[ -f .env ]] || return 0
 
-  node --input-type=module -e "
-    import dotenv from 'dotenv'
-    import { readFileSync } from 'node:fs'
-    const values = dotenv.parse(readFileSync('.env'))
-    process.stdout.write(values[process.argv.at(-1)] ?? '')
-  " "$variable_name"
+  bun -e "process.stdout.write(Bun.env[process.argv.at(-1)] ?? '')" "$variable_name"
 }
 
 confirm_main_update() {
@@ -45,8 +40,7 @@ confirm_main_update() {
 
 main() {
   require_command git "Install Git and try again."
-  require_command node "Install Node.js 22+ and pnpm 10.24.0, then run pnpm install."
-  require_command pnpm "Install pnpm 10.24.0 and run pnpm install."
+  require_command bun "Install Bun 1.3.10 and run bun install."
   require_command docker "Start Docker Desktop (with Buildx) and try again."
   docker buildx version >/dev/null 2>&1 || fail "Docker Buildx is required; enable it in Docker Desktop."
   require_command curl "Install curl and try again."
@@ -96,14 +90,14 @@ main() {
   require_env COOLIFY_TOKEN
 
   local version short_sha
-  version="$(node --input-type=module -e "import pkg from './package.json' with { type: 'json' }; process.stdout.write(pkg.version)")"
+  version="$(bun -e "process.stdout.write((await Bun.file('package.json').json()).version)")"
   short_sha="$(git rev-parse --short=12 HEAD)"
 
   printf 'Validating Pokeori %s at %s…\n' "$version" "$short_sha"
-  pnpm run lint
-  pnpm run typecheck
-  pnpm test
-  pnpm run validate:data
+  bun run lint
+  bun run typecheck
+  bun test
+  bun run validate:data
 
   printf 'Authenticating to GHCR…\n'
   printf '%s' "$GHCR_TOKEN" | docker login ghcr.io --username "$GHCR_USERNAME" --password-stdin
@@ -112,6 +106,8 @@ main() {
   docker buildx build \
     --platform linux/amd64 \
     --push \
+    --cache-from "type=registry,ref=${image}:buildcache" \
+    --cache-to "type=registry,ref=${image}:buildcache,mode=max,image-manifest=true,oci-mediatypes=true" \
     --label "org.opencontainers.image.source=https://github.com/${owner}/${image_name}" \
     --label "org.opencontainers.image.revision=${local_sha}" \
     --label "org.opencontainers.image.version=${version}" \
