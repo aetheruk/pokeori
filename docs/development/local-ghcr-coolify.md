@@ -35,11 +35,9 @@ Get the application deploy webhook URL and a Coolify API token with `Deploy` per
 
 ## Deploy a merged release
 
-Deploy only after the feature pull request has merged to `main`. The command rejects a feature branch, local modifications, or a local `main` that is not exactly `origin/main`.
+Deploy only after the feature pull request has merged to `main`. From a clean feature branch or stale `main`, the command prompts once before switching to `main` and fast-forwarding it to `origin/main`; declining leaves the checkout unchanged. It rejects local modifications or a `main` that has unmerged local commits.
 
 ```bash
-git switch main
-git pull --ff-only origin main
 pnpm install --frozen-lockfile
 pnpm run deploy:production
 ```

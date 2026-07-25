@@ -100,7 +100,7 @@ After a pull request is merged to protected `main`, build and publish the produc
 
 ## Versioning
 
-Pokeori currently uses the pre-release version `0.0.12`. Until the first stable release, APIs, data formats, and game systems may change without backwards compatibility.
+Pokeori currently uses the pre-release version `0.0.13`. Until the first stable release, APIs, data formats, and game systems may change without backwards compatibility.
 
 ## Credits and sources
 
