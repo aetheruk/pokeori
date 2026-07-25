@@ -398,7 +398,7 @@ export const authoredSkillGuideUnlocks: SkillGuideUnlock[] = [
     description:
       'Find Pokemon Eggs in Field Observation after completing the Day Care Egg Program.',
     source: 'authored',
-    icon: { type: 'local', id: '/sprites/items/egg.png' },
+    icon: { type: 'local', id: '/sprites/items/egg.avif' },
   },
   ...fieldObservationResearchUnlocks,
   ...fieldObservationMaterialUnlocks,

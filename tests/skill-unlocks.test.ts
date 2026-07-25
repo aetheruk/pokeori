@@ -686,7 +686,7 @@ describe('skill unlock helpers', () => {
         level: 32,
         category: 'pokemon',
         source: 'authored',
-        icon: { type: 'local', id: '/sprites/items/egg.png' },
+        icon: { type: 'local', id: '/sprites/items/egg.avif' },
       }),
     )
     expect(researcherGuide).toContainEqual(

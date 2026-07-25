@@ -10,7 +10,7 @@ export const viridianCityFieldObservationEntries: FieldObservationConfig[] = [
     subCategory: 'Viridian City',
     icon: {
       type: 'local',
-      id: '/sprites/tall_grass-v2.png',
+      id: '/sprites/tall_grass-v2.avif',
     },
     background: '/backgrounds/rocky-path.avif',
     requirements: [
