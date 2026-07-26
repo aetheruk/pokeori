@@ -42,6 +42,9 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
   const [pendingPurchase, setPendingPurchase] = useState<ShopConfig['items'][number] | null>(null)
   const [purchaseResult, setPurchaseResult] = useState<PurchaseItemResult | null>(null)
   const [lastPurchasedItemName, setLastPurchasedItemName] = useState<string | null>(null)
+  const [purchaseOverrides, setPurchaseOverrides] = useState<
+    Record<string, ShopPurchaseData>
+  >({})
 
   if (!userData) {
     return (
@@ -65,6 +68,13 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
     try {
       const result = await purchaseShopItem(shop.id, itemId)
       if (result.success) {
+        const purchaseData = result.purchaseData
+        if (purchaseData) {
+          setPurchaseOverrides((current) => ({
+            ...current,
+            [itemId]: purchaseData,
+          }))
+        }
         setLastPurchasedItemName(itemName)
         refreshUser()
 
@@ -94,7 +104,10 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
     return checkShopItemRequirements(userData, shop, item)
   })
 
-  const shopPurchases = (userData.shopPurchases || {}) as Record<string, ShopPurchaseData>
+  const shopPurchases = {
+    ...((userData.shopPurchases || {}) as Record<string, ShopPurchaseData>),
+    ...purchaseOverrides,
+  }
   const userCurrency = (userData.user.currency || {}) as Record<string, number>
   const shopCurrencyBalances = Array.from(
     new Set(
