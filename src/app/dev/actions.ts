@@ -5,7 +5,7 @@ import { promises as fs } from 'node:fs'
 import path from 'node:path'
 import { promisify } from 'node:util'
 import { format } from 'prettier'
-import type * as TypeScriptCompilerApi from '@typescript/typescript6'
+import type * as TypeScriptCompilerApi from 'typescript6'
 import { BattleConfig, Location, Task } from '@/data/types'
 import {
   ABILITIES,
@@ -48,9 +48,11 @@ const execFileAsync = promisify(execFile)
 type TypeScriptCompilerApiModule = typeof TypeScriptCompilerApi
 
 async function getTypeScriptCompilerApi(): Promise<TypeScriptCompilerApiModule> {
-  return (await import(
-    '@typescript/typescript6'
-  )) as unknown as TypeScriptCompilerApiModule
+  const loaded = (await import('typescript6')) as unknown as {
+    default?: TypeScriptCompilerApiModule
+  }
+
+  return loaded.default ?? (loaded as TypeScriptCompilerApiModule)
 }
 
 type EntryType =
@@ -366,7 +368,7 @@ async function parseExportedEntryArray<T>(
   for (const statement of source.statements) {
     if (!ts.isVariableStatement(statement)) continue
     const isExported = statement.modifiers?.some(
-      (modifier: TypeScriptCompilerApi.Modifier) =>
+      (modifier: TypeScriptCompilerApi.ModifierLike) =>
         modifier.kind === ts.SyntaxKind.ExportKeyword,
     )
     if (!isExported) continue
