@@ -547,6 +547,7 @@ export interface MoveConfig {
   accuracy: number // 0-100 percentage
   alwaysHits?: boolean // If true, bypasses normal move accuracy checks.
   buffs?: BuffConfig[] // Array of buffs to user (target: self)
+  onUserDamagedSameTurn?: BuffConfig[] // Buffs when the user is hit on the turn this move was used.
   debuffs?: BuffConfig[] // Array of debuffs to enemy (target: enemy)
   status?: {
     id: StatusEffectId

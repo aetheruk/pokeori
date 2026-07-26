@@ -108,6 +108,7 @@ import {
 } from '@/utilities/battle/move-uses'
 import {
   applyMoveRuntimeEffects,
+  applyMoveOnUserDamagedSameTurnEffects,
   applyNextDamageModifier,
   applyContinuousEndEffects,
   checkMoveBattleCondition,
@@ -2341,6 +2342,28 @@ export async function useMove(
     }
 
     const moveSucceeded = !moveMissed && !moveFailed && !continuousInterrupted
+    if (moveSucceeded) {
+      const rageMessages = applyMoveOnUserDamagedSameTurnEffects({
+        move,
+        pokemon: playerMon,
+        damage: enemyDamage,
+      })
+      if (rageMessages.length) message += `\n${rageMessages.join('\n')}`
+    }
+    if (
+      enemyCanMove &&
+      !enemyBattleAction.isBasicAttack &&
+      !enemyMoveInterrupted &&
+      !enemyMoveMissed &&
+      !enemyMoveFailed
+    ) {
+      const rageMessages = applyMoveOnUserDamagedSameTurnEffects({
+        move: enemyBattleAction.move,
+        pokemon: enemyMon,
+        damage: playerDamage,
+      })
+      if (rageMessages.length) message += `\n${rageMessages.join('\n')}`
+    }
     if (activeMoveLock?.type === 'continuous') {
       if (moveSucceeded && state.playerMoveLock?.moveId === move.id) {
         activeMoveLock.repeatUses =

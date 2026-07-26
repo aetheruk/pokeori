@@ -81,6 +81,24 @@ export function getCallableAuthoredMoves(sourceMoveId?: string): MoveConfig[] {
   return getAllMoves().filter((move) => canCallMove(move, sourceMoveId))
 }
 
+export function applyMoveOnUserDamagedSameTurnEffects(params: {
+  move: MoveConfig
+  pokemon: BattlePokemon
+  damage: number
+}): string[] {
+  if (params.damage <= 0 || !params.move.onUserDamagedSameTurn?.length) return []
+
+  params.pokemon.statStages ??= { ...DEFAULT_STAT_STAGES }
+  return params.move.onUserDamagedSameTurn.map((buff) => {
+    params.pokemon.statStages![buff.stat] = clampStatStage(
+      params.pokemon.statStages![buff.stat] + buff.stages,
+      buff.stat,
+    )
+    const stat = buff.stat === 'specialAttack' ? 'Special Attack' : buff.stat
+    return `${params.pokemon.name}'s ${stat} ${buff.stages >= 0 ? 'rose' : 'fell'}!`
+  })
+}
+
 export function resolveCalledMove(params: {
   move: MoveConfig
   state?: BattleState

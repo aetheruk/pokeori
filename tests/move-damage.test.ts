@@ -26,6 +26,7 @@ import {
 } from '@/utilities/battle/metronome'
 import {
   applyMoveRuntimeEffects,
+  applyMoveOnUserDamagedSameTurnEffects,
   applyContinuousEndEffects,
   applyNextDamageModifier,
   consumeNextAccuracyBypass,
@@ -1075,9 +1076,19 @@ describe('move damage helpers', () => {
 
     const rage = getMove('rage')!
     expect(rage.buffs).toBeUndefined()
-    expect(rage.conditionalDamageModifiers).toEqual([
-      { type: 'user-took-damage', multiplier: 2 },
+    expect(rage.continuous).toBeUndefined()
+    expect(rage.conditionalDamageModifiers).toBeUndefined()
+    expect(rage.onUserDamagedSameTurn).toEqual([
+      { stat: 'attack', stages: 1 },
     ])
+    expect(
+      applyMoveOnUserDamagedSameTurnEffects({
+        move: rage,
+        pokemon: attacker,
+        damage: 12,
+      }),
+    ).toEqual([`${attacker.name}'s attack rose!`])
+    expect(attacker.statStages!.attack).toBe(1)
 
     const chipAway = getMove('chip-away')!
     expect(chipAway.ignoreDefenderStatStages).toBe(true)
