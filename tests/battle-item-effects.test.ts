@@ -236,7 +236,11 @@ describe('battle item effects', () => {
       consumedHeldItems: [{ itemId: 'oran-berry', name: 'Oran Berry' }],
     })
 
-    const failedRoll = restoreConsumedBerryByAbility(pokemon, 'clear', () => 0.5)
+    const failedRoll = restoreConsumedBerryByAbility(
+      pokemon,
+      'clear',
+      () => 0.5,
+    )
     expect(failedRoll.applied).toBe(false)
     expect(pokemon.heldItem).toBeUndefined()
     expect(pokemon.consumedHeldItems).toEqual([
@@ -245,7 +249,9 @@ describe('battle item effects', () => {
 
     const restored = restoreConsumedBerryByAbility(pokemon, 'clear', () => 0.49)
     expect(restored.applied).toBe(true)
-    expect(restored.message).toContain("Bulbasaur's ability restored its Oran Berry!")
+    expect(restored.message).toContain(
+      "Bulbasaur's ability restored its Oran Berry!",
+    )
     expect(pokemon.heldItem).toEqual({ id: 'oran-berry', name: 'Oran Berry' })
     expect(pokemon.heldItemId).toBe('oran-berry')
     expect(pokemon.consumedHeldItems).toEqual([])
@@ -264,7 +270,10 @@ describe('battle item effects', () => {
     )
 
     expect(restored.applied).toBe(true)
-    expect(pokemon.heldItem).toEqual({ id: 'sitrus-berry', name: 'Sitrus Berry' })
+    expect(pokemon.heldItem).toEqual({
+      id: 'sitrus-berry',
+      name: 'Sitrus Berry',
+    })
     expect(pokemon.consumedHeldItems).toEqual([])
   })
 
@@ -604,7 +613,7 @@ describe('battle item effects', () => {
     const pokemon = makeBattlePokemon({
       heldItem: { id: 'weak-magnet', name: 'Weak Magnet' },
     })
-    const result = applyHeldAttackBreak(pokemon, 'electric', () => 0.01)
+    const result = applyHeldAttackBreak(pokemon, 'electric', () => 0.029)
 
     expect(result.applied).toBe(true)
     expect(result.message).toContain('Weak Magnet broke')
@@ -612,6 +621,20 @@ describe('battle item effects', () => {
     expect(pokemon.consumedHeldItems).toEqual([
       { itemId: 'weak-magnet', name: 'Weak Magnet' },
     ])
+
+    const boundaryTier = makeBattlePokemon({
+      heldItem: { id: 'weak-magnet', name: 'Weak Magnet' },
+    })
+    const boundaryBreak = applyHeldAttackBreak(
+      boundaryTier,
+      'electric',
+      () => 0.03,
+    )
+    expect(boundaryBreak.applied).toBe(false)
+    expect(boundaryTier.heldItem).toEqual({
+      id: 'weak-magnet',
+      name: 'Weak Magnet',
+    })
 
     const normalTier = makeBattlePokemon({
       heldItem: { id: 'magnet', name: 'Magnet' },
@@ -700,7 +723,10 @@ describe('battle item effects', () => {
         consumed: false,
       },
     ])
-    expect(pokemon.heldItem).toEqual({ id: 'defense-band', name: 'Defense Band' })
+    expect(pokemon.heldItem).toEqual({
+      id: 'defense-band',
+      name: 'Defense Band',
+    })
     expect(pokemon.consumedHeldItems).toBeUndefined()
   })
 

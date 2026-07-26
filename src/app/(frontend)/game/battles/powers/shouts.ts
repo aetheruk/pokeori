@@ -16,7 +16,10 @@ import {
   getSkillLevel,
   validateBattlePowerSkillRequirement,
 } from '@/utilities/skills/unlocks'
-import { applyPokemonResearchEndure } from '@/utilities/battle/research-survival'
+import {
+  applyPokemonResearchEndure,
+  canApplyPokemonResearchEndure,
+} from '@/utilities/battle/research-survival'
 import { getUserInventoryMap } from '@/utilities/user-state'
 import { runBattleActionWithGuard } from '../helpers/action-guard'
 
@@ -165,12 +168,12 @@ export async function useShout(
       resolution.damageMultiplier,
       undefined,
       60,
-	      undefined,
-	      undefined,
-	      state.weather?.weather,
-	      undefined,
-	      { currentTurn: state.turn },
-	    )
+      undefined,
+      undefined,
+      state.weather?.weather,
+      undefined,
+      { currentTurn: state.turn },
+    )
     let playerDamage = playerDmgResult.damage
     if (playerMon.status?.id === 'victory') playerMon.status = undefined
 
@@ -191,12 +194,12 @@ export async function useShout(
       enemyMultiplier,
       undefined,
       undefined,
-	      undefined,
-	      undefined,
-	      state.weather?.weather,
-	      undefined,
-	      { currentTurn: state.turn },
-	    )
+      undefined,
+      undefined,
+      state.weather?.weather,
+      undefined,
+      { currentTurn: state.turn },
+    )
     let enemyDamage = enemyDmgResult.damage
     if (enemyMon.status?.id === 'victory') enemyMon.status = undefined
 
@@ -209,8 +212,18 @@ export async function useShout(
     if (playerShieldResult.damageMultiplier === 0) enemyDamage = 0
 
     // Apply damage
-    const playerEndure = applyPokemonResearchEndure(enemyMon, playerDamage)
-    const enemyEndure = applyPokemonResearchEndure(playerMon, enemyDamage)
+    const playerEndure = applyPokemonResearchEndure(
+      enemyMon,
+      playerDamage,
+      Math.random,
+      canApplyPokemonResearchEndure(state, 'enemy'),
+    )
+    const enemyEndure = applyPokemonResearchEndure(
+      playerMon,
+      enemyDamage,
+      Math.random,
+      canApplyPokemonResearchEndure(state, 'player'),
+    )
     playerDamage = playerEndure.damage
     enemyDamage = enemyEndure.damage
     enemyMon.currentHp = Math.max(0, enemyMon.currentHp - playerDamage)
