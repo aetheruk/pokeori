@@ -86,9 +86,6 @@ import {
   createBox,
   deleteBox,
   getPokemon,
-  getEggsForBox,
-  getPokemonTeamLayout,
-  getUserPokemonCount,
   identifyPokemon,
   hatchEgg,
   releasePokemonBulk,
@@ -115,7 +112,21 @@ type BoxEgg = {
   sourceBackground?: string | null
 }
 
-export function PokemonList() {
+type InitialPokemonBoxState = {
+  docs: Pokemon[]
+  hasNextPage: boolean
+  nextPage: number | null | undefined
+  eggs: BoxEgg[]
+  totalPokemonCount: number
+  battleTeam: Pokemon[]
+  companion: Pokemon | null
+}
+
+export function PokemonList({
+  initialBoxState,
+}: {
+  initialBoxState: InitialPokemonBoxState
+}) {
   const { user, gameData, refreshUser } = useUser()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -137,29 +148,18 @@ export function PokemonList() {
     [gameData?.inventory],
   )
 
-  const userPokemonData = user?.pokemon as any
-  const initialDocs =
-    userPokemonData?.docs ||
-    (Array.isArray(userPokemonData) ? userPokemonData : []) ||
-    []
-  const initialTotal = userPokemonData?.totalDocs || initialDocs.length
-
-  const [pokemonList, setPokemonList] = useState<Pokemon[]>(initialDocs)
-  const [eggs, setEggs] = useState<BoxEgg[]>([])
+  const [pokemonList, setPokemonList] = useState<Pokemon[]>(initialBoxState.docs)
+  const [eggs, setEggs] = useState<BoxEgg[]>(initialBoxState.eggs)
   const [hatchingEggId, setHatchingEggId] = useState<string | null>(null)
   const [eggHatchResult, setEggHatchResult] = useState<any | null>(null)
   const [eggHatchAnimation, setEggHatchAnimation] = useState<any | null>(null)
-  const [battleTeam, setBattleTeam] = useState<Pokemon[]>([])
-  const [companion, setCompanion] = useState<Pokemon | null>(null)
+  const [battleTeam, setBattleTeam] = useState<Pokemon[]>(initialBoxState.battleTeam)
+  const [companion, setCompanion] = useState<Pokemon | null>(initialBoxState.companion)
 
-  const [hasNextPage, setHasNextPage] = useState(
-    userPokemonData?.hasNextPage || false,
-  )
-  const [nextPage, setNextPage] = useState(userPokemonData?.nextPage || 2)
+  const [hasNextPage, setHasNextPage] = useState(initialBoxState.hasNextPage)
+  const [nextPage, setNextPage] = useState(initialBoxState.nextPage ?? null)
   const [loading, setLoading] = useState(false)
-  const [selectedBoxId, setSelectedBoxId] = useState<string | null | undefined>(
-    null,
-  )
+  const [selectedBoxId, setSelectedBoxId] = useState<string | null>(null)
   const [isCreatingBox, setIsCreatingBox] = useState(false)
   const [isRenamingBox, setIsRenamingBox] = useState(false)
   const [isDeletingBox, setIsDeletingBox] = useState(false)
@@ -189,51 +189,7 @@ export function PokemonList() {
 
   const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const longPressTriggeredRef = useRef(false)
-  const didLoadInitialBoxRef = useRef(false)
-
-  useEffect(() => {
-    if (gameData?.pokemon && gameData.pokemon.length > 0) {
-      const allPokemon = gameData.pokemon
-      const newTeam = allPokemon
-        .filter((p) => p.onBattleTeam)
-        .sort(
-          (a, b) => (a.battleTeamPosition || 0) - (b.battleTeamPosition || 0),
-        )
-      const newCompanion = allPokemon.find((p) => p.isCompanion) || null
-
-      setBattleTeam(newTeam)
-      setCompanion(newCompanion)
-
-      // Only update pokemonList if we are NOT in a specific box view, OR if we want to sync
-      if (!selectedBoxId) {
-        setPokemonList(
-          allPokemon.filter((p) => !p.onBattleTeam && !p.isCompanion),
-        )
-        setHasNextPage(false)
-      }
-    }
-  }, [gameData, selectedBoxId])
-
-  useEffect(() => {
-    let cancelled = false
-
-    getPokemonTeamLayout()
-      .then(({ battleTeam, companion }) => {
-        if (cancelled) return
-        setBattleTeam(battleTeam)
-        setCompanion(companion)
-      })
-      .catch(console.error)
-
-    return () => {
-      cancelled = true
-    }
-  }, [gameData?.user?.id])
-
-  const [totalPokemonCount, setTotalPokemonCount] = useState(initialTotal)
-  useEffect(() => {
-    getUserPokemonCount().then(setTotalPokemonCount)
-  }, [])
+  const [totalPokemonCount, setTotalPokemonCount] = useState(initialBoxState.totalPokemonCount)
 
   const canBulkReleasePokemon = useCallback(
     (pokemon: Pokemon) =>
@@ -606,7 +562,7 @@ export function PokemonList() {
         return [...prev, ...uniqueNewDocs]
       })
       setHasNextPage(result.hasNextPage)
-      setNextPage(result.nextPage)
+      setNextPage(result.nextPage ?? null)
     } catch (e) {
       console.error(e)
     } finally {
@@ -619,7 +575,7 @@ export function PokemonList() {
   }, [inView, loadMore])
 
   const handleBoxChange = useCallback(
-    async (boxId: string | null | undefined) => {
+    async (boxId: string | null) => {
       exitBulkReleaseMode()
       setSelectedBoxId(boxId)
       setLoading(true)
@@ -630,7 +586,7 @@ export function PokemonList() {
           result.docs.filter((p) => !p.onBattleTeam && !p.isCompanion),
         )
         setHasNextPage(result.hasNextPage)
-        setNextPage(result.nextPage)
+        setNextPage(result.nextPage ?? null)
       } catch (e) {
         console.error(e)
       } finally {
@@ -640,15 +596,6 @@ export function PokemonList() {
     [exitBulkReleaseMode],
   )
 
-  useEffect(() => {
-    if (didLoadInitialBoxRef.current) return
-    didLoadInitialBoxRef.current = true
-    handleBoxChange(null)
-  }, [handleBoxChange])
-
-  useEffect(() => {
-    getEggsForBox().then(setEggs).catch(console.error)
-  }, [])
 
   const hatchBoxEgg = async (egg: BoxEgg) => {
     setHatchingEggId(egg.id)
@@ -771,7 +718,7 @@ export function PokemonList() {
   }
 
   const belongsInSelectedBox = (pokemon: Pokemon) => {
-    if (selectedBoxId === undefined || selectedBoxId === null) {
+    if (selectedBoxId === null) {
       return !pokemon.boxId
     }
     return pokemon.boxId === selectedBoxId
@@ -1118,6 +1065,7 @@ export function PokemonList() {
             setPokemonList((prev) => prev.filter((p) => p.id !== id))
             setBattleTeam((prev) => prev.filter((p) => p.id !== id))
             if (companion?.id === id) setCompanion(null)
+            setTotalPokemonCount((prev) => Math.max(0, prev - 1))
           }}
           defaultOpenUseItem={
             isSelectingPokemonForItem && selectedItemUsesDetailsDialog

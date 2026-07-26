@@ -27,6 +27,9 @@ import { rollResearchXp } from '@/utilities/research/research-levels'
 import { EVOLUTIONS } from '@/data/evolutions'
 import { getUser, serializePokemon, type StatName } from './utils'
 import { setPokemonRosterRole } from './team'
+import { getEggsForBox } from './eggs'
+import { getPokemonTeamLayout } from './team'
+import { getUserPokemonCount } from './release'
 
 export async function getPokemon(
   page: number = 1,
@@ -58,6 +61,23 @@ export async function getPokemon(
     } else {
       where.boxId = { equals: boxId }
     }
+
+    if (boxId !== 'battle-team') {
+      where.and?.push(
+        {
+          or: [
+            { onBattleTeam: { equals: false } },
+            { onBattleTeam: { exists: false } },
+          ],
+        },
+        {
+          or: [
+            { isCompanion: { equals: false } },
+            { isCompanion: { exists: false } },
+          ],
+        },
+      )
+    }
   }
 
   const { docs, hasNextPage, nextPage } = await payload.find({
@@ -73,6 +93,22 @@ export async function getPokemon(
     docs: docs.map(serializePokemon),
     hasNextPage,
     nextPage,
+  }
+}
+
+export async function getPokemonBoxInitialState() {
+  const [box, eggs, teamLayout, totalPokemonCount] = await Promise.all([
+    getPokemon(1, 18, null),
+    getEggsForBox(),
+    getPokemonTeamLayout(),
+    getUserPokemonCount(),
+  ])
+
+  return {
+    ...box,
+    eggs,
+    totalPokemonCount,
+    ...teamLayout,
   }
 }
 

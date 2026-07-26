@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, Suspense, lazy } from 'react'
-import { GameLoadingState } from '@/components/game/shared/GameLoadingState'
+import { GamePageSkeleton } from '@/components/game/shared/GamePageSkeleton'
 const TrainerLeveling = lazy(() =>
   import('@/components/game/trainer-leveling').then((module) => ({
     default: module.TrainerLeveling,
@@ -35,7 +35,7 @@ const TcgDecksPanel = lazy(() =>
 
 function LazyWrapper({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense fallback={<GameLoadingState label="Loading trainer records" />}>
+    <Suspense fallback={<GamePageSkeleton variant="trainer-panel" />}>
       {children}
     </Suspense>
   )

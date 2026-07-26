@@ -8,11 +8,7 @@ import {
 
 describe('game data sync scopes', () => {
   test('pokemon box sync loads only its roster dependencies', () => {
-    expect(GAME_DATA_SCOPE_KEYS['pokemon-box']).toEqual([
-      'pokemon',
-      'inventory',
-      'pokedex',
-    ])
+    expect(GAME_DATA_SCOPE_KEYS['pokemon-box']).toEqual(['inventory', 'pokedex'])
   })
 
   test('default sync uses the lightweight core scope', () => {

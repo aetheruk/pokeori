@@ -56,11 +56,9 @@ export function GameTimer({
           stroke="currentColor"
           strokeWidth={width}
           fill={
-            isLowTime
-              ? 'var(--game-danger)'
-              : tone === 'scene'
-                ? 'rgba(23,39,51,0.76)'
-                : 'rgba(247,239,223,0.92)'
+            tone === 'scene'
+              ? 'rgba(23,39,51,0.76)'
+              : 'rgba(247,239,223,0.92)'
           }
           className={tone === 'scene' ? 'text-white/25' : 'text-game-border-strong'}
         />
@@ -81,11 +79,7 @@ export function GameTimer({
       <span
         className={cn(
           'absolute font-mono font-semibold',
-          isLowTime
-            ? 'text-game-cream'
-            : tone === 'scene'
-              ? 'text-game-night-ink'
-              : 'text-game-ink',
+          tone === 'scene' ? 'text-game-night-ink' : 'text-game-ink',
           size === 'sm' ? 'text-xs' : size === 'xl' ? 'text-4xl' : 'text-sm',
         )}
       >

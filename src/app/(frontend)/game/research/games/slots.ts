@@ -57,7 +57,7 @@ export async function spinSlotMachine(betAmount?: number) {
       }
 
       const encounter = allGames.find((e) => e.id === state.encounterId)
-      if (!encounter || encounter.gameType !== 'slots') {
+      if (encounter?.gameType !== 'slots') {
         return { success: false, error: 'Invalid game type' }
       }
 

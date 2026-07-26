@@ -34,7 +34,7 @@ export const GAME_DATA_SCOPE_KEYS: Record<GameDataScope, GameDataKeys[]> = {
   core: [],
   trainer: ['inventory'],
   'trainer-collection': TRAINER_COLLECTION_KEYS,
-  'pokemon-box': ['pokemon', 'inventory', 'pokedex'],
+  'pokemon-box': ['inventory', 'pokedex'],
   inventory: ['inventory', 'pokedex', 'gameResults'],
   tcg: ['inventory', 'tcg'],
   pokedex: ['inventory', 'pokedex'],

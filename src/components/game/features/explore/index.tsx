@@ -3,8 +3,8 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react'
 import { useGameUserData } from '@/hooks/useGameUserData'
 import { useUser } from '@/context/UserContext'
-import { Loader2 } from 'lucide-react'
 import { useAudio } from '@/context/AudioContext'
+import { GamePageSkeleton } from '@/components/game/shared/GamePageSkeleton'
 
 // Hooks
 import { useExploreState } from './hooks/useExploreState'
@@ -92,11 +92,7 @@ export function ExploreList() {
   const { refreshUser } = useUser()
 
   if (!userData) {
-    return (
-      <div className="flex justify-center p-12">
-        <Loader2 className="animate-spin" />
-      </div>
-    )
+    return <GamePageSkeleton variant="explore" />
   }
 
   return <ExploreListContent userData={userData} refreshUser={refreshUser} />

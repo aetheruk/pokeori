@@ -71,7 +71,7 @@ export function GameNavigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                prefetch={false}
+                prefetch={true}
                 onPointerEnter={() => prefetchRoute(item.href)}
                 onFocus={() => prefetchRoute(item.href)}
                 onClick={playSelectSfx}
@@ -105,7 +105,7 @@ export function GameNavigation() {
           </div>
           <Link
             href="/game"
-            prefetch={false}
+            prefetch={true}
             onPointerEnter={() => prefetchRoute('/game')}
             onFocus={() => prefetchRoute('/game')}
             className="game-focus-ring flex items-center justify-center gap-3 overflow-hidden rounded-lg px-2 py-2 transition-colors hover:bg-game-surface xl:justify-start"
@@ -145,7 +145,7 @@ export function GameNavigation() {
             <Link
               key={item.href}
               href={item.href}
-              prefetch={false}
+              prefetch={true}
               onPointerDown={() => prefetchRoute(item.href)}
               onFocus={() => prefetchRoute(item.href)}
               onClick={playSelectSfx}

@@ -40,9 +40,24 @@ export function GameShell({
   // The Trainer journal has its own secondary rail. Keep its canvas anchored
   // directly to the primary navigation instead of centering it like a grid page.
   const isTrainerDashboard = pathname === '/game'
+  const isRscManagedRoute = [
+    '/game',
+    '/game/explore',
+    '/game/pokemon',
+    '/game/artisan',
+    '/game/dex',
+    '/game/inventory',
+    '/game/pokedex',
+    '/game/movedex',
+    '/game/abilitydex',
+    '/game/tcg',
+  ].includes(pathname)
 
   return (
-    <UserProvider initialUser={user || null}>
+    <UserProvider
+      initialUser={user || null}
+      scopeOverride={isRscManagedRoute ? 'core' : undefined}
+    >
       <AudioProvider>
         <GameErrorBoundary>
           <div className="game-paper-background fixed inset-0 flex flex-col bg-game-canvas text-game-ink">

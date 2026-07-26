@@ -1,11 +1,12 @@
 import { TrainerDashboard } from '@/components/game/trainer/trainer-dashboard'
+import { GameRouteDataBoundary } from '@/components/game/shared/GameRouteDataBoundary'
 
 export default function GamePage() {
-  // Static page - auth handled client-side
-
   return (
-    <div className="h-full overflow-hidden">
-      <TrainerDashboard />
-    </div>
+    <GameRouteDataBoundary scope="trainer">
+      <div className="h-full overflow-hidden">
+        <TrainerDashboard />
+      </div>
+    </GameRouteDataBoundary>
   )
 }
