@@ -4,8 +4,6 @@ import type { Metadata, Viewport } from 'next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 
-export const dynamic = 'force-dynamic'
-
 export const metadata: Metadata = {
   title: 'Pokeori',
   description: 'Explore, collect, catch, and battle in Pokeori.',

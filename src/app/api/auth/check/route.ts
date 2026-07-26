@@ -2,16 +2,19 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { headers } from 'next/headers'
 import { createRequestId, errorResponse, jsonResponse } from '@/utilities/api-response'
-import { getClientIp, getRateLimiter } from '@/utilities/rate-limiter'
+import { getClientIp, rateLimit } from '@/utilities/rate-limiter'
 
 export async function POST(request: Request) {
   const requestId = createRequestId()
   const requestHeaders = await headers()
 
-  const limiter = getRateLimiter(getClientIp(requestHeaders))
-  try {
-    await limiter.schedule(() => Promise.resolve())
-  } catch {
+  const limit = await rateLimit(
+    'auth-check-ip',
+    getClientIp(requestHeaders),
+    30,
+    60,
+  )
+  if (!limit.allowed) {
     return errorResponse('Rate limit exceeded', 429, requestId)
   }
 

@@ -29,6 +29,24 @@ function fakePayload(rowsByCollection: Record<string, any[]> = {}) {
 }
 
 describe('user state storage compatibility', () => {
+  test('an explicit empty scope performs no user-state queries and omits domains', async () => {
+    let findCalls = 0
+    const payload = fakePayload() as any
+    payload.find = async () => {
+      findCalls += 1
+      return { docs: [] }
+    }
+
+    const state = await getUserStateData(
+      payload,
+      { id: 'user-1' } as User,
+      [],
+    )
+
+    expect(state).toEqual({})
+    expect(findCalls).toBe(0)
+  })
+
   test('pokedex hydration treats caught or researched forms as seen', () => {
     expect(
       pokedexRowsToArray([

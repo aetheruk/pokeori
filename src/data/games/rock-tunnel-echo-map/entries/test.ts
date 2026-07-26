@@ -51,7 +51,7 @@ export const testRockTunnelEchoMapEntries: RockTunnelEchoMapGameConfig[] = [
       floorSprite: '/games/rockpush/floor.avif',
       barrierSprite: '/games/rockpush/barrier.avif',
       holeSprite: '/games/rockpush/hole.avif',
-      winTileSprite: '/games/rockpush/win-tile.png',
+      winTileSprite: '/games/rockpush/win-tile.avif',
       playerSprite: '/games/rockpush/trainer.avif',
     },
   },

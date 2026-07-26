@@ -12,6 +12,7 @@ const detailsOutputDir = path.join(tcgRootDir, 'details')
 const legacyDataFile = path.join(outputDir, 'tcg-data.ts')
 const boosterPacksOutputPath = path.join(outputDir, 'items/entries/booster-packs.ts')
 const setSummariesOutputPath = path.join(tcgRootDir, 'summaries.ts')
+const setLoaderOutputPath = path.join(tcgRootDir, 'set-loader.ts')
 
 if (!fs.existsSync(tcgRootDir)) {
   fs.mkdirSync(tcgRootDir, { recursive: true })
@@ -267,13 +268,24 @@ function writeSetSummariesFile(setIds, setMetadataMap) {
   const entries = setIds
     .map((setId) => {
       const metadata = setMetadataMap.get(setId)
-      return `  { id: ${JSON.stringify(setId)}, name: ${JSON.stringify(metadata?.name || setId)} },`
+      return `  ${JSON.stringify({
+        id: setId,
+        name: metadata?.name || setId,
+        series: metadata?.series || 'Unknown',
+        total: Number(metadata?.total) || 0,
+        printedTotal: Number(metadata?.printedTotal) || null,
+        releaseDate: metadata?.releaseDate || null,
+      })},`
     })
     .join('\n')
 
   const content = `export interface TcgSetSummary {
   id: string
   name: string
+  series: string
+  total: number
+  printedTotal: number | null
+  releaseDate: string | null
 }
 
 export const tcgSetSummaries: TcgSetSummary[] = [
@@ -283,6 +295,28 @@ ${entries}
 
   fs.writeFileSync(setSummariesOutputPath, content)
   console.log(`✓ Created ${path.relative(process.cwd(), setSummariesOutputPath)}`)
+}
+
+function writeSetLoaderFile(setIds) {
+  const cases = setIds
+    .map(
+      (setId) =>
+        `    case '${setId}':\n      return (await import('./sets/${setId}')).default`,
+    )
+    .join('\n')
+  const content = `import type { TcgSet } from './types'
+
+export async function getTcgSetByIdLazy(setId: string): Promise<TcgSet | null> {
+  switch (setId) {
+${cases}
+    default:
+      return null
+  }
+}
+`
+
+  fs.writeFileSync(setLoaderOutputPath, content)
+  console.log(`✓ Created ${path.relative(process.cwd(), setLoaderOutputPath)}`)
 }
 
 function writeBoosterPacksFile(setIds) {
@@ -408,6 +442,7 @@ try {
 
   writeIndexFile(setIds)
   writeSetSummariesFile(setIds, setMetadataMap)
+  writeSetLoaderFile(setIds)
   writeDetailsLoaderFile(setIds)
   writeBoosterPacksFile(setIds)
 

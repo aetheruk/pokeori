@@ -1,27 +1,28 @@
 import { describe, expect, test } from 'bun:test'
 import {
   CHANNELING_POKEMON_SELECT,
-  CHANNELING_SYNC_KEYS,
-  DEFAULT_SYNC_KEYS,
   EXPLORE_POKEMON_SELECT,
-  EXPLORE_SYNC_KEYS,
-  POKEMON_BOX_SYNC_KEYS,
+  GAME_DATA_SCOPE_KEYS,
+  getGameDataScope,
 } from '@/utilities/game-data-scopes'
 
 describe('game data sync scopes', () => {
-  test('pokemon box sync avoids loading the full pokemon collection', () => {
-    expect(POKEMON_BOX_SYNC_KEYS).not.toContain('pokemon')
-    expect(POKEMON_BOX_SYNC_KEYS).toContain('inventory')
-    expect(POKEMON_BOX_SYNC_KEYS).toContain('activeExpedition')
+  test('pokemon box sync loads only its roster dependencies', () => {
+    expect(GAME_DATA_SCOPE_KEYS['pokemon-box']).toEqual([
+      'pokemon',
+      'inventory',
+      'pokedex',
+    ])
   })
 
   test('default sync uses the lightweight core scope', () => {
-    expect(DEFAULT_SYNC_KEYS).toBe(POKEMON_BOX_SYNC_KEYS)
-    expect(DEFAULT_SYNC_KEYS).not.toContain('pokemon')
+    expect(GAME_DATA_SCOPE_KEYS.core).toEqual([])
   })
 
   test('explore sync keeps slim pokemon fields needed for requirements and selection', () => {
-    expect(EXPLORE_SYNC_KEYS).toContain('pokemon')
+    expect(GAME_DATA_SCOPE_KEYS.explore).toContain('pokemon')
+    expect(GAME_DATA_SCOPE_KEYS.explore).toContain('weather')
+    expect(GAME_DATA_SCOPE_KEYS.explore).toContain('activeExpedition')
     expect(EXPLORE_POKEMON_SELECT).toMatchObject({
       id: true,
       speciesId: true,
@@ -34,7 +35,7 @@ describe('game data sync scopes', () => {
   })
 
   test('channeling sync loads only inventory, completion rows, and slim pokemon fields', () => {
-    expect(CHANNELING_SYNC_KEYS).toEqual([
+    expect(GAME_DATA_SCOPE_KEYS.channeling).toEqual([
       'pokemon',
       'inventory',
       'gameResults',
@@ -46,5 +47,13 @@ describe('game data sync scopes', () => {
       level: true,
       gender: true,
     })
+  })
+
+  test('routes resolve to purpose-built scopes', () => {
+    expect(getGameDataScope('/game/tcg')).toBe('tcg')
+    expect(getGameDataScope('/game/inventory')).toBe('inventory')
+    expect(getGameDataScope('/game/explore')).toBe('explore')
+    expect(getGameDataScope('/game/research/encounter')).toBe('inventory')
+    expect(getGameDataScope('/game/games/match3')).toBe('core')
   })
 })

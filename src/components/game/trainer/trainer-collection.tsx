@@ -20,24 +20,21 @@ import { battles } from '@/data/battles'
 import { fieldResearchGames, miniGames } from '@/data/games'
 import { locations } from '@/data/locations'
 import pokemonData from '@/data/pokemon-data'
+import { tcgSetSummaries } from '@/data/tcg/summaries'
 import { usePokedex } from '@/hooks/usePokedex'
 import { useTCG } from '@/hooks/useTCG'
 import { cn } from '@/lib/utils'
 import { ALL_ABILITY_DEX_ENTRIES } from '@/utilities/pokemon/abilitydex'
 import { ALL_MOVE_DEX_ENTRIES } from '@/utilities/pokemon/movedex'
-import { getAllTcgSets } from '@/utilities/tcg/tcg'
 
-const tcgSets = getAllTcgSets()
+const tcgSets = tcgSetSummaries
 const totalPokemon = pokemonData.length
 const totalPokedexForms = pokemonData.reduce(
   (total, pokemon) =>
     total + pokemon.forms.filter((form) => form.form !== 'base').length,
   0,
 )
-const totalTcgCards = tcgSets.reduce(
-  (total, set) => total + set.cards.length,
-  0,
-)
+const totalTcgCards = tcgSets.reduce((total, set) => total + set.total, 0)
 const totalMoveDexEntries = ALL_MOVE_DEX_ENTRIES.length
 const totalAbilityDexEntries = ALL_ABILITY_DEX_ENTRIES.length
 
@@ -60,7 +57,7 @@ const fieldResearchNames = new Map(
 export function TrainerCollection() {
   const { user, gameData } = useUser()
   const { entriesByForm, isLoading: pokedexLoading } = usePokedex()
-  const { entriesByCard, summary: tcgSummary, isLoading: tcgLoading } = useTCG()
+  const { summary: tcgSummary, isLoading: tcgLoading } = useTCG()
 
   const pokemonProgress = useMemo(() => {
     let seen = 0
@@ -122,12 +119,6 @@ export function TrainerCollection() {
   const activeBinders = tcgSets.filter(
     (set) => (inventory[`binder-${set.id}`] || 0) > 0,
   ).length
-  const completedTcgSets = tcgSets.filter((set) => {
-    if ((inventory[`binder-${set.id}`] || 0) <= 0) return false
-    return set.cards.every(
-      (card) => (entriesByCard[card.id]?.quantity || 0) > 0,
-    )
-  }).length
   const missingPokemon = Math.max(totalPokemon - pokemonProgress.caught, 0)
   const missingForms = Math.max(
     totalPokedexForms - pokemonProgress.caughtForms,

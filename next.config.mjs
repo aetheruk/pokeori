@@ -1,5 +1,48 @@
-import { withPayload } from '@payloadcms/next/withPayload'
+import { readFileSync } from 'node:fs'
 import withBundleAnalyzer from '@next/bundle-analyzer'
+import { withPayload } from '@payloadcms/next/withPayload'
+
+const packageVersion = JSON.parse(
+  readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
+).version
+const deploymentId = `pokeori-${packageVersion.replaceAll('.', '-')}`
+
+function runtimePackageGlobs(rootPackages) {
+  const pending = [...rootPackages]
+  const visited = new Set()
+  const globs = []
+
+  while (pending.length > 0) {
+    const packageName = pending.pop()
+    if (!packageName || visited.has(packageName)) continue
+    visited.add(packageName)
+
+    try {
+      const packageJson = JSON.parse(
+        readFileSync(
+          new URL(
+            `./node_modules/${packageName}/package.json`,
+            import.meta.url,
+          ),
+          'utf8',
+        ),
+      )
+      globs.push(`./node_modules/${packageName}/**/*`)
+      pending.push(...Object.keys(packageJson.dependencies || {}))
+    } catch {
+      // Nested dependencies are already covered by their parent package glob.
+    }
+  }
+
+  return globs
+}
+
+const standaloneRuntimeGlobs = runtimePackageGlobs([
+  'payload',
+  '@payloadcms/db-mongodb',
+  '@payloadcms/email-resend',
+  'graphql',
+])
 
 const bundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -9,6 +52,10 @@ const bundleAnalyzer = withBundleAnalyzer({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+  deploymentId,
+  outputFileTracingIncludes: {
+    '/*': standaloneRuntimeGlobs,
+  },
   typescript: {
     ignoreBuildErrors: process.env.NEXT_IGNORE_TYPECHECK === 'true',
   },
@@ -28,6 +75,10 @@ const nextConfig = {
   },
   // Optimize package imports to reduce bundle size
   experimental: {
+    cpus: 2,
+    staticGenerationRetryCount: 1,
+    staticGenerationMaxConcurrency: 2,
+    staticGenerationMinPagesPerWorker: 100,
     optimizePackageImports: [
       'lucide-react',
       'react-icons',
@@ -70,4 +121,6 @@ const nextConfig = {
     ]
   },
 }
-export default withPayload(bundleAnalyzer(nextConfig), { devBundleServerPackages: false })
+export default withPayload(bundleAnalyzer(nextConfig), {
+  devBundleServerPackages: false,
+})

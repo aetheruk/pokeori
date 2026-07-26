@@ -57,6 +57,7 @@ export const Pokemon: CollectionConfig = {
       relationTo: 'users',
       required: true,
       hasMany: false,
+      index: true,
     },
     {
       name: 'originalTrainer',
@@ -82,11 +83,13 @@ export const Pokemon: CollectionConfig = {
       type: 'number',
       required: true,
       min: 1,
+      index: true,
     },
     {
       name: 'formId',
       type: 'text',
       required: true,
+      index: true,
     },
     {
       name: 'ability',

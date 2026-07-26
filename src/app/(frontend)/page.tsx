@@ -3,6 +3,8 @@ import config from '@/payload.config'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
+export const dynamic = 'force-dynamic'
+
 export default async function HomePage() {
   const payload = await getPayload({ config })
   const { user } = await payload.auth({ headers: await headers() })

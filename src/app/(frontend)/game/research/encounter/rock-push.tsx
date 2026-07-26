@@ -978,9 +978,9 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   const filledHoleSprite =
     encounter.settings.filledHoleSprite || '/games/rockpush/filled-hole.avif'
   const winTileSprite =
-    encounter.settings.winTileSprite || '/games/rockpush/win-tile.png'
+    encounter.settings.winTileSprite || '/games/rockpush/win-tile.avif'
   const teleporterSprite =
-    encounter.settings.teleporterSprite || '/games/rockpush/teleporter.png'
+    encounter.settings.teleporterSprite || '/games/rockpush/teleporter.avif'
   const cellWidth = `${100 / Math.max(gridSize.w, 1)}%`
   const cellHeight = `${100 / Math.max(gridSize.h, 1)}%`
   const entityStyle = (

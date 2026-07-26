@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1.7
 
-# Bun is the package manager, build runtime, and production runtime.
+# Bun is the package manager and production runtime. Next compiles with Node in
+# the disposable builder stage because its Alpine worker pool is more stable
+# there; Node is not copied into the runtime image.
 FROM oven/bun:1.3.10-alpine AS base
 WORKDIR /app
 
@@ -15,6 +17,8 @@ RUN --mount=type=cache,id=pokeori-bun-cache,target=/root/.bun/install/cache \
     bun install --frozen-lockfile
 
 FROM base AS builder
+RUN apk add --no-cache nodejs
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
@@ -29,12 +33,14 @@ RUN --mount=type=secret,id=DATABASE_URI,required=false \
     --mount=type=secret,id=PAYLOAD_SECRET,required=false \
     --mount=type=secret,id=RESEND_API_KEY,required=false \
     --mount=type=secret,id=REDIS_URL,required=false \
+    --mount=type=secret,id=NEXT_SERVER_ACTIONS_ENCRYPTION_KEY,required=false \
     --mount=type=cache,id=pokeori-next-cache,target=/app/.next/cache \
     export DATABASE_URI="$(cat /run/secrets/DATABASE_URI 2>/dev/null || printf 'mongodb://127.0.0.1:27017/pokeori')" && \
     export PAYLOAD_SECRET="$(cat /run/secrets/PAYLOAD_SECRET 2>/dev/null || printf 'pokeori-build-only-placeholder')" && \
     export RESEND_API_KEY="$(cat /run/secrets/RESEND_API_KEY 2>/dev/null || printf 're_pokeori-build-only-placeholder')" && \
     export REDIS_URL="$(cat /run/secrets/REDIS_URL 2>/dev/null || printf 'redis://127.0.0.1:6379')" && \
-    bun run build
+    export NEXT_SERVER_ACTIONS_ENCRYPTION_KEY="$(cat /run/secrets/NEXT_SERVER_ACTIONS_ENCRYPTION_KEY 2>/dev/null || printf 'cG9rZW9yaS1idWlsZC1vbmx5LWtleS0wMDAwMDAwMDA=')" && \
+    node ./node_modules/next/dist/bin/next build --webpack
 
 # Production image: Bun runs the generated standalone Next.js server.
 FROM base AS runner
@@ -48,7 +54,6 @@ RUN addgroup -S pokeori && \
 
 COPY --from=builder --chown=pokeori:pokeori /app/public ./public
 
-COPY --from=deps --chown=pokeori:pokeori /app/node_modules ./node_modules
 COPY --from=builder --chown=pokeori:pokeori /app/.next/standalone ./
 COPY --from=builder --chown=pokeori:pokeori /app/.next/static ./.next/static
 
@@ -57,5 +62,8 @@ USER pokeori
 EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=20s --retries=3 \
+  CMD wget -q -T 3 -O /dev/null http://127.0.0.1:3000/api/health || exit 1
 
 CMD ["bun", "server.js"]

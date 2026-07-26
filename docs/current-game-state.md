@@ -1,10 +1,15 @@
 # Current Game State
 
-Last reviewed: 2026-07-24
+Last reviewed: 2026-07-26
 
 This document maps the current implemented game progression from the static game data and runtime unlock rules. It is based on the active data in `src/data/**`, the Explore filtering logic in `src/components/game/features/explore/hooks/useExploreData.ts`, and the requirement resolver in `src/utilities/requirements/index.ts`.
 
 ## Runtime Notes
+
+- Release `0.1.1` adds route-scoped game synchronization, bounded normalized-state queries and writes, Dragonfly-backed distributed rate limits, explicit MongoDB connection/index settings, and dependency-aware health checks.
+- Large public catalogs are now delivered through versioned, paginated catalog APIs. The TCG trainer screen progressively loads card data, secondary trainer tabs are code-split, Pokemon sprite availability uses a compact generated manifest, navigation prefetch is intent-driven, and common sound effects are allocated on demand.
+- The production container now uses a stable Server Actions encryption key, validates its standalone artifact before publishing, and enforces an image-size budget. Immutable sprite caching moved to a release-versioned service worker.
+- Hetzner, Coolify, MongoDB, Dragonfly, and Cloudflare production settings and the phased performance-index migration are documented in `docs/development/performance-runbook.md`.
 
 Recent maintenance touched several stateful game systems:
 

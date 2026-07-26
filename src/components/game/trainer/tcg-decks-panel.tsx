@@ -11,7 +11,8 @@ import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
 import { Button } from '@/components/ui/button'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
-import { getAllTcgSets } from '@/utilities/tcg/tcg'
+import { tcgSetSummaries } from '@/data/tcg/summaries'
+import { APP_VERSION } from '@/utilities/app-version'
 import type { TcgBattleEnergyType } from '@/utilities/tcg/tcg-battle'
 
 export type DeckFormat = 'baby' | 'champions' | 'masters'
@@ -45,6 +46,9 @@ export function TcgDecksPanel({
   >({})
   const [deckMessage, setDeckMessage] = useState('')
   const [deckBusy, setDeckBusy] = useState(false)
+  const [cardLabelById, setCardLabelById] = useState<Map<string, string>>(
+    () => new Map(),
+  )
 
   const inventory = useMemo(
     () =>
@@ -57,22 +61,12 @@ export function TcgDecksPanel({
 
   const generationOptions = useMemo(() => {
     const series = Array.from(
-      new Set(getAllTcgSets().map((set) => set.series)),
+      new Set(tcgSetSummaries.map((set) => set.series)),
     ).sort((a, b) => a.localeCompare(b))
     return series.map((entry) => ({
       id: entry,
       label: entry.replace('&', 'and'),
     }))
-  }, [])
-
-  const cardLabelById = useMemo(() => {
-    const map = new Map<string, string>()
-    for (const set of getAllTcgSets()) {
-      for (const card of set.cards) {
-        map.set(card.id, `${card.name} #${card.number}`)
-      }
-    }
-    return map
   }, [])
 
   useEffect(() => {
@@ -113,8 +107,41 @@ export function TcgDecksPanel({
   const activeDecks = generationDecks[selectedGeneration] || {}
   const activeDeckEntry = activeDecks[deckFormat]
   const activeDeck = activeDeckEntry?.cards || []
+  const activeDeckKey = activeDeck.join(',')
   const activeEnergy = activeDeckEntry?.energy || ''
   const activeValidation = deckValidation[selectedGeneration]?.[deckFormat]
+  useEffect(() => {
+    if (activeDeck.length === 0) {
+      setCardLabelById(new Map())
+      return
+    }
+    const controller = new AbortController()
+    const params = new URLSearchParams({
+      v: APP_VERSION,
+      cardIds: activeDeck.join(','),
+      limit: String(activeDeck.length),
+    })
+    fetch(`/api/game/catalog/tcg?${params}`, {
+      signal: controller.signal,
+    })
+      .then((response) => response.json())
+      .then(
+        (result: {
+          items?: Array<{ card: { id: string; name: string; number: string } }>
+        }) => {
+          setCardLabelById(
+            new Map(
+              (result.items || []).map(({ card }) => [
+                card.id,
+                `${card.name} #${card.number}`,
+              ]),
+            ),
+          )
+        },
+      )
+      .catch(() => {})
+    return () => controller.abort()
+  }, [activeDeckKey])
   const energyOptions = useMemo(
     () =>
       [
@@ -235,9 +262,9 @@ export function TcgDecksPanel({
         {activeValidation &&
           !activeValidation.valid &&
           activeValidation.errors.length > 0 && (
-          <p className="rounded-lg border border-game-ochre/35 bg-game-ochre/10 px-3 py-2 text-xs text-game-ochre">
-            {activeValidation.errors[0]}
-          </p>
+            <p className="rounded-lg border border-game-ochre/35 bg-game-ochre/10 px-3 py-2 text-xs text-game-ochre">
+              {activeValidation.errors[0]}
+            </p>
           )}
 
         <div className="flex flex-wrap items-center gap-2">
@@ -263,7 +290,11 @@ export function TcgDecksPanel({
             Save {DECK_FORMATS.find((f) => f.id === deckFormat)?.label} Deck
           </Button>
           {deckMessage && (
-            <span className="text-xs font-medium text-game-muted" role="status" aria-live="polite">
+            <span
+              className="text-xs font-medium text-game-muted"
+              role="status"
+              aria-live="polite"
+            >
               {deckMessage}
             </span>
           )}

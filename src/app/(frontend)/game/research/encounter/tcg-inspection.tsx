@@ -5,6 +5,7 @@ import { Eye } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { completeGame, startGame } from '@/app/(frontend)/game/games/actions'
 import { GameProgressChip } from '@/components/game/shared/game-progress-chip'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
@@ -15,11 +16,11 @@ import type {
   TcgInspectionGameConfig,
   TcgInspectionQuestionType,
 } from '@/data/games'
+import { tcgSetSummaries } from '@/data/tcg/summaries'
 import type { TcgCard, TcgSet } from '@/data/tcg/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
-import { getAllTcgSets } from '@/utilities/tcg/tcg'
+import { APP_VERSION } from '@/utilities/app-version'
 import { QuestionPrompt } from '../../locations/encounter/_components/question-prompt'
-import { completeGame, startGame } from '@/app/(frontend)/game/games/actions'
 
 interface TcgInspectionGameProps {
   encounter: TcgInspectionGameConfig
@@ -38,6 +39,9 @@ interface InspectionQuestion {
   answer: string
   options: string[]
 }
+
+type CatalogCard = { card: TcgCard; set: TcgSet }
+type CatalogResponse<T> = { items: T[] }
 
 type Phase = 'countdown' | 'attention' | 'reveal' | 'question'
 
@@ -64,21 +68,17 @@ function sample<T>(items: T[], count: number): T[] {
 }
 
 function buildCardPool(
-  sets: TcgSet[],
+  catalogCards: CatalogCard[],
   config: TcgInspectionGameConfig,
 ): InspectionCard[] {
-  const allowedSetIds = config.settings.allowedSetIds
   const allowedRarities = config.settings.allowedRarities
 
-  return sets
-    .filter((set) => !allowedSetIds?.length || allowedSetIds.includes(set.id))
-    .flatMap((set) =>
-      set.cards.map((card) => ({
-        ...card,
-        setId: set.id,
-        setName: set.name,
-      })),
-    )
+  return catalogCards
+    .map(({ card, set }) => ({
+      ...card,
+      setId: set.id,
+      setName: set.name,
+    }))
     .filter((card) => {
       if (!card.images?.small) return false
       if (
@@ -106,7 +106,7 @@ function buildOptions(
 function buildQuestion(
   cards: InspectionCard[],
   cardPool: InspectionCard[],
-  allSets: TcgSet[],
+  allSets: Array<{ name: string }>,
   questionTypes: TcgInspectionQuestionType[],
 ): InspectionQuestion {
   const targetIndex = Math.floor(Math.random() * cards.length)
@@ -250,10 +250,21 @@ export function TcgInspectionGame({
   const revealSeconds = settings.previewSeconds
   const pointsPerCorrect = settings.pointsPerCorrect || 100
 
-  const allSets = useMemo(() => getAllTcgSets(), [])
-  const cardPool = useMemo(
-    () => buildCardPool(allSets, encounter),
-    [allSets, encounter],
+  const selectedSetIds = useMemo(() => {
+    if (settings.allowedSetIds?.length) return settings.allowedSetIds
+
+    const start = Array.from(encounter.id).reduce(
+      (total, character) => total + character.charCodeAt(0),
+      0,
+    )
+    return Array.from(
+      { length: Math.min(8, tcgSetSummaries.length) },
+      (_, i) => tcgSetSummaries[(start + i) % tcgSetSummaries.length].id,
+    )
+  }, [encounter.id, settings.allowedSetIds])
+  const allSets = useMemo(
+    () => tcgSetSummaries.filter((set) => selectedSetIds.includes(set.id)),
+    [selectedSetIds],
   )
   const questionTypes = settings.questionTypes?.length
     ? settings.questionTypes
@@ -281,33 +292,35 @@ export function TcgInspectionGame({
   const scoreRef = useRef(0)
   const endingRef = useRef(false)
 
-  const createSession = useCallback(() => {
-    if (cardPool.length < packSize) {
-      setError('Not enough TCG cards are available for this configuration.')
-      return
-    }
+  const createSession = useCallback(
+    (availableCards: InspectionCard[]) => {
+      if (availableCards.length < packSize) {
+        setError('Not enough TCG cards are available for this configuration.')
+        return
+      }
 
-    const sessionCards = sample(cardPool, packSize)
-    const sessionQuestions = Array.from({ length: questionCount }, () =>
-      buildQuestion(sessionCards, cardPool, allSets, questionTypes),
-    )
-    setCards(sessionCards)
-    setQuestions(sessionQuestions)
-    setAnswerStatus(null)
-    setRevealIndex(0)
-    setRevealLeft(revealSeconds)
-    setQuestionIndex(0)
-    setCountdownLeft(countdownSeconds)
-    setPhase('countdown')
-  }, [
-    allSets,
-    cardPool,
-    countdownSeconds,
-    packSize,
-    questionCount,
-    questionTypes,
-    revealSeconds,
-  ])
+      const sessionCards = sample(availableCards, packSize)
+      const sessionQuestions = Array.from({ length: questionCount }, () =>
+        buildQuestion(sessionCards, availableCards, allSets, questionTypes),
+      )
+      setCards(sessionCards)
+      setQuestions(sessionQuestions)
+      setAnswerStatus(null)
+      setRevealIndex(0)
+      setRevealLeft(revealSeconds)
+      setQuestionIndex(0)
+      setCountdownLeft(countdownSeconds)
+      setPhase('countdown')
+    },
+    [
+      allSets,
+      countdownSeconds,
+      packSize,
+      questionCount,
+      questionTypes,
+      revealSeconds,
+    ],
+  )
 
   const finishGame = useCallback(
     async (finalScore: number) => {
@@ -377,21 +390,43 @@ export function TcgInspectionGame({
     let mounted = true
 
     async function start() {
-      const res = await startGame(encounter.id)
+      const params = new URLSearchParams({
+        v: APP_VERSION,
+        setIds: selectedSetIds.join(','),
+        limit: '80',
+        sampleSeed: encounter.id,
+      })
+      if (settings.allowedRarities?.length) {
+        params.set('rarities', settings.allowedRarities.join(','))
+      }
+      const [res, catalogResponse] = await Promise.all([
+        startGame(encounter.id),
+        fetch(`/api/game/catalog/tcg?${params}`, {
+          cache: 'force-cache',
+        }),
+      ])
       if (!mounted) return
       if (!res.success) {
         setError(res.error || 'Could not start booster inspection.')
         return
       }
+      if (!catalogResponse.ok) {
+        setError('Could not load the inspection card catalog.')
+        return
+      }
+      const catalog =
+        (await catalogResponse.json()) as CatalogResponse<CatalogCard>
+      if (!mounted) return
+      const loadedPool = buildCardPool(catalog.items, encounter)
       setGameStarted(true)
-      createSession()
+      createSession(loadedPool)
     }
 
     void start()
     return () => {
       mounted = false
     }
-  }, [createSession, encounter.id])
+  }, [createSession, encounter, selectedSetIds])
 
   useEffect(() => {
     if (!gameStarted || gameEnded) return

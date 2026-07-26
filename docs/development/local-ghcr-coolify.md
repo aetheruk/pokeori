@@ -29,6 +29,8 @@ REDIS_URL=your-production-redis-uri
 PAYLOAD_SECRET=your-production-payload-secret
 RESEND_API_KEY=your-production-resend-key
 NEXT_PUBLIC_APP_URL=https://pokeori.app
+NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=your-stable-32-byte-base64-key
+TRUST_CLOUDFLARE_PROXY=true
 ```
 
 Get the application deploy webhook URL and a Coolify API token with `Deploy` permission. Store them locally as `COOLIFY_WEBHOOK_URI` and `COOLIFY_WEBHOOK_TOKEN` in the ignored `.env` file (or export the canonical `COOLIFY_WEBHOOK` and `COOLIFY_TOKEN` names). Do not put either value in GitHub repository secrets; GitHub Actions is not part of this release path.
@@ -42,7 +44,7 @@ bun install --frozen-lockfile
 bun run deploy:production
 ```
 
-`deploy:production` obtains the GHCR token from `gh auth token`, defaults the GHCR username to `aetheruk`, and reads the two Coolify aliases from `.env` when they are not already exported. It runs linting, typechecking, the Bun test suite, and data validation, then builds and pushes a `linux/amd64` Docker image. It reuses Bun package downloads, Next compiler output, and a GHCR-backed BuildKit cache, so subsequent releases rebuild and upload only changed layers.
+`deploy:production` obtains the GHCR token from `gh auth token`, defaults the GHCR username to `aetheruk`, and reads Coolify aliases plus the Server Actions build key from `.env` when they are not already exported. It validates the repository, builds a local `linux/amd64` candidate, enforces the 350 MiB image budget, and smokes `/api/app-version` from that exact image before pushing it. It reuses Bun package downloads, Next compiler output, and a GHCR-backed BuildKit cache.
 
 - `ghcr.io/aetheruk/pokeori:latest`
 - `ghcr.io/aetheruk/pokeori:v<package-version>`

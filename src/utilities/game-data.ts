@@ -8,7 +8,6 @@ import {
   EXPLORE_POKEMON_SELECT,
 } from '@/utilities/game-data-scopes'
 import { getUserStateData, toSlimUser } from '@/utilities/user-state'
-import { resolvePokemonRarity } from '@/utilities/pokemon/rarity-effects'
 import { ensureUserWeatherSlot } from '@/utilities/weather'
 
 interface ActiveExpeditionData {
@@ -41,7 +40,7 @@ export async function getGameUserData(
   options: GameUserDataOptions = {},
 ): Promise<RequirementData> {
   const payload = await getPayload({ config: configPromise })
-  const fetchAll = !requiredData || requiredData.length === 0
+  const fetchAll = requiredData === undefined
   const keys = new Set(requiredData || [])
 
   // Helper to check if we should fetch a key
@@ -85,50 +84,9 @@ export async function getGameUserData(
   }
 
   const userState = await getUserStateData(payload as any, user, requiredData)
-  const weatherState = await ensureUserWeatherSlot(payload as any, user as User)
-
-  // Existing Pokemon predate the canonical Pokedex rarity ledger. Derive their
-  // obtained variants at sync time so long-standing collections immediately
-  // populate the new Pokedex Variants section as well as future captures.
-  if (shouldFetch('pokedex')) {
-    const variantPokemon = pokemonData.length
-      ? pokemonData
-      : ((
-          await payload.find({
-            collection: 'pokemon',
-            where: { user: { equals: user.id } },
-            pagination: false,
-            depth: 0,
-            select: {
-              speciesId: true,
-              formId: true,
-              rarity: true,
-              shiny: true,
-              isShadow: true,
-              isRadiant: true,
-            },
-          } as any)
-        ).docs as Pokemon[])
-    const ownedRarities = new Map<string, Set<string>>()
-
-    for (const pokemon of variantPokemon) {
-      const key = `${pokemon.speciesId}:${pokemon.formId}`
-      const rarities = ownedRarities.get(key) ?? new Set<string>()
-      rarities.add(resolvePokemonRarity(pokemon))
-      ownedRarities.set(key, rarities)
-    }
-
-    userState.pokedex = (userState.pokedex as Array<any>).map((entry) => {
-      const owned = ownedRarities.get(`${entry.speciesId}:${entry.formId}`)
-      if (!owned?.size) return entry
-      return {
-        ...entry,
-        raritiesCaught: Array.from(
-          new Set([...(entry.raritiesCaught || []), ...owned]),
-        ),
-      }
-    })
-  }
+  const weatherState = shouldFetch('weather')
+    ? await ensureUserWeatherSlot(payload as any, user as User)
+    : null
 
   let activeExpedition: ActiveExpeditionData | null = null
 
@@ -136,15 +94,32 @@ export async function getGameUserData(
     const runs = await (payload as any).find({
       collection: 'expedition-runs',
       where: {
-        user: { equals: user.id },
+        and: [
+          { user: { equals: user.id } },
+          {
+            status: {
+              in: ['active', 'ready_to_claim'],
+            },
+          },
+        ],
       },
       sort: '-createdAt',
-      limit: 10,
+      limit: 1,
+      depth: 0,
+      select: {
+        expeditionId: true,
+        expeditionName: true,
+        status: true,
+        mapItemId: true,
+        maxLosses: true,
+        losses: true,
+        currentStepIndex: true,
+        totalSteps: true,
+        steps: true,
+      },
     })
 
-    const runDoc = (runs.docs || []).find(
-      (run: any) => run.status === 'active' || run.status === 'ready_to_claim',
-    )
+    const runDoc = runs.docs?.[0]
 
     if (runDoc) {
       activeExpedition = {
@@ -177,6 +152,11 @@ export async function getGameUserData(
               collection: 'users',
               id: user.rivalTrainerId,
               depth: 0,
+              select: {
+                trainerName: true,
+                icon: true,
+                banner: true,
+              },
             })
             .catch(() => null)
 
@@ -190,31 +170,28 @@ export async function getGameUserData(
     }
   }
 
-  const slimUser = {
-    ...(toSlimUser(user) as any),
-    weatherSlot: weatherState.slot,
-    weatherUpdatedAt: weatherState.updatedAt,
-  } as User
-
-  return {
-    user: slimUser,
-    rivalTrainer,
-    currency: user.currency,
-    inventory: userState.inventory,
-    pokemon: pokemonData,
-    tcg: userState.tcg,
-    pokedex: userState.pokedex,
-    abilityDex: userState.abilityDex,
-    completedTasks: userState.completedTasks,
-    battleResults: userState.battleResults,
-    locationEncounterResults: userState.locationEncounterResults,
-    gameResults: userState.gameResults,
-    fieldResearchResults: userState.fieldResearchResults,
-    expeditionResults: userState.expeditionResults,
-    shopPurchases: userState.shopPurchases,
-    lastRoll: (user as any).lastRoll,
-    weatherSlot: weatherState.slot,
-    weatherUpdatedAt: weatherState.updatedAt,
-    activeExpedition,
+  const slimUser = toSlimUser(user)
+  if (weatherState) {
+    ;(slimUser as any).weatherSlot = weatherState.slot
+    ;(slimUser as any).weatherUpdatedAt = weatherState.updatedAt
   }
+
+  const result: Record<string, unknown> = {
+    user: slimUser,
+    currency: user.currency,
+    lastRoll: (user as any).lastRoll,
+  }
+  if (shouldFetch('pokemon')) result.pokemon = pokemonData
+  for (const [key, value] of Object.entries(userState)) {
+    result[key] = value
+  }
+  if (shouldFetch('rivalTrainer')) result.rivalTrainer = rivalTrainer
+  if (shouldFetch('activeExpedition'))
+    result.activeExpedition = activeExpedition
+  if (weatherState) {
+    result.weatherSlot = weatherState.slot
+    result.weatherUpdatedAt = weatherState.updatedAt
+  }
+
+  return result as unknown as RequirementData
 }

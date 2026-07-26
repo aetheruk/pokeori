@@ -27,6 +27,8 @@ schema validation tests.
   item coverage, Pokemon form references, and evolution item/species references.
 - Requirements vs criteria behavior for lock/completion semantics.
 - Game data sync scope checks.
+- Catalog pagination/version/cache checks and a 32 KiB client sprite-index budget.
+- Full compact-sprite parity against the authored manifest.
 - Source hygiene check preventing dev entry actions from reintroducing `eval`.
 - API response helper checks for request IDs.
 - Rate-limit helper checks for forwarded IP parsing.
@@ -47,4 +49,5 @@ bun run test:e2e      # E2E tests
 
 ## Release validation
 `bun run deploy:production` runs lint, typecheck, data validation, and the full
-Bun test suite before it builds or publishes a production image.
+Bun test suite, then enforces the container image budget and smokes the exact
+candidate before publishing it.

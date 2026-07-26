@@ -52,7 +52,7 @@ export const testVoltorbGridEntries: VoltorbGridGameConfig[] = [
       floorSprite: '/games/rockpush/floor.avif',
       boulderSprite: '/games/rockpush/boulder.avif',
       barrierSprite: '/games/rockpush/barrier.avif',
-      winTileSprite: '/games/rockpush/win-tile.png',
+      winTileSprite: '/games/rockpush/win-tile.avif',
       playerSprite: '/games/rockpush/trainer.avif',
     },
   },

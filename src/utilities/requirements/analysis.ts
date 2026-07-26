@@ -16,6 +16,7 @@ export type GameDataKeys =
   | 'shopPurchases'
   | 'activeExpedition'
   | 'rivalTrainer'
+  | 'weather'
 
 export function analyzeRequirements(
   conditions?: TaskCondition[],

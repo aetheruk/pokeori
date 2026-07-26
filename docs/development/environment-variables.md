@@ -21,6 +21,13 @@ GEMINI_API_KEY=your-gemini-api-key-here
 # Redis (optional, defaults to localhost:6379)
 REDIS_URL=redis://localhost:6379
 
+# Stable 32-byte base64 key shared by production builds/replicas
+NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=
+
+# Enable only when the origin is restricted to the named proxy
+TRUST_CLOUDFLARE_PROXY=false
+TRUST_PROXY_HEADERS=false
+
 # Next.js
 NEXT_PUBLIC_APP_URL=https://localhost:3000
 ```
@@ -33,6 +40,9 @@ NEXT_PUBLIC_APP_URL=https://localhost:3000
 | `RESEND_API_KEY` | ✅ | Resend API key for transactional email |
 | `GEMINI_API_KEY` | ❌ | Google Gemini API key (for AI features) |
 | `REDIS_URL` | ❌ | Redis connection URL (defaults to localhost) |
+| `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` | ✅ production | Stable 32-byte base64 key used to build Server Actions |
+| `TRUST_CLOUDFLARE_PROXY` | ✅ production | Trust `CF-Connecting-IP`; enable only when direct origin access is blocked |
+| `TRUST_PROXY_HEADERS` | ❌ | Trust forwarded IP headers from another controlled proxy |
 | `NEXT_PUBLIC_APP_URL` | ✅ | Public URL of the application |
 
 ## Security Notes

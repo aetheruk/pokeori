@@ -17,11 +17,11 @@ The `users` collection remains the source for auth, admin flags, trainer profile
 
 `getGameUserData` reads split collections through `src/utilities/user-state.ts`. Runtime reads do not fall back to old `users` JSON ledgers. The returned `user` is slimmed so large ledgers are not sent inside `user`; callers should use the top-level `RequirementData` arrays instead.
 
-`/api/game/sync` uses `DEFAULT_SYNC_KEYS`, which excludes full Pokemon collection hydration. Explore still requests the scoped slim Pokemon payload because Explore requirement and selection UI need those fields. Client code should read normalized data from `gameData` rather than expecting `user.inventory`, `user.pokedex`, `user.completedTasks`, `user.tcg`, or result maps under `user.stats`.
+`/api/game/sync` accepts a route-derived scope so each game surface only fetches the normalized collections it renders. Unrequested fields are omitted rather than populated with empty placeholders. The client keeps each scope in its own SWR cache, deduplicates foreground requests, and performs a low-frequency background refresh. Explore still requests the scoped slim Pokemon payload because Explore requirement and selection UI need those fields. Client code should read normalized data from `gameData` rather than expecting `user.inventory`, `user.pokedex`, `user.completedTasks`, `user.tcg`, or result maps under `user.stats`.
 
 ## Write Path
 
-Runtime writes use targeted helpers in `src/utilities/user-state.ts`, including map setters for inventory, Pokedex, task progress, TCG cards, shop purchases, and `incrementUserActivityResult` for battle, location, Mini Game, Field Research, and expedition outcomes. Mini Games use `gameResults`/`activityType: game`; Field Research uses `fieldResearchResults`/`activityType: field-research`.
+Runtime writes use targeted helpers in `src/utilities/user-state.ts`, including map setters for inventory, Pokedex, task progress, TCG cards, shop purchases, and `incrementUserActivityResult` for battle, location, Mini Game, Field Research, and expedition outcomes. Mini Games use `gameResults`/`activityType: game`; Field Research uses `fieldResearchResults`/`activityType: field-research`. Bulk writes are split into bounded parallel batches, and activity syncs only query the activity types requested by the active route.
 
 ## Rollout Notes
 
@@ -35,3 +35,14 @@ other or unknown legacy IDs as `game`, and merges a legacy row into an
 existing canonical row without discarding wins, losses, high scores,
 timestamps, or metadata. Runtime reads understand legacy `research` rows
 during the rollout.
+
+## Performance Index Migration
+
+Release `0.1.1` adds a phased production migration for normalized user-state indexes:
+
+```bash
+bun run migrate:performance-indexes --phase=prepare
+bun run migrate:performance-indexes --phase=finalize
+```
+
+The prepare phase creates non-unique query indexes and reconciles duplicate normalized rows. The finalize phase creates the compound unique indexes used by inventory, Pokedex, ability, task, activity, TCG ownership, and shop-state lookups. Run both phases against a backup and verify the prepare report before finalizing.

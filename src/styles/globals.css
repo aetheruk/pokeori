@@ -340,11 +340,11 @@
   }
 
   .game-contour-motif {
-    background-image: url('/ui/pokeori/contour-map.png');
+    background-image: url('/ui/pokeori/contour-map.avif');
   }
 
   .game-field-stamps {
-    background-image: url('/ui/pokeori/field-stamps.png');
+    background-image: url('/ui/pokeori/field-stamps.avif');
   }
 
   .game-rule {
