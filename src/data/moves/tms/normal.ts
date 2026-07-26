@@ -22705,17 +22705,14 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
   {
     id: 'rage',
     name: 'Rage',
-    description: 'The user attacks continuously and builds Attack as it takes hits.',
+    description: 'The user flies into a rage. If it is hit that turn, its Attack rises.',
     stance: 'power',
     target: 'enemy',
     forcedType: 'normal',
     damage: 0.65,
     accuracy: 100,
-    conditionalDamageModifiers: [
-      {
-        type: 'user-took-damage',
-        multiplier: 2,
-      },
+    onUserDamagedSameTurn: [
+      { stat: 'attack', stages: 1 },
     ],
     level: 8,
     formId: [
@@ -22902,10 +22899,6 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
       '10090',
       '10115',
     ],
-    continuous: {
-      min: 2,
-      max: 4,
-    },
   },
   {
     id: 'raging-bull',
