@@ -6,6 +6,7 @@ import {
 } from '@/utilities/pokemon/rarity-effects'
 import type { RequirementData } from '@/utilities/requirements'
 import type { GameDataKeys } from '@/utilities/requirements/analysis'
+import { fieldResearchGames } from '@/data/games'
 
 export const USER_STATE_COLLECTIONS = {
   inventory: 'user-inventory-items',
@@ -31,7 +32,8 @@ export type UserStateDomain =
   | 'completedTasks'
   | 'battleResults'
   | 'locationEncounterResults'
-  | 'researchEncounterResults'
+  | 'gameResults'
+  | 'fieldResearchResults'
   | 'expeditionResults'
   | 'tcg'
   | 'shopPurchases'
@@ -45,7 +47,8 @@ type UserStateData = Pick<
   | 'completedTasks'
   | 'battleResults'
   | 'locationEncounterResults'
-  | 'researchEncounterResults'
+  | 'gameResults'
+  | 'fieldResearchResults'
   | 'expeditionResults'
   | 'shopPurchases'
 >
@@ -90,13 +93,15 @@ export type ActivityStatEntry = {
 export type ActivityStatsMap = {
   battles?: Record<string, ActivityStatEntry>
   locations?: Record<string, ActivityStatEntry>
-  research?: Record<string, ActivityStatEntry>
+  games?: Record<string, ActivityStatEntry>
+  fieldResearch?: Record<string, ActivityStatEntry>
   expeditions?: Record<string, ActivityStatEntry>
 }
 export type ActivityResultDomain =
   | 'battleResults'
   | 'locationEncounterResults'
-  | 'researchEncounterResults'
+  | 'gameResults'
+  | 'fieldResearchResults'
   | 'expeditionResults'
 
 const HEAVY_USER_KEYS = [
@@ -117,12 +122,17 @@ const HEAVY_USER_KEYS = [
 const ACTIVITY_TYPES = {
   battleResults: 'battle',
   locationEncounterResults: 'location',
-  researchEncounterResults: 'research',
+  gameResults: 'game',
+  fieldResearchResults: 'field-research',
   expeditionResults: 'expedition',
 } as const satisfies Record<
   Extract<
     UserStateDomain,
-    'battleResults' | 'locationEncounterResults' | 'researchEncounterResults' | 'expeditionResults'
+    | 'battleResults'
+    | 'locationEncounterResults'
+    | 'gameResults'
+    | 'fieldResearchResults'
+    | 'expeditionResults'
   >,
   string
 >
@@ -160,23 +170,41 @@ function fieldValue(value: unknown): unknown {
 }
 
 function valuesEqual(left: unknown, right: unknown): boolean {
-  return JSON.stringify(fieldValue(left) ?? null) === JSON.stringify(fieldValue(right) ?? null)
+  return (
+    JSON.stringify(fieldValue(left) ?? null) ===
+    JSON.stringify(fieldValue(right) ?? null)
+  )
 }
 
 function getSlimStats(rawStats: unknown): Record<string, unknown> | undefined {
   if (!isObjectRecord(rawStats)) return undefined
 
-  const { battles, locations, research, expeditions, ...smallStats } = rawStats
+  const {
+    battles,
+    locations,
+    research,
+    games,
+    fieldResearch,
+    expeditions,
+    ...smallStats
+  } = rawStats
   void battles
   void locations
   void research
+  void games
+  void fieldResearch
   void expeditions
 
   return Object.keys(smallStats).length > 0 ? smallStats : undefined
 }
 
-function hasRequiredKey(requiredData: GameDataKeys[] | undefined, key: GameDataKeys): boolean {
-  return !requiredData || requiredData.length === 0 || requiredData.includes(key)
+function hasRequiredKey(
+  requiredData: GameDataKeys[] | undefined,
+  key: GameDataKeys,
+): boolean {
+  return (
+    !requiredData || requiredData.length === 0 || requiredData.includes(key)
+  )
 }
 
 async function findRows(
@@ -212,7 +240,9 @@ export function toSlimUser(user: User): User {
   return slimUser as User
 }
 
-export function getUserProfileStats(user: User | null | undefined): Record<string, any> {
+export function getUserProfileStats(
+  user: User | null | undefined,
+): Record<string, any> {
   return getSlimStats((user as any)?.stats) || {}
 }
 
@@ -223,7 +253,9 @@ export function inventoryRowsToArray(rows: any[]): InventoryEntry[] {
   }))
 }
 
-export function inventoryArrayToMap(entries: InventoryEntry[] | undefined): InventoryMap {
+export function inventoryArrayToMap(
+  entries: InventoryEntry[] | undefined,
+): InventoryMap {
   if (!Array.isArray(entries)) return {}
 
   return Object.fromEntries(
@@ -271,12 +303,16 @@ export function pokedexRowsToArray(rows: any[]): PokedexEntry[] {
       caught,
       totalCaught,
       totalSeen,
-      shinyCaught: row.shinyCaught === undefined ? undefined : Boolean(row.shinyCaught),
-      shinySeen: row.shinySeen === undefined ? undefined : Boolean(row.shinySeen),
+      shinyCaught:
+        row.shinyCaught === undefined ? undefined : Boolean(row.shinyCaught),
+      shinySeen:
+        row.shinySeen === undefined ? undefined : Boolean(row.shinySeen),
       raritiesCaught: normalizePokedexRarities(row.raritiesCaught),
       researchXp,
       researchLevel,
-      preferredBattleStance: row.preferredBattleStance as BattleStance | undefined,
+      preferredBattleStance: row.preferredBattleStance as
+        | BattleStance
+        | undefined,
     }
   })
 }
@@ -302,16 +338,18 @@ function normalizePokedexRarities(value: unknown): PokemonRarityId[] {
 export function addPokedexCaughtRarity<T extends PokedexMapEntry>(
   entry: T,
   rarity: PokemonRarityId,
-): T & { raritiesCaught: PokemonRarityId[]; shinyCaught?: boolean; shinySeen?: boolean } {
+): T & {
+  raritiesCaught: PokemonRarityId[]
+  shinyCaught?: boolean
+  shinySeen?: boolean
+} {
   const raritiesCaught = Array.from(
     new Set([...normalizePokedexRarities(entry.raritiesCaught), rarity]),
   )
   return {
     ...entry,
     raritiesCaught,
-    ...(rarity === 'shiny'
-      ? { shinyCaught: true, shinySeen: true }
-      : {}),
+    ...(rarity === 'shiny' ? { shinyCaught: true, shinySeen: true } : {}),
   }
 }
 
@@ -325,7 +363,9 @@ export function getPokedexCaughtRarities(
   return Array.from(new Set(rarities))
 }
 
-export function pokedexArrayToMap(entries: PokedexEntry[] | undefined): PokedexMap {
+export function pokedexArrayToMap(
+  entries: PokedexEntry[] | undefined,
+): PokedexMap {
   if (!Array.isArray(entries)) return {}
 
   return entries.reduce<PokedexMap>((map, { speciesId, formId, ...entry }) => {
@@ -346,11 +386,15 @@ export function abilityDexRowsToArray(rows: any[]): AbilityDexEntry[] {
   }))
 }
 
-export function abilityDexArrayToMap(entries: AbilityDexEntry[] | undefined): AbilityDexMap {
+export function abilityDexArrayToMap(
+  entries: AbilityDexEntry[] | undefined,
+): AbilityDexMap {
   if (!Array.isArray(entries)) return {}
 
   return Object.fromEntries(
-    entries.filter((entry) => entry.abilityId).map((entry) => [entry.abilityId, entry]),
+    entries
+      .filter((entry) => entry.abilityId)
+      .map((entry) => [entry.abilityId, entry]),
   )
 }
 
@@ -405,7 +449,9 @@ function pokedexMapToRows(
 export function taskRowsToArray(rows: any[]): CompletedTaskEntry[] {
   return rows.map((row) => ({
     taskId: String(row.taskId),
-    completedAt: String(row.completedAt || row.lastCompletedAt || row.updatedAt || ''),
+    completedAt: String(
+      row.completedAt || row.lastCompletedAt || row.updatedAt || '',
+    ),
     count: toNumber(row.count),
     updatedAt: row.lastCompletedAt || row.updatedAt,
   }))
@@ -453,7 +499,9 @@ export function tcgArrayToMap(tcg: TcgEntry[] | undefined): TcgMap {
   if (!Array.isArray(tcg)) return {}
 
   return Object.fromEntries(
-    tcg.filter((entry) => entry.cardId).map((entry) => [entry.cardId, toNumber(entry.quantity)]),
+    tcg
+      .filter((entry) => entry.cardId)
+      .map((entry) => [entry.cardId, toNumber(entry.quantity)]),
   )
 }
 
@@ -493,7 +541,10 @@ function shopPurchasesRecordToRows(
   shopPurchases: ShopPurchasesRecord,
 ): Array<{ key: string; data: Record<string, unknown> }> {
   return Object.entries(shopPurchases)
-    .filter(([shopItemId, entry]) => shopItemId && toNumber((entry as any)?.count) > 0)
+    .filter(
+      ([shopItemId, entry]) =>
+        shopItemId && toNumber((entry as any)?.count) > 0,
+    )
     .map(([shopItemId, entry]) => {
       const purchase = isObjectRecord(entry) ? entry : {}
 
@@ -505,8 +556,10 @@ function shopPurchasesRecordToRows(
           shopId: purchase.shopId ?? null,
           itemId: purchase.itemId ?? null,
           count: toNumber(purchase.count),
-          firstPurchasedAt: purchase.firstPurchasedAt || purchase.purchasedAt || null,
-          lastPurchasedAt: purchase.lastPurchasedAt || purchase.purchasedAt || null,
+          firstPurchasedAt:
+            purchase.firstPurchasedAt || purchase.purchasedAt || null,
+          lastPurchasedAt:
+            purchase.lastPurchasedAt || purchase.purchasedAt || null,
         },
       }
     })
@@ -514,15 +567,35 @@ function shopPurchasesRecordToRows(
 
 type ActivityBuckets = Pick<
   UserStateData,
-  'battleResults' | 'locationEncounterResults' | 'researchEncounterResults' | 'expeditionResults'
+  | 'battleResults'
+  | 'locationEncounterResults'
+  | 'gameResults'
+  | 'fieldResearchResults'
+  | 'expeditionResults'
 >
 
 export function activityRowsToArrays(rows: any[]): ActivityBuckets {
+  const fieldResearchIds = new Set(fieldResearchGames.map((entry) => entry.id))
   const rowsForType = (activityType: string) =>
     rows.filter((row) => row.activityType === activityType)
 
-  const mapRows = (activityType: string, idKey: string): any[] =>
-    rowsForType(activityType).map((row) => {
+  const rowsForSplitDomain = (activityType: 'game' | 'field-research') => {
+    const canonicalRows = rowsForType(activityType)
+    const canonicalIds = new Set(
+      canonicalRows.map((row) => String(row.activityId)),
+    )
+    const legacyRows = rowsForType('research').filter((row) => {
+      const activityId = String(row.activityId)
+      if (canonicalIds.has(activityId)) return false
+      return activityType === 'field-research'
+        ? fieldResearchIds.has(activityId)
+        : !fieldResearchIds.has(activityId)
+    })
+    return [...canonicalRows, ...legacyRows]
+  }
+
+  const mapRows = (sourceRows: any[], idKey: string): any[] =>
+    sourceRows.map((row) => {
       return {
         [idKey]: String(row.activityId),
         wins: toNumber(row.wins),
@@ -534,18 +607,26 @@ export function activityRowsToArrays(rows: any[]): ActivityBuckets {
     })
 
   return {
-    battleResults: mapRows('battle', 'battleId') as ActivityBuckets['battleResults'],
+    battleResults: mapRows(
+      rowsForType('battle'),
+      'battleId',
+    ) as ActivityBuckets['battleResults'],
     locationEncounterResults: mapRows(
-      'location',
+      rowsForType('location'),
       'locationId',
     ) as ActivityBuckets['locationEncounterResults'],
-    researchEncounterResults: mapRows(
-      'research',
-      'encounterId',
-    ) as ActivityBuckets['researchEncounterResults'],
-    expeditionResults: mapRows('expedition', 'expeditionId') as NonNullable<
-      ActivityBuckets['expeditionResults']
-    >,
+    gameResults: mapRows(
+      rowsForSplitDomain('game'),
+      'gameId',
+    ) as ActivityBuckets['gameResults'],
+    fieldResearchResults: mapRows(
+      rowsForSplitDomain('field-research'),
+      'fieldResearchId',
+    ) as ActivityBuckets['fieldResearchResults'],
+    expeditionResults: mapRows(
+      rowsForType('expedition'),
+      'expeditionId',
+    ) as NonNullable<ActivityBuckets['expeditionResults']>,
   }
 }
 
@@ -553,7 +634,8 @@ export function activityRowsToMap(rows: any[]): ActivityStatsMap {
   const map: ActivityStatsMap = {
     battles: {},
     locations: {},
-    research: {},
+    games: {},
+    fieldResearch: {},
     expeditions: {},
   }
 
@@ -572,7 +654,18 @@ export function activityRowsToMap(rows: any[]): ActivityStatsMap {
 
     if (row.activityType === 'battle') map.battles![activityId] = entry
     if (row.activityType === 'location') map.locations![activityId] = entry
-    if (row.activityType === 'research') map.research![activityId] = entry
+    if (row.activityType === 'game') map.games![activityId] = entry
+    if (row.activityType === 'field-research')
+      map.fieldResearch![activityId] = entry
+    if (row.activityType === 'research') {
+      if (fieldResearchGames.some((game) => game.id === activityId)) {
+        if (!map.fieldResearch![activityId]) {
+          map.fieldResearch![activityId] = entry
+        }
+      } else if (!map.games![activityId]) {
+        map.games![activityId] = entry
+      }
+    }
     if (row.activityType === 'expedition') map.expeditions![activityId] = entry
   }
 
@@ -590,9 +683,11 @@ function activityMapToRows(
       ? 'battles'
       : domain === 'locationEncounterResults'
         ? 'locations'
-        : domain === 'researchEncounterResults'
-          ? 'research'
-          : 'expeditions'
+        : domain === 'gameResults'
+          ? 'games'
+          : domain === 'fieldResearchResults'
+            ? 'fieldResearch'
+            : 'expeditions'
   const source = isObjectRecord(stats[sourceKey]) ? stats[sourceKey] : {}
 
   return Object.entries(source)
@@ -609,7 +704,10 @@ function activityMapToRows(
         metadata: isObjectRecord(entry.metadata) ? entry.metadata : {},
       },
     }))
-    .filter(({ data }) => data.wins || data.losses || data.highScore || data.lastPlayed)
+    .filter(
+      ({ data }) =>
+        data.wins || data.losses || data.highScore || data.lastPlayed,
+    )
 }
 
 export async function getUserInventoryMap(
@@ -617,7 +715,9 @@ export async function getUserInventoryMap(
   userId: string,
 ): Promise<InventoryMap> {
   return inventoryArrayToMap(
-    inventoryRowsToArray(await findRows(payload, USER_STATE_COLLECTIONS.inventory, userId)),
+    inventoryRowsToArray(
+      await findRows(payload, USER_STATE_COLLECTIONS.inventory, userId),
+    ),
   )
 }
 
@@ -635,8 +735,13 @@ export async function setUserInventoryMap(
   )
 }
 
-export async function getUserTcgMap(payload: PayloadLike, userId: string): Promise<TcgMap> {
-  return tcgArrayToMap(tcgRowsToArray(await findRows(payload, USER_STATE_COLLECTIONS.tcg, userId)))
+export async function getUserTcgMap(
+  payload: PayloadLike,
+  userId: string,
+): Promise<TcgMap> {
+  return tcgArrayToMap(
+    tcgRowsToArray(await findRows(payload, USER_STATE_COLLECTIONS.tcg, userId)),
+  )
 }
 
 export async function setUserTcgMap(
@@ -653,9 +758,14 @@ export async function setUserTcgMap(
   )
 }
 
-export async function getUserPokedexMap(payload: PayloadLike, userId: string): Promise<PokedexMap> {
+export async function getUserPokedexMap(
+  payload: PayloadLike,
+  userId: string,
+): Promise<PokedexMap> {
   return pokedexArrayToMap(
-    pokedexRowsToArray(await findRows(payload, USER_STATE_COLLECTIONS.pokedex, userId)),
+    pokedexRowsToArray(
+      await findRows(payload, USER_STATE_COLLECTIONS.pokedex, userId),
+    ),
   )
 }
 
@@ -664,7 +774,9 @@ export async function getUserAbilityDexMap(
   userId: string,
 ): Promise<AbilityDexMap> {
   return abilityDexArrayToMap(
-    abilityDexRowsToArray(await findRows(payload, USER_STATE_COLLECTIONS.abilityDex, userId)),
+    abilityDexRowsToArray(
+      await findRows(payload, USER_STATE_COLLECTIONS.abilityDex, userId),
+    ),
   )
 }
 
@@ -701,7 +813,9 @@ export async function getUserCompletedTasksMap(
   userId: string,
 ): Promise<CompletedTasksMap> {
   return completedTasksArrayToMap(
-    taskRowsToArray(await findRows(payload, USER_STATE_COLLECTIONS.tasks, userId)),
+    taskRowsToArray(
+      await findRows(payload, USER_STATE_COLLECTIONS.tasks, userId),
+    ),
   )
 }
 
@@ -747,11 +861,28 @@ export async function getUserActivityStatsMap(
   userId: string,
   domains?: Array<keyof typeof ACTIVITY_TYPES>,
 ): Promise<ActivityStatsMap> {
-  const activityTypes = domains?.map((domain) => ACTIVITY_TYPES[domain]) || []
-  const extraWhere = activityTypes.length > 0 ? [{ activityType: { in: activityTypes } }] : []
+  const activityTypes = new Set<string>(
+    domains?.map((domain) => ACTIVITY_TYPES[domain]) || [],
+  )
+  if (
+    domains?.some(
+      (domain) => domain === 'gameResults' || domain === 'fieldResearchResults',
+    )
+  ) {
+    activityTypes.add('research')
+  }
+  const extraWhere =
+    activityTypes.size > 0
+      ? [{ activityType: { in: Array.from(activityTypes) } }]
+      : []
 
   return activityRowsToMap(
-    await findRows(payload, USER_STATE_COLLECTIONS.activityStats, userId, extraWhere),
+    await findRows(
+      payload,
+      USER_STATE_COLLECTIONS.activityStats,
+      userId,
+      extraWhere,
+    ),
   )
 }
 
@@ -762,7 +893,8 @@ export async function setUserActivityStatsMap(
   domains: Array<keyof typeof ACTIVITY_TYPES> = [
     'battleResults',
     'locationEncounterResults',
-    'researchEncounterResults',
+    'gameResults',
+    'fieldResearchResults',
     'expeditionResults',
   ],
 ): Promise<UserStateSyncSummary> {
@@ -801,10 +933,15 @@ export async function incrementUserActivityResult(
 ): Promise<ActivityStatEntry> {
   const activityType = ACTIVITY_TYPES[domain]
   const now = new Date().toISOString()
-  const existingRows = await findRows(payload, USER_STATE_COLLECTIONS.activityStats, userId, [
-    { activityType: { equals: activityType } },
-    { activityId: { equals: activityId } },
-  ])
+  const existingRows = await findRows(
+    payload,
+    USER_STATE_COLLECTIONS.activityStats,
+    userId,
+    [
+      { activityType: { equals: activityType } },
+      { activityId: { equals: activityId } },
+    ],
+  )
   const existing = existingRows[0]
   const existingHighScore = toOptionalNumber(existing?.highScore)
   const nextHighScore =
@@ -859,7 +996,8 @@ export async function getUserStateData(
   const shouldFetchActivityStats =
     hasRequiredKey(requiredData, 'battleResults') ||
     hasRequiredKey(requiredData, 'locationEncounterResults') ||
-    hasRequiredKey(requiredData, 'researchEncounterResults') ||
+    hasRequiredKey(requiredData, 'gameResults') ||
+    hasRequiredKey(requiredData, 'fieldResearchResults') ||
     hasRequiredKey(requiredData, 'expeditionResults')
 
   const [
@@ -897,19 +1035,33 @@ export async function getUserStateData(
   const rowStats = activityRowsToArrays(activityRows)
 
   return {
-    inventory: hasRequiredKey(requiredData, 'inventory') ? inventoryRowsToArray(inventoryRows) : [],
+    inventory: hasRequiredKey(requiredData, 'inventory')
+      ? inventoryRowsToArray(inventoryRows)
+      : [],
     tcg: hasRequiredKey(requiredData, 'tcg') ? tcgRowsToArray(tcgRows) : [],
-    pokedex: hasRequiredKey(requiredData, 'pokedex') ? pokedexRowsToArray(pokedexRows) : [],
+    pokedex: hasRequiredKey(requiredData, 'pokedex')
+      ? pokedexRowsToArray(pokedexRows)
+      : [],
     abilityDex: hasRequiredKey(requiredData, 'abilityDex')
       ? abilityDexRowsToArray(abilityDexRows)
       : [],
-    completedTasks: hasRequiredKey(requiredData, 'completedTasks') ? taskRowsToArray(taskRows) : [],
-    battleResults: hasRequiredKey(requiredData, 'battleResults') ? rowStats.battleResults : [],
-    locationEncounterResults: hasRequiredKey(requiredData, 'locationEncounterResults')
+    completedTasks: hasRequiredKey(requiredData, 'completedTasks')
+      ? taskRowsToArray(taskRows)
+      : [],
+    battleResults: hasRequiredKey(requiredData, 'battleResults')
+      ? rowStats.battleResults
+      : [],
+    locationEncounterResults: hasRequiredKey(
+      requiredData,
+      'locationEncounterResults',
+    )
       ? rowStats.locationEncounterResults
       : [],
-    researchEncounterResults: hasRequiredKey(requiredData, 'researchEncounterResults')
-      ? rowStats.researchEncounterResults
+    gameResults: hasRequiredKey(requiredData, 'gameResults')
+      ? rowStats.gameResults
+      : [],
+    fieldResearchResults: hasRequiredKey(requiredData, 'fieldResearchResults')
+      ? rowStats.fieldResearchResults
       : [],
     expeditionResults: hasRequiredKey(requiredData, 'expeditionResults')
       ? rowStats.expeditionResults
@@ -940,8 +1092,15 @@ async function replaceRowsForUser(
     extraWhere?: Record<string, unknown>[]
   } = {},
 ): Promise<UserStateSyncSummary> {
-  const existingRows = await findRows(payload, collection, userId, options.extraWhere)
-  const existingByKey = new Map(existingRows.map((row) => [getExistingKey(row), row]))
+  const existingRows = await findRows(
+    payload,
+    collection,
+    userId,
+    options.extraWhere,
+  )
+  const existingByKey = new Map(
+    existingRows.map((row) => [getExistingKey(row), row]),
+  )
   const wantedByKey = new Map(rows.map((row) => [row.key, row.data]))
   const summary: UserStateSyncSummary = { created: 0, updated: 0, deleted: 0 }
 

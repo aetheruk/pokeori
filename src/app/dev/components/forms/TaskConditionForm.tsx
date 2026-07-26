@@ -1,7 +1,12 @@
 'use client'
 
 import * as React from 'react'
-import { TaskCondition, TaskRequirementType, PokemonCriteria, BattleTeamCheck } from '@/data/types'
+import {
+  TaskCondition,
+  TaskRequirementType,
+  PokemonCriteria,
+  BattleTeamCheck,
+} from '@/data/types'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
@@ -32,7 +37,8 @@ import {
   getTcgCardList,
   getBattleList,
   getLocationList,
-  getResearchList,
+  getGameList,
+  getFieldResearchList,
   getExpeditionList,
   getPokemonTypeList,
 } from '../../actions'
@@ -61,7 +67,8 @@ const REQUIREMENT_TYPES: TaskRequirementType[] = [
   'date_range',
   'battle_result',
   'location_encounter_result',
-  'research_encounter_result',
+  'game_result',
+  'field_research_result',
   'expedition_result',
   'power_usage',
   'total_evolutions',
@@ -77,17 +84,27 @@ const REQUIREMENT_TYPES: TaskRequirementType[] = [
   'weather',
 ]
 
-export function TaskConditionForm({ condition, onChange, onRemove }: TaskConditionFormProps) {
+export function TaskConditionForm({
+  condition,
+  onChange,
+  onRemove,
+}: TaskConditionFormProps) {
   const handleChange = (field: keyof TaskCondition, value: any) => {
     onChange({ ...condition, [field]: value })
   }
 
-  const handlePokemonCriteriaChange = (field: keyof PokemonCriteria, value: any) => {
+  const handlePokemonCriteriaChange = (
+    field: keyof PokemonCriteria,
+    value: any,
+  ) => {
     const newCriteria = { ...condition.pokemonCriteria, [field]: value }
     handleChange('pokemonCriteria', newCriteria)
   }
 
-  const handleCompanionCheckChange = (field: keyof PokemonCriteria, value: any) => {
+  const handleCompanionCheckChange = (
+    field: keyof PokemonCriteria,
+    value: any,
+  ) => {
     const newCriteria = { ...condition.companionCheck, [field]: value }
     handleChange('companionCheck', newCriteria)
   }
@@ -106,7 +123,10 @@ export function TaskConditionForm({ condition, onChange, onRemove }: TaskConditi
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>Type</Label>
-            <Select value={condition.type} onValueChange={(v) => handleChange('type', v)}>
+            <Select
+              value={condition.type}
+              onValueChange={(v) => handleChange('type', v)}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
@@ -213,7 +233,8 @@ export function TaskConditionForm({ condition, onChange, onRemove }: TaskConditi
               />
             </div>
           )}
-          {(condition.type === 'user_level' || condition.type === 'skill_level') && (
+          {(condition.type === 'user_level' ||
+            condition.type === 'skill_level') && (
             <div className="space-y-2">
               <Label>Skill</Label>
               <DataSelector
@@ -268,14 +289,25 @@ export function TaskConditionForm({ condition, onChange, onRemove }: TaskConditi
               />
             </div>
           )}
-          {condition.type === 'research_encounter_result' && (
+          {condition.type === 'game_result' && (
             <div className="space-y-2">
-              <Label>Research</Label>
+              <Label>Mini Game</Label>
               <DataSelector
                 value={String(condition.targetId || '')}
                 onSelect={(id) => handleChange('targetId', id)}
-                fetcher={getResearchList}
-                placeholder="Select Research (Leave empty for any)"
+                fetcher={getGameList}
+                placeholder="Select Mini Game (Leave empty for any)"
+              />
+            </div>
+          )}
+          {condition.type === 'field_research_result' && (
+            <div className="space-y-2">
+              <Label>Field Research</Label>
+              <DataSelector
+                value={String(condition.targetId || '')}
+                onSelect={(id) => handleChange('targetId', id)}
+                fetcher={getFieldResearchList}
+                placeholder="Select Field Research (Leave empty for any)"
               />
             </div>
           )}
@@ -304,7 +336,9 @@ export function TaskConditionForm({ condition, onChange, onRemove }: TaskConditi
               <Input
                 type="number"
                 value={condition.level || ''}
-                onChange={(e) => handleChange('level', parseInt(e.target.value))}
+                onChange={(e) =>
+                  handleChange('level', parseInt(e.target.value))
+                }
                 placeholder="Minimum level (e.g. 3)"
               />
             </div>
@@ -394,13 +428,19 @@ export function TaskConditionForm({ condition, onChange, onRemove }: TaskConditi
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {['tera', 'mega', 'z-move', 'dynamax', 'shout', 'victory', 'circadian'].map(
-                    (t) => (
-                      <SelectItem key={t} value={t}>
-                        {t}
-                      </SelectItem>
-                    ),
-                  )}
+                  {[
+                    'tera',
+                    'mega',
+                    'z-move',
+                    'dynamax',
+                    'shout',
+                    'victory',
+                    'circadian',
+                  ].map((t) => (
+                    <SelectItem key={t} value={t}>
+                      {t}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -483,7 +523,8 @@ export function TaskConditionForm({ condition, onChange, onRemove }: TaskConditi
         </div>
 
         {/* Pokemon Criteria Builder */}
-        {(condition.type === 'pokemon_owned' || condition.type === 'location_encounter_result') && (
+        {(condition.type === 'pokemon_owned' ||
+          condition.type === 'location_encounter_result') && (
           <div className="border p-4 rounded-md space-y-4">
             <Label className="font-semibold">Pokemon Criteria</Label>
             <div className="grid grid-cols-2 gap-4">
@@ -491,7 +532,9 @@ export function TaskConditionForm({ condition, onChange, onRemove }: TaskConditi
                 <Label>Species</Label>
                 <PokemonSelector
                   value={condition.pokemonCriteria?.speciesId}
-                  onSelect={(id) => handlePokemonCriteriaChange('speciesId', id)}
+                  onSelect={(id) =>
+                    handlePokemonCriteriaChange('speciesId', id)
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -534,7 +577,10 @@ export function TaskConditionForm({ condition, onChange, onRemove }: TaskConditi
                   type="number"
                   value={condition.pokemonCriteria?.minLevel ?? ''}
                   onChange={(e) =>
-                    handlePokemonCriteriaChange('minLevel', parseInt(e.target.value))
+                    handlePokemonCriteriaChange(
+                      'minLevel',
+                      parseInt(e.target.value),
+                    )
                   }
                 />
               </div>
@@ -544,7 +590,10 @@ export function TaskConditionForm({ condition, onChange, onRemove }: TaskConditi
                   type="number"
                   value={condition.pokemonCriteria?.maxLevel ?? ''}
                   onChange={(e) =>
-                    handlePokemonCriteriaChange('maxLevel', parseInt(e.target.value))
+                    handlePokemonCriteriaChange(
+                      'maxLevel',
+                      parseInt(e.target.value),
+                    )
                   }
                 />
               </div>
@@ -553,7 +602,9 @@ export function TaskConditionForm({ condition, onChange, onRemove }: TaskConditi
                 <Switch
                   id="shiny"
                   checked={condition.pokemonCriteria?.shiny}
-                  onCheckedChange={(c) => handlePokemonCriteriaChange('shiny', c)}
+                  onCheckedChange={(c) =>
+                    handlePokemonCriteriaChange('shiny', c)
+                  }
                 />
                 <Label htmlFor="shiny">Shiny</Label>
               </div>
@@ -561,7 +612,9 @@ export function TaskConditionForm({ condition, onChange, onRemove }: TaskConditi
                 <Switch
                   id="shadow-criteria"
                   checked={condition.pokemonCriteria?.isShadow}
-                  onCheckedChange={(c) => handlePokemonCriteriaChange('isShadow', c)}
+                  onCheckedChange={(c) =>
+                    handlePokemonCriteriaChange('isShadow', c)
+                  }
                 />
                 <Label htmlFor="shadow-criteria">Shadow</Label>
               </div>
@@ -569,7 +622,9 @@ export function TaskConditionForm({ condition, onChange, onRemove }: TaskConditi
                 <Switch
                   id="radiant-criteria"
                   checked={condition.pokemonCriteria?.isRadiant}
-                  onCheckedChange={(c) => handlePokemonCriteriaChange('isRadiant', c)}
+                  onCheckedChange={(c) =>
+                    handlePokemonCriteriaChange('isRadiant', c)
+                  }
                 />
                 <Label htmlFor="radiant-criteria">Radiant</Label>
               </div>
@@ -628,7 +683,12 @@ export function TaskConditionForm({ condition, onChange, onRemove }: TaskConditi
                 <Input
                   type="number"
                   value={condition.companionCheck?.minLevel ?? ''}
-                  onChange={(e) => handleCompanionCheckChange('minLevel', parseInt(e.target.value))}
+                  onChange={(e) =>
+                    handleCompanionCheckChange(
+                      'minLevel',
+                      parseInt(e.target.value),
+                    )
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -636,7 +696,12 @@ export function TaskConditionForm({ condition, onChange, onRemove }: TaskConditi
                 <Input
                   type="number"
                   value={condition.companionCheck?.maxLevel ?? ''}
-                  onChange={(e) => handleCompanionCheckChange('maxLevel', parseInt(e.target.value))}
+                  onChange={(e) =>
+                    handleCompanionCheckChange(
+                      'maxLevel',
+                      parseInt(e.target.value),
+                    )
+                  }
                 />
               </div>
 
@@ -644,7 +709,9 @@ export function TaskConditionForm({ condition, onChange, onRemove }: TaskConditi
                 <Switch
                   id="shiny-companion"
                   checked={condition.companionCheck?.shiny}
-                  onCheckedChange={(c) => handleCompanionCheckChange('shiny', c)}
+                  onCheckedChange={(c) =>
+                    handleCompanionCheckChange('shiny', c)
+                  }
                 />
                 <Label htmlFor="shiny-companion">Shiny</Label>
               </div>
@@ -652,7 +719,9 @@ export function TaskConditionForm({ condition, onChange, onRemove }: TaskConditi
                 <Switch
                   id="shadow-companion"
                   checked={condition.companionCheck?.isShadow}
-                  onCheckedChange={(c) => handleCompanionCheckChange('isShadow', c)}
+                  onCheckedChange={(c) =>
+                    handleCompanionCheckChange('isShadow', c)
+                  }
                 />
                 <Label htmlFor="shadow-companion">Shadow</Label>
               </div>
@@ -660,7 +729,9 @@ export function TaskConditionForm({ condition, onChange, onRemove }: TaskConditi
                 <Switch
                   id="radiant-companion"
                   checked={condition.companionCheck?.isRadiant}
-                  onCheckedChange={(c) => handleCompanionCheckChange('isRadiant', c)}
+                  onCheckedChange={(c) =>
+                    handleCompanionCheckChange('isRadiant', c)
+                  }
                 />
                 <Label htmlFor="radiant-companion">Radiant</Label>
               </div>

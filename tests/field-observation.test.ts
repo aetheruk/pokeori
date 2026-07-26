@@ -147,7 +147,8 @@ describe('field observation research mode', () => {
       completedTasks: [],
       battleResults: [],
       locationEncounterResults: [],
-      researchEncounterResults: [],
+      gameResults: [],
+      fieldResearchResults: [],
       user: {},
     } as any
 
@@ -242,7 +243,8 @@ describe('field observation research mode', () => {
       completedTasks: [],
       battleResults: [],
       locationEncounterResults: [],
-      researchEncounterResults: [],
+      gameResults: [],
+      fieldResearchResults: [],
       user: {},
     } as any
     const route24CharredWoodDrop = {
@@ -331,7 +333,8 @@ describe('field observation research mode', () => {
       completedTasks: [],
       battleResults: [],
       locationEncounterResults: [],
-      researchEncounterResults: [],
+      gameResults: [],
+      fieldResearchResults: [],
       user: {},
     } as any
     const viridianForestStudy = fieldObservationGames.find(
@@ -448,7 +451,8 @@ describe('field observation research mode', () => {
       completedTasks: [],
       battleResults: [],
       locationEncounterResults: [],
-      researchEncounterResults: [],
+      gameResults: [],
+      fieldResearchResults: [],
       user: {},
     } as any
     const escapeRopeDrop = fieldObservationGlobalItemEvents.find(

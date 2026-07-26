@@ -87,7 +87,7 @@ export const ceruleanCityrhythmEntries: RhythmConfig[] = [
     background: '/backgrounds/inside-house.avif',
     requirements: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'razz-berry-crushing',
         battleStatus: 'win',
         count: 20,

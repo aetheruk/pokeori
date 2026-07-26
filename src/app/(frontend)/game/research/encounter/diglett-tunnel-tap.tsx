@@ -13,7 +13,10 @@ import type { DiglettTunnelTapGameConfig } from '@/data/games/diglett-tunnel-tap
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
-import { completeResearchEncounter, startResearchEncounter } from '../actions'
+import {
+  completeGame as completeGameActivity,
+  startGame,
+} from '@/app/(frontend)/game/games/actions'
 
 interface DiglettTunnelTapGameProps {
   encounter: DiglettTunnelTapGameConfig & { isEligibleForReplay?: boolean }
@@ -63,7 +66,7 @@ export function DiglettTunnelTapGame({
       setGameEnded(true)
       setActiveMole(null)
 
-      const completion = await completeResearchEncounter(encounter.id, success)
+      const completion = await completeGameActivity(encounter.id, success)
       const finalSuccess = success && completion.success
       setResult({
         success: finalSuccess,
@@ -76,7 +79,7 @@ export function DiglettTunnelTapGame({
   )
 
   const initGame = useCallback(async () => {
-    const start = await startResearchEncounter(encounter.id)
+    const start = await startGame(encounter.id)
     if (!start.success) {
       setResult({
         success: false,
@@ -300,10 +303,7 @@ export function DiglettTunnelTapGame({
               <Button
                 size="lg"
                 onClick={async () => {
-                  const replay = await startResearchEncounter(
-                    encounter.id,
-                    true,
-                  )
+                  const replay = await startGame(encounter.id, true)
                   if (replay.success) window.location.reload()
                   else router.push('/game/explore')
                 }}

@@ -21,10 +21,10 @@ Complete documentation for all game features in Pokeori.
 | `/game/pokedex/*` | Pokedex viewer |
 | `/game/pokemon/*` | Pokemon collection management |
 | `/game/games/*` | Mini-games |
+| `/game/field-research` | Field Research |
 | `/game/tcg/*` | TCG collection |
 | `/game/explore/*` | Exploration/mining |
 | `/game/explore/*` | Expeditions |
 | `/game/voyages/*` | Voyage system |
-| `/game/research/*` | Tasks/research |
 | `/game/inventory/*` | Item inventory |
 | `/game` | Trainer profile, social tools, high scores, TCG decks, and collection hub |

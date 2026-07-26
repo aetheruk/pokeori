@@ -25,7 +25,7 @@ import { ItemSprite } from '@/components/ui/item-sprite'
 import { useAudio } from '@/context/AudioContext'
 import { cn } from '@/lib/utils'
 import { useUser } from '@/context/UserContext'
-import type { ResearchConfig } from '@/data/games'
+import type { GameItem } from '@/data/games'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { getFieldObservationPokemonSpriteSources } from '@/utilities/pokemon/local-sprites'
 import type {
@@ -35,16 +35,16 @@ import type {
   FieldObservationSpawn,
 } from '@/utilities/research/field-observation'
 import {
-  collectFieldObservationDrop,
-  completeResearchEncounter,
-  startResearchEncounter,
-  submitResearchAnswer,
-} from '../actions'
+  collectFieldResearchDrop,
+  completeFieldResearch,
+  startFieldResearch,
+  submitFieldResearchAnswer,
+} from '@/app/(frontend)/game/field-research/actions'
 
 const PROFESSOR_OAK_SPRITE = '/sprites/trainers/special/oak.avif'
 
 interface FieldObservationGameProps {
-  encounter: ResearchConfig
+  encounter: GameItem
   initialState?: any
 }
 
@@ -101,10 +101,7 @@ export function FieldObservationGame({
     async (didWin: boolean, message: string) => {
       if (result) return
       playSfx(didWin ? 'good' : 'bad')
-      const completeResult = await completeResearchEncounter(
-        encounter.id,
-        didWin,
-      )
+      const completeResult = await completeFieldResearch(encounter.id, didWin)
       const accepted = didWin && completeResult.success
       setResult({
         success: accepted,
@@ -153,7 +150,7 @@ export function FieldObservationGame({
     if (collectedDropIds.has(drop.id) || phase !== 'observing') return
     playSfx('good')
     setCollectedDropIds((previous) => new Set(previous).add(drop.id))
-    const result = await collectFieldObservationDrop(drop.id)
+    const result = await collectFieldResearchDrop(drop.id)
     if (!result.success) {
       const elapsed = Date.now() - startTime
       if (
@@ -174,7 +171,7 @@ export function FieldObservationGame({
     setSelectedOption(optionId)
     setIsSubmitting(true)
 
-    const submitResult = await submitResearchAnswer(optionId)
+    const submitResult = await submitFieldResearchAnswer(optionId)
     if (!submitResult.success && submitResult.error) {
       setIsSubmitting(false)
       return
@@ -193,7 +190,7 @@ export function FieldObservationGame({
     setSelectedOption('count-survey')
     setIsSubmitting(true)
 
-    const submitResult = await submitResearchAnswer({
+    const submitResult = await submitFieldResearchAnswer({
       type: 'count-survey',
       counts: countReport,
     })
@@ -345,7 +342,9 @@ export function FieldObservationGame({
                               variant="outline"
                               disabled={isSubmitting || !!result}
                               aria-pressed={selectedOption === option.id}
-                              aria-busy={selectedOption === option.id && isSubmitting}
+                              aria-busy={
+                                selectedOption === option.id && isSubmitting
+                              }
                               onClick={() => handleAnswer(option.id)}
                               className={cn(
                                 'min-h-12 justify-start gap-3 whitespace-normal border border-game-border bg-game-surface-raised px-3 py-2 text-left text-[#293532] shadow-sm hover:border-game-moss/40 hover:bg-game-moss/5 disabled:text-game-muted',
@@ -405,10 +404,7 @@ export function FieldObservationGame({
               <Button
                 size="lg"
                 onClick={async () => {
-                  const replay = await startResearchEncounter(
-                    encounter.id,
-                    true,
-                  )
+                  const replay = await startFieldResearch(encounter.id, true)
                   if (replay?.success) window.location.reload()
                   else router.push('/game/explore')
                 }}

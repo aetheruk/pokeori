@@ -11,20 +11,20 @@ import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverla
 import { Button } from '@/components/ui/button'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useAudio } from '@/context/AudioContext'
-import type { ResearchConfig } from '@/data/games'
+import type { GameItem } from '@/data/games'
 import pokemonData from '@/data/pokemon-data'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import {
-  completeResearchEncounter,
-  startResearchEncounter,
-  submitResearchAnswer,
-} from '../actions'
+  completeGame,
+  startGame,
+  submitGameAnswer,
+} from '@/app/(frontend)/game/games/actions'
 
 interface WhosThatPokemonGameProps {
-  encounter: ResearchConfig
-  initialState?: any // Using any to avoid type circular dep for now, or define ResearchState path
+  encounter: GameItem
+  initialState?: any // Using any to avoid type circular dep for now, or define GameState path
 }
 
 type SpeechRecognitionResultLike = ArrayLike<{ transcript: string }>
@@ -135,7 +135,7 @@ export function WhosThatPokemonGame({
     if (gameStarted) return
 
     // Start or get existing session
-    const result = await startResearchEncounter(encounter.id)
+    const result = await startGame(encounter.id)
 
     if (!result.success) {
       console.error('Failed to start encounter:', result.error)
@@ -187,7 +187,7 @@ export function WhosThatPokemonGame({
         if (prev <= 1) {
           setGameEnded(true)
           // Record failure on server
-          completeResearchEncounter(encounter.id, false).then(() => {
+          completeGame(encounter.id, false).then(() => {
             setResult({
               success: false,
               message: 'Time is up!',
@@ -317,7 +317,7 @@ export function WhosThatPokemonGame({
 
       let result: any
       try {
-        result = await submitResearchAnswer(currentPokemon)
+        result = await submitGameAnswer(currentPokemon)
       } catch {
         setSubmittedRoundKey(null)
         submittedRoundKeyRef.current = null
@@ -363,7 +363,7 @@ export function WhosThatPokemonGame({
         // Check win condition
         if (result.gameOver) {
           // Completed
-          const completeResult = await completeResearchEncounter(
+          const completeResult = await completeGame(
             encounter.id,
             result.wins >= (result.requiredWins || 5),
           )
@@ -699,7 +699,7 @@ export function WhosThatPokemonGame({
                 size="lg"
                 onClick={async () => {
                   try {
-                    const res = await startResearchEncounter(
+                    const res = await startGame(
                       (initialState?.encounter || encounter).id,
                       true,
                     )

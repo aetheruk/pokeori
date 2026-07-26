@@ -104,7 +104,8 @@ export const UserPokedexEntries: CollectionConfig = {
       type: 'json',
       defaultValue: [],
       admin: {
-        description: 'Canonical rarity treatments obtained for this Pokemon form.',
+        description:
+          'Canonical rarity treatments obtained for this Pokemon form.',
       },
     },
     {
@@ -227,7 +228,9 @@ export const UserActivityStats: CollectionConfig = {
       index: true,
       options: [
         { label: 'Battle', value: 'battle' },
-        { label: 'Research', value: 'research' },
+        { label: 'Mini Game', value: 'game' },
+        { label: 'Field Research', value: 'field-research' },
+        { label: 'Legacy Research', value: 'research' },
         { label: 'Location', value: 'location' },
         { label: 'Expedition', value: 'expedition' },
       ],
@@ -358,7 +361,13 @@ export const UserEggs: CollectionConfig = {
   admin: { useAsTitle: 'id' },
   access: serverOwnedAccess,
   fields: [
-    { name: 'user', type: 'relationship', relationTo: 'users', required: true, index: true },
+    {
+      name: 'user',
+      type: 'relationship',
+      relationTo: 'users',
+      required: true,
+      index: true,
+    },
     { name: 'foundAt', type: 'date', required: true, index: true },
     { name: 'hatchAt', type: 'date', required: true, index: true },
     { name: 'sourceResearchId', type: 'text', index: true },
@@ -372,7 +381,17 @@ export const UserEggs: CollectionConfig = {
       defaultValue: 'normal',
       options: POKEMON_RARITY_OPTIONS,
     },
-    { name: 'status', type: 'select', required: true, defaultValue: 'incubating', index: true, options: [{ label: 'Incubating', value: 'incubating' }, { label: 'Hatched', value: 'hatched' }] },
+    {
+      name: 'status',
+      type: 'select',
+      required: true,
+      defaultValue: 'incubating',
+      index: true,
+      options: [
+        { label: 'Incubating', value: 'incubating' },
+        { label: 'Hatched', value: 'hatched' },
+      ],
+    },
     { name: 'hatchedPokemonId', type: 'text' },
     { name: 'hatchPoolId', type: 'text' },
   ],

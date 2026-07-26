@@ -23,7 +23,7 @@ import {
   ART_ACADEMY_SCORE_GRID_SIZE,
   scoreArtAcademyDrawing,
 } from '@/utilities/research/art-academy'
-import { completeResearchEncounter, startResearchEncounter } from '../actions'
+import { completeGame, startGame } from '@/app/(frontend)/game/games/actions'
 
 interface ArtAcademyGameProps {
   encounter: ArtAcademyGameConfig & { isEligibleForReplay?: boolean }
@@ -378,7 +378,7 @@ export function ArtAcademyGame({
       return
     }
 
-    const completion = await completeResearchEncounter(
+    const completion = await completeGame(
       encounter.id,
       false,
       undefined,
@@ -411,7 +411,7 @@ export function ArtAcademyGame({
   ])
 
   const beginGame = useCallback(async () => {
-    const start = await startResearchEncounter(encounter.id)
+    const start = await startGame(encounter.id)
     if (!start.success) {
       setResult({
         success: false,
@@ -696,10 +696,7 @@ export function ArtAcademyGame({
                 size="lg"
                 className="w-full"
                 onClick={async () => {
-                  const replay = await startResearchEncounter(
-                    encounter.id,
-                    true,
-                  )
+                  const replay = await startGame(encounter.id, true)
                   if (replay.success) window.location.reload()
                 }}
               >

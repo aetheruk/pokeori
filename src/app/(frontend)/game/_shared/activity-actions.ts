@@ -1,5 +1,7 @@
 'use server'
 
+// Shared server runtime for Mini Games and Field Research.
+
 import { allGames, GameType } from '@/data/games'
 import { ABILITIES, type AbilityConfig } from '@/data/abilities'
 import {
@@ -107,6 +109,11 @@ import {
   shouldApplyResearchAnswerGrace,
   shouldProtectFieldObservationRewards,
 } from '@/utilities/pokemon/encounter-ability-runtime'
+import {
+  getGameActivityDomain,
+  getGameActivitySessionKey,
+  type GameActivityDomain,
+} from '@/utilities/games/activity-domain'
 
 const DAILY_EXCLUDED_GAME_TYPES = new Set(['slots', 'pachinko', 'prize-wheel'])
 
@@ -121,7 +128,7 @@ export async function getUser(): Promise<User | null> {
   })
   return user as User
 }
-export interface ResearchState {
+export interface GameActivityState {
   userId: string
   encounterId: string
   startTime: number
@@ -161,7 +168,7 @@ export interface ResearchState {
   }
 }
 
-export interface ResearchCompletionResult {
+export interface GameActivityCompletionResult {
   success: boolean
   summary?: any
   expeditionProgress?: ExpeditionProgressSnapshot
@@ -170,15 +177,90 @@ export interface ResearchCompletionResult {
   finalScore?: number
 }
 
+export async function getGameActivityStateForUser(
+  userId: string,
+  domain: GameActivityDomain,
+): Promise<GameActivityState | null> {
+  const sessionKey = getGameActivitySessionKey(userId, domain)
+  const currentState = await redis.get<GameActivityState>(sessionKey)
+  if (currentState) return currentState
+
+  const legacyKey = `research:${userId}`
+  const legacyState = await redis.get<GameActivityState>(legacyKey)
+  if (!legacyState) return null
+
+  const legacyEncounter = allGames.find(
+    (entry) => entry.id === legacyState.encounterId,
+  )
+  if (
+    !legacyEncounter ||
+    getGameActivityDomain(legacyEncounter.gameType) !== domain
+  ) {
+    return null
+  }
+
+  const migrationLock = await acquireActionLock(
+    `lock:activity-session-migration:${userId}`,
+    10,
+  )
+  if (!migrationLock.acquired) {
+    return legacyState
+  }
+
+  try {
+    const stateAfterLock = await redis.get<GameActivityState>(sessionKey)
+    if (stateAfterLock) return stateAfterLock
+
+    const legacyAfterLock = await redis.get<GameActivityState>(legacyKey)
+    if (!legacyAfterLock) return null
+    const encounterAfterLock = allGames.find(
+      (entry) => entry.id === legacyAfterLock.encounterId,
+    )
+    if (
+      !encounterAfterLock ||
+      getGameActivityDomain(encounterAfterLock.gameType) !== domain
+    ) {
+      return null
+    }
+
+    const legacyTtl = await redis.ttl(legacyKey)
+    await redis.set(sessionKey, legacyAfterLock, {
+      ex: legacyTtl > 0 ? legacyTtl : 3600,
+    })
+    await redis.del(legacyKey)
+    return legacyAfterLock
+  } finally {
+    await releaseActionLock(migrationLock)
+  }
+}
+
+export async function setGameActivityStateForUser(
+  userId: string,
+  domain: GameActivityDomain,
+  state: GameActivityState,
+  ttlSeconds: number,
+) {
+  return redis.set(getGameActivitySessionKey(userId, domain), state, {
+    ex: ttlSeconds,
+  })
+}
+
+export async function clearGameActivityStateForUser(
+  userId: string,
+  domain: GameActivityDomain,
+) {
+  return redis.del(getGameActivitySessionKey(userId, domain))
+}
+
 function getResearchStateAbility(
-  state: Pick<ResearchState, 'activeAbilityId'>,
+  state: Pick<GameActivityState, 'activeAbilityId'>,
 ): AbilityConfig | undefined {
   return state.activeAbilityId ? ABILITIES[state.activeAbilityId] : undefined
 }
 
 function getResearchAbilityContext(
   encounter: (typeof allGames)[number],
-  state?: Pick<ResearchState, 'weather'>,
+  state?: Pick<GameActivityState, 'weather'>,
 ) {
   return {
     gameType: encounter.gameType,
@@ -255,8 +337,8 @@ function getResearchSessionTimeLimit(encounter: (typeof allGames)[number]) {
 }
 
 function sanitizeResearchState(
-  state: ResearchState,
-): Omit<ResearchState, 'fieldObservationPrivate' | 'artAcademyPrivate'> {
+  state: GameActivityState,
+): Omit<GameActivityState, 'fieldObservationPrivate' | 'artAcademyPrivate'> {
   const { fieldObservationPrivate, artAcademyPrivate, ...safeState } = state
   void fieldObservationPrivate
   void artAcademyPrivate
@@ -423,7 +505,8 @@ function isSlidingPuzzleMoveValid(
   )
 }
 
-export async function startResearchEncounter(
+export async function startGameActivity(
+  domain: GameActivityDomain,
   encounterId: string,
   forceReset = false,
   consumedPokemonIds?: string[],
@@ -448,7 +531,7 @@ export async function startResearchEncounter(
 
     const rateLimit = await checkActionRateLimit(
       user.id,
-      'research-start',
+      `${domain}-start`,
       30,
       60,
     )
@@ -460,7 +543,7 @@ export async function startResearchEncounter(
     }
 
     const startLock = await acquireActionLock(
-      `lock:research:start:${user.id}:${validatedEncounterId}`,
+      `lock:${domain}:start:${user.id}:${validatedEncounterId}`,
       15,
     )
     if (!startLock.acquired) {
@@ -474,11 +557,15 @@ export async function startResearchEncounter(
       if (!encounter) {
         return { success: false, error: 'Game encounter not found' }
       }
+      if (getGameActivityDomain(encounter.gameType) !== domain) {
+        return {
+          success: false,
+          error: 'Activity belongs to a different game mode',
+        }
+      }
 
       // Check for existing session first
-      const existingState = (await redis.get(
-        `research:${user.id}`,
-      )) as ResearchState | null
+      const existingState = await getGameActivityStateForUser(user.id, domain)
 
       // If a session exists and we aren't forcing a reset, return it
       if (existingState && !validatedForceReset) {
@@ -1043,7 +1130,7 @@ export async function startResearchEncounter(
         // Just placeholder for now
         // Actually completePachinkoDrop will init it if missing?
         // Better to init here
-        const state: ResearchState = {
+        const state: GameActivityState = {
           userId: user.id,
           encounterId: validatedEncounterId,
           startTime,
@@ -1062,9 +1149,12 @@ export async function startResearchEncounter(
             totalCost: 0,
           },
         }
-        await redis.set(`research:${user.id}`, state, {
-          ex: sessionTimeLimit + 120,
-        })
+        await setGameActivityStateForUser(
+          user.id,
+          domain,
+          state,
+          sessionTimeLimit + 120,
+        )
         return {
           success: true,
           startTime,
@@ -1072,7 +1162,7 @@ export async function startResearchEncounter(
         }
       }
 
-      const state: ResearchState = {
+      const state: GameActivityState = {
         userId: user.id,
         encounterId: validatedEncounterId,
         startTime,
@@ -1100,7 +1190,7 @@ export async function startResearchEncounter(
         isEndlessMode || encounter.gameType === 'tcg-battle'
           ? 3600
           : sessionTimeLimit + 120
-      await redis.set(`research:${user.id}`, state, { ex: sessionTTL })
+      await setGameActivityStateForUser(user.id, domain, state, sessionTTL)
 
       return {
         success: true,
@@ -1115,21 +1205,22 @@ export async function startResearchEncounter(
       await releaseActionLock(startLock)
     }
   } catch (error) {
-    console.error('Error starting research encounter:', error)
+    console.error(`Error starting ${domain} activity:`, error)
     return { success: false, error: 'Failed to start encounter' }
   }
 }
 
-export async function submitResearchAnswer(answer: any) {
+export async function submitGameActivityAnswer(
+  domain: GameActivityDomain,
+  answer: any,
+) {
   try {
     const user = await getUser()
     if (!user) {
       return { success: false, error: 'Not authenticated' }
     }
 
-    const state = (await redis.get(
-      `research:${user.id}`,
-    )) as ResearchState | null
+    const state = await getGameActivityStateForUser(user.id, domain)
     if (!state) {
       return {
         success: false,
@@ -1142,6 +1233,12 @@ export async function submitResearchAnswer(answer: any) {
     if (!encounter) {
       return { success: false, error: 'Invalid encounter' }
     }
+    if (getGameActivityDomain(encounter.gameType) !== domain) {
+      return {
+        success: false,
+        error: 'Activity belongs to a different game mode',
+      }
+    }
 
     const answerValidation = validateResearchAnswer(encounter.gameType, answer)
     if (!answerValidation.success) {
@@ -1151,7 +1248,7 @@ export async function submitResearchAnswer(answer: any) {
 
     const submissionRateLimit = await checkActionRateLimit(
       user.id,
-      `research-submit:${state.encounterId}`,
+      `${domain}-submit:${state.encounterId}`,
       200,
       60,
     )
@@ -1292,9 +1389,12 @@ export async function submitResearchAnswer(answer: any) {
           } else {
             // More letters to fill - return partial success (not counted as win yet)
             state.roundData = roundData
-            await redis.set(`research:${user.id}`, state, {
-              ex: Math.floor((gameEndTime + 60000 - Date.now()) / 1000),
-            })
+            await setGameActivityStateForUser(
+              user.id,
+              domain,
+              state,
+              Math.floor((gameEndTime + 60000 - Date.now()) / 1000),
+            )
             return {
               success: true,
               correct: true,
@@ -1384,9 +1484,12 @@ export async function submitResearchAnswer(answer: any) {
 
       if (!isSlidingPuzzleSolved(tiles, boardGridSize)) {
         state.roundData = updatedRoundData
-        await redis.set(`research:${user.id}`, state, {
-          ex: Math.floor((gameEndTime + 60000 - Date.now()) / 1000),
-        })
+        await setGameActivityStateForUser(
+          user.id,
+          domain,
+          state,
+          Math.floor((gameEndTime + 60000 - Date.now()) / 1000),
+        )
 
         return {
           success: true,
@@ -1608,9 +1711,12 @@ export async function submitResearchAnswer(answer: any) {
     }
 
     // Update Redis
-    await redis.set(`research:${user.id}`, state, {
-      ex: Math.floor((gameEndTime + 60000 - Date.now()) / 1000),
-    })
+    await setGameActivityStateForUser(
+      user.id,
+      domain,
+      state,
+      Math.floor((gameEndTime + 60000 - Date.now()) / 1000),
+    )
 
     const requiredWins = getRequiredWins(encounter)
     let gameOver = state.wins >= requiredWins
@@ -1677,9 +1783,7 @@ export async function collectFieldObservationDrop(dropId: string) {
     }
 
     try {
-      const state = (await redis.get(
-        `research:${user.id}`,
-      )) as ResearchState | null
+      const state = await getGameActivityStateForUser(user.id, 'field-research')
       if (!state?.fieldObservationPrivate) {
         return { success: false, error: 'No active field survey' }
       }
@@ -1717,7 +1821,12 @@ export async function collectFieldObservationDrop(dropId: string) {
         60,
         Math.ceil((state.expiry - now) / 1000) + 120,
       )
-      await redis.set(`research:${user.id}`, state, { ex: ttlSeconds })
+      await setGameActivityStateForUser(
+        user.id,
+        'field-research',
+        state,
+        ttlSeconds,
+      )
 
       return {
         success: true,
@@ -1734,7 +1843,9 @@ export async function collectFieldObservationDrop(dropId: string) {
   }
 }
 
-function getCollectedFieldObservationRewards(state: ResearchState): Reward[] {
+function getCollectedFieldObservationRewards(
+  state: GameActivityState,
+): Reward[] {
   const privateRound = state.fieldObservationPrivate
   if (!privateRound) return []
 
@@ -1782,7 +1893,8 @@ function getCollectedRockPushRewards(
     .map(({ prize }) => getRockPushPrizeReward(prize) as Reward)
 }
 
-export async function completeResearchEncounter(
+export async function completeGameActivity(
+  domain: GameActivityDomain,
   encounterId: string,
   success: boolean,
   finalScore?: number,
@@ -1790,7 +1902,7 @@ export async function completeResearchEncounter(
   collectedEndlessRewards?: Record<string, number>,
   collectedRockPushRewardIds?: string[],
   artAcademyDrawing?: string,
-): Promise<ResearchCompletionResult> {
+): Promise<GameActivityCompletionResult> {
   try {
     const user = await getUser()
     if (!user) {
@@ -1802,6 +1914,18 @@ export async function completeResearchEncounter(
       return { success: false, error: encounterInput.error }
     }
     const validatedEncounterId = encounterInput.value as string
+    const configuredEncounter = allGames.find(
+      (entry) => entry.id === validatedEncounterId,
+    )
+    if (!configuredEncounter) {
+      return { success: false, error: 'Game encounter not found' }
+    }
+    if (getGameActivityDomain(configuredEncounter.gameType) !== domain) {
+      return {
+        success: false,
+        error: 'Activity belongs to a different game mode',
+      }
+    }
 
     const completionInput = validateResearchCompletionInput(
       success,
@@ -1823,36 +1947,34 @@ export async function completeResearchEncounter(
       completionInput.value?.collectedRockPushRewardIds
     const validatedArtAcademyDrawing = completionInput.value?.artAcademyDrawing
 
-    const previewState = (await redis.get(
-      `research:${user.id}`,
-    )) as ResearchState | null
+    const previewState = await getGameActivityStateForUser(user.id, domain)
     if (!previewState || previewState.encounterId !== validatedEncounterId) {
       const lastStart = await redis.get<number>(
-        `research:complete-last-start:${user.id}:${validatedEncounterId}`,
+        `${domain}:complete-last-start:${user.id}:${validatedEncounterId}`,
       )
       if (lastStart) {
         const recentResult =
-          await getIdempotentResult<ResearchCompletionResult>(
-            `research:complete-result:${user.id}:${validatedEncounterId}:${lastStart}`,
+          await getIdempotentResult<GameActivityCompletionResult>(
+            `${domain}:complete-result:${user.id}:${validatedEncounterId}:${lastStart}`,
           )
         if (recentResult) {
           return recentResult
         }
       }
 
-      return { success: false, error: 'Research encounter session expired' }
+      return { success: false, error: 'Game activity session expired' }
     }
 
-    const previewResultKey = `research:complete-result:${user.id}:${validatedEncounterId}:${previewState.startTime}`
+    const previewResultKey = `${domain}:complete-result:${user.id}:${validatedEncounterId}:${previewState.startTime}`
     const previewCachedResult =
-      await getIdempotentResult<ResearchCompletionResult>(previewResultKey)
+      await getIdempotentResult<GameActivityCompletionResult>(previewResultKey)
     if (previewCachedResult) {
       return previewCachedResult
     }
 
     const rateLimit = await checkActionRateLimit(
       user.id,
-      `research-complete:${validatedEncounterId}`,
+      `${domain}-complete:${validatedEncounterId}`,
       20,
       60,
     )
@@ -1864,7 +1986,7 @@ export async function completeResearchEncounter(
     }
 
     const completionLock = await acquireActionLock(
-      `lock:research:complete:${user.id}:${validatedEncounterId}`,
+      `lock:${domain}:complete:${user.id}:${validatedEncounterId}`,
       15,
     )
     if (!completionLock.acquired) {
@@ -1874,22 +1996,19 @@ export async function completeResearchEncounter(
     try {
       const payload = await getPayload({ config: configPromise })
 
-      const encounter = allGames.find((e) => e.id === validatedEncounterId)
-      if (!encounter) {
-        return { success: false, error: 'Game encounter not found' }
-      }
+      const encounter = configuredEncounter
 
       // Verify Redis state
-      const state = (await redis.get(
-        `research:${user.id}`,
-      )) as ResearchState | null
+      const state = await getGameActivityStateForUser(user.id, domain)
       if (!state) {
         const recentResult =
-          await getIdempotentResult<ResearchCompletionResult>(previewResultKey)
+          await getIdempotentResult<GameActivityCompletionResult>(
+            previewResultKey,
+          )
         if (recentResult) {
           return recentResult
         }
-        return { success: false, error: 'Research encounter session expired' }
+        return { success: false, error: 'Game activity session expired' }
       }
 
       if (state.encounterId !== validatedEncounterId) {
@@ -1932,9 +2051,9 @@ export async function completeResearchEncounter(
         }
       }
 
-      const resultKey = `research:complete-result:${user.id}:${validatedEncounterId}:${state.startTime}`
+      const resultKey = `${domain}:complete-result:${user.id}:${validatedEncounterId}:${state.startTime}`
       const cachedResult =
-        await getIdempotentResult<ResearchCompletionResult>(resultKey)
+        await getIdempotentResult<GameActivityCompletionResult>(resultKey)
       if (cachedResult) {
         return cachedResult
       }
@@ -1985,7 +2104,7 @@ export async function completeResearchEncounter(
             )
           }
           // Reject the score as cheating
-          await redis.del(`research:${user.id}`)
+          await clearGameActivityStateForUser(user.id, domain)
           return { success: false, error: 'Invalid score detected' }
         }
       }
@@ -2030,7 +2149,7 @@ export async function completeResearchEncounter(
       if (validatedSuccess && !actualSuccess && !isEndlessMode) {
         if (process.env.NODE_ENV === 'development') {
           console.warn(
-            `User ${user.id} claimed research success for ${validatedEncounterId} but verification failed (wins: ${state.wins}/${requiredWins})`,
+            `User ${user.id} claimed ${domain} success for ${validatedEncounterId} but verification failed (wins: ${state.wins}/${requiredWins})`,
           )
         }
       }
@@ -2067,7 +2186,7 @@ export async function completeResearchEncounter(
           await incrementUserActivityResult(
             payload as any,
             user.id,
-            'researchEncounterResults',
+            domain === 'game' ? 'gameResults' : 'fieldResearchResults',
             validatedEncounterId,
             { losses: validatedAdditionalLosses },
           )
@@ -2076,7 +2195,7 @@ export async function completeResearchEncounter(
         await incrementUserActivityResult(
           payload as any,
           user.id,
-          'researchEncounterResults',
+          domain === 'game' ? 'gameResults' : 'fieldResearchResults',
           validatedEncounterId,
           {
             [actualSuccess || isEndlessWin ? 'wins' : 'losses']: 1,
@@ -2093,7 +2212,7 @@ export async function completeResearchEncounter(
         !DAILY_EXCLUDED_GAME_TYPES.has(encounter.gameType)
       ) {
         await recordDailyActivityProgress(user.id, {
-          kind: 'research_win',
+          kind: domain === 'game' ? 'game_win' : 'field_research_win',
           sourceId: validatedEncounterId,
         })
       }
@@ -2389,7 +2508,7 @@ export async function completeResearchEncounter(
 
       const expeditionResult = await recordExpeditionActivityResult(
         user.id,
-        'research',
+        domain,
         validatedEncounterId,
         actualSuccess || isEndlessWin,
       )
@@ -2405,7 +2524,7 @@ export async function completeResearchEncounter(
         expeditionProgress: expeditionResult.expedition,
       }
 
-      const response: ResearchCompletionResult = {
+      const response: GameActivityCompletionResult = {
         success: true,
         summary: summaryWithExpedition,
         expeditionProgress: expeditionResult.expedition,
@@ -2417,38 +2536,37 @@ export async function completeResearchEncounter(
       }
       await setIdempotentResult(resultKey, response, 300)
       await redis.set(
-        `research:complete-last-start:${user.id}:${validatedEncounterId}`,
+        `${domain}:complete-last-start:${user.id}:${validatedEncounterId}`,
         state.startTime,
         {
           ex: 300,
         },
       )
 
-      await redis.del(`research:${user.id}`)
+      await clearGameActivityStateForUser(user.id, domain)
 
       return response
     } finally {
       await releaseActionLock(completionLock)
     }
   } catch (error) {
-    console.error('Error completing research encounter:', error)
+    console.error(`Error completing ${domain} activity:`, error)
     return { success: false, error: 'Internal server error' }
   }
 }
 
-export async function getResearchState() {
+export async function getGameActivityState(domain: GameActivityDomain) {
   try {
     const user = await getUser()
 
     if (!user) return null
 
-    const state = (await redis.get(
-      `research:${user.id}`,
-    )) as ResearchState | null
+    const state = await getGameActivityStateForUser(user.id, domain)
     if (!state) return null
 
     const encounter = allGames.find((e) => e.id === state.encounterId)
     if (!encounter) return null
+    if (getGameActivityDomain(encounter.gameType) !== domain) return null
 
     const timeLimit = getResearchSessionTimeLimit(encounter)
     const gameEndTime = state.startTime + timeLimit * 1000
@@ -2457,7 +2575,7 @@ export async function getResearchState() {
     const isEligibleForReplay = await isActivityEligibleForReplay(
       user as User,
       encounter,
-      'research',
+      domain,
     )
 
     return {
@@ -2469,12 +2587,12 @@ export async function getResearchState() {
       },
     }
   } catch (err) {
-    console.error('Error getting research state:', err)
+    console.error(`Error getting ${domain} state:`, err)
     return null
   }
 }
 
-export async function claimEndlessMilestone(
+export async function claimGameActivityEndlessMilestone(
   encounterId: string,
   score: number,
 ) {
@@ -2509,14 +2627,12 @@ export async function claimEndlessMilestone(
     }
 
     // Get current state before idempotency so claims are scoped to a specific run.
-    const state = (await redis.get(
-      `research:${user.id}`,
-    )) as ResearchState | null
+    const state = await getGameActivityStateForUser(user.id, 'game')
     if (!state || state.encounterId !== validatedEncounterId) {
       return { success: false, error: 'No active session' }
     }
 
-    const idempotentResultKey = `research:endless:claim-result:${user.id}:${validatedEncounterId}:${state.startTime}:${normalizedScore}`
+    const idempotentResultKey = `game:endless:claim-result:${user.id}:${validatedEncounterId}:${state.startTime}:${normalizedScore}`
     const cachedResult = await getIdempotentResult<any>(idempotentResultKey)
     if (cachedResult) {
       return cachedResult
@@ -2593,11 +2709,11 @@ export async function claimEndlessMilestone(
       })
 
       // Update state with claimed milestone
-      const updatedState: ResearchState = {
+      const updatedState: GameActivityState = {
         ...state,
         claimedMilestones: [...claimedMilestones, normalizedScore],
       }
-      await redis.set(`research:${user.id}`, updatedState, { ex: 3600 })
+      await setGameActivityStateForUser(user.id, 'game', updatedState, 3600)
 
       const response = {
         success: true,

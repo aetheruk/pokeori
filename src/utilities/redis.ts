@@ -54,10 +54,17 @@ class RedisWrapper {
     value: T,
     options?: { ex?: number; nx?: boolean },
   ): Promise<string | null> {
-    const stringValue = typeof value === 'object' ? JSON.stringify(value) : String(value)
+    const stringValue =
+      typeof value === 'object' ? JSON.stringify(value) : String(value)
 
     if (options?.ex && options?.nx) {
-      return await this.getClient().set(key, stringValue, 'EX', options.ex, 'NX')
+      return await this.getClient().set(
+        key,
+        stringValue,
+        'EX',
+        options.ex,
+        'NX',
+      )
     }
     if (options?.ex) {
       return await this.getClient().set(key, stringValue, 'EX', options.ex)
@@ -72,11 +79,17 @@ class RedisWrapper {
     return await this.getClient().del(key)
   }
 
-  async lpush(key: string, ...elements: (string | number | Buffer)[]): Promise<number> {
+  async lpush(
+    key: string,
+    ...elements: (string | number | Buffer)[]
+  ): Promise<number> {
     return await this.getClient().lpush(key, ...elements)
   }
 
-  async rpush(key: string, ...elements: (string | number | Buffer)[]): Promise<number> {
+  async rpush(
+    key: string,
+    ...elements: (string | number | Buffer)[]
+  ): Promise<number> {
     return await this.getClient().rpush(key, ...elements)
   }
 
@@ -84,11 +97,21 @@ class RedisWrapper {
     return await this.getClient().expire(key, seconds)
   }
 
-  async sadd(key: string, ...members: (string | number | Buffer)[]): Promise<number> {
+  async ttl(key: string): Promise<number> {
+    return await this.getClient().ttl(key)
+  }
+
+  async sadd(
+    key: string,
+    ...members: (string | number | Buffer)[]
+  ): Promise<number> {
     return await this.getClient().sadd(key, ...members)
   }
 
-  async srem(key: string, ...members: (string | number | Buffer)[]): Promise<number> {
+  async srem(
+    key: string,
+    ...members: (string | number | Buffer)[]
+  ): Promise<number> {
     return await this.getClient().srem(key, ...members)
   }
 
@@ -96,7 +119,10 @@ class RedisWrapper {
     return await this.getClient().smembers(key)
   }
 
-  async sismember(key: string, member: string | number | Buffer): Promise<number> {
+  async sismember(
+    key: string,
+    member: string | number | Buffer,
+  ): Promise<number> {
     return await this.getClient().sismember(key, member)
   }
 

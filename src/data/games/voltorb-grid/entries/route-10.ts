@@ -25,7 +25,7 @@ export const route10VoltorbGridEntries: VoltorbGridGameConfig[] = [
         targetId: 'route-10-voltorb-roundup',
       },
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'route-10-voltorb-primer',
         battleStatus: 'win',
         count: 1,
@@ -72,13 +72,13 @@ export const route10VoltorbGridEntries: VoltorbGridGameConfig[] = [
     background: '/backgrounds/rocky-path.avif',
     requirements: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'route-10-voltorb-primer',
         battleStatus: 'win',
         count: 1,
       },
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'route-10-voltorb-relay',
         battleStatus: 'win',
         count: 1,
@@ -132,13 +132,13 @@ export const route10VoltorbGridEntries: VoltorbGridGameConfig[] = [
     background: '/backgrounds/rocky-path.avif',
     requirements: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'route-10-voltorb-relay',
         battleStatus: 'win',
         count: 1,
       },
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'route-10-voltorb-landslide',
         battleStatus: 'win',
         count: 1,
@@ -201,7 +201,7 @@ export const route10VoltorbGridEntries: VoltorbGridGameConfig[] = [
         targetId: 'route-10-demolition-crew',
       },
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'route-10-voltorb-hairline-crack',
         battleStatus: 'win',
         count: 1,
@@ -276,13 +276,13 @@ export const route10VoltorbGridEntries: VoltorbGridGameConfig[] = [
     background: '/backgrounds/rocky-path.avif',
     requirements: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'route-10-voltorb-hairline-crack',
         battleStatus: 'win',
         count: 1,
       },
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'route-10-voltorb-fuse-line',
         battleStatus: 'win',
         count: 1,
@@ -367,13 +367,13 @@ export const route10VoltorbGridEntries: VoltorbGridGameConfig[] = [
     background: '/backgrounds/rocky-path.avif',
     requirements: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'route-10-voltorb-fuse-line',
         battleStatus: 'win',
         count: 1,
       },
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'route-10-voltorb-split-charge',
         battleStatus: 'win',
         count: 1,
@@ -459,13 +459,13 @@ export const route10VoltorbGridEntries: VoltorbGridGameConfig[] = [
     background: '/backgrounds/rocky-path.avif',
     requirements: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'route-10-voltorb-split-charge',
         battleStatus: 'win',
         count: 1,
       },
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'route-10-voltorb-deep-fault',
         battleStatus: 'win',
         count: 1,
@@ -555,13 +555,13 @@ export const route10VoltorbGridEntries: VoltorbGridGameConfig[] = [
     background: '/backgrounds/rocky-path.avif',
     requirements: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'route-10-voltorb-deep-fault',
         battleStatus: 'win',
         count: 1,
       },
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'route-10-voltorb-final-breach',
         battleStatus: 'win',
         count: 1,

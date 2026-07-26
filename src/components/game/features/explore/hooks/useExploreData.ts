@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 // Data Imports
 import { battles } from '@/data/battles'
 import { expeditions } from '@/data/expeditions'
-import { allGames } from '@/data/games'
+import { fieldResearchGames, miniGames } from '@/data/games'
 import { locations } from '@/data/locations'
 import { shops } from '@/data/shops'
 import { tasks } from '@/data/tasks'
@@ -31,10 +31,15 @@ const STATIC_EXPLORE_ITEMS: ExploreItem[] = [
     type: 'battle' as const,
     originalData: b,
   })),
-  ...allGames.map((r) => ({
-    ...r,
-    type: 'research' as const,
-    originalData: r,
+  ...miniGames.map((game) => ({
+    ...game,
+    type: 'game' as const,
+    originalData: game,
+  })),
+  ...fieldResearchGames.map((study) => ({
+    ...study,
+    type: 'field-research' as const,
+    originalData: study,
   })),
   ...shops.map((s) => ({
     ...s,

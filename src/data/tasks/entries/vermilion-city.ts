@@ -515,7 +515,7 @@ export const vermilionCityTasks: Task[] = [
         count: 12,
       },
       {
-        type: 'research_encounter_result',
+        type: 'field_research_result',
         targetId: 'route-11-field-observation',
         battleStatus: 'win',
         count: 1,

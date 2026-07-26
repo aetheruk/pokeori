@@ -1274,7 +1274,7 @@ export const ceruleanCityTasks: Task[] = [
     repeatable: false,
     criteria: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         count: 10,
         targetId: 'charming-growlithe',
       },
@@ -1647,7 +1647,7 @@ export const ceruleanCityTasks: Task[] = [
     ],
     criteria: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'bill-evolution-stone-study',
         battleStatus: 'win',
         count: 1,

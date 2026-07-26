@@ -1,7 +1,10 @@
 import { describe, expect, test } from 'bun:test'
 import type { ShopConfig } from '@/data/shops/types'
 import type { RequirementData } from '@/utilities/requirements'
-import { checkShopItemRequirements, checkShopRequirements } from '@/utilities/shops/requirements'
+import {
+  checkShopItemRequirements,
+  checkShopRequirements,
+} from '@/utilities/shops/requirements'
 
 const baseRequirementData = {
   user: { id: 'user-1' },
@@ -12,7 +15,8 @@ const baseRequirementData = {
   completedTasks: [],
   battleResults: [],
   locationEncounterResults: [],
-  researchEncounterResults: [],
+  gameResults: [],
+  fieldResearchResults: [],
   expeditionResults: [],
 } as unknown as RequirementData
 

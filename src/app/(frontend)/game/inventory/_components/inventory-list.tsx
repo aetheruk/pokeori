@@ -180,9 +180,9 @@ function getItemActionIcon(item: (typeof items)[number], canChannel = false) {
 function canChannelItem(
   itemId: string,
   inventoryMap: Record<string, number>,
-  researchEncounterResults:
+  gameResults:
     | {
-        encounterId: string
+        gameId: string
         wins: number
         losses: number
         lastPlayed?: string
@@ -194,8 +194,8 @@ function canChannelItem(
   const config = getSpiritChannelingConfigForMemento(itemId)
   if (!config) return false
   const activityId = getSpiritChannelingActivityId(config)
-  return !(researchEncounterResults || []).some(
-    (entry) => entry.encounterId === activityId && (entry.wins || 0) > 0,
+  return !(gameResults || []).some(
+    (entry) => entry.gameId === activityId && (entry.wins || 0) > 0,
   )
 }
 
@@ -401,12 +401,12 @@ export function InventoryList() {
             canChannel: canChannelItem(
               itemDetails.id,
               inventoryMap,
-              gameData?.researchEncounterResults,
+              gameData?.gameResults,
             ),
           }
         })
         .filter((item): item is InventoryListItem => item !== null),
-    [gameData?.researchEncounterResults, inventory, inventoryMap],
+    [gameData?.gameResults, inventory, inventoryMap],
   )
 
   useEffect(() => {
@@ -614,11 +614,7 @@ export function InventoryList() {
       ? getItemSkillLockReason(selectedItem, user?.skills)
       : null
   const selectedItemCanChannel = selectedItem
-    ? canChannelItem(
-        selectedItem.id,
-        inventoryMap,
-        gameData?.researchEncounterResults,
-      )
+    ? canChannelItem(selectedItem.id, inventoryMap, gameData?.gameResults)
     : false
   const hasChannelingBook = (inventoryMap[BOOK_OF_CHANNELING_ITEM_ID] || 0) > 0
   const selectedItemDescription = getInventoryItemDescription(
@@ -671,13 +667,7 @@ export function InventoryList() {
     async (item: (typeof items)[number]) => {
       if (isUsing) return
 
-      if (
-        canChannelItem(
-          item.id,
-          inventoryMap,
-          gameData?.researchEncounterResults,
-        )
-      ) {
+      if (canChannelItem(item.id, inventoryMap, gameData?.gameResults)) {
         router.push(`/game/spirit-channeling?memento=${item.id}`)
         setSelectedItem(null)
         return
@@ -765,7 +755,7 @@ export function InventoryList() {
       }
     },
     [
-      gameData?.researchEncounterResults,
+      gameData?.gameResults,
       inventoryMap,
       isUsing,
       refreshUser,
@@ -1403,7 +1393,7 @@ function TmLearnerTile({
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center text-game-muted">
-            <span className="text-2xl font-bold text-game-muted">?</span>
+          <span className="text-2xl font-bold text-game-muted">?</span>
         </div>
       )}
       <div className="absolute bottom-1 right-1 rounded bg-game-surface/90 px-1 py-0.5 font-mono text-[10px] font-bold leading-none text-game-muted">

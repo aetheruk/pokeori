@@ -47,7 +47,8 @@ export const palletTownExpeditions: ExpeditionConfig[] = [
       ],
       battle: ['pallet-orientation-lab-rattata'],
       location: ['pallet-orientation-route-1'],
-      research: ['pallet-orientation-cry', 'pallet-orientation-field-observation'],
+      game: ['pallet-orientation-cry'],
+      'field-research': ['pallet-orientation-field-observation'],
     },
     path: [
       {
@@ -60,7 +61,7 @@ export const palletTownExpeditions: ExpeditionConfig[] = [
       {
         type: 'activity',
         id: 'pallet-orientation-step-3-cry',
-        activityType: 'research',
+        activityType: 'game',
         activityId: 'pallet-orientation-cry',
         secret: true,
       },
@@ -88,7 +89,7 @@ export const palletTownExpeditions: ExpeditionConfig[] = [
       {
         type: 'activity',
         id: 'pallet-orientation-step-7-field-observation',
-        activityType: 'research',
+        activityType: 'field-research',
         activityId: 'pallet-orientation-field-observation',
         secret: true,
       },

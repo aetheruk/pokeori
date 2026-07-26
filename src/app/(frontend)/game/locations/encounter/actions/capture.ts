@@ -157,7 +157,9 @@ export async function attemptCapture(
             limit: 0,
           })
           .then((res) => res.totalDocs)
-    const eggCount = isChronicle ? 0 : await getActiveEggCount(payload as any, user.id)
+    const eggCount = isChronicle
+      ? 0
+      : await getActiveEggCount(payload as any, user.id)
     // We needed count of pokemon.
     const pokedex = isChronicle
       ? ({} as Record<string, any>)
@@ -195,12 +197,12 @@ export async function attemptCapture(
 
       // Update Research Stats (Fishing Loss - Storage Full)
       if (state.locationId.startsWith('fishing:')) {
-        const researchId = state.locationId.replace('fishing:', '')
+        const gameId = state.locationId.replace('fishing:', '')
         await incrementUserActivityResult(
           payload as any,
           user.id,
-          'researchEncounterResults',
-          researchId,
+          'gameResults',
+          gameId,
           { losses: 1 },
         )
       }
@@ -504,23 +506,23 @@ export async function attemptCapture(
     // User said: "win if it's succesfully caught... loss if it fails to catch" (final?)
     // Win is clear.
     if (caught && state.locationId.startsWith('fishing:')) {
-      const researchId = state.locationId.replace('fishing:', '')
+      const gameId = state.locationId.replace('fishing:', '')
       await incrementUserActivityResult(
         payload as any,
         user.id,
-        'researchEncounterResults',
-        researchId,
+        'gameResults',
+        gameId,
         { wins: 1 },
       )
     }
     // Update Research Stats (Fishing Loss if failed catch - single attempt)
     if (!caught && state.locationId.startsWith('fishing:')) {
-      const researchId = state.locationId.replace('fishing:', '')
+      const gameId = state.locationId.replace('fishing:', '')
       await incrementUserActivityResult(
         payload as any,
         user.id,
-        'researchEncounterResults',
-        researchId,
+        'gameResults',
+        gameId,
         { losses: 1 },
       )
     }
@@ -733,13 +735,16 @@ export async function attemptCapture(
       ...pokedex,
       [speciesKey]: {
         ...speciesData,
-        [formKey]: addPokedexCaughtRarity({
-          ...dexEntry,
-          seen: true,
-          caught: true,
-          totalSeen: Math.max(dexEntry.totalSeen || 0, 1),
-          totalCaught: (dexEntry.totalCaught || 0) + 1,
-        }, rarity),
+        [formKey]: addPokedexCaughtRarity(
+          {
+            ...dexEntry,
+            seen: true,
+            caught: true,
+            totalSeen: Math.max(dexEntry.totalSeen || 0, 1),
+            totalCaught: (dexEntry.totalCaught || 0) + 1,
+          },
+          rarity,
+        ),
       },
     }
 

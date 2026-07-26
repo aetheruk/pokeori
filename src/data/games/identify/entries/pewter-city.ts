@@ -53,7 +53,7 @@ export const pewterCityidentifyEntries: IdentifyConfig[] = [
     background: '/backgrounds/shop.avif',
     requirements: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         battleStatus: 'win',
         targetId: 'pewter-item-identify',
         count: 10,

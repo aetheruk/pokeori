@@ -1,8 +1,15 @@
 import { describe, expect, test } from 'bun:test'
 import type { RequirementData } from '@/utilities/requirements'
-import { checkRequirement, getRequirementProgress } from '@/utilities/requirements'
+import {
+  checkRequirement,
+  getRequirementProgress,
+} from '@/utilities/requirements'
 import { analyzeRequirements } from '@/utilities/requirements/analysis'
-import { checkTaskCriteria, checkTaskRequirements, getTaskProgress } from '@/utilities/tasks/task-logic'
+import {
+  checkTaskCriteria,
+  checkTaskRequirements,
+  getTaskProgress,
+} from '@/utilities/tasks/task-logic'
 import type { Task, TaskCondition } from '@/data/tasks'
 import { isToday } from '@/utilities/date-utils'
 
@@ -15,13 +22,18 @@ const baseRequirementData = {
   completedTasks: [],
   battleResults: [],
   locationEncounterResults: [],
-  researchEncounterResults: [],
+  gameResults: [],
+  fieldResearchResults: [],
 } as unknown as RequirementData
 
 describe('requirements and criteria semantics', () => {
   test('daily reset checks use UTC calendar days', () => {
-    expect(isToday('2026-05-12T23:30:00.000Z', '2026-05-12T00:15:00.000Z')).toBe(true)
-    expect(isToday('2026-05-12T23:30:00.000Z', '2026-05-13T00:15:00.000Z')).toBe(false)
+    expect(
+      isToday('2026-05-12T23:30:00.000Z', '2026-05-12T00:15:00.000Z'),
+    ).toBe(true)
+    expect(
+      isToday('2026-05-12T23:30:00.000Z', '2026-05-13T00:15:00.000Z'),
+    ).toBe(false)
   })
 
   test('requirements gate access while criteria gate completion', () => {
@@ -39,7 +51,13 @@ describe('requirements and criteria semantics', () => {
 
     const unlockedData = {
       ...baseRequirementData,
-      completedTasks: [{ taskId: 'tutorial-1', completedAt: new Date().toISOString(), count: 1 }],
+      completedTasks: [
+        {
+          taskId: 'tutorial-1',
+          completedAt: new Date().toISOString(),
+          count: 1,
+        },
+      ],
     } as RequirementData
 
     const completedData = {
@@ -59,14 +77,25 @@ describe('requirements and criteria semantics', () => {
       inventory: [{ itemId: 'old-rod', quantity: 2 }],
     } as RequirementData
 
-    expect(getRequirementProgress(data, { type: 'item_owned', targetId: 'old-rod', count: 3 }))
-      .toMatchObject({
-        current: 2,
-        target: 3,
-        completed: false,
-      })
+    expect(
+      getRequirementProgress(data, {
+        type: 'item_owned',
+        targetId: 'old-rod',
+        count: 3,
+      }),
+    ).toMatchObject({
+      current: 2,
+      target: 3,
+      completed: false,
+    })
 
-    expect(checkRequirement(data, { type: 'item_owned', targetId: 'old-rod', count: 2 })).toBe(true)
+    expect(
+      checkRequirement(data, {
+        type: 'item_owned',
+        targetId: 'old-rod',
+        count: 2,
+      }),
+    ).toBe(true)
   })
 
   test('any_of requirements pass when any nested requirement passes', () => {
@@ -108,7 +137,10 @@ describe('requirements and criteria semantics', () => {
       target: 1,
       completed: false,
     })
-    expect(analyzeRequirements([requirement]).sort()).toEqual(['pokedex', 'tcg'])
+    expect(analyzeRequirements([requirement]).sort()).toEqual([
+      'pokedex',
+      'tcg',
+    ])
   })
 
   test('research level requirements use the highest level when duplicate form rows exist', () => {
@@ -144,7 +176,11 @@ describe('requirements and criteria semantics', () => {
     const data = {
       ...baseRequirementData,
       completedTasks: [
-        { taskId: 'repeatable-task', completedAt: new Date().toISOString(), count: 4 },
+        {
+          taskId: 'repeatable-task',
+          completedAt: new Date().toISOString(),
+          count: 4,
+        },
       ],
     } as RequirementData
 
@@ -165,7 +201,11 @@ describe('requirements and criteria semantics', () => {
         {
           ...data,
           completedTasks: [
-            { taskId: 'repeatable-task', completedAt: new Date().toISOString(), count: 5 },
+            {
+              taskId: 'repeatable-task',
+              completedAt: new Date().toISOString(),
+              count: 5,
+            },
           ],
         } as RequirementData,
         { type: 'task_completed', targetId: 'repeatable-task', count: 5 },
@@ -177,7 +217,10 @@ describe('requirements and criteria semantics', () => {
         {
           ...baseRequirementData,
           completedTasks: [
-            { taskId: 'legacy-task', completedAt: new Date().toISOString() } as any,
+            {
+              taskId: 'legacy-task',
+              completedAt: new Date().toISOString(),
+            } as any,
           ],
         } as RequirementData,
         { type: 'task_completed', targetId: 'legacy-task' },
@@ -254,11 +297,18 @@ describe('requirements and criteria semantics', () => {
     } as unknown as RequirementData
 
     expect(checkRequirement(data, { type: 'rival_selected' })).toBe(true)
-    expect(checkRequirement(baseRequirementData, { type: 'rival_selected' })).toBe(false)
-    expect(checkRequirement(baseRequirementData, { type: 'rival_selected', inverse: true })).toBe(
-      true,
-    )
-    expect(getRequirementProgress(data, { type: 'rival_selected' })).toMatchObject({
+    expect(
+      checkRequirement(baseRequirementData, { type: 'rival_selected' }),
+    ).toBe(false)
+    expect(
+      checkRequirement(baseRequirementData, {
+        type: 'rival_selected',
+        inverse: true,
+      }),
+    ).toBe(true)
+    expect(
+      getRequirementProgress(data, { type: 'rival_selected' }),
+    ).toMatchObject({
       current: 1,
       target: 1,
       completed: true,
@@ -368,7 +418,13 @@ describe('requirements and criteria semantics', () => {
 
     const data = {
       ...baseRequirementData,
-      completedTasks: [{ taskId: 'claim-once', completedAt: new Date().toISOString(), count: 1 }],
+      completedTasks: [
+        {
+          taskId: 'claim-once',
+          completedAt: new Date().toISOString(),
+          count: 1,
+        },
+      ],
     } as RequirementData
 
     expect(getTaskProgress(data, task)).toMatchObject({
@@ -570,8 +626,14 @@ describe('requirements and criteria semantics', () => {
       companionCheck: { type: 'grass' },
     } as const
 
-    expect(checkRequirement(noCompanionData, grassCompanionRequirement)).toBe(false)
-    expect(checkRequirement(nonGrassCompanionData, grassCompanionRequirement)).toBe(false)
-    expect(checkRequirement(grassCompanionData, grassCompanionRequirement)).toBe(true)
+    expect(checkRequirement(noCompanionData, grassCompanionRequirement)).toBe(
+      false,
+    )
+    expect(
+      checkRequirement(nonGrassCompanionData, grassCompanionRequirement),
+    ).toBe(false)
+    expect(
+      checkRequirement(grassCompanionData, grassCompanionRequirement),
+    ).toBe(true)
   })
 })

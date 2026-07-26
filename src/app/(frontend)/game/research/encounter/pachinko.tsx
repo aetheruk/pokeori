@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { startResearchEncounter } from '@/app/(frontend)/game/research/actions'
+import { startGame } from '@/app/(frontend)/game/games/actions'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { Button } from '@/components/ui/button'
@@ -28,7 +28,7 @@ import type {
 } from '@/data/games/pachinko/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
-import { completeResearchEncounter } from '../actions'
+import { completeGame } from '@/app/(frontend)/game/games/actions'
 import { completePachinkoDrop, completePachinkoMiss } from '../games/pachinko'
 
 interface PachinkoGameProps {
@@ -591,7 +591,7 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
   const handleLeave = async () => {
     if (isDropping) return
 
-    const res = await completeResearchEncounter(encounter.id, true)
+    const res = await completeGame(encounter.id, true)
     setResult({
       success: true,
       message: 'Session Ended',
@@ -799,7 +799,7 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
                 size="lg"
                 onClick={async () => {
                   try {
-                    const res = await startResearchEncounter(
+                    const res = await startGame(
                       (state?.encounter || encounter).id,
                       true,
                     )

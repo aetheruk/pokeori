@@ -2,7 +2,7 @@ import { FieldObservationConfig } from '../types'
 
 function studyWinRequirement() {
   return {
-    type: 'research_encounter_result' as const,
+    type: 'field_research_result' as const,
     targetId: 'route-7-field-observation',
     battleStatus: 'win' as const,
     count: 1,

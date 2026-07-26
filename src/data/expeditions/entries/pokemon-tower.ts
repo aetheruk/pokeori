@@ -93,7 +93,7 @@ export const pokemonTowerExpeditions: ExpeditionConfig[] = [
         'fuji-chronicle-final-climb',
       ],
       location: ['fuji-chronicle-restless-gastly'],
-      research: ['fuji-chronicle-berry-crushing'],
+      game: ['fuji-chronicle-berry-crushing'],
     },
     path: [
       {
@@ -113,7 +113,7 @@ export const pokemonTowerExpeditions: ExpeditionConfig[] = [
       {
         type: 'activity',
         id: 'fuji-chronicle-step-3-berry-crushing',
-        activityType: 'research',
+        activityType: 'game',
         activityId: 'fuji-chronicle-berry-crushing',
         secret: true,
       },

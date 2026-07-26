@@ -17,7 +17,8 @@ const baseRequirementData = {
   completedTasks: [],
   battleResults: [],
   locationEncounterResults: [],
-  researchEncounterResults: [],
+  gameResults: [],
+  fieldResearchResults: [],
   expeditionResults: [],
 } as unknown as RequirementData
 
@@ -173,9 +174,7 @@ describe('expedition path builder', () => {
     const lossRoute = resolveResultBranchAfterStep(steps, 0, 'loss')
 
     expect(winRoute?.end).toBe('complete')
-    expect(winRoute?.steps.map((step) => step.stepId)).toEqual([
-      'secret-check',
-    ])
+    expect(winRoute?.steps.map((step) => step.stepId)).toEqual(['secret-check'])
     expect(lossRoute?.end).toBe('fail')
     expect(lossRoute?.steps.map((step) => step.stepId)).toEqual([
       'secret-check',

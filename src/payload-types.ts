@@ -676,6 +676,18 @@ export interface UserPokedexEntry {
   totalCaught?: number | null;
   shinySeen?: boolean | null;
   shinyCaught?: boolean | null;
+  /**
+   * Canonical rarity treatments obtained for this Pokemon form.
+   */
+  raritiesCaught?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   researchXp?: number | null;
   researchLevel?: number | null;
   preferredBattleStance?: ('power' | 'speed' | 'tech') | null;
@@ -717,7 +729,7 @@ export interface UserTaskProgress {
 export interface UserActivityStat {
   id: string;
   user: string | User;
-  activityType: 'battle' | 'research' | 'location' | 'expedition';
+  activityType: 'battle' | 'game' | 'field-research' | 'research' | 'location' | 'expedition';
   activityId: string;
   wins: number;
   losses: number;
@@ -1176,6 +1188,7 @@ export interface UserPokedexEntriesSelect<T extends boolean = true> {
   totalCaught?: T;
   shinySeen?: T;
   shinyCaught?: T;
+  raritiesCaught?: T;
   researchXp?: T;
   researchLevel?: T;
   preferredBattleStance?: T;

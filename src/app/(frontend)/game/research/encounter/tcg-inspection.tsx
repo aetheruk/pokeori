@@ -19,7 +19,7 @@ import type { TcgCard, TcgSet } from '@/data/tcg/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { getAllTcgSets } from '@/utilities/tcg/tcg'
 import { QuestionPrompt } from '../../locations/encounter/_components/question-prompt'
-import { completeResearchEncounter, startResearchEncounter } from '../actions'
+import { completeGame, startGame } from '@/app/(frontend)/game/games/actions'
 
 interface TcgInspectionGameProps {
   encounter: TcgInspectionGameConfig
@@ -316,11 +316,7 @@ export function TcgInspectionGame({
       setGameEnded(true)
 
       const success = finalScore >= settings.winScore
-      const res = await completeResearchEncounter(
-        encounter.id,
-        success,
-        finalScore,
-      )
+      const res = await completeGame(encounter.id, success, finalScore)
       setResult({
         success: success && res.success,
         message:
@@ -381,7 +377,7 @@ export function TcgInspectionGame({
     let mounted = true
 
     async function start() {
-      const res = await startResearchEncounter(encounter.id)
+      const res = await startGame(encounter.id)
       if (!mounted) return
       if (!res.success) {
         setError(res.error || 'Could not start booster inspection.')

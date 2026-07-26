@@ -40,10 +40,20 @@ export interface LocationEncounterResult {
   updatedAt: string
 }
 
-export interface ResearchEncounterResult {
+export interface GameResult {
   id: string
   user: string | User
-  encounterId: string
+  gameId: string
+  wins: number
+  losses: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface FieldResearchResult {
+  id: string
+  user: string | User
+  fieldResearchId: string
   wins: number
   losses: number
   createdAt: string
@@ -85,18 +95,36 @@ export interface RequirementData {
     firstRegisteredAt?: string
     source?: string
   }[]
-  completedTasks: { taskId: string; completedAt: string; count: number; updatedAt?: string }[]
-  battleResults: { battleId: string; wins: number; losses: number; lastPlayed?: string }[]
+  completedTasks: {
+    taskId: string
+    completedAt: string
+    count: number
+    updatedAt?: string
+  }[]
+  battleResults: {
+    battleId: string
+    wins: number
+    losses: number
+    lastPlayed?: string
+  }[]
   locationEncounterResults: {
     locationId: string
     wins: number
     losses: number
     lastPlayed?: string
   }[]
-  researchEncounterResults: {
-    encounterId: string
+  gameResults: {
+    gameId: string
     wins: number
     losses: number
+    highScore?: number
+    lastPlayed?: string
+  }[]
+  fieldResearchResults: {
+    fieldResearchId: string
+    wins: number
+    losses: number
+    highScore?: number
     lastPlayed?: string
   }[]
   expeditionResults?: ExpeditionResult[]
@@ -205,8 +233,14 @@ function checkStats(
     checkStatRequirements(actualStats.hp ?? 0, requiredStats.hp) &&
     checkStatRequirements(actualStats.attack ?? 0, requiredStats.attack) &&
     checkStatRequirements(actualStats.defense ?? 0, requiredStats.defense) &&
-    checkStatRequirements(actualStats.specialAttack ?? 0, requiredStats.specialAttack) &&
-    checkStatRequirements(actualStats.specialDefense ?? 0, requiredStats.specialDefense) &&
+    checkStatRequirements(
+      actualStats.specialAttack ?? 0,
+      requiredStats.specialAttack,
+    ) &&
+    checkStatRequirements(
+      actualStats.specialDefense ?? 0,
+      requiredStats.specialDefense,
+    ) &&
     checkStatRequirements(actualStats.speed ?? 0, requiredStats.speed)
   )
 }
@@ -220,23 +254,44 @@ function matchesPokemonOriginValue(
 
   const normalizedActual = actual.toLowerCase()
   const expectedValues = Array.isArray(expected) ? expected : [expected]
-  return expectedValues.some((value) => normalizedActual === value.toLowerCase())
+  return expectedValues.some(
+    (value) => normalizedActual === value.toLowerCase(),
+  )
 }
 
-export function isPokemonEligible(pokemon: Pokemon, criteria: PokemonCriteria): boolean {
-  if (criteria.speciesId && pokemon.speciesId !== criteria.speciesId) return false
-  if (!matchesPokemonOriginValue(pokemon.obtainedRegion, criteria.region)) return false
-  if (!matchesPokemonOriginValue(pokemon.obtainedLocation, criteria.location)) return false
-  if (!matchesPokemonOriginValue(pokemon.obtainedSourceId, criteria.locationId)) return false
+export function isPokemonEligible(
+  pokemon: Pokemon,
+  criteria: PokemonCriteria,
+): boolean {
+  if (criteria.speciesId && pokemon.speciesId !== criteria.speciesId)
+    return false
+  if (!matchesPokemonOriginValue(pokemon.obtainedRegion, criteria.region))
+    return false
+  if (!matchesPokemonOriginValue(pokemon.obtainedLocation, criteria.location))
+    return false
+  if (!matchesPokemonOriginValue(pokemon.obtainedSourceId, criteria.locationId))
+    return false
   if (criteria.minLevel && pokemon.level < criteria.minLevel) return false
   if (criteria.maxLevel && pokemon.level > criteria.maxLevel) return false
   if (criteria.size && pokemon.size !== criteria.size) return false
-  if (criteria.rarity && resolvePokemonRarity(pokemon) !== criteria.rarity) return false
-  if (criteria.shiny !== undefined && pokemon.shiny !== criteria.shiny) return false
-  if (criteria.isShadow !== undefined && pokemon.isShadow !== criteria.isShadow) return false
-  if (criteria.isRadiant !== undefined && pokemon.isRadiant !== criteria.isRadiant) return false
-  if (criteria.identified !== undefined && pokemon.identified !== criteria.identified) return false
-  if (criteria.partner !== undefined && pokemon.partner !== criteria.partner) return false
+  if (criteria.rarity && resolvePokemonRarity(pokemon) !== criteria.rarity)
+    return false
+  if (criteria.shiny !== undefined && pokemon.shiny !== criteria.shiny)
+    return false
+  if (criteria.isShadow !== undefined && pokemon.isShadow !== criteria.isShadow)
+    return false
+  if (
+    criteria.isRadiant !== undefined &&
+    pokemon.isRadiant !== criteria.isRadiant
+  )
+    return false
+  if (
+    criteria.identified !== undefined &&
+    pokemon.identified !== criteria.identified
+  )
+    return false
+  if (criteria.partner !== undefined && pokemon.partner !== criteria.partner)
+    return false
   if (criteria.formId && pokemon.formId !== criteria.formId) return false
 
   // Type check requires looking up the form data
@@ -245,7 +300,9 @@ export function isPokemonEligible(pokemon: Pokemon, criteria: PokemonCriteria): 
     if (!formData) return false
 
     const normalizedCriteriaType = criteria.type.toLowerCase()
-    const match = formData.types.some((t) => t.toLowerCase() === normalizedCriteriaType)
+    const match = formData.types.some(
+      (t) => t.toLowerCase() === normalizedCriteriaType,
+    )
     if (!match) return false
   }
 
@@ -269,7 +326,8 @@ export function getRequirementProgress(
   switch (condition.type) {
     case 'user_level':
     case 'skill_level': {
-      const skillId = typeof condition.targetId === 'string' ? condition.targetId : 'catching'
+      const skillId =
+        typeof condition.targetId === 'string' ? condition.targetId : 'catching'
       const extendedUser = user as ExtendedUser
       const userSkills: SkillsData = extendedUser.skills || {}
       current = userSkills[skillId]?.level || 1
@@ -326,7 +384,10 @@ export function getRequirementProgress(
       if (condition.unique) {
         current = setCards.filter((entry) => (entry.quantity || 0) > 0).length
       } else {
-        current = setCards.reduce((sum, entry) => sum + (entry.quantity || 0), 0)
+        current = setCards.reduce(
+          (sum, entry) => sum + (entry.quantity || 0),
+          0,
+        )
       }
       break
     }
@@ -348,13 +409,17 @@ export function getRequirementProgress(
     }
 
     case 'pokedex_seen_specific': {
-      const entry = pokedex.find((e) => e.speciesId === Number(condition.targetId))
+      const entry = pokedex.find(
+        (e) => e.speciesId === Number(condition.targetId),
+      )
       current = entry?.seen ? 1 : 0
       break
     }
 
     case 'pokedex_caught_specific': {
-      const entry = pokedex.find((e) => e.speciesId === Number(condition.targetId))
+      const entry = pokedex.find(
+        (e) => e.speciesId === Number(condition.targetId),
+      )
       current = entry?.caught ? 1 : 0
       break
     }
@@ -372,11 +437,17 @@ export function getRequirementProgress(
       }
       const now = data.currentTime ? new Date(data.currentTime) : new Date()
       const timeZone =
-        context.timeZone || data.currentTimeZone || getRegionTimeZone(context.category)
+        context.timeZone ||
+        data.currentTimeZone ||
+        getRegionTimeZone(context.category)
       const currentMinutes = getTimeZoneMinutes(now, timeZone)
 
-      const [startHour, startMinute] = condition.timeRange.start.split(':').map(Number)
-      const [endHour, endMinute] = condition.timeRange.end.split(':').map(Number)
+      const [startHour, startMinute] = condition.timeRange.start
+        .split(':')
+        .map(Number)
+      const [endHour, endMinute] = condition.timeRange.end
+        .split(':')
+        .map(Number)
       const startTotal = startHour * 60 + startMinute
       const endTotal = endHour * 60 + endMinute
 
@@ -400,7 +471,8 @@ export function getRequirementProgress(
       const currentDate = now.toISOString().split('T')[0] // YYYY-MM-DD
 
       const inRange =
-        currentDate >= condition.dateRange.start && currentDate <= condition.dateRange.end
+        currentDate >= condition.dateRange.start &&
+        currentDate <= condition.dateRange.end
       current = inRange ? 1 : 0
       break
     }
@@ -421,15 +493,35 @@ export function getRequirementProgress(
         ? condition.targetId.map(String)
         : [String(condition.targetId)]
       current = locationIds.reduce((sum, locationId) => {
-        const result = data.locationEncounterResults.find((r) => r.locationId === locationId)
-        return sum + (condition.battleStatus === 'loss' ? result?.losses || 0 : result?.wins || 0)
+        const result = data.locationEncounterResults.find(
+          (r) => r.locationId === locationId,
+        )
+        return (
+          sum +
+          (condition.battleStatus === 'loss'
+            ? result?.losses || 0
+            : result?.wins || 0)
+        )
       }, 0)
       break
     }
 
-    case 'research_encounter_result': {
-      const encounterId = condition.targetId as string
-      const result = data.researchEncounterResults.find((r) => r.encounterId === encounterId)
+    case 'game_result': {
+      const gameId = condition.targetId as string
+      const result = data.gameResults.find((r) => r.gameId === gameId)
+      if (condition.battleStatus === 'loss') {
+        current = result?.losses || 0
+      } else {
+        current = result?.wins || 0
+      }
+      break
+    }
+
+    case 'field_research_result': {
+      const fieldResearchId = condition.targetId as string
+      const result = data.fieldResearchResults.find(
+        (r) => r.fieldResearchId === fieldResearchId,
+      )
       if (condition.battleStatus === 'loss') {
         current = result?.losses || 0
       } else {
@@ -448,7 +540,8 @@ export function getRequirementProgress(
         current = status === 'failed' ? result?.losses || 0 : result?.wins || 0
       } else {
         current = results.reduce(
-          (sum, result) => sum + (status === 'failed' ? result.losses || 0 : result.wins || 0),
+          (sum, result) =>
+            sum + (status === 'failed' ? result.losses || 0 : result.wins || 0),
           0,
         )
       }
@@ -518,7 +611,8 @@ export function getRequirementProgress(
 
       if (condition.targetId) {
         // Check specific voyage
-        const voyageData = voyageStats.completedVoyages?.[condition.targetId as string]
+        const voyageData =
+          voyageStats.completedVoyages?.[condition.targetId as string]
         current = voyageData?.count || 0
       } else {
         // Check total voyages
@@ -562,7 +656,9 @@ export function getRequirementProgress(
 
       // If position is specified (not 'any'), filter by position
       if (check.position !== 'any') {
-        battleTeamPokemon = battleTeamPokemon.filter((p) => p.battleTeamPosition === check.position)
+        battleTeamPokemon = battleTeamPokemon.filter(
+          (p) => p.battleTeamPosition === check.position,
+        )
       }
 
       // Apply species/form/type filtering using isPokemonEligible
@@ -574,7 +670,8 @@ export function getRequirementProgress(
         if (check.type !== undefined) criteria.type = check.type
         if (check.region !== undefined) criteria.region = check.region
         if (check.location !== undefined) criteria.location = check.location
-        if (check.locationId !== undefined) criteria.locationId = check.locationId
+        if (check.locationId !== undefined)
+          criteria.locationId = check.locationId
         if (check.isShadow !== undefined) criteria.isShadow = check.isShadow
         if (check.isRadiant !== undefined) criteria.isRadiant = check.isRadiant
         if (check.rarity !== undefined) criteria.rarity = check.rarity
@@ -616,7 +713,10 @@ export function getRequirementProgress(
       if (targetFormId) {
         current = pokedex
           .filter((p) => p.formId === targetFormId)
-          .reduce((highest, entry) => Math.max(highest, entry.researchLevel || 0), 0)
+          .reduce(
+            (highest, entry) => Math.max(highest, entry.researchLevel || 0),
+            0,
+          )
       }
       break
     }
@@ -637,9 +737,12 @@ export function getRequirementProgress(
       let playedToday = false
 
       // Check battle results
-      const battleResult = data.battleResults.find((r) => r.battleId === activityId)
+      const battleResult = data.battleResults.find(
+        (r) => r.battleId === activityId,
+      )
       if (battleResult && battleResult.wins > 0) {
-        const lastDate = (battleResult as any).updatedAt || battleResult.lastPlayed
+        const lastDate =
+          (battleResult as any).updatedAt || battleResult.lastPlayed
         playedToday = isToday(lastDate)
       }
 
@@ -649,18 +752,22 @@ export function getRequirementProgress(
           (r) => r.locationId === activityId,
         )
         if (locationResult && locationResult.wins > 0) {
-          const lastDate = (locationResult as any).updatedAt || locationResult.lastPlayed
+          const lastDate =
+            (locationResult as any).updatedAt || locationResult.lastPlayed
           playedToday = isToday(lastDate)
         }
       }
 
-      // Check research encounter results
+      // Check mini-game and Field Research results
       if (!playedToday) {
-        const researchResult = data.researchEncounterResults.find(
-          (r) => r.encounterId === activityId,
-        )
-        if (researchResult && researchResult.wins > 0) {
-          const lastDate = (researchResult as any).updatedAt || researchResult.lastPlayed
+        const activityResult =
+          data.gameResults.find((r) => r.gameId === activityId) ||
+          data.fieldResearchResults.find(
+            (r) => r.fieldResearchId === activityId,
+          )
+        if (activityResult && activityResult.wins > 0) {
+          const lastDate =
+            (activityResult as any).updatedAt || activityResult.lastPlayed
           playedToday = isToday(lastDate)
         }
       }
@@ -670,8 +777,12 @@ export function getRequirementProgress(
         const expeditionResult = (data.expeditionResults || []).find(
           (r) => r.expeditionId === activityId,
         )
-        if (expeditionResult && (expeditionResult.wins || 0) + (expeditionResult.losses || 0) > 0) {
-          const lastDate = expeditionResult.updatedAt || expeditionResult.lastPlayed
+        if (
+          expeditionResult &&
+          (expeditionResult.wins || 0) + (expeditionResult.losses || 0) > 0
+        ) {
+          const lastDate =
+            expeditionResult.updatedAt || expeditionResult.lastPlayed
           playedToday = isToday(lastDate)
         }
       }
@@ -715,7 +826,9 @@ export function getRequirementProgress(
       const expectedWeather = Array.isArray(condition.targetId)
         ? condition.targetId
         : [condition.targetId]
-      current = expectedWeather.some((value) => isWeatherType(value) && value === currentWeather)
+      current = expectedWeather.some(
+        (value) => isWeatherType(value) && value === currentWeather,
+      )
         ? 1
         : 0
       break
@@ -745,7 +858,9 @@ export function getRequirementProgress(
 
   // Special handling for roll: we want current <= target (where target is rarity threshold)
   if (condition.type === 'roll') {
-    completed = condition.inverse ? current > target : current > 0 && current <= target
+    completed = condition.inverse
+      ? current > target
+      : current > 0 && current <= target
   }
 
   return {

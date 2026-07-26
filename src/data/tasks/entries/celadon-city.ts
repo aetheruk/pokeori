@@ -169,7 +169,7 @@ export const celadonCityTasks: Task[] = [
         "count": 3
       },
       {
-        "type": "research_encounter_result",
+        "type": "field_research_result",
         "targetId": "route-7-field-observation",
         "count": 1
       }

@@ -65,7 +65,8 @@ export const getTypeIcon = (item: ExploreItem) => {
       return <Compass className="w-4 h-4 text-game-moss-strong" />
     case 'expedition':
       return <MapIcon className="w-4 h-4 text-game-moss-strong" />
-    case 'research':
+    case 'game':
+    case 'field-research':
       const gameType = (item.originalData as any).gameType
       if (gameType === 'snap')
         return <Camera className="w-4 h-4 text-game-moss-strong" />
@@ -150,7 +151,8 @@ export const getGameTypeLabel = (item: ExploreItem) => {
   if (item.type === 'expedition') {
     return isChronicleExploreItem(item) ? 'CHRONICLE' : 'EXPEDITION'
   }
-  if (item.type !== 'research') return item.type.toUpperCase()
+  if (item.type === 'field-research') return 'FIELD RESEARCH'
+  if (item.type !== 'game') return item.type.toUpperCase()
 
   const gameType = (item.originalData as any).gameType
   switch (gameType) {
@@ -190,8 +192,6 @@ export const getGameTypeLabel = (item: ExploreItem) => {
       return 'MINING'
     case 'tcg-inspection':
       return 'TCG'
-    case 'field-observation':
-      return 'STUDY'
     default:
       return 'MINI GAME'
   }

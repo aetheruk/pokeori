@@ -142,12 +142,12 @@ async function failEncounterFromAbility(
   )
 
   if (state.locationId.startsWith('fishing:')) {
-    const researchId = state.locationId.replace('fishing:', '')
+    const gameId = state.locationId.replace('fishing:', '')
     await incrementUserActivityResult(
       payload as any,
       user.id,
-      'researchEncounterResults',
-      researchId,
+      'gameResults',
+      gameId,
       { losses: 1 },
     )
   }

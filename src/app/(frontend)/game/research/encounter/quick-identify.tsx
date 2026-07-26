@@ -10,19 +10,19 @@ import { Button } from '@/components/ui/button'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
-import type { ResearchConfig } from '@/data/games'
+import type { GameItem } from '@/data/games'
 import { items } from '@/data/items'
 import pokemonData from '@/data/pokemon-data'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import {
-  completeResearchEncounter,
-  startResearchEncounter,
-  submitResearchAnswer,
-} from '../actions'
+  completeGame,
+  startGame,
+  submitGameAnswer,
+} from '@/app/(frontend)/game/games/actions'
 
 interface QuickIdentifyGameProps {
-  encounter: ResearchConfig
+  encounter: GameItem
   initialState?: any
 }
 
@@ -78,7 +78,7 @@ export function QuickIdentifyGame({
     if (gameStarted) return
 
     // Start or get existing session
-    const result = await startResearchEncounter(encounter.id)
+    const result = await startGame(encounter.id)
 
     if (!result.success) {
       console.error('Failed to start encounter:', result.error)
@@ -124,7 +124,7 @@ export function QuickIdentifyGame({
           setGameEnded(true)
           setSuccess(false)
           // Record failure on server
-          completeResearchEncounter(encounter.id, false).then(() => {
+          completeGame(encounter.id, false).then(() => {
             setResult({
               success: false,
               message: 'Time is up!',
@@ -156,7 +156,7 @@ export function QuickIdentifyGame({
       if (!currentId) return
       setIsProcessing(true)
 
-      const result = await submitResearchAnswer(chosenId)
+      const result = await submitGameAnswer(chosenId)
 
       if (!result.success) {
         if (result.error === 'Session expired or not found') {
@@ -189,7 +189,7 @@ export function QuickIdentifyGame({
           // allow the hide transition to complete
           await new Promise((resolve) => setTimeout(resolve, 80))
 
-          const completeResult = await completeResearchEncounter(
+          const completeResult = await completeGame(
             encounter.id,
             (result.wins || 0) >= (result.requiredWins || 5),
           )
@@ -234,7 +234,7 @@ export function QuickIdentifyGame({
         playSfx('bad')
         // Check if game is over even if wrong
         if (result.gameOver) {
-          const completeResult = await completeResearchEncounter(
+          const completeResult = await completeGame(
             encounter.id,
             (result.wins || 0) >= (result.requiredWins || 5),
           )
@@ -439,7 +439,7 @@ export function QuickIdentifyGame({
                 type="button"
                 onClick={async () => {
                   try {
-                    const res = await startResearchEncounter(
+                    const res = await startGame(
                       (initialState?.encounter || encounter).id,
                       true,
                     )

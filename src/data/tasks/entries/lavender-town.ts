@@ -84,7 +84,7 @@ export const lavenderTownTasks: Task[] = [
         count: 3,
       },
       {
-        type: 'research_encounter_result',
+        type: 'field_research_result',
         targetId: 'route-8-field-observation',
         count: 1,
       },
@@ -253,7 +253,7 @@ export const lavenderTownTasks: Task[] = [
         count: 10,
       },
       {
-        type: 'research_encounter_result',
+        type: 'field_research_result',
         targetId: 'route-8-field-observation',
         count: 20,
       },

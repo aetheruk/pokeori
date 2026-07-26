@@ -3,7 +3,7 @@ import type { Reward } from '@/data/types'
 import type { TaskCondition } from '@/data/tasks'
 import { battles } from '@/data/battles'
 import { locations } from '@/data/locations'
-import { allGames } from '@/data/games'
+import { allGames, fieldResearchGames, miniGames } from '@/data/games'
 import {
   fieldObservationGlobalItemEvents,
   fieldObservationGlobalPokemonEvents,
@@ -32,7 +32,8 @@ import path from 'node:path'
 const exploreItems = [
   ...battles.map((entry) => ({ ...entry, kind: 'battle' })),
   ...locations.map((entry) => ({ ...entry, kind: 'location' })),
-  ...allGames.map((entry) => ({ ...entry, kind: 'research' })),
+  ...miniGames.map((entry) => ({ ...entry, kind: 'game' })),
+  ...fieldResearchGames.map((entry) => ({ ...entry, kind: 'field-research' })),
   ...shops.map((entry) => ({ ...entry, kind: 'shop' })),
   ...tasks.map((entry) => ({ ...entry, kind: 'task' })),
   ...voyages.map((entry) => ({ ...entry, kind: 'voyage' })),
@@ -43,7 +44,9 @@ const ids = {
   allExplore: new Set(exploreItems.map((entry) => entry.id)),
   battle: new Set(battles.map((entry) => entry.id)),
   location: new Set(locations.map((entry) => entry.id)),
-  research: new Set(allGames.map((entry) => entry.id)),
+  activity: new Set(allGames.map((entry) => entry.id)),
+  game: new Set(miniGames.map((entry) => entry.id)),
+  fieldResearch: new Set(fieldResearchGames.map((entry) => entry.id)),
   task: new Set(tasks.map((entry) => entry.id)),
   expedition: new Set(expeditions.map((entry) => entry.id)),
   item: new Set(items.map((entry) => entry.id)),
@@ -232,11 +235,13 @@ describe('static data references', () => {
                     ? ids.battle
                     : condition.type === 'location_encounter_result'
                       ? ids.location
-                      : condition.type === 'research_encounter_result'
-                        ? ids.research
-                        : condition.type === 'expedition_result'
-                          ? ids.expedition
-                          : null
+                      : condition.type === 'game_result'
+                        ? ids.game
+                        : condition.type === 'field_research_result'
+                          ? ids.fieldResearch
+                          : condition.type === 'expedition_result'
+                            ? ids.expedition
+                            : null
 
         const referenceKey = `${owner.kind}:${owner.id}:${condition.type}:${target}`
         if (
@@ -485,7 +490,8 @@ describe('static data references', () => {
     const expectedSets = {
       battle: ids.battle,
       location: ids.location,
-      research: ids.research,
+      game: ids.game,
+      'field-research': ids.fieldResearch,
       task: ids.task,
     } as const
 
@@ -689,31 +695,44 @@ describe('static data references', () => {
   })
 
   test('inventory start item effects reference authored activities', () => {
-    const broken: Array<{ itemId: string; effect: string; targetId: string }> = []
+    const broken: Array<{ itemId: string; effect: string; targetId: string }> =
+      []
 
     for (const item of items) {
-      if (item.effects?.startBattle && !ids.battle.has(item.effects.startBattle.id)) {
+      if (
+        item.effects?.startBattle &&
+        !ids.battle.has(item.effects.startBattle.id)
+      ) {
         broken.push({
           itemId: item.id,
           effect: 'startBattle',
           targetId: item.effects.startBattle.id,
         })
       }
-      if (item.effects?.startEncounter && !ids.location.has(item.effects.startEncounter.id)) {
+      if (
+        item.effects?.startEncounter &&
+        !ids.location.has(item.effects.startEncounter.id)
+      ) {
         broken.push({
           itemId: item.id,
           effect: 'startEncounter',
           targetId: item.effects.startEncounter.id,
         })
       }
-      if (item.effects?.startResearch && !ids.research.has(item.effects.startResearch.id)) {
+      if (
+        item.effects?.startResearch &&
+        !ids.activity.has(item.effects.startResearch.id)
+      ) {
         broken.push({
           itemId: item.id,
           effect: 'startResearch',
           targetId: item.effects.startResearch.id,
         })
       }
-      if (item.effects?.startMinigame && !ids.research.has(item.effects.startMinigame.id)) {
+      if (
+        item.effects?.startMinigame &&
+        !ids.activity.has(item.effects.startMinigame.id)
+      ) {
         broken.push({
           itemId: item.id,
           effect: 'startMinigame',
@@ -2895,33 +2914,33 @@ describe('static data references', () => {
       targetId: 'route-10-voltorb-roundup',
     })
     expect(voltorbGames[0]?.requirements).toContainEqual({
-      type: 'research_encounter_result',
+      type: 'game_result',
       targetId: 'route-10-voltorb-primer',
       battleStatus: 'win',
       count: 1,
       inverse: true,
     })
     expect(voltorbGames[1]?.requirements).toContainEqual({
-      type: 'research_encounter_result',
+      type: 'game_result',
       targetId: 'route-10-voltorb-primer',
       battleStatus: 'win',
       count: 1,
     })
     expect(voltorbGames[1]?.requirements).toContainEqual({
-      type: 'research_encounter_result',
+      type: 'game_result',
       targetId: 'route-10-voltorb-relay',
       battleStatus: 'win',
       count: 1,
       inverse: true,
     })
     expect(voltorbGames[2]?.requirements).toContainEqual({
-      type: 'research_encounter_result',
+      type: 'game_result',
       targetId: 'route-10-voltorb-relay',
       battleStatus: 'win',
       count: 1,
     })
     expect(voltorbGames[2]?.requirements).toContainEqual({
-      type: 'research_encounter_result',
+      type: 'game_result',
       targetId: 'route-10-voltorb-landslide',
       battleStatus: 'win',
       count: 1,
@@ -2934,7 +2953,7 @@ describe('static data references', () => {
       [1, 2, 3],
     )
     expect(openRoad?.requirements).toContainEqual({
-      type: 'research_encounter_result',
+      type: 'game_result',
       targetId: 'route-10-voltorb-landslide',
       battleStatus: 'win',
       count: 1,
@@ -3014,7 +3033,7 @@ describe('static data references', () => {
     })
     for (let index = 1; index < demolitionGames.length; index += 1) {
       expect(demolitionGames[index]?.requirements).toContainEqual({
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: demolitionGames[index - 1]?.id,
         battleStatus: 'win',
         count: 1,
@@ -3022,7 +3041,7 @@ describe('static data references', () => {
     }
     for (const demolitionGame of demolitionGames) {
       expect(demolitionGame?.requirements).toContainEqual({
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: demolitionGame?.id,
         battleStatus: 'win',
         count: 1,
@@ -3039,7 +3058,7 @@ describe('static data references', () => {
       demolitionGames.map((game) => game?.settings.protectedPokemon?.length),
     ).toEqual([2, 3, 2, 3, 3])
     expect(suchDevastation?.requirements).toContainEqual({
-      type: 'research_encounter_result',
+      type: 'game_result',
       targetId: 'route-10-voltorb-final-breach',
       battleStatus: 'win',
       count: 1,
@@ -3359,7 +3378,7 @@ describe('static data references', () => {
         targetId: 'clear-bell',
       })
       expect(snap?.requirements).toContainEqual({
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: expected.id,
         battleStatus: 'win',
         count: 1,
@@ -3400,7 +3419,7 @@ describe('static data references', () => {
       inverse: true,
     })
     expect(hoOhSnap?.requirements).toContainEqual({
-      type: 'research_encounter_result',
+      type: 'game_result',
       targetId: 'rainbow-feather-shadow-snap',
       battleStatus: 'win',
       count: 3,
@@ -3476,7 +3495,7 @@ describe('static data references', () => {
         targetId: 'clear-bell',
       })
       expect(snap?.requirements).toContainEqual({
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: expected.id,
         battleStatus: 'win',
         count: 1,
@@ -3502,7 +3521,7 @@ describe('static data references', () => {
       targetId: 'clear-bell',
     })
     expect(lugiaSnap?.requirements).toContainEqual({
-      type: 'research_encounter_result',
+      type: 'game_result',
       targetId: 'silver-feather-shadow-snap',
       battleStatus: 'win',
       count: 3,
@@ -4275,7 +4294,7 @@ describe('static data references', () => {
         dropChance: 100,
       })
       expect(game.requirements).toContainEqual({
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: game.id,
         battleStatus: 'win',
         count: 1,
@@ -4288,7 +4307,7 @@ describe('static data references', () => {
       const battle = battles.find((entry) => entry.id === battleId)
       const study = allGames.find((entry) => entry.id === studyId)
       const requirement = {
-        type: 'research_encounter_result' as const,
+        type: 'game_result' as const,
         targetId: echoMapId,
         battleStatus: 'win' as const,
         count: 1,
@@ -4302,7 +4321,7 @@ describe('static data references', () => {
     for (const [battleId, echoMapId] of initialTrainerUnlocks) {
       const battle = battles.find((entry) => entry.id === battleId)
       expect(battle?.requirements).toContainEqual({
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: echoMapId,
         battleStatus: 'win',
         count: 1,
@@ -4391,7 +4410,7 @@ describe('static data references', () => {
     }
 
     expect(shrine?.requirements).toContainEqual({
-      type: 'research_encounter_result',
+      type: 'game_result',
       targetId: 'rock-tunnel-echo-map-hidden-chamber',
       battleStatus: 'win',
       count: 1,
@@ -4462,7 +4481,7 @@ describe('static data references', () => {
         secret: true,
         requirements: [
           {
-            type: 'research_encounter_result',
+            type: 'field_research_result',
             targetId: studyId,
             battleStatus: 'win',
             count,
@@ -4479,7 +4498,7 @@ describe('static data references', () => {
       expect(task?.exitModal?.title).toEqual(expect.any(String))
       expect(task?.exitModal?.background).toBe('/backgrounds/cave.avif')
       expect(task?.requirements).toContainEqual({
-        type: 'research_encounter_result',
+        type: 'field_research_result',
         targetId: studyId,
         battleStatus: 'win',
         count: 5,
@@ -4499,7 +4518,7 @@ describe('static data references', () => {
       expect(task?.completionTrigger).toBe('auto')
       expect(task?.completeButtonText).toBeUndefined()
       expect(task?.requirements).toContainEqual({
-        type: 'research_encounter_result',
+        type: 'field_research_result',
         targetId: studyId,
         battleStatus: 'win',
         count: 10,
@@ -4790,7 +4809,9 @@ describe('static data references', () => {
     ])
     expect(route8Trainers).toHaveLength(13)
 
-    for (const trainer of route8Trainers.filter((entry) => !entry.isWildBattle)) {
+    for (const trainer of route8Trainers.filter(
+      (entry) => !entry.isWildBattle,
+    )) {
       expect(trainer.subCategory).toBe('Lavender Town')
       expect(trainer.requirements).toContainEqual(route8Gate)
       expect(trainer.requirements).toContainEqual({
@@ -4851,7 +4872,7 @@ describe('static data references', () => {
           count: 10,
         },
         {
-          type: 'research_encounter_result',
+          type: 'field_research_result',
           targetId: 'route-8-field-observation',
           count: 20,
         },
@@ -4874,7 +4895,10 @@ describe('static data references', () => {
       secret: true,
     })
     expect(
-      route8?.encounters.reduce((total, encounter) => total + encounter.chance, 0),
+      route8?.encounters.reduce(
+        (total, encounter) => total + encounter.chance,
+        0,
+      ),
     ).toBe(100)
   })
 
@@ -4919,7 +4943,7 @@ describe('static data references', () => {
           count: 3,
         },
         {
-          type: 'research_encounter_result',
+          type: 'field_research_result',
           targetId: 'route-8-field-observation',
           count: 1,
         },
@@ -4975,7 +4999,9 @@ describe('static data references', () => {
 
     for (const speciesId of [58, 37]) {
       const studyTask = tasks.find(
-        (entry) => entry.id === `route-7-${speciesId === 58 ? 'growlithe' : 'vulpix'}-study`,
+        (entry) =>
+          entry.id ===
+          `route-7-${speciesId === 58 ? 'growlithe' : 'vulpix'}-study`,
       )
       expect(studyTask?.requirements).toContainEqual({
         type: 'pokedex_caught_specific',
@@ -4995,7 +5021,7 @@ describe('static data references', () => {
         secret: true,
         requirements: [
           {
-            type: 'research_encounter_result',
+            type: 'field_research_result',
             targetId: 'route-7-field-observation',
             battleStatus: 'win',
             count: 1,
@@ -5019,7 +5045,7 @@ describe('static data references', () => {
           count: 3,
         },
         {
-          type: 'research_encounter_result',
+          type: 'field_research_result',
           targetId: 'route-7-field-observation',
           count: 1,
         },

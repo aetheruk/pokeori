@@ -5,7 +5,10 @@ import { allGames } from '@/data/games'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { grantRewards } from '@/utilities/rewards/reward-logic'
-import { getUser, type ResearchState } from '../actions'
+import {
+  getUser,
+  type GameActivityState,
+} from '@/app/(frontend)/game/_shared/activity-actions'
 import { ABILITIES } from '@/data/abilities'
 import {
   getAbilityShinyMultiplier,
@@ -19,7 +22,10 @@ import {
   type PokemonRarityId,
 } from '@/utilities/pokemon/rarity-effects'
 import { getShinyChance, rollShiny } from '@/utilities/pokemon/shiny-odds'
-import { getResearcherShinyModifier, getSkillLevel } from '@/utilities/skills/unlocks'
+import {
+  getResearcherShinyModifier,
+  getSkillLevel,
+} from '@/utilities/skills/unlocks'
 import type { Reward } from '@/utilities/rewards/reward-logic'
 import type {
   FishingGameConfig,
@@ -39,7 +45,10 @@ import {
   releaseActionLock,
   setIdempotentResult,
 } from '@/utilities/game-integrity'
-import { getRegionTimeZone, getTimeZoneClockTime } from '@/utilities/requirements'
+import {
+  getRegionTimeZone,
+  getTimeZoneClockTime,
+} from '@/utilities/requirements'
 import {
   getUserInventoryMap,
   getUserPokedexMap,
@@ -117,7 +126,10 @@ function getReactionDeadline(fishingState: FishingState): number | null {
   return fishingState.appearTime + entry.reactionTime
 }
 
-async function clearExpiredFishingCast(userId: string, fishingState: FishingState): Promise<boolean> {
+async function clearExpiredFishingCast(
+  userId: string,
+  fishingState: FishingState,
+): Promise<boolean> {
   if (fishingState.phase === 'missed') {
     await redis.del(`fishing:${userId}`)
     return true
@@ -156,7 +168,12 @@ export async function castFishingLine(rodType: RodType) {
       return { success: false, error: 'Not authenticated' }
     }
 
-    const rateLimit = await checkActionRateLimit(user.id, 'fishing-cast', 60, 60)
+    const rateLimit = await checkActionRateLimit(
+      user.id,
+      'fishing-cast',
+      60,
+      60,
+    )
     if (!rateLimit.allowed) {
       return { success: false, error: 'Too many casts. Please wait a moment.' }
     }
@@ -166,11 +183,16 @@ export async function castFishingLine(rodType: RodType) {
       FISHING_ACTION_LOCK_TTL,
     )
     if (!actionLock.acquired) {
-      return { success: false, error: 'Another fishing action is already being processed' }
+      return {
+        success: false,
+        error: 'Another fishing action is already being processed',
+      }
     }
 
     try {
-      const existingFishingState = (await redis.get(`fishing:${user.id}`)) as FishingState | null
+      const existingFishingState = (await redis.get(
+        `fishing:${user.id}`,
+      )) as FishingState | null
       const clearedExpiredCast = existingFishingState
         ? await clearExpiredFishingCast(user.id, existingFishingState)
         : false
@@ -183,14 +205,16 @@ export async function castFishingLine(rodType: RodType) {
       }
 
       // Get research state to get encounter config
-      const researchState = (await redis.get(`research:${user.id}`)) as ResearchState | null
+      const researchState = (await redis.get(
+        `game:${user.id}`,
+      )) as GameActivityState | null
       if (!researchState) {
         return { success: false, error: 'No active fishing session' }
       }
 
-      const encounter = allGames.find((e) => e.id === researchState.encounterId) as
-        | FishingGameConfig
-        | undefined
+      const encounter = allGames.find(
+        (e) => e.id === researchState.encounterId,
+      ) as FishingGameConfig | undefined
       if (!encounter || encounter.gameType !== 'fishing') {
         return { success: false, error: 'Invalid fishing encounter' }
       }
@@ -208,7 +232,8 @@ export async function castFishingLine(rodType: RodType) {
       }
 
       // Roll which pool (Pokemon vs items). Fishing uses a global 80/20 split.
-      const poolRoll = Math.random() * (FISHING_POKEMON_CHANCE + FISHING_ITEM_CHANCE)
+      const poolRoll =
+        Math.random() * (FISHING_POKEMON_CHANCE + FISHING_ITEM_CHANCE)
       let selectedEntry: FishingPokemonEntry | FishingItemEntry
       let resultType: 'pokemon' | 'item'
 
@@ -225,7 +250,8 @@ export async function castFishingLine(rodType: RodType) {
         })
 
         // Fallback to all entries if no valid ones found (to prevent checking empty pool)
-        const pool = validEntries.length > 0 ? validEntries : rodConfig.encounters.entries
+        const pool =
+          validEntries.length > 0 ? validEntries : rodConfig.encounters.entries
 
         selectedEntry = applySecretFishingPokemonReplacement({
           rodType,
@@ -250,9 +276,15 @@ export async function castFishingLine(rodType: RodType) {
         const formId = pokemonEntry.formId || pokemonEntry.speciesId.toString()
         const speciesData = getPokemonForm(formId)
         const activeAbilityId = researchState.activeAbilityId
-        const activeAbilitySourceFormId = researchState.activeAbilitySourceFormId
-        const effectiveAbilityId = resolveStartAbilityId(activeAbilityId, formId)
-        const effectiveAbility = effectiveAbilityId ? ABILITIES[effectiveAbilityId] : undefined
+        const activeAbilitySourceFormId =
+          researchState.activeAbilitySourceFormId
+        const effectiveAbilityId = resolveStartAbilityId(
+          activeAbilityId,
+          formId,
+        )
+        const effectiveAbility = effectiveAbilityId
+          ? ABILITIES[effectiveAbilityId]
+          : undefined
         const researcherLevel = getSkillLevel(user.skills, 'researching')
         const shinyChance = getShinyChance({
           sourceModifier: rodConfig.shinyChanceModifier || 1,
@@ -268,7 +300,9 @@ export async function castFishingLine(rodType: RodType) {
           }),
         })
         const pokedexMap = await getUserPokedexMap(payload as any, user.id)
-        const researchLevel = pokedexMap[pokemonEntry.speciesId.toString()]?.[formId]?.researchLevel || 0
+        const researchLevel =
+          pokedexMap[pokemonEntry.speciesId.toString()]?.[formId]
+            ?.researchLevel || 0
 
         isShiny = rollShiny(shinyChance, researchLevel >= 5 ? 2 : 1)
         if (
@@ -282,14 +316,18 @@ export async function castFishingLine(rodType: RodType) {
         ) {
           isShiny = true
         }
-        rarity = resolvePokemonRarity({ rarity: pokemonEntry.rarity, shiny: isShiny })
+        rarity = resolvePokemonRarity({
+          rarity: pokemonEntry.rarity,
+          shiny: isShiny,
+        })
         isShiny = rarity === 'shiny'
       }
 
       // Calculate appear time
       const appearDelay =
         selectedEntry.appearTime.min +
-        Math.random() * (selectedEntry.appearTime.max - selectedEntry.appearTime.min)
+        Math.random() *
+          (selectedEntry.appearTime.max - selectedEntry.appearTime.min)
       const now = Date.now()
 
       const fishingState: FishingState = {
@@ -312,7 +350,7 @@ export async function castFishingLine(rodType: RodType) {
       await redis.set(`fishing:${user.id}`, fishingState, { ex: 120 }) // 2 min expiry
 
       // Refresh research session TTL to keep it alive while fishing
-      await redis.expire(`research:${user.id}`, 900) // 15 min expiry for fishing sessions
+      await redis.expire(`game:${user.id}`, 900) // 15 min expiry for fishing sessions
 
       return {
         success: true,
@@ -337,9 +375,17 @@ export async function attemptHook() {
       return { success: false, error: 'Not authenticated' }
     }
 
-    const rateLimit = await checkActionRateLimit(user.id, 'fishing-hook', 120, 60)
+    const rateLimit = await checkActionRateLimit(
+      user.id,
+      'fishing-hook',
+      120,
+      60,
+    )
     if (!rateLimit.allowed) {
-      return { success: false, error: 'Too many hook attempts. Please wait a moment.' }
+      return {
+        success: false,
+        error: 'Too many hook attempts. Please wait a moment.',
+      }
     }
 
     const actionLock = await acquireActionLock(
@@ -347,11 +393,16 @@ export async function attemptHook() {
       FISHING_ACTION_LOCK_TTL,
     )
     if (!actionLock.acquired) {
-      return { success: false, error: 'Another fishing action is already being processed' }
+      return {
+        success: false,
+        error: 'Another fishing action is already being processed',
+      }
     }
 
     try {
-      const fishingState = (await redis.get(`fishing:${user.id}`)) as FishingState | null
+      const fishingState = (await redis.get(
+        `fishing:${user.id}`,
+      )) as FishingState | null
       if (!fishingState?.hookedResult) {
         return { success: false, error: 'No active cast' }
       }
@@ -429,9 +480,17 @@ export async function claimFishingItem() {
       return { success: false, error: 'Not authenticated' }
     }
 
-    const rateLimit = await checkActionRateLimit(user.id, 'fishing-claim-item', 30, 60)
+    const rateLimit = await checkActionRateLimit(
+      user.id,
+      'fishing-claim-item',
+      30,
+      60,
+    )
     if (!rateLimit.allowed) {
-      return { success: false, error: 'Too many item claims. Please wait a moment.' }
+      return {
+        success: false,
+        error: 'Too many item claims. Please wait a moment.',
+      }
     }
 
     const actionLock = await acquireActionLock(
@@ -439,15 +498,22 @@ export async function claimFishingItem() {
       FISHING_ACTION_LOCK_TTL,
     )
     if (!actionLock.acquired) {
-      return { success: false, error: 'Another fishing action is already being processed' }
+      return {
+        success: false,
+        error: 'Another fishing action is already being processed',
+      }
     }
 
     try {
       const payload = await getPayload({ config: configPromise })
 
-      const fishingState = (await redis.get(`fishing:${user.id}`)) as FishingState | null
+      const fishingState = (await redis.get(
+        `fishing:${user.id}`,
+      )) as FishingState | null
       if (!fishingState || fishingState.phase !== 'hooked') {
-        const recentClaim = await getIdempotentResult<any>(`fishing:item-claim:last:${user.id}`)
+        const recentClaim = await getIdempotentResult<any>(
+          `fishing:item-claim:last:${user.id}`,
+        )
         if (recentClaim) {
           return recentClaim
         }
@@ -473,17 +539,19 @@ export async function claimFishingItem() {
       ])
 
       // Update stats in Redis (legacy/backup)
-      const researchState = (await redis.get(`research:${user.id}`)) as ResearchState | null
+      const researchState = (await redis.get(
+        `game:${user.id}`,
+      )) as GameActivityState | null
       if (researchState) {
         researchState.wins += 1
-        await redis.set(`research:${user.id}`, researchState, { ex: 900 })
+        await redis.set(`game:${user.id}`, researchState, { ex: 900 })
 
         const encounterId = researchState.encounterId
         if (encounterId) {
           await incrementUserActivityResult(
             payload as any,
             user.id,
-            'researchEncounterResults',
+            'gameResults',
             encounterId,
             { wins: 1 },
           )
@@ -498,7 +566,11 @@ export async function claimFishingItem() {
       }
 
       await setIdempotentResult(claimResultKey, response, 300)
-      await setIdempotentResult(`fishing:item-claim:last:${user.id}`, response, 300)
+      await setIdempotentResult(
+        `fishing:item-claim:last:${user.id}`,
+        response,
+        300,
+      )
 
       // Clear fishing state
       await redis.del(`fishing:${user.id}`)
@@ -520,9 +592,17 @@ export async function releaseFish() {
       return { success: false, error: 'Not authenticated' }
     }
 
-    const rateLimit = await checkActionRateLimit(user.id, 'fishing-release', 40, 60)
+    const rateLimit = await checkActionRateLimit(
+      user.id,
+      'fishing-release',
+      40,
+      60,
+    )
     if (!rateLimit.allowed) {
-      return { success: false, error: 'Too many release actions. Please wait a moment.' }
+      return {
+        success: false,
+        error: 'Too many release actions. Please wait a moment.',
+      }
     }
 
     const actionLock = await acquireActionLock(
@@ -530,7 +610,10 @@ export async function releaseFish() {
       FISHING_ACTION_LOCK_TTL,
     )
     if (!actionLock.acquired) {
-      return { success: false, error: 'Another fishing action is already being processed' }
+      return {
+        success: false,
+        error: 'Another fishing action is already being processed',
+      }
     }
 
     try {
@@ -538,7 +621,7 @@ export async function releaseFish() {
       await redis.del(`fishing:${user.id}`)
 
       // Refresh research session TTL to keep it alive
-      await redis.expire(`research:${user.id}`, 900) // 15 min expiry
+      await redis.expire(`game:${user.id}`, 900) // 15 min expiry
 
       return { success: true, message: 'Released back into the water.' }
     } finally {
@@ -557,9 +640,17 @@ export async function startFishingCatch() {
       return { success: false, error: 'Not authenticated' }
     }
 
-    const rateLimit = await checkActionRateLimit(user.id, 'fishing-start-catch', 30, 60)
+    const rateLimit = await checkActionRateLimit(
+      user.id,
+      'fishing-start-catch',
+      30,
+      60,
+    )
     if (!rateLimit.allowed) {
-      return { success: false, error: 'Too many catch attempts. Please wait a moment.' }
+      return {
+        success: false,
+        error: 'Too many catch attempts. Please wait a moment.',
+      }
     }
 
     const actionLock = await acquireActionLock(
@@ -567,11 +658,16 @@ export async function startFishingCatch() {
       FISHING_ACTION_LOCK_TTL,
     )
     if (!actionLock.acquired) {
-      return { success: false, error: 'Another fishing action is already being processed' }
+      return {
+        success: false,
+        error: 'Another fishing action is already being processed',
+      }
     }
 
     try {
-      const fishingState = (await redis.get(`fishing:${user.id}`)) as FishingState | null
+      const fishingState = (await redis.get(
+        `fishing:${user.id}`,
+      )) as FishingState | null
       if (!fishingState || fishingState.phase !== 'hooked') {
         const recentCatchStart = await getIdempotentResult<any>(
           `fishing:catch-start:last:${user.id}`,
@@ -583,7 +679,8 @@ export async function startFishingCatch() {
       }
 
       const catchStartResultKey = `fishing:catch-start:${user.id}:${fishingState.castTime}`
-      const cachedCatchStart = await getIdempotentResult<any>(catchStartResultKey)
+      const cachedCatchStart =
+        await getIdempotentResult<any>(catchStartResultKey)
       if (cachedCatchStart) {
         return cachedCatchStart
       }
@@ -594,9 +691,9 @@ export async function startFishingCatch() {
       }
 
       const pokemonEntry = result.entry as FishingPokemonEntry
-      const encounter = allGames.find((e) => e.id === fishingState.encounterId) as
-        | FishingGameConfig
-        | undefined
+      const encounter = allGames.find(
+        (e) => e.id === fishingState.encounterId,
+      ) as FishingGameConfig | undefined
 
       if (!encounter) {
         return { success: false, error: 'Encounter not found' }
@@ -608,7 +705,9 @@ export async function startFishingCatch() {
 
       // Create location-style encounter state in Redis
       // This allows reusing the existing catch UI and attemptCapture logic
-      const { getPokemonSpecies, getPokemonForm } = await import('@/utilities/pokemon/pokedex')
+      const { getPokemonSpecies, getPokemonForm } = await import(
+        '@/utilities/pokemon/pokedex'
+      )
 
       const speciesId = pokemonEntry.speciesId
       const formId = pokemonEntry.formId || speciesId.toString()
@@ -654,7 +753,9 @@ export async function startFishingCatch() {
       }
 
       // Store as location encounter for attemptCapture compatibility
-      await redis.set(`encounter:${user.id}`, encounterState, { ex: duration + 60 })
+      await redis.set(`encounter:${user.id}`, encounterState, {
+        ex: duration + 60,
+      })
 
       const response = {
         success: true,
@@ -669,7 +770,11 @@ export async function startFishingCatch() {
       }
 
       await setIdempotentResult(catchStartResultKey, response, 300)
-      await setIdempotentResult(`fishing:catch-start:last:${user.id}`, response, 300)
+      await setIdempotentResult(
+        `fishing:catch-start:last:${user.id}`,
+        response,
+        300,
+      )
 
       // Clear fishing state
       await redis.del(`fishing:${user.id}`)
@@ -690,7 +795,9 @@ export async function getFishingState() {
 
     if (!user) return null
 
-    const fishingState = (await redis.get(`fishing:${user.id}`)) as FishingState | null
+    const fishingState = (await redis.get(
+      `fishing:${user.id}`,
+    )) as FishingState | null
     return fishingState
   } catch (error) {
     console.error('Error getting fishing state:', error)

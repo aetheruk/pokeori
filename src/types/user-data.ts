@@ -67,9 +67,9 @@ export interface LocationStats {
 }
 
 /**
- * Research encounter statistics
+ * Mini-game or Field Research statistics
  */
-export interface ResearchStats {
+export interface GameActivityStats {
   wins?: number
   losses?: number
   lastPlayed?: string
@@ -81,10 +81,19 @@ export interface ResearchStats {
 export interface UserStats {
   battles?: Record<string, BattleStats>
   locations?: Record<string, LocationStats>
-  research?: Record<string, ResearchStats>
+  games?: Record<string, GameActivityStats>
+  fieldResearch?: Record<string, GameActivityStats>
+  /** Legacy pre-0.1.0 activity data, read during migration only. */
+  research?: Record<string, GameActivityStats>
   totalEvolutions?: number
   // Dynamic stats for extensibility
-  [key: string]: number | undefined | Record<string, unknown> | BattleStats | LocationStats | ResearchStats
+  [key: string]:
+    | number
+    | undefined
+    | Record<string, unknown>
+    | BattleStats
+    | LocationStats
+    | GameActivityStats
 }
 
 /**
@@ -254,10 +263,20 @@ export interface LocationResultEntry {
 }
 
 /**
- * Research encounter result array format
+ * Mini-game result array format
  */
-export interface ResearchResultEntry {
-  encounterId: string
+export interface GameResultEntry {
+  gameId: string
+  wins: number
+  losses: number
+  lastPlayed?: string
+}
+
+/**
+ * Field Research result array format
+ */
+export interface FieldResearchResultEntry {
+  fieldResearchId: string
   wins: number
   losses: number
   lastPlayed?: string
@@ -305,7 +324,11 @@ export namespace UserDataConverters {
         .filter(Boolean)
         .map((t) => {
           if (typeof t === 'string') {
-            return { taskId: t, completedAt: new Date().toISOString(), count: 1 }
+            return {
+              taskId: t,
+              completedAt: new Date().toISOString(),
+              count: 1,
+            }
           }
           if (typeof t === 'object' && t !== null) {
             // If it's a valid object from an array with holes, just return it.
@@ -316,7 +339,9 @@ export namespace UserDataConverters {
           }
           return t
         })
-        .filter((t) => t && typeof t === 'object' && t.taskId) as CompletedTaskEntry[]
+        .filter(
+          (t) => t && typeof t === 'object' && t.taskId,
+        ) as CompletedTaskEntry[]
     }
     return Object.entries(completedTasks || {})
       .filter(([_, data]) => data)
@@ -326,7 +351,9 @@ export namespace UserDataConverters {
       })) as CompletedTaskEntry[]
   }
 
-  export function battleStatsToArray(battles: Record<string, BattleStats>): BattleResultEntry[] {
+  export function battleStatsToArray(
+    battles: Record<string, BattleStats>,
+  ): BattleResultEntry[] {
     return Object.entries(battles).map(([battleId, stats]) => ({
       battleId,
       wins: stats.wins || 0,
@@ -346,11 +373,22 @@ export namespace UserDataConverters {
     }))
   }
 
-  export function researchStatsToArray(
-    research: Record<string, ResearchStats>,
-  ): ResearchResultEntry[] {
-    return Object.entries(research).map(([encounterId, stats]) => ({
-      encounterId,
+  export function gameStatsToArray(
+    games: Record<string, GameActivityStats>,
+  ): GameResultEntry[] {
+    return Object.entries(games).map(([gameId, stats]) => ({
+      gameId,
+      wins: stats.wins || 0,
+      losses: stats.losses || 0,
+      lastPlayed: stats.lastPlayed,
+    }))
+  }
+
+  export function fieldResearchStatsToArray(
+    fieldResearch: Record<string, GameActivityStats>,
+  ): FieldResearchResultEntry[] {
+    return Object.entries(fieldResearch).map(([fieldResearchId, stats]) => ({
+      fieldResearchId,
       wins: stats.wins || 0,
       losses: stats.losses || 0,
       lastPlayed: stats.lastPlayed,

@@ -32,8 +32,9 @@ changes.
 ## Rollout
 - Increment `package.json` to a new semantic version for this release; do this for every production deploy, including content updates and hotfixes.
 - Back up production MongoDB before schema or data migrations.
+- For the 0.1.0 activity split, run `bun run migrate:game-activity-domains --dry-run`, review the counts, then run `bun run migrate:game-activity-domains`.
 - Confirm Redis is reachable and TLS settings match the deployment environment.
 - Deploy to staging first when available.
 - Check server logs for request IDs on API failures.
-- Verify login, Explore, Pokemon box, one battle, one location encounter, and one mini-game.
+- Verify login, Explore, Pokemon box, one battle, one location encounter, one Mini Game, and one Field Research study.
 - With an already-open PWA session, confirm it detects the new `/api/app-version` response and reloads to the latest client bundle.

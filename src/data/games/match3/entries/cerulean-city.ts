@@ -12,7 +12,7 @@ export const ceruleanCitymatch3gamesEntries: Match3GameConfig[] = [
     background: '/backgrounds/inside-house.avif',
     requirements: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'bill-evolution-stone-study',
         count: 1,
         inverse: true,

@@ -6,7 +6,10 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { grantRewards } from '@/utilities/rewards/reward-logic'
 import { mergeSummaries } from '../utils'
-import { getUser, type ResearchState } from '../actions'
+import {
+  getUser,
+  type GameActivityState,
+} from '@/app/(frontend)/game/_shared/activity-actions'
 import type { Reward } from '@/utilities/rewards/reward-logic'
 import {
   acquireActionLock,
@@ -53,7 +56,8 @@ async function settlePachinkoDrop({
     }
 
     if (idempotentResultKey) {
-      const cachedResult = await getIdempotentResult<PachinkoSettlementResult>(idempotentResultKey)
+      const cachedResult =
+        await getIdempotentResult<PachinkoSettlementResult>(idempotentResultKey)
       if (cachedResult) return cachedResult
     }
 
@@ -64,23 +68,37 @@ async function settlePachinkoDrop({
       60,
     )
     if (!rateLimit.allowed) {
-      return { success: false, error: 'Too many pachinko actions. Please wait a moment.' }
+      return {
+        success: false,
+        error: 'Too many pachinko actions. Please wait a moment.',
+      }
     }
 
-    const actionLock = await acquireActionLock(`lock:pachinko:action:${user.id}`, 10)
+    const actionLock = await acquireActionLock(
+      `lock:pachinko:action:${user.id}`,
+      10,
+    )
     if (!actionLock.acquired) {
-      return { success: false, error: 'A pachinko action is already being processed' }
+      return {
+        success: false,
+        error: 'A pachinko action is already being processed',
+      }
     }
 
     const payload = await getPayload({ config: configPromise })
 
     try {
       if (idempotentResultKey) {
-        const cachedResult = await getIdempotentResult<PachinkoSettlementResult>(idempotentResultKey)
+        const cachedResult =
+          await getIdempotentResult<PachinkoSettlementResult>(
+            idempotentResultKey,
+          )
         if (cachedResult) return cachedResult
       }
 
-      const state = (await redis.get(`research:${user.id}`)) as ResearchState | null
+      const state = (await redis.get(
+        `game:${user.id}`,
+      )) as GameActivityState | null
       if (!state) {
         return { success: false, error: 'Session expired' }
       }
@@ -91,7 +109,10 @@ async function settlePachinkoDrop({
       }
 
       // Cost Check using fresh user read
-      const freshUser = await payload.findByID({ collection: 'users', id: user.id })
+      const freshUser = await payload.findByID({
+        collection: 'users',
+        id: user.id,
+      })
       const cost = encounter.settings.cost
       let currentBalance = 0
       if (cost) {
@@ -104,7 +125,9 @@ async function settlePachinkoDrop({
 
       const bucket =
         action === 'bucket'
-          ? encounter.settings.board?.buckets.find((b: { id: string }) => b.id === bucketId)
+          ? encounter.settings.board?.buckets.find(
+              (b: { id: string }) => b.id === bucketId,
+            )
           : null
       if (action === 'bucket' && !bucket) {
         return { success: false, error: 'Invalid bucket' }
@@ -116,7 +139,7 @@ async function settlePachinkoDrop({
       await incrementUserActivityResult(
         payload as any,
         user.id,
-        'researchEncounterResults',
+        'gameResults',
         state.encounterId,
         isWin ? { wins: 1 } : { losses: 1 },
       )
@@ -140,25 +163,37 @@ async function settlePachinkoDrop({
       // Grant Rewards
       let dropSummary = null
       if (hasRewards) {
-        const res = await grantRewards(user.id, bucket.rewards as unknown as Reward[])
+        const res = await grantRewards(
+          user.id,
+          bucket.rewards as unknown as Reward[],
+        )
         dropSummary = res.summary
       }
 
       // Update Redis
-      const currentSession = state.pachinkoSession || { totalRewards: {}, totalCost: 0 }
-      if (dropSummary) {
-        currentSession.totalRewards = mergeSummaries(currentSession.totalRewards, dropSummary)
+      const currentSession = state.pachinkoSession || {
+        totalRewards: {},
+        totalCost: 0,
       }
-      currentSession.totalCost = (currentSession.totalCost || 0) + (cost?.amount || 0)
+      if (dropSummary) {
+        currentSession.totalRewards = mergeSummaries(
+          currentSession.totalRewards,
+          dropSummary,
+        )
+      }
+      currentSession.totalCost =
+        (currentSession.totalCost || 0) + (cost?.amount || 0)
       state.pachinkoSession = currentSession
       if (isWin) state.wins += 1
       else state.losses += 1
 
-      await redis.set(`research:${user.id}`, state, { ex: 3600 })
+      await redis.set(`game:${user.id}`, state, { ex: 3600 })
 
       const response = {
         success: true,
-        balance: cost ? currentBalance - cost.amount : freshUser.currency?.pokedollars || 0,
+        balance: cost
+          ? currentBalance - cost.amount
+          : freshUser.currency?.pokedollars || 0,
         rewards: dropSummary,
         summary: currentSession.totalRewards,
         totalCost: currentSession.totalCost,

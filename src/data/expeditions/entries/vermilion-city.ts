@@ -43,7 +43,7 @@ export const vermilionCityExpeditions: ExpeditionConfig[] = [
         'vermilion-gym-gentleman-tucker',
         'vermilion-gym-lt-surge',
       ],
-      research: [
+      game: [
         'vermilion-gym-voltorb-1',
         'vermilion-gym-voltorb-2',
         'vermilion-gym-voltorb-3',
@@ -67,7 +67,7 @@ export const vermilionCityExpeditions: ExpeditionConfig[] = [
       {
         type: 'activity',
         id: 'vermilion-gym-step-3-voltorb-1',
-        activityType: 'research',
+        activityType: 'game',
         activityId: 'vermilion-gym-voltorb-1',
         secret: true,
       },
@@ -81,7 +81,7 @@ export const vermilionCityExpeditions: ExpeditionConfig[] = [
       {
         type: 'activity',
         id: 'vermilion-gym-step-5-voltorb-2',
-        activityType: 'research',
+        activityType: 'game',
         activityId: 'vermilion-gym-voltorb-2',
         secret: true,
       },
@@ -95,7 +95,7 @@ export const vermilionCityExpeditions: ExpeditionConfig[] = [
       {
         type: 'activity',
         id: 'vermilion-gym-step-7-voltorb-3',
-        activityType: 'research',
+        activityType: 'game',
         activityId: 'vermilion-gym-voltorb-3',
         secret: true,
       },
@@ -192,7 +192,7 @@ export const vermilionCityExpeditions: ExpeditionConfig[] = [
         'pokemon-fan-club-poke-kid',
         'pokemon-fan-club-poke-mom',
       ],
-      research: ['pokemon-fan-club-pikachu-puzzle-box'],
+      game: ['pokemon-fan-club-pikachu-puzzle-box'],
     },
     path: [
       {
@@ -233,7 +233,7 @@ export const vermilionCityExpeditions: ExpeditionConfig[] = [
       {
         type: 'activity',
         id: 'fan-club-step-6-puzzle-box',
-        activityType: 'research',
+        activityType: 'game',
         activityId: 'pokemon-fan-club-pikachu-puzzle-box',
         secret: true,
       },
@@ -343,7 +343,7 @@ export const vermilionCityExpeditions: ExpeditionConfig[] = [
         'squirtle-squad-rescue-battle',
       ],
       location: ['squirtle-squad-lost-member'],
-      research: ['squirtle-squad-torn-map'],
+      game: ['squirtle-squad-torn-map'],
     },
     path: [
       {
@@ -430,7 +430,7 @@ export const vermilionCityExpeditions: ExpeditionConfig[] = [
       {
         type: 'activity',
         id: 'squirtle-squad-step-8-torn-map',
-        activityType: 'research',
+        activityType: 'game',
         activityId: 'squirtle-squad-torn-map',
         secret: true,
       },

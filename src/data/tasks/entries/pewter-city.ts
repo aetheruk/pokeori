@@ -1760,7 +1760,7 @@ export const pewterCityTasks: Task[] = [
       "Hey {Trainer}, thanks for helping out with my store. I've got a box of slow-moving craft stock taking up space: cracked Pokeball parts, spare solvent, and a few colored nuts from an order nobody collected. If you can use them for crafting, take them off my hands.",
     requirements: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         battleStatus: 'win',
         count: 1,
         targetId: 'pewter-item-identify',

@@ -300,10 +300,18 @@ export async function startEncounter(
             }),
           )
         : [],
-      researchEncounterResults: activityStats.research
-        ? Object.entries(activityStats.research).map(
-            ([encounterId, s]: [string, any]) => ({
-              encounterId,
+      gameResults: activityStats.games
+        ? Object.entries(activityStats.games).map(
+            ([gameId, s]: [string, any]) => ({
+              gameId,
+              ...s,
+            }),
+          )
+        : [],
+      fieldResearchResults: activityStats.fieldResearch
+        ? Object.entries(activityStats.fieldResearch).map(
+            ([fieldResearchId, s]: [string, any]) => ({
+              fieldResearchId,
               ...s,
             }),
           )

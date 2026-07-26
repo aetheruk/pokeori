@@ -1,6 +1,6 @@
 import { battles } from '@/data/battles'
 import { locations } from '@/data/locations'
-import { allGames } from '@/data/games'
+import { fieldResearchGames, miniGames } from '@/data/games'
 import { tasks } from '@/data/tasks'
 import {
   type ExpeditionActivityType,
@@ -11,7 +11,10 @@ import {
   type ExpeditionPathNode,
   type ExpeditionResultBranchResult,
 } from '@/data/expeditions'
-import { checkRequirement, type RequirementData } from '@/utilities/requirements'
+import {
+  checkRequirement,
+  type RequirementData,
+} from '@/utilities/requirements'
 
 interface ActivityCandidate {
   activityType: ExpeditionActivityType
@@ -21,7 +24,8 @@ interface ActivityCandidate {
 const ALL_EXPEDITION_ACTIVITY_TYPES: ExpeditionActivityType[] = [
   'battle',
   'location',
-  'research',
+  'game',
+  'field-research',
   'task',
 ]
 
@@ -37,8 +41,12 @@ function getActivityDefinition(
     return locations.find((entry) => entry.id === activityId) || null
   }
 
-  if (activityType === 'research') {
-    return allGames.find((entry) => entry.id === activityId) || null
+  if (activityType === 'game') {
+    return miniGames.find((entry) => entry.id === activityId) || null
+  }
+
+  if (activityType === 'field-research') {
+    return fieldResearchGames.find((entry) => entry.id === activityId) || null
   }
 
   if (activityType === 'task') {
@@ -49,7 +57,10 @@ function getActivityDefinition(
 }
 
 function weightedPick<T>(entries: T[], getWeight: (entry: T) => number): T {
-  const totalWeight = entries.reduce((sum, entry) => sum + Math.max(0, getWeight(entry)), 0)
+  const totalWeight = entries.reduce(
+    (sum, entry) => sum + Math.max(0, getWeight(entry)),
+    0,
+  )
 
   if (totalWeight <= 0) {
     return entries[Math.floor(Math.random() * entries.length)]
@@ -71,7 +82,9 @@ function getNodeCategories(
   node: Extract<ExpeditionPathNode, { type: 'activity' }>,
 ): ExpeditionActivityType[] {
   const categories =
-    node.categories || node.activityTypes || (node.activityType ? [node.activityType] : undefined)
+    node.categories ||
+    node.activityTypes ||
+    (node.activityType ? [node.activityType] : undefined)
   if (categories && categories.length > 0) {
     return categories
   }
@@ -83,7 +96,10 @@ function formatBranchLabel(branchId: string): string {
   return branchId.replace(/[-_]/g, ' ').replace(/\b\w/g, (m) => m.toUpperCase())
 }
 
-function formatResultBranchLabel(result: 'win' | 'loss', label?: string): string {
+function formatResultBranchLabel(
+  result: 'win' | 'loss',
+  label?: string,
+): string {
   if (label) {
     return label
   }
@@ -102,7 +118,10 @@ function getPreviewActivities(steps: ExpeditionGeneratedStep[]): Array<{
       ): step is ExpeditionGeneratedStep & {
         activityType: ExpeditionActivityType
         activityName: string
-      } => (step.type || 'activity') === 'activity' && !!step.activityType && !!step.activityName,
+      } =>
+        (step.type || 'activity') === 'activity' &&
+        !!step.activityType &&
+        !!step.activityName,
     )
     .slice(0, 2)
     .map((step) => ({
@@ -111,14 +130,18 @@ function getPreviewActivities(steps: ExpeditionGeneratedStep[]): Array<{
     }))
 }
 
-export function renumberSteps(steps: ExpeditionGeneratedStep[]): ExpeditionGeneratedStep[] {
+export function renumberSteps(
+  steps: ExpeditionGeneratedStep[],
+): ExpeditionGeneratedStep[] {
   return steps.map((step, index) => ({
     ...step,
     stepNumber: index + 1,
   }))
 }
 
-export function cloneSteps(steps: ExpeditionGeneratedStep[]): ExpeditionGeneratedStep[] {
+export function cloneSteps(
+  steps: ExpeditionGeneratedStep[],
+): ExpeditionGeneratedStep[] {
   return JSON.parse(JSON.stringify(steps)) as ExpeditionGeneratedStep[]
 }
 
@@ -126,16 +149,27 @@ export function resolveResultBranchAfterStep(
   steps: ExpeditionGeneratedStep[],
   completedStepIndex: number,
   result: ExpeditionResultBranchResult,
-): { steps: ExpeditionGeneratedStep[]; nextStepIndex: number; end?: 'complete' | 'fail' } | null {
+): {
+  steps: ExpeditionGeneratedStep[]
+  nextStepIndex: number
+  end?: 'complete' | 'fail'
+} | null {
   const completedStep = steps[completedStepIndex]
   const resultBranchIndex = completedStepIndex + 1
   const resultBranch = steps[resultBranchIndex]
 
-  if (!completedStep || !resultBranch || resultBranch.type !== 'result_branch') {
+  if (
+    !completedStep ||
+    !resultBranch ||
+    resultBranch.type !== 'result_branch'
+  ) {
     return null
   }
 
-  if (resultBranch.sourceStepId && resultBranch.sourceStepId !== completedStep.stepId) {
+  if (
+    resultBranch.sourceStepId &&
+    resultBranch.sourceStepId !== completedStep.stepId
+  ) {
     return null
   }
 
@@ -163,10 +197,16 @@ export function resolveResultBranchAfterStep(
   }
 }
 
-function meetsActivityRequirements(activity: any, userData: RequirementData): boolean {
+function meetsActivityRequirements(
+  activity: any,
+  userData: RequirementData,
+): boolean {
   const requirements = activity.requirements || []
   return requirements.every((req: any) =>
-    checkRequirement(userData, req, { category: activity.category, subCategory: activity.subCategory }),
+    checkRequirement(userData, req, {
+      category: activity.category,
+      subCategory: activity.subCategory,
+    }),
   )
 }
 
@@ -178,7 +218,9 @@ function resolveForcedActivityForNode(
     return null
   }
 
-  const searchTypes = node.activityType ? [node.activityType] : ALL_EXPEDITION_ACTIVITY_TYPES
+  const searchTypes = node.activityType
+    ? [node.activityType]
+    : ALL_EXPEDITION_ACTIVITY_TYPES
 
   for (const activityType of searchTypes) {
     const activity = getActivityDefinition(activityType, node.activityId)
@@ -198,7 +240,9 @@ function resolveForcedActivityForNode(
     }
   }
 
-  throw new Error(`Forced expedition activity is missing for node ${node.id}: ${node.activityId}`)
+  throw new Error(
+    `Forced expedition activity is missing for node ${node.id}: ${node.activityId}`,
+  )
 }
 
 function pickActivityForNode(
@@ -209,7 +253,9 @@ function pickActivityForNode(
 ): ActivityCandidate {
   const forcedActivity = resolveForcedActivityForNode(node, userData)
   if (forcedActivity) {
-    usedActivityKeys.add(`${forcedActivity.activityType}:${forcedActivity.activityId}`)
+    usedActivityKeys.add(
+      `${forcedActivity.activityType}:${forcedActivity.activityId}`,
+    )
     return forcedActivity
   }
 
@@ -244,9 +290,13 @@ function pickActivityForNode(
   }
 
   const primaryCandidates = candidates.filter(
-    (candidate) => !usedActivityKeys.has(`${candidate.activityType}:${candidate.activityId}`),
+    (candidate) =>
+      !usedActivityKeys.has(
+        `${candidate.activityType}:${candidate.activityId}`,
+      ),
   )
-  const finalCandidates = primaryCandidates.length > 0 ? primaryCandidates : candidates
+  const finalCandidates =
+    primaryCandidates.length > 0 ? primaryCandidates : candidates
 
   const picked = weightedPick(finalCandidates, () => 1)
   usedActivityKeys.add(`${picked.activityType}:${picked.activityId}`)
@@ -264,8 +314,16 @@ function buildStepsForNodes(
 
   for (const node of nodes) {
     if (node.type === 'activity') {
-      const selected = pickActivityForNode(expedition, node, userData, usedActivityKeys)
-      const activity = getActivityDefinition(selected.activityType, selected.activityId)
+      const selected = pickActivityForNode(
+        expedition,
+        node,
+        userData,
+        usedActivityKeys,
+      )
+      const activity = getActivityDefinition(
+        selected.activityType,
+        selected.activityId,
+      )
 
       if (!activity) {
         throw new Error(
@@ -292,10 +350,15 @@ function buildStepsForNodes(
     if (node.type === 'branch') {
       if (node.selection === 'random') {
         if (node.branches.length === 0) {
-          throw new Error(`Random expedition branch has no options for node ${node.id}`)
+          throw new Error(
+            `Random expedition branch has no options for node ${node.id}`,
+          )
         }
 
-        const selectedBranch = weightedPick(node.branches, (branch) => branch.weight ?? 1)
+        const selectedBranch = weightedPick(
+          node.branches,
+          (branch) => branch.weight ?? 1,
+        )
         const branchSteps = buildStepsForNodes(
           expedition,
           selectedBranch.nodes,
@@ -307,23 +370,24 @@ function buildStepsForNodes(
         continue
       }
 
-      const branchOptions: ExpeditionGeneratedBranchOption[] = node.branches.map((branch) => {
-        const branchUsedActivityKeys = new Set(usedActivityKeys)
-        const branchSteps = buildStepsForNodes(
-          expedition,
-          branch.nodes,
-          userData,
-          branchUsedActivityKeys,
-          branch.id,
-        )
+      const branchOptions: ExpeditionGeneratedBranchOption[] =
+        node.branches.map((branch) => {
+          const branchUsedActivityKeys = new Set(usedActivityKeys)
+          const branchSteps = buildStepsForNodes(
+            expedition,
+            branch.nodes,
+            userData,
+            branchUsedActivityKeys,
+            branch.id,
+          )
 
-        return {
-          branchId: branch.id,
-          label: formatBranchLabel(branch.id),
-          steps: renumberSteps(branchSteps),
-          previewActivities: getPreviewActivities(branchSteps),
-        }
-      })
+          return {
+            branchId: branch.id,
+            label: formatBranchLabel(branch.id),
+            steps: renumberSteps(branchSteps),
+            previewActivities: getPreviewActivities(branchSteps),
+          }
+        })
 
       steps.push({
         type: 'branch_choice',
@@ -338,30 +402,31 @@ function buildStepsForNodes(
     }
 
     if (node.type === 'result_branch') {
-      const resultOptions: ExpeditionGeneratedResultBranchOption[] = node.results.map((result) => {
-        if (result.end && result.nodes && result.nodes.length > 0) {
-          throw new Error(
-            `Terminal expedition result branch cannot also define nodes for ${node.id}:${result.result}`,
+      const resultOptions: ExpeditionGeneratedResultBranchOption[] =
+        node.results.map((result) => {
+          if (result.end && result.nodes && result.nodes.length > 0) {
+            throw new Error(
+              `Terminal expedition result branch cannot also define nodes for ${node.id}:${result.result}`,
+            )
+          }
+
+          const resultUsedActivityKeys = new Set(usedActivityKeys)
+          const resultSteps = buildStepsForNodes(
+            expedition,
+            result.nodes || [],
+            userData,
+            resultUsedActivityKeys,
+            `${node.id}:${result.result}`,
           )
-        }
 
-        const resultUsedActivityKeys = new Set(usedActivityKeys)
-        const resultSteps = buildStepsForNodes(
-          expedition,
-          result.nodes || [],
-          userData,
-          resultUsedActivityKeys,
-          `${node.id}:${result.result}`,
-        )
-
-        return {
-          result: result.result,
-          label: formatResultBranchLabel(result.result, result.label),
-          end: result.end,
-          steps: renumberSteps(resultSteps),
-          previewActivities: getPreviewActivities(resultSteps),
-        }
-      })
+          return {
+            result: result.result,
+            label: formatResultBranchLabel(result.result, result.label),
+            end: result.end,
+            steps: renumberSteps(resultSteps),
+            previewActivities: getPreviewActivities(resultSteps),
+          }
+        })
 
       steps.push({
         type: 'result_branch',
@@ -383,6 +448,11 @@ export function buildExpeditionSteps(
   userData: RequirementData,
 ): ExpeditionGeneratedStep[] {
   const usedActivityKeys = new Set<string>()
-  const steps = buildStepsForNodes(expedition, expedition.path, userData, usedActivityKeys)
+  const steps = buildStepsForNodes(
+    expedition,
+    expedition.path,
+    userData,
+    usedActivityKeys,
+  )
   return renumberSteps(steps)
 }

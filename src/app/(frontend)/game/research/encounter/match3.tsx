@@ -12,7 +12,7 @@ import { useUser } from '@/context/UserContext'
 import type { Match3Crystal, Match3GameConfig } from '@/data/games/match3/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
-import { completeResearchEncounter, startResearchEncounter } from '../actions'
+import { completeGame, startGame } from '@/app/(frontend)/game/games/actions'
 
 interface Match3GameProps {
   encounter: Match3GameConfig
@@ -218,11 +218,7 @@ export function Match3Game({ encounter, initialState }: Match3GameProps) {
 
     // Always pass finalScore so score-based games can be verified server-side.
     const isSuccess = hasWonNormal || hasReachedMilestone
-    const res = await completeResearchEncounter(
-      encounter.id,
-      isSuccess,
-      finalScore,
-    )
+    const res = await completeGame(encounter.id, isSuccess, finalScore)
 
     setResult({
       success: isSuccess && res.success,
@@ -508,7 +504,7 @@ export function Match3Game({ encounter, initialState }: Match3GameProps) {
 
   // Initialize game
   const initGame = useCallback(async () => {
-    const res = await startResearchEncounter(encounter.id)
+    const res = await startGame(encounter.id)
     if (!res.success) {
       console.error('Failed to start:', res.error)
       return
@@ -769,7 +765,7 @@ export function Match3Game({ encounter, initialState }: Match3GameProps) {
                 size="lg"
                 onClick={async () => {
                   try {
-                    const res = await startResearchEncounter(
+                    const res = await startGame(
                       (initialState?.encounter || encounter).id,
                       true,
                     )

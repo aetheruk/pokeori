@@ -40,7 +40,7 @@ import {
 } from '@/data/games/slots/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
-import { completeResearchEncounter, startResearchEncounter } from '../actions'
+import { completeGame, startGame } from '@/app/(frontend)/game/games/actions'
 import { spinSlotMachine } from '../games/slots'
 
 interface SlotGameProps {
@@ -323,7 +323,7 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
     if (spinning) return // Can't leave while spinning
     setGameEnded(true)
 
-    const res = await completeResearchEncounter(encounter.id, true)
+    const res = await completeGame(encounter.id, true)
 
     setResult({
       success: true,
@@ -476,7 +476,7 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
                 size="lg"
                 onClick={async () => {
                   try {
-                    const res = await startResearchEncounter(
+                    const res = await startGame(
                       (initialState?.encounter || encounter).id,
                       true,
                     )

@@ -2,7 +2,11 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import type { User } from '@/payload-types'
 import { items } from '@/data/items'
-import { getPokemonSpecies, getPokemonForm, getSpeciesIdForForm } from '@/utilities/pokemon/pokedex'
+import {
+  getPokemonSpecies,
+  getPokemonForm,
+  getSpeciesIdForForm,
+} from '@/utilities/pokemon/pokedex'
 import { getLevelFromExp } from '@/data/skills'
 import { getBattlingLevel, type SkillLevelReward } from '@/data/skills/battling'
 import { getCatchingLevel } from '@/data/skills/catching'
@@ -51,7 +55,10 @@ import {
 } from '@/utilities/user-state'
 import { ensureUserWeatherSlot } from '@/utilities/weather'
 import { registerAbilityDexEntry } from '@/utilities/pokemon/abilitydex'
-import { getPrimaryFormAbilityId, rollNaturalFormAbility } from '@/data/abilities'
+import {
+  getPrimaryFormAbilityId,
+  rollNaturalFormAbility,
+} from '@/data/abilities'
 import {
   getPokemonRarityLegacyFields,
   resolvePokemonRarity,
@@ -94,7 +101,12 @@ export interface RewardSummary {
   titles: { id: string; name: string }[]
   upgrades: { type: 'storage' | 'boxes'; value: number; label: string }[]
   notices?: { id: string; title: string; message?: string }[]
-  researchXp?: { formId: string; formName: string; amount: number; isCompanion?: boolean }[]
+  researchXp?: {
+    formId: string
+    formName: string
+    amount: number
+    isCompanion?: boolean
+  }[]
   researchBreakthroughs?: {
     formId: string
     pokemonName: string
@@ -114,7 +126,15 @@ type RandomEventEntry = {
   id: string
   category?: string
   subCategory?: string
-  type?: 'task' | 'battle' | 'research' | 'location' | 'voyage' | 'expedition' | 'other'
+  type?:
+    | 'task'
+    | 'battle'
+    | 'game'
+    | 'field-research'
+    | 'location'
+    | 'voyage'
+    | 'expedition'
+    | 'other'
   secret?: boolean
   requirements?: unknown[]
   isRandomEvent?: boolean
@@ -129,16 +149,27 @@ const RANDOM_EVENT_NOTICE = {
 const randomEventEntries: RandomEventEntry[] = [
   ...tasks.map((entry) => ({ ...entry, type: 'task' as const })),
   ...battles.map((entry) => ({ ...entry, type: 'battle' as const })),
-  ...allGames.map((entry) => ({ ...entry, type: 'research' as const })),
+  ...allGames.map((entry) => ({
+    ...entry,
+    type:
+      entry.gameType === 'field-observation'
+        ? ('field-research' as const)
+        : ('game' as const),
+  })),
   ...locations.map((entry) => ({ ...entry, type: 'location' as const })),
   ...voyages.map((entry) => ({ ...entry, type: 'voyage' as const })),
   ...expeditions.map((entry) => ({ ...entry, type: 'expedition' as const })),
 ].filter((entry) => entry.isRandomEvent === true)
 
-function isTaskCompletedForRandomEvent(data: UserTaskData, taskId: string): boolean {
+function isTaskCompletedForRandomEvent(
+  data: UserTaskData,
+  taskId: string,
+): boolean {
   const task = tasks.find((entry) => entry.id === taskId)
   if (!task) return false
-  const completion = data.completedTasks.find((entry) => entry.taskId === taskId)
+  const completion = data.completedTasks.find(
+    (entry) => entry.taskId === taskId,
+  )
   if (!completion) return false
   if (task.daily === true) {
     return isToday(completion.updatedAt || completion.completedAt)
@@ -157,10 +188,14 @@ function hasPendingRandomEvent(data: UserTaskData): boolean {
     }
     if (isTaskCompletedForRandomEvent(data, entry.id)) return false
     return (entry.requirements || []).every((requirement) =>
-      checkRequirement(data, requirement as NonNullable<Reward['requirements']>[number], {
-        category: entry.category,
-        subCategory: entry.subCategory,
-      }),
+      checkRequirement(
+        data,
+        requirement as NonNullable<Reward['requirements']>[number],
+        {
+          category: entry.category,
+          subCategory: entry.subCategory,
+        },
+      ),
     )
   })
 }
@@ -189,14 +224,19 @@ export async function grantRewards(
   const weatherState = await ensureUserWeatherSlot(payload as any, user as User)
 
   // Fetch external collections (Pokemon)
-  const [pokemonDocs, inventory, pokedex, completedTasks, tcg, stats] = await Promise.all([
-    payload.find({ collection: 'pokemon', where: { user: { equals: userId } }, limit: 1000 }),
-    getUserInventoryMap(payload as any, userId),
-    getUserPokedexMap(payload as any, userId),
-    getUserCompletedTasksMap(payload as any, userId),
-    getUserTcgMap(payload as any, userId),
-    getUserActivityStatsMap(payload as any, userId),
-  ])
+  const [pokemonDocs, inventory, pokedex, completedTasks, tcg, stats] =
+    await Promise.all([
+      payload.find({
+        collection: 'pokemon',
+        where: { user: { equals: userId } },
+        limit: 1000,
+      }),
+      getUserInventoryMap(payload as any, userId),
+      getUserPokedexMap(payload as any, userId),
+      getUserCompletedTasksMap(payload as any, userId),
+      getUserTcgMap(payload as any, userId),
+      getUserActivityStatsMap(payload as any, userId),
+    ])
 
   const extendedUser = user as ExtendedUser
   const userSkills: SkillsData = extendedUser.skills || {}
@@ -214,10 +254,17 @@ export async function grantRewards(
     pokemon: pokemonList,
     tcg: UserDataConverters.tcgToArray(tcg),
     pokedex: UserDataConverters.pokedexToArray(pokedex),
-    completedTasks: UserDataConverters.completedTasksToArray(completedTasks as any),
+    completedTasks: UserDataConverters.completedTasksToArray(
+      completedTasks as any,
+    ),
     battleResults: UserDataConverters.battleStatsToArray(stats.battles || {}),
-    locationEncounterResults: UserDataConverters.locationStatsToArray(stats.locations || {}),
-    researchEncounterResults: UserDataConverters.researchStatsToArray(stats.research || {}),
+    locationEncounterResults: UserDataConverters.locationStatsToArray(
+      stats.locations || {},
+    ),
+    gameResults: UserDataConverters.gameStatsToArray(stats.games || {}),
+    fieldResearchResults: UserDataConverters.fieldResearchStatsToArray(
+      stats.fieldResearch || {},
+    ),
     expeditionResults: Object.entries((stats as any).expeditions || {}).map(
       ([expeditionId, expeditionStats]: [string, any]) => ({
         expeditionId,
@@ -395,11 +442,18 @@ export async function grantRewards(
         // Determine IVs/EVs (omitted for brevity, same random logic)
         const ivs = {
           hp: reward.pokemonData?.ivs?.hp ?? Math.floor(Math.random() * 32),
-          attack: reward.pokemonData?.ivs?.attack ?? Math.floor(Math.random() * 32),
-          defense: reward.pokemonData?.ivs?.defense ?? Math.floor(Math.random() * 32),
-          specialAttack: reward.pokemonData?.ivs?.specialAttack ?? Math.floor(Math.random() * 32),
-          specialDefense: reward.pokemonData?.ivs?.specialDefense ?? Math.floor(Math.random() * 32),
-          speed: reward.pokemonData?.ivs?.speed ?? Math.floor(Math.random() * 32),
+          attack:
+            reward.pokemonData?.ivs?.attack ?? Math.floor(Math.random() * 32),
+          defense:
+            reward.pokemonData?.ivs?.defense ?? Math.floor(Math.random() * 32),
+          specialAttack:
+            reward.pokemonData?.ivs?.specialAttack ??
+            Math.floor(Math.random() * 32),
+          specialDefense:
+            reward.pokemonData?.ivs?.specialDefense ??
+            Math.floor(Math.random() * 32),
+          speed:
+            reward.pokemonData?.ivs?.speed ?? Math.floor(Math.random() * 32),
         }
 
         const evs = {
@@ -456,7 +510,8 @@ export async function grantRewards(
               (options.source === 'mystery-gift' ? 'gift' : 'reward'),
             obtainedRegion: reward.pokemonData?.obtainedRegion,
             obtainedLocation: reward.pokemonData?.obtainedLocation,
-            obtainedSourceId: reward.pokemonData?.obtainedSourceId || options.source,
+            obtainedSourceId:
+              reward.pokemonData?.obtainedSourceId || options.source,
             stats: pokemonWithStats.stats,
           },
         })
@@ -490,13 +545,16 @@ export async function grantRewards(
 
         pokedex[speciesKey] = {
           ...speciesMap,
-          [formKey]: addPokedexCaughtRarity({
-            ...existing,
-            caught: true,
-            seen: true,
-            totalCaught: (existing.totalCaught || 0) + 1,
-            totalSeen: (existing.totalSeen || 0) + 1,
-          }, rarity),
+          [formKey]: addPokedexCaughtRarity(
+            {
+              ...existing,
+              caught: true,
+              seen: true,
+              totalCaught: (existing.totalCaught || 0) + 1,
+              totalSeen: (existing.totalSeen || 0) + 1,
+            },
+            rarity,
+          ),
         }
         pokedexChanged = true
       }
@@ -556,7 +614,10 @@ export async function grantRewards(
         return
       }
 
-      if (!checkTaskRequirements(userData, taskDef) || !checkTaskCriteria(userData, taskDef)) {
+      if (
+        !checkTaskRequirements(userData, taskDef) ||
+        !checkTaskCriteria(userData, taskDef)
+      ) {
         return
       }
 
@@ -572,7 +633,9 @@ export async function grantRewards(
         updatedAt: completedAt,
         count: (completedTasks[taskId]?.count || 0) + 1,
       }
-      userData.completedTasks = UserDataConverters.completedTasksToArray(completedTasks as any)
+      userData.completedTasks = UserDataConverters.completedTasksToArray(
+        completedTasks as any,
+      )
       tasksChanged = true
 
       if (taskDef.exitModal) {
@@ -757,7 +820,8 @@ export async function grantRewards(
           if (skillId === 'catching') levelData = getCatchingLevel(l)
           if (skillId === 'researching') levelData = getResearchingLevel(l)
           if (skillId === 'artisan') levelData = getArtisanLevel(l)
-          if (skillId === 'ranked-battling') levelData = getRankedBattlingLevel(l)
+          if (skillId === 'ranked-battling')
+            levelData = getRankedBattlingLevel(l)
 
           if (levelData?.rewards) {
             for (const r of levelData.rewards) {
@@ -789,7 +853,9 @@ export async function grantRewards(
     inventory: UserDataConverters.inventoryToArray(inventory),
     tcg: UserDataConverters.tcgToArray(tcg),
     pokedex: UserDataConverters.pokedexToArray(pokedex),
-    completedTasks: UserDataConverters.completedTasksToArray(completedTasks as any),
+    completedTasks: UserDataConverters.completedTasksToArray(
+      completedTasks as any,
+    ),
     lastRoll: newRoll,
     weatherSlot: weatherState.slot,
     weatherUpdatedAt: weatherState.updatedAt,
@@ -816,8 +882,10 @@ export async function grantRewards(
   if (unlockedBannersChanged) updateData.unlockedBanners = unlockedBanners
   if (unlockedIconsChanged) updateData.unlockedIcons = unlockedIcons
   if (unlockedTitlesChanged) updateData.unlockedTitles = unlockedTitles
-  if (maxPokemonIncrease > 0) updateData.maxPokemon = (user.maxPokemon || 30) + maxPokemonIncrease
-  if (maxBoxesIncrease > 0) updateData.maxBoxes = (user.maxBoxes || 1) + maxBoxesIncrease
+  if (maxPokemonIncrease > 0)
+    updateData.maxPokemon = (user.maxPokemon || 30) + maxPokemonIncrease
+  if (maxBoxesIncrease > 0)
+    updateData.maxBoxes = (user.maxBoxes || 1) + maxBoxesIncrease
 
   await payload.update({
     collection: 'users',
@@ -826,8 +894,12 @@ export async function grantRewards(
   })
 
   await Promise.all([
-    inventoryChanged ? setUserInventoryMap(payload as any, userId, inventory) : Promise.resolve(),
-    pokedexChanged ? setUserPokedexMap(payload as any, userId, pokedex) : Promise.resolve(),
+    inventoryChanged
+      ? setUserInventoryMap(payload as any, userId, inventory)
+      : Promise.resolve(),
+    pokedexChanged
+      ? setUserPokedexMap(payload as any, userId, pokedex)
+      : Promise.resolve(),
     tasksChanged
       ? setUserCompletedTasksMap(payload as any, userId, completedTasks)
       : Promise.resolve(),

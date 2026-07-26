@@ -26,7 +26,7 @@ import {
 } from '@/data/games/prize-wheel/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
-import { completeResearchEncounter, startResearchEncounter } from '../actions'
+import { completeGame, startGame } from '@/app/(frontend)/game/games/actions'
 import { claimPrizeWheelReward, initiatePrizeWheelSpin } from '../games/wheel'
 
 interface PrizeWheelGameProps {
@@ -226,10 +226,7 @@ export function PrizeWheelGame({
         playSfx('bad')
       }
 
-      const completeResult = await completeResearchEncounter(
-        encounter.id,
-        hasRewards,
-      )
+      const completeResult = await completeGame(encounter.id, hasRewards)
       const summaryWithProgress = {
         ...claimRes.summary,
         expeditionProgress:
@@ -457,7 +454,7 @@ export function PrizeWheelGame({
                 size="lg"
                 onClick={async () => {
                   try {
-                    const res = await startResearchEncounter(
+                    const res = await startGame(
                       (initialState?.encounter || encounter).id,
                       true,
                     )

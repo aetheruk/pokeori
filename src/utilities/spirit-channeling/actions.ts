@@ -21,7 +21,10 @@ import {
   releaseActionLock,
   setIdempotentResult,
 } from '@/utilities/game-integrity'
-import { grantRewards, type RewardSummary } from '@/utilities/rewards/reward-logic'
+import {
+  grantRewards,
+  type RewardSummary,
+} from '@/utilities/rewards/reward-logic'
 import {
   getUserActivityStatsMap,
   getUserInventoryMap,
@@ -42,7 +45,11 @@ const BeginChannelingSchema = z.object({
   attemptId: z.string().min(8).max(120),
 })
 
-type ChannelingOutcome = 'wrong-incense' | 'wrong-offering' | 'weak-pokemon' | 'success'
+type ChannelingOutcome =
+  | 'wrong-incense'
+  | 'wrong-offering'
+  | 'weak-pokemon'
+  | 'success'
 
 export interface BeginSpiritChannelingResult {
   success: boolean
@@ -54,24 +61,33 @@ export interface BeginSpiritChannelingResult {
 
 type PayloadLike = Awaited<ReturnType<typeof getPayload>>
 
-function hasInventoryItem(inventory: Record<string, number>, itemId: string, quantity = 1): boolean {
+function hasInventoryItem(
+  inventory: Record<string, number>,
+  itemId: string,
+  quantity = 1,
+): boolean {
   return (inventory[itemId] || 0) >= quantity
 }
 
-function aggregateOfferings(offerings: z.infer<typeof ChannelingOfferingSchema>[]) {
+function aggregateOfferings(
+  offerings: z.infer<typeof ChannelingOfferingSchema>[],
+) {
   return offerings.reduce<Record<string, number>>((record, offering) => {
     record[offering.itemId] = (record[offering.itemId] || 0) + offering.quantity
     return record
   }, {})
 }
 
-function getOfferedEnergy(offerings: Record<string, number>): SpiritChannelingEnergy | null {
+function getOfferedEnergy(
+  offerings: Record<string, number>,
+): SpiritChannelingEnergy | null {
   const energy: SpiritChannelingEnergy = {}
 
   for (const [itemId, quantity] of Object.entries(offerings)) {
     const offering = getSpiritChannelingOffering(itemId)
     if (!offering) return null
-    energy[offering.type] = (energy[offering.type] || 0) + offering.energy * quantity
+    energy[offering.type] =
+      (energy[offering.type] || 0) + offering.energy * quantity
   }
 
   return energy
@@ -82,11 +98,17 @@ async function isChannelingCompleted(
   userId: string,
   activityId: string,
 ): Promise<boolean> {
-  const stats = await getUserActivityStatsMap(payload as any, userId, ['researchEncounterResults'])
-  return (stats.research?.[activityId]?.wins || 0) > 0
+  const stats = await getUserActivityStatsMap(payload as any, userId, [
+    'gameResults',
+  ])
+  return (stats.games?.[activityId]?.wins || 0) > 0
 }
 
-async function getOwnedPokemon(payload: PayloadLike, userId: string, pokemonId: string) {
+async function getOwnedPokemon(
+  payload: PayloadLike,
+  userId: string,
+  pokemonId: string,
+) {
   const result = await payload.find({
     collection: 'pokemon',
     where: {
@@ -113,7 +135,9 @@ async function getOwnedPokemon(payload: PayloadLike, userId: string, pokemonId: 
 function canPokemonChannel(pokemon: any, minLevel: number): boolean {
   if (!pokemon) return false
   const form = getPokemonForm(pokemon.formId)
-  const isPsychic = form?.types?.some((type) => type.toLowerCase() === 'psychic')
+  const isPsychic = form?.types?.some(
+    (type) => type.toLowerCase() === 'psychic',
+  )
   return Boolean(isPsychic && Number(pokemon.level || 0) >= minLevel)
 }
 
@@ -121,23 +145,36 @@ export async function beginSpiritChanneling(
   rawInput: z.input<typeof BeginChannelingSchema>,
 ): Promise<BeginSpiritChannelingResult> {
   const parsed = BeginChannelingSchema.safeParse(rawInput)
-  if (!parsed.success) return { success: false, error: 'Invalid channeling input' }
+  if (!parsed.success)
+    return { success: false, error: 'Invalid channeling input' }
 
   const { user } = await checkUserAuth()
   const rate = await checkActionRateLimit(user.id, 'spirit-channeling', 30, 60)
-  if (!rate.allowed) return { success: false, error: 'Too many channeling attempts. Please wait.' }
+  if (!rate.allowed)
+    return {
+      success: false,
+      error: 'Too many channeling attempts. Please wait.',
+    }
 
   const lock = await acquireActionLock(`lock:spirit-channeling:${user.id}`, 10)
-  if (!lock.acquired) return { success: false, error: 'Another channeling attempt is in progress' }
+  if (!lock.acquired)
+    return {
+      success: false,
+      error: 'Another channeling attempt is in progress',
+    }
 
   try {
     const idemKey = `spirit-channeling:${user.id}:${parsed.data.attemptId}`
-    const cached = await getIdempotentResult<BeginSpiritChannelingResult>(idemKey)
+    const cached =
+      await getIdempotentResult<BeginSpiritChannelingResult>(idemKey)
     if (cached) return cached
 
     const payload = await getPayload({ config: payloadConfig })
-    const config = getSpiritChannelingConfigForMemento(parsed.data.mementoItemId)
-    if (!config) return { success: false, error: 'This item cannot be channeled' }
+    const config = getSpiritChannelingConfigForMemento(
+      parsed.data.mementoItemId,
+    )
+    if (!config)
+      return { success: false, error: 'This item cannot be channeled' }
 
     const activityId = getSpiritChannelingActivityId(config)
     const [inventory, completed] = await Promise.all([
@@ -146,13 +183,19 @@ export async function beginSpiritChanneling(
     ])
 
     if (!hasInventoryItem(inventory, BOOK_OF_CHANNELING_ITEM_ID)) {
-      return { success: false, error: 'You do not know how to perform channeling yet' }
+      return {
+        success: false,
+        error: 'You do not know how to perform channeling yet',
+      }
     }
     if (!hasInventoryItem(inventory, config.mementoItemId)) {
       return { success: false, error: 'You do not own this memento' }
     }
     if (completed) {
-      return { success: false, error: 'This memento has already answered a channeling' }
+      return {
+        success: false,
+        error: 'This memento has already answered a channeling',
+      }
     }
     if (!hasInventoryItem(inventory, parsed.data.incenseItemId)) {
       return { success: false, error: 'You do not own this incense' }
@@ -172,7 +215,10 @@ export async function beginSpiritChanneling(
         return { success: false, error: 'Invalid offering selected' }
       }
       if (!hasInventoryItem(inventory, itemId, quantity)) {
-        return { success: false, error: 'You do not have enough of that offering' }
+        return {
+          success: false,
+          error: 'You do not have enough of that offering',
+        }
       }
     }
 
@@ -188,7 +234,11 @@ export async function beginSpiritChanneling(
       }
     }
 
-    const pokemon = await getOwnedPokemon(payload, user.id, parsed.data.pokemonId)
+    const pokemon = await getOwnedPokemon(
+      payload,
+      user.id,
+      parsed.data.pokemonId,
+    )
     if (!canPokemonChannel(pokemon, config.channelerMinLevel)) {
       return {
         success: false,
@@ -199,7 +249,10 @@ export async function beginSpiritChanneling(
 
     const nextInventory = { ...inventory }
     for (const [itemId, quantity] of Object.entries(aggregatedOfferings)) {
-      nextInventory[itemId] = Math.max(0, (nextInventory[itemId] || 0) - quantity)
+      nextInventory[itemId] = Math.max(
+        0,
+        (nextInventory[itemId] || 0) - quantity,
+      )
       if (nextInventory[itemId] <= 0) delete nextInventory[itemId]
     }
     await setUserInventoryMap(payload as any, user.id, nextInventory)
@@ -208,14 +261,20 @@ export async function beginSpiritChanneling(
       source: activityId,
       skipDropChance: true,
     })
-    await incrementUserActivityResult(payload as any, user.id, 'researchEncounterResults', activityId, {
-      wins: 1,
-      metadata: {
-        mementoItemId: config.mementoItemId,
-        incenseItemId: parsed.data.incenseItemId,
-        pokemonId: parsed.data.pokemonId,
+    await incrementUserActivityResult(
+      payload as any,
+      user.id,
+      'gameResults',
+      activityId,
+      {
+        wins: 1,
+        metadata: {
+          mementoItemId: config.mementoItemId,
+          incenseItemId: parsed.data.incenseItemId,
+          pokemonId: parsed.data.pokemonId,
+        },
       },
-    })
+    )
 
     revalidatePath('/game/spirit-channeling')
     revalidatePath('/game/inventory')

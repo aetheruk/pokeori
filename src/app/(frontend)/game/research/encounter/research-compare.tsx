@@ -31,17 +31,17 @@ import { Button } from '@/components/ui/button'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { Progress } from '@/components/ui/progress'
 import { useAudio } from '@/context/AudioContext'
-import type { ResearchConfig } from '@/data/games'
+import type { GameItem } from '@/data/games'
 import pokemonData from '@/data/pokemon-data'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
 import { logger } from '@/utilities/logger'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import {
-  completeResearchEncounter,
-  startResearchEncounter,
-  submitResearchAnswer,
-} from '../actions'
+  completeGame,
+  startGame,
+  submitGameAnswer,
+} from '@/app/(frontend)/game/games/actions'
 
 // Types for stats
 type Stat =
@@ -289,7 +289,7 @@ export function ResearchCompareGame({
   encounter,
   initialState,
 }: {
-  encounter: ResearchConfig
+  encounter: GameItem
   initialState?: any
 }) {
   useGameMusic(encounter)
@@ -342,7 +342,7 @@ export function ResearchCompareGame({
     if (gameStarted) return
 
     // Start or get existing session
-    const result = await startResearchEncounter(encounter.id)
+    const result = await startGame(encounter.id)
     logger.debug(
       '[ResearchClient] initGame result',
       result,
@@ -429,7 +429,7 @@ export function ResearchCompareGame({
           setGameEnded(true)
           setSuccess(false)
           // Record failure on server
-          completeResearchEncounter(encounter.id, false).then(() => {
+          completeGame(encounter.id, false).then(() => {
             setResult({
               success: false,
               message: 'Time is up!',
@@ -462,7 +462,7 @@ export function ResearchCompareGame({
       setDroppedId(active.id)
 
       const answerId = parseInt(active.id)
-      const result = await submitResearchAnswer(answerId)
+      const result = await submitGameAnswer(answerId)
 
       if (!result.success) {
         if (result.error === 'Session expired or not found') {
@@ -507,7 +507,7 @@ export function ResearchCompareGame({
     setGameEnded(true)
     setSuccess(isWin)
 
-    const result = await completeResearchEncounter(encounter.id, isWin)
+    const result = await completeGame(encounter.id, isWin)
     if (result?.success && result.summary) {
       setSuccess(true)
       setResult({
@@ -623,7 +623,9 @@ export function ResearchCompareGame({
                 animate={{ opacity: 1, y: 0 }}
                 className={cn(
                   'text-sm font-black uppercase tracking-widest',
-                  feedback === 'correct' ? 'text-game-moss-strong' : 'text-red-300',
+                  feedback === 'correct'
+                    ? 'text-game-moss-strong'
+                    : 'text-red-300',
                 )}
               >
                 {feedback === 'correct' ? 'Correct!' : 'Incorrect'}
@@ -728,7 +730,7 @@ export function ResearchCompareGame({
                 size="lg"
                 onClick={async () => {
                   try {
-                    const res = await startResearchEncounter(
+                    const res = await startGame(
                       (initialState?.encounter || encounter).id,
                       true,
                     )
