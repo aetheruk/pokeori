@@ -50,6 +50,7 @@ describe('game data sync scopes', () => {
     expect(getGameDataScope('/game/inventory')).toBe('inventory')
     expect(getGameDataScope('/game/explore')).toBe('explore')
     expect(getGameDataScope('/game/research/encounter')).toBe('inventory')
-    expect(getGameDataScope('/game/games/match3')).toBe('core')
+    expect(getGameDataScope('/game/games/match3')).toBe('inventory')
+    expect(getGameDataScope('/game/games/fishing')).toBe('inventory')
   })
 })

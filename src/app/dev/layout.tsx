@@ -1,3 +1,7 @@
+import { getPayload } from 'payload'
+import configPromise from '@payload-config'
+import { headers } from 'next/headers'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import '../../styles/globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
@@ -8,7 +12,15 @@ export const metadata = {
   description: 'Developer tools for Pokemon App',
 }
 
-export default function DevLayout({ children }: { children: React.ReactNode }) {
+export default async function DevLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const payload = await getPayload({ config: configPromise })
+  const { user } = await payload.auth({ headers: await headers() })
+  if (!user?.isAdmin) notFound()
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="font-sans antialiased">

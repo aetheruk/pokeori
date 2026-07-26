@@ -114,6 +114,10 @@ import {
   getGameActivitySessionKey,
   type GameActivityDomain,
 } from '@/utilities/games/activity-domain'
+import {
+  getRandomItemFromPool,
+  getRandomPokemonFromPool,
+} from '@/utilities/research/round-selection'
 
 const DAILY_EXCLUDED_GAME_TYPES = new Set(['slots', 'pachinko', 'prize-wheel'])
 
@@ -308,16 +312,6 @@ function applyFieldObservationItemEventMultiplier(
     ...event,
     dropChance: Math.min(100, event.dropChance * multiplier),
   }))
-}
-
-function getRandomPokemonFromPool(pool: number[]): number {
-  if (!pool || pool.length === 0) return 1 // Fallback
-  return pool[Math.floor(Math.random() * pool.length)]
-}
-
-function getRandomItemFromPool(pool: string[]): string {
-  if (!pool || pool.length === 0) return 'potion' // Fallback
-  return pool[Math.floor(Math.random() * pool.length)]
 }
 
 function getSnapTargetId(
@@ -1554,7 +1548,7 @@ export async function submitGameActivityAnswer(
     ) {
       // No next target
     } else if (itemPool.length > 0) {
-      nextItemId = getRandomItemFromPool(itemPool)
+      nextItemId = getRandomItemFromPool(itemPool, state.currentItemId)
       state.currentItemId = nextItemId
       state.currentPokemonId = undefined
     } else {
@@ -1562,7 +1556,10 @@ export async function submitGameActivityAnswer(
         pokemonPool.length > 0
           ? pokemonPool
           : pokemonData.map((p) => p.id).slice(0, 50)
-      nextPokemonId = getRandomPokemonFromPool(effectivePool)
+      nextPokemonId = getRandomPokemonFromPool(
+        effectivePool,
+        state.currentPokemonId,
+      )
       state.currentPokemonId = nextPokemonId
       state.currentItemId = undefined
     }
