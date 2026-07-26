@@ -107,6 +107,13 @@ export const celadonCityBattles: BattleConfig[] = [
       {
         "type": "task_completed",
         "targetId": "leaving-police-hq"
+      },
+      {
+        "type": "battle_result",
+        "targetId": "celadon-hq-rocket-ambush",
+        "battleStatus": "win",
+        "count": 1,
+        "inverse": true
       }
     ],
     "enemyTeam": [
@@ -160,6 +167,13 @@ export const celadonCityBattles: BattleConfig[] = [
       {
         "type": "task_completed",
         "targetId": "rocket-problem-wrapup"
+      },
+      {
+        "type": "battle_result",
+        "targetId": "det-ray-choo-skill-test",
+        "battleStatus": "win",
+        "count": 1,
+        "inverse": true
       }
     ],
     "enemyTeam": [
