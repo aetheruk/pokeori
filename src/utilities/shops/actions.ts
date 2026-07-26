@@ -26,6 +26,7 @@ export interface PurchaseItemResult {
   success: boolean
   message?: string
   rewards?: RewardSummary
+  purchaseData?: ShopPurchaseData
 }
 
 export async function purchaseShopItem(
@@ -136,6 +137,8 @@ export async function purchaseShopItem(
   }
 
   // 7. Update Stock / Purchase History
+  let updatedPurchaseData: ShopPurchaseData | undefined
+
   try {
     const currentPurchases = (await getUserShopPurchasesRecord(payload, user.id)) as Record<
       string,
@@ -146,12 +149,14 @@ export async function purchaseShopItem(
     const prevData = currentPurchases[itemId]
     const nextCount = getEffectivePurchaseCount(item, prevData) + 1
 
-    currentPurchases[itemId] = {
+    const nextPurchaseData: ShopPurchaseData = {
       count: nextCount,
       lastPurchasedAt: nowIso,
     }
+    currentPurchases[itemId] = nextPurchaseData
 
     await setUserShopPurchasesRecord(payload, user.id, currentPurchases as any)
+    updatedPurchaseData = nextPurchaseData
   } catch (e) {
     console.error('Error updating purchase history', e)
     // Don't fail the whole transaction if we already took money, but this is bad.
@@ -173,5 +178,5 @@ export async function purchaseShopItem(
   revalidatePath('/game')
   revalidatePath('/game/shops')
 
-  return { success: true, rewards: summary }
+  return { success: true, rewards: summary, purchaseData: updatedPurchaseData }
 }
