@@ -25,7 +25,10 @@ function runtimePackageGlobs(rootPackages) {
         ),
       )
       globs.push(`./node_modules/${packageName}/**/*`)
-      pending.push(...Object.keys(packageJson.dependencies || {}))
+      pending.push(
+        ...Object.keys(packageJson.dependencies || {}),
+        ...Object.keys(packageJson.optionalDependencies || {}),
+      )
     } catch {
       // Nested dependencies are already covered by their parent package glob.
     }
@@ -39,6 +42,7 @@ const standaloneRuntimeGlobs = runtimePackageGlobs([
   '@payloadcms/db-mongodb',
   '@payloadcms/email-resend',
   'graphql',
+  'sharp',
 ])
 
 const bundleAnalyzer = withBundleAnalyzer({
@@ -92,6 +96,7 @@ const nextConfig = {
     '@payloadcms/db-mongodb',
     '@payloadcms/email-resend',
     'graphql',
+    'sharp',
   ],
   // Security headers
   async headers() {
