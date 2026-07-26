@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test'
+import { tasks } from '@/data/tasks'
 import { generateDailyTasks } from '@/utilities/tasks/daily-generator'
 
 const userData = {
@@ -7,7 +8,7 @@ const userData = {
   pokemon: [],
   tcg: [],
   pokedex: [],
-  completedTasks: [],
+  completedTasks: tasks.map((task) => ({ taskId: task.id })),
   battleResults: [],
   locationEncounterResults: [],
   researchEncounterResults: [],
@@ -34,6 +35,16 @@ describe('daily task generator', () => {
     expect(generated.some((task) => task.criteria[0]?.type === 'daily_activity')).toBe(true)
     expect(new Set(generated.map((task) => task.dailyMetadata?.signature)).size).toBe(6)
     expect(generated.filter((task) => task.dailyMetadata?.isBonus)).toHaveLength(1)
+  })
+
+  test('never selects development Test content as a daily challenge source', () => {
+    const generated = generateDailyTasks(userData, {
+      date: new Date('2026-05-27T12:00:00'),
+      random: () => 0.99,
+    })
+
+    expect(generated.some((task) => task.dailyMetadata?.sourceHint.includes('Test'))).toBe(false)
+    expect(generated.some((task) => task.name.includes('Test'))).toBe(false)
   })
 
   test('only offers card crystallizing when the player owns the Crystalizer and a duplicate', () => {

@@ -84,6 +84,7 @@ function conditionsPass(
 function isVisibleSource(
   entry: {
     category?: string
+    subCategory?: string
     hide?: string
     isRandomEvent?: boolean
     requirements?: TaskCondition[]
@@ -91,9 +92,14 @@ function isVisibleSource(
   },
   userData: RequirementData,
 ) {
-  if (entry.category === 'Test' || entry.category === 'Secret' || entry.isRandomEvent) return false
+  if (
+    entry.category === 'Test' ||
+    entry.subCategory === 'Test' ||
+    entry.category === 'Secret' ||
+    entry.isRandomEvent
+  ) return false
   if (entry.hide && userData.completedTasks.some((task) => task.taskId === entry.hide)) return false
-  const context = { category: entry.category, subCategory: (entry as any).subCategory }
+  const context = { category: entry.category, subCategory: entry.subCategory }
   return (
     conditionsPass(userData, entry.requirements, context) &&
     conditionsPass(userData, entry.criteria, context, true)
