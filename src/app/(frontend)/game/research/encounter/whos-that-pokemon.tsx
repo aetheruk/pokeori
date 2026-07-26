@@ -299,6 +299,19 @@ export function WhosThatPokemonGame({
     }
   }, [])
 
+  const advanceToRound = useCallback((nextPokemonId: number) => {
+    // Clear the completed guess before unlocking the next round. When the
+    // server selected the same Pokemon twice, waiting for the round-key effect
+    // left the old answer complete for one render and auto-submitted it.
+    letterSlotsRef.current = []
+    setLetterSlots([])
+    submittedRoundKeyRef.current = null
+    setSubmittedRoundKey(null)
+    setCurrentPokemon(nextPokemonId)
+    setRoundSequence((sequence) => sequence + 1)
+    setRevealed(false)
+  }, [])
+
   // Make guess
   const makeGuess = useCallback(
     async (forceSubmit = false) => {
@@ -384,17 +397,13 @@ export function WhosThatPokemonGame({
         } else {
           // Next Round
           if (result.nextPokemonId) {
-            setCurrentPokemon(result.nextPokemonId)
-            setRoundSequence((sequence) => sequence + 1)
-            setRevealed(false)
+            advanceToRound(result.nextPokemonId)
           }
         }
       } else {
         // Wrong answer — Next Round
         if (result.nextPokemonId) {
-          setCurrentPokemon(result.nextPokemonId)
-          setRoundSequence((sequence) => sequence + 1)
-          setRevealed(false)
+          advanceToRound(result.nextPokemonId)
         }
       }
 
@@ -407,6 +416,7 @@ export function WhosThatPokemonGame({
       isProcessing,
       roundKey,
       submittedRoundKey,
+      advanceToRound,
     ],
   )
 

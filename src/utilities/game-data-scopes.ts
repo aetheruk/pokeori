@@ -122,6 +122,7 @@ export function getGameDataScope(pathname: string): GameDataScope {
   if (pathname === '/game/movedex') return 'movedex'
   if (pathname === '/game/abilitydex') return 'abilitydex'
   if (pathname === '/game/explore') return 'explore'
+  if (pathname.startsWith('/game/games/')) return 'inventory'
   if (pathname === '/game/spirit-channeling') return 'channeling'
   if (pathname === '/game/artisan') return 'artisan'
   if (pathname.startsWith('/game/shops/')) return 'shop'

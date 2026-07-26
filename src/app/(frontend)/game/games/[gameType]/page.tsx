@@ -24,9 +24,11 @@ import { TcgBattleGame } from '@/app/(frontend)/game/research/encounter/tcg-batt
 import { TcgInspectionGame } from '@/app/(frontend)/game/research/encounter/tcg-inspection'
 import { VoltorbGridGame } from '@/app/(frontend)/game/research/encounter/voltorb-grid'
 import { WhosThatPokemonGame } from '@/app/(frontend)/game/research/encounter/whos-that-pokemon'
+import { GameRouteDataBoundary } from '@/components/game/shared/GameRouteDataBoundary'
 import { getGameState, type GameState } from '../actions'
 import type { GameItem, GameType } from '@/data/games'
 import { getGameActivityRoute } from '@/utilities/games/activity-domain'
+import { getGameRouteData } from '@/utilities/game-route-data'
 
 export const dynamic = 'force-dynamic'
 
@@ -76,7 +78,12 @@ export default async function GamePage({
 }: {
   params: Promise<{ gameType: string }>
 }) {
-  const [{ gameType }, state] = await Promise.all([params, getGameState()])
+  const [{ gameType }, state, initialGameData] = await Promise.all([
+    params,
+    getGameState(),
+    getGameRouteData('inventory'),
+  ])
+  if (!initialGameData) redirect('/auth')
   if (!state) redirect('/game/explore')
 
   const encounter = state.encounter as GameStateWithEncounter['encounter']
@@ -87,6 +94,11 @@ export default async function GamePage({
   if (!GameComponent) redirect('/game/explore')
 
   return (
-    <GameComponent encounter={encounter} initialState={state} state={state} />
+    <GameRouteDataBoundary
+      scope="inventory"
+      initialGameData={initialGameData}
+    >
+      <GameComponent encounter={encounter} initialState={state} state={state} />
+    </GameRouteDataBoundary>
   )
 }

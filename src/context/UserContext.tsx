@@ -15,6 +15,7 @@ import { useInventoryStore } from '@/app/(frontend)/store/inventory-store'
 import type { RequirementData } from '@/utilities/requirements'
 import { useGameDataScope } from '@/hooks/use-game-data-scope'
 import type { GameDataScope } from '@/utilities/game-data-scopes'
+import { selectFreshestGameData } from '@/utilities/game-data-snapshot'
 
 interface UserContextType {
   user: User | null
@@ -80,31 +81,38 @@ export function UserProvider({
     },
   )
 
+  const resolvedData = useMemo(
+    () => selectFreshestGameData(data, initialGameData),
+    [data, initialGameData],
+  )
+
   const user = useMemo(() => {
-    if (!data?.user) return null
-    return data.user
-  }, [data?.user])
+    if (!resolvedData?.user) return null
+    return resolvedData.user
+  }, [resolvedData?.user])
 
   const gameData = useMemo(() => {
-    if (!data) return null
+    if (!resolvedData) return null
     return {
-      ...data,
-      user: user || data.user,
+      ...resolvedData,
+      user: user || resolvedData.user,
     }
-  }, [data, user])
+  }, [resolvedData, user])
 
   // Sync inventory when user data changes
   useEffect(() => {
-    if (!data) return
+    if (!resolvedData) return
 
-    if (Array.isArray(data.inventory)) {
+    if (Array.isArray(resolvedData.inventory)) {
       setInventory(
-        Object.fromEntries(data.inventory.map((item) => [item.itemId, item.quantity])),
+        Object.fromEntries(
+          resolvedData.inventory.map((item) => [item.itemId, item.quantity]),
+        ),
       )
       return
     }
 
-  }, [data, setInventory])
+  }, [resolvedData, setInventory])
 
   // Handle auth errors
   useEffect(() => {
