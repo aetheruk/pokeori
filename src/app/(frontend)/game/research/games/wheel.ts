@@ -77,7 +77,7 @@ export async function initiatePrizeWheelSpin() {
       }
 
       const encounter = allGames.find((e) => e.id === state.encounterId)
-      if (!encounter || encounter.gameType !== 'prize-wheel') {
+      if (encounter?.gameType !== 'prize-wheel') {
         return { success: false, error: 'Invalid game type' }
       }
 
@@ -254,7 +254,7 @@ export async function claimPrizeWheelReward(encounterId: string) {
       }
 
       const encounter = allGames.find((e) => e.id === state.encounterId)
-      if (!encounter || encounter.gameType !== 'prize-wheel') {
+      if (encounter?.gameType !== 'prize-wheel') {
         return { success: false, error: 'Invalid game type' }
       }
 

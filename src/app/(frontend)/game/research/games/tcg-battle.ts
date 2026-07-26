@@ -97,7 +97,7 @@ async function getActiveTcgBattleEncounter(
   const encounter = allGames.find(
     (game) => game.id === researchState.encounterId,
   ) as TcgBattleGameConfig | undefined
-  if (!encounter || encounter.gameType !== 'tcg-battle') {
+  if (encounter?.gameType !== 'tcg-battle') {
     throw new Error('Active encounter is not a TCG battle.')
   }
 

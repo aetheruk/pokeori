@@ -215,7 +215,7 @@ export async function castFishingLine(rodType: RodType) {
       const encounter = allGames.find(
         (e) => e.id === researchState.encounterId,
       ) as FishingGameConfig | undefined
-      if (!encounter || encounter.gameType !== 'fishing') {
+      if (encounter?.gameType !== 'fishing') {
         return { success: false, error: 'Invalid fishing encounter' }
       }
 
@@ -510,7 +510,7 @@ export async function claimFishingItem() {
       const fishingState = (await redis.get(
         `fishing:${user.id}`,
       )) as FishingState | null
-      if (!fishingState || fishingState.phase !== 'hooked') {
+      if (fishingState?.phase !== 'hooked') {
         const recentClaim = await getIdempotentResult<any>(
           `fishing:item-claim:last:${user.id}`,
         )
@@ -527,7 +527,7 @@ export async function claimFishingItem() {
       }
 
       const result = fishingState.hookedResult
-      if (!result || result.type !== 'item') {
+      if (result?.type !== 'item') {
         return { success: false, error: 'Not an item' }
       }
 
@@ -668,7 +668,7 @@ export async function startFishingCatch() {
       const fishingState = (await redis.get(
         `fishing:${user.id}`,
       )) as FishingState | null
-      if (!fishingState || fishingState.phase !== 'hooked') {
+      if (fishingState?.phase !== 'hooked') {
         const recentCatchStart = await getIdempotentResult<any>(
           `fishing:catch-start:last:${user.id}`,
         )
@@ -686,7 +686,7 @@ export async function startFishingCatch() {
       }
 
       const result = fishingState.hookedResult
-      if (!result || result.type !== 'pokemon') {
+      if (result?.type !== 'pokemon') {
         return { success: false, error: 'Not a Pokemon' }
       }
 

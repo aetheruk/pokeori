@@ -14,6 +14,7 @@ import { useInventoryStore } from '@/app/(frontend)/store/inventory-store'
 
 import type { RequirementData } from '@/utilities/requirements'
 import { useGameDataScope } from '@/hooks/use-game-data-scope'
+import type { GameDataScope } from '@/utilities/game-data-scopes'
 
 interface UserContextType {
   user: User | null
@@ -40,12 +41,17 @@ const fetcher = async (url: string) => {
 export function UserProvider({
   children,
   initialUser,
+  initialGameData,
+  scopeOverride,
 }: {
   children: React.ReactNode
-  initialUser: User | null
+  initialUser?: User | null
+  initialGameData?: RequirementData | null
+  scopeOverride?: GameDataScope
 }) {
   const router = useRouter()
-  const scope = useGameDataScope()
+  const routeScope = useGameDataScope()
+  const scope = scopeOverride || routeScope
   const setInventory = useInventoryStore((state) => state.setInventory)
   const syncUrl = `/api/game/sync?scope=${scope}`
 
@@ -58,7 +64,7 @@ export function UserProvider({
       dedupingInterval: 5 * 1000,
       revalidateOnFocus: true,
       revalidateIfStale: true,
-      fallbackData: initialUser
+      fallbackData: initialGameData || (initialUser
         ? ({
             user: initialUser,
             pokemon: [],
@@ -69,7 +75,8 @@ export function UserProvider({
             taskSummary: { completed: 0, total: 0, byType: {} },
             requirements: { skills: {}, currencies: {}, pokedex: {} },
           } as unknown as RequirementData)
-        : undefined,
+        : undefined),
+      revalidateOnMount: initialGameData ? false : undefined,
     },
   )
 

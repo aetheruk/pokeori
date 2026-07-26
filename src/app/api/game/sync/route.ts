@@ -1,13 +1,8 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { headers } from 'next/headers'
-import { getGameUserData } from '@/utilities/game-data'
-import {
-  GAME_DATA_SCOPES,
-  GAME_DATA_SCOPE_KEYS,
-  getPokemonPayloadForScope,
-  type GameDataScope,
-} from '@/utilities/game-data-scopes'
+import { GAME_DATA_SCOPES, type GameDataScope } from '@/utilities/game-data-scopes'
+import { getGameRouteData } from '@/utilities/game-route-data'
 import { getClientIp, rateLimit } from '@/utilities/rate-limiter'
 import { validateQuery } from '@/utilities/validators'
 import { z } from 'zod'
@@ -46,50 +41,9 @@ export async function GET(request: Request) {
   }
 
   try {
-    const freshUser = await payload.findByID({
-      collection: 'users',
-      id: user.id,
-      depth: 0,
-      select: {
-        id: true,
-        email: true,
-        createdAt: true,
-        updatedAt: true,
-        isAdmin: true,
-        trainerName: true,
-        banner: true,
-        icon: true,
-        title: true,
-        unlockedBanners: true,
-        unlockedIcons: true,
-        unlockedTitles: true,
-        skills: true,
-        currency: true,
-        maxPokemon: true,
-        maxBoxes: true,
-        boxes: true,
-        kidMode: true,
-        powerUsage: true,
-        stats: true,
-        lastDailyRefresh: true,
-        activeDailyTasks: true,
-        rivalTrainerId: true,
-        activeVoyages: true,
-        voyageStats: true,
-        lastRoll: true,
-        weatherSlot: true,
-        weatherUpdatedAt: true,
-      },
-    })
-
     const resolvedScope = scope as GameDataScope
-    const gameData = await getGameUserData(
-      freshUser,
-      GAME_DATA_SCOPE_KEYS[resolvedScope],
-      {
-        pokemonPayload: getPokemonPayloadForScope(resolvedScope),
-      },
-    )
+    const gameData = await getGameRouteData(resolvedScope, requestHeaders)
+    if (!gameData) return errorResponse('Unauthorized', 401, requestId)
     return jsonResponse(gameData, {}, requestId)
   } catch (error) {
     console.error(`[${requestId}] Error syncing game data:`, error)

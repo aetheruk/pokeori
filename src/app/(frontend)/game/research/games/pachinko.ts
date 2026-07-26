@@ -104,7 +104,7 @@ async function settlePachinkoDrop({
       }
 
       const encounter = allGames.find((e) => e.id === state.encounterId)
-      if (!encounter || encounter.gameType !== 'pachinko') {
+      if (encounter?.gameType !== 'pachinko') {
         return { success: false, error: 'Invalid game type' }
       }
 

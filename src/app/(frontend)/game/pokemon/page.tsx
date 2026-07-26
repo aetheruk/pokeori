@@ -1,19 +1,21 @@
-import { Suspense } from 'react'
+import { redirect } from 'next/navigation'
 import { PokemonList } from './_components/pokemon-list'
-import { Loader2 } from 'lucide-react'
+import { UserProvider } from '@/context/UserContext'
+import { getGameRouteData } from '@/utilities/game-route-data'
+import { getPokemonBoxInitialState } from './actions/box'
 
-export default function PokemonPage() {
+export default async function PokemonPage() {
+  const [initialGameData, initialBoxState] = await Promise.all([
+    getGameRouteData('pokemon-box'),
+    getPokemonBoxInitialState(),
+  ])
+  if (!initialGameData) redirect('/auth')
+
   return (
-    <div className="game-paper-first game-paper-background flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
-      <Suspense
-        fallback={
-          <div className="flex items-center justify-center h-full">
-            <Loader2 className="h-8 w-8 animate-spin text-game-moss" />
-          </div>
-        }
-      >
-        <PokemonList />
-      </Suspense>
-    </div>
+    <UserProvider initialGameData={initialGameData} scopeOverride="pokemon-box">
+      <div className="game-paper-first game-paper-background flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
+        <PokemonList initialBoxState={initialBoxState} />
+      </div>
+    </UserProvider>
   )
 }

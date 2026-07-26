@@ -2,7 +2,6 @@
 
 import { Suspense, useMemo } from 'react'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
-import { GameLoadingState } from '@/components/game/shared/GameLoadingState'
 import { GameInfoModal } from '@/components/game/shared/GameInfoModal'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { ExpeditionModal } from './ExpeditionModal'
@@ -24,6 +23,28 @@ import {
   getFormattedStats,
   getTaskProgressForModal,
 } from './ExploreModalHelpers'
+
+function ExploreDetailSkeleton() {
+  return (
+    <div
+      role="status"
+      aria-busy="true"
+      aria-label="Loading activity details"
+      className="space-y-5"
+    >
+      <div className="h-20 rounded-lg border border-game-border bg-game-surface-raised p-4">
+        <div className="h-3 w-24 rounded bg-game-border/55" />
+        <div className="mt-3 h-4 w-full rounded bg-game-border/55" />
+        <div className="mt-2 h-4 w-4/5 rounded bg-game-border/55" />
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="h-20 rounded-lg border border-game-border bg-game-surface-raised" />
+        <div className="h-20 rounded-lg border border-game-border bg-game-surface-raised" />
+      </div>
+      <div className="h-11 rounded-md bg-game-border/55" />
+    </div>
+  )
+}
 
 interface ActiveVoyage {
   voyageId: string
@@ -308,7 +329,7 @@ export function ExploreDetailsModal({
       autoScrollRewards={false}
       presentation="drawer"
     >
-      <Suspense fallback={<GameLoadingState label="Loading activity details" />}>
+      <Suspense fallback={<ExploreDetailSkeleton />}>
         <ExploreModalContent item={itemForModal} userData={userData} />
       </Suspense>
     </GameInfoModal>

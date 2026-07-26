@@ -48,6 +48,21 @@ Set up Pokeori locally.
    ```
    App runs at `https://localhost:3000` (HTTPS enabled)
 
+## Test the standalone production build locally
+
+Install Caddy once with `brew install caddy`, then build the complete standalone
+artifact and run it behind the checked-in local HTTPS proxy:
+
+```bash
+bun run build:standalone
+bun run start:https
+```
+
+Open `https://localhost:3000`. Next listens internally on
+`http://127.0.0.1:3001`; Caddy terminates the locally trusted TLS connection on
+port 3000. The first run may ask for the macOS password needed to trust Caddy's
+local certificate authority.
+
 ## Troubleshooting
 - **Port 3000 in use**: Kill process with `lsof -ti:3000 | xargs kill`
 - **Redis connection failed**: Ensure Redis is running on default port 6379
