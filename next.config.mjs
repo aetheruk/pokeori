@@ -20,10 +20,7 @@ function runtimePackageGlobs(rootPackages) {
     try {
       const packageJson = JSON.parse(
         readFileSync(
-          new URL(
-            `./node_modules/${packageName}/package.json`,
-            import.meta.url,
-          ),
+          new URL(`./node_modules/${packageName}/package.json`, import.meta.url),
           'utf8',
         ),
       )
@@ -75,9 +72,10 @@ const nextConfig = {
   },
   // Optimize package imports to reduce bundle size
   experimental: {
-    cpus: 2,
+    useTypeScriptCli: true,
+    cpus: 8,
     staticGenerationRetryCount: 1,
-    staticGenerationMaxConcurrency: 2,
+    staticGenerationMaxConcurrency: 20,
     staticGenerationMinPagesPerWorker: 100,
     optimizePackageImports: [
       'lucide-react',

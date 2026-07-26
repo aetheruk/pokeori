@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:1.7
 
-# Bun is the package manager and production runtime. Next compiles with Node in
-# the disposable builder stage because its Alpine worker pool is more stable
-# there; Node is not copied into the runtime image.
-FROM oven/bun:1.3.10-alpine AS base
+# Bun is the package manager, build runtime, and production runtime. Canary is
+# intentional while waiting for the node:v8 MongoDB compatibility fix to land
+# in a stable Bun release.
+FROM oven/bun:canary-alpine AS base
 WORKDIR /app
 
 RUN apk add --no-cache libc6-compat
@@ -17,7 +17,6 @@ RUN --mount=type=cache,id=pokeori-bun-cache,target=/root/.bun/install/cache \
     bun install --frozen-lockfile
 
 FROM base AS builder
-RUN apk add --no-cache nodejs
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -40,7 +39,7 @@ RUN --mount=type=secret,id=DATABASE_URI,required=false \
     export RESEND_API_KEY="$(cat /run/secrets/RESEND_API_KEY 2>/dev/null || printf 're_pokeori-build-only-placeholder')" && \
     export REDIS_URL="$(cat /run/secrets/REDIS_URL 2>/dev/null || printf 'redis://127.0.0.1:6379')" && \
     export NEXT_SERVER_ACTIONS_ENCRYPTION_KEY="$(cat /run/secrets/NEXT_SERVER_ACTIONS_ENCRYPTION_KEY 2>/dev/null || printf 'cG9rZW9yaS1idWlsZC1vbmx5LWtleS0wMDAwMDAwMDA=')" && \
-    node ./node_modules/next/dist/bin/next build --webpack
+    bun --bun next build --turbopack
 
 # Production image: Bun runs the generated standalone Next.js server.
 FROM base AS runner

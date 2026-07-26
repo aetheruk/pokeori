@@ -5,6 +5,7 @@ import { promises as fs } from 'node:fs'
 import path from 'node:path'
 import { promisify } from 'node:util'
 import { format } from 'prettier'
+import type * as TypeScriptCompilerApi from '@typescript/typescript6'
 import { BattleConfig, Location, Task } from '@/data/types'
 import {
   ABILITIES,
@@ -43,6 +44,14 @@ const POKEMON_RESEARCH_LEVEL_REWARDS_PATH = path.join(
   'pokemon-research-level-rewards.json',
 )
 const execFileAsync = promisify(execFile)
+
+type TypeScriptCompilerApiModule = typeof TypeScriptCompilerApi
+
+async function getTypeScriptCompilerApi(): Promise<TypeScriptCompilerApiModule> {
+  return (await import(
+    '@typescript/typescript6'
+  )) as unknown as TypeScriptCompilerApiModule
+}
 
 type EntryType =
   | 'battles'
@@ -296,7 +305,7 @@ export async function runGameDataGeneration(options?: {
 async function parseExportedEntryArray<T>(
   content: string,
 ): Promise<T[] | null> {
-  const ts = await import('typescript')
+  const ts = await getTypeScriptCompilerApi()
   const source = ts.createSourceFile(
     'entry.ts',
     content,
@@ -304,7 +313,7 @@ async function parseExportedEntryArray<T>(
     true,
   )
 
-  const toValue = (node: import('typescript').Node): unknown => {
+  const toValue = (node: TypeScriptCompilerApi.Node): unknown => {
     if (ts.isAsExpression(node) || ts.isSatisfiesExpression(node))
       return toValue(node.expression)
     if (ts.isParenthesizedExpression(node)) return toValue(node.expression)
@@ -321,7 +330,9 @@ async function parseExportedEntryArray<T>(
       return node.operator === ts.SyntaxKind.MinusToken ? -value : value
     }
     if (ts.isArrayLiteralExpression(node)) {
-      return node.elements.map((element) => toValue(element))
+      return node.elements.map((element: TypeScriptCompilerApi.Expression) =>
+        toValue(element),
+      )
     }
     if (ts.isObjectLiteralExpression(node)) {
       const result: Record<string, unknown> = {}
@@ -355,7 +366,8 @@ async function parseExportedEntryArray<T>(
   for (const statement of source.statements) {
     if (!ts.isVariableStatement(statement)) continue
     const isExported = statement.modifiers?.some(
-      (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword,
+      (modifier: TypeScriptCompilerApi.Modifier) =>
+        modifier.kind === ts.SyntaxKind.ExportKeyword,
     )
     if (!isExported) continue
 
@@ -707,8 +719,8 @@ export async function readAbilityEditorData(): Promise<AbilityEditorData> {
 }
 
 function isPropertyNamed(
-  ts: typeof import('typescript'),
-  property: import('typescript').ObjectLiteralElementLike,
+  ts: TypeScriptCompilerApiModule,
+  property: TypeScriptCompilerApi.ObjectLiteralElementLike,
   name: string,
 ) {
   return (
@@ -765,16 +777,16 @@ function normalizeAbilityForSave(
 }
 
 async function findAuthoredAbilityArray(content: string) {
-  const ts = await import('typescript')
+  const ts = await getTypeScriptCompilerApi()
   const source = ts.createSourceFile(
     'abilities.ts',
     content,
     ts.ScriptTarget.Latest,
     true,
   )
-  let array: import('typescript').ArrayLiteralExpression | undefined
+  let array: TypeScriptCompilerApi.ArrayLiteralExpression | undefined
 
-  source.forEachChild((node) => {
+  source.forEachChild((node: TypeScriptCompilerApi.Node) => {
     if (!ts.isVariableStatement(node)) return
     for (const declaration of node.declarationList.declarations) {
       if (
@@ -798,14 +810,15 @@ async function findAuthoredAbilityArray(content: string) {
 
 async function findAuthoredAbilityObject(content: string, abilityId: string) {
   const parsed = await findAuthoredAbilityArray(content)
-  let targetObject: import('typescript').ObjectLiteralExpression | undefined
+  let targetObject: TypeScriptCompilerApi.ObjectLiteralExpression | undefined
 
   if (!parsed.array) return { ...parsed, targetObject }
 
   for (const element of parsed.array.elements) {
     if (!parsed.ts.isObjectLiteralExpression(element)) continue
-    const idProperty = element.properties.find((property) =>
-      isPropertyNamed(parsed.ts, property, 'id'),
+    const idProperty = element.properties.find(
+      (property: TypeScriptCompilerApi.ObjectLiteralElementLike) =>
+        isPropertyNamed(parsed.ts, property, 'id'),
     )
     if (!idProperty || !parsed.ts.isPropertyAssignment(idProperty)) continue
     const initializer = idProperty.initializer
@@ -924,7 +937,7 @@ export async function saveAbilityEffects(
     return { success: false, error: 'Ability ID is required' }
 
   try {
-    const ts = await import('typescript')
+    const ts = await getTypeScriptCompilerApi()
     const content = await fs.readFile(ABILITIES_PATH, 'utf-8')
     const source = ts.createSourceFile(
       'abilities.ts',
@@ -932,9 +945,9 @@ export async function saveAbilityEffects(
       ts.ScriptTarget.Latest,
       true,
     )
-    let targetObject: import('typescript').ObjectLiteralExpression | undefined
+    let targetObject: TypeScriptCompilerApi.ObjectLiteralExpression | undefined
 
-    source.forEachChild((node) => {
+    source.forEachChild((node: TypeScriptCompilerApi.Node) => {
       if (!ts.isVariableStatement(node)) return
       for (const declaration of node.declarationList.declarations) {
         if (
@@ -951,8 +964,9 @@ export async function saveAbilityEffects(
         }
         for (const element of declaration.initializer.elements) {
           if (!ts.isObjectLiteralExpression(element)) continue
-          const idProperty = element.properties.find((property) =>
-            isPropertyNamed(ts, property, 'id'),
+          const idProperty = element.properties.find(
+            (property: TypeScriptCompilerApi.ObjectLiteralElementLike) =>
+              isPropertyNamed(ts, property, 'id'),
           )
           if (!idProperty || !ts.isPropertyAssignment(idProperty)) continue
           const initializer = idProperty.initializer
@@ -977,8 +991,9 @@ export async function saveAbilityEffects(
 
     const json = JSON.stringify(effects || [], null, 2)
     const effectsText = `effects: ${json},`
-    const existingEffects = targetObject.properties.find((property) =>
-      isPropertyNamed(ts, property, 'effects'),
+    const existingEffects = targetObject.properties.find(
+      (property: TypeScriptCompilerApi.ObjectLiteralElementLike) =>
+        isPropertyNamed(ts, property, 'effects'),
     )
     let nextContent: string
     if (existingEffects) {
