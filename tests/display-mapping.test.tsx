@@ -47,7 +47,7 @@ describe('display mapping copy', () => {
     expect(requirement.label).toBe('Complete (Not) Cerulean Cave')
     expect((requirement.icon as any).type).toBe(TaskIconDisplay)
     expect(reward?.label).toBe('Unlock: A CHARming Culprit')
-    expect((reward?.icon as any).type).toBe(TaskIconDisplay)
+    expect((reward!.icon as any).type).toBe(TaskIconDisplay)
   })
 
   test('secret task-complete rewards do not reveal their icons', () => {
@@ -62,7 +62,7 @@ describe('display mapping copy', () => {
 
     expect(reward?.label).toBe('???')
     expect(reward?.subLabel).toBe('Secret Reward')
-    expect((reward?.icon as any).type).not.toBe(TaskIconDisplay)
+    expect((reward!.icon as any).type).not.toBe(TaskIconDisplay)
 
     const targetSecretReward = mapRewardToDisplayItem(
       {
@@ -73,7 +73,7 @@ describe('display mapping copy', () => {
     )
 
     expect(targetSecretReward?.label).toBe('Secret to Unlock')
-    expect((targetSecretReward?.icon as any).type).not.toBe(TaskIconDisplay)
+    expect((targetSecretReward!.icon as any).type).not.toBe(TaskIconDisplay)
   })
 
   test('companion criteria can use authored requirement copy', () => {
