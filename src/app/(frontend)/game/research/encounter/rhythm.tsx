@@ -12,10 +12,10 @@ import { useUser } from '@/context/UserContext'
 import type { RhythmConfig, RhythmIcon } from '@/data/games/rhythm/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import {
-  completeResearchEncounter,
-  startResearchEncounter,
-  submitResearchAnswer,
-} from '../actions'
+  completeGame,
+  startGame,
+  submitGameAnswer,
+} from '@/app/(frontend)/game/games/actions'
 
 interface RhythmGameProps {
   encounter: RhythmConfig
@@ -228,7 +228,7 @@ export function RhythmGame({ encounter, initialState }: RhythmGameProps) {
   const initGame = useCallback(async () => {
     if (gameStarted) return
 
-    const result = await startResearchEncounter(encounter.id)
+    const result = await startGame(encounter.id)
     if (!result.success) {
       console.error('Failed to start encounter:', result.error)
       return
@@ -282,8 +282,8 @@ export function RhythmGame({ encounter, initialState }: RhythmGameProps) {
     const isNormalWin = !!(!isEndlessMode && winScore && score >= winScore)
 
     try {
-      await submitResearchAnswer(isNormalWin)
-      const res = await completeResearchEncounter(
+      await submitGameAnswer(isNormalWin)
+      const res = await completeGame(
         encounter.id,
         isNormalWin,
         Math.floor(score),
@@ -567,7 +567,7 @@ export function RhythmGame({ encounter, initialState }: RhythmGameProps) {
                 size="lg"
                 onClick={async () => {
                   try {
-                    const res = await startResearchEncounter(
+                    const res = await startGame(
                       (initialState?.encounter || encounter).id,
                       true,
                     )

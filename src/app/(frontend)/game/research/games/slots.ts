@@ -6,7 +6,10 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { grantRewards } from '@/utilities/rewards/reward-logic'
 import { mergeSummaries } from '../utils'
-import { getUser, type ResearchState } from '../actions'
+import {
+  getUser,
+  type GameActivityState,
+} from '@/app/(frontend)/game/_shared/activity-actions'
 import {
   acquireActionLock,
   checkActionRateLimit,
@@ -46,7 +49,9 @@ export async function spinSlotMachine(betAmount?: number) {
     const payload = await getPayload({ config: configPromise })
 
     try {
-      const state = (await redis.get(`research:${user.id}`)) as ResearchState | null
+      const state = (await redis.get(
+        `game:${user.id}`,
+      )) as GameActivityState | null
       if (!state) {
         return { success: false, error: 'Session expired' }
       }
@@ -57,7 +62,10 @@ export async function spinSlotMachine(betAmount?: number) {
       }
 
       // Cost Check (fresh user read)
-      const freshUser = await payload.findByID({ collection: 'users', id: user.id })
+      const freshUser = await payload.findByID({
+        collection: 'users',
+        id: user.id,
+      })
       const cost = encounter.settings.cost
       let currentBalance = 0
       if (cost) {
@@ -83,7 +91,10 @@ export async function spinSlotMachine(betAmount?: number) {
 
       if (isWin && paytable.length > 0) {
         // Pick a winning line
-        const totalWeight = paytable.reduce((sum: number, line: any) => sum + (line.weight || 1), 0)
+        const totalWeight = paytable.reduce(
+          (sum: number, line: any) => sum + (line.weight || 1),
+          0,
+        )
         let random = Math.random() * totalWeight
         let chosenLine = paytable[0]
         for (const line of paytable) {
@@ -119,7 +130,7 @@ export async function spinSlotMachine(betAmount?: number) {
       await incrementUserActivityResult(
         payload as any,
         user.id,
-        'researchEncounterResults',
+        'gameResults',
         state.encounterId,
         isWin ? { wins: 1 } : { losses: 1 },
       )
@@ -148,25 +159,32 @@ export async function spinSlotMachine(betAmount?: number) {
 
         // Update redis session accumulation
         const currentSession = state.slotsSession || { totalRewards: {} }
-        currentSession.totalRewards = mergeSummaries(currentSession.totalRewards, spinSummary)
-        currentSession.totalCost = (currentSession.totalCost || 0) + (cost?.amount || 0)
+        currentSession.totalRewards = mergeSummaries(
+          currentSession.totalRewards,
+          spinSummary,
+        )
+        currentSession.totalCost =
+          (currentSession.totalCost || 0) + (cost?.amount || 0)
         state.slotsSession = currentSession
         state.wins += 1
       } else {
         const currentSession = state.slotsSession || { totalRewards: {} }
-        currentSession.totalCost = (currentSession.totalCost || 0) + (cost?.amount || 0)
+        currentSession.totalCost =
+          (currentSession.totalCost || 0) + (cost?.amount || 0)
         state.slotsSession = currentSession
         state.losses += 1
       }
 
       // Update Redis
-      await redis.set(`research:${user.id}`, state, { ex: 3600 })
+      await redis.set(`game:${user.id}`, state, { ex: 3600 })
 
       return {
         success: true,
         icons: resultIcons,
         rewards: spinSummary,
-        balance: cost ? currentBalance - cost.amount : freshUser.currency?.pokedollars || 0,
+        balance: cost
+          ? currentBalance - cost.amount
+          : freshUser.currency?.pokedollars || 0,
       }
     } finally {
       await releaseActionLock(spinLock)

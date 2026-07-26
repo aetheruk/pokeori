@@ -60,15 +60,13 @@ function isPsychicPokemon(pokemon: Pokemon) {
 }
 
 function isChannelingComplete(
-  researchEncounterResults:
-    | NonNullable<
-        ReturnType<typeof useUser>['gameData']
-      >['researchEncounterResults']
+  gameResults:
+    | NonNullable<ReturnType<typeof useUser>['gameData']>['gameResults']
     | undefined,
   activityId: string,
 ) {
-  return (researchEncounterResults || []).some(
-    (entry) => entry.encounterId === activityId && (entry.wins || 0) > 0,
+  return (gameResults || []).some(
+    (entry) => entry.gameId === activityId && (entry.wins || 0) > 0,
   )
 }
 
@@ -109,11 +107,11 @@ export function SpiritChannelingPanel() {
       SPIRIT_CHANNELING_CONFIGS.filter((config) => {
         if ((inventoryMap[config.mementoItemId] || 0) <= 0) return false
         return !isChannelingComplete(
-          gameData?.researchEncounterResults,
+          gameData?.gameResults,
           getSpiritChannelingActivityId(config),
         )
       }),
-    [gameData?.researchEncounterResults, inventoryMap],
+    [gameData?.gameResults, inventoryMap],
   )
 
   const selectedConfig = getSpiritChannelingConfigForMemento(selectedMementoId)

@@ -10,7 +10,11 @@ import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverla
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { getCollisionMask, CollisionMask } from '@/utilities/collision'
 import type { RunGameConfig, SpriteConfig } from '@/data/games/run/types'
-import { completeResearchEncounter, startResearchEncounter, submitResearchAnswer } from '../actions'
+import {
+  completeGame,
+  startGame,
+  submitGameAnswer,
+} from '@/app/(frontend)/game/games/actions'
 import { useUser } from '@/context/UserContext'
 import { usePageVisibility } from '@/hooks/usePageVisibility'
 import { SideScrollerStage } from './side-scroller-stage'
@@ -83,7 +87,9 @@ export function RunGame({ encounter }: RunGameProps) {
   const [parallaxOffsets, setParallaxOffsets] = useState<number[]>(
     encounter.settings.parallaxLayers.map(() => 0),
   )
-  const parallaxOffsetsRef = useRef<number[]>(encounter.settings.parallaxLayers.map(() => 0))
+  const parallaxOffsetsRef = useRef<number[]>(
+    encounter.settings.parallaxLayers.map(() => 0),
+  )
   const scoreRef = useRef(0)
   const masksRef = useRef<Record<string, CollisionMask>>({})
 
@@ -99,8 +105,10 @@ export function RunGame({ encounter }: RunGameProps) {
   const GROUND_Y = 5
   const PLAYER_X = 100
   const PLAYER_SIZE = 60
-  const renderedPlayerWidth = encounter.settings.player?.renderWidth || PLAYER_SIZE
-  const renderedPlayerHeight = encounter.settings.player?.renderHeight || PLAYER_SIZE
+  const renderedPlayerWidth =
+    encounter.settings.player?.renderWidth || PLAYER_SIZE
+  const renderedPlayerHeight =
+    encounter.settings.player?.renderHeight || PLAYER_SIZE
   const CANVAS_WIDTH = 600
   const CANVAS_HEIGHT = 600
 
@@ -117,7 +125,8 @@ export function RunGame({ encounter }: RunGameProps) {
     const loadMasks = async () => {
       const urls: string[] = []
       // Player
-      if (encounter.settings.player?.sheetUrl) urls.push(encounter.settings.player.sheetUrl)
+      if (encounter.settings.player?.sheetUrl)
+        urls.push(encounter.settings.player.sheetUrl)
       else if (encounter.settings.sprite) urls.push(encounter.settings.sprite)
 
       // Obstacles
@@ -148,7 +157,7 @@ export function RunGame({ encounter }: RunGameProps) {
   }, [encounter.settings])
 
   const initGame = useCallback(async () => {
-    const res = await startResearchEncounter(encounter.id)
+    const res = await startGame(encounter.id)
     if (!res.success) {
       console.error('Failed to start:', res.error)
       return
@@ -185,7 +194,10 @@ export function RunGame({ encounter }: RunGameProps) {
     lastJumpTimeRef.current = 0
 
     if (res.restored && res.expiry) {
-      const remaining = Math.max(0, Math.floor((res.expiry - Date.now()) / 1000))
+      const remaining = Math.max(
+        0,
+        Math.floor((res.expiry - Date.now()) / 1000),
+      )
       setTimeLeft(remaining)
     } else {
       setTimeLeft(encounter.settings.timeLimit || 0)
@@ -204,7 +216,13 @@ export function RunGame({ encounter }: RunGameProps) {
 
   // Timer
   useEffect(() => {
-    if (!gameStarted || gameEnded || !isPageVisible || !encounter.settings.timeLimit || timeLeft <= 0)
+    if (
+      !gameStarted ||
+      gameEnded ||
+      !isPageVisible ||
+      !encounter.settings.timeLimit ||
+      timeLeft <= 0
+    )
       return
     const timer = setInterval(() => {
       setTimeLeft((p) => {
@@ -217,7 +235,13 @@ export function RunGame({ encounter }: RunGameProps) {
       })
     }, 1000)
     return () => clearInterval(timer)
-  }, [gameStarted, gameEnded, isPageVisible, timeLeft, encounter.settings.timeLimit])
+  }, [
+    gameStarted,
+    gameEnded,
+    isPageVisible,
+    timeLeft,
+    encounter.settings.timeLimit,
+  ])
 
   const jump = useCallback(() => {
     const now = Date.now()
@@ -229,7 +253,11 @@ export function RunGame({ encounter }: RunGameProps) {
       hasDoubleJumpedRef.current = false
       setHasDoubleJumped(false)
       lastJumpTimeRef.current = now
-    } else if (isJumpingRef.current && !hasDoubleJumpedRef.current && !gameEnded) {
+    } else if (
+      isJumpingRef.current &&
+      !hasDoubleJumpedRef.current &&
+      !gameEnded
+    ) {
       // Double jump - 250ms cooldown to prevent accidental doubles
       if (now - lastJumpTimeRef.current < 250) return
 
@@ -256,8 +284,8 @@ export function RunGame({ encounter }: RunGameProps) {
   const handleWin = async () => {
     playSfx('good')
     setGameEnded(true)
-    await submitResearchAnswer(true)
-    const res = await completeResearchEncounter(encounter.id, true)
+    await submitGameAnswer(true)
+    const res = await completeGame(encounter.id, true)
 
     setResult({
       success: true,
@@ -269,10 +297,10 @@ export function RunGame({ encounter }: RunGameProps) {
   const handleLoss = async () => {
     playSfx('bad')
     setGameEnded(true)
-    await submitResearchAnswer(false)
+    await submitGameAnswer(false)
     // Pass final score for endless mode reward calculation - use scoreRef for up-to-date value
     const finalScore = isEndlessMode ? Math.floor(scoreRef.current) : undefined
-    const res = await completeResearchEncounter(
+    const res = await completeGame(
       encounter.id,
       false,
       finalScore,
@@ -291,7 +319,9 @@ export function RunGame({ encounter }: RunGameProps) {
 
     setResult({
       success: isSuccess,
-      message: isEndlessMode ? `Final Score: ${Math.floor(scoreRef.current)}` : 'Game Over!',
+      message: isEndlessMode
+        ? `Final Score: ${Math.floor(scoreRef.current)}`
+        : 'Game Over!',
       rewards: res.summary, // Will contain milestone rewards for endless mode
     })
   }
@@ -342,7 +372,9 @@ export function RunGame({ encounter }: RunGameProps) {
 
       // Batch all state updates into one
       const baseSpeed = encounter.settings.speed || 120
-      const currentSpeed = isBoostingRef.current ? baseSpeed * BOOST_MULTIPLIER : baseSpeed
+      const currentSpeed = isBoostingRef.current
+        ? baseSpeed * BOOST_MULTIPLIER
+        : baseSpeed
 
       // Update parallax
       const newParallaxOffsets = parallaxOffsetsRef.current.map((offset, i) => {
@@ -358,7 +390,8 @@ export function RunGame({ encounter }: RunGameProps) {
       const groundConfig = encounter.settings.groundObstacle
       const nextGroundSpawn =
         lastGroundSpawnRef.current +
-        Math.random() * (groundConfig.spawnRate.max - groundConfig.spawnRate.min) +
+        Math.random() *
+          (groundConfig.spawnRate.max - groundConfig.spawnRate.min) +
         groundConfig.spawnRate.min
 
       if (frameCountRef.current >= nextGroundSpawn) {
@@ -383,7 +416,8 @@ export function RunGame({ encounter }: RunGameProps) {
       if (aerialConfig) {
         const nextAerialSpawn =
           lastAerialSpawnRef.current +
-          Math.random() * (aerialConfig.spawnRate.max - aerialConfig.spawnRate.min) +
+          Math.random() *
+            (aerialConfig.spawnRate.max - aerialConfig.spawnRate.min) +
           aerialConfig.spawnRate.min
 
         if (frameCountRef.current >= nextAerialSpawn) {
@@ -421,8 +455,10 @@ export function RunGame({ encounter }: RunGameProps) {
 
       let newCollectibles = collectiblesRef.current
       if (collectibleRewardConfigs.length > 0) {
-        const playerWidth = encounter.settings.player?.renderWidth || PLAYER_SIZE
-        const playerHeight = encounter.settings.player?.renderHeight || PLAYER_SIZE
+        const playerWidth =
+          encounter.settings.player?.renderWidth || PLAYER_SIZE
+        const playerHeight =
+          encounter.settings.player?.renderHeight || PLAYER_SIZE
         const collectibleSize = getCollectibleSize(playerWidth, playerHeight)
         const minY = 24
         const maxY = Math.min(CANVAS_HEIGHT * 0.42, playerHeight * 4.4)
@@ -483,7 +519,13 @@ export function RunGame({ encounter }: RunGameProps) {
         cancelAnimationFrame(animationFrameRef.current)
       }
     }
-  }, [gameStarted, gameEnded, isPageVisible, encounter.settings, collectibleRewardConfigs])
+  }, [
+    gameStarted,
+    gameEnded,
+    isPageVisible,
+    encounter.settings,
+    collectibleRewardConfigs,
+  ])
 
   // Collision Detection
   useEffect(() => {
@@ -511,7 +553,9 @@ export function RunGame({ encounter }: RunGameProps) {
       const playerMask = masksRef.current[playerConfig.sheetUrl]
       const frameCount =
         playerConfig.frameCount ||
-        (playerMask ? Math.floor(playerMask.height / playerConfig.frameHeight) : 1) ||
+        (playerMask
+          ? Math.floor(playerMask.height / playerConfig.frameHeight)
+          : 1) ||
         1
       playerFrameIndex = Math.floor(now / frameDuration) % frameCount
     }
@@ -536,9 +580,11 @@ export function RunGame({ encounter }: RunGameProps) {
         const intersectX = Math.max(playerBox.x, obsBox.x)
         const intersectY = Math.max(playerBox.y, obsBox.y)
         const intersectW =
-          Math.min(playerBox.x + playerBox.width, obsBox.x + obsBox.width) - intersectX
+          Math.min(playerBox.x + playerBox.width, obsBox.x + obsBox.width) -
+          intersectX
         const intersectH =
-          Math.min(playerBox.y + playerBox.height, obsBox.y + obsBox.height) - intersectY
+          Math.min(playerBox.y + playerBox.height, obsBox.y + obsBox.height) -
+          intersectY
 
         if (intersectW > 0 && intersectH > 0) {
           // Get masks
@@ -570,7 +616,9 @@ export function RunGame({ encounter }: RunGameProps) {
             const frameDuration = obs.spriteConfig.frameRate || 100
             const frameCount =
               obs.spriteConfig.frameCount ||
-              (obsMask ? Math.floor(obsMask.height / obs.spriteConfig.frameHeight) : 1) ||
+              (obsMask
+                ? Math.floor(obsMask.height / obs.spriteConfig.frameHeight)
+                : 1) ||
               1
             obsFrameIndex = Math.floor(Date.now() / frameDuration) % frameCount
           }
@@ -599,7 +647,10 @@ export function RunGame({ encounter }: RunGameProps) {
                 pOpaque = playerMask.isOpaque(pSheetX, pSheetY)
               } else {
                 // Fallback for simple image: check normalized coord
-                pOpaque = playerMask.isOpaque(pRelX * playerMask.width, pRelY * playerMask.height)
+                pOpaque = playerMask.isOpaque(
+                  pRelX * playerMask.width,
+                  pRelY * playerMask.height,
+                )
               }
 
               if (!pOpaque) continue
@@ -619,7 +670,10 @@ export function RunGame({ encounter }: RunGameProps) {
                   Math.floor(oRelY * obs.spriteConfig.frameHeight)
                 oOpaque = obsMask.isOpaque(oSheetX, oSheetY)
               } else {
-                oOpaque = obsMask.isOpaque(oRelX * obsMask.width, oRelY * obsMask.height)
+                oOpaque = obsMask.isOpaque(
+                  oRelX * obsMask.width,
+                  oRelY * obsMask.height,
+                )
               }
 
               if (oOpaque) {
@@ -640,7 +694,13 @@ export function RunGame({ encounter }: RunGameProps) {
   }, [obstacles, playerY, gameEnded, gameStarted, isPageVisible])
 
   useEffect(() => {
-    if (gameEnded || !gameStarted || !isPageVisible || collectibles.length === 0) return
+    if (
+      gameEnded ||
+      !gameStarted ||
+      !isPageVisible ||
+      collectibles.length === 0
+    )
+      return
 
     const playerWidth = encounter.settings.player?.renderWidth || PLAYER_SIZE
     const playerHeight = encounter.settings.player?.renderHeight || PLAYER_SIZE
@@ -679,7 +739,15 @@ export function RunGame({ encounter }: RunGameProps) {
       collectiblesRef.current = remainingCollectibles
       setCollectibles(remainingCollectibles)
     }
-  }, [collectibles, playerY, gameEnded, gameStarted, isPageVisible, encounter.settings.player, playSfx])
+  }, [
+    collectibles,
+    playerY,
+    gameEnded,
+    gameStarted,
+    isPageVisible,
+    encounter.settings.player,
+    playSfx,
+  ])
 
   // Keyboard controls
   useEffect(() => {
@@ -723,195 +791,208 @@ export function RunGame({ encounter }: RunGameProps) {
         }
         timer={
           encounter.settings.timeLimit ? (
-            <GameTimer timeLeft={timeLeft} totalTime={encounter.settings.timeLimit} />
+            <GameTimer
+              timeLeft={timeLeft}
+              totalTime={encounter.settings.timeLimit}
+            />
           ) : undefined
         }
         onOutsideTap={jump}
         onOutsideSwipe={boost}
       >
-            <Image
-              src={encounter.settings.scene?.backdrop || '/games/run/backgrounds/sky.avif'}
-              alt=""
-              fill
-              priority
-              sizes="600px"
-              className="object-cover"
-            />
-            {/* Parallax Backgrounds */}
-            {encounter.settings.parallaxLayers.map((layer, i) => {
-              const { backgroundPosition: backgroundAnchor = '0', ...layerStyle } =
-                layer.style ?? {}
+        <Image
+          src={
+            encounter.settings.scene?.backdrop ||
+            '/games/run/backgrounds/sky.avif'
+          }
+          alt=""
+          fill
+          priority
+          sizes="600px"
+          className="object-cover"
+        />
+        {/* Parallax Backgrounds */}
+        {encounter.settings.parallaxLayers.map((layer, i) => {
+          const { backgroundPosition: backgroundAnchor = '0', ...layerStyle } =
+            layer.style ?? {}
 
-              return (
-                <div
-                  key={i}
-                  className="absolute inset-0 bg-repeat-x"
-                  style={{
-                    ...layerStyle,
-                    backgroundImage: `url(${layer.url})`,
-                    backgroundPosition: `${-parallaxOffsets[i]}px ${backgroundAnchor}`,
-                    backgroundSize: layerStyle.backgroundSize || 'auto 100%',
-                    backgroundRepeat: layerStyle.backgroundRepeat || 'repeat-x',
-                  }}
-                />
-              )
-            })}
-
-            {/* Player */}
+          return (
             <div
-              className="absolute z-0 h-2 rounded-full bg-slate-950/22 blur-[2px] transition-transform"
+              key={i}
+              className="absolute inset-0 bg-repeat-x"
               style={{
-                left: `${PLAYER_X + 8}px`,
-                bottom: `${GROUND_Y + 4}px`,
-                width: `${renderedPlayerWidth * 0.75}px`,
-                transform: isJumping ? 'scaleX(0.72)' : 'scaleX(1)',
+                ...layerStyle,
+                backgroundImage: `url(${layer.url})`,
+                backgroundPosition: `${-parallaxOffsets[i]}px ${backgroundAnchor}`,
+                backgroundSize: layerStyle.backgroundSize || 'auto 100%',
+                backgroundRepeat: layerStyle.backgroundRepeat || 'repeat-x',
               }}
             />
-            {isBoosting && (
+          )
+        })}
+
+        {/* Player */}
+        <div
+          className="absolute z-0 h-2 rounded-full bg-slate-950/22 blur-[2px] transition-transform"
+          style={{
+            left: `${PLAYER_X + 8}px`,
+            bottom: `${GROUND_Y + 4}px`,
+            width: `${renderedPlayerWidth * 0.75}px`,
+            transform: isJumping ? 'scaleX(0.72)' : 'scaleX(1)',
+          }}
+        />
+        {isBoosting && (
+          <div
+            className="absolute h-8 w-20 rounded-full bg-gradient-to-l from-white/0 via-white/34 to-white/0 blur-[2px]"
+            style={{
+              left: `${PLAYER_X - 68}px`,
+              bottom: `${GROUND_Y + playerY + renderedPlayerHeight * 0.36}px`,
+            }}
+          />
+        )}
+        {(() => {
+          const playerConfig = encounter.settings.player
+          const isJumpingSprite = isJumping && encounter.settings.jumpSprite
+
+          if (playerConfig && !isJumpingSprite) {
+            const frameDuration = playerConfig.frameRate || 100
+            const playerMask = masksRef.current[playerConfig.sheetUrl]
+            const frameCount =
+              playerConfig.frameCount ||
+              (playerMask
+                ? Math.floor(playerMask.height / playerConfig.frameHeight)
+                : 1) ||
+              1
+            const frameIndex =
+              Math.floor(Date.now() / frameDuration) % frameCount
+
+            // Calculate scaled frame height to insure perfect alignment
+            const scale = playerConfig.renderWidth / playerConfig.frameWidth
+            const scaledFrameHeight = playerConfig.frameHeight * scale
+
+            return (
               <div
-                className="absolute h-8 w-20 rounded-full bg-gradient-to-l from-white/0 via-white/34 to-white/0 blur-[2px]"
+                className="absolute transition-none drop-shadow-lg"
                 style={{
-                  left: `${PLAYER_X - 68}px`,
-                  bottom: `${GROUND_Y + playerY + renderedPlayerHeight * 0.36}px`,
+                  left: `${PLAYER_X}px`,
+                  bottom: `${GROUND_Y + playerY}px`,
+                  width: `${playerConfig.renderWidth}px`,
+                  height: `${playerConfig.renderHeight}px`,
+                  backgroundImage: `url(${playerConfig.sheetUrl})`,
+                  backgroundPosition: `0 -${frameIndex * scaledFrameHeight}px`,
+                  backgroundSize: `${playerConfig.renderWidth}px auto`,
+                  backgroundRepeat: 'no-repeat',
+                  transform: 'scaleX(-1)', // Flip player sprite
                 }}
               />
-            )}
-            {(() => {
-              const playerConfig = encounter.settings.player
-              const isJumpingSprite = isJumping && encounter.settings.jumpSprite
+            )
+          }
 
-              if (playerConfig && !isJumpingSprite) {
-                const frameDuration = playerConfig.frameRate || 100
-                const playerMask = masksRef.current[playerConfig.sheetUrl]
-                const frameCount =
-                  playerConfig.frameCount ||
-                  (playerMask ? Math.floor(playerMask.height / playerConfig.frameHeight) : 1) ||
-                  1
-                const frameIndex = Math.floor(Date.now() / frameDuration) % frameCount
+          return (
+            <div
+              className="absolute transition-none"
+              style={{
+                left: `${PLAYER_X}px`,
+                bottom: `${GROUND_Y + playerY}px`,
+                width: `${PLAYER_SIZE}px`,
+                height: `${PLAYER_SIZE}px`,
+              }}
+            >
+              <Image
+                src={
+                  isJumping && encounter.settings.jumpSprite
+                    ? encounter.settings.jumpSprite
+                    : encounter.settings.sprite
+                }
+                alt="Player"
+                fill
+                sizes="60px"
+                className="object-contain drop-shadow-lg scale-x-[-1]"
+              />
+            </div>
+          )
+        })()}
 
-                // Calculate scaled frame height to insure perfect alignment
-                const scale = playerConfig.renderWidth / playerConfig.frameWidth
-                const scaledFrameHeight = playerConfig.frameHeight * scale
+        {/* Collectible Rewards */}
+        {collectibles.map((collectible) => (
+          <div
+            key={collectible.id}
+            className="absolute z-20"
+            style={{
+              left: `${collectible.x}px`,
+              bottom: `${collectible.y}px`,
+              width: `${collectible.size}px`,
+              height: `${collectible.size}px`,
+            }}
+          >
+            <EndlessCollectibleSprite
+              reward={collectible.reward}
+              size={collectible.size}
+            />
+          </div>
+        ))}
 
-                return (
-                  <div
-                    className="absolute transition-none drop-shadow-lg"
-                    style={{
-                      left: `${PLAYER_X}px`,
-                      bottom: `${GROUND_Y + playerY}px`,
-                      width: `${playerConfig.renderWidth}px`,
-                      height: `${playerConfig.renderHeight}px`,
-                      backgroundImage: `url(${playerConfig.sheetUrl})`,
-                      backgroundPosition: `0 -${frameIndex * scaledFrameHeight}px`,
-                      backgroundSize: `${playerConfig.renderWidth}px auto`,
-                      backgroundRepeat: 'no-repeat',
-                      transform: 'scaleX(-1)', // Flip player sprite
-                    }}
-                  />
-                )
-              }
+        {/* Obstacles */}
+        {obstacles.map((obs) => {
+          if (obs.spriteConfig) {
+            const frameDuration = obs.spriteConfig.frameRate || 100
+            const obsMask = masksRef.current[obs.spriteConfig.sheetUrl]
+            const frameCount =
+              obs.spriteConfig.frameCount ||
+              (obsMask
+                ? Math.floor(obsMask.height / obs.spriteConfig.frameHeight)
+                : 1) ||
+              1
+            const frameIndex =
+              Math.floor(Date.now() / frameDuration) % frameCount
 
-              return (
-                <div
-                  className="absolute transition-none"
-                  style={{
-                    left: `${PLAYER_X}px`,
-                    bottom: `${GROUND_Y + playerY}px`,
-                    width: `${PLAYER_SIZE}px`,
-                    height: `${PLAYER_SIZE}px`,
-                  }}
-                >
-                  <Image
-                    src={
-                      isJumping && encounter.settings.jumpSprite
-                        ? encounter.settings.jumpSprite
-                        : encounter.settings.sprite
-                    }
-                    alt="Player"
-                    fill
-                    sizes="60px"
-                    className="object-contain drop-shadow-lg scale-x-[-1]"
-                  />
-                </div>
-              )
-            })()}
+            const scale =
+              obs.spriteConfig.renderWidth / obs.spriteConfig.frameWidth
+            const scaledFrameHeight = obs.spriteConfig.frameHeight * scale
 
-            {/* Collectible Rewards */}
-            {collectibles.map((collectible) => (
+            return (
               <div
-                key={collectible.id}
-                className="absolute z-20"
+                key={obs.id}
+                className="absolute"
                 style={{
-                  left: `${collectible.x}px`,
-                  bottom: `${collectible.y}px`,
-                  width: `${collectible.size}px`,
-                  height: `${collectible.size}px`,
+                  left: `${obs.x}px`,
+                  bottom: `${obs.y}px`,
+                  width: `${obs.width}px`,
+                  height: `${obs.height}px`,
+                  backgroundImage: `url(${obs.spriteConfig.sheetUrl})`,
+                  backgroundPosition: `0 -${frameIndex * scaledFrameHeight}px`,
+                  backgroundSize: `${obs.spriteConfig.renderWidth}px auto`,
+                  backgroundRepeat: 'no-repeat',
                 }}
-              >
-                <EndlessCollectibleSprite
-                  reward={collectible.reward}
-                  size={collectible.size}
-                />
-              </div>
-            ))}
+              />
+            )
+          }
 
-            {/* Obstacles */}
-            {obstacles.map((obs) => {
-              if (obs.spriteConfig) {
-                const frameDuration = obs.spriteConfig.frameRate || 100
-                const obsMask = masksRef.current[obs.spriteConfig.sheetUrl]
-                const frameCount =
-                  obs.spriteConfig.frameCount ||
-                  (obsMask ? Math.floor(obsMask.height / obs.spriteConfig.frameHeight) : 1) ||
-                  1
-                const frameIndex = Math.floor(Date.now() / frameDuration) % frameCount
-
-                const scale = obs.spriteConfig.renderWidth / obs.spriteConfig.frameWidth
-                const scaledFrameHeight = obs.spriteConfig.frameHeight * scale
-
-                return (
-                  <div
-                    key={obs.id}
-                    className="absolute"
-                    style={{
-                      left: `${obs.x}px`,
-                      bottom: `${obs.y}px`,
-                      width: `${obs.width}px`,
-                      height: `${obs.height}px`,
-                      backgroundImage: `url(${obs.spriteConfig.sheetUrl})`,
-                      backgroundPosition: `0 -${frameIndex * scaledFrameHeight}px`,
-                      backgroundSize: `${obs.spriteConfig.renderWidth}px auto`,
-                      backgroundRepeat: 'no-repeat',
-                    }}
-                  />
-                )
-              }
-
-              return (
-                <div
-                  key={obs.id}
-                  className="absolute"
-                  style={{
-                    left: `${obs.x}px`,
-                    bottom: `${obs.y}px`,
-                    width: `${obs.width}px`,
-                    height: `${obs.height}px`,
-                  }}
-                >
-                  <Image
-                    src={
-                      obs.isAerial && encounter.settings.aerialObstacle
-                        ? encounter.settings.aerialObstacle.sprite
-                        : encounter.settings.groundObstacle.sprite
-                    }
-                    alt={obs.isAerial ? 'Aerial Obstacle' : 'Ground Obstacle'}
-                    fill
-                    sizes={`${obs.width}px`}
-                    className="object-fill"
-                  />
-                </div>
-              )
-            })}
+          return (
+            <div
+              key={obs.id}
+              className="absolute"
+              style={{
+                left: `${obs.x}px`,
+                bottom: `${obs.y}px`,
+                width: `${obs.width}px`,
+                height: `${obs.height}px`,
+              }}
+            >
+              <Image
+                src={
+                  obs.isAerial && encounter.settings.aerialObstacle
+                    ? encounter.settings.aerialObstacle.sprite
+                    : encounter.settings.groundObstacle.sprite
+                }
+                alt={obs.isAerial ? 'Aerial Obstacle' : 'Ground Obstacle'}
+                fill
+                sizes={`${obs.width}px`}
+                className="object-fill"
+              />
+            </div>
+          )
+        })}
       </SideScrollerStage>
 
       {result && (
@@ -930,7 +1011,7 @@ export function RunGame({ encounter }: RunGameProps) {
                 size="lg"
                 onClick={async () => {
                   try {
-                    const res = await startResearchEncounter(encounter.id, true)
+                    const res = await startGame(encounter.id, true)
                     if (res?.success) {
                       window.location.reload()
                     } else {

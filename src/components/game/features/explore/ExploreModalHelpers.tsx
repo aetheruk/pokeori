@@ -310,9 +310,7 @@ function isBerryReward(reward: any): boolean {
 }
 
 function shouldHideExploreRewardPreview(selectedItem: any, reward: any) {
-  const isFieldObservation =
-    selectedItem.type === 'research' &&
-    selectedItem.originalData.gameType === 'field-observation'
+  const isFieldObservation = selectedItem.type === 'field-research'
 
   if (reward?.type === 'xp') {
     const skillId = getRewardSkillId(reward)
@@ -421,7 +419,10 @@ export function getFormattedProperties(selectedItem: any) {
         value: bat.levelCap,
       })
     }
-  } else if (selectedItem.type === 'research') {
+  } else if (
+    selectedItem.type === 'game' ||
+    selectedItem.type === 'field-research'
+  ) {
     const res = selectedItem.originalData
     const milestones = getSortedEndlessMilestones(res.settings)
     const repeatingRewards = getSortedEndlessRepeatingRewards(res.settings)
@@ -545,25 +546,33 @@ export function getFormattedStats(
         icon: <ThumbsDown />,
       })
     }
-  } else if (selectedItem.type === 'research') {
-    const researchRes = (userData as any).researchEncounterResults?.find(
-      (r: any) => r.encounterId === selectedItem.id,
-    )
-    if (researchRes) {
+  } else if (
+    selectedItem.type === 'game' ||
+    selectedItem.type === 'field-research'
+  ) {
+    const activityResult =
+      selectedItem.type === 'game'
+        ? (userData as any).gameResults?.find(
+            (result: any) => result.gameId === selectedItem.id,
+          )
+        : (userData as any).fieldResearchResults?.find(
+            (result: any) => result.fieldResearchId === selectedItem.id,
+          )
+    if (activityResult) {
       stats.push({
         label: 'Success',
-        value: researchRes.wins || 0,
+        value: activityResult.wins || 0,
         icon: <ThumbsUp />,
       })
       stats.push({
         label: 'Fail',
-        value: researchRes.losses || 0,
+        value: activityResult.losses || 0,
         icon: <ThumbsDown />,
       })
-      if (researchRes.highScore) {
+      if (activityResult.highScore) {
         stats.push({
           label: 'High Score',
-          value: researchRes.highScore,
+          value: activityResult.highScore,
           icon: <Trophy />,
         })
       }
@@ -727,7 +736,7 @@ export function getFormattedRewards(
     })
   }
 
-  if (selectedItem.type === 'research') {
+  if (selectedItem.type === 'game' || selectedItem.type === 'field-research') {
     const generatedSkillXpReward =
       getGeneratedSkillXpRewardPreview(selectedItem)
     if (generatedSkillXpReward) {
@@ -740,10 +749,7 @@ export function getFormattedRewards(
     }
   }
 
-  if (
-    selectedItem.type === 'research' &&
-    selectedItem.originalData.gameType === 'field-observation'
-  ) {
+  if (selectedItem.type === 'field-research') {
     const fieldObservationItemDrops =
       selectedItem.originalData.settings?.itemDrops || []
     fieldObservationItemDrops.forEach((drop: any) => {
@@ -783,7 +789,7 @@ export function getFormattedRewards(
   }
 
   if (
-    selectedItem.type === 'research' &&
+    selectedItem.type === 'game' &&
     selectedItem.originalData.gameType === 'prize-wheel'
   ) {
     const prizeChances = new Map<string, { reward: any; percentage: number }>()
@@ -831,7 +837,7 @@ export function getFormattedRewards(
   }
 
   if (
-    selectedItem.type === 'research' &&
+    selectedItem.type === 'game' &&
     selectedItem.originalData.gameType === 'fishing'
   ) {
     const fishingGame = selectedItem.originalData as FishingGameConfig
@@ -1134,9 +1140,7 @@ export function ActionButton({
         {loadingId === item.id && (
           <Loader2 className="mr-2 h-4 w-4 animate-spin text-game-cream" />
         )}
-        {!loadingId && (
-          <Check className="mr-2 h-4 w-4 text-game-cream" />
-        )}
+        {!loadingId && <Check className="mr-2 h-4 w-4 text-game-cream" />}
         {hasOtherExpedition
           ? `Another ${expeditionLabel} Is Active`
           : (item.originalData as any)?.buttonText ||
@@ -1146,7 +1150,10 @@ export function ActionButton({
   }
 
   const isBoxFull = userData.pokemon.length >= (userData.user.maxPokemon || 50)
-  const isEncounterType = item.type === 'location' || item.type === 'research'
+  const isEncounterType =
+    item.type === 'location' ||
+    item.type === 'game' ||
+    item.type === 'field-research'
   const isDisabled =
     loadingId === item.id || !criteriaMet || (isBoxFull && isEncounterType)
 
@@ -1208,11 +1215,11 @@ export function ActionButton({
               ? 'Start Battle'
               : item.type === 'location'
                 ? 'Explore'
-                : item.type === 'research'
-                  ? item.originalData?.gameType === 'field-observation'
-                    ? 'Study'
-                    : 'Start Game'
-                  : 'Start'}
+                : item.type === 'field-research'
+                  ? 'Study'
+                  : item.type === 'game'
+                    ? 'Start Game'
+                    : 'Start'}
       </span>
     </Button>
   )
@@ -1306,7 +1313,7 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
     )
   }
 
-  if (item.type === 'research' && item.originalData.gameType === 'fishing') {
+  if (item.type === 'game' && item.originalData.gameType === 'fishing') {
     const fishingGame = item.originalData as FishingGameConfig
     const rodEntries = Object.entries(fishingGame.settings.rods).filter(
       ([, rodConfig]) => Boolean(rodConfig?.encounters?.entries?.length),

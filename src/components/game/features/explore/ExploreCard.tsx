@@ -61,19 +61,16 @@ function ExploreCardComponent({
       (modeItem.originalData as any).isWildBattle
     )
       return 'Battle'
-    if (
-      modeItem.type === 'research' &&
-      (modeItem.originalData as any).gameType === 'field-observation'
-    ) {
+    if (modeItem.type === 'field-research') {
       return 'Study'
     }
     if (
-      modeItem.type === 'research' &&
+      modeItem.type === 'game' &&
       (modeItem.originalData as any).gameType === 'fishing'
     ) {
       return 'Fish'
     }
-    if (isGrouped && modeItem.type === 'research') {
+    if (isGrouped && modeItem.type === 'game') {
       return /\s+EX$/i.test(modeItem.name) ? 'EX' : 'Normal'
     }
     return getGameTypeLabel(modeItem)
@@ -81,7 +78,7 @@ function ExploreCardComponent({
   const getGroupedTypeLabel = () => {
     if (item.type === 'vs-seeker') return 'TRAINER REMATCH'
     if (!isGrouped) return getGameTypeLabel(item)
-    if (groupedItems.every((groupedItem) => groupedItem.type === 'research'))
+    if (groupedItems.every((groupedItem) => groupedItem.type === 'game'))
       return 'MINI GAME'
     return 'LOCATION'
   }

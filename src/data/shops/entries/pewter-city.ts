@@ -14,7 +14,7 @@ export const pewterCityShops: ShopConfig[] = [
     background: '/backgrounds/shop.avif',
     requirements: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'pewter-item-identify',
         battleStatus: 'win',
         count: 5,

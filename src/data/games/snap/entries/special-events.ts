@@ -62,7 +62,7 @@ const legendaryBirdSnapEntries: SnapConfig[] = legendaryBirdSnaps.map((entry) =>
   isRandomEvent: true,
   requirements: [
     {
-      type: 'research_encounter_result',
+      type: 'game_result',
       targetId: entry.id,
       battleStatus: 'win',
       count: 1,
@@ -112,7 +112,7 @@ export const specialEventSnapEntries: SnapConfig[] = [
     requirements: [
       clearBellRequirement,
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'rainbow-feather-shadow-snap',
         battleStatus: 'win',
         count: 3,
@@ -159,7 +159,7 @@ export const specialEventSnapEntries: SnapConfig[] = [
     isRandomEvent: true,
     requirements: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'silver-feather-shadow-snap',
         battleStatus: 'win',
         count: 3,
@@ -207,7 +207,7 @@ export const specialEventSnapEntries: SnapConfig[] = [
     requirements: [
       clearBellRequirement,
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'entei-shadow-snap',
         battleStatus: 'win',
         count: 1,
@@ -255,7 +255,7 @@ export const specialEventSnapEntries: SnapConfig[] = [
     requirements: [
       clearBellRequirement,
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'raikou-shadow-snap',
         battleStatus: 'win',
         count: 1,
@@ -303,7 +303,7 @@ export const specialEventSnapEntries: SnapConfig[] = [
     requirements: [
       clearBellRequirement,
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'suicune-shadow-snap',
         battleStatus: 'win',
         count: 1,

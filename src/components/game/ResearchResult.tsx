@@ -46,9 +46,7 @@ export function ResultActionButton({
     )
   }
 
-  return (
-    <Button {...sharedProps}>{children}</Button>
-  )
+  return <Button {...sharedProps}>{children}</Button>
 }
 
 function isTaskIcon(icon: any): icon is TaskIcon {
@@ -246,14 +244,13 @@ export function GameResult({
           >
             {secondaryAction && (
               <div className="min-w-0 flex-1">
-                <ResultActionButton asChild>{secondaryAction}</ResultActionButton>
+                <ResultActionButton asChild>
+                  {secondaryAction}
+                </ResultActionButton>
               </div>
             )}
             <div
-              className={cn(
-                'min-w-0',
-                secondaryAction ? 'flex-1' : 'w-full',
-              )}
+              className={cn('min-w-0', secondaryAction ? 'flex-1' : 'w-full')}
             >
               <ResultActionButton
                 onClick={handleReturn}
@@ -266,27 +263,5 @@ export function GameResult({
         </StickyFooter>
       </main>
     </div>
-  )
-}
-
-// Legacy ResearchResult component - now just a wrapper around GameResult
-interface ResearchResultProps {
-  success: boolean
-  title?: string
-  message?: React.ReactNode
-  rewardSummary?: RewardSummary | null
-  icon?: string | React.ReactNode | TaskIcon
-  iconAlt?: string
-  onReturn?: () => void
-}
-
-export function ResearchResult(props: ResearchResultProps) {
-  return (
-    <GameResult
-      {...props}
-      sectionTitle="Research Outcome"
-      returnPath="/game/research"
-      returnText="Complete Research"
-    />
   )
 }

@@ -11,18 +11,18 @@ import { Button } from '@/components/ui/button'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
-import type { ResearchConfig } from '@/data/games'
+import type { GameItem } from '@/data/games'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import {
-  completeResearchEncounter,
-  startResearchEncounter,
-  submitResearchAnswer,
-} from '../actions'
+  completeGame,
+  startGame,
+  submitGameAnswer,
+} from '@/app/(frontend)/game/games/actions'
 
 interface SlidingPuzzleGameProps {
-  encounter: ResearchConfig
+  encounter: GameItem
   initialState?: any
 }
 
@@ -73,7 +73,7 @@ export function SlidingPuzzleGame({
   const initGame = useCallback(async () => {
     if (gameStarted) return
 
-    const result = await startResearchEncounter(encounter.id)
+    const result = await startGame(encounter.id)
 
     if (!result.success) {
       console.error('Failed to start encounter:', result.error)
@@ -127,7 +127,7 @@ export function SlidingPuzzleGame({
         if (prev <= 1) {
           setGameEnded(true)
           playSfx('bad')
-          completeResearchEncounter(encounter.id, false).then(() => {
+          completeGame(encounter.id, false).then(() => {
             setResult({
               success: false,
               message: 'Time is up!',
@@ -172,7 +172,7 @@ export function SlidingPuzzleGame({
     setTiles(newTiles)
     setMoveCount((prev: number) => prev + 1)
 
-    const result = await submitResearchAnswer({ moveTileIndex: tileIndex })
+    const result = await submitGameAnswer({ moveTileIndex: tileIndex })
 
     if (!result.success) {
       setIsProcessing(false)
@@ -202,7 +202,7 @@ export function SlidingPuzzleGame({
     await new Promise((resolve) => setTimeout(resolve, 800))
 
     if (result.gameOver) {
-      const completeResult = await completeResearchEncounter(
+      const completeResult = await completeGame(
         encounter.id,
         (result.wins || 0) >= (result.requiredWins || 5),
       )
@@ -382,7 +382,7 @@ export function SlidingPuzzleGame({
                 size="lg"
                 onClick={async () => {
                   try {
-                    const res = await startResearchEncounter(
+                    const res = await startGame(
                       (initialState?.encounter || encounter).id,
                       true,
                     )

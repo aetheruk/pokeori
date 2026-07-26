@@ -1,6 +1,6 @@
 {
   "name": "pokeori",
-  "version": "0.0.17",
+  "version": "0.1.0",
   "description": "Pokeori field-journal adventure game",
   "license": "MIT",
   "type": "module",
@@ -25,6 +25,7 @@
     "fetch:tcg": "bun scripts/fetch-tcg-data.mjs",
     "generate:tcg": "bun scripts/generate-tcg-modules.mjs",
     "migrate:user-state": "bun scripts/migrate-user-state-collections.ts",
+    "migrate:game-activity-domains": "bun scripts/migrate-game-activity-domains.ts",
     "sync:tcg-sprites": "bun scripts/sync-tcg-set-sprites.mjs",
     "fetch:pokemon": "bun scripts/fetch-pokemon-data.mjs",
     "generate:pokemon": "bun scripts/generate-pokemon-modules.mjs",

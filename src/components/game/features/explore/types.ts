@@ -1,7 +1,8 @@
 export type ExploreItemType =
   | 'battle'
   | 'location'
-  | 'research'
+  | 'game'
+  | 'field-research'
   | 'shop'
   | 'voyage'
   | 'expedition'

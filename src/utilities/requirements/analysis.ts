@@ -9,14 +9,17 @@ export type GameDataKeys =
   | 'completedTasks'
   | 'battleResults'
   | 'locationEncounterResults'
-  | 'researchEncounterResults'
+  | 'gameResults'
+  | 'fieldResearchResults'
   | 'expeditionResults'
   | 'currency'
   | 'shopPurchases'
   | 'activeExpedition'
   | 'rivalTrainer'
 
-export function analyzeRequirements(conditions?: TaskCondition[]): GameDataKeys[] {
+export function analyzeRequirements(
+  conditions?: TaskCondition[],
+): GameDataKeys[] {
   if (!conditions || conditions.length === 0) return []
 
   const keys = new Set<GameDataKeys>()
@@ -75,8 +78,12 @@ export function analyzeRequirements(conditions?: TaskCondition[]): GameDataKeys[
         keys.add('locationEncounterResults')
         break
 
-      case 'research_encounter_result':
-        keys.add('researchEncounterResults')
+      case 'game_result':
+        keys.add('gameResults')
+        break
+
+      case 'field_research_result':
+        keys.add('fieldResearchResults')
         break
 
       case 'expedition_result':
@@ -90,7 +97,8 @@ export function analyzeRequirements(conditions?: TaskCondition[]): GameDataKeys[
       case 'daily_not_completed':
         keys.add('battleResults')
         keys.add('locationEncounterResults')
-        keys.add('researchEncounterResults')
+        keys.add('gameResults')
+        keys.add('fieldResearchResults')
         keys.add('expeditionResults')
         keys.add('completedTasks')
         break

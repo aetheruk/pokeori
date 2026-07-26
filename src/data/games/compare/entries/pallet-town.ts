@@ -15,7 +15,7 @@ export const palletTowncompareEntries: CompareConfig[] = [
     },
     background: '/backgrounds/lab.avif',
     requirements: [
-      { type: 'research_encounter_result', targetId: 'tutorial-compare', count: 1, inverse: true },
+      { type: 'game_result', targetId: 'tutorial-compare', count: 1, inverse: true },
       {
         type: 'task_completed',
         battleStatus: 'win',
@@ -120,7 +120,7 @@ export const palletTowncompareEntries: CompareConfig[] = [
     },
     background: '/backgrounds/lab.avif',
     requirements: [
-      { type: 'research_encounter_result', targetId: 'stat-module-hard', count: 1, inverse: true },
+      { type: 'game_result', targetId: 'stat-module-hard', count: 1, inverse: true },
       {
         type: 'task_completed',
         battleStatus: 'win',

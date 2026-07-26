@@ -1,7 +1,10 @@
 import { describe, expect, test } from 'bun:test'
 import { getFormattedRewards } from '@/components/game/features/explore/ExploreModalHelpers'
 import { isLocationEntryMastered } from '@/components/game/features/explore/location-completion'
-import type { ExploreDisplayItem, ExploreItem } from '@/components/game/features/explore/types'
+import type {
+  ExploreDisplayItem,
+  ExploreItem,
+} from '@/components/game/features/explore/types'
 import { battles } from '@/data/battles'
 import { allGames } from '@/data/games'
 import { locations } from '@/data/locations'
@@ -51,7 +54,7 @@ const baseItems: ExploreItem[] = [
     category: 'Kanto',
     subCategory: 'Test',
     icon: { type: 'pokemon', id: '21' },
-    type: 'research',
+    type: 'field-research',
     originalData: {
       gameType: 'field-observation',
       rewards: [],
@@ -68,7 +71,7 @@ const baseItems: ExploreItem[] = [
     category: 'Kanto',
     subCategory: 'Test',
     icon: { type: 'pokemon', id: '129' },
-    type: 'research',
+    type: 'game',
     originalData: {
       gameType: 'fishing',
       rewards: [],
@@ -110,7 +113,7 @@ const fallbackFishingItem: ExploreItem = {
   category: 'Kanto',
   subCategory: 'Test',
   icon: { type: 'pokemon', id: '129' },
-  type: 'research',
+  type: 'game',
   originalData: {
     gameType: 'fishing',
     rewards: [],
@@ -158,7 +161,8 @@ function makeUserData(overrides: Partial<RequirementData> = {}) {
     ],
     battleResults: [],
     locationEncounterResults: [],
-    researchEncounterResults: [],
+    gameResults: [],
+    fieldResearchResults: [],
     ...overrides,
   } as unknown as RequirementData
 }
@@ -175,7 +179,9 @@ describe('Explore location completion star', () => {
   })
 
   test('waits for unowned unique item drops', () => {
-    expect(isLocationEntryMastered(entry, makeUserData({ inventory: [] }))).toBe(false)
+    expect(
+      isLocationEntryMastered(entry, makeUserData({ inventory: [] })),
+    ).toBe(false)
   })
 
   test('waits until every Pokemon form is seen, caught, and research level one', () => {
@@ -184,7 +190,9 @@ describe('Explore location completion star', () => {
         entry,
         makeUserData({
           pokedex: masteredPokedex.map((pokemon) =>
-            pokemon.formId === '21' ? { ...pokemon, researchLevel: 0 } : pokemon,
+            pokemon.formId === '21'
+              ? { ...pokemon, researchLevel: 0 }
+              : pokemon,
           ),
         }),
       ),
@@ -213,8 +221,14 @@ describe('Explore location completion star', () => {
 
   test('fishing reward previews omit repeatable auto item drops', () => {
     const fishingItem = baseItems.find((item) => item.id === 'test-route-fish')!
-    const rewards = getFormattedRewards(fishingItem, makeUserData({ inventory: [] }), [])
-    const labels = (rewards || []).map((reward: { label: unknown }) => reward.label)
+    const rewards = getFormattedRewards(
+      fishingItem,
+      makeUserData({ inventory: [] }),
+      [],
+    )
+    const labels = (rewards || []).map(
+      (reward: { label: unknown }) => reward.label,
+    )
 
     expect(labels).toContain('???')
     expect(labels).not.toContain('Water Gem')
@@ -226,7 +240,9 @@ describe('Explore location completion star', () => {
       makeUserData({ inventory: [] }),
       [],
     )
-    const labels = (rewards || []).map((reward: { label: unknown }) => reward.label)
+    const labels = (rewards || []).map(
+      (reward: { label: unknown }) => reward.label,
+    )
 
     expect(labels).not.toContain('???')
     expect(labels).not.toContain('Water Gem')
@@ -261,7 +277,7 @@ describe('Explore location completion star', () => {
         items: [
           { ...route2Location, type: 'location', originalData: route2Location },
           { ...route2Battle, type: 'battle', originalData: route2Battle },
-          { ...route2Study, type: 'research', originalData: route2Study },
+          { ...route2Study, type: 'field-research', originalData: route2Study },
         ] as ExploreItem[],
       },
     }
@@ -276,7 +292,11 @@ describe('Explore location completion star', () => {
     expect(
       isLocationEntryMastered(
         route2Entry,
-        makeUserData({ inventory: [], completedTasks: [], pokedex: route2Pokedex }),
+        makeUserData({
+          inventory: [],
+          completedTasks: [],
+          pokedex: route2Pokedex,
+        }),
       ),
     ).toBe(true)
   })
@@ -298,7 +318,7 @@ describe('Explore location completion star', () => {
         items: [
           { ...route1Location, type: 'location', originalData: route1Location },
           { ...route1Battle, type: 'battle', originalData: route1Battle },
-          { ...route1Study, type: 'research', originalData: route1Study },
+          { ...route1Study, type: 'field-research', originalData: route1Study },
         ] as ExploreItem[],
       },
     }
@@ -360,7 +380,7 @@ describe('Explore location completion star', () => {
         items: [
           { ...route1Location, type: 'location', originalData: route1Location },
           { ...route1Battle, type: 'battle', originalData: route1Battle },
-          { ...route1Study, type: 'research', originalData: route1Study },
+          { ...route1Study, type: 'field-research', originalData: route1Study },
         ] as ExploreItem[],
       },
     }
@@ -420,7 +440,7 @@ describe('Explore location completion star', () => {
         items: [
           { ...route1Location, type: 'location', originalData: route1Location },
           { ...route1Battle, type: 'battle', originalData: route1Battle },
-          { ...route1Study, type: 'research', originalData: route1Study },
+          { ...route1Study, type: 'field-research', originalData: route1Study },
         ] as ExploreItem[],
       },
     }

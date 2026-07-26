@@ -11,18 +11,18 @@ import { Button } from '@/components/ui/button'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
-import type { ResearchConfig } from '@/data/games'
+import type { GameItem } from '@/data/games'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import {
-  completeResearchEncounter,
-  startResearchEncounter,
-  submitResearchAnswer,
-} from '../actions'
+  completeGame,
+  startGame,
+  submitGameAnswer,
+} from '@/app/(frontend)/game/games/actions'
 
 interface SpellingGameProps {
-  encounter: ResearchConfig
+  encounter: GameItem
   initialState?: any
 }
 
@@ -67,7 +67,7 @@ export function SpellingGame({ encounter, initialState }: SpellingGameProps) {
   const initGame = useCallback(async () => {
     if (gameStarted) return
 
-    const result = await startResearchEncounter(encounter.id)
+    const result = await startGame(encounter.id)
 
     if (!result.success) {
       console.error('Failed to start encounter:', result.error)
@@ -118,7 +118,7 @@ export function SpellingGame({ encounter, initialState }: SpellingGameProps) {
       setTimeLeft((prev: number) => {
         if (prev <= 1) {
           setGameEnded(true)
-          completeResearchEncounter(encounter.id, false).then(() => {
+          completeGame(encounter.id, false).then(() => {
             setResult({
               success: false,
               message: 'Time is up!',
@@ -138,7 +138,7 @@ export function SpellingGame({ encounter, initialState }: SpellingGameProps) {
       if (!roundData || isProcessing || feedback) return
       setIsProcessing(true)
 
-      const result = await submitResearchAnswer({ letter })
+      const result = await submitGameAnswer({ letter })
 
       if (!result.success) {
         if (result.error === 'Session expired or not found') {
@@ -167,7 +167,7 @@ export function SpellingGame({ encounter, initialState }: SpellingGameProps) {
           await new Promise((resolve) => setTimeout(resolve, 1200))
 
           if (result.gameOver) {
-            const completeResult = await completeResearchEncounter(
+            const completeResult = await completeGame(
               encounter.id,
               result.wins >= (result.requiredWins || 5),
             )
@@ -202,10 +202,7 @@ export function SpellingGame({ encounter, initialState }: SpellingGameProps) {
         await new Promise((resolve) => setTimeout(resolve, 1200))
 
         if (result.gameOver) {
-          const completeResult = await completeResearchEncounter(
-            encounter.id,
-            false,
-          )
+          const completeResult = await completeGame(encounter.id, false)
           setResult({
             success: false,
             message: result.message || 'Game Over!',
@@ -469,7 +466,7 @@ export function SpellingGame({ encounter, initialState }: SpellingGameProps) {
                 size="lg"
                 onClick={async () => {
                   try {
-                    const res = await startResearchEncounter(
+                    const res = await startGame(
                       (initialState?.encounter || encounter).id,
                       true,
                     )

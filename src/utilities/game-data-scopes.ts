@@ -8,7 +8,8 @@ export const POKEMON_BOX_SYNC_KEYS = [
   'completedTasks',
   'battleResults',
   'locationEncounterResults',
-  'researchEncounterResults',
+  'gameResults',
+  'fieldResearchResults',
   'expeditionResults',
   'shopPurchases',
   'activeExpedition',
@@ -25,7 +26,7 @@ export const EXPLORE_SYNC_KEYS = [
 export const CHANNELING_SYNC_KEYS = [
   'pokemon',
   'inventory',
-  'researchEncounterResults',
+  'gameResults',
 ] satisfies GameDataKeys[]
 
 export const EXPLORE_POKEMON_SELECT = {

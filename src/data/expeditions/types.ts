@@ -2,7 +2,7 @@ import type { TaskCondition, TaskIcon } from '@/data/tasks'
 import type { Reward } from '@/data/types'
 import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
 
-export type ExpeditionActivityType = 'battle' | 'location' | 'research' | 'task'
+export type ExpeditionActivityType = 'battle' | 'location' | 'game' | 'field-research' | 'task'
 
 export type ExpeditionActivityPool = Partial<Record<ExpeditionActivityType, string[]>>
 

@@ -1,0 +1,92 @@
+import { redirect } from 'next/navigation'
+import type { ComponentType } from 'react'
+import { ArtAcademyGame } from '@/app/(frontend)/game/research/encounter/art-academy'
+import { CryRecognitionGame } from '@/app/(frontend)/game/research/encounter/cry-recognition'
+import { DiglettTunnelTapGame } from '@/app/(frontend)/game/research/encounter/diglett-tunnel-tap'
+import { FlapGame } from '@/app/(frontend)/game/research/encounter/flap'
+import { FishingGame } from '@/app/(frontend)/game/research/encounter/fishing'
+import { MagnemiteCircuitGame } from '@/app/(frontend)/game/research/encounter/magnemite-circuit'
+import { Match3Game } from '@/app/(frontend)/game/research/encounter/match3'
+import { MiningGame } from '@/app/(frontend)/game/research/encounter/mining'
+import { PachinkoGame } from '@/app/(frontend)/game/research/encounter/pachinko'
+import { PokemonSnapGame } from '@/app/(frontend)/game/research/encounter/pokemon-snap'
+import { PrizeWheelGame } from '@/app/(frontend)/game/research/encounter/prize-wheel'
+import { QuickIdentifyGame } from '@/app/(frontend)/game/research/encounter/quick-identify'
+import { ResearchCompareGame } from '@/app/(frontend)/game/research/encounter/research-compare'
+import { RhythmGame } from '@/app/(frontend)/game/research/encounter/rhythm'
+import { RockPushGame } from '@/app/(frontend)/game/research/encounter/rock-push'
+import { RockTunnelEchoMapGame } from '@/app/(frontend)/game/research/encounter/rock-tunnel-echo-map'
+import { RunGame } from '@/app/(frontend)/game/research/encounter/run'
+import { SlidingPuzzleGame } from '@/app/(frontend)/game/research/encounter/sliding-puzzle'
+import { SlotGame } from '@/app/(frontend)/game/research/encounter/slots'
+import { SpellingGame } from '@/app/(frontend)/game/research/encounter/spelling'
+import { TcgBattleGame } from '@/app/(frontend)/game/research/encounter/tcg-battle'
+import { TcgInspectionGame } from '@/app/(frontend)/game/research/encounter/tcg-inspection'
+import { VoltorbGridGame } from '@/app/(frontend)/game/research/encounter/voltorb-grid'
+import { WhosThatPokemonGame } from '@/app/(frontend)/game/research/encounter/whos-that-pokemon'
+import { getGameState, type GameState } from '../actions'
+import type { GameItem, GameType } from '@/data/games'
+import { getGameActivityRoute } from '@/utilities/games/activity-domain'
+
+export const dynamic = 'force-dynamic'
+
+type GameStateWithEncounter = GameState & {
+  timeLeft: number
+  encounter: GameItem & { isEligibleForReplay: boolean }
+}
+
+type GameProps = {
+  encounter: GameItem
+  initialState?: GameStateWithEncounter
+  state?: GameStateWithEncounter
+}
+
+const GAME_COMPONENTS: Partial<Record<GameType, ComponentType<GameProps>>> = {
+  silhouette: WhosThatPokemonGame as unknown as ComponentType<GameProps>,
+  identify: QuickIdentifyGame as unknown as ComponentType<GameProps>,
+  snap: PokemonSnapGame as unknown as ComponentType<GameProps>,
+  cry: CryRecognitionGame as unknown as ComponentType<GameProps>,
+  compare: ResearchCompareGame as unknown as ComponentType<GameProps>,
+  'rock-push': RockPushGame as unknown as ComponentType<GameProps>,
+  run: RunGame as unknown as ComponentType<GameProps>,
+  flap: FlapGame as unknown as ComponentType<GameProps>,
+  slots: SlotGame as unknown as ComponentType<GameProps>,
+  pachinko: PachinkoGame as unknown as ComponentType<GameProps>,
+  'prize-wheel': PrizeWheelGame as unknown as ComponentType<GameProps>,
+  fishing: FishingGame as unknown as ComponentType<GameProps>,
+  match3: Match3Game as unknown as ComponentType<GameProps>,
+  spelling: SpellingGame as unknown as ComponentType<GameProps>,
+  'sliding-puzzle': SlidingPuzzleGame as unknown as ComponentType<GameProps>,
+  rhythm: RhythmGame as unknown as ComponentType<GameProps>,
+  mining: MiningGame as unknown as ComponentType<GameProps>,
+  'tcg-inspection': TcgInspectionGame as unknown as ComponentType<GameProps>,
+  'tcg-battle': TcgBattleGame as unknown as ComponentType<GameProps>,
+  'voltorb-grid': VoltorbGridGame as unknown as ComponentType<GameProps>,
+  'diglett-tunnel-tap':
+    DiglettTunnelTapGame as unknown as ComponentType<GameProps>,
+  'magnemite-circuit':
+    MagnemiteCircuitGame as unknown as ComponentType<GameProps>,
+  'rock-tunnel-echo-map':
+    RockTunnelEchoMapGame as unknown as ComponentType<GameProps>,
+  'art-academy': ArtAcademyGame as unknown as ComponentType<GameProps>,
+}
+
+export default async function GamePage({
+  params,
+}: {
+  params: Promise<{ gameType: string }>
+}) {
+  const [{ gameType }, state] = await Promise.all([params, getGameState()])
+  if (!state) redirect('/game/explore')
+
+  const encounter = state.encounter as GameStateWithEncounter['encounter']
+  const canonicalRoute = getGameActivityRoute(encounter.gameType)
+  if (gameType !== encounter.gameType) redirect(canonicalRoute)
+
+  const GameComponent = GAME_COMPONENTS[encounter.gameType]
+  if (!GameComponent) redirect('/game/explore')
+
+  return (
+    <GameComponent encounter={encounter} initialState={state} state={state} />
+  )
+}

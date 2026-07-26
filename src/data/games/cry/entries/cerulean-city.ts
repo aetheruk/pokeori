@@ -15,7 +15,7 @@ export const ceruleanCitycryEntries: CryConfig[] = [
     background: '/backgrounds/cave.avif',
     requirements: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'charming-growlithe',
         count: 10,
         inverse: true,

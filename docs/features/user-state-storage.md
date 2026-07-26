@@ -1,6 +1,6 @@
 # User State Storage
 
-Player-owned game state is split out of the `users` document into normalized Payload collections. The read layer keeps existing `RequirementData` shapes so task, shop, battle, research, and Explore requirement checks can continue to consume arrays such as `inventory`, `pokedex`, `completedTasks`, `tcg`, and activity result arrays.
+Player-owned game state is split out of the `users` document into normalized Payload collections. The read layer keeps `RequirementData` shapes so task, shop, battle, Mini Game, Field Research, and Explore requirement checks can consume arrays such as `inventory`, `pokedex`, `completedTasks`, `tcg`, and activity result arrays.
 
 ## Split Collections
 
@@ -21,8 +21,17 @@ The `users` collection remains the source for auth, admin flags, trainer profile
 
 ## Write Path
 
-Runtime writes use targeted helpers in `src/utilities/user-state.ts`, including map setters for inventory, Pokedex, task progress, TCG cards, shop purchases, and `incrementUserActivityResult` for battle, location, research, and expedition outcomes. The old `users` after-change mirroring hook and legacy JSON migration helpers have been removed; old ledger columns are dropped from `users`.
+Runtime writes use targeted helpers in `src/utilities/user-state.ts`, including map setters for inventory, Pokedex, task progress, TCG cards, shop purchases, and `incrementUserActivityResult` for battle, location, Mini Game, Field Research, and expedition outcomes. Mini Games use `gameResults`/`activityType: game`; Field Research uses `fieldResearchResults`/`activityType: field-research`.
 
 ## Rollout Notes
 
 New gameplay code should read through `getGameUserData` or `src/utilities/user-state.ts` rather than directly inspecting `users` for owned ledgers. New write paths must use targeted helper/repository writes to the split collections. Small profile fields such as skills, currency, active daily tasks, active voyages, battle power usage, `vsSeeker`, and `totalEvolutions` still live on `users`.
+
+For the 0.1.0 domain split, run
+`bun run migrate:game-activity-domains --dry-run` after taking a MongoDB backup,
+then run `bun run migrate:game-activity-domains`. The idempotent migration
+classifies known Field Observation IDs as `field-research`, classifies all
+other or unknown legacy IDs as `game`, and merges a legacy row into an
+existing canonical row without discarding wins, losses, high scores,
+timestamps, or metadata. Runtime reads understand legacy `research` rows
+during the rollout.

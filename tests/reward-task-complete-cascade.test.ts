@@ -21,20 +21,26 @@ const payloadMock = {
   create: mock(async ({ data }) => data),
 }
 
-const setInventoryMapMock = mock(async (_payload: unknown, _userId: string, inventory: any) => {
-  inventoryState = { ...inventory }
-})
-const setPokedexMapMock = mock(async (_payload: unknown, _userId: string, pokedex: any) => {
-  pokedexState = { ...pokedex }
-})
+const setInventoryMapMock = mock(
+  async (_payload: unknown, _userId: string, inventory: any) => {
+    inventoryState = { ...inventory }
+  },
+)
+const setPokedexMapMock = mock(
+  async (_payload: unknown, _userId: string, pokedex: any) => {
+    pokedexState = { ...pokedex }
+  },
+)
 const setCompletedTasksMapMock = mock(
   async (_payload: unknown, _userId: string, completedTasks: any) => {
     completedTasksState = { ...completedTasks }
   },
 )
-const setTcgMapMock = mock(async (_payload: unknown, _userId: string, tcg: any) => {
-  tcgState = { ...tcg }
-})
+const setTcgMapMock = mock(
+  async (_payload: unknown, _userId: string, tcg: any) => {
+    tcgState = { ...tcg }
+  },
+)
 
 mock.module('@payload-config', () => ({
   default: {},
@@ -70,7 +76,7 @@ mock.module('@/utilities/user-state', () => ({
   getUserCompletedTasksMap: mock(async () => completedTasksState),
   getUserTcgMap: mock(async () => tcgState),
   getUserActivityStatsMap: mock(async () => ({
-    research: activityStatsState,
+    fieldResearch: activityStatsState,
   })),
   setUserInventoryMap: setInventoryMapMock,
   setUserPokedexMap: setPokedexMapMock,

@@ -6,7 +6,11 @@ import path from 'node:path'
 import { promisify } from 'node:util'
 import { format } from 'prettier'
 import { BattleConfig, Location, Task } from '@/data/types'
-import { ABILITIES, type AbilityConfig, type AbilityEffect } from '@/data/abilities'
+import {
+  ABILITIES,
+  type AbilityConfig,
+  type AbilityEffect,
+} from '@/data/abilities'
 import type { MoveConfig } from '@/data/moves/types'
 import { ShopConfig } from '@/data/shops/types'
 import { VoyageConfig } from '@/data/voyages/types'
@@ -19,7 +23,7 @@ import { icons } from '@/data/user/icons'
 import { titles } from '@/data/user/titles'
 import { tcgSets } from '@/data/tcg'
 import { skills } from '@/data/skills'
-import { allGames } from '@/data/games'
+import { fieldResearchGames, miniGames } from '@/data/games'
 import { expeditions } from '@/data/expeditions'
 import {
   formatDevCommandOutput,
@@ -29,36 +33,126 @@ import {
 
 const DATA_DIR = path.join(process.cwd(), 'src/data')
 const SOURCE_DATA_DIR = path.join(process.cwd(), 'source_data', 'pokemon')
-const SOURCE_POKEMON_MOVES_PATH = path.join(SOURCE_DATA_DIR, 'pokemon_moves.json')
+const SOURCE_POKEMON_MOVES_PATH = path.join(
+  SOURCE_DATA_DIR,
+  'pokemon_moves.json',
+)
 const ABILITIES_PATH = path.join(DATA_DIR, 'abilities.ts')
-const POKEMON_RESEARCH_LEVEL_REWARDS_PATH = path.join(DATA_DIR, 'pokemon-research-level-rewards.json')
+const POKEMON_RESEARCH_LEVEL_REWARDS_PATH = path.join(
+  DATA_DIR,
+  'pokemon-research-level-rewards.json',
+)
 const execFileAsync = promisify(execFile)
 
-type EntryType = 'battles' | 'locations' | 'tasks' | 'shops' | 'voyages' | 'research'
-const entryTypes = new Set<EntryType>(['battles', 'locations', 'tasks', 'shops', 'voyages', 'research'])
-const MOVE_FILE_TYPES = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'] as const
+type EntryType =
+  | 'battles'
+  | 'locations'
+  | 'tasks'
+  | 'shops'
+  | 'voyages'
+  | 'research'
+const entryTypes = new Set<EntryType>([
+  'battles',
+  'locations',
+  'tasks',
+  'shops',
+  'voyages',
+  'research',
+])
+const MOVE_FILE_TYPES = [
+  'normal',
+  'fire',
+  'water',
+  'electric',
+  'grass',
+  'ice',
+  'fighting',
+  'poison',
+  'ground',
+  'flying',
+  'psychic',
+  'bug',
+  'rock',
+  'ghost',
+  'dragon',
+  'dark',
+  'steel',
+  'fairy',
+] as const
 const MOVE_TYPE_BY_FILE: Record<
   (typeof MOVE_FILE_TYPES)[number],
   { filename: string; variableName: string; label: string }
 > = {
-  normal: { filename: 'normal.ts', variableName: 'NORMAL_TM_MOVES', label: 'Normal' },
+  normal: {
+    filename: 'normal.ts',
+    variableName: 'NORMAL_TM_MOVES',
+    label: 'Normal',
+  },
   fire: { filename: 'fire.ts', variableName: 'FIRE_TM_MOVES', label: 'Fire' },
-  water: { filename: 'water.ts', variableName: 'WATER_TM_MOVES', label: 'Water' },
-  electric: { filename: 'electric.ts', variableName: 'ELECTRIC_TM_MOVES', label: 'Electric' },
-  grass: { filename: 'grass.ts', variableName: 'GRASS_TM_MOVES', label: 'Grass' },
+  water: {
+    filename: 'water.ts',
+    variableName: 'WATER_TM_MOVES',
+    label: 'Water',
+  },
+  electric: {
+    filename: 'electric.ts',
+    variableName: 'ELECTRIC_TM_MOVES',
+    label: 'Electric',
+  },
+  grass: {
+    filename: 'grass.ts',
+    variableName: 'GRASS_TM_MOVES',
+    label: 'Grass',
+  },
   ice: { filename: 'ice.ts', variableName: 'ICE_TM_MOVES', label: 'Ice' },
-  fighting: { filename: 'fighting.ts', variableName: 'FIGHTING_TM_MOVES', label: 'Fighting' },
-  poison: { filename: 'poison.ts', variableName: 'POISON_TM_MOVES', label: 'Poison' },
-  ground: { filename: 'ground.ts', variableName: 'GROUND_TM_MOVES', label: 'Ground' },
-  flying: { filename: 'flying.ts', variableName: 'FLYING_TM_MOVES', label: 'Flying' },
-  psychic: { filename: 'psychic.ts', variableName: 'PSYCHIC_TM_MOVES', label: 'Psychic' },
+  fighting: {
+    filename: 'fighting.ts',
+    variableName: 'FIGHTING_TM_MOVES',
+    label: 'Fighting',
+  },
+  poison: {
+    filename: 'poison.ts',
+    variableName: 'POISON_TM_MOVES',
+    label: 'Poison',
+  },
+  ground: {
+    filename: 'ground.ts',
+    variableName: 'GROUND_TM_MOVES',
+    label: 'Ground',
+  },
+  flying: {
+    filename: 'flying.ts',
+    variableName: 'FLYING_TM_MOVES',
+    label: 'Flying',
+  },
+  psychic: {
+    filename: 'psychic.ts',
+    variableName: 'PSYCHIC_TM_MOVES',
+    label: 'Psychic',
+  },
   bug: { filename: 'bug.ts', variableName: 'BUG_TM_MOVES', label: 'Bug' },
   rock: { filename: 'rock.ts', variableName: 'ROCK_TM_MOVES', label: 'Rock' },
-  ghost: { filename: 'ghost.ts', variableName: 'GHOST_TM_MOVES', label: 'Ghost' },
-  dragon: { filename: 'dragon.ts', variableName: 'DRAGON_TM_MOVES', label: 'Dragon' },
+  ghost: {
+    filename: 'ghost.ts',
+    variableName: 'GHOST_TM_MOVES',
+    label: 'Ghost',
+  },
+  dragon: {
+    filename: 'dragon.ts',
+    variableName: 'DRAGON_TM_MOVES',
+    label: 'Dragon',
+  },
   dark: { filename: 'dark.ts', variableName: 'DARK_TM_MOVES', label: 'Dark' },
-  steel: { filename: 'steel.ts', variableName: 'STEEL_TM_MOVES', label: 'Steel' },
-  fairy: { filename: 'fairy.ts', variableName: 'FAIRY_TM_MOVES', label: 'Fairy' },
+  steel: {
+    filename: 'steel.ts',
+    variableName: 'STEEL_TM_MOVES',
+    label: 'Steel',
+  },
+  fairy: {
+    filename: 'fairy.ts',
+    variableName: 'FAIRY_TM_MOVES',
+    label: 'Fairy',
+  },
 }
 type MoveTypeFile = keyof typeof MOVE_TYPE_BY_FILE
 
@@ -106,7 +200,10 @@ export interface AbilityEditorEntry {
   generated: boolean
 }
 
-export type AbilityEditorSavePayload = Omit<AbilityEditorEntry, 'explicitEffects' | 'generated'>
+export type AbilityEditorSavePayload = Omit<
+  AbilityEditorEntry,
+  'explicitEffects' | 'generated'
+>
 
 interface AbilityEditorData {
   abilities: AbilityEditorEntry[]
@@ -144,58 +241,83 @@ function getDirectory(type: EntryType) {
 }
 
 export async function runGameDataValidation() {
-
   try {
-    const { stdout, stderr } = await execFileAsync('bun', getGameDataValidationCommand(), {
-      cwd: process.cwd(),
-      timeout: 120_000,
-      maxBuffer: 1024 * 1024 * 5,
-    })
+    const { stdout, stderr } = await execFileAsync(
+      'bun',
+      getGameDataValidationCommand(),
+      {
+        cwd: process.cwd(),
+        timeout: 120_000,
+        maxBuffer: 1024 * 1024 * 5,
+      },
+    )
 
     return { success: true, output: formatDevCommandOutput(stdout, stderr) }
   } catch (error) {
     const err = error as { stdout?: string; stderr?: string; message?: string }
     return {
       success: false,
-      output: formatDevCommandOutput(err.stdout, err.stderr) || err.message || 'Validation failed',
+      output:
+        formatDevCommandOutput(err.stdout, err.stderr) ||
+        err.message ||
+        'Validation failed',
     }
   }
 }
 
-export async function runGameDataGeneration(options?: { skipFetch?: boolean; dryRun?: boolean }) {
-
+export async function runGameDataGeneration(options?: {
+  skipFetch?: boolean
+  dryRun?: boolean
+}) {
   try {
-    const { stdout, stderr } = await execFileAsync('bun', getGameDataGenerationCommand(options), {
-      cwd: process.cwd(),
-      timeout: 300_000,
-      maxBuffer: 1024 * 1024 * 10,
-    })
+    const { stdout, stderr } = await execFileAsync(
+      'bun',
+      getGameDataGenerationCommand(options),
+      {
+        cwd: process.cwd(),
+        timeout: 300_000,
+        maxBuffer: 1024 * 1024 * 10,
+      },
+    )
 
     return { success: true, output: formatDevCommandOutput(stdout, stderr) }
   } catch (error) {
     const err = error as { stdout?: string; stderr?: string; message?: string }
     return {
       success: false,
-      output: formatDevCommandOutput(err.stdout, err.stderr) || err.message || 'Generation failed',
+      output:
+        formatDevCommandOutput(err.stdout, err.stderr) ||
+        err.message ||
+        'Generation failed',
     }
   }
 }
 
-async function parseExportedEntryArray<T>(content: string): Promise<T[] | null> {
+async function parseExportedEntryArray<T>(
+  content: string,
+): Promise<T[] | null> {
   const ts = await import('typescript')
-  const source = ts.createSourceFile('entry.ts', content, ts.ScriptTarget.Latest, true)
+  const source = ts.createSourceFile(
+    'entry.ts',
+    content,
+    ts.ScriptTarget.Latest,
+    true,
+  )
 
   const toValue = (node: import('typescript').Node): unknown => {
-    if (ts.isAsExpression(node) || ts.isSatisfiesExpression(node)) return toValue(node.expression)
+    if (ts.isAsExpression(node) || ts.isSatisfiesExpression(node))
+      return toValue(node.expression)
     if (ts.isParenthesizedExpression(node)) return toValue(node.expression)
-    if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) return node.text
+    if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node))
+      return node.text
     if (ts.isNumericLiteral(node)) return Number(node.text)
     if (node.kind === ts.SyntaxKind.TrueKeyword) return true
     if (node.kind === ts.SyntaxKind.FalseKeyword) return false
     if (node.kind === ts.SyntaxKind.NullKeyword) return null
     if (ts.isPrefixUnaryExpression(node)) {
       const value = toValue(node.operand)
-      if (typeof value !== 'number') throw new Error('Unsupported unary expression')
+      if (typeof value !== 'number')
+        throw new Error('Unsupported unary expression')
       return node.operator === ts.SyntaxKind.MinusToken ? -value : value
     }
     if (ts.isArrayLiteralExpression(node)) {
@@ -210,7 +332,11 @@ async function parseExportedEntryArray<T>(content: string): Promise<T[] | null> 
 
         const name = property.name
         let key: string
-        if (ts.isIdentifier(name) || ts.isStringLiteral(name) || ts.isNumericLiteral(name)) {
+        if (
+          ts.isIdentifier(name) ||
+          ts.isStringLiteral(name) ||
+          ts.isNumericLiteral(name)
+        ) {
           key = name.text
         } else {
           throw new Error('Unsupported object key')
@@ -221,7 +347,9 @@ async function parseExportedEntryArray<T>(content: string): Promise<T[] | null> 
       return result
     }
 
-    throw new Error(`Unsupported syntax in entry file: ${ts.SyntaxKind[node.kind]}`)
+    throw new Error(
+      `Unsupported syntax in entry file: ${ts.SyntaxKind[node.kind]}`,
+    )
   }
 
   for (const statement of source.statements) {
@@ -232,7 +360,10 @@ async function parseExportedEntryArray<T>(content: string): Promise<T[] | null> 
     if (!isExported) continue
 
     for (const declaration of statement.declarationList.declarations) {
-      if (declaration.initializer && ts.isArrayLiteralExpression(declaration.initializer)) {
+      if (
+        declaration.initializer &&
+        ts.isArrayLiteralExpression(declaration.initializer)
+      ) {
         return toValue(declaration.initializer) as T[]
       }
     }
@@ -255,14 +386,18 @@ function getMoveTypePath(type: MoveTypeFile) {
   return path.join(DATA_DIR, 'moves', 'tms', config.filename)
 }
 
-let machineMoveRecommendationCache: Promise<Map<string, Set<string>>> | null = null
+let machineMoveRecommendationCache: Promise<Map<string, Set<string>>> | null =
+  null
 let pokemonMoveIdMapCache: Promise<Map<string, string>> | null = null
 
 async function getMoveIdToIdentifierMap() {
   if (pokemonMoveIdMapCache) return pokemonMoveIdMapCache
 
   pokemonMoveIdMapCache = (async () => {
-    const content = await fs.readFile(path.join(SOURCE_DATA_DIR, 'moves.json'), 'utf-8')
+    const content = await fs.readFile(
+      path.join(SOURCE_DATA_DIR, 'moves.json'),
+      'utf-8',
+    )
     const parsed = JSON.parse(content) as SourcePokemonMoveMeta[]
     const map = new Map<string, string>()
 
@@ -285,7 +420,11 @@ async function getMoveIdToIdentifierMap() {
   return pokemonMoveIdMapCache
 }
 
-function addRecommendation(map: Map<string, Set<string>>, moveId: string, formId: string) {
+function addRecommendation(
+  map: Map<string, Set<string>>,
+  moveId: string,
+  formId: string,
+) {
   const nextMoveId = moveId.toString().trim()
   if (!nextMoveId || !formId) return
 
@@ -334,7 +473,9 @@ async function getPokemonMoveRecommendations() {
   return machineMoveRecommendationCache
 }
 
-async function getRecommendationsForMoveIds(moveIds: string[]): Promise<Record<string, string[]>> {
+async function getRecommendationsForMoveIds(
+  moveIds: string[],
+): Promise<Record<string, string[]>> {
   const sourceRecommendations = await getPokemonMoveRecommendations()
   const result: Record<string, string[]> = {}
 
@@ -376,7 +517,9 @@ export async function listMoveTypeFiles() {
   return getMoveTypeList()
 }
 
-export async function readMoveTypeFile(type: string): Promise<MoveTypeFileData> {
+export async function readMoveTypeFile(
+  type: string,
+): Promise<MoveTypeFileData> {
   const moveType = ensureMoveType(type)
   const filePath = getMoveTypePath(moveType)
   const content = await fs.readFile(filePath, 'utf-8')
@@ -447,7 +590,8 @@ function normalizePokemonResearchLevelReward(
   const formId = reward.formId?.toString().trim()
   const itemId = reward.itemId?.toString().trim()
   const level = Number(reward.level)
-  const quantity = reward.quantity === undefined ? undefined : Number(reward.quantity)
+  const quantity =
+    reward.quantity === undefined ? undefined : Number(reward.quantity)
 
   if (!formId || !itemId || !Number.isFinite(level) || level < 1) return null
 
@@ -455,18 +599,27 @@ function normalizePokemonResearchLevelReward(
     formId,
     level,
     itemId,
-    ...(quantity !== undefined && Number.isFinite(quantity) && quantity > 1 ? { quantity } : {}),
+    ...(quantity !== undefined && Number.isFinite(quantity) && quantity > 1
+      ? { quantity }
+      : {}),
   }
 }
 
-export async function readPokemonResearchLevelRewards(): Promise<PokemonResearchLevelReward[]> {
-  const content = await fs.readFile(POKEMON_RESEARCH_LEVEL_REWARDS_PATH, 'utf-8')
+export async function readPokemonResearchLevelRewards(): Promise<
+  PokemonResearchLevelReward[]
+> {
+  const content = await fs.readFile(
+    POKEMON_RESEARCH_LEVEL_REWARDS_PATH,
+    'utf-8',
+  )
   const parsed = JSON.parse(content) as PokemonResearchLevelReward[]
 
   return sortPokemonResearchLevelRewards(
     parsed
       .map((reward) => normalizePokemonResearchLevelReward(reward))
-      .filter((reward): reward is PokemonResearchLevelReward => Boolean(reward)),
+      .filter((reward): reward is PokemonResearchLevelReward =>
+        Boolean(reward),
+      ),
   )
 }
 
@@ -476,7 +629,9 @@ export async function savePokemonResearchLevelRewards(
   const normalized = sortPokemonResearchLevelRewards(
     rewards
       .map((reward) => normalizePokemonResearchLevelReward(reward))
-      .filter((reward): reward is PokemonResearchLevelReward => Boolean(reward)),
+      .filter((reward): reward is PokemonResearchLevelReward =>
+        Boolean(reward),
+      ),
   )
 
   const deduped = new Map<string, PokemonResearchLevelReward>()
@@ -484,13 +639,20 @@ export async function savePokemonResearchLevelRewards(
     deduped.set(`${reward.formId}:${reward.level}:${reward.itemId}`, reward)
   }
 
-  const fileContents = await format(JSON.stringify(Array.from(deduped.values()), null, 2), {
-    parser: 'json',
-    printWidth: 100,
-  })
+  const fileContents = await format(
+    JSON.stringify(Array.from(deduped.values()), null, 2),
+    {
+      parser: 'json',
+      printWidth: 100,
+    },
+  )
 
   try {
-    await fs.writeFile(POKEMON_RESEARCH_LEVEL_REWARDS_PATH, fileContents, 'utf-8')
+    await fs.writeFile(
+      POKEMON_RESEARCH_LEVEL_REWARDS_PATH,
+      fileContents,
+      'utf-8',
+    )
     return { success: true }
   } catch (error) {
     console.error('Error saving Pokemon research level rewards:', error)
@@ -498,7 +660,9 @@ export async function savePokemonResearchLevelRewards(
   }
 }
 
-export async function getMovePokemonFormList(): Promise<PokemonFormForMoveEditor[]> {
+export async function getMovePokemonFormList(): Promise<
+  PokemonFormForMoveEditor[]
+> {
   return allPokemon.map((species) => ({
     speciesId: species.id,
     speciesName: species.forms[0]?.name || `Pokemon #${species.id}`,
@@ -510,29 +674,33 @@ export async function getMovePokemonFormList(): Promise<PokemonFormForMoveEditor
   }))
 }
 
-export async function getAbilityPokemonFormList(): Promise<PokemonFormForMoveEditor[]> {
+export async function getAbilityPokemonFormList(): Promise<
+  PokemonFormForMoveEditor[]
+> {
   return getMovePokemonFormList()
 }
 
 export async function readAbilityEditorData(): Promise<AbilityEditorData> {
   const abilities = Object.values(ABILITIES)
-    .map((ability): AbilityEditorEntry => ({
-      id: ability.id,
-      name: ability.name,
-      description: ability.description,
-      type: ability.type,
-      value: ability.value,
-      rate: ability.rate,
-      naturalChance: ability.naturalChance,
-      failureRate: ability.failureRate,
-      forms: ability.forms,
-      criteria: ability.criteria,
-      rewards: ability.rewards,
-      encounters: ability.encounters,
-      effects: ability.effects || [],
-      explicitEffects: ability.effects || [],
-      generated: false,
-    }))
+    .map(
+      (ability): AbilityEditorEntry => ({
+        id: ability.id,
+        name: ability.name,
+        description: ability.description,
+        type: ability.type,
+        value: ability.value,
+        rate: ability.rate,
+        naturalChance: ability.naturalChance,
+        failureRate: ability.failureRate,
+        forms: ability.forms,
+        criteria: ability.criteria,
+        rewards: ability.rewards,
+        encounters: ability.encounters,
+        effects: ability.effects || [],
+        explicitEffects: ability.effects || [],
+        generated: false,
+      }),
+    )
     .sort((a, b) => a.name.localeCompare(b.name))
 
   return { abilities }
@@ -550,7 +718,9 @@ function isPropertyNamed(
   )
 }
 
-function normalizeAbilityForSave(ability: AbilityEditorSavePayload): AbilityEditorSavePayload {
+function normalizeAbilityForSave(
+  ability: AbilityEditorSavePayload,
+): AbilityEditorSavePayload {
   const normalizedForms = Array.isArray(ability.forms)
     ? Array.from(
         new Set(
@@ -573,14 +743,21 @@ function normalizeAbilityForSave(ability: AbilityEditorSavePayload): AbilityEdit
     effects: ability.effects || [],
   }
 
-  if (ability.naturalChance !== undefined && Number.isFinite(ability.naturalChance)) {
+  if (
+    ability.naturalChance !== undefined &&
+    Number.isFinite(ability.naturalChance)
+  ) {
     normalized.naturalChance = ability.naturalChance
   }
-  if (ability.failureRate !== undefined && Number.isFinite(ability.failureRate)) {
+  if (
+    ability.failureRate !== undefined &&
+    Number.isFinite(ability.failureRate)
+  ) {
     normalized.failureRate = ability.failureRate
   }
   if (normalizedForms?.length) normalized.forms = normalizedForms
-  if (ability.criteria && Object.keys(ability.criteria).length) normalized.criteria = ability.criteria
+  if (ability.criteria && Object.keys(ability.criteria).length)
+    normalized.criteria = ability.criteria
   if (ability.rewards?.length) normalized.rewards = ability.rewards
   if (ability.encounters?.length) normalized.encounters = ability.encounters
 
@@ -589,16 +766,27 @@ function normalizeAbilityForSave(ability: AbilityEditorSavePayload): AbilityEdit
 
 async function findAuthoredAbilityArray(content: string) {
   const ts = await import('typescript')
-  const source = ts.createSourceFile('abilities.ts', content, ts.ScriptTarget.Latest, true)
+  const source = ts.createSourceFile(
+    'abilities.ts',
+    content,
+    ts.ScriptTarget.Latest,
+    true,
+  )
   let array: import('typescript').ArrayLiteralExpression | undefined
 
   source.forEachChild((node) => {
     if (!ts.isVariableStatement(node)) return
     for (const declaration of node.declarationList.declarations) {
-      if (!ts.isIdentifier(declaration.name) || declaration.name.text !== 'AUTHORED_ABILITIES') {
+      if (
+        !ts.isIdentifier(declaration.name) ||
+        declaration.name.text !== 'AUTHORED_ABILITIES'
+      ) {
         continue
       }
-      if (!declaration.initializer || !ts.isArrayLiteralExpression(declaration.initializer)) {
+      if (
+        !declaration.initializer ||
+        !ts.isArrayLiteralExpression(declaration.initializer)
+      ) {
         continue
       }
       array = declaration.initializer
@@ -655,15 +843,20 @@ async function serializeAbilityForSource(ability: AbilityEditorSavePayload) {
 export async function saveAbilityEntry(ability: AbilityEditorSavePayload) {
   const normalized = normalizeAbilityForSave(ability)
   if (!normalized.id) return { success: false, error: 'Ability ID is required' }
-  if (!normalized.name) return { success: false, error: 'Ability name is required' }
+  if (!normalized.name)
+    return { success: false, error: 'Ability name is required' }
 
   try {
     const content = await fs.readFile(ABILITIES_PATH, 'utf-8')
-    const { source, targetObject } = await findAuthoredAbilityObject(content, normalized.id)
+    const { source, targetObject } = await findAuthoredAbilityObject(
+      content,
+      normalized.id,
+    )
     if (!targetObject) {
       return {
         success: false,
-        error: 'Only authored abilities in src/data/abilities.ts can be saved here.',
+        error:
+          'Only authored abilities in src/data/abilities.ts can be saved here.',
       }
     }
 
@@ -672,7 +865,11 @@ export async function saveAbilityEntry(ability: AbilityEditorSavePayload) {
       content.slice(0, targetObject.getStart(source)) +
       serialized +
       content.slice(targetObject.end)
-    await fs.writeFile(ABILITIES_PATH, await formatAbilitySource(nextContent), 'utf-8')
+    await fs.writeFile(
+      ABILITIES_PATH,
+      await formatAbilitySource(nextContent),
+      'utf-8',
+    )
     return { success: true, ability: normalized }
   } catch (error) {
     console.error('Error saving ability:', error)
@@ -683,13 +880,20 @@ export async function saveAbilityEntry(ability: AbilityEditorSavePayload) {
 export async function createAbilityEntry(ability: AbilityEditorSavePayload) {
   const normalized = normalizeAbilityForSave(ability)
   if (!normalized.id) return { success: false, error: 'Ability ID is required' }
-  if (!normalized.name) return { success: false, error: 'Ability name is required' }
+  if (!normalized.name)
+    return { success: false, error: 'Ability name is required' }
 
   try {
     const content = await fs.readFile(ABILITIES_PATH, 'utf-8')
-    const { array, targetObject } = await findAuthoredAbilityObject(content, normalized.id)
+    const { array, targetObject } = await findAuthoredAbilityObject(
+      content,
+      normalized.id,
+    )
     if (targetObject || ABILITIES[normalized.id]) {
-      return { success: false, error: `Ability "${normalized.id}" already exists.` }
+      return {
+        success: false,
+        error: `Ability "${normalized.id}" already exists.`,
+      }
     }
     if (!array) {
       return { success: false, error: 'Could not locate AUTHORED_ABILITIES.' }
@@ -698,9 +902,12 @@ export async function createAbilityEntry(ability: AbilityEditorSavePayload) {
     const serialized = await serializeAbilityForSource(normalized)
     const insertAt = array.getEnd() - 1
     const separator = array.elements.length ? ',\n' : '\n'
-    const nextContent =
-      `${content.slice(0, insertAt)}${separator}${serialized},\n${content.slice(insertAt)}`
-    await fs.writeFile(ABILITIES_PATH, await formatAbilitySource(nextContent), 'utf-8')
+    const nextContent = `${content.slice(0, insertAt)}${separator}${serialized},\n${content.slice(insertAt)}`
+    await fs.writeFile(
+      ABILITIES_PATH,
+      await formatAbilitySource(nextContent),
+      'utf-8',
+    )
     return { success: true, ability: normalized }
   } catch (error) {
     console.error('Error creating ability:', error)
@@ -708,32 +915,50 @@ export async function createAbilityEntry(ability: AbilityEditorSavePayload) {
   }
 }
 
-export async function saveAbilityEffects(abilityId: string, effects: AbilityEffect[]) {
+export async function saveAbilityEffects(
+  abilityId: string,
+  effects: AbilityEffect[],
+) {
   const normalizedAbilityId = abilityId.trim()
-  if (!normalizedAbilityId) return { success: false, error: 'Ability ID is required' }
+  if (!normalizedAbilityId)
+    return { success: false, error: 'Ability ID is required' }
 
   try {
     const ts = await import('typescript')
     const content = await fs.readFile(ABILITIES_PATH, 'utf-8')
-    const source = ts.createSourceFile('abilities.ts', content, ts.ScriptTarget.Latest, true)
+    const source = ts.createSourceFile(
+      'abilities.ts',
+      content,
+      ts.ScriptTarget.Latest,
+      true,
+    )
     let targetObject: import('typescript').ObjectLiteralExpression | undefined
 
     source.forEachChild((node) => {
       if (!ts.isVariableStatement(node)) return
       for (const declaration of node.declarationList.declarations) {
-        if (!ts.isIdentifier(declaration.name) || declaration.name.text !== 'AUTHORED_ABILITIES') {
+        if (
+          !ts.isIdentifier(declaration.name) ||
+          declaration.name.text !== 'AUTHORED_ABILITIES'
+        ) {
           continue
         }
-        if (!declaration.initializer || !ts.isArrayLiteralExpression(declaration.initializer)) {
+        if (
+          !declaration.initializer ||
+          !ts.isArrayLiteralExpression(declaration.initializer)
+        ) {
           continue
         }
         for (const element of declaration.initializer.elements) {
           if (!ts.isObjectLiteralExpression(element)) continue
-          const idProperty = element.properties.find((property) => isPropertyNamed(ts, property, 'id'))
+          const idProperty = element.properties.find((property) =>
+            isPropertyNamed(ts, property, 'id'),
+          )
           if (!idProperty || !ts.isPropertyAssignment(idProperty)) continue
           const initializer = idProperty.initializer
           if (
-            (ts.isStringLiteral(initializer) || ts.isNoSubstitutionTemplateLiteral(initializer)) &&
+            (ts.isStringLiteral(initializer) ||
+              ts.isNoSubstitutionTemplateLiteral(initializer)) &&
             initializer.text === normalizedAbilityId
           ) {
             targetObject = element
@@ -745,7 +970,8 @@ export async function saveAbilityEffects(abilityId: string, effects: AbilityEffe
     if (!targetObject) {
       return {
         success: false,
-        error: 'Only authored abilities in src/data/abilities.ts can be saved here.',
+        error:
+          'Only authored abilities in src/data/abilities.ts can be saved here.',
       }
     }
 
@@ -825,7 +1051,9 @@ export async function saveEntry<T extends EntryType>(
 ) {
   const filePath = getEntryPath(type, filename)
   try {
-    const existingContent = await fs.readFile(filePath, 'utf-8').catch(() => null)
+    const existingContent = await fs
+      .readFile(filePath, 'utf-8')
+      .catch(() => null)
 
     let variableName = ''
     let typeName = ''
@@ -835,10 +1063,22 @@ export async function saveEntry<T extends EntryType>(
         typeName: 'BattleConfig',
         importLine: "import { BattleConfig } from '../../types'",
       },
-      locations: { typeName: 'Location', importLine: "import { Location } from '../../types'" },
-      tasks: { typeName: 'Task', importLine: "import { Task } from '../../types'" },
-      shops: { typeName: 'ShopConfig', importLine: "import { ShopConfig } from '../types'" },
-      voyages: { typeName: 'VoyageConfig', importLine: "import { VoyageConfig } from '../types'" },
+      locations: {
+        typeName: 'Location',
+        importLine: "import { Location } from '../../types'",
+      },
+      tasks: {
+        typeName: 'Task',
+        importLine: "import { Task } from '../../types'",
+      },
+      shops: {
+        typeName: 'ShopConfig',
+        importLine: "import { ShopConfig } from '../types'",
+      },
+      voyages: {
+        typeName: 'VoyageConfig',
+        importLine: "import { VoyageConfig } from '../types'",
+      },
     }
 
     typeName = typeMap[type]?.typeName || 'any'
@@ -852,7 +1092,9 @@ export async function saveEntry<T extends EntryType>(
     }
 
     if (!variableName) {
-      const baseName = filename.replace('.ts', '').replace(/-([a-z])/g, (g) => g[1].toUpperCase())
+      const baseName = filename
+        .replace('.ts', '')
+        .replace(/-([a-z])/g, (g) => g[1].toUpperCase())
       variableName = baseName + type.charAt(0).toUpperCase() + type.slice(1)
     }
 
@@ -921,7 +1163,9 @@ export async function getPokemonList() {
   }))
 }
 
-export async function getPokemonForms(speciesId: number): Promise<{ id: string; name: string }[]> {
+export async function getPokemonForms(
+  speciesId: number,
+): Promise<{ id: string; name: string }[]> {
   const species = allPokemon.find((p) => p.id === speciesId)
   if (!species) return []
   return species.forms.map((f) => ({
@@ -930,7 +1174,9 @@ export async function getPokemonForms(speciesId: number): Promise<{ id: string; 
   }))
 }
 
-export async function getSpeciesIdForForm(formId: string): Promise<number | null> {
+export async function getSpeciesIdForForm(
+  formId: string,
+): Promise<number | null> {
   const targetId = formId.toString()
   for (const species of allPokemon) {
     const form = species.forms.find((f) => f.id === targetId)
@@ -1015,7 +1261,9 @@ export async function getTcgSetList() {
 
 export async function getTcgCardList(setIds?: string[]) {
   const cards: { id: string; name: string }[] = []
-  const targetSets = setIds?.length ? tcgSets.filter((s) => setIds.includes(s.id)) : tcgSets
+  const targetSets = setIds?.length
+    ? tcgSets.filter((s) => setIds.includes(s.id))
+    : tcgSets
 
   targetSets.forEach((s) => {
     s.cards.forEach((c) => {
@@ -1068,10 +1316,17 @@ export async function getLocationList() {
   return allLocations
 }
 
-export async function getResearchList() {
-  return allGames.map((g) => ({
+export async function getGameList() {
+  return miniGames.map((g) => ({
     id: g.id,
     name: g.name,
+  }))
+}
+
+export async function getFieldResearchList() {
+  return fieldResearchGames.map((study) => ({
+    id: study.id,
+    name: study.name,
   }))
 }
 
@@ -1104,5 +1359,8 @@ export async function getPokemonTypeList() {
     'dark',
     'stellar',
   ]
-  return types.map((t) => ({ id: t, name: t.charAt(0).toUpperCase() + t.slice(1) }))
+  return types.map((t) => ({
+    id: t,
+    name: t.charAt(0).toUpperCase() + t.slice(1),
+  }))
 }

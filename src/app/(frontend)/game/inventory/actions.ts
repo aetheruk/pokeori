@@ -11,7 +11,13 @@ import type { Reward } from '@/data/types'
 import type { User } from '@/payload-types'
 import { startBattle } from '@/app/(frontend)/game/battles/actions'
 import { startEncounter } from '@/app/(frontend)/game/locations/encounter/actions'
-import { startResearchEncounter } from '@/app/(frontend)/game/research/actions'
+import { startGame } from '@/app/(frontend)/game/games/actions'
+import { startFieldResearch } from '@/app/(frontend)/game/field-research/actions'
+import { allGames } from '@/data/games'
+import {
+  getGameActivityDomain,
+  getGameActivityRoute,
+} from '@/utilities/games/activity-domain'
 import { drawTcgBoosterPacks } from '@/utilities/tcg/tcg-card-draw'
 import type { TcgCard } from '@/data/tcg/types'
 import { getItemSkillLockReason } from '@/utilities/skills/unlocks'
@@ -20,7 +26,10 @@ import {
   getUserInventoryMap,
   setUserInventoryMap,
 } from '@/utilities/user-state'
-import { checkRequirement, type RequirementData } from '@/utilities/requirements'
+import {
+  checkRequirement,
+  type RequirementData,
+} from '@/utilities/requirements'
 
 function buildScratchRewardRequirementData(params: {
   user: User
@@ -46,7 +55,8 @@ function buildScratchRewardRequirementData(params: {
     ),
     battleResults: [],
     locationEncounterResults: [],
-    researchEncounterResults: [],
+    gameResults: [],
+    fieldResearchResults: [],
   }
 }
 
@@ -354,7 +364,12 @@ export async function useAllBoosterPacks(itemId: string) {
 
     revalidatePath('/game/inventory')
     revalidatePath('/game/tcg')
-    return { success: true, cards: drawnCards, packsOpened: currentQty, godPacks }
+    return {
+      success: true,
+      cards: drawnCards,
+      packsOpened: currentQty,
+      godPacks,
+    }
   } catch (error) {
     console.error('Error opening booster pack stack:', error)
     return { success: false, error: 'Failed to open booster packs' }
@@ -509,22 +524,31 @@ export async function useConsumable(itemId: string) {
           return { success: false, error: 'Failed to start encounter' }
         }
         redirect = '/game/locations/encounter'
-      } else if (itemDef.effects.startResearch || itemDef.effects.startMinigame) {
+      } else if (
+        itemDef.effects.startResearch ||
+        itemDef.effects.startMinigame
+      ) {
         const researchStart =
           itemDef.effects.startResearch || itemDef.effects.startMinigame
         if (!researchStart) {
           return { success: false, error: 'Failed to start research' }
         }
-        const researchResult = await startResearchEncounter(
-          researchStart.id,
-        )
-        if (!researchResult.success) {
+        const activity = allGames.find((entry) => entry.id === researchStart.id)
+        if (!activity) {
+          return { success: false, error: 'Game not found' }
+        }
+        const domain = getGameActivityDomain(activity.gameType)
+        const activityResult =
+          domain === 'game'
+            ? await startGame(researchStart.id)
+            : await startFieldResearch(researchStart.id)
+        if (!activityResult.success) {
           return {
             success: false,
-            error: researchResult.error || 'Failed to start research',
+            error: activityResult.error || 'Failed to start activity',
           }
         }
-        redirect = '/game/research/encounter'
+        redirect = getGameActivityRoute(activity.gameType)
       }
 
       revalidatePath('/game/inventory')

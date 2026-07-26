@@ -37,7 +37,7 @@ describe('game data sync scopes', () => {
     expect(CHANNELING_SYNC_KEYS).toEqual([
       'pokemon',
       'inventory',
-      'researchEncounterResults',
+      'gameResults',
     ])
     expect(CHANNELING_POKEMON_SELECT).toMatchObject({
       id: true,

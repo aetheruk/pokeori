@@ -51,7 +51,7 @@ function ExploreGridComponent({
       chat: 'Conversations',
       location: 'Locations',
       battle: 'Trainer Battles',
-      research: 'Mini Games',
+      game: 'Mini Games',
       shop: 'Shops',
       voyage: 'Voyages',
       expedition: 'Expeditions',
@@ -68,7 +68,7 @@ function ExploreGridComponent({
       'task',
       'location',
       'battle',
-      'research',
+      'game',
       'shop',
       'voyage',
       'chronicle',
@@ -77,12 +77,12 @@ function ExploreGridComponent({
 
     const groups: Record<string, ExploreItem[]> = {}
     filteredItems.forEach((item) => {
-      // Group route-style research games under locations instead of research
+      // Group route-style activities under their location card.
       let groupType = item.type as string
       if (
-        item.type === 'research' &&
-        ((item.originalData as any).gameType === 'fishing' ||
-          (item.originalData as any).gameType === 'field-observation')
+        item.type === 'field-research' ||
+        (item.type === 'game' &&
+          (item.originalData as any).gameType === 'fishing')
       ) {
         groupType = 'location'
       }
@@ -111,17 +111,17 @@ function ExploreGridComponent({
       type: string,
       items: ExploreItem[],
     ): ExploreDisplayItem[] => {
-      if (type !== 'location' && type !== 'research') {
+      if (type !== 'location' && type !== 'game') {
         return items.map((item) => ({ kind: 'single', item }))
       }
 
-      if (type === 'research') {
+      if (type === 'game') {
         const isGroupableResearchMode = (item: ExploreItem) =>
-          item.type === 'research' &&
-          (item.originalData as any).gameType !== 'fishing' &&
-          (item.originalData as any).gameType !== 'field-observation'
+          item.type === 'game' &&
+          (item.originalData as any).gameType !== 'fishing'
 
-        const getResearchBaseName = (name: string) => name.replace(/\s+EX$/i, '')
+        const getResearchBaseName = (name: string) =>
+          name.replace(/\s+EX$/i, '')
         const isExResearch = (item: ExploreItem) => /\s+EX$/i.test(item.name)
 
         const displayItems: ExploreDisplayItem[] = []
@@ -180,9 +180,9 @@ function ExploreGridComponent({
       const isGroupableLocationMode = (item: ExploreItem) =>
         item.type === 'location' ||
         (item.type === 'battle' && (item.originalData as any).isWildBattle) ||
-        (item.type === 'research' &&
-          ((item.originalData as any).gameType === 'fishing' ||
-            (item.originalData as any).gameType === 'field-observation'))
+        item.type === 'field-research' ||
+        (item.type === 'game' &&
+          (item.originalData as any).gameType === 'fishing')
 
       const displayItems: ExploreDisplayItem[] = []
       const handledIds = new Set<string>()
@@ -214,13 +214,11 @@ function ExploreGridComponent({
         )
         const hasFishing = matchingItems.some(
           (candidate) =>
-            candidate.type === 'research' &&
+            candidate.type === 'game' &&
             (candidate.originalData as any).gameType === 'fishing',
         )
         const hasStudy = matchingItems.some(
-          (candidate) =>
-            candidate.type === 'research' &&
-            (candidate.originalData as any).gameType === 'field-observation',
+          (candidate) => candidate.type === 'field-research',
         )
 
         if (
@@ -232,8 +230,7 @@ function ExploreGridComponent({
             const rank = (mode: ExploreItem) => {
               if (mode.type === 'location') return 0
               if (mode.type === 'battle') return 1
-              if ((mode.originalData as any).gameType === 'field-observation')
-                return 2
+              if (mode.type === 'field-research') return 2
               return 3
             }
             return rank(a) - rank(b) || a.name.localeCompare(b.name)

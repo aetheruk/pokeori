@@ -5,7 +5,7 @@ import { tcgSets } from '../data/tcg'
 import { skills } from '../data/skills'
 import { battles } from '../data/battles'
 import { locations } from '../data/locations'
-import { research } from '../data/games'
+import { fieldResearchGames, miniGames } from '../data/games'
 import { expeditions } from '../data/expeditions'
 import pokemonData from '../data/pokemon-data'
 import { POKEMON_RARITY_OPTIONS } from '../utilities/pokemon/rarity-effects'
@@ -40,9 +40,14 @@ const locationOptions = locations.map((location) => ({
   value: location.id,
 }))
 
-const researchOptions = research.map((encounter) => ({
-  label: encounter.name,
-  value: encounter.id,
+const gameOptions = miniGames.map((game) => ({
+  label: game.name,
+  value: game.id,
+}))
+
+const fieldResearchOptions = fieldResearchGames.map((study) => ({
+  label: study.name,
+  value: study.id,
 }))
 
 const expeditionOptions = expeditions.map((expedition) => ({
@@ -51,7 +56,8 @@ const expeditionOptions = expeditions.map((expedition) => ({
 }))
 
 const pokemonOptions = pokemonData.map((species) => {
-  const baseForm = species.forms.find((f) => f.form === 'base') || species.forms[0]
+  const baseForm =
+    species.forms.find((f) => f.form === 'base') || species.forms[0]
   return {
     label: baseForm.name,
     value: String(species.id),
@@ -72,15 +78,25 @@ export const TaskConditionBlock: Block = {
         { label: 'Pokemon Owned', value: 'pokemon_owned' },
         { label: 'Card Collected (Total)', value: 'card_collected_total' },
         { label: 'Card Collected (Set)', value: 'card_collected_set' },
-        { label: 'Card Collected (Specific)', value: 'card_collected_specific' },
+        {
+          label: 'Card Collected (Specific)',
+          value: 'card_collected_specific',
+        },
         { label: 'Pokedex Seen (Total)', value: 'pokedex_seen_total' },
         { label: 'Pokedex Caught (Total)', value: 'pokedex_caught_total' },
         { label: 'Pokedex Seen (Specific)', value: 'pokedex_seen_specific' },
-        { label: 'Pokedex Caught (Specific)', value: 'pokedex_caught_specific' },
+        {
+          label: 'Pokedex Caught (Specific)',
+          value: 'pokedex_caught_specific',
+        },
         { label: 'Task Completed', value: 'task_completed' },
         { label: 'Battle Result', value: 'battle_result' },
-        { label: 'Location Encounter Result', value: 'location_encounter_result' },
-        { label: 'Research Encounter Result', value: 'research_encounter_result' },
+        {
+          label: 'Location Encounter Result',
+          value: 'location_encounter_result',
+        },
+        { label: 'Mini Game Result', value: 'game_result' },
+        { label: 'Field Research Result', value: 'field_research_result' },
         { label: 'Expedition Result', value: 'expedition_result' },
         { label: 'Time Range', value: 'time_range' },
         { label: 'Date Range', value: 'date_range' },
@@ -110,15 +126,25 @@ export const TaskConditionBlock: Block = {
       type: 'select',
       options: locationOptions,
       admin: {
-        condition: (_, siblingData) => siblingData.type === 'location_encounter_result',
+        condition: (_, siblingData) =>
+          siblingData.type === 'location_encounter_result',
       },
     },
     {
-      name: 'targetResearchEncounterId',
+      name: 'targetGameId',
       type: 'select',
-      options: researchOptions,
+      options: gameOptions,
       admin: {
-        condition: (_, siblingData) => siblingData.type === 'research_encounter_result',
+        condition: (_, siblingData) => siblingData.type === 'game_result',
+      },
+    },
+    {
+      name: 'targetFieldResearchId',
+      type: 'select',
+      options: fieldResearchOptions,
+      admin: {
+        condition: (_, siblingData) =>
+          siblingData.type === 'field_research_result',
       },
     },
     {
@@ -141,7 +167,8 @@ export const TaskConditionBlock: Block = {
         condition: (_, siblingData) =>
           siblingData.type === 'battle_result' ||
           siblingData.type === 'location_encounter_result' ||
-          siblingData.type === 'research_encounter_result',
+          siblingData.type === 'game_result' ||
+          siblingData.type === 'field_research_result',
       },
     },
     {
@@ -180,7 +207,8 @@ export const TaskConditionBlock: Block = {
       type: 'select',
       options: setOptions,
       admin: {
-        condition: (_, siblingData) => siblingData.type === 'card_collected_set',
+        condition: (_, siblingData) =>
+          siblingData.type === 'card_collected_set',
       },
     },
     {
@@ -206,7 +234,8 @@ export const TaskConditionBlock: Block = {
             'pokedex_caught_total',
             'battle_result',
             'location_encounter_result',
-            'research_encounter_result',
+            'game_result',
+            'field_research_result',
             'expedition_result',
             'time_range',
             'date_range',
@@ -247,7 +276,9 @@ export const TaskConditionBlock: Block = {
       label: 'Consume on Completion',
       admin: {
         condition: (_, siblingData) =>
-          ['item_owned', 'currency_owned', 'pokemon_owned'].includes(siblingData.type),
+          ['item_owned', 'currency_owned', 'pokemon_owned'].includes(
+            siblingData.type,
+          ),
       },
     },
     {
@@ -256,7 +287,9 @@ export const TaskConditionBlock: Block = {
       label: 'Unique Count Only',
       admin: {
         condition: (_, siblingData) =>
-          ['card_collected_total', 'card_collected_set'].includes(siblingData.type),
+          ['card_collected_total', 'card_collected_set'].includes(
+            siblingData.type,
+          ),
       },
     },
     {
@@ -356,14 +389,16 @@ export const RewardBlock: Block = {
         components: {
           Field: '@/components/admin/ItemPreview',
         },
-        condition: (_, siblingData) => siblingData.type === 'item' && siblingData.targetItemId,
+        condition: (_, siblingData) =>
+          siblingData.type === 'item' && siblingData.targetItemId,
       },
     },
     {
       name: 'targetId',
       type: 'text',
       admin: {
-        condition: (_, siblingData) => ['pokemon', 'task_complete'].includes(siblingData.type),
+        condition: (_, siblingData) =>
+          ['pokemon', 'task_complete'].includes(siblingData.type),
       },
     },
     {
@@ -420,7 +455,11 @@ export const RewardBlock: Block = {
             },
           ],
         },
-        { name: 'allowedCardIds', type: 'array', fields: [{ name: 'id', type: 'text' }] },
+        {
+          name: 'allowedCardIds',
+          type: 'array',
+          fields: [{ name: 'id', type: 'text' }],
+        },
         { name: 'rarityModifier', type: 'number' },
         { name: 'bonusThreshold', type: 'number' },
         { name: 'qty', type: 'number', defaultValue: 1 },
@@ -440,7 +479,8 @@ export const RewardBlock: Block = {
           type: 'select',
           options: POKEMON_RARITY_OPTIONS,
           admin: {
-            description: 'Mutually exclusive with all other Pokémon rarity treatments.',
+            description:
+              'Mutually exclusive with all other Pokémon rarity treatments.',
           },
         },
         { name: 'shiny', type: 'checkbox' },

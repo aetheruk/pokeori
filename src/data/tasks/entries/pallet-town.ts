@@ -535,7 +535,7 @@ export const palletTownTasks: Task[] = [
     ],
     criteria: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         battleStatus: 'win',
         count: 1,
         targetId: 'tutorial-compare',
@@ -634,7 +634,7 @@ export const palletTownTasks: Task[] = [
     ],
     criteria: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         battleStatus: 'win',
         count: 1,
         targetId: 'tutorial-identify',
@@ -689,7 +689,7 @@ export const palletTownTasks: Task[] = [
     ],
     criteria: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         battleStatus: 'win',
         count: 1,
         targetId: 'who-tutorial',
@@ -776,7 +776,7 @@ export const palletTownTasks: Task[] = [
     ],
     criteria: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         battleStatus: 'win',
         count: 1,
         targetId: 'tutorial-snap',
@@ -1124,7 +1124,7 @@ export const palletTownTasks: Task[] = [
     ],
     criteria: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         battleStatus: 'win',
         count: 1,
         targetId: 'tutorial-sound',
@@ -3007,7 +3007,7 @@ export const palletTownTasks: Task[] = [
     ],
     criteria: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         battleStatus: 'win',
         count: 1,
         targetId: 'stat-module-hard',

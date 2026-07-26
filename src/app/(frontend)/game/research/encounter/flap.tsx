@@ -14,10 +14,10 @@ import { useGameMusic } from '@/hooks/useGameMusic'
 import { usePageVisibility } from '@/hooks/usePageVisibility'
 import { CollisionMask, getCollisionMask } from '@/utilities/collision'
 import {
-  completeResearchEncounter,
-  startResearchEncounter,
-  submitResearchAnswer,
-} from '../actions'
+  completeGame,
+  startGame,
+  submitGameAnswer,
+} from '@/app/(frontend)/game/games/actions'
 import {
   type EndlessCollectible,
   EndlessCollectibleSprite,
@@ -152,7 +152,7 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
   )
 
   const initGame = useCallback(async () => {
-    const res = await startResearchEncounter(encounter.id)
+    const res = await startGame(encounter.id)
     if (!res.success) {
       console.error('Failed to start:', res.error)
       return
@@ -261,8 +261,8 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
   const handleWin = async () => {
     playSfx('good')
     setGameEnded(true)
-    await submitResearchAnswer(true)
-    const res = await completeResearchEncounter(encounter.id, true)
+    await submitGameAnswer(true)
+    const res = await completeGame(encounter.id, true)
 
     setResult({
       success: true,
@@ -274,10 +274,10 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
   const handleLoss = async () => {
     playSfx('bad')
     setGameEnded(true)
-    await submitResearchAnswer(false)
+    await submitGameAnswer(false)
     // Use scoreRef.current for the most up-to-date score value
     const finalScore = isEndlessMode ? Math.floor(scoreRef.current) : undefined
-    const res = await completeResearchEncounter(
+    const res = await completeGame(
       encounter.id,
       false,
       finalScore,
@@ -1058,7 +1058,7 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
                 size="lg"
                 onClick={async () => {
                   try {
-                    const res = await startResearchEncounter(
+                    const res = await startGame(
                       (initialState?.encounter || encounter).id,
                       true,
                     )

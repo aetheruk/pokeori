@@ -51,7 +51,7 @@ import {
   getTcgBattleCardUnlockTurnForCard,
   TCG_BATTLE_FORMATS,
 } from '@/utilities/tcg/tcg-battle'
-import type { ResearchCompletionResult } from '../actions'
+import type { GameCompletionResult } from '@/app/(frontend)/game/games/actions'
 import {
   arrangeTcgBattle,
   claimTcgBattleResult,
@@ -69,7 +69,7 @@ type TcgClientActionResult =
   | {
       success: true
       state: TcgBattleState
-      completion?: ResearchCompletionResult
+      completion?: GameCompletionResult
     }
   | { success: false; error: string }
 type TcgAttack = TcgBattleCardState['attacks'][number]
@@ -727,7 +727,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     null,
   )
   const [showOpeningVs, setShowOpeningVs] = useState(false)
-  const [result, setResult] = useState<ResearchCompletionResult | null>(null)
+  const [result, setResult] = useState<GameCompletionResult | null>(null)
   const [resolution, setResolution] = useState<BattleResolution | null>(null)
   const [isActionBusy, setIsActionBusy] = useState(false)
   const [attackCapPulse, setAttackCapPulse] = useState(false)
@@ -837,7 +837,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
   }, [state])
 
   const commitActionResult = useCallback(
-    (nextState: TcgBattleState, completion?: ResearchCompletionResult) => {
+    (nextState: TcgBattleState, completion?: GameCompletionResult) => {
       setState(nextState)
       setResolution(null)
       setIsActionBusy(false)
@@ -856,7 +856,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       previousState: TcgBattleState,
       nextState: TcgBattleState,
       meta: ActionMeta,
-      completion?: ResearchCompletionResult,
+      completion?: GameCompletionResult,
     ) => {
       clearResolutionTimers()
 
@@ -3096,7 +3096,8 @@ function AttackCommandButton({
       type="button"
       className={cn(
         'group relative h-12 overflow-hidden border border-game-moss/35 bg-game-night-surface/80 px-2 text-left text-game-night-ink hover:bg-game-moss/20',
-        disabled && 'border-game-night-border/40 bg-game-night-surface/55 text-game-night-muted',
+        disabled &&
+          'border-game-night-border/40 bg-game-night-surface/55 text-game-night-muted',
       )}
       disabled={disabled}
       onClick={onClick}
@@ -3119,7 +3120,9 @@ function AttackCommandButton({
         </span>
         <span className="flex shrink-0 flex-col items-end gap-0.5 text-xs font-black">
           <EnergyCost cost={cost} types={attack.cost} />
-          <span className="text-[10px] text-game-night-muted">{attack.damage}</span>
+          <span className="text-[10px] text-game-night-muted">
+            {attack.damage}
+          </span>
         </span>
       </span>
     </Button>

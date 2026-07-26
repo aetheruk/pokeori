@@ -18,7 +18,10 @@ import type {
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
-import { completeResearchEncounter, startResearchEncounter } from '../actions'
+import {
+  completeGame as completeGameActivity,
+  startGame,
+} from '@/app/(frontend)/game/games/actions'
 
 interface MagnemiteCircuitGameProps {
   encounter: MagnemiteCircuitGameConfig & { isEligibleForReplay?: boolean }
@@ -156,7 +159,7 @@ export function MagnemiteCircuitGame({
       completionRef.current = true
       setGameEnded(true)
 
-      const completion = await completeResearchEncounter(encounter.id, success)
+      const completion = await completeGameActivity(encounter.id, success)
       const finalSuccess = success && completion.success
       setResult({
         success: finalSuccess,
@@ -169,7 +172,7 @@ export function MagnemiteCircuitGame({
   )
 
   const initGame = useCallback(async () => {
-    const start = await startResearchEncounter(encounter.id)
+    const start = await startGame(encounter.id)
     if (!start.success) {
       setResult({
         success: false,
@@ -447,10 +450,7 @@ export function MagnemiteCircuitGame({
               <Button
                 size="lg"
                 onClick={async () => {
-                  const replay = await startResearchEncounter(
-                    encounter.id,
-                    true,
-                  )
+                  const replay = await startGame(encounter.id, true)
                   if (replay.success) window.location.reload()
                   else router.push('/game/explore')
                 }}

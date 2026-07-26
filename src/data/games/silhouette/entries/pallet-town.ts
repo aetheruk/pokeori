@@ -16,7 +16,7 @@ export const palletTownsilhouetteEntries: SilhouetteConfig[] = [
     background: '/backgrounds/cave.avif',
     requirements: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'who-tutorial',
         count: 1,
         inverse: true,

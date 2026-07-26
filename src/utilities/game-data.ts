@@ -3,7 +3,10 @@ import configPromise from '@payload-config'
 import type { User, Pokemon } from '@/payload-types'
 import type { RequirementData } from '@/utilities/requirements'
 import type { GameDataKeys } from '@/utilities/requirements/analysis'
-import { CHANNELING_POKEMON_SELECT, EXPLORE_POKEMON_SELECT } from '@/utilities/game-data-scopes'
+import {
+  CHANNELING_POKEMON_SELECT,
+  EXPLORE_POKEMON_SELECT,
+} from '@/utilities/game-data-scopes'
 import { getUserStateData, toSlimUser } from '@/utilities/user-state'
 import { resolvePokemonRarity } from '@/utilities/pokemon/rarity-effects'
 import { ensureUserWeatherSlot } from '@/utilities/weather'
@@ -67,7 +70,8 @@ export async function getGameUserData(
         ],
       },
       pagination: false,
-      ...(options.pokemonPayload === 'explore' || options.pokemonPayload === 'channeling'
+      ...(options.pokemonPayload === 'explore' ||
+      options.pokemonPayload === 'channeling'
         ? {
             depth: 0,
             select:
@@ -89,20 +93,22 @@ export async function getGameUserData(
   if (shouldFetch('pokedex')) {
     const variantPokemon = pokemonData.length
       ? pokemonData
-      : ((await payload.find({
-          collection: 'pokemon',
-          where: { user: { equals: user.id } },
-          pagination: false,
-          depth: 0,
-          select: {
-            speciesId: true,
-            formId: true,
-            rarity: true,
-            shiny: true,
-            isShadow: true,
-            isRadiant: true,
-          },
-        } as any)).docs as Pokemon[])
+      : ((
+          await payload.find({
+            collection: 'pokemon',
+            where: { user: { equals: user.id } },
+            pagination: false,
+            depth: 0,
+            select: {
+              speciesId: true,
+              formId: true,
+              rarity: true,
+              shiny: true,
+              isShadow: true,
+              isRadiant: true,
+            },
+          } as any)
+        ).docs as Pokemon[])
     const ownedRarities = new Map<string, Set<string>>()
 
     for (const pokemon of variantPokemon) {
@@ -202,7 +208,8 @@ export async function getGameUserData(
     completedTasks: userState.completedTasks,
     battleResults: userState.battleResults,
     locationEncounterResults: userState.locationEncounterResults,
-    researchEncounterResults: userState.researchEncounterResults,
+    gameResults: userState.gameResults,
+    fieldResearchResults: userState.fieldResearchResults,
     expeditionResults: userState.expeditionResults,
     shopPurchases: userState.shopPurchases,
     lastRoll: (user as any).lastRoll,

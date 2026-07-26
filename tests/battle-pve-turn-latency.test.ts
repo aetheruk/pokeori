@@ -112,6 +112,8 @@ function makeState(): BattleState {
         originalTrainer: 'enemy',
         name: 'Charmander',
         types: ['Fire'],
+        currentHp: 10_000,
+        maxHp: 10_000,
       }),
     ],
     activePlayerIndex: 0,

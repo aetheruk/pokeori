@@ -84,7 +84,7 @@ export const viridianForestsnapEntries: SnapConfig[] = [
     },
     requirements: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'research-forest-photos',
         battleStatus: 'win',
         count: 1,
@@ -97,7 +97,7 @@ export const viridianForestsnapEntries: SnapConfig[] = [
         count: 10,
       },
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'research-forest-photos',
         battleStatus: 'win',
         count: 30,

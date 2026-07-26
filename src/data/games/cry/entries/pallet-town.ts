@@ -56,7 +56,7 @@ export const palletTowncryEntries: CryConfig[] = [
     },
     background: '/backgrounds/lab.avif',
     requirements: [
-      { type: 'research_encounter_result', targetId: 'tutorial-sound', count: 1, inverse: true },
+      { type: 'game_result', targetId: 'tutorial-sound', count: 1, inverse: true },
       {
         type: 'task_completed',
         battleStatus: 'win',

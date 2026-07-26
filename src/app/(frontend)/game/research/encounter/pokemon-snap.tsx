@@ -11,22 +11,22 @@ import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverla
 import { Button } from '@/components/ui/button'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useAudio } from '@/context/AudioContext'
-import type { ResearchConfig } from '@/data/games'
+import type { GameItem } from '@/data/games'
 import pokemonData from '@/data/pokemon-data'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import {
-  completeResearchEncounter,
-  startResearchEncounter,
-  submitResearchAnswer,
-} from '../actions'
+  completeGame,
+  startGame,
+  submitGameAnswer,
+} from '@/app/(frontend)/game/games/actions'
 
 interface PokemonSnapGameProps {
-  encounter: ResearchConfig
+  encounter: GameItem
   initialState?: any
 }
 
-type CompletionResult = Awaited<ReturnType<typeof completeResearchEncounter>>
+type CompletionResult = Awaited<ReturnType<typeof completeGame>>
 
 function getCompletionExpeditionProgress(completeResult: CompletionResult) {
   return (
@@ -177,7 +177,7 @@ export function PokemonSnapGame({
     if (gameStarted) return
 
     // Start or get existing session
-    const result = await startResearchEncounter(encounter.id)
+    const result = await startGame(encounter.id)
 
     if (!result.success) {
       console.error('Failed to start encounter:', result.error)
@@ -239,10 +239,7 @@ export function PokemonSnapGame({
       setSuccess(didWin)
       playSfx(didWin ? 'good' : 'bad')
 
-      const completeResult = await completeResearchEncounter(
-        encounter.id,
-        didWin,
-      )
+      const completeResult = await completeGame(encounter.id, didWin)
       setResult({
         success: didWin && completeResult.success,
         rewards: completeResult.summary,
@@ -275,7 +272,7 @@ export function PokemonSnapGame({
       targetMissTimeoutRef.current = null
     }
 
-    const result = await submitResearchAnswer(snappedId)
+    const result = await submitGameAnswer(snappedId)
 
     if (!result.success) {
       if (result.error === 'Session expired or not found') {
@@ -283,10 +280,7 @@ export function PokemonSnapGame({
         return
       }
       if (result.gameOver) {
-        const completeResult = await completeResearchEncounter(
-          encounter.id,
-          false,
-        )
+        const completeResult = await completeGame(encounter.id, false)
         setGameEnded(true)
         setSuccess(false)
         setResult({
@@ -333,10 +327,7 @@ export function PokemonSnapGame({
       const didWin = wins >= requiredWins
       targetGameEndedRef.current = true
       setGameEnded(true)
-      const completeResult = await completeResearchEncounter(
-        encounter.id,
-        didWin,
-      )
+      const completeResult = await completeGame(encounter.id, didWin)
       if (didWin && completeResult.success && completeResult.summary) {
         setSuccess(true)
         playSfx('good')
@@ -800,7 +791,7 @@ export function PokemonSnapGame({
                 size="lg"
                 onClick={async () => {
                   try {
-                    const res = await startResearchEncounter(
+                    const res = await startGame(
                       (initialState?.encounter || encounter).id,
                       true,
                     )

@@ -33,10 +33,10 @@ import {
   getRockPushScopedPrizeId,
 } from '@/utilities/research/rock-push'
 import {
-  completeResearchEncounter,
-  startResearchEncounter,
-  submitResearchAnswer,
-} from '../actions'
+  completeGame,
+  startGame,
+  submitGameAnswer,
+} from '@/app/(frontend)/game/games/actions'
 import { EndlessCollectibleSprite } from './endless-collectibles'
 
 interface RockPushGameProps {
@@ -282,7 +282,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
 
   // Initialize Game Logic
   const initGame = useCallback(async () => {
-    const res = await startResearchEncounter(encounter.id)
+    const res = await startGame(encounter.id)
     if (!res.success) {
       console.error('Failed to start:', res.error)
       return
@@ -370,8 +370,8 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     playSfx('good')
     setGameEnded(true)
     // Submit final answer to verify
-    await submitResearchAnswer(true)
-    const res = await completeResearchEncounter(
+    await submitGameAnswer(true)
+    const res = await completeGame(
       encounter.id,
       true,
       undefined,
@@ -391,8 +391,8 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     playSfx('bad')
     setGameEnded(true)
     // Submit loss to clean up server state
-    await submitResearchAnswer(false)
-    await completeResearchEncounter(encounter.id, false)
+    await submitGameAnswer(false)
+    await completeGame(encounter.id, false)
 
     setResult({
       success: false,
@@ -1381,7 +1381,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
                 size="lg"
                 onClick={async () => {
                   try {
-                    const res = await startResearchEncounter(
+                    const res = await startGame(
                       (initialState?.encounter || encounter).id,
                       true,
                     )

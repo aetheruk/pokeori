@@ -37,7 +37,7 @@ import { ItemSprite } from '@/components/ui/item-sprite'
 import { battles } from '@/data/battles'
 import { getCurrency } from '@/data/currencies'
 import { expeditions } from '@/data/expeditions'
-import { research } from '@/data/games'
+import { fieldResearchGames, miniGames } from '@/data/games'
 import { items } from '@/data/items'
 import { locations } from '@/data/locations'
 import { getSkill } from '@/data/skills'
@@ -417,19 +417,35 @@ export function mapCriteriaToDisplayItem(
         subLabel: 'Catch Requirement',
       }
     }
-    case 'research_encounter_result': {
-      const encounter = research.find((r) => r.id === condition.targetId)
-      const action = formatGameAction((encounter as any)?.gameType)
+    case 'game_result': {
+      const game = miniGames.find((entry) => entry.id === condition.targetId)
+      const action = formatGameAction((game as any)?.gameType)
       return {
         icon: getContentIcon(
-          encounter?.icon,
+          game?.icon,
           <Search className="w-5 h-5 text-game-moss-strong" />,
         ),
         label:
           condition.battleStatus === 'loss'
-            ? `Fail ${countLabel(count)}${encounter?.name || 'Research'}`
-            : `${action} ${countLabel(count)}${encounter?.name || 'Research'}`,
-        subLabel: 'Research Requirement',
+            ? `Fail ${countLabel(count)}${game?.name || 'Mini Game'}`
+            : `${action} ${countLabel(count)}${game?.name || 'Mini Game'}`,
+        subLabel: 'Mini Game Requirement',
+      }
+    }
+    case 'field_research_result': {
+      const study = fieldResearchGames.find(
+        (entry) => entry.id === condition.targetId,
+      )
+      return {
+        icon: getContentIcon(
+          study?.icon,
+          <Microscope className="w-5 h-5 text-game-moss-strong" />,
+        ),
+        label:
+          condition.battleStatus === 'loss'
+            ? `Fail ${countLabel(count)}${study?.name || 'Field Research'}`
+            : `Complete ${countLabel(count)}${study?.name || 'Field Research'}`,
+        subLabel: 'Field Research Requirement',
       }
     }
     case 'expedition_result': {
@@ -786,7 +802,10 @@ export function mapCriteriaToDisplayItem(
     }
     case 'daily_activity': {
       const kind = condition.dailyActivity?.kind
-      const activityLabels: Record<string, { label: string; subLabel: string; icon: React.ReactNode }> = {
+      const activityLabels: Record<
+        string,
+        { label: string; subLabel: string; icon: React.ReactNode }
+      > = {
         catch: {
           label: `Catch ${count} ${pluralize('Pokemon', count)}`,
           subLabel: 'Field Research',
@@ -797,9 +816,14 @@ export function mapCriteriaToDisplayItem(
           subLabel: 'Combat Drill',
           icon: <Swords className="w-5 h-5 text-game-moss-strong" />,
         },
-        research_win: {
-          label: `Complete ${count} research ${pluralize('round', count)}`,
-          subLabel: 'Research Assignment',
+        game_win: {
+          label: `Complete ${count} mini-game ${pluralize('round', count)}`,
+          subLabel: 'Mini Game Assignment',
+          icon: <Trophy className="w-5 h-5 text-game-moss-strong" />,
+        },
+        field_research_win: {
+          label: `Complete ${count} Field Research ${pluralize('study', count)}`,
+          subLabel: 'Field Research Assignment',
           icon: <Microscope className="w-5 h-5 text-game-moss-strong" />,
         },
         fishing_catch: {
@@ -825,7 +849,15 @@ export function mapCriteriaToDisplayItem(
         card_collected: {
           label: `Collect ${count} ${pluralize('card', count)}`,
           subLabel: 'TCG Discovery',
-          icon: <Image src="/sprites/card.avif" alt="TCG Card" width={24} height={24} className="w-6 h-6 object-contain" />,
+          icon: (
+            <Image
+              src="/sprites/card.avif"
+              alt="TCG Card"
+              width={24}
+              height={24}
+              className="w-6 h-6 object-contain"
+            />
+          ),
         },
         card_crystalized: {
           label: `Crystalize ${count} ${pluralize('card', count)}`,
@@ -833,11 +865,13 @@ export function mapCriteriaToDisplayItem(
           icon: <Zap className="w-5 h-5 text-game-moss-strong" />,
         },
       }
-      return activityLabels[kind || ''] || {
-        icon: <Calendar className="w-5 h-5 text-game-moss-strong" />,
-        label: `Complete ${count} daily activities`,
-        subLabel: 'Daily Challenge',
-      }
+      return (
+        activityLabels[kind || ''] || {
+          icon: <Calendar className="w-5 h-5 text-game-moss-strong" />,
+          label: `Complete ${count} daily activities`,
+          subLabel: 'Daily Challenge',
+        }
+      )
     }
 
     case 'rival_selected':

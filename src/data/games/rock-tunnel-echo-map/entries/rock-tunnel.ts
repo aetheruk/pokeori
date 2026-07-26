@@ -31,7 +31,7 @@ function oneShotRequirements(id: string, gateTaskId: string) {
       targetId: gateTaskId,
     },
     {
-      type: 'research_encounter_result' as const,
+      type: 'game_result' as const,
       targetId: id,
       battleStatus: 'win' as const,
       count: 1,

@@ -5,7 +5,10 @@ import { allGames } from '@/data/games'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { grantRewards } from '@/utilities/rewards/reward-logic'
-import { getUser, type ResearchState } from '../actions'
+import {
+  getUser,
+  type GameActivityState,
+} from '@/app/(frontend)/game/_shared/activity-actions'
 import {
   acquireActionLock,
   checkActionRateLimit,
@@ -29,25 +32,46 @@ export async function initiatePrizeWheelSpin() {
       return { success: false, error: 'Not authenticated' }
     }
 
-    const rateLimit = await checkActionRateLimit(user.id, 'prize-wheel-spin', 20, 60)
+    const rateLimit = await checkActionRateLimit(
+      user.id,
+      'prize-wheel-spin',
+      20,
+      60,
+    )
     if (!rateLimit.allowed) {
-      return { success: false, error: 'Too many spin attempts. Please try again shortly.' }
+      return {
+        success: false,
+        error: 'Too many spin attempts. Please try again shortly.',
+      }
     }
 
-    const spinLock = await acquireActionLock(`lock:prize-wheel:spin:${user.id}`, 10)
+    const spinLock = await acquireActionLock(
+      `lock:prize-wheel:spin:${user.id}`,
+      10,
+    )
     if (!spinLock.acquired) {
-      return { success: false, error: 'Another spin is already being processed' }
+      return {
+        success: false,
+        error: 'Another spin is already being processed',
+      }
     }
 
     const payload = await getPayload({ config: configPromise })
 
     try {
-      const existingSpin = await redis.get<PrizeWheelSpinData>(`prizewheel:${user.id}`)
+      const existingSpin = await redis.get<PrizeWheelSpinData>(
+        `prizewheel:${user.id}`,
+      )
       if (existingSpin) {
-        return { success: false, error: 'Please claim your existing spin first' }
+        return {
+          success: false,
+          error: 'Please claim your existing spin first',
+        }
       }
 
-      const state = (await redis.get(`research:${user.id}`)) as ResearchState | null
+      const state = (await redis.get(
+        `game:${user.id}`,
+      )) as GameActivityState | null
       if (!state) {
         return { success: false, error: 'Session expired' }
       }
@@ -59,11 +83,15 @@ export async function initiatePrizeWheelSpin() {
 
       // Cost Check with fresh user state
       const cost = encounter.settings.cost
-      const freshUser = await payload.findByID({ collection: 'users', id: user.id })
+      const freshUser = await payload.findByID({
+        collection: 'users',
+        id: user.id,
+      })
       let updatedBalance = 0
 
       if (cost) {
-        const currentBalance = (freshUser.currency as any)?.[cost.currencyType] || 0
+        const currentBalance =
+          (freshUser.currency as any)?.[cost.currencyType] || 0
         if (currentBalance < cost.amount) {
           return { success: false, error: 'Insufficient funds' }
         }
@@ -121,8 +149,12 @@ export async function initiatePrizeWheelSpin() {
       } catch (spinError) {
         // Best-effort rollback if we already charged but failed to persist spin.
         if (cost) {
-          const rollbackUser = await payload.findByID({ collection: 'users', id: user.id })
-          const rollbackBalance = (rollbackUser.currency as any)?.[cost.currencyType] || 0
+          const rollbackUser = await payload.findByID({
+            collection: 'users',
+            id: user.id,
+          })
+          const rollbackBalance =
+            (rollbackUser.currency as any)?.[cost.currencyType] || 0
           await payload.update({
             collection: 'users',
             id: user.id,
@@ -160,9 +192,17 @@ export async function claimPrizeWheelReward(encounterId: string) {
       return { success: false, error: 'Not authenticated' }
     }
 
-    const rateLimit = await checkActionRateLimit(user.id, 'prize-wheel-claim', 30, 60)
+    const rateLimit = await checkActionRateLimit(
+      user.id,
+      'prize-wheel-claim',
+      30,
+      60,
+    )
     if (!rateLimit.allowed) {
-      return { success: false, error: 'Too many claim attempts. Please wait a moment.' }
+      return {
+        success: false,
+        error: 'Too many claim attempts. Please wait a moment.',
+      }
     }
 
     const spinKey = `prizewheel:${user.id}`
@@ -180,7 +220,8 @@ export async function claimPrizeWheelReward(encounterId: string) {
       return { success: false, error: 'Invalid spin session data' }
     }
 
-    const spinId = spinData.spinId || `${spinData.timestamp}-${spinData.targetIndex}`
+    const spinId =
+      spinData.spinId || `${spinData.timestamp}-${spinData.targetIndex}`
     const idempotentResultKey = `prizewheel:claim-result:${user.id}:${spinId}`
 
     const cachedResult = await getIdempotentResult<any>(idempotentResultKey)
@@ -188,20 +229,26 @@ export async function claimPrizeWheelReward(encounterId: string) {
       return cachedResult
     }
 
-    const claimLock = await acquireActionLock(`lock:prize-wheel:claim:${user.id}:${spinId}`, 12)
+    const claimLock = await acquireActionLock(
+      `lock:prize-wheel:claim:${user.id}:${spinId}`,
+      12,
+    )
     if (!claimLock.acquired) {
       return { success: false, error: 'Reward claim already in progress' }
     }
 
     try {
-      const cachedResultAfterLock = await getIdempotentResult<any>(idempotentResultKey)
+      const cachedResultAfterLock =
+        await getIdempotentResult<any>(idempotentResultKey)
       if (cachedResultAfterLock) {
         return cachedResultAfterLock
       }
 
       const payload = await getPayload({ config: configPromise })
 
-      const state = (await redis.get(`research:${user.id}`)) as ResearchState | null
+      const state = (await redis.get(
+        `game:${user.id}`,
+      )) as GameActivityState | null
       if (!state || state.encounterId !== encounterId) {
         return { success: false, error: 'Research session mismatch' }
       }
@@ -230,7 +277,7 @@ export async function claimPrizeWheelReward(encounterId: string) {
       await incrementUserActivityResult(
         payload as any,
         user.id,
-        'researchEncounterResults',
+        'gameResults',
         encounterId,
         hasRewards ? { wins: 1 } : { losses: 1 },
       )

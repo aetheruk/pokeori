@@ -16,7 +16,7 @@ export const palletTownsnapEntries: SnapConfig[] = [
     background: '/backgrounds/lab.avif',
     requirements: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'tutorial-snap',
         count: 1,
         inverse: true,

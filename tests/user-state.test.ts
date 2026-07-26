@@ -2,6 +2,8 @@ import { describe, expect, test } from 'bun:test'
 import type { User } from '@/payload-types'
 import {
   addPokedexCaughtRarity,
+  activityRowsToArrays,
+  activityRowsToMap,
   getPokedexCaughtRarities,
   getUserStateData,
   pokedexRowsToArray,
@@ -162,7 +164,9 @@ describe('user state storage compatibility', () => {
 
     const state = await getUserStateData(
       fakePayload({
-        [USER_STATE_COLLECTIONS.inventory]: [{ itemId: 'great-ball', quantity: 2 }],
+        [USER_STATE_COLLECTIONS.inventory]: [
+          { itemId: 'great-ball', quantity: 2 },
+        ],
         [USER_STATE_COLLECTIONS.pokedex]: [
           {
             speciesId: 26,
@@ -189,7 +193,9 @@ describe('user state storage compatibility', () => {
             updatedAt: '2026-06-02T00:00:00.000Z',
           },
         ],
-        [USER_STATE_COLLECTIONS.tcg]: [{ cardId: 'base1-4', setId: 'base1', quantity: 2 }],
+        [USER_STATE_COLLECTIONS.tcg]: [
+          { cardId: 'base1-4', setId: 'base1', quantity: 2 },
+        ],
         [USER_STATE_COLLECTIONS.shopPurchases]: [
           {
             shopItemId: 'pewter-rare-candy',
@@ -199,7 +205,14 @@ describe('user state storage compatibility', () => {
         ],
       }) as any,
       user,
-      ['inventory', 'pokedex', 'completedTasks', 'battleResults', 'tcg', 'shopPurchases'],
+      [
+        'inventory',
+        'pokedex',
+        'completedTasks',
+        'battleResults',
+        'tcg',
+        'shopPurchases',
+      ],
     )
 
     expect(state.inventory).toEqual([{ itemId: 'great-ball', quantity: 2 }])
@@ -230,11 +243,53 @@ describe('user state storage compatibility', () => {
         updatedAt: '2026-06-02T00:00:00.000Z',
       },
     ])
-    expect(state.tcg).toEqual([{ cardId: 'base1-4', quantity: 2, setId: 'base1' }])
+    expect(state.tcg).toEqual([
+      { cardId: 'base1-4', quantity: 2, setId: 'base1' },
+    ])
     expect(state.shopPurchases).toMatchObject({
       'pewter-rare-candy': {
         count: 1,
         lastPurchasedAt: '2026-06-01T03:00:00.000Z',
+      },
+    })
+  })
+
+  test('splits legacy research rows by game identity while preferring canonical rows', () => {
+    const rows = [
+      {
+        activityType: 'research',
+        activityId: 'tutorial-sound',
+        wins: 2,
+        losses: 1,
+      },
+      {
+        activityType: 'research',
+        activityId: 'route-1-field-observation',
+        wins: 3,
+        losses: 0,
+      },
+      {
+        activityType: 'game',
+        activityId: 'tutorial-sound',
+        wins: 5,
+        losses: 0,
+      },
+    ]
+
+    expect(activityRowsToArrays(rows)).toMatchObject({
+      gameResults: [{ gameId: 'tutorial-sound', wins: 5, losses: 0 }],
+      fieldResearchResults: [
+        {
+          fieldResearchId: 'route-1-field-observation',
+          wins: 3,
+          losses: 0,
+        },
+      ],
+    })
+    expect(activityRowsToMap(rows)).toMatchObject({
+      games: { 'tutorial-sound': { wins: 5, losses: 0 } },
+      fieldResearch: {
+        'route-1-field-observation': { wins: 3, losses: 0 },
       },
     })
   })

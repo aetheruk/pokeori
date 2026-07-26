@@ -17,9 +17,12 @@ export function GameShell({
 }) {
   const pathname = usePathname()
   const isEncounter = pathname.startsWith('/game/locations/encounter')
-  const isResearch = pathname.startsWith('/game/research/encounter')
+  const isGameActivity =
+    pathname.startsWith('/game/games/') ||
+    pathname.startsWith('/game/field-research') ||
+    pathname.startsWith('/game/research/encounter')
   const isBattle = pathname.startsWith('/game/battles/encounter')
-  const isFullscreen = isEncounter || isBattle || isResearch
+  const isFullscreen = isEncounter || isBattle || isGameActivity
 
   // Pages that need full-width content but still show navigation
   const isNoPadding =

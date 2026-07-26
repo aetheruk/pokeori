@@ -45,7 +45,7 @@ function unbeatenBattle(id: string) {
 
 function echoMapWin(targetId: string) {
   return {
-    type: 'research_encounter_result' as const,
+    type: 'game_result' as const,
     targetId,
     battleStatus: 'win' as const,
     count: 1,

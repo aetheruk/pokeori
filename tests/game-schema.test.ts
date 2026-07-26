@@ -686,13 +686,13 @@ describe('generated game data schemas', () => {
     expect(relay?.gameType).toBe('voltorb-grid')
     expect(landslide?.gameType).toBe('voltorb-grid')
     expect(relay?.requirements).toContainEqual({
-      type: 'research_encounter_result',
+      type: 'game_result',
       targetId: 'route-10-voltorb-primer',
       battleStatus: 'win',
       count: 1,
     })
     expect(landslide?.requirements).toContainEqual({
-      type: 'research_encounter_result',
+      type: 'game_result',
       targetId: 'route-10-voltorb-relay',
       battleStatus: 'win',
       count: 1,
@@ -790,7 +790,7 @@ describe('generated game data schemas', () => {
     })
     for (let index = 1; index < demolitionGames.length; index += 1) {
       expect(demolitionGames[index]?.requirements).toContainEqual({
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: demolitionIds[index - 1],
         battleStatus: 'win',
         count: 1,

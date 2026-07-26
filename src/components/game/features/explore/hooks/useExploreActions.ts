@@ -17,7 +17,12 @@ import {
   startExpedition,
 } from '@/utilities/expeditions/actions'
 import { startEncounter } from '@/app/(frontend)/game/locations/encounter/actions'
-import { startResearchEncounter } from '@/app/(frontend)/game/research/actions'
+import { startGame } from '@/app/(frontend)/game/games/actions'
+import { startFieldResearch } from '@/app/(frontend)/game/field-research/actions'
+import {
+  getGameActivityRoute,
+  getGameActivityRouteForId,
+} from '@/utilities/games/activity-domain'
 import {
   startBattle,
   startVsSeekerBattle,
@@ -92,7 +97,9 @@ export function useExploreActions(
 
   // Selection State (New)
   const [selectedPokemonIds, setSelectedPokemonIds] = useState<string[]>([])
-  const [selectedRepelItemId, setSelectedRepelItemId] = useState<string | null>(null)
+  const [selectedRepelItemId, setSelectedRepelItemId] = useState<string | null>(
+    null,
+  )
 
   // PVP State
   const [pvpConfigId, setPvpConfigId] = useState<string | null>(null)
@@ -182,7 +189,9 @@ export function useExploreActions(
     try {
       const result = await startExpedition(expeditionId)
       if (!result.success) {
-        toast.error(result.message || `Failed to start ${expeditionLabel.toLowerCase()}`)
+        toast.error(
+          result.message || `Failed to start ${expeditionLabel.toLowerCase()}`,
+        )
         return
       }
 
@@ -236,7 +245,8 @@ export function useExploreActions(
       const result = await abandonExpedition()
       if (!result.success) {
         toast.error(
-          result.message || `Failed to abandon ${expeditionLabel.toLowerCase()}`,
+          result.message ||
+            `Failed to abandon ${expeditionLabel.toLowerCase()}`,
         )
         return
       }
@@ -332,23 +342,35 @@ export function useExploreActions(
           setShowQueueModal(true)
         } else {
           toast.error(
-            result.error || `Failed to start ${expeditionLabelLower} battle step`,
+            result.error ||
+              `Failed to start ${expeditionLabelLower} battle step`,
           )
         }
 
         return
       }
 
-      if (currentStep.activityType === 'research') {
-        const result = await startResearchEncounter(currentStep.activityId)
+      if (
+        currentStep.activityType === 'game' ||
+        currentStep.activityType === 'field-research'
+      ) {
+        const result =
+          currentStep.activityType === 'game'
+            ? await startGame(currentStep.activityId)
+            : await startFieldResearch(currentStep.activityId)
         if (result.success) {
           markExpeditionReturn(expeditionId)
-          router.push('/game/research/encounter')
+          router.push(
+            currentStep.activityType === 'game'
+              ? getGameActivityRouteForId(currentStep.activityId) || '/game'
+              : '/game/field-research',
+          )
           return
         }
 
         toast.error(
-          result.error || `Failed to start ${expeditionLabelLower} minigame step`,
+          result.error ||
+            `Failed to start ${expeditionLabelLower} minigame step`,
         )
         return
       }
@@ -359,7 +381,9 @@ export function useExploreActions(
           true,
         )
         if (!taskExploreItem) {
-          toast.error(`Task definition not found for ${expeditionLabelLower} step`)
+          toast.error(
+            `Task definition not found for ${expeditionLabelLower} step`,
+          )
           return
         }
 
@@ -438,7 +462,11 @@ export function useExploreActions(
         return
       }
 
-      if (task.enterModal && task.enterModal.length > 0 && !isDoneForModalFlow) {
+      if (
+        task.enterModal &&
+        task.enterModal.length > 0 &&
+        !isDoneForModalFlow
+      ) {
         if (isExpeditionTaskFlow) {
           setExpeditionEnterModalTaskId(task.id)
         } else {
@@ -454,10 +482,9 @@ export function useExploreActions(
         setIsExitModalOpen(true)
         setCompletingTaskId(task.id)
         try {
-          const result =
-            isCompletedExpeditionReplay
-              ? await completeCurrentUserExpeditionTaskStep(task.id)
-              : await completeTask(task.id)
+          const result = isCompletedExpeditionReplay
+            ? await completeCurrentUserExpeditionTaskStep(task.id)
+            : await completeTask(task.id)
           if (result.success) {
             if (isExpeditionTaskFlow) {
               markExpeditionReturn(getActiveExpeditionRun()?.expeditionId)
@@ -511,10 +538,9 @@ export function useExploreActions(
 
       setCompletingTaskId(task.id)
       try {
-        const result =
-          isCompletedExpeditionReplay
-            ? await completeCurrentUserExpeditionTaskStep(task.id)
-            : await completeTask(task.id)
+        const result = isCompletedExpeditionReplay
+          ? await completeCurrentUserExpeditionTaskStep(task.id)
+          : await completeTask(task.id)
         if (result.success) {
           if (isExpeditionTaskFlow) {
             reopenExpeditionPanel(getActiveExpeditionRun()?.expeditionId)
@@ -624,7 +650,10 @@ export function useExploreActions(
     if (
       item.requirements &&
       !item.requirements.every((r: any) =>
-        checkRequirement(userData, r, { category: item.category, subCategory: item.subCategory }),
+        checkRequirement(userData, r, {
+          category: item.category,
+          subCategory: item.subCategory,
+        }),
       )
     ) {
       toast.error('Requirements not met')
@@ -633,7 +662,10 @@ export function useExploreActions(
     if (
       item.criteria &&
       !item.criteria.every((c: any) =>
-        checkRequirement(userData, c, { category: item.category, subCategory: item.subCategory }),
+        checkRequirement(userData, c, {
+          category: item.category,
+          subCategory: item.subCategory,
+        }),
       )
     ) {
       toast.error('Criteria not met')
@@ -648,7 +680,9 @@ export function useExploreActions(
           const result = await startEncounter(
             item.id,
             undefined,
-            item.selectedRepelItemId ? { repelItemId: item.selectedRepelItemId } : undefined,
+            item.selectedRepelItemId
+              ? { repelItemId: item.selectedRepelItemId }
+              : undefined,
           )
           if (result.success) {
             router.push(`/game/locations/encounter`)
@@ -662,18 +696,33 @@ export function useExploreActions(
         }
         break
 
-      case 'research':
+      case 'game':
         try {
           const encounter = item.originalData
           if (checkResearchPokemonConsumption(encounter)) {
             // Now handled inline in GameInfoModal
             return
           }
-          const result = await startResearchEncounter(item.id)
+          const result = await startGame(item.id)
           if (result.success) {
-            router.push(`/game/research/encounter`)
+            router.push(getGameActivityRoute(item.originalData.gameType))
           } else {
             toast.error(result.error || 'Failed to start encounter')
+            setLoadingId(null)
+          }
+        } catch (e) {
+          toast.error('An error occurred')
+          setLoadingId(null)
+        }
+        break
+
+      case 'field-research':
+        try {
+          const result = await startFieldResearch(item.id)
+          if (result.success) {
+            router.push('/game/field-research')
+          } else {
+            toast.error(result.error || 'Failed to start Field Research')
             setLoadingId(null)
           }
         } catch (e) {
@@ -771,13 +820,13 @@ export function useExploreActions(
     setLoadingId(selectedResearchEncounter.id)
 
     try {
-      const result = await startResearchEncounter(
+      const result = await startGame(
         selectedResearchEncounter.id,
         false,
         selectedPokemonIds,
       )
       if (result.success) {
-        router.push(`/game/research/encounter`)
+        router.push(getGameActivityRoute(selectedResearchEncounter.gameType))
       } else {
         toast.error(result.error || 'Failed to start encounter')
         setLoadingId(null)
@@ -848,19 +897,20 @@ export function useExploreActions(
         result = await startEncounter(
           encounter.id,
           selectedPokemonIds,
-          encounter.selectedRepelItemId ? { repelItemId: encounter.selectedRepelItemId } : undefined,
+          encounter.selectedRepelItemId
+            ? { repelItemId: encounter.selectedRepelItemId }
+            : undefined,
         )
         redirectPath = `/game/locations/encounter`
       } else if (type === 'battle') {
         result = await startBattle(encounter.id, selectedPokemonIds)
         redirectPath = '/game/battles/encounter'
+      } else if (type === 'field-research') {
+        result = await startFieldResearch(encounter.id, false)
+        redirectPath = '/game/field-research'
       } else {
-        result = await startResearchEncounter(
-          encounter.id,
-          false,
-          selectedPokemonIds,
-        )
-        redirectPath = `/game/research/encounter`
+        result = await startGame(encounter.id, false, selectedPokemonIds)
+        redirectPath = getGameActivityRoute(encounter.gameType)
       }
 
       if (result.success) {

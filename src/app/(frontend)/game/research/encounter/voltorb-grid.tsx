@@ -25,7 +25,10 @@ import type {
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
-import { completeResearchEncounter, startResearchEncounter } from '../actions'
+import {
+  completeGame as completeGameActivity,
+  startGame,
+} from '@/app/(frontend)/game/games/actions'
 
 interface VoltorbGridGameProps {
   encounter: VoltorbGridGameConfig & { isEligibleForReplay?: boolean }
@@ -175,7 +178,7 @@ export function VoltorbGridGame({
       setGameEnded(true)
       setIsBlasting(false)
 
-      const completion = await completeResearchEncounter(encounter.id, success)
+      const completion = await completeGameActivity(encounter.id, success)
       const finalSuccess = success && completion.success
       setResult({
         success: finalSuccess,
@@ -211,7 +214,7 @@ export function VoltorbGridGame({
   ])
 
   const initGame = useCallback(async () => {
-    const start = await startResearchEncounter(encounter.id)
+    const start = await startGame(encounter.id)
     if (!start.success) {
       setResult({
         success: false,
@@ -880,10 +883,7 @@ export function VoltorbGridGame({
               <Button
                 size="lg"
                 onClick={async () => {
-                  const replay = await startResearchEncounter(
-                    encounter.id,
-                    true,
-                  )
+                  const replay = await startGame(encounter.id, true)
                   if (replay.success) {
                     window.location.reload()
                   } else {

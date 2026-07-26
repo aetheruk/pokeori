@@ -12,10 +12,10 @@ import { useUser } from '@/context/UserContext'
 import type { MiningConfig } from '@/data/games/mining/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import {
-  completeResearchEncounter,
-  startResearchEncounter,
-  submitResearchAnswer,
-} from '../actions'
+  completeGame,
+  startGame,
+  submitGameAnswer,
+} from '@/app/(frontend)/game/games/actions'
 
 interface MiningGameProps {
   encounter: MiningConfig
@@ -218,8 +218,8 @@ export function MiningGame({ encounter, initialState }: MiningGameProps) {
       if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current)
 
       try {
-        await submitResearchAnswer(success)
-        const res = await completeResearchEncounter(encounter.id, success, 0)
+        await submitGameAnswer(success)
+        const res = await completeGame(encounter.id, success, 0)
 
         const hasRewards =
           res.summary &&
@@ -244,7 +244,7 @@ export function MiningGame({ encounter, initialState }: MiningGameProps) {
   const initGame = useCallback(async () => {
     if (gameStarted) return
 
-    const result = await startResearchEncounter(encounter.id)
+    const result = await startGame(encounter.id)
     if (!result.success) {
       console.error('Failed to start encounter:', result.error)
       return
@@ -551,7 +551,7 @@ export function MiningGame({ encounter, initialState }: MiningGameProps) {
                 size="lg"
                 onClick={async () => {
                   try {
-                    const res = await startResearchEncounter(
+                    const res = await startGame(
                       (initialState?.encounter || encounter).id,
                       true,
                     )

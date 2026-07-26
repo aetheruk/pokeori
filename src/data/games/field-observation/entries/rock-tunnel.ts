@@ -30,7 +30,7 @@ const studySettings = {
 
 function echoMapWin(targetId: string) {
   return {
-    type: 'research_encounter_result' as const,
+    type: 'game_result' as const,
     targetId,
     battleStatus: 'win' as const,
     count: 1,
@@ -48,7 +48,7 @@ function totemDrop(targetId: string) {
 
 function studyWinRequirement(studyId: string, wins: number) {
   return {
-    type: 'research_encounter_result' as const,
+    type: 'field_research_result' as const,
     targetId: studyId,
     battleStatus: 'win' as const,
     count: wins,

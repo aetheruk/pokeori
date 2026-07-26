@@ -132,7 +132,7 @@ export const route10Tasks: Task[] = [
     completeButtonText: 'Check the Road',
     requirements: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'route-10-voltorb-landslide',
         battleStatus: 'win',
         count: 1,
@@ -421,7 +421,7 @@ export const route10Tasks: Task[] = [
     completeButtonText: 'Check the Breach',
     requirements: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'route-10-voltorb-final-breach',
         battleStatus: 'win',
         count: 1,

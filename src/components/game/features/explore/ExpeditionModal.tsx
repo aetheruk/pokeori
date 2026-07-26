@@ -88,7 +88,7 @@ function getActivityMeta(
     }
   }
 
-  if (activityType === 'research') {
+  if (activityType === 'game' || activityType === 'field-research') {
     const entry = allGames.find((game) => game.id === activityId)
     return {
       name: entry?.name,
@@ -114,7 +114,7 @@ function getFallbackTypeIcon(activityType?: string) {
     return <Swords className="w-4 h-4 text-game-clay" />
   if (activityType === 'location')
     return <MapIcon className="w-4 h-4 text-game-moss" />
-  if (activityType === 'research')
+  if (activityType === 'game' || activityType === 'field-research')
     return <HelpCircle className="w-4 h-4 text-game-ochre" />
   return <Flag className="w-4 h-4 text-game-ochre" />
 }
@@ -127,7 +127,8 @@ function formatBranchLabel(branchId?: string): string | null {
 function formatActivityLabel(activityType?: string): string {
   if (activityType === 'battle') return 'Battle'
   if (activityType === 'location') return 'Encounter'
-  if (activityType === 'research') return 'Mini Game'
+  if (activityType === 'game') return 'Mini Game'
+  if (activityType === 'field-research') return 'Field Research'
   if (activityType === 'task') return 'Task'
   return activityType || 'Activity'
 }

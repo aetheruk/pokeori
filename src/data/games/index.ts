@@ -183,6 +183,9 @@ export type GameType =
   | 'rock-tunnel-echo-map'
   | 'art-academy'
 
+export type FieldResearchGameType = Extract<GameType, 'field-observation'>
+export type MiniGameType = Exclude<GameType, FieldResearchGameType>
+
 // Unified settings type that covers all game settings
 export interface GameSettings {
   target?: number
@@ -379,6 +382,12 @@ export const allGames: GameItem[] = [
   ...artAcademyGames.map((g) => ({ ...g, gameType: 'art-academy' as const })),
 ]
 
-// Backward compatibility aliases
-export type ResearchConfig = GameItem
-export const research = allGames
+export const fieldResearchGames = allGames.filter(
+  (game): game is GameItem & { gameType: FieldResearchGameType } =>
+    game.gameType === 'field-observation',
+)
+
+export const miniGames = allGames.filter(
+  (game): game is GameItem & { gameType: MiniGameType } =>
+    game.gameType !== 'field-observation',
+)

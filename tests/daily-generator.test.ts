@@ -11,7 +11,8 @@ const userData = {
   completedTasks: tasks.map((task) => ({ taskId: task.id })),
   battleResults: [],
   locationEncounterResults: [],
-  researchEncounterResults: [],
+  gameResults: [],
+  fieldResearchResults: [],
 } as any
 
 function getDailyScripRewards(date: Date) {
@@ -32,9 +33,15 @@ describe('daily task generator', () => {
 
     expect(generated).toHaveLength(6)
     expect(generated.every((task) => task.dailyMetadata?.sourceHint)).toBe(true)
-    expect(generated.some((task) => task.criteria[0]?.type === 'daily_activity')).toBe(true)
-    expect(new Set(generated.map((task) => task.dailyMetadata?.signature)).size).toBe(6)
-    expect(generated.filter((task) => task.dailyMetadata?.isBonus)).toHaveLength(1)
+    expect(
+      generated.some((task) => task.criteria[0]?.type === 'daily_activity'),
+    ).toBe(true)
+    expect(
+      new Set(generated.map((task) => task.dailyMetadata?.signature)).size,
+    ).toBe(6)
+    expect(
+      generated.filter((task) => task.dailyMetadata?.isBonus),
+    ).toHaveLength(1)
   })
 
   test('never selects development Test content as a daily challenge source', () => {
@@ -43,7 +50,9 @@ describe('daily task generator', () => {
       random: () => 0.99,
     })
 
-    expect(generated.some((task) => task.dailyMetadata?.sourceHint.includes('Test'))).toBe(false)
+    expect(
+      generated.some((task) => task.dailyMetadata?.sourceHint.includes('Test')),
+    ).toBe(false)
     expect(generated.some((task) => task.name.includes('Test'))).toBe(false)
   })
 
@@ -51,7 +60,8 @@ describe('daily task generator', () => {
     const otherFamilies = [
       'catch',
       'battle',
-      'research',
+      'game',
+      'field-research',
       'fishing',
       'artisan',
       'shop',
@@ -60,14 +70,23 @@ describe('daily task generator', () => {
       'berry-delivery',
       'material-delivery',
     ].map((family) => ({
-      dailyMetadata: { family, signature: family, templateId: family, sourceHint: family },
+      dailyMetadata: {
+        family,
+        signature: family,
+        templateId: family,
+        sourceHint: family,
+      },
     })) as any
     const withoutDuplicate = generateDailyTasks(
       {
         ...userData,
         inventory: [{ itemId: 'card-crystalizer', quantity: 1 }],
       },
-      { date: new Date('2026-05-27T12:00:00'), random: () => 0.99, previousTasks: otherFamilies },
+      {
+        date: new Date('2026-05-27T12:00:00'),
+        random: () => 0.99,
+        previousTasks: otherFamilies,
+      },
     )
     const withDuplicate = generateDailyTasks(
       {
@@ -75,7 +94,11 @@ describe('daily task generator', () => {
         inventory: [{ itemId: 'card-crystalizer', quantity: 1 }],
         tcg: [{ cardId: 'base1-1', quantity: 4 }],
       },
-      { date: new Date('2026-05-27T12:00:00'), random: () => 0.99, previousTasks: otherFamilies },
+      {
+        date: new Date('2026-05-27T12:00:00'),
+        random: () => 0.99,
+        previousTasks: otherFamilies,
+      },
     )
 
     expect(
@@ -90,7 +113,7 @@ describe('daily task generator', () => {
     ).toBe(true)
   })
 
-  test('accepts yesterday\'s set as rotation input while retaining six distinct signatures', () => {
+  test("accepts yesterday's set as rotation input while retaining six distinct signatures", () => {
     const firstDay = generateDailyTasks(userData, {
       date: new Date('2026-05-27T12:00:00'),
       random: () => 0.25,
@@ -101,21 +124,31 @@ describe('daily task generator', () => {
       random: () => 0.25,
     })
     expect(secondDay).toHaveLength(6)
-    expect(new Set(secondDay.map((task) => task.dailyMetadata?.signature)).size).toBe(6)
+    expect(
+      new Set(secondDay.map((task) => task.dailyMetadata?.signature)).size,
+    ).toBe(6)
   })
 
   test('rewards five standard challenges and one fixed 25-scrip Daily Bonus', () => {
-    expect(getDailyScripRewards(new Date('2026-05-27T12:00:00')).sort((a, b) => (a || 0) - (b || 0))).toEqual([
-      5, 5, 5, 5, 5, 25,
-    ])
-    expect(getDailyScripRewards(new Date('2026-05-30T12:00:00')).sort((a, b) => (a || 0) - (b || 0))).toEqual([
-      5, 5, 5, 5, 5, 25,
-    ])
-    expect(getDailyScripRewards(new Date('2026-05-31T12:00:00')).sort((a, b) => (a || 0) - (b || 0))).toEqual([
-      5, 5, 5, 5, 5, 25,
-    ])
-    expect(getDailyScripRewards(new Date('2026-05-31T00:15:00.000Z')).sort((a, b) => (a || 0) - (b || 0))).toEqual([
-      5, 5, 5, 5, 5, 25,
-    ])
+    expect(
+      getDailyScripRewards(new Date('2026-05-27T12:00:00')).sort(
+        (a, b) => (a || 0) - (b || 0),
+      ),
+    ).toEqual([5, 5, 5, 5, 5, 25])
+    expect(
+      getDailyScripRewards(new Date('2026-05-30T12:00:00')).sort(
+        (a, b) => (a || 0) - (b || 0),
+      ),
+    ).toEqual([5, 5, 5, 5, 5, 25])
+    expect(
+      getDailyScripRewards(new Date('2026-05-31T12:00:00')).sort(
+        (a, b) => (a || 0) - (b || 0),
+      ),
+    ).toEqual([5, 5, 5, 5, 5, 25])
+    expect(
+      getDailyScripRewards(new Date('2026-05-31T00:15:00.000Z')).sort(
+        (a, b) => (a || 0) - (b || 0),
+      ),
+    ).toEqual([5, 5, 5, 5, 5, 25])
   })
 })

@@ -6,6 +6,7 @@ import {
   Gamepad2,
   Layers,
   Map as MapIcon,
+  Microscope,
   Sparkles,
   Swords,
   Trophy,
@@ -16,7 +17,7 @@ import { ItemSprite } from '@/components/ui/item-sprite'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
 import { battles } from '@/data/battles'
-import { allGames } from '@/data/games'
+import { fieldResearchGames, miniGames } from '@/data/games'
 import { locations } from '@/data/locations'
 import pokemonData from '@/data/pokemon-data'
 import { usePokedex } from '@/hooks/usePokedex'
@@ -51,7 +52,10 @@ const battleNames = new Map(battles.map((battle) => [battle.id, battle.name]))
 const locationNames = new Map(
   locations.map((location) => [location.id, location.name]),
 )
-const researchNames = new Map(allGames.map((game) => [game.id, game.name]))
+const gameNames = new Map(miniGames.map((game) => [game.id, game.name]))
+const fieldResearchNames = new Map(
+  fieldResearchGames.map((study) => [study.id, study.name]),
+)
 
 export function TrainerCollection() {
   const { user, gameData } = useUser()
@@ -336,8 +340,13 @@ export function TrainerCollection() {
               />
               <StatusRow
                 icon={Gamepad2}
-                label="Research runs"
-                value={user ? `${playerStats.totalResearch}` : '...'}
+                label="Mini-game runs"
+                value={user ? `${playerStats.totalGames}` : '...'}
+              />
+              <StatusRow
+                icon={Microscope}
+                label="Field Research studies"
+                value={user ? `${playerStats.totalFieldResearch}` : '...'}
               />
             </div>
 
@@ -537,7 +546,8 @@ function getPlayerStats(
     | {
         battleResults?: Array<Record<string, any>>
         locationEncounterResults?: Array<Record<string, any>>
-        researchEncounterResults?: Array<Record<string, any>>
+        gameResults?: Array<Record<string, any>>
+        fieldResearchResults?: Array<Record<string, any>>
       }
     | null
     | undefined,
@@ -550,22 +560,26 @@ function getPlayerStats(
     gameData?.locationEncounterResults,
     'locationId',
   )
-  const researchStats = activityResultsToStatsMap(
-    gameData?.researchEncounterResults,
-    'encounterId',
+  const gameStats = activityResultsToStatsMap(gameData?.gameResults, 'gameId')
+  const fieldResearchStats = activityResultsToStatsMap(
+    gameData?.fieldResearchResults,
+    'fieldResearchId',
   )
 
   const totalBattles = getTotalPlays(battleStats)
   const totalLocations = getTotalPlays(locationStats)
-  const totalResearch = getTotalPlays(researchStats)
+  const totalGames = getTotalPlays(gameStats)
+  const totalFieldResearch = getTotalPlays(fieldResearchStats)
 
   return {
     battleStats,
     locationStats,
-    researchStats,
+    gameStats,
+    fieldResearchStats,
     totalBattles,
     totalLocations,
-    totalResearch,
+    totalGames,
+    totalFieldResearch,
   }
 }
 
@@ -608,7 +622,8 @@ function getPlayCount(stat: PlayStat) {
 function getFavoriteMode(stats: ReturnType<typeof getPlayerStats>) {
   const modes = [
     { label: 'Battles', plays: stats.totalBattles },
-    { label: 'Research', plays: stats.totalResearch },
+    { label: 'Mini Games', plays: stats.totalGames },
+    { label: 'Field Research', plays: stats.totalFieldResearch },
     { label: 'Wild encounters', plays: stats.totalLocations },
   ].sort((a, b) => b.plays - a.plays)
 
@@ -620,7 +635,12 @@ function getFavoriteContent(stats: ReturnType<typeof getPlayerStats>) {
   const entries = [
     ...getContentPlayEntries(stats.battleStats, battleNames, 'Battle'),
     ...getContentPlayEntries(stats.locationStats, locationNames, 'Encounter'),
-    ...getContentPlayEntries(stats.researchStats, researchNames, 'Research'),
+    ...getContentPlayEntries(stats.gameStats, gameNames, 'Mini Game'),
+    ...getContentPlayEntries(
+      stats.fieldResearchStats,
+      fieldResearchNames,
+      'Field Research',
+    ),
   ].sort((a, b) => b.plays - a.plays)
 
   if (!entries[0] || entries[0].plays <= 0) return 'No favourite yet'

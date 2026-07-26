@@ -3,10 +3,22 @@
 23+ mini-games available in Pokeori.
 
 ## Locations
-- Routes: `/game/games/*`
+- Mini Game routes: `/game/games/[gameType]`
+- Field Research route: `/game/field-research`
 - Components: `src/components/game/` (various)
 - Data: `src/data/games/`
 - Utilities: `src/utilities/games/`
+
+Mini Games and Field Research are separate runtime domains. Every activity
+except `field-observation` uses the `game` domain, a `game:{userId}` Redis
+session, and `game` activity-stat rows. Field Observation alone uses the
+`field-research` domain, a `field-research:{userId}` session, and
+`field-research` activity-stat rows. A player can therefore keep one active
+Mini Game and one active Field Research study at the same time.
+
+Legacy `/game/research` and `/game/research/encounter` links resolve the
+player's old active session and redirect to its canonical route. Legacy
+`research:{userId}` sessions migrate lazily on first read.
 
 ## Available Games
 | Game | Route | Description |
@@ -21,7 +33,7 @@
 | Mining | `src/data/games/mining` | Mine for items |
 | Spelling | `src/data/games/spelling` | Spell Pokemon names |
 | Fishing | `src/data/games/fishing` | Catch Pokemon while fishing |
-| Field Observation | `src/data/games/field-observation` | Watch a timed research frame with route and global random spawns, then answer a server-generated observation question |
+| Field Observation | `/game/field-research` | Watch a timed research frame with route and global random spawns, then answer a server-generated observation question |
 | TCG Battle | `src/data/games/tcg-battle` | Server-resolved card battles using saved 15-card TCG decks |
 | Run | `src/data/games/run` | Endless runner |
 | Rock Push | `src/data/games/rock-push` | Puzzle game |
@@ -49,7 +61,7 @@
 - After a Pokemon result is rolled, Old Rod hooks have a hidden 1:512 chance to replace that Pokemon with Relicanth and Good Rod hooks have a hidden 1:512 chance to replace that Pokemon with Feebas. These secret replacements are runtime-only and do not appear in Explore fishing previews.
 - Fishing item hooks grant the item immediately and return the player to the fishing screen. Pokemon hooks still start the catch encounter.
 - Day/night Pokemon filters use the fishing entry's authored category timezone, matching Explore region time.
-- Fishing sessions inherit the research entry's weather snapshot; Pokemon hooks pass that weather into the reused location-style catch state.
+- Fishing sessions inherit the Mini Game entry's weather snapshot; Pokemon hooks pass that weather into the reused location-style catch state.
 - The fishing play screen is portrait-first and scene-led. Entries can author `settings.scene` with a portrait background, optional landscape background, water style, and waterline; the client adds time-of-day tinting plus subtle water shimmer/ripple overlays.
 - Generic item drops use the global Old, Good, and Super Rod pools in `src/data/games/fishing/item-pools.ts`.
 - Location `items.entries` are reserved for quest or location-specific override drops.
@@ -89,7 +101,7 @@
 - Field Observation Researching XP uses `20 + 2 * (contentLevel - 1)` with the Researcher 1.45 modifier. Content level is the rounded average level of reward subjects, or the midpoint of `settings.levelRange` when no subjects exist. Reward subjects also average their Pokemon base-experience modifiers around baseline 160, capped to a 15% decrease or increase. Gathered items add +2.5% XP each, capped at +25%. Difficulty does not affect XP. Failed reports grant 40% Researching XP only if the player submitted a guess and use the same base-experience and gathered-item modifiers. Failed reports still award tapped active drops unless a 30% loss roll triggers the gathered-items failure message.
 - Active companion abilities can modify Field Observation through the shared data-driven ability effect system. Current supported research-facing hooks cover observation/answer timer deltas, generated Researching XP multipliers, Pokemon Research XP multipliers, extra active item drops, and protection against losing gathered drops on failed reports.
 - Each observed reward subject gains Pokemon Research XP: base 1 at Researcher 1, 2 at Researcher 18, 3 at Researcher 50, 4 at Researcher 70, and 5 at Researcher 100, with a 20% per-subject chance to gain +1 above the base tier.
-- Successful research games grant the active partner Pokemon 3 Pokemon Research XP.
+- Successful Mini Games and Field Research studies grant the active partner Pokemon 3 Pokemon Research XP where the activity supports that reward.
 
 ## Pachinko
 - Pachinko is a physics-result cost/reward game. Matter.js resolves whether the ball lands in an authored bucket or misses, while server actions own currency deduction, reward granting, stats, session totals, rate limits, locks, and duplicate drop protection.

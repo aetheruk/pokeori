@@ -23,7 +23,9 @@ const flashCriteria = [
 
 function studyWins(targetId: string, count: number) {
   return {
-    type: 'research_encounter_result' as const,
+    type: targetId.endsWith('-field-observation')
+      ? ('field_research_result' as const)
+      : ('game_result' as const),
     targetId,
     battleStatus: 'win' as const,
     count,
@@ -832,7 +834,7 @@ export const rockTunnelTasks: Task[] = [
     completeButtonText: 'Place Totems',
     requirements: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'rock-tunnel-echo-map-hidden-chamber',
         battleStatus: 'win',
         count: 1,

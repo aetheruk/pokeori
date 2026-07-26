@@ -1,7 +1,10 @@
 import { items } from '@/data/items'
 import { tasks } from '@/data/tasks'
 import type { FishingItemEntry } from '@/data/games/fishing/types'
-import { checkRequirement, type RequirementData } from '@/utilities/requirements'
+import {
+  checkRequirement,
+  type RequirementData,
+} from '@/utilities/requirements'
 import type { ExploreDisplayItem, ExploreItem } from './types'
 
 type RewardLike = {
@@ -21,9 +24,8 @@ function isLocationMode(item: ExploreItem) {
   return (
     item.type === 'location' ||
     (item.type === 'battle' && (item.originalData as any).isWildBattle) ||
-    (item.type === 'research' &&
-      ((item.originalData as any).gameType === 'fishing' ||
-        (item.originalData as any).gameType === 'field-observation'))
+    item.type === 'field-research' ||
+    (item.type === 'game' && (item.originalData as any).gameType === 'fishing')
   )
 }
 
@@ -40,7 +42,10 @@ function getFormId(entry: any) {
   return null
 }
 
-function getPokemonTarget(entry: any, requiresCaught: boolean): PokemonTarget | null {
+function getPokemonTarget(
+  entry: any,
+  requiresCaught: boolean,
+): PokemonTarget | null {
   const formId = getFormId(entry)
   if (!formId) return null
   return {
@@ -124,7 +129,7 @@ function addPokemonFormIds(
     return
   }
 
-  if (item.type === 'research' && data.gameType === 'field-observation') {
+  if (item.type === 'field-research') {
     for (const entry of data.settings?.pokemonPool || []) {
       if (!areRequirementsMet(entry.requirements, item, userData)) continue
       addPokemonTarget(pokemonTargets, getPokemonTarget(entry, false))
@@ -132,10 +137,11 @@ function addPokemonFormIds(
     return
   }
 
-  if (item.type === 'research' && data.gameType === 'fishing') {
+  if (item.type === 'game' && data.gameType === 'fishing') {
     for (const rodConfig of Object.values(data.settings?.rods || {}) as any[]) {
       for (const encounter of rodConfig?.encounters?.entries || []) {
-        if (!areRequirementsMet(encounter.requirements, item, userData)) continue
+        if (!areRequirementsMet(encounter.requirements, item, userData))
+          continue
         addPokemonTarget(pokemonTargets, getPokemonTarget(encounter, true))
       }
     }
@@ -150,7 +156,7 @@ function getCollectibleRewards(item: ExploreItem): RewardLike[] {
   const data = item.originalData as any
   const rewards: RewardLike[] = [...(data.rewards || [])]
 
-  if (item.type === 'research' && data.gameType === 'field-observation') {
+  if (item.type === 'field-research') {
     for (const drop of data.settings?.itemDrops || []) {
       rewards.push({
         type: 'item',
@@ -160,7 +166,7 @@ function getCollectibleRewards(item: ExploreItem): RewardLike[] {
     }
   }
 
-  if (item.type === 'research' && data.gameType === 'fishing') {
+  if (item.type === 'game' && data.gameType === 'fishing') {
     for (const rodConfig of Object.values(data.settings?.rods || {})) {
       for (const entry of getAuthoredFishingItemRewards(rodConfig)) {
         rewards.push({
@@ -198,15 +204,21 @@ function hasRewardLeftToClaim(
   }
 
   if (reward.type === 'banner') {
-    return !((userData.user as any).unlockedBanners || []).includes(reward.targetId)
+    return !((userData.user as any).unlockedBanners || []).includes(
+      reward.targetId,
+    )
   }
 
   if (reward.type === 'icon') {
-    return !((userData.user as any).unlockedIcons || []).includes(reward.targetId)
+    return !((userData.user as any).unlockedIcons || []).includes(
+      reward.targetId,
+    )
   }
 
   if (reward.type === 'title') {
-    return !((userData.user as any).unlockedTitles || []).includes(reward.targetId)
+    return !((userData.user as any).unlockedTitles || []).includes(
+      reward.targetId,
+    )
   }
 
   if (reward.type === 'pokemon') {
@@ -257,9 +269,14 @@ export function isLocationEntryMastered(
     const pokedexEntry = getPokedexEntry(userData, target)
     const researchLevel = pokedexEntry?.researchLevel || 0
     const isCaught =
-      !!pokedexEntry?.caught || Number((pokedexEntry as any)?.totalCaught || 0) > 0
+      !!pokedexEntry?.caught ||
+      Number((pokedexEntry as any)?.totalCaught || 0) > 0
 
-    if (!pokedexEntry || researchLevel < 1 || (target.requiresCaught && !isCaught)) {
+    if (
+      !pokedexEntry ||
+      researchLevel < 1 ||
+      (target.requiresCaught && !isCaught)
+    ) {
       return false
     }
   }

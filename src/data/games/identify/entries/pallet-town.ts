@@ -33,7 +33,7 @@ export const palletTownidentifyEntries: IdentifyConfig[] = [
     background: '/backgrounds/lab.avif',
     requirements: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         targetId: 'tutorial-identify',
         count: 1,
         inverse: true,
@@ -122,7 +122,7 @@ export const palletTownidentifyEntries: IdentifyConfig[] = [
     background: '/backgrounds/lab.avif',
     requirements: [
       {
-        type: 'research_encounter_result',
+        type: 'game_result',
         battleStatus: 'win',
         targetId: 'first-research-job',
         count: 10,
