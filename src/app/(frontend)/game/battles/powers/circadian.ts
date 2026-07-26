@@ -15,7 +15,10 @@ import {
   getSkillLevel,
   validateBattlePowerSkillRequirement,
 } from '@/utilities/skills/unlocks'
-import { applyPokemonResearchEndure } from '@/utilities/battle/research-survival'
+import {
+  applyPokemonResearchEndure,
+  canApplyPokemonResearchEndure,
+} from '@/utilities/battle/research-survival'
 import { getUserInventoryMap } from '@/utilities/user-state'
 import { runBattleActionWithGuard } from '../helpers/action-guard'
 
@@ -129,17 +132,27 @@ export async function useCircadian(
       playerMoveName = "Dawn's Blessing"
       playerStance = 'power'
       log = `${playerMon.name} used ${playerMoveName}!`
-      const { applied } = applyStatus(playerMon, 'veil', state.weather?.weather, {
-        terrain: state.terrain?.terrain,
-      })
+      const { applied } = applyStatus(
+        playerMon,
+        'veil',
+        state.weather?.weather,
+        {
+          terrain: state.terrain?.terrain,
+        },
+      )
       if (applied) log += ` It became veiled!`
     } else if (phase === 'day') {
       playerMoveName = 'Blinding Sun'
       playerStance = 'tech'
       log = `${playerMon.name} unleashed ${playerMoveName}!`
-      const { applied } = applyStatus(enemyMon, 'burn', state.weather?.weather, {
-        terrain: state.terrain?.terrain,
-      })
+      const { applied } = applyStatus(
+        enemyMon,
+        'burn',
+        state.weather?.weather,
+        {
+          terrain: state.terrain?.terrain,
+        },
+      )
       if (applied) log += ` ${enemyMon.name} was burned!`
     } else if (phase === 'dusk') {
       playerMoveName = 'Dusk Shadow'
@@ -187,12 +200,12 @@ export async function useCircadian(
         1.5,
         undefined,
         undefined,
-	        undefined,
-	        undefined,
-	        state.weather?.weather,
-	        undefined,
-	        { currentTurn: state.turn },
-	      )
+        undefined,
+        undefined,
+        state.weather?.weather,
+        undefined,
+        { currentTurn: state.turn },
+      )
       playerDamage = dmgResult.damage
       playerAttackTypeForLog = dmgResult.usedType
 
@@ -239,12 +252,12 @@ export async function useCircadian(
       enemyMultiplier,
       undefined,
       undefined,
-	      undefined,
-	      undefined,
-	      state.weather?.weather,
-	      undefined,
-	      { currentTurn: state.turn },
-	    )
+      undefined,
+      undefined,
+      state.weather?.weather,
+      undefined,
+      { currentTurn: state.turn },
+    )
     let enemyDamage = enemyDmgResult.damage
 
     // Player shield check
@@ -267,8 +280,18 @@ export async function useCircadian(
     }
 
     // Apply damage
-    const playerEndure = applyPokemonResearchEndure(enemyMon, playerDamage)
-    const enemyEndure = applyPokemonResearchEndure(playerMon, enemyDamage)
+    const playerEndure = applyPokemonResearchEndure(
+      enemyMon,
+      playerDamage,
+      Math.random,
+      canApplyPokemonResearchEndure(state, 'enemy'),
+    )
+    const enemyEndure = applyPokemonResearchEndure(
+      playerMon,
+      enemyDamage,
+      Math.random,
+      canApplyPokemonResearchEndure(state, 'player'),
+    )
     playerDamage = playerEndure.damage
     enemyDamage = enemyEndure.damage
     enemyMon.currentHp = Math.max(0, enemyMon.currentHp - playerDamage)

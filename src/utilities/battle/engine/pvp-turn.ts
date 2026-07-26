@@ -34,7 +34,10 @@ import {
   applyHeldItemChargeOnHit,
   applyHeldItemIfTriggered,
 } from '@/utilities/battle/held-items'
-import { applyPokemonResearchEndure } from '@/utilities/battle/research-survival'
+import {
+  applyPokemonResearchEndure,
+  canApplyPokemonResearchEndure,
+} from '@/utilities/battle/research-survival'
 import {
   advanceBattleTypeChangeDuration,
   advanceTeraDuration,
@@ -321,7 +324,8 @@ export function resolvePvpSwap(params: {
   if (Number.isNaN(newIndex) || !team[newIndex])
     return { swapped: false, name: '', messages: [] }
 
-  const oldIndex = side === 'player' ? state.activePlayerIndex : state.activeEnemyIndex
+  const oldIndex =
+    side === 'player' ? state.activePlayerIndex : state.activeEnemyIndex
   const oldMon = team[oldIndex]
   if (
     move.attackType.startsWith('swap:') &&
@@ -381,7 +385,8 @@ export function resolvePvpSwap(params: {
 
     const otherTeam = side === 'player' ? state.enemyTeam : state.playerTeam
     const chaosOpposingMon = otherTeam[opposingIndex]
-    if (chaosOpposingMon) chaosOpposingMon.stats = calculateStats(chaosOpposingMon)
+    if (chaosOpposingMon)
+      chaosOpposingMon.stats = calculateStats(chaosOpposingMon)
   }
 
   clearSourceLinkedTrapSecondaryStatuses({
@@ -457,22 +462,28 @@ export function resolvePvpCombat(params: {
   const specialMove = move.specialMoveId
     ? getMove(move.specialMoveId)
     : undefined
-  const hiddenPower = specialMove?.id === 'hidden-power' ? resolveHiddenPower(attacker) : undefined
+  const hiddenPower =
+    specialMove?.id === 'hidden-power'
+      ? resolveHiddenPower(attacker)
+      : undefined
   const beforeMoveStatus = resolveBeforeMoveStatus(attacker)
   const beforeMoveAbility = beforeMoveStatus.canMove
     ? resolveBattleAbilityBeforeMove(attacker, currentTurn)
     : { canMove: true, message: '' }
   const beforeMoveSecondaryStatus =
     beforeMoveStatus.canMove && beforeMoveAbility.canMove
-    ? processBeforeMoveSecondaryStatuses({
-        state,
-        pokemon: attacker,
-        side: attackerSide,
-        move: specialMove,
-        attackType: hiddenPower?.attackType || move.attackType || specialMove?.forcedType,
-        random: chanceRandom,
-      })
-    : { canMove: true, message: '' }
+      ? processBeforeMoveSecondaryStatuses({
+          state,
+          pokemon: attacker,
+          side: attackerSide,
+          move: specialMove,
+          attackType:
+            hiddenPower?.attackType ||
+            move.attackType ||
+            specialMove?.forcedType,
+          random: chanceRandom,
+        })
+      : { canMove: true, message: '' }
   const beforeMoveCheck = !beforeMoveStatus.canMove
     ? beforeMoveStatus
     : !beforeMoveAbility.canMove
@@ -495,7 +506,8 @@ export function resolvePvpCombat(params: {
     move: specialMove,
     attacker,
     defender,
-    attackType: hiddenPower?.attackType || move.attackType || specialMove?.forcedType,
+    attackType:
+      hiddenPower?.attackType || move.attackType || specialMove?.forcedType,
     terrain: state?.terrain?.terrain,
     random: chanceRandom,
   })
@@ -521,7 +533,8 @@ export function resolvePvpCombat(params: {
         defender,
       })
     : undefined
-  let moveFailed = Boolean(battleConditionFailed) || contest.failMove || moveFailedFromStance
+  let moveFailed =
+    Boolean(battleConditionFailed) || contest.failMove || moveFailedFromStance
   const accuracy = specialMove
     ? getEffectiveMoveAccuracy({
         move: specialMove,
@@ -583,7 +596,12 @@ export function resolvePvpCombat(params: {
           getEffectiveBattleTypes(defender),
           chanceRandom,
           weather,
-          { forceMaxDamageRange: usesBattleAbilityMaxMultiHitDamage(attacker, specialMove) },
+          {
+            forceMaxDamageRange: usesBattleAbilityMaxMultiHitDamage(
+              attacker,
+              specialMove,
+            ),
+          },
         )
       : undefined
   const movePower = specialMove
@@ -611,7 +629,9 @@ export function resolvePvpCombat(params: {
   const recoilMoveDamageMultiplier = specialMove
     ? getBattleAbilityRecoilMoveDamageMultiplier(attacker, specialMove)
     : 1
-  const entryMessages = state ? processBattleAbilityEntryCopiesForState(state) : []
+  const entryMessages = state
+    ? processBattleAbilityEntryCopiesForState(state)
+    : []
   const weatherTypeMessages = state
     ? processBattleAbilityWeatherTypeChangesForState(state)
     : []
@@ -624,7 +644,10 @@ export function resolvePvpCombat(params: {
         addedEffectMoveDamageMultiplier *
         movePower,
   })
-  const beforeAttackFormChanged = applyBattleFormChange(attacker, beforeAttack.formId)
+  const beforeAttackFormChanged = applyBattleFormChange(
+    attacker,
+    beforeAttack.formId,
+  )
   const beforeAttackTypeMessages = applyBattleAbilityBeforeAttackTypeChange({
     pokemon: attacker,
     attackType: hiddenPower?.attackType || move.attackType,
@@ -636,7 +659,10 @@ export function resolvePvpCombat(params: {
         movePower,
   })
   const damageResult =
-    moveFailed || (specialMove?.damage === 0 && !specialMove?.damageRule && !specialMove?.delayedDamage)
+    moveFailed ||
+    (specialMove?.damage === 0 &&
+      !specialMove?.damageRule &&
+      !specialMove?.delayedDamage)
       ? {
           damage: 0,
           typeEffectiveness: 1,
@@ -659,7 +685,9 @@ export function resolvePvpCombat(params: {
           attacker,
           defender,
           moveStance,
-          multiplier * recoilMoveDamageMultiplier * addedEffectMoveDamageMultiplier,
+          multiplier *
+            recoilMoveDamageMultiplier *
+            addedEffectMoveDamageMultiplier,
           hiddenPower?.attackType || move.attackType,
           movePower,
           typeEffectivenessOverride,
@@ -670,30 +698,31 @@ export function resolvePvpCombat(params: {
             defender,
             defenderSide,
           }),
-      {
-        ignoreDefenderStatStages: specialMove?.ignoreDefenderStatStages,
-        damageStatSource: specialMove?.damageStatSource,
-        moveId: specialMove?.id,
-        currentTurn,
-        terrain: state?.terrain?.terrain,
-      },
-    )
+          {
+            ignoreDefenderStatStages: specialMove?.ignoreDefenderStatStages,
+            damageStatSource: specialMove?.damageStatSource,
+            moveId: specialMove?.id,
+            currentTurn,
+            terrain: state?.terrain?.terrain,
+          },
+        )
 
-  const damageRule = !moveFailed && specialMove?.damageRule
-    ? resolveDamageRuleDamage({
-        rule: specialMove.damageRule,
-        attacker,
-        defender,
-        state,
-        side: attackerSide,
-        attackerTeam: state
-          ? attackerSide === 'player'
-            ? state.playerTeam
-            : state.enemyTeam
-          : undefined,
-        applyAverage: true,
-      })
-    : {}
+  const damageRule =
+    !moveFailed && specialMove?.damageRule
+      ? resolveDamageRuleDamage({
+          rule: specialMove.damageRule,
+          attacker,
+          defender,
+          state,
+          side: attackerSide,
+          attackerTeam: state
+            ? attackerSide === 'player'
+              ? state.playerTeam
+              : state.enemyTeam
+            : undefined,
+          applyAverage: true,
+        })
+      : {}
   if (damageRule.failed) {
     moveFailed = true
     if (specialMove && state) {
@@ -727,7 +756,8 @@ export function resolvePvpCombat(params: {
     defenderSide,
     damage: damageRule.failed
       ? 0
-      : damageRule.damage ?? Math.floor(
+      : (damageRule.damage ??
+        Math.floor(
           damageResult.damage *
             (specialMove
               ? getConditionalDamageMultiplier({
@@ -740,16 +770,17 @@ export function resolvePvpCombat(params: {
                   weather,
                 })
               : 1),
-        ),
+        )),
     attackStance: moveStance,
     attackType: damageResult.usedType,
   })
   const nextDamage = applyNextDamageModifier(attacker, reductionResult.damage)
-  const typeImmunityBypassAttackTypes = getSecondaryStatusTypeImmunityBypassAttackTypes({
-    state,
-    defender,
-    defenderSide,
-  })
+  const typeImmunityBypassAttackTypes =
+    getSecondaryStatusTypeImmunityBypassAttackTypes({
+      state,
+      defender,
+      defenderSide,
+    })
   const delayedAbilityResult = specialMove?.delayedDamage
     ? applyBattleAbilityDamageModifiers({
         attacker,
@@ -811,7 +842,10 @@ export function resolvePvpCombat(params: {
     repeatedHitResult.firstHitDamage > 0 &&
     defender.currentHp > 0
   ) {
-    const extraBaseDamage = Math.max(1, Math.floor(nextDamage.damage * extraHitMultiplier))
+    const extraBaseDamage = Math.max(
+      1,
+      Math.floor(nextDamage.damage * extraHitMultiplier),
+    )
     const extraAbilityResult = applyBattleAbilityDamageModifiers({
       attacker,
       defender,
@@ -819,11 +853,12 @@ export function resolvePvpCombat(params: {
       attackStance: moveStance,
       attackType: damageResult.usedType,
       typeEffectiveness: damageResult.typeEffectiveness,
-      typeImmunityBypassAttackTypes: getSecondaryStatusTypeImmunityBypassAttackTypes({
-        state,
-        defender,
-        defenderSide,
-      }),
+      typeImmunityBypassAttackTypes:
+        getSecondaryStatusTypeImmunityBypassAttackTypes({
+          state,
+          defender,
+          defenderSide,
+        }),
     })
     if (extraAbilityResult.messages.length) {
       extraHitMessages.push(...extraAbilityResult.messages)
@@ -834,20 +869,27 @@ export function resolvePvpCombat(params: {
       extraAbilityResult.damage,
       random,
     )
-    if (extraBlockResult.message) extraHitMessages.push(extraBlockResult.message)
+    if (extraBlockResult.message)
+      extraHitMessages.push(extraBlockResult.message)
     const extraEndureResult = applyPokemonResearchEndure(
       defender,
       extraBlockResult.damage,
+      random,
+      canApplyPokemonResearchEndure(state, defenderSide),
     )
     const extraPreviousHp = defender.currentHp
-    defender.currentHp = Math.max(0, defender.currentHp - extraEndureResult.damage)
+    defender.currentHp = Math.max(
+      0,
+      defender.currentHp - extraEndureResult.damage,
+    )
     if (extraEndureResult.damage > 0) {
       totalDamage += extraEndureResult.damage
       extraHitMessages.push(
         `${attacker.name}'s Parental Bond struck again! [icon:damage:${extraEndureResult.damage}]`,
       )
     }
-    if (extraEndureResult.message) extraHitMessages.push(extraEndureResult.message)
+    if (extraEndureResult.message)
+      extraHitMessages.push(extraEndureResult.message)
     extraHitMessages.push(
       ...applyBattleAbilityOnDamagedStatStages({
         defender,
@@ -875,7 +917,10 @@ export function resolvePvpCombat(params: {
       })
     : { switched: false, messages: [] }
   const defenderHpForm = getBattleAbilityHpThresholdFormChange(defender)
-  const defenderHpFormChanged = applyBattleFormChange(defender, defenderHpForm.formId)
+  const defenderHpFormChanged = applyBattleFormChange(
+    defender,
+    defenderHpForm.formId,
+  )
   const attackerKoForm =
     defender.currentHp <= 0 && totalDamage > 0
       ? getBattleAbilityAfterKoFormChange(attacker)
@@ -884,7 +929,10 @@ export function resolvePvpCombat(params: {
     defender.currentHp <= 0 && totalDamage > 0
       ? applyBattleAbilityAfterKoStatStages(attacker)
       : []
-  const attackerKoFormChanged = applyBattleFormChange(attacker, attackerKoForm.formId)
+  const attackerKoFormChanged = applyBattleFormChange(
+    attacker,
+    attackerKoForm.formId,
+  )
   recordBattleDamage({
     state,
     sourceSide: attackerSide,
@@ -977,7 +1025,12 @@ export function resolvePvpCombat(params: {
   }
   const heldStatusResult =
     defender.currentHp > 0
-      ? attemptHeldAttackStatus(attacker, defender, damageResult.usedType, random)
+      ? attemptHeldAttackStatus(
+          attacker,
+          defender,
+          damageResult.usedType,
+          random,
+        )
       : { applied: false, message: '' }
   if (heldStatusResult.applied) {
     effectMessage += ` ${heldStatusResult.message}`
@@ -1025,7 +1078,8 @@ export function resolvePvpCombat(params: {
       }
 
       const target = (buff.target ?? 'self') === 'self' ? attacker : defender
-      const targetSide = (buff.target ?? 'self') === 'self' ? attackerSide : defenderSide
+      const targetSide =
+        (buff.target ?? 'self') === 'self' ? attackerSide : defenderSide
       const opposingPokemon = target === attacker ? defender : attacker
       const opposingSide = target === attacker ? defenderSide : attackerSide
       if (buff.stages < 0) {
@@ -1103,7 +1157,8 @@ export function resolvePvpCombat(params: {
           damageDealt: totalDamage,
         })
       : undefined
-  if (secondaryEffectBlockMessage) effectMessage += ` ${secondaryEffectBlockMessage}`
+  if (secondaryEffectBlockMessage)
+    effectMessage += ` ${secondaryEffectBlockMessage}`
   const skipTargetAddedEffects = Boolean(
     secondaryEffectBlockMessage || suppressesAddedEffects,
   )
@@ -1119,9 +1174,11 @@ export function resolvePvpCombat(params: {
         continue
       }
 
-      const target = (debuff.target ?? 'enemy') === 'enemy' ? defender : attacker
+      const target =
+        (debuff.target ?? 'enemy') === 'enemy' ? defender : attacker
       if (skipTargetAddedEffects && target === defender) continue
-      const targetSide = (debuff.target ?? 'enemy') === 'enemy' ? defenderSide : attackerSide
+      const targetSide =
+        (debuff.target ?? 'enemy') === 'enemy' ? defenderSide : attackerSide
       const opposingPokemon = target === attacker ? defender : attacker
       const opposingSide = target === attacker ? defenderSide : attackerSide
       if (debuff.stages < 0) {
@@ -1210,12 +1267,11 @@ export function resolvePvpCombat(params: {
         )
     ) {
       const statusTarget =
-        specialMove.status.target ??
-        specialMove.target ??
-        'enemy'
+        specialMove.status.target ?? specialMove.target ?? 'enemy'
       const statusTargetPokemon = statusTarget === 'self' ? attacker : defender
       if (!skipTargetAddedEffects || statusTargetPokemon !== defender) {
-        const statusTargetSide = statusTarget === 'self' ? attackerSide : defenderSide
+        const statusTargetSide =
+          statusTarget === 'self' ? attackerSide : defenderSide
         const prevention = getSecondaryStatusStatusPreventionMessage({
           state,
           pokemon: statusTargetPokemon,
@@ -1224,16 +1280,11 @@ export function resolvePvpCombat(params: {
         })
         const statusResult = prevention
           ? { applied: false, message: prevention }
-          : applyStatus(
-              statusTargetPokemon,
-              specialMove.status.id,
-              weather,
-              {
-                force: specialMove.status.forceStatus,
-                terrain: state?.terrain?.terrain,
-                sourcePokemon: attacker,
-              },
-            )
+          : applyStatus(statusTargetPokemon, specialMove.status.id, weather, {
+              force: specialMove.status.forceStatus,
+              terrain: state?.terrain?.terrain,
+              sourcePokemon: attacker,
+            })
         if (statusResult.message) {
           effectMessage += ` ${statusResult.message}`
         }
@@ -1266,13 +1317,19 @@ export function resolvePvpCombat(params: {
       if (
         Math.random() * 100 < accuracy &&
         Math.random() * 100 <
-          getBattleAbilitySecondaryEffectChance(attacker, specialMove, status.chance)
+          getBattleAbilitySecondaryEffectChance(
+            attacker,
+            specialMove,
+            status.chance,
+          )
       ) {
         const statusTarget =
           status.target ?? (specialMove.target === 'self' ? 'self' : 'enemy')
-        const statusTargetPokemon = statusTarget === 'self' ? attacker : defender
+        const statusTargetPokemon =
+          statusTarget === 'self' ? attacker : defender
         if (skipTargetAddedEffects && statusTargetPokemon === defender) continue
-        const statusTargetSide = statusTarget === 'self' ? attackerSide : defenderSide
+        const statusTargetSide =
+          statusTarget === 'self' ? attackerSide : defenderSide
         const prevention = getSecondaryStatusStatusPreventionMessage({
           state,
           pokemon: statusTargetPokemon,
@@ -1281,15 +1338,10 @@ export function resolvePvpCombat(params: {
         })
         const statusResult = prevention
           ? { applied: false, message: prevention }
-          : applyStatus(
-              statusTargetPokemon,
-              status.id,
-              weather,
-              {
-                terrain: state?.terrain?.terrain,
-                sourcePokemon: attacker,
-              },
-            )
+          : applyStatus(statusTargetPokemon, status.id, weather, {
+              terrain: state?.terrain?.terrain,
+              sourcePokemon: attacker,
+            })
         if (statusResult.message) {
           effectMessage += ` ${statusResult.message}`
         }
@@ -1325,7 +1377,11 @@ export function resolvePvpCombat(params: {
     }
   }
 
-  if (!moveFailed && timedSecondaryStatuses.postDamage.length && !skipTargetAddedEffects) {
+  if (
+    !moveFailed &&
+    timedSecondaryStatuses.postDamage.length &&
+    !skipTargetAddedEffects
+  ) {
     const secondaryMessages = applySecondaryStatusesFromMove({
       move: { secondaryStatuses: timedSecondaryStatuses.postDamage },
       state,

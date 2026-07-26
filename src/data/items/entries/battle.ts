@@ -165,13 +165,13 @@ const heldTypeBoostItems: Item[] = TYPE_HELD_ITEM_FAMILIES.flatMap((family) => {
     {
       id: family.lowId,
       name: family.lowName,
-      description: `A diminished held item that increases ${typeName}-type attack damage by 10%. It has a 25% chance to break after an attack.`,
+      description: `A diminished held item that increases ${typeName}-type attack damage by 10%. It has a 3% chance to break after an attack.`,
       category: 'battle' as const,
       spriteId,
       heldConfig: {
         trigger: { type: 'permanent' as const },
         consumeOnUse: true,
-        consumeChance: 25,
+        consumeChance: 3,
         consumeTrigger: 'attack' as const,
         effect: {
           type: 'type-damage-boost' as const,

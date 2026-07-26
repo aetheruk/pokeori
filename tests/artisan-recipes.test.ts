@@ -474,7 +474,7 @@ describe('artisan recipes', () => {
         output: 'antidote',
         costs: [
           { id: 'poke-powder-xs', amount: 2 },
-          { id: 'pecha-berry', amount: 1 },
+          { id: 'pecha-berry', amount: 3 },
           { id: 'toxic-resin-t1', amount: 3 },
         ],
       },
@@ -484,7 +484,7 @@ describe('artisan recipes', () => {
         output: 'paralyze-heal',
         costs: [
           { id: 'poke-powder-xs', amount: 2 },
-          { id: 'cheri-berry', amount: 1 },
+          { id: 'cheri-berry', amount: 3 },
           { id: 'electric-component-t1', amount: 3 },
         ],
       },
@@ -494,7 +494,7 @@ describe('artisan recipes', () => {
         output: 'awakening',
         costs: [
           { id: 'poke-powder-xs', amount: 2 },
-          { id: 'chesto-berry', amount: 1 },
+          { id: 'chesto-berry', amount: 3 },
           { id: 'mind-thread-t1', amount: 3 },
         ],
       },
@@ -504,7 +504,7 @@ describe('artisan recipes', () => {
         output: 'burn-heal',
         costs: [
           { id: 'poke-powder-xs', amount: 2 },
-          { id: 'rawst-berry', amount: 1 },
+          { id: 'rawst-berry', amount: 3 },
           { id: 'aqua-solvent-t1', amount: 3 },
         ],
       },
@@ -514,7 +514,7 @@ describe('artisan recipes', () => {
         output: 'ice-heal',
         costs: [
           { id: 'poke-powder-xs', amount: 2 },
-          { id: 'aspear-berry', amount: 1 },
+          { id: 'aspear-berry', amount: 3 },
           { id: 'cinder-shard-t1', amount: 3 },
         ],
       },
@@ -1472,7 +1472,7 @@ describe('artisan recipes', () => {
 
     expect(low?.heldConfig).toMatchObject({
       consumeOnUse: true,
-      consumeChance: 25,
+      consumeChance: 3,
       consumeTrigger: 'attack',
       effect: {
         type: 'type-damage-boost',
@@ -1514,7 +1514,9 @@ describe('artisan recipes', () => {
     ])
 
     for (const [itemId, [gemId, materialId]] of expected) {
-      const recipe = artisanRecipes.find((entry) => entry.id === `craft-${itemId}`)
+      const recipe = artisanRecipes.find(
+        (entry) => entry.id === `craft-${itemId}`,
+      )
       expect(recipe, itemId).toBeDefined()
       expect(recipe?.category, itemId).toBe('held')
       expect(recipe?.artisanLevel, itemId).toBe(30)

@@ -19,7 +19,11 @@ import type {
   StatStages,
 } from './types'
 import { DEFAULT_STAT_STAGES, clampStatStage } from './stats-calc'
-import { adjustBattleItemUsesRemaining, getBattleItemUsesRemaining, type BattleSide } from './item-use-limits'
+import {
+  adjustBattleItemUsesRemaining,
+  getBattleItemUsesRemaining,
+  type BattleSide,
+} from './item-use-limits'
 import { applyHeldDamageBlock, createRuntimeHeldItem } from './held-items'
 import { getEffectiveBattleTypes, resetBattleTypeChange } from './tera'
 import { lowerPokemonMoveUses } from './move-uses'
@@ -32,10 +36,16 @@ import {
   hasSecondaryStatusAccuracyBypass,
 } from './secondary-statuses'
 import { getTypeEffectiveness } from './type-chart'
-import { getWeatherAccuracy, getWeatherTypeEffectiveness } from './weather-effects'
+import {
+  getWeatherAccuracy,
+  getWeatherTypeEffectiveness,
+} from './weather-effects'
 import { hasOppositeNonGenderlessGenders } from '@/utilities/pokemon/gender'
 import { applyStatus } from './status-effects-logic'
-import { applyPokemonResearchEndure } from './research-survival'
+import {
+  applyPokemonResearchEndure,
+  canApplyPokemonResearchEndure,
+} from './research-survival'
 import {
   blocksBattleForcedSwitchByAbility,
   blocksBattleMentalEffectByAbility,
@@ -88,19 +98,25 @@ export function resolveCalledMove(params: {
     candidates = getCallableAuthoredMoves(params.move.id)
   }
 
-  if (calledMove.mode === 'opponent-last-successful' || calledMove.mode === 'opponent-last-successful-boosted') {
-    const last = params.state?.moveHistory?.lastSuccessful?.[oppositeSide(params.side)]
+  if (
+    calledMove.mode === 'opponent-last-successful' ||
+    calledMove.mode === 'opponent-last-successful-boosted'
+  ) {
+    const last =
+      params.state?.moveHistory?.lastSuccessful?.[oppositeSide(params.side)]
     const move = last?.moveId ? getMove(last.moveId) : undefined
     candidates = move && canCallMove(move, params.move.id) ? [move] : []
   }
 
   if (calledMove.mode === 'self-known-random') {
     const assignedMoveIds = (params.attacker.assignedMoves || [])
-      .map((entry: any) => typeof entry === 'string' ? entry : entry?.moveId)
+      .map((entry: any) => (typeof entry === 'string' ? entry : entry?.moveId))
       .filter(Boolean) as string[]
     candidates = assignedMoveIds
       .map((id) => getMove(id))
-      .filter((move): move is MoveConfig => Boolean(move && canCallMove(move, params.move.id)))
+      .filter((move): move is MoveConfig =>
+        Boolean(move && canCallMove(move, params.move.id)),
+      )
   }
 
   if (!candidates.length) {
@@ -123,7 +139,9 @@ export function resolveCalledMove(params: {
   }
 }
 
-function typeFromHeldPlate(pokemon: BattlePokemon): PokemonTypeName | undefined {
+function typeFromHeldPlate(
+  pokemon: BattlePokemon,
+): PokemonTypeName | undefined {
   const itemId =
     pokemon.heldItem?.id ||
     ((pokemon as any).heldItemId as string | undefined) ||
@@ -132,7 +150,9 @@ function typeFromHeldPlate(pokemon: BattlePokemon): PokemonTypeName | undefined 
   return normalizeType(match?.[1])
 }
 
-function typeFromHeldMemory(pokemon: BattlePokemon): PokemonTypeName | undefined {
+function typeFromHeldMemory(
+  pokemon: BattlePokemon,
+): PokemonTypeName | undefined {
   const itemId =
     pokemon.heldItem?.id ||
     ((pokemon as any).heldItemId as string | undefined) ||
@@ -141,7 +161,9 @@ function typeFromHeldMemory(pokemon: BattlePokemon): PokemonTypeName | undefined
   return normalizeType(match?.[1])
 }
 
-function typeFromHeldDrive(pokemon: BattlePokemon): PokemonTypeName | undefined {
+function typeFromHeldDrive(
+  pokemon: BattlePokemon,
+): PokemonTypeName | undefined {
   const itemId =
     pokemon.heldItem?.id ||
     ((pokemon as any).heldItemId as string | undefined) ||
@@ -160,7 +182,9 @@ function typeFromHeldDrive(pokemon: BattlePokemon): PokemonTypeName | undefined 
   return normalizeType(match?.[1])
 }
 
-function typeFromWeather(weather: WeatherType | undefined): PokemonTypeName | undefined {
+function typeFromWeather(
+  weather: WeatherType | undefined,
+): PokemonTypeName | undefined {
   switch (weather) {
     case 'harsh-sunlight':
     case 'extremely-harsh-sunlight':
@@ -189,7 +213,7 @@ function typeFromWeather(weather: WeatherType | undefined): PokemonTypeName | un
 
 function getKnownMoveIds(pokemon: BattlePokemon): string[] {
   const assignedMoveIds = ((pokemon.assignedMoves || []) as any[])
-    .map((entry) => typeof entry === 'string' ? entry : entry?.moveId)
+    .map((entry) => (typeof entry === 'string' ? entry : entry?.moveId))
     .filter((id): id is string => typeof id === 'string' && id.length > 0)
   if (assignedMoveIds.length) return assignedMoveIds
   if (pokemon.aiMoveLoadout?.length) return pokemon.aiMoveLoadout
@@ -221,7 +245,10 @@ function typeFromFirstKnownMove(params: {
   }
 
   if (firstMove.forcedType === 'random') {
-    return POKEMON_TYPES[Math.floor(params.random() * POKEMON_TYPES.length)] ?? 'normal'
+    return (
+      POKEMON_TYPES[Math.floor(params.random() * POKEMON_TYPES.length)] ??
+      'normal'
+    )
   }
 
   return normalizeType(firstMove.forcedType)
@@ -239,9 +266,12 @@ function typeToResistLastOpponentMove(params: {
   side: BattleSide
   random: () => number
 }): { type?: PokemonTypeName; failed?: string } {
-  const last = params.state.moveHistory?.lastSuccessful?.[oppositeSide(params.side)]
+  const last =
+    params.state.moveHistory?.lastSuccessful?.[oppositeSide(params.side)]
   const lastMove = last?.moveId ? getMove(last.moveId) : undefined
-  const attackType = normalizeType(last?.attackType) ?? (lastMove ? getAuthoredMoveType(lastMove) : undefined)
+  const attackType =
+    normalizeType(last?.attackType) ??
+    (lastMove ? getAuthoredMoveType(lastMove) : undefined)
 
   if (!attackType) {
     return {
@@ -249,12 +279,10 @@ function typeToResistLastOpponentMove(params: {
     }
   }
 
-  const candidates = POKEMON_TYPES
-    .map((type) => ({
-      type,
-      effectiveness: getTypeEffectiveness(attackType, type),
-    }))
-    .filter((candidate) => candidate.effectiveness < 1)
+  const candidates = POKEMON_TYPES.map((type) => ({
+    type,
+    effectiveness: getTypeEffectiveness(attackType, type),
+  })).filter((candidate) => candidate.effectiveness < 1)
 
   if (!candidates.length) {
     return {
@@ -262,13 +290,16 @@ function typeToResistLastOpponentMove(params: {
     }
   }
 
-  const bestEffectiveness = Math.min(...candidates.map((candidate) => candidate.effectiveness))
+  const bestEffectiveness = Math.min(
+    ...candidates.map((candidate) => candidate.effectiveness),
+  )
   const bestTypes = candidates
     .filter((candidate) => candidate.effectiveness === bestEffectiveness)
     .map((candidate) => candidate.type)
 
   return {
-    type: bestTypes[Math.floor(params.random() * bestTypes.length)] ?? bestTypes[0],
+    type:
+      bestTypes[Math.floor(params.random() * bestTypes.length)] ?? bestTypes[0],
   }
 }
 
@@ -283,13 +314,18 @@ export function resolveDynamicMoveType(params: {
   if (!dynamicType) return params.fallbackType
 
   let resolved: PokemonTypeName | undefined
-  if (dynamicType.type === 'held-plate') resolved = typeFromHeldPlate(params.attacker)
-  if (dynamicType.type === 'held-memory') resolved = typeFromHeldMemory(params.attacker)
-  if (dynamicType.type === 'held-drive') resolved = typeFromHeldDrive(params.attacker)
+  if (dynamicType.type === 'held-plate')
+    resolved = typeFromHeldPlate(params.attacker)
+  if (dynamicType.type === 'held-memory')
+    resolved = typeFromHeldMemory(params.attacker)
+  if (dynamicType.type === 'held-drive')
+    resolved = typeFromHeldDrive(params.attacker)
   if (dynamicType.type === 'weather') resolved = typeFromWeather(params.weather)
   if (dynamicType.type === 'tera') resolved = params.attacker.teraTypeOverride
-  if (dynamicType.type === 'user-primary') resolved = normalizeType(params.attacker.types?.[0])
-  if (dynamicType.type === 'target-primary') resolved = normalizeType(params.defender?.types?.[0])
+  if (dynamicType.type === 'user-primary')
+    resolved = normalizeType(params.attacker.types?.[0])
+  if (dynamicType.type === 'target-primary')
+    resolved = normalizeType(params.defender?.types?.[0])
 
   return resolved ?? dynamicType.fallbackType ?? params.fallbackType
 }
@@ -326,7 +362,10 @@ export function getConditionalDamageMultiplier(params: {
     ) {
       multiplier *= modifier.multiplier
     }
-    if (modifier.type === 'user-no-held-item' && !getRuntimeHeldItem(params.attacker)) {
+    if (
+      modifier.type === 'user-no-held-item' &&
+      !getRuntimeHeldItem(params.attacker)
+    ) {
       multiplier *= modifier.multiplier
     }
     if (
@@ -337,31 +376,46 @@ export function getConditionalDamageMultiplier(params: {
     }
     if (
       modifier.type === 'target-pokemon-type' &&
-      modifier.pokemonTypes.some((pokemonType) => pokemonHasEffectiveType(params.defender, pokemonType))
+      modifier.pokemonTypes.some((pokemonType) =>
+        pokemonHasEffectiveType(params.defender, pokemonType),
+      )
     ) {
       multiplier *= modifier.multiplier
     }
     if (
       modifier.type === 'remaining-move-uses-at-or-below' &&
-      (params.attacker.moveUsesRemaining ?? Number.POSITIVE_INFINITY) <= modifier.uses
+      (params.attacker.moveUsesRemaining ?? Number.POSITIVE_INFINITY) <=
+        modifier.uses
     ) {
-      remainingUsesMultiplier = Math.max(remainingUsesMultiplier, modifier.multiplier)
+      remainingUsesMultiplier = Math.max(
+        remainingUsesMultiplier,
+        modifier.multiplier,
+      )
     }
     if (
       modifier.type === 'target-current-hp-at-or-below-percent' &&
-      params.defender.currentHp <= Math.floor(params.defender.maxHp * (modifier.percent / 100))
+      params.defender.currentHp <=
+        Math.floor(params.defender.maxHp * (modifier.percent / 100))
     ) {
       multiplier *= modifier.multiplier
     }
     if (modifier.type === 'user-current-hp-percent') {
-      const hpPercent = Math.max(0, Math.min(100, (params.attacker.currentHp / params.attacker.maxHp) * 100))
+      const hpPercent = Math.max(
+        0,
+        Math.min(
+          100,
+          (params.attacker.currentHp / params.attacker.maxHp) * 100,
+        ),
+      )
       const hpScale = modifier.invert ? 1 - hpPercent / 100 : hpPercent / 100
       const minimum = modifier.minimumMultiplier ?? 0.1
       multiplier *= Math.max(minimum, modifier.multiplierAtFullHp * hpScale)
     }
     if (
       modifier.type === 'weather' &&
-      modifier.weather.includes(params.weather ?? params.state?.weather?.weather ?? 'clear')
+      modifier.weather.includes(
+        params.weather ?? params.state?.weather?.weather ?? 'clear',
+      )
     ) {
       multiplier *= modifier.multiplier
     }
@@ -371,7 +425,14 @@ export function getConditionalDamageMultiplier(params: {
         (params.move.forcedType && params.move.forcedType !== 'random'
           ? params.move.forcedType
           : params.move.dynamicType?.fallbackType)
-      if (attackType && getWeatherTypeEffectiveness(attackType, params.defender, params.weather ?? params.state?.weather?.weather) > 1) {
+      if (
+        attackType &&
+        getWeatherTypeEffectiveness(
+          attackType,
+          params.defender,
+          params.weather ?? params.state?.weather?.weather,
+        ) > 1
+      ) {
         multiplier *= modifier.multiplier
       }
     }
@@ -409,13 +470,20 @@ export function getConditionalDamageMultiplier(params: {
       multiplier *= modifier.multiplier
     }
     if (modifier.type === 'user-took-damage') {
-      const damageEvent = getLastDamageTakenByPokemon(params.state, params.attacker, params.side)
+      const damageEvent = getLastDamageTakenByPokemon(
+        params.state,
+        params.attacker,
+        params.side,
+      )
       if (damageEvent && damageEvent.damage > 0) {
         multiplier *= modifier.multiplier
       }
     }
     if (modifier.type === 'user-stat-lowered-this-turn') {
-      const lowered = params.state?.moveHistory?.statLoweredThisTurn?.[params.side ?? 'player']
+      const lowered =
+        params.state?.moveHistory?.statLoweredThisTurn?.[
+          params.side ?? 'player'
+        ]
       if (
         lowered &&
         lowered.turn === params.state?.turn &&
@@ -427,15 +495,13 @@ export function getConditionalDamageMultiplier(params: {
     if (modifier.type === 'target-switching-out') {
       const targetSide = params.side === 'enemy' ? 'player' : 'enemy'
       const switching = params.state?.moveHistory?.switchingOut?.[targetSide]
-      if (
-        switching &&
-        switching.turn === params.state?.turn
-      ) {
+      if (switching && switching.turn === params.state?.turn) {
         multiplier *= modifier.multiplier
       }
     }
     if (modifier.type === 'user-previous-move-failed') {
-      const lastFailed = params.state?.moveHistory?.lastFailed?.[params.side ?? 'player']
+      const lastFailed =
+        params.state?.moveHistory?.lastFailed?.[params.side ?? 'player']
       const currentTurn = params.state?.turn
       if (
         lastFailed &&
@@ -447,7 +513,8 @@ export function getConditionalDamageMultiplier(params: {
       }
     }
     if (modifier.type === 'user-previous-successful-move') {
-      const lastSuccessful = params.state?.moveHistory?.lastSuccessful?.[params.side ?? 'player']
+      const lastSuccessful =
+        params.state?.moveHistory?.lastSuccessful?.[params.side ?? 'player']
       const currentTurn = params.state?.turn
       if (
         currentTurn !== undefined &&
@@ -468,10 +535,12 @@ export function getMoveHealAmount(params: {
   pokemon: BattlePokemon
   weather?: WeatherType
 }): number {
-  if (params.move.healFull) return params.pokemon.maxHp - params.pokemon.currentHp
+  if (params.move.healFull)
+    return params.pokemon.maxHp - params.pokemon.currentHp
   const weatherHeal = params.move.weatherHeal
   const percent = weatherHeal
-    ? weatherHeal.weather?.[params.weather ?? 'clear'] ?? weatherHeal.defaultPercent
+    ? (weatherHeal.weather?.[params.weather ?? 'clear'] ??
+      weatherHeal.defaultPercent)
     : 50
   return Math.floor(params.pokemon.maxHp * (percent / 100))
 }
@@ -488,24 +557,47 @@ export function resolveDamageRuleDamage(params: {
   const { rule, attacker, defender } = params
   if (!rule) return {}
 
-  if (rule.type === 'flat') return { damage: Math.max(0, Math.floor(rule.amount)) }
+  if (rule.type === 'flat')
+    return { damage: Math.max(0, Math.floor(rule.amount)) }
   if (rule.type === 'target-current-hp-percent') {
-    return { damage: Math.max(1, Math.floor(defender.currentHp * (rule.percent / 100))) }
+    return {
+      damage: Math.max(
+        1,
+        Math.floor(defender.currentHp * (rule.percent / 100)),
+      ),
+    }
   }
   if (rule.type === 'user-level') {
-    return { damage: Math.max(1, Math.floor((attacker.level || 1) * (rule.multiplier ?? 1))) }
+    return {
+      damage: Math.max(
+        1,
+        Math.floor((attacker.level || 1) * (rule.multiplier ?? 1)),
+      ),
+    }
   }
   if (rule.type === 'user-current-hp') {
     return { damage: Math.max(0, attacker.currentHp) }
   }
   if (rule.type === 'last-damage-taken') {
-    const damageEvent = getLastDamageTakenByPokemon(params.state, attacker, params.side)
+    const damageEvent = getLastDamageTakenByPokemon(
+      params.state,
+      attacker,
+      params.side,
+    )
     if (!damageEvent || damageEvent.damage <= 0) {
       return { failed: `${attacker.name} had no recent damage to return.` }
     }
-    consumeLastDamageTakenByPokemon(params.state, attacker, params.side, damageEvent)
+    consumeLastDamageTakenByPokemon(
+      params.state,
+      attacker,
+      params.side,
+      damageEvent,
+    )
     return {
-      damage: Math.max(1, Math.floor(damageEvent.damage * (rule.multiplier ?? 1))),
+      damage: Math.max(
+        1,
+        Math.floor(damageEvent.damage * (rule.multiplier ?? 1)),
+      ),
     }
   }
   if (rule.type === 'party-member-count') {
@@ -513,8 +605,11 @@ export function resolveDamageRuleDamage(params: {
     const count = team.filter((pokemon) =>
       rule.includeFainted ? true : pokemon.currentHp > 0,
     ).length
-    if (count <= 0) return { failed: `${attacker.name} had no allies ready to join in.` }
-    return { damage: Math.max(1, Math.floor(count * rule.perMemberDamage * 50)) }
+    if (count <= 0)
+      return { failed: `${attacker.name} had no allies ready to join in.` }
+    return {
+      damage: Math.max(1, Math.floor(count * rule.perMemberDamage * 50)),
+    }
   }
   if (rule.type === 'match-user-hp') {
     return { damage: Math.max(0, defender.currentHp - attacker.currentHp) }
@@ -529,8 +624,13 @@ export function resolveDamageRuleDamage(params: {
     return { damage: Math.max(0, defenderDelta || -attackerDelta) }
   }
   if (rule.type === 'ohko') {
-    if (rule.failIfUserLowerLevel && (attacker.level || 1) < (defender.level || 1)) {
-      return { failed: `${attacker.name} was too low level for the one-hit knockout.` }
+    if (
+      rule.failIfUserLowerLevel &&
+      (attacker.level || 1) < (defender.level || 1)
+    ) {
+      return {
+        failed: `${attacker.name} was too low level for the one-hit knockout.`,
+      }
     }
     return { damage: defender.currentHp }
   }
@@ -613,7 +713,10 @@ function getLastDamageTakenByPokemon(
   const byPokemon = pokemon.id
     ? state.moveHistory?.damage?.lastTakenByPokemon?.[pokemon.id]
     : undefined
-  return byPokemon ?? (side ? state.moveHistory?.damage?.lastTakenBySide?.[side] : undefined)
+  return (
+    byPokemon ??
+    (side ? state.moveHistory?.damage?.lastTakenBySide?.[side] : undefined)
+  )
 }
 
 function consumeLastDamageTakenByPokemon(
@@ -623,10 +726,16 @@ function consumeLastDamageTakenByPokemon(
   entry: BattleDamageHistoryEntry,
 ): void {
   if (!state?.moveHistory?.damage) return
-  if (pokemon.id && state.moveHistory.damage.lastTakenByPokemon?.[pokemon.id]?.id === entry.id) {
+  if (
+    pokemon.id &&
+    state.moveHistory.damage.lastTakenByPokemon?.[pokemon.id]?.id === entry.id
+  ) {
     delete state.moveHistory.damage.lastTakenByPokemon[pokemon.id]
   }
-  if (side && state.moveHistory.damage.lastTakenBySide?.[side]?.id === entry.id) {
+  if (
+    side &&
+    state.moveHistory.damage.lastTakenBySide?.[side]?.id === entry.id
+  ) {
     delete state.moveHistory.damage.lastTakenBySide[side]
   }
 }
@@ -674,13 +783,22 @@ export function processDelayedMoveDamage(state: BattleState): string[] {
       continue
     }
 
-    const targetIndex = entry.targetSide === 'player' ? state.activePlayerIndex : state.activeEnemyIndex
-    const targetTeam = entry.targetSide === 'player' ? state.playerTeam : state.enemyTeam
+    const targetIndex =
+      entry.targetSide === 'player'
+        ? state.activePlayerIndex
+        : state.activeEnemyIndex
+    const targetTeam =
+      entry.targetSide === 'player' ? state.playerTeam : state.enemyTeam
     const target = targetTeam[targetIndex]
     if (!target || target.currentHp <= 0) continue
 
     const blockResult = applyHeldDamageBlock(target, entry.damage)
-    const endureResult = applyPokemonResearchEndure(target, blockResult.damage)
+    const endureResult = applyPokemonResearchEndure(
+      target,
+      blockResult.damage,
+      Math.random,
+      canApplyPokemonResearchEndure(state, entry.targetSide),
+    )
     target.currentHp = Math.max(0, target.currentHp - endureResult.damage)
     recordBattleDamage({
       state,
@@ -693,7 +811,8 @@ export function processDelayedMoveDamage(state: BattleState): string[] {
       attackType: entry.attackType,
     })
 
-    const ownerName = entry.targetSide === 'player' ? state.playerName : state.enemyName
+    const ownerName =
+      entry.targetSide === 'player' ? state.playerName : state.enemyName
     messages.push(
       `${entry.moveName} struck ${ownerName}'s ${target.name}! [icon:damage:${endureResult.damage}]`,
     )
@@ -712,7 +831,10 @@ export function applyNextDamageModifier(
   const modifier = attacker.nextDamageModifier
   if (!modifier || modifier.remainingUses <= 0 || damage <= 0) return { damage }
 
-  const nextDamage = Math.max(0, Math.floor(damage * (1 + modifier.percent / 100)))
+  const nextDamage = Math.max(
+    0,
+    Math.floor(damage * (1 + modifier.percent / 100)),
+  )
   modifier.remainingUses -= 1
   if (modifier.remainingUses <= 0) attacker.nextDamageModifier = undefined
   return {
@@ -770,7 +892,10 @@ export function applyContinuousEndEffects(params: {
 
 type StatusCureList = StatusEffectId[] | 'all'
 
-function cureStatusMatches(current: string | undefined, statuses: StatusCureList): boolean {
+function cureStatusMatches(
+  current: string | undefined,
+  statuses: StatusCureList,
+): boolean {
   if (!current) return false
   if (statuses === 'all') return true
   return statuses.includes(current as any)
@@ -792,7 +917,10 @@ function cureStatuses(
   return { messages, curedCount }
 }
 
-function revivePartyMember(team: BattlePokemon[], hpPercent: number): string | undefined {
+function revivePartyMember(
+  team: BattlePokemon[],
+  hpPercent: number,
+): string | undefined {
   const target = team.find((pokemon) => pokemon.currentHp <= 0)
   if (!target) return undefined
   target.currentHp = Math.max(1, Math.floor(target.maxHp * (hpPercent / 100)))
@@ -807,7 +935,10 @@ function resetStatStages(pokemon: BattlePokemon): void {
   pokemon.statStages = { ...DEFAULT_STAT_STAGES }
 }
 
-function pokemonHasEffectiveType(pokemon: BattlePokemon, pokemonType: PokemonTypeName): boolean {
+function pokemonHasEffectiveType(
+  pokemon: BattlePokemon,
+  pokemonType: PokemonTypeName,
+): boolean {
   return getEffectiveBattleTypes(pokemon).some(
     (type) => type.toLowerCase() === pokemonType.toLowerCase(),
   )
@@ -823,7 +954,9 @@ function applyBattleTypeOverride(params: {
     .filter((type): type is PokemonTypeName => Boolean(type))
   if (!normalized.length) return
 
-  params.pokemon.battleTypeOriginalTypes ??= [...(params.pokemon.types || ['normal'])]
+  params.pokemon.battleTypeOriginalTypes ??= [
+    ...(params.pokemon.types || ['normal']),
+  ]
   params.pokemon.types = [...normalized]
   params.pokemon.battleTypeOverride = [...normalized]
   params.pokemon.battleTypeTurnsRemaining = params.turns
@@ -839,10 +972,14 @@ function curePostDamageStatus(
   return `${pokemon.name} was cured of ${cured}!`
 }
 
-function getRuntimeHeldItem(pokemon: BattlePokemon): { id: string; name: string } | undefined {
+function getRuntimeHeldItem(
+  pokemon: BattlePokemon,
+): { id: string; name: string } | undefined {
   return (
     pokemon.heldItem ||
-    createRuntimeHeldItem((pokemon as any).heldItemId as string | null | undefined)
+    createRuntimeHeldItem(
+      (pokemon as any).heldItemId as string | null | undefined,
+    )
   )
 }
 
@@ -854,10 +991,13 @@ function setRuntimeHeldItem(
   const hadHeldItem = Boolean(getRuntimeHeldItem(pokemon))
   pokemon.heldItem = item
   ;(pokemon as any).heldItemId = item?.id ?? null
-  pokemon.heldItemBattleOnly = item ? options.battleOnly || undefined : undefined
+  pokemon.heldItemBattleOnly = item
+    ? options.battleOnly || undefined
+    : undefined
   pokemon.itemCharge = 0
   if (item) {
-    if (pokemon.battleAbilityState) pokemon.battleAbilityState.heldItemLost = false
+    if (pokemon.battleAbilityState)
+      pokemon.battleAbilityState.heldItemLost = false
   } else if (hadHeldItem) {
     pokemon.battleAbilityState ??= {}
     pokemon.battleAbilityState.heldItemLost = true
@@ -887,7 +1027,8 @@ export function applyMoveRuntimeEffects(params: {
   let heldItemChanged = false
 
   if (move.nextDamageModifier) {
-    const target = move.nextDamageModifier.target === 'enemy' ? defender : attacker
+    const target =
+      move.nextDamageModifier.target === 'enemy' ? defender : attacker
     target.nextDamageModifier = {
       percent: move.nextDamageModifier.percent,
       remainingUses: move.nextDamageModifier.uses ?? 1,
@@ -897,7 +1038,8 @@ export function applyMoveRuntimeEffects(params: {
   }
 
   if (move.nextAccuracyBypass) {
-    const target = move.nextAccuracyBypass.target === 'enemy' ? defender : attacker
+    const target =
+      move.nextAccuracyBypass.target === 'enemy' ? defender : attacker
     target.nextAccuracyBypass = {
       remainingUses: move.nextAccuracyBypass.uses ?? 1,
       sourceMoveName: move.name,
@@ -912,7 +1054,10 @@ export function applyMoveRuntimeEffects(params: {
         : [move.statusCure.target === 'enemy' ? defender : attacker]
     const cureResult = cureStatuses(team, move.statusCure.statuses)
     if (move.statusCure.failIfNoStatus && cureResult.curedCount === 0) {
-      return { failed: `${move.name} failed because there was no status to cure.`, messages }
+      return {
+        failed: `${move.name} failed because there was no status to cure.`,
+        messages,
+      }
     }
     messages.push(...cureResult.messages)
     if (move.statusCure.healUserPercent && cureResult.curedCount > 0) {
@@ -921,7 +1066,10 @@ export function applyMoveRuntimeEffects(params: {
         Math.floor(attacker.maxHp * (move.statusCure.healUserPercent / 100)),
       )
       const beforeHp = attacker.currentHp
-      attacker.currentHp = Math.min(attacker.maxHp, attacker.currentHp + healAmount)
+      attacker.currentHp = Math.min(
+        attacker.maxHp,
+        attacker.currentHp + healAmount,
+      )
       const healed = attacker.currentHp - beforeHp
       if (healed > 0) messages.push(`${attacker.name} healed ${healed} HP!`)
     }
@@ -936,7 +1084,10 @@ export function applyMoveRuntimeEffects(params: {
       !!sourceStatus && (statuses === 'all' || statuses.includes(sourceStatus))
     if (!canTransfer) {
       if (move.statusTransfer.failIfNoStatus) {
-        return { failed: `${move.name} failed because there was no status to transfer.`, messages }
+        return {
+          failed: `${move.name} failed because there was no status to transfer.`,
+          messages,
+        }
       }
     } else {
       const result = applyStatus(target, sourceStatus, undefined, {
@@ -944,16 +1095,21 @@ export function applyMoveRuntimeEffects(params: {
         sourcePokemon: attacker,
       })
       if (!result.applied) {
-        return { failed: `${move.name} failed because the status could not be transferred.`, messages }
+        return {
+          failed: `${move.name} failed because the status could not be transferred.`,
+          messages,
+        }
       }
-      if (move.statusTransfer.clearSourceOnSuccess !== false) source.status = undefined
+      if (move.statusTransfer.clearSourceOnSuccess !== false)
+        source.status = undefined
       messages.push(result.message)
       messages.push(`${source.name} transferred its status to ${target.name}.`)
     }
   }
 
   if (move.postDamageStatusCure && (params.damageDealt ?? 0) > 0) {
-    const target = move.postDamageStatusCure.target === 'enemy' ? defender : attacker
+    const target =
+      move.postDamageStatusCure.target === 'enemy' ? defender : attacker
     const message = curePostDamageStatus(target, move.postDamageStatusCure)
     if (message) messages.push(message)
   }
@@ -965,7 +1121,8 @@ export function applyMoveRuntimeEffects(params: {
     defender.currentHp <= 0 &&
     random() * 100 < (move.postDamageStatStage.chance ?? 100)
   ) {
-    const target = move.postDamageStatStage.target === 'enemy' ? defender : attacker
+    const target =
+      move.postDamageStatStage.target === 'enemy' ? defender : attacker
     target.statStages ??= { ...DEFAULT_STAT_STAGES }
     const stat = move.postDamageStatStage.stat
     target.statStages[stat] = clampStatStage(
@@ -991,7 +1148,9 @@ export function applyMoveRuntimeEffects(params: {
     const previous = attacker.statStages[first]
     attacker.statStages[first] = attacker.statStages[second]
     attacker.statStages[second] = previous
-    messages.push(`${attacker.name} swapped its ${first} and ${second} changes.`)
+    messages.push(
+      `${attacker.name} swapped its ${first} and ${second} changes.`,
+    )
   }
 
   if (move.statStageEffect?.type === 'reset') {
@@ -1010,13 +1169,18 @@ export function applyMoveRuntimeEffects(params: {
     source.statStages = cloneStatStages(source.statStages)
     const stats = move.statStageEffect.stats?.length
       ? move.statStageEffect.stats
-      : Object.keys(DEFAULT_STAT_STAGES) as Exclude<BuffConfig['stat'], 'crit'>[]
+      : (Object.keys(DEFAULT_STAT_STAGES) as Exclude<
+          BuffConfig['stat'],
+          'crit'
+        >[])
     for (const stat of stats) {
       const previous = target.statStages[stat]
       target.statStages[stat] = source.statStages[stat]
       source.statStages[stat] = previous
     }
-    messages.push(`${attacker.name} swapped stat changes with ${defender.name}.`)
+    messages.push(
+      `${attacker.name} swapped stat changes with ${defender.name}.`,
+    )
   }
 
   if (move.statStageEffect?.type === 'invert-target') {
@@ -1035,7 +1199,8 @@ export function applyMoveRuntimeEffects(params: {
         ? [attacker, defender]
         : [move.statStageEffect.target === 'enemy' ? defender : attacker]
     for (const target of targets) {
-      if (!pokemonHasEffectiveType(target, move.statStageEffect.pokemonType)) continue
+      if (!pokemonHasEffectiveType(target, move.statStageEffect.pokemonType))
+        continue
       target.statStages = cloneStatStages(target.statStages)
       for (const stat of move.statStageEffect.stats) {
         target.statStages[stat] = clampStatStage(
@@ -1044,7 +1209,9 @@ export function applyMoveRuntimeEffects(params: {
         )
       }
       const direction = move.statStageEffect.stages >= 0 ? 'rose' : 'fell'
-      const statNames = move.statStageEffect.stats.map(formatStatStageName).join(' and ')
+      const statNames = move.statStageEffect.stats
+        .map(formatStatStageName)
+        .join(' and ')
       messages.push(`${target.name}'s ${statNames} ${direction}!`)
     }
   }
@@ -1072,14 +1239,19 @@ export function applyMoveRuntimeEffects(params: {
       if (scope === 'side' || scope === 'pokemon-and-side') {
         cleared += clearBattleSideSecondaryStatuses(state, target.side, ids)
       }
-      if (cleared > 0) messages.push(`${target.pokemon.name} shook off lingering effects.`)
+      if (cleared > 0)
+        messages.push(`${target.pokemon.name} shook off lingering effects.`)
     }
   }
 
   if (move.partyRevive) {
     const revived = revivePartyMember(attackerTeam, move.partyRevive.hpPercent)
     if (revived) messages.push(revived)
-    else return { failed: `${move.name} failed because no ally could be revived.`, messages }
+    else
+      return {
+        failed: `${move.name} failed because no ally could be revived.`,
+        messages,
+      }
   }
 
   if (move.itemUseEffect) {
@@ -1087,22 +1259,42 @@ export function applyMoveRuntimeEffects(params: {
       const before = getBattleItemUsesRemaining(state, side)
       adjustBattleItemUsesRemaining(state, side, move.itemUseEffect.amount)
       const after = getBattleItemUsesRemaining(state, side)
-      if (after <= before) return { failed: `${move.name} failed because item uses were already full.`, messages }
+      if (after <= before)
+        return {
+          failed: `${move.name} failed because item uses were already full.`,
+          messages,
+        }
       messages.push(`${move.name} restored ${after - before} battle item use.`)
     }
 
     if (move.itemUseEffect.type === 'remove-enemy') {
       const enemySide = oppositeSide(side)
       const before = getBattleItemUsesRemaining(state, enemySide)
-      if (before <= 0) return { failed: `${move.name} failed because the opposing side had no item use left.`, messages }
-      const changed = Math.abs(adjustBattleItemUsesRemaining(state, enemySide, -move.itemUseEffect.amount))
+      if (before <= 0)
+        return {
+          failed: `${move.name} failed because the opposing side had no item use left.`,
+          messages,
+        }
+      const changed = Math.abs(
+        adjustBattleItemUsesRemaining(
+          state,
+          enemySide,
+          -move.itemUseEffect.amount,
+        ),
+      )
       messages.push(`${move.name} removed ${changed} opposing item use.`)
     }
 
     if (move.itemUseEffect.type === 'consume-self') {
       const before = getBattleItemUsesRemaining(state, side)
-      if (before < move.itemUseEffect.amount && move.itemUseEffect.failIfUnavailable) {
-        return { failed: `${move.name} failed because no item use was available.`, messages }
+      if (
+        before < move.itemUseEffect.amount &&
+        move.itemUseEffect.failIfUnavailable
+      ) {
+        return {
+          failed: `${move.name} failed because no item use was available.`,
+          messages,
+        }
       }
       adjustBattleItemUsesRemaining(state, side, -move.itemUseEffect.amount)
     }
@@ -1110,7 +1302,11 @@ export function applyMoveRuntimeEffects(params: {
 
   if (move.heldItemEffect?.type === 'bestow') {
     const item = getRuntimeHeldItem(attacker)
-    if (!item) return { failed: `${move.name} failed because ${attacker.name} has no held item.`, messages }
+    if (!item)
+      return {
+        failed: `${move.name} failed because ${attacker.name} has no held item.`,
+        messages,
+      }
     setRuntimeHeldItem(defender, item, { battleOnly: true })
     setRuntimeHeldItem(attacker, undefined)
     heldItemChanged = true
@@ -1119,7 +1315,11 @@ export function applyMoveRuntimeEffects(params: {
 
   if (move.heldItemEffect?.type === 'remove-target') {
     const item = getRuntimeHeldItem(defender)
-    if (!item) return { failed: `${move.name} failed because ${defender.name} has no held item.`, messages }
+    if (!item)
+      return {
+        failed: `${move.name} failed because ${defender.name} has no held item.`,
+        messages,
+      }
     const protectedMessage = getBattleHeldItemProtectionMessage(defender)
     if (protectedMessage) return { failed: protectedMessage, messages }
     setRuntimeHeldItem(defender, undefined)
@@ -1129,8 +1329,16 @@ export function applyMoveRuntimeEffects(params: {
 
   if (move.heldItemEffect?.type === 'steal-target') {
     const item = getRuntimeHeldItem(defender)
-    if (!item) return { failed: `${move.name} failed because ${defender.name} has no held item.`, messages }
-    if (getRuntimeHeldItem(attacker)) return { failed: `${move.name} failed because ${attacker.name} already has a held item.`, messages }
+    if (!item)
+      return {
+        failed: `${move.name} failed because ${defender.name} has no held item.`,
+        messages,
+      }
+    if (getRuntimeHeldItem(attacker))
+      return {
+        failed: `${move.name} failed because ${attacker.name} already has a held item.`,
+        messages,
+      }
     const protectedMessage = getBattleHeldItemProtectionMessage(defender)
     if (protectedMessage) return { failed: protectedMessage, messages }
     setRuntimeHeldItem(attacker, item, { battleOnly: true })
@@ -1143,35 +1351,59 @@ export function applyMoveRuntimeEffects(params: {
     const attackerItem = getRuntimeHeldItem(attacker)
     const defenderItem = getRuntimeHeldItem(defender)
     if (!attackerItem && !defenderItem) {
-      return { failed: `${move.name} failed because neither Pokemon has a held item.`, messages }
+      return {
+        failed: `${move.name} failed because neither Pokemon has a held item.`,
+        messages,
+      }
     }
     if (defenderItem) {
       const protectedMessage = getBattleHeldItemProtectionMessage(defender)
       if (protectedMessage) return { failed: protectedMessage, messages }
     }
-    setRuntimeHeldItem(attacker, defenderItem, { battleOnly: Boolean(defenderItem) })
-    setRuntimeHeldItem(defender, attackerItem, { battleOnly: Boolean(attackerItem) })
+    setRuntimeHeldItem(attacker, defenderItem, {
+      battleOnly: Boolean(defenderItem),
+    })
+    setRuntimeHeldItem(defender, attackerItem, {
+      battleOnly: Boolean(attackerItem),
+    })
     heldItemChanged = true
     messages.push(`${attacker.name} and ${defender.name} swapped held items.`)
   }
 
   if (move.heldItemEffect?.type === 'recycle') {
     if (getRuntimeHeldItem(attacker)) {
-      return { failed: `${move.name} failed because ${attacker.name} already has a held item.`, messages }
+      return {
+        failed: `${move.name} failed because ${attacker.name} already has a held item.`,
+        messages,
+      }
     }
     const restored = attacker.consumedHeldItems?.pop()
-    if (!restored) return { failed: `${move.name} failed because no consumed held item was available.`, messages }
+    if (!restored)
+      return {
+        failed: `${move.name} failed because no consumed held item was available.`,
+        messages,
+      }
     const item = { id: restored.itemId, name: restored.name }
-    setRuntimeHeldItem(attacker, item, { battleOnly: restored.persistent === false })
+    setRuntimeHeldItem(attacker, item, {
+      battleOnly: restored.persistent === false,
+    })
     heldItemChanged = true
     messages.push(`${attacker.name} restored its ${item.name}.`)
   }
 
   if (move.heldItemEffect?.type === 'consume-self') {
     const item = getRuntimeHeldItem(attacker)
-    if (!item) return { failed: `${move.name} failed because ${attacker.name} has no held item.`, messages }
+    if (!item)
+      return {
+        failed: `${move.name} failed because ${attacker.name} has no held item.`,
+        messages,
+      }
     attacker.consumedHeldItems ??= []
-    attacker.consumedHeldItems.push({ itemId: item.id, name: item.name, persistent: false })
+    attacker.consumedHeldItems.push({
+      itemId: item.id,
+      name: item.name,
+      persistent: false,
+    })
     setRuntimeHeldItem(attacker, undefined)
     heldItemChanged = true
     messages.push(`${attacker.name} used its ${item.name}.`)
@@ -1185,25 +1417,35 @@ export function applyMoveRuntimeEffects(params: {
     let consumed = 0
     for (const target of targets) {
       const item = getRuntimeHeldItem(target)
-      const definition = item ? items.find((entry) => entry.id === item.id) : undefined
+      const definition = item
+        ? items.find((entry) => entry.id === item.id)
+        : undefined
       if (!item || definition?.category !== 'berry') continue
       if (target === defender) {
         const protectedMessage = getBattleHeldItemProtectionMessage(defender)
         if (protectedMessage) {
-          if (targets.length === 1) return { failed: protectedMessage, messages }
+          if (targets.length === 1)
+            return { failed: protectedMessage, messages }
           messages.push(protectedMessage)
           continue
         }
       }
       target.consumedHeldItems ??= []
-      target.consumedHeldItems.push({ itemId: item.id, name: item.name, persistent: false })
+      target.consumedHeldItems.push({
+        itemId: item.id,
+        name: item.name,
+        persistent: false,
+      })
       setRuntimeHeldItem(target, undefined)
       heldItemChanged = true
       consumed += 1
       messages.push(`${target.name} ate its ${item.name}.`)
     }
     if (consumed === 0) {
-      return { failed: `${move.name} failed because no held berries were available.`, messages }
+      return {
+        failed: `${move.name} failed because no held berries were available.`,
+        messages,
+      }
     }
   }
 
@@ -1227,7 +1469,10 @@ export function applyMoveRuntimeEffects(params: {
     const targetSide = oppositeSide(side)
     const last = state.moveHistory?.lastSuccessful?.[targetSide]
     if (!last?.moveId) {
-      return { failed: `${move.name} failed because no previous target move was available.`, messages }
+      return {
+        failed: `${move.name} failed because no previous target move was available.`,
+        messages,
+      }
     }
     if (blocksBattleMentalEffectByAbility(target, 'encore')) {
       messages.push(getBattleMentalEffectBlockMessage(target, move.name))
@@ -1237,13 +1482,16 @@ export function applyMoveRuntimeEffects(params: {
         moveName: last.moveName,
         turnsRemaining: move.moveLockEffect.turns,
       }
-      messages.push(`${target.name} must repeat ${last.moveName || last.moveId}.`)
+      messages.push(
+        `${target.name} must repeat ${last.moveName || last.moveId}.`,
+      )
     }
   }
 
   if (move.moveUseEffect) {
     const target = move.moveUseEffect.target === 'enemy' ? defender : attacker
-    const targetSide = move.moveUseEffect.target === 'enemy' ? oppositeSide(side) : side
+    const targetSide =
+      move.moveUseEffect.target === 'enemy' ? oppositeSide(side) : side
     const lowered = lowerPokemonMoveUses({
       state,
       side: targetSide,
@@ -1251,9 +1499,14 @@ export function applyMoveRuntimeEffects(params: {
       amount: move.moveUseEffect.amount,
     })
     if (lowered <= 0) {
-      return { failed: `${move.name} failed because ${target.name} had no move uses left.`, messages }
+      return {
+        failed: `${move.name} failed because ${target.name} had no move uses left.`,
+        messages,
+      }
     }
-    messages.push(`${target.name} lost ${lowered} move use${lowered === 1 ? '' : 's'}.`)
+    messages.push(
+      `${target.name} lost ${lowered} move use${lowered === 1 ? '' : 's'}.`,
+    )
   }
 
   if (move.terrainEffect) {
@@ -1285,20 +1538,23 @@ export function applyMoveRuntimeEffects(params: {
         Math.floor(attacker.maxHp / move.curseEffect.ghostHpFraction),
       )
       attacker.currentHp = Math.max(0, attacker.currentHp - selfDamage)
-      defender.secondaryStatuses = addOrReplaceSecondaryStatus(defender.secondaryStatuses, {
-        id: 'curse',
-        name: 'Curse',
-        sourceSide: side,
-        target: 'pokemon',
-        triggers: ['turn-end'],
-        remainingTurns: move.curseEffect.ghostTurns,
-        effects: [
-          {
-            type: 'damage',
-            percentMaxHp: move.curseEffect.ghostDamagePercentMaxHp,
-          },
-        ],
-      })
+      defender.secondaryStatuses = addOrReplaceSecondaryStatus(
+        defender.secondaryStatuses,
+        {
+          id: 'curse',
+          name: 'Curse',
+          sourceSide: side,
+          target: 'pokemon',
+          triggers: ['turn-end'],
+          remainingTurns: move.curseEffect.ghostTurns,
+          effects: [
+            {
+              type: 'damage',
+              percentMaxHp: move.curseEffect.ghostDamagePercentMaxHp,
+            },
+          ],
+        },
+      )
       messages.push(`${attacker.name} cut its HP and cursed ${defender.name}.`)
     } else {
       attacker.statStages = cloneStatStages(attacker.statStages)
@@ -1310,7 +1566,9 @@ export function applyMoveRuntimeEffects(params: {
           stat,
         )
         const direction = buff.stages >= 0 ? 'rose' : 'fell'
-        messages.push(`${attacker.name}'s ${formatStatStageName(buff.stat)} ${direction}!`)
+        messages.push(
+          `${attacker.name}'s ${formatStatStageName(buff.stat)} ${direction}!`,
+        )
       }
     }
   }
@@ -1322,9 +1580,16 @@ export function applyMoveRuntimeEffects(params: {
         messages,
       }
     }
-    const activeIndex = side === 'player' ? state.activeEnemyIndex : state.activePlayerIndex
-    const nextIndex = defenderTeam.findIndex((pokemon, index) => index !== activeIndex && pokemon.currentHp > 0)
-    if (nextIndex === -1) return { failed: `${move.name} failed because there was no replacement.`, messages }
+    const activeIndex =
+      side === 'player' ? state.activeEnemyIndex : state.activePlayerIndex
+    const nextIndex = defenderTeam.findIndex(
+      (pokemon, index) => index !== activeIndex && pokemon.currentHp > 0,
+    )
+    if (nextIndex === -1)
+      return {
+        failed: `${move.name} failed because there was no replacement.`,
+        messages,
+      }
     clearSourceLinkedTrapSecondaryStatuses({
       state,
       sourceSide: side === 'player' ? 'enemy' : 'player',
@@ -1356,13 +1621,21 @@ export function applyMoveRuntimeEffects(params: {
       state.pendingPlayerSwitch = true
       state.pendingPlayerSwitchReason = 'move'
       if (move.switchEffect.passStatStages) {
-        state.pendingPlayerSwitchStatStages = cloneStatStages(attacker.statStages)
+        state.pendingPlayerSwitchStatStages = cloneStatStages(
+          attacker.statStages,
+        )
       }
       messages.push(`Choose a Pokemon to switch in for ${attacker.name}.`)
     } else {
       const activeIndex = state.activeEnemyIndex
-      const nextIndex = attackerTeam.findIndex((pokemon, index) => index !== activeIndex && pokemon.currentHp > 0)
-      if (nextIndex === -1) return { failed: `${move.name} failed because there was no replacement.`, messages }
+      const nextIndex = attackerTeam.findIndex(
+        (pokemon, index) => index !== activeIndex && pokemon.currentHp > 0,
+      )
+      if (nextIndex === -1)
+        return {
+          failed: `${move.name} failed because there was no replacement.`,
+          messages,
+        }
       const passedStatStages = move.switchEffect.passStatStages
         ? cloneStatStages(attacker.statStages)
         : undefined
@@ -1379,7 +1652,9 @@ export function applyMoveRuntimeEffects(params: {
       if (passedStatStages) {
         replacement.statStages = passedStatStages
       }
-      messages.push(`${attacker.name} went back, and ${replacement.name} took its place.`)
+      messages.push(
+        `${attacker.name} went back, and ${replacement.name} took its place.`,
+      )
       messages.push(
         ...processBattleAbilityWeatherSet({
           state,
@@ -1437,7 +1712,9 @@ export function applyMoveRuntimeEffects(params: {
         types: [typeChangeEffect.pokemonType],
         turns: typeChangeEffect.turns,
       })
-      messages.push(`${target.name} became ${typeChangeEffect.pokemonType}-type.`)
+      messages.push(
+        `${target.name} became ${typeChangeEffect.pokemonType}-type.`,
+      )
       nextType = undefined
       typeChangeHandled = true
     }
@@ -1445,7 +1722,8 @@ export function applyMoveRuntimeEffects(params: {
     if (typeChangeEffect.type === 'add') {
       const currentTypes = getEffectiveBattleTypes(target)
       const nextTypes = currentTypes.some(
-        (type) => type.toLowerCase() === typeChangeEffect.pokemonType.toLowerCase(),
+        (type) =>
+          type.toLowerCase() === typeChangeEffect.pokemonType.toLowerCase(),
       )
         ? currentTypes
         : [...currentTypes, typeChangeEffect.pokemonType]
@@ -1454,7 +1732,9 @@ export function applyMoveRuntimeEffects(params: {
         types: nextTypes,
         turns: typeChangeEffect.turns,
       })
-      messages.push(`${target.name} gained the ${typeChangeEffect.pokemonType} type.`)
+      messages.push(
+        `${target.name} gained the ${typeChangeEffect.pokemonType} type.`,
+      )
       nextType = undefined
       typeChangeHandled = true
     }
@@ -1462,14 +1742,17 @@ export function applyMoveRuntimeEffects(params: {
     if (typeChangeEffect.type === 'remove') {
       const currentTypes = getEffectiveBattleTypes(target)
       const nextTypes = currentTypes.filter(
-        (type) => type.toLowerCase() !== typeChangeEffect.pokemonType.toLowerCase(),
+        (type) =>
+          type.toLowerCase() !== typeChangeEffect.pokemonType.toLowerCase(),
       )
       applyBattleTypeOverride({
         pokemon: target,
         types: nextTypes.length ? nextTypes : ['normal'],
         turns: typeChangeEffect.turns,
       })
-      messages.push(`${target.name} lost the ${typeChangeEffect.pokemonType} type.`)
+      messages.push(
+        `${target.name} lost the ${typeChangeEffect.pokemonType} type.`,
+      )
       nextType = undefined
       typeChangeHandled = true
     }
@@ -1478,18 +1761,29 @@ export function applyMoveRuntimeEffects(params: {
       applyBattleTypeOverride({ pokemon: target, types: [nextType] })
       messages.push(`${target.name} became ${nextType}-type.`)
     } else if (!typeChangeHandled) {
-      return { failed: `${move.name} failed because no move type was available.`, messages }
+      return {
+        failed: `${move.name} failed because no move type was available.`,
+        messages,
+      }
     }
   }
 
   if (move.battleRewards?.rewards.length && side === 'player') {
     state.moveRewards ??= []
-    state.moveRewards.push(...move.battleRewards.rewards.map((reward) => ({ ...reward })))
-    const pokedollarReward = move.battleRewards.rewards.find(
-      (reward) => reward.type === 'currency' && reward.targetId === 'pokedollars',
+    state.moveRewards.push(
+      ...move.battleRewards.rewards.map((reward) => ({ ...reward })),
     )
-    if (typeof pokedollarReward?.quantity === 'number' && pokedollarReward.quantity > 0) {
-      messages.push(`${move.name} scattered ${pokedollarReward.quantity} Pokédollars.`)
+    const pokedollarReward = move.battleRewards.rewards.find(
+      (reward) =>
+        reward.type === 'currency' && reward.targetId === 'pokedollars',
+    )
+    if (
+      typeof pokedollarReward?.quantity === 'number' &&
+      pokedollarReward.quantity > 0
+    ) {
+      messages.push(
+        `${move.name} scattered ${pokedollarReward.quantity} Pokédollars.`,
+      )
     }
   }
 
@@ -1505,7 +1799,10 @@ export function consumeNextAccuracyBypass(pokemon: BattlePokemon): boolean {
 }
 
 export function getEffectiveMoveAccuracy(params: {
-  move: Pick<MoveConfig, 'accuracy' | 'alwaysHits' | 'damage' | 'target' | 'stance'>
+  move: Pick<
+    MoveConfig,
+    'accuracy' | 'alwaysHits' | 'damage' | 'target' | 'stance'
+  >
   state?: BattleState
   attacker: BattlePokemon
   defender?: BattlePokemon
@@ -1565,9 +1862,13 @@ export function getEffectiveStanceAccuracy(params: {
   })
 }
 
-export function getMoveLockMessage(pokemon: BattlePokemon, moveId: string): string | undefined {
+export function getMoveLockMessage(
+  pokemon: BattlePokemon,
+  moveId: string,
+): string | undefined {
   const lock = pokemon.encoredMove
-  if (!lock || lock.turnsRemaining <= 0 || lock.moveId === moveId) return undefined
+  if (!lock || lock.turnsRemaining <= 0 || lock.moveId === moveId)
+    return undefined
   return `${pokemon.name} must use ${lock.moveName || lock.moveId}.`
 }
 
@@ -1679,7 +1980,8 @@ export function checkMoveBattleCondition(params: {
 
   if (condition.type === 'not-last-used-move') {
     const last = params.state?.moveHistory?.lastSuccessful?.[params.side]
-    return last?.pokemonId === params.attacker.id && last.moveId === params.move.id
+    return last?.pokemonId === params.attacker.id &&
+      last.moveId === params.move.id
       ? `${params.move.name} failed because it was used last turn.`
       : undefined
   }

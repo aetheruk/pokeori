@@ -68,6 +68,9 @@ export function FieldObservationGame({
   const [collectedDropIds, setCollectedDropIds] = useState<Set<string>>(
     () => new Set(roundData?.collectedDropIds || []),
   )
+  const [collectingDropIds, setCollectingDropIds] = useState<Set<string>>(
+    () => new Set(),
+  )
 
   const isCountSurvey = roundData?.surveyFocus === 'count-survey'
   const observationEnd = startTime + (roundData?.observationDurationMs || 0)
@@ -147,21 +150,37 @@ export function FieldObservationGame({
   const handleCollectDrop = async (
     drop: FieldObservationPublicCollectibleDrop,
   ) => {
-    if (collectedDropIds.has(drop.id) || phase !== 'observing') return
+    if (
+      collectedDropIds.has(drop.id) ||
+      collectingDropIds.has(drop.id) ||
+      phase !== 'observing'
+    ) {
+      return
+    }
     playSfx('good')
-    setCollectedDropIds((previous) => new Set(previous).add(drop.id))
+    const startedAt = Date.now()
+    setCollectingDropIds((previous) => new Set(previous).add(drop.id))
     const result = await collectFieldResearchDrop(drop.id)
-    if (!result.success) {
+    const remainingPopMs = Math.max(0, 180 - (Date.now() - startedAt))
+    if (remainingPopMs > 0) {
+      await new Promise((resolve) => window.setTimeout(resolve, remainingPopMs))
+    }
+
+    setCollectingDropIds((previous) => {
+      const next = new Set(previous)
+      next.delete(drop.id)
+      return next
+    })
+
+    if (result.success) {
+      setCollectedDropIds((previous) => new Set(previous).add(drop.id))
+    } else {
       const elapsed = Date.now() - startTime
       if (
         elapsed >= drop.startMs &&
         elapsed <= drop.startMs + drop.durationMs
       ) {
-        setCollectedDropIds((previous) => {
-          const next = new Set(previous)
-          next.delete(drop.id)
-          return next
-        })
+        return
       }
     }
   }
@@ -279,6 +298,7 @@ export function FieldObservationGame({
                     <FieldDropButton
                       key={drop.id}
                       drop={drop}
+                      collecting={collectingDropIds.has(drop.id)}
                       onCollect={() => handleCollectDrop(drop)}
                     />
                   ))}
@@ -724,9 +744,11 @@ function FieldNotesCanvas({ resetKey }: { resetKey: string }) {
 
 function FieldDropButton({
   drop,
+  collecting,
   onCollect,
 }: {
   drop: FieldObservationPublicCollectibleDrop
+  collecting: boolean
   onCollect: () => void
 }) {
   return (
@@ -735,7 +757,12 @@ function FieldDropButton({
       aria-label={`Collect ${drop.label}`}
       title={drop.label}
       onClick={onCollect}
-      className="game-focus-ring absolute z-[220] flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-game-ochre/70 bg-game-ochre/20 shadow-[0_0_18px_rgba(181,138,67,0.55)] transition-colors hover:bg-game-ochre/30"
+      disabled={collecting}
+      className={cn(
+        'game-focus-ring absolute z-[220] flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-game-ochre/70 bg-game-ochre/20 shadow-[0_0_18px_rgba(181,138,67,0.55)] transition-colors hover:bg-game-ochre/30',
+        collecting &&
+          'pointer-events-none animate-out zoom-out-75 fade-out-0 duration-200 motion-reduce:animate-none',
+      )}
       style={{
         left: `${drop.x}%`,
         top: `${drop.y}%`,

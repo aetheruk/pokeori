@@ -11,15 +11,28 @@ import {
   Sparkles,
   Zap,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { StanceIcon } from '@/components/game/shared/stance-icon'
 import { Button } from '@/components/ui/button'
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { DYNAMAX_UNLOCK_TURNS } from '@/data/powers'
 import { cn } from '@/lib/utils'
 import { getPokemonMoveUsesRemaining } from '@/utilities/battle/move-uses'
+import {
+  getMoveDisplayType,
+  getMoveInfoTags,
+  getMoveTypeSpriteItemId,
+} from '@/utilities/pokemon/move-display'
+import { getMove } from '@/data/moves'
 import type { BattleStance } from '@/utilities/battle/types'
 import {
   POKEMON_POWER_OPTIONS,
@@ -62,6 +75,18 @@ export function PowerSelector() {
   const [powerOpen, setPowerOpen] = useState(false)
   const powersData = battlePowersData
   const [using, setUsing] = useState<string | null>(null)
+  const [moveInfoId, setMoveInfoId] = useState<string | null>(null)
+  const moveHoldTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const longPressTriggered = useRef(false)
+
+  const clearMoveHold = () => {
+    if (moveHoldTimer.current) {
+      clearTimeout(moveHoldTimer.current)
+      moveHoldTimer.current = null
+    }
+  }
+
+  useEffect(() => clearMoveHold, [])
 
   // Check if any powers are available
   const hasAnyMoves = availableMoves.length > 0
@@ -132,6 +157,18 @@ export function PowerSelector() {
     } finally {
       setUsing(null)
     }
+  }
+
+  const openMoveInfo = (moveId: string) => {
+    clearMoveHold()
+    longPressTriggered.current = true
+    setMoveInfoId(moveId)
+  }
+
+  const startMoveHold = (moveId: string) => {
+    clearMoveHold()
+    longPressTriggered.current = false
+    moveHoldTimer.current = setTimeout(() => openMoveInfo(moveId), 500)
   }
 
   const handleUseVictory = async (itemId: string) => {
@@ -289,7 +326,7 @@ export function PowerSelector() {
     isBattlePanelLoading || !!hasAnyPowers || !!powersData?.selectedPokemonPower
 
   const renderMovesContent = () => (
-    <div className="px-4 pt-4 pb-6 max-w-md mx-auto">
+    <div className="mx-auto w-full max-w-2xl px-4 pt-4 pb-6">
       <div className="overflow-y-auto max-h-[calc(70dvh-120px)] space-y-6">
         <div className="space-y-3">
           <SectionDivider>
@@ -305,11 +342,15 @@ export function PowerSelector() {
             </span>
           </SectionDivider>
           {!canUseMove ? (
-            <div className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted" role="status" aria-live="polite">
+            <div
+              className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted"
+              role="status"
+              aria-live="polite"
+            >
               No move uses remaining this battle
             </div>
           ) : (
-            <div className="flex gap-2 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-none">
+            <div className="grid grid-cols-2 gap-2 pb-1">
               {availableMoves.map((move) => {
                 const moveType =
                   (move.forcedType && move.forcedType !== 'random'
@@ -321,9 +362,29 @@ export function PowerSelector() {
                   <Button
                     key={move.id}
                     variant="outline"
-                    className="h-auto min-w-[112px] flex-shrink-0 rounded-xl border border-game-border bg-game-surface-raised py-2 px-3 shadow-sm transition-colors hover:border-game-moss/60 hover:bg-game-moss/10"
+                    className="h-auto min-h-24 w-full min-w-0 rounded-xl border border-game-border bg-game-surface-raised px-3 py-2 shadow-sm transition-colors hover:border-game-moss/60 hover:bg-game-moss/10"
                     disabled={using !== null}
-                    onClick={() => handleUseMove(move.id)}
+                    title={`Use ${move.name}. Press and hold for move details.`}
+                    aria-description="Press and hold for move details."
+                    onPointerDown={(event) => {
+                      if (event.pointerType !== 'mouse' || event.button === 0) {
+                        startMoveHold(move.id)
+                      }
+                    }}
+                    onPointerUp={clearMoveHold}
+                    onPointerCancel={clearMoveHold}
+                    onPointerLeave={clearMoveHold}
+                    onContextMenu={(event) => {
+                      event.preventDefault()
+                      openMoveInfo(move.id)
+                    }}
+                    onClick={() => {
+                      if (longPressTriggered.current) {
+                        longPressTriggered.current = false
+                        return
+                      }
+                      void handleUseMove(move.id)
+                    }}
                   >
                     <ItemSprite
                       itemId={tmSpriteId}
@@ -358,7 +419,7 @@ export function PowerSelector() {
                             className="w-3 h-3 text-game-ochre"
                           />
                         )}
-                        <span className="font-medium text-xs whitespace-nowrap">
+                        <span className="line-clamp-2 text-center text-xs font-medium leading-tight">
                           {move.name}
                         </span>
                       </div>
@@ -407,6 +468,16 @@ export function PowerSelector() {
           </DrawerContent>
         </Drawer>
       )}
+
+      <MoveInfoDialog
+        moveId={moveInfoId}
+        onOpenChange={(open) => {
+          if (!open) {
+            longPressTriggered.current = false
+            setMoveInfoId(null)
+          }
+        }}
+      />
 
       {shouldShowPowerTrigger && (
         <Drawer open={powerOpen} onOpenChange={setPowerOpen}>
@@ -466,7 +537,11 @@ export function PowerSelector() {
                         </span>
                       </SectionDivider>
                       {!canUseTera ? (
-                        <div className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted" role="status" aria-live="polite">
+                        <div
+                          className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted"
+                          role="status"
+                          aria-live="polite"
+                        >
                           {powersState?.teraUsesRemaining === 0
                             ? 'No Terastallization uses remaining'
                             : isAnyPowerActive
@@ -475,7 +550,11 @@ export function PowerSelector() {
                               : 'This Pokemon has already used Terastallization'}
                         </div>
                       ) : !powersData.teraType ? (
-                        <div className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted" role="status" aria-live="polite">
+                        <div
+                          className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted"
+                          role="status"
+                          aria-live="polite"
+                        >
                           No Tera type set
                         </div>
                       ) : (
@@ -511,24 +590,42 @@ export function PowerSelector() {
                       </SectionDivider>
                       {powersState?.megaEvolved && (
                         <div className="flex justify-center">
-                          <span className="text-xs text-game-clay-strong">Active</span>
+                          <span className="text-xs text-game-clay-strong">
+                            Active
+                          </span>
                         </div>
                       )}
                       {powersState?.megaEvolved ? (
-                        <div className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted" role="status" aria-live="polite">
+                        <div
+                          className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted"
+                          role="status"
+                          aria-live="polite"
+                        >
                           Mega Evolution active
                         </div>
                       ) : powersState?.megaUsesRemaining === 0 ? (
-                        <div className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted" role="status" aria-live="polite">
+                        <div
+                          className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted"
+                          role="status"
+                          aria-live="polite"
+                        >
                           No Mega Evolution uses remaining
                         </div>
                       ) : isAnyPowerActive ? (
-                        <div className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted" role="status" aria-live="polite">
+                        <div
+                          className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted"
+                          role="status"
+                          aria-live="polite"
+                        >
                           {disabledReason ||
                             'Cannot Evolve while another power is active'}
                         </div>
                       ) : powersData.megaStones.length === 0 ? (
-                        <div className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted" role="status" aria-live="polite">
+                        <div
+                          className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted"
+                          role="status"
+                          aria-live="polite"
+                        >
                           No compatible Evolution items for this Pokémon
                         </div>
                       ) : (
@@ -580,7 +677,11 @@ export function PowerSelector() {
                         </div>
                       )}
                       {powersState?.zMoveUsesRemaining === 0 ? (
-                        <div className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted" role="status" aria-live="polite">
+                        <div
+                          className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted"
+                          role="status"
+                          aria-live="polite"
+                        >
                           No Z-Move uses remaining
                         </div>
                       ) : isAnyPowerActive ? (
@@ -985,6 +1086,77 @@ export function PowerSelector() {
         </Drawer>
       )}
     </>
+  )
+}
+
+function MoveInfoDialog({
+  moveId,
+  onOpenChange,
+}: {
+  moveId: string | null
+  onOpenChange: (open: boolean) => void
+}) {
+  const move = moveId ? getMove(moveId) : undefined
+  const moveType = move ? getMoveDisplayType(move) : 'normal'
+  const tags = move ? getMoveInfoTags(move) : []
+
+  return (
+    <Dialog open={moveId !== null} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[88dvh] overflow-y-auto border-game-border bg-game-surface text-game-ink sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>{move?.name || 'Move details'}</DialogTitle>
+          <DialogDescription>
+            {move
+              ? 'Battle move information'
+              : 'This move is no longer available.'}
+          </DialogDescription>
+        </DialogHeader>
+        {move && (
+          <div className="space-y-4">
+            <div className="game-panel flex items-start gap-4 p-4">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
+                <ItemSprite
+                  itemId={getMoveTypeSpriteItemId(move)}
+                  alt={`${moveType} TM`}
+                  width={44}
+                  height={44}
+                  className="h-10 w-10 object-contain"
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <StanceIcon
+                    stance={move.stance}
+                    className="h-4 w-4 text-game-moss-strong"
+                  />
+                  <span className="rounded-full border border-game-border bg-game-canvas px-2 py-0.5 text-[10px] font-semibold uppercase text-game-ink">
+                    {moveType}
+                  </span>
+                </div>
+                <p className="mt-3 text-sm leading-relaxed text-game-muted">
+                  {move.description}
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {tags.map((tag) => (
+                <div
+                  key={`${move.id}-${tag.label}`}
+                  className="rounded-lg border border-game-border bg-game-surface-raised px-3 py-2"
+                >
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-game-muted">
+                    {tag.label}
+                  </div>
+                  <div className="mt-0.5 truncate text-xs font-bold capitalize text-game-ink">
+                    {tag.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
   )
 }
 

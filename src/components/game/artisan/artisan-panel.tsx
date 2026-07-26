@@ -659,9 +659,7 @@ function HoldReleaseDialog({
                   <span
                     className={cn(
                       'text-[10px] tracking-widest',
-                      holding
-                        ? 'text-game-ink'
-                        : 'text-game-cream',
+                      holding ? 'text-game-ink' : 'text-game-cream',
                     )}
                   >
                     {holding
@@ -1567,9 +1565,12 @@ export function ArtisanPanel() {
     failed?: boolean
     materialsLost?: boolean
     quality?: string
+    recipeId?: string
     recipeName?: string
     rewards?: any
     icon?: { type: 'item'; id: string }
+    craftMultiplier?: number
+    canReplay?: boolean
   } | null>(null)
 
   const inventory = useMemo(
@@ -1699,14 +1700,14 @@ export function ArtisanPanel() {
 
   const startCraft = useCallback(
     async (recipe: ArtisanRecipe, craftMultiplier = 1) => {
-      if (loadingRecipe || completingCraft) return
+      if (loadingRecipe || completingCraft) return false
       setLoadingRecipe(recipe.id)
       const response = await beginArtisanCraft(recipe.id, craftMultiplier)
       setLoadingRecipe(null)
 
       if (!response.success) {
         toast.error(response.error || 'Craft failed')
-        return
+        return false
       }
 
       setSelectedRecipe(null)
@@ -1714,6 +1715,7 @@ export function ArtisanPanel() {
       setQteRecipe(recipe)
       setCraftSession(response.session as ArtisanCraftSession)
       setCraftDialogOpen(true)
+      return true
     },
     [completingCraft, loadingRecipe],
   )
@@ -1748,14 +1750,28 @@ export function ArtisanPanel() {
         failed: response.failed,
         materialsLost: response.materialsLost,
         quality: response.quality,
+        recipeId: response.recipeId,
         recipeName: response.recipeName,
         rewards: response.summary,
         icon: outputItemId ? { type: 'item', id: outputItemId } : undefined,
+        craftMultiplier: response.craftMultiplier,
+        canReplay: response.canReplay,
       })
       refreshUser(true)
     },
     [completingCraft, craftSession, refreshUser],
   )
+
+  const replayRecipe = craftResult
+    ? artisanRecipes.find((recipe) => recipe.id === craftResult.recipeId)
+    : undefined
+  const replayMultiplier = craftResult?.craftMultiplier || 1
+
+  const handleReplayCraft = useCallback(async () => {
+    if (!replayRecipe || !craftResult?.canReplay) return
+    const started = await startCraft(replayRecipe, replayMultiplier)
+    if (started) setCraftResult(null)
+  }, [craftResult?.canReplay, replayMultiplier, replayRecipe, startCraft])
 
   const selectedState = selectedRecipe
     ? recipeStates.get(selectedRecipe.id)
@@ -1891,6 +1907,23 @@ export function ArtisanPanel() {
                 : `${craftResult.recipeName || 'Craft'} failed. Materials were preserved.`
               : `${craftResult.recipeName || 'Craft'} finished with ${craftResult.quality || 'completed'} quality.`
             : undefined
+        }
+        secondaryAction={
+          craftResult?.canReplay && replayRecipe ? (
+            <Button
+              size="lg"
+              type="button"
+              disabled={loadingRecipe === replayRecipe.id || completingCraft}
+              aria-busy={loadingRecipe === replayRecipe.id}
+              onClick={() => void handleReplayCraft()}
+            >
+              {loadingRecipe === replayRecipe.id
+                ? 'Preparing…'
+                : replayMultiplier > 1
+                  ? `Play Again ×${replayMultiplier}`
+                  : 'Play Again'}
+            </Button>
+          ) : undefined
         }
       />
 

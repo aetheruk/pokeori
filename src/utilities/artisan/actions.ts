@@ -38,7 +38,10 @@ import {
 } from '@/utilities/artisan/rewards'
 import type { ArtisanCraftSession } from '@/utilities/artisan/types'
 import type { RewardSummary } from '@/utilities/rewards/reward-logic'
-import { getUserInventoryMap, setUserInventoryMap } from '@/utilities/user-state'
+import {
+  getUserInventoryMap,
+  setUserInventoryMap,
+} from '@/utilities/user-state'
 import { recordDailyActivityProgress } from '@/utilities/tasks/daily-progress'
 
 const SESSION_TTL_SECONDS = 20
@@ -96,11 +99,15 @@ function buildHoldTargetOffsets(): number[] {
   const targets: number[] = []
 
   for (let index = 0; index < 3; index += 1) {
-    let target = HOLD_TARGET_MIN_MS + Math.floor(Math.random() * (HOLD_TARGET_MAX_MS - HOLD_TARGET_MIN_MS))
+    let target =
+      HOLD_TARGET_MIN_MS +
+      Math.floor(Math.random() * (HOLD_TARGET_MAX_MS - HOLD_TARGET_MIN_MS))
     for (let reroll = 0; reroll < 10 && index > 0; reroll += 1) {
       const previous = targets[index - 1]
       if (Math.abs(target - previous) >= HOLD_TARGET_MIN_SHIFT_MS) break
-      target = HOLD_TARGET_MIN_MS + Math.floor(Math.random() * (HOLD_TARGET_MAX_MS - HOLD_TARGET_MIN_MS))
+      target =
+        HOLD_TARGET_MIN_MS +
+        Math.floor(Math.random() * (HOLD_TARGET_MAX_MS - HOLD_TARGET_MIN_MS))
     }
     targets.push(target)
   }
@@ -108,7 +115,10 @@ function buildHoldTargetOffsets(): number[] {
   return targets
 }
 
-function recipeGateFailed(recipe: ArtisanRecipe, userData: Awaited<ReturnType<typeof getGameUserData>>) {
+function recipeGateFailed(
+  recipe: ArtisanRecipe,
+  userData: Awaited<ReturnType<typeof getGameUserData>>,
+) {
   const checks: TaskCondition[] = [
     ...(recipe.requirements || []),
     ...(recipe.criteria || []),
@@ -127,7 +137,10 @@ async function getValidatedCraftContext(
   const userData = await getGameUserData(freshUser)
 
   const artisanLevel = getSkillLevel(freshUser.skills as any, 'artisan')
-  const requiredArtisanLevel = getArtisanCraftRequiredLevel(recipe, options.craftMultiplier || 1)
+  const requiredArtisanLevel = getArtisanCraftRequiredLevel(
+    recipe,
+    options.craftMultiplier || 1,
+  )
   if (artisanLevel < requiredArtisanLevel) {
     return {
       success: false as const,
@@ -165,18 +178,32 @@ async function getValidatedCraftContext(
   }
 }
 
-export async function beginArtisanCraft(recipeId: string, requestedMultiplier?: number) {
+export async function beginArtisanCraft(
+  recipeId: string,
+  requestedMultiplier?: number,
+) {
   const { user } = await checkUserAuth()
   if (!user) return { success: false, error: 'Not authenticated' }
 
   const recipe = artisanRecipes.find((entry) => entry.id === recipeId)
   if (!recipe) return { success: false, error: 'Recipe not found' }
-  const craftMultiplier = resolveArtisanCraftMultiplier(recipe, requestedMultiplier)
+  const craftMultiplier = resolveArtisanCraftMultiplier(
+    recipe,
+    requestedMultiplier,
+  )
 
-  const rate = await checkActionRateLimit(user.id, 'artisan-craft-begin', 90, 60)
-  if (!rate.allowed) return { success: false, error: 'Too many crafting requests. Please wait.' }
+  const rate = await checkActionRateLimit(
+    user.id,
+    'artisan-craft-begin',
+    90,
+    60,
+  )
+  if (!rate.allowed)
+    return { success: false, error: 'Too many crafting requests. Please wait.' }
 
-  const validation = await getValidatedCraftContext(user.id, recipe, { craftMultiplier })
+  const validation = await getValidatedCraftContext(user.id, recipe, {
+    craftMultiplier,
+  })
   if (!validation.success) return validation
 
   const now = Date.now()
@@ -191,10 +218,13 @@ export async function beginArtisanCraft(recipeId: string, requestedMultiplier?: 
           : recipe.craftType === 'scatter'
             ? SCATTER_DURATION_MS
             : CRAFT_DURATION_MS
-  const holdTargetOffsetsMs = recipe.craftType === 'precise' ? buildHoldTargetOffsets() : undefined
+  const holdTargetOffsetsMs =
+    recipe.craftType === 'precise' ? buildHoldTargetOffsets() : undefined
   const targetAt =
     startAt +
-    (holdTargetOffsetsMs?.[0] || HOLD_TARGET_MIN_MS + Math.floor(Math.random() * (HOLD_TARGET_MAX_MS - HOLD_TARGET_MIN_MS)))
+    (holdTargetOffsetsMs?.[0] ||
+      HOLD_TARGET_MIN_MS +
+        Math.floor(Math.random() * (HOLD_TARGET_MAX_MS - HOLD_TARGET_MIN_MS)))
   const session: ArtisanCraftSession = {
     id: crypto.randomUUID(),
     userId: user.id,
@@ -224,14 +254,21 @@ export async function beginArtisanCraft(recipeId: string, requestedMultiplier?: 
       recipe.craftType === 'balance'
         ? [0, 1, 2].map(() => 0.25 + Math.random() * 0.5)
         : undefined,
-    balanceGoodWindow: recipe.craftType === 'balance' ? BALANCE_GOOD_WINDOW : undefined,
-    balancePerfectWindow: recipe.craftType === 'balance' ? BALANCE_PERFECT_WINDOW : undefined,
-    balancePeriodMs: recipe.craftType === 'balance' ? BALANCE_PERIOD_MS : undefined,
-    mixGoodRotations: recipe.craftType === 'mix' ? MIX_GOOD_ROTATIONS : undefined,
-    mixPerfectRotations: recipe.craftType === 'mix' ? MIX_PERFECT_ROTATIONS : undefined,
+    balanceGoodWindow:
+      recipe.craftType === 'balance' ? BALANCE_GOOD_WINDOW : undefined,
+    balancePerfectWindow:
+      recipe.craftType === 'balance' ? BALANCE_PERFECT_WINDOW : undefined,
+    balancePeriodMs:
+      recipe.craftType === 'balance' ? BALANCE_PERIOD_MS : undefined,
+    mixGoodRotations:
+      recipe.craftType === 'mix' ? MIX_GOOD_ROTATIONS : undefined,
+    mixPerfectRotations:
+      recipe.craftType === 'mix' ? MIX_PERFECT_ROTATIONS : undefined,
   }
 
-  await redis.set(sessionKey(user.id, session.id), session, { ex: SESSION_TTL_SECONDS })
+  await redis.set(sessionKey(user.id, session.id), session, {
+    ex: SESSION_TTL_SECONDS,
+  })
 
   return {
     success: true,
@@ -244,59 +281,80 @@ export async function beginArtisanCraft(recipeId: string, requestedMultiplier?: 
   }
 }
 
-export async function completeArtisanCraft(sessionId: string, craftInput?: number | number[]) {
+export async function completeArtisanCraft(
+  sessionId: string,
+  craftInput?: number | number[],
+) {
   const { user } = await checkUserAuth()
   if (!user) return { success: false, error: 'Not authenticated' }
 
   const lock = await acquireActionLock(`lock:artisan:craft:${user.id}`, 10)
-  if (!lock.acquired) return { success: false, error: 'Another craft request is in progress' }
+  if (!lock.acquired)
+    return { success: false, error: 'Another craft request is in progress' }
 
   try {
     const idemKey = `artisan:craft:complete:${user.id}:${sessionId}`
     const cached = await getIdempotentResult<any>(idemKey)
     if (cached) return cached
 
-    const session = await redis.get<ArtisanCraftSession>(sessionKey(user.id, sessionId))
+    const session = await redis.get<ArtisanCraftSession>(
+      sessionKey(user.id, sessionId),
+    )
     if (!session || session.userId !== user.id) {
       return { success: false, error: 'Crafting session expired' }
     }
 
     const recipe = artisanRecipes.find((entry) => entry.id === session.recipeId)
     if (!recipe) return { success: false, error: 'Recipe not found' }
-    const craftMultiplier = resolveArtisanCraftMultiplier(recipe, session.craftMultiplier)
+    const craftMultiplier = resolveArtisanCraftMultiplier(
+      recipe,
+      session.craftMultiplier,
+    )
 
     const duration = session.endAt - session.startAt
     const quality =
       session.craftType === 'crush'
         ? getArtisanCrushQuality(
-            typeof craftInput === 'number' && Number.isFinite(craftInput) ? craftInput : 0,
+            typeof craftInput === 'number' && Number.isFinite(craftInput)
+              ? craftInput
+              : 0,
             session,
           )
         : session.craftType === 'balance'
           ? getArtisanBalanceQuality(
               Array.isArray(craftInput)
-                ? craftInput.map((entry) => Math.min(duration, Math.max(0, entry)))
+                ? craftInput.map((entry) =>
+                    Math.min(duration, Math.max(0, entry)),
+                  )
                 : [],
               session,
             )
           : session.craftType === 'mix'
             ? getArtisanMixQuality(
-                typeof craftInput === 'number' && Number.isFinite(craftInput) ? craftInput : 0,
+                typeof craftInput === 'number' && Number.isFinite(craftInput)
+                  ? craftInput
+                  : 0,
                 session,
               )
             : session.craftType === 'scatter'
               ? getArtisanScatterQuality(
-                  typeof craftInput === 'number' && Number.isFinite(craftInput) ? craftInput : 0,
+                  typeof craftInput === 'number' && Number.isFinite(craftInput)
+                    ? craftInput
+                    : 0,
                   session,
                 )
               : Array.isArray(craftInput)
                 ? getArtisanHoldQuality(
-                    craftInput.map((entry) => Math.min(duration, Math.max(0, entry))),
+                    craftInput.map((entry) =>
+                      Math.min(duration, Math.max(0, entry)),
+                    ),
                     session,
                   )
                 : getArtisanCraftQuality(
-                    typeof craftInput === 'number' && Number.isFinite(craftInput)
-                      ? session.startAt + Math.min(duration, Math.max(0, craftInput))
+                    typeof craftInput === 'number' &&
+                      Number.isFinite(craftInput)
+                      ? session.startAt +
+                          Math.min(duration, Math.max(0, craftInput))
                       : Date.now(),
                     session,
                   )
@@ -322,14 +380,24 @@ export async function completeArtisanCraft(sessionId: string, craftInput?: numbe
       let currencyChanged = false
       for (const cost of scaleArtisanCosts(recipe.costs, craftMultiplier)) {
         if (cost.type === 'currency') {
-          nextCurrency[cost.id] = Math.max(0, (nextCurrency[cost.id] || 0) - cost.amount)
+          nextCurrency[cost.id] = Math.max(
+            0,
+            (nextCurrency[cost.id] || 0) - cost.amount,
+          )
           currencyChanged = true
           continue
         }
-        validation.inventory[cost.id] = Math.max(0, (validation.inventory[cost.id] || 0) - cost.amount)
+        validation.inventory[cost.id] = Math.max(
+          0,
+          (validation.inventory[cost.id] || 0) - cost.amount,
+        )
       }
 
-      await setUserInventoryMap(validation.payload as any, user.id, validation.inventory)
+      await setUserInventoryMap(
+        validation.payload as any,
+        user.id,
+        validation.inventory,
+      )
       if (currencyChanged) {
         await validation.payload.update({
           collection: 'users',
@@ -345,6 +413,10 @@ export async function completeArtisanCraft(sessionId: string, craftInput?: numbe
         ? await grantRewards(user.id, rewardsToGrant)
         : { summary: emptyRewardSummary() }
 
+    const replayValidation = await getValidatedCraftContext(user.id, recipe, {
+      craftMultiplier,
+    })
+
     await redis.del(sessionKey(user.id, sessionId))
 
     const result = {
@@ -356,6 +428,8 @@ export async function completeArtisanCraft(sessionId: string, craftInput?: numbe
       quantity,
       recipeId: recipe.id,
       recipeName: recipe.name,
+      craftMultiplier,
+      canReplay: replayValidation.success,
     }
     await setIdempotentResult(idemKey, result, 30)
 

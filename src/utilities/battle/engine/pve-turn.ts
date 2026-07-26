@@ -4,9 +4,20 @@ import {
   handleShieldInteraction,
   resolveStance,
 } from '@/utilities/battle/battle-logic'
-import type { BattlePokemon, BattleStance, PowersState, StanceResult } from '@/utilities/battle/types'
-import { applyDimensionalChargeForResult, type BattleTurnResult } from './pvp-turn'
-import { applyPokemonResearchEndure } from '@/utilities/battle/research-survival'
+import type {
+  BattlePokemon,
+  BattleStance,
+  PowersState,
+  StanceResult,
+} from '@/utilities/battle/types'
+import {
+  applyDimensionalChargeForResult,
+  type BattleTurnResult,
+} from './pvp-turn'
+import {
+  applyPokemonResearchEndure,
+  canApplyPokemonResearchEndure,
+} from '@/utilities/battle/research-survival'
 import {
   applyHeldAttackBreak,
   applyHeldDamageBlock,
@@ -96,11 +107,17 @@ export function applyPveExtraHit(params: {
     return { damage: 0, messages: [] }
   }
 
-  const extraHitMultiplier = getBattleAbilityExtraHitDamageMultiplier(attacker, move)
+  const extraHitMultiplier = getBattleAbilityExtraHitDamageMultiplier(
+    attacker,
+    move,
+  )
   if (extraHitMultiplier <= 0) return { damage: 0, messages: [] }
 
   const messages: string[] = []
-  const extraBaseDamage = Math.max(1, Math.floor(baseDamage * extraHitMultiplier))
+  const extraBaseDamage = Math.max(
+    1,
+    Math.floor(baseDamage * extraHitMultiplier),
+  )
   const abilityResult = applyBattleAbilityDamageModifiers({
     attacker,
     defender,
@@ -112,9 +129,18 @@ export function applyPveExtraHit(params: {
   })
   messages.push(...abilityResult.messages)
   applyBattleFormChange(defender, abilityResult.formChangeId)
-  const blockResult = applyHeldDamageBlock(defender, abilityResult.damage, random)
+  const blockResult = applyHeldDamageBlock(
+    defender,
+    abilityResult.damage,
+    random,
+  )
   if (blockResult.message) messages.push(blockResult.message)
-  const endureResult = applyPokemonResearchEndure(defender, blockResult.damage)
+  const endureResult = applyPokemonResearchEndure(
+    defender,
+    blockResult.damage,
+    random,
+    canApplyPokemonResearchEndure(state, defenderSide),
+  )
   const previousHp = defender.currentHp
   defender.currentHp = Math.max(0, defender.currentHp - endureResult.damage)
   if (endureResult.damage > 0) {
@@ -172,7 +198,10 @@ export function resolvePveTurnMultipliers(params: {
 
   return {
     resolution: isZMove
-      ? { result: resolution.result, damageMultiplier: Z_MOVE_DAMAGE_MULTIPLIER }
+      ? {
+          result: resolution.result,
+          damageMultiplier: Z_MOVE_DAMAGE_MULTIPLIER,
+        }
       : resolution,
     playerDamageMultiplier: isZMove
       ? Z_MOVE_DAMAGE_MULTIPLIER
@@ -200,9 +229,9 @@ export function resolvePveDamageExchange(params: {
   enemyTypeEffectivenessOverride?: number
   enemyCritChance?: number
   enemyIgnoreDefenderStatStages?: boolean
-	  weather?: WeatherType
-	  currentTurn?: number
-	}): PveDamageExchange {
+  weather?: WeatherType
+  currentTurn?: number
+}): PveDamageExchange {
   const {
     playerMon,
     enemyMon,
@@ -221,9 +250,9 @@ export function resolvePveDamageExchange(params: {
     enemyTypeEffectivenessOverride,
     enemyCritChance,
     enemyIgnoreDefenderStatStages,
-	  weather,
-	  currentTurn,
-	} = params
+    weather,
+    currentTurn,
+  } = params
 
   const enemyTypeImmunityBypassAttackTypes =
     getSecondaryStatusTypeImmunityBypassAttackTypes({
@@ -239,8 +268,12 @@ export function resolvePveDamageExchange(params: {
     })
   const beforeMessages: string[] = []
   if (params.state) {
-    beforeMessages.push(...processBattleAbilityEntryCopiesForState(params.state))
-    beforeMessages.push(...processBattleAbilityWeatherTypeChangesForState(params.state))
+    beforeMessages.push(
+      ...processBattleAbilityEntryCopiesForState(params.state),
+    )
+    beforeMessages.push(
+      ...processBattleAbilityWeatherTypeChangesForState(params.state),
+    )
   }
   const playerBeforeAttack = getBattleAbilityBeforeAttackFormChange({
     pokemon: playerMon,
@@ -258,7 +291,9 @@ export function resolvePveDamageExchange(params: {
   )
   const enemyBeforeAttack = getBattleAbilityBeforeAttackFormChange({
     pokemon: enemyMon,
-    damage: enemyCanMove ? enemyDamageMultiplier * (enemyBasePower ?? BASE_BATTLE_POWER) : 0,
+    damage: enemyCanMove
+      ? enemyDamageMultiplier * (enemyBasePower ?? BASE_BATTLE_POWER)
+      : 0,
   })
   if (applyBattleFormChange(enemyMon, enemyBeforeAttack.formId)) {
     beforeMessages.push(...enemyBeforeAttack.messages)
@@ -284,12 +319,12 @@ export function resolvePveDamageExchange(params: {
     undefined,
     weather,
     enemyTypeImmunityBypassAttackTypes,
-	    {
-	      moveId: playerMoveId,
-	      currentTurn,
-	      terrain: params.state?.terrain?.terrain,
-	    },
-	  )
+    {
+      moveId: playerMoveId,
+      currentTurn,
+      terrain: params.state?.terrain?.terrain,
+    },
+  )
   let playerDamage = playerDamageResult.damage
 
   const enemyDamageResult = calculateDamage(
@@ -303,13 +338,13 @@ export function resolvePveDamageExchange(params: {
     enemyCritChance,
     weather,
     playerTypeImmunityBypassAttackTypes,
-	    {
-	      ignoreDefenderStatStages: enemyIgnoreDefenderStatStages,
-	      moveId: enemyMoveId,
-	      currentTurn,
-	      terrain: params.state?.terrain?.terrain,
-	    },
-	  )
+    {
+      ignoreDefenderStatStages: enemyIgnoreDefenderStatStages,
+      moveId: enemyMoveId,
+      currentTurn,
+      terrain: params.state?.terrain?.terrain,
+    },
+  )
   let enemyDamage = enemyCanMove ? enemyDamageResult.damage : 0
 
   if (!enemyCanMove && !enemySwapped) {
@@ -324,12 +359,12 @@ export function resolvePveDamageExchange(params: {
       undefined,
       weather,
       enemyTypeImmunityBypassAttackTypes,
-	      {
-	        moveId: playerMoveId,
-	        currentTurn,
-	        terrain: params.state?.terrain?.terrain,
-	      },
-	    )
+      {
+        moveId: playerMoveId,
+        currentTurn,
+        terrain: params.state?.terrain?.terrain,
+      },
+    )
     playerDamage = neutralPlayerResult.damage
   }
 
@@ -501,7 +536,10 @@ export function applyPveDamageExchange(params: {
   const enemyHpForm = getBattleAbilityHpThresholdFormChange(enemyMon)
   const playerHpForm = getBattleAbilityHpThresholdFormChange(playerMon)
   const enemyHpFormChanged = applyBattleFormChange(enemyMon, enemyHpForm.formId)
-  const playerHpFormChanged = applyBattleFormChange(playerMon, playerHpForm.formId)
+  const playerHpFormChanged = applyBattleFormChange(
+    playerMon,
+    playerHpForm.formId,
+  )
   const playerKoForm =
     enemyMon.currentHp <= 0 && playerTotalDamage > 0
       ? getBattleAbilityAfterKoFormChange(playerMon)
@@ -518,7 +556,10 @@ export function applyPveDamageExchange(params: {
     playerMon.currentHp <= 0 && enemyTotalDamage > 0
       ? applyBattleAbilityAfterKoStatStages(enemyMon)
       : []
-  const playerKoFormChanged = applyBattleFormChange(playerMon, playerKoForm.formId)
+  const playerKoFormChanged = applyBattleFormChange(
+    playerMon,
+    playerKoForm.formId,
+  )
   const enemyKoFormChanged = applyBattleFormChange(enemyMon, enemyKoForm.formId)
   recordBattleDamage({
     state: params.state,
@@ -581,7 +622,10 @@ export function applyPveDamageExchange(params: {
     defender: enemyMon,
   })
   const enemyRarityMessages = enemyCanMove
-    ? processBattleRarityAttackAttempt({ attacker: enemyMon, defender: playerMon })
+    ? processBattleRarityAttackAttempt({
+        attacker: enemyMon,
+        defender: playerMon,
+      })
     : []
   const playerBreakResult = applyHeldAttackBreak(playerMon, playerAttackType)
   const enemyBreakResult = enemyCanMove
@@ -635,9 +679,9 @@ export function resolvePveEnemyOnlyAttack(params: {
   enemyTypeEffectivenessOverride?: number
   enemyCritChance?: number
   enemyIgnoreDefenderStatStages?: boolean
-	  weather?: WeatherType
-	  currentTurn?: number
-	}): PveEnemyOnlyAttack {
+  weather?: WeatherType
+  currentTurn?: number
+}): PveEnemyOnlyAttack {
   const {
     playerMon,
     enemyMon,
@@ -650,13 +694,15 @@ export function resolvePveEnemyOnlyAttack(params: {
     enemyTypeEffectivenessOverride,
     enemyCritChance,
     enemyIgnoreDefenderStatStages,
-	  weather,
-	  currentTurn,
-	} = params
+    weather,
+    currentTurn,
+  } = params
 
   const beforeAttack = getBattleAbilityBeforeAttackFormChange({
     pokemon: enemyMon,
-    damage: enemyCanMove ? enemyDamageMultiplier * (enemyBasePower ?? BASE_BATTLE_POWER) : 0,
+    damage: enemyCanMove
+      ? enemyDamageMultiplier * (enemyBasePower ?? BASE_BATTLE_POWER)
+      : 0,
   })
   const beforeFormChanged = applyBattleFormChange(enemyMon, beforeAttack.formId)
   const beforeTypeMessages = applyBattleAbilityBeforeAttackTypeChange({
@@ -681,13 +727,13 @@ export function resolvePveEnemyOnlyAttack(params: {
       defender: playerMon,
       defenderSide: 'player',
     }),
-	    {
-	      ignoreDefenderStatStages: enemyIgnoreDefenderStatStages,
-	      moveId: enemyMoveId,
-	      currentTurn,
-	      terrain: params.state?.terrain?.terrain,
-	    },
-	  )
+    {
+      ignoreDefenderStatStages: enemyIgnoreDefenderStatStages,
+      moveId: enemyMoveId,
+      currentTurn,
+      terrain: params.state?.terrain?.terrain,
+    },
+  )
   let enemyDamage = enemyCanMove ? enemyDamageResult.damage : 0
   let shieldMessage = [
     beforeFormChanged ? beforeAttack.messages.join(' ') : '',
@@ -704,7 +750,9 @@ export function resolvePveEnemyOnlyAttack(params: {
     )
     if (shieldResult.damageMultiplier === 0) enemyDamage = 0
     if (shieldResult.message) {
-      shieldMessage = [shieldMessage, shieldResult.message].filter(Boolean).join(' ')
+      shieldMessage = [shieldMessage, shieldResult.message]
+        .filter(Boolean)
+        .join(' ')
     }
   }
 
@@ -838,7 +886,11 @@ export function applyPveEnemyDamage(params: {
       ? attemptHeldAttackStatus(enemyMon, playerMon, enemyAttackType, random)
       : { applied: false, message: '' }
   const rarityMessages = enemyCanMove
-    ? processBattleRarityAttackAttempt({ attacker: enemyMon, defender: playerMon, random })
+    ? processBattleRarityAttackAttempt({
+        attacker: enemyMon,
+        defender: playerMon,
+        random,
+      })
     : []
   const breakResult =
     enemyCanMove && enemyMon

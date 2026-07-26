@@ -1,5 +1,8 @@
 import { describe, expect, test } from 'bun:test'
-import { applyPokemonResearchEndure } from '@/utilities/battle/research-survival'
+import {
+  applyPokemonResearchEndure,
+  canApplyPokemonResearchEndure,
+} from '@/utilities/battle/research-survival'
 import { makeBattlePokemon } from './helpers/battle-fixtures'
 
 describe('Pokemon research battle effects', () => {
@@ -10,7 +13,7 @@ describe('Pokemon research battle effects', () => {
       pokemonResearchLevel: 4,
     })
 
-    const result = applyPokemonResearchEndure(pokemon, 60, () => 0.01)
+    const result = applyPokemonResearchEndure(pokemon, 60, () => 0.01, true)
 
     expect(result.damage).toBe(39)
     expect(result.message).toBe(
@@ -24,6 +27,7 @@ describe('Pokemon research battle effects', () => {
         makeBattlePokemon({ currentHp: 40, pokemonResearchLevel: 3 }),
         60,
         () => 0,
+        true,
       ).damage,
     ).toBe(60)
     expect(
@@ -31,7 +35,27 @@ describe('Pokemon research battle effects', () => {
         makeBattlePokemon({ currentHp: 1, pokemonResearchLevel: 4 }),
         60,
         () => 0,
+        true,
       ).damage,
     ).toBe(60)
+  })
+
+  test('research endurance is player-side only in PvE and remains available to both PvP sides', () => {
+    const pveState = { isPvp: false }
+    const pvpState = { isPvp: true }
+    const enemy = makeBattlePokemon({ currentHp: 40, pokemonResearchLevel: 4 })
+
+    expect(canApplyPokemonResearchEndure(pveState, 'enemy')).toBe(false)
+    expect(
+      applyPokemonResearchEndure(
+        enemy,
+        60,
+        () => 0,
+        canApplyPokemonResearchEndure(pveState, 'enemy'),
+      ),
+    ).toMatchObject({ damage: 60, message: '' })
+    expect(canApplyPokemonResearchEndure(pveState, 'player')).toBe(true)
+    expect(canApplyPokemonResearchEndure(pvpState, 'player')).toBe(true)
+    expect(canApplyPokemonResearchEndure(pvpState, 'enemy')).toBe(true)
   })
 })

@@ -709,7 +709,7 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
               return (
                 <div
                   key={bucket.id}
-                  className="absolute flex flex-col items-center justify-center gap-0.5 overflow-hidden rounded-b-[25%] border-b-4 border-l-4 border-r-4 bg-[#0d1820]/90 px-1 shadow-[inset_0_-10px_16px_rgba(0,0,0,0.6)]"
+                  className="absolute flex items-center justify-center overflow-hidden rounded-b-[25%] border-b-4 border-l-4 border-r-4 bg-[#0d1820]/90 px-1 shadow-[inset_0_-10px_16px_rgba(0,0,0,0.6)]"
                   style={{
                     left: `${xPercent}%`,
                     bottom: `${bottomPercent}%`,
@@ -727,12 +727,9 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
                   {bucket.icon && (
                     <TaskIconDisplay
                       icon={bucket.icon as any}
-                      className="relative z-10 w-[48%] h-[48%]"
+                      className="relative z-10 h-[72%] w-[72%] object-contain"
                     />
                   )}
-                  <span className="relative z-10 max-w-full truncate text-[10px] font-black uppercase leading-none text-[#f7ecd6] drop-shadow">
-                    {bucket.label || bucket.id}
-                  </span>
                 </div>
               )
             })}

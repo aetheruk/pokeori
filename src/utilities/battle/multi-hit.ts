@@ -1,15 +1,14 @@
-import { applyPokemonResearchEndure } from './research-survival'
+import {
+  applyPokemonResearchEndure,
+  canApplyPokemonResearchEndure,
+} from './research-survival'
 import { applyHeldDamageBlock } from './held-items'
 import {
   applyBattleAbilityDamageModifiers,
   applyBattleAbilityOnDamagedStatStages,
 } from './abilities'
 import { applyBattleFormChange } from './stats-calc'
-import type {
-  BattlePokemon,
-  BattleStance,
-  BattleState,
-} from './types'
+import type { BattlePokemon, BattleStance, BattleState } from './types'
 
 type BattleSide = 'player' | 'enemy'
 
@@ -21,7 +20,10 @@ export interface AppliedRepeatedHitDamage {
   attemptedHits: number
 }
 
-function splitDamageIntoHitChunks(totalDamage: number, hitCount: number): number[] {
+function splitDamageIntoHitChunks(
+  totalDamage: number,
+  hitCount: number,
+): number[] {
   const count = Math.max(1, Math.floor(hitCount))
   const damage = Math.max(0, Math.floor(totalDamage))
   if (count === 1 || damage <= 0) return [damage]
@@ -87,6 +89,8 @@ export function applyRepeatedHitDamage(params: {
     const endureResult = applyPokemonResearchEndure(
       params.defender,
       blockResult.damage,
+      params.random,
+      canApplyPokemonResearchEndure(params.state, params.defenderSide),
     )
     const hitPreviousHp = params.defender.currentHp
     params.defender.currentHp = Math.max(

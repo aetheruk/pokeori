@@ -776,7 +776,7 @@ const ITEM_RECIPES: ArtisanRecipeDraft[] = [
     artisanLevel: 22,
     costs: [
       { id: 'poke-powder-xs', amount: 2 },
-      { id: 'pecha-berry', amount: 1 },
+      { id: 'pecha-berry', amount: 3 },
       { id: 'toxic-resin-t1', amount: 3 },
     ],
     rewards: [{ type: 'item', targetId: 'antidote', quantity: 1, dropChance: 100 }],
@@ -804,7 +804,7 @@ const ITEM_RECIPES: ArtisanRecipeDraft[] = [
     artisanLevel: 22,
     costs: [
       { id: 'poke-powder-xs', amount: 2 },
-      { id: 'cheri-berry', amount: 1 },
+      { id: 'cheri-berry', amount: 3 },
       { id: 'electric-component-t1', amount: 3 },
     ],
     rewards: [{ type: 'item', targetId: 'paralyze-heal', quantity: 1, dropChance: 100 }],
@@ -818,7 +818,7 @@ const ITEM_RECIPES: ArtisanRecipeDraft[] = [
     artisanLevel: 22,
     costs: [
       { id: 'poke-powder-xs', amount: 2 },
-      { id: 'chesto-berry', amount: 1 },
+      { id: 'chesto-berry', amount: 3 },
       { id: 'mind-thread-t1', amount: 3 },
     ],
     rewards: [{ type: 'item', targetId: 'awakening', quantity: 1, dropChance: 100 }],
@@ -832,7 +832,7 @@ const ITEM_RECIPES: ArtisanRecipeDraft[] = [
     artisanLevel: 22,
     costs: [
       { id: 'poke-powder-xs', amount: 2 },
-      { id: 'rawst-berry', amount: 1 },
+      { id: 'rawst-berry', amount: 3 },
       { id: 'aqua-solvent-t1', amount: 3 },
     ],
     rewards: [{ type: 'item', targetId: 'burn-heal', quantity: 1, dropChance: 100 }],
@@ -888,7 +888,7 @@ const ITEM_RECIPES: ArtisanRecipeDraft[] = [
     artisanLevel: 22,
     costs: [
       { id: 'poke-powder-xs', amount: 2 },
-      { id: 'aspear-berry', amount: 1 },
+      { id: 'aspear-berry', amount: 3 },
       { id: 'cinder-shard-t1', amount: 3 },
     ],
     rewards: [{ type: 'item', targetId: 'ice-heal', quantity: 1, dropChance: 100 }],
