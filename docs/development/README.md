@@ -12,6 +12,7 @@ Follow the [Setup Guide](/docs/development/getting-started.md) to run the projec
 - [Linting](/docs/development/linting.md) - ESLint/Prettier setup
 - [Deployment](/docs/development/deployment.md) - Build and deploy guide
 - [Local GHCR and Coolify](/docs/development/local-ghcr-coolify.md) - Build and deploy the pre-built production image from the release machine
+- [Production Performance Runbook](/docs/development/performance-runbook.md) - CX33, MongoDB, Dragonfly, Coolify, and Cloudflare production baseline
 - [Release Checklist](/docs/development/release-checklist.md) - Pre-deploy validation checklist
 
 ## Prerequisites

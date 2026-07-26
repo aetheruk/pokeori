@@ -203,7 +203,7 @@ function hasRequiredKey(
   key: GameDataKeys,
 ): boolean {
   return (
-    !requiredData || requiredData.length === 0 || requiredData.includes(key)
+    requiredData === undefined || requiredData.includes(key)
   )
 }
 
@@ -212,6 +212,7 @@ async function findRows(
   collection: string,
   userId: string,
   extraWhere: Record<string, unknown>[] = [],
+  select?: Record<string, true>,
 ): Promise<any[]> {
   const and = [{ user: { equals: userId } }, ...extraWhere]
   const result = await payload.find({
@@ -220,6 +221,7 @@ async function findRows(
     pagination: false,
     depth: 0,
     overrideAccess: true,
+    ...(select ? { select } : {}),
   })
 
   return result.docs || []
@@ -992,13 +994,29 @@ export async function getUserStateData(
   payload: PayloadLike,
   user: User,
   requiredData?: GameDataKeys[],
-): Promise<UserStateData> {
+): Promise<Partial<UserStateData>> {
   const shouldFetchActivityStats =
     hasRequiredKey(requiredData, 'battleResults') ||
     hasRequiredKey(requiredData, 'locationEncounterResults') ||
     hasRequiredKey(requiredData, 'gameResults') ||
     hasRequiredKey(requiredData, 'fieldResearchResults') ||
     hasRequiredKey(requiredData, 'expeditionResults')
+
+  const requestedActivityTypes = new Set<string>()
+  if (hasRequiredKey(requiredData, 'battleResults'))
+    requestedActivityTypes.add('battle')
+  if (hasRequiredKey(requiredData, 'locationEncounterResults'))
+    requestedActivityTypes.add('location')
+  if (hasRequiredKey(requiredData, 'gameResults')) {
+    requestedActivityTypes.add('game')
+    requestedActivityTypes.add('research')
+  }
+  if (hasRequiredKey(requiredData, 'fieldResearchResults')) {
+    requestedActivityTypes.add('field-research')
+    requestedActivityTypes.add('research')
+  }
+  if (hasRequiredKey(requiredData, 'expeditionResults'))
+    requestedActivityTypes.add('expedition')
 
   const [
     inventoryRows,
@@ -1010,66 +1028,114 @@ export async function getUserStateData(
     shopPurchaseRows,
   ] = await Promise.all([
     hasRequiredKey(requiredData, 'inventory')
-      ? findRows(payload, USER_STATE_COLLECTIONS.inventory, user.id)
+      ? findRows(payload, USER_STATE_COLLECTIONS.inventory, user.id, [], {
+          itemId: true,
+          quantity: true,
+        })
       : Promise.resolve([]),
     hasRequiredKey(requiredData, 'pokedex')
-      ? findRows(payload, USER_STATE_COLLECTIONS.pokedex, user.id)
+      ? findRows(payload, USER_STATE_COLLECTIONS.pokedex, user.id, [], {
+          speciesId: true,
+          formId: true,
+          seen: true,
+          caught: true,
+          totalSeen: true,
+          totalCaught: true,
+          shinySeen: true,
+          shinyCaught: true,
+          raritiesCaught: true,
+          researchXp: true,
+          researchLevel: true,
+          preferredBattleStance: true,
+        })
       : Promise.resolve([]),
     hasRequiredKey(requiredData, 'abilityDex')
-      ? findRows(payload, USER_STATE_COLLECTIONS.abilityDex, user.id)
+      ? findRows(payload, USER_STATE_COLLECTIONS.abilityDex, user.id, [], {
+          abilityId: true,
+          registered: true,
+          source: true,
+          firstRegisteredAt: true,
+          createdAt: true,
+        })
       : Promise.resolve([]),
     hasRequiredKey(requiredData, 'completedTasks')
-      ? findRows(payload, USER_STATE_COLLECTIONS.tasks, user.id)
+      ? findRows(payload, USER_STATE_COLLECTIONS.tasks, user.id, [], {
+          taskId: true,
+          count: true,
+          completedAt: true,
+          lastCompletedAt: true,
+          updatedAt: true,
+        })
       : Promise.resolve([]),
     shouldFetchActivityStats
-      ? findRows(payload, USER_STATE_COLLECTIONS.activityStats, user.id)
+      ? findRows(
+          payload,
+          USER_STATE_COLLECTIONS.activityStats,
+          user.id,
+          [
+            {
+              activityType: {
+                in: Array.from(requestedActivityTypes),
+              },
+            },
+          ],
+          {
+            activityType: true,
+            activityId: true,
+            wins: true,
+            losses: true,
+            highScore: true,
+            lastPlayed: true,
+            updatedAt: true,
+            metadata: true,
+          },
+        )
       : Promise.resolve([]),
     hasRequiredKey(requiredData, 'tcg')
-      ? findRows(payload, USER_STATE_COLLECTIONS.tcg, user.id)
+      ? findRows(payload, USER_STATE_COLLECTIONS.tcg, user.id, [], {
+          cardId: true,
+          setId: true,
+          quantity: true,
+        })
       : Promise.resolve([]),
     hasRequiredKey(requiredData, 'shopPurchases')
-      ? findRows(payload, USER_STATE_COLLECTIONS.shopPurchases, user.id)
+      ? findRows(payload, USER_STATE_COLLECTIONS.shopPurchases, user.id, [], {
+          shopItemId: true,
+          shopId: true,
+          itemId: true,
+          count: true,
+          firstPurchasedAt: true,
+          lastPurchasedAt: true,
+        })
       : Promise.resolve([]),
   ])
 
   const rowStats = activityRowsToArrays(activityRows)
 
-  return {
-    inventory: hasRequiredKey(requiredData, 'inventory')
-      ? inventoryRowsToArray(inventoryRows)
-      : [],
-    tcg: hasRequiredKey(requiredData, 'tcg') ? tcgRowsToArray(tcgRows) : [],
-    pokedex: hasRequiredKey(requiredData, 'pokedex')
-      ? pokedexRowsToArray(pokedexRows)
-      : [],
-    abilityDex: hasRequiredKey(requiredData, 'abilityDex')
-      ? abilityDexRowsToArray(abilityDexRows)
-      : [],
-    completedTasks: hasRequiredKey(requiredData, 'completedTasks')
-      ? taskRowsToArray(taskRows)
-      : [],
-    battleResults: hasRequiredKey(requiredData, 'battleResults')
-      ? rowStats.battleResults
-      : [],
-    locationEncounterResults: hasRequiredKey(
-      requiredData,
-      'locationEncounterResults',
-    )
-      ? rowStats.locationEncounterResults
-      : [],
-    gameResults: hasRequiredKey(requiredData, 'gameResults')
-      ? rowStats.gameResults
-      : [],
-    fieldResearchResults: hasRequiredKey(requiredData, 'fieldResearchResults')
-      ? rowStats.fieldResearchResults
-      : [],
-    expeditionResults: hasRequiredKey(requiredData, 'expeditionResults')
-      ? rowStats.expeditionResults
-      : [],
-    shopPurchases: hasRequiredKey(requiredData, 'shopPurchases')
-      ? shopPurchaseRowsToRecord(shopPurchaseRows)
-      : undefined,
-  }
+  const result: Partial<UserStateData> = {}
+  if (hasRequiredKey(requiredData, 'inventory'))
+    result.inventory = inventoryRowsToArray(inventoryRows)
+  if (hasRequiredKey(requiredData, 'tcg'))
+    result.tcg = tcgRowsToArray(tcgRows)
+  if (hasRequiredKey(requiredData, 'pokedex'))
+    result.pokedex = pokedexRowsToArray(pokedexRows)
+  if (hasRequiredKey(requiredData, 'abilityDex'))
+    result.abilityDex = abilityDexRowsToArray(abilityDexRows)
+  if (hasRequiredKey(requiredData, 'completedTasks'))
+    result.completedTasks = taskRowsToArray(taskRows)
+  if (hasRequiredKey(requiredData, 'battleResults'))
+    result.battleResults = rowStats.battleResults
+  if (hasRequiredKey(requiredData, 'locationEncounterResults'))
+    result.locationEncounterResults = rowStats.locationEncounterResults
+  if (hasRequiredKey(requiredData, 'gameResults'))
+    result.gameResults = rowStats.gameResults
+  if (hasRequiredKey(requiredData, 'fieldResearchResults'))
+    result.fieldResearchResults = rowStats.fieldResearchResults
+  if (hasRequiredKey(requiredData, 'expeditionResults'))
+    result.expeditionResults = rowStats.expeditionResults
+  if (hasRequiredKey(requiredData, 'shopPurchases'))
+    result.shopPurchases = shopPurchaseRowsToRecord(shopPurchaseRows)
+  return result
 }
 
 function existingValueMatches(
@@ -1079,6 +1145,15 @@ function existingValueMatches(
   return Object.entries(data)
     .filter(([key]) => key !== 'user')
     .every(([key, value]) => valuesEqual(doc[key], value))
+}
+
+async function runWriteJobs(jobs: Array<() => Promise<unknown>>) {
+  const concurrency = 10
+  for (let index = 0; index < jobs.length; index += concurrency) {
+    await Promise.all(
+      jobs.slice(index, index + concurrency).map((operation) => operation()),
+    )
+  }
 }
 
 async function replaceRowsForUser(
@@ -1103,17 +1178,20 @@ async function replaceRowsForUser(
   )
   const wantedByKey = new Map(rows.map((row) => [row.key, row.data]))
   const summary: UserStateSyncSummary = { created: 0, updated: 0, deleted: 0 }
+  const writeJobs: Array<() => Promise<unknown>> = []
 
   for (const row of existingRows) {
     if (wantedByKey.has(getExistingKey(row))) continue
     summary.deleted += 1
 
     if (!options.dryRun) {
-      await payload.delete({
-        collection,
-        id: row.id,
-        overrideAccess: true,
-      })
+      writeJobs.push(() =>
+        payload.delete({
+          collection,
+          id: row.id,
+          overrideAccess: true,
+        }),
+      )
     }
   }
 
@@ -1124,11 +1202,13 @@ async function replaceRowsForUser(
       summary.created += 1
 
       if (!options.dryRun) {
-        await payload.create({
-          collection,
-          data,
-          overrideAccess: true,
-        })
+        writeJobs.push(() =>
+          payload.create({
+            collection,
+            data,
+            overrideAccess: true,
+          }),
+        )
       }
       continue
     }
@@ -1137,15 +1217,18 @@ async function replaceRowsForUser(
     summary.updated += 1
 
     if (!options.dryRun) {
-      await payload.update({
-        collection,
-        id: existing.id,
-        data,
-        overrideAccess: true,
-      })
+      writeJobs.push(() =>
+        payload.update({
+          collection,
+          id: existing.id,
+          data,
+          overrideAccess: true,
+        }),
+      )
     }
   }
 
+  await runWriteJobs(writeJobs)
   return summary
 }
 

@@ -110,7 +110,7 @@ export function VoltorbGridGame({
   const boulderSprite =
     encounter.settings.boulderSprite || '/games/rockpush/boulder.avif'
   const winTileSprite =
-    encounter.settings.winTileSprite || '/games/rockpush/win-tile.png'
+    encounter.settings.winTileSprite || '/games/rockpush/win-tile.avif'
   const playerSprite =
     encounter.settings.playerSprite || '/games/rockpush/trainer.avif'
 

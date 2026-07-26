@@ -50,7 +50,7 @@ export function GameShell({
               Skip to game content
             </a>
             <div
-              className="game-field-stamps absolute inset-0 opacity-[0.035]"
+              className="game-field-stamps absolute inset-0 hidden opacity-[0.035] xl:block"
               aria-hidden="true"
             />
             {!isFullscreen && <GameNavigation />}

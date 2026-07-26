@@ -7,6 +7,31 @@ const TrainerLeveling = lazy(() =>
     default: module.TrainerLeveling,
   })),
 )
+const TrainerSearch = lazy(() =>
+  import('@/components/game/trainer/trainer-search').then((module) => ({
+    default: module.TrainerSearch,
+  })),
+)
+const MysteryGift = lazy(() =>
+  import('@/components/game/trainer/mystery-gift').then((module) => ({
+    default: module.MysteryGift,
+  })),
+)
+const HighScores = lazy(() =>
+  import('@/components/game/trainer/high-scores').then((module) => ({
+    default: module.HighScores,
+  })),
+)
+const FriendsList = lazy(() =>
+  import('@/components/game/trainer/friends-list').then((module) => ({
+    default: module.FriendsList,
+  })),
+)
+const TcgDecksPanel = lazy(() =>
+  import('@/components/game/trainer/tcg-decks-panel').then((module) => ({
+    default: module.TcgDecksPanel,
+  })),
+)
 
 function LazyWrapper({ children }: { children: React.ReactNode }) {
   return (
@@ -15,11 +40,6 @@ function LazyWrapper({ children }: { children: React.ReactNode }) {
     </Suspense>
   )
 }
-import { TrainerSearch } from '@/components/game/trainer/trainer-search'
-import { MysteryGift } from '@/components/game/trainer/mystery-gift'
-import { HighScores } from '@/components/game/trainer/high-scores'
-import { FriendsList } from '@/components/game/trainer/friends-list'
-import { TcgDecksPanel, type DeckFormat } from '@/components/game/trainer/tcg-decks-panel'
 import { useUser } from '@/context/UserContext'
 import {
   Gift,
@@ -35,9 +55,10 @@ import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
 import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
 import { skills } from '@/data/skills'
-import { getAllTcgSets } from '@/utilities/tcg/tcg'
+import { tcgSetSummaries } from '@/data/tcg/summaries'
 import { DesktopSectionEmblem } from '@/components/game/shared/DesktopSectionEmblem'
 
+type DeckFormat = 'baby' | 'champions' | 'masters'
 type Tab =
   | 'profile'
   | 'decks'
@@ -51,7 +72,7 @@ export function TrainerDashboard() {
   const [activeTab, setActiveTab] = useState<Tab>('profile')
   const [sectionDrawerOpen, setSectionDrawerOpen] = useState(false)
   const [rankingSkill, setRankingSkill] = useState(skills[0].id)
-  const deckGenerations = Array.from(new Set(getAllTcgSets().map((set) => set.series))).sort((a, b) =>
+  const deckGenerations = Array.from(new Set(tcgSetSummaries.map((set) => set.series))).sort((a, b) =>
     a.localeCompare(b),
   )
   const [deckGeneration, setDeckGeneration] = useState(deckGenerations[0] || '')
@@ -77,12 +98,14 @@ export function TrainerDashboard() {
             id: 'decks' as const,
             label: 'TCG Decks',
             component: (
-              <TcgDecksPanel
-                deckFormat={deckFormat}
-                setDeckFormat={setDeckFormat}
-                selectedGeneration={deckGeneration}
-                setSelectedGeneration={setDeckGeneration}
-              />
+              <LazyWrapper>
+                <TcgDecksPanel
+                  deckFormat={deckFormat}
+                  setDeckFormat={setDeckFormat}
+                  selectedGeneration={deckGeneration}
+                  setSelectedGeneration={setDeckGeneration}
+                />
+              </LazyWrapper>
             ),
           },
         ]
@@ -90,22 +113,38 @@ export function TrainerDashboard() {
     {
       id: 'trainers' as const,
       label: 'Trainers',
-      component: <TrainerSearch />,
+      component: (
+        <LazyWrapper>
+          <TrainerSearch />
+        </LazyWrapper>
+      ),
     },
     {
       id: 'friends' as const,
       label: 'Friends',
-      component: <FriendsList />,
+      component: (
+        <LazyWrapper>
+          <FriendsList />
+        </LazyWrapper>
+      ),
     },
     {
       id: 'gift' as const,
       label: 'Mystery Gift',
-      component: <MysteryGift />,
+      component: (
+        <LazyWrapper>
+          <MysteryGift />
+        </LazyWrapper>
+      ),
     },
     {
       id: 'scores' as const,
       label: 'High Scores',
-      component: <HighScores activeSkill={rankingSkill} />,
+      component: (
+        <LazyWrapper>
+          <HighScores activeSkill={rankingSkill} />
+        </LazyWrapper>
+      ),
     },
   ]
   const activeComponent =

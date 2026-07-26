@@ -17,16 +17,29 @@ class RedisWrapper {
   private getClient(): Redis {
     if (this.client) return this.client
 
+    const commonOptions = {
+      enableAutoPipelining: true,
+      connectTimeout: 3_000,
+      commandTimeout: 3_000,
+      keepAlive: 10_000,
+      noDelay: true,
+      maxRetriesPerRequest: 2,
+      retryStrategy(times: number) {
+        return times > 5 ? null : Math.min(times * 100, 1_000)
+      },
+    }
+
     if (this.url?.startsWith('rediss://')) {
       this.client = new Redis(this.url, {
+        ...commonOptions,
         tls: {
-          rejectUnauthorized: true, // Enforce TLS certificate validation
+          rejectUnauthorized: true,
         },
       })
     } else if (this.url) {
-      this.client = new Redis(this.url)
+      this.client = new Redis(this.url, commonOptions)
     } else {
-      this.client = new Redis()
+      this.client = new Redis(commonOptions)
     }
 
     // Create the connection only when Redis is actually used. This keeps
@@ -130,6 +143,18 @@ class RedisWrapper {
     return await this.getClient().incr(key)
   }
 
+  async incrementWithExpiry(key: string, windowSeconds: number): Promise<number> {
+    const script = `
+      local count = redis.call('INCR', KEYS[1])
+      if count == 1 then
+        redis.call('EXPIRE', KEYS[1], ARGV[1])
+      end
+      return count
+    `
+    const result = await this.getClient().eval(script, 1, key, windowSeconds)
+    return typeof result === 'number' ? result : Number(result || 0)
+  }
+
   async decr(key: string): Promise<number> {
     return await this.getClient().decr(key)
   }
@@ -143,6 +168,15 @@ class RedisWrapper {
       "if redis.call('GET', KEYS[1]) == ARGV[1] then return redis.call('DEL', KEYS[1]) else return 0 end"
     const result = await this.getClient().eval(script, 1, key, expectedValue)
     return typeof result === 'number' ? result : Number(result || 0)
+  }
+
+  async ping(): Promise<boolean> {
+    return (await this.getClient().ping()) === 'PONG'
+  }
+
+  disconnect(): void {
+    this.client?.disconnect()
+    this.client = undefined
   }
 }
 

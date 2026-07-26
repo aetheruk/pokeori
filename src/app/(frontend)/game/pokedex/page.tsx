@@ -26,10 +26,10 @@ import {
 import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
 import { GameErrorBoundary } from '@/components/game/GameErrorBoundary'
+import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
 import { PremiumSearch } from '@/components/game/shared/PremiumSearch'
 import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
-import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
 import { STANCE_ICON_CONFIG } from '@/components/game/shared/stance-icon'
 import { Badge } from '@/components/ui/badge'
@@ -67,7 +67,6 @@ import type {
 import pokemonData from '@/data/pokemon-data'
 import type { PokedexEntry } from '@/hooks/usePokedex'
 import { usePokedex } from '@/hooks/usePokedex'
-import { useTCG } from '@/hooks/useTCG'
 import { cn } from '@/lib/utils'
 import {
   getMostLikelyStanceForPokemonForm,
@@ -82,11 +81,11 @@ import {
   getMoveTypeSpriteItemId,
 } from '@/utilities/pokemon/move-display'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
-import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
 import {
   POKEMON_RARITY_EFFECTS,
   type PokemonRarityId,
 } from '@/utilities/pokemon/rarity-effects'
+import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
 import {
   getMaxResearchLevelForXp,
   getPokemonResearchLevelTmUnlocks,
@@ -94,7 +93,6 @@ import {
   RESEARCH_LEVEL_REWARDS,
   RESEARCH_LEVEL_THRESHOLDS,
 } from '@/utilities/research/research-levels'
-import { getCardsByPokedexNumber } from '@/utilities/tcg/tcg'
 import { ResearchLevelUpModal } from './_components/ResearchLevelUpModal'
 
 const typeIdMap: Record<string, number> = {
@@ -172,7 +170,6 @@ export default function Pokedex() {
     error: progressError,
     summary,
   } = usePokedex()
-  const { entriesByCard } = useTCG()
   const { gameData } = useUser()
   const inventoryMap = useMemo(
     () =>
@@ -256,17 +253,6 @@ export default function Pokedex() {
     ? entriesByForm[selectedBaseForm.id]
     : undefined
   const isBaseSeen = !!(baseProgress?.seen || baseProgress?.caught)
-
-  const relatedTcgCards = useMemo(() => {
-    if (!selectedSpecies) {
-      return []
-    }
-    // Only show cards that the user owns
-    return getCardsByPokedexNumber(selectedSpecies.id).filter((card) => {
-      const entry = entriesByCard[card.id]
-      return entry && entry.quantity > 0
-    })
-  }, [selectedSpecies, entriesByCard])
 
   // Ensure data exists
   if (!pokemonData || (pokemonData as PokemonData).length === 0) {
@@ -784,9 +770,8 @@ function VariantSection({
   progress?: PokedexEntry
 }) {
   const obtainedRarities = new Set<PokemonRarityId>(
-    progress?.raritiesCaught?.filter(
-      (rarity): rarity is PokemonRarityId =>
-        POKEMON_RARITY_EFFECTS.some((effect) => effect.id === rarity),
+    progress?.raritiesCaught?.filter((rarity): rarity is PokemonRarityId =>
+      POKEMON_RARITY_EFFECTS.some((effect) => effect.id === rarity),
     ) || [],
   )
   // Keep all historical catches visible even before their Pokedex entry is
@@ -827,7 +812,10 @@ function VariantSection({
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center rounded-md border border-dashed border-game-border bg-game-surface">
-                    <CircleHelp className="h-4 w-4" aria-label="Undiscovered variant" />
+                    <CircleHelp
+                      className="h-4 w-4"
+                      aria-label="Undiscovered variant"
+                    />
                   </div>
                 )}
               </div>
@@ -860,7 +848,8 @@ function getPreferredStanceConfig(stance: BattleStance) {
     tech: {
       Icon: STANCE_ICON_CONFIG.tech.Icon,
       label: 'Tech',
-      className: 'border-game-moss-strong/30 bg-game-moss-strong/10 text-game-moss-strong',
+      className:
+        'border-game-moss-strong/30 bg-game-moss-strong/10 text-game-moss-strong',
       barClassName: 'bg-game-moss-strong',
     },
   }[stance]

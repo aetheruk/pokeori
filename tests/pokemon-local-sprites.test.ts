@@ -1,8 +1,10 @@
 import { describe, expect, test } from 'bun:test'
+import { statSync } from 'node:fs'
 import spriteManifest from '@/data/pokemon-sprite-manifest.json'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import {
   getBundledPokemonSpriteUrl,
+  getExactBundledPokemonSpriteUrl,
   getFieldObservationPokemonSpriteSources,
 } from '@/utilities/pokemon/local-sprites'
 import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
@@ -82,6 +84,55 @@ describe('bundled pokemon sprites', () => {
     expect(spriteManifest.sprites['201']?.genV?.back?.normal).toBe(
       '/sprites/pokemon/gen-v/back/normal/201.avif',
     )
+  })
+
+  test('compact availability index matches every authored sprite path', () => {
+    const variants = [
+      ['home', 'front', 'normal', false, false],
+      ['home', 'front', 'shiny', true, false],
+      ['home', 'front', 'female', false, true],
+      ['home', 'front', 'shinyFemale', true, true],
+      ['genV', 'front', 'normal', false, false],
+      ['genV', 'front', 'shiny', true, false],
+      ['genV', 'front', 'female', false, true],
+      ['genV', 'front', 'shinyFemale', true, true],
+      ['genV', 'back', 'normal', false, false],
+      ['genV', 'back', 'shiny', true, false],
+      ['genV', 'back', 'female', false, true],
+      ['genV', 'back', 'shinyFemale', true, true],
+    ] as const
+
+    for (const [formId, entry] of Object.entries(spriteManifest.sprites)) {
+      for (const [family, direction, variant, shiny, female] of variants) {
+        const manifestEntry = entry as {
+          home?: Record<string, string>
+          genV?: Partial<
+            Record<'front' | 'back', Record<string, string>>
+          >
+        }
+        const group =
+          family === 'home'
+            ? manifestEntry.home
+            : manifestEntry.genV?.[direction as 'front' | 'back']
+        const expected = group?.[variant]
+        if (!expected) continue
+        expect(
+          getExactBundledPokemonSpriteUrl({
+            formId,
+            family: family === 'home' ? 'home' : 'gen-v',
+            direction,
+            shiny,
+            female,
+          }),
+        ).toBe(expected)
+      }
+    }
+  })
+
+  test('compact client sprite index stays below 32 KiB', () => {
+    expect(
+      statSync('src/data/pokemon-sprite-availability.ts').size,
+    ).toBeLessThan(32 * 1024)
   })
 
   test('uses bundled local type icons', () => {

@@ -8,11 +8,12 @@ import React, {
   useMemo,
 } from 'react'
 import type { User } from '@/payload-types'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import useSWR from 'swr'
 import { useInventoryStore } from '@/app/(frontend)/store/inventory-store'
 
 import type { RequirementData } from '@/utilities/requirements'
+import { useGameDataScope } from '@/hooks/use-game-data-scope'
 
 interface UserContextType {
   user: User | null
@@ -44,16 +45,9 @@ export function UserProvider({
   initialUser: User | null
 }) {
   const router = useRouter()
-  const pathname = usePathname()
+  const scope = useGameDataScope()
   const setInventory = useInventoryStore((state) => state.setInventory)
-  const syncUrl =
-    pathname === '/game/pokemon'
-      ? '/api/game/sync?scope=pokemon-box'
-      : pathname === '/game/spirit-channeling'
-        ? '/api/game/sync?scope=channeling'
-      : pathname === '/game/explore'
-        ? '/api/game/sync?scope=explore'
-        : '/api/game/sync'
+  const syncUrl = `/api/game/sync?scope=${scope}`
 
   // Use SWR for data fetching with automatic revalidation
   const { data, error, isLoading, mutate } = useSWR<RequirementData>(
@@ -61,6 +55,7 @@ export function UserProvider({
     fetcher,
     {
       refreshInterval: 5 * 60 * 1000, // Revalidate every 5 minutes
+      dedupingInterval: 5 * 1000,
       revalidateOnFocus: true,
       revalidateIfStale: true,
       fallbackData: initialUser
@@ -130,9 +125,9 @@ export function UserProvider({
   )
 
   const refreshUser = useCallback(
-    (skipRouterRefresh?: boolean) => {
-      mutate() // Re-fetch data
-      if (!skipRouterRefresh) {
+    (skipRouterRefresh = true) => {
+      void mutate()
+      if (skipRouterRefresh === false) {
         router.refresh()
       }
     },

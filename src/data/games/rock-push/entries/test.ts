@@ -239,8 +239,8 @@ export const testbasicEntries: RockPushGameConfig[] = [
       floorSprite: '/games/rockpush/floor.avif',
       holeSprite: '/games/rockpush/hole.avif',
       filledHoleSprite: '/games/rockpush/filled-hole.avif',
-      winTileSprite: '/games/rockpush/win-tile.png',
-      teleporterSprite: '/games/rockpush/teleporter.png',
+      winTileSprite: '/games/rockpush/win-tile.avif',
+      teleporterSprite: '/games/rockpush/teleporter.avif',
     },
   },
 ]

@@ -2,7 +2,14 @@
 
 import { Loader2 } from 'lucide-react'
 import Image from 'next/image'
-import { memo, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  memo,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { useInView } from 'react-intersection-observer'
 import { RewardSummaryDisplay } from '@/components/game/reward-summary'
 import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
@@ -13,18 +20,16 @@ import { Button } from '@/components/ui/button'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
-import pokemonData from '@/data/pokemon-data'
+import { tcgSetSummaries } from '@/data/tcg/summaries'
 import type { TcgCard, TcgSet } from '@/data/tcg/types'
 import { useGameUserData } from '@/hooks/useGameUserData'
 import { useTCG } from '@/hooks/useTCG'
+import { APP_VERSION } from '@/utilities/app-version'
 import type { RewardSummary } from '@/utilities/rewards/reward-logic'
-import { getAllTcgSets } from '@/utilities/tcg/tcg'
 import type { TcgBattleEnergyType } from '@/utilities/tcg/tcg-battle'
-import { getVisibleItems } from '@/utilities/ui/progressive-list'
 import { crystallizeDuplicates, getTcgDecks, saveTcgDeck } from './actions'
 
-const INITIAL_CARD_BATCH_SIZE = 80
-const CARD_BATCH_INCREMENT = 80
+const CARD_BATCH_SIZE = 80
 const CARD_CRYSTALIZER_ITEM_ID = 'card-crystalizer'
 type DeckFormat = 'baby' | 'champions' | 'masters'
 const DECK_FORMATS: { id: DeckFormat; label: string }[] = [
@@ -32,6 +37,14 @@ const DECK_FORMATS: { id: DeckFormat; label: string }[] = [
   { id: 'champions', label: 'Champions' },
   { id: 'masters', label: 'Masters' },
 ]
+
+type CatalogCard = { card: TcgCard; set: TcgSet }
+type CatalogResponse<T> = {
+  items: T[]
+  total: number
+  nextCursor: string | null
+}
+type PokemonSummary = { id: number; name: string }
 
 export default function TcgExplorerPage() {
   const {
@@ -66,9 +79,14 @@ export default function TcgExplorerPage() {
     >
   >({})
   const [deckMessage, setDeckMessage] = useState<string>('')
-  const [visibleCardCount, setVisibleCardCount] = useState(
-    INITIAL_CARD_BATCH_SIZE,
-  )
+  const [catalogCards, setCatalogCards] = useState<CatalogCard[]>([])
+  const [catalogTotal, setCatalogTotal] = useState(0)
+  const [nextCursor, setNextCursor] = useState<string | null>(null)
+  const [catalogLoading, setCatalogLoading] = useState(false)
+  const [catalogError, setCatalogError] = useState(false)
+  const [filteredPokemon, setFilteredPokemon] = useState<PokemonSummary[]>([])
+  const loadingMoreRef = useRef(false)
+  const deferredSearch = useDeferredValue(searchQuery.trim())
   const inventory = useMemo(
     () =>
       Object.fromEntries(
@@ -85,11 +103,9 @@ export default function TcgExplorerPage() {
 
   const sets = useMemo(() => {
     if (!gameData) return []
-    const allSets = getAllTcgSets().sort((a, b) => a.name.localeCompare(b.name))
-    return allSets.filter((set) => {
-      const binderId = `binder-${set.id}`
-      return (inventory[binderId] || 0) > 0
-    })
+    return tcgSetSummaries
+      .filter((set) => (inventory[`binder-${set.id}`] || 0) > 0)
+      .sort((a, b) => a.name.localeCompare(b.name))
   }, [gameData, inventory])
 
   // Select first set if none selected and sets are available
@@ -102,20 +118,29 @@ export default function TcgExplorerPage() {
     }
   }, [sets, selectedSetId])
 
-  const pokemonList = useMemo(() => {
-    return pokemonData.map((p) => ({
-      id: p.id,
-      name: p.forms.find((f) => f.form === 'base')?.name || p.forms[0].name,
-    }))
-  }, [])
-
-  const filteredPokemon = useMemo(() => {
-    if (!searchQuery) return []
-    const query = searchQuery.toLowerCase()
-    return pokemonList
-      .filter((p) => p.name.toLowerCase().includes(query))
-      .slice(0, 50) // Limit results for performance
-  }, [pokemonList, searchQuery])
+  useEffect(() => {
+    if (!deferredSearch || selectedPokemonId) {
+      setFilteredPokemon([])
+      return
+    }
+    const controller = new AbortController()
+    const params = new URLSearchParams({
+      v: APP_VERSION,
+      q: deferredSearch,
+      limit: '50',
+    })
+    fetch(`/api/game/catalog/pokemon?${params}`, {
+      signal: controller.signal,
+    })
+      .then((response) => response.json())
+      .then((result: CatalogResponse<PokemonSummary>) => {
+        setFilteredPokemon(result.items || [])
+      })
+      .catch((error) => {
+        if (error?.name !== 'AbortError') setFilteredPokemon([])
+      })
+    return () => controller.abort()
+  }, [deferredSearch, selectedPokemonId])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -151,70 +176,86 @@ export default function TcgExplorerPage() {
     setShowDropdown(false)
   }
 
-  /* FILTERING LOGIC */
-  const filteredCards = useMemo(() => {
-    const normalizedSearch = searchQuery.trim().toLowerCase()
-    const matchingPokemonIds = normalizedSearch
-      ? new Set(
-          pokemonList
-            .filter((pokemon) =>
-              pokemon.name.toLowerCase().includes(normalizedSearch),
-            )
-            .map((pokemon) => pokemon.id),
-        )
-      : null
-    // Any Pokemon search spans every owned binder. Selecting a suggestion uses
-    // its exact Pokedex id; free text matches the visible Pokemon suggestions.
-    const isGlobalSearch = !!selectedPokemonId || normalizedSearch.length > 0
-
-    if (!selectedSetId && !isGlobalSearch) return []
-
-    const cards: { card: TcgCard; set: TcgSet }[] = []
-
-    sets.forEach((set) => {
-      // If we ARE NOT doing a global search, respect the selected set
-      if (!isGlobalSearch) {
-        if (
-          selectedSetId &&
-          selectedSetId !== 'all' &&
-          set.id !== selectedSetId
-        )
-          return
-      }
-
-      set.cards.forEach((card) => {
-        // If a pokemon is selected, filter by national pokedex number
-        if (selectedPokemonId) {
-          if (!card.nationalPokedexNumbers.includes(selectedPokemonId)) return
-        } else if (
-          matchingPokemonIds &&
-          !card.nationalPokedexNumbers.some((id) => matchingPokemonIds.has(id))
-        ) {
-          return
-        }
-
-        cards.push({ card, set })
-      })
+  const catalogUrl = useMemo(() => {
+    const isGlobalSearch = Boolean(selectedPokemonId || deferredSearch)
+    const requestedSetIds = isGlobalSearch
+      ? sets.map((set) => set.id)
+      : selectedSetId
+        ? [selectedSetId]
+        : []
+    if (requestedSetIds.length === 0) return null
+    const params = new URLSearchParams({
+      v: APP_VERSION,
+      setIds: requestedSetIds.join(','),
+      limit: String(CARD_BATCH_SIZE),
     })
-
-    return cards
-  }, [sets, selectedSetId, selectedPokemonId, searchQuery, pokemonList])
-
-  useEffect(() => {
-    setVisibleCardCount(INITIAL_CARD_BATCH_SIZE)
-  }, [selectedSetId, selectedPokemonId, searchQuery])
-
-  useEffect(() => {
-    if (inView) {
-      setVisibleCardCount((prev) => prev + CARD_BATCH_INCREMENT)
+    if (selectedPokemonId) {
+      params.set('pokemonId', String(selectedPokemonId))
+    } else if (deferredSearch) {
+      params.set('q', deferredSearch)
     }
-  }, [inView])
+    return `/api/game/catalog/tcg?${params}`
+  }, [deferredSearch, selectedPokemonId, selectedSetId, sets])
 
-  const visibleCards = useMemo(
-    () => getVisibleItems(filteredCards, visibleCardCount),
-    [filteredCards, visibleCardCount],
-  )
-  const hasMoreCards = visibleCardCount < filteredCards.length
+  useEffect(() => {
+    if (!catalogUrl) {
+      setCatalogCards([])
+      setCatalogTotal(0)
+      setNextCursor(null)
+      return
+    }
+    const controller = new AbortController()
+    setCatalogLoading(true)
+    setCatalogError(false)
+    fetch(catalogUrl, { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error('Catalog request failed')
+        return response.json()
+      })
+      .then((result: CatalogResponse<CatalogCard>) => {
+        setCatalogCards(result.items || [])
+        setCatalogTotal(result.total || 0)
+        setNextCursor(result.nextCursor)
+      })
+      .catch((error) => {
+        if (error?.name !== 'AbortError') {
+          setCatalogError(true)
+          setCatalogCards([])
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setCatalogLoading(false)
+      })
+    return () => controller.abort()
+  }, [catalogUrl])
+
+  useEffect(() => {
+    if (!inView || !nextCursor || !catalogUrl || loadingMoreRef.current) return
+    const controller = new AbortController()
+    const nextUrl = new URL(catalogUrl, window.location.origin)
+    nextUrl.searchParams.set('cursor', nextCursor)
+    loadingMoreRef.current = true
+    fetch(`${nextUrl.pathname}?${nextUrl.searchParams}`, {
+      signal: controller.signal,
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error('Catalog request failed')
+        return response.json()
+      })
+      .then((result: CatalogResponse<CatalogCard>) => {
+        setCatalogCards((current) => [...current, ...(result.items || [])])
+        setNextCursor(result.nextCursor)
+      })
+      .catch((error) => {
+        if (error?.name !== 'AbortError') setCatalogError(true)
+      })
+      .finally(() => {
+        loadingMoreRef.current = false
+      })
+    return () => controller.abort()
+  }, [catalogUrl, inView, nextCursor])
+
+  const hasMoreCards = Boolean(nextCursor)
 
   useEffect(() => {
     if (!gameData || !hasDeckBox) return
@@ -263,17 +304,16 @@ export default function TcgExplorerPage() {
   }
 
   const totalCards = useMemo(
-    () => sets.reduce((sum, set) => sum + set.cards.length, 0),
+    () => sets.reduce((sum, set) => sum + set.total, 0),
     [sets],
   )
 
   const currentSetStats = useMemo(() => {
     if (searchQuery.trim()) {
-      const total = filteredCards.length
-      const unique = filteredCards.reduce((count, { card }) => {
+      const unique = catalogCards.reduce((count, { card }) => {
         return count + ((entriesByCard[card.id]?.quantity || 0) > 0 ? 1 : 0)
       }, 0)
-      return { unique, total }
+      return { unique, total: catalogTotal }
     }
 
     if (!selectedSetId || selectedSetId === 'all') {
@@ -286,10 +326,16 @@ export default function TcgExplorerPage() {
     const set = sets.find((s) => s.id === selectedSetId)
     if (!set) return { unique: 0, total: 0 }
 
-    const total = set.cards.length
-    const unique = set.cards.reduce((count, card) => {
-      return count + ((entriesByCard[card.id]?.quantity || 0) > 0 ? 1 : 0)
-    }, 0)
+    const total = set.total
+    const unique = (gameData?.tcg || []).reduce(
+      (count, entry) =>
+        count +
+        (entry.setId === selectedSetId ||
+        entry.cardId.startsWith(`${selectedSetId}-`)
+          ? 1
+          : 0),
+      0,
+    )
 
     return { unique, total }
   }, [
@@ -299,7 +345,9 @@ export default function TcgExplorerPage() {
     entriesByCard,
     selectedPokemonId,
     searchQuery,
-    filteredCards,
+    catalogCards,
+    catalogTotal,
+    gameData?.tcg,
   ])
 
   return (
@@ -353,7 +401,7 @@ export default function TcgExplorerPage() {
                 : 'All Cards'}
             <span className="ml-2 text-xs font-normal text-game-muted">
               (
-              {collectionLoading ? (
+              {collectionLoading || catalogLoading ? (
                 '...'
               ) : (
                 <>
@@ -368,7 +416,7 @@ export default function TcgExplorerPage() {
           </SectionDivider>
         </div>
 
-        {collectionError ? (
+        {collectionError || catalogError ? (
           <div className="game-folio-section mx-auto max-w-xl p-6 text-center">
             <p className="font-display text-lg font-semibold text-game-ink">
               The Carddex could not be opened
@@ -389,7 +437,9 @@ export default function TcgExplorerPage() {
               Find a card binder during your travels to begin this collection.
             </p>
           </div>
-        ) : visibleCards.length === 0 && !collectionLoading ? (
+        ) : catalogCards.length === 0 &&
+          !collectionLoading &&
+          !catalogLoading ? (
           <div className="game-folio-section mx-auto max-w-xl p-6 text-center">
             <p className="font-display text-lg font-semibold text-game-ink">
               No cards match this search
@@ -405,13 +455,27 @@ export default function TcgExplorerPage() {
           </div>
         ) : (
           <div className="grid grid-cols-4 gap-2 pb-8 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 2xl:grid-cols-10">
-            {visibleCards.map(({ card, set }) => (
+            {catalogCards.map(({ card, set }) => (
               <TcgCardItem
                 key={card.id}
                 card={card}
                 set={set}
                 entry={entriesByCard[card.id]}
                 onClick={() => setSelectedCard({ card, set })}
+              />
+            ))}
+          </div>
+        )}
+        {catalogLoading && catalogCards.length === 0 && (
+          <div
+            className="grid grid-cols-4 gap-2 pb-8 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 2xl:grid-cols-10"
+            role="status"
+            aria-label="Loading cards"
+          >
+            {Array.from({ length: 16 }, (_, index) => (
+              <div
+                key={index}
+                className="aspect-[240/330] rounded-sm border border-game-border bg-game-surface"
               />
             ))}
           </div>

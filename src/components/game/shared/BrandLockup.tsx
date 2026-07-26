@@ -14,7 +14,7 @@ export function BrandLockup({ compact = false, className }: BrandLockupProps) {
         className={cn('flex size-10 items-center justify-center', className)}
       >
         <Image
-          src="/images/pokeori-mark.png"
+          src="/images/pokeori-mark.avif"
           alt="Pokeori"
           width={36}
           height={36}
@@ -27,7 +27,7 @@ export function BrandLockup({ compact = false, className }: BrandLockupProps) {
   return (
     <div className={cn('py-1', className)}>
       <Image
-        src="/images/pokeori-wordmark-transparent.png"
+        src="/images/pokeori-wordmark-transparent.avif"
         alt="Pokeori"
         width={2167}
         height={725}

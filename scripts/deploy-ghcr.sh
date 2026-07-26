@@ -88,6 +88,8 @@ main() {
 
   require_env COOLIFY_WEBHOOK
   require_env COOLIFY_TOKEN
+  NEXT_SERVER_ACTIONS_ENCRYPTION_KEY="${NEXT_SERVER_ACTIONS_ENCRYPTION_KEY:-$(dotenv_value NEXT_SERVER_ACTIONS_ENCRYPTION_KEY)}"
+  require_env NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
 
   local version short_sha
   version="$(bun -e "process.stdout.write((await Bun.file('package.json').json()).version)")"
@@ -102,19 +104,57 @@ main() {
   printf 'Authenticating to GHCR…\n'
   printf '%s' "$GHCR_TOKEN" | docker login ghcr.io --username "$GHCR_USERNAME" --password-stdin
 
-  printf 'Building and publishing %s…\n' "$image"
+  local candidate_tag="${image}:candidate-${short_sha}"
+  printf 'Building linux/amd64 release candidate %s…\n' "$candidate_tag"
   docker buildx build \
     --platform linux/amd64 \
-    --push \
+    --load \
     --cache-from "type=registry,ref=${image}:buildcache" \
     --cache-to "type=registry,ref=${image}:buildcache,mode=max,image-manifest=true,oci-mediatypes=true" \
+    --secret id=NEXT_SERVER_ACTIONS_ENCRYPTION_KEY,env=NEXT_SERVER_ACTIONS_ENCRYPTION_KEY \
     --label "org.opencontainers.image.source=https://github.com/${owner}/${image_name}" \
     --label "org.opencontainers.image.revision=${local_sha}" \
     --label "org.opencontainers.image.version=${version}" \
-    --tag "${image}:latest" \
-    --tag "${image}:v${version}" \
-    --tag "${image}:sha-${short_sha}" \
+    --tag "$candidate_tag" \
     .
+
+  local image_size max_image_size
+  image_size="$(docker image inspect "$candidate_tag" --format '{{.Size}}')"
+  max_image_size="${MAX_RELEASE_IMAGE_BYTES:-367001600}"
+  [[ "$image_size" -le "$max_image_size" ]] || \
+    fail "Release image is $image_size bytes; budget is $max_image_size bytes."
+
+  local smoke_container
+  smoke_container="$(docker run --detach --rm \
+    --env DATABASE_URI=mongodb://127.0.0.1:27017/pokeori \
+    --env PAYLOAD_SECRET=pokeori-smoke-only-placeholder \
+    --env RESEND_API_KEY=re_pokeori-smoke-only-placeholder \
+    --env REDIS_URL=redis://127.0.0.1:6379 \
+    --publish 127.0.0.1::3000 \
+    "$candidate_tag")"
+  trap 'docker rm --force "$smoke_container" >/dev/null 2>&1 || true' EXIT
+  local smoke_port
+  smoke_port="$(docker port "$smoke_container" 3000/tcp | awk -F: 'NR == 1 { print $NF }')"
+  for _ in {1..30}; do
+    if curl --fail --silent "http://127.0.0.1:${smoke_port}/api/app-version" |
+      grep --quiet "\"version\":\"${version}\""; then
+      break
+    fi
+    sleep 1
+  done
+  curl --fail --silent "http://127.0.0.1:${smoke_port}/api/app-version" |
+    grep --quiet "\"version\":\"${version}\"" ||
+    fail "Release candidate did not pass the app-version smoke check."
+  docker rm --force "$smoke_container" >/dev/null
+  trap - EXIT
+
+  printf 'Publishing verified release candidate…\n'
+  docker tag "$candidate_tag" "${image}:latest"
+  docker tag "$candidate_tag" "${image}:v${version}"
+  docker tag "$candidate_tag" "${image}:sha-${short_sha}"
+  docker push "${image}:latest"
+  docker push "${image}:v${version}"
+  docker push "${image}:sha-${short_sha}"
 
   printf 'Triggering Coolify…\n'
   curl --fail-with-body --silent --show-error --request GET "$COOLIFY_WEBHOOK" \

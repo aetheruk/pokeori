@@ -21,11 +21,7 @@ export async function checkActionRateLimit(
   windowSeconds: number,
 ): Promise<RateLimitCheck> {
   const key = `ratelimit:${userId}:${action}`
-  const count = await redis.incr(key)
-
-  if (count === 1) {
-    await redis.expire(key, windowSeconds)
-  }
+  const count = await redis.incrementWithExpiry(key, windowSeconds)
 
   return {
     allowed: count <= limit,

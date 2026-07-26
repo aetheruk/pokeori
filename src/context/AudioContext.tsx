@@ -149,11 +149,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     isProviderMountedRef.current = true
 
-    // Preload frequently used SFX
-    preloadSfx('select')
-    preloadSfx('good')
-    preloadSfx('bad')
-
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
     const standalone =
       window.matchMedia('(display-mode: standalone)').matches ||
@@ -163,7 +158,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     return () => {
       isProviderMountedRef.current = false
     }
-  }, [preloadSfx])
+  }, [])
 
   // Play an SFX
   const playSfx = useCallback(

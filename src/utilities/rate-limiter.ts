@@ -1,65 +1,64 @@
-import Bottleneck from 'bottleneck'
+import { redis } from '@/utilities/redis'
 
-// Create a global rate limiter instance
-const limiter = new Bottleneck({
-  maxConcurrent: 10, // Max 10 concurrent requests
-  minTime: 100, // Min 100ms between requests (10 req/sec)
-  reservoir: 100, // Initial bucket size
-  reservoirRefreshAmount: 100, // Refill amount
-  reservoirRefreshInterval: 60 * 1000, // Refill every 60 seconds
-})
-
-// Per-IP rate limiter using in-memory store (consider Redis for production)
-const ipLimiters = new Map<string, { limiter: Bottleneck; lastSeen: number }>()
-const IP_LIMITER_TTL_MS = 10 * 60 * 1000
-
-function pruneExpiredLimiters(now = Date.now()) {
-  for (const [ip, entry] of ipLimiters.entries()) {
-    if (now - entry.lastSeen > IP_LIMITER_TTL_MS) {
-      void entry.limiter.stop({ dropWaitingJobs: true })
-      ipLimiters.delete(ip)
-    }
-  }
+export type RateLimitResult = {
+  allowed: boolean
+  count: number
+  limit: number
+  remaining: number
+  windowSeconds: number
 }
 
-export function getRateLimiter(ip: string): Bottleneck {
-  const now = Date.now()
-  pruneExpiredLimiters(now)
-
-  const existing = ipLimiters.get(ip)
-  if (existing) {
-    existing.lastSeen = now
-    return existing.limiter
-  }
-
-  if (!ipLimiters.has(ip)) {
-    const limiter = new Bottleneck({
-      maxConcurrent: 5,
-      minTime: 200, // 5 req/sec per IP
-      reservoir: 30, // 30 requests
-      reservoirRefreshAmount: 30,
-      reservoirRefreshInterval: 60 * 1000,
-    })
-    ipLimiters.set(ip, { limiter, lastSeen: now })
-  }
-  return ipLimiters.get(ip)!.limiter
+type ClientIpOptions = {
+  trustCloudflare?: boolean
+  trustProxy?: boolean
 }
 
-export async function rateLimit(ip: string): Promise<boolean> {
-  const limiter = getRateLimiter(ip)
-  try {
-    await limiter.schedule(() => Promise.resolve())
-    return true // Allowed
-  } catch {
-    return false // Rate limited
-  }
+function firstAddress(value: string | null): string | null {
+  const address = value?.split(',')[0]?.trim()
+  return address || null
 }
 
-export function getClientIp(headers: Headers): string {
-  const forwardedFor = headers.get('x-forwarded-for')
-  if (forwardedFor) {
-    return forwardedFor.split(',')[0]?.trim() || 'unknown'
+export function getClientIp(
+  headers: Headers,
+  options: ClientIpOptions = {},
+): string {
+  const trustCloudflare =
+    options.trustCloudflare ??
+    process.env.TRUST_CLOUDFLARE_PROXY === 'true'
+  const trustProxy =
+    options.trustProxy ?? process.env.TRUST_PROXY_HEADERS === 'true'
+
+  if (trustCloudflare) {
+    const cloudflareIp = firstAddress(headers.get('cf-connecting-ip'))
+    if (cloudflareIp) return cloudflareIp
   }
 
-  return headers.get('x-real-ip')?.trim() || 'unknown'
+  if (trustProxy) {
+    return (
+      firstAddress(headers.get('x-forwarded-for')) ||
+      firstAddress(headers.get('x-real-ip')) ||
+      'unknown'
+    )
+  }
+
+  return 'unknown'
+}
+
+export async function rateLimit(
+  namespace: string,
+  identifier: string,
+  limit: number,
+  windowSeconds: number,
+): Promise<RateLimitResult> {
+  const safeIdentifier = identifier || 'unknown'
+  const key = `ratelimit:http:${namespace}:${safeIdentifier}`
+  const count = await redis.incrementWithExpiry(key, windowSeconds)
+
+  return {
+    allowed: count <= limit,
+    count,
+    limit,
+    remaining: Math.max(0, limit - count),
+    windowSeconds,
+  }
 }

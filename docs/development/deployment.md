@@ -12,7 +12,7 @@ Deploy Pokeori to production.
 bun run build
 ```
 
-Docker deployments use Bun for dependency installation, the Next build, and the standalone server runtime. Dependency, Next compiler, and GHCR registry caches are reused between releases.
+Docker deployments use Bun for dependency installation and the standalone server runtime. The disposable builder stage compiles Next with Node for stable Alpine worker behavior; Node is not copied into the runtime image. Dependency, Next compiler, and GHCR registry caches are reused between releases.
 
 ## Environment Setup
 Set all production environment variables:
@@ -20,6 +20,8 @@ Set all production environment variables:
 - `PAYLOAD_SECRET`: Strong random secret (generate with `openssl rand -hex 32`)
 - `RESEND_API_KEY`: Production Resend API key
 - `NEXT_PUBLIC_APP_URL`: Production URL (e.g., `https://pokeori.app`)
+- `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`: Stable 32-byte base64 build secret
+- `TRUST_CLOUDFLARE_PROXY=true`: Only when direct origin access is firewalled
 
 ## Deployment Options
 
@@ -34,7 +36,7 @@ Set all production environment variables:
 2. Run the generated standalone Next server
 
 ## Post-Deployment
-1. Run any intentional MongoDB data migration scripts, such as `bun run migrate:user-state -- --dry-run`, before applying them
+1. Follow the prepare/finalize index procedure in the [performance runbook](/docs/development/performance-runbook.md)
 2. Verify API endpoints
 3. Test critical user flows
 4. Monitor error logs

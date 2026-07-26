@@ -70,7 +70,7 @@ export function RockTunnelEchoMapGame({
   const holeSprite =
     encounter.settings.holeSprite || '/games/rockpush/hole.avif'
   const winTileSprite =
-    encounter.settings.winTileSprite || '/games/rockpush/win-tile.png'
+    encounter.settings.winTileSprite || '/games/rockpush/win-tile.avif'
   const playerSprite =
     encounter.settings.playerSprite || '/games/rockpush/trainer.avif'
   const wallKeys = useMemo(

@@ -6,6 +6,7 @@ changes.
 ## Security
 - Rotate any credentials that have ever appeared in `.env` or logs.
 - Confirm production has `DATABASE_URI`, `PAYLOAD_SECRET`, and `RESEND_API_KEY`.
+- Confirm the release machine has the stable `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`.
 - Confirm `.env` is ignored and no real secrets are committed.
 - Confirm `/dev` routes are inaccessible to non-admin users.
 - Confirm sensitive routes/actions are rate-limited or queued.
@@ -32,8 +33,10 @@ changes.
 ## Rollout
 - Increment `package.json` to a new semantic version for this release; do this for every production deploy, including content updates and hotfixes.
 - Back up production MongoDB before schema or data migrations.
+- For 0.1.1, run `migrate:performance-indexes` prepare and finalize phases using the performance runbook; never let production Payload auto-build these indexes at startup.
 - For the 0.1.0 activity split, run `bun run migrate:game-activity-domains --dry-run`, review the counts, then run `bun run migrate:game-activity-domains`.
 - Confirm Redis is reachable and TLS settings match the deployment environment.
+- Confirm `/api/health` checks both MongoDB and Dragonfly and Coolify reports one healthy replica.
 - Deploy to staging first when available.
 - Check server logs for request IDs on API failures.
 - Verify login, Explore, Pokemon box, one battle, one location encounter, one Mini Game, and one Field Research study.

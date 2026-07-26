@@ -10,7 +10,9 @@ Track Pokemon seen/caught status with research levels.
 - Owned Pokemon collection: `src/collections/Pokemon.ts`
 
 ## Data Structure
-Pokedex stored as JSON map in User collection:
+
+Pokedex progress is stored as normalized `user-pokedex-entries` rows. Each row is keyed by user, species, and form; compound indexes keep collection and form lookups bounded as the catalog grows. The read layer exposes the familiar nested map:
+
 ```typescript
 {
   "1": { // speciesId
@@ -18,6 +20,8 @@ Pokedex stored as JSON map in User collection:
   }
 }
 ```
+
+Release `0.1.1` includes a one-time rarity backfill in the performance-index migration so existing owned Pokemon do not require a full collection scan during normal game syncs.
 
 ## Features
 - Filter by region (Kanto, Johto, etc.)

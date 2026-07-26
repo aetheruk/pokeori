@@ -20,12 +20,11 @@ Trading Card Game collection and booster pack opening.
 - Trade with friends (planned)
 
 ## Data Structure
-TCG collection stored in User:
+
+Card ownership is stored in normalized `user-tcg-cards` rows, each containing a user, card ID, and quantity. A compound unique index prevents duplicate ownership rows. Deck choices remain small profile data:
+
 ```typescript
 {
-  "tcg": {
-    "base1-1": 3 // cardId: quantity
-  },
   "tcgDecks": {
     "baby": ["base1-47"]
   },
@@ -38,6 +37,12 @@ TCG collection stored in User:
   }
 }
 ```
+
+## Catalog Delivery
+
+The browser no longer downloads the complete authored TCG catalog with the game bundle. The trainer TCG screen loads compact set summaries first, then requests cards from `/api/game/catalog/tcg` in bounded pages. Deck cards are resolved by ID through the same endpoint.
+
+Catalog responses are versioned with the application release, cached privately in the browser, and cacheable at the shared edge for immutable release URLs. Search results and set pagination are bounded to keep response size and rendering work predictable.
 
 ## TCG Battle
 - Decks require exactly 15 unique owned Pokemon cards with HP, type, image, and attacks.
