@@ -7,6 +7,8 @@ import '../../styles/globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata = {
   title: 'Pokemon App Dev Tools',
   description: 'Developer tools for Pokemon App',
