@@ -7,6 +7,7 @@ import {
   releaseActionLock,
 } from '@/utilities/game-integrity'
 import type { DailyActivityKind } from '@/data/tasks/types'
+import { matchesDailyActivityKind } from '@/utilities/tasks/daily-activity-kind'
 
 export type DailyProgressType =
   | 'daily_catch'
@@ -50,7 +51,8 @@ function matchesBattleCriteria(criterion: any, event: DailyActivityEvent) {
 
 function matchesCriterion(criterion: any, event: DailyActivityEvent) {
   if (criterion.type === 'daily_activity') {
-    if (criterion.dailyActivity?.kind !== event.kind) return false
+    if (!matchesDailyActivityKind(criterion.dailyActivity?.kind, event.kind))
+      return false
     const sourceIds = criterion.dailyActivity?.sourceIds
     if (sourceIds?.length && (!event.sourceId || !sourceIds.includes(event.sourceId))) return false
     if (event.kind === 'catch' || event.kind === 'fishing_catch') {

@@ -20,6 +20,7 @@ Daily, special, and Pokemon Research tasks.
 - Challenges prefer distinct activity families and avoid the prior UTC day's family/target where alternatives exist. Test/debug, secret, and random-event sources are excluded. Each daily stores a source hint shown in its Explore detail drawer.
 - Five generated challenges award 5 Professor Scrip each. Exactly one is marked as the Daily Bonus and awards 25 Professor Scrip, for a 50-scrip daily cap. Rewards are the same every UTC day, including Sunday.
 - `daily_activity` is the shared progress criterion for successful catches, battle wins, Mini Game wins, Field Research completions, fishing catches, crafts, purchases, voyages, and TCG actions. Mini Games use `game_win`; Field Research uses `field_research_win`.
+- Active dailies generated before the Mini Game and Field Research domain split may still store the legacy `research_win` kind. Progress matching treats either a `game_win` or `field_research_win` event as compatible with that legacy kind, while retaining the authored source ID restriction.
 - Resource deliveries consume 1–3 base type gems or tier-one Pokemon materials, or 2–4 berries. Gem and berry deliveries require a reachable guaranteed reward source; Pokemon materials are sourced from the guaranteed tier-one material awarded by compatible catches.
 
 ## Requirements
