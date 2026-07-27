@@ -654,6 +654,9 @@ export function getFormattedRewards(
         {},
       )
     : {}
+  const activeCompanionFormId = userData.pokemon.find(
+    (pokemon) => pokemon.isCompanion,
+  )?.formId
 
   const rewardItems =
     selectedItem.originalData.rewards
@@ -672,6 +675,7 @@ export function getFormattedRewards(
             ),
           userInventory,
           user: userData.user,
+          activeCompanionFormId,
         }),
       )
       .filter((r: any) => r !== null) || []
@@ -692,6 +696,7 @@ export function getFormattedRewards(
             ),
           userInventory,
           user: userData.user,
+          activeCompanionFormId,
         })
         if (mappedReward) {
           rewardItems.push({
@@ -722,6 +727,7 @@ export function getFormattedRewards(
             ),
           userInventory,
           user: userData.user,
+          activeCompanionFormId,
         })
         if (mappedReward) {
           rewardItems.push({
@@ -777,6 +783,7 @@ export function getFormattedRewards(
           ),
         userInventory,
         user: userData.user,
+        activeCompanionFormId,
       })
 
       if (mappedReward) {
@@ -824,6 +831,7 @@ export function getFormattedRewards(
             ),
           userInventory,
           user: userData.user,
+          activeCompanionFormId,
         },
       )
 

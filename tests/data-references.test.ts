@@ -3809,6 +3809,24 @@ describe('static data references', () => {
     }
   })
 
+  test('Celadon Gym limits every challenger battle to three player Pokemon', () => {
+    const gymBattleIds = [
+      'celadon-gym-lass-kay',
+      'celadon-gym-beauty-bridget',
+      'celadon-gym-picnicker-tina',
+      'celadon-gym-lass-lisa',
+      'celadon-gym-cooltrainer-mary',
+      'celadon-gym-beauty-lori',
+      'celadon-gym-beauty-tamia',
+      'celadon-gym-erika',
+    ]
+
+    for (const id of gymBattleIds) {
+      const battle = battles.find((entry) => entry.id === id)
+      expect(battle?.maxPokemon).toBe(3)
+    }
+  })
+
   test('beast stone fusion random tasks consume the three element stones once', () => {
     const expectedTasks = [
       { element: 'fire', icon: 'fire-stone' },

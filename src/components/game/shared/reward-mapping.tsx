@@ -54,6 +54,7 @@ export interface RewardMappingContext {
   checkRequirements?: (requirements?: any[]) => boolean
   userInventory?: Record<string, number>
   user?: any
+  activeCompanionFormId?: string
 }
 
 export function mapRewardToDisplayItem(
@@ -387,14 +388,36 @@ export function mapRewardToDisplayItem(
     case 'active_companion_friendship': {
       const qty = typeof reward.quantity === 'number' ? reward.quantity : 1
       label = `Companion Friendship +${qty}`
-      icon = <Heart className="h-6 w-6 text-game-clay" />
+      icon = context?.activeCompanionFormId ? (
+        <div className="relative h-8 w-8">
+          <Image
+            src={getPokemonImageUrl(context.activeCompanionFormId, 'sprite')}
+            alt="Active companion"
+            fill
+            className="object-contain pixelated"
+          />
+        </div>
+      ) : (
+        <Heart className="h-6 w-6 text-game-clay" />
+      )
       subLabel = 'Active Companion'
       break
     }
     case 'active_companion_research_xp': {
       const qty = typeof reward.quantity === 'number' ? reward.quantity : 1
       label = `Companion Research XP +${qty}`
-      icon = <Scroll className="h-6 w-6 text-game-moss-strong" />
+      icon = context?.activeCompanionFormId ? (
+        <div className="relative h-8 w-8">
+          <Image
+            src={getPokemonImageUrl(context.activeCompanionFormId, 'sprite')}
+            alt="Active companion"
+            fill
+            className="object-contain pixelated"
+          />
+        </div>
+      ) : (
+        <Scroll className="h-6 w-6 text-game-moss-strong" />
+      )
       subLabel = 'Active Companion'
       break
     }
