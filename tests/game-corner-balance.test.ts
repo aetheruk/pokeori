@@ -11,6 +11,7 @@ describe('Celadon Game Corner balance and presentation', () => {
   test('uses the authored standard-game token costs', () => {
     expect(celadonGameCornerPrizeWheelEntries[0].settings.cost?.amount).toBe(10)
     expect(celadonGameCornerSlotEntries[0].settings.cost.amount).toBe(5)
+    expect(celadonGameCornerPachinkoEntries[0].settings.cost?.amount).toBe(5)
   })
 
   test('uses the revised Stardust and Nugget Prize Exchange prices', () => {
@@ -53,7 +54,7 @@ describe('Celadon Game Corner balance and presentation', () => {
         .map((slot) => slot.rewards[0]?.quantity),
     ).toEqual([50, 100, 125, 200, 300, 500])
 
-    expect(celadonGameCornerPachinkoEntries[1].settings.cost?.amount).toBe(50)
+    expect(celadonGameCornerPachinkoEntries[1].settings.cost?.amount).toBe(25)
     expect(
       celadonGameCornerPachinkoEntries[1].settings.board.buckets.map(
         (bucket) => bucket.rewards[0]?.quantity,
