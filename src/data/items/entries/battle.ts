@@ -294,7 +294,7 @@ const inferiorElementalStoneItems: Item[] = INFERIOR_ELEMENTAL_STONE_CONFIGS.map
 const inferiorTimeStoneItems: Item[] = [
   {
     id: 'inferior-dark-stone',
-    name: 'Inferior Dark Stone',
+    name: 'Inferior Dusk Stone',
     description:
       'A flawed held stone that gains 2% charge from damage taken at night. At full charge it becomes a Dusk Stone during 6pm-7pm, or a Moon Stone at other night hours.',
     spriteId: 'moon-stone',
@@ -304,7 +304,7 @@ const inferiorTimeStoneItems: Item[] = [
   },
   {
     id: 'inferior-light-stone',
-    name: 'Inferior Light Stone',
+    name: 'Inferior Sun Stone',
     description:
       'A flawed held stone that gains 2% charge from damage taken during the day. At full charge it becomes a Dawn Stone during 6am-7am, or a Sun Stone at other day hours.',
     spriteId: 'sun-stone',

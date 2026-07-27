@@ -8,6 +8,11 @@ export const banners: BannerConfig[] = [
   { id: 'lab', name: "Professor's Lab", imagePath: '/backgrounds/lab.avif' },
   { id: 'grassy-route', name: 'Grassy Route', imagePath: '/backgrounds/forest.avif' },
   { id: 'ss-anne', name: 'S.S. Anne', imagePath: '/backgrounds/ss-anne.avif' },
+  {
+    id: 'celadon-game-corner',
+    name: 'Celadon Game Corner',
+    imagePath: '/backgrounds/game-corner.avif',
+  },
 ]
 
 export function getBanner(id: string): BannerConfig | undefined {

@@ -236,13 +236,13 @@ const ELEMENTAL_STONE_RECIPES = [
     materialType: 'ice',
   },
   {
-    label: 'Dark',
+    label: 'Dusk',
     outputId: 'inferior-dark-stone',
     gemId: 'dark-gem',
     materialType: 'dark',
   },
   {
-    label: 'Light',
+    label: 'Sun',
     outputId: 'inferior-light-stone',
     gemId: 'dragon-gem',
     materialType: 'dragon',
@@ -1134,9 +1134,9 @@ const ELEMENTAL_STONE_HELD_RECIPES: ArtisanRecipeDraft[] = ELEMENTAL_STONE_RECIP
   artisanLevel: 30,
   costs: [
     { id: stone.gemId, amount: 10 },
-    { id: `${TYPE_PRIMARY_MATERIAL[stone.materialType]}-t1`, amount: 100 },
+    { id: `${TYPE_PRIMARY_MATERIAL[stone.materialType]}-t1`, amount: 40 },
     { id: 'neutral-stone', amount: 1 },
-    { id: 'crystals', amount: 1000, type: 'currency' },
+    { id: 'crystals', amount: 350, type: 'currency' },
   ],
   rewards: [{ type: 'item', targetId: stone.outputId, quantity: 1, dropChance: 100 }],
   outputQuantity: { min: 1, max: 1 },

@@ -44,6 +44,7 @@ import {
   type ArtisanRecipeCategory,
   artisanRecipes,
 } from '@/data/artisan'
+import { getCurrency } from '@/data/currencies'
 import { items } from '@/data/items'
 import { calculateContentSkillXp, resolveSkillXpConfig } from '@/data/skills/xp'
 import { cn } from '@/lib/utils'
@@ -98,9 +99,7 @@ function getItemName(itemId: string) {
 }
 
 function getCurrencyName(currencyId: string) {
-  if (currencyId === 'crystals') return 'Crystals'
-  if (currencyId === 'pokedollars') return 'Pokédollars'
-  return currencyId
+  return getCurrency(currencyId)?.name || currencyId
 }
 
 function getCostOwned(
@@ -213,7 +212,11 @@ function createHeldTypeBoostGroup(
   recipes: ArtisanRecipe[],
 ): RecipeVariantGroup | null {
   const heldRecipes = recipes
-    .filter((recipe) => recipe.category === 'held')
+    .filter(
+      (recipe) =>
+        recipe.category === 'held' &&
+        !recipe.id.startsWith('craft-inferior-'),
+    )
     .sort(
       (a, b) =>
         a.artisanLevel - b.artisanLevel ||
@@ -232,6 +235,30 @@ function createHeldTypeBoostGroup(
     categoryLabel: 'Held',
     artisanLevel: heldRecipes[0].artisanLevel,
     recipes: heldRecipes,
+  }
+}
+
+function createEvolutionStoneGroup(
+  recipes: ArtisanRecipe[],
+): RecipeVariantGroup | null {
+  const stoneRecipes = recipes
+    .filter(
+      (recipe) =>
+        recipe.category === 'held' && recipe.id.startsWith('craft-inferior-'),
+    )
+    .sort((a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id))
+
+  if (stoneRecipes.length === 0) return null
+
+  return {
+    type: 'heldGroup',
+    id: 'evolution-stones-group',
+    name: 'Evolution Stones',
+    description: 'Choose an elemental stone variant to craft and charge.',
+    category: 'held',
+    categoryLabel: 'Held',
+    artisanLevel: stoneRecipes[0].artisanLevel,
+    recipes: stoneRecipes,
   }
 }
 
@@ -435,7 +462,13 @@ function RecipeCostChip({
       )}
     >
       {cost.type === 'currency' ? (
-        <Sparkles className="h-4 w-4 text-game-ochre" />
+        <ItemSprite
+          itemId={getCurrency(cost.id)?.iconId || cost.id}
+          alt={getCurrencyName(cost.id)}
+          width={20}
+          height={20}
+          className="h-5 w-5 object-contain"
+        />
       ) : (
         <ItemSprite
           itemId={cost.id}
@@ -1673,9 +1706,15 @@ export function ArtisanPanel() {
     )
     const heldGroup = createHeldTypeBoostGroup(visibleRecipePool)
     const heldGroupEntries = heldGroup ? [heldGroup as RecipeIndexEntry] : []
+    const evolutionStoneGroup = createEvolutionStoneGroup(visibleRecipePool)
+    const evolutionStoneGroupEntries = evolutionStoneGroup
+      ? [evolutionStoneGroup as RecipeIndexEntry]
+      : []
 
     if (activeCategory === 'lures') return lureGroupEntries
-    if (activeCategory === 'held') return heldGroupEntries
+    if (activeCategory === 'held') {
+      return [...evolutionStoneGroupEntries, ...heldGroupEntries]
+    }
 
     const nonGroupedRecipes = visibleRecipes
       .filter(
@@ -1686,6 +1725,7 @@ export function ArtisanPanel() {
     return [
       ...nonGroupedRecipes,
       ...lureGroupEntries,
+      ...evolutionStoneGroupEntries,
       ...heldGroupEntries,
     ].sort((a, b) => {
       const aLevel =
@@ -2419,7 +2459,13 @@ export function ArtisanPanel() {
                   >
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
                       {cost.type === 'currency' ? (
-                        <Sparkles className="h-7 w-7 text-game-ochre" />
+                        <ItemSprite
+                          itemId={getCurrency(cost.id)?.iconId || cost.id}
+                          alt={getCurrencyName(cost.id)}
+                          width={40}
+                          height={40}
+                          className="h-10 w-10 object-contain"
+                        />
                       ) : (
                         <ItemSprite
                           itemId={cost.id}
