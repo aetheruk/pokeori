@@ -92,6 +92,24 @@ describe('display mapping copy', () => {
     expect(requirement.subLabel).toBe('Active Companion')
   })
 
+  test('companion service rewards use visible, specific reward icons', () => {
+    const friendship = mapRewardToDisplayItem({
+      type: 'active_companion_friendship',
+      quantity: 25,
+    })
+    const research = mapRewardToDisplayItem({
+      type: 'active_companion_research_xp',
+      quantity: 25,
+    })
+
+    expect(friendship?.label).toBe('Companion Friendship +25')
+    expect(friendship?.icon).toBeTruthy()
+    expect(friendship?.subLabel).toBe('Active Companion')
+    expect(research?.label).toBe('Companion Research XP +25')
+    expect(research?.icon).toBeTruthy()
+    expect(research?.subLabel).toBe('Active Companion')
+  })
+
   test('set collection criteria use set names without duplicating progress counts', () => {
     const requirement = mapCriteriaToDisplayItem({
       type: 'card_collected_set',

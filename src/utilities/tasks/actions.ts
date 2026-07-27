@@ -136,13 +136,15 @@ export async function completeTask(
   )
   const activeCompanion =
     companionServiceRewards.length > 0
-      ? userData.pokemon.find((pokemon) => pokemon.partner)
+      ? userData.pokemon.find(
+          (pokemon) => pokemon.isCompanion === true || pokemon.partner === true,
+        )
       : undefined
 
   if (companionServiceRewards.length > 0 && !activeCompanion) {
     return {
       success: false,
-      message: 'Choose a partner Pokemon before using this service.',
+      message: 'Choose a companion Pokemon before using this service.',
     }
   }
 
@@ -156,7 +158,7 @@ export async function completeTask(
   if (activeCompanion && friendshipGain > 0 && (activeCompanion.friendship || 0) >= 255) {
     return {
       success: false,
-      message: `${activeCompanion.name || 'Your partner'} already has maximum friendship.`,
+      message: `${activeCompanion.name || 'Your companion'} already has maximum friendship.`,
     }
   }
 
@@ -307,7 +309,7 @@ export async function completeTask(
     })
     summary.notices?.push({
       id: 'partner-friendship',
-      title: `${activeCompanion.name || 'Partner'} friendship increased`,
+      title: `${activeCompanion.name || 'Companion'} friendship increased`,
       message: `+${newFriendship - (activeCompanion.friendship || 0)} friendship`,
     })
   }
