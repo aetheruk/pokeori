@@ -38,6 +38,12 @@ interface PachinkoGameProps {
 }
 
 function getRewardLabel(reward: any) {
+  if (reward?.type === 'currency') {
+    const currency = getCurrency(reward.targetId || reward.currencyType || '')
+    const quantity = reward.quantity ? `${reward.quantity} ` : ''
+    return `${quantity}${currency?.name || reward.targetId || 'Currency'}`
+  }
+
   return reward?.label || reward?.targetId || reward?.type || 'Prize'
 }
 
@@ -512,8 +518,8 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
       playSfx('good')
       const bucket = config.board.buckets.find((b) => b.id === bucketId)
       const rewardLabel =
+        (bucket?.rewards?.[0] && getRewardLabel(bucket.rewards[0])) ||
         bucket?.label ||
-        bucket?.rewards?.[0]?.label ||
         'Added to session winnings'
 
       setLastDropMessage(`Prize: ${rewardLabel}`)
