@@ -22,7 +22,14 @@ export const celadonGameCornerTasks: Task[] = [
         "targetId": "high-roller"
       }
     ],
-    "criteria": [],
+    "criteria": [
+      {
+        "type": "currency_owned",
+        "targetId": "fun-tokens",
+        "count": 100,
+        "consume": true
+      }
+    ],
     "rewards": [],
     "enterModal": [
       {
@@ -49,7 +56,7 @@ export const celadonGameCornerTasks: Task[] = [
           "id": "rocket-grunt-f"
         },
         "title": "Battle Bets",
-        "message": "Put down 25 Fun Tokens, inspect both teams, then back one side. You'll see the  odds; the Pokemon settle the rest. Win and you can cash out, or roll every token into the next fight.",
+        "message": "Put down 100 Fun Tokens, inspect both teams, then back one side. You'll see the odds; the Pokemon settle the rest. Win and you can cash out, or roll every token into the next fight.",
         "background": "/backgrounds/celadon-game-corner-prize-wheel.avif",
         "buttons": [
           {

@@ -127,6 +127,20 @@ describe('Celadon Game Corner balance and presentation', () => {
     ).toBe('BATTLE BETS')
   })
 
+  test('charges the Battle Bets task entry once and keeps later wagers virtual', () => {
+    const battleBetsTask = celadonGameCornerTasks.find(
+      (task) => task.id === 'battle-bets',
+    )
+
+    expect(battleBetsTask?.criteria).toContainEqual({
+      type: 'currency_owned',
+      targetId: 'fun-tokens',
+      count: 100,
+      consume: true,
+    })
+    expect(battleBetsGames[0].settings.buyIn).toBe(100)
+  })
+
   test('Rocket Scratch Cards use the revised token prizes and rare cosmetics', () => {
     const card = scratchCards['rocket-scratch']
     expect(
