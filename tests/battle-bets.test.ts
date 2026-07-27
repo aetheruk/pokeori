@@ -8,9 +8,9 @@ import {
 import { makePvpBattleState } from './helpers/battle-fixtures'
 
 describe('Battle Bets', () => {
-  test('authors the agreed buy-in, house edge, simulation count, and odds band', () => {
+  test('authors the 100-token virtual starting pot, house edge, simulation count, and odds band', () => {
     expect(battleBetsGames[0].settings).toEqual({
-      buyIn: 25,
+      buyIn: 100,
       houseEdge: 0.05,
       simulationCount: 200,
       minimumWinChance: 0.25,

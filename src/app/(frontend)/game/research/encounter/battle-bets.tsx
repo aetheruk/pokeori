@@ -165,7 +165,7 @@ export function BattleBetsGame({
           </div>
           <div className="p-5 sm:p-6">
             <p className="leading-relaxed text-game-night-ink/80">
-              Put 25 Fun Tokens into the book. Inspect two independently built
+              Your 100 Fun Token entry opens the book. Inspect two independently built
               Shadow teams, study the house odds, then back one Rocket Grunt all
               in.
             </p>
@@ -178,7 +178,7 @@ export function BattleBetsGame({
               disabled={busy}
               onClick={() => void begin()}
             >
-              {busy ? 'Preparing matchup…' : 'Open the book — 25 Tokens'}
+              {busy ? 'Preparing matchup…' : 'Open the book'}
             </Button>
           </div>
         </section>
@@ -268,7 +268,7 @@ export function BattleBetsGame({
                 disabled={busy}
                 onClick={() => void begin(true)}
               >
-                Start another book — 25 Tokens
+                Start another book
               </Button>
             )}
           </section>

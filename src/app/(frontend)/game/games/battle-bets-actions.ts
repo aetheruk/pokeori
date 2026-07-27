@@ -862,16 +862,7 @@ export async function startBattleBets(
       collection: 'users',
       id: user.id,
     })) as User
-    const currency = {
-      ...((freshUser.currency as Record<string, number>) || {}),
-    }
-    const buyIn = game.settings.buyIn ?? 25
-    if ((currency['fun-tokens'] || 0) < buyIn) {
-      return {
-        success: false,
-        error: `You need ${buyIn} Fun Tokens to open the book.`,
-      }
-    }
+    const buyIn = game.settings.buyIn ?? 100
 
     const created = await createSession({
       user: freshUser,
@@ -885,12 +876,6 @@ export async function startBattleBets(
       }
     }
 
-    currency['fun-tokens'] -= buyIn
-    await payload.update({
-      collection: 'users',
-      id: user.id,
-      data: { currency },
-    })
     await redis.set(sessionKey(user.id), created.state, {
       ex: SESSION_TTL_SECONDS,
     })
