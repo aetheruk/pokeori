@@ -1412,7 +1412,7 @@ export const celadonCityTasks: Task[] = [
   {
     "id": "celadon-luxury-massage",
     "name": "Luxury Lounge Massage",
-    "description": "Treat my active partner to a relaxing Pokemon massage.",
+    "description": "Treat my active companion to a relaxing Pokemon massage.",
     "category": "Kanto",
     "subCategory": "Celadon City",
     "background": "/backgrounds/shop.avif",
@@ -1428,6 +1428,10 @@ export const celadonCityTasks: Task[] = [
       {
         "type": "task_completed",
         "targetId": "shop-till-you-drop"
+      },
+      {
+        "type": "companion",
+        "label": "Set an active companion"
       }
     ],
     "criteria": [
@@ -1447,7 +1451,7 @@ export const celadonCityTasks: Task[] = [
     "exitModal": {
       "background": "/backgrounds/shop.avif",
       "title": "Luxury Lounge",
-      "message": "Your partner leaves the massage looking exceptionally content.",
+      "message": "Your companion leaves the massage looking exceptionally content.",
       "closeButtonText": "Lovely",
       "icon": {
         "type": "trainer",
@@ -1458,7 +1462,7 @@ export const celadonCityTasks: Task[] = [
   {
     "id": "celadon-luxury-analysis",
     "name": "Luxury Lounge Analysis",
-    "description": "Have my active partner receive a full health and body analysis.",
+    "description": "Have my active companion receive a full health and body analysis.",
     "category": "Kanto",
     "subCategory": "Celadon City",
     "background": "/backgrounds/shop.avif",
@@ -1474,6 +1478,10 @@ export const celadonCityTasks: Task[] = [
       {
         "type": "task_completed",
         "targetId": "shop-till-you-drop"
+      },
+      {
+        "type": "companion",
+        "label": "Set an active companion"
       }
     ],
     "criteria": [
@@ -1493,7 +1501,7 @@ export const celadonCityTasks: Task[] = [
     "exitModal": {
       "background": "/backgrounds/shop.avif",
       "title": "Luxury Lounge",
-      "message": "The analysis is complete. Hopefully you've learned something about your partner.",
+      "message": "The analysis is complete. Hopefully you've learned something about your companion.",
       "closeButtonText": "Review Results",
       "icon": {
         "type": "trainer",

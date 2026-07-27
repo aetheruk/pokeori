@@ -3740,6 +3740,53 @@ describe('static data references', () => {
     )
   })
 
+  test('Celadon Department Store uses the revised stock, prices, and companion gates', () => {
+    const firstFloor = shops.find(
+      (shop) => shop.id === 'celadon-department-store-1f',
+    )
+    const tmCounter = shops.find(
+      (shop) => shop.id === 'celadon-department-store-2f',
+    )
+    const recipeCounter = shops.find(
+      (shop) => shop.id === 'celadon-department-store-4f',
+    )
+    const massage = tasks.find(
+      (task) => task.id === 'celadon-luxury-massage',
+    )
+    const analysis = tasks.find(
+      (task) => task.id === 'celadon-luxury-analysis',
+    )
+
+    expect(firstFloor?.items.map((item) => item.id)).not.toContain('great-ball')
+    expect(firstFloor?.items.map((item) => item.id)).not.toContain(
+      'great-ball-daily-bundle',
+    )
+    expect(
+      firstFloor?.items.find((item) => item.id === 'battle-super-potion')?.name,
+    ).toBe('Super Potion')
+
+    expect(tmCounter?.items).toHaveLength(5)
+    for (const item of tmCounter?.items || []) {
+      expect(item.cost).toEqual([
+        { type: 'currency', id: 'pokedollars', amount: 5000 },
+      ])
+    }
+
+    expect(recipeCounter?.items).toHaveLength(6)
+    for (const item of recipeCounter?.items || []) {
+      expect(item.cost).toEqual([
+        { type: 'currency', id: 'pokedollars', amount: 3000 },
+      ])
+    }
+
+    for (const service of [massage, analysis]) {
+      expect(service?.requirements).toContainEqual({
+        type: 'companion',
+        label: 'Set an active companion',
+      })
+    }
+  })
+
   test('beast stone fusion random tasks consume the three element stones once', () => {
     const expectedTasks = [
       { element: 'fire', icon: 'fire-stone' },

@@ -2,6 +2,7 @@ import {
   AlertCircle,
   Box,
   Coins,
+  Heart,
   HelpCircle,
   Lock,
   Package,
@@ -381,6 +382,20 @@ export function mapRewardToDisplayItem(
       } else {
         icon = <Scroll className="w-6 h-6 text-game-moss-strong" />
       }
+      break
+    }
+    case 'active_companion_friendship': {
+      const qty = typeof reward.quantity === 'number' ? reward.quantity : 1
+      label = `Companion Friendship +${qty}`
+      icon = <Heart className="h-6 w-6 text-game-clay" />
+      subLabel = 'Active Companion'
+      break
+    }
+    case 'active_companion_research_xp': {
+      const qty = typeof reward.quantity === 'number' ? reward.quantity : 1
+      label = `Companion Research XP +${qty}`
+      icon = <Scroll className="h-6 w-6 text-game-moss-strong" />
+      subLabel = 'Active Companion'
       break
     }
     default: {

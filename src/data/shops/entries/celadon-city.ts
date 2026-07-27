@@ -30,7 +30,6 @@ export const celadonCityShops: ShopConfig[] = [
     items: [
       item('rocket-ball', 'rocket-ball', 350),
       item('rocket-ball-bundle', 'rocket-ball', 3500, 10),
-      item('great-ball', 'great-ball', 1500),
       item('battle-potion', 'battle-potion', 500),
       item('antidote', 'antidote', 550),
       item('ice-heal', 'ice-heal', 550),
@@ -40,12 +39,9 @@ export const celadonCityShops: ShopConfig[] = [
       item('escape-rope', 'escape-rope', 600),
       item('repel', 'repel', 350),
       item('super-repel', 'super-repel', 700),
-      item('battle-super-potion', 'battle-super-potion', 1200),
       {
-        ...item('great-ball-daily-bundle', 'great-ball', 3000, 3),
-        stock: 1,
-        daily: true,
-        name: 'Great Ball Bundle',
+        ...item('battle-super-potion', 'battle-super-potion', 1200),
+        name: 'Super Potion',
       },
     ],
   },
@@ -59,7 +55,7 @@ export const celadonCityShops: ShopConfig[] = [
     background: '/backgrounds/shop.avif',
     requirements: afterStoreIntro,
     items: ['slow-strike', 'mighty-charge', 'accidental-tap', 'cunning-trap', 'play-dumb'].map(
-      (move) => item(`tm-${move}`, `tm-${move}`, 20000),
+      (move) => item(`tm-${move}`, `tm-${move}`, 5000),
     ),
   },
   {
@@ -73,7 +69,7 @@ export const celadonCityShops: ShopConfig[] = [
     requirements: afterRenovation,
     items: ['x-attack', 'x-defense', 'x-sp-atk', 'x-sp-def', 'x-speed', 'dire-hit'].map(
       (statItem) => ({
-        ...item(`${statItem}-recipe`, statItem, 5000),
+        ...item(`${statItem}-recipe`, statItem, 3000),
         name: `${itemName(statItem)} Recipe`,
         description: `Unlock the in-house recipe for ${itemName(statItem)}.`,
         rewards: [
