@@ -1,7 +1,6 @@
 import type { BaseGameConfig } from '../shared'
 
 export interface BattleBetsSettings {
-  buyIn: number
   houseEdge: number
   simulationCount: number
   minimumWinChance: number

@@ -1,12 +1,12 @@
 import { redirect } from 'next/navigation'
 import type { ComponentType } from 'react'
+import { getBattleBetsState } from '@/app/(frontend)/game/games/battle-bets-actions'
 import { ArtAcademyGame } from '@/app/(frontend)/game/research/encounter/art-academy'
 import { BattleBetsGame } from '@/app/(frontend)/game/research/encounter/battle-bets'
-import { getBattleBetsState } from '@/app/(frontend)/game/games/battle-bets-actions'
 import { CryRecognitionGame } from '@/app/(frontend)/game/research/encounter/cry-recognition'
 import { DiglettTunnelTapGame } from '@/app/(frontend)/game/research/encounter/diglett-tunnel-tap'
-import { FlapGame } from '@/app/(frontend)/game/research/encounter/flap'
 import { FishingGame } from '@/app/(frontend)/game/research/encounter/fishing'
+import { FlapGame } from '@/app/(frontend)/game/research/encounter/flap'
 import { MagnemiteCircuitGame } from '@/app/(frontend)/game/research/encounter/magnemite-circuit'
 import { Match3Game } from '@/app/(frontend)/game/research/encounter/match3'
 import { MiningGame } from '@/app/(frontend)/game/research/encounter/mining'
@@ -27,10 +27,10 @@ import { TcgInspectionGame } from '@/app/(frontend)/game/research/encounter/tcg-
 import { VoltorbGridGame } from '@/app/(frontend)/game/research/encounter/voltorb-grid'
 import { WhosThatPokemonGame } from '@/app/(frontend)/game/research/encounter/whos-that-pokemon'
 import { GameRouteDataBoundary } from '@/components/game/shared/GameRouteDataBoundary'
-import { getGameState, type GameState } from '../actions'
 import type { GameItem, GameType } from '@/data/games'
-import { getGameActivityRoute } from '@/utilities/games/activity-domain'
 import { getGameRouteData } from '@/utilities/game-route-data'
+import { getGameActivityRoute } from '@/utilities/games/activity-domain'
+import { type GameState, getGameState } from '../actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -91,16 +91,13 @@ export default async function GamePage({
     const encounter = (await import('@/data/games')).allGames.find(
       (entry) => entry.gameType === 'battle-bets',
     )
-    if (!encounter) redirect('/game/explore')
+    if (!encounter || !battleBetsState) redirect('/game/explore')
     return (
       <GameRouteDataBoundary
         scope="inventory"
         initialGameData={initialGameData}
       >
-        <BattleBetsGame
-          encounter={encounter}
-          initialState={battleBetsState || undefined}
-        />
+        <BattleBetsGame encounter={encounter} initialState={battleBetsState} />
       </GameRouteDataBoundary>
     )
   }

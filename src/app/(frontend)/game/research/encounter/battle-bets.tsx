@@ -1,32 +1,43 @@
 'use client'
 
 import { AnimatePresence } from 'framer-motion'
+import { DoorOpen } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Swords } from 'lucide-react'
 import { toast } from 'sonner'
 import { BattleLog } from '@/app/(frontend)/game/battles/_components/battle-log'
 import { BattleScene } from '@/app/(frontend)/game/battles/_components/battle-scene'
 import {
   advanceBattleBetsBattle,
-  cashOutBattleBets,
+  clearBattleBetsResult,
   placeBattleBet,
-  rollOverBattleBets,
   startBattleBets,
 } from '@/app/(frontend)/game/games/battle-bets-actions'
-import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { VSAnimation } from '@/components/game/battles/VSAnimation'
+import { GameResult } from '@/components/game/ResearchResult'
+import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { ItemSprite } from '@/components/ui/item-sprite'
 import { useAudio } from '@/context/AudioContext'
+import { useUser } from '@/context/UserContext'
 import type { GameItem } from '@/data/games'
+import { useBattleManager } from '@/utilities/battle/engine/useBattleManager'
+import type { BattleState } from '@/utilities/battle/types'
 import type {
   BattleBetsPublicState,
   BattleBetsSide,
   BattleBetsTeamPreview,
 } from '@/utilities/battle-bets'
-import { useBattleManager } from '@/utilities/battle/engine/useBattleManager'
-import type { BattleState } from '@/utilities/battle/types'
 
 function newActionId(): string {
   if (typeof crypto.randomUUID === 'function') return crypto.randomUUID()
@@ -52,98 +63,84 @@ function battleFingerprint(state: BattleState): string {
   ].join('|')
 }
 
+function formatOdds(odds: number): string {
+  return `1:${odds.toFixed(2)}`
+}
+
 export function BattleBetsGame({
+  encounter,
   initialState,
 }: {
   encounter: GameItem
-  initialState?: BattleBetsPublicState
+  initialState: BattleBetsPublicState
 }) {
   const router = useRouter()
+  const { refreshUser } = useUser()
   const [state, setState] = useState(initialState)
   const [busy, setBusy] = useState(false)
+  const [selectedSide, setSelectedSide] = useState<BattleBetsSide>()
+  const [stakeInput, setStakeInput] = useState('')
 
-  const begin = async (forceReset = false) => {
+  const selectedOdds =
+    selectedSide === 'female'
+      ? state.femaleOdds
+      : selectedSide === 'male'
+        ? state.maleOdds
+        : 0
+  const stake = Number(stakeInput)
+  const validStake =
+    Number.isSafeInteger(stake) && stake >= 1 && stake <= state.tokenBalance
+  const potentialPayout =
+    validStake && selectedOdds > 0 ? Math.floor(stake * selectedOdds) : 0
+
+  const closeStakeDialog = () => {
+    if (busy) return
+    setSelectedSide(undefined)
+    setStakeInput('')
+  }
+
+  const openStakeDialog = (side: BattleBetsSide) => {
+    setSelectedSide(side)
+    setStakeInput('')
+  }
+
+  const placeBet = async () => {
+    if (!selectedSide || !validStake) return
     setBusy(true)
-    const result = await startBattleBets(forceReset)
+    const result = await placeBattleBet(selectedSide, stake, newActionId())
+    setBusy(false)
+    if (!result.success) {
+      toast.error(result.error)
+      return
+    }
+    setSelectedSide(undefined)
+    setStakeInput('')
+    setState(result.state)
+    refreshUser()
+  }
+
+  const playAgain = async () => {
+    setBusy(true)
+    const result = await startBattleBets(true)
     setBusy(false)
     if (!result.success) {
       toast.error(result.error)
       return
     }
     setState(result.state)
+    refreshUser()
   }
 
-  const bet = async (side: BattleBetsSide) => {
+  const returnToExplore = async () => {
     setBusy(true)
-    const result = await placeBattleBet(side, newActionId())
+    const result = await clearBattleBetsResult()
     setBusy(false)
     if (!result.success) {
       toast.error(result.error)
       return
     }
-    setState(result.state)
-  }
-
-  const cashOut = async () => {
-    setBusy(true)
-    const result = await cashOutBattleBets(newActionId())
-    setBusy(false)
-    if (!result.success) {
-      toast.error(result.error)
-      return
-    }
-    toast.success(`${result.payout} Fun Tokens added to your balance.`)
-    setState(undefined)
-    router.refresh()
-  }
-
-  const rollOver = async () => {
-    setBusy(true)
-    const result = await rollOverBattleBets(newActionId())
-    setBusy(false)
-    if (!result.success) {
-      toast.error(result.error)
-      return
-    }
-    setState(result.state)
-  }
-
-  if (!state) {
-    return (
-      <main className="game-night flex h-full min-h-0 items-center justify-center overflow-y-auto p-3 text-game-night-ink sm:p-5">
-        <section className="game-activity-panel w-full max-w-lg overflow-hidden">
-          <div className="relative flex min-h-28 items-end border-b border-game-border/40 p-4">
-            <Image
-              src="/backgrounds/game-corner.avif"
-              alt=""
-              fill
-              priority
-              className="object-cover opacity-45"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-game-night-surface/95 via-game-night-surface/75 to-transparent" />
-            <div className="relative">
-              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-game-ochre">
-                High Stakes Room
-              </p>
-              <h1 className="font-serif text-2xl">Battle Bets</h1>
-            </div>
-          </div>
-          <div className="p-4">
-            <p className="text-sm leading-relaxed text-game-night-ink/75">
-              Inspect two Shadow teams, back one Rocket Grunt, then watch both
-              trainers battle. Win to cash out or roll the entire pot onward.
-            </p>
-            <Button
-              className="game-accent-button mt-4 min-h-11 w-full"
-              disabled={busy}
-              onClick={() => void begin()}
-            >
-              {busy ? 'Preparing matchup…' : 'Open the book'}
-            </Button>
-          </div>
-        </section>
-      </main>
-    )
+    refreshUser()
+    router.push('/game/explore')
   }
 
   if (state.phase !== 'inspect' && state.battle) {
@@ -152,88 +149,177 @@ export function BattleBetsGame({
         state={state}
         busy={busy}
         onStateChange={setState}
-        onCashOut={cashOut}
-        onRollOver={rollOver}
-        onRestart={() => begin(true)}
+        onPlayAgain={playAgain}
+        onReturn={returnToExplore}
       />
     )
   }
 
   return (
-    <main className="game-night h-full min-h-0 overflow-y-auto p-3 text-game-night-ink sm:p-5">
-      <div className="mx-auto max-w-4xl">
-        <CompactHeader pot={state.pot} />
-        <p className="mb-3 text-center text-sm text-game-night-ink/65">
-          Choose a side. Your full pot rides on the result.
-        </p>
-        <div className="grid gap-3 lg:grid-cols-2">
-          <TeamCard
-            side="female"
-            team={state.femaleTeam}
-            chance={state.femaleChance}
-            projectedPayout={state.projectedFemalePayout}
-            disabled={busy}
-            onBet={bet}
-          />
-          <TeamCard
-            side="male"
-            team={state.maleTeam}
-            chance={state.maleChance}
-            projectedPayout={state.projectedMalePayout}
-            disabled={busy}
-            onBet={bet}
-          />
+    <main className="game-night relative h-[100dvh] min-h-0 overflow-y-auto bg-game-night-canvas text-game-night-ink">
+      <Image
+        src="/backgrounds/game-corner.avif"
+        alt=""
+        fill
+        priority
+        className="object-cover opacity-20"
+      />
+      <div className="absolute inset-0 bg-game-night-canvas/75" />
+
+      <div className="relative mx-auto flex min-h-full w-full max-w-4xl flex-col px-3 py-[max(0.75rem,env(safe-area-inset-top))] sm:px-5 sm:py-5">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-10 border border-game-night-border/60 bg-game-night-surface/90 text-game-night-ink hover:bg-game-night-surface-raised hover:text-game-night-ink sm:right-5 sm:top-5"
+          disabled={busy}
+          onClick={() => void returnToExplore()}
+          aria-label="Return to Explore"
+        >
+          <DoorOpen className="h-4 w-4" />
+        </Button>
+        <TokenChip balance={state.tokenBalance} />
+
+        <div className="flex flex-1 items-center py-3 sm:py-5">
+          <div className="grid w-full gap-3 lg:grid-cols-2">
+            <TeamCard
+              team={state.femaleTeam}
+              odds={state.femaleOdds}
+              disabled={busy || state.tokenBalance < 1}
+              onBet={() => openStakeDialog('female')}
+            />
+            <TeamCard
+              team={state.maleTeam}
+              odds={state.maleOdds}
+              disabled={busy || state.tokenBalance < 1}
+              onBet={() => openStakeDialog('male')}
+            />
+          </div>
         </div>
       </div>
+
+      <Dialog
+        open={selectedSide !== undefined}
+        onOpenChange={(open) => {
+          if (!open) closeStakeDialog()
+        }}
+      >
+        <DialogContent className="game-night border-game-night-border bg-game-night-surface text-game-night-ink sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-xl">
+              Place your bet
+            </DialogTitle>
+            <DialogDescription className="text-game-night-ink/65">
+              Back{' '}
+              {selectedSide === 'female'
+                ? state.femaleTeam.trainerName
+                : state.maleTeam.trainerName}{' '}
+              at {formatOdds(selectedOdds)}.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-xs text-game-night-ink/60">
+              <span>Stake</span>
+              <span className="font-mono">
+                Balance {state.tokenBalance.toLocaleString()}
+              </span>
+            </div>
+            <div className="flex gap-2">
+              <Input
+                autoFocus
+                inputMode="numeric"
+                pattern="[0-9]*"
+                min={1}
+                max={state.tokenBalance}
+                value={stakeInput}
+                onChange={(event) =>
+                  setStakeInput(event.target.value.replace(/\D/g, ''))
+                }
+                placeholder="Enter Fun Tokens"
+                aria-label="Fun Token stake"
+                className="h-11 border-game-night-border bg-game-night-canvas font-mono text-game-night-ink"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                className="min-h-11 shrink-0 border-game-night-border bg-game-night-canvas text-game-night-ink"
+                onClick={() => setStakeInput(String(state.tokenBalance))}
+              >
+                Max
+              </Button>
+            </div>
+
+            <div className="flex items-center justify-between rounded-lg border border-game-ochre/30 bg-game-night-canvas px-3 py-2">
+              <span className="text-xs text-game-night-ink/60">
+                Total return
+              </span>
+              <span className="font-mono font-semibold text-game-ochre">
+                {potentialPayout.toLocaleString()} Fun Tokens
+              </span>
+            </div>
+          </div>
+
+          <DialogFooter className="grid grid-cols-2 gap-2 sm:grid-cols-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-11 border-game-night-border bg-game-night-canvas text-game-night-ink"
+              disabled={busy}
+              onClick={closeStakeDialog}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              className="game-accent-button min-h-11"
+              disabled={busy || !validStake}
+              onClick={() => void placeBet()}
+            >
+              {busy ? 'Placing bet…' : 'Place Bet'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   )
 }
 
-function CompactHeader({ pot }: { pot: number }) {
+function TokenChip({ balance }: { balance: number }) {
   return (
-    <header className="mb-3 flex min-h-12 items-center justify-between gap-3 rounded-xl border border-game-border/45 bg-game-night-surface px-3 py-2 shadow-sm">
-      <div className="flex min-w-0 items-center gap-2">
-        <Swords className="h-5 w-5 shrink-0 text-game-ochre" />
-        <div className="min-w-0">
-          <p className="truncate font-serif text-lg leading-none">
-            Battle Bets
-          </p>
-          <p className="mt-1 text-[0.6rem] uppercase tracking-[0.14em] text-game-night-ink/55">
-            High Stakes Room
-          </p>
-        </div>
-      </div>
-      <div className="shrink-0 rounded-full border border-game-ochre/35 bg-game-night-canvas px-3 py-1">
-        <span className="font-mono text-sm font-semibold text-game-ochre">
-          {pot}
+    <div className="flex justify-center">
+      <div className="flex min-h-11 items-center gap-2 rounded-full border border-game-ochre/35 bg-game-surface-raised px-4 py-2 text-game-ink shadow-sm">
+        <ItemSprite
+          itemId="fun-token"
+          alt="Fun Tokens"
+          width={22}
+          height={22}
+          className="h-[22px] w-[22px] object-contain"
+        />
+        <span className="font-mono text-base font-semibold">
+          {balance.toLocaleString()}
         </span>
-        <span className="ml-1 text-[0.65rem] text-game-night-ink/60">
-          tokens
-        </span>
+        <span className="text-xs text-game-muted">Fun Tokens</span>
       </div>
-    </header>
+    </div>
   )
 }
 
 function TeamCard({
-  side,
   team,
-  chance,
-  projectedPayout,
+  odds,
   disabled,
   onBet,
 }: {
-  side: BattleBetsSide
   team: BattleBetsTeamPreview
-  chance: number
-  projectedPayout: number
+  odds: number
   disabled: boolean
-  onBet: (side: BattleBetsSide) => Promise<void>
+  onBet: () => void
 }) {
   return (
     <section className="game-activity-panel p-3">
       <div className="flex items-center gap-2.5">
-        <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-game-ochre/35 bg-game-night-canvas">
+        <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-game-ochre/35 bg-game-night-canvas">
           <Image
             src={`/sprites/trainers/${team.trainerSpriteId}.avif`}
             alt={team.trainerName}
@@ -246,11 +332,11 @@ function TeamCard({
           {team.trainerName}
         </h2>
         <div className="text-right">
-          <p className="font-mono text-lg font-semibold leading-none text-game-ochre">
-            {Math.round(chance * 100)}%
+          <p className="font-mono text-base font-semibold leading-none text-game-ochre">
+            {formatOdds(odds)}
           </p>
           <p className="mt-1 text-[0.55rem] uppercase tracking-wider text-game-night-ink/50">
-            chance
+            odds
           </p>
         </div>
       </div>
@@ -281,21 +367,13 @@ function TeamCard({
         ))}
       </div>
 
-      <div className="mt-2 flex items-center gap-2">
-        <p className="min-w-0 flex-1 text-xs text-game-night-ink/60">
-          Return{' '}
-          <span className="font-mono font-semibold text-game-ochre">
-            {projectedPayout}
-          </span>
-        </p>
-        <Button
-          className="game-accent-button min-h-10 min-w-32"
-          disabled={disabled}
-          onClick={() => void onBet(side)}
-        >
-          Back this team
-        </Button>
-      </div>
+      <Button
+        className="game-accent-button mt-3 min-h-11 w-full"
+        disabled={disabled}
+        onClick={onBet}
+      >
+        Back this team
+      </Button>
     </section>
   )
 }
@@ -304,16 +382,14 @@ function BattleBetsBattle({
   state,
   busy,
   onStateChange,
-  onCashOut,
-  onRollOver,
-  onRestart,
+  onPlayAgain,
+  onReturn,
 }: {
   state: BattleBetsPublicState
   busy: boolean
   onStateChange: (state: BattleBetsPublicState) => void
-  onCashOut: () => Promise<void>
-  onRollOver: () => Promise<void>
-  onRestart: () => Promise<void>
+  onPlayAgain: () => Promise<void>
+  onReturn: () => Promise<void>
 }) {
   const initialBattle = useRef(state.battle as BattleState)
   const { battleState, anim, isProcessing, pushTurnResult } = useBattleManager(
@@ -405,13 +481,14 @@ function BattleBetsBattle({
     setTurnError(undefined)
     void advance()
   }
-  const won =
-    state.phase === 'result' &&
-    state.winner !== undefined &&
-    state.winner === state.selectedSide
+
+  const selectedOdds =
+    state.selectedSide === 'female' ? state.femaleOdds : state.maleOdds
+  const selectedTrainer =
+    state.selectedSide === 'female' ? state.femaleTeam : state.maleTeam
 
   return (
-    <main className="game-night h-full min-h-0 text-game-night-ink">
+    <main className="game-night h-[100dvh] min-h-0 text-game-night-ink">
       <div className="game-desktop-activity-stage game-activity-chrome relative flex h-full min-h-0 flex-col overflow-hidden xl:my-4 xl:h-[calc(100%-2rem)] xl:grid xl:grid-cols-[minmax(0,1fr)_19rem] xl:grid-rows-[minmax(26rem,1fr)_auto]">
         <AnimatePresence>
           {showVsAnimation &&
@@ -430,16 +507,14 @@ function BattleBetsBattle({
         <div className="flex min-h-12 items-center justify-between gap-2 border-t border-game-border bg-game-night-surface px-3 py-1.5 xl:col-start-1 xl:row-start-2">
           <div className="min-w-0">
             <p className="truncate text-xs font-semibold">
-              {state.selectedSide === 'female'
-                ? 'Backing Rocket Grunt F'
-                : 'Backing Rocket Grunt M'}
+              Backing {selectedTrainer.trainerName}
             </p>
             <p className="text-[0.62rem] text-game-night-ink/55">
               {advancing || isProcessing ? 'Battle in progress…' : 'AI battle'}
             </p>
           </div>
-          <div className="shrink-0 rounded-full border border-game-ochre/35 bg-game-night-canvas px-2.5 py-1 font-mono text-xs text-game-ochre">
-            Pot {state.pot}
+          <div className="shrink-0 font-mono text-xs text-game-ochre">
+            {state.stake?.toLocaleString()} at {formatOdds(selectedOdds)}
           </div>
           {turnError && (
             <Button
@@ -461,81 +536,29 @@ function BattleBetsBattle({
       </div>
 
       {state.phase === 'result' && isVisuallySettled && (
-        <Settlement
-          won={won}
-          state={state}
-          busy={busy}
-          onCashOut={onCashOut}
-          onRollOver={onRollOver}
-          onRestart={onRestart}
-        />
+        <div className="fixed inset-0 z-[100] bg-game-canvas">
+          <GameResult
+            success={state.won === true}
+            title={state.won ? 'BET WON!' : 'BET LOST'}
+            message={
+              state.won
+                ? `${selectedTrainer.trainerName} won. Your ${state.stake?.toLocaleString()} Fun Token bet paid out ${state.payout?.toLocaleString()} Fun Tokens.`
+                : `${selectedTrainer.trainerName} lost the battle. Your ${state.stake?.toLocaleString()} Fun Token stake is gone.`
+            }
+            rewardSummary={state.rewardSummary}
+            icon={{ type: 'trainer', id: selectedTrainer.trainerSpriteId }}
+            iconAlt={selectedTrainer.trainerName}
+            titleColor={state.won ? 'text-game-ochre' : 'text-game-danger'}
+            returnText="Return to Explore"
+            onReturn={() => void onReturn()}
+            secondaryAction={
+              <Button disabled={busy} onClick={() => void onPlayAgain()}>
+                {busy ? 'Preparing matchup…' : 'Play Again'}
+              </Button>
+            }
+          />
+        </div>
       )}
     </main>
-  )
-}
-
-function Settlement({
-  won,
-  state,
-  busy,
-  onCashOut,
-  onRollOver,
-  onRestart,
-}: {
-  won: boolean
-  state: BattleBetsPublicState
-  busy: boolean
-  onCashOut: () => Promise<void>
-  onRollOver: () => Promise<void>
-  onRestart: () => Promise<void>
-}) {
-  return (
-    <div className="fixed inset-0 z-[100] overflow-y-auto bg-game-night-canvas/96 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] text-game-night-ink backdrop-blur-sm">
-      <div className="flex min-h-full items-center justify-center">
-        <section
-          className="game-activity-panel w-full max-w-sm p-5 text-center"
-          aria-live="polite"
-        >
-          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-game-ochre">
-            Battle settled
-          </p>
-          <h1 className="mt-1 font-serif text-2xl">
-            {won ? 'Your fighter won' : 'Your pot is lost'}
-          </h1>
-          <p className="mt-2 text-sm leading-relaxed text-game-night-ink/70">
-            {won
-              ? `${state.payout} Fun Tokens are waiting. Take them now or risk the full pot on another matchup.`
-              : `${state.winner === 'female' ? 'Rocket Grunt F' : 'Rocket Grunt M'} won the battle.`}
-          </p>
-          {won ? (
-            <div className="mt-5 grid gap-2">
-              <Button
-                className="game-accent-button min-h-12 w-full"
-                disabled={busy}
-                onClick={() => void onCashOut()}
-              >
-                Cash out {state.payout}
-              </Button>
-              <Button
-                variant="outline"
-                className="min-h-12 w-full"
-                disabled={busy}
-                onClick={() => void onRollOver()}
-              >
-                Roll over the full pot
-              </Button>
-            </div>
-          ) : (
-            <Button
-              className="game-accent-button mt-5 min-h-12 w-full"
-              disabled={busy}
-              onClick={() => void onRestart()}
-            >
-              Start another book
-            </Button>
-          )}
-        </section>
-      </div>
-    </div>
   )
 }

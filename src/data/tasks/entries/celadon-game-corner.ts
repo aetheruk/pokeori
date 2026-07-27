@@ -22,14 +22,7 @@ export const celadonGameCornerTasks: Task[] = [
         "targetId": "high-roller"
       }
     ],
-    "criteria": [
-      {
-        "type": "currency_owned",
-        "targetId": "fun-tokens",
-        "count": 100,
-        "consume": true
-      }
-    ],
+    "criteria": [],
     "rewards": [],
     "enterModal": [
       {
@@ -56,7 +49,7 @@ export const celadonGameCornerTasks: Task[] = [
           "id": "rocket-grunt-f"
         },
         "title": "Battle Bets",
-        "message": "Put down 100 Fun Tokens, inspect both teams, then back one side. You'll see the odds; the Pokemon settle the rest. Win and you can cash out, or roll every token into the next fight.",
+        "message": "Inspect both teams, check the odds, then back one side with as many Fun Tokens as you dare. Once the bet is placed, the Pokemon settle the rest.",
         "background": "/backgrounds/celadon-game-corner-prize-wheel.avif",
         "buttons": [
           {
@@ -73,7 +66,7 @@ export const celadonGameCornerTasks: Task[] = [
         "id": "rocket-grunt-f"
       },
       "background": "/backgrounds/celadon-game-corner-prize-wheel.avif",
-      "message": "The High Stakes Room will now take Battle Bets. Choose carefully: every wager is all in.",
+      "message": "The High Stakes Room will now take Battle Bets. Choose a side, set your stake, and watch the match play out.",
       "closeButtonText": "Place a Bet"
     }
   },
