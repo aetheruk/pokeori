@@ -11,7 +11,7 @@ export const battleBetsGames: BattleBetsGameConfig[] = [
     background: '/backgrounds/celadon-game-corner-prize-wheel.avif',
     requirements: [{ type: 'task_completed', targetId: 'battle-bets' }],
     rewards: [],
-    settings: { buyIn: 100, houseEdge: 0.05, simulationCount: 200, minimumWinChance: 0.25, maximumWinChance: 0.75 },
+    settings: { houseEdge: 0.05, simulationCount: 200, minimumWinChance: 0.25, maximumWinChance: 0.75 },
   },
 ]
 

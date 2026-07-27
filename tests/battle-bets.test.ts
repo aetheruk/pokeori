@@ -1,16 +1,18 @@
 import { describe, expect, test } from 'bun:test'
-import { battleBetsGames } from '@/data/games/battle-bets'
 import { resolvePvpTurn } from '@/app/(frontend)/game/battles/pvp/resolution'
+import { battleBetsGames } from '@/data/games/battle-bets'
 import {
+  calculateBattleBetsDecimalOdds,
   calculateBattleBetsPayout,
+  calculateBattleBetsSettlement,
   getBattleBetsFallbackWinner,
+  mirrorBattleBetsBattleState,
 } from '@/utilities/battle-bets'
 import { makePvpBattleState } from './helpers/battle-fixtures'
 
 describe('Battle Bets', () => {
-  test('authors the 100-token virtual starting pot, house edge, simulation count, and odds band', () => {
+  test('authors the house edge, simulation count, and odds band without a fixed buy-in', () => {
     expect(battleBetsGames[0].settings).toEqual({
-      buyIn: 100,
       houseEdge: 0.05,
       simulationCount: 200,
       minimumWinChance: 0.25,
@@ -18,28 +20,67 @@ describe('Battle Bets', () => {
     })
   })
 
-  test('prices an all-in winning pot from the selected probability', () => {
+  test('prices a winning stake as a gross decimal-odds return', () => {
+    expect(
+      calculateBattleBetsDecimalOdds({
+        selectedProbability: 0.725,
+        houseEdge: 0.05,
+      }),
+    ).toBeCloseTo(1.3103448276)
     expect(
       calculateBattleBetsPayout({
-        pot: 25,
+        stake: 100,
+        selectedProbability: 0.725,
+        houseEdge: 0.05,
+      }),
+    ).toBe(131)
+    expect(
+      calculateBattleBetsPayout({
+        stake: 25,
         selectedProbability: 0.5,
         houseEdge: 0.05,
       }),
     ).toBe(47)
     expect(
       calculateBattleBetsPayout({
-        pot: 500,
+        stake: 500,
         selectedProbability: 0.25,
         houseEdge: 0.05,
       }),
     ).toBe(1900)
     expect(
       calculateBattleBetsPayout({
-        pot: 25,
+        stake: 25,
         selectedProbability: 0,
         houseEdge: 0.05,
       }),
     ).toBe(0)
+  })
+
+  test('never pays out when the backed team loses', () => {
+    expect(
+      calculateBattleBetsSettlement({
+        won: false,
+        stake: 1000,
+        selectedProbability: 0.25,
+        houseEdge: 0.05,
+      }),
+    ).toBe(0)
+  })
+
+  test('can orient the backed opponent as the player-side battle team', () => {
+    const state = makePvpBattleState()
+    state.playerName = 'Rocket Grunt F'
+    state.enemyName = 'Rocket Grunt M'
+    state.playerTrainer = { name: 'Rocket Grunt F' }
+    state.enemyTrainer = { name: 'Rocket Grunt M' }
+
+    const mirrored = mirrorBattleBetsBattleState(state)
+
+    expect(mirrored.playerTeam).toBe(state.enemyTeam)
+    expect(mirrored.enemyTeam).toBe(state.playerTeam)
+    expect(mirrored.playerName).toBe('Rocket Grunt M')
+    expect(mirrored.playerTrainer?.name).toBe('Rocket Grunt M')
   })
 
   test('uses remaining team HP to decide a turn-cap result', () => {

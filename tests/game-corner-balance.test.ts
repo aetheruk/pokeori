@@ -1,13 +1,13 @@
 import { describe, expect, test } from 'bun:test'
+import { getGameTypeLabel } from '@/components/game/features/explore/utils'
+import { battleBetsGames } from '@/data/games/battle-bets'
 import { celadonGameCornermatch3gamesEntries } from '@/data/games/match3/entries/celadon-game-corner'
 import { celadonGameCornerPachinkoEntries } from '@/data/games/pachinko/entries/celadon-game-corner'
 import { celadonGameCornerPrizeWheelEntries } from '@/data/games/prize-wheel/entries/celadon-game-corner'
 import { celadonGameCornerSlotEntries } from '@/data/games/slots/entries/celadon-game-corner'
-import { battleBetsGames } from '@/data/games/battle-bets'
-import { celadonGameCornerShops } from '@/data/shops/entries/celadon-game-corner'
 import { scratchCards } from '@/data/scratchcards'
+import { celadonGameCornerShops } from '@/data/shops/entries/celadon-game-corner'
 import { celadonGameCornerTasks } from '@/data/tasks/entries/celadon-game-corner'
-import { getGameTypeLabel } from '@/components/game/features/explore/utils'
 
 describe('Celadon Game Corner balance and presentation', () => {
   test('uses the authored standard-game token costs', () => {
@@ -49,7 +49,9 @@ describe('Celadon Game Corner balance and presentation', () => {
       ),
     ).toEqual([25, 75, 250, 500, 10000])
 
-    expect(celadonGameCornerPrizeWheelEntries[1].settings.cost?.amount).toBe(125)
+    expect(celadonGameCornerPrizeWheelEntries[1].settings.cost?.amount).toBe(
+      125,
+    )
     expect(
       celadonGameCornerPrizeWheelEntries[1].settings.slots
         .slice(1, 7)
@@ -127,18 +129,13 @@ describe('Celadon Game Corner balance and presentation', () => {
     ).toBe('BATTLE BETS')
   })
 
-  test('charges the Battle Bets task entry once and keeps later wagers virtual', () => {
+  test('starts Battle Bets for free and leaves the stake to the game flow', () => {
     const battleBetsTask = celadonGameCornerTasks.find(
       (task) => task.id === 'battle-bets',
     )
 
-    expect(battleBetsTask?.criteria).toContainEqual({
-      type: 'currency_owned',
-      targetId: 'fun-tokens',
-      count: 100,
-      consume: true,
-    })
-    expect(battleBetsGames[0].settings.buyIn).toBe(100)
+    expect(battleBetsTask?.criteria).toEqual([])
+    expect(battleBetsGames[0].settings).not.toHaveProperty('buyIn')
   })
 
   test('Rocket Scratch Cards use the revised token prizes and rare cosmetics', () => {
@@ -163,13 +160,17 @@ describe('Celadon Game Corner balance and presentation', () => {
     expect(card.rewards).toContainEqual(
       expect.objectContaining({
         chance: 1,
-        reward: [expect.objectContaining({ type: 'icon', targetId: 'gambler' })],
+        reward: [
+          expect.objectContaining({ type: 'icon', targetId: 'gambler' }),
+        ],
       }),
     )
     expect(card.rewards).toContainEqual(
       expect.objectContaining({
         chance: 1,
-        reward: [expect.objectContaining({ type: 'title', targetId: 'gambler' })],
+        reward: [
+          expect.objectContaining({ type: 'title', targetId: 'gambler' }),
+        ],
       }),
     )
     expect(card.rewards).toContainEqual(
@@ -189,9 +190,8 @@ describe('Celadon Game Corner balance and presentation', () => {
       ),
     ).toBe(false)
 
-    const expectedTokenValue = card.rewards.reduce(
-      (total, outcome) => {
-        const outcomeValue = (outcome.reward || []).reduce((value, reward) => {
+    const expectedTokenValue = card.rewards.reduce((total, outcome) => {
+      const outcomeValue = (outcome.reward || []).reduce((value, reward) => {
         const quantity =
           typeof reward.quantity === 'number' ? reward.quantity : 0
         if (reward.type === 'currency' && reward.targetId === 'fun-tokens') {
@@ -200,10 +200,8 @@ describe('Celadon Game Corner balance and presentation', () => {
         return value
       }, 0)
 
-        return total + (outcome.chance / 100) * outcomeValue
-      },
-      0,
-    )
+      return total + (outcome.chance / 100) * outcomeValue
+    }, 0)
 
     expect(expectedTokenValue).toBe(67.5)
   })

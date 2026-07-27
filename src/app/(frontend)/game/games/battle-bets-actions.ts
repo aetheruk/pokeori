@@ -1,39 +1,32 @@
 'use server'
 
+import configPromise from '@payload-config'
 import { headers } from 'next/headers'
 import { getPayload } from 'payload'
-import configPromise from '@payload-config'
-import type { Pokemon, User } from '@/payload-types'
-import { items } from '@/data/items'
+import {
+  type PvpMove,
+  resolvePvpTurn,
+} from '@/app/(frontend)/game/battles/pvp/resolution'
 import { allGames } from '@/data/games'
-import type { BattleEnemy, TrainerBattleItemConfig } from '@/data/types'
+import { items } from '@/data/items'
 import { createInitialPowersState } from '@/data/powers'
-import { getGameUserData } from '@/utilities/game-data'
-import {
-  acquireActionLock,
-  checkActionRateLimit,
-  getIdempotentResult,
-  releaseActionLock,
-  setIdempotentResult,
-} from '@/utilities/game-integrity'
-import { redis } from '@/utilities/redis'
-import { checkRequirement } from '@/utilities/requirements'
-import { getPokemonForm } from '@/utilities/pokemon/pokedex'
-import { initializeBattlePokemon } from '@/utilities/battle/battle-logic'
-import {
-  resolveEnemyBattleEvs,
-  resolveEnemyBattleIvs,
-} from '@/utilities/battle/enemy-stat-rolls'
-import {
-  chooseEnemyBattleAction,
-  initializeEnemyAiMoveLoadouts,
-  type EnemyBattleAction,
-} from '@/utilities/battle/enemy-ai'
+import type { BattleEnemy, TrainerBattleItemConfig } from '@/data/types'
+import type { Pokemon, User } from '@/payload-types'
 import {
   processBattleAbilitySuppressionForState,
   processBattleAbilityTerrainSet,
   processBattleAbilityWeatherSet,
 } from '@/utilities/battle/abilities'
+import { initializeBattlePokemon } from '@/utilities/battle/battle-logic'
+import {
+  chooseEnemyBattleAction,
+  type EnemyBattleAction,
+  initializeEnemyAiMoveLoadouts,
+} from '@/utilities/battle/enemy-ai'
+import {
+  resolveEnemyBattleEvs,
+  resolveEnemyBattleIvs,
+} from '@/utilities/battle/enemy-stat-rolls'
 import { initializeTeamMoveUses } from '@/utilities/battle/move-uses'
 import { applyBattleRarityEntryEffects } from '@/utilities/battle/rarity-effects'
 import {
@@ -45,25 +38,37 @@ import {
   normalizeTrainerBattleItems,
 } from '@/utilities/battle/trainer-items'
 import type { BattlePokemon, BattleState } from '@/utilities/battle/types'
+import {
+  type BattleBetsPokemonPreview,
+  type BattleBetsPublicState,
+  type BattleBetsSide,
+  type BattleBetsTeamPreview,
+  calculateBattleBetsDecimalOdds,
+  calculateBattleBetsPayout,
+  calculateBattleBetsSettlement,
+  getBattleBetsFallbackWinner,
+  mirrorBattleBetsBattleState,
+} from '@/utilities/battle-bets'
+import { getGameUserData } from '@/utilities/game-data'
+import {
+  acquireActionLock,
+  checkActionRateLimit,
+  getIdempotentResult,
+  releaseActionLock,
+  setIdempotentResult,
+} from '@/utilities/game-integrity'
+import { getPokemonForm } from '@/utilities/pokemon/pokedex'
+import { redis } from '@/utilities/redis'
+import { checkRequirement } from '@/utilities/requirements'
+import type { RewardSummary } from '@/utilities/rewards/reward-logic'
 import { resolveEnemyBattleMoveUseLimit } from '@/utilities/skills/unlocks'
+import { incrementUserActivityResult } from '@/utilities/user-state'
 import {
   getSeenPokemonOptions,
   getVsSeekerTrainerHealingItemId,
   getVsSeekerTrainerLevel,
   VS_SEEKER_HELD_BERRY_CHANCE,
 } from '@/utilities/vs-seeker'
-import {
-  calculateBattleBetsPayout,
-  getBattleBetsFallbackWinner,
-  type BattleBetsPokemonPreview,
-  type BattleBetsPublicState,
-  type BattleBetsSide,
-  type BattleBetsTeamPreview,
-} from '@/utilities/battle-bets'
-import {
-  resolvePvpTurn,
-  type PvpMove,
-} from '@/app/(frontend)/game/battles/pvp/resolution'
 
 const GAME_ID = 'celadon-high-stakes-battle-bets'
 const SESSION_TTL_SECONDS = 60 * 60
@@ -77,17 +82,22 @@ type SeenPokedex = Record<string, Record<string, { seen?: boolean }>>
 
 interface BattleBetsFixture {
   battleState: BattleState
-  femaleTrainerItems?: TrainerBattleItemConfig[]
-  maleTrainerItems?: TrainerBattleItemConfig[]
-  femaleTrainerItemLastUsedTurn?: number
-  maleTrainerItemLastUsedTurn?: number
+  playerTrainerItems?: TrainerBattleItemConfig[]
+  enemyTrainerItems?: TrainerBattleItemConfig[]
+  playerTrainerItemLastUsedTurn?: number
+  enemyTrainerItemLastUsedTurn?: number
 }
 
 interface BattleBetsStoredState
   extends Omit<
     BattleBetsPublicState,
-    'projectedFemalePayout' | 'projectedMalePayout' | 'battle'
+    'femaleOdds' | 'maleOdds' | 'rewardSummary' | 'battle'
   > {
+  femaleChance: number
+  maleChance: number
+  wagerActionId?: string
+  lastTurnActionId?: string
+  settled?: boolean
   fixture: BattleBetsFixture
 }
 
@@ -176,16 +186,35 @@ function getBattleBetsGame() {
   return game?.gameType === 'battle-bets' ? game : null
 }
 
-function getProjectedPayout(
-  pot: number,
-  probability: number,
-  houseEdge: number,
-): number {
-  return calculateBattleBetsPayout({
-    pot,
-    selectedProbability: probability,
-    houseEdge,
-  })
+function getTokenBalance(user: User): number {
+  return Math.max(
+    0,
+    Math.floor(
+      (user.currency as Record<string, number> | null | undefined)?.[
+        'fun-tokens'
+      ] || 0,
+    ),
+  )
+}
+
+function createBattleBetsRewardSummary(payout: number): RewardSummary {
+  return {
+    xp: {},
+    items: [],
+    pokemon: [],
+    currency: [{ type: 'fun-tokens', quantity: payout }],
+    cards: [],
+    tasksCompleted: [],
+    taskExitModals: [],
+    banners: [],
+    icons: [],
+    titles: [],
+    upgrades: [],
+    notices: [],
+    researchXp: [],
+    researchBreakthroughs: [],
+    eggs: [],
+  }
 }
 
 function toPublicState(state: BattleBetsStoredState): BattleBetsPublicState {
@@ -193,25 +222,28 @@ function toPublicState(state: BattleBetsStoredState): BattleBetsPublicState {
   const houseEdge = game?.settings.houseEdge ?? 0.05
   return {
     gameId: state.gameId,
-    pot: state.pot,
+    sessionId: state.sessionId,
+    tokenBalance: state.tokenBalance,
     phase: state.phase,
     femaleTeam: state.femaleTeam,
     maleTeam: state.maleTeam,
-    femaleChance: state.femaleChance,
-    maleChance: state.maleChance,
-    projectedFemalePayout: getProjectedPayout(
-      state.pot,
-      state.femaleChance,
+    femaleOdds: calculateBattleBetsDecimalOdds({
+      selectedProbability: state.femaleChance,
       houseEdge,
-    ),
-    projectedMalePayout: getProjectedPayout(
-      state.pot,
-      state.maleChance,
+    }),
+    maleOdds: calculateBattleBetsDecimalOdds({
+      selectedProbability: state.maleChance,
       houseEdge,
-    ),
+    }),
     selectedSide: state.selectedSide,
-    winner: state.phase === 'result' ? state.winner : undefined,
+    stake: state.stake,
+    potentialPayout: state.potentialPayout,
+    won: state.phase === 'result' ? state.won : undefined,
     payout: state.phase === 'result' ? state.payout : undefined,
+    rewardSummary:
+      state.phase === 'result' && state.settled && state.won && state.payout
+        ? createBattleBetsRewardSummary(state.payout)
+        : undefined,
     battle: state.phase === 'inspect' ? undefined : state.fixture.battleState,
     createdAt: state.createdAt,
     expiresAt: state.expiresAt,
@@ -385,7 +417,7 @@ function createBattleBetsFixture(params: {
     history: [],
     status: 'ongoing',
     battleId: GAME_ID,
-    background: '/backgrounds/celadon-game-corner-prize-wheel.avif',
+    background: '/backgrounds/game-corner.avif',
     playerName: 'Rocket Grunt F',
     enemyName: 'Rocket Grunt M',
     isWildBattle: false,
@@ -414,10 +446,14 @@ function createBattleBetsFixture(params: {
     playerTrainer: {
       name: 'Rocket Grunt F',
       icon: '/sprites/trainers/rocket-grunt-f.avif',
+      banner: 'celadon-game-corner',
+      title: 'Shadow Champ',
     },
     enemyTrainer: {
       name: 'Rocket Grunt M',
       icon: '/sprites/trainers/rocket-grunt-m.avif',
+      banner: 'celadon-game-corner',
+      title: 'Shadow Champ',
     },
   }
 
@@ -427,7 +463,7 @@ function createBattleBetsFixture(params: {
     random,
   })
   initializeEnemyAiMoveLoadouts({
-    state: mirrorBattleState(battleState),
+    state: mirrorBattleBetsBattleState(battleState),
     profile: 'advanced',
     random,
   })
@@ -478,30 +514,23 @@ function createBattleBetsFixture(params: {
 
   return {
     battleState,
-    femaleTrainerItems: normalizeTrainerBattleItems(femaleConfig.trainerItems),
-    maleTrainerItems: normalizeTrainerBattleItems(maleConfig.trainerItems),
+    playerTrainerItems: normalizeTrainerBattleItems(femaleConfig.trainerItems),
+    enemyTrainerItems: normalizeTrainerBattleItems(maleConfig.trainerItems),
   }
 }
 
-function mirrorBattleState(state: BattleState): BattleState {
-  const femaleId = String(state.playerTeam[0]?.user || FEMALE_USER_ID)
-  const maleId = String(state.enemyTeam[0]?.user || MALE_USER_ID)
+function orientFixtureForBackedSide(
+  fixture: BattleBetsFixture,
+  side: BattleBetsSide,
+): BattleBetsFixture {
+  if (side === 'female') return fixture
+
   return {
-    ...state,
-    playerTeam: state.enemyTeam,
-    enemyTeam: state.playerTeam,
-    activePlayerIndex: state.activeEnemyIndex,
-    activeEnemyIndex: state.activePlayerIndex,
-    playerName: state.enemyName,
-    enemyName: state.playerName,
-    powers: state.pvpPowers?.[maleId] ?? state.powers,
-    pvpPowers: state.pvpPowers
-      ? {
-          ...state.pvpPowers,
-          [femaleId]: state.pvpPowers[femaleId],
-          [maleId]: state.pvpPowers[maleId],
-        }
-      : undefined,
+    battleState: mirrorBattleBetsBattleState(fixture.battleState),
+    playerTrainerItems: fixture.enemyTrainerItems,
+    enemyTrainerItems: fixture.playerTrainerItems,
+    playerTrainerItemLastUsedTurn: fixture.enemyTrainerItemLastUsedTurn,
+    enemyTrainerItemLastUsedTurn: fixture.playerTrainerItemLastUsedTurn,
   }
 }
 
@@ -528,13 +557,13 @@ function enemyActionToPvpMove(action: EnemyBattleAction): PvpMove {
 
 function chooseSideMove(params: {
   state: BattleState
-  side: BattleBetsSide
+  side: 'player' | 'enemy'
   trainerItemRuntime: TrainerItemRuntime
   random: () => number
 }): PvpMove {
   const view =
-    params.side === 'female'
-      ? mirrorBattleState(params.state)
+    params.side === 'player'
+      ? mirrorBattleBetsBattleState(params.state)
       : { ...params.state }
   view.trainerItems = params.trainerItemRuntime.items
   view.trainerItemLastUsedTurn = params.trainerItemRuntime.lastUsedTurn
@@ -603,26 +632,26 @@ async function simulateBattle(
 ): Promise<SimulatedBattle> {
   const random = options.random ?? Math.random
   let state = structuredClone(fixture.battleState)
-  const femaleItems: TrainerItemRuntime = {
-    items: structuredClone(fixture.femaleTrainerItems),
+  const playerItems: TrainerItemRuntime = {
+    items: structuredClone(fixture.playerTrainerItems),
   }
-  const maleItems: TrainerItemRuntime = {
-    items: structuredClone(fixture.maleTrainerItems),
+  const enemyItems: TrainerItemRuntime = {
+    items: structuredClone(fixture.enemyTrainerItems),
   }
   while (state.status === 'ongoing' && state.turn <= MAX_BATTLE_TURNS) {
-    const femaleMove = chooseSideMove({
+    const playerMove = chooseSideMove({
       state,
-      side: 'female',
-      trainerItemRuntime: femaleItems,
+      side: 'player',
+      trainerItemRuntime: playerItems,
       random,
     })
-    const maleMove = chooseSideMove({
+    const enemyMove = chooseSideMove({
       state,
-      side: 'male',
-      trainerItemRuntime: maleItems,
+      side: 'enemy',
+      trainerItemRuntime: enemyItems,
       random,
     })
-    state = await resolvePvpTurn(state, femaleMove, maleMove, {
+    state = await resolvePvpTurn(state, playerMove, enemyMove, {
       persist: false,
       random,
     })
@@ -640,46 +669,45 @@ async function simulateBattle(
 async function resolveNextBattleBetsTurn(
   fixture: BattleBetsFixture,
   random: () => number = Math.random,
-): Promise<BattleBetsSide | undefined> {
+): Promise<boolean> {
   let state = fixture.battleState
   if (state.status !== 'ongoing') {
-    return state.status === 'won' ? 'female' : 'male'
+    return true
   }
 
-  const femaleItems: TrainerItemRuntime = {
-    items: fixture.femaleTrainerItems,
-    lastUsedTurn: fixture.femaleTrainerItemLastUsedTurn,
+  const playerItems: TrainerItemRuntime = {
+    items: fixture.playerTrainerItems,
+    lastUsedTurn: fixture.playerTrainerItemLastUsedTurn,
   }
-  const maleItems: TrainerItemRuntime = {
-    items: fixture.maleTrainerItems,
-    lastUsedTurn: fixture.maleTrainerItemLastUsedTurn,
+  const enemyItems: TrainerItemRuntime = {
+    items: fixture.enemyTrainerItems,
+    lastUsedTurn: fixture.enemyTrainerItemLastUsedTurn,
   }
-  const femaleMove = chooseSideMove({
+  const playerMove = chooseSideMove({
     state,
-    side: 'female',
-    trainerItemRuntime: femaleItems,
+    side: 'player',
+    trainerItemRuntime: playerItems,
     random,
   })
-  const maleMove = chooseSideMove({
+  const enemyMove = chooseSideMove({
     state,
-    side: 'male',
-    trainerItemRuntime: maleItems,
+    side: 'enemy',
+    trainerItemRuntime: enemyItems,
     random,
   })
 
-  state = await resolvePvpTurn(state, femaleMove, maleMove, {
+  state = await resolvePvpTurn(state, playerMove, enemyMove, {
     persist: false,
     random,
   })
   fixture.battleState = state
-  fixture.femaleTrainerItems = femaleItems.items
-  fixture.maleTrainerItems = maleItems.items
-  fixture.femaleTrainerItemLastUsedTurn = femaleItems.lastUsedTurn
-  fixture.maleTrainerItemLastUsedTurn = maleItems.lastUsedTurn
+  fixture.playerTrainerItems = playerItems.items
+  fixture.enemyTrainerItems = enemyItems.items
+  fixture.playerTrainerItemLastUsedTurn = playerItems.lastUsedTurn
+  fixture.enemyTrainerItemLastUsedTurn = enemyItems.lastUsedTurn
 
-  if (state.status === 'won') return 'female'
-  if (state.status === 'lost') return 'male'
-  if (state.turn <= MAX_BATTLE_TURNS) return undefined
+  if (state.status === 'won' || state.status === 'lost') return true
+  if (state.turn <= MAX_BATTLE_TURNS) return false
 
   const winner = getFallbackWinner(state, random)
   state.status = winner === 'female' ? 'won' : 'lost'
@@ -690,9 +718,10 @@ async function resolveNextBattleBetsTurn(
     result: winner === 'female' ? 'win' : 'loss',
     damageDealt: 0,
     damageTaken: 0,
-    message: `${winner === 'female' ? 'Rocket Grunt F' : 'Rocket Grunt M'} takes the judge's decision when the book calls time.`,
+    message: `${winner === 'female' ? state.playerName : state.enemyName} takes the judge's decision when the book calls time.`,
   })
-  return winner
+  fixture.battleState = state
+  return true
 }
 
 function createTeamPreview(
@@ -704,7 +733,7 @@ function createTeamPreview(
       ? fixture.battleState.playerTeam
       : fixture.battleState.enemyTeam
   const trainerItems =
-    side === 'female' ? fixture.femaleTrainerItems : fixture.maleTrainerItems
+    side === 'female' ? fixture.playerTrainerItems : fixture.enemyTrainerItems
   return {
     trainerName: side === 'female' ? 'Rocket Grunt F' : 'Rocket Grunt M',
     trainerSpriteId: side === 'female' ? 'rocket-grunt-f' : 'rocket-grunt-m',
@@ -725,8 +754,6 @@ function createTeamPreview(
 
 async function createSession(params: {
   user: User
-  payload: Awaited<ReturnType<typeof getPayload>>
-  pot: number
 }): Promise<{ state?: BattleBetsStoredState; error?: string }> {
   const game = getBattleBetsGame()
   if (!game) return { error: 'Battle Bets is unavailable.' }
@@ -793,7 +820,8 @@ async function createSession(params: {
   return {
     state: {
       gameId: GAME_ID,
-      pot: params.pot,
+      sessionId: crypto.randomUUID(),
+      tokenBalance: getTokenBalance(params.user),
       phase: 'inspect',
       femaleTeam: createTeamPreview('female', best.fixture),
       maleTeam: createTeamPreview('male', best.fixture),
@@ -849,7 +877,11 @@ export async function startBattleBets(
 
   try {
     let existing = await redis.get<BattleBetsStoredState>(sessionKey(user.id))
-    if (existing && !isSupportedSessionPhase(String(existing.phase))) {
+    if (
+      existing &&
+      (!isSupportedSessionPhase(String(existing.phase)) ||
+        typeof existing.sessionId !== 'string')
+    ) {
       await redis.del(sessionKey(user.id))
       existing = null
     }
@@ -857,10 +889,24 @@ export async function startBattleBets(
       await redis.del(sessionKey(user.id))
       existing = null
     }
+    if (existing?.phase === 'result' && !existing.settled) {
+      existing = await settleBattleBetsResult({
+        payload,
+        user,
+        state: existing,
+      })
+    }
     if (
       existing &&
-      !(forceReset && existing.phase === 'result' && existing.payout === 0)
+      (existing.phase === 'battle' ||
+        (existing.phase === 'inspect' && !forceReset))
     ) {
+      const freshUser = (await payload.findByID({
+        collection: 'users',
+        id: user.id,
+      })) as User
+      existing.tokenBalance = getTokenBalance(freshUser)
+      await saveLiveSession(user.id, existing)
       return {
         success: true,
         state: toPublicState(existing),
@@ -875,12 +921,9 @@ export async function startBattleBets(
       collection: 'users',
       id: user.id,
     })) as User
-    const buyIn = game.settings.buyIn ?? 100
 
     const created = await createSession({
       user: freshUser,
-      payload,
-      pot: buyIn,
     })
     if (!created.state) {
       return {
@@ -899,10 +942,14 @@ export async function startBattleBets(
 }
 
 export async function getBattleBetsState(): Promise<BattleBetsPublicState | null> {
-  const { user } = await currentUser()
+  const { payload, user } = await currentUser()
   if (!user) return null
-  const state = await redis.get<BattleBetsStoredState>(sessionKey(user.id))
-  if (state && !isSupportedSessionPhase(String(state.phase))) {
+  let state = await redis.get<BattleBetsStoredState>(sessionKey(user.id))
+  if (
+    state &&
+    (!isSupportedSessionPhase(String(state.phase)) ||
+      typeof state.sessionId !== 'string')
+  ) {
     await redis.del(sessionKey(user.id))
     return null
   }
@@ -910,16 +957,33 @@ export async function getBattleBetsState(): Promise<BattleBetsPublicState | null
     await redis.del(sessionKey(user.id))
     return null
   }
+  if (state) {
+    if (state.phase === 'result' && !state.settled) {
+      state = await settleBattleBetsResult({ payload, user, state })
+    }
+    const freshUser = (await payload.findByID({
+      collection: 'users',
+      id: user.id,
+    })) as User
+    state.tokenBalance = getTokenBalance(freshUser)
+  }
   return state ? toPublicState(state) : null
 }
 
 export async function placeBattleBet(
   side: BattleBetsSide,
+  stake: number,
   clientActionId: string,
 ): Promise<StateActionResult> {
-  const { user } = await currentUser()
+  const { payload, user } = await currentUser()
   if (!user || (side !== 'female' && side !== 'male')) {
     return { success: false, error: 'Invalid wager.' }
+  }
+  if (!Number.isSafeInteger(stake) || stake < 1) {
+    return {
+      success: false,
+      error: 'Enter a whole-number stake of at least 1 Fun Token.',
+    }
   }
   if (!isValidClientActionId(clientActionId)) {
     return { success: false, error: 'Invalid wager request.' }
@@ -941,6 +1005,14 @@ export async function placeBattleBet(
     const repeated = await getIdempotentResult<StateActionResult>(resultKey)
     if (repeated) return repeated
     const state = await redis.get<BattleBetsStoredState>(sessionKey(user.id))
+    if (state?.phase === 'battle' && state.wagerActionId === clientActionId) {
+      const response: StateActionResult = {
+        success: true,
+        state: toPublicState(state),
+      }
+      await setIdempotentResult(resultKey, response, SESSION_TTL_SECONDS)
+      return response
+    }
     if (state?.phase !== 'inspect') {
       return { success: false, error: 'There is no open wager.' }
     }
@@ -948,19 +1020,65 @@ export async function placeBattleBet(
       await redis.del(sessionKey(user.id))
       return {
         success: false,
-        error: 'That book expired and the virtual pot was forfeited.',
+        error: 'That matchup has expired. Start a new game.',
       }
     }
+
+    const freshUser = (await payload.findByID({
+      collection: 'users',
+      id: user.id,
+    })) as User
+    const tokenBalance = getTokenBalance(freshUser)
+    if (stake > tokenBalance) {
+      return {
+        success: false,
+        error: 'You do not have enough Fun Tokens for that stake.',
+      }
+    }
+    const game = getBattleBetsGame()
+    if (!game) return { success: false, error: 'Battle Bets is unavailable.' }
+    const selectedProbability =
+      side === 'female' ? state.femaleChance : state.maleChance
+    const potentialPayout = calculateBattleBetsPayout({
+      stake,
+      selectedProbability,
+      houseEdge: game.settings.houseEdge ?? 0.05,
+    })
+    const currency = {
+      ...((freshUser.currency as Record<string, number>) || {}),
+      'fun-tokens': tokenBalance - stake,
+    }
+
+    await payload.update({
+      collection: 'users',
+      id: user.id,
+      data: { currency },
+    })
 
     const next: BattleBetsStoredState = {
       ...state,
       phase: 'battle',
       selectedSide: side,
+      stake,
+      potentialPayout,
+      tokenBalance: tokenBalance - stake,
+      wagerActionId: clientActionId,
+      fixture: orientFixtureForBackedSide(state.fixture, side),
     }
     if (!(await saveLiveSession(user.id, next))) {
+      await payload.update({
+        collection: 'users',
+        id: user.id,
+        data: {
+          currency: {
+            ...((freshUser.currency as Record<string, number>) || {}),
+            'fun-tokens': tokenBalance,
+          },
+        },
+      })
       return {
         success: false,
-        error: 'That book expired and the virtual pot was forfeited.',
+        error: 'That matchup expired before the wager could be placed.',
       }
     }
     const response: StateActionResult = {
@@ -974,10 +1092,109 @@ export async function placeBattleBet(
   }
 }
 
+async function settleBattleBetsResult(params: {
+  payload: Awaited<ReturnType<typeof getPayload>>
+  user: User
+  state: BattleBetsStoredState
+}): Promise<BattleBetsStoredState> {
+  if (params.state.phase !== 'result' || params.state.settled) {
+    return params.state
+  }
+
+  const receiptKey = actionResultKey(
+    params.user.id,
+    'settlement',
+    params.state.sessionId,
+  )
+  const existingReceipt = await getIdempotentResult<{
+    tokenBalance: number
+    payout: number
+    won: boolean
+    activityRecorded: boolean
+  }>(receiptKey)
+  if (existingReceipt) {
+    if (!existingReceipt.activityRecorded) {
+      await setIdempotentResult(
+        receiptKey,
+        { ...existingReceipt, activityRecorded: true },
+        SESSION_TTL_SECONDS,
+      )
+      await incrementUserActivityResult(
+        params.payload as any,
+        params.user.id,
+        'gameResults',
+        GAME_ID,
+        existingReceipt.won ? { wins: 1 } : { losses: 1 },
+      )
+    }
+    const restored = {
+      ...params.state,
+      won: existingReceipt.won,
+      payout: existingReceipt.payout,
+      tokenBalance: existingReceipt.tokenBalance,
+      settled: true,
+    }
+    await saveLiveSession(params.user.id, restored)
+    return restored
+  }
+
+  const won =
+    params.state.fixture.battleState.status === 'won' &&
+    params.state.won === true
+  const payout = won ? Math.max(0, params.state.payout || 0) : 0
+  const freshUser = (await params.payload.findByID({
+    collection: 'users',
+    id: params.user.id,
+  })) as User
+  let tokenBalance = getTokenBalance(freshUser)
+
+  if (won && payout > 0) {
+    tokenBalance += payout
+    await params.payload.update({
+      collection: 'users',
+      id: params.user.id,
+      data: {
+        currency: {
+          ...((freshUser.currency as Record<string, number>) || {}),
+          'fun-tokens': tokenBalance,
+        },
+      },
+    })
+  }
+
+  await setIdempotentResult(
+    receiptKey,
+    { tokenBalance, payout, won, activityRecorded: false },
+    SESSION_TTL_SECONDS,
+  )
+  await setIdempotentResult(
+    receiptKey,
+    { tokenBalance, payout, won, activityRecorded: true },
+    SESSION_TTL_SECONDS,
+  )
+  await incrementUserActivityResult(
+    params.payload as any,
+    params.user.id,
+    'gameResults',
+    GAME_ID,
+    won ? { wins: 1 } : { losses: 1 },
+  )
+
+  const settled = {
+    ...params.state,
+    won,
+    payout,
+    tokenBalance,
+    settled: true,
+  }
+  await saveLiveSession(params.user.id, settled)
+  return settled
+}
+
 export async function advanceBattleBetsBattle(
   clientActionId: string,
 ): Promise<StateActionResult> {
-  const { user } = await currentUser()
+  const { payload, user } = await currentUser()
   if (!user) return { success: false, error: 'Not authenticated' }
   if (!isValidClientActionId(clientActionId)) {
     return { success: false, error: 'Invalid battle request.' }
@@ -1002,45 +1219,61 @@ export async function advanceBattleBetsBattle(
       await redis.del(sessionKey(user.id))
       return {
         success: false,
-        error: 'That book expired and the virtual pot was forfeited.',
+        error: 'That battle has expired.',
       }
     }
-    if (state.phase === 'result') {
+    if (state.lastTurnActionId === clientActionId) {
+      const replayed =
+        state.phase === 'result'
+          ? await settleBattleBetsResult({ payload, user, state })
+          : state
       const response: StateActionResult = {
         success: true,
-        state: toPublicState(state),
+        state: toPublicState(replayed),
+      }
+      await setIdempotentResult(resultKey, response, SESSION_TTL_SECONDS)
+      return response
+    }
+    if (state.phase === 'result') {
+      const settled = await settleBattleBetsResult({ payload, user, state })
+      const response: StateActionResult = {
+        success: true,
+        state: toPublicState(settled),
       }
       await setIdempotentResult(resultKey, response, SESSION_TTL_SECONDS)
       return response
     }
 
-    const winner = await resolveNextBattleBetsTurn(state.fixture)
+    const completed = await resolveNextBattleBetsTurn(state.fixture)
     let next = state
-    if (winner) {
-      const selectedChance =
+    if (completed) {
+      const won = state.fixture.battleState.status === 'won'
+      const selectedProbability =
         state.selectedSide === 'female' ? state.femaleChance : state.maleChance
       const game = getBattleBetsGame()
-      const won = winner === state.selectedSide
-      const payout =
-        won && game
-          ? calculateBattleBetsPayout({
-              pot: state.pot,
-              selectedProbability: selectedChance,
-              houseEdge: game.settings.houseEdge ?? 0.05,
-            })
-          : 0
+      const payout = calculateBattleBetsSettlement({
+        won,
+        stake: state.stake || 0,
+        selectedProbability,
+        houseEdge: game?.settings.houseEdge ?? 0.05,
+      })
       next = {
         ...state,
         phase: 'result',
-        winner,
+        won,
         payout,
+        settled: false,
       }
     }
+    next = { ...next, lastTurnActionId: clientActionId }
     if (!(await saveLiveSession(user.id, next))) {
       return {
         success: false,
-        error: 'That book expired and the virtual pot was forfeited.',
+        error: 'That battle has expired.',
       }
+    }
+    if (next.phase === 'result') {
+      next = await settleBattleBetsResult({ payload, user, state: next })
     }
     const response: StateActionResult = {
       success: true,
@@ -1053,135 +1286,26 @@ export async function advanceBattleBetsBattle(
   }
 }
 
-export async function cashOutBattleBets(
-  clientActionId: string,
-): Promise<ActionFailure | { success: true; payout: number }> {
-  const { payload, user } = await currentUser()
+export async function clearBattleBetsResult(): Promise<
+  ActionFailure | { success: true }
+> {
+  const { user } = await currentUser()
   if (!user) return { success: false, error: 'Not authenticated' }
-  if (!isValidClientActionId(clientActionId)) {
-    return { success: false, error: 'Invalid cash-out request.' }
-  }
-  const rateLimit = await checkRateLimit(user.id, 'cash-out')
-  if (rateLimit) return rateLimit
-  const resultKey = actionResultKey(user.id, 'cash-out', clientActionId)
-  const cached = await getIdempotentResult<
-    ActionFailure | { success: true; payout: number }
-  >(resultKey)
-  if (cached) return cached
 
   const lock = await acquireActionLock(`lock:battle-bets:${user.id}`, 30)
   if (!lock.acquired) {
-    return { success: false, error: 'That pot is already being settled.' }
+    return { success: false, error: 'That result is still being settled.' }
   }
   try {
-    const repeated = await getIdempotentResult<
-      ActionFailure | { success: true; payout: number }
-    >(resultKey)
-    if (repeated) return repeated
     const state = await redis.get<BattleBetsStoredState>(sessionKey(user.id))
-    if (
-      state?.phase !== 'result' ||
-      !state.payout ||
-      state.winner !== state.selectedSide
-    ) {
+    if (state?.phase === 'battle') {
       return {
         success: false,
-        error: 'There is no winning pot to cash out.',
+        error: 'The active wager must finish before leaving.',
       }
     }
-    if (getRemainingSessionTtl(state.expiresAt) <= 0) {
-      await redis.del(sessionKey(user.id))
-      return {
-        success: false,
-        error: 'That book expired and the virtual pot was forfeited.',
-      }
-    }
-
-    const freshUser = (await payload.findByID({
-      collection: 'users',
-      id: user.id,
-    })) as User
-    const currency = {
-      ...((freshUser.currency as Record<string, number>) || {}),
-    }
-    currency['fun-tokens'] = (currency['fun-tokens'] || 0) + state.payout
-    await payload.update({
-      collection: 'users',
-      id: user.id,
-      data: { currency },
-    })
     await redis.del(sessionKey(user.id))
-    const response = { success: true as const, payout: state.payout }
-    await setIdempotentResult(resultKey, response, SESSION_TTL_SECONDS)
-    return response
-  } finally {
-    await releaseActionLock(lock)
-  }
-}
-
-export async function rollOverBattleBets(
-  clientActionId: string,
-): Promise<StateActionResult> {
-  const { payload, user } = await currentUser()
-  if (!user) return { success: false, error: 'Not authenticated' }
-  if (!isValidClientActionId(clientActionId)) {
-    return { success: false, error: 'Invalid rollover request.' }
-  }
-  const rateLimit = await checkRateLimit(user.id, 'roll-over', 6)
-  if (rateLimit) return rateLimit
-  const resultKey = actionResultKey(user.id, 'roll-over', clientActionId)
-  const cached = await getIdempotentResult<StateActionResult>(resultKey)
-  if (cached) return cached
-
-  const lock = await acquireActionLock(
-    `lock:battle-bets:${user.id}`,
-    ACTION_LOCK_SECONDS,
-  )
-  if (!lock.acquired) {
-    return { success: false, error: 'The next book is already being prepared.' }
-  }
-  try {
-    const repeated = await getIdempotentResult<StateActionResult>(resultKey)
-    if (repeated) return repeated
-    const state = await redis.get<BattleBetsStoredState>(sessionKey(user.id))
-    if (
-      state?.phase !== 'result' ||
-      !state.payout ||
-      state.winner !== state.selectedSide
-    ) {
-      return {
-        success: false,
-        error: 'Win a battle before rolling over.',
-      }
-    }
-    if (getRemainingSessionTtl(state.expiresAt) <= 0) {
-      await redis.del(sessionKey(user.id))
-      return {
-        success: false,
-        error: 'That book expired and the virtual pot was forfeited.',
-      }
-    }
-
-    const created = await createSession({
-      user,
-      payload,
-      pot: state.payout,
-    })
-    if (!created.state) {
-      return {
-        success: false,
-        error: created.error || 'The house could not prepare another matchup.',
-      }
-    }
-    await redis.set(sessionKey(user.id), created.state, {
-      ex: SESSION_TTL_SECONDS,
-    })
-    const response: StateActionResult = {
-      success: true,
-      state: toPublicState(created.state),
-    }
-    await setIdempotentResult(resultKey, response, SESSION_TTL_SECONDS)
-    return response
+    return { success: true }
   } finally {
     await releaseActionLock(lock)
   }
