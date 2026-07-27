@@ -5,6 +5,7 @@ const currencyTypeSchema = z.enum([
   'crystals',
   'mega-shards',
   'pokedollars',
+  'fun-tokens',
   'battle-points',
   'berry-powder',
   'prof-scrip',
@@ -34,6 +35,7 @@ const pokemonCriteriaSchema = z
     region: z.union([z.string(), z.array(z.string())]).optional(),
     location: z.union([z.string(), z.array(z.string())]).optional(),
     locationId: z.union([z.string(), z.array(z.string())]).optional(),
+    ballType: z.string().optional(),
     minLevel: z.number().int().min(1).max(100).optional(),
     maxLevel: z.number().int().min(1).max(100).optional(),
     size: z.enum(['XS', 'S', 'L', 'XL']).optional(),
@@ -491,7 +493,12 @@ const settingsByGameType: Record<string, z.ZodTypeAny> = {
     })
     .passthrough(),
   run: z.object({ speed: z.number().positive() }).passthrough(),
-  flap: z.object({ speed: z.number().positive().optional() }).passthrough(),
+  flap: z
+    .object({
+      speed: z.number().positive().optional(),
+      entryCost: costSchema.optional(),
+    })
+    .passthrough(),
   slots: z
     .object({
       symbols: z.array(z.object({ id: z.string(), icon: taskIconSchema }).passthrough()).min(1),

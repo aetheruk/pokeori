@@ -703,6 +703,24 @@ describe('skill unlock helpers', () => {
     )
     expect(researcherGuide).toContainEqual(
       expect.objectContaining({
+        label: 'Neutral Stones',
+        itemId: 'neutral-stone',
+        level: 32,
+        category: 'items',
+        source: 'authored',
+      }),
+    )
+    expect(getSkillGuideUnlocks('artisan')).toContainEqual(
+      expect.objectContaining({
+        label: 'Elemental Stonecraft',
+        itemId: 'neutral-stone',
+        level: 30,
+        category: 'items',
+        source: 'authored',
+      }),
+    )
+    expect(researcherGuide).toContainEqual(
+      expect.objectContaining({
         label: 'Study XP x2',
         level: 18,
         source: 'authored',

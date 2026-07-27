@@ -21,6 +21,7 @@ export interface SlotGameSettings {
       | 'crystals'
       | 'mega-shards'
       | 'pokedollars'
+      | 'fun-tokens'
       | 'battle-points'
       | 'berry-powder'
       | 'prof-scrip'

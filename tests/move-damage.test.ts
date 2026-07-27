@@ -725,7 +725,7 @@ describe('move damage helpers', () => {
 
     expect(move).toBeDefined()
     expect(move?.stance).toBe('speed')
-    expect(move?.damage).toBe(0.5)
+    expect(move?.damage).toBe(0.2)
     expect(move?.accuracy).toBe(100)
     expect(move?.contest).toEqual({
       attackerMetric: 'effective-stat:speed',

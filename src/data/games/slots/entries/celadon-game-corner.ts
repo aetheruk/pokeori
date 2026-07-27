@@ -1,3 +1,68 @@
 import { SlotGameConfig } from '../types'
 
-export const celadonGameCornerslotGames: SlotGameConfig[] = []
+export const celadonGameCornerSlotEntries: SlotGameConfig[] = [
+  {
+    id: 'celadon-rocket-slots',
+    name: 'Rocket Slots',
+    description: 'Line up three symbols to turn a small stack of Fun Tokens into a bigger one.',
+    category: 'Kanto',
+    subCategory: 'Celadon Game Corner',
+    icon: { type: 'item', id: 'fun-token' },
+    background: '/backgrounds/celadon-game-corner-arcade.avif',
+    requirements: [{ type: 'task_completed', targetId: 'when-the-fun-stops' }],
+    criteria: [],
+    rewards: [],
+    settings: {
+      timeLimit: 600,
+      cost: { currencyType: 'fun-tokens', amount: 10 },
+      winRate: 40,
+      symbols: [
+        { id: 'token', icon: { type: 'item', id: 'fun-token' }, weight: 60 },
+        { id: 'stardust', icon: { type: 'item', id: 'stardust' }, weight: 25 },
+        { id: 'nugget', icon: { type: 'item', id: 'nugget' }, weight: 10 },
+        { id: 'porygon', icon: { type: 'pokemon', id: '137' }, weight: 5 },
+      ],
+      paytable: [
+        { icons: ['token', 'token', 'token'], rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 5, dropChance: 100 }], weight: 25 },
+        { icons: ['stardust', 'stardust', 'stardust'], rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 15, dropChance: 100 }], weight: 10 },
+        { icons: ['nugget', 'nugget', 'nugget'], rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 50, dropChance: 100 }], weight: 4 },
+        { icons: ['porygon', 'porygon', 'porygon'], rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 100, dropChance: 100 }], weight: 1 },
+      ],
+      backgroundImage: '/backgrounds/celadon-game-corner-arcade.avif',
+      machineTheme: 'classic',
+      themeColour: '#9f1239',
+    },
+  },
+  {
+    id: 'celadon-high-stakes-slots',
+    name: 'High Stakes Rocket Slots',
+    description: 'The same reels, with a far more serious pile of Fun Tokens on the line.',
+    category: 'Kanto',
+    subCategory: 'Celadon Game Corner',
+    icon: { type: 'item', id: 'fun-token' },
+    background: '/backgrounds/celadon-game-corner-arcade.avif',
+    requirements: [{ type: 'task_completed', targetId: 'high-roller' }],
+    criteria: [],
+    rewards: [],
+    settings: {
+      timeLimit: 600,
+      cost: { currencyType: 'fun-tokens', amount: 100 },
+      winRate: 40,
+      symbols: [
+        { id: 'token', icon: { type: 'item', id: 'fun-token' }, weight: 60 },
+        { id: 'stardust', icon: { type: 'item', id: 'stardust' }, weight: 25 },
+        { id: 'nugget', icon: { type: 'item', id: 'nugget' }, weight: 10 },
+        { id: 'porygon', icon: { type: 'pokemon', id: '137' }, weight: 5 },
+      ],
+      paytable: [
+        { icons: ['token', 'token', 'token'], rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 50, dropChance: 100 }], weight: 25 },
+        { icons: ['stardust', 'stardust', 'stardust'], rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 150, dropChance: 100 }], weight: 10 },
+        { icons: ['nugget', 'nugget', 'nugget'], rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 500, dropChance: 100 }], weight: 4 },
+        { icons: ['porygon', 'porygon', 'porygon'], rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 1000, dropChance: 100 }], weight: 1 },
+      ],
+      backgroundImage: '/backgrounds/celadon-game-corner-arcade.avif',
+      machineTheme: 'neon',
+      themeColour: '#f59e0b',
+    },
+  },
+]

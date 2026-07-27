@@ -2,190 +2,475 @@ import { BattleConfig } from '../../types'
 
 export const celadonCityBattles: BattleConfig[] = [
   {
-    "id": "route-7-battle",
-    "name": "Route 7",
-    "description": "Wild Pokemon rustle in the grass just outside Celadon City.",
-    "category": "Kanto",
-    "subCategory": "Celadon City",
-    "icon": {
-      "type": "pokemon",
-      "id": "43"
+    id: 'route-7-battle',
+    name: 'Route 7',
+    description: 'Wild Pokemon rustle in the grass just outside Celadon City.',
+    category: 'Kanto',
+    subCategory: 'Celadon City',
+    icon: {
+      type: 'pokemon',
+      id: '43',
     },
-    "background": "/backgrounds/grassy-route.avif",
-    "requirements": [
+    background: '/backgrounds/grassy-route.avif',
+    requirements: [
       {
-        "type": "task_completed",
-        "targetId": "underground-path-route-8"
-      }
+        type: 'task_completed',
+        targetId: 'underground-path-route-8',
+      },
     ],
-    "isWildBattle": true,
-    "enemyAttackTelegraphChance": 2,
-    "enemyTeam": [
+    isWildBattle: true,
+    enemyAttackTelegraphChance: 2,
+    enemyTeam: [
       {
-        "speciesId": 16,
-        "formId": "16",
-        "level": {
-          "min": 18,
-          "max": 22
-        }
+        speciesId: 16,
+        formId: '16',
+        level: {
+          min: 18,
+          max: 22,
+        },
       },
       {
-        "speciesId": 17,
-        "formId": "17",
-        "level": {
-          "min": 18,
-          "max": 22
-        }
+        speciesId: 17,
+        formId: '17',
+        level: {
+          min: 18,
+          max: 22,
+        },
       },
       {
-        "speciesId": 43,
-        "formId": "43",
-        "level": {
-          "min": 18,
-          "max": 22
-        }
+        speciesId: 43,
+        formId: '43',
+        level: {
+          min: 18,
+          max: 22,
+        },
       },
       {
-        "speciesId": 69,
-        "formId": "69",
-        "level": {
-          "min": 18,
-          "max": 22
-        }
+        speciesId: 69,
+        formId: '69',
+        level: {
+          min: 18,
+          max: 22,
+        },
       },
       {
-        "speciesId": 56,
-        "formId": "56",
-        "level": {
-          "min": 18,
-          "max": 22
-        }
+        speciesId: 56,
+        formId: '56',
+        level: {
+          min: 18,
+          max: 22,
+        },
       },
       {
-        "speciesId": 58,
-        "formId": "58",
-        "level": {
-          "min": 18,
-          "max": 22
-        }
+        speciesId: 58,
+        formId: '58',
+        level: {
+          min: 18,
+          max: 22,
+        },
       },
       {
-        "speciesId": 37,
-        "formId": "37",
-        "level": {
-          "min": 18,
-          "max": 22
-        }
+        speciesId: 37,
+        formId: '37',
+        level: {
+          min: 18,
+          max: 22,
+        },
       },
       {
-        "speciesId": 63,
-        "formId": "63",
-        "level": {
-          "min": 18,
-          "max": 22
-        }
-      }
+        speciesId: 63,
+        formId: '63',
+        level: {
+          min: 18,
+          max: 22,
+        },
+      },
     ],
-    "rewards": [],
-    "maxPokemon": 1,
-    "levelCap": 30
+    rewards: [],
+    maxPokemon: 1,
+    levelCap: 30,
   },
   {
-    "id": "celadon-hq-rocket-ambush",
-    "trainerClassId": "rocket-grunt",
-    "name": "Rocket Grunt",
-    "description": "A Rocket Grunt ambushes you as you leave Police HQ.",
-    "category": "Kanto",
-    "subCategory": "Celadon City",
-    "icon": {
-      "type": "trainer",
-      "id": "rocket-grunt"
+    id: 'celadon-hq-rocket-ambush',
+    trainerClassId: 'rocket-grunt',
+    name: 'Rocket Grunt',
+    description: 'A Rocket Grunt ambushes you as you leave Police HQ.',
+    category: 'Kanto',
+    subCategory: 'Celadon City',
+    icon: {
+      type: 'trainer',
+      id: 'rocket-grunt',
     },
-    "background": "/backgrounds/police-hq.avif",
-    "title": "Team Rocket",
-    "requirements": [
+    background: '/backgrounds/police-hq.avif',
+    title: 'Team Rocket',
+    requirements: [
       {
-        "type": "task_completed",
-        "targetId": "leaving-police-hq"
+        type: 'task_completed',
+        targetId: 'leaving-police-hq',
       },
       {
-        "type": "battle_result",
-        "targetId": "celadon-hq-rocket-ambush",
-        "battleStatus": "win",
-        "count": 1,
-        "inverse": true
-      }
+        type: 'battle_result',
+        targetId: 'celadon-hq-rocket-ambush',
+        battleStatus: 'win',
+        count: 1,
+        inverse: true,
+      },
     ],
-    "enemyTeam": [
+    enemyTeam: [
       {
-        "speciesId": 110,
-        "formId": "110",
-        "level": 30,
-        "isShadow": true,
-        "name": "Shadow Weezing",
-        "rarity": "shadow"
+        speciesId: 110,
+        formId: '110',
+        level: 30,
+        isShadow: true,
+        name: 'Shadow Weezing',
+        rarity: 'shadow',
       },
       {
-        "speciesId": 20,
-        "formId": "20",
-        "level": 30,
-        "isShadow": true,
-        "name": "Shadow Raticate",
-        "rarity": "shadow"
-      }
+        speciesId: 20,
+        formId: '20',
+        level: 30,
+        isShadow: true,
+        name: 'Shadow Raticate',
+        rarity: 'shadow',
+      },
     ],
-    "trainerItems": [
+    trainerItems: [
       {
-        "itemId": "battle-super-potion",
-        "quantity": 1
-      }
+        itemId: 'battle-super-potion',
+        quantity: 1,
+      },
     ],
-    "rewards": [],
-    "maxPokemon": 3,
-    "levelCap": 35,
-    "enemyAttackTelegraphChance": 2,
-    "allowedItems": [
-      "battle-potion",
-      "battle-super-potion"
-    ]
+    rewards: [],
+    maxPokemon: 3,
+    levelCap: 35,
+    enemyAttackTelegraphChance: 2,
+    allowedItems: ['battle-potion', 'battle-super-potion'],
   },
   {
-    "id": "det-ray-choo-skill-test",
-    "trainerClassId": "detective",
-    "trainerName": "Ray Choo",
-    "name": "Det. Ray Choo",
-    "description": "Detective Ray Choo wants to test your skills before the two of you begin your investigation.",
-    "category": "Kanto",
-    "subCategory": "Celadon City",
-    "icon": {
-      "type": "trainer",
-      "id": "detective"
+    id: 'det-ray-choo-skill-test',
+    trainerClassId: 'detective',
+    trainerName: 'Ray Choo',
+    name: 'Det. Ray Choo',
+    description:
+      'Detective Ray Choo wants to test your skills before the two of you begin your investigation.',
+    category: 'Kanto',
+    subCategory: 'Celadon City',
+    icon: {
+      type: 'trainer',
+      id: 'detective',
     },
-    "background": "/backgrounds/celadon.avif",
-    "title": "Detective",
-    "requirements": [
+    background: '/backgrounds/celadon.avif',
+    title: 'Detective',
+    requirements: [
       {
-        "type": "task_completed",
-        "targetId": "rocket-problem-wrapup"
+        type: 'task_completed',
+        targetId: 'rocket-problem-wrapup',
       },
       {
-        "type": "battle_result",
-        "targetId": "det-ray-choo-skill-test",
-        "battleStatus": "win",
-        "count": 1,
-        "inverse": true
-      }
+        type: 'battle_result',
+        targetId: 'det-ray-choo-skill-test',
+        battleStatus: 'win',
+        count: 1,
+        inverse: true,
+      },
     ],
-    "enemyTeam": [
+    enemyTeam: [
       {
-        "speciesId": 58,
-        "formId": "58",
-        "level": 45
-      }
+        speciesId: 58,
+        formId: '58',
+        level: 45,
+      },
     ],
-    "rewards": [],
-    "maxPokemon": 2,
-    "levelCap": 30,
-    "enemyAttackTelegraphChance": 2
-  }
+    rewards: [],
+    maxPokemon: 2,
+    levelCap: 30,
+    enemyAttackTelegraphChance: 2,
+  },
+  {
+    id: 'celadon-gym-lass-kay',
+    trainerClassId: 'lass',
+    trainerName: 'Kay',
+    name: 'Lass Kay',
+    description: "The first of Celadon Gym's trainers blocks the path to Erika.",
+    category: 'Kanto',
+    subCategory: 'Celadon City',
+    icon: { type: 'trainer', id: 'lass' },
+    background: '/backgrounds/gym-grass.avif',
+    title: 'Celadon Gym',
+    requirements: [
+      { type: 'task_completed', targetId: 'celadon-gym-challenge' },
+      {
+        type: 'battle_result',
+        targetId: 'celadon-gym-lass-kay',
+        battleStatus: 'win',
+        count: 1,
+        inverse: true,
+      },
+    ],
+    enemyTeam: [
+      { speciesId: 69, formId: '69', level: 23 },
+      { speciesId: 70, formId: '70', level: 23 },
+    ],
+    rewards: [],
+    maxPokemon: 6,
+    levelCap: 30,
+    enemyAttackTelegraphChance: 2,
+    bannedPlayerTypes: ['fire', 'flying'],
+  },
+  {
+    id: 'celadon-gym-beauty-bridget',
+    trainerClassId: 'beauty',
+    trainerName: 'Bridget',
+    name: 'Beauty Bridget',
+    description: 'A Beauty challenges anyone who wants to continue through the Gym.',
+    category: 'Kanto',
+    subCategory: 'Celadon City',
+    icon: { type: 'trainer', id: 'beauty' },
+    background: '/backgrounds/gym-grass.avif',
+    title: 'Celadon Gym',
+    requirements: [
+      { type: 'battle_result', targetId: 'celadon-gym-lass-kay', battleStatus: 'win', count: 1 },
+      {
+        type: 'battle_result',
+        targetId: 'celadon-gym-beauty-bridget',
+        battleStatus: 'win',
+        count: 1,
+        inverse: true,
+      },
+    ],
+    enemyTeam: [
+      { speciesId: 43, formId: '43', level: 21 },
+      { speciesId: 43, formId: '43', level: 21 },
+      { speciesId: 69, formId: '69', level: 21 },
+      { speciesId: 69, formId: '69', level: 21 },
+    ],
+    rewards: [],
+    maxPokemon: 6,
+    levelCap: 30,
+    enemyAttackTelegraphChance: 2,
+    bannedPlayerTypes: ['fire', 'flying'],
+  },
+  {
+    id: 'celadon-gym-picnicker-tina',
+    trainerClassId: 'picknicker',
+    trainerName: 'Tina',
+    name: 'Picnicker Tina',
+    description: "Tina is tending the Gym's plants, but she is ready for a battle.",
+    category: 'Kanto',
+    subCategory: 'Celadon City',
+    icon: { type: 'trainer', id: 'picknicker' },
+    background: '/backgrounds/gym-grass.avif',
+    title: 'Celadon Gym',
+    requirements: [
+      {
+        type: 'battle_result',
+        targetId: 'celadon-gym-beauty-bridget',
+        battleStatus: 'win',
+        count: 1,
+      },
+      {
+        type: 'battle_result',
+        targetId: 'celadon-gym-picnicker-tina',
+        battleStatus: 'win',
+        count: 1,
+        inverse: true,
+      },
+    ],
+    enemyTeam: [
+      { speciesId: 1, formId: '1', level: 24 },
+      { speciesId: 2, formId: '2', level: 24 },
+    ],
+    rewards: [],
+    maxPokemon: 6,
+    levelCap: 30,
+    enemyAttackTelegraphChance: 2,
+    bannedPlayerTypes: ['fire', 'flying'],
+  },
+  {
+    id: 'celadon-gym-lass-lisa',
+    trainerClassId: 'lass',
+    trainerName: 'Lisa',
+    name: 'Lass Lisa',
+    description: 'Lisa insists that a challenger must appreciate beautiful Pokemon.',
+    category: 'Kanto',
+    subCategory: 'Celadon City',
+    icon: { type: 'trainer', id: 'lass' },
+    background: '/backgrounds/gym-grass.avif',
+    title: 'Celadon Gym',
+    requirements: [
+      {
+        type: 'battle_result',
+        targetId: 'celadon-gym-picnicker-tina',
+        battleStatus: 'win',
+        count: 1,
+      },
+      {
+        type: 'battle_result',
+        targetId: 'celadon-gym-lass-lisa',
+        battleStatus: 'win',
+        count: 1,
+        inverse: true,
+      },
+    ],
+    enemyTeam: [
+      { speciesId: 43, formId: '43', level: 23 },
+      { speciesId: 44, formId: '44', level: 23 },
+    ],
+    rewards: [],
+    maxPokemon: 6,
+    levelCap: 30,
+    enemyAttackTelegraphChance: 2,
+    bannedPlayerTypes: ['fire', 'flying'],
+  },
+  {
+    id: 'celadon-gym-cooltrainer-mary',
+    trainerClassId: 'expert-f',
+    trainerName: 'Mary',
+    name: 'Cooltrainer Mary',
+    description: "Mary is one of Celadon Gym's strongest trainers.",
+    category: 'Kanto',
+    subCategory: 'Celadon City',
+    icon: { type: 'trainer', id: 'expert-f' },
+    background: '/backgrounds/gym-grass.avif',
+    title: 'Celadon Gym',
+    requirements: [
+      { type: 'battle_result', targetId: 'celadon-gym-lass-lisa', battleStatus: 'win', count: 1 },
+      {
+        type: 'battle_result',
+        targetId: 'celadon-gym-cooltrainer-mary',
+        battleStatus: 'win',
+        count: 1,
+        inverse: true,
+      },
+    ],
+    enemyTeam: [
+      { speciesId: 69, formId: '69', level: 22 },
+      { speciesId: 43, formId: '43', level: 22 },
+      { speciesId: 70, formId: '70', level: 22 },
+      { speciesId: 44, formId: '44', level: 22 },
+      { speciesId: 2, formId: '2', level: 22 },
+    ],
+    rewards: [],
+    maxPokemon: 6,
+    levelCap: 30,
+    enemyAttackTelegraphChance: 2,
+    bannedPlayerTypes: ['fire', 'flying'],
+  },
+  {
+    id: 'celadon-gym-beauty-lori',
+    trainerClassId: 'beauty',
+    trainerName: 'Lori',
+    name: 'Beauty Lori',
+    description: "Lori waits at the last turn before the Gym Leader's room.",
+    category: 'Kanto',
+    subCategory: 'Celadon City',
+    icon: { type: 'trainer', id: 'beauty' },
+    background: '/backgrounds/gym-grass.avif',
+    title: 'Celadon Gym',
+    requirements: [
+      {
+        type: 'battle_result',
+        targetId: 'celadon-gym-cooltrainer-mary',
+        battleStatus: 'win',
+        count: 1,
+      },
+      {
+        type: 'battle_result',
+        targetId: 'celadon-gym-beauty-lori',
+        battleStatus: 'win',
+        count: 1,
+        inverse: true,
+      },
+    ],
+    enemyTeam: [{ speciesId: 102, formId: '102', level: 24 }],
+    rewards: [],
+    maxPokemon: 6,
+    levelCap: 30,
+    enemyAttackTelegraphChance: 2,
+    bannedPlayerTypes: ['fire', 'flying'],
+  },
+  {
+    id: 'celadon-gym-beauty-tamia',
+    trainerClassId: 'beauty',
+    trainerName: 'Tamia',
+    name: 'Beauty Tamia',
+    description: 'Tamia makes sure only worthy trainers reach Erika.',
+    category: 'Kanto',
+    subCategory: 'Celadon City',
+    icon: { type: 'trainer', id: 'beauty' },
+    background: '/backgrounds/gym-grass.avif',
+    title: 'Celadon Gym',
+    requirements: [
+      { type: 'battle_result', targetId: 'celadon-gym-beauty-lori', battleStatus: 'win', count: 1 },
+      {
+        type: 'battle_result',
+        targetId: 'celadon-gym-beauty-tamia',
+        battleStatus: 'win',
+        count: 1,
+        inverse: true,
+      },
+    ],
+    enemyTeam: [
+      { speciesId: 69, formId: '69', level: 24 },
+      { speciesId: 69, formId: '69', level: 24 },
+    ],
+    rewards: [],
+    maxPokemon: 6,
+    levelCap: 30,
+    enemyAttackTelegraphChance: 2,
+    bannedPlayerTypes: ['fire', 'flying'],
+  },
+  {
+    id: 'celadon-gym-erika',
+    trainerClassId: 'gym-kanto-erika',
+    trainerName: 'Erika',
+    name: 'Gym Leader Erika',
+    description: 'Erika, the Rainbow Pokemon Gym Leader, awaits among the fragrant flowers.',
+    category: 'Kanto',
+    subCategory: 'Celadon City',
+    icon: { type: 'trainer', id: 'gym-kanto-erika' },
+    background: '/backgrounds/gym-grass.avif',
+    title: 'Gym Leader Erika',
+    requirements: [
+      {
+        type: 'battle_result',
+        targetId: 'celadon-gym-beauty-tamia',
+        battleStatus: 'win',
+        count: 1,
+      },
+      {
+        type: 'battle_result',
+        targetId: 'celadon-gym-erika',
+        battleStatus: 'win',
+        count: 1,
+        inverse: true,
+      },
+    ],
+    enemyTeam: [
+      {
+        speciesId: 71,
+        formId: '71',
+        level: 29,
+        aiMoves: ['stun-spore', 'acid', 'poison-powder', 'giga-drain'],
+      },
+      {
+        speciesId: 114,
+        formId: '114',
+        level: 24,
+        aiMoves: ['poison-powder', 'constrict', 'ingrain', 'giga-drain'],
+      },
+      {
+        speciesId: 45,
+        formId: '45',
+        level: 29,
+        aiMoves: ['sleep-powder', 'acid', 'stun-spore', 'giga-drain'],
+      },
+    ],
+    rewards: [],
+    maxPokemon: 6,
+    levelCap: 30,
+    enemyAttackTelegraphChance: 2,
+    bannedPlayerTypes: ['fire', 'flying'],
+    aiProfile: 'boss',
+  },
 ]

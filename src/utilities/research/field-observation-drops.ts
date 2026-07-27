@@ -144,6 +144,7 @@ export function buildFieldObservationCollectibleDrops({
         targetId: event.itemId,
         quantity: event.quantity || 1,
         dropChance: 100,
+        guaranteed: event.guaranteed,
         secret: event.secret,
       },
       kind: 'item' as const,

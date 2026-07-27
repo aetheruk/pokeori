@@ -3537,6 +3537,17 @@ describe('static data references', () => {
 
   test('field observation global beast events reference authored items and Pokemon', () => {
     expect(fieldObservationGlobalItemEvents).toContainEqual({
+      id: 'global-field-observation-neutral-stone',
+      itemId: 'neutral-stone',
+      dropChance: 100 / 35,
+      guaranteed: true,
+      requirements: [
+        { type: 'skill_level', targetId: 'researching', count: 32 },
+        { type: 'task_completed', targetId: 'a-craftsmans-secret' },
+      ],
+    })
+    expect(ids.item.has('neutral-stone')).toBe(true)
+    expect(fieldObservationGlobalItemEvents).toContainEqual({
       id: 'global-field-observation-escape-rope',
       itemId: 'escape-rope',
       dropChance: 5,
@@ -3699,6 +3710,34 @@ describe('static data references', () => {
         inverse: true,
       })
     }
+  })
+
+  test('Celadon Mansion Ceremony of Stones leads to the Gentleman’s stonecraft lesson', () => {
+    const ceremony = tasks.find((task) => task.id === 'ceremony-of-stones')
+    const lesson = tasks.find((task) => task.id === 'a-craftsmans-secret')
+
+    expect(ceremony).toMatchObject({
+      name: 'Ceremony of Stones',
+      requirements: [{ type: 'task_completed', targetId: 'vip-coming-through' }],
+      icon: { type: 'trainer', id: 'socialite' },
+    })
+    expect(ceremony?.enterModal).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ icon: { type: 'trainer', id: 'socialite' } }),
+        expect.objectContaining({ icon: { type: 'trainer', id: 'gentleman' } }),
+      ]),
+    )
+    expect(lesson).toMatchObject({
+      name: "A Craftsman's Secret",
+      requirements: [{ type: 'task_completed', targetId: 'ceremony-of-stones' }],
+      icon: { type: 'trainer', id: 'gentleman' },
+    })
+    expect(lesson?.rewards).toEqual(
+      expect.arrayContaining([
+        { type: 'item', targetId: 'neutral-stone', quantity: 1 },
+        { type: 'task_complete', targetId: 'elemental-stones-recipe' },
+      ]),
+    )
   })
 
   test('beast stone fusion random tasks consume the three element stones once', () => {

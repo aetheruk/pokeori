@@ -3,6 +3,7 @@
 Artisan introduces a dedicated material and recipe loop in `/game/artisan`.
 
 ## Core Loop
+
 - Gather Pokemon materials from wild catches and active Field Observation drops.
 - Salvage broken ball casings from wild battles and active Field Observation salvage drops.
 - Crush no-effect color berries directly into matching dyes in the Materials category. Dye recipes unlock by Artisan level: Red/Spelon 1, Purple/Nanab 7, Green/Wepear 14, Blue/Bluk 21, Yellow/Pinap 28, and White/Enigma plus Black/Pamtre at 40. Each dye recipe shows an x5 bulk craft from the same recipe once the player is 5 Artisan levels above that recipe.
@@ -17,6 +18,7 @@ Artisan introduces a dedicated material and recipe loop in `/game/artisan`.
 - Recipes can also be service-style crafts with no primary item output, using `primaryOutputRewardIndex: null`; these keep authored reward quantities and can use `iconItemId` or the first ingredient as the recipe icon.
 
 ## Material Sources
+
 - Wild catches: guaranteed primary material roll.
 - Field Observation: pre-rolled active material drops from observed Pokemon.
 - Wild battles: 25% broken ball casing salvage.
@@ -29,6 +31,7 @@ Tiered material IDs remain authored for recipes and future reward sources, but a
 Tiered material item ids stay stable as `-t1`, `-t2`, and `-t3`, but player-facing names use base, `+`, and `EX` labels.
 
 ## Lure Economy
+
 - Direct lure drops from Field Observation are removed.
 - Type lures are crafted from matching type gems, matching Pokemon material, and one level-relevant PokePowder, and use the Balance craft type. Base lures use two base gems, Advanced lures use five base gems, and Master lures use five pristine gems. Base and Advanced lures use base materials; Master lures use T3 materials. Each lure recipe shows an x3 bulk craft once the player is 5 Artisan levels above that recipe.
 - All base type lure recipes unlock at Artisan 10 and Researcher 10, all Advanced type lure recipes unlock at Artisan 40 and Researcher 40, and all Master type lure recipes unlock at Artisan 70 and Researcher 70.
@@ -36,37 +39,39 @@ Tiered material item ids stay stable as `-t1`, `-t2`, and `-t3`, but player-faci
 - Explorer controls encounter item capacity automatically: 1 item at Explorer 1, 2 at 25, 3 at 50, 4 at 80, and 5 at 95.
 
 ## Ball Crafting Progression
+
 - Artisan now crafts every ball type except Master Ball. Ball recipes produce 1 ball normally and 2 balls on Perfect quality.
 - Core ball progression currently starts with Poké Ball, adds Moon Ball through the hidden Moon Ball Manual at Artisan 12, Net Ball through the Bug Maniac at Artisan 16, Great Ball at 25, and Ultra Ball at 50. Other specialty balls are held at Artisan 100 until their unlocks are authored. Every ball recipe shows an x3 bulk craft once the player is 5 Artisan levels above that recipe.
 - Poké Ball, Great Ball, and Ultra Ball are visible from their Artisan/material gates. Moon Ball is an authored early specialty recipe at Artisan 12 through its hidden manual and costs 3 Broken Balls, 2 Fairy Gems, and 3 T1 Fairy Charms, while Net Ball is authored at Artisan 16 through the Bug Maniac manual, uses green dye, and only gets its catch bonus on Bug-type Pokemon. Every other craftable specialty ball is temporarily held at Artisan 100 and has a hidden auto `"{Ball Name} Manual"` task gate, so those recipes can be unlocked by authored content before appearing in the Artisan recipe list. Held recipes exist for all 18 type boost item families in three recipe-gated tiers: diminished tier at Artisan 18, normal tier at Artisan 50, and Unstable tier at Artisan 75. Diminished held recipe manual tasks exist for all 18 types; authored prize unlocks are visible recipe prizes, while unauthored manuals remain secret placeholders.
 - Special Ball recipe costs use base broken ball casings, one dye, one themed base Pokemon material, and two level-relevant PokePowder. Potion mixing unlocks at Artisan 5 and costs XS PokePowder, Purple Dye, and Aqua Solvent. Fresh Water unlocks at Artisan 13 with 3 XS PokePowder, 1 Aqua Solvent, and 1 Water Gem, Super Potion at 32 with S PokePowder, Red Dye, and base Aqua Solvent, Soda Pop at 35 with S PokePowder, base Aqua Solvent, and Blue Dye, and Lemonade at 41 with M PokePowder, base Aqua Solvent, and Yellow Dye. Status remedy mixing unlocks at Artisan 8/18/26/32/39 for Antidote, Paralyze Heal, Awakening, Burn Heal, and Ice Heal; each costs two XS PokePowder, three matching berries, and three matching Pokemon materials: Poison, Grass, Psychic, Water, and Fire respectively. Medicine and status remedy recipes show x3 bulk crafts once the player is 5 Artisan levels above the recipe. Basic Poké Ball remains the simple starter recipe without powder. Metal Scrap remains the Steel-type material instead of the generic ball casing input.
-- The hidden `Recipe: Elemental Stones` task unlocks eight level 30 Held recipes: Inferior Fire, Water, Leaf, Thunder, Shiny, Ice, Dark, and Light Stone. Each costs 10 matching gems, 100 matching T1 Pokemon material, 1 Neutral Stone, and 1000 Crystals. Dark uses Dark Gem and Shadow Cloth; Light uses Dragon Gem and Drake Scale. These recipes require Perfect quality; Bad or Good results grant no output and preserve all item and Crystal costs.
+- Celadon Mansion's `Ceremony of Stones` and `A Craftsman's Secret` teach the existing `Recipe: Elemental Stones` manual, award one Neutral Stone, and unlock eight level 30 Held recipes: Inferior Fire, Water, Leaf, Thunder, Shiny, Ice, Dark, and Light Stone. Each costs 10 matching gems, 100 matching T1 Pokemon material, 1 Neutral Stone, and 1000 Crystals. Dark uses Dark Gem and Shadow Cloth; Light uses Dragon Gem and Drake Scale. These recipes require Perfect quality; Bad or Good results grant no output and preserve all item and Crystal costs. After the Gentleman’s lesson, Researcher level 32 can find Neutral Stones in every Field Observation on an independent 1-in-35 roll.
 - Existing recipes avoid `+`/T2 material costs; active material and broken-ball drop paths currently emit only base-tier IDs.
 
 ### Diminished Held Recipe Prize Status
 
-| Type | Diminished recipe | Authored prize source |
-| --- | --- | --- |
-| Normal | Cotton Scarf Recipe | Route 3 catches, 12% |
-| Fire | Dusty Charcoal Recipe | Charmander's Den post-shortcut catches, 12% |
-| Water | Magic Water Recipe | Squirtle Cove post-regular catches, 12% |
-| Electric | Weak Magnet Recipe | Route 10 catches, 12% |
-| Grass | Regular Seed Recipe | Secret Garden post-trust catches, 12% |
-| Ice | Often-Melt Ice Recipe | Not currently authored |
-| Fighting | Brown Belt Recipe | Not currently authored |
-| Poison | Poison Tip Recipe | Route 22 catches, 12% |
-| Ground | Coarse Sand Recipe | Diglett's Cave catches, 12% |
-| Flying | Dull Beak Recipe | Not currently authored |
-| Psychic | Straight Spoon Recipe | Not currently authored |
-| Bug | Aluminium Powder Recipe | Buggy Champion, 100% |
-| Rock | Brittle Hard Stone Recipe | Mt. Moon 1F/B1F/B2F catches, 12% |
-| Ghost | Faux Spell Tag Recipe | Not currently authored |
-| Dragon | Chipped Dragon Fang Recipe | Not currently authored |
-| Dark | Chipped Glasses Recipe | Not currently authored |
-| Steel | Rusty Coat Recipe | Rock Tunnel metal mining, 12% |
-| Fairy | Fairy Down Recipe | Clefairy Cavern catches, 12% |
+| Type     | Diminished recipe          | Authored prize source                       |
+| -------- | -------------------------- | ------------------------------------------- |
+| Normal   | Cotton Scarf Recipe        | Route 3 catches, 12%                        |
+| Fire     | Dusty Charcoal Recipe      | Charmander's Den post-shortcut catches, 12% |
+| Water    | Magic Water Recipe         | Squirtle Cove post-regular catches, 12%     |
+| Electric | Weak Magnet Recipe         | Route 10 catches, 12%                       |
+| Grass    | Regular Seed Recipe        | Secret Garden post-trust catches, 12%       |
+| Ice      | Often-Melt Ice Recipe      | Not currently authored                      |
+| Fighting | Brown Belt Recipe          | Not currently authored                      |
+| Poison   | Poison Tip Recipe          | Route 22 catches, 12%                       |
+| Ground   | Coarse Sand Recipe         | Diglett's Cave catches, 12%                 |
+| Flying   | Dull Beak Recipe           | Not currently authored                      |
+| Psychic  | Straight Spoon Recipe      | Not currently authored                      |
+| Bug      | Aluminium Powder Recipe    | Buggy Champion, 100%                        |
+| Rock     | Brittle Hard Stone Recipe  | Mt. Moon 1F/B1F/B2F catches, 12%            |
+| Ghost    | Faux Spell Tag Recipe      | Not currently authored                      |
+| Dragon   | Chipped Dragon Fang Recipe | Not currently authored                      |
+| Dark     | Chipped Glasses Recipe     | Not currently authored                      |
+| Steel    | Rusty Coat Recipe          | Rock Tunnel metal mining, 12%               |
+| Fairy    | Fairy Down Recipe          | Clefairy Cavern catches, 12%                |
 
 ## Skill Progression
+
 - `artisan` is a first-class skill.
 - Recipe access is gated by Artisan level.
 - Recipes can also use the shared requirements/criteria system: failed requirements hide recipes, while failed criteria keep recipes visible but locked.
@@ -74,6 +79,7 @@ Tiered material item ids stay stable as `-t1`, `-t2`, and `-t3`, but player-faci
 - Recipe rewards use the shared reward infrastructure. Craft quality scaling applies only to the primary item output, while secondary items, currency, Pokemon research XP, titles, icons, cards, upgrades, and chance-based rewards keep their authored reward definitions. Successful crafts grant generated Artisan XP from recipe level with a 1x base modifier, then Good crafts apply 1.15x Artisan XP and Perfect crafts apply 1.3x. Failed crafts grant no generated Artisan XP unless a separate flat reward is explicitly authored elsewhere.
 
 ## Crafting UI
+
 - `/game/artisan` uses the standard premium game UI patterns: `PremiumHeader`, compact recipe rows, a sticky bottom recipe category selector, item sprites for outputs and costs, and `GameInfoModal` recipe details. Lures appear as tier groups, and type boost held item recipes appear under a single `Held Type Boost` group that opens a variant picker.
 - Completed craft results offer Play Again whenever the server confirms the player can afford the same recipe and original single or bulk multiplier after that craft. Replay always starts another craft check and is revalidated by the server.
 - Level-locked and criteria-locked recipes remain visible with lock reasons so players can see upcoming progression. Requirement-locked recipes are hidden until their requirements pass.
@@ -82,5 +88,6 @@ Tiered material item ids stay stable as `-t1`, `-t2`, and `-t3`, but player-faci
 - `craft-day-care-clay-brick` is a Special recipe unlocked during the post-Thunder Badge Day Care building repairs, costs 1 Soft Clay (`terra-dust-t1`), uses Mix, requires Good quality, consumes clay on Bad for no brick, produces 1 Kiln-Fired Brick on Good and 2 on Perfect, and has no bulk craft.
 - `craft-hiker-clothes` is a Special recipe unlocked by the Route 9 Pass clothing pattern task, costs 10 Soft Fluff and 6 Wing Feather, uses Precise, requires Good quality, preserves materials on Bad failure, and produces the Trail Clothes needed for the Hiker outfit gate.
 - `craft-battle-observer` is a level 3 Items recipe that costs 2 basic Electric components and 2 basic Metal scraps, uses Scatter, produces at least 1 Battle Observer, produces 2 on Perfect quality, and shows an x5 bulk craft once the player is 5 Artisan levels above the recipe.
+- Celadon Department Store's post-renovation 4F notes sell one-time recipe manuals for X Attack, X Defense, X Sp. Atk, X Sp. Def, X Speed, and Dire Hit at 5,000 Pokedollars each. Their unlocked Artisan Items recipes use 1 S PokePowder plus 2 matching T1 Pokemon materials, produce one battle item, and offer x3 bulk crafts; X items require Artisan 32 and Dire Hit requires Artisan 36.
 - Berry Candy Items recipes cost 1 matching Dye and 2 XS PokePowder, use Scatter, produce 1 candy normally or 2 on Perfect quality, and show an x3 bulk craft once the player is 5 Artisan levels above the recipe. They unlock four Artisan levels after the matching dye: Red Berry Candy at 5, Purple Berry Candy at 11, Green Berry Candy at 18, Blue Berry Candy at 25, and Yellow Berry Candy at 32. Each raises a Pokemon's friendship by 5 and can be used during wild encounters to add +10 percentage points to that encounter's Second Chance roll.
 - `craft-research-kit` is a level 35 Items recipe that packs a Battle Observer, Potion, Poke Ball, 2 XS PokePowder, and 2 Soft Fluff into 1 Research Kit.

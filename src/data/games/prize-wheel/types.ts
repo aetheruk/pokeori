@@ -26,6 +26,7 @@ export interface PrizeWheelGameConfig extends BaseGameConfig {
         | 'crystals'
         | 'mega-shards'
         | 'pokedollars'
+        | 'fun-tokens'
         | 'battle-points'
         | 'berry-powder'
         | 'prof-scrip'

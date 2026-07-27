@@ -118,6 +118,36 @@ export const viridianCityShops: ShopConfig[] = [
           },
         ],
       },
+      {
+        id: 'lets-go-ability-patch',
+        name: "Let's Go Ability Patch",
+        description: "Teaches Pikachu the Let's Go ability.",
+        icon: {
+          type: 'item',
+          id: 'lets-go-ability-patch',
+        },
+        requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'a-classy-guy',
+          },
+        ],
+        cost: [
+          {
+            type: 'currency',
+            id: 'pokedollars',
+            amount: 1000,
+          },
+        ],
+        rewards: [
+          {
+            type: 'item',
+            quantity: 1,
+            targetId: 'lets-go-ability-patch',
+            dropChance: 100,
+          },
+        ],
+      },
     ],
   },
 ]

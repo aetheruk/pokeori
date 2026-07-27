@@ -605,6 +605,32 @@ describe('requirements and criteria semantics', () => {
     ).toBe(false)
   })
 
+  test('pokemon criteria can require a specific capture ball', () => {
+    const data = {
+      ...baseRequirementData,
+      pokemon: [
+        { speciesId: 16, formId: '16', level: 12, ballType: 'nest-ball' },
+        { speciesId: 16, formId: '16', level: 12, ballType: 'poke-ball' },
+      ],
+    } as unknown as RequirementData
+
+    expect(
+      checkRequirement(data, {
+        type: 'pokemon_owned',
+        count: 1,
+        pokemonCriteria: { speciesId: 16, ballType: 'nest-ball' },
+      }),
+    ).toBe(true)
+
+    expect(
+      checkRequirement(data, {
+        type: 'pokemon_owned',
+        count: 2,
+        pokemonCriteria: { speciesId: 16, ballType: 'nest-ball' },
+      }),
+    ).toBe(false)
+  })
+
   test('companion requirements only pass for the active matching companion', () => {
     const noCompanionData = {
       ...baseRequirementData,

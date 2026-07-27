@@ -100,6 +100,16 @@ export async function completeTask(
   const requiredKeys = analyzeRequirements(allConditions)
 
   if (!requiredKeys.includes('completedTasks')) requiredKeys.push('completedTasks')
+  if (
+    task.rewards.some(
+      (reward) =>
+        reward.type === 'active_companion_friendship' ||
+        reward.type === 'active_companion_research_xp',
+    ) &&
+    !requiredKeys.includes('pokemon')
+  ) {
+    requiredKeys.push('pokemon')
+  }
 
   const userData = await getGameUserData(user as User, requiredKeys)
 
@@ -117,6 +127,37 @@ export async function completeTask(
   const existingCompletion = userData.completedTasks.find((t) => t.taskId === taskId)
   if (existingCompletion && !task.repeatable) {
     return { success: false, message: 'Task already completed' }
+  }
+
+  const companionServiceRewards = (task.rewards || []).filter(
+    (reward) =>
+      reward.type === 'active_companion_friendship' ||
+      reward.type === 'active_companion_research_xp',
+  )
+  const activeCompanion =
+    companionServiceRewards.length > 0
+      ? userData.pokemon.find((pokemon) => pokemon.partner)
+      : undefined
+
+  if (companionServiceRewards.length > 0 && !activeCompanion) {
+    return {
+      success: false,
+      message: 'Choose a partner Pokemon before using this service.',
+    }
+  }
+
+  const friendshipGain = companionServiceRewards
+    .filter((reward) => reward.type === 'active_companion_friendship')
+    .reduce(
+      (total, reward) => total + (typeof reward.quantity === 'number' ? reward.quantity : 1),
+      0,
+    )
+
+  if (activeCompanion && friendshipGain > 0 && (activeCompanion.friendship || 0) >= 255) {
+    return {
+      success: false,
+      message: `${activeCompanion.name || 'Your partner'} already has maximum friendship.`,
+    }
   }
 
   // 4. Handle Consumption
@@ -227,10 +268,19 @@ export async function completeTask(
   }
 
   // 5. Grant Rewards
-  const rewardsToGrant: Reward[] = task.rewards.map((r) => {
+  const rewardsToGrant: Reward[] = task.rewards.flatMap((r) => {
+    if (r.type === 'active_companion_friendship') return []
+
     const pokemonOrigin = r.type === 'pokemon' ? resolveTaskPokemonOrigin(task, r) : undefined
     const reward: Reward = {
       ...r,
+      ...(r.type === 'active_companion_research_xp' && activeCompanion
+        ? {
+            type: 'pokemon_research_xp' as const,
+            targetId: activeCompanion.formId,
+            isCompanion: true,
+          }
+        : {}),
       dropChance: r.dropChance || 100,
       pokemonData: pokemonOrigin
         ? {
@@ -243,10 +293,24 @@ export async function completeTask(
     // if (r.type === 'currency') {
     //   reward.targetId = r.targetId || 'crystals'
     // }
-    return reward
+    return [reward]
   })
 
   const { summary } = await grantRewards(user.id, rewardsToGrant)
+
+  if (activeCompanion && friendshipGain > 0) {
+    const newFriendship = Math.min(255, (activeCompanion.friendship || 0) + friendshipGain)
+    await payload.update({
+      collection: 'pokemon',
+      id: activeCompanion.id,
+      data: { friendship: newFriendship },
+    })
+    summary.notices?.push({
+      id: 'partner-friendship',
+      title: `${activeCompanion.name || 'Partner'} friendship increased`,
+      message: `+${newFriendship - (activeCompanion.friendship || 0)} friendship`,
+    })
+  }
 
   // 6. Record Completion
   const userRefetched = await payload.findByID({ collection: 'users', id: user.id })
@@ -349,7 +413,7 @@ export async function refreshDailyTasks(): Promise<{ success: boolean; message?:
     const yesterday = new Date(today)
     yesterday.setUTCDate(yesterday.getUTCDate() - 1)
     const previousTasks = isToday(lastRefresh, yesterday)
-      ? (((userRefetched as any).activeDailyTasks as any[]) || [])
+      ? ((userRefetched as any).activeDailyTasks as any[]) || []
       : undefined
 
     const newTasks = generateDailyTasks(userData, { previousTasks })

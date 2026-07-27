@@ -271,6 +271,7 @@ export function isPokemonEligible(
     return false
   if (!matchesPokemonOriginValue(pokemon.obtainedSourceId, criteria.locationId))
     return false
+  if (criteria.ballType && pokemon.ballType !== criteria.ballType) return false
   if (criteria.minLevel && pokemon.level < criteria.minLevel) return false
   if (criteria.maxLevel && pokemon.level > criteria.maxLevel) return false
   if (criteria.size && pokemon.size !== criteria.size) return false

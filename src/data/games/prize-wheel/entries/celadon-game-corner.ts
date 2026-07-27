@@ -1,3 +1,62 @@
 import { PrizeWheelGameConfig } from '../types'
 
-export const celadonGameCornerchanseyEntries: PrizeWheelGameConfig[] = []
+export const celadonGameCornerPrizeWheelEntries: PrizeWheelGameConfig[] = [
+  {
+    id: 'celadon-rocket-prize-wheel',
+    gameType: 'prize-wheel',
+    name: 'Rocket Prize Wheel',
+    description: 'A high-stakes spin with a chance to win a Rocket Scratch Card.',
+    icon: { type: 'item', id: 'fun-token' },
+    background: '/backgrounds/celadon-game-corner-prize-wheel.avif',
+    category: 'Kanto',
+    subCategory: 'Celadon Game Corner',
+    requirements: [{ type: 'task_completed', targetId: 'when-the-fun-stops' }],
+    criteria: [],
+    rewards: [],
+    settings: {
+      background: '/backgrounds/celadon-game-corner-prize-wheel.avif',
+      themeColour: '#9f1239',
+      cost: { currencyType: 'fun-tokens', amount: 25 },
+      spinTime: { min: 4, max: 7 },
+      slots: [
+        { id: 'nothing', label: 'Try Again', color: '#4b5563', icon: { type: 'item', id: 'fun-token' }, percentage: 25, rewards: [] },
+        { id: 'ten', label: '10 Tokens', color: '#7c2d12', icon: { type: 'item', id: 'fun-token' }, percentage: 20, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 10, label: '10 Fun Tokens' }] },
+        { id: 'twenty', label: '20 Tokens', color: '#9a3412', icon: { type: 'item', id: 'fun-token' }, percentage: 20, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 20, label: '20 Fun Tokens' }] },
+        { id: 'twenty-five', label: '25 Tokens', color: '#a16207', icon: { type: 'item', id: 'fun-token' }, percentage: 15, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 25, label: '25 Fun Tokens' }] },
+        { id: 'forty', label: '40 Tokens', color: '#ca8a04', icon: { type: 'item', id: 'fun-token' }, percentage: 10, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 40, label: '40 Fun Tokens' }] },
+        { id: 'sixty', label: '60 Tokens', color: '#eab308', icon: { type: 'item', id: 'fun-token' }, percentage: 5, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 60, label: '60 Fun Tokens' }] },
+        { id: 'hundred', label: '100 Tokens', color: '#facc15', icon: { type: 'item', id: 'fun-token' }, percentage: 4, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 100, label: '100 Fun Tokens' }] },
+        { id: 'scratch-card', label: 'Scratch Card', color: '#be123c', icon: { type: 'item', id: 'scratchcard' }, percentage: 1, rewards: [{ type: 'item', targetId: 'rocket-scratch', quantity: 1, label: 'Rocket Scratch Card' }] },
+      ],
+    },
+  },
+  {
+    id: 'celadon-high-stakes-prize-wheel',
+    gameType: 'prize-wheel',
+    name: 'High Stakes Rocket Prize Wheel',
+    description: 'A private wheel where every spin costs more than most people carry.',
+    icon: { type: 'item', id: 'fun-token' },
+    background: '/backgrounds/celadon-game-corner-prize-wheel.avif',
+    category: 'Kanto',
+    subCategory: 'Celadon Game Corner',
+    requirements: [{ type: 'task_completed', targetId: 'high-roller' }],
+    criteria: [],
+    rewards: [],
+    settings: {
+      background: '/backgrounds/celadon-game-corner-prize-wheel.avif',
+      themeColour: '#f59e0b',
+      cost: { currencyType: 'fun-tokens', amount: 250 },
+      spinTime: { min: 4, max: 7 },
+      slots: [
+        { id: 'nothing', label: 'Try Again', color: '#4b5563', icon: { type: 'item', id: 'fun-token' }, percentage: 25, rewards: [] },
+        { id: 'hundred', label: '100 Tokens', color: '#7c2d12', icon: { type: 'item', id: 'fun-token' }, percentage: 20, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 100, label: '100 Fun Tokens' }] },
+        { id: 'two-hundred', label: '200 Tokens', color: '#9a3412', icon: { type: 'item', id: 'fun-token' }, percentage: 20, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 200, label: '200 Fun Tokens' }] },
+        { id: 'two-fifty', label: '250 Tokens', color: '#a16207', icon: { type: 'item', id: 'fun-token' }, percentage: 15, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 250, label: '250 Fun Tokens' }] },
+        { id: 'four-hundred', label: '400 Tokens', color: '#ca8a04', icon: { type: 'item', id: 'fun-token' }, percentage: 10, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 400, label: '400 Fun Tokens' }] },
+        { id: 'six-hundred', label: '600 Tokens', color: '#eab308', icon: { type: 'item', id: 'fun-token' }, percentage: 5, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 600, label: '600 Fun Tokens' }] },
+        { id: 'thousand', label: '1,000 Tokens', color: '#facc15', icon: { type: 'item', id: 'fun-token' }, percentage: 4, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 1000, label: '1,000 Fun Tokens' }] },
+        { id: 'scratch-card', label: 'Scratch Card', color: '#be123c', icon: { type: 'item', id: 'scratchcard' }, percentage: 1, rewards: [{ type: 'item', targetId: 'rocket-scratch', quantity: 5, label: '5 Rocket Scratch Cards' }] },
+      ],
+    },
+  },
+]

@@ -113,12 +113,10 @@ player's old active session and redirect to its canonical route. Legacy
 - Players move around a tile board and shove Voltorb one tile at a time. The Discharge action fires a cross-shaped blast from the first authored Voltorb only; other Voltorb explode only when that blast chain touches them.
 - Exploded Voltorb disappear after the blast resolves, so multi-Voltorb layouts can require building a chain before pressing Discharge.
 - Blasts stop at walls and protected Pokemon, and clear the first debris tile in each direction. Protected Pokemon can be pushed, block pushed Voltorb, remain on the board, and fail the puzzle if caught in any blast. Standing in any blast fails the puzzle. The exit is blocked until the authored debris goal is met.
-- `route-10-voltorb-grid-test` is a no-requirement Test sub-region entry for trying Route 10-style Voltorb shove-and-discharge layouts before wiring one into progression.
 
 ## Diglett Tunnel Tap
 - Diglett Tunnel Tap entries are authored through `settings.gridSize`, `targetScore`, `timeLimit`, `spawnIntervalMs`, `visibleMs`, optional scoring values, and optional lives.
 - Diglett and Dugtrio pop out of tunnel holes. Diglett increase score, while Dugtrio remove score and lives. The game succeeds when the target score is reached before time or lives run out.
-- `diglett-tunnel-tap-test` is a no-requirement Test sub-region entry for Diglett's Cave-style tuning.
 
 ## Magnemite Circuit
 - Magnemite Circuit entries are authored through `settings.gridSize`, `source`, `targets`, `tiles`, optional `timeLimit`, and optional `maxRotations`.
@@ -128,7 +126,6 @@ player's old active session and redirect to its canonical route. Legacy
 ## Rock Tunnel Echo Map
 - Rock Tunnel Echo Map entries are authored through `settings.gridSize`, `playerStart`, `exit`, `walls`, optional `holes`, optional `timeLimit`, optional `maxMoves`, opening echo reveal timing, and optional Rock Push-style cave sprites.
 - The maze reveals once at the start, then goes dark except for the tile under the player. Hole tiles are shown during the opening echo and instantly fail the run when stepped on.
-- `rock-tunnel-echo-map-test` is a no-requirement Test sub-region entry for Rock Tunnel memory-maze tuning.
 
 ## Art Academy
 - Art Academy entries require `settings.formId`, `timeLimit`, and a 50–100 `successThreshold`; `paletteSize` is optional and defaults to 12 representative opaque HOME-sprite colours.

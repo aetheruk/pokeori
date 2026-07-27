@@ -21,6 +21,11 @@ export const currencies: Currency[] = [
     iconId: 'relic-gold',
   },
   {
+    id: 'fun-tokens',
+    name: 'Fun Tokens',
+    iconId: 'fun-token',
+  },
+  {
     id: 'battle-points',
     name: 'Battle Points',
     iconId: 'relic-copper',

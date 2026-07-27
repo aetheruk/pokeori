@@ -221,6 +221,7 @@ export interface User {
     crystals?: number | null;
     'mega-shards'?: number | null;
     pokedollars?: number | null;
+    'fun-tokens'?: number | null;
     'battle-points'?: number | null;
     'berry-powder'?: number | null;
     'prof-scrip'?: number | null;
@@ -983,6 +984,7 @@ export interface UsersSelect<T extends boolean = true> {
         crystals?: T;
         'mega-shards'?: T;
         pokedollars?: T;
+        'fun-tokens'?: T;
         'battle-points'?: T;
         'berry-powder'?: T;
         'prof-scrip'?: T;

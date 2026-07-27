@@ -1,13 +1,11 @@
 import { describe, expect, test } from 'bun:test'
 import {
   allGames,
-  type DiglettTunnelTapGameConfig,
   type MagnemiteCircuitGameConfig,
   type MagnemiteCircuitPosition,
   type MagnemiteCircuitTile,
   type MagnemiteCircuitTileType,
   type PrizeWheelGameConfig,
-  type RockTunnelEchoMapGameConfig,
   type VoltorbGridGameConfig,
   type VoltorbGridPosition,
   type VoltorbGridVoltorb,
@@ -359,42 +357,6 @@ function magnemiteCircuitHasSolution(
   return false
 }
 
-function shortestEchoPathLength(
-  settings: RockTunnelEchoMapGameConfig['settings'],
-) {
-  const wallKeys = new Set(settings.walls.map(gridKey))
-  const holeKeys = new Set((settings.holes || []).map(gridKey))
-  const queue = [{ position: settings.playerStart, distance: 0 }]
-  const seen = new Set([gridKey(settings.playerStart)])
-
-  while (queue.length > 0) {
-    const current = queue.shift()
-    if (!current) break
-    if (isSameGridPosition(current.position, settings.exit)) {
-      return current.distance
-    }
-
-    Object.values(directionDeltas).forEach((delta) => {
-      const next = {
-        x: current.position.x + delta.x,
-        y: current.position.y + delta.y,
-      }
-      const key = gridKey(next)
-      if (
-        isInsideGrid(next, settings.gridSize) &&
-        !wallKeys.has(key) &&
-        !holeKeys.has(key) &&
-        !seen.has(key)
-      ) {
-        seen.add(key)
-        queue.push({ position: next, distance: current.distance + 1 })
-      }
-    })
-  }
-
-  return null
-}
-
 describe('generated game data schemas', () => {
   test('all game entries have unique ids', () => {
     const ids = allGames.map((game) => game.id)
@@ -505,33 +467,9 @@ describe('generated game data schemas', () => {
     )
   })
 
-  test('Voltorb Grid has a repeatable Test sub-region puzzle entry', () => {
-    const game = allGames.find(
-      (entry) => entry.id === 'route-10-voltorb-grid-test',
-    )
-    const settings = game?.settings as
-      | VoltorbGridGameConfig['settings']
-      | undefined
-
-    expect(game).toBeDefined()
-    expect(game?.gameType).toBe('voltorb-grid')
-    expect(game?.subCategory).toBe('Test')
-    expect(game?.icon).toEqual({ type: 'pokemon', id: '100' })
-    expect(settings?.gridSize).toEqual({ cols: 8, rows: 8 })
-    expect(settings?.playerStart).toEqual({ x: 1, y: 6 })
-    expect(settings?.exit).toEqual({ x: 6, y: 1 })
-    expect(settings?.voltorbs.length).toBeGreaterThanOrEqual(1)
-    expect(settings?.protectedPokemon).toEqual([
-      { id: 'watcher', speciesId: 25, x: 0, y: 7 },
-    ])
-    expect(settings?.requiredCleared).toBe(3)
-    expect(settings?.maxDischarges).toBe(1)
-    expect(settings?.winRate).toBe(1)
-  })
-
   test('Voltorb Grid validation rejects impossible debris goals and out-of-bounds positions', () => {
     const game = allGames.find(
-      (entry) => entry.id === 'route-10-voltorb-grid-test',
+      (entry) => entry.id === 'route-10-voltorb-primer',
     )
     expect(game).toBeDefined()
 
@@ -554,44 +492,6 @@ describe('generated game data schemas', () => {
     expect(
       outOfBoundsResult.error?.issues.map((issue) => issue.message),
     ).toContain('Voltorb Grid position must fit inside the board')
-  })
-
-  test('Voltorb Grid test puzzle requires pushing and chained Voltorb before discharge is solvable', () => {
-    const game = allGames.find(
-      (entry) => entry.id === 'route-10-voltorb-grid-test',
-    )
-    expect(game).toBeDefined()
-    const settings = game!.settings as VoltorbGridGameConfig['settings']
-
-    const earlyDischarge = simulateVoltorbGrid(settings, ['discharge'])
-    expect(earlyDischarge.failed).toBe(true)
-    expect(earlyDischarge.reachedExit).toBe(false)
-    expect(earlyDischarge.cleared).toBeLessThan(settings.requiredCleared!)
-
-    const solution = simulateVoltorbGrid(settings, [
-      'right',
-      'right',
-      'down',
-      'right',
-      'up',
-      'up',
-      'left',
-      'discharge',
-      'up',
-      'up',
-      'right',
-      'right',
-      'up',
-      'right',
-      'up',
-    ])
-
-    expect(solution.failed).toBe(false)
-    expect(solution.reachedExit).toBe(true)
-    expect(solution.cleared).toBe(settings.requiredCleared!)
-    expect(solution.discharges).toBe(1)
-    expect(solution.moves).toBeLessThan(settings.maxMoves!)
-    expect(solution.voltorbs).toHaveLength(0)
   })
 
   test('Voltorb Grid discharges only the first Voltorb until blasts chain into others', () => {
@@ -1088,33 +988,13 @@ describe('generated game data schemas', () => {
     expect(finalResult.protectedPokemon[2]).toMatchObject({ x: 11, y: 5 })
   })
 
-  test('new route-themed puzzle games have Test sub-region entries', () => {
-    const diglett = allGames.find(
-      (entry) => entry.id === 'diglett-tunnel-tap-test',
-    )
-    const diglettSettings = diglett?.settings as
-      | DiglettTunnelTapGameConfig['settings']
-      | undefined
+  test('future route-themed puzzle games retain Test sub-region entries', () => {
     const magnemite = allGames.find(
       (entry) => entry.id === 'magnemite-circuit-test',
     )
     const magnemiteSettings = magnemite?.settings as
       | MagnemiteCircuitGameConfig['settings']
       | undefined
-    const echo = allGames.find(
-      (entry) => entry.id === 'rock-tunnel-echo-map-test',
-    )
-    const echoSettings = echo?.settings as
-      | RockTunnelEchoMapGameConfig['settings']
-      | undefined
-
-    expect(diglett?.gameType).toBe('diglett-tunnel-tap')
-    expect(diglett?.subCategory).toBe('Test')
-    expect(diglett?.icon).toEqual({ type: 'pokemon', id: '50' })
-    expect(diglettSettings?.gridSize).toEqual({ cols: 4, rows: 4 })
-    expect(diglettSettings?.targetScore).toBe(14)
-    expect(diglettSettings?.winRate).toBe(1)
-
     expect(magnemite?.gameType).toBe('magnemite-circuit')
     expect(magnemite?.subCategory).toBe('Test')
     expect(magnemite?.icon).toEqual({ type: 'pokemon', id: '81' })
@@ -1123,31 +1003,9 @@ describe('generated game data schemas', () => {
     expect(magnemiteSettings?.tiles.length).toBeGreaterThanOrEqual(14)
     expect(magnemiteSettings?.winRate).toBe(1)
 
-    expect(echo?.gameType).toBe('rock-tunnel-echo-map')
-    expect(echo?.subCategory).toBe('Test')
-    expect(echo?.icon).toEqual({ type: 'pokemon', id: '41' })
-    expect(echoSettings?.gridSize).toEqual({ cols: 8, rows: 8 })
-    expect(echoSettings?.playerStart).toEqual({ x: 1, y: 6 })
-    expect(echoSettings?.exit).toEqual({ x: 6, y: 1 })
-    expect(echoSettings?.holes?.length).toBeGreaterThanOrEqual(3)
-    expect(echoSettings?.winRate).toBe(1)
   })
 
-  test('new route-themed puzzle games have playable Test layouts', () => {
-    const diglett = allGames.find(
-      (entry) => entry.id === 'diglett-tunnel-tap-test',
-    )
-    const diglettSettings = diglett?.settings as
-      | DiglettTunnelTapGameConfig['settings']
-      | undefined
-    expect(diglettSettings).toBeDefined()
-    const conservativeDiglettSpawns = Math.floor(
-      (diglettSettings!.timeLimit * 1000) / diglettSettings!.spawnIntervalMs,
-    )
-    expect(
-      conservativeDiglettSpawns * (diglettSettings!.diglettScore || 1) * 0.6,
-    ).toBeGreaterThan(diglettSettings!.targetScore)
-
+  test('future route-themed puzzle games have playable Test layouts', () => {
     const magnemite = allGames.find(
       (entry) => entry.id === 'magnemite-circuit-test',
     )
@@ -1158,17 +1016,6 @@ describe('generated game data schemas', () => {
     expect(magnemiteCircuitIsSolved(magnemiteSettings!)).toBe(false)
     expect(magnemiteCircuitHasSolution(magnemiteSettings!)).toBe(true)
 
-    const echo = allGames.find(
-      (entry) => entry.id === 'rock-tunnel-echo-map-test',
-    )
-    const echoSettings = echo?.settings as
-      | RockTunnelEchoMapGameConfig['settings']
-      | undefined
-    expect(echoSettings).toBeDefined()
-    const echoPathLength = shortestEchoPathLength(echoSettings!)
-    expect(echoPathLength).not.toBeNull()
-    expect(echoPathLength!).toBeLessThanOrEqual(echoSettings!.maxMoves!)
-    expect(echoSettings!.holes).toContainEqual({ x: 7, y: 1 })
   })
 
   test('Magnemite Circuit validation requires source and target tiles', () => {

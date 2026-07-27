@@ -413,14 +413,16 @@ export function isMidEncounterUsableItem(
   item: Pick<Item, 'id' | 'category' | 'effects'>,
 ): boolean {
   if (isSecondChanceEncounterItem(item)) return true
-  return item.category === 'misc' && (MID_ENCOUNTER_UTILITY_ITEMS.has(item.id) || isTypeLureItem(item))
+  if (MID_ENCOUNTER_UTILITY_ITEMS.has(item.id)) return true
+  return item.category === 'misc' && isTypeLureItem(item)
 }
 
 export function isEncounterUtilityItem(
   item: Pick<Item, 'id' | 'category' | 'effects'>,
 ): boolean {
   if (isSecondChanceEncounterItem(item)) return true
-  return item.category === 'misc' && (isTypeLureItem(item) || ENCOUNTER_UTILITY_ITEMS.has(item.id))
+  if (ENCOUNTER_UTILITY_ITEMS.has(item.id)) return true
+  return item.category === 'misc' && isTypeLureItem(item)
 }
 
 export function isEncounterItemUsableForPokemon(

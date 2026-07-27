@@ -1,3 +1,152 @@
 import { ShopConfig } from '../types'
 
-export const celadonGameCornerShops: ShopConfig[] = []
+export const celadonGameCornerShops: ShopConfig[] = [
+  {
+    id: 'celadon-game-corner-token-exchange',
+    name: 'Token Exchange',
+    description: 'Trade Pokédollars for Fun Tokens and head back to the games.',
+    category: 'Kanto',
+    subCategory: 'Celadon Game Corner',
+    icon: {
+      type: 'trainer',
+      id: 'maid',
+    },
+    background: '/backgrounds/game-corner.avif',
+    requirements: [
+      {
+        type: 'task_completed',
+        targetId: 'when-the-fun-stops',
+      },
+    ],
+    items: [
+      {
+        id: 'fun-token-bundle',
+        name: '100 Fun Tokens',
+        description: 'A bundle of tokens for Celadon Game Corner games.',
+        icon: {
+          type: 'item',
+          id: 'fun-token',
+        },
+        cost: [
+          {
+            type: 'currency',
+            id: 'pokedollars',
+            amount: 1000,
+          },
+        ],
+        rewards: [
+          {
+            type: 'currency',
+            targetId: 'fun-tokens',
+            quantity: 100,
+            dropChance: 100,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'celadon-game-corner-scratch-stand',
+    name: 'Scratch Card Stand',
+    description: 'A Maid sells suspiciously glossy Rocket Scratch Cards.',
+    category: 'Kanto',
+    subCategory: 'Celadon Game Corner',
+    icon: { type: 'trainer', id: 'maid' },
+    background: '/backgrounds/celadon-game-corner-arcade.avif',
+    requirements: [{ type: 'task_completed', targetId: 'when-the-fun-stops' }],
+    items: [
+      {
+        id: 'rocket-scratch-card',
+        name: 'Rocket Scratch Card',
+        description: 'Scratch it in your inventory for a token prize, treasure, or nothing at all.',
+        icon: { type: 'item', id: 'scratchcard' },
+        cost: [{ type: 'currency', id: 'fun-tokens', amount: 100 }],
+        rewards: [{ type: 'item', targetId: 'rocket-scratch', quantity: 1, dropChance: 100 }],
+      },
+    ],
+  },
+  {
+    id: 'celadon-game-corner-prize-exchange',
+    name: 'Prize Exchange',
+    description: 'A Rocket Grunt quietly trades Fun Tokens for prizes. Everything is always in stock.',
+    category: 'Kanto',
+    subCategory: 'Celadon Game Corner',
+    icon: { type: 'trainer', id: 'rocket-grunt' },
+    background: '/backgrounds/celadon-game-corner-prize-exchange.avif',
+    requirements: [{ type: 'task_completed', targetId: 'when-the-fun-stops' }],
+    items: [
+      {
+        id: 'game-corner-stardust',
+        name: 'Stardust',
+        description: 'A handful of valuable, glittering dust.',
+        icon: { type: 'item', id: 'stardust' },
+        cost: [{ type: 'currency', id: 'fun-tokens', amount: 250 }],
+        rewards: [{ type: 'item', targetId: 'stardust', quantity: 1, dropChance: 100 }],
+      },
+      {
+        id: 'game-corner-nugget',
+        name: 'Nugget',
+        description: 'A solid nugget of pure gold.',
+        icon: { type: 'item', id: 'nugget' },
+        cost: [{ type: 'currency', id: 'fun-tokens', amount: 1000 }],
+        rewards: [{ type: 'item', targetId: 'nugget', quantity: 1, dropChance: 100 }],
+      },
+      {
+        id: 'game-corner-link-cable',
+        name: 'Link Cable',
+        description: 'A cable that can trigger trade evolutions.',
+        icon: { type: 'item', id: 'link-cable' },
+        cost: [{ type: 'currency', id: 'fun-tokens', amount: 1000 }],
+        rewards: [{ type: 'item', targetId: 'link-cable', quantity: 1, dropChance: 100 }],
+      },
+      {
+        id: 'game-corner-shadow-mr-mime',
+        name: 'Shadow Mr. Mime',
+        description: 'A level 20 Shadow Mr. Mime kept in a Rocket Ball.',
+        icon: { type: 'pokemon', id: '122' },
+        cost: [{ type: 'currency', id: 'fun-tokens', amount: 1500 }],
+        rewards: [{ type: 'pokemon', targetId: 122, quantity: 1, dropChance: 100, pokemonData: { formId: '122', level: 20, ballType: 'rocket-ball', isShadow: true, rarity: 'shadow' } }],
+      },
+      {
+        id: 'game-corner-backup-ability-patch',
+        name: 'Backup Ability Patch',
+        description: 'Teaches Porygon the Backup companion ability.',
+        icon: { type: 'item', id: 'ability-patch' },
+        cost: [{ type: 'currency', id: 'fun-tokens', amount: 2000 }],
+        rewards: [{ type: 'item', targetId: 'backup-ability-patch', quantity: 1, dropChance: 100 }],
+      },
+      {
+        id: 'game-corner-shadow-scyther',
+        name: 'Shadow Scyther',
+        description: 'A level 20 Shadow Scyther kept in a Rocket Ball.',
+        icon: { type: 'pokemon', id: '123' },
+        cost: [{ type: 'currency', id: 'fun-tokens', amount: 5500 }],
+        rewards: [{ type: 'pokemon', targetId: 123, quantity: 1, dropChance: 100, pokemonData: { formId: '123', level: 20, ballType: 'rocket-ball', isShadow: true, rarity: 'shadow' } }],
+      },
+      {
+        id: 'game-corner-shadow-pinsir',
+        name: 'Shadow Pinsir',
+        description: 'A level 20 Shadow Pinsir kept in a Rocket Ball.',
+        icon: { type: 'pokemon', id: '127' },
+        cost: [{ type: 'currency', id: 'fun-tokens', amount: 5500 }],
+        rewards: [{ type: 'pokemon', targetId: 127, quantity: 1, dropChance: 100, pokemonData: { formId: '127', level: 20, ballType: 'rocket-ball', isShadow: true, rarity: 'shadow' } }],
+      },
+      {
+        id: 'game-corner-shadow-dratini',
+        name: 'Shadow Dratini',
+        description: 'A level 20 Shadow Dratini kept in a Rocket Ball.',
+        icon: { type: 'pokemon', id: '147' },
+        cost: [{ type: 'currency', id: 'fun-tokens', amount: 6000 }],
+        rewards: [{ type: 'pokemon', targetId: 147, quantity: 1, dropChance: 100, pokemonData: { formId: '147', level: 20, ballType: 'rocket-ball', isShadow: true, rarity: 'shadow' } }],
+      },
+      {
+        id: 'game-corner-porygon',
+        name: 'Porygon',
+        description: 'A level 20 Porygon kept in a Rocket Ball.',
+        icon: { type: 'pokemon', id: '137' },
+        cost: [{ type: 'currency', id: 'fun-tokens', amount: 9999 }],
+        rewards: [{ type: 'pokemon', targetId: 137, quantity: 1, dropChance: 100, pokemonData: { formId: '137', level: 20, ballType: 'rocket-ball' } }],
+      },
+    ],
+  },
+]

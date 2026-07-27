@@ -2,7 +2,6 @@ import { Item } from '../types'
 import { DEED_POLL_ITEM_ID, FUJI_GLASSES_ITEM_ID } from '../special-item-ids'
 import {
   BOOK_OF_CHANNELING_ITEM_ID,
-  DEV_CHANNELING_MEMENTO_ITEM_ID,
   SPIRIT_CHANNELING_INCENSE_ITEMS,
 } from '@/data/spirit-channeling'
 
@@ -158,15 +157,6 @@ const spiritChannelingItems: Item[] = [
     description:
       'Your handy guide to the occult, with plenty of space for otherworldy beings to write notes!',
     category: 'books',
-    spriteId: 'guide-book',
-    unique: true,
-    consume: false,
-  },
-  {
-    id: DEV_CHANNELING_MEMENTO_ITEM_ID,
-    name: 'Dev Memento',
-    description: 'A test memento with a faint presence for spirit channeling.',
-    category: 'key',
     spriteId: 'guide-book',
     unique: true,
     consume: false,

@@ -10,7 +10,10 @@ import { getPokemonForm, getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 export interface EndlessCollectibleRewardConfig {
   key: string
   everyScore: number
-  reward: LocationReward
+  rewardOptions: Array<{
+    key: string
+    reward: LocationReward
+  }>
 }
 
 export interface EndlessCollectible {
@@ -36,13 +39,16 @@ export function getEndlessCollectibleRewardConfigs(
       return []
     }
 
-    return (entry.rewards || []).map(
+    const rewardOptions = (entry.rewards || []).map(
       (reward: LocationReward, rewardIndex: number) => ({
         key: `${entryIndex}:${rewardIndex}`,
-        everyScore: entry.everyScore,
         reward,
       }),
     )
+
+    return rewardOptions.length > 0
+      ? [{ key: `${entryIndex}`, everyScore: entry.everyScore, rewardOptions }]
+      : []
   })
 }
 

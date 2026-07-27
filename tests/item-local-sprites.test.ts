@@ -92,14 +92,8 @@ describe('local item sprites', () => {
     expect(getItemSpriteUrl('book-of-channeling')).toBe(
       '/sprites/items/guide-book.avif',
     )
-    expect(getItemSpriteUrl('dev-channeling-memento')).toBe(
-      '/sprites/items/guide-book.avif',
-    )
     expect(getItemSpriteUrl('incense-memory')).toBe(
       '/sprites/items/key/incense-memory.avif',
-    )
-    expect(getItemSpriteUrl('incense-dev')).toBe(
-      '/sprites/items/key/incense-dev.avif',
     )
   })
 

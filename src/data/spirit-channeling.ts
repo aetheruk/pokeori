@@ -4,7 +4,6 @@ import { FUJI_GLASSES_ITEM_ID } from '@/data/items/special-item-ids'
 import { TYPE_MATERIAL_CONFIG } from '@/utilities/artisan/material-drops'
 
 export const BOOK_OF_CHANNELING_ITEM_ID = 'book-of-channeling'
-export const DEV_CHANNELING_MEMENTO_ITEM_ID = 'dev-channeling-memento'
 
 export const SPIRIT_CHANNELING_ACTIVITY_PREFIX = 'spirit-channeling'
 
@@ -14,12 +13,6 @@ export const SPIRIT_CHANNELING_INCENSE_ITEMS = [
     name: 'Boon Incense',
     description: 'A reusable incense for quiet ritual work.',
     spriteId: 'key/incense-boon',
-  },
-  {
-    id: 'incense-dev',
-    name: 'Dev Incense',
-    description: 'A reusable test incense for strange ritual work.',
-    spriteId: 'key/incense-dev',
   },
   {
     id: 'incense-exploration',
@@ -109,31 +102,6 @@ export const POKEMON_TYPE_NAMES: PokemonTypeName[] = [
 ]
 
 export const SPIRIT_CHANNELING_CONFIGS: SpiritChannelingConfig[] = [
-  {
-    id: 'dev-channeling-memento',
-    name: 'Dev Memento Channeling',
-    description: 'A test memento carrying a faint presence for channeling validation.',
-    mementoItemId: DEV_CHANNELING_MEMENTO_ITEM_ID,
-    correctIncenseItemId: 'incense-dev',
-    requiredEnergy: { water: 3 },
-    channelerMinLevel: 10,
-    rewards: [
-      {
-        type: 'pokemon',
-        targetId: 92,
-        quantity: 1,
-        dropChance: 100,
-        pokemonData: {
-          formId: '92',
-          level: 10,
-          obtainedMethod: 'reward',
-          obtainedRegion: 'Kanto',
-          obtainedLocation: 'Spirit Channeling',
-          obtainedSourceId: `spirit-channeling:${DEV_CHANNELING_MEMENTO_ITEM_ID}`,
-        },
-      },
-    ],
-  },
   {
     id: 'fuji-glasses-memory',
     name: "Fuji's Glasses Memory",

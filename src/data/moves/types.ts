@@ -26,12 +26,7 @@ export type MoveContestMetric =
   | 'effective-stat:specialDefense'
   | 'effective-stat:speed'
 export type MoveContestComparison =
-  | 'greaterThan'
-  | 'greaterThanOrEqual'
-  | 'lessThan'
-  | 'lessThanOrEqual'
-  | 'equal'
-  | 'notEqual'
+  'greaterThan' | 'greaterThanOrEqual' | 'lessThan' | 'lessThanOrEqual' | 'equal' | 'notEqual'
 export type MoveContestResult = 'win' | 'loss' | 'tie'
 export type MoveContestMetricValue = MoveContestMetric | number
 
@@ -325,13 +320,12 @@ export type MoveHeldItemEffect =
   | { type: 'recycle' }
   | { type: 'consume-self' }
   | { type: 'consume-berries'; target: 'self' | 'enemy' | 'both' }
-export type MoveStatusCure =
-  | {
-      target: 'self' | 'enemy' | 'ally-party'
-      statuses: StatusEffectId[] | 'all'
-      healUserPercent?: number
-      failIfNoStatus?: boolean
-    }
+export type MoveStatusCure = {
+  target: 'self' | 'enemy' | 'ally-party'
+  statuses: StatusEffectId[] | 'all'
+  healUserPercent?: number
+  failIfNoStatus?: boolean
+}
 export type MoveStatusTransfer = {
   from: 'self'
   to: 'enemy'
@@ -355,8 +349,7 @@ export type MoveBattleCondition =
   | { type: 'target-has-held-item' }
   | { type: 'user-has-consumed-held-item' }
 export type MoveSwitchEffect =
-  | { type: 'force-enemy-random' }
-  | { type: 'self-pending'; passStatStages?: boolean }
+  { type: 'force-enemy-random' } | { type: 'self-pending'; passStatStages?: boolean }
 export type MoveTypeChangeEffect =
   | { type: 'random'; target?: 'self' | 'enemy'; types?: PokemonTypeName[] }
   | { type: 'first-known-move'; target?: 'self' | 'enemy' }

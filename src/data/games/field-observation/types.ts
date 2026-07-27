@@ -42,6 +42,8 @@ export interface FieldObservationItemDrop {
   itemId: string
   dropChance: number
   quantity?: number | { min: number; max: number }
+  /** Preserve a drop that has already won its chance roll when the round is full. */
+  guaranteed?: boolean
   secret?: boolean
   requirements?: TaskCondition[]
 }

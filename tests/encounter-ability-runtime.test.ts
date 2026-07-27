@@ -7,6 +7,7 @@ import {
   getFieldObservationGlobalEventMultipliers,
   getFieldObservationSpawnModifiers,
   getCaptureAbilityRewards,
+  chooseAbilityEncounterReplacement,
 } from '@/utilities/pokemon/encounter-ability-runtime'
 import { buildFieldObservationCollectibleDrops } from '@/utilities/research/field-observation-drops'
 import type { FieldObservationSettings } from '@/data/games/field-observation'
@@ -40,6 +41,44 @@ describe('encounter ability runtime', () => {
         (effect) => effect.type === 'field-observation-spawn-modifier',
       ),
     ).toBe(true)
+  })
+
+  test("Let's Go replaces normal catch encounters with Eevee at 1-in-32", () => {
+    const originalRandom = Math.random
+    Math.random = () => 0
+    try {
+      expect(
+        chooseAbilityEncounterReplacement({
+          ability: ABILITIES.lets_go,
+          formId: '25',
+          speciesId: 25,
+          locationId: 'route-7',
+          category: 'Kanto',
+          subCategory: 'Celadon City',
+        }),
+      ).toMatchObject({ speciesId: 133, formId: '133' })
+    } finally {
+      Math.random = originalRandom
+    }
+  })
+
+  test('Backup replaces normal catch encounters with Porygon at 1-in-50', () => {
+    const originalRandom = Math.random
+    Math.random = () => 0
+    try {
+      expect(
+        chooseAbilityEncounterReplacement({
+          ability: ABILITIES.backup,
+          formId: '137',
+          speciesId: 137,
+          locationId: 'route-7',
+          category: 'Kanto',
+          subCategory: 'Celadon City',
+        }),
+      ).toMatchObject({ speciesId: 137, formId: '137' })
+    } finally {
+      Math.random = originalRandom
+    }
   })
 
   test('field observation pool weighting only boosts matching target types', () => {
@@ -169,9 +208,16 @@ describe('encounter ability runtime', () => {
       'extra-shiny-roll',
       'answer-fail-encounter',
     ])
+    const approvedEncounterReplacementAbilities = new Set(['lets_go', 'backup'])
 
     for (const ability of Object.values(ABILITIES)) {
       for (const effect of ability.effects || []) {
+        if (
+          effect.type === 'encounter-replacement' &&
+          approvedEncounterReplacementAbilities.has(ability.id)
+        ) {
+          continue
+        }
         expect(bannedEffectTypes.has(effect.type)).toBe(false)
         if (effect.type === 'catch-rate-multiplier') {
           expect(effect.multiplier).toBeLessThanOrEqual(1.08)

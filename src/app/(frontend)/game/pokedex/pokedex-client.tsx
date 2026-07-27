@@ -728,6 +728,7 @@ function PokemonCard({
             pokemonName={pokemon.name}
             researchXp={progress?.researchXp || 0}
             researchLevel={progress?.researchLevel || 0}
+            inventoryMap={inventoryMap}
           />
         )}
 
@@ -1083,11 +1084,13 @@ function ResearchSection({
   pokemonName,
   researchXp,
   researchLevel,
+  inventoryMap,
 }: {
   formId: string
   pokemonName: string
   researchXp: number
   researchLevel: number
+  inventoryMap: Record<string, number>
 }) {
   const isMaxLevel = researchLevel >= MAX_RESEARCH_LEVEL
 
@@ -1212,7 +1215,10 @@ function ResearchSection({
                   <ResearchTmUnlockCard
                     key={`${unlock.level}-${unlock.itemId}`}
                     unlock={unlock}
-                    isUnlocked={researchLevel >= unlock.level}
+                    isUnlocked={
+                      researchLevel >= unlock.level ||
+                      (inventoryMap[unlock.itemId] || 0) > 0
+                    }
                   />
                 ))}
               </div>

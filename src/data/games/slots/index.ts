@@ -1,6 +1,6 @@
-import { testbasicslotgameEntries } from './entries/test'
+import { celadonGameCornerSlotEntries } from './entries/celadon-game-corner'
 
 export * from './types'
 import { SlotGameConfig } from './types'
 
-export const slotGames: SlotGameConfig[] = [...testbasicslotgameEntries]
+export const slotGames: SlotGameConfig[] = [...celadonGameCornerSlotEntries]
