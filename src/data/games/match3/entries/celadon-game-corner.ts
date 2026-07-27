@@ -58,7 +58,7 @@ export const celadonGameCornermatch3gamesEntries: Match3GameConfig[] = [
       {
         type: 'currency_owned',
         targetId: 'fun-tokens',
-        count: 100,
+        count: 50,
         consume: true,
       },
     ],
@@ -66,7 +66,7 @@ export const celadonGameCornermatch3gamesEntries: Match3GameConfig[] = [
       {
         type: 'currency',
         targetId: 'fun-tokens',
-        quantity: 500,
+        quantity: 250,
       },
     ],
     settings: {

@@ -62,6 +62,8 @@ export interface PvpMove {
   attackType?: string
   specialMoveId?: string
   calledByMetronome?: boolean
+  skipAction?: boolean
+  spectatorMessage?: string
   powers?: {
     mega?: boolean
     megaFormId?: string
@@ -90,7 +92,13 @@ export async function resolvePvpTurn(
   state: BattleState,
   p1Move: PvpMove,
   p2Move: PvpMove,
+  options: {
+    persist?: boolean
+    random?: () => number
+  } = {},
 ): Promise<BattleState> {
+  const shouldPersist = options.persist !== false
+  const random = options.random ?? Math.random
   // Helper to apply powers
   const applyPowers = async (
     mon: BattlePokemon,
@@ -207,6 +215,8 @@ export async function resolvePvpTurn(
 
   let p1UsedPower = await handleDimensionalShiftUsage(p1Move, p1Id, true)
   let p2UsedPower = await handleDimensionalShiftUsage(p2Move, p2Id, false)
+  p1UsedPower = p1UsedPower || p1Move.skipAction === true
+  p2UsedPower = p2UsedPower || p2Move.skipAction === true
 
   const p1Swap = resolvePvpSwap({
     state,
@@ -228,6 +238,13 @@ export async function resolvePvpTurn(
   // Re-fetch Active Mons (in case they changed)
   const p1Mon = state.playerTeam[state.activePlayerIndex]
   const p2Mon = state.enemyTeam[state.activeEnemyIndex]
+  if (p1Mon.currentHp <= 0 || p2Mon.currentHp <= 0) {
+    // A pre-action effect (for example a Shadow scream in a spectator battle)
+    // can knock out its user before combat. Let faint resolution handle it
+    // without either side attacking an already-fainted Pokemon.
+    p1UsedPower = true
+    p2UsedPower = true
+  }
 
   const p1UsedZMovePower =
     p1Move.attackType === 'power:z-move' || !!p1Move.powers?.zMoveCharge
@@ -241,6 +258,8 @@ export async function resolvePvpTurn(
   p2UsedPower = p2UsedPower || p2UsedZMovePower
 
   let logMessage = ``
+  if (p1Move.spectatorMessage) logMessage += `${p1Move.spectatorMessage}\n`
+  if (p2Move.spectatorMessage) logMessage += `${p2Move.spectatorMessage}\n`
   if (p1PowerMessages.length) logMessage += `${p1PowerMessages.join('\n')}\n`
   if (p2PowerMessages.length) logMessage += `${p2PowerMessages.join('\n')}\n`
   if (state.history[0]?.message.includes('Dimensional Shift')) {
@@ -277,7 +296,8 @@ export async function resolvePvpTurn(
       defender: p2Mon,
       move: getMove(p1Move.specialMoveId),
     })
-    if (pressureMessages.length) logMessage += `\n${pressureMessages.join('\n')}`
+    if (pressureMessages.length)
+      logMessage += `\n${pressureMessages.join('\n')}`
   }
   if (p2Move.specialMoveId) {
     const pressureMessages = applyBattleAbilityOpposingMoveUseDepletion({
@@ -287,7 +307,8 @@ export async function resolvePvpTurn(
       defender: p1Mon,
       move: getMove(p2Move.specialMoveId),
     })
-    if (pressureMessages.length) logMessage += `\n${pressureMessages.join('\n')}`
+    if (pressureMessages.length)
+      logMessage += `\n${pressureMessages.join('\n')}`
   }
 
   if (p1Swap.swapped) {
@@ -362,6 +383,7 @@ export async function resolvePvpTurn(
         enemyMove: p2Move,
         skipped: p1Skipped,
         currentTurn: state.turn,
+        random,
         weather: state.weather?.weather,
       })
       addCombatLog(p1Resolution.message)
@@ -384,6 +406,7 @@ export async function resolvePvpTurn(
           enemyMove: p2Move,
           skipped: p1Skipped,
           currentTurn: state.turn,
+          random,
           weather: state.weather?.weather,
         })
         addCombatLog(p1Resolution.message)
@@ -404,6 +427,7 @@ export async function resolvePvpTurn(
             enemyMove: p2Move,
             skipped: p2Skipped,
             currentTurn: state.turn,
+            random,
             weather: state.weather?.weather,
           })
           addCombatLog(p2Resolution.message)
@@ -422,6 +446,7 @@ export async function resolvePvpTurn(
             enemyMove: p2Move,
             skipped: p2Skipped,
             currentTurn: state.turn,
+            random,
             weather: state.weather?.weather,
           })
           addCombatLog(p2Resolution.message)
@@ -442,6 +467,7 @@ export async function resolvePvpTurn(
             enemyMove: p2Move,
             skipped: p1Skipped,
             currentTurn: state.turn,
+            random,
             weather: state.weather?.weather,
           })
           addCombatLog(p1Resolution.message)
@@ -461,6 +487,7 @@ export async function resolvePvpTurn(
       enemyMove: p2Move,
       skipped: p2Skipped,
       currentTurn: state.turn,
+      random,
       weather: state.weather?.weather,
     })
     addCombatLog(p2Resolution.message)
@@ -474,7 +501,9 @@ export async function resolvePvpTurn(
   }
 
   if (p1Resolution.didAttack && p1Resolution.usedType) {
-    const specialMove = p1Move.specialMoveId ? getMove(p1Move.specialMoveId) : undefined
+    const specialMove = p1Move.specialMoveId
+      ? getMove(p1Move.specialMoveId)
+      : undefined
     if (specialMove) {
       recordSuccessfulMoveUse({
         state,
@@ -494,7 +523,9 @@ export async function resolvePvpTurn(
   }
 
   if (p2Resolution.didAttack && p2Resolution.usedType) {
-    const specialMove = p2Move.specialMoveId ? getMove(p2Move.specialMoveId) : undefined
+    const specialMove = p2Move.specialMoveId
+      ? getMove(p2Move.specialMoveId)
+      : undefined
     if (specialMove) {
       recordSuccessfulMoveUse({
         state,
@@ -564,7 +595,10 @@ export async function resolvePvpTurn(
   const p1FaintedMon = state.playerTeam[state.activePlayerIndex]
   const p2FaintedMon = state.enemyTeam[state.activeEnemyIndex]
   const faintedFriendshipUpdates: Promise<void>[] = []
-  if (p1FaintedMon?.currentHp === 0 || p2FaintedMon?.currentHp === 0) {
+  if (
+    shouldPersist &&
+    (p1FaintedMon?.currentHp === 0 || p2FaintedMon?.currentHp === 0)
+  ) {
     const payload = await getPayload({ config: configPromise })
     if (p1FaintedMon?.currentHp === 0) {
       faintedFriendshipUpdates.push(
@@ -600,18 +634,25 @@ export async function resolvePvpTurn(
   }
 
   // Update Stats if Over
-  if (state.status === 'won' || state.status === 'lost') {
+  if (shouldPersist && (state.status === 'won' || state.status === 'lost')) {
     const payload = await getPayload({ config: configPromise })
     const winnerId = state.status === 'won' ? p1Id : p2Id
     const loserId = state.status === 'won' ? p2Id : p1Id
-    const winningTeam = state.status === 'won' ? state.playerTeam : state.enemyTeam
+    const winningTeam =
+      state.status === 'won' ? state.playerTeam : state.enemyTeam
 
     const updateStats = async (uid: string, isWin: boolean) => {
       try {
-        await incrementUserActivityResult(payload as any, uid, 'battleResults', state.battleId, {
-          wins: isWin ? 1 : 0,
-          losses: isWin ? 0 : 1,
-        })
+        await incrementUserActivityResult(
+          payload as any,
+          uid,
+          'battleResults',
+          state.battleId,
+          {
+            wins: isWin ? 1 : 0,
+            losses: isWin ? 0 : 1,
+          },
+        )
       } catch (e) {
         console.error('Stats Update Fail', e)
       }
@@ -662,6 +703,8 @@ export async function resolvePvpTurn(
 
   state.history = trimBattleHistory(state.history)
   state.turn += 1
-  await persistConsumedHeldItems(state)
+  if (shouldPersist) {
+    await persistConsumedHeldItems(state)
+  }
   return state
 }

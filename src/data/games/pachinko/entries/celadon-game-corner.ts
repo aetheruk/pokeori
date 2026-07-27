@@ -6,15 +6,13 @@ const rocketPachinkoSettings: PachinkoGameSettings = {
     height: 800,
     pegs: [],
     buckets: [
-      { id: 'zero-left', label: '0', color: '#4b5563', x: 80, y: 760, width: 90, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [] },
-      { id: 'five-left', label: '5', color: '#7c2d12', x: 190, y: 760, width: 90, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 5, dropChance: 100 }] },
+      { id: 'five-left', label: '5', color: '#7c2d12', x: 80, y: 760, width: 90, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 5, dropChance: 100 }] },
       { id: 'fifty', label: '50', color: '#ca8a04', x: 300, y: 760, width: 90, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 50, dropChance: 100 }] },
-      { id: 'five-right', label: '5', color: '#7c2d12', x: 410, y: 760, width: 90, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 5, dropChance: 100 }] },
-      { id: 'zero-right', label: '0', color: '#4b5563', x: 520, y: 760, width: 90, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [] },
+      { id: 'five-right', label: '5', color: '#7c2d12', x: 520, y: 760, width: 90, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 5, dropChance: 100 }] },
     ],
     obstacles: [
-      { x: 195, y: 670, width: 130, height: 10, angle: -0.24, bounce: 0.75 },
-      { x: 405, y: 670, width: 130, height: 10, angle: 0.24, bounce: 0.75 },
+      { x: 195, y: 630, width: 130, height: 10, angle: -0.24, bounce: 0.75 },
+      { x: 405, y: 630, width: 130, height: 10, angle: 0.24, bounce: 0.75 },
     ],
     wallBounciness: 0.55,
   },
@@ -23,7 +21,7 @@ const rocketPachinkoSettings: PachinkoGameSettings = {
   gravityScale: 0.8,
 }
 
-for (let row = 0; row < 14; row++) {
+for (let row = 0; row < 13; row++) {
   const columns = row % 2 === 0 ? 13 : 12
   const startX = (600 - (columns - 1) * 40) / 2
   for (let column = 0; column < columns; column++) {
@@ -42,7 +40,7 @@ export const celadonGameCornerPachinkoEntries: PachinkoGameConfig[] = [
     gameType: 'pachinko',
     name: 'Rocket Pachinko',
     description: 'Drop a ball through the pegs and chase the 50-token centre bucket.',
-    icon: { type: 'item', id: 'fun-token' },
+    icon: { type: 'pokemon', id: '100' },
     background: '/backgrounds/celadon-game-corner-arcade.avif',
     category: 'Kanto',
     subCategory: 'Celadon Game Corner',
@@ -60,8 +58,8 @@ export const celadonGameCornerPachinkoEntries: PachinkoGameConfig[] = [
     id: 'celadon-high-stakes-pachinko',
     gameType: 'pachinko',
     name: 'High Stakes Rocket Pachinko',
-    description: 'One hundred tokens buys a single drop toward the 500-token jackpot.',
-    icon: { type: 'item', id: 'fun-token' },
+    description: 'Fifty tokens buys a single drop toward the 250-token jackpot.',
+    icon: { type: 'pokemon', id: '101' },
     background: '/backgrounds/celadon-game-corner-arcade.avif',
     category: 'Kanto',
     subCategory: 'Celadon Game Corner',
@@ -76,15 +74,15 @@ export const celadonGameCornerPachinkoEntries: PachinkoGameConfig[] = [
           ...bucket,
           rewards:
             bucket.id === 'fifty'
-              ? [{ type: 'currency', targetId: 'fun-tokens', quantity: 500, dropChance: 100 }]
+              ? [{ type: 'currency', targetId: 'fun-tokens', quantity: 250, dropChance: 100 }]
               : bucket.id.includes('five')
-                ? [{ type: 'currency', targetId: 'fun-tokens', quantity: 50, dropChance: 100 }]
+                ? [{ type: 'currency', targetId: 'fun-tokens', quantity: 25, dropChance: 100 }]
                 : [],
         })),
       },
       background: '/backgrounds/celadon-game-corner-arcade.avif',
       themeColour: '#f59e0b',
-      cost: { currencyType: 'fun-tokens', amount: 100 },
+      cost: { currencyType: 'fun-tokens', amount: 50 },
     },
   },
 ]

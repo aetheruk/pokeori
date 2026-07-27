@@ -44,6 +44,7 @@ player's old active session and redirect to its canonical route. Legacy
 | Magnemite Circuit | `src/data/games/magnemite-circuit` | Rotating circuit puzzle for powering route machinery |
 | Rock Tunnel Echo Map | `src/data/games/rock-tunnel-echo-map` | Dark movement maze with one opening echo reveal and hidden hole traps |
 | Art Academy | `src/data/games/art-academy` | Timed Pokemon sprite-copying study with an extracted artwork palette and server-scored canvas |
+| Battle Bets | `/game/games/battle-bets` | Token-only all-in wagering on sealed AI-vs-AI Shadow battles |
 | TCG Memory | `src/data/games/tcg-memory` | Memory match with TCG cards |
 | Voltorb Flip | `src/data/games/voltorb-flip` | Puzzle game |
 | And more... | | |
@@ -105,6 +106,7 @@ player's old active session and redirect to its canonical route. Legacy
 
 ## Pachinko
 - Pachinko is a physics-result cost/reward game. Matter.js resolves whether the ball lands in an authored bucket or misses, while server actions own currency deduction, reward granting, stats, session totals, rate limits, locks, and duplicate drop protection.
+- Celadon Rocket Pachinko has three rewarding buckets: its two lower-value buckets are placed at the board edges and its jackpot remains in the centre. The former empty zero-reward buckets are not authored, and the lower slanted guides are raised into the gap below the last peg row. The standard and High Stakes entries share this board geometry.
 - Each ball carries a drop id. Bucket hits call the bucket settlement action and misses call the miss settlement action; both return the same session summary shape for the client.
 - Boards are authored through `settings.board` with dimensions, pegs, buckets, optional obstacles, bouncer pegs, bucket labels, bucket colors, and bucket rewards. Validation requires bucket ids to be unique and pegs/buckets to fit inside the board.
 
@@ -135,3 +137,18 @@ player's old active session and redirect to its canonical route. Legacy
 
 ## Prize Wheel
 - Prize Wheel entries can require an authored currency cost before a spin starts. Current Chansey wheels spend League Tickets, are available anytime, do not use daily completion gates, and show their ticket cost plus prize pool odds in Explore modals.
+- Celadon's standard Rocket Prize Wheel costs 10 Fun Tokens. Its wheel and prize table use distinct Pokemon/item icons plus visible reward labels, and an always-visible leave button remains available whenever a spin is not resolving.
+
+## Celadon Game Corner balance
+
+- Standard Rocket Slots cost 5 Fun Tokens and every payline supplies a human-readable token reward label for both the prize table and win toast. Celadon Slots, Prize Wheel, Pachinko, and Match 3 entries use game-specific Pokemon icons in Explore, with evolved variants distinguishing their High Stakes versions. Every paired High Stakes game costs and pays exactly five times its standard version: Slots 25, Prize Wheel 50, Pachinko 50, and Match 3 50 Fun Tokens.
+- A 100-token Rocket Scratch Card has a 25% blank outcome. Its remaining 75% is split across 25/50/100/250 Fun Tokens, Stardust, and Nuggets; valuing those items at their Prize Exchange prices gives the card an expected return of 92 Fun Tokens.
+
+## Battle Bets
+
+- Battle Bets is a custom High Stakes Room mini-game session under `battle-bets:{userId}` rather than the generic `game:{userId}` completion runtime. Opening a new book deducts 25 Fun Tokens and creates a one-hour virtual pot; restoring the same live book never charges again, and expiry forfeits the unclaimed pot.
+- Each side is an independently generated Rocket Grunt F/M team of three Shadow Pokemon. Team selection follows the VS Seeker pool and scaling rules, including seen non-Legendary/non-Mythical forms, badge-scaled levels, Advanced AI, held-berry chance, and an independent trainer healing-item chance.
+- Match odds come from 200 server-side headless battles using the normal battle turn engine. Match generation makes up to 20 attempts to find a matchup whose displayed odds fall between 25% and 75%, retaining the closest attempt if none enters that band. Payouts use `floor(pot * 0.95 / selectedProbability)`.
+- Selecting a side commits the entire pot and immediately seals one separately resolved server outcome. The client receives a read-only turn replay with normal/fast playback, team HP and replacements, and the battle log; reduced-motion clients advance directly to the final frame.
+- A winning result remains virtual until the player explicitly cashes out or rolls the full payout into a newly generated matchup. Losses pay zero. Start, wager, replay settlement, rollover, and cash-out transitions use rate limits, action locks, and idempotent result keys where a duplicate could spend or grant currency.
+- Headless wager battles run with persistence disabled. They do not grant battle or mini-game results, XP, rewards, KO credit, friendship changes, daily progress, held-item inventory changes, or any other Pokemon progression.

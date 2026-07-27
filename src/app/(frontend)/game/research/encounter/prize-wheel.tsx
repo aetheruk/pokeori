@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronDown, Loader2, Trophy } from 'lucide-react'
+import { ChevronDown, DoorOpen, Loader2, Trophy } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
@@ -274,6 +274,21 @@ export function PrizeWheelGame({
         )}
       </div>
 
+      {/* Leave control */}
+      <div className="absolute right-4 top-4 z-50">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-11 w-11 rounded-full border border-game-night-border/60 bg-game-night-surface/85 text-game-night-ink shadow-lg transition-colors hover:bg-game-night-surface-raised hover:text-game-night-ink"
+          onClick={handleExit}
+          disabled={isSpinning || isClaiming}
+          aria-label="Leave prize wheel"
+        >
+          <DoorOpen className="h-4 w-4" />
+        </Button>
+      </div>
+
       {/* Main Content */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center p-4 pb-32">
         {/* Pointer */}
@@ -322,7 +337,7 @@ export function PrizeWheelGame({
                     transform: `rotate(${renderAngle}deg) translate(clamp(100px, 35%, 140px)) rotate(${-renderAngle}deg)`,
                   }}
                 >
-                  <div className="relative mb-1 h-12 w-12 drop-shadow-md">
+                  <div className="relative h-9 w-9 drop-shadow-md">
                     <TaskIconDisplay
                       icon={
                         (typeof slot.icon === 'string'
@@ -332,6 +347,9 @@ export function PrizeWheelGame({
                       className="w-full h-full"
                     />
                   </div>
+                  <span className="max-w-16 text-center text-[10px] font-black leading-none drop-shadow-md">
+                    {slot.label}
+                  </span>
                 </div>
               )
             })}

@@ -9,6 +9,7 @@ import {
   type GameActivityCompletionResult,
   type GameActivityState,
 } from '@/app/(frontend)/game/_shared/activity-actions'
+import { startBattleBets } from './battle-bets-actions'
 
 export type GameState = GameActivityState
 export type GameCompletionResult = GameActivityCompletionResult
@@ -18,6 +19,9 @@ export async function startGame(
   forceReset = false,
   consumedPokemonIds?: string[],
 ) {
+  if (gameId === 'celadon-high-stakes-battle-bets') {
+    return startBattleBets(forceReset) as any
+  }
   return startGameActivity('game', gameId, forceReset, consumedPokemonIds)
 }
 

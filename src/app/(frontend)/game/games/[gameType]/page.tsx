@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation'
 import type { ComponentType } from 'react'
 import { ArtAcademyGame } from '@/app/(frontend)/game/research/encounter/art-academy'
+import { BattleBetsGame } from '@/app/(frontend)/game/research/encounter/battle-bets'
+import { getBattleBetsState } from '@/app/(frontend)/game/games/battle-bets-actions'
 import { CryRecognitionGame } from '@/app/(frontend)/game/research/encounter/cry-recognition'
 import { DiglettTunnelTapGame } from '@/app/(frontend)/game/research/encounter/diglett-tunnel-tap'
 import { FlapGame } from '@/app/(frontend)/game/research/encounter/flap'
@@ -71,6 +73,7 @@ const GAME_COMPONENTS: Partial<Record<GameType, ComponentType<GameProps>>> = {
   'rock-tunnel-echo-map':
     RockTunnelEchoMapGame as unknown as ComponentType<GameProps>,
   'art-academy': ArtAcademyGame as unknown as ComponentType<GameProps>,
+  'battle-bets': BattleBetsGame as unknown as ComponentType<GameProps>,
 }
 
 export default async function GamePage({
@@ -78,15 +81,38 @@ export default async function GamePage({
 }: {
   params: Promise<{ gameType: string }>
 }) {
-  const [{ gameType }, state, initialGameData] = await Promise.all([
-    params,
+  const { gameType } = await params
+  if (gameType === 'battle-bets') {
+    const [initialGameData, battleBetsState] = await Promise.all([
+      getGameRouteData('inventory'),
+      getBattleBetsState(),
+    ])
+    if (!initialGameData) redirect('/auth')
+    const encounter = (await import('@/data/games')).allGames.find(
+      (entry) => entry.gameType === 'battle-bets',
+    )
+    if (!encounter) redirect('/game/explore')
+    return (
+      <GameRouteDataBoundary
+        scope="inventory"
+        initialGameData={initialGameData}
+      >
+        <BattleBetsGame
+          encounter={encounter}
+          initialState={battleBetsState || undefined}
+        />
+      </GameRouteDataBoundary>
+    )
+  }
+
+  const [state, initialGameData] = await Promise.all([
     getGameState(),
     getGameRouteData('inventory'),
   ])
   if (!initialGameData) redirect('/auth')
   if (!state) redirect('/game/explore')
-
-  const encounter = state.encounter as GameStateWithEncounter['encounter']
+  const gameState = state as GameStateWithEncounter
+  const encounter = gameState.encounter as GameStateWithEncounter['encounter']
   const canonicalRoute = getGameActivityRoute(encounter.gameType)
   if (gameType !== encounter.gameType) redirect(canonicalRoute)
 
@@ -94,11 +120,12 @@ export default async function GamePage({
   if (!GameComponent) redirect('/game/explore')
 
   return (
-    <GameRouteDataBoundary
-      scope="inventory"
-      initialGameData={initialGameData}
-    >
-      <GameComponent encounter={encounter} initialState={state} state={state} />
+    <GameRouteDataBoundary scope="inventory" initialGameData={initialGameData}>
+      <GameComponent
+        encounter={encounter}
+        initialState={gameState}
+        state={gameState}
+      />
     </GameRouteDataBoundary>
   )
 }
