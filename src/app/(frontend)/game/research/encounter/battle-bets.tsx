@@ -1,31 +1,55 @@
 'use client'
 
+import { AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useReducedMotion } from 'framer-motion'
+import { Swords } from 'lucide-react'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
-import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
-import type { GameItem } from '@/data/games'
-import type {
-  BattleBetsPublicState,
-  BattleBetsReplayFrame,
-  BattleBetsSide,
-  BattleBetsTeamPreview,
-} from '@/utilities/battle-bets'
+import { BattleLog } from '@/app/(frontend)/game/battles/_components/battle-log'
+import { BattleScene } from '@/app/(frontend)/game/battles/_components/battle-scene'
 import {
+  advanceBattleBetsBattle,
   cashOutBattleBets,
-  finishBattleBetsReplay,
   placeBattleBet,
   rollOverBattleBets,
   startBattleBets,
 } from '@/app/(frontend)/game/games/battle-bets-actions'
-
-type ReplaySpeed = 'normal' | 'fast'
+import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
+import { VSAnimation } from '@/components/game/battles/VSAnimation'
+import { Button } from '@/components/ui/button'
+import { useAudio } from '@/context/AudioContext'
+import type { GameItem } from '@/data/games'
+import type {
+  BattleBetsPublicState,
+  BattleBetsSide,
+  BattleBetsTeamPreview,
+} from '@/utilities/battle-bets'
+import { useBattleManager } from '@/utilities/battle/engine/useBattleManager'
+import type { BattleState } from '@/utilities/battle/types'
 
 function newActionId(): string {
-  return crypto.randomUUID()
+  if (typeof crypto.randomUUID === 'function') return crypto.randomUUID()
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+}
+
+function battleFingerprint(state: BattleState): string {
+  const playerHp = state.playerTeam
+    .map((pokemon) => pokemon.currentHp)
+    .join(',')
+  const enemyHp = state.enemyTeam.map((pokemon) => pokemon.currentHp).join(',')
+  const latest = state.history[0]
+
+  return [
+    state.turn,
+    state.status,
+    state.activePlayerIndex,
+    state.activeEnemyIndex,
+    playerHp,
+    enemyHp,
+    latest?.turn ?? 0,
+    latest?.message ?? '',
+  ].join('|')
 }
 
 export function BattleBetsGame({
@@ -35,61 +59,8 @@ export function BattleBetsGame({
   initialState?: BattleBetsPublicState
 }) {
   const router = useRouter()
-  const reduceMotion = useReducedMotion()
   const [state, setState] = useState(initialState)
   const [busy, setBusy] = useState(false)
-  const [frameIndex, setFrameIndex] = useState(() =>
-    initialState?.phase === 'result'
-      ? Math.max(0, (initialState.replay?.length || 1) - 1)
-      : 0,
-  )
-  const [playing, setPlaying] = useState(initialState?.phase === 'replay')
-  const [speed, setSpeed] = useState<ReplaySpeed>('normal')
-  const settlingRef = useRef(false)
-  const replay = state?.replay || []
-
-  const finishReplay = useCallback(async () => {
-    if (settlingRef.current) return
-    settlingRef.current = true
-    const result = await finishBattleBetsReplay(newActionId())
-    settlingRef.current = false
-    if (!result.success) {
-      toast.error(result.error)
-      return
-    }
-    setState(result.state)
-  }, [])
-
-  useEffect(() => {
-    if (state?.phase !== 'replay' || replay.length === 0) return
-    if (reduceMotion) {
-      setFrameIndex(replay.length - 1)
-      setPlaying(false)
-      void finishReplay()
-      return
-    }
-    if (!playing) return
-    if (frameIndex >= replay.length - 1) {
-      setPlaying(false)
-      void finishReplay()
-      return
-    }
-
-    const timeout = window.setTimeout(
-      () =>
-        setFrameIndex((current) => Math.min(current + 1, replay.length - 1)),
-      speed === 'fast' ? 425 : 1050,
-    )
-    return () => window.clearTimeout(timeout)
-  }, [
-    finishReplay,
-    frameIndex,
-    playing,
-    reduceMotion,
-    replay.length,
-    speed,
-    state?.phase,
-  ])
 
   const begin = async (forceReset = false) => {
     setBusy(true)
@@ -99,8 +70,6 @@ export function BattleBetsGame({
       toast.error(result.error)
       return
     }
-    setFrameIndex(0)
-    setPlaying(result.state.phase === 'replay')
     setState(result.state)
   }
 
@@ -112,8 +81,6 @@ export function BattleBetsGame({
       toast.error(result.error)
       return
     }
-    setFrameIndex(0)
-    setPlaying(true)
     setState(result.state)
   }
 
@@ -138,43 +105,36 @@ export function BattleBetsGame({
       toast.error(result.error)
       return
     }
-    setFrameIndex(0)
-    setPlaying(false)
     setState(result.state)
   }
 
   if (!state) {
     return (
-      <main className="game-night min-h-full p-4 text-game-night-ink sm:p-6">
-        <section className="game-activity-panel mx-auto max-w-xl overflow-hidden">
-          <div className="relative h-44 border-b border-game-border/40">
+      <main className="game-night flex h-full min-h-0 items-center justify-center overflow-y-auto p-3 text-game-night-ink sm:p-5">
+        <section className="game-activity-panel w-full max-w-lg overflow-hidden">
+          <div className="relative flex min-h-28 items-end border-b border-game-border/40 p-4">
             <Image
-              src="/backgrounds/celadon-game-corner-prize-wheel.avif"
+              src="/backgrounds/game-corner.avif"
               alt=""
               fill
               priority
-              className="object-cover opacity-70"
+              className="object-cover opacity-45"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-game-night-surface via-transparent to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-game-ochre">
-                Celadon High Stakes Room
+            <div className="absolute inset-0 bg-gradient-to-r from-game-night-surface/95 via-game-night-surface/75 to-transparent" />
+            <div className="relative">
+              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-game-ochre">
+                High Stakes Room
               </p>
-              <h1 className="font-serif text-3xl">Battle Bets</h1>
+              <h1 className="font-serif text-2xl">Battle Bets</h1>
             </div>
           </div>
-          <div className="p-5 sm:p-6">
-            <p className="leading-relaxed text-game-night-ink/80">
-              Your 100 Fun Token entry opens the book. Inspect two independently built
-              Shadow teams, study the house odds, then back one Rocket Grunt all
-              in.
-            </p>
-            <p className="mt-3 text-sm text-game-night-ink/65">
-              A winning pot can be cashed out or rolled into a fresh matchup.
-              The book expires after one hour.
+          <div className="p-4">
+            <p className="text-sm leading-relaxed text-game-night-ink/75">
+              Inspect two Shadow teams, back one Rocket Grunt, then watch both
+              trainers battle. Win to cash out or roll the entire pot onward.
             </p>
             <Button
-              className="game-accent-button mt-6 w-full"
+              className="game-accent-button mt-4 min-h-11 w-full"
               disabled={busy}
               onClick={() => void begin()}
             >
@@ -186,137 +146,72 @@ export function BattleBetsGame({
     )
   }
 
-  const isResult = state.phase === 'result'
-  const won =
-    isResult &&
-    state.winner !== undefined &&
-    state.winner === state.selectedSide
+  if (state.phase !== 'inspect' && state.battle) {
+    return (
+      <BattleBetsBattle
+        state={state}
+        busy={busy}
+        onStateChange={setState}
+        onCashOut={cashOut}
+        onRollOver={rollOver}
+        onRestart={() => begin(true)}
+      />
+    )
+  }
 
   return (
-    <main className="game-night min-h-full p-3 text-game-night-ink sm:p-5">
-      <div className="mx-auto max-w-6xl">
-        <header className="game-activity-panel mb-4 flex flex-wrap items-center justify-between gap-3 p-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-game-ochre">
-              Celadon High Stakes Room
-            </p>
-            <h1 className="font-serif text-2xl sm:text-3xl">Battle Bets</h1>
-          </div>
-          <div className="rounded-lg border border-game-ochre/50 bg-game-night-surface px-4 py-2 text-right">
-            <p className="text-[0.65rem] uppercase tracking-wider text-game-night-ink/65">
-              {won ? 'Winning pot' : 'Current pot'}
-            </p>
-            <p className="font-mono text-lg font-semibold text-game-ochre">
-              {won ? state.payout : state.pot} tokens
-            </p>
-          </div>
-        </header>
-
-        {state.phase === 'inspect' ? (
-          <Inspection state={state} busy={busy} onBet={bet} />
-        ) : (
-          <Spectator
-            state={state}
-            frame={replay[Math.min(frameIndex, replay.length - 1)]}
-            frameIndex={frameIndex}
-            frameCount={replay.length}
-            playing={playing}
-            speed={speed}
-            onTogglePlaying={() => setPlaying((current) => !current)}
-            onToggleSpeed={() =>
-              setSpeed((current) => (current === 'normal' ? 'fast' : 'normal'))
-            }
+    <main className="game-night h-full min-h-0 overflow-y-auto p-3 text-game-night-ink sm:p-5">
+      <div className="mx-auto max-w-4xl">
+        <CompactHeader pot={state.pot} />
+        <p className="mb-3 text-center text-sm text-game-night-ink/65">
+          Choose a side. Your full pot rides on the result.
+        </p>
+        <div className="grid gap-3 lg:grid-cols-2">
+          <TeamCard
+            side="female"
+            team={state.femaleTeam}
+            chance={state.femaleChance}
+            projectedPayout={state.projectedFemalePayout}
+            disabled={busy}
+            onBet={bet}
           />
-        )}
-
-        {isResult && (
-          <section
-            className="game-activity-panel mt-4 p-5 text-center sm:p-6"
-            aria-live="polite"
-          >
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-game-ochre">
-              The book is settled
-            </p>
-            <h2 className="mt-1 font-serif text-2xl sm:text-3xl">
-              {won ? 'Your side won.' : 'The house takes the pot.'}
-            </h2>
-            <p className="mx-auto mt-2 max-w-xl text-game-night-ink/75">
-              {won
-                ? `Your all-in wager is now worth ${state.payout} Fun Tokens. Take the money, or carry every token into a new fight.`
-                : `${state.winner === 'female' ? 'Rocket Grunt F' : 'Rocket Grunt M'} won the battle. Nothing returns from this book.`}
-            </p>
-            {won ? (
-              <div className="mx-auto mt-5 grid max-w-xl gap-3 sm:grid-cols-2">
-                <Button
-                  className="game-accent-button"
-                  disabled={busy}
-                  onClick={() => void cashOut()}
-                >
-                  Cash out {state.payout}
-                </Button>
-                <Button
-                  variant="outline"
-                  disabled={busy}
-                  onClick={() => void rollOver()}
-                >
-                  Roll it all over
-                </Button>
-              </div>
-            ) : (
-              <Button
-                className="game-accent-button mt-5 w-full max-w-sm"
-                disabled={busy}
-                onClick={() => void begin(true)}
-              >
-                Start another book
-              </Button>
-            )}
-          </section>
-        )}
+          <TeamCard
+            side="male"
+            team={state.maleTeam}
+            chance={state.maleChance}
+            projectedPayout={state.projectedMalePayout}
+            disabled={busy}
+            onBet={bet}
+          />
+        </div>
       </div>
     </main>
   )
 }
 
-function Inspection({
-  state,
-  busy,
-  onBet,
-}: {
-  state: BattleBetsPublicState
-  busy: boolean
-  onBet: (side: BattleBetsSide) => Promise<void>
-}) {
+function CompactHeader({ pot }: { pot: number }) {
   return (
-    <>
-      <section className="game-activity-panel mb-4 p-4 text-center">
-        <p className="font-serif text-xl">Inspect the teams</p>
-        <p className="mt-1 text-sm text-game-night-ink/70">
-          Choose a side using the house odds. Your choice commits the entire
-          pot.
-        </p>
-      </section>
-      <div className="grid gap-4 lg:grid-cols-2">
-        <TeamCard
-          side="female"
-          team={state.femaleTeam}
-          chance={state.femaleChance}
-          projectedPayout={state.projectedFemalePayout}
-          pot={state.pot}
-          disabled={busy}
-          onBet={onBet}
-        />
-        <TeamCard
-          side="male"
-          team={state.maleTeam}
-          chance={state.maleChance}
-          projectedPayout={state.projectedMalePayout}
-          pot={state.pot}
-          disabled={busy}
-          onBet={onBet}
-        />
+    <header className="mb-3 flex min-h-12 items-center justify-between gap-3 rounded-xl border border-game-border/45 bg-game-night-surface px-3 py-2 shadow-sm">
+      <div className="flex min-w-0 items-center gap-2">
+        <Swords className="h-5 w-5 shrink-0 text-game-ochre" />
+        <div className="min-w-0">
+          <p className="truncate font-serif text-lg leading-none">
+            Battle Bets
+          </p>
+          <p className="mt-1 text-[0.6rem] uppercase tracking-[0.14em] text-game-night-ink/55">
+            High Stakes Room
+          </p>
+        </div>
       </div>
-    </>
+      <div className="shrink-0 rounded-full border border-game-ochre/35 bg-game-night-canvas px-3 py-1">
+        <span className="font-mono text-sm font-semibold text-game-ochre">
+          {pot}
+        </span>
+        <span className="ml-1 text-[0.65rem] text-game-night-ink/60">
+          tokens
+        </span>
+      </div>
+    </header>
   )
 }
 
@@ -325,7 +220,6 @@ function TeamCard({
   team,
   chance,
   projectedPayout,
-  pot,
   disabled,
   onBet,
 }: {
@@ -333,280 +227,314 @@ function TeamCard({
   team: BattleBetsTeamPreview
   chance: number
   projectedPayout: number
-  pot: number
   disabled: boolean
   onBet: (side: BattleBetsSide) => Promise<void>
 }) {
   return (
-    <section className="game-activity-panel p-3 sm:p-4">
-      <div className="flex items-center gap-3">
-        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-game-ochre/40 bg-game-night-canvas">
+    <section className="game-activity-panel p-3">
+      <div className="flex items-center gap-2.5">
+        <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-game-ochre/35 bg-game-night-canvas">
           <Image
             src={`/sprites/trainers/${team.trainerSpriteId}.avif`}
             alt={team.trainerName}
             fill
-            sizes="48px"
+            sizes="40px"
             className="object-contain"
           />
         </div>
-        <div className="min-w-0 flex-1">
-          <h2 className="font-serif text-xl">{team.trainerName}</h2>
-          <p className="text-xs text-game-night-ink/65">Shadow team</p>
-        </div>
+        <h2 className="min-w-0 flex-1 truncate font-serif text-lg">
+          {team.trainerName}
+        </h2>
         <div className="text-right">
-          <p className="font-mono text-xl font-semibold text-game-ochre">
+          <p className="font-mono text-lg font-semibold leading-none text-game-ochre">
             {Math.round(chance * 100)}%
           </p>
-          <p className="text-[0.65rem] uppercase tracking-wider text-game-night-ink/60">
-            win chance
+          <p className="mt-1 text-[0.55rem] uppercase tracking-wider text-game-night-ink/50">
+            chance
           </p>
         </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-3 gap-2">
+      <div className="mt-2 grid grid-cols-3 gap-1.5">
         {team.pokemon.map((pokemon, index) => (
           <article
             key={`${pokemon.formId}-${index}`}
-            className="flex min-w-0 flex-col items-center rounded-lg border border-game-border/40 bg-game-night-surface px-1 py-2"
+            className="flex min-w-0 items-center gap-1 rounded-lg border border-game-border/35 bg-game-night-surface px-1.5 py-1"
           >
             <PokemonRaritySprite
               formId={pokemon.formId}
               view="front"
               isShadow
-              alt={`Shadow ${pokemon.name}`}
-              className="h-11 w-11"
-              sizes="44px"
+              alt=""
+              className="h-9 w-9 shrink-0"
+              sizes="36px"
             />
-            <p className="mt-1 w-full truncate text-center text-xs font-semibold">
-              {pokemon.name}
-            </p>
-            <p className="text-center text-[0.65rem] text-game-night-ink/65">Lv. {pokemon.level}</p>
+            <div className="min-w-0">
+              <p className="truncate text-[0.68rem] font-semibold">
+                {pokemon.name}
+              </p>
+              <p className="text-[0.6rem] text-game-night-ink/55">
+                Lv. {pokemon.level}
+              </p>
+            </div>
           </article>
         ))}
       </div>
 
-      <div className="mt-3 flex items-center justify-between gap-3 rounded-lg border border-game-ochre/25 bg-game-night-canvas p-3">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-game-night-ink/60">
-            All-in return
-          </p>
-          <p className="font-mono text-xl text-game-ochre">
-            {projectedPayout} tokens
-          </p>
-          <p className="text-xs text-game-night-ink/55">{pot} token pot</p>
-        </div>
+      <div className="mt-2 flex items-center gap-2">
+        <p className="min-w-0 flex-1 text-xs text-game-night-ink/60">
+          Return{' '}
+          <span className="font-mono font-semibold text-game-ochre">
+            {projectedPayout}
+          </span>
+        </p>
         <Button
-          className="game-accent-button min-w-28"
+          className="game-accent-button min-h-10 min-w-32"
           disabled={disabled}
           onClick={() => void onBet(side)}
         >
-          Back {team.trainerName}
+          Back this team
         </Button>
       </div>
     </section>
   )
 }
 
-function Spectator({
+function BattleBetsBattle({
   state,
-  frame,
-  frameIndex,
-  frameCount,
-  playing,
-  speed,
-  onTogglePlaying,
-  onToggleSpeed,
+  busy,
+  onStateChange,
+  onCashOut,
+  onRollOver,
+  onRestart,
 }: {
   state: BattleBetsPublicState
-  frame?: BattleBetsReplayFrame
-  frameIndex: number
-  frameCount: number
-  playing: boolean
-  speed: ReplaySpeed
-  onTogglePlaying: () => void
-  onToggleSpeed: () => void
+  busy: boolean
+  onStateChange: (state: BattleBetsPublicState) => void
+  onCashOut: () => Promise<void>
+  onRollOver: () => Promise<void>
+  onRestart: () => Promise<void>
 }) {
-  const messages = useMemo(
-    () =>
-      (state.replay || [])
-        .slice(0, frameIndex + 1)
-        .flatMap((entry) => entry.messages)
-        .slice(-14),
-    [frameIndex, state.replay],
+  const initialBattle = useRef(state.battle as BattleState)
+  const { battleState, anim, isProcessing, pushTurnResult } = useBattleManager(
+    initialBattle.current,
   )
-  if (!frame) {
-    return (
-      <section className="game-activity-panel p-6 text-center">
-        The battle record is unavailable.
-      </section>
-    )
+  const { playMusic, stopMusic } = useAudio()
+  const [showVsAnimation, setShowVsAnimation] = useState(
+    state.phase === 'battle' && initialBattle.current.turn === 1,
+  )
+  const [advancing, setAdvancing] = useState(false)
+  const [turnError, setTurnError] = useState<string>()
+  const lastRequestedFingerprint = useRef<string | undefined>(undefined)
+  const serverBattle = state.battle as BattleState
+  const serverFingerprint = useMemo(
+    () => battleFingerprint(serverBattle),
+    [serverBattle],
+  )
+  const visualFingerprint = useMemo(
+    () => battleFingerprint(battleState),
+    [battleState],
+  )
+  const isVisuallySettled =
+    serverFingerprint === visualFingerprint && !isProcessing
+
+  useEffect(() => {
+    playMusic(serverBattle.config?.music || '/music/battle.mp3', {
+      loop: true,
+      volume: 0.3,
+    })
+    return () => stopMusic({ delayMs: 500 })
+  }, [playMusic, serverBattle.battleId, serverBattle.config?.music, stopMusic])
+
+  useEffect(() => {
+    if (serverFingerprint === visualFingerprint || isProcessing) return
+    pushTurnResult({ success: true, state: serverBattle })
+  }, [
+    isProcessing,
+    pushTurnResult,
+    serverBattle,
+    serverFingerprint,
+    visualFingerprint,
+  ])
+
+  const advance = useCallback(async () => {
+    if (
+      state.phase !== 'battle' ||
+      advancing ||
+      isProcessing ||
+      showVsAnimation ||
+      serverFingerprint !== visualFingerprint
+    ) {
+      return
+    }
+    if (lastRequestedFingerprint.current === serverFingerprint) return
+
+    lastRequestedFingerprint.current = serverFingerprint
+    setAdvancing(true)
+    setTurnError(undefined)
+    const result = await advanceBattleBetsBattle(newActionId())
+    setAdvancing(false)
+    if (!result.success) {
+      setTurnError(result.error)
+      toast.error(result.error)
+      return
+    }
+    onStateChange(result.state)
+  }, [
+    advancing,
+    isProcessing,
+    onStateChange,
+    serverFingerprint,
+    showVsAnimation,
+    state.phase,
+    visualFingerprint,
+  ])
+
+  useEffect(() => {
+    void advance()
+  }, [advance])
+
+  useEffect(() => {
+    if (state.phase === 'result' && isVisuallySettled) {
+      stopMusic({ fade: true })
+    }
+  }, [isVisuallySettled, state.phase, stopMusic])
+
+  const retryTurn = () => {
+    lastRequestedFingerprint.current = undefined
+    setTurnError(undefined)
+    void advance()
   }
+  const won =
+    state.phase === 'result' &&
+    state.winner !== undefined &&
+    state.winner === state.selectedSide
 
   return (
-    <section className="game-activity-panel overflow-hidden">
-      <div className="relative min-h-[25rem] overflow-hidden bg-game-night-canvas p-4 sm:p-6">
-        <Image
-          src="/backgrounds/celadon-game-corner-prize-wheel.avif"
-          alt=""
-          fill
-          className="object-cover opacity-20"
-        />
-        <div className="absolute inset-0 bg-game-night-canvas/65" />
-        <div className="relative grid gap-8 md:grid-cols-2">
-          <BattleSide
-            label="Rocket Grunt F"
-            selected={state.selectedSide === 'female'}
-            team={frame.femaleTeam}
-            activeIndex={frame.femaleActiveIndex}
-            view="back"
-          />
-          <BattleSide
-            label="Rocket Grunt M"
-            selected={state.selectedSide === 'male'}
-            team={frame.maleTeam}
-            activeIndex={frame.maleActiveIndex}
-            view="front"
-          />
+    <main className="game-night h-full min-h-0 text-game-night-ink">
+      <div className="game-desktop-activity-stage game-activity-chrome relative flex h-full min-h-0 flex-col overflow-hidden xl:my-4 xl:h-[calc(100%-2rem)] xl:grid xl:grid-cols-[minmax(0,1fr)_19rem] xl:grid-rows-[minmax(26rem,1fr)_auto]">
+        <AnimatePresence>
+          {showVsAnimation &&
+            serverBattle.playerTrainer &&
+            serverBattle.enemyTrainer && (
+              <VSAnimation
+                player={serverBattle.playerTrainer}
+                enemy={serverBattle.enemyTrainer}
+                onComplete={() => setShowVsAnimation(false)}
+              />
+            )}
+        </AnimatePresence>
+
+        <BattleScene battleState={battleState} anim={anim} />
+
+        <div className="flex min-h-12 items-center justify-between gap-2 border-t border-game-border bg-game-night-surface px-3 py-1.5 xl:col-start-1 xl:row-start-2">
+          <div className="min-w-0">
+            <p className="truncate text-xs font-semibold">
+              {state.selectedSide === 'female'
+                ? 'Backing Rocket Grunt F'
+                : 'Backing Rocket Grunt M'}
+            </p>
+            <p className="text-[0.62rem] text-game-night-ink/55">
+              {advancing || isProcessing ? 'Battle in progress…' : 'AI battle'}
+            </p>
+          </div>
+          <div className="shrink-0 rounded-full border border-game-ochre/35 bg-game-night-canvas px-2.5 py-1 font-mono text-xs text-game-ochre">
+            Pot {state.pot}
+          </div>
+          {turnError && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="min-h-10 shrink-0"
+              onClick={retryTurn}
+            >
+              Retry turn
+            </Button>
+          )}
+        </div>
+
+        <div className="relative min-h-0 flex-[24] border-t border-game-border bg-game-surface-raised xl:col-start-2 xl:row-start-1 xl:row-span-2 xl:border-l xl:border-t-0">
+          <div className="h-full overflow-hidden">
+            <BattleLog logs={battleState.history} />
+          </div>
         </div>
       </div>
 
-      <div className="border-t border-game-border/40 bg-game-night-surface p-4">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-xs uppercase tracking-[0.18em] text-game-ochre">
-              Spectator feed
-            </p>
-            <p className="font-mono text-sm text-game-night-ink/65">
-              Turn {frame.turn} · {frameIndex + 1} / {frameCount}
-            </p>
-          </div>
-          {state.phase === 'replay' && (
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={onTogglePlaying}
-                aria-label={
-                  playing ? 'Pause battle replay' : 'Play battle replay'
-                }
-              >
-                {playing ? 'Pause' : 'Play'}
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={onToggleSpeed}
-                aria-label={`Use ${speed === 'normal' ? 'fast' : 'normal'} replay speed`}
-              >
-                {speed === 'normal' ? '1×' : '2×'}
-              </Button>
-            </div>
-          )}
-        </div>
-        <div
-          className="min-h-20 max-h-52 overflow-y-auto rounded-lg border border-game-border/40 bg-game-night-canvas p-3"
-          aria-live="polite"
-        >
-          {messages.map((message, index) => (
-            <p
-              key={`${frame.turn}-${index}-${message}`}
-              className="text-sm leading-relaxed text-game-night-ink/80"
-            >
-              {message}
-            </p>
-          ))}
-        </div>
-      </div>
-    </section>
+      {state.phase === 'result' && isVisuallySettled && (
+        <Settlement
+          won={won}
+          state={state}
+          busy={busy}
+          onCashOut={onCashOut}
+          onRollOver={onRollOver}
+          onRestart={onRestart}
+        />
+      )}
+    </main>
   )
 }
 
-function BattleSide({
-  label,
-  selected,
-  team,
-  activeIndex,
-  view,
+function Settlement({
+  won,
+  state,
+  busy,
+  onCashOut,
+  onRollOver,
+  onRestart,
 }: {
-  label: string
-  selected: boolean
-  team: BattleBetsReplayFrame['femaleTeam']
-  activeIndex: number
-  view: 'front' | 'back'
+  won: boolean
+  state: BattleBetsPublicState
+  busy: boolean
+  onCashOut: () => Promise<void>
+  onRollOver: () => Promise<void>
+  onRestart: () => Promise<void>
 }) {
-  const active = team[activeIndex]
-  if (!active) return null
-  const hpPercent = Math.max(
-    0,
-    Math.min(100, (active.currentHp / Math.max(1, active.maxHp)) * 100),
-  )
-
   return (
-    <div
-      className={`rounded-2xl border p-4 backdrop-blur-sm ${
-        selected
-          ? 'border-game-ochre bg-game-night-surface/85'
-          : 'border-game-border/45 bg-game-night-surface/70'
-      }`}
-    >
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <p className="font-serif text-xl">{label}</p>
-          {selected && (
-            <p className="text-xs font-semibold uppercase tracking-wider text-game-ochre">
-              Your wager
-            </p>
+    <div className="fixed inset-0 z-[100] overflow-y-auto bg-game-night-canvas/96 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] text-game-night-ink backdrop-blur-sm">
+      <div className="flex min-h-full items-center justify-center">
+        <section
+          className="game-activity-panel w-full max-w-sm p-5 text-center"
+          aria-live="polite"
+        >
+          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-game-ochre">
+            Battle settled
+          </p>
+          <h1 className="mt-1 font-serif text-2xl">
+            {won ? 'Your fighter won' : 'Your pot is lost'}
+          </h1>
+          <p className="mt-2 text-sm leading-relaxed text-game-night-ink/70">
+            {won
+              ? `${state.payout} Fun Tokens are waiting. Take them now or risk the full pot on another matchup.`
+              : `${state.winner === 'female' ? 'Rocket Grunt F' : 'Rocket Grunt M'} won the battle.`}
+          </p>
+          {won ? (
+            <div className="mt-5 grid gap-2">
+              <Button
+                className="game-accent-button min-h-12 w-full"
+                disabled={busy}
+                onClick={() => void onCashOut()}
+              >
+                Cash out {state.payout}
+              </Button>
+              <Button
+                variant="outline"
+                className="min-h-12 w-full"
+                disabled={busy}
+                onClick={() => void onRollOver()}
+              >
+                Roll over the full pot
+              </Button>
+            </div>
+          ) : (
+            <Button
+              className="game-accent-button mt-5 min-h-12 w-full"
+              disabled={busy}
+              onClick={() => void onRestart()}
+            >
+              Start another book
+            </Button>
           )}
-        </div>
-        <div
-          className="flex gap-1"
-          role="group"
-          aria-label={`${label} team status`}
-        >
-          {team.map((pokemon, index) => (
-            <span
-              key={`${pokemon.formId}-${index}`}
-              className={`h-2.5 w-2.5 rounded-full border ${
-                pokemon.fainted
-                  ? 'border-game-border/50 bg-transparent'
-                  : index === activeIndex
-                    ? 'border-game-ochre bg-game-ochre'
-                    : 'border-game-night-ink/45 bg-game-night-ink/45'
-              }`}
-              title={`${pokemon.name}: ${pokemon.fainted ? 'fainted' : 'ready'}`}
-            />
-          ))}
-        </div>
-      </div>
-      <PokemonRaritySprite
-        formId={active.formId}
-        view={view}
-        isShadow
-        alt={`Shadow ${active.name}`}
-        className="mx-auto h-44 w-44 sm:h-52 sm:w-52"
-        sizes="208px"
-      />
-      <div className="rounded-xl border border-game-border/40 bg-game-night-canvas/90 p-3">
-        <div className="flex items-baseline justify-between gap-3">
-          <p className="font-semibold">Shadow {active.name}</p>
-          <p className="font-mono text-sm">Lv. {active.level}</p>
-        </div>
-        <div
-          className="mt-2 h-2.5 overflow-hidden rounded-full bg-game-border/35"
-          role="progressbar"
-          aria-label={`${active.name} health`}
-          aria-valuemin={0}
-          aria-valuemax={active.maxHp}
-          aria-valuenow={active.currentHp}
-        >
-          <div
-            className="h-full rounded-full bg-game-ochre transition-[width] duration-300 motion-reduce:transition-none"
-            style={{ width: `${hpPercent}%` }}
-          />
-        </div>
-        <p className="mt-1 text-right font-mono text-xs text-game-night-ink/65">
-          {active.currentHp} / {active.maxHp} HP
-        </p>
+        </section>
       </div>
     </div>
   )

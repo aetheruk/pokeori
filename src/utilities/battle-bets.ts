@@ -1,3 +1,5 @@
+import type { BattleState } from '@/utilities/battle/types'
+
 export type BattleBetsSide = 'female' | 'male'
 
 export interface BattleBetsPokemonPreview {
@@ -17,29 +19,10 @@ export interface BattleBetsTeamPreview {
   trainerItemId?: string
 }
 
-export interface BattleBetsReplayPokemon {
-  formId: string
-  name: string
-  level: number
-  currentHp: number
-  maxHp: number
-  fainted: boolean
-  isShadow: true
-}
-
-export interface BattleBetsReplayFrame {
-  turn: number
-  femaleActiveIndex: number
-  maleActiveIndex: number
-  femaleTeam: BattleBetsReplayPokemon[]
-  maleTeam: BattleBetsReplayPokemon[]
-  messages: string[]
-}
-
 export interface BattleBetsPublicState {
   gameId: string
   pot: number
-  phase: 'inspect' | 'replay' | 'result'
+  phase: 'inspect' | 'battle' | 'result'
   femaleTeam: BattleBetsTeamPreview
   maleTeam: BattleBetsTeamPreview
   femaleChance: number
@@ -49,7 +32,7 @@ export interface BattleBetsPublicState {
   selectedSide?: BattleBetsSide
   winner?: BattleBetsSide
   payout?: number
-  replay?: BattleBetsReplayFrame[]
+  battle?: BattleState
   createdAt: number
   expiresAt: number
 }
