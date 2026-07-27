@@ -417,7 +417,7 @@ function createBattleBetsFixture(params: {
     history: [],
     status: 'ongoing',
     battleId: GAME_ID,
-    background: '/backgrounds/game-corner.avif',
+    background: '/backgrounds/celadon-game-corner-arcade.avif',
     playerName: 'Rocket Grunt F',
     enemyName: 'Rocket Grunt M',
     isWildBattle: false,

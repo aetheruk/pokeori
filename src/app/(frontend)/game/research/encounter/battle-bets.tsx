@@ -204,12 +204,12 @@ export function BattleBetsGame({
           if (!open) closeStakeDialog()
         }}
       >
-        <DialogContent className="game-night border-game-night-border bg-game-night-surface text-game-night-ink sm:max-w-sm">
+        <DialogContent className="border-game-border bg-game-surface text-game-ink sm:max-w-sm">
           <DialogHeader>
             <DialogTitle className="font-serif text-xl">
               Place your bet
             </DialogTitle>
-            <DialogDescription className="text-game-night-ink/65">
+            <DialogDescription>
               Back{' '}
               {selectedSide === 'female'
                 ? state.femaleTeam.trainerName
@@ -219,7 +219,7 @@ export function BattleBetsGame({
           </DialogHeader>
 
           <div className="space-y-3">
-            <div className="flex items-center justify-between text-xs text-game-night-ink/60">
+            <div className="flex items-center justify-between text-xs text-game-muted">
               <span>Stake</span>
               <span className="font-mono">
                 Balance {state.tokenBalance.toLocaleString()}
@@ -238,33 +238,30 @@ export function BattleBetsGame({
                 }
                 placeholder="Enter Fun Tokens"
                 aria-label="Fun Token stake"
-                className="h-11 border-game-night-border bg-game-night-canvas font-mono text-game-night-ink"
+                className="font-mono"
               />
               <Button
                 type="button"
                 variant="outline"
-                className="min-h-11 shrink-0 border-game-night-border bg-game-night-canvas text-game-night-ink"
+                className="shrink-0"
                 onClick={() => setStakeInput(String(state.tokenBalance))}
               >
                 Max
               </Button>
             </div>
 
-            <div className="flex items-center justify-between rounded-lg border border-game-ochre/30 bg-game-night-canvas px-3 py-2">
-              <span className="text-xs text-game-night-ink/60">
-                Total return
-              </span>
+            <div className="flex items-center justify-between rounded-lg border border-game-ochre/30 bg-game-ochre/10 px-3 py-2">
+              <span className="text-xs text-game-muted">Total return</span>
               <span className="font-mono font-semibold text-game-ochre">
                 {potentialPayout.toLocaleString()} Fun Tokens
               </span>
             </div>
           </div>
 
-          <DialogFooter className="grid grid-cols-2 gap-2 sm:grid-cols-2">
+          <DialogFooter>
             <Button
               type="button"
               variant="outline"
-              className="min-h-11 border-game-night-border bg-game-night-canvas text-game-night-ink"
               disabled={busy}
               onClick={closeStakeDialog}
             >
@@ -272,7 +269,6 @@ export function BattleBetsGame({
             </Button>
             <Button
               type="button"
-              className="game-accent-button min-h-11"
               disabled={busy || !validStake}
               onClick={() => void placeBet()}
             >
