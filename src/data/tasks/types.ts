@@ -60,6 +60,7 @@ export interface PokemonCriteria {
   region?: string | string[]
   location?: string | string[]
   locationId?: string | string[]
+  ballType?: string
   minLevel?: number
   maxLevel?: number
   size?: 'XS' | 'S' | 'L' | 'XL'

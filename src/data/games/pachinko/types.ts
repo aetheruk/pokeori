@@ -5,6 +5,7 @@ export type PachinkoCurrencyType =
   | 'crystals'
   | 'mega-shards'
   | 'pokedollars'
+  | 'fun-tokens'
   | 'battle-points'
   | 'berry-powder'
   | 'prof-scrip'

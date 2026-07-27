@@ -466,12 +466,16 @@ export function RunGame({ encounter }: RunGameProps) {
         collectibleRewardConfigs.forEach((config) => {
           let nextScore = collectibleSchedulesRef.current[config.key]
           while (nextScore !== undefined && newScore >= nextScore) {
+            const rewardOption =
+              config.rewardOptions[
+                Math.floor(Math.random() * config.rewardOptions.length)
+              ]
             newCollectibles = [
               ...newCollectibles,
               {
                 id: collectibleIdCounterRef.current++,
-                rewardKey: config.key,
-                reward: config.reward,
+                rewardKey: rewardOption.key,
+                reward: rewardOption.reward,
                 x: CANVAS_WIDTH,
                 y: minY + Math.random() * Math.max(0, maxY - minY),
                 size: collectibleSize,

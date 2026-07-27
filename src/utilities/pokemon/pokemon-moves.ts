@@ -1,10 +1,6 @@
 import { items } from '@/data/items'
 import { getAllMoves, getMove } from '@/data/moves'
-import type {
-  MoveConfig,
-  MoveContinuousConfig,
-  MoveStance,
-} from '@/data/moves/types'
+import type { MoveConfig, MoveContinuousConfig, MoveStance } from '@/data/moves/types'
 import type { BattleAiProfileId } from '@/data/types'
 import { selectBattleMoveLoadoutFromCandidates } from '@/utilities/battle/enemy-ai'
 import type { BattlePokemon } from '@/utilities/battle/types'
@@ -35,9 +31,7 @@ export type AssignedMoveInput =
   | null
   | undefined
 
-export function normalizeAssignedMoveIds(
-  assignedMoves: AssignedMoveInput,
-): string[] {
+export function normalizeAssignedMoveIds(assignedMoves: AssignedMoveInput): string[] {
   if (!Array.isArray(assignedMoves)) return []
 
   const seen = new Set<string>()
@@ -57,9 +51,7 @@ export function toAssignedMoveRows(moveIds: string[]): { moveId: string }[] {
   return moveIds.map((moveId) => ({ moveId }))
 }
 
-export function getInventoryMoveIds(
-  inventory: Record<string, number>,
-): string[] {
+export function getInventoryMoveIds(inventory: Record<string, number>): string[] {
   const seen = new Set<string>()
   const moveIds: string[] = []
 

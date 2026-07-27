@@ -1,6 +1,6 @@
-import { testbasicEntries } from './entries/test'
+import { celadonCityFlapEntries } from './entries/celadon-city'
 
 export * from './types'
 import { FlapGameConfig } from './types'
 
-export const basicEntries: FlapGameConfig[] = [...testbasicEntries]
+export const basicEntries: FlapGameConfig[] = [...celadonCityFlapEntries]

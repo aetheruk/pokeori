@@ -252,6 +252,7 @@ export interface GameSettings {
       | 'crystals'
       | 'mega-shards'
       | 'pokedollars'
+      | 'fun-tokens'
       | 'battle-points'
       | 'berry-powder'
       | 'prof-scrip'

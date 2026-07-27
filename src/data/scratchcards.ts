@@ -12,6 +12,90 @@ export interface ScratchCardConfig {
 }
 
 export const scratchCards: Record<string, ScratchCardConfig> = {
+  'rocket-scratch': {
+    id: 'rocket-scratch',
+    name: 'Rocket Scratch Card',
+    background: '/scratchcard/rocket-scratch.avif',
+    rewards: [
+      {
+        chance: 55,
+        reward: [],
+        icon: { type: 'item', id: 'fun-token' },
+      },
+      {
+        chance: 25,
+        reward: [
+          {
+            type: 'currency',
+            targetId: 'fun-tokens',
+            quantity: 25,
+            label: '25 Fun Tokens',
+          },
+        ],
+        icon: { type: 'item', id: 'fun-token' },
+      },
+      {
+        chance: 10,
+        reward: [
+          {
+            type: 'currency',
+            targetId: 'fun-tokens',
+            quantity: 50,
+            label: '50 Fun Tokens',
+          },
+        ],
+        icon: { type: 'item', id: 'fun-token' },
+      },
+      {
+        chance: 5,
+        reward: [
+          {
+            type: 'currency',
+            targetId: 'fun-tokens',
+            quantity: 100,
+            label: '100 Fun Tokens',
+          },
+        ],
+        icon: { type: 'item', id: 'fun-token' },
+      },
+      {
+        chance: 3,
+        reward: [
+          {
+            type: 'item',
+            targetId: 'stardust',
+            quantity: 1,
+            label: 'Stardust',
+          },
+        ],
+        icon: { type: 'item', id: 'stardust' },
+      },
+      {
+        chance: 1.5,
+        reward: [
+          {
+            type: 'item',
+            targetId: 'nugget',
+            quantity: 1,
+            label: 'Nugget',
+          },
+        ],
+        icon: { type: 'item', id: 'nugget' },
+      },
+      {
+        chance: 0.5,
+        reward: [
+          {
+            type: 'currency',
+            targetId: 'fun-tokens',
+            quantity: 250,
+            label: '250 Fun Tokens',
+          },
+        ],
+        icon: { type: 'item', id: 'fun-token' },
+      },
+    ],
+  },
   'zap-n-scratch': {
     id: 'zap-n-scratch',
     name: 'Zap n Scratch',

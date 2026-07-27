@@ -88,10 +88,12 @@ encounterItems.push({
 encounterItems.push({
   id: 'chaos-stone',
   name: 'Chaos Stone',
-  description: 'Causes a chaotic effect when attempting to catch Pokemon',
-  category: 'misc',
+  description:
+    'A reusable key stone that has an equal chance to raise or lower catch progress by three stages.',
+  category: 'key',
   spriteId: 'everstone',
-  unique: false,
+  unique: true,
+  consume: false,
   skillRequirements: { catching: 40 },
 })
 

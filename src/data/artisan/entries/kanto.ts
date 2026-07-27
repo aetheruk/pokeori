@@ -70,24 +70,132 @@ const TYPE_HELD_ITEM_FAMILIES: Array<{
   lowId: string
   lowName: string
 }> = [
-  { type: 'normal', normalId: 'silk-scarf', normalName: 'Silk Scarf', lowId: 'cotton-scarf', lowName: 'Cotton Scarf' },
-  { type: 'fire', normalId: 'charcoal', normalName: 'Charcoal', lowId: 'dusty-charcoal', lowName: 'Dusty Charcoal' },
-  { type: 'water', normalId: 'mystic-water', normalName: 'Mystic Water', lowId: 'magic-water', lowName: 'Magic Water' },
-  { type: 'electric', normalId: 'magnet', normalName: 'Magnet', lowId: 'weak-magnet', lowName: 'Weak Magnet' },
-  { type: 'grass', normalId: 'miracle-seed', normalName: 'Miracle Seed', lowId: 'regular-seed', lowName: 'Regular Seed' },
-  { type: 'ice', normalId: 'never-melt-ice', normalName: 'Never-Melt Ice', lowId: 'often-melt-ice', lowName: 'Often-Melt Ice' },
-  { type: 'fighting', normalId: 'black-belt', normalName: 'Black Belt', lowId: 'brown-belt', lowName: 'Brown Belt' },
-  { type: 'poison', normalId: 'poison-barb', normalName: 'Poison Barb', lowId: 'poison-tip', lowName: 'Poison Tip' },
-  { type: 'ground', normalId: 'soft-sand', normalName: 'Soft Sand', lowId: 'coarse-sand', lowName: 'Coarse Sand' },
-  { type: 'flying', normalId: 'sharp-beak', normalName: 'Sharp Beak', lowId: 'dull-beak', lowName: 'Dull Beak' },
-  { type: 'psychic', normalId: 'twisted-spoon', normalName: 'Twisted Spoon', lowId: 'straight-spoon', lowName: 'Straight Spoon' },
-  { type: 'bug', normalId: 'silver-powder', normalName: 'Silver Powder', lowId: 'aluminium-powder', lowName: 'Aluminium Powder' },
-  { type: 'rock', normalId: 'hard-stone', normalName: 'Hard Stone', lowId: 'brittle-hard-stone', lowName: 'Brittle Hard Stone' },
-  { type: 'ghost', normalId: 'spell-tag', normalName: 'Spell Tag', lowId: 'faux-spell-tag', lowName: 'Faux Spell Tag' },
-  { type: 'dragon', normalId: 'dragon-fang', normalName: 'Dragon Fang', lowId: 'chipped-dragon-fang', lowName: 'Chipped Dragon Fang' },
-  { type: 'dark', normalId: 'black-glasses', normalName: 'Black Glasses', lowId: 'chipped-glasses', lowName: 'Chipped Glasses' },
-  { type: 'steel', normalId: 'metal-polish', normalName: 'Metal Polish', lowId: 'rusty-coat', lowName: 'Rusty Coat' },
-  { type: 'fairy', normalId: 'fairy-feather', normalName: 'Fairy Feather', lowId: 'fairy-down', lowName: 'Fairy Down' },
+  {
+    type: 'normal',
+    normalId: 'silk-scarf',
+    normalName: 'Silk Scarf',
+    lowId: 'cotton-scarf',
+    lowName: 'Cotton Scarf',
+  },
+  {
+    type: 'fire',
+    normalId: 'charcoal',
+    normalName: 'Charcoal',
+    lowId: 'dusty-charcoal',
+    lowName: 'Dusty Charcoal',
+  },
+  {
+    type: 'water',
+    normalId: 'mystic-water',
+    normalName: 'Mystic Water',
+    lowId: 'magic-water',
+    lowName: 'Magic Water',
+  },
+  {
+    type: 'electric',
+    normalId: 'magnet',
+    normalName: 'Magnet',
+    lowId: 'weak-magnet',
+    lowName: 'Weak Magnet',
+  },
+  {
+    type: 'grass',
+    normalId: 'miracle-seed',
+    normalName: 'Miracle Seed',
+    lowId: 'regular-seed',
+    lowName: 'Regular Seed',
+  },
+  {
+    type: 'ice',
+    normalId: 'never-melt-ice',
+    normalName: 'Never-Melt Ice',
+    lowId: 'often-melt-ice',
+    lowName: 'Often-Melt Ice',
+  },
+  {
+    type: 'fighting',
+    normalId: 'black-belt',
+    normalName: 'Black Belt',
+    lowId: 'brown-belt',
+    lowName: 'Brown Belt',
+  },
+  {
+    type: 'poison',
+    normalId: 'poison-barb',
+    normalName: 'Poison Barb',
+    lowId: 'poison-tip',
+    lowName: 'Poison Tip',
+  },
+  {
+    type: 'ground',
+    normalId: 'soft-sand',
+    normalName: 'Soft Sand',
+    lowId: 'coarse-sand',
+    lowName: 'Coarse Sand',
+  },
+  {
+    type: 'flying',
+    normalId: 'sharp-beak',
+    normalName: 'Sharp Beak',
+    lowId: 'dull-beak',
+    lowName: 'Dull Beak',
+  },
+  {
+    type: 'psychic',
+    normalId: 'twisted-spoon',
+    normalName: 'Twisted Spoon',
+    lowId: 'straight-spoon',
+    lowName: 'Straight Spoon',
+  },
+  {
+    type: 'bug',
+    normalId: 'silver-powder',
+    normalName: 'Silver Powder',
+    lowId: 'aluminium-powder',
+    lowName: 'Aluminium Powder',
+  },
+  {
+    type: 'rock',
+    normalId: 'hard-stone',
+    normalName: 'Hard Stone',
+    lowId: 'brittle-hard-stone',
+    lowName: 'Brittle Hard Stone',
+  },
+  {
+    type: 'ghost',
+    normalId: 'spell-tag',
+    normalName: 'Spell Tag',
+    lowId: 'faux-spell-tag',
+    lowName: 'Faux Spell Tag',
+  },
+  {
+    type: 'dragon',
+    normalId: 'dragon-fang',
+    normalName: 'Dragon Fang',
+    lowId: 'chipped-dragon-fang',
+    lowName: 'Chipped Dragon Fang',
+  },
+  {
+    type: 'dark',
+    normalId: 'black-glasses',
+    normalName: 'Black Glasses',
+    lowId: 'chipped-glasses',
+    lowName: 'Chipped Glasses',
+  },
+  {
+    type: 'steel',
+    normalId: 'metal-polish',
+    normalName: 'Metal Polish',
+    lowId: 'rusty-coat',
+    lowName: 'Rusty Coat',
+  },
+  {
+    type: 'fairy',
+    normalId: 'fairy-feather',
+    normalName: 'Fairy Feather',
+    lowId: 'fairy-down',
+    lowName: 'Fairy Down',
+  },
 ]
 
 const ELEMENTAL_STONE_RECIPES = [
@@ -649,6 +757,63 @@ const POKE_POWDER_RECIPES: ArtisanRecipeDraft[] = candyItems.map((candy, index) 
 })
 
 const ITEM_RECIPES: ArtisanRecipeDraft[] = [
+  ...[
+    {
+      id: 'x-attack',
+      name: 'X Attack',
+      artisanLevel: 32,
+      materialId: 'grip-weave-t1',
+      description: 'Blend fighting fibres into a sharp Attack-boosting battle tonic.',
+    },
+    {
+      id: 'x-defense',
+      name: 'X Defense',
+      artisanLevel: 32,
+      materialId: 'small-stone-t1',
+      description: 'Grind protective stone dust into a sturdy Defense tonic.',
+    },
+    {
+      id: 'x-sp-atk',
+      name: 'X Sp. Atk',
+      artisanLevel: 32,
+      materialId: 'mind-thread-t1',
+      description: 'Steep psychic threads into a focused Sp. Atk tonic.',
+    },
+    {
+      id: 'x-sp-def',
+      name: 'X Sp. Def',
+      artisanLevel: 32,
+      materialId: 'spirit-wisp-t1',
+      description: 'Distil spectral wisps into a calming Sp. Def tonic.',
+    },
+    {
+      id: 'x-speed',
+      name: 'X Speed',
+      artisanLevel: 32,
+      materialId: 'wing-feather-t1',
+      description: 'Whip wing feathers into a quick-moving Speed tonic.',
+    },
+    {
+      id: 'dire-hit',
+      name: 'Dire Hit',
+      artisanLevel: 36,
+      materialId: 'toxic-resin-t1',
+      description: 'Mix potent resin into a battle tonic that sharpens critical focus.',
+    },
+  ].map((recipe) => ({
+    id: `craft-${recipe.id}`,
+    name: recipe.name,
+    description: recipe.description,
+    artisanLevel: recipe.artisanLevel,
+    requirements: [{ type: 'task_completed' as const, targetId: `${recipe.id}-recipe` }],
+    costs: [
+      { id: 'poke-powder-s', amount: 1 },
+      { id: recipe.materialId, amount: 2 },
+    ],
+    rewards: [{ type: 'item' as const, targetId: recipe.id, quantity: 1, dropChance: 100 }],
+    craftType: 'mix' as const,
+    bulk: 3,
+  })),
   {
     id: 'craft-battle-observer',
     name: 'Battle Observer',
@@ -800,7 +965,8 @@ const ITEM_RECIPES: ArtisanRecipeDraft[] = [
   {
     id: 'mix-paralyze-heal',
     name: 'Paralyze Heal',
-    description: 'Mix fine powder, Cheri Berry, and Electric-type components into a paralysis remedy.',
+    description:
+      'Mix fine powder, Cheri Berry, and Electric-type components into a paralysis remedy.',
     artisanLevel: 22,
     costs: [
       { id: 'poke-powder-xs', amount: 2 },
@@ -961,31 +1127,29 @@ const HELD_RECIPES: ArtisanRecipeDraft[] = TYPE_HELD_ITEM_FAMILIES.flatMap((fami
   ]
 })
 
-const ELEMENTAL_STONE_HELD_RECIPES: ArtisanRecipeDraft[] = ELEMENTAL_STONE_RECIPES.map(
-  (stone) => ({
-    id: `craft-${stone.outputId}`,
-    name: `Inferior ${stone.label} Stone`,
-    description: `Fuse elemental gems into an Inferior ${stone.label} Stone. Only a perfect craft binds the stone.`,
-    artisanLevel: 30,
-    costs: [
-      { id: stone.gemId, amount: 10 },
-      { id: `${TYPE_PRIMARY_MATERIAL[stone.materialType]}-t1`, amount: 100 },
-      { id: 'neutral-stone', amount: 1 },
-      { id: 'crystals', amount: 1000, type: 'currency' },
-    ],
-    rewards: [{ type: 'item', targetId: stone.outputId, quantity: 1, dropChance: 100 }],
-    outputQuantity: { min: 1, max: 1 },
-    qualityOutputQuantity: { perfect: 1 },
-    minimumQuality: 'perfect',
-    iconItemId: stone.outputId,
-    requirements: [
-      {
-        type: 'task_completed',
-        targetId: 'elemental-stones-recipe',
-      },
-    ],
-  }),
-)
+const ELEMENTAL_STONE_HELD_RECIPES: ArtisanRecipeDraft[] = ELEMENTAL_STONE_RECIPES.map((stone) => ({
+  id: `craft-${stone.outputId}`,
+  name: `Inferior ${stone.label} Stone`,
+  description: `Fuse elemental gems into an Inferior ${stone.label} Stone. Only a perfect craft binds the stone.`,
+  artisanLevel: 30,
+  costs: [
+    { id: stone.gemId, amount: 10 },
+    { id: `${TYPE_PRIMARY_MATERIAL[stone.materialType]}-t1`, amount: 100 },
+    { id: 'neutral-stone', amount: 1 },
+    { id: 'crystals', amount: 1000, type: 'currency' },
+  ],
+  rewards: [{ type: 'item', targetId: stone.outputId, quantity: 1, dropChance: 100 }],
+  outputQuantity: { min: 1, max: 1 },
+  qualityOutputQuantity: { perfect: 1 },
+  minimumQuality: 'perfect',
+  iconItemId: stone.outputId,
+  requirements: [
+    {
+      type: 'task_completed',
+      targetId: 'elemental-stones-recipe',
+    },
+  ],
+}))
 
 const CONCENTRATED_ELEMENT_RECIPES: ArtisanRecipeDraft[] = [
   {
@@ -1010,7 +1174,8 @@ const CONCENTRATED_ELEMENT_RECIPES: ArtisanRecipeDraft[] = [
   {
     id: 'craft-concentrated-thunder',
     name: 'Concentrated Thunder',
-    description: 'Refine a lifeless thunder stone with Rainbow Feather energy and dense PokePowder.',
+    description:
+      'Refine a lifeless thunder stone with Rainbow Feather energy and dense PokePowder.',
     artisanLevel: 50,
     costs: [
       { id: 'rainbow-feather', amount: 1 },
@@ -1051,7 +1216,8 @@ const CONCENTRATED_BRANCH_RECIPES: ArtisanRecipeDraft[] = [
   {
     id: 'craft-concentrated-flaming-branch',
     name: 'Concentrated Flaming Branch',
-    description: 'Refine a lifeless flaming branch with Silver Feather energy and dense PokePowder.',
+    description:
+      'Refine a lifeless flaming branch with Silver Feather energy and dense PokePowder.',
     artisanLevel: 35,
     costs: [
       { id: 'silver-feather', amount: 1 },
@@ -1072,7 +1238,8 @@ const CONCENTRATED_BRANCH_RECIPES: ArtisanRecipeDraft[] = [
   {
     id: 'craft-concentrated-charged-branch',
     name: 'Concentrated Charged Branch',
-    description: 'Refine a lifeless charged branch with Silver Feather energy and dense PokePowder.',
+    description:
+      'Refine a lifeless charged branch with Silver Feather energy and dense PokePowder.',
     artisanLevel: 35,
     costs: [
       { id: 'silver-feather', amount: 1 },

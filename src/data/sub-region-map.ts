@@ -210,6 +210,9 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/game-corner.avif',
     description: 'A haven of games for those wanting to lose their money.',
     music: '/music/minigame.mp3',
+    unlockRequirements: [
+      { type: 'task_completed', targetId: 'when-the-fun-stops' },
+    ],
   },
   'Saffron City': {
     category: 'Saffron City',

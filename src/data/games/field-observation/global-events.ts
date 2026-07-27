@@ -84,6 +84,16 @@ export const fieldObservationGlobalPokemonEvents: FieldObservationGlobalPokemonE
 
 export const fieldObservationGlobalItemEvents: FieldObservationGlobalItemEvent[] = [
   {
+    id: 'global-field-observation-neutral-stone',
+    itemId: 'neutral-stone',
+    dropChance: 100 / 35,
+    guaranteed: true,
+    requirements: [
+      { type: 'skill_level', targetId: 'researching', count: 32 },
+      { type: 'task_completed', targetId: 'a-craftsmans-secret' },
+    ],
+  },
+  {
     id: 'global-field-observation-repel',
     itemId: 'repel',
     dropChance: 5,

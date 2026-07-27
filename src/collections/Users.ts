@@ -121,6 +121,11 @@ export const Users: CollectionConfig = {
           defaultValue: 0,
         },
         {
+          name: 'fun-tokens',
+          type: 'number',
+          defaultValue: 0,
+        },
+        {
           name: 'battle-points',
           type: 'number',
           defaultValue: 0,

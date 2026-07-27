@@ -1,5 +1,5 @@
-import { testPachinkoEntries } from './entries/test'
+import { celadonGameCornerPachinkoEntries } from './entries/celadon-game-corner'
 
 export * from './types'
 
-export const pachinkoGames = [...testPachinkoEntries]
+export const pachinkoGames = [...celadonGameCornerPachinkoEntries]

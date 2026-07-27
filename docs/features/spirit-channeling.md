@@ -10,4 +10,4 @@ Spirit Channeling is a gated side activity launched from eligible memento items 
 - Failed attempts consume nothing. Successful attempts consume only the selected offering quantities, grant the config rewards, and mark that memento channeling complete.
 - Completion is tracked in user activity stats under the research activity id `spirit-channeling:{mementoItemId}`.
 
-The v1 starter test config is the dev-only Dev Memento, Dev Incense, 3 Water energy, and a level 10+ Psychic-type Pokemon, rewarding a level 10 Gastly.
+The first authored ritual is Fuji's Glasses Memory, which uses Memory Incense, 5 Ground energy, and a level 5+ Psychic-type Pokemon to unlock the Mr. Fuji Pokemon Tower Chronicle.

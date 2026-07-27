@@ -16,10 +16,7 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { headers } from 'next/headers'
 import { getQuizData } from '@/data/quiz'
-import {
-  generatePokemonStats,
-  computeStats,
-} from '@/utilities/pokemon/pokemon-mechanics'
+import { generatePokemonStats, computeStats } from '@/utilities/pokemon/pokemon-mechanics'
 import { incrementDailyTaskProgress } from '@/utilities/tasks/daily-progress'
 import { grantRewards } from '@/utilities/rewards/reward-logic'
 import { recordExpeditionActivityResult } from '@/utilities/expeditions/actions'
@@ -29,10 +26,7 @@ import {
   applyAnswerAbility,
   getStoredEncounterAbility,
 } from '@/utilities/pokemon/encounter-ability-runtime'
-import {
-  checkRequirement,
-  type RequirementData,
-} from '@/utilities/requirements'
+import { checkRequirement, type RequirementData } from '@/utilities/requirements'
 import type { User } from '@/payload-types'
 import { getGameUserData } from '@/utilities/game-data'
 import { analyzeRequirements } from '@/utilities/requirements/analysis'
@@ -71,10 +65,7 @@ import {
   serializeEncounterQte,
   shouldRollEncounterQte,
 } from '@/utilities/pokemon/encounter-qte'
-import {
-  ENCOUNTER_MECHANICS_LOCK_TTL,
-  getEncounterMechanicsLockKey,
-} from './lock'
+import { ENCOUNTER_MECHANICS_LOCK_TTL, getEncounterMechanicsLockKey } from './lock'
 import { buildEncounterQuizQuestion } from './quiz-question'
 
 async function rollNextQtePromptIfReady({
@@ -143,13 +134,7 @@ async function failEncounterFromAbility(
 
   if (state.locationId.startsWith('fishing:')) {
     const gameId = state.locationId.replace('fishing:', '')
-    await incrementUserActivityResult(
-      payload as any,
-      user.id,
-      'gameResults',
-      gameId,
-      { losses: 1 },
-    )
+    await incrementUserActivityResult(payload as any, user.id, 'gameResults', gameId, { losses: 1 })
   }
 
   const expeditionResult = await recordExpeditionActivityResult(
@@ -169,9 +154,7 @@ export async function getQuizQuestion(
 ) {
   try {
     const user = await getUser()
-    const state = user
-      ? ((await redis.get(`encounter:${user.id}`)) as EncounterState | null)
-      : null
+    const state = user ? ((await redis.get(`encounter:${user.id}`)) as EncounterState | null) : null
     return buildEncounterQuizQuestion({ pokemonId, kidMode, formId, state })
   } catch (error) {
     console.error('Error loading quiz:', error)
@@ -239,8 +222,7 @@ export async function applyEncounterPromptResult({
   isCorrect = answerAbilityResult.isCorrect
 
   if (promptType === 'question') {
-    state.normalQuestionsSinceLastQte =
-      (state.normalQuestionsSinceLastQte || 0) + 1
+    state.normalQuestionsSinceLastQte = (state.normalQuestionsSinceLastQte || 0) + 1
   } else {
     state.normalQuestionsSinceLastQte = 0
   }
@@ -250,21 +232,12 @@ export async function applyEncounterPromptResult({
     state.consecutiveCorrectAnswers = (state.consecutiveCorrectAnswers || 0) + 1
     const shieldResult = applyCorrectAnswerToShield(state, now)
     if (!shieldResult.wasShielded) {
-      const defaultIncrease = answerAbilityResult.skipDefault
-        ? 0
-        : changeAmount * rateMultiplier
-      const rateIncrease =
-        defaultIncrease + (answerAbilityResult.rateDelta || 0)
-      state.currentCatchRate = Math.min(
-        255,
-        state.currentCatchRate + rateIncrease,
-      )
+      const defaultIncrease = answerAbilityResult.skipDefault ? 0 : changeAmount * rateMultiplier
+      const rateIncrease = defaultIncrease + (answerAbilityResult.rateDelta || 0)
+      state.currentCatchRate = Math.min(255, state.currentCatchRate + rateIncrease)
     }
     if (answerAbilityResult.timerDeltaMs) {
-      state.expiry = Math.max(
-        Date.now() + 1000,
-        state.expiry + answerAbilityResult.timerDeltaMs,
-      )
+      state.expiry = Math.max(Date.now() + 1000, state.expiry + answerAbilityResult.timerDeltaMs)
     }
     state.questionsAnswered.push(promptId)
     if (promptType === 'qte') state.qte = undefined
@@ -316,10 +289,7 @@ export async function applyEncounterPromptResult({
 
   if (!wasShielded) {
     if (!answerAbilityResult.skipDefault) {
-      state.currentCatchRate = Math.max(
-        0,
-        state.currentCatchRate - changeAmount / 2,
-      )
+      state.currentCatchRate = Math.max(0, state.currentCatchRate - changeAmount / 2)
     }
     if (answerAbilityResult.rateDelta) {
       state.currentCatchRate = Math.max(
@@ -329,10 +299,7 @@ export async function applyEncounterPromptResult({
     }
   }
   if (answerAbilityResult.timerDeltaMs) {
-    state.expiry = Math.max(
-      Date.now() + 1000,
-      state.expiry + answerAbilityResult.timerDeltaMs,
-    )
+    state.expiry = Math.max(Date.now() + 1000, state.expiry + answerAbilityResult.timerDeltaMs)
   }
   state.questionsAnswered.push(promptId)
   if (promptType === 'qte') state.qte = undefined
@@ -357,12 +324,7 @@ export async function submitAnswer(
     const user = await getUser()
     if (!user) return { success: false, error: 'Unauthorized' }
 
-    const rateLimit = await checkActionRateLimit(
-      user.id,
-      'encounter-submit-answer',
-      240,
-      60,
-    )
+    const rateLimit = await checkActionRateLimit(user.id, 'encounter-submit-answer', 240, 60)
     if (!rateLimit.allowed) {
       return {
         success: false,
@@ -386,9 +348,7 @@ export async function submitAnswer(
       const state = (await redis.get(encounterId)) as EncounterState | null
 
       if (!state) {
-        const recentAnswer = await getIdempotentResult<any>(
-          `encounter:answer:last:${user.id}`,
-        )
+        const recentAnswer = await getIdempotentResult<any>(`encounter:answer:last:${user.id}`)
         if (recentAnswer) {
           return recentAnswer
         }
@@ -466,11 +426,7 @@ export async function submitAnswer(
       }
       const ttl = (response as any).encounterFailed ? 300 : 120
       await setIdempotentResult(resultKey, response, ttl)
-      await setIdempotentResult(
-        `encounter:answer:last:${user.id}`,
-        response,
-        ttl,
-      )
+      await setIdempotentResult(`encounter:answer:last:${user.id}`, response, ttl)
       return response
     } finally {
       await releaseActionLock(mechanicsLock)
@@ -488,12 +444,7 @@ export async function useEncounterItem(itemId: string) {
     const user = await getUser()
     if (!user) return { success: false, error: 'Unauthorized' }
 
-    const rateLimit = await checkActionRateLimit(
-      user.id,
-      'encounter-use-item',
-      80,
-      60,
-    )
+    const rateLimit = await checkActionRateLimit(user.id, 'encounter-use-item', 80, 60)
     if (!rateLimit.allowed) {
       return {
         success: false,
@@ -519,9 +470,7 @@ export async function useEncounterItem(itemId: string) {
       const state = (await redis.get(encounterId)) as EncounterState | null
 
       if (!state) {
-        const recentUseItem = await getIdempotentResult<any>(
-          `encounter:item:last:${user.id}`,
-        )
+        const recentUseItem = await getIdempotentResult<any>(`encounter:item:last:${user.id}`)
         if (recentUseItem) {
           return recentUseItem
         }
@@ -540,9 +489,7 @@ export async function useEncounterItem(itemId: string) {
 
       refreshEncounterShield(state)
 
-      const itemUseLimit = getExplorerEncounterItemLimit(
-        getSkillLevel(user.skills, 'catching'),
-      )
+      const itemUseLimit = getExplorerEncounterItemLimit(getSkillLevel(user.skills, 'catching'))
       if ((state.itemsUsed || []).length >= itemUseLimit) {
         return {
           success: false,
@@ -558,10 +505,7 @@ export async function useEncounterItem(itemId: string) {
       }
 
       const itemDef = items.find((i) => i.id === itemId)
-      if (
-        !itemDef ||
-        (!isMidEncounterUsableItem(itemDef) && !isPreEncounterOnlyItem(itemDef))
-      ) {
+      if (!itemDef || (!isMidEncounterUsableItem(itemDef) && !isPreEncounterOnlyItem(itemDef))) {
         return { success: false, error: 'Invalid item' }
       }
       const skillLockReason = getItemSkillLockReason(itemDef, user.skills)
@@ -574,8 +518,7 @@ export async function useEncounterItem(itemId: string) {
       let expeditionProgress: any
 
       // Get Species Data for Logic
-      const species =
-        getPokemonForm(state.formId) || getPokemonSpecies(state.pokemonId)
+      const species = getPokemonForm(state.formId) || getPokemonSpecies(state.pokemonId)
       if (!species) return { success: false, error: 'Pokemon data not found' }
       const lureType = getTypeLureType(itemId)
       const secondChanceModifier = getEncounterSecondChanceModifier(itemDef)
@@ -623,61 +566,39 @@ export async function useEncounterItem(itemId: string) {
         if (state.shield?.active) {
           message = `Used ${itemDef.name}, but the shield blocked the catch-rate boost!`
         } else {
-          newRate = Math.min(
-            255,
-            state.currentCatchRate + lureMultiplier * stageValue,
-          )
+          newRate = Math.min(255, state.currentCatchRate + lureMultiplier * stageValue)
           message = `Used ${itemDef.name}! Catch rate increased!`
         }
       }
       // 4. Second Chance support items
       else if (secondChanceModifier > 0) {
-        state.secondChanceModifier =
-          (state.secondChanceModifier || 0) + secondChanceModifier
+        state.secondChanceModifier = (state.secondChanceModifier || 0) + secondChanceModifier
         message = `Used ${itemDef.name}! Second Chance increased by ${secondChanceModifier}%.`
       }
       // 5. Chaos Stone
       else if (itemId === 'chaos-stone') {
-        const roll = Math.random()
-        if (roll < 0.33) {
-          // Flee
-          const runAwayResult = await runAway()
-          if (!runAwayResult.success) {
-            return {
-              success: false,
-              error: runAwayResult.message || 'Failed to flee',
-            }
-          }
-          expeditionProgress = (runAwayResult as any)?.expeditionProgress
-          fled = true
-          message = 'The Chaos Stone caused the Pokemon to flee!'
-        } else if (roll < 0.66) {
-          // +5 Stages
-          const speciesData = getPokemonSpecies(state.pokemonId)
-          const baseRate = speciesData?.capture_rate || 100
-          const stageValue = Math.min(10, baseRate / 6)
+        const speciesData = getPokemonSpecies(state.pokemonId)
+        const baseRate = speciesData?.capture_rate || 100
+        const stageValue = Math.min(10, baseRate / 6)
 
+        if (Math.random() < 0.5) {
           if (state.shield?.active) {
-            message =
-              'The Chaos Stone surged, but the shield blocked the catch-rate boost!'
+            message = 'The Chaos Stone surged, but the shield blocked the catch-rate boost!'
           } else {
-            newRate = Math.min(255, state.currentCatchRate + 5 * stageValue)
-            message = 'Chaos Stone greatly increased catch rate!'
+            newRate = Math.min(255, state.currentCatchRate + 3 * stageValue)
+            message = 'Chaos Stone increased catch rate by three stages!'
           }
         } else {
-          // -5 Stages
-          const speciesData = getPokemonSpecies(state.pokemonId)
-          const baseRate = speciesData?.capture_rate || 100
-          const stageValue = Math.min(10, baseRate / 6)
-
-          newRate = Math.max(0, state.currentCatchRate - 5 * stageValue)
-          message = 'Chaos Stone drastically reduced catch rate!'
+          newRate = Math.max(0, state.currentCatchRate - 3 * stageValue)
+          message = 'Chaos Stone reduced catch rate by three stages!'
         }
       }
 
-      // Decrement Inventory
-      inventory[itemId] = qty - 1
-      await setUserInventoryMap(payload as any, user.id, inventory)
+      // Key encounter tools such as Chaos Stone persist after use.
+      if (itemDef.consume !== false) {
+        inventory[itemId] = qty - 1
+        await setUserInventoryMap(payload as any, user.id, inventory)
+      }
 
       if (fled) {
         const response = {
@@ -687,11 +608,7 @@ export async function useEncounterItem(itemId: string) {
           expeditionProgress,
         }
         await setIdempotentResult(resultKey, response, 120)
-        await setIdempotentResult(
-          `encounter:item:last:${user.id}`,
-          response,
-          120,
-        )
+        await setIdempotentResult(`encounter:item:last:${user.id}`, response, 120)
         return response
       }
 
@@ -699,10 +616,7 @@ export async function useEncounterItem(itemId: string) {
       state.currentCatchRate = newRate
       state.itemsUsed = [...(state.itemsUsed || []), itemId]
 
-      const encounterTtl = Math.max(
-        60,
-        Math.floor((state.expiry - Date.now()) / 1000) + 60,
-      )
+      const encounterTtl = Math.max(60, Math.floor((state.expiry - Date.now()) / 1000) + 60)
       await redis.set(encounterId, state, {
         ex: encounterTtl,
       })

@@ -400,6 +400,28 @@ export const authoredSkillGuideUnlocks: SkillGuideUnlock[] = [
     source: 'authored',
     icon: { type: 'local', id: '/sprites/items/egg.avif' },
   },
+  {
+    skillId: 'researching',
+    level: 32,
+    category: 'items',
+    label: 'Neutral Stones',
+    description:
+      'Find Neutral Stones in Field Observation after learning the Gentleman’s stonecraft.',
+    source: 'authored',
+    itemId: 'neutral-stone',
+    icon: itemIcon('neutral-stone'),
+  },
+  {
+    skillId: 'artisan',
+    level: 30,
+    category: 'items',
+    label: 'Elemental Stonecraft',
+    description:
+      'Craft chargeable Inferior Elemental Stones after learning the Gentleman’s recipes.',
+    source: 'authored',
+    itemId: 'neutral-stone',
+    icon: itemIcon('neutral-stone'),
+  },
   ...fieldObservationResearchUnlocks,
   ...fieldObservationMaterialUnlocks,
   ...nutUnlocks,

@@ -1,5 +1,6 @@
 import type { AbilityAssignment, AbilityConfig } from './abilities/types'
 import { CANONICAL_ABILITIES } from './abilities/canonical-generated'
+import { customAbilities } from './abilities/custom'
 import {
   ABILITY_GLOBAL_MAP,
   ABILITY_TYPE_MAP,
@@ -41,7 +42,10 @@ export {
   resolveAbilityForms,
 } from './abilities/forms'
 
-const ALL_ABILITIES: AbilityConfig[] = [...CANONICAL_ABILITIES]
+const ALL_ABILITIES: AbilityConfig[] = [
+  ...CANONICAL_ABILITIES,
+  ...customAbilities,
+]
 
 export const ABILITIES: Record<string, AbilityConfig> = Object.fromEntries(
   ALL_ABILITIES.map((ability) => [

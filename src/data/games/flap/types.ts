@@ -21,6 +21,11 @@ export interface FlapGameConfig extends BaseGameConfig {
     parallaxLayers: ParallaxLayer[] // Background layers
     scene?: SideScrollerSceneConfig
     timeLimit?: number // Optional time limit
+    /** Charged once when a new run starts; restored sessions are not charged again. */
+    entryCost?: {
+      currencyType: 'pokedollars'
+      amount: number
+    }
     // Flap-specific physics
     gravity: number // Downward acceleration per frame
     flapForce: number // Upward velocity on flap

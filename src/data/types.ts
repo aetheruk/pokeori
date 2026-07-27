@@ -3,6 +3,7 @@ import { StatusEffectId } from './moves/types'
 import type { SkillXpConfig } from './skills/xp'
 import type { TrainerClassId } from './trainers'
 import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
+import type { PokemonTypeName } from './items/types'
 
 export * from './tasks/types'
 export * from './moves/types'
@@ -37,6 +38,8 @@ export interface Reward {
     | 'increase_max_pokemon'
     | 'increase_max_boxes'
     | 'pokemon_research_xp'
+    | 'active_companion_friendship'
+    | 'active_companion_research_xp'
     | 'egg'
   targetId?: string | number // Changed: Now used for currency type (e.g. 'crystals')
   skill?: string
@@ -207,6 +210,8 @@ export interface BattleConfig {
   trainerItems?: TrainerBattleItemConfig[]
   rewards: LocationReward[]
   levelCap?: number // Optional level cap for player?
+  /** Player Battle Team members with these types cannot enter this battle. */
+  bannedPlayerTypes?: PokemonTypeName[]
   maxPokemon: number // Required, 1-6
   itemsPerBattle?: number // Optional hard cap against the Trainer skill item-use limit
   allowedItems?: string[] // Item IDs allowed in battle, empty = all battle items
@@ -245,11 +250,7 @@ export interface ResearchConfig {
   category: string
   subCategory?: string
   type:
-    | 'whos-that-pokemon'
-    | 'quick-identify'
-    | 'pokemon-snap'
-    | 'cry-recognition'
-    | 'research-compare'
+    'whos-that-pokemon' | 'quick-identify' | 'pokemon-snap' | 'cry-recognition' | 'research-compare'
   icon: TaskIcon
   requirements: TaskCondition[]
   criteria?: TaskCondition[]

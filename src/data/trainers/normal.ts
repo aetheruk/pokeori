@@ -2,7 +2,9 @@ import type { TrainerClass } from './types'
 
 export const normalTrainerClasses = [
   { id: 'beauty', name: 'Beauty', spriteId: '/sprites/trainers/beauty.avif', payoutModifier: 70, gender: 'f', kind: 'normal', special: false, vsSeeker: true },
+  { id: 'bird-keeper', name: 'Birdkeeper', spriteId: '/sprites/trainers/bird-keeper.avif', payoutModifier: 25, gender: 'm', kind: 'normal', special: false },
   { id: 'black-belt', name: 'Black Belt', spriteId: '/sprites/trainers/black-belt.avif', payoutModifier: 25, gender: 'm', kind: 'normal', special: false, vsSeeker: true },
+  { id: 'butler', name: 'Butler', spriteId: '/sprites/trainers/butler.avif', payoutModifier: 50, gender: 'm', kind: 'normal', special: false },
   { id: 'breeder-f', name: 'Breeder', spriteId: '/sprites/trainers/breeder-f.avif', payoutModifier: 40, gender: 'f', kind: 'normal', special: false, vsSeeker: true },
   { id: 'breeder-m', name: 'Breeder', spriteId: '/sprites/trainers/breeder-m.avif', payoutModifier: 40, gender: 'm', kind: 'normal', special: false, vsSeeker: true },
   { id: 'bug-catcher', name: 'Bug Catcher', spriteId: '/sprites/trainers/bug-catcher.avif', payoutModifier: 10, gender: 'm', kind: 'normal', special: false, vsSeeker: true },
@@ -19,6 +21,7 @@ export const normalTrainerClasses = [
   { id: 'hex-maniac', name: 'Hex Maniac', spriteId: '/sprites/trainers/hex-maniac.avif', payoutModifier: 32, gender: 'f', kind: 'normal', special: false, vsSeeker: true },
   { id: 'hiker', name: 'Hiker', spriteId: '/sprites/trainers/hiker.avif', payoutModifier: 35, gender: 'm', kind: 'normal', special: false, vsSeeker: true },
   { id: 'lass', name: 'Lass', spriteId: '/sprites/trainers/lass.avif', payoutModifier: 15, gender: 'f', kind: 'normal', special: false, vsSeeker: true },
+  { id: 'maid', name: 'Maid', spriteId: '/sprites/trainers/maid.avif', payoutModifier: 50, gender: 'f', kind: 'normal', special: false, vsSeeker: true },
   { id: 'old-couple', name: 'Old Couple', spriteId: '/sprites/trainers/old-couple.avif', payoutModifier: 40, gender: 'm', kind: 'normal', special: false },
   { id: 'nurse', name: 'Nurse', spriteId: '/sprites/trainers/nurse.avif', payoutModifier: 20, gender: 'f', kind: 'normal', special: false },
   { id: 'picnicker', name: 'Picnicker', spriteId: '/sprites/trainers/picknicker.avif', payoutModifier: 20, gender: 'f', kind: 'normal', special: false, vsSeeker: true },
@@ -44,6 +47,7 @@ export const normalTrainerClasses = [
   { id: 'sailor', name: 'Sailor', spriteId: '/sprites/trainers/sailor.avif', payoutModifier: 30, gender: 'm', kind: 'normal', special: false, vsSeeker: true },
   { id: 'school-kid-f', name: 'School Kid', spriteId: '/sprites/trainers/school-kid-f.avif', payoutModifier: 15, gender: 'f', kind: 'normal', special: false, vsSeeker: true },
   { id: 'school-kid-m', name: 'School Kid', spriteId: '/sprites/trainers/school-kid-m.avif', payoutModifier: 15, gender: 'm', kind: 'normal', special: false, vsSeeker: true },
+  { id: 'socialite', name: 'Socialite', spriteId: '/sprites/trainers/socialite.avif', payoutModifier: 70, gender: 'f', kind: 'normal', special: false, vsSeeker: true },
   { id: 'super-nerd', name: 'Super Nerd', spriteId: '/sprites/trainers/super-nerd.avif', payoutModifier: 25, gender: 'm', kind: 'normal', special: false, vsSeeker: true },
   { id: 'swimmer-f', name: 'Swimmer', spriteId: '/sprites/trainers/swimmer-f.avif', payoutModifier: 5, gender: 'f', kind: 'normal', special: false, vsSeeker: true },
   { id: 'swimmer-m', name: 'Swimmer', spriteId: '/sprites/trainers/swimmer-m.avif', payoutModifier: 5, gender: 'm', kind: 'normal', special: false, vsSeeker: true },

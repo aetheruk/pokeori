@@ -1,4 +1,9 @@
 import type { MoveConfig } from '../types'
+import pokemonData, { type PokemonData } from '@/data/pokemon-data'
+
+const ALL_POKEMON_FORM_IDS = (pokemonData as PokemonData).flatMap((species) =>
+  species.forms.map((form) => form.id),
+)
 
 export const NORMAL_TM_MOVES: MoveConfig[] = [
   {
@@ -650,7 +655,7 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
     description:
       'The user lunges at the target at a speed that makes it almost impossible to counter.',
     stance: 'speed',
-    damage: 0.5,
+    damage: 0.2,
     level: 5,
     target: 'enemy',
     accuracy: 100,
@@ -671,6 +676,160 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
         message: '{attacker} was not faster, so {move} failed!',
       },
     },
+    formId: ALL_POKEMON_FORM_IDS,
+  },
+  {
+    id: 'slow-strike',
+    name: 'Slow Strike',
+    description: 'A careful strike that lands only when the user moves after its target.',
+    stance: 'speed',
+    damage: 0.2,
+    level: 5,
+    target: 'enemy',
+    forcedType: 'normal',
+    accuracy: 100,
+    contest: {
+      attackerMetric: 'effective-stat:speed',
+      defenderMetric: 'effective-stat:speed',
+      comparison: 'lessThan',
+      success: {
+        damageMultiplier: 1,
+        preventCounter: true,
+        result: 'win',
+        message: '{attacker} waited for an opening and avoided the counterattack!',
+      },
+      failure: {
+        damageMultiplier: 0,
+        failMove: true,
+        result: 'loss',
+        message: '{attacker} was not slower, so {move} failed!',
+      },
+    },
+    formId: ALL_POKEMON_FORM_IDS,
+  },
+  {
+    id: 'mighty-charge',
+    name: 'Mighty Charge',
+    description: 'A forceful charge that lands only when the user has higher Attack.',
+    stance: 'power',
+    damage: 0.2,
+    level: 5,
+    target: 'enemy',
+    forcedType: 'normal',
+    accuracy: 100,
+    contest: {
+      attackerMetric: 'effective-stat:attack',
+      defenderMetric: 'effective-stat:attack',
+      comparison: 'greaterThan',
+      success: {
+        damageMultiplier: 1,
+        preventCounter: true,
+        result: 'win',
+        message: '{attacker} overpowered the target and avoided the counterattack!',
+      },
+      failure: {
+        damageMultiplier: 0,
+        failMove: true,
+        result: 'loss',
+        message: '{attacker} was not stronger, so {move} failed!',
+      },
+    },
+    formId: ALL_POKEMON_FORM_IDS,
+  },
+  {
+    id: 'accidental-tap',
+    name: 'Accidental Tap',
+    description: 'An unexpected tap that lands only when the user has lower Attack.',
+    stance: 'power',
+    damage: 0.2,
+    level: 5,
+    target: 'enemy',
+    forcedType: 'normal',
+    accuracy: 100,
+    contest: {
+      attackerMetric: 'effective-stat:attack',
+      defenderMetric: 'effective-stat:attack',
+      comparison: 'lessThan',
+      success: {
+        damageMultiplier: 1,
+        preventCounter: true,
+        result: 'win',
+        message: '{attacker} caught the target off guard and avoided the counterattack!',
+      },
+      failure: {
+        damageMultiplier: 0,
+        failMove: true,
+        result: 'loss',
+        message: '{attacker} was not weaker, so {move} failed!',
+      },
+    },
+    formId: ALL_POKEMON_FORM_IDS,
+  },
+  {
+    id: 'cunning-trap',
+    name: 'Cunning Trap',
+    description: 'A clever trap that lands only when the user has higher Sp. Atk.',
+    stance: 'tech',
+    damage: 0.2,
+    level: 5,
+    target: 'enemy',
+    forcedType: 'normal',
+    accuracy: 100,
+    contest: {
+      attackerMetric: 'effective-stat:specialAttack',
+      defenderMetric: 'effective-stat:specialAttack',
+      comparison: 'greaterThan',
+      success: {
+        damageMultiplier: 1,
+        preventCounter: true,
+        result: 'win',
+        message: '{attacker} outthought the target and avoided the counterattack!',
+      },
+      failure: {
+        damageMultiplier: 0,
+        failMove: true,
+        result: 'loss',
+        message: '{attacker} was not cleverer, so {move} failed!',
+      },
+    },
+    formId: ALL_POKEMON_FORM_IDS,
+  },
+  {
+    id: 'play-dumb',
+    name: 'Play Dumb',
+    description: 'A feigned mistake that lands only when the user has lower Sp. Atk.',
+    stance: 'tech',
+    damage: 0.2,
+    level: 5,
+    target: 'enemy',
+    forcedType: 'normal',
+    accuracy: 100,
+    contest: {
+      attackerMetric: 'effective-stat:specialAttack',
+      defenderMetric: 'effective-stat:specialAttack',
+      comparison: 'lessThan',
+      success: {
+        damageMultiplier: 1,
+        preventCounter: true,
+        result: 'win',
+        message: '{attacker} played dumb and avoided the counterattack!',
+      },
+      failure: {
+        damageMultiplier: 0,
+        failMove: true,
+        result: 'loss',
+        message: '{attacker} was not less clever, so {move} failed!',
+      },
+    },
+    formId: ALL_POKEMON_FORM_IDS,
+  },
+  /*
+  {
+    id: 'quick-attack-legacy-forms',
+    aiOnly: true,
+    name: 'Quick Attack Legacy Forms',
+    description: 'Legacy compatibility placeholder.',
+    stance: 'speed', damage: 0, target: 'enemy', accuracy: 100,
     formId: [
       '16',
       '17',
@@ -895,6 +1054,7 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
     ],
     failOnStance: 'loss',
   },
+  */
   {
     id: 'rest',
     name: 'Rest',
@@ -22711,9 +22871,7 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
     forcedType: 'normal',
     damage: 0.65,
     accuracy: 100,
-    onUserDamagedSameTurn: [
-      { stat: 'attack', stages: 1 },
-    ],
+    onUserDamagedSameTurn: [{ stat: 'attack', stages: 1 }],
     level: 8,
     formId: [
       '1',

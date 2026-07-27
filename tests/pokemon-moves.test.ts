@@ -10,9 +10,7 @@ import {
 } from '@/utilities/pokemon/pokemon-moves'
 import type { BattlePokemon } from '@/utilities/battle/types'
 
-function makeBattlePokemon(
-  overrides: Partial<BattlePokemon> = {},
-): BattlePokemon {
+function makeBattlePokemon(overrides: Partial<BattlePokemon> = {}): BattlePokemon {
   return {
     id: 'pokemon-1',
     user: 'user-1',
@@ -63,6 +61,26 @@ describe('pokemon move assignment helpers', () => {
     })
 
     expect(result.success).toBe(true)
+  })
+
+  test('Protective Pollen is restricted to forms with a biologically themed powder or spore move', () => {
+    expect(
+      getAvailableMoveOptions({
+        pokemonTypes: ['grass'],
+        pokemonFormId: '45',
+        pokemonLevel: 30,
+        inventory: { 'tm-protective-pollen': 1 },
+      }).some((move) => move.id === 'protective-pollen'),
+    ).toBe(true)
+
+    expect(
+      getAvailableMoveOptions({
+        pokemonTypes: ['ice'],
+        pokemonFormId: '361',
+        pokemonLevel: 30,
+        inventory: { 'tm-protective-pollen': 1 },
+      }).some((move) => move.id === 'protective-pollen'),
+    ).toBe(false)
   })
 
   test('rejects Trainer-cap over-assignment and missing TMs', () => {
@@ -289,9 +307,7 @@ describe('pokemon move assignment helpers', () => {
     })
 
     expect(onixAvailable.map((move) => move.id)).toContain('wave-breaker')
-    expect(rattataAvailable.map((move) => move.id)).not.toContain(
-      'wave-breaker',
-    )
+    expect(rattataAvailable.map((move) => move.id)).not.toContain('wave-breaker')
   })
 
   test('Harden is restricted to Caterpie line forms', () => {
@@ -353,9 +369,7 @@ describe('pokemon move assignment helpers', () => {
 
     expect(squirtleAvailable.map((move) => move.id)).toContain('bubble-guard')
     expect(horseaAvailable.map((move) => move.id)).toContain('bubble-guard')
-    expect(rattataAvailable.map((move) => move.id)).not.toContain(
-      'bubble-guard',
-    )
+    expect(rattataAvailable.map((move) => move.id)).not.toContain('bubble-guard')
   })
 
   test('Water moves include newly authored form IDs', () => {
@@ -488,12 +502,8 @@ describe('pokemon move assignment helpers', () => {
     expect(growlitheAvailable.map((move) => move.id)).toContain('flame-charge')
     expect(ponytaAvailable.map((move) => move.id)).toContain('fire-spin')
     expect(vaporeonAvailable.map((move) => move.id)).toContain('water-gun')
-    expect(vaporeonPressurePumpAvailable.map((move) => move.id)).toContain(
-      'bubble',
-    )
-    expect(vaporeonAquaBlitzAvailable.map((move) => move.id)).toContain(
-      'whirlpool',
-    )
+    expect(vaporeonPressurePumpAvailable.map((move) => move.id)).toContain('bubble')
+    expect(vaporeonAquaBlitzAvailable.map((move) => move.id)).toContain('whirlpool')
   })
 
   test('Grass moves include newly authored form IDs', () => {
@@ -573,9 +583,7 @@ describe('pokemon move assignment helpers', () => {
 
     expect(ekansAvailable.map((move) => move.id)).toContain('poison-sting')
     expect(weedleAvailable.map((move) => move.id)).toContain('poison-sting')
-    expect(rattataAvailable.map((move) => move.id)).not.toContain(
-      'poison-sting',
-    )
+    expect(rattataAvailable.map((move) => move.id)).not.toContain('poison-sting')
   })
 
   test('Mega Punch is restricted to its authored form IDs', () => {
@@ -751,9 +759,7 @@ describe('pokemon move assignment helpers', () => {
   test('authored TM and HM move configs omit Pokemon type eligibility', () => {
     const tmMoveIds = new Set(
       items.flatMap((item) =>
-        item.moveId && (item.category === 'tm' || item.id.startsWith('tm-'))
-          ? [item.moveId]
-          : [],
+        item.moveId && (item.category === 'tm' || item.id.startsWith('tm-')) ? [item.moveId] : [],
       ),
     )
     const tmMoves = getAllMoves().filter((move) => tmMoveIds.has(move.id))

@@ -63,6 +63,7 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
   const [gameStarted, setGameStarted] = useState(false)
   const [gameEnded, setGameEnded] = useState(false)
   const [result, setResult] = useState<any | null>(null)
+  const [startError, setStartError] = useState<string | null>(null)
   const [score, setScore] = useState(0)
   const [timeLeft, setTimeLeft] = useState(encounter.settings.timeLimit || 0)
   const [countdown, setCountdown] = useState(3) // 3 second countdown
@@ -155,9 +156,11 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
     const res = await startGame(encounter.id)
     if (!res.success) {
       console.error('Failed to start:', res.error)
+      setStartError(res.error || 'Unable to start Pidgey Training.')
       return
     }
 
+    setStartError(null)
     setGameStarted(true)
     setGameEnded(false)
     setResult(null)
@@ -441,12 +444,16 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
         collectibleRewardConfigs.forEach((config) => {
           let nextScore = collectibleSchedulesRef.current[config.key]
           while (nextScore !== undefined && newScore >= nextScore) {
+            const rewardOption =
+              config.rewardOptions[
+                Math.floor(Math.random() * config.rewardOptions.length)
+              ]
             newCollectibles = [
               ...newCollectibles,
               {
                 id: collectibleIdCounterRef.current++,
-                rewardKey: config.key,
-                reward: config.reward,
+                rewardKey: rewardOption.key,
+                reward: rewardOption.reward,
                 x: CANVAS_WIDTH,
                 y: minY + Math.random() * Math.max(0, maxY - minY),
                 size: collectibleSize,
@@ -805,7 +812,20 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
         }
         onOutsideTap={flap}
         overlay={
-          countdown > 0 ? (
+          startError ? (
+            <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#081014]/60 p-6 backdrop-blur-sm">
+              <div className="max-w-sm rounded-xl border border-game-border bg-game-surface p-5 text-center text-game-ink shadow-xl">
+                <p className="font-semibold">Unable to start</p>
+                <p className="mt-2 text-sm text-game-ink-muted">{startError}</p>
+                <Button
+                  className="mt-4"
+                  onClick={() => router.push('/game/explore')}
+                >
+                  Back to Explore
+                </Button>
+              </div>
+            </div>
+          ) : countdown > 0 ? (
             <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#081014]/50 backdrop-blur-sm">
               <div className="animate-pulse">
                 <GameTimer

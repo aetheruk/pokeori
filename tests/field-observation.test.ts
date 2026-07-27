@@ -502,6 +502,77 @@ describe('field observation research mode', () => {
     ).toEqual([])
   })
 
+  test('Neutral Stones unlock at Researcher 32 after the Gentleman teaches stonecraft', () => {
+    const baseData = {
+      inventory: [],
+      pokemon: [],
+      tcg: [],
+      pokedex: [],
+      completedTasks: [],
+      battleResults: [],
+      locationEncounterResults: [],
+      gameResults: [],
+      fieldResearchResults: [],
+      user: { skills: { researching: { level: 32 } } },
+    } as any
+    const neutralStoneDrop = fieldObservationGlobalItemEvents.find(
+      (event) => event.id === 'global-field-observation-neutral-stone',
+    )
+    if (!neutralStoneDrop) throw new Error('Missing global Neutral Stone drop')
+
+    expect(neutralStoneDrop).toMatchObject({
+      itemId: 'neutral-stone',
+      dropChance: 100 / 35,
+      guaranteed: true,
+      requirements: [
+        { type: 'skill_level', targetId: 'researching', count: 32 },
+        { type: 'task_completed', targetId: 'a-craftsmans-secret' },
+      ],
+    })
+    expect(
+      rollFieldObservationItemDrops([neutralStoneDrop], baseData, 'Kanto', () => 0),
+    ).toEqual([])
+    const unlockedData = {
+      ...baseData,
+      completedTasks: [
+        {
+          taskId: 'a-craftsmans-secret',
+          completedAt: '2026-07-27T00:00:00.000Z',
+          count: 1,
+        },
+      ],
+    }
+    expect(
+      rollFieldObservationItemDrops([neutralStoneDrop], unlockedData, 'Kanto', () => 0),
+    ).toEqual([neutralStoneDrop])
+    expect(
+      rollFieldObservationItemDrops(
+        [neutralStoneDrop],
+        unlockedData,
+        'Kanto',
+        () => 1 / 35,
+      ),
+    ).toEqual([])
+
+    const crowdedDrops = Array.from({ length: 7 }, (_, index) => ({
+      id: `crowded-drop-${index}`,
+      itemId: 'escape-rope',
+      dropChance: 100,
+    }))
+    const collectibles = buildFieldObservationCollectibleDrops({
+      rewardSubjects: [],
+      spawns: [],
+      researchingLevel: 32,
+      surveyFocus: 'standard',
+      observationDurationMs: 20_000,
+      globalItemEvents: [...crowdedDrops, neutralStoneDrop],
+      random: () => 0.5,
+    })
+    expect(collectibles).toContainEqual(
+      expect.objectContaining({ itemId: 'neutral-stone' }),
+    )
+  })
+
   test('rolls spawn genders from species appearance rates', () => {
     const femaleOnlyRound = generateFieldObservationRound(
       {

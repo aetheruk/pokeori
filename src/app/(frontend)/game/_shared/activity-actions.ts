@@ -638,6 +638,7 @@ export async function startGameActivity(
         }
 
         const itemsToConsume: Record<string, number> = {}
+        const currenciesToConsume: Record<string, number> = {}
         let hasConsumption = false
 
         // Check Pokemon Consumption Criteria
@@ -714,6 +715,14 @@ export async function startGameActivity(
               (itemsToConsume[req.targetId] || 0) + (req.count || 1)
             hasConsumption = true
           }
+          if (
+            req.consume &&
+            req.type === 'currency_owned' &&
+            typeof req.targetId === 'string'
+          ) {
+            currenciesToConsume[req.targetId] =
+              (currenciesToConsume[req.targetId] || 0) + (req.count || 1)
+          }
         }
 
         // Perform Item Consumption
@@ -734,6 +743,31 @@ export async function startGameActivity(
           }
 
           await setUserInventoryMap(payload as any, user.id, newInventory)
+        }
+
+        if (Object.keys(currenciesToConsume).length > 0) {
+          const freshUser = await payload.findByID({
+            collection: 'users',
+            id: user.id,
+          })
+          const updatedCurrency = { ...(freshUser.currency || {}) } as Record<
+            string,
+            number
+          >
+
+          for (const [currencyId, count] of Object.entries(currenciesToConsume)) {
+            const current = updatedCurrency[currencyId] || 0
+            if (current < count) {
+              return { success: false, error: `Not enough ${currencyId}` }
+            }
+            updatedCurrency[currencyId] = current - count
+          }
+
+          await payload.update({
+            collection: 'users',
+            id: user.id,
+            data: { currency: updatedCurrency },
+          })
         }
       }
 
@@ -1184,7 +1218,68 @@ export async function startGameActivity(
         isEndlessMode || encounter.gameType === 'tcg-battle'
           ? 3600
           : sessionTimeLimit + 120
-      await setGameActivityStateForUser(user.id, domain, state, sessionTTL)
+
+      // Flap activities may have an entry fee. Charge only for a brand-new
+      // session: restored sessions returned above must never cost the player
+      // a second time.
+      const entryCost =
+        encounter.gameType === 'flap'
+          ? (encounter.settings as { entryCost?: { currencyType: 'pokedollars'; amount: number } })
+              .entryCost
+          : undefined
+      let chargedEntryCost = false
+      if (entryCost) {
+        const freshUser = await payload.findByID({
+          collection: 'users',
+          id: user.id,
+        })
+        const currentBalance =
+          (freshUser.currency as Record<string, number> | undefined)?.[
+            entryCost.currencyType
+          ] || 0
+        if (currentBalance < entryCost.amount) {
+          return { success: false, error: 'Insufficient funds' }
+        }
+
+        await payload.update({
+          collection: 'users',
+          id: user.id,
+          data: {
+            currency: {
+              ...freshUser.currency,
+              [entryCost.currencyType]: currentBalance - entryCost.amount,
+            },
+          },
+        })
+        chargedEntryCost = true
+      }
+
+      try {
+        await setGameActivityStateForUser(user.id, domain, state, sessionTTL)
+      } catch (error) {
+        // Do not keep an entry fee if the run could not be created.
+        if (chargedEntryCost && entryCost) {
+          const rollbackUser = await payload.findByID({
+            collection: 'users',
+            id: user.id,
+          })
+          const rollbackBalance =
+            (rollbackUser.currency as Record<string, number> | undefined)?.[
+              entryCost.currencyType
+            ] || 0
+          await payload.update({
+            collection: 'users',
+            id: user.id,
+            data: {
+              currency: {
+                ...rollbackUser.currency,
+                [entryCost.currencyType]: rollbackBalance + entryCost.amount,
+              },
+            },
+          })
+        }
+        throw error
+      }
 
       return {
         success: true,

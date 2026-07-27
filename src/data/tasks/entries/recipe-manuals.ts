@@ -100,6 +100,15 @@ const heldItemRecipeManuals = [
   { itemId: 'unstable-fairy-feather', itemName: 'Unstable Fairy Feather' },
 ] as const
 
+const battleItemRecipeManuals = [
+  { itemId: 'x-attack', itemName: 'X Attack' },
+  { itemId: 'x-defense', itemName: 'X Defense' },
+  { itemId: 'x-sp-atk', itemName: 'X Sp. Atk' },
+  { itemId: 'x-sp-def', itemName: 'X Sp. Def' },
+  { itemId: 'x-speed', itemName: 'X Speed' },
+  { itemId: 'dire-hit', itemName: 'Dire Hit' },
+] as const
+
 export const recipeManualTasks: Task[] = [
   {
     id: 'elemental-stones-recipe',
@@ -165,5 +174,27 @@ export const recipeManualTasks: Task[] = [
     criteria: [],
     rewards: [],
     exitModal: recipeUnlockedExitModal({ itemId: manual.itemId, itemName: manual.itemName }),
+  })),
+  ...battleItemRecipeManuals.map((manual) => ({
+    id: `${manual.itemId}-recipe`,
+    name: `${manual.itemName} Recipe`,
+    description: `A hidden artisan note that unlocks the ${manual.itemName} crafting recipe.`,
+    category: 'Secret',
+    subCategory: 'Recipe Manuals',
+    icon: {
+      type: 'item' as const,
+      id: manual.itemId,
+    },
+    repeatable: false,
+    secret: true,
+    completionTrigger: 'auto' as const,
+    completeButtonText: 'Read Recipe',
+    requirements: [],
+    criteria: [],
+    rewards: [],
+    exitModal: recipeUnlockedExitModal({
+      itemId: manual.itemId,
+      itemName: manual.itemName,
+    }),
   })),
 ]
