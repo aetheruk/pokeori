@@ -808,7 +808,7 @@ const ITEM_RECIPES: ArtisanRecipeDraft[] = [
     requirements: [{ type: 'task_completed' as const, targetId: `${recipe.id}-recipe` }],
     costs: [
       { id: 'poke-powder-s', amount: 1 },
-      { id: recipe.materialId, amount: 2 },
+      { id: recipe.materialId, amount: 5 },
     ],
     rewards: [{ type: 'item' as const, targetId: recipe.id, quantity: 1, dropChance: 100 }],
     craftType: 'mix' as const,
@@ -1146,7 +1146,7 @@ const ELEMENTAL_STONE_HELD_RECIPES: ArtisanRecipeDraft[] = ELEMENTAL_STONE_RECIP
   requirements: [
     {
       type: 'task_completed',
-      targetId: 'elemental-stones-recipe',
+      targetId: 'a-craftsmans-secret',
     },
   ],
 }))

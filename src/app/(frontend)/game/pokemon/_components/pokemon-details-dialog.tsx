@@ -873,8 +873,10 @@ export function PokemonDetailsDialog({
                 return true
               }
 
-              const anyReady = possibleEvolutions.some(isEvolutionReady)
-              if (!anyReady) return null
+              // This panel is an actionable prompt, so never surface a
+              // branch that the current Pokemon cannot evolve into now.
+              const readyEvolutions = possibleEvolutions.filter(isEvolutionReady)
+              if (readyEvolutions.length === 0) return null
 
               return (
                 <div className="w-full max-w-md space-y-4">
@@ -882,7 +884,7 @@ export function PokemonDetailsDialog({
                     Evolution Detected
                   </SectionDivider>
                   <div className="grid gap-3">
-                    {possibleEvolutions.map((evo) => {
+                    {readyEvolutions.map((evo) => {
                       const { conditions } = evo
                       const pokedex = (gameData?.pokedex || []) as any[]
                       const hasSeenEvo =

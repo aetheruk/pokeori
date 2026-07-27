@@ -466,6 +466,24 @@ describe('artisan recipes', () => {
     expect(getArtisanCraftRequiredLevel(recipe!, 3)).toBe(10)
   })
 
+  test('Celadon battle item recipes use five matching Pokemon materials', () => {
+    for (const recipeId of [
+      'craft-x-attack',
+      'craft-x-defense',
+      'craft-x-sp-atk',
+      'craft-x-sp-def',
+      'craft-x-speed',
+      'craft-dire-hit',
+    ]) {
+      const recipe = artisanRecipes.find((entry) => entry.id === recipeId)
+      const materialCost = recipe?.costs.find((cost) =>
+        cost.id.endsWith('-t1'),
+      )
+
+      expect(materialCost?.amount, recipeId).toBe(5)
+    }
+  })
+
   test('status remedy recipes unlock together and use berries, candy dust, and typed materials', () => {
     const expectedRecipes = [
       {
@@ -1532,7 +1550,7 @@ describe('artisan recipes', () => {
       })
       expect(recipe?.requirements, itemId).toContainEqual({
         type: 'task_completed',
-        targetId: 'elemental-stones-recipe',
+        targetId: 'a-craftsmans-secret',
       })
       expect(recipe?.costs, itemId).toEqual(
         expect.arrayContaining([

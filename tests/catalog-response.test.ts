@@ -4,6 +4,7 @@ import {
   catalogResponse,
   parseCatalogPage,
 } from '@/utilities/catalog-response'
+import { APP_VERSION } from '@/utilities/app-version'
 
 describe('public game catalog responses', () => {
   test('caps pages and rejects invalid cursors', () => {
@@ -16,7 +17,7 @@ describe('public game catalog responses', () => {
     const response = catalogResponse([{ id: 2 }], 3, 1, 1)
     expect(response.headers.get('cache-control')).toContain('s-maxage=2592000')
     expect(await response.json()).toMatchObject({
-      version: '0.3.1',
+      version: APP_VERSION,
       items: [{ id: 2 }],
       total: 3,
       nextCursor: '2',

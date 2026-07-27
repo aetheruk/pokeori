@@ -1078,6 +1078,73 @@ export const celadonCityTasks: Task[] = [
     }
   },
   {
+    "id": "celadon-socialite-eevee-trade",
+    "name": "Eevee, Darling",
+    "description": "A Socialite at Pokémansion is paying handsomely for Eevee to join her collection.",
+    "category": "Kanto",
+    "subCategory": "Celadon City",
+    "background": "/backgrounds/celadon-mansion-lounge.avif",
+    "icon": {
+      "type": "trainer",
+      "id": "socialite"
+    },
+    "secret": false,
+    "completionTrigger": "manual",
+    "completeButtonText": "Offer Eevee",
+    "repeatable": true,
+    "requirements": [
+      {
+        "type": "task_completed",
+        "targetId": "a-craftsmans-secret"
+      }
+    ],
+    "criteria": [
+      {
+        "type": "pokemon_owned",
+        "count": 1,
+        "consume": true,
+        "pokemonCriteria": {
+          "speciesId": 133
+        }
+      }
+    ],
+    "rewards": [
+      {
+        "type": "currency",
+        "targetId": "pokedollars",
+        "quantity": 1500
+      }
+    ],
+    "enterModal": [
+      {
+        "id": 1,
+        "background": "/backgrounds/celadon-mansion-lounge.avif",
+        "title": "Socialite",
+        "message": "Oh, an Eevee! Such refinement cannot be left to wander the roads. I would simply adore to add one to my collection. Naturally, I shall compensate you for the privilege.",
+        "icon": {
+          "type": "trainer",
+          "id": "socialite"
+        },
+        "buttons": [
+          {
+            "text": "Choose an Eevee",
+            "type": "success"
+          }
+        ]
+      }
+    ],
+    "exitModal": {
+      "background": "/backgrounds/celadon-mansion-lounge.avif",
+      "title": "Socialite",
+      "message": "Divine. This Eevee will want for nothing in its new home. Do bring me another if you happen upon one, darling.",
+      "closeButtonText": "Until next time",
+      "icon": {
+        "type": "trainer",
+        "id": "socialite"
+      }
+    }
+  },
+  {
     "id": "celadon-gym-challenge",
     "name": "Erika's Gym Challenge",
     "description": "Celadon Gym is just ahead. I should see whether Erika knows anything about what Team Rocket is doing.",

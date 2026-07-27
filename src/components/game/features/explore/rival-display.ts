@@ -15,6 +15,11 @@ const RIVAL_BATTLE_IDS = new Set([
   'rival-ss-anne',
 ])
 
+const COMPANION_SERVICE_TASK_IDS = new Set([
+  'celadon-luxury-massage',
+  'celadon-luxury-analysis',
+])
+
 export function isRivalOutcomeTask(item: ExploreItem) {
   if (item.type !== 'task') return false
 
@@ -25,6 +30,16 @@ export function isRivalOutcomeTask(item: ExploreItem) {
 }
 
 export function getExploreItemIcon(item: ExploreItem, userData: RequirementData): TaskIcon {
+  if (item.type === 'task' && COMPANION_SERVICE_TASK_IDS.has(item.id)) {
+    const companion = userData.pokemon.find((pokemon) => pokemon.isCompanion)
+    if (companion) {
+      return {
+        type: 'pokemon',
+        id: companion.formId || String(companion.speciesId),
+      }
+    }
+  }
+
   if (!isRivalExploreBattle(item) && !isRivalOutcomeTask(item)) return item.icon
 
   const rivalIconId = userData.rivalTrainer?.icon
