@@ -18,12 +18,12 @@ export const scratchCards: Record<string, ScratchCardConfig> = {
     background: '/scratchcard/rocket-scratch.avif',
     rewards: [
       {
-        chance: 55,
+        chance: 25,
         reward: [],
         icon: { type: 'item', id: 'fun-token' },
       },
       {
-        chance: 25,
+        chance: 30,
         reward: [
           {
             type: 'currency',
@@ -35,7 +35,7 @@ export const scratchCards: Record<string, ScratchCardConfig> = {
         icon: { type: 'item', id: 'fun-token' },
       },
       {
-        chance: 10,
+        chance: 20,
         reward: [
           {
             type: 'currency',
@@ -47,7 +47,7 @@ export const scratchCards: Record<string, ScratchCardConfig> = {
         icon: { type: 'item', id: 'fun-token' },
       },
       {
-        chance: 5,
+        chance: 12,
         reward: [
           {
             type: 'currency',
@@ -59,7 +59,7 @@ export const scratchCards: Record<string, ScratchCardConfig> = {
         icon: { type: 'item', id: 'fun-token' },
       },
       {
-        chance: 3,
+        chance: 6,
         reward: [
           {
             type: 'item',
@@ -71,7 +71,7 @@ export const scratchCards: Record<string, ScratchCardConfig> = {
         icon: { type: 'item', id: 'stardust' },
       },
       {
-        chance: 1.5,
+        chance: 4,
         reward: [
           {
             type: 'item',
@@ -83,7 +83,7 @@ export const scratchCards: Record<string, ScratchCardConfig> = {
         icon: { type: 'item', id: 'nugget' },
       },
       {
-        chance: 0.5,
+        chance: 3,
         reward: [
           {
             type: 'currency',

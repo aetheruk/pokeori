@@ -16,7 +16,7 @@ describe('public game catalog responses', () => {
     const response = catalogResponse([{ id: 2 }], 3, 1, 1)
     expect(response.headers.get('cache-control')).toContain('s-maxage=2592000')
     expect(await response.json()).toMatchObject({
-      version: '0.2.0',
+      version: '0.3.0',
       items: [{ id: 2 }],
       total: 3,
       nextCursor: '2',

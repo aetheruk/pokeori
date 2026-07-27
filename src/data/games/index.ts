@@ -128,6 +128,9 @@ export { rockTunnelEchoMapGames } from './rock-tunnel-echo-map'
 export type { ArtAcademyGameConfig, ArtAcademySettings } from './art-academy'
 export { artAcademyGames } from './art-academy'
 
+export type { BattleBetsGameConfig, BattleBetsSettings } from './battle-bets/types'
+export { battleBetsGames } from './battle-bets'
+
 // All games combined (useful for explore-list)
 import { silhouetteEntries as silhouetteGames } from './silhouette'
 import { identifyEntries as identifyGames } from './identify'
@@ -154,6 +157,7 @@ import { diglettTunnelTapGames } from './diglett-tunnel-tap'
 import { magnemiteCircuitGames } from './magnemite-circuit'
 import { rockTunnelEchoMapGames } from './rock-tunnel-echo-map'
 import { artAcademyGames } from './art-academy'
+import { battleBetsGames } from './battle-bets'
 import type { BaseGameConfig } from './shared'
 
 export type GameType =
@@ -182,6 +186,7 @@ export type GameType =
   | 'magnemite-circuit'
   | 'rock-tunnel-echo-map'
   | 'art-academy'
+  | 'battle-bets'
 
 export type FieldResearchGameType = Extract<GameType, 'field-observation'>
 export type MiniGameType = Exclude<GameType, FieldResearchGameType>
@@ -348,6 +353,11 @@ export interface GameSettings {
   // Art Academy specific
   formId?: string
   paletteSize?: number
+  buyIn?: number
+  houseEdge?: number
+  simulationCount?: number
+  minimumWinChance?: number
+  maximumWinChance?: number
 }
 
 export interface GameItem extends BaseGameConfig {
@@ -381,6 +391,7 @@ export const allGames: GameItem[] = [
   ...magnemiteCircuitGames.map((g) => ({ ...g, gameType: 'magnemite-circuit' as const })),
   ...rockTunnelEchoMapGames.map((g) => ({ ...g, gameType: 'rock-tunnel-echo-map' as const })),
   ...artAcademyGames.map((g) => ({ ...g, gameType: 'art-academy' as const })),
+  ...battleBetsGames.map((g) => ({ ...g, gameType: 'battle-bets' as const })),
 ]
 
 export const fieldResearchGames = allGames.filter(

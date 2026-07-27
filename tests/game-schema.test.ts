@@ -5,6 +5,7 @@ import {
   type MagnemiteCircuitPosition,
   type MagnemiteCircuitTile,
   type MagnemiteCircuitTileType,
+  type PachinkoGameConfig,
   type PrizeWheelGameConfig,
   type VoltorbGridGameConfig,
   type VoltorbGridPosition,
@@ -465,6 +466,38 @@ describe('generated game data schemas', () => {
     expect(result.error?.issues.map((issue) => issue.message)).toContain(
       'Bucket must fit inside the pachinko board',
     )
+  })
+
+  test('Celadon Pachinko keeps rewarding low buckets at the board edges', () => {
+    const games = allGames.filter(
+      (game) =>
+        game.id === 'celadon-rocket-pachinko' ||
+        game.id === 'celadon-high-stakes-pachinko',
+    ) as PachinkoGameConfig[]
+    expect(games).toHaveLength(2)
+
+    for (const game of games) {
+      expect(game.settings.board.buckets).toHaveLength(3)
+      expect(
+        game.settings.board.buckets.every(
+          (bucket: { rewards: unknown[] }) => bucket.rewards.length > 0,
+        ),
+      ).toBe(true)
+      expect(
+        game.settings.board.buckets.map((bucket: { x: number }) => bucket.x),
+      ).toEqual([80, 300, 520])
+      expect(game.settings.board.obstacles).toHaveLength(2)
+      expect(
+        (game.settings.board.obstacles || []).every(
+          (obstacle: { y: number }) => obstacle.y === 630,
+        ),
+      ).toBe(true)
+      expect(
+        Math.max(
+          ...game.settings.board.pegs.map((peg: { y: number }) => peg.y),
+        ),
+      ).toBeLessThan(630)
+    }
   })
 
   test('Voltorb Grid validation rejects impossible debris goals and out-of-bounds positions', () => {
@@ -1002,7 +1035,6 @@ describe('generated game data schemas', () => {
     expect(magnemiteSettings?.targets).toHaveLength(3)
     expect(magnemiteSettings?.tiles.length).toBeGreaterThanOrEqual(14)
     expect(magnemiteSettings?.winRate).toBe(1)
-
   })
 
   test('future route-themed puzzle games have playable Test layouts', () => {
@@ -1015,7 +1047,6 @@ describe('generated game data schemas', () => {
     expect(magnemiteSettings).toBeDefined()
     expect(magnemiteCircuitIsSolved(magnemiteSettings!)).toBe(false)
     expect(magnemiteCircuitHasSolution(magnemiteSettings!)).toBe(true)
-
   })
 
   test('Magnemite Circuit validation requires source and target tiles', () => {

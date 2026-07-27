@@ -2,6 +2,27 @@ import { Task } from '../../types'
 
 export const celadonGameCornerTasks: Task[] = [
   {
+    id: 'battle-bets',
+    name: 'Battle Bets',
+    description: 'The High Stakes Room has found a new way to turn Shadow Pokemon into entertainment.',
+    category: 'Kanto',
+    subCategory: 'Celadon Game Corner',
+    background: '/backgrounds/celadon-game-corner-prize-wheel.avif',
+    icon: { type: 'trainer', id: 'rocket-grunt-f' },
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Open the Book',
+    requirements: [{ type: 'task_completed', targetId: 'high-roller' }],
+    criteria: [],
+    rewards: [],
+    enterModal: [
+      { id: 1, icon: { type: 'trainer', id: 'rocket-grunt-f' }, title: 'Battle Bets', message: 'The quietest table in the room has no cards at all. Two Rocket Grunts stand at either side of a battle screen, their Shadow Pokemon waiting for an order.', background: '/backgrounds/celadon-game-corner-prize-wheel.avif', buttons: [{ text: 'What is this?', type: 'navigate', id: 2 }] },
+      { id: 2, icon: { type: 'trainer', id: 'rocket-grunt-f' }, title: 'The House Book', message: 'Put down 25 Fun Tokens, inspect both teams, then back one side. The book gives you the odds; the Pokemon settle the rest. Win and you can cash out, or roll every token into the next fight.', background: '/backgrounds/celadon-game-corner-prize-wheel.avif', buttons: [{ text: 'Show me the odds', type: 'success' }] },
+    ],
+    exitModal: { title: 'The Book Is Open', icon: { type: 'trainer', id: 'rocket-grunt-f' }, background: '/backgrounds/celadon-game-corner-prize-wheel.avif', message: 'The High Stakes Room will now take Battle Bets. Choose carefully: every wager is all in.', closeButtonText: 'Place a Bet' },
+  },
+  {
     id: 'high-roller',
     name: 'High Roller',
     description:
@@ -16,7 +37,7 @@ export const celadonGameCornerTasks: Task[] = [
     completeButtonText: 'Accept Invitation',
     requirements: [
       { type: 'task_completed', targetId: 'when-the-fun-stops' },
-      { type: 'currency_owned', targetId: 'fun-tokens', count: 2000 },
+      { type: 'currency_owned', targetId: 'fun-tokens', count: 1000 },
     ],
     criteria: [],
     rewards: [],

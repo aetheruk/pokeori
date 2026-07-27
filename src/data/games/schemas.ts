@@ -819,6 +819,16 @@ const settingsByGameType: Record<string, z.ZodTypeAny> = {
       paletteSize: z.number().int().min(2).max(16).optional(),
     })
     .strict(),
+  'battle-bets': z
+    .object({
+      buyIn: z.number().int().positive(),
+      houseEdge: z.number().min(0).max(0.25),
+      simulationCount: z.number().int().min(1).max(500),
+      minimumWinChance: z.number().min(0.01).max(0.5),
+      maximumWinChance: z.number().min(0.5).max(0.99),
+    })
+    .strict()
+    .refine((settings) => settings.minimumWinChance < settings.maximumWinChance),
 }
 
 export const gameItemSchema = baseGameSchema
