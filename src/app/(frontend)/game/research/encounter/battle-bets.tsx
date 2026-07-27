@@ -7,7 +7,6 @@ import { useReducedMotion } from 'framer-motion'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
-import { items } from '@/data/items'
 import type { GameItem } from '@/data/games'
 import type {
   BattleBetsPublicState,
@@ -27,11 +26,6 @@ type ReplaySpeed = 'normal' | 'fast'
 
 function newActionId(): string {
   return crypto.randomUUID()
-}
-
-function itemName(itemId?: string): string {
-  if (!itemId) return 'None'
-  return items.find((item) => item.id === itemId)?.name || itemId
 }
 
 export function BattleBetsGame({
@@ -298,8 +292,8 @@ function Inspection({
       <section className="game-activity-panel mb-4 p-4 text-center">
         <p className="font-serif text-xl">Inspect the teams</p>
         <p className="mt-1 text-sm text-game-night-ink/70">
-          The house ran 200 complete battles to price this matchup. Your choice
-          commits the entire pot.
+          Choose a side using the house odds. Your choice commits the entire
+          pot.
         </p>
       </section>
       <div className="grid gap-4 lg:grid-cols-2">
@@ -344,31 +338,23 @@ function TeamCard({
   onBet: (side: BattleBetsSide) => Promise<void>
 }) {
   return (
-    <section className="game-activity-panel p-4 sm:p-5">
-      <div className="flex items-center gap-4">
-        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border border-game-ochre/40 bg-game-night-canvas">
+    <section className="game-activity-panel p-3 sm:p-4">
+      <div className="flex items-center gap-3">
+        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-game-ochre/40 bg-game-night-canvas">
           <Image
             src={`/sprites/trainers/${team.trainerSpriteId}.avif`}
             alt={team.trainerName}
             fill
-            sizes="80px"
+            sizes="48px"
             className="object-contain"
           />
         </div>
         <div className="min-w-0 flex-1">
-          <h2 className="font-serif text-2xl">{team.trainerName}</h2>
-          <p className="text-sm text-game-night-ink/65">
-            Advanced AI · 3 Shadow Pokémon
-          </p>
-          <p className="mt-1 text-xs text-game-night-ink/65">
-            Trainer item:{' '}
-            <span className="text-game-night-ink">
-              {itemName(team.trainerItemId)}
-            </span>
-          </p>
+          <h2 className="font-serif text-xl">{team.trainerName}</h2>
+          <p className="text-xs text-game-night-ink/65">Shadow team</p>
         </div>
         <div className="text-right">
-          <p className="font-mono text-2xl font-semibold text-game-ochre">
+          <p className="font-mono text-xl font-semibold text-game-ochre">
             {Math.round(chance * 100)}%
           </p>
           <p className="text-[0.65rem] uppercase tracking-wider text-game-night-ink/60">
@@ -377,34 +363,29 @@ function TeamCard({
         </div>
       </div>
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+      <div className="mt-3 grid grid-cols-3 gap-2">
         {team.pokemon.map((pokemon, index) => (
           <article
             key={`${pokemon.formId}-${index}`}
-            className="rounded-xl border border-game-border/40 bg-game-night-surface p-3"
+            className="flex min-w-0 flex-col items-center rounded-lg border border-game-border/40 bg-game-night-surface px-1 py-2"
           >
             <PokemonRaritySprite
               formId={pokemon.formId}
               view="front"
               isShadow
               alt={`Shadow ${pokemon.name}`}
-              className="mx-auto h-24 w-24"
-              sizes="96px"
+              className="h-11 w-11"
+              sizes="44px"
             />
-            <p className="mt-1 truncate text-center font-semibold">
-              Shadow {pokemon.name}
+            <p className="mt-1 w-full truncate text-center text-xs font-semibold">
+              {pokemon.name}
             </p>
-            <p className="text-center text-xs text-game-night-ink/65">
-              Lv. {pokemon.level} · {pokemon.types.join(' / ')}
-            </p>
-            <p className="mt-2 truncate text-center text-xs text-game-night-ink/65">
-              Held: {itemName(pokemon.heldItemId)}
-            </p>
+            <p className="text-center text-[0.65rem] text-game-night-ink/65">Lv. {pokemon.level}</p>
           </article>
         ))}
       </div>
 
-      <div className="mt-5 flex items-end justify-between gap-4 rounded-xl border border-game-ochre/25 bg-game-night-canvas p-3">
+      <div className="mt-3 flex items-center justify-between gap-3 rounded-lg border border-game-ochre/25 bg-game-night-canvas p-3">
         <div>
           <p className="text-xs uppercase tracking-wider text-game-night-ink/60">
             All-in return
@@ -412,12 +393,10 @@ function TeamCard({
           <p className="font-mono text-xl text-game-ochre">
             {projectedPayout} tokens
           </p>
-          <p className="text-xs text-game-night-ink/55">
-            {pot} token pot · 5% house edge
-          </p>
+          <p className="text-xs text-game-night-ink/55">{pot} token pot</p>
         </div>
         <Button
-          className="game-accent-button min-w-36"
+          className="game-accent-button min-w-28"
           disabled={disabled}
           onClick={() => void onBet(side)}
         >

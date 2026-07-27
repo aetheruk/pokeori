@@ -90,6 +90,8 @@ export const getTypeIcon = (item: ExploreItem) => {
         return <CircleDot className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'prize-wheel')
         return <Disc className="w-4 h-4 text-game-moss-strong" />
+      if (gameType === 'battle-bets')
+        return <Swords className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'fishing')
         return <Fish className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'match3')
@@ -178,6 +180,8 @@ export const getGameTypeLabel = (item: ExploreItem) => {
       return 'PACHINKO'
     case 'prize-wheel':
       return 'WHEEL'
+    case 'battle-bets':
+      return 'BATTLE BETS'
     case 'fishing':
       return 'FISHING'
     case 'match3':

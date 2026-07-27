@@ -3,13 +3,15 @@ import { celadonGameCornermatch3gamesEntries } from '@/data/games/match3/entries
 import { celadonGameCornerPachinkoEntries } from '@/data/games/pachinko/entries/celadon-game-corner'
 import { celadonGameCornerPrizeWheelEntries } from '@/data/games/prize-wheel/entries/celadon-game-corner'
 import { celadonGameCornerSlotEntries } from '@/data/games/slots/entries/celadon-game-corner'
+import { battleBetsGames } from '@/data/games/battle-bets'
 import { celadonGameCornerShops } from '@/data/shops/entries/celadon-game-corner'
 import { scratchCards } from '@/data/scratchcards'
 import { celadonGameCornerTasks } from '@/data/tasks/entries/celadon-game-corner'
+import { getGameTypeLabel } from '@/components/game/features/explore/utils'
 
 describe('Celadon Game Corner balance and presentation', () => {
   test('uses the authored standard-game token costs', () => {
-    expect(celadonGameCornerPrizeWheelEntries[0].settings.cost?.amount).toBe(10)
+    expect(celadonGameCornerPrizeWheelEntries[0].settings.cost?.amount).toBe(25)
     expect(celadonGameCornerSlotEntries[0].settings.cost.amount).toBe(5)
     expect(celadonGameCornerPachinkoEntries[0].settings.cost?.amount).toBe(5)
   })
@@ -47,7 +49,7 @@ describe('Celadon Game Corner balance and presentation', () => {
       ),
     ).toEqual([25, 75, 250, 500, 10000])
 
-    expect(celadonGameCornerPrizeWheelEntries[1].settings.cost?.amount).toBe(50)
+    expect(celadonGameCornerPrizeWheelEntries[1].settings.cost?.amount).toBe(125)
     expect(
       celadonGameCornerPrizeWheelEntries[1].settings.slots
         .slice(1, 7)
@@ -113,6 +115,16 @@ describe('Celadon Game Corner balance and presentation', () => {
     ].map((icon) => JSON.stringify(icon))
 
     expect(new Set(icons).size).toBe(icons.length)
+  })
+
+  test('labels Battle Bets as a distinct Explore game type', () => {
+    expect(
+      getGameTypeLabel({
+        id: battleBetsGames[0].id,
+        type: 'game',
+        originalData: { ...battleBetsGames[0], gameType: 'battle-bets' },
+      } as any),
+    ).toBe('BATTLE BETS')
   })
 
   test('Rocket Scratch Cards use the revised token prizes and rare cosmetics', () => {

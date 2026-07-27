@@ -16,7 +16,7 @@ export const celadonGameCornerPrizeWheelEntries: PrizeWheelGameConfig[] = [
     settings: {
       background: '/backgrounds/celadon-game-corner-prize-wheel.avif',
       themeColour: '#9f1239',
-      cost: { currencyType: 'fun-tokens', amount: 10 },
+      cost: { currencyType: 'fun-tokens', amount: 25 },
       spinTime: { min: 4, max: 7 },
       slots: [
         { id: 'nothing', label: 'Try Again', color: '#4b5563', icon: { type: 'pokemon', id: '19' }, percentage: 25, rewards: [] },
@@ -45,7 +45,7 @@ export const celadonGameCornerPrizeWheelEntries: PrizeWheelGameConfig[] = [
     settings: {
       background: '/backgrounds/celadon-game-corner-prize-wheel.avif',
       themeColour: '#f59e0b',
-      cost: { currencyType: 'fun-tokens', amount: 50 },
+      cost: { currencyType: 'fun-tokens', amount: 125 },
       spinTime: { min: 4, max: 7 },
       slots: [
         { id: 'nothing', label: 'Try Again', color: '#4b5563', icon: { type: 'pokemon', id: '20' }, percentage: 25, rewards: [] },
