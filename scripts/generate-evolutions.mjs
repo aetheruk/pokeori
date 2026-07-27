@@ -97,9 +97,48 @@ export {
   ${exports},
 }
 
-export const EVOLUTIONS: Record<number, Evolution[]> = {
+const rawEvolutions: Record<number, Evolution[]> = {
 ${spreads}
 }
+
+const hasUsableCondition = (evolution: Evolution) =>
+  Object.keys(evolution.conditions).length > 0
+
+const targetsSameForm = (left: Evolution, right: Evolution) =>
+  (left.targetForm || 'base') === (right.targetForm || 'base')
+
+const sourceFormsOverlap = (left: Evolution, right: Evolution) =>
+  !left.conditions.requiredSourceForm ||
+  !right.conditions.requiredSourceForm ||
+  left.conditions.requiredSourceForm === right.conditions.requiredSourceForm
+
+/**
+ * Location evolutions are represented by Evolution Compass in PokeOri. Keep
+ * that fallback only when the target does not already have an authored route.
+ */
+const normalizeEvolutions = (evolutions: Evolution[]) =>
+  evolutions.filter((evolution) => {
+    // Unsupported special level-up mechanics have no actionable condition.
+    if (!hasUsableCondition(evolution)) return false
+
+    if (!evolution.conditions.locationId) return true
+
+    return !evolutions.some(
+      (candidate) =>
+        candidate !== evolution &&
+        !candidate.conditions.locationId &&
+        candidate.speciesId === evolution.speciesId &&
+        targetsSameForm(candidate, evolution) &&
+        sourceFormsOverlap(candidate, evolution),
+    )
+  })
+
+export const EVOLUTIONS: Record<number, Evolution[]> = Object.fromEntries(
+  Object.entries(rawEvolutions).map(([speciesId, evolutions]) => [
+    Number(speciesId),
+    normalizeEvolutions(evolutions),
+  ]),
+)
 `
 
   fs.writeFileSync(path.join(OUTPUT_DIR, 'index.ts'), indexContent)

@@ -72,6 +72,7 @@ export const celadonCityShops: ShopConfig[] = [
         ...item(`${statItem}-recipe`, statItem, 3000),
         name: `${itemName(statItem)} Recipe`,
         description: `Unlock the in-house recipe for ${itemName(statItem)}.`,
+        stock: 1,
         rewards: [
           {
             type: 'task_complete' as const,

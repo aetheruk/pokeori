@@ -3,6 +3,7 @@ import { celadonGameCornermatch3gamesEntries } from '@/data/games/match3/entries
 import { celadonGameCornerPachinkoEntries } from '@/data/games/pachinko/entries/celadon-game-corner'
 import { celadonGameCornerPrizeWheelEntries } from '@/data/games/prize-wheel/entries/celadon-game-corner'
 import { celadonGameCornerSlotEntries } from '@/data/games/slots/entries/celadon-game-corner'
+import { celadonGameCornerShops } from '@/data/shops/entries/celadon-game-corner'
 import { scratchCards } from '@/data/scratchcards'
 import { celadonGameCornerTasks } from '@/data/tasks/entries/celadon-game-corner'
 
@@ -10,6 +11,21 @@ describe('Celadon Game Corner balance and presentation', () => {
   test('uses the authored standard-game token costs', () => {
     expect(celadonGameCornerPrizeWheelEntries[0].settings.cost?.amount).toBe(10)
     expect(celadonGameCornerSlotEntries[0].settings.cost.amount).toBe(5)
+  })
+
+  test('uses the revised Stardust and Nugget Prize Exchange prices', () => {
+    const prizeExchange = celadonGameCornerShops.find(
+      (shop) => shop.id === 'celadon-game-corner-prize-exchange',
+    )
+
+    expect(
+      prizeExchange?.items.find((item) => item.id === 'game-corner-stardust')
+        ?.cost[0]?.amount,
+    ).toBe(600)
+    expect(
+      prizeExchange?.items.find((item) => item.id === 'game-corner-nugget')
+        ?.cost[0]?.amount,
+    ).toBe(2500)
   })
 
   test('unlocks High Roller at 1,000 tokens and scales paired games by five', () => {
@@ -28,7 +44,7 @@ describe('Celadon Game Corner balance and presentation', () => {
       celadonGameCornerSlotEntries[1].settings.paytable.map(
         (line) => line.rewards[0]?.quantity,
       ),
-    ).toEqual([25, 75, 250, 500])
+    ).toEqual([25, 75, 250, 500, 10000])
 
     expect(celadonGameCornerPrizeWheelEntries[1].settings.cost?.amount).toBe(50)
     expect(
@@ -48,6 +64,28 @@ describe('Celadon Game Corner balance and presentation', () => {
     expect(celadonGameCornermatch3gamesEntries[1].rewards?.[0]?.quantity).toBe(
       250,
     )
+    expect(celadonGameCornermatch3gamesEntries[0].settings.winScore).toBe(1000)
+    expect(celadonGameCornermatch3gamesEntries[1].settings.winScore).toBe(1400)
+  })
+
+  test('awards an exact 1-in-250 Rocket Slots jackpot', () => {
+    for (const [game, expectedPrize] of [
+      [celadonGameCornerSlotEntries[0], 1000],
+      [celadonGameCornerSlotEntries[1], 10000],
+    ] as const) {
+      const jackpot = game.settings.paytable.find(
+        (line) => line.icons[0] === 'jackpot',
+      )
+      const totalWeight = game.settings.paytable.reduce(
+        (total, line) => total + line.weight,
+        0,
+      )
+      const winRate = Number(game.settings.winRate) / 100
+      const jackpotOdds = winRate * ((jackpot?.weight || 0) / totalWeight)
+
+      expect(jackpot?.rewards[0]?.quantity).toBe(expectedPrize)
+      expect(jackpotOdds).toBe(1 / 250)
+    }
   })
 
   test('shows named slot prizes and distinguishable wheel segments', () => {

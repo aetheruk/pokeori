@@ -80,7 +80,7 @@ export const celadonGameCornerShops: ShopConfig[] = [
         name: 'Stardust',
         description: 'A handful of valuable, glittering dust.',
         icon: { type: 'item', id: 'stardust' },
-        cost: [{ type: 'currency', id: 'fun-tokens', amount: 250 }],
+        cost: [{ type: 'currency', id: 'fun-tokens', amount: 600 }],
         rewards: [{ type: 'item', targetId: 'stardust', quantity: 1, dropChance: 100 }],
       },
       {
@@ -88,7 +88,7 @@ export const celadonGameCornerShops: ShopConfig[] = [
         name: 'Nugget',
         description: 'A solid nugget of pure gold.',
         icon: { type: 'item', id: 'nugget' },
-        cost: [{ type: 'currency', id: 'fun-tokens', amount: 1000 }],
+        cost: [{ type: 'currency', id: 'fun-tokens', amount: 2500 }],
         rewards: [{ type: 'item', targetId: 'nugget', quantity: 1, dropChance: 100 }],
       },
       {

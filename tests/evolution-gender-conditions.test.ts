@@ -11,6 +11,64 @@ import {
 } from '@/utilities/pokemon/evolution-conditions'
 
 describe('evolution gender conditions', () => {
+  test('keeps Evolution Compass only for location evolutions without an item fallback', () => {
+    for (const evolutions of Object.values(EVOLUTIONS)) {
+      for (const evolution of evolutions) {
+        if (!evolution.conditions.locationId) continue
+
+        const hasFallback = evolutions.some(
+          (candidate) =>
+            candidate !== evolution &&
+            !candidate.conditions.locationId &&
+            candidate.speciesId === evolution.speciesId &&
+            (candidate.targetForm || 'base') ===
+              (evolution.targetForm || 'base') &&
+            (!candidate.conditions.requiredSourceForm ||
+              !evolution.conditions.requiredSourceForm ||
+              candidate.conditions.requiredSourceForm ===
+                evolution.conditions.requiredSourceForm),
+        )
+
+        expect(hasFallback).toBe(false)
+      }
+    }
+  })
+
+  test('uses Eevee Stones instead of Evolution Compass where both routes exist', () => {
+    const eeveeEvolutions = EVOLUTIONS[133] || []
+
+    expect(
+      eeveeEvolutions.some(
+        (evolution) =>
+          evolution.speciesId === 470 &&
+          evolution.conditions.itemId === 'leaf-stone',
+      ),
+    ).toBe(true)
+    expect(
+      eeveeEvolutions.some(
+        (evolution) =>
+          evolution.speciesId === 471 &&
+          evolution.conditions.itemId === 'ice-stone',
+      ),
+    ).toBe(true)
+    expect(
+      eeveeEvolutions.some((evolution) => evolution.conditions.locationId),
+    ).toBe(false)
+  })
+
+  test('does not expose unsupported conditionless special evolutions', () => {
+    expect(
+      EVOLUTIONS[133]?.some((evolution) => evolution.speciesId === 700),
+    ).toBe(true)
+    expect(
+      EVOLUTIONS[133]?.find((evolution) => evolution.speciesId === 700)
+        ?.conditions,
+    ).toEqual({ minHappiness: 160 })
+    expect(EVOLUTIONS[349] || []).not.toContainEqual(
+      expect.objectContaining({ conditions: {} }),
+    )
+  })
+
   test('maps generated evolution gender ids to owned Pokemon genders', () => {
     expect(getEvolutionConditionGender({ gender: 1 })).toBe('female')
     expect(getEvolutionConditionGender({ gender: 2 })).toBe('male')

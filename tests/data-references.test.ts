@@ -3738,6 +3738,24 @@ describe('static data references', () => {
         { type: 'task_complete', targetId: 'elemental-stones-recipe' },
       ]),
     )
+
+    expect(tasks.find((task) => task.id === 'celadon-socialite-eevee-trade')).toMatchObject({
+      repeatable: true,
+      requirements: [
+        { type: 'task_completed', targetId: 'a-craftsmans-secret' },
+      ],
+      criteria: [
+        {
+          type: 'pokemon_owned',
+          count: 1,
+          consume: true,
+          pokemonCriteria: { speciesId: 133 },
+        },
+      ],
+      rewards: [
+        { type: 'currency', targetId: 'pokedollars', quantity: 1500 },
+      ],
+    })
   })
 
   test('Celadon Department Store uses the revised stock, prices, and companion gates', () => {
@@ -3784,6 +3802,10 @@ describe('static data references', () => {
         type: 'companion',
         label: 'Set an active companion',
       })
+    }
+
+    for (const item of recipeCounter?.items || []) {
+      expect(item.stock).toBe(1)
     }
   })
 

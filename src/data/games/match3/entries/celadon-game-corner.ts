@@ -41,7 +41,7 @@ export const celadonGameCornermatch3gamesEntries: Match3GameConfig[] = [
       themeColour: '#9f1239',
       background: '/backgrounds/celadon-game-corner-arcade.avif',
       timeLimit: 25,
-      winScore: 3200,
+      winScore: 1000,
     },
   },
   {
@@ -84,7 +84,7 @@ export const celadonGameCornermatch3gamesEntries: Match3GameConfig[] = [
       themeColour: '#f59e0b',
       background: '/backgrounds/celadon-game-corner-prize-wheel.avif',
       timeLimit: 20,
-      winScore: 4000,
+      winScore: 1400,
     },
   },
 ]
