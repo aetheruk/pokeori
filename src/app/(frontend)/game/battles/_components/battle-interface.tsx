@@ -49,9 +49,8 @@ import { needsPlayerLeadSelection } from '@/utilities/battle/switching'
 import type { BattlePowersData } from '../powers/powers-data'
 import { BattleActionMenu } from './battle-action-menu'
 import { type BattleContextType, BattleProvider } from './battle-context'
-import { BattleHeader } from './battle-header'
+import { BattleScene } from './battle-scene'
 import { BattleSurrenderButton } from './battle-surrender-button'
-import { PokemonSpriteDisplay } from './pokemon-sprite-display'
 
 interface BattleInterfaceProps {
   initialState: BattleState
@@ -765,26 +764,16 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
               />
             )}
         </AnimatePresence>
-        <div className="relative flex flex-[36] flex-col items-center justify-center bg-game-night-surface p-4 xl:col-start-1 xl:row-start-1 xl:min-h-0 xl:flex-none">
-          <BattleHeader
-            battleState={battleState}
-            activePlayerMon={activePlayerMon}
-            activeEnemyMon={activeEnemyMon}
-            isWaitingForOpponent={isWaitingForOpponent}
-          />
-          <PokemonSpriteDisplay
-            activePlayerMon={activePlayerMon}
-            activeEnemyMon={activeEnemyMon}
-            {...anim}
-            playerHasTeraEffect={contextValue.playerHasTeraEffect}
-            playerHasZPowerEffect={!!activePlayerMon?.zMoveReady}
-            playerTeraType={activePlayerMon.teraTypeOverride}
-            enemyHasTeraEffect={!!activeEnemyMon.teraTypeOverride}
-            enemyHasZPowerEffect={false}
-            enemyTeraType={activeEnemyMon.teraTypeOverride}
-            hidePlayer={choosingLead}
-          />
-        </div>
+        <BattleScene
+          battleState={battleState}
+          anim={anim}
+          isWaitingForOpponent={isWaitingForOpponent}
+          hidePlayer={choosingLead}
+          playerHasTeraEffect={contextValue.playerHasTeraEffect}
+          playerHasZPowerEffect={!!activePlayerMon.zMoveReady}
+          enemyHasTeraEffect={!!activeEnemyMon.teraTypeOverride}
+          enemyHasZPowerEffect={false}
+        />
         <div className="xl:col-start-1 xl:row-start-2">
           <BattleActionMenu />
         </div>
