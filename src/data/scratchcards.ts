@@ -19,23 +19,18 @@ export const scratchCards: Record<string, ScratchCardConfig> = {
     rewards: [
       {
         chance: 25,
-        reward: [],
-        icon: { type: 'item', id: 'fun-token' },
-      },
-      {
-        chance: 30,
         reward: [
           {
-            type: 'currency',
-            targetId: 'fun-tokens',
-            quantity: 25,
-            label: '25 Fun Tokens',
+            type: 'item',
+            targetId: 'rocket-ball',
+            quantity: 3,
+            label: '3 Rocket Balls',
           },
         ],
-        icon: { type: 'item', id: 'fun-token' },
+        icon: { type: 'item', id: 'rocket-ball' },
       },
       {
-        chance: 20,
+        chance: 60,
         reward: [
           {
             type: 'currency',
@@ -47,31 +42,19 @@ export const scratchCards: Record<string, ScratchCardConfig> = {
         icon: { type: 'item', id: 'fun-token' },
       },
       {
-        chance: 12,
+        chance: 5,
         reward: [
           {
             type: 'currency',
             targetId: 'fun-tokens',
-            quantity: 100,
-            label: '100 Fun Tokens',
+            quantity: 250,
+            label: '250 Fun Tokens',
           },
         ],
         icon: { type: 'item', id: 'fun-token' },
       },
       {
-        chance: 6,
-        reward: [
-          {
-            type: 'item',
-            targetId: 'stardust',
-            quantity: 1,
-            label: 'Stardust',
-          },
-        ],
-        icon: { type: 'item', id: 'stardust' },
-      },
-      {
-        chance: 4,
+        chance: 3,
         reward: [
           {
             type: 'item',
@@ -88,11 +71,56 @@ export const scratchCards: Record<string, ScratchCardConfig> = {
           {
             type: 'currency',
             targetId: 'fun-tokens',
-            quantity: 250,
-            label: '250 Fun Tokens',
+            quantity: 500,
+            label: '500 Fun Tokens',
           },
         ],
         icon: { type: 'item', id: 'fun-token' },
+      },
+      {
+        chance: 1,
+        reward: [
+          {
+            type: 'currency',
+            targetId: 'fun-tokens',
+            quantity: 1000,
+            label: '1,000 Fun Tokens',
+          },
+        ],
+        icon: { type: 'item', id: 'fun-token' },
+      },
+      {
+        chance: 1,
+        reward: [
+          {
+            type: 'icon',
+            targetId: 'gambler',
+            label: 'Gambler Icon',
+          },
+        ],
+        icon: { type: 'trainer', id: 'gamer' },
+      },
+      {
+        chance: 1,
+        reward: [
+          {
+            type: 'title',
+            targetId: 'gambler',
+            label: 'Gambler Title',
+          },
+        ],
+        icon: { type: 'trainer', id: 'gamer' },
+      },
+      {
+        chance: 1,
+        reward: [
+          {
+            type: 'banner',
+            targetId: 'celadon-game-corner',
+            label: 'Celadon Game Corner Background',
+          },
+        ],
+        icon: { type: 'trainer', id: 'gamer' },
       },
     ],
   },

@@ -33,6 +33,7 @@ export const titles: TitleConfig[] = [
   { id: 'lightning-lieutenant', name: 'Lightning Lieutenant' },
   { id: 'joey-friend', name: "Joey's Best Friend" },
   { id: 'team-rocket-grunt', name: 'Team Rocket Grunt' },
+  { id: 'gambler', name: 'Gambler' },
   { id: 'golden-child', name: 'Golden Child' },
   { id: 'the-captain', name: 'The Captain' },
   { id: 'the-nido-king', name: 'The Nido King' },

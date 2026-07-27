@@ -1555,12 +1555,21 @@ describe('artisan recipes', () => {
       expect(recipe?.costs, itemId).toEqual(
         expect.arrayContaining([
           { id: gemId, amount: 10 },
-          { id: materialId, amount: 100 },
+          { id: materialId, amount: 40 },
           { id: 'neutral-stone', amount: 1 },
-          { id: 'crystals', amount: 1000, type: 'currency' },
+          { id: 'crystals', amount: 350, type: 'currency' },
         ]),
       )
     }
+  })
+
+  test('names the time-based evolution stones for their Sun and Dusk results', () => {
+    expect(items.find((item) => item.id === 'inferior-light-stone')?.name).toBe(
+      'Inferior Sun Stone',
+    )
+    expect(items.find((item) => item.id === 'inferior-dark-stone')?.name).toBe(
+      'Inferior Dusk Stone',
+    )
   })
 
   test('unauthored specialty ball recipes are held at Artisan 100', () => {

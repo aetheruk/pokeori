@@ -115,39 +115,70 @@ describe('Celadon Game Corner balance and presentation', () => {
     expect(new Set(icons).size).toBe(icons.length)
   })
 
-  test('Rocket Scratch Cards have a 75% hit rate and 92-token expected value', () => {
+  test('Rocket Scratch Cards use the revised token prizes and rare cosmetics', () => {
     const card = scratchCards['rocket-scratch']
     expect(
       card.rewards.reduce((total, outcome) => total + outcome.chance, 0),
     ).toBe(100)
 
-    const winningChance = card.rewards.reduce(
-      (total, outcome) =>
-        total + ((outcome.reward?.length || 0) > 0 ? outcome.chance : 0),
-      0,
+    expect(card.rewards.every((outcome) => outcome.reward?.length)).toBe(true)
+    expect(card.rewards).toContainEqual(
+      expect.objectContaining({
+        chance: 25,
+        reward: [
+          expect.objectContaining({
+            type: 'item',
+            targetId: 'rocket-ball',
+            quantity: 3,
+          }),
+        ],
+      }),
     )
-    expect(winningChance).toBe(75)
+    expect(card.rewards).toContainEqual(
+      expect.objectContaining({
+        chance: 1,
+        reward: [expect.objectContaining({ type: 'icon', targetId: 'gambler' })],
+      }),
+    )
+    expect(card.rewards).toContainEqual(
+      expect.objectContaining({
+        chance: 1,
+        reward: [expect.objectContaining({ type: 'title', targetId: 'gambler' })],
+      }),
+    )
+    expect(card.rewards).toContainEqual(
+      expect.objectContaining({
+        chance: 1,
+        reward: [
+          expect.objectContaining({
+            type: 'banner',
+            targetId: 'celadon-game-corner',
+          }),
+        ],
+      }),
+    )
+    expect(
+      card.rewards.some((outcome) =>
+        outcome.reward?.some((reward) => reward.targetId === 'stardust'),
+      ),
+    ).toBe(false)
 
-    const tokenExchangeValue: Record<string, number> = {
-      stardust: 250,
-      nugget: 1000,
-    }
-    const expectedValue = card.rewards.reduce((total, outcome) => {
-      const outcomeValue = (outcome.reward || []).reduce((value, reward) => {
+    const expectedTokenValue = card.rewards.reduce(
+      (total, outcome) => {
+        const outcomeValue = (outcome.reward || []).reduce((value, reward) => {
         const quantity =
           typeof reward.quantity === 'number' ? reward.quantity : 0
         if (reward.type === 'currency' && reward.targetId === 'fun-tokens') {
           return value + quantity
         }
-        if (reward.type === 'item' && reward.targetId) {
-          return value + (tokenExchangeValue[reward.targetId] || 0) * quantity
-        }
         return value
       }, 0)
 
-      return total + (outcome.chance / 100) * outcomeValue
-    }, 0)
+        return total + (outcome.chance / 100) * outcomeValue
+      },
+      0,
+    )
 
-    expect(expectedValue).toBe(92)
+    expect(expectedTokenValue).toBe(67.5)
   })
 })

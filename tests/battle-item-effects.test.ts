@@ -405,11 +405,11 @@ describe('battle item effects', () => {
 
   test('inferior time stones charge only during their active day or night window', () => {
     const lightStone = makeBattlePokemon({
-      heldItem: { id: 'inferior-light-stone', name: 'Inferior Light Stone' },
+      heldItem: { id: 'inferior-light-stone', name: 'Inferior Sun Stone' },
       itemCharge: 20,
     })
     const darkStone = makeBattlePokemon({
-      heldItem: { id: 'inferior-dark-stone', name: 'Inferior Dark Stone' },
+      heldItem: { id: 'inferior-dark-stone', name: 'Inferior Dusk Stone' },
       itemCharge: 20,
     })
 
@@ -452,7 +452,7 @@ describe('battle item effects', () => {
       pokemon: makeBattlePokemon({
         id: 'light-dawn',
         user: 'player-1',
-        heldItem: { id: 'inferior-light-stone', name: 'Inferior Light Stone' },
+        heldItem: { id: 'inferior-light-stone', name: 'Inferior Sun Stone' },
         itemCharge: 98,
       }),
       damage: 25,
@@ -463,7 +463,7 @@ describe('battle item effects', () => {
       pokemon: makeBattlePokemon({
         id: 'light-day',
         user: 'player-1',
-        heldItem: { id: 'inferior-light-stone', name: 'Inferior Light Stone' },
+        heldItem: { id: 'inferior-light-stone', name: 'Inferior Sun Stone' },
         itemCharge: 98,
       }),
       damage: 25,
@@ -474,7 +474,7 @@ describe('battle item effects', () => {
       pokemon: makeBattlePokemon({
         id: 'dark-dusk',
         user: 'player-1',
-        heldItem: { id: 'inferior-dark-stone', name: 'Inferior Dark Stone' },
+        heldItem: { id: 'inferior-dark-stone', name: 'Inferior Dusk Stone' },
         itemCharge: 98,
       }),
       damage: 25,
@@ -485,7 +485,7 @@ describe('battle item effects', () => {
       pokemon: makeBattlePokemon({
         id: 'dark-night',
         user: 'player-1',
-        heldItem: { id: 'inferior-dark-stone', name: 'Inferior Dark Stone' },
+        heldItem: { id: 'inferior-dark-stone', name: 'Inferior Dusk Stone' },
         itemCharge: 98,
       }),
       damage: 25,
