@@ -85,31 +85,36 @@ export interface BattlePokemon extends Omit<Pokemon, 'stats'> {
   dynamaxOriginalMaxHp?: number
   originalFormId?: string // Store original form for reference (e.g., for Mega/Dynamax revert)
   originalHeldItemId?: string | null
-	  battleAbilityState?: {
-      consumedShields?: string[]
-      zeroToHeroActivated?: boolean
-      battleBondActivated?: boolean
-      heldItemLost?: boolean
-      suppressed?: boolean
-      lastIntimidatedOpponent?: string
-      lastBeforeMoveSkipTurn?: number
-      beforeAttackTypeChangeActivated?: boolean
-	    illusionMask?: {
-	      name: string
-	      formId?: string
-	    }
-	    originalAbility?: string
-	    originalTransform?: {
-	      name: string
-	      formId: string
-	      types: string[]
-	      stats: BattlePokemon['stats']
-	      statStages?: StatStages
-	    }
-	  }
+  battleAbilityState?: {
+    consumedShields?: string[]
+    zeroToHeroActivated?: boolean
+    battleBondActivated?: boolean
+    heldItemLost?: boolean
+    suppressed?: boolean
+    lastIntimidatedOpponent?: string
+    lastBeforeMoveSkipTurn?: number
+    beforeAttackTypeChangeActivated?: boolean
+    illusionMask?: {
+      name: string
+      formId?: string
+    }
+    originalAbility?: string
+    originalTransform?: {
+      name: string
+      formId: string
+      types: string[]
+      stats: BattlePokemon['stats']
+      statStages?: StatStages
+    }
+  }
   heldItem?: { id: string; name: string } // Minimal item data for battle logic
   heldItemBattleOnly?: boolean
-  consumedHeldItems?: { itemId: string; name: string; persistent?: boolean; forceClear?: boolean }[]
+  consumedHeldItems?: {
+    itemId: string
+    name: string
+    persistent?: boolean
+    forceClear?: boolean
+  }[]
   pokemonResearchLevel?: number
   observedPreferredStance?: BattleStance
   // Status Effect
@@ -298,6 +303,7 @@ export type BattlePresentationEvent =
       side: BattlePresentationSide
       fromIndex: number
       toIndex: number
+      hpOnEntry: number
       reason: 'voluntary' | 'replacement' | 'lead'
       message: string
     }

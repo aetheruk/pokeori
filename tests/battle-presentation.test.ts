@@ -291,6 +291,127 @@ describe('battle presentation timeline', () => {
     })
   })
 
+  test('keeps voluntary switch HP at entry value until the incoming hit lands', () => {
+    const playerLead = {
+      ...makePvpBattleState().playerTeam[0],
+      id: 'p1-lead',
+      name: 'P1 Lead',
+    }
+    const playerReserve = {
+      ...makePvpBattleState().playerTeam[0],
+      id: 'p1-reserve',
+      name: 'P1 Reserve',
+    }
+    const state = makePvpBattleState({
+      playerTeam: [playerLead, playerReserve],
+    })
+    beginBattlePresentation(state)
+
+    state.activePlayerIndex = 1
+    state.playerTeam[1].currentHp = 90
+    state.history.unshift({
+      turn: 1,
+      playerStance: 'speed',
+      enemyStance: 'power',
+      result: 'loss',
+      damageDealt: 0,
+      damageTaken: 30,
+      enemyAttackType: 'fire',
+      message: [
+        'Player 1 sent out P1 Reserve!',
+        'Player 2: P2 Mon attacks! [icon:stance:power] [icon:type:fire] Dealt 30.',
+      ].join('\n'),
+    })
+
+    finalizeBattlePresentation(state)
+
+    expect(state.presentation?.events[0]).toMatchObject({
+      type: 'switch',
+      side: 'player',
+      fromIndex: 0,
+      toIndex: 1,
+      hpOnEntry: 120,
+      reason: 'voluntary',
+    })
+    expect(
+      state.presentation?.events.find((event) => event.type === 'attack'),
+    ).toMatchObject({
+      type: 'attack',
+      targetSide: 'player',
+      targetIndex: 1,
+      damage: 30,
+      hpAfter: 90,
+    })
+  })
+
+  test('plays replacement entry damage after the switch with matching HP', () => {
+    const playerLead = {
+      ...makePvpBattleState().playerTeam[0],
+      id: 'p1-lead',
+      name: 'P1 Lead',
+    }
+    const playerReserve = {
+      ...makePvpBattleState().playerTeam[0],
+      id: 'p1-reserve',
+      name: 'P1 Reserve',
+    }
+    const state = makePvpBattleState({
+      playerTeam: [playerLead, playerReserve],
+    })
+    beginBattlePresentation(state)
+
+    state.playerTeam[0].currentHp = 0
+    state.playerTeam[1].currentHp = 105
+    state.activePlayerIndex = 1
+    state.history.unshift({
+      turn: 1,
+      playerStance: 'tech',
+      enemyStance: 'power',
+      result: 'loss',
+      damageDealt: 0,
+      damageTaken: 120,
+      enemyAttackType: 'fire',
+      message: [
+        'Player 2: P2 Mon attacks! [icon:stance:power] [icon:type:fire] Dealt 120.',
+        "Player 1's P1 Lead fainted!",
+        'Player 1 sent out P1 Reserve!',
+        "Player 1's P1 Reserve is hurt by Spikes. [icon:damage:15]",
+      ].join('\n'),
+    })
+
+    finalizeBattlePresentation(state)
+
+    expect(state.presentation?.events).toMatchObject([
+      {
+        type: 'attack',
+        targetSide: 'player',
+        targetIndex: 0,
+        hpAfter: 0,
+      },
+      {
+        type: 'faint',
+        side: 'player',
+        pokemonIndex: 0,
+        hpAfter: 0,
+      },
+      {
+        type: 'switch',
+        side: 'player',
+        fromIndex: 0,
+        toIndex: 1,
+        hpOnEntry: 120,
+      },
+      {
+        type: 'hp-change',
+        side: 'player',
+        pokemonIndex: 1,
+        kind: 'damage',
+        amount: 15,
+        hpAfter: 105,
+      },
+    ])
+  })
+
   test('carries authoritative zero HP into faint events when damage is unparsed', () => {
     const state = makePvpBattleState()
     beginBattlePresentation(state)
