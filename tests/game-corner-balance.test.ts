@@ -31,6 +31,20 @@ describe('Celadon Game Corner balance and presentation', () => {
     ).toBe(2500)
   })
 
+  test('awards Porygon in a Poké Ball with the Silph Co. background', () => {
+    const prizeExchange = celadonGameCornerShops.find(
+      (shop) => shop.id === 'celadon-game-corner-prize-exchange',
+    )
+    const porygonReward = prizeExchange?.items.find(
+      (item) => item.id === 'game-corner-porygon',
+    )?.rewards[0]
+
+    expect(porygonReward?.pokemonData?.ballType).toBe('poke-ball')
+    expect(porygonReward?.pokemonData?.background).toBe(
+      '/backgrounds/silph.avif',
+    )
+  })
+
   test('unlocks High Roller at 1,000 tokens and scales paired games by five', () => {
     const highRoller = celadonGameCornerTasks.find(
       (task) => task.id === 'high-roller',

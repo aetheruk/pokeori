@@ -66,7 +66,7 @@ import {
   matchesEvolutionTimeOfDayForRegion,
   resolveEvolutionTimeRegion,
 } from '@/utilities/pokemon/evolution-conditions'
-import { getOwnedPokemonGender } from '@/utilities/pokemon/gender'
+import { formatPokemonGenderLabel, getOwnedPokemonGender } from '@/utilities/pokemon/gender'
 import {
   formatHeldItemTrigger,
   getHeldItemDefinition,
@@ -1138,7 +1138,7 @@ export function PokemonDetailsDialog({
                   },
                   {
                     label: 'Gender',
-                    value: pokemonGender,
+                    value: formatPokemonGenderLabel(pokemonGender),
                     icon: Info,
                     color: 'game-moss',
                   },

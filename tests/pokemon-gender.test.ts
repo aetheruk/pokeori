@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { getPokemonSpecies } from '@/utilities/pokemon/pokedex'
 import {
+  formatPokemonGenderLabel,
   getDefaultPokemonGender,
   getOwnedPokemonGender,
   rollPokemonGender,
@@ -27,5 +28,11 @@ describe('Pokemon gender data', () => {
   test('defaults missing owned Pokemon gender to male for legacy records', () => {
     expect(getOwnedPokemonGender({})).toBe('male')
     expect(getDefaultPokemonGender(120)).toBe('genderless')
+  })
+
+  test('formats stored genders as display labels', () => {
+    expect(formatPokemonGenderLabel('male')).toBe('Male')
+    expect(formatPokemonGenderLabel('female')).toBe('Female')
+    expect(formatPokemonGenderLabel('genderless')).toBe('Genderless')
   })
 })

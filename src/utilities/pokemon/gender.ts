@@ -37,6 +37,10 @@ export function getOwnedPokemonGender(pokemon: { gender?: unknown }): PokemonGen
   return normalizePokemonGender(pokemon.gender) || 'male'
 }
 
+export function formatPokemonGenderLabel(gender: PokemonGender): string {
+  return gender.charAt(0).toUpperCase() + gender.slice(1)
+}
+
 export function hasOppositeNonGenderlessGenders(
   source: { gender?: unknown },
   target: { gender?: unknown },
