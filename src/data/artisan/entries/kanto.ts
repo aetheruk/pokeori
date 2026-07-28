@@ -1134,7 +1134,7 @@ const ELEMENTAL_STONE_HELD_RECIPES: ArtisanRecipeDraft[] = ELEMENTAL_STONE_RECIP
   artisanLevel: 30,
   costs: [
     { id: stone.gemId, amount: 10 },
-    { id: `${TYPE_PRIMARY_MATERIAL[stone.materialType]}-t1`, amount: 40 },
+    { id: `${TYPE_PRIMARY_MATERIAL[stone.materialType]}-t1`, amount: 20 },
     { id: 'neutral-stone', amount: 1 },
     { id: 'crystals', amount: 350, type: 'currency' },
   ],

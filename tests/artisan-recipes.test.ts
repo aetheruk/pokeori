@@ -1555,7 +1555,7 @@ describe('artisan recipes', () => {
       expect(recipe?.costs, itemId).toEqual(
         expect.arrayContaining([
           { id: gemId, amount: 10 },
-          { id: materialId, amount: 40 },
+          { id: materialId, amount: 20 },
           { id: 'neutral-stone', amount: 1 },
           { id: 'crystals', amount: 350, type: 'currency' },
         ]),
