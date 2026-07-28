@@ -305,6 +305,13 @@ export interface BattlePresentation {
   events: BattlePresentationEvent[]
 }
 
+export interface PendingBattleMoveSwitch {
+  kind: 'self' | 'forced'
+  side: BattlePresentationSide
+  activeIndex: number
+  passStatStages?: StatStages
+}
+
 export interface BattleState {
   playerTeam: BattlePokemon[]
   enemyTeam: BattlePokemon[]
@@ -314,10 +321,11 @@ export interface BattleState {
   turn: number
   history: BattleLogEntry[]
   presentation?: BattlePresentation
-  status: 'ongoing' | 'won' | 'lost'
+  status: 'ongoing' | 'won' | 'lost' | 'draw'
   pendingPlayerSwitch?: boolean
   pendingPlayerSwitchReason?: 'lead' | 'fainted' | 'move'
   pendingPlayerSwitchStatStages?: StatStages
+  pendingMoveSwitches?: PendingBattleMoveSwitch[]
   battleId: string
   background?: string
   playerName: string

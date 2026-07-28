@@ -58,6 +58,27 @@ describe('battle presentation timeline', () => {
     ])
   })
 
+  test('silently syncs an unparsed authoritative HP difference', () => {
+    const state = makePvpBattleState()
+    beginBattlePresentation(state)
+    state.playerTeam[0].currentHp = 90
+    state.history.unshift({
+      turn: 1,
+      playerStance: 'tech',
+      enemyStance: 'tech',
+      result: 'tie',
+      damageDealt: 0,
+      damageTaken: 0,
+      message: 'An unrecognised legacy effect resolved.',
+    })
+
+    finalizeBattlePresentation(state)
+
+    expect(
+      state.presentation?.events.some((event) => event.type === 'hp-change'),
+    ).toBe(false)
+  })
+
   test('flips every semantic side for the opposing PVP perspective', () => {
     const state = makePvpBattleState()
     beginBattlePresentation(state)

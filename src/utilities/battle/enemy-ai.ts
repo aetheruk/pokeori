@@ -2283,6 +2283,7 @@ export function applyEnemyAiMoveEffects(params: {
   weather?: WeatherType
   random?: () => number
   skipPreDamageDefensiveEffects?: boolean
+  skipPrimaryHealing?: boolean
 }): string[] {
   const { move, self, opponent, weather } = params
   const random = params.random ?? Math.random
@@ -2373,7 +2374,7 @@ export function applyEnemyAiMoveEffects(params: {
     }
   }
 
-  if (move.heal) {
+  if (move.heal && !params.skipPrimaryHealing) {
     const healAmount = getMoveHealAmount({
       move,
       pokemon: self,

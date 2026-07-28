@@ -34,6 +34,7 @@ import {
   clearSourceLinkedTrapSecondaryStatuses,
   clearSelectedPokemonSecondaryStatuses,
   hasSecondaryStatusAccuracyBypass,
+  processSecondaryStatusesForSwitch,
 } from './secondary-statuses'
 import { getTypeEffectiveness } from './type-chart'
 import {
@@ -57,8 +58,10 @@ import {
   processBattleAbilityTerrainSet,
   processBattleAbilityWeatherSet,
   processBattleAbilityWeatherTypeChangesForState,
+  processBattleAbilitySuppressionForState,
   applyBattleAbilityStatusReflection,
 } from './abilities'
+import { processBattleAbilitySwitchOut } from './switching'
 
 const CALLABLE_MOVE_EXCLUSIONS = new Set(['metronome'])
 
@@ -1592,8 +1595,9 @@ export function applyMoveRuntimeEffects(params: {
         messages,
       }
     }
+    const targetSide = oppositeSide(side)
     const activeIndex =
-      side === 'player' ? state.activeEnemyIndex : state.activePlayerIndex
+      targetSide === 'player' ? state.activePlayerIndex : state.activeEnemyIndex
     const nextIndex = defenderTeam.findIndex(
       (pokemon, index) => index !== activeIndex && pokemon.currentHp > 0,
     )
@@ -1602,84 +1606,34 @@ export function applyMoveRuntimeEffects(params: {
         failed: `${move.name} failed because there was no replacement.`,
         messages,
       }
-    clearSourceLinkedTrapSecondaryStatuses({
-      state,
-      sourceSide: side === 'player' ? 'enemy' : 'player',
-      sourcePokemon: defender,
+    state.pendingMoveSwitches ??= []
+    state.pendingMoveSwitches.push({
+      kind: 'forced',
+      side: targetSide,
+      activeIndex,
     })
-    clearPokemonSecondaryStatuses(defender)
-    resetBattleTypeChange(defender)
-    if (side === 'player') state.activeEnemyIndex = nextIndex
-    else state.activePlayerIndex = nextIndex
-    const replacement = defenderTeam[nextIndex]
-    replacement.activeTurnStarted = state.turn + 1
-    messages.push(`${defender.name} was forced out!`)
-    messages.push(
-      ...processBattleAbilityWeatherSet({
-        state,
-        pokemon: replacement,
-        ownerName: side === 'player' ? state.enemyName : state.playerName,
-      }),
-      ...processBattleAbilityTerrainSet({
-        state,
-        pokemon: replacement,
-        ownerName: side === 'player' ? state.enemyName : state.playerName,
-      }),
-    )
   }
 
   if (move.switchEffect?.type === 'self-pending') {
-    if (side === 'player') {
-      state.pendingPlayerSwitch = true
-      state.pendingPlayerSwitchReason = 'move'
-      if (move.switchEffect.passStatStages) {
-        state.pendingPlayerSwitchStatStages = cloneStatStages(
-          attacker.statStages,
-        )
+    const activeIndex =
+      side === 'player' ? state.activePlayerIndex : state.activeEnemyIndex
+    const nextIndex = attackerTeam.findIndex(
+      (pokemon, index) => index !== activeIndex && pokemon.currentHp > 0,
+    )
+    if (nextIndex === -1)
+      return {
+        failed: `${move.name} failed because there was no replacement.`,
+        messages,
       }
-      messages.push(`Choose a Pokemon to switch in for ${attacker.name}.`)
-    } else {
-      const activeIndex = state.activeEnemyIndex
-      const nextIndex = attackerTeam.findIndex(
-        (pokemon, index) => index !== activeIndex && pokemon.currentHp > 0,
-      )
-      if (nextIndex === -1)
-        return {
-          failed: `${move.name} failed because there was no replacement.`,
-          messages,
-        }
-      const passedStatStages = move.switchEffect.passStatStages
+    state.pendingMoveSwitches ??= []
+    state.pendingMoveSwitches.push({
+      kind: 'self',
+      side,
+      activeIndex,
+      passStatStages: move.switchEffect.passStatStages
         ? cloneStatStages(attacker.statStages)
-        : undefined
-      clearSourceLinkedTrapSecondaryStatuses({
-        state,
-        sourceSide: 'enemy',
-        sourcePokemon: attacker,
-      })
-      clearPokemonSecondaryStatuses(attacker)
-      resetBattleTypeChange(attacker)
-      state.activeEnemyIndex = nextIndex
-      const replacement = attackerTeam[nextIndex]
-      replacement.activeTurnStarted = state.turn + 1
-      if (passedStatStages) {
-        replacement.statStages = passedStatStages
-      }
-      messages.push(
-        `${attacker.name} went back, and ${replacement.name} took its place.`,
-      )
-      messages.push(
-        ...processBattleAbilityWeatherSet({
-          state,
-          pokemon: replacement,
-          ownerName: state.enemyName,
-        }),
-        ...processBattleAbilityTerrainSet({
-          state,
-          pokemon: replacement,
-          ownerName: state.enemyName,
-        }),
-      )
-    }
+        : undefined,
+    })
   }
 
   if (move.typeChangeEffect) {
@@ -1800,6 +1754,87 @@ export function applyMoveRuntimeEffects(params: {
   }
 
   return { messages }
+}
+
+/**
+ * Resolves move-authored pivots after primary damage and the primary KO check.
+ * Voluntary switches are handled before combat; ordinary faint replacements
+ * remain deferred until the end of the turn.
+ */
+export function resolvePendingMoveSwitches(state: BattleState): string[] {
+  const queued = state.pendingMoveSwitches ?? []
+  state.pendingMoveSwitches = undefined
+  const messages: string[] = []
+
+  for (const pending of queued) {
+    const team = pending.side === 'player' ? state.playerTeam : state.enemyTeam
+    const currentIndex =
+      pending.side === 'player'
+        ? state.activePlayerIndex
+        : state.activeEnemyIndex
+    if (currentIndex !== pending.activeIndex) continue
+
+    const outgoing = team[currentIndex]
+    if (!outgoing || outgoing.currentHp <= 0) continue
+    const replacementIndex = team.findIndex(
+      (pokemon, index) => index !== currentIndex && pokemon.currentHp > 0,
+    )
+    if (replacementIndex === -1) continue
+
+    if (
+      pending.kind === 'self' &&
+      pending.side === 'player' &&
+      !state.isPvp
+    ) {
+      state.pendingPlayerSwitch = true
+      state.pendingPlayerSwitchReason = 'move'
+      state.pendingPlayerSwitchStatStages = pending.passStatStages
+      messages.push(`Choose a Pokemon to switch in for ${outgoing.name}.`)
+      continue
+    }
+
+    clearSourceLinkedTrapSecondaryStatuses({
+      state,
+      sourceSide: pending.side,
+      sourcePokemon: outgoing,
+    })
+    clearPokemonSecondaryStatuses(outgoing)
+    resetBattleTypeChange(outgoing)
+    messages.push(...processBattleAbilitySwitchOut(outgoing))
+
+    if (pending.side === 'player') state.activePlayerIndex = replacementIndex
+    else state.activeEnemyIndex = replacementIndex
+
+    const replacement = team[replacementIndex]
+    replacement.activeTurnStarted = state.turn + 1
+    if (pending.passStatStages) {
+      replacement.statStages = cloneStatStages(pending.passStatStages)
+    }
+
+    messages.push(
+      pending.kind === 'forced'
+        ? `${outgoing.name} was forced out, and ${replacement.name} took its place.`
+        : `${outgoing.name} went back, and ${replacement.name} took its place.`,
+    )
+    messages.push(...processSecondaryStatusesForSwitch(state, pending.side))
+    messages.push(...processBattleAbilitySuppressionForState(state))
+    const ownerName =
+      pending.side === 'player' ? state.playerName : state.enemyName
+    messages.push(
+      ...processBattleAbilityWeatherSet({
+        state,
+        pokemon: replacement,
+        ownerName,
+      }),
+      ...processBattleAbilityTerrainSet({
+        state,
+        pokemon: replacement,
+        ownerName,
+      }),
+    )
+  }
+
+  return messages
 }
 
 export function consumeNextAccuracyBypass(pokemon: BattlePokemon): boolean {

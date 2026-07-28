@@ -32,7 +32,6 @@ import {
   applyHeldAttackBreak,
   applyHeldDamageBlock,
   applyHeldItemChargeOnHit,
-  applyHeldItemIfTriggered,
 } from '@/utilities/battle/held-items'
 import {
   applyPokemonResearchEndure,
@@ -239,6 +238,63 @@ export interface PvpCombatResolution {
   preventsOpponentDamage?: boolean
 }
 
+export interface PvpActionEligibility {
+  canMove: boolean
+  message: string
+  beforeMoveStatus: ReturnType<typeof resolveBeforeMoveStatus>
+  beforeMoveAbility: ReturnType<typeof resolveBattleAbilityBeforeMove>
+  beforeMoveSecondaryStatus: ReturnType<
+    typeof processBeforeMoveSecondaryStatuses
+  >
+}
+
+export function preparePvpCombatAction(params: {
+  state?: BattleState
+  attacker: BattlePokemon
+  attackerSide: 'player' | 'enemy'
+  move: PvpQueuedMoveForPowerUse
+  currentTurn?: number
+  random?: () => number
+}): PvpActionEligibility {
+  const specialMove = params.move.specialMoveId
+    ? getMove(params.move.specialMoveId)
+    : undefined
+  const hiddenPower =
+    specialMove?.id === 'hidden-power'
+      ? resolveHiddenPower(params.attacker)
+      : undefined
+  const beforeMoveStatus = resolveBeforeMoveStatus(params.attacker)
+  const beforeMoveAbility = beforeMoveStatus.canMove
+    ? resolveBattleAbilityBeforeMove(params.attacker, params.currentTurn)
+    : { canMove: true, message: '' }
+  const beforeMoveSecondaryStatus =
+    beforeMoveStatus.canMove && beforeMoveAbility.canMove
+      ? processBeforeMoveSecondaryStatuses({
+          state: params.state,
+          pokemon: params.attacker,
+          side: params.attackerSide,
+          move: specialMove,
+          attackType:
+            hiddenPower?.attackType ||
+            params.move.attackType ||
+            specialMove?.forcedType,
+          random: params.random,
+        })
+      : { canMove: true, message: '' }
+  const blocked = !beforeMoveStatus.canMove
+    ? beforeMoveStatus
+    : !beforeMoveAbility.canMove
+      ? beforeMoveAbility
+      : beforeMoveSecondaryStatus
+  return {
+    canMove: blocked.canMove,
+    message: blocked.message,
+    beforeMoveStatus,
+    beforeMoveAbility,
+    beforeMoveSecondaryStatus,
+  }
+}
+
 export function invertBattleResult(result: BattleTurnResult): BattleTurnResult {
   if (result === 'win') return 'loss'
   if (result === 'loss') return 'win'
@@ -438,6 +494,8 @@ export function resolvePvpCombat(params: {
   currentTurn?: number
   random?: () => number
   weather?: WeatherType
+  eligibility?: PvpActionEligibility
+  primaryHealingApplied?: number
 }): PvpCombatResolution {
   const {
     state,
@@ -452,6 +510,8 @@ export function resolvePvpCombat(params: {
     currentTurn,
     random,
     weather,
+    eligibility,
+    primaryHealingApplied,
   } = params
   const chanceRandom = random ?? Math.random
 
@@ -467,29 +527,22 @@ export function resolvePvpCombat(params: {
     specialMove?.id === 'hidden-power'
       ? resolveHiddenPower(attacker)
       : undefined
-  const beforeMoveStatus = resolveBeforeMoveStatus(attacker)
-  const beforeMoveAbility = beforeMoveStatus.canMove
-    ? resolveBattleAbilityBeforeMove(attacker, currentTurn)
-    : { canMove: true, message: '' }
-  const beforeMoveSecondaryStatus =
-    beforeMoveStatus.canMove && beforeMoveAbility.canMove
-      ? processBeforeMoveSecondaryStatuses({
-          state,
-          pokemon: attacker,
-          side: attackerSide,
-          move: specialMove,
-          attackType:
-            hiddenPower?.attackType ||
-            move.attackType ||
-            specialMove?.forcedType,
-          random: chanceRandom,
-        })
-      : { canMove: true, message: '' }
-  const beforeMoveCheck = !beforeMoveStatus.canMove
-    ? beforeMoveStatus
-    : !beforeMoveAbility.canMove
-      ? beforeMoveAbility
-      : beforeMoveSecondaryStatus
+  const prepared =
+    eligibility ??
+    preparePvpCombatAction({
+      state,
+      attacker,
+      attackerSide,
+      move,
+      currentTurn,
+      random: chanceRandom,
+    })
+  const {
+    beforeMoveStatus,
+    beforeMoveAbility,
+    beforeMoveSecondaryStatus,
+  } = prepared
+  const beforeMoveCheck = prepared
   if (!beforeMoveCheck.canMove) {
     if (move.powers?.zMove) clearZMoveCharge(attacker)
     return {
@@ -1046,11 +1099,6 @@ export function resolvePvpCombat(params: {
     effectMessage += ` ${attackBreakResult.message}`
   }
 
-  const heldItemResult = applyHeldItemIfTriggered(defender, 'hp')
-  if (heldItemResult.applied) {
-    effectMessage += ` ${heldItemResult.message}`
-  }
-
   if (beforeMoveStatus.message) {
     effectMessage += ` ${beforeMoveStatus.message}`
   }
@@ -1058,7 +1106,7 @@ export function resolvePvpCombat(params: {
     effectMessage += ` ${beforeMoveAbility.message}`
   }
 
-  if (!moveFailed && specialMove?.heal) {
+  if (!moveFailed && specialMove?.heal && !primaryHealingApplied) {
     const healAmount = getMoveHealAmount({
       move: specialMove,
       pokemon: attacker,
@@ -1069,6 +1117,8 @@ export function resolvePvpCombat(params: {
       attacker.currentHp + healAmount,
     )
     effectMessage += ` ${attacker.name} healed ${healAmount} HP!`
+  } else if (!moveFailed && primaryHealingApplied) {
+    effectMessage += ` ${attacker.name} healed ${primaryHealingApplied} HP! [icon:heal:${primaryHealingApplied}]`
   }
 
   if (!moveFailed && specialMove?.buffs) {

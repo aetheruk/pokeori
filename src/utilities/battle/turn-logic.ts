@@ -20,10 +20,13 @@ import {
 import { processBattleRarityTurnEnd } from './rarity-effects'
 
 export function processTurnEnd(state: BattleState): string[] {
-  const messages = processEndTurnStatusDamage(state)
+  const messages = processEndTurnStatusDamage(state, 'damage')
   messages.push(...processEndTurnWeatherDamageForState(state))
   messages.push(...processSecondaryStatusesForTurnEnd(state))
   messages.push(...processDelayedMoveDamage(state))
+  // Survivor-only healing is deliberately after all residual damage. Every
+  // healing helper guards against 0 HP, so a residual KO cannot be undone.
+  messages.push(...processEndTurnStatusDamage(state, 'healing'))
   messages.push(...processTerrainTurnEffects(state))
   const { playerTeam, enemyTeam, activePlayerIndex, activeEnemyIndex } = state
   const playerMon = playerTeam[activePlayerIndex]
@@ -88,7 +91,10 @@ export function processEndTurnWeatherDamageForState(state: BattleState): string[
   return messages
 }
 
-export function processEndTurnStatusDamage(state: BattleState): string[] {
+export function processEndTurnStatusDamage(
+  state: BattleState,
+  phase: 'all' | 'damage' | 'healing' = 'all',
+): string[] {
   const messages: string[] = []
   const { playerTeam, enemyTeam, activePlayerIndex, activeEnemyIndex } = state
   const playerMon = playerTeam[activePlayerIndex]
@@ -97,16 +103,19 @@ export function processEndTurnStatusDamage(state: BattleState): string[] {
   const processStatus = (mon: BattlePokemon, ownerName: string) => {
     if (!mon.status || mon.currentHp <= 0) return
 
-    const heldItemResult = applyHeldItemIfTriggered(mon, 'status')
-    if (heldItemResult.applied) {
-      messages.push(heldItemResult.message)
-      return
-    }
-
     const effect = STATUS_EFFECTS[mon.status.id]
     if (!effect) return
+    if (
+      phase !== 'healing' &&
+      !effect.healingPerTurn &&
+      !effect.damagePerTurn
+    ) {
+      const heldItemResult = applyHeldItemIfTriggered(mon, 'status')
+      if (heldItemResult.applied) messages.push(heldItemResult.message)
+    }
 
     if (effect.healingPerTurn) {
+      if (phase === 'damage') return
       if (mon.currentHp < mon.maxHp) {
         const healing = Math.max(1, Math.floor(mon.maxHp * effect.healingPerTurn))
         const oldHp = mon.currentHp
@@ -129,6 +138,12 @@ export function processEndTurnStatusDamage(state: BattleState): string[] {
         })
       : 0
     if (statusTurnDamagePercent > 0) {
+      if (phase === 'healing') return
+      const heldItemResult = applyHeldItemIfTriggered(mon, 'status')
+      if (heldItemResult.applied) {
+        messages.push(heldItemResult.message)
+        return
+      }
       const sourceDamage = Math.max(
         1,
         Math.floor((mon.maxHp * statusTurnDamagePercent) / 100),
@@ -170,6 +185,7 @@ export function processEndTurnStatusDamage(state: BattleState): string[] {
         statusId: mon.status.id,
       })
       if (healPercent > 0) {
+        if (phase === 'damage') return
         if (mon.currentHp < mon.maxHp) {
           const healing = Math.max(1, Math.floor((mon.maxHp * healPercent) / 100))
           const oldHp = mon.currentHp
@@ -188,6 +204,13 @@ export function processEndTurnStatusDamage(state: BattleState): string[] {
         if (mon.status.id === 'bad-poison') {
           mon.status.counter = stage + 1
         }
+        return
+      }
+
+      if (phase === 'healing') return
+      const heldItemResult = applyHeldItemIfTriggered(mon, 'status')
+      if (heldItemResult.applied) {
+        messages.push(heldItemResult.message)
         return
       }
 

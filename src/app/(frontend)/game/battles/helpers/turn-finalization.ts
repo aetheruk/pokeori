@@ -34,6 +34,7 @@ import { createBattleTurnTimer } from './timing'
 import { persistPokemonBattleKOs, recordPokemonKO } from './pokemon-ko-credit'
 import { processBattleAbilitySuppressionForState } from '@/utilities/battle/abilities'
 import { finalizeBattlePresentation } from '@/utilities/battle/presentation'
+import { resolvePendingMoveSwitches } from '@/utilities/battle/move-effects'
 
 function getBattleConfigForState(state: BattleState) {
   return (
@@ -92,21 +93,6 @@ export async function finalizeTurn(
     status: state.status,
   })
 
-  // Process End of Turn Effects (Burn damage etc)
-  const endTurnMessages = processTurnEnd(state)
-  if (endTurnMessages.length > 0) {
-    // Append to latest history entry
-    if (state.history.length > 0) {
-      state.history[0].message += `\n${endTurnMessages.join('\n')}`
-    }
-  }
-
-  const { playerTeam, enemyTeam, activePlayerIndex, activeEnemyIndex } = state
-  const playerMon = playerTeam[activePlayerIndex]
-  const enemyMon = enemyTeam[activeEnemyIndex]
-  const playerName = state.playerName
-  const enemyName = state.enemyName
-
   if (state.history.length === 0) {
     state.history.unshift({
       turn: state.turn,
@@ -119,6 +105,20 @@ export async function finalizeTurn(
     })
   }
 
+  // Move-authored pivots resolve after primary damage. A fainted pivot user
+  // cannot leave, while a surviving user may pivot even after KOing its target.
+  const moveSwitchMessages = resolvePendingMoveSwitches(state)
+  if (moveSwitchMessages.length > 0) {
+    state.history[0].message += `\n${moveSwitchMessages.join('\n')}`
+  }
+
+  const { playerTeam, enemyTeam } = state
+  const playerMon = playerTeam[state.activePlayerIndex]
+  const enemyMon = enemyTeam[state.activeEnemyIndex]
+  const playerName = state.playerName
+  const enemyName = state.enemyName
+
+  // Held HP items have priority over residual damage.
   const heldItemMessages = [
     applyHeldItemIfTriggered(playerMon, 'hp').message,
     applyHeldItemIfTriggered(enemyMon, 'hp').message,
@@ -127,10 +127,38 @@ export async function finalizeTurn(
     state.history[0].message += `\n${heldItemMessages.join('\n')}`
   }
 
+  const endTurnMessages = processTurnEnd(state)
+  if (endTurnMessages.length > 0) {
+    state.history[0].message += `\n${endTurnMessages.join('\n')}`
+  }
+
   advancePowerStateForTurn(state)
 
+  const bothTeamsExhausted =
+    playerMon.currentHp === 0 &&
+    enemyMon.currentHp === 0 &&
+    !hasAvailableReplacement(playerTeam, state.activePlayerIndex) &&
+    !hasAvailableReplacement(enemyTeam, state.activeEnemyIndex)
+  const playerWinsSimultaneousExhaustion =
+    bothTeamsExhausted && state.history[0]?.result === 'win'
+
+  if (playerWinsSimultaneousExhaustion) {
+    recordPokemonKO(state, 'player')
+    const payload = await timer.time('getPayload:faintedPlayerDoubleKo', () =>
+      getPayload({ config: configPromise }),
+    )
+    await timer.time('decrementFriendship:playerDoubleKo', () =>
+      decrementFaintedPokemonFriendship({
+        payload,
+        pokemon: playerMon,
+        userId: user.id,
+      }),
+    )
+    state.history[0].message += `\n${formatPokemonFaintedMessage(playerName, playerMon.name)}`
+  }
+
   // Check Deaths
-  if (playerMon.currentHp === 0) {
+  if (playerMon.currentHp === 0 && !playerWinsSimultaneousExhaustion) {
     recordPokemonKO(state, 'player')
     const payload = await timer.time('getPayload:faintedPlayer', () =>
       getPayload({ config: configPromise }),
@@ -151,7 +179,7 @@ export async function finalizeTurn(
     }
     state.history[0].message += `\n${formatPokemonFaintedMessage(playerName, playerMon.name)}`
 
-    if (hasAvailableReplacement(playerTeam, activePlayerIndex)) {
+    if (hasAvailableReplacement(playerTeam, state.activePlayerIndex)) {
       state.pendingPlayerSwitch = true
       state.pendingPlayerSwitchReason = 'fainted'
       resetPlayerPowerStateForReplacement(state)
@@ -221,7 +249,7 @@ export async function finalizeTurn(
     const nextEnemyIndex = chooseEnemyReplacementIndex({
       state,
       playerMon,
-      currentEnemyIndex: activeEnemyIndex,
+      currentEnemyIndex: state.activeEnemyIndex,
     })
     if (nextEnemyIndex !== -1) {
       clearSourceLinkedTrapSecondaryStatuses({

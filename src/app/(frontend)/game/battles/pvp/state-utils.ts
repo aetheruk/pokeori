@@ -141,7 +141,7 @@ export function flipPvpState(state: BattleState, battleId: string): BattleState 
         ? 'lost'
         : state.status === 'lost'
           ? 'won'
-          : (state.status as 'ongoing' | 'won' | 'lost'),
+          : state.status,
   }
 }
 

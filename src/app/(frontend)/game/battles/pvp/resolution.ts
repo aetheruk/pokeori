@@ -17,6 +17,7 @@ import {
   applyDimensionalChargeForResult,
   consumeQueuedMovePowerUses,
   invertBattleResult,
+  preparePvpCombatAction,
   resolvePvpCombat,
   resolvePvpFaint,
   resolvePvpSwap,
@@ -28,7 +29,10 @@ import {
   processEndTurnWeatherDamageForState,
 } from '@/utilities/battle/turn-logic'
 import { processSecondaryStatusesForTurnEnd } from '@/utilities/battle/secondary-statuses'
-import { applyHeldItemIfTriggered } from '@/utilities/battle/held-items'
+import {
+  applyHeldItemIfTriggered,
+  restoreConsumedBerryByAbility,
+} from '@/utilities/battle/held-items'
 import {
   applyBattleAbilityOpposingMoveUseDepletion,
   processBattleAbilityTeraActivation,
@@ -51,8 +55,10 @@ import {
 } from '@/utilities/battle/z-move'
 import {
   processDelayedMoveDamage,
+  getMoveHealAmount,
   recordSuccessfulBasicAttackUse,
   recordSuccessfulMoveUse,
+  resolvePendingMoveSwitches,
 } from '@/utilities/battle/move-effects'
 import { decrementFaintedPokemonFriendship } from '@/utilities/battle/friendship'
 import { processBattleRarityTurnEnd } from '@/utilities/battle/rarity-effects'
@@ -60,6 +66,7 @@ import {
   beginBattlePresentation,
   finalizeBattlePresentation,
 } from '@/utilities/battle/presentation'
+import { processTerrainTurnEffects } from '@/utilities/battle/terrain-effects'
 
 export interface PvpMove {
   stance: BattleStance
@@ -325,38 +332,6 @@ export async function resolvePvpTurn(
     if (p2Swap.messages.length) logMessage += `\n${p2Swap.messages.join('\n')}`
   }
 
-  // If BOTH swapped, turn ends (no attacks).
-  if (p1Swap.swapped && p2Swap.swapped) {
-    if (logMessage)
-      state.history.unshift({
-        turn: state.turn,
-        playerStance: 'speed',
-        enemyStance: 'speed', // Dummy
-        result: 'tie',
-        damageDealt: 0,
-        damageTaken: 0,
-        message: logMessage.trim(),
-      })
-    p1Powers.dimensionalShift.charges.draws++
-    p2Powers.dimensionalShift.charges.draws++
-    advancePvpPowerStateForTurn(
-      state.playerTeam[state.activePlayerIndex],
-      p1Powers,
-      state.turn,
-    )
-    advancePvpPowerStateForTurn(
-      state.enemyTeam[state.activeEnemyIndex],
-      p2Powers,
-      state.turn,
-    )
-    state.pvpPowers = { ...pvpPowers, [p1Id]: p1Powers, [p2Id]: p2Powers }
-    state.powers = p1Powers
-    state.history = trimBattleHistory(state.history)
-    state.turn += 1
-    finalizeBattlePresentation(state)
-    return state
-  }
-
   const addCombatLog = (message: string) => {
     if (message) logMessage += `\n${message}`
   }
@@ -374,114 +349,81 @@ export async function resolvePvpTurn(
     result: 'tie',
     message: '',
   }
-  // Only attack if not swapped AND not used power (using power consumes turn)
-  if (!p1Swap.swapped && !p1UsedPower) {
-    if (p2Swap.swapped) {
-      // Free hit on new P2
-      p1Resolution = resolvePvpCombat({
+  const p1Committed = !p1Swap.swapped && !p1UsedPower && !p1Skipped
+  const p2Committed = !p2Swap.swapped && !p2UsedPower && !p2Skipped
+  // Eligibility is resolved for both sides before primary HP changes. This
+  // prevents software ordering (including an interim 0 HP) from changing
+  // whether the second committed action occurs.
+  const p1Eligibility = p1Committed
+    ? preparePvpCombatAction({
         state,
         attacker: p1Mon,
-        defender: p2Mon,
-        move: p1Move,
-        attackerName: state.playerName,
         attackerSide: 'player',
-        playerMove: p1Move,
-        enemyMove: p2Move,
-        skipped: p1Skipped,
+        move: p1Move,
         currentTurn: state.turn,
         random,
-        weather: state.weather?.weather,
       })
-      addCombatLog(p1Resolution.message)
-    } else {
-      // Normal Combat
-      // Speed check
-      if (
-        getEffectiveBattleSpeed(p1Mon, state.turn) >=
-        getEffectiveBattleSpeed(p2Mon, state.turn)
-      ) {
-        // P1 First
-        p1Resolution = resolvePvpCombat({
-          state,
-          attacker: p1Mon,
-          defender: p2Mon,
-          move: p1Move,
-          attackerName: state.playerName,
-          attackerSide: 'player',
-          playerMove: p1Move,
-          enemyMove: p2Move,
-          skipped: p1Skipped,
-          currentTurn: state.turn,
-          random,
-          weather: state.weather?.weather,
-        })
-        addCombatLog(p1Resolution.message)
-        if (
-          p1Mon.currentHp > 0 &&
-          p2Mon.currentHp > 0 &&
-          !p2UsedPower &&
-          !p1Resolution.preventsOpponentDamage
-        ) {
-          p2Resolution = resolvePvpCombat({
-            state,
-            attacker: p2Mon,
-            defender: p1Mon,
-            move: p2Move,
-            attackerName: state.enemyName,
-            attackerSide: 'enemy',
-            playerMove: p1Move,
-            enemyMove: p2Move,
-            skipped: p2Skipped,
-            currentTurn: state.turn,
-            random,
-            weather: state.weather?.weather,
-          })
-          addCombatLog(p2Resolution.message)
-        }
-      } else {
-        // P2 First
-        if (!p2UsedPower) {
-          p2Resolution = resolvePvpCombat({
-            state,
-            attacker: p2Mon,
-            defender: p1Mon,
-            move: p2Move,
-            attackerName: state.enemyName,
-            attackerSide: 'enemy',
-            playerMove: p1Move,
-            enemyMove: p2Move,
-            skipped: p2Skipped,
-            currentTurn: state.turn,
-            random,
-            weather: state.weather?.weather,
-          })
-          addCombatLog(p2Resolution.message)
-        }
-        if (
-          p1Mon.currentHp > 0 &&
-          p2Mon.currentHp > 0 &&
-          !p2Resolution.preventsOpponentDamage
-        ) {
-          p1Resolution = resolvePvpCombat({
-            state,
-            attacker: p1Mon,
-            defender: p2Mon,
-            move: p1Move,
-            attackerName: state.playerName,
-            attackerSide: 'player',
-            playerMove: p1Move,
-            enemyMove: p2Move,
-            skipped: p1Skipped,
-            currentTurn: state.turn,
-            random,
-            weather: state.weather?.weather,
-          })
-          addCombatLog(p1Resolution.message)
-        }
-      }
-    }
-  } else if (!p2Swap.swapped && !p2UsedPower) {
-    // P1 swapped/powered, P2 attacks (Free hit)
+    : undefined
+  const p2Eligibility = p2Committed
+    ? preparePvpCombatAction({
+        state,
+        attacker: p2Mon,
+        attackerSide: 'enemy',
+        move: p2Move,
+        currentTurn: state.turn,
+        random,
+      })
+    : undefined
+
+  const applyPrimaryHealingCredit = (
+    pokemon: BattlePokemon,
+    move: PvpMove,
+    eligible: boolean,
+  ): number => {
+    const authoredMove = move.specialMoveId
+      ? getMove(move.specialMoveId)
+      : undefined
+    if (!eligible || !authoredMove?.heal) return 0
+    const amount = getMoveHealAmount({
+      move: authoredMove,
+      pokemon,
+      weather: state.weather?.weather,
+    })
+    // Deliberately allow a temporary over-max pool. The authoritative commit
+    // clamps after both attacks, so 90 + 40 healing - 50 damage settles at 80.
+    pokemon.currentHp += amount
+    return amount
+  }
+  const p1PrimaryHealing = applyPrimaryHealingCredit(
+    p1Mon,
+    p1Move,
+    p1Eligibility?.canMove === true,
+  )
+  const p2PrimaryHealing = applyPrimaryHealingCredit(
+    p2Mon,
+    p2Move,
+    p2Eligibility?.canMove === true,
+  )
+
+  const resolveP1 = () => {
+    p1Resolution = resolvePvpCombat({
+      state,
+      attacker: p1Mon,
+      defender: p2Mon,
+      move: p1Move,
+      attackerName: state.playerName,
+      attackerSide: 'player',
+      playerMove: p1Move,
+      enemyMove: p2Move,
+      currentTurn: state.turn,
+      random,
+      weather: state.weather?.weather,
+      eligibility: p1Eligibility,
+      primaryHealingApplied: p1PrimaryHealing,
+    })
+    addCombatLog(p1Resolution.message)
+  }
+  const resolveP2 = () => {
     p2Resolution = resolvePvpCombat({
       state,
       attacker: p2Mon,
@@ -491,13 +433,36 @@ export async function resolvePvpTurn(
       attackerSide: 'enemy',
       playerMove: p1Move,
       enemyMove: p2Move,
-      skipped: p2Skipped,
       currentTurn: state.turn,
       random,
       weather: state.weather?.weather,
+      eligibility: p2Eligibility,
+      primaryHealingApplied: p2PrimaryHealing,
     })
     addCombatLog(p2Resolution.message)
   }
+
+  if (
+    p1Committed &&
+    (!p2Committed ||
+      getEffectiveBattleSpeed(p1Mon, state.turn) >=
+        getEffectiveBattleSpeed(p2Mon, state.turn))
+  ) {
+    resolveP1()
+    if (p2Committed && !p1Resolution.preventsOpponentDamage) resolveP2()
+  } else if (p2Committed) {
+    resolveP2()
+    if (p1Committed && !p2Resolution.preventsOpponentDamage) resolveP1()
+  }
+
+  if (p1PrimaryHealing > 0 && !p1Resolution.didAttack) {
+    p1Mon.currentHp -= p1PrimaryHealing
+  }
+  if (p2PrimaryHealing > 0 && !p2Resolution.didAttack) {
+    p2Mon.currentHp -= p2PrimaryHealing
+  }
+  p1Mon.currentHp = Math.min(p1Mon.maxHp, Math.max(0, p1Mon.currentHp))
+  p2Mon.currentHp = Math.min(p2Mon.maxHp, Math.max(0, p2Mon.currentHp))
 
   let turnResult: BattleTurnResult = 'tie'
   if (p1Resolution.didAttack) {
@@ -550,7 +515,22 @@ export async function resolvePvpTurn(
     }
   }
 
-  const endTurnStatusMessages = processEndTurnStatusDamage(state)
+  const moveSwitchMessages = resolvePendingMoveSwitches(state)
+  if (moveSwitchMessages.length > 0) {
+    logMessage += `\n${moveSwitchMessages.join('\n')}`
+  }
+
+  const heldItemMessages = [
+    applyHeldItemIfTriggered(state.playerTeam[state.activePlayerIndex], 'hp')
+      .message,
+    applyHeldItemIfTriggered(state.enemyTeam[state.activeEnemyIndex], 'hp')
+      .message,
+  ].filter(Boolean)
+  if (heldItemMessages.length > 0) {
+    logMessage += `\n${heldItemMessages.join('\n')}`
+  }
+
+  const endTurnStatusMessages = processEndTurnStatusDamage(state, 'damage')
   if (endTurnStatusMessages.length > 0) {
     logMessage += `\n${endTurnStatusMessages.join('\n')}`
   }
@@ -570,14 +550,28 @@ export async function resolvePvpTurn(
     logMessage += `\n${delayedDamageMessages.join('\n')}`
   }
 
-  const heldItemMessages = [
-    applyHeldItemIfTriggered(state.playerTeam[state.activePlayerIndex], 'hp')
-      .message,
-    applyHeldItemIfTriggered(state.enemyTeam[state.activeEnemyIndex], 'hp')
-      .message,
+  const endTurnHealingMessages = processEndTurnStatusDamage(state, 'healing')
+  if (endTurnHealingMessages.length > 0) {
+    logMessage += `\n${endTurnHealingMessages.join('\n')}`
+  }
+
+  const terrainHealingMessages = processTerrainTurnEffects(state)
+  if (terrainHealingMessages.length > 0) {
+    logMessage += `\n${terrainHealingMessages.join('\n')}`
+  }
+
+  const berryRestoreMessages = [
+    restoreConsumedBerryByAbility(
+      state.playerTeam[state.activePlayerIndex],
+      state.weather?.weather,
+    ).message,
+    restoreConsumedBerryByAbility(
+      state.enemyTeam[state.activeEnemyIndex],
+      state.weather?.weather,
+    ).message,
   ].filter(Boolean)
-  if (heldItemMessages.length > 0) {
-    logMessage += `\n${heldItemMessages.join('\n')}`
+  if (berryRestoreMessages.length > 0) {
+    logMessage += `\n${berryRestoreMessages.join('\n')}`
   }
 
   const abilityTurnEndMessages = processBattleAbilityTurnEndEffects({
@@ -630,9 +624,44 @@ export async function resolvePvpTurn(
   if (p1FaintedMon?.currentHp === 0) recordPokemonKO(state, 'player')
   if (p2FaintedMon?.currentHp === 0) recordPokemonKO(state, 'enemy')
 
-  const playerFaintMessages = resolvePvpFaint(state, state.playerTeam, 'player')
-  if (playerFaintMessages.length > 0)
-    logMessage += `\n${playerFaintMessages.join('\n')}`
+  const p1HasReserve = state.playerTeam.some(
+    (pokemon, index) =>
+      index !== state.activePlayerIndex && pokemon.currentHp > 0,
+  )
+  const p2HasReserve = state.enemyTeam.some(
+    (pokemon, index) =>
+      index !== state.activeEnemyIndex && pokemon.currentHp > 0,
+  )
+  const simultaneousExhaustion =
+    p1FaintedMon?.currentHp === 0 &&
+    p2FaintedMon?.currentHp === 0 &&
+    !p1HasReserve &&
+    !p2HasReserve
+
+  if (simultaneousExhaustion) {
+    state.status =
+      turnResult === 'win'
+        ? 'won'
+        : turnResult === 'loss'
+          ? 'lost'
+          : 'draw'
+    logMessage += `\n${p1FaintedMon.name} fainted!`
+    logMessage += `\n${p2FaintedMon.name} fainted!`
+    logMessage +=
+      state.status === 'draw'
+        ? `\nBoth teams are out of Pokemon. The battle is a draw!`
+        : `\nBoth teams are out of Pokemon. ${
+            state.status === 'won' ? state.playerName : state.enemyName
+          } wins the stance decision!`
+  } else {
+    const playerFaintMessages = resolvePvpFaint(
+      state,
+      state.playerTeam,
+      'player',
+    )
+    if (playerFaintMessages.length > 0)
+      logMessage += `\n${playerFaintMessages.join('\n')}`
+  }
   if (state.status === 'ongoing') {
     const enemyFaintMessages = resolvePvpFaint(state, state.enemyTeam, 'enemy')
     if (enemyFaintMessages.length > 0)

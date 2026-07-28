@@ -82,7 +82,12 @@ export async function joinFriendlyLobby(
   const isBattleStale = async (battleId?: string) => {
     if (!battleId) return true
     const state = await redis.get<{ status: string }>(`${BATTLE_PREFIX}${battleId}`)
-    return !state || state.status === 'won' || state.status === 'lost'
+    return (
+      !state ||
+      state.status === 'won' ||
+      state.status === 'lost' ||
+      state.status === 'draw'
+    )
   }
 
   if (lobby.hostUserId === userId) {
