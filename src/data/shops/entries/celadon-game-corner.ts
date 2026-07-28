@@ -142,10 +142,23 @@ export const celadonGameCornerShops: ShopConfig[] = [
       {
         id: 'game-corner-porygon',
         name: 'Porygon',
-        description: 'A level 20 Porygon kept in a Rocket Ball.',
+        description: 'A level 20 Porygon caught in a Poké Ball.',
         icon: { type: 'pokemon', id: '137' },
         cost: [{ type: 'currency', id: 'fun-tokens', amount: 9999 }],
-        rewards: [{ type: 'pokemon', targetId: 137, quantity: 1, dropChance: 100, pokemonData: { formId: '137', level: 20, ballType: 'rocket-ball' } }],
+        rewards: [
+          {
+            type: 'pokemon',
+            targetId: 137,
+            quantity: 1,
+            dropChance: 100,
+            pokemonData: {
+              formId: '137',
+              level: 20,
+              ballType: 'poke-ball',
+              background: '/backgrounds/silph.avif',
+            },
+          },
+        ],
       },
     ],
   },
