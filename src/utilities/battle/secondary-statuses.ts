@@ -21,6 +21,7 @@ import type {
   BattleState,
 } from './types'
 import { getEffectiveBattleTypes } from './tera'
+import { formatBattleStatName } from './stat-labels'
 import {
   blocksBattleOutgoingDamageReductionByAbility,
   blocksBattleMentalEffectByAbility,
@@ -342,7 +343,9 @@ function applySecondaryStatusEffects(params: {
         stat,
       )
       const direction = effect.stages >= 0 ? 'rose' : 'fell'
-      messages.push(`${affected.name}'s ${effect.stat} ${direction}!`)
+      messages.push(
+        `${affected.name}'s ${formatBattleStatName(effect.stat)} ${direction}!`,
+      )
     }
   }
 
@@ -719,7 +722,9 @@ function applySnatchedBeneficialEffects(params: {
       source.statStages[buff.stat] + buff.stages,
       buff.stat,
     )
-    messages.push(`${source.name} snatched ${move.name} and its ${buff.stat} rose!`)
+    messages.push(
+      `${source.name} snatched ${move.name} and its ${formatBattleStatName(buff.stat)} rose!`,
+    )
   }
 
   if (move.nextDamageModifier) {

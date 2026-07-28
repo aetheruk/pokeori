@@ -28,6 +28,10 @@ import { clearZMoveCharge } from '@/utilities/battle/z-move'
 import { getBattleItemUseLimit } from '@/utilities/battle/item-use-limits'
 import { runBattleActionWithGuard } from '../helpers/action-guard'
 import { getChronicleBattleItemUseLimit } from '@/utilities/battle/chronicle-budgets'
+import {
+  beginBattlePresentation,
+  finalizeBattlePresentation,
+} from '@/utilities/battle/presentation'
 
 export async function useBattleItem(
   itemId: string,
@@ -44,6 +48,7 @@ export async function useBattleItem(
   return runBattleActionWithGuard(user.id, clientActionId, async () => {
     const state = await getActiveBattleState(user)
     if (!state) return { success: false, error: 'No active battle' }
+    beginBattlePresentation(state)
 
     if (state.status !== 'ongoing')
       return { success: false, error: 'Battle has ended' }
@@ -225,6 +230,7 @@ export async function useBattleItem(
         damageTaken: 0,
         message,
       })
+      finalizeBattlePresentation(state)
       await redis.set(`battle:${user.id}`, state, { ex: BATTLE_TTL })
     }
 

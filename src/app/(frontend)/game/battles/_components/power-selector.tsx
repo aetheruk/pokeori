@@ -11,6 +11,7 @@ import {
   Sparkles,
   Zap,
 } from 'lucide-react'
+import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import { StanceIcon } from '@/components/game/shared/stance-icon'
 import { Button } from '@/components/ui/button'
@@ -26,12 +27,14 @@ import { ItemSprite } from '@/components/ui/item-sprite'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { DYNAMAX_UNLOCK_TURNS } from '@/data/powers'
 import { cn } from '@/lib/utils'
+import { getMoveEffectivePower } from '@/utilities/battle/move-presentation'
 import { getPokemonMoveUsesRemaining } from '@/utilities/battle/move-uses'
 import {
   getMoveDisplayType,
   getMoveInfoTags,
   getMoveTypeSpriteItemId,
 } from '@/utilities/pokemon/move-display'
+import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
 import { getMove } from '@/data/moves'
 import type { BattleStance } from '@/utilities/battle/types'
 import {
@@ -41,10 +44,51 @@ import {
 
 import { useBattleContext } from './battle-context'
 
+const MOVE_TYPE_IDS: Record<string, number> = {
+  normal: 1,
+  fighting: 2,
+  flying: 3,
+  poison: 4,
+  ground: 5,
+  rock: 6,
+  bug: 7,
+  ghost: 8,
+  steel: 9,
+  fire: 10,
+  water: 11,
+  grass: 12,
+  electric: 13,
+  psychic: 14,
+  ice: 15,
+  dragon: 16,
+  dark: 17,
+  fairy: 18,
+}
+
+const MOVE_STANCE_TONES = {
+  power: {
+    chip: 'border-game-clay/40 bg-game-clay/10 text-game-clay-strong',
+    value: 'text-game-clay-strong',
+  },
+  speed: {
+    chip: 'border-game-stance-blue/45 bg-game-stance-blue/10 text-game-stance-blue-strong',
+    value: 'text-game-stance-blue-strong',
+  },
+  tech: {
+    chip: 'border-game-moss/40 bg-game-moss/10 text-game-moss-strong',
+    value: 'text-game-moss-strong',
+  },
+  random: {
+    chip: 'border-game-ochre/45 bg-game-ochre/10 text-game-ochre',
+    value: 'text-game-ochre',
+  },
+} as const
+
 export function PowerSelector() {
   const {
     battleState,
     activePlayerMon,
+    selectedType,
     isAnimating,
     isWaitingForServer,
     isBattlePanelLoading,
@@ -353,16 +397,23 @@ export function PowerSelector() {
             <div className="grid grid-cols-2 gap-2 pb-1">
               {availableMoves.map((move) => {
                 const moveType =
-                  (move.forcedType && move.forcedType !== 'random'
-                    ? move.forcedType.toLowerCase()
-                    : undefined) || 'normal'
-                const tmSpriteId = `tm-${moveType}`
+                  move.forcedType?.toLowerCase() ||
+                  selectedType?.toLowerCase() ||
+                  activePlayerMon.types?.[0]?.toLowerCase() ||
+                  'normal'
+                const moveTypeId = MOVE_TYPE_IDS[moveType]
+                const effectivePower = getMoveEffectivePower(
+                  move,
+                  activePlayerMon.stats,
+                  activePlayerMon.statStages,
+                )
+                const stanceTone = MOVE_STANCE_TONES[move.stance]
 
                 return (
                   <Button
                     key={move.id}
                     variant="outline"
-                    className="h-auto min-h-24 w-full min-w-0 rounded-xl border border-game-border bg-game-surface-raised px-3 py-2 shadow-sm transition-colors hover:border-game-moss/60 hover:bg-game-moss/10"
+                    className="group h-28 w-full min-w-0 flex-col items-stretch justify-between gap-2 rounded-lg border border-game-border bg-game-surface-raised px-3 py-3 text-left shadow-sm transition-colors hover:border-game-moss/60 hover:bg-game-moss/10"
                     disabled={using !== null}
                     title={`Use ${move.name}. Press and hold for move details.`}
                     aria-description="Press and hold for move details."
@@ -386,42 +437,49 @@ export function PowerSelector() {
                       void handleUseMove(move.id)
                     }}
                   >
-                    <ItemSprite
-                      itemId={tmSpriteId}
-                      alt="TM"
-                      width={40}
-                      height={40}
-                      className="w-10 h-10"
-                    />
-                    <div className="flex flex-col items-center gap-1">
-                      <div className="flex items-center gap-1.5">
-                        {move.stance === 'power' && (
-                          <StanceIcon
-                            stance="power"
-                            className="w-3 h-3 text-game-clay-strong"
+                    <div className="flex w-full items-center justify-between gap-2">
+                      <div className="flex h-6 min-w-0 items-center">
+                        {moveTypeId ? (
+                          <Image
+                            src={getPokemonTypeIconUrl(moveTypeId)}
+                            alt={`${moveType} type`}
+                            width={64}
+                            height={28}
+                            className="h-5 w-auto object-contain"
+                            unoptimized
                           />
+                        ) : (
+                          <span className="truncate rounded-full border border-game-ochre/40 bg-game-ochre/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-game-ochre">
+                            {moveType}
+                          </span>
                         )}
-                        {move.stance === 'speed' && (
-                          <StanceIcon
-                            stance="speed"
-                            className="w-3 h-3 text-game-stance-blue-strong"
-                          />
+                      </div>
+                      <span
+                        className={cn(
+                          'inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-1 text-[9px] font-black uppercase tracking-wider',
+                          stanceTone.chip,
                         )}
-                        {move.stance === 'tech' && (
-                          <StanceIcon
-                            stance="tech"
-                            className="w-3 h-3 text-game-moss-strong"
-                          />
+                      >
+                        <StanceIcon stance={move.stance} className="size-3" />
+                        {move.stance}
+                      </span>
+                    </div>
+                    <div className="flex w-full min-w-0 items-end justify-between gap-2">
+                      <span className="line-clamp-2 min-w-0 flex-1 text-sm font-bold leading-tight text-game-ink">
+                        {move.name}
+                      </span>
+                      <div
+                        className={cn(
+                          'shrink-0 text-right font-black leading-none',
+                          effectivePower === 'Status'
+                            ? 'text-lg'
+                            : effectivePower.includes('–')
+                              ? 'text-2xl sm:text-3xl'
+                              : 'text-3xl sm:text-4xl',
+                          stanceTone.value,
                         )}
-                        {move.stance === 'random' && (
-                          <StanceIcon
-                            stance="random"
-                            className="w-3 h-3 text-game-ochre"
-                          />
-                        )}
-                        <span className="line-clamp-2 text-center text-xs font-medium leading-tight">
-                          {move.name}
-                        </span>
+                      >
+                        {effectivePower}
                       </div>
                     </div>
                   </Button>

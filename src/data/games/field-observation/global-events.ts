@@ -86,10 +86,10 @@ export const fieldObservationGlobalItemEvents: FieldObservationGlobalItemEvent[]
   {
     id: 'global-field-observation-neutral-stone',
     itemId: 'neutral-stone',
-    dropChance: 100 / 35,
+    dropChance: 100 / 16,
     guaranteed: true,
     requirements: [
-      { type: 'skill_level', targetId: 'researching', count: 32 },
+      { type: 'skill_level', targetId: 'researching', count: 25 },
       { type: 'task_completed', targetId: 'a-craftsmans-secret' },
     ],
   },

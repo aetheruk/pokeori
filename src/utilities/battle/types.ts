@@ -255,6 +255,56 @@ export interface PowersState {
   }
 }
 
+export type BattlePresentationSide = 'player' | 'enemy'
+
+export type BattlePresentationEvent =
+  | {
+      type: 'attack'
+      actorSide: BattlePresentationSide
+      targetSide: BattlePresentationSide
+      actorIndex: number
+      targetIndex: number
+      damage: number
+      hpAfter: number
+      attackType?: string
+      simultaneousGroup?: string
+      message: string
+    }
+  | {
+      type: 'hp-change'
+      side: BattlePresentationSide
+      pokemonIndex: number
+      kind: 'damage' | 'heal'
+      amount: number
+      hpAfter: number
+      message: string
+    }
+  | {
+      type: 'message'
+      message: string
+    }
+  | {
+      type: 'faint'
+      side: BattlePresentationSide
+      pokemonIndex: number
+      formId?: string
+      message: string
+    }
+  | {
+      type: 'switch'
+      side: BattlePresentationSide
+      fromIndex: number
+      toIndex: number
+      reason: 'voluntary' | 'replacement' | 'lead'
+      message: string
+    }
+
+export interface BattlePresentation {
+  sequenceId: string
+  turn: number
+  events: BattlePresentationEvent[]
+}
+
 export interface BattleState {
   playerTeam: BattlePokemon[]
   enemyTeam: BattlePokemon[]
@@ -263,6 +313,7 @@ export interface BattleState {
   playerParticipantIndexes?: number[]
   turn: number
   history: BattleLogEntry[]
+  presentation?: BattlePresentation
   status: 'ongoing' | 'won' | 'lost'
   pendingPlayerSwitch?: boolean
   pendingPlayerSwitchReason?: 'lead' | 'fainted' | 'move'

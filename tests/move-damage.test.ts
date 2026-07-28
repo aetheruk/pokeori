@@ -167,8 +167,8 @@ describe('move damage helpers', () => {
     state.activePlayerIndex = 1
     const switchMessages = processSecondaryStatusesForSwitch(state, 'player', () => 0)
     expect(switchMessages).toEqual([
-      "Grass Ally's attack rose!",
-      "Grass Ally's specialAttack rose!",
+      "Grass Ally's Attack rose!",
+      "Grass Ally's Special Attack rose!",
     ])
     expect(state.playerTeam[1].statStages).toMatchObject({ attack: 1, specialAttack: 1 })
     expect(attacker.statStages).toBeUndefined()
@@ -1087,7 +1087,7 @@ describe('move damage helpers', () => {
         pokemon: attacker,
         damage: 12,
       }),
-    ).toEqual([`${attacker.name}'s attack rose!`])
+    ).toEqual([`${attacker.name}'s Attack rose!`])
     expect(attacker.statStages!.attack).toBe(1)
 
     const chipAway = getMove('chip-away')!

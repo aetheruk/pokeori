@@ -705,7 +705,7 @@ describe('skill unlock helpers', () => {
       expect.objectContaining({
         label: 'Neutral Stones',
         itemId: 'neutral-stone',
-        level: 32,
+        level: 25,
         category: 'items',
         source: 'authored',
       }),

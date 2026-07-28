@@ -1,6 +1,7 @@
 import { STANCE_ICON_CONFIG } from '@/components/game/shared/stance-icon'
 import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
+import { getBattleStatusChip } from '@/utilities/battle/status-presentation'
 import type { BattleStance } from '@/utilities/battle/types'
 
 interface HealthDisplayProps {
@@ -30,6 +31,7 @@ export function HealthDisplay({
   const resolvedAlign = align ?? (isPlayer || centered ? 'center' : 'left')
   const isCentered = resolvedAlign === 'center'
   const isRight = resolvedAlign === 'right'
+  const statusChip = status ? getBattleStatusChip(status.id) : null
   const identityChip = (
     <span className="inline-flex min-w-0 items-center gap-1.5 rounded-full border border-game-border bg-game-surface-raised px-2.5 py-1 text-[11px] font-bold text-game-ink shadow-sm">
       <span className="truncate">{name}</span>
@@ -61,29 +63,14 @@ export function HealthDisplay({
           )}
         >
           {isPlayer && identityChip}
-          {status && (
+          {statusChip && (
             <div
               className={cn(
-                'rounded-full border border-game-night-border/60 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-game-cream shadow-sm',
-                status.id === 'burn' && 'bg-game-clay',
-                (status.id === 'poison' || status.id === 'bad-poison') &&
-                  'bg-game-clay-strong',
-                status.id === 'paralysis' && 'bg-game-ochre-strong',
-                status.id === 'sleep' && 'bg-game-night-muted',
-                status.id === 'frostbite' && 'bg-game-moss-strong',
-                status.id === 'veil' && 'bg-game-clay-strong',
-                ![
-                  'burn',
-                  'poison',
-                  'bad-poison',
-                  'paralysis',
-                  'sleep',
-                  'frostbite',
-                  'veil',
-                ].includes(status.id) && 'bg-game-night-muted',
+                'rounded-full border px-2 py-0.5 text-[10px] font-black uppercase tracking-wider shadow-sm',
+                statusChip.className,
               )}
             >
-              {status.id === 'bad-poison' ? 'Toxic' : status.id}
+              {statusChip.label}
             </div>
           )}
         </div>

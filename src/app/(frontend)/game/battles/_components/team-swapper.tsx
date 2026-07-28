@@ -1,6 +1,6 @@
 'use client'
 
-import { Heart, HeartOff, Loader2, RefreshCcw } from 'lucide-react'
+import { HeartOff, Loader2, RefreshCcw } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -177,7 +177,7 @@ export function TeamSwapper({
                     />
                     {isFainted && (
                       <div className="absolute inset-0 flex items-center justify-center">
-                      <HeartOff className="w-6 h-6 text-game-danger" />
+                        <HeartOff className="w-6 h-6 text-game-danger" />
                       </div>
                     )}
                   </div>
@@ -213,12 +213,8 @@ export function TeamSwapper({
                           style={{ width: `${hpPercent}%` }}
                         />
                       </div>
-                      <div className="flex items-center justify-between gap-1 text-[10px] text-game-muted">
-                        <span className="flex min-w-0 items-center gap-1">
-                          <Heart className="h-3 w-3 shrink-0" />
-                          {pokemon.currentHp} / {pokemon.maxHp}
-                        </span>
-                        <span className="shrink-0">{hpPercent}%</span>
+                      <div className="text-right text-[10px] font-semibold text-game-muted">
+                        {pokemon.currentHp} / {pokemon.maxHp}
                       </div>
                     </div>
 

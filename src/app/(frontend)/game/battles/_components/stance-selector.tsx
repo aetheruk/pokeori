@@ -50,8 +50,8 @@ export function StanceSelector({
     label: string
     value: number
     icon: typeof STANCE_ICON_CONFIG.power.Icon
+    surfaceTone: string
     iconTone: string
-    valueTone: string
     hoverTone: string
   }> = [
     {
@@ -59,28 +59,28 @@ export function StanceSelector({
       label: 'SPEED',
       value: speedVal,
       icon: STANCE_ICON_CONFIG.speed.Icon,
+      surfaceTone: 'border-game-stance-blue-strong bg-game-stance-blue-strong',
       iconTone: 'text-game-stance-blue',
-      valueTone: 'text-game-stance-blue-strong',
       hoverTone:
-        'hover:border-game-stance-blue/70 hover:bg-game-stance-blue/10',
+        'hover:border-game-stance-blue hover:bg-game-stance-blue-strong',
     },
     {
       stance: 'power',
       label: 'POWER',
       value: powerVal,
       icon: STANCE_ICON_CONFIG.power.Icon,
+      surfaceTone: 'border-game-clay-strong bg-game-clay-strong',
       iconTone: 'text-game-clay',
-      valueTone: 'text-game-clay-strong',
-      hoverTone: 'hover:border-game-clay/60 hover:bg-game-clay/8',
+      hoverTone: 'hover:border-game-clay hover:bg-game-clay-strong',
     },
     {
       stance: 'tech',
       label: 'TECH',
       value: techVal,
       icon: STANCE_ICON_CONFIG.tech.Icon,
+      surfaceTone: 'border-game-moss-strong bg-game-moss-strong',
       iconTone: 'text-game-moss',
-      valueTone: 'text-game-moss-strong',
-      hoverTone: 'hover:border-game-moss/60 hover:bg-game-moss/8',
+      hoverTone: 'hover:border-game-moss hover:bg-game-moss-strong',
     },
   ]
 
@@ -98,14 +98,15 @@ export function StanceSelector({
             type="button"
             variant="outline"
             className={cn(
-              'group relative h-20 overflow-hidden rounded-lg border border-game-border bg-game-surface-raised px-2.5 py-2.5 transition-colors',
+              'group relative h-20 overflow-hidden rounded-lg border px-2.5 py-2.5 text-white transition-colors',
+              card.surfaceTone,
               card.hoverTone,
               isStanceDisabled &&
-                'border-game-border bg-game-canvas opacity-45',
+                'border-game-border bg-game-canvas text-game-muted opacity-45',
               isPending &&
-                'border-game-moss bg-game-moss/10 ring-1 ring-game-moss/35',
+                'border-white/70 ring-2 ring-white/45 ring-offset-1 ring-offset-game-surface',
               isZReady &&
-                'border-game-ochre/70 bg-game-ochre/10 ring-2 ring-game-ochre/70 ring-offset-2 ring-offset-game-surface',
+                'ring-2 ring-game-ochre/80 ring-offset-2 ring-offset-game-surface',
             )}
             onClick={() => onSelect(card.stance)}
             disabled={disabled || isStanceDisabled}
@@ -116,18 +117,18 @@ export function StanceSelector({
             <Icon
               aria-hidden
               className={cn(
-                'pointer-events-none absolute left-1/2 top-1/2 size-[72%] max-h-[72%] max-w-[72%] -translate-x-1/2 -translate-y-1/2 opacity-20 [&_*]:stroke-[1.35]',
-                isZReady ? 'text-game-ochre' : card.iconTone,
+                'pointer-events-none absolute -left-[14%] top-1/2 size-[76%] max-h-[76%] max-w-[76%] -translate-y-1/2 animate-pulse opacity-60 motion-reduce:animate-none [&_*]:stroke-[1.35]',
+                card.iconTone,
               )}
             />
 
             <div className="relative z-10 h-full w-full">
               <div className="absolute right-0 top-0 flex items-center gap-1">
                 {isPending && (
-                  <Loader2 className="h-4 w-4 animate-spin text-game-moss-strong" />
+                  <Loader2 className="h-4 w-4 animate-spin text-white" />
                 )}
                 {isZReady && (
-                  <span className="rounded border border-game-ochre/50 bg-game-ochre/10 px-1.5 py-0.5 text-[10px] font-black leading-none text-game-ochre">
+                  <span className="rounded border border-game-ochre/50 bg-game-surface-raised/90 px-1.5 py-0.5 text-[10px] font-black leading-none text-game-ochre">
                     Z
                   </span>
                 )}
@@ -135,12 +136,8 @@ export function StanceSelector({
 
               <div
                 className={cn(
-                  'absolute bottom-0 right-0 whitespace-nowrap text-right text-3xl font-black leading-none sm:text-4xl',
-                  isZReady
-                    ? 'text-game-ochre'
-                    : isStanceDisabled
-                      ? 'text-game-muted'
-                      : card.valueTone,
+                  'absolute -bottom-1 right-0 whitespace-nowrap text-right text-[2.75rem] font-black leading-none tracking-tight text-white sm:text-5xl',
+                  isStanceDisabled && 'text-game-muted',
                 )}
               >
                 {isZReady ? 'Z' : card.value.toLocaleString()}

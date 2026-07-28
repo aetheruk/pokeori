@@ -548,7 +548,7 @@ describe('PVP turn engine helpers', () => {
     )
   })
 
-  test('captivate only lowers Sp. Atk against opposite gender targets', () => {
+  test('captivate only lowers Special Attack against opposite gender targets', () => {
     const state = makeBattleState()
     const attacker = state.playerTeam[0]
     const defender = state.enemyTeam[0]
@@ -569,7 +569,7 @@ describe('PVP turn engine helpers', () => {
 
     expect(applied.didAttack).toBe(true)
     expect(defender.statStages?.specialAttack).toBe(-2)
-    expect(applied.message).toContain("Enemy One's specialAttack fell!")
+    expect(applied.message).toContain("Enemy One's Special Attack fell!")
 
     defender.statStages = undefined
     defender.gender = 'male'

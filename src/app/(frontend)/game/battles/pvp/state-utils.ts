@@ -1,7 +1,45 @@
 import { createInitialPowersState } from '@/data/powers'
-import type { BattleState, BattleLogEntry, PowersState } from '@/utilities/battle/types'
+import type {
+  BattleState,
+  BattleLogEntry,
+  BattlePresentation,
+  BattlePresentationSide,
+  PowersState,
+} from '@/utilities/battle/types'
 
 type BattleUserRef = string | { id?: string | null } | null | undefined
+
+function flipPresentationSide(
+  side: BattlePresentationSide,
+): BattlePresentationSide {
+  return side === 'player' ? 'enemy' : 'player'
+}
+
+function flipBattlePresentation(
+  presentation: BattlePresentation | undefined,
+): BattlePresentation | undefined {
+  if (!presentation) return undefined
+  return {
+    ...presentation,
+    events: presentation.events.map((event) => {
+      if (event.type === 'attack') {
+        return {
+          ...event,
+          actorSide: flipPresentationSide(event.actorSide),
+          targetSide: flipPresentationSide(event.targetSide),
+        }
+      }
+      if (
+        event.type === 'hp-change' ||
+        event.type === 'faint' ||
+        event.type === 'switch'
+      ) {
+        return { ...event, side: flipPresentationSide(event.side) }
+      }
+      return event
+    }),
+  }
+}
 
 export function normalizeBattleUserId(userRef: BattleUserRef): string | null {
   if (!userRef) return null
@@ -92,6 +130,7 @@ export function flipPvpState(state: BattleState, battleId: string): BattleState 
       playerAttackType: entry.enemyAttackType,
       enemyAttackType: entry.playerAttackType,
     })),
+    presentation: flipBattlePresentation(state.presentation),
     itemsUsedThisBattle: [],
     powers: p2Id ? getPerspectivePowers(state, p2Id) : state.powers,
     config: getPerspectiveConfig(state, p2Id),

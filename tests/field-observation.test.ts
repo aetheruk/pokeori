@@ -502,7 +502,7 @@ describe('field observation research mode', () => {
     ).toEqual([])
   })
 
-  test('Neutral Stones unlock at Researcher 32 after the Gentleman teaches stonecraft', () => {
+  test('Neutral Stones unlock at Researcher 25 after the Gentleman teaches stonecraft', () => {
     const baseData = {
       inventory: [],
       pokemon: [],
@@ -513,7 +513,7 @@ describe('field observation research mode', () => {
       locationEncounterResults: [],
       gameResults: [],
       fieldResearchResults: [],
-      user: { skills: { researching: { level: 32 } } },
+      user: { skills: { researching: { level: 25 } } },
     } as any
     const neutralStoneDrop = fieldObservationGlobalItemEvents.find(
       (event) => event.id === 'global-field-observation-neutral-stone',
@@ -522,10 +522,10 @@ describe('field observation research mode', () => {
 
     expect(neutralStoneDrop).toMatchObject({
       itemId: 'neutral-stone',
-      dropChance: 100 / 35,
+      dropChance: 100 / 16,
       guaranteed: true,
       requirements: [
-        { type: 'skill_level', targetId: 'researching', count: 32 },
+        { type: 'skill_level', targetId: 'researching', count: 25 },
         { type: 'task_completed', targetId: 'a-craftsmans-secret' },
       ],
     })
@@ -550,7 +550,7 @@ describe('field observation research mode', () => {
         [neutralStoneDrop],
         unlockedData,
         'Kanto',
-        () => 1 / 35,
+        () => 1 / 16,
       ),
     ).toEqual([])
 

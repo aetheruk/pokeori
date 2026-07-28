@@ -489,14 +489,14 @@ describe('generated game data schemas', () => {
       expect(game.settings.board.obstacles).toHaveLength(2)
       expect(
         (game.settings.board.obstacles || []).every(
-          (obstacle: { y: number }) => obstacle.y === 630,
+          (obstacle: { y: number }) => obstacle.y === 650,
         ),
       ).toBe(true)
       expect(
         Math.max(
           ...game.settings.board.pegs.map((peg: { y: number }) => peg.y),
         ),
-      ).toBeLessThan(630)
+      ).toBeLessThan(650)
     }
   })
 

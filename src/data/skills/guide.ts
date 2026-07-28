@@ -402,7 +402,7 @@ export const authoredSkillGuideUnlocks: SkillGuideUnlock[] = [
   },
   {
     skillId: 'researching',
-    level: 32,
+    level: 25,
     category: 'items',
     label: 'Neutral Stones',
     description:

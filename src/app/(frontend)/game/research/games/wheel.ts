@@ -6,6 +6,8 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { grantRewards } from '@/utilities/rewards/reward-logic'
 import {
+  clearGameActivityStateForUser,
+  completeGameActivity,
   getUser,
   type GameActivityState,
 } from '@/app/(frontend)/game/_shared/activity-actions'
@@ -20,9 +22,119 @@ import { incrementUserActivityResult } from '@/utilities/user-state'
 
 interface PrizeWheelSpinData {
   spinId: string
+  encounterId?: string
   targetIndex: number
   spinDuration: number
   timestamp: number
+}
+
+interface PrizeWheelClaimResult {
+  success: boolean
+  summary?: any
+  message?: string
+  error?: string
+  hasRewards?: boolean
+}
+
+function parseSpinData(
+  spinDataRaw: PrizeWheelSpinData | string,
+): PrizeWheelSpinData | null {
+  try {
+    const spinData =
+      typeof spinDataRaw === 'string'
+        ? (JSON.parse(spinDataRaw) as PrizeWheelSpinData)
+        : spinDataRaw
+    return typeof spinData?.targetIndex === 'number' ? spinData : null
+  } catch {
+    return null
+  }
+}
+
+async function settlePrizeWheelSpin({
+  userId,
+  encounterId,
+  spinData,
+  deleteSpinOnSuccess,
+}: {
+  userId: string
+  encounterId: string
+  spinData: PrizeWheelSpinData
+  deleteSpinOnSuccess: boolean
+}): Promise<PrizeWheelClaimResult> {
+  if (spinData.encounterId && spinData.encounterId !== encounterId) {
+    return { success: false, error: 'Research session mismatch' }
+  }
+
+  const spinId =
+    spinData.spinId || `${spinData.timestamp}-${spinData.targetIndex}`
+  const idempotentResultKey = `prizewheel:claim-result:${userId}:${spinId}`
+  const spinKey = `prizewheel:${userId}`
+  const cachedResult =
+    await getIdempotentResult<PrizeWheelClaimResult>(idempotentResultKey)
+  if (cachedResult) {
+    if (deleteSpinOnSuccess) await redis.del(spinKey)
+    return cachedResult
+  }
+
+  const claimLock = await acquireActionLock(
+    `lock:prize-wheel:claim:${userId}:${spinId}`,
+    12,
+  )
+  if (!claimLock.acquired) {
+    return { success: false, error: 'Reward claim already in progress' }
+  }
+
+  try {
+    const cachedResultAfterLock =
+      await getIdempotentResult<PrizeWheelClaimResult>(idempotentResultKey)
+    if (cachedResultAfterLock) {
+      if (deleteSpinOnSuccess) await redis.del(spinKey)
+      return cachedResultAfterLock
+    }
+
+    const state = (await redis.get(`game:${userId}`)) as GameActivityState | null
+    if (!state || state.encounterId !== encounterId) {
+      return { success: false, error: 'Research session mismatch' }
+    }
+
+    const encounter = allGames.find((entry) => entry.id === state.encounterId)
+    if (encounter?.gameType !== 'prize-wheel') {
+      return { success: false, error: 'Invalid game type' }
+    }
+
+    const targetSlot = (encounter.settings.slots || [])[spinData.targetIndex]
+    if (!targetSlot) {
+      return { success: false, error: 'Invalid target slot' }
+    }
+
+    const hasRewards = Boolean(targetSlot.rewards?.length)
+    let rewardSummary = null
+    if (hasRewards) {
+      const rewardResult = await grantRewards(userId, targetSlot.rewards)
+      rewardSummary = rewardResult.summary
+    }
+
+    const payload = await getPayload({ config: configPromise })
+    await incrementUserActivityResult(
+      payload as any,
+      userId,
+      'gameResults',
+      encounterId,
+      hasRewards ? { wins: 1 } : { losses: 1 },
+    )
+
+    const response: PrizeWheelClaimResult = {
+      success: true,
+      summary: rewardSummary,
+      message: hasRewards ? 'Prize Claimed!' : 'Better luck next time!',
+      hasRewards,
+    }
+    await setIdempotentResult(idempotentResultKey, response, 600)
+    if (deleteSpinOnSuccess) await redis.del(spinKey)
+    return response
+  } finally {
+    await releaseActionLock(claimLock)
+  }
 }
 
 export async function initiatePrizeWheelSpin() {
@@ -138,6 +250,7 @@ export async function initiatePrizeWheelSpin() {
 
       const spinData: PrizeWheelSpinData = {
         spinId: crypto.randomUUID(),
+        encounterId: encounter.id,
         targetIndex,
         spinDuration,
         timestamp: Date.now(),
@@ -211,92 +324,89 @@ export async function claimPrizeWheelReward(encounterId: string) {
       return { success: false, error: 'Spin session expired or invalid' }
     }
 
-    const spinData =
-      typeof spinDataRaw === 'string'
-        ? (JSON.parse(spinDataRaw) as PrizeWheelSpinData)
-        : (spinDataRaw as PrizeWheelSpinData)
-
-    if (typeof spinData?.targetIndex !== 'number') {
+    const spinData = parseSpinData(spinDataRaw)
+    if (!spinData) {
       return { success: false, error: 'Invalid spin session data' }
     }
 
-    const spinId =
-      spinData.spinId || `${spinData.timestamp}-${spinData.targetIndex}`
-    const idempotentResultKey = `prizewheel:claim-result:${user.id}:${spinId}`
+    return settlePrizeWheelSpin({
+      userId: user.id,
+      encounterId,
+      spinData,
+      deleteSpinOnSuccess: true,
+    })
+  } catch (error) {
+    console.error('Error claiming prize wheel reward:', error)
+    return { success: false, error: 'Internal server error' }
+  }
+}
 
-    const cachedResult = await getIdempotentResult<any>(idempotentResultKey)
-    if (cachedResult) {
-      return cachedResult
-    }
+export async function exitPrizeWheel(encounterId: string) {
+  try {
+    const user = await getUser()
+    if (!user) return { success: false, error: 'Not authenticated' }
 
-    const claimLock = await acquireActionLock(
-      `lock:prize-wheel:claim:${user.id}:${spinId}`,
-      12,
+    const exitLock = await acquireActionLock(
+      `lock:prize-wheel:exit:${user.id}`,
+      20,
     )
-    if (!claimLock.acquired) {
-      return { success: false, error: 'Reward claim already in progress' }
+    if (!exitLock.acquired) {
+      return { success: false, error: 'Prize wheel exit already in progress' }
     }
 
     try {
-      const cachedResultAfterLock =
-        await getIdempotentResult<any>(idempotentResultKey)
-      if (cachedResultAfterLock) {
-        return cachedResultAfterLock
-      }
-
-      const payload = await getPayload({ config: configPromise })
-
       const state = (await redis.get(
         `game:${user.id}`,
       )) as GameActivityState | null
-      if (!state || state.encounterId !== encounterId) {
+      if (state && state.encounterId !== encounterId) {
         return { success: false, error: 'Research session mismatch' }
       }
 
-      const encounter = allGames.find((e) => e.id === state.encounterId)
-      if (encounter?.gameType !== 'prize-wheel') {
-        return { success: false, error: 'Invalid game type' }
+      const spinKey = `prizewheel:${user.id}`
+      const spinDataRaw =
+        await redis.get<PrizeWheelSpinData | string>(spinKey)
+
+      if (!spinDataRaw) {
+        if (state) await clearGameActivityStateForUser(user.id, 'game')
+        return { success: true }
+      }
+      if (!state) {
+        return { success: false, error: 'Research session mismatch' }
       }
 
-      const slots = encounter.settings.slots || []
-      const targetSlot = slots[spinData.targetIndex]
-
-      if (!targetSlot) {
-        return { success: false, error: 'Invalid target slot' }
+      const spinData = parseSpinData(spinDataRaw)
+      if (!spinData) {
+        return { success: false, error: 'Invalid spin session data' }
       }
 
-      // Grant Rewards
-      let rewardSummary = null
-      const hasRewards = targetSlot.rewards && targetSlot.rewards.length > 0
-
-      if (hasRewards) {
-        const res = await grantRewards(user.id, targetSlot.rewards)
-        rewardSummary = res.summary
-      }
-
-      await incrementUserActivityResult(
-        payload as any,
-        user.id,
-        'gameResults',
+      const claimResult = await settlePrizeWheelSpin({
+        userId: user.id,
         encounterId,
-        hasRewards ? { wins: 1 } : { losses: 1 },
-      )
+        spinData,
+        deleteSpinOnSuccess: false,
+      })
+      if (!claimResult.success) return claimResult
 
-      const response = {
-        success: true,
-        summary: rewardSummary,
-        message: hasRewards ? 'Prize Claimed!' : 'Better luck next time!',
+      const completionResult = await completeGameActivity(
+        'game',
+        encounterId,
+        Boolean(claimResult.hasRewards),
+      )
+      if (!completionResult.success) {
+        return {
+          success: false,
+          error: completionResult.error || 'Unable to close prize wheel session',
+        }
       }
 
-      await setIdempotentResult(idempotentResultKey, response, 600)
       await redis.del(spinKey)
-
-      return response
+      await clearGameActivityStateForUser(user.id, 'game')
+      return { success: true, settledSpin: true }
     } finally {
-      await releaseActionLock(claimLock)
+      await releaseActionLock(exitLock)
     }
   } catch (error) {
-    console.error('Error claiming prize wheel reward:', error)
+    console.error('Error exiting prize wheel:', error)
     return { success: false, error: 'Internal server error' }
   }
 }

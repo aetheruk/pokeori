@@ -106,7 +106,7 @@ player's old active session and redirect to its canonical route. Legacy
 
 ## Pachinko
 - Pachinko is a physics-result cost/reward game. Matter.js resolves whether the ball lands in an authored bucket or misses, while server actions own currency deduction, reward granting, stats, session totals, rate limits, locks, and duplicate drop protection.
-- Celadon Rocket Pachinko has three rewarding buckets: its two lower-value buckets are placed at the board edges and its jackpot remains in the centre. The former empty zero-reward buckets are not authored, and the lower slanted guides are raised into the gap below the last peg row. The standard and High Stakes entries share this board geometry.
+- Celadon Rocket Pachinko has three rewarding buckets: its two lower-value buckets are placed at the board edges and its jackpot remains in the centre. The former empty zero-reward buckets are not authored, and the lower slanted guides sit farther below the last peg row so a ball cannot wedge against the diagonal lines. The standard and High Stakes entries share this board geometry.
 - Each ball carries a drop id. Bucket hits call the bucket settlement action and misses call the miss settlement action; both return the same session summary shape for the client.
 - Boards are authored through `settings.board` with dimensions, pegs, buckets, optional obstacles, bouncer pegs, bucket labels, bucket colors, and bucket rewards. Validation requires bucket ids to be unique and pegs/buckets to fit inside the board.
 
@@ -137,7 +137,7 @@ player's old active session and redirect to its canonical route. Legacy
 
 ## Prize Wheel
 - Prize Wheel entries can require an authored currency cost before a spin starts. Current Chansey wheels spend League Tickets, are available anytime, do not use daily completion gates, and show their ticket cost plus prize pool odds in Explore modals.
-- Celadon's standard Rocket Prize Wheel costs 10 Fun Tokens. Its wheel and prize table use distinct Pokemon/item icons plus visible reward labels, and an always-visible leave button remains available whenever a spin is not resolving.
+- Celadon's standard Rocket Prize Wheel costs 10 Fun Tokens. Its wheel and prize table use distinct Pokemon/item icons plus visible reward labels. The leave action is server-backed and idempotent: it clears idle activity state, or settles an already-decided paid spin exactly once before completing the activity and deleting both Prize Wheel and generic game-session Redis keys.
 
 ## Celadon Game Corner balance
 

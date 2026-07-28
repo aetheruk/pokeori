@@ -1606,7 +1606,7 @@ describe('PVE turn engine helpers', () => {
       random: () => 0,
     })
 
-    expect(appliedMessages).toEqual(["Player's Sp. Atk fell!"])
+    expect(appliedMessages).toEqual(["Player's Special Attack fell!"])
     expect(player.statStages?.specialAttack).toBe(-2)
 
     player.statStages = undefined

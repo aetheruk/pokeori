@@ -33,6 +33,7 @@ Explore locations, mine for items, and discover Pokemon.
 - Background music per region
 - Battle detail previews show opponent teams with the Pokemon name or `???` plus level or level-range labels, without capture-completion badges.
 - Explore detail modals lazy-load their heavier detail helpers after open. Reward previews memoize selected rewards, collapse repeated secret fishing drops, disable reward carousel auto-scroll, and omit generic XP/material/gem/candy/casing previews for catch, battle, and Field Observation entries. Fishing reward previews omit repeatable auto item drops such as Water Gems and Aqua Solvent, while still showing unclaimed unique/secret collectibles.
+- Explore detail modal Rules and Stats use the same compact horizontal card geometry, including a fixed card height and icon tile, spacing, and label/value alignment.
 - Location cards can show a gold star centered along the bottom edge of the icon once every grouped Catch, Battle, Study, and Fish Pokemon form is at least research level 1, every Catch/Fish form is caught, and no one-time collectible rewards such as task unlocks or unique items remain claimable.
 - Catch scare-away QTEs show decoy Pokemon from the same eligible catch encounter pool, excluding the active form. Single-Pokemon special catches fall back to Unown forms for the decoys.
 - Missing or stale catch encounter sessions clear the client and return the player to Explore instead of leaving the encounter page mounted. Timer-zero responses keep the encounter session alive and move the player into the capture phase.

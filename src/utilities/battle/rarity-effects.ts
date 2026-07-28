@@ -3,6 +3,7 @@ import { WEATHER_LABELS, type WeatherType } from '@/data/weather'
 import { resolvePokemonRarity } from '@/utilities/pokemon/rarity-effects'
 import { applyStatus } from './status-effects-logic'
 import type { BattlePokemon, BattleState } from './types'
+import { formatBattleStatName } from './stat-labels'
 
 const BATTLE_TYPES = [
   'normal',
@@ -38,16 +39,6 @@ type RarityWeatherState = Pick<BattleState, 'weather' | 'turn'>
 
 function formatType(type: string) {
   return `${type[0]?.toUpperCase() ?? ''}${type.slice(1)}`
-}
-
-function formatStat(stat: (typeof RETRO_STATS)[number]) {
-  return {
-    attack: 'Attack',
-    defense: 'Defense',
-    specialAttack: 'Sp. Atk',
-    specialDefense: 'Sp. Def',
-    speed: 'Speed',
-  }[stat]
 }
 
 function addType(types: string[], type: string) {
@@ -186,7 +177,7 @@ export function applyBattleRarityEntryEffects(
     pokemon.statStages[boosted] = Math.min(6, pokemon.statStages[boosted] + 3)
     pokemon.statStages[lowered] = Math.max(-6, pokemon.statStages[lowered] - 3)
     messages.push(
-      `${pokemon.name} raised ${formatStat(boosted)} and lowered ${formatStat(lowered)}!`,
+      `${pokemon.name} raised ${formatBattleStatName(boosted)} and lowered ${formatBattleStatName(lowered)}!`,
     )
   }
 

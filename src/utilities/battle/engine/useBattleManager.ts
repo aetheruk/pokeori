@@ -5,6 +5,7 @@ import { generateBattleEvents } from './event-generator'
 import { useAudio } from '@/context/AudioContext'
 import { tasks } from '@/data/tasks'
 import { prependBattleHistory, trimBattleHistory } from '../history'
+import type { BattlePresentationEvent } from '../types'
 
 // Helper for deep cloning battle state to prevent mutation side-effects
 const shallowCloneState = (state: BattleState): BattleState => ({
@@ -72,6 +73,32 @@ const prependVisualLogEntry = (
   if (!entry) return trimBattleHistory(history)
   if (isSameLogEntry(history[0], entry)) return trimBattleHistory(history)
   return prependBattleHistory(history, entry)
+}
+
+const revealVisualLogMessage = (
+  history: BattleLogEntry[],
+  entry: BattleLogEntry | undefined,
+  message: string,
+) => {
+  const trimmedMessage = message.trim()
+  if (!entry || !trimmedMessage) return trimBattleHistory(history)
+
+  if (history[0]?.turn === entry.turn) {
+    const existingLines = history[0].message.split('\n')
+    if (existingLines.includes(trimmedMessage)) return trimBattleHistory(history)
+    return trimBattleHistory([
+      {
+        ...entry,
+        message: [...existingLines, trimmedMessage].join('\n'),
+      },
+      ...history.slice(1),
+    ])
+  }
+
+  return prependBattleHistory(history, {
+    ...entry,
+    message: trimmedMessage,
+  })
 }
 
 const BATTLE_DEBUG_LOG_KEY = 'pokemon-app:battle-debug-log'
@@ -181,6 +208,7 @@ export function useBattleManager(initialState: BattleState) {
   const isMountedRef = useRef(true)
   const terminalFallbackTimerRef = useRef<number | null>(null)
   const processingWatchdogTimerRef = useRef<number | null>(null)
+  const prefersReducedMotionRef = useRef(false)
 
   // Crucial: This ref tracks the 'Target' state we are animating TOWARDS.
   // Subsequent pushTurnResult calls must diff against this to avoid duplicate anims.
@@ -264,7 +292,10 @@ export function useBattleManager(initialState: BattleState) {
   const delay = useCallback(
     (ms: number) => {
       return new Promise<void>((resolve) => {
-        const timerId = setTrackedTimeout(resolve, ms)
+        const timerId = setTrackedTimeout(
+          resolve,
+          prefersReducedMotionRef.current ? 0 : ms,
+        )
         if (timerId === null) resolve()
       })
     },
@@ -273,8 +304,17 @@ export function useBattleManager(initialState: BattleState) {
 
   useEffect(() => {
     isMountedRef.current = true
+    const reducedMotionQuery = window.matchMedia?.(
+      '(prefers-reduced-motion: reduce)',
+    )
+    const updateReducedMotion = () => {
+      prefersReducedMotionRef.current = reducedMotionQuery?.matches ?? false
+    }
+    updateReducedMotion()
+    reducedMotionQuery?.addEventListener('change', updateReducedMotion)
 
     return () => {
+      reducedMotionQuery?.removeEventListener('change', updateReducedMotion)
       isMountedRef.current = false
       queueRunIdRef.current += 1
       queueRef.current.length = 0
@@ -764,6 +804,280 @@ export function useBattleManager(initialState: BattleState) {
                   playerStatusDamageSplat: null,
                   enemyStatusDamageSplat: null,
                 }))
+              } else if (seq.type === 'PRESENTATION') {
+                const presentationEvents =
+                  seq.presentation?.events as BattlePresentationEvent[]
+                const logEntry = seq.logEntry as BattleLogEntry | undefined
+                const finalState = seq.newState as BattleState
+                const presentationTargetState = cloneState(finalState)
+                const playedSimultaneousGroups = new Set<string>()
+
+                const revealMessage = (message: string) => {
+                  if (!message.trim()) return
+                  setVisualState((prev) => {
+                    const next = cloneState(prev)
+                    next.history = revealVisualLogMessage(
+                      next.history,
+                      logEntry,
+                      message,
+                    )
+                    return next
+                  })
+                }
+
+                for (const presentationEvent of presentationEvents || []) {
+                  if (shouldStop()) break
+
+                  if (presentationEvent.type === 'message') {
+                    revealMessage(presentationEvent.message)
+                    await delay(220)
+                    continue
+                  }
+
+                  if (presentationEvent.type === 'attack') {
+                    if (
+                      presentationEvent.simultaneousGroup &&
+                      playedSimultaneousGroups.has(
+                        presentationEvent.simultaneousGroup,
+                      )
+                    ) {
+                      continue
+                    }
+                    if (presentationEvent.simultaneousGroup) {
+                      const simultaneousAttacks = presentationEvents.filter(
+                        (
+                          candidate,
+                        ): candidate is Extract<
+                          BattlePresentationEvent,
+                          { type: 'attack' }
+                        > =>
+                          candidate.type === 'attack' &&
+                          candidate.simultaneousGroup ===
+                            presentationEvent.simultaneousGroup,
+                      )
+                      playedSimultaneousGroups.add(
+                        presentationEvent.simultaneousGroup,
+                      )
+                      safePlaySfx('stance_tie')
+                      setAnim((prev) => ({
+                        ...prev,
+                        playerAttacking: simultaneousAttacks.some(
+                          (attack) => attack.actorSide === 'player',
+                        ),
+                        enemyAttacking: simultaneousAttacks.some(
+                          (attack) => attack.actorSide === 'enemy',
+                        ),
+                      }))
+                      await delay(300)
+                      if (shouldStop()) break
+                      setAnim((prev) => {
+                        const next = { ...prev }
+                        next.playerAttacking = false
+                        next.enemyAttacking = false
+                        for (const attack of simultaneousAttacks) {
+                          if (attack.targetSide === 'player') {
+                            next.playerHit = attack.damage > 0
+                            next.playerDamageSplat =
+                              attack.damage > 0 ? attack.damage : null
+                            next.playerImpactType = attack.attackType || null
+                          } else {
+                            next.enemyHit = attack.damage > 0
+                            next.enemyDamageSplat =
+                              attack.damage > 0 ? attack.damage : null
+                            next.enemyImpactType = attack.attackType || null
+                          }
+                        }
+                        return next
+                      })
+                      for (const attack of simultaneousAttacks) {
+                        revealMessage(attack.message)
+                      }
+                      setVisualState((prev) => {
+                        const next = cloneState(prev)
+                        for (const attack of simultaneousAttacks) {
+                          const team =
+                            attack.targetSide === 'player'
+                              ? next.playerTeam
+                              : next.enemyTeam
+                          const pokemon = team[attack.targetIndex]
+                          if (pokemon) pokemon.currentHp = attack.hpAfter
+                        }
+                        return next
+                      })
+                      await delay(400)
+                      if (shouldStop()) break
+                      setAnim((prev) => ({
+                        ...prev,
+                        playerHit: false,
+                        enemyHit: false,
+                        playerDamageSplat: null,
+                        enemyDamageSplat: null,
+                        playerImpactType: null,
+                        enemyImpactType: null,
+                      }))
+                      continue
+                    }
+
+                    const actorKey =
+                      presentationEvent.actorSide === 'player'
+                        ? 'playerAttacking'
+                        : 'enemyAttacking'
+                    const hitKey =
+                      presentationEvent.targetSide === 'player'
+                        ? 'playerHit'
+                        : 'enemyHit'
+                    const splatKey =
+                      presentationEvent.targetSide === 'player'
+                        ? 'playerDamageSplat'
+                        : 'enemyDamageSplat'
+                    const impactKey =
+                      presentationEvent.targetSide === 'player'
+                        ? 'playerImpactType'
+                        : 'enemyImpactType'
+
+                    safePlaySfx(
+                      presentationEvent.actorSide === 'player'
+                        ? 'stance_win'
+                        : 'stance_loss',
+                    )
+                    setAnim((prev) => ({ ...prev, [actorKey]: true }))
+                    await delay(300)
+                    if (shouldStop()) break
+
+                    setAnim((prev) => ({
+                      ...prev,
+                      [actorKey]: false,
+                      [hitKey]: presentationEvent.damage > 0,
+                      [splatKey]:
+                        presentationEvent.damage > 0
+                          ? presentationEvent.damage
+                          : null,
+                      [impactKey]: presentationEvent.attackType || null,
+                    }))
+                    revealMessage(presentationEvent.message)
+                    setVisualState((prev) => {
+                      const next = cloneState(prev)
+                      const team =
+                        presentationEvent.targetSide === 'player'
+                          ? next.playerTeam
+                          : next.enemyTeam
+                      const pokemon = team[presentationEvent.targetIndex]
+                      if (pokemon) pokemon.currentHp = presentationEvent.hpAfter
+                      return next
+                    })
+                    await delay(400)
+                    if (shouldStop()) break
+                    setAnim((prev) => ({
+                      ...prev,
+                      [hitKey]: false,
+                      [splatKey]: null,
+                      [impactKey]: null,
+                    }))
+                    continue
+                  }
+
+                  if (presentationEvent.type === 'hp-change') {
+                    const splatKey =
+                      presentationEvent.side === 'player'
+                        ? 'playerStatusDamageSplat'
+                        : 'enemyStatusDamageSplat'
+                    setAnim((prev) => ({
+                      ...prev,
+                      [splatKey]:
+                        presentationEvent.kind === 'heal'
+                          ? -presentationEvent.amount
+                          : presentationEvent.amount,
+                    }))
+                    revealMessage(presentationEvent.message)
+                    setVisualState((prev) => {
+                      const next = cloneState(prev)
+                      const team =
+                        presentationEvent.side === 'player'
+                          ? next.playerTeam
+                          : next.enemyTeam
+                      const pokemon = team[presentationEvent.pokemonIndex]
+                      if (pokemon) pokemon.currentHp = presentationEvent.hpAfter
+                      return next
+                    })
+                    await delay(600)
+                    if (shouldStop()) break
+                    setAnim((prev) => ({ ...prev, [splatKey]: null }))
+                    continue
+                  }
+
+                  if (presentationEvent.type === 'faint') {
+                    const faintKey =
+                      presentationEvent.side === 'player'
+                        ? 'playerFainting'
+                        : 'enemyFainting'
+                    revealMessage(presentationEvent.message)
+                    await delay(200)
+                    if (shouldStop()) break
+                    safePlayPokemonCry(presentationEvent.formId)
+                    setAnim((prev) => ({ ...prev, [faintKey]: true }))
+                    await delay(1000)
+                    if (shouldStop()) break
+                    const keepHidden =
+                      presentationEvent.side === 'player' &&
+                      finalState.pendingPlayerSwitch &&
+                      finalState.activePlayerIndex ===
+                        presentationEvent.pokemonIndex
+                    setAnim((prev) => ({
+                      ...prev,
+                      [faintKey]: keepHidden,
+                    }))
+                    continue
+                  }
+
+                  const outKey =
+                    presentationEvent.side === 'player'
+                      ? 'playerSwitchingOut'
+                      : 'enemySwitchingOut'
+                  const inKey =
+                    presentationEvent.side === 'player'
+                      ? 'playerSwitchingIn'
+                      : 'enemySwitchingIn'
+                  revealMessage(presentationEvent.message)
+                  if (presentationEvent.reason === 'voluntary') {
+                    setAnim((prev) => ({ ...prev, [outKey]: true }))
+                    await delay(350)
+                    if (shouldStop()) break
+                  }
+                  setVisualState((prev) => {
+                    const next = cloneState(prev)
+                    const finalTeam =
+                      presentationEvent.side === 'player'
+                        ? presentationTargetState.playerTeam
+                        : presentationTargetState.enemyTeam
+                    const nextPokemon = finalTeam[presentationEvent.toIndex]
+                    if (!nextPokemon) return prev
+                    if (presentationEvent.side === 'player') {
+                      next.activePlayerIndex = presentationEvent.toIndex
+                      next.playerTeam[presentationEvent.toIndex] = nextPokemon
+                    } else {
+                      next.activeEnemyIndex = presentationEvent.toIndex
+                      next.enemyTeam[presentationEvent.toIndex] = nextPokemon
+                    }
+                    return next
+                  })
+                  setAnim((prev) => ({
+                    ...prev,
+                    [outKey]: false,
+                    [inKey]: true,
+                    playerFainting:
+                      presentationEvent.side === 'player'
+                        ? false
+                        : prev.playerFainting,
+                    enemyFainting:
+                      presentationEvent.side === 'enemy'
+                        ? false
+                        : prev.enemyFainting,
+                  }))
+                  await delay(50)
+                  if (shouldStop()) break
+                  setAnim((prev) => ({ ...prev, [inKey]: false }))
+                  await delay(300)
+                }
               }
               break
             }
@@ -914,7 +1228,7 @@ export function useBattleManager(initialState: BattleState) {
 
       // Prevent duplicate processing of the same turn
       const latestLog = nextState.history[0]
-      const stateHash = `${nextState.turn}-${nextState.status}-${nextState.activePlayerIndex}-${nextState.activeEnemyIndex}-${latestLog?.turn || 0}-${latestLog?.message || ''}`
+      const stateHash = `${nextState.turn}-${nextState.status}-${nextState.activePlayerIndex}-${nextState.activeEnemyIndex}-${nextState.presentation?.sequenceId || ''}-${latestLog?.turn || 0}-${latestLog?.message || ''}`
       if (lastResultRef.current === stateHash) {
         recordBattleDebug('turn-result-duplicate', {
           state: nextState,

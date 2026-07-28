@@ -30,6 +30,10 @@ import {
   processBattleAbilityWeatherSet,
 } from '@/utilities/battle/abilities'
 import { resetBattleTypeChange } from '@/utilities/battle/tera'
+import {
+  beginBattlePresentation,
+  finalizeBattlePresentation,
+} from '@/utilities/battle/presentation'
 import { runBattleActionWithGuard } from '../helpers/action-guard'
 import { applyBattleRarityEntryEffects } from '@/utilities/battle/rarity-effects'
 
@@ -49,6 +53,7 @@ export async function swapPokemon(
   return runBattleActionWithGuard(user.id, clientActionId, async () => {
     const state = await getActiveBattleState(user)
     if (!state) return { success: false, error: 'No active battle' }
+    beginBattlePresentation(state)
 
     if (state.status !== 'ongoing')
       return { success: false, error: 'Battle has ended' }
@@ -170,6 +175,7 @@ export async function swapPokemon(
         message,
       })
 
+      finalizeBattlePresentation(state)
       await redis.set(`battle:${user.id}`, state, { ex: BATTLE_TTL })
       if (state.status !== 'ongoing') {
         revalidatePath('/game/battles/encounter')
@@ -230,6 +236,7 @@ export async function swapPokemon(
         message,
       })
 
+      finalizeBattlePresentation(state)
       await redis.set(`battle:${user.id}`, state, { ex: BATTLE_TTL })
       if (state.status !== 'ongoing') {
         revalidatePath('/game/battles/encounter')

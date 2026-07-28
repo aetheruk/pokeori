@@ -41,6 +41,7 @@ import { resolveStance } from './turn-resolution'
 import { resolveHiddenPower } from './hidden-power'
 import { consumePokemonMoveUse, getPokemonMoveUsesRemaining } from './move-uses'
 import { calculateAiStance } from './ai-logic'
+import { formatBattleStatName } from './stat-labels'
 import {
   applyMoveRuntimeEffects,
   checkMoveBattleCondition,
@@ -2273,17 +2274,6 @@ export function shouldInterruptEnemyAiMove(params: {
   )
 }
 
-function formatStatName(stat: string): string {
-  switch (stat) {
-    case 'specialAttack':
-      return 'Sp. Atk'
-    case 'specialDefense':
-      return 'Sp. Def'
-    default:
-      return stat.charAt(0).toUpperCase() + stat.slice(1)
-  }
-}
-
 export function applyEnemyAiMoveEffects(params: {
   move: MoveConfig
   self: BattlePokemon
@@ -2368,7 +2358,7 @@ export function applyEnemyAiMoveEffects(params: {
       }
       const direction = buff.stages >= 0 ? 'rose' : 'fell'
       messages.push(
-        `${target.name}'s ${formatStatName(buff.stat)} ${direction}!`,
+        `${target.name}'s ${formatBattleStatName(buff.stat)} ${direction}!`,
       )
       if (buff.stages > 0) {
         messages.push(
@@ -2525,7 +2515,7 @@ export function applyEnemyAiMoveEffects(params: {
       }
       const direction = debuff.stages >= 0 ? 'rose' : 'fell'
       messages.push(
-        `${target.name}'s ${formatStatName(debuff.stat)} ${direction}!`,
+        `${target.name}'s ${formatBattleStatName(debuff.stat)} ${direction}!`,
       )
       if (debuff.stages > 0) {
         messages.push(

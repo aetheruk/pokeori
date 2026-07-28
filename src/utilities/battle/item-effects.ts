@@ -1,19 +1,11 @@
 import type { BattlePokemon, StatStages } from '@/utilities/battle/types'
 import { DEFAULT_STAT_STAGES } from '@/utilities/battle/stats-calc'
 import type { BattleEffect } from '@/data/items'
+import { formatBattleStatName } from './stat-labels'
 
 export interface BattleItemEffectResult {
   applied: boolean
   message: string
-}
-
-const STAT_NAMES: Record<string, string> = {
-  attack: 'Attack',
-  defense: 'Defense',
-  specialAttack: 'Sp. Atk',
-  specialDefense: 'Sp. Def',
-  speed: 'Speed',
-  crit: 'Critical Hit ratio',
 }
 
 function formatMessages(messages: string[]): string {
@@ -120,13 +112,13 @@ export function applyBattleItemEffect(params: {
         if (applied) return { applied: true, message: formatMessages(messages) }
         return {
           applied: false,
-          message: `${pokemon.name}'s ${STAT_NAMES[battleEffect.buffStat]} won't go any higher.`,
+          message: `${pokemon.name}'s ${formatBattleStatName(battleEffect.buffStat)} won't go any higher.`,
         }
       }
 
       pokemon.statStages[statKey] = newStage
       messages.push(
-        `${pokemon.name}'s ${STAT_NAMES[battleEffect.buffStat]} rose!`,
+        `${pokemon.name}'s ${formatBattleStatName(battleEffect.buffStat)} rose!`,
       )
       return { applied: true, message: formatMessages(messages) }
     }

@@ -33,6 +33,7 @@ import { clearDynamaxState } from '@/utilities/battle/dynamax'
 import { createBattleTurnTimer } from './timing'
 import { persistPokemonBattleKOs, recordPokemonKO } from './pokemon-ko-credit'
 import { processBattleAbilitySuppressionForState } from '@/utilities/battle/abilities'
+import { finalizeBattlePresentation } from '@/utilities/battle/presentation'
 
 function getBattleConfigForState(state: BattleState) {
   return (
@@ -276,6 +277,7 @@ export async function finalizeTurn(
         : false
   }
   await timer.time('persistConsumedHeldItems', () => persistConsumedHeldItems(state))
+  finalizeBattlePresentation(state)
   await timer.time('redisSetBattleState', () =>
     redis.set(`battle:${user.id}`, state, { ex: BATTLE_TTL }),
   )
