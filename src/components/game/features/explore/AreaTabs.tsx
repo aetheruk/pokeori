@@ -38,7 +38,7 @@ export function AreaTabs({
       headerClassName="pr-0 text-center sm:text-center"
       className="flex flex-col bg-game-surface"
     >
-      <div className="flex-1 overflow-y-auto px-4 pb-4 pt-4">
+      <div className="min-h-0 overflow-y-auto px-4 pb-4 pt-4">
         <div className="grid grid-cols-2 gap-3">
           {subCategories
             .filter(

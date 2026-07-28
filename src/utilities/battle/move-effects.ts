@@ -1873,7 +1873,10 @@ export function getEffectiveMoveAccuracy(params: {
   ) {
     return 100
   }
-  const baseAccuracy = params.move.stance ? 100 : params.move.accuracy
+  // Basic stance attacks explicitly author 100 accuracy when they are created.
+  // Assigned moves must retain their own authored base accuracy even though
+  // every battle move also carries a stance.
+  const baseAccuracy = params.move.accuracy ?? 100
   const weatherAccuracy = getWeatherAccuracy(baseAccuracy, params.weather)
   return getBattleAbilityMoveAccuracy({
     attacker: params.attacker,
@@ -1882,6 +1885,16 @@ export function getEffectiveMoveAccuracy(params: {
     accuracy: weatherAccuracy,
     weather: params.weather,
   })
+}
+
+export function doesBattleMoveHit(
+  accuracy: number,
+  random: () => number = Math.random,
+): boolean {
+  const boundedAccuracy = Math.max(0, Math.min(100, accuracy))
+  if (boundedAccuracy <= 0) return false
+  if (boundedAccuracy >= 100) return true
+  return random() * 100 <= boundedAccuracy
 }
 
 export function getEffectiveStanceAccuracy(params: {

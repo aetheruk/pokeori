@@ -75,6 +75,7 @@ import { consumePokemonMoveUse } from '@/utilities/battle/move-uses'
 import {
   applyMoveRuntimeEffects,
   getEffectiveStanceAccuracy,
+  doesBattleMoveHit,
   applyNextDamageModifier,
   checkMoveBattleCondition,
   getEffectiveMoveAccuracy,
@@ -607,7 +608,7 @@ export function resolvePvpCombat(params: {
         weather,
         stance: moveStance,
       })
-  const moveMissed = accuracy < 100 && chanceRandom() * 100 > accuracy
+  const moveMissed = !doesBattleMoveHit(accuracy, chanceRandom)
   if (moveMissed) {
     moveFailed = true
   }
@@ -1301,17 +1302,8 @@ export function resolvePvpCombat(params: {
   }
 
   if (!moveFailed && specialMove?.status) {
-    const accuracy = getEffectiveMoveAccuracy({
-      move: specialMove,
-      state,
-      attacker,
-      defender,
-      attackerSide,
-      weather,
-    })
     if (
-      Math.random() * 100 < accuracy &&
-      Math.random() * 100 <
+      chanceRandom() * 100 <
         getBattleAbilitySecondaryEffectChance(
           attacker,
           specialMove,
@@ -1357,18 +1349,9 @@ export function resolvePvpCombat(params: {
   }
 
   if (!moveFailed && specialMove?.additionalStatuses) {
-    const accuracy = getEffectiveMoveAccuracy({
-      move: specialMove,
-      state,
-      attacker,
-      defender,
-      attackerSide,
-      weather,
-    })
     for (const status of specialMove.additionalStatuses) {
       if (
-        Math.random() * 100 < accuracy &&
-        Math.random() * 100 <
+        chanceRandom() * 100 <
           getBattleAbilitySecondaryEffectChance(
             attacker,
             specialMove,
@@ -1468,27 +1451,15 @@ export function resolvePvpCombat(params: {
   }
 
   if (!moveFailed && specialMove?.disableStance) {
-    const accuracy = getEffectiveMoveAccuracy({
-      move: specialMove,
-      state,
-      attacker,
-      defender,
-      attackerSide,
-      weather,
-    })
-    if (Math.random() * 100 < accuracy) {
-      if (!skipTargetAddedEffects) {
-        effectMessage += blocksBattleMentalEffectByAbility(defender, 'disable')
-          ? ` ${getBattleMentalEffectBlockMessage(defender, specialMove.name)}`
-          : ` ${applyStanceDisable({
-              pokemon: defender,
-              stance: specialMove.disableStance.stance,
-              turns: specialMove.disableStance.turns,
-              currentTurn,
-            })}`
-      }
-    } else {
-      effectMessage += ` ${specialMove.name} failed!`
+    if (!skipTargetAddedEffects) {
+      effectMessage += blocksBattleMentalEffectByAbility(defender, 'disable')
+        ? ` ${getBattleMentalEffectBlockMessage(defender, specialMove.name)}`
+        : ` ${applyStanceDisable({
+            pokemon: defender,
+            stance: specialMove.disableStance.stance,
+            turns: specialMove.disableStance.turns,
+            currentTurn,
+          })}`
     }
   }
 

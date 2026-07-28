@@ -57,6 +57,7 @@ import {
   applyContinuousEndEffects,
   checkMoveBattleCondition,
   getEffectiveStanceAccuracy,
+  doesBattleMoveHit,
   queueDelayedMoveDamage,
   tickMoveLock,
 } from '@/utilities/battle/move-effects'
@@ -527,7 +528,7 @@ export async function processEnemyAttackOnly(
       weather: state.weather?.weather,
       stance: enemyStance,
     })
-    enemyMoveMissed = stanceAccuracy < 100 && Math.random() * 100 > stanceAccuracy
+    enemyMoveMissed = !doesBattleMoveHit(stanceAccuracy)
   }
   let enemyAiEffectMessages: string[] = []
 

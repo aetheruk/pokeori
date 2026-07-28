@@ -148,7 +148,10 @@ export function ResponsivePanel({
       <Drawer open={open} onOpenChange={onOpenChange}>
         <DrawerContent
           showHandle={showHandle}
-          className={cn('game-paper-modal game-paper-background relative', className)}
+          className={cn(
+            'game-paper-modal game-paper-background',
+            className,
+          )}
           style={{ maxHeight: mobileMaxHeight }}
         >
           {showCloseButton && (

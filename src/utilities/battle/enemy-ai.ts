@@ -45,6 +45,7 @@ import { formatBattleStatName } from './stat-labels'
 import {
   applyMoveRuntimeEffects,
   checkMoveBattleCondition,
+  doesBattleMoveHit,
   getEffectiveMoveAccuracy,
   getConditionalDamageMultiplier,
   getMoveHealAmount,
@@ -121,7 +122,7 @@ export function resolveEnemyAiMoveAccuracy(params: {
 
   return {
     accuracy,
-    missed: accuracy < 100 && random() * 100 > accuracy,
+    missed: !doesBattleMoveHit(accuracy, random),
   }
 }
 

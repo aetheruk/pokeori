@@ -1975,8 +1975,6 @@ export function getBattleAbilityMoveAccuracy(params: {
   accuracy: number
   weather?: WeatherType
 }): number {
-  if (params.attacker.currentHp <= 0) return params.accuracy
-
   const attackerEffects = getAbilityEffects(params.attacker)
   const defenderEffects =
     params.defender && params.defender.currentHp > 0
@@ -2048,9 +2046,8 @@ export function getBattleAbilityMoveAccuracy(params: {
           weather: params.weather,
         })
       : 0)
-  accuracy *=
-    getAccuracyEvasionStageMultiplier(attackerAccuracyStage) /
-    getAccuracyEvasionStageMultiplier(defenderEvasionStage)
+  const netAccuracyStage = attackerAccuracyStage - defenderEvasionStage
+  accuracy *= getAccuracyEvasionStageMultiplier(netAccuracyStage)
 
   return Math.max(0, Math.min(100, accuracy))
 }
