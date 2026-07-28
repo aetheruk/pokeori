@@ -236,6 +236,7 @@ export function buildVsSeekerBattleConfig(params: {
       ...getVsSeekerCurrencyRewards(),
       ...getVsSeekerCandyRewards(level),
     ],
+    disableLossPayout: true,
     disableCandyRewards: true,
     maxPokemon: 3,
     levelCap: level,

@@ -15,9 +15,11 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { login, register } from '../actions'
 import { InstallHelpDialog } from './install-help-dialog'
+import { KidModeInfoDialog } from './kid-mode-info-dialog'
 import { ProjectInfoDialog } from './project-info-dialog'
 
 const initialState = {
@@ -26,6 +28,7 @@ const initialState = {
 
 export function AuthForm() {
   const [activeTab, setActiveTab] = useState('login')
+  const [kidMode, setKidMode] = useState(false)
   const [loginState, loginAction, isLoginPending] = useActionState(
     login,
     initialState,
@@ -245,6 +248,35 @@ export function AuthForm() {
                       required
                       className="border-game-border bg-game-surface-raised/80"
                     />
+                  </div>
+                  <div className="flex items-center gap-3 rounded-xl border border-game-border bg-game-surface-raised/80 p-3">
+                    <div className="min-w-0 flex-1">
+                      <Label
+                        htmlFor="kid-mode"
+                        className="text-sm font-semibold text-game-ink"
+                      >
+                        Kid Mode
+                      </Label>
+                      <p
+                        id="kid-mode-description"
+                        className="mt-1 text-xs leading-relaxed text-game-muted"
+                      >
+                        Simpler research, stronger Pokemon in solo battles, and
+                        no social or competitive features.
+                      </p>
+                    </div>
+                    <input
+                      type="hidden"
+                      name="kidMode"
+                      value={kidMode ? 'true' : 'false'}
+                    />
+                    <Switch
+                      id="kid-mode"
+                      checked={kidMode}
+                      onCheckedChange={setKidMode}
+                      aria-describedby="kid-mode-description"
+                    />
+                    <KidModeInfoDialog />
                   </div>
                 </CardContent>
                 <CardFooter className="pt-4">

@@ -81,6 +81,7 @@ const REQUIREMENT_TYPES: TaskRequirementType[] = [
   'companion',
   'research_level',
   'research_level_total',
+  'kid_mode',
   'weather',
 ]
 

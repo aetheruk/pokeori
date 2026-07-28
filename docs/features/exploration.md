@@ -9,6 +9,7 @@ Explore locations, mine for items, and discover Pokemon.
 
 ## Features
 - Region-based location maps
+- Region and area drawers list only destinations the player has unlocked; locked regions and sub-regions are omitted rather than shown as disabled cards.
 - Route cards can expose the three core route gameplay pillars: Catch, Battle, and Study. Study is powered by Field Observation entries and appears beside Catch/Battle when the route has matching authored data.
 - Mine for items (berries, evolution stones)
 - Random Pokemon encounters

@@ -32,6 +32,7 @@ import type {
   FieldObservationAvailablePokemon,
   FieldObservationPublicCollectibleDrop,
   FieldObservationPublicRoundData,
+  FieldObservationQuestionOption,
   FieldObservationSpawn,
 } from '@/utilities/research/field-observation'
 import {
@@ -73,6 +74,8 @@ export function FieldObservationGame({
   )
 
   const isCountSurvey = roundData?.surveyFocus === 'count-survey'
+  const isKidModeQuestion =
+    roundData?.question.type === 'kid-most-appeared'
   const observationEnd = startTime + (roundData?.observationDurationMs || 0)
   const sessionEnd = observationEnd + (roundData?.answerDurationMs || 0)
   const phase = now < observationEnd ? 'observing' : 'answering'
@@ -330,7 +333,9 @@ export function FieldObservationGame({
                           <span className="truncate text-sm font-semibold text-[#293532]">
                             {isCountSurvey
                               ? 'Count report'
-                              : 'Observation question'}
+                              : isKidModeQuestion
+                                ? 'Kid Mode question'
+                                : 'Observation question'}
                           </span>
                         </div>
                       </div>
@@ -352,6 +357,18 @@ export function FieldObservationGame({
                       >
                         Submit count
                       </Button>
+                    ) : isKidModeQuestion ? (
+                      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                        {roundData.question.options.map((option) => (
+                          <PokemonAnswerTile
+                            key={option.id}
+                            option={option}
+                            selected={selectedOption === option.id}
+                            disabled={isSubmitting || !!result}
+                            onSelect={() => handleAnswer(option.id)}
+                          />
+                        ))}
+                      </div>
                     ) : (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         {roundData.question.options.map(
@@ -437,6 +454,65 @@ export function FieldObservationGame({
         />
       )}
     </div>
+  )
+}
+
+function PokemonAnswerTile({
+  option,
+  selected,
+  disabled,
+  onSelect,
+}: {
+  option: FieldObservationQuestionOption
+  selected: boolean
+  disabled: boolean
+  onSelect: () => void
+}) {
+  const formId = option.formId || String(option.speciesId || 201)
+  const spriteSources = useMemo(
+    () => getFieldObservationPokemonSpriteSources(formId),
+    [formId],
+  )
+  const [sourceIndex, setSourceIndex] = useState(0)
+  const currentSpriteSource = spriteSources[sourceIndex] ?? spriteSources[0]
+
+  useEffect(() => {
+    setSourceIndex(0)
+  }, [formId])
+
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      aria-label={option.label}
+      aria-pressed={selected}
+      onClick={onSelect}
+      className={cn(
+        'game-focus-ring flex min-h-28 flex-col items-center justify-center gap-2 rounded-lg border bg-game-surface-raised p-3 text-center text-game-ink shadow-sm transition-colors hover:border-game-moss/50 hover:bg-game-moss/5 disabled:opacity-70',
+        selected
+          ? 'border-game-moss bg-game-moss/10 ring-2 ring-game-moss/30'
+          : 'border-game-border',
+      )}
+    >
+      <Image
+        src={currentSpriteSource}
+        alt=""
+        width={80}
+        height={80}
+        className="h-16 w-16 object-contain"
+        draggable={false}
+        onError={() => {
+          setSourceIndex((previous) =>
+            previous >= spriteSources.length - 1
+              ? previous
+              : previous + 1,
+          )
+        }}
+      />
+      <span className="text-sm font-semibold leading-tight">
+        {option.label}
+      </span>
+    </button>
   )
 }
 

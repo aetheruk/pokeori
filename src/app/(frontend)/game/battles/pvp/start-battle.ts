@@ -66,6 +66,7 @@ export async function initializeSharedPvpBattle(
 
   if (!p1Details || !p2Details || p1Docs.length === 0 || p2Docs.length === 0)
     return null
+  if (p1Details.kidMode === true || p2Details.kidMode === true) return null
 
   const p1TrainerLevel = getSkillLevel(p1Details.skills, 'battling')
   const p2TrainerLevel = getSkillLevel(p2Details.skills, 'battling')

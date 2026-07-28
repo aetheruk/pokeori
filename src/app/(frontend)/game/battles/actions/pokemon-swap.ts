@@ -4,7 +4,7 @@ import { getUser } from '../helpers/user'
 import { BATTLE_TTL, getActiveBattleState } from '../helpers/state-management'
 import { battles } from '@/data/battles'
 import { processEnemyAttackOnly } from '../pve/enemy-attack'
-import { calculateStats } from '@/utilities/battle/battle-logic'
+import { recalculateBattlePokemonStats } from '@/utilities/battle/battle-logic'
 import { queuePvpMoveAndResolveTurn } from '../pvp/turn-sync'
 import { redis } from '@/utilities/redis'
 import {
@@ -297,9 +297,9 @@ export async function swapPokemon(
 
     if (state.powers?.dimensionalShift?.activeEffect?.type === 'chaos') {
       state.powers.dimensionalShift.activeEffect = undefined
-      oldPokemon.stats = calculateStats(oldPokemon)
+      oldPokemon.stats = recalculateBattlePokemonStats(oldPokemon)
       const enemyMon = state.enemyTeam[state.activeEnemyIndex]
-      enemyMon.stats = calculateStats(enemyMon)
+      enemyMon.stats = recalculateBattlePokemonStats(enemyMon)
     }
 
     const message = [

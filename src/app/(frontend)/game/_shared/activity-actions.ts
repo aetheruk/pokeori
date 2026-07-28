@@ -563,7 +563,17 @@ export async function startGameActivity(
 
       // If a session exists and we aren't forcing a reset, return it
       if (existingState && !validatedForceReset) {
-        if (existingState.expiry > Date.now()) {
+        const isFieldObservation = encounter.gameType === 'field-observation'
+        const restoredRoundUsesKidModeQuestion =
+          existingState.roundData?.question?.type === 'kid-most-appeared'
+        const isIncompatibleFieldObservation =
+          isFieldObservation &&
+          restoredRoundUsesKidModeQuestion !== (user.kidMode === true)
+
+        if (
+          existingState.expiry > Date.now() &&
+          !isIncompatibleFieldObservation
+        ) {
           return {
             success: true,
             restored: true,
@@ -1075,6 +1085,7 @@ export async function startGameActivity(
           Math.random,
           {
             globalPokemonEvent,
+            kidModeQuestion: user.kidMode === true,
             spawnModifierResolver: (surveyFocus) =>
               getFieldObservationSpawnModifiers({
                 ability: activeAbility,

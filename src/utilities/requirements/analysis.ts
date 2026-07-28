@@ -109,6 +109,7 @@ export function analyzeRequirements(
       case 'weather':
       case 'user_level':
       case 'total_evolutions':
+      case 'kid_mode':
       case 'rival_selected':
         // No extra data needed
         break

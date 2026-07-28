@@ -4,6 +4,11 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
+import type { User } from '@/payload-types'
+import {
+  KID_MODE_ACCESS_ERROR,
+  isKidModeUser,
+} from '@/utilities/kid-mode'
 
 export interface FriendRequest {
   id: string
@@ -13,15 +18,34 @@ export interface FriendRequest {
   createdAt: string
 }
 
+async function getFreshAuthenticatedUser(payload: any): Promise<User | null> {
+  const { user } = await payload.auth({ headers: await headers() })
+  if (!user) return null
+  return payload.findByID({
+    collection: 'users',
+    id: user.id,
+    depth: 0,
+  }) as Promise<User>
+}
+
+function kidModeError(user: User | null) {
+  return isKidModeUser(user)
+    ? { success: false, error: KID_MODE_ACCESS_ERROR }
+    : null
+}
+
 // Send a friend request
-export async function sendFriendRequest(targetUserId: string) {
+export async function sendFriendRequest(
+  targetUserId: string,
+): Promise<{ success: boolean; error?: string }> {
   const payload = await getPayload({ config: configPromise })
-  const headersList = await headers()
-  const { user } = await payload.auth({ headers: headersList })
+  const user = await getFreshAuthenticatedUser(payload)
 
   if (!user) {
     return { success: false, error: 'Not authenticated' }
   }
+  const actorError = kidModeError(user)
+  if (actorError) return actorError
 
   if (user.id === targetUserId) {
     return { success: false, error: 'Cannot send friend request to yourself' }
@@ -31,6 +55,9 @@ export async function sendFriendRequest(targetUserId: string) {
     const targetUser = await payload.findByID({ collection: 'users', id: targetUserId })
     if (!targetUser) {
       return { success: false, error: 'User not found' }
+    }
+    if (isKidModeUser(targetUser)) {
+      return { success: false, error: 'That trainer is not available.' }
     }
 
     // Check if already friends
@@ -85,14 +112,17 @@ export async function sendFriendRequest(targetUserId: string) {
 }
 
 // Accept a friend request
-export async function acceptFriendRequest(requestId: string) {
+export async function acceptFriendRequest(
+  requestId: string,
+): Promise<{ success: boolean; error?: string }> {
   const payload = await getPayload({ config: configPromise })
-  const headersList = await headers()
-  const { user } = await payload.auth({ headers: headersList })
+  const user = await getFreshAuthenticatedUser(payload)
 
   if (!user) {
     return { success: false, error: 'Not authenticated' }
   }
+  const actorError = kidModeError(user)
+  if (actorError) return actorError
 
   try {
     const requests = ((user as any).friendRequests || []) as FriendRequest[]
@@ -122,6 +152,9 @@ export async function acceptFriendRequest(requestId: string) {
 
     // Update sender's data
     const sender = await payload.findByID({ collection: 'users', id: request.from })
+    if (isKidModeUser(sender)) {
+      return { success: false, error: 'That trainer is not available.' }
+    }
     const senderRequests = ((sender as any).friendRequests || []) as FriendRequest[]
     const senderFriends = ((sender as any).friends || []) as string[]
 
@@ -145,14 +178,17 @@ export async function acceptFriendRequest(requestId: string) {
 }
 
 // Reject a friend request
-export async function rejectFriendRequest(requestId: string) {
+export async function rejectFriendRequest(
+  requestId: string,
+): Promise<{ success: boolean; error?: string }> {
   const payload = await getPayload({ config: configPromise })
-  const headersList = await headers()
-  const { user } = await payload.auth({ headers: headersList })
+  const user = await getFreshAuthenticatedUser(payload)
 
   if (!user) {
     return { success: false, error: 'Not authenticated' }
   }
+  const actorError = kidModeError(user)
+  if (actorError) return actorError
 
   try {
     const requests = ((user as any).friendRequests || []) as FriendRequest[]
@@ -174,6 +210,9 @@ export async function rejectFriendRequest(requestId: string) {
     // Update other user
     const otherUserId = request.from === user.id ? request.to : request.from
     const otherUser = await payload.findByID({ collection: 'users', id: otherUserId })
+    if (isKidModeUser(otherUser)) {
+      return { success: false, error: 'That trainer is not available.' }
+    }
     const otherRequests = ((otherUser as any).friendRequests || []) as FriendRequest[]
 
     await payload.update({
@@ -191,16 +230,24 @@ export async function rejectFriendRequest(requestId: string) {
 }
 
 // Remove a friend
-export async function removeFriend(friendId: string) {
+export async function removeFriend(
+  friendId: string,
+): Promise<{ success: boolean; error?: string }> {
   const payload = await getPayload({ config: configPromise })
-  const headersList = await headers()
-  const { user } = await payload.auth({ headers: headersList })
+  const user = await getFreshAuthenticatedUser(payload)
 
   if (!user) {
     return { success: false, error: 'Not authenticated' }
   }
+  const actorError = kidModeError(user)
+  if (actorError) return actorError
 
   try {
+    const friend = await payload.findByID({ collection: 'users', id: friendId })
+    if (isKidModeUser(friend)) {
+      return { success: false, error: 'That trainer is not available.' }
+    }
+
     const friends = ((user as any).friends || []) as string[]
     const updatedFriends = friends.filter((id) => id !== friendId)
 
@@ -211,7 +258,6 @@ export async function removeFriend(friendId: string) {
     })
 
     // Remove from friend's list
-    const friend = await payload.findByID({ collection: 'users', id: friendId })
     const friendFriends = ((friend as any).friends || []) as string[]
 
     await payload.update({
@@ -229,14 +275,26 @@ export async function removeFriend(friendId: string) {
 }
 
 // Get friends list
-export async function getFriendsList() {
+export async function getFriendsList(): Promise<{
+  success: boolean
+  error?: string
+  data?: Array<{
+    id: string
+    trainerName?: string | null
+    icon: any
+    banner: any
+    title: any
+    skills: User['skills']
+  }>
+}> {
   const payload = await getPayload({ config: configPromise })
-  const headersList = await headers()
-  const { user } = await payload.auth({ headers: headersList })
+  const user = await getFreshAuthenticatedUser(payload)
 
   if (!user) {
     return { success: false, error: 'Not authenticated' }
   }
+  const actorError = kidModeError(user)
+  if (actorError) return actorError
 
   try {
     const friends = ((user as any).friends || []) as string[]
@@ -248,9 +306,10 @@ export async function getFriendsList() {
     const friendUsers = await payload.find({
       collection: 'users',
       where: {
-        id: {
-          in: friends,
-        },
+        and: [
+          { id: { in: friends } },
+          { kidMode: { not_equals: true } },
+        ],
       },
     })
 
@@ -271,14 +330,24 @@ export async function getFriendsList() {
 }
 
 // Get pending friend requests
-export async function getPendingRequests() {
+export async function getPendingRequests(): Promise<{
+  success: boolean
+  error?: string
+  data?: Array<
+    FriendRequest & {
+      senderName: string
+      senderIcon: any
+    }
+  >
+}> {
   const payload = await getPayload({ config: configPromise })
-  const headersList = await headers()
-  const { user } = await payload.auth({ headers: headersList })
+  const user = await getFreshAuthenticatedUser(payload)
 
   if (!user) {
     return { success: false, error: 'Not authenticated' }
   }
+  const actorError = kidModeError(user)
+  if (actorError) return actorError
 
   try {
     const requests = ((user as any).friendRequests || []) as FriendRequest[]
@@ -293,19 +362,21 @@ export async function getPendingRequests() {
     const senders = await payload.find({
       collection: 'users',
       where: {
-        id: {
-          in: senderIds,
-        },
+        and: [
+          { id: { in: senderIds } },
+          { kidMode: { not_equals: true } },
+        ],
       },
     })
 
-    const requestsWithDetails = pendingIncoming.map((request) => {
+    const requestsWithDetails = pendingIncoming.flatMap((request) => {
       const sender = senders.docs.find((s) => s.id === request.from)
-      return {
+      if (!sender) return []
+      return [{
         ...request,
-        senderName: sender?.trainerName || 'Unknown',
-        senderIcon: (sender as any)?.icon || 'ditto',
-      }
+        senderName: sender.trainerName || 'Unknown',
+        senderIcon: (sender as any).icon || 'ditto',
+      }]
     })
 
     return { success: true, data: requestsWithDetails }

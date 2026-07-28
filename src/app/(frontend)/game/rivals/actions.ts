@@ -5,6 +5,10 @@ import configPromise from '@payload-config'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import type { User } from '@/payload-types'
+import {
+  KID_MODE_ACCESS_ERROR,
+  isKidModeUser,
+} from '@/utilities/kid-mode'
 import { tasks } from '@/data/tasks'
 import { analyzeRequirements } from '@/utilities/requirements/analysis'
 import { getGameUserData } from '@/utilities/game-data'
@@ -45,9 +49,15 @@ export async function selectRivalTrainer(
   if (!freshUser) {
     return { success: false, error: 'User not found' }
   }
+  if (isKidModeUser(freshUser)) {
+    return { success: false, error: KID_MODE_ACCESS_ERROR }
+  }
 
   if (!rivalUser) {
     return { success: false, error: 'Rival trainer not found' }
+  }
+  if (isKidModeUser(rivalUser)) {
+    return { success: false, error: 'That trainer is not available.' }
   }
 
   const existingRivalId = (freshUser as any).rivalTrainerId as string | undefined

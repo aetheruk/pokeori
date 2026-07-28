@@ -236,6 +236,8 @@ export interface BattleConfig {
   daily?: boolean
   isRandomEvent?: boolean
   disableRewards?: boolean
+  /** Prevent currency deductions when the player loses this battle. */
+  disableLossPayout?: boolean
   disableCandyRewards?: boolean
   generatedXpMultiplier?: number
   music?: string // Custom background music URL (default: '/music/battle.mp3')

@@ -61,6 +61,8 @@ export interface BattlePokemon extends Omit<Pokemon, 'stats'> {
   }
   currentHp: number
   maxHp: number
+  /** Battle-instance-only multiplier applied after normal stat modifiers. */
+  battleStatMultiplier?: number
   name: string // Ensure name is always present
   types: string[]
   statStages?: StatStages // Stat modifiers from X-items

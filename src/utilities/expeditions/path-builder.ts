@@ -145,6 +145,59 @@ export function cloneSteps(
   return JSON.parse(JSON.stringify(steps)) as ExpeditionGeneratedStep[]
 }
 
+export function normalizeKidModeExpeditionSteps(params: {
+  expeditionId: string
+  steps: ExpeditionGeneratedStep[]
+  currentStepIndex: number
+  kidMode: boolean
+}): {
+  changed: boolean
+  steps: ExpeditionGeneratedStep[]
+  currentStepIndex: number
+} {
+  if (
+    !params.kidMode ||
+    params.expeditionId !== 'pallet-town-orientation'
+  ) {
+    return {
+      changed: false,
+      steps: params.steps,
+      currentStepIndex: params.currentStepIndex,
+    }
+  }
+
+  const removedIndexes = params.steps.flatMap((step, index) =>
+    step.activityId === 'pallet-orientation-rival-selection' ||
+    step.stepId === 'pallet-orientation-step-8-rival-selection'
+      ? [index]
+      : [],
+  )
+  if (removedIndexes.length === 0) {
+    return {
+      changed: false,
+      steps: params.steps,
+      currentStepIndex: params.currentStepIndex,
+    }
+  }
+
+  const removed = new Set(removedIndexes)
+  const steps = renumberSteps(
+    params.steps.filter((_, index) => !removed.has(index)),
+  )
+  const removedBeforeCurrent = removedIndexes.filter(
+    (index) => index < params.currentStepIndex,
+  ).length
+
+  return {
+    changed: true,
+    steps,
+    currentStepIndex: Math.min(
+      Math.max(0, params.currentStepIndex - removedBeforeCurrent),
+      steps.length,
+    ),
+  }
+}
+
 export function resolveResultBranchAfterStep(
   steps: ExpeditionGeneratedStep[],
   completedStepIndex: number,
@@ -314,6 +367,14 @@ function buildStepsForNodes(
 
   for (const node of nodes) {
     if (node.type === 'activity') {
+      if (
+        node.requirements?.some(
+          (requirement) => !checkRequirement(userData, requirement),
+        )
+      ) {
+        continue
+      }
+
       const selected = pickActivityForNode(
         expedition,
         node,

@@ -193,13 +193,28 @@ export async function getLobbyStatus(code: string): Promise<PvpLobby | null> {
   return await redis.get<PvpLobby>(`${LOBBY_PREFIX}${code}`)
 }
 
+export async function closeFriendlyLobby(code: string): Promise<void> {
+  if (!FRIENDLY_CODE_PATTERN.test(code)) return
+  const key = `${LOBBY_PREFIX}${code}`
+  const lobby = await redis.get<PvpLobby>(key)
+  await redis.del(key)
+  if (!lobby) return
+  await redis.del(`pvp:status:${lobby.hostUserId}`)
+  if (lobby.guestUserId) {
+    await redis.del(`pvp:status:${lobby.guestUserId}`)
+  }
+}
+
 // --- Ranked Queue Logic ---
 
 function getQueueMemberKey(configId: string, userId: string): string {
   return `${QUEUE_MEMBER_PREFIX}${configId}:${userId}`
 }
 
-async function popValidQueuedUser(configId: string): Promise<string | null> {
+async function popValidQueuedUser(
+  configId: string,
+  isUserEligible: (userId: string) => Promise<boolean>,
+): Promise<string | null> {
   const queueKey = `${QUEUE_KEY}${configId}`
 
   while (true) {
@@ -215,6 +230,10 @@ async function popValidQueuedUser(configId: string): Promise<string | null> {
     }
 
     await redis.del(memberKey)
+    if (!(await isUserEligible(candidate))) {
+      await redis.del(`pvp:status:${candidate}`)
+      continue
+    }
     return candidate
   }
 }
@@ -222,6 +241,7 @@ async function popValidQueuedUser(configId: string): Promise<string | null> {
 export async function joinRankedQueue(
   configId: string,
   userId: string,
+  isUserEligible: (userId: string) => Promise<boolean> = async () => true,
 ): Promise<{ success: boolean; status: 'queued' | 'matched'; battleId?: string; error?: string }> {
   if (!configId.trim()) {
     return { success: false, status: 'queued', error: 'Invalid battle configuration' }
@@ -237,7 +257,7 @@ export async function joinRankedQueue(
   }
 
   // Check if anyone is waiting
-  const waitingUser = await popValidQueuedUser(configId)
+  const waitingUser = await popValidQueuedUser(configId, isUserEligible)
 
   if (waitingUser && waitingUser !== userId) {
     // MATCH FOUND!
@@ -297,8 +317,12 @@ export async function leaveRankedQueue(
 
 export async function checkPvpStatus(
   userId: string,
-): Promise<{ status: string; battleId?: string }> {
-  const data = await redis.get<{ status: string; battleId?: string }>(`pvp:status:${userId}`)
+): Promise<{ status: string; battleId?: string; configId?: string }> {
+  const data = await redis.get<{
+    status: string
+    battleId?: string
+    configId?: string
+  }>(`pvp:status:${userId}`)
   if (!data) return { status: 'idle' }
   return data
 }

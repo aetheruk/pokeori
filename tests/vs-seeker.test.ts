@@ -141,6 +141,7 @@ describe('VS Seeker battle generation', () => {
       dropChance: 100,
     })
     expect(config?.disableCandyRewards).toBe(true)
+    expect(config?.disableLossPayout).toBe(true)
     expect(config?.rewards).toEqual(
       expect.arrayContaining([
         { type: 'item', targetId: 'rare-candy-xs', quantity: 3, dropChance: 100 },

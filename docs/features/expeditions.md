@@ -9,6 +9,7 @@ Expeditions are authored multi-step Explore routes made from tasks, battles, loc
 - Explore components: `src/components/game/features/explore/ExpeditionModal.tsx`
 
 ## Features
+- Activity nodes can carry user requirements and are omitted when those requirements are not met. Kid Mode uses this to skip Pallet Town Orientation's rival-selection step; active legacy orientation runs are normalized lazily so their current index, step numbers, and total remain valid.
 - Generates an expedition path from authored activity nodes and optional branch choices.
 - Supports result branches after an activity step. When the next node is a `result_branch`, a win follows the win route and a loss follows the loss route without spending an expedition life. Result branches can also set `end: 'complete'` or `end: 'fail'` to finish the run immediately from a non-final path point.
 - Tracks one active expedition run per player through `expedition-runs`.

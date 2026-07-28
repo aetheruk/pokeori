@@ -1,7 +1,6 @@
 import { getPokemonForm } from '@/utilities/pokemon/pokedex'
-import { calculateStatsFromBase } from '@/utilities/battle/battle-logic'
+import { recalculateBattlePokemonStats } from '@/utilities/battle/battle-logic'
 import type { BattlePokemon, BattleState } from '@/utilities/battle/types'
-import { applyHeldItemStatModifiers } from '@/utilities/pokemon/held-items'
 
 export const activateMegaEvolution = (
   mon: BattlePokemon,
@@ -19,29 +18,7 @@ export const activateMegaEvolution = (
   mon.megaTurnsRemaining = undefined
 
   // Update Stats
-  const newStats = applyHeldItemStatModifiers(
-    calculateStatsFromBase(
-      megaForm.stats,
-      mon.level,
-      {
-        hp: mon.ivs?.hp ?? 15,
-        attack: mon.ivs?.attack ?? 15,
-        defense: mon.ivs?.defense ?? 15,
-        specialAttack: mon.ivs?.specialAttack ?? 15,
-        specialDefense: mon.ivs?.specialDefense ?? 15,
-        speed: mon.ivs?.speed ?? 15,
-      },
-      {
-        hp: mon.evs?.hp ?? 0,
-        attack: mon.evs?.attack ?? 0,
-        defense: mon.evs?.defense ?? 0,
-        specialAttack: mon.evs?.specialAttack ?? 0,
-        specialDefense: mon.evs?.specialDefense ?? 0,
-        speed: mon.evs?.speed ?? 0,
-      },
-    ),
-    mon.heldItem?.id || mon.heldItemId,
-  )
+  const newStats = recalculateBattlePokemonStats(mon)
   const hpRatio = mon.currentHp / mon.maxHp
   mon.stats = newStats
   mon.maxHp = newStats.hp

@@ -60,6 +60,7 @@ export interface FieldObservationQuestionOption {
   id: string
   label: string
   speciesId?: number
+  formId?: string
 }
 
 export interface FieldObservationQuestion {
@@ -198,6 +199,7 @@ export function generateFieldObservationRound(
     globalPokemonEvent?: FieldObservationGlobalPokemonEvent | null
     spawnModifiers?: FieldObservationSpawnModifiers
     spawnModifierResolver?: (surveyFocus: FieldObservationSurveyFocus) => FieldObservationSpawnModifiers
+    kidModeQuestion?: boolean
   } = {},
 ): GeneratedFieldObservationRound {
   const difficulty = clampInteger(settings.difficulty || 1, 1, 10)
@@ -210,7 +212,7 @@ export function generateFieldObservationRound(
   const spawnModifiers = options.spawnModifierResolver
     ? options.spawnModifierResolver(surveyFocus)
     : options.spawnModifiers
-  const spawns = [
+  let spawns = [
     ...generateSpawns(
       settings,
       pool,
@@ -222,8 +224,12 @@ export function generateFieldObservationRound(
     ),
     ...generateGlobalPokemonSpawns(settings, observationDurationMs, options.globalPokemonEvent, random),
   ].sort((a, b) => a.startMs - b.startMs)
-  const selected =
-    surveyFocus === 'count-survey'
+  if (options.kidModeQuestion) {
+    spawns = ensureUniqueMostAppeared(spawns)
+  }
+  const selected = options.kidModeQuestion
+    ? buildKidModeMostAppearedQuestion(spawns)
+    : surveyFocus === 'count-survey'
       ? buildCountSurveyQuestion(spawns)
       : buildStandardQuestion(spawns, pool, random)
   const rewardSubjects = buildRewardSubjects(spawns)
@@ -510,6 +516,77 @@ function buildCountSurveyQuestion(spawns: FieldObservationSpawn[]): QuestionCand
     correctOptionId: 'count-survey',
     rewardSpeciesIds: unique(spawns.map((spawn) => spawn.speciesId)),
   }
+}
+
+function buildKidModeMostAppearedQuestion(
+  spawns: FieldObservationSpawn[],
+): QuestionCandidate {
+  const counts = countBySpecies(spawns)
+  const appearedSpecies = unique(spawns.map((spawn) => spawn.speciesId))
+  const correctSpeciesId = appearedSpecies.reduce((winner, speciesId) =>
+    (counts.get(speciesId) || 0) > (counts.get(winner) || 0)
+      ? speciesId
+      : winner,
+  )
+
+  return {
+    question: {
+      id: 'field-kid-most-appeared',
+      type: 'kid-most-appeared',
+      prompt: 'Who appeared the most?',
+      options: appearedSpecies.map((speciesId) => {
+        const spawn = spawns.find((entry) => entry.speciesId === speciesId)
+        return {
+          id: `species:${speciesId}`,
+          label: getSpeciesName(speciesId),
+          speciesId,
+          formId: spawn?.formId || String(speciesId),
+        }
+      }),
+    },
+    correctOptionId: `species:${correctSpeciesId}`,
+    rewardSpeciesIds: [correctSpeciesId],
+  }
+}
+
+function ensureUniqueMostAppeared(
+  spawns: FieldObservationSpawn[],
+): FieldObservationSpawn[] {
+  if (spawns.length === 0) return spawns
+
+  const counts = countBySpecies(spawns)
+  const highestCount = Math.max(...counts.values())
+  const leaders = Array.from(counts.entries())
+    .filter(([, count]) => count === highestCount)
+    .map(([speciesId]) => speciesId)
+  if (leaders.length <= 1) return spawns
+
+  // Global event appearances are authored rewards, so keep them intact while
+  // making the ordinary observation set produce one unambiguous answer.
+  const source =
+    spawns.find(
+      (spawn) => leaders.includes(spawn.speciesId) && !spawn.id.startsWith('global-'),
+    ) || spawns.find((spawn) => spawn.speciesId === leaders[0])
+  if (!source) return spawns
+
+  const replacementIndex = spawns.findIndex(
+    (spawn) =>
+      spawn.speciesId !== source.speciesId && !spawn.id.startsWith('global-'),
+  )
+  if (replacementIndex < 0) return spawns
+
+  return spawns.map((spawn, index) =>
+    index === replacementIndex
+      ? {
+          ...spawn,
+          speciesId: source.speciesId,
+          formId: source.formId,
+          name: source.name,
+          shiny: source.shiny,
+          gender: source.gender,
+        }
+      : spawn,
+  )
 }
 
 function buildCountAnswer(

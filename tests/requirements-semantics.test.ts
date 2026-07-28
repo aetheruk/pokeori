@@ -313,6 +313,33 @@ describe('requirements and criteria semantics', () => {
       target: 1,
       completed: true,
     })
+
+    const kidData = {
+      ...data,
+      user: { ...data.user, kidMode: true },
+    } as RequirementData
+    expect(checkRequirement(kidData, { type: 'rival_selected' })).toBe(false)
+  })
+
+  test('kid mode requirements support direct and inverse gating', () => {
+    const kidData = {
+      ...baseRequirementData,
+      user: { id: 'user-1', kidMode: true },
+    } as unknown as RequirementData
+
+    expect(checkRequirement(kidData, { type: 'kid_mode' })).toBe(true)
+    expect(
+      checkRequirement(kidData, { type: 'kid_mode', inverse: true }),
+    ).toBe(false)
+    expect(checkRequirement(baseRequirementData, { type: 'kid_mode' })).toBe(
+      false,
+    )
+    expect(
+      checkRequirement(baseRequirementData, {
+        type: 'kid_mode',
+        inverse: true,
+      }),
+    ).toBe(true)
   })
 
   test('time range criteria fall back to UTC consistently', () => {

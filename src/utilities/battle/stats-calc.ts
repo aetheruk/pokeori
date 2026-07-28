@@ -337,12 +337,50 @@ export function calculateStats(
   return stats
 }
 
+export function applyBattleStatMultiplier(
+  stats: BattlePokemon['stats'],
+  multiplier?: number,
+): BattlePokemon['stats'] {
+  if (!multiplier || multiplier === 1) return stats
+
+  return {
+    hp: Math.floor(stats.hp * multiplier),
+    attack: Math.floor(stats.attack * multiplier),
+    defense: Math.floor(stats.defense * multiplier),
+    specialAttack: Math.floor(stats.specialAttack * multiplier),
+    specialDefense: Math.floor(stats.specialDefense * multiplier),
+    speed: Math.floor(stats.speed * multiplier),
+  }
+}
+
+export function recalculateBattlePokemonStats(
+  pokemon: BattlePokemon,
+): BattlePokemon['stats'] {
+  const recalculated = applyHeldItemStatModifiers(
+    calculateStats({
+      ...(pokemon as unknown as Pokemon),
+      stats: undefined,
+    }),
+    suppressesBattleHeldItemEffectsByAbility(pokemon)
+      ? undefined
+      : pokemon.heldItem?.id || pokemon.heldItemId,
+  )
+  const boosted = applyBattleStatMultiplier(
+    recalculated,
+    pokemon.battleStatMultiplier,
+  )
+  const maxHpOverride = getBattleMaxHpOverride(pokemon)
+  if (maxHpOverride) boosted.hp = maxHpOverride
+  return boosted
+}
+
 export function initializeBattlePokemon(
   pokemon: Pokemon,
   levelCap?: number,
   forceLevel?: boolean,
   trainerLevel?: number,
   pokemonResearchLevel?: number,
+  battleStatMultiplier?: number,
 ): BattlePokemon {
   if (!pokemon.ability) {
     const primaryAbilityId = getPrimaryFormAbilityId(pokemon.formId)
@@ -351,11 +389,14 @@ export function initializeBattlePokemon(
     }
   }
   const heldItem = getHeldItemDefinition((pokemon as any).heldItemId)
-  const stats = applyHeldItemStatModifiers(
-    calculateStats(pokemon, levelCap, forceLevel, trainerLevel),
-    suppressesBattleHeldItemEffectsByAbility(pokemon as BattlePokemon)
-      ? undefined
-      : heldItem?.id,
+  const stats = applyBattleStatMultiplier(
+    applyHeldItemStatModifiers(
+      calculateStats(pokemon, levelCap, forceLevel, trainerLevel),
+      suppressesBattleHeldItemEffectsByAbility(pokemon as BattlePokemon)
+        ? undefined
+        : heldItem?.id,
+    ),
+    battleStatMultiplier,
   )
   const maxHpOverride = getBattleMaxHpOverride(pokemon as BattlePokemon)
   if (maxHpOverride) {
@@ -416,6 +457,7 @@ export function initializeBattlePokemon(
     stats, // Ensure we use the calculated stats
     currentHp: stats.hp,
     maxHp: stats.hp,
+    battleStatMultiplier,
     types: formData?.types || ['normal'],
     statStages: { ...DEFAULT_STAT_STAGES }, // Initialize with no modifiers
     teraTypeOverride: undefined,
@@ -455,16 +497,7 @@ export function applyBattleFormChange(
   refreshBattleRarityTypes(pokemon)
   const currentHp = pokemon.currentHp
   const hpRatio = pokemon.maxHp > 0 ? currentHp / pokemon.maxHp : 0
-  const stats = applyHeldItemStatModifiers(
-    calculateStats(pokemon as unknown as Pokemon),
-    suppressesBattleHeldItemEffectsByAbility(pokemon)
-      ? undefined
-      : pokemon.heldItem?.id,
-  )
-  const maxHpOverride = getBattleMaxHpOverride(pokemon)
-  if (maxHpOverride) {
-    stats.hp = maxHpOverride
-  }
+  const stats = recalculateBattlePokemonStats(pokemon)
   pokemon.stats = stats
   pokemon.maxHp = stats.hp
   pokemon.currentHp =

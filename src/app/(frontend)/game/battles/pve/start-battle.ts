@@ -62,12 +62,16 @@ import {
 } from '@/utilities/battle/abilities'
 import { applyBattleRarityEntryEffects } from '@/utilities/battle/rarity-effects'
 import { getBattleMoveOptions } from '@/utilities/pokemon/pokemon-moves'
+import {
+  KID_MODE_ACCESS_ERROR,
+  KID_MODE_PVE_STAT_MULTIPLIER,
+} from '@/utilities/kid-mode'
 
 export async function startBattle(
   battleId: string,
   consumedPokemonIds?: string[],
 ): Promise<{ success: boolean; error?: string; state?: BattleState }> {
-  const user = await getUser()
+  const user = await getUser({ fresh: true })
   if (!user) return { success: false, error: 'Not authenticated' }
 
   const battleConfig = battles.find((b) => b.id === battleId)
@@ -75,6 +79,9 @@ export async function startBattle(
 
   // PVP Handling
   if (battleConfig.pvp) {
+    if (user.kidMode === true) {
+      return { success: false, error: KID_MODE_ACCESS_ERROR }
+    }
     if (battleConfig.pvp_type === 'ranked') return { success: false, error: 'PVP_RANKED' }
     return { success: false, error: 'PVP_FRIENDLY' }
   }
@@ -253,7 +260,9 @@ export async function startBattleFromConfig(
     expiresAt: weatherState.expiresAt,
   }
   const rivalContext = isRivalBattleConfig(battleConfig)
-    ? await getRivalBattleContext(payload, user, battleConfig)
+    ? user.kidMode === true
+      ? { error: KID_MODE_ACCESS_ERROR }
+      : await getRivalBattleContext(payload, user, battleConfig)
     : null
   if (rivalContext?.error) {
     return { success: false, error: rivalContext.error }
@@ -357,6 +366,9 @@ export async function startBattleFromConfig(
         false,
         playerTrainerLevel,
         getPokemonResearchLevel(pokedex as any, p.speciesId, p.formId),
+        user.kidMode === true
+          ? KID_MODE_PVE_STAT_MULTIPLIER
+          : undefined,
       ),
     ),
     moveUseLimit,
@@ -685,6 +697,9 @@ async function getRivalBattleContext(
 
   if (!rivalUser) {
     return { error: 'Your selected rival could not be found.' }
+  }
+  if (rivalUser.kidMode === true) {
+    return { error: 'Your selected rival is not available.' }
   }
 
   const rivalPokemonResult = await payload.find({

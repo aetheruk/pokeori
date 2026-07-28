@@ -606,6 +606,10 @@ export const ceruleanCityTasks: Task[] = [
     completeButtonText: 'Continue',
     requirements: [
       {
+        type: 'kid_mode',
+        inverse: true,
+      },
+      {
         type: 'battle_result',
         targetId: 'rival-cerulean',
         battleStatus: 'win',
@@ -644,6 +648,10 @@ export const ceruleanCityTasks: Task[] = [
     completionTrigger: 'manual',
     completeButtonText: 'Continue',
     requirements: [
+      {
+        type: 'kid_mode',
+        inverse: true,
+      },
       {
         type: 'battle_result',
         targetId: 'rival-cerulean',

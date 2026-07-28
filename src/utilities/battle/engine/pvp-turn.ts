@@ -3,13 +3,13 @@ import { getMove, resolveMoveDamageMultiplier } from '@/data/moves'
 import type { WeatherType } from '@/data/weather'
 import {
   calculateDamage,
-  calculateStats,
   clampStatStage,
   DEFAULT_STAT_STAGES,
   resolveStance,
   resolveMoveContest,
   formatTypeEffectivenessMessage,
 } from '@/utilities/battle/battle-logic'
+import { recalculateBattlePokemonStats } from '@/utilities/battle/stats-calc'
 import { shouldFailMoveFromStance } from '@/utilities/battle/move-contest'
 import {
   applyStatus,
@@ -438,12 +438,13 @@ export function resolvePvpSwap(params: {
     const oldIndex =
       side === 'player' ? state.activePlayerIndex : state.activeEnemyIndex
     const oldMon = team[oldIndex]
-    if (oldMon) oldMon.stats = calculateStats(oldMon)
+    if (oldMon) oldMon.stats = recalculateBattlePokemonStats(oldMon)
 
     const otherTeam = side === 'player' ? state.enemyTeam : state.playerTeam
     const chaosOpposingMon = otherTeam[opposingIndex]
     if (chaosOpposingMon)
-      chaosOpposingMon.stats = calculateStats(chaosOpposingMon)
+      chaosOpposingMon.stats =
+        recalculateBattlePokemonStats(chaosOpposingMon)
   }
 
   clearSourceLinkedTrapSecondaryStatuses({

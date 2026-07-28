@@ -40,6 +40,7 @@ export type TaskRequirementType =
   | 'daily_crystalize'
   | 'daily_activity'
   | 'daily_not_completed'
+  | 'kid_mode'
   | 'rival_selected'
   | 'weather'
   | 'roll'

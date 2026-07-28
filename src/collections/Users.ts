@@ -179,8 +179,12 @@ export const Users: CollectionConfig = {
       type: 'checkbox',
       defaultValue: false,
       label: 'Kid Mode',
+      access: {
+        update: superAdminCheck,
+      },
       admin: {
-        description: 'Enable simplified UI for kids (e.g. sprites instead of text in quizzes)',
+        description:
+          'Simplifies research, boosts solo battle stats, and disables rivals, PvP, social Trainer pages, Mystery Gift, and High Scores.',
       },
     },
     {

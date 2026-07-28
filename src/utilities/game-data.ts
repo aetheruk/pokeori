@@ -9,6 +9,7 @@ import {
 } from '@/utilities/game-data-scopes'
 import { getUserStateData, toSlimUser } from '@/utilities/user-state'
 import { ensureUserWeatherSlot } from '@/utilities/weather'
+import { normalizeKidModeExpeditionSteps } from '@/utilities/expeditions/path-builder'
 
 interface ActiveExpeditionData {
   id: string
@@ -122,6 +123,24 @@ export async function getGameUserData(
     const runDoc = runs.docs?.[0]
 
     if (runDoc) {
+      const normalized = normalizeKidModeExpeditionSteps({
+        expeditionId: runDoc.expeditionId,
+        steps: runDoc.steps || [],
+        currentStepIndex: runDoc.currentStepIndex || 0,
+        kidMode: user.kidMode === true,
+      })
+      if (normalized.changed) {
+        await (payload as any).update({
+          collection: 'expedition-runs',
+          id: runDoc.id,
+          data: {
+            steps: normalized.steps,
+            currentStepIndex: normalized.currentStepIndex,
+            totalSteps: normalized.steps.length,
+          },
+        })
+      }
+
       activeExpedition = {
         id: runDoc.id,
         expeditionId: runDoc.expeditionId,
@@ -130,9 +149,9 @@ export async function getGameUserData(
         mapItemId: runDoc.mapItemId,
         maxLosses: runDoc.maxLosses || 0,
         losses: runDoc.losses || 0,
-        currentStepIndex: runDoc.currentStepIndex || 0,
-        totalSteps: runDoc.totalSteps || 0,
-        steps: runDoc.steps || [],
+        currentStepIndex: normalized.currentStepIndex,
+        totalSteps: normalized.steps.length,
+        steps: normalized.steps,
       }
     }
   }
@@ -141,6 +160,7 @@ export async function getGameUserData(
 
   if (
     shouldFetch('rivalTrainer') &&
+    user.kidMode !== true &&
     typeof user.rivalTrainerId === 'string' &&
     user.rivalTrainerId
   ) {
@@ -156,11 +176,12 @@ export async function getGameUserData(
                 trainerName: true,
                 icon: true,
                 banner: true,
+                kidMode: true,
               },
             })
             .catch(() => null)
 
-    if (rivalUser) {
+    if (rivalUser && rivalUser.kidMode !== true) {
       rivalTrainer = {
         id: rivalUser.id,
         trainerName: rivalUser.trainerName,

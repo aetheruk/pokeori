@@ -746,6 +746,36 @@ describe('field observation research mode', () => {
     ).toBe(false)
   })
 
+  test('Kid Mode always asks who appeared most with tappable Pokemon options', () => {
+    const round = generateFieldObservationRound(
+      routeOneSettings,
+      seededRandom(42),
+      { kidModeQuestion: true },
+    )
+    const counts = new Map<number, number>()
+    for (const spawn of round.publicRoundData.spawns) {
+      counts.set(spawn.speciesId, (counts.get(spawn.speciesId) || 0) + 1)
+    }
+    const leaders = Array.from(counts.entries()).sort(
+      (a, b) => b[1] - a[1],
+    )
+
+    expect(round.publicRoundData.question.type).toBe('kid-most-appeared')
+    expect(round.publicRoundData.question.prompt).toBe(
+      'Who appeared the most?',
+    )
+    expect(round.publicRoundData.question.options.length).toBeGreaterThan(0)
+    expect(
+      round.publicRoundData.question.options.every(
+        (option) => option.speciesId && option.formId,
+      ),
+    ).toBe(true)
+    expect(leaders[0][1]).toBeGreaterThan(leaders[1]?.[1] || 0)
+    expect(round.privateRoundData.correctOptionId).toBe(
+      `species:${leaders[0][0]}`,
+    )
+  })
+
   test('produces varied question families from the same core settings', () => {
     const settings: FieldObservationSettings = {
       ...routeOneSettings,

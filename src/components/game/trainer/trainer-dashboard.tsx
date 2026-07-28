@@ -81,6 +81,7 @@ export function TrainerDashboard() {
     (gameData?.inventory || []).map((item) => [item.itemId, item.quantity]),
   )
   const hasDeckBox = (inventory['deck-box'] || 0) > 0
+  const isKidMode = user?.kidMode === true
 
   const TABS = [
     {
@@ -110,42 +111,46 @@ export function TrainerDashboard() {
           },
         ]
       : []),
-    {
-      id: 'trainers' as const,
-      label: 'Trainers',
-      component: (
-        <LazyWrapper>
-          <TrainerSearch />
-        </LazyWrapper>
-      ),
-    },
-    {
-      id: 'friends' as const,
-      label: 'Friends',
-      component: (
-        <LazyWrapper>
-          <FriendsList />
-        </LazyWrapper>
-      ),
-    },
-    {
-      id: 'gift' as const,
-      label: 'Mystery Gift',
-      component: (
-        <LazyWrapper>
-          <MysteryGift />
-        </LazyWrapper>
-      ),
-    },
-    {
-      id: 'scores' as const,
-      label: 'High Scores',
-      component: (
-        <LazyWrapper>
-          <HighScores activeSkill={rankingSkill} />
-        </LazyWrapper>
-      ),
-    },
+    ...(!isKidMode
+      ? [
+          {
+            id: 'trainers' as const,
+            label: 'Trainers',
+            component: (
+              <LazyWrapper>
+                <TrainerSearch />
+              </LazyWrapper>
+            ),
+          },
+          {
+            id: 'friends' as const,
+            label: 'Friends',
+            component: (
+              <LazyWrapper>
+                <FriendsList />
+              </LazyWrapper>
+            ),
+          },
+          {
+            id: 'gift' as const,
+            label: 'Mystery Gift',
+            component: (
+              <LazyWrapper>
+                <MysteryGift />
+              </LazyWrapper>
+            ),
+          },
+          {
+            id: 'scores' as const,
+            label: 'High Scores',
+            component: (
+              <LazyWrapper>
+                <HighScores activeSkill={rankingSkill} />
+              </LazyWrapper>
+            ),
+          },
+        ]
+      : []),
   ]
   const activeComponent =
     TABS.find((tab) => tab.id === activeTab)?.component || TABS[0].component
@@ -159,10 +164,14 @@ export function TrainerDashboard() {
   }
 
   useEffect(() => {
-    if (!hasDeckBox && activeTab === 'decks') {
+    if (
+      (!hasDeckBox && activeTab === 'decks') ||
+      (isKidMode &&
+        ['trainers', 'friends', 'gift', 'scores'].includes(activeTab))
+    ) {
       setActiveTab('profile')
     }
-  }, [activeTab, hasDeckBox])
+  }, [activeTab, hasDeckBox, isKidMode])
 
   const activeSection = TABS.find((tab) => tab.id === activeTab) || TABS[0]
   const ActiveIcon = tabIcons[activeSection.id]

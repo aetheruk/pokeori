@@ -49,6 +49,7 @@ export async function register(prevState: unknown, formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
   const confirmPassword = formData.get('confirmPassword') as string
+  const kidMode = formData.get('kidMode') === 'true'
 
   if (!trainerName || !email || !password || !confirmPassword) {
     return { error: 'All fields are required' }
@@ -72,6 +73,7 @@ export async function register(prevState: unknown, formData: FormData) {
         trainerName,
         email,
         password,
+        kidMode,
       },
     })
 
