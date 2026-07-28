@@ -4,7 +4,9 @@ const afterStoreIntro = [{ type: 'task_completed' as const, targetId: 'shop-till
 const afterRenovation = [
   { type: 'task_completed' as const, targetId: 'department-store-renovation-notes' },
 ]
-const afterComplaints = [{ type: 'task_completed' as const, targetId: 'rocket-ball-complaints' }]
+const afterRooftopOffer = [
+  { type: 'task_completed' as const, targetId: 'rooftop-mysterious-offer' },
+]
 
 const item = (id: string, targetId: string, amount: number, quantity = 1) => ({
   id,
@@ -105,7 +107,7 @@ export const celadonCityShops: ShopConfig[] = [
     subCategory: 'Celadon City',
     icon: { type: 'trainer', id: 'rocket-grunt' },
     background: '/backgrounds/celadon.avif',
-    requirements: afterComplaints,
+    requirements: afterRooftopOffer,
     items: [
       {
         ...item('chaos-stone', 'chaos-stone', 50000),
