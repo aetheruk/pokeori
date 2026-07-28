@@ -221,7 +221,10 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/saffron.avif',
     description: 'A city on the east coast, featuring the Pokemon League.',
     music: '/music/viridian_city.mp3',
-        weatherSlots: {
+    unlockRequirements: [
+      { type: 'task_completed', targetId: 'a-stone-for-a-friend' },
+    ],
+    weatherSlots: {
       1: 'rain',
       2: 'rain',
       3: 'rain',

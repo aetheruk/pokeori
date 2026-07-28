@@ -3758,6 +3758,46 @@ describe('static data references', () => {
     })
   })
 
+  test('Detective Choo regroups the four Celadon leads before the Saffron handoff', () => {
+    const regroup = tasks.find((task) => task.id === 'regroup-effort')
+    const fireStoneTask = tasks.find(
+      (task) => task.id === 'a-stone-for-a-friend',
+    )
+
+    expect(regroup).toMatchObject({
+      name: 'Regroup',
+      repeatable: false,
+      icon: { type: 'trainer', id: 'detective' },
+      requirements: [
+        { type: 'task_completed', targetId: 'rooftop-mysterious-offer' },
+        { type: 'task_completed', targetId: 'a-craftsmans-secret' },
+        { type: 'task_completed', targetId: 'erikas-gossip' },
+        { type: 'task_completed', targetId: 'corporate-takeover' },
+      ],
+      rewards: [
+        { type: 'xp', skill: 'explorer', quantity: 2000, dropChance: 100 },
+      ],
+    })
+    expect(fireStoneTask).toMatchObject({
+      name: 'A Stone for a Friend',
+      repeatable: false,
+      requirements: [{ type: 'task_completed', targetId: 'regroup-effort' }],
+      criteria: [
+        {
+          type: 'item_owned',
+          targetId: 'fire-stone',
+          count: 1,
+          consume: true,
+        },
+      ],
+    })
+    expect(fireStoneTask?.exitModal?.message).toContain('Sabrina')
+    expect(fireStoneTask?.exitModal?.message).toContain('Saffron')
+    expect(subCategories['Saffron City']?.unlockRequirements).toEqual([
+      { type: 'task_completed', targetId: 'a-stone-for-a-friend' },
+    ])
+  })
+
   test('Celadon Department Store uses the revised stock, prices, and companion gates', () => {
     const firstFloor = shops.find(
       (shop) => shop.id === 'celadon-department-store-1f',

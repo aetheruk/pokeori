@@ -599,6 +599,187 @@ export const celadonCityTasks: Task[] = [
     }
   },
   {
+    "id": "regroup-effort",
+    "name": "Regroup",
+    "description": "I've followed every lead Detective Choo gave me. It's time to compare what we've learned.",
+    "category": "Kanto",
+    "subCategory": "Celadon City",
+    "background": "/backgrounds/celadon.avif",
+    "icon": {
+      "type": "trainer",
+      "id": "detective"
+    },
+    "secret": false,
+    "completionTrigger": "manual",
+    "completeButtonText": "Meet Detective Choo",
+    "repeatable": false,
+    "requirements": [
+      {
+        "type": "task_completed",
+        "targetId": "rooftop-mysterious-offer"
+      },
+      {
+        "type": "task_completed",
+        "targetId": "a-craftsmans-secret"
+      },
+      {
+        "type": "task_completed",
+        "targetId": "erikas-gossip"
+      },
+      {
+        "type": "task_completed",
+        "targetId": "corporate-takeover"
+      }
+    ],
+    "criteria": [],
+    "rewards": [
+      {
+        "type": "xp",
+        "skill": "explorer",
+        "quantity": 2000,
+        "dropChance": 100
+      }
+    ],
+    "enterModal": [
+      {
+        "id": 1,
+        "title": "Det. Ray Choo",
+        "message": "There you are, {Trainer}. I was starting to get a little worried. Did you manage to find anything out?",
+        "background": "/backgrounds/celadon.avif",
+        "icon": {
+          "type": "trainer",
+          "id": "detective"
+        },
+        "buttons": [
+          {
+            "text": "It's all connected",
+            "type": "navigate",
+            "id": 2
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Det. Ray Choo",
+        "message": "Rocket is strangling the Evolution Stone supply, replacing ordinary Poké Balls with their own failures, and using the Game Corner money to make a play for Silph Co. That is not petty crime; it is a takeover of how trainers travel, train, and grow stronger.",
+        "background": "/backgrounds/celadon.avif",
+        "icon": {
+          "type": "trainer",
+          "id": "detective"
+        },
+        "buttons": [
+          {
+            "text": "And Shadow Force?",
+            "type": "navigate",
+            "id": 3
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Det. Ray Choo",
+        "message": "Operation Shadow Force is the piece we still cannot see. But it is moving fast, and every lead points back to their Shadow Pokémon and whatever they did at Pokémon Tower. You did excellent work. We finally have a shape to this case.",
+        "background": "/backgrounds/celadon.avif",
+        "icon": {
+          "type": "trainer",
+          "id": "detective"
+        },
+        "buttons": [
+          {
+            "text": "What's next?",
+            "type": "success"
+          }
+        ]
+      }
+    ],
+    "exitModal": {
+      "background": "/backgrounds/celadon.avif",
+      "title": "Det. Ray Choo",
+      "message": "Before we move on, I need a small favour. We're going to need all the fire power we can muster and I would rather trust a stone made outside Rocket's grip. Can you make a Fire Stone, so my partner can reach his full potential?",
+      "closeButtonText": "I'll make one",
+      "icon": {
+        "type": "trainer",
+        "id": "detective"
+      }
+    }
+  },
+  {
+    "id": "a-stone-for-a-friend",
+    "name": "A Stone for a Friend",
+    "description": "Detective Choo needs a Fire Stone for his Growlithe. I should make one without Team Rocket's help.",
+    "category": "Kanto",
+    "subCategory": "Celadon City",
+    "background": "/backgrounds/celadon.avif",
+    "icon": {
+      "type": "trainer",
+      "id": "detective"
+    },
+    "secret": false,
+    "completionTrigger": "manual",
+    "completeButtonText": "Give Ray the Fire Stone",
+    "repeatable": false,
+    "requirements": [
+      {
+        "type": "task_completed",
+        "targetId": "regroup-effort"
+      }
+    ],
+    "criteria": [
+      {
+        "type": "item_owned",
+        "targetId": "fire-stone",
+        "count": 1,
+        "consume": true
+      }
+    ],
+    "rewards": [],
+    "enterModal": [
+      {
+        "id": 1,
+        "title": "Det. Ray Choo",
+        "message": "You made it yourself? Excellent work! Then Rocket did not get to decide what my partner could become.\n",
+        "background": "/backgrounds/celadon.avif",
+        "icon": {
+          "type": "trainer",
+          "id": "detective"
+        },
+        "buttons": [
+          {
+            "text": "Use the Fire Stone",
+            "type": "navigate",
+            "id": 2
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Det. Ray Choo",
+        "message": "The Fire Stone glows in Growlithe's paws. In a burst of warm light, Ray's loyal partner grows into a proud Arcanine. Ray laughs, then gives his mane an affectionate scratch.",
+        "background": "/backgrounds/celadon.avif",
+        "icon": {
+          "type": "trainer",
+          "id": "detective"
+        },
+        "buttons": [
+          {
+            "text": "Arcanine!",
+            "type": "success"
+          }
+        ]
+      }
+    ],
+    "exitModal": {
+      "background": "/backgrounds/celadon.avif",
+      "title": "Det. Ray Choo",
+      "message": "Now, I may have a lead on the Pokémon Tower problem. Sabrina in Saffron is our best chance of getting to the top of Pokemon Tower and seeing the aftermath for ourselves. It's also worth chasing up the Silph Co lead while we're there.",
+      "closeButtonText": "Head for Saffron",
+      "icon": {
+        "type": "trainer",
+        "id": "detective"
+      }
+    }
+  },
+  {
     "id": "spread-your-wings",
     "name": "Spread Your Wings",
     "description": "This guy is looking particularly stressed, surrounded by feathers and white gloop.",
@@ -1469,10 +1650,44 @@ export const celadonCityTasks: Task[] = [
       "background": "/backgrounds/shop.avif",
       "title": "Frustrated Trainers",
       "message": "Hey what's the deal! The new Rocket Balls don't do anything at all. No matter how many I've bought they fail every single time!",
-      "closeButtonText": "Visit Rooftop",
+      "closeButtonText": "Follow Up",
       "icon": {
         "type": "trainer",
         "id": "ranger"
+      }
+    }
+  },
+  {
+    "id": "rooftop-mysterious-offer",
+    "name": "A Mysterious Offer",
+    "description": "A Rocket Grunt on the Department Store rooftop seems interested in the complaints downstairs.",
+    "category": "Kanto",
+    "subCategory": "Celadon City",
+    "background": "/backgrounds/celadon.avif",
+    "icon": {
+      "type": "trainer",
+      "id": "rocket-grunt"
+    },
+    "repeatable": false,
+    "secret": false,
+    "completionTrigger": "manual",
+    "completeButtonText": "Hear Him Out",
+    "requirements": [
+      {
+        "type": "task_completed",
+        "targetId": "rocket-ball-complaints"
+      }
+    ],
+    "criteria": [],
+    "rewards": [],
+    "exitModal": {
+      "background": "/backgrounds/celadon.avif",
+      "title": "Rocket Grunt",
+      "message": "Those complainers downstairs have no idea what they're talking about. Rocket Balls are exactly what the company needs them to be. Still, you seem like the sort who appreciates something a little less predictable. I have one curiosity left from a private shipment, if you've got the money for it.",
+      "closeButtonText": "Browse the Offer",
+      "icon": {
+        "type": "trainer",
+        "id": "rocket-grunt"
       }
     }
   },
