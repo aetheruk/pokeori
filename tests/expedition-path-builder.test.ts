@@ -4,6 +4,7 @@ import { ssAnneExpeditions } from '@/data/expeditions/entries/ss-anne'
 import type { ExpeditionConfig } from '@/data/expeditions'
 import {
   buildExpeditionSteps,
+  normalizeKidModeExpeditionSteps,
   resolveResultBranchAfterStep,
 } from '@/utilities/expeditions/path-builder'
 import type { RequirementData } from '@/utilities/requirements'
@@ -214,6 +215,43 @@ describe('expedition path builder', () => {
     ).toBe(true)
     expect(steps.some((step) => step.activityType === 'location')).toBe(true)
     expect(steps.at(-1)?.activityId).toBe('pallet-orientation-wrap-up')
+  })
+
+  test('skips and repairs the rival step for Kid Mode orientation runs', () => {
+    const expedition = palletTownExpeditions.find(
+      (entry) => entry.id === 'pallet-town-orientation',
+    )!
+    const standardUserData = {
+      ...baseRequirementData,
+      pokedex: [{ speciesId: 1, formId: '1', seen: true, caught: true }],
+    } as RequirementData
+    const kidUserData = {
+      ...standardUserData,
+      user: { id: 'user-1', kidMode: true },
+    } as unknown as RequirementData
+
+    const standardSteps = buildExpeditionSteps(expedition, standardUserData)
+    const kidSteps = buildExpeditionSteps(expedition, kidUserData)
+    expect(kidSteps).toHaveLength(8)
+    expect(
+      kidSteps.some(
+        (step) => step.activityId === 'pallet-orientation-rival-selection',
+      ),
+    ).toBe(false)
+    expect(kidSteps.at(-1)?.activityId).toBe('pallet-orientation-wrap-up')
+
+    const normalized = normalizeKidModeExpeditionSteps({
+      expeditionId: expedition.id,
+      steps: standardSteps,
+      currentStepIndex: 8,
+      kidMode: true,
+    })
+    expect(normalized.changed).toBe(true)
+    expect(normalized.steps).toHaveLength(8)
+    expect(normalized.currentStepIndex).toBe(7)
+    expect(normalized.steps[7].activityId).toBe(
+      'pallet-orientation-wrap-up',
+    )
   })
 
   test('does not require future step criteria before generating the SS Anne path', () => {

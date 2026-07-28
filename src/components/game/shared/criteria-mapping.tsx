@@ -874,6 +874,13 @@ export function mapCriteriaToDisplayItem(
       )
     }
 
+    case 'kid_mode':
+      return {
+        icon: <Users className="w-5 h-5 text-game-moss-strong" />,
+        label: condition.inverse ? 'Standard Mode' : 'Kid Mode',
+        subLabel: 'Play Mode',
+      }
+
     case 'rival_selected':
       return {
         icon: <Users className="w-5 h-5 text-game-moss-strong" />,

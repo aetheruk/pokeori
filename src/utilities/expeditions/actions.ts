@@ -24,6 +24,7 @@ import {
 import {
   buildExpeditionSteps,
   cloneSteps,
+  normalizeKidModeExpeditionSteps,
   renumberSteps,
   resolveResultBranchAfterStep,
 } from '@/utilities/expeditions/path-builder'
@@ -219,7 +220,46 @@ async function getRunsForUser(payload: any, userId: string): Promise<ExpeditionR
     limit: 10,
   })
 
-  return (res.docs || []) as ExpeditionRunDoc[]
+  const runs = (res.docs || []) as ExpeditionRunDoc[]
+  const orientationRuns = runs.filter(
+    (run) => run.expeditionId === 'pallet-town-orientation',
+  )
+  if (orientationRuns.length === 0) return runs
+
+  const user = (await payload.findByID({
+    collection: 'users',
+    id: userId,
+    depth: 0,
+    select: { kidMode: true },
+  })) as Pick<User, 'kidMode'>
+  if (user.kidMode !== true) return runs
+
+  await Promise.all(
+    orientationRuns.map(async (run) => {
+      const normalized = normalizeKidModeExpeditionSteps({
+        expeditionId: run.expeditionId,
+        steps: run.steps || [],
+        currentStepIndex: run.currentStepIndex || 0,
+        kidMode: true,
+      })
+      if (!normalized.changed) return
+
+      run.steps = normalized.steps
+      run.currentStepIndex = normalized.currentStepIndex
+      run.totalSteps = normalized.steps.length
+      await payload.update({
+        collection: 'expedition-runs',
+        id: run.id,
+        data: {
+          steps: normalized.steps,
+          currentStepIndex: normalized.currentStepIndex,
+          totalSteps: normalized.steps.length,
+        },
+      })
+    }),
+  )
+
+  return runs
 }
 
 async function getActiveRunForUser(payload: any, userId: string): Promise<ExpeditionRunDoc | null> {

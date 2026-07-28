@@ -106,6 +106,12 @@ export const palletTownExpeditions: ExpeditionConfig[] = [
         activityType: 'task',
         activityId: 'pallet-orientation-rival-selection',
         secret: true,
+        requirements: [
+          {
+            type: 'kid_mode',
+            inverse: true,
+          },
+        ],
       },
       {
         type: 'activity',

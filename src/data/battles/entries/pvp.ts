@@ -15,6 +15,10 @@ export const pvpBattles: BattleConfig[] = [
         type: 'item_owned',
         targetId: 'vs-seeker',
       },
+      {
+        type: 'kid_mode',
+        inverse: true,
+      },
     ],
     enemyTeam: [],
     rewards: [],
@@ -36,6 +40,10 @@ export const pvpBattles: BattleConfig[] = [
       {
         type: 'item_owned',
         targetId: 'vs-seeker',
+      },
+      {
+        type: 'kid_mode',
+        inverse: true,
       },
     ],
     enemyTeam: [],

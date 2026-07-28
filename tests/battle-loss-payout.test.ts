@@ -30,6 +30,7 @@ describe('trainer battle loss payout', () => {
     expect(buildTrainerBattleLossPayout({ rewards, isWildBattle: true })).toBe(0)
     expect(buildTrainerBattleLossPayout({ rewards, pvp: true })).toBe(0)
     expect(buildTrainerBattleLossPayout({ rewards, disableRewards: true })).toBe(0)
+    expect(buildTrainerBattleLossPayout({ rewards, disableLossPayout: true })).toBe(0)
   })
 
   test('ignores non-Pokedollar rewards', () => {

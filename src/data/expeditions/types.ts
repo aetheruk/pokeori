@@ -9,6 +9,8 @@ export type ExpeditionActivityPool = Partial<Record<ExpeditionActivityType, stri
 export interface ExpeditionActivityNode {
   type: 'activity'
   id: string
+  /** Omit this node when its user requirements are not met. */
+  requirements?: TaskCondition[]
   // If true, UI should mask this step as unknown.
   secret?: boolean
   // Force a specific activity for this node.

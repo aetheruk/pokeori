@@ -178,7 +178,13 @@ export const palletTownTasks: Task[] = [
     secret: true,
     completionTrigger: 'manual',
     completeButtonText: 'Choose Rival',
-    requirements: palletOrientationRequirements,
+    requirements: [
+      ...palletOrientationRequirements,
+      {
+        type: 'kid_mode',
+        inverse: true,
+      },
+    ],
     criteria: [],
     rewards: [],
     exitModal: {
@@ -365,6 +371,10 @@ export const palletTownTasks: Task[] = [
         type: 'rival_selected',
         inverse: true,
       },
+      {
+        type: 'kid_mode',
+        inverse: true,
+      },
     ],
     criteria: [],
     rewards: [],
@@ -406,6 +416,10 @@ export const palletTownTasks: Task[] = [
     completeButtonText: 'Continue',
     requirements: [
       {
+        type: 'kid_mode',
+        inverse: true,
+      },
+      {
         type: 'battle_result',
         targetId: 'rival-pallet-town',
         battleStatus: 'win',
@@ -444,6 +458,10 @@ export const palletTownTasks: Task[] = [
     completionTrigger: 'manual',
     completeButtonText: 'Continue',
     requirements: [
+      {
+        type: 'kid_mode',
+        inverse: true,
+      },
       {
         type: 'battle_result',
         targetId: 'rival-pallet-town',

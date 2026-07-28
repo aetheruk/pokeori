@@ -697,6 +697,10 @@ export const ssAnneTasks: Task[] = [
     completeButtonText: 'Continue',
     requirements: [
       {
+        type: 'kid_mode',
+        inverse: true,
+      },
+      {
         type: 'battle_result',
         targetId: 'rival-ss-anne',
         battleStatus: 'win',
@@ -734,6 +738,10 @@ export const ssAnneTasks: Task[] = [
     completionTrigger: 'manual',
     completeButtonText: 'Continue',
     requirements: [
+      {
+        type: 'kid_mode',
+        inverse: true,
+      },
       {
         type: 'battle_result',
         targetId: 'rival-ss-anne',

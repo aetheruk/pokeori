@@ -136,6 +136,10 @@ export const viridianCityTasks: Task[] = [
     completeButtonText: 'Continue',
     requirements: [
       {
+        type: 'kid_mode',
+        inverse: true,
+      },
+      {
         type: 'battle_result',
         targetId: 'rival-route-22',
         battleStatus: 'win',
@@ -174,6 +178,10 @@ export const viridianCityTasks: Task[] = [
     completionTrigger: 'manual',
     completeButtonText: 'Continue',
     requirements: [
+      {
+        type: 'kid_mode',
+        inverse: true,
+      },
       {
         type: 'battle_result',
         targetId: 'rival-route-22',

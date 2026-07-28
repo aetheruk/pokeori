@@ -811,9 +811,15 @@ export function getRequirementProgress(
       break
     }
 
+    case 'kid_mode': {
+      current = user.kidMode === true ? 1 : 0
+      break
+    }
+
     case 'rival_selected': {
       const extendedUser = user as ExtendedUser
-      current = extendedUser.rivalTrainerId ? 1 : 0
+      current =
+        user.kidMode !== true && extendedUser.rivalTrainerId ? 1 : 0
       break
     }
 

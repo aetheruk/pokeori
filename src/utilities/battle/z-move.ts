@@ -1,6 +1,5 @@
 import type { BattlePokemon } from './types'
-import { calculateStatsFromBase } from '@/utilities/battle/battle-logic'
-import { applyHeldItemStatModifiers } from '@/utilities/pokemon/held-items'
+import { recalculateBattlePokemonStats } from '@/utilities/battle/battle-logic'
 import { getPokemonForm } from '@/utilities/pokemon/pokedex'
 
 export const Z_MOVE_DAMAGE_MULTIPLIER = 5
@@ -33,32 +32,9 @@ export function transformUltraNecrozmaForZMove(mon: BattlePokemon): boolean {
   if (!ultraForm?.stats) return false
 
   const hpRatio = mon.maxHp > 0 ? mon.currentHp / mon.maxHp : 1
-  const nextStats = applyHeldItemStatModifiers(
-    calculateStatsFromBase(
-      ultraForm.stats,
-      mon.level,
-      {
-        hp: mon.ivs?.hp ?? 15,
-        attack: mon.ivs?.attack ?? 15,
-        defense: mon.ivs?.defense ?? 15,
-        specialAttack: mon.ivs?.specialAttack ?? 15,
-        specialDefense: mon.ivs?.specialDefense ?? 15,
-        speed: mon.ivs?.speed ?? 15,
-      },
-      {
-        hp: mon.evs?.hp ?? 0,
-        attack: mon.evs?.attack ?? 0,
-        defense: mon.evs?.defense ?? 0,
-        specialAttack: mon.evs?.specialAttack ?? 0,
-        specialDefense: mon.evs?.specialDefense ?? 0,
-        speed: mon.evs?.speed ?? 0,
-      },
-    ),
-    mon.heldItem?.id || mon.heldItemId,
-  )
-
   mon.originalFormId = mon.originalFormId || mon.formId
   mon.formId = ULTRA_NECROZMA_FORM_ID
+  const nextStats = recalculateBattlePokemonStats(mon)
   mon.stats = nextStats
   mon.maxHp = nextStats.hp
   mon.currentHp = Math.max(1, Math.round(hpRatio * nextStats.hp))

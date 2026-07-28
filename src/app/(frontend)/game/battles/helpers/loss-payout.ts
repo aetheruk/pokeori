@@ -30,11 +30,16 @@ function getNumericPokedollarReward(reward: LocationReward): number {
 export function buildTrainerBattleLossPayout(
   battleConfig: Pick<
     BattleConfig,
-    'disableRewards' | 'isWildBattle' | 'pvp' | 'rewards'
+    | 'disableRewards'
+    | 'disableLossPayout'
+    | 'isWildBattle'
+    | 'pvp'
+    | 'rewards'
   >,
 ): number {
   if (
     battleConfig.disableRewards ||
+    battleConfig.disableLossPayout ||
     battleConfig.isWildBattle ||
     battleConfig.pvp
   ) {

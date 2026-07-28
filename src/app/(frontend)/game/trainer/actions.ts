@@ -6,6 +6,21 @@ import { headers } from 'next/headers'
 import { mysteryGifts } from '@/data/mystery-gifts'
 import { revalidatePath } from 'next/cache'
 import { getUserPokedexMap, getUserTcgMap } from '@/utilities/user-state'
+import type { User } from '@/payload-types'
+import {
+  KID_MODE_ACCESS_ERROR,
+  isKidModeUser,
+} from '@/utilities/kid-mode'
+
+async function getFreshAuthenticatedUser(payload: any): Promise<User | null> {
+  const { user } = await payload.auth({ headers: await headers() })
+  if (!user) return null
+  return payload.findByID({
+    collection: 'users',
+    id: user.id,
+    depth: 0,
+  }) as Promise<User>
+}
 
 async function getTrainerCollectionCounts(payload: any, userId: string) {
   const [tcg, pokedex] = await Promise.all([
@@ -33,8 +48,14 @@ async function getTrainerCollectionCounts(payload: any, userId: string) {
 
 export async function searchTrainers(query: string) {
   const payload = await getPayload({ config: configPromise })
-  const headersList = await headers()
-  const { user: currentUser } = await payload.auth({ headers: headersList })
+  const currentUser = await getFreshAuthenticatedUser(payload)
+
+  if (!currentUser) {
+    return { success: false, error: 'Not authenticated' }
+  }
+  if (isKidModeUser(currentUser)) {
+    return { success: false, error: KID_MODE_ACCESS_ERROR }
+  }
 
   if (!query || query.length < 3) {
     return { success: false, error: 'Search query too short' }
@@ -44,9 +65,10 @@ export async function searchTrainers(query: string) {
     const users = await payload.find({
       collection: 'users',
       where: {
-        trainerName: {
-          contains: query,
-        },
+        and: [
+          { trainerName: { contains: query } },
+          { kidMode: { not_equals: true } },
+        ],
       },
       limit: 10,
     })
@@ -94,12 +116,23 @@ export async function getHighScores(
   skill: 'catching' | 'battling' | 'researching' | 'artisan' | 'ranked-battling',
 ) {
   const payload = await getPayload({ config: configPromise })
-  const headersList = await headers()
-  const { user: currentUser } = await payload.auth({ headers: headersList })
+  const currentUser = await getFreshAuthenticatedUser(payload)
+
+  if (!currentUser) {
+    return { success: false, error: 'Not authenticated' }
+  }
+  if (isKidModeUser(currentUser)) {
+    return { success: false, error: KID_MODE_ACCESS_ERROR }
+  }
 
   try {
     const sortedUsers = await payload.find({
       collection: 'users',
+      where: {
+        kidMode: {
+          not_equals: true,
+        },
+      },
       sort: `-skills.${skill}.level`,
       limit: 20,
     })
@@ -147,11 +180,13 @@ export async function getHighScores(
 
 export async function redeemMysteryGift(code: string) {
   const payload = await getPayload({ config: configPromise })
-  const headersList = await headers()
-  const { user } = await payload.auth({ headers: headersList })
+  const user = await getFreshAuthenticatedUser(payload)
 
   if (!user) {
     return { success: false, error: 'Not authenticated' }
+  }
+  if (isKidModeUser(user)) {
+    return { success: false, error: KID_MODE_ACCESS_ERROR }
   }
 
   const normalizedCode = code.toUpperCase().trim()

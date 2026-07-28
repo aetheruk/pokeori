@@ -87,6 +87,7 @@ player's old active session and redirect to its canonical route. Legacy
 
 ## Field Observation
 - Field Observation is the core Researcher route game and the third route gameplay pillar alongside Catch and Battle. The server generates a short sprite observation round from `settings.pokemonPool`, then asks one question from the full built-in question set; entries configure only the Pokemon pool, level range, observation time, answer time, and difficulty.
+- Kid Mode uses one dedicated question type for every Field Observation: `Who appeared the most?`. The generated round guarantees one unambiguous most-seen Pokemon, and the player answers by tapping a Pokemon sprite tile. A restored non-Kid question is regenerated when a Kid Mode player resumes the activity; Standard Mode keeps the full question set.
 - Individual Field Observation Pokemon pool entries can define `requirements`; the server filters locked Pokemon out before generating the observation round.
 - Weather requirements are supported on Field Observation entries, Pokemon pool entries, authored item drops, and global Pokemon/item events using the weather snapshot resolved when the research session starts.
 - Explore groups Field Observation entries with matching route catch/battle entries, exposing them as a `Study` route action with a magnifying glass icon instead of a standalone Mini Games card.
