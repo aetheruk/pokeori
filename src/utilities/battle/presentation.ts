@@ -142,6 +142,40 @@ function inferPokemonIndexFromLine(params: {
     : params.fallbackIndex
 }
 
+function inferSwitchDestinationIndex(params: {
+  line: string
+  side: BattlePresentationSide
+  state: BattleState
+  baseline: PresentationBaseline
+}): number | undefined {
+  const baselineTeam = teamForSide(params.baseline, params.side)
+  const finalTeam = stateTeamForSide(params.state, params.side)
+  const teamLength = Math.max(baselineTeam.length, finalTeam.length)
+  const normalizedLine = params.line.toLocaleLowerCase()
+  const matchedIndexes = new Set<number>()
+
+  for (let index = 0; index < teamLength; index += 1) {
+    const names = new Set(
+      [baselineTeam[index]?.name, finalTeam[index]?.name].filter(
+        (name): name is string => Boolean(name),
+      ),
+    )
+    if (
+      [...names].some((name) => {
+        const normalizedName = name.toLocaleLowerCase()
+        return (
+          normalizedLine.includes(`sent out ${normalizedName}`) ||
+          normalizedLine.includes(`go, ${normalizedName}`)
+        )
+      })
+    ) {
+      matchedIndexes.add(index)
+    }
+  }
+
+  return matchedIndexes.size === 1 ? [...matchedIndexes][0] : undefined
+}
+
 function buildPresentation(
   state: BattleState,
   baseline: PresentationBaseline,
@@ -161,7 +195,11 @@ function buildPresentation(
     player: state.activePlayerIndex,
     enemy: state.activeEnemyIndex,
   }
-  const faintMessages: Partial<Record<BattlePresentationSide, string>> = {}
+  const faintRecords: {
+    side: BattlePresentationSide
+    pokemonIndex: number
+    message: string
+  }[] = []
   const deferredAfterFaint: string[] = []
   let sawFaintMessage = false
 
@@ -231,11 +269,82 @@ function buildPresentation(
     if (actorSide && amount > 0) followUpDamage[actorSide] += amount
   }
 
+  const appendSwitchEventFromLine = (line: string): boolean => {
+    const side = inferSideFromLine(line, state, baseline)
+    if (!side) return false
+
+    const toIndex = inferSwitchDestinationIndex({
+      line,
+      side,
+      state,
+      baseline,
+    })
+    if (toIndex === undefined) return false
+
+    const fromIndex = latestPresentedActiveIndex(
+      events,
+      side,
+      originalActive[side],
+    )
+    if (fromIndex === toIndex) {
+      const existingSwitch = events
+        .filter(
+          (
+            event,
+          ): event is Extract<BattlePresentationEvent, { type: 'switch' }> =>
+            event.type === 'switch' &&
+            event.side === side &&
+            event.toIndex === toIndex,
+        )
+        .at(-1)
+      if (!existingSwitch) return false
+      if (!existingSwitch.message) existingSwitch.message = line
+      return true
+    }
+
+    const outgoingHp =
+      runningHp[side][fromIndex] ??
+      teamForSide(baseline, side)[fromIndex]?.currentHp ??
+      stateTeamForSide(state, side)[fromIndex]?.currentHp ??
+      0
+    const hpOnEntry =
+      runningHp[side][toIndex] ??
+      teamForSide(baseline, side)[toIndex]?.currentHp ??
+      stateTeamForSide(state, side)[toIndex]?.currentHp ??
+      0
+    events.push({
+      type: 'switch',
+      side,
+      fromIndex,
+      toIndex,
+      hpOnEntry,
+      reason: outgoingHp <= 0 ? 'replacement' : 'voluntary',
+      message: line,
+    })
+    runningHp[side][toIndex] = hpOnEntry
+    return true
+  }
+
   for (const line of lines) {
     if (/\bfainted[!.]?$/i.test(line.replace(/\[[^\]]+\]/g, '').trim())) {
       const faintedSide = inferSideFromLine(line, state, baseline)
-      if (faintedSide) faintMessages[faintedSide] = line
-      else deferredAfterFaint.push(line)
+      if (faintedSide) {
+        faintRecords.push({
+          side: faintedSide,
+          pokemonIndex: inferPokemonIndexFromLine({
+            line,
+            side: faintedSide,
+            state,
+            baseline,
+            fallbackIndex: latestPresentedActiveIndex(
+              events,
+              faintedSide,
+              originalActive[faintedSide],
+            ),
+          }),
+          message: line,
+        })
+      } else deferredAfterFaint.push(line)
       sawFaintMessage = true
       continue
     }
@@ -243,6 +352,8 @@ function buildPresentation(
       deferredAfterFaint.push(line)
       continue
     }
+
+    if (appendSwitchEventFromLine(line)) continue
 
     const stanceMatch = line.match(/\[icon:stance:([^\]]+)\]/i)
     if (stanceMatch) {
@@ -505,8 +616,37 @@ function buildPresentation(
     }
   }
 
+  const emittedFaints = new Set<string>()
+  for (const faintRecord of faintRecords) {
+    const beforePokemon = teamForSide(baseline, faintRecord.side)[
+      faintRecord.pokemonIndex
+    ]
+    const finalPokemon = stateTeamForSide(state, faintRecord.side)[
+      faintRecord.pokemonIndex
+    ]
+    if (
+      beforePokemon &&
+      finalPokemon &&
+      beforePokemon.currentHp > 0 &&
+      finalPokemon.currentHp <= 0
+    ) {
+      events.push({
+        type: 'faint',
+        side: faintRecord.side,
+        pokemonIndex: faintRecord.pokemonIndex,
+        hpAfter: clampHp(finalPokemon, finalPokemon.currentHp),
+        formId: beforePokemon.formId,
+        message: faintRecord.message,
+      })
+      emittedFaints.add(`${faintRecord.side}:${faintRecord.pokemonIndex}`)
+    }
+  }
+
+  // Preserve a silent faint fallback for legacy logs that do not name the
+  // outgoing Pokemon.
   for (const side of ['player', 'enemy'] as const) {
     const beforeIndex = originalActive[side]
+    if (emittedFaints.has(`${side}:${beforeIndex}`)) continue
     const beforePokemon = teamForSide(baseline, side)[beforeIndex]
     const finalPokemon = stateTeamForSide(state, side)[beforeIndex]
     if (
@@ -521,35 +661,9 @@ function buildPresentation(
         pokemonIndex: beforeIndex,
         hpAfter: clampHp(finalPokemon, finalPokemon.currentHp),
         formId: beforePokemon.formId,
-        message: faintMessages[side] || '',
+        message: '',
       })
-
-      if (finalActive[side] !== beforeIndex) {
-        const replacementName = stateTeamForSide(state, side)[finalActive[side]]
-          ?.name
-        const replacementMessageIndex = deferredAfterFaint.findIndex(
-          (message) =>
-            Boolean(replacementName) &&
-            message.includes(replacementName!) &&
-            /\b(sent out|go,)\b/i.test(message),
-        )
-        const replacementMessage =
-          replacementMessageIndex >= 0
-            ? deferredAfterFaint.splice(replacementMessageIndex, 1)[0]
-            : ''
-        events.push({
-          type: 'switch',
-          side,
-          fromIndex: beforeIndex,
-          toIndex: finalActive[side],
-          hpOnEntry:
-            teamForSide(baseline, side)[finalActive[side]]?.currentHp ??
-            stateTeamForSide(state, side)[finalActive[side]]?.currentHp ??
-            0,
-          reason: 'replacement',
-          message: replacementMessage,
-        })
-      }
+      emittedFaints.add(`${side}:${beforeIndex}`)
     }
   }
 
@@ -557,6 +671,8 @@ function buildPresentation(
   // Parse their HP markers only after the switch event exists so the splat and
   // bar update target the incoming Pokemon rather than the outgoing one.
   for (const message of deferredAfterFaint) {
+    if (appendSwitchEventFromLine(message)) continue
+
     const side = inferSideFromLine(message, state, baseline)
     const hpMatches = [...message.matchAll(/\[icon:(damage|heal):(\d+)\]/g)]
     if (side && hpMatches.length > 0) {
@@ -595,6 +711,38 @@ function buildPresentation(
     }
 
     events.push({ type: 'message', message })
+  }
+
+  // If a legacy log omitted the replacement line, align the active sprite only
+  // after every authored faint and entry effect has played.
+  for (const side of ['player', 'enemy'] as const) {
+    const presentedIndex = latestPresentedActiveIndex(
+      events,
+      side,
+      originalActive[side],
+    )
+    if (presentedIndex === finalActive[side]) continue
+    const outgoing = stateTeamForSide(state, side)[presentedIndex]
+    const incoming = stateTeamForSide(state, side)[finalActive[side]]
+    if (
+      !outgoing ||
+      outgoing.currentHp > 0 ||
+      !incoming ||
+      incoming.currentHp <= 0
+    )
+      continue
+    events.push({
+      type: 'switch',
+      side,
+      fromIndex: presentedIndex,
+      toIndex: finalActive[side],
+      hpOnEntry:
+        runningHp[side][finalActive[side]] ??
+        teamForSide(baseline, side)[finalActive[side]]?.currentHp ??
+        incoming.currentHp,
+      reason: 'replacement',
+      message: '',
+    })
   }
 
   for (const side of ['player', 'enemy'] as const) {

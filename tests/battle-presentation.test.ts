@@ -344,6 +344,79 @@ describe('battle presentation timeline', () => {
     })
   })
 
+  test('plays a transient enemy switch, incoming KO, and return switch in order', () => {
+    const enemyLead = {
+      ...makePvpBattleState().enemyTeam[0],
+      id: 'p2-lead',
+      name: 'P2 Lead',
+    }
+    const enemyReserve = {
+      ...makePvpBattleState().enemyTeam[0],
+      id: 'p2-reserve',
+      name: 'P2 Reserve',
+    }
+    const state = makePvpBattleState({
+      enemyTeam: [enemyLead, enemyReserve],
+    })
+    beginBattlePresentation(state)
+
+    state.enemyTeam[1].currentHp = 0
+    state.activeEnemyIndex = 0
+    state.history.unshift({
+      turn: 1,
+      playerStance: 'power',
+      enemyStance: 'tech',
+      result: 'win',
+      damageDealt: 120,
+      damageTaken: 0,
+      playerAttackType: 'grass',
+      message: [
+        'Player 2 withdrew P2 Lead and sent out P2 Reserve!',
+        'Player 1: P1 Mon attacks! [icon:stance:power] [icon:type:grass] Dealt 120.',
+        "Player 2's P2 Reserve fainted!",
+        'Player 2 sent out P2 Lead!',
+      ].join('\n'),
+    })
+
+    finalizeBattlePresentation(state)
+
+    expect(state.presentation?.events).toMatchObject([
+      {
+        type: 'switch',
+        side: 'enemy',
+        fromIndex: 0,
+        toIndex: 1,
+        hpOnEntry: 120,
+        reason: 'voluntary',
+        message: 'Player 2 withdrew P2 Lead and sent out P2 Reserve!',
+      },
+      {
+        type: 'attack',
+        actorSide: 'player',
+        targetSide: 'enemy',
+        targetIndex: 1,
+        damage: 120,
+        hpAfter: 0,
+      },
+      {
+        type: 'faint',
+        side: 'enemy',
+        pokemonIndex: 1,
+        hpAfter: 0,
+        message: "Player 2's P2 Reserve fainted!",
+      },
+      {
+        type: 'switch',
+        side: 'enemy',
+        fromIndex: 1,
+        toIndex: 0,
+        hpOnEntry: 120,
+        reason: 'replacement',
+        message: 'Player 2 sent out P2 Lead!',
+      },
+    ])
+  })
+
   test('plays replacement entry damage after the switch with matching HP', () => {
     const playerLead = {
       ...makePvpBattleState().playerTeam[0],
