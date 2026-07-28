@@ -635,7 +635,7 @@ export const celadonCityTasks: Task[] = [
     "rewards": [
       {
         "type": "xp",
-        "skill": "explorer",
+        "skill": "catching",
         "quantity": 2000,
         "dropChance": 100
       }
