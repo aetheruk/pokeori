@@ -328,18 +328,97 @@ function buildPresentation(
     events.push({ type: 'message', message: line })
   }
 
-  if (log.result === 'tie') {
-    const attacks = events.filter(
-      (event): event is Extract<BattlePresentationEvent, { type: 'attack' }> =>
-        event.type === 'attack',
+  const attacks = events.filter(
+    (event): event is Extract<BattlePresentationEvent, { type: 'attack' }> =>
+      event.type === 'attack',
+  )
+  const shadowPainEvents = events.filter(
+    (
+      event,
+    ): event is Extract<BattlePresentationEvent, { type: 'hp-change' }> =>
+      event.type === 'hp-change' &&
+      event.kind === 'damage' &&
+      /screams out in pain/i.test(event.message),
+  )
+  if (attacks.length > 1 || (attacks.length > 0 && shadowPainEvents.length > 0)) {
+    const simultaneousGroup = `impact:${log.turn}`
+    for (const attack of attacks) {
+      attack.simultaneousGroup = simultaneousGroup
+      attack.animateActor =
+        log.result === 'tie' ||
+        (log.result === 'win' && attack.actorSide === 'player') ||
+        (log.result === 'loss' && attack.actorSide === 'enemy')
+    }
+    for (const shadowPainEvent of shadowPainEvents) {
+      shadowPainEvent.simultaneousGroup = simultaneousGroup
+    }
+
+    // Shadow pain is logged before the opponent's action, but it is part of
+    // the same committed attack impact. Keep an attack first in the timeline
+    // so the client can start the shared impact group from that event.
+    const groupedEvents = events.filter(
+      (
+        event,
+      ): event is Extract<
+        BattlePresentationEvent,
+        { type: 'attack' | 'hp-change' }
+      > =>
+        (event.type === 'attack' || event.type === 'hp-change') &&
+        event.simultaneousGroup === simultaneousGroup,
     )
-    if (
-      attacks.some((event) => event.actorSide === 'player') &&
-      attacks.some((event) => event.actorSide === 'enemy')
-    ) {
-      for (const attack of attacks.slice(0, 2)) {
-        attack.simultaneousGroup = `tie:${log.turn}`
+    const groupStartingHp: Partial<Record<BattlePresentationSide, number>> = {}
+    for (const event of groupedEvents) {
+      const side = event.type === 'attack' ? event.targetSide : event.side
+      if (groupStartingHp[side] !== undefined) continue
+      groupStartingHp[side] =
+        event.type === 'attack'
+          ? event.hpAfter + event.damage
+          : event.hpAfter + (event.kind === 'damage' ? event.amount : -event.amount)
+    }
+    const groupedShadowEvents = new Set(shadowPainEvents)
+    const orderedEvents = events.filter(
+      (event) => !groupedShadowEvents.has(event as never),
+    )
+    const firstAttackIndex = orderedEvents.findIndex(
+      (event) =>
+        event.type === 'attack' &&
+        event.simultaneousGroup === simultaneousGroup,
+    )
+    if (firstAttackIndex >= 0) {
+      orderedEvents.splice(firstAttackIndex + 1, 0, ...shadowPainEvents)
+      const groupedRunningHp = { ...groupStartingHp }
+      for (const event of orderedEvents) {
+        if (
+          (event.type !== 'attack' && event.type !== 'hp-change') ||
+          event.simultaneousGroup !== simultaneousGroup
+        ) {
+          continue
+        }
+        const side = event.type === 'attack' ? event.targetSide : event.side
+        const pokemon =
+          event.type === 'attack'
+            ? stateTeamForSide(state, side)[event.targetIndex]
+            : stateTeamForSide(state, side)[event.pokemonIndex]
+        const currentHp =
+          groupedRunningHp[side] ??
+          (event.type === 'attack'
+            ? event.hpAfter + event.damage
+            : event.hpAfter +
+              (event.kind === 'damage' ? event.amount : -event.amount))
+        const hpAfter = clampHp(
+          pokemon,
+          currentHp +
+            (event.type === 'attack'
+              ? -event.damage
+              : event.kind === 'heal'
+                ? event.amount
+                : -event.amount),
+        )
+        event.hpAfter = hpAfter
+        groupedRunningHp[side] = hpAfter
       }
+      events.length = 0
+      events.push(...orderedEvents)
     }
   }
 
@@ -351,7 +430,45 @@ function buildPresentation(
         runningHp[side][pokemonIndex] ??
         teamForSide(baseline, side)[pokemonIndex]?.currentHp ??
         finalPokemon.currentHp
-      if (presentedHp === finalPokemon.currentHp) continue
+      const baselineHp =
+        teamForSide(baseline, side)[pokemonIndex]?.currentHp ??
+        finalPokemon.currentHp
+      let lastHpEvent:
+        | Extract<BattlePresentationEvent, { type: 'attack' }>
+        | Extract<BattlePresentationEvent, { type: 'hp-change' }>
+        | undefined
+      for (let eventIndex = events.length - 1; eventIndex >= 0; eventIndex -= 1) {
+        const event = events[eventIndex]
+        if (
+          (event.type === 'attack' &&
+            event.targetSide === side &&
+            event.targetIndex === pokemonIndex) ||
+          (event.type === 'hp-change' &&
+            event.side === side &&
+            event.pokemonIndex === pokemonIndex)
+        ) {
+          lastHpEvent = event
+          break
+        }
+      }
+      if (
+        presentedHp !== finalPokemon.currentHp &&
+        lastHpEvent &&
+        (finalPokemon.currentHp <= baselineHp ||
+          (lastHpEvent.type === 'hp-change' &&
+            lastHpEvent.kind === 'heal'))
+      ) {
+        // Keep the final authoritative reconciliation from visibly raising or
+        // lowering a bar after the effect timeline. Any correction that does
+        // not exceed starting HP is folded into the last authored HP impact.
+        lastHpEvent.hpAfter = finalPokemon.currentHp
+        runningHp[side][pokemonIndex] = finalPokemon.currentHp
+      }
+      const reconciledHp =
+        runningHp[side][pokemonIndex] ??
+        teamForSide(baseline, side)[pokemonIndex]?.currentHp ??
+        finalPokemon.currentHp
+      if (reconciledHp === finalPokemon.currentHp) continue
       // The server state is authoritative. Log parsing is retained for legacy
       // battles, but a parser mismatch must never look like a late heal/damage
       // event to the player.
@@ -360,7 +477,7 @@ function buildPresentation(
         turn: log.turn,
         side,
         pokemonIndex,
-        presentedHp,
+        presentedHp: reconciledHp,
         authoritativeHp: finalPokemon.currentHp,
       })
       runningHp[side][pokemonIndex] = finalPokemon.currentHp

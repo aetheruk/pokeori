@@ -861,29 +861,63 @@ export function useBattleManager(initialState: BattleState) {
                       continue
                     }
                     if (presentationEvent.simultaneousGroup) {
-                      const simultaneousAttacks = presentationEvents.filter(
+                      const simultaneousEvents = presentationEvents.filter(
+                        (
+                          candidate,
+                        ): candidate is
+                          | Extract<
+                              BattlePresentationEvent,
+                              { type: 'attack' }
+                            >
+                          | Extract<
+                              BattlePresentationEvent,
+                              { type: 'hp-change' }
+                            > =>
+                          (candidate.type === 'attack' ||
+                            candidate.type === 'hp-change') &&
+                          candidate.simultaneousGroup ===
+                            presentationEvent.simultaneousGroup,
+                      )
+                      const simultaneousAttacks = simultaneousEvents.filter(
                         (
                           candidate,
                         ): candidate is Extract<
                           BattlePresentationEvent,
                           { type: 'attack' }
-                        > =>
-                          candidate.type === 'attack' &&
-                          candidate.simultaneousGroup ===
-                            presentationEvent.simultaneousGroup,
+                        > => candidate.type === 'attack',
+                      )
+                      const simultaneousHpChanges = simultaneousEvents.filter(
+                        (
+                          candidate,
+                        ): candidate is Extract<
+                          BattlePresentationEvent,
+                          { type: 'hp-change' }
+                        > => candidate.type === 'hp-change',
                       )
                       playedSimultaneousGroups.add(
                         presentationEvent.simultaneousGroup,
                       )
-                      safePlaySfx('stance_tie')
+                      const playerMoves = simultaneousAttacks.some(
+                        (attack) =>
+                          attack.actorSide === 'player' &&
+                          attack.animateActor !== false,
+                      )
+                      const enemyMoves = simultaneousAttacks.some(
+                        (attack) =>
+                          attack.actorSide === 'enemy' &&
+                          attack.animateActor !== false,
+                      )
+                      safePlaySfx(
+                        playerMoves && enemyMoves
+                          ? 'stance_tie'
+                          : playerMoves
+                            ? 'stance_win'
+                            : 'stance_loss',
+                      )
                       setAnim((prev) => ({
                         ...prev,
-                        playerAttacking: simultaneousAttacks.some(
-                          (attack) => attack.actorSide === 'player',
-                        ),
-                        enemyAttacking: simultaneousAttacks.some(
-                          (attack) => attack.actorSide === 'enemy',
-                        ),
+                        playerAttacking: playerMoves,
+                        enemyAttacking: enemyMoves,
                       }))
                       await delay(300)
                       if (shouldStop()) break
@@ -904,20 +938,39 @@ export function useBattleManager(initialState: BattleState) {
                             next.enemyImpactType = attack.attackType || null
                           }
                         }
+                        for (const hpChange of simultaneousHpChanges) {
+                          const splatKey =
+                            hpChange.side === 'player'
+                              ? 'playerStatusDamageSplat'
+                              : 'enemyStatusDamageSplat'
+                          next[splatKey] =
+                            hpChange.kind === 'heal'
+                              ? -hpChange.amount
+                              : hpChange.amount
+                        }
                         return next
                       })
-                      for (const attack of simultaneousAttacks) {
-                        revealMessage(attack.message)
+                      for (const simultaneousEvent of simultaneousEvents) {
+                        revealMessage(simultaneousEvent.message)
                       }
                       setVisualState((prev) => {
                         const next = cloneState(prev)
-                        for (const attack of simultaneousAttacks) {
+                        for (const simultaneousEvent of simultaneousEvents) {
+                          const targetSide =
+                            simultaneousEvent.type === 'attack'
+                              ? simultaneousEvent.targetSide
+                              : simultaneousEvent.side
+                          const pokemonIndex =
+                            simultaneousEvent.type === 'attack'
+                              ? simultaneousEvent.targetIndex
+                              : simultaneousEvent.pokemonIndex
                           const team =
-                            attack.targetSide === 'player'
+                            targetSide === 'player'
                               ? next.playerTeam
                               : next.enemyTeam
-                          const pokemon = team[attack.targetIndex]
-                          if (pokemon) pokemon.currentHp = attack.hpAfter
+                          const pokemon = team[pokemonIndex]
+                          if (pokemon)
+                            pokemon.currentHp = simultaneousEvent.hpAfter
                         }
                         return next
                       })
@@ -929,6 +982,8 @@ export function useBattleManager(initialState: BattleState) {
                         enemyHit: false,
                         playerDamageSplat: null,
                         enemyDamageSplat: null,
+                        playerStatusDamageSplat: null,
+                        enemyStatusDamageSplat: null,
                         playerImpactType: null,
                         enemyImpactType: null,
                       }))
@@ -994,6 +1049,14 @@ export function useBattleManager(initialState: BattleState) {
                   }
 
                   if (presentationEvent.type === 'hp-change') {
+                    if (
+                      presentationEvent.simultaneousGroup &&
+                      playedSimultaneousGroups.has(
+                        presentationEvent.simultaneousGroup,
+                      )
+                    ) {
+                      continue
+                    }
                     const splatKey =
                       presentationEvent.side === 'player'
                         ? 'playerStatusDamageSplat'
@@ -1035,10 +1098,15 @@ export function useBattleManager(initialState: BattleState) {
                     await delay(1000)
                     if (shouldStop()) break
                     const keepHidden =
-                      presentationEvent.side === 'player' &&
-                      finalState.pendingPlayerSwitch &&
-                      finalState.activePlayerIndex ===
-                        presentationEvent.pokemonIndex
+                      (finalState.status !== 'ongoing' &&
+                        (presentationEvent.side === 'player'
+                          ? finalState.activePlayerIndex
+                          : finalState.activeEnemyIndex) ===
+                          presentationEvent.pokemonIndex) ||
+                      (presentationEvent.side === 'player' &&
+                        finalState.pendingPlayerSwitch &&
+                        finalState.activePlayerIndex ===
+                          presentationEvent.pokemonIndex)
                     setAnim((prev) => ({
                       ...prev,
                       [faintKey]: keepHidden,
@@ -1136,8 +1204,9 @@ export function useBattleManager(initialState: BattleState) {
 
               setAnim((prev) => ({
                 ...prev,
-                playerFainting: keepPlayerFaintedHidden,
-                enemyFainting: false,
+                playerFainting:
+                  (playerKOd && isGameOver) || keepPlayerFaintedHidden,
+                enemyFainting: Boolean(enemyKOd && isGameOver),
               }))
 
               if (newState) {
