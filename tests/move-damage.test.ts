@@ -25,6 +25,7 @@ import {
   resolveMetronomeMove,
 } from '@/utilities/battle/metronome'
 import {
+  doesBattleMoveHit,
   applyMoveRuntimeEffects,
   applyMoveOnUserDamagedSameTurnEffects,
   applyContinuousEndEffects,
@@ -34,6 +35,7 @@ import {
   getCallableAuthoredMoves,
   getConditionalDamageMultiplier,
   getEffectiveMoveAccuracy,
+  getEffectiveStanceAccuracy,
   getMoveHealAmount,
   getMoveLockMessage,
   getRepeatDamageMultiplier,
@@ -49,6 +51,7 @@ import {
   resolveDynamicMoveType,
   tickMoveLock,
 } from '@/utilities/battle/move-effects'
+import { createBasicAttackMove } from '@/utilities/battle/engine/battle-action'
 import {
   getBattleItemUseLimit,
   getBattleItemUsesRemaining,
@@ -73,6 +76,84 @@ import { shouldFailMoveFromStance } from '@/utilities/battle/move-contest'
 import { processBattleAbilitySwitchOut } from '@/utilities/battle/switching'
 
 describe('move damage helpers', () => {
+  test('basic stance attacks use 100 base accuracy with combined accuracy and evasion stages', () => {
+    const state = makePveBattleState()
+    const attacker = state.playerTeam[0]
+    const defender = state.enemyTeam[0]
+
+    for (const stance of ['power', 'speed', 'tech'] as const) {
+      expect(createBasicAttackMove(stance).accuracy).toBe(100)
+      expect(
+        getEffectiveStanceAccuracy({
+          state,
+          attacker,
+          defender,
+          attackerSide: 'player',
+          stance,
+        }),
+      ).toBe(100)
+    }
+
+    attacker.statStages = { ...DEFAULT_STAT_STAGES, accuracy: -1 }
+    defender.statStages = { ...DEFAULT_STAT_STAGES, evasion: 1 }
+    expect(
+      getEffectiveStanceAccuracy({
+        state,
+        attacker,
+        defender,
+        attackerSide: 'player',
+        stance: 'power',
+      }),
+    ).toBe(60)
+
+    attacker.currentHp = 0
+    expect(
+      getEffectiveStanceAccuracy({
+        state,
+        attacker,
+        defender,
+        attackerSide: 'player',
+        stance: 'power',
+      }),
+    ).toBe(60)
+
+    attacker.currentHp = attacker.maxHp
+    attacker.statStages.accuracy = 1
+    expect(
+      getEffectiveStanceAccuracy({
+        state,
+        attacker,
+        defender,
+        attackerSide: 'player',
+        stance: 'power',
+      }),
+    ).toBe(100)
+  })
+
+  test('authored moves retain their accuracy and primary hit rolls handle boundaries', () => {
+    const state = makePveBattleState()
+    const attacker = state.playerTeam[0]
+    const defender = state.enemyTeam[0]
+    const move = getMove('lovely-kiss')!
+
+    expect(move.stance).toBeDefined()
+    expect(move.accuracy).toBe(75)
+    expect(
+      getEffectiveMoveAccuracy({
+        move,
+        state,
+        attacker,
+        defender,
+        attackerSide: 'player',
+      }),
+    ).toBe(75)
+
+    expect(doesBattleMoveHit(0, () => 0)).toBe(false)
+    expect(doesBattleMoveHit(60, () => 0.6)).toBe(true)
+    expect(doesBattleMoveHit(60, () => 0.61)).toBe(false)
+    expect(doesBattleMoveHit(100, () => 0.99)).toBe(true)
+  })
+
   test('wave breaker hits lightly unless the defender is Water type', () => {
     const move = getMove('wave-breaker')
 

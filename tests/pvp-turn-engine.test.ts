@@ -92,6 +92,72 @@ function withFailOnStance<T extends 'loss' | 'tie'>(
 }
 
 describe('PVP turn engine helpers', () => {
+  test('basic stance attacks use accuracy and evasion stages when resolving hits', () => {
+    const attacker = makePokemon({
+      name: 'Attacker',
+      statStages: {
+        attack: 0,
+        defense: 0,
+        specialAttack: 0,
+        specialDefense: 0,
+        speed: 0,
+        crit: 0,
+        accuracy: -1,
+        evasion: 0,
+      },
+    })
+    const defender = makePokemon({
+      name: 'Defender',
+      statStages: {
+        attack: 0,
+        defense: 0,
+        specialAttack: 0,
+        specialDefense: 0,
+        speed: 0,
+        crit: 0,
+        accuracy: 0,
+        evasion: 1,
+      },
+    })
+
+    const result = resolvePvpCombat({
+      attacker,
+      defender,
+      move: { stance: 'power', attackType: 'normal' },
+      attackerName: 'Player',
+      attackerSide: 'player',
+      playerMove: { stance: 'power', attackType: 'normal' },
+      enemyMove: { stance: 'tech', attackType: 'normal' },
+      random: () => 0.61,
+    })
+
+    expect(result.didAttack).toBe(false)
+    expect(result.dmg).toBe(0)
+    expect(defender.currentHp).toBe(100)
+    expect(result.message).toContain('missed!')
+  })
+
+  test('a move that hits rolls status chance without a second accuracy check', () => {
+    const attacker = makePokemon({ name: 'Attacker' })
+    const defender = makePokemon({ name: 'Defender' })
+    const rolls = [0.7, 0.99]
+
+    const result = resolvePvpCombat({
+      attacker,
+      defender,
+      move: { stance: 'tech', specialMoveId: 'lovely-kiss' },
+      attackerName: 'Player',
+      attackerSide: 'player',
+      playerMove: { stance: 'tech', specialMoveId: 'lovely-kiss' },
+      enemyMove: { stance: 'power', attackType: 'normal' },
+      random: () => rolls.shift() ?? 0.5,
+    })
+
+    expect(result.didAttack).toBe(true)
+    expect(result.message).not.toContain('missed!')
+    expect(defender.status?.id).toBe('sleep')
+  })
+
   test('commits both attacks before KO and draws a tied simultaneous exhaustion', async () => {
     const state = makeBattleState()
     state.playerTeam[0].currentHp = 1
@@ -1224,7 +1290,7 @@ describe('PVP turn engine helpers', () => {
       attackerSide: 'player',
       playerMove: { stance: 'tech', specialMoveId: 'steel-beam' },
       enemyMove: { stance: 'power' },
-      random: () => 0.99,
+      random: () => 0.5,
     })
 
     expect(hpCostResult.didAttack).toBe(true)

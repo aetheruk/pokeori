@@ -128,6 +128,7 @@ import {
   resolveDamageRuleDamage,
   resolveDynamicMoveType,
   tickMoveLock,
+  doesBattleMoveHit,
 } from '@/utilities/battle/move-effects'
 import { createBattleTurnTimer } from '../helpers/timing'
 import { runBattleActionWithGuard } from '../helpers/action-guard'
@@ -1152,7 +1153,7 @@ export async function useMove(
     let playerDamage = 0
     let playerAttackTypeForLog: string | undefined
 
-    if (accuracy < 100 && Math.random() * 100 > accuracy) {
+    if (!doesBattleMoveHit(accuracy)) {
       moveMissed = true
       if (!isBasicAttack) {
         recordFailedMoveUse({

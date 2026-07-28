@@ -283,7 +283,7 @@ export function EncounterQte({
                       alt=""
                       width={64}
                       height={64}
-                      className="h-16 w-16 object-contain drop-shadow-[0_10px_12px_rgba(0,0,0,0.28)]"
+                      className="h-16 w-16 object-contain"
                     />
                   </motion.span>
                 </button>
@@ -498,7 +498,6 @@ export function EncounterQte({
               female={gender === 'female'}
               alt={pokemonName}
               className="h-full w-full"
-              imageClassName="drop-shadow-2xl"
             />
           </motion.div>
           <button
