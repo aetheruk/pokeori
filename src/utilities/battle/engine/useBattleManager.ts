@@ -1099,8 +1099,37 @@ export function useBattleManager(initialState: BattleState) {
                       presentationEvent.side === 'player'
                         ? 'playerFainting'
                         : 'enemyFainting'
+                    setVisualState((prev) => {
+                      const next = cloneState(prev)
+                      const team =
+                        presentationEvent.side === 'player'
+                          ? next.playerTeam
+                          : next.enemyTeam
+                      const pokemon = team[presentationEvent.pokemonIndex]
+                      if (pokemon) {
+                        const finalTeam =
+                          presentationEvent.side === 'player'
+                            ? presentationTargetState.playerTeam
+                            : presentationTargetState.enemyTeam
+                        const finalHp =
+                          finalTeam[presentationEvent.pokemonIndex]?.currentHp
+                        const hpAfter = Number.isFinite(
+                          presentationEvent.hpAfter,
+                        )
+                          ? presentationEvent.hpAfter
+                          : finalHp
+                        if (!Number.isFinite(hpAfter)) return prev
+                        pokemon.currentHp = Math.min(
+                          pokemon.maxHp,
+                          Math.max(0, hpAfter),
+                        )
+                      }
+                      return next
+                    })
                     revealMessage(presentationEvent.message)
-                    await delay(200)
+                    // A faint is authoritative. Give the HUD's 500ms bar
+                    // transition time to reach zero before hiding the sprite.
+                    await delay(500)
                     if (shouldStop()) break
                     safePlayPokemonCry(presentationEvent.formId)
                     setAnim((prev) => ({ ...prev, [faintKey]: true }))

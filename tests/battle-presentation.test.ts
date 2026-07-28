@@ -282,12 +282,45 @@ describe('battle presentation timeline', () => {
     ])
     expect(state.presentation?.events[1]).toMatchObject({
       type: 'faint',
+      hpAfter: 0,
       message: "Player 2's P2 Mon fainted!",
     })
     expect(state.presentation?.events[2]).toMatchObject({
       type: 'switch',
       message: 'Player 2 sent out P2 Reserve!',
     })
+  })
+
+  test('carries authoritative zero HP into faint events when damage is unparsed', () => {
+    const state = makePvpBattleState()
+    beginBattlePresentation(state)
+    state.playerTeam[0].currentHp = 0
+    state.status = 'lost'
+    state.history.unshift({
+      turn: 1,
+      playerStance: 'tech',
+      enemyStance: 'tech',
+      result: 'loss',
+      damageDealt: 0,
+      damageTaken: 0,
+      message: [
+        'An unrecognised legacy effect resolved.',
+        "Player 1's P1 Mon fainted!",
+      ].join('\n'),
+    })
+
+    finalizeBattlePresentation(state)
+
+    expect(state.presentation?.events).toMatchObject([
+      { type: 'message', message: 'An unrecognised legacy effect resolved.' },
+      {
+        type: 'faint',
+        side: 'player',
+        pokemonIndex: 0,
+        hpAfter: 0,
+        message: "Player 1's P1 Mon fainted!",
+      },
+    ])
   })
 
   test('authors a switch-in when a player selects a replacement after fainting', () => {
