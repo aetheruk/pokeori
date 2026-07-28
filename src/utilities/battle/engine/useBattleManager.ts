@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import type { BattleState, BattleLogEntry } from '../types'
 import { BattleEvent, AnimationState, INITIAL_ANIMATION_STATE } from './types'
 import { generateBattleEvents } from './event-generator'
+import { getCombinedImpactDamage } from './impact-group'
 import { useAudio } from '@/context/AudioContext'
 import { tasks } from '@/data/tasks'
 import { prependBattleHistory, trimBattleHistory } from '../history'
@@ -894,6 +895,8 @@ export function useBattleManager(initialState: BattleState) {
                           { type: 'hp-change' }
                         > => candidate.type === 'hp-change',
                       )
+                      const combinedDamage =
+                        getCombinedImpactDamage(simultaneousEvents)
                       playedSimultaneousGroups.add(
                         presentationEvent.simultaneousGroup,
                       )
@@ -939,15 +942,21 @@ export function useBattleManager(initialState: BattleState) {
                           }
                         }
                         for (const hpChange of simultaneousHpChanges) {
-                          const splatKey =
+                          if (hpChange.kind !== 'heal') continue
+                          const healingSplatKey =
                             hpChange.side === 'player'
                               ? 'playerStatusDamageSplat'
                               : 'enemyStatusDamageSplat'
-                          next[splatKey] =
-                            hpChange.kind === 'heal'
-                              ? -hpChange.amount
-                              : hpChange.amount
+                          next[healingSplatKey] = -hpChange.amount
                         }
+                        next.playerDamageSplat =
+                          combinedDamage.player > 0
+                            ? combinedDamage.player
+                            : null
+                        next.enemyDamageSplat =
+                          combinedDamage.enemy > 0
+                            ? combinedDamage.enemy
+                            : null
                         return next
                       })
                       for (const simultaneousEvent of simultaneousEvents) {

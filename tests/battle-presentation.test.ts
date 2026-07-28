@@ -5,6 +5,8 @@ import {
 } from '@/utilities/battle/presentation'
 import { formatBattleStatName } from '@/utilities/battle/stat-labels'
 import { generateBattleEvents } from '@/utilities/battle/engine/event-generator'
+import { getCombinedImpactDamage } from '@/utilities/battle/engine/impact-group'
+import type { BattlePresentationEvent } from '@/utilities/battle/types'
 import { flipPvpState } from '@/app/(frontend)/game/battles/pvp/state-utils'
 import { makePvpBattleState } from './helpers/battle-fixtures'
 
@@ -113,6 +115,21 @@ describe('battle presentation timeline', () => {
       type: 'hp-change',
       side: 'player',
       hpAfter: 80,
+    })
+    expect(
+      getCombinedImpactDamage(
+        impactEvents!.filter(
+          (
+            event,
+          ): event is
+            | Extract<BattlePresentationEvent, { type: 'attack' }>
+            | Extract<BattlePresentationEvent, { type: 'hp-change' }> =>
+            event.type === 'attack' || event.type === 'hp-change',
+        ),
+      ),
+    ).toEqual({
+      player: 40,
+      enemy: 40,
     })
   })
 
