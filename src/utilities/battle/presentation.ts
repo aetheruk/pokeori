@@ -210,6 +210,32 @@ function buildPresentation(
         attackType: line.match(/\[icon:type:([^\]]+)\]/i)?.[1],
         message: line,
       })
+      // Stance lines can also contain authored recoil, drain, or healing
+      // markers. Parse those before leaving the line; the old parser skipped
+      // every inline HP effect once it found a stance icon.
+      const inlineHpMatches = [
+        ...line.matchAll(/\[icon:(damage|heal):(\d+)\]/g),
+      ]
+      for (const hpMatch of inlineHpMatches) {
+        const kind = hpMatch[1] === 'heal' ? 'heal' : 'damage'
+        const amount = Number.parseInt(hpMatch[2], 10)
+        const pokemon = stateTeamForSide(state, actorSide)[actorIndex]
+        const hpAfter = clampHp(
+          pokemon,
+          (runningHp[actorSide][actorIndex] ?? pokemon?.currentHp ?? 0) +
+            (kind === 'heal' ? amount : -amount),
+        )
+        runningHp[actorSide][actorIndex] = hpAfter
+        events.push({
+          type: 'hp-change',
+          side: actorSide,
+          pokemonIndex: actorIndex,
+          kind,
+          amount,
+          hpAfter,
+          message: line,
+        })
+      }
       continue
     }
 
@@ -250,7 +276,7 @@ function buildPresentation(
 
     const healingAmount = Number.parseInt(
       line.match(
-        /(?:healed for\s+(\d+)\s+HP|\(\+(\d+)\s+HP\)|restored\s+(\d+)\s+HP)/i,
+        /(?:healed(?:\s+for)?\s+(\d+)\s+HP|\(\+(\d+)\s+HP\)|restored\s+(\d+)\s+HP)/i,
       )?.slice(1).find(Boolean) || '0',
       10,
     )
@@ -305,15 +331,16 @@ function buildPresentation(
         teamForSide(baseline, side)[pokemonIndex]?.currentHp ??
         finalPokemon.currentHp
       if (presentedHp === finalPokemon.currentHp) continue
-      const kind = finalPokemon.currentHp > presentedHp ? 'heal' : 'damage'
-      events.push({
-        type: 'hp-change',
+      // The server state is authoritative. Log parsing is retained for legacy
+      // battles, but a parser mismatch must never look like a late heal/damage
+      // event to the player.
+      console.warn('Battle presentation HP mismatch; applying silent sync', {
+        battleId: state.battleId,
+        turn: log.turn,
         side,
         pokemonIndex,
-        kind,
-        amount: Math.abs(finalPokemon.currentHp - presentedHp),
-        hpAfter: finalPokemon.currentHp,
-        message: '',
+        presentedHp,
+        authoritativeHp: finalPokemon.currentHp,
       })
       runningHp[side][pokemonIndex] = finalPokemon.currentHp
     }

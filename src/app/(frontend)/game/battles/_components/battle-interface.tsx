@@ -217,7 +217,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
   ])
 
   useEffect(() => {
-    if (battleState.status === 'won' || battleState.status === 'lost') {
+    if (battleState.status !== 'ongoing') {
       stopMusic({ fade: true })
     }
   }, [battleState.status, stopMusic])
@@ -856,11 +856,19 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
           )}
           <GameResult
             success={battleState.status === 'won'}
-            title={battleState.status === 'won' ? 'VICTORY!' : 'DEFEAT...'}
+            title={
+              battleState.status === 'won'
+                ? 'VICTORY!'
+                : battleState.status === 'draw'
+                  ? 'DRAW'
+                  : 'DEFEAT...'
+            }
             message={
               battleState.status === 'won'
                 ? `You defeated ${battleState.isWildBattle ? 'the wild Pokemon' : battleState.enemyName}!`
-                : `You were defeated by ${battleState.enemyName}...`
+                : battleState.status === 'draw'
+                  ? `Both teams are out of Pokemon. The battle ends in a draw.`
+                  : `You were defeated by ${battleState.enemyName}...`
             }
             rewardSummary={battleState.rewards}
             icon={resultIcon}
@@ -868,7 +876,9 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
             titleColor={
               battleState.status === 'won'
                 ? 'text-game-ochre'
-                : 'text-game-danger'
+                : battleState.status === 'draw'
+                  ? 'text-game-night-text'
+                  : 'text-game-danger'
             }
             additionalContent={
               expeditionProgress ? (

@@ -887,6 +887,8 @@ export async function useMove(
       }
     }
 
+    const enemyHpAtPrimaryStart = enemyMon.currentHp
+
     const resolution = resolveStance(resolvedMoveStance, enemyStance)
     const contest = resolveMoveContest({
       move,
@@ -1121,6 +1123,7 @@ export async function useMove(
       }
     }
 
+    let playerPrimaryHealing = 0
     // Apply healing
     if (!moveFailed && move.heal) {
       const healAmount = getMoveHealAmount({
@@ -1128,11 +1131,11 @@ export async function useMove(
         pokemon: playerMon,
         weather: state.weather?.weather,
       })
-      playerMon.currentHp = Math.min(
-        playerMon.maxHp,
-        playerMon.currentHp + healAmount,
-      )
-      message += `${playerMon.name} healed ${healAmount} HP! `
+      // Primary healing is a temporary HP credit. It is capped only after the
+      // opposing move resolves, so incoming damage is settled against the
+      // combined pool rather than an incorrect intermediate HP value.
+      playerMon.currentHp += healAmount
+      playerPrimaryHealing = healAmount
     }
 
     // Accuracy check
@@ -1817,6 +1820,9 @@ export async function useMove(
         }
       }
     }
+    if (playerPrimaryHealing > 0 && !moveMissed) {
+      message += `${playerMon.name} healed ${playerPrimaryHealing} HP! [icon:heal:${playerPrimaryHealing}] `
+    }
 
     // Vanished removal
     if (wasVanishedBeforeMove && playerMon.status?.id === 'vanished') {
@@ -1839,6 +1845,7 @@ export async function useMove(
     let enemyMoveInterrupted = false
     let enemyMoveMissed = false
     let enemyMoveFailed = false
+    let enemyPrimaryHealing = 0
     const preventEnemyCounter =
       !moveMissed &&
       !moveFailed &&
@@ -2104,6 +2111,25 @@ export async function useMove(
         }
       }
 
+      if (
+        !enemyBattleAction.isBasicAttack &&
+        !enemyMoveInterrupted &&
+        !enemyMoveMissed &&
+        !enemyMoveFailed &&
+        enemyBattleAction.move.heal
+      ) {
+        enemyPrimaryHealing = getMoveHealAmount({
+          move: enemyBattleAction.move,
+          pokemon: enemyMon,
+          weather: state.weather?.weather,
+        })
+        const primaryOverkill = Math.max(
+          0,
+          playerDamage - enemyHpAtPrimaryStart,
+        )
+        enemyMon.currentHp += enemyPrimaryHealing - primaryOverkill
+      }
+
       enemyDamage =
         enemyMoveInterrupted ||
         enemyMoveMissed ||
@@ -2269,7 +2295,13 @@ export async function useMove(
           damageDealt: enemyDamage,
           weather: state.weather?.weather,
           skipPreDamageDefensiveEffects: true,
+          skipPrimaryHealing: enemyPrimaryHealing > 0,
         })
+        if (enemyPrimaryHealing > 0) {
+          enemyAiEffectMessages.unshift(
+            `${enemyMon.name} healed ${enemyPrimaryHealing} HP! [icon:heal:${enemyPrimaryHealing}]`,
+          )
+        }
       }
       if (
         !enemyMoveInterrupted &&
@@ -2418,6 +2450,18 @@ export async function useMove(
         remainingTurns: Math.max(1, Math.floor(move.recharge)),
       }
     }
+
+    if (playerPrimaryHealing > 0 && (moveFailed || moveMissed)) {
+      playerMon.currentHp -= playerPrimaryHealing
+    }
+    playerMon.currentHp = Math.min(
+      playerMon.maxHp,
+      Math.max(0, playerMon.currentHp),
+    )
+    enemyMon.currentHp = Math.min(
+      enemyMon.maxHp,
+      Math.max(0, enemyMon.currentHp),
+    )
 
     state.history.unshift({
       turn: state.turn,

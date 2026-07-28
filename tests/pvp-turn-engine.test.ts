@@ -12,7 +12,9 @@ import {
 } from '@/utilities/battle/engine/pvp-turn'
 import { resolvePvpTurn } from '@/app/(frontend)/game/battles/pvp/resolution'
 import { applySecondaryStatusesFromMove } from '@/utilities/battle/secondary-statuses'
+import { applyHeldItemIfTriggered } from '@/utilities/battle/held-items'
 import type { BattlePokemon, BattleState } from '@/utilities/battle/types'
+import { getMoveHealAmount } from '@/utilities/battle/move-effects'
 
 function makePokemon(overrides: Partial<BattlePokemon> = {}): BattlePokemon {
   return {
@@ -90,6 +92,55 @@ function withFailOnStance<T extends 'loss' | 'tie'>(
 }
 
 describe('PVP turn engine helpers', () => {
+  test('commits both attacks before KO and draws a tied simultaneous exhaustion', async () => {
+    const state = makeBattleState()
+    state.playerTeam[0].currentHp = 1
+    state.enemyTeam[0].currentHp = 1
+    state.playerTeam[1].currentHp = 0
+    state.enemyTeam[1].currentHp = 0
+    state.playerTeam[0].stats.speed = 100
+    state.enemyTeam[0].stats.speed = 1
+
+    await resolvePvpTurn(
+      state,
+      { stance: 'power', attackType: 'normal' },
+      { stance: 'power', attackType: 'normal' },
+      { persist: false, random: () => 0.5 },
+    )
+
+    expect(state.playerTeam[0].currentHp).toBe(0)
+    expect(state.enemyTeam[0].currentHp).toBe(0)
+    expect(state.status).toBe('draw')
+    expect(state.history[0]?.message).toContain(
+      'Both teams are out of Pokemon. The battle is a draw!',
+    )
+  })
+
+  test('settles primary move healing against incoming damage as one HP pool', async () => {
+    const state = makeBattleState()
+    const recover = getMove('recover')!
+    state.playerTeam[0].currentHp = 30
+    state.playerTeam[0].maxHp = 100
+    state.playerTeam[0].stats.speed = 100
+    state.enemyTeam[0].stats.attack = 100
+
+    await resolvePvpTurn(
+      state,
+      { stance: 'tech', specialMoveId: recover.id },
+      { stance: 'tech', attackType: 'normal' },
+      { persist: false, random: () => 0.5 },
+    )
+
+    const healing = getMoveHealAmount({
+      move: recover,
+      pokemon: state.playerTeam[0],
+    })
+    const incoming = state.history[0]?.damageTaken ?? 0
+    expect(state.playerTeam[0].currentHp).toBe(
+      Math.min(100, Math.max(0, 30 + healing - incoming)),
+    )
+  })
+
   test('initial powers default to trained move uses and one use per power system', () => {
     const powers = createInitialPowersState()
 
@@ -975,7 +1026,7 @@ describe('PVP turn engine helpers', () => {
     expect(result.preventsOpponentDamage).toBe(false)
   })
 
-  test('PVP combat triggers held HP berries after damage', () => {
+  test('PVP combat defers held HP berries until the held-item phase', () => {
     const attacker = makePokemon({
       name: 'Attacker',
       stats: {
@@ -1005,7 +1056,11 @@ describe('PVP turn engine helpers', () => {
     })
 
     expect(result.didAttack).toBe(true)
-    expect(result.message).toContain('Defender used its Oran Berry!')
+    expect(result.message).not.toContain('Defender used its Oran Berry!')
+    expect(defender.heldItem?.id).toBe('oran-berry')
+
+    const heldResult = applyHeldItemIfTriggered(defender, 'hp')
+    expect(heldResult.message).toContain('Defender used its Oran Berry!')
     expect(defender.heldItem).toBeUndefined()
     expect(defender.consumedHeldItems).toEqual([
       { itemId: 'oran-berry', name: 'Oran Berry' },

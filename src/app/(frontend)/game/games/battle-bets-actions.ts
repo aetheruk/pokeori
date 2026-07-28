@@ -707,6 +707,14 @@ async function resolveNextBattleBetsTurn(
   fixture.enemyTrainerItemLastUsedTurn = enemyItems.lastUsedTurn
 
   if (state.status === 'won' || state.status === 'lost') return true
+  if (state.status === 'draw') {
+    const winner = getFallbackWinner(state, random)
+    state.status = winner === 'female' ? 'won' : 'lost'
+    state.history[0]!.message += `\nThe judge awards the battle to ${
+      winner === 'female' ? state.playerName : state.enemyName
+    }.`
+    return true
+  }
   if (state.turn <= MAX_BATTLE_TURNS) return false
 
   const winner = getFallbackWinner(state, random)

@@ -276,6 +276,9 @@ function applySecondaryStatusEffects(params: {
   if (affected.currentHp <= 0) return messages
 
   for (const effect of status.effects) {
+    // Residual damage establishes the KO gate for every later effect in the
+    // status. Passive healing must never revive a Pokemon that just reached 0.
+    if (affected.currentHp <= 0) break
     if (effect.type === 'damage' || effect.type === 'absorb') {
       const damage = Math.min(affected.currentHp, calculateEffectDamage(affected, effect))
       if (damage <= 0) continue

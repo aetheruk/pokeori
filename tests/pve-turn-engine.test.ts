@@ -27,6 +27,7 @@ import {
   applyMoveRuntimeEffects,
   checkMoveBattleCondition,
   recordSuccessfulMoveUse,
+  resolvePendingMoveSwitches,
 } from '@/utilities/battle/move-effects'
 import {
   consumePreparedEnemyStance,
@@ -600,11 +601,33 @@ describe('PVE turn engine helpers', () => {
     })
 
     expect(result.failed).toBeUndefined()
-    expect(result.messages).toContain(
+    expect(state.activeEnemyIndex).toBe(0)
+    const switchMessages = resolvePendingMoveSwitches(state)
+    expect(switchMessages).toContain(
       'Lead Enemy went back, and Bench Enemy took its place.',
     )
     expect(state.activeEnemyIndex).toBe(1)
     expect(replacement.activeTurnStarted).toBe(state.turn + 1)
+  })
+
+  test('a move pivot fails when its user is KOed by simultaneous primary damage', () => {
+    const player = makePokemon({ id: 'player', name: 'Player Mon' })
+    const enemy = makePokemon({ id: 'enemy-1', name: 'Lead Enemy' })
+    const replacement = makePokemon({ id: 'enemy-2', name: 'Bench Enemy' })
+    const state = makeState(player, enemy)
+    state.enemyTeam = [enemy, replacement]
+
+    applyMoveRuntimeEffects({
+      move: getMove('u-turn')!,
+      state,
+      side: 'enemy',
+      attacker: enemy,
+      defender: player,
+    })
+    enemy.currentHp = 0
+
+    expect(resolvePendingMoveSwitches(state)).toEqual([])
+    expect(state.activeEnemyIndex).toBe(0)
   })
 
   test('Hard Stone no longer blocks PVE incoming damage', () => {
@@ -1911,6 +1934,35 @@ describe('PVE turn engine helpers', () => {
       "Enemy's Enemy is hurt by Leech Seed. [icon:damage:10]",
     )
     expect(messages).toContain('Player absorbed energy! [icon:heal:10]')
+  })
+
+  test('secondary healing cannot revive a Pokemon after residual damage KOs it', () => {
+    const player = makePokemon({ id: 'player', name: 'Player' })
+    const enemy = makePokemon({
+      id: 'enemy',
+      name: 'Enemy',
+      currentHp: 5,
+      maxHp: 100,
+      secondaryStatuses: [
+        {
+          id: 'damage-then-heal',
+          name: 'Damage Then Heal',
+          triggers: ['turn-end'],
+          effects: [
+            { type: 'damage', flatDamage: 10 },
+            { type: 'heal', flatHealing: 50 },
+          ],
+          sourceSide: 'player',
+          target: 'pokemon',
+          remainingTurns: 1,
+        },
+      ],
+    })
+
+    const messages = processTurnEnd(makeState(player, enemy))
+
+    expect(enemy.currentHp).toBe(0)
+    expect(messages.some((message) => message.includes('recovered'))).toBe(false)
   })
 
   test('side secondary statuses trigger on switch', () => {
