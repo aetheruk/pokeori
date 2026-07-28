@@ -86,7 +86,8 @@ const revealVisualLogMessage = (
 
   if (history[0]?.turn === entry.turn) {
     const existingLines = history[0].message.split('\n')
-    if (existingLines.includes(trimmedMessage)) return trimBattleHistory(history)
+    if (existingLines.includes(trimmedMessage))
+      return trimBattleHistory(history)
     return trimBattleHistory([
       {
         ...entry,
@@ -823,8 +824,8 @@ export function useBattleManager(initialState: BattleState) {
                   enemyStatusDamageSplat: null,
                 }))
               } else if (seq.type === 'PRESENTATION') {
-                const presentationEvents =
-                  seq.presentation?.events as BattlePresentationEvent[]
+                const presentationEvents = seq.presentation
+                  ?.events as BattlePresentationEvent[]
                 const logEntry = seq.logEntry as BattleLogEntry | undefined
                 const finalState = seq.newState as BattleState
                 const presentationTargetState = cloneState(finalState)
@@ -866,10 +867,7 @@ export function useBattleManager(initialState: BattleState) {
                         (
                           candidate,
                         ): candidate is
-                          | Extract<
-                              BattlePresentationEvent,
-                              { type: 'attack' }
-                            >
+                          | Extract<BattlePresentationEvent, { type: 'attack' }>
                           | Extract<
                               BattlePresentationEvent,
                               { type: 'hp-change' }
@@ -954,9 +952,7 @@ export function useBattleManager(initialState: BattleState) {
                             ? combinedDamage.player
                             : null
                         next.enemyDamageSplat =
-                          combinedDamage.enemy > 0
-                            ? combinedDamage.enemy
-                            : null
+                          combinedDamage.enemy > 0 ? combinedDamage.enemy : null
                         return next
                       })
                       for (const simultaneousEvent of simultaneousEvents) {
@@ -1174,12 +1170,24 @@ export function useBattleManager(initialState: BattleState) {
                         : presentationTargetState.enemyTeam
                     const nextPokemon = finalTeam[presentationEvent.toIndex]
                     if (!nextPokemon) return prev
+                    const hpOnEntry = Number.isFinite(
+                      presentationEvent.hpOnEntry,
+                    )
+                      ? presentationEvent.hpOnEntry
+                      : nextPokemon.currentHp
+                    const visualPokemon = {
+                      ...nextPokemon,
+                      currentHp: Math.min(
+                        nextPokemon.maxHp,
+                        Math.max(0, hpOnEntry),
+                      ),
+                    }
                     if (presentationEvent.side === 'player') {
                       next.activePlayerIndex = presentationEvent.toIndex
-                      next.playerTeam[presentationEvent.toIndex] = nextPokemon
+                      next.playerTeam[presentationEvent.toIndex] = visualPokemon
                     } else {
                       next.activeEnemyIndex = presentationEvent.toIndex
-                      next.enemyTeam[presentationEvent.toIndex] = nextPokemon
+                      next.enemyTeam[presentationEvent.toIndex] = visualPokemon
                     }
                     return next
                   })

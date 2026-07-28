@@ -56,9 +56,7 @@ function activeIndexForSide(
   source: Pick<PresentationBaseline, 'activePlayerIndex' | 'activeEnemyIndex'>,
   side: BattlePresentationSide,
 ) {
-  return side === 'player'
-    ? source.activePlayerIndex
-    : source.activeEnemyIndex
+  return side === 'player' ? source.activePlayerIndex : source.activeEnemyIndex
 }
 
 function inferSideFromLine(
@@ -66,9 +64,15 @@ function inferSideFromLine(
   state: BattleState,
   baseline: PresentationBaseline,
 ): BattlePresentationSide | undefined {
-  if (line.includes(`${state.playerName}:`) || line.includes(`${state.playerName}'s`))
+  if (
+    line.includes(`${state.playerName}:`) ||
+    line.includes(`${state.playerName}'s`)
+  )
     return 'player'
-  if (line.includes(`${state.enemyName}:`) || line.includes(`${state.enemyName}'s`))
+  if (
+    line.includes(`${state.enemyName}:`) ||
+    line.includes(`${state.enemyName}'s`)
+  )
     return 'enemy'
 
   const playerNames = baseline.playerTeam.map((pokemon) => pokemon.name)
@@ -91,6 +95,51 @@ function hashMessage(message: string): string {
 function clampHp(pokemon: BattlePokemon | undefined, hp: number): number {
   if (!pokemon) return Math.max(0, hp)
   return Math.min(pokemon.maxHp, Math.max(0, hp))
+}
+
+function latestPresentedActiveIndex(
+  events: BattlePresentationEvent[],
+  side: BattlePresentationSide,
+  fallbackIndex: number,
+): number {
+  return (
+    events
+      .filter(
+        (
+          event,
+        ): event is Extract<BattlePresentationEvent, { type: 'switch' }> =>
+          event.type === 'switch' && event.side === side,
+      )
+      .at(-1)?.toIndex ?? fallbackIndex
+  )
+}
+
+function inferPokemonIndexFromLine(params: {
+  line: string
+  side: BattlePresentationSide
+  state: BattleState
+  baseline: PresentationBaseline
+  fallbackIndex: number
+}): number {
+  const baselineTeam = teamForSide(params.baseline, params.side)
+  const finalTeam = stateTeamForSide(params.state, params.side)
+  const matchedIndexes = new Set<number>()
+  const teamLength = Math.max(baselineTeam.length, finalTeam.length)
+
+  for (let index = 0; index < teamLength; index += 1) {
+    const names = new Set(
+      [baselineTeam[index]?.name, finalTeam[index]?.name].filter(
+        (name): name is string => Boolean(name),
+      ),
+    )
+    if ([...names].some((name) => params.line.includes(name))) {
+      matchedIndexes.add(index)
+    }
+  }
+
+  return matchedIndexes.size === 1
+    ? [...matchedIndexes][0]
+    : params.fallbackIndex
 }
 
 function buildPresentation(
@@ -125,6 +174,8 @@ function buildPresentation(
       stateTeamForSide(state, side)[originalActive[side]]?.currentHp ?? 0
     const incomingHp =
       stateTeamForSide(state, side)[finalActive[side]]?.currentHp ?? 0
+    const hpOnEntry =
+      teamForSide(baseline, side)[finalActive[side]]?.currentHp ?? incomingHp
 
     if (outgoingHp > 0 && finalOutgoingHp > 0 && incomingHp > 0) {
       events.push({
@@ -132,6 +183,7 @@ function buildPresentation(
         side,
         fromIndex: originalActive[side],
         toIndex: finalActive[side],
+        hpOnEntry,
         reason: 'voluntary',
         message: '',
       })
@@ -148,6 +200,7 @@ function buildPresentation(
         side,
         fromIndex: originalActive[side],
         toIndex: finalActive[side],
+        hpOnEntry,
         reason: 'replacement',
         message: '',
       })
@@ -160,7 +213,10 @@ function buildPresentation(
 
   let playerAttackConsumed = false
   let enemyAttackConsumed = false
-  const lines = log.message.split('\n').map((line) => line.trim()).filter(Boolean)
+  const lines = log.message
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
   const followUpDamage: Record<BattlePresentationSide, number> = {
     player: 0,
     enemy: 0,
@@ -206,14 +262,16 @@ function buildPresentation(
       if (actorSide === 'player') playerAttackConsumed = true
       else enemyAttackConsumed = true
 
-      const actorIndex = activeIndexForSide(baseline, actorSide)
-      const targetIndex =
-        events
-          .filter(
-            (event): event is Extract<BattlePresentationEvent, { type: 'switch' }> =>
-              event.type === 'switch' && event.side === targetSide,
-          )
-          .at(-1)?.toIndex ?? originalActive[targetSide]
+      const actorIndex = latestPresentedActiveIndex(
+        events,
+        actorSide,
+        activeIndexForSide(baseline, actorSide),
+      )
+      const targetIndex = latestPresentedActiveIndex(
+        events,
+        targetSide,
+        originalActive[targetSide],
+      )
       const target = stateTeamForSide(state, targetSide)[targetIndex]
       const hpAfter = clampHp(
         target,
@@ -270,7 +328,17 @@ function buildPresentation(
             : 'player'
           : inferredSide
       if (side) {
-        const pokemonIndex = finalActive[side]
+        const pokemonIndex = inferPokemonIndexFromLine({
+          line,
+          side,
+          state,
+          baseline,
+          fallbackIndex: latestPresentedActiveIndex(
+            events,
+            side,
+            originalActive[side],
+          ),
+        })
         const pokemon = stateTeamForSide(state, side)[pokemonIndex]
         for (const hpMatch of hpMatches) {
           const kind = hpMatch[1] === 'heal' ? 'heal' : 'damage'
@@ -296,15 +364,28 @@ function buildPresentation(
     }
 
     const healingAmount = Number.parseInt(
-      line.match(
-        /(?:healed(?:\s+for)?\s+(\d+)\s+HP|\(\+(\d+)\s+HP\)|restored\s+(\d+)\s+HP)/i,
-      )?.slice(1).find(Boolean) || '0',
+      line
+        .match(
+          /(?:healed(?:\s+for)?\s+(\d+)\s+HP|\(\+(\d+)\s+HP\)|restored\s+(\d+)\s+HP)/i,
+        )
+        ?.slice(1)
+        .find(Boolean) || '0',
       10,
     )
     if (healingAmount > 0) {
       const side = inferSideFromLine(line, state, baseline)
       if (side) {
-        const pokemonIndex = finalActive[side]
+        const pokemonIndex = inferPokemonIndexFromLine({
+          line,
+          side,
+          state,
+          baseline,
+          fallbackIndex: latestPresentedActiveIndex(
+            events,
+            side,
+            originalActive[side],
+          ),
+        })
         const pokemon = stateTeamForSide(state, side)[pokemonIndex]
         const hpAfter = clampHp(
           pokemon,
@@ -333,14 +414,15 @@ function buildPresentation(
       event.type === 'attack',
   )
   const shadowPainEvents = events.filter(
-    (
-      event,
-    ): event is Extract<BattlePresentationEvent, { type: 'hp-change' }> =>
+    (event): event is Extract<BattlePresentationEvent, { type: 'hp-change' }> =>
       event.type === 'hp-change' &&
       event.kind === 'damage' &&
       /screams out in pain/i.test(event.message),
   )
-  if (attacks.length > 1 || (attacks.length > 0 && shadowPainEvents.length > 0)) {
+  if (
+    attacks.length > 1 ||
+    (attacks.length > 0 && shadowPainEvents.length > 0)
+  ) {
     const simultaneousGroup = `impact:${log.turn}`
     for (const attack of attacks) {
       attack.simultaneousGroup = simultaneousGroup
@@ -373,7 +455,8 @@ function buildPresentation(
       groupStartingHp[side] =
         event.type === 'attack'
           ? event.hpAfter + event.damage
-          : event.hpAfter + (event.kind === 'damage' ? event.amount : -event.amount)
+          : event.hpAfter +
+            (event.kind === 'damage' ? event.amount : -event.amount)
     }
     const groupedShadowEvents = new Set(shadowPainEvents)
     const orderedEvents = events.filter(
@@ -423,8 +506,104 @@ function buildPresentation(
   }
 
   for (const side of ['player', 'enemy'] as const) {
+    const beforeIndex = originalActive[side]
+    const beforePokemon = teamForSide(baseline, side)[beforeIndex]
+    const finalPokemon = stateTeamForSide(state, side)[beforeIndex]
+    if (
+      beforePokemon &&
+      finalPokemon &&
+      beforePokemon.currentHp > 0 &&
+      finalPokemon.currentHp <= 0
+    ) {
+      events.push({
+        type: 'faint',
+        side,
+        pokemonIndex: beforeIndex,
+        hpAfter: clampHp(finalPokemon, finalPokemon.currentHp),
+        formId: beforePokemon.formId,
+        message: faintMessages[side] || '',
+      })
+
+      if (finalActive[side] !== beforeIndex) {
+        const replacementName = stateTeamForSide(state, side)[finalActive[side]]
+          ?.name
+        const replacementMessageIndex = deferredAfterFaint.findIndex(
+          (message) =>
+            Boolean(replacementName) &&
+            message.includes(replacementName!) &&
+            /\b(sent out|go,)\b/i.test(message),
+        )
+        const replacementMessage =
+          replacementMessageIndex >= 0
+            ? deferredAfterFaint.splice(replacementMessageIndex, 1)[0]
+            : ''
+        events.push({
+          type: 'switch',
+          side,
+          fromIndex: beforeIndex,
+          toIndex: finalActive[side],
+          hpOnEntry:
+            teamForSide(baseline, side)[finalActive[side]]?.currentHp ??
+            stateTeamForSide(state, side)[finalActive[side]]?.currentHp ??
+            0,
+          reason: 'replacement',
+          message: replacementMessage,
+        })
+      }
+    }
+  }
+
+  // Replacement entry effects are logged after the faint and send-out lines.
+  // Parse their HP markers only after the switch event exists so the splat and
+  // bar update target the incoming Pokemon rather than the outgoing one.
+  for (const message of deferredAfterFaint) {
+    const side = inferSideFromLine(message, state, baseline)
+    const hpMatches = [...message.matchAll(/\[icon:(damage|heal):(\d+)\]/g)]
+    if (side && hpMatches.length > 0) {
+      const pokemonIndex = inferPokemonIndexFromLine({
+        line: message,
+        side,
+        state,
+        baseline,
+        fallbackIndex: latestPresentedActiveIndex(
+          events,
+          side,
+          finalActive[side],
+        ),
+      })
+      const pokemon = stateTeamForSide(state, side)[pokemonIndex]
+      for (const hpMatch of hpMatches) {
+        const kind = hpMatch[1] === 'heal' ? 'heal' : 'damage'
+        const amount = Number.parseInt(hpMatch[2], 10)
+        const hpAfter = clampHp(
+          pokemon,
+          (runningHp[side][pokemonIndex] ?? pokemon?.currentHp ?? 0) +
+            (kind === 'heal' ? amount : -amount),
+        )
+        runningHp[side][pokemonIndex] = hpAfter
+        events.push({
+          type: 'hp-change',
+          side,
+          pokemonIndex,
+          kind,
+          amount,
+          hpAfter,
+          message,
+        })
+      }
+      continue
+    }
+
+    events.push({ type: 'message', message })
+  }
+
+  for (const side of ['player', 'enemy'] as const) {
     const finalTeam = stateTeamForSide(state, side)
-    for (let pokemonIndex = 0; pokemonIndex < finalTeam.length; pokemonIndex += 1) {
+    for (
+      let pokemonIndex = 0;
+      pokemonIndex < finalTeam.length;
+      pokemonIndex += 1
+    ) {
       const finalPokemon = finalTeam[pokemonIndex]
       const presentedHp =
         runningHp[side][pokemonIndex] ??
@@ -437,7 +616,11 @@ function buildPresentation(
         | Extract<BattlePresentationEvent, { type: 'attack' }>
         | Extract<BattlePresentationEvent, { type: 'hp-change' }>
         | undefined
-      for (let eventIndex = events.length - 1; eventIndex >= 0; eventIndex -= 1) {
+      for (
+        let eventIndex = events.length - 1;
+        eventIndex >= 0;
+        eventIndex -= 1
+      ) {
         const event = events[eventIndex]
         if (
           (event.type === 'attack' &&
@@ -455,8 +638,7 @@ function buildPresentation(
         presentedHp !== finalPokemon.currentHp &&
         lastHpEvent &&
         (finalPokemon.currentHp <= baselineHp ||
-          (lastHpEvent.type === 'hp-change' &&
-            lastHpEvent.kind === 'heal'))
+          (lastHpEvent.type === 'hp-change' && lastHpEvent.kind === 'heal'))
       ) {
         // Keep the final authoritative reconciliation from visibly raising or
         // lowering a bar after the effect timeline. Any correction that does
@@ -482,55 +664,7 @@ function buildPresentation(
       })
       runningHp[side][pokemonIndex] = finalPokemon.currentHp
     }
-
-    const beforeIndex = originalActive[side]
-    const beforePokemon = teamForSide(baseline, side)[beforeIndex]
-    const finalPokemon = stateTeamForSide(state, side)[beforeIndex]
-    if (
-      beforePokemon &&
-      finalPokemon &&
-      beforePokemon.currentHp > 0 &&
-      finalPokemon.currentHp <= 0
-    ) {
-      events.push({
-        type: 'faint',
-        side,
-        pokemonIndex: beforeIndex,
-        hpAfter: clampHp(finalPokemon, finalPokemon.currentHp),
-        formId: beforePokemon.formId,
-        message: faintMessages[side] || '',
-      })
-
-      if (finalActive[side] !== beforeIndex) {
-        const replacementName =
-          stateTeamForSide(state, side)[finalActive[side]]?.name
-        const replacementMessageIndex = deferredAfterFaint.findIndex(
-          (message) =>
-            Boolean(replacementName) &&
-            message.includes(replacementName!) &&
-            /\b(sent out|go,)\b/i.test(message),
-        )
-        const replacementMessage =
-          replacementMessageIndex >= 0
-            ? deferredAfterFaint.splice(replacementMessageIndex, 1)[0]
-            : ''
-        events.push({
-          type: 'switch',
-          side,
-          fromIndex: beforeIndex,
-          toIndex: finalActive[side],
-          reason: 'replacement',
-          message: replacementMessage,
-        })
-      }
-    }
   }
-
-  events.push(
-    ...deferredAfterFaint.map(
-      (message): BattlePresentationEvent => ({ type: 'message', message }),
-    ),
-  )
 
   return {
     sequenceId: `${state.battleId}:${log.turn}:${hashMessage(log.message)}`,
