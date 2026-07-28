@@ -268,6 +268,7 @@ export type BattlePresentationEvent =
       hpAfter: number
       attackType?: string
       simultaneousGroup?: string
+      animateActor?: boolean
       message: string
     }
   | {
@@ -277,6 +278,7 @@ export type BattlePresentationEvent =
       kind: 'damage' | 'heal'
       amount: number
       hpAfter: number
+      simultaneousGroup?: string
       message: string
     }
   | {

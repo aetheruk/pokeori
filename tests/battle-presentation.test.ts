@@ -40,6 +40,8 @@ describe('battle presentation timeline', () => {
         targetSide: 'player',
         damage: 30,
         hpAfter: 90,
+        animateActor: false,
+        simultaneousGroup: 'impact:1',
       },
       {
         type: 'attack',
@@ -47,6 +49,8 @@ describe('battle presentation timeline', () => {
         targetSide: 'enemy',
         damage: 40,
         hpAfter: 80,
+        animateActor: true,
+        simultaneousGroup: 'impact:1',
       },
       {
         type: 'hp-change',
@@ -56,6 +60,85 @@ describe('battle presentation timeline', () => {
         hpAfter: 77,
       },
     ])
+  })
+
+  test('groups Shadow pain with both attack impacts while moving only the stance winner', () => {
+    const state = makePvpBattleState()
+    beginBattlePresentation(state)
+
+    state.playerTeam[0].currentHp = 80
+    state.enemyTeam[0].currentHp = 80
+    state.history.unshift({
+      turn: 1,
+      playerStance: 'power',
+      enemyStance: 'tech',
+      result: 'win',
+      damageDealt: 40,
+      damageTaken: 30,
+      playerAttackType: 'grass',
+      enemyAttackType: 'fire',
+      message: [
+        "Player 1's P1 Mon screams out in pain! [icon:damage:10]",
+        'Player 2: P2 Mon uses Speed Attack! [icon:stance:tech] [icon:type:fire] Dealt 30.',
+        'Player 1: P1 Mon uses Power Attack! [icon:stance:power] [icon:type:grass] Dealt 40.',
+      ].join('\n'),
+    })
+
+    finalizeBattlePresentation(state)
+
+    const impactEvents = state.presentation?.events.filter(
+      (event) =>
+        (event.type === 'attack' || event.type === 'hp-change') &&
+        event.simultaneousGroup === 'impact:1',
+    )
+    expect(impactEvents?.map((event) => event.type)).toEqual([
+      'attack',
+      'hp-change',
+      'attack',
+    ])
+    expect(
+      impactEvents
+        ?.filter((event) => event.type === 'attack')
+        .map((event) => [event.actorSide, event.animateActor]),
+    ).toEqual([
+      ['enemy', false],
+      ['player', true],
+    ])
+    expect(impactEvents?.at(-1)).toMatchObject({
+      type: 'attack',
+      targetSide: 'enemy',
+      hpAfter: 80,
+    })
+    expect(impactEvents?.[1]).toMatchObject({
+      type: 'hp-change',
+      side: 'player',
+      hpAfter: 80,
+    })
+  })
+
+  test('folds an authoritative damage correction into the impact HP target', () => {
+    const state = makePvpBattleState()
+    beginBattlePresentation(state)
+    state.playerTeam[0].currentHp = 100
+    state.history.unshift({
+      turn: 1,
+      playerStance: 'power',
+      enemyStance: 'tech',
+      result: 'loss',
+      damageDealt: 0,
+      damageTaken: 30,
+      enemyAttackType: 'fire',
+      message:
+        'Player 2: P2 Mon attacks! [icon:stance:tech] [icon:type:fire] Dealt 30.',
+    })
+
+    finalizeBattlePresentation(state)
+
+    expect(state.presentation?.events[0]).toMatchObject({
+      type: 'attack',
+      targetSide: 'player',
+      hpAfter: 100,
+    })
   })
 
   test('silently syncs an unparsed authoritative HP difference', () => {
