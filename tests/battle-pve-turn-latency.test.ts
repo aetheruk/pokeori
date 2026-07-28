@@ -104,7 +104,10 @@ function makePokemon(overrides: Partial<BattlePokemon> = {}): BattlePokemon {
 
 function makeState(): BattleState {
   return {
-    playerTeam: [makePokemon()],
+    // This suite measures action dependency loading, not faint handling. Keep
+    // both battlers safely above any single-turn damage so the randomized
+    // enemy stance cannot send the test through persistence side effects.
+    playerTeam: [makePokemon({ currentHp: 10_000, maxHp: 10_000 })],
     enemyTeam: [
       makePokemon({
         id: 'enemy-1',
