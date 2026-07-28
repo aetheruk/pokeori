@@ -190,6 +190,48 @@ describe('battle presentation timeline', () => {
     })
   })
 
+  test('authors a switch-in when a player selects a replacement after fainting', () => {
+    const fainted = {
+      ...makePvpBattleState().playerTeam[0],
+      currentHp: 0,
+    }
+    const replacement = {
+      ...makePvpBattleState().playerTeam[0],
+      id: 'p1-replacement',
+      formId: '2',
+      name: 'P1 Reserve',
+    }
+    const state = makePvpBattleState({
+      playerTeam: [fainted, replacement],
+      activePlayerIndex: 0,
+      pendingPlayerSwitch: true,
+      pendingPlayerSwitchReason: 'fainted',
+    })
+    beginBattlePresentation(state)
+
+    state.activePlayerIndex = 1
+    state.pendingPlayerSwitch = false
+    state.pendingPlayerSwitchReason = undefined
+    state.history.unshift({
+      turn: 2,
+      playerStance: 'tech',
+      enemyStance: 'tech',
+      result: 'tie',
+      damageDealt: 0,
+      damageTaken: 0,
+      message: 'Player 1 sent out P1 Reserve!',
+    })
+    finalizeBattlePresentation(state)
+
+    expect(state.presentation?.events[0]).toMatchObject({
+      type: 'switch',
+      side: 'player',
+      fromIndex: 0,
+      toIndex: 1,
+      reason: 'replacement',
+    })
+  })
+
   test('uses semantic presentation events and retains legacy diff fallback', () => {
     const oldState = makePvpBattleState()
     const newState = makePvpBattleState({

@@ -538,7 +538,24 @@ export function useBattleManager(initialState: BattleState) {
           switch (event.type) {
             case 'SET_INITIAL_STATE':
               if (shouldStop()) break
-              setVisualState(normalizeState(event.payload))
+              {
+                const normalizedState = normalizeState(event.payload)
+                setVisualState(normalizedState)
+                setAnim((prev) => ({
+                  ...prev,
+                  playerFainting:
+                    normalizedState.playerTeam[
+                      normalizedState.activePlayerIndex
+                    ]?.currentHp > 0
+                      ? false
+                      : prev.playerFainting,
+                  enemyFainting:
+                    normalizedState.enemyTeam[normalizedState.activeEnemyIndex]
+                      ?.currentHp > 0
+                      ? false
+                      : prev.enemyFainting,
+                }))
+              }
               break
 
             case 'PLAY_SEQUENCE': {

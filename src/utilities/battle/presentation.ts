@@ -117,17 +117,38 @@ function buildPresentation(
   let sawFaintMessage = false
 
   for (const side of ['player', 'enemy'] as const) {
-    if (
-      originalActive[side] !== finalActive[side] &&
-      (teamForSide(baseline, side)[originalActive[side]]?.currentHp ?? 0) > 0 &&
-      (stateTeamForSide(state, side)[originalActive[side]]?.currentHp ?? 0) > 0
-    ) {
+    if (originalActive[side] === finalActive[side]) continue
+
+    const outgoingHp =
+      teamForSide(baseline, side)[originalActive[side]]?.currentHp ?? 0
+    const finalOutgoingHp =
+      stateTeamForSide(state, side)[originalActive[side]]?.currentHp ?? 0
+    const incomingHp =
+      stateTeamForSide(state, side)[finalActive[side]]?.currentHp ?? 0
+
+    if (outgoingHp > 0 && finalOutgoingHp > 0 && incomingHp > 0) {
       events.push({
         type: 'switch',
         side,
         fromIndex: originalActive[side],
         toIndex: finalActive[side],
         reason: 'voluntary',
+        message: '',
+      })
+      runningHp[side][finalActive[side]] =
+        teamForSide(baseline, side)[finalActive[side]]?.currentHp ??
+        stateTeamForSide(state, side)[finalActive[side]]?.currentHp ??
+        0
+    } else if (outgoingHp <= 0 && incomingHp > 0) {
+      // Player faint replacements are selected in a separate server action.
+      // Its baseline therefore already contains the fainted outgoing Pokemon,
+      // so it needs an explicit switch event to clear the prior faint animation.
+      events.push({
+        type: 'switch',
+        side,
+        fromIndex: originalActive[side],
+        toIndex: finalActive[side],
+        reason: 'replacement',
         message: '',
       })
       runningHp[side][finalActive[side]] =
