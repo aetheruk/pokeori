@@ -3775,7 +3775,7 @@ describe('static data references', () => {
         { type: 'task_completed', targetId: 'corporate-takeover' },
       ],
       rewards: [
-        { type: 'xp', skill: 'explorer', quantity: 2000, dropChance: 100 },
+        { type: 'xp', skill: 'catching', quantity: 2000, dropChance: 100 },
       ],
     })
     expect(fireStoneTask).toMatchObject({
