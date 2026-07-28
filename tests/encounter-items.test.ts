@@ -59,6 +59,7 @@ describe('encounter item filtering', () => {
     expect(dayCareClayBrick).toMatchObject({
       name: 'Kiln-Fired Brick',
       spriteId: 'brick',
+      sellValue: 10,
     })
     expect(isTypeLureItem(bugLure)).toBe(true)
     expect(isTypeLureItem(advancedBugLure)).toBe(true)

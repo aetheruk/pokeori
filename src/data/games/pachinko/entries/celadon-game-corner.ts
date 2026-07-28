@@ -11,8 +11,8 @@ const rocketPachinkoSettings: PachinkoGameSettings = {
       { id: 'five-right', label: '5', color: '#7c2d12', x: 520, y: 760, width: 90, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 5, dropChance: 100 }] },
     ],
     obstacles: [
-      { x: 195, y: 630, width: 130, height: 10, angle: -0.24, bounce: 0.75 },
-      { x: 405, y: 630, width: 130, height: 10, angle: 0.24, bounce: 0.75 },
+      { x: 195, y: 650, width: 130, height: 10, angle: -0.24, bounce: 0.75 },
+      { x: 405, y: 650, width: 130, height: 10, angle: 0.24, bounce: 0.75 },
     ],
     wallBounciness: 0.55,
   },

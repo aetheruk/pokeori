@@ -82,8 +82,10 @@ function BattleValueChip({
     <span
       className={cn(
         'mx-1 inline-flex items-center rounded-full border px-1.5 py-0.5 align-middle text-[10px] font-black uppercase leading-none',
-        type === 'damage' && 'border-game-danger/35 bg-game-danger/10 text-game-danger',
-        type === 'heal' && 'border-game-moss/35 bg-game-moss/10 text-game-moss-strong',
+        type === 'damage' &&
+          'border-game-danger/35 bg-game-danger/10 text-game-danger',
+        type === 'heal' &&
+          'border-game-moss/35 bg-game-moss/10 text-game-moss-strong',
       )}
     >
       {type === 'damage' ? '-' : '+'}
@@ -640,7 +642,8 @@ function BattleEffectRow({ effect }: { effect: ParsedBattleEffect }) {
         'rounded-md border px-2.5 py-1.5 text-xs leading-relaxed break-words',
         effect.tone === 'good' &&
           'border-game-moss/35 bg-game-moss/10 text-game-moss-strong',
-        effect.tone === 'bad' && 'border-game-danger/40 bg-game-danger/10 text-game-danger',
+        effect.tone === 'bad' &&
+          'border-game-danger/40 bg-game-danger/10 text-game-danger',
         effect.tone === 'status' &&
           'border-game-moss/35 bg-game-moss/10 text-game-moss-strong',
         effect.tone === 'neutral' &&
@@ -677,13 +680,14 @@ interface BattleLogProps {
 }
 
 export function BattleLog({ logs }: BattleLogProps) {
-  const topRef = useRef<HTMLDivElement>(null)
+  const bottomRef = useRef<HTMLDivElement>(null)
   const [showAllTurns, setShowAllTurns] = useState(false)
 
   useEffect(() => {
-    // Scroll to top to show newest log
-    topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }, [logs])
+    if (!showAllTurns) {
+      bottomRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' })
+    }
+  }, [logs, showAllTurns])
 
   useEffect(() => {
     setShowAllTurns(false)
@@ -694,7 +698,8 @@ export function BattleLog({ logs }: BattleLogProps) {
     const groups: Record<number, BattleLogEntry[]> = {}
     const seenMessages = new Set<string>()
 
-    // We iterate backwards to prioritize the latest version of a turn if there's overlap
+    // Battle history is stored newest-first. Preserve that order while
+    // deduplicating so the newest version of an overlapping entry wins.
     logs.forEach((log) => {
       // Create a unique key for deduplication (Turn + Message)
       const key = `${log.turn}-${log.message}`
@@ -705,13 +710,18 @@ export function BattleLog({ logs }: BattleLogProps) {
       groups[log.turn].push(log)
     })
 
-    return Object.entries(groups).sort(([a], [b]) => Number(b) - Number(a)) // Newest turn first
+    return Object.entries(groups)
+      .sort(([a], [b]) => Number(a) - Number(b))
+      .map(
+        ([turn, turnLogs]) =>
+          [turn, [...turnLogs].reverse()] as [string, BattleLogEntry[]],
+      )
   }, [logs])
 
   const DEFAULT_VISIBLE_TURNS = 4
   const visibleGroups = showAllTurns
     ? groupedLogs
-    : groupedLogs.slice(0, DEFAULT_VISIBLE_TURNS)
+    : groupedLogs.slice(-DEFAULT_VISIBLE_TURNS)
   const hiddenTurnCount = Math.max(0, groupedLogs.length - visibleGroups.length)
 
   return (
@@ -724,7 +734,26 @@ export function BattleLog({ logs }: BattleLogProps) {
             : 'space-y-6',
         )}
       >
-        <div ref={topRef} />
+        {hiddenTurnCount > 0 && (
+          <button
+            type="button"
+            onClick={() => setShowAllTurns(true)}
+            className="game-focus-ring w-full rounded-lg border border-game-border bg-game-surface py-2 text-xs font-semibold text-game-muted transition-colors hover:border-game-moss/50 hover:text-game-ink"
+          >
+            Show {hiddenTurnCount} older turn
+            {hiddenTurnCount === 1 ? '' : 's'}
+          </button>
+        )}
+
+        {showAllTurns && groupedLogs.length > DEFAULT_VISIBLE_TURNS && (
+          <button
+            type="button"
+            onClick={() => setShowAllTurns(false)}
+            className="game-focus-ring w-full rounded-lg border border-game-border bg-game-surface py-2 text-xs font-semibold text-game-muted transition-colors hover:border-game-moss/50 hover:text-game-ink"
+          >
+            Show latest turns only
+          </button>
+        )}
 
         {visibleGroups.map(([turn, turnLogs]) => (
           <div key={turn} className="space-y-3">
@@ -741,33 +770,40 @@ export function BattleLog({ logs }: BattleLogProps) {
             <div className="space-y-2">
               {turnLogs.map((log, i) => {
                 const parsedLog = parseBattleMessage(log.message || '', log)
-                const resultTone =
-                  log.result === 'win'
-                    ? 'text-game-moss-strong'
+                const hasStanceOutcome = parsedLog.actions.some(
+                  (action) => !!action.stance,
+                )
+                const resultTone = !hasStanceOutcome
+                  ? undefined
+                  : log.result === 'win'
+                    ? 'border-game-moss-strong bg-game-moss-strong text-white'
                     : log.result === 'loss'
-                      ? 'text-game-danger'
+                      ? 'border-game-danger bg-game-danger text-white'
                       : log.result === 'tie'
-                        ? 'text-game-ochre'
+                        ? 'border-game-ochre bg-game-ochre text-game-night-canvas'
                         : undefined
-                const resultLabel =
-                  log.result === 'win'
-                    ? 'Victory'
+                const resultLabel = !hasStanceOutcome
+                  ? undefined
+                  : log.result === 'win'
+                    ? 'STANCE WIN'
                     : log.result === 'loss'
-                      ? 'Stance Fail'
+                      ? 'STANCE LOSS'
                       : log.result === 'tie'
-                        ? 'Draw'
+                        ? 'STANCE TIE'
                         : undefined
 
                 return (
                   <div key={i} className="flex flex-col gap-2">
                     {resultLabel && (
-                      <div
-                        className={cn(
-                          'text-[10px] font-black uppercase tracking-[0.08em]',
-                          resultTone,
-                        )}
-                      >
-                        {resultLabel}
+                      <div className="flex justify-center">
+                        <span
+                          className={cn(
+                            'inline-flex min-w-24 items-center justify-center rounded-full border px-3 py-1 text-center text-xs font-semibold tracking-[0.06em] shadow-sm',
+                            resultTone,
+                          )}
+                        >
+                          {resultLabel}
+                        </span>
                       </div>
                     )}
 
@@ -806,26 +842,6 @@ export function BattleLog({ logs }: BattleLogProps) {
           </div>
         ))}
 
-        {hiddenTurnCount > 0 && (
-          <button
-            type="button"
-            onClick={() => setShowAllTurns(true)}
-            className="game-focus-ring w-full rounded-lg border border-game-border bg-game-surface py-2 text-xs font-semibold text-game-muted transition-colors hover:border-game-moss/50 hover:text-game-ink"
-          >
-            Show {hiddenTurnCount} older turn{hiddenTurnCount === 1 ? '' : 's'}
-          </button>
-        )}
-
-        {showAllTurns && groupedLogs.length > DEFAULT_VISIBLE_TURNS && (
-          <button
-            type="button"
-            onClick={() => setShowAllTurns(false)}
-            className="game-focus-ring w-full rounded-lg border border-game-border bg-game-surface py-2 text-xs font-semibold text-game-muted transition-colors hover:border-game-moss/50 hover:text-game-ink"
-          >
-            Show latest turns only
-          </button>
-        )}
-
         {groupedLogs.length === 0 && (
           <div className="rounded-xl border border-dashed border-game-border-strong bg-game-canvas/60 px-5 py-4 text-center text-game-muted">
             <p className="text-sm font-bold uppercase tracking-[0.08em] text-game-ink">
@@ -836,6 +852,8 @@ export function BattleLog({ logs }: BattleLogProps) {
             </p>
           </div>
         )}
+
+        <div ref={bottomRef} />
       </div>
     </ScrollArea>
   )

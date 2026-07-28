@@ -16,6 +16,7 @@ import { lowerPokemonMoveUses } from './move-uses'
 import { applyStanceDisable } from './stance-disable'
 import { getHeldItemDefinition } from '@/utilities/pokemon/held-items'
 import { getDualTypeEffectiveness } from './type-chart'
+import { formatBattleStatName } from './stat-labels'
 
 const PRIMAL_WEATHERS = new Set<WeatherType>([
   'extremely-harsh-sunlight',
@@ -844,19 +845,6 @@ export function guaranteesBattleCriticalHitByAbility(params: {
   })
 }
 
-function formatStatName(stat: keyof NonNullable<BattlePokemon['statStages']>): string {
-  switch (stat) {
-    case 'specialAttack':
-      return 'Special Attack'
-    case 'specialDefense':
-      return 'Special Defense'
-    case 'crit':
-      return 'critical-hit chance'
-    default:
-      return stat[0].toUpperCase() + stat.slice(1)
-  }
-}
-
 export function applyBattleAbilityAfterKoStatStages(
   pokemon: BattlePokemon,
 ): string[] {
@@ -874,7 +862,7 @@ export function applyBattleAbilityAfterKoStatStages(
     )
     if (pokemon.statStages[effect.stat] === before) continue
     messages.push(
-      `${pokemon.name}'s ${getAbilityName(pokemon)} raised ${formatStatName(effect.stat)}!`,
+      `${pokemon.name}'s ${getAbilityName(pokemon)} raised ${formatBattleStatName(effect.stat)}!`,
     )
   }
 
@@ -909,8 +897,8 @@ function applyBattleStatStageBoosts(params: {
         : `${abilityOwner.name}'s ${getAbilityName(abilityOwner)}`
     messages.push(
       abilityOwner === params.pokemon
-        ? `${ownerLabel} ${direction} ${formatStatName(statKey)}!`
-        : `${ownerLabel} ${direction} ${params.pokemon.name}'s ${formatStatName(statKey)}!`,
+        ? `${ownerLabel} ${direction} ${formatBattleStatName(statKey)}!`
+        : `${ownerLabel} ${direction} ${params.pokemon.name}'s ${formatBattleStatName(statKey)}!`,
     )
   }
 

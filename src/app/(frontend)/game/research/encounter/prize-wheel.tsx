@@ -27,7 +27,11 @@ import {
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
 import { completeGame, startGame } from '@/app/(frontend)/game/games/actions'
-import { claimPrizeWheelReward, initiatePrizeWheelSpin } from '../games/wheel'
+import {
+  claimPrizeWheelReward,
+  exitPrizeWheel,
+  initiatePrizeWheelSpin,
+} from '../games/wheel'
 
 interface PrizeWheelGameProps {
   encounter: PrizeWheelGameConfig
@@ -120,6 +124,8 @@ export function PrizeWheelGame({
   const wheelRef = useRef<HTMLDivElement>(null)
   const currentRotation = useRef(0)
   const handleClaimRef = useRef<() => void>(() => {})
+  const spinTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const autoClaimTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const slots = encounter.settings.slots || []
   const sliceSize = 360 / slots.length
@@ -192,9 +198,9 @@ export function PrizeWheelGame({
       currentRotation.current = finalRotation
 
       // Wait for spin to end, then auto-claim after 1 second
-      setTimeout(() => {
+      spinTimerRef.current = setTimeout(() => {
         // Auto-claim after 1 second delay
-        setTimeout(() => {
+        autoClaimTimerRef.current = setTimeout(() => {
           setCanClaim(true)
           setIsSpinning(false)
           handleClaimRef.current()
@@ -204,6 +210,7 @@ export function PrizeWheelGame({
   }, [isSpinning, spinResult, sliceSize])
 
   const [isClaiming, setIsClaiming] = useState(false)
+  const [isExiting, setIsExiting] = useState(false)
 
   const handleClaim = async (autoClaim = false) => {
     if ((!canClaim && !autoClaim) || isClaiming) return
@@ -253,8 +260,30 @@ export function PrizeWheelGame({
     handleClaimRef.current = () => handleClaim(true)
   })
 
+  useEffect(
+    () => () => {
+      if (spinTimerRef.current) clearTimeout(spinTimerRef.current)
+      if (autoClaimTimerRef.current) clearTimeout(autoClaimTimerRef.current)
+    },
+    [],
+  )
+
   const handleExit = async () => {
-    router.push('/game/explore')
+    if (isExiting) return
+    if (spinTimerRef.current) clearTimeout(spinTimerRef.current)
+    if (autoClaimTimerRef.current) clearTimeout(autoClaimTimerRef.current)
+    setIsExiting(true)
+    const exitResult = await exitPrizeWheel(encounter.id)
+    if (exitResult.success) {
+      router.push('/game/explore')
+      return
+    }
+
+    toast.error(
+      ('error' in exitResult && exitResult.error) ||
+        'Unable to leave the prize wheel',
+    )
+    setIsExiting(false)
   }
 
   return (
@@ -282,10 +311,15 @@ export function PrizeWheelGame({
           size="icon"
           className="h-11 w-11 rounded-full border border-game-night-border/60 bg-game-night-surface/85 text-game-night-ink shadow-lg transition-colors hover:bg-game-night-surface-raised hover:text-game-night-ink"
           onClick={handleExit}
-          disabled={isSpinning || isClaiming}
+          disabled={isClaiming || isExiting}
+          aria-busy={isExiting}
           aria-label="Leave prize wheel"
         >
-          <DoorOpen className="h-4 w-4" />
+          {isExiting ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <DoorOpen className="h-4 w-4" />
+          )}
         </Button>
       </div>
 

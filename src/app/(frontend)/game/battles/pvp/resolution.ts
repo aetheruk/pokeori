@@ -56,6 +56,10 @@ import {
 } from '@/utilities/battle/move-effects'
 import { decrementFaintedPokemonFriendship } from '@/utilities/battle/friendship'
 import { processBattleRarityTurnEnd } from '@/utilities/battle/rarity-effects'
+import {
+  beginBattlePresentation,
+  finalizeBattlePresentation,
+} from '@/utilities/battle/presentation'
 
 export interface PvpMove {
   stance: BattleStance
@@ -97,6 +101,7 @@ export async function resolvePvpTurn(
     random?: () => number
   } = {},
 ): Promise<BattleState> {
+  beginBattlePresentation(state)
   const shouldPersist = options.persist !== false
   const random = options.random ?? Math.random
   // Helper to apply powers
@@ -348,6 +353,7 @@ export async function resolvePvpTurn(
     state.powers = p1Powers
     state.history = trimBattleHistory(state.history)
     state.turn += 1
+    finalizeBattlePresentation(state)
     return state
   }
 
@@ -706,5 +712,6 @@ export async function resolvePvpTurn(
   if (shouldPersist) {
     await persistConsumedHeldItems(state)
   }
+  finalizeBattlePresentation(state)
   return state
 }

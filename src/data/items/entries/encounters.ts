@@ -123,6 +123,7 @@ encounterItems.push({
   description: 'A dense clay brick fired in the Route 5 Day Care kiln.',
   category: 'misc',
   spriteId: 'brick',
+  sellValue: 10,
   unique: false,
 })
 

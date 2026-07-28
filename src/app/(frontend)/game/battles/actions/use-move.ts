@@ -131,6 +131,7 @@ import {
 } from '@/utilities/battle/move-effects'
 import { createBattleTurnTimer } from '../helpers/timing'
 import { runBattleActionWithGuard } from '../helpers/action-guard'
+import { beginBattlePresentation } from '@/utilities/battle/presentation'
 import {
   applyBattleAbilityAfterKoStatStages,
   applyBattleAbilityBeforeAttackTypeChange,
@@ -319,6 +320,7 @@ export async function useMove(
       getActiveBattleState(user),
     )
     if (!state) return { success: false, error: 'No active battle' }
+    beginBattlePresentation(state)
     if (state.status !== 'ongoing')
       return { success: false, error: 'Battle has ended', state }
     if (needsPlayerLeadSelection(state)) {

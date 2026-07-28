@@ -200,6 +200,9 @@ function DamageSplat({
 
   if (!visible || !damage) return null
 
+  const isHealing = damage < 0
+  const displayedAmount = Math.abs(damage)
+
   // Status-based colors
   const statusColors: Record<string, { glow: string; text: string; shadow: string }> = {
     poison: { glow: 'bg-game-clay-strong', text: 'text-game-clay-strong', shadow: 'rgba(184,97,72,0.8)' },
@@ -216,17 +219,17 @@ function DamageSplat({
   const statusColor = statusId && isStatusDamage ? statusColors[statusId] : null
 
   // Fallback damage-based colors
-  const isHighDamage = damage >= 100
-  const isCritical = damage >= 200
+  const isHighDamage = displayedAmount >= 100
+  const isCritical = displayedAmount >= 200
 
   const glowClass =
-    statusColor?.glow ||
+    (isHealing ? 'bg-game-moss' : statusColor?.glow) ||
     (isCritical ? 'bg-game-danger' : isHighDamage ? 'bg-game-clay' : 'bg-game-ochre')
   const textClass =
-    statusColor?.text ||
+    (isHealing ? 'text-game-moss-strong' : statusColor?.text) ||
     (isCritical ? 'text-game-danger' : isHighDamage ? 'text-game-clay' : 'text-game-ochre')
   const shadowColor =
-    statusColor?.shadow ||
+    (isHealing ? 'rgba(95,121,79,0.8)' : statusColor?.shadow) ||
     (isCritical
       ? 'rgba(189,90,71,0.8)'
       : isHighDamage
@@ -258,7 +261,7 @@ function DamageSplat({
             `,
           }}
         >
-          {damage}
+          {isHealing ? `+${displayedAmount}` : displayedAmount}
         </span>
       </div>
     </div>

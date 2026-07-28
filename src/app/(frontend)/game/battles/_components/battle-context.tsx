@@ -9,6 +9,7 @@ interface BattleMoveOption {
   id: string
   name: string
   stance: MoveStance
+  damage: number
   forcedType?: string
   charged?: number
   recharge?: number

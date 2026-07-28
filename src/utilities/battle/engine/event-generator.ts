@@ -178,6 +178,28 @@ export function generateBattleEvents(
   oldState: BattleState,
   newState: BattleState,
 ): BattleEvent[] {
+  if (
+    newState.presentation &&
+    newState.presentation.sequenceId !== oldState.presentation?.sequenceId
+  ) {
+    const presentationEvents: BattleEvent[] = [
+      {
+        type: 'PLAY_SEQUENCE',
+        payload: {
+          type: 'PRESENTATION',
+          presentation: newState.presentation,
+          logEntry: newState.history[0],
+          newState,
+        },
+      },
+      { type: 'SET_INITIAL_STATE', payload: newState },
+    ]
+    if (newState.status !== 'ongoing') {
+      presentationEvents.push({ type: 'BATTLE_END', payload: newState })
+    }
+    return presentationEvents
+  }
+
   const events: BattleEvent[] = []
 
   // Indices for convenience

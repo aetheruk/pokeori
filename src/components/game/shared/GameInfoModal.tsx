@@ -25,6 +25,39 @@ export interface TaskProgressData {
   label: string
 }
 
+interface GameInfoMetricCardProps {
+  icon?: ReactNode
+  label: string
+  value: string | number
+  title?: string
+}
+
+function GameInfoMetricCard({
+  icon,
+  label,
+  value,
+  title,
+}: GameInfoMetricCardProps) {
+  return (
+    <div
+      className="group flex h-[4.5rem] items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 transition-colors hover:border-game-moss/45"
+      title={title || label}
+    >
+      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised text-game-moss-strong [&>svg]:size-4">
+        {icon}
+      </div>
+      <div className="flex min-w-0 flex-1 flex-col justify-center">
+        <span className="truncate text-[10px] font-bold uppercase tracking-wider text-game-muted">
+          {label}
+        </span>
+        <span className="truncate font-mono text-sm font-black text-game-ink">
+          {value}
+        </span>
+      </div>
+    </div>
+  )
+}
+
 interface GameInfoModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -206,7 +239,9 @@ export function GameInfoModal({
                     <span className="shrink-0 font-bold uppercase tracking-wide text-game-moss-strong">
                       Available at
                     </span>
-                    <span className="text-game-muted">{sourceHint.replace(/^Available (at|from)\s+/i, '')}</span>
+                    <span className="text-game-muted">
+                      {sourceHint.replace(/^Available (at|from)\s+/i, '')}
+                    </span>
                   </div>
                 )}
               </div>
@@ -274,21 +309,13 @@ export function GameInfoModal({
                   <SectionDivider>RULES</SectionDivider>
                   <div className="grid grid-cols-2 gap-3">
                     {properties.map((prop, idx) => (
-                      <div
+                      <GameInfoMetricCard
                         key={idx}
-                        className="group flex flex-col items-center justify-center rounded-xl border border-game-border bg-game-surface p-3 transition-colors hover:border-game-moss/45"
+                        icon={prop.icon}
+                        label={prop.label}
+                        value={prop.value}
                         title={prop.title || prop.label}
-                      >
-                        <div className="mb-1 text-game-moss-strong transition-opacity group-hover:opacity-100">
-                          {prop.icon}
-                        </div>
-                        <span className="mb-0.5 text-[10px] font-bold uppercase tracking-wider text-game-muted">
-                          {prop.label}
-                        </span>
-                        <span className="font-mono font-bold text-game-ink">
-                          {prop.value}
-                        </span>
-                      </div>
+                      />
                     ))}
                   </div>
                 </div>
@@ -299,21 +326,13 @@ export function GameInfoModal({
                   <SectionDivider>STATS</SectionDivider>
                   <div className="grid grid-cols-2 gap-3">
                     {stats.map((stat, idx) => (
-                      <div
+                      <GameInfoMetricCard
                         key={idx}
-                        className="group flex items-center gap-3 rounded-xl border border-game-border bg-game-surface p-3 transition-colors hover:border-game-moss/45"
+                        icon={stat.icon}
+                        label={stat.label}
+                        value={stat.value}
                         title={stat.label}
-                      >
-                        <div className="text-game-moss-strong">{stat.icon}</div>
-                        <div className="flex flex-col">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-game-muted">
-                            {stat.label}
-                          </span>
-                          <span className="font-mono text-sm font-black text-game-ink">
-                            {stat.value}
-                          </span>
-                        </div>
-                      </div>
+                      />
                     ))}
                   </div>
                 </div>

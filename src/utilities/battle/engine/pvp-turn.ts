@@ -50,6 +50,7 @@ import {
   processBattleRarityAttackAttempt,
 } from '@/utilities/battle/rarity-effects'
 import { BASE_BATTLE_POWER } from '@/utilities/battle/constants'
+import { formatBattleStatName } from '@/utilities/battle/stat-labels'
 import {
   Z_MOVE_DAMAGE_MULTIPLIER,
   clearZMoveCharge,
@@ -1134,7 +1135,7 @@ export function resolvePvpCombat(params: {
         }
       }
       const direction = buff.stages >= 0 ? 'rose' : 'fell'
-      effectMessage += ` ${target.name}'s ${statKey} ${direction}!`
+      effectMessage += ` ${target.name}'s ${formatBattleStatName(statKey)} ${direction}!`
       if (buff.stages > 0) {
         const copyMessages = applyBattleAbilityOpponentStatStageBoostCopy({
           pokemon: opposingPokemon,
@@ -1233,7 +1234,7 @@ export function resolvePvpCombat(params: {
         }
       }
       const direction = debuff.stages >= 0 ? 'rose' : 'fell'
-      effectMessage += ` ${target.name}'s ${statKey} ${direction}!`
+      effectMessage += ` ${target.name}'s ${formatBattleStatName(statKey)} ${direction}!`
       if (debuff.stages > 0) {
         const copyMessages = applyBattleAbilityOpponentStatStageBoostCopy({
           pokemon: opposingPokemon,

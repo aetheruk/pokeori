@@ -46,6 +46,7 @@ import {
   applyPokemonResearchEndure,
   canApplyPokemonResearchEndure,
 } from './research-survival'
+import { formatBattleStatName } from './stat-labels'
 import {
   blocksBattleForcedSwitchByAbility,
   blocksBattleMentalEffectByAbility,
@@ -94,8 +95,7 @@ export function applyMoveOnUserDamagedSameTurnEffects(params: {
       params.pokemon.statStages![buff.stat] + buff.stages,
       buff.stat,
     )
-    const stat = buff.stat === 'specialAttack' ? 'Special Attack' : buff.stat
-    return `${params.pokemon.name}'s ${stat} ${buff.stages >= 0 ? 'rose' : 'fell'}!`
+    return `${params.pokemon.name}'s ${formatBattleStatName(buff.stat)} ${buff.stages >= 0 ? 'rose' : 'fell'}!`
   })
 }
 
@@ -1022,12 +1022,6 @@ function setRuntimeHeldItem(
   }
 }
 
-function formatStatStageName(stat: keyof typeof DEFAULT_STAT_STAGES): string {
-  if (stat === 'specialAttack') return 'Special Attack'
-  if (stat === 'specialDefense') return 'Special Defense'
-  return stat.charAt(0).toUpperCase() + stat.slice(1)
-}
-
 export function applyMoveRuntimeEffects(params: {
   move: MoveConfig
   state: BattleState
@@ -1149,7 +1143,7 @@ export function applyMoveRuntimeEffects(params: {
     )
     const direction = move.postDamageStatStage.stages >= 0 ? 'rose' : 'fell'
     messages.push(
-      `${target.name}'s ${formatStatStageName(move.postDamageStatStage.stat)} ${direction}!`,
+      `${target.name}'s ${formatBattleStatName(move.postDamageStatStage.stat)} ${direction}!`,
     )
   }
 
@@ -1228,7 +1222,7 @@ export function applyMoveRuntimeEffects(params: {
       }
       const direction = move.statStageEffect.stages >= 0 ? 'rose' : 'fell'
       const statNames = move.statStageEffect.stats
-        .map(formatStatStageName)
+        .map(formatBattleStatName)
         .join(' and ')
       messages.push(`${target.name}'s ${statNames} ${direction}!`)
     }
@@ -1585,7 +1579,7 @@ export function applyMoveRuntimeEffects(params: {
         )
         const direction = buff.stages >= 0 ? 'rose' : 'fell'
         messages.push(
-          `${attacker.name}'s ${formatStatStageName(buff.stat)} ${direction}!`,
+          `${attacker.name}'s ${formatBattleStatName(buff.stat)} ${direction}!`,
         )
       }
     }
