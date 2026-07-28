@@ -496,6 +496,7 @@ function buildPresentation(
         type: 'faint',
         side,
         pokemonIndex: beforeIndex,
+        hpAfter: clampHp(finalPokemon, finalPokemon.currentHp),
         formId: beforePokemon.formId,
         message: faintMessages[side] || '',
       })

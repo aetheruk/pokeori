@@ -289,6 +289,7 @@ export type BattlePresentationEvent =
       type: 'faint'
       side: BattlePresentationSide
       pokemonIndex: number
+      hpAfter: number
       formId?: string
       message: string
     }
