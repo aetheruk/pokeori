@@ -265,6 +265,23 @@ describe('artisan recipes', () => {
     })
   })
 
+  test('nest ball unlocks at Artisan 29 with green and yellow dye', () => {
+    const recipe = artisanRecipes.find((entry) => entry.id === 'craft-nest-ball')
+
+    expect(recipe?.artisanLevel).toBe(29)
+    expect(recipe?.costs).toEqual([
+      { id: 'broken-ball-t1', amount: 3 },
+      { id: 'paint-green', amount: 1 },
+      { id: 'paint-yellow', amount: 1 },
+      { id: 'poke-powder-s', amount: 2 },
+    ])
+    expect(recipe?.costs.some((cost) => cost.id === 'wood-scraps-t1')).toBe(false)
+    expect(recipe?.requirements).toContainEqual({
+      type: 'task_completed',
+      targetId: 'nest-ball-manual',
+    })
+  })
+
   test('great ball unlocks with blue dye at Artisan 25', () => {
     const recipe = artisanRecipes.find(
       (entry) => entry.id === 'craft-great-ball',
@@ -1579,6 +1596,7 @@ describe('artisan recipes', () => {
       ['ultra-ball', 50],
       ['net-ball', 16],
       ['moon-ball', 12],
+      ['nest-ball', 29],
     ])
     const ballRecipes = artisanRecipes.filter((recipe) =>
       recipe.rewards.some((reward) => {
