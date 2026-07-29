@@ -5,6 +5,11 @@ import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { useInventoryStore } from '@/app/(frontend)/store/inventory-store'
 import { Button } from '@/components/ui/button'
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from '@/components/ui/carousel'
 import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import {
   Dialog,
@@ -17,7 +22,14 @@ import { ItemSprite } from '@/components/ui/item-sprite'
 import { useUser } from '@/context/UserContext'
 import type { Pokemon } from '@/payload-types'
 import { getOwnedPokemonGender } from '@/utilities/pokemon/gender'
-import { getPokemonItemEffectLabel } from '@/utilities/pokemon/item-usability'
+import {
+  getPokemonItemEffectLabel,
+  getPokemonItemPickerGroup,
+  POKEMON_ITEM_PICKER_GROUP_LABELS,
+  POKEMON_ITEM_PICKER_GROUP_ORDER,
+  type PokemonItemPickerGroup,
+} from '@/utilities/pokemon/item-usability'
+import { SectionDivider } from '@/components/ui/section-divider'
 import {
   applyItemToPokemon,
   getFusionPartnerOptions,
@@ -45,19 +57,6 @@ const STATS: { label: string; value: StatName }[] = [
   { label: 'Sp. Def', value: 'specialDefense' },
   { label: 'Speed', value: 'speed' },
 ]
-
-const ITEM_GROUP_LABELS: Record<string, string> = {
-  candy: 'Candies',
-  vitamin: 'Training Items',
-  'ability-patch': 'Ability Patches',
-  research: 'Research Items',
-}
-
-function getItemGroup(item: UsableItem): string {
-  return item.definition.effects?.grantPokemonResearchXp
-    ? 'research'
-    : item.definition.category
-}
 
 export function UseItemDialog({
   pokemon,
@@ -150,12 +149,15 @@ export function UseItemDialog({
   }
 
   const groupedItems = useMemo(() => {
-    const groups = new Map<string, UsableItem[]>()
+    const groups = new Map<PokemonItemPickerGroup, UsableItem[]>()
     for (const item of items) {
-      const group = getItemGroup(item)
+      const group = getPokemonItemPickerGroup(item.definition)
       groups.set(group, [...(groups.get(group) || []), item])
     }
-    return Array.from(groups.entries())
+    return POKEMON_ITEM_PICKER_GROUP_ORDER.flatMap((group) => {
+      const groupItems = groups.get(group)
+      return groupItems?.length ? [[group, groupItems] as const] : []
+    })
   }, [items])
 
   const handleItemClick = (item: UsableItem) => {
@@ -240,8 +242,8 @@ export function UseItemDialog({
           Use Item
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[88dvh] overflow-hidden border-game-border bg-game-surface p-0 text-game-ink sm:max-w-[460px]">
-        <DialogHeader className="border-b border-game-border bg-game-surface-raised px-5 py-4 text-left">
+      <DialogContent className="flex max-h-[88dvh] flex-col gap-0 overflow-hidden border-game-border bg-game-surface p-0 text-game-ink sm:max-w-[460px]">
+        <DialogHeader className="shrink-0 border-b border-game-border bg-game-surface-raised px-5 py-4 text-left">
           <div className="flex items-start gap-3 pr-8">
             {(selectedItemForStat || selectedFusionItem) && (
               <Button
@@ -277,7 +279,7 @@ export function UseItemDialog({
           </div>
         </DialogHeader>
 
-        <div className="custom-scrollbar overflow-y-auto p-4">
+        <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">
           {loading ? (
             <div className="flex justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-game-moss" />
@@ -416,51 +418,78 @@ export function UseItemDialog({
           ) : (
             <div className="space-y-5">
               {groupedItems.map(([group, groupItems]) => (
-                <div key={group} className="space-y-2">
-                  <div className="px-1 text-[11px] font-bold uppercase tracking-wide text-game-muted">
-                    {ITEM_GROUP_LABELS[group] || 'Items'}
-                  </div>
-                  <div className="grid grid-cols-1 gap-2">
-                    {groupItems.map((item) => (
-                      <Button
-                        key={item.id}
-                        variant="outline"
-                        className="flex min-h-[68px] w-full items-center justify-between gap-3 whitespace-normal rounded-lg border-game-border bg-game-surface-raised p-3 text-left text-game-ink hover:border-game-moss/45 hover:bg-game-moss/5"
-                        onClick={() => handleItemClick(item)}
-                        disabled={!!usingItem}
-                      >
-                        <div className="flex min-w-0 flex-1 items-center gap-3">
-                          <ItemSprite
-                            itemId={item.itemId}
-                            alt={item.definition.name}
-                            width={32}
-                            height={32}
-                            className="h-8 w-8 shrink-0 pixelated"
-                          />
-                          <div className="min-w-0 flex-1 text-left">
-                            <div className="font-medium leading-tight">
-                              {item.definition.name}
+                <section
+                  key={group}
+                  aria-labelledby={`pokemon-item-group-${group}`}
+                >
+                  <SectionDivider className="mb-2">
+                    <span
+                      id={`pokemon-item-group-${group}`}
+                      className="flex items-center gap-2"
+                    >
+                      {POKEMON_ITEM_PICKER_GROUP_LABELS[group]}
+                      <span className="rounded-full border border-game-border bg-game-canvas/70 px-1.5 py-0.5 font-mono text-[10px] font-semibold tracking-normal text-game-muted">
+                        {groupItems.length}
+                      </span>
+                    </span>
+                  </SectionDivider>
+                  <Carousel
+                    opts={{ align: 'start', containScroll: 'trimSnaps' }}
+                    className="w-full"
+                    aria-label={`${POKEMON_ITEM_PICKER_GROUP_LABELS[group]} carousel`}
+                  >
+                    <CarouselContent className="-ml-2">
+                      {groupItems.map((item) => (
+                        <CarouselItem
+                          key={item.id}
+                          className={
+                            groupItems.length === 1
+                              ? 'basis-full pl-2'
+                              : 'basis-[90%] pl-2 sm:basis-[82%]'
+                          }
+                        >
+                          <Button
+                            variant="outline"
+                            className="flex h-full min-h-[76px] w-full items-center justify-between gap-3 whitespace-normal rounded-xl border-game-border bg-game-surface-raised p-3 text-left text-game-ink shadow-sm hover:border-game-moss/45 hover:bg-game-moss/5"
+                            onClick={() => handleItemClick(item)}
+                            disabled={!!usingItem}
+                          >
+                            <div className="flex min-w-0 flex-1 items-center gap-3">
+                              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-canvas/70">
+                                <ItemSprite
+                                  itemId={item.itemId}
+                                  alt={item.definition.name}
+                                  width={36}
+                                  height={36}
+                                  className="h-9 w-9 pixelated"
+                                />
+                              </div>
+                              <div className="min-w-0 flex-1 text-left">
+                                <div className="font-display text-sm font-semibold leading-tight">
+                                  {item.definition.name}
+                                </div>
+                                <div className="mt-1 text-xs leading-snug text-game-muted">
+                                  {getPokemonItemEffectLabel(item.definition)}
+                                </div>
+                              </div>
                             </div>
-                            <div className="mt-1 text-xs leading-snug text-game-muted">
-                              {getPokemonItemEffectLabel(item.definition)}
+                            <div className="flex shrink-0 items-center gap-2">
+                              <span className="rounded-full border border-game-border bg-game-canvas/70 px-2 py-1 font-mono text-xs font-semibold text-game-muted">
+                                ×
+                                {inventoryStore[item.itemId] !== undefined
+                                  ? inventoryStore[item.itemId]
+                                  : item.quantity}
+                              </span>
+                              {usingItem === item.itemId && (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              )}
                             </div>
-                          </div>
-                        </div>
-                        <div className="flex shrink-0 items-center gap-2">
-                          <span className="font-mono text-sm text-game-muted">
-                            x
-                            {inventoryStore[item.itemId] !== undefined
-                              ? inventoryStore[item.itemId]
-                              : item.quantity}
-                          </span>
-                          {usingItem === item.itemId && (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          )}
-                        </div>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
+                          </Button>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                  </Carousel>
+                </section>
               ))}
             </div>
           )}
