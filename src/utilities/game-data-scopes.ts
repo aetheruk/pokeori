@@ -75,6 +75,7 @@ export const EXPLORE_POKEMON_SELECT = {
   formId: true,
   name: true,
   level: true,
+  ballType: true,
   size: true,
   shiny: true,
   rarity: true,

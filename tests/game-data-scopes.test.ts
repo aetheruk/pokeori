@@ -24,6 +24,7 @@ describe('game data sync scopes', () => {
       speciesId: true,
       formId: true,
       level: true,
+      ballType: true,
       stats: true,
       onBattleTeam: true,
       isCompanion: true,
