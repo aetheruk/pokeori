@@ -68,7 +68,7 @@ export const celadonGameCornerShops: ShopConfig[] = [
   {
     id: 'celadon-game-corner-prize-exchange',
     name: 'Prize Exchange',
-    description: 'A Rocket Grunt quietly trades Fun Tokens for prizes. Everything is always in stock.',
+    description: 'A Rocket Grunt quietly trades Fun Tokens for prizes, with limited supplies of valuable materials.',
     category: 'Kanto',
     subCategory: 'Celadon Game Corner',
     icon: { type: 'trainer', id: 'rocket-grunt' },
@@ -82,6 +82,7 @@ export const celadonGameCornerShops: ShopConfig[] = [
         icon: { type: 'item', id: 'stardust' },
         cost: [{ type: 'currency', id: 'fun-tokens', amount: 600 }],
         rewards: [{ type: 'item', targetId: 'stardust', quantity: 1, dropChance: 100 }],
+        stock: 25,
       },
       {
         id: 'game-corner-nugget',
@@ -90,6 +91,7 @@ export const celadonGameCornerShops: ShopConfig[] = [
         icon: { type: 'item', id: 'nugget' },
         cost: [{ type: 'currency', id: 'fun-tokens', amount: 2500 }],
         rewards: [{ type: 'item', targetId: 'nugget', quantity: 1, dropChance: 100 }],
+        stock: 10,
       },
       {
         id: 'game-corner-link-cable',

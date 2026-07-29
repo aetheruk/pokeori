@@ -26,9 +26,17 @@ describe('Celadon Game Corner balance and presentation', () => {
         ?.cost[0]?.amount,
     ).toBe(600)
     expect(
+      prizeExchange?.items.find((item) => item.id === 'game-corner-stardust')
+        ?.stock,
+    ).toBe(25)
+    expect(
       prizeExchange?.items.find((item) => item.id === 'game-corner-nugget')
         ?.cost[0]?.amount,
     ).toBe(2500)
+    expect(
+      prizeExchange?.items.find((item) => item.id === 'game-corner-nugget')
+        ?.stock,
+    ).toBe(10)
   })
 
   test('awards Porygon in a Poké Ball with the Silph Co. background', () => {
@@ -45,7 +53,7 @@ describe('Celadon Game Corner balance and presentation', () => {
     )
   })
 
-  test('unlocks High Roller at 1,000 tokens and scales paired games by five', () => {
+  test('unlocks High Roller at 1,000 tokens and scales the fixed-payout games by five', () => {
     const highRoller = celadonGameCornerTasks.find(
       (task) => task.id === 'high-roller',
     )
@@ -66,11 +74,6 @@ describe('Celadon Game Corner balance and presentation', () => {
     expect(celadonGameCornerPrizeWheelEntries[1].settings.cost?.amount).toBe(
       125,
     )
-    expect(
-      celadonGameCornerPrizeWheelEntries[1].settings.slots
-        .slice(1, 7)
-        .map((slot) => slot.rewards[0]?.quantity),
-    ).toEqual([50, 100, 125, 200, 300, 500])
 
     expect(celadonGameCornerPachinkoEntries[1].settings.cost?.amount).toBe(25)
     expect(
@@ -78,6 +81,16 @@ describe('Celadon Game Corner balance and presentation', () => {
         (bucket) => bucket.rewards[0]?.quantity,
       ),
     ).toEqual([25, 250, 25])
+    expect(
+      celadonGameCornerPachinkoEntries[0].settings.board.buckets.map(
+        (bucket) => bucket.label,
+      ),
+    ).toEqual(['Prize', 'Jackpot', 'Prize'])
+    expect(
+      celadonGameCornerPachinkoEntries[1].settings.board.buckets.map(
+        (bucket) => bucket.label,
+      ),
+    ).toEqual(['Prize', 'Jackpot', 'Prize'])
 
     expect(celadonGameCornermatch3gamesEntries[1].criteria?.[0]?.count).toBe(50)
     expect(celadonGameCornermatch3gamesEntries[1].rewards?.[0]?.quantity).toBe(
@@ -85,6 +98,94 @@ describe('Celadon Game Corner balance and presentation', () => {
     )
     expect(celadonGameCornermatch3gamesEntries[0].settings.winScore).toBe(1000)
     expect(celadonGameCornermatch3gamesEntries[1].settings.winScore).toBe(1400)
+  })
+
+  test('uses the generous High Stakes Prize Wheel payout table', () => {
+    const highStakesWheel = celadonGameCornerPrizeWheelEntries[1]
+    const outcomes = Object.fromEntries(
+      highStakesWheel.settings.slots.map((slot) => [
+        slot.id,
+        {
+          percentage: slot.percentage,
+          quantity: slot.rewards[0]?.quantity || 0,
+          targetId: slot.rewards[0]?.targetId || null,
+        },
+      ]),
+    )
+
+    expect(
+      highStakesWheel.settings.slots.reduce(
+        (total, slot) => total + slot.percentage,
+        0,
+      ),
+    ).toBe(100)
+    expect(outcomes).toEqual({
+      nothing: { percentage: 50, quantity: 0, targetId: null },
+      'one-twenty-five': {
+        percentage: 15,
+        quantity: 125,
+        targetId: 'fun-tokens',
+      },
+      'five-hundred': {
+        percentage: 10,
+        quantity: 500,
+        targetId: 'fun-tokens',
+      },
+      'one-thousand': {
+        percentage: 5,
+        quantity: 1000,
+        targetId: 'fun-tokens',
+      },
+      'scratch-card': {
+        percentage: 20,
+        quantity: 1,
+        targetId: 'rocket-scratch',
+      },
+    })
+  })
+
+  test('scales the standard Prize Wheel token stakes and prizes by five', () => {
+    const standardWheel = celadonGameCornerPrizeWheelEntries[0]
+    const outcomes = Object.fromEntries(
+      standardWheel.settings.slots.map((slot) => [
+        slot.id,
+        {
+          percentage: slot.percentage,
+          quantity: slot.rewards[0]?.quantity || 0,
+          targetId: slot.rewards[0]?.targetId || null,
+        },
+      ]),
+    )
+
+    expect(
+      standardWheel.settings.slots.reduce(
+        (total, slot) => total + slot.percentage,
+        0,
+      ),
+    ).toBe(100)
+    expect(outcomes).toEqual({
+      nothing: { percentage: 66, quantity: 0, targetId: null },
+      'twenty-five': {
+        percentage: 15,
+        quantity: 25,
+        targetId: 'fun-tokens',
+      },
+      'one-hundred': {
+        percentage: 10,
+        quantity: 100,
+        targetId: 'fun-tokens',
+      },
+      'two-hundred': {
+        percentage: 5,
+        quantity: 200,
+        targetId: 'fun-tokens',
+      },
+      'scratch-card': {
+        percentage: 4,
+        quantity: 1,
+        targetId: 'rocket-scratch',
+      },
+    })
   })
 
   test('awards an exact 1-in-250 Rocket Slots jackpot', () => {
