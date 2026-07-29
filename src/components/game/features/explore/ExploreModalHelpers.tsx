@@ -220,14 +220,34 @@ function getSortedEndlessRepeatingRewards(settings: any) {
     ? settings.endless.repeatingRewards || []
     : []
   return [...repeatingRewards].sort(
-    (a: any, b: any) => (a.everyScore || 0) - (b.everyScore || 0),
+    (a: any, b: any) =>
+      getRepeatingRewardMinimumScore(a.everyScore) -
+      getRepeatingRewardMinimumScore(b.everyScore),
   )
+}
+
+function getRepeatingRewardMinimumScore(everyScore: unknown): number {
+  if (typeof everyScore === 'number' && Number.isFinite(everyScore)) {
+    return everyScore
+  }
+  if (
+    everyScore &&
+    typeof everyScore === 'object' &&
+    'min' in everyScore &&
+    typeof everyScore.min === 'number' &&
+    Number.isFinite(everyScore.min)
+  ) {
+    return everyScore.min
+  }
+  return 0
 }
 
 function formatMilestoneRange(milestones: any[], repeatingRewards: any[] = []) {
   const scores = [
     ...milestones.map((milestone) => milestone.score),
-    ...repeatingRewards.map((reward) => reward.everyScore),
+    ...repeatingRewards.map((reward) =>
+      getRepeatingRewardMinimumScore(reward.everyScore),
+    ),
   ]
     .filter(
       (score): score is number =>
@@ -254,11 +274,24 @@ function formatPointMilestoneSubLabel(score: unknown, subLabel?: string) {
 }
 
 function formatRepeatingRewardSubLabel(everyScore: unknown, subLabel?: string) {
-  if (typeof everyScore !== 'number' || !Number.isFinite(everyScore)) {
+  let milestoneLabel: string
+  if (typeof everyScore === 'number' && Number.isFinite(everyScore)) {
+    milestoneLabel = `Every ${everyScore} pts`
+  } else if (
+    everyScore &&
+    typeof everyScore === 'object' &&
+    'min' in everyScore &&
+    'max' in everyScore &&
+    typeof everyScore.min === 'number' &&
+    typeof everyScore.max === 'number' &&
+    Number.isFinite(everyScore.min) &&
+    Number.isFinite(everyScore.max)
+  ) {
+    milestoneLabel = `Every ${everyScore.min}-${everyScore.max} pts`
+  } else {
     return subLabel
   }
 
-  const milestoneLabel = `Every ${everyScore} pts`
   return subLabel ? `${milestoneLabel} | ${subLabel}` : milestoneLabel
 }
 

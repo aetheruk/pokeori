@@ -1,4 +1,10 @@
-import { BaseGameConfig, SpriteConfig, ParallaxLayer, SideScrollerSceneConfig } from '../shared'
+import {
+  BaseGameConfig,
+  SpriteConfig,
+  ParallaxLayer,
+  SideScrollerSceneConfig,
+  EndlessScoreInterval,
+} from '../shared'
 import { LocationReward } from '@/data/types'
 
 export type { SpriteConfig, ParallaxLayer }
@@ -9,7 +15,7 @@ export interface EndlessMilestone {
 }
 
 export interface EndlessRepeatingReward {
-  everyScore: number
+  everyScore: EndlessScoreInterval
   random?: boolean
   rewards: LocationReward[]
 }

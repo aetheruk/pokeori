@@ -1,4 +1,10 @@
-import { BaseGameConfig, SpriteConfig, ParallaxLayer, SideScrollerSceneConfig } from '../shared'
+import {
+  BaseGameConfig,
+  SpriteConfig,
+  ParallaxLayer,
+  SideScrollerSceneConfig,
+  EndlessScoreInterval,
+} from '../shared'
 import { LocationReward } from '@/data/types'
 
 export interface EndlessMilestone {
@@ -7,7 +13,7 @@ export interface EndlessMilestone {
 }
 
 export interface EndlessRepeatingReward {
-  everyScore: number
+  everyScore: EndlessScoreInterval
   random?: boolean
   rewards: LocationReward[]
 }
@@ -21,11 +27,6 @@ export interface FlapGameConfig extends BaseGameConfig {
     parallaxLayers: ParallaxLayer[] // Background layers
     scene?: SideScrollerSceneConfig
     timeLimit?: number // Optional time limit
-    /** Charged once when a new run starts; restored sessions are not charged again. */
-    entryCost?: {
-      currencyType: 'pokedollars'
-      amount: number
-    }
     // Flap-specific physics
     gravity: number // Downward acceleration per frame
     flapForce: number // Upward velocity on flap

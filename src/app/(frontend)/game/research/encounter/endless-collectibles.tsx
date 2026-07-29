@@ -5,11 +5,16 @@ import Image from 'next/image'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { items } from '@/data/items'
 import type { LocationReward } from '@/data/types'
+import type { EndlessScoreInterval } from '@/data/games/shared'
 import { getPokemonForm, getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
+import {
+  getEndlessScoreIntervalMinimum,
+  getNextRandomRepeatingRewardScore,
+} from '@/utilities/research/endless-milestones'
 
 export interface EndlessCollectibleRewardConfig {
   key: string
-  everyScore: number
+  everyScore: EndlessScoreInterval
   rewardOptions: Array<{
     key: string
     reward: LocationReward
@@ -33,8 +38,7 @@ export function getEndlessCollectibleRewardConfigs(
   return repeatingRewards.flatMap((entry: any, entryIndex: number) => {
     if (
       !entry.random ||
-      !Number.isFinite(entry.everyScore) ||
-      entry.everyScore <= 0
+      getEndlessScoreIntervalMinimum(entry.everyScore) === null
     ) {
       return []
     }
@@ -52,10 +56,7 @@ export function getEndlessCollectibleRewardConfigs(
   })
 }
 
-export function getNextCollectibleScore(fromScore: number, everyScore: number) {
-  const variance = 0.75 + Math.random() * 0.5
-  return fromScore + everyScore * variance
-}
+export const getNextCollectibleScore = getNextRandomRepeatingRewardScore
 
 export function getCollectibleSize(playerWidth: number, playerHeight: number) {
   const playerBaseSize = Math.max(playerWidth, playerHeight)

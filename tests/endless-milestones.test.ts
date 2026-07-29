@@ -3,9 +3,11 @@ import {
   getAchievedUnclaimedMilestones,
   getEarnedRandomRepeatingRewards,
   getEarnedRepeatingRewards,
+  getEndlessScoreIntervalMinimum,
   getLowestEndlessRewardScore,
   getLowestMilestoneScore,
   getMaxAllowedEndlessScore,
+  getNextRandomRepeatingRewardScore,
   normalizeFinalScore,
 } from '@/utilities/research/endless-milestones'
 
@@ -52,6 +54,20 @@ describe('endless milestone helpers', () => {
       }),
     ).toBe(50)
     expect(getLowestEndlessRewardScore({ milestones: [], repeatingRewards: [] })).toBeNull()
+  })
+
+  test('supports authored random repeating reward score ranges', () => {
+    const interval = { min: 50, max: 75 }
+
+    expect(getEndlessScoreIntervalMinimum(interval)).toBe(50)
+    expect(getNextRandomRepeatingRewardScore(100, interval, () => 0)).toBe(150)
+    expect(getNextRandomRepeatingRewardScore(100, interval, () => 1)).toBe(175)
+    expect(
+      getLowestEndlessRewardScore({
+        milestones: [],
+        repeatingRewards: [{ everyScore: interval, random: true }],
+      }),
+    ).toBe(50)
   })
 
   test('scales repeating rewards by final score interval counts', () => {
@@ -113,6 +129,31 @@ describe('endless milestone helpers', () => {
       { type: 'item', targetId: 'soft-fluff-t1', quantity: 2, dropChance: 100 },
       { type: 'item', targetId: 'wing-feather-t1', quantity: 4, dropChance: 100 },
       { type: 'item', targetId: 'broken-ball-t1', quantity: 4, dropChance: 100 },
+    ])
+  })
+
+  test('bounds collected random rewards by the minimum authored interval', () => {
+    expect(
+      getEarnedRandomRepeatingRewards({
+        repeatingRewards: [
+          {
+            everyScore: { min: 50, max: 75 },
+            random: true,
+            rewards: [
+              { type: 'item', targetId: 'swift-feather', quantity: 1 },
+            ],
+          },
+        ],
+        finalScore: 250,
+        collectedRewards: { '0:0': 99 },
+      }),
+    ).toEqual([
+      {
+        type: 'item',
+        targetId: 'swift-feather',
+        quantity: 5,
+        dropChance: 100,
+      },
     ])
   })
 

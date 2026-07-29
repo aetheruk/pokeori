@@ -3,7 +3,7 @@
 // Match icons as they move across a track to a shadow target
 //
 
-import { BaseGameConfig, TaskIcon } from '../shared'
+import { BaseGameConfig, EndlessScoreInterval, TaskIcon } from '../shared'
 
 export interface RhythmIcon extends TaskIcon {
   label?: string // Optional display label
@@ -29,7 +29,7 @@ export interface EndlessMilestone {
 }
 
 export interface EndlessRepeatingReward {
-  everyScore: number
+  everyScore: EndlessScoreInterval
   random?: boolean
   rewards: import('@/data/types').LocationReward[]
 }

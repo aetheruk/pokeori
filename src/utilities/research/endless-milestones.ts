@@ -1,4 +1,5 @@
 import type { Reward } from '@/utilities/rewards/reward-logic'
+import type { EndlessScoreInterval } from '@/data/games/shared'
 
 export interface EndlessMilestone {
   score: number
@@ -6,9 +7,37 @@ export interface EndlessMilestone {
 }
 
 export interface EndlessRepeatingReward {
-  everyScore: number
+  everyScore: EndlessScoreInterval
   random?: boolean
   rewards?: Reward[]
+}
+
+export function getEndlessScoreIntervalMinimum(
+  interval: EndlessScoreInterval,
+): number | null {
+  if (typeof interval === 'number') {
+    return Number.isFinite(interval) && interval > 0 ? interval : null
+  }
+
+  return Number.isFinite(interval.min) &&
+    Number.isFinite(interval.max) &&
+    interval.min > 0 &&
+    interval.max >= interval.min
+    ? interval.min
+    : null
+}
+
+export function getNextRandomRepeatingRewardScore(
+  fromScore: number,
+  interval: EndlessScoreInterval,
+  random: () => number = Math.random,
+): number {
+  if (typeof interval === 'number') {
+    const variance = 0.75 + random() * 0.5
+    return fromScore + interval * variance
+  }
+
+  return fromScore + interval.min + random() * (interval.max - interval.min)
 }
 
 export function normalizeFinalScore(score: number | undefined): number | null {
@@ -27,8 +56,13 @@ export function getLowestEndlessRewardScore(params: {
 }): number | null {
   const scores = [
     ...(params.milestones || []).map((milestone) => milestone.score),
-    ...(params.repeatingRewards || []).map((reward) => reward.everyScore),
-  ].filter((score) => Number.isFinite(score) && score > 0)
+    ...(params.repeatingRewards || []).map((reward) =>
+      getEndlessScoreIntervalMinimum(reward.everyScore),
+    ),
+  ].filter(
+    (score): score is number =>
+      typeof score === 'number' && Number.isFinite(score) && score > 0,
+  )
 
   if (scores.length === 0) return null
   return Math.min(...scores)
@@ -71,7 +105,12 @@ export function getEarnedRepeatingRewards(
 
   return repeatingRewards.flatMap((entry) => {
     if (entry.random) return []
-    if (!Number.isFinite(entry.everyScore) || entry.everyScore <= 0) return []
+    if (
+      typeof entry.everyScore !== 'number' ||
+      !Number.isFinite(entry.everyScore) ||
+      entry.everyScore <= 0
+    )
+      return []
     const multiplier = Math.floor(normalizedScore / entry.everyScore)
     if (multiplier <= 0) return []
 
@@ -93,11 +132,18 @@ export function getEarnedRandomRepeatingRewards(params: {
   const collectedRewards = params.collectedRewards || {}
 
   return params.repeatingRewards.flatMap((entry, entryIndex) => {
-    if (!entry.random || !Number.isFinite(entry.everyScore) || entry.everyScore <= 0) {
+    const minimumInterval = getEndlessScoreIntervalMinimum(entry.everyScore)
+    if (!entry.random || minimumInterval === null) {
       return []
     }
 
-    const maxCollectibleCount = Math.floor(normalizedScore / (entry.everyScore * 0.75))
+    const minimumPossibleInterval =
+      typeof entry.everyScore === 'number'
+        ? minimumInterval * 0.75
+        : minimumInterval
+    const maxCollectibleCount = Math.floor(
+      normalizedScore / minimumPossibleInterval,
+    )
     if (maxCollectibleCount <= 0) return []
 
     return (entry.rewards || []).flatMap((reward, rewardIndex) => {

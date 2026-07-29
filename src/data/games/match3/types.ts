@@ -1,4 +1,4 @@
-import { BaseGameConfig } from '../shared'
+import { BaseGameConfig, EndlessScoreInterval } from '../shared'
 import { LocationReward, TaskIcon } from '@/data/types'
 
 export interface Match3Crystal {
@@ -15,7 +15,7 @@ export interface EndlessMilestone {
 }
 
 export interface EndlessRepeatingReward {
-  everyScore: number
+  everyScore: EndlessScoreInterval
   random?: boolean
   rewards: LocationReward[]
 }
