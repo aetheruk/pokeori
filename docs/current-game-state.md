@@ -1,11 +1,12 @@
 # Current Game State
 
-Last reviewed: 2026-07-28
+Last reviewed: 2026-07-29
 
 This document maps the current implemented game progression from the static game data and runtime unlock rules. It is based on the active data in `src/data/**`, the Explore filtering logic in `src/components/game/features/explore/hooks/useExploreData.ts`, and the requirement resolver in `src/utilities/requirements/index.ts`.
 
 ## Runtime Notes
 
+- The Pokemon details Use Item dialog keeps its item list within the available viewport and scrolls vertically for large inventories. Usable items are grouped by their actual Pokemon effect—level candies, friendship items, training items, evolution/form items, Tera Shards, ability patches, and research items—and each group uses a horizontally swipeable card carousel.
 - Release `0.3.17` combines same-frame incoming attack damage and self-damage, including Shadow Pokemon scream damage, into one readable damage splat per Pokemon while preserving the individual HP effects and battle-log lines.
 - Release `0.3.18` applies server-authoritative zero HP to the HUD before the sprite faint animation starts, preventing a Pokemon from disappearing while its health bar still contains colour.
 - Release `0.3.19` keeps an incoming Pokemon at its actual entry HP until subsequent damage or healing resolves, and applies switch-entry HP effects after the incoming sprite appears so splats and bar movement remain aligned.

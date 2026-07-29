@@ -24,6 +24,41 @@ const POKEMON_STAT_LABELS: Record<PokemonStatName, string> = {
   speed: 'Speed',
 }
 
+export type PokemonItemPickerGroup =
+  | 'level-candy'
+  | 'friendship'
+  | 'training'
+  | 'evolution'
+  | 'tera'
+  | 'ability'
+  | 'research'
+  | 'other'
+
+export const POKEMON_ITEM_PICKER_GROUP_ORDER: PokemonItemPickerGroup[] = [
+  'level-candy',
+  'friendship',
+  'training',
+  'evolution',
+  'tera',
+  'ability',
+  'research',
+  'other',
+]
+
+export const POKEMON_ITEM_PICKER_GROUP_LABELS: Record<
+  PokemonItemPickerGroup,
+  string
+> = {
+  'level-candy': 'Level Candies',
+  friendship: 'Friendship Items',
+  training: 'Training Items',
+  evolution: 'Evolution Items',
+  tera: 'Tera Shards',
+  ability: 'Ability Patches',
+  research: 'Research Items',
+  other: 'Other Items',
+}
+
 export type PokemonItemUseTarget = {
   speciesId?: number | null
   formId?: string | null
@@ -58,6 +93,36 @@ export type PokemonItemUseTarget = {
   fusionBaseFormId?: string | null
   fusedWithPokemonId?: string | null
   fusedIntoPokemonId?: string | null
+}
+
+export function getPokemonItemPickerGroup(item: Item): PokemonItemPickerGroup {
+  const effects = item.effects
+
+  if (effects?.increaseLevel) return 'level-candy'
+  if (effects?.increaseFriendship) return 'friendship'
+  if (
+    effects?.increaseEv ||
+    effects?.decreaseEv ||
+    effects?.changeNature ||
+    effects?.maximizeIv ||
+    effects?.maximizeOneIv
+  ) {
+    return 'training'
+  }
+  if (
+    item.category === 'evolution' ||
+    effects?.changeForm ||
+    effects?.fusePokemon
+  ) {
+    return 'evolution'
+  }
+  if (effects?.setTeraType) return 'tera'
+  if (item.category === 'ability-patch' || effects?.teachAbility) {
+    return 'ability'
+  }
+  if (effects?.grantPokemonResearchXp) return 'research'
+
+  return 'other'
 }
 
 export function isPokemonTargetedInventoryItem(item: Item): boolean {

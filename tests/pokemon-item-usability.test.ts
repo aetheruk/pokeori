@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { items } from '@/data/items'
 import {
   getPokemonItemEffectLabel,
+  getPokemonItemPickerGroup,
   getPokemonItemUnavailableReason,
   isPokemonTargetedInventoryItem,
 } from '@/utilities/pokemon/item-usability'
@@ -116,6 +117,25 @@ describe('Pokemon item usability', () => {
     )
     expect(getPokemonItemEffectLabel(item('meteorite'))).toBe('Change Forme')
     expect(getPokemonItemEffectLabel(item('dna-splicers'))).toBe('Fuse/Unfuse')
+  })
+
+  test('groups Pokemon items by their actual use rather than raw inventory category', () => {
+    expect(getPokemonItemPickerGroup(item('rare-candy-m'))).toBe('level-candy')
+    expect(getPokemonItemPickerGroup(item('red-berry-candy'))).toBe(
+      'friendship',
+    )
+    expect(getPokemonItemPickerGroup(item('pretty-feather'))).toBe('friendship')
+    expect(getPokemonItemPickerGroup(item('protein'))).toBe('training')
+    expect(getPokemonItemPickerGroup(item('adamant-mint'))).toBe('training')
+    expect(getPokemonItemPickerGroup(item('bottle-cap'))).toBe('training')
+    expect(getPokemonItemPickerGroup(item('thunder-stone'))).toBe('evolution')
+    expect(getPokemonItemPickerGroup(item('rusty-sword'))).toBe('evolution')
+    expect(getPokemonItemPickerGroup(item('dna-splicers'))).toBe('evolution')
+    expect(getPokemonItemPickerGroup(item('tera-shard-fire'))).toBe('tera')
+    expect(getPokemonItemPickerGroup(item('vital-spirit-ability-patch'))).toBe(
+      'ability',
+    )
+    expect(getPokemonItemPickerGroup(item('research-kit'))).toBe('research')
   })
 
   test('hides Tera Shards when the Pokemon already has that Tera type', () => {
