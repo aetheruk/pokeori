@@ -28,6 +28,13 @@ import type {
 } from '@/data/games/pachinko/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
+import {
+  getPachinkoBucketSensor,
+  getPachinkoDropX,
+  PACHINKO_BUCKET_RAIL_WIDTH,
+  PACHINKO_DROP_TIMEOUT_MS,
+  PACHINKO_WALL_WIDTH,
+} from '@/utilities/research/pachinko-physics'
 import { completeGame } from '@/app/(frontend)/game/games/actions'
 import { completePachinkoDrop, completePachinkoMiss } from '../games/pachinko'
 
@@ -105,10 +112,7 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
   const engineRef = useRef<Matter.Engine | null>(null)
   const runnerRef = useRef<Matter.Runner | null>(null)
   const renderRef = useRef<Matter.Render | null>(null)
-  const scaleRef = useRef(1)
-  const offsetXRef = useRef(0)
-  const offsetYRef = useRef(0)
-  const containerWidthRef = useRef(400)
+  const dropTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const settledBodyIdsRef = useRef<Set<number>>(new Set())
   const router = useRouter()
   const { playSfx } = useAudio()
@@ -161,6 +165,10 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
+      if (dropTimeoutRef.current) {
+        clearTimeout(dropTimeoutRef.current)
+        dropTimeoutRef.current = null
+      }
       if (renderRef.current) {
         Matter.Render.stop(renderRef.current)
         if (renderRef.current.canvas) {
@@ -195,21 +203,14 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
 
     engine.gravity.y = config.gravityScale ?? 1.0
 
-    const containerRect = sceneRef.current.getBoundingClientRect()
-    const containerWidth = containerRect.width || 400
-    const containerHeight = containerRect.height || 600
-    containerWidthRef.current = containerWidth
-
-    const scaleX = containerWidth / config.board.width
-    const scaleY = containerHeight / config.board.height
-    const scale = Math.min(scaleX, scaleY)
-
+    // Keep the simulation in authored board coordinates. CSS scales only the
+    // canvas presentation, so odds do not change with viewport dimensions.
     const render = Render.create({
       element: sceneRef.current,
       engine: engine,
       options: {
-        width: containerWidth,
-        height: containerHeight,
+        width: config.board.width,
+        height: config.board.height,
         wireframes: false,
         background: '#18181b',
         pixelRatio: 1,
@@ -217,23 +218,10 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
     })
     renderRef.current = render
 
-    const offsetX = (containerWidth - config.board.width * scale) / 2
-    const offsetY = (containerHeight - config.board.height * scale) / 2
-
-    scaleRef.current = scale
-    offsetXRef.current = offsetX
-    offsetYRef.current = offsetY
-
-    const scalePos = (x: number, y: number) => ({
-      x: x * scale + offsetX,
-      y: y * scale + offsetY,
-    })
-
     // Create Pegs
     const pegs: Matter.Body[] = []
     config.board.pegs.forEach((peg) => {
-      const pos = scalePos(peg.x, peg.y)
-      const circle = Bodies.circle(pos.x, pos.y, (peg.radius || 5) * scale, {
+      const circle = Bodies.circle(peg.x, peg.y, peg.radius || 5, {
         isStatic: true,
         render: { fillStyle: peg.isBouncer ? '#facc15' : themeColour },
         restitution: peg.isBouncer ? 1.2 : config.board.wallBounciness || 0.5,
@@ -246,18 +234,19 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
     const buckets: Matter.Body[] = []
     const bucketWalls: Matter.Body[] = []
     config.board.buckets.forEach((bucket) => {
-      const pos = scalePos(bucket.x, bucket.y)
-      const halfWidth = (bucket.width * scale) / 2
-      const halfHeight = (bucket.height * scale) / 2
-      const railWidth = Math.max(4, 6 * scale)
+      const halfWidth = bucket.width / 2
+      const halfHeight = bucket.height / 2
+      const railWidth = PACHINKO_BUCKET_RAIL_WIDTH
       const railColour = bucket.color || themeColour
+      const ballRadius = config.ballRadius || 8
+      const sensorBounds = getPachinkoBucketSensor(bucket, ballRadius)
 
-      // Sensor for detection (invisible)
+      // Detect only after the ball has entered between the physical rails.
       const sensor = Bodies.rectangle(
-        pos.x,
-        pos.y,
-        bucket.width * scale,
-        bucket.height * scale,
+        sensorBounds.x,
+        sensorBounds.y,
+        sensorBounds.width,
+        sensorBounds.height,
         {
           isStatic: true,
           isSensor: true,
@@ -278,27 +267,27 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
       }
 
       const leftBucketWall = Bodies.rectangle(
-        pos.x - halfWidth,
-        pos.y,
+        bucket.x - halfWidth,
+        bucket.y,
         railWidth,
-        bucket.height * scale,
+        bucket.height,
         wallOptions,
       )
       bucketWalls.push(leftBucketWall)
 
       const rightBucketWall = Bodies.rectangle(
-        pos.x + halfWidth,
-        pos.y,
+        bucket.x + halfWidth,
+        bucket.y,
         railWidth,
-        bucket.height * scale,
+        bucket.height,
         wallOptions,
       )
       bucketWalls.push(rightBucketWall)
 
       const bottomBucketWall = Bodies.rectangle(
-        pos.x,
-        pos.y + halfHeight,
-        bucket.width * scale + railWidth,
+        bucket.x,
+        bucket.y + halfHeight,
+        bucket.width + railWidth,
         railWidth,
         wallOptions,
       )
@@ -307,13 +296,12 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
 
     const obstacles: Matter.Body[] = []
     config.board.obstacles?.forEach((obstacle) => {
-      const pos = scalePos(obstacle.x, obstacle.y)
       obstacles.push(
         Bodies.rectangle(
-          pos.x,
-          pos.y,
-          obstacle.width * scale,
-          obstacle.height * scale,
+          obstacle.x,
+          obstacle.y,
+          obstacle.width,
+          obstacle.height,
           {
             angle: obstacle.angle || 0,
             isStatic: obstacle.isStatic ?? true,
@@ -332,25 +320,25 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
     // Walls
     const wallOpts = { isStatic: true, render: { fillStyle: '#333' } }
     const leftWall = Bodies.rectangle(
-      offsetX,
-      containerHeight / 2,
-      10,
-      containerHeight,
+      0,
+      config.board.height / 2,
+      PACHINKO_WALL_WIDTH,
+      config.board.height,
       wallOpts,
     )
     const rightWall = Bodies.rectangle(
-      offsetX + config.board.width * scale,
-      containerHeight / 2,
-      10,
-      containerHeight,
+      config.board.width,
+      config.board.height / 2,
+      PACHINKO_WALL_WIDTH,
+      config.board.height,
       wallOpts,
     )
 
     // Floor sensor
     const floorSensor = Bodies.rectangle(
-      containerWidth / 2,
-      containerHeight + 20,
-      containerWidth,
+      config.board.width / 2,
+      config.board.height + 20,
+      config.board.width,
       40,
       {
         isStatic: true,
@@ -427,9 +415,8 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
         return
       }
 
-      const scale = scaleRef.current
-      const targetX = bucket.x * scale + offsetXRef.current
-      const targetY = bucket.y * scale + offsetYRef.current
+      const targetX = bucket.x
+      const targetY = bucket.y
 
       Matter.Body.setVelocity(ballBody, { x: 0, y: 0 })
       Matter.Body.setAngularVelocity(ballBody, 0)
@@ -438,7 +425,7 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
 
       const holdMs = 220
       const shrinkMs = 420
-      const initialRadius = Math.max(1, (config.ballRadius || 8) * scale)
+      const initialRadius = Math.max(1, config.ballRadius || 8)
       let currentScale = 1
       let start: number | null = null
 
@@ -488,6 +475,10 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
     if (settledBodyIdsRef.current.has(ballBody.id)) return
 
     settledBodyIdsRef.current.add(ballBody.id)
+    if (dropTimeoutRef.current) {
+      clearTimeout(dropTimeoutRef.current)
+      dropTimeoutRef.current = null
+    }
     if (bucketId) {
       await animateBallIntoBucket(ballBody, bucketId)
     } else {
@@ -562,34 +553,32 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
     setPendingDrops((prev) => prev + 1)
     setLastDropMessage('Dropping...')
 
-    const scale = scaleRef.current
-    const offsetX = offsetXRef.current
-    const offsetY = offsetYRef.current
-    const containerWidth = containerWidthRef.current
-
-    // Calculate X position from arrow position percentage
-    const dropX = (arrowPosition / 100) * containerWidth
+    const ballRadius = config.ballRadius || 8
+    const dropX = getPachinkoDropX({
+      arrowPosition,
+      boardWidth: config.board.width,
+      ballRadius,
+    })
     const dropId = crypto.randomUUID()
 
-    const ball = Matter.Bodies.circle(
-      dropX,
-      offsetY + 20 * scale,
-      (config.ballRadius || 8) * scale,
-      {
-        restitution: config.ballBounciness || 0.6,
-        friction: 0.001,
-        mass: 5,
-        label: 'BALL',
-        plugin: { dropId },
-        render: { fillStyle: '#fff' },
-      },
-    )
+    const ball = Matter.Bodies.circle(dropX, 20, ballRadius, {
+      restitution: config.ballBounciness || 0.6,
+      friction: 0.001,
+      mass: 5,
+      label: 'BALL',
+      plugin: { dropId },
+      render: { fillStyle: '#fff' },
+    })
 
     Matter.Composite.add(engineRef.current.world, ball)
     Matter.Body.setVelocity(ball, {
-      x: (Math.random() - 0.5) * 2 * scale,
+      x: (Math.random() - 0.5) * 2,
       y: 0,
     })
+
+    dropTimeoutRef.current = setTimeout(() => {
+      void completeDropSettlement({ ballBody: ball })
+    }, PACHINKO_DROP_TIMEOUT_MS)
   }
 
   const [result, setResult] = useState<any | null>(null)

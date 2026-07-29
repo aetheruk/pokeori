@@ -8,6 +8,46 @@ import { celadonGameCornerSlotEntries } from '@/data/games/slots/entries/celadon
 import { scratchCards } from '@/data/scratchcards'
 import { celadonGameCornerShops } from '@/data/shops/entries/celadon-game-corner'
 import { celadonGameCornerTasks } from '@/data/tasks/entries/celadon-game-corner'
+import {
+  getPachinkoBucketSensor,
+  getPachinkoDropX,
+  PACHINKO_DROP_TIMEOUT_MS,
+} from '@/utilities/research/pachinko-physics'
+
+function getSlotRtp(game: (typeof celadonGameCornerSlotEntries)[number]) {
+  const totalWeight = game.settings.paytable.reduce(
+    (total, line) => total + line.weight,
+    0,
+  )
+  const winRate = Number(game.settings.winRate) / 100
+  const expectedReturn = game.settings.paytable.reduce((total, line) => {
+    const quantity = Number(line.rewards[0]?.quantity || 0)
+    return total + winRate * (line.weight / totalWeight) * quantity
+  }, 0)
+
+  return expectedReturn / game.settings.cost.amount
+}
+
+function getPrizeWheelRtp(
+  game: (typeof celadonGameCornerPrizeWheelEntries)[number],
+) {
+  const expectedReturn = game.settings.slots.reduce((total, slot) => {
+    const reward = slot.rewards[0]
+    if (!reward) return total
+
+    const quantity = Number(reward.quantity || 0)
+    const value =
+      reward.type === 'currency' && reward.targetId === 'fun-tokens'
+        ? quantity
+        : reward.type === 'item' && reward.targetId === 'rocket-scratch'
+          ? quantity * 100
+          : 0
+
+    return total + (slot.percentage / 100) * value
+  }, 0)
+
+  return expectedReturn / Number(game.settings.cost?.amount || 1)
+}
 
 describe('Celadon Game Corner balance and presentation', () => {
   test('uses the authored standard-game token costs', () => {
@@ -69,7 +109,7 @@ describe('Celadon Game Corner balance and presentation', () => {
       celadonGameCornerSlotEntries[1].settings.paytable.map(
         (line) => line.rewards[0]?.quantity,
       ),
-    ).toEqual([25, 75, 250, 500, 10000])
+    ).toEqual([25, 75, 250, 500, 5500])
 
     expect(celadonGameCornerPrizeWheelEntries[1].settings.cost?.amount).toBe(
       125,
@@ -80,7 +120,7 @@ describe('Celadon Game Corner balance and presentation', () => {
       celadonGameCornerPachinkoEntries[1].settings.board.buckets.map(
         (bucket) => bucket.rewards[0]?.quantity,
       ),
-    ).toEqual([25, 250, 25])
+    ).toEqual([75, 250, 75])
     expect(
       celadonGameCornerPachinkoEntries[0].settings.board.buckets.map(
         (bucket) => bucket.label,
@@ -100,7 +140,7 @@ describe('Celadon Game Corner balance and presentation', () => {
     expect(celadonGameCornermatch3gamesEntries[1].settings.winScore).toBe(1400)
   })
 
-  test('uses the generous High Stakes Prize Wheel payout table', () => {
+  test('uses the rare-jackpot High Stakes Prize Wheel payout table', () => {
     const highStakesWheel = celadonGameCornerPrizeWheelEntries[1]
     const outcomes = Object.fromEntries(
       highStakesWheel.settings.slots.map((slot) => [
@@ -120,9 +160,9 @@ describe('Celadon Game Corner balance and presentation', () => {
       ),
     ).toBe(100)
     expect(outcomes).toEqual({
-      nothing: { percentage: 50, quantity: 0, targetId: null },
+      nothing: { percentage: 66.49, quantity: 0, targetId: null },
       'one-twenty-five': {
-        percentage: 15,
+        percentage: 18,
         quantity: 125,
         targetId: 'fun-tokens',
       },
@@ -137,9 +177,14 @@ describe('Celadon Game Corner balance and presentation', () => {
         targetId: 'fun-tokens',
       },
       'scratch-card': {
-        percentage: 20,
-        quantity: 1,
+        percentage: 0.5,
+        quantity: 5,
         targetId: 'rocket-scratch',
+      },
+      'ultra-jackpot': {
+        percentage: 0.01,
+        quantity: 250000,
+        targetId: 'fun-tokens',
       },
     })
   })
@@ -164,9 +209,9 @@ describe('Celadon Game Corner balance and presentation', () => {
       ),
     ).toBe(100)
     expect(outcomes).toEqual({
-      nothing: { percentage: 66, quantity: 0, targetId: null },
+      nothing: { percentage: 66.49, quantity: 0, targetId: null },
       'twenty-five': {
-        percentage: 15,
+        percentage: 18,
         quantity: 25,
         targetId: 'fun-tokens',
       },
@@ -181,17 +226,35 @@ describe('Celadon Game Corner balance and presentation', () => {
         targetId: 'fun-tokens',
       },
       'scratch-card': {
-        percentage: 4,
+        percentage: 0.5,
         quantity: 1,
         targetId: 'rocket-scratch',
+      },
+      'ultra-jackpot': {
+        percentage: 0.01,
+        quantity: 50000,
+        targetId: 'fun-tokens',
       },
     })
   })
 
-  test('awards an exact 1-in-250 Rocket Slots jackpot', () => {
+  test('keeps Slots and Prize Wheel long-run RTP near 120%', () => {
+    expect(getSlotRtp(celadonGameCornerSlotEntries[0])).toBeCloseTo(1.198, 10)
+    expect(getSlotRtp(celadonGameCornerSlotEntries[1])).toBeCloseTo(1.198, 10)
+    expect(getPrizeWheelRtp(celadonGameCornerPrizeWheelEntries[0])).toBeCloseTo(
+      1.2,
+      10,
+    )
+    expect(getPrizeWheelRtp(celadonGameCornerPrizeWheelEntries[1])).toBeCloseTo(
+      1.2,
+      10,
+    )
+  })
+
+  test('awards an exact 1-in-1,000 Rocket Slots jackpot', () => {
     for (const [game, expectedPrize] of [
-      [celadonGameCornerSlotEntries[0], 1000],
-      [celadonGameCornerSlotEntries[1], 10000],
+      [celadonGameCornerSlotEntries[0], 1100],
+      [celadonGameCornerSlotEntries[1], 5500],
     ] as const) {
       const jackpot = game.settings.paytable.find(
         (line) => line.icons[0] === 'jackpot',
@@ -204,8 +267,39 @@ describe('Celadon Game Corner balance and presentation', () => {
       const jackpotOdds = winRate * ((jackpot?.weight || 0) / totalWeight)
 
       expect(jackpot?.rewards[0]?.quantity).toBe(expectedPrize)
-      expect(jackpotOdds).toBe(1 / 250)
+      expect(jackpotOdds).toBe(1 / 1000)
     }
+  })
+
+  test('uses viewport-independent Pachinko drop and capture geometry', () => {
+    const game = celadonGameCornerPachinkoEntries[0]
+    const ballRadius = game.settings.ballRadius || 8
+    const jackpot = game.settings.board.buckets.find(
+      (bucket) => bucket.id === 'fifty',
+    )
+
+    expect(jackpot?.width).toBe(24)
+    expect(
+      getPachinkoDropX({
+        arrowPosition: 0,
+        boardWidth: game.settings.board.width,
+        ballRadius,
+      }),
+    ).toBe(14)
+    expect(
+      getPachinkoDropX({
+        arrowPosition: 100,
+        boardWidth: game.settings.board.width,
+        ballRadius,
+      }),
+    ).toBe(586)
+    expect(jackpot && getPachinkoBucketSensor(jackpot, ballRadius)).toEqual({
+      x: 300,
+      y: 773,
+      width: 2,
+      height: 2,
+    })
+    expect(PACHINKO_DROP_TIMEOUT_MS).toBe(30_000)
   })
 
   test('shows named slot prizes and distinguishable wheel segments', () => {

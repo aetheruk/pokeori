@@ -164,8 +164,7 @@ function ScratchCardInterface({
       <div
         className="relative aspect-[1/2] animate-in overflow-hidden rounded-xl border border-game-border bg-game-night-canvas shadow-lg zoom-in-95 duration-300"
         style={{
-          width:
-            'min(300px, calc(100vw - 4rem), calc((100dvh - 8rem) / 2))',
+          width: 'min(300px, calc(100vw - 4rem), calc((100dvh - 8rem) / 2))',
         }}
       >
         {/* Background Image */}
@@ -198,7 +197,7 @@ function ScratchCardInterface({
         </div>
       </div>
 
-      <div className="flex flex-col items-center gap-2">
+      <div className="flex flex-col items-center gap-2 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <Button
           onClick={() => setShowRewards(true)}
           className={`transition-all duration-300 font-bold ${
