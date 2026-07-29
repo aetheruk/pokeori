@@ -20,6 +20,13 @@ Legacy `/game/research` and `/game/research/encounter` links resolve the
 player's old active session and redirect to its canonical route. Legacy
 `research:{userId}` sessions migrate lazily on first read.
 
+Installed PWAs suppress outward horizontal touch gestures that begin at the
+left or right viewport edge so browser history navigation cannot close an
+active game. The guard is limited to standalone display mode and leaves taps,
+vertical movement, inward swipes, and the game's own touch handlers intact.
+This supplements the app shell's `overscroll-behavior: none` fallback for
+WebKit, which may still permit history swipes despite that CSS property.
+
 ## Available Games
 | Game | Route | Description |
 |------|-------|-------------|

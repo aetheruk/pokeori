@@ -1,4 +1,5 @@
 import { PwaRegister } from '@/components/pwa-register'
+import { PwaEdgeNavigationGuard } from '@/components/pwa-edge-navigation-guard'
 import '@/styles/globals.css'
 import type { Metadata, Viewport } from 'next'
 import { ThemeProvider } from '@/components/theme-provider'
@@ -41,6 +42,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <PwaRegister />
+          <PwaEdgeNavigationGuard />
           {children}
           <Toaster position="top-center" />
         </ThemeProvider>
