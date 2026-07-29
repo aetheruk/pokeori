@@ -25,6 +25,7 @@ describe('game data sync scopes', () => {
       formId: true,
       level: true,
       ballType: true,
+      size: true,
       stats: true,
       onBattleTeam: true,
       isCompanion: true,

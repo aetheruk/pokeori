@@ -11,6 +11,7 @@ import {
   getTaskProgress,
 } from '@/utilities/tasks/task-logic'
 import type { Task, TaskCondition } from '@/data/tasks'
+import { rockTunnelTasks } from '@/data/tasks/entries/rock-tunnel'
 import { isToday } from '@/utilities/date-utils'
 
 const baseRequirementData = {
@@ -69,6 +70,22 @@ describe('requirements and criteria semantics', () => {
     expect(checkTaskRequirements(unlockedData, task)).toBe(true)
     expect(checkTaskCriteria(unlockedData, task)).toBe(false)
     expect(checkTaskCriteria(completedData, task)).toBe(true)
+  })
+
+  test('Mankey Size Study recognizes separate XS and XL Mankey', () => {
+    const task = rockTunnelTasks.find(
+      (entry) => entry.id === 'rock-tunnel-mankey-size-study',
+    )
+    const data = {
+      ...baseRequirementData,
+      pokemon: [
+        { id: 1, speciesId: 56, formId: '56', level: 20, size: 'XS' },
+        { id: 2, speciesId: 56, formId: '56', level: 20, size: 'XL' },
+      ],
+    } as unknown as RequirementData
+
+    expect(task).toBeDefined()
+    expect(checkTaskCriteria(data, task!)).toBe(true)
   })
 
   test('progress reports current values without mutating state', () => {
