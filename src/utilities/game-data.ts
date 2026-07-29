@@ -198,6 +198,7 @@ export async function getGameUserData(
   }
 
   const result: Record<string, unknown> = {
+    snapshotAt: new Date().toISOString(),
     user: slimUser,
     currency: user.currency,
     lastRoll: (user as any).lastRoll,

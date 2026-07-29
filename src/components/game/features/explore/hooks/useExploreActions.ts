@@ -40,7 +40,7 @@ import {
 
 export function useExploreActions(
   userData: RequirementData | null,
-  refreshUser: () => void,
+  refreshUser: () => Promise<RequirementData | undefined>,
 ) {
   const router = useRouter()
   const { playSfx, resumeMusic } = useAudio()
@@ -162,20 +162,32 @@ export function useExploreActions(
     } as ExploreItem
   }
 
-  const reopenExpeditionPanel = (expeditionId?: string | null) => {
+  const reopenExpeditionPanel = async (expeditionId?: string | null) => {
     const targetExpeditionId =
       expeditionId || getActiveExpeditionRun()?.expeditionId
     const expedition = targetExpeditionId
       ? expeditions.find((entry) => entry.id === targetExpeditionId)
       : undefined
 
-    clearExpeditionReturn()
-
     if (!expedition) {
+      clearExpeditionReturn()
       setSelectedItem(null)
       return
     }
 
+    try {
+      await refreshUser()
+    } catch (error) {
+      console.error('Failed to refresh expedition progress', error)
+      clearExpeditionReturn()
+      setSelectedItem(null)
+      toast.error(
+        'Progress was saved, but Explore could not refresh. Reopen the expedition to continue.',
+      )
+      return
+    }
+
+    clearExpeditionReturn()
     setSelectedItem({
       ...expedition,
       type: 'expedition',
@@ -543,7 +555,7 @@ export function useExploreActions(
           : await completeTask(task.id)
         if (result.success) {
           if (isExpeditionTaskFlow) {
-            reopenExpeditionPanel(getActiveExpeditionRun()?.expeditionId)
+            await reopenExpeditionPanel(getActiveExpeditionRun()?.expeditionId)
           } else {
             setSelectedItem(null)
           }

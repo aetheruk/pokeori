@@ -103,10 +103,12 @@ function ExploreListContent({
   refreshUser,
 }: {
   userData: RequirementData
-  refreshUser: () => void
+  refreshUser: () => Promise<RequirementData | undefined>
 }) {
   const { availableItems: allUnlockedItems } = useExploreData(userData, '', '')
   const [showDailyRefresh, setShowDailyRefresh] = useState(false)
+  const [hasSyncedExpeditionReturn, setHasSyncedExpeditionReturn] =
+    useState(false)
 
   useEffect(() => {
     refreshDailyTasks()
@@ -193,10 +195,37 @@ function ExploreListContent({
     : 'Expedition'
 
   useEffect(() => {
+    if (!getExpeditionReturn()) {
+      setHasSyncedExpeditionReturn(true)
+      return
+    }
+
+    let cancelled = false
+    setHasSyncedExpeditionReturn(false)
+
+    refreshUser()
+      .then(() => {
+        if (!cancelled) setHasSyncedExpeditionReturn(true)
+      })
+      .catch((error) => {
+        console.error('Failed to refresh expedition return state', error)
+        clearExpeditionReturn()
+        if (!cancelled) setHasSyncedExpeditionReturn(true)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [refreshUser])
+
+  useEffect(() => {
+    if (!hasSyncedExpeditionReturn) return
+
     const returnExpeditionId = getExpeditionReturn()
     if (!returnExpeditionId || actions.selectedItem) return
 
     if (!activeExpedition) {
+      clearExpeditionReturn()
       return
     }
 
@@ -221,7 +250,7 @@ function ExploreListContent({
       clearExpeditionReturn()
       actions.setSelectedItem(expeditionItem)
     }
-  }, [activeExpedition, actions, allUnlockedItems])
+  }, [activeExpedition, actions, allUnlockedItems, hasSyncedExpeditionReturn])
 
   const trainerName = extendedUser.trainerName || 'Trainer'
   const selectionTaskItemForModal = actions.selectedTaskForCompletion
@@ -503,7 +532,7 @@ function ExploreListContent({
           if (!open) {
             const expeditionId = getExpeditionReturn()
             if (expeditionId) {
-              actions.reopenExpeditionPanel(expeditionId)
+              void actions.reopenExpeditionPanel(expeditionId)
             } else {
               actions.setSelectedItem(null)
             }
@@ -596,7 +625,7 @@ function ExploreListContent({
                   : await completeTask(task.id)
               if (result.success) {
                 if (isExpeditionTaskFlow) {
-                  actions.reopenExpeditionPanel(
+                  await actions.reopenExpeditionPanel(
                     (userData as any).activeExpedition?.expeditionId,
                   )
                 } else {
@@ -631,13 +660,13 @@ function ExploreListContent({
               actions.setExpeditionEnterModalTaskId(null)
             }
           }}
-          onSuccess={() => {
+          onSuccess={async () => {
             const task = actions.rivalSelectionTask
             const isExpeditionTaskFlow =
               !!task && actions.expeditionEnterModalTaskId === task.id
 
             if (isExpeditionTaskFlow) {
-              actions.reopenExpeditionPanel(
+              await actions.reopenExpeditionPanel(
                 (userData as any).activeExpedition?.expeditionId,
               )
             } else {
