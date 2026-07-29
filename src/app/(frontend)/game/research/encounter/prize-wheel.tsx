@@ -38,6 +38,12 @@ interface PrizeWheelGameProps {
   initialState?: any
 }
 
+function formatPrizePercentage(percentage: number) {
+  if (percentage >= 1) return percentage.toFixed(1)
+  if (percentage >= 0.1) return percentage.toFixed(2)
+  return percentage.toFixed(3).replace(/0+$/, '').replace(/\.$/, '')
+}
+
 function PrizesModal({ encounter }: { encounter: PrizeWheelGameConfig }) {
   const slots = encounter.settings.slots || []
 
@@ -60,7 +66,7 @@ function PrizesModal({ encounter }: { encounter: PrizeWheelGameConfig }) {
         </DialogHeader>
         <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
           {slots.map((slot, i) => {
-            const percent = slot.percentage.toFixed(1)
+            const percent = formatPrizePercentage(slot.percentage)
             // 1 in X chance
             const oneInX = Math.round(100 / slot.percentage)
 
