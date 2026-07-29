@@ -687,7 +687,7 @@ export function getFormattedRewards(
         {},
       )
     : {}
-  const activeCompanionFormId = userData.pokemon.find(
+  const activeCompanionFormId = (userData.pokemon || []).find(
     (pokemon) => pokemon.isCompanion,
   )?.formId
 

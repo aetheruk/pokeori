@@ -421,7 +421,7 @@ function ExploreListContent({
         }
         open={!!actions.activeVoyage}
         onOpenChange={(open) => !open && actions.setActiveVoyage(null)}
-        userPokemon={userData.pokemon || []}
+        userData={userData}
         onSuccess={(result) => {
           refreshUser()
           actions.setActiveVoyage(null)

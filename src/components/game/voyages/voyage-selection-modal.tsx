@@ -27,8 +27,8 @@ import { SectionDivider } from '@/components/ui/section-divider'
 import { VoyageConfig } from '@/data/voyages/types'
 import { useCountdown } from '@/hooks/useCountdown'
 import { cn } from '@/lib/utils'
-import type { Pokemon } from '@/payload-types'
 import { getOwnedPokemonGender } from '@/utilities/pokemon/gender'
+import type { RequirementData } from '@/utilities/requirements'
 import { completeVoyage, startVoyage } from '@/utilities/voyages/actions'
 
 interface VoyageSelectionModalProps {
@@ -39,7 +39,7 @@ interface VoyageSelectionModalProps {
   }
   open: boolean
   onOpenChange: (open: boolean) => void
-  userPokemon: Pokemon[]
+  userData: RequirementData
   onSuccess: (result?: any) => void
 }
 
@@ -48,11 +48,12 @@ export function VoyageSelectionModal({
   activeVoyageData,
   open,
   onOpenChange,
-  userPokemon,
+  userData,
   onSuccess,
 }: VoyageSelectionModalProps) {
   const [selectedPokemonIds, setSelectedPokemonIds] = useState<string[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const userPokemon = userData.pokemon || []
 
   const { formatted: timeLeft, isFinished } = useCountdown(
     activeVoyageData?.endTime || null,
@@ -188,7 +189,11 @@ export function VoyageSelectionModal({
       icon={<TaskIconDisplay icon={voyage.icon} className="w-10 h-10" />}
       background={voyage.background}
       properties={getFormattedProperties(mockItem)}
-      rewards={getFormattedRewards(mockItem, { user: {} } as any, [])}
+      rewards={getFormattedRewards(
+        mockItem,
+        userData,
+        userData.completedTasks || [],
+      )}
       actionButton={
         <Button
           onClick={handleAction}

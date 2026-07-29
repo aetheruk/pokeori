@@ -234,6 +234,26 @@ describe('Explore location completion star', () => {
     expect(labels).not.toContain('Water Gem')
   })
 
+  test('voyage reward previews tolerate a transient snapshot without Pokemon', () => {
+    const voyageItem = {
+      id: 'test-voyage',
+      name: 'Test Voyage',
+      description: 'A voyage reward preview.',
+      category: 'Kanto',
+      icon: { type: 'pokemon', id: '16' },
+      type: 'voyage',
+      originalData: {
+        rewards: [{ type: 'item', targetId: 'water-gem', quantity: 1 }],
+      },
+    } as unknown as ExploreItem
+    const userData = makeUserData()
+    delete (userData as Partial<RequirementData>).pokemon
+
+    expect(getFormattedRewards(voyageItem, userData, [])).toEqual([
+      expect.objectContaining({ label: 'Water Gem x1' }),
+    ])
+  })
+
   test('fishing reward previews omit global fallback item pools', () => {
     const rewards = getFormattedRewards(
       fallbackFishingItem,
