@@ -115,7 +115,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 
 ## Pachinko
 - Pachinko is a physics-result cost/reward game. Matter.js resolves whether the ball lands in an authored bucket or misses, while server actions own currency deduction, reward granting, stats, session totals, rate limits, locks, and duplicate drop protection.
-- Celadon Rocket Pachinko has three rewarding buckets: its two lower-value buckets are placed at the board edges and its jackpot remains in the centre. The former empty zero-reward buckets are not authored, and the lower slanted guides sit farther below the last peg row so a ball cannot wedge against the diagonal lines. The standard and High Stakes entries share this board geometry.
+- Celadon Rocket Pachinko has three rewarding buckets: its two lower-value buckets are placed at the board edges and labelled `Prize`, while its centre top payout is labelled `Jackpot`. The prize list pairs those semantic labels with the correct 5/50 standard or 25/250 High Stakes Fun Token amounts. The former empty zero-reward buckets are not authored, and the lower slanted guides sit farther below the last peg row so a ball cannot wedge against the diagonal lines. The standard and High Stakes entries share this board geometry.
 - Each ball carries a drop id. Bucket hits call the bucket settlement action and misses call the miss settlement action; both return the same session summary shape for the client.
 - Boards are authored through `settings.board` with dimensions, pegs, buckets, optional obstacles, bouncer pegs, bucket labels, bucket colors, and bucket rewards. Validation requires bucket ids to be unique and pegs/buckets to fit inside the board.
 
@@ -146,11 +146,11 @@ WebKit, which may still permit history swipes despite that CSS property.
 
 ## Prize Wheel
 - Prize Wheel entries can require an authored currency cost before a spin starts. Current Chansey wheels spend League Tickets, are available anytime, do not use daily completion gates, and show their ticket cost plus prize pool odds in Explore modals.
-- Celadon's standard Rocket Prize Wheel costs 10 Fun Tokens. Its wheel and prize table use distinct Pokemon/item icons plus visible reward labels. The leave action is server-backed and idempotent: it clears idle activity state, or settles an already-decided paid spin exactly once before completing the activity and deleting both Prize Wheel and generic game-session Redis keys.
+- Celadon's standard Rocket Prize Wheel costs 25 Fun Tokens and has five outcomes: no prize at 66%, 25 Fun Tokens at 15%, 100 at 10%, 200 at 5%, and one Rocket Scratch Card at 4%. Its token costs, prizes, and expected value are one-fifth of the 125-token High Stakes wheel, whose outcomes are no prize at 50%, 125 Fun Tokens at 15%, 500 at 10%, 1,000 at 5%, and one Rocket Scratch Card at 20%. Both wheels use distinct Pokemon/item icons plus visible reward labels. The leave action is server-backed and idempotent: it clears idle activity state, or settles an already-decided paid spin exactly once before completing the activity and deleting both Prize Wheel and generic game-session Redis keys.
 
 ## Celadon Game Corner balance
 
-- Standard Rocket Slots cost 5 Fun Tokens and every payline supplies a human-readable token reward label for both the prize table and win toast. Celadon Slots, Prize Wheel, Pachinko, and Match 3 entries use game-specific Pokemon icons in Explore, with evolved variants distinguishing their High Stakes versions. Every paired High Stakes game costs and pays exactly five times its standard version: Slots 25, Prize Wheel 125, Pachinko 25, and Match 3 50 Fun Tokens.
+- Standard Rocket Slots cost 5 Fun Tokens and every payline supplies a human-readable token reward label for both the prize table and win toast. Celadon Slots, Prize Wheel, Pachinko, and Match 3 entries use game-specific Pokemon icons in Explore, with evolved variants distinguishing their High Stakes versions. The paired games retain five-times High Stakes costs and token payouts. The Prize Wheel also scales its scratch-card chance from 4% to 20%, with no-prize odds absorbing the difference.
 - A 100-token Rocket Scratch Card always pays something: 25% awards three Rocket Balls, 60% awards 50 Fun Tokens, 5% awards 250, 3% awards 500, 1% awards 1,000, 3% awards a Nugget, and three separate 1% outcomes unlock the Gambler icon, Gambler title, or Game Corner background.
 
 ## Battle Bets

@@ -6,9 +6,9 @@ const rocketPachinkoSettings: PachinkoGameSettings = {
     height: 800,
     pegs: [],
     buckets: [
-      { id: 'five-left', label: '5', color: '#7c2d12', x: 80, y: 760, width: 90, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 5, dropChance: 100 }] },
-      { id: 'fifty', label: '50', color: '#ca8a04', x: 300, y: 760, width: 90, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 50, dropChance: 100 }] },
-      { id: 'five-right', label: '5', color: '#7c2d12', x: 520, y: 760, width: 90, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 5, dropChance: 100 }] },
+      { id: 'five-left', label: 'Prize', color: '#7c2d12', x: 80, y: 760, width: 90, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 5, dropChance: 100 }] },
+      { id: 'fifty', label: 'Jackpot', color: '#ca8a04', x: 300, y: 760, width: 90, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 50, dropChance: 100 }] },
+      { id: 'five-right', label: 'Prize', color: '#7c2d12', x: 520, y: 760, width: 90, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 5, dropChance: 100 }] },
     ],
     obstacles: [
       { x: 195, y: 650, width: 130, height: 10, angle: -0.24, bounce: 0.75 },
