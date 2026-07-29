@@ -496,7 +496,6 @@ const settingsByGameType: Record<string, z.ZodTypeAny> = {
   flap: z
     .object({
       speed: z.number().positive().optional(),
-      entryCost: costSchema.optional(),
     })
     .passthrough(),
   slots: z

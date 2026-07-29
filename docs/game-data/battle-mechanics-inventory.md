@@ -213,7 +213,7 @@ Special Pokemon flags are stored on Pokemon records and can be authored on Pokem
 
 ## Field TMs
 
-Field TMs/HMs are key items in `src/data/items/entries/key-items.ts`. All current Field TMs/HMs link to assignable battle moves through `moveId`; reward authoring still controls which ones players can naturally obtain.
+Field TMs/HMs are inventory items generated in `src/data/items/entries/tms.ts`. The five field HMs retain their legacy `tm-*` IDs for stored-inventory and reward compatibility, but display as HM01 through HM05 instead of as TMs. All current Field TMs/HMs link to assignable battle moves through `moveId`; reward authoring still controls which ones players can naturally obtain.
 
 | Field TM                      | Current status                                                                                                                                                                                                                                                        |
 | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

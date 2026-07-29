@@ -3758,6 +3758,57 @@ describe('static data references', () => {
     })
   })
 
+  test('Pidgey Training consumes its authored Pokedollar entry criterion', () => {
+    const pidgeyTraining = allGames.find(
+      (entry) => entry.id === 'pidgey-training',
+    )
+    const endless = pidgeyTraining?.settings.endless
+
+    expect(pidgeyTraining?.criteria).toEqual([
+      {
+        type: 'currency_owned',
+        targetId: 'pokedollars',
+        count: 100,
+        consume: true,
+      },
+    ])
+    expect((pidgeyTraining?.settings as any)?.entryCost).toBeUndefined()
+    expect(endless?.repeatingRewards).toContainEqual({
+      everyScore: { min: 50, max: 75 },
+      random: true,
+      rewards: [
+        { type: 'item', targetId: 'health-feather', quantity: 1 },
+        { type: 'item', targetId: 'muscle-feather', quantity: 1 },
+        { type: 'item', targetId: 'resist-feather', quantity: 1 },
+        { type: 'item', targetId: 'genius-feather', quantity: 1 },
+        { type: 'item', targetId: 'clever-feather', quantity: 1 },
+        { type: 'item', targetId: 'swift-feather', quantity: 1 },
+      ],
+    })
+    expect(endless?.milestones).toContainEqual({
+      score: 5000,
+      rewards: [
+        {
+          type: 'title',
+          targetId: 'sky-high',
+          quantity: 1,
+          dropChance: 100,
+        },
+      ],
+    })
+    expect(endless?.milestones).toContainEqual({
+      score: 8000,
+      rewards: [
+        {
+          type: 'icon',
+          targetId: 'bird-keeper',
+          quantity: 1,
+          dropChance: 100,
+        },
+      ],
+    })
+  })
+
   test('Detective Choo regroups the four Celadon leads before the Saffron handoff', () => {
     const regroup = tasks.find((task) => task.id === 'regroup-effort')
     const fireStoneTask = tasks.find(

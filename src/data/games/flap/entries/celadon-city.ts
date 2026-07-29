@@ -12,6 +12,14 @@ export const celadonCityFlapEntries: FlapGameConfig[] = [
     requirements: [
       { type: 'task_completed', targetId: 'nesting-season' },
     ],
+    criteria: [
+      {
+        type: 'currency_owned',
+        targetId: 'pokedollars',
+        count: 100,
+        consume: true,
+      },
+    ],
     rewards: [],
     settings: {
       speed: 200,
@@ -55,16 +63,35 @@ export const celadonCityFlapEntries: FlapGameConfig[] = [
         backdrop: '/games/fly/backgrounds/sky-backdrop.avif',
         atmosphere: 'sky',
       },
-      entryCost: {
-        currencyType: 'pokedollars',
-        amount: 100,
-      },
       endless: {
         enabled: true,
-        milestones: [],
+        milestones: [
+          {
+            score: 5000,
+            rewards: [
+              {
+                type: 'title',
+                targetId: 'sky-high',
+                quantity: 1,
+                dropChance: 100,
+              },
+            ],
+          },
+          {
+            score: 8000,
+            rewards: [
+              {
+                type: 'icon',
+                targetId: 'bird-keeper',
+                quantity: 1,
+                dropChance: 100,
+              },
+            ],
+          },
+        ],
         repeatingRewards: [
           {
-            everyScore: 100,
+            everyScore: { min: 50, max: 75 },
             random: true,
             rewards: [
               { type: 'item', targetId: 'health-feather', quantity: 1 },

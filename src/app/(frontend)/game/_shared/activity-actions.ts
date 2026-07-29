@@ -1230,67 +1230,7 @@ export async function startGameActivity(
           ? 3600
           : sessionTimeLimit + 120
 
-      // Flap activities may have an entry fee. Charge only for a brand-new
-      // session: restored sessions returned above must never cost the player
-      // a second time.
-      const entryCost =
-        encounter.gameType === 'flap'
-          ? (encounter.settings as { entryCost?: { currencyType: 'pokedollars'; amount: number } })
-              .entryCost
-          : undefined
-      let chargedEntryCost = false
-      if (entryCost) {
-        const freshUser = await payload.findByID({
-          collection: 'users',
-          id: user.id,
-        })
-        const currentBalance =
-          (freshUser.currency as Record<string, number> | undefined)?.[
-            entryCost.currencyType
-          ] || 0
-        if (currentBalance < entryCost.amount) {
-          return { success: false, error: 'Insufficient funds' }
-        }
-
-        await payload.update({
-          collection: 'users',
-          id: user.id,
-          data: {
-            currency: {
-              ...freshUser.currency,
-              [entryCost.currencyType]: currentBalance - entryCost.amount,
-            },
-          },
-        })
-        chargedEntryCost = true
-      }
-
-      try {
-        await setGameActivityStateForUser(user.id, domain, state, sessionTTL)
-      } catch (error) {
-        // Do not keep an entry fee if the run could not be created.
-        if (chargedEntryCost && entryCost) {
-          const rollbackUser = await payload.findByID({
-            collection: 'users',
-            id: user.id,
-          })
-          const rollbackBalance =
-            (rollbackUser.currency as Record<string, number> | undefined)?.[
-              entryCost.currencyType
-            ] || 0
-          await payload.update({
-            collection: 'users',
-            id: user.id,
-            data: {
-              currency: {
-                ...rollbackUser.currency,
-                [entryCost.currencyType]: rollbackBalance + entryCost.amount,
-              },
-            },
-          })
-        }
-        throw error
-      }
+      await setGameActivityStateForUser(user.id, domain, state, sessionTTL)
 
       return {
         success: true,

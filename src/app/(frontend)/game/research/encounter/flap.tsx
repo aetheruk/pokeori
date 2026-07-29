@@ -293,7 +293,9 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
       ((res.summary.items && res.summary.items.length > 0) ||
         (res.summary.pokemon && res.summary.pokemon.length > 0) ||
         (res.summary.currency && res.summary.currency.length > 0) ||
-        (res.summary.cards && res.summary.cards.length > 0))
+        (res.summary.cards && res.summary.cards.length > 0) ||
+        (res.summary.icons && res.summary.icons.length > 0) ||
+        (res.summary.titles && res.summary.titles.length > 0))
     const isSuccess = isEndlessMode && hasRewards
 
     setResult({

@@ -27,6 +27,13 @@ export interface BaseGameConfig {
   skillXp?: SkillXpConfig
 }
 
+export type EndlessScoreInterval =
+  | number
+  | {
+      min: number
+      max: number
+    }
+
 // Re-export commonly used types
 export type { TaskIcon, TaskCondition, LocationReward }
 

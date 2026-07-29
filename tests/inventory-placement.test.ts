@@ -112,13 +112,16 @@ describe('inventory placement', () => {
   })
 
   test('field tms display in the dedicated tms pocket', () => {
-    for (const itemId of [
-      'tm-cut',
-      'tm-fly',
-      'tm-surf',
-      'tm-strength',
-      'tm-flash',
-    ]) {
+    const fieldHms = {
+      'tm-cut': 'HM01: Cut',
+      'tm-fly': 'HM02: Fly',
+      'tm-surf': 'HM03: Surf',
+      'tm-strength': 'HM04: Strength',
+      'tm-flash': 'HM05: Flash',
+    }
+
+    for (const [itemId, name] of Object.entries(fieldHms)) {
+      expect(item(itemId).name).toBe(name)
       expect(getInventoryDisplayPlacement(item(itemId))).toEqual({
         group: 'tms',
         subCategory: 'tms',
