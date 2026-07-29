@@ -21,7 +21,9 @@ interface UserContextType {
   user: User | null
   gameData: RequirementData | null
   setUser: (user: User) => void
-  refreshUser: (skipRouterRefresh?: boolean) => void
+  refreshUser: (
+    skipRouterRefresh?: boolean,
+  ) => Promise<RequirementData | undefined>
   updateUserContext: (partialUser: Partial<User>) => void
   isLoading: boolean
 }
@@ -65,18 +67,20 @@ export function UserProvider({
       dedupingInterval: 5 * 1000,
       revalidateOnFocus: true,
       revalidateIfStale: true,
-      fallbackData: initialGameData || (initialUser
-        ? ({
-            user: initialUser,
-            pokemon: [],
-            tasks: [],
-            locations: [],
-            expeditions: [],
-            allTcg: {},
-            taskSummary: { completed: 0, total: 0, byType: {} },
-            requirements: { skills: {}, currencies: {}, pokedex: {} },
-          } as unknown as RequirementData)
-        : undefined),
+      fallbackData:
+        initialGameData ||
+        (initialUser
+          ? ({
+              user: initialUser,
+              pokemon: [],
+              tasks: [],
+              locations: [],
+              expeditions: [],
+              allTcg: {},
+              taskSummary: { completed: 0, total: 0, byType: {} },
+              requirements: { skills: {}, currencies: {}, pokedex: {} },
+            } as unknown as RequirementData)
+          : undefined),
       revalidateOnMount: initialGameData ? false : undefined,
     },
   )
@@ -111,7 +115,6 @@ export function UserProvider({
       )
       return
     }
-
   }, [resolvedData, setInventory])
 
   // Handle auth errors
@@ -140,11 +143,12 @@ export function UserProvider({
   )
 
   const refreshUser = useCallback(
-    (skipRouterRefresh = true) => {
-      void mutate()
+    async (skipRouterRefresh = true) => {
+      const refreshedData = await mutate()
       if (skipRouterRefresh === false) {
         router.refresh()
       }
+      return refreshedData
     },
     [mutate, router],
   )

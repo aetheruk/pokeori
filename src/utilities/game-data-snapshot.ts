@@ -1,6 +1,12 @@
 import type { RequirementData } from '@/utilities/requirements'
 
 function getSnapshotTimestamp(data?: RequirementData | null) {
+  const snapshotAt = data?.snapshotAt
+  if (snapshotAt) {
+    const snapshotTimestamp = Date.parse(snapshotAt)
+    if (Number.isFinite(snapshotTimestamp)) return snapshotTimestamp
+  }
+
   const value = data?.user?.updatedAt
   if (!value) return Number.NaN
   return Date.parse(value)

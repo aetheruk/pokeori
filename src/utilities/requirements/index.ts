@@ -69,6 +69,7 @@ export interface ExpeditionResult {
 }
 
 export interface RequirementData {
+  snapshotAt?: string
   user: User
   rivalTrainer?: {
     id: string
@@ -818,8 +819,7 @@ export function getRequirementProgress(
 
     case 'rival_selected': {
       const extendedUser = user as ExtendedUser
-      current =
-        user.kidMode !== true && extendedUser.rivalTrainerId ? 1 : 0
+      current = user.kidMode !== true && extendedUser.rivalTrainerId ? 1 : 0
       break
     }
 
