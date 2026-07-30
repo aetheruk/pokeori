@@ -32,13 +32,14 @@ up after the stake is accepted. Rotom appears on both the machine marquee and
 the Explore game entry, while the Explore list gives UFO Catcher its own
 joystick game-type icon.
 
-All targets are items; UFO Catcher never returns Fun Tokens. The server makes
-five weighted draws without replacement when the attempt starts, so the
-revealed prizes are always distinct. Common medicine, gems, materials, and
-candies fill most cabinets, with rarer X items, special Poké Balls, and EV
-vitamins appearing through the same visible pool.
+UFO Catcher never returns Fun Tokens. The server makes five weighted draws
+without replacement when the attempt starts, so the revealed prizes are always
+distinct. Common medicine, gems, materials, and candies fill most cabinets,
+with rarer X items, special Poké Balls, evolution items, valuables, EV vitamins,
+and profile unlocks appearing through the same visible pool. A profile icon or
+title is removed from a trainer's eligible pool after they unlock it.
 
-Capture footprints deliberately tighten with item rarity: common prizes use a
+Capture footprints deliberately tighten with prize rarity: common prizes use a
 36-unit radius, uncommon prizes 32, rare prizes 27, and ultra-rare prizes 22.
 At the authored carriage speeds, a common prize permits roughly
 180ms of horizontal error when the depth is exact; the two-axis circular check
@@ -64,19 +65,24 @@ records a loss.
 
 ## Celadon balance
 
-Celadon has one UFO Catcher machine. It costs 50 Fun Tokens per attempt.
+Celadon has one UFO Catcher machine. It costs 30 Fun Tokens per attempt.
 
 | Pool entry | Quantity | Weight per entry | Rarity |
 | --- | ---: | ---: | --- |
 | Potion | 1 | 14 | Common |
 | Antidote | 1 | 12 | Common |
+| Each other single-status cure | 1 | 8 | Common |
 | XS Candy | 2 | 8 | Common |
 | S Candy | 2 | 6 | Common |
-| Each type gem | 1 | 2 | Common |
-| Each tier-one Pokémon material | 5 | 2 | Common |
+| Each type gem | 2 | 2 | Common |
+| Each tier-one Pokémon material | 3 | 2 | Common |
+| Full Heal | 1 | 2 | Uncommon |
 | Each X item / Dire Hit | 1 | 2 | Uncommon |
+| Rotom profile icon | 1 unlock | 1 | Uncommon |
+| UFO Master title | 1 unlock | 1 | Uncommon |
 | Ultra Ball | 1 | 4 | Rare |
 | Rocket Ball | 1 | 2 | Rare |
+| Link Cable, Up-Grade, Dubious Disc, or Nugget | 1 | 0.5 each | Rare |
 | Each EV vitamin | 1 | 0.5 | Ultra rare |
 
 Weights are relative and recalculate after each selected entry is removed. The

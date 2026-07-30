@@ -95,6 +95,38 @@ export function selectUfoCatcherPrizePool(
   return selected
 }
 
+export function getEligibleUfoCatcherTiers(
+  tiers: UfoCatcherPrizeTier[],
+  unlocks: {
+    unlockedIcons?: unknown
+    unlockedTitles?: unknown
+  },
+) {
+  const unlockedIcons = new Set(
+    Array.isArray(unlocks.unlockedIcons)
+      ? unlocks.unlockedIcons.filter(
+          (iconId): iconId is string => typeof iconId === 'string',
+        )
+      : [],
+  )
+  const unlockedTitles = new Set(
+    Array.isArray(unlocks.unlockedTitles)
+      ? unlocks.unlockedTitles.filter(
+          (titleId): titleId is string => typeof titleId === 'string',
+        )
+      : [],
+  )
+
+  return tiers.filter((tier) => {
+    const reward = tier.rewards[0]
+    const targetId = reward?.targetId?.toString()
+    if (!targetId) return true
+    if (reward.type === 'icon') return !unlockedIcons.has(targetId)
+    if (reward.type === 'title') return !unlockedTitles.has(targetId)
+    return true
+  })
+}
+
 export function buildUfoCatcherPrizeLayout({
   settings,
   tierRolls,

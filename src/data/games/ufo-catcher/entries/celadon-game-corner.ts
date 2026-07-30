@@ -90,6 +90,40 @@ function itemPrize({
   }
 }
 
+function profilePrize({
+  id,
+  label,
+  icon,
+  rewardType,
+  targetId,
+  weight,
+}: {
+  id: string
+  label: string
+  icon: UfoCatcherPrizeTier['icon']
+  rewardType: 'icon' | 'title'
+  targetId: string
+  weight: number
+}): UfoCatcherPrizeTier {
+  const rarity = 'uncommon'
+  return {
+    id,
+    label,
+    icon,
+    rarity,
+    weight,
+    ...gripByRarity[rarity],
+    rewards: [
+      {
+        type: rewardType,
+        targetId,
+        dropChance: 100,
+        label,
+      },
+    ],
+  }
+}
+
 const typeNames = [
   'Normal',
   'Fire',
@@ -150,12 +184,27 @@ const itemPrizePool: UfoCatcherPrizeTier[] = [
     weight: 12,
     rarity: 'common',
   }),
+  ...[
+    ['paralyze-heal', 'Paralyze Heal'],
+    ['awakening', 'Awakening'],
+    ['burn-heal', 'Burn Heal'],
+    ['ice-heal', 'Ice Heal'],
+  ].map(([itemId, name]) =>
+    itemPrize({
+      id: itemId,
+      label: name,
+      itemId,
+      quantity: 1,
+      weight: 8,
+      rarity: 'common',
+    }),
+  ),
   ...typeNames.map((type) =>
     itemPrize({
       id: `${type.toLowerCase()}-gems`,
-      label: `${type} Gem`,
+      label: `2 ${type} Gems`,
       itemId: `${type.toLowerCase()}-gem`,
-      quantity: 1,
+      quantity: 2,
       weight: 2,
       rarity: 'common',
     }),
@@ -163,9 +212,9 @@ const itemPrizePool: UfoCatcherPrizeTier[] = [
   ...materialFamilies.map(([itemId, name]) =>
     itemPrize({
       id: itemId,
-      label: `5 ${name}`,
+      label: `3 ${name}`,
       itemId,
-      quantity: 5,
+      quantity: 3,
       weight: 2,
       rarity: 'common',
     }),
@@ -186,6 +235,14 @@ const itemPrizePool: UfoCatcherPrizeTier[] = [
     weight: 6,
     rarity: 'common',
   }),
+  itemPrize({
+    id: 'full-heal',
+    label: 'Full Heal',
+    itemId: 'full-heal',
+    quantity: 1,
+    weight: 2,
+    rarity: 'uncommon',
+  }),
   ...[
     ['x-attack', 'X Attack'],
     ['x-defense', 'X Defense'],
@@ -203,6 +260,22 @@ const itemPrizePool: UfoCatcherPrizeTier[] = [
       rarity: 'uncommon',
     }),
   ),
+  profilePrize({
+    id: 'rotom-icon',
+    label: 'Rotom Icon',
+    icon: { type: 'pokemon', id: '479' },
+    rewardType: 'icon',
+    targetId: 'rotom',
+    weight: 1,
+  }),
+  profilePrize({
+    id: 'ufo-master-title',
+    label: 'UFO Master Title',
+    icon: { type: 'trainer', id: 'gamer' },
+    rewardType: 'title',
+    targetId: 'ufo-master',
+    weight: 1,
+  }),
   itemPrize({
     id: 'ultra-ball',
     label: 'Ultra Ball',
@@ -211,6 +284,21 @@ const itemPrizePool: UfoCatcherPrizeTier[] = [
     weight: 4,
     rarity: 'rare',
   }),
+  ...[
+    ['link-cable', 'Link Cable'],
+    ['up-grade', 'Up-Grade'],
+    ['dubious-disc', 'Dubious Disc'],
+    ['nugget', 'Nugget'],
+  ].map(([itemId, name]) =>
+    itemPrize({
+      id: itemId,
+      label: name,
+      itemId,
+      quantity: 1,
+      weight: 0.5,
+      rarity: 'rare',
+    }),
+  ),
   itemPrize({
     id: 'rocket-ball',
     label: 'Rocket Ball',
@@ -240,7 +328,7 @@ const itemPrizePool: UfoCatcherPrizeTier[] = [
 
 const ufoCatcherSettings: UfoCatcherSettings = {
   board,
-  cost: { currencyType: 'fun-tokens', amount: 50 },
+  cost: { currencyType: 'fun-tokens', amount: 30 },
   xTravelMs: 2400,
   yTravelMs: 1800,
   gripCurveExponent: 1.5,
@@ -257,7 +345,7 @@ export const celadonGameCornerUfoCatcherEntries: UfoCatcherGameConfig[] = [
     gameType: 'ufo-catcher',
     name: 'Rocket UFO Catcher',
     description:
-      'Guide the claw across the cabinet and back over an item prize before making your drop.',
+      'Guide the claw across the cabinet and back over a prize before making your drop.',
     category: 'Kanto',
     subCategory: 'Celadon Game Corner',
     icon: { type: 'pokemon', id: '479' },

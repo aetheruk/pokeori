@@ -571,11 +571,12 @@ const ufoCatcherSettingsSchema = z
       }
       tierIds.add(tier.id)
 
-      if (tier.rewards[0]?.type !== 'item') {
+      if (!['item', 'icon', 'title'].includes(tier.rewards[0]?.type || '')) {
         ctx.addIssue({
           code: 'custom',
           path: ['tiers', index, 'rewards'],
-          message: 'UFO Catcher prizes must award items only',
+          message:
+            'UFO Catcher prizes must award items or profile unlocks only',
         })
       }
     })

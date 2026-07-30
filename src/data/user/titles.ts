@@ -35,6 +35,7 @@ export const titles: TitleConfig[] = [
   { id: 'sky-high', name: 'Sky High' },
   { id: 'team-rocket-grunt', name: 'Team Rocket Grunt' },
   { id: 'gambler', name: 'Gambler' },
+  { id: 'ufo-master', name: 'UFO Master' },
   { id: 'golden-child', name: 'Golden Child' },
   { id: 'the-captain', name: 'The Captain' },
   { id: 'the-nido-king', name: 'The Nido King' },
