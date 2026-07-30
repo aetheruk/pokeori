@@ -30,6 +30,7 @@ import {
   MousePointerClick,
   Radar,
   Paintbrush,
+  Joystick,
 } from 'lucide-react'
 import { MdCatchingPokemon } from 'react-icons/md'
 import type { ExploreItem } from './types'
@@ -88,6 +89,8 @@ export const getTypeIcon = (item: ExploreItem) => {
         return <Coins className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'pachinko')
         return <CircleDot className="w-4 h-4 text-game-moss-strong" />
+      if (gameType === 'ufo-catcher')
+        return <Joystick className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'prize-wheel')
         return <Disc className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'battle-bets')
@@ -178,6 +181,8 @@ export const getGameTypeLabel = (item: ExploreItem) => {
       return 'SLOTS'
     case 'pachinko':
       return 'PACHINKO'
+    case 'ufo-catcher':
+      return 'UFO CATCHER'
     case 'prize-wheel':
       return 'WHEEL'
     case 'battle-bets':
