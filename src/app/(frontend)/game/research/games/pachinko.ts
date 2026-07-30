@@ -1,16 +1,12 @@
 'use server'
 
-import { redis } from '@/utilities/redis'
-import { allGames } from '@/data/games'
-import { getPayload } from 'payload'
 import configPromise from '@payload-config'
-import { grantRewards } from '@/utilities/rewards/reward-logic'
-import { mergeSummaries } from '../utils'
+import { getPayload } from 'payload'
 import {
-  getUser,
   type GameActivityState,
+  getUser,
 } from '@/app/(frontend)/game/_shared/activity-actions'
-import type { Reward } from '@/utilities/rewards/reward-logic'
+import { allGames } from '@/data/games'
 import {
   acquireActionLock,
   checkActionRateLimit,
@@ -18,8 +14,16 @@ import {
   releaseActionLock,
   setIdempotentResult,
 } from '@/utilities/game-integrity'
-import { incrementUserActivityResult } from '@/utilities/user-state'
+import { redis } from '@/utilities/redis'
 import { splitGuaranteedPachinkoCurrencyRewards } from '@/utilities/research/pachinko-rewards'
+import {
+  type PachinkoRoundRequest,
+  resolvePachinkoRound,
+} from '@/utilities/research/pachinko-round'
+import type { Reward } from '@/utilities/rewards/reward-logic'
+import { grantRewards } from '@/utilities/rewards/reward-logic'
+import { incrementUserActivityResult } from '@/utilities/user-state'
+import { mergeSummaries } from '../utils'
 
 type PachinkoSettlementResult = {
   success: boolean
@@ -28,24 +32,24 @@ type PachinkoSettlementResult = {
   rewards?: any
   summary?: any
   totalCost?: number
+  hitCount?: number
+  hitCounts?: Record<string, number>
+  isBonus?: boolean
 }
 
-function getDropResultKey(userId: string, dropId?: string) {
-  if (!dropId) return null
-  if (!/^[a-zA-Z0-9:_-]{1,80}$/.test(dropId)) return null
-  return `pachinko:drop-result:${userId}:${dropId}`
+function getRoundResultKey(userId: string, roundId: unknown) {
+  if (typeof roundId !== 'string' || !/^[a-zA-Z0-9:_-]{1,80}$/.test(roundId)) {
+    return null
+  }
+  return `pachinko:round-result:${userId}:${roundId}`
 }
 
-async function settlePachinkoDrop({
+export async function completePachinkoRound({
   encounterId,
-  bucketId,
-  dropId,
-  action,
+  request,
 }: {
   encounterId: string
-  bucketId?: string
-  dropId?: string
-  action: 'bucket' | 'miss'
+  request: PachinkoRoundRequest
 }): Promise<PachinkoSettlementResult> {
   try {
     const user = await getUser()
@@ -53,20 +57,18 @@ async function settlePachinkoDrop({
       return { success: false, error: 'Not authenticated' }
     }
 
-    const idempotentResultKey = getDropResultKey(user.id, dropId)
-    if (dropId && !idempotentResultKey) {
-      return { success: false, error: 'Invalid drop id' }
+    const idempotentResultKey = getRoundResultKey(user.id, request?.roundId)
+    if (!idempotentResultKey) {
+      return { success: false, error: 'Invalid round id' }
     }
 
-    if (idempotentResultKey) {
-      const cachedResult =
-        await getIdempotentResult<PachinkoSettlementResult>(idempotentResultKey)
-      if (cachedResult) return cachedResult
-    }
+    const cachedResult =
+      await getIdempotentResult<PachinkoSettlementResult>(idempotentResultKey)
+    if (cachedResult) return cachedResult
 
     const rateLimit = await checkActionRateLimit(
       user.id,
-      action === 'bucket' ? 'pachinko-drop' : 'pachinko-miss',
+      'pachinko-round',
       80,
       60,
     )
@@ -91,13 +93,9 @@ async function settlePachinkoDrop({
     const payload = await getPayload({ config: configPromise })
 
     try {
-      if (idempotentResultKey) {
-        const cachedResult =
-          await getIdempotentResult<PachinkoSettlementResult>(
-            idempotentResultKey,
-          )
-        if (cachedResult) return cachedResult
-      }
+      const lockedCachedResult =
+        await getIdempotentResult<PachinkoSettlementResult>(idempotentResultKey)
+      if (lockedCachedResult) return lockedCachedResult
 
       const state = (await redis.get(
         `game:${user.id}`,
@@ -112,6 +110,14 @@ async function settlePachinkoDrop({
       const encounter = allGames.find((e) => e.id === encounterId)
       if (encounter?.gameType !== 'pachinko') {
         return { success: false, error: 'Invalid game type' }
+      }
+
+      const resolvedRound = resolvePachinkoRound(
+        encounter.settings.board?.buckets || [],
+        request,
+      )
+      if (!resolvedRound.valid) {
+        return { success: false, error: resolvedRound.error }
       }
 
       // Cost Check using fresh user read
@@ -129,30 +135,20 @@ async function settlePachinkoDrop({
         }
       }
 
-      const bucket =
-        action === 'bucket'
-          ? encounter.settings.board?.buckets.find(
-              (b: { id: string }) => b.id === bucketId,
+      const roundRewards = resolvedRound.hitBuckets.flatMap(
+        (bucket) => bucket.rewards,
+      )
+      const isWin = roundRewards.length > 0
+      const { guaranteedCurrencyPayout, deferredRewards } =
+        cost && roundRewards.length > 0
+          ? splitGuaranteedPachinkoCurrencyRewards(
+              roundRewards,
+              cost.currencyType,
             )
-          : null
-      if (action === 'bucket' && !bucket) {
-        return { success: false, error: 'Invalid bucket' }
-      }
-
-      const hasRewards = bucket?.rewards && bucket.rewards.length > 0
-      const isWin = action === 'bucket' && hasRewards
-      const {
-        guaranteedCurrencyPayout,
-        deferredRewards,
-      } = cost && bucket?.rewards
-        ? splitGuaranteedPachinkoCurrencyRewards(
-            bucket.rewards,
-            cost.currencyType,
-          )
-        : {
-            guaranteedCurrencyPayout: 0,
-            deferredRewards: bucket?.rewards || [],
-          }
+          : {
+              guaranteedCurrencyPayout: 0,
+              deferredRewards: roundRewards,
+            }
       const settledBalance = cost
         ? currentBalance - cost.amount + guaranteedCurrencyPayout
         : freshUser.currency?.pokedollars || 0
@@ -182,7 +178,7 @@ async function settlePachinkoDrop({
       }
 
       // Grant Rewards
-      let dropSummary: any = guaranteedCurrencyPayout
+      let roundSummary: any = guaranteedCurrencyPayout
         ? {
             currency: [
               {
@@ -197,7 +193,7 @@ async function settlePachinkoDrop({
           user.id,
           deferredRewards as unknown as Reward[],
         )
-        dropSummary = mergeSummaries(dropSummary, res.summary)
+        roundSummary = mergeSummaries(roundSummary, res.summary)
       }
 
       // Update Redis
@@ -205,10 +201,10 @@ async function settlePachinkoDrop({
         totalRewards: {},
         totalCost: 0,
       }
-      if (dropSummary) {
+      if (roundSummary) {
         currentSession.totalRewards = mergeSummaries(
           currentSession.totalRewards,
-          dropSummary,
+          roundSummary,
         )
       }
       currentSession.totalCost =
@@ -222,45 +218,22 @@ async function settlePachinkoDrop({
       const response = {
         success: true,
         balance: settledBalance,
-        rewards: dropSummary,
+        rewards: roundSummary,
         summary: currentSession.totalRewards,
         totalCost: currentSession.totalCost,
+        hitCount: resolvedRound.hitBuckets.length,
+        hitCounts: resolvedRound.hitCounts,
+        isBonus: resolvedRound.isBonus,
       }
 
-      if (idempotentResultKey) {
-        await setIdempotentResult(idempotentResultKey, response, 600)
-      }
+      await setIdempotentResult(idempotentResultKey, response, 600)
 
       return response
     } finally {
       await releaseActionLock(actionLock)
     }
   } catch (error) {
-    console.error(`Error completing pachinko ${action}:`, error)
+    console.error('Error completing pachinko round:', error)
     return { success: false, error: 'Internal server error' }
   }
-}
-
-export async function completePachinkoDrop(
-  encounterId: string,
-  bucketId: string,
-  dropId?: string,
-) {
-  return settlePachinkoDrop({
-    encounterId,
-    bucketId,
-    dropId,
-    action: 'bucket',
-  })
-}
-
-/**
- * Track a missed pachinko drop (ball hit floor, not a bucket)
- * Deducts cost but gives no rewards, increments loss stat
- */
-export async function completePachinkoMiss(
-  encounterId: string,
-  dropId?: string,
-) {
-  return settlePachinkoDrop({ encounterId, dropId, action: 'miss' })
 }

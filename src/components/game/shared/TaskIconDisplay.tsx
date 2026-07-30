@@ -2,6 +2,7 @@
 
 import {
   Banknote,
+  ChevronsDown,
   ChevronsRight,
   ChevronsUp,
   Coins,
@@ -16,6 +17,7 @@ import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 
 const LUCIDE_ICONS: Record<string, any> = {
   ChevronsUp,
+  ChevronsDown,
   ChevronsRight,
   HelpCircle,
   Coins,

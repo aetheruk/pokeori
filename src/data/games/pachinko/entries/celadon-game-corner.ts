@@ -6,13 +6,11 @@ const rocketPachinkoSettings: PachinkoGameSettings = {
     height: 800,
     pegs: [],
     buckets: [
-      { id: 'fifteen-left', label: 'Prize', color: '#7c2d12', x: 70, y: 760, width: 72, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 15, dropChance: 100 }] },
-      { id: 'fifty', label: 'Jackpot', color: '#ca8a04', x: 300, y: 760, width: 28, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 50, dropChance: 100 }] },
-      { id: 'fifteen-right', label: 'Prize', color: '#7c2d12', x: 530, y: 760, width: 72, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 15, dropChance: 100 }] },
-    ],
-    obstacles: [
-      { x: 195, y: 650, width: 130, height: 10, angle: -0.24, bounce: 0.75 },
-      { x: 405, y: 650, width: 130, height: 10, angle: 0.24, bounce: 0.75 },
+      { id: 'fifteen-left', kind: 'prize', label: 'Prize', color: '#7c2d12', x: 70, y: 760, width: 90, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 15, dropChance: 100 }] },
+      { id: 'bonus-left', kind: 'bonus', label: '5-Ball Bonus Drop', color: '#b58a43', x: 185, y: 760, width: 32, height: 50, icon: { type: 'lucide', id: 'ChevronsDown' }, rewards: [] },
+      { id: 'fifty', kind: 'jackpot', label: 'Jackpot', color: '#ca8a04', x: 300, y: 760, width: 32, height: 50, icon: { type: 'pokemon', id: '100' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 50, dropChance: 100 }] },
+      { id: 'bonus-right', kind: 'bonus', label: '5-Ball Bonus Drop', color: '#b58a43', x: 415, y: 760, width: 32, height: 50, icon: { type: 'lucide', id: 'ChevronsDown' }, rewards: [] },
+      { id: 'fifteen-right', kind: 'prize', label: 'Prize', color: '#7c2d12', x: 530, y: 760, width: 90, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 15, dropChance: 100 }] },
     ],
     wallBounciness: 0.55,
   },
@@ -39,7 +37,7 @@ export const celadonGameCornerPachinkoEntries: PachinkoGameConfig[] = [
     id: 'celadon-rocket-pachinko',
     gameType: 'pachinko',
     name: 'Rocket Pachinko',
-    description: 'Drop a ball through the pegs and chase the narrow 50-token centre jackpot.',
+    description: 'Drop through the pegs for token prizes, the narrow 50-token Voltorb jackpot, or a five-ball Bonus Drop.',
     icon: { type: 'pokemon', id: '100' },
     background: '/backgrounds/celadon-game-corner-arcade.avif',
     category: 'Kanto',
@@ -58,7 +56,7 @@ export const celadonGameCornerPachinkoEntries: PachinkoGameConfig[] = [
     id: 'celadon-high-stakes-pachinko',
     gameType: 'pachinko',
     name: 'High Stakes Rocket Pachinko',
-    description: 'Twenty-five tokens buys a single drop toward the narrow 250-token jackpot.',
+    description: 'Twenty-five tokens buys a drop toward the 250-token Electrode jackpot or a five-ball Bonus Drop.',
     icon: { type: 'pokemon', id: '101' },
     background: '/backgrounds/celadon-game-corner-arcade.avif',
     category: 'Kanto',
@@ -72,6 +70,10 @@ export const celadonGameCornerPachinkoEntries: PachinkoGameConfig[] = [
         ...rocketPachinkoSettings.board,
         buckets: rocketPachinkoSettings.board.buckets.map((bucket) => ({
           ...bucket,
+          icon:
+            bucket.kind === 'jackpot'
+              ? { type: 'pokemon' as const, id: '101' }
+              : bucket.icon,
           rewards:
             bucket.id === 'fifty'
               ? [{ type: 'currency', targetId: 'fun-tokens', quantity: 250, dropChance: 100 }]

@@ -9,11 +9,13 @@ import { scratchCards } from '@/data/scratchcards'
 import { celadonGameCornerShops } from '@/data/shops/entries/celadon-game-corner'
 import { celadonGameCornerTasks } from '@/data/tasks/entries/celadon-game-corner'
 import {
+  getPachinkoBonusFan,
   getPachinkoBucketSensor,
   getPachinkoDropX,
   PACHINKO_DROP_TIMEOUT_MS,
 } from '@/utilities/research/pachinko-physics'
 import { splitGuaranteedPachinkoCurrencyRewards } from '@/utilities/research/pachinko-rewards'
+import { resolvePachinkoRound } from '@/utilities/research/pachinko-round'
 
 function getSlotRtp(game: (typeof celadonGameCornerSlotEntries)[number]) {
   const totalWeight = game.settings.paytable.reduce(
@@ -118,19 +120,19 @@ describe('Celadon Game Corner balance and presentation', () => {
 
     expect(celadonGameCornerPachinkoEntries[1].settings.cost?.amount).toBe(25)
     expect(
-      celadonGameCornerPachinkoEntries[1].settings.board.buckets.map(
-        (bucket) => bucket.rewards[0]?.quantity,
-      ),
+      celadonGameCornerPachinkoEntries[1].settings.board.buckets
+        .filter((bucket) => bucket.kind !== 'bonus')
+        .map((bucket) => bucket.rewards[0]?.quantity),
     ).toEqual([75, 250, 75])
     expect(
-      celadonGameCornerPachinkoEntries[0].settings.board.buckets.map(
-        (bucket) => bucket.label,
-      ),
+      celadonGameCornerPachinkoEntries[0].settings.board.buckets
+        .filter((bucket) => bucket.kind !== 'bonus')
+        .map((bucket) => bucket.label),
     ).toEqual(['Prize', 'Jackpot', 'Prize'])
     expect(
-      celadonGameCornerPachinkoEntries[1].settings.board.buckets.map(
-        (bucket) => bucket.label,
-      ),
+      celadonGameCornerPachinkoEntries[1].settings.board.buckets
+        .filter((bucket) => bucket.kind !== 'bonus')
+        .map((bucket) => bucket.label),
     ).toEqual(['Prize', 'Jackpot', 'Prize'])
 
     expect(celadonGameCornermatch3gamesEntries[1].criteria?.[0]?.count).toBe(50)
@@ -310,11 +312,16 @@ describe('Celadon Game Corner balance and presentation', () => {
       (bucket) => bucket.id === 'fifty',
     )
 
-    const [leftBucket, , rightBucket] = game.settings.board.buckets
+    const leftBucket = game.settings.board.buckets.find(
+      (bucket) => bucket.id === 'fifteen-left',
+    )
+    const rightBucket = game.settings.board.buckets.find(
+      (bucket) => bucket.id === 'fifteen-right',
+    )
 
-    expect(leftBucket).toMatchObject({ x: 70, width: 72 })
-    expect(jackpot?.width).toBe(28)
-    expect(rightBucket).toMatchObject({ x: 530, width: 72 })
+    expect(leftBucket).toMatchObject({ x: 70, width: 90 })
+    expect(jackpot?.width).toBe(32)
+    expect(rightBucket).toMatchObject({ x: 530, width: 90 })
     expect(
       getPachinkoDropX({
         arrowPosition: 0,
@@ -332,10 +339,99 @@ describe('Celadon Game Corner balance and presentation', () => {
     expect(jackpot && getPachinkoBucketSensor(jackpot, ballRadius)).toEqual({
       x: 300,
       y: 773,
-      width: 6,
+      width: 10,
       height: 2,
     })
     expect(PACHINKO_DROP_TIMEOUT_MS).toBe(30_000)
+  })
+
+  test('resolves one paid Pachinko round into five bonus outcomes', () => {
+    const buckets = celadonGameCornerPachinkoEntries[0].settings.board.buckets
+    const resolved = resolvePachinkoRound(buckets, {
+      roundId: 'round-1',
+      triggerBucketId: 'bonus-left',
+      outcomeBucketIds: ['fifteen-left', null, 'fifty', 'fifteen-left', null],
+    })
+
+    expect(resolved).toEqual({
+      valid: true,
+      isBonus: true,
+      hitBuckets: [
+        expect.objectContaining({ id: 'fifteen-left' }),
+        expect.objectContaining({ id: 'fifty' }),
+        expect.objectContaining({ id: 'fifteen-left' }),
+      ],
+      hitCounts: {
+        'fifteen-left': 2,
+        fifty: 1,
+      },
+    })
+    if (resolved.valid) {
+      expect(
+        splitGuaranteedPachinkoCurrencyRewards(
+          resolved.hitBuckets.flatMap((bucket) => bucket.rewards),
+          'fun-tokens',
+        ).guaranteedCurrencyPayout,
+      ).toBe(80)
+    }
+
+    expect(
+      resolvePachinkoRound(buckets, {
+        roundId: 'round-2',
+        triggerBucketId: 'bonus-left',
+        outcomeBucketIds: ['fifty'],
+      }),
+    ).toEqual({
+      valid: false,
+      error: 'Bonus drops must resolve 5 balls',
+    })
+    expect(
+      resolvePachinkoRound(buckets, {
+        roundId: 'round-3',
+        outcomeBucketIds: ['bonus-right'],
+      }),
+    ).toEqual({
+      valid: false,
+      error: 'Invalid outcome bucket',
+    })
+  })
+
+  test('fans all five Pachinko bonus balls within the board walls', () => {
+    expect(
+      getPachinkoBonusFan({
+        dropX: 300,
+        boardWidth: 600,
+        ballRadius: 8,
+      }),
+    ).toEqual([
+      { x: 284, xVelocity: -2.4 },
+      { x: 292, xVelocity: -1.2 },
+      { x: 300, xVelocity: 0 },
+      { x: 308, xVelocity: 1.2 },
+      { x: 316, xVelocity: 2.4 },
+    ])
+    expect(
+      getPachinkoBonusFan({
+        dropX: 14,
+        boardWidth: 600,
+        ballRadius: 8,
+      }).map((ball) => ball.x),
+    ).toEqual([14, 14, 14, 22, 30])
+  })
+
+  test('uses Voltorb and Electrode for the Pachinko jackpots', () => {
+    const [standard, highStakes] = celadonGameCornerPachinkoEntries
+
+    expect(
+      standard.settings.board.buckets.find(
+        (bucket) => bucket.kind === 'jackpot',
+      )?.icon,
+    ).toEqual({ type: 'pokemon', id: '100' })
+    expect(
+      highStakes.settings.board.buckets.find(
+        (bucket) => bucket.kind === 'jackpot',
+      )?.icon,
+    ).toEqual({ type: 'pokemon', id: '101' })
   })
 
   test('shows named slot prizes and distinguishable wheel segments', () => {
