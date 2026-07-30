@@ -46,6 +46,7 @@ export const icons: IconConfig[] = [
     name: 'Gambler',
     icon: { type: 'trainer', id: 'gamer' },
   },
+  { id: 'rotom', name: 'Rotom', icon: { type: 'pokemon', id: '479' } },
   {
     id: 'trainer-gb-red',
     name: 'Red 1',

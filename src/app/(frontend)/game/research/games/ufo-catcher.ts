@@ -25,6 +25,7 @@ import {
 import { redis } from '@/utilities/redis'
 import {
   buildUfoCatcherPrizeLayout,
+  getEligibleUfoCatcherTiers,
   resolveUfoCatcherAttempt,
   type UfoCatcherControlInput,
 } from '@/utilities/research/ufo-catcher'
@@ -168,12 +169,22 @@ export async function startUfoCatcherAttempt(
       }
 
       const prizeCount = encounter.settings.prizeCount
+      const eligibleTiers = getEligibleUfoCatcherTiers(
+        encounter.settings.tiers,
+        {
+          unlockedIcons: freshUser.unlockedIcons,
+          unlockedTitles: freshUser.unlockedTitles,
+        },
+      )
       const publicAttempt: UfoCatcherPublicAttempt = {
         attemptId: crypto.randomUUID(),
         encounterId,
         createdAt: Date.now(),
         prizes: buildUfoCatcherPrizeLayout({
-          settings: encounter.settings as UfoCatcherSettings,
+          settings: {
+            ...(encounter.settings as UfoCatcherSettings),
+            tiers: eligibleTiers,
+          },
           tierRolls: Array.from({ length: prizeCount }, secureRoll),
           anchorRolls: Array.from({ length: prizeCount }, secureRoll),
           jitterRolls: Array.from({ length: prizeCount }, () => ({

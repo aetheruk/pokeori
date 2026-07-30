@@ -7,9 +7,12 @@ import {
 import { allGames } from '@/data/games'
 import { celadonGameCornerUfoCatcherEntries } from '@/data/games/ufo-catcher/entries/celadon-game-corner'
 import { validateGameItem } from '@/data/games/schemas'
+import { getIcon } from '@/data/user/icons'
+import { getTitle } from '@/data/user/titles'
 import { getGameActivityRoute } from '@/utilities/games/activity-domain'
 import {
   buildUfoCatcherPrizeLayout,
+  getEligibleUfoCatcherTiers,
   getUfoCatcherCoordinates,
   resolveUfoCatcherAttempt,
   selectUfoCatcherPrizePool,
@@ -35,24 +38,31 @@ function getItemReward(tierId: string) {
 }
 
 describe('UFO Catcher authored balance', () => {
-  test('authors one 50-token item-only machine with five prizes per play', () => {
+  test('authors one 30-token non-currency machine with five prizes per play', () => {
     expect(celadonGameCornerUfoCatcherEntries.map((entry) => entry.id)).toEqual(
       ['celadon-rocket-ufo-catcher'],
     )
     expect(standard.settings.cost).toEqual({
       currencyType: 'fun-tokens',
-      amount: 50,
+      amount: 30,
     })
     expect(standard.settings.prizeCount).toBe(5)
     expect(standard.icon).toEqual({ type: 'pokemon', id: '479' })
     expect(
       standard.settings.tiers.every(
-        (tier) => tier.rewards.length === 1 && tier.rewards[0]?.type === 'item',
+        (tier) =>
+          tier.rewards.length === 1 &&
+          ['item', 'icon', 'title'].includes(tier.rewards[0]?.type || ''),
       ),
     ).toBe(true)
+    expect(
+      standard.settings.tiers.some((tier) =>
+        tier.rewards.some((reward) => reward.type === 'currency'),
+      ),
+    ).toBe(false)
   })
 
-  test('includes the requested consumables, gems, materials, balls, and vitamins', () => {
+  test('includes the requested consumables, gems, materials, balls, evolution items, and vitamins', () => {
     expect(getItemReward('potions')).toMatchObject({
       targetId: 'battle-potion',
       quantity: 1,
@@ -61,6 +71,18 @@ describe('UFO Catcher authored balance', () => {
       targetId: 'antidote',
       quantity: 1,
     })
+    for (const itemId of [
+      'paralyze-heal',
+      'awakening',
+      'burn-heal',
+      'ice-heal',
+      'full-heal',
+    ]) {
+      expect(getItemReward(itemId)).toMatchObject({
+        targetId: itemId,
+        quantity: 1,
+      })
+    }
     expect(getItemReward('xs-candy')).toMatchObject({
       targetId: 'rare-candy-xs',
       quantity: 2,
@@ -92,7 +114,7 @@ describe('UFO Catcher authored balance', () => {
     ]) {
       expect(getItemReward(`${type}-gems`)).toMatchObject({
         targetId: `${type}-gem`,
-        quantity: 1,
+        quantity: 2,
       })
     }
 
@@ -118,7 +140,7 @@ describe('UFO Catcher authored balance', () => {
     ]) {
       expect(getItemReward(materialId)).toMatchObject({
         targetId: materialId,
-        quantity: 5,
+        quantity: 3,
       })
     }
 
@@ -131,6 +153,10 @@ describe('UFO Catcher authored balance', () => {
       'dire-hit',
       'ultra-ball',
       'rocket-ball',
+      'link-cable',
+      'up-grade',
+      'dubious-disc',
+      'nugget',
       'hp-up',
       'protein',
       'iron',
@@ -143,6 +169,46 @@ describe('UFO Catcher authored balance', () => {
         quantity: 1,
       })
     }
+  })
+
+  test('authors medium-rare Rotom icon and UFO Master title unlocks', () => {
+    expect(
+      standard.settings.tiers.find((tier) => tier.id === 'rotom-icon'),
+    ).toMatchObject({
+      label: 'Rotom Icon',
+      icon: { type: 'pokemon', id: '479' },
+      rarity: 'uncommon',
+      weight: 1,
+      rewards: [
+        {
+          type: 'icon',
+          targetId: 'rotom',
+          dropChance: 100,
+        },
+      ],
+    })
+    expect(
+      standard.settings.tiers.find((tier) => tier.id === 'ufo-master-title'),
+    ).toMatchObject({
+      label: 'UFO Master Title',
+      rarity: 'uncommon',
+      weight: 1,
+      rewards: [
+        {
+          type: 'title',
+          targetId: 'ufo-master',
+          dropChance: 100,
+        },
+      ],
+    })
+    expect(getIcon('rotom')).toMatchObject({
+      name: 'Rotom',
+      icon: { type: 'pokemon', id: '479' },
+    })
+    expect(getTitle('ufo-master')).toEqual({
+      id: 'ufo-master',
+      name: 'UFO Master',
+    })
   })
 
   test('makes rarer items progressively harder to grip', () => {
@@ -233,8 +299,19 @@ describe('UFO Catcher geometry and resolution', () => {
       selectUfoCatcherTier(standard.settings.tiers, firstBoundary).id,
     ).toBe('antidotes')
     expect(selectUfoCatcherTier(standard.settings.tiers, 0.999999).id).toBe(
-      'carbos',
+      standard.settings.tiers.at(-1)!.id,
     )
+  })
+
+  test('removes profile prizes from future cabinets after they are unlocked', () => {
+    const eligible = getEligibleUfoCatcherTiers(standard.settings.tiers, {
+      unlockedIcons: ['rotom'],
+      unlockedTitles: ['ufo-master'],
+    })
+
+    expect(eligible.some((tier) => tier.id === 'rotom-icon')).toBe(false)
+    expect(eligible.some((tier) => tier.id === 'ufo-master-title')).toBe(false)
+    expect(eligible.some((tier) => tier.id === 'link-cable')).toBe(true)
   })
 
   test('selects five distinct weighted prizes and randomized unique anchors', () => {
@@ -377,7 +454,7 @@ describe('UFO Catcher registration and validation', () => {
     expect(result.success).toBe(false)
     if (!result.success) {
       expect(result.error.issues.map((issue) => issue.message)).toContain(
-        'UFO Catcher prizes must award items only',
+        'UFO Catcher prizes must award items or profile unlocks only',
       )
     }
   })
