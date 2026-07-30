@@ -485,7 +485,7 @@ describe('generated game data schemas', () => {
       ).toBe(true)
       expect(
         game.settings.board.buckets.map((bucket: { x: number }) => bucket.x),
-      ).toEqual([80, 300, 520])
+      ).toEqual([70, 300, 530])
       expect(game.settings.board.obstacles).toHaveLength(2)
       expect(
         (game.settings.board.obstacles || []).every(

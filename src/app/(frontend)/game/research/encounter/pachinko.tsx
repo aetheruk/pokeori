@@ -54,6 +54,18 @@ function getRewardLabel(reward: any) {
   return reward?.label || reward?.targetId || reward?.type || 'Prize'
 }
 
+function getAwardedRewardLabel(summary: any) {
+  const currencyReward = summary?.currency?.[0]
+  if (currencyReward?.type && currencyReward?.quantity) {
+    const currency = getCurrency(currencyReward.type)
+    return `${currencyReward.quantity} ${
+      currency?.name || currencyReward.type
+    }`
+  }
+
+  return null
+}
+
 // Prizes Modal Component
 function PrizesModal({ buckets }: { buckets: any[] }) {
   return (
@@ -487,8 +499,8 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
 
     const dropId = getBallDropId(ballBody)
     const result = bucketId
-      ? await completePachinkoDrop(bucketId, dropId)
-      : await completePachinkoMiss(dropId)
+      ? await completePachinkoDrop(encounter.id, bucketId, dropId)
+      : await completePachinkoMiss(encounter.id, dropId)
 
     setPendingDrops((prev) => Math.max(0, prev - 1))
     setIsDropping(false)
@@ -509,6 +521,7 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
       playSfx('good')
       const bucket = config.board.buckets.find((b) => b.id === bucketId)
       const rewardLabel =
+        getAwardedRewardLabel(result.rewards) ||
         (bucket?.rewards?.[0] && getRewardLabel(bucket.rewards[0])) ||
         bucket?.label ||
         'Added to session winnings'
