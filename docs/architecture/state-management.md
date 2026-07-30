@@ -27,6 +27,10 @@ Backend data managed via Payload CMS:
 - **Game Data**: Static data imported from `src/data/` modules
 
 ## State Sync
-- User data polls every 5 minutes via `UserContext`
-- Payload CMS handles session/auth state via cookies
-- No client-side cache (SWR installed but unused)
+- Route-scoped player data is cached by SWR in `UserContext` and revalidates
+  every 5 minutes and when the window regains focus
+- Initial Server Component snapshots seed SWR on the main management routes
+- Failed syncs retain the latest usable snapshot; only independently confirmed
+  authentication loss redirects to `/auth`
+- Payload CMS handles authentication through an HTTP-only cookie, while the
+  persistent game shell refreshes active sessions before token expiry

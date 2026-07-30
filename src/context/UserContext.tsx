@@ -16,6 +16,10 @@ import type { RequirementData } from '@/utilities/requirements'
 import { useGameDataScope } from '@/hooks/use-game-data-scope'
 import type { GameDataScope } from '@/utilities/game-data-scopes'
 import { selectFreshestGameData } from '@/utilities/game-data-snapshot'
+import {
+  ApiResponseError,
+  isAuthenticationError,
+} from '@/utilities/auth/session-policy'
 
 interface UserContextType {
   user: User | null
@@ -31,13 +35,20 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined)
 
 const fetcher = async (url: string) => {
-  const res = await fetch(url)
+  const res = await fetch(url, {
+    credentials: 'include',
+    cache: 'no-store',
+  })
+
   if (!res.ok) {
-    if (res.status === 401) {
-      throw new Error('Unauthorized')
-    }
-    throw new Error('Failed to fetch')
+    const requestId = res.headers.get('x-request-id') || undefined
+    throw new ApiResponseError(
+      `Game data refresh failed with status ${res.status}`,
+      res.status,
+      requestId,
+    )
   }
+
   return res.json()
 }
 
@@ -67,6 +78,8 @@ export function UserProvider({
       dedupingInterval: 5 * 1000,
       revalidateOnFocus: true,
       revalidateIfStale: true,
+      shouldRetryOnError: (refreshError) =>
+        !isAuthenticationError(refreshError),
       fallbackData:
         initialGameData ||
         (initialUser
@@ -117,13 +130,51 @@ export function UserProvider({
     }
   }, [resolvedData, setInventory])
 
-  // Handle auth errors
+  // Confirm apparent auth failures before leaving the current game screen. A
+  // transient sync or auth-check failure must not look like a logout.
   useEffect(() => {
-    if (error) {
-      setInventory({})
-      router.push('/auth')
+    if (!error || !isAuthenticationError(error)) return
+
+    let cancelled = false
+
+    const confirmAuthenticationLoss = async () => {
+      try {
+        const response = await fetch('/api/auth/check', {
+          method: 'POST',
+          credentials: 'include',
+          cache: 'no-store',
+        })
+
+        if (cancelled) return
+
+        if (response.ok) {
+          void mutate()
+          return
+        }
+
+        if (response.status !== 401) {
+          console.error(
+            `Unable to confirm authentication after game sync returned ${error.status}`,
+          )
+          return
+        }
+
+        setInventory({})
+        router.replace('/auth')
+      } catch (authCheckError) {
+        console.error(
+          'Unable to confirm authentication after game sync failed',
+          authCheckError,
+        )
+      }
     }
-  }, [error, router, setInventory])
+
+    void confirmAuthenticationLoss()
+
+    return () => {
+      cancelled = true
+    }
+  }, [error, mutate, router, setInventory])
 
   const setUser = useCallback(
     (newUser: User) => {

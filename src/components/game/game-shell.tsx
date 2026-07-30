@@ -5,6 +5,7 @@ import { GameErrorBoundary } from '@/components/game/GameErrorBoundary'
 import { GameNavigation } from '@/components/game/game-navigation'
 import { AudioProvider } from '@/context/AudioContext'
 import { UserProvider } from '@/context/UserContext'
+import { useAuthSessionKeepalive } from '@/hooks/use-auth-session-keepalive'
 import { cn } from '@/lib/utils'
 import type { User } from '@/payload-types'
 
@@ -16,6 +17,8 @@ export function GameShell({
   user?: User | null
 }) {
   const pathname = usePathname()
+  useAuthSessionKeepalive()
+
   const isEncounter = pathname.startsWith('/game/locations/encounter')
   const isGameActivity =
     pathname.startsWith('/game/games/') ||

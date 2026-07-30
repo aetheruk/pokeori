@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { skills } from '../data/skills/index'
 import superAdminCheck, { adminOrSelf } from '@/utilities/access'
+import { GAME_AUTH_TOKEN_EXPIRATION_SECONDS } from '@/utilities/auth/session-policy'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -8,7 +9,9 @@ export const Users: CollectionConfig = {
     useAsTitle: 'email',
   },
   auth: {
-    tokenExpiration: 7200, // 2 hours
+    // Keep installed/PWA players signed in between visits. The active game shell
+    // refreshes this token before it expires.
+    tokenExpiration: GAME_AUTH_TOKEN_EXPIRATION_SECONDS,
   },
   access: {
     admin: superAdminCheck,
