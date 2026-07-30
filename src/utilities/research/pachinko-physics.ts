@@ -4,6 +4,32 @@ export const PACHINKO_WALL_WIDTH = 10
 export const PACHINKO_BUCKET_RAIL_WIDTH = 6
 export const PACHINKO_BUCKET_SENSOR_HEIGHT = 2
 export const PACHINKO_DROP_TIMEOUT_MS = 30_000
+export const PACHINKO_BONUS_BALL_COUNT = 5
+
+const PACHINKO_BONUS_FAN = [
+  { xOffset: -16, xVelocity: -2.4 },
+  { xOffset: -8, xVelocity: -1.2 },
+  { xOffset: 0, xVelocity: 0 },
+  { xOffset: 8, xVelocity: 1.2 },
+  { xOffset: 16, xVelocity: 2.4 },
+] as const
+
+export function getPachinkoBonusFan({
+  dropX,
+  boardWidth,
+  ballRadius,
+}: {
+  dropX: number
+  boardWidth: number
+  ballRadius: number
+}) {
+  const wallInset = PACHINKO_WALL_WIDTH / 2 + ballRadius + 1
+
+  return PACHINKO_BONUS_FAN.map(({ xOffset, xVelocity }) => ({
+    x: Math.min(boardWidth - wallInset, Math.max(wallInset, dropX + xOffset)),
+    xVelocity,
+  }))
+}
 
 export function getPachinkoDropX({
   arrowPosition,

@@ -362,6 +362,7 @@ const pachinkoPegSchema = z
 const pachinkoBucketSchema = z
   .object({
     id: z.string().min(1),
+    kind: z.enum(['prize', 'jackpot', 'bonus']).optional(),
     x: z.number().nonnegative(),
     y: z.number().nonnegative(),
     width: z.number().positive(),
@@ -407,6 +408,14 @@ const pachinkoBoardSchema = z
         })
       }
       bucketIds.add(bucket.id)
+
+      if (bucket.kind === 'bonus' && bucket.rewards.length > 0) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['buckets', index, 'rewards'],
+          message: 'Pachinko bonus buckets cannot award direct rewards',
+        })
+      }
 
       const halfWidth = bucket.width / 2
       const halfHeight = bucket.height / 2

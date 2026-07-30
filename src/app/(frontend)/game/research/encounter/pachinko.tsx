@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { startGame } from '@/app/(frontend)/game/games/actions'
+import { completeGame, startGame } from '@/app/(frontend)/game/games/actions'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { Button } from '@/components/ui/button'
@@ -29,19 +29,30 @@ import type {
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
 import {
+  getPachinkoBonusFan,
   getPachinkoBucketSensor,
   getPachinkoDropX,
+  PACHINKO_BONUS_BALL_COUNT,
   PACHINKO_BUCKET_RAIL_WIDTH,
   PACHINKO_DROP_TIMEOUT_MS,
   PACHINKO_WALL_WIDTH,
 } from '@/utilities/research/pachinko-physics'
-import { completeGame } from '@/app/(frontend)/game/games/actions'
-import { completePachinkoDrop, completePachinkoMiss } from '../games/pachinko'
+import { completePachinkoRound } from '../games/pachinko'
 
 interface PachinkoGameProps {
   encounter: PachinkoGameConfig
   initialState?: any
   state?: any
+}
+
+interface ActivePachinkoRound {
+  roundId: string
+  dropX: number
+  mode: 'normal' | 'bonus'
+  triggerBucketId?: string
+  pendingBodyIds: Set<number>
+  outcomeBucketIds: Array<string | null>
+  settlementStarted: boolean
 }
 
 function getRewardLabel(reward: any) {
@@ -58,9 +69,7 @@ function getAwardedRewardLabel(summary: any) {
   const currencyReward = summary?.currency?.[0]
   if (currencyReward?.type && currencyReward?.quantity) {
     const currency = getCurrency(currencyReward.type)
-    return `${currencyReward.quantity} ${
-      currency?.name || currencyReward.type
-    }`
+    return `${currencyReward.quantity} ${currency?.name || currencyReward.type}`
   }
 
   return null
@@ -109,6 +118,11 @@ function PrizesModal({ buckets }: { buckets: any[] }) {
                     {getRewardLabel(reward)}
                   </div>
                 ))}
+                {bucket.kind === 'bonus' && (
+                  <div className="text-sm leading-tight text-game-muted">
+                    Five balls for the price of one drop
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -124,7 +138,12 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
   const engineRef = useRef<Matter.Engine | null>(null)
   const runnerRef = useRef<Matter.Runner | null>(null)
   const renderRef = useRef<Matter.Render | null>(null)
-  const dropTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const dropTimeoutsRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(
+    new Map(),
+  )
+  const activeRoundRef = useRef<ActivePachinkoRound | null>(null)
+  const bonusTargetBodiesRef = useRef<Map<string, Matter.Body[]>>(new Map())
+  const bonusTargetsInWorldRef = useRef(true)
   const settledBodyIdsRef = useRef<Set<number>>(new Set())
   const router = useRouter()
   const { playSfx } = useAudio()
@@ -141,6 +160,7 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
     state?.pachinkoSession?.totalCost || 0,
   )
   const [pendingDrops, setPendingDrops] = useState(0)
+  const [isBonusDrop, setIsBonusDrop] = useState(false)
   const [lastDropMessage, setLastDropMessage] = useState(
     'Line up the marker and drop.',
   )
@@ -177,10 +197,10 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (dropTimeoutRef.current) {
-        clearTimeout(dropTimeoutRef.current)
-        dropTimeoutRef.current = null
+      for (const timeout of dropTimeoutsRef.current.values()) {
+        clearTimeout(timeout)
       }
+      dropTimeoutsRef.current.clear()
       if (renderRef.current) {
         Matter.Render.stop(renderRef.current)
         if (renderRef.current.canvas) {
@@ -304,6 +324,15 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
         wallOptions,
       )
       bucketWalls.push(bottomBucketWall)
+
+      if (bucket.kind === 'bonus') {
+        bonusTargetBodiesRef.current.set(bucket.id, [
+          sensor,
+          leftBucketWall,
+          rightBucketWall,
+          bottomBucketWall,
+        ])
+      }
     })
 
     const obstacles: Matter.Body[] = []
@@ -409,10 +438,6 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
     Runner.run(runner, engine)
   }, [config, themeColour])
 
-  const getBallDropId = (ballBody: Matter.Body) => {
-    return ((ballBody.plugin || {}) as { dropId?: string }).dropId
-  }
-
   const animateBallIntoBucket = (ballBody: Matter.Body, bucketId: string) => {
     return new Promise<void>((resolve) => {
       const engine = engineRef.current
@@ -476,77 +501,199 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
     })
   }
 
-  const completeDropSettlement = async ({
+  const setBonusTargetsActive = (active: boolean) => {
+    const engine = engineRef.current
+    if (!engine || bonusTargetsInWorldRef.current === active) return
+
+    const targetBodies = [...bonusTargetBodiesRef.current.values()].flat()
+    if (active) {
+      Matter.Composite.add(engine.world, targetBodies)
+    } else {
+      for (const body of targetBodies) {
+        Matter.Composite.remove(engine.world, body)
+      }
+    }
+    bonusTargetsInWorldRef.current = active
+  }
+
+  const spawnRoundBall = ({
+    round,
+    x,
+    xVelocity,
+  }: {
+    round: ActivePachinkoRound
+    x: number
+    xVelocity: number
+  }) => {
+    const engine = engineRef.current
+    if (!engine) return
+
+    const ballRadius = config.ballRadius || 8
+    const ball = Matter.Bodies.circle(x, 20, ballRadius, {
+      restitution: config.ballBounciness || 0.6,
+      friction: 0.001,
+      mass: 5,
+      label: 'BALL',
+      plugin: { roundId: round.roundId },
+      render: { fillStyle: '#fff' },
+    })
+
+    round.pendingBodyIds.add(ball.id)
+    Matter.Composite.add(engine.world, ball)
+    Matter.Body.setVelocity(ball, { x: xVelocity, y: 0 })
+
+    const timeout = setTimeout(() => {
+      void resolvePachinkoBall({ ballBody: ball })
+    }, PACHINKO_DROP_TIMEOUT_MS)
+    dropTimeoutsRef.current.set(ball.id, timeout)
+  }
+
+  const finishPachinkoRound = async (round: ActivePachinkoRound) => {
+    if (round.settlementStarted || round.pendingBodyIds.size > 0) return
+    if (activeRoundRef.current?.roundId !== round.roundId) return
+
+    round.settlementStarted = true
+
+    try {
+      const result = await completePachinkoRound({
+        encounterId: encounter.id,
+        request: {
+          roundId: round.roundId,
+          triggerBucketId: round.triggerBucketId,
+          outcomeBucketIds: round.outcomeBucketIds,
+        },
+      })
+
+      if (!result.success) {
+        toast.error(result.error || 'Drop failed')
+        setLastDropMessage(result.error || 'Drop failed')
+        return
+      }
+
+      setSessionSummary(result.summary || {})
+      setSessionCost(
+        (current) => result.totalCost ?? current + (cost?.amount || 0),
+      )
+      refreshUser(false)
+
+      if (result.rewards) {
+        playSfx('good')
+        const rewardLabel =
+          getAwardedRewardLabel(result.rewards) || 'Added to session winnings'
+        const hitCopy =
+          result.isBonus && result.hitCount
+            ? ` from ${result.hitCount} ${
+                result.hitCount === 1 ? 'winning ball' : 'winning balls'
+              }`
+            : ''
+
+        setLastDropMessage(
+          result.isBonus
+            ? `Bonus Drop: ${rewardLabel}${hitCopy}`
+            : `Prize: ${rewardLabel}`,
+        )
+        toast.success(result.isBonus ? 'Bonus prize!' : 'Prize!', {
+          description: `${rewardLabel}${hitCopy}`,
+        })
+      } else {
+        playSfx('bad')
+        setLastDropMessage(
+          result.isBonus
+            ? 'Bonus Drop complete — all five balls missed.'
+            : 'Missed the prize slots.',
+        )
+        toast.info('Miss', {
+          description: result.isBonus
+            ? 'No prize from the five bonus balls.'
+            : 'No prize this drop.',
+        })
+      }
+    } catch {
+      toast.error('Drop failed')
+      setLastDropMessage('Drop failed')
+    } finally {
+      setBonusTargetsActive(true)
+      setIsBonusDrop(false)
+      setPendingDrops((previous) => Math.max(0, previous - 1))
+      setIsDropping(false)
+      activeRoundRef.current = null
+    }
+  }
+
+  const startBonusDrop = (
+    round: ActivePachinkoRound,
+    triggerBucketId: string,
+  ) => {
+    round.mode = 'bonus'
+    round.triggerBucketId = triggerBucketId
+    setBonusTargetsActive(false)
+    setIsBonusDrop(true)
+    setLastDropMessage(
+      `BONUS DROP! ${PACHINKO_BONUS_BALL_COUNT} balls are in play.`,
+    )
+    playSfx('good')
+
+    const fan = getPachinkoBonusFan({
+      dropX: round.dropX,
+      boardWidth: config.board.width,
+      ballRadius: config.ballRadius || 8,
+    })
+    for (const ball of fan) {
+      spawnRoundBall({
+        round,
+        x: ball.x,
+        xVelocity: ball.xVelocity,
+      })
+    }
+  }
+
+  const resolvePachinkoBall = async ({
     ballBody,
     bucketId,
   }: {
     ballBody: Matter.Body
     bucketId?: string
   }) => {
-    if (!engineRef.current) return
+    const engine = engineRef.current
+    const round = activeRoundRef.current
+    if (!engine || !round?.pendingBodyIds.has(ballBody.id)) return
     if (settledBodyIdsRef.current.has(ballBody.id)) return
 
     settledBodyIdsRef.current.add(ballBody.id)
-    if (dropTimeoutRef.current) {
-      clearTimeout(dropTimeoutRef.current)
-      dropTimeoutRef.current = null
-    }
+    const timeout = dropTimeoutsRef.current.get(ballBody.id)
+    if (timeout) clearTimeout(timeout)
+    dropTimeoutsRef.current.delete(ballBody.id)
+
+    const bucket = bucketId
+      ? config.board.buckets.find((entry) => entry.id === bucketId)
+      : undefined
+
     if (bucketId) {
       await animateBallIntoBucket(ballBody, bucketId)
     } else {
-      Matter.Composite.remove(engineRef.current.world, ballBody)
+      Matter.Composite.remove(engine.world, ballBody)
     }
+    round.pendingBodyIds.delete(ballBody.id)
 
-    const dropId = getBallDropId(ballBody)
-    const result = bucketId
-      ? await completePachinkoDrop(encounter.id, bucketId, dropId)
-      : await completePachinkoMiss(encounter.id, dropId)
-
-    setPendingDrops((prev) => Math.max(0, prev - 1))
-    setIsDropping(false)
-
-    if (!result.success) {
-      toast.error(result.error || 'Drop failed')
-      setLastDropMessage(result.error || 'Drop failed')
+    if (bucket?.kind === 'bonus' && round.mode === 'normal') {
+      startBonusDrop(round, bucket.id)
       return
     }
 
-    setSessionSummary(result.summary || {})
-    setSessionCost(
-      (current) => result.totalCost ?? current + (cost?.amount || 0),
+    round.outcomeBucketIds.push(
+      bucket && bucket.kind !== 'bonus' ? bucket.id : null,
     )
-    refreshUser(false)
-
-    if (bucketId && result.rewards) {
-      playSfx('good')
-      const bucket = config.board.buckets.find((b) => b.id === bucketId)
-      const rewardLabel =
-        getAwardedRewardLabel(result.rewards) ||
-        (bucket?.rewards?.[0] && getRewardLabel(bucket.rewards[0])) ||
-        bucket?.label ||
-        'Added to session winnings'
-
-      setLastDropMessage(`Prize: ${rewardLabel}`)
-      toast.success('Prize!', {
-        description: rewardLabel,
-      })
-    } else {
-      playSfx('bad')
-      setLastDropMessage(bucketId ? 'Empty bucket.' : 'Missed the buckets.')
-      if (!bucketId) {
-        toast.info('Miss', {
-          description: 'No prize this drop.',
-        })
-      }
+    if (round.pendingBodyIds.size === 0) {
+      await finishPachinkoRound(round)
     }
   }
 
   const handleFloorHit = (ballBody: Matter.Body) => {
-    void completeDropSettlement({ ballBody })
+    void resolvePachinkoBall({ ballBody })
   }
 
   const handleBucketEntry = (bucketId: string, ballBody: Matter.Body) => {
-    void completeDropSettlement({ ballBody, bucketId })
+    void resolvePachinkoBall({ ballBody, bucketId })
   }
 
   const handleDrop = () => {
@@ -572,26 +719,20 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
       boardWidth: config.board.width,
       ballRadius,
     })
-    const dropId = crypto.randomUUID()
-
-    const ball = Matter.Bodies.circle(dropX, 20, ballRadius, {
-      restitution: config.ballBounciness || 0.6,
-      friction: 0.001,
-      mass: 5,
-      label: 'BALL',
-      plugin: { dropId },
-      render: { fillStyle: '#fff' },
+    const round: ActivePachinkoRound = {
+      roundId: crypto.randomUUID(),
+      dropX,
+      mode: 'normal',
+      pendingBodyIds: new Set(),
+      outcomeBucketIds: [],
+      settlementStarted: false,
+    }
+    activeRoundRef.current = round
+    spawnRoundBall({
+      round,
+      x: dropX,
+      xVelocity: (Math.random() - 0.5) * 2,
     })
-
-    Matter.Composite.add(engineRef.current.world, ball)
-    Matter.Body.setVelocity(ball, {
-      x: (Math.random() - 0.5) * 2,
-      y: 0,
-    })
-
-    dropTimeoutRef.current = setTimeout(() => {
-      void completeDropSettlement({ ballBody: ball })
-    }, PACHINKO_DROP_TIMEOUT_MS)
   }
 
   const [result, setResult] = useState<any | null>(null)
@@ -701,46 +842,41 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
             className="w-full h-full [&>canvas]:w-full [&>canvas]:h-full"
           />
 
-          {/* Bucket Icons - positioned to match physics buckets */}
+          {/* Prize icons sit above the physical slots rendered by Matter.js. */}
           <div className="absolute inset-0 pointer-events-none">
-            {config.board.buckets.map((bucket) => {
-              // Calculate percentage position based on bucket x/y in config
-              const xPercent = (bucket.x / config.board.width) * 100
-              // Calculate from bottom: board.height - bucket.y gives distance from bottom
-              const distanceFromBottom = config.board.height - bucket.y
-              const bottomPercent =
-                (distanceFromBottom / config.board.height) * 100
-              // Calculate percentage dimensions relative to board
-              const widthPercent = (bucket.width / config.board.width) * 100
-              const heightPercent = (bucket.height / config.board.height) * 100
+            {config.board.buckets
+              .filter((bucket) => !isBonusDrop || bucket.kind !== 'bonus')
+              .map((bucket) => {
+                const xPercent = (bucket.x / config.board.width) * 100
+                const distanceFromBottom =
+                  config.board.height - (bucket.y - bucket.height / 2)
+                const bottomPercent =
+                  (distanceFromBottom / config.board.height) * 100
 
-              return (
-                <div
-                  key={bucket.id}
-                  className="absolute flex items-center justify-center overflow-hidden rounded-b-[25%] border-b-4 border-l-4 border-r-4 bg-[#0d1820]/90 px-1 shadow-[inset_0_-10px_16px_rgba(0,0,0,0.6)]"
-                  style={{
-                    left: `${xPercent}%`,
-                    bottom: `${bottomPercent}%`,
-                    width: `${widthPercent}%`,
-                    height: `${heightPercent}%`,
-                    transform: 'translateX(-50%) translateY(50%)',
-                    borderColor: bucket.color || themeColour,
-                  }}
-                >
+                return (
                   <div
-                    className="absolute left-0 right-0 top-0 h-1.5"
-                    style={{ backgroundColor: bucket.color || themeColour }}
-                  />
-                  <div className="absolute inset-x-[18%] bottom-1 h-2 rounded-full bg-[#081014]/70" />
-                  {bucket.icon && (
-                    <TaskIconDisplay
-                      icon={bucket.icon as any}
-                      className="relative z-10 h-[72%] w-[72%] object-contain"
-                    />
-                  )}
-                </div>
-              )
-            })}
+                    key={bucket.id}
+                    className="absolute flex aspect-square items-center justify-center"
+                    style={{
+                      left: `${xPercent}%`,
+                      bottom: `${bottomPercent}%`,
+                      width: bucket.kind === 'prize' ? '10%' : '8%',
+                      transform: 'translateX(-50%)',
+                      color: bucket.color || themeColour,
+                    }}
+                  >
+                    {bucket.icon && (
+                      <TaskIconDisplay
+                        icon={bucket.icon as any}
+                        className={cn(
+                          'h-full w-full object-contain drop-shadow-[0_2px_2px_rgba(0,0,0,0.75)]',
+                          bucket.kind === 'bonus' && 'text-game-ochre',
+                        )}
+                      />
+                    )}
+                  </div>
+                )
+              })}
           </div>
         </div>
         <div className="mt-3 flex w-full max-w-md flex-col gap-2 text-center">
@@ -779,9 +915,19 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
           }}
           onClick={handleDrop}
           disabled={isDropping || Boolean(result)}
-          aria-label={isDropping ? 'Dropping ball' : 'Drop ball'}
+          aria-label={
+            isBonusDrop
+              ? 'Five bonus balls dropping'
+              : isDropping
+                ? 'Dropping ball'
+                : 'Drop ball'
+          }
         >
-          {isDropping ? '...' : 'DROP'}
+          {isBonusDrop
+            ? `BONUS DROP · ${PACHINKO_BONUS_BALL_COUNT} BALLS`
+            : isDropping
+              ? '...'
+              : 'DROP'}
         </Button>
       </div>
 

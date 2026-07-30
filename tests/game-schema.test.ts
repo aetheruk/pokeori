@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import {
+  type ArtAcademyGameConfig,
   allGames,
   type MagnemiteCircuitGameConfig,
   type MagnemiteCircuitPosition,
@@ -10,7 +11,6 @@ import {
   type VoltorbGridGameConfig,
   type VoltorbGridPosition,
   type VoltorbGridVoltorb,
-  type ArtAcademyGameConfig,
 } from '@/data/games'
 import { validateGameItem } from '@/data/games/schemas'
 import { scoreArtAcademyDrawing } from '@/utilities/research/art-academy'
@@ -468,7 +468,21 @@ describe('generated game data schemas', () => {
     )
   })
 
-  test('Celadon Pachinko keeps rewarding low buckets at the board edges', () => {
+  test('pachinko validation rejects direct rewards on bonus slots', () => {
+    const pachinko = allGames.find((game) => game.gameType === 'pachinko')
+    expect(pachinko).toBeDefined()
+
+    const invalidBonusGame = JSON.parse(JSON.stringify(pachinko))
+    invalidBonusGame.settings.board.buckets[0].kind = 'bonus'
+
+    const result = validateGameItem(invalidBonusGame)
+    expect(result.success).toBe(false)
+    expect(result.error?.issues.map((issue) => issue.message)).toContain(
+      'Pachinko bonus buckets cannot award direct rewards',
+    )
+  })
+
+  test('Celadon Pachinko authors two non-paying five-ball bonus slots', () => {
     const games = allGames.filter(
       (game) =>
         game.id === 'celadon-rocket-pachinko' ||
@@ -477,26 +491,32 @@ describe('generated game data schemas', () => {
     expect(games).toHaveLength(2)
 
     for (const game of games) {
-      expect(game.settings.board.buckets).toHaveLength(3)
+      expect(game.settings.board.buckets).toHaveLength(5)
       expect(
-        game.settings.board.buckets.every(
-          (bucket: { rewards: unknown[] }) => bucket.rewards.length > 0,
-        ),
+        game.settings.board.buckets
+          .filter((bucket) => bucket.kind !== 'bonus')
+          .every((bucket: { rewards: unknown[] }) => bucket.rewards.length > 0),
       ).toBe(true)
       expect(
         game.settings.board.buckets.map((bucket: { x: number }) => bucket.x),
-      ).toEqual([70, 300, 530])
-      expect(game.settings.board.obstacles).toHaveLength(2)
+      ).toEqual([70, 185, 300, 415, 530])
       expect(
-        (game.settings.board.obstacles || []).every(
-          (obstacle: { y: number }) => obstacle.y === 650,
-        ),
-      ).toBe(true)
+        game.settings.board.buckets
+          .filter((bucket) => bucket.kind === 'bonus')
+          .map((bucket) => ({
+            width: bucket.width,
+            rewards: bucket.rewards,
+          })),
+      ).toEqual([
+        { width: 32, rewards: [] },
+        { width: 32, rewards: [] },
+      ])
+      expect(game.settings.board.obstacles).toBeUndefined()
       expect(
         Math.max(
           ...game.settings.board.pegs.map((peg: { y: number }) => peg.y),
         ),
-      ).toBeLessThan(650)
+      ).toBe(600)
     }
   })
 

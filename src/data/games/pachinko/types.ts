@@ -20,6 +20,7 @@ export interface PachinkoPeg {
 
 export interface PachinkoBucket {
   id: string
+  kind?: 'prize' | 'jackpot' | 'bonus'
   x: number
   y: number
   width: number
