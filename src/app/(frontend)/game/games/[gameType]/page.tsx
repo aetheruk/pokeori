@@ -24,6 +24,7 @@ import { SlotGame } from '@/app/(frontend)/game/research/encounter/slots'
 import { SpellingGame } from '@/app/(frontend)/game/research/encounter/spelling'
 import { TcgBattleGame } from '@/app/(frontend)/game/research/encounter/tcg-battle'
 import { TcgInspectionGame } from '@/app/(frontend)/game/research/encounter/tcg-inspection'
+import { UfoCatcherGame } from '@/app/(frontend)/game/research/encounter/ufo-catcher'
 import { VoltorbGridGame } from '@/app/(frontend)/game/research/encounter/voltorb-grid'
 import { WhosThatPokemonGame } from '@/app/(frontend)/game/research/encounter/whos-that-pokemon'
 import { GameRouteDataBoundary } from '@/components/game/shared/GameRouteDataBoundary'
@@ -56,6 +57,7 @@ const GAME_COMPONENTS: Partial<Record<GameType, ComponentType<GameProps>>> = {
   flap: FlapGame as unknown as ComponentType<GameProps>,
   slots: SlotGame as unknown as ComponentType<GameProps>,
   pachinko: PachinkoGame as unknown as ComponentType<GameProps>,
+  'ufo-catcher': UfoCatcherGame as unknown as ComponentType<GameProps>,
   'prize-wheel': PrizeWheelGame as unknown as ComponentType<GameProps>,
   fishing: FishingGame as unknown as ComponentType<GameProps>,
   match3: Match3Game as unknown as ComponentType<GameProps>,

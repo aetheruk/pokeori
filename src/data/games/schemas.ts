@@ -462,6 +462,137 @@ const pachinkoSettingsSchema = z
   })
   .strict()
 
+const ufoCatcherAnchorSchema = z
+  .object({
+    id: z.string().min(1).max(80),
+    x: z.number().nonnegative(),
+    y: z.number().nonnegative(),
+  })
+  .strict()
+
+const ufoCatcherTierSchema = z
+  .object({
+    id: z.string().min(1).max(80),
+    label: z.string().min(1),
+    icon: taskIconSchema,
+    rarity: z.enum(['common', 'uncommon', 'rare', 'ultra-rare']),
+    weight: z.number().positive().max(1000),
+    hitRadius: z.number().positive(),
+    edgeGripChance: z.number().min(0).max(1),
+    centerGripChance: z.number().min(0).max(1),
+    rewards: z.array(rewardSchema).length(1),
+  })
+  .strict()
+  .refine((tier) => tier.centerGripChance >= tier.edgeGripChance, {
+    message: 'Centre grip chance must be at least the edge grip chance',
+  })
+
+const ufoCatcherSettingsSchema = z
+  .object({
+    board: z
+      .object({
+        width: z.number().positive(),
+        depth: z.number().positive(),
+        clawBounds: z
+          .object({
+            minX: z.number().nonnegative(),
+            maxX: z.number().positive(),
+            minY: z.number().nonnegative(),
+            maxY: z.number().positive(),
+          })
+          .strict(),
+        anchors: z.array(ufoCatcherAnchorSchema).length(7),
+        positionJitter: z
+          .object({
+            x: z.number().nonnegative(),
+            y: z.number().nonnegative(),
+          })
+          .strict(),
+      })
+      .strict(),
+    cost: costSchema,
+    xTravelMs: z.number().int().min(500).max(10000),
+    yTravelMs: z.number().int().min(500).max(10000),
+    gripCurveExponent: z.number().positive().max(5),
+    prizeCount: z.number().int().min(1).max(7),
+    tiers: z.array(ufoCatcherTierSchema).min(2),
+    timeLimit: z.number().positive().optional(),
+    background: z.string().optional(),
+    themeColour: z.string().min(1).optional(),
+  })
+  .strict()
+  .superRefine((settings, ctx) => {
+    const { width, depth, clawBounds, anchors } = settings.board
+    if (
+      clawBounds.minX >= clawBounds.maxX ||
+      clawBounds.maxX > width ||
+      clawBounds.minY >= clawBounds.maxY ||
+      clawBounds.maxY > depth
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['board', 'clawBounds'],
+        message: 'UFO Catcher claw bounds must fit inside the board',
+      })
+    }
+
+    const anchorIds = new Set<string>()
+    anchors.forEach((anchor, index) => {
+      if (anchorIds.has(anchor.id)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['board', 'anchors', index, 'id'],
+          message: `Duplicate UFO Catcher anchor id: ${anchor.id}`,
+        })
+      }
+      anchorIds.add(anchor.id)
+      if (
+        anchor.x < clawBounds.minX ||
+        anchor.x > clawBounds.maxX ||
+        anchor.y < clawBounds.minY ||
+        anchor.y > clawBounds.maxY
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['board', 'anchors', index],
+          message: 'UFO Catcher anchor must fit inside the claw bounds',
+        })
+      }
+    })
+
+    const tierIds = new Set<string>()
+    settings.tiers.forEach((tier, index) => {
+      if (tierIds.has(tier.id)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['tiers', index, 'id'],
+          message: `Duplicate UFO Catcher tier id: ${tier.id}`,
+        })
+      }
+      tierIds.add(tier.id)
+
+      if (tier.rewards[0]?.type !== 'item') {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['tiers', index, 'rewards'],
+          message: 'UFO Catcher prizes must award items only',
+        })
+      }
+    })
+
+    if (
+      settings.prizeCount > anchors.length ||
+      settings.prizeCount > settings.tiers.length
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['prizeCount'],
+        message:
+          'UFO Catcher prize count cannot exceed the available tiers or anchors',
+      })
+    }
+  })
+
 const settingsByGameType: Record<string, z.ZodTypeAny> = {
   silhouette: commonKnowledgeSettings,
   identify: commonKnowledgeSettings,
@@ -515,6 +646,7 @@ const settingsByGameType: Record<string, z.ZodTypeAny> = {
     })
     .passthrough(),
   pachinko: pachinkoSettingsSchema,
+  'ufo-catcher': ufoCatcherSettingsSchema,
   'prize-wheel': z
     .object({
       slots: z.array(z.object({ id: z.string(), percentage: z.number().min(0).max(100) }).passthrough()),

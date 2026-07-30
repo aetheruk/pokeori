@@ -44,6 +44,16 @@ export { slotGames } from './slots'
 export type { PachinkoGameConfig } from './pachinko/types'
 export { pachinkoGames } from './pachinko'
 
+// UFO Catcher game
+export type {
+  UfoCatcherGameConfig,
+  UfoCatcherPlacedPrize,
+  UfoCatcherPrizeTier,
+  UfoCatcherPublicAttempt,
+  UfoCatcherSettings,
+} from './ufo-catcher/types'
+export { ufoCatcherGames } from './ufo-catcher'
+
 // Prize Wheel game
 export type { PrizeWheelGameConfig } from './prize-wheel/types'
 export { chanseyEntries as prizeWheelGames } from './prize-wheel'
@@ -142,6 +152,7 @@ import { runGames } from './run'
 import { basicEntries as flapGames } from './flap'
 import { slotGames } from './slots'
 import { pachinkoGames } from './pachinko'
+import { ufoCatcherGames } from './ufo-catcher'
 import { chanseyEntries as prizeWheelGames } from './prize-wheel'
 import { fishingGames } from './fishing'
 import { match3Games } from './match3'
@@ -171,6 +182,7 @@ export type GameType =
   | 'flap'
   | 'slots'
   | 'pachinko'
+  | 'ufo-catcher'
   | 'prize-wheel'
   | 'fishing'
   | 'match3'
@@ -274,6 +286,11 @@ export interface GameSettings {
   ballRadius?: number
   ballBounciness?: number
   gravityScale?: number
+  // UFO Catcher specific
+  xTravelMs?: number
+  yTravelMs?: number
+  gripCurveExponent?: number
+  tiers?: import('./ufo-catcher/types').UfoCatcherPrizeTier[]
   // Fishing specific
   rods?: {
     old?: import('./fishing/types').FishingRodConfig
@@ -376,6 +393,10 @@ export const allGames: GameItem[] = [
   ...flapGames.map((g) => ({ ...g, gameType: 'flap' as const })),
   ...slotGames.map((g) => ({ ...g, gameType: 'slots' as const })),
   ...pachinkoGames.map((g) => ({ ...g, gameType: 'pachinko' as const })),
+  ...ufoCatcherGames.map(
+    (g) =>
+      ({ ...g, gameType: 'ufo-catcher' as const }) as unknown as GameItem,
+  ),
   ...prizeWheelGames.map((g) => ({ ...g, gameType: 'prize-wheel' as const })),
   ...fishingGames.map((g) => ({ ...g, gameType: 'fishing' as const })),
   ...match3Games.map((g) => ({ ...g, gameType: 'match3' as const })),

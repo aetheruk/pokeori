@@ -27,6 +27,7 @@ export function getRequiredResearchWins(encounter: ResearchGameConfig): number {
   if (
     encounter.gameType === 'slots' ||
     encounter.gameType === 'pachinko' ||
+    encounter.gameType === 'ufo-catcher' ||
     encounter.gameType === 'prize-wheel'
   ) {
     return 0

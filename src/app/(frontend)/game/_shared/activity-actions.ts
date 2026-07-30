@@ -119,7 +119,12 @@ import {
   getRandomPokemonFromPool,
 } from '@/utilities/research/round-selection'
 
-const DAILY_EXCLUDED_GAME_TYPES = new Set(['slots', 'pachinko', 'prize-wheel'])
+const DAILY_EXCLUDED_GAME_TYPES = new Set([
+  'slots',
+  'pachinko',
+  'ufo-catcher',
+  'prize-wheel',
+])
 
 export async function getUser(): Promise<User | null> {
   const payload = await getPayload({ config: configPromise })
@@ -167,6 +172,11 @@ export interface GameActivityState {
   }
   // Pachinko specific
   pachinkoSession?: {
+    totalRewards: any
+    totalCost: number
+  }
+  // UFO Catcher specific
+  ufoCatcherSession?: {
     totalRewards: any
     totalCost: number
   }
@@ -2155,6 +2165,7 @@ export async function completeGameActivity(
       const isGamblingGame =
         encounter.gameType === 'slots' ||
         encounter.gameType === 'pachinko' ||
+        encounter.gameType === 'ufo-catcher' ||
         encounter.gameType === 'prize-wheel'
       const isScoreCompletionGame =
         ((encounter.gameType === 'match3' ||
@@ -2216,10 +2227,11 @@ export async function completeGameActivity(
       if (
         encounter.gameType === 'slots' ||
         encounter.gameType === 'pachinko' ||
+        encounter.gameType === 'ufo-catcher' ||
         encounter.gameType === 'prize-wheel' ||
         encounter.gameType === 'fishing'
       ) {
-        // Slots & Pachinko record stats per-spin/drop
+        // Chance games record stats per attempt
         // But batch-reported losses (misses) for pachinko need to be added here
         if (
           encounter.gameType === 'pachinko' &&
@@ -2405,6 +2417,17 @@ export async function completeGameActivity(
             rewardSummary.currency.push({
               type: cost.currencyType,
               quantity: -state.pachinkoSession.totalCost,
+              label: 'Total Spent',
+            })
+          }
+        } else if (encounter.gameType === 'ufo-catcher') {
+          rewardSummary = state.ufoCatcherSession?.totalRewards || {}
+          const cost = encounter.settings.cost
+          if (cost && state.ufoCatcherSession?.totalCost) {
+            rewardSummary.currency = rewardSummary.currency || []
+            rewardSummary.currency.push({
+              type: cost.currencyType,
+              quantity: -state.ufoCatcherSession.totalCost,
               label: 'Total Spent',
             })
           }
