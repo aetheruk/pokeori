@@ -13,8 +13,13 @@ Authentication handled by Payload CMS.
 3. User verifies email to activate account
 
 ## Session Management
-- Sessions stored in Payload CMS
-- Token refresh endpoint: `POST /api/users/refresh-token`
+- Authentication uses Payload's HTTP-only `payload-token` cookie
+- Player tokens have a 30-day lifetime
+- The persistent game shell calls `POST /api/users/refresh-token` when play
+  begins, after returning from a sufficiently long background period, and
+  before the current token expires
+- Temporary refresh failures are retried without navigating away from the
+  current game screen
 - Logout: `POST /api/users/logout`
 
 ## Auth Checks
@@ -25,3 +30,9 @@ const payload = await getPayload({ config })
 const { user } = await payload.auth({ headers: req.headers })
 if (!user) return new NextResponse('Unauthorized', { status: 401 })
 ```
+
+Client game-data sync errors are not themselves proof that the cookie expired.
+`UserContext` only navigates to `/auth` when `/api/game/sync` reports an
+authentication status and the independent `POST /api/auth/check` request
+confirms that the session is no longer valid. Rate limits, server failures, and
+network interruptions retain the latest usable SWR snapshot.
