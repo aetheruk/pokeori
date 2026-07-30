@@ -19,6 +19,7 @@ import {
   setIdempotentResult,
 } from '@/utilities/game-integrity'
 import { incrementUserActivityResult } from '@/utilities/user-state'
+import { splitGuaranteedPachinkoCurrencyRewards } from '@/utilities/research/pachinko-rewards'
 
 type PachinkoSettlementResult = {
   success: boolean
@@ -36,10 +37,12 @@ function getDropResultKey(userId: string, dropId?: string) {
 }
 
 async function settlePachinkoDrop({
+  encounterId,
   bucketId,
   dropId,
   action,
 }: {
+  encounterId: string
   bucketId?: string
   dropId?: string
   action: 'bucket' | 'miss'
@@ -102,8 +105,11 @@ async function settlePachinkoDrop({
       if (!state) {
         return { success: false, error: 'Session expired' }
       }
+      if (state.encounterId !== encounterId) {
+        return { success: false, error: 'Pachinko session changed' }
+      }
 
-      const encounter = allGames.find((e) => e.id === state.encounterId)
+      const encounter = allGames.find((e) => e.id === encounterId)
       if (encounter?.gameType !== 'pachinko') {
         return { success: false, error: 'Invalid game type' }
       }
@@ -135,6 +141,21 @@ async function settlePachinkoDrop({
 
       const hasRewards = bucket?.rewards && bucket.rewards.length > 0
       const isWin = action === 'bucket' && hasRewards
+      const {
+        guaranteedCurrencyPayout,
+        deferredRewards,
+      } = cost && bucket?.rewards
+        ? splitGuaranteedPachinkoCurrencyRewards(
+            bucket.rewards,
+            cost.currencyType,
+          )
+        : {
+            guaranteedCurrencyPayout: 0,
+            deferredRewards: bucket?.rewards || [],
+          }
+      const settledBalance = cost
+        ? currentBalance - cost.amount + guaranteedCurrencyPayout
+        : freshUser.currency?.pokedollars || 0
 
       await incrementUserActivityResult(
         payload as any,
@@ -148,7 +169,7 @@ async function settlePachinkoDrop({
       if (cost) {
         updateData.currency = {
           ...freshUser.currency,
-          [cost.currencyType]: currentBalance - cost.amount,
+          [cost.currencyType]: settledBalance,
         }
       }
 
@@ -161,13 +182,22 @@ async function settlePachinkoDrop({
       }
 
       // Grant Rewards
-      let dropSummary = null
-      if (hasRewards) {
+      let dropSummary: any = guaranteedCurrencyPayout
+        ? {
+            currency: [
+              {
+                type: cost!.currencyType,
+                quantity: guaranteedCurrencyPayout,
+              },
+            ],
+          }
+        : null
+      if (deferredRewards.length > 0) {
         const res = await grantRewards(
           user.id,
-          bucket.rewards as unknown as Reward[],
+          deferredRewards as unknown as Reward[],
         )
-        dropSummary = res.summary
+        dropSummary = mergeSummaries(dropSummary, res.summary)
       }
 
       // Update Redis
@@ -191,9 +221,7 @@ async function settlePachinkoDrop({
 
       const response = {
         success: true,
-        balance: cost
-          ? currentBalance - cost.amount
-          : freshUser.currency?.pokedollars || 0,
+        balance: settledBalance,
         rewards: dropSummary,
         summary: currentSession.totalRewards,
         totalCost: currentSession.totalCost,
@@ -213,14 +241,26 @@ async function settlePachinkoDrop({
   }
 }
 
-export async function completePachinkoDrop(bucketId: string, dropId?: string) {
-  return settlePachinkoDrop({ bucketId, dropId, action: 'bucket' })
+export async function completePachinkoDrop(
+  encounterId: string,
+  bucketId: string,
+  dropId?: string,
+) {
+  return settlePachinkoDrop({
+    encounterId,
+    bucketId,
+    dropId,
+    action: 'bucket',
+  })
 }
 
 /**
  * Track a missed pachinko drop (ball hit floor, not a bucket)
  * Deducts cost but gives no rewards, increments loss stat
  */
-export async function completePachinkoMiss(dropId?: string) {
-  return settlePachinkoDrop({ dropId, action: 'miss' })
+export async function completePachinkoMiss(
+  encounterId: string,
+  dropId?: string,
+) {
+  return settlePachinkoDrop({ encounterId, dropId, action: 'miss' })
 }

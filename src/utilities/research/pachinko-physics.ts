@@ -27,7 +27,7 @@ export function getPachinkoBucketSensor(
 ) {
   const width = Math.max(
     2,
-    bucket.width - PACHINKO_BUCKET_RAIL_WIDTH * 2 - ballRadius * 2,
+    bucket.width - PACHINKO_BUCKET_RAIL_WIDTH - ballRadius * 2,
   )
   const y =
     bucket.y +

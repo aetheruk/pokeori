@@ -13,6 +13,7 @@ import {
   getPachinkoDropX,
   PACHINKO_DROP_TIMEOUT_MS,
 } from '@/utilities/research/pachinko-physics'
+import { splitGuaranteedPachinkoCurrencyRewards } from '@/utilities/research/pachinko-rewards'
 
 function getSlotRtp(game: (typeof celadonGameCornerSlotEntries)[number]) {
   const totalWeight = game.settings.paytable.reduce(
@@ -138,6 +139,37 @@ describe('Celadon Game Corner balance and presentation', () => {
     )
     expect(celadonGameCornermatch3gamesEntries[0].settings.winScore).toBe(1000)
     expect(celadonGameCornermatch3gamesEntries[1].settings.winScore).toBe(1400)
+  })
+
+  test('settles Pachinko token prizes at their authored gross value', () => {
+    const [standard, highStakes] = celadonGameCornerPachinkoEntries
+    const standardLeft = standard.settings.board.buckets[0]
+    const highStakesLeft = highStakes.settings.board.buckets[0]
+
+    const standardSettlement = splitGuaranteedPachinkoCurrencyRewards(
+      standardLeft.rewards,
+      standard.settings.cost!.currencyType,
+    )
+    const highStakesSettlement = splitGuaranteedPachinkoCurrencyRewards(
+      highStakesLeft.rewards,
+      highStakes.settings.cost!.currencyType,
+    )
+
+    expect(standardSettlement.guaranteedCurrencyPayout).toBe(15)
+    expect(highStakesSettlement.guaranteedCurrencyPayout).toBe(75)
+    expect(standardSettlement.deferredRewards).toEqual([])
+    expect(highStakesSettlement.deferredRewards).toEqual([])
+
+    expect(
+      100 -
+        standard.settings.cost!.amount +
+        standardSettlement.guaranteedCurrencyPayout,
+    ).toBe(110)
+    expect(
+      100 -
+        highStakes.settings.cost!.amount +
+        highStakesSettlement.guaranteedCurrencyPayout,
+    ).toBe(150)
   })
 
   test('uses the rare-jackpot High Stakes Prize Wheel payout table', () => {
@@ -278,7 +310,11 @@ describe('Celadon Game Corner balance and presentation', () => {
       (bucket) => bucket.id === 'fifty',
     )
 
-    expect(jackpot?.width).toBe(24)
+    const [leftBucket, , rightBucket] = game.settings.board.buckets
+
+    expect(leftBucket).toMatchObject({ x: 70, width: 72 })
+    expect(jackpot?.width).toBe(28)
+    expect(rightBucket).toMatchObject({ x: 530, width: 72 })
     expect(
       getPachinkoDropX({
         arrowPosition: 0,
@@ -296,7 +332,7 @@ describe('Celadon Game Corner balance and presentation', () => {
     expect(jackpot && getPachinkoBucketSensor(jackpot, ballRadius)).toEqual({
       x: 300,
       y: 773,
-      width: 2,
+      width: 6,
       height: 2,
     })
     expect(PACHINKO_DROP_TIMEOUT_MS).toBe(30_000)
