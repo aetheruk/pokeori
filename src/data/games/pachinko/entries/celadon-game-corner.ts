@@ -6,11 +6,11 @@ const rocketPachinkoSettings: PachinkoGameSettings = {
     height: 800,
     pegs: [],
     buckets: [
-      { id: 'fifteen-left', kind: 'prize', label: 'Prize', color: '#7c2d12', x: 70, y: 760, width: 90, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 15, dropChance: 100 }] },
+      { id: 'fifteen-left', kind: 'prize', label: 'Prize', color: '#7c2d12', x: 70, y: 760, width: 60, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 15, dropChance: 100 }] },
       { id: 'bonus-left', kind: 'bonus', label: '5-Ball Bonus Drop', color: '#b58a43', x: 185, y: 760, width: 32, height: 50, icon: { type: 'lucide', id: 'ChevronsDown' }, rewards: [] },
       { id: 'fifty', kind: 'jackpot', label: 'Jackpot', color: '#ca8a04', x: 300, y: 760, width: 32, height: 50, icon: { type: 'pokemon', id: '100' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 50, dropChance: 100 }] },
       { id: 'bonus-right', kind: 'bonus', label: '5-Ball Bonus Drop', color: '#b58a43', x: 415, y: 760, width: 32, height: 50, icon: { type: 'lucide', id: 'ChevronsDown' }, rewards: [] },
-      { id: 'fifteen-right', kind: 'prize', label: 'Prize', color: '#7c2d12', x: 530, y: 760, width: 90, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 15, dropChance: 100 }] },
+      { id: 'fifteen-right', kind: 'prize', label: 'Prize', color: '#7c2d12', x: 530, y: 760, width: 60, height: 50, icon: { type: 'item', id: 'fun-token' }, rewards: [{ type: 'currency', targetId: 'fun-tokens', quantity: 15, dropChance: 100 }] },
     ],
     wallBounciness: 0.55,
   },

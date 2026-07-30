@@ -319,9 +319,9 @@ describe('Celadon Game Corner balance and presentation', () => {
       (bucket) => bucket.id === 'fifteen-right',
     )
 
-    expect(leftBucket).toMatchObject({ x: 70, width: 90 })
+    expect(leftBucket).toMatchObject({ x: 70, width: 60 })
     expect(jackpot?.width).toBe(32)
-    expect(rightBucket).toMatchObject({ x: 530, width: 90 })
+    expect(rightBucket).toMatchObject({ x: 530, width: 60 })
     expect(
       getPachinkoDropX({
         arrowPosition: 0,
