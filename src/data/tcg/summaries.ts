@@ -85,6 +85,7 @@ export const tcgSetSummaries: TcgSetSummary[] = [
   {"id":"me2pt5","name":"Ascended Heroes","series":"Mega Evolution","total":295,"printedTotal":217,"releaseDate":"2026/01/30"},
   {"id":"me3","name":"Perfect Order","series":"Mega Evolution","total":124,"printedTotal":88,"releaseDate":"2026/03/27"},
   {"id":"me4","name":"Chaos Rising","series":"Mega Evolution","total":122,"printedTotal":86,"releaseDate":"2026/05/22"},
+  {"id":"me5","name":"Pitch Black","series":"Mega Evolution","total":120,"printedTotal":84,"releaseDate":"2026/07/17"},
   {"id":"neo1","name":"Neo Genesis","series":"Neo","total":111,"printedTotal":111,"releaseDate":"2000/12/16"},
   {"id":"neo2","name":"Neo Discovery","series":"Neo","total":75,"printedTotal":75,"releaseDate":"2001/06/01"},
   {"id":"neo3","name":"Neo Revelation","series":"Neo","total":66,"printedTotal":64,"releaseDate":"2001/09/21"},
