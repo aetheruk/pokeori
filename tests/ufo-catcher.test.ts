@@ -171,6 +171,40 @@ describe('UFO Catcher authored balance', () => {
     }
   })
 
+  test('makes the Team Rocket binder a dominant common prize with an owned-item upgrade', () => {
+    const tier = standard.settings.tiers.find(
+      (entry) => entry.id === 'rocket-binder',
+    )
+
+    expect(tier).toMatchObject({
+      label: 'Team Rocket Binder',
+      icon: { type: 'item', id: 'binder-base5' },
+      rarity: 'common',
+      weight: 70,
+      rewards: [
+        {
+          type: 'item',
+          targetId: 'binder-base5',
+          quantity: 1,
+          dropChance: 100,
+        },
+      ],
+      replacementWhenOwned: {
+        itemId: 'binder-base5',
+        label: 'Team Rocket Booster Pack',
+        icon: { type: 'item', id: 'pack-base5' },
+        rewards: [
+          {
+            type: 'item',
+            targetId: 'pack-base5',
+            quantity: 1,
+            dropChance: 100,
+          },
+        ],
+      },
+    })
+  })
+
   test('authors medium-rare Rotom icon and UFO Master title unlocks', () => {
     expect(
       standard.settings.tiers.find((tier) => tier.id === 'rotom-icon'),
@@ -297,7 +331,7 @@ describe('UFO Catcher geometry and resolution', () => {
     ).toBe('potions')
     expect(
       selectUfoCatcherTier(standard.settings.tiers, firstBoundary).id,
-    ).toBe('antidotes')
+    ).toBe('rocket-binder')
     expect(selectUfoCatcherTier(standard.settings.tiers, 0.999999).id).toBe(
       standard.settings.tiers.at(-1)!.id,
     )
@@ -312,6 +346,26 @@ describe('UFO Catcher geometry and resolution', () => {
     expect(eligible.some((tier) => tier.id === 'rotom-icon')).toBe(false)
     expect(eligible.some((tier) => tier.id === 'ufo-master-title')).toBe(false)
     expect(eligible.some((tier) => tier.id === 'link-cable')).toBe(true)
+  })
+
+  test('replaces the owned Team Rocket binder with a booster pack', () => {
+    const eligible = getEligibleUfoCatcherTiers(standard.settings.tiers, {
+      inventory: { 'binder-base5': 1 },
+    })
+    const rocketPrize = eligible.find((tier) => tier.id === 'rocket-binder')
+
+    expect(rocketPrize).toMatchObject({
+      label: 'Team Rocket Booster Pack',
+      icon: { type: 'item', id: 'pack-base5' },
+      weight: 70,
+      rewards: [
+        {
+          type: 'item',
+          targetId: 'pack-base5',
+          quantity: 1,
+        },
+      ],
+    })
   })
 
   test('selects five distinct weighted prizes and randomized unique anchors', () => {

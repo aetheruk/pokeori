@@ -100,6 +100,7 @@ export function getEligibleUfoCatcherTiers(
   unlocks: {
     unlockedIcons?: unknown
     unlockedTitles?: unknown
+    inventory?: Record<string, number> | null
   },
 ) {
   const unlockedIcons = new Set(
@@ -117,13 +118,27 @@ export function getEligibleUfoCatcherTiers(
       : [],
   )
 
-  return tiers.filter((tier) => {
+  const eligibleTiers = tiers.filter((tier) => {
     const reward = tier.rewards[0]
     const targetId = reward?.targetId?.toString()
     if (!targetId) return true
     if (reward.type === 'icon') return !unlockedIcons.has(targetId)
     if (reward.type === 'title') return !unlockedTitles.has(targetId)
     return true
+  })
+
+  return eligibleTiers.map((tier) => {
+    const replacement = tier.replacementWhenOwned
+    if (!replacement || (unlocks.inventory?.[replacement.itemId] || 0) <= 0) {
+      return tier
+    }
+
+    return {
+      ...tier,
+      label: replacement.label,
+      icon: replacement.icon,
+      rewards: replacement.rewards,
+    }
   })
 }
 

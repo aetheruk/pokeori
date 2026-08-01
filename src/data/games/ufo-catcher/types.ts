@@ -17,6 +17,13 @@ export interface UfoCatcherAnchor {
   y: number
 }
 
+export interface UfoCatcherOwnedItemReplacement {
+  itemId: string
+  label: string
+  icon: TaskIcon
+  rewards: LocationReward[]
+}
+
 export interface UfoCatcherPrizeTier {
   id: string
   label: string
@@ -27,6 +34,7 @@ export interface UfoCatcherPrizeTier {
   edgeGripChance: number
   centerGripChance: number
   rewards: LocationReward[]
+  replacementWhenOwned?: UfoCatcherOwnedItemReplacement
 }
 
 export interface UfoCatcherSettings {
