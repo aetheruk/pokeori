@@ -351,4 +351,25 @@ export const subCategories: Record<string, RegionData> = {
     music: '/music/moon.mp3',
     unlockRequirements: [{ type: 'task_completed', targetId: 'vermilion-rumours' }],
   },
+  'Kanto Underground': {
+    category: 'Kanto Underground',
+    region: 'Underground',
+    order: 10,
+    image: '/backgrounds/underground.avif',
+    description:
+      'A hidden community of collectors buried much farther beneath Kanto than seems reasonable.',
+    music: '/music/moon.mp3',
+    unlockRequirements: [
+      {
+        type: 'task_completed',
+        targetId: 'digletts-cave-secret-knock',
+      },
+    ],
+    completeRequirements: [
+      {
+        type: 'task_completed',
+        targetId: 'kanto-underground-somehow-deeper',
+      },
+    ],
+  },
 }

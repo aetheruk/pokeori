@@ -1958,7 +1958,20 @@ describe('static data references', () => {
       targetId: 'rubber-mallet',
     })
     expect((malletGame as any)?.settings.hazardPokemonId).toBe('95')
-    expect((malletGame as any)?.rewards).toEqual([])
+    expect((malletGame as any)?.rewards).toEqual([
+      {
+        type: 'task_complete',
+        targetId: 'digletts-cave-what-are-you-doing',
+        dropChance: 100,
+        secret: true,
+        requirements: [
+          {
+            type: 'item_owned',
+            targetId: 'binder-basep',
+          },
+        ],
+      },
+    ])
     expect((malletGame as any)?.skillXp).toEqual({
       skill: 'researching',
       level: 5,
@@ -1986,6 +1999,83 @@ describe('static data references', () => {
         secret: true,
       },
     ])
+  })
+
+  test('Whack-a-Diglett opens the five-task Kanto Underground TCG lead-in', () => {
+    const leadInTaskIds = [
+      'digletts-cave-what-are-you-doing',
+      'digletts-cave-new-recruit',
+      'digletts-cave-secret-knock',
+      'kanto-underground-deep-deep-underground',
+      'kanto-underground-somehow-deeper',
+    ]
+    const leadInTasks = leadInTaskIds.map((id) =>
+      tasks.find((task) => task.id === id),
+    )
+    const hiddenIntroduction = leadInTasks[0]
+    const undergroundRegion = subCategories['Kanto Underground']
+    const finalTask = leadInTasks[4]
+
+    expect(leadInTasks.every(Boolean)).toBe(true)
+    expect(hiddenIntroduction?.secret).toBe(true)
+    expect(hiddenIntroduction?.completionTrigger).toBe('auto')
+    expect(hiddenIntroduction?.requirements).toContainEqual({
+      type: 'item_owned',
+      targetId: 'binder-basep',
+    })
+
+    for (let index = 1; index < leadInTasks.length; index += 1) {
+      expect(leadInTasks[index]?.requirements).toContainEqual({
+        type: 'task_completed',
+        targetId: leadInTaskIds[index - 1],
+      })
+    }
+
+    expect(leadInTasks[2]?.exitModal?.message).toBe(
+      'The Maniac taps an absurdly complicated rhythm against the rock with your mallet. A section of wall swings open and a woman peers through. She spots your empty Promo binder and smiles. “The new recruit! Right on time.” The Maniac gestures for you to follow, and she waves you inside. “Come along.”',
+    )
+
+    expect(undergroundRegion).toMatchObject({
+      category: 'Kanto Underground',
+      region: 'Underground',
+      unlockRequirements: [
+        {
+          type: 'task_completed',
+          targetId: 'digletts-cave-secret-knock',
+        },
+      ],
+      completeRequirements: [
+        {
+          type: 'task_completed',
+          targetId: 'kanto-underground-somehow-deeper',
+        },
+      ],
+    })
+    expect(finalTask?.rewards).toEqual([
+      {
+        type: 'card',
+        quantity: 1,
+        dropChance: 100,
+        cardDrawParams: {
+          allowedCardIds: ['basep-38'],
+          guaranteed: true,
+        },
+      },
+      {
+        type: 'pokemon_research_xp',
+        targetId: '201-j',
+        quantity: 1,
+        dropChance: 100,
+      },
+    ])
+    expect(finalTask?.enterModal?.[1]?.message).toBe('MORE CRYSTALS. BRING THEM.')
+    expect(finalTask?.enterModal?.[2]?.message).toBe(
+      'TRADING WITH OTHER TRAINERS IS MUCH FASTER THAN GATHERING THEM YOURSELF. CONTINUE.',
+    )
+    expect(finalTask?.enterModal?.[3]?.title).toBe('Underground Collectors')
+    expect(finalTask?.description).toBe(
+      'The deepest gathering place has been built around something deeper still.',
+    )
   })
 
   test('Pewter slow stock task rewards crafting supplies', () => {

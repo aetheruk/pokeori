@@ -21,7 +21,20 @@ export const diglettsCaveDiglettTunnelTapEntries: DiglettTunnelTapGameConfig[] =
         targetId: 'rubber-mallet',
       },
     ],
-    rewards: [],
+    rewards: [
+      {
+        type: 'task_complete',
+        targetId: 'digletts-cave-what-are-you-doing',
+        dropChance: 100,
+        secret: true,
+        requirements: [
+          {
+            type: 'item_owned',
+            targetId: 'binder-basep',
+          },
+        ],
+      },
+    ],
     skillXp: { skill: 'researching', level: 5 },
     settings: {
       gridSize: { cols: 4, rows: 4 },
