@@ -66,7 +66,7 @@ Catalog responses are versioned with the application release, cached privately i
 
 ## Booster Packs
 - Generated via `src/utilities/tcg/` logic
-- Booster packs use structured slots instead of the general card reward bonus-roll draw. Standard 5-card packs draw 3 common cards, 1 uncommon card, and 1 rare-slot card.
+- Booster packs use structured slots instead of the general card reward bonus-roll draw. Standard 5-card packs draw 3 common cards, 1 uncommon+ card, and 1 rare+ card. The uncommon+ slot is 70% uncommon and 30% rare-slot upgrades, so luck can produce two rare-or-better cards in one pack.
 - Rare-slot cards use normalized rarity buckets with a 70 rare / 18 holo rare / 8 ultra / 3 secret / 1 chase upgrade table. Missing buckets are skipped and the available bucket weights are rebalanced.
 - Bulk opening applies a 10% penalty to holo rare, ultra, secret, and chase rare-slot weights, moving the reclaimed weight into plain rare. Single-pack opening uses the standard table.
 - Non-promo packs have a 1:1000 God Pack chance; a God Pack changes every slot in that pack into a rare-or-better slot.
