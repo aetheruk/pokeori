@@ -1334,6 +1334,101 @@ describe('PVE turn engine helpers', () => {
     expect(state.enemyMoveUsesRemaining).toBe(1)
   })
 
+  test('enemy AI accounts for ability-based type immunities when scoring moves', () => {
+    const player = makePokemon({
+      id: 'player',
+      name: 'Levitate Player',
+      types: ['poison'],
+      ability: 'levitate',
+    })
+    const enemy = makePokemon({
+      id: 'enemy',
+      name: 'Enemy',
+      speciesId: 4,
+      formId: '4',
+      level: 50,
+      types: ['ground'],
+      aiMoves: ['earthquake'],
+      aiMoveLoadout: ['earthquake'],
+    })
+    const state = makeState(player, enemy)
+    state.enemyMoveUsesRemaining = 1
+    state.ai = { version: 1, profile: 'boss' }
+
+    const selected = chooseEnemyAiMove({
+      state,
+      enemyMon: enemy,
+      playerMon: player,
+      playerStance: 'power',
+      random: () => 0.5,
+    })
+
+    expect(selected).toBeUndefined()
+    expect(state.enemyMoveUsesRemaining).toBe(1)
+
+    enemy.ability = 'mold_breaker'
+    const bypassingMove = chooseEnemyAiMove({
+      state,
+      enemyMon: enemy,
+      playerMon: player,
+      playerStance: 'power',
+      random: () => 0.5,
+    })
+
+    expect(bypassingMove?.move.id).toBe('earthquake')
+    expect(state.enemyMoveUsesRemaining).toBe(0)
+  })
+
+  test('enemy AI values an ability immunity when choosing a switch-in', () => {
+    const player = makePokemon({
+      id: 'player',
+      name: 'Ground Player',
+      types: ['ground'],
+      battleMoveIds: ['earthquake'],
+    })
+    const activeEnemy = makePokemon({
+      id: 'active-enemy',
+      name: 'Active Enemy',
+      speciesId: 4,
+      formId: '4',
+      types: ['fire'],
+      currentHp: 20,
+      aiMoveLoadout: ['ember'],
+    })
+    const weakEnemy = makePokemon({
+      id: 'weak-enemy',
+      name: 'Weak Enemy',
+      speciesId: 7,
+      formId: '7',
+      types: ['water'],
+      aiMoveLoadout: ['water-gun'],
+    })
+    const levitateEnemy = makePokemon({
+      id: 'levitate-enemy',
+      name: 'Levitate Enemy',
+      speciesId: 92,
+      formId: '92',
+      types: ['poison'],
+      ability: 'levitate',
+      aiMoveLoadout: ['shadow-ball'],
+    })
+    const state = makeState(player, activeEnemy)
+    state.enemyTeam = [activeEnemy, weakEnemy, levitateEnemy]
+    state.ai = { version: 1, profile: 'boss' }
+    state.enemyMoveUsesRemaining = 0
+
+    const action = chooseEnemyBattleAction({
+      state,
+      enemyMon: activeEnemy,
+      playerMon: player,
+      canUseItems: false,
+      consumeMoveUse: false,
+      random: () => 0.5,
+    })
+
+    expect(action).toMatchObject({ kind: 'switch', newIndex: 2 })
+  })
+
   test('enemy AI does not choose Dream Eater unless the target is asleep', () => {
     const player = makePokemon({
       id: 'player',

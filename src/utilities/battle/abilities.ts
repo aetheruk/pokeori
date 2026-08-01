@@ -2758,6 +2758,34 @@ export function getBattleMaxHpOverride(
   return Math.max(1, Math.min(...hpOverrides))
 }
 
+/**
+ * Returns whether an active defender ability nullifies an attack type before
+ * ordinary damage modifiers run. Keep this separate from the mutating damage
+ * modifier so callers such as the battle AI can make the same prediction.
+ */
+export function isBattleAbilityTypeImmune(params: {
+  attacker?: BattlePokemon
+  defender: BattlePokemon
+  attackType?: string
+  typeImmunityBypassAttackTypes?: string[] | true
+}): boolean {
+  const attackType = params.attackType?.toLowerCase()
+  if (!attackType || bypassesDefenderBattleAbilitiesByAbility(params.attacker)) {
+    return false
+  }
+
+  return getAbilityEffects(params.defender).some(
+    (effect) =>
+      (effect.type === 'battle-type-immunity' ||
+        effect.type === 'battle-type-absorb') &&
+      effect.attackTypes.some((type) => type.toLowerCase() === attackType) &&
+      !bypassesTypeImmunity(
+        attackType,
+        params.typeImmunityBypassAttackTypes,
+      ),
+  )
+}
+
 export function applyBattleAbilityDamageModifiers(params: {
   attacker?: BattlePokemon
   defender: BattlePokemon
