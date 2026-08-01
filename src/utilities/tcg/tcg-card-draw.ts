@@ -40,14 +40,69 @@ export type NormalizedTcgPackRarity =
   | 'common'
   | 'uncommon'
   | 'rare'
-  | 'holoRare'
-  | 'ultra'
-  | 'secret'
   | 'chase'
 
-type BoosterPackSlot = 'common' | 'uncommonPlus' | 'rare' | 'promo'
-type RareSlotRarity = Exclude<NormalizedTcgPackRarity, 'common' | 'uncommon'>
-type UncommonPlusRarity = 'uncommon' | RareSlotRarity
+type BoosterPackSlot = 'standard' | 'rareOrBetter' | 'promo'
+
+/**
+ * The source API has many historical rarity labels. These are the labels used
+ * by pack generation after they have been reduced to the four game buckets.
+ * Rare is the broad, general rare pool; chase is reserved for secret and
+ * special-illustration style cards.
+ */
+export const TCG_PACK_RARITY_BUCKETS = {
+  common: ['Common', 'Promo', 'Unknown'],
+  uncommon: ['Uncommon'],
+  rare: [
+    'Rare',
+    'Rare Holo',
+    'Double Rare',
+    'Rare Holo EX',
+    'Rare Holo GX',
+    'Rare Holo V',
+    'Rare Holo VMAX',
+    'Rare Holo VSTAR',
+    'Rare Shining',
+    'Rare Shiny',
+    'Rare Shiny GX',
+    'Shiny Rare',
+    'Radiant Rare',
+    'Rare ACE',
+    'ACE SPEC Rare',
+    'Amazing Rare',
+    'Rare Prism Star',
+    'Rare Prime',
+    'Rare Holo LV.X',
+    'Rare BREAK',
+    'Rare Ultra',
+    'Ultra Rare',
+    'Shiny Ultra Rare',
+    'Illustration Rare',
+    'Trainer Gallery Rare Holo',
+    'LEGEND',
+    'Classic Collection',
+  ],
+  chase: [
+    'Special Illustration Rare',
+    'MEGA_ATTACK_RARE',
+    'Rare Secret',
+    'Rare Rainbow',
+    'Hyper Rare',
+    'Mega Hyper Rare',
+    'Black White Rare',
+    'Rare Holo Star',
+  ],
+} as const
+
+export type TcgBoosterRarityWeights = Record<NormalizedTcgPackRarity, number>
+
+/** Per-slot odds for a normal booster pack. Values are percentage points. */
+export const TCG_BOOSTER_SLOT_WEIGHTS: TcgBoosterRarityWeights = {
+  common: 65,
+  uncommon: 20,
+  rare: 14,
+  chase: 1,
+}
 
 export interface BoosterPackDraw {
   cards: TcgCard[]
@@ -76,14 +131,11 @@ const GUARANTEED_BONUS_ROLL_CUTOFF = 0.0001
 export const TCG_GOD_PACK_RATE = 1 / 1000
 const NEW_CARD_WEIGHT_BONUS = 1.15
 
-const RARE_SLOT_WEIGHTS: Record<RareSlotRarity, number> = {
-  rare: 70,
-  holoRare: 18,
-  ultra: 8,
-  secret: 3,
-  chase: 1,
-}
-const UNCOMMON_PLUS_UPGRADE_RATE = 0.3
+const TCG_PACK_RARITY_LOOKUP = new Map<string, NormalizedTcgPackRarity>(
+  (Object.entries(TCG_PACK_RARITY_BUCKETS) as Array<
+    [NormalizedTcgPackRarity, readonly string[]]
+  >).flatMap(([bucket, rarities]) => rarities.map((rarity) => [rarity, bucket])),
+)
 
 const defaultLogger: Pick<Console, 'debug' | 'warn'> =
   typeof console !== 'undefined'
@@ -163,101 +215,17 @@ function getCardRarityChance(card: TcgCard, modifier: number): number {
 }
 
 export function normalizeTcgPackRarity(rarity?: string | null): NormalizedTcgPackRarity {
-  switch (rarity) {
-    case 'Uncommon':
-      return 'uncommon'
-    case 'Rare':
-      return 'rare'
-    case 'Rare Holo':
-      return 'holoRare'
-
-    case 'Double Rare':
-    case 'Rare Holo EX':
-    case 'Rare Holo GX':
-    case 'Rare Holo V':
-    case 'Radiant Rare':
-    case 'Rare Shiny GX':
-    case 'Rare Holo LV.X':
-    case 'Illustration Rare':
-    case 'Trainer Gallery Rare Holo':
-    case 'LEGEND':
-    case 'Rare BREAK':
-    case 'Rare Holo VMAX':
-    case 'Rare Ultra':
-    case 'Shiny Ultra Rare':
-    case 'Ultra Rare':
-    case 'Classic Collection':
-      return 'ultra'
-
-    case 'Special Illustration Rare':
-    case 'MEGA_ATTACK_RARE':
-    case 'Rare Secret':
-    case 'Rare Holo VSTAR':
-      return 'secret'
-
-    case 'Rare Rainbow':
-    case 'Hyper Rare':
-    case 'Mega Hyper Rare':
-    case 'Black White Rare':
-    case 'Rare Holo Star':
-      return 'chase'
-
-    case 'Rare Shining':
-    case 'Rare Shiny':
-    case 'Shiny Rare':
-    case 'Rare ACE':
-    case 'ACE SPEC Rare':
-    case 'Amazing Rare':
-    case 'Rare Prism Star':
-    case 'Rare Prime':
-      return 'ultra'
-
-    default:
-      return 'common'
-  }
+  return TCG_PACK_RARITY_LOOKUP.get(rarity?.trim() || '') ?? 'common'
 }
 
 function getBoosterPackSlots(cardsPerPack: number, godPack: boolean): BoosterPackSlot[] {
   const count = normalizeQuantity(cardsPerPack)
   if (count === 1) return ['promo']
-  if (godPack) return Array.from({ length: count }, () => 'rare')
-
-  const commonCount = Math.max(0, count - 2)
-  return [
-    ...Array.from({ length: commonCount }, () => 'common' as const),
-    'uncommonPlus',
-    'rare',
-  ]
+  return Array.from({ length: count }, () => (godPack ? 'rareOrBetter' : 'standard'))
 }
 
-export function getTcgBoosterRareSlotWeights(
-  bulkPenalty: boolean,
-): Record<RareSlotRarity, number> {
-  if (!bulkPenalty) return RARE_SLOT_WEIGHTS
-
-  const weights = { ...RARE_SLOT_WEIGHTS }
-  let reclaimedWeight = 0
-  for (const bucket of ['holoRare', 'ultra', 'secret', 'chase'] as const) {
-    const penalty = weights[bucket] * 0.1
-    weights[bucket] -= penalty
-    reclaimedWeight += penalty
-  }
-  weights.rare += reclaimedWeight
-  return weights
-}
-
-export function getTcgBoosterUncommonPlusSlotWeights(
-  bulkPenalty: boolean,
-): Record<UncommonPlusRarity, number> {
-  const rareWeights = getTcgBoosterRareSlotWeights(bulkPenalty)
-  return {
-    uncommon: (1 - UNCOMMON_PLUS_UPGRADE_RATE) * 100,
-    rare: rareWeights.rare * UNCOMMON_PLUS_UPGRADE_RATE,
-    holoRare: rareWeights.holoRare * UNCOMMON_PLUS_UPGRADE_RATE,
-    ultra: rareWeights.ultra * UNCOMMON_PLUS_UPGRADE_RATE,
-    secret: rareWeights.secret * UNCOMMON_PLUS_UPGRADE_RATE,
-    chase: rareWeights.chase * UNCOMMON_PLUS_UPGRADE_RATE,
-  }
+export function getTcgBoosterSlotRarityWeights(_bulkPenalty = false): TcgBoosterRarityWeights {
+  return { ...TCG_BOOSTER_SLOT_WEIGHTS }
 }
 
 function weightedPick<T>(
@@ -311,41 +279,37 @@ function pickBucketCard(
   return null
 }
 
-function pickRareSlotCard(
+function pickChaseCard(
   bucketedCards: Record<NormalizedTcgPackRarity, TcgCard[]>,
   openedInPack: Set<string>,
   collection: Record<string, number>,
-  bulkPenalty: boolean,
   rng: () => number,
 ): TcgCard | null {
-  const weights = getTcgBoosterRareSlotWeights(bulkPenalty)
-  const availableBuckets = (Object.keys(weights) as Array<keyof typeof weights>).filter(
-    (bucket) => bucketedCards[bucket].length > 0,
+  const unownedChaseCards = bucketedCards.chase.filter(
+    (card) => (collection[card.id] || 0) <= 0 && !openedInPack.has(card.id),
   )
-  const selectedBucket = weightedPick(availableBuckets, (bucket) => weights[bucket], rng)
-  if (!selectedBucket) {
-    return pickBucketCard(
-      bucketedCards,
-      ['uncommon', 'common'],
-      openedInPack,
-      collection,
-      rng,
-    )
-  }
 
-  return pickCardFromPool(bucketedCards[selectedBucket], openedInPack, collection, rng)
+  // Prefer a chase card the user has not collected. Once every chase card is
+  // owned (or all remaining unowned cards are already in this pack), fall back
+  // to the normal pool so the slot is still drawable.
+  return pickCardFromPool(
+    unownedChaseCards.length > 0 ? unownedChaseCards : bucketedCards.chase,
+    openedInPack,
+    collection,
+    rng,
+  )
 }
 
-function pickUncommonPlusSlotCard(
+function pickWeightedBucketCard(
   bucketedCards: Record<NormalizedTcgPackRarity, TcgCard[]>,
   openedInPack: Set<string>,
   collection: Record<string, number>,
-  bulkPenalty: boolean,
+  weights: TcgBoosterRarityWeights,
+  allowedBuckets: NormalizedTcgPackRarity[],
   rng: () => number,
 ): TcgCard | null {
-  const weights = getTcgBoosterUncommonPlusSlotWeights(bulkPenalty)
-  const availableBuckets = (Object.keys(weights) as UncommonPlusRarity[]).filter(
-    (bucket) => bucketedCards[bucket].length > 0,
+  const availableBuckets = allowedBuckets.filter(
+    (bucket) => bucketedCards[bucket].length > 0 && weights[bucket] > 0,
   )
   const selectedBucket = weightedPick(availableBuckets, (bucket) => weights[bucket], rng)
   if (!selectedBucket) {
@@ -358,7 +322,9 @@ function pickUncommonPlusSlotCard(
     )
   }
 
-  return pickCardFromPool(bucketedCards[selectedBucket], openedInPack, collection, rng)
+  return selectedBucket === 'chase'
+    ? pickChaseCard(bucketedCards, openedInPack, collection, rng)
+    : pickCardFromPool(bucketedCards[selectedBucket], openedInPack, collection, rng)
 }
 
 export function buildTcgBoosterPackDraws({
@@ -377,9 +343,6 @@ export function buildTcgBoosterPackDraws({
     common: [] as TcgCard[],
     uncommon: [] as TcgCard[],
     rare: [] as TcgCard[],
-    holoRare: [] as TcgCard[],
-    ultra: [] as TcgCard[],
-    secret: [] as TcgCard[],
     chase: [] as TcgCard[],
   } satisfies Record<NormalizedTcgPackRarity, TcgCard[]>
 
@@ -389,6 +352,10 @@ export function buildTcgBoosterPackDraws({
 
   const normalizedPackCount = normalizeQuantity(packCount)
   const packs: BoosterPackDraw[] = []
+  const slotWeights = getTcgBoosterSlotRarityWeights(bulkPenalty)
+  // Keep selections from earlier packs in this operation visible to the chase
+  // protection without mutating the caller's collection object.
+  const workingCollection = { ...collection }
 
   for (let packIndex = 0; packIndex < normalizedPackCount; packIndex += 1) {
     const godPack = cardsPerPack > 1 && clamp(rng(), 0, 1) < TCG_GOD_PACK_RATE
@@ -399,28 +366,24 @@ export function buildTcgBoosterPackDraws({
     for (const slot of slots) {
       const card =
         slot === 'promo'
-          ? pickCardFromPool(setCards, openedInPack, collection, rng)
-          : slot === 'rare'
-            ? pickRareSlotCard(bucketedCards, openedInPack, collection, bulkPenalty, rng)
-            : slot === 'uncommonPlus'
-              ? pickUncommonPlusSlotCard(
-                  bucketedCards,
-                  openedInPack,
-                  collection,
-                  bulkPenalty,
-                  rng,
-                )
-              : pickBucketCard(
-                  bucketedCards,
-                  ['common', 'uncommon', 'rare', 'holoRare', 'ultra', 'secret', 'chase'],
-                  openedInPack,
-                  collection,
-                  rng,
-                )
+          ? pickCardFromPool(setCards, openedInPack, workingCollection, rng)
+          : pickWeightedBucketCard(
+              bucketedCards,
+              openedInPack,
+              workingCollection,
+              slot === 'rareOrBetter'
+                ? { common: 0, uncommon: 0, rare: slotWeights.rare, chase: slotWeights.chase }
+                : slotWeights,
+              slot === 'rareOrBetter'
+                ? ['rare', 'chase']
+                : ['common', 'uncommon', 'rare', 'chase'],
+              rng,
+            )
 
       if (card) {
         packCards.push(card)
         openedInPack.add(card.id)
+        workingCollection[card.id] = (workingCollection[card.id] || 0) + 1
       }
     }
 

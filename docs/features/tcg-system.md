@@ -66,9 +66,10 @@ Catalog responses are versioned with the application release, cached privately i
 
 ## Booster Packs
 - Generated via `src/utilities/tcg/` logic
-- Booster packs use structured slots instead of the general card reward bonus-roll draw. Standard 5-card packs draw 3 common cards, 1 uncommon+ card, and 1 rare+ card. The uncommon+ slot is 70% uncommon and 30% rare-slot upgrades, so luck can produce two rare-or-better cards in one pack.
-- Rare-slot cards use normalized rarity buckets with a 70 rare / 18 holo rare / 8 ultra / 3 secret / 1 chase upgrade table. Missing buckets are skipped and the available bucket weights are rebalanced.
-- Bulk opening applies a 10% penalty to holo rare, ultra, secret, and chase rare-slot weights, moving the reclaimed weight into plain rare. Single-pack opening uses the standard table.
+- Booster packs use structured slots instead of the general card reward bonus-roll draw. Every standard pack slot independently rolls 65% common, 20% uncommon, 14% general rare, or 1% chase, so any pack can contain multiple rare cards (including two or more chase cards at very low odds).
+- The synced Pokemon TCG API rarity labels are grouped into four pack buckets. General rare includes ordinary rares, holo rares, ex/GX/V/VSTAR/VMAX, Radiant, Amazing, Illustration, Trainer Gallery, Ultra, and other special-but-non-secret labels. Chase is reserved for Special Illustration, Secret, Rainbow, Hyper/Mega Hyper, Black White, Holo Star, and `MEGA_ATTACK_RARE` labels. Unknown labels fall back to common so newly added source data remains drawable.
+- Bulk opening uses the same per-slot table as single-pack opening; there is no separate bulk rarity penalty now that all slots roll independently. Missing buckets are skipped and the available bucket weights are rebalanced.
+- Chase selections prefer cards the user does not own yet, including across a multi-pack opening. Once every chase card in that set is owned, duplicates are allowed so the chase slot can still resolve. Sets without chase cards, such as Base Set, simply omit that bucket and rebalance the remaining common/uncommon/rare weights; God Packs likewise fall back to their available rare-or-better buckets.
 - Non-promo packs have a 1:1000 God Pack chance; a God Pack changes every slot in that pack into a rare-or-better slot.
 - Pack draws avoid exact duplicate card IDs within a single pack when possible and give unowned cards a small selection weight bonus.
 - Shiny/rare card animations
