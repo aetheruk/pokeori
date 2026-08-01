@@ -65,12 +65,50 @@ export const mtMoonminingEntries: MiningConfig[] = [
         targetId: 'dome-fossil',
         quantity: 1,
         dropChance: 1,
+        requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'mt-moon-expert-advice',
+            inverse: true,
+          },
+        ],
+      },
+      {
+        type: 'item',
+        targetId: 'dome-fossil',
+        quantity: 1,
+        dropChance: 2,
+        requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'mt-moon-expert-advice',
+          },
+        ],
       },
       {
         type: 'item',
         targetId: 'helix-fossil',
         quantity: 1,
         dropChance: 1,
+        requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'mt-moon-expert-advice',
+            inverse: true,
+          },
+        ],
+      },
+      {
+        type: 'item',
+        targetId: 'helix-fossil',
+        quantity: 1,
+        dropChance: 2,
+        requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'mt-moon-expert-advice',
+          },
+        ],
       },
     ],
     skillXp: { skill: 'catching', level: 15 },

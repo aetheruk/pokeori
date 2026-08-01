@@ -1912,12 +1912,35 @@ export const ceruleanCityTasks: Task[] = [
         targetId: 'pack-gym1',
         quantity: 1,
         dropChance: 100,
+        requirements: [
+          {
+            type: 'card_collected_set',
+            targetId: 'gym1',
+            count: 132,
+            unique: true,
+            inverse: true,
+          },
+        ],
       },
       {
         type: 'currency',
         targetId: 'league-ticket',
         quantity: 1,
         dropChance: 100,
+      },
+      {
+        type: 'currency',
+        targetId: 'league-ticket',
+        quantity: 1,
+        dropChance: 100,
+        requirements: [
+          {
+            type: 'card_collected_set',
+            targetId: 'gym1',
+            count: 132,
+            unique: true,
+          },
+        ],
       },
     ],
     exitModal: {
@@ -2122,6 +2145,12 @@ export const ceruleanCityTasks: Task[] = [
         type: 'daily_not_completed',
         targetId: 'thirsty-work-route-5',
       },
+      {
+        type: 'task_completed',
+        targetId: 'thirsty-work-route-5',
+        count: 10,
+        inverse: true,
+      },
     ],
     criteria: [
       {
@@ -2148,6 +2177,49 @@ export const ceruleanCityTasks: Task[] = [
       message:
         "That's just what I needed. I picked this up on my rounds, but you and your Pokemon will get more use out of it.",
       closeButtonText: 'Receive Great Ball',
+    },
+  },
+  {
+    id: 'thirsty-work-route-5-quenched',
+    name: 'Thirsty Work: Quenched',
+    description:
+      'After ten deliveries, the Route 5 guard finally has enough Fresh Water to see him through his shifts.',
+    category: 'Kanto',
+    subCategory: 'Cerulean City',
+    background: '/backgrounds/grassy-route.avif',
+    icon: {
+      type: 'trainer',
+      id: 'policeman',
+    },
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Collect Thanks',
+    requirements: [
+      {
+        type: 'task_completed',
+        targetId: 'thirsty-work-route-5',
+        count: 10,
+      },
+    ],
+    criteria: [],
+    rewards: [
+      {
+        type: 'item',
+        targetId: 'ultra-ball',
+        quantity: 3,
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/grassy-route.avif',
+      title: 'Route 5 Guard',
+      icon: {
+        type: 'trainer',
+        id: 'policeman',
+      },
+      message:
+        "You've kept me supplied for ten deliveries now. I should have enough Fresh Water to get through the rest of my shifts. Please take these as a thank-you.",
+      closeButtonText: 'Thanks!',
     },
   },
   {

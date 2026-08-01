@@ -83,6 +83,12 @@ export const celadonCityTasks: Task[] = [
       {
         "type": "daily_not_completed",
         "targetId": "thirstier-work-route-7"
+      },
+      {
+        "type": "task_completed",
+        "targetId": "thirstier-work-route-7",
+        "count": 10,
+        "inverse": true
       }
     ],
     "criteria": [
@@ -109,6 +115,47 @@ export const celadonCityTasks: Task[] = [
       },
       "message": "Perfect timing. This post is dry work, but I've got a couple of spare Great Balls from the gatehouse stores.",
       "closeButtonText": "Receive Great Balls"
+    }
+  },
+  {
+    "id": "thirstier-work-route-7-quenched",
+    "name": "Thirstier Work: Quenched",
+    "description": "After ten deliveries, the Route 7 guard finally has enough Soda Pop to see him through his shifts.",
+    "category": "Kanto",
+    "subCategory": "Celadon City",
+    "background": "/backgrounds/grassy-route.avif",
+    "icon": {
+      "type": "trainer",
+      "id": "policeman"
+    },
+    "repeatable": false,
+    "secret": false,
+    "completionTrigger": "manual",
+    "completeButtonText": "Collect Thanks",
+    "requirements": [
+      {
+        "type": "task_completed",
+        "targetId": "thirstier-work-route-7",
+        "count": 10
+      }
+    ],
+    "criteria": [],
+    "rewards": [
+      {
+        "type": "item",
+        "targetId": "ultra-ball",
+        "quantity": 3
+      }
+    ],
+    "exitModal": {
+      "background": "/backgrounds/grassy-route.avif",
+      "title": "Route 7 Guard",
+      "icon": {
+        "type": "trainer",
+        "id": "policeman"
+      },
+      "message": "Ten deliveries! I think I've got enough Soda Pop to last me now. Thanks for keeping this post running—please take these Ultra Balls.",
+      "closeButtonText": "Receive Ultra Balls"
     }
   },
   {
@@ -1493,13 +1540,36 @@ export const celadonCityTasks: Task[] = [
         "type": "item",
         "targetId": "pack-gym1",
         "quantity": 1,
-        "dropChance": 100
+        "dropChance": 100,
+        "requirements": [
+          {
+            "type": "card_collected_set",
+            "targetId": "gym1",
+            "count": 132,
+            "unique": true,
+            "inverse": true
+          }
+        ]
       },
       {
         "type": "currency",
         "targetId": "league-ticket",
         "quantity": 1,
         "dropChance": 100
+      },
+      {
+        "type": "currency",
+        "targetId": "league-ticket",
+        "quantity": 1,
+        "dropChance": 100,
+        "requirements": [
+          {
+            "type": "card_collected_set",
+            "targetId": "gym1",
+            "count": 132,
+            "unique": true
+          }
+        ]
       }
     ],
     "exitModal": {
