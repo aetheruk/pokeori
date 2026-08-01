@@ -72,8 +72,10 @@ import {
   getBattleSecondaryEffectBlockMessage,
   getBattleRecoilDamageBlockMessage,
   getBattleAbilitySwitchPreventionMessage,
+  getBattleAbilityTypeEffectivenessOverride,
   getBattleMentalEffectBlockMessage,
   getBattleStatStageDropBlockMessage,
+  isBattleAbilityTypeImmune,
   suppressesBattleCounterPreventionByAbility,
   suppressesBattleMoveAddedEffectsByAbility,
   usesBattleAbilityMaxMultiHitDamage,
@@ -371,22 +373,27 @@ function getBestAttackTypeForDamage(params: {
   weatherMultiplier: number
 } {
   const { move, attacker, defender, weather } = params
+  const effectiveAttackerTypes = getEffectiveBattleTypes(attacker)
   const attackTypes = move
     ? getMoveAttackTypes(move, attacker, weather)
-    : attacker.types?.length
-      ? attacker.types.map((type) => type.toLowerCase())
+    : effectiveAttackerTypes.length
+      ? effectiveAttackerTypes.map((type) => type.toLowerCase())
       : ['normal']
 
   let best = {
     attackType: attackTypes[0] || 'normal',
-    typeEffectiveness: -1,
+    typeEffectiveness: Number.NEGATIVE_INFINITY,
     weatherMultiplier: 1,
   }
 
   for (const attackType of attackTypes) {
-    const typeEffectiveness = move?.ignoreTypeEffectiveness
-      ? 1
-      : getWeatherTypeEffectiveness(attackType, defender, weather)
+    const typeEffectiveness = getAiTypeEffectiveness({
+      attacker,
+      defender,
+      attackType,
+      move,
+      weather,
+    })
     const weatherMultiplier = getWeatherAttackMultiplier(attackType, weather)
     const score = typeEffectiveness * weatherMultiplier
     const bestScore = best.typeEffectiveness * best.weatherMultiplier
@@ -398,22 +405,52 @@ function getBestAttackTypeForDamage(params: {
   return best
 }
 
+function getAiTypeEffectiveness(params: {
+  attacker: BattlePokemon
+  defender: BattlePokemon
+  attackType: string
+  move?: MoveConfig
+  weather?: WeatherType
+}): number {
+  const { attacker, defender, attackType, move, weather } = params
+  if (
+    isBattleAbilityTypeImmune({
+      attacker,
+      defender,
+      attackType,
+    })
+  ) {
+    return 0
+  }
+
+  const baseEffectiveness = move?.ignoreTypeEffectiveness
+    ? 1
+    : getWeatherTypeEffectiveness(attackType, defender, weather)
+  return getBattleAbilityTypeEffectivenessOverride({
+    attacker,
+    defender,
+    typeEffectiveness: baseEffectiveness,
+  })
+}
+
 function enemyMoveWouldHaveNoEffect(params: {
   move: MoveConfig
+  attacker: BattlePokemon
   attackType: string
   defender: BattlePokemon
   weather?: WeatherType
 }): boolean {
-  if (params.move.damage <= 0 || params.move.ignoreTypeEffectiveness)
-    return false
+  if (params.move.damage <= 0) return false
 
   if (params.move.id === 'hidden-power') {
     return (
-      getWeatherTypeEffectiveness(
-        params.attackType,
-        params.defender,
-        params.weather,
-      ) === 0 ||
+      getAiTypeEffectiveness({
+        attacker: params.attacker,
+        defender: params.defender,
+        attackType: params.attackType,
+        move: params.move,
+        weather: params.weather,
+      }) === 0 ||
       getWeatherAttackMultiplier(params.attackType, params.weather) === 0
     )
   }
@@ -421,7 +458,13 @@ function enemyMoveWouldHaveNoEffect(params: {
   if (params.move.forcedType === 'random') {
     return !POKEMON_TYPES.some((type) => {
       if (
-        getWeatherTypeEffectiveness(type, params.defender, params.weather) === 0
+        getAiTypeEffectiveness({
+          attacker: params.attacker,
+          defender: params.defender,
+          attackType: type,
+          move: params.move,
+          weather: params.weather,
+        }) === 0
       ) {
         return false
       }
@@ -430,11 +473,13 @@ function enemyMoveWouldHaveNoEffect(params: {
   }
 
   return (
-    getWeatherTypeEffectiveness(
-      params.attackType,
-      params.defender,
-      params.weather,
-    ) === 0 ||
+    getAiTypeEffectiveness({
+      attacker: params.attacker,
+      defender: params.defender,
+      attackType: params.attackType,
+      move: params.move,
+      weather: params.weather,
+    }) === 0 ||
     getWeatherAttackMultiplier(params.attackType, params.weather) === 0
   )
 }
@@ -624,9 +669,13 @@ function estimateDamageScore(params: {
   const typeInfo = attackType
     ? {
         attackType,
-        typeEffectiveness: move?.ignoreTypeEffectiveness
-          ? 1
-          : getWeatherTypeEffectiveness(attackType, defender, weather),
+        typeEffectiveness: getAiTypeEffectiveness({
+          attacker,
+          defender,
+          attackType,
+          move,
+          weather,
+        }),
         weatherMultiplier: getWeatherAttackMultiplier(attackType, weather),
       }
     : getBestAttackTypeForDamage({ move, attacker, defender, weather })
@@ -992,6 +1041,7 @@ function scoreMove(params: {
     !effectOnly &&
     enemyMoveWouldHaveNoEffect({
       move,
+      attacker: self,
       attackType,
       defender: opponent,
       weather,
@@ -2053,17 +2103,42 @@ function scorePokemonMatchup(params: {
       bestOffense = Math.max(bestOffense, scored.score)
   }
 
-  let incomingRisk = 0
-  for (const type of getEffectiveBattleTypes(defender)) {
-    const effectiveness = getWeatherTypeEffectiveness(
-      type.toLowerCase(),
-      attacker,
-      state.weather?.weather,
-    )
-    incomingRisk = Math.max(incomingRisk, effectiveness * 18)
-  }
+  const incomingRisk = getIncomingMatchupRisk({
+    attacker: defender,
+    defender: attacker,
+    weather: state.weather?.weather,
+  })
 
   return bestOffense - incomingRisk + hpPercent(attacker) * 16
+}
+
+function getIncomingMatchupRisk(params: {
+  attacker: BattlePokemon
+  defender: BattlePokemon
+  weather?: WeatherType
+}): number {
+  const { attacker, defender, weather } = params
+  const candidateEffectiveness = [
+    getBestAttackTypeForDamage({ attacker, defender, weather })
+      .typeEffectiveness,
+    ...(attacker.battleMoveIds || []).flatMap((moveId) => {
+      const move = getMove(moveId)
+      if (!move || (move.damage <= 0 && !move.damageRule)) return []
+      return [
+        getBestAttackTypeForDamage({
+          move,
+          attacker,
+          defender,
+          weather,
+        }).typeEffectiveness,
+      ]
+    }),
+  ]
+  const strongestIncomingType = Math.max(0, ...candidateEffectiveness)
+
+  // Changing Pokémon gives the player a free chance to exploit a weakness, so
+  // make that defensive cost meaningfully outweigh a marginal offensive gain.
+  return strongestIncomingType * 36
 }
 
 function chooseEnemySwitchAction(params: {
