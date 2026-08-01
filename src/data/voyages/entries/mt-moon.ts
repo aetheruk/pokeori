@@ -50,12 +50,50 @@ export const mtMoonVoyages: VoyageConfig[] = [
         targetId: 'dome-fossil',
         quantity: 1,
         dropChance: 2,
+        requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'mt-moon-expert-advice',
+            inverse: true,
+          },
+        ],
+      },
+      {
+        type: 'item',
+        targetId: 'dome-fossil',
+        quantity: 1,
+        dropChance: 4,
+        requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'mt-moon-expert-advice',
+          },
+        ],
       },
       {
         type: 'item',
         targetId: 'helix-fossil',
         quantity: 1,
         dropChance: 2,
+        requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'mt-moon-expert-advice',
+            inverse: true,
+          },
+        ],
+      },
+      {
+        type: 'item',
+        targetId: 'helix-fossil',
+        quantity: 1,
+        dropChance: 4,
+        requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'mt-moon-expert-advice',
+          },
+        ],
       },
       {
         type: 'xp',

@@ -1993,6 +1993,12 @@ describe('static data references', () => {
 
     expect(task?.name).toBe('Slow Stock')
     expect(task?.criteria).toEqual([])
+    expect(task?.requirements).toContainEqual({
+      type: 'task_completed',
+      targetId: 'pewter-overstock',
+      count: 5,
+      inverse: true,
+    })
     expect(task?.rewards).toEqual([
       { type: 'item', quantity: 2, targetId: 'nut-red' },
       { type: 'item', quantity: 2, targetId: 'nut-purple' },
@@ -4914,6 +4920,140 @@ describe('static data references', () => {
         },
       ],
     })
+
+    const expertAdvice = tasks.find(
+      (entry) => entry.id === 'mt-moon-expert-advice',
+    )
+    expect(expertAdvice?.name).toBe('Expert Advice')
+    expect(expertAdvice?.repeatable).toBe(false)
+    expect(expertAdvice?.requirements).toContainEqual({
+      type: 'task_completed',
+      targetId: 'mt-moon-fossils',
+    })
+    expect(expertAdvice?.requirements).toContainEqual({
+      type: 'card_collected_set',
+      targetId: 'base3',
+      count: 62,
+      unique: true,
+    })
+    expect(expertAdvice?.exitModal?.message).toBe(
+      "Hey {Trainer}, that's some really nice work on the fossil sets, really appreciate the crystals. They will be pleased indeed. Lemme give you a few tips and tricks when you're fossil hunting.",
+    )
+
+    for (const [entry, baseDropChance, improvedDropChance] of [
+      [mining, 1, 2],
+      [voyage, 2, 4],
+    ] as const) {
+      const domeRewards = (entry?.rewards || []).filter(
+        (reward) => reward.targetId === 'dome-fossil',
+      )
+      const helixRewards = (entry?.rewards || []).filter(
+        (reward) => reward.targetId === 'helix-fossil',
+      )
+      for (const fossilRewards of [domeRewards, helixRewards]) {
+        expect(fossilRewards.map((reward) => reward.dropChance)).toEqual([
+          baseDropChance,
+          improvedDropChance,
+        ])
+        expect(fossilRewards[0]?.requirements).toContainEqual({
+          type: 'task_completed',
+          targetId: 'mt-moon-expert-advice',
+          inverse: true,
+        })
+        expect(fossilRewards[1]?.requirements).toContainEqual({
+          type: 'task_completed',
+          targetId: 'mt-moon-expert-advice',
+        })
+      }
+    }
+  })
+
+  test('Gym Heroes daily rewards swap packs for a second League Ticket at a full set', () => {
+    const gymDailyEntries = [
+      tasks.find((entry) => entry.id === 'brock-daily-stones'),
+      tasks.find((entry) => entry.id === 'misty-daily-scales'),
+      allGames.find((entry) => entry.id === 'vermilion-gym-voltorb-drill'),
+      tasks.find((entry) => entry.id === 'erikas-sweet-tooth'),
+    ]
+
+    for (const entry of gymDailyEntries) {
+      expect(entry).toBeDefined()
+      const rewards = entry?.rewards || []
+      expect(rewards).toContainEqual({
+        type: 'item',
+        targetId: 'pack-gym1',
+        quantity: 1,
+        dropChance: 100,
+        requirements: [
+          {
+            type: 'card_collected_set',
+            targetId: 'gym1',
+            count: 132,
+            unique: true,
+            inverse: true,
+          },
+        ],
+      })
+      expect(
+        rewards.filter(
+          (reward) =>
+            reward.type === 'currency' && reward.targetId === 'league-ticket',
+        ),
+      ).toHaveLength(2)
+      expect(rewards).toContainEqual({
+        type: 'currency',
+        targetId: 'league-ticket',
+        quantity: 1,
+        dropChance: 100,
+        requirements: [
+          {
+            type: 'card_collected_set',
+            targetId: 'gym1',
+            count: 132,
+            unique: true,
+          },
+        ],
+      })
+    }
+  })
+
+  test('Thirsty Work dailies stop after ten completions and pay quenched wrap-ups', () => {
+    const dailyEntries = [
+      {
+        daily: tasks.find((entry) => entry.id === 'thirsty-work-route-5'),
+        wrapup: tasks.find(
+          (entry) => entry.id === 'thirsty-work-route-5-quenched',
+        ),
+        dailyId: 'thirsty-work-route-5',
+      },
+      {
+        daily: tasks.find((entry) => entry.id === 'thirstier-work-route-7'),
+        wrapup: tasks.find(
+          (entry) => entry.id === 'thirstier-work-route-7-quenched',
+        ),
+        dailyId: 'thirstier-work-route-7',
+      },
+    ]
+
+    for (const { daily, wrapup, dailyId } of dailyEntries) {
+      expect(daily?.requirements).toContainEqual({
+        type: 'task_completed',
+        targetId: dailyId,
+        count: 10,
+        inverse: true,
+      })
+      expect(wrapup?.repeatable).toBe(false)
+      expect(wrapup?.requirements).toContainEqual({
+        type: 'task_completed',
+        targetId: dailyId,
+        count: 10,
+      })
+      expect(wrapup?.rewards).toContainEqual({
+        type: 'item',
+        targetId: 'ultra-ball',
+        quantity: 3,
+      })
+    }
   })
 
   test('catch encounter shield and flee configs stay bounded', () => {

@@ -113,12 +113,35 @@ export const vermillionCitysnapEntries: SnapConfig[] = [
         targetId: 'pack-gym1',
         quantity: 1,
         dropChance: 100,
+        requirements: [
+          {
+            type: 'card_collected_set',
+            targetId: 'gym1',
+            count: 132,
+            unique: true,
+            inverse: true,
+          },
+        ],
       },
       {
         type: 'currency',
         targetId: 'league-ticket',
         quantity: 1,
         dropChance: 100,
+      },
+      {
+        type: 'currency',
+        targetId: 'league-ticket',
+        quantity: 1,
+        dropChance: 100,
+        requirements: [
+          {
+            type: 'card_collected_set',
+            targetId: 'gym1',
+            count: 132,
+            unique: true,
+          },
+        ],
       },
     ],
     settings: {

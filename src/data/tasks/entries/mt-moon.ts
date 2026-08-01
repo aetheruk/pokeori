@@ -710,6 +710,48 @@ export const mtMoonTasks: Task[] = [
     },
   },
   {
+    id: 'mt-moon-expert-advice',
+    name: 'Expert Advice',
+    description:
+      'Researcher Miguel is so impressed by my fervour for the TCG that he offers some practical advice for fossil hunting.',
+    category: 'Kanto',
+    subCategory: 'Mt. Moon',
+    icon: {
+      type: 'trainer',
+      id: 'researcher',
+    },
+    background: '/backgrounds/cave.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Listen to Advice',
+    requirements: [
+      {
+        type: 'task_completed',
+        targetId: 'mt-moon-fossils',
+      },
+      {
+        type: 'card_collected_set',
+        targetId: 'base3',
+        count: 62,
+        unique: true,
+      },
+    ],
+    criteria: [],
+    rewards: [],
+    exitModal: {
+      background: '/backgrounds/cave.avif',
+      title: 'Researcher Miguel',
+      icon: {
+        type: 'trainer',
+        id: 'researcher',
+      },
+      message:
+        "Hey {Trainer}, that's some really nice work on the fossil sets, really appreciate the crystals. They will be pleased indeed. Lemme give you a few tips and tricks when you're fossil hunting.",
+      closeButtonText: 'Thanks, Miguel',
+    },
+  },
+  {
     id: 'exp-mt-moon-lass-warning',
     name: 'A Mysterious Lass',
     description: 'A quiet lass blocks your path and watches every move you make.',

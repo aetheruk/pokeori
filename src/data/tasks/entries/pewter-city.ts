@@ -1543,12 +1543,35 @@ export const pewterCityTasks: Task[] = [
         targetId: 'pack-gym1',
         quantity: 1,
         dropChance: 100,
+        requirements: [
+          {
+            type: 'card_collected_set',
+            targetId: 'gym1',
+            count: 132,
+            unique: true,
+            inverse: true,
+          },
+        ],
       },
       {
         type: 'currency',
         targetId: 'league-ticket',
         quantity: 1,
         dropChance: 100,
+      },
+      {
+        type: 'currency',
+        targetId: 'league-ticket',
+        quantity: 1,
+        dropChance: 100,
+        requirements: [
+          {
+            type: 'card_collected_set',
+            targetId: 'gym1',
+            count: 132,
+            unique: true,
+          },
+        ],
       },
     ],
     id: 'brock-daily-stones',
@@ -1768,6 +1791,12 @@ export const pewterCityTasks: Task[] = [
       {
         type: 'daily_not_completed',
         targetId: 'pewter-overstock',
+      },
+      {
+        type: 'task_completed',
+        targetId: 'pewter-overstock',
+        count: 5,
+        inverse: true,
       },
     ],
     criteria: [],
