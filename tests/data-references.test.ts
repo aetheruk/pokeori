@@ -2032,7 +2032,7 @@ describe('static data references', () => {
     }
 
     expect(leadInTasks[2]?.exitModal?.message).toBe(
-      'The Maniac taps an absurdly complicated rhythm against the rock with your mallet. A section of wall swings open and a woman peers through. She spots your empty Promo binder and smiles. “The new recruit! Right on time.” The Maniac gestures for you to follow, and she waves you inside. “Come along.”',
+      'The Maniac taps an absurdly complicated rhythm against the rock with your mallet. A section of wall swings open and a woman peers through. She spots your empty Promo binder and smiles. “The new recruit! Right on time.” The stranger gestures for you to follow, and she waves you inside. UNDERGROUND Is now accessible from the region map.',
     )
 
     expect(undergroundRegion).toMatchObject({
@@ -2061,18 +2061,12 @@ describe('static data references', () => {
           guaranteed: true,
         },
       },
-      {
-        type: 'pokemon_research_xp',
-        targetId: '201-j',
-        quantity: 1,
-        dropChance: 100,
-      },
     ])
     expect(finalTask?.enterModal?.[1]?.message).toBe('MORE CRYSTALS. BRING THEM.')
     expect(finalTask?.enterModal?.[2]?.message).toBe(
-      'TRADING WITH OTHER TRAINERS IS MUCH FASTER THAN GATHERING THEM YOURSELF. CONTINUE.',
+      '"The pit wants crystals, so we created the TCG so we can trade with other trainers." It’s much faster than gathering them yourself. Nobody nearby looks surprised or concerned. The woman smiles and opens your binder. “Right then. Let’s make this official.”',
     )
-    expect(finalTask?.enterModal?.[3]?.title).toBe('Underground Collectors')
+    expect(finalTask?.enterModal).toHaveLength(3)
     expect(finalTask?.description).toBe(
       'The deepest gathering place has been built around something deeper still.',
     )

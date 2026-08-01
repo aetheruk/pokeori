@@ -32,8 +32,7 @@ export const kantoUndergroundTasks: Task[] = [
       {
         id: 1,
         title: 'Underground',
-        message:
-          '“This way. It isn’t far,” says the male Maniac. The passage immediately drops into a steep stairway carved through the rock.',
+        message: 'The passage immediately drops into a steep stairway carved through the rock.',
         background: undergroundBackground,
         icon: {
           type: 'trainer',
@@ -87,7 +86,7 @@ export const kantoUndergroundTasks: Task[] = [
         id: 4,
         title: 'Kanto Underground',
         message:
-          'At last, the tunnel opens into a bright cavern filled with card tables, binders, trading, and cheerful conversation. “Here we are,” says the male Maniac, as though the journey took five minutes.',
+          'At last, the tunnel opens into a bright cavern filled with card tables, binders, and cheerful conversation. “Here we are!”, as though the journey took five minutes.',
         background: undergroundBackground,
         icon: {
           type: 'trainer',
@@ -95,7 +94,7 @@ export const kantoUndergroundTasks: Task[] = [
         },
         buttons: [
           {
-            text: 'Enter the Gathering',
+            text: 'Whoa!',
             type: 'success',
           },
         ],
@@ -116,8 +115,7 @@ export const kantoUndergroundTasks: Task[] = [
   {
     id: 'kanto-underground-somehow-deeper',
     name: 'Somehow, Deeper',
-    description:
-      'The deepest gathering place has been built around something deeper still.',
+    description: 'The deepest gathering place has been built around something deeper still.',
     category: 'Underground',
     subCategory: 'Kanto Underground',
     icon: {
@@ -146,12 +144,6 @@ export const kantoUndergroundTasks: Task[] = [
           allowedCardIds: ['basep-38'],
           guaranteed: true,
         },
-      },
-      {
-        type: 'pokemon_research_xp',
-        targetId: '201-j',
-        quantity: 1,
-        dropChance: 100,
       },
     ],
     enterModal: [
@@ -188,22 +180,9 @@ export const kantoUndergroundTasks: Task[] = [
       },
       {
         id: 3,
-        title: 'The Pit',
-        message: 'TRADING WITH OTHER TRAINERS IS MUCH FASTER THAN GATHERING THEM YOURSELF. CONTINUE.',
-        background: undergroundBackground,
-        buttons: [
-          {
-            text: 'Turn to the Collectors',
-            type: 'navigate',
-            id: 4,
-          },
-        ],
-      },
-      {
-        id: 4,
         title: 'Underground Collectors',
         message:
-          '“Exactly,” says the male Maniac. “The pit wants more crystals, so we trade with other trainers. It’s much faster than gathering them yourself.” Nobody nearby looks surprised or concerned. The woman smiles and opens your binder. “Right then. Let’s make this official.”',
+          '"The pit wants crystals, so we created the TCG so we can trade with other trainers." It’s much faster than gathering them yourself. Nobody nearby looks surprised or concerned. The woman smiles and opens your binder. “Right then. Let’s make this official.”',
         background: undergroundBackground,
         icon: {
           type: 'trainer',
@@ -211,7 +190,7 @@ export const kantoUndergroundTasks: Task[] = [
         },
         buttons: [
           {
-            text: 'Join the Collectors',
+            text: 'What the...',
             type: 'success',
           },
         ],
@@ -225,7 +204,7 @@ export const kantoUndergroundTasks: Task[] = [
         id: '201-j',
       },
       message:
-        'The woman slides Promo No. 38, Unown [J], into the first empty sleeve. “J is for Join. Everyone starts somewhere.” Behind her, the gathering carries on as if a bottomless talking pit were the most ordinary thing in Kanto.',
+        'The woman slides Promo No. 38, Unown [J], into the first empty sleeve. “J is for Join. Everyone starts somewhere.” Behind her, everyone carries on completely ignoring the incredibly ominous pit.',
       closeButtonText: 'Take the Card',
     },
   },
