@@ -488,6 +488,26 @@ describe('Celadon Game Corner balance and presentation', () => {
     expect(card.rewards.every((outcome) => outcome.reward?.length)).toBe(true)
     expect(card.rewards).toContainEqual(
       expect.objectContaining({
+        chance: 60,
+        reward: [
+          expect.objectContaining({
+            type: 'item',
+            targetId: 'pack-base5',
+            quantity: 2,
+          }),
+        ],
+        icon: { type: 'item', id: 'pack-base5' },
+      }),
+    )
+    expect(
+      card.rewards.some((outcome) =>
+        outcome.reward?.some(
+          (reward) => reward.type === 'currency' && reward.quantity === 50,
+        ),
+      ),
+    ).toBe(false)
+    expect(card.rewards).toContainEqual(
+      expect.objectContaining({
         chance: 25,
         reward: [
           expect.objectContaining({
@@ -544,6 +564,12 @@ describe('Celadon Game Corner balance and presentation', () => {
       return total + (outcome.chance / 100) * outcomeValue
     }, 0)
 
-    expect(expectedTokenValue).toBe(67.5)
+    expect(expectedTokenValue).toBe(37.5)
+
+    expect(scratchCards['moon-scratch'].rewards).not.toContainEqual(
+      expect.objectContaining({
+        reward: [expect.objectContaining({ targetId: 'pack-base5' })],
+      }),
+    )
   })
 })

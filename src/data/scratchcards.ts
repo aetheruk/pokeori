@@ -33,13 +33,13 @@ export const scratchCards: Record<string, ScratchCardConfig> = {
         chance: 60,
         reward: [
           {
-            type: 'currency',
-            targetId: 'fun-tokens',
-            quantity: 50,
-            label: '50 Fun Tokens',
+            type: 'item',
+            targetId: 'pack-base5',
+            quantity: 2,
+            label: '2 Team Rocket Booster Packs',
           },
         ],
-        icon: { type: 'item', id: 'fun-token' },
+        icon: { type: 'item', id: 'pack-base5' },
       },
       {
         chance: 5,

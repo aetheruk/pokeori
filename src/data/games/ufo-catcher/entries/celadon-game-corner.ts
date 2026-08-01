@@ -62,6 +62,7 @@ function itemPrize({
   quantity,
   weight,
   rarity,
+  replacementWhenOwned,
 }: {
   id: string
   label: string
@@ -70,6 +71,7 @@ function itemPrize({
   quantity: number
   weight: number
   rarity: UfoCatcherPrizeTier['rarity']
+  replacementWhenOwned?: UfoCatcherPrizeTier['replacementWhenOwned']
 }): UfoCatcherPrizeTier {
   return {
     id,
@@ -87,6 +89,7 @@ function itemPrize({
         label,
       },
     ],
+    replacementWhenOwned,
   }
 }
 
@@ -175,6 +178,28 @@ const itemPrizePool: UfoCatcherPrizeTier[] = [
     quantity: 1,
     weight: 14,
     rarity: 'common',
+  }),
+  itemPrize({
+    id: 'rocket-binder',
+    label: 'Team Rocket Binder',
+    itemId: 'binder-base5',
+    quantity: 1,
+    weight: 70,
+    rarity: 'common',
+    replacementWhenOwned: {
+      itemId: 'binder-base5',
+      label: 'Team Rocket Booster Pack',
+      icon: { type: 'item', id: 'pack-base5' },
+      rewards: [
+        {
+          type: 'item',
+          targetId: 'pack-base5',
+          quantity: 1,
+          dropChance: 100,
+          label: 'Team Rocket Booster Pack',
+        },
+      ],
+    },
   }),
   itemPrize({
     id: 'antidotes',

@@ -31,7 +31,10 @@ import {
 } from '@/utilities/research/ufo-catcher'
 import type { Reward } from '@/utilities/rewards/reward-logic'
 import { grantRewards } from '@/utilities/rewards/reward-logic'
-import { incrementUserActivityResult } from '@/utilities/user-state'
+import {
+  getUserInventoryMap,
+  incrementUserActivityResult,
+} from '@/utilities/user-state'
 import { mergeSummaries } from '../utils'
 
 const UFO_CATCHER_ATTEMPT_TTL_SECONDS = 300
@@ -40,6 +43,7 @@ const UFO_CATCHER_RESULT_TTL_SECONDS = 600
 interface UfoCatcherPrivateAttempt {
   publicAttempt: UfoCatcherPublicAttempt
   gripRoll: number
+  rewardsByTierId: Record<string, Reward[]>
 }
 
 export interface UfoCatcherAttemptResult {
@@ -162,6 +166,7 @@ export async function startUfoCatcherAttempt(
         collection: 'users',
         id: user.id,
       })
+      const freshInventory = await getUserInventoryMap(payload, freshUser.id)
       const { cost } = encounter.settings
       const currentBalance = getCurrencyBalance(freshUser, cost.currencyType)
       if (currentBalance < cost.amount) {
@@ -174,6 +179,7 @@ export async function startUfoCatcherAttempt(
         {
           unlockedIcons: freshUser.unlockedIcons,
           unlockedTitles: freshUser.unlockedTitles,
+          inventory: freshInventory,
         },
       )
       const publicAttempt: UfoCatcherPublicAttempt = {
@@ -198,6 +204,9 @@ export async function startUfoCatcherAttempt(
       const privateAttempt: UfoCatcherPrivateAttempt = {
         publicAttempt,
         gripRoll: secureRoll(),
+        rewardsByTierId: Object.fromEntries(
+          eligibleTiers.map((tier) => [tier.id, tier.rewards as Reward[]]),
+        ),
       }
 
       await payload.update({
@@ -351,11 +360,13 @@ export async function settleUfoCatcherAttempt({
         const tier = encounter.settings.tiers.find(
           (entry) => entry.id === resolution.prize.tierId,
         )
-        if (!tier)
+        const rewards =
+          attempt.rewardsByTierId?.[resolution.prize.tierId] || tier?.rewards
+        if (!rewards)
           return { success: false, error: 'Prize configuration changed' }
         const rewardResult = await grantRewards(
           user.id,
-          tier.rewards as unknown as Reward[],
+          rewards,
         )
         rewardSummary = rewardResult.summary
       }

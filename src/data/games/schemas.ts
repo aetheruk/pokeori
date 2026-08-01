@@ -470,6 +470,15 @@ const ufoCatcherAnchorSchema = z
   })
   .strict()
 
+const ufoCatcherOwnedItemReplacementSchema = z
+  .object({
+    itemId: z.string().min(1),
+    label: z.string().min(1),
+    icon: taskIconSchema,
+    rewards: z.array(rewardSchema).length(1),
+  })
+  .strict()
+
 const ufoCatcherTierSchema = z
   .object({
     id: z.string().min(1).max(80),
@@ -481,6 +490,7 @@ const ufoCatcherTierSchema = z
     edgeGripChance: z.number().min(0).max(1),
     centerGripChance: z.number().min(0).max(1),
     rewards: z.array(rewardSchema).length(1),
+    replacementWhenOwned: ufoCatcherOwnedItemReplacementSchema.optional(),
   })
   .strict()
   .refine((tier) => tier.centerGripChance >= tier.edgeGripChance, {
