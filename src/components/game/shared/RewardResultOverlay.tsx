@@ -308,13 +308,15 @@ export function RewardResultOverlay({
 
       <Dialog
         open={currentStep === 'summary' || currentStep === 'cards'}
-        onOpenChange={(open) => {
-          if (!open) handleFinalClose()
-        }}
+        // The result flow is deliberately closed by its action buttons. A
+        // parent Drawer/Dialog teardown must not dismiss it mid-transition.
+        onOpenChange={() => undefined}
       >
         <DialogContent
           showCloseButton={false}
-          onInteractOutside={(e) => e.preventDefault()}
+          container={container}
+          onEscapeKeyDown={(event) => event.preventDefault()}
+          onInteractOutside={(event) => event.preventDefault()}
           className="max-w-none h-[100dvh] w-screen gap-0 border-0 bg-game-surface p-0 focus:outline-none"
         >
           <DialogTitle className="sr-only">Reward Result</DialogTitle>

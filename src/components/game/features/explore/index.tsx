@@ -512,7 +512,10 @@ function ExploreListContent({
         return (
           <RewardResultOverlay
             result={actions.expeditionRewardResult}
-            onClose={() => actions.setExpeditionRewardResult(null)}
+            onClose={() => {
+              actions.setExpeditionRewardResult(null)
+              actions.setSelectedItem(null)
+            }}
             title={`${expeditionLabel} COMPLETE`}
             message={`${expeditionLabelTitle} rewards claimed`}
             icon={

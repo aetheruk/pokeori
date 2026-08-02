@@ -1,11 +1,12 @@
 # Current Game State
 
-Last reviewed: 2026-07-30
+Last reviewed: 2026-08-02
 
 This document maps the current implemented game progression from the static game data and runtime unlock rules. It is based on the active data in `src/data/**`, the Explore filtering logic in `src/components/game/features/explore/hooks/useExploreData.ts`, and the requirement resolver in `src/utilities/requirements/index.ts`.
 
 ## Runtime Notes
 
+- Release `0.6.9` fixes the tutorial rival picker when it is opened from an Expedition or Chronicle task: the full-screen picker no longer competes with the underlying Explore Drawer, and rival selection completes before the task path is reopened. Expedition and Chronicle reward/result screens now remain open until the trainer chooses Continue, then close the path panel cleanly.
 - Release `0.6.1` lowers Rocket UFO Catcher entry to 30 Fun Tokens and broadens its non-token prize pool. Type gems now award two, tier-one Pokémon materials award three, and every standard status cure is represented. Medium-rare profile prizes unlock the Rotom icon or `UFO Master` title and are retired from that trainer's future cabinets once owned. Rare targets add Link Cable, Up-Grade, Dubious Disc, and Nugget alongside the existing special Balls.
 - Release `0.6.0` introduces the 50-Fun-Token Rocket UFO Catcher as a single item-only Celadon Game Corner machine. Each paid reveal contains five distinct weighted items in randomized safe positions, with common medicine, gems, materials, and candies leading into rarer X items, special Balls, and EV vitamins. The server owns prize selection, positioning, grip chance, settlement, attempt restoration, and rewards. Its clay cabinet uses Rotom for its game entry and marquee, a solid sliding shutter, a visual prize chute, and an explicit UFO Catcher Explore icon. The primary-pointer hold control suppresses long-press browser callouts and context menus, ignores auxiliary mouse buttons, and keeps the idle 50-token play action text-only.
 - Release `0.5.1` narrows both Pachinko outer prize slots from 90 to 60 authored units, exactly two-thirds of their previous width, so a human-timed drop has a meaningfully smaller target. Jackpot and Bonus Drop slots remain 32 units wide and all payouts are unchanged.

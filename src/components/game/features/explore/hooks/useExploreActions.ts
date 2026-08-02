@@ -234,7 +234,6 @@ export function useExploreActions(
         rewards: (result as any).rewards || (result as any).summary,
         expeditionId,
       })
-      setSelectedItem(null)
       refreshUser()
     } catch (error) {
       toast.error(`Failed to claim ${expeditionLabel.toLowerCase()} rewards`)
