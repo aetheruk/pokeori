@@ -55,4 +55,8 @@ describe('game data sync scopes', () => {
     expect(getGameDataScope('/game/games/match3')).toBe('inventory')
     expect(getGameDataScope('/game/games/fishing')).toBe('inventory')
   })
+
+  test('artisan sync includes TCG data for card-gated recipes', () => {
+    expect(GAME_DATA_SCOPE_KEYS.artisan).toContain('tcg')
+  })
 })

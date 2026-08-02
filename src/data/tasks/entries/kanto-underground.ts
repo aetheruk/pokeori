@@ -1,6 +1,6 @@
 import { Task } from '../../types'
 
-const undergroundBackground = '/backgrounds/underground.avif'
+const undergroundBackground = '/backgrounds/kanto-underground.avif'
 
 export const kantoUndergroundTasks: Task[] = [
   {

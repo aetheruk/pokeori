@@ -52,6 +52,7 @@ export const GAME_DATA_SCOPE_KEYS: Record<GameDataScope, GameDataKeys[]> = {
   artisan: [
     'inventory',
     'pokedex',
+    'tcg',
     'completedTasks',
     'gameResults',
     'shopPurchases',
