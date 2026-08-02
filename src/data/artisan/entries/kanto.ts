@@ -1315,6 +1315,23 @@ const QUEST_RECIPES: ArtisanRecipeDraft[] = [
         type: 'item_owned',
         targetId: 'binder-base2',
       },
+      {
+        type: 'any_of',
+        conditions: [
+          {
+            type: 'card_collected_set',
+            targetId: 'base2',
+            count: 64,
+            unique: true,
+            inverse: true,
+          },
+          {
+            type: 'task_completed',
+            targetId: 'bug-god-tiny-armour',
+            inverse: true,
+          },
+        ],
+      },
     ],
   },
   {

@@ -883,6 +883,23 @@ describe('artisan recipes', () => {
       type: 'item_owned',
       targetId: 'binder-base2',
     })
+    expect(recipe?.requirements).toContainEqual({
+      type: 'any_of',
+      conditions: [
+        {
+          type: 'card_collected_set',
+          targetId: 'base2',
+          count: 64,
+          unique: true,
+          inverse: true,
+        },
+        {
+          type: 'task_completed',
+          targetId: 'bug-god-tiny-armour',
+          inverse: true,
+        },
+      ],
+    })
 
     expect(task).toBeDefined()
     expect(task?.repeatable).toBe(true)
@@ -893,6 +910,23 @@ describe('artisan recipes', () => {
     expect(task?.requirements).toContainEqual({
       type: 'item_owned',
       targetId: 'binder-base2',
+    })
+    expect(task?.requirements).toContainEqual({
+      type: 'any_of',
+      conditions: [
+        {
+          type: 'card_collected_set',
+          targetId: 'base2',
+          count: 64,
+          unique: true,
+          inverse: true,
+        },
+        {
+          type: 'task_completed',
+          targetId: 'bug-god-tiny-armour',
+          inverse: true,
+        },
+      ],
     })
     expect(task?.criteria).toContainEqual({
       type: 'item_owned',
@@ -961,6 +995,68 @@ describe('artisan recipes', () => {
       targetId: 'tiny-bug-armour',
       quantity: 10,
     })
+  })
+
+  test('Bug Out wraps the full Jungle set after the first Bug God hand-in', () => {
+    const task = tasks.find((entry) => entry.id === 'bug-out')
+
+    expect(task).toMatchObject({
+      name: 'Bug Out',
+      repeatable: false,
+      requirements: [
+        {
+          type: 'card_collected_set',
+          targetId: 'base2',
+          count: 64,
+          unique: true,
+        },
+        {
+          type: 'task_completed',
+          targetId: 'bug-god-tiny-armour',
+        },
+      ],
+      rewards: [
+        {
+          type: 'xp',
+          skill: 'catching',
+          quantity: 500,
+          dropChance: 100,
+        },
+      ],
+      exitModal: {
+        title: 'Bug Maniac',
+        message: 'Hahaha The Swarm is ready... Later {Trainer} Perhaps we will meet again.',
+        closeButtonText: 'Later',
+      },
+    })
+  })
+
+  test('the Bug God offering chain remains finishable once after Jungle completion', () => {
+    for (const taskId of [
+      'bug-maniac-trade-1',
+      'bug-maniac-trade-2',
+      'bug-maniac-trade-3',
+    ]) {
+      const task = tasks.find((entry) => entry.id === taskId)
+
+      expect(task?.requirements).toContainEqual({
+        type: 'any_of',
+        conditions: [
+          {
+            type: 'card_collected_set',
+            targetId: 'base2',
+            count: 64,
+            unique: true,
+            inverse: true,
+          },
+          {
+            type: 'task_completed',
+            targetId: 'bug-maniac-trade-3',
+            inverse: true,
+          },
+        ],
+      })
+    }
   })
 
   test('berry candies unlock four artisan levels after their dye recipes', () => {

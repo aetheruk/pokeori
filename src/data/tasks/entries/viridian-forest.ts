@@ -52,6 +52,23 @@ export const viridianForestTasks: Task[] = [
         type: 'task_completed',
         targetId: 'bug-maniac-discovery',
       },
+      {
+        type: 'any_of',
+        conditions: [
+          {
+            type: 'card_collected_set',
+            targetId: JUNGLE_SET_ID,
+            count: JUNGLE_SET_UNIQUE_CARD_COUNT,
+            unique: true,
+            inverse: true,
+          },
+          {
+            type: 'task_completed',
+            targetId: 'bug-maniac-trade-3',
+            inverse: true,
+          },
+        ],
+      },
     ],
     criteria: [
       {
@@ -105,6 +122,23 @@ export const viridianForestTasks: Task[] = [
       {
         type: 'task_completed',
         targetId: 'bug-maniac-trade-1',
+      },
+      {
+        type: 'any_of',
+        conditions: [
+          {
+            type: 'card_collected_set',
+            targetId: JUNGLE_SET_ID,
+            count: JUNGLE_SET_UNIQUE_CARD_COUNT,
+            unique: true,
+            inverse: true,
+          },
+          {
+            type: 'task_completed',
+            targetId: 'bug-maniac-trade-3',
+            inverse: true,
+          },
+        ],
       },
     ],
     criteria: [
@@ -160,6 +194,23 @@ export const viridianForestTasks: Task[] = [
       {
         type: 'task_completed',
         targetId: 'bug-maniac-trade-2',
+      },
+      {
+        type: 'any_of',
+        conditions: [
+          {
+            type: 'card_collected_set',
+            targetId: JUNGLE_SET_ID,
+            count: JUNGLE_SET_UNIQUE_CARD_COUNT,
+            unique: true,
+            inverse: true,
+          },
+          {
+            type: 'task_completed',
+            targetId: 'bug-maniac-trade-3',
+            inverse: true,
+          },
+        ],
       },
     ],
     criteria: [
@@ -308,6 +359,23 @@ export const viridianForestTasks: Task[] = [
         type: 'item_owned',
         targetId: 'binder-base2',
       },
+      {
+        type: 'any_of',
+        conditions: [
+          {
+            type: 'card_collected_set',
+            targetId: JUNGLE_SET_ID,
+            count: JUNGLE_SET_UNIQUE_CARD_COUNT,
+            unique: true,
+            inverse: true,
+          },
+          {
+            type: 'task_completed',
+            targetId: 'bug-god-tiny-armour',
+            inverse: true,
+          },
+        ],
+      },
     ],
     criteria: [
       {
@@ -352,6 +420,53 @@ export const viridianForestTasks: Task[] = [
       message:
         'YES. YES! Look at them. Armoured. Magnificent. Terrifying. The Bug God nods. Probably. Take this.',
       closeButtonText: 'Take Reward',
+      icon: {
+        type: 'trainer',
+        id: 'bug-maniac',
+      },
+    },
+  },
+  {
+    id: 'bug-out',
+    name: 'Bug Out',
+    description: 'The Weird Bug guy is muttering to himself.',
+    category: 'Kanto',
+    subCategory: 'Viridian Forest',
+    icon: {
+      type: 'trainer',
+      id: 'bug-maniac',
+    },
+    background: '/backgrounds/forest.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Listen In',
+    requirements: [
+      {
+        type: 'card_collected_set',
+        targetId: JUNGLE_SET_ID,
+        count: JUNGLE_SET_UNIQUE_CARD_COUNT,
+        unique: true,
+      },
+      {
+        type: 'task_completed',
+        targetId: 'bug-god-tiny-armour',
+      },
+    ],
+    criteria: [],
+    rewards: [
+      {
+        type: 'xp',
+        skill: 'catching',
+        quantity: 500,
+        dropChance: 100,
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/forest.avif',
+      title: 'Bug Maniac',
+      message: 'Hahaha The Swarm is ready... Later {Trainer} Perhaps we will meet again.',
+      closeButtonText: 'Later',
       icon: {
         type: 'trainer',
         id: 'bug-maniac',
