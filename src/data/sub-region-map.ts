@@ -355,7 +355,7 @@ export const subCategories: Record<string, RegionData> = {
     category: 'Kanto Underground',
     region: 'Underground',
     order: 10,
-    image: '/backgrounds/underground.avif',
+    image: '/backgrounds/kanto-underground.avif',
     description:
       'A hidden community of collectors buried much farther beneath Kanto than seems reasonable.',
     music: '/music/moon.mp3',

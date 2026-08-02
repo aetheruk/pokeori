@@ -100,7 +100,7 @@ export const viridianForestsnapEntries: SnapConfig[] = [
         type: 'game_result',
         targetId: 'research-forest-photos',
         battleStatus: 'win',
-        count: 30,
+        count: 10,
       },
     ],
     settings: {
