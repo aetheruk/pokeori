@@ -92,7 +92,7 @@ export const diglettsCaveTasks: Task[] = [
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Follow the Maniac',
+    completeButtonText: 'Follow the Stranger',
     chat: true,
     requirements: [
       {
