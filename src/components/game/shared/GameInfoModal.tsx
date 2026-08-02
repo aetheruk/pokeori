@@ -88,6 +88,7 @@ interface GameInfoModalProps {
   background?: string
   autoScrollRewards?: boolean
   presentation?: 'dialog' | 'drawer'
+  modal?: boolean
 }
 
 export function GameInfoModal({
@@ -111,6 +112,7 @@ export function GameInfoModal({
   background,
   autoScrollRewards = false,
   presentation = 'dialog',
+  modal = true,
 }: GameInfoModalProps) {
   const isDrawer = presentation === 'drawer'
   const Header = ({
@@ -397,9 +399,16 @@ export function GameInfoModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange} modal={modal}>
       <DialogContent
         showCloseButton={false}
+        showOverlay={modal}
+        onPointerDownCapture={(event) => {
+          if (!modal) event.stopPropagation()
+        }}
+        onInteractOutside={(event) => {
+          if (!modal) event.preventDefault()
+        }}
         className={cn(
           '!inset-0 !h-[100dvh] !max-h-none !w-screen !max-w-none !translate-x-0 !translate-y-0 m-0 flex flex-col gap-0 overflow-hidden rounded-none border-0 bg-game-surface p-0',
           className,

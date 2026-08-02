@@ -17,7 +17,7 @@ interface RivalSelectionDialogProps {
   taskId: string
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSuccess: () => void
+  onSuccess: () => void | Promise<void>
 }
 
 type TrainerSearchResult = {
@@ -78,7 +78,7 @@ export function RivalSelectionDialog({
       const result = await selectRivalTrainer(trainerId, taskId)
       if (result.success) {
         toast.success(`${result.rivalName || 'Rival'} is now your rival.`)
-        onSuccess()
+        await onSuccess()
         onOpenChange(false)
       } else {
         toast.error(result.error || 'Failed to choose rival.')
@@ -115,6 +115,7 @@ export function RivalSelectionDialog({
       background="/backgrounds/lab.avif"
       icon={<Swords className="w-8 h-8 text-game-moss-strong" />}
       autoScrollRewards={false}
+      modal={false}
     >
       <div className="space-y-6">
         <form onSubmit={handleSearch} className="space-y-3">
@@ -134,7 +135,11 @@ export function RivalSelectionDialog({
               disabled={isSearching || query.trim().length < 3}
               className="h-11 bg-game-clay px-4 font-bold text-game-cream hover:bg-game-clay/90"
             >
-              {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Search'}
+              {isSearching ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                'Search'
+              )}
             </Button>
           </div>
         </form>
@@ -158,7 +163,10 @@ export function RivalSelectionDialog({
                 >
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface">
                     {iconData?.icon ? (
-                      <TaskIconDisplay icon={iconData.icon} className="h-8 w-8" />
+                      <TaskIconDisplay
+                        icon={iconData.icon}
+                        className="h-8 w-8"
+                      />
                     ) : (
                       <UserRound className="h-6 w-6 text-game-muted" />
                     )}
@@ -168,10 +176,14 @@ export function RivalSelectionDialog({
                       {isSelf ? "I'm My Own Rival" : trainer.trainerName}
                     </div>
                     <div className="truncate text-[11px] font-bold uppercase tracking-wider text-game-moss-strong">
-                      {isSelf ? trainer.trainerName : titleData?.name || 'Trainer'}
+                      {isSelf
+                        ? trainer.trainerName
+                        : titleData?.name || 'Trainer'}
                     </div>
                   </div>
-                  {isSelecting && <Loader2 className="h-4 w-4 animate-spin text-game-moss" />}
+                  {isSelecting && (
+                    <Loader2 className="h-4 w-4 animate-spin text-game-moss" />
+                  )}
                 </button>
               )
             })}
