@@ -1,7 +1,7 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
-import { Eye } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Eye, Heart } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -43,7 +43,7 @@ interface InspectionQuestion {
 type CatalogCard = { card: TcgCard; set: TcgSet }
 type CatalogResponse<T> = { items: T[] }
 
-type Phase = 'countdown' | 'attention' | 'reveal' | 'question'
+type Phase = 'study' | 'question'
 
 const DEFAULT_QUESTION_TYPES: TcgInspectionQuestionType[] = [
   'name',
@@ -104,6 +104,34 @@ function buildOptions(
 }
 
 function buildQuestion(
+  cards: InspectionCard[],
+  cardPool: InspectionCard[],
+  allSets: Array<{ name: string }>,
+  questionTypes: TcgInspectionQuestionType[],
+  previousQuestion?: InspectionQuestion,
+): InspectionQuestion {
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    const question = buildQuestionCandidate(
+      cards,
+      cardPool,
+      allSets,
+      questionTypes,
+    )
+    if (
+      question.options.length > 1 &&
+      (!previousQuestion ||
+        question.type !== previousQuestion.type ||
+        question.targetIndex !== previousQuestion.targetIndex ||
+        question.answer !== previousQuestion.answer)
+    ) {
+      return question
+    }
+  }
+
+  return buildQuestionCandidate(cards, cardPool, allSets, ['name'])
+}
+
+function buildQuestionCandidate(
   cards: InspectionCard[],
   cardPool: InspectionCard[],
   allSets: Array<{ name: string }>,
@@ -245,9 +273,8 @@ export function TcgInspectionGame({
   const settings = encounter.settings
   const packSize = settings.packSize
   const questionCount = settings.rounds
-  const countdownSeconds = settings.countdownSeconds || 3
-  const attentionSeconds = settings.attentionSeconds || 1
-  const revealSeconds = settings.previewSeconds
+  const studySeconds = settings.studySeconds || 30
+  const maxLives = settings.lives || 2
   const pointsPerCorrect = settings.pointsPerCorrect || 100
 
   const selectedSetIds = useMemo(() => {
@@ -272,12 +299,13 @@ export function TcgInspectionGame({
 
   const [gameStarted, setGameStarted] = useState(false)
   const [gameEnded, setGameEnded] = useState(false)
-  const [phase, setPhase] = useState<Phase>('countdown')
-  const [countdownLeft, setCountdownLeft] = useState(countdownSeconds)
-  const [revealIndex, setRevealIndex] = useState(0)
-  const [revealLeft, setRevealLeft] = useState(revealSeconds)
+  const [phase, setPhase] = useState<Phase>('study')
+  const [studyLeft, setStudyLeft] = useState(studySeconds)
+  const [previewIndex, setPreviewIndex] = useState(0)
+  const [previewDirection, setPreviewDirection] = useState(1)
   const [questionIndex, setQuestionIndex] = useState(0)
   const [score, setScore] = useState(0)
+  const [lives, setLives] = useState(maxLives)
   const [timeLeft, setTimeLeft] = useState(
     initialState?.timeLeft || settings.timeLimit,
   )
@@ -300,25 +328,39 @@ export function TcgInspectionGame({
       }
 
       const sessionCards = sample(availableCards, packSize)
-      const sessionQuestions = Array.from({ length: questionCount }, () =>
-        buildQuestion(sessionCards, availableCards, allSets, questionTypes),
-      )
+      const sessionQuestions: InspectionQuestion[] = []
+      for (let index = 0; index < questionCount; index += 1) {
+        sessionQuestions.push(
+          buildQuestion(
+            sessionCards,
+            availableCards,
+            allSets,
+            questionTypes,
+            sessionQuestions.at(-1),
+          ),
+        )
+      }
       setCards(sessionCards)
       setQuestions(sessionQuestions)
       setAnswerStatus(null)
-      setRevealIndex(0)
-      setRevealLeft(revealSeconds)
+      setPreviewIndex(0)
+      setPreviewDirection(1)
       setQuestionIndex(0)
-      setCountdownLeft(countdownSeconds)
-      setPhase('countdown')
+      setScore(0)
+      scoreRef.current = 0
+      setLives(maxLives)
+      setStudyLeft(studySeconds)
+      setTimeLeft(settings.timeLimit)
+      setPhase('study')
     },
     [
       allSets,
-      countdownSeconds,
+      maxLives,
       packSize,
       questionCount,
       questionTypes,
-      revealSeconds,
+      settings.timeLimit,
+      studySeconds,
     ],
   )
 
@@ -344,8 +386,8 @@ export function TcgInspectionGame({
   )
 
   const advanceQuestion = useCallback(
-    (nextScore: number) => {
-      if (questionIndex >= questions.length - 1) {
+    (nextScore: number, nextLives: number) => {
+      if (nextLives <= 0 || questionIndex >= questions.length - 1) {
         void finishGame(nextScore)
         return
       }
@@ -365,6 +407,8 @@ export function TcgInspectionGame({
       const nextScore = correct
         ? scoreRef.current + pointsPerCorrect
         : scoreRef.current
+      const nextLives = correct ? lives : Math.max(0, lives - 1)
+      setLives(nextLives)
       if (correct) {
         setScore(nextScore)
         scoreRef.current = nextScore
@@ -373,11 +417,12 @@ export function TcgInspectionGame({
         playSfx('bad')
       }
 
-      window.setTimeout(() => advanceQuestion(nextScore), 1350)
+      window.setTimeout(() => advanceQuestion(nextScore, nextLives), 1350)
     },
     [
       advanceQuestion,
       gameEnded,
+      lives,
       playSfx,
       pointsPerCorrect,
       questionIndex,
@@ -430,6 +475,7 @@ export function TcgInspectionGame({
 
   useEffect(() => {
     if (!gameStarted || gameEnded) return
+    if (phase !== 'question') return
     if (timeLeft <= 0) {
       void finishGame(scoreRef.current)
       return
@@ -439,62 +485,48 @@ export function TcgInspectionGame({
       setTimeLeft((value: number) => Math.max(0, value - 1))
     }, 1000)
     return () => window.clearTimeout(timer)
-  }, [finishGame, gameEnded, gameStarted, timeLeft])
+  }, [finishGame, gameEnded, gameStarted, phase, timeLeft])
 
   useEffect(() => {
-    if (!gameStarted || gameEnded || phase !== 'countdown') return
-    if (countdownLeft <= 0) {
-      setPhase('attention')
+    if (!gameStarted || gameEnded || phase !== 'study') return
+    if (studyLeft <= 0) {
+      setPhase('question')
+      setTimeLeft(settings.timeLimit)
       return
     }
 
     const timer = window.setTimeout(() => {
-      setCountdownLeft((value) => value - 1)
+      setStudyLeft((value) => value - 1)
     }, 1000)
     return () => window.clearTimeout(timer)
-  }, [countdownLeft, gameEnded, gameStarted, phase])
+  }, [gameEnded, gameStarted, phase, settings.timeLimit, studyLeft])
 
-  useEffect(() => {
-    if (!gameStarted || gameEnded || phase !== 'attention') return
-    const timer = window.setTimeout(() => {
-      setPhase('reveal')
-      setRevealLeft(revealSeconds)
-    }, attentionSeconds * 1000)
-    return () => window.clearTimeout(timer)
-  }, [attentionSeconds, gameEnded, gameStarted, phase, revealSeconds])
+  const startQuiz = useCallback(() => {
+    if (gameEnded || !gameStarted || phase !== 'study') return
+    setTimeLeft(settings.timeLimit)
+    setPhase('question')
+  }, [gameEnded, gameStarted, phase, settings.timeLimit])
 
-  useEffect(() => {
-    if (!gameStarted || gameEnded || phase !== 'reveal') return
-    if (revealLeft <= 0) {
-      if (revealIndex >= cards.length - 1) {
-        setPhase('question')
-        return
-      }
-      setRevealIndex((value) => value + 1)
-      setRevealLeft(revealSeconds)
-      return
+  const showPreviousCard = useCallback(() => {
+    setPreviewDirection(-1)
+    setPreviewIndex((value) => (value === 0 ? cards.length - 1 : value - 1))
+  }, [cards.length])
+
+  const showNextCard = useCallback(() => {
+    setPreviewDirection(1)
+    setPreviewIndex((value) => (value >= cards.length - 1 ? 0 : value + 1))
+  }, [cards.length])
+
+  const returnToExplore = async () => {
+    try {
+      await refreshUser(false)
+    } catch (refreshError) {
+      console.error('Failed to refresh TCG inspection progress', refreshError)
     }
-
-    const timer = window.setTimeout(() => {
-      setRevealLeft((value) => value - 1)
-    }, 1000)
-    return () => window.clearTimeout(timer)
-  }, [
-    cards.length,
-    gameEnded,
-    gameStarted,
-    phase,
-    revealIndex,
-    revealLeft,
-    revealSeconds,
-  ])
-
-  const returnToExplore = () => {
-    refreshUser()
     router.push('/game/explore')
   }
 
-  const currentCard = cards[revealIndex]
+  const currentCard = cards[previewIndex]
   const currentQuestion = questions[questionIndex]
   const questionCard = currentQuestion
     ? cards[currentQuestion.targetIndex]
@@ -537,29 +569,38 @@ export function TcgInspectionGame({
             <GameProgressChip wins={score} required={settings.winScore} />
           </div>
           <div className="absolute right-4 top-4 z-20">
-            <GameTimer timeLeft={timeLeft} totalTime={settings.timeLimit} />
+            <GameTimer
+              timeLeft={phase === 'study' ? studyLeft : timeLeft}
+              totalTime={phase === 'study' ? studySeconds : settings.timeLimit}
+              tone="scene"
+            />
+          </div>
+          <div
+            className="absolute left-3 top-12 z-20 flex items-center gap-1.5 rounded-full border border-game-night-border bg-game-night-surface/90 px-3 py-1 text-game-night-ink shadow-sm backdrop-blur-md"
+            role="status"
+          >
+            <span className="sr-only">{lives} lives remaining</span>
+            {Array.from({ length: maxLives }).map((_, index) => (
+              <Heart
+                key={index}
+                className={
+                  index < lives ? 'text-game-clay' : 'text-game-night-muted'
+                }
+                fill="currentColor"
+                size={14}
+              />
+            ))}
           </div>
 
-          {phase === 'countdown' && (
-            <div className="relative z-10 flex items-center justify-center">
-              <div className="animate-pulse">
-                <GameTimer
-                  timeLeft={Math.max(1, countdownLeft)}
-                  totalTime={countdownSeconds}
-                  size="xl"
-                  className="text-[#f7ecd6] drop-shadow-2xl"
-                  colorOverride="text-[#d3ad63]"
-                />
+          {phase === 'study' && (
+            <div className="relative z-10 flex flex-col items-center justify-center gap-3 px-6 text-center text-game-night-ink">
+              <Eye className="h-12 w-12 text-game-ochre drop-shadow-lg" />
+              <div className="rounded-lg border border-game-night-border bg-game-night-surface/75 px-5 py-3 backdrop-blur">
+                <p className="font-serif text-xl font-bold">Study the cards</p>
+                <p className="mt-1 text-sm text-game-night-muted">
+                  Review each card, then press Ready when you are prepared.
+                </p>
               </div>
-            </div>
-          )}
-
-          {phase === 'attention' && (
-            <div className="relative z-10 flex flex-col items-center justify-center gap-3 text-center">
-              <Eye className="h-12 w-12 text-[#d3ad63] drop-shadow-lg" />
-              <p className="rounded-full bg-[#081014]/55 px-4 py-2 text-xl font-black uppercase tracking-wide text-[#f7ecd6] backdrop-blur">
-                Pay attention
-              </p>
             </div>
           )}
 
@@ -650,26 +691,65 @@ export function TcgInspectionGame({
             </div>
           )}
 
-          {phase !== 'question' && (
-            <div className="relative z-10 flex min-h-[40dvh] flex-col items-center justify-center text-center">
-              {phase === 'reveal' && currentCard ? (
-                <div className="flex w-full flex-col items-center justify-center">
-                  <div className="relative aspect-[2.5/3.5] h-[44dvh] max-h-[520px] min-h-[320px] overflow-hidden rounded-lg bg-[#0d1820] shadow-xl">
+          {phase === 'study' && currentCard && (
+            <div className="relative z-10 flex min-h-[40dvh] flex-col items-center justify-center gap-4 text-center">
+              <div className="flex w-full items-center justify-center gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={showPreviousCard}
+                  aria-label="Previous card"
+                >
+                  <ChevronLeft />
+                </Button>
+                <AnimatePresence
+                  initial={false}
+                  custom={previewDirection}
+                  mode="wait"
+                >
+                  <motion.div
+                    key={currentCard.id}
+                    initial={{
+                      opacity: 0,
+                      x: previewDirection * 80,
+                      scale: 0.96,
+                    }}
+                    animate={{ opacity: 1, x: 0, scale: 1 }}
+                    exit={{
+                      opacity: 0,
+                      x: previewDirection * -80,
+                      scale: 0.96,
+                    }}
+                    transition={{ duration: 0.22, ease: 'easeOut' }}
+                    className="relative aspect-[2.5/3.5] h-[38dvh] max-h-[440px] min-h-[260px] overflow-hidden rounded-lg border border-game-border bg-game-night-surface shadow-xl"
+                  >
                     <Image
                       src={currentCard.images.small}
                       alt={currentCard.name}
                       fill
                       priority
-                      sizes="(max-width: 640px) 82vw, 360px"
+                      sizes="(max-width: 640px) 62vw, 300px"
                       className="object-contain"
                     />
-                  </div>
-                </div>
-              ) : (
-                <p className="max-w-xs text-sm font-semibold text-game-muted">
-                  The inspection will begin shortly.
-                </p>
-              )}
+                  </motion.div>
+                </AnimatePresence>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={showNextCard}
+                  aria-label="Next card"
+                >
+                  <ChevronRight />
+                </Button>
+              </div>
+              <p className="text-sm font-semibold text-game-muted">
+                Card {previewIndex + 1} of {cards.length}
+              </p>
+              <Button type="button" size="lg" onClick={startQuiz}>
+                Ready
+              </Button>
             </div>
           )}
         </main>

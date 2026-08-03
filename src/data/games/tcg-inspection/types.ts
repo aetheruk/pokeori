@@ -16,9 +16,12 @@ export interface TcgInspectionGameSettings {
   questionTypes?: TcgInspectionQuestionType[]
   packSize: number
   rounds: number
+  studySeconds?: number
+  lives?: number
+  // Legacy fields retained so older authored games can still load safely.
   countdownSeconds?: number
   attentionSeconds?: number
-  previewSeconds: number
+  previewSeconds?: number
   timeLimit: number
   winScore: number
   pointsPerCorrect?: number

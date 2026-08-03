@@ -71,6 +71,14 @@ function lockKey(userId: string) {
   return `lock:tcg-battle:${userId}`
 }
 
+async function rejectTcgBattleStart(userId: string, error: string) {
+  // startGameActivity creates the parent research session before the TCG
+  // battle-specific validation runs. Clear that session when the deck cannot
+  // satisfy this battle so the failed launch cannot trap the user in it.
+  await redis.del(`game:${userId}`)
+  return { success: false as const, error }
+}
+
 async function withTcgBattleLock<T>(userId: string, action: () => Promise<T>) {
   const lock = await acquireActionLock(lockKey(userId), 10)
   if (!lock.acquired)
@@ -128,48 +136,6 @@ async function saveState(state: TcgBattleState): Promise<TcgBattleState> {
 type StoredGenerationDeckEntry = Partial<
   Record<TcgBattleDeckFormat, { cards: string[]; energy?: TcgBattleEnergyType }>
 >
-
-function normalizeDecks(
-  value: unknown,
-): Partial<Record<TcgBattleDeckFormat, string[]>> {
-  const decks = (value || {}) as Record<string, unknown>
-  const directDecks = {
-    baby: Array.isArray(decks.baby)
-      ? decks.baby.filter((id): id is string => typeof id === 'string')
-      : [],
-    champions: Array.isArray(decks.champions)
-      ? decks.champions.filter((id): id is string => typeof id === 'string')
-      : [],
-    masters: Array.isArray(decks.masters)
-      ? decks.masters.filter((id): id is string => typeof id === 'string')
-      : [],
-  }
-  if (
-    directDecks.baby.length > 0 ||
-    directDecks.champions.length > 0 ||
-    directDecks.masters.length > 0
-  ) {
-    return directDecks
-  }
-
-  const byGeneration = decks as Record<string, Record<string, unknown>>
-  const formats: TcgBattleDeckFormat[] = ['baby', 'champions', 'masters']
-  const result: Partial<Record<TcgBattleDeckFormat, string[]>> = {}
-  for (const format of formats) {
-    let best: string[] = []
-    for (const generationDecks of Object.values(byGeneration)) {
-      if (!generationDecks || typeof generationDecks !== 'object') continue
-      const candidate = Array.isArray(generationDecks[format])
-        ? (generationDecks[format] as unknown[]).filter(
-            (id): id is string => typeof id === 'string',
-          )
-        : []
-      if (candidate.length > best.length) best = candidate
-    }
-    result[format] = best
-  }
-  return result
-}
 
 function normalizeDecksByGeneration(
   value: unknown,
@@ -707,20 +673,34 @@ export async function startTcgBattle(
         (user as any).tcgDecksByGeneration,
       )
       const requiredSeriesDecks = decksByGeneration[requiredSeries] || {}
-      const decks = normalizeDecks((user as any).tcgDecks)
       const payload = await getPayload({ config: configPromise })
       const collection = await getUserTcgMap(payload as any, user.id)
       const selectedDeckEntry = requiredSeriesDecks[format]
-      const selectedDeckIds = (
-        (selectedDeckEntry?.cards || decks[format] || []) as string[]
-      ).filter((cardId) => getTcgCardSeriesById(cardId) === requiredSeries)
+      if (!selectedDeckEntry) {
+        return rejectTcgBattleStart(
+          user.id,
+          `Set up a ${TCG_BATTLE_FORMATS[format].label} deck for ${requiredSeries} first.`,
+        )
+      }
+
+      const selectedDeckIds = selectedDeckEntry.cards
+      if (
+        selectedDeckIds.some(
+          (cardId) => getTcgCardSeriesById(cardId) !== requiredSeries,
+        )
+      ) {
+        return rejectTcgBattleStart(
+          user.id,
+          `Your deck must use only ${requiredSeries} cards.`,
+        )
+      }
       const playerDeck = await validateTcgBattleDeck(
         selectedDeckIds,
         collection,
         format,
       )
       if (!playerDeck.valid) {
-        return { success: false, error: playerDeck.errors.join(' ') }
+        return rejectTcgBattleStart(user.id, playerDeck.errors.join(' '))
       }
 
       const opponentDeck = (
@@ -730,16 +710,17 @@ export async function startTcgBattle(
           ),
         )
       ).filter((card): card is NonNullable<typeof card> => Boolean(card))
-      if (opponentDeck.length !== 15)
-        return { success: false, error: 'Opponent deck is invalid.' }
+      if (opponentDeck.length !== 15) {
+        return rejectTcgBattleStart(user.id, 'Opponent deck is invalid.')
+      }
       const opponentOffSeries = encounter.settings.opponentDeckCardIds.some(
         (cardId) => getTcgCardSeriesById(cardId) !== requiredSeries,
       )
       if (opponentOffSeries) {
-        return {
-          success: false,
-          error: `Opponent deck must use only ${requiredSeries} cards.`,
-        }
+        return rejectTcgBattleStart(
+          user.id,
+          `Opponent deck must use only ${requiredSeries} cards.`,
+        )
       }
 
       const playerHand = drawTcgBattleCards(playerDeck.cards, 6)
