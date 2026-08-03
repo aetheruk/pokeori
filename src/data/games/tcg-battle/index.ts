@@ -1,2 +1,8 @@
 export * from './types'
-export { testTcgBattleGames as tcgBattleGames } from './entries/test'
+import { kantoUndergroundTcgBattleEntries } from './entries/kanto-underground'
+import { testTcgBattleGames } from './entries/test'
+
+export const tcgBattleGames = [
+  ...testTcgBattleGames,
+  ...kantoUndergroundTcgBattleEntries,
+]

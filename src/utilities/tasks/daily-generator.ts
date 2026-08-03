@@ -535,10 +535,10 @@ function buildCandidates(
     const count = randomInt(random, 1, Math.min(3, duplicateCount))
     candidates.push({
       family: 'tcg',
-      templateId: 'tcg-crystalize',
-      signature: 'tcg:crystalize',
-      name: `Crystalize ${count} Cards`,
-      description: `Crystalize ${count} duplicate TCG cards.`,
+      templateId: 'tcg-redistribute',
+      signature: 'tcg:redistribute',
+      name: `Send ${count} Duplicate Cards to HQ`,
+      description: `Send ${count} duplicate TCG cards to HQ for redistribution.`,
       icon: { type: 'item', id: 'revive' },
       criteria: [toDailyActivity('card_crystalized', count)],
       sourceHint: 'Available from duplicate cards in your TCG collection.',

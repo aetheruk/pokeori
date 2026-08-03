@@ -395,8 +395,8 @@ export const keyItems: Item[] = [
   },
   {
     id: 'card-crystalizer',
-    name: 'Card Crystalizer',
-    description: 'Cards in. Crystals Out.',
+    name: 'Card Redistribution Box',
+    description: 'Duplicate cards in. HQ redistribution funds out.',
     category: 'key',
     spriteId: 'crystalizer',
     unique: true,

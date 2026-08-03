@@ -411,16 +411,16 @@ function clampNumber(
   return Math.min(max, Math.max(min, parsed))
 }
 
-export interface CrystallizeResult {
+export interface DuplicateRedistributionResult {
   ok: boolean
   error?: string
-  crystalsAdded?: number
+  pokedollarsAdded?: number
   cardsRemoved?: number
   summary?: any // RewardSummary compatible
 }
 
-export async function crystallizeDuplicates(cardId: string): Promise<CrystallizeResult> {
-  const { tcgRarityCrystalValues } = await import('@/data/tcg-rarity')
+export async function redistributeDuplicateCards(cardId: string): Promise<DuplicateRedistributionResult> {
+  const { tcgRarityPokedollarValues } = await import('@/data/tcg-rarity')
   const { getTcgCardById } = await import('@/utilities/tcg/tcg')
 
   try {
@@ -433,14 +433,14 @@ export async function crystallizeDuplicates(cardId: string): Promise<Crystallize
 
     const inventory = await getUserInventoryMap(payload as any, user.id)
     if (!hasCardCrystalizer(inventory)) {
-      return { ok: false, error: 'Card Crystalizer required.' }
+      return { ok: false, error: 'Card Redistribution Box required.' }
     }
 
     const cardsMap = await getUserTcgMap(payload as any, user.id)
     const currentQty = cardsMap[cardId] || 0
 
     if (currentQty <= 1) {
-      return { ok: false, error: 'No duplicate copies to crystallize.' }
+      return { ok: false, error: 'No duplicate copies to send to HQ.' }
     }
 
     // Get card definition for rarity
@@ -451,8 +451,8 @@ export async function crystallizeDuplicates(cardId: string): Promise<Crystallize
 
     const removeQty = currentQty - 1
     const rarity = cardDef.rarity || 'Common'
-    const crystalValue = tcgRarityCrystalValues[rarity] || 1 // Default to 1 if unknown
-    const totalCrystals = removeQty * crystalValue
+    const pokedollarValue = tcgRarityPokedollarValues[rarity] || 5
+    const totalPokedollars = removeQty * pokedollarValue
 
     // Update TCG entry locally
     cardsMap[cardId] = 1 // Keep 1 copy
@@ -461,7 +461,7 @@ export async function crystallizeDuplicates(cardId: string): Promise<Crystallize
     const currentCurrency = user.currency || {}
     const updatedCurrency = {
       ...currentCurrency,
-      crystals: (currentCurrency.crystals || 0) + totalCrystals,
+      pokedollars: (currentCurrency.pokedollars || 0) + totalPokedollars,
     }
 
     const { incrementDailyTaskProgress } = await import('@/utilities/tasks/daily-progress')
@@ -485,22 +485,25 @@ export async function crystallizeDuplicates(cardId: string): Promise<Crystallize
       xp: 0,
       items: [],
       pokemon: [],
-      currency: [{ type: 'crystals', quantity: totalCrystals }],
+      currency: [{ type: 'pokedollars', quantity: totalPokedollars }],
       cards: [],
       tasksCompleted: [],
     }
 
     return {
       ok: true,
-      crystalsAdded: totalCrystals,
+      pokedollarsAdded: totalPokedollars,
       cardsRemoved: removeQty,
       summary,
     }
   } catch (error) {
-    console.error('[Crystallize Action] Error:', error)
+    console.error('[Duplicate Redistribution Action] Error:', error)
     return {
       ok: false,
       error: error instanceof Error ? error.message : 'Unknown error',
     }
   }
 }
+
+/** Backwards-compatible alias for callers that still use the old action name. */
+export const crystallizeDuplicates = redistributeDuplicateCards

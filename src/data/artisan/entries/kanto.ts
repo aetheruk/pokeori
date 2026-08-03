@@ -1476,6 +1476,43 @@ const QUEST_RECIPES: ArtisanRecipeDraft[] = [
   },
 ]
 
+const TCG_RECIPES: ArtisanRecipeDraft[] = [
+  {
+    id: 'craft-tcg-foil-pack',
+    name: 'Foil Pack',
+    description: 'Press metal scrap into blank foil wrappers to make your own booster packs.',
+    artisanLevel: 10,
+    costs: [{ id: 'metal-scrap-t1', amount: 2 }],
+    rewards: [{ type: 'item', targetId: 'empty-foil-pack', quantity: 1, dropChance: 100 }],
+    craftType: 'scatter',
+    outputQuantity: { min: 0, max: 5 },
+    qualityOutputQuantity: { good: 3, perfect: 5 },
+    minimumQuality: 'good',
+    iconItemId: 'empty-foil-pack',
+    requirements: [{ type: 'task_completed', targetId: 'underground-tcg-my-very-own-set' }],
+  },
+  {
+    id: 'craft-tcg-base4-pack',
+    name: 'Base Set 2 Booster Pack',
+    description: 'Balance foil, colour, and dye into a freshly printed Base Set 2 booster pack.',
+    artisanLevel: 12,
+    costs: [
+      { id: 'empty-foil-pack', amount: 1 },
+      { id: 'dried-red', amount: 1 },
+      { id: 'dried-purple', amount: 1 },
+      { id: 'dried-green', amount: 1 },
+    ],
+    rewards: [{ type: 'item', targetId: 'pack-base4', quantity: 1, dropChance: 100 }],
+    craftType: 'balance',
+    outputQuantity: { min: 0, max: 2 },
+    qualityOutputQuantity: { good: 1, perfect: 2 },
+    minimumQuality: 'good',
+    materialFailQualities: ['bad'],
+    iconItemId: 'pack-base4',
+    requirements: [{ type: 'task_completed', targetId: 'underground-tcg-my-very-own-set' }],
+  },
+]
+
 export const kantoArtisanRecipes: ArtisanRecipe[] = [
   ...withCraftDefaults('materials', paintRecipes),
   ...withCraftDefaults('materials', DRIED_DYE_RECIPES),
@@ -1493,4 +1530,5 @@ export const kantoArtisanRecipes: ArtisanRecipe[] = [
   ...withCraftDefaults('held', [...HELD_RECIPES, ...ELEMENTAL_STONE_HELD_RECIPES]),
   ...withCraftDefaults('items', ITEM_RECIPES),
   ...withCraftDefaults('quests', QUEST_RECIPES),
+  ...withCraftDefaults('tcg', TCG_RECIPES),
 ]
