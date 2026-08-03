@@ -45,10 +45,10 @@ export const pewterTcgTasks: Task[] = [
   lesson({
     id: 'pewter-school-tcg-deck-setup',
     name: 'TCG Lesson: Deck Setup',
-    description: 'Learn how to build and arrange a Pokemon card deck.',
+    description: 'Learn how to build, price, and arrange a Pokemon card deck.',
     button: 'Study Deck Setup',
     title: 'Deck Setup',
-    message: 'A battle deck contains 15 unique Pokemon cards. At the start of a battle, place three Pokemon in front and three on the bench. The front row attacks; the bench waits for its turn.',
+    message: 'A battle deck contains exactly 15 unique Pokemon cards. In the Trainer page, Auto Fill can build a legal deck from your collection. You can also open the CardDex, choose a Pokemon card, and add it to a deck manually. Choose the card group first, then save the deck for that group and format. In Kanto we play Base Rules, so choose the Base card group when a battle asks for Base cards. Baby, Champions, and Masters are the three formats: they allow total deck costs of 30, 55, and 85 respectively. Card costs reflect what you bring: an evolving Basic costs 1, a Stage 1 costs 3, a Stage 2 costs 5, a non-evolving Basic costs 5, EX/GX/V/Radiant cards cost 10, and the biggest special cards cost 15. Your 15 cards must stay within the selected format limit. At the start of a battle, place three Pokemon in front and three on the bench. The front row attacks; the bench waits for its turn.',
   }),
   lesson({
     id: 'pewter-school-tcg-energy',
@@ -56,7 +56,7 @@ export const pewterTcgTasks: Task[] = [
     description: 'Learn how energy charges attacks and how turns flow.',
     button: 'Study Energy',
     title: 'Energy and Attacks',
-    message: 'Charge your energy before attacking. Every attack has a cost, and the battle limits how much power can be used in the early turns. When you are finished, end the turn and let the opponent respond.',
+    message: 'Charge your energy before attacking. Every attack has an energy cost, and the battle opens up as the turns progress: attacks can use up to 1 energy on turns 1 and 2, 2 on turns 3 and 4, 3 on turns 5 and 6, 4 on turns 7 to 9, and any amount from turn 10. Card stages unlock too: Stage 1 cards arrive on turn 3, Stage 2 cards on turn 5, 10-cost cards on turn 7, and 15-cost cards on turn 10. Charge when you need more energy; when you are finished, end the turn and let the opponent respond.',
   }),
   lesson({
     id: 'pewter-school-tcg-effects',

@@ -28,7 +28,15 @@ const battle = (input: {
   description: input.description,
   category: 'Underground',
   subCategory: 'Kanto Underground',
-  icon: { type: 'lucide', id: 'cards' },
+  icon: {
+    type: 'lucide',
+    id:
+      input.energy === 'Fire'
+        ? 'Flame'
+        : input.energy === 'Water'
+          ? 'Droplets'
+          : 'Leaf',
+  },
   background: '/backgrounds/kanto-underground.avif',
   requirements: input.requirements,
   rewards: [{ type: 'currency', targetId: 'pokedollars', quantity: input.reward }],
@@ -126,4 +134,3 @@ export const kantoUndergroundTcgBattleEntries: TcgBattleGameConfig[] = [
     replayable: true,
   }),
 ]
-

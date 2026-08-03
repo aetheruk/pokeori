@@ -8,7 +8,7 @@ export const testTcgBattleGames: TcgBattleGameConfig[] = [
     description: 'Test the Baby deck format against a low-cost opponent deck.',
     category: 'Kanto',
     subCategory: 'Test',
-    icon: { type: 'lucide', id: 'cards' },
+    icon: { type: 'lucide', id: 'CreditCard' },
     requirements: [],
     rewards: [],
     settings: {
@@ -41,7 +41,7 @@ export const testTcgBattleGames: TcgBattleGameConfig[] = [
     description: 'Test the Champions deck format against evolved Kanto cards.',
     category: 'Kanto',
     subCategory: 'Test',
-    icon: { type: 'lucide', id: 'cards' },
+    icon: { type: 'lucide', id: 'CreditCard' },
     requirements: [],
     rewards: [],
     settings: {
@@ -74,7 +74,7 @@ export const testTcgBattleGames: TcgBattleGameConfig[] = [
     description: 'Test the Masters deck format against high-impact special cards.',
     category: 'Kanto',
     subCategory: 'Test',
-    icon: { type: 'lucide', id: 'cards' },
+    icon: { type: 'lucide', id: 'CreditCard' },
     requirements: [],
     rewards: [],
     settings: {

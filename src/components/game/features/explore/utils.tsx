@@ -109,6 +109,8 @@ export const getTypeIcon = (item: ExploreItem) => {
         return <Pickaxe className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'tcg-inspection')
         return <CreditCard className="w-4 h-4 text-game-moss-strong" />
+      if (gameType === 'tcg-battle')
+        return <CreditCard className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'field-observation')
         return <Search className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'voltorb-grid')
@@ -201,6 +203,8 @@ export const getGameTypeLabel = (item: ExploreItem) => {
       return 'MINING'
     case 'tcg-inspection':
       return 'TCG'
+    case 'tcg-battle':
+      return 'TCG BATTLE'
     default:
       return 'MINI GAME'
   }

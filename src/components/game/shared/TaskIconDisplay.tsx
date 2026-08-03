@@ -6,7 +6,11 @@ import {
   ChevronsRight,
   ChevronsUp,
   Coins,
+  CreditCard,
+  Droplets,
+  Flame,
   HelpCircle,
+  Leaf,
 } from 'lucide-react'
 import Image from 'next/image'
 import { ItemSprite } from '@/components/ui/item-sprite'
@@ -22,6 +26,10 @@ const LUCIDE_ICONS: Record<string, any> = {
   HelpCircle,
   Coins,
   Banknote,
+  CreditCard,
+  Flame,
+  Droplets,
+  Leaf,
 }
 
 interface TaskIconDisplayProps {
