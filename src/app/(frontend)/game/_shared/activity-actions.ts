@@ -2176,11 +2176,18 @@ export async function completeGameActivity(
         encounter.gameType === 'ufo-catcher' ||
         encounter.gameType === 'prize-wheel'
       const isScoreCompletionGame =
-        ((encounter.gameType === 'match3' ||
-          encounter.gameType === 'tcg-inspection') &&
+        (encounter.gameType === 'match3' &&
           typeof encounter.settings.winScore === 'number') ||
+        (encounter.gameType === 'tcg-inspection' &&
+          typeof encounter.settings.requiredAnswers === 'number') ||
         (encounter.gameType === 'art-academy' &&
           typeof encounter.settings.successThreshold === 'number')
+      const scoreCompletionTarget =
+        encounter.gameType === 'tcg-inspection'
+          ? encounter.settings.requiredAnswers
+          : encounter.gameType === 'art-academy'
+            ? encounter.settings.successThreshold
+            : encounter.settings.winScore
       const isSnapTargetMode = getSnapTargetId(encounter) !== undefined
       const isFieldObservation = encounter.gameType === 'field-observation'
       const requiredWins = getRequiredWins(encounter)
@@ -2194,12 +2201,9 @@ export async function completeGameActivity(
       const scoreCompletionSuccess =
         isScoreCompletionGame &&
         normalizedFinalScore !== null &&
-        normalizedFinalScore >=
-          (encounter.gameType === 'art-academy'
-            ? encounter.settings.successThreshold
-            : encounter.settings.winScore)!
+        normalizedFinalScore >= scoreCompletionTarget!
       const completionWin =
-        encounter.gameType === 'art-academy'
+        encounter.gameType === 'art-academy' || isScoreCompletionGame
           ? scoreCompletionSuccess
           : validatedSuccess || scoreCompletionSuccess
       const currentWins =

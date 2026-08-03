@@ -34,9 +34,10 @@ export function getRequiredResearchWins(encounter: ResearchGameConfig): number {
   }
 
   const isScoreCompletionGame =
-    ((encounter.gameType === 'match3' ||
-      encounter.gameType === 'tcg-inspection') &&
+    (encounter.gameType === 'match3' &&
       typeof (encounter.settings as any).winScore === 'number') ||
+    (encounter.gameType === 'tcg-inspection' &&
+      typeof (encounter.settings as any).requiredAnswers === 'number') ||
     (encounter.gameType === 'art-academy' &&
       typeof (encounter.settings as any).successThreshold === 'number')
 

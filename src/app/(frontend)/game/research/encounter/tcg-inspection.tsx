@@ -272,10 +272,9 @@ export function TcgInspectionGame({
 
   const settings = encounter.settings
   const packSize = settings.packSize
-  const questionCount = settings.rounds
+  const requiredAnswers = settings.requiredAnswers
   const studySeconds = settings.studySeconds || 30
   const maxLives = settings.lives || 2
-  const pointsPerCorrect = settings.pointsPerCorrect || 100
 
   const selectedSetIds = useMemo(() => {
     if (settings.allowedSetIds?.length) return settings.allowedSetIds
@@ -304,20 +303,21 @@ export function TcgInspectionGame({
   const [previewIndex, setPreviewIndex] = useState(0)
   const [previewDirection, setPreviewDirection] = useState(1)
   const [questionIndex, setQuestionIndex] = useState(0)
-  const [score, setScore] = useState(0)
+  const [correctAnswers, setCorrectAnswers] = useState(0)
   const [lives, setLives] = useState(maxLives)
   const [timeLeft, setTimeLeft] = useState(
     initialState?.timeLeft || settings.timeLimit,
   )
   const [cards, setCards] = useState<InspectionCard[]>([])
   const [questions, setQuestions] = useState<InspectionQuestion[]>([])
+  const [questionPool, setQuestionPool] = useState<InspectionCard[]>([])
   const [answerStatus, setAnswerStatus] = useState<
     'correct' | 'incorrect' | null
   >(null)
   const [result, setResult] = useState<any | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const scoreRef = useRef(0)
+  const correctAnswersRef = useRef(0)
   const endingRef = useRef(false)
 
   const createSession = useCallback(
@@ -328,26 +328,21 @@ export function TcgInspectionGame({
       }
 
       const sessionCards = sample(availableCards, packSize)
-      const sessionQuestions: InspectionQuestion[] = []
-      for (let index = 0; index < questionCount; index += 1) {
-        sessionQuestions.push(
-          buildQuestion(
-            sessionCards,
-            availableCards,
-            allSets,
-            questionTypes,
-            sessionQuestions.at(-1),
-          ),
-        )
-      }
+      const firstQuestion = buildQuestion(
+        sessionCards,
+        availableCards,
+        allSets,
+        questionTypes,
+      )
       setCards(sessionCards)
-      setQuestions(sessionQuestions)
+      setQuestionPool(availableCards)
+      setQuestions([firstQuestion])
       setAnswerStatus(null)
       setPreviewIndex(0)
       setPreviewDirection(1)
       setQuestionIndex(0)
-      setScore(0)
-      scoreRef.current = 0
+      setCorrectAnswers(0)
+      correctAnswersRef.current = 0
       setLives(maxLives)
       setStudyLeft(studySeconds)
       setTimeLeft(settings.timeLimit)
@@ -357,7 +352,6 @@ export function TcgInspectionGame({
       allSets,
       maxLives,
       packSize,
-      questionCount,
       questionTypes,
       settings.timeLimit,
       studySeconds,
@@ -365,36 +359,50 @@ export function TcgInspectionGame({
   )
 
   const finishGame = useCallback(
-    async (finalScore: number) => {
+    async (finalCorrectAnswers: number) => {
       if (endingRef.current) return
       endingRef.current = true
       setGameEnded(true)
 
-      const success = finalScore >= settings.winScore
-      const res = await completeGame(encounter.id, success, finalScore)
+      const success = finalCorrectAnswers >= requiredAnswers
+      const res = await completeGame(encounter.id, success, finalCorrectAnswers)
       setResult({
         success: success && res.success,
         message:
           success && res.success
-            ? `Inspection passed: ${finalScore}`
-            : `Final score: ${finalScore}`,
+            ? `Inspection passed: ${finalCorrectAnswers} correct answers`
+            : `Correct answers: ${finalCorrectAnswers}`,
         rewards: res.summary,
       })
       playSfx(success && res.success ? 'good' : 'bad')
     },
-    [encounter.id, playSfx, settings.winScore],
+    [encounter.id, playSfx, requiredAnswers],
   )
 
   const advanceQuestion = useCallback(
-    (nextScore: number, nextLives: number) => {
-      if (nextLives <= 0 || questionIndex >= questions.length - 1) {
-        void finishGame(nextScore)
+    (nextCorrectAnswers: number, nextLives: number) => {
+      if (
+        endingRef.current ||
+        nextLives <= 0 ||
+        nextCorrectAnswers >= requiredAnswers
+      ) {
+        void finishGame(nextCorrectAnswers)
         return
       }
+      setQuestions((currentQuestions) => [
+        ...currentQuestions,
+        buildQuestion(
+          cards,
+          questionPool,
+          allSets,
+          questionTypes,
+          currentQuestions.at(-1),
+        ),
+      ])
       setQuestionIndex((value) => value + 1)
       setAnswerStatus(null)
     },
-    [finishGame, questionIndex, questions.length],
+    [allSets, cards, finishGame, questionPool, questionTypes, requiredAnswers],
   )
 
   const handleAnswer = useCallback(
@@ -404,27 +412,29 @@ export function TcgInspectionGame({
 
       const correct = answer === question.answer
       setAnswerStatus(correct ? 'correct' : 'incorrect')
-      const nextScore = correct
-        ? scoreRef.current + pointsPerCorrect
-        : scoreRef.current
+      const nextCorrectAnswers = correct
+        ? correctAnswersRef.current + 1
+        : correctAnswersRef.current
       const nextLives = correct ? lives : Math.max(0, lives - 1)
       setLives(nextLives)
       if (correct) {
-        setScore(nextScore)
-        scoreRef.current = nextScore
+        setCorrectAnswers(nextCorrectAnswers)
+        correctAnswersRef.current = nextCorrectAnswers
         playSfx('good')
       } else {
         playSfx('bad')
       }
 
-      window.setTimeout(() => advanceQuestion(nextScore, nextLives), 1350)
+      window.setTimeout(
+        () => advanceQuestion(nextCorrectAnswers, nextLives),
+        1350,
+      )
     },
     [
       advanceQuestion,
       gameEnded,
       lives,
       playSfx,
-      pointsPerCorrect,
       questionIndex,
       questions,
       answerStatus,
@@ -477,7 +487,7 @@ export function TcgInspectionGame({
     if (!gameStarted || gameEnded) return
     if (phase !== 'question') return
     if (timeLeft <= 0) {
-      void finishGame(scoreRef.current)
+      void finishGame(correctAnswersRef.current)
       return
     }
 
@@ -566,7 +576,10 @@ export function TcgInspectionGame({
           <div className="absolute inset-0 z-0 bg-[#081014]/40" />
 
           <div className="absolute left-3 top-3 z-20">
-            <GameProgressChip wins={score} required={settings.winScore} />
+            <GameProgressChip
+              wins={correctAnswers}
+              required={requiredAnswers}
+            />
           </div>
           <div className="absolute right-4 top-4 z-20">
             <GameTimer
@@ -725,7 +738,7 @@ export function TcgInspectionGame({
                     className="relative aspect-[2.5/3.5] h-[38dvh] max-h-[440px] min-h-[260px] overflow-hidden rounded-lg border border-game-border bg-game-night-surface shadow-xl"
                   >
                     <Image
-                      src={currentCard.images.small}
+                      src={currentCard.images.large || currentCard.images.small}
                       alt={currentCard.name}
                       fill
                       priority
@@ -755,7 +768,12 @@ export function TcgInspectionGame({
         </main>
       </div>
 
-      <RewardResultOverlay result={result} onClose={returnToExplore} />
+      <RewardResultOverlay
+        result={result}
+        onClose={returnToExplore}
+        icon={encounter.icon}
+        iconAlt={encounter.name}
+      />
     </div>
   )
 }

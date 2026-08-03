@@ -331,6 +331,7 @@ export interface GameSettings {
   allowedRarities?: string[]
   questionTypes?: import('./tcg-inspection/types').TcgInspectionQuestionType[]
   packSize?: number
+  requiredAnswers?: number
   rounds?: number
   studySeconds?: number
   lives?: number

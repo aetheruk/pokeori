@@ -700,14 +700,15 @@ const settingsByGameType: Record<string, z.ZodTypeAny> = {
   'tcg-inspection': z
     .object({
       packSize: z.number().int().min(3).max(10),
-      rounds: z.number().int().positive(),
+      requiredAnswers: z.number().int().positive(),
       studySeconds: z.number().positive().optional(),
       lives: z.number().int().positive().optional(),
+      rounds: z.number().int().positive().optional(),
       countdownSeconds: z.number().positive().optional(),
       attentionSeconds: z.number().positive().optional(),
       previewSeconds: z.number().positive().optional(),
       timeLimit: z.number().positive(),
-      winScore: z.number().nonnegative(),
+      winScore: z.number().nonnegative().optional(),
       allowedSetIds: z.array(z.string()).optional(),
       allowedRarities: z.array(z.string()).optional(),
       questionTypes: z

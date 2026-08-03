@@ -101,6 +101,11 @@ describe('TCG Basic Training content', () => {
 
     expect(inspection?.settings.studySeconds).toBe(30)
     expect(inspection?.settings.lives).toBe(2)
+    expect(inspection?.name).toBe('TCG Quiz')
+    expect(inspection?.description).toBe(
+      'I need to Research the cards correctly to pass my basic training.',
+    )
+    expect(inspection?.settings.requiredAnswers).toBe(3)
     expect(inspection?.requirements).toContainEqual({
       type: 'game_result',
       targetId: 'underground-tcg-card-memory-game',
