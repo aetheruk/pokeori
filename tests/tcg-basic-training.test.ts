@@ -130,6 +130,9 @@ describe('TCG Basic Training content', () => {
     expect(
       (grass!.settings as { opponentEnergyType?: string }).opponentEnergyType,
     ).toBe('Grass')
+    expect(fire?.icon).toEqual({ type: 'lucide', id: 'Flame' })
+    expect(water?.icon).toEqual({ type: 'lucide', id: 'Droplets' })
+    expect(grass?.icon).toEqual({ type: 'lucide', id: 'Leaf' })
     expect(fire?.rewards).toContainEqual({
       type: 'currency',
       targetId: 'pokedollars',
@@ -141,6 +144,26 @@ describe('TCG Basic Training content', () => {
       count: 5,
       consume: true,
     })
+
+    const deckLesson = tasks.find(
+      (task) => task.id === 'pewter-school-tcg-deck-setup',
+    )
+    const energyLesson = tasks.find(
+      (task) => task.id === 'pewter-school-tcg-energy',
+    )
+    expect(deckLesson?.description).toBe(
+      'Learn how to build, price, and arrange a Pokemon card deck.',
+    )
+    expect(deckLesson?.exitModal?.message).toContain('Auto Fill')
+    expect(deckLesson?.exitModal?.message).toContain('CardDex')
+    expect(deckLesson?.exitModal?.message).toContain('Base Rules')
+    expect(deckLesson?.exitModal?.message).toContain('30, 55, and 85')
+    expect(energyLesson?.exitModal?.message).toContain(
+      'Stage 1 cards arrive on turn 3',
+    )
+    expect(energyLesson?.exitModal?.message).toContain(
+      'any amount from turn 10',
+    )
 
     for (const game of [fire, water, grass]) {
       for (const cardId of game?.settings.opponentDeckCardIds || []) {

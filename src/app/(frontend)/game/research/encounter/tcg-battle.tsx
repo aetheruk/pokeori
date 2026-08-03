@@ -1831,6 +1831,8 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       {resultOverlay && (
         <RewardResultOverlay
           result={resultOverlay}
+          icon={encounter.icon}
+          iconAlt={encounter.name}
           title={
             state.phase === 'finished'
               ? getWinnerLabel(state.winner)
