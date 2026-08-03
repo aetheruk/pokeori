@@ -10,7 +10,7 @@ export const kantoUndergroundArtAcademyEntries: ArtAcademyGameConfig[] = [
     icon: { type: 'pokemon', id: '25' },
     background: '/backgrounds/kanto-underground.avif',
     requirements: [
-      { type: 'game_result', targetId: 'underground-tcg-battle-grass', battleStatus: 'win', count: 1 },
+      { type: 'task_completed', targetId: 'underground-tcg-battle-wrapup' },
       { type: 'game_result', targetId: 'underground-tcg-art-academy', battleStatus: 'win', count: 1, inverse: true },
     ],
     criteria: [{ type: 'item_owned', targetId: 'dried-yellow', count: 5, consume: true }],
@@ -31,4 +31,3 @@ export const kantoUndergroundArtAcademyEntries: ArtAcademyGameConfig[] = [
     },
   },
 ]
-

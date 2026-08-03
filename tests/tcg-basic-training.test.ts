@@ -4,12 +4,12 @@ import { allGames } from '@/data/games'
 import { items } from '@/data/items'
 import { tasks } from '@/data/tasks'
 import { tcgRarityPokedollarValues } from '@/data/tcg-rarity'
-import { getTcgCardById } from '@/utilities/tcg/tcg'
-import { validateTcgBattleDeck } from '@/utilities/tcg/tcg-battle'
 import {
   resolveCraftRewards,
   shouldConsumeCraftCosts,
 } from '@/utilities/artisan/rewards'
+import { getTcgCardById } from '@/utilities/tcg/tcg'
+import { validateTcgBattleDeck } from '@/utilities/tcg/tcg-battle'
 
 describe('TCG Basic Training content', () => {
   test('authors the underground task progression and visible set gates', () => {
@@ -21,6 +21,9 @@ describe('TCG Basic Training content', () => {
     )
     const ownSet = tasks.find(
       (task) => task.id === 'underground-tcg-my-very-own-set',
+    )
+    const battleWrapup = tasks.find(
+      (task) => task.id === 'underground-tcg-battle-wrapup',
     )
     const base4Complete = tasks.find(
       (task) => task.id === 'underground-tcg-base4-complete',
@@ -81,6 +84,30 @@ describe('TCG Basic Training content', () => {
         unique: true,
       },
     ])
+    expect(battleWrapup?.completeButtonText).toBe('Design My First Card')
+    expect(battleWrapup?.requirements).toEqual([
+      {
+        type: 'game_result',
+        targetId: 'underground-tcg-battle-fire',
+        battleStatus: 'win',
+        count: 1,
+      },
+      {
+        type: 'game_result',
+        targetId: 'underground-tcg-battle-water',
+        battleStatus: 'win',
+        count: 1,
+      },
+      {
+        type: 'game_result',
+        targetId: 'underground-tcg-battle-grass',
+        battleStatus: 'win',
+        count: 1,
+      },
+    ])
+    expect(battleWrapup?.exitModal?.message).toContain(
+      'Battles are fun, but they do not bring in Crystals',
+    )
   })
 
   test('authors the inspection, battle, and art tutorial games with one-time gates', async () => {
@@ -144,6 +171,10 @@ describe('TCG Basic Training content', () => {
       targetId: 'dried-yellow',
       count: 5,
       consume: true,
+    })
+    expect(artAcademy?.requirements).toContainEqual({
+      type: 'task_completed',
+      targetId: 'underground-tcg-battle-wrapup',
     })
 
     const deckLesson = tasks.find(
