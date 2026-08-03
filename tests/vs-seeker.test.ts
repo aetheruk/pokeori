@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import {
   buildVsSeekerBattleConfig,
   formatVsSeekerCooldown,
+  getVsSeekerAiProfile,
   getVsSeekerBadgeCount,
   getVsSeekerCandyRewards,
   getVsSeekerCooldownRemaining,
@@ -92,6 +93,20 @@ describe('VS Seeker battle generation', () => {
     ).toBeNull()
   })
 
+  test('uses lighter AI until all Kanto badges are earned', () => {
+    expect(getVsSeekerAiProfile({})).toBe('trainer')
+
+    const sevenBadgeInventory = Object.fromEntries(
+      VS_SEEKER_BADGE_LEVELS.slice(0, 7).map((badge) => [badge.badgeId, 1]),
+    )
+    expect(getVsSeekerAiProfile(sevenBadgeInventory)).toBe('trainer')
+
+    const eightBadgeInventory = Object.fromEntries(
+      VS_SEEKER_BADGE_LEVELS.map((badge) => [badge.badgeId, 1]),
+    )
+    expect(getVsSeekerAiProfile(eightBadgeInventory)).toBe('advanced')
+  })
+
   test('requires the VS Seeker item to be owned', () => {
     expect(hasVsSeeker({})).toBe(false)
     expect(hasVsSeeker({ 'vs-seeker': 0 })).toBe(false)
@@ -117,7 +132,7 @@ describe('VS Seeker battle generation', () => {
     expect(config?.trainerName).toBe('Mira')
     expect(config?.name).toBe('Beauty Mira')
     expect(config?.icon).toEqual({ type: 'trainer', id: 'beauty' })
-    expect(config?.aiProfile).toBe('advanced')
+    expect(config?.aiProfile).toBe('trainer')
     expect(config?.levelCap).toBe(20)
     expect(config?.enemyTeam).toHaveLength(3)
     expect(config?.enemyTeam.every((enemy) => enemy.level === 20)).toBe(true)

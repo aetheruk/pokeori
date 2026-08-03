@@ -1280,9 +1280,6 @@ function BalanceDialog({
                       isActive ? 'border-game-ochre' : 'border-game-border',
                     )}
                   >
-                    <div className="mb-2 text-center text-[10px] font-black uppercase tracking-widest text-game-muted">
-                      {stage}
-                    </div>
                     <div className="relative h-36 overflow-hidden rounded-full border border-game-border bg-game-canvas">
                       <div
                         className="absolute left-0 right-0 border-y border-game-moss bg-game-moss/25"
@@ -1329,7 +1326,7 @@ function BalanceDialog({
               ) : (
                 <span className="flex items-center gap-2">
                   <Target className="h-4 w-4" />
-                  {started ? `Lock ${balanceStages[activeIndex]}` : 'Get Ready'}
+                  Lock in
                 </span>
               )}
             </Button>
