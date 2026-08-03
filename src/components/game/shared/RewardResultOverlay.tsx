@@ -300,14 +300,30 @@ export function RewardResultOverlay({
 
   return (
     <>
-      {/* 3. The Full Screen Overlay for Summary & Cards */}
-      {/* We keep this mounted if we are in cards or summary step to maintain background/context if needed, 
-          but technically they are sequential scenes. 
-          For smooth transition, we can stick to one Dialog for the "Overlay" parts. 
-      */}
+      {/* Card rewards use the same full-screen reveal surface as booster packs. */}
+      {currentStep === 'cards' && (
+        <Suspense
+          fallback={
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-game-night-canvas p-8 text-center text-game-night-ink"
+              role="status"
+              aria-live="polite"
+            >
+              Preparing cards…
+            </div>
+          }
+        >
+          <CardDrawReveal
+            cards={rewardCards}
+            onComplete={handleCardRevealComplete}
+          />
+        </Suspense>
+      )}
+
+      {/* Summary remains a dialog so it can preserve the result-flow focus trap. */}
 
       <Dialog
-        open={currentStep === 'summary' || currentStep === 'cards'}
+        open={currentStep === 'summary'}
         // The result flow is deliberately closed by its action buttons. A
         // parent Drawer/Dialog teardown must not dismiss it mid-transition.
         onOpenChange={() => undefined}
@@ -321,28 +337,6 @@ export function RewardResultOverlay({
         >
           <DialogTitle className="sr-only">Reward Result</DialogTitle>
           <div className="flex-1 w-full h-full flex flex-col overflow-hidden relative">
-            {currentStep === 'cards' && (
-              <div className="absolute inset-0 z-[60] bg-game-night-surface">
-                <Suspense
-                  fallback={
-                    <div
-                      className="p-8 text-center text-game-cream"
-                      role="status"
-                      aria-live="polite"
-                    >
-                      Preparing cards…
-                    </div>
-                  }
-                >
-                  <CardDrawReveal
-                    cards={rewardCards}
-                    onComplete={handleCardRevealComplete}
-                    className="absolute inset-0 z-[60]"
-                  />
-                </Suspense>
-              </div>
-            )}
-
             {currentStep === 'summary' && (
               <GameResult
                 embedded

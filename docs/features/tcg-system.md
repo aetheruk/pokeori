@@ -75,6 +75,7 @@ Catalog responses are versioned with the application release, cached privately i
 - Pack draws avoid exact duplicate card IDs within a single pack when possible and give unowned cards a small selection weight bonus.
 - Shiny/rare card animations
 - Single-pack opening uses the standard card drawer reveal. The inventory lightning action consumes every owned pack for that set, draws all cards in safe server chunks, and opens directly on the summary grid.
+- Cards granted by activities use the same full-screen card drawer reveal as booster packs, including the same night canvas, flip animation, rarity treatment, summary grid, and collection action.
 
 ## Local Set Artwork
 - TCG card art remains remote through each card's `images.small` / `images.large` URL.
