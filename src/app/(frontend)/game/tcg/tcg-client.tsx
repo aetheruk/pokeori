@@ -26,7 +26,11 @@ import { useGameUserData } from '@/hooks/useGameUserData'
 import { useTCG } from '@/hooks/useTCG'
 import { APP_VERSION } from '@/utilities/app-version'
 import type { RewardSummary } from '@/utilities/rewards/reward-logic'
-import type { TcgBattleEnergyType } from '@/utilities/tcg/tcg-battle'
+import {
+  calculateTcgBattleCardCost,
+  TCG_BATTLE_FORMATS,
+  type TcgBattleEnergyType,
+} from '@/utilities/tcg/tcg-battle'
 import type { TcgCatalogPage } from '@/utilities/tcg/catalog'
 import { getTcgDecks, redistributeDuplicateCards, saveTcgDeck } from './actions'
 
@@ -85,10 +89,20 @@ export default function TcgExplorerPage({
       >
     >
   >({})
+  const [deckValidation, setDeckValidation] = useState<
+    Record<string, Record<DeckFormat, { totalCost: number }>>
+  >({})
+  const [deckCardsById, setDeckCardsById] = useState<Map<string, TcgCard>>(
+    () => new Map(),
+  )
   const [deckMessage, setDeckMessage] = useState<string>('')
-  const [catalogCards, setCatalogCards] = useState<CatalogCard[]>(initialCatalog?.items || [])
+  const [catalogCards, setCatalogCards] = useState<CatalogCard[]>(
+    initialCatalog?.items || [],
+  )
   const [catalogTotal, setCatalogTotal] = useState(initialCatalog?.total || 0)
-  const [nextCursor, setNextCursor] = useState<string | null>(initialCatalog?.nextCursor || null)
+  const [nextCursor, setNextCursor] = useState<string | null>(
+    initialCatalog?.nextCursor || null,
+  )
   const [catalogLoading, setCatalogLoading] = useState(false)
   const [catalogError, setCatalogError] = useState(false)
   const [filteredPokemon, setFilteredPokemon] = useState<PokemonSummary[]>([])
@@ -271,6 +285,12 @@ export default function TcgExplorerPage({
       if (!mounted) return
       if (result.ok) {
         setGenerationDecks(result.generationDecks || {})
+        setDeckValidation(
+          (result.validation || {}) as Record<
+            string,
+            Record<DeckFormat, { totalCost: number }>
+          >,
+        )
       } else if (result.error) {
         setDeckMessage(result.error)
       }
@@ -280,13 +300,75 @@ export default function TcgExplorerPage({
     }
   }, [gameData, hasDeckBox])
 
+  const selectedCardGeneration = selectedCard?.set.series || ''
+  const selectedGenerationDeckCardIds = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          Object.values(generationDecks[selectedCardGeneration] || {}).flatMap(
+            (deck) => deck?.cards || [],
+          ),
+        ),
+      ),
+    [generationDecks, selectedCardGeneration],
+  )
+
+  useEffect(() => {
+    if (selectedGenerationDeckCardIds.length === 0) {
+      setDeckCardsById(new Map())
+      return
+    }
+    const controller = new AbortController()
+    const params = new URLSearchParams({
+      v: APP_VERSION,
+      cardIds: selectedGenerationDeckCardIds.join(','),
+      limit: String(selectedGenerationDeckCardIds.length),
+    })
+    fetch(`/api/game/catalog/tcg?${params}`, { signal: controller.signal })
+      .then((response) => response.json())
+      .then((result: { items?: CatalogCard[] }) => {
+        setDeckCardsById(
+          new Map((result.items || []).map(({ card }) => [card.id, card])),
+        )
+      })
+      .catch((error) => {
+        if (error?.name !== 'AbortError') setDeckCardsById(new Map())
+      })
+    return () => controller.abort()
+  }, [selectedGenerationDeckCardIds])
+
+  const getGenerationDeckCost = (generation: string, format: DeckFormat) => {
+    const deck = generationDecks[generation]?.[format]?.cards || []
+    const hasAllCards = deck.every((cardId) => deckCardsById.has(cardId))
+    if (hasAllCards) {
+      return deck.reduce(
+        (total, cardId) =>
+          total + calculateTcgBattleCardCost(deckCardsById.get(cardId)!),
+        0,
+      )
+    }
+    return deckValidation[generation]?.[format]?.totalCost || 0
+  }
+
   const toggleCardInGenerationDeck = async (
     generation: string,
     format: DeckFormat,
     cardId: string,
   ) => {
+    if (!selectedCard) return
     const currentDeck = generationDecks[generation]?.[format]?.cards || []
     const currentEnergy = generationDecks[generation]?.[format]?.energy
+    const cardCost = calculateTcgBattleCardCost(selectedCard.card)
+    const currentCost = getGenerationDeckCost(generation, format)
+    if (
+      !currentDeck.includes(cardId) &&
+      currentCost + cardCost > TCG_BATTLE_FORMATS[format].deckCostLimit
+    ) {
+      setDeckMessage(
+        `${selectedCard?.card.name || 'That card'} would exceed the ${TCG_BATTLE_FORMATS[format].label} cost limit.`,
+      )
+      return
+    }
     const nextDeck = currentDeck.includes(cardId)
       ? currentDeck.filter((id) => id !== cardId)
       : currentDeck.length >= 15
@@ -686,12 +768,26 @@ export default function TcgExplorerPage({
                               generationDecks[generation]?.[format.id]?.cards ||
                               []
                             const isInDeck = deck.includes(selectedCard.card.id)
+                            const deckCost = getGenerationDeckCost(
+                              generation,
+                              format.id,
+                            )
+                            const cardCost = calculateTcgBattleCardCost(
+                              selectedCard.card,
+                            )
+                            const costLimit =
+                              TCG_BATTLE_FORMATS[format.id].deckCostLimit
+                            const wouldExceedCost =
+                              !isInDeck && deckCost + cardCost > costLimit
                             return (
                               <Button
                                 key={format.id}
                                 variant={isInDeck ? 'default' : 'outline'}
                                 className="w-full justify-between"
-                                disabled={!isInDeck && deck.length >= 15}
+                                disabled={
+                                  !isInDeck &&
+                                  (deck.length >= 15 || wouldExceedCost)
+                                }
                                 onClick={() =>
                                   toggleCardInGenerationDeck(
                                     generation,
@@ -703,10 +799,11 @@ export default function TcgExplorerPage({
                                 <span>
                                   {isInDeck
                                     ? `Remove from ${format.label}`
-                                    : `Add to ${format.label}`}
+                                    : `Add to ${format.label} (+${cardCost} cost)`}
                                 </span>
                                 <span className="text-xs font-mono text-game-muted">
-                                  {deck.length}/15
+                                  {deck.length}/15 cards · {deckCost}/
+                                  {costLimit} cost
                                 </span>
                               </Button>
                             )

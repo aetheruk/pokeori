@@ -316,7 +316,9 @@ export function isTcgBattleCardLegal(card: TcgCardDetail): boolean {
   )
 }
 
-export function calculateTcgBattleCardCost(card: TcgCardDetail): number {
+export function calculateTcgBattleCardCost(
+  card: Pick<TcgCardDetail, 'name' | 'subtypes' | 'evolvesTo'>,
+): number {
   const subtypes = (card.subtypes || []).map((subtype) => subtype.toUpperCase())
   const name = card.name.toUpperCase()
   const special15 = ['VMAX', 'VSTAR', 'MEGA', 'TAG TEAM', 'LEGEND', 'V-UNION', 'ETERNAMAX']
