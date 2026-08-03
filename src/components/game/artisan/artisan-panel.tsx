@@ -77,6 +77,7 @@ const categoryLabels: Record<ArtisanRecipeCategory | 'all', string> = {
   held: 'Held',
   items: 'Items',
   quests: 'Special',
+  tcg: 'TCG',
 }
 
 type RecipeVariantGroup = {
@@ -1145,7 +1146,7 @@ interface BalanceDialogProps {
   onClose: () => void
 }
 
-const balanceStages = ['Gem', 'Material', 'PokePowder']
+const balanceStages = ['Lock in', 'Lock in', 'Lock in']
 
 function BalanceDialog({
   recipe,
@@ -1273,7 +1274,7 @@ function BalanceDialog({
 
                 return (
                   <div
-                    key={stage}
+                  key={`${stage}-${index}`}
                     className={cn(
                       'rounded-lg border bg-game-surface p-3',
                       isActive ? 'border-game-ochre' : 'border-game-border',
@@ -1641,6 +1642,7 @@ export function ArtisanPanel() {
       held: 0,
       items: 0,
       quests: 0,
+      tcg: 0,
     }
 
     for (const recipe of visibleRecipePool) {
@@ -1651,7 +1653,7 @@ export function ArtisanPanel() {
 
   const categoryOptions = useMemo(() => {
     return (
-      ['all', 'materials', 'balls', 'lures', 'held', 'items', 'quests'] as const
+      ['all', 'materials', 'balls', 'lures', 'held', 'items', 'quests', 'tcg'] as const
     ).filter((category) => category === 'all' || counts[category] > 0)
   }, [counts])
 

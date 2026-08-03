@@ -796,7 +796,7 @@ export function mapCriteriaToDisplayItem(
     case 'daily_crystalize': {
       return {
         icon: <Zap className="w-5 h-5 text-game-moss-strong" />,
-        label: `Crystalize ${count} Cards`,
+        label: `Send ${count} duplicate ${pluralize('card', count)} to HQ`,
         subLabel: 'TCG Mastery',
       }
     }
@@ -860,7 +860,7 @@ export function mapCriteriaToDisplayItem(
           ),
         },
         card_crystalized: {
-          label: `Crystalize ${count} ${pluralize('card', count)}`,
+          label: `Send ${count} duplicate ${pluralize('card', count)} to HQ`,
           subLabel: 'TCG Mastery',
           icon: <Zap className="w-5 h-5 text-game-moss-strong" />,
         },

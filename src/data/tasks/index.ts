@@ -4,6 +4,7 @@ import { viridianCityTasks } from './entries/viridian-city'
 
 import { viridianForestTasks } from './entries/viridian-forest'
 import { pewterCityTasks } from './entries/pewter-city'
+import { pewterTcgTasks } from './entries/pewter-tcg'
 import { mtMoonTasks } from './entries/mt-moon'
 import { ceruleanCityTasks } from './entries/cerulean-city'
 import { vermilionCityTasks } from './entries/vermilion-city'
@@ -40,6 +41,7 @@ export const tasks: Task[] = [
   ...viridianCityTasks,
   ...viridianForestTasks,
   ...pewterCityTasks,
+  ...pewterTcgTasks,
   ...mtMoonTasks,
   ...ceruleanCityTasks,
   ...vermilionCityTasks,

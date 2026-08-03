@@ -826,7 +826,8 @@ describe('TCG battle utilities', () => {
 
   test('validates test encounter opponent decks resolve to legal cards', async () => {
     const tcgBattleGames = allGames.filter(
-      (game): game is TcgBattleGameConfig => game.gameType === 'tcg-battle',
+      (game): game is TcgBattleGameConfig =>
+        game.gameType === 'tcg-battle' && game.subCategory === 'Test',
     )
     expect(tcgBattleGames.length).toBe(3)
 

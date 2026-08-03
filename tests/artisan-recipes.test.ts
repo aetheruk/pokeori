@@ -396,6 +396,7 @@ describe('artisan recipes', () => {
         'held',
         'items',
         'quests',
+        'tcg',
       ]).toContain(recipe.category)
       expect(recipe.outputQuantity.min).toBeGreaterThanOrEqual(0)
       expect(recipe.outputQuantity.max).toBeGreaterThanOrEqual(

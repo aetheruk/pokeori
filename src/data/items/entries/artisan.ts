@@ -324,8 +324,20 @@ const artisanConsumables: Item[] = [
   },
 ]
 
+const tcgItems: Item[] = [
+  {
+    id: 'empty-foil-pack',
+    name: 'Empty Foil Pack',
+    description: 'A blank foil wrapper waiting to be filled with a booster pack.',
+    category: 'misc',
+    spriteId: 'pack-base4',
+    sellValue: 10,
+  },
+]
+
 export const artisanItems: Item[] = [
   ...artisanConsumables,
+  ...tcgItems,
   ...tieredMaterial(
     'broken-ball',
     'Broken Ball',

@@ -28,7 +28,7 @@ import { APP_VERSION } from '@/utilities/app-version'
 import type { RewardSummary } from '@/utilities/rewards/reward-logic'
 import type { TcgBattleEnergyType } from '@/utilities/tcg/tcg-battle'
 import type { TcgCatalogPage } from '@/utilities/tcg/catalog'
-import { crystallizeDuplicates, getTcgDecks, saveTcgDeck } from './actions'
+import { getTcgDecks, redistributeDuplicateCards, saveTcgDeck } from './actions'
 
 const CARD_BATCH_SIZE = 80
 const CARD_CRYSTALIZER_ITEM_ID = 'card-crystalizer'
@@ -75,7 +75,7 @@ export default function TcgExplorerPage({
   } | null>(null)
   const [showDropdown, setShowDropdown] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const [crystalizing, setCrystalizing] = useState(false)
+  const [redistributing, setRedistributing] = useState(false)
   const [rewardSummary, setRewardSummary] = useState<RewardSummary | null>(null)
   const [generationDecks, setGenerationDecks] = useState<
     Record<
@@ -618,12 +618,12 @@ export default function TcgExplorerPage({
                 </div>
 
                 {/* Collection Status / Actions */}
-                {/* Crystalise Section */}
+                {/* Duplicate redistribution section */}
                 {rewardSummary ? (
                   <div className="animate-in fade-in zoom-in duration-500 space-y-4">
                     <RewardSummaryDisplay
                       summary={rewardSummary}
-                      title="Crystallized"
+                      title="Sent to HQ"
                     />
                   </div>
                 ) : (
@@ -634,12 +634,12 @@ export default function TcgExplorerPage({
                       <div>
                         <Button
                           className="w-full"
-                          disabled={crystalizing}
+                          disabled={redistributing}
                           onClick={async () => {
-                            if (crystalizing) return
-                            setCrystalizing(true)
+                            if (redistributing) return
+                            setRedistributing(true)
                             try {
-                              const result = await crystallizeDuplicates(
+                              const result = await redistributeDuplicateCards(
                                 selectedCard.card.id,
                               )
                               if (result.ok && result.summary) {
@@ -650,22 +650,22 @@ export default function TcgExplorerPage({
                             } catch (e) {
                               // Silent error
                             } finally {
-                              setCrystalizing(false)
+                              setRedistributing(false)
                             }
                           }}
                         >
-                          {crystalizing ? (
+                          {redistributing ? (
                             <Loader2 className="h-5 w-5 animate-spin" />
                           ) : (
                             <div className="h-2 w-2 rounded-full bg-game-cream" />
                           )}
                           <span className="text-sm font-semibold">
-                            {crystalizing
-                              ? 'Crystallizing…'
-                              : `Crystallize ${
+                            {redistributing
+                              ? 'Sending to HQ…'
+                              : `Send ${
                                   (entriesByCard[selectedCard.card.id]
                                     ?.quantity || 0) - 1
-                                } cards`}
+                                } duplicate cards to HQ`}
                           </span>
                         </Button>
                       </div>

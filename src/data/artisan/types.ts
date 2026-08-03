@@ -8,7 +8,7 @@ export interface ArtisanCost {
   type?: 'item' | 'currency'
 }
 
-export type ArtisanRecipeCategory = 'materials' | 'balls' | 'lures' | 'held' | 'items' | 'quests'
+export type ArtisanRecipeCategory = 'materials' | 'balls' | 'lures' | 'held' | 'items' | 'quests' | 'tcg'
 export type ArtisanCraftType = 'precise' | 'crush' | 'balance' | 'mix' | 'scatter'
 
 export interface ArtisanRecipe {

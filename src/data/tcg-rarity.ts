@@ -101,3 +101,54 @@ export const tcgRarityCrystalValues: Record<string, number> = {
 
   Promo: 5,
 }
+
+/**
+ * Duplicate copies are sent to HQ for redistribution rather than turned into
+ * Crystals. Keep these values deliberately modest because common duplicates
+ * arrive frequently and the player keeps one copy of every card.
+ */
+export const tcgRarityPokedollarValues: Record<string, number> = {
+  Common: 5,
+  Unknown: 5,
+  Promo: 5,
+  Uncommon: 10,
+  Rare: 20,
+  'Rare Holo': 35,
+
+  'Rare Shining': 50,
+  'Rare Shiny': 50,
+  'Shiny Rare': 50,
+  'Double Rare': 50,
+  'Rare Holo EX': 50,
+  'Rare Holo GX': 50,
+  'Rare Holo V': 50,
+
+  'Rare ACE': 75,
+  'ACE SPEC Rare': 75,
+  'Amazing Rare': 75,
+  'Radiant Rare': 75,
+  'Rare Prism Star': 75,
+  'Rare Prime': 75,
+  'Rare Shiny GX': 75,
+  'Rare Holo LV.X': 75,
+  'Illustration Rare': 75,
+  'Trainer Gallery Rare Holo': 75,
+  LEGEND: 75,
+  'Rare BREAK': 75,
+  'Rare Holo VMAX': 75,
+
+  'Rare Ultra': 100,
+  'Shiny Ultra Rare': 100,
+  'Ultra Rare': 100,
+  'Classic Collection': 100,
+  'Special Illustration Rare': 100,
+  MEGA_ATTACK_RARE: 100,
+  'Rare Secret': 100,
+  'Rare Holo VSTAR': 100,
+  'Rare Rainbow': 100,
+
+  'Hyper Rare': 150,
+  'Mega Hyper Rare': 150,
+  'Black White Rare': 150,
+  'Rare Holo Star': 150,
+}
