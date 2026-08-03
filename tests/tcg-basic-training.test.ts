@@ -5,6 +5,7 @@ import { items } from '@/data/items'
 import { tasks } from '@/data/tasks'
 import { tcgRarityPokedollarValues } from '@/data/tcg-rarity'
 import { getTcgCardById } from '@/utilities/tcg/tcg'
+import { validateTcgBattleDeck } from '@/utilities/tcg/tcg-battle'
 import {
   resolveCraftRewards,
   shouldConsumeCraftCosts,
@@ -82,7 +83,7 @@ describe('TCG Basic Training content', () => {
     ])
   })
 
-  test('authors the inspection, battle, and art tutorial games with one-time gates', () => {
+  test('authors the inspection, battle, and art tutorial games with one-time gates', async () => {
     const inspection = allGames.find(
       (game) => game.id === 'underground-tcg-card-memory-game',
     )
@@ -130,9 +131,9 @@ describe('TCG Basic Training content', () => {
     expect(
       (grass!.settings as { opponentEnergyType?: string }).opponentEnergyType,
     ).toBe('Grass')
-    expect(fire?.icon).toEqual({ type: 'lucide', id: 'Flame' })
-    expect(water?.icon).toEqual({ type: 'lucide', id: 'Droplets' })
-    expect(grass?.icon).toEqual({ type: 'lucide', id: 'Leaf' })
+    expect(fire?.icon).toEqual({ type: 'pokemon', id: '6' })
+    expect(water?.icon).toEqual({ type: 'pokemon', id: '9' })
+    expect(grass?.icon).toEqual({ type: 'pokemon', id: '3' })
     expect(fire?.rewards).toContainEqual({
       type: 'currency',
       targetId: 'pokedollars',
@@ -166,9 +167,21 @@ describe('TCG Basic Training content', () => {
     )
 
     for (const game of [fire, water, grass]) {
+      const cardIds = game?.settings.opponentDeckCardIds || []
       for (const cardId of game?.settings.opponentDeckCardIds || []) {
         expect(getTcgCardById(cardId), `${game?.id}:${cardId}`).not.toBeNull()
       }
+      const validation = await validateTcgBattleDeck(
+        cardIds,
+        Object.fromEntries(cardIds.map((cardId) => [cardId, 1])),
+        'baby',
+      )
+      expect(validation.valid, `${game?.id} should be a valid Baby deck`).toBe(
+        true,
+      )
+      expect(validation.totalCost, `${game?.id} deck cost`).toBeLessThanOrEqual(
+        30,
+      )
     }
   })
 

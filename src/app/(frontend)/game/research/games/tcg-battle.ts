@@ -9,7 +9,6 @@ import {
   arrangeOpponentTcgBattleCards,
   applyTcgBattleEnergyDiscards,
   applyTcgBattleStatusConditions,
-  buildTcgBattleCardSummary,
   canSideTakeTcgBattleAction,
   canTcgBattleEndByPassStall,
   clearTcgBattleControlStatus,
@@ -703,17 +702,8 @@ export async function startTcgBattle(
         return rejectTcgBattleStart(user.id, playerDeck.errors.join(' '))
       }
 
-      const opponentDeck = (
-        await Promise.all(
-          encounter.settings.opponentDeckCardIds.map((cardId) =>
-            buildTcgBattleCardSummary(cardId),
-          ),
-        )
-      ).filter((card): card is NonNullable<typeof card> => Boolean(card))
-      if (opponentDeck.length !== 15) {
-        return rejectTcgBattleStart(user.id, 'Opponent deck is invalid.')
-      }
-      const opponentOffSeries = encounter.settings.opponentDeckCardIds.some(
+      const opponentCardIds = encounter.settings.opponentDeckCardIds
+      const opponentOffSeries = opponentCardIds.some(
         (cardId) => getTcgCardSeriesById(cardId) !== requiredSeries,
       )
       if (opponentOffSeries) {
@@ -722,6 +712,19 @@ export async function startTcgBattle(
           `Opponent deck must use only ${requiredSeries} cards.`,
         )
       }
+
+      const opponentDeckValidation = await validateTcgBattleDeck(
+        opponentCardIds,
+        Object.fromEntries(opponentCardIds.map((cardId) => [cardId, 1])),
+        format,
+      )
+      if (!opponentDeckValidation.valid) {
+        return rejectTcgBattleStart(
+          user.id,
+          `Opponent deck is invalid. ${opponentDeckValidation.errors.join(' ')}`,
+        )
+      }
+      const opponentDeck = opponentDeckValidation.cards
 
       const playerHand = drawTcgBattleCards(playerDeck.cards, 6)
       const opponentHand = drawTcgBattleCards(opponentDeck, 6)

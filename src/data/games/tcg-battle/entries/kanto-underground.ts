@@ -29,13 +29,8 @@ const battle = (input: {
   category: 'Underground',
   subCategory: 'Kanto Underground',
   icon: {
-    type: 'lucide',
-    id:
-      input.energy === 'Fire'
-        ? 'Flame'
-        : input.energy === 'Water'
-          ? 'Droplets'
-          : 'Leaf',
+    type: 'pokemon',
+    id: input.energy === 'Fire' ? '6' : input.energy === 'Water' ? '9' : '3',
   },
   background: '/backgrounds/kanto-underground.avif',
   requirements: input.requirements,
@@ -52,13 +47,13 @@ const battle = (input: {
 
 const fireCards = [
   'base1-46', 'base1-28', 'base1-68', 'base1-60', 'base1-36',
-  'base1-24', 'base1-12', 'base1-23', 'base2-3', 'base2-19',
-  'base2-44', 'base3-12', 'base3-27', 'base3-39', 'base1-4',
+  'base3-39', 'base4-42', 'base4-51', 'base4-69', 'base1-24',
+  'base1-12', 'base1-23', 'base2-3', 'base2-19', 'base1-4',
 ]
 const waterCards = [
-  'base1-63', 'base1-65', 'base1-41', 'base1-59', 'base1-35',
-  'base1-38', 'base1-42', 'base1-64', 'base1-25', 'base1-6',
-  'base2-12', 'base2-46', 'base3-10', 'base3-35', 'base3-49',
+  'base1-63', 'base1-65', 'base1-41', 'base1-35', 'base3-49',
+  'base3-51', 'base3-53', 'base3-54', 'base3-56', 'base1-42',
+  'base1-64', 'base2-46', 'base3-35', 'base1-25', 'base3-10',
 ]
 const grassCards = [
   'base1-44', 'base1-45', 'base1-69', 'base1-66', 'base1-51',

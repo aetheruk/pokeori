@@ -1,6 +1,7 @@
 'use client'
 
 import { Save, Wand2, X } from 'lucide-react'
+import Image from 'next/image'
 import { useEffect, useMemo, useState } from 'react'
 import {
   autoBuildTcgDeck,
@@ -12,8 +13,12 @@ import { Button } from '@/components/ui/button'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
 import { tcgSetSummaries } from '@/data/tcg/summaries'
+import type { TcgCard } from '@/data/tcg/types'
 import { APP_VERSION } from '@/utilities/app-version'
-import type { TcgBattleEnergyType } from '@/utilities/tcg/tcg-battle'
+import {
+  calculateTcgBattleCardCost,
+  type TcgBattleEnergyType,
+} from '@/utilities/tcg/tcg-battle'
 
 export type DeckFormat = 'baby' | 'champions' | 'masters'
 type DeckEntry = { cards: string[]; energy?: TcgBattleEnergyType }
@@ -46,7 +51,7 @@ export function TcgDecksPanel({
   >({})
   const [deckMessage, setDeckMessage] = useState('')
   const [deckBusy, setDeckBusy] = useState(false)
-  const [cardLabelById, setCardLabelById] = useState<Map<string, string>>(
+  const [cardsById, setCardsById] = useState<Map<string, TcgCard>>(
     () => new Map(),
   )
 
@@ -112,7 +117,7 @@ export function TcgDecksPanel({
   const activeValidation = deckValidation[selectedGeneration]?.[deckFormat]
   useEffect(() => {
     if (activeDeck.length === 0) {
-      setCardLabelById(new Map())
+      setCardsById(new Map())
       return
     }
     const controller = new AbortController()
@@ -125,23 +130,26 @@ export function TcgDecksPanel({
       signal: controller.signal,
     })
       .then((response) => response.json())
-      .then(
-        (result: {
-          items?: Array<{ card: { id: string; name: string; number: string } }>
-        }) => {
-          setCardLabelById(
-            new Map(
-              (result.items || []).map(({ card }) => [
-                card.id,
-                `${card.name} #${card.number}`,
-              ]),
-            ),
-          )
-        },
-      )
+      .then((result: { items?: Array<{ card: TcgCard }> }) => {
+        setCardsById(
+          new Map((result.items || []).map(({ card }) => [card.id, card])),
+        )
+      })
       .catch(() => {})
     return () => controller.abort()
   }, [activeDeckKey])
+  const activeCost = useMemo(() => {
+    const hasAllCards = activeDeck.every((cardId) => cardsById.has(cardId))
+    if (hasAllCards) {
+      return activeDeck.reduce(
+        (total, cardId) =>
+          total + calculateTcgBattleCardCost(cardsById.get(cardId)!),
+        0,
+      )
+    }
+    return activeValidation?.totalCost || 0
+  }, [activeDeck, activeValidation?.totalCost, cardsById])
+  const activeFormat = DECK_FORMATS.find((format) => format.id === deckFormat)
   const energyOptions = useMemo(
     () =>
       [
@@ -216,6 +224,23 @@ export function TcgDecksPanel({
     <div className="h-full overflow-y-auto p-4 md:p-6">
       <div className="game-paper-background space-y-4 rounded-xl border border-game-border bg-game-surface p-4 shadow-sm">
         <SectionDivider className="mb-1">TCG Generation Decks</SectionDivider>
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-game-border bg-game-surface-raised px-3 py-2">
+          <span className="text-sm font-semibold text-game-ink">
+            {activeFormat?.label} Deck
+          </span>
+          <span className="text-xs font-bold uppercase tracking-[0.12em] text-game-muted">
+            Deck cost{' '}
+            <span
+              className={
+                activeCost > (activeFormat?.cap || 0)
+                  ? 'text-game-danger'
+                  : 'text-game-moss-strong'
+              }
+            >
+              {activeCost}/{activeFormat?.cap}
+            </span>
+          </span>
+        </div>
         <PremiumSelect
           label="Battle Energy Card (Activates Turn 15)"
           value={activeEnergy}
@@ -236,26 +261,49 @@ export function TcgDecksPanel({
           options={energyOptions}
         />
 
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-8">
           {activeDeck.length === 0 ? (
-            <span className="rounded-lg border border-dashed border-game-border bg-game-surface-raised px-3 py-2 text-sm text-game-muted">
+            <span className="col-span-full rounded-lg border border-dashed border-game-border bg-game-surface-raised px-3 py-2 text-sm text-game-muted">
               No cards selected. Use Auto fill to draft a legal starting deck.
             </span>
           ) : (
-            activeDeck.map((cardId) => (
-              <button
-                type="button"
-                key={cardId}
-                aria-label={`Remove ${cardLabelById.get(cardId) || cardId} from deck`}
-                className="game-focus-ring inline-flex min-h-10 items-center gap-2 rounded-lg border border-game-border bg-game-surface-raised px-3 py-1 text-xs text-game-ink transition-colors hover:border-game-clay hover:text-game-clay-strong"
-                onClick={() => removeCardFromDeck(cardId)}
-              >
-                <span className="max-w-[220px] truncate">
-                  {cardLabelById.get(cardId) || cardId}
-                </span>
-                <X className="h-3 w-3" />
-              </button>
-            ))
+            activeDeck.map((cardId, index) => {
+              const card = cardsById.get(cardId)
+              const cardCost = card ? calculateTcgBattleCardCost(card) : null
+              return (
+                <button
+                  type="button"
+                  key={cardId}
+                  aria-label={`Remove ${card?.name || cardId} from deck`}
+                  className="game-focus-ring group min-w-0 text-left"
+                  onClick={() => removeCardFromDeck(cardId)}
+                >
+                  <div className="relative aspect-[2.5/3.5] overflow-hidden rounded-md border border-game-border bg-game-surface-raised shadow-sm transition-transform group-hover:-translate-y-0.5 group-hover:border-game-clay">
+                    <Image
+                      src={
+                        card?.images.large ||
+                        card?.images.small ||
+                        '/images/tcg-back.avif'
+                      }
+                      alt={card?.name || cardId}
+                      fill
+                      sizes="(max-width: 640px) 30vw, (max-width: 1024px) 18vw, 110px"
+                      className="object-cover"
+                      priority={index < 3}
+                    />
+                    <span className="absolute left-1 top-1 rounded bg-game-ink/85 px-1.5 py-0.5 text-[10px] font-bold text-game-cream">
+                      {cardCost === null ? '…' : `Cost ${cardCost}`}
+                    </span>
+                    <span className="absolute right-1 top-1 rounded-full bg-game-clay p-1 text-game-cream opacity-0 transition-opacity group-hover:opacity-100">
+                      <X className="h-3 w-3" />
+                    </span>
+                  </div>
+                  <span className="mt-1 block truncate text-[10px] font-semibold text-game-ink">
+                    {card?.name || cardId}
+                  </span>
+                </button>
+              )
+            })
           )}
         </div>
 
