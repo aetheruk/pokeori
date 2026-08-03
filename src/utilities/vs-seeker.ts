@@ -96,6 +96,14 @@ export function getVsSeekerBadgeCount(
     .length
 }
 
+export function getVsSeekerAiProfile(
+  inventory: Record<string, number>,
+): 'trainer' | 'advanced' {
+  return getVsSeekerBadgeCount(inventory) >= VS_SEEKER_BADGE_LEVELS.length
+    ? 'advanced'
+    : 'trainer'
+}
+
 export function getVsSeekerTrainerHealingItemId(params: {
   inventory: Record<string, number>
   rng?: () => number
@@ -241,7 +249,7 @@ export function buildVsSeekerBattleConfig(params: {
     maxPokemon: 3,
     levelCap: level,
     allowSwapping: true,
-    aiProfile: 'advanced',
+    aiProfile: getVsSeekerAiProfile(params.inventory),
   }
 }
 
