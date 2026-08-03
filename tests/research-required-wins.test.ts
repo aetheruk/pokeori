@@ -14,11 +14,21 @@ describe('research required wins', () => {
 
   test('preserves special completion rules for other research game families', () => {
     const prizeWheel = allGames.find((game) => game.gameType === 'prize-wheel')
-    const match3 = allGames.find((game) => game.gameType === 'match3' && typeof game.settings.winScore === 'number')
-    const fieldObservation = allGames.find((game) => game.gameType === 'field-observation')
+    const match3 = allGames.find(
+      (game) =>
+        game.gameType === 'match3' &&
+        typeof game.settings.winScore === 'number',
+    )
+    const tcgQuiz = allGames.find((game) => game.gameType === 'tcg-inspection')
+    const fieldObservation = allGames.find(
+      (game) => game.gameType === 'field-observation',
+    )
 
     expect(prizeWheel && getRequiredResearchWins(prizeWheel)).toBe(0)
     expect(match3 && getRequiredResearchWins(match3)).toBe(1)
-    expect(fieldObservation && getRequiredResearchWins(fieldObservation)).toBe(1)
+    expect(tcgQuiz && getRequiredResearchWins(tcgQuiz)).toBe(1)
+    expect(fieldObservation && getRequiredResearchWins(fieldObservation)).toBe(
+      1,
+    )
   })
 })

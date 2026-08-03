@@ -15,15 +15,16 @@ export interface TcgInspectionGameSettings {
   allowedRarities?: string[]
   questionTypes?: TcgInspectionQuestionType[]
   packSize: number
-  rounds: number
+  requiredAnswers: number
   studySeconds?: number
   lives?: number
   // Legacy fields retained so older authored games can still load safely.
+  rounds?: number
   countdownSeconds?: number
   attentionSeconds?: number
   previewSeconds?: number
   timeLimit: number
-  winScore: number
+  winScore?: number
   pointsPerCorrect?: number
   themeColour?: string
 }
