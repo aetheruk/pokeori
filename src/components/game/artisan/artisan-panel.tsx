@@ -1193,7 +1193,6 @@ function BalanceDialog({
     0,
     session.endAt - Math.max(now, session.startAt),
   )
-  const activeIndex = Math.min(locks.length, 2)
   const targets = session.balanceTargets || [0.45, 0.55, 0.5]
   const perfectWindow = session.balancePerfectWindow || 0.07
   const position = getArtisanBalancePosition(elapsedMs, session.balancePeriodMs)
@@ -1241,7 +1240,7 @@ function BalanceDialog({
           recipe={recipe}
           title="Scent Balance"
           subtitle="Lock each component when its meter enters the target zone."
-          status={started ? `Lock ${balanceStages[activeIndex]}` : 'Get ready'}
+          status={started ? 'Lock in' : 'Get ready'}
           onClose={onClose}
           completing={completing}
         >
