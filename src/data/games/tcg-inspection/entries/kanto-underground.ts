@@ -26,9 +26,8 @@ export const kantoUndergroundTcgInspectionEntries: TcgInspectionGameConfig[] = [
       questionTypes: ['name', 'number', 'rarity', 'pokemonType', 'hp'],
       packSize: 5,
       rounds: 6,
-      countdownSeconds: 3,
-      attentionSeconds: 1,
-      previewSeconds: 2,
+      studySeconds: 30,
+      lives: 2,
       timeLimit: 60,
       winScore: 400,
       pointsPerCorrect: 100,
@@ -36,4 +35,3 @@ export const kantoUndergroundTcgInspectionEntries: TcgInspectionGameConfig[] = [
     },
   },
 ]
-

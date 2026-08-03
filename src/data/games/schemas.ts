@@ -701,9 +701,11 @@ const settingsByGameType: Record<string, z.ZodTypeAny> = {
     .object({
       packSize: z.number().int().min(3).max(10),
       rounds: z.number().int().positive(),
+      studySeconds: z.number().positive().optional(),
+      lives: z.number().int().positive().optional(),
       countdownSeconds: z.number().positive().optional(),
       attentionSeconds: z.number().positive().optional(),
-      previewSeconds: z.number().positive(),
+      previewSeconds: z.number().positive().optional(),
       timeLimit: z.number().positive(),
       winScore: z.number().nonnegative(),
       allowedSetIds: z.array(z.string()).optional(),

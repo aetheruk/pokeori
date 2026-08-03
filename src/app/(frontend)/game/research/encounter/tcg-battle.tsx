@@ -757,6 +757,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       const response = await startTcgBattle(encounter.id)
       if (!response.success) {
         toast.error(response.error)
+        router.replace('/game/explore')
         return
       }
       setState(response.state)
@@ -766,7 +767,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           : response.state.player.front.map((card) => card.instanceId),
       )
     })
-  }, [encounter.id])
+  }, [encounter.id, router])
 
   useEffect(() => {
     if (state?.phase !== 'battle') return

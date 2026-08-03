@@ -337,6 +337,12 @@ function getResearchSessionTimeLimit(encounter: (typeof allGames)[number]) {
   if (encounter.gameType === 'field-observation') {
     return getFieldObservationSessionSeconds(encounter.settings as any)
   }
+  if (encounter.gameType === 'tcg-inspection') {
+    return (
+      (encounter.settings.timeLimit || 60) +
+      (encounter.settings.studySeconds || 0)
+    )
+  }
   return encounter.settings.timeLimit || 60
 }
 
@@ -775,7 +781,9 @@ export async function startGameActivity(
             number
           >
 
-          for (const [currencyId, count] of Object.entries(currenciesToConsume)) {
+          for (const [currencyId, count] of Object.entries(
+            currenciesToConsume,
+          )) {
             const current = updatedCurrency[currencyId] || 0
             if (current < count) {
               return { success: false, error: `Not enough ${currencyId}` }

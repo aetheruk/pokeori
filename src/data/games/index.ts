@@ -332,6 +332,8 @@ export interface GameSettings {
   questionTypes?: import('./tcg-inspection/types').TcgInspectionQuestionType[]
   packSize?: number
   rounds?: number
+  studySeconds?: number
+  lives?: number
   previewSeconds?: number
   pointsPerCorrect?: number
   // TCG Battle specific
