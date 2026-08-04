@@ -21,6 +21,7 @@ export interface ArtAcademyPublicRoundData {
   artAcademy: {
     spriteUrl: string
     palette: string[]
+    referenceCells: string
     scoreGridSize: number
     guideGridSize: number
   }
@@ -49,18 +50,20 @@ export async function createArtAcademyRound(
     new Uint8Array(data),
     settings.paletteSize || 12,
   )
+  const encodedReferenceCells = Buffer.from(reference.referenceCells).toString(
+    'base64url',
+  )
 
   return {
     privateRoundData: {
       palette: reference.palette,
-      referenceCells: Buffer.from(reference.referenceCells).toString(
-        'base64url',
-      ),
+      referenceCells: encodedReferenceCells,
     },
     publicRoundData: {
       artAcademy: {
         spriteUrl,
         palette: reference.palette.map(artAcademyColorToHex),
+        referenceCells: encodedReferenceCells,
         scoreGridSize: ART_ACADEMY_SCORE_GRID_SIZE,
         guideGridSize: ART_ACADEMY_GUIDE_GRID_SIZE,
       },
