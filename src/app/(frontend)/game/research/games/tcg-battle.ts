@@ -13,11 +13,15 @@ import {
   canTcgBattleEndByPassStall,
   clearTcgBattleControlStatus,
   clearTcgBattleStatuses,
+  clearTcgBattleTemporaryEffects,
+  chooseTcgBattleAttackChoice,
   chooseOpponentTcgBattleAttack,
   compactTcgBattleBoard,
   drawTcgBattleCards,
   getAllowedTcgBattleAttackCost,
   getEffectiveTcgBattleAttackCost,
+  getTcgBattleAttackEffect,
+  getValidTcgBattleTargets,
   getTcgBattleCardUnlockTurnForCard,
   getNextTcgBattleTurnNumber,
   normalizeTcgBattleEnergyType,
@@ -28,6 +32,9 @@ import {
   resolveTcgBattleStatusAttackCheck,
   TCG_BATTLE_FORMATS,
   validateTcgBattleDeck,
+  validateTcgBattleAttackChoice,
+  isTcgBattleAttackDisabled,
+  type TcgBattleAttackChoice,
   type TcgBattleCardState,
   type TcgBattleDeckFormat,
   type TcgBattleEnergyDiscardResolution,
@@ -58,6 +65,8 @@ type TcgBattleActionResult =
       completion?: GameActivityCompletionResult
     }
   | { success: false; error: string }
+
+type WithoutId<T> = T extends { id: string } ? Omit<T, 'id'> : never
 
 const BATTLE_TTL_SECONDS = 60 * 60
 const GAME_TTL_SECONDS = 60 * 60
@@ -246,6 +255,7 @@ function clearDamageEvents(state: TcgBattleState) {
   state.lastCoinFlipEvents = []
   state.lastStatusEvent = undefined
   state.lastStatusEvents = []
+  state.lastEffectEvents = []
 }
 
 function recordDamageEvent(
@@ -292,6 +302,136 @@ function recordStatusEvents(
   events: Omit<NonNullable<TcgBattleState['lastStatusEvents']>[number], 'id'>[],
 ) {
   for (const event of events) recordStatusEvent(state, event)
+}
+
+function recordEffectEvent(
+  state: TcgBattleState,
+  event: WithoutId<NonNullable<TcgBattleState['lastEffectEvents']>[number]>,
+) {
+  state.lastEffectEvents = [
+    ...(state.lastEffectEvents || []),
+    { id: crypto.randomUUID(), ...event } as NonNullable<TcgBattleState['lastEffectEvents']>[number],
+  ]
+}
+
+function getTemporaryEffects(card: TcgBattleCardState) {
+  card.temporaryEffects ||= {}
+  return card.temporaryEffects
+}
+
+function swapTcgBattleCards(
+  state: TcgBattleState,
+  sideKey: TcgBattleSide,
+  frontCard: TcgBattleCardState,
+  benchCardId: string,
+) {
+  const side = state[sideKey]
+  const frontIndex = side.front.findIndex((card) => card.instanceId === frontCard.instanceId)
+  const benchIndex = side.back.findIndex((card) => card.instanceId === benchCardId && card.currentHp > 0)
+  if (frontIndex < 0 || benchIndex < 0) return false
+  const replacement = side.back[benchIndex]
+  clearTcgBattleStatuses(frontCard)
+  clearTcgBattleTemporaryEffects(frontCard)
+  side.front[frontIndex] = replacement
+  side.back[benchIndex] = frontCard
+  recordEffectEvent(state, {
+    kind: 'switch',
+    side: sideKey,
+    sourceId: frontCard.instanceId,
+    targetId: replacement.instanceId,
+  })
+  return true
+}
+
+function applyTcgBattleSpecialEffects(params: {
+  state: TcgBattleState
+  sideKey: TcgBattleSide
+  attacker: TcgBattleCardState
+  target: TcgBattleCardState
+  choice?: TcgBattleAttackChoice
+  resolution: ReturnType<typeof resolveTcgBattleAttack>
+  blockTargetEffects: boolean
+}) {
+  const { state, sideKey, attacker, target, resolution, blockTargetEffects } = params
+  const opponentKey = sideKey === 'player' ? 'opponent' : 'player'
+  const choice = resolution.copiedAttackName && params.choice?.kind === 'copiedAttack'
+    ? params.choice.followUp
+    : params.choice
+
+  if (resolution.copiedAttackName) {
+    recordEffectEvent(state, {
+      kind: 'copy',
+      sourceId: attacker.instanceId,
+      targetId: target.instanceId,
+      label: resolution.copiedAttackName,
+    })
+  }
+
+  for (const rule of resolution.specialEffects || []) {
+    const targetsOpponent = [
+      'disableAttack',
+      'blockTargeting',
+      'changeWeakness',
+      'changeType',
+      'placeMarker',
+    ].includes(rule.kind) || (rule.kind === 'switch' && rule.target === 'opponent')
+    if (blockTargetEffects && targetsOpponent) continue
+
+    if (rule.kind === 'switch' && choice?.kind === 'benchSwitch') {
+      const switched = swapTcgBattleCards(
+        state,
+        rule.target === 'self' ? sideKey : opponentKey,
+        rule.target === 'self' ? attacker : target,
+        choice.cardId,
+      )
+      if (switched) state.log.unshift(`${rule.target === 'self' ? attacker.name : target.name} switched with a benched card.`)
+      continue
+    }
+    if (rule.kind === 'disableAttack' && choice?.kind === 'disabledAttack') {
+      getTemporaryEffects(target).disabledAttack = { attackIndex: choice.attackIndex, remainingTurns: 2 }
+      recordEffectEvent(state, { kind: 'control', sourceId: attacker.instanceId, targetId: target.instanceId, label: `${target.attacks[choice.attackIndex]?.name || 'Attack'} disabled` })
+      continue
+    }
+    if (rule.kind === 'buffAttack') {
+      getTemporaryEffects(attacker).nextAttackBuff = { attackName: rule.attackName, baseDamage: rule.baseDamage, remainingTurns: 2 }
+      recordEffectEvent(state, { kind: 'control', sourceId: attacker.instanceId, targetId: attacker.instanceId, label: `${rule.attackName} empowered` })
+      continue
+    }
+    if (rule.kind === 'blockTargeting') {
+      getTemporaryEffects(target).cannotTarget = { targetId: attacker.instanceId, remainingTurns: 2 }
+      recordEffectEvent(state, { kind: 'control', sourceId: attacker.instanceId, targetId: target.instanceId, label: `Cannot target ${attacker.name}` })
+      continue
+    }
+    if ((rule.kind === 'changeWeakness' || rule.kind === 'changeResistance' || rule.kind === 'changeType') && choice?.kind === 'typeChange') {
+      const affected = rule.kind === 'changeResistance' ? attacker : target
+      const effects = getTemporaryEffects(affected)
+      if (rule.kind === 'changeWeakness') effects.weaknessType = choice.type
+      if (rule.kind === 'changeResistance') effects.resistanceType = choice.type
+      if (rule.kind === 'changeType') effects.battleType = choice.type
+      recordEffectEvent(state, { kind: 'type', sourceId: attacker.instanceId, targetId: affected.instanceId, label: `${choice.type} ${rule.kind.replace('change', '').toLowerCase()}` })
+      continue
+    }
+    if (rule.kind === 'textureMagic' && choice?.kind === 'textureMagic') {
+      if (choice.resistanceType) getTemporaryEffects(attacker).resistanceType = choice.resistanceType
+      if (choice.weaknessType && !blockTargetEffects) getTemporaryEffects(target).weaknessType = choice.weaknessType
+      recordEffectEvent(state, { kind: 'type', sourceId: attacker.instanceId, targetId: target.instanceId, label: 'Texture Magic' })
+      continue
+    }
+    if (rule.kind === 'destinyBond') {
+      getTemporaryEffects(attacker).destinyBond = { remainingTurns: 1 }
+      recordEffectEvent(state, { kind: 'control', sourceId: attacker.instanceId, targetId: attacker.instanceId, label: 'Destiny Bond' })
+      continue
+    }
+    if (rule.kind === 'reflectDamage') {
+      getTemporaryEffects(attacker).reflectDamage = { remainingTurns: 1 }
+      recordEffectEvent(state, { kind: 'control', sourceId: attacker.instanceId, targetId: attacker.instanceId, label: 'Mirror Shell' })
+      continue
+    }
+    if (rule.kind === 'placeMarker') {
+      target.markers = Array.from(new Set([...(target.markers || []), rule.marker]))
+      recordEffectEvent(state, { kind: 'marker', sourceId: attacker.instanceId, targetId: target.instanceId, label: 'Lightning Rod' })
+    }
+  }
 }
 
 function formatEnergyDiscardSummary(
@@ -364,10 +504,14 @@ function applyAttack(
   attacker: TcgBattleCardState,
   attackIndex: number,
   target: TcgBattleCardState,
+  choice?: TcgBattleAttackChoice,
 ) {
   const side = state[sideKey]
   const attack = attacker.attacks[attackIndex]
   if (!attack) throw new Error('Invalid attack.')
+  if (isTcgBattleAttackDisabled(attacker, attackIndex)) {
+    throw new Error(`${attack.name} is disabled this turn.`)
+  }
 
   const energyCost = getEffectiveTcgBattleAttackCost(state, attack)
   if (energyCost > side.energy) throw new Error('Not enough energy.')
@@ -378,6 +522,16 @@ function applyAttack(
   if (state.turnNumber < unlockTurn) {
     throw new Error(`${attacker.name} is locked until turn ${unlockTurn}.`)
   }
+  const choiceError = validateTcgBattleAttackChoice({
+    state,
+    sideKey,
+    attacker,
+    attack,
+    target,
+    choice,
+    paidAttackCost: energyCost,
+  })
+  if (choiceError) throw new Error(choiceError)
 
   const statusCheck = resolveTcgBattleStatusAttackCheck(attacker)
   if (statusCheck.coinFlips) {
@@ -420,6 +574,9 @@ function applyAttack(
     return
   }
 
+  const blockTargetEffects = target.incomingAttackModifier?.kind === 'preventAllEffects'
+  const targetHadDestinyBond = Boolean(target.temporaryEffects?.destinyBond)
+  const targetHadReflectDamage = Boolean(target.temporaryEffects?.reflectDamage)
   const resolution = resolveTcgBattleAttack({
     state,
     sideKey,
@@ -427,9 +584,25 @@ function applyAttack(
     attack,
     target,
     paidAttackCost: energyCost,
+    choice,
   })
   side.energy -= energyCost
-  applyTcgBattleEnergyDiscards(state, sideKey, resolution.energyDiscards)
+  const applicableEnergyDiscards = blockTargetEffects
+    ? resolution.energyDiscards?.filter((discard) => discard.target === 'self')
+    : resolution.energyDiscards
+  applyTcgBattleEnergyDiscards(state, sideKey, applicableEnergyDiscards)
+  for (const gain of resolution.energyGains || []) {
+    const targetSide = gain.target === 'self' ? sideKey : sideKey === 'player' ? 'opponent' : 'player'
+    const before = state[targetSide].energy
+    state[targetSide].energy = Math.min(
+      TCG_BATTLE_FORMATS[state.format].energyCap,
+      before + gain.amount,
+    )
+    const added = state[targetSide].energy - before
+    if (added > 0) {
+      recordEffectEvent(state, { kind: 'energy', side: targetSide, sourceId: attacker.instanceId, amount: added })
+    }
+  }
   if (resolution.coinFlips) {
     recordCoinFlipEvent(state, {
       sourceId: attacker.instanceId,
@@ -440,6 +613,7 @@ function applyAttack(
     })
   }
   target.currentHp = Math.max(0, target.currentHp - resolution.targetDamage)
+  getTemporaryEffects(target).lastIncomingAttackDamage = resolution.targetDamage
   if (resolution.targetDamage > 0) {
     recordDamageEvent(state, {
       sourceId: attacker.instanceId,
@@ -512,12 +686,36 @@ function applyAttack(
       reason: 'self',
     })
   }
+  if (targetHadReflectDamage && resolution.targetDamage > 0 && attacker.currentHp > 0) {
+    const reflected = Math.min(attacker.currentHp, resolution.targetDamage)
+    attacker.currentHp -= reflected
+    recordDamageEvent(state, {
+      sourceId: target.instanceId,
+      targetId: attacker.instanceId,
+      targetSide: sideKey,
+      damage: reflected,
+      reason: 'self',
+    })
+  }
+  if (targetHadDestinyBond && target.currentHp <= 0 && attacker.currentHp > 0) {
+    const bondedDamage = attacker.currentHp
+    attacker.currentHp = 0
+    recordDamageEvent(state, {
+      sourceId: target.instanceId,
+      targetId: attacker.instanceId,
+      targetSide: sideKey,
+      damage: bondedDamage,
+      reason: 'self',
+    })
+  }
   const statusEvents = applyTcgBattleStatusConditions(
     state,
     sideKey,
     attacker.instanceId,
     target.instanceId,
-    resolution.statusConditions,
+    blockTargetEffects
+      ? resolution.statusConditions?.filter((status) => status.target === 'self')
+      : resolution.statusConditions,
   )
   recordStatusEvents(
     state,
@@ -534,6 +732,22 @@ function applyAttack(
       protectedCard.incomingAttackModifier = protection.modifier
     }
   }
+  applyTcgBattleSpecialEffects({
+    state,
+    sideKey,
+    attacker,
+    target,
+    choice,
+    resolution,
+    blockTargetEffects,
+  })
+
+  if (attacker.temporaryEffects?.nextAttackBuff?.attackName.toLowerCase() === attack.name.toLowerCase()) {
+    delete attacker.temporaryEffects.nextAttackBuff
+  }
+  if (attacker.temporaryEffects?.lastIncomingAttackDamage !== undefined) {
+    delete attacker.temporaryEffects.lastIncomingAttackDamage
+  }
 
   state.consecutivePasses = 0
   const coinSummary = resolution.coinFlips
@@ -542,8 +756,8 @@ function applyAttack(
   const selfSummary =
     selfDamage > 0 ? ` ${attacker.name} took ${selfDamage} recoil.` : ''
   const energyDiscardSummary =
-    resolution.energyDiscards && resolution.energyDiscards.length > 0
-      ? ` ${formatEnergyDiscardSummary(sideKey, resolution.energyDiscards)}`
+    applicableEnergyDiscards && applicableEnergyDiscards.length > 0
+      ? ` ${formatEnergyDiscardSummary(sideKey, applicableEnergyDiscards)}`
       : ''
   const statusSummary =
     resolution.statusConditions && resolution.statusConditions.length > 0
@@ -597,6 +811,7 @@ function runOpponentTurn(state: TcgBattleState) {
     choice.attacker,
     choice.attackIndex,
     choice.target,
+    choice.choice,
   )
   finishOpponentTurn(state)
 }
@@ -831,6 +1046,7 @@ export async function tcgBattleAttack(
   attackerId: string,
   attackIndex: number,
   targetId: string,
+  choice?: TcgBattleAttackChoice,
 ): Promise<TcgBattleActionResult> {
   try {
     const user = await getUser()
@@ -844,12 +1060,15 @@ export async function tcgBattleAttack(
       }
 
       const attacker = findCard(state.player.front, attackerId)
-      const target = findCard(state.opponent.front, targetId)
+      const target = findCard(
+        [...state.opponent.front, ...state.opponent.back],
+        targetId,
+      )
       if (!attacker || !target)
         return { success: false, error: 'Invalid attacker or target.' }
 
       clearDamageEvents(state)
-      applyAttack(state, 'player', attacker, attackIndex, target)
+      applyAttack(state, 'player', attacker, attackIndex, target, choice)
       afterPlayerAction(state)
       await saveState(state)
       return { success: true, state }
@@ -904,6 +1123,7 @@ export async function tcgBattleRetreat(
       clearDamageEvents(state)
       state.player.energy -= cost
       clearTcgBattleStatuses(retreating)
+      clearTcgBattleTemporaryEffects(retreating)
       state.player.front[frontIndex] = state.player.back[backIndex]
       state.player.back[backIndex] = retreating
       state.consecutivePasses = 0

@@ -1,6 +1,6 @@
 # Battle Mechanics Inventory
 
-Last reviewed: 2026-07-06
+Last reviewed: 2026-08-04
 
 This document tracks authored Pokemon abilities, battle moves, TMs, field TMs, and power systems. Keep it in sync with:
 
@@ -255,6 +255,12 @@ Dusk Mane and Dawn Wings Necrozma Ultra Burst through the Z-Move system: once a 
 Player battle item use checks item `skillRequirements` before consumption. Trainer level controls item capacity per battle: 2 at level 1, 3 at 17, 4 at 38, and 5 at 52. Trainer level also controls trained move uses per Pokemon per battle: 2 at level 10, 3 at 21, 4 at 42, and 5 at 59. Current battle-use gates are Trainer level 1 for Battle Observer, Trainer level 3 for Potion, Trainer level 4 for Fresh Water, Trainer levels 5-9 for Antidote, Paralyze Heal, Awakening, Burn Heal, and Ice Heal, Trainer level 27 for Super Potion, Trainer level 29 for Soda Pop, Trainer level 34 for Lemonade, Trainer level 32 for all X items, Trainer level 36 for Dire Hit, Trainer level 37 for Full Heal, Trainer level 40 for Training Bands, Trainer level 41 for Sitrus Berry, Trainer level 51 for Hyper Potion, Trainer level 60 for Max Potion, and Trainer level 81 for Full Restore. Held berries also use Trainer item gates when assigned or used. Berries are not directly usable from the inventory or Pokemon item dialog; color/utility berries act as crafting materials, while eligible Oran/Sitrus/status berries act through battle item or held-item systems. Pokemon-targeted items can also author reusable form-change effects, currently used by Rusty Sword, Rusty Shield, Griseous Orb, Adamant Orb, Lustrous Orb, Rotom form manuals, Ogerpon masks, Reveal Glass, Gracidea, Prison Bottle, and Meteorite. Pokemon-targeted fusion effects are used by DNA Splicers, N-Solarizer, N-Lunarizer, and Reins of Unity; they fuse Kyurem/Necrozma/Calyrex with the selected owned partner, hide that partner from normal availability, and unfuse both records when the same item is used on the fused Pokemon. Held item assignment syncs Plate, Memory, and Drive form families for Arceus, Silvally, and Genesect. Assigned move changes also sync Keldeo between base and Resolute Form based on whether Sacred Sword is assigned, and Meloetta between base and Pirouette Form based on whether Relic Song is assigned. No berry grants direct friendship. Ball usage is not skill-gated; ball access is controlled by shops, drops, Artisan recipes, materials, and recipe/manual unlocks. Lures and repels are Explorer-gated outside battle, with Repel at 20, Super Repel at 40, and Max Repel at 75.
 
 Owned Pokemon lose 1 friendship, clamped at 0, whenever they faint in PVE or PVP battles. NPC trainer and wild enemy Pokemon do not persist friendship changes.
+
+## TCG Battle Attack Effects
+
+TCG Battle has a separate, simplified attack interpreter in `src/utilities/tcg/tcg-battle.ts`; it does not use the main Pokemon battle move registry. The Base-series audit covers all 406 Pokemon cards in Base Set, Jungle, Fossil, Base Set 2, Team Rocket, and Wizards Black Star Promos. Supported mechanics include dynamic and until-tails coin sequences, conditional damage/healing/recoil, board and shared-energy formulas, scoped targets and switches, shared-energy mutation, temporary attack locks/buffs/protection/type overrides, Destiny Bond and reflected damage, Lightning Rod markers, and Metronome-style attack copying. Player choices are server-validated and opponent choices are generated server-side.
+
+Attacks whose effects exist only in the physical game's deck, hand, prize-card, discard-pile, Trainer-card, or evolution systems remain filtered. The audit test fixes that boundary at 31 unsupported attack occurrences across 19 attack names; `base3-3`, `base3-18`, `basep-31`, and `basep-35` are the only audited cards with no mechanics-compatible attack.
 
 ## Reserved Future Content
 

@@ -41,7 +41,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 | Spelling | `src/data/games/spelling` | Spell Pokemon names |
 | Fishing | `src/data/games/fishing` | Catch Pokemon while fishing |
 | Field Observation | `/game/field-research` | Watch a timed research frame with route and global random spawns, then answer a server-generated observation question |
-| TCG Battle | `src/data/games/tcg-battle` | Server-resolved card battles using saved 15-card TCG decks |
+| TCG Battle | `src/data/games/tcg-battle` | Server-resolved simplified card battles using saved 15-card TCG decks |
 | Run | `src/data/games/run` | Endless runner |
 | Rock Push | `src/data/games/rock-push` | Puzzle game |
 | Prize Wheel | `src/data/games/prize-wheel` | Spin for rewards |
@@ -112,6 +112,13 @@ WebKit, which may still permit history swipes despite that CSS property.
 - Active companion abilities can modify Field Observation through the shared data-driven ability effect system. Current supported research-facing hooks cover observation/answer timer deltas, generated Researching XP multipliers, Pokemon Research XP multipliers, extra active item drops, and protection against losing gathered drops on failed reports.
 - Each observed reward subject gains Pokemon Research XP: base 1 at Researcher 1, 2 at Researcher 18, 3 at Researcher 50, 4 at Researcher 70, and 5 at Researcher 100, with a 20% per-subject chance to gain +1 above the base tier.
 - Successful Mini Games and Field Research studies grant the active partner Pokemon 3 Pokemon Research XP where the activity supports that reward.
+
+## TCG Battle
+
+- TCG Battle uses a server-authoritative shared-energy board format rather than reproducing the full physical card game. Attacks may damage active or supported bench targets, switch cards, gain or discard shared energy, apply temporary control/protection/type effects, place supported markers, or copy another attack. Deck, hand, prize-card, discard-pile, Trainer-card, and evolution-only instructions are intentionally outside the engine.
+- Base-series compatibility is audited across all 406 Pokemon cards in `base1` through `base5` plus `basep`. The classic text interpreter supports every mechanics-compatible attack in those sets; 31 occurrences across 19 wholly off-model attack names remain filtered, leaving only four cards with no legal attack (`base3-3`, `base3-18`, `basep-31`, and `basep-35`).
+- Attacks that need a target, switch, attack, energy amount, or type selection open a night-styled choice drawer for the player. The server validates every submitted choice against current battle state, while opponent choices are generated server-side.
+- Dynamic coin attacks roll the number of coins required by current state. Until-tails attacks use a 20-flip safety cap so malformed or adversarial state cannot create an unbounded resolution.
 
 ## Pachinko
 - Pachinko is a physics-result cost/reward game. Matter.js resolves whether each ball lands in an authored slot or misses, while server actions own currency deduction, reward granting, stats, session totals, rate limits, locks, and duplicate round protection.

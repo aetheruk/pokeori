@@ -17,7 +17,11 @@ export type TcgBattleEnergyType =
   | 'Dragon'
   | 'Colorless'
 
-export type TcgBattleCoinCondition = 'heads' | 'tails'
+export type TcgBattleCoinCondition =
+  | 'heads'
+  | 'tails'
+  | { result: 'heads' | 'tails'; minimum: number }
+export type TcgBattleCoinResult = 'heads' | 'tails'
 export type TcgBattleStatusCondition = 'asleep' | 'poisoned' | 'burned' | 'paralyzed' | 'confused'
 
 export type TcgBattleCountSource =
@@ -25,6 +29,14 @@ export type TcgBattleCountSource =
   | { kind: 'pokemonInPlay'; side: 'own' | 'opponent' | 'both' }
   | { kind: 'damageCounters'; target: 'attacker' | 'target' }
   | { kind: 'unusedEnergy' }
+  | { kind: 'chosenEnergy' }
+  | { kind: 'energy'; side: 'own' | 'opponent' }
+  | {
+      kind: 'namedPokemon'
+      side: 'own' | 'opponent' | 'both'
+      zone: 'bench' | 'play'
+      names: string[]
+    }
 
 export type TcgBattleDamageRule =
   | { kind: 'fixed'; amount: number }
@@ -33,22 +45,28 @@ export type TcgBattleDamageRule =
   | { kind: 'headsBonus'; baseDamage: number; bonusDamage: number }
   | { kind: 'headsBonusEach'; baseDamage: number; bonusDamage: number; coinFlipCount: number }
   | { kind: 'headsMultiplier'; damagePerHeads: number; coinFlipCount: number }
+  | { kind: 'tailsBonus'; baseDamage: number; bonusDamage: number }
+  | { kind: 'tailsMultiplier'; damagePerTails: number }
   | { kind: 'count'; baseDamage: number; perUnitDamage: number; source: TcgBattleCountSource; maxUnits?: number }
+  | { kind: 'subtractCount'; baseDamage: number; perUnitDamage: number; source: TcgBattleCountSource }
+  | { kind: 'remainingHpHalf' }
+  | { kind: 'lastIncomingDamage' }
 
 export type TcgBattleSelfDamageRule =
   | { kind: 'fixed'; amount: number; condition?: TcgBattleCoinCondition }
   | { kind: 'damageCounters'; perCounterDamage: number; condition?: TcgBattleCoinCondition }
+  | { kind: 'perTail'; amount: number }
 
 export type TcgBattleEnergyDiscardRule = {
   target: 'self' | 'opponent'
-  amount: number | 'all'
+  amount: number | 'all' | 'heads' | 'choice'
   condition?: TcgBattleCoinCondition
 }
 
 export type TcgBattleEnergyDiscardResolution = {
   target: 'self' | 'opponent'
   amount: number
-  requestedAmount: number | 'all'
+  requestedAmount: number | 'all' | 'heads' | 'choice'
 }
 
 export type TcgBattleStatusRule = {
@@ -59,8 +77,9 @@ export type TcgBattleStatusRule = {
 
 export type TcgBattleProtectionRule = {
   target: 'self' | 'opponent'
-  kind: 'preventAll' | 'reduce'
+  kind: 'preventAll' | 'preventAllEffects' | 'reduce' | 'preventAtMost' | 'halve'
   amount?: number
+  attackerOnly?: boolean
   condition?: TcgBattleCoinCondition
 }
 
@@ -68,16 +87,65 @@ export type TcgBattleBenchDamageRule = {
   amount: number
   side: 'own' | 'opponent' | 'both'
   maxTargets?: number
+  condition?: TcgBattleCoinCondition
 }
 
 export type TcgBattleCounterDamageRule =
   | { amount: number; target: 'self' | 'opponent' }
   | { amount: number; side: 'own' | 'opponent' | 'both'; maxTargets?: number }
+  | {
+      amount: number
+      side: 'own' | 'opponent' | 'both'
+      names: string[]
+      zone: 'bench' | 'play'
+    }
 
 export type TcgBattleHealingRule =
-  | { amount: number; target: 'self' | 'opponent' }
-  | { amount: number; side: 'own' | 'opponent' | 'both'; maxTargets?: number }
-  | { target: 'self' | 'opponent'; amountFrom: 'damageDealt' }
+  | { amount: number | 'all'; target: 'self' | 'opponent'; condition?: TcgBattleCoinCondition }
+  | { amount: number; side: 'own' | 'opponent' | 'both'; maxTargets?: number; condition?: TcgBattleCoinCondition }
+  | { target: 'self' | 'opponent'; amountFrom: 'damageDealt'; condition?: TcgBattleCoinCondition }
+
+export type TcgBattleEnergyGainRule = {
+  target: 'self' | 'opponent'
+  amount: number
+}
+
+export type TcgBattleAttackChoice =
+  | { kind: 'copiedAttack'; attackIndex: number; followUp?: TcgBattleAttackChoice }
+  | { kind: 'disabledAttack'; attackIndex: number }
+  | { kind: 'benchSwitch'; cardId: string }
+  | { kind: 'energyAmount'; amount: number }
+  | { kind: 'typeChange'; type: TcgBattleEnergyType }
+  | {
+      kind: 'textureMagic'
+      resistanceType?: TcgBattleEnergyType
+      weaknessType?: TcgBattleEnergyType
+    }
+
+export type TcgBattleChoiceRequirement =
+  | 'copyAttack'
+  | 'disableAttack'
+  | 'opponentBench'
+  | 'ownBench'
+  | 'energyAmount'
+  | 'typeChange'
+  | 'textureMagic'
+
+export type TcgBattleSpecialRule =
+  | { kind: 'switch'; target: 'self' | 'opponent'; condition?: TcgBattleCoinCondition }
+  | { kind: 'disableAttack'; condition?: TcgBattleCoinCondition }
+  | { kind: 'buffAttack'; attackName: string; baseDamage: number }
+  | { kind: 'blockTargeting'; condition?: TcgBattleCoinCondition }
+  | { kind: 'changeWeakness'; condition?: TcgBattleCoinCondition }
+  | { kind: 'changeResistance'; condition?: TcgBattleCoinCondition }
+  | { kind: 'changeType'; condition?: TcgBattleCoinCondition }
+  | { kind: 'textureMagic' }
+  | { kind: 'destinyBond' }
+  | { kind: 'mirrorLastDamage' }
+  | { kind: 'reflectDamage' }
+  | { kind: 'placeMarker'; marker: 'lightningRod' }
+  | { kind: 'markerDamage'; marker: 'lightningRod'; amount: number }
+  | { kind: 'copyAttack'; coinGate?: TcgBattleCoinCondition; preserveExtraCosts: boolean }
 
 export type TcgBattleStatusResolution = {
   target: 'self' | 'opponent'
@@ -86,11 +154,28 @@ export type TcgBattleStatusResolution = {
 
 export type TcgBattleIncomingAttackModifier =
   | { kind: 'preventAll'; remainingOpponentTurns: number }
-  | { kind: 'reduce'; amount: number; remainingOpponentTurns: number }
+  | { kind: 'preventAllEffects'; remainingOpponentTurns: number }
+  | { kind: 'reduce'; amount: number; remainingOpponentTurns: number; attackerId?: string }
+  | { kind: 'preventAtMost'; amount: number; remainingOpponentTurns: number }
+  | { kind: 'halve'; remainingOpponentTurns: number }
+
+export interface TcgBattleTemporaryEffects {
+  disabledAttack?: { attackIndex: number; remainingTurns: number }
+  cannotTarget?: { targetId: string; remainingTurns: number }
+  nextAttackBuff?: { attackName: string; baseDamage: number; remainingTurns: number }
+  weaknessType?: TcgBattleEnergyType
+  resistanceType?: TcgBattleEnergyType
+  battleType?: TcgBattleEnergyType
+  destinyBond?: { remainingTurns: number }
+  reflectDamage?: { remainingTurns: number }
+  lastIncomingAttackDamage?: number
+}
 
 export interface TcgBattleAttackEffect {
   damage: TcgBattleDamageRule
   coinFlipCount?: number
+  coinFlipSource?: TcgBattleCountSource
+  flipUntilTails?: boolean
   selfDamage?: TcgBattleSelfDamageRule[]
   selfKnockOut?: boolean
   energyDiscard?: TcgBattleEnergyDiscardRule[]
@@ -98,7 +183,12 @@ export interface TcgBattleAttackEffect {
   benchDamage?: TcgBattleBenchDamageRule[]
   counterDamage?: TcgBattleCounterDamageRule[]
   healing?: TcgBattleHealingRule[]
+  energyGain?: TcgBattleEnergyGainRule[]
   protection?: TcgBattleProtectionRule[]
+  targetScope?: 'front' | 'bench' | 'any'
+  ignoreWeaknessResistance?: boolean
+  choiceRequirement?: TcgBattleChoiceRequirement
+  special?: TcgBattleSpecialRule[]
 }
 
 export type TcgBattleAttack = TcgCardAttack & {
@@ -134,6 +224,8 @@ export interface TcgBattleCardState extends TcgBattleCardSummary {
   currentHp: number
   statusConditions?: TcgBattleStatusCondition[]
   incomingAttackModifier?: TcgBattleIncomingAttackModifier
+  temporaryEffects?: TcgBattleTemporaryEffects
+  markers?: Array<'lightningRod'>
 }
 
 export interface TcgBattleSideState {
@@ -152,6 +244,14 @@ export interface TcgBattleTrainerCard {
   banner?: string
   title?: string
 }
+
+export type TcgBattleEffectEvent =
+  | { id: string; kind: 'switch'; side: TcgBattleSide; sourceId: string; targetId: string }
+  | { id: string; kind: 'control'; sourceId: string; targetId: string; label: string }
+  | { id: string; kind: 'type'; sourceId: string; targetId: string; label: string }
+  | { id: string; kind: 'marker'; sourceId: string; targetId: string; label: string }
+  | { id: string; kind: 'copy'; sourceId: string; targetId: string; label: string }
+  | { id: string; kind: 'energy'; side: TcgBattleSide; sourceId: string; amount: number }
 
 export interface TcgBattleState {
   userId: string
@@ -185,7 +285,7 @@ export interface TcgBattleState {
     id: string
     sourceId: string
     side: TcgBattleSide
-    results: TcgBattleCoinCondition[]
+    results: TcgBattleCoinResult[]
     heads: number
     tails: number
   }
@@ -193,7 +293,7 @@ export interface TcgBattleState {
     id: string
     sourceId: string
     side: TcgBattleSide
-    results: TcgBattleCoinCondition[]
+    results: TcgBattleCoinResult[]
     heads: number
     tails: number
   }[]
@@ -211,6 +311,7 @@ export interface TcgBattleState {
     targetSide: TcgBattleSide
     statuses: TcgBattleStatusCondition[]
   }[]
+  lastEffectEvents?: TcgBattleEffectEvent[]
   log: string[]
   playerTrainer?: TcgBattleTrainerCard
   enemyTrainer?: TcgBattleTrainerCard
@@ -488,6 +589,8 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack): TcgBattleAtta
   const normalizedDamage = normalizeTcgDamageText(attack.damage || '')
   const exactDamage = parseTcgAttackDamage(normalizedDamage)
   const baseDamage = parseTcgAttackBaseDamage(normalizedDamage)
+  const classicEffect = inferClassicTcgBattleAttackEffect(attack, text, normalizedDamage, baseDamage)
+  if (classicEffect) return classicEffect
   const selfDamage = inferTcgBattleSelfDamage(text)
   const energyDiscard = inferTcgBattleEnergyDiscard(text)
   const status = inferTcgBattleStatus(text)
@@ -606,9 +709,12 @@ export interface TcgBattleAttackResolution {
     modifier: TcgBattleIncomingAttackModifier
   }[]
   energyDiscards?: TcgBattleEnergyDiscardResolution[]
+  energyGains?: { target: 'self' | 'opponent'; amount: number }[]
   statusConditions?: TcgBattleStatusResolution[]
+  specialEffects?: TcgBattleSpecialRule[]
+  copiedAttackName?: string
   coinFlips?: {
-    results: TcgBattleCoinCondition[]
+    results: TcgBattleCoinResult[]
     heads: number
     tails: number
   }
@@ -620,7 +726,7 @@ export interface TcgBattleStatusAttackCheck {
   clearedStatus?: Extract<TcgBattleStatusCondition, 'asleep' | 'paralyzed' | 'confused'>
   selfDamage: number
   coinFlips?: {
-    results: TcgBattleCoinCondition[]
+    results: TcgBattleCoinResult[]
     heads: number
     tails: number
   }
@@ -633,9 +739,10 @@ export function resolveTcgBattleAttack(params: {
   attack: TcgBattleAttack
   target: TcgBattleCardState
   paidAttackCost?: number
+  choice?: TcgBattleAttackChoice
   random?: () => number
 }): TcgBattleAttackResolution {
-  const { state, sideKey, attacker, attack, target, paidAttackCost, random = Math.random } = params
+  const { state, sideKey, attacker, attack, target, paidAttackCost, choice, random = Math.random } = params
   const effect = getTcgBattleAttackEffect(attack)
   if (!effect) {
     return {
@@ -646,22 +753,72 @@ export function resolveTcgBattleAttack(params: {
     }
   }
 
-  const coinFlips = effect.coinFlipCount ? rollTcgBattleCoins(effect.coinFlipCount, random) : undefined
-  const targetDamageBeforeModifiers = calculateTcgBattleRawDamage(effect.damage, {
+  const dynamicCoinCount = effect.coinFlipSource
+    ? getTcgBattleCount(effect.coinFlipSource, {
+        state,
+        sideKey,
+        attacker,
+        target,
+        paidAttackCost,
+        coinMode: 'actual',
+      })
+    : effect.coinFlipCount || 0
+  const coinFlips = effect.flipUntilTails
+    ? rollTcgBattleCoinsUntilTails(random)
+    : dynamicCoinCount > 0
+      ? rollTcgBattleCoins(dynamicCoinCount, random)
+      : undefined
+
+  const copyRule = effect.special?.find((rule) => rule.kind === 'copyAttack')
+  if (
+    copyRule &&
+    doesTcgBattleConditionPass(copyRule.coinGate, coinFlips) &&
+    choice?.kind === 'copiedAttack'
+  ) {
+    const copiedAttack = target.attacks[choice.attackIndex]
+    const copiedEffect = copiedAttack && getTcgBattleAttackEffect(copiedAttack)
+    if (copiedAttack && copiedEffect && !copiedEffect.special?.some((rule) => rule.kind === 'copyAttack')) {
+      const copiedResolution = resolveTcgBattleAttack({
+        state,
+        sideKey,
+        attacker,
+        attack: copiedAttack,
+        target,
+        paidAttackCost: 0,
+        choice: choice.followUp,
+        random,
+      })
+      return {
+        ...copiedResolution,
+        coinFlips: coinFlips || copiedResolution.coinFlips,
+        energyDiscards: copyRule.preserveExtraCosts
+          ? copiedResolution.energyDiscards
+          : copiedResolution.energyDiscards?.filter((discard) => discard.target !== 'self'),
+        copiedAttackName: copiedAttack.name,
+      }
+    }
+  }
+  let targetDamageBeforeModifiers = calculateTcgBattleRawDamage(effect.damage, {
     state,
     sideKey,
     attacker,
     target,
     paidAttackCost,
     coinFlips,
+    choice,
     coinMode: 'actual',
   })
+  const attackBuff = attacker.temporaryEffects?.nextAttackBuff
+  if (attackBuff?.attackName.toLowerCase() === attack.name.toLowerCase()) {
+    targetDamageBeforeModifiers = Math.max(targetDamageBeforeModifiers, attackBuff.baseDamage)
+  }
   const targetDamageAfterType = applyTcgWeaknessAndResistance(attacker, target, targetDamageBeforeModifiers)
-  const targetDamage = applyTcgBattleIncomingAttackModifier(target, targetDamageAfterType)
+  const typedDamage = effect.ignoreWeaknessResistance ? targetDamageBeforeModifiers : targetDamageAfterType
+  const targetDamage = applyTcgBattleIncomingAttackModifier(target, typedDamage, attacker.instanceId)
   const selfDamage = (effect.selfDamage || []).reduce(
     (sum, rule) =>
-      doesTcgBattleConditionPass(rule.condition, coinFlips)
-        ? sum + calculateTcgBattleSelfDamage(rule, attacker)
+      doesTcgBattleConditionPass('condition' in rule ? rule.condition : undefined, coinFlips)
+        ? sum + calculateTcgBattleSelfDamage(rule, attacker, coinFlips)
         : sum,
     0,
   )
@@ -671,9 +828,10 @@ export function resolveTcgBattleAttack(params: {
     attack,
     paidAttackCost,
     coinFlips,
+    choice,
   })
   const statusConditions = calculateTcgBattleStatusConditions(effect.status || [], coinFlips)
-  const benchDamage = calculateTcgBattleBenchDamage(effect.benchDamage || [], state, sideKey, random)
+  const benchDamage = calculateTcgBattleBenchDamage(effect.benchDamage || [], state, sideKey, random, coinFlips)
   const counterDamage = calculateTcgBattleCounterDamage(effect.counterDamage || [], state, sideKey, attacker, target, random)
   const healing = calculateTcgBattleHealing(
     effect.healing || [],
@@ -683,6 +841,7 @@ export function resolveTcgBattleAttack(params: {
     target,
     random,
     targetDamage,
+    coinFlips,
   )
   const protection = calculateTcgBattleProtection(effect.protection || [], sideKey, attacker, target, coinFlips)
 
@@ -694,9 +853,14 @@ export function resolveTcgBattleAttack(params: {
     benchDamage: benchDamage.length > 0 ? benchDamage : undefined,
     counterDamage: counterDamage.length > 0 ? counterDamage : undefined,
     healing: healing.length > 0 ? healing : undefined,
+    energyGains: effect.energyGain,
     protection: protection.length > 0 ? protection : undefined,
     energyDiscards: energyDiscards.length > 0 ? energyDiscards : undefined,
     statusConditions: statusConditions.length > 0 ? statusConditions : undefined,
+    specialEffects: (effect.special || []).filter((rule) => {
+      if (rule.kind === 'copyAttack') return false
+      return doesTcgBattleConditionPass('condition' in rule ? rule.condition : undefined, coinFlips)
+    }),
     coinFlips,
   }
 }
@@ -757,21 +921,41 @@ export function clearTcgBattleStatuses(card: TcgBattleCardState) {
   card.statusConditions = undefined
 }
 
-export function applyTcgBattleIncomingAttackModifier(card: TcgBattleCardState, damage: number): number {
+export function applyTcgBattleIncomingAttackModifier(
+  card: TcgBattleCardState,
+  damage: number,
+  attackerId?: string,
+): number {
   const modifier = card.incomingAttackModifier
   if (!modifier || damage <= 0) return Math.max(0, damage)
   if (modifier.kind === 'preventAll') return 0
-  if (modifier.kind === 'reduce') return Math.max(0, damage - Math.max(0, modifier.amount))
+  if (modifier.kind === 'preventAllEffects') return 0
+  if (modifier.kind === 'preventAtMost') return damage <= modifier.amount ? 0 : damage
+  if (modifier.kind === 'halve') return Math.floor(damage / 20) * 10
+  if (modifier.kind === 'reduce') {
+    if (modifier.attackerId && modifier.attackerId !== attackerId) return Math.max(0, damage)
+    return Math.max(0, damage - Math.max(0, modifier.amount))
+  }
   return Math.max(0, damage)
 }
 
 export function tickTcgBattleIncomingAttackModifiers(state: TcgBattleState, sideKey: TcgBattleSide) {
   for (const card of [...state[sideKey].front, ...state[sideKey].back]) {
     const modifier = card.incomingAttackModifier
-    if (!modifier) continue
-    modifier.remainingOpponentTurns -= 1
-    if (modifier.remainingOpponentTurns <= 0) {
-      card.incomingAttackModifier = undefined
+    if (modifier) {
+      modifier.remainingOpponentTurns -= 1
+      if (modifier.remainingOpponentTurns <= 0) {
+        card.incomingAttackModifier = undefined
+      }
+    }
+
+    const effects = card.temporaryEffects
+    if (!effects) continue
+    for (const key of ['disabledAttack', 'cannotTarget', 'nextAttackBuff', 'destinyBond', 'reflectDamage'] as const) {
+      const effect = effects[key]
+      if (!effect) continue
+      effect.remainingTurns -= 1
+      if (effect.remainingTurns <= 0) delete effects[key]
     }
   }
 }
@@ -811,15 +995,40 @@ export function calculateTcgBattleDamage(
   const effect = getTcgBattleAttackEffect(attack)
   if (!effect) return 0
 
-  const damage = calculateTcgBattleRawDamage(effect.damage, {
+  const dynamicCount = effect.coinFlipSource
+    ? getTcgBattleCount(effect.coinFlipSource, {
+        state,
+        sideKey,
+        attacker,
+        target,
+        paidAttackCost: attack.convertedEnergyCost ?? attack.cost?.length ?? 0,
+        coinMode: 'max',
+      })
+    : 0
+  const projectedCoinCount = effect.flipUntilTails ? 1 : Math.max(0, dynamicCount)
+  const useTails = effect.damage.kind === 'tailsMultiplier' || effect.damage.kind === 'tailsBonus'
+  const projectedCoins = projectedCoinCount > 0
+    ? {
+        results: Array.from({ length: projectedCoinCount }, () => (useTails ? 'tails' : 'heads') as TcgBattleCoinResult),
+        heads: useTails ? 0 : projectedCoinCount,
+        tails: useTails ? projectedCoinCount : 0,
+      }
+    : undefined
+
+  let damage = calculateTcgBattleRawDamage(effect.damage, {
     state,
     sideKey,
     attacker,
     target,
     paidAttackCost: attack.convertedEnergyCost ?? attack.cost?.length ?? 0,
+    coinFlips: projectedCoins,
     coinMode: 'max',
   })
-  return applyTcgWeaknessAndResistance(attacker, target, damage)
+  const attackBuff = attacker.temporaryEffects?.nextAttackBuff
+  if (attackBuff?.attackName.toLowerCase() === attack.name.toLowerCase()) {
+    damage = Math.max(damage, attackBuff.baseDamage)
+  }
+  return effect.ignoreWeaknessResistance ? damage : applyTcgWeaknessAndResistance(attacker, target, damage)
 }
 
 export function getTcgBattleWinner(state: TcgBattleState): TcgBattleSide | 'tie' | null {
@@ -859,18 +1068,34 @@ export function compactTcgBattleBoard(side: TcgBattleSideState): void {
 export function chooseOpponentTcgBattleAttack(state: TcgBattleState) {
   const maxCost = getAllowedTcgBattleAttackCost(state.turnNumber)
   let best:
-    | { attacker: TcgBattleCardState; target: TcgBattleCardState; attackIndex: number; damage: number }
+    | {
+        attacker: TcgBattleCardState
+        target: TcgBattleCardState
+        attackIndex: number
+        damage: number
+        choice?: TcgBattleAttackChoice
+      }
     | null = null
 
   for (const attacker of state.opponent.front.filter((card) => card.currentHp > 0)) {
     if (!isTcgBattleSummaryUnlocked(attacker, state.turnNumber)) continue
     for (const [attackIndex, attack] of attacker.attacks.entries()) {
+      if (isTcgBattleAttackDisabled(attacker, attackIndex)) continue
       const cost = getEffectiveTcgBattleAttackCost(state, attack)
       if (cost > maxCost || cost > state.opponent.energy) continue
-      for (const target of state.player.front.filter((card) => card.currentHp > 0)) {
+      for (const target of getValidTcgBattleTargets(state, 'opponent', attacker, attack)) {
+        const choice = chooseTcgBattleAttackChoice({
+          state,
+          sideKey: 'opponent',
+          attacker,
+          attack,
+          target,
+          paidAttackCost: cost,
+        })
+        if (getTcgBattleAttackEffect(attack)?.choiceRequirement && !choice) continue
         const damage = calculateTcgBattleDamage(attacker, attack, target, state, 'opponent')
         if (!best || damage > best.damage || target.currentHp < best.target.currentHp) {
-          best = { attacker, target, attackIndex, damage }
+          best = { attacker, target, attackIndex, damage, choice }
         }
       }
     }
@@ -888,8 +1113,21 @@ export function canSideTakeTcgBattleAction(state: TcgBattleState, sideKey: TcgBa
     card.currentHp > 0 &&
     isTcgBattleSummaryUnlocked(card, state.turnNumber) &&
     card.attacks.some((attack) => {
+      const attackIndex = card.attacks.indexOf(attack)
+      if (isTcgBattleAttackDisabled(card, attackIndex)) return false
       const cost = getEffectiveTcgBattleAttackCost(state, attack)
-      return cost <= maxCost && cost <= side.energy
+      if (cost > maxCost || cost > side.energy) return false
+      return getValidTcgBattleTargets(state, sideKey, card, attack).some((target) => {
+        const required = getTcgBattleAttackEffect(attack)?.choiceRequirement
+        return !required || Boolean(chooseTcgBattleAttackChoice({
+          state,
+          sideKey,
+          attacker: card,
+          attack,
+          target,
+          paidAttackCost: cost,
+        }))
+      })
     }),
   )
 }
@@ -921,6 +1159,293 @@ function normalizeTcgAttackText(text: string): string {
 
 function normalizeTcgDamageText(damage: string): string {
   return damage.replace(/×/g, 'x').trim()
+}
+
+function inferClassicTcgBattleAttackEffect(
+  attack: TcgCardAttack,
+  text: string,
+  damage: string,
+  baseDamage: number,
+): TcgBattleAttackEffect | null {
+  const name = attack.name.toLowerCase()
+  const zero = (): TcgBattleAttackEffect => ({ damage: { kind: 'fixed', amount: 0 } })
+
+  if (/damage (?:plus|times).*energy card(?:s)? attached to the defending pokemon/.test(text)) {
+    const perUnit = Number.parseInt(text.match(/(?:plus|does) (\d+) more damage for each energy|does (\d+) damage times/)?.slice(1).find(Boolean) || '10', 10)
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage: damage.endsWith('+') ? baseDamage : 0,
+        perUnitDamage: perUnit,
+        source: { kind: 'energy', side: 'opponent' },
+      },
+    }
+  }
+
+  if (/energy attached to .* but not used to pay for this attack/.test(text) && damage.endsWith('+')) {
+    const perUnit = Number.parseInt(text.match(/plus (\d+) more damage for each/)?.[1] || '10', 10)
+    const maxBonus = Number.parseInt(text.match(/can't add more than (\d+) damage/)?.[1] || '0', 10)
+    const maxUnitsFromOrdinal = Number.parseInt(text.match(/after the (\d+)(?:st|nd|rd|th)/)?.[1] || '0', 10)
+    return {
+      damage: {
+        kind: 'count',
+        baseDamage,
+        perUnitDamage: perUnit,
+        source: { kind: 'unusedEnergy' },
+        maxUnits: maxBonus > 0 ? Math.floor(maxBonus / perUnit) : maxUnitsFromOrdinal || undefined,
+      },
+    }
+  }
+
+  if (name === 'do the wave') {
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'bench', side: 'own' } } }
+  }
+  if (name === 'meditate') {
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'damageCounters', target: 'target' } } }
+  }
+  if (name === 'rage') {
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'damageCounters', target: 'attacker' } } }
+  }
+  if (name === 'flail') {
+    return { damage: { kind: 'count', baseDamage: 0, perUnitDamage: 10, source: { kind: 'damageCounters', target: 'attacker' } } }
+  }
+  if (name === 'karate chop') {
+    return { damage: { kind: 'subtractCount', baseDamage, perUnitDamage: 10, source: { kind: 'damageCounters', target: 'attacker' } } }
+  }
+  if (name === 'super fang') return { damage: { kind: 'remainingHpHalf' } }
+  if (name === 'boyfriends') {
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 20, source: { kind: 'namedPokemon', side: 'own', zone: 'play', names: ['Nidoking'] } } }
+  }
+  if (name === 'magnetism') {
+    return { damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'namedPokemon', side: 'own', zone: 'bench', names: ['Magnemite', 'Magneton', 'Dark Magneton'] } } }
+  }
+  if (name === 'mass explosion') {
+    const names = ['Koffing', 'Weezing', 'Dark Weezing']
+    return {
+      damage: { kind: 'count', baseDamage: 0, perUnitDamage: 20, source: { kind: 'namedPokemon', side: 'both', zone: 'play', names } },
+      counterDamage: [{ amount: 20, side: 'both', zone: 'play', names }],
+    }
+  }
+  if (name === 'big eggsplosion') {
+    return { damage: { kind: 'headsMultiplier', damagePerHeads: 20, coinFlipCount: 0 }, coinFlipSource: { kind: 'energy', side: 'own' } }
+  }
+  if (name === 'bench manipulation') {
+    return {
+      damage: { kind: 'tailsMultiplier', damagePerTails: 20 },
+      coinFlipSource: { kind: 'bench', side: 'opponent' },
+      ignoreWeaknessResistance: true,
+    }
+  }
+  if (name === 'continuous fireball') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: 50, coinFlipCount: 0 },
+      coinFlipSource: { kind: 'energy', side: 'own' },
+      energyDiscard: [{ target: 'self', amount: 'heads' }],
+    }
+  }
+  if (name === 'burning fire') {
+    return {
+      damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'chosenEnergy' } },
+      energyDiscard: [{ target: 'self', amount: 'choice' }],
+      choiceRequirement: 'energyAmount',
+    }
+  }
+  if (name === 'playing with fire') {
+    return {
+      damage: { kind: 'headsBonus', baseDamage, bonusDamage: 20 },
+      coinFlipCount: 1,
+      energyDiscard: [{ target: 'self', amount: 1, condition: 'heads' }],
+    }
+  }
+  if (name === 'flames of rage') {
+    return {
+      damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'damageCounters', target: 'attacker' } },
+      energyDiscard: [{ target: 'self', amount: 2 }],
+    }
+  }
+  if (name === 'knock down') {
+    return { damage: { kind: 'tailsBonus', baseDamage, bonusDamage: 20 }, coinFlipCount: 1 }
+  }
+  if (name === 'rampage') {
+    return {
+      damage: { kind: 'count', baseDamage, perUnitDamage: 10, source: { kind: 'damageCounters', target: 'attacker' } },
+      coinFlipCount: 1,
+      status: [{ target: 'self', statuses: ['confused'], condition: 'tails' }],
+    }
+  }
+  if (name === 'miraculous comeback') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: 10, coinFlipCount: 0 },
+      coinFlipSource: { kind: 'pokemonInPlay', side: 'both' },
+      selfDamage: [{ kind: 'perTail', amount: 10 }],
+    }
+  }
+  if (name === 'seething anger') {
+    return {
+      damage: { kind: 'headsBonusEach', baseDamage, bonusDamage: 10, coinFlipCount: 0 },
+      coinFlipSource: { kind: 'damageCounters', target: 'attacker' },
+    }
+  }
+  if (['stone barrage', 'repeating kick'].includes(name)) {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: name === 'repeating kick' ? 20 : 10, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'metal pincer') {
+    return {
+      damage: { kind: 'headsBonusEach', baseDamage, bonusDamage: 10, coinFlipCount: 0 },
+      flipUntilTails: true,
+    }
+  }
+  if (name === 'petal whirlwind') {
+    return {
+      damage: { kind: 'headsMultiplier', damagePerHeads: 30, coinFlipCount: 3 },
+      coinFlipCount: 3,
+      status: [{ target: 'self', statuses: ['confused'], condition: { result: 'heads', minimum: 2 } }],
+    }
+  }
+
+  if (name === 'cat punch') {
+    return {
+      damage: { kind: 'zeroOnTails', amount: 20 },
+      coinFlipCount: 1,
+      benchDamage: [{ amount: 20, side: 'opponent', maxTargets: 1, condition: 'tails' }],
+      ignoreWeaknessResistance: true,
+    }
+  }
+  if (['coin hurl', 'jump over'].includes(name)) {
+    return {
+      damage: { kind: 'zeroOnTails', amount: 20 },
+      coinFlipCount: 1,
+      targetScope: name === 'jump over' ? 'bench' : 'any',
+      ignoreWeaknessResistance: true,
+    }
+  }
+  const directDamage: Record<string, { amount: number; scope: 'bench' | 'any' }> = {
+    'dig under': { amount: 10, scope: 'any' },
+    flitter: { amount: 20, scope: 'any' },
+    stare: { amount: 10, scope: 'any' },
+    'stretch kick': { amount: 20, scope: 'bench' },
+    telekinesis: { amount: 30, scope: 'any' },
+  }
+  if (directDamage[name]) {
+    return {
+      damage: { kind: 'fixed', amount: directDamage[name].amount },
+      targetScope: directDamage[name].scope,
+      ignoreWeaknessResistance: true,
+    }
+  }
+  if (['lure', 'fascinate', 'tempt'].includes(name)) {
+    const conditional = name === 'lure' ? undefined : 'heads'
+    return {
+      ...zero(),
+      coinFlipCount: conditional ? 1 : undefined,
+      choiceRequirement: 'opponentBench',
+      special: [{ kind: 'switch', target: 'opponent', condition: conditional }],
+    }
+  }
+  if (name === 'teleport') {
+    return { ...zero(), choiceRequirement: 'ownBench', special: [{ kind: 'switch', target: 'self' }] }
+  }
+
+  if (name === 'first aid') return { ...zero(), healing: [{ target: 'self', amount: 10 }] }
+  if (name === 'spacing out') {
+    return { ...zero(), coinFlipCount: 1, healing: [{ target: 'self', amount: 10, condition: 'heads' }] }
+  }
+  if (name === 'recover') {
+    return {
+      ...zero(),
+      healing: [{ target: 'self', amount: 'all' }],
+      energyDiscard: [{ target: 'self', amount: 1 }],
+    }
+  }
+  if (name === 'afternoon nap' || name === 'recharge') {
+    return { ...zero(), energyGain: [{ target: 'self', amount: 1 }] }
+  }
+  if (name === 'energy absorption') {
+    return { ...zero(), energyGain: [{ target: 'self', amount: 2 }] }
+  }
+
+  if (name === 'amnesia') {
+    return { ...zero(), choiceRequirement: 'disableAttack', special: [{ kind: 'disableAttack' }] }
+  }
+  if (name === 'swords dance') {
+    return { ...zero(), special: [{ kind: 'buffAttack', attackName: 'Slash', baseDamage: 60 }] }
+  }
+  if (name === 'barrier') {
+    return {
+      ...zero(),
+      energyDiscard: [{ target: 'self', amount: 1 }],
+      protection: [{ target: 'self', kind: 'preventAllEffects' }],
+    }
+  }
+  if (name === 'harden') {
+    return { ...zero(), protection: [{ target: 'self', kind: 'preventAtMost', amount: 30 }] }
+  }
+  if (name === 'light screen') {
+    return { ...zero(), protection: [{ target: 'self', kind: 'halve' }] }
+  }
+  if (name === 'growl' || name === 'snivel') {
+    return {
+      ...zero(),
+      protection: [{ target: 'self', kind: 'reduce', amount: name === 'growl' ? 10 : 20, attackerOnly: true }],
+    }
+  }
+  if (name === 'tail wag' || name === 'leer') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      special: [{ kind: 'blockTargeting', condition: 'heads' }],
+    }
+  }
+  if (name === 'destiny bond') {
+    return {
+      ...zero(),
+      energyDiscard: [{ target: 'self', amount: 1 }],
+      special: [{ kind: 'destinyBond' }],
+    }
+  }
+  if (name === 'mirror move') return { damage: { kind: 'lastIncomingDamage' }, ignoreWeaknessResistance: true, special: [{ kind: 'mirrorLastDamage' }] }
+  if (name === 'mirror shell') return { ...zero(), special: [{ kind: 'reflectDamage' }] }
+  if (name === 'conversion 1') {
+    return { ...zero(), choiceRequirement: 'typeChange', special: [{ kind: 'changeWeakness' }] }
+  }
+  if (name === 'conversion 2') {
+    return { ...zero(), choiceRequirement: 'typeChange', special: [{ kind: 'changeResistance' }] }
+  }
+  if (name === 'paint') {
+    return {
+      ...zero(),
+      coinFlipCount: 1,
+      choiceRequirement: 'typeChange',
+      special: [{ kind: 'changeType', condition: 'heads' }],
+    }
+  }
+  if (name === 'texture magic') {
+    return { ...zero(), choiceRequirement: 'textureMagic', special: [{ kind: 'textureMagic' }] }
+  }
+  if (name === 'lightning rod') {
+    return { ...zero(), targetScope: 'any', special: [{ kind: 'placeMarker', marker: 'lightningRod' }] }
+  }
+  if (name === 'lightning bolt' && /lightning rod marker/.test(text)) {
+    return {
+      damage: { kind: 'fixed', amount: 20 },
+      targetScope: 'any',
+      special: [{ kind: 'markerDamage', marker: 'lightningRod', amount: 20 }],
+    }
+  }
+  if (name === 'metronome' || name === 'mini-metronome') {
+    const mini = name === 'mini-metronome'
+    return {
+      ...zero(),
+      coinFlipCount: mini ? 1 : undefined,
+      choiceRequirement: 'copyAttack',
+      special: [{ kind: 'copyAttack', coinGate: mini ? 'heads' : undefined, preserveExtraCosts: mini }],
+    }
+  }
+
+  return null
 }
 
 function parseTcgAttackBaseDamage(damage: string): number {
@@ -1048,7 +1573,12 @@ function inferTcgBattleCounterDamage(text: string): TcgBattleCounterDamageRule[]
 
 function inferTcgBattleHealing(text: string): TcgBattleHealingRule[] {
   const rules: TcgBattleHealingRule[] = []
-  const addRule = (amount: number, rule: Omit<TcgBattleHealingRule, 'amount'>) => {
+  const addRule = (
+    amount: number,
+    rule:
+      | { target: 'self' | 'opponent'; condition?: TcgBattleCoinCondition }
+      | { side: 'own' | 'opponent' | 'both'; maxTargets?: number; condition?: TcgBattleCoinCondition },
+  ) => {
     if (!Number.isFinite(amount) || amount <= 0) return
     rules.push({ amount, ...rule } as TcgBattleHealingRule)
   }
@@ -1094,6 +1624,7 @@ function calculateTcgBattleBenchDamage(
   state: TcgBattleState,
   sideKey: TcgBattleSide,
   random: () => number,
+  coinFlips?: TcgBattleAttackResolution['coinFlips'],
 ): { targetSide: TcgBattleSide; targetId: string; damage: number }[] {
   const results: { targetSide: TcgBattleSide; targetId: string; damage: number }[] = []
 
@@ -1106,6 +1637,7 @@ function calculateTcgBattleBenchDamage(
   }
 
   for (const rule of rules) {
+    if (!doesTcgBattleConditionPass(rule.condition, coinFlips)) continue
     if (rule.side === 'own' || rule.side === 'both') addFromSide(sideKey, rule.amount, rule.maxTargets)
     if (rule.side === 'opponent' || rule.side === 'both') {
       addFromSide(sideKey === 'player' ? 'opponent' : 'player', rule.amount, rule.maxTargets)
@@ -1133,8 +1665,18 @@ function calculateTcgBattleCounterDamage(
     }
 
     const addFromSide = (targetSide: TcgBattleSide) => {
-      const candidates = state[targetSide].back.filter((card) => card.currentHp > 0)
-      const selected = rule.maxTargets ? pickRandomTcgBattleCards(candidates, rule.maxTargets, random) : candidates
+      let candidates = ('zone' in rule && rule.zone === 'play'
+        ? [...state[targetSide].front, ...state[targetSide].back]
+        : state[targetSide].back
+      ).filter((card) => card.currentHp > 0)
+      if ('names' in rule) {
+        const normalizeName = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '')
+        const names = new Set(rule.names.map(normalizeName))
+        candidates = candidates.filter((card) => names.has(normalizeName(card.name)))
+      }
+      const selected = 'maxTargets' in rule && rule.maxTargets
+        ? pickRandomTcgBattleCards(candidates, rule.maxTargets, random)
+        : candidates
       for (const card of selected) {
         results.push({ targetSide, targetId: card.instanceId, damage: rule.amount })
       }
@@ -1153,9 +1695,11 @@ function calculateTcgBattleHealing(
   target: TcgBattleCardState,
   random: () => number,
   damageDealt: number,
+  coinFlips?: TcgBattleAttackResolution['coinFlips'],
 ): { targetSide: TcgBattleSide; targetId: string; amount: number }[] {
   const results: { targetSide: TcgBattleSide; targetId: string; amount: number }[] = []
   for (const rule of rules) {
+    if (!doesTcgBattleConditionPass(rule.condition, coinFlips)) continue
     if ('amountFrom' in rule && rule.amountFrom === 'damageDealt') {
       const amount = Math.max(0, damageDealt)
       if (amount <= 0) continue
@@ -1168,7 +1712,9 @@ function calculateTcgBattleHealing(
     if ('target' in rule && 'amount' in rule) {
       const targetSide = rule.target === 'self' ? sideKey : sideKey === 'player' ? 'opponent' : 'player'
       const targetId = rule.target === 'self' ? attacker.instanceId : target.instanceId
-      results.push({ targetSide, targetId, amount: rule.amount })
+      const targetCard = rule.target === 'self' ? attacker : target
+      const amount = rule.amount === 'all' ? Math.max(0, targetCard.hp - targetCard.currentHp) : rule.amount
+      if (amount > 0) results.push({ targetSide, targetId, amount })
       continue
     }
 
@@ -1411,7 +1957,7 @@ function inferTcgBattleSelfDamage(text: string): TcgBattleSelfDamageRule[] {
 }
 
 function hasConditionalSelfDamage(rules: TcgBattleSelfDamageRule[]): boolean {
-  return rules.some((rule) => Boolean(rule.condition))
+  return rules.some((rule) => Boolean('condition' in rule && rule.condition))
 }
 
 function inferTcgBattleEnergyDiscard(text: string): TcgBattleEnergyDiscardRule[] {
@@ -1565,13 +2111,13 @@ function calculateTcgBattleProtection(
     if (!doesTcgBattleConditionPass(rule.condition, coinFlips)) continue
     const targetSide = rule.target === 'self' ? sideKey : sideKey === 'player' ? 'opponent' : 'player'
     const targetId = rule.target === 'self' ? attacker.instanceId : target.instanceId
-    if (rule.kind === 'preventAll') {
+    if (rule.kind === 'preventAll' || rule.kind === 'preventAllEffects') {
       applied.push({
         targetSide,
         targetId,
-        modifier: { kind: 'preventAll', remainingOpponentTurns: 1 },
+        modifier: { kind: rule.kind, remainingOpponentTurns: 1 },
       })
-    } else {
+    } else if (rule.kind === 'reduce') {
       applied.push({
         targetSide,
         targetId,
@@ -1579,29 +2125,262 @@ function calculateTcgBattleProtection(
           kind: 'reduce',
           amount: Math.max(0, rule.amount || 0),
           remainingOpponentTurns: 1,
+          attackerId: rule.attackerOnly ? target.instanceId : undefined,
         },
       })
+    } else if (rule.kind === 'preventAtMost') {
+      applied.push({
+        targetSide,
+        targetId,
+        modifier: {
+          kind: 'preventAtMost',
+          amount: Math.max(0, rule.amount || 0),
+          remainingOpponentTurns: 1,
+        },
+      })
+    } else {
+      applied.push({ targetSide, targetId, modifier: { kind: 'halve', remainingOpponentTurns: 1 } })
     }
   }
 
   return applied
 }
 
-function getTcgBattleAttackEffect(attack: TcgBattleAttack): TcgBattleAttackEffect | null {
+export function getTcgBattleAttackEffect(attack: TcgBattleAttack): TcgBattleAttackEffect | null {
   return attack.battleEffect || inferTcgBattleAttackEffect(attack)
+}
+
+export function getValidTcgBattleTargets(
+  state: TcgBattleState,
+  sideKey: TcgBattleSide,
+  attacker: TcgBattleCardState,
+  attack: TcgBattleAttack,
+): TcgBattleCardState[] {
+  const effect = getTcgBattleAttackEffect(attack)
+  if (!effect) return []
+  const opponentKey = sideKey === 'player' ? 'opponent' : 'player'
+  const scope = effect.targetScope || 'front'
+  const candidates = scope === 'front'
+    ? state[opponentKey].front
+    : scope === 'bench'
+      ? state[opponentKey].back
+      : [...state[opponentKey].front, ...state[opponentKey].back]
+  return candidates.filter((card) => {
+    if (card.currentHp <= 0) return false
+    if (attacker.temporaryEffects?.cannotTarget?.targetId === card.instanceId) return false
+    const markerRule = effect.special?.find((rule) => rule.kind === 'markerDamage')
+    if (markerRule?.kind === 'markerDamage' && !card.markers?.includes(markerRule.marker)) return false
+    if (effect.special?.some((rule) => rule.kind === 'changeWeakness') && card.weaknesses.length === 0) return false
+    return true
+  })
+}
+
+export function isTcgBattleAttackDisabled(card: TcgBattleCardState, attackIndex: number): boolean {
+  return card.temporaryEffects?.disabledAttack?.attackIndex === attackIndex
+}
+
+export function validateTcgBattleAttackChoice(params: {
+  state: TcgBattleState
+  sideKey: TcgBattleSide
+  attacker: TcgBattleCardState
+  attack: TcgBattleAttack
+  target: TcgBattleCardState
+  choice?: TcgBattleAttackChoice
+  paidAttackCost: number
+}): string | null {
+  const { state, sideKey, attacker, attack, target, choice, paidAttackCost } = params
+  const effect = getTcgBattleAttackEffect(attack)
+  if (!effect) return 'That attack is not supported.'
+  const validTargets = getValidTcgBattleTargets(state, sideKey, attacker, attack)
+  if (!validTargets.some((card) => card.instanceId === target.instanceId)) return 'Invalid target for that attack.'
+
+  const required = effect.choiceRequirement
+  if (!required) return choice ? 'That attack does not accept an extra choice.' : null
+  if (!choice) return 'Choose how that attack should resolve.'
+  const own = state[sideKey]
+  const opponent = state[sideKey === 'player' ? 'opponent' : 'player']
+  const validType = (type: TcgBattleEnergyType | undefined) => Boolean(type && type !== 'Colorless')
+
+  if (required === 'copyAttack') {
+    if (choice.kind !== 'copiedAttack') return 'Choose an attack to copy.'
+    const copied = target.attacks[choice.attackIndex]
+    const copiedEffect = copied && getTcgBattleAttackEffect(copied)
+    if (!copied || !copiedEffect || copiedEffect.special?.some((rule) => rule.kind === 'copyAttack')) {
+      return 'That attack cannot be copied.'
+    }
+    if (copiedEffect.choiceRequirement) {
+      const nestedError = validateTcgBattleAttackChoice({
+        state,
+        sideKey,
+        attacker,
+        attack: copied,
+        target,
+        choice: choice.followUp,
+        paidAttackCost: 0,
+      })
+      if (nestedError) return nestedError
+    }
+    return null
+  }
+  if (required === 'disableAttack') {
+    return choice.kind === 'disabledAttack' && target.attacks[choice.attackIndex]
+      ? null
+      : 'Choose a valid opposing attack.'
+  }
+  if (required === 'opponentBench' || required === 'ownBench') {
+    if (choice.kind !== 'benchSwitch') return 'Choose a benched card.'
+    const bench = required === 'ownBench' ? own.back : opponent.back
+    return bench.some((card) => card.instanceId === choice.cardId && card.currentHp > 0)
+      ? null
+      : 'Choose a living benched card.'
+  }
+  if (required === 'energyAmount') {
+    const available = Math.max(0, own.energy - paidAttackCost)
+    return choice.kind === 'energyAmount' && Number.isInteger(choice.amount) && choice.amount >= 0 && choice.amount <= available
+      ? null
+      : 'Choose an available Energy amount.'
+  }
+  if (required === 'typeChange') {
+    return choice.kind === 'typeChange' && validType(choice.type) ? null : 'Choose a non-Colorless type.'
+  }
+  if (required === 'textureMagic') {
+    if (choice.kind !== 'textureMagic') return 'Choose Texture Magic types.'
+    if (!choice.resistanceType && !choice.weaknessType) return 'Choose at least one type.'
+    if ((choice.resistanceType && !validType(choice.resistanceType)) || (choice.weaknessType && !validType(choice.weaknessType))) {
+      return 'Texture Magic cannot choose Colorless.'
+    }
+    return null
+  }
+  return null
+}
+
+export function chooseTcgBattleAttackChoice(params: {
+  state: TcgBattleState
+  sideKey: TcgBattleSide
+  attacker: TcgBattleCardState
+  attack: TcgBattleAttack
+  target: TcgBattleCardState
+  paidAttackCost: number
+}): TcgBattleAttackChoice | undefined {
+  const { state, sideKey, attacker, attack, target, paidAttackCost } = params
+  const effect = getTcgBattleAttackEffect(attack)
+  const required = effect?.choiceRequirement
+  if (!required) return undefined
+  if (required === 'copyAttack') {
+    const candidates = target.attacks
+      .map((candidate, attackIndex) => {
+        const candidateEffect = getTcgBattleAttackEffect(candidate)
+        const followUp = candidateEffect
+          ? chooseTcgBattleAttackChoice({
+              state,
+              sideKey,
+              attacker,
+              attack: candidate,
+              target,
+              paidAttackCost: 0,
+            })
+          : undefined
+        const validTarget = getValidTcgBattleTargets(
+          state,
+          sideKey,
+          attacker,
+          candidate,
+        ).some((card) => card.instanceId === target.instanceId)
+        return {
+          attackIndex,
+          attack: candidate,
+          candidateEffect,
+          followUp,
+          validTarget,
+          damage: calculateTcgBattleDamage(
+            attacker,
+            candidate,
+            target,
+            state,
+            sideKey,
+          ),
+        }
+      })
+      .filter(
+        ({ candidateEffect, followUp, validTarget }) =>
+          candidateEffect &&
+          validTarget &&
+          !candidateEffect.special?.some((rule) => rule.kind === 'copyAttack') &&
+          (!candidateEffect.choiceRequirement || followUp),
+      )
+      .sort((a, b) => b.damage - a.damage)
+    const picked = candidates[0]
+    if (!picked) return undefined
+    return {
+      kind: 'copiedAttack',
+      attackIndex: picked.attackIndex,
+      followUp: picked.followUp,
+    }
+  }
+  if (required === 'disableAttack') {
+    let bestIndex = 0
+    let bestDamage = -1
+    target.attacks.forEach((candidate, index) => {
+      const damage = calculateTcgBattleDamage(target, candidate, attacker, state, sideKey === 'player' ? 'opponent' : 'player')
+      if (damage > bestDamage) {
+        bestDamage = damage
+        bestIndex = index
+      }
+    })
+    return { kind: 'disabledAttack', attackIndex: bestIndex }
+  }
+  if (required === 'opponentBench' || required === 'ownBench') {
+    const bench = required === 'ownBench'
+      ? state[sideKey].back
+      : state[sideKey === 'player' ? 'opponent' : 'player'].back
+    const picked = [...bench].filter((card) => card.currentHp > 0).sort((a, b) => b.currentHp - a.currentHp)[0]
+    return picked ? { kind: 'benchSwitch', cardId: picked.instanceId } : undefined
+  }
+  if (required === 'energyAmount') {
+    return { kind: 'energyAmount', amount: Math.max(0, state[sideKey].energy - paidAttackCost) }
+  }
+  const attackType = normalizeTcgBattleEnergyType(attacker.types[0]) || 'Grass'
+  const targetType = normalizeTcgBattleEnergyType(target.types[0]) || 'Grass'
+  if (required === 'typeChange') return { kind: 'typeChange', type: attackType === 'Colorless' ? 'Grass' : attackType }
+  if (required === 'textureMagic') {
+    return {
+      kind: 'textureMagic',
+      resistanceType: targetType === 'Colorless' ? 'Grass' : targetType,
+      weaknessType: attackType === 'Colorless' ? 'Grass' : attackType,
+    }
+  }
+  return undefined
+}
+
+export function clearTcgBattleTemporaryEffects(card: TcgBattleCardState) {
+  card.temporaryEffects = undefined
+  card.incomingAttackModifier = undefined
 }
 
 function rollTcgBattleCoins(
   count: number,
   random: () => number,
 ): NonNullable<TcgBattleAttackResolution['coinFlips']> {
-  const results = Array.from({ length: count }, () => (random() >= 0.5 ? 'heads' : 'tails') as TcgBattleCoinCondition)
+  const results = Array.from({ length: count }, () => (random() >= 0.5 ? 'heads' : 'tails') as TcgBattleCoinResult)
   const heads = results.filter((result) => result === 'heads').length
   return {
     results,
     heads,
     tails: count - heads,
   }
+}
+
+function rollTcgBattleCoinsUntilTails(
+  random: () => number,
+): NonNullable<TcgBattleAttackResolution['coinFlips']> {
+  const results: Array<'heads' | 'tails'> = []
+  while (results.length < 20) {
+    const result = random() >= 0.5 ? 'heads' : 'tails'
+    results.push(result)
+    if (result === 'tails') break
+  }
+  const heads = results.filter((result) => result === 'heads').length
+  return { results, heads, tails: results.length - heads }
 }
 
 function calculateTcgBattleRawDamage(
@@ -1613,6 +2392,7 @@ function calculateTcgBattleRawDamage(
     target: TcgBattleCardState
     paidAttackCost?: number
     coinFlips?: TcgBattleAttackResolution['coinFlips']
+    choice?: TcgBattleAttackChoice
     coinMode: 'actual' | 'max'
   },
 ): number {
@@ -1639,6 +2419,14 @@ function calculateTcgBattleRawDamage(
       const heads = getEstimatedTcgBattleHeads(rule.coinFlipCount, context)
       return rule.damagePerHeads * heads
     }
+    case 'tailsBonus': {
+      const tails = context.coinMode === 'actual' ? (context.coinFlips?.tails ?? 0) : 1
+      return rule.baseDamage + (tails > 0 ? rule.bonusDamage : 0)
+    }
+    case 'tailsMultiplier': {
+      const tails = context.coinMode === 'actual' ? (context.coinFlips?.tails ?? 0) : 1
+      return rule.damagePerTails * tails
+    }
     case 'count':
       return (
         rule.baseDamage +
@@ -1648,6 +2436,12 @@ function calculateTcgBattleRawDamage(
             typeof rule.maxUnits === 'number' ? rule.maxUnits : Number.POSITIVE_INFINITY,
           )
       )
+    case 'subtractCount':
+      return Math.max(0, rule.baseDamage - rule.perUnitDamage * getTcgBattleCount(rule.source, context))
+    case 'remainingHpHalf':
+      return Math.ceil(context.target.currentHp / 20) * 10
+    case 'lastIncomingDamage':
+      return Math.max(0, context.attacker.temporaryEffects?.lastIncomingAttackDamage || 0)
   }
 }
 
@@ -1671,6 +2465,7 @@ function getTcgBattleCount(
     target: TcgBattleCardState
     paidAttackCost?: number
     coinMode: 'actual' | 'max'
+    choice?: TcgBattleAttackChoice
   },
 ): number {
   if (source.kind === 'damageCounters') {
@@ -1688,9 +2483,29 @@ function getTcgBattleCount(
     )
   }
 
+  if (source.kind === 'chosenEnergy') {
+    return context.choice?.kind === 'energyAmount' ? Math.max(0, context.choice.amount) : 0
+  }
+
   if (!context.state || !context.sideKey) return 0
   const own = context.state[context.sideKey]
   const opponent = context.state[context.sideKey === 'player' ? 'opponent' : 'player']
+
+  if (source.kind === 'energy') {
+    return source.side === 'own' ? own.energy : opponent.energy
+  }
+
+  if (source.kind === 'namedPokemon') {
+    const normalizeName = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '')
+    const wanted = new Set(source.names.map(normalizeName))
+    const cardsFor = (side: TcgBattleSideState) =>
+      source.zone === 'bench' ? side.back : [...side.front, ...side.back]
+    const countFor = (side: TcgBattleSideState) =>
+      cardsFor(side).filter((card) => card.currentHp > 0 && wanted.has(normalizeName(card.name))).length
+    if (source.side === 'own') return countFor(own)
+    if (source.side === 'opponent') return countFor(opponent)
+    return countFor(own) + countFor(opponent)
+  }
 
   if (source.kind === 'bench') {
     if (source.side === 'own') return own.back.filter((card) => card.currentHp > 0).length
@@ -1706,8 +2521,13 @@ function getTcgBattleCount(
   return getLivingTcgBattleCards(own).length + getLivingTcgBattleCards(opponent).length
 }
 
-function calculateTcgBattleSelfDamage(rule: TcgBattleSelfDamageRule, attacker: TcgBattleCardState): number {
+function calculateTcgBattleSelfDamage(
+  rule: TcgBattleSelfDamageRule,
+  attacker: TcgBattleCardState,
+  coinFlips?: TcgBattleAttackResolution['coinFlips'],
+): number {
   if (rule.kind === 'fixed') return rule.amount
+  if (rule.kind === 'perTail') return rule.amount * (coinFlips?.tails || 0)
   return rule.perCounterDamage * Math.max(0, Math.floor((attacker.hp - attacker.currentHp) / 10))
 }
 
@@ -1719,6 +2539,7 @@ function calculateTcgBattleEnergyDiscards(
     attack: TcgBattleAttack
     paidAttackCost?: number
     coinFlips?: TcgBattleAttackResolution['coinFlips']
+    choice?: TcgBattleAttackChoice
   },
 ): TcgBattleEnergyDiscardResolution[] {
   if (rules.length === 0) return []
@@ -1734,7 +2555,17 @@ function calculateTcgBattleEnergyDiscards(
     if (!doesTcgBattleConditionPass(rule.condition, context.coinFlips)) continue
 
     const available = remaining[rule.target]
-    const amount = Math.min(available, rule.amount === 'all' ? available : rule.amount)
+    const requested =
+      rule.amount === 'all'
+        ? available
+        : rule.amount === 'heads'
+          ? context.coinFlips?.heads || 0
+          : rule.amount === 'choice'
+            ? context.choice?.kind === 'energyAmount'
+              ? context.choice.amount
+              : 0
+            : rule.amount
+    const amount = Math.min(available, Math.max(0, requested))
     if (amount <= 0) continue
 
     remaining[rule.target] -= amount
@@ -1803,6 +2634,10 @@ function doesTcgBattleConditionPass(
 ): boolean {
   if (!condition) return true
   if (!coinFlips) return false
+  if (typeof condition === 'object') {
+    const count = condition.result === 'heads' ? coinFlips.heads : coinFlips.tails
+    return count >= condition.minimum
+  }
   return condition === 'heads' ? coinFlips.heads > 0 : coinFlips.tails > 0
 }
 
@@ -1811,17 +2646,27 @@ function applyTcgWeaknessAndResistance(
   target: TcgBattleCardState,
   damage: number,
 ): number {
-  const attackType = attacker.types[0]
+  const attackType = attacker.temporaryEffects?.battleType || attacker.types[0]
   if (!attackType) return damage
 
   let modifiedDamage = damage
-  const weakness = target.weaknesses.find((entry) => entry.type === attackType)
+  const weaknessType = target.temporaryEffects?.weaknessType
+  const weakness = weaknessType
+    ? weaknessType === attackType
+      ? { type: weaknessType, value: '×2' }
+      : undefined
+    : target.weaknesses.find((entry) => entry.type === attackType)
   if (weakness) {
     if (normalizeTcgDamageText(weakness.value).includes('x2')) modifiedDamage *= 2
     else modifiedDamage += parseSignedModifier(weakness.value)
   }
 
-  const resistance = target.resistances.find((entry) => entry.type === attackType)
+  const resistanceType = target.temporaryEffects?.resistanceType
+  const resistance = resistanceType
+    ? resistanceType === attackType
+      ? { type: resistanceType, value: '-30' }
+      : undefined
+    : target.resistances.find((entry) => entry.type === attackType)
   if (resistance) modifiedDamage = Math.max(0, modifiedDamage + parseSignedModifier(resistance.value))
 
   return modifiedDamage
