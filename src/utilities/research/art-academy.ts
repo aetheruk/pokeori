@@ -48,6 +48,28 @@ export function artAcademyColorToHex(color: ArtAcademyColor) {
     .join('')}`
 }
 
+export function encodeArtAcademyCells(cells: Uint8Array) {
+  let binary = ''
+  const chunkSize = 1024
+  for (let index = 0; index < cells.length; index += chunkSize) {
+    binary += String.fromCharCode(...cells.subarray(index, index + chunkSize))
+  }
+  return btoa(binary)
+    .replaceAll('+', '-')
+    .replaceAll('/', '_')
+    .replaceAll('=', '')
+}
+
+export function decodeArtAcademyCells(encoded: string) {
+  const base64 = encoded.replaceAll('-', '+').replaceAll('_', '/')
+  const binary = atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, '='))
+  const cells = new Uint8Array(binary.length)
+  for (let index = 0; index < binary.length; index += 1) {
+    cells[index] = binary.charCodeAt(index)
+  }
+  return cells
+}
+
 /**
  * Converts opaque artwork into a compact, distinct palette. The source is already
  * normalized to the fixed score grid before this runs.

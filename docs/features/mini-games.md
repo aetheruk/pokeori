@@ -147,9 +147,9 @@ WebKit, which may still permit history swipes despite that CSS property.
 - The maze reveals once at the start, then goes dark except for the tile under the player. Hole tiles are shown during the opening echo and instantly fail the run when stepped on.
 
 ## Art Academy
-- Art Academy entries require `settings.formId`, `timeLimit`, and a 50–100 `successThreshold`; `paletteSize` is optional and defaults to 12 representative opaque HOME-sprite colours.
+- Art Academy entries require `settings.formId`, `timeLimit`, and a 30–100 `successThreshold`; `paletteSize` is optional and defaults to 12 representative opaque HOME-sprite colours.
 - The reference plate and freehand drawing board share a visual 3×3 guide overlay. The guides help with proportion but do not limit the player to cells.
-- At session start, the server normalizes the normal bundled HOME sprite to a fixed 64×64 transparent raster, builds the round palette, and keeps the indexed reference private in Redis. The client submits an indexed 64×64 version of its canvas, and the server scores exact palette matches only at reference-sprite pixels; paint outside the sprite is ignored.
+- At session start, the server normalizes the normal bundled HOME sprite to a fixed 64×64 transparent raster and builds the round palette. The same indexed reference grid is sent with the already-visible reference artwork for live scoring and retained privately in Redis for authoritative completion scoring, eliminating browser-versus-server image-resampling differences. The client submits an indexed 64×64 version of its canvas, and the server scores exact palette matches only at reference-sprite pixels; paint outside the sprite is ignored.
 - `art-academy-test` is a no-requirement Kanto Test entry using Pikachu, a three-minute timer, an 8-colour palette, and a 50% passing threshold. The player sees a live similarity preview until the final 30 seconds, when it is hidden, and can submit at any time.
 
 ## Prize Wheel

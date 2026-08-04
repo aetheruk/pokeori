@@ -13,7 +13,15 @@ import {
   type VoltorbGridVoltorb,
 } from '@/data/games'
 import { validateGameItem } from '@/data/games/schemas'
-import { scoreArtAcademyDrawing } from '@/utilities/research/art-academy'
+import {
+  decodeArtAcademyCells,
+  encodeArtAcademyCells,
+  scoreArtAcademyDrawing,
+} from '@/utilities/research/art-academy'
+import {
+  createArtAcademyRound,
+  scoreSerializedArtAcademyDrawing,
+} from '@/utilities/research/art-academy-server'
 
 type Direction = 'up' | 'right' | 'down' | 'left'
 
@@ -407,7 +415,7 @@ describe('generated game data schemas', () => {
     })
 
     const invalidThreshold = JSON.parse(JSON.stringify(game))
-    invalidThreshold.settings.successThreshold = 49
+    invalidThreshold.settings.successThreshold = 29
     expect(validateGameItem(invalidThreshold).success).toBe(false)
 
     const invalidPalette = JSON.parse(JSON.stringify(game))
@@ -437,6 +445,33 @@ describe('generated game data schemas', () => {
     expect(
       scoreArtAcademyDrawing(reference, new Uint8Array([1, 2, 0, 0]), palette),
     ).toBe(50)
+  })
+
+  test('Art Academy live scoring uses the exact server reference grid', async () => {
+    const round = await createArtAcademyRound({
+      formId: '25',
+      timeLimit: 180,
+      successThreshold: 50,
+      paletteSize: 8,
+    })
+    const publicReference = round.publicRoundData.artAcademy.referenceCells
+    const decodedReference = decodeArtAcademyCells(publicReference)
+
+    expect(publicReference).toBe(round.privateRoundData.referenceCells)
+    expect(decodedReference).toHaveLength(64 ** 2)
+    expect(
+      scoreArtAcademyDrawing(
+        decodedReference,
+        decodedReference,
+        round.privateRoundData.palette,
+      ),
+    ).toBe(100)
+    expect(
+      scoreSerializedArtAcademyDrawing({
+        encodedDrawing: encodeArtAcademyCells(decodedReference),
+        privateRoundData: round.privateRoundData,
+      }),
+    ).toBe(100)
   })
 
   test('pachinko validation rejects duplicate bucket ids', () => {

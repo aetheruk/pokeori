@@ -27,7 +27,7 @@ export const kantoUndergroundArtAcademyEntries: ArtAcademyGameConfig[] = [
     settings: {
       formId: '25',
       timeLimit: 180,
-      successThreshold: 50,
+      successThreshold: 30,
       paletteSize: 8,
     },
   },

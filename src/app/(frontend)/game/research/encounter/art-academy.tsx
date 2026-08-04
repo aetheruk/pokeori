@@ -21,6 +21,8 @@ import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
 import {
   ART_ACADEMY_SCORE_GRID_SIZE,
+  decodeArtAcademyCells,
+  encodeArtAcademyCells,
   scoreArtAcademyDrawing,
 } from '@/utilities/research/art-academy'
 import { completeGame, startGame } from '@/app/(frontend)/game/games/actions'
@@ -33,6 +35,7 @@ interface ArtAcademyGameProps {
 interface ArtAcademyRound {
   spriteUrl: string
   palette: string[]
+  referenceCells: string
   scoreGridSize: number
   guideGridSize: number
 }
@@ -106,18 +109,6 @@ function nearestPaletteIndex(
   return selected
 }
 
-function encodeCells(cells: Uint8Array) {
-  let binary = ''
-  const chunkSize = 1024
-  for (let index = 0; index < cells.length; index += chunkSize) {
-    binary += String.fromCharCode(...cells.subarray(index, index + chunkSize))
-  }
-  return btoa(binary)
-    .replaceAll('+', '-')
-    .replaceAll('/', '_')
-    .replaceAll('=', '')
-}
-
 function hexToColor(hex: string) {
   const value = Number.parseInt(hex.slice(1), 16)
   return {
@@ -156,8 +147,6 @@ export function ArtAcademyGame({
   const [gameStarted, setGameStarted] = useState(false)
   const [gameEnded, setGameEnded] = useState(false)
   const [showReference, setShowReference] = useState(false)
-  const [previewReferenceCells, setPreviewReferenceCells] =
-    useState<Uint8Array | null>(null)
   const [resizeTick, setResizeTick] = useState(0)
   const [result, setResult] = useState<any | null>(null)
 
@@ -231,57 +220,14 @@ export function ArtAcademyGame({
     return () => observer.disconnect()
   }, [])
 
-  useEffect(() => {
-    if (!round) return
-    let cancelled = false
-    setPreviewReferenceCells(null)
-
-    const image = new window.Image()
-    image.onload = () => {
-      if (cancelled) return
-      const scoreCanvas = document.createElement('canvas')
-      scoreCanvas.width = round.scoreGridSize
-      scoreCanvas.height = round.scoreGridSize
-      const context = scoreCanvas.getContext('2d')
-      if (!context) return
-      const scale = Math.min(
-        round.scoreGridSize / image.naturalWidth,
-        round.scoreGridSize / image.naturalHeight,
-      )
-      const width = image.naturalWidth * scale
-      const height = image.naturalHeight * scale
-      context.drawImage(
-        image,
-        (round.scoreGridSize - width) / 2,
-        (round.scoreGridSize - height) / 2,
-        width,
-        height,
-      )
-
-      const imageData = context.getImageData(
-        0,
-        0,
-        round.scoreGridSize,
-        round.scoreGridSize,
-      ).data
-      const cells = new Uint8Array(round.scoreGridSize ** 2)
-      for (let cell = 0; cell < cells.length; cell += 1) {
-        const index = cell * 4
-        if (imageData[index + 3] < 32) continue
-        cells[cell] =
-          nearestPaletteIndex(
-            imageData[index],
-            imageData[index + 1],
-            imageData[index + 2],
-            round.palette,
-          ) + 1
-      }
-      setPreviewReferenceCells(cells)
-    }
-    image.src = round.spriteUrl
-
-    return () => {
-      cancelled = true
+  const previewReferenceCells = useMemo(() => {
+    if (!round?.referenceCells) return null
+    try {
+      const cells = decodeArtAcademyCells(round.referenceCells)
+      const expectedLength = round.scoreGridSize ** 2
+      return cells.length === expectedLength ? cells : null
+    } catch {
+      return null
     }
   }, [round])
 
@@ -349,7 +295,7 @@ export function ArtAcademyGame({
 
   const buildDrawingPayload = useCallback(() => {
     const cells = buildDrawingCells()
-    return cells ? encodeCells(cells) : null
+    return cells ? encodeArtAcademyCells(cells) : null
   }, [buildDrawingCells])
 
   const liveScore = useMemo(() => {

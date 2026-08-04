@@ -211,6 +211,7 @@ describe('TCG Basic Training content', () => {
       'Study each sample pack, then identify its cards so Mina can approve them for distribution.',
     )
     expect(inspection?.settings.requiredAnswers).toBe(3)
+    expect(artAcademy?.settings.successThreshold).toBe(30)
     expect(inspection?.requirements).toContainEqual({
       type: 'game_result',
       targetId: 'underground-tcg-card-memory-game',
