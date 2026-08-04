@@ -4,7 +4,8 @@ export const kantoUndergroundArtAcademyEntries: ArtAcademyGameConfig[] = [
   {
     id: 'underground-tcg-art-academy',
     name: 'Design Your First Card',
-    description: 'Create your first Pokemon card artwork before the timer runs out.',
+    description:
+      'Use five portions of dried yellow dye to create the Pikachu artwork for a new promotional card.',
     category: 'Underground',
     subCategory: 'Kanto Underground',
     icon: { type: 'pokemon', id: '25' },

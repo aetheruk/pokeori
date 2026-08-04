@@ -2032,7 +2032,7 @@ describe('static data references', () => {
     }
 
     expect(leadInTasks[2]?.exitModal?.message).toBe(
-      'The Maniac taps an absurdly complicated rhythm against the rock with your mallet. A section of wall swings open and a woman peers through. She spots your empty Promo binder and smiles. “The new recruit! Right on time.” The stranger gestures for you to follow, and she waves you inside. UNDERGROUND Is now accessible from the region map.',
+      '“Mistakes still need Orientation,” Mina says, waving you through. Gideon returns the mallet and follows. The passage seals behind you without leaving so much as a crack. UNDERGROUND is now accessible from the region map.',
     )
 
     expect(undergroundRegion).toMatchObject({
@@ -2062,11 +2062,11 @@ describe('static data references', () => {
         },
       },
     ])
-    expect(finalTask?.enterModal?.[1]?.message).toBe('MORE CRYSTALS. BRING THEM.')
+    expect(finalTask?.enterModal?.[1]?.message).toBe('MORE CRYSTALS.')
     expect(finalTask?.enterModal?.[2]?.message).toBe(
-      '"The pit wants crystals, so we created the TCG so we can trade with other trainers." It’s much faster than gathering them yourself. Nobody nearby looks surprised or concerned. The woman smiles and opens your binder. “Right then. Let’s make this official.”',
+      '“It does that,” Mina explains. “The pit wants crystals. Trainers find crystals. Trainers also like Pokemon. So we print Pokemon on cards and encourage the trainers to bring their crystals to us.” Nobody nearby looks surprised or concerned.',
     )
-    expect(finalTask?.enterModal).toHaveLength(3)
+    expect(finalTask?.enterModal).toHaveLength(5)
     expect(finalTask?.description).toBe(
       'The deepest gathering place has been built around something deeper still.',
     )
@@ -3841,7 +3841,9 @@ describe('static data references', () => {
 
     expect(ceremony).toMatchObject({
       name: 'Ceremony of Stones',
-      requirements: [{ type: 'task_completed', targetId: 'vip-coming-through' }],
+      requirements: [
+        { type: 'task_completed', targetId: 'vip-coming-through' },
+      ],
       icon: { type: 'trainer', id: 'socialite' },
     })
     expect(ceremony?.enterModal).toEqual(
@@ -3852,7 +3854,9 @@ describe('static data references', () => {
     )
     expect(lesson).toMatchObject({
       name: "A Craftsman's Secret",
-      requirements: [{ type: 'task_completed', targetId: 'ceremony-of-stones' }],
+      requirements: [
+        { type: 'task_completed', targetId: 'ceremony-of-stones' },
+      ],
       icon: { type: 'trainer', id: 'gentleman' },
     })
     expect(lesson?.rewards).toEqual(
@@ -3862,7 +3866,9 @@ describe('static data references', () => {
       ]),
     )
 
-    expect(tasks.find((task) => task.id === 'celadon-socialite-eevee-trade')).toMatchObject({
+    expect(
+      tasks.find((task) => task.id === 'celadon-socialite-eevee-trade'),
+    ).toMatchObject({
       repeatable: true,
       requirements: [
         { type: 'task_completed', targetId: 'a-craftsmans-secret' },
@@ -3875,9 +3881,7 @@ describe('static data references', () => {
           pokemonCriteria: { speciesId: 133 },
         },
       ],
-      rewards: [
-        { type: 'currency', targetId: 'pokedollars', quantity: 1500 },
-      ],
+      rewards: [{ type: 'currency', targetId: 'pokedollars', quantity: 1500 }],
     })
   })
 
@@ -3982,12 +3986,8 @@ describe('static data references', () => {
     const recipeCounter = shops.find(
       (shop) => shop.id === 'celadon-department-store-4f',
     )
-    const massage = tasks.find(
-      (task) => task.id === 'celadon-luxury-massage',
-    )
-    const analysis = tasks.find(
-      (task) => task.id === 'celadon-luxury-analysis',
-    )
+    const massage = tasks.find((task) => task.id === 'celadon-luxury-massage')
+    const analysis = tasks.find((task) => task.id === 'celadon-luxury-analysis')
 
     expect(firstFloor?.items.map((item) => item.id)).not.toContain('great-ball')
     expect(firstFloor?.items.map((item) => item.id)).not.toContain(

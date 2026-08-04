@@ -31,12 +31,13 @@ export const kantoUndergroundTasks: Task[] = [
     enterModal: [
       {
         id: 1,
-        title: 'Underground',
-        message: 'The passage immediately drops into a steep stairway carved through the rock.',
+        title: 'Mina',
+        message:
+          'Beyond the hidden door, the passage immediately drops into a steep stairway carved through the rock. Mina starts down without checking whether either of you is following. “Mind the first seven hundred steps. They can be slippery.”',
         background: undergroundBackground,
         icon: {
           type: 'trainer',
-          id: 'tcg-maniac-m',
+          id: 'tcg-maniac-f',
         },
         buttons: [
           {
@@ -50,11 +51,11 @@ export const kantoUndergroundTasks: Task[] = [
         id: 2,
         title: 'Deep Underground',
         message:
-          'After several flights of stairs, two ladders, and a rattling lift, a painted sign reads: DEEP UNDERGROUND. The woman walks straight past it. “We’re not there yet.”',
+          'After several flights of stairs, two ladders, and a rattling lift, a painted sign reads: DEEP UNDERGROUND. Gideon pauses beside it proudly. Mina walks straight past. “That is the visitor level. We are not visiting.”',
         background: undergroundBackground,
         icon: {
           type: 'trainer',
-          id: 'tcg-maniac-f',
+          id: 'tcg-maniac-m',
         },
         buttons: [
           {
@@ -68,7 +69,7 @@ export const kantoUndergroundTasks: Task[] = [
         id: 3,
         title: 'Deep, Deep Underground',
         message:
-          'A much older sign reads: DEEP, DEEP UNDERGROUND. Far below it, somebody has added another arrow and the words YES, STILL UNDERGROUND.',
+          'A much older sign eventually reads: DEEP, DEEP UNDERGROUND. Someone has pinned a smaller notice beneath it: HEAD OFFICE — THIS WAY. Below that, in different handwriting: YES, STILL UNDERGROUND.',
         background: undergroundBackground,
         icon: {
           type: 'local',
@@ -86,7 +87,7 @@ export const kantoUndergroundTasks: Task[] = [
         id: 4,
         title: 'Kanto Underground',
         message:
-          'At last, the tunnel opens into a bright cavern filled with card tables, binders, and cheerful conversation. “Here we are!”, as though the journey took five minutes.',
+          'At last, the tunnel opens into a vast, warmly lit cavern filled with card presses, packing tables, towering binders, and hundreds of cheerful collectors. “Here we are!” Mina announces, as though the journey took five minutes.',
         background: undergroundBackground,
         icon: {
           type: 'trainer',
@@ -94,7 +95,7 @@ export const kantoUndergroundTasks: Task[] = [
         },
         buttons: [
           {
-            text: 'Whoa!',
+            text: 'This is enormous',
             type: 'success',
           },
         ],
@@ -108,7 +109,7 @@ export const kantoUndergroundTasks: Task[] = [
         id: 'tcg-maniac-f',
       },
       message:
-        'The collectors welcome you without asking your name. Beyond the card tables, a simple railing surrounds a perfectly black opening in the cavern floor.',
+        'Nobody asks who you are. Several collectors congratulate Gideon on finding you, one hands you a blank membership form, and another asks whether you brought crystals. Beyond the busy tables, a simple railing surrounds a perfectly black opening in the cavern floor.',
       closeButtonText: 'Approach the Gathering',
     },
   },
@@ -149,9 +150,9 @@ export const kantoUndergroundTasks: Task[] = [
     enterModal: [
       {
         id: 1,
-        title: 'Somehow, Deeper',
+        title: 'Mina',
         message:
-          'The woman leads you to the railing. The pit below is wider than a house and so deep that torchlight disappears without touching anything. “And this is the pit,” she says brightly.',
+          'Mina leads you to the railing. The opening below is wider than a house and so deep that its torchlight disappears without touching anything. “And this is the pit,” she says brightly. A collector beside her checks a clipboard.',
         background: undergroundBackground,
         icon: {
           type: 'trainer',
@@ -168,11 +169,11 @@ export const kantoUndergroundTasks: Task[] = [
       {
         id: 2,
         title: 'The Pit',
-        message: 'MORE CRYSTALS. BRING THEM.',
+        message: 'MORE CRYSTALS.',
         background: undergroundBackground,
         buttons: [
           {
-            text: 'Listen',
+            text: 'Step Back',
             type: 'navigate',
             id: 3,
           },
@@ -180,9 +181,27 @@ export const kantoUndergroundTasks: Task[] = [
       },
       {
         id: 3,
-        title: 'Underground Collectors',
+        title: 'Mina',
         message:
-          '"The pit wants crystals, so we created the TCG so we can trade with other trainers." It’s much faster than gathering them yourself. Nobody nearby looks surprised or concerned. The woman smiles and opens your binder. “Right then. Let’s make this official.”',
+          '“It does that,” Mina explains. “The pit wants crystals. Trainers find crystals. Trainers also like Pokemon. So we print Pokemon on cards and encourage the trainers to bring their crystals to us.” Nobody nearby looks surprised or concerned.',
+        background: undergroundBackground,
+        icon: {
+          type: 'trainer',
+          id: 'tcg-maniac-f',
+        },
+        buttons: [
+          {
+            text: 'You invented the TCG?',
+            type: 'navigate',
+            id: 4,
+          },
+        ],
+      },
+      {
+        id: 4,
+        title: 'Gideon',
+        message:
+          '“Invented, distributed, promoted, and tastefully monetised,” Gideon says. “Gathering crystals ourselves was slow. Making the entire world want our cards is much more efficient.” Behind him, a worker tips a barrow of crystals into the darkness.',
         background: undergroundBackground,
         icon: {
           type: 'trainer',
@@ -190,7 +209,25 @@ export const kantoUndergroundTasks: Task[] = [
         },
         buttons: [
           {
-            text: 'What the...',
+            text: 'And nobody questions this?',
+            type: 'navigate',
+            id: 5,
+          },
+        ],
+      },
+      {
+        id: 5,
+        title: 'Mina',
+        message:
+          'Mina opens your Promo binder to the first empty sleeve. “Questions are covered after Basic Training. Mostly by Basic Training. Right then—let’s make this official.”',
+        background: undergroundBackground,
+        icon: {
+          type: 'trainer',
+          id: 'tcg-maniac-f',
+        },
+        buttons: [
+          {
+            text: 'Apparently I work here',
             type: 'success',
           },
         ],
@@ -204,7 +241,7 @@ export const kantoUndergroundTasks: Task[] = [
         id: '201-j',
       },
       message:
-        'The woman slides Promo No. 38, Unown [J], into the first empty sleeve. “J is for Join. Everyone starts somewhere.” Behind her, everyone carries on completely ignoring the incredibly ominous pit.',
+        'Mina slides Promo No. 38, Unown [J], into the first empty sleeve. “J is for Join. Or Journey. The filing cabinet says Join.” Behind her, the enormous organization carries on feeding crystals to the talking hole in the ground.',
       closeButtonText: 'Take the Card',
     },
   },

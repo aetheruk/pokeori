@@ -11,6 +11,13 @@ import {
 import { getTcgCardById } from '@/utilities/tcg/tcg'
 import { validateTcgBattleDeck } from '@/utilities/tcg/tcg-battle'
 
+function taskDialogue(task: (typeof tasks)[number] | undefined) {
+  return [
+    ...(task?.enterModal?.map((step) => step.message) || []),
+    task?.exitModal?.message || '',
+  ].join(' ')
+}
+
 describe('TCG Basic Training content', () => {
   test('authors the underground task progression and visible set gates', () => {
     const basicTraining = tasks.find(
@@ -25,11 +32,23 @@ describe('TCG Basic Training content', () => {
     const battleWrapup = tasks.find(
       (task) => task.id === 'underground-tcg-battle-wrapup',
     )
+    const practiceBriefing = tasks.find(
+      (task) => task.id === 'underground-tcg-practice-briefing',
+    )
+    const calOutreach = tasks.find(
+      (task) => task.id === 'underground-tcg-cal-outreach',
+    )
+    const marinaOutreach = tasks.find(
+      (task) => task.id === 'underground-tcg-marina-outreach',
+    )
+    const fernOutreach = tasks.find(
+      (task) => task.id === 'underground-tcg-fern-outreach',
+    )
     const base4Complete = tasks.find(
       (task) => task.id === 'underground-tcg-base4-complete',
     )
 
-    expect(basicTraining?.enterModal).toHaveLength(4)
+    expect(basicTraining?.enterModal).toHaveLength(5)
     expect(
       basicTraining?.enterModal?.[0]?.buttons.some(
         (button) => button.type === 'success',
@@ -41,13 +60,12 @@ describe('TCG Basic Training content', () => {
     expect(basicTraining?.completeButtonText).toBe('Begin Training')
     expect(
       basicTraining?.enterModal?.[0]?.buttons.map((button) => button.text),
-    ).toEqual(['Gather Crystals', 'Dig Even Deeper', 'Profit?'])
+    ).toEqual(['Keep the pit supplied', 'Dig Even Deeper', 'Profit?'])
     expect(
       basicTraining?.enterModal?.[1]?.buttons.map((button) => button.text),
-    ).toEqual(['We make them ofcourse!', 'The Pit'])
-    expect(basicTraining?.exitModal?.message).toContain(
-      'Gather Crystals Spread the word of the TCG',
-    )
+    ).toEqual(['You make them here', 'The Pit', 'Wild booster packs'])
+    expect(taskDialogue(basicTraining)).toContain('Make cards. Spread cards.')
+    expect(taskDialogue(basicTraining)).toContain('Feed pit')
     expect(redistribution?.name).toBe('Feeding the Pit')
     expect(redistribution?.completeButtonText).toBe('Throw Crystals')
     expect(redistribution?.criteria).toContainEqual({
@@ -85,6 +103,7 @@ describe('TCG Basic Training content', () => {
       },
     ])
     expect(battleWrapup?.completeButtonText).toBe('Design My First Card')
+    expect(battleWrapup?.name).toBe('Back to Work')
     expect(battleWrapup?.requirements).toEqual([
       {
         type: 'game_result',
@@ -105,9 +124,47 @@ describe('TCG Basic Training content', () => {
         count: 1,
       },
     ])
-    expect(battleWrapup?.exitModal?.message).toContain(
-      'Battles are fun, but they do not bring in Crystals',
+    expect(taskDialogue(battleWrapup)).toContain('LESS PLAYING. MORE CRYSTALS.')
+    expect(taskDialogue(battleWrapup)).toContain(
+      'playing the same colleagues forever produces no crystals',
     )
+
+    expect(practiceBriefing?.requirements).toEqual([
+      { type: 'task_completed', targetId: 'pewter-school-tcg-pop-quiz' },
+      {
+        type: 'task_completed',
+        targetId: 'underground-tcg-battle-wrapup',
+        inverse: true,
+      },
+    ])
+    expect(taskDialogue(practiceBriefing)).toContain(
+      'Cal, Marina, and Fern are our field outreach team',
+    )
+    expect(calOutreach?.requirements).toContainEqual({
+      type: 'game_result',
+      targetId: 'underground-tcg-battle-tutorial',
+      battleStatus: 'win',
+      count: 1,
+    })
+    expect(marinaOutreach?.requirements).toContainEqual({
+      type: 'game_result',
+      targetId: 'underground-tcg-battle-fire',
+      battleStatus: 'win',
+      count: 1,
+    })
+    expect(fernOutreach?.requirements).toContainEqual({
+      type: 'game_result',
+      targetId: 'underground-tcg-battle-water',
+      battleStatus: 'win',
+      count: 1,
+    })
+    for (const leadIn of [calOutreach, marinaOutreach, fernOutreach]) {
+      expect(leadIn?.requirements).toContainEqual({
+        type: 'task_completed',
+        targetId: 'underground-tcg-battle-wrapup',
+        inverse: true,
+      })
+    }
   })
 
   test('authors the inspection, battle, and art tutorial games with one-time gates', async () => {
@@ -116,6 +173,9 @@ describe('TCG Basic Training content', () => {
     )
     const fire = allGames.find(
       (game) => game.id === 'underground-tcg-battle-fire',
+    )
+    const tutorial = allGames.find(
+      (game) => game.id === 'underground-tcg-battle-tutorial',
     )
     const water = allGames.find(
       (game) => game.id === 'underground-tcg-battle-water',
@@ -129,9 +189,9 @@ describe('TCG Basic Training content', () => {
 
     expect(inspection?.settings.studySeconds).toBe(30)
     expect(inspection?.settings.lives).toBe(2)
-    expect(inspection?.name).toBe('TCG Quiz')
+    expect(inspection?.name).toBe('Card Quality Control')
     expect(inspection?.description).toBe(
-      'I need to Research the cards correctly to pass my basic training.',
+      'Study each sample pack, then identify its cards so Mina can approve them for distribution.',
     )
     expect(inspection?.settings.requiredAnswers).toBe(3)
     expect(inspection?.requirements).toContainEqual({
@@ -147,6 +207,34 @@ describe('TCG Basic Training content', () => {
       quantity: 1,
       dropChance: 100,
     })
+    expect(tutorial?.name).toBe('Lost-and-Found Practice')
+    expect(tutorial?.settings.opponentDeckCardIds).toHaveLength(15)
+    expect(new Set(tutorial?.settings.opponentDeckCardIds).size).toBe(15)
+    expect(tutorial?.settings.deckFormat).toBe('baby')
+    expect(tutorial?.settings.requiredSeries).toBe('Base')
+    expect(
+      (tutorial!.settings as { opponentEnergyType?: string })
+        .opponentEnergyType,
+    ).toBe('Colorless')
+    expect(tutorial?.icon).toEqual({ type: 'pokemon', id: '19' })
+    expect(tutorial?.rewards).toContainEqual({
+      type: 'currency',
+      targetId: 'pokedollars',
+      quantity: 250,
+    })
+    expect(tutorial?.requirements).toEqual([
+      {
+        type: 'task_completed',
+        targetId: 'underground-tcg-practice-briefing',
+      },
+      {
+        type: 'game_result',
+        targetId: 'underground-tcg-battle-tutorial',
+        battleStatus: 'win',
+        count: 1,
+        inverse: true,
+      },
+    ])
     expect(fire?.settings.opponentDeckCardIds).toHaveLength(15)
     expect(new Set(fire?.settings.opponentDeckCardIds).size).toBe(15)
     expect(
@@ -165,6 +253,18 @@ describe('TCG Basic Training content', () => {
       type: 'currency',
       targetId: 'pokedollars',
       quantity: 1000,
+    })
+    expect(fire?.requirements).toContainEqual({
+      type: 'task_completed',
+      targetId: 'underground-tcg-cal-outreach',
+    })
+    expect(water?.requirements).toContainEqual({
+      type: 'task_completed',
+      targetId: 'underground-tcg-marina-outreach',
+    })
+    expect(grass?.requirements).toContainEqual({
+      type: 'task_completed',
+      targetId: 'underground-tcg-fern-outreach',
     })
     expect(artAcademy?.criteria).toContainEqual({
       type: 'item_owned',
@@ -186,18 +286,18 @@ describe('TCG Basic Training content', () => {
     expect(deckLesson?.description).toBe(
       'Learn how to build, price, and arrange a Pokemon card deck.',
     )
-    expect(deckLesson?.exitModal?.message).toContain('Auto Fill')
-    expect(deckLesson?.exitModal?.message).toContain('CardDex')
-    expect(deckLesson?.exitModal?.message).toContain('Base Rules')
-    expect(deckLesson?.exitModal?.message).toContain('30, 55, and 85')
-    expect(energyLesson?.exitModal?.message).toContain(
-      'Stage 1 cards arrive on turn 3',
+    expect(taskDialogue(deckLesson)).toContain('Auto Fill')
+    expect(taskDialogue(deckLesson)).toContain('CardDex')
+    expect(taskDialogue(deckLesson)).toContain('Base Rules')
+    expect(taskDialogue(deckLesson)).toContain('30, 55, and 85')
+    expect(taskDialogue(energyLesson)).toContain(
+      'Stage 1 cards unlock on turn 3',
     )
-    expect(energyLesson?.exitModal?.message).toContain(
-      'any amount from turn 10',
+    expect(taskDialogue(energyLesson)).toContain(
+      'From turn 10, any attack cost is allowed',
     )
 
-    for (const game of [fire, water, grass]) {
+    for (const game of [tutorial, fire, water, grass]) {
       const cardIds = game?.settings.opponentDeckCardIds || []
       for (const cardId of game?.settings.opponentDeckCardIds || []) {
         expect(getTcgCardById(cardId), `${game?.id}:${cardId}`).not.toBeNull()
@@ -213,6 +313,9 @@ describe('TCG Basic Training content', () => {
       expect(validation.totalCost, `${game?.id} deck cost`).toBeLessThanOrEqual(
         30,
       )
+      if (game?.id === 'underground-tcg-battle-tutorial') {
+        expect(validation.totalCost).toBe(15)
+      }
     }
   })
 

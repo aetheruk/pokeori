@@ -16,6 +16,12 @@ const lesson = (input: {
   title: string
   message: string
   icon?: TaskIcon
+  dialogue: Array<{
+    title: string
+    message: string
+    button: string
+    icon?: TaskIcon
+  }>
 }): Task => ({
   id: input.id,
   name: input.name,
@@ -32,6 +38,18 @@ const lesson = (input: {
   requirements: tcgStoryGate,
   criteria: [],
   rewards: [],
+  enterModal: input.dialogue.map((step, index) => ({
+    id: index + 1,
+    title: step.title,
+    message: step.message,
+    background: schoolBackground,
+    icon: step.icon || input.icon || lessonIcon,
+    buttons: [
+      index === input.dialogue.length - 1
+        ? { text: step.button, type: 'success' as const }
+        : { text: step.button, type: 'navigate' as const, id: index + 2 },
+    ],
+  })),
   exitModal: {
     background: schoolBackground,
     title: input.title,
@@ -48,7 +66,34 @@ export const pewterTcgTasks: Task[] = [
     description: 'Learn how to build, price, and arrange a Pokemon card deck.',
     button: 'Study Deck Setup',
     title: 'Deck Setup',
-    message: 'A battle deck contains exactly 15 unique Pokemon cards. In the Trainer page, Auto Fill can build a legal deck from your collection. You can also open the CardDex, choose a Pokemon card, and add it to a deck manually. Choose the card group first, then save the deck for that group and format. In Kanto we play Base Rules, so choose the Base card group when a battle asks for Base cards. Baby, Champions, and Masters are the three formats: they allow total deck costs of 30, 55, and 85 respectively. Card costs reflect what you bring: an evolving Basic costs 1, a Stage 1 costs 3, a Stage 2 costs 5, a non-evolving Basic costs 5, EX/GX/V/Radiant cards cost 10, and the biggest special cards cost 15. Your 15 cards must stay within the selected format limit. At the start of a battle, place three Pokemon in front and three on the bench. The front row attacks; the bench waits for its turn.',
+    dialogue: [
+      {
+        title: 'TCG Instructor',
+        message:
+          'The instructor accepts Gideon’s referral form without reacting to the words SECRET UNDERGROUND HEAD OFFICE. “A battle deck contains exactly fifteen unique Pokemon cards. Not fourteen, not sixteen, and no duplicates.”',
+        button: 'How do I build one?',
+      },
+      {
+        title: 'TCG Instructor',
+        message:
+          '“On the Trainer page, Auto Fill can build a legal deck from cards you own. For more control, open a Pokemon card in the CardDex and add it manually.”',
+        button: 'Choose the card group',
+      },
+      {
+        title: 'TCG Instructor',
+        message:
+          '“Choose the card group first, then save the deck for that group and format. Kanto uses Base Rules, so Underground battles require a Base-group deck.” He underlines Base three times. Apparently this has gone wrong before.',
+        button: 'Learn the formats',
+      },
+      {
+        title: 'TCG Instructor',
+        message:
+          '“Baby, Champions, and Masters allow total deck costs of 30, 55, and 85. Your fifteen cards must remain within the chosen limit.”',
+        button: 'Review card costs',
+      },
+    ],
+    message:
+      'Card costs reflect what you bring: an evolving Basic costs 1, a Stage 1 costs 3, a Stage 2 costs 5, and a non-evolving Basic costs 5. EX, GX, V, and Radiant cards cost 10; the largest special cards cost 15. At battle start, place three Pokemon in front and three on the bench. The front row attacks while the bench waits to be promoted.',
   }),
   lesson({
     id: 'pewter-school-tcg-energy',
@@ -56,7 +101,28 @@ export const pewterTcgTasks: Task[] = [
     description: 'Learn how energy charges attacks and how turns flow.',
     button: 'Study Energy',
     title: 'Energy and Attacks',
-    message: 'Charge your energy before attacking. Every attack has an energy cost, and the battle opens up as the turns progress: attacks can use up to 1 energy on turns 1 and 2, 2 on turns 3 and 4, 3 on turns 5 and 6, 4 on turns 7 to 9, and any amount from turn 10. Card stages unlock too: Stage 1 cards arrive on turn 3, Stage 2 cards on turn 5, 10-cost cards on turn 7, and 15-cost cards on turn 10. Charge when you need more energy; when you are finished, end the turn and let the opponent respond.',
+    dialogue: [
+      {
+        title: 'TCG Instructor',
+        message:
+          'The instructor places an Energy card beside the board. “Every attack has an energy cost. If you cannot afford an attack, charge energy instead of staring at the card until it becomes cheaper.”',
+        button: 'Learn attack pacing',
+      },
+      {
+        title: 'TCG Instructor',
+        message:
+          '“Attacks can use up to 1 energy on turns 1 and 2, 2 on turns 3 and 4, 3 on turns 5 and 6, and 4 on turns 7 through 9. From turn 10, any attack cost is allowed.”',
+        button: 'What about card stages?',
+      },
+      {
+        title: 'TCG Instructor',
+        message:
+          '“Stage 1 cards unlock on turn 3 and Stage 2 on turn 5. Cards costing 10 unlock on turn 7; cards costing 15 wait until turn 10.” The strongest cards are apparently very committed to dramatic entrances.',
+        button: 'Finish the turn',
+      },
+    ],
+    message:
+      'Charge when you need more energy. When you are finished acting, end the turn and let the opponent respond. Plan ahead: the cards and attacks available to both sides expand as the turn count rises.',
   }),
   lesson({
     id: 'pewter-school-tcg-effects',
@@ -64,7 +130,28 @@ export const pewterTcgTasks: Task[] = [
     description: 'Learn how to read weaknesses, retreat costs, and status effects.',
     button: 'Study Battle Effects',
     title: 'Weakness and Effects',
-    message: 'Read the type icons before committing to an attack. Weakness can turn a modest hit into a knockout, while retreat costs and effects decide whether a damaged Pokemon should stay active.',
+    dialogue: [
+      {
+        title: 'TCG Instructor',
+        message:
+          '“A large damage number is exciting,” the instructor says, “but type icons are often more important. Check the defending card’s Weakness and Resistance before choosing a target.”',
+        button: 'Read the whole card',
+      },
+      {
+        title: 'TCG Instructor',
+        message:
+          '“Attack text can add coin flips, healing, recoil, protection, status conditions, or damage to the bench. The damage number is only the beginning of the sentence.”',
+        button: 'What if a card is hurt?',
+      },
+      {
+        title: 'TCG Instructor',
+        message:
+          '“Compare the danger of staying active with the card’s retreat cost. A timely retreat preserves a useful Pokemon; a late retreat preserves paperwork.”',
+        button: 'Review the lesson',
+      },
+    ],
+    message:
+      'Read type icons and attack text before committing. Weakness can turn a modest hit into a knockout, while Resistance, retreat costs, status conditions, and other effects decide whether a damaged Pokemon should remain active.',
   }),
   lesson({
     id: 'pewter-school-tcg-knockouts',
@@ -72,13 +159,38 @@ export const pewterTcgTasks: Task[] = [
     description: 'Learn what happens when an active Pokemon is knocked out.',
     button: 'Study Knockouts',
     title: 'Knockouts and Promotion',
-    message: 'When the active Pokemon is knocked out, promote one from the bench. Keep a healthy reserve ready, because the battle ends when one side can no longer continue.',
+    dialogue: [
+      {
+        title: 'Headmaster',
+        message:
+          'The Headmaster takes over for the final lesson. “When an active Pokemon is knocked out, it leaves the front row. The empty position must be filled from your bench.”',
+        button: 'Choose a replacement',
+        icon: headmasterIcon,
+      },
+      {
+        title: 'Headmaster',
+        message:
+          '“Promote a healthy card that can act at the current turn. Do not wait until the knockout to remember what is on your bench.” She taps the unused cards pointedly.',
+        button: 'How does the battle end?',
+        icon: headmasterIcon,
+      },
+      {
+        title: 'Headmaster',
+        message:
+          '“The battle ends when one side can no longer continue. A strong front row wins turns; a prepared bench wins battles.”',
+        button: 'Review the lesson',
+        icon: headmasterIcon,
+      },
+    ],
+    message:
+      'When an active Pokemon is knocked out, promote one from the bench. Keep a healthy reserve ready, because the battle ends when one side can no longer continue.',
     icon: headmasterIcon,
   }),
   {
     id: 'pewter-school-tcg-pop-quiz',
     name: 'TCG Pop Quiz',
-    description: 'The headmaster wants to check that I understand the new battle rules.',
+    description:
+      'The Headmaster wants to confirm that Underground HQ did not send me all this way for nothing.',
     category: 'Kanto',
     subCategory: 'Pewter School',
     icon: headmasterIcon,
@@ -107,7 +219,8 @@ export const pewterTcgTasks: Task[] = [
       {
         id: 1,
         title: 'TCG Pop Quiz',
-        message: 'How many unique Pokemon cards belong in a battle deck?',
+        message:
+          'The Headmaster straightens Gideon’s referral form. “Let us see whether your mysterious employer sent you here for an education or merely another stamp. How many unique Pokemon cards belong in a battle deck?”',
         background: schoolBackground,
         icon: headmasterIcon,
         buttons: [
@@ -119,7 +232,7 @@ export const pewterTcgTasks: Task[] = [
       {
         id: 2,
         title: 'TCG Pop Quiz',
-        message: 'How many Pokemon begin in the front row?',
+        message: '“Good. Of those fifteen cards, how many Pokemon begin in the front row?”',
         background: schoolBackground,
         icon: headmasterIcon,
         buttons: [
@@ -131,7 +244,7 @@ export const pewterTcgTasks: Task[] = [
       {
         id: 3,
         title: 'TCG Pop Quiz',
-        message: 'What must an attack have before it can be used?',
+        message: '“What must an attack have before it can be used?”',
         background: schoolBackground,
         icon: headmasterIcon,
         buttons: [
@@ -143,7 +256,7 @@ export const pewterTcgTasks: Task[] = [
       {
         id: 4,
         title: 'TCG Pop Quiz',
-        message: 'What should happen after your active Pokemon is knocked out?',
+        message: '“What should happen after an active Pokemon is knocked out?”',
         background: schoolBackground,
         icon: headmasterIcon,
         buttons: [
@@ -155,7 +268,8 @@ export const pewterTcgTasks: Task[] = [
       {
         id: 5,
         title: 'TCG Pop Quiz',
-        message: 'What is the most important thing in the game?',
+        message:
+          'The Headmaster lowers her notes. “One final question. Rules matter, but what is the most important thing in the game?”',
         background: schoolBackground,
         icon: headmasterIcon,
         buttons: [
@@ -167,7 +281,8 @@ export const pewterTcgTasks: Task[] = [
       {
         id: 99,
         title: 'TCG Pop Quiz',
-        message: 'Not quite. Review the lessons and try the question again.',
+        message:
+          'The Headmaster marks the answer with a neat red line. “Not quite. Underground referrals are unusual, but they are not exempt from revision. Review the lessons and begin again.”',
         background: schoolBackground,
         icon: headmasterIcon,
         buttons: [
@@ -180,7 +295,8 @@ export const pewterTcgTasks: Task[] = [
       background: schoolBackground,
       title: 'Quiz Complete',
       icon: headmasterIcon,
-      message: 'You have the fundamentals. Take this card I designed now it’s time to prove yourself against some real players. Head back to HQ',
+      message:
+        '“You have the fundamentals,” the Headmaster says, signing the certificate. She gives you Promo Meowth, a card she designed herself. “Take that back to your cavernous employer and tell them you are ready for the practical portion.”',
       closeButtonText: 'Take Meowth',
     },
   },
