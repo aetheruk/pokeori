@@ -137,6 +137,35 @@ describe('TCG battle utilities', () => {
     expect(attacks.every((attack) => attack.battleEffect)).toBe(true)
   })
 
+  test('supports classic unused Water Energy bonus attacks', async () => {
+    const blastoise = await buildTcgBattleCardSummary('base1-2')
+    const poliwag = await buildTcgBattleCardSummary('base1-59')
+
+    expect(blastoise).not.toBeNull()
+    expect(poliwag).not.toBeNull()
+
+    const opponentCard = makeBattleCard('opponent-card', 1)
+    const playerCard = {
+      ...poliwag!,
+      instanceId: 'base1-59:test',
+      currentHp: poliwag!.hp,
+    }
+    const state = makeBattleState({
+      player: makeBattleSide(playerCard, 5),
+      opponent: makeBattleSide(opponentCard, 5),
+    })
+    const resolution = resolveTcgBattleAttack({
+      state,
+      sideKey: 'player',
+      attacker: playerCard,
+      attack: playerCard.attacks[0],
+      target: opponentCard,
+      paidAttackCost: 1,
+    })
+
+    expect(resolution.targetDamageBeforeModifiers).toBe(30)
+  })
+
   test('resolves coin bonus, fixed recoil, and weakness', () => {
     const playerCard = makeBattleCard('player-card', 1)
     const opponentCard = makeBattleCard('opponent-card', 1)

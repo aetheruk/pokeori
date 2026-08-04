@@ -24,6 +24,7 @@ export type TcgBattleCountSource =
   | { kind: 'bench'; side: 'own' | 'opponent' | 'both' }
   | { kind: 'pokemonInPlay'; side: 'own' | 'opponent' | 'both' }
   | { kind: 'damageCounters'; target: 'attacker' | 'target' }
+  | { kind: 'unusedEnergy' }
 
 export type TcgBattleDamageRule =
   | { kind: 'fixed'; amount: number }
@@ -651,6 +652,7 @@ export function resolveTcgBattleAttack(params: {
     sideKey,
     attacker,
     target,
+    paidAttackCost,
     coinFlips,
     coinMode: 'actual',
   })
@@ -814,6 +816,7 @@ export function calculateTcgBattleDamage(
     sideKey,
     attacker,
     target,
+    paidAttackCost: attack.convertedEnergyCost ?? attack.cost?.length ?? 0,
     coinMode: 'max',
   })
   return applyTcgWeaknessAndResistance(attacker, target, damage)
@@ -1215,6 +1218,7 @@ function inferCountedTcgBattleDamage(
       baseDamage,
       perUnitDamage: countMatch.damage,
       source: countMatch.source,
+      maxUnits: countMatch.maxUnits,
     }
   }
 
@@ -1224,6 +1228,7 @@ function inferCountedTcgBattleDamage(
       baseDamage: 0,
       perUnitDamage: countMatch.damage,
       source: countMatch.source,
+      maxUnits: countMatch.maxUnits,
     }
   }
 
@@ -1235,8 +1240,21 @@ function matchTcgBattleCountSource(text: string):
       mode: 'damage' | 'more'
       damage: number
       source: TcgBattleCountSource
+      maxUnits?: number
     }
   | null {
+  const unusedEnergyMore = text.match(
+    /(?:this attack )?does \d+ damage plus (\d+) more damage for each [a-z]+ energy attached to [a-z0-9' .&-]+ but not used to pay for this attack's energy cost\. extra [a-z]+ energy after the (\d+)(?:st|nd|rd|th) (?:doesn't|don't) count\b/,
+  )
+  if (unusedEnergyMore) {
+    return {
+      mode: 'more',
+      damage: Number.parseInt(unusedEnergyMore[1], 10),
+      source: { kind: 'unusedEnergy' },
+      maxUnits: Number.parseInt(unusedEnergyMore[2], 10),
+    }
+  }
+
   const ownBenchMore = text.match(/this attack does (\d+) more damage for each of your benched pokemon\b/)
   if (ownBenchMore) {
     return {
@@ -1593,6 +1611,7 @@ function calculateTcgBattleRawDamage(
     sideKey?: TcgBattleSide
     attacker: TcgBattleCardState
     target: TcgBattleCardState
+    paidAttackCost?: number
     coinFlips?: TcgBattleAttackResolution['coinFlips']
     coinMode: 'actual' | 'max'
   },
@@ -1650,11 +1669,23 @@ function getTcgBattleCount(
     sideKey?: TcgBattleSide
     attacker: TcgBattleCardState
     target: TcgBattleCardState
+    paidAttackCost?: number
+    coinMode: 'actual' | 'max'
   },
 ): number {
   if (source.kind === 'damageCounters') {
     const card = source.target === 'attacker' ? context.attacker : context.target
     return Math.max(0, Math.floor((card.hp - card.currentHp) / 10))
+  }
+
+  if (source.kind === 'unusedEnergy') {
+    if (!context.state || !context.sideKey) {
+      return context.coinMode === 'max' ? Number.POSITIVE_INFINITY : 0
+    }
+    return Math.max(
+      0,
+      context.state[context.sideKey].energy - (context.paidAttackCost || 0),
+    )
   }
 
   if (!context.state || !context.sideKey) return 0
