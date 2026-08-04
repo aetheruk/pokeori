@@ -3350,7 +3350,18 @@ describe('static data references', () => {
         quantity,
         dropChance: 100,
       })
+      expect(snap?.rewards).not.toContainEqual({
+        type: 'currency',
+        targetId: 'crystals',
+        quantity: expect.anything(),
+        dropChance: expect.anything(),
+      })
     }
+
+    expect(
+      allGames.find((entry) => entry.id === 'research-forest-photos-ex')
+        ?.skillXpOnFailure,
+    ).toBe(false)
 
     const normalForestPhotos = allGames.find(
       (entry) => entry.id === 'research-forest-photos',
@@ -3360,9 +3371,31 @@ describe('static data references', () => {
       targetId: 'binder-base2',
     })
 
+    const bugGauntlet = expeditions.find(
+      (entry) => entry.id === 'bug-gauntlet-expedition',
+    )
+    expect(bugGauntlet?.rewards).toContainEqual({
+      type: 'currency',
+      targetId: 'pokedollars',
+      quantity: 200,
+      dropChance: 100,
+    })
+
     const photoExchange = tasks.find(
       (entry) => entry.id === 'task-photo-exchange',
     )
+    expect(photoExchange?.criteria).toContainEqual({
+      type: 'item_owned',
+      targetId: 'quality-forest-photo',
+      count: 3,
+      consume: true,
+    })
+    expect(photoExchange?.criteria).toContainEqual({
+      type: 'currency_owned',
+      targetId: 'crystals',
+      count: 10,
+      consume: true,
+    })
     expect(photoExchange?.rewards).toContainEqual({
       type: 'item',
       targetId: 'pack-base2',

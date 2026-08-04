@@ -79,7 +79,7 @@ export const viridianForestExpeditions: ExpeditionConfig[] = [
       {
         type: 'currency',
         targetId: 'pokedollars',
-        quantity: 600,
+        quantity: 200,
         dropChance: 100,
       },
     ],

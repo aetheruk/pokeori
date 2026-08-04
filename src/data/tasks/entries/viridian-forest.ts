@@ -297,6 +297,12 @@ export const viridianForestTasks: Task[] = [
         count: 3,
         consume: true,
       },
+      {
+        type: 'currency_owned',
+        targetId: 'crystals',
+        count: 10,
+        consume: true,
+      },
     ],
     rewards: [
       {

@@ -118,12 +118,6 @@ export const viridianForestsnapEntries: SnapConfig[] = [
         dropChance: 100,
       },
       {
-        type: 'currency',
-        quantity: 20,
-        dropChance: 100,
-        targetId: 'crystals',
-      },
-      {
         type: 'pokemon_research_xp',
         targetId: '10',
         quantity: 2,
@@ -155,6 +149,7 @@ export const viridianForestsnapEntries: SnapConfig[] = [
       },
     ],
     skillXp: { skill: 'catching', level: 6 },
+    skillXpOnFailure: false,
     background: '/backgrounds/forest.avif',
   },
 ]
