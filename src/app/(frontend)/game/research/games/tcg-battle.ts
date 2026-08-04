@@ -1,5 +1,6 @@
 'use server'
 
+import { revalidatePath } from 'next/cache'
 import { allGames, type TcgBattleGameConfig } from '@/data/games'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
@@ -1250,7 +1251,10 @@ export async function claimTcgBattleResult(): Promise<TcgBattleActionResult> {
       }
     }
 
-    if (completion.success) await redis.del(battleKey(user.id))
+    if (completion.success) {
+      await redis.del(battleKey(user.id))
+      revalidatePath('/game/explore')
+    }
     return { success: true, state, completion }
   } catch (error) {
     return {

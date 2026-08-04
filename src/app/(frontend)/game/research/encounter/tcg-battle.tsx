@@ -45,6 +45,7 @@ import {
 } from '@/components/ui/drawer'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useAudio } from '@/context/AudioContext'
+import { useUser } from '@/context/UserContext'
 import type { TcgBattleGameConfig } from '@/data/games'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
@@ -529,6 +530,7 @@ function getWinnerMessage(winner?: TcgBattleState['winner']) {
 export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
   useGameMusic(encounter)
   const { playSfx } = useAudio()
+  const { refreshUser } = useUser()
   const router = useRouter()
   const [state, setState] = useState<TcgBattleState | null>(null)
   const [frontIds, setFrontIds] = useState<string[]>([])
@@ -1486,7 +1488,14 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     setAttackerId(card.instanceId)
   }
 
-  const returnToExplore = () => router.push('/game/explore')
+  const returnToExplore = async () => {
+    try {
+      await refreshUser(false)
+    } catch (refreshError) {
+      console.error('Failed to refresh TCG battle progress', refreshError)
+    }
+    router.push('/game/explore')
+  }
   const resultOverlay = useMemo(() => {
     if (!result) return null
     if (state?.phase !== 'finished') return result
