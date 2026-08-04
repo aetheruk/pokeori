@@ -35,6 +35,14 @@ import { TrainerCard } from '@/components/game/battles/TrainerCard'
 import { VSAnimation } from '@/components/game/battles/VSAnimation'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from '@/components/ui/drawer'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useAudio } from '@/context/AudioContext'
 import type { TcgBattleGameConfig } from '@/data/games'
@@ -42,13 +50,21 @@ import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
 import { getTcgEnergySymbol } from '@/utilities/tcg/energy-symbols'
 import type {
+  TcgBattleAttackChoice,
   TcgBattleCardState,
+  TcgBattleChoiceRequirement,
+  TcgBattleEnergyType,
   TcgBattleState,
   TcgBattleStatusCondition,
 } from '@/utilities/tcg/tcg-battle'
 import {
+  calculateTcgBattleDamage,
+  chooseTcgBattleAttackChoice,
   getEffectiveTcgBattleAttackCost,
+  getTcgBattleAttackEffect,
   getTcgBattleCardUnlockTurnForCard,
+  getValidTcgBattleTargets,
+  isTcgBattleAttackDisabled,
   TCG_BATTLE_FORMATS,
 } from '@/utilities/tcg/tcg-battle'
 import type { GameCompletionResult } from '@/app/(frontend)/game/games/actions'
@@ -179,225 +195,30 @@ function canPlayerTakeAnyAttack(state: TcgBattleState): boolean {
     (card) =>
       card.currentHp > 0 &&
       isCardUnlockedByTurn(card, state.turnNumber) &&
-      card.attacks.some((attack) => {
+      card.attacks.some((attack, attackIndex) => {
+        if (isTcgBattleAttackDisabled(card, attackIndex)) return false
         const cost = getAttackCost(attack, state)
-        return cost <= attackCap && cost <= state.player.energy
+        const effect = getTcgBattleAttackEffect(attack)
+        return (
+          cost <= attackCap &&
+          cost <= state.player.energy &&
+          getValidTcgBattleTargets(state, 'player', card, attack).some(
+            (target) =>
+              !effect?.choiceRequirement ||
+              Boolean(
+                chooseTcgBattleAttackChoice({
+                  state,
+                  sideKey: 'player',
+                  attacker: card,
+                  attack,
+                  target,
+                  paidAttackCost: cost,
+                }),
+              ),
+          )
+        )
       }),
   )
-}
-
-function parseAttackDamage(damage?: string): number {
-  const normalized = (damage || '').trim()
-  return /^\d+$/.test(normalized) ? Number.parseInt(normalized, 10) : 0
-}
-
-function normalizeAttackText(text?: string): string {
-  return (text || '')
-    .replace(/Pokémon/g, 'Pokemon')
-    .replace(/pokémon/g, 'pokemon')
-    .replace(/×/g, 'x')
-    .toLowerCase()
-    .replace(/\s+/g, ' ')
-    .trim()
-}
-
-function normalizeDamageText(damage?: string): string {
-  return (damage || '').replace(/×/g, 'x').trim()
-}
-
-function parseAttackBaseDamage(damage?: string): number {
-  const match = normalizeDamageText(damage).match(/^(\d+)/)
-  return match ? Number.parseInt(match[1], 10) : 0
-}
-
-function parseSignedModifier(value: string): number {
-  const match = value.match(/[+-]\d+/)
-  return match ? Number.parseInt(match[0], 10) : 0
-}
-
-function countDamageCounters(card?: TcgBattleCardState): number {
-  if (!card) return 0
-  return Math.max(0, Math.floor((card.hp - card.currentHp) / 10))
-}
-
-function getSideCount(
-  state: TcgBattleState | undefined,
-  side: 'own' | 'opponent' | 'both',
-  zone: 'bench' | 'play',
-) {
-  if (!state) return 0
-  const ownCards =
-    zone === 'bench'
-      ? state.player.back
-      : [...state.player.front, ...state.player.back]
-  const opponentCards =
-    zone === 'bench'
-      ? state.opponent.back
-      : [...state.opponent.front, ...state.opponent.back]
-  const ownCount = ownCards.filter((card) => card.currentHp > 0).length
-  const opponentCount = opponentCards.filter(
-    (card) => card.currentHp > 0,
-  ).length
-  if (side === 'own') return ownCount
-  if (side === 'opponent') return opponentCount
-  return ownCount + opponentCount
-}
-
-function getProjectedRawDamage(
-  attack: TcgAttack,
-  attacker: TcgBattleCardState | undefined,
-  target: TcgBattleCardState | undefined,
-  state?: TcgBattleState,
-): number {
-  const damageText = normalizeDamageText(attack.damage)
-  const text = normalizeAttackText(attack.text)
-  const exactDamage = parseAttackDamage(damageText)
-  if (/^\d+$/.test(damageText)) return exactDamage
-
-  const baseDamage = parseAttackBaseDamage(damageText)
-  const headsBonus = text.match(
-    /flip a coin\. if heads, this attack does (\d+) more damage\b/,
-  )
-  if (headsBonus && damageText.endsWith('+'))
-    return baseDamage + Number.parseInt(headsBonus[1], 10)
-
-  const oldHeadsBonus = text.match(
-    /flip a coin\. if heads, this attack does \d+ damage plus (\d+) more damage; if tails, this attack does \d+ damage/,
-  )
-  if (oldHeadsBonus && damageText.endsWith('+'))
-    return baseDamage + Number.parseInt(oldHeadsBonus[1], 10)
-
-  const headsBonusEach = text.match(
-    /flip (\d+) coins\. this attack does (\d+) more damage for each heads\b/,
-  )
-  if (headsBonusEach && damageText.endsWith('+')) {
-    return (
-      baseDamage +
-      Number.parseInt(headsBonusEach[1], 10) *
-        Number.parseInt(headsBonusEach[2], 10)
-    )
-  }
-
-  const headsMultiplier = text.match(
-    /flip (\d+) coins\. this attack does (\d+) damage (?:for each heads|times the number of heads)\b/,
-  )
-  if (headsMultiplier && damageText.endsWith('x')) {
-    return (
-      Number.parseInt(headsMultiplier[1], 10) *
-      Number.parseInt(headsMultiplier[2], 10)
-    )
-  }
-
-  const ownBenchMore = text.match(
-    /this attack does (\d+) more damage for each of your benched pokemon\b/,
-  )
-  if (ownBenchMore && damageText.endsWith('+')) {
-    return (
-      baseDamage +
-      Number.parseInt(ownBenchMore[1], 10) * getSideCount(state, 'own', 'bench')
-    )
-  }
-
-  const opponentBenchMore = text.match(
-    /this attack does (\d+) more damage for each of your opponent's benched pokemon\b/,
-  )
-  if (opponentBenchMore && damageText.endsWith('+')) {
-    return (
-      baseDamage +
-      Number.parseInt(opponentBenchMore[1], 10) *
-        getSideCount(state, 'opponent', 'bench')
-    )
-  }
-
-  const bothBenchMore = text.match(
-    /this attack does (\d+) more damage for each benched pokemon \(both yours and your opponent's\)\b/,
-  )
-  if (bothBenchMore && damageText.endsWith('+')) {
-    return (
-      baseDamage +
-      Number.parseInt(bothBenchMore[1], 10) *
-        getSideCount(state, 'both', 'bench')
-    )
-  }
-
-  const selfCounterMore = text.match(
-    /this attack does (\d+) more damage for each damage counter on this pokemon\b/,
-  )
-  if (selfCounterMore && damageText.endsWith('+')) {
-    return (
-      baseDamage +
-      Number.parseInt(selfCounterMore[1], 10) * countDamageCounters(attacker)
-    )
-  }
-
-  const targetCounterMore = text.match(
-    /this attack does (\d+) more damage for each damage counter on your opponent's active pokemon\b/,
-  )
-  if (targetCounterMore && damageText.endsWith('+')) {
-    return (
-      baseDamage +
-      Number.parseInt(targetCounterMore[1], 10) * countDamageCounters(target)
-    )
-  }
-
-  const countDamage =
-    text.match(
-      /this attack does (\d+) damage for each of your opponent's benched pokemon\b/,
-    ) ||
-    text.match(
-      /does (\d+) damage times the number of your opponent's benched pokemon\b/,
-    )
-  if (
-    countDamage &&
-    (damageText.endsWith('x') || damageText === '?' || damageText === '')
-  ) {
-    return (
-      Number.parseInt(countDamage[1], 10) *
-      getSideCount(state, 'opponent', 'bench')
-    )
-  }
-
-  const ownPlayDamage = text.match(
-    /this attack does (\d+) damage for each of your pokemon in play\b/,
-  )
-  if (
-    ownPlayDamage &&
-    (damageText.endsWith('x') || damageText === '?' || damageText === '')
-  ) {
-    return (
-      Number.parseInt(ownPlayDamage[1], 10) * getSideCount(state, 'own', 'play')
-    )
-  }
-
-  const selfCounterDamage =
-    text.match(
-      /this attack does (\d+) damage for each damage counter on this pokemon\b/,
-    ) ||
-    text.match(
-      /does (\d+) damage times the number of damage counters on this pokemon\b/,
-    )
-  if (
-    selfCounterDamage &&
-    (damageText.endsWith('x') || damageText === '?' || damageText === '')
-  ) {
-    return (
-      Number.parseInt(selfCounterDamage[1], 10) * countDamageCounters(attacker)
-    )
-  }
-
-  const targetCounterDamage = text.match(
-    /this attack does (\d+) damage for each damage counter on your opponent's active pokemon\b/,
-  )
-  if (
-    targetCounterDamage &&
-    (damageText.endsWith('x') || damageText === '?' || damageText === '')
-  ) {
-    return (
-      Number.parseInt(targetCounterDamage[1], 10) * countDamageCounters(target)
-    )
-  }
-
-  return exactDamage
 }
 
 function getProjectedDamage(
@@ -406,22 +227,13 @@ function getProjectedDamage(
   target: TcgBattleCardState | undefined,
   state?: TcgBattleState,
 ): number {
-  let damage = getProjectedRawDamage(attack, attacker, target, state)
-  const attackType = attacker?.types[0]
-  if (!attackType || !target) return damage
-
-  const weakness = target.weaknesses.find((entry) => entry.type === attackType)
-  if (weakness) {
-    if (weakness.value.includes('x2')) damage *= 2
-    else damage += parseSignedModifier(weakness.value)
-  }
-
-  const resistance = target.resistances.find(
-    (entry) => entry.type === attackType,
+  if (!attacker || !target) return 0
+  const sideKey = state && [...state.opponent.front, ...state.opponent.back].some(
+    (card) => card.instanceId === attacker.instanceId,
   )
-  if (resistance)
-    damage = Math.max(0, damage + parseSignedModifier(resistance.value))
-  return damage
+    ? 'opponent'
+    : 'player'
+  return calculateTcgBattleDamage(attacker, attack, target, state, sideKey)
 }
 
 function getHpPercent(card?: TcgBattleCardState): number {
@@ -723,6 +535,9 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
   const [attackerId, setAttackerId] = useState('')
   const [targetId, setTargetId] = useState('')
   const [benchMode, setBenchMode] = useState<BenchMode | null>(null)
+  const [choiceAttackIndex, setChoiceAttackIndex] = useState<number | null>(
+    null,
+  )
   const [previewCard, setPreviewCard] = useState<TcgBattleCardState | null>(
     null,
   )
@@ -1106,6 +921,12 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
         nextState,
         (event) => event.targetSide === 'player',
       )
+      const playerEffectEvent =
+        meta.kind === 'attack'
+          ? nextState.lastEffectEvents?.find(
+              (event) => event.sourceId === meta.attackerId,
+            )
+          : undefined
       const endOfRoundStatusDamageEvents =
         nextState.lastDamageEvents?.filter(
           (event) => event.reason === 'status',
@@ -1227,6 +1048,25 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
         }
 
         queueStatusResolution(playerStatusEvent)
+        if (playerEffectEvent) {
+          const effectDetail =
+            'label' in playerEffectEvent
+              ? playerEffectEvent.label
+              : playerEffectEvent.kind === 'energy'
+                ? `${playerEffectEvent.amount} Energy gained`
+                : 'The front line changed'
+          showResolution(
+            {
+              id: makeResolutionId('player-effect'),
+              tone: 'player',
+              title: playerEffectEvent.kind === 'copy' ? 'Copied Attack' : 'Card Effect',
+              detail: effectDetail,
+              sourceId: playerEffectEvent.sourceId,
+            },
+            'select',
+          )
+          cursor += RESOLUTION_TIMING.actionIntro
+        }
         queueOpponentSettle(planOpponentSettle())
         queuePlayerSettle(planPlayerSettle())
       } else if (meta.kind === 'retreat') {
@@ -1562,6 +1402,69 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     })
   }
 
+  const requestAttack = (attackIndex: number) => {
+    if (!state || !selectedAttacker) return
+    const attack = selectedAttacker.attacks[attackIndex]
+    if (!attack) return
+    const effect = getTcgBattleAttackEffect(attack)
+    const validTargets = getValidTcgBattleTargets(
+      state,
+      'player',
+      selectedAttacker,
+      attack,
+    )
+    const currentTarget = validTargets.find(
+      (card) => card.instanceId === targetId,
+    )
+    if (
+      effect?.choiceRequirement ||
+      effect?.targetScope === 'bench' ||
+      effect?.targetScope === 'any' ||
+      !currentTarget
+    ) {
+      setChoiceAttackIndex(attackIndex)
+      return
+    }
+    callAction(
+      () =>
+        tcgBattleAttack(
+          selectedAttacker.instanceId,
+          attackIndex,
+          currentTarget.instanceId,
+        ),
+      {
+        kind: 'attack',
+        attackerId: selectedAttacker.instanceId,
+        targetId: currentTarget.instanceId,
+        attackIndex,
+      },
+    )
+  }
+
+  const submitAttackChoice = (
+    attackIndex: number,
+    selectedTargetId: string,
+    choice?: TcgBattleAttackChoice,
+  ) => {
+    if (!selectedAttacker) return
+    setChoiceAttackIndex(null)
+    callAction(
+      () =>
+        tcgBattleAttack(
+          selectedAttacker.instanceId,
+          attackIndex,
+          selectedTargetId,
+          choice,
+        ),
+      {
+        kind: 'attack',
+        attackerId: selectedAttacker.instanceId,
+        targetId: selectedTargetId,
+        attackIndex,
+      },
+    )
+  }
+
   const handleSetupSelect = (cardId: string) => {
     if (isBusy) return
     if (frontIds.includes(cardId)) {
@@ -1748,17 +1651,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
             attackCap={attackCap}
             isPending={isBusy}
             resolution={resolution}
-            onAttack={(attackIndex) =>
-              callAction(
-                () => tcgBattleAttack(attackerId, attackIndex, targetId),
-                {
-                  kind: 'attack',
-                  attackerId,
-                  targetId,
-                  attackIndex,
-                },
-              )
-            }
+            onAttack={requestAttack}
           />
         </section>
 
@@ -1802,6 +1695,18 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
               },
             )
           }}
+        />
+      )}
+
+      {choiceAttackIndex !== null && selectedAttacker && (
+        <AttackChoiceDrawer
+          open
+          state={state}
+          attacker={selectedAttacker}
+          attackIndex={choiceAttackIndex}
+          defaultTargetId={targetId}
+          onClose={() => setChoiceAttackIndex(null)}
+          onConfirm={submitAttackChoice}
         />
       )}
 
@@ -2179,6 +2084,379 @@ function TeamEnergyReadout({
   )
 }
 
+const TCG_CHOICE_TYPES: TcgBattleEnergyType[] = [
+  'Grass',
+  'Fire',
+  'Water',
+  'Lightning',
+  'Psychic',
+  'Fighting',
+  'Darkness',
+  'Metal',
+  'Fairy',
+  'Dragon',
+]
+
+function AttackChoiceDrawer({
+  open,
+  state,
+  attacker,
+  attackIndex,
+  defaultTargetId,
+  onClose,
+  onConfirm,
+}: {
+  open: boolean
+  state: TcgBattleState
+  attacker: TcgBattleCardState
+  attackIndex: number
+  defaultTargetId: string
+  onClose: () => void
+  onConfirm: (
+    attackIndex: number,
+    targetId: string,
+    choice?: TcgBattleAttackChoice,
+  ) => void
+}) {
+  const attack = attacker.attacks[attackIndex]
+  const effect = attack ? getTcgBattleAttackEffect(attack) : null
+  const validTargets = attack
+    ? getValidTcgBattleTargets(state, 'player', attacker, attack)
+    : []
+  const initialTarget = validTargets.some(
+    (card) => card.instanceId === defaultTargetId,
+  )
+    ? defaultTargetId
+    : validTargets[0]?.instanceId || ''
+  const [selectedTargetId, setSelectedTargetId] = useState(initialTarget)
+  const [selectedCardId, setSelectedCardId] = useState('')
+  const [selectedAttackIndex, setSelectedAttackIndex] = useState<number | null>(
+    null,
+  )
+  const [followUpAttackIndex, setFollowUpAttackIndex] = useState<number | null>(
+    null,
+  )
+  const [energyAmount, setEnergyAmount] = useState(0)
+  const [selectedType, setSelectedType] = useState<TcgBattleEnergyType>('Grass')
+  const [resistanceType, setResistanceType] =
+    useState<TcgBattleEnergyType>('Grass')
+  const [weaknessType, setWeaknessType] =
+    useState<TcgBattleEnergyType>('Grass')
+  const target = validTargets.find(
+    (card) => card.instanceId === selectedTargetId,
+  )
+  const requirement = effect?.choiceRequirement
+  const attackCost = attack ? getAttackCost(attack, state) : 0
+  const availableEnergy = Math.max(0, state.player.energy - attackCost)
+  const copiedAttack =
+    requirement === 'copyAttack' && target && selectedAttackIndex !== null
+      ? target.attacks[selectedAttackIndex]
+      : undefined
+  const copiedEffect = copiedAttack
+    ? getTcgBattleAttackEffect(copiedAttack)
+    : null
+  const activeRequirement: Exclude<
+    TcgBattleChoiceRequirement,
+    'copyAttack'
+  > | undefined =
+    requirement === 'copyAttack'
+      ? copiedEffect?.choiceRequirement === 'copyAttack'
+        ? undefined
+        : copiedEffect?.choiceRequirement
+      : requirement
+  const benchChoices =
+    activeRequirement === 'ownBench'
+      ? state.player.back
+      : activeRequirement === 'opponentBench'
+        ? state.opponent.back
+        : []
+
+  useEffect(() => {
+    if (
+      !benchChoices.some(
+        (card) => card.instanceId === selectedCardId && card.currentHp > 0,
+      )
+    ) {
+      setSelectedCardId(
+        benchChoices.find((card) => card.currentHp > 0)?.instanceId || '',
+      )
+    }
+  }, [benchChoices, selectedCardId])
+
+  useEffect(() => {
+    if (activeRequirement === 'energyAmount') setEnergyAmount(availableEnergy)
+  }, [activeRequirement, availableEnergy])
+
+  if (!attack || !effect) return null
+
+  const buildChoiceFor = (
+    required: Exclude<
+      NonNullable<typeof requirement>,
+      'copyAttack'
+    > | undefined,
+    attackChoiceIndex: number | null,
+  ): TcgBattleAttackChoice | undefined => {
+    if (required === 'disableAttack' && attackChoiceIndex !== null) {
+      return { kind: 'disabledAttack', attackIndex: attackChoiceIndex }
+    }
+    if (
+      (required === 'opponentBench' || required === 'ownBench') &&
+      selectedCardId
+    ) {
+      return { kind: 'benchSwitch', cardId: selectedCardId }
+    }
+    if (required === 'energyAmount') {
+      return { kind: 'energyAmount', amount: energyAmount }
+    }
+    if (required === 'typeChange') {
+      return { kind: 'typeChange', type: selectedType }
+    }
+    if (required === 'textureMagic') {
+      return { kind: 'textureMagic', resistanceType, weaknessType }
+    }
+    return undefined
+  }
+
+  const buildChoice = (): TcgBattleAttackChoice | undefined => {
+    if (requirement === 'copyAttack' && selectedAttackIndex !== null) {
+      return {
+        kind: 'copiedAttack',
+        attackIndex: selectedAttackIndex,
+        followUp: buildChoiceFor(activeRequirement, followUpAttackIndex),
+      }
+    }
+    return buildChoiceFor(activeRequirement, selectedAttackIndex)
+  }
+
+  const activeChoiceReady =
+    !activeRequirement ||
+    (activeRequirement === 'disableAttack'
+      ? (requirement === 'copyAttack'
+          ? followUpAttackIndex
+          : selectedAttackIndex) !== null
+      : activeRequirement === 'opponentBench' ||
+          activeRequirement === 'ownBench'
+        ? Boolean(selectedCardId)
+        : true)
+  const choiceReady =
+    !requirement ||
+    (requirement === 'copyAttack'
+      ? selectedAttackIndex !== null && activeChoiceReady
+      : activeChoiceReady)
+
+  const renderCardChoices = (
+    cards: TcgBattleCardState[],
+    value: string,
+    onChange: (value: string) => void,
+  ) => (
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+      {cards.filter((card) => card.currentHp > 0).map((card) => (
+        <button
+          type="button"
+          key={card.instanceId}
+          onClick={() => onChange(card.instanceId)}
+          className={cn(
+            'game-focus-ring min-h-11 rounded-lg border bg-game-night-surface px-3 py-2 text-left text-game-night-ink transition-colors',
+            value === card.instanceId
+              ? 'border-game-moss bg-game-moss/25'
+              : 'border-game-night-border/60 hover:border-game-moss/60',
+          )}
+        >
+          <span className="block truncate text-sm font-semibold">{card.name}</span>
+          <span className="font-mono text-xs text-game-night-muted">
+            {card.currentHp}/{card.hp} HP
+          </span>
+        </button>
+      ))}
+    </div>
+  )
+
+  const renderTypeChoices = (
+    value: TcgBattleEnergyType,
+    onChange: (value: TcgBattleEnergyType) => void,
+  ) => (
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+      {TCG_CHOICE_TYPES.map((type) => (
+        <button
+          type="button"
+          key={type}
+          onClick={() => onChange(type)}
+          className={cn(
+            'game-focus-ring min-h-11 rounded-lg border px-3 py-2 text-sm font-semibold transition-colors',
+            TYPE_BADGE_CLASSES[type],
+            value === type ? 'ring-2 ring-game-moss' : 'opacity-80 hover:opacity-100',
+          )}
+        >
+          {type}
+        </button>
+      ))}
+    </div>
+  )
+
+  return (
+    <Drawer open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
+      <DrawerContent className="border-game-night-border bg-game-night-surface text-game-night-ink md:max-w-2xl">
+        <DrawerHeader className="border-b border-game-night-border text-left">
+          <DrawerTitle className="font-display text-game-night-ink">
+            Choose {attack.name}
+          </DrawerTitle>
+          <DrawerDescription className="text-game-night-muted">
+            Complete the card’s extra choice before committing the attack.
+          </DrawerDescription>
+        </DrawerHeader>
+        <div className="max-h-[60dvh] space-y-4 overflow-y-auto p-4">
+          {(effect.targetScope === 'bench' || effect.targetScope === 'any') && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-night-ink">Target</h3>
+              {renderCardChoices(validTargets, selectedTargetId, setSelectedTargetId)}
+            </section>
+          )}
+          {(activeRequirement === 'opponentBench' ||
+            activeRequirement === 'ownBench') && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-night-ink">
+                {activeRequirement === 'ownBench'
+                  ? 'Switch with'
+                  : 'Bring forward'}
+              </h3>
+              {renderCardChoices(benchChoices, selectedCardId, setSelectedCardId)}
+            </section>
+          )}
+          {requirement === 'copyAttack' && target && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-night-ink">
+                Attack to copy
+              </h3>
+              <div className="grid gap-2">
+                {target.attacks.map((candidate, index) => {
+                  const candidateEffect = getTcgBattleAttackEffect(candidate)
+                  const isRecursive = candidateEffect?.special?.some(
+                    (rule) => rule.kind === 'copyAttack',
+                  )
+                  const acceptsTarget = getValidTcgBattleTargets(
+                    state,
+                    'player',
+                    attacker,
+                    candidate,
+                  ).some((card) => card.instanceId === target.instanceId)
+                  const unavailable =
+                    !candidateEffect || Boolean(isRecursive) || !acceptsTarget
+                  return (
+                    <button
+                      type="button"
+                      key={`${candidate.name}-${index}`}
+                      disabled={unavailable}
+                      onClick={() => {
+                        setSelectedAttackIndex(index)
+                        setFollowUpAttackIndex(null)
+                      }}
+                      className={cn(
+                        'game-focus-ring min-h-11 rounded-lg border px-3 py-2 text-left transition-colors',
+                        selectedAttackIndex === index
+                          ? 'border-game-moss bg-game-moss/25'
+                          : 'border-game-night-border bg-game-night-canvas/50 hover:border-game-moss/60',
+                        unavailable && 'cursor-not-allowed opacity-40',
+                      )}
+                    >
+                      <span className="block text-sm font-semibold">{candidate.name}</span>
+                      <span className="text-xs text-game-night-muted">{candidate.text || `${candidate.damage || 0} damage`}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </section>
+          )}
+          {activeRequirement === 'disableAttack' && target && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-night-ink">
+                Attack to disable
+              </h3>
+              <div className="grid gap-2">
+                {target.attacks.map((candidate, index) => {
+                  const selectedIndex =
+                    requirement === 'copyAttack'
+                      ? followUpAttackIndex
+                      : selectedAttackIndex
+                  return (
+                    <button
+                      type="button"
+                      key={`${candidate.name}-${index}`}
+                      onClick={() =>
+                        requirement === 'copyAttack'
+                          ? setFollowUpAttackIndex(index)
+                          : setSelectedAttackIndex(index)
+                      }
+                      className={cn(
+                        'game-focus-ring min-h-11 rounded-lg border px-3 py-2 text-left transition-colors',
+                        selectedIndex === index
+                          ? 'border-game-moss bg-game-moss/25'
+                          : 'border-game-night-border bg-game-night-canvas/50 hover:border-game-moss/60',
+                      )}
+                    >
+                      <span className="block text-sm font-semibold">
+                        {candidate.name}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </section>
+          )}
+          {activeRequirement === 'energyAmount' && (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold text-game-night-ink">Extra Energy</h3>
+              <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+                {Array.from({ length: availableEnergy + 1 }, (_, amount) => (
+                  <button
+                    type="button"
+                    key={amount}
+                    onClick={() => setEnergyAmount(amount)}
+                    className={cn(
+                      'game-focus-ring min-h-11 rounded-lg border font-mono text-sm',
+                      energyAmount === amount
+                        ? 'border-game-moss bg-game-moss/25 text-game-night-ink'
+                        : 'border-game-night-border bg-game-night-canvas/50 text-game-night-muted',
+                    )}
+                  >
+                    {amount}
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+          {activeRequirement === 'typeChange' &&
+            renderTypeChoices(selectedType, setSelectedType)}
+          {activeRequirement === 'textureMagic' && (
+            <>
+              <section className="space-y-2">
+                <h3 className="text-sm font-semibold text-game-night-ink">Your resistance</h3>
+                {renderTypeChoices(resistanceType, setResistanceType)}
+              </section>
+              <section className="space-y-2">
+                <h3 className="text-sm font-semibold text-game-night-ink">Target weakness</h3>
+                {renderTypeChoices(weaknessType, setWeaknessType)}
+              </section>
+            </>
+          )}
+        </div>
+        <DrawerFooter className="border-t border-game-night-border sm:flex-row sm:justify-end">
+          <Button type="button" variant="outline" onClick={onClose} className="min-h-11">
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            disabled={!selectedTargetId || !choiceReady}
+            onClick={() => onConfirm(attackIndex, selectedTargetId, buildChoice())}
+            className="min-h-11 bg-game-clay text-white hover:bg-game-clay-strong"
+          >
+            Commit attack
+          </Button>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  )
+}
+
 function InlineAttackButtons({
   state,
   selectedAttacker,
@@ -2206,6 +2484,26 @@ function InlineAttackButtons({
     <div className="z-20 flex w-full max-w-[min(34rem,calc(100vw-1rem))] flex-wrap items-center justify-center gap-2 px-2 pt-1">
       {attacks.map((attack, index) => {
         const cost = getAttackCost(attack, state)
+        const validTargets = selectedAttacker
+          ? getValidTcgBattleTargets(state, 'player', selectedAttacker, attack)
+          : []
+        const effect = getTcgBattleAttackEffect(attack)
+        const hasResolvableTarget = selectedAttacker
+          ? validTargets.some(
+              (target) =>
+                !effect?.choiceRequirement ||
+                Boolean(
+                  chooseTcgBattleAttackChoice({
+                    state,
+                    sideKey: 'player',
+                    attacker: selectedAttacker,
+                    attack,
+                    target,
+                    paidAttackCost: cost,
+                  }),
+                ),
+            )
+          : false
         const projectedDamage = getProjectedDamage(
           selectedAttacker,
           attack,
@@ -2214,7 +2512,9 @@ function InlineAttackButtons({
         )
         const disabledReason = !canAct
           ? 'Wait'
-          : !selectedTarget
+          : isTcgBattleAttackDisabled(selectedAttacker!, index)
+            ? 'Disabled'
+          : !hasResolvableTarget
             ? 'Target'
             : !isCardUnlockedByTurn(selectedAttacker, state.turnNumber)
               ? `Turn ${selectedAttacker ? getTcgBattleCardUnlockTurnForCard(selectedAttacker) : 1}`
@@ -2566,7 +2866,7 @@ function CoinFlipOverlay({ cue }: { cue: CoinCue }) {
       <div className="absolute inset-0 bg-[#081014]/30 backdrop-blur-[1px]" />
       <div className="relative flex flex-col items-center gap-4">
         <div className="flex items-center justify-center gap-3 sm:gap-5">
-          {cue.results.map((result, index) => {
+          {cue.results.slice(0, 6).map((result, index) => {
             const src =
               result === 'heads'
                 ? '/images/coin-front.avif'
@@ -2601,6 +2901,11 @@ function CoinFlipOverlay({ cue }: { cue: CoinCue }) {
               </motion.div>
             )
           })}
+          {cue.results.length > 6 && (
+            <div className="flex h-20 min-w-20 items-center justify-center rounded-lg border border-game-night-border bg-game-night-surface px-3 font-mono text-sm font-bold text-game-night-ink sm:h-24">
+              +{cue.results.length - 6}
+            </div>
+          )}
         </div>
         <motion.div
           className={cn(
@@ -3493,6 +3798,18 @@ function CardImageButton({
               />
             </span>
           ))}
+        </div>
+      )}
+      {card.markers?.includes('lightningRod') && (
+        <div
+          className={cn(
+            'pointer-events-none absolute bottom-1 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 rounded-full border border-yellow-200/50 bg-[#172733]/90 px-2 py-1 text-[9px] font-black uppercase tracking-wide text-yellow-100 shadow-md backdrop-blur-sm',
+            side === 'opponent' && 'rotate-180',
+          )}
+          title="Lightning Rod marker"
+        >
+          <Zap className="h-3 w-3" />
+          Rod
         </div>
       )}
     </button>

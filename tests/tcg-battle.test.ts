@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'bun:test'
 import { allGames, type TcgBattleGameConfig } from '@/data/games'
+import base1Details from '@/data/tcg/details/base1'
+import base2Details from '@/data/tcg/details/base2'
+import base3Details from '@/data/tcg/details/base3'
+import base4Details from '@/data/tcg/details/base4'
+import base5Details from '@/data/tcg/details/base5'
+import basePromoDetails from '@/data/tcg/details/basep'
 import {
   applyTcgBattleEnergyDiscards,
   applyTcgBattleStatusConditions,
@@ -8,6 +14,7 @@ import {
   canSideChargeEnergy,
   calculateTcgBattleCardCost,
   calculateTcgBattleDamage,
+  chooseTcgBattleAttackChoice,
   getEffectiveTcgBattleAttackCost,
   getAllowedTcgBattleAttackCost,
   getNextTcgBattleTurnNumber,
@@ -15,11 +22,15 @@ import {
   getTcgBattleCardUnlockTurnForCard,
   isTcgBattleCardUnlocked,
   getSupportedTcgBattleAttacks,
+  getValidTcgBattleTargets,
+  inferTcgBattleAttackEffect,
+  isTcgBattleCardLegal,
   parseTcgAttackDamage,
   resolveTcgBattleAttack,
   resolveTcgBattleStatusAttackCheck,
   TCG_BATTLE_FORMATS,
   validateTcgBattleDeck,
+  validateTcgBattleAttackChoice,
   type TcgBattleAttack,
   type TcgBattleCardState,
   type TcgBattleSideState,
@@ -997,5 +1008,196 @@ describe('TCG battle utilities', () => {
 
     expect(canSideChargeEnergy(state, 'player')).toBe(true)
     expect(canTcgBattleEndByPassStall(state)).toBe(false)
+  })
+
+  test('supports the audited Base-series attacks and keeps only off-model effects filtered', () => {
+    const cards = [
+      ...base1Details,
+      ...base2Details,
+      ...base3Details,
+      ...base4Details,
+      ...base5Details,
+      ...basePromoDetails,
+    ].filter((card) => card.supertype === 'Pokémon')
+    const unsupported = cards.flatMap((card) =>
+      (card.attacks || [])
+        .filter((attack) => !inferTcgBattleAttackEffect(attack))
+        .map((attack) => ({ cardId: card.id, name: attack.name })),
+    )
+    const intentionallyUnsupported = new Set([
+      'Call for Family',
+      'Call for Friend',
+      'Devolution Beam',
+      'Dizziness',
+      'Eek',
+      'Energy Control',
+      'Energy Conversion',
+      'Fetch',
+      'Fling',
+      'Headache',
+      "Let's Play!",
+      'Mischief',
+      'Prophecy',
+      'Rapid Evolution',
+      'Scavenge',
+      'Sprout',
+      'Third Eye',
+      'Vanish',
+      'Wildfire',
+    ])
+
+    expect(cards).toHaveLength(406)
+    expect(unsupported).toHaveLength(31)
+    expect(new Set(unsupported.map((attack) => attack.name))).toEqual(
+      intentionallyUnsupported,
+    )
+    expect(
+      cards.filter((card) => !isTcgBattleCardLegal(card)).map((card) => card.id),
+    ).toEqual(['base3-3', 'base3-18', 'basep-31', 'basep-35'])
+  })
+
+  test('resolves classic counter, shared-energy, and remaining-HP formulas', () => {
+    const attacker = makeBattleCard('formula-attacker', 1)
+    const target = makeBattleCard('formula-target', 1)
+    attacker.hp = 80
+    attacker.currentHp = 60
+    target.hp = 90
+    target.currentHp = 50
+    const state = makeBattleState({
+      player: makeBattleSide(attacker, 4),
+      opponent: makeBattleSide(target, 3),
+    })
+    const [rage] = getSupportedTcgBattleAttacks([
+      makeAttack({ name: 'Rage', damage: '10+', text: 'Does 10 damage plus 10 more damage for each damage counter on Tauros.' }),
+    ])
+    const [meditate] = getSupportedTcgBattleAttacks([
+      makeAttack({ name: 'Meditate', damage: '20+', text: 'Does 20 damage plus 10 more damage for each damage counter on the Defending Pokémon.' }),
+    ])
+    const [psychic] = getSupportedTcgBattleAttacks([
+      makeAttack({ name: 'Psychic', damage: '10+', text: 'Does 10 damage plus 10 more damage for each Energy card attached to the Defending Pokémon.' }),
+    ])
+    const [karateChop] = getSupportedTcgBattleAttacks([
+      makeAttack({ name: 'Karate Chop', damage: '50-', text: 'Does 50 damage minus 10 damage for each damage counter on Machoke.' }),
+    ])
+    const [superFang] = getSupportedTcgBattleAttacks([
+      makeAttack({ name: 'Super Fang', damage: '?', text: "Does damage to the Defending Pokémon equal to half the Defending Pokémon's remaining HP (rounded up to the nearest 10)." }),
+    ])
+
+    expect(calculateTcgBattleDamage(attacker, rage, target, state, 'player')).toBe(30)
+    expect(calculateTcgBattleDamage(attacker, meditate, target, state, 'player')).toBe(60)
+    expect(calculateTcgBattleDamage(attacker, psychic, target, state, 'player')).toBe(40)
+    expect(calculateTcgBattleDamage(attacker, karateChop, target, state, 'player')).toBe(30)
+    expect(calculateTcgBattleDamage(attacker, superFang, target, state, 'player')).toBe(30)
+  })
+
+  test('resolves dynamic and until-tails classic coin attacks', () => {
+    const attacker = makeBattleCard('coin-attacker', 1)
+    const target = makeBattleCard('coin-target', 1)
+    const benchOne = makeBattleCard('bench-one', 1)
+    const benchTwo = makeBattleCard('bench-two', 1)
+    const state = makeBattleState({
+      player: makeBattleSide(attacker, 3),
+      opponent: makeBattleSide(target, 3, { back: [benchOne, benchTwo] }),
+    })
+    const [bigEggsplosion] = getSupportedTcgBattleAttacks([
+      makeAttack({ name: 'Big Eggsplosion', damage: '20×', text: 'Flip a number of coins equal to the number of Energy attached to Exeggutor. This attack does 20 damage times the number of heads.' }),
+    ])
+    const [benchManipulation] = getSupportedTcgBattleAttacks([
+      makeAttack({ name: 'Bench Manipulation', damage: '20×', text: "Your opponent flips a number of coins equal to the number of Pokémon on his or her Bench. This attack does 20 damage times the number of tails. Don't apply Weakness and Resistance for this attack." }),
+    ])
+    const [stoneBarrage] = getSupportedTcgBattleAttacks([
+      makeAttack({ name: 'Stone Barrage', damage: '10×', text: 'Flip a coin until you get tails. This attack does 10 damage times the number of heads.' }),
+    ])
+
+    expect(resolveTcgBattleAttack({ state, sideKey: 'player', attacker, attack: bigEggsplosion, target, random: () => 0.9 }).targetDamage).toBe(60)
+    expect(resolveTcgBattleAttack({ state, sideKey: 'player', attacker, attack: benchManipulation, target, random: () => 0.1 }).targetDamage).toBe(40)
+    const rolls = [0.9, 0.9, 0.1]
+    const barrage = resolveTcgBattleAttack({ state, sideKey: 'player', attacker, attack: stoneBarrage, target, random: () => rolls.shift() ?? 0.1 })
+    expect(barrage.targetDamage).toBe(20)
+    expect(barrage.coinFlips?.results).toEqual(['heads', 'heads', 'tails'])
+  })
+
+  test('validates attack-specific targets and typed choices', () => {
+    const attacker = makeBattleCard('choice-attacker', 1)
+    const target = makeBattleCard('choice-target', 1)
+    const bench = makeBattleCard('choice-bench', 1)
+    const state = makeBattleState({
+      player: makeBattleSide(attacker, 4),
+      opponent: makeBattleSide(target, 4, { back: [bench] }),
+    })
+    const [lure] = getSupportedTcgBattleAttacks([
+      makeAttack({ name: 'Lure', damage: '', text: "If your opponent has any Benched Pokémon, choose 1 of them and switch it with his or her Active Pokémon." }),
+    ])
+    const [paint] = getSupportedTcgBattleAttacks([
+      makeAttack({ name: 'Paint', damage: '', text: 'Flip a coin. If heads, choose a type (other than Colorless) and put a Coloring counter on the Defending Pokémon. That Pokémon is now the type you chose.' }),
+    ])
+    expect(getValidTcgBattleTargets(state, 'player', attacker, lure)).toEqual([target])
+    expect(validateTcgBattleAttackChoice({ state, sideKey: 'player', attacker, attack: lure, target, paidAttackCost: 1 })).toBe('Choose how that attack should resolve.')
+    expect(validateTcgBattleAttackChoice({ state, sideKey: 'player', attacker, attack: lure, target, choice: { kind: 'benchSwitch', cardId: bench.instanceId }, paidAttackCost: 1 })).toBeNull()
+    expect(validateTcgBattleAttackChoice({ state, sideKey: 'player', attacker, attack: paint, target, choice: { kind: 'typeChange', type: 'Colorless' }, paidAttackCost: 1 })).toBe('Choose a non-Colorless type.')
+  })
+
+  test('copies only supported attacks and carries their required choice', () => {
+    const attacker = makeBattleCard('metronome-user', 1)
+    const target = makeBattleCard('copy-target', 1)
+    const bench = makeBattleCard('copy-bench', 1)
+    const unsupported = makeAttack({
+      name: 'Fetch',
+      damage: '',
+      text: 'Draw a card.',
+    })
+    const lure = makeAttack({
+      name: 'Lure',
+      damage: '',
+      text: "If your opponent has any Benched Pokémon, choose 1 of them and switch it with his or her Active Pokémon.",
+    })
+    target.attacks = [unsupported, lure]
+    const state = makeBattleState({
+      player: makeBattleSide(attacker, 4),
+      opponent: makeBattleSide(target, 4, { back: [bench] }),
+    })
+    const [metronome] = getSupportedTcgBattleAttacks([
+      makeAttack({
+        name: 'Metronome',
+        damage: '',
+        text: "Choose 1 of the Defending Pokémon's attacks. Metronome copies that attack except for its Energy costs and anything else required in order to use that attack.",
+      }),
+    ])
+
+    const choice = chooseTcgBattleAttackChoice({
+      state,
+      sideKey: 'player',
+      attacker,
+      attack: metronome,
+      target,
+      paidAttackCost: 1,
+    })
+
+    expect(choice).toEqual({
+      kind: 'copiedAttack',
+      attackIndex: 1,
+      followUp: { kind: 'benchSwitch', cardId: bench.instanceId },
+    })
+    expect(
+      validateTcgBattleAttackChoice({
+        state,
+        sideKey: 'player',
+        attacker,
+        attack: metronome,
+        target,
+        choice,
+        paidAttackCost: 1,
+      }),
+    ).toBeNull()
+    expect(
+      resolveTcgBattleAttack({
+        state,
+        sideKey: 'player',
+        attacker,
+        attack: metronome,
+        target,
+        choice,
+      }).specialEffects,
+    ).toEqual([{ kind: 'switch', target: 'opponent', condition: undefined }])
   })
 })
