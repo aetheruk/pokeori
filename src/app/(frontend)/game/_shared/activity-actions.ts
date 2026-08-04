@@ -2556,7 +2556,7 @@ export async function completeGameActivity(
             })
             rewardSummary = summary
           }
-        } else if (encounter.skillXp) {
+        } else if (encounter.skillXp && encounter.skillXpOnFailure !== false) {
           const skillXpReward = buildGeneratedResearchSkillXpReward(
             encounter,
             encounter.skillXp.level,

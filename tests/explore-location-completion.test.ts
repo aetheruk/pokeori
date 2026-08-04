@@ -1,5 +1,8 @@
 import { describe, expect, test } from 'bun:test'
-import { getFormattedRewards } from '@/components/game/features/explore/ExploreModalHelpers'
+import {
+  getFormattedRewards,
+  getFormattedStats,
+} from '@/components/game/features/explore/ExploreModalHelpers'
 import { isLocationEntryMastered } from '@/components/game/features/explore/location-completion'
 import type {
   ExploreDisplayItem,
@@ -502,5 +505,30 @@ describe('Explore location completion star', () => {
         }),
       ),
     ).toBe(true)
+  })
+
+  test('shows TCG battle wins and losses in the Explore drawer', () => {
+    const tcgBattleItem = {
+      id: 'tcg-battle-fire-trial',
+      type: 'game',
+      originalData: { gameType: 'tcg-battle' },
+    }
+
+    expect(getFormattedStats(tcgBattleItem, makeUserData())).toMatchObject([
+      { label: 'Wins', value: 0 },
+      { label: 'Losses', value: 0 },
+    ])
+
+    expect(
+      getFormattedStats(
+        tcgBattleItem,
+        makeUserData({
+          gameResults: [{ gameId: tcgBattleItem.id, wins: 2, losses: 1 }],
+        }),
+      ),
+    ).toMatchObject([
+      { label: 'Wins', value: 2 },
+      { label: 'Losses', value: 1 },
+    ])
   })
 })

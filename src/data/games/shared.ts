@@ -25,6 +25,8 @@ export interface BaseGameConfig {
   isRandomEvent?: boolean
   isEligibleForReplay?: boolean
   skillXp?: SkillXpConfig
+  /** Whether the configured skill XP is also awarded when the game is failed. */
+  skillXpOnFailure?: boolean
 }
 
 export type EndlessScoreInterval =

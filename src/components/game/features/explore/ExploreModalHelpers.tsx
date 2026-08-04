@@ -583,6 +583,9 @@ export function getFormattedStats(
     selectedItem.type === 'game' ||
     selectedItem.type === 'field-research'
   ) {
+    const isTcgBattle =
+      selectedItem.type === 'game' &&
+      selectedItem.originalData?.gameType === 'tcg-battle'
     const activityResult =
       selectedItem.type === 'game'
         ? (userData as any).gameResults?.find(
@@ -591,18 +594,18 @@ export function getFormattedStats(
         : (userData as any).fieldResearchResults?.find(
             (result: any) => result.fieldResearchId === selectedItem.id,
           )
-    if (activityResult) {
+    if (activityResult || isTcgBattle) {
       stats.push({
-        label: 'Success',
-        value: activityResult.wins || 0,
+        label: isTcgBattle ? 'Wins' : 'Success',
+        value: activityResult?.wins || 0,
         icon: <ThumbsUp />,
       })
       stats.push({
-        label: 'Fail',
-        value: activityResult.losses || 0,
+        label: isTcgBattle ? 'Losses' : 'Fail',
+        value: activityResult?.losses || 0,
         icon: <ThumbsDown />,
       })
-      if (activityResult.highScore) {
+      if (activityResult?.highScore) {
         stats.push({
           label: 'High Score',
           value: activityResult.highScore,
