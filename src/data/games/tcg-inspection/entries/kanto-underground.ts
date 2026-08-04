@@ -3,8 +3,9 @@ import type { TcgInspectionGameConfig } from '../types'
 export const kantoUndergroundTcgInspectionEntries: TcgInspectionGameConfig[] = [
   {
     id: 'underground-tcg-card-memory-game',
-    name: 'TCG Quiz',
-    description: 'I need to Research the cards correctly to pass my basic training.',
+    name: 'Card Quality Control',
+    description:
+      'Study each sample pack, then identify its cards so Mina can approve them for distribution.',
     category: 'Underground',
     subCategory: 'Kanto Underground',
     icon: { type: 'item', id: 'pack-base1' },
