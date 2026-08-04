@@ -65,6 +65,7 @@ Catalog responses are versioned with the application release, cached privately i
 - Generic energy is spent from a side pool. A turn is a full player-plus-opponent round. Turn gates allow attacks costing 0-1 energy on turns 1-2, 2 on turns 3-4, 3 on turns 5-6, 4 on turns 7-9, and unlimited from turn 10.
 - On turn 15+, both sides' selected energy-card types activate globally. Each selected type removes one matching energy symbol from all attack costs for both players for the rest of the battle; matching selections stack.
 - Wins are decided by remaining living cards. Claiming a player victory counts as one completed research win; opponent wins and exact ties record a failed attempt. Pass-stall tiebreakers only resolve after both sides pass consecutively once the 4+ attack allowance is reached and neither side has a legal attack with remaining energy; results are decided by remaining HP, then living card count. Exact ties are losses for the player.
+- Claiming a TCG Battle result invalidates the server-rendered Explore route, and closing the result refreshes the scoped user snapshot before navigation. Recorded wins, task progress, unlocks, and replacement entries therefore appear without restarting the PWA.
 
 ## Booster Packs
 - Generated via `src/utilities/tcg/` logic
