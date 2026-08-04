@@ -19,6 +19,23 @@ function taskDialogue(task: (typeof tasks)[number] | undefined) {
 }
 
 describe('TCG Basic Training content', () => {
+  test('keeps the complete TCG Underground storyline dialogue free of em dashes', () => {
+    const storylinePrefixes = [
+      'digletts-cave-',
+      'kanto-underground-',
+      'underground-tcg-',
+      'pewter-school-tcg-',
+    ]
+    const storylineTasks = tasks.filter((task) =>
+      storylinePrefixes.some((prefix) => task.id.startsWith(prefix)),
+    )
+
+    expect(storylineTasks.length).toBeGreaterThan(0)
+    for (const task of storylineTasks) {
+      expect(taskDialogue(task), task.id).not.toContain('—')
+    }
+  })
+
   test('authors the underground task progression and visible set gates', () => {
     const basicTraining = tasks.find(
       (task) => task.id === 'underground-tcg-basic-training',

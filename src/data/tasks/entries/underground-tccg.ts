@@ -89,7 +89,7 @@ export const undergroundTccgTasks: Task[] = [
       },
       retryStep(
         'Basic Training',
-        'Mina makes a careful note on your form. “Not quite. Do not worry—the pit cannot see individual quiz results. As far as we know.”',
+        'Mina makes a careful note on your form. “Not quite. Do not worry. The pit cannot see individual quiz results. As far as we know.”',
       ),
     ],
     exitModal: {

@@ -69,7 +69,7 @@ export const kantoUndergroundTasks: Task[] = [
         id: 3,
         title: 'Deep, Deep Underground',
         message:
-          'A much older sign eventually reads: DEEP, DEEP UNDERGROUND. Someone has pinned a smaller notice beneath it: HEAD OFFICE — THIS WAY. Below that, in different handwriting: YES, STILL UNDERGROUND.',
+          'A much older sign eventually reads: DEEP, DEEP UNDERGROUND. Someone has pinned a smaller notice beneath it: HEAD OFFICE: THIS WAY. Below that, in different handwriting: YES, STILL UNDERGROUND.',
         background: undergroundBackground,
         icon: {
           type: 'local',
@@ -219,7 +219,7 @@ export const kantoUndergroundTasks: Task[] = [
         id: 5,
         title: 'Mina',
         message:
-          'Mina opens your Promo binder to the first empty sleeve. “Questions are covered after Basic Training. Mostly by Basic Training. Right then—let’s make this official.”',
+          'Mina opens your Promo binder to the first empty sleeve. “Questions are covered after Basic Training. Mostly by Basic Training. Right then. Let’s make this official.”',
         background: undergroundBackground,
         icon: {
           type: 'trainer',
