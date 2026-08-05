@@ -330,7 +330,7 @@ const tcgItems: Item[] = [
     name: 'Empty Foil Pack',
     description: 'A blank foil wrapper waiting to be filled with a booster pack.',
     category: 'misc',
-    spriteId: 'pack-base4',
+    spriteId: 'tcg/empty-foil-pack',
     sellValue: 10,
   },
 ]
