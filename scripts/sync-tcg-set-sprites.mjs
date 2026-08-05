@@ -80,7 +80,9 @@ async function composeItemSprite({ basePath, overlayPath, overlayBox, outputPath
 
   if (!force && fs.existsSync(outputPath)) return true
 
-  const overlay = await makeOverlay(overlayPath, overlayBox.width, overlayBox.height, overlayBox.rotate || 0)
+  const overlay = overlayPath
+    ? await makeOverlay(overlayPath, overlayBox.width, overlayBox.height, overlayBox.rotate || 0)
+    : null
   ensureDir(path.dirname(outputPath))
 
   const pipeline = sharp(basePath).resize(100, 100, {
@@ -134,6 +136,11 @@ try {
 
   const sets = loadSetsMetadata()
   const results = []
+
+  await composeItemSprite({
+    basePath: boosterBasePath,
+    outputPath: path.join(publicItemDir, 'empty-foil-pack.avif'),
+  })
 
   for (const set of sets) {
     results.push(await syncSet(set))

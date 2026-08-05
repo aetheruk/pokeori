@@ -710,7 +710,7 @@ const DRIED_DYE_RECIPES: ArtisanRecipeDraft[] = PAINT_RECIPES.map((recipe) => {
     name: `Dried ${color[0].toUpperCase()}${color.slice(1)} Dye`,
     description: `Balance and dry ${color} dye into a shelf-stable crafting pigment.`,
     artisanLevel: recipe.artisanLevel + 3,
-    costs: [{ id: recipe.id, amount: 5 }],
+    costs: [{ id: recipe.id, amount: 3 }],
     rewards: [{ type: 'item' as const, targetId: `dried-${color}`, quantity: 1, dropChance: 100 }],
     craftType: 'balance',
     fail: true,
@@ -1480,7 +1480,7 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
   {
     id: 'craft-tcg-foil-pack',
     name: 'Foil Pack',
-    description: 'Press metal scrap into blank foil wrappers to make your own booster packs.',
+    description: 'Add Scrap Metal to the machine to press fresh foil packs.',
     artisanLevel: 10,
     costs: [{ id: 'metal-scrap-t1', amount: 2 }],
     rewards: [{ type: 'item', targetId: 'empty-foil-pack', quantity: 1, dropChance: 100 }],
@@ -1494,7 +1494,7 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
   {
     id: 'craft-tcg-base1-pack',
     name: 'Base Set Booster Pack',
-    description: 'Seal classic Base Set cards in purple-dyed foil.',
+    description: 'Calibrate the printers to manufacture your own Booster Packs.',
     artisanLevel: 12,
     costs: [
       { id: 'empty-foil-pack', amount: 1 },
@@ -1512,7 +1512,7 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
   {
     id: 'craft-tcg-base2-pack',
     name: 'Jungle Booster Pack',
-    description: 'Seal Jungle cards in green-dyed foil.',
+    description: 'Calibrate the printers to manufacture your own Booster Packs.',
     artisanLevel: 12,
     costs: [
       { id: 'empty-foil-pack', amount: 1 },
@@ -1530,7 +1530,7 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
   {
     id: 'craft-tcg-base3-pack',
     name: 'Fossil Booster Pack',
-    description: 'Seal Fossil cards in yellow-dyed foil.',
+    description: 'Calibrate the printers to manufacture your own Booster Packs.',
     artisanLevel: 12,
     costs: [
       { id: 'empty-foil-pack', amount: 1 },
@@ -1548,7 +1548,7 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
   {
     id: 'craft-tcg-base4-pack',
     name: 'Base Set 2 Booster Pack',
-    description: 'Balance foil, colour, and dye into a freshly printed Base Set 2 booster pack.',
+    description: 'Calibrate the printers to manufacture your own Booster Packs.',
     artisanLevel: 12,
     costs: [
       { id: 'empty-foil-pack', amount: 1 },
@@ -1566,7 +1566,7 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
   {
     id: 'craft-tcg-base5-pack',
     name: 'Team Rocket Booster Pack',
-    description: 'Seal Team Rocket cards in black-dyed foil for binder owners.',
+    description: 'Calibrate the printers to manufacture your own Booster Packs.',
     artisanLevel: 12,
     costs: [
       { id: 'empty-foil-pack', amount: 1 },

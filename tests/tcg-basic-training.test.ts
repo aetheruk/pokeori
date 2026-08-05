@@ -357,9 +357,12 @@ describe('TCG Basic Training content', () => {
       ),
     }))
 
-    expect(items.find((item) => item.id === 'empty-foil-pack')).toBeDefined()
+    expect(items.find((item) => item.id === 'empty-foil-pack')).toMatchObject({
+      spriteId: 'tcg/empty-foil-pack',
+    })
     expect(foil).toMatchObject({
       category: 'tcg',
+      description: 'Add Scrap Metal to the machine to press fresh foil packs.',
       craftType: 'scatter',
       outputQuantity: { min: 0, max: 5 },
       qualityOutputQuantity: { good: 3, perfect: 5 },
@@ -367,6 +370,8 @@ describe('TCG Basic Training content', () => {
     for (const { setId, dyeId, recipe } of packRecipes) {
       expect(recipe).toMatchObject({
         category: 'tcg',
+        description:
+          'Calibrate the printers to manufacture your own Booster Packs.',
         craftType: 'balance',
         costs: [
           { id: 'empty-foil-pack', amount: 1 },
