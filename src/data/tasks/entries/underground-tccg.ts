@@ -25,7 +25,8 @@ export const undergroundTccgTasks: Task[] = [
   {
     id: 'underground-tcg-basic-training',
     name: 'Basic Training',
-    description: 'This is all quite strange… Nobody seems to be acknowledging the pit. Is that fine?',
+    description:
+      'This is all quite strange… Nobody seems to be acknowledging the pit. Is that fine?',
     category: 'Underground',
     subCategory: 'Kanto Underground',
     icon: maniacMale,
@@ -155,7 +156,8 @@ export const undergroundTccgTasks: Task[] = [
   {
     id: 'underground-tcg-card-memory',
     name: 'Know Your Cards',
-    description: 'Apparently to be effective at spreading the word I need knowledge of the cards themselves.',
+    description:
+      'Apparently to be effective at spreading the word I need knowledge of the cards themselves.',
     category: 'Underground',
     subCategory: 'Kanto Underground',
     icon: { type: 'item', id: 'pack-base1' },
@@ -271,7 +273,8 @@ export const undergroundTccgTasks: Task[] = [
   {
     id: 'underground-tcg-funding',
     name: 'Who Pays for All This?',
-    description: 'The card operation is much larger than I expected. Where is the funding coming from?',
+    description:
+      'The card operation is much larger than I expected. Where is the funding coming from?',
     category: 'Underground',
     subCategory: 'Kanto Underground',
     icon: maniacFemale,
@@ -464,8 +467,7 @@ export const undergroundTccgTasks: Task[] = [
   {
     id: 'underground-tcg-marina-outreach',
     name: 'Quality Assurance',
-    description:
-      'Cal says Marina approved the team’s highly internal approach to public outreach.',
+    description: 'Cal says Marina approved the team’s highly internal approach to public outreach.',
     category: 'Underground',
     subCategory: 'Kanto Underground',
     icon: maniacFemale,
@@ -602,9 +604,24 @@ export const undergroundTccgTasks: Task[] = [
     completeButtonText: 'Design My First Card',
     chat: true,
     requirements: [
-      { type: 'game_result', targetId: 'underground-tcg-battle-fire', battleStatus: 'win', count: 1 },
-      { type: 'game_result', targetId: 'underground-tcg-battle-water', battleStatus: 'win', count: 1 },
-      { type: 'game_result', targetId: 'underground-tcg-battle-grass', battleStatus: 'win', count: 1 },
+      {
+        type: 'game_result',
+        targetId: 'underground-tcg-battle-fire',
+        battleStatus: 'win',
+        count: 1,
+      },
+      {
+        type: 'game_result',
+        targetId: 'underground-tcg-battle-water',
+        battleStatus: 'win',
+        count: 1,
+      },
+      {
+        type: 'game_result',
+        targetId: 'underground-tcg-battle-grass',
+        battleStatus: 'win',
+        count: 1,
+      },
     ],
     criteria: [],
     rewards: [],
@@ -675,7 +692,14 @@ export const undergroundTccgTasks: Task[] = [
     completionTrigger: 'manual',
     completeButtonText: 'Finish Basic Training',
     chat: true,
-    requirements: [{ type: 'game_result', targetId: 'underground-tcg-art-academy', battleStatus: 'win', count: 1 }],
+    requirements: [
+      {
+        type: 'game_result',
+        targetId: 'underground-tcg-art-academy',
+        battleStatus: 'win',
+        count: 1,
+      },
+    ],
     criteria: [],
     rewards: [],
     enterModal: [
@@ -726,7 +750,8 @@ export const undergroundTccgTasks: Task[] = [
   {
     id: 'underground-tcg-my-very-own-set',
     name: 'My Very Own Set',
-    description: 'The best way to practise designing a set is to copy an existing one and change it slightly.',
+    description:
+      'The best way to practise designing a set is to copy an existing one and change it slightly.',
     category: 'Underground',
     subCategory: 'Kanto Underground',
     icon: { type: 'item', id: 'binder-base4' },
@@ -833,8 +858,61 @@ export const undergroundTccgTasks: Task[] = [
       title: 'A Stroke of Genius',
       icon: { type: 'pokemon', id: '137' },
       message:
-        'Reused artwork, one additional number, and an entirely renewed appetite for collecting. Mina awards you 50,000 Pokédollars and Promo Computer Error while the next shipment of crystals rolls toward the pit.',
+        'Reused artwork, one additional number, and an entirely renewed appetite for collecting. Mina awards you 20,000 Pokédollars and Promo Cool Porygon while the next shipment of crystals rolls toward the pit.',
       closeButtonText: 'Accept the Reward',
+    },
+  },
+  {
+    id: 'underground-tcg-booster-box-manufacturing',
+    name: 'Profit Time!',
+    description: 'Now were talking. Minas going to show mw how to get in on the action.',
+    category: 'Underground',
+    subCategory: 'Kanto Underground',
+    icon: { type: 'item', id: 'pack-base4' },
+    background: undergroundBackground,
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Review Manufacturing',
+    chat: true,
+    requirements: [{ type: 'task_completed', targetId: 'underground-tcg-my-very-own-set' }],
+    criteria: [],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        title: 'Mina',
+        message: 'I see you eyeing up those crates, you want in on the action do you?',
+        background: undergroundBackground,
+        icon: maniacFemale,
+        buttons: [{ text: 'Kinda...', type: 'navigate', id: 2 }],
+      },
+      {
+        id: 2,
+        title: 'Gideon',
+        message:
+          'Well! Its simple enough, Once you complete a set yourself, we will go ahead and assume you have full knowledge of it approve you for manufacturing',
+        background: undergroundBackground,
+        icon: maniacMale,
+        buttons: [{ text: 'Go on', type: 'navigate', id: 3 }],
+      },
+      {
+        id: 3,
+        title: 'Mina',
+        message:
+          'To summarise, finish a set, make your own packs, enough for a booster box obviously were not shipping singles then bring them back here and youll be paid for your hard work.',
+        background: undergroundBackground,
+        icon: maniacFemale,
+        buttons: [{ text: 'How much?', type: 'success' }],
+      },
+    ],
+    exitModal: {
+      background: undergroundBackground,
+      title: 'Booster Box Manufacturing',
+      icon: { type: 'item', id: 'pack-base4' },
+      message:
+        'The production rule is simple: thirty-six matching Booster Packs make one Booster Box. Finish a set binder, fill the order, and send the crate upstairs. HQ will pay 8,000 Pokédollars for each completed shipment.',
+      closeButtonText: 'Return to the Presses',
     },
   },
 ]

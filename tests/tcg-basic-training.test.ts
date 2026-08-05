@@ -69,6 +69,9 @@ describe('TCG Basic Training content', () => {
     const base4Complete = tasks.find(
       (task) => task.id === 'underground-tcg-base4-complete',
     )
+    const boosterBoxManufacturing = tasks.find(
+      (task) => task.id === 'underground-tcg-booster-box-manufacturing',
+    )
 
     expect(basicTraining?.enterModal).toHaveLength(5)
     expect(
@@ -119,6 +122,22 @@ describe('TCG Basic Training content', () => {
       targetId: 'pokedollars',
       quantity: 20000,
     })
+    expect(boosterBoxManufacturing).toMatchObject({
+      name: 'Profit Time!',
+      repeatable: false,
+      chat: true,
+      requirements: [
+        { type: 'task_completed', targetId: 'underground-tcg-my-very-own-set' },
+      ],
+      criteria: [],
+      rewards: [],
+    })
+    expect(taskDialogue(boosterBoxManufacturing)).toContain(
+      'thirty-six matching Booster Packs',
+    )
+    expect(taskDialogue(boosterBoxManufacturing)).toContain('8,000 Pokédollars')
+    expect(taskDialogue(boosterBoxManufacturing)).not.toContain('Artisan')
+    expect(taskDialogue(boosterBoxManufacturing)).not.toContain('Explore')
     expect(battleWrapup?.completeButtonText).toBe('Design My First Card')
     expect(battleWrapup?.name).toBe('Back to Work')
     expect(battleWrapup?.requirements).toEqual([
@@ -428,6 +447,7 @@ describe('TCG Basic Training content', () => {
     expect(foil).toMatchObject({
       category: 'tcg',
       description: 'Add Scrap Metal to the machine to press fresh foil packs.',
+      artisanLevel: 15,
       craftType: 'scatter',
       outputQuantity: { min: 0, max: 5 },
       qualityOutputQuantity: { good: 3, perfect: 5 },
@@ -435,6 +455,7 @@ describe('TCG Basic Training content', () => {
     for (const { setId, dyeId, recipe } of packRecipes) {
       expect(recipe).toMatchObject({
         category: 'tcg',
+        artisanLevel: 22,
         description:
           'Calibrate the printers to manufacture your own Booster Packs.',
         craftType: 'balance',
