@@ -1481,7 +1481,7 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
     id: 'craft-tcg-foil-pack',
     name: 'Foil Pack',
     description: 'Add Scrap Metal to the machine to press fresh foil packs.',
-    artisanLevel: 10,
+    artisanLevel: 15,
     costs: [{ id: 'metal-scrap-t1', amount: 2 }],
     rewards: [{ type: 'item', targetId: 'empty-foil-pack', quantity: 1, dropChance: 100 }],
     craftType: 'scatter',
@@ -1495,7 +1495,7 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
     id: 'craft-tcg-base1-pack',
     name: 'Base Set Booster Pack',
     description: 'Calibrate the printers to manufacture your own Booster Packs.',
-    artisanLevel: 12,
+    artisanLevel: 22,
     costs: [
       { id: 'empty-foil-pack', amount: 1 },
       { id: 'dried-purple', amount: 1 },
@@ -1513,7 +1513,7 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
     id: 'craft-tcg-base2-pack',
     name: 'Jungle Booster Pack',
     description: 'Calibrate the printers to manufacture your own Booster Packs.',
-    artisanLevel: 12,
+    artisanLevel: 22,
     costs: [
       { id: 'empty-foil-pack', amount: 1 },
       { id: 'dried-green', amount: 1 },
@@ -1531,7 +1531,7 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
     id: 'craft-tcg-base3-pack',
     name: 'Fossil Booster Pack',
     description: 'Calibrate the printers to manufacture your own Booster Packs.',
-    artisanLevel: 12,
+    artisanLevel: 22,
     costs: [
       { id: 'empty-foil-pack', amount: 1 },
       { id: 'dried-yellow', amount: 1 },
@@ -1549,7 +1549,7 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
     id: 'craft-tcg-base4-pack',
     name: 'Base Set 2 Booster Pack',
     description: 'Calibrate the printers to manufacture your own Booster Packs.',
-    artisanLevel: 12,
+    artisanLevel: 22,
     costs: [
       { id: 'empty-foil-pack', amount: 1 },
       { id: 'dried-red', amount: 1 },
@@ -1567,7 +1567,7 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
     id: 'craft-tcg-base5-pack',
     name: 'Team Rocket Booster Pack',
     description: 'Calibrate the printers to manufacture your own Booster Packs.',
-    artisanLevel: 12,
+    artisanLevel: 22,
     costs: [
       { id: 'empty-foil-pack', amount: 1 },
       { id: 'dried-black', amount: 1 },
@@ -1588,7 +1588,7 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
     id: 'craft-tcg-gym1-pack',
     name: 'Gym Heroes Booster Pack',
     description: 'Calibrate the printers to manufacture your own Booster Packs.',
-    artisanLevel: 12,
+    artisanLevel: 22,
     costs: [
       { id: 'empty-foil-pack', amount: 1 },
       { id: 'dried-blue', amount: 1 },
