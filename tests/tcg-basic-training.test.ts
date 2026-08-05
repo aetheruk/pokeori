@@ -97,19 +97,9 @@ describe('TCG Basic Training content', () => {
       quantity: 1,
       dropChance: 100,
     })
-    expect(ownSet?.criteria).toEqual([
-      {
-        type: 'card_collected_set',
-        targetId: 'base1',
-        count: 102,
-        unique: true,
-      },
-      {
-        type: 'card_collected_set',
-        targetId: 'base2',
-        count: 64,
-        unique: true,
-      },
+    expect(ownSet?.criteria).toEqual([])
+    expect(ownSet?.requirements).toEqual([
+      { type: 'task_completed', targetId: 'underground-tcg-wrapup' },
     ])
     expect(base4Complete?.criteria).toEqual([
       {
@@ -353,9 +343,19 @@ describe('TCG Basic Training content', () => {
     const foil = artisanRecipes.find(
       (recipe) => recipe.id === 'craft-tcg-foil-pack',
     )
-    const base4 = artisanRecipes.find(
-      (recipe) => recipe.id === 'craft-tcg-base4-pack',
-    )
+    const packRecipes = [
+      { setId: 'base1', dyeId: 'dried-purple' },
+      { setId: 'base2', dyeId: 'dried-green' },
+      { setId: 'base3', dyeId: 'dried-yellow' },
+      { setId: 'base4', dyeId: 'dried-red' },
+      { setId: 'base5', dyeId: 'dried-black' },
+    ].map(({ setId, dyeId }) => ({
+      setId,
+      dyeId,
+      recipe: artisanRecipes.find(
+        (entry) => entry.id === `craft-tcg-${setId}-pack`,
+      ),
+    }))
 
     expect(items.find((item) => item.id === 'empty-foil-pack')).toBeDefined()
     expect(foil).toMatchObject({
@@ -364,12 +364,27 @@ describe('TCG Basic Training content', () => {
       outputQuantity: { min: 0, max: 5 },
       qualityOutputQuantity: { good: 3, perfect: 5 },
     })
-    expect(base4).toMatchObject({
-      category: 'tcg',
-      craftType: 'balance',
-      outputQuantity: { min: 0, max: 2 },
-      qualityOutputQuantity: { good: 1, perfect: 2 },
-      materialFailQualities: ['bad'],
+    for (const { setId, dyeId, recipe } of packRecipes) {
+      expect(recipe).toMatchObject({
+        category: 'tcg',
+        craftType: 'balance',
+        costs: [
+          { id: 'empty-foil-pack', amount: 1 },
+          { id: dyeId, amount: 1 },
+        ],
+        rewards: [
+          { type: 'item', targetId: `pack-${setId}`, quantity: 1 },
+        ],
+        outputQuantity: { min: 0, max: 2 },
+        qualityOutputQuantity: { good: 1, perfect: 2 },
+        materialFailQualities: ['bad'],
+      })
+    }
+    const base4 = packRecipes.find(({ setId }) => setId === 'base4')?.recipe
+    const base5 = packRecipes.find(({ setId }) => setId === 'base5')?.recipe
+    expect(base5?.requirements).toContainEqual({
+      type: 'item_owned',
+      targetId: 'binder-base5',
     })
     expect(shouldConsumeCraftCosts(base4!, 'bad')).toBe(true)
     expect(resolveCraftRewards(base4!, 'bad')).toEqual([])

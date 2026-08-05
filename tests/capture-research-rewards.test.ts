@@ -89,6 +89,17 @@ describe('capture research XP rewards', () => {
     ])
   })
 
+  test('does not add EV-reducing berries to the catch healing pool', () => {
+    const rewards = buildCaptureHealingBerryRewards(100, () => 0.99)
+    expect(rewards.map((reward) => reward.targetId)).toEqual([
+      'lum-berry',
+      'lum-berry',
+    ])
+    expect(rewards.map((reward) => reward.targetId)).not.toContain(
+      'pomeg-berry',
+    )
+  })
+
   test('adds the global catch Escape Rope roll', () => {
     expect(buildCaptureEscapeRopeReward()).toEqual({
       type: 'item',

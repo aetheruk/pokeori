@@ -2,8 +2,12 @@ import { describe, expect, test } from 'bun:test'
 import {
   buildFieldObservationBerryRewards,
   buildFieldObservationMintRewards,
+  FIELD_OBSERVATION_ADDITIONAL_NUT_DROP_LEVEL,
+  FIELD_OBSERVATION_EV_BERRIES,
+  FIELD_OBSERVATION_EV_BERRY_UNLOCKS,
   FIELD_OBSERVATION_HEALING_BERRY_UNLOCKS,
   FIELD_OBSERVATION_MINTS,
+  getFieldObservationEvBerries,
   getFieldObservationHealingBerries,
   getFieldObservationMints,
   FIELD_OBSERVATION_NUTS,
@@ -139,7 +143,7 @@ describe('field observation berry drops', () => {
         const selectionRoll =
           (cumulativeWeight + entry.weight / 2) / totalWeight
         cumulativeWeight += entry.weight
-        const rolls = [0.84, selectionRoll]
+        const rolls = [0.84, 0.99, selectionRoll, 0.49, 0.49]
         Math.random = () => rolls.shift() ?? 0
         const [reward] = buildFieldObservationBerryRewards(
           [{ speciesId: 1, formId: '1', level: 10, pokemonResearchXp: 1 }],
@@ -181,6 +185,31 @@ describe('field observation berry drops', () => {
     expect(getFieldObservationNuts(40)).toEqual([...FIELD_OBSERVATION_NUTS])
   })
 
+  test('Researcher level 37 rolls the nut table a second time', () => {
+    const originalRandom = Math.random
+    try {
+      const singleRoll = [0.84, 0, 0.49]
+      Math.random = () => singleRoll.shift() ?? 0
+      const beforeUnlock = buildFieldObservationBerryRewards(
+        [{ speciesId: 1, formId: '1', level: 10, pokemonResearchXp: 1 }],
+        pokemonData as any[],
+        FIELD_OBSERVATION_ADDITIONAL_NUT_DROP_LEVEL - 1,
+      )
+      expect(beforeUnlock).toHaveLength(1)
+
+      const doubleRoll = [0.84, 0.84, 0, 0, 0.49]
+      Math.random = () => doubleRoll.shift() ?? 0
+      const afterUnlock = buildFieldObservationBerryRewards(
+        [{ speciesId: 1, formId: '1', level: 10, pokemonResearchXp: 1 }],
+        pokemonData as any[],
+        FIELD_OBSERVATION_ADDITIONAL_NUT_DROP_LEVEL,
+      )
+      expect(afterUnlock).toHaveLength(2)
+    } finally {
+      Math.random = originalRandom
+    }
+  })
+
   test('healing berries unlock as a separate Researcher field pool', () => {
     expect(getFieldObservationHealingBerries(15)).toEqual([])
     expect(getFieldObservationHealingBerries(16)).toEqual([
@@ -204,10 +233,35 @@ describe('field observation berry drops', () => {
       'sitrus-berry',
       'lum-berry',
     ])
-    expect(getFieldObservationHealingBerries(41)).not.toContain('pomeg-berry')
     expect(getFieldObservationHealingBerries(42)).toEqual(
       FIELD_OBSERVATION_HEALING_BERRY_UNLOCKS.map((unlock) => unlock.itemId),
     )
+    expect(getFieldObservationHealingBerries(42)).not.toContain('pomeg-berry')
+  })
+
+  test('EV-reducing berries unlock as an independent Researcher field pool', () => {
+    expect(getFieldObservationEvBerries(41)).toEqual([])
+    expect(getFieldObservationEvBerries(42)).toEqual(
+      FIELD_OBSERVATION_EV_BERRY_UNLOCKS.map((unlock) => unlock.itemId),
+    )
+    expect(getFieldObservationEvBerries(42)).toEqual(FIELD_OBSERVATION_EV_BERRIES)
+
+    const originalRandom = Math.random
+    try {
+      const rolls = [0.99, 0.99, 0.5, 0, 0.5, 0]
+      Math.random = () => rolls.shift() ?? 0
+      const rewards = buildFieldObservationBerryRewards(
+        [{ speciesId: 1, formId: '1', level: 10, pokemonResearchXp: 1 }],
+        pokemonData as any[],
+        42,
+      )
+      expect(rewards.map((reward) => reward.targetId)).toEqual([
+        'oran-berry',
+        'pomeg-berry',
+      ])
+    } finally {
+      Math.random = originalRandom
+    }
   })
 
   test('healing berry rewards start at zero to one drops', () => {
