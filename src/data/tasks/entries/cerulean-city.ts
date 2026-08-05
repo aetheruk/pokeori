@@ -1905,6 +1905,12 @@ export const ceruleanCityTasks: Task[] = [
         count: 1,
         consume: true,
       },
+      {
+        type: 'currency_owned',
+        targetId: 'crystals',
+        count: 20,
+        consume: true,
+      },
     ],
     rewards: [
       {

@@ -5095,6 +5095,12 @@ describe('static data references', () => {
 
     for (const entry of gymDailyEntries) {
       expect(entry).toBeDefined()
+      expect(entry?.criteria).toContainEqual({
+        type: 'currency_owned',
+        targetId: 'crystals',
+        count: 20,
+        consume: true,
+      })
       const rewards = entry?.rewards || []
       expect(rewards).toContainEqual({
         type: 'item',

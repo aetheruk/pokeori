@@ -13,6 +13,7 @@ import { diglettsCaveTasks } from './entries/digletts-cave'
 import { route10Tasks } from './entries/route-10'
 import { kantoUndergroundTasks } from './entries/kanto-underground'
 import { undergroundTccgTasks } from './entries/underground-tccg'
+import { tcgBoosterBoxDeliveryTasks } from './entries/tcg-booster-box-deliveries'
 import { rockTunnelTasks } from './entries/rock-tunnel'
 import { lavenderTownTasks } from './entries/lavender-town'
 import { celadonCityTasks } from './entries/celadon-city'
@@ -50,6 +51,7 @@ export const tasks: Task[] = [
   ...route10Tasks,
   ...kantoUndergroundTasks,
   ...undergroundTccgTasks,
+  ...tcgBoosterBoxDeliveryTasks,
   ...rockTunnelTasks,
   ...lavenderTownTasks,
   ...celadonCityTasks,

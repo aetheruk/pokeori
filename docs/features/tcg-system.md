@@ -16,6 +16,8 @@ Trading Card Game collection and booster pack opening.
 - View collection by set
 - Build saved 15-card Baby, Champions, and Masters battle decks per TCG generation series, with card previews and live deck-cost totals in Trainer and CardDex
 - Send duplicate cards to HQ for Pokedollars after unlocking the `card-crystalizer` key item (the Card Redistribution Box)
+- Deliver 36 packs as a repeatable Booster Box Delivery after completing the matching binder; each generated set task consumes the packs and pays 8,000 Pokedollars
+- Daily Gym Pack activities for Brock, Misty, Surge, and Erika consume 20 Crystals in addition to their existing entry requirements
 - Card rarity indicators
 - Trade with friends (planned)
 
