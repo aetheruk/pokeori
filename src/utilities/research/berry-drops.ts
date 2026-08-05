@@ -22,6 +22,9 @@ export const FIELD_OBSERVATION_HEALING_BERRY_UNLOCKS = [
   { itemId: 'persim-berry', level: 16 },
   { itemId: 'sitrus-berry', level: 38 },
   { itemId: 'lum-berry', level: 38 },
+] as const
+
+export const FIELD_OBSERVATION_EV_BERRY_UNLOCKS = [
   { itemId: 'pomeg-berry', level: 42 },
   { itemId: 'kelpsy-berry', level: 42 },
   { itemId: 'qualot-berry', level: 42 },
@@ -30,7 +33,13 @@ export const FIELD_OBSERVATION_HEALING_BERRY_UNLOCKS = [
   { itemId: 'tamato-berry', level: 42 },
 ] as const
 
+export const FIELD_OBSERVATION_ADDITIONAL_NUT_DROP_LEVEL = 37
+
 export const FIELD_OBSERVATION_NUTS = FIELD_OBSERVATION_NUT_UNLOCKS.map(
+  (unlock) => unlock.itemId,
+)
+
+export const FIELD_OBSERVATION_EV_BERRIES = FIELD_OBSERVATION_EV_BERRY_UNLOCKS.map(
   (unlock) => unlock.itemId,
 )
 
@@ -96,6 +105,15 @@ export function getFieldObservationHealingBerries(
   ).map((unlock) => unlock.itemId)
 }
 
+export function getFieldObservationEvBerries(
+  researchingLevel: number,
+): string[] {
+  const safeLevel = Math.max(1, Math.floor(researchingLevel || 1))
+  return FIELD_OBSERVATION_EV_BERRY_UNLOCKS.filter(
+    (unlock) => safeLevel >= unlock.level,
+  ).map((unlock) => unlock.itemId)
+}
+
 export function getFieldObservationMints(researchingLevel: number): string[] {
   const safeLevel = Math.max(1, Math.floor(researchingLevel || 1))
   return FIELD_OBSERVATION_MINT_UNLOCKS.filter(
@@ -103,7 +121,7 @@ export function getFieldObservationMints(researchingLevel: number): string[] {
   ).map((unlock) => unlock.itemId)
 }
 
-function getNutRewardCount(): number {
+function rollNutRewardCount(): number {
   const roll = Math.random()
   if (roll < 0.1) return 3
   if (roll < 0.3) return 2
@@ -111,9 +129,22 @@ function getNutRewardCount(): number {
   return 0
 }
 
+function getNutRewardCount(researchingLevel: number): number {
+  const baseCount = rollNutRewardCount()
+  if (researchingLevel < FIELD_OBSERVATION_ADDITIONAL_NUT_DROP_LEVEL) {
+    return baseCount
+  }
+  return baseCount + rollNutRewardCount()
+}
+
 function getHealingBerryRewardCount(researchingLevel: number): number {
   if (researchingLevel < FIELD_OBSERVATION_HEALING_BERRY_UNLOCKS[0].level)
     return 0
+  return Math.random() < 0.5 ? 0 : 1
+}
+
+function getEvBerryRewardCount(researchingLevel: number): number {
+  if (researchingLevel < FIELD_OBSERVATION_EV_BERRY_UNLOCKS[0].level) return 0
   return Math.random() < 0.5 ? 0 : 1
 }
 
@@ -176,15 +207,19 @@ export function buildFieldObservationBerryRewards(
   if (rewardSubjects.length === 0) return []
 
   const nuts = pickWeightedBerries(
-    getNutRewardCount(),
+    getNutRewardCount(researchingLevel),
     getFieldObservationNutDropWeights(researchingLevel),
   )
   const healingBerries = pickBerries(
     getHealingBerryRewardCount(researchingLevel),
     getFieldObservationHealingBerries(researchingLevel),
   )
+  const evBerries = pickBerries(
+    getEvBerryRewardCount(researchingLevel),
+    getFieldObservationEvBerries(researchingLevel),
+  )
 
-  return [...nuts, ...healingBerries].map((berryId) => ({
+  return [...nuts, ...healingBerries, ...evBerries].map((berryId) => ({
     type: 'item',
     targetId: berryId,
     quantity: 1,

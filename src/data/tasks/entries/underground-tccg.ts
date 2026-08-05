@@ -734,20 +734,17 @@ export const undergroundTccgTasks: Task[] = [
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Show My Collection',
+    completeButtonText: 'Begin Set Design',
     chat: true,
     requirements: [{ type: 'task_completed', targetId: 'underground-tcg-wrapup' }],
-    criteria: [
-      { type: 'card_collected_set', targetId: 'base1', count: 102, unique: true },
-      { type: 'card_collected_set', targetId: 'base2', count: 64, unique: true },
-    ],
+    criteria: [],
     rewards: [{ type: 'item', targetId: 'binder-base4', quantity: 1, dropChance: 100 }],
     enterModal: [
       {
         id: 1,
         title: 'Mina',
         message:
-          'Mina turns through your completed Base and Jungle collections while Gideon records the totals twice. “Two full sets. You understand what collectors expect, which means you are ready to design a set of your own.”',
+          'Mina turns through examples from the Base and Jungle collections while Gideon records the card totals twice. “You have seen what collectors expect, which means you are ready to design a set of your own.”',
         background: undergroundBackground,
         icon: maniacFemale,
         buttons: [{ text: 'Where do I start?', type: 'navigate', id: 2 }],

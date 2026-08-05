@@ -20,6 +20,8 @@ import {
 import { FIELD_OBSERVATION_RESEARCH_XP_UNLOCKS } from '@/utilities/research/research-levels'
 import { FIELD_OBSERVATION_PRIMARY_MATERIAL_LIMIT_UNLOCKS } from '@/utilities/artisan/material-drops'
 import {
+  FIELD_OBSERVATION_ADDITIONAL_NUT_DROP_LEVEL,
+  FIELD_OBSERVATION_EV_BERRY_UNLOCKS,
   FIELD_OBSERVATION_HEALING_BERRY_UNLOCKS,
   FIELD_OBSERVATION_MINT_DROP_CHANCE,
   FIELD_OBSERVATION_MINT_UNLOCK_LEVEL,
@@ -164,15 +166,42 @@ const healingBerryUnlocks: SkillGuideUnlock[] = FIELD_OBSERVATION_HEALING_BERRY_
     label:
       unlock.itemId === 'oran-berry'
         ? 'Healing Berries'
-        : unlock.itemId === 'pomeg-berry'
-          ? 'EV-Reducing Berries'
         : berry?.name || unlock.itemId,
     description:
       unlock.itemId === 'oran-berry'
         ? 'Find 0-1 healing berries in Field Observation.'
-        : unlock.itemId === 'pomeg-berry'
-          ? 'Adds EV-reducing berries to healing berry drops.'
         : `Adds ${berry?.name || 'this berry'} to healing berry drops.`,
+    source: 'authored',
+    itemId: unlock.itemId,
+    icon: itemIcon(unlock.itemId),
+  }
+})
+
+const additionalNutDropUnlock: SkillGuideUnlock = {
+  skillId: 'researching',
+  level: FIELD_OBSERVATION_ADDITIONAL_NUT_DROP_LEVEL,
+  category: 'items',
+  label: 'Additional Nut Drops',
+  description: 'Field Observation rolls the dye nut drop table a second time.',
+  source: 'authored',
+  itemId: 'nut-red',
+  icon: itemIcon('nut-red'),
+}
+
+const evBerryUnlocks: SkillGuideUnlock[] = FIELD_OBSERVATION_EV_BERRY_UNLOCKS.map((unlock) => {
+  const berry = guideItemsById.get(unlock.itemId)
+  return {
+    skillId: 'researching',
+    level: unlock.level,
+    category: 'items',
+    label:
+      unlock.itemId === 'pomeg-berry'
+        ? 'EV-Reducing Berries'
+        : berry?.name || unlock.itemId,
+    description:
+      unlock.itemId === 'pomeg-berry'
+        ? 'Find 0-1 EV-reducing berries from a separate Field Observation drop roll.'
+        : `Adds ${berry?.name || 'this berry'} to EV-reducing berry drops.`,
     source: 'authored',
     itemId: unlock.itemId,
     icon: itemIcon(unlock.itemId),
@@ -425,7 +454,9 @@ export const authoredSkillGuideUnlocks: SkillGuideUnlock[] = [
   ...fieldObservationResearchUnlocks,
   ...fieldObservationMaterialUnlocks,
   ...nutUnlocks,
+  additionalNutDropUnlock,
   ...healingBerryUnlocks,
+  ...evBerryUnlocks,
   ...fieldObservationMintUnlocks,
   ...researcherMoveSlotUnlocks,
   {

@@ -644,6 +644,14 @@ describe('skill unlock helpers', () => {
     )
     expect(researcherGuide).toContainEqual(
       expect.objectContaining({
+        label: 'Additional Nut Drops',
+        itemId: 'nut-red',
+        level: 37,
+        source: 'authored',
+      }),
+    )
+    expect(researcherGuide).toContainEqual(
+      expect.objectContaining({
         label: 'Healing Berries',
         itemId: 'oran-berry',
         level: 16,
