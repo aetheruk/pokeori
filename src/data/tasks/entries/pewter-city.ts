@@ -1536,6 +1536,12 @@ export const pewterCityTasks: Task[] = [
         count: 10,
         consume: true,
       },
+      {
+        type: 'currency_owned',
+        targetId: 'crystals',
+        count: 20,
+        consume: true,
+      },
     ],
     rewards: [
       {

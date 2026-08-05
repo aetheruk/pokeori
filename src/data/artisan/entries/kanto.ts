@@ -1584,6 +1584,27 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
       { type: 'item_owned', targetId: 'binder-base5' },
     ],
   },
+  {
+    id: 'craft-tcg-gym1-pack',
+    name: 'Gym Heroes Booster Pack',
+    description: 'Calibrate the printers to manufacture your own Booster Packs.',
+    artisanLevel: 12,
+    costs: [
+      { id: 'empty-foil-pack', amount: 1 },
+      { id: 'dried-blue', amount: 1 },
+    ],
+    rewards: [{ type: 'item', targetId: 'pack-gym1', quantity: 1, dropChance: 100 }],
+    craftType: 'balance',
+    outputQuantity: { min: 0, max: 2 },
+    qualityOutputQuantity: { good: 1, perfect: 2 },
+    minimumQuality: 'good',
+    materialFailQualities: ['bad'],
+    iconItemId: 'pack-gym1',
+    requirements: [
+      { type: 'task_completed', targetId: 'underground-tcg-my-very-own-set' },
+      { type: 'card_collected_set', targetId: 'gym1', count: 132, unique: true },
+    ],
+  },
 ]
 
 export const kantoArtisanRecipes: ArtisanRecipe[] = [

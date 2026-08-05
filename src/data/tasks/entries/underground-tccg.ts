@@ -793,7 +793,7 @@ export const undergroundTccgTasks: Task[] = [
     requirements: [{ type: 'task_completed', targetId: 'underground-tcg-my-very-own-set' }],
     criteria: [{ type: 'card_collected_set', targetId: 'base4', count: 130, unique: true }],
     rewards: [
-      { type: 'currency', targetId: 'pokedollars', quantity: 50000 },
+      { type: 'currency', targetId: 'pokedollars', quantity: 20000 },
       {
         type: 'card',
         quantity: 1,

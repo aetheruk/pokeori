@@ -4,6 +4,11 @@ import { allGames } from '@/data/games'
 import { items } from '@/data/items'
 import { tasks } from '@/data/tasks'
 import { tcgRarityPokedollarValues } from '@/data/tcg-rarity'
+import { tcgSetSummaries } from '@/data/tcg/summaries'
+import {
+  TCG_BOOSTER_BOX_PACK_COUNT,
+  TCG_BOOSTER_BOX_REWARD,
+} from '@/data/tasks/entries/tcg-booster-box-deliveries'
 import {
   resolveCraftRewards,
   shouldConsumeCraftCosts,
@@ -109,6 +114,11 @@ describe('TCG Basic Training content', () => {
         unique: true,
       },
     ])
+    expect(base4Complete?.rewards).toContainEqual({
+      type: 'currency',
+      targetId: 'pokedollars',
+      quantity: 20000,
+    })
     expect(battleWrapup?.completeButtonText).toBe('Design My First Card')
     expect(battleWrapup?.name).toBe('Back to Work')
     expect(battleWrapup?.requirements).toEqual([
@@ -171,6 +181,60 @@ describe('TCG Basic Training content', () => {
         targetId: 'underground-tcg-battle-wrapup',
         inverse: true,
       })
+    }
+  })
+
+  test('generates a gated repeatable booster-box delivery for every TCG set', () => {
+    const deliveryTasks = tasks.filter((task) =>
+      task.id.startsWith('tcg-booster-box-delivery-'),
+    )
+
+    expect(deliveryTasks).toHaveLength(tcgSetSummaries.length)
+
+    for (const set of tcgSetSummaries) {
+      const task = deliveryTasks.find(
+        (entry) => entry.id === `tcg-booster-box-delivery-${set.id}`,
+      )
+
+      expect(task, set.id).toMatchObject({
+        name: `${set.name} Booster Box Delivery`,
+        repeatable: true,
+        completeButtonText: 'Deliver Booster Box',
+        rewards: [
+          {
+            type: 'currency',
+            targetId: 'pokedollars',
+            quantity: TCG_BOOSTER_BOX_REWARD,
+          },
+        ],
+      })
+      expect(task?.requirements).toContainEqual({
+        type: 'task_completed',
+        targetId: 'underground-tcg-my-very-own-set',
+      })
+      expect(task?.requirements).toContainEqual({
+        type: 'item_owned',
+        targetId: `binder-${set.id}`,
+      })
+      expect(task?.requirements).toContainEqual({
+        type: 'card_collected_set',
+        targetId: set.id,
+        count: set.total,
+        unique: true,
+      })
+      expect(task?.requirements).toContainEqual({
+        type: 'item_owned',
+        targetId: `pack-${set.id}`,
+        count: TCG_BOOSTER_BOX_PACK_COUNT,
+      })
+      expect(task?.criteria).toEqual([
+        {
+          type: 'item_owned',
+          targetId: `pack-${set.id}`,
+          count: TCG_BOOSTER_BOX_PACK_COUNT,
+          consume: true,
+        },
+      ])
     }
   })
 
@@ -349,6 +413,7 @@ describe('TCG Basic Training content', () => {
       { setId: 'base3', dyeId: 'dried-yellow' },
       { setId: 'base4', dyeId: 'dried-red' },
       { setId: 'base5', dyeId: 'dried-black' },
+      { setId: 'gym1', dyeId: 'dried-blue' },
     ].map(({ setId, dyeId }) => ({
       setId,
       dyeId,
@@ -390,6 +455,13 @@ describe('TCG Basic Training content', () => {
     expect(base5?.requirements).toContainEqual({
       type: 'item_owned',
       targetId: 'binder-base5',
+    })
+    const gym1 = packRecipes.find(({ setId }) => setId === 'gym1')?.recipe
+    expect(gym1?.requirements).toContainEqual({
+      type: 'card_collected_set',
+      targetId: 'gym1',
+      count: 132,
+      unique: true,
     })
     expect(shouldConsumeCraftCosts(base4!, 'bad')).toBe(true)
     expect(resolveCraftRewards(base4!, 'bad')).toEqual([])

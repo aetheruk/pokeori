@@ -107,6 +107,14 @@ export const vermillionCitysnapEntries: SnapConfig[] = [
         targetId: 'vermilion-gym-voltorb-drill',
       },
     ],
+    criteria: [
+      {
+        type: 'currency_owned',
+        targetId: 'crystals',
+        count: 20,
+        consume: true,
+      },
+    ],
     rewards: [
       {
         type: 'item',
