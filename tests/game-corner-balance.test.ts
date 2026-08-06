@@ -71,6 +71,8 @@ describe('Celadon Game Corner balance and presentation', () => {
     const [lowStakes, highStakes] = celadonGameCornerTcgBattleEntries
     expect(lowStakes.icon).toEqual({ type: 'trainer', id: 'tcg-maniac-m' })
     expect(highStakes.icon).toEqual({ type: 'trainer', id: 'tcg-maniac-f' })
+    expect(lowStakes.settings.deckFormat).toBe('baby')
+    expect(highStakes.settings.deckFormat).toBe('champions')
     expect(lowStakes.criteria).toContainEqual({
       type: 'currency_owned',
       targetId: 'fun-tokens',
@@ -80,7 +82,7 @@ describe('Celadon Game Corner balance and presentation', () => {
     expect(lowStakes.rewards[0]).toMatchObject({
       type: 'currency',
       targetId: 'fun-tokens',
-      quantity: 200,
+      quantity: 120,
     })
     expect(highStakes.criteria).toContainEqual({
       type: 'currency_owned',
@@ -91,7 +93,7 @@ describe('Celadon Game Corner balance and presentation', () => {
     expect(highStakes.rewards[0]).toMatchObject({
       type: 'currency',
       targetId: 'fun-tokens',
-      quantity: 500,
+      quantity: 350,
     })
 
     for (const game of celadonGameCornerTcgBattleEntries) {
@@ -118,7 +120,11 @@ describe('Celadon Game Corner balance and presentation', () => {
       ).toBeGreaterThanOrEqual(6)
       expect(game.settings.opponentEnergyType).toBe('Colorless')
       expect(validation.totalCost).toBeLessThanOrEqual(
-        game.settings.deckFormat === 'baby' ? 30 : 85,
+        game.settings.deckFormat === 'baby'
+          ? 30
+          : game.settings.deckFormat === 'champions'
+            ? 55
+            : 85,
       )
     }
   })

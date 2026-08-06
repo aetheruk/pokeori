@@ -44,4 +44,49 @@ describe('TCG battle completion navigation', () => {
     expect(refresh).toBeGreaterThan(handlerStart)
     expect(navigate).toBeGreaterThan(refresh)
   })
+
+  test('claims the finished result automatically after the winner animation', () => {
+    const source = readFileSync(
+      join(
+        process.cwd(),
+        'src/app/(frontend)/game/research/encounter/tcg-battle.tsx',
+      ),
+      'utf8',
+    )
+    const controlsStart = source.indexOf('function BattleCommandControls(')
+    const finishedBranch = source.indexOf(
+      "if (state.phase === 'finished')",
+      controlsStart,
+    )
+    const autoClaimTimer = source.indexOf(
+      'const timer = window.setTimeout',
+      controlsStart,
+    )
+    const claimCall = source.indexOf('claimHandlerRef.current()', controlsStart)
+
+    expect(controlsStart).toBeGreaterThan(-1)
+    expect(finishedBranch).toBeGreaterThan(controlsStart)
+    expect(autoClaimTimer).toBeGreaterThan(controlsStart)
+    expect(claimCall).toBeGreaterThan(autoClaimTimer)
+  })
+
+  test('removes the finished battle overlay once the shared result is shown', () => {
+    const source = readFileSync(
+      join(
+        process.cwd(),
+        'src/app/(frontend)/game/research/encounter/tcg-battle.tsx',
+      ),
+      'utf8',
+    )
+    const finishedBranch = source.indexOf("if (state.phase === 'finished')")
+    const overlayGuard = source.indexOf(
+      "if (state.phase === 'finished' && resultShown) return null",
+      source.indexOf('function BattleCommandControls('),
+    )
+
+    expect(finishedBranch).toBeGreaterThan(-1)
+    expect(overlayGuard).toBeGreaterThan(
+      source.indexOf('function BattleCommandControls('),
+    )
+  })
 })
