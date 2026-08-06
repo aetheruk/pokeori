@@ -49,7 +49,7 @@ const battle = (input: {
   iconId: string
   themeColour: string
   energy: TcgBattleEnergyType
-  format: 'baby' | 'masters'
+  format: 'baby' | 'champions'
   unlockTaskId: string
   cards: string[]
   cost: number
@@ -102,7 +102,7 @@ export const celadonGameCornerTcgBattleEntries: TcgBattleGameConfig[] = [
     unlockTaskId: 'when-the-fun-stops',
     cards: casualRocketDeck,
     cost: 50,
-    reward: 200,
+    reward: 120,
     background: '/backgrounds/celadon-game-corner-arcade.avif',
   }),
   battle({
@@ -112,11 +112,11 @@ export const celadonGameCornerTcgBattleEntries: TcgBattleGameConfig[] = [
     iconId: 'tcg-maniac-f',
     themeColour: '#b58a43',
     energy: 'Colorless',
-    format: 'masters',
+    format: 'champions',
     unlockTaskId: 'high-roller',
     cards: highStakesRocketDeck,
     cost: 200,
-    reward: 500,
+    reward: 350,
     background: '/backgrounds/celadon-game-corner-prize-wheel.avif',
   }),
 ]

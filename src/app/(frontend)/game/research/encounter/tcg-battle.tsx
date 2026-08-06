@@ -1668,6 +1668,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           state={state}
           selectedAttacker={selectedAttacker}
           isPending={isBusy}
+          resultShown={Boolean(result)}
           resolution={resolution}
           onCharge={() =>
             callAction(() => tcgBattleCharge(), { kind: 'charge' })
@@ -2575,6 +2576,7 @@ function BattleCommandControls({
   state,
   selectedAttacker,
   isPending,
+  resultShown,
   resolution,
   onCharge,
   onClaim,
@@ -2584,12 +2586,41 @@ function BattleCommandControls({
   state: TcgBattleState
   selectedAttacker?: TcgBattleCardState
   isPending: boolean
+  resultShown: boolean
   resolution?: BattleResolution | null
   onCharge: () => void
   onClaim: () => void
   onPromote: () => void
   onRetreat: () => void
 }) {
+  const claimHandlerRef = useRef(onClaim)
+  const autoClaimedResultRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    claimHandlerRef.current = onClaim
+  }, [onClaim])
+
+  useEffect(() => {
+    if (state.phase !== 'finished' || resultShown || isPending) return
+
+    const resultKey = `${state.encounterId}:${state.winner || 'unknown'}`
+    if (autoClaimedResultRef.current === resultKey) return
+
+    const loserSide =
+      state.winner === 'player'
+        ? 'opponent'
+        : state.winner === 'opponent'
+          ? 'player'
+          : null
+    const animationDurationMs = loserSide ? 1650 : 820
+    const timer = window.setTimeout(() => {
+      autoClaimedResultRef.current = resultKey
+      claimHandlerRef.current()
+    }, animationDurationMs + 350)
+
+    return () => window.clearTimeout(timer)
+  }, [isPending, resultShown, state.encounterId, state.phase, state.winner])
+
   const canAct =
     state.phase === 'battle' && state.activeSide === 'player' && !resolution
   const formatConfig = TCG_BATTLE_FORMATS[state.format]
@@ -2611,6 +2642,8 @@ function BattleCommandControls({
       </div>
     )
   }
+
+  if (state.phase === 'finished' && resultShown) return null
 
   if (state.phase === 'finished') {
     const playerTrainer = state.playerTrainer || {
