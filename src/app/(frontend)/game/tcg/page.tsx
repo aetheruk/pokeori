@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { tcgSetSummaries } from '@/data/tcg/summaries'
 import { getGameRouteData } from '@/utilities/game-route-data'
 import { getTcgCatalogPage } from '@/utilities/tcg/catalog'
+import { sortTcgSetsByReleaseDate } from '@/utilities/tcg/set-order'
 import TcgExplorerClient from './tcg-client'
 
 export default async function TcgExplorerPage() {
@@ -11,9 +12,12 @@ export default async function TcgExplorerPage() {
   const inventory = Object.fromEntries(
     (initialGameData.inventory || []).map((item) => [item.itemId, item.quantity]),
   )
-  const initialSetId = tcgSetSummaries
-    .filter((set) => (inventory[`binder-${set.id}`] || 0) > 0)
-    .sort((left, right) => left.name.localeCompare(right.name))[0]?.id || ''
+  const initialSetId =
+    sortTcgSetsByReleaseDate(
+      tcgSetSummaries.filter(
+        (set) => (inventory[`binder-${set.id}`] || 0) > 0,
+      ),
+    )[0]?.id || ''
   const initialCatalog = initialSetId
     ? await getTcgCatalogPage({ setIds: [initialSetId], limit: 80 })
     : null

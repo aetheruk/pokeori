@@ -511,12 +511,20 @@ describe('Explore location completion star', () => {
     const tcgBattleItem = {
       id: 'tcg-battle-fire-trial',
       type: 'game',
-      originalData: { gameType: 'tcg-battle' },
+      originalData: {
+        gameType: 'tcg-battle',
+        settings: {
+          deckFormat: 'champions',
+          requiredSeries: 'Gym',
+        },
+      },
     }
 
     expect(getFormattedStats(tcgBattleItem, makeUserData())).toMatchObject([
       { label: 'Wins', value: 0 },
       { label: 'Losses', value: 0 },
+      { label: 'Deck Level', value: 'Champions' },
+      { label: 'Format', value: 'Gym' },
     ])
 
     expect(
@@ -529,6 +537,8 @@ describe('Explore location completion star', () => {
     ).toMatchObject([
       { label: 'Wins', value: 2 },
       { label: 'Losses', value: 1 },
+      { label: 'Deck Level', value: 'Champions' },
+      { label: 'Format', value: 'Gym' },
     ])
   })
 })

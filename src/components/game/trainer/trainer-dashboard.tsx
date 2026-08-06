@@ -57,6 +57,7 @@ import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
 import { skills } from '@/data/skills'
 import { tcgSetSummaries } from '@/data/tcg/summaries'
 import { DesktopSectionEmblem } from '@/components/game/shared/DesktopSectionEmblem'
+import { getTcgSeriesInReleaseOrder } from '@/utilities/tcg/set-order'
 
 type DeckFormat = 'baby' | 'champions' | 'masters'
 type Tab =
@@ -72,9 +73,7 @@ export function TrainerDashboard() {
   const [activeTab, setActiveTab] = useState<Tab>('profile')
   const [sectionDrawerOpen, setSectionDrawerOpen] = useState(false)
   const [rankingSkill, setRankingSkill] = useState(skills[0].id)
-  const deckGenerations = Array.from(new Set(tcgSetSummaries.map((set) => set.series))).sort((a, b) =>
-    a.localeCompare(b),
-  )
+  const deckGenerations = getTcgSeriesInReleaseOrder(tcgSetSummaries)
   const [deckGeneration, setDeckGeneration] = useState(deckGenerations[0] || '')
   const [deckFormat, setDeckFormat] = useState<DeckFormat>('baby')
   const inventory = Object.fromEntries(

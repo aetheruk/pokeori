@@ -9,6 +9,7 @@ import basePromoDetails from '@/data/tcg/details/basep'
 import {
   applyTcgBattleEnergyDiscards,
   applyTcgBattleStatusConditions,
+  autoBuildTcgBattleDeck,
   buildTcgBattleCardSummary,
   canTcgBattleEndByPassStall,
   canSideChargeEnergy,
@@ -37,6 +38,7 @@ import {
   type TcgBattleState,
 } from '@/utilities/tcg/tcg-battle'
 import { getTcgCardDetailById } from '@/data/tcg/details'
+import { getAllTcgCards } from '@/utilities/tcg/tcg'
 
 function makeBattleCard(id: string, attackCost: number): TcgBattleCardState {
   return {
@@ -112,6 +114,29 @@ function makeBattleState(overrides: Partial<TcgBattleState> = {}): TcgBattleStat
 }
 
 describe('TCG battle utilities', () => {
+  test('auto-fill uses each format cost cap while building fifteen cards', async () => {
+    const collection = Object.fromEntries(
+      getAllTcgCards().map((card) => [card.id, 1]),
+    )
+    const [baby, champions, masters] = await Promise.all(
+      (['baby', 'champions', 'masters'] as const).map((format) =>
+        autoBuildTcgBattleDeck(collection, format),
+      ),
+    )
+
+    expect(baby.valid).toBe(true)
+    expect(champions.valid).toBe(true)
+    expect(masters.valid).toBe(true)
+    expect(baby.cards).toHaveLength(15)
+    expect(champions.cards).toHaveLength(15)
+    expect(masters.cards).toHaveLength(15)
+    expect(baby.totalCost).toBe(TCG_BATTLE_FORMATS.baby.deckCostLimit)
+    expect(champions.totalCost).toBe(
+      TCG_BATTLE_FORMATS.champions.deckCostLimit,
+    )
+    expect(masters.totalCost).toBe(TCG_BATTLE_FORMATS.masters.deckCostLimit)
+  })
+
   test('parses leading attack damage values', () => {
     expect(parseTcgAttackDamage('30')).toBe(30)
     expect(parseTcgAttackDamage('30+')).toBe(0)

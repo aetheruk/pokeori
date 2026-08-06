@@ -69,6 +69,8 @@ describe('Celadon Game Corner balance and presentation', () => {
     ])
 
     const [lowStakes, highStakes] = celadonGameCornerTcgBattleEntries
+    expect(lowStakes.icon).toEqual({ type: 'trainer', id: 'tcg-maniac-m' })
+    expect(highStakes.icon).toEqual({ type: 'trainer', id: 'tcg-maniac-f' })
     expect(lowStakes.criteria).toContainEqual({
       type: 'currency_owned',
       targetId: 'fun-tokens',

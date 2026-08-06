@@ -15,6 +15,7 @@ import { useUser } from '@/context/UserContext'
 import { tcgSetSummaries } from '@/data/tcg/summaries'
 import type { TcgCard } from '@/data/tcg/types'
 import { APP_VERSION } from '@/utilities/app-version'
+import { getTcgSeriesInReleaseOrder } from '@/utilities/tcg/set-order'
 import {
   calculateTcgBattleCardCost,
   type TcgBattleEnergyType,
@@ -65,9 +66,7 @@ export function TcgDecksPanel({
   const hasDeckBox = (inventory['deck-box'] || 0) > 0
 
   const generationOptions = useMemo(() => {
-    const series = Array.from(
-      new Set(tcgSetSummaries.map((set) => set.series)),
-    ).sort((a, b) => a.localeCompare(b))
+    const series = getTcgSeriesInReleaseOrder(tcgSetSummaries)
     return series.map((entry) => ({
       id: entry,
       label: entry.replace('&', 'and'),
