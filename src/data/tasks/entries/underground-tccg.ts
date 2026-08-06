@@ -865,7 +865,7 @@ export const undergroundTccgTasks: Task[] = [
   {
     id: 'underground-tcg-booster-box-manufacturing',
     name: 'Profit Time!',
-    description: 'Now were talking. Minas going to show mw how to get in on the action.',
+    description: 'Now were talking. Minas going to show me how to get in on the action.',
     category: 'Underground',
     subCategory: 'Kanto Underground',
     icon: { type: 'item', id: 'pack-base4' },
@@ -891,7 +891,7 @@ export const undergroundTccgTasks: Task[] = [
         id: 2,
         title: 'Gideon',
         message:
-          'Well! Its simple enough, Once you complete a set yourself, we will go ahead and assume you have full knowledge of it approve you for manufacturing',
+          'Well! Its simple enough, Once you complete a set yourself, we will go ahead and assume you have full knowledge of it and approve you for manufacturing',
         background: undergroundBackground,
         icon: maniacMale,
         buttons: [{ text: 'Go on', type: 'navigate', id: 3 }],

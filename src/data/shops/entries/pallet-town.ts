@@ -59,6 +59,7 @@ export const palletTownShops: ShopConfig[] = [
             amount: 500,
           },
         ],
+        stock: 1,
         rewards: [
           {
             type: 'icon',
@@ -83,6 +84,7 @@ export const palletTownShops: ShopConfig[] = [
             amount: 500,
           },
         ],
+        stock: 1,
         rewards: [
           {
             type: 'icon',
@@ -107,6 +109,7 @@ export const palletTownShops: ShopConfig[] = [
             amount: 500,
           },
         ],
+        stock: 1,
         rewards: [
           {
             type: 'icon',
@@ -131,6 +134,7 @@ export const palletTownShops: ShopConfig[] = [
             amount: 500,
           },
         ],
+        stock: 1,
         rewards: [
           {
             type: 'icon',
