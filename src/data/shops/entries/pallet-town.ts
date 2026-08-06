@@ -46,7 +46,7 @@ export const palletTownShops: ShopConfig[] = [
       },
       {
         id: 'trainer-gb-red',
-        name: 'Red 1',
+        name: 'Red (Red)',
         description: 'Classic GB RED trainer sprite.',
         icon: {
           type: 'trainer',
@@ -71,7 +71,7 @@ export const palletTownShops: ShopConfig[] = [
       },
       {
         id: 'trainer-gb-blue',
-        name: 'Blue 1',
+        name: 'Blue (Red)',
         description: 'Classic GB BLUE trainer sprite.',
         icon: {
           type: 'trainer',
@@ -96,7 +96,7 @@ export const palletTownShops: ShopConfig[] = [
       },
       {
         id: 'trainer-gb-red-2',
-        name: 'Red 2',
+        name: 'Red (Blue)',
         description: 'Alternative Pokemon Red Version trainer sprite.',
         icon: {
           type: 'trainer',
@@ -121,7 +121,7 @@ export const palletTownShops: ShopConfig[] = [
       },
       {
         id: 'trainer-gb-blue-2',
-        name: 'Blue 2',
+        name: 'Blue (Blue)',
         description: 'Alternative Pokemon Blue Version trainer sprite.',
         icon: {
           type: 'trainer',

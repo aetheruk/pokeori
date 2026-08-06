@@ -1138,11 +1138,13 @@ describe('static data references', () => {
       item.rewards.some((reward) => reward.type === 'icon'),
     )
 
-    expect(iconItems?.map((item) => [item.id, item.stock, item.daily || false])).toEqual([
-      ['trainer-gb-red', 1, false],
-      ['trainer-gb-blue', 1, false],
-      ['trainer-gb-red-2', 1, false],
-      ['trainer-gb-blue-2', 1, false],
+    expect(
+      iconItems?.map((item) => [item.id, item.name, item.stock, item.daily || false]),
+    ).toEqual([
+      ['trainer-gb-red', 'Red (Red)', 1, false],
+      ['trainer-gb-blue', 'Blue (Red)', 1, false],
+      ['trainer-gb-red-2', 'Red (Blue)', 1, false],
+      ['trainer-gb-blue-2', 'Blue (Blue)', 1, false],
     ])
   })
 
