@@ -25,6 +25,7 @@ import type { TcgCard, TcgSet } from '@/data/tcg/types'
 import { useGameUserData } from '@/hooks/useGameUserData'
 import { useTCG } from '@/hooks/useTCG'
 import { APP_VERSION } from '@/utilities/app-version'
+import { sortTcgSetsByReleaseDate } from '@/utilities/tcg/set-order'
 import type { RewardSummary } from '@/utilities/rewards/reward-logic'
 import {
   calculateTcgBattleCardCost,
@@ -124,9 +125,11 @@ export default function TcgExplorerPage({
 
   const sets = useMemo(() => {
     if (!gameData) return []
-    return tcgSetSummaries
-      .filter((set) => (inventory[`binder-${set.id}`] || 0) > 0)
-      .sort((a, b) => a.name.localeCompare(b.name))
+    return sortTcgSetsByReleaseDate(
+      tcgSetSummaries.filter(
+        (set) => (inventory[`binder-${set.id}`] || 0) > 0,
+      ),
+    )
   }, [gameData, inventory])
 
   // Select first set if none selected and sets are available

@@ -17,6 +17,7 @@ import {
   type TcgBattleEnergyType,
 } from '@/utilities/tcg/tcg-battle'
 import { getAllTcgSets, getTcgCardSeriesById } from '@/utilities/tcg/tcg'
+import { getTcgSeriesInReleaseOrder } from '@/utilities/tcg/set-order'
 import {
   getUserInventoryMap,
   getUserTcgMap,
@@ -81,7 +82,7 @@ function normalizeGenerationDecks(
 }
 
 function getKnownTcgGenerations(): string[] {
-  return Array.from(new Set(getAllTcgSets().map((set) => set.series))).sort((a, b) => a.localeCompare(b))
+  return getTcgSeriesInReleaseOrder(getAllTcgSets())
 }
 
 function ensureGeneration(generationInput: string): string | null {

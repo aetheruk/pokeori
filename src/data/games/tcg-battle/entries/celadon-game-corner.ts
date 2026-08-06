@@ -62,7 +62,7 @@ const battle = (input: {
   description: input.description,
   category: 'Kanto',
   subCategory: 'Celadon Game Corner',
-  icon: { type: 'pokemon', id: input.iconId },
+  icon: { type: 'trainer', id: input.iconId },
   background: input.background,
   requirements: gameCornerBattleRequirements(input.unlockTaskId),
   criteria: [
@@ -94,9 +94,8 @@ export const celadonGameCornerTcgBattleEntries: TcgBattleGameConfig[] = [
   battle({
     id: 'celadon-tcg-battle',
     name: 'Rocket TCG Table',
-    description:
-      'Play a compact Rocket card deck at the public table. A Base Baby deck costs 50 Fun Tokens to enter and pays 200 for a win.',
-    iconId: '52',
+    description: 'Stake your tokens in a fast-paced TCG battle.',
+    iconId: 'tcg-maniac-m',
     themeColour: '#5f794f',
     energy: 'Colorless',
     format: 'baby',
@@ -109,9 +108,8 @@ export const celadonGameCornerTcgBattleEntries: TcgBattleGameConfig[] = [
   battle({
     id: 'celadon-high-stakes-tcg-battle',
     name: 'High Stakes Rocket TCG',
-    description:
-      'Take on Rocket’s polished mixed-type deck upstairs. A Base Masters deck costs 200 Fun Tokens to enter and pays 500 for a win.',
-    iconId: '6',
+    description: 'Raise the stakes in a fast-paced TCG battle.',
+    iconId: 'tcg-maniac-f',
     themeColour: '#b58a43',
     energy: 'Colorless',
     format: 'masters',

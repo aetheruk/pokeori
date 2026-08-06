@@ -480,20 +480,58 @@ export async function autoBuildTcgBattleDeck(
     if (summary) candidates.push(summary)
   }
 
-  candidates.sort((a, b) => {
-    const costDelta = a.cost - b.cost
-    if (costDelta !== 0) return costDelta
-    return getCardBattleScore(b) - getCardBattleScore(a)
-  })
-
   const limit = TCG_BATTLE_FORMATS[format].deckCostLimit
-  const selected: TcgBattleCardSummary[] = []
-  let totalCost = 0
+  const candidatesByCost = new Map<number, TcgBattleCardSummary[]>()
   for (const card of candidates) {
-    if (selected.length >= 15) break
-    if (totalCost + card.cost > limit) continue
-    selected.push(card)
-    totalCost += card.cost
+    const cardsAtCost = candidatesByCost.get(card.cost) || []
+    cardsAtCost.push(card)
+    candidatesByCost.set(card.cost, cardsAtCost)
+  }
+
+  // Only the best fifteen cards at each cost can contribute to a fifteen-card
+  // deck. Keeping that bounded pool makes the format-aware selection cheap
+  // even when a trainer owns the full catalog.
+  const candidatePool = Array.from(candidatesByCost.values()).flatMap((cards) =>
+    [...cards]
+      .sort((a, b) => getCardBattleScore(b) - getCardBattleScore(a))
+      .slice(0, 15),
+  )
+  type DeckState = { score: number; cards: TcgBattleCardSummary[] }
+  const states: Array<Array<DeckState | undefined>> = Array.from(
+    { length: 16 },
+    () => Array.from({ length: limit + 1 }),
+  )
+  states[0][0] = { score: 0, cards: [] }
+
+  for (const card of candidatePool) {
+    for (let count = 14; count >= 0; count -= 1) {
+      for (let currentCost = 0; currentCost + card.cost <= limit; currentCost += 1) {
+        const state = states[count][currentCost]
+        if (!state) continue
+        const nextCost = currentCost + card.cost
+        const nextScore = state.score + getCardBattleScore(card)
+        const existing = states[count + 1][nextCost]
+        if (!existing || nextScore > existing.score) {
+          states[count + 1][nextCost] = {
+            score: nextScore,
+            cards: [...state.cards, card],
+          }
+        }
+      }
+    }
+  }
+
+  let selected: TcgBattleCardSummary[] = []
+  let totalCost = 0
+  let bestScore = -Infinity
+  for (let cost = 0; cost <= limit; cost += 1) {
+    const state = states[15][cost]
+    if (!state) continue
+    if (state.score > bestScore || (state.score === bestScore && cost > totalCost)) {
+      selected = state.cards
+      totalCost = cost
+      bestScore = state.score
+    }
   }
 
   const errors = selected.length === 15 ? [] : ['Not enough legal owned cards to build this format.']
