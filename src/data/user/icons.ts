@@ -49,22 +49,22 @@ export const icons: IconConfig[] = [
   { id: 'rotom', name: 'Rotom', icon: { type: 'pokemon', id: '479' } },
   {
     id: 'trainer-gb-red',
-    name: 'Red 1',
+    name: 'Red (Red)',
     icon: { type: 'trainer', id: 'gb-red' },
   },
   {
     id: 'trainer-gb-blue',
-    name: 'Blue 1',
+    name: 'Blue (Red)',
     icon: { type: 'trainer', id: 'gb-blue' },
   },
   {
     id: 'trainer-gb-red-2',
-    name: 'Red 2',
+    name: 'Red (Blue)',
     icon: { type: 'trainer', id: 'gb-red-2' },
   },
   {
     id: 'trainer-gb-blue-2',
-    name: 'Blue 2',
+    name: 'Blue (Blue)',
     icon: { type: 'trainer', id: 'gb-blue-2' },
   },
   { id: 'nugget', name: 'Nugget', icon: { type: 'item', id: 'nugget' } },

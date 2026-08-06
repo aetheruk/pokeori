@@ -55,6 +55,7 @@ Catalog responses are versioned with the application release, cached privately i
 - Each generation series has three deck slots (`baby`, `champions`, `masters`) and auto-build runs per generation+format, only using owned cards from sets in that generation series.
 - Each generation+format deck also stores one extra energy-card type slot (outside the 15 card list). The selected type must be valid for that generation series.
 - Each TCG Battle game entry can now require a specific series (`settings.requiredSeries`), and battle start enforces both the required series and required format.
+- Celadon Game Corner adds repeatable low- and high-stakes TCG tables. The public Rocket TCG Table requires the `deck-box`, a Base Baby deck, and 50 Fun Tokens for a 200-token win payout; the High Stakes Rocket TCG table additionally requires `high-roller`, a Base Masters deck, and 200 Fun Tokens for a 500-token win payout. Both opponent decks are neutral mixed-type 15-card Base-series decks with broad type coverage, so neither table presents a simple elemental counter-pick, and both are validated with the same battle rules as player decks.
 - Format deck-cost caps are Baby 30, Champions 55, and Masters 85.
 - Format energy pacing uses low starts and charge turns: Baby 4 start / 12 cap / +2 charge, Champions 5 / 16 / +2, Masters 6 / 22 / +2.
 - Manual pass is replaced by Charge/End Turn. When at cap and a legal attack exists, the player must attack before ending turn.

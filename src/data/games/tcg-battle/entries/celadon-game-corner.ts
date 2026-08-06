@@ -1,0 +1,124 @@
+import type { TcgBattleGameConfig } from '../types'
+import type { TcgBattleEnergyType } from '@/utilities/tcg/tcg-battle'
+
+const gameCornerBattleRequirements = (unlockTaskId: string) => [
+  { type: 'task_completed' as const, targetId: unlockTaskId },
+  { type: 'item_owned' as const, targetId: 'deck-box' },
+]
+
+const casualRocketDeck = [
+  'base1-20',
+  'base5-65',
+  'base5-56',
+  'base5-59',
+  'base5-49',
+  'base5-55',
+  'base3-39',
+  'base1-3',
+  'base1-65',
+  'base1-27',
+  'base3-11',
+  'base1-6',
+  'base1-23',
+  'base3-8',
+  'base2-45',
+]
+
+const highStakesRocketDeck = [
+  'base1-20',
+  'base5-65',
+  'base5-56',
+  'base5-59',
+  'base5-49',
+  'base5-55',
+  'base3-39',
+  'base3-11',
+  'base1-6',
+  'base1-23',
+  'base3-8',
+  'base2-45',
+  'base5-33',
+  'base1-2',
+  'base1-4',
+]
+
+const battle = (input: {
+  id: string
+  name: string
+  description: string
+  iconId: string
+  themeColour: string
+  energy: TcgBattleEnergyType
+  format: 'baby' | 'masters'
+  unlockTaskId: string
+  cards: string[]
+  cost: number
+  reward: number
+  background: string
+}): TcgBattleGameConfig => ({
+  id: input.id,
+  gameType: 'tcg-battle',
+  name: input.name,
+  description: input.description,
+  category: 'Kanto',
+  subCategory: 'Celadon Game Corner',
+  icon: { type: 'pokemon', id: input.iconId },
+  background: input.background,
+  requirements: gameCornerBattleRequirements(input.unlockTaskId),
+  criteria: [
+    {
+      type: 'currency_owned',
+      targetId: 'fun-tokens',
+      count: input.cost,
+      consume: true,
+    },
+  ],
+  rewards: [
+    {
+      type: 'currency',
+      targetId: 'fun-tokens',
+      quantity: input.reward,
+    },
+  ],
+  isEligibleForReplay: true,
+  settings: {
+    deckFormat: input.format,
+    requiredSeries: 'Base',
+    opponentDeckCardIds: input.cards,
+    opponentEnergyType: input.energy,
+    themeColour: input.themeColour,
+  },
+})
+
+export const celadonGameCornerTcgBattleEntries: TcgBattleGameConfig[] = [
+  battle({
+    id: 'celadon-tcg-battle',
+    name: 'Rocket TCG Table',
+    description:
+      'Play a compact Rocket card deck at the public table. A Base Baby deck costs 50 Fun Tokens to enter and pays 200 for a win.',
+    iconId: '52',
+    themeColour: '#5f794f',
+    energy: 'Colorless',
+    format: 'baby',
+    unlockTaskId: 'when-the-fun-stops',
+    cards: casualRocketDeck,
+    cost: 50,
+    reward: 200,
+    background: '/backgrounds/celadon-game-corner-arcade.avif',
+  }),
+  battle({
+    id: 'celadon-high-stakes-tcg-battle',
+    name: 'High Stakes Rocket TCG',
+    description:
+      'Take on Rocket’s polished mixed-type deck upstairs. A Base Masters deck costs 200 Fun Tokens to enter and pays 500 for a win.',
+    iconId: '6',
+    themeColour: '#b58a43',
+    energy: 'Colorless',
+    format: 'masters',
+    unlockTaskId: 'high-roller',
+    cards: highStakesRocketDeck,
+    cost: 200,
+    reward: 500,
+    background: '/backgrounds/celadon-game-corner-prize-wheel.avif',
+  }),
+]
