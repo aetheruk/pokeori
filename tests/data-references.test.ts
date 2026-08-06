@@ -1132,6 +1132,20 @@ describe('static data references', () => {
     ).toEqual(oneTimeItemIds.map((itemId) => [itemId, 1, false]))
   })
 
+  test("Prof's Scrip Shop icon rewards are one-time purchases", () => {
+    const scripShop = shops.find((shop) => shop.id === 'retro-trainer-cards')
+    const iconItems = scripShop?.items.filter((item) =>
+      item.rewards.some((reward) => reward.type === 'icon'),
+    )
+
+    expect(iconItems?.map((item) => [item.id, item.stock, item.daily || false])).toEqual([
+      ['trainer-gb-red', 1, false],
+      ['trainer-gb-blue', 1, false],
+      ['trainer-gb-red-2', 1, false],
+      ['trainer-gb-blue-2', 1, false],
+    ])
+  })
+
   test("Captain's Credit profile rewards use award sprites without changing icon unlocks", () => {
     const captainsShop = shops.find(
       (shop) => shop.id === 'ss-anne-captains-shop',
