@@ -4,6 +4,7 @@ import { getTcgCardDetailById } from '@/data/tcg/details'
 export type TcgBattleDeckFormat = 'baby' | 'champions' | 'masters'
 export type TcgBattleSide = 'player' | 'opponent'
 export type TcgBattlePhase = 'arranging' | 'battle' | 'promotion' | 'finished'
+export type TcgBattleMode = 'pve' | 'pvp'
 export type TcgBattleEnergyType =
   | 'Grass'
   | 'Fire'
@@ -253,9 +254,30 @@ export type TcgBattleEffectEvent =
   | { id: string; kind: 'copy'; sourceId: string; targetId: string; label: string }
   | { id: string; kind: 'energy'; side: TcgBattleSide; sourceId: string; amount: number }
 
+export type TcgBattleLastAction = {
+  id: string
+  side: TcgBattleSide
+  kind:
+    | 'arrange'
+    | 'attack'
+    | 'retreat'
+    | 'charge'
+    | 'promote'
+    | 'surrender'
+    | 'timeout'
+  attackerId?: string
+  attackIndex?: number
+  targetId?: string
+  frontId?: string
+  backId?: string
+  cardId?: string
+}
+
 export interface TcgBattleState {
   userId: string
   encounterId: string
+  battleMode?: TcgBattleMode
+  matchId?: string
   format: TcgBattleDeckFormat
   phase: TcgBattlePhase
   turnNumber: number
@@ -315,8 +337,145 @@ export interface TcgBattleState {
   log: string[]
   playerTrainer?: TcgBattleTrainerCard
   enemyTrainer?: TcgBattleTrainerCard
+  ready?: Record<TcgBattleSide, boolean>
+  revision?: number
+  lastAction?: TcgBattleLastAction
+  deadlineAt?: number
+  pendingPromotions?: TcgBattleSide[]
+  resumeSideAfterPromotion?: TcgBattleSide
+  outcomeReason?: 'knockout' | 'stall' | 'surrender' | 'timeout'
+  noContest?: boolean
   startedAt: number
   updatedAt: number
+}
+
+export interface TcgPvpSharedBattleState extends TcgBattleState {
+  battleMode: 'pvp'
+  matchId: string
+  participantIds: Record<TcgBattleSide, string>
+  ready: Record<TcgBattleSide, boolean>
+  revision: number
+  deadlineAt: number
+  statsFinalized?: boolean
+  acknowledgedBy?: string[]
+}
+
+export function flipTcgBattleSide(side: TcgBattleSide): TcgBattleSide {
+  return side === 'player' ? 'opponent' : 'player'
+}
+
+function cloneTcgBattlePerspectiveSide(
+  side: TcgBattleSideState,
+): TcgBattleSideState {
+  return {
+    ...side,
+    deck: [...side.deck],
+    hand: [...side.hand],
+    front: [...side.front],
+    back: [...side.back],
+    discard: [...side.discard],
+  }
+}
+
+function flipTcgBattleEffectEvent(
+  event: TcgBattleEffectEvent,
+): TcgBattleEffectEvent {
+  if ('side' in event) {
+    return { ...event, side: flipTcgBattleSide(event.side) }
+  }
+  return { ...event }
+}
+
+export function toTcgPvpPerspectiveState(
+  shared: TcgPvpSharedBattleState,
+  viewerUserId: string,
+): TcgBattleState | null {
+  const isCanonicalPlayer = shared.participantIds.player === viewerUserId
+  const isCanonicalOpponent = shared.participantIds.opponent === viewerUserId
+  if (!isCanonicalPlayer && !isCanonicalOpponent) return null
+
+  const shouldFlip = isCanonicalOpponent
+  const ownSide = cloneTcgBattlePerspectiveSide(
+    shouldFlip ? shared.opponent : shared.player,
+  )
+  const opposingSide = cloneTcgBattlePerspectiveSide(
+    shouldFlip ? shared.player : shared.opponent,
+  )
+
+  // The opponent's unused deck, private arrangement, and selected Energy remain
+  // server-only until the relevant public battle state makes them visible.
+  opposingSide.deck = []
+  opposingSide.hand = []
+  if (shared.phase === 'arranging') {
+    opposingSide.front = []
+    opposingSide.back = []
+  }
+  if (shared.turnNumber < 15) opposingSide.selectedEnergy = undefined
+
+  const flipSide = (side: TcgBattleSide) =>
+    shouldFlip ? flipTcgBattleSide(side) : side
+  const { participantIds: _participantIds, ...publicState } = shared
+
+  return {
+    ...publicState,
+    userId: viewerUserId,
+    player: ownSide,
+    opponent: opposingSide,
+    activeSide: flipSide(shared.activeSide),
+    pendingPromotion: shared.pendingPromotion
+      ? flipSide(shared.pendingPromotion)
+      : undefined,
+    pendingPromotions: shared.pendingPromotions?.map(flipSide),
+    resumeSideAfterPromotion: shared.resumeSideAfterPromotion
+      ? flipSide(shared.resumeSideAfterPromotion)
+      : undefined,
+    winner:
+      shared.winner === 'tie' || !shared.winner
+        ? shared.winner
+        : flipSide(shared.winner),
+    ready: {
+      player: shouldFlip ? shared.ready.opponent : shared.ready.player,
+      opponent: shouldFlip ? shared.ready.player : shared.ready.opponent,
+    },
+    playerTrainer: shouldFlip ? shared.enemyTrainer : shared.playerTrainer,
+    enemyTrainer: shouldFlip ? shared.playerTrainer : shared.enemyTrainer,
+    lastAction: shared.lastAction
+      ? { ...shared.lastAction, side: flipSide(shared.lastAction.side) }
+      : undefined,
+    lastDamageEvent: shared.lastDamageEvent
+      ? {
+          ...shared.lastDamageEvent,
+          targetSide: flipSide(shared.lastDamageEvent.targetSide),
+        }
+      : undefined,
+    lastDamageEvents: shared.lastDamageEvents?.map((event) => ({
+      ...event,
+      targetSide: flipSide(event.targetSide),
+    })),
+    lastCoinFlipEvent: shared.lastCoinFlipEvent
+      ? {
+          ...shared.lastCoinFlipEvent,
+          side: flipSide(shared.lastCoinFlipEvent.side),
+        }
+      : undefined,
+    lastCoinFlipEvents: shared.lastCoinFlipEvents?.map((event) => ({
+      ...event,
+      side: flipSide(event.side),
+    })),
+    lastStatusEvent: shared.lastStatusEvent
+      ? {
+          ...shared.lastStatusEvent,
+          targetSide: flipSide(shared.lastStatusEvent.targetSide),
+        }
+      : undefined,
+    lastStatusEvents: shared.lastStatusEvents?.map((event) => ({
+      ...event,
+      targetSide: flipSide(event.targetSide),
+    })),
+    lastEffectEvents: shared.lastEffectEvents?.map((event) =>
+      shouldFlip ? flipTcgBattleEffectEvent(event) : { ...event },
+    ),
+  }
 }
 
 const TCG_BATTLE_ENERGY_TYPES: readonly TcgBattleEnergyType[] = [

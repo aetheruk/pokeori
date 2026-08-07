@@ -18,6 +18,7 @@ import {
 } from '@/utilities/expeditions/actions'
 import { startEncounter } from '@/app/(frontend)/game/locations/encounter/actions'
 import { startGame } from '@/app/(frontend)/game/games/actions'
+import { prepareTcgPvp } from '@/app/(frontend)/game/research/games/tcg-battle'
 import { startFieldResearch } from '@/app/(frontend)/game/field-research/actions'
 import {
   getGameActivityRoute,
@@ -105,6 +106,8 @@ export function useExploreActions(
   const [pvpConfigId, setPvpConfigId] = useState<string | null>(null)
   const [showPvpModal, setShowPvpModal] = useState(false)
   const [showQueueModal, setShowQueueModal] = useState(false)
+  const [tcgPvpConfigId, setTcgPvpConfigId] = useState<string | null>(null)
+  const [showTcgPvpModal, setShowTcgPvpModal] = useState(false)
 
   const playSelectSfx = () => playSfx('select')
 
@@ -714,6 +717,25 @@ export function useExploreActions(
             // Now handled inline in GameInfoModal
             return
           }
+          if (
+            encounter.gameType === 'tcg-battle' &&
+            encounter.settings?.battleMode === 'pvp'
+          ) {
+            const result = await prepareTcgPvp(item.id)
+            if (!result.success) {
+              toast.error(result.error || 'Unable to prepare TCG PVP')
+              setLoadingId(null)
+              return
+            }
+            if ('matchId' in result && result.matchId) {
+              router.push('/game/games/tcg-battle')
+              return
+            }
+            setTcgPvpConfigId(item.id)
+            setShowTcgPvpModal(true)
+            setLoadingId(null)
+            return
+          }
           const result = await startGame(item.id)
           if (result.success) {
             router.push(getGameActivityRoute(item.originalData.gameType))
@@ -1017,6 +1039,10 @@ export function useExploreActions(
     setShowPvpModal,
     showQueueModal,
     setShowQueueModal,
+    tcgPvpConfigId,
+    setTcgPvpConfigId,
+    showTcgPvpModal,
+    setShowTcgPvpModal,
     handleAction,
     handleCompleteVoyage,
     handleAbandonExpedition,

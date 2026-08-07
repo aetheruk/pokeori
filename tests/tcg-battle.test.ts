@@ -30,12 +30,14 @@ import {
   resolveTcgBattleAttack,
   resolveTcgBattleStatusAttackCheck,
   TCG_BATTLE_FORMATS,
+  toTcgPvpPerspectiveState,
   validateTcgBattleDeck,
   validateTcgBattleAttackChoice,
   type TcgBattleAttack,
   type TcgBattleCardState,
   type TcgBattleSideState,
   type TcgBattleState,
+  type TcgPvpSharedBattleState,
 } from '@/utilities/tcg/tcg-battle'
 import { getTcgCardDetailById } from '@/data/tcg/details'
 import { getAllTcgCards } from '@/utilities/tcg/tcg'
@@ -897,9 +899,10 @@ describe('TCG battle utilities', () => {
     expect(tcgBattleGames.length).toBe(3)
 
     for (const game of tcgBattleGames) {
-      expect(game.settings.opponentDeckCardIds).toHaveLength(15)
+      const opponentDeckCardIds = game.settings.opponentDeckCardIds!
+      expect(opponentDeckCardIds).toHaveLength(15)
       const cards = await Promise.all(
-        game.settings.opponentDeckCardIds.map((cardId) => buildTcgBattleCardSummary(cardId)),
+        opponentDeckCardIds.map((cardId) => buildTcgBattleCardSummary(cardId)),
       )
       expect(cards.every(Boolean)).toBe(true)
     }
@@ -998,6 +1001,117 @@ describe('TCG battle utilities', () => {
     expect(getAllowedTcgBattleAttackCost(3)).toBe(2)
     expect(getAllowedTcgBattleAttackCost(getNextTcgBattleTurnNumber(3, 'player', 'opponent'))).toBe(2)
     expect(getAllowedTcgBattleAttackCost(getNextTcgBattleTurnNumber(3, 'opponent', 'player'))).toBe(2)
+  })
+
+  test('keeps PVP arrangement choices private from the opposing viewer', () => {
+    const playerCard = makeBattleCard('player-private', 1)
+    const opponentCard = makeBattleCard('opponent-private', 1)
+    const shared: TcgPvpSharedBattleState = {
+      ...makeBattleState({
+        format: 'champions',
+        phase: 'arranging',
+        player: makeBattleSide(playerCard, 5, {
+          hand: [playerCard],
+          front: [playerCard],
+          selectedEnergy: 'Fire',
+        }),
+        opponent: makeBattleSide(opponentCard, 5, {
+          hand: [opponentCard],
+          front: [opponentCard],
+          selectedEnergy: 'Water',
+        }),
+      }),
+      battleMode: 'pvp',
+      matchId: 'match-private',
+      participantIds: { player: 'user-a', opponent: 'user-b' },
+      ready: { player: true, opponent: false },
+      revision: 3,
+      deadlineAt: Date.now() + 120_000,
+    }
+
+    const perspective = toTcgPvpPerspectiveState(shared, 'user-b')
+
+    expect(perspective?.player.hand.map((card) => card.id)).toEqual([
+      'opponent-private',
+    ])
+    expect(perspective?.opponent.deck).toEqual([])
+    expect(perspective?.opponent.hand).toEqual([])
+    expect(perspective?.opponent.front).toEqual([])
+    expect(perspective?.opponent.back).toEqual([])
+    expect(perspective?.opponent.selectedEnergy).toBeUndefined()
+    expect(perspective?.ready).toEqual({ player: false, opponent: true })
+    expect(
+      (perspective as unknown as { participantIds?: unknown }).participantIds,
+    ).toBeUndefined()
+  })
+
+  test('maps shared PVP state so every viewer is the bottom player', () => {
+    const playerCard = makeBattleCard('canonical-player', 1)
+    const opponentCard = makeBattleCard('canonical-opponent', 1)
+    const shared: TcgPvpSharedBattleState = {
+      ...makeBattleState({
+        format: 'champions',
+        activeSide: 'opponent',
+        winner: 'player',
+        player: makeBattleSide(playerCard, 5, {
+          selectedEnergy: 'Fire',
+        }),
+        opponent: makeBattleSide(opponentCard, 5, {
+          selectedEnergy: 'Water',
+        }),
+        playerTrainer: { name: 'Collector A' },
+        enemyTrainer: { name: 'Collector B' },
+        lastDamageEvent: {
+          id: 'damage',
+          sourceId: opponentCard.instanceId,
+          targetId: playerCard.instanceId,
+          targetSide: 'player',
+          damage: 10,
+        },
+        lastCoinFlipEvent: {
+          id: 'coin',
+          sourceId: opponentCard.instanceId,
+          side: 'opponent',
+          results: ['heads'],
+          heads: 1,
+          tails: 0,
+        },
+        lastEffectEvents: [
+          {
+            id: 'energy',
+            kind: 'energy',
+            side: 'player',
+            sourceId: playerCard.instanceId,
+            amount: 1,
+          },
+        ],
+      }),
+      battleMode: 'pvp',
+      matchId: 'match-flip',
+      participantIds: { player: 'user-a', opponent: 'user-b' },
+      ready: { player: true, opponent: true },
+      revision: 7,
+      deadlineAt: Date.now() + 120_000,
+      lastAction: { id: 'action', side: 'opponent', kind: 'charge' },
+    }
+
+    const perspective = toTcgPvpPerspectiveState(shared, 'user-b')
+
+    expect(perspective?.userId).toBe('user-b')
+    expect(perspective?.player.front[0]?.id).toBe('canonical-opponent')
+    expect(perspective?.opponent.front[0]?.id).toBe('canonical-player')
+    expect(perspective?.activeSide).toBe('player')
+    expect(perspective?.winner).toBe('opponent')
+    expect(perspective?.playerTrainer?.name).toBe('Collector B')
+    expect(perspective?.enemyTrainer?.name).toBe('Collector A')
+    expect(perspective?.lastAction?.side).toBe('player')
+    expect(perspective?.lastDamageEvent?.targetSide).toBe('opponent')
+    expect(perspective?.lastCoinFlipEvent?.side).toBe('player')
+    expect(perspective?.lastEffectEvents?.[0]).toMatchObject({
+      kind: 'energy',
+      side: 'opponent',
+    })
+    expect(toTcgPvpPerspectiveState(shared, 'spectator')).toBeNull()
   })
 
   test('does not end by pass stall before final attack allowance', () => {

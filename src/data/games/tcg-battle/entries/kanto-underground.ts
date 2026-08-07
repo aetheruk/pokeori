@@ -68,6 +68,31 @@ const grassCards = [
 ]
 
 export const kantoUndergroundTcgBattleEntries: TcgBattleGameConfig[] = [
+  {
+    id: 'underground-tcg-pvp',
+    gameType: 'tcg-battle',
+    name: 'Underground TCG PVP',
+    description:
+      'Challenge another collector in a fast-paced Base Champions TCG battle.',
+    category: 'Underground',
+    subCategory: 'Kanto Underground',
+    icon: { type: 'trainer', id: 'tcg-maniac-m' },
+    background: '/backgrounds/kanto-underground.avif',
+    requirements: [
+      { type: 'item_owned', targetId: 'deck-box' },
+      { type: 'task_completed', targetId: 'underground-tcg-battle-wrapup' },
+      { type: 'kid_mode', inverse: true },
+    ],
+    rewards: [],
+    isEligibleForReplay: true,
+    settings: {
+      battleMode: 'pvp',
+      deckFormat: 'champions',
+      requiredSeries: 'Base',
+      matchmakingModes: ['friendly', 'quick'],
+      themeColour: '#b58a43',
+    },
+  },
   battle({
     id: 'underground-tcg-battle-tutorial',
     name: 'Lost-and-Found Practice',

@@ -273,6 +273,7 @@ describe('TCG Basic Training content', () => {
     const grass = allGames.find(
       (game) => game.id === 'underground-tcg-battle-grass',
     )
+    const pvp = allGames.find((game) => game.id === 'underground-tcg-pvp')
     const artAcademy = allGames.find(
       (game) => game.id === 'underground-tcg-art-academy',
     )
@@ -340,6 +341,31 @@ describe('TCG Basic Training content', () => {
     expect(fire?.icon).toEqual({ type: 'pokemon', id: '6' })
     expect(water?.icon).toEqual({ type: 'pokemon', id: '9' })
     expect(grass?.icon).toEqual({ type: 'pokemon', id: '3' })
+    expect(pvp).toMatchObject({
+      gameType: 'tcg-battle',
+      name: 'Underground TCG PVP',
+      description:
+        'Challenge another collector in a fast-paced Base Champions TCG battle.',
+      category: 'Underground',
+      subCategory: 'Kanto Underground',
+      icon: { type: 'trainer', id: 'tcg-maniac-m' },
+      rewards: [],
+      settings: {
+        battleMode: 'pvp',
+        deckFormat: 'champions',
+        requiredSeries: 'Base',
+        matchmakingModes: ['friendly', 'quick'],
+      },
+    })
+    expect(pvp?.requirements).toEqual([
+      { type: 'item_owned', targetId: 'deck-box' },
+      {
+        type: 'task_completed',
+        targetId: 'underground-tcg-battle-wrapup',
+      },
+      { type: 'kid_mode', inverse: true },
+    ])
+    expect(pvp?.criteria || []).toEqual([])
     expect(fire?.rewards).toContainEqual({
       type: 'currency',
       targetId: 'pokedollars',
@@ -463,9 +489,7 @@ describe('TCG Basic Training content', () => {
           { id: 'empty-foil-pack', amount: 1 },
           { id: dyeId, amount: 1 },
         ],
-        rewards: [
-          { type: 'item', targetId: `pack-${setId}`, quantity: 1 },
-        ],
+        rewards: [{ type: 'item', targetId: `pack-${setId}`, quantity: 1 }],
         outputQuantity: { min: 0, max: 2 },
         qualityOutputQuantity: { good: 1, perfect: 2 },
         materialFailQualities: ['bad'],

@@ -28,6 +28,7 @@ import { TaskEnterDialog } from '@/components/game/task-enter-dialog'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { PvpModal } from '@/app/(frontend)/game/battles/pvp/pvp-modal'
 import { PvpQueueModal } from '@/app/(frontend)/game/battles/pvp/pvp-queue-modal'
+import { TcgPvpModal } from '@/app/(frontend)/game/research/games/tcg-pvp-modal'
 import { DailyRefreshModal } from '@/components/game/modals/DailyRefreshModal'
 import { RivalSelectionDialog } from '@/components/game/rivals/rival-selection-dialog'
 import {
@@ -702,6 +703,11 @@ function ExploreListContent({
             onOpenChange={actions.setShowQueueModal}
             configId={actions.pvpConfigId || ''}
             userId={userData.user.id}
+          />
+          <TcgPvpModal
+            open={actions.showTcgPvpModal}
+            onOpenChange={actions.setShowTcgPvpModal}
+            encounterId={actions.tcgPvpConfigId || ''}
           />
         </>
       )}

@@ -103,6 +103,7 @@ export const taskConditionSchema: z.ZodType<any> = z.lazy(() =>
         'research_level',
         'research_level_total',
         'total_battles_won',
+        'kid_mode',
         'daily_catch',
         'daily_battle',
         'daily_card',
@@ -721,8 +722,35 @@ const settingsByGameType: Record<string, z.ZodTypeAny> = {
     .object({
       deckFormat: z.enum(['baby', 'champions', 'masters']),
       requiredSeries: z.string().min(1),
-      opponentDeckCardIds: z.array(z.string().min(1)).length(15),
+      battleMode: z.enum(['pve', 'pvp']).optional(),
+      matchmakingModes: z.array(z.enum(['friendly', 'quick'])).min(1).optional(),
+      opponentDeckCardIds: z.array(z.string().min(1)).length(15).optional(),
+      opponentEnergyType: z.string().min(1).optional(),
       themeColour: z.string().min(1).optional(),
+    })
+    .superRefine((settings, context) => {
+      if (settings.battleMode === 'pvp') {
+        if (!settings.matchmakingModes?.length) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['matchmakingModes'],
+            message: 'PVP TCG battles require at least one matchmaking mode.',
+          })
+        }
+        if (settings.opponentDeckCardIds) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['opponentDeckCardIds'],
+            message: 'PVP TCG battles use the matched player deck.',
+          })
+        }
+      } else if (!settings.opponentDeckCardIds) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['opponentDeckCardIds'],
+          message: 'PVE TCG battles require an opponent deck.',
+        })
+      }
     })
     .passthrough(),
   'field-observation': z
