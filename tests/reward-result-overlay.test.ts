@@ -1,11 +1,55 @@
 import { describe, expect, test } from 'bun:test'
 import {
+  getRewardResultInitialStep,
   getRewardResultExitModalQueue,
   shouldShowRewardResultSecondaryAction,
   type GenericResult,
 } from '@/components/game/shared/RewardResultOverlay'
 
 describe('reward result exit modal ordering', () => {
+  test('opens currency-only results directly on the summary step', () => {
+    expect(
+      getRewardResultInitialStep({
+        success: true,
+        summary: {
+          xp: {},
+          items: [],
+          pokemon: [],
+          currency: [{ type: 'fun-tokens', quantity: 120 }],
+          cards: [],
+        },
+      }),
+    ).toBe('summary')
+  })
+
+  test('keeps card and level-up reveals ahead of the summary', () => {
+    expect(
+      getRewardResultInitialStep({
+        success: true,
+        summary: {
+          xp: {},
+          items: [],
+          pokemon: [],
+          currency: [],
+          cards: [{ id: 'base1-1', discarded: false }],
+          levelUp: { newLevel: 2 },
+        },
+      }),
+    ).toBe('level-up')
+    expect(
+      getRewardResultInitialStep({
+        success: true,
+        summary: {
+          xp: {},
+          items: [],
+          pokemon: [],
+          currency: [],
+          cards: [{ id: 'base1-1', discarded: false }],
+        },
+      }),
+    ).toBe('cards')
+  })
+
   test('shows the completed task modal before task-complete reward modals', () => {
     const result: GenericResult = {
       success: true,

@@ -103,15 +103,16 @@ describe('Celadon Game Corner balance and presentation', () => {
       })
       expect(game.isEligibleForReplay).toBe(true)
 
-      const cardIds = game.settings.opponentDeckCardIds
+      const cardIds = game.settings.opponentDeckCardIds!
       const validation = await validateTcgBattleDeck(
         cardIds,
         Object.fromEntries(cardIds.map((cardId) => [cardId, 1])),
         game.settings.deckFormat,
       )
-      expect(validation.valid, `${game.id} should be a valid opponent deck`).toBe(
-        true,
-      )
+      expect(
+        validation.valid,
+        `${game.id} should be a valid opponent deck`,
+      ).toBe(true)
       expect(new Set(cardIds).size).toBe(15)
       expect(
         new Set(

@@ -60,6 +60,35 @@ export interface GenericResult {
   exitModal?: TaskExitModal
 }
 
+export type RewardResultStep =
+  | 'idle'
+  | 'level-up'
+  | 'cards'
+  | 'research-breakthrough'
+  | 'summary'
+  | 'exit-modal'
+
+export function getRewardResultInitialStep(
+  result: GenericResult | null,
+): RewardResultStep {
+  if (!result) return 'idle'
+
+  const rewardSummary = result.rewards || result.summary
+  if (rewardSummary?.levelUp) return 'level-up'
+
+  const validCards = rewardSummary?.cards?.filter((card: any) => !card.discarded) || []
+  if (validCards.length > 0) return 'cards'
+
+  if (
+    rewardSummary?.researchBreakthroughs &&
+    rewardSummary.researchBreakthroughs.length > 0
+  ) {
+    return 'research-breakthrough'
+  }
+
+  return 'summary'
+}
+
 interface RewardResultOverlayProps {
   result: GenericResult | null
   onClose: () => void
@@ -102,14 +131,9 @@ export function RewardResultOverlay({
   secondaryAction,
 }: RewardResultOverlayProps) {
   // State for sequential flow
-  const [currentStep, setCurrentStep] = useState<
-    | 'idle'
-    | 'level-up'
-    | 'cards'
-    | 'research-breakthrough'
-    | 'summary'
-    | 'exit-modal'
-  >('idle')
+  const [currentStep, setCurrentStep] = useState<RewardResultStep>(() =>
+    getRewardResultInitialStep(result),
+  )
 
   const [levelUpData, setLevelUpData] = useState<any | null>(null)
   const [rewardCards, setRewardCards] = useState<any[]>([])
@@ -166,25 +190,13 @@ export function RewardResultOverlay({
     setExitModalData(exitModals[0] || null)
     setExitModalQueue(exitModals.slice(1))
 
-    // Determine initial step
-    const validCards =
-      rewardSummary?.cards?.filter((c: any) => !c.discarded) || []
-
-    if (rewardSummary?.levelUp) {
-      setCurrentStep('level-up')
-    } else if (validCards.length > 0) {
-      setCurrentStep('cards')
-    } else if (
-      rewardSummary?.researchBreakthroughs &&
-      rewardSummary.researchBreakthroughs.length > 0
-    ) {
-      setCurrentBreakthrough(rewardSummary.researchBreakthroughs[0])
-      setResearchBreakthroughs(rewardSummary.researchBreakthroughs.slice(1))
-      setCurrentStep('research-breakthrough')
-    } else {
-      // Default to summary for any other valid result
-      setCurrentStep('summary')
+    const initialStep = getRewardResultInitialStep(result)
+    if (initialStep === 'research-breakthrough') {
+      const breakthroughs = rewardSummary?.researchBreakthroughs || []
+      setCurrentBreakthrough(breakthroughs[0])
+      setResearchBreakthroughs(breakthroughs.slice(1))
     }
+    setCurrentStep(initialStep)
   }, [result])
 
   // --- Step Handlers ---

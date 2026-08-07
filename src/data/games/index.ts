@@ -341,6 +341,9 @@ export interface GameSettings {
   deckFormat?: import('@/utilities/tcg/tcg-battle').TcgBattleDeckFormat
   requiredSeries?: string
   opponentDeckCardIds?: string[]
+  opponentEnergyType?: import('@/utilities/tcg/tcg-battle').TcgBattleEnergyType
+  battleMode?: 'pve' | 'pvp'
+  matchmakingModes?: Array<'friendly' | 'quick'>
   themeColour?: string
   // Field Observation specific
   levelRange?: { min: number; max: number }

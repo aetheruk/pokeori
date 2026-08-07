@@ -10,6 +10,7 @@ import {
   Crosshair,
   EyeOff,
   Layers,
+  Loader2,
   Lock,
   Shield,
   SkipForward,
@@ -35,6 +36,16 @@ import { TrainerCard } from '@/components/game/battles/TrainerCard'
 import { VSAnimation } from '@/components/game/battles/VSAnimation'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import {
   Drawer,
   DrawerContent,
@@ -72,7 +83,9 @@ import type { GameCompletionResult } from '@/app/(frontend)/game/games/actions'
 import {
   arrangeTcgBattle,
   claimTcgBattleResult,
+  refreshTcgBattleState,
   startTcgBattle,
+  surrenderTcgPvp,
   tcgBattleAttack,
   tcgBattleCharge,
   tcgBattlePromote,
@@ -119,7 +132,7 @@ type BattleResolution = {
   damageCue?: DamageCue
   coinCue?: CoinCue
 }
-type ActionMeta =
+type ActionMeta = (
   | {
       kind: 'attack'
       attackerId: string
@@ -131,6 +144,7 @@ type ActionMeta =
   | { kind: 'promote'; cardId: string }
   | { kind: 'arrange' }
   | { kind: 'claim' }
+) & { actorSide?: SideTone }
 
 interface TcgBattleGameProps {
   encounter: TcgBattleGameConfig
@@ -229,11 +243,13 @@ function getProjectedDamage(
   state?: TcgBattleState,
 ): number {
   if (!attacker || !target) return 0
-  const sideKey = state && [...state.opponent.front, ...state.opponent.back].some(
-    (card) => card.instanceId === attacker.instanceId,
-  )
-    ? 'opponent'
-    : 'player'
+  const sideKey =
+    state &&
+    [...state.opponent.front, ...state.opponent.back].some(
+      (card) => card.instanceId === attacker.instanceId,
+    )
+      ? 'opponent'
+      : 'player'
   return calculateTcgBattleDamage(attacker, attack, target, state, sideKey)
 }
 
@@ -520,7 +536,11 @@ function getWinnerLabel(winner?: TcgBattleState['winner']) {
   return 'Result'
 }
 
-function getWinnerMessage(winner?: TcgBattleState['winner']) {
+function getWinnerMessage(
+  winner?: TcgBattleState['winner'],
+  noContest?: boolean,
+) {
+  if (noContest) return 'The match expired before either collector was ready.'
   if (winner === 'player') return 'You won the TCG battle.'
   if (winner === 'opponent') return 'You lost the TCG battle.'
   if (winner === 'tie') return 'The TCG battle ended in a draw.'
@@ -551,8 +571,11 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
   const [showEvolutionEnergyBurst, setShowEvolutionEnergyBurst] =
     useState(false)
   const [showEnergyCardBurst, setShowEnergyCardBurst] = useState(false)
+  const [showSurrenderConfirm, setShowSurrenderConfirm] = useState(false)
+  const [clockNow, setClockNow] = useState(() => Date.now())
   const [isPending, startTransition] = useTransition()
   const timersRef = useRef<number[]>([])
+  const lastAnimatedActionRef = useRef<string | null>(null)
 
   const clearResolutionTimers = useCallback(() => {
     timersRef.current.forEach((timer) => window.clearTimeout(timer))
@@ -579,12 +602,19 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       }
       setState(response.state)
       setFrontIds(
-        response.state.phase === 'arranging'
+        response.state.phase === 'arranging' && !response.state.ready?.player
           ? []
           : response.state.player.front.map((card) => card.instanceId),
       )
     })
   }, [encounter.id, router])
+
+  useEffect(() => {
+    if (state?.battleMode !== 'pvp' || state.phase === 'finished') return
+    setClockNow(Date.now())
+    const timer = window.setInterval(() => setClockNow(Date.now()), 1000)
+    return () => window.clearInterval(timer)
+  }, [state?.battleMode, state?.phase])
 
   useEffect(() => {
     if (state?.phase !== 'battle') return
@@ -612,6 +642,9 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
   )
   const attackCap = state ? getAllowedAttackCost(state.turnNumber) : 1
   const formatConfig = state ? TCG_BATTLE_FORMATS[state.format] : null
+  const deadlineSeconds = state?.deadlineAt
+    ? Math.max(0, Math.ceil((state.deadlineAt - clockNow) / 1000))
+    : null
   const prevAttackCapRef = useRef<number>(attackCap)
   const prevTurnRef = useRef<number>(state?.turnNumber || 1)
   const isBusy =
@@ -681,7 +714,8 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       if (meta.kind === 'arrange') {
         commitActionResult(nextState, completion)
         setShowOpeningVs(
-          Boolean(nextState.playerTrainer && nextState.enemyTrainer),
+          nextState.phase === 'battle' &&
+            Boolean(nextState.playerTrainer && nextState.enemyTrainer),
         )
         return
       }
@@ -766,9 +800,11 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
             publishVisualState((draft) => applyVisualStatusEvent(draft, event)),
         )
       }
-      const planOpponentSettle = () => {
+      const planOpponentSettle = (autoPromote = true) => {
         const fainted = compactVisualBattleBoard(plannedState.opponent)
-        const promoted = promoteOpponentVisualFront(plannedState)
+        const promoted = autoPromote
+          ? promoteOpponentVisualFront(plannedState)
+          : []
         return { fainted, promoted }
       }
       const planPlayerSettle = () => {
@@ -1061,7 +1097,10 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
             {
               id: makeResolutionId('player-effect'),
               tone: 'player',
-              title: playerEffectEvent.kind === 'copy' ? 'Copied Attack' : 'Card Effect',
+              title:
+                playerEffectEvent.kind === 'copy'
+                  ? 'Copied Attack'
+                  : 'Card Effect',
               detail: effectDetail,
               sourceId: playerEffectEvent.sourceId,
             },
@@ -1069,7 +1108,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           )
           cursor += RESOLUTION_TIMING.actionIntro
         }
-        queueOpponentSettle(planOpponentSettle())
+        queueOpponentSettle(planOpponentSettle(nextState.battleMode !== 'pvp'))
         queuePlayerSettle(planPlayerSettle())
       } else if (meta.kind === 'retreat') {
         const retreating = findSideCard(previousState.player, meta.frontId)
@@ -1131,7 +1170,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
         ? findSideCard(plannedState.player, opponentDamageEvent.targetId)
         : undefined
 
-      if (!skipOpponentStep) {
+      if (!skipOpponentStep && nextState.battleMode !== 'pvp') {
         if (opponentCoinCue) {
           queueResolution(
             RESOLUTION_TIMING.betweenActions,
@@ -1329,6 +1368,191 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     ],
   )
 
+  const animateRemoteActionResult = useCallback(
+    (previousState: TcgBattleState, nextState: TcgBattleState) => {
+      const action = nextState.lastAction
+      if (action?.side !== 'opponent') {
+        commitActionResult(nextState)
+        return
+      }
+
+      clearResolutionTimers()
+      setIsActionBusy(true)
+      if (action.kind === 'arrange') {
+        commitActionResult(nextState)
+        if (
+          previousState.phase === 'arranging' &&
+          nextState.phase === 'battle' &&
+          nextState.playerTrainer &&
+          nextState.enemyTrainer
+        ) {
+          setShowOpeningVs(true)
+        }
+        return
+      }
+      if (action.kind === 'surrender' || action.kind === 'timeout') {
+        commitActionResult(nextState)
+        return
+      }
+
+      const visualState = cloneTcgBattleState(previousState)
+      clearVisualActionEvents(visualState)
+      setState(visualState)
+      const remoteDamage = nextState.lastDamageEvents?.find(
+        (event) =>
+          event.reason !== 'status' &&
+          (event.targetSide === 'player' || event.targetSide === 'opponent'),
+      )
+      const remoteCoin = makeCoinCue(
+        nextState.lastCoinFlipEvents?.find(
+          (event) => event.side === 'opponent',
+        ),
+      )
+
+      if (action.kind === 'attack') {
+        const attacker = findSideCard(
+          previousState.opponent,
+          action.attackerId || '',
+        )
+        const target = findSideCard(previousState.player, action.targetId || '')
+        const attack = attacker?.attacks[action.attackIndex || 0]
+        setResolution({
+          id: makeResolutionId('remote-attack'),
+          tone: 'opponent',
+          title: remoteCoin
+            ? 'Opponent Flip'
+            : attack?.name || 'Opponent Attack',
+          detail: remoteCoin
+            ? formatCoinSummary(remoteCoin)
+            : target
+              ? `${attacker?.name || 'Opponent card'} targets ${target.name}`
+              : nextState.log[0] || 'The opposing front line acts.',
+          sourceId: attacker?.instanceId,
+          coinCue: remoteCoin,
+        })
+        playSfx('bad')
+        const damageDelay = remoteCoin
+          ? RESOLUTION_TIMING.coinFlip
+          : RESOLUTION_TIMING.actionIntro
+        if (remoteDamage) {
+          scheduleResolutionStep(() => {
+            setResolution({
+              id: makeResolutionId('remote-damage'),
+              tone:
+                remoteDamage.targetSide === 'player' ? 'opponent' : 'system',
+              title:
+                remoteDamage.reason === 'self' ? 'Recoil' : 'Opponent Attack',
+              detail:
+                remoteDamage.targetSide === 'player'
+                  ? `${target?.name || 'Your card'} takes the hit`
+                  : `${attacker?.name || 'Opponent card'} takes damage`,
+              sourceId: remoteDamage.sourceId,
+              damageCue: {
+                id: makeResolutionId('remote-damage-cue'),
+                targetId: remoteDamage.targetId,
+                damage: remoteDamage.damage,
+                side: remoteDamage.targetSide,
+              },
+            })
+            setState((current) => {
+              if (!current) return current
+              const draft = cloneTcgBattleState(current)
+              applyVisualDamageEvent(draft, remoteDamage)
+              return draft
+            })
+            playSfx(remoteDamage.targetSide === 'player' ? 'bad' : 'select')
+          }, damageDelay)
+        }
+        scheduleResolutionStep(
+          () => commitActionResult(nextState),
+          damageDelay + RESOLUTION_TIMING.damageHold,
+        )
+        return
+      }
+
+      const detail =
+        action.kind === 'retreat'
+          ? 'The opposing collector rotates their front line.'
+          : action.kind === 'promote'
+            ? 'The opposing collector promotes a bench card.'
+            : nextState.opponent.energy > previousState.opponent.energy
+              ? 'The opposing collector stores more Energy.'
+              : 'The opposing collector ends their turn.'
+      setResolution({
+        id: makeResolutionId(`remote-${action.kind}`),
+        tone: action.kind === 'promote' ? 'system' : 'opponent',
+        title:
+          action.kind === 'retreat'
+            ? 'Opponent Retreat'
+            : action.kind === 'promote'
+              ? 'Opponent Promotion'
+              : 'Opponent Charge',
+        detail,
+      })
+      playSfx('select')
+      scheduleResolutionStep(
+        () => commitActionResult(nextState),
+        RESOLUTION_TIMING.actionIntro + RESOLUTION_TIMING.finalSettle,
+      )
+    },
+    [
+      clearResolutionTimers,
+      commitActionResult,
+      playSfx,
+      scheduleResolutionStep,
+    ],
+  )
+
+  useEffect(() => {
+    if (
+      state?.battleMode !== 'pvp' ||
+      state.phase === 'finished' ||
+      isActionBusy ||
+      resolution ||
+      showOpeningVs
+    ) {
+      return
+    }
+
+    let cancelled = false
+    let inFlight = false
+    const poll = async () => {
+      if (inFlight) return
+      inFlight = true
+      try {
+        const response = await refreshTcgBattleState()
+        if (cancelled || !response.success) return
+        const currentRevision = state.revision || 0
+        const nextRevision = response.state.revision || 0
+        if (nextRevision <= currentRevision) return
+        const actionId = response.state.lastAction?.id
+        if (actionId && lastAnimatedActionRef.current === actionId) return
+        if (actionId) lastAnimatedActionRef.current = actionId
+
+        if (response.state.lastAction?.side === 'opponent') {
+          animateRemoteActionResult(state, response.state)
+        } else {
+          commitActionResult(response.state)
+        }
+      } finally {
+        inFlight = false
+      }
+    }
+
+    const interval = window.setInterval(() => void poll(), 1000)
+    return () => {
+      cancelled = true
+      window.clearInterval(interval)
+    }
+  }, [
+    animateRemoteActionResult,
+    commitActionResult,
+    isActionBusy,
+    resolution,
+    showOpeningVs,
+    state,
+  ])
+
   const primeActionResolution = (
     previousState: TcgBattleState | null,
     meta: ActionMeta,
@@ -1433,6 +1657,8 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           selectedAttacker.instanceId,
           attackIndex,
           currentTarget.instanceId,
+          undefined,
+          state.revision,
         ),
       {
         kind: 'attack',
@@ -1457,6 +1683,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           attackIndex,
           selectedTargetId,
           choice,
+          state?.revision,
         ),
       {
         kind: 'attack',
@@ -1496,6 +1723,49 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     }
     router.push('/game/explore')
   }
+
+  const handleSurrender = () => {
+    if (state?.battleMode !== 'pvp' || isBusy) return
+    setShowSurrenderConfirm(false)
+    setIsActionBusy(true)
+    startTransition(async () => {
+      const response = await surrenderTcgPvp(state.revision)
+      if (!response.success) {
+        setIsActionBusy(false)
+        toast.error(response.error)
+        return
+      }
+      commitActionResult(response.state, response.completion)
+    })
+  }
+
+  const surrenderDialog = state?.battleMode === 'pvp' && (
+    <AlertDialog
+      open={showSurrenderConfirm}
+      onOpenChange={setShowSurrenderConfirm}
+    >
+      <AlertDialogContent className="game-paper-background border-game-border bg-game-surface text-game-ink">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="font-display">
+            Surrender this match?
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            The opposing collector will receive the win. This cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Keep playing</AlertDialogCancel>
+          <AlertDialogAction
+            className="bg-game-clay text-game-cream hover:bg-game-clay/90"
+            onClick={handleSurrender}
+          >
+            Surrender
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+
   const resultOverlay = useMemo(() => {
     if (!result) return null
     if (state?.phase !== 'finished') return result
@@ -1503,9 +1773,9 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     return {
       ...result,
       success: result.success && state.winner === 'player',
-      message: getWinnerMessage(state.winner),
+      message: getWinnerMessage(state.winner, state.noContest),
     }
-  }, [result, state?.phase, state?.winner])
+  }, [result, state?.noContest, state?.phase, state?.winner])
 
   if (!state) {
     return (
@@ -1517,6 +1787,46 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
             Loading TCG battle
           </div>
         </div>
+      </div>
+    )
+  }
+
+  if (
+    state.battleMode === 'pvp' &&
+    state.phase === 'arranging' &&
+    state.ready?.player
+  ) {
+    return (
+      <div className="game-activity-chrome relative grid h-[100dvh] place-items-center overflow-hidden bg-game-canvas p-6 text-game-ink">
+        <ArenaBackdrop />
+        <div className="relative z-10 w-full max-w-md rounded-lg border border-[#d3ad63]/30 bg-[#172733]/90 p-6 text-center shadow-2xl backdrop-blur-md">
+          <Loader2 className="mx-auto h-9 w-9 animate-spin text-game-ochre" />
+          <SectionDivider className="mx-auto mb-2 mt-5 max-w-xs">
+            Your board is ready
+          </SectionDivider>
+          <h1 className="font-display text-3xl font-semibold text-[#f7ecd6]">
+            Waiting for your opponent
+          </h1>
+          <p className="mt-3 text-sm text-[#d8d2c3]">
+            Their cards stay hidden until both collectors are ready.
+          </p>
+          {deadlineSeconds !== null && (
+            <div className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-lg border border-[#f7ecd6]/15 bg-[#081014]/45 px-4 font-mono text-lg font-bold text-amber-200">
+              <Clock3 className="h-4 w-4" />
+              {formatMatchClock(deadlineSeconds)}
+            </div>
+          )}
+          <Button
+            type="button"
+            variant="ghost"
+            className="game-focus-ring mx-auto mt-5 min-h-11 text-[#d8d2c3] hover:bg-[#f7ecd6]/10 hover:text-[#f7ecd6]"
+            onClick={() => setShowSurrenderConfirm(true)}
+          >
+            <X className="h-4 w-4" />
+            Leave match
+          </Button>
+        </div>
+        {surrenderDialog}
       </div>
     )
   }
@@ -1534,6 +1844,22 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
         <ArenaBackdrop />
         <main className="relative z-10 flex h-full flex-col">
           <header className="shrink-0 px-4 pt-[calc(env(safe-area-inset-top)+1.8rem)] text-center sm:pt-[calc(env(safe-area-inset-top)+2.6rem)]">
+            {state.battleMode === 'pvp' && deadlineSeconds !== null && (
+              <div className="mx-auto mb-3 flex w-fit min-h-11 items-center gap-2 rounded-lg border border-[#f7ecd6]/15 bg-[#172733]/80 px-4 font-mono text-sm font-bold text-amber-200">
+                <Clock3 className="h-4 w-4" />
+                {formatMatchClock(deadlineSeconds)}
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  className="ml-1 h-9 w-9 text-[#d8d2c3] hover:bg-[#f7ecd6]/10 hover:text-[#f7ecd6]"
+                  aria-label="Surrender match"
+                  onClick={() => setShowSurrenderConfirm(true)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
             <SectionDivider className="mx-auto mb-2 max-w-xs sm:max-w-sm">
               Choose
             </SectionDivider>
@@ -1565,9 +1891,13 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
                     className="h-12 rounded-lg bg-game-clay px-8 text-xs font-black uppercase tracking-[0.18em] text-game-cream shadow-md hover:bg-game-clay/90"
                     disabled={isBusy}
                     onClick={() =>
-                      callAction(() => arrangeTcgBattle(frontIds, benchIds), {
-                        kind: 'arrange',
-                      })
+                      callAction(
+                        () =>
+                          arrangeTcgBattle(frontIds, benchIds, state.revision),
+                        {
+                          kind: 'arrange',
+                        },
+                      )
                     }
                   >
                     <Check className="h-4 w-4" />
@@ -1598,6 +1928,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
             </div>
           </footer>
         </main>
+        {surrenderDialog}
       </div>
     )
   }
@@ -1610,7 +1941,20 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           state={state}
           attackCap={attackCap}
           attackCapPulse={attackCapPulse}
+          deadlineSeconds={deadlineSeconds}
+          onSurrender={() => setShowSurrenderConfirm(true)}
         />
+
+        {state.battleMode === 'pvp' &&
+          state.phase !== 'finished' &&
+          (state.activeSide === 'opponent' ||
+            state.pendingPromotion === 'opponent') && (
+            <div className="pointer-events-none absolute left-1/2 top-[calc(env(safe-area-inset-top)+4.8rem)] z-30 -translate-x-1/2 rounded-lg border border-[#f7ecd6]/15 bg-[#172733]/90 px-3 py-2 text-center text-[11px] font-black uppercase tracking-[0.12em] text-amber-200 shadow-lg backdrop-blur-md">
+              {state.pendingPromotion === 'opponent'
+                ? 'Opponent is choosing a promotion'
+                : 'Opponent’s turn'}
+            </div>
+          )}
 
         <section className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 pb-16 pt-2 sm:gap-4 sm:pb-20">
           <TeamEnergyReadout
@@ -1671,7 +2015,9 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           resultShown={Boolean(result)}
           resolution={resolution}
           onCharge={() =>
-            callAction(() => tcgBattleCharge(), { kind: 'charge' })
+            callAction(() => tcgBattleCharge(state.revision), {
+              kind: 'charge',
+            })
           }
           onClaim={() =>
             callAction(() => claimTcgBattleResult(), { kind: 'claim' })
@@ -1689,7 +2035,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           isPending={isBusy}
           onClose={() => setBenchMode(null)}
           onPromote={(cardId) =>
-            callAction(() => tcgBattlePromote(cardId), {
+            callAction(() => tcgBattlePromote(cardId, state.revision), {
               kind: 'promote',
               cardId,
             })
@@ -1697,7 +2043,12 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           onRetreat={(benchId) => {
             if (!selectedAttacker) return
             callAction(
-              () => tcgBattleRetreat(selectedAttacker.instanceId, benchId),
+              () =>
+                tcgBattleRetreat(
+                  selectedAttacker.instanceId,
+                  benchId,
+                  state.revision,
+                ),
               {
                 kind: 'retreat',
                 frontId: selectedAttacker.instanceId,
@@ -1755,12 +2106,13 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           }
           message={
             state.phase === 'finished'
-              ? getWinnerMessage(state.winner)
+              ? getWinnerMessage(state.winner, state.noContest)
               : undefined
           }
           onClose={returnToExplore}
         />
       )}
+      {surrenderDialog}
       <style jsx global>{`
         @keyframes tcg-hit {
           0% {
@@ -1951,14 +2303,23 @@ function formatEnergyCap(value: number): string {
   return value === Number.POSITIVE_INFINITY ? '4+' : `${value}`
 }
 
+function formatMatchClock(seconds: number): string {
+  const minutes = Math.floor(seconds / 60)
+  return `${minutes}:${String(seconds % 60).padStart(2, '0')}`
+}
+
 function BattleTopBar({
   state,
   attackCap,
   attackCapPulse,
+  deadlineSeconds,
+  onSurrender,
 }: {
   state: TcgBattleState
   attackCap: number
   attackCapPulse: boolean
+  deadlineSeconds: number | null
+  onSurrender: () => void
 }) {
   const freeTypes =
     state.turnNumber >= 15
@@ -1970,10 +2331,16 @@ function BattleTopBar({
     state.phase === 'finished'
       ? state.winner === 'player'
         ? 'YOU'
-        : 'CPU'
+        : state.winner === 'tie'
+          ? 'DRAW'
+          : state.battleMode === 'pvp'
+            ? 'OPPONENT'
+            : 'CPU'
       : state.pendingPromotion === 'player' || state.activeSide === 'player'
         ? 'YOU'
-        : 'CPU'
+        : state.battleMode === 'pvp'
+          ? 'OPPONENT'
+          : 'CPU'
 
   return (
     <div className="mt-1 shrink-0 px-1 py-1 sm:mt-2">
@@ -1991,6 +2358,9 @@ function BattleTopBar({
         <div className="text-center leading-tight">
           <div className="text-[11px] font-light tracking-[0.08em] text-[#d8d2c3]">
             Round {state.turnNumber}
+            {state.battleMode === 'pvp' && deadlineSeconds !== null
+              ? ` · ${formatMatchClock(deadlineSeconds)}`
+              : ''}
           </div>
           <div className="text-[12px] font-black tracking-[0.14em] text-emerald-300">
             {sideLabel}
@@ -2006,6 +2376,18 @@ function BattleTopBar({
                 <EnergyIcon type={type || 'Colorless'} className="h-5 w-5" />
               </span>
             ))}
+          {state.battleMode === 'pvp' && state.phase !== 'finished' && (
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              className="h-10 w-10 text-[#d8d2c3] hover:bg-[#f7ecd6]/10 hover:text-[#f7ecd6]"
+              aria-label="Surrender match"
+              onClick={onSurrender}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
     </div>
@@ -2150,8 +2532,7 @@ function AttackChoiceDrawer({
   const [selectedType, setSelectedType] = useState<TcgBattleEnergyType>('Grass')
   const [resistanceType, setResistanceType] =
     useState<TcgBattleEnergyType>('Grass')
-  const [weaknessType, setWeaknessType] =
-    useState<TcgBattleEnergyType>('Grass')
+  const [weaknessType, setWeaknessType] = useState<TcgBattleEnergyType>('Grass')
   const target = validTargets.find(
     (card) => card.instanceId === selectedTargetId,
   )
@@ -2165,10 +2546,9 @@ function AttackChoiceDrawer({
   const copiedEffect = copiedAttack
     ? getTcgBattleAttackEffect(copiedAttack)
     : null
-  const activeRequirement: Exclude<
-    TcgBattleChoiceRequirement,
-    'copyAttack'
-  > | undefined =
+  const activeRequirement:
+    | Exclude<TcgBattleChoiceRequirement, 'copyAttack'>
+    | undefined =
     requirement === 'copyAttack'
       ? copiedEffect?.choiceRequirement === 'copyAttack'
         ? undefined
@@ -2200,10 +2580,9 @@ function AttackChoiceDrawer({
   if (!attack || !effect) return null
 
   const buildChoiceFor = (
-    required: Exclude<
-      NonNullable<typeof requirement>,
-      'copyAttack'
-    > | undefined,
+    required:
+      | Exclude<NonNullable<typeof requirement>, 'copyAttack'>
+      | undefined,
     attackChoiceIndex: number | null,
   ): TcgBattleAttackChoice | undefined => {
     if (required === 'disableAttack' && attackChoiceIndex !== null) {
@@ -2260,24 +2639,28 @@ function AttackChoiceDrawer({
     onChange: (value: string) => void,
   ) => (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-      {cards.filter((card) => card.currentHp > 0).map((card) => (
-        <button
-          type="button"
-          key={card.instanceId}
-          onClick={() => onChange(card.instanceId)}
-          className={cn(
-            'game-focus-ring min-h-11 rounded-lg border bg-game-night-surface px-3 py-2 text-left text-game-night-ink transition-colors',
-            value === card.instanceId
-              ? 'border-game-moss bg-game-moss/25'
-              : 'border-game-night-border/60 hover:border-game-moss/60',
-          )}
-        >
-          <span className="block truncate text-sm font-semibold">{card.name}</span>
-          <span className="font-mono text-xs text-game-night-muted">
-            {card.currentHp}/{card.hp} HP
-          </span>
-        </button>
-      ))}
+      {cards
+        .filter((card) => card.currentHp > 0)
+        .map((card) => (
+          <button
+            type="button"
+            key={card.instanceId}
+            onClick={() => onChange(card.instanceId)}
+            className={cn(
+              'game-focus-ring min-h-11 rounded-lg border bg-game-night-surface px-3 py-2 text-left text-game-night-ink transition-colors',
+              value === card.instanceId
+                ? 'border-game-moss bg-game-moss/25'
+                : 'border-game-night-border/60 hover:border-game-moss/60',
+            )}
+          >
+            <span className="block truncate text-sm font-semibold">
+              {card.name}
+            </span>
+            <span className="font-mono text-xs text-game-night-muted">
+              {card.currentHp}/{card.hp} HP
+            </span>
+          </button>
+        ))}
     </div>
   )
 
@@ -2294,7 +2677,9 @@ function AttackChoiceDrawer({
           className={cn(
             'game-focus-ring min-h-11 rounded-lg border px-3 py-2 text-sm font-semibold transition-colors',
             TYPE_BADGE_CLASSES[type],
-            value === type ? 'ring-2 ring-game-moss' : 'opacity-80 hover:opacity-100',
+            value === type
+              ? 'ring-2 ring-game-moss'
+              : 'opacity-80 hover:opacity-100',
           )}
         >
           {type}
@@ -2317,8 +2702,14 @@ function AttackChoiceDrawer({
         <div className="max-h-[60dvh] space-y-4 overflow-y-auto p-4">
           {(effect.targetScope === 'bench' || effect.targetScope === 'any') && (
             <section className="space-y-2">
-              <h3 className="text-sm font-semibold text-game-night-ink">Target</h3>
-              {renderCardChoices(validTargets, selectedTargetId, setSelectedTargetId)}
+              <h3 className="text-sm font-semibold text-game-night-ink">
+                Target
+              </h3>
+              {renderCardChoices(
+                validTargets,
+                selectedTargetId,
+                setSelectedTargetId,
+              )}
             </section>
           )}
           {(activeRequirement === 'opponentBench' ||
@@ -2329,7 +2720,11 @@ function AttackChoiceDrawer({
                   ? 'Switch with'
                   : 'Bring forward'}
               </h3>
-              {renderCardChoices(benchChoices, selectedCardId, setSelectedCardId)}
+              {renderCardChoices(
+                benchChoices,
+                selectedCardId,
+                setSelectedCardId,
+              )}
             </section>
           )}
           {requirement === 'copyAttack' && target && (
@@ -2368,8 +2763,12 @@ function AttackChoiceDrawer({
                         unavailable && 'cursor-not-allowed opacity-40',
                       )}
                     >
-                      <span className="block text-sm font-semibold">{candidate.name}</span>
-                      <span className="text-xs text-game-night-muted">{candidate.text || `${candidate.damage || 0} damage`}</span>
+                      <span className="block text-sm font-semibold">
+                        {candidate.name}
+                      </span>
+                      <span className="text-xs text-game-night-muted">
+                        {candidate.text || `${candidate.damage || 0} damage`}
+                      </span>
                     </button>
                   )
                 })}
@@ -2414,7 +2813,9 @@ function AttackChoiceDrawer({
           )}
           {activeRequirement === 'energyAmount' && (
             <section className="space-y-2">
-              <h3 className="text-sm font-semibold text-game-night-ink">Extra Energy</h3>
+              <h3 className="text-sm font-semibold text-game-night-ink">
+                Extra Energy
+              </h3>
               <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
                 {Array.from({ length: availableEnergy + 1 }, (_, amount) => (
                   <button
@@ -2439,24 +2840,35 @@ function AttackChoiceDrawer({
           {activeRequirement === 'textureMagic' && (
             <>
               <section className="space-y-2">
-                <h3 className="text-sm font-semibold text-game-night-ink">Your resistance</h3>
+                <h3 className="text-sm font-semibold text-game-night-ink">
+                  Your resistance
+                </h3>
                 {renderTypeChoices(resistanceType, setResistanceType)}
               </section>
               <section className="space-y-2">
-                <h3 className="text-sm font-semibold text-game-night-ink">Target weakness</h3>
+                <h3 className="text-sm font-semibold text-game-night-ink">
+                  Target weakness
+                </h3>
                 {renderTypeChoices(weaknessType, setWeaknessType)}
               </section>
             </>
           )}
         </div>
         <DrawerFooter className="border-t border-game-night-border sm:flex-row sm:justify-end">
-          <Button type="button" variant="outline" onClick={onClose} className="min-h-11">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            className="min-h-11"
+          >
             Cancel
           </Button>
           <Button
             type="button"
             disabled={!selectedTargetId || !choiceReady}
-            onClick={() => onConfirm(attackIndex, selectedTargetId, buildChoice())}
+            onClick={() =>
+              onConfirm(attackIndex, selectedTargetId, buildChoice())
+            }
             className="min-h-11 bg-game-clay text-white hover:bg-game-clay-strong"
           >
             Commit attack
@@ -2524,15 +2936,15 @@ function InlineAttackButtons({
           ? 'Wait'
           : isTcgBattleAttackDisabled(selectedAttacker!, index)
             ? 'Disabled'
-          : !hasResolvableTarget
-            ? 'Target'
-            : !isCardUnlockedByTurn(selectedAttacker, state.turnNumber)
-              ? `Turn ${selectedAttacker ? getTcgBattleCardUnlockTurnForCard(selectedAttacker) : 1}`
-              : cost > state.player.energy
-                ? 'Energy'
-                : cost > attackCap
-                  ? 'Cap'
-                  : ''
+            : !hasResolvableTarget
+              ? 'Target'
+              : !isCardUnlockedByTurn(selectedAttacker, state.turnNumber)
+                ? `Turn ${selectedAttacker ? getTcgBattleCardUnlockTurnForCard(selectedAttacker) : 1}`
+                : cost > state.player.energy
+                  ? 'Energy'
+                  : cost > attackCap
+                    ? 'Cap'
+                    : ''
         const disabled = isPending || Boolean(disabledReason)
 
         return (
