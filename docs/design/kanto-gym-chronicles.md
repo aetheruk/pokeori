@@ -12,22 +12,28 @@ Unlocked Badge Chronicles appear in Explore under Kanto's Pokemon Tower area, al
 
 | Leader | Chronicle | Memory focus | Signature activity | Claim reward |
 | --- | --- | --- | --- | ---: |
-| Brock | The Weight We Carry | Quarry collapse; strength becomes shared responsibility | Brace the Tunnel | 200 Explorer XP |
-| Misty | Beneath the Spotlight | Aquatic-show emergency; leadership replaces performance | Emergency Pump Sequence | 300 Explorer XP |
+| Brock | The Quarry Rescue | Quarry collapse; Brock learns to rely on the crew around him | Brace the Tunnel | 200 Explorer XP |
+| Misty | When the Pumps Failed | Aquatic-show emergency; Misty takes charge and reshapes the Gym | Emergency Valve Sequence | 300 Explorer XP |
 | Lt. Surge | The Last Flight | Wartime evacuation; conscience overrides an unsafe order | Restore Auxiliary Power | 400 Explorer XP |
-| Erika | The Roots Beneath Celadon | Poisoned greenhouse; patient investigation becomes public action | Trace the Contamination | 500 Explorer XP |
-| Koga | The Antidote | Stolen venoms; Janine's injury changes how discipline is taught | Identify the Toxin | 600 Explorer XP |
-| Sabrina | Every Voice at Once | Teleport calibration failure; connection replaces isolation | Realign the Signal | 700 Explorer XP |
-| Blaine | The Question We Should Have Asked | Legitimate recovery research becomes an unethical pressure test | Evacuation Alarms | 800 Explorer XP |
-| Giovanni | The Price of Order | Crisis relief becomes institutional control at a private cost | Clear the Relief Road | 1,000 Explorer XP |
+| Erika | The Old Glasshouse | A leak from a derelict dye warehouse threatens the neighbouring community glasshouse | Follow the Drainage | 500 Explorer XP |
+| Koga | The Stolen Venoms | Janine is injured after Koga pursues stolen venom samples alone | Antidote Drill | 600 Explorer XP |
+| Sabrina | The Silph Test | A teleport calibration traps Porygon between overlapping signals | Calibration Pattern | 700 Explorer XP |
+| Blaine | One More Trial | Legitimate recovery research continues after its safety is in doubt | Containment Drill | 800 Explorer XP |
+| Giovanni | The Western Road | Emergency relief becomes a regional network under Giovanni's control | Clear the Relief Road | 1,000 Explorer XP |
 
 Every route contains five narrative beats, two battles, and one mini-game. The player uses the leader's authored team, battle medicine, and balls inside the memory.
+
+## Narrative Voice
+
+The memories are spoken in direct, first-person language. Each beat focuses on what the Leader saw, did, or said rather than turning the event into a formal moral. Reflection is restrained and usually saved for the final beat.
+
+Each Leader has a separate rhythm: Brock is warm and practical, Misty is brisk and competitive, Surge is clipped and direct, Erika is observant and gently firm, Koga is concise and emotionally guarded, Sabrina is quiet and precise, Blaine is curious and technical, and Giovanni is controlled and persuasive. Dialogue avoids em dashes, repeated oppositional phrasing, and explicit speeches about what each Badge represents.
 
 ## The Viridian Relief Thread
 
 A small black Rhyhorn seal recurs on mundane paperwork: Erika's redevelopment contract, Koga's stolen chemical case, Sabrina's Silph grant ledger, and Blaine's Cinnabar funding papers. It is not framed as a supernatural omen. Giovanni's Chronicle resolves the motif as the mark used on the exclusive relief and infrastructure contracts through which he converted emergency competence into durable influence.
 
-The final image is deliberately double-edged. Giovanni signs a public Gym stewardship charter beside a private consolidation charter while his son's dinner goes cold. His tragedy is not that he wanted disorder; it is that he learned to value controllable order above consent and intimacy.
+Giovanni signs the Gym charter and the final transport contracts on the same day. He sees no conflict between serving Viridian publicly and controlling its supply network privately. His son waiting through dinner shows the personal cost without requiring Giovanni to explain it.
 
 ## Blaine and Fuji Boundary
 

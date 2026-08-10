@@ -205,7 +205,7 @@ export const pokemonTowerExpeditions: ExpeditionConfig[] = [
     rewards: [
       {
         type: 'xp',
-        skill: 'explorer',
+        skill: 'catching',
         quantity: 800,
         dropChance: 100,
       },

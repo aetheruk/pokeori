@@ -3,8 +3,8 @@ import type { IdentifyConfig } from '../types'
 export const gymLeaderChronicleIdentifyEntries: IdentifyConfig[] = [
   {
     id: 'chronicle-erika-trace-the-contamination',
-    name: 'Trace the Contamination',
-    description: 'Identify the greenhouse Pokémon affected along the poisoned drainage route.',
+    name: 'Follow the Drainage',
+    description: 'Identify the affected greenhouse Pokémon and follow the old drain toward the empty warehouse.',
     category: 'Secret', subCategory: 'Erika Chronicle',
     icon: { type: 'pokemon', id: '114' },
     background: '/backgrounds/chronicle-erika-greenhouse.avif',
@@ -14,8 +14,8 @@ export const gymLeaderChronicleIdentifyEntries: IdentifyConfig[] = [
   },
   {
     id: 'chronicle-koga-identify-the-toxin',
-    name: 'Identify the Toxin',
-    description: 'Recognize the venom sources quickly enough to prepare Janine’s antidote.',
+    name: 'Antidote Drill',
+    description: "Match each Pokémon to its venom sample during Janine's training exercise.",
     category: 'Secret', subCategory: 'Koga Chronicle',
     icon: { type: 'item', id: 'antidote' },
     background: '/backgrounds/chronicle-koga-apothecary.avif',
