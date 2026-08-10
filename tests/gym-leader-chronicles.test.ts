@@ -40,6 +40,8 @@ describe('Kanto Gym Leader Chronicles', () => {
       )
 
       expect(expedition).toBeDefined()
+      expect(expedition?.category).toBe('Kanto')
+      expect(expedition?.subCategory).toBe('Pokemon Tower')
       expect(expedition?.canFail).toBe(false)
       expect(expedition?.path).toHaveLength(8)
       expect(expedition?.path.every((node) => node.type === 'activity')).toBe(
