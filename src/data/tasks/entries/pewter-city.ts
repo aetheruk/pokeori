@@ -1533,7 +1533,7 @@ export const pewterCityTasks: Task[] = [
       {
         type: 'item_owned',
         targetId: 'small-stone-t1',
-        count: 10,
+        count: 5,
         consume: true,
       },
       {

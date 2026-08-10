@@ -50,6 +50,29 @@ describe('reward result exit modal ordering', () => {
     ).toBe('cards')
   })
 
+  test('opens research breakthroughs before the reward summary', () => {
+    expect(
+      getRewardResultInitialStep({
+        success: true,
+        summary: {
+          xp: {},
+          items: [],
+          pokemon: [],
+          currency: [],
+          cards: [],
+          researchBreakthroughs: [
+            {
+              formId: '25',
+              pokemonName: 'Pikachu',
+              newLevel: 1,
+              skillXpGranted: 0,
+            },
+          ],
+        },
+      }),
+    ).toBe('research-breakthrough')
+  })
+
   test('shows the completed task modal before task-complete reward modals', () => {
     const result: GenericResult = {
       success: true,
