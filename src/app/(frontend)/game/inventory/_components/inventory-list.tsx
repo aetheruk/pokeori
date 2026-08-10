@@ -80,7 +80,6 @@ import { isPokemonTargetedInventoryItem } from '@/utilities/pokemon/item-usabili
 import {
   getMoveDisplayType,
   getMoveInfoTags,
-  getMoveLevel,
   getMoveTypeSpriteItemId,
 } from '@/utilities/pokemon/move-display'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
@@ -1303,9 +1302,6 @@ function TmMoveDetails({
                 />
                 <Badge className="border-game-border bg-game-canvas px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-game-ink">
                   {moveTypeLabel}
-                </Badge>
-                <Badge className="border-game-ochre/30 bg-game-ochre/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-game-ochre">
-                  Use Lv. {getMoveLevel(move)}
                 </Badge>
               </div>
               <p className="mt-2 text-sm leading-relaxed text-game-muted">

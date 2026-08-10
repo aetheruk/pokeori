@@ -1555,9 +1555,6 @@ export function PokemonDetailsDialog({
                               <span className="rounded-full border border-game-border bg-game-canvas px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-game-muted">
                                 Power {formatAssignedMovePower(move.damage)}
                               </span>
-                              <span className="rounded-full border border-game-border bg-game-canvas px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-game-muted">
-                                Lv {move.level}
-                              </span>
                             </div>
                             <div className="mt-1 line-clamp-2 text-[11px] leading-snug text-game-muted">
                               {move.description}

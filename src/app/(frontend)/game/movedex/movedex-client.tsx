@@ -290,8 +290,6 @@ function MoveDexListItem({
   const stanceConfig = STANCE_ICON_CONFIG[entry.move.stance]
   const moveTypeId =
     entry.moveType === 'random' ? null : typeIdMap[entry.moveType]
-  const moveLevel = entry.move.level ?? 1
-
   return (
     <button
       type="button"
@@ -366,7 +364,7 @@ function MoveDexListItem({
             : 'border-game-border bg-game-canvas text-game-muted',
         )}
       >
-        {isKnown ? `Lv ${moveLevel}` : '???'}
+        {isKnown ? 'Known' : '???'}
       </Badge>
     </button>
   )
