@@ -6,6 +6,7 @@ import { vermilionCityExpeditions } from './entries/vermilion-city'
 import { ssAnneExpeditions } from './entries/ss-anne'
 import { route9Expeditions } from './entries/route-9'
 import { pokemonTowerExpeditions } from './entries/pokemon-tower'
+import { gymLeaderChronicleExpeditions } from './entries/gym-leader-chronicles'
 
 export * from './types'
 
@@ -17,6 +18,7 @@ export const expeditions: ExpeditionConfig[] = [
   ...ssAnneExpeditions,
   ...route9Expeditions,
   ...pokemonTowerExpeditions,
+  ...gymLeaderChronicleExpeditions,
 ]
 
 export function getExpedition(id: string): ExpeditionConfig | undefined {

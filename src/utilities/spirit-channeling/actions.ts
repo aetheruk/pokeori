@@ -9,8 +9,8 @@ import {
   getSpiritChannelingActivityId,
   getSpiritChannelingConfigForMemento,
   getSpiritChannelingEnergyClue,
+  getSpiritChannelingOfferedEnergy,
   getSpiritChannelingOffering,
-  type SpiritChannelingEnergy,
 } from '@/data/spirit-channeling'
 import { getPokemonForm } from '@/utilities/pokemon/pokedex'
 import { checkUserAuth } from '@/utilities/auth/server-auth'
@@ -76,21 +76,6 @@ function aggregateOfferings(
     record[offering.itemId] = (record[offering.itemId] || 0) + offering.quantity
     return record
   }, {})
-}
-
-function getOfferedEnergy(
-  offerings: Record<string, number>,
-): SpiritChannelingEnergy | null {
-  const energy: SpiritChannelingEnergy = {}
-
-  for (const [itemId, quantity] of Object.entries(offerings)) {
-    const offering = getSpiritChannelingOffering(itemId)
-    if (!offering) return null
-    energy[offering.type] =
-      (energy[offering.type] || 0) + offering.energy * quantity
-  }
-
-  return energy
 }
 
 async function isChannelingCompleted(
@@ -222,7 +207,12 @@ export async function beginSpiritChanneling(
       }
     }
 
-    const offeredEnergy = getOfferedEnergy(aggregatedOfferings)
+    const offeredEnergy = getSpiritChannelingOfferedEnergy(
+      Object.entries(aggregatedOfferings).map(([itemId, quantity]) => ({
+        itemId,
+        quantity,
+      })),
+    )
     const energyClue = offeredEnergy
       ? getSpiritChannelingEnergyClue(config.requiredEnergy, offeredEnergy)
       : 'The spirits do not understand that offering.'

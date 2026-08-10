@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { ItemSprite } from '@/components/ui/item-sprite'
+import { Input } from '@/components/ui/input'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
 import { items } from '@/data/items'
@@ -24,6 +25,7 @@ import {
   BOOK_OF_CHANNELING_ITEM_ID,
   getSpiritChannelingActivityId,
   getSpiritChannelingConfigForMemento,
+  getSpiritChannelingOfferedEnergy,
   SPIRIT_CHANNELING_CONFIGS,
   SPIRIT_CHANNELING_INCENSE_ITEMS,
   SPIRIT_CHANNELING_OFFERING_ITEMS,
@@ -220,6 +222,37 @@ export function SpiritChannelingPanel() {
     [inventoryMap],
   )
 
+  const setSlotQuantity = useCallback(
+    (index: number, quantity: number) => {
+      setOfferingSlots((slots) =>
+        slots.map((slot, slotIndex) => {
+          if (slotIndex !== index || !slot.itemId) return slot
+          const nextQuantity = Number.isFinite(quantity)
+            ? Math.trunc(quantity)
+            : 1
+          return {
+            ...slot,
+            quantity: Math.min(
+              inventoryMap[slot.itemId] || 1,
+              Math.max(1, nextQuantity),
+            ),
+          }
+        }),
+      )
+    },
+    [inventoryMap],
+  )
+
+  const offeredEnergy = useMemo(
+    () =>
+      getSpiritChannelingOfferedEnergy(
+        offeringSlots
+          .filter((slot) => slot.itemId)
+          .map((slot) => ({ itemId: slot.itemId, quantity: slot.quantity })),
+      ) || {},
+    [offeringSlots],
+  )
+
   const canSubmit =
     hasBook &&
     !!selectedConfig &&
@@ -342,9 +375,26 @@ export function SpiritChannelingPanel() {
                       }}
                       onClear={clearSlotItem}
                       onQuantityChange={adjustSlotQuantity}
+                      onQuantitySet={setSlotQuantity}
                     />
                   ))}
                 </div>
+                {Object.keys(offeredEnergy).length > 0 && (
+                  <div
+                    className="mt-4 flex flex-wrap justify-center gap-2"
+                    role="status"
+                    aria-label="Offered energy totals"
+                  >
+                    {Object.entries(offeredEnergy).map(([type, amount]) => (
+                      <span
+                        key={type}
+                        className="rounded-full border border-game-night-border bg-game-night-surface px-3 py-1 font-mono text-xs font-black uppercase tracking-[0.08em] text-game-night-ink"
+                      >
+                        {type} energy: {amount}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </Section>
 
               <Section title="Channeling">
@@ -863,6 +913,7 @@ function OfferingSlotControl({
   onActivate,
   onClear,
   onQuantityChange,
+  onQuantitySet,
 }: {
   index: number
   slot: OfferingSlot
@@ -870,11 +921,12 @@ function OfferingSlotControl({
   onActivate: (index: number) => void
   onClear: (index: number) => void
   onQuantityChange: (index: number, delta: number) => void
+  onQuantitySet: (index: number, quantity: number) => void
 }) {
   const quantityMax = slot.itemId ? inventoryMap[slot.itemId] || 1 : 1
 
   return (
-    <div className="flex w-20 flex-col items-center">
+    <div className="flex w-36 flex-col items-center">
       <div className="relative h-[72px] w-[72px]">
         <button
           type="button"
@@ -934,11 +986,18 @@ function OfferingSlotControl({
         >
           <Minus className="h-3.5 w-3.5" />
         </Button>
-        <div className="w-5 text-center">
-          <div className="font-mono text-xs font-black text-game-ink">
-            {slot.itemId ? slot.quantity : 0}
-          </div>
-        </div>
+        <Input
+          type="number"
+          inputMode="numeric"
+          min={1}
+          max={quantityMax}
+          value={slot.itemId ? slot.quantity : 0}
+          disabled={!slot.itemId}
+          onChange={(event) => onQuantitySet(index, Number(event.target.value))}
+          onFocus={(event) => event.currentTarget.select()}
+          aria-label={`Offering ${index + 1} quantity`}
+          className="h-8 w-14 border-0 bg-transparent px-1 text-center font-mono text-xs font-black text-game-ink shadow-none focus-visible:ring-1 focus-visible:ring-game-moss"
+        />
         <Button
           type="button"
           size="icon-sm"

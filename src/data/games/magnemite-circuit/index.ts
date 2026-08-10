@@ -8,7 +8,9 @@ export type {
 
 import { MagnemiteCircuitGameConfig } from './types'
 import { testMagnemiteCircuitEntries } from './entries/test'
+import { gymLeaderChronicleCircuitEntries } from './entries/gym-leader-chronicles'
 
 export const magnemiteCircuitGames: MagnemiteCircuitGameConfig[] = [
   ...testMagnemiteCircuitEntries,
+  ...gymLeaderChronicleCircuitEntries,
 ]
