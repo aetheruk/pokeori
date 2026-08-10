@@ -29,7 +29,7 @@ const battleDefinitions: Record<KantoGymChronicleKey, ChronicleBattleDefinition[
   ],
   erika: [
     { id: 'suffering-muk', name: 'A Frightened Muk', description: 'Calm the sick Muk without forcing it farther into the contaminated drain.', icon: { type: 'pokemon', id: '89' }, wild: true, maxPokemon: 3, enemyTeam: [{ speciesId: 89, formId: '89', level: 30, aiMoves: ['sludge', 'acid', 'harden'] }] },
-    { id: 'developer-enforcer', name: 'The Site Manager', description: 'Keep the east beds intact until the city inspector arrives.', trainerClassId: 'gentleman', trainerName: 'Gable', icon: { type: 'trainer', id: 'gentleman' }, enemyTeam: [{ speciesId: 110, formId: '110', level: 28 }, { speciesId: 53, formId: '53', level: 29 }] },
+    { id: 'developer-enforcer', name: 'The Site Manager', description: 'Stop Gable from emptying the chemical tank into the drain before the city inspector arrives.', trainerClassId: 'gentleman', trainerName: 'Gable', icon: { type: 'trainer', id: 'gentleman' }, maxPokemon: 3, enemyTeam: [{ speciesId: 110, formId: '110', level: 28 }, { speciesId: 53, formId: '53', level: 29 }] },
   ],
   koga: [
     { id: 'venom-poachers', name: 'The Venom Thieves', description: 'Corner the first thief outside the Safari Zone storehouse.', trainerClassId: 'pokemaniac', trainerName: 'Raku', icon: { type: 'trainer', id: 'pokemaniac' }, enemyTeam: [{ speciesId: 20, formId: '20', level: 32 }, { speciesId: 24, formId: '24', level: 34 }] },
