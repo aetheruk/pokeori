@@ -1,6 +1,7 @@
 import type { LocationReward } from '@/data/types'
 import type { PokemonTypeName } from '@/data/items/types'
 import { FUJI_GLASSES_ITEM_ID } from '@/data/items/special-item-ids'
+import { KANTO_GYM_CHRONICLES } from '@/data/gym-leader-chronicles'
 import { TYPE_MATERIAL_CONFIG } from '@/utilities/artisan/material-drops'
 
 export const BOOK_OF_CHANNELING_ITEM_ID = 'book-of-channeling'
@@ -80,6 +81,11 @@ export interface SpiritChannelingOfferingItem {
   kind: 'material' | 'gem'
 }
 
+export interface SpiritChannelingOfferingSelection {
+  itemId: string
+  quantity: number
+}
+
 export const POKEMON_TYPE_NAMES: PokemonTypeName[] = [
   'normal',
   'fire',
@@ -120,6 +126,24 @@ export const SPIRIT_CHANNELING_CONFIGS: SpiritChannelingConfig[] = [
       },
     ],
   },
+  ...KANTO_GYM_CHRONICLES.map((chronicle) => ({
+    id: `${chronicle.key}-${chronicle.badgeName.toLowerCase().replace(' badge', '')}-badge-memory`,
+    name: `${chronicle.leaderName}: ${chronicle.title}`,
+    description: `A personal memory held in the ${chronicle.badgeName}.`,
+    mementoItemId: chronicle.badgeItemId,
+    correctIncenseItemId: 'incense-memory' as const,
+    requiredEnergy: { [chronicle.energyType]: chronicle.energyAmount },
+    channelerMinLevel: chronicle.channelerMinLevel,
+    rewards: [
+      {
+        type: 'task_complete' as const,
+        targetId: chronicle.markerId,
+        quantity: 1,
+        dropChance: 100,
+        secret: true,
+      },
+    ],
+  })),
 ]
 
 export const SPIRIT_CHANNELING_CONFIG_BY_MEMENTO = new Map(
@@ -174,6 +198,23 @@ export const SPIRIT_CHANNELING_OFFERING_BY_ITEM_ID = new Map(
 
 export function getSpiritChannelingOffering(itemId: string) {
   return SPIRIT_CHANNELING_OFFERING_BY_ITEM_ID.get(itemId)
+}
+
+export function getSpiritChannelingOfferedEnergy(
+  offerings: SpiritChannelingOfferingSelection[],
+): SpiritChannelingEnergy | null {
+  const energy: SpiritChannelingEnergy = {}
+
+  for (const selection of offerings) {
+    const offering = getSpiritChannelingOffering(selection.itemId)
+    if (!offering || !Number.isInteger(selection.quantity) || selection.quantity < 1) {
+      return null
+    }
+    energy[offering.type] =
+      (energy[offering.type] || 0) + offering.energy * selection.quantity
+  }
+
+  return energy
 }
 
 export function normalizeSpiritChannelingEnergy(

@@ -32,6 +32,7 @@ import { ceruleanCaveBattles } from './entries/cerulean-cave'
 import { pvpBattles } from './entries/pvp'
 import { secretBattles } from './entries/secret'
 import { specialEventBattles } from './entries/special-events'
+import { gymLeaderChronicleBattles } from './entries/gym-leader-chronicles'
 
 export * from '../types'
 
@@ -69,4 +70,5 @@ export const battles: BattleConfig[] = [
   ...pvpBattles,
   ...secretBattles,
   ...specialEventBattles,
+  ...gymLeaderChronicleBattles,
 ]

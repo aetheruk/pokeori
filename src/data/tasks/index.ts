@@ -33,6 +33,7 @@ import { indigoPlateauTasks } from './entries/indigo-plateau'
 import { ceruleanCaveTasks } from './entries/cerulean-cave'
 import { specialEventTasks } from './entries/special-events'
 import { recipeManualTasks } from './entries/recipe-manuals'
+import { gymLeaderChronicleTasks } from './entries/gym-leader-chronicles'
 
 export * from '../types'
 export * from '../tasks/types'
@@ -71,4 +72,5 @@ export const tasks: Task[] = [
   ...ceruleanCaveTasks,
   ...specialEventTasks,
   ...recipeManualTasks,
+  ...gymLeaderChronicleTasks,
 ]

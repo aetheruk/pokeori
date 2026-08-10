@@ -5,6 +5,7 @@ import {
   doesSpiritChannelingEnergyMatch,
   getSpiritChannelingConfigForMemento,
   getSpiritChannelingEnergyClue,
+  getSpiritChannelingOfferedEnergy,
   getSpiritChannelingOffering,
   SPIRIT_CHANNELING_CONFIGS,
   SPIRIT_CHANNELING_INCENSE_ITEMS,
@@ -78,5 +79,14 @@ describe('spirit channeling data', () => {
     expect(getSpiritChannelingEnergyClue({ ghost: 3 }, { ghost: 4 })).toBe(
       'The spirits are overwhelmed by Ghost offerings.',
     )
+  })
+
+  test('offering energy aggregates material and gem quantities', () => {
+    expect(
+      getSpiritChannelingOfferedEnergy([
+        { itemId: 'small-stone-t1', quantity: 94 },
+        { itemId: 'rock-gem', quantity: 1 },
+      ]),
+    ).toEqual({ rock: 97 })
   })
 })

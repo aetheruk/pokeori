@@ -1139,7 +1139,12 @@ describe('static data references', () => {
     )
 
     expect(
-      iconItems?.map((item) => [item.id, item.name, item.stock, item.daily || false]),
+      iconItems?.map((item) => [
+        item.id,
+        item.name,
+        item.stock,
+        item.daily || false,
+      ]),
     ).toEqual([
       ['trainer-gb-red', 'Red (Red)', 1, false],
       ['trainer-gb-blue', 'Blue (Red)', 1, false],
@@ -5103,15 +5108,29 @@ describe('static data references', () => {
     }
   })
 
-  test('Gym Heroes daily rewards swap packs for a second League Ticket at a full set', () => {
+  test('Gym Heroes dailies double packs after the matching Chronicle and swap packs at a full set', () => {
     const gymDailyEntries = [
-      tasks.find((entry) => entry.id === 'brock-daily-stones'),
-      tasks.find((entry) => entry.id === 'misty-daily-scales'),
-      allGames.find((entry) => entry.id === 'vermilion-gym-voltorb-drill'),
-      tasks.find((entry) => entry.id === 'erikas-sweet-tooth'),
-    ]
+      {
+        entry: tasks.find((entry) => entry.id === 'brock-daily-stones'),
+        chronicleId: 'brock-boulder-badge-chronicle',
+      },
+      {
+        entry: tasks.find((entry) => entry.id === 'misty-daily-scales'),
+        chronicleId: 'misty-cascade-badge-chronicle',
+      },
+      {
+        entry: allGames.find(
+          (entry) => entry.id === 'vermilion-gym-voltorb-drill',
+        ),
+        chronicleId: 'surge-thunder-badge-chronicle',
+      },
+      {
+        entry: tasks.find((entry) => entry.id === 'erikas-sweet-tooth'),
+        chronicleId: 'erika-rainbow-badge-chronicle',
+      },
+    ] as const
 
-    for (const entry of gymDailyEntries) {
+    for (const { entry, chronicleId } of gymDailyEntries) {
       expect(entry).toBeDefined()
       expect(entry?.criteria).toContainEqual({
         type: 'currency_owned',
@@ -5120,7 +5139,11 @@ describe('static data references', () => {
         consume: true,
       })
       const rewards = entry?.rewards || []
-      expect(rewards).toContainEqual({
+      const packRewards = rewards.filter(
+        (reward) => reward.type === 'item' && reward.targetId === 'pack-gym1',
+      )
+      expect(packRewards).toHaveLength(2)
+      expect(packRewards).toContainEqual({
         type: 'item',
         targetId: 'pack-gym1',
         quantity: 1,
@@ -5132,6 +5155,27 @@ describe('static data references', () => {
             count: 132,
             unique: true,
             inverse: true,
+          },
+        ],
+      })
+      expect(packRewards).toContainEqual({
+        type: 'item',
+        targetId: 'pack-gym1',
+        quantity: 1,
+        dropChance: 100,
+        requirements: [
+          {
+            type: 'card_collected_set',
+            targetId: 'gym1',
+            count: 132,
+            unique: true,
+            inverse: true,
+          },
+          {
+            type: 'expedition_result',
+            targetId: chronicleId,
+            expeditionStatus: 'completed',
+            count: 1,
           },
         ],
       })
@@ -5158,9 +5202,7 @@ describe('static data references', () => {
     }
 
     expect(
-      tasks
-        .find((entry) => entry.id === 'brock-daily-stones')
-        ?.criteria,
+      tasks.find((entry) => entry.id === 'brock-daily-stones')?.criteria,
     ).toContainEqual({
       type: 'item_owned',
       targetId: 'small-stone-t1',
