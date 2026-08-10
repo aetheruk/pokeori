@@ -76,7 +76,6 @@ import type { BattleStance } from '@/utilities/battle/types'
 import {
   getMoveDisplayType,
   getMoveInfoTags,
-  getMoveLevel,
   getMoveTmItem,
   getMoveTypeSpriteItemId,
 } from '@/utilities/pokemon/move-display'
@@ -952,11 +951,7 @@ function PreferredStanceBadge({
 function getCompatibleMovesForForm(formId: string): MoveConfig[] {
   return getAllMoves()
     .filter((move) => move.formId?.includes(formId) ?? false)
-    .sort((a, b) => {
-      const levelDiff = getMoveLevel(a) - getMoveLevel(b)
-      if (levelDiff !== 0) return levelDiff
-      return a.name.localeCompare(b.name)
-    })
+    .sort((a, b) => a.name.localeCompare(b.name))
 }
 
 function ObservedMoveListButton({
@@ -986,7 +981,7 @@ function ObservedMoveListButton({
         <DialogHeader className="border-b border-game-border px-5 pt-5 pb-4">
           <DialogTitle>{pokemon.name} move notes</DialogTitle>
           <DialogDescription>
-            Battle Observer data can identify compatible TMs by level order.
+            Battle Observer data can identify compatible TMs for this species.
           </DialogDescription>
         </DialogHeader>
 
@@ -1053,16 +1048,13 @@ function ObservedMoveRow({
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="rounded bg-game-moss/10 px-1.5 py-0.5 font-mono text-[10px] font-bold leading-none text-game-moss-strong">
-              Lv {getMoveLevel(move)}
-            </span>
             <h4 className="truncate text-sm font-semibold text-game-ink">
               {isKnown ? move.name : 'TM Not found'}
             </h4>
           </div>
           <div className="mt-1 flex flex-wrap gap-1">
             {(isKnown
-              ? tags.slice(1, 5)
+              ? tags.slice(0, 4)
               : [{ label: 'Type', value: type }]
             ).map((tag) => (
               <span

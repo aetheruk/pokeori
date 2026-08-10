@@ -20,10 +20,6 @@ export function getMoveTypeSpriteItemId(move: Pick<MoveConfig, 'forcedType'>): s
   return type === 'random' ? 'tm-normal' : `tm-${type}`
 }
 
-export function getMoveLevel(move: Pick<MoveConfig, 'level'>): number {
-  return move.level || 1
-}
-
 function formatPercent(value: number): string {
   return `${Math.round(value)}%`
 }
@@ -85,7 +81,6 @@ function formatStatus(status: NonNullable<MoveConfig['status']>): string {
 
 export function getMoveInfoTags(move: MoveConfig): MoveInfoTag[] {
   const tags: MoveInfoTag[] = [
-    { label: 'Level', value: String(getMoveLevel(move)) },
     { label: 'Stance', value: move.stance === 'random' ? 'Random' : move.stance },
     { label: 'Type', value: getMoveDisplayType(move) },
     { label: 'Accuracy', value: formatPercent(move.accuracy) },

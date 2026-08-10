@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { items } from '@/data/items'
-import { getAllMoves } from '@/data/moves'
+import { getAllMoves, getMove } from '@/data/moves'
+import { canEnemyPokemonUseAiMove } from '@/utilities/battle/enemy-ai'
 import {
   getAssignedMoveOptions,
   getAvailableMoveOptions,
@@ -83,6 +84,65 @@ describe('pokemon move assignment helpers', () => {
     ).toBe(false)
   })
 
+  test('player-owned moves ignore authored levels while fallback and AI retain them', () => {
+    const inventory = {
+      'tm-mega-punch': 1,
+      'tm-ember': 1,
+    }
+    const lowLevelCharmander = makeBattlePokemon({
+      formId: '4',
+      level: 10,
+      types: ['fire'],
+      assignedMoves: [{ moveId: 'mega-punch' }],
+    })
+
+    expect(
+      getAvailableMoveOptions({
+        pokemonTypes: ['fire'],
+        pokemonFormId: '4',
+        pokemonLevel: 10,
+        inventory,
+      }).map((move) => move.id),
+    ).toContain('mega-punch')
+    expect(
+      getAvailableMoveOptions({
+        pokemonTypes: ['fire'],
+        pokemonFormId: '4',
+        pokemonLevel: 10,
+        inventory,
+        enforceLevel: true,
+      }).map((move) => move.id),
+    ).not.toContain('mega-punch')
+    expect(
+      validateAssignedMoveIds({
+        moveIds: ['mega-punch'],
+        pokemonTypes: ['fire'],
+        pokemonFormId: '4',
+        pokemonLevel: 10,
+        inventory,
+      }).success,
+    ).toBe(true)
+
+    expect(
+      getBattleMoveOptions({
+        assignedMoves: lowLevelCharmander.assignedMoves,
+        pokemonTypes: lowLevelCharmander.types,
+        pokemonFormId: lowLevelCharmander.formId,
+        pokemonLevel: lowLevelCharmander.level,
+        inventory,
+        maxAssignedMoves: 2,
+        pokemon: lowLevelCharmander,
+        profile: 'trainer',
+      }).map((move) => move.id),
+    ).toEqual(['mega-punch', 'ember'])
+    expect(
+      canEnemyPokemonUseAiMove(
+        lowLevelCharmander,
+        getMove('mega-punch')!,
+      ),
+    ).toBe(false)
+  })
+
   test('rejects Trainer-cap over-assignment and missing TMs', () => {
     expect(
       validateAssignedMoveIds({
@@ -161,9 +221,9 @@ describe('pokemon move assignment helpers', () => {
     expect(cappedAssigned.map((move) => move.id)).toEqual(['sing'])
   })
 
-  test('battle move options fill unusable assigned slots from owned TMs at capped level', () => {
+  test('battle move options fill empty slots from owned TMs at capped level', () => {
     const charmander = makeBattlePokemon({
-      assignedMoves: [{ moveId: 'mega-punch' }],
+      assignedMoves: [],
     })
     const moves = getBattleMoveOptions({
       assignedMoves: charmander.assignedMoves,

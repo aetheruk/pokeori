@@ -71,8 +71,15 @@ export function canPokemonUseMove(params: {
   pokemonFormId?: string | null
   pokemonLevel?: number | null
   inventory?: Record<string, number>
+  enforceLevel?: boolean
 }): boolean {
-  const { move, pokemonFormId, pokemonLevel, inventory = {} } = params
+  const {
+    move,
+    pokemonFormId,
+    pokemonLevel,
+    inventory = {},
+    enforceLevel = false,
+  } = params
   if (move.aiOnly || move.manualOnly) return false
 
   const tmItem = items.find((item) => item.moveId === move.id)
@@ -84,7 +91,7 @@ export function canPokemonUseMove(params: {
     if (!move.formId.includes(pokemonFormId)) return false
   }
 
-  if (move.level) {
+  if (enforceLevel && move.level) {
     const level = pokemonLevel || 1
     if (level < move.level) return false
   }
@@ -97,8 +104,15 @@ export function getAvailableMoveOptions(params: {
   pokemonFormId?: string | null
   pokemonLevel?: number | null
   inventory?: Record<string, number>
+  enforceLevel?: boolean
 }): PokemonMoveOption[] {
-  const { pokemonTypes, pokemonFormId, pokemonLevel, inventory } = params
+  const {
+    pokemonTypes,
+    pokemonFormId,
+    pokemonLevel,
+    inventory,
+    enforceLevel = false,
+  } = params
 
   return getAllMoves()
     .filter((move) =>
@@ -108,6 +122,7 @@ export function getAvailableMoveOptions(params: {
         pokemonFormId,
         pokemonLevel,
         inventory,
+        enforceLevel,
       }),
     )
     .map((move) => toPokemonMoveOption(move))
@@ -139,6 +154,7 @@ export function getAssignedMoveOptions(params: {
         pokemonFormId: params.pokemonFormId,
         pokemonLevel: params.pokemonLevel,
         inventory: params.inventory,
+        enforceLevel: false,
       })
     ) {
       return []
@@ -179,6 +195,9 @@ export function getBattleMoveOptions(params: {
     pokemonFormId: params.pokemonFormId,
     pokemonLevel: params.pokemonLevel,
     inventory: params.inventory,
+    // Player-selected moves may ignore authored learn levels, but an empty
+    // slot should not silently auto-equip a late-game move.
+    enforceLevel: true,
   })
     .map((move) => move.id)
     .filter((moveId) => !assignedIds.has(moveId))
