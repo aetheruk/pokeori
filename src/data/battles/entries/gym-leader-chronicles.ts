@@ -11,6 +11,7 @@ interface ChronicleBattleDefinition {
   icon: BattleConfig['icon']
   enemyTeam: BattleEnemy[]
   wild?: boolean
+  maxPokemon?: number
 }
 
 const battleDefinitions: Record<KantoGymChronicleKey, ChronicleBattleDefinition[]> = {
@@ -27,7 +28,7 @@ const battleDefinitions: Record<KantoGymChronicleKey, ChronicleBattleDefinition[
     { id: 'electabuzz-overload', name: 'Hold the Current', description: 'Stay with Electabuzz while it keeps the failing auxiliary circuit alive.', icon: { type: 'pokemon', id: '125' }, wild: true, enemyTeam: [{ speciesId: 125, formId: '125', level: 30, aiMoves: ['thunder-shock', 'thunder-wave', 'quick-attack'] }] },
   ],
   erika: [
-    { id: 'suffering-muk', name: 'A Frightened Muk', description: 'Calm the sick Muk without forcing it farther into the contaminated drain.', icon: { type: 'pokemon', id: '89' }, wild: true, enemyTeam: [{ speciesId: 89, formId: '89', level: 30, aiMoves: ['sludge', 'acid', 'harden'] }] },
+    { id: 'suffering-muk', name: 'A Frightened Muk', description: 'Calm the sick Muk without forcing it farther into the contaminated drain.', icon: { type: 'pokemon', id: '89' }, wild: true, maxPokemon: 3, enemyTeam: [{ speciesId: 89, formId: '89', level: 30, aiMoves: ['sludge', 'acid', 'harden'] }] },
     { id: 'developer-enforcer', name: 'The Site Manager', description: 'Keep the east beds intact until the city inspector arrives.', trainerClassId: 'gentleman', trainerName: 'Gable', icon: { type: 'trainer', id: 'gentleman' }, enemyTeam: [{ speciesId: 110, formId: '110', level: 28 }, { speciesId: 53, formId: '53', level: 29 }] },
   ],
   koga: [
@@ -63,7 +64,8 @@ export const gymLeaderChronicleBattles: BattleConfig[] = KANTO_GYM_CHRONICLES.fl
       requirements: [{ type: 'task_completed', targetId: chronicle.markerId }],
       enemyTeam: battle.enemyTeam,
       rewards: [],
-      maxPokemon: Math.min(4, Math.max(1, battle.enemyTeam.length)),
+      maxPokemon:
+        battle.maxPokemon ?? Math.min(4, Math.max(1, battle.enemyTeam.length)),
       levelCap: Math.max(
         ...battle.enemyTeam.map((enemy) =>
           typeof enemy.level === 'number' ? enemy.level + 4 : enemy.level.max + 4,
