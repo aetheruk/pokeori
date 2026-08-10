@@ -4,7 +4,7 @@ export const gymLeaderChronicleRockPushEntries: RockPushGameConfig[] = [
   {
     id: 'chronicle-giovanni-clear-the-relief-road',
     name: 'Clear the Relief Road',
-    description: 'Move the fallen stone and reopen Viridian’s western supply route.',
+    description: "Move the fallen stone and reopen Viridian's western supply route.",
     category: 'Secret', subCategory: 'Giovanni Chronicle',
     icon: { type: 'item', id: 'hard-stone' },
     background: '/backgrounds/chronicle-giovanni-viridian-office.avif',

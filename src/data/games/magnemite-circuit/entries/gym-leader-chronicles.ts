@@ -4,7 +4,7 @@ export const gymLeaderChronicleCircuitEntries: MagnemiteCircuitGameConfig[] = [
   {
     id: 'chronicle-surge-restore-auxiliary-power',
     name: 'Restore Auxiliary Power',
-    description: 'Rotate the damaged transport circuit and return power to the controls.',
+    description: 'Reconnect the damaged auxiliary circuit and return power to the controls.',
     category: 'Secret', subCategory: 'Lt. Surge Chronicle',
     icon: { type: 'pokemon', id: '81' },
     background: '/backgrounds/chronicle-surge-storm-transport.avif',

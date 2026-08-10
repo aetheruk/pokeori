@@ -4,7 +4,7 @@ export const gymLeaderChronicleMiningEntries: MiningConfig[] = [
   {
     id: 'chronicle-brock-brace-the-tunnel',
     name: 'Brace the Tunnel',
-    description: 'Strike the fractured stone precisely enough to place the rescue supports.',
+    description: 'Clear fractured stone so the quarry crew can brace the damaged roof.',
     category: 'Secret',
     subCategory: 'Brock Chronicle',
     icon: { type: 'item', id: 'hard-stone' },

@@ -3,8 +3,8 @@ import type { RhythmConfig } from '../types'
 export const gymLeaderChronicleRhythmEntries: RhythmConfig[] = [
   {
     id: 'chronicle-misty-emergency-pumps',
-    name: 'Emergency Pump Sequence',
-    description: 'Match Misty’s rescue signals to restart the aquatic theater pumps.',
+    name: 'Emergency Valve Sequence',
+    description: "Follow Misty's signals to isolate the damaged tank and keep the service gates powered.",
     category: 'Secret', subCategory: 'Misty Chronicle',
     icon: { type: 'pokemon', id: '121' },
     background: '/backgrounds/chronicle-misty-water-theater.avif',
@@ -21,8 +21,8 @@ export const gymLeaderChronicleRhythmEntries: RhythmConfig[] = [
   },
   {
     id: 'chronicle-blaine-evacuation-alarms',
-    name: 'Evacuation Alarms',
-    description: 'Follow the laboratory alarm sequence and open the safe evacuation route.',
+    name: 'Containment Drill',
+    description: "Learn the laboratory's alarm sequence and open the marked evacuation route.",
     category: 'Secret', subCategory: 'Blaine Chronicle',
     icon: { type: 'pokemon', id: '58' },
     background: '/backgrounds/chronicle-blaine-cinnabar-lab.avif',

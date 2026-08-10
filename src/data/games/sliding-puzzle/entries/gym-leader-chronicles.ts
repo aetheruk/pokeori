@@ -3,8 +3,8 @@ import type { SlidingPuzzleConfig } from '../types'
 export const gymLeaderChronicleSlidingPuzzleGames: SlidingPuzzleConfig[] = [
   {
     id: 'chronicle-sabrina-realign-the-signal',
-    name: 'Realign the Signal',
-    description: 'Reassemble Porygon’s broken calibration pattern and guide it home.',
+    name: 'Calibration Pattern',
+    description: "Reassemble Porygon's signal pattern during the chamber's routine test.",
     category: 'Secret', subCategory: 'Sabrina Chronicle',
     icon: { type: 'pokemon', id: '137' },
     background: '/backgrounds/chronicle-sabrina-teleport-lab.avif',

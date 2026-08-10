@@ -55,7 +55,7 @@ describe('Kanto Gym Leader Chronicles', () => {
       expect(expedition?.rewards).toContainEqual(
         expect.objectContaining({
           type: 'xp',
-          skill: 'explorer',
+          skill: 'catching',
           quantity: explorerXp,
         }),
       )
@@ -66,6 +66,18 @@ describe('Kanto Gym Leader Chronicles', () => {
         }),
       )
     }
+  })
+
+  test('every Chronicle awards Explorer XP through the canonical catching skill id', () => {
+    const chronicleXpRewards = expeditions
+      .filter((expedition) => expedition.chronicle)
+      .flatMap((expedition) => expedition.rewards || [])
+      .filter((reward) => reward.type === 'xp')
+
+    expect(chronicleXpRewards.length).toBeGreaterThan(0)
+    expect(
+      chronicleXpRewards.every((reward) => reward.skill === 'catching'),
+    ).toBe(true)
   })
 
   test('supporting activities exist and do not expose later-world plot terms', () => {
@@ -99,6 +111,10 @@ describe('Kanto Gym Leader Chronicles', () => {
         battles: battles.filter(
           (battle) =>
             battle.subCategory === `${definition.leaderName} Chronicle`,
+        ),
+        games: allGames.filter(
+          (game) =>
+            game.subCategory === `${definition.leaderName} Chronicle`,
         ),
       }).toLowerCase()
       expect(authored.includes('—'), `${definition.key}:em dash`).toBe(false)

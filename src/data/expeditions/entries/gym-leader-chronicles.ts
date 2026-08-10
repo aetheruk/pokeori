@@ -83,7 +83,7 @@ export const gymLeaderChronicleExpeditions: ExpeditionConfig[] = KANTO_GYM_CHRON
     return {
       id: chronicle.expeditionId,
       name: `${chronicle.leaderName}: ${chronicle.title}`,
-      description: `Enter the ${chronicle.badgeName} and experience a defining memory from ${chronicle.leaderName}'s past.`,
+      description: `Step into the memory held by the ${chronicle.badgeName} and see how ${chronicle.leaderName} came to lead a Gym.`,
       category: 'Kanto',
       subCategory: 'Pokemon Tower',
       buttonText: 'Enter the Memory',
@@ -118,7 +118,7 @@ export const gymLeaderChronicleExpeditions: ExpeditionConfig[] = KANTO_GYM_CHRON
         secret: true,
       })),
       rewards: [
-        { type: 'xp', skill: 'explorer', quantity: chronicle.explorerXp, dropChance: 100 },
+        { type: 'xp', skill: 'catching', quantity: chronicle.explorerXp, dropChance: 100 },
       ],
     }
   },
