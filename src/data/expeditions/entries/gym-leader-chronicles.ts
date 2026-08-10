@@ -85,7 +85,7 @@ export const gymLeaderChronicleExpeditions: ExpeditionConfig[] = KANTO_GYM_CHRON
       name: `${chronicle.leaderName}: ${chronicle.title}`,
       description: `Enter the ${chronicle.badgeName} and experience a defining memory from ${chronicle.leaderName}'s past.`,
       category: 'Kanto',
-      subCategory: 'Gym Leader Chronicles',
+      subCategory: 'Pokemon Tower',
       buttonText: 'Enter the Memory',
       icon: { type: 'trainer', id: chronicle.trainerIconId },
       background: chronicle.background,

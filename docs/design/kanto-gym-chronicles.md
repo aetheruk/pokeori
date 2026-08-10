@@ -6,6 +6,8 @@ The eight Gym Badge Chronicles are personal, playable memories told from each Ka
 
 Each Chronicle is unlocked by channeling its badge with Memory Incense, the exact authored elemental energy, and a Psychic-type Pokemon at the required level. The resulting expedition is linear, secret, one-time, and can be played independently of the other badge memories.
 
+Unlocked Badge Chronicles appear in Explore under Kanto's Pokemon Tower area, alongside the other memory fragments surfaced through Spirit Channeling. They are grouped under the Chronicles heading rather than being given a separate region area.
+
 ## Authored Set
 
 | Leader | Chronicle | Memory focus | Signature activity | Claim reward |
