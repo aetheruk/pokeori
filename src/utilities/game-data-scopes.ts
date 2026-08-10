@@ -43,6 +43,7 @@ export const GAME_DATA_SCOPE_KEYS: Record<GameDataScope, GameDataKeys[]> = {
   explore: [
     'pokemon',
     ...TRAINER_COLLECTION_KEYS,
+    'shopPurchases',
     'expeditionResults',
     'activeExpedition',
     'rivalTrainer',
