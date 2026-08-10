@@ -80,6 +80,26 @@ describe('Kanto Gym Leader Chronicles', () => {
     ).toBe(true)
   })
 
+  test("Erika can bring her full team and counter Muk's Poison typing", () => {
+    const expedition = expeditions.find(
+      (candidate) => candidate.id === 'erika-rainbow-badge-chronicle',
+    )
+    const chronicle =
+      typeof expedition?.chronicle === 'object'
+        ? expedition.chronicle
+        : undefined
+    const exeggutor = chronicle?.battleTeam?.find(
+      (pokemon) => pokemon.speciesId === 103,
+    )
+    const mukBattle = battles.find(
+      (battle) => battle.id === 'chronicle-erika-suffering-muk',
+    )
+
+    expect(mukBattle?.maxPokemon).toBe(3)
+    expect(exeggutor?.assignedMoves).toContain('psybeam')
+    expect(exeggutor?.assignedMoves).toContain('sleep-powder')
+  })
+
   test('supporting activities exist and do not expose later-world plot terms', () => {
     const gameIds = new Set(allGames.map((game) => game.id))
     const battleIds = new Set(battles.map((battle) => battle.id))

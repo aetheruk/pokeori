@@ -27,9 +27,9 @@ const battleTeams: Record<KantoGymChronicleKey, ExpeditionChroniclePokemonConfig
     { speciesId: 100, formId: '100', name: 'Voltorb', level: 25, assignedMoves: ['thunder-shock', 'quick-attack'] },
   ],
   erika: [
-    { speciesId: 44, formId: '44', name: 'Gloom', level: 28, assignedMoves: ['absorb', 'acid', 'mega-drain'] },
-    { speciesId: 114, formId: '114', name: 'Tangela', level: 27, assignedMoves: ['vine-whip', 'bind', 'mega-drain'] },
-    { speciesId: 70, formId: '70', name: 'Weepinbell', level: 29, assignedMoves: ['razor-leaf', 'acid', 'vine-whip'] },
+    { speciesId: 44, formId: '44', name: 'Gloom', level: 28, assignedMoves: ['absorb', 'acid', 'mega-drain', 'sleep-powder'] },
+    { speciesId: 114, formId: '114', name: 'Tangela', level: 27, assignedMoves: ['vine-whip', 'bind', 'mega-drain', 'stun-spore'] },
+    { speciesId: 103, formId: '103', name: 'Exeggutor', level: 29, assignedMoves: ['psybeam', 'sleep-powder', 'leech-seed', 'reflect'] },
   ],
   koga: [
     { speciesId: 48, formId: '48', name: 'Venonat', level: 32, assignedMoves: ['confusion', 'psybeam', 'poison-sting'] },
