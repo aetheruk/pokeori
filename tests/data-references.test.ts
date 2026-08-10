@@ -4018,6 +4018,8 @@ describe('static data references', () => {
       expect(item.cost).toEqual([
         { type: 'currency', id: 'pokedollars', amount: 5000 },
       ])
+      expect(item.stock).toBe(1)
+      expect(item.daily || false).toBe(false)
     }
 
     expect(recipeCounter?.items).toHaveLength(6)
@@ -5154,6 +5156,17 @@ describe('static data references', () => {
         ],
       })
     }
+
+    expect(
+      tasks
+        .find((entry) => entry.id === 'brock-daily-stones')
+        ?.criteria,
+    ).toContainEqual({
+      type: 'item_owned',
+      targetId: 'small-stone-t1',
+      count: 5,
+      consume: true,
+    })
   })
 
   test('Thirsty Work dailies stop after ten completions and pay quenched wrap-ups', () => {

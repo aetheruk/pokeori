@@ -20,7 +20,7 @@ import {
 import { calculateReleaseRewards } from '@/utilities/rewards/candy-logic'
 import type { NatureName } from '@/data/natures'
 import type { Pokemon, User } from '@/payload-types'
-import { grantRewards } from '@/utilities/rewards/reward-logic'
+import { grantRewards, type RewardSummary } from '@/utilities/rewards/reward-logic'
 import { getPokemonForm, getPokemonSpecies } from '@/utilities/pokemon/pokedex'
 import { items } from '@/data/items'
 import { ABILITIES } from '@/data/abilities'
@@ -207,6 +207,7 @@ export async function applyItemToPokemon(
     }
 
     let updatedPokemon: typeof pokemon | null = null
+    let rewardSummary: RewardSummary | undefined
 
     // 3. Apply Effect
     if (itemDef.effects.increaseEv) {
@@ -651,6 +652,7 @@ export async function applyItemToPokemon(
       if (!result.success) {
         throw new Error('Failed to grant research XP')
       }
+      rewardSummary = result.summary
 
       // Refresh pokemon data if needed (though research XP is on Pokedex, not Pokemon doc)
       updatedPokemon = await payload.findByID({
@@ -676,6 +678,7 @@ export async function applyItemToPokemon(
       success: true as const,
       message: `Used ${itemDef.name} on ${pokemon.name || 'Pokemon'}`,
       pokemon: updatedPokemon,
+      summary: rewardSummary,
     }
   } catch (error) {
     logger.error('Error applying item to Pokemon:', error)

@@ -57,7 +57,10 @@ export const celadonCityShops: ShopConfig[] = [
     background: '/backgrounds/shop.avif',
     requirements: afterStoreIntro,
     items: ['slow-strike', 'mighty-charge', 'accidental-tap', 'cunning-trap', 'play-dumb'].map(
-      (move) => item(`tm-${move}`, `tm-${move}`, 5000),
+      (move) => ({
+        ...item(`tm-${move}`, `tm-${move}`, 5000),
+        stock: 1,
+      }),
     ),
   },
   {

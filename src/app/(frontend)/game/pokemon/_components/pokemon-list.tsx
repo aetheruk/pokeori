@@ -66,6 +66,7 @@ import type { PokemonData } from '@/data/pokemon-data'
 import pokemonData from '@/data/pokemon-data'
 import { cn } from '@/lib/utils'
 import type { Pokemon } from '@/payload-types'
+import type { RewardSummary } from '@/utilities/rewards/reward-logic'
 import { getOwnedPokemonGender } from '@/utilities/pokemon/gender'
 import {
   getPokemonRarityEffect,
@@ -186,6 +187,13 @@ export function PokemonList({
   const [usingItemOnPokemonId, setUsingItemOnPokemonId] = useState<
     string | null
   >(null)
+  const [itemRewardResult, setItemRewardResult] = useState<{
+    itemId: string
+    itemName: string
+    summary: RewardSummary
+    leaveSelection: boolean
+    message: string
+  } | null>(null)
 
   const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const longPressTriggeredRef = useRef(false)
@@ -789,7 +797,15 @@ export function PokemonList({
       await refreshUser()
 
       const currentQuantity = inventoryMap[itemToUse.id] || 0
-      if (currentQuantity <= 1) {
+      if (result.summary) {
+        setItemRewardResult({
+          itemId: itemToUse.id,
+          itemName: itemToUse.name,
+          summary: result.summary as RewardSummary,
+          leaveSelection: currentQuantity <= 1,
+          message: result.message || `Used ${itemToUse.name}.`,
+        })
+      } else if (currentQuantity <= 1) {
         router.replace('/game/pokemon')
       }
     } catch (error) {
@@ -1716,6 +1732,25 @@ export function PokemonList({
         title="Egg Hatched"
         message={eggHatchResult?.message}
       />
+      {itemRewardResult && (
+        <RewardResultOverlay
+          result={{
+            success: true,
+            message: itemRewardResult.message,
+            rewards: itemRewardResult.summary,
+          }}
+          onClose={() => {
+            const leaveSelection = itemRewardResult.leaveSelection
+            setItemRewardResult(null)
+            refreshUser()
+            if (leaveSelection) router.replace('/game/pokemon')
+          }}
+          title={`${itemRewardResult.itemName} Used`}
+          message={itemRewardResult.message}
+          icon={{ type: 'item', id: itemRewardResult.itemId }}
+          iconAlt={itemRewardResult.itemName}
+        />
+      )}
     </div>
   )
 }

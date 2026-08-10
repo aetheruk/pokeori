@@ -19,6 +19,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { ItemSprite } from '@/components/ui/item-sprite'
+import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { useUser } from '@/context/UserContext'
 import type { Pokemon } from '@/payload-types'
 import { getOwnedPokemonGender } from '@/utilities/pokemon/gender'
@@ -30,6 +31,7 @@ import {
   type PokemonItemPickerGroup,
 } from '@/utilities/pokemon/item-usability'
 import { SectionDivider } from '@/components/ui/section-divider'
+import type { RewardSummary } from '@/utilities/rewards/reward-logic'
 import {
   applyItemToPokemon,
   getFusionPartnerOptions,
@@ -82,6 +84,12 @@ export function UseItemDialog({
     FusionPartnerOption[]
   >([])
   const [loadingFusionPartners, setLoadingFusionPartners] = useState(false)
+  const [rewardResult, setRewardResult] = useState<{
+    itemId: string
+    itemName: string
+    summary: RewardSummary
+    message: string
+  } | null>(null)
 
   const inventoryStore = useInventoryStore((state) => state.inventory)
   const decrementItem = useInventoryStore((state) => state.decrementItem)
@@ -212,7 +220,8 @@ export function UseItemDialog({
         return
       }
       if (result.success && result.pokemon) {
-        toast.success(result.message)
+        const itemName = loadedItem?.definition.name || itemId
+        if (!result.summary) toast.success(result.message)
         const newLevel = result.pokemon.level || 1
         setCurrentLevel(newLevel)
         onUpdate?.(result.pokemon)
@@ -221,6 +230,15 @@ export function UseItemDialog({
         setSelectedItemForStat(null) // Reset selection view
         setSelectedFusionItem(null)
         setFusionPartnerOptions([])
+        if (result.summary) {
+          setOpen(false)
+          setRewardResult({
+            itemId,
+            itemName,
+            summary: result.summary as RewardSummary,
+            message: result.message || `Used ${itemName}.`,
+          })
+        }
       }
     } catch (error) {
       if (shouldConsume) incrementItem(itemId)
@@ -495,6 +513,23 @@ export function UseItemDialog({
           )}
         </div>
       </DialogContent>
+      {rewardResult && (
+        <RewardResultOverlay
+          result={{
+            success: true,
+            message: rewardResult.message,
+            rewards: rewardResult.summary,
+          }}
+          onClose={() => {
+            setRewardResult(null)
+            refreshUser()
+          }}
+          title={`${rewardResult.itemName} Used`}
+          message={rewardResult.message}
+          icon={{ type: 'item', id: rewardResult.itemId }}
+          iconAlt={rewardResult.itemName}
+        />
+      )}
     </Dialog>
   )
 }
