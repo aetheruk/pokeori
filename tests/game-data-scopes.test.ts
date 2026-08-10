@@ -19,6 +19,7 @@ describe('game data sync scopes', () => {
     expect(GAME_DATA_SCOPE_KEYS.explore).toContain('pokemon')
     expect(GAME_DATA_SCOPE_KEYS.explore).toContain('weather')
     expect(GAME_DATA_SCOPE_KEYS.explore).toContain('activeExpedition')
+    expect(GAME_DATA_SCOPE_KEYS.explore).toContain('shopPurchases')
     expect(EXPLORE_POKEMON_SELECT).toMatchObject({
       id: true,
       speciesId: true,
