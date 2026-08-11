@@ -5416,16 +5416,12 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
   {
     id: 'bind',
     name: 'Bind',
-    description: 'The user binds the target for one to three turns. stopping all moves.',
+    description: 'The user binds and squeezes the target for four to five turns.',
     stance: 'random',
     target: 'enemy',
     forcedType: 'normal',
-    damage: 0.2,
+    damage: 0.3,
     accuracy: 85,
-    continuous: {
-      min: 1,
-      max: 3,
-    },
     level: 10,
     formId: [
       '1',
@@ -5512,7 +5508,28 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
       '10180',
       '10181',
     ],
-    interruptEnemyMove: 100,
+    secondaryStatuses: [
+      {
+        id: 'bind',
+        name: 'Bind',
+        target: 'enemy-pokemon',
+        triggers: ['turn-end'],
+        turns: {
+          min: 4,
+          max: 5,
+        },
+        effects: [
+          {
+            type: 'damage',
+            percentMaxHp: 12.5,
+          },
+          {
+            type: 'switch-prevention',
+          },
+        ],
+        chance: 100,
+      },
+    ],
   },
   {
     id: 'block',

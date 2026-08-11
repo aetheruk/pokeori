@@ -2236,6 +2236,36 @@ describe('move damage helpers', () => {
     )
   })
 
+  test('Bind uses residual trapping instead of a continuous move lock', () => {
+    const bind = getMove('bind')!
+    const state = makePveBattleState()
+    const attacker = state.playerTeam[0]
+    const defender = state.enemyTeam[0]
+
+    expect(bind.damage).toBe(0.3)
+    expect(bind.accuracy).toBe(85)
+    expect(bind.continuous).toBeUndefined()
+    expect(bind.interruptEnemyMove).toBeUndefined()
+
+    applySecondaryStatusesFromMove({
+      move: bind,
+      state,
+      attacker,
+      defender,
+      sourceSide: 'player',
+      random: () => 0,
+    })
+
+    expect(defender.secondaryStatuses?.[0]).toMatchObject({
+      id: 'bind',
+      remainingTurns: 4,
+      effects: [
+        { type: 'damage', percentMaxHp: 12.5 },
+        { type: 'switch-prevention' },
+      ],
+    })
+  })
+
   test('trapping move effects end when the source pokemon leaves battle', () => {
     const state = makePveBattleState({
       playerTeam: [
