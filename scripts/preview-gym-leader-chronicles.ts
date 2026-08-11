@@ -38,7 +38,7 @@ for (const chronicle of chronicles) {
       console.log(`\n${number} SCENE: ${beat.title}`)
       for (const panel of beat.panels) {
         const speaker =
-          panel.kind === 'narration' ? 'Narration' : panel.speaker
+          panel.kind === 'narration' ? 'Narration' : panel.speaker.name
         console.log(`  [${speaker}] ${panel.message}`)
       }
       return

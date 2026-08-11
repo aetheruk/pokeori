@@ -2,10 +2,14 @@ import { describe, expect, test } from 'bun:test'
 import { battles } from '@/data/battles'
 import { expeditions } from '@/data/expeditions'
 import { allGames } from '@/data/games'
-import { KANTO_GYM_CHRONICLE_STORIES } from '@/data/gym-leader-chronicle-stories'
+import {
+  chronicleActivityId,
+  KANTO_GYM_CHRONICLE_STORIES,
+} from '@/data/gym-leader-chronicle-stories'
 import { KANTO_GYM_CHRONICLES } from '@/data/gym-leader-chronicles'
 import { SPIRIT_CHANNELING_CONFIGS } from '@/data/spirit-channeling'
 import { tasks } from '@/data/tasks'
+import { banners } from '@/data/user'
 
 const expectedRituals = [
   ['badge-kanto-boulder', 'rock', 97, 5, 200],
@@ -82,12 +86,70 @@ describe('Kanto Gym Leader Chronicles', () => {
           quantity: explorerXp,
         }),
       )
+      expect(expedition?.rewards).toContainEqual(
+        expect.objectContaining({
+          type: 'banner',
+          targetId: `chronicle-${definition.key}`,
+          dropChance: 100,
+        }),
+      )
       expect(expedition?.requirements).toContainEqual(
         expect.objectContaining({
           type: 'task_completed',
           targetId: definition.markerId,
         }),
       )
+    }
+  })
+
+  test('every Chronicle speech and narration panel renders its authored icon', () => {
+    for (const definition of KANTO_GYM_CHRONICLES) {
+      const story = KANTO_GYM_CHRONICLE_STORIES[definition.key]
+      const speakerIcons = new Map<string, string>()
+
+      for (const scene of story.sequence.filter(
+        (beat) => beat.type === 'scene',
+      )) {
+        const task = tasks.find(
+          (candidate) =>
+            candidate.id === chronicleActivityId(definition.key, scene.id),
+        )
+
+        expect(task?.enterModal).toHaveLength(scene.panels.length)
+
+        scene.panels.forEach((panel, index) => {
+          const rendered = task?.enterModal?.[index]
+
+          if (panel.kind === 'narration') {
+            expect(rendered?.title).toBe(scene.title)
+            expect(rendered?.icon).toEqual({
+              type: 'item',
+              id: definition.badgeItemId,
+            })
+            return
+          }
+
+          const iconKey = JSON.stringify(panel.speaker.icon)
+          const existingIcon = speakerIcons.get(panel.speaker.name)
+          if (existingIcon) expect(iconKey).toBe(existingIcon)
+          speakerIcons.set(panel.speaker.name, iconKey)
+
+          expect(rendered?.title).toBe(panel.speaker.name)
+          expect(rendered?.icon).toEqual(panel.speaker.icon)
+        })
+      }
+    }
+  })
+
+  test('every Chronicle has a matching player banner definition', () => {
+    for (const definition of KANTO_GYM_CHRONICLES) {
+      const banner = banners.find(
+        (candidate) => candidate.id === `chronicle-${definition.key}`,
+      )
+
+      expect(banner).toBeDefined()
+      expect(banner?.imagePath).toBe(definition.background)
+      expect(banner?.name).toBe(`${definition.leaderName}: ${definition.title}`)
     }
   })
 
@@ -157,7 +219,7 @@ describe('Kanto Gym Leader Chronicles', () => {
     ).toBe(true)
   })
 
-  test('Erika can bring her full team to both glasshouse confrontations', () => {
+  test('Erika brings her full team to Celia’s exhibition battle', () => {
     const expedition = expeditions.find(
       (candidate) => candidate.id === 'erika-rainbow-badge-chronicle',
     )
@@ -168,14 +230,12 @@ describe('Kanto Gym Leader Chronicles', () => {
     const exeggutor = chronicle?.battleTeam?.find(
       (pokemon) => pokemon.speciesId === 103,
     )
-    const erikaBattles = battles.filter(
-      (battle) =>
-        battle.id === 'chronicle-erika-suffering-muk' ||
-        battle.id === 'chronicle-erika-developer-enforcer',
+    const erikaBattle = battles.find(
+      (battle) => battle.id === 'chronicle-erika-exhibition-rival',
     )
 
-    expect(erikaBattles).toHaveLength(2)
-    expect(erikaBattles.every((battle) => battle.maxPokemon === 3)).toBe(true)
+    expect(erikaBattle?.trainerName).toBe('Celia')
+    expect(erikaBattle?.maxPokemon).toBe(3)
     expect(exeggutor?.assignedMoves).toContain('psybeam')
     expect(exeggutor?.assignedMoves).toContain('sleep-powder')
   })
@@ -196,11 +256,14 @@ describe('Kanto Gym Leader Chronicles', () => {
     expect(indexOf('surge', 'scene', 'mako-refuses-an-order')).toBeLessThan(
       indexOf('surge', 'battle', 'substation-magneton'),
     )
-    expect(indexOf('erika', 'game', 'trace-the-contamination')).toBeLessThan(
-      indexOf('erika', 'battle', 'suffering-muk'),
+    expect(indexOf('erika', 'scene', 'a-proper-future')).toBeLessThan(
+      indexOf('erika', 'game', 'identify-the-notes'),
     )
-    expect(indexOf('erika', 'scene', 'the-pump')).toBeLessThan(
-      indexOf('erika', 'battle', 'developer-enforcer'),
+    expect(indexOf('erika', 'scene', 'the-rehearsal')).toBeLessThan(
+      indexOf('erika', 'battle', 'exhibition-rival'),
+    )
+    expect(indexOf('erika', 'battle', 'exhibition-rival')).toBeLessThan(
+      indexOf('erika', 'scene', 'the-applause'),
     )
     expect(indexOf('blaine', 'scene', 'the-anomaly')).toBeLessThan(
       indexOf('blaine', 'game', 'run-the-containment-sequence'),
@@ -243,8 +306,7 @@ describe('Kanto Gym Leader Chronicles', () => {
             battle.subCategory === `${definition.leaderName} Chronicle`,
         ),
         games: allGames.filter(
-          (game) =>
-            game.subCategory === `${definition.leaderName} Chronicle`,
+          (game) => game.subCategory === `${definition.leaderName} Chronicle`,
         ),
       }).toLowerCase()
       expect(authored.includes('—'), `${definition.key}:em dash`).toBe(false)
