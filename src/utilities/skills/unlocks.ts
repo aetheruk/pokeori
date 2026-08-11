@@ -99,23 +99,31 @@ export const BATTLE_POWER_UNLOCK_LEVELS: Record<PokemonPowerId, number> = {
 }
 
 export const SKILL_TITLE_TIERS = [
-  { level: 10, suffix: 'New' },
-  { level: 20, suffix: 'Junior' },
-  { level: 30, suffix: 'Growing' },
-  { level: 40, suffix: 'Adept' },
-  { level: 50, suffix: 'Expert' },
-  { level: 60, suffix: 'Professional' },
-  { level: 70, suffix: 'Ace' },
-  { level: 80, suffix: 'Incredible' },
-  { level: 90, suffix: 'Master' },
-  { level: 100, suffix: '' },
+  { level: 30 },
+  { level: 60 },
+  { level: 100 },
 ] as const
 
-const SKILL_TITLE_NAMES: Record<CoreSkillId, string> = {
-  battling: 'Trainer',
-  catching: 'Explorer',
-  researching: 'Researcher',
-  artisan: 'Artisan',
+const SKILL_TITLE_NAMES: Record<
+  CoreSkillId,
+  Record<(typeof SKILL_TITLE_TIERS)[number]['level'], string>
+> = {
+  battling: { 30: 'Proven Trainer', 60: 'Elite Trainer', 100: 'Battle Legend' },
+  catching: {
+    30: 'Seasoned Explorer',
+    60: 'Pathfinder',
+    100: 'World Explorer',
+  },
+  researching: {
+    30: 'Field Researcher',
+    60: 'Senior Researcher',
+    100: 'Pokemon Professor',
+  },
+  artisan: {
+    30: 'Skilled Artisan',
+    60: 'Master Artisan',
+    100: 'Grand Artisan',
+  },
 }
 
 export function getSkillLevel(
@@ -313,10 +321,11 @@ export function getSkillTitleId(skillId: CoreSkillId, level: number): string {
 }
 
 export function getSkillTitleName(skillId: CoreSkillId, level: number): string {
-  const skillName = SKILL_TITLE_NAMES[skillId]
-  const tier = SKILL_TITLE_TIERS.find((entry) => entry.level === level)
-  if (!tier) return skillName
-  return tier.suffix ? `${tier.suffix} ${skillName}` : skillName
+  const title =
+    SKILL_TITLE_NAMES[skillId][
+      level as keyof (typeof SKILL_TITLE_NAMES)[CoreSkillId]
+    ]
+  return title || SKILL_TITLE_NAMES[skillId][30]
 }
 
 export function getUnlockedSkillTitleIds(

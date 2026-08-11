@@ -1,11 +1,12 @@
 'use client'
 
 import {
-  Package,
   BookOpen,
   Loader2,
   Map as MapIcon,
+  Package,
   Pencil,
+  Search,
   Shield,
   Sparkles,
   Swords,
@@ -31,6 +32,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import { SectionDivider } from '@/components/ui/section-divider'
 import {
   Select,
@@ -48,7 +50,7 @@ import {
   type SkillGuideUnlock,
 } from '@/data/skills/guide'
 import { getTotalExpForLevel } from '@/data/skills/xp'
-import { banners, icons, titles } from '@/data/user'
+import { type BannerConfig, banners, icons, titles } from '@/data/user'
 import { cn } from '@/lib/utils'
 import {
   type CoreSkillId,
@@ -407,12 +409,109 @@ function getSkillUnlockCategoryLabel(category: SkillGuideUnlock['category']) {
   }
 }
 
+function BannerPickerDialog({
+  open,
+  onOpenChange,
+  availableBanners,
+  selectedBannerId,
+  onSelect,
+}: {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  availableBanners: BannerConfig[]
+  selectedBannerId: string | null
+  onSelect: (bannerId: string) => void
+}) {
+  const [query, setQuery] = useState('')
+  const filteredBanners = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase()
+    if (!normalizedQuery) return availableBanners
+    return availableBanners.filter((banner) =>
+      banner.name.toLowerCase().includes(normalizedQuery),
+    )
+  }, [availableBanners, query])
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        onOpenChange(nextOpen)
+        if (!nextOpen) setQuery('')
+      }}
+    >
+      <DialogContent className="flex h-[min(760px,calc(100dvh-2rem))] max-h-none flex-col overflow-hidden rounded-xl border-game-border bg-game-surface p-0 text-game-ink shadow-lg sm:max-w-2xl">
+        <DialogHeader className="shrink-0 border-b border-game-border px-5 pb-4 pt-5 text-left sm:px-6 sm:pt-6">
+          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-game-moss-strong">
+            Trainer kit
+          </p>
+          <DialogTitle className="font-display text-2xl font-bold tracking-tight text-game-ink">
+            Choose a banner
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="shrink-0 px-5 pt-4 sm:px-6">
+          <div className="relative">
+            <Search
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-game-muted"
+              aria-hidden="true"
+            />
+            <Input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search banners"
+              aria-label="Search unlocked banners"
+              className="pl-9"
+            />
+          </div>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-6 pt-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-game-border sm:px-6">
+          {filteredBanners.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-game-border bg-game-surface-raised/55 py-10 text-center text-sm text-game-muted">
+              No banners match that search.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {filteredBanners.map((banner) => (
+                <button
+                  key={banner.id}
+                  type="button"
+                  onClick={() => onSelect(banner.id)}
+                  aria-pressed={selectedBannerId === banner.id}
+                  className={cn(
+                    'game-focus-ring group/banner relative aspect-[8/3] min-h-24 w-full overflow-hidden rounded-lg border-2 text-left transition-colors',
+                    selectedBannerId === banner.id
+                      ? 'border-game-moss ring-2 ring-game-moss/20'
+                      : 'border-game-border hover:border-game-moss/45',
+                  )}
+                >
+                  <span
+                    className="absolute inset-0 bg-cover bg-center transition-opacity group-hover/banner:opacity-90"
+                    style={{ backgroundImage: `url(${banner.imagePath})` }}
+                  />
+                  <span className="absolute inset-0 flex items-end bg-gradient-to-t from-game-night-canvas/90 via-game-night-canvas/15 to-transparent p-3">
+                    <span className="font-display text-sm font-semibold text-game-cream drop-shadow-sm">
+                      {banner.name}
+                    </span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 export function TrainerLeveling() {
   const { user, refreshUser, updateUserContext } = useUser()
   const { isAudioEnabled, toggleAudioEnabled } = useAudio()
   const [selectedSkill, setSelectedSkill] = useState<CoreSkill | null>(null)
   const [isSkillModalOpen, setIsSkillModalOpen] = useState(false)
   const [isCustomizeModalOpen, setIsCustomizeModalOpen] = useState(false)
+  const [isBannerPickerOpen, setIsBannerPickerOpen] = useState(false)
   const [selectedBanner, setSelectedBanner] = useState<string | null>(null)
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null)
   const [selectedTitle, setSelectedTitle] = useState<string | null>(null)
@@ -425,6 +524,12 @@ export function TrainerLeveling() {
       ),
     [user?.skills, (user as any)?.unlockedTitles],
   )
+  const availableBanners = banners.filter((banner) =>
+    ((user as any)?.unlockedBanners || ['lab']).includes(banner.id),
+  )
+  const selectedBannerDefinition =
+    availableBanners.find((banner) => banner.id === selectedBanner) ||
+    availableBanners[0]
 
   if (!user) return null
 
@@ -463,7 +568,13 @@ export function TrainerLeveling() {
                 onClick={() => {
                   setSelectedBanner((user as any).banner || 'lab')
                   setSelectedIcon((user as any).icon || 'ditto')
-                  setSelectedTitle((user as any).title || 'new-beginnings')
+                  const currentTitle = (user as any).title || 'new-beginnings'
+                  setSelectedTitle(
+                    equipableTitleIdSet.has(currentTitle) &&
+                      titles.some((title) => title.id === currentTitle)
+                      ? currentTitle
+                      : 'new-beginnings',
+                  )
                   setIsCustomizeModalOpen(true)
                 }}
                 aria-label="Customize trainer card"
@@ -618,9 +729,12 @@ export function TrainerLeveling() {
       {/* Customize Modal */}
       <Dialog
         open={isCustomizeModalOpen}
-        onOpenChange={setIsCustomizeModalOpen}
+        onOpenChange={(open) => {
+          setIsCustomizeModalOpen(open)
+          if (!open) setIsBannerPickerOpen(false)
+        }}
       >
-        <DialogContent className="max-h-[85vh] overflow-hidden rounded-xl border-game-border bg-game-surface p-0 text-game-ink shadow-lg sm:max-w-lg">
+        <DialogContent className="h-[min(720px,calc(100dvh-2rem))] max-h-none overflow-hidden rounded-xl border-game-border bg-game-surface p-0 text-game-ink shadow-lg sm:max-w-lg">
           <div className="relative flex h-full flex-col overflow-hidden p-5 sm:p-6">
             <DialogHeader className="relative z-10 border-b border-game-border pb-4 text-left">
               <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-game-moss-strong">
@@ -637,38 +751,28 @@ export function TrainerLeveling() {
                 <SectionDivider textColor="text-game-moss-strong">
                   Background Banner
                 </SectionDivider>
-                <div className="grid grid-cols-2 gap-2">
-                  {banners
-                    .filter((b) =>
-                      ((user as any).unlockedBanners || ['lab']).includes(b.id),
-                    )
-                    .map((banner) => (
-                      <button
-                        key={banner.id}
-                        type="button"
-                        onClick={() => setSelectedBanner(banner.id)}
-                        aria-pressed={selectedBanner === banner.id}
-                        className={cn(
-                          'group/banner relative h-20 w-full overflow-hidden rounded-lg border-2 transition-colors',
-                          selectedBanner === banner.id
-                            ? 'border-game-moss ring-2 ring-game-moss/20'
-                            : 'border-game-border opacity-60 hover:border-game-moss/40 hover:opacity-100',
-                        )}
-                      >
-                        <div
-                          className="absolute inset-0 bg-cover bg-center"
-                          style={{
-                            backgroundImage: `url(${banner.imagePath})`,
-                          }}
-                        />
-                        <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/75 via-transparent to-transparent p-3">
-                          <span className="w-full truncate text-left text-[10px] font-black uppercase tracking-widest text-game-cream">
-                            {banner.name}
-                          </span>
-                        </div>
-                      </button>
-                    ))}
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsBannerPickerOpen(true)}
+                  className="game-focus-ring group/banner relative aspect-[8/3] min-h-28 w-full overflow-hidden rounded-lg border-2 border-game-border text-left transition-colors hover:border-game-moss/45"
+                >
+                  {selectedBannerDefinition ? (
+                    <span
+                      className="absolute inset-0 bg-cover bg-center"
+                      style={{
+                        backgroundImage: `url(${selectedBannerDefinition.imagePath})`,
+                      }}
+                    />
+                  ) : null}
+                  <span className="absolute inset-0 flex items-end justify-between gap-3 bg-gradient-to-t from-game-night-canvas/90 via-game-night-canvas/15 to-transparent p-4">
+                    <span className="min-w-0 truncate font-display text-sm font-semibold text-game-cream">
+                      {selectedBannerDefinition?.name || 'Choose a banner'}
+                    </span>
+                    <span className="shrink-0 rounded-md border border-game-cream/45 bg-game-night-canvas/35 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-game-cream">
+                      Browse
+                    </span>
+                  </span>
+                </button>
               </div>
 
               {/* Icon Selection */}
@@ -792,6 +896,17 @@ export function TrainerLeveling() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <BannerPickerDialog
+        open={isBannerPickerOpen}
+        onOpenChange={setIsBannerPickerOpen}
+        availableBanners={availableBanners}
+        selectedBannerId={selectedBanner}
+        onSelect={(bannerId) => {
+          setSelectedBanner(bannerId)
+          setIsBannerPickerOpen(false)
+        }}
+      />
     </div>
   )
 }

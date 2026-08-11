@@ -71,6 +71,8 @@ export interface SpiritChannelingConfig {
   correctIncenseItemId: SpiritChannelingIncenseItemId
   requiredEnergy: SpiritChannelingEnergy
   channelerMinLevel: number
+  channelerType?: PokemonTypeName
+  channelerFormId?: string
   rewards: LocationReward[]
 }
 

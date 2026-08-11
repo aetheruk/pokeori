@@ -27,8 +27,8 @@ export const gymLeaderChronicleRhythmEntries: RhythmConfig[] = [
   },
   {
     id: 'chronicle-misty-finale-rehearsal',
-    name: 'Finale Rehearsal',
-    description: "Hit Misty's cues while Cerulean's sisters rehearse the finale one more time.",
+    name: 'Stay With the Routine',
+    description: "Keep Misty in step with her sisters' water-show choreography without turning every cue into a battle command.",
     category: 'Secret',
     subCategory: 'Misty Chronicle',
     icon: { type: 'pokemon', id: '121' },

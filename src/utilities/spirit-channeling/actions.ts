@@ -1,7 +1,7 @@
 'use server'
 
-import type { Payload } from 'payload'
 import { revalidatePath } from 'next/cache'
+import type { Payload } from 'payload'
 import { z } from 'zod'
 import {
   BOOK_OF_CHANNELING_ITEM_ID,
@@ -12,8 +12,11 @@ import {
   getSpiritChannelingOffering,
   hasDuplicateSpiritChannelingOfferings,
 } from '@/data/spirit-channeling'
-import { getPokemonForm } from '@/utilities/pokemon/pokedex'
 import { checkUserAuth } from '@/utilities/auth/server-auth'
+import {
+  createTransactionPayload,
+  runEconomyAction,
+} from '@/utilities/economy/transactions'
 import {
   acquireActionLock,
   checkActionRateLimit,
@@ -26,12 +29,15 @@ import {
   type RewardSummary,
 } from '@/utilities/rewards/reward-logic'
 import {
+  getSpiritChannelerIneligibilityReason,
+  type SpiritChannelerCandidate,
+} from '@/utilities/spirit-channeling/eligibility'
+import {
   getUserActivityStatsMap,
   getUserInventoryMap,
   incrementUserActivityResult,
   setUserInventoryMap,
 } from '@/utilities/user-state'
-import { createTransactionPayload, runEconomyAction } from '@/utilities/economy/transactions'
 
 const ChannelingOfferingSchema = z.object({
   itemId: z.string().min(1).max(80),
@@ -94,7 +100,7 @@ async function getOwnedPokemon(
   payload: PayloadLike,
   userId: string,
   pokemonId: string,
-) {
+): Promise<SpiritChannelerCandidate | null> {
   const result = await payload.find({
     collection: 'pokemon',
     where: {
@@ -115,16 +121,7 @@ async function getOwnedPokemon(
     overrideAccess: true,
   } as any)
 
-  return result.docs?.[0] || null
-}
-
-function canPokemonChannel(pokemon: any, minLevel: number): boolean {
-  if (!pokemon) return false
-  const form = getPokemonForm(pokemon.formId)
-  const isPsychic = form?.types?.some(
-    (type) => type.toLowerCase() === 'psychic',
-  )
-  return Boolean(isPsychic && Number(pokemon.level || 0) >= minLevel)
+  return (result.docs?.[0] as SpiritChannelerCandidate | undefined) || null
 }
 
 export async function beginSpiritChanneling(
@@ -162,132 +159,144 @@ export async function beginSpiritChanneling(
         requestId: parsed.data.attemptId,
       },
       async ({ payload: basePayload, req }) => {
-    const payload = createTransactionPayload(basePayload, req)
-    const config = getSpiritChannelingConfigForMemento(
-      parsed.data.mementoItemId,
-    )
-    if (!config)
-      return { success: false, error: 'This item cannot be channeled' }
+        const payload = createTransactionPayload(basePayload, req)
+        const config = getSpiritChannelingConfigForMemento(
+          parsed.data.mementoItemId,
+        )
+        if (!config)
+          return { success: false, error: 'This item cannot be channeled' }
 
-    const activityId = getSpiritChannelingActivityId(config)
-    const inventory = await getUserInventoryMap(payload as any, user.id, { req })
-    const completed = await isChannelingCompleted(payload, user.id, activityId)
+        const activityId = getSpiritChannelingActivityId(config)
+        const inventory = await getUserInventoryMap(payload as any, user.id, {
+          req,
+        })
+        const completed = await isChannelingCompleted(
+          payload,
+          user.id,
+          activityId,
+        )
 
-    if (!hasInventoryItem(inventory, BOOK_OF_CHANNELING_ITEM_ID)) {
-      return {
-        success: false,
-        error: 'You do not know how to perform channeling yet',
-      }
-    }
-    if (!hasInventoryItem(inventory, config.mementoItemId)) {
-      return { success: false, error: 'You do not own this memento' }
-    }
-    if (completed) {
-      return {
-        success: false,
-        error: 'This memento has already answered a channeling',
-      }
-    }
-    if (!hasInventoryItem(inventory, parsed.data.incenseItemId)) {
-      return { success: false, error: 'You do not own this incense' }
-    }
-
-    if (parsed.data.incenseItemId !== config.correctIncenseItemId) {
-      return {
-        success: false,
-        outcome: 'wrong-incense',
-        message: 'There is no response from your channeling.',
-      }
-    }
-
-    if (hasDuplicateSpiritChannelingOfferings(parsed.data.offerings)) {
-      return {
-        success: false,
-        error: 'Each offering slot must use a different item',
-      }
-    }
-
-    const aggregatedOfferings = aggregateOfferings(parsed.data.offerings)
-    for (const [itemId, quantity] of Object.entries(aggregatedOfferings)) {
-      if (!getSpiritChannelingOffering(itemId)) {
-        return { success: false, error: 'Invalid offering selected' }
-      }
-      if (!hasInventoryItem(inventory, itemId, quantity)) {
-        return {
-          success: false,
-          error: 'You do not have enough of that offering',
+        if (!hasInventoryItem(inventory, BOOK_OF_CHANNELING_ITEM_ID)) {
+          return {
+            success: false,
+            error: 'You do not know how to perform channeling yet',
+          }
         }
-      }
-    }
+        if (!hasInventoryItem(inventory, config.mementoItemId)) {
+          return { success: false, error: 'You do not own this memento' }
+        }
+        if (completed) {
+          return {
+            success: false,
+            error: 'This memento has already answered a channeling',
+          }
+        }
+        if (!hasInventoryItem(inventory, parsed.data.incenseItemId)) {
+          return { success: false, error: 'You do not own this incense' }
+        }
 
-    const offeredEnergy = getSpiritChannelingOfferedEnergy(
-      Object.entries(aggregatedOfferings).map(([itemId, quantity]) => ({
-        itemId,
-        quantity,
-      })),
-    )
-    const energyClue = offeredEnergy
-      ? getSpiritChannelingEnergyClue(config.requiredEnergy, offeredEnergy)
-      : 'The spirits do not understand that offering.'
-    if (energyClue) {
-      return {
-        success: false,
-        outcome: 'wrong-offering',
-        message: energyClue,
-      }
-    }
+        if (parsed.data.incenseItemId !== config.correctIncenseItemId) {
+          return {
+            success: false,
+            outcome: 'wrong-incense',
+            message: 'There is no response from your channeling.',
+          }
+        }
 
-    const pokemon = await getOwnedPokemon(
-      payload,
-      user.id,
-      parsed.data.pokemonId,
-    )
-    if (!canPokemonChannel(pokemon, config.channelerMinLevel)) {
-      return {
-        success: false,
-        outcome: 'weak-pokemon',
-        message: 'Your Pokemon is unable to commune with the spirits.',
-      }
-    }
+        if (hasDuplicateSpiritChannelingOfferings(parsed.data.offerings)) {
+          return {
+            success: false,
+            error: 'Each offering slot must use a different item',
+          }
+        }
 
-    const nextInventory = { ...inventory }
-    for (const [itemId, quantity] of Object.entries(aggregatedOfferings)) {
-      nextInventory[itemId] = Math.max(
-        0,
-        (nextInventory[itemId] || 0) - quantity,
-      )
-      if (nextInventory[itemId] <= 0) delete nextInventory[itemId]
-    }
-    await setUserInventoryMap(payload as any, user.id, nextInventory, { req })
+        const aggregatedOfferings = aggregateOfferings(parsed.data.offerings)
+        for (const [itemId, quantity] of Object.entries(aggregatedOfferings)) {
+          if (!getSpiritChannelingOffering(itemId)) {
+            return { success: false, error: 'Invalid offering selected' }
+          }
+          if (!hasInventoryItem(inventory, itemId, quantity)) {
+            return {
+              success: false,
+              error: 'You do not have enough of that offering',
+            }
+          }
+        }
 
-    const { summary } = await grantRewards(user.id, config.rewards, {
-      source: activityId,
-      skipDropChance: true,
-      payload: basePayload,
-      req,
-    })
-    await incrementUserActivityResult(
-      payload as any,
-      user.id,
-      'gameResults',
-      activityId,
-      {
-        wins: 1,
-        metadata: {
-          mementoItemId: config.mementoItemId,
-          incenseItemId: parsed.data.incenseItemId,
-          pokemonId: parsed.data.pokemonId,
-        },
-      },
-      { req },
-    )
+        const offeredEnergy = getSpiritChannelingOfferedEnergy(
+          Object.entries(aggregatedOfferings).map(([itemId, quantity]) => ({
+            itemId,
+            quantity,
+          })),
+        )
+        const energyClue = offeredEnergy
+          ? getSpiritChannelingEnergyClue(config.requiredEnergy, offeredEnergy)
+          : 'The spirits do not understand that offering.'
+        if (energyClue) {
+          return {
+            success: false,
+            outcome: 'wrong-offering',
+            message: energyClue,
+          }
+        }
 
-    return {
-      success: true,
-      outcome: 'success',
-      message: 'The spirit answers your channeling.',
-      summary,
-    }
+        const pokemon = await getOwnedPokemon(
+          payload,
+          user.id,
+          parsed.data.pokemonId,
+        )
+        const channelerError = getSpiritChannelerIneligibilityReason(
+          pokemon,
+          config,
+        )
+        if (channelerError) {
+          return {
+            success: false,
+            outcome: 'weak-pokemon',
+            message: channelerError,
+          }
+        }
+
+        const nextInventory = { ...inventory }
+        for (const [itemId, quantity] of Object.entries(aggregatedOfferings)) {
+          nextInventory[itemId] = Math.max(
+            0,
+            (nextInventory[itemId] || 0) - quantity,
+          )
+          if (nextInventory[itemId] <= 0) delete nextInventory[itemId]
+        }
+        await setUserInventoryMap(payload as any, user.id, nextInventory, {
+          req,
+        })
+
+        const { summary } = await grantRewards(user.id, config.rewards, {
+          source: activityId,
+          skipDropChance: true,
+          payload: basePayload,
+          req,
+        })
+        await incrementUserActivityResult(
+          payload as any,
+          user.id,
+          'gameResults',
+          activityId,
+          {
+            wins: 1,
+            metadata: {
+              mementoItemId: config.mementoItemId,
+              incenseItemId: parsed.data.incenseItemId,
+              pokemonId: parsed.data.pokemonId,
+            },
+          },
+          { req },
+        )
+
+        return {
+          success: true,
+          outcome: 'success',
+          message: 'The spirit answers your channeling.',
+          summary,
+        }
       },
     )
     revalidatePath('/game/spirit-channeling')

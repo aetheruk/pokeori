@@ -22,7 +22,7 @@ The runtime preserves each Badge ritual, memory marker, expedition ID, Leader pa
 | Leader | Chronicle | Core relationship | Story problem | Beats | Games | Battles |
 | --- | --- | --- | --- | ---: | --- | ---: |
 | Brock | The Empty Chair | Brock and Forrest | Brock tries to replace Flint instead of trusting his family | 13 | Rhythm, Mining | 2 |
-| Misty | The Fourth Sister | Misty and Daisy | Misty's invisible work is the only thing keeping the water show safe | 13 | Rhythm, Cry | 2 |
+| Misty | Out of Step | Misty and her sisters | Misty wants a battle programme of her own instead of a place in her sisters' choreography | 13 | Rhythm, Cry | 2 |
 | Lt. Surge | After the Thunder | Surge and Mako | A city emergency cannot be run like a military transport | 12 | Magnemite Circuit, Cry | 2 |
 | Erika | The Old Glasshouse | Erika, Gloom, and Sumi | A hidden chemical leak threatens a community garden and its Pokémon | 12 | Identify | 2 |
 | Koga | The Daughter's Method | Koga and Janine | A perfect trail exploits the method Koga refuses to question | 13 | Silhouette, Identify | 3 |
@@ -50,25 +50,25 @@ Breakfast without Flint -> Keep the Morning Moving -> Flint's note -> Mara's ins
 - Forrest speaks plainly but does not sound like an adult therapist.
 - Mara is a safety examiner, not an antagonist. She refuses Brock's unsafe timetable and rewards the shared plan.
 
-## Misty: The Fourth Sister
+## Misty: Out of Step
 
 ### Treatment
 
-Misty runs cues, lighting sheets, and pump checks while Daisy, Violet, and Lily receive the visible parts of Cerulean's water show. She notices a lower-intake warning, but Daisy accepts the technician's report because the theatre is full. A storm knocks out the pumps during the opening performance. Water falls below the lower-tank line and Horsea are pulled toward the service grates.
+Misty keeps turning the sisters' water-show choreography into battle practice. Daisy responds by giving her the centre position in the preview, unaware that Misty has arranged a League battle-lead trial at Cerulean Cape for the same afternoon. Misty points out that all three sisters assumed she wanted a larger place in their show instead of asking whether she wanted the show at all.
 
-The sisters evacuate the audience while Misty identifies the Horsea's location from the overlapping alarms and cries. A frightened Gyarados blocks the service channel. Misty calms it first, then all four sisters rescue the Horsea and shut the intake together.
+During the preview, a Horsea flinches at the applause and escapes through the north canal. All four sisters follow it to the Cape. Misty separates Horsea's cry from the wild Pokemon around the coves, then clears a path past an agitated Gyarados after discovering fishing line caught around its tail. When they find Horsea, Misty stops her sisters from grabbing it and gives it a quiet route home.
 
-Afterward, Daisy celebrates that the audience saw nothing go wrong. Misty finally says that hiding her work is the problem. At dawn, Daisy offers the League's formal battle-lead test. The battle is a handover, not permission to leave the family. Misty takes control of the Gym battle programme while her sisters keep the shows. Daisy returns the scratched earring Misty wore during the failed finale.
+At the Cape, the sisters finally separate their ambitions. Daisy admits that she mistook Misty's rejection of the choreography for a rejection of the family. She stands opposite Misty in the League trial, and Misty wins the whole battle programme rather than the hours left over after performances. The final image is two posters drying side by side: one for the sisters' water show, and one naming Misty as Cerulean Gym's battle lead.
 
 ### Beat order
 
-Rehearsal credits -> Finale Rehearsal -> pump warning -> storm -> Listen Across the Water -> Gyarados setup -> Gyarados battle -> Horsea rescue -> backstage argument -> Daisy's formal challenge -> Daisy battle -> one Gym with two stages -> scratched earring.
+Choreography argument -> Stay With the Routine -> conflicting plans -> Horsea leaves the preview -> Follow Horsea's Call -> Gyarados at the cove -> Gyarados battle -> Horsea chooses a quiet route -> four answers for the Gym -> Daisy's League trial -> Daisy battle -> book around the battles -> two posters.
 
 ### Voice
 
 - Misty is quick, funny, and specific. Anger arrives after she has already solved the immediate problem.
-- Daisy is competent and defensive because she depends on Misty more than she has admitted.
-- Violet and Lily contribute to the rescue rather than existing only as shallow foils.
+- Daisy is competent and initially assumes that a more visible role in the show is the same thing as being heard.
+- Violet and Lily enjoy performing without being shallow foils. Their humour makes the sisters feel familiar with one another.
 
 ## Lt. Surge: After the Thunder
 

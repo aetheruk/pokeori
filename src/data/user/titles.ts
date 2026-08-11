@@ -44,5 +44,20 @@ export const titles: TitleConfig[] = [
 ]
 
 export function getTitle(id: string): TitleConfig | undefined {
-  return titles.find((t) => t.id === id)
+  const title = titles.find((entry) => entry.id === id)
+  if (title) return title
+
+  const legacySkillTitle = /^skill-(battling|catching|researching|artisan)-(\d+)$/.exec(
+    id,
+  )
+  if (!legacySkillTitle) return undefined
+
+  const [, skillId, rawLevel] = legacySkillTitle
+  const level = Number(rawLevel)
+  const retainedLevel = level >= 60 ? 60 : level >= 30 ? 30 : null
+  if (!retainedLevel) return titles.find((entry) => entry.id === 'new-beginnings')
+
+  return titles.find(
+    (entry) => entry.id === getSkillTitleId(skillId as CoreSkillId, retainedLevel),
+  )
 }

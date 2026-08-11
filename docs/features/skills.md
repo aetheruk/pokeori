@@ -53,4 +53,4 @@ The Trainer menu shows a skill guide for Trainer, Explorer, Researcher, and Arti
 - Researcher can also gate extra Pokemon pools or authored research progression when entries define those requirements.
 
 ## Titles
-Each core skill unlocks a title every 10 levels. The suffix ladder is New, Junior, Growing, Adept, Expert, Professional, Ace, Incredible, Master, and then the bare skill name at level 100. These skill-derived titles are equipable from the player's current skill levels without needing to be persisted in `unlockedTitles`.
+Each core skill unlocks only three prestige titles, at levels 30, 60, and 100. The names are distinct to Trainer, Explorer, Researcher, and Artisan rather than sharing a ten-step suffix ladder. These skill-derived titles are equipable from the player's current skill levels without needing to be persisted in `unlockedTitles`; an equipped retired milestone title resolves to the nearest retained title until the player next edits their identity.
