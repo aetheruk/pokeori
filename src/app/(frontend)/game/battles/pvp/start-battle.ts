@@ -168,6 +168,7 @@ export async function initializeSharedPvpBattle(
     history: [],
     status: 'ongoing',
     battleId: battleConfig.id,
+    economyActionId: battleId,
     pvpBattleId: battleId,
     background: battleConfig.background,
     playerName: p1Details.trainerName || 'Player 1',

@@ -26,6 +26,10 @@ import {
 } from '@/utilities/user-state'
 import { isToday } from '@/utilities/date-utils'
 import { acquireActionLock, releaseActionLock } from '@/utilities/game-integrity'
+import {
+  getEconomyActionErrorMessage,
+  runEconomyAction,
+} from '@/utilities/economy/transactions'
 
 // Server-side password map: taskId -> accepted passwords
 // Passwords stored here only, never exposed to client
@@ -70,18 +74,38 @@ export interface CompleteTaskResult {
 export async function completeTask(
   taskId: string,
   selectedPokemonIds?: string[],
+  clientActionId?: string,
 ): Promise<CompleteTaskResult> {
-  const { user } = await checkUserAuth()
-  if (!user) {
+  const { user: authenticatedUser } = await checkUserAuth()
+  if (!authenticatedUser) {
     return { success: false, message: 'Not authenticated' }
   }
+  if (!clientActionId) {
+    return { success: false, message: 'Missing action identifier' }
+  }
 
-  const payload = await getPayload({ config: payloadConfig })
+  try {
+    const result = await runEconomyAction<CompleteTaskResult>(
+      {
+        userId: authenticatedUser.id,
+        action: 'complete-task',
+        requestId: clientActionId,
+      },
+      async ({ payload, req }) => {
+        const user = (await payload.findByID({
+          collection: 'users',
+          id: authenticatedUser.id,
+          req,
+        })) as User
 
   let task = tasks.find((t) => t.id === taskId)
   let isGeneratedDaily = false
   if (!task) {
-    const userRefetched = await payload.findByID({ collection: 'users', id: user.id })
+    const userRefetched = await payload.findByID({
+      collection: 'users',
+      id: user.id,
+      req,
+    })
     const activeDailies = ((userRefetched as any).activeDailyTasks as any[]) || []
     task = activeDailies.find((t: any) => t.id === taskId) as typeof task
     if (!task) {
@@ -111,7 +135,7 @@ export async function completeTask(
     requiredKeys.push('pokemon')
   }
 
-  const userData = await getGameUserData(user as User, requiredKeys)
+  const userData = await getGameUserData(user, requiredKeys, { payload, req })
 
   // 1. Check Requirements (Can they even see/start this?)
   if (!checkTaskRequirements(userData, task)) {
@@ -217,28 +241,24 @@ export async function completeTask(
   const uniquePokemonToConsume = [...new Set(pokemonToConsume)]
 
   // Execute Consumption
-  try {
-    // Delete Pokemon
-    if (uniquePokemonToConsume.length > 0) {
-      await Promise.all(
-        uniquePokemonToConsume.map((id) =>
-          payload.delete({
-            collection: 'pokemon',
-            id,
-          }),
-        ),
-      )
+  // Delete Pokemon sequentially because Mongo sessions cannot run concurrent operations.
+  for (const id of uniquePokemonToConsume) {
+    await payload.delete({
+      collection: 'pokemon',
+      id,
+      req,
+    })
     }
 
     // Reduce Items (Embedded)
     if (itemsToConsume.length > 0) {
-      const userInventory = await getUserInventoryMap(payload, user.id)
+      const userInventory = await getUserInventoryMap(payload, user.id, { req })
 
       itemsToConsume.forEach(({ id: itemId, quantity }) => {
         userInventory[itemId] = Math.max(0, (userInventory[itemId] || 0) - quantity)
       })
 
-      await setUserInventoryMap(payload, user.id, userInventory)
+      await setUserInventoryMap(payload, user.id, userInventory, { req })
     }
 
     // Reduce Currency
@@ -260,14 +280,11 @@ export async function completeTask(
           data: {
             currency: newCurrency,
           },
+          req,
         })
         user.currency = newCurrency
       }
     }
-  } catch (e) {
-    console.error('Error consuming resources', e)
-    return { success: false, message: 'Failed to consume resources' }
-  }
 
   // 5. Grant Rewards
   const rewardsToGrant: Reward[] = task.rewards.flatMap((r) => {
@@ -298,7 +315,7 @@ export async function completeTask(
     return [reward]
   })
 
-  const { summary } = await grantRewards(user.id, rewardsToGrant)
+  const { summary } = await grantRewards(user.id, rewardsToGrant, { payload, req })
 
   if (activeCompanion && friendshipGain > 0) {
     const newFriendship = Math.min(255, (activeCompanion.friendship || 0) + friendshipGain)
@@ -306,6 +323,7 @@ export async function completeTask(
       collection: 'pokemon',
       id: activeCompanion.id,
       data: { friendship: newFriendship },
+      req,
     })
     summary.notices?.push({
       id: 'partner-friendship',
@@ -315,11 +333,15 @@ export async function completeTask(
   }
 
   // 6. Record Completion
-  const userRefetched = await payload.findByID({ collection: 'users', id: user.id })
+  const userRefetched = await payload.findByID({
+    collection: 'users',
+    id: user.id,
+    req,
+  })
   const updateData: Record<string, any> = {}
 
   if (!isGeneratedDaily) {
-    const completedTasks = await getUserCompletedTasksMap(payload, user.id)
+    const completedTasks = await getUserCompletedTasksMap(payload, user.id, { req })
     const storageId = taskId
     const existing = completedTasks[storageId]
 
@@ -335,7 +357,7 @@ export async function completeTask(
         updatedAt: new Date().toISOString(),
       }
     }
-    await setUserCompletedTasksMap(payload, user.id, completedTasks)
+    await setUserCompletedTasksMap(payload, user.id, completedTasks, { req })
 
     // Also update activeDailyTasks if it's a static daily task
     let activeDailyTasks = (userRefetched as any).activeDailyTasks as any[]
@@ -367,13 +389,22 @@ export async function completeTask(
       collection: 'users',
       id: user.id,
       data: updateData,
+      req,
     })
   }
 
-  await recordExpeditionActivityResult(user.id, 'task', taskId, true)
+  await recordExpeditionActivityResult(user.id, 'task', taskId, true, { payload, req })
 
-  revalidatePath('/game/tasks')
   return { success: true, rewards: summary, exitModal: task.exitModal }
+      },
+    )
+
+    revalidatePath('/game/tasks')
+    return result
+  } catch (error) {
+    console.error('Failed to complete task transaction', error)
+    return { success: false, message: getEconomyActionErrorMessage(error) }
+  }
 }
 
 export async function refreshDailyTasks(): Promise<{ success: boolean; message?: string }> {

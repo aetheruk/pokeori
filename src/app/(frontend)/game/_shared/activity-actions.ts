@@ -2399,6 +2399,7 @@ export async function completeGameActivity(
           if (allRewards.length > 0) {
             const { summary } = await grantRewards(user.id, allRewards, {
               requirementContext: rewardRequirementContext,
+              idempotencyKey: resultKey,
             })
             rewardSummary = summary
           }
@@ -2488,6 +2489,7 @@ export async function completeGameActivity(
 
           const { summary } = await grantRewards(user.id, rewardsToGrant, {
             requirementContext: rewardRequirementContext,
+            idempotencyKey: resultKey,
           })
           const egg = await maybeCreateFieldObservationEgg(
             payload as any,
@@ -2521,6 +2523,7 @@ export async function completeGameActivity(
           if (skillXpReward) rewardsToGrant.push(skillXpReward)
           const { summary } = await grantRewards(user.id, rewardsToGrant, {
             requirementContext: rewardRequirementContext,
+            idempotencyKey: resultKey,
           })
           rewardSummary = summary
         }
@@ -2553,6 +2556,7 @@ export async function completeGameActivity(
           if (rewardsToGrant.length > 0) {
             const { summary } = await grantRewards(user.id, rewardsToGrant, {
               requirementContext: rewardRequirementContext,
+              idempotencyKey: resultKey,
             })
             rewardSummary = summary
           }
@@ -2567,6 +2571,7 @@ export async function completeGameActivity(
           if (skillXpReward) {
             const { summary } = await grantRewards(user.id, [skillXpReward], {
               requirementContext: rewardRequirementContext,
+              idempotencyKey: resultKey,
             })
             rewardSummary = summary
           }
@@ -2579,7 +2584,10 @@ export async function completeGameActivity(
         const { summary } = await grantRewards(
           user.id,
           collectedFieldObservationRewards,
-          { requirementContext: rewardRequirementContext },
+          {
+            requirementContext: rewardRequirementContext,
+            idempotencyKey: resultKey,
+          },
         )
         rewardSummary = summary
       }
@@ -2779,6 +2787,7 @@ export async function claimGameActivityEndlessMilestone(
 
       // Grant rewards
       const { summary } = await grantRewards(user.id, milestone.rewards, {
+        idempotencyKey: idempotentResultKey,
         requirementContext: {
           category: encounter.category,
           subCategory: encounter.subCategory,

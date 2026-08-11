@@ -13,9 +13,12 @@ import {
 import {
   acquireActionLock,
   checkActionRateLimit,
+  getIdempotentResult,
   releaseActionLock,
+  setIdempotentResult,
 } from '@/utilities/game-integrity'
 import { incrementUserActivityResult } from '@/utilities/user-state'
+import { getEconomyActionErrorMessage, runEconomyAction } from '@/utilities/economy/transactions'
 
 function getRandomSymbol(symbols: any[]): string {
   if (!symbols.length) return '?'
@@ -29,12 +32,16 @@ function getRandomSymbol(symbols: any[]): string {
   return symbols[0].id
 }
 
-export async function spinSlotMachine(betAmount?: number) {
+export async function spinSlotMachine(clientActionId: string, betAmount?: number) {
   try {
     const user = await getUser()
     if (!user) {
       return { success: false, error: 'Not authenticated' }
     }
+    if (!clientActionId) return { success: false, error: 'Missing action identifier' }
+    const resultKey = `slots:spin-result:${user.id}:${clientActionId}`
+    const cachedResult = await getIdempotentResult<any>(resultKey)
+    if (cachedResult) return cachedResult
 
     const rateLimit = await checkActionRateLimit(user.id, 'slots-spin', 40, 60)
     if (!rateLimit.allowed) {
@@ -61,20 +68,7 @@ export async function spinSlotMachine(betAmount?: number) {
         return { success: false, error: 'Invalid game type' }
       }
 
-      // Cost Check (fresh user read)
-      const freshUser = await payload.findByID({
-        collection: 'users',
-        id: user.id,
-      })
       const cost = encounter.settings.cost
-      let currentBalance = 0
-      if (cost) {
-        const currencyKey = cost.currencyType
-        currentBalance = freshUser.currency?.[currencyKey] || 0
-        if (currentBalance < cost.amount) {
-          return { success: false, error: 'Insufficient funds' }
-        }
-      }
 
       // Slots RNG Logic
       const settings = encounter.settings
@@ -127,35 +121,45 @@ export async function spinSlotMachine(betAmount?: number) {
         }
       }
 
-      await incrementUserActivityResult(
-        payload as any,
-        user.id,
-        'gameResults',
-        state.encounterId,
-        isWin ? { wins: 1 } : { losses: 1 },
+      const economyResult = await runEconomyAction(
+        { userId: user.id, action: 'slots-spin', requestId: clientActionId, payload },
+        async ({ req }) => {
+          const freshUser = await payload.findByID({ collection: 'users', id: user.id, req })
+          const currentBalance = cost
+            ? freshUser.currency?.[cost.currencyType] || 0
+            : freshUser.currency?.pokedollars || 0
+          if (cost && currentBalance < cost.amount) {
+            return { success: false as const, error: 'Insufficient funds' }
+          }
+          await incrementUserActivityResult(
+            payload as any,
+            user.id,
+            'gameResults',
+            state.encounterId,
+            isWin ? { wins: 1 } : { losses: 1 },
+            { req },
+          )
+          const balance = cost ? currentBalance - cost.amount : currentBalance
+          if (cost) {
+            await payload.update({
+              collection: 'users',
+              id: user.id,
+              data: { currency: { ...freshUser.currency, [cost.currencyType]: balance } },
+              req,
+            })
+          }
+          let spinSummary = null
+          if (wonRewards.length > 0) {
+            const res = await grantRewards(user.id, wonRewards, { payload, req })
+            spinSummary = res.summary
+          }
+          return { success: true as const, spinSummary, balance }
+        },
       )
+      if (!economyResult.success) return economyResult
+      const spinSummary = economyResult.spinSummary
 
-      const updateData: any = {}
-      if (cost) {
-        updateData.currency = {
-          ...freshUser.currency,
-          [cost.currencyType]: currentBalance - cost.amount,
-        }
-      }
-
-      if (Object.keys(updateData).length > 0) {
-        await payload.update({
-          collection: 'users',
-          id: user.id,
-          data: updateData,
-        })
-      }
-
-      // Grant Rewards
-      let spinSummary = null
       if (wonRewards.length > 0) {
-        const res = await grantRewards(user.id, wonRewards)
-        spinSummary = res.summary
 
         // Update redis session accumulation
         const currentSession = state.slotsSession || { totalRewards: {} }
@@ -178,19 +182,19 @@ export async function spinSlotMachine(betAmount?: number) {
       // Update Redis
       await redis.set(`game:${user.id}`, state, { ex: 3600 })
 
-      return {
+      const response = {
         success: true,
         icons: resultIcons,
         rewards: spinSummary,
-        balance: cost
-          ? currentBalance - cost.amount
-          : freshUser.currency?.pokedollars || 0,
+        balance: economyResult.balance,
       }
+      await setIdempotentResult(resultKey, response, 600)
+      return response
     } finally {
       await releaseActionLock(spinLock)
     }
   } catch (err) {
     console.error('Error spinning slots:', err)
-    return { success: false, error: 'Server error' }
+    return { success: false, error: getEconomyActionErrorMessage(err) }
   }
 }

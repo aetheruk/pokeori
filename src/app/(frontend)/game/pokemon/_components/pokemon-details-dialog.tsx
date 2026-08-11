@@ -659,7 +659,7 @@ export function PokemonDetailsDialog({
     if (isSavingHeldItem !== null) return
     setIsSavingHeldItem(itemId || 'none')
     try {
-      const result = await setHeldItem(pokemon.id, itemId)
+      const result = await setHeldItem(pokemon.id, itemId, crypto.randomUUID())
       if (result.success) {
         toast.success(itemId ? 'Held item set' : 'Held item cleared')
         if (result.pokemon && onRename) onRename(result.pokemon)
@@ -956,6 +956,7 @@ export function PokemonDetailsDialog({
                             pokemon.id,
                             evo.speciesId,
                             requiredItemId || undefined,
+                            crypto.randomUUID(),
                           )
                           if (result.success) {
                             setEvolutionTarget({

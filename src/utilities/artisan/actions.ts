@@ -1,6 +1,6 @@
 'use server'
 
-import { getPayload } from 'payload'
+import { getPayload, type Payload, type PayloadRequest } from 'payload'
 import payloadConfig from '@/payload.config'
 import { revalidatePath } from 'next/cache'
 import { checkUserAuth } from '@/utilities/auth/server-auth'
@@ -43,6 +43,7 @@ import {
   setUserInventoryMap,
 } from '@/utilities/user-state'
 import { recordDailyActivityProgress } from '@/utilities/tasks/daily-progress'
+import { runEconomyAction } from '@/utilities/economy/transactions'
 
 const SESSION_TTL_SECONDS = 20
 const START_DELAY_MS = 650
@@ -130,11 +131,23 @@ function recipeGateFailed(
 async function getValidatedCraftContext(
   userId: string,
   recipe: ArtisanRecipe,
-  options: { checkCosts?: boolean; craftMultiplier?: number } = {},
+  options: {
+    checkCosts?: boolean
+    craftMultiplier?: number
+    payload?: Payload
+    req?: PayloadRequest
+  } = {},
 ) {
-  const payload = await getPayload({ config: payloadConfig })
-  const freshUser = await payload.findByID({ collection: 'users', id: userId })
-  const userData = await getGameUserData(freshUser)
+  const payload = options.payload || (await getPayload({ config: payloadConfig }))
+  const freshUser = await payload.findByID({
+    collection: 'users',
+    id: userId,
+    req: options.req,
+  })
+  const userData = await getGameUserData(freshUser, undefined, {
+    payload,
+    req: options.req,
+  })
 
   const artisanLevel = getSkillLevel(freshUser.skills as any, 'artisan')
   const requiredArtisanLevel = getArtisanCraftRequiredLevel(
@@ -152,7 +165,7 @@ async function getValidatedCraftContext(
     return { success: false as const, error: 'Recipe requirements not met' }
   }
 
-  const inventory = await getUserInventoryMap(payload as any, userId)
+  const inventory = await getUserInventoryMap(payload as any, userId, { req: options.req })
   const currency = (freshUser.currency || {}) as Record<string, number>
   if (options.checkCosts !== false) {
     const costs = scaleArtisanCosts(recipe.costs, options.craftMultiplier || 1)
@@ -369,9 +382,14 @@ export async function completeArtisanCraft(
         ? null
         : getQuantityForQuality(recipe, quality) * craftMultiplier
 
+    const result = await runEconomyAction<any>(
+      { userId: user.id, action: 'complete-artisan-craft', requestId: sessionId },
+      async ({ payload, req }) => {
     const validation = await getValidatedCraftContext(user.id, recipe, {
       checkCosts: materialsLost,
       craftMultiplier,
+      payload,
+      req,
     })
     if (!validation.success) return validation
 
@@ -397,6 +415,7 @@ export async function completeArtisanCraft(
         validation.payload as any,
         user.id,
         validation.inventory,
+        { req },
       )
       if (currencyChanged) {
         await validation.payload.update({
@@ -404,22 +423,23 @@ export async function completeArtisanCraft(
           id: user.id,
           data: { currency: nextCurrency },
           depth: 0,
+          req,
         })
       }
     }
     const rewardsToGrant = resolveCraftRewards(recipe, quality, craftMultiplier)
     const { summary } =
       rewardsToGrant.length > 0
-        ? await grantRewards(user.id, rewardsToGrant)
+        ? await grantRewards(user.id, rewardsToGrant, { payload, req, source: 'artisan-craft' })
         : { summary: emptyRewardSummary() }
 
     const replayValidation = await getValidatedCraftContext(user.id, recipe, {
       craftMultiplier,
+      payload,
+      req,
     })
 
-    await redis.del(sessionKey(user.id, sessionId))
-
-    const result = {
+    const transactionResult = {
       success: true,
       failed,
       materialsLost,
@@ -431,14 +451,20 @@ export async function completeArtisanCraft(
       craftMultiplier,
       canReplay: replayValidation.success,
     }
-    await setIdempotentResult(idemKey, result, 30)
 
     if (!failed) {
       await recordDailyActivityProgress(user.id, {
         kind: 'craft_success',
         sourceId: recipe.id,
-      })
+      }, { payload, req })
     }
+
+    return transactionResult
+      },
+    )
+
+    await redis.del(sessionKey(user.id, sessionId))
+    await setIdempotentResult(idemKey, result, 30)
 
     revalidatePath('/game/artisan')
     revalidatePath('/game/inventory')

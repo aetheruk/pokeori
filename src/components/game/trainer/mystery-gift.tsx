@@ -19,7 +19,7 @@ export function MysteryGift() {
 
     setIsLoading(true)
     try {
-      const response = await redeemMysteryGift(code)
+      const response = await redeemMysteryGift(code, crypto.randomUUID())
       if (response.success) {
         setResult({
           success: true,

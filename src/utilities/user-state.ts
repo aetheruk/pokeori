@@ -7,6 +7,7 @@ import {
 import type { RequirementData } from '@/utilities/requirements'
 import type { GameDataKeys } from '@/utilities/requirements/analysis'
 import { fieldResearchGames } from '@/data/games'
+import type { PayloadRequest } from 'payload'
 
 export const USER_STATE_COLLECTIONS = {
   inventory: 'user-inventory-items',
@@ -23,6 +24,10 @@ type PayloadLike = {
   create: (args: any) => Promise<any>
   update: (args: any) => Promise<any>
   delete: (args: any) => Promise<any>
+}
+
+export type UserStateOperationOptions = {
+  req?: PayloadRequest
 }
 
 export type UserStateDomain =
@@ -213,6 +218,7 @@ async function findRows(
   userId: string,
   extraWhere: Record<string, unknown>[] = [],
   select?: Record<string, true>,
+  req?: PayloadRequest,
 ): Promise<any[]> {
   const and = [{ user: { equals: userId } }, ...extraWhere]
   const result = await payload.find({
@@ -221,6 +227,7 @@ async function findRows(
     pagination: false,
     depth: 0,
     overrideAccess: true,
+    ...(req ? { req } : {}),
     ...(select ? { select } : {}),
   })
 
@@ -715,10 +722,18 @@ function activityMapToRows(
 export async function getUserInventoryMap(
   payload: PayloadLike,
   userId: string,
+  options: UserStateOperationOptions = {},
 ): Promise<InventoryMap> {
   return inventoryArrayToMap(
     inventoryRowsToArray(
-      await findRows(payload, USER_STATE_COLLECTIONS.inventory, userId),
+      await findRows(
+        payload,
+        USER_STATE_COLLECTIONS.inventory,
+        userId,
+        [],
+        undefined,
+        options.req,
+      ),
     ),
   )
 }
@@ -727,6 +742,7 @@ export async function setUserInventoryMap(
   payload: PayloadLike,
   userId: string,
   inventory: InventoryMap,
+  options: UserStateOperationOptions = {},
 ): Promise<UserStateSyncSummary> {
   return replaceRowsForUser(
     payload,
@@ -734,15 +750,26 @@ export async function setUserInventoryMap(
     userId,
     inventoryMapToRows(userId, inventory),
     (row) => String(row.itemId),
+    options,
   )
 }
 
 export async function getUserTcgMap(
   payload: PayloadLike,
   userId: string,
+  options: UserStateOperationOptions = {},
 ): Promise<TcgMap> {
   return tcgArrayToMap(
-    tcgRowsToArray(await findRows(payload, USER_STATE_COLLECTIONS.tcg, userId)),
+    tcgRowsToArray(
+      await findRows(
+        payload,
+        USER_STATE_COLLECTIONS.tcg,
+        userId,
+        [],
+        undefined,
+        options.req,
+      ),
+    ),
   )
 }
 
@@ -750,6 +777,7 @@ export async function setUserTcgMap(
   payload: PayloadLike,
   userId: string,
   tcg: TcgMap,
+  options: UserStateOperationOptions = {},
 ): Promise<UserStateSyncSummary> {
   return replaceRowsForUser(
     payload,
@@ -757,16 +785,25 @@ export async function setUserTcgMap(
     userId,
     tcgMapToRows(userId, tcg),
     (row) => String(row.cardId),
+    options,
   )
 }
 
 export async function getUserPokedexMap(
   payload: PayloadLike,
   userId: string,
+  options: UserStateOperationOptions = {},
 ): Promise<PokedexMap> {
   return pokedexArrayToMap(
     pokedexRowsToArray(
-      await findRows(payload, USER_STATE_COLLECTIONS.pokedex, userId),
+      await findRows(
+        payload,
+        USER_STATE_COLLECTIONS.pokedex,
+        userId,
+        [],
+        undefined,
+        options.req,
+      ),
     ),
   )
 }
@@ -774,10 +811,18 @@ export async function getUserPokedexMap(
 export async function getUserAbilityDexMap(
   payload: PayloadLike,
   userId: string,
+  options: UserStateOperationOptions = {},
 ): Promise<AbilityDexMap> {
   return abilityDexArrayToMap(
     abilityDexRowsToArray(
-      await findRows(payload, USER_STATE_COLLECTIONS.abilityDex, userId),
+      await findRows(
+        payload,
+        USER_STATE_COLLECTIONS.abilityDex,
+        userId,
+        [],
+        undefined,
+        options.req,
+      ),
     ),
   )
 }
@@ -786,6 +831,7 @@ export async function setUserPokedexMap(
   payload: PayloadLike,
   userId: string,
   pokedex: PokedexMap,
+  options: UserStateOperationOptions = {},
 ): Promise<UserStateSyncSummary> {
   return replaceRowsForUser(
     payload,
@@ -793,6 +839,7 @@ export async function setUserPokedexMap(
     userId,
     pokedexMapToRows(userId, pokedex),
     (row) => `${row.speciesId}:${row.formId}`,
+    options,
   )
 }
 
@@ -800,6 +847,7 @@ export async function setUserAbilityDexMap(
   payload: PayloadLike,
   userId: string,
   abilityDex: AbilityDexMap,
+  options: UserStateOperationOptions = {},
 ): Promise<UserStateSyncSummary> {
   return replaceRowsForUser(
     payload,
@@ -807,16 +855,25 @@ export async function setUserAbilityDexMap(
     userId,
     abilityDexMapToRows(userId, abilityDex),
     (row) => String(row.abilityId),
+    options,
   )
 }
 
 export async function getUserCompletedTasksMap(
   payload: PayloadLike,
   userId: string,
+  options: UserStateOperationOptions = {},
 ): Promise<CompletedTasksMap> {
   return completedTasksArrayToMap(
     taskRowsToArray(
-      await findRows(payload, USER_STATE_COLLECTIONS.tasks, userId),
+      await findRows(
+        payload,
+        USER_STATE_COLLECTIONS.tasks,
+        userId,
+        [],
+        undefined,
+        options.req,
+      ),
     ),
   )
 }
@@ -825,6 +882,7 @@ export async function setUserCompletedTasksMap(
   payload: PayloadLike,
   userId: string,
   completedTasks: CompletedTasksMap,
+  options: UserStateOperationOptions = {},
 ): Promise<UserStateSyncSummary> {
   return replaceRowsForUser(
     payload,
@@ -832,15 +890,24 @@ export async function setUserCompletedTasksMap(
     userId,
     completedTasksMapToRows(userId, completedTasks),
     (row) => String(row.taskId),
+    options,
   )
 }
 
 export async function getUserShopPurchasesRecord(
   payload: PayloadLike,
   userId: string,
+  options: UserStateOperationOptions = {},
 ): Promise<ShopPurchasesRecord> {
   return shopPurchaseRowsToRecord(
-    await findRows(payload, USER_STATE_COLLECTIONS.shopPurchases, userId),
+    await findRows(
+      payload,
+      USER_STATE_COLLECTIONS.shopPurchases,
+      userId,
+      [],
+      undefined,
+      options.req,
+    ),
   )
 }
 
@@ -848,6 +915,7 @@ export async function setUserShopPurchasesRecord(
   payload: PayloadLike,
   userId: string,
   shopPurchases: ShopPurchasesRecord,
+  options: UserStateOperationOptions = {},
 ): Promise<UserStateSyncSummary> {
   return replaceRowsForUser(
     payload,
@@ -855,6 +923,7 @@ export async function setUserShopPurchasesRecord(
     userId,
     shopPurchasesRecordToRows(userId, shopPurchases),
     (row) => String(row.shopItemId),
+    options,
   )
 }
 
@@ -862,6 +931,7 @@ export async function getUserActivityStatsMap(
   payload: PayloadLike,
   userId: string,
   domains?: Array<keyof typeof ACTIVITY_TYPES>,
+  options: UserStateOperationOptions = {},
 ): Promise<ActivityStatsMap> {
   const activityTypes = new Set<string>(
     domains?.map((domain) => ACTIVITY_TYPES[domain]) || [],
@@ -884,6 +954,8 @@ export async function getUserActivityStatsMap(
       USER_STATE_COLLECTIONS.activityStats,
       userId,
       extraWhere,
+      undefined,
+      options.req,
     ),
   )
 }
@@ -899,6 +971,7 @@ export async function setUserActivityStatsMap(
     'fieldResearchResults',
     'expeditionResults',
   ],
+  options: UserStateOperationOptions = {},
 ): Promise<UserStateSyncSummary> {
   let summary: UserStateSyncSummary = { created: 0, updated: 0, deleted: 0 }
 
@@ -913,6 +986,7 @@ export async function setUserActivityStatsMap(
         (row) => String(row.activityId),
         {
           extraWhere: [{ activityType: { equals: ACTIVITY_TYPES[domain] } }],
+          req: options.req,
         },
       ),
     )
@@ -932,6 +1006,7 @@ export async function incrementUserActivityResult(
     highScore?: number
     metadata?: Record<string, unknown>
   },
+  options: UserStateOperationOptions = {},
 ): Promise<ActivityStatEntry> {
   const activityType = ACTIVITY_TYPES[domain]
   const now = new Date().toISOString()
@@ -943,6 +1018,8 @@ export async function incrementUserActivityResult(
       { activityType: { equals: activityType } },
       { activityId: { equals: activityId } },
     ],
+    undefined,
+    options.req,
   )
   const existing = existingRows[0]
   const existingHighScore = toOptionalNumber(existing?.highScore)
@@ -978,12 +1055,14 @@ export async function incrementUserActivityResult(
       id: existing.id,
       data,
       overrideAccess: true,
+      ...(options.req ? { req: options.req } : {}),
     })
   } else {
     await payload.create({
       collection: USER_STATE_COLLECTIONS.activityStats,
       data,
       overrideAccess: true,
+      ...(options.req ? { req: options.req } : {}),
     })
   }
 
@@ -994,6 +1073,7 @@ export async function getUserStateData(
   payload: PayloadLike,
   user: User,
   requiredData?: GameDataKeys[],
+  options: UserStateOperationOptions = {},
 ): Promise<Partial<UserStateData>> {
   const shouldFetchActivityStats =
     hasRequiredKey(requiredData, 'battleResults') ||
@@ -1031,7 +1111,7 @@ export async function getUserStateData(
       ? findRows(payload, USER_STATE_COLLECTIONS.inventory, user.id, [], {
           itemId: true,
           quantity: true,
-        })
+        }, options.req)
       : Promise.resolve([]),
     hasRequiredKey(requiredData, 'pokedex')
       ? findRows(payload, USER_STATE_COLLECTIONS.pokedex, user.id, [], {
@@ -1047,7 +1127,7 @@ export async function getUserStateData(
           researchXp: true,
           researchLevel: true,
           preferredBattleStance: true,
-        })
+        }, options.req)
       : Promise.resolve([]),
     hasRequiredKey(requiredData, 'abilityDex')
       ? findRows(payload, USER_STATE_COLLECTIONS.abilityDex, user.id, [], {
@@ -1056,7 +1136,7 @@ export async function getUserStateData(
           source: true,
           firstRegisteredAt: true,
           createdAt: true,
-        })
+        }, options.req)
       : Promise.resolve([]),
     hasRequiredKey(requiredData, 'completedTasks')
       ? findRows(payload, USER_STATE_COLLECTIONS.tasks, user.id, [], {
@@ -1065,7 +1145,7 @@ export async function getUserStateData(
           completedAt: true,
           lastCompletedAt: true,
           updatedAt: true,
-        })
+        }, options.req)
       : Promise.resolve([]),
     shouldFetchActivityStats
       ? findRows(
@@ -1089,6 +1169,7 @@ export async function getUserStateData(
             updatedAt: true,
             metadata: true,
           },
+          options.req,
         )
       : Promise.resolve([]),
     hasRequiredKey(requiredData, 'tcg')
@@ -1096,7 +1177,7 @@ export async function getUserStateData(
           cardId: true,
           setId: true,
           quantity: true,
-        })
+        }, options.req)
       : Promise.resolve([]),
     hasRequiredKey(requiredData, 'shopPurchases')
       ? findRows(payload, USER_STATE_COLLECTIONS.shopPurchases, user.id, [], {
@@ -1106,7 +1187,7 @@ export async function getUserStateData(
           count: true,
           firstPurchasedAt: true,
           lastPurchasedAt: true,
-        })
+        }, options.req)
       : Promise.resolve([]),
   ])
 
@@ -1147,7 +1228,15 @@ function existingValueMatches(
     .every(([key, value]) => valuesEqual(doc[key], value))
 }
 
-async function runWriteJobs(jobs: Array<() => Promise<unknown>>) {
+async function runWriteJobs(
+  jobs: Array<() => Promise<unknown>>,
+  sequential = false,
+) {
+  if (sequential) {
+    for (const operation of jobs) await operation()
+    return
+  }
+
   const concurrency = 10
   for (let index = 0; index < jobs.length; index += concurrency) {
     await Promise.all(
@@ -1165,6 +1254,7 @@ async function replaceRowsForUser(
   options: {
     dryRun?: boolean
     extraWhere?: Record<string, unknown>[]
+    req?: PayloadRequest
   } = {},
 ): Promise<UserStateSyncSummary> {
   const existingRows = await findRows(
@@ -1172,6 +1262,8 @@ async function replaceRowsForUser(
     collection,
     userId,
     options.extraWhere,
+    undefined,
+    options.req,
   )
   const existingByKey = new Map(
     existingRows.map((row) => [getExistingKey(row), row]),
@@ -1190,6 +1282,7 @@ async function replaceRowsForUser(
           collection,
           id: row.id,
           overrideAccess: true,
+          ...(options.req ? { req: options.req } : {}),
         }),
       )
     }
@@ -1207,6 +1300,7 @@ async function replaceRowsForUser(
             collection,
             data,
             overrideAccess: true,
+            ...(options.req ? { req: options.req } : {}),
           }),
         )
       }
@@ -1223,12 +1317,13 @@ async function replaceRowsForUser(
           id: existing.id,
           data,
           overrideAccess: true,
+          ...(options.req ? { req: options.req } : {}),
         }),
       )
     }
   }
 
-  await runWriteJobs(writeJobs)
+  await runWriteJobs(writeJobs, Boolean(options.req?.transactionID))
   return summary
 }
 

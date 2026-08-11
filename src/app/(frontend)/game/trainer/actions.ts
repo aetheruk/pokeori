@@ -11,6 +11,7 @@ import {
   KID_MODE_ACCESS_ERROR,
   isKidModeUser,
 } from '@/utilities/kid-mode'
+import { getEconomyActionErrorMessage, runEconomyAction } from '@/utilities/economy/transactions'
 
 async function getFreshAuthenticatedUser(payload: any): Promise<User | null> {
   const { user } = await payload.auth({ headers: await headers() })
@@ -178,7 +179,7 @@ export async function getHighScores(
 
 // --- Mystery Gift ---
 
-export async function redeemMysteryGift(code: string) {
+export async function redeemMysteryGift(code: string, clientActionId: string) {
   const payload = await getPayload({ config: configPromise })
   const user = await getFreshAuthenticatedUser(payload)
 
@@ -188,6 +189,7 @@ export async function redeemMysteryGift(code: string) {
   if (isKidModeUser(user)) {
     return { success: false, error: KID_MODE_ACCESS_ERROR }
   }
+  if (!clientActionId) return { success: false, error: 'Missing action identifier' }
 
   const normalizedCode = code.toUpperCase().trim()
   const gift = mysteryGifts.find((g) => g.code === normalizedCode)
@@ -204,31 +206,44 @@ export async function redeemMysteryGift(code: string) {
     return { success: false, error: 'This code has expired' }
   }
 
-  // Check if already redeemed
-  const redeemedCodes = (user as any).redeemedCodes || []
-  if (redeemedCodes.includes(normalizedCode)) {
-    return { success: false, error: 'You have already redeemed this code' }
-  }
-
   try {
-    // Grant rewards using the comprehensive system
-    const { grantRewards } = await import('@/utilities/rewards/reward-logic')
-    const { summary } = await grantRewards(user.id, gift.rewards, { source: 'mystery-gift' })
+    const result = await runEconomyAction(
+      { userId: user.id, action: 'redeem-mystery-gift', requestId: clientActionId },
+      async ({ payload: transactionPayload, req }) => {
+        const freshUser = await transactionPayload.findByID({
+          collection: 'users',
+          id: user.id,
+          depth: 0,
+          req,
+        })
+        const redeemedCodes = (freshUser as any).redeemedCodes || []
+        if (redeemedCodes.includes(normalizedCode)) {
+          return { success: false, error: 'You have already redeemed this code' }
+        }
 
-    // Update redeemed codes
-    await payload.update({
-      collection: 'users',
-      id: user.id,
-      data: {
-        redeemedCodes: [...redeemedCodes, normalizedCode],
+        const { grantRewards } = await import('@/utilities/rewards/reward-logic')
+        const { summary } = await grantRewards(user.id, gift.rewards, {
+          source: 'mystery-gift',
+          payload: transactionPayload,
+          req,
+        })
+
+        await transactionPayload.update({
+          collection: 'users',
+          id: user.id,
+          data: {
+            redeemedCodes: [...redeemedCodes, normalizedCode],
+          },
+          req,
+        })
+
+        return { success: true, summary }
       },
-    })
-
+    )
     revalidatePath('/game')
-
-    return { success: true, summary }
+    return result
   } catch (error) {
     console.error('Redemption error:', error)
-    return { success: false, error: 'Failed to redeem code' }
+    return { success: false, error: getEconomyActionErrorMessage(error) }
   }
 }

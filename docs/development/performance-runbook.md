@@ -48,7 +48,16 @@ ledgers, and creates query indexes. `finalize` repeats the duplicate audit and
 adds the compound unique indexes. Run `finalize` only after the deployed
 application is healthy on the prepared schema. The migration keeps maximum
 quantities/counters, unions rarity ledgers, and preserves earliest/latest
-timestamps as appropriate.
+timestamps as appropriate. It also clamps historical negative economy balances
+to zero and reconciles durable economy receipt duplicates. The migration exits
+without writing unless MongoDB advertises replica-set and logical-session
+support.
+
+MongoDB must run as a replica set, including single-node production installs.
+Economy actions deliberately fail closed when transactions are unavailable.
+`/api/health` reports `mongoTransactions: true` only when both the topology and
+Payload adapter support transactions; a false value makes the application
+unhealthy.
 
 The runtime MongoDB pool is capped at 20 connections with a minimum of 2,
 60-second idle retirement, 5-second connect/server-selection timeouts, and a
@@ -114,7 +123,8 @@ calls Coolify.
 
 After rollout:
 
-1. Confirm `/api/health` returns 200 and both dependencies are true.
+1. Confirm `/api/health` returns 200 with `mongo`, `mongoTransactions`, and
+   `dragonfly` all true.
 2. Confirm `/api/app-version` and `/sw.js` are `no-store`.
 3. Confirm a repeated catalog and sprite request becomes a Cloudflare HIT.
 4. Smoke login, Trainer, Explore, Pokémon box, Inventory, Carddex search and

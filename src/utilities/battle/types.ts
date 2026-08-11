@@ -338,6 +338,8 @@ export interface BattleState {
   pendingPlayerSwitchStatStages?: StatStages
   pendingMoveSwitches?: PendingBattleMoveSwitch[]
   battleId: string
+  /** Unique settlement identity used for durable economy receipts. */
+  economyActionId?: string
   background?: string
   playerName: string
   enemyName: string

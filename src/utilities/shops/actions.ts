@@ -21,6 +21,10 @@ import {
   setUserShopPurchasesRecord,
 } from '@/utilities/user-state'
 import { recordDailyActivityProgress } from '@/utilities/tasks/daily-progress'
+import {
+  getEconomyActionErrorMessage,
+  runEconomyAction,
+} from '@/utilities/economy/transactions'
 
 export interface PurchaseItemResult {
   success: boolean
@@ -32,6 +36,7 @@ export interface PurchaseItemResult {
 export async function purchaseShopItem(
   shopId: string,
   itemId: string,
+  clientActionId: string,
 ): Promise<PurchaseItemResult> {
   const { user } = await checkUserAuth()
   if (!user) {
@@ -48,135 +53,144 @@ export async function purchaseShopItem(
     return { success: false, message: 'Item not found' }
   }
 
-  const payload = await getPayload({ config: payloadConfig })
-
-  // 1. Analyze Requirements to fetch needed user data
-  const requirements = [...(shop.requirements || []), ...(item.requirements || [])]
-  const requiredKeys = analyzeRequirements(requirements)
-
-  // Always fetch currency and inventory for cost checking
-  if (!requiredKeys.includes('currency')) requiredKeys.push('currency')
-  if (!requiredKeys.includes('inventory')) requiredKeys.push('inventory')
-  if (!requiredKeys.includes('shopPurchases')) requiredKeys.push('shopPurchases')
-
-  const freshUser = await payload.findByID({ collection: 'users', id: user.id })
-  const userData = await getGameUserData(freshUser, requiredKeys)
-
-  // 2. Check Shop Requirements
-  if (!checkShopRequirements(userData, shop)) {
-    return { success: false, message: 'Shop locked' }
-  }
-
-  // 3. Check Item Requirements
-  if (!checkShopItemRequirements(userData, shop, item)) {
-    return { success: false, message: 'Item locked' }
-  }
-
-  // 4. Check Stock
-  const shopPurchases = (userData.shopPurchases || {}) as Record<string, ShopPurchaseData>
-  const purchaseData = shopPurchases[itemId]
-
-  if (isOutOfStock(item, purchaseData)) {
-    return { success: false, message: 'Out of stock' }
-  }
-
-  // 5. Check Costs (Currency & Items)
-  const currencyToConsume: { id: string; quantity: number }[] = []
-  const itemsToConsume: { id: string; quantity: number }[] = []
-
-  for (const cost of item.cost) {
-    if (cost.type === 'currency') {
-      const currency = (userData.currency || {}) as Record<string, number>
-      const current = currency[cost.id] || 0
-      if (current < cost.amount) {
-        return { success: false, message: `Not enough ${cost.id}` }
-      }
-      currencyToConsume.push({ id: cost.id, quantity: cost.amount })
-    } else if (cost.type === 'item') {
-      const inventoryItem = userData.inventory.find((i) => i.itemId === cost.id)
-      const current = inventoryItem ? inventoryItem.quantity : 0
-      if (current < cost.amount) {
-        return { success: false, message: `Not enough item: ${cost.id}` }
-      }
-      itemsToConsume.push({ id: cost.id, quantity: cost.amount })
-    }
-  }
-
-  // 6. Consume Resources
   try {
-    // Consume Currency
-    if (currencyToConsume.length > 0) {
-      const newCurrency = { ...userData.currency }
-      for (const c of currencyToConsume) {
-        // @ts-expect-error - dynamic
-        newCurrency[c.id] = (newCurrency[c.id] || 0) - c.quantity
-      }
+    const payload = await getPayload({ config: payloadConfig })
+    const result = await runEconomyAction<PurchaseItemResult>(
+      {
+        userId: user.id,
+        action: 'shop-purchase',
+        requestId: clientActionId,
+        payload,
+      },
+      async ({ req }) => {
+        const requirements = [
+          ...(shop.requirements || []),
+          ...(item.requirements || []),
+        ]
+        const requiredKeys = analyzeRequirements(requirements)
+        if (!requiredKeys.includes('currency')) requiredKeys.push('currency')
+        if (!requiredKeys.includes('inventory')) requiredKeys.push('inventory')
+        if (!requiredKeys.includes('shopPurchases')) {
+          requiredKeys.push('shopPurchases')
+        }
 
-      await payload.update({
-        collection: 'users',
-        id: user.id,
-        data: { currency: newCurrency },
-      })
-      // Update local Ref for subsequent logic if needed (or just assume success)
-      userData.currency = newCurrency
+        const freshUser = await payload.findByID({
+          collection: 'users',
+          id: user.id,
+          req,
+        })
+        const userData = await getGameUserData(freshUser, requiredKeys, {
+          payload,
+          req,
+        })
+
+        if (!checkShopRequirements(userData, shop)) {
+          return { success: false, message: 'Shop locked' }
+        }
+        if (!checkShopItemRequirements(userData, shop, item)) {
+          return { success: false, message: 'Item locked' }
+        }
+
+        const shopPurchases = (userData.shopPurchases || {}) as Record<
+          string,
+          ShopPurchaseData
+        >
+        if (isOutOfStock(item, shopPurchases[itemId])) {
+          return { success: false, message: 'Out of stock' }
+        }
+
+        const currency = {
+          ...((userData.currency || {}) as Record<string, number>),
+        }
+        const inventory = await getUserInventoryMap(payload, user.id, { req })
+
+        for (const cost of item.cost) {
+          if (!Number.isSafeInteger(cost.amount) || cost.amount <= 0) {
+            throw new Error(`Invalid shop cost for ${shop.id}:${item.id}`)
+          }
+          if (cost.type === 'currency') {
+            const current = currency[cost.id] || 0
+            if (current < cost.amount) {
+              return { success: false, message: `Not enough ${cost.id}` }
+            }
+            currency[cost.id] = current - cost.amount
+          } else {
+            const current = inventory[cost.id] || 0
+            if (current < cost.amount) {
+              return {
+                success: false,
+                message: `Not enough item: ${cost.id}`,
+              }
+            }
+            inventory[cost.id] = current - cost.amount
+          }
+        }
+
+        if (item.cost.some((cost) => cost.type === 'currency')) {
+          await payload.update({
+            collection: 'users',
+            id: user.id,
+            data: { currency },
+            req,
+          })
+        }
+        if (item.cost.some((cost) => cost.type === 'item')) {
+          await setUserInventoryMap(payload, user.id, inventory, { req })
+        }
+
+        const currentPurchases = (await getUserShopPurchasesRecord(
+          payload,
+          user.id,
+          { req },
+        )) as Record<string, ShopPurchaseData>
+        const nowIso = new Date().toISOString()
+        const nextPurchaseData: ShopPurchaseData = {
+          count:
+            getEffectivePurchaseCount(item, currentPurchases[itemId]) + 1,
+          lastPurchasedAt: nowIso,
+        }
+        currentPurchases[itemId] = nextPurchaseData
+        await setUserShopPurchasesRecord(
+          payload,
+          user.id,
+          currentPurchases as any,
+          { req },
+        )
+
+        const rewardsToGrant: Reward[] = item.rewards.map((reward) => ({
+          ...reward,
+          dropChance: 100,
+        }))
+        const { summary } = await grantRewards(user.id, rewardsToGrant, {
+          skipDropChance: true,
+          payload,
+          req,
+        })
+
+        await recordDailyActivityProgress(
+          user.id,
+          {
+            kind: 'shop_purchase',
+            sourceId: `${shop.id}:${item.id}`,
+          },
+          { payload, req },
+        )
+
+        return {
+          success: true,
+          rewards: summary,
+          purchaseData: nextPurchaseData,
+        }
+      },
+    )
+
+    if (result.success) {
+      revalidatePath('/game')
+      revalidatePath('/game/shops')
     }
-
-    // Consume Items
-    if (itemsToConsume.length > 0) {
-      const userInventory = await getUserInventoryMap(payload, user.id)
-
-      for (const i of itemsToConsume) {
-        userInventory[i.id] = Math.max(0, (userInventory[i.id] || 0) - i.quantity)
-      }
-
-      await setUserInventoryMap(payload, user.id, userInventory)
-    }
-  } catch (e) {
-    console.error('Error consuming resources during purchase', e)
-    return { success: false, message: 'Transaction failed' }
+    return result
+  } catch (error) {
+    console.error('Shop purchase transaction failed', error)
+    return { success: false, message: getEconomyActionErrorMessage(error) }
   }
-
-  // 7. Update Stock / Purchase History
-  let updatedPurchaseData: ShopPurchaseData | undefined
-
-  try {
-    const currentPurchases = (await getUserShopPurchasesRecord(payload, user.id)) as Record<
-      string,
-      ShopPurchaseData
-    >
-
-    const nowIso = new Date().toISOString()
-    const prevData = currentPurchases[itemId]
-    const nextCount = getEffectivePurchaseCount(item, prevData) + 1
-
-    const nextPurchaseData: ShopPurchaseData = {
-      count: nextCount,
-      lastPurchasedAt: nowIso,
-    }
-    currentPurchases[itemId] = nextPurchaseData
-
-    await setUserShopPurchasesRecord(payload, user.id, currentPurchases as any)
-    updatedPurchaseData = nextPurchaseData
-  } catch (e) {
-    console.error('Error updating purchase history', e)
-    // Don't fail the whole transaction if we already took money, but this is bad.
-  }
-
-  // 8. Grant Rewards
-  const rewardsToGrant: Reward[] = item.rewards.map((r) => ({
-    ...r,
-    dropChance: 100, // Ensure they get what they bought
-  }))
-
-  const { summary } = await grantRewards(user.id, rewardsToGrant, { skipDropChance: true })
-
-  await recordDailyActivityProgress(user.id, {
-    kind: 'shop_purchase',
-    sourceId: `${shop.id}:${item.id}`,
-  })
-
-  revalidatePath('/game')
-  revalidatePath('/game/shops')
-
-  return { success: true, rewards: summary, purchaseData: updatedPurchaseData }
 }

@@ -1,4 +1,5 @@
 import { getPayload } from 'payload'
+import { randomUUID } from 'node:crypto'
 import configPromise from '@payload-config'
 import { redis } from '@/utilities/redis'
 import { revalidatePath } from 'next/cache'
@@ -522,6 +523,7 @@ export async function startBattleFromConfig(
     pendingPlayerSwitch: battleConfig.isWildBattle ? true : undefined,
     pendingPlayerSwitchReason: battleConfig.isWildBattle ? 'lead' : undefined,
     battleId: battleConfig.id,
+    economyActionId: randomUUID(),
     background: battleConfig.background,
     playerName: chronicleContext?.chronicle.playerName || user.trainerName || 'Player',
     enemyName:

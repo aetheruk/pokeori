@@ -63,6 +63,7 @@ import { checkRequirement } from '@/utilities/requirements'
 import type { RewardSummary } from '@/utilities/rewards/reward-logic'
 import { resolveEnemyBattleMoveUseLimit } from '@/utilities/skills/unlocks'
 import { incrementUserActivityResult } from '@/utilities/user-state'
+import { runEconomyAction } from '@/utilities/economy/transactions'
 import {
   getSeenPokemonOptions,
   getVsSeekerTrainerHealingItemId,
@@ -1032,17 +1033,6 @@ export async function placeBattleBet(
       }
     }
 
-    const freshUser = (await payload.findByID({
-      collection: 'users',
-      id: user.id,
-    })) as User
-    const tokenBalance = getTokenBalance(freshUser)
-    if (stake > tokenBalance) {
-      return {
-        success: false,
-        error: 'You do not have enough Fun Tokens for that stake.',
-      }
-    }
     const game = getBattleBetsGame()
     if (!game) return { success: false, error: 'Battle Bets is unavailable.' }
     const selectedProbability =
@@ -1052,16 +1042,30 @@ export async function placeBattleBet(
       selectedProbability,
       houseEdge: game.settings.houseEdge ?? 0.05,
     })
-    const currency = {
-      ...((freshUser.currency as Record<string, number>) || {}),
-      'fun-tokens': tokenBalance - stake,
-    }
-
-    await payload.update({
-      collection: 'users',
-      id: user.id,
-      data: { currency },
-    })
+    const debit = await runEconomyAction(
+      { userId: user.id, action: 'place-battle-bet', requestId: clientActionId, payload },
+      async ({ req }) => {
+        const freshUser = (await payload.findByID({ collection: 'users', id: user.id, req })) as User
+        const tokenBalance = getTokenBalance(freshUser)
+        if (stake > tokenBalance) {
+          return { success: false as const, error: 'You do not have enough Fun Tokens for that stake.' }
+        }
+        const balance = tokenBalance - stake
+        await payload.update({
+          collection: 'users',
+          id: user.id,
+          data: {
+            currency: {
+              ...((freshUser.currency as Record<string, number>) || {}),
+              'fun-tokens': balance,
+            },
+          },
+          req,
+        })
+        return { success: true as const, balance }
+      },
+    )
+    if (!debit.success) return debit
 
     const next: BattleBetsStoredState = {
       ...state,
@@ -1069,21 +1073,30 @@ export async function placeBattleBet(
       selectedSide: side,
       stake,
       potentialPayout,
-      tokenBalance: tokenBalance - stake,
+      tokenBalance: debit.balance,
       wagerActionId: clientActionId,
       fixture: orientFixtureForBackedSide(state.fixture, side),
     }
     if (!(await saveLiveSession(user.id, next))) {
-      await payload.update({
-        collection: 'users',
-        id: user.id,
-        data: {
-          currency: {
-            ...((freshUser.currency as Record<string, number>) || {}),
-            'fun-tokens': tokenBalance,
-          },
+      await runEconomyAction(
+        { userId: user.id, action: 'refund-battle-bet', requestId: clientActionId, payload },
+        async ({ req }) => {
+          const freshUser = (await payload.findByID({ collection: 'users', id: user.id, req })) as User
+          const balance = getTokenBalance(freshUser) + stake
+          await payload.update({
+            collection: 'users',
+            id: user.id,
+            data: {
+              currency: {
+                ...((freshUser.currency as Record<string, number>) || {}),
+                'fun-tokens': balance,
+              },
+            },
+            req,
+          })
+          return { refunded: true }
         },
-      })
+      )
       return {
         success: false,
         error: 'That matchup expired before the wager could be placed.',
@@ -1150,42 +1163,48 @@ async function settleBattleBetsResult(params: {
     params.state.fixture.battleState.status === 'won' &&
     params.state.won === true
   const payout = won ? Math.max(0, params.state.payout || 0) : 0
-  const freshUser = (await params.payload.findByID({
-    collection: 'users',
-    id: params.user.id,
-  })) as User
-  let tokenBalance = getTokenBalance(freshUser)
-
-  if (won && payout > 0) {
-    tokenBalance += payout
-    await params.payload.update({
-      collection: 'users',
-      id: params.user.id,
-      data: {
-        currency: {
-          ...((freshUser.currency as Record<string, number>) || {}),
-          'fun-tokens': tokenBalance,
-        },
-      },
-    })
-  }
+  const settlement = await runEconomyAction(
+    {
+      userId: params.user.id,
+      action: 'settle-battle-bet',
+      requestId: params.state.sessionId,
+      payload: params.payload,
+    },
+    async ({ req }) => {
+      const freshUser = (await params.payload.findByID({
+        collection: 'users', id: params.user.id, req,
+      })) as User
+      const tokenBalance = getTokenBalance(freshUser) + payout
+      if (payout > 0) {
+        await params.payload.update({
+          collection: 'users',
+          id: params.user.id,
+          data: {
+            currency: {
+              ...((freshUser.currency as Record<string, number>) || {}),
+              'fun-tokens': tokenBalance,
+            },
+          },
+          req,
+        })
+      }
+      await incrementUserActivityResult(
+        params.payload as any,
+        params.user.id,
+        'gameResults',
+        GAME_ID,
+        won ? { wins: 1 } : { losses: 1 },
+        { req },
+      )
+      return { tokenBalance, payout, won, activityRecorded: true }
+    },
+  )
+  const { tokenBalance } = settlement
 
   await setIdempotentResult(
     receiptKey,
-    { tokenBalance, payout, won, activityRecorded: false },
+    settlement,
     SESSION_TTL_SECONDS,
-  )
-  await setIdempotentResult(
-    receiptKey,
-    { tokenBalance, payout, won, activityRecorded: true },
-    SESSION_TTL_SECONDS,
-  )
-  await incrementUserActivityResult(
-    params.payload as any,
-    params.user.id,
-    'gameResults',
-    GAME_ID,
-    won ? { wins: 1 } : { losses: 1 },
   )
 
   const settled = {

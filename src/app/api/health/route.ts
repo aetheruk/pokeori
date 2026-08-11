@@ -1,6 +1,7 @@
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { redis } from '@/utilities/redis'
+import { hasEconomyTransactionSupport } from '@/utilities/economy/transactions'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -29,14 +30,26 @@ async function checkDependencies() {
     getPayload({ config: configPromise }),
     'MongoDB connection',
   )
+  const admin = payload.db.connection.db?.admin()
+  if (!admin) throw new Error('MongoDB is unavailable')
   const mongo = await withTimeout(
-    payload.db.connection.db?.admin().ping() ?? Promise.reject(new Error('MongoDB is unavailable')),
+    admin.ping(),
     'MongoDB',
   )
+  const topology = await withTimeout(
+    admin.command({ hello: 1 }),
+    'MongoDB transaction topology',
+  )
   const dragonfly = await withTimeout(redis.ping(), 'Dragonfly')
+  const mongoTransactions = Boolean(
+    hasEconomyTransactionSupport(payload) &&
+      topology.setName &&
+      topology.logicalSessionTimeoutMinutes,
+  )
 
   return {
     mongo: mongo.ok === 1,
+    mongoTransactions,
     dragonfly,
   }
 }
@@ -44,7 +57,8 @@ async function checkDependencies() {
 async function response(includeBody: boolean) {
   try {
     const dependencies = await checkDependencies()
-    const healthy = dependencies.mongo && dependencies.dragonfly
+    const healthy =
+      dependencies.mongo && dependencies.mongoTransactions && dependencies.dragonfly
     return new Response(
       includeBody ? JSON.stringify({ status: healthy ? 'ok' : 'degraded', dependencies }) : null,
       {

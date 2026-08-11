@@ -122,7 +122,7 @@ export function useExploreActions(
   const handleCompleteVoyage = async (voyageId: string) => {
     setLoadingId(voyageId)
     try {
-      const result = await completeVoyage(voyageId)
+      const result = await completeVoyage(voyageId, crypto.randomUUID())
       if (result.success) {
         refreshUser()
         setSelectedItem(null)
@@ -202,7 +202,7 @@ export function useExploreActions(
     const expeditionLabel = getExpeditionLabel(expeditionId)
     setLoadingId(expeditionId)
     try {
-      const result = await startExpedition(expeditionId)
+      const result = await startExpedition(expeditionId, crypto.randomUUID())
       if (!result.success) {
         toast.error(
           result.message || `Failed to start ${expeditionLabel.toLowerCase()}`,
@@ -223,7 +223,7 @@ export function useExploreActions(
     const expeditionLabel = getExpeditionLabel(expeditionId)
     setLoadingId(expeditionId)
     try {
-      const result = await claimExpeditionRewards(expeditionId)
+      const result = await claimExpeditionRewards(expeditionId, crypto.randomUUID())
       if (!result.success) {
         toast.error(
           result.message ||
@@ -256,7 +256,7 @@ export function useExploreActions(
 
     setLoadingId(activeRun.expeditionId)
     try {
-      const result = await abandonExpedition()
+      const result = await abandonExpedition(crypto.randomUUID())
       if (!result.success) {
         toast.error(
           result.message ||
@@ -498,7 +498,7 @@ export function useExploreActions(
         try {
           const result = isCompletedExpeditionReplay
             ? await completeCurrentUserExpeditionTaskStep(task.id)
-            : await completeTask(task.id)
+            : await completeTask(task.id, undefined, crypto.randomUUID())
           if (result.success) {
             if (isExpeditionTaskFlow) {
               markExpeditionReturn(getActiveExpeditionRun()?.expeditionId)
@@ -554,7 +554,7 @@ export function useExploreActions(
       try {
         const result = isCompletedExpeditionReplay
           ? await completeCurrentUserExpeditionTaskStep(task.id)
-          : await completeTask(task.id)
+          : await completeTask(task.id, undefined, crypto.randomUUID())
         if (result.success) {
           if (isExpeditionTaskFlow) {
             await reopenExpeditionPanel(getActiveExpeditionRun()?.expeditionId)
@@ -885,7 +885,7 @@ export function useExploreActions(
 
     setCompletingTaskId(task.id)
     try {
-      const result = await completeTask(task.id, selectedPokemonIds)
+      const result = await completeTask(task.id, selectedPokemonIds, crypto.randomUUID())
       if (result.success) {
         if (shouldClearExpeditionContext) {
           reopenExpeditionPanel(getActiveExpeditionRun()?.expeditionId)

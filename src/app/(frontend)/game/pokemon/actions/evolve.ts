@@ -1,7 +1,6 @@
 'use server'
 
-import { getPayload, Where } from 'payload'
-import config from '@/payload.config'
+import type { Where } from 'payload'
 import { revalidatePath } from 'next/cache'
 import { headers } from 'next/headers'
 import { logger } from '@/utilities/logger'
@@ -49,6 +48,7 @@ import {
   setUserInventoryMap,
   setUserPokedexMap,
 } from '@/utilities/user-state'
+import { getEconomyActionErrorMessage, runEconomyAction } from '@/utilities/economy/transactions'
 
 function getRequiredEvolutionItem(
   conditions: EvolutionCondition,
@@ -82,15 +82,21 @@ export async function evolvePokemon(
   pokemonId: string,
   targetSpeciesId: number,
   triggerItemId?: string,
+  clientActionId?: string,
 ) {
   const user = await getUser()
   if (!user) throw new Error('Unauthorized')
-  const payload = await getPayload({ config })
+  if (!clientActionId) return { success: false, message: 'Missing action identifier' }
+  try {
+    const result = await runEconomyAction(
+      { userId: user.id, action: 'evolve-pokemon', requestId: clientActionId },
+      async ({ payload, req }) => {
 
   // 1. Fetch Pokemon
   const pokemon = await payload.findByID({
     collection: 'pokemon',
     id: pokemonId,
+    req,
   })
 
   if (
@@ -187,7 +193,7 @@ export async function evolvePokemon(
     }
 
     // Check Inventory
-    const userInventory = await getUserInventoryMap(payload as any, user.id)
+    const userInventory = await getUserInventoryMap(payload as any, user.id, { req })
     if ((userInventory[requiredItem] || 0) < 1) {
       // Create readable names for custom items
       let itemName = requiredItem
@@ -199,7 +205,7 @@ export async function evolvePokemon(
 
     // Consume Item
     userInventory[requiredItem] -= 1
-    await setUserInventoryMap(payload as any, user.id, userInventory)
+    await setUserInventoryMap(payload as any, user.id, userInventory, { req })
   }
 
   // Friendship Check
@@ -248,6 +254,7 @@ export async function evolvePokemon(
       ability: newAbilityId || '',
       evolved: true,
     },
+    req,
   })
 
   // 3b. Recalculate stats for the new species/form
@@ -255,6 +262,7 @@ export async function evolvePokemon(
   const evolvedPokemon = await payload.findByID({
     collection: 'pokemon',
     id: pokemonId,
+    req,
   })
 
   // Calculate new stats based on new species base stats
@@ -267,6 +275,7 @@ export async function evolvePokemon(
     data: {
       stats: pokemonWithNewStats.stats,
     },
+    req,
   })
 
   // 4. Update User Stats (Pokedex & Count)
@@ -274,10 +283,11 @@ export async function evolvePokemon(
   const freshUser = await payload.findByID({
     collection: 'users',
     id: user.id,
+    req,
   })
 
   // Update Pokedex for new species
-  const pokedex = await getUserPokedexMap(payload as any, user.id)
+  const pokedex = await getUserPokedexMap(payload as any, user.id, { req })
   const speciesKey = targetEvolution.speciesId.toString()
   const formKey = newFormId
 
@@ -314,16 +324,15 @@ export async function evolvePokemon(
     newTotal: userStats.totalEvolutions,
   })
 
-  await Promise.all([
-    setUserPokedexMap(payload as any, user.id, pokedex),
-    payload.update({
+  await setUserPokedexMap(payload as any, user.id, pokedex, { req })
+  await payload.update({
       collection: 'users',
       id: user.id,
       data: {
         stats: userStats,
       },
-    }),
-  ])
+      req,
+    })
 
   // Grant Research XP via reward logic to trigger auto-leveling
   const { grantRewards } = await import('@/utilities/rewards/reward-logic')
@@ -334,15 +343,15 @@ export async function evolvePokemon(
       quantity: rollResearchXp(),
       dropChance: 100,
     },
-  ])
+  ], { payload, req, source: 'pokemon-evolution' })
 
   // 5. Fetch Updated Pokemon & Return
   const updatedPokemon = await payload.findByID({
     collection: 'pokemon',
     id: pokemonId,
+    req,
   })
 
-  revalidatePath('/game/pokemon')
   return {
     success: true,
     message: `Evolved into ${targetEvolution.name}!`,
@@ -350,5 +359,12 @@ export async function evolvePokemon(
     newFormId: newFormId,
     pokemon: serializePokemon(updatedPokemon),
     rewards: summary,
+  }
+      },
+    )
+    revalidatePath('/game/pokemon')
+    return result
+  } catch (error) {
+    return { success: false, message: getEconomyActionErrorMessage(error) }
   }
 }

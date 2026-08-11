@@ -1,4 +1,4 @@
-import { getPayload } from 'payload'
+import { getPayload, type Payload, type PayloadRequest } from 'payload'
 import payloadConfig from '@/payload.config'
 import { tcgRarityOdds } from '@/data/tcg-rarity'
 import type { TcgCard } from '@/data/tcg/types'
@@ -19,6 +19,9 @@ export interface CardDrawParams {
   rng?: () => number
   logger?: Pick<Console, 'debug' | 'warn'>
   userInventory?: Record<string, number>
+  payload?: Payload
+  req?: PayloadRequest
+  persist?: boolean
 }
 
 export interface SingleCardDrawResult {
@@ -125,6 +128,9 @@ export interface BuildBoosterPackDrawParams {
 export interface TcgBoosterPackDrawParams extends BuildBoosterPackDrawParams {
   logger?: Pick<Console, 'debug' | 'warn'>
   userInventory?: Record<string, number>
+  payload?: Payload
+  req?: PayloadRequest
+  persist?: boolean
 }
 
 const GUARANTEED_BONUS_ROLL_CUTOFF = 0.0001
@@ -574,7 +580,16 @@ export async function drawRandomTcgCard(params: CardDrawParams = {}): Promise<Ca
   }
 
   try {
-    await persistDrawnCards(userId, draws, logger, userInventory)
+    if (params.persist !== false) {
+      await persistDrawnCards(
+        userId,
+        draws,
+        logger,
+        userInventory,
+        params.payload,
+        params.req,
+      )
+    }
   } catch (error) {
     logger.warn?.('[TCG Draw] Failed to persist drawn cards.', error)
     throw error
@@ -600,8 +615,13 @@ export async function drawTcgBoosterPacks(
   const packCount = normalizeQuantity(params.packCount)
   const set = getTcgSetById(params.setId)
   const initialPoolSize = set?.cards.length || 0
-  const payload = await getPayload({ config: payloadConfig })
-  const collection = await getUserTcgMap(payload as any, userId)
+  const payload = params.payload || (await getPayload({ config: payloadConfig }))
+  const requestOptions = params.req ? { req: params.req } : {}
+  const collection = await getUserTcgMap(
+    payload as any,
+    userId,
+    requestOptions,
+  )
   const packs = buildTcgBoosterPackDraws({
     ...params,
     packCount,
@@ -620,7 +640,16 @@ export async function drawTcgBoosterPacks(
   )
 
   try {
-    await persistDrawnCards(userId, draws, logger, params.userInventory)
+    if (params.persist !== false) {
+      await persistDrawnCards(
+        userId,
+        draws,
+        logger,
+        params.userInventory,
+        payload,
+        params.req,
+      )
+    }
   } catch (error) {
     logger.warn?.('[TCG Pack Draw] Failed to persist drawn cards.', error)
     throw error
@@ -652,12 +681,18 @@ async function persistDrawnCards(
   draws: SingleCardDrawResult[],
   logger: Pick<Console, 'debug' | 'warn'>,
   providedInventory?: Record<string, number>,
+  providedPayload?: Payload,
+  req?: PayloadRequest,
 ): Promise<void> {
-  const payloadConfigResolved = await payloadConfig
-  const payload = await getPayload({ config: payloadConfigResolved })
+  const payload =
+    providedPayload ||
+    (await getPayload({ config: await payloadConfig }))
+  const requestOptions = req ? { req } : {}
 
-  const cardsMap = await getUserTcgMap(payload as any, userId)
-  const inventory = providedInventory || (await getUserInventoryMap(payload as any, userId))
+  const cardsMap = await getUserTcgMap(payload as any, userId, requestOptions)
+  const inventory =
+    providedInventory ||
+    (await getUserInventoryMap(payload as any, userId, requestOptions))
 
   const aggregates = new Map<string, DrawAggregation>()
 
@@ -703,11 +738,17 @@ async function persistDrawnCards(
     totalCardsAdded += aggregate.count
   }
 
-  await setUserTcgMap(payload as any, userId, cardsMap)
+  await setUserTcgMap(payload as any, userId, cardsMap, requestOptions)
 
   // Hook into explicit daily progress
   if (totalCardsAdded > 0) {
-    await incrementDailyTaskProgress(userId, 'daily_card', totalCardsAdded)
+    await incrementDailyTaskProgress(
+      userId,
+      'daily_card',
+      totalCardsAdded,
+      undefined,
+      { payload, req },
+    )
   }
 
   logger.debug?.('[TCG Draw] Persisted drawn cards for user.', {

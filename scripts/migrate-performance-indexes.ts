@@ -43,6 +43,22 @@ const mergeQuantity = (field: string) => (documents: Document[]) => ({
 
 const uniqueIndexes: UniqueIndexPlan[] = [
   {
+    slug: 'economy-action-receipts',
+    keys: { key: 1 },
+    name: 'key_1',
+    merge: (documents) => {
+      const latestDocument = [...documents].sort(
+        (left, right) =>
+          new Date(right.committedAt || right.createdAt || 0).getTime() -
+          new Date(left.committedAt || left.createdAt || 0).getTime(),
+      )[0]
+      return {
+        response: latestDocument?.response,
+        committedAt: latestDocument?.committedAt,
+      }
+    },
+  },
+  {
     slug: 'user-inventory-items',
     keys: { user: 1, itemId: 1 },
     name: 'user_item_unique',
@@ -318,6 +334,63 @@ async function backfillPokedexRarities(payload: any, dryRun: boolean) {
   )
 }
 
+async function repairInvalidEconomyBalances(payload: any, dryRun: boolean) {
+  const repairs = [
+    { slug: 'user-inventory-items', fields: ['quantity'] },
+    { slug: 'user-tcg-cards', fields: ['quantity'] },
+    { slug: 'user-shop-purchases', fields: ['count'] },
+    { slug: 'user-task-progress', fields: ['count'] },
+    {
+      slug: 'user-activity-stats',
+      fields: ['wins', 'losses', 'highScore'],
+    },
+  ]
+  let repairedRows = 0
+
+  for (const repair of repairs) {
+    const collection = (payload.db.collections as any)[repair.slug]?.collection
+    if (!collection) throw new Error(`Missing collection model for ${repair.slug}`)
+    for (const field of repair.fields) {
+      const filter = { [field]: { $lt: 0 } }
+      const count = await collection.countDocuments(filter)
+      repairedRows += count
+      if (!dryRun && count > 0) {
+        await collection.updateMany(filter, { $set: { [field]: 0 } })
+      }
+      console.log(
+        `${dryRun ? 'Would repair' : 'Repaired'} ${count} negative ${repair.slug}.${field} value(s)`,
+      )
+    }
+  }
+
+  const users = (payload.db.collections as any).users?.collection
+  if (!users) throw new Error('Missing users collection model')
+  const currencyFields = [
+    'crystals',
+    'mega-shards',
+    'pokedollars',
+    'fun-tokens',
+    'battle-points',
+    'berry-powder',
+    'prof-scrip',
+    'league-ticket',
+  ]
+  for (const currency of currencyFields) {
+    const field = `currency.${currency}`
+    const filter = { [field]: { $lt: 0 } }
+    const count = await users.countDocuments(filter)
+    repairedRows += count
+    if (!dryRun && count > 0) {
+      await users.updateMany(filter, { $set: { [field]: 0 } })
+    }
+    console.log(
+      `${dryRun ? 'Would repair' : 'Repaired'} ${count} negative ${field} value(s)`,
+    )
+  }
+
+  return repairedRows
+}
+
 async function main() {
   if (process.argv.includes('--help') || process.argv.includes('-h')) {
     console.log(`Usage: bun run migrate:performance-indexes -- [options]
@@ -332,7 +405,16 @@ Options:
   const phase = parsePhase()
   const dryRun = process.argv.includes('--dry-run')
   const payload = await getPayload({ config: payloadConfig })
+  const mongoAdmin = payload.db.connection.db?.admin()
+  if (!mongoAdmin) throw new Error('MongoDB connection is unavailable')
+  const topology = await mongoAdmin.command({ hello: 1 })
+  if (!topology.setName || !topology.logicalSessionTimeoutMinutes) {
+    throw new Error(
+      'MongoDB must run as a replica set with session support before economy migrations can run.',
+    )
+  }
   let duplicateGroups = 0
+  const repairedBalances = await repairInvalidEconomyBalances(payload as any, dryRun)
 
   for (const plan of uniqueIndexes) {
     const collection = (payload.db.collections as any)[plan.slug]?.collection
@@ -367,7 +449,7 @@ Options:
   }
 
   console.log(
-    `${dryRun ? 'Dry run' : 'Migration'} complete (${phase}): ${duplicateGroups} duplicate group(s) found.`,
+    `${dryRun ? 'Dry run' : 'Migration'} complete (${phase}): ${duplicateGroups} duplicate group(s) found, ${repairedBalances} invalid balance(s) found.`,
   )
 }
 

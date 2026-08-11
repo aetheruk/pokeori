@@ -536,7 +536,7 @@ export async function claimFishingItem() {
       // Grant the item
       const { summary } = await grantRewards(user.id, [
         { type: 'item', targetId: itemEntry.itemId, quantity: 1 },
-      ])
+      ], { idempotencyKey: claimResultKey })
 
       // Update stats in Redis (legacy/backup)
       const researchState = (await redis.get(

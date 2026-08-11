@@ -66,7 +66,11 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
     setPurchasingItem(itemId)
 
     try {
-      const result = await purchaseShopItem(shop.id, itemId)
+      const result = await purchaseShopItem(
+        shop.id,
+        itemId,
+        crypto.randomUUID(),
+      )
       if (result.success) {
         const purchaseData = result.purchaseData
         if (purchaseData) {

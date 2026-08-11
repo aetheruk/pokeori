@@ -281,7 +281,7 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
     setSpinning(true)
 
     // Call API
-    const res = await spinSlotMachine()
+    const res = await spinSlotMachine(crypto.randomUUID())
 
     if (!res.success) {
       console.error(res.error)

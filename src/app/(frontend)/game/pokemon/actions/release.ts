@@ -17,6 +17,10 @@ import {
   getPokemonReleaseBlockMessage,
 } from '@/utilities/pokemon/release-planning'
 import { getActiveEggCount } from '@/utilities/day-care/eggs'
+import {
+  getEconomyActionErrorMessage,
+  runEconomyAction,
+} from '@/utilities/economy/transactions'
 
 function formatReleaseRewardItems(summary: RewardSummary): string {
   if (!summary.items.length) return 'nothing'
@@ -25,15 +29,22 @@ function formatReleaseRewardItems(summary: RewardSummary): string {
     .join(', ')
 }
 
-export async function releasePokemon(pokemonId: string) {
+export async function releasePokemon(pokemonId: string, clientActionId: string) {
   const user = await getUser()
   if (!user) throw new Error('Unauthorized')
-  const payload = await getPayload({ config })
+  if (!clientActionId) return { success: false, message: 'Missing action identifier' }
+
+  try {
+    const result = await runEconomyAction(
+      { userId: user.id, action: 'release-pokemon', requestId: clientActionId },
+      async ({ payload, req }) => {
+        const freshUser = await payload.findByID({ collection: 'users', id: user.id, req })
 
   // 1. Verify Ownership
   const pokemon = await payload.findByID({
     collection: 'pokemon',
     id: pokemonId,
+    req,
   })
 
   if (
@@ -62,14 +73,15 @@ export async function releasePokemon(pokemonId: string) {
         },
       ],
     },
+    req,
   })
 
   if (countResult.totalDocs <= 1) {
     return { success: false, message: 'Cannot release your only Pokemon!' }
   }
 
-  const pokedex = await getUserPokedexMap(payload as any, user.id)
-  const researcherLevel = getSkillLevel(user.skills, 'researching')
+  const pokedex = await getUserPokedexMap(payload as any, user.id, { req })
+  const researcherLevel = getSkillLevel(freshUser.skills, 'researching')
   const rewardsToGrant = buildPokemonReleaseRewards({
     pokemon,
     pokedex: pokedex as Record<string, any>,
@@ -78,27 +90,36 @@ export async function releasePokemon(pokemonId: string) {
 
   const { summary } = await grantRewards(user.id, rewardsToGrant, {
     source: 'pokemon-release',
+    payload,
+    req,
   })
 
   // 4. Delete
   await payload.delete({
     collection: 'pokemon',
     id: pokemonId,
+    req,
   })
-
-  revalidatePath('/game/pokemon')
-  revalidatePath('/game/inventory')
 
   return {
     success: true,
     summary,
     message: `Goodbye, ${pokemon.name}! You received ${formatReleaseRewardItems(summary)}.`,
   }
+      },
+    )
+    revalidatePath('/game/pokemon')
+    revalidatePath('/game/inventory')
+    return result
+  } catch (error) {
+    return { success: false, message: getEconomyActionErrorMessage(error) }
+  }
 }
 
-export async function releasePokemonBulk(pokemonIds: string[]) {
+export async function releasePokemonBulk(pokemonIds: string[], clientActionId: string) {
   const user = await getUser()
   if (!user) throw new Error('Unauthorized')
+  if (!clientActionId) return { success: false, message: 'Missing action identifier' }
 
   if (!Array.isArray(pokemonIds)) {
     return { success: false, message: 'Invalid Pokemon selection' }
@@ -121,7 +142,11 @@ export async function releasePokemonBulk(pokemonIds: string[]) {
     }
   }
 
-  const payload = await getPayload({ config })
+  try {
+    const result = await runEconomyAction(
+      { userId: user.id, action: 'release-pokemon-bulk', requestId: clientActionId },
+      async ({ payload, req }) => {
+        const freshUser = await payload.findByID({ collection: 'users', id: user.id, req })
 
   const { docs } = await payload.find({
     collection: 'pokemon',
@@ -141,6 +166,7 @@ export async function releasePokemonBulk(pokemonIds: string[]) {
     depth: 0,
     limit: requestedIds.length,
     pagination: false,
+    req,
   })
 
   if (docs.length !== requestedIds.length) {
@@ -178,14 +204,15 @@ export async function releasePokemonBulk(pokemonIds: string[]) {
         },
       ],
     },
+    req,
   })
 
   if (countResult.totalDocs - pokemonToRelease.length < 1) {
     return { success: false, message: 'Cannot release all of your Pokemon!' }
   }
 
-  const pokedex = await getUserPokedexMap(payload as any, user.id)
-  const researcherLevel = getSkillLevel(user.skills, 'researching')
+  const pokedex = await getUserPokedexMap(payload as any, user.id, { req })
+  const researcherLevel = getSkillLevel(freshUser.skills, 'researching')
   const rewardsToGrant = pokemonToRelease.flatMap((pokemon) =>
     buildPokemonReleaseRewards({
       pokemon,
@@ -196,25 +223,31 @@ export async function releasePokemonBulk(pokemonIds: string[]) {
 
   const { summary } = await grantRewards(user.id, rewardsToGrant, {
     source: 'pokemon-release-bulk',
+    payload,
+    req,
   })
 
-  await Promise.all(
-    pokemonToRelease.map((pokemon) =>
-      payload.delete({
-        collection: 'pokemon',
-        id: pokemon.id,
-      }),
-    ),
-  )
-
-  revalidatePath('/game/pokemon')
-  revalidatePath('/game/inventory')
+  for (const pokemon of pokemonToRelease) {
+    await payload.delete({
+      collection: 'pokemon',
+      id: pokemon.id,
+      req,
+    })
+  }
 
   return {
     success: true,
     summary,
     releasedIds: pokemonToRelease.map((pokemon) => pokemon.id),
     message: `Released ${pokemonToRelease.length} Pokemon. You received ${formatReleaseRewardItems(summary)}.`,
+  }
+      },
+    )
+    revalidatePath('/game/pokemon')
+    revalidatePath('/game/inventory')
+    return result
+  } catch (error) {
+    return { success: false, message: getEconomyActionErrorMessage(error) }
   }
 }
 

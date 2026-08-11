@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, mock, test } from 'bun:test'
 
+const transactionOptions = { req: {} as any }
+
 let inventoryState: Record<string, number>
 let pokedexState: Record<string, Record<string, any>>
 let completedTasksState: Record<string, any>
@@ -115,7 +117,7 @@ describe('task_complete reward cascading', () => {
         dropChance: 100,
         secret: true,
       },
-    ])
+    ], transactionOptions)
 
     expect(summary.items).toContainEqual({
       id: 'battle-potion',
@@ -140,7 +142,7 @@ describe('task_complete reward cascading', () => {
         dropChance: 100,
         secret: true,
       },
-    ])
+    ], transactionOptions)
 
     expect(summary.taskExitModals?.[0]?.title).toBe("Huh, What's That?")
     expect(summary.researchXp).toContainEqual(
@@ -168,7 +170,7 @@ describe('task_complete reward cascading', () => {
         targetId: '1',
         pokemonData: { level: 5, ability: 'chlorophyll' },
       },
-    ])
+    ], transactionOptions)
 
     const createdPokemon = payloadMock.create.mock.calls
       .filter(([args]) => args.collection === 'pokemon')
@@ -197,7 +199,7 @@ describe('task_complete reward cascading', () => {
           sourceLocation: 'Celadon Day Care',
         },
       },
-    ])
+    ], transactionOptions)
 
     const createdEgg = payloadMock.create.mock.calls
       .map(([args]) => args)

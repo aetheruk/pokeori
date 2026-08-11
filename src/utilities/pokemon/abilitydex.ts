@@ -8,6 +8,7 @@ import {
 import type { LocationReward } from '@/data/types'
 import pokemonData from '@/data/pokemon-data'
 import { USER_STATE_COLLECTIONS } from '@/utilities/user-state'
+import type { PayloadRequest } from 'payload'
 
 export type AbilityDexEntry = {
   ability: AbilityConfig
@@ -246,6 +247,7 @@ export async function registerAbilityDexEntry(
   userId: string,
   abilityId: string | null | undefined,
   source = 'pokemon',
+  req?: PayloadRequest,
 ): Promise<{ registered: boolean; isNew: boolean }> {
   if (!abilityId || !ABILITIES[abilityId]) return { registered: false, isNew: false }
 
@@ -257,6 +259,7 @@ export async function registerAbilityDexEntry(
     limit: 1,
     depth: 0,
     overrideAccess: true,
+    ...(req ? { req } : {}),
   })
 
   if (existing.docs?.[0]) return { registered: true, isNew: false }
@@ -271,6 +274,7 @@ export async function registerAbilityDexEntry(
       firstRegisteredAt: new Date().toISOString(),
     },
     overrideAccess: true,
+    ...(req ? { req } : {}),
   })
 
   return { registered: true, isNew: true }

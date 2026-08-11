@@ -7,6 +7,7 @@ import {
   type WeatherType,
 } from '@/data/weather'
 import type { User } from '@/payload-types'
+import type { PayloadRequest } from 'payload'
 
 export const WEATHER_ROLL_MAX = 1_000_000
 export const WEATHER_SLOT_COUNT = 20
@@ -85,6 +86,7 @@ export async function ensureUserWeatherSlot(
   user: WeatherUser,
   now: Date = new Date(),
   random: () => number = Math.random,
+  req?: PayloadRequest,
 ): Promise<WeatherSlotState> {
   const active = getActiveStoredWeatherSlot(user, now)
   if (active) return active
@@ -102,6 +104,7 @@ export async function ensureUserWeatherSlot(
       weatherUpdatedAt: updatedAt,
     },
     overrideAccess: true,
+    ...(req ? { req } : {}),
   })
 
   return {
