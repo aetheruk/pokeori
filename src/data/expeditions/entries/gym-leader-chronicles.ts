@@ -55,7 +55,11 @@ const battleTeams: Record<KantoGymChronicleKey, ExpeditionChroniclePokemonConfig
 export const gymLeaderChronicleExpeditions: ExpeditionConfig[] = KANTO_GYM_CHRONICLES.map(
   (chronicle) => {
     const story = KANTO_GYM_CHRONICLE_STORIES[chronicle.key]
-    const activityPool = story.path.reduce<ExpeditionActivityPool>((pool, activity) => {
+    const activities = story.sequence.map((beat) => ({
+      type: beat.type === 'scene' ? ('task' as const) : beat.type,
+      id: beat.id,
+    }))
+    const activityPool = activities.reduce<ExpeditionActivityPool>((pool, activity) => {
       const ids = pool[activity.type] ?? []
       pool[activity.type] = [...ids, chronicleActivityId(chronicle.key, activity.id)]
       return pool
@@ -91,7 +95,7 @@ export const gymLeaderChronicleExpeditions: ExpeditionConfig[] = KANTO_GYM_CHRON
         },
       ],
       activityPool,
-      path: story.path.map((activity, index) => ({
+      path: activities.map((activity, index) => ({
         type: 'activity' as const,
         id: `${chronicle.key}-chronicle-step-${index + 1}`,
         activityType: activity.type,

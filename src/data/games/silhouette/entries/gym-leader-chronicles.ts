@@ -22,7 +22,8 @@ export const gymLeaderChronicleSilhouetteEntries: SilhouetteConfig[] = [
   {
     id: 'chronicle-sabrina-find-the-true-shape',
     name: 'Find the True Shape',
-    description: 'Separate the real silhouettes from the fearful shapes projected into Sabrina’s quiet room.',
+    description:
+      'Separate Porygon’s real signal from the Pokémon shapes caught in the psychic feedback.',
     category: 'Secret',
     subCategory: 'Sabrina Chronicle',
     icon: { type: 'trainer', id: 'gym-kanto-sabrina' },
@@ -31,7 +32,7 @@ export const gymLeaderChronicleSilhouetteEntries: SilhouetteConfig[] = [
     criteria: [],
     rewards: [],
     settings: {
-      pokemonPool: [63, 64, 92, 93, 96, 122],
+      pokemonPool: [64, 92, 93, 96, 122, 137],
       optionsPool: [],
       timeLimit: 35,
       winRate: 5,

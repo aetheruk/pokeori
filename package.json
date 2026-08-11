@@ -1,6 +1,6 @@
 {
   "name": "pokeori",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "description": "Pokeori field-journal adventure game",
   "license": "MIT",
   "type": "module",
@@ -40,6 +40,7 @@
     "download:sprites": "bun scripts/sync-pokemon-sprites.mjs",
     "generate:data": "bun scripts/generate-data-entries.mjs",
     "generate:quizzes": "bun scripts/generate-quizzes.ts --start=256 --limit=10000",
+    "review:chronicles": "bun scripts/preview-gym-leader-chronicles.ts",
     "clone:sprites": "bun scripts/sync-pokemon-sprites.mjs --prepare-source-only",
     "moves:assign-recommended-forms": "bun scripts/assign-tm-recommended-form-ids.ts",
     "deploy:production": "bash scripts/deploy-ghcr.sh"

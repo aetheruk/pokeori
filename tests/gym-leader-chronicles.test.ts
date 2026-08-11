@@ -19,21 +19,21 @@ const expectedRituals = [
 ] as const
 
 const expectedPathLengths = {
-  brock: 12,
+  brock: 13,
   misty: 13,
   surge: 12,
-  erika: 11,
+  erika: 12,
   koga: 13,
-  sabrina: 12,
-  blaine: 14,
-  giovanni: 12,
+  sabrina: 14,
+  blaine: 15,
+  giovanni: 13,
 } as const
 
 const expectedGameTypes = {
   brock: ['mining', 'rhythm'],
   misty: ['cry', 'rhythm'],
   surge: ['cry', 'magnemite-circuit'],
-  erika: ['art-academy', 'identify', 'rhythm'],
+  erika: ['identify'],
   koga: ['identify', 'silhouette'],
   sabrina: ['silhouette', 'sliding-puzzle'],
   blaine: ['compare', 'rhythm'],
@@ -99,6 +99,7 @@ describe('Kanto Gym Leader Chronicles', () => {
         (candidate) => candidate.id === definition.expeditionId,
       )!
       const story = KANTO_GYM_CHRONICLE_STORIES[definition.key]
+      const scenes = story.sequence.filter((beat) => beat.type === 'scene')
       const taskNodes = expedition.path.filter(
         (node) => node.type === 'activity' && node.activityType === 'task',
       )
@@ -110,12 +111,27 @@ describe('Kanto Gym Leader Chronicles', () => {
         )
         .sort()
 
-      expect(taskNodes).toHaveLength(story.scenes.length)
+      expect(taskNodes).toHaveLength(scenes.length)
       expect(
-        story.scenes.every(
-          (scene) => scene.dialogue.length >= 2 && scene.dialogue.length <= 4,
+        scenes.every(
+          (scene) => scene.panels.length >= 4 && scene.panels.length <= 7,
         ),
       ).toBe(true)
+      expect(
+        scenes.every((scene) =>
+          scene.panels.every(
+            (panel) => panel.kind === 'narration' || Boolean(panel.speaker),
+          ),
+        ),
+      ).toBe(true)
+      expect(story.sequence[0]?.type).toBe('scene')
+      expect(story.sequence.at(-1)?.type).toBe('scene')
+      for (let index = 0; index < story.sequence.length; index += 1) {
+        const beat = story.sequence[index]
+        if (beat.type === 'scene') continue
+        expect(story.sequence[index - 1]?.type).toBe('scene')
+        expect(story.sequence[index + 1]?.type).toBe('scene')
+      }
       expect(gameTypes).toEqual([...expectedGameTypes[definition.key]].sort())
 
       const signature = expedition.path
@@ -141,7 +157,7 @@ describe('Kanto Gym Leader Chronicles', () => {
     ).toBe(true)
   })
 
-  test('Erika can bring her full team to the exhibition challenge', () => {
+  test('Erika can bring her full team to both glasshouse confrontations', () => {
     const expedition = expeditions.find(
       (candidate) => candidate.id === 'erika-rainbow-badge-chronicle',
     )
@@ -152,13 +168,46 @@ describe('Kanto Gym Leader Chronicles', () => {
     const exeggutor = chronicle?.battleTeam?.find(
       (pokemon) => pokemon.speciesId === 103,
     )
-    const exhibitionBattle = battles.find(
-      (battle) => battle.id === 'chronicle-erika-exhibition-rival',
+    const erikaBattles = battles.filter(
+      (battle) =>
+        battle.id === 'chronicle-erika-suffering-muk' ||
+        battle.id === 'chronicle-erika-developer-enforcer',
     )
 
-    expect(exhibitionBattle?.maxPokemon).toBe(3)
+    expect(erikaBattles).toHaveLength(2)
+    expect(erikaBattles.every((battle) => battle.maxPokemon === 3)).toBe(true)
     expect(exeggutor?.assignedMoves).toContain('psybeam')
     expect(exeggutor?.assignedMoves).toContain('sleep-powder')
+  })
+
+  test('narrative activities occur only after their causal setup', () => {
+    const indexOf = (
+      key: keyof typeof KANTO_GYM_CHRONICLE_STORIES,
+      type: 'scene' | 'battle' | 'game',
+      id: string,
+    ) =>
+      KANTO_GYM_CHRONICLE_STORIES[key].sequence.findIndex(
+        (beat) => beat.type === type && beat.id === id,
+      )
+
+    expect(indexOf('misty', 'battle', 'service-gyarados')).toBeLessThan(
+      indexOf('misty', 'scene', 'the-horsea-rescue'),
+    )
+    expect(indexOf('surge', 'scene', 'mako-refuses-an-order')).toBeLessThan(
+      indexOf('surge', 'battle', 'substation-magneton'),
+    )
+    expect(indexOf('erika', 'game', 'trace-the-contamination')).toBeLessThan(
+      indexOf('erika', 'battle', 'suffering-muk'),
+    )
+    expect(indexOf('erika', 'scene', 'the-pump')).toBeLessThan(
+      indexOf('erika', 'battle', 'developer-enforcer'),
+    )
+    expect(indexOf('blaine', 'scene', 'the-anomaly')).toBeLessThan(
+      indexOf('blaine', 'game', 'run-the-containment-sequence'),
+    )
+    expect(indexOf('blaine', 'scene', 'one-more-trial')).toBeLessThan(
+      indexOf('blaine', 'battle', 'escaped-magmar'),
+    )
   })
 
   test('supporting activities exist and do not expose later-world plot terms', () => {

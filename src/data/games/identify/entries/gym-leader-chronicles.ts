@@ -2,17 +2,22 @@ import type { IdentifyConfig } from '../types'
 
 export const gymLeaderChronicleIdentifyEntries: IdentifyConfig[] = [
   {
-    id: 'chronicle-erika-identify-the-notes',
-    name: 'Identify the Notes',
-    description: 'Identify each botanical fragrance before Erika chooses the exhibition blend.',
+    id: 'chronicle-erika-trace-the-contamination',
+    name: 'Follow the Drainage',
+    description:
+      'Identify the affected greenhouse Pokémon and follow the old drain toward the empty warehouse.',
     category: 'Secret',
     subCategory: 'Erika Chronicle',
     icon: { type: 'pokemon', id: '44' },
-    background: '/backgrounds/chronicle-erika-flower-exhibition.avif',
+    background: '/backgrounds/chronicle-erika-greenhouse.avif',
     requirements: [{ type: 'task_completed', targetId: 'rainbow-badge-memory-revealed' }],
     criteria: [],
     rewards: [],
-    settings: { pokemonPool: [43, 44, 45, 69, 70, 71, 114], timeLimit: 35, winRate: 7 },
+    settings: {
+      pokemonPool: [43, 44, 88, 89, 109, 110, 114],
+      timeLimit: 35,
+      winRate: 8,
+    },
   },
   {
     id: 'chronicle-koga-separate-the-toxins',
