@@ -238,6 +238,7 @@ async function getRunsForUser(
     },
     sort: '-createdAt',
     limit: 10,
+    pagination: false,
     req,
   })
 

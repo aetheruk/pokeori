@@ -261,6 +261,7 @@ export async function grantRewards(
     collection: 'pokemon',
     where: { user: { equals: userId } },
     limit: 1000,
+    pagination: false,
     ...requestOptions,
   })
   const inventory = await getUserInventoryMap(payload as any, userId, requestOptions)

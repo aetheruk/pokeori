@@ -37,14 +37,32 @@ describe('user state storage compatibility', () => {
       return { docs: [] }
     }
 
-    const state = await getUserStateData(
-      payload,
-      { id: 'user-1' } as User,
-      [],
-    )
+    const state = await getUserStateData(payload, { id: 'user-1' } as User, [])
 
     expect(state).toEqual({})
     expect(findCalls).toBe(0)
+  })
+
+  test('serializes split-state reads inside a MongoDB transaction request', async () => {
+    let inFlight = 0
+    let maxInFlight = 0
+    const payload = fakePayload() as any
+    payload.find = async () => {
+      inFlight += 1
+      maxInFlight = Math.max(maxInFlight, inFlight)
+      await new Promise((resolve) => setTimeout(resolve, 1))
+      inFlight -= 1
+      return { docs: [] }
+    }
+
+    await getUserStateData(
+      payload,
+      { id: 'user-1' } as User,
+      ['inventory', 'pokedex', 'shopPurchases'],
+      { req: { transactionID: 'transaction-1' } as any },
+    )
+
+    expect(maxInFlight).toBe(1)
   })
 
   test('pokedex hydration treats caught or researched forms as seen', () => {

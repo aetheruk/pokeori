@@ -13,7 +13,10 @@ treated as one economy boundary.
   the mutation twice.
 - Transaction-aware helpers receive the Payload `req`; MongoDB operations in a
   transaction run sequentially because a session must not execute concurrent
-  operations.
+  operations. Payload `find` calls on that request disable pagination because
+  its paginated adapter executes the document and count queries concurrently;
+  normalized user-state fan-out reads are likewise serialized only while a
+  transaction request is active.
 - Reward grants without an existing transaction open their own fail-closed
   transaction. Settlement paths with an existing server result key also use it
   as the durable reward idempotency identity.
