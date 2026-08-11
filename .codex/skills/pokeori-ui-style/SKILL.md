@@ -9,7 +9,7 @@ Use this skill for every player-facing PokeOri UI change. Read the canonical gui
 
 ## Workflow
 
-1. Identify whether the surface is a paper-first management screen or a dark-night activity screen.
+1. Keep the interface chrome paper-first, even when the activity includes a contextual scene or playfield.
 2. Reuse semantic tokens and shared primitives before adding local Tailwind colors, borders, radii, or shadows.
 3. Keep actions, status, progress, error, rarity, and Pokemon-type colors semantically distinct.
 4. Preserve mobile touch sizing, keyboard focus, reduced-motion behavior, and existing gameplay/session logic.
@@ -18,7 +18,7 @@ Use this skill for every player-facing PokeOri UI change. Read the canonical gui
 
 ## Non-negotiable rules
 
-- Prefer parchment, cream, ink navy, moss, clay, and ochre over neon teal/green or pure black.
+- Prefer parchment, cream, deep charcoal ink, moss, clay, and ochre over neon teal/green or pure black.
 - Use serif display text for brand/page titles, humanist sans for interface copy, and monospace only for timers and numeric data.
 - Use 8–12px paper cards and clipped/map-like tabs; reserve pill shapes for statuses and compact metadata.
 - Use moss for active navigation and selection, clay for primary actions and rewards, and ochre for discoveries/progress.
