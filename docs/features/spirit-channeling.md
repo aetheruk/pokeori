@@ -14,13 +14,13 @@ Fuji's Glasses Memory uses Memory Incense, 5 Ground energy, and a level 5+ Psych
 
 Each Kanto Gym Badge is also an authored memento. Every badge ritual uses Memory Incense and unlocks one Gym Leader Chronicle marker:
 
-| Badge | Offering energy | Psychic channeler |
-| --- | ---: | ---: |
-| Boulder | 97 Rock (Small Stone and/or Rock Gem) | Level 5+ |
-| Cascade | 77 Water (Aqua Solvent and/or Water Gem) | Level 10+ |
-| Thunder | 54 Electric (Electric Component and/or Electric Gem) | Level 15+ |
-| Rainbow | 64 Grass (Wood Scraps and/or Grass Gem) | Level 20+ |
-| Soul | 96 Poison (Toxic Resin and/or Poison Gem) | Level 25+ |
-| Marsh | 59 Psychic (Mind Thread and/or Psychic Gem) | Level 30+ |
-| Volcano | 51 Fire (Cinder Shard and/or Fire Gem) | Level 35+ |
-| Earth | 81 Ground (Terra Dust and/or Ground Gem) | Level 40+ |
+| Badge | Chronicle | Offering energy | Psychic channeler |
+| --- | --- | ---: | ---: |
+| Boulder | The Empty Chair | 97 Rock (Small Stone and/or Rock Gem) | Level 5+ |
+| Cascade | The Fourth Sister | 77 Water (Aqua Solvent and/or Water Gem) | Level 10+ |
+| Thunder | After the Thunder | 54 Electric (Electric Component and/or Electric Gem) | Level 15+ |
+| Rainbow | The Unwelcome Bloom | 64 Grass (Wood Scraps and/or Grass Gem) | Level 20+ |
+| Soul | The Daughter's Method | 96 Poison (Toxic Resin and/or Poison Gem) | Level 25+ |
+| Marsh | The Quiet Room | 59 Psychic (Mind Thread and/or Psychic Gem) | Level 30+ |
+| Volcano | The Last Question | 51 Fire (Cinder Shard and/or Fire Gem) | Level 35+ |
+| Earth | Dinner at Eight | 81 Ground (Terra Dust and/or Ground Gem) | Level 40+ |

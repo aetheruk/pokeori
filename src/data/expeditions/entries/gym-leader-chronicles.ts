@@ -1,16 +1,13 @@
+import {
+  chronicleActivityId,
+  KANTO_GYM_CHRONICLE_STORIES,
+} from '@/data/gym-leader-chronicle-stories'
 import { KANTO_GYM_CHRONICLES, type KantoGymChronicleKey } from '@/data/gym-leader-chronicles'
-import type { ExpeditionChroniclePokemonConfig, ExpeditionConfig } from '../types'
-
-const activityIds: Record<KantoGymChronicleKey, { tasks: string[]; battles: string[]; game: string }> = {
-  brock: { tasks: ['before-dawn', 'collapse', 'shared-weight', 'league-offer', 'first-lesson'], battles: ['panicked-rhyhorn', 'first-challenger'], game: 'brace-the-tunnel' },
-  misty: { tasks: ['rehearsal', 'storm', 'command', 'sisters-test', 'earrings'], battles: ['panicked-gyarados', 'sisters-test'], game: 'emergency-pumps' },
-  surge: { tasks: ['briefing', 'storm', 'turn-back', 'landing', 'new-station'], battles: ['runway-drill', 'electabuzz-overload'], game: 'restore-auxiliary-power' },
-  erika: { tasks: ['glasshouse', 'sick-soil', 'whispers', 'public-bloom', 'living-gym'], battles: ['suffering-muk', 'developer-enforcer'], game: 'trace-the-contamination' },
-  koga: { tasks: ['lesson', 'stolen-venom', 'janine-follows', 'antidote', 'new-teaching'], battles: ['venom-poachers', 'chemical-case'], game: 'identify-the-toxin' },
-  sabrina: { tasks: ['noise', 'silph-invitation', 'ignored-warning', 'younger-echo', 'open-door'], battles: ['unstable-porygon', 'dojo-trial'], game: 'realign-the-signal' },
-  blaine: { tasks: ['honest-question', 'patron', 'fuji-warning', 'evacuation', 'aftermath'], battles: ['lockdown-system', 'burning-corridor'], game: 'evacuation-alarms' },
-  giovanni: { tasks: ['empty-road', 'terms', 'league-notice', 'waiting-son', 'two-charters'], battles: ['relief-raiders', 'league-assessment'], game: 'clear-the-relief-road' },
-}
+import type {
+  ExpeditionActivityPool,
+  ExpeditionChroniclePokemonConfig,
+  ExpeditionConfig,
+} from '../types'
 
 const battleTeams: Record<KantoGymChronicleKey, ExpeditionChroniclePokemonConfig[]> = {
   brock: [
@@ -55,35 +52,19 @@ const battleTeams: Record<KantoGymChronicleKey, ExpeditionChroniclePokemonConfig
   ],
 }
 
-function taskId(key: KantoGymChronicleKey, id: string) {
-  return `chronicle-${key}-${id}`
-}
-
-function battleId(key: KantoGymChronicleKey, id: string) {
-  return `chronicle-${key}-${id}`
-}
-
 export const gymLeaderChronicleExpeditions: ExpeditionConfig[] = KANTO_GYM_CHRONICLES.map(
   (chronicle) => {
-    const activities = activityIds[chronicle.key]
-    const taskIds = activities.tasks.map((id) => taskId(chronicle.key, id))
-    const battleIds = activities.battles.map((id) => battleId(chronicle.key, id))
-    const gameId = `chronicle-${chronicle.key}-${activities.game}`
-    const ordered = [
-      { type: 'task' as const, id: taskIds[0] },
-      { type: 'game' as const, id: gameId },
-      { type: 'task' as const, id: taskIds[1] },
-      { type: 'battle' as const, id: battleIds[0] },
-      { type: 'task' as const, id: taskIds[2] },
-      { type: 'battle' as const, id: battleIds[1] },
-      { type: 'task' as const, id: taskIds[3] },
-      { type: 'task' as const, id: taskIds[4] },
-    ]
+    const story = KANTO_GYM_CHRONICLE_STORIES[chronicle.key]
+    const activityPool = story.path.reduce<ExpeditionActivityPool>((pool, activity) => {
+      const ids = pool[activity.type] ?? []
+      pool[activity.type] = [...ids, chronicleActivityId(chronicle.key, activity.id)]
+      return pool
+    }, {})
 
     return {
       id: chronicle.expeditionId,
       name: `${chronicle.leaderName}: ${chronicle.title}`,
-      description: `Step into the memory held by the ${chronicle.badgeName} and see how ${chronicle.leaderName} came to lead a Gym.`,
+      description: `Step into the memory held by the ${chronicle.badgeName} and witness the choices that shaped ${chronicle.leaderName}.`,
       category: 'Kanto',
       subCategory: 'Pokemon Tower',
       buttonText: 'Enter the Memory',
@@ -109,12 +90,12 @@ export const gymLeaderChronicleExpeditions: ExpeditionConfig[] = KANTO_GYM_CHRON
           inverse: true,
         },
       ],
-      activityPool: { task: taskIds, battle: battleIds, game: [gameId] },
-      path: ordered.map((activity, index) => ({
+      activityPool,
+      path: story.path.map((activity, index) => ({
         type: 'activity' as const,
         id: `${chronicle.key}-chronicle-step-${index + 1}`,
         activityType: activity.type,
-        activityId: activity.id,
+        activityId: chronicleActivityId(chronicle.key, activity.id),
         secret: true,
       })),
       rewards: [

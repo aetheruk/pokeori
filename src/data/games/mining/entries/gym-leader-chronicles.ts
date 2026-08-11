@@ -2,13 +2,13 @@ import type { MiningConfig } from '../types'
 
 export const gymLeaderChronicleMiningEntries: MiningConfig[] = [
   {
-    id: 'chronicle-brock-brace-the-tunnel',
-    name: 'Brace the Tunnel',
-    description: 'Clear fractured stone so the quarry crew can brace the damaged roof.',
+    id: 'chronicle-brock-repair-the-gym-wall',
+    name: 'Repair the Gym Wall',
+    description: 'Clear the crumbling stone and rebuild the wall before the next League inspection.',
     category: 'Secret',
     subCategory: 'Brock Chronicle',
     icon: { type: 'item', id: 'hard-stone' },
-    background: '/backgrounds/chronicle-brock-quarry.avif',
+    background: '/backgrounds/chronicle-brock-neglected-gym.avif',
     requirements: [{ type: 'task_completed', targetId: 'boulder-badge-memory-revealed' }],
     criteria: [],
     rewards: [],

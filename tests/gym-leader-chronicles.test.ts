@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { battles } from '@/data/battles'
 import { expeditions } from '@/data/expeditions'
 import { allGames } from '@/data/games'
+import { KANTO_GYM_CHRONICLE_STORIES } from '@/data/gym-leader-chronicle-stories'
 import { KANTO_GYM_CHRONICLES } from '@/data/gym-leader-chronicles'
 import { SPIRIT_CHANNELING_CONFIGS } from '@/data/spirit-channeling'
 import { tasks } from '@/data/tasks'
@@ -17,6 +18,28 @@ const expectedRituals = [
   ['badge-kanto-earth', 'ground', 81, 40, 1000],
 ] as const
 
+const expectedPathLengths = {
+  brock: 12,
+  misty: 13,
+  surge: 12,
+  erika: 11,
+  koga: 13,
+  sabrina: 12,
+  blaine: 14,
+  giovanni: 12,
+} as const
+
+const expectedGameTypes = {
+  brock: ['mining', 'rhythm'],
+  misty: ['cry', 'rhythm'],
+  surge: ['cry', 'magnemite-circuit'],
+  erika: ['art-academy', 'identify', 'rhythm'],
+  koga: ['identify', 'silhouette'],
+  sabrina: ['silhouette', 'sliding-puzzle'],
+  blaine: ['compare', 'rhythm'],
+  giovanni: ['rock-push'],
+} as const
+
 describe('Kanto Gym Leader Chronicles', () => {
   test('every badge channels with Memory Incense and its exact authored energy', () => {
     for (const [badgeId, type, amount, minLevel] of expectedRituals) {
@@ -30,7 +53,7 @@ describe('Kanto Gym Leader Chronicles', () => {
     }
   })
 
-  test('every Chronicle is a fixed eight-step personal story with its authored reward', () => {
+  test('every Chronicle is a fixed long-form personal story with its authored reward', () => {
     for (const [badgeId, , , , explorerXp] of expectedRituals) {
       const definition = KANTO_GYM_CHRONICLES.find(
         (candidate) => candidate.badgeItemId === badgeId,
@@ -43,7 +66,7 @@ describe('Kanto Gym Leader Chronicles', () => {
       expect(expedition?.category).toBe('Kanto')
       expect(expedition?.subCategory).toBe('Pokemon Tower')
       expect(expedition?.canFail).toBe(false)
-      expect(expedition?.path).toHaveLength(8)
+      expect(expedition?.path).toHaveLength(expectedPathLengths[definition.key])
       expect(expedition?.path.every((node) => node.type === 'activity')).toBe(
         true,
       )
@@ -68,6 +91,44 @@ describe('Kanto Gym Leader Chronicles', () => {
     }
   })
 
+  test('the anthology uses distinct scene structures and signature game mixes', () => {
+    const pathSignatures = new Set<string>()
+
+    for (const definition of KANTO_GYM_CHRONICLES) {
+      const expedition = expeditions.find(
+        (candidate) => candidate.id === definition.expeditionId,
+      )!
+      const story = KANTO_GYM_CHRONICLE_STORIES[definition.key]
+      const taskNodes = expedition.path.filter(
+        (node) => node.type === 'activity' && node.activityType === 'task',
+      )
+      const gameTypes = expedition.path
+        .flatMap((node) =>
+          node.type === 'activity' && node.activityType === 'game'
+            ? [allGames.find((game) => game.id === node.activityId)?.gameType]
+            : [],
+        )
+        .sort()
+
+      expect(taskNodes).toHaveLength(story.scenes.length)
+      expect(
+        story.scenes.every(
+          (scene) => scene.dialogue.length >= 2 && scene.dialogue.length <= 4,
+        ),
+      ).toBe(true)
+      expect(gameTypes).toEqual([...expectedGameTypes[definition.key]].sort())
+
+      const signature = expedition.path
+        .map((node) =>
+          node.type === 'activity' ? node.activityType?.slice(0, 1) : '?',
+        )
+        .join('')
+      pathSignatures.add(signature)
+    }
+
+    expect(pathSignatures.size).toBe(KANTO_GYM_CHRONICLES.length)
+  })
+
   test('every Chronicle awards Explorer XP through the canonical catching skill id', () => {
     const chronicleXpRewards = expeditions
       .filter((expedition) => expedition.chronicle)
@@ -80,7 +141,7 @@ describe('Kanto Gym Leader Chronicles', () => {
     ).toBe(true)
   })
 
-  test("Erika can bring her full team and counter both Poison encounters", () => {
+  test('Erika can bring her full team to the exhibition challenge', () => {
     const expedition = expeditions.find(
       (candidate) => candidate.id === 'erika-rainbow-badge-chronicle',
     )
@@ -91,15 +152,11 @@ describe('Kanto Gym Leader Chronicles', () => {
     const exeggutor = chronicle?.battleTeam?.find(
       (pokemon) => pokemon.speciesId === 103,
     )
-    const mukBattle = battles.find(
-      (battle) => battle.id === 'chronicle-erika-suffering-muk',
-    )
-    const siteManagerBattle = battles.find(
-      (battle) => battle.id === 'chronicle-erika-developer-enforcer',
+    const exhibitionBattle = battles.find(
+      (battle) => battle.id === 'chronicle-erika-exhibition-rival',
     )
 
-    expect(mukBattle?.maxPokemon).toBe(3)
-    expect(siteManagerBattle?.maxPokemon).toBe(3)
+    expect(exhibitionBattle?.maxPokemon).toBe(3)
     expect(exeggutor?.assignedMoves).toContain('psybeam')
     expect(exeggutor?.assignedMoves).toContain('sleep-powder')
   })
