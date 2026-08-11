@@ -4,7 +4,7 @@ import { SpiritChannelingPanel } from '@/components/game/spirit-channeling/spiri
 
 export default function SpiritChannelingPage() {
   return (
-    <div className="game-night flex h-full flex-col overflow-hidden bg-game-night-canvas text-game-night-ink">
+    <div className="game-paper-first game-paper-background flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
       <Suspense
         fallback={
           <div className="flex h-full items-center justify-center">

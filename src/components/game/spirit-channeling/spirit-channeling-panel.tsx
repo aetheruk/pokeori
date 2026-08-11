@@ -334,7 +334,7 @@ export function SpiritChannelingPanel() {
   ])
 
   return (
-    <div className="game-night flex h-full min-w-0 flex-col overflow-hidden bg-game-night-canvas text-game-night-ink">
+    <div className="game-paper-first game-paper-background flex h-full min-w-0 flex-col overflow-hidden bg-game-canvas text-game-ink">
       <PremiumHeader
         title={headerTitle}
         subtitle={selectedMementoId ? 'Channeling' : undefined}
@@ -396,7 +396,7 @@ export function SpiritChannelingPanel() {
                     {Object.entries(offeredEnergy).map(([type, amount]) => (
                       <span
                         key={type}
-                        className="rounded-full border border-game-night-border bg-game-night-surface px-3 py-1 font-mono text-xs font-black uppercase tracking-[0.08em] text-game-night-ink"
+                        className="rounded-full border border-game-border bg-game-surface px-3 py-1 font-mono text-xs font-black uppercase tracking-[0.08em] text-game-ink"
                       >
                         {type} energy: {amount}
                       </span>
@@ -428,7 +428,7 @@ export function SpiritChannelingPanel() {
       </div>
 
       {!isLoading && hasBook && availableConfigs.length > 0 && (
-        <div className="shrink-0 border-t border-game-night-border bg-game-night-surface/95 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 backdrop-blur md:hidden">
+        <div className="shrink-0 border-t border-game-border bg-game-surface/95 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 backdrop-blur md:hidden">
           <ChannelingButton
             canSubmit={canSubmit}
             submitting={submitting}
@@ -1033,23 +1033,23 @@ function CeremonyDisplay({
   incenseItemId: string
 }) {
   return (
-    <div className="absolute inset-0 flex items-end justify-center overflow-hidden bg-[radial-gradient(ellipse_at_bottom,rgba(20,184,166,0.12),rgba(24,24,27,0.16)_46%,transparent_74%)]">
+    <div className="absolute inset-0 flex items-end justify-center overflow-hidden bg-game-canvas">
       {incenseItemId && (
         <>
-          <div className="absolute bottom-4 h-6 w-24 rounded-full bg-[#081014]/35 blur-md" />
+          <div className="absolute bottom-4 h-6 w-24 rounded-full bg-game-ink/10 blur-md" />
           <ItemSprite
             itemId={incenseItemId}
             alt="Incense"
-            className="relative z-10 mb-3 h-12 w-12 object-contain drop-shadow-[0_0_14px_rgba(184,200,148,0.22)]"
+            className="relative z-10 mb-3 h-12 w-12 object-contain drop-shadow-sm"
           />
         </>
       )}
       {(state === 'smoke' || state === 'ghost') && (
         <>
-          <div className="absolute bottom-14 h-20 w-10 animate-pulse rounded-full bg-[#e8eadf]/18 blur-2xl" />
-          <div className="absolute bottom-20 ml-7 h-14 w-14 animate-pulse rounded-full bg-[#b8c894]/10 blur-2xl" />
-          <div className="absolute bottom-20 -ml-8 h-12 w-12 animate-pulse rounded-full bg-[#f7ecd6]/12 blur-xl" />
-          <div className="absolute bottom-14 ml-1 h-24 w-4 animate-pulse rounded-full bg-[#f7ecd6]/12 blur-lg" />
+          <div className="absolute bottom-14 h-20 w-10 motion-safe:animate-pulse rounded-full bg-game-moss/18 blur-2xl" />
+          <div className="absolute bottom-20 ml-7 h-14 w-14 motion-safe:animate-pulse rounded-full bg-game-ochre/14 blur-2xl" />
+          <div className="absolute bottom-20 -ml-8 h-12 w-12 motion-safe:animate-pulse rounded-full bg-game-surface-raised/70 blur-xl" />
+          <div className="absolute bottom-14 ml-1 h-24 w-4 motion-safe:animate-pulse rounded-full bg-game-surface-raised/60 blur-lg" />
         </>
       )}
       {state === 'ghost' && (

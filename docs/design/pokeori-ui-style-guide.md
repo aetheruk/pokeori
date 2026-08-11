@@ -4,12 +4,7 @@ Pokeori is a field journal for exploring, observing, collecting, and caring for 
 
 ## Visual language
 
-Use two related presentations rather than one universal dark theme:
-
-- **Paper-first:** Trainer, Explore, Pokemon, Pokedex, MoveDex, AbilityDex, Inventory, Artisan, TCG management, social rows, shops, tasks, and planning screens.
-- **Night activity:** battles, catches, Field Observation, research minigames, Spirit Channeling, TCG battles, and other focused full-screen activities.
-
-Both presentations share geometry, typography, semantic color, focus states, touch sizing, and motion rules.
+Use one field-journal presentation across player-facing UI. Focused activities may contain a contextual scene or playfield, but their readable interface chrome, controls, dialogs, and status surfaces remain paper-first.
 
 ## Palette and semantics
 
@@ -27,9 +22,6 @@ The exact CSS variables live in `src/styles/globals.css`. Use semantic roles ins
 | Deep moss | `#405d3d` | pressed/strong moss states |
 | Clay | `#b86148` | primary actions, rewards, urgent calls to action |
 | Ochre | `#b58a43` | discoveries, milestones, special progress |
-| Night canvas | ink navy `#172733` | battle/research activity background |
-| Night surface | blue charcoal `#22353d` | activity cards and controls |
-| Night text | cream `#f7ecd6` | readable activity text |
 
 Avoid pure black, electric teal, saturated emerald, arbitrary gradient text, and decorative color that does not communicate state. Preserve Pokemon type colors and rarity colors when they are gameplay semantics.
 
@@ -57,12 +49,12 @@ Avoid pure black, electric teal, saturated emerald, arbitrary gradient text, and
 - Secondary actions use outlined or lightly tinted paper surfaces, never a second competing neon accent.
 - Page headers combine a small contextual label, a serif title, and an optional short description. Avoid repeated oversized headers above every subsection.
 - Lists use stable rows with an icon tile, clear title/metadata hierarchy, and visible keyboard focus. Hover should not move or enlarge the row.
-- Dialogs and drawers use paper surfaces on paper-first screens and night surfaces on activity screens, while retaining the same padding and close/focus behavior.
+- Dialogs and drawers use paper surfaces across player-facing screens, while retaining the same padding and close/focus behavior.
 
 ## Activity and scene composition
 
 - Focused activities use light field-journal chrome by default: parchment HUDs, cream controls, ink copy, moss selection, clay calls to action, and ochre discovery states.
-- Keep the playfield itself contextual. A fishing pond, battle scene, card table, or puzzle board may be dark or colourful, but it must be separated from the readable UI by a dedicated scene layer.
+- Keep the playfield itself contextual. A fishing pond, battle scene, card table, or puzzle board may use its own artwork or scene treatment, but it must be separated from the readable UI by a dedicated scene layer.
 - Dynamic artwork never carries unprotected copy. Put titles, time/weather chips, and close controls on a deep-ink translucent plaque or a raised paper surface.
 - Brand marks use their deep-ink plaque over scenery; do not recolor the supplied artwork to match a local activity palette.
 
@@ -96,7 +88,7 @@ The wide-screen breakpoint is `lg` (1024px). Below it, the app remains touch-fir
 
 ## Review checklist
 
-- Is this a paper-first or night-activity surface?
+- Is this readable interface chrome, or is it a contextual playfield layer?
 - Are colors communicating a state or merely decorating the component?
 - Does the component reuse the shared primitive and semantic token?
 - Does the layout work at mobile width, desktop width, and with long copy?
@@ -105,4 +97,4 @@ The wide-screen breakpoint is `lg` (1024px). Below it, the app remains touch-fir
 
 ## Migration note
 
-The player-facing refactor is staged. A compatibility bridge at the end of `src/styles/globals.css` maps older zinc, white, teal, emerald, and black utility classes to the active paper/night tokens while data-heavy screens are migrated. New work should use the semantic `game-*` utilities directly; the bridge is a safety net, not a replacement for updating touched components.
+The player-facing refactor is staged. A compatibility bridge at the end of `src/styles/globals.css` maps older zinc, white, teal, emerald, and black utility classes to the active field-journal tokens while data-heavy screens are migrated. New work should use the semantic `game-*` utilities directly; the bridge is a safety net, not a replacement for updating touched components.
