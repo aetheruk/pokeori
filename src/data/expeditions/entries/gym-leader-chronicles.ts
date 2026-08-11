@@ -104,6 +104,7 @@ export const gymLeaderChronicleExpeditions: ExpeditionConfig[] = KANTO_GYM_CHRON
       })),
       rewards: [
         { type: 'xp', skill: 'catching', quantity: chronicle.explorerXp, dropChance: 100 },
+        { type: 'banner', targetId: `chronicle-${chronicle.key}`, dropChance: 100 },
       ],
     }
   },
