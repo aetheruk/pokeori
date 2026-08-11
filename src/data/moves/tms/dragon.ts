@@ -1028,7 +1028,11 @@ export const DRAGON_TM_MOVES: MoveConfig[] = [
     stance: 'tech',
     target: 'enemy',
     forcedType: 'dragon',
-    damage: 3.6,
+    damage: 0,
+    damageRule: {
+      type: 'flat',
+      amount: 40,
+    },
     accuracy: 100,
     level: 40,
     formId: [

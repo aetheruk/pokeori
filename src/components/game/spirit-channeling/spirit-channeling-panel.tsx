@@ -127,6 +127,14 @@ export function SpiritChannelingPanel() {
   const ownedOfferings = SPIRIT_CHANNELING_OFFERING_ITEMS.filter(
     (offering) => (inventoryMap[offering.itemId] || 0) > 0,
   )
+  const selectableOfferings = ownedOfferings.filter(
+    (offering) =>
+      offering.itemId === offeringSlots[activeOfferingSlotIndex]?.itemId ||
+      offeringSlots.every(
+        (slot, index) =>
+          index === activeOfferingSlotIndex || slot.itemId !== offering.itemId,
+      ),
+  )
   const psychicPokemon = useMemo(
     () =>
       ((gameData?.pokemon || []) as Pokemon[])
@@ -443,7 +451,7 @@ export function SpiritChannelingPanel() {
       <OfferingPickerDialog
         open={isOfferingModalOpen}
         onOpenChange={setIsOfferingModalOpen}
-        offerings={ownedOfferings}
+        offerings={selectableOfferings}
         inventoryMap={inventoryMap}
         selectedItemId={offeringSlots[activeOfferingSlotIndex]?.itemId || ''}
         slotIndex={activeOfferingSlotIndex}

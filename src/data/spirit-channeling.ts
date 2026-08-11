@@ -86,6 +86,13 @@ export interface SpiritChannelingOfferingSelection {
   quantity: number
 }
 
+export function hasDuplicateSpiritChannelingOfferings(
+  offerings: SpiritChannelingOfferingSelection[],
+): boolean {
+  const itemIds = offerings.map((offering) => offering.itemId)
+  return new Set(itemIds).size !== itemIds.length
+}
+
 export const POKEMON_TYPE_NAMES: PokemonTypeName[] = [
   'normal',
   'fire',

@@ -192,6 +192,13 @@ export interface TcgBattleAttackEffect {
   special?: TcgBattleSpecialRule[]
 }
 
+function shouldIgnoreTcgWeaknessAndResistance(text: string): boolean {
+  return (
+    /(?:this attack(?:'s)? damage|this damage) (?:isn't|is not) affected by weakness(?:,| or| and) resistance\b/.test(text) ||
+    /(?:don't|do not) apply weakness and resistance for (?:this attack|this damage)\b/.test(text)
+  )
+}
+
 export type TcgBattleAttack = TcgCardAttack & {
   battleEffect?: TcgBattleAttackEffect
 }
@@ -783,11 +790,16 @@ export function getSupportedTcgBattleAttacks(attacks: TcgCardAttack[]): TcgBattl
 
 export function inferTcgBattleAttackEffect(attack: TcgCardAttack): TcgBattleAttackEffect | null {
   const text = normalizeTcgAttackText(attack.text || '')
+  const ignoreWeaknessResistance = shouldIgnoreTcgWeaknessAndResistance(text)
   const normalizedDamage = normalizeTcgDamageText(attack.damage || '')
   const exactDamage = parseTcgAttackDamage(normalizedDamage)
   const baseDamage = parseTcgAttackBaseDamage(normalizedDamage)
   const classicEffect = inferClassicTcgBattleAttackEffect(attack, text, normalizedDamage, baseDamage)
-  if (classicEffect) return classicEffect
+  if (classicEffect) {
+    return ignoreWeaknessResistance
+      ? { ...classicEffect, ignoreWeaknessResistance: true }
+      : classicEffect
+  }
   const selfDamage = inferTcgBattleSelfDamage(text)
   const energyDiscard = inferTcgBattleEnergyDiscard(text)
   const status = inferTcgBattleStatus(text)
@@ -836,6 +848,7 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack): TcgBattleAtta
       counterDamage: counterDamageEffects,
       healing: healingEffects,
       protection: protectionEffects,
+      ignoreWeaknessResistance,
     }
   }
 
@@ -863,6 +876,7 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack): TcgBattleAtta
       counterDamage: counterDamageEffects,
       healing: healingEffects,
       protection: protectionEffects,
+      ignoreWeaknessResistance,
     }
   }
 
@@ -877,6 +891,7 @@ export function inferTcgBattleAttackEffect(attack: TcgCardAttack): TcgBattleAtta
     counterDamage: counterDamageEffects,
     healing: healingEffects,
     protection: protectionEffects,
+    ignoreWeaknessResistance,
   }
 }
 
@@ -2344,7 +2359,16 @@ function calculateTcgBattleProtection(
 }
 
 export function getTcgBattleAttackEffect(attack: TcgBattleAttack): TcgBattleAttackEffect | null {
-  return attack.battleEffect || inferTcgBattleAttackEffect(attack)
+  if (!attack.battleEffect) return inferTcgBattleAttackEffect(attack)
+
+  // Battles already in progress can carry an effect inferred before the text
+  // bypass rule was added. Refresh this one flag without rebuilding the rest
+  // of the persisted attack effect.
+  return shouldIgnoreTcgWeaknessAndResistance(
+    normalizeTcgAttackText(attack.text || ''),
+  ) && !attack.battleEffect.ignoreWeaknessResistance
+    ? { ...attack.battleEffect, ignoreWeaknessResistance: true }
+    : attack.battleEffect
 }
 
 export function getValidTcgBattleTargets(

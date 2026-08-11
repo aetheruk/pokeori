@@ -234,6 +234,46 @@ describe('TCG battle utilities', () => {
     expect(resolution.coinFlips?.heads).toBe(1)
   })
 
+  test('does not apply weakness or resistance when the attack text says so', () => {
+    const playerCard = makeBattleCard('player-card', 1)
+    const opponentCard = makeBattleCard('opponent-card', 1)
+    opponentCard.weaknesses = [{ type: 'Colorless', value: '×2' }]
+    opponentCard.resistances = [{ type: 'Colorless', value: '-10' }]
+    const state = makeBattleState({
+      player: makeBattleSide(playerCard, 5),
+      opponent: makeBattleSide(opponentCard, 5),
+    })
+    const [attack] = getSupportedTcgBattleAttacks([
+      makeAttack({
+        damage: '30',
+        text: "This attack's damage isn't affected by Weakness or Resistance.",
+      }),
+    ])
+
+    expect(attack?.battleEffect?.ignoreWeaknessResistance).toBe(true)
+    const resolution = resolveTcgBattleAttack({
+      state,
+      sideKey: 'player',
+      attacker: playerCard,
+      attack,
+      target: opponentCard,
+    })
+
+    expect(resolution.targetDamageBeforeModifiers).toBe(30)
+    expect(resolution.targetDamage).toBe(30)
+  })
+
+  test('recognizes the expanded weakness and resistance wording', () => {
+    const [attack] = getSupportedTcgBattleAttacks([
+      makeAttack({
+        damage: '30',
+        text: "This attack's damage isn't affected by Weakness, Resistance, or any other effects on the Defending Pokémon.",
+      }),
+    ])
+
+    expect(attack?.battleEffect?.ignoreWeaknessResistance).toBe(true)
+  })
+
   test('resolves all-heads coin gates like Drill Tackle', () => {
     const playerCard = makeBattleCard('player-card', 1)
     const opponentCard = makeBattleCard('opponent-card', 1)

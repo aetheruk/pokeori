@@ -7,6 +7,7 @@ import {
   getSpiritChannelingEnergyClue,
   getSpiritChannelingOfferedEnergy,
   getSpiritChannelingOffering,
+  hasDuplicateSpiritChannelingOfferings,
   SPIRIT_CHANNELING_CONFIGS,
   SPIRIT_CHANNELING_INCENSE_ITEMS,
   SPIRIT_CHANNELING_OFFERING_ITEMS,
@@ -88,5 +89,20 @@ describe('spirit channeling data', () => {
         { itemId: 'rock-gem', quantity: 1 },
       ]),
     ).toEqual({ rock: 97 })
+  })
+
+  test('does not allow one offering item in multiple slots', () => {
+    expect(
+      hasDuplicateSpiritChannelingOfferings([
+        { itemId: 'small-stone-t1', quantity: 1 },
+        { itemId: 'small-stone-t1', quantity: 1 },
+      ]),
+    ).toBe(true)
+    expect(
+      hasDuplicateSpiritChannelingOfferings([
+        { itemId: 'small-stone-t1', quantity: 2 },
+        { itemId: 'rock-gem', quantity: 1 },
+      ]),
+    ).toBe(false)
   })
 })

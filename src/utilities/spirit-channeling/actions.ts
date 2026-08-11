@@ -11,6 +11,7 @@ import {
   getSpiritChannelingEnergyClue,
   getSpiritChannelingOfferedEnergy,
   getSpiritChannelingOffering,
+  hasDuplicateSpiritChannelingOfferings,
 } from '@/data/spirit-channeling'
 import { getPokemonForm } from '@/utilities/pokemon/pokedex'
 import { checkUserAuth } from '@/utilities/auth/server-auth'
@@ -191,6 +192,13 @@ export async function beginSpiritChanneling(
         success: false,
         outcome: 'wrong-incense',
         message: 'There is no response from your channeling.',
+      }
+    }
+
+    if (hasDuplicateSpiritChannelingOfferings(parsed.data.offerings)) {
+      return {
+        success: false,
+        error: 'Each offering slot must use a different item',
       }
     }
 
