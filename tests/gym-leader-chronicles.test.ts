@@ -12,15 +12,26 @@ import { tasks } from '@/data/tasks'
 import { banners } from '@/data/user'
 
 const expectedRituals = [
-  ['badge-kanto-boulder', 'rock', 97, 5, 200],
-  ['badge-kanto-cascade', 'water', 77, 10, 300],
-  ['badge-kanto-thunder', 'electric', 54, 15, 400],
-  ['badge-kanto-rainbow', 'grass', 64, 20, 500],
-  ['badge-kanto-soul', 'poison', 96, 25, 600],
-  ['badge-kanto-marsh', 'psychic', 59, 30, 700],
-  ['badge-kanto-volcano', 'fire', 51, 35, 800],
-  ['badge-kanto-earth', 'ground', 81, 40, 1000],
+  ['badge-kanto-boulder', 'rock', 49, 5, 200],
+  ['badge-kanto-cascade', 'water', 86, 10, 300],
+  ['badge-kanto-thunder', 'electric', 70, 15, 400],
+  ['badge-kanto-rainbow', 'grass', 44, 20, 500],
+  ['badge-kanto-soul', 'poison', 34, 25, 600],
+  ['badge-kanto-marsh', 'psychic', 64, 30, 700],
+  ['badge-kanto-volcano', 'fire', 43, 35, 800],
+  ['badge-kanto-earth', 'ground', 91, 40, 1000],
 ] as const
+
+const expectedBannerNames = {
+  brock: 'Pewter Hearth',
+  misty: 'Cerulean Water Show',
+  surge: 'Vermilion Blackout',
+  erika: 'Celadon Flower Show',
+  koga: 'Fuchsia Courtyard',
+  sabrina: 'Quiet Mindscape',
+  blaine: 'Cinnabar Quiz Room',
+  giovanni: 'Viridian Dining Room',
+} as const
 
 const expectedPathLengths = {
   brock: 13,
@@ -149,7 +160,7 @@ describe('Kanto Gym Leader Chronicles', () => {
 
       expect(banner).toBeDefined()
       expect(banner?.imagePath).toBe(definition.background)
-      expect(banner?.name).toBe(`${definition.leaderName}: ${definition.title}`)
+      expect(banner?.name).toBe(expectedBannerNames[definition.key])
     }
   })
 
@@ -271,6 +282,16 @@ describe('Kanto Gym Leader Chronicles', () => {
     expect(indexOf('blaine', 'scene', 'one-more-trial')).toBeLessThan(
       indexOf('blaine', 'battle', 'escaped-magmar'),
     )
+  })
+
+  test('Misty follows Horsea to the Cape and ends with separate honest posters', () => {
+    const mistyStory = KANTO_GYM_CHRONICLE_STORIES.misty
+    const authoredStory = JSON.stringify(mistyStory)
+
+    expect(authoredStory).toContain('Cerulean Cape')
+    expect(authoredStory).toContain('two-posters')
+    expect(authoredStory).toContain('Cerulean Gym Challenges')
+    expect(authoredStory.toLowerCase()).not.toContain('pump')
   })
 
   test('supporting activities exist and do not expose later-world plot terms', () => {

@@ -3,12 +3,12 @@ import type { CryConfig } from '../types'
 export const gymLeaderChronicleCryEntries: CryConfig[] = [
   {
     id: 'chronicle-misty-listen-across-the-water',
-    name: 'Listen Below the Stage',
-    description: 'Pick the stranded Horsea out from the alarms and cries echoing through the flooded service tanks.',
+    name: "Follow Horsea's Call",
+    description: 'Pick Horsea out from the wild Pokemon calls echoing around Cerulean Cape.',
     category: 'Secret',
     subCategory: 'Misty Chronicle',
     icon: { type: 'pokemon', id: '116' },
-    background: '/backgrounds/chronicle-misty-pump-room.avif',
+    background: '/backgrounds/chronicle-misty-cerulean-cape.avif',
     requirements: [{ type: 'task_completed', targetId: 'cascade-badge-memory-revealed' }],
     criteria: [],
     rewards: [],

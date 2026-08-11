@@ -8,34 +8,12 @@ import {
   getContentSkillBaseXp,
   getPokemonBaseExperienceXpModifier,
 } from '@/data/skills/xp'
-import {
-  getTrainerBattleItemUseCount,
-  getTrainerBattleMoveUseCount,
-  getBattlePowerUnlockLevel,
-  getEnemyBattleMoveUseCount,
-  getExplorerEncounterItemLimit,
-  getExplorerVoyageSlotCount,
-  getResearcherMoveSlotCount,
-  getEffectivePokemonIvs,
-  getEquipableTitleIds,
-  getResearcherAbilityRolls,
-  getResearcherHiddenAbilitiesUnlocked,
-  getResearcherShinyModifier,
-  getSkillTitleId,
-  getSkillTitleName,
-  getTrainerIvCap,
-  resolveTrainerBattleItemUseLimit,
-  resolveTrainerBattleMoveUseLimit,
-  resolveEnemyBattleMoveUseLimit,
-  canUseItemWithSkillRequirements,
-  getItemSkillLockReason,
-  getUnlockedSkillTitleIds,
-  validateBattlePowerSkillRequirement,
-} from '@/utilities/skills/unlocks'
+import { getTitle } from '@/data/user'
+import { getFieldObservationPrimaryMaterialLimit } from '@/utilities/artisan/material-drops'
 import {
   calculateLevelUpSkillXp,
-  getFieldObservationResearchXpBaseAmount,
   getFieldObservationResearchXpAmount,
+  getFieldObservationResearchXpBaseAmount,
   getMaxResearchLevelForXp,
   getPokemonResearchLevel,
   getPokemonResearchLevelItemRewards,
@@ -43,7 +21,30 @@ import {
   getRecoverableResearchTmRewards,
   shouldAwardFieldObservationResearchXp,
 } from '@/utilities/research/research-levels'
-import { getFieldObservationPrimaryMaterialLimit } from '@/utilities/artisan/material-drops'
+import {
+  canUseItemWithSkillRequirements,
+  getBattlePowerUnlockLevel,
+  getEffectivePokemonIvs,
+  getEnemyBattleMoveUseCount,
+  getEquipableTitleIds,
+  getExplorerEncounterItemLimit,
+  getExplorerVoyageSlotCount,
+  getItemSkillLockReason,
+  getResearcherAbilityRolls,
+  getResearcherHiddenAbilitiesUnlocked,
+  getResearcherMoveSlotCount,
+  getResearcherShinyModifier,
+  getSkillTitleId,
+  getSkillTitleName,
+  getTrainerBattleItemUseCount,
+  getTrainerBattleMoveUseCount,
+  getTrainerIvCap,
+  getUnlockedSkillTitleIds,
+  resolveEnemyBattleMoveUseLimit,
+  resolveTrainerBattleItemUseLimit,
+  resolveTrainerBattleMoveUseLimit,
+  validateBattlePowerSkillRequirement,
+} from '@/utilities/skills/unlocks'
 
 describe('skill unlock helpers', () => {
   test('content skill XP uses flat level scaling and skill modifiers', () => {
@@ -378,29 +379,40 @@ describe('skill unlock helpers', () => {
   })
 
   test('skill titles derive from skill levels', () => {
-    expect(getSkillTitleId('battling', 10)).toBe('skill-battling-10')
-    expect(getSkillTitleName('battling', 10)).toBe('New Trainer')
-    expect(getSkillTitleName('researching', 100)).toBe('Researcher')
+    expect(getSkillTitleId('battling', 30)).toBe('skill-battling-30')
+    expect(getSkillTitleName('battling', 30)).toBe('Proven Trainer')
+    expect(getSkillTitleName('researching', 100)).toBe('Pokemon Professor')
     expect(
       getUnlockedSkillTitleIds({
-        battling: { level: 20 },
-        catching: { level: 9 },
+        battling: { level: 60 },
+        catching: { level: 29 },
         researching: { level: 100 },
       }),
     ).toContain('skill-researching-100')
+    expect(getUnlockedSkillTitleIds({ battling: { level: 100 } })).toEqual([
+      'skill-battling-30',
+      'skill-battling-60',
+      'skill-battling-100',
+    ])
   })
 
   test('equipable titles include stored and skill-derived titles', () => {
     const equipableTitleIds = getEquipableTitleIds(['boulder-breaker'], {
-      battling: { level: 20 },
-      catching: { level: 9 },
+      battling: { level: 60 },
+      catching: { level: 29 },
     })
 
     expect(equipableTitleIds).toContain('new-beginnings')
     expect(equipableTitleIds).toContain('boulder-breaker')
-    expect(equipableTitleIds).toContain('skill-battling-10')
-    expect(equipableTitleIds).toContain('skill-battling-20')
-    expect(equipableTitleIds).not.toContain('skill-catching-10')
+    expect(equipableTitleIds).toContain('skill-battling-30')
+    expect(equipableTitleIds).toContain('skill-battling-60')
+    expect(equipableTitleIds).not.toContain('skill-catching-30')
+  })
+
+  test('retired skill titles resolve to retained prestige titles', () => {
+    expect(getTitle('skill-battling-20')?.name).toBe('New Beginnings')
+    expect(getTitle('skill-battling-50')?.name).toBe('Proven Trainer')
+    expect(getTitle('skill-battling-90')?.name).toBe('Elite Trainer')
   })
 
   test('item skill requirements feed the guide without Explorer ball gates', () => {
