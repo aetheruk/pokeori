@@ -23,6 +23,7 @@ import {
   getUserTcgMap,
   setUserTcgMap,
 } from '@/utilities/user-state'
+import { getEconomyActionErrorMessage, runEconomyAction } from '@/utilities/economy/transactions'
 
 export interface DrawActionState {
   ok: boolean
@@ -420,7 +421,10 @@ export interface DuplicateRedistributionResult {
   summary?: any // RewardSummary compatible
 }
 
-export async function redistributeDuplicateCards(cardId: string): Promise<DuplicateRedistributionResult> {
+export async function redistributeDuplicateCards(
+  cardId: string,
+  clientActionId: string,
+): Promise<DuplicateRedistributionResult> {
   const { tcgRarityPokedollarValues } = await import('@/data/tcg-rarity')
   const { getTcgCardById } = await import('@/utilities/tcg/tcg')
 
@@ -431,13 +435,19 @@ export async function redistributeDuplicateCards(cardId: string): Promise<Duplic
     if (!user) {
       return { ok: false, error: 'You must be logged in.' }
     }
+    if (!clientActionId) return { ok: false, error: 'Missing action identifier' }
 
-    const inventory = await getUserInventoryMap(payload as any, user.id)
+    const result = await runEconomyAction<DuplicateRedistributionResult>(
+      { userId: user.id, action: 'redistribute-tcg-duplicates', requestId: clientActionId, payload },
+      async ({ req }) => {
+    const freshUser = await payload.findByID({ collection: 'users', id: user.id, req })
+
+    const inventory = await getUserInventoryMap(payload as any, user.id, { req })
     if (!hasCardCrystalizer(inventory)) {
       return { ok: false, error: 'Card Redistribution Box required.' }
     }
 
-    const cardsMap = await getUserTcgMap(payload as any, user.id)
+    const cardsMap = await getUserTcgMap(payload as any, user.id, { req })
     const currentQty = cardsMap[cardId] || 0
 
     if (currentQty <= 1) {
@@ -459,7 +469,7 @@ export async function redistributeDuplicateCards(cardId: string): Promise<Duplic
     cardsMap[cardId] = 1 // Keep 1 copy
 
     // Add currency locally
-    const currentCurrency = user.currency || {}
+    const currentCurrency = freshUser.currency || {}
     const updatedCurrency = {
       ...currentCurrency,
       pokedollars: (currentCurrency.pokedollars || 0) + totalPokedollars,
@@ -467,19 +477,24 @@ export async function redistributeDuplicateCards(cardId: string): Promise<Duplic
 
     const { incrementDailyTaskProgress } = await import('@/utilities/tasks/daily-progress')
 
-    await setUserTcgMap(payload as any, user.id, cardsMap)
+    await setUserTcgMap(payload as any, user.id, cardsMap, { req })
     await payload.update({
       collection: 'users',
       id: user.id,
       data: {
         currency: updatedCurrency,
       },
+      req,
     })
 
     // Explicit Daily Progress Tracking
-    await incrementDailyTaskProgress(user.id, 'daily_crystalize', removeQty)
-
-    revalidatePath('/game/tcg')
+    await incrementDailyTaskProgress(
+      user.id,
+      'daily_crystalize',
+      removeQty,
+      undefined,
+      { payload, req },
+    )
 
     // Construct RewardSummary-like object for the UI
     const summary = {
@@ -497,11 +512,15 @@ export async function redistributeDuplicateCards(cardId: string): Promise<Duplic
       cardsRemoved: removeQty,
       summary,
     }
+      },
+    )
+    revalidatePath('/game/tcg')
+    return result
   } catch (error) {
     console.error('[Duplicate Redistribution Action] Error:', error)
     return {
       ok: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : getEconomyActionErrorMessage(error),
     }
   }
 }

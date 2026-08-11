@@ -564,6 +564,7 @@ export async function attemptCapture(
       rewardsToGrant.push(...abilityRewards.rewards)
       const { summary } = await grantRewards(user.id, rewardsToGrant, {
         requirementContext: rewardRequirementContext,
+        idempotencyKey: captureResultKey,
       })
 
       const response = {
@@ -815,6 +816,7 @@ export async function attemptCapture(
 
     const { summary } = await grantRewards(user.id, rewardsToGrant, {
       requirementContext: rewardRequirementContext,
+      idempotencyKey: captureResultKey,
     })
 
     // Consolidate messages

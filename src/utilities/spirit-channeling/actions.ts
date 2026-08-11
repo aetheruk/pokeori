@@ -1,7 +1,6 @@
 'use server'
 
-import { getPayload } from 'payload'
-import payloadConfig from '@/payload.config'
+import type { Payload } from 'payload'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import {
@@ -32,6 +31,7 @@ import {
   incrementUserActivityResult,
   setUserInventoryMap,
 } from '@/utilities/user-state'
+import { createTransactionPayload, runEconomyAction } from '@/utilities/economy/transactions'
 
 const ChannelingOfferingSchema = z.object({
   itemId: z.string().min(1).max(80),
@@ -60,7 +60,7 @@ export interface BeginSpiritChannelingResult {
   error?: string
 }
 
-type PayloadLike = Awaited<ReturnType<typeof getPayload>>
+type PayloadLike = Payload
 
 function hasInventoryItem(
   inventory: Record<string, number>,
@@ -155,7 +155,14 @@ export async function beginSpiritChanneling(
       await getIdempotentResult<BeginSpiritChannelingResult>(idemKey)
     if (cached) return cached
 
-    const payload = await getPayload({ config: payloadConfig })
+    const result = await runEconomyAction<BeginSpiritChannelingResult>(
+      {
+        userId: user.id,
+        action: 'spirit-channeling',
+        requestId: parsed.data.attemptId,
+      },
+      async ({ payload: basePayload, req }) => {
+    const payload = createTransactionPayload(basePayload, req)
     const config = getSpiritChannelingConfigForMemento(
       parsed.data.mementoItemId,
     )
@@ -163,10 +170,8 @@ export async function beginSpiritChanneling(
       return { success: false, error: 'This item cannot be channeled' }
 
     const activityId = getSpiritChannelingActivityId(config)
-    const [inventory, completed] = await Promise.all([
-      getUserInventoryMap(payload as any, user.id),
-      isChannelingCompleted(payload, user.id, activityId),
-    ])
+    const inventory = await getUserInventoryMap(payload as any, user.id, { req })
+    const completed = await isChannelingCompleted(payload, user.id, activityId)
 
     if (!hasInventoryItem(inventory, BOOK_OF_CHANNELING_ITEM_ID)) {
       return {
@@ -253,11 +258,13 @@ export async function beginSpiritChanneling(
       )
       if (nextInventory[itemId] <= 0) delete nextInventory[itemId]
     }
-    await setUserInventoryMap(payload as any, user.id, nextInventory)
+    await setUserInventoryMap(payload as any, user.id, nextInventory, { req })
 
     const { summary } = await grantRewards(user.id, config.rewards, {
       source: activityId,
       skipDropChance: true,
+      payload: basePayload,
+      req,
     })
     await incrementUserActivityResult(
       payload as any,
@@ -272,18 +279,20 @@ export async function beginSpiritChanneling(
           pokemonId: parsed.data.pokemonId,
         },
       },
+      { req },
     )
 
-    revalidatePath('/game/spirit-channeling')
-    revalidatePath('/game/inventory')
-    revalidatePath('/game/explore')
-
-    const result: BeginSpiritChannelingResult = {
+    return {
       success: true,
       outcome: 'success',
       message: 'The spirit answers your channeling.',
       summary,
     }
+      },
+    )
+    revalidatePath('/game/spirit-channeling')
+    revalidatePath('/game/inventory')
+    revalidatePath('/game/explore')
     await setIdempotentResult(idemKey, result, 30)
     return result
   } finally {

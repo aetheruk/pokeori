@@ -1,4 +1,4 @@
-import type { Payload } from 'payload'
+import type { Payload, PayloadRequest } from 'payload'
 import pokemonData, { type PokemonData } from '@/data/pokemon-data'
 import { allGames } from '@/data/games'
 import { getPokemonForm, getSpeciesIdForForm } from '@/utilities/pokemon/pokedex'
@@ -177,9 +177,10 @@ export async function getEggHatchOutcome(
   payload: Payload,
   user: any,
   eggRarity?: PokemonRarityId | string | null,
+  req?: PayloadRequest,
 ) {
   return rollEggHatch(
-    await getUserPokedexMap(payload as any, user.id),
+    await getUserPokedexMap(payload as any, user.id, { req }),
     getSkillLevel(user.skills, 'researching'),
     Math.random,
     DAY_CARE_EGG_POOLS,

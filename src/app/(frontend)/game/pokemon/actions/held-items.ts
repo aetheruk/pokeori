@@ -1,7 +1,5 @@
 'use server'
 
-import { getPayload } from 'payload'
-import config from '@/payload.config'
 import { revalidatePath } from 'next/cache'
 import { getHeldItemDefinition } from '@/utilities/pokemon/held-items'
 import {
@@ -18,16 +16,27 @@ import {
   setUserInventoryMap,
 } from '@/utilities/user-state'
 import { resolveHeldItemFormId } from '@/utilities/pokemon/held-item-form-swaps'
+import { getEconomyActionErrorMessage, runEconomyAction } from '@/utilities/economy/transactions'
 
-export async function setHeldItem(pokemonId: string, itemId: string | null) {
+export async function setHeldItem(
+  pokemonId: string,
+  itemId: string | null,
+  clientActionId: string,
+) {
   const user = await getUser()
   if (!user) return { success: false, message: 'Unauthorized' }
+  if (!clientActionId) return { success: false, message: 'Missing action identifier' }
 
-  const payload = await getPayload({ config })
+  try {
+    const result = await runEconomyAction(
+      { userId: user.id, action: 'set-held-item', requestId: clientActionId },
+      async ({ payload, req }) => {
+  const freshUser = await payload.findByID({ collection: 'users', id: user.id, req })
   const pokemon = await payload.findByID({
     collection: 'pokemon',
     id: pokemonId,
     depth: 0,
+    req,
   })
 
   const ownerId =
@@ -45,8 +54,8 @@ export async function setHeldItem(pokemonId: string, itemId: string | null) {
   })
 
   if (nextItemId) {
-    const trainerLevel = getSkillLevel(user.skills, 'battling')
-    const pokedex = await getUserPokedexMap(payload as any, user.id)
+    const trainerLevel = getSkillLevel(freshUser.skills, 'battling')
+    const pokedex = await getUserPokedexMap(payload as any, user.id, { req })
     if (!canUseTrainerHeldItems(trainerLevel)) {
       return {
         success: false,
@@ -77,9 +86,8 @@ export async function setHeldItem(pokemonId: string, itemId: string | null) {
       id: pokemonId,
       data: { formId: nextFormId },
       depth: 0,
+      req,
     })
-
-    revalidatePath('/game/pokemon')
 
     return {
       success: true,
@@ -93,13 +101,13 @@ export async function setHeldItem(pokemonId: string, itemId: string | null) {
     return { success: false, message: 'That item cannot be held' }
   }
   if (nextItem) {
-    const skillLockReason = getItemSkillLockReason(nextItem, user.skills)
+    const skillLockReason = getItemSkillLockReason(nextItem, freshUser.skills)
     if (skillLockReason) {
       return { success: false, message: skillLockReason }
     }
   }
 
-  const inventory = await getUserInventoryMap(payload as any, user.id)
+  const inventory = await getUserInventoryMap(payload as any, user.id, { req })
 
   if (currentHeldItemId) {
     inventory[currentHeldItemId] = (inventory[currentHeldItemId] || 0) + 1
@@ -119,7 +127,7 @@ export async function setHeldItem(pokemonId: string, itemId: string | null) {
     }
   }
 
-  await setUserInventoryMap(payload as any, user.id, inventory)
+  await setUserInventoryMap(payload as any, user.id, inventory, { req })
 
   const updatedPokemon = await payload.update({
     collection: 'pokemon',
@@ -130,13 +138,19 @@ export async function setHeldItem(pokemonId: string, itemId: string | null) {
       formId: nextFormId,
     },
     depth: 0,
+    req,
   })
-
-  revalidatePath('/game/pokemon')
 
   return {
     success: true,
     pokemon: serializePokemon(updatedPokemon),
     heldItemId: nextItemId,
+  }
+      },
+    )
+    revalidatePath('/game/pokemon')
+    return result
+  } catch (error) {
+    return { success: false, message: getEconomyActionErrorMessage(error) }
   }
 }

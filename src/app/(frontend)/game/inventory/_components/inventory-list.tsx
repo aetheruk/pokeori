@@ -632,7 +632,7 @@ export function InventoryList() {
       if (isSelling || !item.sellValue) return
       setIsSelling(true)
       try {
-        const result = await sellItem(item.id, quantity)
+        const result = await sellItem(item.id, quantity, crypto.randomUUID())
         if (result.success) {
           const totalValue = item.sellValue * quantity
           toast.success(
@@ -686,7 +686,7 @@ export function InventoryList() {
       setIsUsing(true)
       try {
         if (item.category === 'booster-pack') {
-          const result = await useBoosterPack(item.id)
+          const result = await useBoosterPack(item.id, crypto.randomUUID())
           if (result.success && result.cards && item.boosterPack) {
             setSelectedItem(null)
             refreshUser()
@@ -701,7 +701,7 @@ export function InventoryList() {
         }
 
         if (item.category === 'scratch-card') {
-          const result = await useScratchCard(item.id)
+          const result = await useScratchCard(item.id, crypto.randomUUID())
           if (
             result.success &&
             result.background &&
@@ -731,7 +731,7 @@ export function InventoryList() {
           item.effects?.startResearch ||
           item.effects?.startMinigame
         ) {
-          const result = await useConsumable(item.id)
+          const result = await useConsumable(item.id, crypto.randomUUID())
           if (result.success && result.summary) {
             refreshUser()
             setRewardResult({
@@ -769,7 +769,10 @@ export function InventoryList() {
 
       setIsUsing(true)
       try {
-        const result = await useAllBoosterPacks(item.id)
+        const result = await useAllBoosterPacks(
+          item.id,
+          crypto.randomUUID(),
+        )
         if (result.success && result.cards) {
           setSelectedItem(null)
           refreshUser()

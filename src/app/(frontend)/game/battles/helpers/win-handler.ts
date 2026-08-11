@@ -48,6 +48,7 @@ export async function handleWin(
 
   const rewardsToGrant = buildBattleWinRewards(state, user, battleConfig)
   const { summary } = await grantRewards(user.id, rewardsToGrant, {
+    idempotencyKey: `battle-win:${state.economyActionId || state.battleId}:${user.id}`,
     requirementContext: {
       category: battleConfig.category,
       subCategory: battleConfig.subCategory,

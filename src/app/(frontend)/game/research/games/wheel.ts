@@ -110,7 +110,9 @@ async function settlePrizeWheelSpin({
     const hasRewards = Boolean(targetSlot.rewards?.length)
     let rewardSummary = null
     if (hasRewards) {
-      const rewardResult = await grantRewards(userId, targetSlot.rewards)
+      const rewardResult = await grantRewards(userId, targetSlot.rewards, {
+        idempotencyKey: idempotentResultKey,
+      })
       rewardSummary = rewardResult.summary
     }
 

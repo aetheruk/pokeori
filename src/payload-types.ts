@@ -78,6 +78,7 @@ export interface Config {
     'user-tcg-cards': UserTcgCard;
     'user-shop-purchases': UserShopPurchase;
     'user-eggs': UserEgg;
+    'economy-action-receipts': EconomyActionReceipt;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -100,6 +101,7 @@ export interface Config {
     'user-tcg-cards': UserTcgCardsSelect<false> | UserTcgCardsSelect<true>;
     'user-shop-purchases': UserShopPurchasesSelect<false> | UserShopPurchasesSelect<true>;
     'user-eggs': UserEggsSelect<false> | UserEggsSelect<true>;
+    'economy-action-receipts': EconomyActionReceiptsSelect<false> | EconomyActionReceiptsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -242,7 +244,7 @@ export interface User {
       }[]
     | null;
   /**
-   * Enable simplified UI for kids (e.g. sprites instead of text in quizzes)
+   * Simplifies research, boosts solo battle stats, and disables rivals, PvP, social Trainer pages, Mystery Gift, and High Scores.
    */
   kidMode?: boolean | null;
   powerUsage?: {
@@ -823,6 +825,29 @@ export interface UserEgg {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "economy-action-receipts".
+ */
+export interface EconomyActionReceipt {
+  id: string;
+  key: string;
+  user: string | User;
+  action: string;
+  requestId: string;
+  response:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  committedAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -888,6 +913,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'user-eggs';
         value: string | UserEgg;
+      } | null)
+    | ({
+        relationTo: 'economy-action-receipts';
+        value: string | EconomyActionReceipt;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1282,6 +1311,20 @@ export interface UserEggsSelect<T extends boolean = true> {
   status?: T;
   hatchedPokemonId?: T;
   hatchPoolId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "economy-action-receipts_select".
+ */
+export interface EconomyActionReceiptsSelect<T extends boolean = true> {
+  key?: T;
+  user?: T;
+  action?: T;
+  requestId?: T;
+  response?: T;
+  committedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

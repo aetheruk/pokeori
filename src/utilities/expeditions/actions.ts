@@ -1,6 +1,6 @@
 'use server'
 
-import { getPayload } from 'payload'
+import { getPayload, type PayloadRequest } from 'payload'
 import configPromise from '@payload-config'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
@@ -29,6 +29,7 @@ import {
   resolveResultBranchAfterStep,
 } from '@/utilities/expeditions/path-builder'
 import type { User } from '@/payload-types'
+import { getEconomyActionErrorMessage, runEconomyAction } from '@/utilities/economy/transactions'
 
 interface ExpeditionRunDoc {
   id: string
@@ -100,12 +101,22 @@ function mapRunDocToActiveRun(runDoc: ExpeditionRunDoc): ActiveExpeditionRun {
   }
 }
 
-async function consumeMapItem(payload: any, userId: string, mapItemId?: string): Promise<boolean> {
+interface ExpeditionOperationOptions {
+  payload?: any
+  req?: PayloadRequest
+}
+
+async function consumeMapItem(
+  payload: any,
+  userId: string,
+  mapItemId?: string,
+  req?: PayloadRequest,
+): Promise<boolean> {
   if (!mapItemId) {
     return true
   }
 
-  const inventory = await getUserInventoryMap(payload, userId)
+  const inventory = await getUserInventoryMap(payload, userId, { req })
   const currentQuantity = inventory[mapItemId] || 0
 
   if (currentQuantity < 1) {
@@ -114,7 +125,7 @@ async function consumeMapItem(payload: any, userId: string, mapItemId?: string):
 
   inventory[mapItemId] = currentQuantity - 1
 
-  await setUserInventoryMap(payload, userId, inventory)
+  await setUserInventoryMap(payload, userId, inventory, { req })
 
   return true
 }
@@ -124,8 +135,9 @@ async function updateExpeditionStats(
   userId: string,
   expeditionId: string,
   completed: boolean,
+  req?: PayloadRequest,
 ): Promise<void> {
-  const stats = await getUserActivityStatsMap(payload, userId, ['expeditionResults'])
+  const stats = await getUserActivityStatsMap(payload, userId, ['expeditionResults'], { req })
   const expeditionStats = stats.expeditions || {}
   const current = expeditionStats[expeditionId] || { wins: 0, losses: 0 }
   const now = new Date().toISOString()
@@ -143,6 +155,7 @@ async function updateExpeditionStats(
     userId,
     { expeditions: expeditionStats },
     ['expeditionResults'],
+    { req },
   )
 }
 
@@ -154,6 +167,7 @@ async function endExpeditionRun(
   currentStepIndex: number,
   canFail: boolean,
   status: 'ready_to_claim' | 'failed',
+  req?: PayloadRequest,
 ): Promise<{
   success: true
   updated: true
@@ -176,8 +190,8 @@ async function endExpeditionRun(
     progressed: true,
   }
 
-  await consumeMapItem(payload, userId, run.mapItemId)
-  await updateExpeditionStats(payload, userId, run.expeditionId, completed)
+  await consumeMapItem(payload, userId, run.mapItemId, req)
+  await updateExpeditionStats(payload, userId, run.expeditionId, completed, req)
 
   if (completed) {
     await (payload as any).update({
@@ -190,11 +204,13 @@ async function endExpeditionRun(
         steps,
         completedAt: new Date().toISOString(),
       },
+      req,
     })
   } else {
     await (payload as any).delete({
       collection: 'expedition-runs',
       id: run.id,
+      req,
     })
   }
 
@@ -210,7 +226,11 @@ async function endExpeditionRun(
   }
 }
 
-async function getRunsForUser(payload: any, userId: string): Promise<ExpeditionRunDoc[]> {
+async function getRunsForUser(
+  payload: any,
+  userId: string,
+  req?: PayloadRequest,
+): Promise<ExpeditionRunDoc[]> {
   const res = await payload.find({
     collection: 'expedition-runs',
     where: {
@@ -218,6 +238,7 @@ async function getRunsForUser(payload: any, userId: string): Promise<ExpeditionR
     },
     sort: '-createdAt',
     limit: 10,
+    req,
   })
 
   const runs = (res.docs || []) as ExpeditionRunDoc[]
@@ -231,33 +252,33 @@ async function getRunsForUser(payload: any, userId: string): Promise<ExpeditionR
     id: userId,
     depth: 0,
     select: { kidMode: true },
+    req,
   })) as Pick<User, 'kidMode'>
   if (user.kidMode !== true) return runs
 
-  await Promise.all(
-    orientationRuns.map(async (run) => {
-      const normalized = normalizeKidModeExpeditionSteps({
-        expeditionId: run.expeditionId,
-        steps: run.steps || [],
-        currentStepIndex: run.currentStepIndex || 0,
-        kidMode: true,
-      })
-      if (!normalized.changed) return
+  for (const run of orientationRuns) {
+    const normalized = normalizeKidModeExpeditionSteps({
+      expeditionId: run.expeditionId,
+      steps: run.steps || [],
+      currentStepIndex: run.currentStepIndex || 0,
+      kidMode: true,
+    })
+    if (!normalized.changed) continue
 
-      run.steps = normalized.steps
-      run.currentStepIndex = normalized.currentStepIndex
-      run.totalSteps = normalized.steps.length
-      await payload.update({
-        collection: 'expedition-runs',
-        id: run.id,
-        data: {
-          steps: normalized.steps,
-          currentStepIndex: normalized.currentStepIndex,
-          totalSteps: normalized.steps.length,
-        },
-      })
-    }),
-  )
+    run.steps = normalized.steps
+    run.currentStepIndex = normalized.currentStepIndex
+    run.totalSteps = normalized.steps.length
+    await payload.update({
+      collection: 'expedition-runs',
+      id: run.id,
+      data: {
+        steps: normalized.steps,
+        currentStepIndex: normalized.currentStepIndex,
+        totalSteps: normalized.steps.length,
+      },
+      req,
+    })
+  }
 
   return runs
 }
@@ -285,8 +306,11 @@ export async function getActiveExpeditionForUser(
   return mapRunDocToActiveRun(run)
 }
 
-export async function startExpedition(expeditionId: string): Promise<StartExpeditionResult> {
-  const { payload, user } = await getAuthedPayloadUser()
+export async function startExpedition(
+  expeditionId: string,
+  clientActionId: string,
+): Promise<StartExpeditionResult> {
+  const { user } = await getAuthedPayloadUser()
   if (!user) {
     return { success: false, message: 'Not authenticated' }
   }
@@ -295,14 +319,14 @@ export async function startExpedition(expeditionId: string): Promise<StartExpedi
   if (!expedition) {
     return { success: false, message: 'Expedition not found' }
   }
-
-  const lock = await acquireActionLock(getLockKey(user.id), EXPEDITION_PROGRESS_LOCK_TTL)
-  if (!lock.acquired) {
-    return { success: false, message: 'Another expedition action is in progress' }
-  }
+  if (!clientActionId) return { success: false, message: 'Missing action identifier' }
 
   try {
-    const existingRun = await getActiveRunForUser(payload as any, user.id)
+    const result = await runEconomyAction<StartExpeditionResult>(
+      { userId: user.id, action: 'start-expedition', requestId: clientActionId },
+      async ({ payload, req }) => {
+    const runs = await getRunsForUser(payload as any, user.id, req)
+    const existingRun = runs.find((run) => run.status === 'active' || run.status === 'ready_to_claim')
     if (existingRun) {
       return { success: false, message: 'You already have an active expedition' }
     }
@@ -310,9 +334,10 @@ export async function startExpedition(expeditionId: string): Promise<StartExpedi
     const freshUser = (await payload.findByID({
       collection: 'users',
       id: user.id,
+      req,
     })) as User
 
-    const userData = await getGameUserData(freshUser)
+    const userData = await getGameUserData(freshUser, undefined, { payload, req })
 
     const expeditionGating = [...(expedition.requirements || []), ...(expedition.criteria || [])]
 
@@ -361,33 +386,36 @@ export async function startExpedition(expeditionId: string): Promise<StartExpedi
         steps: generatedSteps,
         startedAt: now,
       },
+      req,
     })) as ExpeditionRunDoc
-
-    revalidatePath('/game')
-    revalidatePath('/game/explore')
 
     return {
       success: true,
       run: mapRunDocToActiveRun(created),
     }
-  } finally {
-    await releaseActionLock(lock)
+      },
+    )
+    revalidatePath('/game')
+    revalidatePath('/game/explore')
+    return result
+  } catch (error) {
+    return { success: false, message: getEconomyActionErrorMessage(error) }
   }
 }
 
-export async function abandonExpedition(): Promise<ExpeditionActionResult> {
-  const { payload, user } = await getAuthedPayloadUser()
+export async function abandonExpedition(clientActionId: string): Promise<ExpeditionActionResult> {
+  const { user } = await getAuthedPayloadUser()
   if (!user) {
     return { success: false, message: 'Not authenticated' }
   }
 
-  const lock = await acquireActionLock(getLockKey(user.id), EXPEDITION_PROGRESS_LOCK_TTL)
-  if (!lock.acquired) {
-    return { success: false, message: 'Another expedition action is in progress' }
-  }
+  if (!clientActionId) return { success: false, message: 'Missing action identifier' }
 
   try {
-    const runs = await getRunsForUser(payload as any, user.id)
+    const result = await runEconomyAction<ExpeditionActionResult>(
+      { userId: user.id, action: 'abandon-expedition', requestId: clientActionId },
+      async ({ payload, req }) => {
+    const runs = await getRunsForUser(payload as any, user.id, req)
     const activeRun = runs.find((run) => run.status === 'active')
 
     if (!activeRun) {
@@ -399,38 +427,42 @@ export async function abandonExpedition(): Promise<ExpeditionActionResult> {
       return { success: false, message: 'This expedition cannot be abandoned' }
     }
 
-    await consumeMapItem(payload, user.id, activeRun.mapItemId)
-    await updateExpeditionStats(payload, user.id, activeRun.expeditionId, false)
+    await consumeMapItem(payload, user.id, activeRun.mapItemId, req)
+    await updateExpeditionStats(payload, user.id, activeRun.expeditionId, false, req)
 
     await (payload as any).delete({
       collection: 'expedition-runs',
       id: activeRun.id,
+      req,
     })
 
+    return { success: true }
+      },
+    )
     revalidatePath('/game')
     revalidatePath('/game/explore')
-
-    return { success: true }
-  } finally {
-    await releaseActionLock(lock)
+    return result
+  } catch (error) {
+    return { success: false, message: getEconomyActionErrorMessage(error) }
   }
 }
 
 export async function claimExpeditionRewards(
   expeditionId?: string,
+  clientActionId?: string,
 ): Promise<ClaimExpeditionResult> {
-  const { payload, user } = await getAuthedPayloadUser()
+  const { user } = await getAuthedPayloadUser()
   if (!user) {
     return { success: false, message: 'Not authenticated' }
   }
 
-  const lock = await acquireActionLock(getLockKey(user.id), EXPEDITION_PROGRESS_LOCK_TTL)
-  if (!lock.acquired) {
-    return { success: false, message: 'Another expedition action is in progress' }
-  }
+  if (!clientActionId) return { success: false, message: 'Missing action identifier' }
 
   try {
-    const runs = await getRunsForUser(payload as any, user.id)
+    const result = await runEconomyAction<ClaimExpeditionResult>(
+      { userId: user.id, action: 'claim-expedition', requestId: clientActionId },
+      async ({ payload, req }) => {
+    const runs = await getRunsForUser(payload as any, user.id, req)
     const run = runs.find(
       (entry) =>
         entry.status === 'ready_to_claim' && (!expeditionId || entry.expeditionId === expeditionId),
@@ -447,23 +479,30 @@ export async function claimExpeditionRewards(
 
     const rewardsToGrant = expedition.rewards || []
 
-    const { summary } = await grantRewards(user.id, rewardsToGrant, { source: 'expedition' })
+    const { summary } = await grantRewards(user.id, rewardsToGrant, {
+      source: 'expedition',
+      payload,
+      req,
+    })
 
     await (payload as any).delete({
       collection: 'expedition-runs',
       id: run.id,
+      req,
     })
-
-    revalidatePath('/game')
-    revalidatePath('/game/explore')
 
     return {
       success: true,
       rewards: summary,
       summary,
     }
-  } finally {
-    await releaseActionLock(lock)
+      },
+    )
+    revalidatePath('/game')
+    revalidatePath('/game/explore')
+    return result
+  } catch (error) {
+    return { success: false, message: getEconomyActionErrorMessage(error) }
   }
 }
 
@@ -640,6 +679,7 @@ export async function recordExpeditionActivityResult(
   activityType: ExpeditionActivityType,
   activityId: string,
   didWin: boolean,
+  options: ExpeditionOperationOptions = {},
 ): Promise<{
   success: boolean
   failed?: boolean
@@ -647,15 +687,18 @@ export async function recordExpeditionActivityResult(
   updated?: boolean
   expedition?: ExpeditionProgressSnapshot
 }> {
-  const payload = await getPayload({ config: configPromise })
+  const payload = options.payload || (await getPayload({ config: configPromise }))
+  const { req } = options
 
-  const lock = await acquireActionLock(getLockKey(userId), EXPEDITION_PROGRESS_LOCK_TTL)
-  if (!lock.acquired) {
-    return { success: false }
+  const lock = req
+    ? null
+    : await acquireActionLock(getLockKey(userId), EXPEDITION_PROGRESS_LOCK_TTL)
+  if (lock && !lock.acquired) {
+      return { success: false }
   }
 
   try {
-    const runs = await getRunsForUser(payload as any, userId)
+    const runs = await getRunsForUser(payload as any, userId, req)
     const run = runs.find((entry) => entry.status === 'active')
     if (!run) {
       return { success: true, updated: false }
@@ -702,6 +745,7 @@ export async function recordExpeditionActivityResult(
           nextStepIndex,
           canFail,
           routedResult.end === 'complete' ? 'ready_to_claim' : 'failed',
+          req,
         )
       }
 
@@ -722,8 +766,8 @@ export async function recordExpeditionActivityResult(
           progressed: true,
         }
 
-        await consumeMapItem(payload, userId, run.mapItemId)
-        await updateExpeditionStats(payload, userId, run.expeditionId, true)
+        await consumeMapItem(payload, userId, run.mapItemId, req)
+        await updateExpeditionStats(payload, userId, run.expeditionId, true, req)
 
         await (payload as any).update({
           collection: 'expedition-runs',
@@ -735,6 +779,7 @@ export async function recordExpeditionActivityResult(
             steps: updatedSteps,
             completedAt: new Date().toISOString(),
           },
+          req,
         })
 
         revalidatePath('/game')
@@ -765,6 +810,7 @@ export async function recordExpeditionActivityResult(
           totalSteps: updatedSteps.length,
           steps: updatedSteps,
         },
+        req,
       })
 
       revalidatePath('/game')
@@ -789,6 +835,7 @@ export async function recordExpeditionActivityResult(
           nextStepIndex,
           canFail,
           routedLoss.end === 'complete' ? 'ready_to_claim' : 'failed',
+          req,
         )
       }
 
@@ -809,8 +856,8 @@ export async function recordExpeditionActivityResult(
           progressed: true,
         }
 
-        await consumeMapItem(payload, userId, run.mapItemId)
-        await updateExpeditionStats(payload, userId, run.expeditionId, true)
+        await consumeMapItem(payload, userId, run.mapItemId, req)
+        await updateExpeditionStats(payload, userId, run.expeditionId, true, req)
 
         await (payload as any).update({
           collection: 'expedition-runs',
@@ -822,6 +869,7 @@ export async function recordExpeditionActivityResult(
             steps: updatedSteps,
             completedAt: new Date().toISOString(),
           },
+          req,
         })
 
         revalidatePath('/game')
@@ -852,6 +900,7 @@ export async function recordExpeditionActivityResult(
           totalSteps: updatedSteps.length,
           steps: updatedSteps,
         },
+        req,
       })
 
       revalidatePath('/game')
@@ -881,6 +930,7 @@ export async function recordExpeditionActivityResult(
         data: {
           steps,
         },
+        req,
       })
 
       revalidatePath('/game')
@@ -906,12 +956,13 @@ export async function recordExpeditionActivityResult(
         progressed: false,
       }
 
-      await consumeMapItem(payload, userId, run.mapItemId)
-      await updateExpeditionStats(payload, userId, run.expeditionId, false)
+      await consumeMapItem(payload, userId, run.mapItemId, req)
+      await updateExpeditionStats(payload, userId, run.expeditionId, false, req)
 
       await (payload as any).delete({
         collection: 'expedition-runs',
         id: run.id,
+        req,
       })
 
       revalidatePath('/game')
@@ -941,6 +992,7 @@ export async function recordExpeditionActivityResult(
         losses: newLosses,
         steps,
       },
+      req,
     })
 
     revalidatePath('/game')
@@ -948,6 +1000,6 @@ export async function recordExpeditionActivityResult(
 
     return { success: true, updated: true, expedition }
   } finally {
-    await releaseActionLock(lock)
+    if (lock) await releaseActionLock(lock)
   }
 }

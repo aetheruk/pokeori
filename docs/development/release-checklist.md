@@ -17,6 +17,7 @@ changes.
 - Review any allowlisted unresolved references in `tests/data-references.test.ts`.
 - Verify new rewards point to real item, currency, and task IDs.
 - Verify `requirements`, `criteria`, `hide`, `overrides`, and daily locks match the intended unlock flow.
+- For economy changes, confirm every related MongoDB write shares one Payload transaction request and retries use a stable action identity.
 
 ## Quality Gates
 - Run `bun run lint`.
@@ -36,7 +37,7 @@ changes.
 - For 0.1.1, run `migrate:performance-indexes` prepare and finalize phases using the performance runbook; never let production Payload auto-build these indexes at startup.
 - For the 0.1.0 activity split, run `bun run migrate:game-activity-domains --dry-run`, review the counts, then run `bun run migrate:game-activity-domains`.
 - Confirm Redis is reachable and TLS settings match the deployment environment.
-- Confirm `/api/health` checks both MongoDB and Dragonfly and Coolify reports one healthy replica.
+- Confirm `/api/health` checks MongoDB, replica-set transaction support, and Dragonfly, and Coolify reports one healthy application replica.
 - Deploy to staging first when available.
 - Check server logs for request IDs on API failures.
 - Verify login, Explore, Pokemon box, one battle, one location encounter, one Mini Game, and one Field Research study.

@@ -130,7 +130,7 @@ export function VoyageSelectionModal({
     try {
       if (activeVoyageData) {
         if (!isFinished) return
-        const result = await completeVoyage(voyage.id)
+        const result = await completeVoyage(voyage.id, crypto.randomUUID())
         if (result.success) {
           toast.success('Voyage Completed!')
           onSuccess(result)
@@ -139,7 +139,7 @@ export function VoyageSelectionModal({
           toast.error(result.message || 'Failed to complete voyage')
         }
       } else {
-        const result = await startVoyage(voyage.id, selectedPokemonIds)
+        const result = await startVoyage(voyage.id, selectedPokemonIds, crypto.randomUUID())
         if (result.success) {
           toast.success('Voyage started!')
           onSuccess()

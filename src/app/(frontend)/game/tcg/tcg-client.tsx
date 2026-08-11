@@ -726,6 +726,7 @@ export default function TcgExplorerPage({
                             try {
                               const result = await redistributeDuplicateCards(
                                 selectedCard.card.id,
+                                crypto.randomUUID(),
                               )
                               if (result.ok && result.summary) {
                                 setRewardSummary(result.summary)

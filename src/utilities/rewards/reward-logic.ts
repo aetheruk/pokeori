@@ -1,4 +1,9 @@
-import { getPayload } from 'payload'
+import { getPayload, type Payload, type PayloadRequest } from 'payload'
+import {
+  createEconomyActionId,
+  createEconomyRequestId,
+  runEconomyAction,
+} from '@/utilities/economy/transactions'
 import configPromise from '@payload-config'
 import type { User } from '@/payload-types'
 import { items } from '@/data/items'
@@ -214,29 +219,64 @@ export async function grantRewards(
     source?: string
     skipDropChance?: boolean
     requirementContext?: RequirementEvaluationContext
+    payload?: Payload
+    req?: PayloadRequest
+    idempotencyKey?: string
   } = {},
 ): Promise<{ success: boolean; summary: RewardSummary }> {
-  const payload = await getPayload({ config: configPromise })
+  if (!options.req) {
+    return runEconomyAction(
+      {
+        userId,
+        action: 'grant-rewards',
+        requestId: options.idempotencyKey
+          ? createEconomyRequestId(options.idempotencyKey)
+          : createEconomyActionId(),
+        payload: options.payload,
+      },
+      ({ payload, req }) => grantRewards(userId, rewards, { ...options, payload, req }),
+    )
+  }
+
+  const payload = options.payload || (await getPayload({ config: configPromise }))
+  const requestOptions = options.req ? { req: options.req } : {}
 
   // Fetch user with embedded fields
-  const user = await payload.findByID({ collection: 'users', id: userId })
+  const user = await payload.findByID({
+    collection: 'users',
+    id: userId,
+    ...requestOptions,
+  })
   if (!user) throw new Error('User not found')
-  const weatherState = await ensureUserWeatherSlot(payload as any, user as User)
+  const weatherState = await ensureUserWeatherSlot(
+    payload as any,
+    user as User,
+    new Date(),
+    Math.random,
+    options.req,
+  )
 
   // Fetch external collections (Pokemon)
-  const [pokemonDocs, inventory, pokedex, completedTasks, tcg, stats] =
-    await Promise.all([
-      payload.find({
-        collection: 'pokemon',
-        where: { user: { equals: userId } },
-        limit: 1000,
-      }),
-      getUserInventoryMap(payload as any, userId),
-      getUserPokedexMap(payload as any, userId),
-      getUserCompletedTasksMap(payload as any, userId),
-      getUserTcgMap(payload as any, userId),
-      getUserActivityStatsMap(payload as any, userId),
-    ])
+  const pokemonDocs = await payload.find({
+    collection: 'pokemon',
+    where: { user: { equals: userId } },
+    limit: 1000,
+    ...requestOptions,
+  })
+  const inventory = await getUserInventoryMap(payload as any, userId, requestOptions)
+  const pokedex = await getUserPokedexMap(payload as any, userId, requestOptions)
+  const completedTasks = await getUserCompletedTasksMap(
+    payload as any,
+    userId,
+    requestOptions,
+  )
+  const tcg = await getUserTcgMap(payload as any, userId, requestOptions)
+  const stats = await getUserActivityStatsMap(
+    payload as any,
+    userId,
+    undefined,
+    requestOptions,
+  )
 
   const extendedUser = user as ExtendedUser
   const userSkills: SkillsData = extendedUser.skills || {}
@@ -381,6 +421,7 @@ export async function grantRewards(
           ...params,
           qty: quantity,
           userInventory: inventory,
+          persist: false,
         })
 
         result.draws.forEach((d) => {
@@ -514,12 +555,14 @@ export async function grantRewards(
               reward.pokemonData?.obtainedSourceId || options.source,
             stats: pokemonWithStats.stats,
           },
+          ...requestOptions,
         })
         await registerAbilityDexEntry(
           payload as any,
           userId,
           rewardAbilityId,
           options.source || 'reward',
+          options.req,
         )
         summary.pokemon.push({
           speciesId,
@@ -891,20 +934,26 @@ export async function grantRewards(
     collection: 'users',
     id: userId,
     data: updateData,
+    ...requestOptions,
   })
 
-  await Promise.all([
-    inventoryChanged
-      ? setUserInventoryMap(payload as any, userId, inventory)
-      : Promise.resolve(),
-    pokedexChanged
-      ? setUserPokedexMap(payload as any, userId, pokedex)
-      : Promise.resolve(),
-    tasksChanged
-      ? setUserCompletedTasksMap(payload as any, userId, completedTasks)
-      : Promise.resolve(),
-    tcgChanged ? setUserTcgMap(payload as any, userId, tcg) : Promise.resolve(),
-  ])
+  if (inventoryChanged) {
+    await setUserInventoryMap(payload as any, userId, inventory, requestOptions)
+  }
+  if (pokedexChanged) {
+    await setUserPokedexMap(payload as any, userId, pokedex, requestOptions)
+  }
+  if (tasksChanged) {
+    await setUserCompletedTasksMap(
+      payload as any,
+      userId,
+      completedTasks,
+      requestOptions,
+    )
+  }
+  if (tcgChanged) {
+    await setUserTcgMap(payload as any, userId, tcg, requestOptions)
+  }
 
   return { success: true, summary }
 }

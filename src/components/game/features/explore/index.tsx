@@ -626,7 +626,7 @@ function ExploreListContent({
               const result =
                 isExpeditionTaskFlow && isAlreadyCompleted
                   ? await completeCurrentUserExpeditionTaskStep(task.id)
-                  : await completeTask(task.id)
+                  : await completeTask(task.id, undefined, crypto.randomUUID())
               if (result.success) {
                 if (isExpeditionTaskFlow) {
                   await actions.reopenExpeditionPanel(

@@ -24,6 +24,7 @@ const dirname = path.dirname(filename)
 
 import { Pokemon } from './collections/Pokemon'
 import { ExpeditionRuns } from './collections/ExpeditionRuns'
+import { EconomyActionReceipts } from './collections/EconomyActionReceipts'
 
 const requiredEnv = (name: string) => {
   const value = process.env[name]
@@ -54,6 +55,7 @@ export default buildConfig({
     UserTcgCards,
     UserShopPurchases,
     UserEggs,
+    EconomyActionReceipts,
   ],
   editor: lexicalEditor(),
   email: resendAdapter({

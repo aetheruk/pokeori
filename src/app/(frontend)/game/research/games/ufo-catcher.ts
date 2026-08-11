@@ -367,6 +367,7 @@ export async function settleUfoCatcherAttempt({
         const rewardResult = await grantRewards(
           user.id,
           rewards,
+          { idempotencyKey: resultKey },
         )
         rewardSummary = rewardResult.summary
       }

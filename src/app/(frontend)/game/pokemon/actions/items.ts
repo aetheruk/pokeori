@@ -44,6 +44,11 @@ import {
   getFusionOptionForPartnerForm,
   isValidFusionPartner,
 } from '@/utilities/pokemon/fusion'
+import {
+  createTransactionPayload,
+  getEconomyActionErrorMessage,
+  runEconomyAction,
+} from '@/utilities/economy/transactions'
 
 export const getUsableItems = cache(
   async (pokemonTarget: PokemonItemUseTarget) => {
@@ -159,21 +164,24 @@ export async function applyItemToPokemon(
   pokemonId: string,
   itemId: string,
   options?: { targetStat?: StatName; partnerPokemonId?: string },
+  clientActionId?: string,
 ) {
-  try {
-    const payload = await getPayload({ config })
+  const authenticatedUser = await getUser()
+  if (!authenticatedUser) return { success: false as const, error: 'Unauthorized' }
+  if (!clientActionId) return { success: false as const, error: 'Missing action identifier' }
 
-    const [user, pokemon] = await Promise.all([
-      getUser(),
-      payload.findByID({
+  try {
+    const result = await runEconomyAction(
+      { userId: authenticatedUser.id, action: 'apply-pokemon-item', requestId: clientActionId },
+      async ({ payload: basePayload, req }) => {
+      const payload = createTransactionPayload(basePayload, req)
+      const user = await payload.findByID({ collection: 'users', id: authenticatedUser.id })
+      const pokemon = await payload.findByID({
         collection: 'pokemon',
         id: pokemonId,
-      }),
-    ])
+      })
 
-    if (!user) throw new Error('Unauthorized')
-
-    const userInventory = await getUserInventoryMap(payload as any, user.id)
+    const userInventory = await getUserInventoryMap(payload as any, user.id, { req })
     const currentQuantity = userInventory[itemId] || 0
 
     if (currentQuantity <= 0) {
@@ -339,8 +347,7 @@ export async function applyItemToPokemon(
           throw new Error('Fusion partner data is out of sync.')
         }
 
-        await Promise.all([
-          payload.update({
+        await payload.update({
             collection: 'pokemon',
             id: pokemonId,
             data: {
@@ -350,16 +357,15 @@ export async function applyItemToPokemon(
               fusedWithPokemonId: null,
             },
             depth: 0,
-          }),
-          payload.update({
+          })
+        await payload.update({
             collection: 'pokemon',
             id: partner.id,
             data: {
               fusedIntoPokemonId: null,
             },
             depth: 0,
-          }),
-        ])
+          })
       } else {
         if (!options?.partnerPokemonId) {
           throw new Error('Choose a compatible Pokemon to fuse with.')
@@ -391,8 +397,7 @@ export async function applyItemToPokemon(
           throw new Error('That Pokemon cannot be fused with this Pokemon.')
         }
 
-        await Promise.all([
-          payload.update({
+        await payload.update({
             collection: 'pokemon',
             id: pokemonId,
             data: {
@@ -402,8 +407,8 @@ export async function applyItemToPokemon(
               fusedWithPokemonId: partner.id,
             },
             depth: 0,
-          }),
-          payload.update({
+          })
+        await payload.update({
             collection: 'pokemon',
             id: partner.id,
             data: {
@@ -413,8 +418,7 @@ export async function applyItemToPokemon(
               isCompanion: false,
             },
             depth: 0,
-          }),
-        ])
+          })
       }
 
       updatedPokemon = await payload.findByID({
@@ -598,6 +602,7 @@ export async function applyItemToPokemon(
         user.id,
         newAbilityId,
         'ability-patch',
+        req,
       )
     } else if (itemDef.effects.grantPokemonResearchXp) {
       // Only allow if no formId specified in item def, or if it matches the pokemon's form
@@ -641,18 +646,18 @@ export async function applyItemToPokemon(
       }
 
       // Use grantRewards utility to grant research XP
-      const result = await grantRewards(user.id, [
+      const rewardResult = await grantRewards(user.id, [
         {
           type: 'pokemon_research_xp',
           targetId: targetFormId,
           quantity: actualAmount,
         },
-      ])
+      ], { source: 'pokemon-item', payload: basePayload, req })
 
-      if (!result.success) {
+      if (!rewardResult.success) {
         throw new Error('Failed to grant research XP')
       }
-      rewardSummary = result.summary
+      rewardSummary = rewardResult.summary
 
       // Refresh pokemon data if needed (though research XP is on Pokedex, not Pokemon doc)
       updatedPokemon = await payload.findByID({
@@ -670,16 +675,19 @@ export async function applyItemToPokemon(
       } else {
         delete userInventory[itemId]
       }
-      await setUserInventoryMap(payload as any, user.id, userInventory)
+      await setUserInventoryMap(payload as any, user.id, userInventory, { req })
     }
 
-    revalidatePath('/game/pokemon')
     return {
       success: true as const,
       message: `Used ${itemDef.name} on ${pokemon.name || 'Pokemon'}`,
       pokemon: updatedPokemon,
       summary: rewardSummary,
     }
+      },
+    )
+    revalidatePath('/game/pokemon')
+    return result
   } catch (error) {
     logger.error('Error applying item to Pokemon:', error)
     return {
@@ -687,7 +695,7 @@ export async function applyItemToPokemon(
       error:
         error instanceof Error
           ? error.message
-          : 'An error occurred while using the item',
+          : getEconomyActionErrorMessage(error),
     }
   }
 }

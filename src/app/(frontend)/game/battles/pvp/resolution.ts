@@ -86,12 +86,18 @@ export interface PvpMove {
   }
 }
 
-async function grantPvpRewards(userId: string, battleConfigId: string) {
+async function grantPvpRewards(
+  userId: string,
+  battleConfigId: string,
+  economyActionId: string,
+) {
   const battleConfig = battles.find((b) => b.id === battleConfigId)
   if (!battleConfig) return undefined
 
   try {
-    const res = await grantRewards(userId, battleConfig.rewards || [])
+    const res = await grantRewards(userId, battleConfig.rewards || [], {
+      idempotencyKey: `pvp-win:${economyActionId}:${userId}`,
+    })
     return res.summary
   } catch (e) {
     console.error('Error granting PVP rewards', e)
@@ -696,7 +702,11 @@ export async function resolvePvpTurn(
     await Promise.all([
       updateStats(winnerId, true),
       updateStats(loserId, false),
-      grantPvpRewards(winnerId, state.battleId),
+      grantPvpRewards(
+        winnerId,
+        state.battleId,
+        state.economyActionId || state.pvpBattleId || state.battleId,
+      ),
       persistHeldItemBattleWinEffects(winningTeam),
       persistPokemonBattleKOs(state),
     ])

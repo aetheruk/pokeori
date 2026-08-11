@@ -12,6 +12,7 @@ import { RequirementData } from '@/utilities/requirements'
 import { StartVoyageSchema } from '@/utilities/validators'
 import { getExplorerVoyageSlotCount, getSkillLevel } from '@/utilities/skills/unlocks'
 import { recordDailyActivityProgress } from '@/utilities/tasks/daily-progress'
+import { getEconomyActionErrorMessage, runEconomyAction } from '@/utilities/economy/transactions'
 
 export type VoyageResult = {
   success: boolean
@@ -20,7 +21,11 @@ export type VoyageResult = {
   completed?: boolean
 }
 
-export async function startVoyage(voyageId: string, pokemonIds: string[]): Promise<VoyageResult> {
+export async function startVoyage(
+  voyageId: string,
+  pokemonIds: string[],
+  clientActionId: string,
+): Promise<VoyageResult> {
   const validated = StartVoyageSchema.safeParse({ voyageId, pokemonIds })
   if (!validated.success) {
     return { success: false, message: 'Invalid data' }
@@ -30,9 +35,23 @@ export async function startVoyage(voyageId: string, pokemonIds: string[]): Promi
   const { user: currentUser } = await payload.auth({ headers: await headers() })
 
   if (!currentUser) return { success: false, message: 'User not logged in' }
+  if (!clientActionId) return { success: false, message: 'Missing action identifier' }
+
+  try {
+    const result = await runEconomyAction<VoyageResult>(
+      { userId: currentUser.id, action: 'start-voyage', requestId: clientActionId },
+      async ({ payload: transactionPayload, req }) => {
+        const freshUser = await transactionPayload.findByID({
+          collection: 'users',
+          id: currentUser.id,
+          req,
+        })
 
   // Use full gameData to ensure RequirementData shape is met (completedTasks as array etc)
-  const gameData = await getGameUserData(currentUser)
+  const gameData = await getGameUserData(freshUser, undefined, {
+    payload: transactionPayload,
+    req,
+  })
   const { user } = gameData
 
   if (!user) return { success: false, message: 'User not found' }
@@ -66,13 +85,14 @@ export async function startVoyage(voyageId: string, pokemonIds: string[]): Promi
 
   // 3. Validate Pokemon
   // Fetch full pokemon data
-  const { docs: userPokemon } = await payload.find({
+  const { docs: userPokemon } = await transactionPayload.find({
     collection: 'pokemon',
     where: {
       id: { in: pokemonIds },
       user: { equals: user.id },
     },
     limit: 100,
+    req,
   })
 
   if (userPokemon.length !== pokemonIds.length) {
@@ -144,9 +164,10 @@ export async function startVoyage(voyageId: string, pokemonIds: string[]): Promi
 
   // DELETE Pokemon (Consumption)
   for (const pid of pokemonIds) {
-    await payload.delete({
+    await transactionPayload.delete({
       collection: 'pokemon',
       id: pid,
+      req,
     })
   }
 
@@ -157,29 +178,53 @@ export async function startVoyage(voyageId: string, pokemonIds: string[]): Promi
     pokemonIds, // keeping IDs just for record, they are gone from inventory
   }
 
-  await payload.update({
+  await transactionPayload.update({
     collection: 'users',
     id: user.id,
     data: {
       activeVoyages: [...activeVoyages, newActiveVoyage],
     },
+    req,
   })
 
-  revalidatePath('/game/voyages')
   return { success: true, message: 'Voyage started!' }
+      },
+    )
+    revalidatePath('/game/voyages')
+    return result
+  } catch (error) {
+    return { success: false, message: getEconomyActionErrorMessage(error) }
+  }
 }
 
 import { grantRewards } from '@/utilities/rewards/reward-logic'
 
 // ... (existing imports)
 
-export async function completeVoyage(voyageId: string): Promise<VoyageResult> {
+export async function completeVoyage(
+  voyageId: string,
+  clientActionId: string,
+): Promise<VoyageResult> {
   const payload = await getPayload({ config: configPromise })
   const { user: currentUser } = await payload.auth({ headers: await headers() })
 
   if (!currentUser) return { success: false, message: 'Not authenticated' }
+  if (!clientActionId) return { success: false, message: 'Missing action identifier' }
 
-  const { user } = await getGameUserData(currentUser)
+  try {
+    const result = await runEconomyAction<VoyageResult>(
+      { userId: currentUser.id, action: 'complete-voyage', requestId: clientActionId },
+      async ({ payload: transactionPayload, req }) => {
+        const freshUser = await transactionPayload.findByID({
+          collection: 'users',
+          id: currentUser.id,
+          req,
+        })
+
+  const { user } = await getGameUserData(freshUser, undefined, {
+    payload: transactionPayload,
+    req,
+  })
 
   const activeVoyages = (user.activeVoyages || []) as ActiveVoyage[]
   if (process.env.NODE_ENV === 'development') console.log('Completing Voyage:', {
@@ -232,9 +277,13 @@ export async function completeVoyage(voyageId: string): Promise<VoyageResult> {
   let summary: any = { items: [], pokemon: [], currency: [], cards: [], tasksCompleted: [], xp: {} }
 
   if (isSuccess && rewardsToGrant.length > 0) {
-    const result = await grantRewards(user.id, rewardsToGrant, { source: 'voyage' })
-    if (result.success) {
-      summary = result.summary
+    const rewardResult = await grantRewards(user.id, rewardsToGrant, {
+      source: 'voyage',
+      payload: transactionPayload,
+      req,
+    })
+    if (rewardResult.success) {
+      summary = rewardResult.summary
     }
   }
 
@@ -251,28 +300,34 @@ export async function completeVoyage(voyageId: string): Promise<VoyageResult> {
     },
   }
 
-  await payload.update({
+  await transactionPayload.update({
     collection: 'users',
     id: user.id,
     data: {
       activeVoyages: updatedActiveVoyages,
       voyageStats: newStats,
     },
+    req,
   })
 
   if (isSuccess) {
     await recordDailyActivityProgress(user.id, {
       kind: 'voyage_success',
       sourceId: voyage.id,
-    })
+    }, { payload: transactionPayload, req })
   }
-
-  revalidatePath('/game/voyages')
 
   return {
     success: true,
     completed: true,
     rewards: summary,
     message: isSuccess ? 'SUCCESS' : 'FAILURE',
+  }
+      },
+    )
+    revalidatePath('/game/voyages')
+    return result
+  } catch (error) {
+    return { success: false, message: getEconomyActionErrorMessage(error) }
   }
 }

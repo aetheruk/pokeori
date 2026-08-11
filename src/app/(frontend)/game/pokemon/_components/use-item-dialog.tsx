@@ -213,7 +213,7 @@ export function UseItemDialog({
       const result = await applyItemToPokemon(pokemon.id, itemId, {
         targetStat,
         partnerPokemonId,
-      })
+      }, crypto.randomUUID())
       if (!result.success) {
         if (shouldConsume) incrementItem(itemId)
         toast.error(result.error || 'Failed to use item')

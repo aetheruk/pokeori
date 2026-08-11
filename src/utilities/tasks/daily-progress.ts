@@ -1,6 +1,6 @@
 'use server'
 
-import { getPayload } from 'payload'
+import { getPayload, type Payload, type PayloadRequest } from 'payload'
 import payloadConfig from '@/payload.config'
 import {
   acquireActionLock,
@@ -28,6 +28,11 @@ export type DailyProgressMetadata = Pick<
   DailyActivityEvent,
   'sourceId' | 'speciesId' | 'types' | 'isTrainer'
 >
+
+export type DailyProgressOptions = {
+  payload?: Payload
+  req?: PayloadRequest
+}
 
 function matchesCatchCriteria(criterion: any, event: DailyActivityEvent) {
   if (criterion.pokemonCriteria?.speciesId && criterion.pokemonCriteria.speciesId !== event.speciesId) {
@@ -74,13 +79,21 @@ function matchesCriterion(criterion: any, event: DailyActivityEvent) {
 export async function recordDailyActivityProgress(
   userId: string,
   event: DailyActivityEvent,
+  options: DailyProgressOptions = {},
 ): Promise<{ success: boolean; completedTaskIds?: string[] }> {
-  const lock = await acquireActionLock(`lock:daily-progress:${userId}`, 5)
-  if (!lock.acquired) return { success: false }
+  const lock = options.req
+    ? null
+    : await acquireActionLock(`lock:daily-progress:${userId}`, 5)
+  if (lock && !lock.acquired) return { success: false }
 
   try {
-    const payload = await getPayload({ config: payloadConfig })
-    const user = await payload.findByID({ collection: 'users', id: userId })
+    const payload = options.payload || (await getPayload({ config: payloadConfig }))
+    const requestOptions = options.req ? { req: options.req } : {}
+    const user = await payload.findByID({
+      collection: 'users',
+      id: userId,
+      ...requestOptions,
+    })
     const activeTasks = ((user as any).activeDailyTasks as any[]) || []
     if (activeTasks.length === 0) return { success: false }
 
@@ -116,14 +129,16 @@ export async function recordDailyActivityProgress(
       collection: 'users',
       id: userId,
       data: { activeDailyTasks: updatedTasks } as any,
+      ...requestOptions,
     })
 
     return { success: true, completedTaskIds: Array.from(completedTaskIds) }
   } catch (error) {
+    if (options.req) throw error
     console.error(`Failed to record daily activity progress for ${event.kind}:`, error)
     return { success: false }
   } finally {
-    await releaseActionLock(lock)
+    if (lock) await releaseActionLock(lock)
   }
 }
 
@@ -133,6 +148,7 @@ export async function incrementDailyTaskProgress(
   progressType: DailyProgressType,
   amount: number = 1,
   metadata?: DailyProgressMetadata,
+  options: DailyProgressOptions = {},
 ): Promise<{ success: boolean; completedTaskIds?: string[] }> {
   const kindByLegacyType: Record<DailyProgressType, DailyActivityKind> = {
     daily_catch: 'catch',
@@ -141,10 +157,14 @@ export async function incrementDailyTaskProgress(
     daily_crystalize: 'card_crystalized',
   }
 
-  return recordDailyActivityProgress(userId, {
-    kind: kindByLegacyType[progressType],
-    legacyType: progressType,
-    amount,
-    ...metadata,
-  })
+  return recordDailyActivityProgress(
+    userId,
+    {
+      kind: kindByLegacyType[progressType],
+      legacyType: progressType,
+      amount,
+      ...metadata,
+    },
+    options,
+  )
 }

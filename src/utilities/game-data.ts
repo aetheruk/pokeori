@@ -1,4 +1,4 @@
-import { getPayload } from 'payload'
+import { getPayload, type Payload, type PayloadRequest } from 'payload'
 import configPromise from '@payload-config'
 import type { User, Pokemon } from '@/payload-types'
 import type { RequirementData } from '@/utilities/requirements'
@@ -33,6 +33,8 @@ interface RivalTrainerDisplayData {
 
 type GameUserDataOptions = {
   pokemonPayload?: 'full' | 'explore' | 'channeling'
+  payload?: Payload
+  req?: PayloadRequest
 }
 
 export async function getGameUserData(
@@ -40,7 +42,8 @@ export async function getGameUserData(
   requiredData?: GameDataKeys[],
   options: GameUserDataOptions = {},
 ): Promise<RequirementData> {
-  const payload = await getPayload({ config: configPromise })
+  const payload = options.payload || (await getPayload({ config: configPromise }))
+  const requestOptions = options.req ? { req: options.req } : {}
   const fetchAll = requiredData === undefined
   const keys = new Set(requiredData || [])
 
@@ -70,6 +73,7 @@ export async function getGameUserData(
         ],
       },
       pagination: false,
+      ...requestOptions,
       ...(options.pokemonPayload === 'explore' ||
       options.pokemonPayload === 'channeling'
         ? {
@@ -84,9 +88,15 @@ export async function getGameUserData(
     pokemonData = manualFetch.docs as Pokemon[]
   }
 
-  const userState = await getUserStateData(payload as any, user, requiredData)
+  const userState = await getUserStateData(payload as any, user, requiredData, requestOptions)
   const weatherState = shouldFetch('weather')
-    ? await ensureUserWeatherSlot(payload as any, user as User)
+    ? await ensureUserWeatherSlot(
+        payload as any,
+        user as User,
+        new Date(),
+        Math.random,
+        options.req,
+      )
     : null
 
   let activeExpedition: ActiveExpeditionData | null = null
@@ -104,6 +114,7 @@ export async function getGameUserData(
           },
         ],
       },
+      ...requestOptions,
       sort: '-createdAt',
       limit: 1,
       depth: 0,
@@ -138,6 +149,7 @@ export async function getGameUserData(
             currentStepIndex: normalized.currentStepIndex,
             totalSteps: normalized.steps.length,
           },
+          ...requestOptions,
         })
       }
 
@@ -178,6 +190,7 @@ export async function getGameUserData(
                 banner: true,
                 kidMode: true,
               },
+              ...requestOptions,
             })
             .catch(() => null)
 

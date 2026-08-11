@@ -522,7 +522,7 @@ export function PokemonList({
     const selectedIds = [...bulkReleaseIds]
     setIsBulkReleasingPokemon(true)
     try {
-      const result = await releasePokemonBulk(selectedIds)
+      const result = await releasePokemonBulk(selectedIds, crypto.randomUUID())
       if (result.success) {
         const releasedIds = new Set((result as any).releasedIds || selectedIds)
         setPokemonList((prev) => prev.filter((p) => !releasedIds.has(p.id)))
@@ -608,7 +608,7 @@ export function PokemonList({
   const hatchBoxEgg = async (egg: BoxEgg) => {
     setHatchingEggId(egg.id)
     try {
-      const result = await hatchEgg(egg.id)
+      const result = await hatchEgg(egg.id, crypto.randomUUID())
       if (!result.success) {
         toast.error(result.message)
         return
@@ -786,7 +786,12 @@ export function PokemonList({
 
     setUsingItemOnPokemonId(pokemon.id)
     try {
-      const result = await applyItemToPokemon(pokemon.id, itemToUse.id)
+      const result = await applyItemToPokemon(
+        pokemon.id,
+        itemToUse.id,
+        undefined,
+        crypto.randomUUID(),
+      )
       if (!result.success) {
         toast.error(result.error || 'Failed to use item')
         return
