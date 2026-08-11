@@ -23,8 +23,9 @@ const memoryMarkerTasks: Task[] = KANTO_GYM_CHRONICLES.map((chronicle) => ({
 
 const storyTasks: Task[] = KANTO_GYM_CHRONICLES.flatMap((chronicle) => {
   const story = KANTO_GYM_CHRONICLE_STORIES[chronicle.key]
+  const scenes = story.sequence.filter((beat) => beat.type === 'scene')
 
-  return story.scenes.map((scene) => ({
+  return scenes.map((scene) => ({
     id: chronicleActivityId(chronicle.key, scene.id),
     name: scene.title,
     description: scene.description,
@@ -40,15 +41,16 @@ const storyTasks: Task[] = KANTO_GYM_CHRONICLES.flatMap((chronicle) => {
     requirements: [{ type: 'task_completed', targetId: chronicle.markerId }],
     criteria: [],
     rewards: [],
-    enterModal: scene.dialogue.map((line, index) => {
-      const isLastLine = index === scene.dialogue.length - 1
+    enterModal: scene.panels.map((panel, index) => {
+      const isLastLine = index === scene.panels.length - 1
 
       return {
         id: index + 1,
-        icon: line.icon ?? { type: 'trainer', id: chronicle.trainerIconId },
-        title: line.speaker,
-        message: line.message,
-        background: line.background ?? scene.background,
+        icon: panel.icon ?? { type: 'trainer', id: chronicle.trainerIconId },
+        title:
+          panel.kind === 'speech' ? panel.speaker ?? scene.title : scene.title,
+        message: panel.message,
+        background: panel.background ?? scene.background,
         buttons: [
           isLastLine
             ? { text: 'Continue the Memory', type: 'success' as const }

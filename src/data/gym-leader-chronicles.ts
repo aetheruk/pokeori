@@ -53,8 +53,8 @@ export const KANTO_GYM_CHRONICLES = [
   {
     key: 'erika', leaderName: 'Erika', badgeItemId: 'badge-kanto-rainbow', badgeName: 'Rainbow Badge',
     markerId: 'rainbow-badge-memory-revealed', expeditionId: 'erika-rainbow-badge-chronicle',
-    title: 'The Unwelcome Bloom', playerTitle: 'Celadon Apprentice Perfumer', trainerIconId: 'gym-kanto-erika',
-    trainerSprite: '/sprites/trainers/gym/kanto/erika.avif', background: '/backgrounds/chronicle-erika-flower-exhibition.avif',
+    title: 'The Old Glasshouse', playerTitle: 'Celadon Glasshouse Keeper', trainerIconId: 'gym-kanto-erika',
+    trainerSprite: '/sprites/trainers/gym/kanto/erika.avif', background: '/backgrounds/chronicle-erika-greenhouse.avif',
     energyType: 'grass', energyAmount: 64, channelerMinLevel: 20, explorerXp: 500,
   },
   {
