@@ -212,6 +212,26 @@ function hasRequiredKey(
   )
 }
 
+const transactionReadQueues = new WeakMap<object, Promise<unknown>>()
+
+function runUserStateRead<T>(
+  req: PayloadRequest | undefined,
+  operation: () => Promise<T>,
+): Promise<T> {
+  if (!req?.transactionID) return operation()
+
+  const previous = transactionReadQueues.get(req) || Promise.resolve()
+  const result = previous.then(operation, operation)
+  transactionReadQueues.set(
+    req,
+    result.then(
+      () => undefined,
+      () => undefined,
+    ),
+  )
+  return result
+}
+
 async function findRows(
   payload: PayloadLike,
   collection: string,
@@ -221,15 +241,17 @@ async function findRows(
   req?: PayloadRequest,
 ): Promise<any[]> {
   const and = [{ user: { equals: userId } }, ...extraWhere]
-  const result = await payload.find({
-    collection,
-    where: and.length === 1 ? and[0] : { and },
-    pagination: false,
-    depth: 0,
-    overrideAccess: true,
-    ...(req ? { req } : {}),
-    ...(select ? { select } : {}),
-  })
+  const result = await runUserStateRead(req, () =>
+    payload.find({
+      collection,
+      where: and.length === 1 ? and[0] : { and },
+      pagination: false,
+      depth: 0,
+      overrideAccess: true,
+      ...(req ? { req } : {}),
+      ...(select ? { select } : {}),
+    }),
+  )
 
   return result.docs || []
 }

@@ -92,6 +92,7 @@ export async function startVoyage(
       user: { equals: user.id },
     },
     limit: 100,
+    pagination: false,
     req,
   })
 

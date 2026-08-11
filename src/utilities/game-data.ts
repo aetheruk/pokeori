@@ -117,6 +117,7 @@ export async function getGameUserData(
       ...requestOptions,
       sort: '-createdAt',
       limit: 1,
+      pagination: false,
       depth: 0,
       select: {
         expeditionId: true,

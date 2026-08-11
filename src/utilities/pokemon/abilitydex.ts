@@ -257,6 +257,7 @@ export async function registerAbilityDexEntry(
       and: [{ user: { equals: userId } }, { abilityId: { equals: abilityId } }],
     },
     limit: 1,
+    pagination: false,
     depth: 0,
     overrideAccess: true,
     ...(req ? { req } : {}),

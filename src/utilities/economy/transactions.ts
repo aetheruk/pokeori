@@ -66,8 +66,7 @@ export function hasEconomyTransactionSupport(payload: Payload): boolean {
   const database = (payload as Payload | undefined)?.db
   return (
     typeof database?.beginTransaction === 'function' &&
-    (database as { transactionOptions?: unknown }).transactionOptions !==
-      false
+    (database as { transactionOptions?: unknown }).transactionOptions !== false
   )
 }
 
@@ -79,6 +78,7 @@ export function createTransactionPayload(
   payload: Payload,
   req: PayloadRequest,
 ): Payload {
+  let operationQueue: Promise<unknown> = Promise.resolve()
   const transactionalMethods = new Set([
     'count',
     'create',
@@ -100,8 +100,22 @@ export function createTransactionPayload(
         return value
       }
 
-      return (args: Record<string, unknown>) =>
-        value.call(target, { ...args, req: args.req || req })
+      return (args: Record<string, unknown>) => {
+        const execute = () => value.call(target, {
+          ...args,
+          // Payload's paginated Mongo find runs its document and count queries
+          // concurrently. MongoDB does not permit parallel operations on one
+          // transaction session, so transactional reads must be unpaginated.
+          ...(property === 'find' ? { pagination: false } : {}),
+          req: args.req || req,
+        })
+        const result = operationQueue.then(execute, execute)
+        operationQueue = result.then(
+          () => undefined,
+          () => undefined,
+        )
+        return result
+      }
     },
   })
 }
@@ -141,6 +155,7 @@ async function findReceipt<T>(
     collection: RECEIPT_COLLECTION,
     where: { key: { equals: receiptKey } },
     limit: 1,
+    pagination: false,
     depth: 0,
     overrideAccess: true,
     ...(req ? { req } : {}),
@@ -204,7 +219,7 @@ export async function runEconomyAction<T>(
         }
 
         const response = await operation({
-          payload,
+          payload: createTransactionPayload(payload, req),
           req,
           userId: options.userId,
           action: options.action,
@@ -233,7 +248,10 @@ export async function runEconomyAction<T>(
         try {
           await PayloadAPI.killTransaction(req)
         } catch (rollbackError) {
-          console.error('Failed to roll back economy transaction', rollbackError)
+          console.error(
+            'Failed to roll back economy transaction',
+            rollbackError,
+          )
         }
 
         if (
