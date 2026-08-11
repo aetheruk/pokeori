@@ -16,6 +16,21 @@ The release boundary is a pull request merged to protected `main`. Never deploy 
 5. Run `bun run deploy:production`. It validates the project, builds a `linux/amd64` image, reuses local and GHCR BuildKit caches, pushes `latest`, `v<package-version>`, and immutable `sha-<commit>` tags to GHCR, then triggers Coolify only after a successful push.
 6. Verify Coolify health, critical gameplay flows, `/api/app-version`, and a refresh of an already-open PWA session.
 
+## Release-machine execution
+
+Run release operations with host access, outside the restricted sandbox (or with
+an equivalent escalated execution context). The sandbox cannot reliably access
+the Git metadata needed by `git fetch`/`git push`, GitHub CLI credentials and
+network services, or the Docker Desktop socket. This applies to `gh auth
+status`, GitHub PR/push commands, `docker version`/Buildx, and
+`bun run deploy:production`. A sandbox permission error for one of these tools
+is an environment limitation, not evidence that the release-machine setup is
+missing.
+
+Never print `.env` or credential values while checking prerequisites. Inspect
+only whether required variables are present, and rotate any credential that is
+accidentally exposed in command output.
+
 ## Guardrails
 
 - Preserve GitHub protection for `main`: pull requests, admin enforcement, no force pushes/deletions, and resolved conversations.
