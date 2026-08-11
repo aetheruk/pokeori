@@ -986,6 +986,17 @@ describe('move damage helpers', () => {
         defender,
       }).damage,
     ).toBe(20)
+    expect(getMove('dragon-rage')?.damageRule).toEqual({
+      type: 'flat',
+      amount: 40,
+    })
+    expect(
+      resolveDamageRuleDamage({
+        rule: getMove('dragon-rage')?.damageRule,
+        attacker,
+        defender,
+      }).damage,
+    ).toBe(40)
     attacker.level = 37
     expect(
       resolveDamageRuleDamage({
