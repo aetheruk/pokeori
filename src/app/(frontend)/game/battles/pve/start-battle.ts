@@ -528,7 +528,9 @@ export async function startBattleFromConfig(
     playerName: chronicleContext?.chronicle.playerName || user.trainerName || 'Player',
     enemyName:
       rivalContext?.trainer?.name ||
-      (battleConfig.isWildBattle ? 'Wild Pokemon' : battleConfig.name),
+      (battleConfig.isWildBattle
+        ? 'Wild Pokemon'
+        : battleConfig.trainerName || battleConfig.name),
     isWildBattle: battleConfig.isWildBattle,
     weather: weatherSnapshot,
     itemsUsedThisBattle: [],
@@ -576,7 +578,10 @@ export async function startBattleFromConfig(
     },
     enemyTrainer: battleConfig.title
       ? {
-          name: rivalContext?.trainer?.name || battleConfig.name,
+          name:
+            rivalContext?.trainer?.name ||
+            battleConfig.trainerName ||
+            battleConfig.name,
           icon: rivalContext?.trainer?.icon || battleConfig.icon.id,
           banner: rivalContext?.trainer?.banner || battleConfig.background,
           title: rivalContext?.trainer?.title || battleConfig.title,

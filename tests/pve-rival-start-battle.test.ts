@@ -180,4 +180,31 @@ describe('PVE rival battle start', () => {
       speciesId: 4,
     })
   })
+
+  test('uses an authored trainer name instead of the battle title', async () => {
+    const { startBattleFromConfig } = await import(
+      '@/app/(frontend)/game/battles/pve/start-battle'
+    )
+
+    const battleConfig = {
+      id: 'chronicle-erika-exhibition-rival',
+      name: 'A Graceful Answer',
+      trainerName: 'Celia',
+      description: 'An exhibition battle against Celia.',
+      category: 'Secret',
+      subCategory: 'Erika Chronicle',
+      icon: { type: 'trainer', id: 'beauty' },
+      background: '/backgrounds/chronicle-erika-flower-exhibition.avif',
+      maxPokemon: 1,
+      levelCap: 20,
+      requirements: [],
+      enemyTeam: [{ speciesId: 4, formId: '4', level: 12 }],
+      rewards: [],
+    } satisfies BattleConfig
+
+    const result = await startBattleFromConfig(playerUser, battleConfig)
+
+    expect(result.success).toBe(true)
+    expect(result.state?.enemyName).toBe('Celia')
+  })
 })
