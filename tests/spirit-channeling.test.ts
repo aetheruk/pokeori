@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { items } from '@/data/items'
 import { FUJI_GLASSES_ITEM_ID } from '@/data/items/special-item-ids'
+import { pokemonTowerTasks } from '@/data/tasks/entries/pokemon-tower'
 import {
   BOOK_OF_CHANNELING_ITEM_ID,
   doesSpiritChannelingEnergyMatch,
@@ -123,13 +124,13 @@ describe('spirit channeling data', () => {
         { formId: '25', level: 4 },
         { channelerMinLevel: 5 },
       ),
-    ).toBe('This channeling requires a level 5+ Pokemon.')
+    ).toBe('This memory needs a channeler at level 5 or higher.')
     expect(
       getSpiritChannelerIneligibilityReason(
         { formId: '25', level: 20 },
         { channelerMinLevel: 5, channelerType: 'water' },
       ),
-    ).toBe('This channeling requires a Water-type Pokemon.')
+    ).toBe('This memory needs a Water-type Pokémon at level 5 or higher.')
     expect(
       canPokemonSpiritChannel(
         { formId: '25', level: 20 },
@@ -137,10 +138,45 @@ describe('spirit channeling data', () => {
       ),
     ).toBe(true)
     expect(
+      getSpiritChannelerIneligibilityReason(
+        { formId: '7', level: 20 },
+        { channelerMinLevel: 10, channelerFormId: '25' },
+      ),
+    ).toBe('This memory needs Pikachu at level 10 or higher.')
+    expect(
+      getSpiritChannelerIneligibilityReason(
+        { formId: '25', level: 9 },
+        { channelerMinLevel: 10, channelerFormId: '25' },
+      ),
+    ).toBe('This memory needs a channeler at level 10 or higher.')
+    expect(
       getSpiritChannelerRequirementLabel({
         channelerMinLevel: 10,
         channelerType: 'water',
       }),
-    ).toBe('Water-type Pokemon, level 10+')
+    ).toBe('Water-type Pokémon · Level 10+')
+    expect(
+      getSpiritChannelerRequirementLabel({
+        channelerMinLevel: 10,
+        channelerFormId: '25',
+      }),
+    ).toBe('Pikachu · Level 10+')
+  })
+
+  test('the first channeling lesson explains universal aptitude and partner suitability', () => {
+    const tutorialTaskIds = [
+      'pkmn-tower-channeling-1',
+      'pkmn-tower-channeling-2',
+    ]
+    const dialogue = pokemonTowerTasks
+      .filter((task) => tutorialTaskIds.includes(task.id))
+      .flatMap((task) => task.enterModal || [])
+      .map((step) => step.message)
+      .join(' ')
+
+    expect(dialogue).toContain('Every Pokémon can channel')
+    expect(dialogue).toContain('Some memories favour a certain type')
+    expect(dialogue).toContain('a Psychic type would be the most suitable')
+    expect(dialogue).toContain('level 5 or higher')
   })
 })

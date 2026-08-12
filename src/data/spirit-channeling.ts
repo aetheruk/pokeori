@@ -63,16 +63,30 @@ export type SpiritChannelingIncenseItemId = (typeof SPIRIT_CHANNELING_INCENSE_IT
 
 export type SpiritChannelingEnergy = Partial<Record<PokemonTypeName, number>>
 
-export interface SpiritChannelingConfig {
+export type SpiritChannelerRequirement = {
+  channelerMinLevel: number
+} & (
+  | {
+      channelerType?: never
+      channelerFormId?: never
+    }
+  | {
+      channelerType: PokemonTypeName
+      channelerFormId?: never
+    }
+  | {
+      channelerType?: never
+      channelerFormId: string
+    }
+)
+
+export type SpiritChannelingConfig = SpiritChannelerRequirement & {
   id: string
   name: string
   description: string
   mementoItemId: string
   correctIncenseItemId: SpiritChannelingIncenseItemId
   requiredEnergy: SpiritChannelingEnergy
-  channelerMinLevel: number
-  channelerType?: PokemonTypeName
-  channelerFormId?: string
   rewards: LocationReward[]
 }
 

@@ -1,11 +1,8 @@
 import type { PokemonTypeName } from '@/data/items/types'
-import type { SpiritChannelingConfig } from '@/data/spirit-channeling'
+import type { SpiritChannelerRequirement } from '@/data/spirit-channeling'
 import { getPokemonForm } from '@/utilities/pokemon/pokedex'
 
-export type SpiritChannelerRequirement = Pick<
-  SpiritChannelingConfig,
-  'channelerMinLevel' | 'channelerType' | 'channelerFormId'
->
+export type { SpiritChannelerRequirement } from '@/data/spirit-channeling'
 
 export interface SpiritChannelerCandidate {
   formId: string
@@ -23,25 +20,20 @@ export function getSpiritChannelerRequirementLabel(
     ? getPokemonForm(requirement.channelerFormId)?.name ||
       `form ${requirement.channelerFormId}`
     : null
-  const identityRequirements = [
-    formName,
-    requirement.channelerType
-      ? `${formatPokemonType(requirement.channelerType)}-type Pokemon`
-      : null,
-  ].filter((value): value is string => Boolean(value))
-  const identityRequirement =
-    identityRequirements.length > 0
-      ? identityRequirements.join(' and ')
-      : 'Any Pokemon'
+  const identityRequirement = formName
+    ? formName
+    : requirement.channelerType
+      ? `${formatPokemonType(requirement.channelerType)}-type Pokémon`
+      : 'Any Pokémon'
 
-  return `${identityRequirement}, level ${requirement.channelerMinLevel}+`
+  return `${identityRequirement} · Level ${requirement.channelerMinLevel}+`
 }
 
 export function getSpiritChannelerIneligibilityReason(
   pokemon: SpiritChannelerCandidate | null | undefined,
   requirement: SpiritChannelerRequirement,
 ): string | null {
-  if (!pokemon) return 'Choose a Pokemon to channel the memory.'
+  if (!pokemon) return 'Choose a Pokémon to channel this memory.'
 
   const form = getPokemonForm(pokemon.formId)
   if (
@@ -51,7 +43,7 @@ export function getSpiritChannelerIneligibilityReason(
     const formName =
       getPokemonForm(requirement.channelerFormId)?.name ||
       `form ${requirement.channelerFormId}`
-    return `This channeling requires ${formName}.`
+    return `This memory needs ${formName} at level ${requirement.channelerMinLevel} or higher.`
   }
 
   if (
@@ -60,11 +52,11 @@ export function getSpiritChannelerIneligibilityReason(
       (type) => type.toLowerCase() === requirement.channelerType,
     )
   ) {
-    return `This channeling requires a ${formatPokemonType(requirement.channelerType)}-type Pokemon.`
+    return `This memory needs a ${formatPokemonType(requirement.channelerType)}-type Pokémon at level ${requirement.channelerMinLevel} or higher.`
   }
 
   if (Number(pokemon.level || 0) < requirement.channelerMinLevel) {
-    return `This channeling requires a level ${requirement.channelerMinLevel}+ Pokemon.`
+    return `This memory needs a channeler at level ${requirement.channelerMinLevel} or higher.`
   }
 
   return null
