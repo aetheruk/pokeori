@@ -13,6 +13,9 @@ import { SPIRIT_CHANNELING_CONFIGS } from '@/data/spirit-channeling'
 import { tasks } from '@/data/tasks'
 import { banners } from '@/data/user'
 import type { ChronicleNarrativePhase } from '@/data/expeditions/types'
+import { getMove } from '@/data/moves'
+import { getDualTypeEffectiveness } from '@/utilities/battle/type-chart'
+import { getPokemonForm } from '@/utilities/pokemon/pokedex'
 
 const expectedRituals = [
   ['badge-kanto-boulder', 'rock', 49, 5],
@@ -181,7 +184,7 @@ describe('Kanto Gym Leader Chronicles gold-tier anthology', () => {
     }
   })
 
-  test('all supporting content exists and each battle has an activity loadout', () => {
+  test('all supporting content exists and each battle loadout fits its team cap', () => {
     const gameIds = new Set(allGames.map((entry) => entry.id))
     const battleIds = new Set(battles.map((entry) => entry.id))
     const taskIds = new Set(tasks.map((entry) => entry.id))
@@ -200,10 +203,14 @@ describe('Kanto Gym Leader Chronicles gold-tier anthology', () => {
         if (node.activityType === 'task')
           expect(taskIds.has(node.activityId!)).toBe(true)
         if (node.activityType === 'battle') {
+          const battle = battles.find((entry) => entry.id === node.activityId!)
+          const battleTeam =
+            chronicle?.activityLoadouts?.[node.activityId!]?.battleTeam
           expect(battleIds.has(node.activityId!)).toBe(true)
-          expect(
-            chronicle?.activityLoadouts?.[node.activityId!]?.battleTeam?.length,
-          ).toBeGreaterThan(0)
+          expect(battleTeam?.length).toBeGreaterThan(0)
+          expect(battleTeam!.length, node.activityId!).toBeLessThanOrEqual(
+            battle?.maxPokemon ?? 6,
+          )
         }
         if (node.activityType === 'game') {
           expect(gameIds.has(node.activityId!)).toBe(true)
@@ -248,6 +255,59 @@ describe('Kanto Gym Leader Chronicles gold-tier anthology', () => {
         (entry) => entry.id === 'chronicle-v2-erika-exhibition-rival',
       )?.trainerName,
     ).toBe('Celia')
+  })
+
+  test('the Rainbow Assessment has answers to its counter matchups', () => {
+    const battle = battles.find(
+      (entry) => entry.id === 'chronicle-v2-erika-league-steward',
+    )!
+    const erikaDefinition = KANTO_GYM_CHRONICLES.find(
+      (entry) => entry.key === 'erika',
+    )!
+    const expedition = expeditions.find(
+      (entry) => entry.id === erikaDefinition.expeditionId,
+    )!
+    const chronicle =
+      typeof expedition.chronicle === 'object' ? expedition.chronicle : undefined
+    const playerTeam =
+      chronicle?.activityLoadouts?.[battle.id]?.battleTeam ?? []
+
+    expect(playerTeam).toHaveLength(4)
+    expect(battle.maxPokemon).toBe(playerTeam.length)
+
+    const playerMatchups = playerTeam.map((pokemon) => ({
+      types: getPokemonForm(pokemon.formId ?? String(pokemon.speciesId))!.types,
+      moves: (pokemon.assignedMoves ?? [])
+        .map((moveId) => getMove(moveId))
+        .filter((move) => move && move.damage > 0),
+    }))
+    const enemyMatchups = battle.enemyTeam.map((pokemon) => ({
+      types: getPokemonForm(pokemon.formId ?? String(pokemon.speciesId))!.types,
+      moves: (pokemon.aiMoves ?? [])
+        .map((moveId) => getMove(moveId))
+        .filter((move) => move && move.damage > 0),
+    }))
+
+    const universalHardCounters = enemyMatchups.filter((enemy) =>
+      enemy.moves.some((move) =>
+        playerMatchups.every(
+          (player) =>
+            getDualTypeEffectiveness(move!.forcedType ?? 'normal', player.types) > 1,
+        ),
+      ),
+    )
+    expect(universalHardCounters).toHaveLength(1)
+
+    for (const enemy of enemyMatchups) {
+      expect(
+        playerMatchups.some((player) =>
+          player.moves.some(
+            (move) =>
+              getDualTypeEffectiveness(move!.forcedType ?? 'normal', enemy.types) >= 1,
+          ),
+        ),
+      ).toBe(true)
+    }
   })
 
   test('every Chronicle has its short-form player banner definition', () => {
