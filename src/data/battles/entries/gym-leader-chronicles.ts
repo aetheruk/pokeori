@@ -71,7 +71,7 @@ const definitions: Record<KantoGymChronicleKey, ChronicleBattleDefinition[]> = {
     },
     {
       id: 'league-assessment', name: 'Vermilion League Assessment', description: 'Prove that controlled power includes listening when the plan must change.',
-      trainerClassId: 'chronicle-steward', trainerName: 'League Steward', icon: { type: 'trainer', id: 'chronicle-steward' }, background: '/backgrounds/chronicle-surge-gym-shelter.avif', aiProfile: 'boss',
+      trainerClassId: 'chronicle-steward', trainerName: 'League Steward', icon: { type: 'trainer', id: 'chronicle-steward' }, background: '/backgrounds/chronicle-surge-gym-shelter.avif', maxPokemon: 4, aiProfile: 'boss',
       enemyTeam: [
         { speciesId: 105, formId: '105', level: 30, aiMoves: ['bone-club', 'headbutt', 'leer'] },
         { speciesId: 28, formId: '28', level: 31, aiMoves: ['slash', 'sand-attack', 'swift'] },
@@ -91,10 +91,10 @@ const definitions: Record<KantoGymChronicleKey, ChronicleBattleDefinition[]> = {
     },
     {
       id: 'league-steward', name: 'The Rainbow Assessment', description: 'Earn authority over the garden without pretending the opportunity came without conditions.',
-      trainerClassId: 'chronicle-steward', trainerName: 'Exhibition Steward', icon: { type: 'trainer', id: 'chronicle-steward' }, background: '/backgrounds/chronicle-erika-greenhouse.avif', maxPokemon: 3, aiProfile: 'boss',
+      trainerClassId: 'chronicle-steward', trainerName: 'Exhibition Steward', icon: { type: 'trainer', id: 'chronicle-steward' }, background: '/backgrounds/chronicle-erika-greenhouse.avif', maxPokemon: 4, aiProfile: 'boss',
       enemyTeam: [
         { speciesId: 126, formId: '126', level: 30, aiMoves: ['ember', 'smokescreen', 'confuse-ray'] },
-        { speciesId: 22, formId: '22', level: 31, aiMoves: ['drill-peck', 'fury-attack', 'leer'] },
+        { speciesId: 75, formId: '75', level: 30, aiMoves: ['rock-throw', 'defense-curl', 'headbutt'] },
         { speciesId: 49, formId: '49', level: 31, aiMoves: ['psybeam', 'supersonic', 'stun-spore'] },
       ],
     },
