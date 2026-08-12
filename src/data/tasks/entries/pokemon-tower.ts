@@ -103,7 +103,8 @@ export const pokemonTowerTasks: Task[] = [
   {
     id: 'pkmn-tower-channeling-1',
     name: 'A Mysterious Girl',
-    description: 'Oh no, what does she want, I really need to get out of here.',
+    description:
+      'A girl in the tower says a remembered voice may reach where I cannot.',
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     icon: {
@@ -114,7 +115,7 @@ export const pokemonTowerTasks: Task[] = [
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Im kinda in a hurry',
+    completeButtonText: "I'll hear her out",
     requirements: [
       {
         type: 'task_completed',
@@ -132,17 +133,18 @@ export const pokemonTowerTasks: Task[] = [
         id: 'psychic-f',
       },
       message:
-        "Okay So I need to fetch 15 pieces of clay and 5 Dried purple dyes. She'll explain more when I return.",
+        'The girl needs 15 pieces of Soft Clay and 5 Dried Purple Dye to prepare a vessel for Spirit Channeling.',
       closeButtonText: "Let's go",
     },
     enterModal: [
       {
         id: 1,
         title: 'Mysterious Girl',
-        message: "I couldn't help but overhear you're looking for someone?",
+        message:
+          "You're looking for Mr. Fuji. Whatever stopped you upstairs will turn you away again if you go back unchanged.",
         buttons: [
           {
-            text: 'I never said anything...',
+            text: 'I never said his name...',
             type: 'navigate',
             id: 2,
           },
@@ -157,10 +159,10 @@ export const pokemonTowerTasks: Task[] = [
         id: 2,
         title: 'Mysterious Girl',
         message:
-          "Let me rephrase that. I know you're looking for someone. I heard you crystal clear in my mind's eye.",
+          "You didn't need to. Worry has a loud voice, especially in a place where so many memories have gathered.",
         buttons: [
           {
-            text: 'Hear. Eye?',
+            text: 'You can hear memories?',
             type: 'navigate',
             id: 3,
           },
@@ -175,10 +177,10 @@ export const pokemonTowerTasks: Task[] = [
         id: 3,
         title: 'Mysterious Girl',
         message:
-          "You're being flippant now, you know exactly what I mean. Do you want my help or not?",
+          "Not clearly. They are more like echoes caught in people, places, and treasured objects. With the right ritual, a Pokémon can give one of those echoes enough shape to be understood.",
         buttons: [
           {
-            text: 'How?',
+            text: 'Only a Psychic Pokémon?',
             type: 'navigate',
             id: 4,
           },
@@ -193,10 +195,10 @@ export const pokemonTowerTasks: Task[] = [
         id: 4,
         title: 'Mysterious Girl',
         message:
-          "It's simple really. I'm going to teach you how to commune with the spirits. Well not you, you look a bit simple. But I can teach you how to work with Psychic Pokemon to channel the spirits to help.",
+          "Every Pokémon can channel. Psychic types often sense an echo more easily, but affinity matters more than a single rule. Some memories favour a certain type, and a rare few will answer only to one particular kind of Pokémon.",
         buttons: [
           {
-            text: 'Rude.',
+            text: 'So I need the right partner.',
             type: 'navigate',
             id: 5,
           },
@@ -211,10 +213,10 @@ export const pokemonTowerTasks: Task[] = [
         id: 5,
         title: 'Mysterious Girl',
         message:
-          "There's a dark presence lingering over Pokemon Tower that I've not felt before, And not cuddly dark like Umbreon. We're talking Regular super bad times dark. I have a strong feeling by helping you out here, the future will be much brighter.",
+          "Yes, and enough experience to hold the connection steady. First we need a vessel for the incense. Bring me 15 pieces of Soft Clay and 5 Dried Purple Dye, and I will show you the rest.",
         buttons: [
           {
-            text: "Okay I'm in!",
+            text: "I'll get them.",
             type: 'success',
           },
         ],
@@ -229,7 +231,8 @@ export const pokemonTowerTasks: Task[] = [
   {
     id: 'pkmn-tower-channeling-2',
     name: 'Spooky Sundries',
-    description: 'I need to get the clay and purple dye for the girl.',
+    description:
+      'The clay and dye are ready. It is time to learn the full channeling ritual.',
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     icon: {
@@ -240,7 +243,7 @@ export const pokemonTowerTasks: Task[] = [
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Fetched it!',
+    completeButtonText: 'Prepare the vessel',
     requirements: [
       {
         type: 'task_completed',
@@ -285,7 +288,7 @@ export const pokemonTowerTasks: Task[] = [
         id: 'book-of-channeling',
       },
       message:
-        'Ahhh! She disappeared right in front of me, That would have been scary but not gonna lie I kinda saw that coming a mile off. Oh well here goes!',
+        'The girl has vanished, leaving the Book of Channeling and Memory Incense behind. Mr. Fuji’s glasses are the first memento to try.',
       closeButtonText: "Let's go",
     },
     enterModal: [
@@ -293,10 +296,10 @@ export const pokemonTowerTasks: Task[] = [
         id: 1,
         title: 'Mysterious Girl',
         message:
-          "I knew you could be relied on, hand it over we're going to use this to produce a container specially designed to lure spirits that can reveal memories",
+          "You found everything. The clay will hold the incense safely, and the dye will make its smoke visible while it gathers around a memory.",
         buttons: [
           {
-            text: 'Wow, how handy.',
+            text: 'And the book?',
             type: 'navigate',
             id: 2,
           },
@@ -311,10 +314,10 @@ export const pokemonTowerTasks: Task[] = [
         id: 2,
         title: 'Mysterious Girl',
         message:
-          "Indeed. You're also going to need this Book of Channeling, it's got all the latest tips and tricks on how to commune with beings beyond your mortal understanding.",
+          "The Book of Channeling records the ritual. Keep it close. It will help you recognise mementos and prepare incense, offerings, and a suitable Pokémon partner.",
         buttons: [
           {
-            text: 'Neat!',
+            text: 'Start with the memento?',
             type: 'navigate',
             id: 3,
           },
@@ -329,10 +332,10 @@ export const pokemonTowerTasks: Task[] = [
         id: 3,
         title: 'Mysterious Girl',
         message:
-          "Now for the key part, for this to work, you'll need to provide a Memento. Something with significance to the person or place of the memory you are trying to recall.",
+          "Exactly. A memento gives the memory somewhere to gather. Mr. Fuji wore those spare glasses for years, so they should still carry an echo of what mattered to him.",
         buttons: [
           {
-            text: "Fuji's Glasses!",
+            text: 'What does the offering do?',
             type: 'navigate',
             id: 4,
           },
@@ -347,10 +350,10 @@ export const pokemonTowerTasks: Task[] = [
         id: 4,
         title: 'Mysterious Girl',
         message:
-          "The next step is to prepare an offering, Pokemon Materials or Gems will usually work a treat, depending on the type of connection you're trying to make the offering may change, this is going be trial and error I'm afraid.",
+          "Materials and Gems give the echo energy. Its nature and amount must suit the memory. Watch how the smoke responds: it will tell you when an offering is foreign, too weak, or overwhelming.",
         buttons: [
           {
-            text: 'Okay...',
+            text: 'Then I choose a channeler?',
             type: 'navigate',
             id: 5,
           },
@@ -365,7 +368,25 @@ export const pokemonTowerTasks: Task[] = [
         id: 5,
         title: 'Mysterious Girl',
         message:
-          'Finally you will need a psychic Pokemon of sufficient power to perform the actual channeling, for something like this though a Rattata would probably do, but best use a Psychic Pokemon for safety. Goodbye {Trainer} Good Luck.',
+          "Yes. Any Pokémon can carry an echo, provided it is experienced enough. Some memories favour a certain type or even a specific form, so read each channeler's requirements before beginning.",
+        buttons: [
+          {
+            text: "And for Mr. Fuji's glasses?",
+            type: 'navigate',
+            id: 6,
+          },
+        ],
+        background: '/backgrounds/pkmn-tower.avif',
+        icon: {
+          type: 'trainer',
+          id: 'psychic-f',
+        },
+      },
+      {
+        id: 6,
+        title: 'Mysterious Girl',
+        message:
+          "Use a partner at level 5 or higher. Any Pokémon can succeed, but a Psychic type would be the most suitable for a first attempt. Keep the connection gentle, {Trainer}.",
         buttons: [
           {
             text: 'I never told you my name...',

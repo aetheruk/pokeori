@@ -881,9 +881,7 @@ function PokemonPickerDialog({
                         )}
                       >
                         LVL {entry.level}
-                        {ineligibilityReason
-                          ? ` · ${ineligibilityReason.replace(/^This channeling requires /, 'Needs ').replace(/\.$/, '')}`
-                          : ''}
+                        {ineligibilityReason ? ` · ${ineligibilityReason}` : ''}
                       </span>
                     </span>
                   </button>
