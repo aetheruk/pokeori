@@ -38,8 +38,9 @@ dump.rdb
 # Source data (not needed in Docker)
 source_data/
 
-# Scripts (dev only)
-scripts/
+# Scripts (dev only, except the bundled production Chronicle reset)
+scripts/*
+!scripts/reset-gym-chronicles-v2.ts
 
 # Tools (dev only)
 tools/

@@ -39,8 +39,8 @@ RUN --mount=type=secret,id=DATABASE_URI,required=false \
     export RESEND_API_KEY="$(cat /run/secrets/RESEND_API_KEY 2>/dev/null || printf 're_pokeori-build-only-placeholder')" && \
     export REDIS_URL="$(cat /run/secrets/REDIS_URL 2>/dev/null || printf 'redis://127.0.0.1:6379')" && \
     export NEXT_SERVER_ACTIONS_ENCRYPTION_KEY="$(cat /run/secrets/NEXT_SERVER_ACTIONS_ENCRYPTION_KEY 2>/dev/null || printf 'cG9rZW9yaS1idWlsZC1vbmx5LWtleS0wMDAwMDAwMDA=')" && \
-    bun --bun next build --turbopack && \
-    bun build scripts/reset-gym-chronicles-v2.ts --target=bun --outfile .next/reset-gym-chronicles-v2.js
+    bun build scripts/reset-gym-chronicles-v2.ts --target=bun --outfile /tmp/reset-gym-chronicles-v2.js && \
+    bun --bun next build --turbopack
 
 # Production image: Bun runs the generated standalone Next.js server.
 FROM base AS runner
@@ -56,7 +56,7 @@ COPY --from=builder --chown=pokeori:pokeori /app/public ./public
 
 COPY --from=builder --chown=pokeori:pokeori /app/.next/standalone ./
 COPY --from=builder --chown=pokeori:pokeori /app/.next/static ./.next/static
-COPY --from=builder --chown=pokeori:pokeori /app/.next/reset-gym-chronicles-v2.js ./scripts/reset-gym-chronicles-v2.js
+COPY --from=builder --chown=pokeori:pokeori /tmp/reset-gym-chronicles-v2.js ./scripts/reset-gym-chronicles-v2.js
 
 USER pokeori
 
