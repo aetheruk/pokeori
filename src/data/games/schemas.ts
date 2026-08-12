@@ -1001,6 +1001,37 @@ const settingsByGameType: Record<string, z.ZodTypeAny> = {
       paletteSize: z.number().int().min(2).max(16).optional(),
     })
     .strict(),
+  'procedure-order': z
+    .object({
+      cards: z
+        .array(
+          z
+            .object({
+              id: z.string().regex(/^[a-z0-9-]+$/),
+              label: z.string().min(1).max(80),
+              description: z.string().min(1).max(180).optional(),
+              icon: taskIconSchema.optional(),
+            })
+            .strict(),
+        )
+        .min(3)
+        .max(12),
+      timeLimit: z.number().int().min(30).max(300),
+      maxSubmissions: z.number().int().min(1).max(5),
+      themeColour: z.string().min(1).optional(),
+      background: z.string().min(1).optional(),
+    })
+    .strict()
+    .superRefine((settings, context) => {
+      const ids = settings.cards.map((card) => card.id)
+      if (new Set(ids).size !== ids.length) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['cards'],
+          message: 'Procedure Order card IDs must be unique.',
+        })
+      }
+    }),
   'battle-bets': z
     .object({
       houseEdge: z.number().min(0).max(0.25),

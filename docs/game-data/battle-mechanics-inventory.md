@@ -1,6 +1,8 @@
 # Battle Mechanics Inventory
 
-Last reviewed: 2026-08-04
+Last reviewed: 2026-08-12
+
+Release 0.13.0 adds no new move or ability definitions. The rebuilt Gym Leader Chronicles now assign canonical existing moves per enemy and per-activity player loadout, use `trainer` through `boss` AI profiles, and lower attack-telegraph rates by anthology progression from Brock (70%) to Giovanni (20%).
 
 This document tracks authored Pokemon abilities, battle moves, TMs, field TMs, and power systems. Keep it in sync with:
 

@@ -4,6 +4,14 @@ import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
 
 export type ExpeditionActivityType = 'battle' | 'location' | 'game' | 'field-research' | 'task'
 
+export type ChronicleNarrativePhase =
+  | 'backstory'
+  | 'development'
+  | 'conflict'
+  | 'contemplation'
+  | 'resolution'
+  | 'reflection'
+
 export type ExpeditionActivityPool = Partial<Record<ExpeditionActivityType, string[]>>
 
 export interface ExpeditionActivityNode {
@@ -21,6 +29,8 @@ export interface ExpeditionActivityNode {
   categories?: ExpeditionActivityType[]
   // Backward-compatible alias for categories.
   activityTypes?: ExpeditionActivityType[]
+  phase?: ChronicleNarrativePhase
+  phaseTitle?: string
 }
 
 export interface ExpeditionBranchOption {
@@ -115,6 +125,14 @@ export interface ExpeditionChronicleConfig {
   battleTeam?: ExpeditionChroniclePokemonConfig[]
   battleItems?: Record<string, number>
   balls?: Record<string, number>
+  activityLoadouts?: Record<
+    string,
+    {
+      battleTeam?: ExpeditionChroniclePokemonConfig[]
+      battleItems?: Record<string, number>
+      balls?: Record<string, number>
+    }
+  >
 }
 
 export interface ExpeditionConfig {
@@ -156,6 +174,8 @@ export interface ExpeditionGeneratedStep {
   attempts: number
   status: 'pending' | 'completed'
   completedAt?: string
+  phase?: ChronicleNarrativePhase
+  phaseTitle?: string
 }
 
 export type ExpeditionRunStatus = 'active' | 'ready_to_claim'

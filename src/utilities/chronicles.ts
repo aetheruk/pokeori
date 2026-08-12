@@ -62,6 +62,15 @@ export async function getActiveChronicleContext(params: {
   return {
     expeditionId: activeRun.expeditionId,
     expeditionName: activeRun.expeditionName,
-    chronicle,
+    chronicle: (() => {
+      const loadout = chronicle.activityLoadouts?.[params.activityId]
+      if (!loadout) return chronicle
+      return {
+        ...chronicle,
+        battleTeam: loadout.battleTeam ?? chronicle.battleTeam,
+        battleItems: loadout.battleItems ?? chronicle.battleItems,
+        balls: loadout.balls ?? chronicle.balls,
+      }
+    })(),
   }
 }

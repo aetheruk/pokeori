@@ -5,6 +5,7 @@ import {
 import { KANTO_GYM_CHRONICLES, type KantoGymChronicleKey } from '@/data/gym-leader-chronicles'
 import type {
   ExpeditionActivityPool,
+  ExpeditionChronicleConfig,
   ExpeditionChroniclePokemonConfig,
   ExpeditionConfig,
 } from '../types'
@@ -12,7 +13,8 @@ import type {
 const battleTeams: Record<KantoGymChronicleKey, ExpeditionChroniclePokemonConfig[]> = {
   brock: [
     { speciesId: 74, formId: '74', name: 'Geodude', level: 12, assignedMoves: ['rock-throw', 'harden'] },
-    { speciesId: 95, formId: '95', name: 'Onix', level: 14, assignedMoves: ['bind', 'headbutt', 'rock-slide'] },
+    { speciesId: 111, formId: '111', name: 'Rhyhorn', level: 14, assignedMoves: ['horn-attack', 'stomp', 'tail-whip'] },
+    { speciesId: 95, formId: '95', name: 'Onix', level: 16, assignedMoves: ['bind', 'headbutt', 'rock-slide'] },
   ],
   misty: [
     { speciesId: 121, formId: '121', name: 'Starmie', level: 21, assignedMoves: ['water-gun', 'confusion', 'recover', 'swift'] },
@@ -52,12 +54,80 @@ const battleTeams: Record<KantoGymChronicleKey, ExpeditionChroniclePokemonConfig
   ],
 }
 
+type ChronicleActivityLoadout = NonNullable<
+  ExpeditionChronicleConfig['activityLoadouts']
+>
+
+const activityLoadouts: Record<KantoGymChronicleKey, ChronicleActivityLoadout> = {
+  brock: {
+    'chronicle-v2-brock-first-challenger': {
+      battleTeam: [
+        { speciesId: 74, formId: '74', name: 'Geodude', level: 12, assignedMoves: ['rock-throw', 'harden', 'tackle'] },
+        { speciesId: 95, formId: '95', name: 'Onix', level: 14, assignedMoves: ['bind', 'headbutt', 'rock-throw'] },
+      ],
+    },
+    'chronicle-v2-brock-league-examiner': { battleTeam: battleTeams.brock },
+  },
+  misty: {
+    'chronicle-v2-misty-service-gyarados': {
+      battleTeam: [
+        { speciesId: 121, formId: '121', name: 'Starmie', level: 21, assignedMoves: ['water-gun', 'confusion', 'recover', 'swift'] },
+        { speciesId: 54, formId: '54', name: 'Psyduck', level: 18, assignedMoves: ['water-gun', 'confusion', 'disable', 'tail-whip'] },
+      ],
+      battleItems: { 'battle-potion': 2 },
+    },
+    'chronicle-v2-misty-daisys-challenge': {
+      battleTeam: [...battleTeams.misty, { speciesId: 120, formId: '120', name: 'Staryu', level: 20, assignedMoves: ['water-gun', 'swift', 'recover'] }],
+    },
+  },
+  surge: {
+    'chronicle-v2-surge-makos-drill': {
+      battleTeam: [
+        { speciesId: 26, formId: '26', name: 'Raichu', level: 29, assignedMoves: ['thunder-shock', 'thunder-wave', 'quick-attack'] },
+        { speciesId: 100, formId: '100', name: 'Voltorb', level: 26, assignedMoves: ['spark', 'swift', 'screech'] },
+      ],
+    },
+    'chronicle-v2-surge-substation-magneton': { battleTeam: battleTeams.surge, battleItems: { 'battle-super-potion': 2 } },
+    'chronicle-v2-surge-league-assessment': {
+      battleTeam: [...battleTeams.surge, { speciesId: 25, formId: '25', name: 'Pikachu', level: 27, assignedMoves: ['thunder-shock', 'quick-attack', 'double-team'] }],
+    },
+  },
+  erika: {
+    'chronicle-v2-erika-exhibition-rival': { battleTeam: battleTeams.erika },
+    'chronicle-v2-erika-league-steward': {
+      battleTeam: [...battleTeams.erika, { speciesId: 45, formId: '45', name: 'Vileplume', level: 30, assignedMoves: ['mega-drain', 'acid', 'sleep-powder', 'stun-spore'] }],
+    },
+  },
+  koga: {
+    'chronicle-v2-koga-decoy-thief': { battleTeam: battleTeams.koga.slice(0, 2) },
+    'chronicle-v2-koga-tunnel-culprit': { battleTeam: battleTeams.koga },
+    'chronicle-v2-koga-ren-succession': {
+      battleTeam: [...battleTeams.koga, { speciesId: 24, formId: '24', name: 'Arbok', level: 35, assignedMoves: ['glare', 'acid', 'bite', 'screech'] }],
+    },
+  },
+  sabrina: {
+    'chronicle-v2-sabrina-unstable-porygon': { battleTeam: battleTeams.sabrina.slice(0, 2), battleItems: { 'battle-super-potion': 2 } },
+    'chronicle-v2-sabrina-koichis-focus-test': { battleTeam: battleTeams.sabrina },
+  },
+  blaine: {
+    'chronicle-v2-blaine-orins-demonstration': { battleTeam: battleTeams.blaine.slice(0, 2) },
+    'chronicle-v2-blaine-escaped-magmar': { battleTeam: battleTeams.blaine.slice(0, 3), battleItems: { 'battle-hyper-potion': 1, 'battle-super-potion': 2 } },
+    'chronicle-v2-blaine-league-assessment': { battleTeam: battleTeams.blaine },
+  },
+  giovanni: {
+    'chronicle-v2-giovanni-relief-raiders': { battleTeam: battleTeams.giovanni.slice(0, 3) },
+    'chronicle-v2-giovanni-league-assessment': { battleTeam: battleTeams.giovanni },
+  },
+}
+
 export const gymLeaderChronicleExpeditions: ExpeditionConfig[] = KANTO_GYM_CHRONICLES.map(
   (chronicle) => {
     const story = KANTO_GYM_CHRONICLE_STORIES[chronicle.key]
     const activities = story.sequence.map((beat) => ({
       type: beat.type === 'scene' ? ('task' as const) : beat.type,
       id: beat.id,
+      phase: beat.phase,
+      phaseTitle: beat.phaseTitle,
     }))
     const activityPool = activities.reduce<ExpeditionActivityPool>((pool, activity) => {
       const ids = pool[activity.type] ?? []
@@ -83,6 +153,7 @@ export const gymLeaderChronicleExpeditions: ExpeditionConfig[] = KANTO_GYM_CHRON
         battleTeam: battleTeams[chronicle.key],
         battleItems: { 'battle-potion': 3, 'battle-super-potion': 1 },
         balls: { 'poke-ball': 3, 'great-ball': 1 },
+        activityLoadouts: activityLoadouts[chronicle.key],
       },
       requirements: [
         { type: 'task_completed', targetId: chronicle.markerId },
@@ -100,6 +171,8 @@ export const gymLeaderChronicleExpeditions: ExpeditionConfig[] = KANTO_GYM_CHRON
         id: `${chronicle.key}-chronicle-step-${index + 1}`,
         activityType: activity.type,
         activityId: chronicleActivityId(chronicle.key, activity.id),
+        phase: activity.phase,
+        phaseTitle: activity.phaseTitle,
         secret: true,
       })),
       rewards: [

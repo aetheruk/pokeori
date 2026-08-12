@@ -155,10 +155,7 @@ export function normalizeKidModeExpeditionSteps(params: {
   steps: ExpeditionGeneratedStep[]
   currentStepIndex: number
 } {
-  if (
-    !params.kidMode ||
-    params.expeditionId !== 'pallet-town-orientation'
-  ) {
+  if (!params.kidMode || params.expeditionId !== 'pallet-town-orientation') {
     return {
       changed: false,
       steps: params.steps,
@@ -400,6 +397,8 @@ function buildStepsForNodes(
         activityType: selected.activityType,
         activityId: selected.activityId,
         activityName: activity.name,
+        phase: node.phase,
+        phaseTitle: node.phaseTitle,
         branchId,
         attempts: 0,
         status: 'pending',

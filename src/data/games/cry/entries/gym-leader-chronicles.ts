@@ -2,7 +2,7 @@ import type { CryConfig } from '../types'
 
 export const gymLeaderChronicleCryEntries: CryConfig[] = [
   {
-    id: 'chronicle-misty-listen-across-the-water',
+    id: 'chronicle-v2-misty-listen-across-the-water',
     name: "Follow Horsea's Call",
     description: 'Pick Horsea out from the wild Pokemon calls echoing around Cerulean Cape.',
     category: 'Secret',
@@ -15,12 +15,12 @@ export const gymLeaderChronicleCryEntries: CryConfig[] = [
     settings: {
       pokemonPool: [54, 86, 116, 118, 120, 129],
       optionsPool: [],
-      timeLimit: 30,
-      winRate: 5,
+      timeLimit: 50,
+      winRate: 7,
     },
   },
   {
-    id: 'chronicle-surge-voices-in-the-dark',
+    id: 'chronicle-v2-surge-voices-in-the-dark',
     name: 'Voices in the Dark',
     description: 'Identify the Pokémon calling from different rooms while the Gym shelters Vermilion.',
     category: 'Secret',
@@ -33,8 +33,8 @@ export const gymLeaderChronicleCryEntries: CryConfig[] = [
     settings: {
       pokemonPool: [25, 26, 81, 82, 100, 125],
       optionsPool: [],
-      timeLimit: 30,
-      winRate: 5,
+      timeLimit: 45,
+      winRate: 7,
     },
   },
 ]
