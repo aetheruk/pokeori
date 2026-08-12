@@ -11,13 +11,16 @@ import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
 import { getIcon, getTitle } from '@/data/user'
 import { searchTrainers } from '@/app/(frontend)/game/trainer/actions'
-import { selectRivalTrainer } from '@/app/(frontend)/game/rivals/actions'
+import {
+  selectRivalTrainer,
+  type SelectRivalResult,
+} from '@/app/(frontend)/game/rivals/actions'
 
 interface RivalSelectionDialogProps {
   taskId: string
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSuccess: () => void | Promise<void>
+  onSuccess: (result: SelectRivalResult) => void | Promise<void>
 }
 
 type TrainerSearchResult = {
@@ -78,7 +81,7 @@ export function RivalSelectionDialog({
       const result = await selectRivalTrainer(trainerId, taskId)
       if (result.success) {
         toast.success(`${result.rivalName || 'Rival'} is now your rival.`)
-        await onSuccess()
+        await onSuccess(result)
         onOpenChange(false)
       } else {
         toast.error(result.error || 'Failed to choose rival.')

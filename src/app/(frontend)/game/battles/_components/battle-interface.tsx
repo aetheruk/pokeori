@@ -38,6 +38,7 @@ import { ResearchLevelUpModal } from '@/app/(frontend)/game/pokedex/_components/
 import { VSAnimation } from '@/components/game/battles/VSAnimation'
 import { LevelUpModal } from '@/components/game/level-up-modal'
 import { GameResult } from '@/components/game/ResearchResult'
+import { markExpeditionReturn } from '@/components/game/features/explore/expedition-return'
 import { TaskExitDialog } from '@/components/game/task-exit-dialog'
 import { useUser } from '@/context/UserContext'
 import { battles } from '@/data/battles'
@@ -921,6 +922,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
               ) : undefined
             }
             onReturn={async () => {
+              markExpeditionReturn(expeditionProgress?.expeditionId)
               await clearBattleState()
               refreshUser(true)
               router.replace('/game/explore')

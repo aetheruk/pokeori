@@ -16,13 +16,17 @@ import {
   checkTaskCriteria,
   checkTaskRequirements,
 } from '@/utilities/tasks/task-logic'
-import { recordExpeditionActivityResult } from '@/utilities/expeditions/actions'
+import {
+  recordExpeditionActivityResult,
+  type ExpeditionProgressSnapshot,
+} from '@/utilities/expeditions/actions'
 import { getUserCompletedTasksMap, setUserCompletedTasksMap } from '@/utilities/user-state'
 
-type SelectRivalResult = {
+export type SelectRivalResult = {
   success: boolean
   error?: string
   rivalName?: string
+  expeditionProgress?: ExpeditionProgressSnapshot
 }
 
 export async function selectRivalTrainer(
@@ -122,9 +126,14 @@ export async function selectRivalTrainer(
 
   await Promise.all(writes)
 
-  if (taskId) {
-    await recordExpeditionActivityResult(freshUser.id, 'task', taskId, true)
-  }
+  const expeditionResult = taskId
+    ? await recordExpeditionActivityResult(
+        freshUser.id,
+        'task',
+        taskId,
+        true,
+      )
+    : undefined
 
   revalidatePath('/game')
   revalidatePath('/game/explore')
@@ -132,5 +141,6 @@ export async function selectRivalTrainer(
   return {
     success: true,
     rivalName: rivalUser.trainerName || 'Rival',
+    expeditionProgress: expeditionResult?.expedition,
   }
 }

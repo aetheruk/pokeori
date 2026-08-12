@@ -1,6 +1,12 @@
 'use client'
 
-import { ArrowDown, ArrowUp, GripVertical, ListChecks } from 'lucide-react'
+import {
+  ArrowDown,
+  ArrowUp,
+  CircleHelp,
+  GripVertical,
+  ListChecks,
+} from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -13,6 +19,13 @@ import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
 import type {
@@ -66,6 +79,7 @@ export function ProcedureOrderGame({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [feedback, setFeedback] = useState<string | null>(null)
   const [result, setResult] = useState<any | null>(null)
+  const [helpOpen, setHelpOpen] = useState(false)
 
   const finish = useCallback(
     async (success: boolean, message: string) => {
@@ -161,7 +175,7 @@ export function ProcedureOrderGame({
   }
 
   return (
-    <div className="relative min-h-dvh overflow-hidden bg-game-night-canvas text-game-night-ink">
+    <div className="relative h-dvh min-h-0 overflow-hidden bg-game-night-canvas text-game-night-ink">
       <Image
         src={encounter.background || '/backgrounds/forest.avif'}
         alt=""
@@ -171,32 +185,44 @@ export function ProcedureOrderGame({
       />
       <div className="absolute inset-0 bg-game-night-canvas/65" />
 
-      <main className="game-desktop-activity-stage relative z-10 mx-auto flex min-h-dvh w-full max-w-5xl flex-col px-4 py-5 md:px-8 md:py-8">
-        <header className="mb-4 flex items-start justify-between gap-4 rounded-xl border border-game-border bg-game-surface/95 p-4 text-game-ink shadow-sm">
-          <div className="min-w-0">
-            <p className="game-field-label">Procedure</p>
-            <h1 className="mt-1 font-display text-2xl font-semibold">
-              {encounter.name}
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-game-muted">
-              {encounter.description}
-            </p>
-          </div>
-          <GameTimer timeLeft={timeLeft} totalTime={timeLimit} />
-        </header>
+      <div className="absolute left-4 top-4 z-30">
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="h-12 w-12 rounded-full border-game-border-strong bg-game-surface-raised/95 text-game-moss-strong shadow-sm backdrop-blur-sm"
+          onClick={() => setHelpOpen(true)}
+          aria-label="How to play"
+        >
+          <CircleHelp className="h-5 w-5" />
+        </Button>
+      </div>
 
-        <section className="game-panel flex-1 p-4 md:p-6">
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-sm text-game-muted">
-              <ListChecks className="h-4 w-4 text-game-moss-strong" />
-              Arrange every step, then check the procedure.
+      <div className="absolute right-4 top-4 z-30">
+        <GameTimer timeLeft={timeLeft} totalTime={timeLimit} />
+      </div>
+
+      <main className="game-desktop-activity-stage relative z-10 mx-auto flex h-dvh min-h-0 w-full max-w-5xl flex-col px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-20 sm:px-4 md:px-8 md:pb-8 md:pt-20">
+        <section className="game-panel mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col overflow-hidden p-3 md:p-5">
+          <div className="mb-3 flex shrink-0 items-start justify-between gap-3 border-b border-game-border pb-3">
+            <div className="min-w-0">
+              <h1 className="truncate font-display text-lg font-semibold text-game-ink sm:text-xl">
+                {encounter.name}
+              </h1>
+              <div className="mt-1 flex items-center gap-2 text-xs text-game-muted sm:text-sm">
+                <ListChecks className="h-4 w-4 shrink-0 text-game-moss-strong" />
+                <span>Arrange the steps, then check your order.</span>
+              </div>
             </div>
-            <span className="rounded-full border border-game-border bg-game-surface-raised px-3 py-1 font-mono text-xs text-game-muted">
-              {Math.max(0, maxSubmissions - submissions)} checks left
+            <span className="shrink-0 rounded-full border border-game-border bg-game-surface-raised px-2.5 py-1 font-mono text-xs text-game-muted">
+              {Math.max(0, maxSubmissions - submissions)} checks
             </span>
           </div>
 
-          <ol className="space-y-2" aria-label="Ordered procedure steps">
+          <ol
+            className="custom-scrollbar min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain pr-1"
+            aria-label="Ordered procedure steps"
+          >
             {cards.map((card, index) => (
               <li
                 key={card.id}
@@ -214,14 +240,14 @@ export function ProcedureOrderGame({
                   playSfx('select')
                 }}
                 className={cn(
-                  'grid grid-cols-[2.25rem_2.75rem_minmax(0,1fr)_5.5rem] items-center gap-2 rounded-lg border border-game-border bg-game-surface-raised p-2 text-game-ink shadow-sm',
+                  'grid grid-cols-[1.75rem_2.5rem_minmax(0,1fr)_5.25rem] items-center gap-1.5 rounded-lg border border-game-border bg-game-surface-raised p-1.5 text-game-ink shadow-sm sm:grid-cols-[2.25rem_2.75rem_minmax(0,1fr)_5.5rem] sm:gap-2 sm:p-2',
                   !gameEnded && 'cursor-grab active:cursor-grabbing',
                 )}
               >
-                <span className="flex h-9 w-9 items-center justify-center font-mono text-sm font-bold text-game-moss-strong">
+                <span className="flex h-9 items-center justify-center font-mono text-sm font-bold text-game-moss-strong">
                   {index + 1}
                 </span>
-                <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-game-border bg-game-surface">
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-game-border bg-game-surface sm:h-10 sm:w-10">
                   {card.icon ? (
                     <TaskIconDisplay icon={card.icon} className="h-7 w-7" />
                   ) : (
@@ -229,9 +255,11 @@ export function ProcedureOrderGame({
                   )}
                 </span>
                 <span className="min-w-0">
-                  <span className="block font-semibold">{card.label}</span>
+                  <span className="block text-sm font-semibold leading-tight sm:text-base">
+                    {card.label}
+                  </span>
                   {card.description ? (
-                    <span className="mt-0.5 block text-xs leading-relaxed text-game-muted">
+                    <span className="mt-0.5 hidden text-xs leading-relaxed text-game-muted sm:block">
                       {card.description}
                     </span>
                   ) : null}
@@ -264,27 +292,47 @@ export function ProcedureOrderGame({
             ))}
           </ol>
 
-          <div className="mt-5 min-h-12">
+          <div className="mt-3 shrink-0 border-t border-game-border pt-3">
             {feedback ? (
               <p
-                className="rounded-lg border border-game-clay/40 bg-game-clay/10 p-3 text-sm text-game-ink"
+                className="mb-3 rounded-lg border border-game-clay/40 bg-game-clay/10 p-3 text-sm text-game-ink"
                 role="status"
               >
                 {feedback}
               </p>
             ) : null}
-          </div>
 
-          <Button
-            type="button"
-            onClick={() => void submit()}
-            disabled={!gameStarted || gameEnded || isSubmitting}
-            className="mt-2 min-h-11 w-full"
-          >
-            {isSubmitting ? 'Checking sequence…' : 'Check procedure'}
-          </Button>
+            <Button
+              type="button"
+              onClick={() => void submit()}
+              disabled={!gameStarted || gameEnded || isSubmitting}
+              className="min-h-11 w-full"
+            >
+              {isSubmitting ? 'Checking sequence…' : 'Check procedure'}
+            </Button>
+          </div>
         </section>
       </main>
+
+      <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>How to play {encounter.name}</DialogTitle>
+            <DialogDescription>{encounter.description}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 text-sm leading-relaxed text-game-ink">
+            <p>
+              Arrange all of the steps so each ingredient is prepared before it
+              is used. More than one order may be safe when two steps do not
+              depend on one another.
+            </p>
+            <p>
+              Drag a step into place, or use its arrow buttons. You have{' '}
+              <strong>{maxSubmissions} checks</strong> before the attempt ends.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {result ? (
         <RewardResultOverlay

@@ -194,6 +194,12 @@ function ExploreListContent({
   const activeExpeditionLabel = activeExpeditionConfig?.chronicle
     ? 'Chronicle'
     : 'Expedition'
+  const completionExpeditionProgress = actions.completionResult?.expeditionProgress
+  const completionResultLabel = completionExpeditionProgress?.isChronicle
+    ? 'CHRONICLE STEP'
+    : completionExpeditionProgress
+      ? 'EXPEDITION STEP'
+      : 'TASK'
 
   useEffect(() => {
     if (!getExpeditionReturn()) {
@@ -225,31 +231,22 @@ function ExploreListContent({
     const returnExpeditionId = getExpeditionReturn()
     if (!returnExpeditionId || actions.selectedItem) return
 
-    if (!activeExpedition) {
-      clearExpeditionReturn()
-      return
-    }
-
-    if (activeExpedition.expeditionId !== returnExpeditionId) {
-      clearExpeditionReturn()
-      return
-    }
-
-    const isReturnTargetActive =
-      activeExpedition.status === 'active' ||
-      activeExpedition.status === 'ready_to_claim'
-
-    if (!isReturnTargetActive) {
-      clearExpeditionReturn()
-      return
-    }
-
     const expeditionItem = allUnlockedItems.find(
       (item) => item.type === 'expedition' && item.id === returnExpeditionId,
     )
+    const expeditionDefinition = expeditions.find(
+      (entry) => entry.id === returnExpeditionId,
+    )
+
+    clearExpeditionReturn()
     if (expeditionItem) {
-      clearExpeditionReturn()
       actions.setSelectedItem(expeditionItem)
+    } else if (expeditionDefinition) {
+      actions.setSelectedItem({
+        ...expeditionDefinition,
+        type: 'expedition',
+        originalData: expeditionDefinition,
+      } as any)
     }
   }, [activeExpedition, actions, allUnlockedItems, hasSyncedExpeditionReturn])
 
@@ -462,19 +459,31 @@ function ExploreListContent({
 
       <RewardResultOverlay
         result={actions.completionResult}
-        onClose={() => actions.setCompletionResult(null)}
+        onClose={() => {
+          const expeditionId = actions.completionResult?.expeditionProgress?.expeditionId
+          actions.setCompletionResult(null)
+          if (expeditionId) {
+            void actions.reopenExpeditionPanel(expeditionId)
+          }
+        }}
         icon={actions.lastCompletedTask?.icon}
         iconAlt={actions.lastCompletedTask?.name || 'Task'}
-        title="TASK COMPLETE!"
+        title={`${completionResultLabel} ${
+          actions.completionResult?.success ? 'COMPLETE!' : 'FAILED'
+        }`}
         message={
-          <>
-            You completed &quot;
-            {parseText(
-              actions.lastCompletedTask?.name || undefined,
-              trainerName,
-            )}
-            &quot;!
-          </>
+          actions.completionResult?.success ? (
+            <>
+              You completed &quot;
+              {parseText(
+                actions.lastCompletedTask?.name || undefined,
+                trainerName,
+              )}
+              &quot;!
+            </>
+          ) : (
+            actions.completionResult?.message || 'This step was not completed.'
+          )
         }
       />
 
@@ -629,14 +638,12 @@ function ExploreListContent({
                   : await completeTask(task.id, undefined, crypto.randomUUID())
               if (result.success) {
                 if (isExpeditionTaskFlow) {
-                  await actions.reopenExpeditionPanel(
-                    (userData as any).activeExpedition?.expeditionId,
-                  )
+                  actions.setSelectedItem(null)
                 } else {
                   actions.setSelectedItem(null)
                 }
                 actions.setCompletionResult(result)
-                refreshUser()
+                await refreshUser()
               } else {
                 const { toast } = require('sonner')
                 toast.error(result.message || 'Failed to complete task')
@@ -664,15 +671,19 @@ function ExploreListContent({
               actions.setExpeditionEnterModalTaskId(null)
             }
           }}
-          onSuccess={async () => {
+          onSuccess={async (result) => {
             const task = actions.rivalSelectionTask
             const isExpeditionTaskFlow =
               !!task && actions.expeditionEnterModalTaskId === task.id
 
             if (isExpeditionTaskFlow) {
-              await actions.reopenExpeditionPanel(
-                (userData as any).activeExpedition?.expeditionId,
-              )
+              actions.setSelectedItem(null)
+              actions.setLastCompletedTask(task)
+              actions.setCompletionResult({
+                success: true,
+                message: `${result.rivalName || 'Your rival'} was selected.`,
+                expeditionProgress: result.expeditionProgress,
+              })
             } else {
               actions.setSelectedItem(null)
             }

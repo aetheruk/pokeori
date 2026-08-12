@@ -16,7 +16,10 @@ import { revalidatePath } from 'next/cache'
 import type { Pokemon, User } from '@/payload-types'
 import { getGameUserData } from '@/utilities/game-data'
 import { analyzeRequirements } from '@/utilities/requirements/analysis'
-import { recordExpeditionActivityResult } from '@/utilities/expeditions/actions'
+import {
+  recordExpeditionActivityResult,
+  type ExpeditionProgressSnapshot,
+} from '@/utilities/expeditions/actions'
 import { resolveTaskPokemonOrigin } from '@/utilities/pokemon/origin'
 import {
   getUserCompletedTasksMap,
@@ -69,6 +72,7 @@ export interface CompleteTaskResult {
   message?: string
   exitModal?: TaskExitModal
   rewards?: RewardSummary
+  expeditionProgress?: ExpeditionProgressSnapshot
 }
 
 export async function completeTask(
@@ -393,9 +397,24 @@ export async function completeTask(
     })
   }
 
-  await recordExpeditionActivityResult(user.id, 'task', taskId, true, { payload, req })
+  const expeditionResult = await recordExpeditionActivityResult(
+    user.id,
+    'task',
+    taskId,
+    true,
+    { payload, req },
+  )
 
-  return { success: true, rewards: summary, exitModal: task.exitModal }
+  ;(summary as RewardSummary & {
+    expeditionProgress?: ExpeditionProgressSnapshot
+  }).expeditionProgress = expeditionResult.expedition
+
+  return {
+    success: true,
+    rewards: summary,
+    exitModal: task.exitModal,
+    expeditionProgress: expeditionResult.expedition,
+  }
       },
     )
 

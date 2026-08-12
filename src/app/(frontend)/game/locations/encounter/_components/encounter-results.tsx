@@ -3,6 +3,7 @@ import nextDynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { GameResult } from '@/components/game/ResearchResult'
+import { markExpeditionReturn } from '@/components/game/features/explore/expedition-return'
 import { TaskExitDialog } from '@/components/game/task-exit-dialog'
 import { Button } from '@/components/ui/button'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
@@ -261,6 +262,7 @@ export function EncounterResults({
         }
         returnText="Continue"
         onReturn={() => {
+          markExpeditionReturn(expeditionProgress?.expeditionId)
           refreshUser()
           router.push('/game/explore')
         }}
