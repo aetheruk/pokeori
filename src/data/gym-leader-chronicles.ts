@@ -60,7 +60,7 @@ export const KANTO_GYM_CHRONICLES = [
   {
     key: 'koga', leaderName: 'Koga', badgeItemId: 'badge-kanto-soul', badgeName: 'Soul Badge',
     markerId: 'soul-badge-memory-revealed', expeditionId: 'koga-soul-badge-chronicle',
-    title: "The Daughter's Method", playerTitle: 'Fuchsia Gym Leader', trainerIconId: 'gym-kanto-koga',
+    title: 'The Unwritten Path', playerTitle: 'Fuchsia Gym Leader', trainerIconId: 'gym-kanto-koga',
     trainerSprite: '/sprites/trainers/gym/kanto/koga.avif', background: '/backgrounds/chronicle-koga-training-courtyard.avif',
     energyType: 'poison', energyAmount: 34, channelerMinLevel: 25, explorerXp: 600,
   },

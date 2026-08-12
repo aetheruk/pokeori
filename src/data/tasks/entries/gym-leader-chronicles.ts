@@ -49,7 +49,13 @@ const storyTasks: Task[] = KANTO_GYM_CHRONICLES.flatMap((chronicle) => {
         icon:
           panel.kind === 'speech'
             ? panel.speaker.icon
-            : { type: 'item' as const, id: chronicle.badgeItemId },
+            : {
+                type: 'item' as const,
+                id:
+                  panel.icon === 'incense'
+                    ? 'incense-memory'
+                    : chronicle.badgeItemId,
+              },
         title: panel.kind === 'speech' ? panel.speaker.name : scene.title,
         message: panel.message,
         background: panel.background ?? scene.background,

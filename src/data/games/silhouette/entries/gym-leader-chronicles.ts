@@ -2,7 +2,7 @@ import type { SilhouetteConfig } from '../types'
 
 export const gymLeaderChronicleSilhouetteEntries: SilhouetteConfig[] = [
   {
-    id: 'chronicle-koga-read-the-shadow-marks',
+    id: 'chronicle-v2-koga-read-the-shadow-marks',
     name: 'Read the Shadow Marks',
     description: 'Identify the Pokémon represented in Koga’s succession exercises.',
     category: 'Secret',
@@ -15,12 +15,12 @@ export const gymLeaderChronicleSilhouetteEntries: SilhouetteConfig[] = [
     settings: {
       pokemonPool: [23, 24, 48, 49, 88, 109],
       optionsPool: [],
-      timeLimit: 35,
-      winRate: 5,
+      timeLimit: 45,
+      winRate: 8,
     },
   },
   {
-    id: 'chronicle-sabrina-find-the-true-shape',
+    id: 'chronicle-v2-sabrina-find-the-true-shape',
     name: 'Find the True Shape',
     description:
       'Separate Porygon’s real signal from the Pokémon shapes caught in the psychic feedback.',
@@ -34,8 +34,8 @@ export const gymLeaderChronicleSilhouetteEntries: SilhouetteConfig[] = [
     settings: {
       pokemonPool: [64, 92, 93, 96, 122, 137],
       optionsPool: [],
-      timeLimit: 35,
-      winRate: 5,
+      timeLimit: 45,
+      winRate: 8,
     },
   },
 ]

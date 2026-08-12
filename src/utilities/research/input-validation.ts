@@ -39,6 +39,20 @@ const slidingPuzzleAnswerSchema = z.object({
   moveTileIndex: z.number().int().min(0).max(255),
 })
 
+const procedureOrderAnswerSchema = z.object({
+  cardIds: z
+    .array(
+      z
+        .string()
+        .trim()
+        .min(1)
+        .max(80)
+        .regex(/^[a-z0-9-]+$/),
+    )
+    .min(3)
+    .max(12),
+})
+
 const encounterIdSchema = z
   .string()
   .trim()
@@ -84,6 +98,7 @@ const submitAnswerSchemas: Partial<Record<GameType, z.ZodType>> = {
   'field-observation': fieldObservationAnswerSchema,
   spelling: spellingAnswerSchema,
   'sliding-puzzle': slidingPuzzleAnswerSchema,
+  'procedure-order': procedureOrderAnswerSchema,
 }
 
 export function validateResearchAnswer(

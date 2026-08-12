@@ -8,7 +8,9 @@ export type {
 
 import { VoltorbGridGameConfig } from './types'
 import { route10VoltorbGridEntries } from './entries/route-10'
+import { gymLeaderChronicleVoltorbGridEntries } from './entries/gym-leader-chronicles'
 
 export const voltorbGridGames: VoltorbGridGameConfig[] = [
   ...route10VoltorbGridEntries,
+  ...gymLeaderChronicleVoltorbGridEntries,
 ]

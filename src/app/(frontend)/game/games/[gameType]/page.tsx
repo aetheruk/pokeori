@@ -13,6 +13,7 @@ import { MiningGame } from '@/app/(frontend)/game/research/encounter/mining'
 import { PachinkoGame } from '@/app/(frontend)/game/research/encounter/pachinko'
 import { PokemonSnapGame } from '@/app/(frontend)/game/research/encounter/pokemon-snap'
 import { PrizeWheelGame } from '@/app/(frontend)/game/research/encounter/prize-wheel'
+import { ProcedureOrderGame } from '@/app/(frontend)/game/research/encounter/procedure-order'
 import { QuickIdentifyGame } from '@/app/(frontend)/game/research/encounter/quick-identify'
 import { ResearchCompareGame } from '@/app/(frontend)/game/research/encounter/research-compare'
 import { RhythmGame } from '@/app/(frontend)/game/research/encounter/rhythm'
@@ -75,6 +76,7 @@ const GAME_COMPONENTS: Partial<Record<GameType, ComponentType<GameProps>>> = {
   'rock-tunnel-echo-map':
     RockTunnelEchoMapGame as unknown as ComponentType<GameProps>,
   'art-academy': ArtAcademyGame as unknown as ComponentType<GameProps>,
+  'procedure-order': ProcedureOrderGame as unknown as ComponentType<GameProps>,
   'battle-bets': BattleBetsGame as unknown as ComponentType<GameProps>,
 }
 

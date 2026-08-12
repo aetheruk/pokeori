@@ -133,6 +133,15 @@ function formatActivityLabel(activityType?: string): string {
   return activityType || 'Activity'
 }
 
+const CHRONICLE_PHASES = [
+  ['backstory', 'Backstory'],
+  ['development', 'Development'],
+  ['conflict', 'Conflict'],
+  ['contemplation', 'Contemplation'],
+  ['resolution', 'Resolution'],
+  ['reflection', 'Reflection'],
+] as const
+
 function getPokemonDisplayName(
   formId?: string | number,
   speciesId?: string | number,
@@ -274,6 +283,15 @@ export function ExpeditionModal({
     !!activeRun &&
     activeRun.status === 'active' &&
     expedition?.canAbandon !== false
+  const isChronicle = isChronicleExploreItem(item)
+  const currentPhase = activeRun
+    ? activeRun.steps?.[activeRun.currentStepIndex]?.phase
+    : undefined
+  const completedPhases = new Set(
+    (activeRun?.steps || [])
+      .filter((step: any) => step.status === 'completed' && step.phase)
+      .map((step: any) => step.phase),
+  )
 
   return (
     <ResponsivePanel
@@ -438,6 +456,52 @@ export function ExpeditionModal({
                   </>
                 )}
               </div>
+            </div>
+          )}
+
+          {isChronicle && (
+            <div className="space-y-4">
+              <SectionDivider>Memory folio</SectionDivider>
+              {!activeRun ? (
+                <div className="game-panel border-game-ochre/35 bg-game-ochre/10 p-4 text-sm leading-relaxed text-game-ink">
+                  Allow about 50–60 minutes. Progress saves after every scene
+                  and activity, but this memory occupies your one expedition
+                  slot until it is completed or abandoned.
+                </div>
+              ) : null}
+              <ol className="grid grid-cols-2 gap-2 md:grid-cols-3">
+                {CHRONICLE_PHASES.map(([phase, label], index) => {
+                  const isDone = completedPhases.has(phase)
+                  const isCurrent = currentPhase === phase
+                  return (
+                    <li
+                      key={phase}
+                      className={cn(
+                        'relative overflow-hidden rounded-lg border p-3',
+                        isDone
+                          ? 'border-game-moss/45 bg-game-moss/10'
+                          : isCurrent
+                            ? 'border-game-ochre/60 bg-game-ochre/10'
+                            : 'border-game-border bg-game-surface-raised',
+                      )}
+                    >
+                      <span className="font-mono text-[10px] text-game-muted">
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                      <span className="mt-1 block font-display text-sm font-semibold text-game-ink">
+                        {label}
+                      </span>
+                      <span className="mt-1 block text-[10px] font-semibold uppercase tracking-wider text-game-muted">
+                        {isDone
+                          ? 'Remembered'
+                          : isCurrent
+                            ? 'Current'
+                            : 'Unseen'}
+                      </span>
+                    </li>
+                  )
+                })}
+              </ol>
             </div>
           )}
 

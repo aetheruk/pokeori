@@ -78,6 +78,7 @@ import {
 } from '@/utilities/research/research-levels'
 import { maybeCreateFieldObservationEgg } from '@/utilities/day-care/eggs'
 import { getRequiredResearchWins } from '@/utilities/research/required-wins'
+import { validateProcedureOrder } from '@/utilities/research/procedure-order'
 import type { FieldObservationSettings } from '@/data/games/field-observation'
 import type { ArtAcademySettings } from '@/data/games/art-academy'
 import {
@@ -1026,6 +1027,16 @@ export async function startGameActivity(
           typeof gridSizeRaw === 'number' ? gridSizeRaw : 4
         const shuffleMoves = encounter.settings.shuffleMoves || 100
         roundData = generateSlidingPuzzleState(gridSize, shuffleMoves)
+      } else if (encounter.gameType === 'procedure-order') {
+        const cards = [...(encounter.settings.cards || [])]
+        for (let index = cards.length - 1; index > 0; index -= 1) {
+          const swapIndex = Math.floor(Math.random() * (index + 1))
+          ;[cards[index], cards[swapIndex]] = [cards[swapIndex], cards[index]]
+        }
+        roundData = {
+          cards,
+          submissions: 0,
+        }
       } else if (encounter.gameType === 'art-academy') {
         const generated = await createArtAcademyRound(
           encounter.settings as ArtAcademySettings,
@@ -1562,6 +1573,50 @@ export async function submitGameActivityAnswer(
 
       // Puzzle solved for this round.
       isCorrect = true
+    } else if (encounter.gameType === 'procedure-order') {
+      const maxSubmissions = encounter.settings.maxSubmissions ?? 3
+      const { cardIds } = validatedAnswer as { cardIds: string[] }
+      const roundData = state.roundData
+      const configuredCardIds = (encounter.settings.cards || []).map(
+        (card) => card.id,
+      )
+      const submissions = Number(roundData?.submissions || 0) + 1
+      isCorrect = validateProcedureOrder({
+        encounterId: encounter.id,
+        cardIds,
+        configuredCardIds,
+      })
+      state.roundData = {
+        ...roundData,
+        submissions,
+      }
+
+      if (!isCorrect && submissions < maxSubmissions) {
+        state.losses += 1
+        state.history.push({
+          questionId: encounter.id,
+          answer: validatedAnswer,
+          correct: false,
+          timestamp: Date.now(),
+        })
+        await setGameActivityStateForUser(
+          user.id,
+          domain,
+          state,
+          Math.max(60, Math.floor((gameEndTime + 60000 - Date.now()) / 1000)),
+        )
+        return {
+          success: true,
+          correct: false,
+          partial: true,
+          message: 'That sequence leaves an important step out of place.',
+          roundData: state.roundData,
+          wins: state.wins,
+          submissions,
+          submissionsLeft: maxSubmissions - submissions,
+          gameOver: false,
+        }
+      }
     }
 
     if (
@@ -1789,6 +1844,15 @@ export async function submitGameActivityAnswer(
     if (
       !isCorrect &&
       (encounter.settings.death || snapTargetId !== undefined)
+    ) {
+      gameOver = true
+    }
+
+    if (
+      !isCorrect &&
+      encounter.gameType === 'procedure-order' &&
+      Number(state.roundData?.submissions || 0) >=
+        (encounter.settings.maxSubmissions ?? 3)
     ) {
       gameOver = true
     }

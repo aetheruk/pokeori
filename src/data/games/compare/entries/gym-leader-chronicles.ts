@@ -2,7 +2,7 @@ import type { CompareConfig } from '../types'
 
 export const gymLeaderChronicleCompareEntries: CompareConfig[] = [
   {
-    id: 'chronicle-blaine-compare-the-baselines',
+    id: 'chronicle-v2-blaine-compare-the-baselines',
     name: 'Compare the Baselines',
     description: 'Check the recovery baselines before Blaine and Fuji approve the first trial.',
     category: 'Secret',

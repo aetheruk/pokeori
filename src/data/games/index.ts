@@ -138,6 +138,14 @@ export { rockTunnelEchoMapGames } from './rock-tunnel-echo-map'
 export type { ArtAcademyGameConfig, ArtAcademySettings } from './art-academy'
 export { artAcademyGames } from './art-academy'
 
+// Procedure Order game
+export type {
+  ProcedureOrderCard,
+  ProcedureOrderGameConfig,
+  ProcedureOrderSettings,
+} from './procedure-order'
+export { procedureOrderGames } from './procedure-order'
+
 export type { BattleBetsGameConfig, BattleBetsSettings } from './battle-bets/types'
 export { battleBetsGames } from './battle-bets'
 
@@ -168,6 +176,7 @@ import { diglettTunnelTapGames } from './diglett-tunnel-tap'
 import { magnemiteCircuitGames } from './magnemite-circuit'
 import { rockTunnelEchoMapGames } from './rock-tunnel-echo-map'
 import { artAcademyGames } from './art-academy'
+import { procedureOrderGames } from './procedure-order'
 import { battleBetsGames } from './battle-bets'
 import type { BaseGameConfig } from './shared'
 
@@ -198,6 +207,7 @@ export type GameType =
   | 'magnemite-circuit'
   | 'rock-tunnel-echo-map'
   | 'art-academy'
+  | 'procedure-order'
   | 'battle-bets'
 
 export type FieldResearchGameType = Extract<GameType, 'field-observation'>
@@ -376,6 +386,9 @@ export interface GameSettings {
   // Art Academy specific
   formId?: string
   paletteSize?: number
+  // Procedure Order specific
+  cards?: import('./procedure-order').ProcedureOrderCard[]
+  maxSubmissions?: number
   buyIn?: number
   houseEdge?: number
   simulationCount?: number
@@ -418,6 +431,7 @@ export const allGames: GameItem[] = [
   ...magnemiteCircuitGames.map((g) => ({ ...g, gameType: 'magnemite-circuit' as const })),
   ...rockTunnelEchoMapGames.map((g) => ({ ...g, gameType: 'rock-tunnel-echo-map' as const })),
   ...artAcademyGames.map((g) => ({ ...g, gameType: 'art-academy' as const })),
+  ...procedureOrderGames.map((g) => ({ ...g, gameType: 'procedure-order' as const })),
   ...battleBetsGames.map((g) => ({ ...g, gameType: 'battle-bets' as const })),
 ]
 

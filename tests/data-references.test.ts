@@ -1068,6 +1068,11 @@ describe('static data references', () => {
     ).toBe(true)
 
     for (const battle of battles) {
+      if (battle.id.startsWith('chronicle-v2-')) {
+        expect(battle.enemyAttackTelegraphChance).toBeGreaterThanOrEqual(20)
+        expect(battle.enemyAttackTelegraphChance).toBeLessThanOrEqual(70)
+        continue
+      }
       const expected =
         battle.subCategory === 'Pallet Town'
           ? 80

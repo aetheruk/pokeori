@@ -1,201 +1,89 @@
 # Kanto Gym Leader Chronicles Story Bible
 
-Last reviewed: 2026-08-11
+Last reviewed: 2026-08-12
 
 ## Narrative Contract
 
-The eight Badge Chronicles are personal Pokémon adventures played from each Kanto Gym Leader's perspective. Each memory must work first as a complete causal story and only then as an expedition route.
+The eight Badge Chronicles are substantial personal Pokémon dramas about how each Kanto Leader came to hold the role. Each is authored as one causal route through six phases: Backstory, Character and Sub-character Development, Conflict, Contemplation, Resolution, and Reflection.
 
-Every Chronicle is:
+Every Chronicle:
 
-- A fixed, non-branching memory with a clear desire, complication, choice, consequence, and ending.
-- Written as live dramatic scenes. Brief narration may establish time, place, or visible action, but it does not deliver the moral of the story.
-- Grounded in Pokémon behaviour and regional life. Games and battles solve problems that have already been established in dialogue.
-- Built as one ordered sequence. Every game or battle has a setup scene immediately before it and a reaction scene immediately after it.
-- Written in four-to-seven short panels per scene. Characters interrupt, disagree, ask for information, and change their minds without speaking in slogans.
-- Mature all-ages. Harm and failure matter, but the writing does not use cruelty, graphic detail, or a cartoon villain to manufacture stakes.
-
-The runtime preserves each Badge ritual, memory marker, expedition ID, Leader party, Explorer XP reward, one-time completion gate, and downstream Gym Heroes daily gate.
+- Uses at least 20 live dramatic scenes and 100 panels, with gameplay placed only after its narrative purpose is established.
+- Lets scenes breathe through multi-sentence dialogue and selective narration. Narration uses the Badge memento or Memory Incense icon; it never impersonates a named speaker.
+- Gives supporting characters their own wants, limits and consequences. They are not mouthpieces for the Leader's lesson.
+- Makes becoming Leader the overarching resolution without requiring a triumphant ending.
+- Uses an authored team for every battle step. Teams, moves, items, AI and telegraph rates rise across the anthology.
+- Is fixed, secret, non-branching, retryable and rewardless at activity level. Explorer XP and the scene banner are awarded only at expedition claim.
 
 ## Anthology Index
 
-| Leader | Chronicle | Core relationship | Story problem | Beats | Games | Battles |
-| --- | --- | --- | --- | ---: | --- | ---: |
-| Brock | The Empty Chair | Brock and Forrest | Brock tries to replace Flint instead of trusting his family | 13 | Rhythm, Mining | 2 |
-| Misty | Out of Step | Misty and her sisters | Misty wants a battle programme of her own instead of a place in her sisters' choreography | 13 | Rhythm, Cry | 2 |
-| Lt. Surge | After the Thunder | Surge and Mako | A city emergency cannot be run like a military transport | 12 | Magnemite Circuit, Cry | 2 |
-| Erika | The Old Glasshouse | Erika, Gloom, and Sumi | A hidden chemical leak threatens a community garden and its Pokémon | 12 | Identify | 2 |
-| Koga | The Daughter's Method | Koga and Janine | A perfect trail exploits the method Koga refuses to question | 13 | Silhouette, Identify | 3 |
-| Sabrina | The Quiet Room | Sabrina, her family, and Koichi | A Silph test violates Sabrina's boundaries and traps Porygon | 14 | Sliding Puzzle, Silhouette | 2 |
-| Blaine | The Last Question | Blaine and Fuji | Blaine hides a stop condition to protect a successful project | 15 | Compare, Rhythm | 2 |
-| Giovanni | Dinner at Eight | Giovanni and his son | Every useful opportunity makes one personal promise easier to postpone | 13 | Rock Push | 2 |
+| Leader | Chronicle | Central relationship | Defining outcome | Activities |
+| --- | --- | --- | --- | ---: |
+| Brock | The Empty Chair | Brock, Forrest and Flint | Brock accepts Pewter leadership without silently surrendering his breeder future | 5 |
+| Misty | Out of Step | Misty, Daisy, Violet and Lily | The water show and battle programme become equal, explicit uses of Cerulean Gym | 5 |
+| Lt. Surge | After the Thunder | Surge and Mako | A veteran's command system becomes a civilian Gym and storm shelter that permits refusal | 6 |
+| Erika | The Unspoken Bloom | Erika, Sumi, Celia and her mother | Erika gains institutional authority but remains constrained by the social web that enabled it | 4 |
+| Koga | The Unwritten Path | Koga, Janine and Ren | Koga rejects inherited certainty and builds a method designed to be questioned | 6 |
+| Sabrina | The Quiet Room | Sabrina, her family, Orla and Koichi | Saffron Gym codifies consent without pretending Sabrina has been cured | 5 |
+| Blaine | The Last Question | Blaine, Nami, Fuji and Orin | A preventable death remains in the record of a Gym designed around stop authority | 6 |
+| Giovanni | Dinner at Eight | Giovanni and Silver | Viridian gains an effective Leader while a father learns that success cannot purchase presence | 4 |
 
-## Brock: The Empty Chair
+## Treatments
 
-### Treatment
+### Brock: The Empty Chair
 
-Flint leaves without a return date. Brock hides the note and keeps the Harrison household moving because one normal morning feels kinder than admitting that their father walked away. At Pewter Gym, Onix refuses food while Brock sweeps plaster from a damaged battle floor. League examiner Mara explains that Brock can receive a temporary licence only after the building is safe and he passes an assessment.
+Flint leaves his family and Gym after failing on the League circuit. Brock hides the uncertain return date, runs the household alone and asks League examiner Mara to judge the work rather than his age. A challenge accepted on a damaged floor causes the west wall to fail; Onix braces it while Mara closes the Gym. Forrest then discovers the breeding-course place Brock has allowed to expire in silence.
 
-Taro arrives for a promised challenge. Brock accepts to prove the Gym is still functioning, but the battle shakes loose a wall that Onix must brace. Mara closes the Gym. Forrest then finds Brock's breeder-course acceptance letter and realises Brock has quietly discarded his own future. The argument ends when the other children arrive with tools and insist on sharing the work.
+Flint returns expecting apology and labour to restore his chair. Brock refuses the keys but accepts help carrying quarry stone. The family names every responsibility, repairs the wall and leaves its scar visible. Brock asks Celadon to defer, not cancel, his course. Mara licenses a Gym that requires a deputy. Flint begins earning his place through repeated attendance, and the old chair becomes an ordinary kitchen chair instead of the measure of a family.
 
-After the family repairs the wall, Brock reads Flint's note aloud and gives every household and Gym job a name. Mara returns, tests the repaired Gym and Brock's team, and grants the temporary licence. Brock asks the breeder course to defer his place rather than rejecting it. The final image is the breeder manual open beside the Gym ledger.
+### Misty: Out of Step
 
-### Beat order
+Misty hears battle decisions inside her sisters' choreography and secretly submits a League programme. The trial conflicts with the sponsor preview Daisy built around her, exposing how both sisters make family decisions alone. Horsea's distress call leads all four to Cerulean Cape, where a Gyarados is warning boats away from its injured companion. Misty's rescue succeeds but costs both the trial and the preview.
 
-Breakfast without Flint -> Keep the Morning Moving -> Flint's note -> Mara's inspection -> Taro's setup -> Taro battle -> wall closure -> breeder letter -> Repair the Gym Wall -> family meeting -> Mara setup -> League assessment -> two books open.
+The sisters admit the burdens hidden by their familiar roles. They design independent show and challenge programmes that share water, staff and safety authority. Daisy becomes Misty's formal trial opponent and loses without losing her own future. Two honest posters replace one family image, and Misty later returns to rehearsal by choice.
 
-### Voice
+### Lt. Surge: After the Thunder
 
-- Brock redirects emotional questions toward practical work until he can no longer do so.
-- Forrest speaks plainly but does not sound like an adult therapist.
-- Mara is a safety examiner, not an antagonist. She refuses Brock's unsafe timetable and rewards the shared plan.
+Surge's military transport survived a catastrophic storm because he maintained one medical circuit, but Mako was burned obeying the route. In Vermilion, Surge builds a Gym that doubles as a shelter and repeats the command structure that once saved lives. A blackout exposes the difference between trained crew and frightened civilians. Mako refuses an unsafe order, forcing Surge to ask what he can see.
 
-## Misty: Out of Step
+Together they rescue a Magneton caught between fields and restore the harbour without crossing the flooded bank. The revised shelter protocol requires reasons, confirmations and universal stop authority. Surge earns the licence for a Gym whose power is measured in bad weather, and his voice remains loud while finally making room for answers.
 
-### Treatment
+### Erika: The Unspoken Bloom
 
-Misty keeps turning the sisters' water-show choreography into battle practice. Daisy responds by giving her the centre position in the preview, unaware that Misty has arranged a League battle-lead trial at Cerulean Cape for the same afternoon. Misty points out that all three sisters assumed she wanted a larger place in their show instead of asking whether she wanted the show at all.
+Erika and greenhouse technician Sumi develop a fragrance whose difficult first note rewards patience. Erika's mother removes Sumi's name and sells it as a House Tamamushi edition. Celia asks the true author aloud at the exhibition. Seeing Sumi's livelihood and her brother's lease held inside her family's influence, Erika gives a graceful non-answer. She wins the public battle and receives praise for beautiful restraint.
 
-During the preview, a Horsea flinches at the applause and escapes through the north canal. All four sisters follow it to the Cape. Misty separates Horsea's cry from the wild Pokemon around the coves, then clears a path past an agitated Gyarados after discovering fishing line caught around its tail. When they find Horsea, Misty stops her sisters from grabbing it and gives it a quiet route home.
+Her mother offers the Gym garden and Sumi's security if Erika accepts the League appointment. Erika secures ownership terms for future staff work, but cannot recover Formula Four or speak without endangering Sumi. She becomes a skilled, protective Leader through the status that confines her. The final bottle remains privately labelled, and the ending explicitly refuses to call her free.
 
-At the Cape, the sisters finally separate their ambitions. Daisy admits that she mistook Misty's rejection of the choreography for a rejection of the family. She stands opposite Misty in the League trial, and Misty wins the whole battle programme rather than the hours left over after performances. The final image is two posters drying side by side: one for the sisters' water show, and one naming Misty as Cerulean Gym's battle lead.
+### Koga: The Unwritten Path
 
-### Beat order
+Master Ren teaches that a successor preserves the route. Janine marks a safer path and Koga erases it. Ren then stages a toxin theft as a succession test, buying a debtor's false confession and hiding the real case. One bottle breaks; vapour reaches the old retreat line exactly as Janine predicted. Koga counters Ren and evacuates students along her chalk route.
 
-Choreography argument -> Stay With the Routine -> conflicting plans -> Horsea leaves the preview -> Follow Horsea's Call -> Gyarados at the cove -> Gyarados battle -> Horsea chooses a quiet route -> four answers for the Gym -> Daisy's League trial -> Daisy battle -> book around the battles -> two posters.
+Ren revokes the inheritance, leaving Koga to define what remains without the authority of lineage. Koga keeps patience, observation and restraint while discarding the idea that their owner cannot be questioned. He wins a succession battle by using Janine's route. Fuchsia's first principle becomes a practical truth written nowhere permanent: the wind always changes.
 
-### Voice
+### Sabrina: The Quiet Room
 
-- Misty is quick, funny, and specific. Anger arrives after she has already solved the immediate problem.
-- Daisy is competent and initially assumes that a more visible role in the show is the same thing as being heard.
-- Violet and Lily enjoy performing without being shallow foils. Their humour makes the sisters feel familiar with one another.
+Sabrina hears thoughts before words. Her frightened parents create an empty room that offers relief but turns protection into confinement. Dr Orla is the first adult to make refusal real. Silph director Venn instead treats Sabrina's perception as a teleport component and uses her to recover Porygon from a split signal. He then activates another test without consent.
 
-## Lt. Surge: After the Thunder
+Koichi reaches Sabrina by asking before he breaks the receiver. She leaves Silph, confronts her parents and trains under focus rules she controls. The work helps without making other minds quiet or removing her anger. Saffron Gym's consent charter applies to Leader and challenger alike, and its quiet room has no lock.
 
-### Treatment
+### Blaine: The Last Question
 
-Surge runs a Vermilion shelter drill using standards written for a military crew. Mako's team loses time carrying a practice patient, and Surge marks them down despite the humane choice. Their argument is interrupted by a real blackout that threatens the Pokémon Center and harbour grid.
+Blaine, Fuji and Nami found a recovery lab around one question: what is the heat for? League funding creates pressure for a public result. When Magmar produces a rare response, Blaine hides a manual override and ignores Nami's agreed stop order for ten more seconds. The seal ruptures. Nami remains at the manual wheel to clear the corridor and dies off-screen after forcing Blaine to answer that the heat is now for nothing.
 
-Surge and Mako restore a safe east-grid route, then turn the Gym into a crowded shelter. Identifying Pokémon cries reunites them with their Trainers, but a child refuses to enter while Surge is shouting. Surge lowers himself and his voice instead of repeating the order.
+The inquiry keeps every omission visible. Years later, Fuji will advise only if Nami's authority, not her name, becomes permanent. Blaine earns a conditional licence for a Gym anyone can stop. When the rare curve returns, he ends the trial while the desirable answer is still on the monitor.
 
-Mako reports three Magnemite trapped behind an unstable transformer. Surge orders a retreat; Mako refuses because the Magneton's next surge will also destroy the Center line. Surge asks for the safest route and helps calm Magneton. Back at the Gym, he asks the room for expertise and builds the plan from the answers. The first permanent shelter roster contains volunteers, not ranks.
+### Giovanni: Dinner at Eight
 
-### Beat order
+Giovanni reopens Viridian's western road where the League has failed, combining public relief with private freight leverage. Each solved problem makes him more indispensable and secures the vacant Gym. The final assessment falls on Silver's tournament day. Giovanni promises the front row and dinner at eight, then takes a ten-minute depot meeting because he does not trust anyone else to close it.
 
-Shelter drill -> Mako drill battle -> real alarm -> grid setup -> Restore the East Grid -> shelter fills -> Voices in the Dark -> child at the door -> Mako refuses -> Magneton battle -> ask the room -> first roster.
+He returns after ten to a runner-up trophy and orders a better one. Silver rejects an object he did not earn and asks whether the next promise is any different. Giovanni becomes an effective Leader while learning that his ledger cannot price the moment his son stopped looking at the door. He attends the next tournament, but the original trophy and missed evening remain.
 
-### Voice
+## Authoring and Runtime Guardrails
 
-- Surge starts in commands and gradually asks shorter, practical questions.
-- Mako disagrees through technical facts and immediate consequences.
-- Civilians are individuals with useful knowledge, not an abstract lesson for Surge.
-
-## Erika: The Old Glasshouse
-
-### Treatment
-
-Oddish abandon the east beds of a community glasshouse and Gloom refuses to cross the soil. Sumi tells Erika that a company has bought the neighbouring dye warehouse and claims the land beneath the garden. Site manager Gable produces a clean site report and gives the gardeners one month to leave.
-
-Erika traces damaged roots toward an old drain. Beneath the floor, she finds a Muk burned by the contaminated runoff. After calming Muk, Gloom and Tangela follow the pipe to a cracked storage tank hidden in the warehouse. Sumi takes copies of the report to fetch the city inspector.
-
-Gable arrives with a pump. He admits the leak predates the purchase but intends to empty the tank through the glasshouse drain before inspection. Erika blocks the pump and defeats his team. The inspector samples the tank, pump, and dead beds, then suspends the project. At the hearing, the company loses its claim and must fund the cleanup. Months later the Oddish return, and the gardeners nominate Erika to lead Celadon Gym.
-
-### Beat order
-
-Oddish leave -> development notice -> Follow the Drainage -> Muk in the runoff -> Muk battle -> cracked tank -> Gable's pump -> Site Manager battle -> inspection -> hearing -> new soil -> Gym nomination.
-
-### Voice
-
-- Erika is observant, courteous, and difficult to rush. Her sharpest lines name a concrete contradiction.
-- Sumi has history and responsibility in the garden; she is Erika's partner, not an attendant waiting to agree.
-- Gable is culpable because he chooses concealment after learning the truth, not because he dislikes flowers.
-
-## Koga: The Daughter's Method
-
-### Treatment
-
-Koga gives Janine the same succession course his teacher gave him. Janine identifies a planted mark and objects that the test rewards following a mistake. Their disagreement becomes a formal spar, interrupted when Apothecary Ren reports six stolen toxin samples.
-
-The recovered ledger reveals that Pecha powder scattered along the obvious rooftop trail cannot come from the stolen compounds. Koga follows it anyway and defeats a decoy carrying an empty case. Janine instead follows the unmarked service passage beneath the apothecary.
-
-Koga reaches the tunnel and, for the first time inside the memory, gives Janine a plan she may improve. Together they close the route and recover the real case. Koga revises the succession scroll so the student must explain why the chosen trail is true.
-
-### Beat order
-
-Written trial -> Read the Shadow Marks -> Janine's conclusion -> spar -> missing case -> Separate the Toxins -> obvious trail -> decoy setup -> decoy battle -> Janine's evidence -> tunnel plan -> culprit battle -> revised scroll.
-
-### Voice
-
-- Koga uses few words and dislikes admitting that irritation is uncertainty.
-- Janine's challenges are evidence-led and respectful without being submissive.
-- Their dry humour appears only after the immediate danger is over.
-
-## Sabrina: The Quiet Room
-
-### Treatment
-
-Young Sabrina hears thoughts before people speak and cannot make breakfast quiet. Silph researcher Orla offers a controlled teleport calibration that may help Sabrina practise selecting one psychic signal. Sabrina agrees only after Orla promises to stop whenever she asks.
-
-The first Porygon transfer succeeds. Director Venn then activates a second receiver without consent. Porygon flickers between both destinations while amplified thoughts from the neighbouring Fighting Dojo overwhelm Sabrina. After reaching Porygon through the unstable chamber, Sabrina retreats into the Quiet Room she built in her mind.
-
-Inside, Sabrina distinguishes Porygon's real pulse from projected Pokémon shapes. Haunter's ridiculous reflection breaks the repeated signal long enough for her to route Porygon safely to the first receiver. Koichi waits outside the chamber and asks permission before entering. He later offers a focus battle with rules Sabrina controls. At home, her family changes the breakfast room and agrees to knock, while Sabrina keeps a Quiet Room with handles on both sides.
-
-### Beat order
-
-Breakfast noise -> Silph offer -> first calibration -> Hold the Focus Pattern -> second receiver -> two signals -> unstable Porygon battle -> Quiet Room -> Find the True Shape -> Haunter finds the signal -> Koichi asks -> focus-battle setup -> Koichi battle -> two handles.
-
-### Voice
-
-- Sabrina is concrete and sensory. She never gives a speech explaining all of her boundaries.
-- Orla honours consent and challenges Venn, so Silph is represented by people rather than one institutional personality.
-- Koichi admits fear aloud and lets Sabrina choose whether the conversation continues.
-
-## Blaine: The Last Question
-
-### Treatment
-
-In the abandoned laboratory, Blaine begins writing a Gym quiz and remembers the recovery study he built with Fuji. Their signed protocol says every failed result is recorded and any fall below baseline stops the work. After comparing baselines, they help an injured Growlithe stand. A League patron then offers five years of funding for a successful Friday demonstration.
-
-The laboratory passes its safety battle and every worker completes the containment sequence. Afterward, Orin finds that subject twelve is below its intake baseline. Blaine hides that page from the demonstration summary and orders one more rehearsal. Fuji discovers the omission and invokes the stop rule. Blaine authorises one lower-power trial anyway.
-
-The field overheats, the locks fail, and a panicked Magmar blocks the evacuation corridor. The technicians escape, but the unnamed subject dies off-screen. Fuji leaves Cinnabar because Blaine knew enough before the alarm. Years later, Blaine writes the answer before the question: stop, record what happened, and ask for help.
-
-### Beat order
-
-Question one -> signed stop rule -> Compare the Baselines -> first success -> Friday deadline -> safety setup -> safety battle -> twelfth result -> Containment Sequence -> Fuji finds the page -> one more trial -> alarm -> Magmar battle -> Fuji leaves -> no trick answer.
-
-### Voice
-
-- Blaine is warm and witty until a direct answer threatens the project he loves.
-- Fuji is scientifically precise and compassionate. He does not oppose research; he opposes changing its rules after harm appears.
-- The death is stated without identifying or depicting the subject and without naming later-world plot material.
-
-## Giovanni: Dinner at Eight
-
-### Treatment
-
-Giovanni promises to sit in the front row at his son's tournament final at eight. A morning meeting asks him to clear Viridian's blocked western supply road. The work succeeds, but raiders threaten the first medicine convoy, and solving that problem creates exclusive transport contracts.
-
-His son calls after winning the morning round. At three, the League offers Giovanni the vacant Viridian Gym if he completes an assessment that day. Passing gives him another institution connected to the same crews and routes. At six ten, Ariana presents a southern-depot meeting. Giovanni initially delegates it, then takes over because he does not trust anyone else to close the agreement.
-
-At seven, Giovanni calculates that the meeting and drive still fit before the final. At ten twenty-three, he returns to a cold dining room and a runner-up trophy. He orders a better trophy for breakfast. His son rejects it because it is not the one he earned. Giovanni's ledger records one missed evening while the replacement stays boxed.
-
-### Beat order
-
-Breakfast promise -> road meeting -> Clear the Western Road -> raider setup -> raider battle -> first reminder -> League offer -> assessment battle -> Gym charter -> Ariana's opportunity -> seven o'clock -> cold dinner -> that is not mine.
-
-### Voice
-
-- Giovanni is concise, attentive, and persuasive. His failure is not forgetting the time; it is repeatedly deciding that he can control it.
-- Ariana states the strategic truth without flattery.
-- Giovanni's son speaks in concrete promises, matches, seats, and trophies rather than explaining his father's flaw.
-
-## Authoring Guardrails
-
-- Preserve the eight expedition IDs, Badge memory marker IDs, energy requirements, Explorer XP rewards, Leader teams, and downstream daily gates.
-- Keep supporting games and battles rewardless. The expedition claim is the only reward boundary.
-- Do not name Shadow Pokémon, rifts, Mewtwo, Team Rainbow Rocket, or later-world plans.
-- Avoid em dashes and imported moral vocabulary. If a line could be spoken unchanged by another Leader, rewrite it.
-- A battle may represent danger, a formal test, or an obstructive Trainer, but its purpose must be stated before the battle begins.
-- The first scene establishes an immediate want. The final scene resolves a relationship through a concrete action or object.
-- Update this document, `docs/current-game-state.md`, and Chronicle tests whenever a treatment, beat order, cast, or continuity meaning changes.
+- Preserve Badge ritual, memory marker and expedition IDs, but version every internal route activity as `chronicle-v2-*`.
+- Keep phase order monotonic and place a scene immediately before and after each game or battle.
+- Use the shared character definition for every recurring named speaker. Never substitute a generic class portrait after a character has an authored sprite.
+- Preserve concise banner names and the current Badge-channeling energy amounts.
+- Avoid em dashes and later-world plot terms. Keep violence consequential but non-graphic.
+- Validate puzzle reachability, procedure constraints, move legality, activity references and per-battle Chronicle loadouts in tests.
+- Deploying this edition requires `bun scripts/reset-gym-chronicles-v2.js --dry-run` and then `bun scripts/reset-gym-chronicles-v2.js` inside the production container. This removes old Chronicle runs/activity rows and only active game, research or battle Redis sessions for affected players.
