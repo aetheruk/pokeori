@@ -13,6 +13,7 @@ const CardDrawReveal = lazy(() =>
 import { ResearchLevelUpModal } from '@/app/(frontend)/game/pokedex/_components/ResearchLevelUpModal'
 import { LevelUpModal } from '@/components/game/level-up-modal'
 import { GameResult } from '@/components/game/ResearchResult'
+import { markExpeditionReturn } from '@/components/game/features/explore/expedition-return'
 import { TaskExitDialog } from '@/components/game/task-exit-dialog'
 import type { TaskExitModal, TaskIcon } from '@/data/tasks'
 import type { CompleteTaskResult } from '@/utilities/tasks/actions'
@@ -255,6 +256,10 @@ export function RewardResultOverlay({
   }
 
   const handleFinalClose = () => {
+    const rewardSummary = result?.rewards || result?.summary
+    const expeditionProgress =
+      result?.expeditionProgress || (rewardSummary as any)?.expeditionProgress
+    markExpeditionReturn(expeditionProgress?.expeditionId)
     setCurrentStep('idle')
     setExitModalData(null)
     setExitModalQueue([])

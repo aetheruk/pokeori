@@ -632,6 +632,7 @@ export async function completeCurrentUserExpeditionTaskStep(
   failed?: boolean
   updated?: boolean
   expedition?: ExpeditionProgressSnapshot
+  expeditionProgress?: ExpeditionProgressSnapshot
 }> {
   const { user } = await getAuthedPayloadUser()
   if (!user) {
@@ -653,25 +654,31 @@ export async function completeCurrentUserExpeditionTaskStep(
     return { success: false, message: 'Task is not the active expedition step' }
   }
 
+  const rewards: RewardSummary & {
+    expeditionProgress?: ExpeditionProgressSnapshot
+  } = {
+    xp: {},
+    items: [],
+    pokemon: [],
+    currency: [],
+    cards: [],
+    tasksCompleted: [],
+    banners: [],
+    icons: [],
+    titles: [],
+    upgrades: [],
+    expeditionProgress: result.expedition,
+  }
+
   return {
     success: true,
     exitModal: tasks.find((task) => task.id === taskId)?.exitModal,
-    rewards: {
-      xp: {},
-      items: [],
-      pokemon: [],
-      currency: [],
-      cards: [],
-      tasksCompleted: [],
-      banners: [],
-      icons: [],
-      titles: [],
-      upgrades: [],
-    },
+    rewards,
     completed: result.completed,
     failed: result.failed,
     updated: result.updated,
     expedition: result.expedition,
+    expeditionProgress: result.expedition,
   }
 }
 

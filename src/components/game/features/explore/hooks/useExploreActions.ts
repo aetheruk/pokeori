@@ -492,6 +492,29 @@ export function useExploreActions(
       }
 
       if (task.chat && task.exitModal && !isDoneForModalFlow) {
+        if (isExpeditionTaskFlow) {
+          setCompletingTaskId(task.id)
+          try {
+            const result = isCompletedExpeditionReplay
+              ? await completeCurrentUserExpeditionTaskStep(task.id)
+              : await completeTask(task.id, undefined, crypto.randomUUID())
+            if (result.success) {
+              setSelectedItem(null)
+              setCompletionResult(result)
+              setLastCompletedTask(task)
+              await refreshUser()
+            } else {
+              toast.error(result.message || 'Failed to complete task')
+            }
+          } catch (e) {
+            toast.error('Error completing task')
+          } finally {
+            setExpeditionEnterModalTaskId(null)
+            setCompletingTaskId(null)
+          }
+          return
+        }
+
         setExitModalData(task.exitModal)
         setIsExitModalOpen(true)
         setCompletingTaskId(task.id)
@@ -557,14 +580,14 @@ export function useExploreActions(
           : await completeTask(task.id, undefined, crypto.randomUUID())
         if (result.success) {
           if (isExpeditionTaskFlow) {
-            await reopenExpeditionPanel(getActiveExpeditionRun()?.expeditionId)
+            setSelectedItem(null)
           } else {
             setSelectedItem(null)
           }
-          if (!task.chat) setCompletionResult(result)
+          setCompletionResult(result)
           setLastCompletedTask(task) // Store task object
-          refreshUser()
-          if (task.chat && task.exitModal) {
+          await refreshUser()
+          if (!isExpeditionTaskFlow && task.chat && task.exitModal) {
             setExitModalData(task.exitModal)
             setIsExitModalOpen(true)
           }
@@ -825,19 +848,17 @@ export function useExploreActions(
         return
       }
 
-      refreshUser()
-
-      if (result.expedition?.status === 'failed') {
-        toast.error(`${expeditionLabel} failed. You are out of lives.`)
-      } else if (result.expedition?.canFail === false) {
-        toast.error(`${expeditionLabel} step can be retried.`)
-      } else if (result.expedition) {
-        toast.error(
-          `${expeditionLabel} step failed. Lives left: ${result.expedition.livesLeft}/${result.expedition.maxLosses}.`,
-        )
-      } else {
-        toast.error(`${expeditionLabel} step failed`)
-      }
+      const task = tasks.find((entry) => entry.id === failedTaskId)
+      setLastCompletedTask(task || null)
+      setCompletionResult({
+        success: false,
+        message:
+          result.expedition?.canFail === false
+            ? `${expeditionLabel} step can be retried.`
+            : `${expeditionLabel} step failed.`,
+        expeditionProgress: result.expedition,
+      })
+      await refreshUser()
     } catch (error) {
       toast.error(`Failed to record ${expeditionLabelLower} step failure`)
     } finally {
@@ -888,7 +909,7 @@ export function useExploreActions(
       const result = await completeTask(task.id, selectedPokemonIds, crypto.randomUUID())
       if (result.success) {
         if (shouldClearExpeditionContext) {
-          reopenExpeditionPanel(getActiveExpeditionRun()?.expeditionId)
+          setSelectedItem(null)
         } else {
           setSelectedItem(null)
         }
@@ -896,7 +917,7 @@ export function useExploreActions(
         setLastCompletedTask(task)
         setSelectedTaskForCompletion(null)
         setIsSelectionModalOpen(false)
-        refreshUser()
+        await refreshUser()
         setSelectedPokemonIds([])
       } else {
         toast.error(result.message || 'Failed to complete task')

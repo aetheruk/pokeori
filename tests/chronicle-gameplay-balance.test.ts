@@ -102,6 +102,68 @@ function solveSokoban(settings: any): number | null {
 }
 
 describe('Chronicle gameplay balance', () => {
+  test('procedure-order UI keeps its controls reachable in a fixed viewport', async () => {
+    const source = await Bun.file(
+      'src/app/(frontend)/game/research/encounter/procedure-order.tsx',
+    ).text()
+
+    expect(source).toContain('h-dvh min-h-0 overflow-hidden')
+    expect(source).toContain('min-h-0 flex-1 space-y-2 overflow-y-auto')
+    expect(source).toContain('shrink-0 border-t border-game-border')
+    expect(source).toContain('absolute right-4 top-4 z-30')
+    expect(source).toContain('aria-label="How to play"')
+    expect(source).not.toContain('min-h-dvh w-full max-w-5xl')
+  })
+
+  test('every Chronicle activity result returns to its newly active step', async () => {
+    const [
+      resultSource,
+      battleSource,
+      encounterSource,
+      exploreSource,
+      expeditionSource,
+      taskActionSource,
+    ] =
+      await Promise.all([
+        Bun.file(
+          'src/components/game/shared/RewardResultOverlay.tsx',
+        ).text(),
+        Bun.file(
+          'src/app/(frontend)/game/battles/_components/battle-interface.tsx',
+        ).text(),
+        Bun.file(
+          'src/app/(frontend)/game/locations/encounter/_components/encounter-results.tsx',
+        ).text(),
+        Bun.file('src/components/game/features/explore/index.tsx').text(),
+        Bun.file(
+          'src/components/game/features/explore/ExpeditionModal.tsx',
+        ).text(),
+        Bun.file('src/utilities/tasks/actions.ts').text(),
+      ])
+
+    expect(resultSource).toContain(
+      'markExpeditionReturn(expeditionProgress?.expeditionId)',
+    )
+    expect(battleSource).toContain(
+      'markExpeditionReturn(expeditionProgress?.expeditionId)',
+    )
+    expect(encounterSource).toContain(
+      'markExpeditionReturn(expeditionProgress?.expeditionId)',
+    )
+    expect(exploreSource).toContain(
+      'void actions.reopenExpeditionPanel(expeditionId)',
+    )
+    expect(expeditionSource).toContain(
+      "currentStepRef.current?.scrollIntoView({",
+    )
+    expect(expeditionSource).toContain(
+      "data-expedition-current-step={isCurrent ? 'true' : undefined}",
+    )
+    expect(taskActionSource).toContain(
+      'expeditionProgress: expeditionResult.expedition',
+    )
+  })
+
   test('procedure puzzles accept their authored safe order and reject reversal', () => {
     for (const game of procedureOrderGames) {
       const ids = game.settings.cards.map((card) => card.id)

@@ -16,7 +16,7 @@ import {
   X,
 } from 'lucide-react'
 import Image from 'next/image'
-import { type ReactNode, useState } from 'react'
+import { type ReactNode, useEffect, useRef, useState } from 'react'
 import {
   RewardCarousel,
   type RewardItem,
@@ -251,6 +251,7 @@ export function ExpeditionModal({
   if (!item) return null
 
   const [expandedStepId, setExpandedStepId] = useState<string | null>(null)
+  const currentStepRef = useRef<HTMLDivElement | null>(null)
 
   const expedition = item.originalData
   const expeditionLabel = getExpeditionDisplayName(item)
@@ -274,6 +275,26 @@ export function ExpeditionModal({
     !!activeRun &&
     activeRun.status === 'active' &&
     expedition?.canAbandon !== false
+
+  useEffect(() => {
+    if (
+      !open ||
+      !activeRun ||
+      (activeRun.status !== 'active' &&
+        activeRun.status !== 'ready_to_claim')
+    )
+      return
+
+    const frame = window.requestAnimationFrame(() => {
+      currentStepRef.current?.scrollIntoView({
+        behavior: 'auto',
+        block: 'center',
+      })
+    })
+
+    return () => window.cancelAnimationFrame(frame)
+  }, [activeRun, activeRun?.currentStepIndex, open])
+
   return (
     <ResponsivePanel
       open={open}
@@ -486,6 +507,9 @@ export function ExpeditionModal({
                       index === (activeRun?.currentStepIndex || 0)
                     const shouldHideSecret = isSecret && !isDone && !isCurrent
                     const isLast = index === steps.length - 1
+                    const isScrollTarget =
+                      isCurrent ||
+                      (activeRun?.status === 'ready_to_claim' && isLast)
                     const meta =
                       !shouldHideSecret &&
                       stepType === 'activity' &&
@@ -510,7 +534,12 @@ export function ExpeditionModal({
                     const isExpanded = expandedStepId === stepKey
 
                     return (
-                      <div key={stepKey} className="relative pl-14">
+                      <div
+                        key={stepKey}
+                        ref={isScrollTarget ? currentStepRef : undefined}
+                        data-expedition-current-step={isCurrent ? 'true' : undefined}
+                        className="relative scroll-m-6 pl-14"
+                      >
                         {!isLast && (
                           <div
                             className={cn(
