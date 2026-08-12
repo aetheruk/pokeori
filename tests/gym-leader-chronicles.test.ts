@@ -1,4 +1,6 @@
 import { describe, expect, test } from 'bun:test'
+import { readdir } from 'node:fs/promises'
+import sharp from 'sharp'
 import { battles } from '@/data/battles'
 import { expeditions } from '@/data/expeditions'
 import { allGames } from '@/data/games'
@@ -13,14 +15,14 @@ import { banners } from '@/data/user'
 import type { ChronicleNarrativePhase } from '@/data/expeditions/types'
 
 const expectedRituals = [
-  ['badge-kanto-boulder', 'rock', 49, 5, 200],
-  ['badge-kanto-cascade', 'water', 86, 10, 300],
-  ['badge-kanto-thunder', 'electric', 70, 15, 400],
-  ['badge-kanto-rainbow', 'grass', 44, 20, 500],
-  ['badge-kanto-soul', 'poison', 34, 25, 600],
-  ['badge-kanto-marsh', 'psychic', 64, 30, 700],
-  ['badge-kanto-volcano', 'fire', 43, 35, 800],
-  ['badge-kanto-earth', 'ground', 91, 40, 1000],
+  ['badge-kanto-boulder', 'rock', 49, 5],
+  ['badge-kanto-cascade', 'water', 86, 10],
+  ['badge-kanto-thunder', 'electric', 70, 15],
+  ['badge-kanto-rainbow', 'grass', 44, 20],
+  ['badge-kanto-soul', 'poison', 34, 25],
+  ['badge-kanto-marsh', 'psychic', 64, 30],
+  ['badge-kanto-volcano', 'fire', 43, 35],
+  ['badge-kanto-earth', 'ground', 91, 40],
 ] as const
 
 const expectedBannerNames = {
@@ -67,7 +69,7 @@ describe('Kanto Gym Leader Chronicles gold-tier anthology', () => {
   })
 
   test('each Chronicle is a long fixed six-phase route with the authored reward', () => {
-    for (const [badgeId, , , , explorerXp] of expectedRituals) {
+    for (const [badgeId] of expectedRituals) {
       const definition = KANTO_GYM_CHRONICLES.find(
         (entry) => entry.badgeItemId === badgeId,
       )!
@@ -96,7 +98,7 @@ describe('Kanto Gym Leader Chronicles gold-tier anthology', () => {
         expect.objectContaining({
           type: 'xp',
           skill: 'catching',
-          quantity: explorerXp,
+          quantity: 3000,
         }),
       )
       expect(expedition.rewards).toContainEqual(
@@ -110,6 +112,39 @@ describe('Kanto Gym Leader Chronicles gold-tier anthology', () => {
           (node) => node.type === 'activity' && node.secret,
         ),
       ).toBe(true)
+    }
+  })
+
+  test('Chronicle authoring phases and duration targets stay out of the player UI', async () => {
+    const source = await Bun.file(
+      'src/components/game/features/explore/ExpeditionModal.tsx',
+    ).text()
+
+    expect(source).not.toContain('CHRONICLE_PHASES')
+    expect(source).not.toContain('Memory folio')
+    expect(source).not.toContain('50–60 minutes')
+  })
+
+  test('supporting trainer sprites are readable at native UI size', async () => {
+    const spriteDirectory = 'public/sprites/trainers/chronicles'
+    const spriteFiles = (await readdir(spriteDirectory)).filter((file) =>
+      file.endsWith('.avif'),
+    )
+
+    expect(spriteFiles).toHaveLength(23)
+    for (const spriteFile of spriteFiles) {
+      const metadata = await sharp(
+        `${spriteDirectory}/${spriteFile}`,
+      ).metadata()
+      const trimmed = await sharp(`${spriteDirectory}/${spriteFile}`)
+        .trim({ background: { r: 0, g: 0, b: 0, alpha: 0 } })
+        .toBuffer({ resolveWithObject: true })
+
+      expect(metadata.width, spriteFile).toBe(80)
+      expect(metadata.height, spriteFile).toBe(80)
+      expect(metadata.hasAlpha, spriteFile).toBe(true)
+      expect(trimmed.info.height, spriteFile).toBeGreaterThanOrEqual(68)
+      expect(trimmed.info.width, spriteFile).toBeGreaterThanOrEqual(20)
     }
   })
 
