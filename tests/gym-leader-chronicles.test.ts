@@ -274,6 +274,9 @@ describe('Kanto Gym Leader Chronicles gold-tier anthology', () => {
 
     expect(playerTeam).toHaveLength(4)
     expect(battle.maxPokemon).toBe(playerTeam.length)
+    expect(battle.enemyTeam.map((pokemon) => pokemon.speciesId)).toEqual([
+      53, 76, 65,
+    ])
 
     const playerMatchups = playerTeam.map((pokemon) => ({
       types: getPokemonForm(pokemon.formId ?? String(pokemon.speciesId))!.types,
@@ -296,17 +299,17 @@ describe('Kanto Gym Leader Chronicles gold-tier anthology', () => {
         ),
       ),
     )
-    expect(universalHardCounters).toHaveLength(1)
+    expect(universalHardCounters).toHaveLength(0)
 
     for (const enemy of enemyMatchups) {
       expect(
-        playerMatchups.some((player) =>
+        playerMatchups.filter((player) =>
           player.moves.some(
             (move) =>
               getDualTypeEffectiveness(move!.forcedType ?? 'normal', enemy.types) >= 1,
           ),
-        ),
-      ).toBe(true)
+        ).length,
+      ).toBeGreaterThanOrEqual(2)
     }
   })
 

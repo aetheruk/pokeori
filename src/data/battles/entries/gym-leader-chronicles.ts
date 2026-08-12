@@ -93,9 +93,9 @@ const definitions: Record<KantoGymChronicleKey, ChronicleBattleDefinition[]> = {
       id: 'league-steward', name: 'The Rainbow Assessment', description: 'Earn authority over the garden without pretending the opportunity came without conditions.',
       trainerClassId: 'chronicle-steward', trainerName: 'Exhibition Steward', icon: { type: 'trainer', id: 'chronicle-steward' }, background: '/backgrounds/chronicle-erika-greenhouse.avif', maxPokemon: 4, aiProfile: 'boss',
       enemyTeam: [
-        { speciesId: 126, formId: '126', level: 30, aiMoves: ['ember', 'smokescreen', 'confuse-ray'] },
-        { speciesId: 75, formId: '75', level: 30, aiMoves: ['rock-throw', 'defense-curl', 'headbutt'] },
-        { speciesId: 49, formId: '49', level: 31, aiMoves: ['psybeam', 'supersonic', 'stun-spore'] },
+        { speciesId: 53, formId: '53', level: 29, aiMoves: ['pay-day', 'bite', 'growl'] },
+        { speciesId: 76, formId: '76', level: 30, aiMoves: ['rock-throw', 'defense-curl', 'headbutt'] },
+        { speciesId: 65, formId: '65', level: 30, aiMoves: ['confusion', 'disable', 'reflect'] },
       ],
     },
   ],
