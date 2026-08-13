@@ -13,7 +13,6 @@ import {
   Swords,
   ThumbsDown,
   ThumbsUp,
-  X,
 } from 'lucide-react'
 import Image from 'next/image'
 import { type ReactNode, useEffect, useRef, useState } from 'react'
@@ -21,6 +20,7 @@ import {
   RewardCarousel,
   type RewardItem,
 } from '@/components/game/reward-carousel'
+import { ExploreDrawerHeader } from '@/components/game/shared/ExploreDrawerHeader'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { Button } from '@/components/ui/button'
 import { ItemSprite } from '@/components/ui/item-sprite'
@@ -308,61 +308,33 @@ export function ExpeditionModal({
       mobileMaxHeight="calc(100dvh - 6rem)"
       className="flex h-[calc(100dvh-6rem)] w-screen max-w-none flex-col gap-0 overflow-hidden rounded-t-2xl border-x-0 border-b-0 border-t border-game-border bg-game-surface p-0 text-game-ink md:max-w-none lg:h-dvh lg:rounded-l-xl lg:rounded-t-none lg:border-y-0 lg:border-r-0"
     >
-      <div className="shrink-0 p-0">
-        <div className="relative h-56 w-full overflow-hidden border-b border-game-border bg-game-night-surface md:h-64">
-          <div className="absolute inset-0 z-0">
-            <Image
-              src={expedition?.background || '/backgrounds/forest.avif'}
-              alt={`${expeditionLabel} background`}
-              fill
-              sizes="100vw"
-              className="object-cover opacity-70 brightness-85"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-game-night-surface/5 via-game-night-surface/25 to-game-surface" />
-          </div>
-
-          <div className="absolute left-7 top-7 z-20">
-            <span className="inline-flex items-center gap-2 rounded-full border border-game-ochre/45 bg-game-night-surface/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-game-ochre backdrop-blur-md">
-              <MapIcon className="w-3.5 h-3.5" />
-              {expeditionLabel.toUpperCase()}
-            </span>
-          </div>
-
-          <div className="absolute left-1/2 top-3 z-20 h-1.5 w-20 -translate-x-1/2 rounded-full bg-game-cream/30" />
-
-          <button
+      <ExploreDrawerHeader
+        background={expedition?.background}
+        label={
+          <>
+            <MapIcon className="h-3.5 w-3.5" />
+            {expeditionLabel.toUpperCase()}
+          </>
+        }
+        icon={<TaskIconDisplay icon={item.icon} className="h-8 w-8" />}
+        onClose={() => onOpenChange(false)}
+        closeAriaLabel="Close expedition details"
+      >
+        {canAbandonExpedition && onRequestAbandonExpedition && (
+          <Button
             type="button"
-            onClick={() => onOpenChange(false)}
-            className="game-focus-ring absolute right-7 top-7 z-20 rounded-md border border-game-night-border/60 bg-game-night-surface/85 p-2 text-game-cream backdrop-blur-md transition-colors hover:bg-game-night-surface hover:text-game-night-ink"
-            aria-label="Close expedition details"
+            size="icon"
+            variant="outline"
+            onClick={onRequestAbandonExpedition}
+            disabled={loadingId === item.id}
+            className="absolute bottom-5 left-6 z-20 h-11 w-11 rounded-full border-game-night-border/60 bg-game-night-surface/72 text-game-cream hover:border-game-clay hover:bg-game-clay"
+            aria-label={`Abandon ${expeditionLabel}`}
+            title={`Abandon ${expeditionLabel}`}
           >
-            <X className="w-6 h-6" />
-          </button>
-
-          {canAbandonExpedition && onRequestAbandonExpedition && (
-            <Button
-              type="button"
-              size="icon"
-              variant="outline"
-              onClick={onRequestAbandonExpedition}
-              disabled={loadingId === item.id}
-              className="absolute bottom-5 left-6 z-20 h-11 w-11 rounded-full border-game-night-border/60 bg-game-night-surface/72 text-game-cream hover:border-game-clay hover:bg-game-clay"
-              aria-label={`Abandon ${expeditionLabel}`}
-              title={`Abandon ${expeditionLabel}`}
-            >
-              <DoorOpen className="w-5 h-5" />
-            </Button>
-          )}
-
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-6">
-            <div className="relative">
-              <div className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-lg border border-game-night-border/60 bg-game-night-surface/80 backdrop-blur-sm">
-                <TaskIconDisplay icon={item.icon} className="w-10 h-10" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+            <DoorOpen className="h-5 w-5" />
+          </Button>
+        )}
+      </ExploreDrawerHeader>
 
       <div className="custom-scrollbar flex-1 overflow-y-auto bg-game-canvas p-5 md:p-8">
         <div className="max-w-4xl mx-auto space-y-8 pb-8">
