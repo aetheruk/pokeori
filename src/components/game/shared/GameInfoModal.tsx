@@ -17,6 +17,7 @@ import {
 import { Progress } from '@/components/ui/progress'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { SectionDivider } from '@/components/ui/section-divider'
+import { ExploreDrawerHeader } from '@/components/game/shared/ExploreDrawerHeader'
 import { cn } from '@/lib/utils'
 
 export interface TaskProgressData {
@@ -163,59 +164,71 @@ export function GameInfoModal({
     )
   const content = (
     <>
-      <Header className="p-0 space-y-0 shrink-0">
-        <div className="relative h-40 w-full overflow-hidden border-b border-game-border bg-game-surface md:h-52">
-          {/* Background Image with Overlay */}
-          <div className="absolute inset-0 z-0">
-            <Image
-              src={background || '/backgrounds/forest.avif'}
-              alt="Background"
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover opacity-80 brightness-90"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-game-night-surface/5 via-game-night-surface/25 to-game-surface" />
-          </div>
-
-          {category && (
-            <div className="absolute left-7 top-7 z-50">
-              <span className="inline-block rounded-md border border-game-night-border/60 bg-game-night-surface/85 px-2.5 py-1 text-[11px] font-medium text-game-ochre backdrop-blur-md">
-                {category}
+      {isDrawer ? (
+        <ExploreDrawerHeader
+          background={background}
+          label={category}
+          icon={icon}
+          onClose={() => onOpenChange(false)}
+          badge={
+            isCaught ? (
+              <span className="flex items-center gap-0.5 rounded-full border-2 border-game-surface bg-game-moss px-2 py-0.5 text-[10px] font-black text-game-cream">
+                CAUGHT
               </span>
+            ) : undefined
+          }
+        />
+      ) : (
+        <Header className="p-0 space-y-0 shrink-0">
+          <div className="relative h-40 w-full overflow-hidden border-b border-game-border bg-game-surface md:h-52">
+            {/* Background Image with Overlay */}
+            <div className="absolute inset-0 z-0">
+              <Image
+                src={background || '/backgrounds/forest.avif'}
+                alt="Background"
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover opacity-80 brightness-90"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-game-night-surface/5 via-game-night-surface/25 to-game-surface" />
             </div>
-          )}
 
-          {isDrawer && (
-            <div className="absolute left-1/2 top-3 z-50 h-1.5 w-20 -translate-x-1/2 rounded-full bg-game-cream/30" />
-          )}
-
-          {/* Close Button */}
-          <Close className="game-focus-ring absolute right-7 top-7 z-50 flex size-10 items-center justify-center rounded-md border border-game-night-border/60 bg-game-night-surface/84 text-game-cream transition-colors hover:bg-game-night-surface hover:text-game-night-ink">
-            <X className="h-4 w-4" aria-hidden="true" />
-          </Close>
-
-          {/* Header Content */}
-          <div className="absolute inset-0 z-10 flex items-center justify-center p-5">
-            <div className="relative">
-              <div
-                className={cn(
-                  'group relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-game-border bg-game-surface-raised',
-                  isCaught && 'border-game-moss/60',
-                )}
-              >
-                <div className="absolute inset-0 bg-game-moss/10 opacity-0 transition-opacity group-hover:opacity-100" />
-                <div className="scale-125">{icon}</div>
+            {category && (
+              <div className="absolute left-7 top-7 z-50">
+                <span className="inline-block rounded-md border border-game-night-border/60 bg-game-night-surface/85 px-2.5 py-1 text-[11px] font-medium text-game-ochre backdrop-blur-md">
+                  {category}
+                </span>
               </div>
-              {isCaught && (
-                <div className="absolute -bottom-2 -right-2 flex items-center gap-0.5 rounded-full border-2 border-game-surface bg-game-moss px-2 py-0.5 text-[10px] font-black text-game-cream">
-                  <span>CAUGHT</span>
+            )}
+
+            {/* Close Button */}
+            <Close className="game-focus-ring absolute right-7 top-7 z-50 flex size-10 items-center justify-center rounded-md border border-game-night-border/60 bg-game-night-surface/84 text-game-cream transition-colors hover:bg-game-night-surface hover:text-game-night-ink">
+              <X className="h-4 w-4" aria-hidden="true" />
+            </Close>
+
+            {/* Header Content */}
+            <div className="absolute inset-0 z-10 flex items-center justify-center p-5">
+              <div className="relative">
+                <div
+                  className={cn(
+                    'group relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-game-border bg-game-surface-raised',
+                    isCaught && 'border-game-moss/60',
+                  )}
+                >
+                  <div className="absolute inset-0 bg-game-moss/10 opacity-0 transition-opacity group-hover:opacity-100" />
+                  <div className="scale-125">{icon}</div>
                 </div>
-              )}
+                {isCaught && (
+                  <div className="absolute -bottom-2 -right-2 flex items-center gap-0.5 rounded-full border-2 border-game-surface bg-game-moss px-2 py-0.5 text-[10px] font-black text-game-cream">
+                    <span>CAUGHT</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </Header>
+        </Header>
+      )}
 
       <div className="custom-scrollbar flex-1 overflow-x-hidden overflow-y-auto bg-game-canvas p-5 md:p-6">
         <div className="mx-auto max-w-3xl space-y-7 pb-8">
