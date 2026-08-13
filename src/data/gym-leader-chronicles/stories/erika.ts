@@ -18,13 +18,13 @@ export const erikaChronicleStory: KantoGymChronicleStory = {
       speech(mother, 'The exhibition committee will announce your patronage after the opening arrangement. Stand beside the Bellossom screen and say how honoured you are.'),
       speech(erika, 'Am I honoured?'),
       speech(mother, 'You will be when you understand what the appointment protects. Our family makes space for beautiful things.'),
-      speech(erika, 'Only the beautiful things that know where to stand.'),
+      speech(erika, 'And if I do not want to stand there?'),
     ]),
     scene('backstory', 'sumis-bench', 'The Greenhouse Before Guests', 'Erika finds freedom in Sumi’s working greenhouse, where plants are allowed to be useful.', greenhouse, [
       speech(sumi, 'This batch is not elegant. Gloom’s pollen makes the opening sharp, but it settles into something warmer after ten minutes.'),
       speech(erika, 'Then the first impression is honest and the second rewards patience. I like it.'),
       speech(sumi, 'Your mother will ask for roses.'),
-      speech(erika, 'My mother asks roses to apologise for being roses. Show me the measurements again.'),
+      speech(erika, 'My mother only likes roses that behave. Show me the measurements again.'),
       narration('At Sumi’s bench, Erika’s careful hands were not decorative. They weighed, crushed, filtered and recorded.'),
     ]),
     game('backstory', 'prepare-sumis-fragrance'),
@@ -40,7 +40,7 @@ export const erikaChronicleStory: KantoGymChronicleStory = {
       speech(erika, 'Sumi is not workshop detail.'),
       speech(mother, 'Of course not. She is valued staff. Valued staff do not need society guests examining their private history.'),
       speech(erika, 'You make concealment sound like kindness.'),
-      speech(mother, 'Kindness without discretion is merely vanity.'),
+      speech(mother, 'If you make a fuss about it, it stops being kind and starts being about you.'),
     ]),
 
     scene('development', 'celias-arrival', 'The Rival Arrangement', 'Celia arrives expecting a social contest and recognises Erika’s real interest.', exhibition, [
@@ -56,13 +56,13 @@ export const erikaChronicleStory: KantoGymChronicleStory = {
       speech(steward, 'Your mother approved the first wording.'),
       speech(erika, 'The first wording was inaccurate.'),
       speech(steward, 'Accuracy is rarely the only consideration at an exhibition.'),
-      speech(erika, 'That does not improve the inaccuracy.'),
+      speech(erika, 'That does not make it accurate.'),
     ]),
     scene('development', 'the-gym-proposal', 'A Public Garden', 'The League invites Erika’s family to sponsor a Gym and assumes she will lead it.', greenhouse, [
       speech(steward, 'Celadon needs a licensed Gym. Your family owns the garden site and funds the horticultural society. The committee believes Erika would be an elegant candidate.'),
       speech(mother, 'She would be delighted.'),
       speech(erika, 'You have not asked whether I want to be a Gym Leader.'),
-      speech(mother, 'You train every morning and lecture guests about plant care. This converts an eccentricity into standing.'),
+      speech(mother, 'You train every morning and lecture guests about plant care. That could turn an odd habit into real standing.'),
       speech(sumi, 'It might also give her authority over what the garden teaches.'),
     ]),
     scene('development', 'celias-challenge', 'An Acceptable Spectacle', 'Celia proposes a battle that can prove Erika’s skill in terms the committee understands.', exhibition, [
@@ -101,7 +101,7 @@ export const erikaChronicleStory: KantoGymChronicleStory = {
       speech(steward, 'Extraordinary restraint. The League could ask for no finer temperament in Celadon’s Leader.'),
       speech(celia, 'They watched you say exactly what you meant with your Pokémon. Then they applauded you for saying nothing with your own voice.'),
       speech(erika, 'You think I do not know that?'),
-      speech(celia, 'I think knowing has become the place you hide.'),
+      speech(celia, 'I think you know exactly what you are doing, and I think that is the problem.'),
     ]),
     scene('conflict', 'the-warehouse-threat', 'What the Family Protects', 'Erika learns why Sumi asked her not to speak.', warehouse, [
       speech(sumi, 'My brother’s dye workshop rents this building from your uncle. Your mother reminded me the lease is reviewed next month.'),
@@ -121,7 +121,7 @@ export const erikaChronicleStory: KantoGymChronicleStory = {
     scene('contemplation', 'among-closed-flowers', 'What Silence Preserves', 'Erika considers whether compromise is prudence or fear.', greenhouse, [
       narration('At dusk, the greenhouse flowers closed without an audience. Erika had always admired that they did not mistake visibility for life. Tonight the thought felt less like wisdom and more like an excuse.'),
       speech(erika, 'If I speak, Sumi pays first. If I do not, Mother learns the threat works.'),
-      speech(sumi, 'Both choices can be wrong in different directions.'),
+      speech(sumi, 'Then either choice is going to cost someone. You just get to pick who.'),
       speech(erika, 'Celia would speak.'),
       speech(sumi, 'Celia’s family owns its leases. Courage does not have the same price for everyone.'),
     ]),
@@ -135,7 +135,7 @@ export const erikaChronicleStory: KantoGymChronicleStory = {
     scene('contemplation', 'the-private-label', 'A Name Beneath the Drawer', 'Erika records the truth where it cannot yet alter the public story.', greenhouse, [
       narration('Erika wrote Sumi Arai, Formula Four in the greenhouse ledger and sealed a copy of the method beneath the specimen drawer. It was not justice. Its smallness made her ashamed, which was why she refused to call it enough.'),
       speech(sumi, 'One day the label may be safe to show.'),
-      speech(erika, 'One day is a dangerous place to store a promise.'),
+      speech(erika, 'If that day ever comes.'),
       speech(sumi, 'Then keep the promise where you must look at it while you work.'),
       speech(erika, 'I can do that. I wish I had done more.'),
     ]),
@@ -152,7 +152,7 @@ export const erikaChronicleStory: KantoGymChronicleStory = {
       speech(steward, 'The Rainbow licence is granted. Your methods showed patience without passivity and control without needless force.'),
       speech(erika, 'Those distinctions are easier in battle.'),
       speech(mother, 'You represented the family beautifully.'),
-      speech(erika, 'I represented the Gym. They will not always be the same thing.'),
+      speech(erika, 'I represented the Gym. That is who I am now.'),
       narration('Her mother smiled for the photographers. Erika smiled too. Neither expression resolved the sentence between them.'),
     ]),
     scene('resolution', 'sumis-contract', 'What Changes on Paper', 'The new contract protects Sumi’s future work but cannot repair the exhibition.', greenhouse, [
@@ -160,7 +160,7 @@ export const erikaChronicleStory: KantoGymChronicleStory = {
       speech(erika, 'Formula Four is excluded. Mother would not yield it.'),
       speech(sumi, 'I know.'),
       speech(erika, 'I need you to know I did not decide that was acceptable.'),
-      speech(sumi, 'Then do not confuse remembering a failure with repairing it. Build something better beside it.'),
+      speech(sumi, 'Then stop dwelling on the one we lost and build the next one properly.'),
     ]),
 
     scene('reflection', 'the-hidden-bottle', 'The Unspoken Bloom', 'Erika keeps the original formula as a private reminder of what her composure cost.', greenhouse, [
