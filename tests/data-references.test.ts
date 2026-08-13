@@ -662,6 +662,33 @@ describe('static data references', () => {
     expect(broken).toEqual([])
   })
 
+  test('dedicated status moves always inflict their primary status on hit', () => {
+    const alwaysStatusMoveIds = [
+      'thunder-wave',
+      'glare',
+      'stun-spore',
+      'toxic',
+      'will-o-wisp',
+      'sleep-powder',
+      'zap-cannon',
+      'buzzy-buzz',
+    ]
+    const movesById = new Map(getAllMoves().map((move) => [move.id, move]))
+
+    for (const moveId of alwaysStatusMoveIds) {
+      const move = movesById.get(moveId)
+      expect(move, `${moveId} should be authored`).toBeDefined()
+      expect(
+        move?.status,
+        `${moveId} should author its primary status`,
+      ).toBeDefined()
+      expect(
+        move?.status?.chance,
+        `${moveId} should always inflict its status on a successful hit`,
+      ).toBe(100)
+    }
+  })
+
   test('fishing item pools reference authored items', () => {
     const broken: Array<{ owner: string; itemId: string }> = []
 

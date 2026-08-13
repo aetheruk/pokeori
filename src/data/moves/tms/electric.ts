@@ -494,7 +494,7 @@ export const ELECTRIC_TM_MOVES: MoveConfig[] = [
     ],
     status: {
       id: 'paralysis',
-      chance: 80,
+      chance: 100,
       target: 'enemy',
     },
   },
