@@ -52,6 +52,18 @@ function solveSokoban(settings: any): number | null {
   const barriers = new Set((settings.barriers || []).map(key))
   const holes = new Set((settings.holes || []).map(key))
   const startBoulders = (settings.boulders || []).map(key).sort()
+  // The rock-push client always walls the outer ring of the grid, and the
+  // player cannot walk onto a hole cell. Mirrors isBlockedCellForPlayer and
+  // the border walls authored in buildScreenRuntimeState.
+  const isBorder = (position: Point) =>
+    position.x <= 0 ||
+    position.y <= 0 ||
+    position.x >= size - 1 ||
+    position.y >= size - 1
+  const blockedForRock = (position: Point) =>
+    isBorder(position) || barriers.has(key(position))
+  const blockedForPlayer = (position: Point) =>
+    blockedForRock(position) || holes.has(key(position))
   const queue = [
     { player: settings.playerStart, boulders: startBoulders, distance: 0 },
   ]
@@ -69,22 +81,14 @@ function solveSokoban(settings: any): number | null {
         y: current.player.y + delta.y,
       }
       if (
-        next.x < 0 ||
-        next.y < 0 ||
-        next.x >= size ||
-        next.y >= size ||
-        barriers.has(key(next))
+        blockedForPlayer(next)
       )
         continue
       const nextBoulders = [...current.boulders]
       if (boulders.has(key(next))) {
         const pushed = { x: next.x + delta.x, y: next.y + delta.y }
         if (
-          pushed.x < 0 ||
-          pushed.y < 0 ||
-          pushed.x >= size ||
-          pushed.y >= size ||
-          barriers.has(key(pushed)) ||
+          blockedForRock(pushed) ||
           boulders.has(key(pushed))
         )
           continue
