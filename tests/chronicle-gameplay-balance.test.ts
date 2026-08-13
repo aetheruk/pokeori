@@ -3,8 +3,19 @@ import { allGames } from '@/data/games'
 import type { MagnemiteCircuitGameConfig } from '@/data/games'
 import type { MagnemiteCircuitTile } from '@/data/games/magnemite-circuit'
 import type { VoltorbGridGameConfig } from '@/data/games/voltorb-grid'
+import { gymLeaderChronicleBattles } from '@/data/battles/entries/gym-leader-chronicles'
+import {
+  KANTO_GYM_CHRONICLES,
+  type KantoGymChronicleKey,
+} from '@/data/gym-leader-chronicles'
+import { gymLeaderChronicleExpeditions } from '@/data/expeditions/entries/gym-leader-chronicles'
+import { getMove } from '@/data/moves'
 import { procedureOrderGames } from '@/data/games/procedure-order'
 import { validateProcedureOrder } from '@/utilities/research/procedure-order'
+import { getDualTypeEffectiveness } from '@/utilities/battle/type-chart'
+import { calculateStats } from '@/utilities/battle/stats-calc'
+import { getPokemonForm } from '@/utilities/pokemon/pokedex'
+import type { BattleConfig, BattleEnemy } from '@/data/types'
 
 interface Point {
   x: number
@@ -566,6 +577,513 @@ function magnemiteMinClicks(
   return bestTotal
 }
 
+type BattleStanceChoice = 'power' | 'speed' | 'tech'
+
+interface ChronicleBattleMove {
+  id: string
+  type: string
+  stance: BattleStanceChoice
+  power: number
+  accuracy: number
+  damage: number
+  healPct?: number
+}
+
+interface ChronicleBattleMon {
+  name: string
+  level: number
+  types: string[]
+  stats: ReturnType<typeof calculateStats>
+  maxHp: number
+  hp: number
+  moves: ChronicleBattleMove[]
+  basic: ChronicleBattleMove[]
+}
+
+interface ChronicleBattlePoke {
+  speciesId: number
+  formId?: string
+  level: number
+  moves: string[]
+}
+
+const battleStanceMultiplier = (
+  player: BattleStanceChoice,
+  enemy: BattleStanceChoice,
+) => {
+  if (player === enemy) return 1
+  if (
+    (player === 'power' && enemy === 'tech') ||
+    (player === 'speed' && enemy === 'power') ||
+    (player === 'tech' && enemy === 'speed')
+  ) {
+    return 1.35
+  }
+  return 0.75
+}
+
+const chronicleTypeStancePreferences: Record<string, BattleStanceChoice> = {
+  fighting: 'power',
+  ground: 'power',
+  rock: 'power',
+  steel: 'power',
+  poison: 'power',
+  bug: 'power',
+  electric: 'speed',
+  flying: 'speed',
+  dark: 'speed',
+  ghost: 'speed',
+  ice: 'speed',
+  water: 'tech',
+  fire: 'tech',
+  grass: 'tech',
+  psychic: 'tech',
+  dragon: 'tech',
+  fairy: 'tech',
+}
+
+function makeChronicleBattleBasicAttack(
+  stance: BattleStanceChoice,
+): ChronicleBattleMove {
+  return {
+    id: `basic-${stance}`,
+    type: '',
+    stance,
+    power: 50,
+    accuracy: 1,
+    damage: 1,
+  }
+}
+
+function buildChronicleBattleMon(
+  pokemon: ChronicleBattlePoke,
+): ChronicleBattleMon {
+  const form = getPokemonForm(pokemon.formId || String(pokemon.speciesId))
+  if (!form) throw new Error(`missing form ${pokemon.formId}`)
+  const stats = calculateStats({
+    formId: pokemon.formId || String(pokemon.speciesId),
+    level: pokemon.level,
+    ivs: {
+      hp: 0,
+      attack: 0,
+      defense: 0,
+      specialAttack: 0,
+      specialDefense: 0,
+      speed: 0,
+    },
+    evs: {
+      hp: 0,
+      attack: 0,
+      defense: 0,
+      specialAttack: 0,
+      specialDefense: 0,
+      speed: 0,
+    },
+  } as any)
+  const moves: ChronicleBattleMove[] = []
+  for (const moveId of pokemon.moves) {
+    const move = getMove(moveId)
+    if (!move) continue
+    if ((move.damage || 0) > 0) {
+      moves.push({
+        id: moveId,
+        type: move.forcedType || '',
+        stance: (move.stance || 'speed') as BattleStanceChoice,
+        power: Math.max(1, Math.round(50 * (move.damage || 0))),
+        accuracy: (move.accuracy ?? 100) / 100,
+        damage: move.damage || 0,
+      })
+    } else if (moveId === 'recover') {
+      moves.push({
+        id: moveId,
+        type: 'normal',
+        stance: 'tech',
+        power: 0,
+        accuracy: 1,
+        damage: 0,
+        healPct: 0.5,
+      })
+    }
+  }
+  return {
+    name: form.name || String(pokemon.speciesId),
+    level: pokemon.level,
+    types: form.types,
+    stats,
+    maxHp: stats.hp,
+    hp: stats.hp,
+    moves,
+    basic: (['power', 'speed', 'tech'] as BattleStanceChoice[]).map(
+      makeChronicleBattleBasicAttack,
+    ),
+  }
+}
+
+function chronicleBattleExpectedDamage(
+  attacker: ChronicleBattleMon,
+  defender: ChronicleBattleMon,
+  move: ChronicleBattleMove,
+  defenderStance: BattleStanceChoice,
+) {
+  if (move.damage <= 0) return 0
+  let effectiveness = 0
+  if (move.type) {
+    effectiveness = getDualTypeEffectiveness(move.type, defender.types)
+  } else {
+    for (const type of attacker.types) {
+      effectiveness = Math.max(
+        effectiveness,
+        getDualTypeEffectiveness(type, defender.types),
+      )
+    }
+  }
+  if (effectiveness <= 0) return 0
+
+  let attackStat = 0
+  let defenseStat = 0
+  if (move.stance === 'power') {
+    attackStat = attacker.stats.attack
+    defenseStat = defender.stats.defense
+  } else if (move.stance === 'tech') {
+    attackStat = attacker.stats.specialAttack
+    defenseStat = defender.stats.specialDefense
+  } else {
+    attackStat = attacker.stats.speed
+    defenseStat = defender.stats.speed
+  }
+  const raw =
+    (((2 * attacker.level) / 5 + 2) *
+      move.power *
+      (attackStat / Math.max(1, defenseStat))) /
+      50 +
+    2
+  return (
+    raw *
+    battleStanceMultiplier(move.stance, defenderStance) *
+    effectiveness *
+    move.accuracy
+  )
+}
+
+function chronicleBattleBestAction(
+  attacker: ChronicleBattleMon,
+  defender: ChronicleBattleMon,
+  defenderStance: BattleStanceChoice,
+  allowBasic: boolean,
+): { move: ChronicleBattleMove; damage: number } {
+  let best = { move: attacker.basic[1], damage: 0 }
+  const options = allowBasic
+    ? [...attacker.moves, ...attacker.basic]
+    : attacker.moves
+  for (const move of options) {
+    const damage = chronicleBattleExpectedDamage(
+      attacker,
+      defender,
+      move,
+      defenderStance,
+    )
+    if (damage > best.damage) best = { move, damage }
+  }
+  return best
+}
+
+function chronicleEnemyStanceWeights(
+  enemy: ChronicleBattleMon,
+  player: ChronicleBattleMon,
+): Record<BattleStanceChoice, number> {
+  let powerWeight = enemy.stats.attack
+  let speedWeight = enemy.stats.speed
+  let techWeight = enemy.stats.specialAttack
+  for (const type of enemy.types) {
+    const preferred = chronicleTypeStancePreferences[type.toLowerCase()]
+    const bonus = enemy.level <= 15 ? 20 : enemy.level <= 40 ? 15 : 10
+    if (preferred === 'power') powerWeight += bonus
+    else if (preferred === 'speed') speedWeight += bonus
+    else if (preferred === 'tech') techWeight += bonus
+  }
+  if (enemy.level > 15) {
+    const attack = player.stats.attack
+    const speed = player.stats.speed
+    const specialAttack = player.stats.specialAttack
+    if (attack > speed && attack > specialAttack) speedWeight += 25
+    else if (speed > attack && speed > specialAttack) techWeight += 25
+    else if (specialAttack > attack && specialAttack > speed) powerWeight += 25
+  }
+  return {
+    power: Math.max(0, powerWeight + 5),
+    speed: Math.max(0, speedWeight + 5),
+    tech: Math.max(0, techWeight + 5),
+  }
+}
+
+function chronicleBattleBestMoveInStance(
+  attacker: ChronicleBattleMon,
+  defender: ChronicleBattleMon,
+  stance: BattleStanceChoice,
+  allowBasic: boolean,
+) {
+  let best = { move: attacker.basic[0], damage: 0 }
+  const options = allowBasic
+    ? [...attacker.moves, ...attacker.basic]
+    : attacker.moves
+  for (const move of options) {
+    if (move.stance !== stance || move.damage <= 0) continue
+    const damage = chronicleBattleExpectedDamage(
+      attacker,
+      defender,
+      move,
+      stance,
+    )
+    if (damage > best.damage) best = { move, damage }
+  }
+  return best
+}
+
+function chronicleBattleMatchup(
+  attacker: ChronicleBattleMon,
+  defender: ChronicleBattleMon,
+) {
+  // The enemy commits to a stance before seeing the player's choice, so the
+  // player picks the stance and move that maximises expected damage over the
+  // enemy's stance distribution.
+  const weights = chronicleEnemyStanceWeights(defender, attacker)
+  const total = weights.power + weights.speed + weights.tech
+  let best = {
+    playerMove: attacker.basic[0],
+    stance: 'power' as BattleStanceChoice,
+    playerDamage: 0,
+    enemyDamage: Number.POSITIVE_INFINITY,
+  }
+  for (const stance of ['power', 'speed', 'tech'] as BattleStanceChoice[]) {
+    const playerMove = chronicleBattleBestMoveInStance(
+      attacker,
+      defender,
+      stance,
+      true,
+    )
+    let playerExpected = 0
+    let enemyExpected = 0
+    for (const enemyStance of ['power', 'speed', 'tech'] as BattleStanceChoice[]) {
+      const chance = weights[enemyStance] / total
+      const enemyMove = chronicleBattleBestMoveInStance(
+        defender,
+        attacker,
+        enemyStance,
+        true,
+      )
+      playerExpected +=
+        chance *
+        chronicleBattleExpectedDamage(
+          attacker,
+          defender,
+          playerMove.move,
+          enemyStance,
+        )
+      enemyExpected +=
+        chance *
+        chronicleBattleExpectedDamage(
+          defender,
+          attacker,
+          enemyMove.move,
+          stance,
+        )
+    }
+    if (playerExpected - enemyExpected > best.playerDamage - best.enemyDamage) {
+      best = {
+        playerMove: playerMove.move,
+        stance,
+        playerDamage: playerExpected,
+        enemyDamage: enemyExpected,
+      }
+    }
+  }
+  return {
+    playerMove: best.playerMove,
+    playerDamage: best.playerDamage,
+    enemyDamage: best.enemyDamage,
+  }
+}
+
+const CHRONICLE_BATTLE_POTIONS: Record<string, number> = {
+  'battle-potion': 20,
+  'battle-super-potion': 50,
+  'battle-hyper-potion': 200,
+}
+
+function chronicleBattleIsWinnable(
+  playerMons: ChronicleBattlePoke[],
+  enemyTeam: BattleEnemy[],
+  items: Record<string, number>,
+): boolean {
+  const players = playerMons.map(buildChronicleBattleMon)
+  const enemies = enemyTeam.map((enemy) =>
+    buildChronicleBattleMon({
+      speciesId: enemy.speciesId,
+      formId: enemy.formId,
+      level: enemy.level as number,
+      moves: enemy.aiMoves || [],
+    }),
+  )
+  const memo = new Set<string>()
+  let states = 0
+
+  const search = (
+    playerIndex: number,
+    playerHps: number[],
+    enemyIndex: number,
+    enemyHps: number[],
+    potions: Record<string, number>,
+    turn: number,
+  ): boolean => {
+    states += 1
+    if (states > 2_000_000 || turn > 80) return false
+    if (enemyHps.every((hp) => hp <= 0)) return true
+    const key = `${playerIndex}|${playerHps.join(',')}|${enemyIndex}|${enemyHps.join(',')}|${Object.values(
+      potions,
+    ).join(',')}|${turn}`
+    if (memo.has(key)) return false
+    memo.add(key)
+    if (playerHps.every((hp) => hp <= 0)) return false
+
+    const player = players[playerIndex]
+    const enemy = enemies[enemyIndex]
+    const { playerDamage, playerMove, enemyDamage } = chronicleBattleMatchup(
+      player,
+      enemy,
+    )
+
+    if (playerMove.damage > 0) {
+      const nextPlayerHps = [...playerHps]
+      const nextEnemyHps = [...enemyHps]
+      nextPlayerHps[playerIndex] = Math.max(
+        0,
+        nextPlayerHps[playerIndex] - enemyDamage,
+      )
+      nextEnemyHps[enemyIndex] = Math.max(
+        0,
+        nextEnemyHps[enemyIndex] - playerDamage,
+      )
+      if (nextEnemyHps.every((hp) => hp <= 0)) return true
+      let nextEnemy = enemyIndex
+      while (nextEnemy < enemies.length && nextEnemyHps[nextEnemy] <= 0) {
+        nextEnemy += 1
+      }
+      if (nextEnemy >= enemies.length) return true
+      if (nextPlayerHps.every((hp) => hp <= 0)) return false
+      if (nextPlayerHps[playerIndex] > 0) {
+        if (
+          search(
+            playerIndex,
+            nextPlayerHps,
+            nextEnemy,
+            nextEnemyHps,
+            potions,
+            turn + 1,
+          )
+        ) {
+          return true
+        }
+      } else {
+        for (let index = 0; index < players.length; index += 1) {
+          if (
+            nextPlayerHps[index] > 0 &&
+            search(
+              index,
+              nextPlayerHps,
+              nextEnemy,
+              nextEnemyHps,
+              potions,
+              turn + 1,
+            )
+          ) {
+            return true
+          }
+        }
+      }
+    }
+
+    if (playerMove.healPct) {
+      const nextPlayerHps = [...playerHps]
+      nextPlayerHps[playerIndex] = Math.max(
+        0,
+        Math.min(
+          player.maxHp,
+          nextPlayerHps[playerIndex] +
+            Math.floor(player.maxHp * playerMove.healPct),
+        ) - enemyDamage,
+      )
+      if (
+        nextPlayerHps[playerIndex] > 0 &&
+        search(
+          playerIndex,
+          nextPlayerHps,
+          enemyIndex,
+          enemyHps,
+          potions,
+          turn + 1,
+        )
+      ) {
+        return true
+      }
+    }
+
+    for (const [itemId, amount] of Object.entries(potions)) {
+      if (amount <= 0) continue
+      const nextPotions = { ...potions, [itemId]: amount - 1 }
+      const nextPlayerHps = [...playerHps]
+      nextPlayerHps[playerIndex] = Math.max(
+        0,
+        Math.min(
+          player.maxHp,
+          nextPlayerHps[playerIndex] + CHRONICLE_BATTLE_POTIONS[itemId],
+        ) - enemyDamage,
+      )
+      if (
+        nextPlayerHps[playerIndex] > 0 &&
+        search(
+          playerIndex,
+          nextPlayerHps,
+          enemyIndex,
+          enemyHps,
+          nextPotions,
+          turn + 1,
+        )
+      ) {
+        return true
+      }
+    }
+
+    for (let index = 0; index < players.length; index += 1) {
+      if (index === playerIndex || playerHps[index] <= 0) continue
+      const nextPlayerHps = [...playerHps]
+      nextPlayerHps[index] = Math.max(0, nextPlayerHps[index] - enemyDamage)
+      if (
+        nextPlayerHps[index] > 0 &&
+        search(
+          index,
+          nextPlayerHps,
+          enemyIndex,
+          enemyHps,
+          potions,
+          turn + 1,
+        )
+      ) {
+        return true
+      }
+    }
+    return false
+  }
+
+  return search(
+    0,
+    players.map((pokemon) => pokemon.hp),
+    0,
+    enemies.map((pokemon) => pokemon.hp),
+    { ...items },
+    0,
+  )
+}
+
 describe('Chronicle gameplay balance', () => {
   test('procedure-order UI keeps its controls reachable in a fixed viewport', async () => {
     const source = await Bun.file(
@@ -715,6 +1233,43 @@ describe('Chronicle gameplay balance', () => {
     expect(minimum!, game!.id).toBeGreaterThanOrEqual(8)
     expect(minimum!, game!.id).toBeLessThanOrEqual(settings.maxRotations ?? 18)
     expect(settings.maxRotations! - minimum!, game!.id).toBeLessThanOrEqual(6)
+  })
+
+  test('every Chronicle battle is winnable with its authored memory team', () => {
+    const chronicleByKey = new Map(
+      KANTO_GYM_CHRONICLES.map((chronicle) => [chronicle.key, chronicle]),
+    )
+    const expeditionByKey = new Map(
+      gymLeaderChronicleExpeditions.map((expedition) => {
+        const key = [...chronicleByKey.values()].find(
+          (chronicle) => chronicle.expeditionId === expedition.id,
+        )!.key
+        return [key, expedition]
+      }),
+    )
+
+    for (const battle of gymLeaderChronicleBattles) {
+      const key = battle.id.split('-')[2] as KantoGymChronicleKey
+      const chronicle = expeditionByKey.get(key)!.chronicle as any
+      const loadout = chronicle?.activityLoadouts?.[battle.id]
+      const playerMons: ChronicleBattlePoke[] = (
+        loadout?.battleTeam?.length
+          ? loadout.battleTeam
+          : chronicle?.battleTeam || []
+      ).map((pokemon: any) => ({
+        speciesId: pokemon.speciesId,
+        formId: pokemon.formId,
+        level: pokemon.level,
+        moves: pokemon.assignedMoves || [],
+      }))
+      const items: Record<string, number> =
+        loadout?.battleItems || chronicle?.battleItems || {}
+
+      expect(
+        chronicleBattleIsWinnable(playerMons, battle.enemyTeam, items),
+        `${battle.id} must be winnable with its authored team`,
+      ).toBe(true)
+    }
   })
 
   test('Chronicle games use deliberate mid-to-late challenge budgets', () => {
