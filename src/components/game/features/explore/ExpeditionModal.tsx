@@ -306,22 +306,22 @@ export function ExpeditionModal({
       showCloseButton={false}
       desktopWidth="min(44vw, 680px)"
       mobileMaxHeight="calc(100dvh - 6rem)"
-      className="flex h-[calc(100dvh-6rem)] w-screen max-w-none flex-col gap-0 overflow-hidden rounded-t-[2rem] border-x-0 border-b-0 border-t border-game-border bg-game-surface p-0 text-game-ink md:max-w-none lg:h-dvh lg:rounded-l-xl lg:rounded-t-none lg:border-y-0 lg:border-r-0"
+      className="flex h-[calc(100dvh-6rem)] w-screen max-w-none flex-col gap-0 overflow-hidden rounded-t-2xl border-x-0 border-b-0 border-t border-game-border bg-game-surface p-0 text-game-ink md:max-w-none lg:h-dvh lg:rounded-l-xl lg:rounded-t-none lg:border-y-0 lg:border-r-0"
     >
       <div className="shrink-0 p-0">
-        <div className="relative h-44 w-full overflow-hidden border-b border-game-border bg-game-night-surface md:h-52">
+        <div className="relative h-56 w-full overflow-hidden border-b border-game-border bg-game-night-surface md:h-64">
           <div className="absolute inset-0 z-0">
             <Image
               src={expedition?.background || '/backgrounds/forest.avif'}
               alt={`${expeditionLabel} background`}
               fill
               sizes="100vw"
-              className="object-cover opacity-40 brightness-50"
+              className="object-cover opacity-70 brightness-85"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-game-night-surface/10 via-game-night-surface/58 to-game-surface" />
+            <div className="absolute inset-0 bg-gradient-to-b from-game-night-surface/5 via-game-night-surface/25 to-game-surface" />
           </div>
 
-          <div className="absolute left-6 top-6 z-20">
+          <div className="absolute left-7 top-7 z-20">
             <span className="inline-flex items-center gap-2 rounded-full border border-game-ochre/45 bg-game-night-surface/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-game-ochre backdrop-blur-md">
               <MapIcon className="w-3.5 h-3.5" />
               {expeditionLabel.toUpperCase()}
@@ -333,7 +333,7 @@ export function ExpeditionModal({
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="game-focus-ring absolute right-4 top-4 z-20 rounded-md border border-game-night-border/60 bg-game-night-surface/85 p-2 text-game-cream backdrop-blur-md transition-colors hover:bg-game-night-surface hover:text-game-night-ink"
+            className="game-focus-ring absolute right-7 top-7 z-20 rounded-md border border-game-night-border/60 bg-game-night-surface/85 p-2 text-game-cream backdrop-blur-md transition-colors hover:bg-game-night-surface hover:text-game-night-ink"
             aria-label="Close expedition details"
           >
             <X className="w-6 h-6" />
