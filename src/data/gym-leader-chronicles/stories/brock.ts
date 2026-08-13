@@ -184,7 +184,7 @@ export const brockChronicleStory: KantoGymChronicleStory = {
       speech(forrest, 'Reading is not a household emergency. You are still off.'),
       speech(brock, 'All right. But wake me if the roof moves.'),
     ]),
-    scene('reflection', 'the-chair-is-just-a-chair', 'No Place Empty', 'Brock stops measuring family by who occupies Flint’s old seat.', home, [
+    scene('reflection', 'the-chair-is-just-a-chair', 'No Place Empty', 'Flint’s old chair stays at the table, but nobody keeps it empty anymore.', home, [
       narration('Flint’s old chair stayed at the table, but nobody kept it empty anymore. Some mornings Flint sat there. Some mornings a twin piled schoolbooks on it. Once, Onix put his head through the window and took the whole loaf.'),
       speech(flint, 'You know, I used to think that chair meant I was in charge.'),
       speech(brock, 'It means you are closest to the stove. Turn the eggs before they burn.'),

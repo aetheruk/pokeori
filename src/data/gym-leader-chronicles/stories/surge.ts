@@ -13,7 +13,7 @@ const child = character('Niko', trainer('youngster'))
 
 export const surgeChronicleStory: KantoGymChronicleStory = {
   sequence: [
-    scene('backstory', 'storm-transport', 'The Last Transport', 'Surge learns what an electrical system means when lives depend on it.', transport, [
+    scene('backstory', 'storm-transport', 'The Last Transport', 'Lightning knocks out every instrument on the transport, and Surge has to keep the medical deck powered.', transport, [
       narration('Years before Vermilion knew him as a Gym Leader, Surge worked aboard a storm transport that carried field medics and wounded Pokémon. Lightning turned the sea white. Then every instrument on the bridge failed at once.'),
       speech(mako, 'Main power is gone. I am trying to isolate the backup cells, but they are flooding faster than I can keep up.'),
       speech(surge, 'Then stop trying to save the whole board. Give me one live route to the medical deck and kill everything else.'),
@@ -27,7 +27,7 @@ export const surgeChronicleStory: KantoGymChronicleStory = {
       speech(mako, 'The east conduit is arcing.'),
       speech(surge, 'Then we move between the arcs. Go.'),
     ]),
-    scene('backstory', 'the-cost-of-ninety-seconds', 'A Route Kept Alive', 'The transport survives, and Surge mistakes survival for proof that every command was right.', transport, [
+    scene('backstory', 'the-cost-of-ninety-seconds', 'A Route Kept Alive', 'The transport makes port, but the burns Mako carries show what those commands cost.', transport, [
       narration('The medical deck kept its power. Navigation came back one hundred and twelve seconds later. Two crewmen were burned crossing the conduit, including Mako, who followed the order before he could question it.'),
       speech(mako, 'We made port. That is what the report will say.'),
       speech(surge, 'That is what matters.'),
@@ -90,7 +90,7 @@ export const surgeChronicleStory: KantoGymChronicleStory = {
       speech(surge, 'On the transport, hesitation cost lives.'),
       speech(mako, 'And following orders cost burns. Both of those things are true.'),
     ]),
-    scene('conflict', 'ask-the-room', 'What Do You Need?', 'Surge changes the question and gains a plan he could not command into existence.', shelter, [
+    scene('conflict', 'ask-the-room', 'What Do You Need?', 'Surge stops giving orders and asks the room what it actually needs.', shelter, [
       speech(surge, 'All right. Mako, what route is safe?'),
       speech(mako, 'The service bridge, if somebody grounds the western fence first.'),
       speech(nurse, 'I can move medical south now that the first families are settled. That frees two insulated mats.'),
@@ -108,7 +108,7 @@ export const surgeChronicleStory: KantoGymChronicleStory = {
       narration('Raichu planted its feet. Surge waited for the spark before he moved.'),
     ]),
     battle('conflict', 'substation-magneton'),
-    scene('conflict', 'lights-return', 'A City Exhales', 'Power returns gradually, exposing the difference between rescue and repair.', streets, [
+    scene('conflict', 'lights-return', 'A City Exhales', 'The harbour lights come back one row at a time, and Surge admits how close he came to sending Mako across the trench.', streets, [
       narration('The harbour lamps came back one row at a time. People cheered inside the Gym. Surge could not join them yet. Every light reminded him of an instrument blinking back on board the transport.'),
       speech(mako, 'Magneton is stable. The flooded bank stayed isolated. Nobody crossed the trench.'),
       speech(surge, 'I nearly sent you across it.'),
@@ -164,14 +164,14 @@ export const surgeChronicleStory: KantoGymChronicleStory = {
       speech(surge, 'The second is surviving his commentary.'),
     ]),
 
-    scene('reflection', 'when-thunder-returns', 'A Different Voice', 'Another storm shows how deeply the lesson has entered the building.', shelter, [
+    scene('reflection', 'when-thunder-returns', 'A Different Voice', 'A summer storm rolls in during a full Gym challenge, and the shelter opens before the siren.', shelter, [
       narration('The next summer, thunder rolled over Vermilion in the middle of a full Gym challenge. Surge stopped the match before the siren and opened the shelter partitions.'),
       speech(surge, 'Mako, what do you see on the east bank?'),
       speech(mako, 'Stable for now. I would isolate it before the first people arrive.'),
       speech(surge, 'Agreed. Hana, what does medical need?'),
       narration('His voice still carried across the room. The difference was that it made room for answers.'),
     ]),
-    scene('reflection', 'after-the-thunder', 'Lights Along the Harbour', 'Surge accepts that courage can include revising the command.', streets, [
+    scene('reflection', 'after-the-thunder', 'Lights Along the Harbour', 'Surge watches the harbour lights hold and lets the revised plan be the one that worked.', streets, [
       speech(mako, 'People still tell the transport story. In their version, you held the whole ship together with Raichu and one sentence.'),
       speech(surge, 'That is a nice story. It leaves out every part that went wrong.'),
       speech(mako, 'That sounds like something for the sign outside.'),

@@ -156,7 +156,7 @@ export const mistyChronicleStory: KantoGymChronicleStory = {
       speech(daisy, 'And on four, try not to battle the chandelier.'),
     ]),
 
-    scene('reflection', 'two-posters', 'Two Honest Posters', 'Cerulean stops asking one image to explain everything it is.', theatre, [
+    scene('reflection', 'two-posters', 'Two Honest Posters', 'Two posters go up outside the Gym, one for the evening show and one for the challenge programme.', theatre, [
       narration('Two posters went up outside the Gym. One promised the Waterflower Sisters’ evening show. The other announced Cerulean Gym Challenges under Leader Misty. Neither poster called the other a special attraction.'),
       speech(misty, 'Your portrait is bigger.'),
       speech(daisy, 'There are three of us on that poster.'),

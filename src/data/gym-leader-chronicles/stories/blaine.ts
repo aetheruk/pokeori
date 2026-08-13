@@ -120,7 +120,7 @@ export const blaineChronicleStory: KantoGymChronicleStory = { sequence: [
     narration('Fuji did not soften it. Blaine was grateful, and hated him for it.'),
   ]),
 
-  scene('contemplation','years-of-questions','The Abandoned Quiz Room','Blaine spends years turning answers into accountable questions.',quiz,[
+  scene('contemplation','years-of-questions','The Abandoned Quiz Room','Blaine comes back to the empty Gym wing and writes the questions he should have asked.',quiz,[
     narration('The proposed Gym wing gathered dust. Blaine came back alone to write questions on its walls: Who can stop this? Who benefits if it continues? What evidence would make us abandon the result?'),
     speech(orin,'You have written the same question twelve ways.'),
     speech(blaine,'Then maybe one version reaches me before curiosity does.'),
@@ -170,7 +170,7 @@ export const blaineChronicleStory: KantoGymChronicleStory = { sequence: [
     speech(blaine,'She did complain. I have the note.'),
     narration('They moved the desk. The absence stayed, without becoming an altar.'),
   ]),
-  scene('reflection','when-the-answer-is-stop','The Work After Knowing','Blaine proves the lesson only by repeating it when the result is tempting.',lab,[
+  scene('reflection','when-the-answer-is-stop','The Work After Knowing','The rare response returns during an ordinary recovery, and Blaine stops the chamber anyway.',lab,[
     narration('Months later, Magmar’s rare response returned during an ordinary recovery. The curve climbed cleanly toward the discovery Blaine had once wanted more than caution.'),
     speech(orin,'Wall temperature diverging.'),
     speech(blaine,'Stop the chamber.'),
