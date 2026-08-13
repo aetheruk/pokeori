@@ -53,7 +53,7 @@ export function TrainerCard({ name, icon, banner, title, className, children }: 
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-end px-6 pb-6 pt-8">
         {/* Icon */}
         <div className="relative mb-3">
-          <div className="w-14 h-14 bg-game-night-ink/10 rounded-lg flex items-center justify-center overflow-hidden shrink-0 border border-game-night-ink/20 shadow-xl backdrop-blur-md">
+          <div className="w-14 h-14 bg-game-surface-raised/90 rounded-lg flex items-center justify-center overflow-hidden shrink-0 border border-game-border/70 shadow-xl backdrop-blur-md">
             <TaskIconDisplay icon={iconData as any} className="w-10 h-10" />
           </div>
         </div>

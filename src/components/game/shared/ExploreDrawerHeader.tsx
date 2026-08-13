@@ -48,7 +48,7 @@ export function ExploreDrawerHeader({
 
       {label && (
         <div className="absolute left-7 top-7 z-20">
-          <span className="inline-flex items-center gap-2 rounded-full border border-game-ochre/45 bg-game-night-surface/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-game-ochre backdrop-blur-md">
+          <span className="inline-flex items-center gap-2 rounded-full border border-game-ochre/45 bg-game-surface-raised/95 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-game-clay-strong backdrop-blur-md">
             {label}
           </span>
         </div>
@@ -59,7 +59,7 @@ export function ExploreDrawerHeader({
       <button
         type="button"
         onClick={onClose}
-        className="game-focus-ring absolute right-7 top-7 z-20 rounded-md border border-game-night-border/60 bg-game-night-surface/85 p-2 text-game-cream backdrop-blur-md transition-colors hover:bg-game-night-surface hover:text-game-night-ink"
+        className="game-focus-ring absolute right-7 top-7 z-20 rounded-md border border-game-border/60 bg-game-surface-raised/90 p-2 text-game-ink backdrop-blur-md transition-colors hover:bg-game-surface hover:text-game-clay-strong"
         aria-label={closeAriaLabel}
       >
         <X className="h-6 w-6" />
@@ -71,7 +71,7 @@ export function ExploreDrawerHeader({
         <div className="relative">
           <div
             className={cn(
-              'relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-lg border border-game-night-border/60 bg-game-night-surface/80 backdrop-blur-sm',
+              'relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-lg border border-game-border/60 bg-game-surface-raised/90 backdrop-blur-sm',
               iconClassName,
             )}
           >

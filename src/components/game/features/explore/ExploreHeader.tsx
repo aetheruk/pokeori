@@ -152,7 +152,7 @@ export function ExploreHeader({
             <button
               type="button"
               onClick={() => setIsInfoOpen(true)}
-              className="game-focus-ring flex min-h-10 items-center gap-1.5 rounded-md border border-game-night-border/60 bg-game-night-surface/85 px-2.5 py-1.5 text-xs font-medium text-game-cream backdrop-blur-md transition-colors hover:bg-game-night-surface"
+              className="game-focus-ring flex min-h-10 items-center gap-1.5 rounded-md border border-game-border/60 bg-game-surface-raised/90 px-2.5 py-1.5 text-xs font-medium text-game-ink backdrop-blur-md transition-colors hover:bg-game-surface"
               title={isDaytime ? 'Daytime' : 'Nighttime'}
             >
               {isDaytime ? (
@@ -161,7 +161,7 @@ export function ExploreHeader({
                 <Moon className="w-4 h-4" />
               )}
               <span>{formattedRegionTime}</span>
-              <span className="h-3 w-px bg-game-cream/30" />
+              <span className="h-3 w-px bg-game-ink/25" />
               <WeatherIcon weather={weather.weather} />
               <span>{weather.label}</span>
             </button>

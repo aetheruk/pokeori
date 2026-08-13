@@ -768,7 +768,7 @@ export function TrainerLeveling() {
                     <span className="min-w-0 truncate font-display text-sm font-semibold text-game-cream">
                       {selectedBannerDefinition?.name || 'Choose a banner'}
                     </span>
-                    <span className="shrink-0 rounded-md border border-game-cream/45 bg-game-night-canvas/35 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-game-cream">
+                    <span className="shrink-0 rounded-md border border-game-border/70 bg-game-surface-raised/90 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-game-clay-strong">
                       Browse
                     </span>
                   </span>

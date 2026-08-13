@@ -196,14 +196,14 @@ export function GameInfoModal({
 
             {category && (
               <div className="absolute left-7 top-7 z-50">
-                <span className="inline-block rounded-md border border-game-night-border/60 bg-game-night-surface/85 px-2.5 py-1 text-[11px] font-medium text-game-ochre backdrop-blur-md">
+                <span className="inline-block rounded-md border border-game-ochre/45 bg-game-surface-raised/95 px-2.5 py-1 text-[11px] font-medium text-game-clay-strong backdrop-blur-md">
                   {category}
                 </span>
               </div>
             )}
 
             {/* Close Button */}
-            <Close className="game-focus-ring absolute right-7 top-7 z-50 flex size-10 items-center justify-center rounded-md border border-game-night-border/60 bg-game-night-surface/84 text-game-cream transition-colors hover:bg-game-night-surface hover:text-game-night-ink">
+            <Close className="game-focus-ring absolute right-7 top-7 z-50 flex size-10 items-center justify-center rounded-md border border-game-border/60 bg-game-surface-raised/90 text-game-ink transition-colors hover:bg-game-surface hover:text-game-clay-strong">
               <X className="h-4 w-4" aria-hidden="true" />
             </Close>
 

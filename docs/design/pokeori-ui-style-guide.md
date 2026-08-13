@@ -98,3 +98,5 @@ The wide-screen breakpoint is `lg` (1024px). Below it, the app remains touch-fir
 ## Migration note
 
 The player-facing refactor is staged. A compatibility bridge at the end of `src/styles/globals.css` maps older zinc, white, teal, emerald, and black utility classes to the active field-journal tokens while data-heavy screens are migrated. New work should use the semantic `game-*` utilities directly; the bridge is a safety net, not a replacement for updating touched components.
+
+Explore drawer and dialog header plaques, the explore page weather chip, expedition abandon control, trainer banner chips, and trainer-card icon tiles now use light raised-paper surfaces with clay/ochre accents directly, so they stay paper-first even outside `game-activity-chrome` screens.
