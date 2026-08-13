@@ -35,7 +35,7 @@ const definitions: Record<KantoGymChronicleKey, ChronicleBattleDefinition[]> = {
       enemyTeam: [
         { speciesId: 111, formId: '111', level: 15, aiMoves: ['horn-attack', 'stomp', 'tail-whip'] },
         { speciesId: 37, formId: '37', level: 15, aiMoves: ['ember', 'quick-attack', 'confuse-ray'] },
-        { speciesId: 67, formId: '67', level: 16, aiMoves: ['karate-chop', 'low-kick', 'focus-energy'] },
+        { speciesId: 67, formId: '67', level: 15, aiMoves: ['karate-chop', 'low-kick', 'focus-energy'] },
       ],
     },
   ],
@@ -43,7 +43,7 @@ const definitions: Record<KantoGymChronicleKey, ChronicleBattleDefinition[]> = {
     {
       id: 'service-gyarados', name: 'Gyarados at the Cove', description: 'Create room to rescue Horsea without mistaking Gyarados’s warning for cruelty.',
       icon: { type: 'pokemon', id: '130' }, background: '/backgrounds/chronicle-misty-cerulean-cape.avif', wild: true, maxPokemon: 3, aiProfile: 'advanced',
-      enemyTeam: [{ speciesId: 130, formId: '130', level: 23, aiMoves: ['bite', 'dragon-rage', 'leer'] }],
+      enemyTeam: [{ speciesId: 130, formId: '130', level: 20, aiMoves: ['bite', 'dragon-rage', 'leer'] }],
     },
     {
       id: 'daisys-challenge', name: "Daisy's League Trial", description: 'Meet Daisy’s adaptable water team in the formal trial for Cerulean leadership.',
@@ -73,9 +73,9 @@ const definitions: Record<KantoGymChronicleKey, ChronicleBattleDefinition[]> = {
       id: 'league-assessment', name: 'Vermilion League Assessment', description: 'Prove that controlled power includes listening when the plan must change.',
       trainerClassId: 'chronicle-steward', trainerName: 'League Steward', icon: { type: 'trainer', id: 'chronicle-steward' }, background: '/backgrounds/chronicle-surge-gym-shelter.avif', maxPokemon: 4, aiProfile: 'boss',
       enemyTeam: [
-        { speciesId: 105, formId: '105', level: 30, aiMoves: ['bone-club', 'headbutt', 'leer'] },
-        { speciesId: 28, formId: '28', level: 31, aiMoves: ['slash', 'sand-attack', 'swift'] },
-        { speciesId: 85, formId: '85', level: 32, aiMoves: ['drill-peck', 'fury-attack', 'growl'] },
+        { speciesId: 53, formId: '53', level: 30, aiMoves: ['pay-day', 'bite', 'growl'] },
+        { speciesId: 85, formId: '85', level: 31, aiMoves: ['drill-peck', 'fury-attack', 'growl'] },
+        { speciesId: 65, formId: '65', level: 32, aiMoves: ['confusion', 'disable', 'reflect'] },
       ],
     },
   ],
@@ -103,7 +103,7 @@ const definitions: Record<KantoGymChronicleKey, ChronicleBattleDefinition[]> = {
     {
       id: 'decoy-thief', name: 'The Perfect Decoy', description: 'Test Jiro’s rehearsed confession instead of accepting the convenient ending.',
       trainerClassId: 'super-nerd', trainerName: 'Jiro', icon: { type: 'trainer', id: 'super-nerd' }, background: '/backgrounds/chronicle-koga-fuchsia-rooftops.avif', maxPokemon: 3, aiProfile: 'advanced',
-      enemyTeam: [{ speciesId: 88, formId: '88', level: 33, aiMoves: ['sludge', 'acid-armor', 'disable'] }, { speciesId: 42, formId: '42', level: 34, aiMoves: ['wing-attack', 'confuse-ray', 'bite'] }],
+      enemyTeam: [{ speciesId: 88, formId: '88', level: 33, aiMoves: ['sludge', 'acid-armor', 'disable'] }, { speciesId: 42, formId: '42', level: 30, aiMoves: ['wing-attack', 'confuse-ray', 'bite'] }],
     },
     {
       id: 'tunnel-culprit', name: 'The Toxin Evacuation', description: 'Clear the exposed courtyard by trusting Janine’s unmarked route.',
@@ -142,7 +142,7 @@ const definitions: Record<KantoGymChronicleKey, ChronicleBattleDefinition[]> = {
     {
       id: 'league-assessment', name: 'The Cinnabar Assessment', description: 'Demonstrate a Fire Gym whose strongest system is its ability to stop.',
       trainerClassId: 'chronicle-steward', trainerName: 'League Examiner', icon: { type: 'trainer', id: 'chronicle-steward' }, background: '/backgrounds/chronicle-blaine-abandoned-quiz-room.avif', maxPokemon: 4, aiProfile: 'boss',
-      enemyTeam: [{ speciesId: 91, formId: '91', level: 43, aiMoves: ['clamp', 'aurora-beam', 'withdraw'] }, { speciesId: 62, formId: '62', level: 44, aiMoves: ['water-gun', 'body-slam', 'hypnosis'] }, { speciesId: 121, formId: '121', level: 45, aiMoves: ['water-gun', 'psybeam', 'recover', 'swift'] }],
+      enemyTeam: [{ speciesId: 53, formId: '53', level: 43, aiMoves: ['pay-day', 'bite', 'growl'] }, { speciesId: 71, formId: '71', level: 44, aiMoves: ['acid', 'sleep-powder', 'vine-whip'] }, { speciesId: 65, formId: '65', level: 45, aiMoves: ['confusion', 'disable', 'reflect'] }],
     },
   ],
   giovanni: [

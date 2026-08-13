@@ -2262,7 +2262,12 @@ export function chooseEnemyBattleAction(params: {
       state,
       enemyMon,
       playerMon,
-      playerStance: params.playerStance,
+      // The enemy must not see the player's chosen stance before committing.
+      // It guesses via stat-based counter-play and the telegraph system, and
+      // the player reacts to telegraphed stances. Passing the resolved stance
+      // here let the enemy always counter the player and made stance contests
+      // unwinnable (and telegraphs meaningless).
+      playerStance: undefined,
       profile,
       random,
     }),
@@ -2273,7 +2278,7 @@ export function chooseEnemyBattleAction(params: {
     enemyMon,
     playerMon,
     opponentUsedMove: params.opponentUsedMove,
-    playerStance: params.playerStance,
+    playerStance: undefined,
     random,
     consumeUse: false,
   })
