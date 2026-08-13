@@ -125,7 +125,7 @@ export const giovanniChronicleStory: KantoGymChronicleStory = { sequence: [
     speech(silver,'You cleared Thursday too.'),
   ]),
 
-  scene('contemplation','the-ledger-entry','One Missed Evening','Giovanni tries to quantify a failure that resists accounting.',office,[
+  scene('contemplation','the-ledger-entry','One Missed Evening','The western road earns its first full quarter, and Giovanni has no way to account for the evening Silver stopped waiting.',office,[
     narration('The western road earned its first full quarter of revenue. The southern depots signed. Viridian Gym opened on schedule. Giovanni’s ledger had no column for the moment Silver stopped looking at the door.'),
     speech(ariana,'You got everything you wanted.'),
     speech(giovanni,'The boy disagrees.'),
@@ -139,7 +139,7 @@ export const giovanniChronicleStory: KantoGymChronicleStory = { sequence: [
     speech(giovanni,'You think one missed tournament reveals my method?'),
     speech(hadrian,'I think your first instinct was to buy a better ending.'),
   ]),
-  scene('contemplation','outside-silvers-door','An Apology Without Entry','Giovanni attempts honesty but still expects language to secure access.',home,[
+  scene('contemplation','outside-silvers-door','An Apology Without Entry','Giovanni apologises through the door, and Silver asks him to come back when the apology can stand alone.',home,[
     speech(giovanni,'I chose the meeting. I knew I might miss the final, and I told myself I could control the delay. I was wrong.'),
     speech(silver,'Are you saying this because you are sorry, or because you want me to open the door?'),
     speech(giovanni,'Both.'),
@@ -171,7 +171,7 @@ export const giovanniChronicleStory: KantoGymChronicleStory = { sequence: [
     narration('Dinner began at eight. Silver discussed strategy, not forgiveness. Giovanni listened without correcting the distinction.'),
   ]),
 
-  scene('reflection','the-second-final','A Seat Occupied','Giovanni attends the next tournament and discovers presence cannot be delegated or optimised.',home,[
+  scene('reflection','the-second-final','A Seat Occupied','Giovanni sits through the next tournament with no calls to take, and stays after Silver loses.',home,[
     narration('At the next tournament, Giovanni arrived before the doors opened. He disliked the narrow seats, the crowd, and every minute in which no decision required him.'),
     speech(ariana,'The southern depots are asking for you.'),
     speech(giovanni,'They can ask Petrel.'),
