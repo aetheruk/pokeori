@@ -110,6 +110,7 @@ export function ExploreHeader({
             src={currentImage}
             alt={currentTitle || 'Area'}
             fill
+            sizes="(min-width: 1280px) 1216px, (min-width: 768px) calc(100vw - 5rem), 100vw"
             className="object-cover"
             priority
           />
