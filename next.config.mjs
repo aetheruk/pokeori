@@ -102,6 +102,27 @@ const nextConfig = {
   async headers() {
     return [
       {
+        // Route/location map art and bundled sprite assets are static per
+        // release; let browsers reuse them for a day while SWR refreshes in
+        // the background after a new deploy swaps any artwork.
+        source: '/backgrounds/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
+      {
+        source: '/sprites/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
+      {
         source: '/:path*',
         headers: [
           { key: 'X-Frame-Options', value: 'DENY' },

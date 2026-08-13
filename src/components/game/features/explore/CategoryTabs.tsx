@@ -54,6 +54,7 @@ export function CategoryTabs({
                     src={regionData.image}
                     alt={regionKey}
                     fill
+                    sizes="(max-width: 768px) 50vw, 240px"
                     className="object-cover"
                   />
                   {activeCategory === regionKey && (

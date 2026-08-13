@@ -123,7 +123,6 @@ export function PokemonSnapGame({
   const [sessionStartTime, setSessionStartTime] = useState<number | null>(
     initialState?.startTime || null,
   )
-  const preloadedImages = useRef<{ [id: number]: HTMLImageElement }>({})
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const targetMissTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const targetGameEndedRef = useRef(false)
@@ -154,15 +153,8 @@ export function PokemonSnapGame({
     setPokemonPool(pool)
 
     setSpritesReady(false)
-    preloadedImages.current = {}
-
     Promise.all(
-      pool.flatMap((id) =>
-        getSnapPokemonImageUrls(id).map(async (src) => {
-          const img = await preloadImage(src)
-          preloadedImages.current[id] = img
-        }),
-      ),
+      pool.flatMap((id) => getSnapPokemonImageUrls(id).map(preloadImage)),
     ).then(() => {
       if (!cancelled) setSpritesReady(true)
     })
@@ -662,11 +654,15 @@ export function PokemonSnapGame({
 
               {pokemonVisible && currentPokemon && (
                 <div className="relative w-48 h-48 animate-in zoom-in-50 duration-300">
+                  {/* unoptimized: the preload above warms these exact bundled
+                      AVIF URLs, so the first flash renders instantly instead of
+                      waiting on the image optimizer's /_next/image URL. */}
                   <Image
                     src={getPokemonImageUrl(currentPokemon.toString(), 'home')}
                     alt={pokemonName}
                     width={192}
                     height={192}
+                    unoptimized
                     className="object-contain drop-shadow-2xl"
                   />
                 </div>
@@ -740,6 +736,7 @@ export function PokemonSnapGame({
                                 alt={pokemonName}
                                 width={48}
                                 height={48}
+                                unoptimized
                                 className="object-contain"
                               />
                             </div>
