@@ -1,6 +1,6 @@
 # Kanto Gym Leader Chronicles Story Bible
 
-Last reviewed: 2026-08-12
+Last reviewed: 2026-08-13
 
 ## Narrative Contract
 
@@ -85,5 +85,7 @@ He returns after ten to a runner-up trophy and orders a better one. Silver rejec
 - Use the shared character definition for every recurring named speaker. Never substitute a generic class portrait after a character has an authored sprite.
 - Preserve concise banner names and the current Badge-channeling energy amounts.
 - Avoid em dashes and later-world plot terms. Keep violence consequential but non-graphic.
+- Write dialogue the way each character would actually talk. Speech must sound distinct per speaker and read aloud naturally: short functional lines, plain vocabulary for children and soldiers, no shared aphorism register, and no line that exists only to sound meaningful. Narration may stay evocative but should report what happens rather than summarise a theme. Erika's reserved register is the anthology's reference voice.
+- Chronicle minigames must be provably completable: the Surge Voltorb Grid and Magnemite Circuit are covered by solver-backed balance tests that verify the board is winnable within its authored move/rotation budget and is not trivially pre-solved.
 - Validate puzzle reachability, procedure constraints, move legality, activity references and per-battle Chronicle loadouts in tests.
 - Deploying this edition requires `bun scripts/reset-gym-chronicles-v2.js --dry-run` and then `bun scripts/reset-gym-chronicles-v2.js` inside the production container. This removes old Chronicle runs/activity rows and only active game, research or battle Redis sessions for affected players.
