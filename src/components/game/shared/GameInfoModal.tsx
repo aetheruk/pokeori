@@ -164,7 +164,7 @@ export function GameInfoModal({
   const content = (
     <>
       <Header className="p-0 space-y-0 shrink-0">
-        <div className="relative h-32 w-full overflow-hidden border-b border-game-border bg-game-surface md:h-40">
+        <div className="relative h-40 w-full overflow-hidden border-b border-game-border bg-game-surface md:h-52">
           {/* Background Image with Overlay */}
           <div className="absolute inset-0 z-0">
             <Image
@@ -173,13 +173,13 @@ export function GameInfoModal({
               fill
               priority
               sizes="100vw"
-              className="object-cover opacity-65 brightness-[0.62]"
+              className="object-cover opacity-80 brightness-90"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-game-night-surface/18 via-game-night-surface/44 to-game-surface" />
+            <div className="absolute inset-0 bg-gradient-to-b from-game-night-surface/5 via-game-night-surface/25 to-game-surface" />
           </div>
 
           {category && (
-            <div className="absolute left-4 top-4 z-50">
+            <div className="absolute left-7 top-7 z-50">
               <span className="inline-block rounded-md border border-game-night-border/60 bg-game-night-surface/85 px-2.5 py-1 text-[11px] font-medium text-game-ochre backdrop-blur-md">
                 {category}
               </span>
@@ -191,12 +191,12 @@ export function GameInfoModal({
           )}
 
           {/* Close Button */}
-          <Close className="game-focus-ring absolute right-3 top-3 z-50 flex size-10 items-center justify-center rounded-md border border-game-night-border/60 bg-game-night-surface/84 text-game-cream transition-colors hover:bg-game-night-surface hover:text-game-night-ink">
+          <Close className="game-focus-ring absolute right-7 top-7 z-50 flex size-10 items-center justify-center rounded-md border border-game-night-border/60 bg-game-night-surface/84 text-game-cream transition-colors hover:bg-game-night-surface hover:text-game-night-ink">
             <X className="h-4 w-4" aria-hidden="true" />
           </Close>
 
           {/* Header Content */}
-          <div className="absolute inset-0 z-10 flex items-center justify-center p-5 pt-8">
+          <div className="absolute inset-0 z-10 flex items-center justify-center p-5">
             <div className="relative">
               <div
                 className={cn(
