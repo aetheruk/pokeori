@@ -35,7 +35,7 @@ export const sabrinaChronicleStory: KantoGymChronicleStory = { sequence: [
     speech(young,'If I say no, will you think I wasted your trip?'),
     speech(orla,'Probably. You are allowed to disappoint me.'),
     speech(young,'Nobody says that.'),
-    speech(orla,'Then nobody has made refusal easy enough to be real.'),
+    speech(orla,'Then adults need to do a better job of respecting your boundaries.'),
   ]),
   scene('backstory','the-silph-offer','A Useful Gift','Silph offers control, legitimacy and an audience that wants results.',lab,[
     speech(venn,'Our teleport division can teach you to narrow the signal. In return, your perception can catch instabilities our instruments miss.'),
@@ -47,7 +47,7 @@ export const sabrinaChronicleStory: KantoGymChronicleStory = { sequence: [
   ]),
 
   scene('development','signals-and-shapes','Learning to Choose One Voice','Sabrina builds focus by identifying what is present rather than fighting everything else.',lab,[
-    speech(orla,'Do not empty your mind. Minds are not rooms with brooms. Pick one shape and let the others stay without answering them.'),
+    speech(orla,'Do not try to force everything quiet. Just focus on one shape and let the background noise fade.'),
     speech(sabrina,'Director Venn is counting how long I take.'),
     speech(orla,'He can count. You do not owe his impatience a faster result.'),
     speech(venn,'The company does have a schedule.'),
@@ -117,7 +117,7 @@ export const sabrinaChronicleStory: KantoGymChronicleStory = { sequence: [
   ]),
 
   scene('contemplation','family-in-the-dojo','What Fear Did','Sabrina’s parents admit that protection became control.',dojo,[
-    speech(mother,'I wished you were ordinary. Not because ordinary is better, but because I knew how to mother ordinary.'),
+    speech(mother,'I wished you were an ordinary kid. Not because there was anything wrong with you, but because I did not know how to help you.'),
     speech(father,'Every expert who sounded certain became someone I wanted to obey.'),
     speech(sabrina,'Even when the expert wanted access to me.'),
     speech(father,'Yes. I am sorry.'),
@@ -128,13 +128,13 @@ export const sabrinaChronicleStory: KantoGymChronicleStory = { sequence: [
     speech(sabrina,'You announce your attacks?'),
     speech(koichi,'Until you ask me not to. You control the distance, the length, and the stop word.'),
     speech(sabrina,'And if I hear you worrying that I am dangerous?'),
-    speech(koichi,'Then you will hear a thought I am responsible for examining, not a verdict you have to obey.'),
+    speech(koichi,'Then that is my problem to deal with, not yours.'),
   ]),
   battle('contemplation','koichis-focus-test'),
   scene('contemplation','not-cured','A Mind Still Crowded','The battle helps without transforming Sabrina into someone untouched by her power.',dojo,[
     speech(koichi,'You held focus longer today.'),
     speech(sabrina,'I also heard every spectator wondering if I would lose control.'),
-    speech(koichi,'You can make progress and still hurt. Those are not opposites.'),
+    speech(koichi,'Healing takes time, Sabrina. You do not have to feel completely fine right away.'),
     speech(sabrina,'People prefer a cure. It gives a story a clean ending.'),
     speech(orla,'Then we should build something designed for a life, not an ending.'),
   ]),
@@ -150,8 +150,7 @@ export const sabrinaChronicleStory: KantoGymChronicleStory = { sequence: [
   scene('resolution','league-hearing','A Candidate Who Hears the Panel','The League must assess Sabrina while knowing she can hear what its members withhold.',lab,[
     speech(sabrina,'One of you thinks I am too unstable. One thinks appointing me will repair Silph’s reputation. Neither thought stops you from speaking honestly.'),
     speech(orla,'Sabrina, consent applies to the panel too.'),
-    speech(sabrina,'You are right. I should not have named what they did not offer.'),
-    speech(sabrina,'I apologise. That mistake is exactly why this Gym needs rules stronger than confidence.'),
+    speech(sabrina,'You are right. I should not have named what they did not offer. I apologise. That mistake is exactly why this Gym needs rules stronger than confidence.'),
   ]),
   scene('resolution','the-marsh-licence','Leader of Saffron Gym','Sabrina earns the licence by demonstrating accountability, not perfect control.',mind,[
     narration('The licence required independent review, documented consent, and a permanent right for challengers to end psychic exercises. Sabrina added a fourth clause in her own hand: the Leader may be corrected.'),
@@ -171,7 +170,7 @@ export const sabrinaChronicleStory: KantoGymChronicleStory = { sequence: [
     speech(orla,'Silph adopted the charter after the inquiry. Venn calls it administratively burdensome.'),
     speech(sabrina,'Then it is probably doing work.'),
     speech(orla,'Your name is not on it, as you asked.'),
-    speech(sabrina,'Good. A rule should not need my story to hold it up.'),
+    speech(sabrina,'Good. The policy should protect people whether they know who I am or not.'),
   ]),
   scene('reflection','a-quieter-room','Not Empty','Sabrina’s quiet room becomes a place chosen, not imposed.',mind,[
     narration('Saffron Gym kept one room without clocks or mirrors. Its door had no lock. Sabrina entered when the city got too loud and left when she chose.'),

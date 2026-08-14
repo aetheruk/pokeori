@@ -15,7 +15,7 @@ export const blaineChronicleStory: KantoGymChronicleStory = { sequence: [
     speech(fuji,'What is the heat for?'),
     speech(blaine,'Restoring circulation without burning already-injured tissue.'),
     speech(nami,'And when that purpose is met?'),
-    speech(blaine,'We stop. A machine that cannot answer when to stop is just an accident with a timetable.'),
+    speech(blaine,'We shut it down. If you do not know when to stop, you are just waiting for an accident.'),
   ]),
   scene('backstory','baseline-morning','Three Sets of Numbers','The team treats disagreement as part of the protocol.',lab,[
     speech(nami,'Ponyta’s pulse says the chamber can go two degrees higher. The wall sensor says one.'),
@@ -38,7 +38,7 @@ export const blaineChronicleStory: KantoGymChronicleStory = { sequence: [
     speech(nami,'Did you record the overrun?'),
     speech(blaine,'I recorded the response.'),
     speech(fuji,'Those are not the same record.'),
-    speech(blaine,'The protocol exists to serve the patient, not to preserve its own purity.'),
+    speech(blaine,'The rules are here to help the Pokémon, not to tie our hands when something works.'),
   ]),
 
   scene('development','orins-demonstration','The Brilliant Young Researcher','Orin challenges the lab’s caution and recognises Blaine’s appetite for discovery.',lab,[
@@ -55,7 +55,7 @@ export const blaineChronicleStory: KantoGymChronicleStory = { sequence: [
     speech(blaine,'Run it again at the same baseline.'),
     speech(nami,'Tomorrow. Magmar has completed its safe exposure.'),
     speech(orin,'The response might be gone after rest.'),
-    speech(fuji,'Then we record that it is gone. Rarity does not create consent.'),
+    speech(fuji,'Then we log that it stopped. We are not keeping an injured Pokémon in a hot chamber just because we are curious.'),
   ]),
   scene('development','the-hidden-override','A Switch Without a Label','Blaine installs a manual extension and tells himself it is only for emergencies.',lab,[
     speech(blaine,'The regulator shuts down before a clinician can tell stress from breakthrough. I added a sixty-second override.'),
@@ -128,7 +128,7 @@ export const blaineChronicleStory: KantoGymChronicleStory = { sequence: [
     speech(blaine,'They should not.'),
   ]),
   scene('contemplation','fujis-condition','Repair Is Not Erasure','Fuji agrees to advise only if the new institution keeps the failure visible.',quiz,[
-    speech(fuji,'Do not name the room after Nami. Institutions like turning the dead into permission to continue.'),
+    speech(fuji,'Do not name the room after Nami. Putting her name on a plaque does not make the building safer.'),
     speech(blaine,'Then what do we preserve?'),
     speech(fuji,'Her authority. Any trainer, technician, or Pokémon handler can end a trial. No override.'),
     speech(blaine,'And the warped door?'),
@@ -153,7 +153,7 @@ export const blaineChronicleStory: KantoGymChronicleStory = { sequence: [
     speech(steward,'Cinnabar Gym is licensed for one year under independent safety review. The inquiry stays attached to the public record.'),
     speech(blaine,'Good.'),
     speech(orin,'You could sound a little happier.'),
-    speech(blaine,'I am. I have learned not to treat a good result as proof of a sound process.'),
+    speech(blaine,'I am. Getting lucky with a result does not mean the system was safe.'),
     speech(fuji,'That almost sounds like wisdom. We will test it again tomorrow.'),
   ]),
   scene('resolution','first-quiz','Questions Before Fire','The Gym’s first challenge begins with permission to stop.',quiz,[

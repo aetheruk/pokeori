@@ -31,7 +31,7 @@ export const surgeChronicleStory: KantoGymChronicleStory = {
       narration('The medical deck kept its power. Navigation came back one hundred and twelve seconds later. Two crewmen were burned crossing the conduit, including Mako, who followed the order before he could question it.'),
       speech(mako, 'We made port. That is what the report will say.'),
       speech(surge, 'That is what matters.'),
-      speech(mako, 'That is what matters most. Those are not the same thing.'),
+      speech(mako, 'We made port, sure. But two of us ended up in the burn ward to do it.'),
       narration('Surge received a commendation. He kept it in a drawer, and kept giving orders in exactly the same voice.'),
     ]),
     scene('backstory', 'vermillion-contract', 'A Civilian Posting', 'Vermilion hires the decorated veteran to modernise its unreliable grid.', streets, [
@@ -48,7 +48,7 @@ export const surgeChronicleStory: KantoGymChronicleStory = {
       speech(surge, 'Clear weather, trainers learn to handle Electric types. When a storm warning goes out, we fold the barriers back and this floor becomes a shelter.'),
       speech(nurse, 'People will come in with babies, medication, frightened Pokémon, and no interest in military lines.'),
       speech(surge, 'Lines keep the exits clear.'),
-      speech(mako, 'People keep exits clear when they understand why the lines are there.'),
+      speech(mako, 'Panicking people ignore lines on a floor, Surge. They need to know where they are going.'),
     ]),
     scene('development', 'makos-drill', 'The Drill as Written', 'Mako tests whether Surge’s plan survives disagreement.', shelter, [
       speech(mako, 'Scenario. East door is jammed, generator at sixty percent, thirty civilians in the yellow lane.'),
@@ -75,7 +75,7 @@ export const surgeChronicleStory: KantoGymChronicleStory = {
     game('development', 'restore-the-east-grid'),
 
     scene('conflict', 'blackout', 'After the Thunder', 'The repaired circuit fails elsewhere and Vermilion goes dark.', streets, [
-      narration('The east grid came back for eleven minutes. Then a transformer blew past the section we fixed. The darkness rolled block by block toward the harbour, with alarms and Pokémon cries following it.'),
+      narration('The east grid came back for eleven minutes. Then a transformer blew past the repaired section. The darkness rolled block by block toward the harbour, with alarms and Pokémon cries following it.'),
       speech(surge, 'Shelter team, blackout protocol. Yellow lane to the west wall. Nobody stops in the entrance.'),
       speech(child, 'My Pikachu ran toward the substation! It hates thunder, and it thinks the wires are calling it!'),
       speech(surge, 'You stay here. I will send someone.'),
@@ -114,7 +114,7 @@ export const surgeChronicleStory: KantoGymChronicleStory = {
       speech(surge, 'I nearly sent you across it.'),
       speech(mako, 'You did send me. I said no, and you listened before it came to that.'),
       speech(surge, 'That is a pretty small improvement.'),
-      speech(mako, 'Most real improvements are small enough to keep.'),
+      speech(mako, 'It is a start. At least nobody got burned today.'),
     ]),
 
     scene('contemplation', 'the-commendation', 'The Sentence in the Report', 'Surge finally reads the transport report beyond its successful outcome.', shelter, [
@@ -126,9 +126,9 @@ export const surgeChronicleStory: KantoGymChronicleStory = {
     ]),
     scene('contemplation', 'nikos-question', 'Why Is the Gym a Shelter?', 'A child asks for an explanation no regulation required.', shelter, [
       speech(child, 'If this is a Pokémon Gym, why are there cots behind the battle wall?'),
-      speech(surge, 'Because storms do not care what a building was supposed to be.'),
+      speech(surge, 'Because when a hurricane hits, people need a roof, not a battle arena.'),
       speech(child, 'Then why make challengers practise switches and warning calls?'),
-      speech(surge, 'Because power that only works in perfect weather is not worth much.'),
+      speech(surge, 'Because out in a real storm, quick reflexes and clear calls keep you alive.'),
       speech(child, 'That sounds like something you would put on a sign.'),
       speech(surge, 'You may have a future in regulations, kid.'),
     ]),

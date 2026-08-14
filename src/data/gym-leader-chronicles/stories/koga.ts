@@ -69,7 +69,7 @@ export const kogaChronicleStory: KantoGymChronicleStory = { sequence: [
     speech(ren,'Every heir faces a false theft. The decoy tests precision. The hidden case tests discretion. You were meant to return it quietly.'),
     speech(koga,'You made a desperate man confess to a crime he did not commit.'),
     speech(ren,'I cleared his debt. He agreed.'),
-    speech(janine,'Consent bought with medicine is another kind of trap.'),
+    speech(janine,'You took advantage of a sick family, Ren. That is not an agreement.'),
     speech(ren,'This is why children do not inherit institutions.'),
   ]),
   scene('conflict','the-sealed-bottles','The Wrong Mixture','One hidden bottle has genuinely been damaged during Ren’s test.',shop,[
@@ -91,7 +91,7 @@ export const kogaChronicleStory: KantoGymChronicleStory = { sequence: [
   battle('conflict','tunnel-culprit'),
   scene('conflict','after-the-evacuation','The Price of Being Right','Janine’s route saves the class but does not erase Koga’s earlier dismissal.',court,[
     speech(koga,'Your route held. I should have tested it when you first marked the stone.'),
-    speech(janine,'You should have listened when I explained it. Testing me does not mean you believe I can see.'),
+    speech(janine,'You should have listened when I explained it. Testing me is not the same as believing I can see.'),
     speech(koga,'No. It is not.'),
     speech(ren,'Do not grovel to a student because chance favoured her.'),
     speech(koga,'Chance did not draw the wind. She did.'),
@@ -106,14 +106,14 @@ export const kogaChronicleStory: KantoGymChronicleStory = { sequence: [
 
   scene('contemplation','unwritten-route','Where the Map Ends','Koga and Janine build a lesson around changing information.',roofs,[
     speech(koga,'I erased your chalk because I was afraid that letting a student change the course would make me a weak teacher.'),
-    speech(janine,'A weak teacher needs the map to stay right. A useful one notices when the roof has changed.'),
+    speech(janine,'A good teacher does not panic when the conditions change. You adapt to what is in front of you.'),
     speech(koga,'You will help design the League course.'),
     speech(janine,'I will challenge it. Designing it with you would make me too fond of it.'),
   ]),
   scene('contemplation','jiros-statement','A Witness With a Choice','Koga gives Jiro the option Ren denied him.',shop,[
     speech(koga,'The League needs your account. Refusing will not restore the debt or expose your family.'),
     speech(jiro,'Why trust a confession from someone who lied?'),
-    speech(koga,'Because I know what shaped the lie. That does not make it true. It makes it evidence.'),
+    speech(koga,'Because understanding why you lied helps us prove what Ren did.'),
     speech(jiro,'Then write that I agreed because medicine was withheld. Do not make me brave after the fact.'),
   ]),
   scene('contemplation','koga-before-ren','The Method and the Man','Koga distinguishes what deserves preservation from who claimed ownership.',court,[
@@ -151,7 +151,7 @@ export const kogaChronicleStory: KantoGymChronicleStory = { sequence: [
     speech(ren,'The school is noisier now.'),
     speech(koga,'Questions make noise.'),
     speech(ren,'And has doubt made them stronger?'),
-    speech(koga,'It has made their confidence more expensive. They have to earn it every time.'),
+    speech(koga,'It has made them think. They have to prove their choices work instead of just repeating what they were told.'),
     speech(ren,'That answer sounds almost traditional.'),
     speech(koga,'Give it fifty years. Someone will pretend it always was.'),
   ]),
