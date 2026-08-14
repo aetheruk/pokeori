@@ -22,7 +22,7 @@ export const erikaChronicleStory: KantoGymChronicleStory = {
     ]),
     scene('backstory', 'sumis-bench', 'The Greenhouse Before Guests', 'Erika finds freedom in Sumi’s working greenhouse, where plants are allowed to be useful.', greenhouse, [
       speech(sumi, 'This batch is not elegant. Gloom’s pollen makes the opening sharp, but it settles into something warmer after ten minutes.'),
-      speech(erika, 'Then the first impression is honest and the second rewards patience. I like it.'),
+      speech(erika, 'It is sharp at first, but it warms up after a few minutes. I like that it takes time.'),
       speech(sumi, 'Your mother will ask for roses.'),
       speech(erika, 'My mother only likes roses that behave. Show me the measurements again.'),
       narration('At Sumi’s bench, Erika’s careful hands were not decorative. They weighed, crushed, filtered and recorded.'),
@@ -40,7 +40,7 @@ export const erikaChronicleStory: KantoGymChronicleStory = {
       speech(erika, 'Sumi is not workshop detail.'),
       speech(mother, 'Of course not. She is valued staff. Valued staff do not need society guests examining their private history.'),
       speech(erika, 'You make concealment sound like kindness.'),
-      speech(mother, 'If you make a fuss about it, it stops being kind and starts being about you.'),
+      speech(mother, 'Making a public fuss about it will only embarrass her and make a spectacle of yourself.'),
     ]),
 
     scene('development', 'celias-arrival', 'The Rival Arrangement', 'Celia arrives expecting a social contest and recognises Erika’s real interest.', exhibition, [
@@ -123,7 +123,7 @@ export const erikaChronicleStory: KantoGymChronicleStory = {
       speech(erika, 'If I speak, Sumi pays first. If I do not, Mother learns the threat works.'),
       speech(sumi, 'Then either choice is going to cost someone. You just get to pick who.'),
       speech(erika, 'Celia would speak.'),
-      speech(sumi, 'Celia’s family owns its leases. Courage does not have the same price for everyone.'),
+      speech(sumi, 'Celia can afford to cause a scene. Her family does not rent from yours.'),
     ]),
     scene('contemplation', 'celias-farewell', 'No Easy Acquittal', 'Celia refuses to condemn Erika, but also refuses to call her helpless.', exhibition, [
       speech(celia, 'I was unfair to ask for heroism while Sumi stood in the blast line.'),

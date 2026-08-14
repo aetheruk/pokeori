@@ -47,16 +47,16 @@ export const brockChronicleStory: KantoGymChronicleStory = {
     scene('development', 'mara-at-the-door', 'A Provisional Answer', 'Mara finds a capable young trainer inside an unsafe Gym.', gym, [
       speech(mara, 'I came to inspect a licensed Gym. I found a minor holding its keys, a damaged west wall, and no responsible adult on the premises.'),
       speech(brock, 'You found the person doing the work. I can show you the team, the challenge rules, and every repair still outstanding.'),
-      speech(mara, 'Competence is not adulthood, Brock. It also is not a roof brace.'),
+      speech(mara, 'You might be doing the work, Brock, but you are still a kid. And enthusiasm does not hold up a cracked wall.'),
       speech(brock, 'Then give me the provisional assessment. If I fail it, close the Gym. If I pass, judge the building after I fix it.'),
       speech(mara, 'Thirty days. A safe floor, a real household plan, and a battle assessment. I will not bend one of those just because I admire the others.'),
     ]),
     scene('development', 'the-letter-in-the-ledger', 'A Different Future', 'Brock’s breeding-course offer sits unread beside the Gym accounts.', annex, [
       narration('The League annex kept copies of every application. Mara handed Brock a letter he had sent months earlier: admission to a Pokémon breeding programme in Celadon, starting in six weeks.'),
       speech(mara, 'You applied before your father left. Do you still want this?'),
-      speech(brock, 'Wanting it does not make breakfast, and Celadon is not close enough to tuck anyone in.'),
-      speech(mara, 'That is not what I asked.'),
-      speech(brock, 'It is the only answer that feeds everyone right now.'),
+      speech(brock, 'It does not matter what I want. I have to make breakfast every morning, and I cannot take care of five kids from Celadon.'),
+      speech(mara, 'That is what you have to do. I asked what you want.'),
+      speech(brock, 'Right now, what I want is to keep this family fed and under a roof.'),
     ]),
     scene('development', 'taro-kept-his-ticket', 'The Promised Challenger', 'Taro arrives with a challenge booking Flint accepted before leaving.', gym, [
       speech(taro, 'My ticket says today. Mum paid for the train twice because Mr Flint cancelled the first time.'),
@@ -92,18 +92,18 @@ export const brockChronicleStory: KantoGymChronicleStory = {
       speech(brock, 'Put it back.'),
       speech(forrest, 'Did you tell them no?'),
       speech(brock, 'I did not answer.'),
-      speech(forrest, 'That is how you say no. You just wait until the choice goes away on its own.'),
+      speech(forrest, 'If you ignore the letter, they give the spot to someone else. You are just letting it slip away.'),
     ]),
     scene('conflict', 'flint-returns', 'The Key in Flint’s Hand', 'Flint returns expecting absence to be repaired by his presence.', home, [
       narration('Flint came back after dark, quarry dust on his coat and the old Gym key in his palm. The youngest kids reached him first. Brock stayed by the stove.'),
       speech(flint, 'I heard about the wall. I should have been here. I can take the Gym back tomorrow and square things with the inspector.'),
-      speech(brock, 'You cannot square things with her. You cannot walk back into the chair just because the room got hard without you.'),
+      speech(brock, 'You cannot just square things. You cannot walk back in and take over like nothing happened the second things get tough.'),
       speech(flint, 'I failed on the circuit. I could not come home and watch all of you see that.'),
       speech(forrest, 'So you made Brock do all of it instead.'),
     ]),
     scene('conflict', 'not-an-apology-yet', 'What Flint Left', 'Brock refuses the easy restoration Flint offers.', home, [
       speech(flint, 'I am sorry. Give me the keys and I will put this right.'),
-      speech(brock, 'You are sorry because you saw the damage. I needed you to be sorry when you wrote that note.'),
+      speech(brock, 'You are sorry now because the wall came down. Where was that when you walked out and left that note?'),
       speech(flint, 'What do you want me to do?'),
       speech(brock, 'Tonight? Do the dishes. Tomorrow, tell every kid where you went. Then show up the day after that. The keys stay with Mara until the assessment.'),
       speech(forrest, 'And Brock answers Celadon before anything else gets to decide for him.'),
@@ -132,7 +132,7 @@ export const brockChronicleStory: KantoGymChronicleStory = {
 
     scene('contemplation', 'under-the-quarry-sky', 'The Life Beyond Pewter', 'Brock admits that staying and wanting to leave can both be true.', quarry, [
       speech(brock, 'When I read the course letter, I can see the nursery rooms. I can almost smell the clean bandages. Then I picture this kitchen without me, and the whole thing feels selfish.'),
-      speech(forrest, 'You taught us every job except how to get by without you. We would be fine. That does not mean we need you forever.'),
+      speech(forrest, 'You taught us how to do every job around here. We would manage. You do not have to carry us forever.'),
       speech(brock, 'You should not have to become me because I leave.'),
       speech(forrest, 'Then do not leave like Dad did. Tell us where. Tell us when. Come back when you said you would.'),
     ]),
@@ -140,7 +140,7 @@ export const brockChronicleStory: KantoGymChronicleStory = {
       speech(flint, 'Mara says the League might license you. I thought I would feel replaced.'),
       speech(brock, 'Are you asking me to make you feel better about it?'),
       speech(flint, 'No. I am trying to notice when I do that. I can fix the roof and take the little ones to school. I do not need the chair to be their father.'),
-      speech(brock, 'Being their father is the part with the harder attendance.'),
+      speech(brock, 'Being their father means showing up every day, not just when you feel like it.'),
     ]),
     scene('contemplation', 'the-deferral-call', 'Not No', 'Brock asks the breeding programme for time instead of surrendering his place.', annex, [
       narration('Brock made the call from Mara’s office because the kitchen was too loud and the Gym too quiet. He expected the programme director to say no.'),
@@ -166,7 +166,7 @@ export const brockChronicleStory: KantoGymChronicleStory = {
     scene('resolution', 'the-provisional-key', 'Leader of Pewter Gym', 'Mara grants Brock the key without pretending it solves his family.', gym, [
       speech(mara, 'Brock Harrison, the League grants you a provisional Gym licence. It will be reviewed when your deferred course begins.'),
       speech(brock, 'So the licence allows a deputy?'),
-      speech(mara, 'It requires one. The League is finally learning that indispensable people are usually a sign of a badly designed institution.'),
+      speech(mara, 'It requires one. Nobody should have to run a Gym completely on their own.'),
       speech(forrest, 'I volunteer for deputy training, not deputy parenting.'),
       speech(flint, 'And I volunteer to earn the jobs I used to assume were mine.'),
     ]),

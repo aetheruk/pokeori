@@ -114,23 +114,23 @@ export const mistyChronicleStory: KantoGymChronicleStory = {
     scene('contemplation', 'pool-after-closing', 'No Audience', 'Misty and Daisy speak honestly when there is nobody left to impress.', theatre, [
       narration('After closing, Daisy sat at the edge of the pool with her stage shoes beside her. Misty joined her without an argument ready. For a while, neither sister said anything.'),
       speech(daisy, 'When our parents handed the tour to us, everyone looked at me. I said yes before I knew what I was agreeing to. Then I kept saying yes until it sounded like authority.'),
-      speech(misty, 'When I battle, nobody gets to decide I am just decoration. The result is not polite. It tells me what worked.'),
-      speech(daisy, 'Results can lie too. You won space for Horsea today, but you also missed the trial and the preview. One good choice can still hurt people.'),
+      speech(misty, 'When I battle, nobody treats me like stage decoration. The scoreboard does not care about smiling for sponsors. It just shows if you were good enough.'),
+      speech(daisy, 'A win does not fix everything, Misty. You saved that Horsea, but you also missed your trial and ruined our preview. Good intentions can still leave a mess.'),
       speech(misty, 'I know. I just do not regret the rescue enough to pretend I would choose differently.'),
     ]),
     scene('contemplation', 'daisys-question', 'What Would Your Gym Teach?', 'Daisy asks Misty to define more than what she is resisting.', theatre, [
       speech(daisy, 'Suppose you win. What does a challenger learn here, besides how hard my little sister is to push around?'),
-      speech(misty, 'They learn to read movement before they attack. Water shows you every careless decision. A good trainer adapts to it instead of blaming the current.'),
+      speech(misty, 'They learn to read the water instead of fighting it. If you rush, the currents push you out of position. A good trainer adapts instead of making excuses.'),
       speech(daisy, 'That sounds suspiciously like choreography.'),
       speech(misty, 'It sounds like what I learned from choreography after I stopped resenting it.'),
-      speech(daisy, 'Then maybe you were not out of step. Maybe you were counting toward a different ending.'),
+      speech(daisy, 'Then maybe you were not out of step with us after all. You just wanted a different stage.'),
     ]),
     scene('contemplation', 'the-four-column-plan', 'A Gym With Two Doors', 'The sisters design separate programmes that share staff, water and responsibility.', theatre, [
       speech(violet, 'Morning rehearsals, afternoon challenges, and no rearranging platforms without putting it on the board.'),
       speech(lily, 'The show gets an understudy. The battle programme gets a lifeguard who is not also battling.'),
       speech(daisy, 'Sponsor money keeps the pool running. Challenge fees keep the teams running. Neither budget quietly rescues the other.'),
       speech(misty, 'And any sister can call a safety stop without losing her place in the argument.'),
-      narration('The plan was less elegant than Daisy’s schedules and less direct than Misty. That is how they knew it belonged to all four of them.'),
+      narration('The plan was less elegant than Daisy’s schedules and less direct than Misty’s way. That is how they knew it belonged to all four of them.'),
     ]),
 
     scene('resolution', 'trial-day', 'Daisy’s Side of the Pool', 'Daisy accepts the role of opponent without turning the match into a family verdict.', theatre, [

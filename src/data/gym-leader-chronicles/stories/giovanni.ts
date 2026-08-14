@@ -23,7 +23,7 @@ export const giovanniChronicleStory: KantoGymChronicleStory = { sequence: [
     speech(hadrian,'The League will lease the road but cannot fund the reconstruction. Whoever repairs it gets the freight rights for ten years.'),
     speech(giovanni,'Seven years, and Viridian residents ride free.'),
     speech(hadrian,'You are negotiating against your own advantage?'),
-    speech(giovanni,'A road the city resents is expensive to guard. Gratitude is cheaper when it is bought early.'),
+    speech(giovanni,'If the city resents the toll, we will spend half our budget guarding the trucks. Keeping them happy early saves money later.'),
   ]),
   game('backstory','read-the-parcel-map'),
   scene('backstory','silver-practises','The Seat Reserved','Silver trains while Giovanni handles calls from the edge of the room.',home,[
@@ -84,14 +84,14 @@ export const giovanniChronicleStory: KantoGymChronicleStory = { sequence: [
     speech(giovanni,'The assessment ends before your final.'),
     speech(silver,'If I reach the final.'),
     speech(giovanni,'You will.'),
-    speech(silver,'That is not confidence. That is you arranging the future so you never have to answer the condition.'),
+    speech(silver,'You always say that. It is just your way of dodging a real answer.'),
     speech(giovanni,'Front row. Dinner at eight. I gave you my word.'),
   ]),
   scene('conflict','the-assessment','Viridian’s Candidate','Hadrian tests the polished institution Giovanni built.',office,[
     speech(hadrian,'A Leader serves challengers whether their arrival is profitable, convenient, or politically useful.'),
     speech(giovanni,'Reliable institutions are profitable, because unreliability is expensive.'),
     speech(hadrian,'That answer is about incentives. I asked about duty.'),
-    speech(giovanni,'Duty without a system is a promise made by someone who expects others to absorb the cost.'),
+    speech(giovanni,'Good intentions do not keep roads open or feed cities. Solid logistics do.'),
   ]),
   battle('conflict','league-assessment'),
   scene('conflict','six-ten','The Meeting That Cannot Wait','Ariana brings the private crisis Giovanni cannot delegate.',office,[
@@ -130,20 +130,20 @@ export const giovanniChronicleStory: KantoGymChronicleStory = { sequence: [
     speech(ariana,'You got everything you wanted.'),
     speech(giovanni,'The boy disagrees.'),
     speech(ariana,'Children are poor accountants.'),
-    speech(giovanni,'No. They notice costs adults have agreed not to price.'),
+    speech(giovanni,'No. He just knows when his father breaks a promise.'),
   ]),
   scene('contemplation','hadrians-warning','What a Gym Magnifies','Hadrian recognises the flaw the League licence cannot correct.',office,[
     speech(hadrian,'You will be an effective Leader. That is not unqualified praise.'),
     speech(giovanni,'You licensed the Gym.'),
     speech(hadrian,'Because Viridian needs the institution you built. It will magnify whatever you practise inside it: discipline, patience, or the belief that results excuse methods.'),
     speech(giovanni,'You think one missed tournament reveals my method?'),
-    speech(hadrian,'I think your first instinct was to buy a better ending.'),
+    speech(hadrian,'I think your first instinct was to buy him off with an expensive trophy.'),
   ]),
   scene('contemplation','outside-silvers-door','An Apology Without Entry','Giovanni apologises through the door, and Silver asks him to come back when the apology can stand alone.',home,[
     speech(giovanni,'I chose the meeting. I knew I might miss the final, and I told myself I could control the delay. I was wrong.'),
     speech(silver,'Are you saying this because you are sorry, or because you want me to open the door?'),
     speech(giovanni,'Both.'),
-    speech(silver,'Then come back when the first answer can survive without the second.'),
+    speech(silver,'Then come back when you are actually sorry, not just trying to fix this so you feel better.'),
     narration('Giovanni stood outside longer than necessary, as if patience could become presence retroactively.'),
   ]),
 
@@ -183,7 +183,7 @@ export const giovanniChronicleStory: KantoGymChronicleStory = { sequence: [
     speech(silver,'You stayed even after I lost.'),
     speech(giovanni,'The promise was attendance, not victory.'),
     speech(silver,'You sound proud of getting that sentence right.'),
-    speech(giovanni,'I am learning not to rewrite simple words until they mean what suits me.'),
+    speech(giovanni,'I told you I would be there, Silver. That is all there is to it.'),
     narration('At eight, they ate together. The runner-up trophy from the first tournament stayed on Silver’s shelf. The replacement stayed boxed in Giovanni’s office: a perfect object for an evening that had never happened.'),
   ]),
 ] }
