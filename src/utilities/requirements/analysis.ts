@@ -17,6 +17,7 @@ export type GameDataKeys =
   | 'activeExpedition'
   | 'rivalTrainer'
   | 'weather'
+  | 'storyState'
 
 export function analyzeRequirements(
   conditions?: TaskCondition[],

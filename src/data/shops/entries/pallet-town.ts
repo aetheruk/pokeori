@@ -56,7 +56,7 @@ export const palletTownShops: ShopConfig[] = [
           {
             type: 'currency',
             id: 'prof-scrip',
-            amount: 500,
+            amount: 1000,
           },
         ],
         stock: 1,
@@ -81,7 +81,7 @@ export const palletTownShops: ShopConfig[] = [
           {
             type: 'currency',
             id: 'prof-scrip',
-            amount: 500,
+            amount: 1000,
           },
         ],
         stock: 1,
@@ -106,7 +106,7 @@ export const palletTownShops: ShopConfig[] = [
           {
             type: 'currency',
             id: 'prof-scrip',
-            amount: 500,
+            amount: 1000,
           },
         ],
         stock: 1,
@@ -131,7 +131,7 @@ export const palletTownShops: ShopConfig[] = [
           {
             type: 'currency',
             id: 'prof-scrip',
-            amount: 500,
+            amount: 1000,
           },
         ],
         stock: 1,
@@ -139,6 +139,159 @@ export const palletTownShops: ShopConfig[] = [
           {
             type: 'icon',
             targetId: 'trainer-gb-blue-2',
+            quantity: 1,
+            dropChance: 100,
+          },
+        ],
+      },
+      {
+        id: 'title-golden-child',
+        name: 'Title: Golden Child',
+        description: 'Unlock the title "Golden Child".',
+        icon: {
+          type: 'local',
+          id: '/sprites/items/certificate.avif',
+        },
+        cost: [
+          {
+            type: 'currency',
+            id: 'prof-scrip',
+            amount: 500,
+          },
+        ],
+        stock: 1,
+        requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'nugget-bridge-join',
+          },
+        ],
+        rewards: [
+          {
+            type: 'title',
+            targetId: 'golden-child',
+            dropChance: 100,
+          },
+        ],
+      },
+      {
+        id: 'icon-nugget',
+        name: 'Icon: Nugget',
+        description: 'Unlock the Nugget trainer icon.',
+        icon: {
+          type: 'item',
+          id: 'nugget',
+        },
+        cost: [
+          {
+            type: 'currency',
+            id: 'prof-scrip',
+            amount: 500,
+          },
+        ],
+        stock: 1,
+        requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'nugget-bridge-join',
+          },
+        ],
+        rewards: [
+          {
+            type: 'icon',
+            targetId: 'nugget',
+            quantity: 1,
+            dropChance: 100,
+          },
+        ],
+      },
+      {
+        id: 'title-team-rocket-grunt',
+        name: 'Title: Team Rocket Grunt',
+        description: 'Unlock the title "Team Rocket Grunt".',
+        icon: {
+          type: 'local',
+          id: '/sprites/items/certificate.avif',
+        },
+        cost: [
+          {
+            type: 'currency',
+            id: 'prof-scrip',
+            amount: 500,
+          },
+        ],
+        stock: 1,
+        requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'nugget-bridge-refuse',
+          },
+        ],
+        rewards: [
+          {
+            type: 'title',
+            targetId: 'team-rocket-grunt',
+            dropChance: 100,
+          },
+        ],
+      },
+      {
+        id: 'icon-rocket-m',
+        name: 'Icon: Rocket Grunt (M)',
+        description: 'Unlock the male Team Rocket Grunt trainer icon.',
+        icon: {
+          type: 'trainer',
+          id: 'rocket-grunt-m',
+        },
+        cost: [
+          {
+            type: 'currency',
+            id: 'prof-scrip',
+            amount: 500,
+          },
+        ],
+        stock: 1,
+        requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'nugget-bridge-refuse',
+          },
+        ],
+        rewards: [
+          {
+            type: 'icon',
+            targetId: 'rocket-m',
+            quantity: 1,
+            dropChance: 100,
+          },
+        ],
+      },
+      {
+        id: 'icon-rocket-f',
+        name: 'Icon: Rocket Grunt (F)',
+        description: 'Unlock the female Team Rocket Grunt trainer icon.',
+        icon: {
+          type: 'trainer',
+          id: 'rocket-grunt-f',
+        },
+        cost: [
+          {
+            type: 'currency',
+            id: 'prof-scrip',
+            amount: 500,
+          },
+        ],
+        stock: 1,
+        requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'nugget-bridge-refuse',
+          },
+        ],
+        rewards: [
+          {
+            type: 'icon',
+            targetId: 'rocket-f',
             quantity: 1,
             dropChance: 100,
           },
