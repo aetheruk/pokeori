@@ -14,13 +14,21 @@ import { useStoryStateStore } from '@/app/(frontend)/store/story-state-store'
 export function GameShell({
   children,
   user,
+  initialTakeover = false,
 }: {
   children: React.ReactNode
   user?: User | null
+  initialTakeover?: boolean
 }) {
   const pathname = usePathname()
-  const [takeoverActive, setTakeoverActive] = useState(false)
+  const [takeoverActive, setTakeoverActive] = useState(initialTakeover)
   useAuthSessionKeepalive()
+
+  useEffect(() => {
+    if (initialTakeover) {
+      document.body.classList.add('pokeori-blackout')
+    }
+  }, [initialTakeover])
 
   const isEncounter = pathname.startsWith('/game/locations/encounter')
   const isGameActivity =

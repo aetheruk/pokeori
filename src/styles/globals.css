@@ -371,7 +371,8 @@
   }
 
   body.pokeori-blackout .game-paper-first,
-  body.pokeori-blackout .game-paper-modal {
+  body.pokeori-blackout .game-paper-modal,
+  .pokeori-blackout-scope {
     --game-canvas: var(--game-night-canvas);
     --game-surface: var(--game-night-surface);
     --game-surface-raised: #2b4248;
@@ -434,10 +435,76 @@
     will-change: transform, opacity;
   }
 
+  @keyframes pokeori-unown-peek {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.16);
+    }
+  }
+
+  .pokeori-unown-peek img {
+    animation: pokeori-unown-peek 13s ease-in-out infinite;
+  }
+
+  @keyframes pokeori-blackout-warmth {
+    0%,
+    100% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .pokeori-blackout-warmth {
+    opacity: 0.7;
+    animation: pokeori-blackout-warmth 11s ease-in-out infinite;
+  }
+
+  .pokeori-blackout-warmth-top {
+    animation-delay: -5.5s;
+  }
+
+  @keyframes pokeori-blackout-breathe {
+    0%,
+    100% {
+      transform: skewX(-1.2deg) rotate(-0.8deg) scale(1);
+    }
+    50% {
+      transform: skewX(1.2deg) rotate(0.8deg) scale(1.035);
+    }
+  }
+
+  .pokeori-blackout-breathe {
+    animation: pokeori-blackout-breathe 18s ease-in-out infinite;
+  }
+
+  .pokeori-blackout-breathe-alt {
+    animation-direction: reverse;
+    animation-duration: 23s;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .pokeori-unown-float {
       animation: none !important;
       opacity: 0.35;
+    }
+
+    .pokeori-unown-peek img {
+      animation: none !important;
+    }
+
+    .pokeori-blackout-warmth {
+      animation: none !important;
+      opacity: 0.7;
+    }
+
+    .pokeori-blackout-breathe,
+    .pokeori-blackout-breathe-alt {
+      animation: none !important;
     }
   }
 

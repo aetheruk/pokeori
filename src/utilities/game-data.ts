@@ -16,7 +16,6 @@ import {
   deriveStoryStateFromTasks,
   SAFFRON_ESCAPE_COMPLETE_TASK_ID,
   SAFFRON_GYM_AMBUSH_TASK_ID,
-  type StoryState,
 } from '@/utilities/story-state'
 import { ensureUserWeatherSlot } from '@/utilities/weather'
 import { normalizeKidModeExpeditionSteps } from '@/utilities/expeditions/path-builder'
@@ -100,37 +99,36 @@ export async function getGameUserData(
 
   const userState = await getUserStateData(payload as any, user, requiredData, requestOptions)
 
-  let storyState: StoryState | undefined
-  if (shouldFetch('storyState')) {
-    const storyTaskRows = (
-      (await payload.find({
-        collection: USER_STATE_COLLECTIONS.tasks,
-        where: {
-          and: [
-            { user: { equals: user.id } },
-            {
-              taskId: {
-                in: [
-                  SAFFRON_GYM_AMBUSH_TASK_ID,
-                  SAFFRON_ESCAPE_COMPLETE_TASK_ID,
-                ],
-              },
+  // Story state is always derived from task progress so every scope can
+  // redirect/seed takeover-aware chrome before the client syncs.
+  const storyTaskRows = (
+    (await payload.find({
+      collection: USER_STATE_COLLECTIONS.tasks,
+      where: {
+        and: [
+          { user: { equals: user.id } },
+          {
+            taskId: {
+              in: [
+                SAFFRON_GYM_AMBUSH_TASK_ID,
+                SAFFRON_ESCAPE_COMPLETE_TASK_ID,
+              ],
             },
-          ],
-        },
-        pagination: false,
-        depth: 0,
-        overrideAccess: true,
-        select: { taskId: true },
-        ...requestOptions,
-      })) as unknown as { docs?: Array<{ taskId?: unknown }> }
-    ).docs || []
-    storyState = deriveStoryStateFromTasks(
-      storyTaskRows.map((row: { taskId?: unknown }) => ({
-        taskId: String(row.taskId),
-      })),
-    )
-  }
+          },
+        ],
+      },
+      pagination: false,
+      depth: 0,
+      overrideAccess: true,
+      select: { taskId: true },
+      ...requestOptions,
+    })) as unknown as { docs?: Array<{ taskId?: unknown }> }
+  ).docs || []
+  const storyState = deriveStoryStateFromTasks(
+    storyTaskRows.map((row: { taskId?: unknown }) => ({
+      taskId: String(row.taskId),
+    })),
+  )
 
   const weatherState = shouldFetch('weather')
     ? await ensureUserWeatherSlot(

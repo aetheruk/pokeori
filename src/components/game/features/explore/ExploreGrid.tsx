@@ -13,6 +13,7 @@ interface ExploreGridProps {
   activeExpedition: any | null
   trainerName: string
   userData: RequirementData
+  hideEmptyState?: boolean
   onAction: (item: ExploreItem) => void
   playSelectSfx: () => void
   setActiveShop: (shop: any) => void
@@ -28,12 +29,14 @@ function ExploreGridComponent({
   activeExpedition,
   trainerName,
   userData,
+  hideEmptyState = false,
   onAction,
   playSelectSfx,
   setActiveShop,
   setSelectedItem,
 }: ExploreGridProps) {
   if (filteredItems.length === 0 && !randomEvent && !vsSeekerEvent) {
+    if (hideEmptyState) return null
     return (
       <div
         className="mx-auto max-w-xl rounded-lg border border-dashed border-game-border-strong bg-game-canvas/60 px-4 py-10 text-center text-sm font-medium text-game-muted"

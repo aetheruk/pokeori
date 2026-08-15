@@ -8,13 +8,22 @@ export async function GameRouteDataBoundary({
   scope,
   children,
   initialGameData: suppliedGameData,
+  allowDuringTakeover = false,
 }: {
   scope: GameDataScope
   children: React.ReactNode
   initialGameData?: RequirementData | null
+  allowDuringTakeover?: boolean
 }) {
   const initialGameData = suppliedGameData || await getGameRouteData(scope)
   if (!initialGameData) redirect('/auth')
+  if (
+    !allowDuringTakeover &&
+    scope !== 'explore' &&
+    initialGameData.storyState?.saffronTakeover
+  ) {
+    redirect('/game/explore')
+  }
 
   return (
     <UserProvider initialGameData={initialGameData} scopeOverride={scope}>

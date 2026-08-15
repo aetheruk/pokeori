@@ -19,6 +19,7 @@ import { CategoryTabs } from './CategoryTabs'
 import { AreaTabs } from './AreaTabs'
 import { ExploreGrid } from './ExploreGrid'
 import { FilterBar } from './FilterBar'
+import { BlackoutBackdrop } from './BlackoutBackdrop'
 import { BlackoutUnowns } from './BlackoutUnowns'
 import type { RequirementData } from '@/utilities/requirements'
 import type { ExtendedUser } from '@/types/user-data'
@@ -303,10 +304,11 @@ function ExploreListContent({
     <div
       className={cn(
         'game-paper-first game-paper-background flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink',
-        isTakeover && 'relative isolate',
+        isTakeover && 'pokeori-blackout-scope relative isolate',
       )}
     >
-      {isTakeover && <BlackoutUnowns />}
+      {isTakeover && <BlackoutBackdrop />}
+      {isTakeover && <BlackoutUnowns trainerName={trainerName} />}
       {/* Header */}
       {!isTakeover && (
         <ExploreHeader
@@ -364,6 +366,7 @@ function ExploreListContent({
           activeExpedition={activeExpedition}
           trainerName={trainerName}
           userData={userData}
+          hideEmptyState={isTakeover}
           onAction={actions.handleAction}
           playSelectSfx={actions.playSelectSfx}
           setActiveShop={actions.setActiveShop}
