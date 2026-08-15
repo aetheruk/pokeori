@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { regionCategories } from '@/data/region-map'
 import { subCategories } from '@/data/sub-region-map'
 import { tasks } from '@/data/tasks'
+import { buildNameForms } from '@/components/game/features/explore/BlackoutUnowns'
 import {
   isSaffronTakeoverActive,
   SAFFRON_ESCAPE_COMPLETE_TASK_ID,
@@ -60,5 +61,37 @@ describe('Saffron blackout region', () => {
     expect(subCategories['???']?.alwaysAvailable).toBe(true)
     expect(subCategories['???']?.image).toBe('/backgrounds/saffron.avif')
     expect(regionCategories['???']?.image).toBe('/backgrounds/saffron.avif')
+  })
+})
+
+describe('blackout Unown name spelling', () => {
+  test('spells the trainer name and ends with a question-mark Unown', () => {
+    expect(buildNameForms('Ash')).toEqual([
+      '201-a',
+      '201-s',
+      '201-h',
+      '201-question',
+    ])
+  })
+
+  test('strips non-letters and caps long names', () => {
+    const forms = buildNameForms('Pika-2 !! Fan')
+    expect(forms).toEqual([
+      '201-p',
+      '201-i',
+      '201-k',
+      '201-a',
+      '201-f',
+      '201-a',
+      '201-n',
+      '201-question',
+    ])
+    const long = buildNameForms('A'.repeat(30))
+    expect(long.length).toBe(13)
+  })
+
+  test('falls back to just a question-mark Unown for an empty name', () => {
+    expect(buildNameForms('')).toEqual(['201-question'])
+    expect(buildNameForms(undefined)).toEqual(['201-question'])
   })
 })

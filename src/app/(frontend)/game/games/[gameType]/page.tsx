@@ -100,6 +100,7 @@ export default async function GamePage({
       <GameRouteDataBoundary
         scope="inventory"
         initialGameData={initialGameData}
+        allowDuringTakeover
       >
         <BattleBetsGame encounter={encounter} initialState={battleBetsState} />
       </GameRouteDataBoundary>
@@ -121,7 +122,11 @@ export default async function GamePage({
   if (!GameComponent) redirect('/game/explore')
 
   return (
-    <GameRouteDataBoundary scope="inventory" initialGameData={initialGameData}>
+    <GameRouteDataBoundary
+      scope="inventory"
+      initialGameData={initialGameData}
+      allowDuringTakeover
+    >
       <GameComponent
         encounter={encounter}
         initialState={gameState}
