@@ -25,17 +25,17 @@ const FLOAT_SPECS: UnownFloatSpec[] = [
   { formId: '201-question', left: '44%', top: '82%', size: 52, driftDuration: 23, fadeDuration: 11, delay: 1, peakOpacity: 0.5 },
   { formId: '201-v', left: '58%', top: '14%', size: 46, driftDuration: 17, fadeDuration: 9, delay: 8, peakOpacity: 0.55, peek: true },
   { formId: '201-z', left: '72%', top: '64%', size: 60, driftDuration: 20, fadeDuration: 8, delay: 4, peakOpacity: 0.45 },
-  { formId: '201-h', left: '85%', top: '26%', size: 42, driftDuration: 15, fadeDuration: 7, delay: 10, peakOpacity: 0.6, shiny: true },
-  { formId: '201-s', left: '12%', top: '42%', size: 48, driftDuration: 19, fadeDuration: 10, delay: 2, peakOpacity: 0.5 },
-  { formId: '201-f', left: '66%', top: '40%', size: 38, driftDuration: 14, fadeDuration: 6, delay: 12, peakOpacity: 0.6 },
+  { formId: '201-h', left: '85%', top: '26%', size: 42, driftDuration: 15, fadeDuration: 7, delay: 10, peakOpacity: 0.6 },
+  { formId: '201-s', left: '8%', top: '30%', size: 48, driftDuration: 19, fadeDuration: 10, delay: 2, peakOpacity: 0.5 },
+  { formId: '201-f', left: '70%', top: '28%', size: 38, driftDuration: 14, fadeDuration: 6, delay: 12, peakOpacity: 0.6 },
   { formId: '201-w', left: '38%', top: '55%', size: 44, driftDuration: 22, fadeDuration: 9, delay: 5, peakOpacity: 0.5 },
   { formId: '201-g', left: '90%', top: '78%', size: 40, driftDuration: 17, fadeDuration: 8, delay: 7, peakOpacity: 0.45 },
   { formId: '201-u', left: '50%', top: '32%', size: 36, driftDuration: 16, fadeDuration: 7, delay: 9, peakOpacity: 0.55 },
   { formId: '201-k', left: '24%', top: '88%', size: 42, driftDuration: 20, fadeDuration: 10, delay: 11, peakOpacity: 0.5 },
   { formId: '201-y', left: '80%', top: '8%', size: 46, driftDuration: 18, fadeDuration: 9, delay: 13, peakOpacity: 0.5 },
-  { formId: '201-e', left: '10%', top: '64%', size: 44, driftDuration: 19, fadeDuration: 9, delay: 4, peakOpacity: 0.55, shiny: true },
-  { formId: '201-l', left: '68%', top: '82%', size: 48, driftDuration: 21, fadeDuration: 8, delay: 6, peakOpacity: 0.5, shiny: true },
-  { formId: '201-p', left: '34%', top: '8%', size: 40, driftDuration: 16, fadeDuration: 7, delay: 12, peakOpacity: 0.6, shiny: true },
+  { formId: '201-e', left: '10%', top: '64%', size: 44, driftDuration: 19, fadeDuration: 9, delay: 4, peakOpacity: 0.55 },
+  { formId: '201-l', left: '68%', top: '82%', size: 48, driftDuration: 21, fadeDuration: 8, delay: 6, peakOpacity: 0.5 },
+  { formId: '201-p', left: '34%', top: '8%', size: 40, driftDuration: 16, fadeDuration: 7, delay: 12, peakOpacity: 0.6 },
 ]
 
 const NAME_LETTER_LIMIT = 12
@@ -107,8 +107,9 @@ export function BlackoutUnowns({ trainerName }: { trainerName?: string }) {
                   <Image
                     src={getPokemonImageUrl(formId, 'home')}
                     alt=""
-                    width={1}
-                    height={1}
+                    width={96}
+                    height={96}
+                    unoptimized
                     className="h-full w-full object-contain"
                   />
                 </div>

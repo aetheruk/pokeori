@@ -38,9 +38,9 @@ flashes back to the light palette.
 The blackout list also renders a decorative layer of Unown sprites
 (`BlackoutUnowns`) that drift and fade in and out behind the content. The layer
 is `pointer-events-none` and `aria-hidden`, uses the bundled home Unown forms,
-includes shiny H, E, L, and P forms (spelling HELP) and occasional scale
-"peeks", and disables all motion under `prefers-reduced-motion`. The same layer
-adds a soft vignette that keeps the centre readable.
+includes occasional scale "peeks", and disables all motion under
+`prefers-reduced-motion`. The same layer adds a soft vignette that keeps the
+centre readable.
 
 Behind the Unown sits the bundled `twisted-dimension` artwork
 (`BlackoutBackdrop`), anchored to the top and bottom edges with fade masks over
@@ -58,6 +58,10 @@ the glyphs responsively to the name length and viewport, accounting for gaps,
 and caps very long names). Each letter gets slightly jittered delay, drift,
 fade, and peak timings so the word materialises organically rather than as a
 uniform ticker. The letters use the same drift/fade motion and freeze under
+`prefers-reduced-motion`.
+
+Tapping or clicking anywhere on the blackout page triggers a brief, subtle
+screen shake (0.28s) as interaction feedback; it is skipped entirely under
 `prefers-reduced-motion`.
 
 - The `saffron-gym-ambush` task stays in Saffron City as the trigger; it is
