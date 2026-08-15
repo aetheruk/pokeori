@@ -7,7 +7,17 @@ import {
   CHANNELING_POKEMON_SELECT,
   EXPLORE_POKEMON_SELECT,
 } from '@/utilities/game-data-scopes'
-import { getUserStateData, toSlimUser } from '@/utilities/user-state'
+import {
+  getUserStateData,
+  toSlimUser,
+  USER_STATE_COLLECTIONS,
+} from '@/utilities/user-state'
+import {
+  deriveStoryStateFromTasks,
+  SAFFRON_ESCAPE_COMPLETE_TASK_ID,
+  SAFFRON_GYM_AMBUSH_TASK_ID,
+  type StoryState,
+} from '@/utilities/story-state'
 import { ensureUserWeatherSlot } from '@/utilities/weather'
 import { normalizeKidModeExpeditionSteps } from '@/utilities/expeditions/path-builder'
 
@@ -89,6 +99,39 @@ export async function getGameUserData(
   }
 
   const userState = await getUserStateData(payload as any, user, requiredData, requestOptions)
+
+  let storyState: StoryState | undefined
+  if (shouldFetch('storyState')) {
+    const storyTaskRows = (
+      (await payload.find({
+        collection: USER_STATE_COLLECTIONS.tasks,
+        where: {
+          and: [
+            { user: { equals: user.id } },
+            {
+              taskId: {
+                in: [
+                  SAFFRON_GYM_AMBUSH_TASK_ID,
+                  SAFFRON_ESCAPE_COMPLETE_TASK_ID,
+                ],
+              },
+            },
+          ],
+        },
+        pagination: false,
+        depth: 0,
+        overrideAccess: true,
+        select: { taskId: true },
+        ...requestOptions,
+      })) as unknown as { docs?: Array<{ taskId?: unknown }> }
+    ).docs || []
+    storyState = deriveStoryStateFromTasks(
+      storyTaskRows.map((row: { taskId?: unknown }) => ({
+        taskId: String(row.taskId),
+      })),
+    )
+  }
+
   const weatherState = shouldFetch('weather')
     ? await ensureUserWeatherSlot(
         payload as any,
@@ -218,6 +261,7 @@ export async function getGameUserData(
     lastRoll: (user as any).lastRoll,
   }
   if (shouldFetch('pokemon')) result.pokemon = pokemonData
+  if (storyState) result.storyState = storyState
   for (const [key, value] of Object.entries(userState)) {
     result[key] = value
   }

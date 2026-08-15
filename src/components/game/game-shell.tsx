@@ -1,10 +1,11 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
+import { useEffect } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
 import { GameErrorBoundary } from '@/components/game/GameErrorBoundary'
 import { GameNavigation } from '@/components/game/game-navigation'
 import { AudioProvider } from '@/context/AudioContext'
-import { UserProvider } from '@/context/UserContext'
+import { UserProvider, useUser } from '@/context/UserContext'
 import { useAuthSessionKeepalive } from '@/hooks/use-auth-session-keepalive'
 import { cn } from '@/lib/utils'
 import type { User } from '@/payload-types'
@@ -56,11 +57,42 @@ export function GameShell({
     '/game/tcg',
   ].includes(pathname)
 
+const TAKEOVER_ALLOWED_PREFIXES = [
+  '/game/games/',
+  '/game/battles/',
+  '/game/field-research',
+  '/game/research/encounter',
+  '/game/locations/encounter',
+]
+
+function isTakeoverAllowedPath(pathname: string) {
+  return (
+    pathname === '/game/explore' ||
+    TAKEOVER_ALLOWED_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+  )
+}
+
+function TakeoverRouteGuard() {
+  const pathname = usePathname()
+  const router = useRouter()
+  const { gameData } = useUser()
+  const takeoverActive = gameData?.storyState?.saffronTakeover === true
+
+  useEffect(() => {
+    if (!takeoverActive) return
+    if (isTakeoverAllowedPath(pathname)) return
+    router.replace('/game/explore')
+  }, [pathname, router, takeoverActive])
+
+  return null
+}
+
   return (
     <UserProvider
       initialUser={user || null}
       scopeOverride={isRscManagedRoute ? 'core' : undefined}
     >
+      <TakeoverRouteGuard />
       <AudioProvider>
         <GameErrorBoundary>
           <div className="game-paper-background fixed inset-0 flex flex-col bg-game-canvas text-game-ink">

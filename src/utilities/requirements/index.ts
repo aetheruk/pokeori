@@ -1,4 +1,5 @@
 import type { User, Pokemon } from '@/payload-types'
+import type { StoryState } from '@/utilities/story-state'
 import { resolvePokemonRarity } from '@/utilities/pokemon/rarity-effects'
 import { regionCategories } from '@/data/region-map'
 import type {
@@ -71,6 +72,7 @@ export interface ExpeditionResult {
 export interface RequirementData {
   snapshotAt?: string
   user: User
+  storyState?: StoryState
   rivalTrainer?: {
     id: string
     trainerName?: string | null

@@ -11,8 +11,9 @@ describe('game data sync scopes', () => {
     expect(GAME_DATA_SCOPE_KEYS['pokemon-box']).toEqual(['inventory', 'pokedex'])
   })
 
-  test('default sync uses the lightweight core scope', () => {
-    expect(GAME_DATA_SCOPE_KEYS.core).toEqual([])
+  test('default sync keeps the core scope light, with only the story-state read', () => {
+    expect(GAME_DATA_SCOPE_KEYS.core).toEqual(['storyState'])
+    expect(GAME_DATA_SCOPE_KEYS.core).not.toContain('completedTasks')
   })
 
   test('explore sync keeps slim pokemon fields needed for requirements and selection', () => {

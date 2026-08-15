@@ -17,8 +17,10 @@ import { CategoryTabs } from './CategoryTabs'
 import { AreaTabs } from './AreaTabs'
 import { ExploreGrid } from './ExploreGrid'
 import { FilterBar } from './FilterBar'
+import { SaffronTakeoverView } from './SaffronTakeoverView'
 import type { RequirementData } from '@/utilities/requirements'
 import type { ExtendedUser } from '@/types/user-data'
+import { isSaffronTakeoverActive } from '@/utilities/story-state'
 
 // Modals
 import { ShopModal } from '@/components/game/shops/shop-modal'
@@ -284,6 +286,25 @@ function ExploreListContent({
     setPreviousSubCategory(currentLocation.subCategory)
     setActiveCategory('Dailies')
     setActiveSubCategory('')
+  }
+
+  if (isSaffronTakeoverActive(userData)) {
+    return (
+      <>
+        <SaffronTakeoverView userData={userData} />
+        <TaskExitDialog
+          data={actions.exitModalData}
+          open={actions.isExitModalOpen}
+          onOpenChange={(open) => {
+            actions.setIsExitModalOpen(open)
+            if (!open) {
+              actions.setExitModalData(null)
+              actions.setSelectedItem(null)
+            }
+          }}
+        />
+      </>
+    )
   }
 
   return (
@@ -637,10 +658,25 @@ function ExploreListContent({
                   ? await completeCurrentUserExpeditionTaskStep(task.id)
                   : await completeTask(task.id, undefined, crypto.randomUUID())
               if (result.success) {
-                if (isExpeditionTaskFlow) {
-                  actions.setSelectedItem(null)
-                } else {
-                  actions.setSelectedItem(null)
+                actions.setSelectedItem(null)
+                // A task that completes into the Saffron takeover plays its
+                // exit modal over the blackout view before the city goes dark.
+                const takeoverStarted = isSaffronTakeoverActive({
+                  completedTasks: [
+                    ...(userData?.completedTasks || []),
+                    { taskId: task.id },
+                  ],
+                })
+                if (
+                  !isExpeditionTaskFlow &&
+                  takeoverStarted &&
+                  task.exitModal
+                ) {
+                  actions.setExitModalData(task.exitModal)
+                  actions.setIsExitModalOpen(true)
+                  actions.setCompletionResult(null)
+                  await refreshUser()
+                  return
                 }
                 actions.setCompletionResult(result)
                 await refreshUser()

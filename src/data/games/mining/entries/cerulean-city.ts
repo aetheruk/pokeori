@@ -44,7 +44,7 @@ export const ceruleanCityminingEntries: MiningConfig[] = [
       {
         type: 'item',
         targetId: 'razz-berry',
-        quantity: { min: 3, max: 6 },
+        quantity: { min: 1, max: 3 },
         dropChance: 100,
       },
     ],

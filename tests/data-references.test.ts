@@ -1182,7 +1182,48 @@ describe('static data references', () => {
       ['trainer-gb-blue', 'Blue (Red)', 1, false],
       ['trainer-gb-red-2', 'Red (Blue)', 1, false],
       ['trainer-gb-blue-2', 'Blue (Blue)', 1, false],
+      ['icon-nugget', 'Icon: Nugget', 1, false],
+      ['icon-rocket-m', 'Icon: Rocket Grunt (M)', 1, false],
+      ['icon-rocket-f', 'Icon: Rocket Grunt (F)', 1, false],
     ])
+  })
+
+  test("Prof's Scrip Shop prices and missed Nugget Bridge choice items are configured correctly", () => {
+    const scripShop = shops.find((shop) => shop.id === 'retro-trainer-cards')
+
+    // GB icons are 1000 Prof Scrips each
+    const gbIcons = ['trainer-gb-red', 'trainer-gb-blue', 'trainer-gb-red-2', 'trainer-gb-blue-2']
+    for (const id of gbIcons) {
+      const item = scripShop?.items.find((i) => i.id === id)
+      expect(item?.cost).toEqual([{ type: 'currency', id: 'prof-scrip', amount: 1000 }])
+    }
+
+    // Missed choice items are 500 Prof Scrips each with mutually exclusive requirements
+    const goldenChildTitle = scripShop?.items.find((i) => i.id === 'title-golden-child')
+    const nuggetIcon = scripShop?.items.find((i) => i.id === 'icon-nugget')
+    const rocketTitle = scripShop?.items.find((i) => i.id === 'title-team-rocket-grunt')
+    const rocketMIcon = scripShop?.items.find((i) => i.id === 'icon-rocket-m')
+    const rocketFIcon = scripShop?.items.find((i) => i.id === 'icon-rocket-f')
+
+    expect(goldenChildTitle?.cost).toEqual([{ type: 'currency', id: 'prof-scrip', amount: 500 }])
+    expect(goldenChildTitle?.requirements).toEqual([{ type: 'task_completed', targetId: 'nugget-bridge-join' }])
+    expect(goldenChildTitle?.rewards).toEqual([{ type: 'title', targetId: 'golden-child', dropChance: 100 }])
+
+    expect(nuggetIcon?.cost).toEqual([{ type: 'currency', id: 'prof-scrip', amount: 500 }])
+    expect(nuggetIcon?.requirements).toEqual([{ type: 'task_completed', targetId: 'nugget-bridge-join' }])
+    expect(nuggetIcon?.rewards).toEqual([{ type: 'icon', targetId: 'nugget', quantity: 1, dropChance: 100 }])
+
+    expect(rocketTitle?.cost).toEqual([{ type: 'currency', id: 'prof-scrip', amount: 500 }])
+    expect(rocketTitle?.requirements).toEqual([{ type: 'task_completed', targetId: 'nugget-bridge-refuse' }])
+    expect(rocketTitle?.rewards).toEqual([{ type: 'title', targetId: 'team-rocket-grunt', dropChance: 100 }])
+
+    expect(rocketMIcon?.cost).toEqual([{ type: 'currency', id: 'prof-scrip', amount: 500 }])
+    expect(rocketMIcon?.requirements).toEqual([{ type: 'task_completed', targetId: 'nugget-bridge-refuse' }])
+    expect(rocketMIcon?.rewards).toEqual([{ type: 'icon', targetId: 'rocket-m', quantity: 1, dropChance: 100 }])
+
+    expect(rocketFIcon?.cost).toEqual([{ type: 'currency', id: 'prof-scrip', amount: 500 }])
+    expect(rocketFIcon?.requirements).toEqual([{ type: 'task_completed', targetId: 'nugget-bridge-refuse' }])
+    expect(rocketFIcon?.rewards).toEqual([{ type: 'icon', targetId: 'rocket-f', quantity: 1, dropChance: 100 }])
   })
 
   test("Captain's Credit profile rewards use award sprites without changing icon unlocks", () => {
