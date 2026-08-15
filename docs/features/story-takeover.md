@@ -24,6 +24,21 @@ authored exactly like any other area:
   active. Entries should also gate themselves with a `task_completed`
   requirement on `saffron-gym-ambush` so they never surface in the normal
   region picker for players outside the blackout.
+
+While the takeover is active the shell toggles a `pokeori-blackout` class on
+`document.body`, which inverts the paper palette to the night palette across
+the Explore page and every portaled drawer (task details, enter/exit modals).
+This is driven purely by CSS variables in `src/styles/globals.css`.
+The shell only toggles the class from confident state: while the initial sync
+or a dev hot-reload is in flight (when the server snapshot is missing and the
+client store is unset), the class is left untouched so the blackout never
+flashes back to the light palette.
+
+The blackout list also renders a decorative layer of Unown sprites
+(`BlackoutUnowns`) that drift and fade in and out behind the content. The layer
+is `pointer-events-none` and `aria-hidden`, uses the bundled home Unown forms,
+and disables the drift/fade animations under `prefers-reduced-motion`.
+
 - The `saffron-gym-ambush` task stays in Saffron City as the trigger; it is
   one-time and disappears after completion.
 

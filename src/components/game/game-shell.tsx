@@ -96,14 +96,27 @@ function TakeoverActiveProbe({
 }: {
   onTakeoverChange: (active: boolean) => void
 }) {
+  const pathname = usePathname()
   const { gameData } = useUser()
   const storeTakeover = useStoryStateStore((state) => state.saffronTakeover)
-  const takeoverActive =
-    storeTakeover || gameData?.storyState?.saffronTakeover === true
+  const serverTakeover = gameData?.storyState?.saffronTakeover === true
+  const takeoverActive = storeTakeover || serverTakeover
 
   useEffect(() => {
+    const hasLoadedData = gameData !== undefined && gameData !== null
+    if (!hasLoadedData && !storeTakeover) return
     onTakeoverChange(takeoverActive)
-  }, [onTakeoverChange, takeoverActive])
+  }, [gameData, onTakeoverChange, storeTakeover, takeoverActive])
+
+  // Apply the blackout palette only from confident state. During an initial
+  // sync or a dev hot-reload gap `gameData` can be transiently missing; toggling
+  // the class off then would flash (and stick to) the light theme until the next
+  // fetch, so leave the class untouched while the server data is unavailable.
+  useEffect(() => {
+    const hasLoadedData = gameData !== undefined && gameData !== null
+    if (!hasLoadedData && !storeTakeover) return
+    document.body.classList.toggle('pokeori-blackout', takeoverActive)
+  }, [gameData, pathname, serverTakeover, storeTakeover, takeoverActive])
 
   return null
 }
