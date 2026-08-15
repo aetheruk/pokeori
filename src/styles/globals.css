@@ -468,6 +468,29 @@
     animation-delay: -5.5s;
   }
 
+  @keyframes pokeori-blackout-shake {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+    20% {
+      transform: translate3d(-3px, 1px, 0) rotate(-0.4deg);
+    }
+    40% {
+      transform: translate3d(3px, -2px, 0) rotate(0.4deg);
+    }
+    60% {
+      transform: translate3d(-3px, -1px, 0) rotate(-0.3deg);
+    }
+    80% {
+      transform: translate3d(2px, 2px, 0) rotate(0.3deg);
+    }
+  }
+
+  .pokeori-blackout-shake {
+    animation: pokeori-blackout-shake 0.28s ease-in-out;
+  }
+
   @keyframes pokeori-blackout-breathe {
     0%,
     100% {
@@ -504,6 +527,10 @@
 
     .pokeori-blackout-breathe,
     .pokeori-blackout-breathe-alt {
+      animation: none !important;
+    }
+
+    .pokeori-blackout-shake {
       animation: none !important;
     }
   }

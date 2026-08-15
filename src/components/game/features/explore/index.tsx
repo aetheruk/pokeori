@@ -113,6 +113,7 @@ function ExploreListContent({
 }) {
   const { availableItems: allUnlockedItems } = useExploreData(userData, '', '')
   const [showDailyRefresh, setShowDailyRefresh] = useState(false)
+  const [blackoutShaking, setBlackoutShaking] = useState(false)
   const [hasSyncedExpeditionReturn, setHasSyncedExpeditionReturn] =
     useState(false)
 
@@ -300,11 +301,30 @@ function ExploreListContent({
     setActiveSubCategory('')
   }
 
+  const handleBlackoutTap = () => {
+    if (!isTakeover) return
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return
+    }
+    setBlackoutShaking(true)
+  }
+
   return (
     <div
+      onClick={handleBlackoutTap}
+      onAnimationEnd={(event) => {
+        if (event.animationName === 'pokeori-blackout-shake') {
+          setBlackoutShaking(false)
+        }
+      }}
       className={cn(
         'game-paper-first game-paper-background flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink',
-        isTakeover && 'pokeori-blackout-scope relative isolate',
+        isTakeover &&
+          'pokeori-blackout-scope relative isolate cursor-pointer',
+        blackoutShaking && 'pokeori-blackout-shake',
       )}
     >
       {isTakeover && <BlackoutBackdrop />}
