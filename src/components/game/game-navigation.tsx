@@ -33,12 +33,7 @@ export function GameNavigation() {
   const pathname = usePathname()
   const router = useRouter()
   const { playSfx } = useAudio()
-  const { user, gameData } = useUser()
-
-  const takeoverActive = gameData?.storyState?.saffronTakeover === true
-  const visibleNavItems = takeoverActive
-    ? navItems.filter((item) => item.href === '/game/explore')
-    : navItems
+  const { user } = useUser()
 
   useEffect(() => {
     return scheduleBodyPointerEventsRestore()
@@ -68,7 +63,7 @@ export function GameNavigation() {
           aria-label="Game sections"
           className="flex-1 space-y-1 overflow-y-auto px-3 py-4 xl:px-4"
         >
-          {visibleNavItems.map((item) => {
+          {navItems.map((item) => {
             const isActive =
               pathname === item.href ||
               (item.href !== '/game' && pathname.startsWith(item.href))
@@ -95,49 +90,47 @@ export function GameNavigation() {
             )
           })}
         </nav>
-        {!takeoverActive && (
-          <div className="mt-auto border-t border-game-border p-3 xl:p-4">
-            <div className="mb-2 hidden grid-cols-2 gap-2 xl:grid">
-              <ResourceValue
-                iconId={pokedollars?.iconId}
-                value={user?.currency?.pokedollars || 0}
-                label={pokedollars?.name || 'PokeDollars'}
-              />
-              <ResourceValue
-                iconId={crystals?.iconId}
-                value={user?.currency?.crystals || 0}
-                label={crystals?.name || 'Crystals'}
-              />
-            </div>
-            <Link
-              href="/game"
-              prefetch={true}
-              onPointerEnter={() => prefetchRoute('/game')}
-              onFocus={() => prefetchRoute('/game')}
-              className="game-focus-ring flex items-center justify-center gap-3 overflow-hidden rounded-lg px-2 py-2 transition-colors hover:bg-game-surface xl:justify-start"
-            >
-              <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-game-moss/30 bg-game-moss/10">
-                {user ? (
-                  <TaskIconDisplay
-                    icon={
-                      getIcon(user.icon || 'ditto')?.icon ||
-                      ({ type: 'pokemon', id: '132' } as any)
-                    }
-                    className="w-full h-full object-cover scale-110"
-                  />
-                ) : (
-                  <span className="text-xs font-bold">TR</span>
-                )}
-              </div>
-              <div className="hidden min-w-0 text-sm xl:block">
-                <p className="truncate font-medium text-game-ink">
-                  {user?.trainerName || 'Trainer'}
-                </p>
-                <p className="text-[11px] text-game-muted">Trainer profile</p>
-              </div>
-            </Link>
+        <div className="mt-auto border-t border-game-border p-3 xl:p-4">
+          <div className="mb-2 hidden grid-cols-2 gap-2 xl:grid">
+            <ResourceValue
+              iconId={pokedollars?.iconId}
+              value={user?.currency?.pokedollars || 0}
+              label={pokedollars?.name || 'PokeDollars'}
+            />
+            <ResourceValue
+              iconId={crystals?.iconId}
+              value={user?.currency?.crystals || 0}
+              label={crystals?.name || 'Crystals'}
+            />
           </div>
-        )}
+          <Link
+            href="/game"
+            prefetch={true}
+            onPointerEnter={() => prefetchRoute('/game')}
+            onFocus={() => prefetchRoute('/game')}
+            className="game-focus-ring flex items-center justify-center gap-3 overflow-hidden rounded-lg px-2 py-2 transition-colors hover:bg-game-surface xl:justify-start"
+          >
+            <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-game-moss/30 bg-game-moss/10">
+              {user ? (
+                <TaskIconDisplay
+                  icon={
+                    getIcon(user.icon || 'ditto')?.icon ||
+                    ({ type: 'pokemon', id: '132' } as any)
+                  }
+                  className="w-full h-full object-cover scale-110"
+                />
+              ) : (
+                <span className="text-xs font-bold">TR</span>
+              )}
+            </div>
+            <div className="hidden min-w-0 text-sm xl:block">
+              <p className="truncate font-medium text-game-ink">
+                {user?.trainerName || 'Trainer'}
+              </p>
+              <p className="text-[11px] text-game-muted">Trainer profile</p>
+            </div>
+          </Link>
+        </div>
       </aside>
 
       {/* Mobile Bottom Nav */}
@@ -145,7 +138,7 @@ export function GameNavigation() {
         aria-label="Game sections"
         className="fixed inset-x-0 bottom-0 z-50 flex h-[4.5rem] items-end justify-around border-t border-game-border bg-game-surface/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
       >
-        {visibleNavItems.map((item) => {
+        {navItems.map((item) => {
           const isActive = isItemActive(item)
 
           return (

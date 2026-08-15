@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { GameErrorBoundary } from '@/components/game/GameErrorBoundary'
 import { GameNavigation } from '@/components/game/game-navigation'
@@ -9,6 +9,7 @@ import { UserProvider, useUser } from '@/context/UserContext'
 import { useAuthSessionKeepalive } from '@/hooks/use-auth-session-keepalive'
 import { cn } from '@/lib/utils'
 import type { User } from '@/payload-types'
+import { useStoryStateStore } from '@/app/(frontend)/store/story-state-store'
 
 export function GameShell({
   children,
@@ -18,6 +19,7 @@ export function GameShell({
   user?: User | null
 }) {
   const pathname = usePathname()
+  const [takeoverActive, setTakeoverActive] = useState(false)
   useAuthSessionKeepalive()
 
   const isEncounter = pathname.startsWith('/game/locations/encounter')
@@ -76,7 +78,9 @@ function TakeoverRouteGuard() {
   const pathname = usePathname()
   const router = useRouter()
   const { gameData } = useUser()
-  const takeoverActive = gameData?.storyState?.saffronTakeover === true
+  const storeTakeover = useStoryStateStore((state) => state.saffronTakeover)
+  const takeoverActive =
+    storeTakeover || gameData?.storyState?.saffronTakeover === true
 
   useEffect(() => {
     if (!takeoverActive) return
@@ -87,12 +91,30 @@ function TakeoverRouteGuard() {
   return null
 }
 
+function TakeoverActiveProbe({
+  onTakeoverChange,
+}: {
+  onTakeoverChange: (active: boolean) => void
+}) {
+  const { gameData } = useUser()
+  const storeTakeover = useStoryStateStore((state) => state.saffronTakeover)
+  const takeoverActive =
+    storeTakeover || gameData?.storyState?.saffronTakeover === true
+
+  useEffect(() => {
+    onTakeoverChange(takeoverActive)
+  }, [onTakeoverChange, takeoverActive])
+
+  return null
+}
+
   return (
     <UserProvider
       initialUser={user || null}
       scopeOverride={isRscManagedRoute ? 'core' : undefined}
     >
       <TakeoverRouteGuard />
+      <TakeoverActiveProbe onTakeoverChange={setTakeoverActive} />
       <AudioProvider>
         <GameErrorBoundary>
           <div className="game-paper-background fixed inset-0 flex flex-col bg-game-canvas text-game-ink">
@@ -103,13 +125,15 @@ function TakeoverRouteGuard() {
               className="game-field-stamps absolute inset-0 hidden opacity-[0.035] xl:block"
               aria-hidden="true"
             />
-            {!isFullscreen && <GameNavigation />}
+            {!isFullscreen && !takeoverActive && <GameNavigation />}
             <main
               id="game-content"
               tabIndex={-1}
               className={cn(
                 'relative flex-1 min-h-0 overflow-hidden bg-game-canvas outline-none',
-                !isFullscreen ? 'pb-[4.5rem] md:pb-0 md:pl-20 xl:pl-56' : '',
+                !isFullscreen && !takeoverActive
+                  ? 'pb-[4.5rem] md:pb-0 md:pl-20 xl:pl-56'
+                  : '',
               )}
             >
               <div
