@@ -5,6 +5,7 @@ import { useGameUserData } from '@/hooks/useGameUserData'
 import { useUser } from '@/context/UserContext'
 import { useAudio } from '@/context/AudioContext'
 import { GamePageSkeleton } from '@/components/game/shared/GamePageSkeleton'
+import { useStoryStateStore } from '@/app/(frontend)/store/story-state-store'
 
 // Hooks
 import { useExploreState } from './hooks/useExploreState'
@@ -17,7 +18,6 @@ import { CategoryTabs } from './CategoryTabs'
 import { AreaTabs } from './AreaTabs'
 import { ExploreGrid } from './ExploreGrid'
 import { FilterBar } from './FilterBar'
-import { SaffronTakeoverView } from './SaffronTakeoverView'
 import type { RequirementData } from '@/utilities/requirements'
 import type { ExtendedUser } from '@/types/user-data'
 import { isSaffronTakeoverActive } from '@/utilities/story-state'
@@ -149,11 +149,20 @@ function ExploreListContent({
     subCategoryStatuses,
   } = useExploreState(allUnlockedItems, userData)
 
+  const isTakeover = isSaffronTakeoverActive(userData.completedTasks || [])
+  const setSaffronTakeover = useStoryStateStore((state) => state.setSaffronTakeover)
+  const displayCategory = isTakeover ? '???' : activeCategory
+  const displaySubCategory = isTakeover ? '???' : activeSubCategory
+
+  useEffect(() => {
+    setSaffronTakeover(isTakeover)
+  }, [isTakeover, setSaffronTakeover])
+
   // 3. Filtered Data (for Grid)
   const { filteredItems, randomEvent, vsSeekerEvent } = useExploreData(
     userData,
-    activeCategory,
-    activeSubCategory,
+    displayCategory,
+    displaySubCategory,
   )
 
   // 4. Actions & Modals State
@@ -161,8 +170,8 @@ function ExploreListContent({
 
   // 5. Derived UI Data
   const regionData = getRegionData(
-    activeCategory,
-    activeSubCategory,
+    displayCategory,
+    displaySubCategory,
     regionCategories,
   )
 
@@ -288,74 +297,61 @@ function ExploreListContent({
     setActiveSubCategory('')
   }
 
-  if (isSaffronTakeoverActive(userData)) {
-    return (
-      <>
-        <SaffronTakeoverView userData={userData} />
-        <TaskExitDialog
-          data={actions.exitModalData}
-          open={actions.isExitModalOpen}
-          onOpenChange={(open) => {
-            actions.setIsExitModalOpen(open)
-            if (!open) {
-              actions.setExitModalData(null)
-              actions.setSelectedItem(null)
-            }
-          }}
-        />
-      </>
-    )
-  }
-
   return (
     <div className="game-paper-first game-paper-background flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
       {/* Header */}
-      <ExploreHeader
-        currentImage={currentImage as any}
-        currentTitle={currentTitle}
-        currentDescription={currentDescription}
-        activeCategory={activeCategory}
-        activeSubCategory={activeSubCategory}
-        weatherSlot={
-          userData.weatherSlot ||
-          (userData.user as any).weatherSlot ||
-          undefined
-        }
-      />
+      {!isTakeover && (
+        <ExploreHeader
+          currentImage={currentImage as any}
+          currentTitle={currentTitle}
+          currentDescription={currentDescription}
+          activeCategory={displayCategory}
+          activeSubCategory={displaySubCategory}
+          weatherSlot={
+            userData.weatherSlot ||
+            (userData.user as any).weatherSlot ||
+            undefined
+          }
+        />
+      )}
 
       {/* Region Drawer */}
-      <CategoryTabs
-        regionModalOpen={regionModalOpen}
-        setRegionModalOpen={setRegionModalOpen}
-        regionCategories={regionCategories}
-        categories={categories}
-        activeCategory={activeCategory}
-        handleCategoryChange={handleCategoryChange}
-      />
-      <AreaTabs
-        areaModalOpen={areaModalOpen}
-        setAreaModalOpen={setAreaModalOpen}
-        activeCategory={areaSelectorLocation.category}
-        activeSubCategory={areaSelectorLocation.subCategory}
-        subCategories={areaSelectorSubCategories}
-        subCategoryStatuses={areaSelectorStatuses}
-        handleSubCategoryChange={(subCategory) => {
-          if (isDailies) {
-            setActiveCategory(areaSelectorLocation.category)
-            setPreviousCategory(areaSelectorLocation.category)
-            setPreviousSubCategory(subCategory)
-          }
-          setActiveSubCategory(subCategory)
-        }}
-      />
+      {!isTakeover && (
+        <CategoryTabs
+          regionModalOpen={regionModalOpen}
+          setRegionModalOpen={setRegionModalOpen}
+          regionCategories={regionCategories}
+          categories={categories}
+          activeCategory={activeCategory}
+          handleCategoryChange={handleCategoryChange}
+        />
+      )}
+      {!isTakeover && (
+        <AreaTabs
+          areaModalOpen={areaModalOpen}
+          setAreaModalOpen={setAreaModalOpen}
+          activeCategory={areaSelectorLocation.category}
+          activeSubCategory={areaSelectorLocation.subCategory}
+          subCategories={areaSelectorSubCategories}
+          subCategoryStatuses={areaSelectorStatuses}
+          handleSubCategoryChange={(subCategory) => {
+            if (isDailies) {
+              setActiveCategory(areaSelectorLocation.category)
+              setPreviousCategory(areaSelectorLocation.category)
+              setPreviousSubCategory(subCategory)
+            }
+            setActiveSubCategory(subCategory)
+          }}
+        />
+      )}
 
       {/* Main Grid */}
       <div className="flex-1 min-h-0 overflow-y-auto px-4 md:px-6 pt-4">
         <ExploreGrid
           filteredItems={filteredItems}
-          randomEvent={randomEvent}
-          vsSeekerEvent={vsSeekerEvent}
-          activeCategory={activeCategory}
+          randomEvent={isTakeover ? null : randomEvent}
+          vsSeekerEvent={isTakeover ? null : vsSeekerEvent}
+          activeCategory={displayCategory}
           activeVoyages={activeVoyages}
           activeExpedition={activeExpedition}
           trainerName={trainerName}
@@ -368,21 +364,23 @@ function ExploreListContent({
       </div>
 
       {/* Filter Bar */}
-      <FilterBar
-        activeCategory={activeCategory}
-        activeSubCategory={activeSubCategory}
-        onOpenRegionModal={() => setRegionModalOpen(true)}
-        onOpenAreaModal={() => setAreaModalOpen(true)}
-        onOpenDailies={openDailyChallenges}
-        onReturnFromDailies={() => {
-          const previousLocation = getFallbackLocation(
-            previousCategory,
-            previousSubCategory,
-          )
-          setActiveCategory(previousLocation.category)
-          setActiveSubCategory(previousLocation.subCategory)
-        }}
-      />
+      {!isTakeover && (
+        <FilterBar
+          activeCategory={activeCategory}
+          activeSubCategory={activeSubCategory}
+          onOpenRegionModal={() => setRegionModalOpen(true)}
+          onOpenAreaModal={() => setAreaModalOpen(true)}
+          onOpenDailies={openDailyChallenges}
+          onReturnFromDailies={() => {
+            const previousLocation = getFallbackLocation(
+              previousCategory,
+              previousSubCategory,
+            )
+            setActiveCategory(previousLocation.category)
+            setActiveSubCategory(previousLocation.subCategory)
+          }}
+        />
+      )}
 
       {/* --- MODALS --- */}
 
@@ -661,12 +659,10 @@ function ExploreListContent({
                 actions.setSelectedItem(null)
                 // A task that completes into the Saffron takeover plays its
                 // exit modal over the blackout view before the city goes dark.
-                const takeoverStarted = isSaffronTakeoverActive({
-                  completedTasks: [
-                    ...(userData?.completedTasks || []),
-                    { taskId: task.id },
-                  ],
-                })
+                const takeoverStarted = isSaffronTakeoverActive([
+                  ...(userData?.completedTasks || []),
+                  { taskId: task.id },
+                ])
                 if (
                   !isExpeditionTaskFlow &&
                   takeoverStarted &&

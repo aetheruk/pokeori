@@ -25,6 +25,14 @@ export const subCategories: Record<string, RegionData> = {
     description: 'Debug-only test encounters for development.',
     music: '/music/minigame.mp3',
   },
+  '???': {
+    category: '???',
+    region: '???',
+    order: 0,
+    alwaysAvailable: true,
+    image: '/backgrounds/saffron.avif',
+    description: '???',
+  },
   'Pallet Town': {
     category: 'Pallet Town',
     region: 'Kanto',

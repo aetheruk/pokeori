@@ -2,10 +2,30 @@
 
 The Saffron takeover is the first story-driven UI lockdown in the game. After
 the player completes the one-time `saffron-gym-ambush` task in Saffron City,
-the entire game collapses to a single Explore screen: navigation shows only
-Explore, direct visits to other game pages redirect back to Explore, and the
-Explore chrome (region/area selectors, filters, dailies) is replaced by a
-distinct night "blackout" view.
+the game restricts the shell to a single Explore screen: the navigation rail
+and mobile bottom nav are removed entirely, direct visits to other game pages
+redirect back to `/game/explore`, and Explore renders a normal list pinned to
+the `???` region and `???` location.
+
+## Blackout Explore list
+
+During the takeover, Explore keeps its normal list rendering (header, grid,
+drawers for detail modals) but hides the entire Explore header, the
+region/area selectors, and the filter bar, so the blackout list begins
+directly with its content. The VS Seeker and random-event cards are also
+suppressed so only authored `???` content appears. Content for the blackout is
+authored exactly like any other area:
+
+- Tasks, locations, battles, games, shops, voyages, and expeditions with
+  `category: '???'` and `subCategory: '???'` appear in the list.
+- The `???` region is registered in `src/data/region-map.ts` and
+  `src/data/sub-region-map.ts` with `alwaysAvailable: true`, so it never
+  needs unlock requirements and only shows its entries while the takeover is
+  active. Entries should also gate themselves with a `task_completed`
+  requirement on `saffron-gym-ambush` so they never surface in the normal
+  region picker for players outside the blackout.
+- The `saffron-gym-ambush` task stays in Saffron City as the trigger; it is
+  one-time and disappears after completion.
 
 ## State derivation
 
@@ -13,41 +33,30 @@ distinct night "blackout" view.
   `saffron-gym-ambush` task is completed and the `saffron-escape-complete`
   task is not yet recorded.
 - The server exposes the boolean as `RequirementData.storyState.saffronTakeover`
-  (loaded on the `core` game-data scope, which the shell navigation uses).
+  (loaded on the `core` game-data scope, which the shell uses).
 - The Explore page computes the same boolean client-side from its
   `completedTasks` payload via `isSaffronTakeoverActive`.
 - The future escape chronicle will record `saffron-escape-complete` when it is
-  claimed, which turns the takeover off.
-
-## Takeover view
-
-`SaffronTakeoverView` renders instead of the normal Explore header, region/area
-tabs, grid, and filter bar. It uses the `game-night` palette over the Saffron
-artwork for a visually distinct "lights out" treatment and shows memory slots
-from `src/data/saffron-takeover.ts`:
-
-- `arianna-saffron-takeover-chronicle` (Ariana's Record)
-- `choo-saffron-investigation-chronicle` (Choo's Case File)
-- `player-saffron-escape-chronicle` (The Escape), which is revealed only once
-  both prior chronicle expeditions show a completed result.
-
-Slots are sealed (non-interactive) placeholders until the chronicle
-expeditions are authored. When those land, the slots should be replaced by
-real expedition entries rendered on the takeover screen.
+  claimed, which turns the takeover off and restores the normal shell.
 
 ## Guards
 
-- `GameNavigation` filters the desktop rail and mobile bottom nav to Explore
-  only while the takeover is active and hides the profile/currency block.
+- `GameShell` hides `GameNavigation` entirely and removes the nav/padding while
+  the takeover is active, so Trainer, Pokemon, Artisan, Dex, and the profile
+  link are unreachable. Explore mirrors the derived flag into the shared
+  `useStoryStateStore` client store the moment the ambush task completes, so
+  the shell hides navigation immediately instead of waiting for its next data
+  sync; the server-side `storyState` flag covers fresh loads and direct route
+  visits.
 - `TakeoverRouteGuard` in `GameShell` redirects any non-Explore game route back
   to `/game/explore`; fullscreen activity routes (`/game/games/*`,
-  `/game/battles/*`, field research, encounters) remain reachable so future
-  chronicle activities can launch from the takeover screen.
+  `/game/battles/*`, field research, encounters) remain reachable so chronicle
+  activities authored under `???` can launch from the blackout list.
 - The `saffron-gym-ambush` task opens with a short enter modal ("Choo will be
   right behind me, I'll go on ahead.") and, because completing it activates
   the takeover, its exit modal ("Hello is anyo........." with the "...."
-  button) plays over the blackout view before Explore is locked down.
+  button) plays before Explore locks down to the `???` region.
 
 Server-side action guards (PVP, bets, socials) are intentionally not part of
-this first slice; they should be added when the chronicle content lands so a
+this slice; they should be added when the chronicle content lands so a
 story-locked player can only run takeover activities.

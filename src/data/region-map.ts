@@ -74,6 +74,12 @@ export const regionCategories: Record<string, RegionData> = {
         "image": "/backgrounds/paldea.avif",
         "timeZone": "Europe/Madrid"
     },
+    '???': {
+        "category": "???",
+        "image": "/backgrounds/saffron.avif",
+        "description": "???",
+        "timeZone": "UTC"
+    },
     
         
     
