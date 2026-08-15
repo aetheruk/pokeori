@@ -331,6 +331,116 @@
     background-image: none !important;
   }
 
+  /* Saffron blackout takeover inverts the paper chrome to the night palette
+     across the Explore page and every portaled drawer. */
+  body.pokeori-blackout {
+    --game-canvas: var(--game-night-canvas);
+    --game-surface: var(--game-night-surface);
+    --game-surface-raised: #2b4248;
+    --game-border: var(--game-night-border);
+    --game-border-strong: rgb(247 236 214 / 0.28);
+    --game-ink: var(--game-night-ink);
+    --game-muted: var(--game-night-muted);
+    --game-moss: #91a96b;
+    --game-moss-strong: #b8c894;
+    --game-clay: #d78467;
+    --game-stance-blue: #8eb9e2;
+    --game-stance-blue-strong: #b9d8f1;
+    --game-ochre: #d3ad63;
+    --game-accent: #91a96b;
+    --game-paper-background: var(--game-night-canvas);
+    --background: var(--game-night-canvas);
+    --foreground: var(--game-night-ink);
+    --card: var(--game-night-surface);
+    --card-foreground: var(--game-night-ink);
+    --popover: #2b4248;
+    --popover-foreground: var(--game-night-ink);
+    --primary: #91a96b;
+    --primary-foreground: #172733;
+    --secondary: #30474b;
+    --secondary-foreground: var(--game-night-ink);
+    --muted: #30474b;
+    --muted-foreground: var(--game-night-muted);
+    --accent: #30474b;
+    --accent-foreground: var(--game-night-ink);
+    --border: var(--game-night-border);
+    --input: rgb(247 236 214 / 0.22);
+    --ring: #91a96b;
+    background: var(--game-canvas);
+    color: var(--game-ink);
+  }
+
+  body.pokeori-blackout .game-paper-first,
+  body.pokeori-blackout .game-paper-modal {
+    --game-canvas: var(--game-night-canvas);
+    --game-surface: var(--game-night-surface);
+    --game-surface-raised: #2b4248;
+    --game-border: var(--game-night-border);
+    --game-border-strong: rgb(247 236 214 / 0.28);
+    --game-ink: var(--game-night-ink);
+    --game-muted: var(--game-night-muted);
+    --game-moss: #91a96b;
+    --game-moss-strong: #b8c894;
+    --game-clay: #d78467;
+    --game-stance-blue: #8eb9e2;
+    --game-stance-blue-strong: #b9d8f1;
+    --game-ochre: #d3ad63;
+    --game-accent: #91a96b;
+    --game-paper-background: var(--game-night-canvas);
+    background-color: var(--game-night-canvas) !important;
+    color: var(--game-ink);
+  }
+
+  /* Floating Unown for the Saffron blackout Explore list. */
+  @keyframes pokeori-unown-drift {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) rotate(-8deg);
+    }
+    25% {
+      transform: translate3d(12px, -18px, 0) rotate(6deg);
+    }
+    50% {
+      transform: translate3d(-10px, -30px, 0) rotate(-4deg);
+    }
+    75% {
+      transform: translate3d(-16px, -10px, 0) rotate(9deg);
+    }
+  }
+
+  @keyframes pokeori-unown-fade {
+    0% {
+      opacity: 0;
+    }
+    18% {
+      opacity: var(--unown-peak, 0.55);
+    }
+    62% {
+      opacity: var(--unown-peak, 0.55);
+    }
+    82% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .pokeori-unown-float {
+    animation:
+      pokeori-unown-drift var(--unown-drift, 16s) ease-in-out infinite,
+      pokeori-unown-fade var(--unown-fade, 9s) ease-in-out infinite;
+    animation-delay: var(--unown-delay, 0s);
+    will-change: transform, opacity;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pokeori-unown-float {
+      animation: none !important;
+      opacity: 0.35;
+    }
+  }
+
   .game-contour-motif,
   .game-field-stamps {
     background-repeat: no-repeat;

@@ -6,6 +6,7 @@ import { useUser } from '@/context/UserContext'
 import { useAudio } from '@/context/AudioContext'
 import { GamePageSkeleton } from '@/components/game/shared/GamePageSkeleton'
 import { useStoryStateStore } from '@/app/(frontend)/store/story-state-store'
+import { cn } from '@/lib/utils'
 
 // Hooks
 import { useExploreState } from './hooks/useExploreState'
@@ -18,6 +19,7 @@ import { CategoryTabs } from './CategoryTabs'
 import { AreaTabs } from './AreaTabs'
 import { ExploreGrid } from './ExploreGrid'
 import { FilterBar } from './FilterBar'
+import { BlackoutUnowns } from './BlackoutUnowns'
 import type { RequirementData } from '@/utilities/requirements'
 import type { ExtendedUser } from '@/types/user-data'
 import { isSaffronTakeoverActive } from '@/utilities/story-state'
@@ -298,7 +300,13 @@ function ExploreListContent({
   }
 
   return (
-    <div className="game-paper-first game-paper-background flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
+    <div
+      className={cn(
+        'game-paper-first game-paper-background flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink',
+        isTakeover && 'relative isolate',
+      )}
+    >
+      {isTakeover && <BlackoutUnowns />}
       {/* Header */}
       {!isTakeover && (
         <ExploreHeader
