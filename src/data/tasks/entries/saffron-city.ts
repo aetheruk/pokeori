@@ -92,8 +92,8 @@ export const saffronCityTasks: Task[] = [
     category: '???',
     subCategory: '???',
     icon: {
-      type: 'lucide',
-      id: 'HelpCircle',
+      type: 'local',
+      id: '/sprites/items/egg.avif',
     },
     background: '/backgrounds/twisted-dimension.avif',
     repeatable: true,
