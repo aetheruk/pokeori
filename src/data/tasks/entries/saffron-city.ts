@@ -71,7 +71,7 @@ export const saffronCityTasks: Task[] = [
       type: 'lucide',
       id: 'HelpCircle',
     },
-    background: '/backgrounds/twisted-dimension.avif',
+    background: '/backgrounds/cosmos.avif',
     repeatable: false,
     secret: true,
     completionTrigger: 'manual',
@@ -84,9 +84,9 @@ export const saffronCityTasks: Task[] = [
     criteria: [],
     rewards: [],
   },
-  // Placeholder repeatable task unlocked by Struggle; content not authored yet.
+  // Unlocked by Struggle; id was changed after earlier test completions.
   {
-    id: 'a-golden-glow',
+    id: 'golden-glow',
     name: 'A Golden Glow',
     description: '???',
     category: '???',
@@ -95,10 +95,11 @@ export const saffronCityTasks: Task[] = [
       type: 'local',
       id: '/sprites/items/egg.avif',
     },
-    background: '/backgrounds/twisted-dimension.avif',
-    repeatable: true,
+    background: '/backgrounds/cosmos-gold.avif',
+    repeatable: false,
     secret: false,
     completionTrigger: 'manual',
+    completeButtonText: '…',
     requirements: [
       {
         type: 'task_completed',
@@ -111,5 +112,120 @@ export const saffronCityTasks: Task[] = [
     ],
     criteria: [],
     rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        title: '…',
+        message: 'Well now, Quite the spirit in you {Trainer}',
+        background: '/backgrounds/cosmos-gold.avif',
+        icon: {
+          type: 'local',
+          id: '/sprites/items/egg.avif',
+        },
+        buttons: [
+          {
+            text: '…',
+            type: 'navigate',
+            id: 2,
+          },
+        ],
+      },
+      {
+        id: 2,
+        title: '…',
+        message:
+          "I'm afraid though it's not your day at all, No no no my child in fact The long and short of it is well… you have ended up rather, how can I put this lightly. Dead.",
+        background: '/backgrounds/cosmos-gold.avif',
+        icon: {
+          type: 'local',
+          id: '/sprites/items/egg.avif',
+        },
+        buttons: [
+          {
+            text: '…',
+            type: 'navigate',
+            id: 3,
+          },
+        ],
+      },
+      {
+        id: 3,
+        title: '…',
+        message: 'Perhaps it is for the best though.',
+        background: '/backgrounds/cosmos-gold.avif',
+        icon: {
+          type: 'local',
+          id: '/sprites/items/egg.avif',
+        },
+        buttons: [
+          {
+            text: '…',
+            type: 'navigate',
+            id: 4,
+          },
+        ],
+      },
+      {
+        id: 4,
+        title: '…',
+        message:
+          'Hmm not particularly chatty are we. Then again I suppose it is difficult getting used to the lack of form or matter.',
+        background: '/backgrounds/cosmos-gold.avif',
+        icon: {
+          type: 'local',
+          id: '/sprites/items/egg.avif',
+        },
+        buttons: [
+          {
+            text: '…',
+            type: 'navigate',
+            id: 5,
+          },
+        ],
+      },
+      {
+        id: 5,
+        title: '…',
+        message: 'Focus {Trainer}.',
+        background: '/backgrounds/cosmos-gold.avif',
+        icon: {
+          type: 'local',
+          id: '/sprites/items/egg.avif',
+        },
+        buttons: [
+          {
+            text: '…',
+            type: 'navigate',
+            id: 6,
+          },
+        ],
+      },
+      {
+        id: 6,
+        title: '…',
+        message: 'First do you remember how you came to be here?',
+        background: '/backgrounds/cosmos-gold.avif',
+        icon: {
+          type: 'local',
+          id: '/sprites/items/egg.avif',
+        },
+        buttons: [
+          {
+            text: 'No',
+            type: 'success',
+          },
+        ],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/cosmos-gold.avif',
+      title: '…',
+      icon: {
+        type: 'local',
+        id: '/sprites/items/egg.avif',
+      },
+      message: 'Impressive I felt that. Please allow me to me show you.',
+      closeButtonText: '…',
+    },
   },
 ]

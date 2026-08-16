@@ -374,13 +374,13 @@ function ExploreListContent({
       )}
     >
       {isTakeover && <BlackoutBackdrop />}
+      {isTakeover && <BlackoutUnowns trainerName={trainerName} />}
       {isTakeover && (
         <BlackoutGoldenGlow
           tapCount={goldenTapCount}
           revealed={struggleCompleted || eggRevealed}
         />
       )}
-      {isTakeover && <BlackoutUnowns trainerName={trainerName} />}
       {goldenFlash && (
         <div
           className="pokeori-golden-flash pointer-events-none absolute inset-0 z-50"

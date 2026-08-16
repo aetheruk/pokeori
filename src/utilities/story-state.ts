@@ -12,7 +12,7 @@
 export const SAFFRON_GYM_AMBUSH_TASK_ID = 'saffron-gym-ambush'
 export const SAFFRON_ESCAPE_COMPLETE_TASK_ID = 'saffron-escape-complete'
 export const STRUGGLE_TASK_ID = 'struggle'
-export const A_GOLDEN_GLOW_TASK_ID = 'a-golden-glow'
+export const A_GOLDEN_GLOW_TASK_ID = 'golden-glow'
 
 export interface StoryState {
   saffronTakeover: boolean

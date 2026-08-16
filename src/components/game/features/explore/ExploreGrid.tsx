@@ -331,9 +331,11 @@ function ExploreGridComponent({
               takeoverStyle && 'flex max-w-md flex-col items-center',
             )}
           >
-            <SectionDivider textColor="text-game-moss-strong">
-              {typeDisplayNames[type]}
-            </SectionDivider>
+            {!takeoverStyle && (
+              <SectionDivider textColor="text-game-moss-strong">
+                {typeDisplayNames[type]}
+              </SectionDivider>
+            )}
             <div
               className={cn(
                 'grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4',

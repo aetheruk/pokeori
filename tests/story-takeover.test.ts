@@ -113,16 +113,25 @@ describe('blackout golden glow tasks', () => {
     )
   })
 
-  test('a golden glow is a repeatable task unlocked by struggle', () => {
+  test('golden glow is a one-time task unlocked by struggle with authored cosmos dialogue', () => {
     const task = tasks.find((entry) => entry.id === A_GOLDEN_GLOW_TASK_ID)
     expect(task).toBeDefined()
-    expect(task?.repeatable).toBe(true)
+    expect(task?.repeatable).toBe(false)
     expect(task?.category).toBe('???')
+    expect(task?.background).toBe('/backgrounds/cosmos-gold.avif')
     expect(task?.requirements).toContainEqual(
       expect.objectContaining({
         type: 'task_completed',
         targetId: STRUGGLE_TASK_ID,
       }),
+    )
+    expect(task?.enterModal?.length).toBe(6)
+    expect(task?.enterModal?.[0]?.message).toBe(
+      'Well now, Quite the spirit in you {Trainer}',
+    )
+    expect(task?.enterModal?.[5]?.buttons?.[0]?.text).toBe('No')
+    expect(task?.exitModal?.message).toBe(
+      'Impressive I felt that. Please allow me to me show you.',
     )
   })
 })

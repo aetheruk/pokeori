@@ -42,7 +42,7 @@ includes occasional scale "peeks", and disables all motion under
 `prefers-reduced-motion`. The same layer adds a soft vignette that keeps the
 centre readable.
 
-Behind the Unown sits the bundled `twisted-dimension` artwork
+Behind the Unown sits the bundled `cosmos` artwork
 (`BlackoutBackdrop`), anchored to the top and bottom edges with fade masks over
 a deep void sky: an inverted copy hangs overhead and a darker copy grounds the
 bottom, leaving the centre open for content. It is a static layer, so
@@ -70,8 +70,9 @@ flashes to white and the glow becomes an egg floating in an ethereal halo,
 which silently completes the hidden one-time `struggle` task (`secret: true`,
 so it never appears in the client UI). Once the egg is revealed the screen
 shake and the growing-glow mechanic are disabled. Completing `struggle` unlocks
-the repeatable placeholder task `a-golden-glow` in the `???` list (using the
-egg sprite), ready for real content.
+the one-time task `golden-glow` in the `???` list: a golden-cosmos dialogue
+with egg icons where every title and button reads `…` except the final
+answer, which completes the task.
 
 In the takeover state the task list is vertically centred, card titles and
 text are centred, and each card carries a slow-moving golden orbit ring around
