@@ -60,4 +60,56 @@ export const saffronCityTasks: Task[] = [
       closeButtonText: '....',
     },
   },
+  // Hidden story trigger: completed silently by the blackout glow mechanic.
+  {
+    id: 'struggle',
+    name: 'Struggle',
+    description: 'A faint struggle against the dark.',
+    category: '???',
+    subCategory: '???',
+    icon: {
+      type: 'lucide',
+      id: 'HelpCircle',
+    },
+    background: '/backgrounds/twisted-dimension.avif',
+    repeatable: false,
+    secret: true,
+    completionTrigger: 'manual',
+    requirements: [
+      {
+        type: 'task_completed',
+        targetId: 'saffron-gym-ambush',
+      },
+    ],
+    criteria: [],
+    rewards: [],
+  },
+  // Placeholder repeatable task unlocked by Struggle; content not authored yet.
+  {
+    id: 'a-golden-glow',
+    name: 'A Golden Glow',
+    description: '???',
+    category: '???',
+    subCategory: '???',
+    icon: {
+      type: 'lucide',
+      id: 'HelpCircle',
+    },
+    background: '/backgrounds/twisted-dimension.avif',
+    repeatable: true,
+    secret: false,
+    completionTrigger: 'manual',
+    requirements: [
+      {
+        type: 'task_completed',
+        targetId: 'struggle',
+      },
+      {
+        type: 'task_completed',
+        targetId: 'saffron-gym-ambush',
+      },
+    ],
+    criteria: [],
+    rewards: [],
+  },
 ]

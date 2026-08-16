@@ -4,9 +4,11 @@ import { subCategories } from '@/data/sub-region-map'
 import { tasks } from '@/data/tasks'
 import { buildNameForms } from '@/components/game/features/explore/BlackoutUnowns'
 import {
+  A_GOLDEN_GLOW_TASK_ID,
   isSaffronTakeoverActive,
   SAFFRON_ESCAPE_COMPLETE_TASK_ID,
   SAFFRON_GYM_AMBUSH_TASK_ID,
+  STRUGGLE_TASK_ID,
 } from '@/utilities/story-state'
 
 describe('Saffron takeover story state', () => {
@@ -93,5 +95,34 @@ describe('blackout Unown name spelling', () => {
   test('falls back to just a question-mark Unown for an empty name', () => {
     expect(buildNameForms('')).toEqual(['201-question'])
     expect(buildNameForms(undefined)).toEqual(['201-question'])
+  })
+})
+
+describe('blackout golden glow tasks', () => {
+  test('struggle is a hidden one-time task gated on the ambush', () => {
+    const task = tasks.find((entry) => entry.id === STRUGGLE_TASK_ID)
+    expect(task).toBeDefined()
+    expect(task?.secret).toBe(true)
+    expect(task?.repeatable).toBe(false)
+    expect(task?.category).toBe('???')
+    expect(task?.requirements).toContainEqual(
+      expect.objectContaining({
+        type: 'task_completed',
+        targetId: 'saffron-gym-ambush',
+      }),
+    )
+  })
+
+  test('a golden glow is a repeatable task unlocked by struggle', () => {
+    const task = tasks.find((entry) => entry.id === A_GOLDEN_GLOW_TASK_ID)
+    expect(task).toBeDefined()
+    expect(task?.repeatable).toBe(true)
+    expect(task?.category).toBe('???')
+    expect(task?.requirements).toContainEqual(
+      expect.objectContaining({
+        type: 'task_completed',
+        targetId: STRUGGLE_TASK_ID,
+      }),
+    )
   })
 })

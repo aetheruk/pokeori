@@ -21,6 +21,7 @@ interface ExploreCardProps {
   playSelectSfx: () => void
   setActiveShop: (shop: any) => void // Type this properly if possible
   setSelectedItem: (item: ExploreItem) => void
+  centered?: boolean
 }
 
 function ExploreCardComponent({
@@ -33,6 +34,7 @@ function ExploreCardComponent({
   playSelectSfx,
   setActiveShop,
   setSelectedItem,
+  centered = false,
 }: ExploreCardProps) {
   const item = entry.kind === 'single' ? entry.item : entry.group.items[0]!
   const isChronicle = isChronicleExploreItem(item)
@@ -100,6 +102,7 @@ function ExploreCardComponent({
         isHighlighted
           ? 'border-game-ochre/45 bg-game-surface-raised'
           : 'border-game-border bg-game-surface hover:border-game-moss/35 hover:bg-game-surface-raised',
+        centered && 'justify-center',
       )}
       role={isInteractive ? 'button' : undefined}
       tabIndex={isInteractive ? 0 : undefined}
@@ -141,7 +144,12 @@ function ExploreCardComponent({
       </div>
 
       {/* Content Details */}
-      <div className="flex-1 min-w-0 flex flex-col pt-1">
+      <div
+        className={cn(
+          'flex-1 min-w-0 flex flex-col pt-1',
+          centered && 'items-center text-center',
+        )}
+      >
         <span
           className={cn(
             'mb-1 text-[11px] font-semibold uppercase tracking-wide transition-colors',
