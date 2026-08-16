@@ -37,10 +37,10 @@ export function BlackoutGoldenGlow({
             <Image
               src="/sprites/items/egg.avif"
               alt=""
-              width={288}
-              height={288}
+              width={200}
+              height={200}
               unoptimized
-              className="h-72 w-72"
+              className="h-[200px] w-[200px]"
             />
           </div>
         </div>
