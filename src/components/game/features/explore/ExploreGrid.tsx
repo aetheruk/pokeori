@@ -276,7 +276,12 @@ function ExploreGridComponent({
   }, [filteredItems])
 
   return (
-    <div className={cn('space-y-8', takeoverStyle && 'flex w-full flex-col items-center')}>
+    <div
+      className={cn(
+        'space-y-8',
+        takeoverStyle && 'flex w-full flex-col items-center pb-8 md:pb-10',
+      )}
+    >
       {vsSeekerEvent && (
         <div>
           <SectionDivider textColor="text-game-ochre">VS Seeker</SectionDivider>
