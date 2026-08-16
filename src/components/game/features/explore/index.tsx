@@ -437,7 +437,8 @@ function ExploreListContent({
       <div
         className={cn(
           'flex-1 min-h-0 overflow-y-auto px-4 md:px-6 pt-4',
-          isTakeover && 'flex flex-col items-center justify-end gap-4 pt-0',
+          isTakeover &&
+            'flex flex-col items-center justify-end gap-4 pt-0 pb-6 md:pb-8',
         )}
       >
         <ExploreGrid
