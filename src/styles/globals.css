@@ -491,6 +491,88 @@
     animation: pokeori-blackout-shake 0.28s ease-in-out;
   }
 
+  @keyframes pokeori-golden-breathe {
+    0%,
+    100% {
+      opacity: 0.88;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .pokeori-golden-breathe {
+    animation: pokeori-golden-breathe 6s ease-in-out infinite;
+  }
+
+  @keyframes pokeori-golden-rays-spin {
+    from {
+      transform: translate(-50%, -50%) rotate(0deg);
+    }
+    to {
+      transform: translate(-50%, -50%) rotate(360deg);
+    }
+  }
+
+  .pokeori-golden-rays {
+    animation: pokeori-golden-rays-spin 70s linear infinite;
+  }
+
+  @keyframes pokeori-golden-orbit {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .pokeori-golden-glow-card {
+    position: relative;
+    border-radius: 0.75rem;
+    box-shadow: 0 0 22px rgb(255 214 140 / 0.18);
+  }
+
+  .pokeori-golden-glow-card::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    z-index: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg 230deg,
+      rgb(255 214 140 / 0.95) 300deg,
+      rgb(255 214 140 / 0.35) 330deg,
+      transparent 360deg
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    animation: pokeori-golden-orbit 5s linear infinite;
+    pointer-events: none;
+  }
+
+  @keyframes pokeori-golden-flash {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .pokeori-golden-flash {
+    background: #ffffff;
+    animation: pokeori-golden-flash 0.9s ease-out forwards;
+  }
+
   @keyframes pokeori-blackout-breathe {
     0%,
     100% {
@@ -531,6 +613,12 @@
     }
 
     .pokeori-blackout-shake {
+      animation: none !important;
+    }
+
+    .pokeori-golden-breathe,
+    .pokeori-golden-rays,
+    .pokeori-golden-glow-card::before {
       animation: none !important;
     }
   }

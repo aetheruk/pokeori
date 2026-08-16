@@ -2,6 +2,7 @@ import { SectionDivider } from '@/components/ui/section-divider'
 import { ExploreCard } from './ExploreCard'
 import type { ExploreDisplayItem, ExploreItem, ExploreItemGroup } from './types'
 import type { RequirementData } from '@/utilities/requirements'
+import { cn } from '@/lib/utils'
 import { memo, useMemo } from 'react'
 
 interface ExploreGridProps {
@@ -14,6 +15,7 @@ interface ExploreGridProps {
   trainerName: string
   userData: RequirementData
   hideEmptyState?: boolean
+  takeoverStyle?: boolean
   onAction: (item: ExploreItem) => void
   playSelectSfx: () => void
   setActiveShop: (shop: any) => void
@@ -30,6 +32,7 @@ function ExploreGridComponent({
   trainerName,
   userData,
   hideEmptyState = false,
+  takeoverStyle = false,
   onAction,
   playSelectSfx,
   setActiveShop,
@@ -273,7 +276,7 @@ function ExploreGridComponent({
   }, [filteredItems])
 
   return (
-    <div className="space-y-8">
+    <div className={cn('space-y-8', takeoverStyle && 'flex w-full flex-col items-center')}>
       {vsSeekerEvent && (
         <div>
           <SectionDivider textColor="text-game-ochre">VS Seeker</SectionDivider>
@@ -316,24 +319,42 @@ function ExploreGridComponent({
       )}
       {groupedSections.map(({ type, items }) => {
         return (
-          <div key={type}>
+          <div
+            key={type}
+            className={cn(
+              'w-full',
+              takeoverStyle && 'flex max-w-md flex-col items-center',
+            )}
+          >
             <SectionDivider textColor="text-game-moss-strong">
               {typeDisplayNames[type]}
             </SectionDivider>
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+            <div
+              className={cn(
+                'grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4',
+                takeoverStyle && 'flex w-full flex-col items-center gap-4',
+              )}
+            >
               {items.map((entry) => (
-                <ExploreCard
+                <div
                   key={entry.kind === 'group' ? entry.group.id : entry.item.id}
-                  entry={entry}
-                  trainerName={trainerName}
-                  userData={userData}
-                  activeVoyages={activeVoyages}
-                  activeExpedition={activeExpedition}
-                  onAction={onAction}
-                  playSelectSfx={playSelectSfx}
-                  setActiveShop={setActiveShop}
-                  setSelectedItem={setSelectedItem}
-                />
+                  className={cn('w-full', takeoverStyle && 'pokeori-golden-glow-card')}
+                >
+                  <div className={takeoverStyle ? 'relative z-10' : undefined}>
+                    <ExploreCard
+                      entry={entry}
+                      trainerName={trainerName}
+                      userData={userData}
+                      activeVoyages={activeVoyages}
+                      activeExpedition={activeExpedition}
+                      onAction={onAction}
+                      playSelectSfx={playSelectSfx}
+                      setActiveShop={setActiveShop}
+                      setSelectedItem={setSelectedItem}
+                      centered={takeoverStyle}
+                    />
+                  </div>
+                </div>
               ))}
             </div>
           </div>
@@ -353,5 +374,6 @@ export const ExploreGrid = memo(
     prev.activeVoyages === next.activeVoyages &&
     prev.activeExpedition === next.activeExpedition &&
     prev.trainerName === next.trainerName &&
-    prev.userData === next.userData,
+    prev.userData === next.userData &&
+    prev.takeoverStyle === next.takeoverStyle,
 )

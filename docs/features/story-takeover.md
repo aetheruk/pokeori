@@ -64,6 +64,18 @@ Tapping or clicking anywhere on the blackout page triggers a brief, subtle
 screen shake (0.28s) as interaction feedback; it is skipped entirely under
 `prefers-reduced-motion`.
 
+There is also an ethereal golden glow at the centre of the blackout that
+breathes gently and grows with every tap. After 20 taps the full screen
+flashes to white, which silently completes the hidden one-time `struggle` task
+(`secret: true`, so it never appears in the client UI). Completing it unlocks
+the repeatable placeholder task `a-golden-glow` in the `???` list, ready for
+real content.
+
+In the takeover state the task list is vertically centred, card titles and
+text are centred, and each card carries a slow-moving golden orbit ring around
+its edge. The glow growth, orbit, rays, and breathing all freeze or keep only
+user-driven motion under `prefers-reduced-motion`.
+
 - The `saffron-gym-ambush` task stays in Saffron City as the trigger; it is
   one-time and disappears after completion.
 

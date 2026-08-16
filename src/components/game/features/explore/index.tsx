@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, Suspense, lazy } from 'react'
+import React, { useState, useEffect, useRef, Suspense, lazy } from 'react'
 import { useGameUserData } from '@/hooks/useGameUserData'
 import { useUser } from '@/context/UserContext'
 import { useAudio } from '@/context/AudioContext'
@@ -21,9 +21,13 @@ import { ExploreGrid } from './ExploreGrid'
 import { FilterBar } from './FilterBar'
 import { BlackoutBackdrop } from './BlackoutBackdrop'
 import { BlackoutUnowns } from './BlackoutUnowns'
+import { BlackoutGoldenGlow } from './BlackoutGoldenGlow'
 import type { RequirementData } from '@/utilities/requirements'
 import type { ExtendedUser } from '@/types/user-data'
-import { isSaffronTakeoverActive } from '@/utilities/story-state'
+import {
+  isSaffronTakeoverActive,
+  STRUGGLE_TASK_ID,
+} from '@/utilities/story-state'
 
 // Modals
 import { ShopModal } from '@/components/game/shops/shop-modal'
@@ -57,7 +61,7 @@ import {
 import { parseText } from '@/utilities/text-parsing'
 import { voyages } from '@/data/voyages'
 import { expeditions } from '@/data/expeditions'
-import { refreshDailyTasks } from '@/utilities/tasks/actions'
+import { completeTask, refreshDailyTasks } from '@/utilities/tasks/actions'
 
 // Data
 import {
@@ -114,6 +118,9 @@ function ExploreListContent({
   const { availableItems: allUnlockedItems } = useExploreData(userData, '', '')
   const [showDailyRefresh, setShowDailyRefresh] = useState(false)
   const [blackoutShaking, setBlackoutShaking] = useState(false)
+  const [goldenTapCount, setGoldenTapCount] = useState(0)
+  const [goldenFlash, setGoldenFlash] = useState(false)
+  const goldenTapRef = useRef(0)
   const [hasSyncedExpeditionReturn, setHasSyncedExpeditionReturn] =
     useState(false)
 
@@ -301,15 +308,49 @@ function ExploreListContent({
     setActiveSubCategory('')
   }
 
+  const triggerStruggleCompletion = async () => {
+    if (!userData) return
+    if (
+      userData.completedTasks.some(
+        (entry) => entry.taskId === STRUGGLE_TASK_ID,
+      )
+    ) {
+      return
+    }
+    try {
+      const result = await completeTask(
+        STRUGGLE_TASK_ID,
+        undefined,
+        crypto.randomUUID(),
+      )
+      if (result.success) {
+        refreshUser()
+      }
+    } catch {
+      // Struggle is a silent background completion; never surface errors.
+    }
+  }
+
   const handleBlackoutTap = () => {
     if (!isTakeover) return
     if (
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
     ) {
-      return
+      // Taps still charge the glow under reduced motion; only the shake is cut.
+    } else {
+      setBlackoutShaking(true)
     }
-    setBlackoutShaking(true)
+    const next = goldenTapRef.current + 1
+    if (next >= 20) {
+      goldenTapRef.current = 0
+      setGoldenTapCount(0)
+      setGoldenFlash(true)
+      void triggerStruggleCompletion()
+    } else {
+      goldenTapRef.current = next
+      setGoldenTapCount(next)
+    }
   }
 
   return (
@@ -328,7 +369,14 @@ function ExploreListContent({
       )}
     >
       {isTakeover && <BlackoutBackdrop />}
+      {isTakeover && <BlackoutGoldenGlow tapCount={goldenTapCount} />}
       {isTakeover && <BlackoutUnowns trainerName={trainerName} />}
+      {goldenFlash && (
+        <div
+          className="pokeori-golden-flash pointer-events-none absolute inset-0 z-50"
+          onAnimationEnd={() => setGoldenFlash(false)}
+        />
+      )}
       {/* Header */}
       {!isTakeover && (
         <ExploreHeader
@@ -376,12 +424,18 @@ function ExploreListContent({
       )}
 
       {/* Main Grid */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-4 md:px-6 pt-4">
+      <div
+        className={cn(
+          'flex-1 min-h-0 overflow-y-auto px-4 md:px-6 pt-4',
+          isTakeover && 'flex flex-col items-center justify-center gap-4 pt-0',
+        )}
+      >
         <ExploreGrid
           filteredItems={filteredItems}
           randomEvent={isTakeover ? null : randomEvent}
           vsSeekerEvent={isTakeover ? null : vsSeekerEvent}
           activeCategory={displayCategory}
+          takeoverStyle={isTakeover}
           activeVoyages={activeVoyages}
           activeExpedition={activeExpedition}
           trainerName={trainerName}
