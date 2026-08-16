@@ -66,10 +66,12 @@ screen shake (0.28s) as interaction feedback; it is skipped entirely under
 
 There is also an ethereal golden glow at the centre of the blackout that
 breathes gently and grows with every tap. After 20 taps the full screen
-flashes to white, which silently completes the hidden one-time `struggle` task
-(`secret: true`, so it never appears in the client UI). Completing it unlocks
-the repeatable placeholder task `a-golden-glow` in the `???` list, ready for
-real content.
+flashes to white and the glow becomes an egg floating in an ethereal halo,
+which silently completes the hidden one-time `struggle` task (`secret: true`,
+so it never appears in the client UI). Once the egg is revealed the screen
+shake and the growing-glow mechanic are disabled. Completing `struggle` unlocks
+the repeatable placeholder task `a-golden-glow` in the `???` list (using the
+egg sprite), ready for real content.
 
 In the takeover state the task list is vertically centred, card titles and
 text are centred, and each card carries a slow-moving golden orbit ring around

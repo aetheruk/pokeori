@@ -120,6 +120,7 @@ function ExploreListContent({
   const [blackoutShaking, setBlackoutShaking] = useState(false)
   const [goldenTapCount, setGoldenTapCount] = useState(0)
   const [goldenFlash, setGoldenFlash] = useState(false)
+  const [eggRevealed, setEggRevealed] = useState(false)
   const goldenTapRef = useRef(0)
   const [hasSyncedExpeditionReturn, setHasSyncedExpeditionReturn] =
     useState(false)
@@ -162,6 +163,9 @@ function ExploreListContent({
 
   const isTakeover = isSaffronTakeoverActive(userData.completedTasks || [])
   const setSaffronTakeover = useStoryStateStore((state) => state.setSaffronTakeover)
+  const struggleCompleted = userData.completedTasks.some(
+    (entry) => entry.taskId === STRUGGLE_TASK_ID,
+  )
   const displayCategory = isTakeover ? '???' : activeCategory
   const displaySubCategory = isTakeover ? '???' : activeSubCategory
 
@@ -332,7 +336,7 @@ function ExploreListContent({
   }
 
   const handleBlackoutTap = () => {
-    if (!isTakeover) return
+    if (!isTakeover || struggleCompleted || eggRevealed) return
     if (
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -346,6 +350,7 @@ function ExploreListContent({
       goldenTapRef.current = 0
       setGoldenTapCount(0)
       setGoldenFlash(true)
+      setEggRevealed(true)
       void triggerStruggleCompletion()
     } else {
       goldenTapRef.current = next
@@ -369,7 +374,12 @@ function ExploreListContent({
       )}
     >
       {isTakeover && <BlackoutBackdrop />}
-      {isTakeover && <BlackoutGoldenGlow tapCount={goldenTapCount} />}
+      {isTakeover && (
+        <BlackoutGoldenGlow
+          tapCount={goldenTapCount}
+          revealed={struggleCompleted || eggRevealed}
+        />
+      )}
       {isTakeover && <BlackoutUnowns trainerName={trainerName} />}
       {goldenFlash && (
         <div

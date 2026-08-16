@@ -505,6 +505,20 @@
     animation: pokeori-golden-breathe 6s ease-in-out infinite;
   }
 
+  @keyframes pokeori-egg-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+
+  .pokeori-egg-float {
+    animation: pokeori-egg-float 5s ease-in-out infinite;
+  }
+
   @keyframes pokeori-golden-rays-spin {
     from {
       transform: translate(-50%, -50%) rotate(0deg);
@@ -518,12 +532,18 @@
     animation: pokeori-golden-rays-spin 70s linear infinite;
   }
 
+  @property --pokeori-golden-angle {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+  }
+
   @keyframes pokeori-golden-orbit {
     from {
-      transform: rotate(0deg);
+      --pokeori-golden-angle: 0deg;
     }
     to {
-      transform: rotate(360deg);
+      --pokeori-golden-angle: 360deg;
     }
   }
 
@@ -536,12 +556,12 @@
   .pokeori-golden-glow-card::before {
     content: '';
     position: absolute;
-    inset: -1px;
+    inset: 0;
     z-index: 0;
     border-radius: inherit;
     padding: 1px;
     background: conic-gradient(
-      from 0deg,
+      from var(--pokeori-golden-angle),
       transparent 0deg 230deg,
       rgb(255 214 140 / 0.95) 300deg,
       rgb(255 214 140 / 0.35) 330deg,
@@ -617,6 +637,7 @@
     }
 
     .pokeori-golden-breathe,
+    .pokeori-egg-float,
     .pokeori-golden-rays,
     .pokeori-golden-glow-card::before {
       animation: none !important;
