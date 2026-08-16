@@ -40,7 +40,7 @@ export function BlackoutGoldenGlow({
               width={288}
               height={288}
               unoptimized
-              className="h-auto w-auto"
+              className="h-72 w-72"
             />
           </div>
         </div>
