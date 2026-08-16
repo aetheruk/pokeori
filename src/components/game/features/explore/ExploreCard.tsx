@@ -119,29 +119,31 @@ function ExploreCardComponent({
           : undefined
       }
     >
-      <div className="relative shrink-0">
-        <div
-          className={cn(
-            'relative z-10 flex h-14 w-14 items-center justify-center rounded-lg border transition-colors',
-            isHighlighted
-              ? 'border-game-ochre/45 bg-game-surface-raised'
-              : 'border-game-border bg-game-surface-raised group-hover:border-game-moss/35',
-          )}
-        >
-          <div className="">
-            <TaskIconDisplay
-              icon={displayIcon}
-              className={cn(
-                'w-9 h-9',
-                isHighlighted ? 'text-game-ochre' : 'text-game-ink',
-              )}
-            />
+      {!centered && (
+        <div className="relative shrink-0">
+          <div
+            className={cn(
+              'relative z-10 flex h-14 w-14 items-center justify-center rounded-lg border transition-colors',
+              isHighlighted
+                ? 'border-game-ochre/45 bg-game-surface-raised'
+                : 'border-game-border bg-game-surface-raised group-hover:border-game-moss/35',
+            )}
+          >
+            <div className="">
+              <TaskIconDisplay
+                icon={displayIcon}
+                className={cn(
+                  'w-9 h-9',
+                  isHighlighted ? 'text-game-ochre' : 'text-game-ink',
+                )}
+              />
+            </div>
+            {isLocationMastered && (
+              <Star className="pointer-events-none absolute bottom-0 left-1/2 z-20 h-2 w-2 -translate-x-1/2 translate-y-1/2 fill-game-ochre text-game-ochre drop-shadow" />
+            )}
           </div>
-          {isLocationMastered && (
-            <Star className="pointer-events-none absolute bottom-0 left-1/2 z-20 h-2 w-2 -translate-x-1/2 translate-y-1/2 fill-game-ochre text-game-ochre drop-shadow" />
-          )}
         </div>
-      </div>
+      )}
 
       {/* Content Details */}
       <div
@@ -150,16 +152,18 @@ function ExploreCardComponent({
           centered && 'items-center text-center',
         )}
       >
-        <span
-          className={cn(
-            'mb-1 text-[11px] font-semibold uppercase tracking-wide transition-colors',
-            isHighlighted
-              ? 'text-game-ochre'
-              : 'text-game-moss-strong group-hover:text-game-moss',
-          )}
-        >
-          {getGroupedTypeLabel()}
-        </span>
+        {!centered && (
+          <span
+            className={cn(
+              'mb-1 text-[11px] font-semibold uppercase tracking-wide transition-colors',
+              isHighlighted
+                ? 'text-game-ochre'
+                : 'text-game-moss-strong group-hover:text-game-moss',
+            )}
+          >
+            {getGroupedTypeLabel()}
+          </span>
+        )}
         <h3
           className={cn(
             'line-clamp-3 text-base font-semibold leading-tight transition-colors',
@@ -259,17 +263,19 @@ function ExploreCardComponent({
       </div>
 
       {/* Type Icon Accessory */}
-      <div
-        className={cn(
-          isGrouped ? 'hidden' : 'ml-2 shrink-0 transition-colors',
-          isHighlighted
-            ? 'text-game-moss-strong'
-            : 'text-game-muted group-hover:text-game-ink',
-        )}
-        title={item.type}
-      >
-        {getTypeIcon(item)}
-      </div>
+      {!centered && (
+        <div
+          className={cn(
+            isGrouped ? 'hidden' : 'ml-2 shrink-0 transition-colors',
+            isHighlighted
+              ? 'text-game-moss-strong'
+              : 'text-game-muted group-hover:text-game-ink',
+          )}
+          title={item.type}
+        >
+          {getTypeIcon(item)}
+        </div>
+      )}
     </Card>
   )
 }

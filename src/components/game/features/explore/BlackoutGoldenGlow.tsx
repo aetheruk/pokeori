@@ -26,21 +26,30 @@ export function BlackoutGoldenGlow({
       >
         <div className="pokeori-egg-float relative">
           <div
-            className="pokeori-golden-breathe absolute left-1/2 top-1/2 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 rounded-full"
+            className="pokeori-golden-breathe absolute left-1/2 top-1/2 h-[24rem] w-[24rem] -translate-x-1/2 -translate-y-1/2 rounded-full"
             style={{
               background:
-                'radial-gradient(circle, rgb(255 214 140 / 0.28) 0%, rgb(181 138 67 / 0.1) 50%, transparent 74%)',
-              filter: 'blur(16px)',
+                'radial-gradient(circle, rgb(255 214 140 / 0.4) 0%, rgb(181 138 67 / 0.18) 40%, transparent 62%)',
+              filter: 'blur(10px)',
+            }}
+          />
+          {/* Tight rim hugging the egg */}
+          <div
+            className="absolute left-1/2 top-1/2 h-[190px] w-[190px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{
+              background:
+                'radial-gradient(circle, rgb(255 231 178 / 0.55) 0%, rgb(255 205 120 / 0.25) 48%, transparent 70%)',
+              filter: 'blur(3px)',
             }}
           />
           <div className="relative z-10">
             <Image
               src="/sprites/items/egg.avif"
               alt=""
-              width={200}
-              height={200}
+              width={176}
+              height={176}
               unoptimized
-              className="h-[200px] w-[200px]"
+              className="h-[176px] w-[176px]"
             />
           </div>
         </div>
