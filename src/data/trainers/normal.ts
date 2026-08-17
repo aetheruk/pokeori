@@ -10,6 +10,7 @@ export const normalTrainerClasses = [
   { id: 'bug-catcher', name: 'Bug Catcher', spriteId: '/sprites/trainers/bug-catcher.avif', payoutModifier: 10, gender: 'm', kind: 'normal', special: false, vsSeeker: true },
   { id: 'bug-maniac', name: 'Bug Maniac', spriteId: '/sprites/trainers/bug-maniac.avif', payoutModifier: 25, gender: 'm', kind: 'normal', special: false, vsSeeker: true },
   { id: 'camper', name: 'Camper', spriteId: '/sprites/trainers/camper.avif', payoutModifier: 20, gender: 'm', kind: 'normal', special: false, vsSeeker: true },
+  { id: 'channeler', name: 'Channeler', spriteId: '/sprites/trainers/hex-maniac.avif', payoutModifier: 32, gender: 'f', kind: 'normal', special: false, vsSeeker: true },
   { id: 'cyclist-f', name: 'Cyclist', spriteId: '/sprites/trainers/cyclist-f.avif', payoutModifier: 20, gender: 'f', kind: 'normal', special: false, vsSeeker: true },
   { id: 'cyclist-m', name: 'Cyclist', spriteId: '/sprites/trainers/cyclist-m.avif', payoutModifier: 20, gender: 'm', kind: 'normal', special: false, vsSeeker: true },
   { id: 'engineer', name: 'Engineer', spriteId: '/sprites/trainers/engineer.avif', payoutModifier: 50, gender: 'm', kind: 'normal', special: false, vsSeeker: true },

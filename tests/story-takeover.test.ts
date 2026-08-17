@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { regionCategories } from '@/data/region-map'
 import { subCategories } from '@/data/sub-region-map'
 import { tasks } from '@/data/tasks'
+import { battles } from '@/data/battles'
 import { buildNameForms } from '@/components/game/features/explore/BlackoutUnowns'
 import {
   A_GOLDEN_GLOW_TASK_ID,
@@ -131,7 +132,242 @@ describe('blackout golden glow tasks', () => {
     )
     expect(task?.enterModal?.[5]?.buttons?.[0]?.text).toBe('No')
     expect(task?.exitModal?.message).toBe(
-      'Impressive I felt that. Please allow me to me show you.',
+      'Impressive I felt that. Please allow me to show you.',
+    )
+  })
+})
+
+describe('blackout void chronicles and time divergence', () => {
+  test('both blackout chronicles unlock after golden glow and have authored party configurations', () => {
+    const rocketChronicle = tasks.find(
+      (entry) => entry.id === 'rocket-chronicle-pokemon-tower-summit',
+    )
+    const chooChronicle = tasks.find(
+      (entry) => entry.id === 'choo-chronicle-departing-celadon',
+    )
+    expect(rocketChronicle).toBeDefined()
+    expect(chooChronicle).toBeDefined()
+  })
+
+  test('entity reflections and celebi warp tasks lead into the celadon timeline divergence', () => {
+    const reflections = tasks.find((entry) => entry.id === 'entity-reflections')
+    const celebiWarp = tasks.find((entry) => entry.id === 'entity-celebi-warp')
+    const divergence = tasks.find(
+      (entry) => entry.id === 'celadon-timeline-divergence',
+    )
+
+    expect(reflections).toBeDefined()
+    expect(reflections?.requirements).toContainEqual(
+      expect.objectContaining({
+        type: 'expedition_result',
+        targetId: 'chronicle-rocket-assassination',
+      }),
+    )
+    expect(reflections?.requirements).toContainEqual(
+      expect.objectContaining({
+        type: 'expedition_result',
+        targetId: 'chronicle-ray-choo-pursuit',
+      }),
+    )
+
+    expect(celebiWarp).toBeDefined()
+    expect(celebiWarp?.requirements).toContainEqual(
+      expect.objectContaining({
+        type: 'task_completed',
+        targetId: 'entity-reflections',
+      }),
+    )
+
+    expect(divergence).toBeDefined()
+    expect(divergence?.requirements).toContainEqual(
+      expect.objectContaining({
+        type: 'task_completed',
+        targetId: 'entity-celebi-warp',
+      }),
+    )
+  })
+
+  test('celadon poison dead drop unlocks after the timeline divergence and awards the sealed toxin', () => {
+    const deadDrop = tasks.find(
+      (entry) => entry.id === 'celadon-poison-dead-drop',
+    )
+    expect(deadDrop).toBeDefined()
+    expect(deadDrop?.requirements).toContainEqual(
+      expect.objectContaining({
+        type: 'task_completed',
+        targetId: 'celadon-timeline-divergence',
+      }),
+    )
+    expect(deadDrop?.rewards).toContainEqual(
+      expect.objectContaining({
+        type: 'item',
+        targetId: 'rocket-poison-vial',
+      }),
+    )
+  })
+
+  test('pokemon tower ascent sequence unlocks after timeline divergence and awards the Azure Flute', () => {
+    const towerReturn = tasks.find(
+      (entry) => entry.id === 'pokemon-tower-return-with-choo',
+    )
+    const towerClearing = tasks.find(
+      (entry) => entry.id === 'pokemon-tower-clearing-the-floors',
+    )
+    const calmingKita = tasks.find(
+      (entry) => entry.id === 'pokemon-tower-calming-kita',
+    )
+    const kitaBoss = battles.find(
+      (entry) => entry.id === 'pokemon-tower-kita-boss',
+    )
+    const towerSummit = tasks.find(
+      (entry) => entry.id === 'pokemon-tower-summit-azure-flute',
+    )
+
+    expect(towerReturn).toBeDefined()
+    expect(towerReturn?.requirements).toContainEqual(
+      expect.objectContaining({
+        type: 'task_completed',
+        targetId: 'celadon-timeline-divergence',
+      }),
+    )
+
+    expect(towerClearing).toBeDefined()
+    expect(towerClearing?.requirements).toContainEqual(
+      expect.objectContaining({
+        type: 'task_completed',
+        targetId: 'pokemon-tower-return-with-choo',
+      }),
+    )
+    expect(towerClearing?.requirements).toContainEqual(
+      expect.objectContaining({
+        type: 'battle_result',
+        targetId: 'pokemon-tower-shadow-surge-3',
+        battleStatus: 'win',
+      }),
+    )
+
+    expect(calmingKita).toBeDefined()
+    expect(calmingKita?.requirements).toContainEqual(
+      expect.objectContaining({
+        type: 'task_completed',
+        targetId: 'pokemon-tower-clearing-the-floors',
+      }),
+    )
+
+    expect(kitaBoss).toBeDefined()
+    expect(kitaBoss?.maxPokemon).toBe(2)
+    expect(kitaBoss?.levelCap).toBe(40)
+    expect(kitaBoss?.enemyTeam).toEqual([
+      expect.objectContaining({
+        speciesId: 105,
+        formId: '10115',
+        level: 40,
+      }),
+    ])
+
+    expect(towerSummit).toBeDefined()
+    expect(towerSummit?.requirements).toContainEqual(
+      expect.objectContaining({
+        type: 'battle_result',
+        targetId: 'pokemon-tower-kita-boss',
+        battleStatus: 'win',
+      }),
+    )
+    expect(towerSummit?.rewards).toContainEqual(
+      expect.objectContaining({
+        type: 'item',
+        targetId: 'azure-flute',
+      }),
+    )
+  })
+
+  test('pokemon tower dungeon features FireRed trainers, catches, field observation and research XP tasks', () => {
+    // Check research XP tasks
+    const gastlyStudy = tasks.find(
+      (entry) => entry.id === 'pokemon-tower-gastly-spiritual-study',
+    )
+    const haunterStudy = tasks.find(
+      (entry) => entry.id === 'pokemon-tower-haunter-shadow-study',
+    )
+    const cuboneStudy = tasks.find(
+      (entry) => entry.id === 'pokemon-tower-cubone-memorial-study',
+    )
+    const marowakStudy = tasks.find(
+      (entry) => entry.id === 'pokemon-tower-purification-circle-study',
+    )
+
+    expect(gastlyStudy).toBeDefined()
+    expect(gastlyStudy?.rewards).toContainEqual(
+      expect.objectContaining({
+        type: 'pokemon_research_xp',
+        targetId: '92',
+      }),
+    )
+
+    expect(haunterStudy).toBeDefined()
+    expect(haunterStudy?.rewards).toContainEqual(
+      expect.objectContaining({
+        type: 'pokemon_research_xp',
+        targetId: '93',
+      }),
+    )
+
+    expect(cuboneStudy).toBeDefined()
+    expect(cuboneStudy?.rewards).toContainEqual(
+      expect.objectContaining({
+        type: 'pokemon_research_xp',
+        targetId: '104',
+      }),
+    )
+
+    expect(marowakStudy).toBeDefined()
+    expect(marowakStudy?.rewards).toContainEqual(
+      expect.objectContaining({
+        type: 'pokemon_research_xp',
+        targetId: '105',
+      }),
+    )
+  })
+
+  test('post-divergence repeatable guidance tasks are authored for Saffron avoidance and Celadon cycling road caution', () => {
+    const saffronAvoidance = tasks.find(
+      (entry) => entry.id === 'saffron-avoidance-reflection',
+    )
+    const route16Snorlax = tasks.find(
+      (entry) => entry.id === 'route-16-sleeping-snorlax',
+    )
+    const celadonCaution = tasks.find(
+      (entry) => entry.id === 'celadon-cycling-road-caution',
+    )
+
+    expect(saffronAvoidance).toBeDefined()
+    expect(saffronAvoidance?.repeatable).toBe(true)
+    expect(saffronAvoidance?.subCategory).toBe('Saffron City')
+    expect(saffronAvoidance?.requirements).toContainEqual(
+      expect.objectContaining({
+        type: 'task_completed',
+        targetId: 'celadon-timeline-divergence',
+      }),
+    )
+
+    expect(route16Snorlax).toBeDefined()
+    expect(route16Snorlax?.subCategory).toBe('Celadon City')
+    expect(route16Snorlax?.criteria).toContainEqual(
+      expect.objectContaining({
+        type: 'item_owned',
+        targetId: 'azure-flute',
+      }),
+    )
+
+    expect(celadonCaution).toBeDefined()
+    expect(celadonCaution?.repeatable).toBe(true)
+    expect(celadonCaution?.subCategory).toBe('Celadon City')
+    expect(celadonCaution?.requirements).toContainEqual(
+      expect.objectContaining({
+        type: 'battle_result',
+        targetId: 'route-16-furious-snorlax',
+        battleStatus: 'win',
+      }),
     )
   })
 })

@@ -1887,5 +1887,199 @@ export const celadonCityTasks: Task[] = [
         "id": "maid"
       }
     }
+  },
+  {
+    "id": "celadon-poison-dead-drop",
+    "name": "The Unclaimed Toxin",
+    "description": "Search the drainage grate in Celadon's back alley for the sealed Team Rocket toxin revealed in the memory.",
+    "category": "Kanto",
+    "subCategory": "Celadon City",
+    "background": "/backgrounds/celadon.avif",
+    "icon": {
+      "type": "item",
+      "id": "rocket-poison-vial"
+    },
+    "secret": false,
+    "completionTrigger": "manual",
+    "completeButtonText": "Examine Grate",
+    "repeatable": false,
+    "requirements": [
+      {
+        "type": "task_completed",
+        "targetId": "celadon-timeline-divergence"
+      }
+    ],
+    "criteria": [],
+    "rewards": [
+      {
+        "type": "item",
+        "targetId": "rocket-poison-vial",
+        "quantity": 1,
+        "dropChance": 100
+      },
+      {
+        "type": "xp",
+        "skill": "catching",
+        "quantity": 250,
+        "dropChance": 100
+      }
+    ],
+    "enterModal": [
+      {
+        "id": 1,
+        "title": "Celadon Back Alley",
+        "message": "You slip into the narrow alleyway behind the department store. Rust-stained storm drains line the asphalt, matching the memory from the timeline divergence.",
+        "background": "/backgrounds/celadon.avif",
+        "icon": {
+          "type": "item",
+          "id": "rocket-poison-vial"
+        },
+        "buttons": [
+          {
+            "text": "Check Drainage Grate",
+            "type": "navigate",
+            "id": 2
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Hidden Dead Drop",
+        "message": "Behind the iron grate sits a dark, heavy glass vial wrapped in weatherproof seal. The liquid inside glints with a sinister purplish sheen.",
+        "background": "/backgrounds/celadon.avif",
+        "icon": {
+          "type": "item",
+          "id": "rocket-poison-vial"
+        },
+        "buttons": [
+          {
+            "text": "Recover Toxin",
+            "type": "success"
+          }
+        ]
+      }
+    ],
+    "exitModal": {
+      "background": "/backgrounds/celadon.avif",
+      "title": "Sealed Rocket Toxin",
+      "message": "You recovered the Sealed Rocket Toxin. Its synthetic formulation is far beyond ordinary Kanto medicines. Master Koga of Fuchsia City, the authority on ninjutsu toxins, may be able to analyze it.",
+      "closeButtonText": "Keep it Safe",
+      "icon": {
+        "type": "item",
+        "id": "rocket-poison-vial"
+      }
+    }
+  },
+  {
+    "id": "route-16-sleeping-snorlax",
+    "name": "Sleeping Snorlax",
+    "description": "A massive Snorlax is sound asleep across the western road toward Route 16.",
+    "category": "Kanto",
+    "subCategory": "Celadon City",
+    "background": "/backgrounds/grassy-route.avif",
+    "icon": {
+      "type": "pokemon",
+      "id": "143"
+    },
+    "repeatable": false,
+    "secret": false,
+    "completionTrigger": "manual",
+    "completeButtonText": "Play Azure Flute",
+    "requirements": [
+      {
+        "type": "task_completed",
+        "targetId": "celadon-timeline-divergence"
+      }
+    ],
+    "criteria": [
+      {
+        "type": "item_owned",
+        "targetId": "azure-flute",
+        "secret": true
+      }
+    ],
+    "rewards": [],
+    "exitModal": {
+      "background": "/backgrounds/grassy-route.avif",
+      "title": "Sleeping Snorlax",
+      "icon": {
+        "type": "pokemon",
+        "id": "143"
+      },
+      "message": "The celestial melody of the Azure Flute echoes across the trees. The Snorlax awakens in a fury!",
+      "closeButtonText": "Brace Yourself"
+    }
+  },
+  {
+    "id": "celadon-cycling-road-caution",
+    "name": "The Path South",
+    "description": "Consider the safest route south to Fuchsia City after clearing the Route 16 Snorlax.",
+    "category": "Kanto",
+    "subCategory": "Celadon City",
+    "background": "/backgrounds/celadon.avif",
+    "icon": {
+      "type": "trainer",
+      "id": "rocket"
+    },
+    "repeatable": true,
+    "secret": false,
+    "completionTrigger": "manual",
+    "chat": true,
+    "completeButtonText": "Head for Lavender",
+    "requirements": [
+      {
+        "type": "battle_result",
+        "targetId": "route-16-furious-snorlax",
+        "battleStatus": "win",
+        "count": 1
+      }
+    ],
+    "criteria": [],
+    "rewards": [],
+    "enterModal": [
+      {
+        "id": 1,
+        "title": "{trainer}",
+        "message": "With the sleeping Snorlax moved, Route 16 is open to the west. However, Cycling Road beyond is known to harbor Team Rocket outposts and hostile biker gangs that could jeopardize your mission.",
+        "background": "/backgrounds/celadon.avif",
+        "icon": {
+          "type": "trainer",
+          "id": "rocket"
+        },
+        "buttons": [
+          {
+            "text": "Plan the Route",
+            "type": "navigate",
+            "id": 2
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "{trainer}",
+        "message": "The safest, most discreet path south to Fuchsia City is eastward through Lavender Town and down Silence Bridge (Route 12), bypassing the Rocket strongholds on Cycling Road entirely.",
+        "background": "/backgrounds/celadon.avif",
+        "icon": {
+          "type": "trainer",
+          "id": "rocket"
+        },
+        "buttons": [
+          {
+            "text": "Choose Lavender Path",
+            "type": "success"
+          }
+        ]
+      }
+    ],
+    "exitModal": {
+      "background": "/backgrounds/celadon.avif",
+      "title": "Silence Bridge Route",
+      "icon": {
+        "type": "trainer",
+        "id": "rocket"
+      },
+      "message": "You decide to avoid the dangerous Rocket facilities on Cycling Road and travel south via Lavender Town instead.",
+      "closeButtonText": "Understood"
+    }
   }
 ]

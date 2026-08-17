@@ -85,14 +85,34 @@ user-driven motion under `prefers-reduced-motion`.
 ## State derivation
 
 - The state is derived, not persisted separately. It is active when the
-  `saffron-gym-ambush` task is completed and the `saffron-escape-complete`
-  task is not yet recorded.
+  `saffron-gym-ambush` task is completed and the escape completion task
+  (`celadon-timeline-divergence` or legacy `saffron-escape-complete`) is not yet recorded.
 - The server exposes the boolean as `RequirementData.storyState.saffronTakeover`
   (loaded on the `core` game-data scope, which the shell uses).
 - The Explore page computes the same boolean client-side from its
   `completedTasks` payload via `isSaffronTakeoverActive`.
-- The future escape chronicle will record `saffron-escape-complete` when it is
-  claimed, which turns the takeover off and restores the normal shell.
+- Completing `celadon-timeline-divergence` records the escape completion, turning
+  the takeover off and cleanly restoring the normal navigation shell and Kanto Explore list.
+
+## Story Sequence & Resolution
+
+1. **The Ambush & The Void**:
+   - Completing `saffron-gym-ambush` knocks the player unconscious and triggers the blackout state.
+   - In Explore (locked to `???`), tapping the golden glow completes `struggle` and unlocks `golden-glow`.
+2. **The Blackout Chronicles**:
+   - `golden-glow` unlocks two narrative Chronicles in the `???` region:
+     - `chronicle-rocket-assassination`: Played as Executive Ariana. Begins at the summit of Pokemon Tower with Kita the Marowak fallen on the stone floor and Mr. Fuji bound as a captive. Follows Rocket surveillance reports of the player and Detective Choo investigating Celadon, and Ariana authorizing the lethal toxin assassination ambush at Saffron Gym.
+     - `chronicle-ray-choo-pursuit`: Played as Detective Ray Choo. Shows Ray speeding toward Saffron on his motorbike with his newly evolved Arcanine, breaking through a perimeter guard, witnessing a Rocket courier stashing a sealed dark vial into a Celadon alley drainage grate, and arriving at Saffron Gym moments too late as the poison strikes the player down.
+3. **The Entity & Celebi Time Travel**:
+   - Completing both chronicles unlocks `entity-reflections` ("Threads of Fate") with the cosmic entity in the void, testing the trainer's resolve.
+   - `entity-celebi-warp` ("The Voice Across Time") follows, where the entity summons Celebi to turn back the river of time.
+4. **Celadon Divergence & Poison Dead Drop**:
+   - `celadon-timeline-divergence` ("A Divergence in Time") returns the player to Celadon right as Ray Choo suggests going to Saffron. The player interrupts, warning Ray of the assassination ambush. Completing this task ends the blackout state.
+   - The player can now inspect the Celadon alley drainage grate (`celadon-poison-dead-drop`) to recover the **Sealed Rocket Toxin** (`rocket-poison-vial`), establishing the narrative reason to consult Master Koga in Fuchsia City.
+5. **Pokemon Tower Ascent & The Azure Flute**:
+   - `pokemon-tower-return-with-choo` brings the player and Detective Choo to Lavender Town, where the player calls out to Kita.
+   - Guided by Kita's spiritual resonance, they ascend the tower in `pokemon-tower-clearing-the-floors`.
+   - At the summit in `pokemon-tower-summit-azure-flute`, they discover a weathered note addressed to the trainer and the **Azure Flute** (`azure-flute`), which awakens the sleeping Snorlax blocking Route 12 and Route 16 to open southern Kanto.
 
 ## Guards
 
@@ -118,7 +138,3 @@ user-driven motion under `prefers-reduced-motion`.
   right behind me, I'll go on ahead.") and, because completing it activates
   the takeover, its exit modal ("Hello is anyo........." with the "...."
   button) plays before Explore locks down to the `???` region.
-
-Server-side action guards (PVP, bets, socials) are intentionally not part of
-this slice; they should be added when the chronicle content lands so a
-story-locked player can only run takeover activities.

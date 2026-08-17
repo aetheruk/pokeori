@@ -842,7 +842,7 @@ export const lavenderTownTasks: Task[] = [
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Use Poke Flute',
+    completeButtonText: 'Play Azure Flute',
     requirements: [
       {
         type: 'battle_result',
@@ -854,7 +854,7 @@ export const lavenderTownTasks: Task[] = [
     criteria: [
       {
         type: 'item_owned',
-        targetId: 'pokeflute',
+        targetId: 'azure-flute',
         secret: true,
       },
     ],
@@ -866,8 +866,8 @@ export const lavenderTownTasks: Task[] = [
         type: 'pokemon',
         id: '143',
       },
-      message: 'The Snorlax wakes up and does not look happy!',
-      closeButtonText: 'Uh oh',
+      message: 'The celestial melody of the Azure Flute echoes across the water. The Snorlax awakens in a fury!',
+      closeButtonText: 'Brace Yourself',
     },
   },
   {
