@@ -1318,7 +1318,7 @@ export const pokemonTowerTasks: Task[] = [
       {
         id: 1,
         title: 'Detective Ray Choo',
-        message: 'Arcanine’s flames cut through the thick shadow haze. Look ahead—the dark apparitions are scattering into the walls. The summit door is right in front of us!',
+        message: 'Arcanine’s flames cut through the thick shadow haze. Look ahead, the dark apparitions are scattering into the walls. The summit door is right in front of us!',
         background: '/backgrounds/pkmn-tower.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Push Open Door', type: 'navigate', id: 2 }],
@@ -1376,7 +1376,7 @@ export const pokemonTowerTasks: Task[] = [
       {
         id: 2,
         title: '{trainer}',
-        message: 'You step onto the floorboards. The figure turns. It is Kita, but transformed—her bone club burns with otherworldly spirit fire, and her dark eyes glint with raw sorrow and rage. Having never met you, and consumed by grief and loss, she sees only intruders before her.',
+        message: 'You step onto the floorboards. The figure turns. It is Kita, but transformed, her bone club burning with otherworldly spirit fire, and her dark eyes glinting with raw sorrow and rage. Having never met you, and consumed by grief and loss, she sees only intruders before her.',
         background: '/backgrounds/pkmn-tower.avif',
         icon: { type: 'pokemon', id: '105' },
         buttons: [{ text: 'Listen to Ray', type: 'navigate', id: 3 }],
@@ -1451,7 +1451,7 @@ export const pokemonTowerTasks: Task[] = [
       {
         id: 3,
         title: 'Detective Ray Choo',
-        message: 'She’s finally at peace... Mr. Fuji’s memory and her spirit are free. But look—there on the stone where she was standing, something was left behind.',
+        message: 'She’s finally at peace... Her spirit is free. But look, there on the stone where she was standing, something was left behind.',
         background: '/backgrounds/pkmn-tower.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Examine the Floor', type: 'success' }],
@@ -1506,7 +1506,7 @@ export const pokemonTowerTasks: Task[] = [
       {
         id: 1,
         title: 'Note Addressed to {trainer}',
-        message: '"To {trainer}, who altered the stream of time: The threads of fate have been rewoven by your resolve. The shadow over Saffron remains, but your path lies southward. Take this Azure Flute. Its pure, celestial melody will pierce any slumber, opening the southern highways through Route 12 and Route 16. Seek the Master of Poison in Fuchsia City to unravel the toxin, and return when you are whole."',
+        message: '"For the one whose spirit defied the natural order, please take this gift. Its melody is enough to wake anything from the deepest of slumbers."',
         background: '/backgrounds/pkmn-tower.avif',
         icon: { type: 'item', id: 'azure-flute' },
         buttons: [{ text: 'Ray’s Realization', type: 'navigate', id: 2 }],
@@ -1514,7 +1514,7 @@ export const pokemonTowerTasks: Task[] = [
       {
         id: 2,
         title: 'Detective Ray Choo',
-        message: 'An Azure Flute... It hums with pure cosmic energy. And that note—it mentions the southern routes! The sleeping Snorlax blocking Route 12 and 16—this flute will wake them right up! Take it, {trainer}. Head south to Fuchsia City and find Master Koga. Let’s make Team Rocket pay for every inch of Kanto.',
+        message: 'An Azure Flute... It hums with pure cosmic energy. The sleeping Snorlax blocking Route 12 and 16, this flute will wake them right up! Take it, {trainer}. Head south to Fuchsia City and find Master Koga. Let’s make Team Rocket pay for every inch of Kanto.',
         background: '/backgrounds/pkmn-tower.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Take the Flute', type: 'success' }],

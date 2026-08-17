@@ -1,5 +1,9 @@
 # Current Game State
 
+- Release `0.13.33` polishes story takeover dialogue and text formatting:
+  - **Azure Flute Note Dialogue**: Replaced explanatory text on the summit note with poetic, evocative lore (*"For the one whose spirit defied the natural order, please take this gift. Its melody is enough to wake anything from the deepest of slumbers."*).
+  - **Fuji Dialogue Correction**: Removed mention of Mr. Fuji's memory in Kita's resolution dialogue since Mr. Fuji is alive.
+  - **Dialogue Naturalization Pass**: Removed em-dashes and unnatural phrasing across all Saffron blackout, Celadon divergence, and Pokémon Tower story tasks in favor of natural punctuation and cadence.
 - Release `0.13.32` polishes the Pokemon Tower summit narrative and boss battle:
   - **Kita Boss Battle**: Simplified battle name from `Kita (Alolan Marowak)` to `Kita`.
   - **Summit Narrative Split**: Split the summit resolution into two sequential tasks:

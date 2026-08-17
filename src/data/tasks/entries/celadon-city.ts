@@ -154,7 +154,7 @@ export const celadonCityTasks: Task[] = [
         "type": "trainer",
         "id": "policeman"
       },
-      "message": "Ten deliveries! I think I've got enough Soda Pop to last me now. Thanks for keeping this post running—please take these Ultra Balls.",
+      "message": "Ten deliveries! I think I've got enough Soda Pop to last me now. Thanks for keeping this post running. Please take these Ultra Balls.",
       "closeButtonText": "Receive Ultra Balls"
     }
   },
@@ -1201,7 +1201,7 @@ export const celadonCityTasks: Task[] = [
     "exitModal": {
       "background": "/backgrounds/celadon-mansion-lounge.avif",
       "title": "Gentleman",
-      "message": "You heard all that, did you? It is a disgrace. There are older ways to make an Evolution Stone—ways Rocket cannot lock behind a velvet rope. Find me after the ceremony.",
+      "message": "You heard all that, did you? It is a disgrace. There are older ways to make an Evolution Stone, ways Rocket cannot lock behind a velvet rope. Find me after the ceremony.",
       "closeButtonText": "Speak to him",
       "icon": {
         "type": "trainer",
