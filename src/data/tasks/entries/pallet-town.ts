@@ -2124,7 +2124,7 @@ export const palletTownTasks: Task[] = [
       background: '/backgrounds/lab.avif',
       title: 'The Professor',
       message:
-        "Oshawott! The scalchop on its stomach isn't just used for battle--it can be used to break open hard berries as well.",
+        "Oshawott! The scalchop on its stomach isn't just used for battle, it can be used to break open hard berries as well.",
       closeButtonText: 'Meet Oshawott',
       icon: {
         type: 'trainer',

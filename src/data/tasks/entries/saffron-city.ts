@@ -477,7 +477,7 @@ export const saffronCityTasks: Task[] = [
       {
         id: 2,
         title: 'Rocket Guard',
-        message: 'Turn around, old man! Saffron is under official quarantine by order of—',
+        message: 'Turn around, old man! Saffron is under official quarantine by order of...',
         background: '/backgrounds/saffron.avif',
         icon: { type: 'trainer', id: 'rocket-grunt-m' },
         buttons: [{ text: 'Arcanine, Attack!', type: 'success' }],
@@ -538,7 +538,7 @@ export const saffronCityTasks: Task[] = [
       {
         id: 1,
         title: 'Detective Ray Choo',
-        message: 'There! Outside the gym doors—NO! {trainer}, LOOK OUT!',
+        message: 'There! Outside the gym doors... NO! {trainer}, LOOK OUT!',
         background: '/backgrounds/saffron.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'The Poison Strikes', type: 'navigate', id: 2 }],
@@ -555,7 +555,7 @@ export const saffronCityTasks: Task[] = [
       {
         id: 3,
         title: 'Detective Ray Choo',
-        message: 'Hold on! Arcanine, clear them out! {trainer}, STAY WITH ME—',
+        message: 'Hold on! Arcanine, clear them out! {trainer}, STAY WITH ME...',
         background: '/backgrounds/saffron.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'A Second Strike', type: 'navigate', id: 4 }],
@@ -762,7 +762,7 @@ export const saffronCityTasks: Task[] = [
         id: 1,
         title: 'Detective Ray Choo',
         message:
-          'Well, look at that Growlithe! Or rather, Arcanine now! That Fire Stone worked wonders. Now then, {trainer}, next stop: Saffron City. Sabrina’s Gym is our best bet to—',
+          'Well, look at that Growlithe! Or rather, Arcanine now! That Fire Stone worked wonders. Now then, {trainer}, next stop: Saffron City. Sabrina’s Gym is our best bet to...',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Interrupt Ray', type: 'navigate', id: 2 }],
@@ -771,7 +771,7 @@ export const saffronCityTasks: Task[] = [
         id: 2,
         title: '{trainer}',
         message:
-          'Ray, stop. Saffron is an ambush. Team Rocket arranged for a lethal toxin to be delivered right here in Celadon—behind the alley drain. In the timeline I just saw, their hitman used it to strike us both down outside Sabrina’s Gym. We need to intercept that toxin now, stay clear of Saffron, and head straight to Pokémon Tower.',
+          'Ray, stop. Saffron is an ambush. Team Rocket arranged for a lethal toxin to be delivered right here in Celadon, right behind the alley drain. In the timeline I just saw, their hitman used it to strike us both down outside Sabrina’s Gym. We need to intercept that toxin now, stay clear of Saffron, and head straight to Pokémon Tower.',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Ray’s Reaction', type: 'navigate', id: 3 }],

@@ -3462,7 +3462,7 @@ export const ceruleanCityTasks: Task[] = [
         id: 2,
         title: 'Day Care Couple',
         message:
-          "Chansey—that's a wonderful suggestion. It would know how to look after an injury, but more importantly, young Pokemon seem to trust one almost immediately.",
+          "Chansey, that's a wonderful suggestion. It would know how to look after an injury, but more importantly, young Pokemon seem to trust one almost immediately.",
         background: '/backgrounds/inside-house.avif',
         icon: {
           type: 'trainer',
@@ -3966,7 +3966,7 @@ export const ceruleanCityTasks: Task[] = [
       background: '/backgrounds/inside-house.avif',
       title: 'Day Care Couple',
       icon: { type: 'pokemon', id: '175' },
-      message: 'Sometimes Pokemon Eggs are left abandoned in unexpected areas. Keep an eye out while you conduct Field Observations—we will help you hatch any you find.',
+      message: 'Sometimes Pokemon Eggs are left abandoned in unexpected areas. Keep an eye out while you conduct Field Observations, we will help you hatch any you find.',
       closeButtonText: 'I will keep watch',
     },
   },
