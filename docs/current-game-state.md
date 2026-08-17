@@ -1,5 +1,12 @@
 # Current Game State
 
+- Release `0.13.32` polishes the Pokemon Tower summit narrative and boss battle:
+  - **Kita Boss Battle**: Simplified battle name from `Kita (Alolan Marowak)` to `Kita`.
+  - **Summit Narrative Split**: Split the summit resolution into two sequential tasks:
+    - `pokemon-tower-kita-resolution` (*The Flame Subsides*): Plays Detective Ray Choo and Kita's farewell sequence after winning the boss fight, where her spirit finds peace and departs into stardust.
+    - `pokemon-tower-summit-azure-flute` (*A Message in the Silence*): Features the overview description *"There's a strange note here."*, discovering the note addressed to `{trainer}` and claiming the **Azure Flute** (`azure-flute`).
+  - **Azure Flute Sprite**: Authored dedicated `key/azure-flute` AVIF item sprite from source icon and updated item definitions and manifest.
+  - **Dialogue & Modal Polish**: Updated dialogue in `pokemon-tower-calming-kita` to naturally reflect that the player and Kita have never met in life, and streamlined the exit modal to cleanly state the objective without mechanical player cap phrasing.
 - Release `0.13.31` updates Pokemon Tower dungeon rewards and the Shadow Surge battle progression:
   - **Floor Rewards (3F-6F)**: Authored drop variations are added across Catch, Wild Battle, and Field Observation for each floor:
     - **3F**: Very rare 1% drop chance for Fisher's Incense (`incense-fishers`), gated to unowned.
@@ -608,7 +615,7 @@ Pokemon Tower unlocks from Lavender Town after `lavender-missing-mountain`.
       - `pokemon-tower-cubone-memorial-study` (The Whispering Skull): 30 Cubone Research XP (4F).
       - `pokemon-tower-haunter-shadow-study` (Shadow Projection): 30 Haunter Research XP (5F).
       - `pokemon-tower-purification-circle-study` (The Purified Circle): 30 Marowak Research XP (6F).
-  - **Summit Boss & Resolution**: Defeating the Shadow Gauntlet unlocks `pokemon-tower-clearing-the-floors` and `pokemon-tower-calming-kita` (*The Spectral Flame*). Players face Kita, reborn in spectral fire as an Alolan Marowak (`pokemon-tower-kita-boss`, Level 40, 2-Pokemon team limit, Level Cap 40). Quelling her rage calms her spirit and leads into `pokemon-tower-summit-azure-flute`, where `{trainer}` and Detective Choo find the Note and claim the **Azure Flute** to awaken the Snorlax on Routes 12 & 16.
+  - **Summit Boss & Resolution**: Defeating the Shadow Gauntlet unlocks `pokemon-tower-clearing-the-floors` and `pokemon-tower-calming-kita` (*The Spectral Flame*). Players face Kita (`pokemon-tower-kita-boss`, Level 40, 2-Pokemon team limit, Level Cap 40). Quelling her rage calms her spirit and leads into `pokemon-tower-kita-resolution` (*The Flame Subsides*), where she nods in gratitude and dissolves in peace, followed by `pokemon-tower-summit-azure-flute` (*A Message in the Silence*), where `{trainer}` and Detective Choo find the Note and claim the **Azure Flute** to awaken the Snorlax on Routes 12 & 16.
 
 Current role in flow: Pokemon Tower features both the early-game Spirit Channeling / Mr. Fuji Chronicle backstory and the post-timeline-divergence dungeon ascent with Detective Choo, including full FireRed Channeler trainer progression across floors 3F to 6F, an upper-floor Shadow Pokémon Gauntlet, the level 40 Alolan Marowak boss battle to calm Kita, Field Observation studies, Pokemon Research XP tasks, and the Azure Flute summit reward.
 

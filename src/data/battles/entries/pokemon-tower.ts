@@ -459,7 +459,7 @@ export const pokemonTowerBattles: BattleConfig[] = [
   // --- Boss Battle: Calming Kita ---
   {
     id: 'pokemon-tower-kita-boss',
-    name: 'Kita (Alolan Marowak)',
+    name: 'Kita',
     description: 'Calm Kita, who has been reborn through spectral fire into an Alolan Marowak.',
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
