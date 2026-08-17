@@ -407,8 +407,8 @@ export const saffronCityTasks: Task[] = [
   // --- Ray Choo Chronicle Steps ---
   {
     id: 'choo-chronicle-departing-celadon',
-    name: 'Rushing from Celadon',
-    description: 'Ray Choo starts his engine, noticing something suspicious in the back alleys.',
+    name: 'Departing Celadon',
+    description: 'Ray Choo revs his engine, sensing danger stirring in the city.',
     category: 'Secret',
     subCategory: 'Celadon City',
     icon: {
@@ -420,7 +420,7 @@ export const saffronCityTasks: Task[] = [
     secret: true,
     completionTrigger: 'manual',
     chat: true,
-    completeButtonText: 'Accelerate',
+    completeButtonText: 'Hit the Gas',
     requirements: [{ type: 'task_completed', targetId: 'golden-glow' }],
     criteria: [],
     rewards: [],
@@ -429,16 +429,16 @@ export const saffronCityTasks: Task[] = [
         id: 1,
         title: 'Detective Ray Choo',
         message:
-          'Arcanine, let’s roll! The kid went on ahead to Saffron, but my gut tells me something is wrong in this city...',
+          'Arcanine, let’s roll! {trainer} went on ahead to Saffron, but something feels completely off in this city...',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'detective' },
-        buttons: [{ text: 'Glance at Alley', type: 'navigate', id: 2 }],
+        buttons: [{ text: 'Check the Alleys', type: 'navigate', id: 2 }],
       },
       {
         id: 2,
         title: 'Detective Ray Choo',
         message:
-          'Hold up... look down that alley near the drainage grate. A Rocket courier just dropped a sealed canister into the drain, and a shadowed figure in an assassin coat was watching from the roof! That’s an arranged dead drop handover! What kind of lethal cargo are they moving through Celadon? No time to dig it out now—I have to catch up to the trainer before they walk into trouble!',
+          'Rocket operatives slipping through the back streets... they’re mobilizing fast. We need to catch up to {trainer} before they walk into trouble!',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Speed Away', type: 'success' }],
@@ -771,7 +771,7 @@ export const saffronCityTasks: Task[] = [
         id: 2,
         title: '{trainer}',
         message:
-          'Ray, stop. Saffron is an assassination trap. Team Rocket arranged a courier delivery of lethal neurotoxin to a dead drop in the Celadon alley for a hitman. In the original timeline, that operative collected the poison and struck us both down outside the gym doors. Because of the timeline shift, we can intercept that delivery at the alley drainage grate right now before the assassin can pick it up! Then we change our course directly to Pokémon Tower in Lavender Town.',
+          'Ray, stop. Saffron is an ambush. Team Rocket arranged for a lethal toxin to be delivered right here in Celadon—behind the alley drain. In the timeline I just saw, their hitman used it to strike us both down outside Sabrina’s Gym. We need to intercept that toxin now, stay clear of Saffron, and head straight to Pokémon Tower.',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Ray’s Reaction', type: 'navigate', id: 3 }],
@@ -780,7 +780,7 @@ export const saffronCityTasks: Task[] = [
         id: 3,
         title: 'Detective Ray Choo',
         message:
-          'Wait... an arranged assassination delivery? Both of us taken out by poison...?! You’re trembling, but your eyes... you look like you’ve lived through the nightmare already. And that strange emerald scent in the air... Alright, {trainer}. I don’t know how you know this, kid, but I trust your instincts. Let us intercept that poison before their operative collects it, call off Saffron, and head straight to Pokémon Tower!',
+          'An ambush in Saffron...? Both of us taken out by poison...?! You’re dead serious, aren’t you. And that strange emerald glow lingering around you... Alright, {trainer}. I don’t know how you know this, but I trust your instincts. Let’s grab that toxin before their operative does, call off Saffron, and head straight to Pokémon Tower!',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Break the Loop', type: 'success' }],

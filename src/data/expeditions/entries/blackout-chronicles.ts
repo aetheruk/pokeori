@@ -122,9 +122,8 @@ export const blackoutChronicleExpeditions: ExpeditionConfig[] = [
   },
   {
     id: 'chronicle-ray-choo-pursuit',
-    name: "Detective Choo: The Saffron Pursuit",
-    description:
-      'Follow Detective Ray Choo as he races toward Saffron City with his Arcanine, only to be struck down alongside {trainer}.',
+    name: 'Detective Choo: The Saffron Pursuit',
+    description: 'Follow Detective Ray Choo as he races toward Saffron City with his Arcanine.',
     category: '???',
     subCategory: '???',
     buttonText: 'Recall Memory',
