@@ -1890,8 +1890,8 @@ export const celadonCityTasks: Task[] = [
   },
   {
     "id": "celadon-poison-dead-drop",
-    "name": "The Unclaimed Toxin",
-    "description": "Search the drainage grate in Celadon's back alley for the sealed Team Rocket toxin revealed in the memory.",
+    "name": "Intercepting the Toxin",
+    "description": "Use your foreknowledge of the Rocket delivery to retrieve the sealed neurotoxin before the assassin can collect it.",
     "category": "Kanto",
     "subCategory": "Celadon City",
     "background": "/backgrounds/celadon.avif",
@@ -1901,7 +1901,7 @@ export const celadonCityTasks: Task[] = [
     },
     "secret": false,
     "completionTrigger": "manual",
-    "completeButtonText": "Examine Grate",
+    "completeButtonText": "Intercept Delivery",
     "repeatable": false,
     "requirements": [
       {
@@ -1928,7 +1928,7 @@ export const celadonCityTasks: Task[] = [
       {
         "id": 1,
         "title": "Celadon Back Alley",
-        "message": "You slip into the narrow alleyway behind the department store. Rust-stained storm drains line the asphalt, matching the memory from the timeline divergence.",
+        "message": "You slip into the narrow alleyway behind the department store. Rust-stained storm drains line the asphalt, matching the dead drop location arranged in Ariana's order.",
         "background": "/backgrounds/celadon.avif",
         "icon": {
           "type": "item",
@@ -1944,8 +1944,8 @@ export const celadonCityTasks: Task[] = [
       },
       {
         "id": 2,
-        "title": "Hidden Dead Drop",
-        "message": "Behind the iron grate sits a dark, heavy glass vial wrapped in weatherproof seal. The liquid inside glints with a sinister purplish sheen.",
+        "title": "Intercepting the Drop",
+        "message": "You pry open the iron drainage grate. The courier has just stashed the heavy, sealed vial wrapped in weatherproof casing. You retrieve it from the drop point just moments before the Rocket assassin arrives for collection!",
         "background": "/backgrounds/celadon.avif",
         "icon": {
           "type": "item",
@@ -1953,7 +1953,7 @@ export const celadonCityTasks: Task[] = [
         },
         "buttons": [
           {
-            "text": "Recover Toxin",
+            "text": "Intercept Toxin",
             "type": "success"
           }
         ]
@@ -1961,8 +1961,8 @@ export const celadonCityTasks: Task[] = [
     ],
     "exitModal": {
       "background": "/backgrounds/celadon.avif",
-      "title": "Sealed Rocket Toxin",
-      "message": "You recovered the Sealed Rocket Toxin. Its synthetic formulation is far beyond ordinary Kanto medicines. Master Koga of Fuchsia City, the authority on ninjutsu toxins, may be able to analyze it.",
+      "title": "Toxin Intercepted",
+      "message": "You intercepted the Sealed Rocket Toxin, dismantling Team Rocket's assassination plot before the hitman could retrieve it. Its synthetic formulation is far beyond ordinary Kanto medicines. Master Koga of Fuchsia City, the authority on ninjutsu toxins, may be able to analyze it.",
       "closeButtonText": "Keep it Safe",
       "icon": {
         "type": "item",

@@ -316,7 +316,7 @@ export const saffronCityTasks: Task[] = [
   {
     id: 'rocket-chronicle-poison-order',
     name: 'The Elimination Order',
-    description: 'Ariana authorizes the retrieval of the synthetic toxin.',
+    description: 'Ariana arranges the delivery of the synthetic toxin to a dead drop for an operative.',
     category: 'Secret',
     subCategory: 'Saffron City',
     icon: {
@@ -336,7 +336,7 @@ export const saffronCityTasks: Task[] = [
       {
         id: 1,
         title: 'Executive Ariana',
-        message: 'We cannot afford complications. Retrieve the lethal neurotoxin sample from the dead drop behind the Celadon alley drainage grate. Have the strike squad position themselves at Sabrina’s gym doors.',
+        message: 'We cannot afford complications. Contact our Celadon distribution cell. Have a courier deliver the synthetic neurotoxin to the dead drop behind the Celadon alley drainage grate. Dispatch an assassin operative to collect it there and position at Sabrina’s gym doors.',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'ariana' },
         buttons: [{ text: 'Confirm Target', type: 'navigate', id: 2 }],
@@ -344,7 +344,7 @@ export const saffronCityTasks: Task[] = [
       {
         id: 2,
         title: 'Rocket Grunt',
-        message: 'Understood. And if the trainer enters Saffron alone?',
+        message: 'Understood, Executive. The courier is dispatching the vial to the drop location now, and the operative has been alerted to collect it on their way to Saffron.',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'rocket-grunt-m' },
         buttons: [{ text: 'Final Verdict', type: 'navigate', id: 3 }],
@@ -352,7 +352,7 @@ export const saffronCityTasks: Task[] = [
       {
         id: 3,
         title: 'Executive Ariana',
-        message: 'Then you end it swiftly. Strike from the blind spot with the toxin. No alarms, no witnesses. Kanto belongs to the future, not sentiment.',
+        message: 'Ensure the handover is coordinated cleanly. When the trainer arrives at Saffron Gym, strike from the blind spot with the toxin. No alarms, no witnesses. Kanto belongs to the future, not sentiment.',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'ariana' },
         buttons: [{ text: 'Deploy', type: 'success' }],
@@ -429,7 +429,7 @@ export const saffronCityTasks: Task[] = [
       {
         id: 2,
         title: 'Detective Ray Choo',
-        message: 'Hold up... look down that alley near the drainage grate. A Rocket courier just shoved a dark, sealed vial into the drain cover. What in the world are they stashing in Celadon? No time to dig it out now—I have to catch up to the trainer!',
+        message: 'Hold up... look down that alley near the drainage grate. A Rocket courier just dropped a sealed canister into the drain, and a shadowed figure in an assassin coat was watching from the roof! That’s an arranged dead drop handover! What kind of lethal cargo are they moving through Celadon? No time to dig it out now—I have to catch up to the trainer before they walk into trouble!',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Speed Away', type: 'success' }],
@@ -746,7 +746,7 @@ export const saffronCityTasks: Task[] = [
       {
         id: 2,
         title: '{trainer}',
-        message: 'Ray, stop. Saffron is an assassination trap. Team Rocket has sealed the city and stationed a strike squad with lethal neurotoxin at the gym doors. They ambushed us both with poisoned needles. They stashed a vial in the Celadon alley drain. We cannot go to Saffron—we need to go directly to Pokémon Tower in Lavender Town.',
+        message: 'Ray, stop. Saffron is an assassination trap. Team Rocket arranged a courier delivery of lethal neurotoxin to a dead drop in the Celadon alley for a hitman. In the original timeline, that operative collected the poison and struck us both down outside the gym doors. Because of the timeline shift, we can intercept that delivery at the alley drainage grate right now before the assassin can pick it up! Then we change our course directly to Pokémon Tower in Lavender Town.',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Ray’s Reaction', type: 'navigate', id: 3 }],
@@ -754,7 +754,7 @@ export const saffronCityTasks: Task[] = [
       {
         id: 3,
         title: 'Detective Ray Choo',
-        message: 'Wait... both of us taken out by poison...? You’re trembling, but your eyes... you look like you’ve lived through the nightmare already. And that strange emerald scent in the air... Alright, {trainer}. I don’t know how you know this, kid, but I trust your instincts. We call off Saffron. We head straight to Pokémon Tower!',
+        message: 'Wait... an arranged assassination delivery? Both of us taken out by poison...?! You’re trembling, but your eyes... you look like you’ve lived through the nightmare already. And that strange emerald scent in the air... Alright, {trainer}. I don’t know how you know this, kid, but I trust your instincts. Let us intercept that poison before their operative collects it, call off Saffron, and head straight to Pokémon Tower!',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Break the Loop', type: 'success' }],

@@ -101,14 +101,14 @@ user-driven motion under `prefers-reduced-motion`.
    - In Explore (locked to `???`), tapping the golden glow completes `struggle` and unlocks `golden-glow`.
 2. **The Blackout Chronicles**:
    - `golden-glow` unlocks two narrative Chronicles in the `???` region:
-     - `chronicle-rocket-assassination`: Played as Executive Ariana. Begins at the summit of Pokemon Tower with Kita the Marowak fallen on the stone floor and Mr. Fuji bound as a captive. Follows Rocket surveillance reports of the player and Detective Choo investigating Celadon, and Ariana authorizing the lethal toxin assassination ambush at Saffron Gym.
-     - `chronicle-ray-choo-pursuit`: Played as Detective Ray Choo. Shows Ray speeding toward Saffron on his motorbike with his newly evolved Arcanine, breaking through a perimeter guard, witnessing a Rocket courier stashing a sealed dark vial into a Celadon alley drainage grate, and arriving at Saffron Gym moments too late as the poison strikes the player down.
+     - `chronicle-rocket-assassination`: Played as Executive Ariana. Begins at the summit of Pokemon Tower with Kita the Marowak fallen on the stone floor and Mr. Fuji bound as a captive. Follows Rocket surveillance reports of the player and Detective Choo investigating Celadon, and Ariana arranging for a courier to deliver the lethal neurotoxin to a Celadon alley dead drop for an assassin operative.
+     - `chronicle-ray-choo-pursuit`: Played as Detective Ray Choo. Shows Ray speeding toward Saffron on his motorbike with his newly evolved Arcanine, breaking through a perimeter guard, witnessing a Rocket courier stashing the sealed toxin canister into a Celadon alley drainage grate while an operative shadows the pickup from the roof, and arriving at Saffron Gym moments too late as the poison strikes the player down.
 3. **The Entity & Celebi Time Travel**:
    - Completing both chronicles unlocks `entity-reflections` ("Threads of Fate") with the cosmic entity in the void, testing the trainer's resolve.
    - `entity-celebi-warp` ("The Voice Across Time") follows, where the entity summons Celebi to turn back the river of time.
-4. **Celadon Divergence & Poison Dead Drop**:
-   - `celadon-timeline-divergence` ("A Divergence in Time") returns the player to Celadon right as Ray Choo suggests going to Saffron. The player interrupts, warning Ray of the assassination ambush. Completing this task ends the blackout state.
-   - The player can now inspect the Celadon alley drainage grate (`celadon-poison-dead-drop`) to recover the **Sealed Rocket Toxin** (`rocket-poison-vial`), establishing the narrative reason to consult Master Koga in Fuchsia City.
+4. **Celadon Divergence & Poison Dead Drop Interception**:
+   - `celadon-timeline-divergence` ("A Divergence in Time") returns the player to Celadon right as Ray Choo suggests going to Saffron. The player interrupts, warning Ray of the arranged assassination delivery. Completing this task ends the blackout state.
+   - The player can now intercept the delivery at the Celadon alley drainage grate (`celadon-poison-dead-drop` / *Intercepting the Toxin*) before the Rocket operative can retrieve it, recovering the **Sealed Rocket Toxin** (`rocket-poison-vial`) and establishing the narrative reason to consult Master Koga in Fuchsia City.
 5. **Pokemon Tower Ascent & The Azure Flute**:
    - `pokemon-tower-return-with-choo` brings the player and Detective Choo to Lavender Town, where the player calls out to Kita.
    - Guided by Kita's spiritual resonance, they ascend the tower in `pokemon-tower-clearing-the-floors`.
