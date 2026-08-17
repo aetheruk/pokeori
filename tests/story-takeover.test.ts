@@ -353,6 +353,17 @@ describe('blackout void chronicles and time divergence', () => {
         targetId: '105',
       }),
     )
+
+    // Check that wild battles on 3F-6F share the exact name with locations for clean card merging
+    const battle3F = battles.find((b) => b.id === 'pokemon-tower-3f-wild')
+    const battle4F = battles.find((b) => b.id === 'pokemon-tower-4f-wild')
+    const battle5F = battles.find((b) => b.id === 'pokemon-tower-5f-wild')
+    const battle6F = battles.find((b) => b.id === 'pokemon-tower-6f-wild')
+
+    expect(battle3F?.name).toBe('Pokemon Tower 3F')
+    expect(battle4F?.name).toBe('Pokemon Tower 4F')
+    expect(battle5F?.name).toBe('Pokemon Tower 5F')
+    expect(battle6F?.name).toBe('Pokemon Tower 6F')
   })
 
   test('post-divergence repeatable guidance tasks are authored for Saffron avoidance and Celadon cycling road caution', () => {
