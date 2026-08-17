@@ -171,6 +171,12 @@ export const blackoutChronicleExpeditions: ExpeditionConfig[] = [
       },
       {
         type: 'expedition_result',
+        targetId: 'chronicle-rocket-assassination',
+        expeditionStatus: 'completed',
+        count: 1,
+      },
+      {
+        type: 'expedition_result',
         targetId: 'chronicle-ray-choo-pursuit',
         expeditionStatus: 'completed',
         count: 1,

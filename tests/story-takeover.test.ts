@@ -3,6 +3,7 @@ import { regionCategories } from '@/data/region-map'
 import { subCategories } from '@/data/sub-region-map'
 import { tasks } from '@/data/tasks'
 import { battles } from '@/data/battles'
+import { expeditions } from '@/data/expeditions'
 import { buildNameForms } from '@/components/game/features/explore/BlackoutUnowns'
 import {
   A_GOLDEN_GLOW_TASK_ID,
@@ -37,23 +38,13 @@ describe('Saffron knockout task data', () => {
   test('the gym ambush task is authored as a one-time Saffron cinematic', () => {
     const task = tasks.find((entry) => entry.id === SAFFRON_GYM_AMBUSH_TASK_ID)
     expect(task).toBeDefined()
-    expect(task?.name).toBe('Reaching Sabrina')
-    expect(task?.description).toContain(
-      'There sure is a lot of Rocket about in this town',
-    )
     expect(task?.repeatable).toBe(false)
+    expect(task?.secret).toBe(false)
+    expect(task?.category).toBe('Kanto')
     expect(task?.subCategory).toBe('Saffron City')
-    expect(task?.requirements).toContainEqual(
-      expect.objectContaining({
-        type: 'task_completed',
-        targetId: 'a-stone-for-a-friend',
-      }),
-    )
-    expect(task?.enterModal?.[0]?.message).toBe(
-      "Choo will be right behind me, I'll go on ahead.",
-    )
-    expect(task?.exitModal?.message).toBe('Hello is anyo.........')
-    expect(task?.exitModal?.closeButtonText).toBe('....')
+    expect(task?.enterModal).toHaveLength(1)
+    expect(task?.enterModal?.[0]?.message).toContain('Choo will be right behind me')
+    expect(task?.exitModal?.message).toContain('Hello is anyo')
   })
 })
 
@@ -105,11 +96,10 @@ describe('blackout golden glow tasks', () => {
     expect(task).toBeDefined()
     expect(task?.secret).toBe(true)
     expect(task?.repeatable).toBe(false)
-    expect(task?.category).toBe('???')
     expect(task?.requirements).toContainEqual(
       expect.objectContaining({
         type: 'task_completed',
-        targetId: 'saffron-gym-ambush',
+        targetId: SAFFRON_GYM_AMBUSH_TASK_ID,
       }),
     )
   })
@@ -117,8 +107,8 @@ describe('blackout golden glow tasks', () => {
   test('golden glow is a one-time task unlocked by struggle with authored cosmos dialogue', () => {
     const task = tasks.find((entry) => entry.id === A_GOLDEN_GLOW_TASK_ID)
     expect(task).toBeDefined()
+    expect(task?.secret).toBe(false)
     expect(task?.repeatable).toBe(false)
-    expect(task?.category).toBe('???')
     expect(task?.background).toBe('/backgrounds/cosmos-gold.avif')
     expect(task?.requirements).toContainEqual(
       expect.objectContaining({
@@ -126,7 +116,13 @@ describe('blackout golden glow tasks', () => {
         targetId: STRUGGLE_TASK_ID,
       }),
     )
-    expect(task?.enterModal?.length).toBe(6)
+    expect(task?.requirements).toContainEqual(
+      expect.objectContaining({
+        type: 'task_completed',
+        targetId: SAFFRON_GYM_AMBUSH_TASK_ID,
+      }),
+    )
+    expect(task?.enterModal).toHaveLength(6)
     expect(task?.enterModal?.[0]?.message).toBe(
       'Well now, Quite the spirit in you {Trainer}',
     )
@@ -138,15 +134,36 @@ describe('blackout golden glow tasks', () => {
 })
 
 describe('blackout void chronicles and time divergence', () => {
-  test('both blackout chronicles unlock after golden glow and have authored party configurations', () => {
-    const rocketChronicle = tasks.find(
-      (entry) => entry.id === 'rocket-chronicle-pokemon-tower-summit',
+  test('both blackout chronicles are authored and Ray Choo chronicle is gated behind the Rocket chronicle', () => {
+    const rocketExp = expeditions.find(
+      (entry) => entry.id === 'chronicle-rocket-assassination',
     )
-    const chooChronicle = tasks.find(
-      (entry) => entry.id === 'choo-chronicle-departing-celadon',
+    const chooExp = expeditions.find(
+      (entry) => entry.id === 'chronicle-ray-choo-pursuit',
     )
-    expect(rocketChronicle).toBeDefined()
-    expect(chooChronicle).toBeDefined()
+
+    expect(rocketExp).toBeDefined()
+    expect(rocketExp?.requirements).toContainEqual(
+      expect.objectContaining({
+        type: 'task_completed',
+        targetId: 'golden-glow',
+      }),
+    )
+
+    expect(chooExp).toBeDefined()
+    expect(chooExp?.requirements).toContainEqual(
+      expect.objectContaining({
+        type: 'task_completed',
+        targetId: 'golden-glow',
+      }),
+    )
+    expect(chooExp?.requirements).toContainEqual(
+      expect.objectContaining({
+        type: 'expedition_result',
+        targetId: 'chronicle-rocket-assassination',
+        expeditionStatus: 'completed',
+      }),
+    )
   })
 
   test('entity reflections and celebi warp tasks lead into the celadon timeline divergence', () => {

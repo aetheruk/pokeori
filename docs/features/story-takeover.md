@@ -99,10 +99,10 @@ user-driven motion under `prefers-reduced-motion`.
 1. **The Ambush & The Void**:
    - Completing `saffron-gym-ambush` knocks the player unconscious and triggers the blackout state.
    - In Explore (locked to `???`), tapping the golden glow completes `struggle` and unlocks `golden-glow`.
-2. **The Blackout Chronicles**:
-   - `golden-glow` unlocks two narrative Chronicles in the `???` region:
+2. **The Blackout Chronicles (Sequential Progression)**:
+   - `golden-glow` unlocks the first of two sequential narrative Chronicles in the `???` region:
      - `chronicle-rocket-assassination`: Played as Executive Ariana. Begins at the summit of Pokemon Tower with Kita the Marowak fallen on the stone floor and Mr. Fuji bound as a captive. Follows Rocket surveillance reports of the player and Detective Choo investigating Celadon, and Ariana arranging for a courier to deliver the lethal neurotoxin to a Celadon alley dead drop for an assassin operative.
-     - `chronicle-ray-choo-pursuit`: Played as Detective Ray Choo. Shows Ray speeding toward Saffron on his motorbike with his newly evolved Arcanine, breaking through a perimeter guard, witnessing a Rocket courier stashing the sealed toxin canister into a Celadon alley drainage grate while an operative shadows the pickup from the roof, and arriving at Saffron Gym moments too late as the poison strikes the player down.
+     - `chronicle-ray-choo-pursuit`: Unlocked upon completing the Rocket chronicle. Played as Detective Ray Choo. Shows Ray speeding toward Saffron on his motorbike with his newly evolved Arcanine, breaking through a perimeter guard, witnessing a Rocket courier stashing the sealed toxin canister into a Celadon alley drainage grate while an operative shadows the pickup from the roof, and arriving at Saffron Gym moments too late as the poison strikes the player down.
 3. **The Entity & Celebi Time Travel**:
    - Completing both chronicles unlocks `entity-reflections` ("Threads of Fate") with the cosmic entity in the void, testing the trainer's resolve.
    - `entity-celebi-warp` ("The Voice Across Time") follows, where the entity summons Celebi to turn back the river of time.
