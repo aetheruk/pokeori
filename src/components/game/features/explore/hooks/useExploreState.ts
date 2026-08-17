@@ -3,6 +3,7 @@ import { usePersistentState } from '@/hooks/usePersistentState'
 import { regionCategories } from '@/data/region-map'
 import { subCategories as subCategoryDataMap } from '@/data/sub-region-map'
 import { checkRequirement, type RequirementData } from '@/utilities/requirements'
+import { isSaffronTakeoverActive } from '@/utilities/story-state'
 import type { ExploreItem } from '../types'
 
 export const DEFAULT_EXPLORE_CATEGORY = 'Kanto'
@@ -11,6 +12,8 @@ export const DEFAULT_EXPLORE_SUB_CATEGORY = 'Pallet Town'
 export type SubRegionStatus = 'locked' | 'available' | 'in_progress' | 'complete'
 
 export function useExploreState(availableItems: ExploreItem[], userData: RequirementData | null) {
+  const isTakeover = isSaffronTakeoverActive(userData?.completedTasks || [])
+
   // Persistent Filter State
   const [activeCategory, setActiveCategory, isCategoryLoaded] = usePersistentState<string>(
     'exploreCategory',
@@ -33,13 +36,19 @@ export function useExploreState(availableItems: ExploreItem[], userData: Require
   const [areaModalOpen, setAreaModalOpen] = useState(false)
 
   // Categories Calculation
-  const categories = useMemo(
-    () => Array.from(new Set(availableItems.map((i) => i.category))).sort(),
-    [availableItems],
-  )
+  const categories = useMemo(() => {
+    const rawCategories = Array.from(
+      new Set(availableItems.map((i) => i.category)),
+    ).sort()
+    if (isTakeover) {
+      return rawCategories
+    }
+    return rawCategories.filter((cat) => cat !== '???')
+  }, [availableItems, isTakeover])
 
   const getSubCategoriesFor = (cat: string) => {
     if (!cat) return []
+    if (!isTakeover && cat === '???') return []
     const unlockedByItems = Array.from(
       new Set(
         availableItems
@@ -52,14 +61,17 @@ export function useExploreState(availableItems: ExploreItem[], userData: Require
       .sort(([, a], [, b]) => (a.order ?? Number.MAX_SAFE_INTEGER) - (b.order ?? Number.MAX_SAFE_INTEGER))
       .map(([subCategory]) => subCategory)
 
-    if (authoredForCategory.length > 0) {
-      return authoredForCategory
+    const list = authoredForCategory.length > 0 ? authoredForCategory : unlockedByItems.sort()
+    if (isTakeover) {
+      return list
     }
-
-    return unlockedByItems.sort()
+    return list.filter((sub) => sub !== '???')
   }
 
   const isSubCategoryLocked = (category: string, subCategory: string) => {
+    if (subCategory === '???') {
+      return !isTakeover
+    }
     const authored = subCategoryDataMap[subCategory]
     if (!authored) {
       return !availableItems.some(
