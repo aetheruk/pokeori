@@ -9,7 +9,7 @@ import React, {
 } from 'react'
 import type { User } from '@/payload-types'
 import { useRouter } from 'next/navigation'
-import useSWR from 'swr'
+import useSWR, { useSWRConfig } from 'swr'
 import { useInventoryStore } from '@/app/(frontend)/store/inventory-store'
 
 import type { RequirementData } from '@/utilities/requirements'
@@ -193,15 +193,23 @@ export function UserProvider({
     [mutate],
   )
 
+  const { mutate: globalMutate } = useSWRConfig()
+
   const refreshUser = useCallback(
     async (skipRouterRefresh = true) => {
       const refreshedData = await mutate()
+      void globalMutate(
+        (key) =>
+          typeof key === 'string' &&
+          key.startsWith('/api/game/sync') &&
+          key !== syncUrl,
+      )
       if (skipRouterRefresh === false) {
         router.refresh()
       }
       return refreshedData
     },
-    [mutate, router],
+    [globalMutate, mutate, router, syncUrl],
   )
 
   const value = useMemo(

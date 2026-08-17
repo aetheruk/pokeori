@@ -32,6 +32,15 @@ describe('Saffron takeover story state', () => {
       ]),
     ).toBe(false)
   })
+
+  test('useStoryStateStore tracks explicit client takeover transitions', () => {
+    const { useStoryStateStore } = require('@/app/(frontend)/store/story-state-store')
+    expect(useStoryStateStore.getState().saffronTakeover).toBe(null)
+    useStoryStateStore.getState().setSaffronTakeover(true)
+    expect(useStoryStateStore.getState().saffronTakeover).toBe(true)
+    useStoryStateStore.getState().setSaffronTakeover(false)
+    expect(useStoryStateStore.getState().saffronTakeover).toBe(false)
+  })
 })
 
 describe('Saffron knockout task data', () => {

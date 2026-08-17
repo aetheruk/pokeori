@@ -87,8 +87,9 @@ function TakeoverRouteGuard() {
   const router = useRouter()
   const { gameData } = useUser()
   const storeTakeover = useStoryStateStore((state) => state.saffronTakeover)
+  const serverTakeover = gameData?.storyState?.saffronTakeover === true
   const takeoverActive =
-    storeTakeover || gameData?.storyState?.saffronTakeover === true
+    storeTakeover !== null ? storeTakeover : serverTakeover
 
   useEffect(() => {
     if (!takeoverActive) return
@@ -108,11 +109,12 @@ function TakeoverActiveProbe({
   const { gameData } = useUser()
   const storeTakeover = useStoryStateStore((state) => state.saffronTakeover)
   const serverTakeover = gameData?.storyState?.saffronTakeover === true
-  const takeoverActive = storeTakeover || serverTakeover
+  const takeoverActive =
+    storeTakeover !== null ? storeTakeover : serverTakeover
 
   useEffect(() => {
     const hasLoadedData = gameData !== undefined && gameData !== null
-    if (!hasLoadedData && !storeTakeover) return
+    if (!hasLoadedData && storeTakeover === null) return
     onTakeoverChange(takeoverActive)
   }, [gameData, onTakeoverChange, storeTakeover, takeoverActive])
 
@@ -122,9 +124,9 @@ function TakeoverActiveProbe({
   // fetch, so leave the class untouched while the server data is unavailable.
   useEffect(() => {
     const hasLoadedData = gameData !== undefined && gameData !== null
-    if (!hasLoadedData && !storeTakeover) return
+    if (!hasLoadedData && storeTakeover === null) return
     document.body.classList.toggle('pokeori-blackout', takeoverActive)
-  }, [gameData, pathname, serverTakeover, storeTakeover, takeoverActive])
+  }, [gameData, pathname, storeTakeover, takeoverActive])
 
   return null
 }

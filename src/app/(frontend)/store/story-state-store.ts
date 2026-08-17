@@ -3,7 +3,7 @@
 import { create } from 'zustand'
 
 interface StoryStateStore {
-  saffronTakeover: boolean
+  saffronTakeover: boolean | null
   setSaffronTakeover: (active: boolean) => void
 }
 
@@ -14,6 +14,6 @@ interface StoryStateStore {
  * task completes instead of waiting for the next core sync revalidation.
  */
 export const useStoryStateStore = create<StoryStateStore>((set) => ({
-  saffronTakeover: false,
+  saffronTakeover: null,
   setSaffronTakeover: (active) => set({ saffronTakeover: active }),
 }))
