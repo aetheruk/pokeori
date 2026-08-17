@@ -50,7 +50,21 @@ export const pokemonTowerBattles: BattleConfig[] = [
       { speciesId: 92, formId: '92', level: { min: 20, max: 22 } },
       { speciesId: 41, formId: '41', level: { min: 20, max: 21 } },
     ],
-    rewards: [],
+    rewards: [
+      {
+        type: 'item',
+        targetId: 'incense-fishers',
+        quantity: 1,
+        dropChance: 1,
+        requirements: [
+          {
+            type: 'item_owned',
+            targetId: 'incense-fishers',
+            inverse: true,
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'pokemon-tower-channeler-hope',
@@ -126,7 +140,13 @@ export const pokemonTowerBattles: BattleConfig[] = [
       { speciesId: 104, formId: '104', level: { min: 21, max: 23 } },
       { speciesId: 41, formId: '41', level: { min: 21, max: 22 } },
     ],
-    rewards: [],
+    rewards: [
+      {
+        type: 'task_complete',
+        targetId: 'faux-spell-tag-recipe',
+        dropChance: 12,
+      },
+    ],
   },
   {
     id: 'pokemon-tower-channeler-laurel',
@@ -202,7 +222,21 @@ export const pokemonTowerBattles: BattleConfig[] = [
       { speciesId: 92, formId: '92', level: { min: 22, max: 24 } },
       { speciesId: 104, formId: '104', level: { min: 22, max: 24 } },
     ],
-    rewards: [],
+    rewards: [
+      {
+        type: 'item',
+        targetId: 'incense-fortune',
+        quantity: 1,
+        dropChance: 1,
+        requirements: [
+          {
+            type: 'item_owned',
+            targetId: 'incense-fortune',
+            inverse: true,
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'pokemon-tower-channeler-ruth',
@@ -292,7 +326,13 @@ export const pokemonTowerBattles: BattleConfig[] = [
       { speciesId: 104, formId: '104', level: { min: 24, max: 26 } },
       { speciesId: 92, formId: '92', level: { min: 23, max: 25 } },
     ],
-    rewards: [],
+    rewards: [
+      {
+        type: 'task_complete',
+        targetId: 'chipped-glasses-recipe',
+        dropChance: 12,
+      },
+    ],
   },
   {
     id: 'pokemon-tower-channeler-angelica',
@@ -361,9 +401,11 @@ export const pokemonTowerBattles: BattleConfig[] = [
     background: towerBackground,
     maxPokemon: 3,
     levelCap: 36,
-    isWildBattle: true,
     enemyAttackTelegraphChance: 2,
-    requirements: [beatenBattle('pokemon-tower-channeler-emilia')],
+    requirements: [
+      beatenBattle('pokemon-tower-channeler-emilia'),
+      unbeatenBattle('pokemon-tower-shadow-surge-1'),
+    ],
     enemyTeam: [
       { speciesId: 92, formId: '92', level: 26, isShadow: true, name: 'Shadow Gastly' },
       { speciesId: 20, formId: '20', level: 26, isShadow: true, name: 'Shadow Raticate' },
@@ -380,9 +422,11 @@ export const pokemonTowerBattles: BattleConfig[] = [
     background: towerBackground,
     maxPokemon: 3,
     levelCap: 36,
-    isWildBattle: true,
     enemyAttackTelegraphChance: 2,
-    requirements: [beatenBattle('pokemon-tower-shadow-surge-1')],
+    requirements: [
+      beatenBattle('pokemon-tower-shadow-surge-1'),
+      unbeatenBattle('pokemon-tower-shadow-surge-2'),
+    ],
     enemyTeam: [
       { speciesId: 17, formId: '17', level: 27, isShadow: true, name: 'Shadow Pidgeotto' },
       { speciesId: 92, formId: '92', level: 27, isShadow: true, name: 'Shadow Gastly' },
@@ -399,9 +443,11 @@ export const pokemonTowerBattles: BattleConfig[] = [
     background: towerBackground,
     maxPokemon: 3,
     levelCap: 38,
-    isWildBattle: true,
     enemyAttackTelegraphChance: 2,
-    requirements: [beatenBattle('pokemon-tower-shadow-surge-2')],
+    requirements: [
+      beatenBattle('pokemon-tower-shadow-surge-2'),
+      unbeatenBattle('pokemon-tower-shadow-surge-3'),
+    ],
     enemyTeam: [
       { speciesId: 93, formId: '93', level: 28, isShadow: true, name: 'Shadow Haunter' },
       { speciesId: 20, formId: '20', level: 28, isShadow: true, name: 'Shadow Raticate' },

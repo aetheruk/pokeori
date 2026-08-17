@@ -1436,9 +1436,17 @@ describe('artisan recipes', () => {
         recipeId: 'brittle-hard-stone-recipe',
         source: 'Mt. Moon catches',
       },
-      { type: 'ghost', recipeId: 'faux-spell-tag-recipe', source: null },
+      {
+        type: 'ghost',
+        recipeId: 'faux-spell-tag-recipe',
+        source: 'Pokemon Tower 4F drops',
+      },
       { type: 'dragon', recipeId: 'chipped-dragon-fang-recipe', source: null },
-      { type: 'dark', recipeId: 'chipped-glasses-recipe', source: null },
+      {
+        type: 'dark',
+        recipeId: 'chipped-glasses-recipe',
+        source: 'Pokemon Tower 6F drops',
+      },
       {
         type: 'steel',
         recipeId: 'rusty-coat-recipe',
@@ -1461,11 +1469,13 @@ describe('artisan recipes', () => {
     expect([...authoredPrizeIds].sort()).toEqual([
       'aluminium-powder-recipe',
       'brittle-hard-stone-recipe',
+      'chipped-glasses-recipe',
       'coarse-sand-recipe',
       'cotton-scarf-recipe',
       'dull-beak-recipe',
       'dusty-charcoal-recipe',
       'fairy-down-recipe',
+      'faux-spell-tag-recipe',
       'magic-water-recipe',
       'poison-tip-recipe',
       'regular-seed-recipe',

@@ -1,5 +1,12 @@
 # Current Game State
 
+- Release `0.13.31` updates Pokemon Tower dungeon rewards and the Shadow Surge battle progression:
+  - **Floor Rewards (3F-6F)**: Authored drop variations are added across Catch, Wild Battle, and Field Observation for each floor:
+    - **3F**: Very rare 1% drop chance for Fisher's Incense (`incense-fishers`), gated to unowned.
+    - **4F**: Rare 12% drop chance for Ghost-type held item recipe manual (`faux-spell-tag-recipe` / Faux Spell Tag).
+    - **5F**: Very rare 1% drop chance for Fortune Incense (`incense-fortune`), gated to unowned.
+    - **6F**: Rare 12% drop chance for Dark-type held item recipe manual (`chipped-glasses-recipe` / Chipped Glasses).
+  - **Shadow Surge Gauntlet**: Shadow Surge I, II, and III are converted into 3 sequential 1-time battles against their defined corrupted Shadow Pokémon teams (removing random wild pool selection) that hide upon victory (`unbeatenBattle`).
 - Release `0.13.30` fixes two Explore polish details: the `???` blackout region and location are now suppressed from region/area selectors whenever the Saffron blackout takeover is inactive, and Pokemon Tower 3F through 6F wild battle names match their location cards so Catch, Battle, and Study actions merge cleanly into single cards on the Explore grid.
 - Release `0.13.29` fixes immediate color palette and navigation restoration upon Saffron blackout timeline divergence. The shell now mirrors client-side takeover changes with zero latency and triggers sibling sync cache revalidations.
 - Release `0.13.23` fixes two blackout details: the golden orbit ring around task cards now stays attached to the card edge (the conic angle animates via `` instead of rotating the ring shape), and the `a-golden-glow` task uses the Unown `?` icon. See `docs/features/story-takeover.md`.
@@ -581,21 +588,21 @@ Pokemon Tower unlocks from Lavender Town after `lavender-missing-mountain`.
 - Completing the Mr. Fuji Chronicle unlocks a branch-specific `Realisation` chat based on the Nugget Bridge Team Rocket choice. Both versions feed into `lavender-fuji-memory-debrief`, then the shared `celadon-police-hq-lead` chat points the player toward Celadon Police HQ as the next story handoff. The authored Celadon City `police-hq` follow-up uses the Policeman trainer sprite and the dedicated `/backgrounds/police-hq.avif` police-station interior; the player reports the Tower incident, but the officer dismisses it for lack of verifiable evidence.
 - **Pokemon Tower Dungeon Loop (Return with Detective Choo)**: After the Saffron blackout resolution and Celebi timeline divergence (`celadon-timeline-divergence`), `pokemon-tower-return-with-choo` unlocks the multi-floor dungeon progression loop across floors 3F to 7F:
   - **Floor Catch Locations & Wild Battles**:
-    - **3F**: `pokemon-tower-3f` catch spot and `pokemon-tower-3f-wild` (Gastly, Zubat).
-    - **4F**: `pokemon-tower-4f` catch spot and `pokemon-tower-4f-wild` (Gastly, Zubat, Cubone).
-    - **5F**: `pokemon-tower-5f` catch spot and `pokemon-tower-5f-wild` (Gastly, Haunter, Cubone).
-    - **6F**: `pokemon-tower-6f` catch spot and `pokemon-tower-6f-wild` (Gastly, Haunter, Cubone).
+    - **3F**: `pokemon-tower-3f` catch spot and `pokemon-tower-3f-wild` (Gastly, Zubat). Very rare 1% drop chance for Fisher's Incense (`incense-fishers`).
+    - **4F**: `pokemon-tower-4f` catch spot and `pokemon-tower-4f-wild` (Gastly, Zubat, Cubone). Rare 12% drop chance for Faux Spell Tag recipe manual (`faux-spell-tag-recipe`).
+    - **5F**: `pokemon-tower-5f` catch spot and `pokemon-tower-5f-wild` (Gastly, Haunter, Cubone). Very rare 1% drop chance for Fortune Incense (`incense-fortune`).
+    - **6F**: `pokemon-tower-6f` catch spot and `pokemon-tower-6f-wild` (Gastly, Haunter, Cubone). Rare 12% drop chance for Chipped Glasses recipe manual (`chipped-glasses-recipe`).
   - **FireRed Trainer Gauntlet**:
     - **3F Channelers**: Channeler Hope (Gastly Lv. 22), Channeler Patricia (Gastly Lv. 22), Channeler Carly (Gastly Lv. 24).
     - **4F Channelers**: Channeler Laurel (Gastly Lv. 23 x2), Channeler Jody (Gastly Lv. 22), Channeler Paula (Gastly Lv. 24).
     - **5F Channelers**: Channeler Ruth (Gastly Lv. 22), Channeler Tammy (Haunter Lv. 23), Channeler Karina (Gastly Lv. 24), Channeler Janae (Gastly Lv. 22).
     - **6F Channelers**: Channeler Angelica (Gastly Lv. 22 x3), Channeler Jennifer (Gastly Lv. 24), Channeler Emilia (Gastly Lv. 24).
     - **Upper Floors Shadow Gauntlet**:
-      - `pokemon-tower-shadow-surge-1`: Shadow Gastly (Lv. 26), Shadow Raticate (Lv. 26).
-      - `pokemon-tower-shadow-surge-2`: Shadow Pidgeotto (Lv. 27), Shadow Gastly (Lv. 27).
-      - `pokemon-tower-shadow-surge-3`: Shadow Haunter (Lv. 28), Shadow Raticate (Lv. 28), Shadow Pidgeotto (Lv. 28).
+      - `pokemon-tower-shadow-surge-1`: Shadow Gastly (Lv. 26), Shadow Raticate (Lv. 26). 1-time battle hidden after victory.
+      - `pokemon-tower-shadow-surge-2`: Shadow Pidgeotto (Lv. 27), Shadow Gastly (Lv. 27). 1-time battle hidden after victory.
+      - `pokemon-tower-shadow-surge-3`: Shadow Haunter (Lv. 28), Shadow Raticate (Lv. 28), Shadow Pidgeotto (Lv. 28). 1-time battle hidden after victory.
   - **Field Observation & Research XP Studies**:
-    - Field Observation studies are authored for 3F, 4F, 5F, and 6F (`pokemon-tower-3f-field-observation` through `pokemon-tower-6f-field-observation`).
+    - Field Observation studies are authored for 3F, 4F, 5F, and 6F (`pokemon-tower-3f-field-observation` through `pokemon-tower-6f-field-observation`), each carrying the matching floor's rare drops (3F Fisher's Incense, 4F Faux Spell Tag recipe, 5F Fortune Incense, 6F Chipped Glasses recipe).
     - 4 automated Research XP tasks award Pokemon Research XP upon completing Field Observation studies:
       - `pokemon-tower-gastly-spiritual-study` (Gaseous Resonance): 30 Gastly Research XP (3F).
       - `pokemon-tower-cubone-memorial-study` (The Whispering Skull): 30 Cubone Research XP (4F).
