@@ -962,7 +962,7 @@ export const keyItems: Item[] = [
     consume: false,
     description: 'An ancient, resonant flute whose pure tone can pierce any slumber.',
     category: 'key',
-    spriteId: 'key/poke-flute',
+    spriteId: 'key/azure-flute',
   },
   {
     id: 'rocket-poison-vial',

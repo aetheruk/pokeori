@@ -245,6 +245,9 @@ describe('blackout void chronicles and time divergence', () => {
     const kitaBoss = battles.find(
       (entry) => entry.id === 'pokemon-tower-kita-boss',
     )
+    const kitaResolution = tasks.find(
+      (entry) => entry.id === 'pokemon-tower-kita-resolution',
+    )
     const towerSummit = tasks.find(
       (entry) => entry.id === 'pokemon-tower-summit-azure-flute',
     )
@@ -281,6 +284,7 @@ describe('blackout void chronicles and time divergence', () => {
     )
 
     expect(kitaBoss).toBeDefined()
+    expect(kitaBoss?.name).toBe('Kita')
     expect(kitaBoss?.maxPokemon).toBe(2)
     expect(kitaBoss?.levelCap).toBe(40)
     expect(kitaBoss?.enemyTeam).toEqual([
@@ -291,12 +295,21 @@ describe('blackout void chronicles and time divergence', () => {
       }),
     ])
 
-    expect(towerSummit).toBeDefined()
-    expect(towerSummit?.requirements).toContainEqual(
+    expect(kitaResolution).toBeDefined()
+    expect(kitaResolution?.requirements).toContainEqual(
       expect.objectContaining({
         type: 'battle_result',
         targetId: 'pokemon-tower-kita-boss',
         battleStatus: 'win',
+      }),
+    )
+
+    expect(towerSummit).toBeDefined()
+    expect(towerSummit?.description).toBe("There's a strange note here.")
+    expect(towerSummit?.requirements).toContainEqual(
+      expect.objectContaining({
+        type: 'task_completed',
+        targetId: 'pokemon-tower-kita-resolution',
       }),
     )
     expect(towerSummit?.rewards).toContainEqual(

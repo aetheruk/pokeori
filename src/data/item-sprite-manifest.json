@@ -53,6 +53,7 @@
     "aura-break-ability-patch": "/sprites/items/ability-patch.avif",
     "auspicious-armor": "/sprites/items/evolution/auspicious-armor.avif",
     "awakening": "/sprites/items/awakening.avif",
+    "azure-flute": "/sprites/items/key/azure-flute.avif",
     "backup-ability-patch": "/sprites/items/ability-patch.avif",
     "bad-dreams-ability-patch": "/sprites/items/ability-patch.avif",
     "badge-galar-dark": "/sprites/items/badges/badge-galar-dark.avif",
@@ -1185,6 +1186,7 @@
     "rock-memory": "/sprites/items/tm/tm-rock.avif",
     "rock-plate": "/sprites/items/plates/stone-plate.avif",
     "rocket-ball": "/sprites/items/balls/rocket-ball.avif",
+    "rocket-poison-vial": "/sprites/items/materials/poison-resin.avif",
     "rocket-scratch": "/sprites/items/scratchcard.avif",
     "rocky-payload-ability-patch": "/sprites/items/ability-patch.avif",
     "rotom-fan-manual": "/sprites/items/rotom-catalogue.avif",
@@ -2349,6 +2351,7 @@
     "audinite": "/sprites/items/mega/audinite.avif",
     "auspicious-armor": "/sprites/items/evolution/auspicious-armor.avif",
     "awakening": "/sprites/items/awakening.avif",
+    "azure-flute": "/sprites/items/key/azure-flute.avif",
     "badge-galar-dark": "/sprites/items/badges/badge-galar-dark.avif",
     "badge-galar-dragon": "/sprites/items/badges/badge-galar-dragon.avif",
     "badge-galar-fairy": "/sprites/items/badges/badge-galar-fairy.avif",
@@ -2968,6 +2971,7 @@
     "jolly-mint": "/sprites/items/jolly-mint.avif",
     "kangaskhanite": "/sprites/items/mega/kangaskhanite.avif",
     "kelpsy": "/sprites/items/berries/kelpsy.avif",
+    "key/azure-flute": "/sprites/items/key/azure-flute.avif",
     "key/charred-wood": "/sprites/items/key/charred-wood.avif",
     "key/good-rod": "/sprites/items/key/good-rod.avif",
     "key/incense-boon": "/sprites/items/key/incense-boon.avif",
@@ -3989,5 +3993,20 @@
     "zinc": "/sprites/items/zinc.avif",
     "zygardeite": "/sprites/items/mega/zygardeite.avif"
   },
-  "missing": []
+  "missing": [
+    {
+      "itemId": "binder-me5",
+      "name": "TCG Binder (Pitch Black)",
+      "category": "Binder",
+      "spriteId": "binder-me5",
+      "expectedPath": "/sprites/items/tcg/binder-me5.avif"
+    },
+    {
+      "itemId": "pack-me5",
+      "name": "Pitch Black Booster Pack",
+      "category": "booster-pack",
+      "spriteId": "pack-me5",
+      "expectedPath": "/sprites/items/tcg/pack-me5.avif"
+    }
+  ]
 }
