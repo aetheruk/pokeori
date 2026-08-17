@@ -621,7 +621,7 @@ Route 8 unlocks after `celadon-police-hq-lead`.
   - `route-16-sleeping-snorlax`, `route-16-furious-snorlax`, and `route-16-dazed-snorlax`: The western Route 16 Snorlax blocking Cycling Road can now be awakened using the Azure Flute obtained from Pokémon Tower.
   - `celadon-cycling-road-caution` (*The Path South*): A repeatable task under Celadon City unlocked after clearing the Route 16 Snorlax. The player notes that although Route 16 is clear, Cycling Road beyond harbors Team Rocket outposts and hostile bikers; the safest, most discreet path south to Fuchsia City is eastward through Lavender Town and down Silence Bridge (Route 12).
 
-Current role in flow: Route 8 and Celadon City feature rich progression leading into the post-timeline divergence story arc, including the Celadon poison dead drop, the Route 16 Snorlax awakening via the Azure Flute, and narrative guidance directing the player safely toward Silence Bridge (Route 12) to reach Fuchsia City.
+Current role in flow: Route 8 and Celadon City feature rich progression leading into the post-timeline divergence story arc, including intercepting Team Rocket's arranged neurotoxin delivery in Celadon, the Route 16 Snorlax awakening via the Azure Flute, and narrative guidance directing the player safely toward Silence Bridge (Route 12) to reach Fuchsia City.
 
 ## Known Future Gates
 
