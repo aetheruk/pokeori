@@ -410,13 +410,16 @@ describe('blackout void chronicles and time divergence', () => {
     )
 
     expect(celadonCaution).toBeDefined()
-    expect(celadonCaution?.repeatable).toBe(true)
+    expect(celadonCaution?.name).toBe('The Path South')
+    expect(celadonCaution?.description).toBe(
+      "I think I'm going to head to Fuchsia via Lavender Town to avoid the Rocket Factory for now.",
+    )
+    expect(celadonCaution?.icon).toEqual({ type: 'pokemon', id: '143' })
     expect(celadonCaution?.subCategory).toBe('Celadon City')
     expect(celadonCaution?.requirements).toContainEqual(
       expect.objectContaining({
-        type: 'battle_result',
-        targetId: 'route-16-furious-snorlax',
-        battleStatus: 'win',
+        type: 'location_encounter_result',
+        targetId: 'route-16-dazed-snorlax',
       }),
     )
   })

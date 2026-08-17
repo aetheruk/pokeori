@@ -2013,73 +2013,26 @@ export const celadonCityTasks: Task[] = [
   {
     "id": "celadon-cycling-road-caution",
     "name": "The Path South",
-    "description": "Consider the safest route south to Fuchsia City after clearing the Route 16 Snorlax.",
+    "description": "I think I'm going to head to Fuchsia via Lavender Town to avoid the Rocket Factory for now.",
     "category": "Kanto",
     "subCategory": "Celadon City",
     "background": "/backgrounds/celadon.avif",
     "icon": {
-      "type": "trainer",
-      "id": "rocket"
+      "type": "pokemon",
+      "id": "143"
     },
-    "repeatable": true,
+    "repeatable": false,
     "secret": false,
-    "completionTrigger": "manual",
-    "chat": true,
-    "completeButtonText": "Head for Lavender",
+    "completionTrigger": "auto",
+    "completeButtonText": "Understood",
     "requirements": [
       {
-        "type": "battle_result",
-        "targetId": "route-16-furious-snorlax",
-        "battleStatus": "win",
+        "type": "location_encounter_result",
+        "targetId": "route-16-dazed-snorlax",
         "count": 1
       }
     ],
     "criteria": [],
-    "rewards": [],
-    "enterModal": [
-      {
-        "id": 1,
-        "title": "{trainer}",
-        "message": "With the sleeping Snorlax moved, Route 16 is open to the west. However, Cycling Road beyond is known to harbor Team Rocket outposts and hostile biker gangs that could jeopardize your mission.",
-        "background": "/backgrounds/celadon.avif",
-        "icon": {
-          "type": "trainer",
-          "id": "rocket"
-        },
-        "buttons": [
-          {
-            "text": "Plan the Route",
-            "type": "navigate",
-            "id": 2
-          }
-        ]
-      },
-      {
-        "id": 2,
-        "title": "{trainer}",
-        "message": "The safest, most discreet path south to Fuchsia City is eastward through Lavender Town and down Silence Bridge (Route 12), bypassing the Rocket strongholds on Cycling Road entirely.",
-        "background": "/backgrounds/celadon.avif",
-        "icon": {
-          "type": "trainer",
-          "id": "rocket"
-        },
-        "buttons": [
-          {
-            "text": "Choose Lavender Path",
-            "type": "success"
-          }
-        ]
-      }
-    ],
-    "exitModal": {
-      "background": "/backgrounds/celadon.avif",
-      "title": "Silence Bridge Route",
-      "icon": {
-        "type": "trainer",
-        "id": "rocket"
-      },
-      "message": "You decide to avoid the dangerous Rocket facilities on Cycling Road and travel south via Lavender Town instead.",
-      "closeButtonText": "Understood"
-    }
+    "rewards": []
   }
 ]

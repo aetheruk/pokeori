@@ -103,8 +103,7 @@ export const pokemonTowerTasks: Task[] = [
   {
     id: 'pkmn-tower-channeling-1',
     name: 'A Mysterious Girl',
-    description:
-      'A girl in the tower says a remembered voice may reach where I cannot.',
+    description: 'A girl in the tower says a remembered voice may reach where I cannot.',
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     icon: {
@@ -177,7 +176,7 @@ export const pokemonTowerTasks: Task[] = [
         id: 3,
         title: 'Mysterious Girl',
         message:
-          "Not clearly. They are more like echoes caught in people, places, and treasured objects. With the right ritual, a Pokémon can give one of those echoes enough shape to be understood.",
+          'Not clearly. They are more like echoes caught in people, places, and treasured objects. With the right ritual, a Pokémon can give one of those echoes enough shape to be understood.',
         buttons: [
           {
             text: 'Only a Psychic Pokémon?',
@@ -195,7 +194,7 @@ export const pokemonTowerTasks: Task[] = [
         id: 4,
         title: 'Mysterious Girl',
         message:
-          "Every Pokémon can channel. Psychic types often sense an echo more easily, but affinity matters more than a single rule. Some memories favour a certain type, and a rare few will answer only to one particular kind of Pokémon.",
+          'Every Pokémon can channel. Psychic types often sense an echo more easily, but affinity matters more than a single rule. Some memories favour a certain type, and a rare few will answer only to one particular kind of Pokémon.',
         buttons: [
           {
             text: 'So I need the right partner.',
@@ -213,7 +212,7 @@ export const pokemonTowerTasks: Task[] = [
         id: 5,
         title: 'Mysterious Girl',
         message:
-          "Yes, and enough experience to hold the connection steady. First we need a vessel for the incense. Bring me 15 pieces of Soft Clay and 5 Dried Purple Dye, and I will show you the rest.",
+          'Yes, and enough experience to hold the connection steady. First we need a vessel for the incense. Bring me 15 pieces of Soft Clay and 5 Dried Purple Dye, and I will show you the rest.',
         buttons: [
           {
             text: "I'll get them.",
@@ -231,8 +230,7 @@ export const pokemonTowerTasks: Task[] = [
   {
     id: 'pkmn-tower-channeling-2',
     name: 'Spooky Sundries',
-    description:
-      'The clay and dye are ready. It is time to learn the full channeling ritual.',
+    description: 'The clay and dye are ready. It is time to learn the full channeling ritual.',
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     icon: {
@@ -296,7 +294,7 @@ export const pokemonTowerTasks: Task[] = [
         id: 1,
         title: 'Mysterious Girl',
         message:
-          "You found everything. The clay will hold the incense safely, and the dye will make its smoke visible while it gathers around a memory.",
+          'You found everything. The clay will hold the incense safely, and the dye will make its smoke visible while it gathers around a memory.',
         buttons: [
           {
             text: 'And the book?',
@@ -314,7 +312,7 @@ export const pokemonTowerTasks: Task[] = [
         id: 2,
         title: 'Mysterious Girl',
         message:
-          "The Book of Channeling records the ritual. Keep it close. It will help you recognise mementos and prepare incense, offerings, and a suitable Pokémon partner.",
+          'The Book of Channeling records the ritual. Keep it close. It will help you recognise mementos and prepare incense, offerings, and a suitable Pokémon partner.',
         buttons: [
           {
             text: 'Start with the memento?',
@@ -332,7 +330,7 @@ export const pokemonTowerTasks: Task[] = [
         id: 3,
         title: 'Mysterious Girl',
         message:
-          "Exactly. A memento gives the memory somewhere to gather. Mr. Fuji wore those spare glasses for years, so they should still carry an echo of what mattered to him.",
+          'Exactly. A memento gives the memory somewhere to gather. Mr. Fuji wore those spare glasses for years, so they should still carry an echo of what mattered to him.',
         buttons: [
           {
             text: 'What does the offering do?',
@@ -350,7 +348,7 @@ export const pokemonTowerTasks: Task[] = [
         id: 4,
         title: 'Mysterious Girl',
         message:
-          "Materials and Gems give the echo energy. Its nature and amount must suit the memory. Watch how the smoke responds: it will tell you when an offering is foreign, too weak, or overwhelming.",
+          'Materials and Gems give the echo energy. Its nature and amount must suit the memory. Watch how the smoke responds: it will tell you when an offering is foreign, too weak, or overwhelming.',
         buttons: [
           {
             text: 'Then I choose a channeler?',
@@ -386,7 +384,7 @@ export const pokemonTowerTasks: Task[] = [
         id: 6,
         title: 'Mysterious Girl',
         message:
-          "Use a partner at level 5 or higher. Any Pokémon can succeed, but a Psychic type would be the most suitable for a first attempt. Keep the connection gentle, {Trainer}.",
+          'Use a partner at level 5 or higher. Any Pokémon can succeed, but a Psychic type would be the most suitable for a first attempt. Keep the connection gentle, {Trainer}.',
         buttons: [
           {
             text: 'I never told you my name...',
@@ -458,8 +456,7 @@ export const pokemonTowerTasks: Task[] = [
   {
     id: 'fuji-chronicle-pokemon-house',
     name: 'The Evening Meal',
-    description:
-      'Mr. Fuji prepares dinner for the Pokemon at the orphanage.',
+    description: 'Mr. Fuji prepares dinner for the Pokemon at the orphanage.',
     category: 'Secret',
     subCategory: 'Pokemon Tower',
     icon: {
@@ -564,8 +561,7 @@ export const pokemonTowerTasks: Task[] = [
       {
         id: 2,
         title: 'Mr. Fuji',
-        message:
-          "Okay okay, we'll go investigate. Please just stop the tapping at the window.",
+        message: "Okay okay, we'll go investigate. Please just stop the tapping at the window.",
         buttons: [
           {
             text: 'Call Kita',
@@ -891,8 +887,7 @@ export const pokemonTowerTasks: Task[] = [
       {
         id: 2,
         title: 'Ariana',
-        message:
-          "Fuji. Dear me, that's no way to greet an old friend now is it?",
+        message: "Fuji. Dear me, that's no way to greet an old friend now is it?",
         buttons: [
           {
             text: 'Listen',
@@ -1023,7 +1018,7 @@ export const pokemonTowerTasks: Task[] = [
         id: 2,
         title: 'Pokemon Tower',
         message:
-          "Arbok lunges forward and sinks its fangs into Kita. Fuji shouts before he can reach them.",
+          'Arbok lunges forward and sinks its fangs into Kita. Fuji shouts before he can reach them.',
         buttons: [
           {
             text: 'Wait',
@@ -1215,7 +1210,8 @@ export const pokemonTowerTasks: Task[] = [
   {
     id: 'pokemon-tower-return-with-choo',
     name: 'An Echo in the Mist',
-    description: 'Return to Pokemon Tower in Lavender Town alongside Detective Ray Choo to investigate the summit.',
+    description:
+      'Return to Pokemon Tower in Lavender Town alongside Detective Ray Choo to investigate the summit.',
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     icon: {
@@ -1247,7 +1243,8 @@ export const pokemonTowerTasks: Task[] = [
       {
         id: 1,
         title: 'Detective Ray Choo',
-        message: 'Here we are, {trainer}. Pokemon Tower. The air feels heavy, but quiet... Tell me again, what are we looking for up there?',
+        message:
+          'Here we are, {trainer}. Pokemon Tower. The air feels heavy, but quiet... Tell me again, what are we looking for up there?',
         background: '/backgrounds/pkmn-tower.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Step Forward', type: 'navigate', id: 2 }],
@@ -1255,7 +1252,8 @@ export const pokemonTowerTasks: Task[] = [
       {
         id: 2,
         title: '{trainer}',
-        message: 'You step into the candlelit mist of the entrance hall, closing your eyes and calling into the stillness: "Kita...!"',
+        message:
+          'You step into the candlelit mist of the entrance hall, closing your eyes and calling into the stillness: "Kita...!"',
         background: '/backgrounds/pkmn-tower.avif',
         icon: { type: 'pokemon', id: '105' },
         buttons: [{ text: 'Feel the Spirit', type: 'navigate', id: 3 }],
@@ -1263,7 +1261,8 @@ export const pokemonTowerTasks: Task[] = [
       {
         id: 3,
         title: 'Detective Ray Choo',
-        message: 'Did you feel that? The whole room dropped ten degrees, and the mist parted toward the stairs. Something is guiding us upward. Stay close to Arcanine!',
+        message:
+          'Did you feel that? The whole room dropped ten degrees, and the mist parted toward the stairs. Something is guiding us upward. Stay close to Arcanine!',
         background: '/backgrounds/pkmn-tower.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Enter the Tower', type: 'success' }],
@@ -1273,14 +1272,16 @@ export const pokemonTowerTasks: Task[] = [
       background: '/backgrounds/pkmn-tower.avif',
       title: 'A Guiding Presence',
       icon: { type: 'pokemon', id: '105' },
-      message: 'Kita’s spiritual resonance echoes through the tower floors, clearing a path toward the summit.',
+      message:
+        'Kita’s spiritual resonance echoes through the tower floors, clearing a path toward the summit.',
       closeButtonText: 'Climb Upward',
     },
   },
   {
     id: 'pokemon-tower-clearing-the-floors',
     name: 'Ascending Through the Mist',
-    description: 'Break through the lingering shadow Pokémon in the upper corridors to reach the summit.',
+    description:
+      'Break through the lingering shadow Pokémon in the upper corridors to reach the summit.',
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     icon: {
@@ -1318,7 +1319,8 @@ export const pokemonTowerTasks: Task[] = [
       {
         id: 1,
         title: 'Detective Ray Choo',
-        message: 'Arcanine’s flames cut through the thick shadow haze. Look ahead, the dark apparitions are scattering into the walls. The summit door is right in front of us!',
+        message:
+          'Arcanine’s flames cut through the thick shadow haze. Look ahead, the dark apparitions are scattering into the walls. The summit door is right in front of us!',
         background: '/backgrounds/pkmn-tower.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Push Open Door', type: 'navigate', id: 2 }],
@@ -1326,7 +1328,8 @@ export const pokemonTowerTasks: Task[] = [
       {
         id: 2,
         title: 'Pokemon Tower Summit',
-        message: 'The heavy wooden doors swing open. A cold, ghostly wind howls across the highest floor, where eerie violet flames dance in the pale moonlight.',
+        message:
+          'The heavy wooden doors swing open. A cold, ghostly wind howls across the highest floor, where eerie violet flames dance in the pale moonlight.',
         background: '/backgrounds/pkmn-tower.avif',
         icon: { type: 'pokemon', id: '105' },
         buttons: [{ text: 'Step Forward', type: 'success' }],
@@ -1336,7 +1339,8 @@ export const pokemonTowerTasks: Task[] = [
   {
     id: 'pokemon-tower-calming-kita',
     name: 'The Spectral Flame',
-    description: 'Confront the grief-stricken spirit of Kita, reborn with ghostly flame at the summit.',
+    description:
+      'Confront the grief-stricken spirit of Kita, reborn with ghostly flame at the summit.',
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     icon: {
@@ -1368,7 +1372,8 @@ export const pokemonTowerTasks: Task[] = [
       {
         id: 1,
         title: 'Detective Ray Choo',
-        message: 'Look there... in the center of the floor where Fuji was taken! Those spectral green and violet flames... Is that... Marowak?!',
+        message:
+          'Look there... in the center of the floor where Fuji was taken! Those spectral green and violet flames... Is that... Marowak?!',
         background: '/backgrounds/pkmn-tower.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Look Closely', type: 'navigate', id: 2 }],
@@ -1376,7 +1381,8 @@ export const pokemonTowerTasks: Task[] = [
       {
         id: 2,
         title: '{trainer}',
-        message: 'You step onto the floorboards. The figure turns. It is Kita, but transformed, her bone club burning with otherworldly spirit fire, and her dark eyes glinting with raw sorrow and rage. Having never met you, and consumed by grief and loss, she sees only intruders before her.',
+        message:
+          'You step onto the floorboards. The figure turns. It is Kita, but transformed, her bone club burning with otherworldly spirit fire, and her dark eyes glinting with raw sorrow and rage. Having never met you, and consumed by grief and loss, she sees only intruders before her.',
         background: '/backgrounds/pkmn-tower.avif',
         icon: { type: 'pokemon', id: '105' },
         buttons: [{ text: 'Listen to Ray', type: 'navigate', id: 3 }],
@@ -1384,7 +1390,8 @@ export const pokemonTowerTasks: Task[] = [
       {
         id: 3,
         title: 'Detective Ray Choo',
-        message: 'Her spirit was transformed by grief and death into an Alolan Marowak! Words won’t break through that spectral tempest, {trainer}. We need to battle her and quell the rage burning in her heart!',
+        message:
+          'Her spirit was transformed by grief and death into an Alolan Marowak! Words won’t break through that spectral tempest, {trainer}. We need to battle her and quell the rage burning in her heart!',
         background: '/backgrounds/pkmn-tower.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Face Kita in Battle', type: 'success' }],
@@ -1394,7 +1401,8 @@ export const pokemonTowerTasks: Task[] = [
       background: '/backgrounds/pkmn-tower.avif',
       title: 'Challenge Kita',
       icon: { type: 'pokemon', id: '105' },
-      message: 'Challenge Kita at the summit to quell the spectral fire and bring peace to her spirit.',
+      message:
+        'Challenge Kita at the summit to quell the spectral fire and bring peace to her spirit.',
       closeButtonText: 'Enter Battle',
     },
   },
@@ -1435,7 +1443,8 @@ export const pokemonTowerTasks: Task[] = [
       {
         id: 1,
         title: 'Detective Ray Choo',
-        message: 'The spectral flames... they’re subsiding. Look at her eyes, {trainer}. The tempest has passed.',
+        message:
+          'The spectral flames... they’re subsiding. Look at her eyes, {trainer}. The tempest has passed.',
         background: '/backgrounds/pkmn-tower.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Approach Kita', type: 'navigate', id: 2 }],
@@ -1443,7 +1452,8 @@ export const pokemonTowerTasks: Task[] = [
       {
         id: 2,
         title: 'Kita',
-        message: 'Kita lowers her bone club as the green flames settle into a warm, gentle light. She looks into your eyes, giving a slow, peaceful nod of gratitude before dissolving into shimmering stardust.',
+        message:
+          'Kita lowers her bone club as the green flames settle into a warm, gentle light. She looks into your eyes, giving a slow, peaceful nod of gratitude before dissolving into shimmering stardust.',
         background: '/backgrounds/pkmn-tower.avif',
         icon: { type: 'pokemon', id: '105' },
         buttons: [{ text: 'Watch Her Rest', type: 'navigate', id: 3 }],
@@ -1451,7 +1461,8 @@ export const pokemonTowerTasks: Task[] = [
       {
         id: 3,
         title: 'Detective Ray Choo',
-        message: 'She’s finally at peace... Her spirit is free. But look, there on the stone where she was standing, something was left behind.',
+        message:
+          'She’s finally at peace... Her spirit is free. But look, there on the stone where she was standing, something was left behind.',
         background: '/backgrounds/pkmn-tower.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Examine the Floor', type: 'success' }],
@@ -1461,7 +1472,8 @@ export const pokemonTowerTasks: Task[] = [
       background: '/backgrounds/pkmn-tower.avif',
       title: 'A Spirit at Rest',
       icon: { type: 'pokemon', id: '105' },
-      message: 'Kita’s spirit has found peace and departed the tower, leaving behind a tranquil silence.',
+      message:
+        'Kita’s spirit has found peace and departed the tower, leaving behind a tranquil silence.',
       closeButtonText: 'Look Closer',
     },
   },
@@ -1506,7 +1518,8 @@ export const pokemonTowerTasks: Task[] = [
       {
         id: 1,
         title: 'Note Addressed to {trainer}',
-        message: '"For the one whose spirit defied the natural order, please take this gift. Its melody is enough to wake anything from the deepest of slumbers."',
+        message:
+          '"For the one whose spirit defied the natural order, please take this gift. Its melody is enough to wake anything from the deepest of slumbers."',
         background: '/backgrounds/pkmn-tower.avif',
         icon: { type: 'item', id: 'azure-flute' },
         buttons: [{ text: 'Ray’s Realization', type: 'navigate', id: 2 }],
@@ -1514,7 +1527,8 @@ export const pokemonTowerTasks: Task[] = [
       {
         id: 2,
         title: 'Detective Ray Choo',
-        message: 'An Azure Flute... It hums with pure cosmic energy. The sleeping Snorlax blocking Route 12 and 16, this flute will wake them right up! Take it, {trainer}. Head south to Fuchsia City and find Master Koga. Let’s make Team Rocket pay for every inch of Kanto.',
+        message:
+          'What a strange instrument... Good news for us though. This happens to be exactly what we need to get past that Snorlax blocking the way south! Hopefully Koga can help us with our poison predicament!',
         background: '/backgrounds/pkmn-tower.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Take the Flute', type: 'success' }],
@@ -1524,7 +1538,8 @@ export const pokemonTowerTasks: Task[] = [
       background: '/backgrounds/pkmn-tower.avif',
       title: 'The Azure Flute',
       icon: { type: 'item', id: 'azure-flute' },
-      message: 'You obtained the Azure Flute! Its celestial tone can awaken the sleeping Snorlax blocking Route 12 and Route 16, opening the path to Fuchsia City.',
+      message:
+        'You obtained the Azure Flute! Its celestial tone can awaken the sleeping Snorlax blocking Route 12 and Route 16, opening the path to Fuchsia City.',
       closeButtonText: 'Prepare for the South',
     },
   },
@@ -1532,7 +1547,8 @@ export const pokemonTowerTasks: Task[] = [
   {
     id: 'pokemon-tower-gastly-spiritual-study',
     name: 'Gaseous Resonance',
-    description: 'Analyze the fluctuating gaseous density of Gastly drifting through the lower tower.',
+    description:
+      'Analyze the fluctuating gaseous density of Gastly drifting through the lower tower.',
     category: 'Kanto',
     subCategory: 'Pokemon Tower',
     icon: { type: 'pokemon', id: '92' },
@@ -1561,7 +1577,8 @@ export const pokemonTowerTasks: Task[] = [
       background: '/backgrounds/pkmn-tower.avif',
       title: 'Gaseous Resonance',
       icon: { type: 'pokemon', id: '92' },
-      message: 'You recorded detailed density spectral readings from the Gastly drifting through the lower tower incense.',
+      message:
+        'You recorded detailed density spectral readings from the Gastly drifting through the lower tower incense.',
       closeButtonText: 'Record Notes',
     },
   },
@@ -1597,7 +1614,8 @@ export const pokemonTowerTasks: Task[] = [
       background: '/backgrounds/pkmn-tower.avif',
       title: 'Shadow Projection',
       icon: { type: 'pokemon', id: '93' },
-      message: 'You documented how Haunter manipulates light and spiritual shadows across the upper stone columns.',
+      message:
+        'You documented how Haunter manipulates light and spiritual shadows across the upper stone columns.',
       closeButtonText: 'Record Notes',
     },
   },
@@ -1633,7 +1651,8 @@ export const pokemonTowerTasks: Task[] = [
       background: '/backgrounds/pkmn-tower.avif',
       title: 'The Whispering Skull',
       icon: { type: 'pokemon', id: '104' },
-      message: 'You documented the acoustic resonance of Cubone tapping their bones in rhythm with the tower bells.',
+      message:
+        'You documented the acoustic resonance of Cubone tapping their bones in rhythm with the tower bells.',
       closeButtonText: 'Record Notes',
     },
   },
@@ -1669,7 +1688,8 @@ export const pokemonTowerTasks: Task[] = [
       background: '/backgrounds/pkmn-tower.avif',
       title: 'The Purified Circle',
       icon: { type: 'pokemon', id: '105' },
-      message: 'The holy circle pulses with residual protective energy, resonating deeply with Kita’s enduring spirit.',
+      message:
+        'The holy circle pulses with residual protective energy, resonating deeply with Kita’s enduring spirit.',
       closeButtonText: 'Record Notes',
     },
   },

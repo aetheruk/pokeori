@@ -1,5 +1,8 @@
 # Current Game State
 
+- Release `0.13.34` tunes the Celadon post-Snorlax guidance narrative:
+  - **The Path South (`celadon-cycling-road-caution`)**: Updated unlock requirement to trigger after catching/clearing the Dazed Snorlax (`route-16-dazed-snorlax`) rather than immediately on battle victory. Uses Snorlax icon (`143`) and simplified uncompletable overview description: *"I think I'm going to head to Fuchsia via Lavender Town to avoid the Rocket Factory for now."*
+  - **Dialogue Polish**: Refined Detective Ray Choo's Azure Flute debrief dialogue on Pokémon Tower summit.
 - Release `0.13.33` polishes story takeover dialogue and text formatting:
   - **Azure Flute Note Dialogue**: Replaced explanatory text on the summit note with poetic, evocative lore (*"For the one whose spirit defied the natural order, please take this gift. Its melody is enough to wake anything from the deepest of slumbers."*).
   - **Fuji Dialogue Correction**: Removed mention of Mr. Fuji's memory in Kita's resolution dialogue since Mr. Fuji is alive.
@@ -638,7 +641,7 @@ Route 8 unlocks after `celadon-police-hq-lead`.
 - **Post-Timeline Divergence Celadon & Saffron Guidance**:
   - `saffron-avoidance-reflection` (*Steer Clear of Saffron*): A repeatable task under Saffron City after `celadon-timeline-divergence`. From the player's perspective, remembering the lethal assassination trap, they have no intention of entering Saffron City while it remains under Team Rocket quarantine.
   - `route-16-sleeping-snorlax`, `route-16-furious-snorlax`, and `route-16-dazed-snorlax`: The western Route 16 Snorlax blocking Cycling Road can now be awakened using the Azure Flute obtained from Pokémon Tower.
-  - `celadon-cycling-road-caution` (*The Path South*): A repeatable task under Celadon City unlocked after clearing the Route 16 Snorlax. The player notes that although Route 16 is clear, Cycling Road beyond harbors Team Rocket outposts and hostile bikers; the safest, most discreet path south to Fuchsia City is eastward through Lavender Town and down Silence Bridge (Route 12).
+  - `celadon-cycling-road-caution` (*The Path South*): An uncompletable task under Celadon City unlocked after resolving the Route 16 Dazed Snorlax (`route-16-dazed-snorlax`). Displays Snorlax icon and overview noting the player's decision to travel south to Fuchsia via Lavender Town and Route 12 to avoid the Rocket Factory.
 
 Current role in flow: Route 8 and Celadon City feature rich progression leading into the post-timeline divergence story arc, including intercepting Team Rocket's arranged neurotoxin delivery in Celadon, the Route 16 Snorlax awakening via the Azure Flute, and narrative guidance directing the player safely toward Silence Bridge (Route 12) to reach Fuchsia City.
 
