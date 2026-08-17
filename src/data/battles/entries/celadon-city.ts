@@ -473,4 +473,35 @@ export const celadonCityBattles: BattleConfig[] = [
     bannedPlayerTypes: ['fire', 'flying'],
     aiProfile: 'boss',
   },
+  {
+    id: 'route-16-furious-snorlax',
+    name: 'Furious Snorlax',
+    description: 'The woken Snorlax is furious and blocking Route 16.',
+    category: 'Kanto',
+    subCategory: 'Celadon City',
+    icon: {
+      type: 'pokemon',
+      id: '143',
+    },
+    background: '/backgrounds/grassy-route.avif',
+    requirements: [
+      {
+        type: 'battle_result',
+        targetId: 'route-16-furious-snorlax',
+        battleStatus: 'win',
+        count: 1,
+        inverse: true,
+      },
+      {
+        type: 'task_completed',
+        targetId: 'route-16-sleeping-snorlax',
+      },
+    ],
+    isWildBattle: true,
+    enemyAttackTelegraphChance: 2,
+    enemyTeam: [{ speciesId: 143, formId: '143', level: 30 }],
+    rewards: [],
+    maxPokemon: 1,
+    levelCap: 30,
+  },
 ]

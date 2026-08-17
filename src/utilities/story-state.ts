@@ -10,7 +10,7 @@
  */
 
 export const SAFFRON_GYM_AMBUSH_TASK_ID = 'saffron-gym-ambush'
-export const SAFFRON_ESCAPE_COMPLETE_TASK_ID = 'saffron-escape-complete'
+export const SAFFRON_ESCAPE_COMPLETE_TASK_ID = 'celadon-timeline-divergence'
 export const STRUGGLE_TASK_ID = 'struggle'
 export const A_GOLDEN_GLOW_TASK_ID = 'golden-glow'
 
@@ -27,7 +27,9 @@ export function isSaffronTakeoverActive(
 ): boolean {
   const completed = new Set((completedTasks || []).map((row) => row.taskId))
   const ambushDone = completed.has(SAFFRON_GYM_AMBUSH_TASK_ID)
-  const escapeDone = completed.has(SAFFRON_ESCAPE_COMPLETE_TASK_ID)
+  const escapeDone =
+    completed.has(SAFFRON_ESCAPE_COMPLETE_TASK_ID) ||
+    completed.has('saffron-escape-complete')
   return ambushDone && !escapeDone
 }
 

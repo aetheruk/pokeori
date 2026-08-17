@@ -121,4 +121,181 @@ export const pokemonTowerLocations: Location[] = [
     ],
     rewards: [],
   },
+  {
+    id: 'pokemon-tower-3f',
+    name: 'Pokemon Tower 3F',
+    description: 'Ghostly vapors linger over the stone markers on the third floor.',
+    category: 'Kanto',
+    subCategory: 'Pokemon Tower',
+    icon: {
+      type: 'pokemon',
+      id: '92',
+    },
+    background: '/backgrounds/pkmn-tower.avif',
+    timer: 20,
+    shinyChanceModifier: 1,
+    catchRateModifier: 1,
+    keyEncounter: false,
+    levelRange: {
+      min: 20,
+      max: 22,
+    },
+    requirements: [
+      {
+        type: 'task_completed',
+        targetId: 'pokemon-tower-return-with-choo',
+      },
+    ],
+    encounters: [
+      {
+        speciesId: 92,
+        formId: '92',
+        chance: 90,
+      },
+      {
+        speciesId: 41,
+        formId: '41',
+        chance: 10,
+      },
+    ],
+    rewards: [],
+  },
+  {
+    id: 'pokemon-tower-4f',
+    name: 'Pokemon Tower 4F',
+    description: 'Incense burns beside memorial chambers where young Pokemon seek solace.',
+    category: 'Kanto',
+    subCategory: 'Pokemon Tower',
+    icon: {
+      type: 'pokemon',
+      id: '104',
+    },
+    background: '/backgrounds/pkmn-tower.avif',
+    timer: 20,
+    shinyChanceModifier: 1,
+    catchRateModifier: 1,
+    keyEncounter: false,
+    levelRange: {
+      min: 21,
+      max: 23,
+    },
+    requirements: [
+      {
+        type: 'battle_result',
+        targetId: 'pokemon-tower-channeler-carly',
+        battleStatus: 'win',
+        count: 1,
+      },
+    ],
+    encounters: [
+      {
+        speciesId: 92,
+        formId: '92',
+        chance: 85,
+      },
+      {
+        speciesId: 41,
+        formId: '41',
+        chance: 10,
+      },
+      {
+        speciesId: 104,
+        formId: '104',
+        chance: 5,
+      },
+    ],
+    rewards: [],
+  },
+  {
+    id: 'pokemon-tower-5f',
+    name: 'Pokemon Tower 5F',
+    description: 'A radiant magic circle cleanses the air as stronger spirits gather.',
+    category: 'Kanto',
+    subCategory: 'Pokemon Tower',
+    icon: {
+      type: 'pokemon',
+      id: '93',
+    },
+    background: '/backgrounds/pkmn-tower.avif',
+    timer: 20,
+    shinyChanceModifier: 1,
+    catchRateModifier: 1,
+    keyEncounter: false,
+    levelRange: {
+      min: 22,
+      max: 25,
+    },
+    requirements: [
+      {
+        type: 'battle_result',
+        targetId: 'pokemon-tower-channeler-paula',
+        battleStatus: 'win',
+        count: 1,
+      },
+    ],
+    encounters: [
+      {
+        speciesId: 92,
+        formId: '92',
+        chance: 75,
+      },
+      {
+        speciesId: 93,
+        formId: '93',
+        chance: 15,
+      },
+      {
+        speciesId: 104,
+        formId: '104',
+        chance: 10,
+      },
+    ],
+    rewards: [],
+  },
+  {
+    id: 'pokemon-tower-6f',
+    name: 'Pokemon Tower 6F',
+    description: 'The high floors echo with profound spiritual stillness.',
+    category: 'Kanto',
+    subCategory: 'Pokemon Tower',
+    icon: {
+      type: 'pokemon',
+      id: '93',
+    },
+    background: '/backgrounds/pkmn-tower.avif',
+    timer: 20,
+    shinyChanceModifier: 1,
+    catchRateModifier: 1,
+    keyEncounter: false,
+    levelRange: {
+      min: 23,
+      max: 26,
+    },
+    requirements: [
+      {
+        type: 'battle_result',
+        targetId: 'pokemon-tower-channeler-janae',
+        battleStatus: 'win',
+        count: 1,
+      },
+    ],
+    encounters: [
+      {
+        speciesId: 92,
+        formId: '92',
+        chance: 65,
+      },
+      {
+        speciesId: 93,
+        formId: '93',
+        chance: 20,
+      },
+      {
+        speciesId: 104,
+        formId: '104',
+        chance: 15,
+      },
+    ],
+    rewards: [],
+  },
 ]

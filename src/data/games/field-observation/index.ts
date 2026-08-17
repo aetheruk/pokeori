@@ -13,6 +13,7 @@ import { diglettsCaveFieldObservationEntries } from './entries/digletts-cave'
 import { route10FieldObservationEntries } from './entries/route-10'
 import { rockTunnelFieldObservationEntries } from './entries/rock-tunnel'
 import { lavenderTownFieldObservationEntries } from './entries/lavender-town'
+import { pokemonTowerFieldObservationEntries } from './entries/pokemon-tower'
 import { celadonCityFieldObservationEntries } from './entries/celadon-city'
 
 export const fieldObservationGames: FieldObservationConfig[] = [
@@ -27,5 +28,6 @@ export const fieldObservationGames: FieldObservationConfig[] = [
   ...route10FieldObservationEntries,
   ...rockTunnelFieldObservationEntries,
   ...lavenderTownFieldObservationEntries,
+  ...pokemonTowerFieldObservationEntries,
   ...celadonCityFieldObservationEntries,
 ].map(withDefaultFieldObservationRewards)

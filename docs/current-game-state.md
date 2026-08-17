@@ -578,8 +578,31 @@ Pokemon Tower unlocks from Lavender Town after `lavender-missing-mountain`.
 - Spirit Channeling offering slots now require distinct item IDs; players should increase one offering's quantity rather than placing the same item in multiple slots, and both the picker and server enforce this rule.
 - `mr-fuji-pokemon-tower-chronicle` appears under Explore Chronicles after `fuji-glasses-memory-revealed`. It is a one-time Chronicle played as Mr. Fuji that rewards 800 Explorer XP through the canonical `catching` skill ID, using an authored Kita Marowak/Yari Poliwag/Aino Weedle/Okuho Lickitung party, three Sitrus held berries, Potion/Super Potion battle inventory, and a small ball inventory. The Chronicle is a linear memory: the Book of Channeling opens the memory, Fuji prepares dinner at Pokemon House, a two-berry rhythm game handles berry crushing, a green flash and metallic screech draw Fuji and Kita toward Pokemon Tower, explicit modal tasks cover the Gastly torrent and first Rocket confrontation, a panicked Gastly encounter warns them about humans and a machine, Team Rocket fights block the first floor and three cable-lined floors, Ariana reveals the Shadow Pokemon work, and the final scripted strike ends the memory as Arbok injures Kita and knocks Fuji down. Chronicle battles and catches suppress normal rewards and capture progress. Ariana is registered as a special trainer sprite from `/sprites/trainers/special/ariana.avif`.
 - Completing the Mr. Fuji Chronicle unlocks a branch-specific `Realisation` chat based on the Nugget Bridge Team Rocket choice. Both versions feed into `lavender-fuji-memory-debrief`, then the shared `celadon-police-hq-lead` chat points the player toward Celadon Police HQ as the next story handoff. The authored Celadon City `police-hq` follow-up uses the Policeman trainer sprite and the dedicated `/backgrounds/police-hq.avif` police-station interior; the player reports the Tower incident, but the officer dismisses it for lack of verifiable evidence.
+- **Pokemon Tower Dungeon Loop (Return with Detective Choo)**: After the Saffron blackout resolution and Celebi timeline divergence (`celadon-timeline-divergence`), `pokemon-tower-return-with-choo` unlocks the multi-floor dungeon progression loop across floors 3F to 7F:
+  - **Floor Catch Locations & Wild Battles**:
+    - **3F**: `pokemon-tower-3f` catch spot and `pokemon-tower-3f-wild` (Gastly, Zubat).
+    - **4F**: `pokemon-tower-4f` catch spot and `pokemon-tower-4f-wild` (Gastly, Zubat, Cubone).
+    - **5F**: `pokemon-tower-5f` catch spot and `pokemon-tower-5f-wild` (Gastly, Haunter, Cubone).
+    - **6F**: `pokemon-tower-6f` catch spot and `pokemon-tower-6f-wild` (Gastly, Haunter, Cubone).
+  - **FireRed Trainer Gauntlet**:
+    - **3F Channelers**: Channeler Hope (Gastly Lv. 22), Channeler Patricia (Gastly Lv. 22), Channeler Carly (Gastly Lv. 24).
+    - **4F Channelers**: Channeler Laurel (Gastly Lv. 23 x2), Channeler Jody (Gastly Lv. 22), Channeler Paula (Gastly Lv. 24).
+    - **5F Channelers**: Channeler Ruth (Gastly Lv. 22), Channeler Tammy (Haunter Lv. 23), Channeler Karina (Gastly Lv. 24), Channeler Janae (Gastly Lv. 22).
+    - **6F Channelers**: Channeler Angelica (Gastly Lv. 22 x3), Channeler Jennifer (Gastly Lv. 24), Channeler Emilia (Gastly Lv. 24).
+    - **Upper Floors Shadow Gauntlet**:
+      - `pokemon-tower-shadow-surge-1`: Shadow Gastly (Lv. 26), Shadow Raticate (Lv. 26).
+      - `pokemon-tower-shadow-surge-2`: Shadow Pidgeotto (Lv. 27), Shadow Gastly (Lv. 27).
+      - `pokemon-tower-shadow-surge-3`: Shadow Haunter (Lv. 28), Shadow Raticate (Lv. 28), Shadow Pidgeotto (Lv. 28).
+  - **Field Observation & Research XP Studies**:
+    - Field Observation studies are authored for 3F, 4F, 5F, and 6F (`pokemon-tower-3f-field-observation` through `pokemon-tower-6f-field-observation`).
+    - 4 automated Research XP tasks award Pokemon Research XP upon completing Field Observation studies:
+      - `pokemon-tower-gastly-spiritual-study` (Gaseous Resonance): 30 Gastly Research XP (3F).
+      - `pokemon-tower-cubone-memorial-study` (The Whispering Skull): 30 Cubone Research XP (4F).
+      - `pokemon-tower-haunter-shadow-study` (Shadow Projection): 30 Haunter Research XP (5F).
+      - `pokemon-tower-purification-circle-study` (The Purified Circle): 30 Marowak Research XP (6F).
+  - **Summit Boss & Resolution**: Defeating the Shadow Gauntlet unlocks `pokemon-tower-clearing-the-floors` and `pokemon-tower-calming-kita` (*The Spectral Flame*). Players face Kita, reborn in spectral fire as an Alolan Marowak (`pokemon-tower-kita-boss`, Level 40, 2-Pokemon team limit, Level Cap 40). Quelling her rage calms her spirit and leads into `pokemon-tower-summit-azure-flute`, where `{trainer}` and Detective Choo find the Note and claim the **Azure Flute** to awaken the Snorlax on Routes 12 & 16.
 
-Current role in flow: Pokemon Tower now reaches the Spirit Channeling tutorial, turns Fuji's Glasses into the first story memento, exposes a serious Mr. Fuji backstory Chronicle, and hands off toward Celadon Police HQ. Deeper main-tower progression after the Chronicle and the eventual Silph Scope resolution remain future work.
+Current role in flow: Pokemon Tower features both the early-game Spirit Channeling / Mr. Fuji Chronicle backstory and the post-timeline-divergence dungeon ascent with Detective Choo, including full FireRed Channeler trainer progression across floors 3F to 6F, an upper-floor Shadow Pokémon Gauntlet, the level 40 Alolan Marowak boss battle to calm Kita, Field Observation studies, Pokemon Research XP tasks, and the Azure Flute summit reward.
 
 ### 10. Route 8 / Celadon Approach
 
@@ -593,8 +616,12 @@ Route 8 unlocks after `celadon-police-hq-lead`.
 - Route 7 catch, wild battle, and Field Observation share a level 18-22 mixed grass pool: Pidgey, Pidgeotto, Oddish, Bellsprout, Mankey, Growlithe, Vulpix, and Abra. The wild battle has player level cap 30 and the Study uses the standard 12-second Field Observation timing. Successful Route 7 Field Observation has independent 10% chances to reveal the hidden `route-7-growlithe-study` and `route-7-vulpix-study` tasks; each requires that species to have been caught and awards 30 matching Pokemon Research XP. Route 7 has no authored route trainer roster.
 - `thirstier-work-route-7` is a repeatable daily Celadon guard task that appears after `underground-path-route-8`, consumes one Soda Pop, and rewards two Great Balls.
 - `explore-celadon-city` unlocks after `underground-path-route-8` and requires 3 Route 7 wild battle wins, 3 Route 7 catches, and 1 successful Route 7 Field Observation before entering Celadon City.
+- **Post-Timeline Divergence Celadon & Saffron Guidance**:
+  - `saffron-avoidance-reflection` (*Steer Clear of Saffron*): A repeatable task under Saffron City after `celadon-timeline-divergence`. From the player's perspective, remembering the lethal assassination trap, they have no intention of entering Saffron City while it remains under Team Rocket quarantine.
+  - `route-16-sleeping-snorlax`, `route-16-furious-snorlax`, and `route-16-dazed-snorlax`: The western Route 16 Snorlax blocking Cycling Road can now be awakened using the Azure Flute obtained from Pokémon Tower.
+  - `celadon-cycling-road-caution` (*The Path South*): A repeatable task under Celadon City unlocked after clearing the Route 16 Snorlax. The player notes that although Route 16 is clear, Cycling Road beyond harbors Team Rocket outposts and hostile bikers; the safest, most discreet path south to Fuchsia City is eastward through Lavender Town and down Silence Bridge (Route 12).
 
-Current role in flow: Route 8 is the Lavender-authored west road toward Celadon, giving the player playable catch, battle, Study, and trainer content after the Fuji memory debrief points them toward Celadon Police HQ.
+Current role in flow: Route 8 and Celadon City feature rich progression leading into the post-timeline divergence story arc, including the Celadon poison dead drop, the Route 16 Snorlax awakening via the Azure Flute, and narrative guidance directing the player safely toward Silence Bridge (Route 12) to reach Fuchsia City.
 
 ## Known Future Gates
 
@@ -669,4 +696,13 @@ Celadon Police HQ now leads into `leaving-police-hq`, a one-time Rocket Grunt am
 - `battle-bets` is a free High Stakes Room unlock task after `high-roller`. Starting the mini-game costs nothing: it independently builds three-Pokemon all-Shadow Rocket Grunt F and Rocket Grunt M teams using the VS Seeker rules, then prices the matchup from 200 headless shared-engine simulations with a 5% house edge. Odds are shown as decimal returns such as `1:1.31`. Backing a team opens a stake dialog for any whole Fun Token amount from 1 through the trainer's current balance; placing the bet deducts that stake once, and a win returns `floor(stake × odds)` including the original stake while a loss returns zero. The backed trainer is oriented as the player side so their team always occupies the lower battle HUD and only a player-side battle win can pay. Each initialization contains exactly one battle with no rollover or virtual pot. The full AI-vs-AI battle uses the Celadon Game Corner arcade background with the standard battle scene and animation queue, followed by the shared result screen with Return to Explore and Play Again; wins show the gross Fun Token return in the standard Rewards section. A settled match records exactly one normal mini-game win or loss for stats and daily progress, while headless combat still suppresses Pokemon XP, KO, friendship, and held-item persistence.
 - The Celadon Mansion branch now uses the dedicated `celadon-mansion-lounge.avif` background for its task cards and dialogue modals, from Butler Lionel's first refusal through the Ceremony of Stones and the Gentleman's stonecraft lesson.
 
-The current authored frontier is the Saffron City blackout: `saffron-gym-ambush` is playable and the full UI takeover (navigation removed, blackout Explore list pinned to the `???` region) is implemented. The next major progression work is the two 30+ step chronicles (Ariana Record and Choo Case File), the player escape chronicle that ends the takeover, and the Fuchsia and Snorlax lead that follows.
+The current authored game progression includes the full Saffron blackout void resolution and route southward:
+1. `saffron-gym-ambush` triggers the Saffron blackout takeover where Explore locks to the `???` cosmic void and navigation is suppressed.
+2. `struggle` and `golden-glow` introduce the cosmic Entity in the starry expanse.
+3. Two narrative chronicles unlock in the void:
+   - `chronicle-rocket-assassination` (Executive Ariana): Begins at Pokémon Tower summit with Kita fallen and Fuji captive, tracks Rocket surveillance reports on the player and Choo in Celadon, and issues the lethal poison assassination hit at Saffron Gym.
+   - `chronicle-ray-choo-pursuit` (Detective Ray Choo): Shows Ray racing on his motorbike with his newly evolved Arcanine, breaking past a perimeter guard, noticing the Celadon alley drainage dead drop, and witnessing the lethal poison ambush at Saffron Gym.
+4. Completing both chronicles unlocks `entity-reflections` ("Threads of Fate") and `entity-celebi-warp` ("The Voice Across Time"), where the Entity summons Celebi to turn back time.
+5. `celadon-timeline-divergence` ("A Divergence in Time") returns the player to Celadon right as Ray suggests Saffron; the player warns Ray of the assassination ambush, breaking the time loop and restoring normal Kanto exploration.
+6. `celadon-poison-dead-drop` ("The Unclaimed Toxin") allows the player to recover the `rocket-poison-vial` from the Celadon back alley, setting up the investigation lead for Master Koga in Fuchsia City.
+7. Returning to Lavender Town, the player and Detective Choo ascend Pokémon Tower with Kita's guidance (`pokemon-tower-return-with-choo` and `pokemon-tower-clearing-the-floors`), reaching the summit in `pokemon-tower-summit-azure-flute` to discover the Note to the Trainer and the **Azure Flute** (`azure-flute`), which awakens the sleeping Snorlax on Route 12 and Route 16 to open southern Kanto toward Fuchsia City.

@@ -34,4 +34,39 @@ export const celadonCityLocations: Location[] = [
     ],
     rewards: [],
   },
+  {
+    id: 'route-16-dazed-snorlax',
+    name: 'Dazed Snorlax',
+    description: 'The Snorlax has calmed down just enough for a careful catch attempt.',
+    category: 'Kanto',
+    subCategory: 'Celadon City',
+    icon: {
+      type: 'pokemon',
+      id: '143',
+    },
+    background: '/backgrounds/grassy-route.avif',
+    levelRange: {
+      min: 30,
+      max: 30,
+    },
+    requirements: [
+      {
+        type: 'battle_result',
+        targetId: 'route-16-furious-snorlax',
+        battleStatus: 'win',
+        count: 1,
+      },
+      {
+        type: 'location_encounter_result',
+        targetId: 'route-16-dazed-snorlax',
+        count: 1,
+        inverse: true,
+      },
+    ],
+    encounters: [{ speciesId: 143, formId: '143', chance: 100 }],
+    rewards: [],
+    timer: 30,
+    catchRateModifier: 1,
+    keyEncounter: true,
+  },
 ]
