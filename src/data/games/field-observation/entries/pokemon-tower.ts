@@ -31,6 +31,21 @@ export const pokemonTowerFieldObservationEntries: FieldObservationConfig[] = [
       timeLimit: 12,
       answerTimeLimit: 12,
       difficulty: 2,
+      itemDrops: [
+        {
+          id: 'pokemon-tower-3f-fishers-incense',
+          itemId: 'incense-fishers',
+          dropChance: 1,
+          quantity: 1,
+          requirements: [
+            {
+              type: 'item_owned',
+              targetId: 'incense-fishers',
+              inverse: true,
+            },
+          ],
+        },
+      ],
     },
   },
   {
@@ -52,7 +67,13 @@ export const pokemonTowerFieldObservationEntries: FieldObservationConfig[] = [
         count: 1,
       },
     ],
-    rewards: [],
+    rewards: [
+      {
+        type: 'task_complete',
+        targetId: 'faux-spell-tag-recipe',
+        dropChance: 12,
+      },
+    ],
     settings: {
       pokemonPool: [
         { speciesId: 92, formId: '92', weight: 70 },
@@ -101,6 +122,21 @@ export const pokemonTowerFieldObservationEntries: FieldObservationConfig[] = [
       timeLimit: 12,
       answerTimeLimit: 12,
       difficulty: 2,
+      itemDrops: [
+        {
+          id: 'pokemon-tower-5f-fortune-incense',
+          itemId: 'incense-fortune',
+          dropChance: 1,
+          quantity: 1,
+          requirements: [
+            {
+              type: 'item_owned',
+              targetId: 'incense-fortune',
+              inverse: true,
+            },
+          ],
+        },
+      ],
     },
   },
   {
@@ -122,7 +158,13 @@ export const pokemonTowerFieldObservationEntries: FieldObservationConfig[] = [
         count: 1,
       },
     ],
-    rewards: [],
+    rewards: [
+      {
+        type: 'task_complete',
+        targetId: 'chipped-glasses-recipe',
+        dropChance: 12,
+      },
+    ],
     settings: {
       pokemonPool: [
         { speciesId: 92, formId: '92', weight: 45 },

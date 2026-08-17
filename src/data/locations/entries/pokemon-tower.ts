@@ -158,7 +158,21 @@ export const pokemonTowerLocations: Location[] = [
         chance: 10,
       },
     ],
-    rewards: [],
+    rewards: [
+      {
+        type: 'item',
+        targetId: 'incense-fishers',
+        quantity: 1,
+        dropChance: 1,
+        requirements: [
+          {
+            type: 'item_owned',
+            targetId: 'incense-fishers',
+            inverse: true,
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'pokemon-tower-4f',
@@ -204,7 +218,13 @@ export const pokemonTowerLocations: Location[] = [
         chance: 5,
       },
     ],
-    rewards: [],
+    rewards: [
+      {
+        type: 'task_complete',
+        targetId: 'faux-spell-tag-recipe',
+        dropChance: 12,
+      },
+    ],
   },
   {
     id: 'pokemon-tower-5f',
@@ -250,7 +270,21 @@ export const pokemonTowerLocations: Location[] = [
         chance: 10,
       },
     ],
-    rewards: [],
+    rewards: [
+      {
+        type: 'item',
+        targetId: 'incense-fortune',
+        quantity: 1,
+        dropChance: 1,
+        requirements: [
+          {
+            type: 'item_owned',
+            targetId: 'incense-fortune',
+            inverse: true,
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'pokemon-tower-6f',
@@ -296,6 +330,12 @@ export const pokemonTowerLocations: Location[] = [
         chance: 15,
       },
     ],
-    rewards: [],
+    rewards: [
+      {
+        type: 'task_complete',
+        targetId: 'chipped-glasses-recipe',
+        dropChance: 12,
+      },
+    ],
   },
 ]
