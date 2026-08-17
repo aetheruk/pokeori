@@ -268,7 +268,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 3,
         title: 'Executive Ariana',
-        message: 'Leave it. It made its choice. We have what we came for: the psychic frequency baseline. Forward the data to our teams at Silph Co. We have a timetable to keep.',
+        message:
+          'Leave it. It made its choice. We have what we came for: the psychic frequency baseline. Forward the data to our teams at Silph Co. We have a timetable to keep.',
         background: '/backgrounds/pkmn-tower.avif',
         icon: { type: 'trainer', id: 'ariana' },
         buttons: [{ text: 'Depart', type: 'success' }],
@@ -298,7 +299,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 1,
         title: 'Rocket Scout',
-        message: 'Executive Ariana, urgent report from Celadon. A young trainer and that private investigator, Choo, have been prying into our operations. They traced the stone deliveries and the rooftop exchange.',
+        message:
+          'Executive Ariana, urgent report from Celadon. A young trainer and that private investigator, Choo, have been prying into our operations. They traced the stone deliveries and the rooftop exchange.',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'rocket-grunt-f' },
         buttons: [{ text: 'Analyze Threat', type: 'navigate', id: 2 }],
@@ -306,7 +308,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 2,
         title: 'Executive Ariana',
-        message: 'Detective Choo is predictable, but that trainer is moving far too quickly. If they connect the Celadon freight lines to Silph Co., our position in Saffron will be exposed before the lockdown is complete.',
+        message:
+          'Detective Choo is predictable, but that trainer is moving far too quickly. If they connect the Celadon freight lines to Silph Co., our position in Saffron will be exposed before the lockdown is complete.',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'ariana' },
         buttons: [{ text: 'Issue Order', type: 'success' }],
@@ -316,7 +319,7 @@ export const saffronCityTasks: Task[] = [
   {
     id: 'rocket-chronicle-poison-order',
     name: 'The Elimination Order',
-    description: 'Ariana arranges the delivery of the synthetic toxin to a dead drop for an operative.',
+    description: 'Ariana arranges a solution.',
     category: 'Secret',
     subCategory: 'Saffron City',
     icon: {
@@ -336,7 +339,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 1,
         title: 'Executive Ariana',
-        message: 'We cannot afford complications. Contact our Celadon distribution cell. Have a courier deliver the synthetic neurotoxin to the dead drop behind the Celadon alley drainage grate. Dispatch an assassin operative to collect it there and position at Sabrina’s gym doors.',
+        message:
+          'We cannot afford complications. Contact our Celadon logistics cell. Have them arrange a package to the deaddrop." Ill see to it that its collected.',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'ariana' },
         buttons: [{ text: 'Confirm Target', type: 'navigate', id: 2 }],
@@ -344,7 +348,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 2,
         title: 'Rocket Grunt',
-        message: 'Understood, Executive. The courier is dispatching the vial to the drop location now, and the operative has been alerted to collect it on their way to Saffron.',
+        message:
+          'Understood, Executive. Logistics is dispatching the vial to the drop location now.',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'rocket-grunt-m' },
         buttons: [{ text: 'Final Verdict', type: 'navigate', id: 3 }],
@@ -352,7 +357,7 @@ export const saffronCityTasks: Task[] = [
       {
         id: 3,
         title: 'Executive Ariana',
-        message: 'Ensure the handover is coordinated cleanly. When the trainer arrives at Saffron Gym, strike from the blind spot with the toxin. No alarms, no witnesses. Kanto belongs to the future, not sentiment.',
+        message: 'Ensure the handover is coordinated cleanly. No witnesses.',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'ariana' },
         buttons: [{ text: 'Deploy', type: 'success' }],
@@ -382,7 +387,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 1,
         title: 'Executive Ariana',
-        message: 'The target is entering the street alone. Choo is still miles behind. Take your positions. When the doors open, strike.',
+        message:
+          'The target is entering the street alone. Choo is still miles behind. Take your positions. When the doors open, strike.',
         background: '/backgrounds/saffron.avif',
         icon: { type: 'trainer', id: 'ariana' },
         buttons: [{ text: 'The Shadows Close', type: 'navigate', id: 2 }],
@@ -390,7 +396,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 2,
         title: 'Saffron City',
-        message: 'The shadows close in as rain begins to fall on Saffron City. The order is carried out in absolute silence.',
+        message:
+          'The shadows close in as rain begins to fall on Saffron City. The order is carried out in absolute silence.',
         background: '/backgrounds/saffron.avif',
         icon: { type: 'trainer', id: 'rocket' },
         buttons: [{ text: 'Conclude Memory', type: 'success' }],
@@ -421,7 +428,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 1,
         title: 'Detective Ray Choo',
-        message: 'Arcanine, let’s roll! The kid went on ahead to Saffron, but my gut tells me something is wrong in this city...',
+        message:
+          'Arcanine, let’s roll! The kid went on ahead to Saffron, but my gut tells me something is wrong in this city...',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Glance at Alley', type: 'navigate', id: 2 }],
@@ -429,7 +437,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 2,
         title: 'Detective Ray Choo',
-        message: 'Hold up... look down that alley near the drainage grate. A Rocket courier just dropped a sealed canister into the drain, and a shadowed figure in an assassin coat was watching from the roof! That’s an arranged dead drop handover! What kind of lethal cargo are they moving through Celadon? No time to dig it out now—I have to catch up to the trainer before they walk into trouble!',
+        message:
+          'Hold up... look down that alley near the drainage grate. A Rocket courier just dropped a sealed canister into the drain, and a shadowed figure in an assassin coat was watching from the roof! That’s an arranged dead drop handover! What kind of lethal cargo are they moving through Celadon? No time to dig it out now—I have to catch up to the trainer before they walk into trouble!',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Speed Away', type: 'success' }],
@@ -459,7 +468,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 1,
         title: 'Detective Ray Choo',
-        message: 'Look at those roadblocks... Rocket has the entire perimeter sealed tight. Hey, you! What did you do to the city gates?!',
+        message:
+          'Look at those roadblocks... Rocket has the entire perimeter sealed tight. Hey, you! What did you do to the city gates?!',
         background: '/backgrounds/saffron.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Demanded Entry', type: 'navigate', id: 2 }],
@@ -497,7 +507,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 1,
         title: 'Detective Ray Choo',
-        message: 'The streets are completely deserted... No civilians, only Rocket sentries. Sabrina’s Gym is just ahead. Please tell me I’m not too late...',
+        message:
+          'The streets are completely deserted... No civilians, only Rocket sentries. Sabrina’s Gym is just ahead. Please tell me I’m not too late...',
         background: '/backgrounds/saffron.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Turn the Corner', type: 'success' }],
@@ -535,7 +546,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 2,
         title: 'Saffron Gym Ambush',
-        message: 'From the darkened doorway, a poisoned needle glints in the rain, striking {trainer} before they can react. {trainer} stumbles, collapsing onto the rain-slick pavement as shadows scatter.',
+        message:
+          'From the darkened doorway, a poisoned needle glints in the rain, striking {trainer} before they can react. {trainer} stumbles, collapsing onto the rain-slick pavement as shadows scatter.',
         background: '/backgrounds/saffron.avif',
         icon: { type: 'trainer', id: 'rocket' },
         buttons: [{ text: 'Ray Rushes In', type: 'navigate', id: 3 }],
@@ -551,7 +563,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 4,
         title: 'The Second Needle',
-        message: 'Ray lunges forward, but from the mist beside the doorway, a second needle flashes. Ray gasps as a sudden, paralyzing chill tears through his veins.',
+        message:
+          'Ray lunges forward, but from the mist beside the doorway, a second needle flashes. Ray gasps as a sudden, paralyzing chill tears through his veins.',
         background: '/backgrounds/saffron.avif',
         icon: { type: 'trainer', id: 'rocket' },
         buttons: [{ text: 'Collapse', type: 'navigate', id: 5 }],
@@ -559,7 +572,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 5,
         title: 'Detective Ray Choo',
-        message: 'Ungh... what... what is this... poison...? Arcanine... fall... back... {trainer}... no...',
+        message:
+          'Ungh... what... what is this... poison...? Arcanine... fall... back... {trainer}... no...',
         background: '/backgrounds/saffron.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Darkness Consumes All', type: 'success' }],
@@ -609,7 +623,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 1,
         title: '…',
-        message: 'A curious persistence. Most mortal consciousness dissolves into the expanse once its vessel falls. Yet your spirit maintains its form, {trainer}.',
+        message:
+          'A curious persistence. Most mortal consciousness dissolves into the expanse once its vessel falls. Yet your spirit maintains its form, {trainer}.',
         background: '/backgrounds/cosmos-gold.avif',
         icon: { type: 'local', id: '/sprites/items/egg.avif' },
         buttons: [{ text: '…', type: 'navigate', id: 2 }],
@@ -617,7 +632,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 2,
         title: '…',
-        message: 'You have viewed the echoes of what transpired. The silence over the tower. The poison that snuffed out your companion and yourself. The designs of men seeking dominion over what they cannot comprehend.',
+        message:
+          'You have viewed the echoes of what transpired. The silence over the tower. The poison that snuffed out your companion and yourself. The designs of men seeking dominion over what they cannot comprehend.',
         background: '/backgrounds/cosmos-gold.avif',
         icon: { type: 'local', id: '/sprites/items/egg.avif' },
         buttons: [{ text: '…', type: 'navigate', id: 3 }],
@@ -625,7 +641,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 3,
         title: '…',
-        message: 'Even now, in the stillness of the void, your thought pulls against the stillness. Tell me, {trainer}... what is it that remains within you?',
+        message:
+          'Even now, in the stillness of the void, your thought pulls against the stillness. Tell me, {trainer}... what is it that remains within you?',
         background: '/backgrounds/cosmos-gold.avif',
         icon: { type: 'local', id: '/sprites/items/egg.avif' },
         buttons: [{ text: 'Resolve', type: 'navigate', id: 4 }],
@@ -633,7 +650,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 4,
         title: '…',
-        message: 'Resolve. It is not my place to grant or deny. Creation simply bends under the weight of such conviction.',
+        message:
+          'Resolve. It is not my place to grant or deny. Creation simply bends under the weight of such conviction.',
         background: '/backgrounds/cosmos-gold.avif',
         icon: { type: 'local', id: '/sprites/items/egg.avif' },
         buttons: [{ text: 'Listen', type: 'success' }],
@@ -674,7 +692,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 1,
         title: '…',
-        message: 'When a soul pulls hard enough upon the threads of its fate, the continuum fractures. The river of time bends toward the disturbance.',
+        message:
+          'When a soul pulls hard enough upon the threads of its fate, the continuum fractures. The river of time bends toward the disturbance.',
         background: '/backgrounds/cosmos.avif',
         icon: { type: 'local', id: '/sprites/items/egg.avif' },
         buttons: [{ text: 'An Emerald Light', type: 'navigate', id: 2 }],
@@ -682,7 +701,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 2,
         title: 'Voice of the Forest',
-        message: 'Drawn by the temporal distortion, an emerald light pierces the void. Celebi emerges from the starlight, its ancient eyes fixing upon {trainer}’s consciousness with quiet recognition.',
+        message:
+          'Drawn by the temporal distortion, an emerald light pierces the void. Celebi emerges from the starlight, its ancient eyes fixing upon {trainer}’s consciousness with quiet recognition.',
         background: '/backgrounds/cosmos.avif',
         icon: { type: 'pokemon', id: '251' },
         buttons: [{ text: 'Feel the Resonance', type: 'navigate', id: 3 }],
@@ -690,7 +710,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 3,
         title: '…',
-        message: 'The wanderer of time has answered your anomaly. Whether you unravel the tapestry further or mend what was broken is for you to determine, {trainer}. The cosmos merely observes.',
+        message:
+          'The wanderer of time has answered your anomaly. Whether you unravel the tapestry further or mend what was broken is for you to determine, {trainer}. The cosmos merely observes.',
         background: '/backgrounds/cosmos.avif',
         icon: { type: 'local', id: '/sprites/items/egg.avif' },
         buttons: [{ text: 'Step Through the Rift', type: 'success' }],
@@ -700,14 +721,16 @@ export const saffronCityTasks: Task[] = [
       background: '/backgrounds/cosmos.avif',
       title: 'Temporal Shift',
       icon: { type: 'pokemon', id: '251' },
-      message: 'Emerald light envelops you. The void dissolves as the flow of time claims you once more.',
+      message:
+        'Emerald light envelops you. The void dissolves as the flow of time claims you once more.',
       closeButtonText: 'Awaken',
     },
   },
   {
     id: 'celadon-timeline-divergence',
     name: 'A Divergence in Time',
-    description: 'Awaken in Celadon City beside Detective Ray Choo, altering the course of destiny.',
+    description:
+      'Awaken in Celadon City beside Detective Ray Choo, altering the course of destiny.',
     category: '???',
     subCategory: '???',
     icon: {
@@ -738,7 +761,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 1,
         title: 'Detective Ray Choo',
-        message: 'Well, look at that Growlithe! Or rather, Arcanine now! That Fire Stone worked wonders. Now then, {trainer}, next stop: Saffron City. Sabrina’s Gym is our best bet to—',
+        message:
+          'Well, look at that Growlithe! Or rather, Arcanine now! That Fire Stone worked wonders. Now then, {trainer}, next stop: Saffron City. Sabrina’s Gym is our best bet to—',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Interrupt Ray', type: 'navigate', id: 2 }],
@@ -746,7 +770,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 2,
         title: '{trainer}',
-        message: 'Ray, stop. Saffron is an assassination trap. Team Rocket arranged a courier delivery of lethal neurotoxin to a dead drop in the Celadon alley for a hitman. In the original timeline, that operative collected the poison and struck us both down outside the gym doors. Because of the timeline shift, we can intercept that delivery at the alley drainage grate right now before the assassin can pick it up! Then we change our course directly to Pokémon Tower in Lavender Town.',
+        message:
+          'Ray, stop. Saffron is an assassination trap. Team Rocket arranged a courier delivery of lethal neurotoxin to a dead drop in the Celadon alley for a hitman. In the original timeline, that operative collected the poison and struck us both down outside the gym doors. Because of the timeline shift, we can intercept that delivery at the alley drainage grate right now before the assassin can pick it up! Then we change our course directly to Pokémon Tower in Lavender Town.',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Ray’s Reaction', type: 'navigate', id: 3 }],
@@ -754,7 +779,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 3,
         title: 'Detective Ray Choo',
-        message: 'Wait... an arranged assassination delivery? Both of us taken out by poison...?! You’re trembling, but your eyes... you look like you’ve lived through the nightmare already. And that strange emerald scent in the air... Alright, {trainer}. I don’t know how you know this, kid, but I trust your instincts. Let us intercept that poison before their operative collects it, call off Saffron, and head straight to Pokémon Tower!',
+        message:
+          'Wait... an arranged assassination delivery? Both of us taken out by poison...?! You’re trembling, but your eyes... you look like you’ve lived through the nightmare already. And that strange emerald scent in the air... Alright, {trainer}. I don’t know how you know this, kid, but I trust your instincts. Let us intercept that poison before their operative collects it, call off Saffron, and head straight to Pokémon Tower!',
         background: '/backgrounds/celadon.avif',
         icon: { type: 'trainer', id: 'detective' },
         buttons: [{ text: 'Break the Loop', type: 'success' }],
@@ -764,14 +790,16 @@ export const saffronCityTasks: Task[] = [
       background: '/backgrounds/celadon.avif',
       title: 'Timeline Restored',
       icon: { type: 'trainer', id: 'detective' },
-      message: 'The cosmic veil shatters. The ambush was averted. Saffron City’s deadly trap has been broken, and the path to Pokémon Tower opens before you.',
+      message:
+        'The cosmic veil shatters. The ambush was averted. Saffron City’s deadly trap has been broken, and the path to Pokémon Tower opens before you.',
       closeButtonText: 'Explore Kanto',
     },
   },
   {
     id: 'saffron-avoidance-reflection',
     name: 'Steer Clear of Saffron',
-    description: 'Remembering the lethal ambush, you have no intention of setting foot in Saffron City right now.',
+    description:
+      'Remembering the lethal ambush, you have no intention of setting foot in Saffron City right now.',
     category: 'Kanto',
     subCategory: 'Saffron City',
     icon: {
@@ -796,7 +824,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 1,
         title: '{trainer}',
-        message: 'You look toward the fortified checkpoints of Saffron City. Team Rocket patrols the perimeter in force, and the memory of the lethal poisoned needle is still burned into your mind.',
+        message:
+          'You look toward the fortified checkpoints of Saffron City. Team Rocket patrols the perimeter in force, and the memory of the lethal poisoned needle is still burned into your mind.',
         background: '/backgrounds/saffron.avif',
         icon: { type: 'trainer', id: 'rocket' },
         buttons: [{ text: 'Think Ahead', type: 'navigate', id: 2 }],
@@ -804,7 +833,8 @@ export const saffronCityTasks: Task[] = [
       {
         id: 2,
         title: '{trainer}',
-        message: 'Entering Saffron right now would be walking straight into another assassination trap. You have no intention of going here until you unravel the Rocket toxin and return fully prepared.',
+        message:
+          'Entering Saffron right now would be walking straight into another assassination trap. You have no intention of going here until you unravel the Rocket toxin and return fully prepared.',
         background: '/backgrounds/saffron.avif',
         icon: { type: 'trainer', id: 'rocket' },
         buttons: [{ text: 'Turn Away', type: 'success' }],
@@ -814,7 +844,8 @@ export const saffronCityTasks: Task[] = [
       background: '/backgrounds/saffron.avif',
       title: 'Saffron Under Lockdown',
       icon: { type: 'trainer', id: 'rocket' },
-      message: 'You keep your distance from Saffron City. Your priority lies southward toward Fuchsia City with Master Koga.',
+      message:
+        'You keep your distance from Saffron City. Your priority lies southward toward Fuchsia City with Master Koga.',
       closeButtonText: 'Plan Your Route',
     },
   },
