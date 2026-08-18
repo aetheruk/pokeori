@@ -896,33 +896,31 @@ describe('static data references', () => {
       battleGatedOn('route-14-biker-gerald', 'route-14-biker-intro'),
     ).toBe(true)
     expect(
-      battleGatedOn('route-14-biker-malik', 'route-14-biker-confront-malik'),
+      battleGatedOn('route-14-biker-malik', 'route-14-biker-fetch-1'),
     ).toBe(true)
     expect(
-      battleGatedOn('route-14-biker-isaac', 'route-14-biker-confront-isaac'),
+      battleGatedOn('route-14-biker-isaac', 'route-14-biker-fetch-2'),
     ).toBe(true)
     expect(
       battleGatedOn('route-14-biker-lukas', 'route-14-biker-confront-lukas'),
     ).toBe(true)
-
-    const taskGatedOn = (taskId: string, targetId: string) =>
+    expect(
       tasks
-        .find((task) => task.id === taskId)
+        .find((task) => task.id === 'route-14-biker-confront-lukas')
         ?.requirements?.some(
-          (req) => req.type === 'task_completed' && req.targetId === targetId,
-        )
-
-    expect(
-      taskGatedOn('route-14-biker-confront-malik', 'route-14-biker-fetch-1'),
+          (req) =>
+            req.type === 'task_completed' &&
+            req.targetId === 'route-14-biker-fetch-3',
+        ),
     ).toBe(true)
     expect(
-      taskGatedOn('route-14-biker-confront-isaac', 'route-14-biker-fetch-2'),
-    ).toBe(true)
-    expect(
-      taskGatedOn('route-14-biker-confront-lukas', 'route-14-biker-fetch-3'),
-    ).toBe(true)
-    expect(
-      taskGatedOn('route-14-biker-fetch-1', 'route-14-biker-intro'),
+      tasks
+        .find((task) => task.id === 'route-14-biker-fetch-1')
+        ?.requirements?.some(
+          (req) =>
+            req.type === 'task_completed' &&
+            req.targetId === 'route-14-biker-intro',
+        ),
     ).toBe(true)
 
     const fetchGatedOnWin = (fetchId: string, battleId: string) =>

@@ -873,7 +873,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
       robertGate,
       {
         type: 'task_completed',
-        targetId: 'route-14-biker-confront-malik',
+        targetId: 'route-14-biker-fetch-1',
       },
       unbeatenBattle('route-14-biker-malik'),
     ],
@@ -903,7 +903,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
       robertGate,
       {
         type: 'task_completed',
-        targetId: 'route-14-biker-confront-isaac',
+        targetId: 'route-14-biker-fetch-2',
       },
       unbeatenBattle('route-14-biker-isaac'),
     ],
