@@ -333,7 +333,7 @@ export const pokemonTowerLocations: Location[] = [
     rewards: [
       {
         type: 'task_complete',
-        targetId: 'chipped-glasses-recipe',
+        targetId: 'straight-spoon-recipe',
         dropChance: 12,
       },
     ],

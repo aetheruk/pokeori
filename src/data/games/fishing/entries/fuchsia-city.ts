@@ -4,7 +4,7 @@ export const fuchsiaCityFishing: FishingGameConfig[] = [
   {
     id: 'route-13-fishing',
     name: 'Route 13',
-    description: 'Fish the water alongside the final road south to Fuchsia City.',
+    description: 'Fish the water alongside the long east-west stretch of road.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     background: '/backgrounds/grassy-route.avif',

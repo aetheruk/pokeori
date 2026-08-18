@@ -92,10 +92,14 @@ export function buildBattleWinRewards(
 
   const involvedPlayerPokemon = getInvolvedPlayerPokemon(state)
   for (const pokemon of involvedPlayerPokemon) {
-    if (!pokemon.formId) continue
+    const researchFormId =
+      pokemon.originalFormId ||
+      pokemon.battleAbilityState?.originalTransform?.formId ||
+      pokemon.formId
+    if (!researchFormId) continue
     rewardsToGrant.push({
       type: 'pokemon_research_xp',
-      targetId: pokemon.formId,
+      targetId: researchFormId,
       quantity: BATTLE_PARTICIPANT_RESEARCH_XP,
       dropChance: 100,
     })

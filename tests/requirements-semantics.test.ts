@@ -675,6 +675,40 @@ describe('requirements and criteria semantics', () => {
     ).toBe(false)
   })
 
+  test('pokemon criteria can require natures', () => {
+    const data = {
+      ...baseRequirementData,
+      pokemon: [
+        { speciesId: 16, formId: '16', level: 12, nature: 'Lonely' },
+        { speciesId: 16, formId: '16', level: 12, nature: 'brave' },
+      ],
+    } as unknown as RequirementData
+
+    expect(
+      checkRequirement(data, {
+        type: 'pokemon_owned',
+        count: 1,
+        pokemonCriteria: { nature: 'lonely' },
+      }),
+    ).toBe(true)
+
+    expect(
+      checkRequirement(data, {
+        type: 'pokemon_owned',
+        count: 2,
+        pokemonCriteria: { nature: 'lonely' },
+      }),
+    ).toBe(false)
+
+    expect(
+      checkRequirement(data, {
+        type: 'pokemon_owned',
+        count: 1,
+        pokemonCriteria: { nature: 'jolly' },
+      }),
+    ).toBe(false)
+  })
+
   test('companion requirements only pass for the active matching companion', () => {
     const noCompanionData = {
       ...baseRequirementData,

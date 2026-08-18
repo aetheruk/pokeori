@@ -1061,6 +1061,33 @@ export const keyItems: Item[] = [
     unique: true,
   },
   {
+    id: 'greasy-spark-plug',
+    name: 'Greasy Spark Plug',
+    description:
+      'A spark plug caked in grime and engine oil. Somewhere out there, a Biker is missing this.',
+    category: 'key',
+    spriteId: 'metal-alloy',
+    unique: false,
+  },
+  {
+    id: 'bent-carburetor',
+    name: 'Bent Carburetor',
+    description:
+      'A carburetor that has seen better days. A Biker might be able to hammer it back into shape.',
+    category: 'key',
+    spriteId: 'iron',
+    unique: false,
+  },
+  {
+    id: 'snapped-chain-link',
+    name: 'Snapped Chain Link',
+    description:
+      'A broken link from a motorcycle chain. Somewhere out there, a bike is missing this.',
+    category: 'key',
+    spriteId: 'metal-coat',
+    unique: false,
+  },
+  {
     id: 'gimmighoul-coin',
     name: 'Gimmighoul Coin',
     description:

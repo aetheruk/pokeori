@@ -278,6 +278,8 @@ export function isPokemonEligible(
   if (criteria.minLevel && pokemon.level < criteria.minLevel) return false
   if (criteria.maxLevel && pokemon.level > criteria.maxLevel) return false
   if (criteria.size && pokemon.size !== criteria.size) return false
+  if (criteria.nature && !matchesPokemonOriginValue(pokemon.nature, criteria.nature))
+    return false
   if (criteria.rarity && resolvePokemonRarity(pokemon) !== criteria.rarity)
     return false
   if (criteria.shiny !== undefined && pokemon.shiny !== criteria.shiny)

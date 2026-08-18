@@ -1409,7 +1409,7 @@ describe('artisan recipes', () => {
         source: 'Secret Garden catches',
       },
       { type: 'ice', recipeId: 'often-melt-ice-recipe', source: null },
-      { type: 'fighting', recipeId: 'brown-belt-recipe', source: null },
+      { type: 'fighting', recipeId: 'brown-belt-recipe', source: 'Route 15 catches' },
       {
         type: 'poison',
         recipeId: 'poison-tip-recipe',
@@ -1425,7 +1425,11 @@ describe('artisan recipes', () => {
         recipeId: 'dull-beak-recipe',
         source: 'Route 8 catches',
       },
-      { type: 'psychic', recipeId: 'straight-spoon-recipe', source: null },
+      {
+        type: 'psychic',
+        recipeId: 'straight-spoon-recipe',
+        source: 'Pokemon Tower 6F drops',
+      },
       {
         type: 'bug',
         recipeId: 'aluminium-powder-recipe',
@@ -1442,11 +1446,7 @@ describe('artisan recipes', () => {
         source: 'Pokemon Tower 4F drops',
       },
       { type: 'dragon', recipeId: 'chipped-dragon-fang-recipe', source: null },
-      {
-        type: 'dark',
-        recipeId: 'chipped-glasses-recipe',
-        source: 'Pokemon Tower 6F drops',
-      },
+      { type: 'dark', recipeId: 'chipped-glasses-recipe', source: null },
       {
         type: 'steel',
         recipeId: 'rusty-coat-recipe',
@@ -1469,7 +1469,7 @@ describe('artisan recipes', () => {
     expect([...authoredPrizeIds].sort()).toEqual([
       'aluminium-powder-recipe',
       'brittle-hard-stone-recipe',
-      'chipped-glasses-recipe',
+      'brown-belt-recipe',
       'coarse-sand-recipe',
       'cotton-scarf-recipe',
       'dull-beak-recipe',
@@ -1480,6 +1480,7 @@ describe('artisan recipes', () => {
       'poison-tip-recipe',
       'regular-seed-recipe',
       'rusty-coat-recipe',
+      'straight-spoon-recipe',
       'weak-magnet-recipe',
     ])
 
@@ -1494,6 +1495,7 @@ describe('artisan recipes', () => {
       (location) => location.id === 'viridian-outskirts',
     )
     const route10 = locations.find((location) => location.id === 'route-10')
+    const route15 = locations.find((location) => location.id === 'route-15')
     const diglettsCave = locations.find(
       (location) => location.id === 'digletts-cave-main',
     )
@@ -1534,6 +1536,7 @@ describe('artisan recipes', () => {
       charmanderDen,
       secretGarden,
       squirtleCove,
+      route15,
     ]) {
       expect(location).toBeDefined()
     }
@@ -1581,6 +1584,11 @@ describe('artisan recipes', () => {
     expect(squirtleCove?.rewards).toContainEqual({
       type: 'task_complete',
       targetId: 'magic-water-recipe',
+      dropChance: 12,
+    })
+    expect(route15?.rewards).toContainEqual({
+      type: 'task_complete',
+      targetId: 'brown-belt-recipe',
       dropChance: 12,
     })
     for (const location of mtMoonCatchLocations) {

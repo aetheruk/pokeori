@@ -1285,6 +1285,7 @@ describe('move damage helpers', () => {
     defender.name = 'Pikachu'
     defender.types = ['Electric']
     defender.stats = { hp: 90, attack: 55, defense: 40, specialAttack: 50, specialDefense: 50, speed: 90 }
+    defender.assignedMoves = [{ moveId: 'thunderbolt' }, { moveId: 'quick-attack' }]
     const transform = getMove('transform')!
     expect(transform.transformEffect).toEqual({ target: 'enemy' })
     applyMoveRuntimeEffects({ move: transform, state, side: 'player', attacker, defender })
@@ -1293,6 +1294,14 @@ describe('move damage helpers', () => {
     expect(attacker.name).toBe('Pikachu')
     expect(attacker.types).toEqual(['Electric'])
     expect(attacker.stats.speed).toBe(90)
+    expect(attacker.assignedMoves).toEqual([
+      { moveId: 'thunderbolt' },
+      { moveId: 'quick-attack' },
+    ])
+    expect(attacker.battleAbilityState?.originalTransform?.formId).toBe('1')
+    expect(
+      attacker.battleAbilityState?.originalTransform?.assignedMoves,
+    ).toBeUndefined()
 
     attacker.heldItem = { id: 'oran-berry', name: 'Oran Berry' }
     defender.heldItem = { id: 'hard-stone', name: 'Hard Stone' }

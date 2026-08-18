@@ -27,6 +27,7 @@ import {
 import { applyHeldDamageBlock, createRuntimeHeldItem } from './held-items'
 import { getEffectiveBattleTypes, resetBattleTypeChange } from './tera'
 import { lowerPokemonMoveUses } from './move-uses'
+import { applyBattleTransform } from './transform'
 import {
   addOrReplaceSecondaryStatus,
   clearBattleSideSecondaryStatuses,
@@ -1470,12 +1471,7 @@ export function applyMoveRuntimeEffects(params: {
 
   if (move.transformEffect) {
     const originalName = attacker.name
-    attacker.originalFormId ??= attacker.formId
-    attacker.formId = defender.formId
-    attacker.name = defender.name
-    attacker.types = [...defender.types]
-    attacker.stats = { ...defender.stats }
-    attacker.statStages = cloneStatStages(defender.statStages)
+    applyBattleTransform(attacker, defender)
     messages.push(`${originalName} transformed into ${defender.name}.`)
   }
 

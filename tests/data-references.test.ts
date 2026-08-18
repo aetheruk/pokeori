@@ -848,6 +848,248 @@ describe('static data references', () => {
     }
   })
 
+  test('Route 14 standard content gates on the final Route 13 trainer', () => {
+    const robertGate = (entry: { requirements?: TaskCondition[] } | undefined) =>
+      entry?.requirements?.some(
+        (req) =>
+          req.type === 'battle_result' &&
+          req.targetId === 'route-13-bird-keeper-robert' &&
+          req.battleStatus === 'win' &&
+          req.count === 1,
+      )
+
+    expect(robertGate(locations.find((entry) => entry.id === 'route-14'))).toBe(
+      true,
+    )
+    expect(
+      robertGate(battles.find((entry) => entry.id === 'route-14-battle')),
+    ).toBe(true)
+    expect(
+      robertGate(
+        fieldResearchGames.find(
+          (entry) => entry.id === 'route-14-field-observation',
+        ),
+      ),
+    ).toBe(true)
+  })
+
+  test('Route 14 fetch tasks gate the Biker battles', () => {
+    expect(
+      tasks
+        .filter((task) => task.id.startsWith('route-14-biker-fetch-'))
+        .map((task) => task.id)
+        .sort(),
+    ).toEqual([
+      'route-14-biker-fetch-1',
+      'route-14-biker-fetch-2',
+      'route-14-biker-fetch-3',
+    ])
+
+    const gatesBiker = (battleId: string, fetchId: string) =>
+      battles
+        .find((battle) => battle.id === battleId)
+        ?.requirements?.some(
+          (req) => req.type === 'task_completed' && req.targetId === fetchId,
+        )
+
+    expect(gatesBiker('route-14-biker-malik', 'route-14-biker-fetch-1')).toBe(
+      true,
+    )
+    expect(gatesBiker('route-14-biker-isaac', 'route-14-biker-fetch-2')).toBe(
+      true,
+    )
+    expect(gatesBiker('route-14-biker-lukas', 'route-14-biker-fetch-3')).toBe(
+      true,
+    )
+  })
+
+  test('Farfetch\u2019d and the sky patrol unlock after the Feathered Gauntlet', () => {
+    const route14 = locations.find((entry) => entry.id === 'route-14')
+    const farfetchd = route14?.encounters?.find(
+      (encounter) => encounter.speciesId === 83,
+    )
+    expect(
+      farfetchd?.requirements?.some(
+        (req) =>
+          req.type === 'task_completed' &&
+          req.targetId === 'route-14-bird-gauntlet-clear',
+      ),
+    ).toBe(true)
+
+    const voyage = voyages.find((entry) => entry.id === 'route-14-flying-voyage')
+    expect(
+      voyage?.requirements?.some(
+        (req) =>
+          req.type === 'task_completed' &&
+          req.targetId === 'route-14-bird-gauntlet-clear',
+      ),
+    ).toBe(true)
+    expect(voyage?.minPokemon).toBe(3)
+    expect(voyage?.maxPokemon).toBe(3)
+    expect(voyage?.pokemonCriteria?.allowedTypes).toContain('flying')
+
+    for (const feather of [
+      'health-feather',
+      'muscle-feather',
+      'resist-feather',
+      'genius-feather',
+      'clever-feather',
+      'swift-feather',
+    ]) {
+      const reward = voyage?.rewards.find(
+        (entry) => entry.type === 'item' && entry.targetId === feather,
+      )
+      expect(reward?.dropChance).toBe(100)
+      expect(reward?.quantity).toEqual({ min: 1, max: 5 })
+    }
+  })
+
+  test('Bird Champion Donald fights at level 31 for the next candy tier', () => {
+    const donald = battles.find(
+      (battle) => battle.id === 'route-14-bird-champion-donald',
+    )
+    const maxLevel = Math.max(
+      ...(donald?.enemyTeam || []).map((enemy) =>
+        typeof enemy.level === 'number' ? enemy.level : 1,
+      ),
+    )
+    expect(maxLevel).toBe(31)
+  })
+
+  test('Route 15 content gates on Detective Choo\u2019s rest and trainers chain in order', () => {
+    const chooGate = (entry: { requirements?: TaskCondition[] } | undefined) =>
+      entry?.requirements?.some(
+        (req) =>
+          req.type === 'task_completed' &&
+          req.targetId === 'route-15-choo-rest',
+      )
+
+    expect(chooGate(locations.find((entry) => entry.id === 'route-15'))).toBe(
+      true,
+    )
+    expect(
+      chooGate(battles.find((entry) => entry.id === 'route-15-battle')),
+    ).toBe(true)
+    expect(
+      chooGate(
+        fieldResearchGames.find(
+          (entry) => entry.id === 'route-15-field-observation',
+        ),
+      ),
+    ).toBe(true)
+
+    const chooTask = tasks.find((entry) => entry.id === 'route-15-choo-rest')
+    expect(
+      chooTask?.requirements?.some(
+        (req) =>
+          req.type === 'task_completed' &&
+          req.targetId === 'route-14-bikers-cleared',
+      ),
+    ).toBe(true)
+
+    const chain = [
+      'route-15-picnicker-becky',
+      'route-15-crush-kin-ron-mya',
+      'route-15-picnicker-celia',
+      'route-15-biker-ernest',
+      'route-15-biker-alex',
+      'route-15-beauty-grace',
+      'route-15-beauty-olivia',
+      'route-15-picnicker-kindra',
+      'route-15-bird-keeper-chester',
+      'route-15-bird-keeper-edwin',
+      'route-15-picnicker-yazmin',
+    ]
+
+    for (let index = 0; index < chain.length; index += 1) {
+      const battle = battles.find((entry) => entry.id === chain[index])
+      expect(battle).toBeDefined()
+      if (index > 0) {
+        expect(
+          battle?.requirements?.some(
+            (req) =>
+              req.type === 'battle_result' &&
+              req.targetId === chain[index - 1] &&
+              req.battleStatus === 'win',
+          ),
+        ).toBe(true)
+      }
+    }
+  })
+
+  test('Explore Fuchsia City gates on the final Route 15 trainer and the Nature Module quest rewards the scanner', () => {
+    const explore = tasks.find((entry) => entry.id === 'explore-fuchsia-city')
+    expect(
+      explore?.requirements?.some(
+        (req) =>
+          req.type === 'battle_result' &&
+          req.targetId === 'route-15-picnicker-yazmin' &&
+          req.battleStatus === 'win',
+      ),
+    ).toBe(true)
+
+    const expectedCriteria = [
+      ['battle_result', 'route-15-battle', 3],
+      ['location_encounter_result', 'route-15', 3],
+      ['field_research_result', 'route-15-field-observation', 1],
+    ] as const
+    for (const [type, targetId, count] of expectedCriteria) {
+      expect(
+        explore?.criteria?.some(
+          (req) =>
+            req.type === type && req.targetId === targetId && req.count === count,
+        ),
+      ).toBe(true)
+    }
+
+    const intro = tasks.find(
+      (entry) => entry.id === 'route-15-nature-module-intro',
+    )
+    expect(
+      intro?.requirements?.some(
+        (req) =>
+          req.type === 'task_completed' &&
+          req.targetId === 'explore-fuchsia-city',
+      ),
+    ).toBe(true)
+
+    const study = tasks.find(
+      (entry) => entry.id === 'route-15-nature-module-study',
+    )
+    expect(
+      study?.requirements?.some(
+        (req) =>
+          req.type === 'task_completed' &&
+          req.targetId === 'route-15-nature-module-intro',
+      ),
+    ).toBe(true)
+    expect(
+      study?.rewards.some(
+        (reward) =>
+          reward.type === 'item' && reward.targetId === 'nature-scanner',
+      ),
+    ).toBe(true)
+
+    const dittoNatureCriteria = study?.criteria?.filter(
+      (req) =>
+        req.type === 'pokemon_owned' &&
+        req.pokemonCriteria?.speciesId === 132 &&
+        req.pokemonCriteria?.formId === '132' &&
+        (req.pokemonCriteria?.nature === 'lonely' ||
+          req.pokemonCriteria?.nature === 'brave'),
+    )
+    expect(
+      dittoNatureCriteria?.some(
+        (req) => req.pokemonCriteria?.nature === 'lonely',
+      ),
+    ).toBe(true)
+    expect(
+      dittoNatureCriteria?.some(
+        (req) => req.pokemonCriteria?.nature === 'brave',
+      ),
+    ).toBe(true)
+  })
+
   test('Route 11 trainer battles use trainer payouts without manual candy rewards', () => {
     const route11TrainerBattles = battles.filter(
       (battle) => !battle.isWildBattle && battle.id.startsWith('route-11-'),

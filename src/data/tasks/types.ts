@@ -65,6 +65,7 @@ export interface PokemonCriteria {
   minLevel?: number
   maxLevel?: number
   size?: 'XS' | 'S' | 'L' | 'XL'
+  nature?: string | string[]
   shiny?: boolean
   rarity?: PokemonRarityId
   isShadow?: boolean
