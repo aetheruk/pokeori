@@ -13,6 +13,7 @@ import { StartVoyageSchema } from '@/utilities/validators'
 import { getExplorerVoyageSlotCount, getSkillLevel } from '@/utilities/skills/unlocks'
 import { recordDailyActivityProgress } from '@/utilities/tasks/daily-progress'
 import { getEconomyActionErrorMessage, runEconomyAction } from '@/utilities/economy/transactions'
+import { isVoyagePokemonEligible } from './eligibility'
 
 export type VoyageResult = {
   success: boolean
@@ -112,13 +113,12 @@ export async function startVoyage(
   // Check Criteria (Individual)
   if (voyage.pokemonCriteria) {
     for (const p of userPokemon) {
-      if (
-        voyage.pokemonCriteria.allowedSpeciesIds &&
-        !voyage.pokemonCriteria.allowedSpeciesIds.includes(p.speciesId)
-      ) {
-        return { success: false, message: `Pokemon ${p.name} is not allowed (wrong species)` }
+      if (!isVoyagePokemonEligible(p, voyage.pokemonCriteria)) {
+        return {
+          success: false,
+          message: `Pokemon ${p.name} is not allowed for this voyage`,
+        }
       }
-      // Add other checks (level etc) if needed
     }
   }
 

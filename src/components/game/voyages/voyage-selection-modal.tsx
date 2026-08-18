@@ -30,6 +30,7 @@ import { cn } from '@/lib/utils'
 import { getOwnedPokemonGender } from '@/utilities/pokemon/gender'
 import type { RequirementData } from '@/utilities/requirements'
 import { completeVoyage, startVoyage } from '@/utilities/voyages/actions'
+import { isVoyagePokemonEligible } from '@/utilities/voyages/eligibility'
 
 interface VoyageSelectionModalProps {
   voyage: VoyageConfig | null
@@ -66,13 +67,7 @@ export function VoyageSelectionModal({
       if (p.locked) return false
       const criteria = voyage.pokemonCriteria
       if (!criteria) return true
-      if (
-        criteria.allowedSpeciesIds &&
-        !criteria.allowedSpeciesIds.includes(p.speciesId)
-      )
-        return false
-      if (criteria.minLevel && (p.level || 1) < criteria.minLevel) return false
-      return true
+      return isVoyagePokemonEligible(p, criteria)
     })
   }, [userPokemon, voyage, activeVoyageData])
 
