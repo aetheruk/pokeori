@@ -2,6 +2,7 @@ import type { TrainerClass } from './types'
 
 export const normalTrainerClasses = [
   { id: 'beauty', name: 'Beauty', spriteId: '/sprites/trainers/beauty.avif', payoutModifier: 70, gender: 'f', kind: 'normal', special: false, vsSeeker: true },
+  { id: 'biker', name: 'Biker', spriteId: '/sprites/trainers/biker.avif', payoutModifier: 40, gender: 'm', kind: 'normal', special: false, vsSeeker: true },
   { id: 'bird-keeper', name: 'Birdkeeper', spriteId: '/sprites/trainers/bird-keeper.avif', payoutModifier: 25, gender: 'm', kind: 'normal', special: false },
   { id: 'black-belt', name: 'Black Belt', spriteId: '/sprites/trainers/black-belt.avif', payoutModifier: 25, gender: 'm', kind: 'normal', special: false, vsSeeker: true },
   { id: 'butler', name: 'Butler', spriteId: '/sprites/trainers/butler.avif', payoutModifier: 50, gender: 'm', kind: 'normal', special: false },

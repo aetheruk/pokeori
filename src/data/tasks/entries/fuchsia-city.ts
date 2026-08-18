@@ -281,6 +281,74 @@ export const fuchsiaCityTasks: Task[] = [
     },
   },
   {
+    id: 'route-14-biker-intro',
+    name: 'The Junkyard Crew',
+    description:
+      'A gang of Bikers has blocked the road south, and their leader wants to see you try.',
+    category: 'Kanto',
+    subCategory: 'Fuchsia City',
+    icon: {
+      type: 'trainer',
+      id: 'biker',
+    },
+    background: '/backgrounds/grassy-route.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    chat: true,
+    completeButtonText: 'Talk to Gerald',
+    requirements: [robertGate],
+    criteria: [],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        background: '/backgrounds/grassy-route.avif',
+        title: 'Biker Gerald',
+        icon: {
+          type: 'trainer',
+          id: 'biker',
+        },
+        message:
+          "Hold it right there, Trainer. Road's closed. Junkyard Crew business, and this stretch of Route 14 is ours. You want past? You'll have to beat all four of us. And even then, I'm not promising anything.",
+        buttons: [
+          {
+            text: 'Beat all four of you?',
+            type: 'navigate',
+            id: 2,
+          },
+        ],
+      },
+      {
+        id: 2,
+        background: '/backgrounds/grassy-route.avif',
+        title: 'Biker Gerald',
+        icon: {
+          type: 'trainer',
+          id: 'biker',
+        },
+        message:
+          "Me, then Malik, then Isaac, then Lukas. That's the order. Try not to break your Pokeballs on the first one.",
+        buttons: [
+          {
+            text: 'Fine',
+            type: 'success',
+          },
+        ],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/grassy-route.avif',
+      title: 'The Junkyard Crew',
+      icon: {
+        type: 'trainer',
+        id: 'biker',
+      },
+      message: "Gerald revs his bike and grins. 'First up is me. Hope you're ready.'",
+      closeButtonText: 'Battle Gerald',
+    },
+  },
+  {
     id: 'route-14-biker-fetch-1',
     name: 'A Spark of Goodwill',
     description: 'Biker Gerald\u2019s bike will not start without a spark plug.',
@@ -351,6 +419,63 @@ export const fuchsiaCityTasks: Task[] = [
       message:
         "Gerald squints at the greasy spark plug, nods once, and waves you past. 'Malik's your problem now.'",
       closeButtonText: 'Move On',
+    },
+  },
+  {
+    id: 'route-14-biker-confront-malik',
+    name: 'Malik\u2019s Suspicion',
+    description:
+      'Biker Malik does not trust a Trainer who fixes bikes, and he is blocking the road.',
+    category: 'Kanto',
+    subCategory: 'Fuchsia City',
+    icon: {
+      type: 'trainer',
+      id: 'biker',
+    },
+    background: '/backgrounds/grassy-route.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    chat: true,
+    completeButtonText: 'Face Malik',
+    requirements: [
+      robertGate,
+      {
+        type: 'task_completed',
+        targetId: 'route-14-biker-fetch-1',
+      },
+    ],
+    criteria: [],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        background: '/backgrounds/grassy-route.avif',
+        title: 'Biker Malik',
+        icon: {
+          type: 'trainer',
+          id: 'biker',
+        },
+        message:
+          "Stop. Gerald told me about you. Brought him a spark plug like some kind of mechanic. I don't trust trainers who fix bikes. Mine's clogged, and I bet it's your fault somehow.",
+        buttons: [
+          {
+            text: 'I found a carburetor',
+            type: 'success',
+          },
+        ],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/grassy-route.avif',
+      title: 'Biker Malik',
+      icon: {
+        type: 'trainer',
+        id: 'biker',
+      },
+      message:
+        "Malik glares. 'Bring it to me first. Then we'll see about letting you past.'",
+      closeButtonText: 'Get the Carburetor',
     },
   },
   {
@@ -427,6 +552,63 @@ export const fuchsiaCityTasks: Task[] = [
     },
   },
   {
+    id: 'route-14-biker-confront-isaac',
+    name: 'Isaac\u2019s Excuse',
+    description:
+      'Biker Isaac is blocking the road and expects you to do all the work first.',
+    category: 'Kanto',
+    subCategory: 'Fuchsia City',
+    icon: {
+      type: 'trainer',
+      id: 'biker',
+    },
+    background: '/backgrounds/grassy-route.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    chat: true,
+    completeButtonText: 'Face Isaac',
+    requirements: [
+      robertGate,
+      {
+        type: 'task_completed',
+        targetId: 'route-14-biker-fetch-2',
+      },
+    ],
+    criteria: [],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        background: '/backgrounds/grassy-route.avif',
+        title: 'Biker Isaac',
+        icon: {
+          type: 'trainer',
+          id: 'biker',
+        },
+        message:
+          "Ugh. Another one. Malik said you'd be coming. My chain snapped and I am NOT going looking for it. Bring me the link and we can skip the part where I pretend to be threatening.",
+        buttons: [
+          {
+            text: 'The chain link',
+            type: 'success',
+          },
+        ],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/grassy-route.avif',
+      title: 'Biker Isaac',
+      icon: {
+        type: 'trainer',
+        id: 'biker',
+      },
+      message:
+        "'Yeah, yeah. Bring it back and Lukas is the only one left. He doesn't talk much. That's the scary one.'",
+      closeButtonText: 'Get the Chain Link',
+    },
+  },
+  {
     id: 'route-14-biker-fetch-3',
     name: 'The Missing Chain Link',
     description: 'Biker Isaac lost a chain link somewhere in the Route 14 study spots.',
@@ -497,6 +679,62 @@ export const fuchsiaCityTasks: Task[] = [
       message:
         "'Yeah yeah, you found it. Lukas is the last one. He's quiet. Watch your back.'",
       closeButtonText: 'Move On',
+    },
+  },
+  {
+    id: 'route-14-biker-confront-lukas',
+    name: 'The Quiet One',
+    description:
+      'Biker Lukas steps onto the road. He does not say much, and that is worse.',
+    category: 'Kanto',
+    subCategory: 'Fuchsia City',
+    icon: {
+      type: 'trainer',
+      id: 'biker',
+    },
+    background: '/backgrounds/grassy-route.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    chat: true,
+    completeButtonText: 'Face Lukas',
+    requirements: [
+      robertGate,
+      {
+        type: 'task_completed',
+        targetId: 'route-14-biker-fetch-3',
+      },
+    ],
+    criteria: [],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        background: '/backgrounds/grassy-route.avif',
+        title: 'Biker Lukas',
+        icon: {
+          type: 'trainer',
+          id: 'biker',
+        },
+        message:
+          "...You got the parts. All of them. Gerald said you didn't complain once. ...We'll see if that's true after you fight me.",
+        buttons: [
+          {
+            text: 'I\u2019m ready',
+            type: 'success',
+          },
+        ],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/grassy-route.avif',
+      title: 'Biker Lukas',
+      icon: {
+        type: 'trainer',
+        id: 'biker',
+      },
+      message: 'Lukas just nods and steps onto the road.',
+      closeButtonText: 'Battle Lukas',
     },
   },
   {

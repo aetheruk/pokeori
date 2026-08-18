@@ -194,7 +194,7 @@ const route8Battles: BattleConfig[] = [
   }),
   route8TrainerBattle({
     id: 'route-8-biker-jaren',
-    trainerClassId: 'cyclist-m',
+    trainerClassId: 'biker',
     trainerName: 'Jaren',
     name: 'Biker Jaren',
     description: 'A Route 8 Biker blocks the path with a pair of Grimer.',
@@ -206,7 +206,7 @@ const route8Battles: BattleConfig[] = [
   }),
   route8TrainerBattle({
     id: 'route-8-biker-ricardo',
-    trainerClassId: 'cyclist-m',
+    trainerClassId: 'biker',
     trainerName: 'Ricardo',
     name: 'Biker Ricardo',
     description: 'A Route 8 Biker rides with Koffing and Grimer.',

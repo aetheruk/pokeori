@@ -873,7 +873,7 @@ describe('static data references', () => {
     ).toBe(true)
   })
 
-  test('Route 14 fetch tasks gate the Biker battles', () => {
+  test('Route 14 biker storyline gates battles in order', () => {
     expect(
       tasks
         .filter((task) => task.id.startsWith('route-14-biker-fetch-'))
@@ -885,22 +885,62 @@ describe('static data references', () => {
       'route-14-biker-fetch-3',
     ])
 
-    const gatesBiker = (battleId: string, fetchId: string) =>
+    const battleGatedOn = (battleId: string, taskId: string) =>
       battles
         .find((battle) => battle.id === battleId)
         ?.requirements?.some(
-          (req) => req.type === 'task_completed' && req.targetId === fetchId,
+          (req) => req.type === 'task_completed' && req.targetId === taskId,
         )
 
-    expect(gatesBiker('route-14-biker-malik', 'route-14-biker-fetch-1')).toBe(
-      true,
-    )
-    expect(gatesBiker('route-14-biker-isaac', 'route-14-biker-fetch-2')).toBe(
-      true,
-    )
-    expect(gatesBiker('route-14-biker-lukas', 'route-14-biker-fetch-3')).toBe(
-      true,
-    )
+    expect(
+      battleGatedOn('route-14-biker-gerald', 'route-14-biker-intro'),
+    ).toBe(true)
+    expect(
+      battleGatedOn('route-14-biker-malik', 'route-14-biker-confront-malik'),
+    ).toBe(true)
+    expect(
+      battleGatedOn('route-14-biker-isaac', 'route-14-biker-confront-isaac'),
+    ).toBe(true)
+    expect(
+      battleGatedOn('route-14-biker-lukas', 'route-14-biker-confront-lukas'),
+    ).toBe(true)
+
+    const taskGatedOn = (taskId: string, targetId: string) =>
+      tasks
+        .find((task) => task.id === taskId)
+        ?.requirements?.some(
+          (req) => req.type === 'task_completed' && req.targetId === targetId,
+        )
+
+    expect(
+      taskGatedOn('route-14-biker-confront-malik', 'route-14-biker-fetch-1'),
+    ).toBe(true)
+    expect(
+      taskGatedOn('route-14-biker-confront-isaac', 'route-14-biker-fetch-2'),
+    ).toBe(true)
+    expect(
+      taskGatedOn('route-14-biker-confront-lukas', 'route-14-biker-fetch-3'),
+    ).toBe(true)
+
+    const fetchGatedOnWin = (fetchId: string, battleId: string) =>
+      tasks
+        .find((task) => task.id === fetchId)
+        ?.requirements?.some(
+          (req) =>
+            req.type === 'battle_result' &&
+            req.targetId === battleId &&
+            req.battleStatus === 'win',
+        )
+
+    expect(
+      fetchGatedOnWin('route-14-biker-fetch-1', 'route-14-biker-gerald'),
+    ).toBe(true)
+    expect(
+      fetchGatedOnWin('route-14-biker-fetch-2', 'route-14-biker-malik'),
+    ).toBe(true)
+    expect(
+      fetchGatedOnWin('route-14-biker-fetch-3', 'route-14-biker-isaac'),
+    ).toBe(true)
   })
 
   test('Farfetch\u2019d and the sky patrol unlock after the Feathered Gauntlet', () => {

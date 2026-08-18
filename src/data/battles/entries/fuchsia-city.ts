@@ -332,7 +332,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-13-biker-jared',
-    trainerClassId: 'cyclist-m',
+    trainerClassId: 'biker',
     trainerName: 'Jared',
     name: 'Biker Jared',
     description: 'A Biker revving his engine and trailing Koffing smoke across Route 13.',
@@ -340,7 +340,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     subCategory: 'Fuchsia City',
     icon: {
       type: 'trainer',
-      id: 'cyclist-m',
+      id: 'biker',
     },
     background: '/backgrounds/grassy-route.avif',
     requirements: [
@@ -358,7 +358,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
       { speciesId: 109, formId: '109', level: 28 },
       { speciesId: 109, formId: '109', level: 28 },
     ],
-    rewards: [trainerPokeDollarReward('cyclist-m', 28), candyExDrop],
+    rewards: [trainerPokeDollarReward('biker', 28), candyExDrop],
     maxPokemon: 2,
     levelCap: 35,
     enemyAttackTelegraphChance: 2,
@@ -828,7 +828,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   // Junkyard Crew
   {
     id: 'route-14-biker-gerald',
-    trainerClassId: 'cyclist-m',
+    trainerClassId: 'biker',
     trainerName: 'Gerald',
     name: 'Biker Gerald',
     description: 'The loud leader of the Junkyard Crew, blocking the road south.',
@@ -836,22 +836,29 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     subCategory: 'Fuchsia City',
     icon: {
       type: 'trainer',
-      id: 'cyclist-m',
+      id: 'biker',
     },
     background: '/backgrounds/grassy-route.avif',
-    requirements: [robertGate, unbeatenBattle('route-14-biker-gerald')],
+    requirements: [
+      robertGate,
+      {
+        type: 'task_completed',
+        targetId: 'route-14-biker-intro',
+      },
+      unbeatenBattle('route-14-biker-gerald'),
+    ],
     enemyTeam: [
       { speciesId: 109, formId: '109', level: 29 },
       { speciesId: 89, formId: '89', level: 29 },
     ],
-    rewards: [trainerPokeDollarReward('cyclist-m', 29)],
+    rewards: [trainerPokeDollarReward('biker', 29)],
     maxPokemon: 2,
     levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
     id: 'route-14-biker-malik',
-    trainerClassId: 'cyclist-m',
+    trainerClassId: 'biker',
     trainerName: 'Malik',
     name: 'Biker Malik',
     description: 'A paranoid Biker convinced everyone is after his bike parts.',
@@ -859,14 +866,14 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     subCategory: 'Fuchsia City',
     icon: {
       type: 'trainer',
-      id: 'cyclist-m',
+      id: 'biker',
     },
     background: '/backgrounds/grassy-route.avif',
     requirements: [
       robertGate,
       {
         type: 'task_completed',
-        targetId: 'route-14-biker-fetch-1',
+        targetId: 'route-14-biker-confront-malik',
       },
       unbeatenBattle('route-14-biker-malik'),
     ],
@@ -874,14 +881,14 @@ export const fuchsiaCityBattles: BattleConfig[] = [
       { speciesId: 109, formId: '109', level: 29 },
       { speciesId: 88, formId: '88', level: 29 },
     ],
-    rewards: [trainerPokeDollarReward('cyclist-m', 29)],
+    rewards: [trainerPokeDollarReward('biker', 29)],
     maxPokemon: 2,
     levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
     id: 'route-14-biker-isaac',
-    trainerClassId: 'cyclist-m',
+    trainerClassId: 'biker',
     trainerName: 'Isaac',
     name: 'Biker Isaac',
     description: 'The laziest member of the Junkyard Crew, guarding the middle of the road.',
@@ -889,14 +896,14 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     subCategory: 'Fuchsia City',
     icon: {
       type: 'trainer',
-      id: 'cyclist-m',
+      id: 'biker',
     },
     background: '/backgrounds/grassy-route.avif',
     requirements: [
       robertGate,
       {
         type: 'task_completed',
-        targetId: 'route-14-biker-fetch-2',
+        targetId: 'route-14-biker-confront-isaac',
       },
       unbeatenBattle('route-14-biker-isaac'),
     ],
@@ -905,14 +912,14 @@ export const fuchsiaCityBattles: BattleConfig[] = [
       { speciesId: 88, formId: '88', level: 28 },
       { speciesId: 109, formId: '109', level: 28 },
     ],
-    rewards: [trainerPokeDollarReward('cyclist-m', 28)],
+    rewards: [trainerPokeDollarReward('biker', 28)],
     maxPokemon: 2,
     levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
     id: 'route-14-biker-lukas',
-    trainerClassId: 'cyclist-m',
+    trainerClassId: 'biker',
     trainerName: 'Lukas',
     name: 'Biker Lukas',
     description: 'The quiet enforcer of the Junkyard Crew, and the last roadblock.',
@@ -920,14 +927,14 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     subCategory: 'Fuchsia City',
     icon: {
       type: 'trainer',
-      id: 'cyclist-m',
+      id: 'biker',
     },
     background: '/backgrounds/grassy-route.avif',
     requirements: [
       robertGate,
       {
         type: 'task_completed',
-        targetId: 'route-14-biker-fetch-3',
+        targetId: 'route-14-biker-confront-lukas',
       },
       unbeatenBattle('route-14-biker-lukas'),
     ],
@@ -937,7 +944,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
       { speciesId: 88, formId: '88', level: 26 },
       { speciesId: 109, formId: '109', level: 26 },
     ],
-    rewards: [trainerPokeDollarReward('cyclist-m', 26)],
+    rewards: [trainerPokeDollarReward('biker', 26)],
     maxPokemon: 2,
     levelCap: 35,
     enemyAttackTelegraphChance: 2,
@@ -1058,7 +1065,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   },
   {
     id: 'route-15-biker-ernest',
-    trainerClassId: 'cyclist-m',
+    trainerClassId: 'biker',
     trainerName: 'Ernest',
     name: 'Biker Ernest',
     description: 'A Biker trailing a whole cloud of Koffing across Route 15.',
@@ -1066,7 +1073,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     subCategory: 'Fuchsia City',
     icon: {
       type: 'trainer',
-      id: 'cyclist-m',
+      id: 'biker',
     },
     background: '/backgrounds/grassy-route.avif',
     requirements: [
@@ -1086,14 +1093,14 @@ export const fuchsiaCityBattles: BattleConfig[] = [
       { speciesId: 109, formId: '109', level: 25 },
       { speciesId: 88, formId: '88', level: 25 },
     ],
-    rewards: [trainerPokeDollarReward('cyclist-m', 25)],
+    rewards: [trainerPokeDollarReward('biker', 25)],
     maxPokemon: 2,
     levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
     id: 'route-15-biker-alex',
-    trainerClassId: 'cyclist-m',
+    trainerClassId: 'biker',
     trainerName: 'Alex',
     name: 'Biker Alex',
     description: 'A Biker blocking the road with a smoggy trio of poison Pokemon.',
@@ -1101,7 +1108,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     subCategory: 'Fuchsia City',
     icon: {
       type: 'trainer',
-      id: 'cyclist-m',
+      id: 'biker',
     },
     background: '/backgrounds/grassy-route.avif',
     requirements: [
@@ -1119,7 +1126,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
       { speciesId: 88, formId: '88', level: 28 },
       { speciesId: 110, formId: '110', level: 28 },
     ],
-    rewards: [trainerPokeDollarReward('cyclist-m', 28)],
+    rewards: [trainerPokeDollarReward('biker', 28)],
     maxPokemon: 2,
     levelCap: 35,
     enemyAttackTelegraphChance: 2,
