@@ -1286,6 +1286,7 @@ describe('move damage helpers', () => {
     defender.types = ['Electric']
     defender.stats = { hp: 90, attack: 55, defense: 40, specialAttack: 50, specialDefense: 50, speed: 90 }
     defender.assignedMoves = [{ moveId: 'thunderbolt' }, { moveId: 'quick-attack' }]
+    defender.battleMoveIds = ['thunderbolt', 'quick-attack']
     const transform = getMove('transform')!
     expect(transform.transformEffect).toEqual({ target: 'enemy' })
     applyMoveRuntimeEffects({ move: transform, state, side: 'player', attacker, defender })
@@ -1294,10 +1295,12 @@ describe('move damage helpers', () => {
     expect(attacker.name).toBe('Pikachu')
     expect(attacker.types).toEqual(['Electric'])
     expect(attacker.stats.speed).toBe(90)
+    expect(attacker.stats.hp).toBe(120)
     expect(attacker.assignedMoves).toEqual([
       { moveId: 'thunderbolt' },
       { moveId: 'quick-attack' },
     ])
+    expect(attacker.battleMoveIds).toEqual(['thunderbolt', 'quick-attack'])
     expect(attacker.battleAbilityState?.originalTransform?.formId).toBe('1')
     expect(
       attacker.battleAbilityState?.originalTransform?.assignedMoves,

@@ -18,6 +18,7 @@ export function rememberOriginalTransform(pokemon: BattlePokemon): void {
     stats: { ...pokemon.stats },
     statStages: pokemon.statStages ? { ...pokemon.statStages } : undefined,
     assignedMoves: pokemon.assignedMoves ? [...pokemon.assignedMoves] : undefined,
+    battleMoveIds: pokemon.battleMoveIds ? [...pokemon.battleMoveIds] : undefined,
   }
 }
 
@@ -31,13 +32,21 @@ export function applyBattleTransform(
   pokemon.formId = defender.formId
   pokemon.name = defender.name
   pokemon.types = [...defender.types]
-  pokemon.stats = { ...defender.stats }
+  // Transform copies the target's offensive/defensive stats but not its HP.
+  pokemon.stats = {
+    attack: defender.stats.attack,
+    defense: defender.stats.defense,
+    specialAttack: defender.stats.specialAttack,
+    specialDefense: defender.stats.specialDefense,
+    speed: defender.stats.speed,
+    hp: pokemon.stats.hp,
+  }
   pokemon.statStages = defender.statStages
     ? { ...defender.statStages }
     : undefined
-  pokemon.assignedMoves = getKnownBattleMoveIds(defender).map((moveId) => ({
-    moveId,
-  }))
+  const copiedMoveIds = getKnownBattleMoveIds(defender)
+  pokemon.assignedMoves = copiedMoveIds.map((moveId) => ({ moveId }))
+  pokemon.battleMoveIds = copiedMoveIds
   if (options?.copyAbility && defender.ability) {
     pokemon.ability = defender.ability
   }
@@ -55,6 +64,9 @@ export function restoreOriginalTransform(pokemon: BattlePokemon): string[] {
     : undefined
   pokemon.assignedMoves = originalTransform.assignedMoves
     ? [...originalTransform.assignedMoves]
+    : undefined
+  pokemon.battleMoveIds = originalTransform.battleMoveIds
+    ? [...originalTransform.battleMoveIds]
     : undefined
   if (pokemon.battleAbilityState) {
     pokemon.battleAbilityState.originalTransform = undefined
