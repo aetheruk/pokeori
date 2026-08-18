@@ -87,4 +87,37 @@ export const lavenderTownLocations: Location[] = [
     catchRateModifier: 1,
     keyEncounter: true,
   },
+  {
+    id: 'route-12',
+    name: 'Route 12',
+    description:
+      'The long grassy span of Silence Bridge finally lies open, leading south toward Fuchsia City.',
+    category: 'Kanto',
+    subCategory: 'Lavender Town',
+    icon: {
+      type: 'pokemon',
+      id: '43',
+    },
+    background: '/backgrounds/grassy-route.avif',
+    levelRange: {
+      min: 22,
+      max: 30,
+    },
+    requirements: [
+      {
+        type: 'location_encounter_result',
+        targetId: 'route-12-dazed-snorlax',
+        count: 1,
+      },
+    ],
+    encounters: [
+      { speciesId: 43, formId: '43', chance: 18 },
+      { speciesId: 44, formId: '44', chance: 2 },
+      { speciesId: 69, formId: '69', chance: 18 },
+      { speciesId: 70, formId: '70', chance: 2 },
+      { speciesId: 16, formId: '16', chance: 30 },
+      { speciesId: 48, formId: '48', chance: 30 },
+    ],
+    rewards: [],
+  },
 ]

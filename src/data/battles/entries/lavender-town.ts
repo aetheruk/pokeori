@@ -529,4 +529,36 @@ export const lavenderTownBattles: BattleConfig[] = [
     maxPokemon: 1,
     levelCap: 30,
   },
+  {
+    id: 'route-12-battle',
+    name: 'Route 12',
+    description: 'Wild Pokemon roam the tall grass of Silence Bridge south of Lavender Town.',
+    category: 'Kanto',
+    subCategory: 'Lavender Town',
+    icon: {
+      type: 'pokemon',
+      id: '43',
+    },
+    background: '/backgrounds/grassy-route.avif',
+    requirements: [
+      {
+        type: 'location_encounter_result',
+        targetId: 'route-12-dazed-snorlax',
+        count: 1,
+      },
+    ],
+    isWildBattle: true,
+    enemyAttackTelegraphChance: 2,
+    enemyTeam: [
+      { speciesId: 43, formId: '43', level: { min: 22, max: 26 } },
+      { speciesId: 44, formId: '44', level: { min: 28, max: 30 } },
+      { speciesId: 69, formId: '69', level: { min: 22, max: 26 } },
+      { speciesId: 70, formId: '70', level: { min: 28, max: 30 } },
+      { speciesId: 16, formId: '16', level: { min: 23, max: 27 } },
+      { speciesId: 48, formId: '48', level: { min: 24, max: 26 } },
+    ],
+    rewards: [],
+    maxPokemon: 1,
+    levelCap: 30,
+  },
 ]

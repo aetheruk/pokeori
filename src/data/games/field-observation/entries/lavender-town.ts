@@ -39,4 +39,41 @@ export const lavenderTownFieldObservationEntries: FieldObservationConfig[] = [
       difficulty: 2,
     },
   },
+  {
+    id: 'route-12-field-observation',
+    name: 'Route 12',
+    description: 'Study the Pokemon drifting through the tall grass along Silence Bridge.',
+    category: 'Kanto',
+    subCategory: 'Lavender Town',
+    icon: {
+      type: 'pokemon',
+      id: '43',
+    },
+    background: '/backgrounds/grassy-route.avif',
+    requirements: [
+      {
+        type: 'location_encounter_result',
+        targetId: 'route-12-dazed-snorlax',
+        count: 1,
+      },
+    ],
+    rewards: [],
+    settings: {
+      pokemonPool: [
+        { speciesId: 43, formId: '43', weight: 18 },
+        { speciesId: 44, formId: '44', weight: 2 },
+        { speciesId: 69, formId: '69', weight: 18 },
+        { speciesId: 70, formId: '70', weight: 2 },
+        { speciesId: 16, formId: '16', weight: 30 },
+        { speciesId: 48, formId: '48', weight: 30 },
+      ],
+      levelRange: {
+        min: 22,
+        max: 30,
+      },
+      timeLimit: 12,
+      answerTimeLimit: 12,
+      difficulty: 2,
+    },
+  },
 ]

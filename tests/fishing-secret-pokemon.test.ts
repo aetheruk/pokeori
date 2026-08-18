@@ -12,49 +12,74 @@ const baseEntry: FishingPokemonEntry = {
 }
 
 describe('secret fishing Pokemon replacements', () => {
-  test('old rod can secretly replace a Pokemon result with Relicanth', () => {
-    expect(
-      applySecretFishingPokemonReplacement({
-        rodType: 'old',
-        entry: baseEntry,
-        random: () => 0,
-      }),
-    ).toEqual({
-      ...baseEntry,
-      speciesId: 369,
-      formId: '369',
-    })
+  const rodTypes = ['old', 'good', 'super'] as const
+
+  test('any rod can secretly replace a Pokemon result with Relicanth', () => {
+    for (const rodType of rodTypes) {
+      expect(
+        applySecretFishingPokemonReplacement({
+          rodType,
+          entry: baseEntry,
+          random: () => 0,
+        }),
+      ).toEqual({
+        ...baseEntry,
+        speciesId: 369,
+        formId: '369',
+      })
+    }
   })
 
-  test('good rod can secretly replace a Pokemon result with Feebas', () => {
-    expect(
-      applySecretFishingPokemonReplacement({
-        rodType: 'good',
-        entry: baseEntry,
-        random: () => 0,
-      }),
-    ).toEqual({
-      ...baseEntry,
-      speciesId: 349,
-      formId: '349',
-    })
+  test('any rod can secretly replace a Pokemon result with Feebas', () => {
+    for (const rodType of rodTypes) {
+      let calls = 0
+      expect(
+        applySecretFishingPokemonReplacement({
+          rodType,
+          entry: baseEntry,
+          random: () => (calls++ === 0 ? 1 / 1024 : 0),
+        }),
+      ).toEqual({
+        ...baseEntry,
+        speciesId: 349,
+        formId: '349',
+      })
+    }
   })
 
-  test('secret replacements do not affect super rod or failed rolls', () => {
-    expect(
-      applySecretFishingPokemonReplacement({
-        rodType: 'super',
-        entry: baseEntry,
-        random: () => 0,
-      }),
-    ).toBe(baseEntry)
+  test('Relicanth wins over Feebas when both rolls would succeed', () => {
+    for (const rodType of rodTypes) {
+      expect(
+        applySecretFishingPokemonReplacement({
+          rodType,
+          entry: baseEntry,
+          random: () => 1 / 2048,
+        }),
+      ).toEqual({
+        ...baseEntry,
+        speciesId: 369,
+        formId: '369',
+      })
+    }
+  })
 
-    expect(
-      applySecretFishingPokemonReplacement({
-        rodType: 'old',
-        entry: baseEntry,
-        random: () => 1 / 512,
-      }),
-    ).toBe(baseEntry)
+  test('failed rolls keep the original Pokemon', () => {
+    for (const rodType of rodTypes) {
+      expect(
+        applySecretFishingPokemonReplacement({
+          rodType,
+          entry: baseEntry,
+          random: () => 1 / 512,
+        }),
+      ).toBe(baseEntry)
+
+      expect(
+        applySecretFishingPokemonReplacement({
+          rodType,
+          entry: baseEntry,
+          random: () => 1,
+        }),
+      ).toBe(baseEntry)
+    }
   })
 })

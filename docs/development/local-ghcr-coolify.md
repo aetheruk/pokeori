@@ -41,8 +41,11 @@ Deploy only after the feature pull request has merged to `main`. From a clean fe
 
 ```bash
 bun install --frozen-lockfile
+docker builder prune -af && docker system prune -af
 bun run deploy:production
 ```
+
+Prune Docker images and build cache before building. A host disk that is nearly full stops the Docker engine mid-deploy with `no space left on device` (see `com.docker.backend.log`); keep several GB free on the release machine and restart Docker Desktop if the engine stopped.
 
 `deploy:production` obtains the GHCR token from `gh auth token`, defaults the GHCR username to `aetheruk`, and reads Coolify aliases plus the Server Actions build key from `.env` when they are not already exported. It validates the repository, builds a local `linux/amd64` candidate, enforces the 350 MiB image budget, and smokes `/api/app-version` from that exact image before pushing it. It reuses Bun package downloads, Next compiler output, and a GHCR-backed BuildKit cache.
 
