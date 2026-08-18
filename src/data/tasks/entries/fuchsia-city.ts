@@ -351,12 +351,13 @@ export const fuchsiaCityTasks: Task[] = [
   {
     id: 'route-14-biker-fetch-1',
     name: 'A Spark of Goodwill',
-    description: 'Biker Gerald\u2019s bike will not start without a spark plug.',
+    description:
+      'The Junkyard Crew blocks Route 14, but Gerald says he will let you pass if you fix his bike - it will not start without a spark plug.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {
       type: 'trainer',
-      id: 'cyclist-m',
+      id: 'biker',
     },
     background: '/backgrounds/grassy-route.avif',
     repeatable: false,
@@ -366,6 +367,10 @@ export const fuchsiaCityTasks: Task[] = [
     completeButtonText: 'Hand Over Spark Plug',
     requirements: [
       robertGate,
+      {
+        type: 'task_completed',
+        targetId: 'route-14-biker-intro',
+      },
       {
         type: 'battle_result',
         targetId: 'route-14-biker-gerald',
@@ -397,7 +402,7 @@ export const fuchsiaCityTasks: Task[] = [
         title: 'Biker Gerald',
         icon: {
           type: 'trainer',
-          id: 'cyclist-m',
+          id: 'biker',
         },
         message:
           "Oi! You're the one who cleared the road up north, right? My bike won't start and I know why - spark plug's gone. The wild Pokemon keep kicking 'em out of the tall grass. Go shake one loose in a battle and bring it back.",
@@ -414,7 +419,7 @@ export const fuchsiaCityTasks: Task[] = [
       title: 'Biker Gerald',
       icon: {
         type: 'trainer',
-        id: 'cyclist-m',
+        id: 'biker',
       },
       message:
         "Gerald squints at the greasy spark plug, nods once, and waves you past. 'Malik's your problem now.'",
@@ -481,12 +486,13 @@ export const fuchsiaCityTasks: Task[] = [
   {
     id: 'route-14-biker-fetch-2',
     name: 'A Clogged Carburetor',
-    description: 'Biker Malik needs a carburetor that a Pokemon coughed up somewhere.',
+    description:
+      'Malik is blocking the road too, and he will not move until his clogged carburetor is replaced.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {
       type: 'trainer',
-      id: 'cyclist-m',
+      id: 'biker',
     },
     background: '/backgrounds/grassy-route.avif',
     repeatable: false,
@@ -527,7 +533,7 @@ export const fuchsiaCityTasks: Task[] = [
         title: 'Biker Malik',
         icon: {
           type: 'trainer',
-          id: 'cyclist-m',
+          id: 'biker',
         },
         message:
           "Don't come any closer. I saw what you did to Gerald's bike. ... Fine. My carburetor's clogged. A Pokemon coughed it up somewhere in the grass - go catch yourself something and check what it was carrying.",
@@ -544,7 +550,7 @@ export const fuchsiaCityTasks: Task[] = [
       title: 'Biker Malik',
       icon: {
         type: 'trainer',
-        id: 'cyclist-m',
+        id: 'biker',
       },
       message:
         "Malik reluctantly waves you past. 'Isaac's up ahead. He's the lazy one. Good luck.'",
@@ -611,12 +617,13 @@ export const fuchsiaCityTasks: Task[] = [
   {
     id: 'route-14-biker-fetch-3',
     name: 'The Missing Chain Link',
-    description: 'Biker Isaac lost a chain link somewhere in the Route 14 study spots.',
+    description:
+      'Isaac\u2019s snapped chain link rolled off into the study spots; he expects you to fetch it before letting you through.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {
       type: 'trainer',
-      id: 'cyclist-m',
+      id: 'biker',
     },
     background: '/backgrounds/grassy-route.avif',
     repeatable: false,
@@ -657,7 +664,7 @@ export const fuchsiaCityTasks: Task[] = [
         title: 'Biker Isaac',
         icon: {
           type: 'trainer',
-          id: 'cyclist-m',
+          id: 'biker',
         },
         message:
           "Ugh. Do I look like I'm in a hurry? My chain snapped and one of the links rolled off into the study spots. Go poke around the tall grass with that notebook of yours and find it. I'd do it myself but... I'm resting.",
@@ -674,7 +681,7 @@ export const fuchsiaCityTasks: Task[] = [
       title: 'Biker Isaac',
       icon: {
         type: 'trainer',
-        id: 'cyclist-m',
+        id: 'biker',
       },
       message:
         "'Yeah yeah, you found it. Lukas is the last one. He's quiet. Watch your back.'",
@@ -746,7 +753,7 @@ export const fuchsiaCityTasks: Task[] = [
     subCategory: 'Fuchsia City',
     icon: {
       type: 'trainer',
-      id: 'cyclist-m',
+      id: 'biker',
     },
     background: '/backgrounds/grassy-route.avif',
     repeatable: false,
@@ -779,7 +786,7 @@ export const fuchsiaCityTasks: Task[] = [
         title: 'Biker Lukas',
         icon: {
           type: 'trainer',
-          id: 'cyclist-m',
+          id: 'biker',
         },
         message:
           "You got the parts. You did the work. Nobody's ever done the work without complaining before.",
@@ -797,7 +804,7 @@ export const fuchsiaCityTasks: Task[] = [
         title: 'Biker Lukas',
         icon: {
           type: 'trainer',
-          id: 'cyclist-m',
+          id: 'biker',
         },
         message:
           "Truth is, we didn't block it for fun. A pack of wild Pokemon tore through our camp and wrecked every single bike. We couldn't chase them off and we were too proud to ask for help. So we just... blocked the road.",
@@ -815,7 +822,7 @@ export const fuchsiaCityTasks: Task[] = [
         title: 'Biker Lukas',
         icon: {
           type: 'trainer',
-          id: 'cyclist-m',
+          id: 'biker',
         },
         message:
           "You fixed our bikes and beat all four of us. The road south is open. If anyone asks, we fixed it ourselves.",
@@ -832,7 +839,7 @@ export const fuchsiaCityTasks: Task[] = [
       title: 'The Road South',
       icon: {
         type: 'trainer',
-        id: 'cyclist-m',
+        id: 'biker',
       },
       message: 'The Junkyard Crew packs up camp and clears the road. Route 15 lies ahead.',
       closeButtonText: 'Head South',

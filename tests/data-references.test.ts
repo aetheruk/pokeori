@@ -921,6 +921,9 @@ describe('static data references', () => {
     expect(
       taskGatedOn('route-14-biker-confront-lukas', 'route-14-biker-fetch-3'),
     ).toBe(true)
+    expect(
+      taskGatedOn('route-14-biker-fetch-1', 'route-14-biker-intro'),
+    ).toBe(true)
 
     const fetchGatedOnWin = (fetchId: string, battleId: string) =>
       tasks
@@ -1126,6 +1129,46 @@ describe('static data references', () => {
     expect(
       dittoNatureCriteria?.some(
         (req) => req.pokemonCriteria?.nature === 'brave',
+      ),
+    ).toBe(true)
+  })
+
+  test('the 5F Lick Off requires Explorer 40 and a Gengar partner, and unlocks Lickitung', () => {
+    const task = tasks.find((entry) => entry.id === 'pokemon-tower-5f-lick-off')
+    expect(
+      task?.requirements?.some(
+        (req) =>
+          req.type === 'battle_result' &&
+          req.targetId === 'pokemon-tower-channeler-paula' &&
+          req.battleStatus === 'win',
+      ),
+    ).toBe(true)
+    expect(
+      task?.requirements?.some(
+        (req) =>
+          req.type === 'skill_level' &&
+          req.targetId === 'catching' &&
+          req.count === 40,
+      ),
+    ).toBe(true)
+    expect(
+      task?.requirements?.some(
+        (req) =>
+          req.type === 'companion' &&
+          req.companionCheck?.speciesId === 94 &&
+          req.companionCheck?.formId === '94',
+      ),
+    ).toBe(true)
+
+    const floor5 = locations.find((entry) => entry.id === 'pokemon-tower-5f')
+    const lickitung = floor5?.encounters?.find(
+      (encounter) => encounter.speciesId === 108,
+    )
+    expect(
+      lickitung?.requirements?.some(
+        (req) =>
+          req.type === 'task_completed' &&
+          req.targetId === 'pokemon-tower-5f-lick-off',
       ),
     ).toBe(true)
   })

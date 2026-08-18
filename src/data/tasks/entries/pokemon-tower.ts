@@ -1693,4 +1693,129 @@ export const pokemonTowerTasks: Task[] = [
       closeButtonText: 'Record Notes',
     },
   },
+  {
+    id: 'pokemon-tower-5f-lick-off',
+    name: 'The Lick Off',
+    description:
+      'A Gengar on Pokemon Tower 5F is challenging your Gengar to a battle of tongues.',
+    category: 'Kanto',
+    subCategory: 'Pokemon Tower',
+    icon: {
+      type: 'pokemon',
+      id: '94',
+    },
+    background: '/backgrounds/pkmn-tower.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    chat: true,
+    completeButtonText: 'Accept the Challenge',
+    requirements: [
+      {
+        type: 'battle_result',
+        targetId: 'pokemon-tower-channeler-paula',
+        battleStatus: 'win',
+        count: 1,
+      },
+      {
+        type: 'skill_level',
+        targetId: 'catching',
+        count: 40,
+      },
+      {
+        type: 'companion',
+        count: 1,
+        companionCheck: {
+          speciesId: 94,
+          formId: '94',
+        },
+      },
+    ],
+    criteria: [],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        background: '/backgrounds/pkmn-tower.avif',
+        title: 'Gengar',
+        icon: {
+          type: 'pokemon',
+          id: '94',
+        },
+        message:
+          "You. Gengar. Me. Gengar. This is a Lick Off. Two Gengars enter. One... actually both leave, but only one is the better licker. Ready?",
+        buttons: [
+          {
+            text: 'Ready?',
+            type: 'navigate',
+            id: 2,
+          },
+        ],
+      },
+      {
+        id: 2,
+        background: '/backgrounds/pkmn-tower.avif',
+        title: 'Gengar',
+        icon: {
+          type: 'pokemon',
+          id: '94',
+        },
+        message:
+          "Both Gengars begin licking each other. Neither flinches. Neither blinks. They are locked in the most intense tongue battle the Tower has ever seen. It is unclear if anyone is winning.",
+        buttons: [
+          {
+            text: 'Keep watching',
+            type: 'navigate',
+            id: 3,
+          },
+        ],
+      },
+      {
+        id: 3,
+        background: '/backgrounds/pkmn-tower.avif',
+        title: 'Lickitung',
+        icon: {
+          type: 'pokemon',
+          id: '108',
+        },
+        message:
+          "A Lickitung wanders in from the stairs. It watches for a long moment. Then, in one single, magnificent sweep, it licks BOTH Gengars from head to tail. The Lick Off ends instantly. Everyone is covered in saliva. Nobody knows what just happened.",
+        buttons: [
+          {
+            text: 'What just happened?',
+            type: 'navigate',
+            id: 4,
+          },
+        ],
+      },
+      {
+        id: 4,
+        background: '/backgrounds/pkmn-tower.avif',
+        title: 'Gengar',
+        icon: {
+          type: 'pokemon',
+          id: '94',
+        },
+        message:
+          "...Fine. Nobody beats the Lickitung. It is the true master of the lick. ...You saw it too. Now it knows this floor is safe. It might stay.",
+        buttons: [
+          {
+            text: 'Welcome, Lickitung',
+            type: 'success',
+          },
+        ],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/pkmn-tower.avif',
+      title: 'The Lick Off',
+      icon: {
+        type: 'pokemon',
+        id: '108',
+      },
+      message:
+        'The Lickitung licks a memorial stone, looks satisfied, and settles in on 5F. It seems to be staying.',
+      closeButtonText: 'Leave Them To It',
+    },
+  },
 ]
