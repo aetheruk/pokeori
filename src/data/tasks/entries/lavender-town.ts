@@ -956,4 +956,182 @@ export const lavenderTownTasks: Task[] = [
       },
     ],
   },
+  {
+    id: 'route-12-fishing-guru',
+    name: 'Monster from the Deep',
+    description:
+      "The home of the legendary Fishing Guru, I hope he's less unhinged than that guy in Vermilion City.",
+    category: 'Kanto',
+    subCategory: 'Lavender Town',
+    icon: {
+      type: 'trainer',
+      id: 'fisherman',
+    },
+    background: '/backgrounds/inside-house.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    chat: true,
+    completeButtonText: 'Knock on the Door',
+    requirements: [
+      {
+        type: 'location_encounter_result',
+        targetId: 'route-12-dazed-snorlax',
+        count: 1,
+      },
+    ],
+    criteria: [],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        background: '/backgrounds/inside-house.avif',
+        title: 'Fishing Guru',
+        icon: {
+          type: 'trainer',
+          id: 'fisherman',
+        },
+        message:
+          'Ahh Hello, Trainer! You must be here for some supreme fishing knowledge.',
+        buttons: [
+          {
+            text: 'I sure am!',
+            type: 'navigate',
+            id: 2,
+          },
+        ],
+      },
+      {
+        id: 2,
+        background: '/backgrounds/inside-house.avif',
+        title: 'Fishing Guru',
+        icon: {
+          type: 'trainer',
+          id: 'fisherman',
+        },
+        message:
+          "Well unfortunately now isn't a great time or should I say SUPER Time!",
+        buttons: [
+          {
+            text: 'Brilliant...',
+            type: 'navigate',
+            id: 3,
+          },
+        ],
+      },
+      {
+        id: 3,
+        background: '/backgrounds/inside-house.avif',
+        title: 'Fishing Guru',
+        icon: {
+          type: 'trainer',
+          id: 'fisherman',
+        },
+        message:
+          "Anyway, I'm tired of giving out rods and not getting anything in return, You have no idea how many trainers come through here asking for free Rods.",
+        buttons: [
+          {
+            text: 'Ok...',
+            type: 'navigate',
+            id: 4,
+          },
+        ],
+      },
+      {
+        id: 4,
+        background: '/backgrounds/inside-house.avif',
+        title: 'Fishing Guru',
+        icon: {
+          type: 'trainer',
+          id: 'fisherman',
+        },
+        message:
+          "Okay so you'll help fantastic, I knew you would! You see I've got an obsession lately, A new species of Fish Pokemon has been sighted pretty much everywhere... just you know incredibly infrequently and I'm trying to track it down and I've had no luck.",
+        buttons: [
+          {
+            text: 'Continue',
+            type: 'navigate',
+            id: 5,
+          },
+        ],
+      },
+      {
+        id: 5,
+        background: '/backgrounds/inside-house.avif',
+        title: 'Fishing Guru',
+        icon: {
+          type: 'trainer',
+          id: 'fisherman',
+        },
+        message:
+          "Rumours have it that it's just the most disgusting looking creature and I just have to have one.",
+        buttons: [
+          {
+            text: 'Interesting...',
+            type: 'success',
+          },
+        ],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/inside-house.avif',
+      title: 'Monster from the Deep',
+      icon: {
+        type: 'trainer',
+        id: 'fisherman',
+      },
+      message:
+        "The Fisherman, says he's willing to part with knowledge and a brand new rod, all I have to do is bring him a really ugly fish, that nobody has fully confirmed exists. Shouldn't be too hard.",
+      closeButtonText: 'Sounds Easy',
+    },
+  },
+  {
+    id: 'route-12-eye-of-the-beholder',
+    name: 'Eye of the Beholder',
+    description: 'Apparently the sightings are limited to... Everywhere?',
+    category: 'Kanto',
+    subCategory: 'Lavender Town',
+    icon: {
+      type: 'pokemon',
+      id: '349',
+    },
+    background: '/backgrounds/inside-house.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Hand Over Feebas',
+    requirements: [
+      {
+        type: 'task_completed',
+        targetId: 'route-12-fishing-guru',
+      },
+    ],
+    criteria: [
+      {
+        type: 'pokemon_owned',
+        targetId: 349,
+        count: 1,
+        consume: true,
+        secret: true,
+      },
+    ],
+    rewards: [
+      {
+        type: 'item',
+        targetId: 'super-rod',
+        quantity: 1,
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/inside-house.avif',
+      title: 'Fishing Guru',
+      icon: {
+        type: 'pokemon',
+        id: '349',
+      },
+      message:
+        "Oh my days, it's beautiful! I can't believe you actually found one! Here take this Rod, this will take your fishing game to the next level!",
+      closeButtonText: 'Thank You!',
+    },
+  },
 ]
