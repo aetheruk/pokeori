@@ -37,6 +37,16 @@ export const icons: IconConfig[] = [
     icon: { type: 'trainer', id: 'hiker' },
   },
   {
+    id: 'cyclist',
+    name: 'Cyclist',
+    icon: { type: 'trainer', id: 'cyclist-m' },
+  },
+  {
+    id: 'cyclist-f',
+    name: 'Cyclist',
+    icon: { type: 'trainer', id: 'cyclist-f' },
+  },
+  {
     id: 'bird-keeper',
     name: 'Birdkeeper',
     icon: { type: 'trainer', id: 'bird-keeper' },

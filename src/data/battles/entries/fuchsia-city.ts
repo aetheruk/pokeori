@@ -438,7 +438,36 @@ export const fuchsiaCityBattles: BattleConfig[] = [
         targetId: 'greasy-spark-plug',
         quantity: 1,
         dropChance: 8,
+        requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'route-14-biker-fetch-1',
+            inverse: true,
+          },
+          {
+            type: 'item_owned',
+            targetId: 'greasy-spark-plug',
+            inverse: true,
+          },
+        ],
+      },
+      {
+        type: 'item',
+        targetId: 'rusty-bike-parts',
+        quantity: 1,
+        dropChance: 1,
         secret: true,
+        requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'route-14-bikers-cleared',
+          },
+          {
+            type: 'item_owned',
+            targetId: 'rusty-bike-parts',
+            inverse: true,
+          },
+        ],
       },
     ],
     maxPokemon: 1,

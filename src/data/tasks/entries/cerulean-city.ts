@@ -314,6 +314,129 @@ export const ceruleanCityTasks: Task[] = [
     },
   },
   {
+    id: 'cerulean-bike-shop-worst-customer',
+    name: 'The Worst Customer',
+    description:
+      'The Cerulean Cycles owner will not be impressed by another pile of bike scrap.',
+    category: 'Kanto',
+    subCategory: 'Cerulean City',
+    icon: {
+      type: 'item',
+      id: 'rusty-bike-parts',
+    },
+    background: '/backgrounds/bike-shop.avif',
+    repeatable: false,
+    secret: true,
+    completionTrigger: 'manual',
+    chat: true,
+    completeButtonText: 'Hand Over the Parts',
+    requirements: [
+      {
+        type: 'task_completed',
+        targetId: 'bike-shop-trade',
+      },
+      {
+        type: 'item_owned',
+        targetId: 'rusty-bike-parts',
+      },
+    ],
+    criteria: [
+      {
+        type: 'item_owned',
+        targetId: 'rusty-bike-parts',
+        count: 1,
+        consume: true,
+        secret: true,
+      },
+    ],
+    rewards: [
+      {
+        type: 'icon',
+        targetId: 'cyclist',
+        quantity: 1,
+        dropChance: 100,
+      },
+      {
+        type: 'icon',
+        targetId: 'cyclist-f',
+        quantity: 1,
+        dropChance: 100,
+      },
+      {
+        type: 'title',
+        targetId: 'worst-customer',
+        quantity: 1,
+        dropChance: 100,
+      },
+    ],
+    enterModal: [
+      {
+        id: 1,
+        background: '/backgrounds/bike-shop.avif',
+        title: 'Cycle Shop Owner',
+        icon: {
+          type: 'item',
+          id: 'broken-bike',
+        },
+        message:
+          "Oh no. It's YOU again. Last time you brought me a completely trashed bike. What is it this time?",
+        buttons: [
+          {
+            text: 'Show the rusty bike parts',
+            type: 'navigate',
+            id: 2,
+          },
+        ],
+      },
+      {
+        id: 2,
+        background: '/backgrounds/bike-shop.avif',
+        title: 'Cycle Shop Owner',
+        icon: {
+          type: 'item',
+          id: 'rusty-bike-parts',
+        },
+        message:
+          "These are... bike parts. RUSTY bike parts. Do I look like a scrapyard?! I'm done. I am banning you from Cerulean Cycles. You are officially the WORST customer I have ever had.",
+        buttons: [
+          {
+            text: 'But they\u2019re useful!',
+            type: 'navigate',
+            id: 3,
+          },
+        ],
+      },
+      {
+        id: 3,
+        background: '/backgrounds/bike-shop.avif',
+        title: 'Cycle Shop Owner',
+        icon: {
+          type: 'item',
+          id: 'rusty-bike-parts',
+        },
+        message:
+          "Out! OUT! ...Fine, keep them if you want, I don't want them anywhere near my shop. But don't you EVER bring me trash again. Ever.",
+        buttons: [
+          {
+            text: 'Banned',
+            type: 'success',
+          },
+        ],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/bike-shop.avif',
+      title: 'Banned from Cerulean Cycles',
+      icon: {
+        type: 'item',
+        id: 'rusty-bike-parts',
+      },
+      message:
+        'The Cycle Shop owner slams the door behind you. You have been banned from Cerulean Cycles - and you now hold the title of Worst Customer.',
+      closeButtonText: 'Wear It Proudly',
+    },
+  },
+  {
     id: 'cerulean-trade-jynx',
     name: 'Making Deals in Cerulean City',
     description: 'A trainer in Cerulean City is looking for a Poliwhirl',

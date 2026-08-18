@@ -101,7 +101,35 @@ export const fuchsiaCityFieldObservationEntries: FieldObservationConfig[] = [
           id: 'route-14-snapped-chain-link',
           itemId: 'snapped-chain-link',
           dropChance: 10,
+          requirements: [
+            {
+              type: 'task_completed',
+              targetId: 'route-14-biker-fetch-3',
+              inverse: true,
+            },
+            {
+              type: 'item_owned',
+              targetId: 'snapped-chain-link',
+              inverse: true,
+            },
+          ],
+        },
+        {
+          id: 'route-14-rusty-bike-parts',
+          itemId: 'rusty-bike-parts',
+          dropChance: 1,
           secret: true,
+          requirements: [
+            {
+              type: 'task_completed',
+              targetId: 'route-14-bikers-cleared',
+            },
+            {
+              type: 'item_owned',
+              targetId: 'rusty-bike-parts',
+              inverse: true,
+            },
+          ],
         },
       ],
     },

@@ -1088,6 +1088,16 @@ export const keyItems: Item[] = [
     unique: false,
   },
   {
+    id: 'rusty-bike-parts',
+    name: 'Rusty Bike Parts',
+    description:
+      'A pile of rusted scrap that vaguely resembles the remains of several bicycles. Nobody would want this.',
+    category: 'key',
+    spriteId: 'metal-alloy',
+    hueRotate: 15,
+    unique: true,
+  },
+  {
     id: 'gimmighoul-coin',
     name: 'Gimmighoul Coin',
     description:
