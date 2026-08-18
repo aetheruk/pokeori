@@ -257,7 +257,7 @@ export const pokemonTowerLocations: Location[] = [
       {
         speciesId: 92,
         formId: '92',
-        chance: 75,
+        chance: 70,
       },
       {
         speciesId: 93,
@@ -268,6 +268,17 @@ export const pokemonTowerLocations: Location[] = [
         speciesId: 104,
         formId: '104',
         chance: 10,
+      },
+      {
+        speciesId: 108,
+        formId: '108',
+        chance: 5,
+        requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'pokemon-tower-5f-lick-off',
+          },
+        ],
       },
     ],
     rewards: [

@@ -606,7 +606,7 @@ Pokemon Tower unlocks from Lavender Town after `lavender-missing-mountain`.
   - **Floor Catch Locations & Wild Battles**:
     - **3F**: `pokemon-tower-3f` catch spot and `pokemon-tower-3f-wild` (Gastly, Zubat). Very rare 1% drop chance for Fisher's Incense (`incense-fishers`).
     - **4F**: `pokemon-tower-4f` catch spot and `pokemon-tower-4f-wild` (Gastly, Zubat, Cubone). Rare 12% drop chance for Faux Spell Tag recipe manual (`faux-spell-tag-recipe`).
-    - **5F**: `pokemon-tower-5f` catch spot and `pokemon-tower-5f-wild` (Gastly, Haunter, Cubone). Very rare 1% drop chance for Fortune Incense (`incense-fortune`).
+    - **5F**: `pokemon-tower-5f` catch spot and `pokemon-tower-5f-wild` (Gastly, Haunter, Cubone). Very rare 1% drop chance for Fortune Incense (`incense-fortune`). Completing `pokemon-tower-5f-lick-off` unlocks a 5% wild Lickitung encounter on the floor.
     - **6F**: `pokemon-tower-6f` catch spot and `pokemon-tower-6f-wild` (Gastly, Haunter, Cubone). Rare 12% drop chance for Straight Spoon recipe manual (`straight-spoon-recipe`).
   - **FireRed Trainer Gauntlet**:
     - **3F Channelers**: Channeler Hope (Gastly Lv. 22), Channeler Patricia (Gastly Lv. 22), Channeler Carly (Gastly Lv. 24).
@@ -625,6 +625,7 @@ Pokemon Tower unlocks from Lavender Town after `lavender-missing-mountain`.
       - `pokemon-tower-haunter-shadow-study` (Shadow Projection): 30 Haunter Research XP (5F).
       - `pokemon-tower-purification-circle-study` (The Purified Circle): 30 Marowak Research XP (6F).
   - **Summit Boss & Resolution**: Defeating the Shadow Gauntlet unlocks `pokemon-tower-clearing-the-floors` and `pokemon-tower-calming-kita` (*The Spectral Flame*). Players face Kita (`pokemon-tower-kita-boss`, Level 40, 2-Pokemon team limit, Level Cap 40). Quelling her rage calms her spirit and leads into `pokemon-tower-kita-resolution` (*The Flame Subsides*), where she nods in gratitude and dissolves in peace, followed by `pokemon-tower-summit-azure-flute` (*A Message in the Silence*), where `{trainer}` and Detective Choo find the Note and claim the **Azure Flute** to awaken the Snorlax on Routes 12 & 16.
+- `pokemon-tower-5f-lick-off` (*The Lick Off*) is an optional silly quest that appears once 5F is unlocked (after Channeler Paula), at Explorer level 40, with a Gengar as the active partner. A rival Gengar challenges your Gengar to a Lick Off; mid-contest a Lickitung wanders in and licks both of them in one magnificent sweep, ending the contest forever. Completing it unlocks Lickitung as a 5% encounter on 5F.
 
 Current role in flow: Pokemon Tower features both the early-game Spirit Channeling / Mr. Fuji Chronicle backstory and the post-timeline-divergence dungeon ascent with Detective Choo, including full FireRed Channeler trainer progression across floors 3F to 6F, an upper-floor Shadow Pokémon Gauntlet, the level 40 Alolan Marowak boss battle to calm Kita, Field Observation studies, Pokemon Research XP tasks, and the Azure Flute summit reward.
 
