@@ -1134,4 +1134,55 @@ export const lavenderTownTasks: Task[] = [
       closeButtonText: 'Thank You!',
     },
   },
+  {
+    id: 'on-to-fuchsia-city',
+    name: 'On to Fuchsia City',
+    description: 'Wow this is quite the trek',
+    category: 'Kanto',
+    subCategory: 'Lavender Town',
+    icon: {
+      type: 'local',
+      id: '/sprites/sign.avif',
+    },
+    background: '/backgrounds/grassy-route.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Head South',
+    requirements: [
+      {
+        type: 'task_completed',
+        targetId: 'route-12-fishing-guru',
+      },
+    ],
+    criteria: [
+      {
+        type: 'location_encounter_result',
+        targetId: 'route-12',
+        count: 3,
+      },
+      {
+        type: 'battle_result',
+        targetId: 'route-12-battle',
+        battleStatus: 'win',
+        count: 5,
+      },
+      {
+        type: 'field_research_result',
+        targetId: 'route-12-field-observation',
+        count: 1,
+      },
+    ],
+    rewards: [],
+    exitModal: {
+      background: '/backgrounds/grassy-route.avif',
+      title: 'On to Fuchsia City',
+      icon: {
+        type: 'local',
+        id: '/sprites/sign.avif',
+      },
+      message: "Hopefully it's not much further now.",
+      closeButtonText: 'Select Fuchsia City',
+    },
+  },
 ]
