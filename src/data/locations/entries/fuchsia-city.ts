@@ -94,7 +94,36 @@ export const fuchsiaCityLocations: Location[] = [
         quantity: 1,
         targetId: 'bent-carburetor',
         dropChance: 10,
+        requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'route-14-biker-fetch-2',
+            inverse: true,
+          },
+          {
+            type: 'item_owned',
+            targetId: 'bent-carburetor',
+            inverse: true,
+          },
+        ],
+      },
+      {
+        type: 'item',
+        quantity: 1,
+        targetId: 'rusty-bike-parts',
+        dropChance: 1,
         secret: true,
+        requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'route-14-bikers-cleared',
+          },
+          {
+            type: 'item_owned',
+            targetId: 'rusty-bike-parts',
+            inverse: true,
+          },
+        ],
       },
     ],
   },

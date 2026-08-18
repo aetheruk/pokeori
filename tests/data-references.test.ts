@@ -1171,6 +1171,147 @@ describe('static data references', () => {
     ).toBe(true)
   })
 
+  test('bike parts are limited and rusty bike parts unlock the Cerulean ban', () => {
+    const partDropsFor = (partId: string, fetchId: string) => {
+      const battleReward = battles
+        .find((battle) => battle.id === 'route-14-battle')
+        ?.rewards.find(
+          (reward) => reward.type === 'item' && reward.targetId === partId,
+        )
+      const locationReward = locations
+        .find((location) => location.id === 'route-14')
+        ?.rewards.find(
+          (reward) => reward.type === 'item' && reward.targetId === partId,
+        )
+      const studyDrop = fieldResearchGames
+        .find((game) => game.id === 'route-14-field-observation')
+        ?.settings.itemDrops?.find((drop) => drop.itemId === partId)
+
+      const rewards = [battleReward, locationReward, studyDrop].filter(
+        Boolean,
+      ) as {
+        secret?: boolean
+        requirements?: TaskCondition[]
+      }[]
+      expect(rewards.length).toBeGreaterThan(0)
+      for (const reward of rewards) {
+        expect(reward.secret).toBeUndefined()
+        expect(
+          reward.requirements?.some(
+            (req) =>
+              req.type === 'item_owned' &&
+              req.targetId === partId &&
+              req.inverse === true,
+          ),
+        ).toBe(true)
+        expect(
+          reward.requirements?.some(
+            (req) =>
+              req.type === 'task_completed' &&
+              req.targetId === fetchId &&
+              req.inverse === true,
+          ),
+        ).toBe(true)
+      }
+    }
+
+    for (const [part, fetchId] of [
+      ['greasy-spark-plug', 'route-14-biker-fetch-1'],
+      ['bent-carburetor', 'route-14-biker-fetch-2'],
+      ['snapped-chain-link', 'route-14-biker-fetch-3'],
+    ] as const) {
+      partDropsFor(part, fetchId)
+    }
+
+    expect(items.find((item) => item.id === 'rusty-bike-parts')?.unique).toBe(
+      true,
+    )
+    const rustyRewards = [
+      battles
+        .find((battle) => battle.id === 'route-14-battle')
+        ?.rewards.find(
+          (reward) =>
+            reward.type === 'item' && reward.targetId === 'rusty-bike-parts',
+        ),
+      locations
+        .find((location) => location.id === 'route-14')
+        ?.rewards.find(
+          (reward) =>
+            reward.type === 'item' && reward.targetId === 'rusty-bike-parts',
+        ),
+      fieldResearchGames
+        .find((game) => game.id === 'route-14-field-observation')
+        ?.settings.itemDrops?.find(
+          (drop) => drop.itemId === 'rusty-bike-parts',
+        ),
+    ].filter(Boolean) as {
+      dropChance?: number
+      secret?: boolean
+      requirements?: TaskCondition[]
+    }[]
+    expect(rustyRewards).toHaveLength(3)
+    for (const reward of rustyRewards) {
+      expect(reward.dropChance).toBe(1)
+      expect(reward.secret).toBe(true)
+      expect(
+        reward.requirements?.some(
+          (req) =>
+            req.type === 'task_completed' &&
+            req.targetId === 'route-14-bikers-cleared',
+        ),
+      ).toBe(true)
+      expect(
+        reward.requirements?.some(
+          (req) =>
+            req.type === 'item_owned' &&
+            req.targetId === 'rusty-bike-parts' &&
+            req.inverse === true,
+        ),
+      ).toBe(true)
+    }
+
+    const ban = tasks.find(
+      (task) => task.id === 'cerulean-bike-shop-worst-customer',
+    )
+    expect(ban?.secret).toBe(true)
+    expect(
+      ban?.requirements?.some(
+        (req) =>
+          req.type === 'task_completed' && req.targetId === 'bike-shop-trade',
+      ),
+    ).toBe(true)
+    expect(
+      ban?.requirements?.some(
+        (req) =>
+          req.type === 'item_owned' && req.targetId === 'rusty-bike-parts',
+      ),
+    ).toBe(true)
+    expect(
+      ban?.criteria?.some(
+        (req) =>
+          req.type === 'item_owned' &&
+          req.targetId === 'rusty-bike-parts' &&
+          req.consume === true,
+      ),
+    ).toBe(true)
+    expect(
+      ban?.rewards.some(
+        (reward) => reward.type === 'icon' && reward.targetId === 'cyclist',
+      ),
+    ).toBe(true)
+    expect(
+      ban?.rewards.some(
+        (reward) => reward.type === 'icon' && reward.targetId === 'cyclist-f',
+      ),
+    ).toBe(true)
+    expect(
+      ban?.rewards.some(
+        (reward) =>
+          reward.type === 'title' && reward.targetId === 'worst-customer',
+      ),
+    ).toBe(true)
+  })
+
   test('Route 11 trainer battles use trainer payouts without manual candy rewards', () => {
     const route11TrainerBattles = battles.filter(
       (battle) => !battle.isWildBattle && battle.id.startsWith('route-11-'),
