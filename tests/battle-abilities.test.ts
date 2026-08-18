@@ -1050,6 +1050,7 @@ describe('canonical battle abilities', () => {
       ability: 'huge_power',
       formId: '184',
       assignedMoves: [{ moveId: 'aqua-tail' }, { moveId: 'play-rough' }],
+      battleMoveIds: ['aqua-tail', 'play-rough'],
       types: ['Water', 'Fairy'],
       stats: {
         hp: 120,
@@ -1079,6 +1080,8 @@ describe('canonical battle abilities', () => {
       { moveId: 'aqua-tail' },
       { moveId: 'play-rough' },
     ])
+    expect(ditto.battleMoveIds).toEqual(['aqua-tail', 'play-rough'])
+    expect(ditto.stats.hp).toBe(100)
     expect(ditto.originalFormId).toBe('132')
     expect(ditto.battleAbilityState?.originalAbility).toBe('imposter')
     expect(ditto.battleAbilityState?.originalTransform?.name).toBe('Ditto')
@@ -1094,6 +1097,7 @@ describe('canonical battle abilities', () => {
     expect(ditto.statStages?.speed).toBe(1)
     expect(ditto.ability).toBe('imposter')
     expect(ditto.assignedMoves).toBeUndefined()
+    expect(ditto.battleMoveIds).toBeUndefined()
     expect(ditto.battleAbilityState?.originalTransform).toBeUndefined()
     expect(ditto.battleAbilityState?.originalAbility).toBeUndefined()
   })

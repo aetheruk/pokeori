@@ -108,6 +108,7 @@ export interface BattlePokemon extends Omit<Pokemon, 'stats'> {
       stats: BattlePokemon['stats']
       statStages?: StatStages
       assignedMoves?: { moveId: string; id?: string | null }[] | null
+      battleMoveIds?: string[]
     }
   }
   heldItem?: { id: string; name: string } // Minimal item data for battle logic
