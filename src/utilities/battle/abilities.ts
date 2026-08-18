@@ -14,6 +14,10 @@ import { applyStatus } from './status-effects-logic'
 import { hasOppositeNonGenderlessGenders } from '@/utilities/pokemon/gender'
 import { lowerPokemonMoveUses } from './move-uses'
 import { applyStanceDisable } from './stance-disable'
+import {
+  applyBattleTransform,
+  restoreOriginalTransform,
+} from './transform'
 import { getHeldItemDefinition } from '@/utilities/pokemon/held-items'
 import { getDualTypeEffectiveness } from './type-chart'
 import { formatBattleStatName } from './stat-labels'
@@ -210,17 +214,6 @@ function rememberOriginalBattleAbility(pokemon: BattlePokemon): void {
   if (!pokemon.ability) return
   pokemon.battleAbilityState ??= {}
   pokemon.battleAbilityState.originalAbility ??= pokemon.ability
-}
-
-function rememberOriginalBattleTransform(pokemon: BattlePokemon): void {
-  pokemon.battleAbilityState ??= {}
-  pokemon.battleAbilityState.originalTransform ??= {
-    name: pokemon.name,
-    formId: pokemon.formId,
-    types: [...pokemon.types],
-    stats: { ...pokemon.stats },
-    statStages: pokemon.statStages ? { ...pokemon.statStages } : undefined,
-  }
 }
 
 function isRecoilSelfDamageMove(
@@ -2574,15 +2567,7 @@ function processBattleAbilityEntryTransform(params: {
   const originalName = pokemon.name
   const originalAbilityName = getAbilityName(pokemon)
   rememberOriginalBattleAbility(pokemon)
-  rememberOriginalBattleTransform(pokemon)
-  pokemon.formId = opposingPokemon.formId
-  pokemon.name = opposingPokemon.name
-  pokemon.types = [...opposingPokemon.types]
-  pokemon.stats = { ...opposingPokemon.stats }
-  pokemon.statStages = opposingPokemon.statStages
-    ? { ...opposingPokemon.statStages }
-    : undefined
-  pokemon.ability = opposingPokemon.ability
+  applyBattleTransform(pokemon, opposingPokemon, { copyAbility: true })
 
   return [
     `${originalName}'s ${originalAbilityName} transformed it into ${opposingPokemon.name}!`,
@@ -2681,17 +2666,7 @@ export function restoreBattleAbilityMutationOnSwitchOut(
   }
   const originalTransform = pokemon.battleAbilityState?.originalTransform
   if (originalTransform) {
-    pokemon.name = originalTransform.name
-    pokemon.formId = originalTransform.formId
-    pokemon.types = [...originalTransform.types]
-    pokemon.stats = { ...originalTransform.stats }
-    pokemon.statStages = originalTransform.statStages
-      ? { ...originalTransform.statStages }
-      : undefined
-    if (pokemon.battleAbilityState) {
-      pokemon.battleAbilityState.originalTransform = undefined
-    }
-    messages.push(`${pokemon.name}'s transformation wore off.`)
+    messages.push(...restoreOriginalTransform(pokemon))
   }
 
   const originalAbility = pokemon.battleAbilityState?.originalAbility

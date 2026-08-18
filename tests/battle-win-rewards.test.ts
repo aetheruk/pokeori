@@ -226,6 +226,49 @@ describe('battle win rewards', () => {
     })
   })
 
+  test('awards participant research XP to the original form after Transform', () => {
+    const transformedDitto = makeBattlePokemon({
+      id: 'player-ditto',
+      user: 'player-1',
+      speciesId: 132,
+      formId: '25',
+      originalFormId: '132',
+      name: 'Pikachu',
+      types: ['Electric'],
+    })
+    const state = makePveBattleState({
+      playerTeam: [transformedDitto],
+      enemyTeam: [
+        makeBattlePokemon({
+          id: 'enemy-rattata',
+          user: 'enemy',
+          speciesId: 19,
+          formId: '19',
+          level: 5,
+          name: 'Rattata',
+        }),
+      ],
+    })
+
+    const rewards = buildBattleWinRewards(state, user, {
+      isWildBattle: false,
+      rewards: [],
+    })
+
+    expect(rewards).toContainEqual({
+      type: 'pokemon_research_xp',
+      targetId: '132',
+      quantity: BATTLE_PARTICIPANT_RESEARCH_XP,
+      dropChance: 100,
+    })
+    expect(
+      rewards.some(
+        (reward) =>
+          reward.type === 'pokemon_research_xp' && reward.targetId === '25',
+      ),
+    ).toBe(false)
+  })
+
   test('does not add Pokemon research XP for trainer battle targets', () => {
     const state = makePveBattleState({
       enemyTeam: [
