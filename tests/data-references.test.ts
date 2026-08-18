@@ -812,9 +812,11 @@ describe('static data references', () => {
     ).not.toContain('aqua-solvent-t3')
   })
 
-  test('trainer battles do not author manual candy rewards', () => {
+  test('trainer battles do not author manual candy rewards outside Route 13', () => {
     const candyRewardOwners = battles
-      .filter((battle) => !battle.isWildBattle)
+      .filter(
+        (battle) => !battle.isWildBattle && !battle.id.startsWith('route-13-'),
+      )
       .filter((battle) =>
         battle.rewards.some(
           (reward) =>
@@ -825,6 +827,25 @@ describe('static data references', () => {
       .map((battle) => battle.id)
 
     expect(candyRewardOwners).toEqual([])
+  })
+
+  test('Route 13 trainer battles add one S Candy EX drop to every trainer', () => {
+    const route13TrainerBattles = battles.filter(
+      (battle) => !battle.isWildBattle && battle.id.startsWith('route-13-'),
+    )
+
+    expect(route13TrainerBattles.length).toBeGreaterThan(0)
+
+    for (const battle of route13TrainerBattles) {
+      const candyDrops = battle.rewards.filter(
+        (reward) =>
+          reward.type === 'item' &&
+          String(reward.targetId) === 'rare-candy-l',
+      )
+      expect(candyDrops).toHaveLength(1)
+      expect(candyDrops[0].quantity).toBe(1)
+      expect(candyDrops[0].dropChance).toBe(100)
+    }
   })
 
   test('Route 11 trainer battles use trainer payouts without manual candy rewards', () => {

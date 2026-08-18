@@ -15,6 +15,7 @@ import { rockTunnelFieldObservationEntries } from './entries/rock-tunnel'
 import { lavenderTownFieldObservationEntries } from './entries/lavender-town'
 import { pokemonTowerFieldObservationEntries } from './entries/pokemon-tower'
 import { celadonCityFieldObservationEntries } from './entries/celadon-city'
+import { fuchsiaCityFieldObservationEntries } from './entries/fuchsia-city'
 
 export const fieldObservationGames: FieldObservationConfig[] = [
   ...palletTownFieldObservationEntries,
@@ -30,4 +31,5 @@ export const fieldObservationGames: FieldObservationConfig[] = [
   ...lavenderTownFieldObservationEntries,
   ...pokemonTowerFieldObservationEntries,
   ...celadonCityFieldObservationEntries,
+  ...fuchsiaCityFieldObservationEntries,
 ].map(withDefaultFieldObservationRewards)

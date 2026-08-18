@@ -267,6 +267,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/fuchsia.avif',
     description: 'A city on the south coast, featuring the sprawling Safari Zone',
     music: '/music/viridian_city.mp3',
+    unlockRequirements: [{ type: 'task_completed', targetId: 'on-to-fuchsia-city' }],
             weatherSlots: {
       1: 'rain',
       2: 'rain',

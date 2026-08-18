@@ -1051,6 +1051,16 @@ export const keyItems: Item[] = [
     unique: true,
   },
   {
+    id: 'manics-journal-pg-132',
+    name: "Manic's Journal Pg 132",
+    description:
+      "Ditto. Ditto in the grass. Ditto pretending to be a ROCK. Why would anyone pretend to be a ROCK? Mew can turn into any Pokemon, Ditto can turn into any Pokemon, what if Ditto is a Mew that... gave up? A rough draft? An unfinished sketch that never got coloured in?! And Mew has EVERY Pokemon's DNA, so if Ditto has every Pokemon's DNA too, then Ditto has MY DNA. I'M DITTO. WAIT NO. I mean Ditto could be me. Could be anyone. Could be YOU. If you are reading this and you can transform into anything, please stop following me. Research needed!!",
+    category: 'books',
+    spriteId: 'guide-book',
+    hueRotate: 200,
+    unique: true,
+  },
+  {
     id: 'gimmighoul-coin',
     name: 'Gimmighoul Coin',
     description:
