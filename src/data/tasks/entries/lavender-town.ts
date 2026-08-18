@@ -1092,8 +1092,8 @@ export const lavenderTownTasks: Task[] = [
     category: 'Kanto',
     subCategory: 'Lavender Town',
     icon: {
-      type: 'pokemon',
-      id: '349',
+      type: 'trainer',
+      id: 'fisherman',
     },
     background: '/backgrounds/inside-house.avif',
     repeatable: false,
