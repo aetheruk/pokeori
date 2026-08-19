@@ -10,7 +10,7 @@ export const fuchsiaCitybasicEntries: RockPushGameConfig[] = [
     name: 'The Unseen Path',
     description:
       'Feel out the first invisible course. The Gym walls reveal themselves only when you touch them.',
-    category: 'Kanto',
+    category: 'Secret',
     subCategory: 'Fuchsia City',
     icon: { type: 'trainer', id: 'chronicle-janine' },
     background: '/backgrounds/gym-poison.avif',
@@ -35,7 +35,7 @@ export const fuchsiaCitybasicEntries: RockPushGameConfig[] = [
     name: 'The Vanishing Course',
     description:
       'Read the empty floor, remember each invisible wall you reveal, and reach the far corner.',
-    category: 'Kanto',
+    category: 'Secret',
     subCategory: 'Fuchsia City',
     icon: { type: 'trainer', id: 'gym-kanto-koga' },
     background: '/backgrounds/gym-poison.avif',

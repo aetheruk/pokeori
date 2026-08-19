@@ -1373,7 +1373,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     name: 'Juggler Nate',
     description:
       'Nate opens the Gym Trial with Drowzee and Kadabra, forcing challengers to think clearly through the poison.',
-    category: 'Kanto',
+    category: 'Secret',
     subCategory: 'Fuchsia City',
     icon: { type: 'trainer', id: 'juggler' },
     background: '/backgrounds/gym-poison.avif',
@@ -1396,7 +1396,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     name: 'Juggler Kayden',
     description:
       'Kayden trusts a single powerful Hypno to stop challengers before they reach the first invisible course.',
-    category: 'Kanto',
+    category: 'Secret',
     subCategory: 'Fuchsia City',
     icon: { type: 'trainer', id: 'juggler' },
     background: '/backgrounds/gym-poison.avif',
@@ -1418,7 +1418,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     name: 'Juggler Kirk',
     description:
       'Kirk waits beyond the first invisible course with three Drowzee and a Kadabra ready to blur the way forward.',
-    category: 'Kanto',
+    category: 'Secret',
     subCategory: 'Fuchsia City',
     icon: { type: 'trainer', id: 'juggler' },
     background: '/backgrounds/gym-poison.avif',
@@ -1443,7 +1443,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     name: 'Tamer Edgar',
     description:
       'Edgar commands two Arbok and a Sandslash from the centre of the poisoned floor.',
-    category: 'Kanto',
+    category: 'Secret',
     subCategory: 'Fuchsia City',
     icon: { type: 'trainer', id: 'tamer' },
     background: '/backgrounds/gym-poison.avif',
@@ -1467,7 +1467,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     name: 'Tamer Phil',
     description:
       'Phil guards the final stretch with Sandslash and Arbok, where the poisoned floor has had time to take hold.',
-    category: 'Kanto',
+    category: 'Secret',
     subCategory: 'Fuchsia City',
     icon: { type: 'trainer', id: 'tamer' },
     background: '/backgrounds/gym-poison.avif',
@@ -1490,7 +1490,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     name: 'Juggler Shawn',
     description:
       'Shawn is Koga’s final Gym Trainer, pairing Drowzee and Hypno just beyond the last invisible wall.',
-    category: 'Kanto',
+    category: 'Secret',
     subCategory: 'Fuchsia City',
     icon: { type: 'trainer', id: 'juggler' },
     background: '/backgrounds/gym-poison.avif',
@@ -1514,7 +1514,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     title: 'Soul Badge',
     description:
       'Reach Koga at the heart of his invisible Gym and defeat him before the poisoned floor decides the battle for you.',
-    category: 'Kanto',
+    category: 'Secret',
     subCategory: 'Fuchsia City',
     icon: { type: 'trainer', id: 'gym-kanto-koga' },
     background: '/backgrounds/gym-poison.avif',
