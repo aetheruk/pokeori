@@ -137,10 +137,10 @@ describe('battle move and status presentation', () => {
 
     expect(femaleMarkup).toContain('aria-label="Female"')
     expect(femaleMarkup).toContain('text-pink-600')
-    expect(femaleMarkup).toContain('>♀<')
+    expect(femaleMarkup).toContain('lucide-venus')
     expect(maleMarkup).toContain('aria-label="Male"')
     expect(maleMarkup).toContain('text-blue-600')
-    expect(maleMarkup).toContain('>♂<')
+    expect(maleMarkup).toContain('lucide-mars')
     expect(genderlessMarkup).not.toContain('aria-label="Female"')
     expect(genderlessMarkup).not.toContain('aria-label="Male"')
   })

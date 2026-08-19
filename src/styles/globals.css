@@ -62,8 +62,8 @@
   --color-game-night-muted: var(--game-night-muted);
   /* Fixed light foreground for controls on moss, clay, and danger fills. */
   --color-game-cream: #f7ecd6;
-  --font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
-  --font-sans: 'Avenir Next', Avenir, 'Segoe UI', ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-sans);
+  --font-sans: 'Nunito Sans', 'Avenir Next', Avenir, 'Segoe UI', ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   --animate-aurora: aurora 60s linear infinite;

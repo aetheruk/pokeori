@@ -4,6 +4,7 @@ import { headers } from 'next/headers'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import '../../styles/globals.css'
+import { appSans } from '@/app/fonts'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 
@@ -25,7 +26,7 @@ export default async function DevLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="font-sans antialiased">
+      <body className={`${appSans.variable} font-sans antialiased`}>
         <div className="flex min-h-screen flex-col bg-background text-foreground">
           <ThemeProvider
             attribute="class"

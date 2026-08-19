@@ -27,8 +27,7 @@ Avoid pure black, electric teal, saturated emerald, arbitrary gradient text, and
 
 ## Typography
 
-- Use a Georgia/Times-style serif stack for the Pokeori wordmark companion text, page titles, section titles, and authored story moments.
-- Use the system sans stack for labels, controls, descriptions, and body copy.
+- Use the self-hosted Nunito Sans family for the Pokeori wordmark companion text, page titles, section titles, authored story moments, labels, controls, descriptions, and body copy, with the system sans stack as a fallback for non-Next surfaces.
 - Use the system monospace stack only for timers, levels, quantities, IDs, and other numeric readouts.
 - Prefer sentence case. Use uppercase or letter spacing only for short metadata labels, not entire page titles or paragraphs.
 - Keep display titles compact and editorial rather than oversized or italicized by default.

@@ -3,6 +3,7 @@ import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
 import { getBattleStatusChip } from '@/utilities/battle/status-presentation'
 import type { BattleStance } from '@/utilities/battle/types'
+import { Mars, Venus } from 'lucide-react'
 
 interface HealthDisplayProps {
   currentHp: number
@@ -106,21 +107,25 @@ export function HealthDisplay({
 function GenderBadge({ gender }: { gender?: string | null }) {
   const config =
     gender === 'female'
-      ? { label: 'Female', symbol: '♀', className: 'text-pink-600' }
+      ? { label: 'Female', Icon: Venus, className: 'text-pink-600' }
       : gender === 'male'
-        ? { label: 'Male', symbol: '♂', className: 'text-blue-600' }
+        ? { label: 'Male', Icon: Mars, className: 'text-blue-600' }
         : null
 
   if (!config) return null
+  const Icon = config.Icon
 
   return (
     <span
-      className={cn('shrink-0 text-sm font-black leading-none', config.className)}
+      className={cn(
+        'inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center',
+        config.className,
+      )}
       role="img"
       aria-label={config.label}
       title={config.label}
     >
-      {config.symbol}
+      <Icon aria-hidden="true" className="h-3.5 w-3.5" strokeWidth={3} />
     </span>
   )
 }
