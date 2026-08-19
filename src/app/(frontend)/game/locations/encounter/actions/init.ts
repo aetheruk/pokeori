@@ -237,6 +237,7 @@ export async function startEncounter(
         duration: Math.floor(
           (existingState.expiry - existingState.startTime) / 1000,
         ),
+        encounterMode: existingState.encounterMode || 'standard',
       }
       await setIdempotentResult(startResultKey, response, 30)
       return response
@@ -629,6 +630,14 @@ export async function startEncounter(
         chance: encounter.chance,
       })),
       weather: weatherSnapshot,
+      encounterMode: location.encounterMode || 'standard',
+      safari:
+        location.encounterMode === 'safari'
+          ? {
+              stage: 0,
+              actions: 0,
+            }
+          : undefined,
       activeAbilityId,
       activeAbilitySourcePokemonId: activePoke.docs[0]
         ? String((activePoke.docs[0] as any).id)
@@ -739,6 +748,7 @@ export async function startEncounter(
       startTime,
       expiry,
       duration,
+      encounterMode: state.encounterMode || 'standard',
       message: breakMessage,
     }
 
@@ -861,5 +871,7 @@ export const getEncounter = cache(async () => {
     isEligibleForReplay,
     specialEncounter: state.specialEncounter,
     qte: serializeEncounterQte(state.qte),
+    encounterMode: state.encounterMode || 'standard',
+    safari: state.safari,
   }
 })

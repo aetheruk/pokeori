@@ -446,6 +446,72 @@ describe('PVE turn engine helpers', () => {
     expect(failure.message).toContain('was not faster')
   })
 
+  test('Swift Poison only succeeds for a faster user and prevents the counterattack', () => {
+    const swiftPoison = getMove('swift-poison')!
+    const target = makePokemon({
+      name: 'Target',
+      stats: {
+        hp: 100,
+        attack: 60,
+        defense: 60,
+        specialAttack: 60,
+        specialDefense: 60,
+        speed: 60,
+      },
+    })
+    const fasterUser = makePokemon({
+      name: 'Fast User',
+      stats: {
+        hp: 100,
+        attack: 60,
+        defense: 60,
+        specialAttack: 60,
+        specialDefense: 60,
+        speed: 61,
+      },
+    })
+    const slowerUser = makePokemon({
+      name: 'Slow User',
+      stats: {
+        hp: 100,
+        attack: 60,
+        defense: 60,
+        specialAttack: 60,
+        specialDefense: 60,
+        speed: 59,
+      },
+    })
+
+    const success = resolveMoveContest({
+      move: swiftPoison,
+      attacker: fasterUser,
+      defender: target,
+    })
+    const failure = resolveMoveContest({
+      move: swiftPoison,
+      attacker: slowerUser,
+      defender: target,
+    })
+
+    expect(swiftPoison.accuracy).toBe(90)
+    expect(swiftPoison.status).toEqual({
+      id: 'poison',
+      chance: 100,
+      target: 'enemy',
+    })
+    expect(success).toMatchObject({
+      success: true,
+      preventCounter: true,
+      failMove: false,
+    })
+    expect(failure).toMatchObject({
+      success: false,
+      preventCounter: false,
+      failMove: true,
+      damageMultiplier: 0,
+    })
+  })
+
   test('enemy AI only chooses Quick Attack when it wins the Speed contest', () => {
     const player = makePokemon({
       id: 'player',
@@ -2089,7 +2155,9 @@ describe('PVE turn engine helpers', () => {
     const messages = processTurnEnd(makeState(player, enemy))
 
     expect(enemy.currentHp).toBe(0)
-    expect(messages.some((message) => message.includes('recovered'))).toBe(false)
+    expect(messages.some((message) => message.includes('recovered'))).toBe(
+      false,
+    )
   })
 
   test('side secondary statuses trigger on switch', () => {

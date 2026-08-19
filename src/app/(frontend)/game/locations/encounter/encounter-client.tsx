@@ -1,7 +1,7 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
-import { Backpack, Sparkles } from 'lucide-react'
+import { Backpack, Cookie, Megaphone, Sparkles } from 'lucide-react'
 import nextDynamic from 'next/dynamic'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -38,6 +38,7 @@ import {
   completeEncounterQte,
   getEncounter,
   getQuizQuestion,
+  performSafariAction,
   researchEscape,
   runAway,
   submitAnswer,
@@ -159,6 +160,11 @@ interface EncounterData {
     failMessage?: string
   }
   qte?: PublicEncounterQte
+  encounterMode?: 'standard' | 'safari'
+  safari?: {
+    stage: number
+    actions: number
+  }
 }
 
 interface Question {
@@ -417,7 +423,9 @@ export default function EncounterPage() {
   const [encounter, setEncounter] = useState<EncounterData | null>(null)
   const [loading, setLoading] = useState(true)
   const [timeLeft, setTimeLeft] = useState(0)
-  const [phase, setPhase] = useState<'quiz' | 'capture' | 'result'>('quiz')
+  const [phase, setPhase] = useState<'quiz' | 'safari' | 'capture' | 'result'>(
+    'quiz',
+  )
   const [catchRate, setCatchRate] = useState(0)
   const [currentLocation, setCurrentLocation] = useState<
     (typeof locations)[0] | null
@@ -511,6 +519,7 @@ export default function EncounterPage() {
   const [ghostStage, setGhostStage] = useState<'glitch' | 'black'>('glitch')
   const [activeQte, setActiveQte] = useState<PublicEncounterQte | null>(null)
   const [submittingQte, setSubmittingQte] = useState(false)
+  const [submittingSafariAction, setSubmittingSafariAction] = useState(false)
   const [captureRingScale, setCaptureRingScale] = useState(1)
   const pokemonTargetRef = useRef<HTMLDivElement | null>(null)
   const ghostSequenceStartedRef = useRef(false)
@@ -573,6 +582,7 @@ export default function EncounterPage() {
       setHasAttemptedCapture(false)
       setSubmittingQte(false)
       setUsingItem(false)
+      setSubmittingSafariAction(false)
       setEncounter(null)
       setLoading(true)
       stopMusic({ fade: true })
@@ -653,6 +663,11 @@ export default function EncounterPage() {
       setCatchRate(data.currentCatchRate)
       setActiveQte(data.qte || null)
       setLoading(false)
+      if (data.encounterMode === 'safari') {
+        setPhase('safari')
+        setHasRevealedName(true)
+        return
+      }
       if (
         data.specialEncounter?.type !== 'silph-scope-ghost' ||
         data.specialEncounter.hasRequiredItem
@@ -709,7 +724,7 @@ export default function EncounterPage() {
       const remaining = Math.max(0, Math.ceil((encounter.expiry - now) / 1000))
       setTimeLeft(remaining)
 
-      if (remaining <= 0 && phase === 'quiz') {
+      if (remaining <= 0 && (phase === 'quiz' || phase === 'safari')) {
         setPhase('capture')
       }
     }, 100)
@@ -732,6 +747,56 @@ export default function EncounterPage() {
     }
     setQuestionLoading(false)
   }
+
+  const handleSafariAction = useCallback(
+    async (action: 'bait' | 'shout') => {
+      if (!encounter || submittingSafariAction) return
+      setSubmittingSafariAction(true)
+      playSelectSfx()
+      try {
+        const response = await performSafariAction(action, crypto.randomUUID())
+        if (response.success) {
+          if (response.encounterFailed) {
+            playBadSfx()
+            setCaptureResult({
+              success: true,
+              caught: false,
+              failMessage: response.failMessage,
+              pokemonName: encounter.pokemonName,
+              formId: response.formId,
+              pokemonId: response.pokemonId,
+              expeditionProgress: response.expeditionProgress,
+            })
+            setPhase('result')
+            return
+          }
+
+          playGoodSfx()
+          setCatchRate(response.newCatchRate)
+          setEncounter((current) =>
+            current
+              ? {
+                  ...current,
+                  currentCatchRate: response.newCatchRate,
+                  safari: response.safari,
+                }
+              : current,
+          )
+          toast.success(response.message)
+          if (response.enterCapture) setPhase('capture')
+        } else if (shouldEnterCaptureFromResponse(response)) {
+          setPhase('capture')
+        } else if (isExpiredEncounterResponse(response)) {
+          exitExpiredEncounter(response)
+        } else {
+          toast.error(response.error || 'That action failed.')
+        }
+      } finally {
+        setSubmittingSafariAction(false)
+      }
+    },
+    [encounter, exitExpiredEncounter, submittingSafariAction],
+  )
 
   const showBundledNextQuestion = useCallback(
     (question: Question) => {
@@ -1698,6 +1763,61 @@ export default function EncounterPage() {
             ))}
         </AnimatePresence>
 
+        {phase === 'safari' && (
+          <motion.div
+            key="safari-actions"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mx-auto flex w-full max-w-md flex-col gap-4 rounded-2xl border border-game-border bg-game-surface-raised p-4 shadow-sm"
+          >
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-game-muted">
+                Safari encounter
+              </p>
+              <h2 className="mt-1 text-xl font-bold text-game-ink">
+                Choose your approach
+              </h2>
+              <p className="mt-1 text-sm text-game-muted">
+                Bait keeps the Pokemon calm but makes it harder to catch.
+                Shouting does the opposite.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                className="min-h-14 gap-2 border-game-moss/45 bg-game-moss/10 text-game-moss-strong hover:bg-game-moss/15"
+                disabled={submittingSafariAction}
+                onClick={() => handleSafariAction('bait')}
+              >
+                <Cookie className="h-5 w-5" />
+                Bait
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="min-h-14 gap-2 border-game-ochre/50 bg-game-ochre/10 text-game-ink hover:bg-game-ochre/15"
+                disabled={submittingSafariAction}
+                onClick={() => handleSafariAction('shout')}
+              >
+                <Megaphone className="h-5 w-5 text-game-ochre" />
+                Shout
+              </Button>
+            </div>
+            <Button
+              type="button"
+              className="min-h-14 bg-game-clay text-game-cream hover:bg-game-clay/90"
+              disabled={submittingSafariAction || balls.length === 0}
+              onClick={() => setPhase('capture')}
+            >
+              Throw a Ball
+            </Button>
+            <p className="text-center text-xs text-game-muted">
+              Actions used: {encounter.safari?.actions || 0} / 5
+            </p>
+          </motion.div>
+        )}
+
         {phase === 'capture' && (
           <CaptureScene
             balls={balls}
@@ -1722,31 +1842,33 @@ export default function EncounterPage() {
         <div className="relative shrink-0 border-t border-game-border bg-game-surface/96 pb-[env(safe-area-inset-bottom)] text-game-ink backdrop-blur-xl xl:col-start-1 xl:row-start-2 xl:border-t xl:border-r-0">
           <div className="relative z-10 flex items-center justify-between gap-3 px-4 py-3">
             {/* Items Button */}
-            <Button
-              type="button"
-              variant="outline"
-              className={cn(
-                'h-12 flex-1 gap-2 border-game-border bg-game-surface-raised text-game-ink hover:border-game-moss/35 hover:bg-game-canvas',
-                encounterItemsRemaining <= 0 && 'opacity-50',
-              )}
-              onClick={() => setShowItemsModal(true)}
-              disabled={isCapturing || encounterItemsRemaining <= 0}
-              aria-busy={isCapturing}
-            >
-              <Backpack className="h-5 w-5 text-game-moss-strong" />
-              <span className="text-xs font-bold uppercase tracking-wider">
-                Items
-              </span>
-              {encounterItemsRemaining > 0 && (
-                <span className="ml-1 text-[10px] font-bold text-game-muted">
-                  ({encounterItemsRemaining})
+            {encounter.encounterMode !== 'safari' && (
+              <Button
+                type="button"
+                variant="outline"
+                className={cn(
+                  'h-12 flex-1 gap-2 border-game-border bg-game-surface-raised text-game-ink hover:border-game-moss/35 hover:bg-game-canvas',
+                  encounterItemsRemaining <= 0 && 'opacity-50',
+                )}
+                onClick={() => setShowItemsModal(true)}
+                disabled={isCapturing || encounterItemsRemaining <= 0}
+                aria-busy={isCapturing}
+              >
+                <Backpack className="h-5 w-5 text-game-moss-strong" />
+                <span className="text-xs font-bold uppercase tracking-wider">
+                  Items
                 </span>
-              )}
-            </Button>
+                {encounterItemsRemaining > 0 && (
+                  <span className="ml-1 text-[10px] font-bold text-game-muted">
+                    ({encounterItemsRemaining})
+                  </span>
+                )}
+              </Button>
+            )}
 
             {/* Run Button */}
             {(() => {
-              const isCapturePhase = phase === 'capture'
+              const isCapturePhase = phase === 'capture' || phase === 'safari'
 
               // Research Level 3+: Guaranteed free escape in any phase
               const hasResearchEscape = (encounter.formResearchLevel || 0) >= 3

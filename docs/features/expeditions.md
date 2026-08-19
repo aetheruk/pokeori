@@ -19,6 +19,7 @@ Expeditions are authored multi-step Explore routes made from tasks, battles, loc
 - Every expedition activity type, including inline task and Chronicle dialogue beats, presents its result before returning. Closing the complete result sequence marks its source expedition for restoration; Explore refreshes that run, reopens its panel, and centres the newly current path item (or the final item when rewards are ready).
 - Supports max-loss failure and ready-to-claim completion states.
 - Grants expedition rewards only when the completed expedition is claimed.
+- Expedition entry fees can use consumed currency criteria. Safari expeditions charge 500 Pokédollars per new run, combine Field Observation and Safari catch activities, and use five completed runs of the prior area as the next-area gate. One-time expedition finds such as HM Strength use inverse ownership requirements so later clears substitute only the repeatable reward pool.
 - `canAbandon: false` prevents a run from being abandoned in the UI and server action.
 - `canFail: false` keeps failed steps retryable without adding losses or deleting the run.
 

@@ -111,6 +111,8 @@ export interface Location {
   icon: TaskIcon
   requirements: TaskCondition[]
   criteria?: TaskCondition[]
+  /** Replaces the standard research quiz with Safari Bait/Shout choices. */
+  encounterMode?: 'standard' | 'safari'
   requiredItem?: {
     id: string
     useOnCatch?: boolean
@@ -212,6 +214,8 @@ export interface BattleConfig {
   levelCap?: number // Optional level cap for player?
   /** Player Battle Team members with these types cannot enter this battle. */
   bannedPlayerTypes?: PokemonTypeName[]
+  /** Battle-floor effect applied to every player Pokemon when the battle starts. */
+  playerTeamInitialStatus?: StatusEffectId
   maxPokemon: number // Required, 1-6
   itemsPerBattle?: number // Optional hard cap against the Trainer skill item-use limit
   allowedItems?: string[] // Item IDs allowed in battle, empty = all battle items

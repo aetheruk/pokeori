@@ -1295,4 +1295,20 @@ export const keyItems: Item[] = [
     hueRotate: 220,
     unique: true,
   },
+  {
+    id: 'safari-research-pass',
+    name: "Researcher's Pass",
+    description: 'Membership credentials granting research access to the Safari Zone.',
+    category: 'key',
+    spriteId: 'scrip',
+    unique: true,
+  },
+  {
+    id: 'safari-catching-permit',
+    name: 'Safari Catching Permit',
+    description: 'Koga-authorized permission to join catching expeditions in the Safari Zone.',
+    category: 'key',
+    spriteId: 'safari-ball',
+    unique: true,
+  },
 ]

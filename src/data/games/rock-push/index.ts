@@ -3,8 +3,10 @@ import { RockPushGameConfig } from './types'
 
 import { testbasicEntries } from './entries/test'
 import { gymLeaderChronicleRockPushEntries } from './entries/gym-leader-chronicles'
+import { fuchsiaCitybasicEntries } from './entries/fuchsia-city'
 
 export const basicEntries: RockPushGameConfig[] = [
   ...testbasicEntries,
   ...gymLeaderChronicleRockPushEntries,
+  ...fuchsiaCitybasicEntries,
 ]
