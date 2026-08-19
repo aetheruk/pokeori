@@ -209,9 +209,7 @@ export const recipeManualTasks: Task[] = [
     completionTrigger: 'auto' as const,
     completeButtonText: 'Read Recipe',
     requirements:
-      manual.itemId === 'revive'
-        ? [{ type: 'task_completed' as const, targetId: 'revive-recipe-discovery' }]
-        : [],
+      [],
     criteria: [],
     rewards: [],
     exitModal: recipeUnlockedExitModal({

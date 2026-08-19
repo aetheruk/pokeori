@@ -102,7 +102,10 @@ async function settlePrizeWheelSpin({
       return { success: false, error: 'Invalid game type' }
     }
 
-    const targetSlot = (encounter.settings.slots || [])[spinData.targetIndex]
+    const activeSlots = Array.isArray(state.roundData?.prizeWheelSlots)
+      ? state.roundData.prizeWheelSlots
+      : encounter.settings.slots || []
+    const targetSlot = activeSlots[spinData.targetIndex]
     if (!targetSlot) {
       return { success: false, error: 'Invalid target slot' }
     }
@@ -225,7 +228,9 @@ export async function initiatePrizeWheelSpin() {
       }
 
       // Determine Result
-      const slots = encounter.settings.slots || []
+      const slots = Array.isArray(state.roundData?.prizeWheelSlots)
+        ? state.roundData.prizeWheelSlots
+        : encounter.settings.slots || []
       if (slots.length === 0) {
         return { success: false, error: 'Configuration error: No slots' }
       }

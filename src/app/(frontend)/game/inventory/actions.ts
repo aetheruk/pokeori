@@ -26,10 +26,11 @@ import {
   getUserInventoryMap,
   setUserInventoryMap,
 } from '@/utilities/user-state'
+import type { RequirementData } from '@/utilities/requirements'
 import {
-  checkRequirement,
-  type RequirementData,
-} from '@/utilities/requirements'
+  getEligibleScratchCardRewards,
+  selectScratchCardReward,
+} from '@/utilities/research/scratch-cards'
 import {
   getEconomyActionErrorMessage,
   runEconomyAction,
@@ -62,21 +63,6 @@ function buildScratchRewardRequirementData(params: {
     gameResults: [],
     fieldResearchResults: [],
   }
-}
-
-function isScratchRewardConfigEligible(
-  rewardConfig: { reward?: Reward[] },
-  requirementData: RequirementData,
-): boolean {
-  const rewards = rewardConfig.reward || []
-  if (rewards.length === 0) return true
-
-  return rewards.some((reward) => {
-    if (!reward.requirements || reward.requirements.length === 0) return true
-    return reward.requirements.every((requirement) =>
-      checkRequirement(requirementData, requirement),
-    )
-  })
 }
 
 export async function sellItem(
@@ -197,6 +183,11 @@ export async function useScratchCard(itemId: string, clientActionId: string) {
         payload,
       },
       async ({ req }) => {
+        const freshUser = await payload.findByID({
+          collection: 'users',
+          id: user.id,
+          req,
+        })
         const inventory = await getUserInventoryMap(payload, user.id, { req })
         const currentQty = inventory[itemId] || 0
         if (currentQty < 1) {
@@ -217,27 +208,28 @@ export async function useScratchCard(itemId: string, clientActionId: string) {
           { req },
         )
         const requirementData = buildScratchRewardRequirementData({
-          user,
+          user: freshUser,
           inventory: newInventory,
           completedTasks,
         })
-        const eligibleRewards = cardConfig.rewards.filter((rewardConfig) =>
-          isScratchRewardConfigEligible(rewardConfig, requirementData),
+        const eligibleRewards = getEligibleScratchCardRewards(
+          cardConfig.rewards,
+          {
+            inventory: newInventory,
+            unlockedBanners: freshUser.unlockedBanners,
+            unlockedIcons: freshUser.unlockedIcons,
+            unlockedTitles: freshUser.unlockedTitles,
+          },
+          requirementData,
         )
         if (eligibleRewards.length === 0) {
           throw new Error('No eligible reward configuration found')
         }
 
-        const roll = Math.random() * 100
-        let cumulative = 0
-        let selectedRewardConfig = eligibleRewards[eligibleRewards.length - 1]
-        for (const rewardConfig of eligibleRewards) {
-          cumulative += rewardConfig.chance
-          if (roll < cumulative) {
-            selectedRewardConfig = rewardConfig
-            break
-          }
-        }
+        const selectedRewardConfig = selectScratchCardReward(
+          eligibleRewards,
+          Math.random(),
+        )
 
         const rewardsToGrant = selectedRewardConfig?.reward || []
         let summary: any = null

@@ -119,6 +119,7 @@ import {
   getRandomItemFromPool,
   getRandomPokemonFromPool,
 } from '@/utilities/research/round-selection'
+import { getEligiblePrizeWheelSlots } from '@/utilities/research/prize-wheel'
 
 const DAILY_EXCLUDED_GAME_TYPES = new Set([
   'slots',
@@ -623,11 +624,18 @@ export async function startGameActivity(
               ),
             ]
           : []
+      const prizeWheelSlotRequirements =
+        encounter.gameType === 'prize-wheel'
+          ? (encounter.settings.slots || []).flatMap(
+              (slot) => slot.requirements || [],
+            )
+          : []
       const requiredKeys = analyzeRequirements([
         ...(encounter.requirements || []),
         ...(encounter.criteria || []),
         ...fieldObservationPoolRequirements,
         ...fieldObservationGlobalRequirements,
+        ...prizeWheelSlotRequirements,
       ])
       const userData = await getGameUserData(user as User, requiredKeys)
       const weatherSnapshot = {
@@ -649,6 +657,19 @@ export async function startGameActivity(
 
       if (!requirementsMet) {
         return { success: false, error: 'Requirements not met' }
+      }
+
+      const prizeWheelSlots =
+        encounter.gameType === 'prize-wheel'
+          ? getEligiblePrizeWheelSlots(encounter.settings.slots || [], userData, {
+              category: encounter.category,
+              subCategory: encounter.subCategory,
+              weather: weatherSnapshot.weather,
+            })
+          : undefined
+
+      if (encounter.gameType === 'prize-wheel' && prizeWheelSlots?.length === 0) {
+        return { success: false, error: 'No eligible prize wheel slots' }
       }
 
       // Check and Consume Criteria
@@ -1165,6 +1186,8 @@ export async function startGameActivity(
         )
         roundData = generated.publicRoundData
         fieldObservationPrivate = generated.privateRoundData
+      } else if (encounter.gameType === 'prize-wheel') {
+        roundData = { prizeWheelSlots }
       }
 
       // Generate initial slot session data if applicable
