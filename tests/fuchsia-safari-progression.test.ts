@@ -151,6 +151,16 @@ describe('Fuchsia Gym and Safari progression', () => {
     )
     expect(admissionProse).toContain('We do not issue visitor passes')
     expect(admissionProse).toContain('We will take each step in order')
+    expect(admissionProse).toContain('substantial record of independent fieldwork')
+    expect(admissionProse).not.toContain('Researcher level')
+    expect(admissionProse).not.toContain('level 30')
+    expect(admissionProse).toContain('Ray needs to hear this')
+    expect(admissionProse).toContain('My research record should speak for itself')
+    expect(admissionProse).toContain('No pressure... I hope')
+    expect(admissionProse).toContain('The Institute should have their records')
+    expect(admissionProse).not.toContain('Visit the Fuchsia Research Institute')
+    expect(admissionProse).not.toContain('Pay the 2,000 PokéDollar')
+    expect(admissionProse).not.toContain('locked gate with paperwork')
     expect(admissionProse).toContain('You passed')
     expect(admissionProse).toContain('Pay 2,000 PokéDollars')
   })
@@ -531,7 +541,8 @@ describe('Fuchsia Gym and Safari progression', () => {
     )
     expect(trailTask?.icon).toEqual({ type: 'trainer', id: 'detective' })
     const trail = JSON.stringify(trailTask)
-    expect(trail).toContain('out-investigated')
+    expect(trail).toContain('We have searched every lead we have')
+    expect(trail).not.toContain('out-investigated')
 
     const trial = JSON.stringify(
       tasks.find((task) => task.id === 'fuchsia-gym-trial-ready'),
