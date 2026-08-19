@@ -24,7 +24,7 @@ function safariArea({
     id,
     name,
     description,
-    category: 'Kanto',
+    category: 'Secret',
     subCategory: 'Safari Zone',
     icon: { type: 'pokemon', id: icon },
     background: '/backgrounds/safari-reserve.avif',

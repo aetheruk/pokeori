@@ -374,6 +374,9 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(
       safariLocations.every((entry) => entry.expeditionOnly === true),
     ).toBe(true)
+    expect(
+      safariLocations.every((entry) => entry.category === 'Secret'),
+    ).toBe(true)
 
     const canonicalSpecies = new Map([
       ['central', [29, 30, 32, 33, 46, 47, 48, 102, 111, 113, 114, 123, 127]],
@@ -473,9 +476,9 @@ describe('Fuchsia Gym and Safari progression', () => {
         ),
       ),
     ).toBe(true)
-    expect(
-      searchStudies.every((entry) => entry.hide === 'fuchsia-koga-study-toxin'),
-    ).toBe(true)
+    expect(searchStudies.every((entry) => entry.category === 'Secret')).toBe(
+      true,
+    )
 
     const clueGates = new Map([
       ['safari-central-field-observation', 'safari-clue-last-sign-out'],
@@ -603,6 +606,46 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(locations.some((entry) => entry.id.includes('area-five'))).toBe(
       false,
     )
+  })
+
+  test('Safari and Koga Gym expedition activities never appear as standalone Explore content', () => {
+    const expeditionIds = [
+      'fuchsia-gym-trial-expedition',
+      'safari-central-expedition',
+      'safari-east-expedition',
+      'safari-west-expedition',
+      'safari-north-expedition',
+    ]
+
+    for (const expeditionId of expeditionIds) {
+      const expedition = expeditions.find((entry) => entry.id === expeditionId)
+      expect(expedition, expeditionId).toBeDefined()
+
+      for (const step of expedition?.path || []) {
+        if (step.type !== 'activity' || !step.activityType || !step.activityId) {
+          continue
+        }
+
+        const activity =
+          step.activityType === 'battle'
+            ? battles.find((entry) => entry.id === step.activityId)
+            : step.activityType === 'location'
+              ? locations.find((entry) => entry.id === step.activityId)
+              : step.activityType === 'game'
+                ? basicEntries.find((entry) => entry.id === step.activityId)
+                : step.activityType === 'field-research'
+                  ? fieldObservationGames.find(
+                      (entry) => entry.id === step.activityId,
+                    )
+                  : tasks.find((entry) => entry.id === step.activityId)
+
+        expect(activity, `${expeditionId}:${step.activityId}`).toBeDefined()
+        expect(
+          activity?.category,
+          `${expeditionId}:${step.activityId}`,
+        ).toBe('Secret')
+      }
+    }
   })
 
   test('Koga identifies an Unknown Compound and requests a partner Chansey', () => {
