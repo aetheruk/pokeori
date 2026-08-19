@@ -924,7 +924,7 @@ export const fuchsiaCityTasks: Task[] = [
     id: 'route-15-nature-module-intro',
     name: "Fern's Big Ditto Theory",
     description:
-      'Researcher Fern has a theory about Ditto and needs two very different examples to prove it.',
+      'Researcher Fern already has a Lonely Ditto. She needs a Brave one to finish testing the Nature Module.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {
@@ -970,10 +970,10 @@ export const fuchsiaCityTasks: Task[] = [
           id: 'researcher-f',
         },
         message:
-          "Ditto seemed like the perfect place to start. Same face, same little blob, completely different personalities. I need one that's Lonely and one that's Brave. Route 15 is a good place to look, but natures are unpredictable. You might get lucky. Or you might spend the afternoon meeting a lot of very similar Ditto.",
+          "Ditto seemed like the perfect place to start. Same face, same little blob, completely different personalities. I already have a Lonely Ditto, but I need a Brave one to compare it with. Route 15 is a good place to look, but natures are unpredictable. You might get lucky. Or you might spend the afternoon meeting a lot of very similar Ditto.",
         buttons: [
           {
-            text: "I'll look for them",
+            text: "I'll look for one",
             type: 'success',
           },
         ],
@@ -987,15 +987,15 @@ export const fuchsiaCityTasks: Task[] = [
         id: 'researcher-f',
       },
       message:
-        "Fern writes down 'Lonely Ditto' and 'Brave Ditto', then adds a note underneath: 'Do not accept two Ditto who are both just vibing.' 'Bring them back when you find them,' she says. 'I'll see what the module can make of them.'",
-      closeButtonText: 'Find the Ditto',
+        "Fern writes down 'Brave Ditto' and adds a note underneath: 'One Lonely Ditto already accounted for.' 'Bring me a brave one when you find it,' she says. 'Then I'll see what the module can make of the comparison.'",
+      closeButtonText: 'Find a Brave Ditto',
     },
   },
   {
     id: 'route-15-nature-module-study',
-    name: 'Two Ditto, One Theory',
+    name: 'One Brave Ditto',
     description:
-      'Fern is ready to test the Nature Module, if you can bring her a Lonely Ditto and a Brave Ditto.',
+      "Fern's Lonely Ditto is ready for comparison. Bring her a Ditto with a Brave nature.",
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {
@@ -1006,7 +1006,7 @@ export const fuchsiaCityTasks: Task[] = [
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Show Fern the Ditto',
+    completeButtonText: 'Show Fern the Brave Ditto',
     requirements: [
       {
         type: 'task_completed',
@@ -1014,15 +1014,6 @@ export const fuchsiaCityTasks: Task[] = [
       },
     ],
     criteria: [
-      {
-        type: 'pokemon_owned',
-        count: 1,
-        pokemonCriteria: {
-          speciesId: 132,
-          formId: '132',
-          nature: 'lonely',
-        },
-      },
       {
         type: 'pokemon_owned',
         count: 1,
@@ -1055,7 +1046,7 @@ export const fuchsiaCityTasks: Task[] = [
         id: 'nature-scanner',
       },
       message:
-        "Fern checks the module against the Lonely Ditto, then the Brave one. The screen flickers, chirps, and finally lights up. 'It works!' she says. 'They really are different. Same face, different feelings.' She presses the Nature Module into your hands. 'Take it. You found the proof, so you should get to use it.'",
+        "Fern checks the module against her Lonely Ditto, then the Brave one. The screen flickers, chirps, and finally lights up. 'It works!' she says. 'They really are different. Same face, different feelings.' She presses the Nature Module into your hands. 'Take it. You found the missing proof, so you should get to use it.'",
       closeButtonText: 'Take the Nature Module',
     },
   },

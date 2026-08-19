@@ -125,6 +125,11 @@ export const fuchsiaCityFieldObservationEntries: FieldObservationConfig[] = [
               targetId: 'route-14-bikers-cleared',
             },
             {
+              type: 'task_completed',
+              targetId: 'cerulean-bike-shop-worst-customer',
+              inverse: true,
+            },
+            {
               type: 'item_owned',
               targetId: 'rusty-bike-parts',
               inverse: true,
