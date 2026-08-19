@@ -4082,6 +4082,16 @@ describe('static data references', () => {
       dropChance: 100,
     })
 
+    const featheredGauntlet = expeditions.find(
+      (entry) => entry.id === 'route-14-bird-gauntlet-expedition',
+    )
+    expect(featheredGauntlet?.rewards).toContainEqual({
+      type: 'item',
+      targetId: 'rare-candy-l',
+      quantity: 3,
+      dropChance: 100,
+    })
+
     const photoExchange = tasks.find(
       (entry) => entry.id === 'task-photo-exchange',
     )

@@ -81,6 +81,12 @@ export const fuchsiaCityExpeditions: ExpeditionConfig[] = [
         quantity: 3,
         dropChance: 100,
       },
+      {
+        type: 'item',
+        targetId: 'rare-candy-l',
+        quantity: 3,
+        dropChance: 100,
+      },
     ],
   },
 ]
