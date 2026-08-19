@@ -38,7 +38,10 @@ export interface BattleContextType {
   battlePowersData: BattlePowersData | null
   playerHasTeraEffect: boolean
   handleStanceSelect: (stance: BattleStance) => void | Promise<void>
-  handleUseItem: (itemId: string) => void | Promise<void>
+  handleUseItem: (
+    itemId: string,
+    targetPokemonIndex?: number,
+  ) => void | Promise<void>
   handleUseTera: () => void | Promise<void>
   handleUseMega: (megaStoneId: string) => void | Promise<void>
   handleUseZMove: () => void | Promise<void>

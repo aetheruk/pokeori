@@ -40,7 +40,11 @@ const BattleActionSchema = z.discriminatedUnion('kind', [
     moveId: identifier,
     selectedType: identifier.optional(),
   }),
-  baseAction.extend({ kind: z.literal('item'), itemId: identifier }),
+  baseAction.extend({
+    kind: z.literal('item'),
+    itemId: identifier,
+    pokemonIndex: z.number().int().min(0).max(5).optional(),
+  }),
   baseAction.extend({
     kind: z.literal('swap'),
     pokemonIndex: z.number().int().min(0).max(5),
@@ -115,7 +119,11 @@ export async function POST(request: Request) {
         )
         break
       case 'item':
-        result = await useBattleItem(action.itemId, action.clientActionId)
+        result = await useBattleItem(
+          action.itemId,
+          action.clientActionId,
+          action.pokemonIndex,
+        )
         break
       case 'swap':
         result = await swapPokemon(action.pokemonIndex, action.clientActionId)

@@ -62,8 +62,8 @@ type PendingBattleAction = {
   label: string
   stance?: BattleStance
   itemId?: string
-  moveId?: string
   pokemonIndex?: number
+  moveId?: string
 }
 
 interface CardRevealErrorBoundaryProps {
@@ -499,18 +499,20 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
     [availableMoves, selectedType, wrapAction],
   )
   const handleUseItem = useCallback(
-    (id: string) =>
+    (id: string, targetPokemonIndex?: number) =>
       wrapAction(
         (clientActionId) =>
           submitBattleActionRequest({
             kind: 'item',
             itemId: id,
+            pokemonIndex: targetPokemonIndex,
             clientActionId,
           }),
         {
           kind: 'item',
           label: 'Using item',
           itemId: id,
+          pokemonIndex: targetPokemonIndex,
         },
       ),
     [wrapAction],

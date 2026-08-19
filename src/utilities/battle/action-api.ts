@@ -17,7 +17,11 @@ export type BattleActionRequest =
       moveId: string
       selectedType?: string
     })
-  | (BattleActionBase & { kind: 'item'; itemId: string })
+  | (BattleActionBase & {
+      kind: 'item'
+      itemId: string
+      pokemonIndex?: number
+    })
   | (BattleActionBase & { kind: 'swap'; pokemonIndex: number })
   | (BattleActionBase & { kind: 'tera' })
   | (BattleActionBase & { kind: 'mega'; formId: string })

@@ -1,6 +1,6 @@
 'use client'
 
-import { Loader2 } from 'lucide-react'
+import { ArrowLeft, HeartOff, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/carousel'
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import { ItemSprite } from '@/components/ui/item-sprite'
+import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { cn } from '@/lib/utils'
 import { getBattleItemUseLimit } from '@/utilities/battle/item-use-limits'
@@ -40,6 +41,17 @@ export function ItemSelector() {
   const [items, setItems] = useState<BattleInventoryItem[]>([])
   const [loading, setLoading] = useState(false)
   const [using, setUsing] = useState<string | null>(null)
+  const [reviveItem, setReviveItem] = useState<BattleInventoryItem | null>(
+    null,
+  )
+  const activePokemonIsFainted =
+    battleState.playerTeam[battleState.activePlayerIndex]?.currentHp <= 0
+
+  const reviveTargets = battleState.playerTeam.filter(
+    (pokemon, index) =>
+      pokemon.currentHp <= 0 &&
+      (!activePokemonIsFainted || index === battleState.activePlayerIndex),
+  )
 
   const remainingUses = maxItemsPerBattle - itemsUsedThisBattle
   const canUseItems = remainingUses > 0
@@ -57,12 +69,13 @@ export function ItemSelector() {
     }
   }, [open])
 
-  const handleUseItem = async (itemId: string) => {
+  const handleUseItem = async (itemId: string, targetPokemonIndex?: number) => {
     if (using) return
     setUsing(itemId)
     try {
-      await onUseItem(itemId)
+      await onUseItem(itemId, targetPokemonIndex)
       setOpen(false)
+      setReviveItem(null)
     } finally {
       setUsing(null)
     }
@@ -117,7 +130,7 @@ export function ItemSelector() {
     if (activePlayerMon.status?.id === 'vanished') return true
 
     const effect = item.battleEffect
-    if (effect.type === 'revive') return activePlayerMon.currentHp <= 0
+    if (effect.type === 'revive') return reviveTargets.length > 0
     if (effect.type === 'heal') {
       const missingHp = Math.max(
         0,
@@ -163,7 +176,13 @@ export function ItemSelector() {
   }
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
+    <Drawer
+      open={open}
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen)
+        if (!nextOpen) setReviveItem(null)
+      }}
+    >
       <DrawerTrigger asChild>
         <Button
           variant="outline"
@@ -208,7 +227,73 @@ export function ItemSelector() {
               </span>
             </span>
           </SectionDivider>
-          {loading ? (
+          {reviveItem ? (
+            <div className="space-y-3">
+              <Button
+                type="button"
+                variant="ghost"
+                className="game-focus-ring h-10 px-2 text-game-muted hover:bg-game-canvas/60 hover:text-game-ink"
+                onClick={() => setReviveItem(null)}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to items
+              </Button>
+              <p className="text-sm text-game-muted">
+                Choose a fainted Pokémon to revive to{' '}
+                {reviveItem.battleEffect.reviveHpPercent || 50}% HP.
+              </p>
+              {reviveTargets.length === 0 ? (
+                <p className="rounded-xl border border-game-border bg-game-canvas/55 p-4 text-sm text-game-muted">
+                  No fainted Pokémon can be revived right now.
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  {reviveTargets.map((pokemon) => {
+                    const index = battleState.playerTeam.indexOf(pokemon)
+                    return (
+                      <Button
+                        key={`${pokemon.id}-${index}`}
+                        type="button"
+                        variant="outline"
+                        className={cn(
+                          'game-focus-ring relative h-auto min-h-[4.5rem] rounded-xl border border-game-danger/50 bg-game-danger/5 px-3 py-2 text-left',
+                          'flex items-center gap-3 shadow-sm transition-colors hover:border-game-ochre/60 hover:bg-game-ochre/10',
+                          using === reviveItem.itemId &&
+                            'pointer-events-none opacity-50',
+                        )}
+                        onClick={() =>
+                          void handleUseItem(reviveItem.itemId, index)
+                        }
+                        disabled={using !== null || isWaitingForServer}
+                      >
+                        <div className="relative h-12 w-12 flex-shrink-0">
+                          <PokemonRaritySprite
+                            formId={pokemon.formId}
+                            view="front"
+                            rarity={pokemon.rarity}
+                            shiny={pokemon.shiny}
+                            isShadow={pokemon.isShadow}
+                            isRadiant={pokemon.isRadiant}
+                            female={pokemon.gender === 'female'}
+                            alt={pokemon.name}
+                            sizes="48px"
+                            className="h-full w-full grayscale"
+                          />
+                          <HeartOff className="absolute inset-0 m-auto h-5 w-5 text-game-danger" />
+                        </div>
+                        <span className="min-w-0 flex-1 truncate text-sm font-semibold">
+                          {pokemon.name}
+                        </span>
+                        {using === reviveItem.itemId && (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        )}
+                      </Button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          ) : loading ? (
             <div className="flex items-center justify-center h-40">
               <Loader2 className="w-8 h-8 animate-spin text-game-muted" />
             </div>
@@ -255,7 +340,13 @@ export function ItemSelector() {
                                   using === item.itemId &&
                                     'opacity-50 pointer-events-none',
                                 )}
-                                onClick={() => handleUseItem(item.itemId)}
+                                onClick={() => {
+                                  if (item.battleEffect.type === 'revive') {
+                                    setReviveItem(item)
+                                  } else {
+                                    void handleUseItem(item.itemId)
+                                  }
+                                }}
                                 disabled={using !== null || !itemApplies}
                               >
                                 <ItemSprite

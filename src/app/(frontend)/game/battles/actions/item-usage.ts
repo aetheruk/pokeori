@@ -36,6 +36,7 @@ import {
 export async function useBattleItem(
   itemId: string,
   clientActionId?: string,
+  targetPokemonIndex?: number,
 ): Promise<{
   success: boolean
   error?: string
@@ -150,8 +151,42 @@ export async function useBattleItem(
 
     const playerMon = state.playerTeam[state.activePlayerIndex]
     const battleEffect = item.battleEffect
+    let targetPokemon = playerMon
+    let resolvedTargetIndex = state.activePlayerIndex
+
+    if (battleEffect.type === 'revive') {
+      resolvedTargetIndex = targetPokemonIndex ?? state.activePlayerIndex
+      if (
+        !Number.isInteger(resolvedTargetIndex) ||
+        resolvedTargetIndex < 0 ||
+        resolvedTargetIndex >= state.playerTeam.length
+      ) {
+        return { success: false, error: 'Invalid Revive target', state }
+      }
+
+      if (
+        needsPlayerReplacement(state) &&
+        resolvedTargetIndex !== state.activePlayerIndex
+      ) {
+        return {
+          success: false,
+          error: 'Revive the active fainted Pokemon before switching',
+          state,
+        }
+      }
+
+      targetPokemon = state.playerTeam[resolvedTargetIndex]
+      if (!targetPokemon || targetPokemon.currentHp > 0) {
+        return {
+          success: false,
+          error: 'Choose a fainted Pokemon to revive',
+          state,
+        }
+      }
+    }
+
     let effectResult = applyBattleItemEffect({
-      pokemon: playerMon,
+      pokemon: targetPokemon,
       battleEffect,
     })
 
@@ -202,6 +237,15 @@ export async function useBattleItem(
 
     const message = effectResult.message
     clearZMoveCharge(playerMon)
+
+    if (
+      battleEffect.type === 'revive' &&
+      resolvedTargetIndex === state.activePlayerIndex &&
+      state.pendingPlayerSwitchReason === 'fainted'
+    ) {
+      state.pendingPlayerSwitch = false
+      state.pendingPlayerSwitchReason = undefined
+    }
 
     // Update Inventory (Embedded Map Update)
     const nextQty = currentQty - 1
