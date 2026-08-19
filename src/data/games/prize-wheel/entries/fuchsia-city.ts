@@ -43,13 +43,14 @@ export const fuchsiaCitychanseyEntries: PrizeWheelGameConfig[] = [
           color: '#f7cf05',
           percentage: 5,
           icon: { type: 'item' as const, id: 'revive' },
-          rewards: [
+          requirements: [
             {
-              type: 'task_complete' as const,
-              targetId: 'revive-recipe-discovery',
-              quantity: 1,
-              dropChance: 100,
+              type: 'task_completed' as const,
+              targetId: 'revive-recipe',
+              inverse: true,
             },
+          ],
+          rewards: [
             {
               type: 'task_complete' as const,
               targetId: 'revive-recipe',

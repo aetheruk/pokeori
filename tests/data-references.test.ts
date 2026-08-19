@@ -2552,13 +2552,14 @@ describe('static data references', () => {
     })
     expect(slots.map((slot) => slot.id)).toEqual([...xItemIds, 'revive-recipe'])
     expect(recipeSlot?.percentage).toBe(5)
-    expect(recipeSlot?.rewards).toEqual([
+    expect(recipeSlot?.requirements).toEqual([
       {
-        type: 'task_complete',
-        targetId: 'revive-recipe-discovery',
-        quantity: 1,
-        dropChance: 100,
+        type: 'task_completed',
+        targetId: 'revive-recipe',
+        inverse: true,
       },
+    ])
+    expect(recipeSlot?.rewards).toEqual([
       {
         type: 'task_complete',
         targetId: 'revive-recipe',

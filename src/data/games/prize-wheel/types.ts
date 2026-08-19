@@ -1,4 +1,4 @@
-import { BaseGameConfig, TaskIcon } from '../shared'
+import { BaseGameConfig, TaskCondition, TaskIcon } from '../shared'
 import { Reward } from '@/utilities/rewards/reward-logic'
 
 export interface PrizeWheelSlot {
@@ -7,6 +7,7 @@ export interface PrizeWheelSlot {
   color: string // Hex or Tailwind class
   icon?: TaskIcon | string
   percentage: number // 0-100, should sum to 100
+  requirements?: TaskCondition[]
   rewards: Reward[]
 }
 

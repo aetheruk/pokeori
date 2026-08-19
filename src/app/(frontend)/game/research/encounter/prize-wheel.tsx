@@ -44,9 +44,7 @@ function formatPrizePercentage(percentage: number) {
   return percentage.toFixed(3).replace(/0+$/, '').replace(/\.$/, '')
 }
 
-function PrizesModal({ encounter }: { encounter: PrizeWheelGameConfig }) {
-  const slots = encounter.settings.slots || []
-
+function PrizesModal({ slots }: { slots: PrizeWheelSlot[] }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -133,7 +131,8 @@ export function PrizeWheelGame({
   const spinTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const autoClaimTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const slots = encounter.settings.slots || []
+  const slots: PrizeWheelSlot[] =
+    initialState?.roundData?.prizeWheelSlots || encounter.settings.slots || []
   const sliceSize = 360 / slots.length
 
   // Cost info
@@ -425,7 +424,7 @@ export function PrizeWheelGame({
       {/* Controls Section (Fixed Bottom) */}
       <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-4 px-4 z-50 pb-safe">
         {/* Prizes Modal */}
-        <PrizesModal encounter={encounter} />
+        <PrizesModal slots={slots} />
 
         {cost && costCurrency && !canClaim ? (
           <div className="flex items-center gap-2 rounded-full border border-game-border bg-game-surface-raised px-4 py-2 text-sm font-semibold text-game-ink shadow-sm">
