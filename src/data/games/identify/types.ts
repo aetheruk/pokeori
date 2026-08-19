@@ -9,6 +9,7 @@ export interface IdentifySettings {
   pokemonPool?: number[]
   itemPool?: string[]
   optionsPool?: number[]
+  optionCount?: number
   timeLimit?: number
   winRate?: number
   death?: boolean

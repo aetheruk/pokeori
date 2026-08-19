@@ -97,12 +97,9 @@ describe('Fuchsia Gym and Safari progression', () => {
     }
 
     expect(
-      tasks.find(
-        (task) => task.id === 'fuchsia-research-institute-credentials',
-      )?.criteria,
-    ).toEqual([
-      { type: 'skill_level', targetId: 'researching', count: 30 },
-    ])
+      tasks.find((task) => task.id === 'fuchsia-research-institute-credentials')
+        ?.criteria,
+    ).toEqual([{ type: 'skill_level', targetId: 'researching', count: 30 }])
     expect(
       tasks.find(
         (task) => task.id === 'fuchsia-research-institute-exam-results',
@@ -116,9 +113,8 @@ describe('Fuchsia Gym and Safari progression', () => {
       },
     ])
     expect(
-      tasks.find(
-        (task) => task.id === 'fuchsia-research-institute-membership',
-      )?.criteria,
+      tasks.find((task) => task.id === 'fuchsia-research-institute-membership')
+        ?.criteria,
     ).toEqual([
       {
         type: 'currency_owned',
@@ -135,15 +131,21 @@ describe('Fuchsia Gym and Safari progression', () => {
       type: 'task_completed',
       targetId: 'fuchsia-research-institute-exam-briefing',
     })
+    expect(exam?.requirements).toContainEqual({
+      type: 'game_result',
+      targetId: 'fuchsia-research-institute-identify',
+      battleStatus: 'win',
+      count: 1,
+      inverse: true,
+    })
     expect(exam?.settings).toMatchObject({
-      timeLimit: 45,
-      winRate: 12,
+      optionCount: 6,
+      timeLimit: 35,
+      winRate: 20,
     })
 
     const admissionProse = JSON.stringify(
-      taskChain.map(([taskId]) =>
-        tasks.find((task) => task.id === taskId),
-      ),
+      taskChain.map(([taskId]) => tasks.find((task) => task.id === taskId)),
     )
     expect(admissionProse).toContain('Only Chartered Researchers may enter')
     expect(admissionProse).toContain(
@@ -151,11 +153,15 @@ describe('Fuchsia Gym and Safari progression', () => {
     )
     expect(admissionProse).toContain('We do not issue visitor passes')
     expect(admissionProse).toContain('We will take each step in order')
-    expect(admissionProse).toContain('substantial record of independent fieldwork')
+    expect(admissionProse).toContain(
+      'substantial record of independent fieldwork',
+    )
     expect(admissionProse).not.toContain('Researcher level')
     expect(admissionProse).not.toContain('level 30')
     expect(admissionProse).toContain('Ray needs to hear this')
-    expect(admissionProse).toContain('My research record should speak for itself')
+    expect(admissionProse).toContain(
+      'My research record should speak for itself',
+    )
     expect(admissionProse).toContain('No pressure... I hope')
     expect(admissionProse).toContain('The Institute should have their records')
     expect(admissionProse).not.toContain('Visit the Fuchsia Research Institute')
@@ -361,16 +367,66 @@ describe('Fuchsia Gym and Safari progression', () => {
     const safariLocations = locations.filter(
       (entry) => entry.id.startsWith('safari-') && entry.id.endsWith('-catch'),
     )
-    expect(safariLocations).toHaveLength(5)
+    expect(safariLocations).toHaveLength(4)
     expect(
       safariLocations.every((entry) => entry.encounterMode === 'safari'),
     ).toBe(true)
+    expect(
+      safariLocations.every((entry) => entry.expeditionOnly === true),
+    ).toBe(true)
+
+    const canonicalSpecies = new Map([
+      ['central', [29, 30, 32, 33, 46, 47, 48, 102, 111, 113, 114, 123, 127]],
+      [
+        'east',
+        [29, 30, 32, 33, 46, 47, 84, 102, 104, 105, 113, 115, 123, 127, 128],
+      ],
+      ['west', [29, 30, 32, 33, 48, 49, 84, 102, 104, 105, 114, 115, 127, 128]],
+      [
+        'north',
+        [29, 30, 32, 33, 46, 49, 102, 104, 111, 113, 115, 123, 127, 128],
+      ],
+    ])
+    for (const [area, speciesIds] of canonicalSpecies) {
+      const location = locations.find(
+        (entry) => entry.id === `safari-${area}-catch`,
+      )
+      const study = fieldObservationGames.find(
+        (entry) => entry.id === `safari-${area}-field-observation`,
+      )
+      expect(
+        location?.encounters
+          .map((encounter) => encounter.speciesId)
+          .sort((a, b) => a - b),
+        area,
+      ).toEqual(speciesIds)
+      expect(
+        study?.settings.pokemonPool
+          .map((pokemon) => pokemon.speciesId)
+          .sort((a, b) => a - b),
+        area,
+      ).toEqual(speciesIds)
+      expect(
+        location?.encounters.reduce(
+          (total, encounter) => total + encounter.chance,
+          0,
+        ),
+        area,
+      ).toBe(100)
+      expect(
+        study?.settings.pokemonPool.reduce(
+          (total, pokemon) => total + pokemon.weight,
+          0,
+        ),
+        area,
+      ).toBe(100)
+    }
 
     const safariExpeditions = expeditions.filter(
       (entry) =>
         entry.id.startsWith('safari-') && entry.id.endsWith('-expedition'),
     )
-    expect(safariExpeditions).toHaveLength(5)
+    expect(safariExpeditions).toHaveLength(4)
     expect(
       safariExpeditions.every((entry) =>
         entry.criteria?.some(
@@ -395,20 +451,30 @@ describe('Fuchsia Gym and Safari progression', () => {
     ).toBe(true)
   })
 
-  test('trail discoveries are 15 percent and Area 5 awards Strength once', () => {
+  test('four trail surveys reveal visible clues and North awards Strength once', () => {
     const searchStudies = fieldObservationGames.filter((entry) =>
-      ['institute', 'central', 'east', 'west', 'north'].some(
+      ['central', 'east', 'west', 'north'].some(
         (area) => entry.id === `safari-${area}-field-observation`,
       ),
     )
-    expect(searchStudies).toHaveLength(5)
+    expect(searchStudies).toHaveLength(4)
+    expect(
+      fieldObservationGames.some(
+        (entry) => entry.id === 'safari-institute-field-observation',
+      ),
+    ).toBe(false)
     expect(
       searchStudies.every((entry) =>
         entry.rewards.some(
           (reward) =>
-            reward.type === 'task_complete' && reward.dropChance === 15,
+            reward.type === 'task_complete' &&
+            reward.dropChance === 15 &&
+            !reward.secret,
         ),
       ),
+    ).toBe(true)
+    expect(
+      searchStudies.every((entry) => entry.hide === 'fuchsia-koga-study-toxin'),
     ).toBe(true)
 
     const clueGates = new Map([
@@ -426,23 +492,51 @@ describe('Fuchsia Gym and Safari progression', () => {
       expect(tasks.find((task) => task.id === clueId)?.secret).toBe(false)
     }
 
-    const areaFive = expeditions.find(
-      (entry) => entry.id === 'safari-area-five-expedition',
+    const discoveryIds = [
+      'safari-discovery-east',
+      'safari-discovery-west',
+      'safari-discovery-north',
+      'safari-discovery-search-complete',
+    ]
+    for (const discoveryId of discoveryIds) {
+      const discovery = tasks.find((task) => task.id === discoveryId)
+      expect(discovery?.secret, discoveryId).toBe(true)
+      expect(discovery?.icon, discoveryId).toEqual({
+        type: 'trainer',
+        id: 'detective',
+      })
+      expect(discovery?.exitModal, discoveryId).toMatchObject({
+        title: 'Det. Ray Choo',
+        closeButtonText: 'Return to Explore',
+      })
+    }
+
+    expect(
+      tasks.find((task) => task.id === 'safari-clue-last-sign-out')
+        ?.requirements,
+    ).toContainEqual({
+      type: 'task_completed',
+      targetId: 'safari-zone-search-begins',
+    })
+    expect(tasks.some((task) => task.id === 'safari-discovery-central')).toBe(
+      false,
     )
-    expect(areaFive?.activityPool.task).toEqual([
-      'safari-area-five-strength-cache',
-    ])
-    expect(areaFive?.path).toContainEqual(
+
+    const north = expeditions.find(
+      (entry) => entry.id === 'safari-north-expedition',
+    )
+    expect(north?.activityPool.task).toEqual(['safari-north-strength-cache'])
+    expect(north?.path).toContainEqual(
       expect.objectContaining({
         activityType: 'task',
-        activityId: 'safari-area-five-strength-cache',
+        activityId: 'safari-north-strength-cache',
         secret: true,
         requirements: [
           { type: 'item_owned', targetId: 'tm-strength', inverse: true },
         ],
       }),
     )
-    const strength = areaFive?.rewards.find(
+    const strength = north?.rewards.find(
       (reward) => reward.targetId === 'tm-strength',
     )
     expect(strength?.dropChance).toBe(100)
@@ -454,42 +548,61 @@ describe('Fuchsia Gym and Safari progression', () => {
 
     const safariProgress = {
       user: { id: 'fuchsia-test-user' },
-      inventory: [{ itemId: 'safari-catching-permit', quantity: 1 }],
+      inventory: [
+        { itemId: 'safari-research-pass', quantity: 1 },
+        { itemId: 'safari-catching-permit', quantity: 1 },
+      ],
       pokemon: [],
       tcg: [],
       pokedex: [],
-      completedTasks: [],
+      completedTasks: [
+        {
+          taskId: 'safari-clue-purple-thread',
+          count: 1,
+        },
+      ],
       battleResults: [],
       locationEncounterResults: [],
       gameResults: [],
       fieldResearchResults: [],
       expeditionResults: [
         {
-          expeditionId: 'safari-north-expedition',
+          expeditionId: 'safari-west-expedition',
           wins: 5,
           losses: 0,
         },
       ],
     } as unknown as RequirementData
-    const firstVisit = buildExpeditionSteps(areaFive!, safariProgress)
+    const firstVisit = buildExpeditionSteps(north!, safariProgress)
     expect(
       firstVisit.some(
-        (step) => step.activityId === 'safari-area-five-strength-cache',
+        (step) => step.activityId === 'safari-north-strength-cache',
       ),
     ).toBe(true)
 
-    const returnVisit = buildExpeditionSteps(areaFive!, {
+    const returnVisit = buildExpeditionSteps(north!, {
       ...safariProgress,
       inventory: [
+        { itemId: 'safari-research-pass', quantity: 1 },
         { itemId: 'safari-catching-permit', quantity: 1 },
         { itemId: 'tm-strength', quantity: 1 },
       ],
     })
     expect(
       returnVisit.some(
-        (step) => step.activityId === 'safari-area-five-strength-cache',
+        (step) => step.activityId === 'safari-north-strength-cache',
       ),
     ).toBe(false)
+
+    expect(expeditions.some((entry) => entry.id.includes('area-five'))).toBe(
+      false,
+    )
+    expect(
+      fieldObservationGames.some((entry) => entry.id.includes('area-five')),
+    ).toBe(false)
+    expect(locations.some((entry) => entry.id.includes('area-five'))).toBe(
+      false,
+    )
   })
 
   test('Koga identifies an Unknown Compound and requests a partner Chansey', () => {
@@ -541,14 +654,17 @@ describe('Fuchsia Gym and Safari progression', () => {
     )
     expect(trailTask?.icon).toEqual({ type: 'trainer', id: 'detective' })
     const trail = JSON.stringify(trailTask)
-    expect(trail).toContain('We have searched every lead we have')
+    expect(trail).toContain('We have followed the whole trail')
+    expect(trail).not.toContain('sign of a struggle')
     expect(trail).not.toContain('out-investigated')
 
-    const trial = JSON.stringify(
-      tasks.find((task) => task.id === 'fuchsia-gym-trial-ready'),
+    const trialTask = tasks.find(
+      (task) => task.id === 'fuchsia-gym-trial-ready',
     )
+    expect(trialTask?.name).toBe('Returning to the Gym')
+    const trial = JSON.stringify(trialTask)
     expect(trial).toContain('They have been back for hours')
-    expect(trial).toContain('how he avoids interruptions')
+    expect(trial).not.toContain('how he avoids interruptions')
 
     const study = JSON.stringify(
       tasks.find((task) => task.id === 'fuchsia-koga-study-toxin'),

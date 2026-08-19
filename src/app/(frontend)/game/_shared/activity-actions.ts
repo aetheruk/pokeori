@@ -116,6 +116,7 @@ import {
   type GameActivityDomain,
 } from '@/utilities/games/activity-domain'
 import {
+  buildIdentifyOptions,
   getRandomItemFromPool,
   getRandomPokemonFromPool,
 } from '@/utilities/research/round-selection'
@@ -661,14 +662,21 @@ export async function startGameActivity(
 
       const prizeWheelSlots =
         encounter.gameType === 'prize-wheel'
-          ? getEligiblePrizeWheelSlots(encounter.settings.slots || [], userData, {
-              category: encounter.category,
-              subCategory: encounter.subCategory,
-              weather: weatherSnapshot.weather,
-            })
+          ? getEligiblePrizeWheelSlots(
+              encounter.settings.slots || [],
+              userData,
+              {
+                category: encounter.category,
+                subCategory: encounter.subCategory,
+                weather: weatherSnapshot.weather,
+              },
+            )
           : undefined
 
-      if (encounter.gameType === 'prize-wheel' && prizeWheelSlots?.length === 0) {
+      if (
+        encounter.gameType === 'prize-wheel' &&
+        prizeWheelSlots?.length === 0
+      ) {
         return { success: false, error: 'No eligible prize wheel slots' }
       }
 
@@ -892,20 +900,14 @@ export async function startGameActivity(
         // Generate options
         if (itemPool.length > 0) {
           // Item Options
+          const configuredOptions = encounter.settings
+            .optionsPool as unknown as string[]
           const optionsPool =
-            (encounter.settings.optionsPool as unknown as string[]) || itemPool
-          const wrongOptions: string[] = []
-          while (wrongOptions.length < 3) {
-            const randomId = getRandomItemFromPool(itemPool)
-            if (
-              randomId !== currentItemId &&
-              !wrongOptions.includes(randomId)
-            ) {
-              wrongOptions.push(randomId)
-            }
-          }
-          const allOptions = [currentItemId, ...wrongOptions].sort(
-            () => Math.random() - 0.5,
+            configuredOptions?.length > 0 ? configuredOptions : itemPool
+          const allOptions = buildIdentifyOptions(
+            currentItemId as string,
+            optionsPool,
+            encounter.settings.optionCount,
           )
           roundData = { options: allOptions }
         } else {
@@ -919,18 +921,10 @@ export async function startGameActivity(
             encounter.settings.optionsPool.length > 0
               ? encounter.settings.optionsPool
               : effectivePool
-          const wrongOptions: number[] = []
-          while (wrongOptions.length < 3) {
-            const randomId = getRandomPokemonFromPool(optionsPool)
-            if (
-              randomId !== currentPokemonId &&
-              !wrongOptions.includes(randomId)
-            ) {
-              wrongOptions.push(randomId)
-            }
-          }
-          const allOptions = [currentPokemonId, ...wrongOptions].sort(
-            () => Math.random() - 0.5,
+          const allOptions = buildIdentifyOptions(
+            currentPokemonId as number,
+            optionsPool,
+            encounter.settings.optionCount,
           )
           roundData = { options: allOptions }
         }
@@ -1710,17 +1704,14 @@ export async function submitGameActivityAnswer(
     if (encounter.gameType === 'identify') {
       if (itemPool.length > 0) {
         // Item Options
+        const configuredOptions = encounter.settings
+          .optionsPool as unknown as string[]
         const optionsPool =
-          (encounter.settings.optionsPool as unknown as string[]) || itemPool
-        const wrongOptions: string[] = []
-        while (wrongOptions.length < 3) {
-          const randomId = getRandomItemFromPool(itemPool)
-          if (randomId !== nextItemId && !wrongOptions.includes(randomId)) {
-            wrongOptions.push(randomId)
-          }
-        }
-        const allOptions = [nextItemId, ...wrongOptions].sort(
-          () => Math.random() - 0.5,
+          configuredOptions?.length > 0 ? configuredOptions : itemPool
+        const allOptions = buildIdentifyOptions(
+          nextItemId as string,
+          optionsPool,
+          encounter.settings.optionCount,
         )
         state.roundData = { options: allOptions }
       } else {
@@ -1734,15 +1725,10 @@ export async function submitGameActivityAnswer(
           encounter.settings.optionsPool.length > 0
             ? encounter.settings.optionsPool
             : effectivePool
-        const wrongOptions: number[] = []
-        while (wrongOptions.length < 3) {
-          const randomId = getRandomPokemonFromPool(optionsPool)
-          if (randomId !== nextPokemonId && !wrongOptions.includes(randomId)) {
-            wrongOptions.push(randomId)
-          }
-        }
-        const allOptions = [nextPokemonId, ...wrongOptions].sort(
-          () => Math.random() - 0.5,
+        const allOptions = buildIdentifyOptions(
+          nextPokemonId as number,
+          optionsPool,
+          encounter.settings.optionCount,
         )
         state.roundData = { options: allOptions }
       }

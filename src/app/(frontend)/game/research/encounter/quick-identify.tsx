@@ -72,6 +72,7 @@ export function QuickIdentifyGame({
   const isItemGame =
     (encounter.settings.itemPool && encounter.settings.itemPool.length > 0) ||
     false
+  const usesExpandedGrid = options.length > 4
 
   // Start game / Restore Session
   const initGame = useCallback(async () => {
@@ -354,7 +355,13 @@ export function QuickIdentifyGame({
               </div>
 
               <div className="flex-1 flex items-center justify-center">
-                <div className="grid w-full grid-cols-2 place-items-center gap-3">
+                <div
+                  className={`grid w-full place-items-center gap-3 ${
+                    usesExpandedGrid
+                      ? 'max-w-xl grid-cols-3 gap-2 sm:gap-3'
+                      : 'grid-cols-2'
+                  }`}
+                >
                   {options.map((optionId) => {
                     if (isItemGame) {
                       const item = items.find((i) => i.id === optionId)
@@ -371,7 +378,13 @@ export function QuickIdentifyGame({
                           disabled={isProcessing}
                           aria-busy={isProcessing}
                         >
-                          <div className="w-24 h-24 relative flex items-center justify-center">
+                          <div
+                            className={`${
+                              usesExpandedGrid
+                                ? 'h-16 w-16 sm:h-20 sm:w-20'
+                                : 'h-24 w-24'
+                            } relative flex items-center justify-center`}
+                          >
                             <ItemSprite
                               itemId={optionId as string}
                               alt={itemName}
@@ -400,7 +413,13 @@ export function QuickIdentifyGame({
                           disabled={isProcessing}
                           aria-busy={isProcessing}
                         >
-                          <div className="w-24 h-24 relative">
+                          <div
+                            className={`${
+                              usesExpandedGrid
+                                ? 'h-16 w-16 sm:h-20 sm:w-20'
+                                : 'h-24 w-24'
+                            } relative`}
+                          >
                             <Image
                               src={getPokemonImageUrl(
                                 optionId.toString(),

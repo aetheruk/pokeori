@@ -220,6 +220,7 @@ export interface GameSettings {
   pokemonPool?: any[]
   itemPool?: string[]
   optionsPool?: number[]
+  optionCount?: number
   timeLimit?: number
   winRate?: number | { min: number; max: number }
   successThreshold?: number

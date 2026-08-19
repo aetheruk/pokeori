@@ -20,7 +20,7 @@ function safariExpedition({
   locationId,
   icon,
   requirements = [],
-  areaFive = false,
+  strengthCache = false,
 }: {
   id: string
   name: string
@@ -29,7 +29,7 @@ function safariExpedition({
   locationId: string
   icon: string
   requirements?: ExpeditionConfig['requirements']
-  areaFive?: boolean
+  strengthCache?: boolean
 }): ExpeditionConfig {
   return {
     id,
@@ -38,7 +38,7 @@ function safariExpedition({
     category: 'Kanto',
     subCategory: 'Safari Zone',
     icon: { type: 'pokemon', id: icon },
-    background: '/backgrounds/safari.avif',
+    background: '/backgrounds/safari-reserve.avif',
     maxLosses: 1,
     canAbandon: true,
     requirements: [permitRequirement, ...requirements],
@@ -48,18 +48,18 @@ function safariExpedition({
     activityPool: {
       'field-research': [fieldResearchId],
       location: [locationId],
-      ...(areaFive ? { task: ['safari-area-five-strength-cache'] } : {}),
+      ...(strengthCache ? { task: ['safari-north-strength-cache'] } : {}),
     },
     path: [
       { type: 'activity', id: `${id}-survey`, activityType: 'field-research', activityId: fieldResearchId },
       { type: 'activity', id: `${id}-catch`, activityType: 'location', activityId: locationId },
-      ...(areaFive
+      ...(strengthCache
         ? [
             {
               type: 'activity' as const,
               id: `${id}-strength-cache`,
               activityType: 'task' as const,
-              activityId: 'safari-area-five-strength-cache',
+              activityId: 'safari-north-strength-cache',
               secret: true,
               requirements: [
                 { type: 'item_owned' as const, targetId: 'tm-strength', inverse: true },
@@ -71,7 +71,7 @@ function safariExpedition({
     rewards: [
       { type: 'item', targetId: 'toxic-resin-t1', quantity: { min: 1, max: 3 }, dropChance: 100 },
       { type: 'item', targetId: 'soft-fluff-t1', quantity: 1, dropChance: 35 },
-      ...(areaFive
+      ...(strengthCache
         ? [
             {
               type: 'item' as const,
@@ -123,21 +123,11 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
     id: 'safari-north-expedition',
     name: 'Northern Survey',
     description:
-      'Cross the northern ledges and narrow channels, complete a habitat survey, and attempt a Safari catch.',
+      'Cross the northern ledges and old service paths, complete a habitat survey, and attempt a Safari catch.',
     fieldResearchId: 'safari-north-field-observation',
     locationId: 'safari-north-catch',
     icon: '128',
     requirements: [fiveClears('safari-west-expedition')],
-  }),
-  safariExpedition({
-    id: 'safari-area-five-expedition',
-    name: 'Area 5 Deep Survey',
-    description:
-      'Push along Area 5’s overgrown service trail, survey its rare Pokémon, and inspect anything the old crews left behind.',
-    fieldResearchId: 'safari-area-five-field-observation',
-    locationId: 'safari-area-five-catch',
-    icon: '113',
-    requirements: [fiveClears('safari-north-expedition')],
-    areaFive: true,
+    strengthCache: true,
   }),
 ]
