@@ -6,6 +6,7 @@ import {
   ArrowRight,
   ArrowUp,
   CircleDot,
+  EyeOff,
   Footprints,
   RefreshCw,
   Undo2,
@@ -247,6 +248,9 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   const [collectedPrizeIds, setCollectedPrizeIds] = useState<Set<string>>(
     new Set(),
   )
+  const [revealedBarrierKeys, setRevealedBarrierKeys] = useState<Set<string>>(
+    new Set(),
+  )
   const blockedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const slideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -305,6 +309,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       rocks: {},
     })
     setCollectedPrizeIds(new Set())
+    setRevealedBarrierKeys(new Set())
 
     if (res.restored && res.expiry) {
       const remaining = Math.max(
@@ -405,6 +410,20 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     if (blockedTimerRef.current) clearTimeout(blockedTimerRef.current)
     setBlockedOffset({ x: dx * 8, y: dy * 8 })
     blockedTimerRef.current = setTimeout(() => setBlockedOffset(null), 90)
+  }
+
+  const revealAuthoredBarrier = (position: Position) => {
+    if (!encounter.settings.invisibleMaze) return
+    const isAuthoredBarrier = (activeScreenConfig?.barriers || []).some(
+      (barrier) => isSamePosition(barrier, position),
+    )
+    if (!isAuthoredBarrier) return
+
+    setRevealedBarrierKeys((current) => {
+      const next = new Set(current)
+      next.add(`${activeScreenId}:${getRockPushPositionKey(position)}`)
+      return next
+    })
   }
 
   const lockSlidingInput = (durationMs: number) => {
@@ -738,6 +757,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     const nextPlayerPos = { x: playerPos.x + dx, y: playerPos.y + dy }
 
     if (isBlockedCellForPlayer(nextPlayerPos)) {
+      revealAuthoredBarrier(nextPlayerPos)
       signalBlocked(dx, dy)
       return
     }
@@ -993,6 +1013,14 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     transform: `translate(${position.x * 100}%, ${position.y * 100}%)${extraTransform}`,
     transitionDuration: `${transitionDurationMs}ms`,
   })
+  const isInvisibleAuthoredBarrier = (position: Position) =>
+    encounter.settings.invisibleMaze === true &&
+    (activeScreenConfig?.barriers || []).some((barrier) =>
+      isSamePosition(barrier, position),
+    ) &&
+    !revealedBarrierKeys.has(
+      `${activeScreenId}:${getRockPushPositionKey(position)}`,
+    )
 
   return (
     <div className="relative min-h-dvh flex flex-col font-sans overflow-hidden game-night bg-game-night-canvas">
@@ -1023,12 +1051,21 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       <div className="relative z-10 flex flex-col items-center justify-center min-h-dvh w-full p-4">
         {/* Header Stats / Chips */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 flex flex-row gap-3 z-50 pointer-events-none">
-          {/* Rocks Chip */}
+          {/* Objective Chip */}
           <div className="flex items-center gap-2 rounded-full border border-game-border bg-game-surface-raised px-3 py-1 text-xs font-bold text-game-ink shadow-sm backdrop-blur-sm">
-            <CircleDot className="h-3 w-3 text-game-moss" />
-            <span>
-              {displayRocksSolved} / {totalRocks}
-            </span>
+            {encounter.settings.invisibleMaze ? (
+              <>
+                <EyeOff className="h-3 w-3 text-game-ochre" />
+                <span>Find the exit</span>
+              </>
+            ) : (
+              <>
+                <CircleDot className="h-3 w-3 text-game-moss" />
+                <span>
+                  {displayRocksSolved} / {totalRocks}
+                </span>
+              </>
+            )}
           </div>
 
           {/* Moves Chip */}
@@ -1079,60 +1116,65 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
             }}
           >
             {grid.map((row, y) =>
-              row.map((cell, x) => (
-                <div
-                  key={`${x}-${y}`}
-                  className={cn(
-                    'relative w-full h-full flex items-center justify-center [image-rendering:pixelated] bg-[length:100%_100%]',
-                    cell === 'wall' &&
-                      'shadow-[inset_0_-6px_10px_rgba(0,0,0,0.35)]',
-                  )}
-                  style={{
-                    backgroundImage:
-                      cell === 'wall'
-                        ? `url('${barrierSprite}')`
-                        : cell === 'ice'
-                          ? `url('${iceSprite}')`
-                          : cell === 'empty' ||
-                              cell === 'hole' ||
-                              cell === 'filled'
-                            ? `url('${floorSprite}')`
-                            : undefined,
-                  }}
-                >
-                  {cell === 'hole' && (
-                    <div className="absolute inset-[12%]">
-                      {holeSprite ? (
-                        <Image
-                          src={holeSprite}
-                          alt=""
-                          fill
-                          sizes="64px"
-                          className="object-contain [image-rendering:pixelated]"
-                        />
-                      ) : (
-                        <div className="h-full w-full rounded-full border-2 border-[#081014]/30 bg-[#081014]/70 shadow-[inset_0_0_10px_rgba(0,0,0,0.9)]" />
-                      )}
-                    </div>
-                  )}
+              row.map((cell, x) => {
+                const hideBarrier = isInvisibleAuthoredBarrier({ x, y })
+                return (
+                  <div
+                    key={`${x}-${y}`}
+                    className={cn(
+                      'relative w-full h-full flex items-center justify-center [image-rendering:pixelated] bg-[length:100%_100%]',
+                      cell === 'wall' &&
+                        !hideBarrier &&
+                        'shadow-[inset_0_-6px_10px_rgba(0,0,0,0.35)]',
+                    )}
+                    style={{
+                      backgroundImage:
+                        cell === 'wall' && !hideBarrier
+                          ? `url('${barrierSprite}')`
+                          : cell === 'ice'
+                            ? `url('${iceSprite}')`
+                            : cell === 'empty' ||
+                                hideBarrier ||
+                                cell === 'hole' ||
+                                cell === 'filled'
+                              ? `url('${floorSprite}')`
+                              : undefined,
+                    }}
+                  >
+                    {cell === 'hole' && (
+                      <div className="absolute inset-[12%]">
+                        {holeSprite ? (
+                          <Image
+                            src={holeSprite}
+                            alt=""
+                            fill
+                            sizes="64px"
+                            className="object-contain [image-rendering:pixelated]"
+                          />
+                        ) : (
+                          <div className="h-full w-full rounded-full border-2 border-[#081014]/30 bg-[#081014]/70 shadow-[inset_0_0_10px_rgba(0,0,0,0.9)]" />
+                        )}
+                      </div>
+                    )}
 
-                  {cell === 'filled' && (
-                    <div className="absolute inset-[16%]">
-                      {filledHoleSprite ? (
-                        <Image
-                          src={filledHoleSprite}
-                          alt=""
-                          fill
-                          sizes="64px"
-                          className="object-contain [image-rendering:pixelated]"
-                        />
-                      ) : (
-                        <div className="h-full w-full rounded-full border border-[#081014]/40 bg-[#46545a]/85 shadow-[inset_0_4px_6px_rgba(255,255,255,0.12),inset_0_-5px_8px_rgba(0,0,0,0.45)]" />
-                      )}
-                    </div>
-                  )}
-                </div>
-              )),
+                    {cell === 'filled' && (
+                      <div className="absolute inset-[16%]">
+                        {filledHoleSprite ? (
+                          <Image
+                            src={filledHoleSprite}
+                            alt=""
+                            fill
+                            sizes="64px"
+                            className="object-contain [image-rendering:pixelated]"
+                          />
+                        ) : (
+                          <div className="h-full w-full rounded-full border border-[#081014]/40 bg-[#46545a]/85 shadow-[inset_0_4px_6px_rgba(255,255,255,0.12),inset_0_-5px_8px_rgba(0,0,0,0.45)]" />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )
+              }),
             )}
 
             <div className="pointer-events-none absolute inset-0 z-20">

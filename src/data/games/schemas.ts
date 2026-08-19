@@ -642,6 +642,7 @@ const settingsByGameType: Record<string, z.ZodTypeAny> = {
       prizes: z.array(rockPushPrizeSchema).optional(),
       timeLimit: z.number().positive().optional(),
       maxMoves: z.number().int().positive().optional(),
+      invisibleMaze: z.boolean().optional(),
     })
     .passthrough(),
   run: z.object({ speed: z.number().positive() }).passthrough(),

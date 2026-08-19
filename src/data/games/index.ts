@@ -248,6 +248,7 @@ export interface GameSettings {
   screens?: import('./rock-push/types').RockPushScreenConfig[]
   prizes?: import('./rock-push/types').RockPushPrizeSquare[]
   maxMoves?: number
+  invisibleMaze?: boolean
   boulderSprite?: string
   barrierSprite?: string
   floorSprite?: string

@@ -46,6 +46,11 @@ export interface EncounterState {
     chance: number
   }[]
   weather?: WeatherSnapshot
+  encounterMode?: 'standard' | 'safari'
+  safari?: {
+    stage: number
+    actions: number
+  }
 
   activeAbilityId?: string
   activeAbilitySourcePokemonId?: string

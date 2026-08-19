@@ -86,6 +86,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 - Boards can author `teleporters`, including cross-screen teleports through `settings.screens`. A two-way pair is represented by two source teleporter entries targeting each other; a one-way teleporter renders only its source entry and uses the target coordinate as a hidden landing reference.
 - Optional `settings.prizes` entries place item reward squares on the board. A prize is added to the final reward pool only if the player walks over that square and then completes the puzzle.
 - Optional `settings.screens[*].prizes` entries work like board-level prizes and are validated with screen-scoped ids.
+- `settings.invisibleMaze: true` turns authored internal barriers into contact-revealed walls. The outer boundary remains visible, bumping an internal wall permanently reveals it for that attempt, and a `winTiles` exit can complete a maze with no boulders.
 - Default rock-push sprites live under `public/games/rockpush`, including separate floor, ice, stalagmite barrier, boulder, hole, filled-hole, win-tile, teleporter, and trainer assets. Entries can override these through `settings.floorSprite`, `settings.iceSprite`, `settings.barrierSprite`, `settings.boulderSprite`, `settings.holeSprite`, `settings.filledHoleSprite`, `settings.winTileSprite`, `settings.teleporterSprite`, and `settings.playerSprite`.
 
 ## Snap

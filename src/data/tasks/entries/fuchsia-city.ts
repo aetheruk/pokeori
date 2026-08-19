@@ -359,7 +359,7 @@ export const fuchsiaCityTasks: Task[] = [
     id: 'route-14-biker-fetch-1',
     name: 'A Spark of Goodwill',
     description:
-      'The Junkyard Crew blocks Route 14, but Gerald says he will let you pass if you fix his bike - it will not start without a spark plug.',
+      'The Junkyard Crew blocks Route 14, but Gerald says he will let you pass if you fix his bike; it will not start without a spark plug.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {
@@ -412,7 +412,7 @@ export const fuchsiaCityTasks: Task[] = [
           id: 'biker',
         },
         message:
-          "Oi! You're the one who cleared the road up north, right? My bike won't start and I know why - spark plug's gone. The wild Pokemon keep kicking 'em out of the tall grass. Go shake one loose in a battle and bring it back.",
+          "Oi! You're the one who cleared the road up north, right? My bike won't start, and I know why. The spark plug's gone. The wild Pokémon keep kicking 'em out of the tall grass. Go shake one loose in a battle and bring it back.",
         buttons: [
           {
             text: 'Fine',
@@ -486,7 +486,7 @@ export const fuchsiaCityTasks: Task[] = [
           id: 'biker',
         },
         message:
-          "Don't come any closer. I saw what you did to Gerald's bike. ... Fine. My carburetor's clogged. A Pokemon coughed it up somewhere in the grass - go catch yourself something and check what it was carrying.",
+          "Don't come any closer. I saw what you did to Gerald's bike. ... Fine. My carburetor's clogged. A Pokémon coughed it up somewhere in the grass. Go catch something and check what it was carrying.",
         buttons: [
           {
             text: 'Whatever',
@@ -700,7 +700,7 @@ export const fuchsiaCityTasks: Task[] = [
           id: 'biker',
         },
         message:
-          "Truth is, we didn't block it for fun. A pack of wild Pokemon tore through our camp and wrecked every single bike. We couldn't chase them off and we were too proud to ask for help. So we just... blocked the road.",
+          "Truth is, we didn't block it for fun. A pack of wild Pokémon tore through our camp and wrecked every single bike. We couldn't chase them off and we were too proud to ask for help. So we just... blocked the road.",
         buttons: [
           {
             text: 'You fixed it yourselves',
@@ -791,7 +791,7 @@ export const fuchsiaCityTasks: Task[] = [
           id: 'detective',
         },
         message:
-          "Route 15's just ahead, and Fuchsia after that. I keep picturing how we're going to walk those steps - quiet and careful, like a proper investigation, or loud and fast, the way you seem to do everything. Which is it going to be?",
+          "Route 15's just ahead, and Fuchsia after that. I keep picturing how we're going to walk those steps: quiet and careful, like a proper investigation, or loud and fast, the way you seem to do everything. Which is it going to be?",
         buttons: [
           {
             text: 'Quiet and careful',
@@ -832,7 +832,7 @@ export const fuchsiaCityTasks: Task[] = [
           id: 'detective',
         },
         message:
-          "What was it like? Dying, I mean. I saw you come back. I've seen a lot in this job - corruption, cover-ups, a whole department on Rocket's payroll - but I have never, not once, seen someone walk out of something like that. It doesn't feel real. Any of it.",
+          "What was it like? Dying, I mean. I saw you come back. I've seen a lot in this job: corruption, cover-ups, a whole department on Rocket's payroll. But I have never, not once, seen someone walk out of something like that. It doesn't feel real. Any of it.",
         buttons: [
           {
             text: 'It doesn\u2019t feel real to me either',
@@ -850,7 +850,7 @@ export const fuchsiaCityTasks: Task[] = [
           id: 'detective',
         },
         message:
-          "Yeah. That's the thing, isn't it. You went through the impossible and came out the other side, and now we're standing on a road south of everything Team Rocket thinks it controls. Whatever's down there - I'm glad you're the one walking it with me.",
+          "Yeah. That's the thing, isn't it. You went through the impossible and came out the other side, and now we're standing on a road south of everything Team Rocket thinks it controls. Whatever's down there, I'm glad you're the one walking it with me.",
         buttons: [
           {
             text: 'Let\u2019s go',
@@ -917,7 +917,7 @@ export const fuchsiaCityTasks: Task[] = [
       },
       message:
         'We need to find Koga ASAP. He should know a way to prevent this poison.',
-      closeButtonText: 'Tour Fuchsia',
+      closeButtonText: 'Head to the Gym',
     },
   },
   {
@@ -952,7 +952,7 @@ export const fuchsiaCityTasks: Task[] = [
           id: 'researcher-f',
         },
         message:
-          "Hey, you! Sorry, I nearly walked right past you. I'm Fern. I'm trying to finish a little project, and I could use a hand. This is the Nature Module. It should be able to pick up on a Pokemon's nature, but I need to test it properly before I trust it.",
+          "Hey, you! Sorry, I nearly walked right past you. I'm Fern. I'm trying to finish a little project, and I could use a hand. This is the Nature Module. It should be able to pick up on a Pokémon's nature, but I need to test it properly before I trust it.",
         buttons: [
           {
             text: 'What kind of test?',

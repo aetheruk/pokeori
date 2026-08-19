@@ -5,7 +5,10 @@ import { redis } from '@/utilities/redis'
 import { revalidatePath } from 'next/cache'
 import { battles } from '@/data/battles'
 import { getPokemonForm } from '@/utilities/pokemon/pokedex'
-import { initializeBattlePokemon, applyStatus } from '@/utilities/battle/battle-logic'
+import {
+  initializeBattlePokemon,
+  applyStatus,
+} from '@/utilities/battle/battle-logic'
 import { analyzeRequirements } from '@/utilities/requirements/analysis'
 import { getGameUserData } from '@/utilities/game-data'
 import { checkRequirement, isPokemonEligible } from '@/utilities/requirements'
@@ -17,8 +20,14 @@ import { BATTLE_TTL } from '../helpers/state-management'
 import type { BattleConfig } from '@/data/types'
 import type { BattleEnemy } from '@/data/types'
 import { normalizeTrainerBattleItems } from '@/utilities/battle/trainer-items'
-import { initializeEnemyAiMoveLoadouts, resolveBattleAiProfile } from '@/utilities/battle/enemy-ai'
-import { resolveEnemyBattleEvs, resolveEnemyBattleIvs } from '@/utilities/battle/enemy-stat-rolls'
+import {
+  initializeEnemyAiMoveLoadouts,
+  resolveBattleAiProfile,
+} from '@/utilities/battle/enemy-ai'
+import {
+  resolveEnemyBattleEvs,
+  resolveEnemyBattleIvs,
+} from '@/utilities/battle/enemy-stat-rolls'
 import { getObservedPreferredStance } from '@/utilities/battle/pokedex-observation'
 import { rollPokemonGender } from '@/utilities/pokemon/gender'
 import { getActiveChronicleContext } from '@/utilities/chronicles'
@@ -55,7 +64,10 @@ import {
   setUserPokedexMap,
 } from '@/utilities/user-state'
 import { getActiveExpeditionForUser } from '@/utilities/expeditions/actions'
-import { ensureUserWeatherSlot, resolveSubRegionWeather } from '@/utilities/weather'
+import {
+  ensureUserWeatherSlot,
+  resolveSubRegionWeather,
+} from '@/utilities/weather'
 import {
   processBattleAbilitySuppressionForState,
   processBattleAbilityTerrainSet,
@@ -83,7 +95,8 @@ export async function startBattle(
     if (user.kidMode === true) {
       return { success: false, error: KID_MODE_ACCESS_ERROR }
     }
-    if (battleConfig.pvp_type === 'ranked') return { success: false, error: 'PVP_RANKED' }
+    if (battleConfig.pvp_type === 'ranked')
+      return { success: false, error: 'PVP_RANKED' }
     return { success: false, error: 'PVP_FRIENDLY' }
   }
 
@@ -97,7 +110,8 @@ export async function startBattle(
         subCategory: battleConfig.subCategory,
       }),
     )
-    if (!meetsRequirements) return { success: false, error: 'Requirements not met' }
+    if (!meetsRequirements)
+      return { success: false, error: 'Requirements not met' }
   }
 
   // Check criteria - these can also be consumed!
@@ -148,7 +162,8 @@ export async function startBattle(
       const targetId = req.targetId as string
 
       const matchingPokemon = userPokemon.filter((p) => {
-        if (req.pokemonCriteria) return isPokemonEligible(p, req.pokemonCriteria)
+        if (req.pokemonCriteria)
+          return isPokemonEligible(p, req.pokemonCriteria)
         if (targetId) return String(p.speciesId) === targetId
         return true
       })
@@ -174,8 +189,13 @@ export async function startBattle(
   let hasConsumption = false
 
   for (const req of allReqsAndCriteria) {
-    if (req.consume && req.type === 'item_owned' && typeof req.targetId === 'string') {
-      itemsToConsume[req.targetId] = (itemsToConsume[req.targetId] || 0) + (req.count || 1)
+    if (
+      req.consume &&
+      req.type === 'item_owned' &&
+      typeof req.targetId === 'string'
+    ) {
+      itemsToConsume[req.targetId] =
+        (itemsToConsume[req.targetId] || 0) + (req.count || 1)
       hasConsumption = true
     }
   }
@@ -202,7 +222,8 @@ export async function startBattle(
   for (const req of allReqsAndCriteria) {
     if (req.consume && req.type === 'currency_owned') {
       const currencyId = (req.targetId as string) || 'crystals'
-      currenciesToConsume[currencyId] = (currenciesToConsume[currencyId] || 0) + (req.count || 1)
+      currenciesToConsume[currencyId] =
+        (currenciesToConsume[currencyId] || 0) + (req.count || 1)
       hasCurrencyConsumption = true
     }
   }
@@ -276,7 +297,9 @@ export async function startBattleFromConfig(
         activityType: 'battle',
         activityId: battleConfig.id,
       })
-  const activeExpedition = options.dynamic ? null : await getActiveExpeditionForUser(user.id)
+  const activeExpedition = options.dynamic
+    ? null
+    : await getActiveExpeditionForUser(user.id)
   const activeExpeditionStep =
     activeExpedition?.status === 'active'
       ? activeExpedition.steps[activeExpedition.currentStepIndex]
@@ -292,7 +315,8 @@ export async function startBattleFromConfig(
       : undefined
   const chronicleTeam = chronicleContext?.chronicle.battleTeam || []
 
-  const shouldCheckTeamTypes = !chronicleContext && !!battleConfig.bannedPlayerTypes?.length
+  const shouldCheckTeamTypes =
+    !chronicleContext && !!battleConfig.bannedPlayerTypes?.length
   const userPokemonDocs = chronicleContext
     ? chronicleTeam
         .slice(0, playerTeamLoadLimit)
@@ -316,11 +340,15 @@ export async function startBattleFromConfig(
     const invalidPokemon = userPokemonDocs.find((pokemon) => {
       const types = getPokemonForm(pokemon.formId)?.types || []
       return types.some((type) =>
-        bannedTypes.includes(type.toLowerCase() as (typeof bannedTypes)[number]),
+        bannedTypes.includes(
+          type.toLowerCase() as (typeof bannedTypes)[number],
+        ),
       )
     })
     if (invalidPokemon) {
-      const labels = bannedTypes.map((type) => `${type[0].toUpperCase()}${type.slice(1)}`)
+      const labels = bannedTypes.map(
+        (type) => `${type[0].toUpperCase()}${type.slice(1)}`,
+      )
       return {
         success: false,
         error: `${battleConfig.name} does not allow ${labels.join(' or ')}-type Pokemon on your Battle Team.`,
@@ -348,10 +376,16 @@ export async function startBattleFromConfig(
         battleItems: chronicleBattleItems,
         battleConfig,
       })
-    : resolveTrainerBattleItemUseLimit(trainerLevel, battleConfig.itemsPerBattle)
+    : resolveTrainerBattleItemUseLimit(
+        trainerLevel,
+        battleConfig.itemsPerBattle,
+      )
   const moveUseLimit = chronicleContext
     ? getChronicleMoveUseLimit(battleConfig)
-    : resolveTrainerBattleMoveUseLimit(trainerLevel, battleConfig.movesPerBattle)
+    : resolveTrainerBattleMoveUseLimit(
+        trainerLevel,
+        battleConfig.movesPerBattle,
+      )
   const playerTrainerLevel = chronicleContext ? 100 : trainerLevel
   const [pokedex, playerMoveInventory] = await Promise.all([
     getUserPokedexMap(payload as any, user.id),
@@ -367,13 +401,22 @@ export async function startBattleFromConfig(
         false,
         playerTrainerLevel,
         getPokemonResearchLevel(pokedex as any, p.speciesId, p.formId),
-        user.kidMode === true
-          ? KID_MODE_PVE_STAT_MULTIPLIER
-          : undefined,
+        user.kidMode === true ? KID_MODE_PVE_STAT_MULTIPLIER : undefined,
       ),
     ),
     moveUseLimit,
   )
+  const playerStartingStatusMessages = battleConfig.playerTeamInitialStatus
+    ? playerTeam.flatMap((pokemon) => {
+        const result = applyStatus(
+          pokemon,
+          battleConfig.playerTeamInitialStatus!,
+          undefined,
+          { force: true },
+        )
+        return result.applied ? [result.message] : []
+      })
+    : []
   if (playerTeam[0] && !battleConfig.isWildBattle) {
     playerTeam[0].activeTurnStarted = 1
   }
@@ -402,8 +445,9 @@ export async function startBattleFromConfig(
           const level =
             typeof enemy.level === 'number'
               ? enemy.level
-              : Math.floor(Math.random() * (enemy.level.max - enemy.level.min + 1)) +
-                enemy.level.min
+              : Math.floor(
+                  Math.random() * (enemy.level.max - enemy.level.min + 1),
+                ) + enemy.level.min
 
           const rarity = resolvePokemonRarity(enemy)
           const rarityLegacyFields = getPokemonRarityLegacyFields(rarity)
@@ -525,7 +569,8 @@ export async function startBattleFromConfig(
     battleId: battleConfig.id,
     economyActionId: randomUUID(),
     background: battleConfig.background,
-    playerName: chronicleContext?.chronicle.playerName || user.trainerName || 'Player',
+    playerName:
+      chronicleContext?.chronicle.playerName || user.trainerName || 'Player',
     enemyName:
       rivalContext?.trainer?.name ||
       (battleConfig.isWildBattle
@@ -571,7 +616,8 @@ export async function startBattleFromConfig(
       music: battleConfig.music,
     },
     playerTrainer: {
-      name: chronicleContext?.chronicle.playerName || user.trainerName || 'Player',
+      name:
+        chronicleContext?.chronicle.playerName || user.trainerName || 'Player',
       icon: chronicleContext?.chronicle.playerIcon || (user as any).icon,
       banner: (user as any).banner,
       title: chronicleContext?.chronicle.playerTitle || (user as any).title,
@@ -591,8 +637,10 @@ export async function startBattleFromConfig(
   }
   initializeEnemyAiMoveLoadouts({ state: initialState, profile: aiProfile })
   normalizeChronicleBattleBudgets(initialState, battleConfig)
-  const suppressionMessages = processBattleAbilitySuppressionForState(initialState)
+  const suppressionMessages =
+    processBattleAbilitySuppressionForState(initialState)
   const initialFieldMessages = [
+    ...playerStartingStatusMessages,
     ...(battleConfig.isWildBattle
       ? []
       : applyBattleRarityEntryEffects(
@@ -661,7 +709,9 @@ async function getEligibleBattleEnemies(
   user: User,
   battleConfig: BattleConfig,
 ): Promise<BattleEnemy[]> {
-  const enemyRequirements = battleConfig.enemyTeam.flatMap((enemy) => enemy.requirements || [])
+  const enemyRequirements = battleConfig.enemyTeam.flatMap(
+    (enemy) => enemy.requirements || [],
+  )
   if (enemyRequirements.length === 0) return battleConfig.enemyTeam
 
   const requiredKeys = analyzeRequirements(enemyRequirements)

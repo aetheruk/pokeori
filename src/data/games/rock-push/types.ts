@@ -51,6 +51,8 @@ export interface RockPushGameConfig extends BaseGameConfig {
     winRate?: number
     timeLimit?: number
     maxMoves?: number
+    /** Hide authored internal barriers until the player walks into them. */
+    invisibleMaze?: boolean
     boulderSprite?: string
     barrierSprite?: string
     floorSprite?: string

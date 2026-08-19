@@ -9,6 +9,7 @@ import { pokemonTowerExpeditions } from './entries/pokemon-tower'
 import { gymLeaderChronicleExpeditions } from './entries/gym-leader-chronicles'
 import { blackoutChronicleExpeditions } from './entries/blackout-chronicles'
 import { fuchsiaCityExpeditions } from './entries/fuchsia-city'
+import { safariZoneExpeditions } from './entries/safari-zone'
 
 export * from './types'
 
@@ -23,6 +24,7 @@ export const expeditions: ExpeditionConfig[] = [
   ...gymLeaderChronicleExpeditions,
   ...blackoutChronicleExpeditions,
   ...fuchsiaCityExpeditions,
+  ...safariZoneExpeditions,
 ]
 
 export function getExpedition(id: string): ExpeditionConfig | undefined {

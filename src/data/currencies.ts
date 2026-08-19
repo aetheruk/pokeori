@@ -45,6 +45,11 @@ export const currencies: Currency[] = [
     name: 'League Tickets',
     iconId: 'league-ticket',
   },
+  {
+    id: 'shadow-crystals',
+    name: 'Shadow Crystals',
+    iconId: 'tera-shard-poison',
+  },
 ]
 
 export function getCurrency(id: string): Currency | undefined {
