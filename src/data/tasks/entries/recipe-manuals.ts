@@ -101,6 +101,7 @@ const heldItemRecipeManuals = [
 ] as const
 
 const battleItemRecipeManuals = [
+  { itemId: 'revive', itemName: 'Revive', authoredPrize: true },
   { itemId: 'x-attack', itemName: 'X Attack' },
   { itemId: 'x-defense', itemName: 'X Defense' },
   { itemId: 'x-sp-atk', itemName: 'X Sp. Atk' },
@@ -110,6 +111,24 @@ const battleItemRecipeManuals = [
 ] as const
 
 export const recipeManualTasks: Task[] = [
+  {
+    id: 'revive-recipe-discovery',
+    name: 'Revive Recipe Discovery',
+    description: 'A hidden marker for Chansey’s rare Revive recipe discovery.',
+    category: 'Secret',
+    subCategory: 'Recipe Manuals',
+    icon: {
+      type: 'item' as const,
+      id: 'revive',
+    },
+    repeatable: false,
+    secret: true,
+    completionTrigger: 'auto' as const,
+    completeButtonText: 'Read Recipe',
+    requirements: [],
+    criteria: [],
+    rewards: [],
+  },
   {
     id: 'elemental-stones-recipe',
     name: 'Recipe: Elemental Stones',
@@ -186,10 +205,13 @@ export const recipeManualTasks: Task[] = [
       id: manual.itemId,
     },
     repeatable: false,
-    secret: true,
+    secret: !('authoredPrize' in manual && manual.authoredPrize),
     completionTrigger: 'auto' as const,
     completeButtonText: 'Read Recipe',
-    requirements: [],
+    requirements:
+      manual.itemId === 'revive'
+        ? [{ type: 'task_completed' as const, targetId: 'revive-recipe-discovery' }]
+        : [],
     criteria: [],
     rewards: [],
     exitModal: recipeUnlockedExitModal({

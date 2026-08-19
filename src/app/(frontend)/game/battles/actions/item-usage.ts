@@ -64,13 +64,6 @@ export async function useBattleItem(
         state,
       }
     }
-    if (needsPlayerReplacement(state)) {
-      return {
-        success: false,
-        error: 'Choose your next Pokemon before using an item',
-        state,
-      }
-    }
     if (state.playerMoveLock) {
       return {
         success: false,
@@ -120,6 +113,16 @@ export async function useBattleItem(
     if (!item) return { success: false, error: 'Item not found' }
     if (!item.battleEffect)
       return { success: false, error: 'This item cannot be used in battle' }
+    if (
+      needsPlayerReplacement(state) &&
+      item.battleEffect.type !== 'revive'
+    ) {
+      return {
+        success: false,
+        error: 'Choose your next Pokemon before using an item',
+        state,
+      }
+    }
     const skillLockReason = state.chronicle
       ? null
       : getItemSkillLockReason(item, user.skills)

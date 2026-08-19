@@ -35,6 +35,7 @@ export type PokemonTypeName =
 export interface BattleEffect {
   type:
     | 'heal'
+    | 'revive'
     | 'buff'
     | 'tera'
     | 'reveal-stance'
@@ -45,6 +46,7 @@ export interface BattleEffect {
     | 'attack-status-chance'
     | 'item-charge'
   healAmount?: number // For potions - flat HP restore
+  reviveHpPercent?: number // For Revive-style items used on a fainted Pokemon
   healFull?: boolean // For Max Potion - restore to full
   buffStat?: BattleStatType | 'crit' // Which stat to buff
   buffStages?: number // How many stages (+1 typically)

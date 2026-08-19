@@ -50,6 +50,19 @@ export function applyBattleItemEffect(params: {
     applied = true
   }
 
+  if (battleEffect.type === 'revive') {
+    if (pokemon.currentHp > 0) {
+      return { applied: false, message: `${pokemon.name} is not fainted.` }
+    }
+
+    const revivePercent = Math.max(1, Math.min(100, battleEffect.reviveHpPercent || 50))
+    pokemon.currentHp = Math.max(1, Math.floor((pokemon.maxHp * revivePercent) / 100))
+    return {
+      applied: true,
+      message: `${pokemon.name} was revived with ${pokemon.currentHp} HP!`,
+    }
+  }
+
   if (battleEffect.type === 'heal') {
     if (battleEffect.healFull) {
       const healedAmount = pokemon.maxHp - pokemon.currentHp

@@ -2,6 +2,19 @@ import { Item } from '../types'
 
 export const healingItems: Item[] = [
   {
+    id: 'revive',
+    name: 'Revive',
+    description: 'A medicine that revives a fainted Pokémon and restores half of its maximum HP.',
+    category: 'potion',
+    spriteId: 'revive',
+    skillRequirements: { battling: 36 },
+    battleEffect: {
+      type: 'revive',
+      reviveHpPercent: 50,
+      skipsTurn: true,
+    },
+  },
+  {
     id: 'battle-potion',
     name: 'Potion',
     description: 'A spray-type medicine for treating wounds. It restores 20 HP to a Pokémon.',
