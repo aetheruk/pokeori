@@ -406,7 +406,7 @@ describe('battle win rewards', () => {
     ).toBe(false)
   })
 
-  test('wild battle gem rewards ignore high-tier gem config and grant one base gem', () => {
+  test('wild battles grant one primary material from the enemy Pokemon types instead of a gem', () => {
     const state = makePveBattleState({
       enemyTeam: [
         makeBattlePokemon({
@@ -423,21 +423,23 @@ describe('battle win rewards', () => {
     const rewards = buildBattleWinRewards(state, user, {
       isWildBattle: true,
       rewards: [],
-      gemConfig: {
-        base: { min: 1, max: 5, dropRate: 100 },
-        shining: { min: 1, max: 5, dropRate: 100 },
-        pristine: { min: 1, max: 5, dropRate: 100 },
-      },
     })
 
-    const gemReward = rewards.find(
-      (reward) => reward.type === 'item' && String(reward.targetId).endsWith('-gem'),
+    const materialReward = rewards.find(
+      (reward) =>
+        reward.type === 'item' &&
+        ['small-stone-t1', 'terra-dust-t1'].includes(String(reward.targetId)),
     )
 
-    expect(gemReward).toMatchObject({
-      quantity: { min: 1, max: 1 },
+    expect(materialReward).toMatchObject({
+      quantity: 1,
       dropChance: 100,
     })
-    expect(['rock-gem', 'ground-gem']).toContain(gemReward?.targetId)
+    expect(
+      rewards.some(
+        (reward) =>
+          reward.type === 'item' && String(reward.targetId).endsWith('-gem'),
+      ),
+    ).toBe(false)
   })
 })

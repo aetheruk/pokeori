@@ -1015,45 +1015,6 @@ export const ceruleanCityTasks: Task[] = [
     rewards: [],
   },
   {
-    id: 'surf-cerulean-cave',
-    name: 'Reaching Cerulean Cave',
-    description: 'I can see a cave in the distance but how am I going to get across there...',
-    category: 'Kanto',
-    subCategory: 'Cerulean City',
-    background: '/backgrounds/beach.avif',
-    icon: {
-      type: 'pokemon',
-      id: '131',
-    },
-    exitModal: {
-      icon: {
-        type: 'pokemon',
-        id: '131',
-      },
-      title: 'Surfing the Waves',
-      background: '/backgrounds/beach.avif',
-      message: 'Huh well that was easy!',
-      closeButtonText: 'Cross Water',
-    },
-    requirements: [
-      {
-        type: 'task_completed',
-        count: 1,
-        targetId: 'nugget-bridge-end',
-      },
-    ],
-    criteria: [
-      {
-        type: 'item_owned',
-        count: 1,
-        targetId: 'tm-surf',
-      },
-    ],
-    repeatable: false,
-    completeButtonText: 'Use Surf',
-    rewards: [],
-  },
-  {
     id: 'charred-hiker',
     name: 'The Charred Hiker',
     category: 'Kanto',
@@ -4466,49 +4427,6 @@ export const ceruleanCityTasks: Task[] = [
       message:
         'The Hiker gives the outfit one last look and steps aside. The gravel still shifts, but now you have the gear to handle it.',
       closeButtonText: 'Head for the Pass',
-    },
-  },
-  {
-    id: 'surf-route-10-water',
-    name: 'Route 10 Waterside',
-    description:
-      'The mountain path drops toward deep water here. I can see the way onward, but I need a Pokemon that can Surf.',
-    category: 'Kanto',
-    subCategory: 'Cerulean City',
-    background: '/backgrounds/beach.avif',
-    icon: {
-      type: 'pokemon',
-      id: '131',
-    },
-    repeatable: false,
-    secret: false,
-    completionTrigger: 'manual',
-    completeButtonText: 'Use Surf',
-    requirements: [
-      {
-        type: 'expedition_result',
-        targetId: 'route-9-pass-expedition',
-        expeditionStatus: 'completed',
-        count: 1,
-      },
-    ],
-    criteria: [
-      {
-        type: 'item_owned',
-        targetId: 'tm-surf',
-        count: 1,
-      },
-    ],
-    rewards: [],
-    exitModal: {
-      background: '/backgrounds/beach.avif',
-      title: 'Route 10 Waterside',
-      icon: {
-        type: 'pokemon',
-        id: '131',
-      },
-      message: 'The current is strong, but Surf carries you cleanly across.',
-      closeButtonText: 'Cross Water',
     },
   },
 ]

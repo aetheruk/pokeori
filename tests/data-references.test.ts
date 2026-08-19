@@ -3604,9 +3604,13 @@ describe('static data references', () => {
     const route10Study = allGames.find(
       (game) => game.id === 'route-10-field-observation',
     )
-    const route10SurfGate = tasks.find(
-      (task) => task.id === 'surf-route-10-water',
-    )
+    expect(
+      tasks.some(
+        (task) =>
+          task.id === 'surf-cerulean-cave' ||
+          task.id === 'surf-route-10-water',
+      ),
+    ).toBe(false)
     const rockAndHardPlace = tasks.find(
       (task) => task.id === 'route-10-rock-and-hard-place',
     )
@@ -3658,7 +3662,6 @@ describe('static data references', () => {
     expect(route10Battle?.requirements).toContainEqual(route10Gate)
     expect(route10Fishing?.requirements).toContainEqual(route10Gate)
     expect(route10Study?.requirements).toContainEqual(route10Gate)
-    expect(route10SurfGate?.requirements).toContainEqual(route10Gate)
     expect(rockAndHardPlace?.requirements).toContainEqual(route10Gate)
     expect(route10Fishing?.gameType).toBe('fishing')
     expect(route10Fishing?.criteria).toContainEqual({
@@ -3680,11 +3683,6 @@ describe('static data references', () => {
         .map((entry) => entry.speciesId)
         .sort((a, b) => a - b),
     ).toEqual([54, 79, 98])
-    expect(route10SurfGate?.criteria).toContainEqual({
-      type: 'item_owned',
-      targetId: 'tm-surf',
-      count: 1,
-    })
     expect(voltorbRoundup?.criteria).toContainEqual({
       type: 'pokemon_owned',
       targetId: 100,

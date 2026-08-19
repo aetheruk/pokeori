@@ -957,6 +957,45 @@ describe('field observation research mode', () => {
     )
   })
 
+  test('field observation can reveal one gem from the observed Pokemon type pool', () => {
+    const drops = buildFieldObservationCollectibleDrops({
+      rewardSubjects: [
+        { speciesId: 74, formId: '74', level: 10, pokemonResearchXp: 1 },
+      ],
+      spawns: [],
+      researchingLevel: 1,
+      surveyFocus: 'standard',
+      observationDurationMs: 20_000,
+      random: () => 0,
+    })
+
+    expect(drops).toContainEqual(
+      expect.objectContaining({
+        itemId: 'rock-gem',
+        kind: 'item',
+        reward: expect.objectContaining({
+          targetId: 'rock-gem',
+          dropChance: 100,
+        }),
+      }),
+    )
+  })
+
+  test('field observation gem rolls can miss', () => {
+    const drops = buildFieldObservationCollectibleDrops({
+      rewardSubjects: [
+        { speciesId: 74, formId: '74', level: 10, pokemonResearchXp: 1 },
+      ],
+      spawns: [],
+      researchingLevel: 1,
+      surveyFocus: 'standard',
+      observationDurationMs: 20_000,
+      random: () => 0.99,
+    })
+
+    expect(drops.some((drop) => drop.itemId.endsWith('-gem'))).toBe(false)
+  })
+
   test('adds default Research Kit rewards without direct currency to every study entry', () => {
     for (const study of fieldObservationGames) {
       expect(study.rewards.some((reward) => reward.type === 'currency')).toBe(

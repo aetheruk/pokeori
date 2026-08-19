@@ -182,7 +182,7 @@ function getSpecialFormMaterials(
 
 export function buildArtisanMaterialRewards(
   context: DropContext,
-  source: 'capture' | 'field-observation',
+  source: 'capture' | 'battle' | 'field-observation',
   options: MaterialRewardOptions = {},
 ): LocationReward[] {
   const rng = options.rng || Math.random
