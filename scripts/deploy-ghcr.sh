@@ -8,6 +8,7 @@ readonly DEFAULT_GHCR_OWNER="aetheruk"
 readonly DEFAULT_IMAGE_NAME="pokeori"
 readonly DEFAULT_REMOTE="origin"
 readonly DEFAULT_BRANCH="main"
+readonly GHCR_RELEASE_HISTORY_LIMIT=3
 
 fail() {
   printf 'Deployment stopped: %s\n' "$*" >&2
@@ -44,6 +45,7 @@ main() {
   require_command docker "Start Docker Desktop (with Buildx) and try again."
   docker buildx version >/dev/null 2>&1 || fail "Docker Buildx is required; enable it in Docker Desktop."
   require_command curl "Install curl and try again."
+  require_command gh "Authenticate with GitHub CLI or set GHCR_TOKEN."
 
   local remote="${DEPLOY_REMOTE:-$DEFAULT_REMOTE}"
   local branch="${DEPLOY_BRANCH:-$DEFAULT_BRANCH}"
@@ -76,7 +78,6 @@ main() {
   [[ "$local_sha" == "$remote_sha" ]] || fail "'$branch' must exactly match '${remote}/${branch}'."
 
   if [[ -z "${GHCR_TOKEN:-}" ]]; then
-    require_command gh "Authenticate with GitHub CLI or set GHCR_TOKEN."
     GHCR_TOKEN="$(gh auth token)" || fail "Unable to read the GitHub CLI token."
   fi
   GHCR_USERNAME="${GHCR_USERNAME:-$owner}"
@@ -155,6 +156,39 @@ main() {
   docker push "${image}:latest"
   docker push "${image}:v${version}"
   docker push "${image}:sha-${short_sha}"
+
+  printf 'Pruning GHCR release history (keeping the newest %s images)…\n' "$GHCR_RELEASE_HISTORY_LIMIT"
+  local package_owner_type="${GHCR_OWNER_TYPE:-user}"
+  local package_versions_endpoint
+  case "$package_owner_type" in
+    user) package_versions_endpoint="users/${owner}/packages/container/${image_name}/versions" ;;
+    org) package_versions_endpoint="orgs/${owner}/packages/container/${image_name}/versions" ;;
+    *) fail "GHCR_OWNER_TYPE must be 'user' or 'org'." ;;
+  esac
+
+  local package_versions
+  package_versions="$(GH_TOKEN="$GHCR_TOKEN" gh api --paginate --slurp \
+    "${package_versions_endpoint}?per_page=100" \
+    --jq 'add | sort_by(.created_at) | reverse | .[] | [(.id | tostring), ((.metadata.container.tags // []) | join(","))] | @tsv')" ||
+    fail "Unable to list GHCR package versions. The release token needs package read/admin access."
+
+  local release_count=0 version_id tags
+  while IFS=$'\t' read -r version_id tags; do
+    [[ -n "$version_id" ]] || continue
+    [[ ",${tags}," == *,buildcache,* ]] && continue
+
+    if [[ -z "$tags" ]]; then
+      printf 'Deleting untagged GHCR version %s…\n' "$version_id"
+    else
+      release_count=$((release_count + 1))
+      (( release_count > GHCR_RELEASE_HISTORY_LIMIT )) || continue
+      printf 'Deleting old GHCR version %s (%s)…\n' "$version_id" "$tags"
+    fi
+
+    GH_TOKEN="$GHCR_TOKEN" gh api --method DELETE --silent \
+      "${package_versions_endpoint}/${version_id}" ||
+      fail "Unable to delete GHCR package version ${version_id}. Grant the release token delete:packages access."
+  done <<< "$package_versions"
 
   printf 'Triggering Coolify…\n'
   curl --fail-with-body --silent --show-error --request GET "$COOLIFY_WEBHOOK" \

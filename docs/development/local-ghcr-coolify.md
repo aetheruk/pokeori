@@ -15,7 +15,7 @@ There are no GitHub Actions workflows in this repository. Keep `main` protected 
 
 Install Docker Desktop (including Docker Buildx), Bun 1.3.10+, Git, and curl. Sign in to GitHub with an account that can push packages to `ghcr.io/aetheruk/pokeori`.
 
-Authenticate the GitHub CLI with an account that can write packages (`write:packages`; add `read:packages` if the package is private). Configure the Coolify application as a pre-built Docker image using:
+Authenticate the GitHub CLI with an account that can write and remove package versions (`write:packages` and `delete:packages`; add `read:packages` if the package is private). Configure the Coolify application as a pre-built Docker image using:
 
 ```text
 ghcr.io/aetheruk/pokeori:latest
@@ -53,7 +53,7 @@ Prune Docker images and build cache before building. A host disk that is nearly 
 - `ghcr.io/aetheruk/pokeori:v<package-version>`
 - `ghcr.io/aetheruk/pokeori:sha-<12-character-commit>`
 
-Only after the image push succeeds does it call the Coolify webhook. The package version is the PWA release identifier, so increment `package.json` as part of every release pull request.
+After the three tags are pushed, the deploy script deletes untagged versions and release manifests older than the newest three. The `buildcache` manifest is retained for the next build. If the package belongs to an organization rather than a user namespace, set `GHCR_OWNER_TYPE=org` before deploying. Only after publishing and pruning succeed does the script call the Coolify webhook. The package version is the PWA release identifier, so increment `package.json` as part of every release pull request.
 
 ## Verify the rollout
 

@@ -106,6 +106,45 @@ describe('battle move and status presentation', () => {
     expect(markup).toContain('>Paralysis<')
   })
 
+  test('shows gender symbols beside gendered Pokemon names', () => {
+    const femaleMarkup = renderToStaticMarkup(
+      <HealthDisplay
+        currentHp={30}
+        maxHp={50}
+        name="Nidoran"
+        level={20}
+        gender="female"
+      />,
+    )
+    const maleMarkup = renderToStaticMarkup(
+      <HealthDisplay
+        currentHp={30}
+        maxHp={50}
+        name="Nidoran"
+        level={20}
+        gender="male"
+      />,
+    )
+    const genderlessMarkup = renderToStaticMarkup(
+      <HealthDisplay
+        currentHp={30}
+        maxHp={50}
+        name="Staryu"
+        level={20}
+        gender="genderless"
+      />,
+    )
+
+    expect(femaleMarkup).toContain('aria-label="Female"')
+    expect(femaleMarkup).toContain('text-pink-600')
+    expect(femaleMarkup).toContain('>♀<')
+    expect(maleMarkup).toContain('aria-label="Male"')
+    expect(maleMarkup).toContain('text-blue-600')
+    expect(maleMarkup).toContain('>♂<')
+    expect(genderlessMarkup).not.toContain('aria-label="Female"')
+    expect(genderlessMarkup).not.toContain('aria-label="Male"')
+  })
+
   test('centres strong stance outcomes above their battle actions', () => {
     const markup = renderToStaticMarkup(
       <BattleLog

@@ -7,6 +7,13 @@ const robertGate = {
   count: 1,
 }
 
+const fuchsiaArrivalGate = {
+  type: 'battle_result' as const,
+  targetId: 'route-15-picnicker-yazmin',
+  battleStatus: 'win' as const,
+  count: 1,
+}
+
 export const fuchsiaCityTasks: Task[] = [
   {
     id: 'route-13-manic-ditto-mew',
@@ -867,8 +874,7 @@ export const fuchsiaCityTasks: Task[] = [
   {
     id: 'explore-fuchsia-city',
     name: 'Explore Fuchsia City',
-    description:
-      'The Safari Zone town finally comes into view at the end of Route 15.',
+    description: 'A long journey but we made it!',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {
@@ -881,12 +887,7 @@ export const fuchsiaCityTasks: Task[] = [
     completionTrigger: 'manual',
     completeButtonText: 'Enter Fuchsia City',
     requirements: [
-      {
-        type: 'battle_result',
-        targetId: 'route-15-picnicker-yazmin',
-        battleStatus: 'win',
-        count: 1,
-      },
+      fuchsiaArrivalGate,
     ],
     criteria: [
       {
@@ -915,7 +916,7 @@ export const fuchsiaCityTasks: Task[] = [
         id: '/sprites/sign.avif',
       },
       message:
-        'The southern city smells of flowers and dust from the Safari Zone. A whole town waits beyond the last road.',
+        'We need to find Koga ASAP. He should know a way to prevent this poison.',
       closeButtonText: 'Tour Fuchsia',
     },
   },
@@ -937,10 +938,7 @@ export const fuchsiaCityTasks: Task[] = [
     chat: true,
     completeButtonText: 'Talk to the Researcher',
     requirements: [
-      {
-        type: 'task_completed',
-        targetId: 'explore-fuchsia-city',
-      },
+      fuchsiaArrivalGate,
     ],
     criteria: [],
     rewards: [],

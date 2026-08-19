@@ -1060,6 +1060,10 @@ describe('static data references', () => {
 
   test('Explore Fuchsia City gates on the final Route 15 trainer and the Nature Module quest rewards the scanner', () => {
     const explore = tasks.find((entry) => entry.id === 'explore-fuchsia-city')
+    expect(explore?.description).toBe('A long journey but we made it!')
+    expect(explore?.exitModal?.message).toBe(
+      'We need to find Koga ASAP. He should know a way to prevent this poison.',
+    )
     expect(
       explore?.requirements?.some(
         (req) =>
@@ -1089,10 +1093,21 @@ describe('static data references', () => {
     expect(
       intro?.requirements?.some(
         (req) =>
-          req.type === 'task_completed' &&
-          req.targetId === 'explore-fuchsia-city',
+          req.type === 'battle_result' &&
+          req.targetId === 'route-15-picnicker-yazmin' &&
+          req.battleStatus === 'win',
       ),
     ).toBe(true)
+
+    for (const entry of [
+      locations.find((location) => location.id === 'route-15'),
+      battles.find((battle) => battle.id === 'route-15-battle'),
+      fieldResearchGames.find(
+        (game) => game.id === 'route-15-field-observation',
+      ),
+    ]) {
+      expect(entry?.icon).toEqual({ type: 'pokemon', id: '48' })
+    }
 
     const study = tasks.find(
       (entry) => entry.id === 'route-15-nature-module-study',
@@ -1172,7 +1187,11 @@ describe('static data references', () => {
   })
 
   test('bike parts are limited and rusty bike parts unlock the Cerulean ban', () => {
-    const partDropsFor = (partId: string, fetchId: string) => {
+    const partDropsFor = (
+      partId: string,
+      fetchId: string,
+      expectedDropChance: number,
+    ) => {
       const battleReward = battles
         .find((battle) => battle.id === 'route-14-battle')
         ?.rewards.find(
@@ -1190,10 +1209,12 @@ describe('static data references', () => {
       const rewards = [battleReward, locationReward, studyDrop].filter(
         Boolean,
       ) as {
+        dropChance?: number
         secret?: boolean
         requirements?: TaskCondition[]
       }[]
       expect(rewards.length).toBeGreaterThan(0)
+      expect(rewards[0]?.dropChance).toBe(expectedDropChance)
       for (const reward of rewards) {
         expect(reward.secret).toBeUndefined()
         expect(
@@ -1215,12 +1236,12 @@ describe('static data references', () => {
       }
     }
 
-    for (const [part, fetchId] of [
-      ['greasy-spark-plug', 'route-14-biker-fetch-1'],
-      ['bent-carburetor', 'route-14-biker-fetch-2'],
-      ['snapped-chain-link', 'route-14-biker-fetch-3'],
+    for (const [part, fetchId, expectedDropChance] of [
+      ['greasy-spark-plug', 'route-14-biker-fetch-1', 10],
+      ['bent-carburetor', 'route-14-biker-fetch-2', 30],
+      ['snapped-chain-link', 'route-14-biker-fetch-3', 16],
     ] as const) {
-      partDropsFor(part, fetchId)
+      partDropsFor(part, fetchId, expectedDropChance)
     }
 
     expect(items.find((item) => item.id === 'rusty-bike-parts')?.unique).toBe(
@@ -1273,7 +1294,7 @@ describe('static data references', () => {
     const ban = tasks.find(
       (task) => task.id === 'cerulean-bike-shop-worst-customer',
     )
-    expect(ban?.secret).toBe(true)
+    expect(ban?.secret).toBe(false)
     expect(
       ban?.requirements?.some(
         (req) =>
