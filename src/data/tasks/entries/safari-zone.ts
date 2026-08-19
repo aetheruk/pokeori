@@ -5,20 +5,37 @@ const janineIcon = { type: 'trainer' as const, id: 'chronicle-janine' }
 const rangerIcon = { type: 'trainer' as const, id: 'ranger' }
 const detectiveIcon = { type: 'trainer' as const, id: 'detective' }
 
-const hiddenDiscovery = (id: string, requirement: string): Task => ({
+const hiddenDiscovery = ({
   id,
-  name: 'Safari Trail Discovered',
+  name,
+  requirement,
+  message,
+}: {
+  id: string
+  name: string
+  requirement: string
+  message: string
+}): Task => ({
+  id,
+  name,
   description: 'An internal Safari Zone route marker.',
   category: 'Kanto',
   subCategory: 'Safari Zone',
-  icon: rangerIcon,
-  background: '/backgrounds/safari.avif',
+  icon: detectiveIcon,
+  background: '/backgrounds/safari-reserve.avif',
   repeatable: false,
   secret: true,
   completionTrigger: 'manual',
   requirements: [{ type: 'task_completed', targetId: requirement }],
   criteria: [],
   rewards: [],
+  exitModal: {
+    background: '/backgrounds/safari-reserve.avif',
+    title: 'Det. Ray Choo',
+    icon: detectiveIcon,
+    message,
+    closeButtonText: 'Return to Explore',
+  },
 })
 
 export const safariZoneTasks: Task[] = [
@@ -52,7 +69,7 @@ export const safariZoneTasks: Task[] = [
     category: 'Kanto',
     subCategory: 'Safari Zone',
     icon: rangerIcon,
-    background: '/backgrounds/safari.avif',
+    background: '/backgrounds/safari-reserve.avif',
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
@@ -63,7 +80,7 @@ export const safariZoneTasks: Task[] = [
     enterModal: [
       {
         id: 1,
-        background: '/backgrounds/safari.avif',
+        background: '/backgrounds/safari-reserve.avif',
         title: 'Safari Zone Ranger',
         icon: rangerIcon,
         message: 'Sorry, the reserve is closed to general visitors while field surveys are underway. Only Chartered Researchers may enter this part of the Safari Zone. Are you a member of the Fuchsia Research Institute?',
@@ -71,7 +88,7 @@ export const safariZoneTasks: Task[] = [
       },
       {
         id: 2,
-        background: '/backgrounds/safari.avif',
+        background: '/backgrounds/safari-reserve.avif',
         title: 'Safari Zone Ranger',
         icon: rangerIcon,
         message: 'Then I cannot sign you into the reserve. Koga and Janine entered before sunrise under the Institute charter, which is why they were allowed beyond this gate.',
@@ -79,7 +96,7 @@ export const safariZoneTasks: Task[] = [
       },
       {
         id: 3,
-        background: '/backgrounds/safari.avif',
+        background: '/backgrounds/safari-reserve.avif',
         title: 'Safari Zone Ranger',
         icon: rangerIcon,
         message: 'I understand, and I will watch for them. If you need to conduct your own search, speak to the Institute in Fuchsia City about membership. Return with a valid Researcher’s Pass and I can admit you properly.',
@@ -94,7 +111,7 @@ export const safariZoneTasks: Task[] = [
     category: 'Kanto',
     subCategory: 'Safari Zone',
     icon: detectiveIcon,
-    background: '/backgrounds/safari.avif',
+    background: '/backgrounds/safari-reserve.avif',
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
@@ -105,7 +122,7 @@ export const safariZoneTasks: Task[] = [
     enterModal: [
       {
         id: 1,
-        background: '/backgrounds/safari.avif',
+        background: '/backgrounds/safari-reserve.avif',
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
         message: 'Koga and Janine signed in as Institute researchers, so they did not enter in secret. The Institute should have their records and may know what they were working on.',
@@ -113,7 +130,7 @@ export const safariZoneTasks: Task[] = [
       },
       {
         id: 2,
-        background: '/backgrounds/safari.avif',
+        background: '/backgrounds/safari-reserve.avif',
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
         message: 'Go to the Fuchsia Research Institute and find out how to get a Researcher’s Pass. I will stay here and ask the Ranger whether he noticed anything else.',
@@ -226,7 +243,7 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Institute Field Examiner',
         icon: { type: 'trainer', id: 'researcher-f' },
-        message: 'You will identify Pokémon drawn from our Safari records. The assessment is timed, and the charter standard requires twelve correct identifications before the field clock expires. Accuracy first, then speed.',
+        message: 'You will identify Pokémon drawn from our Safari records. Six possibilities will appear at a time, and you must make twenty correct identifications in thirty-five seconds. Decide carefully, but keep moving.',
         buttons: [{ text: 'I’m Ready', type: 'navigate', id: 3 }],
       },
       {
@@ -242,7 +259,7 @@ export const safariZoneTasks: Task[] = [
   {
     id: 'fuchsia-research-institute-exam-results',
     name: 'The Charter Examination',
-    description: 'Twelve identifications against the clock. No pressure... I hope.',
+    description: 'Twenty identifications in thirty-five seconds. No pressure... I hope.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: { type: 'trainer', id: 'researcher-f' },
@@ -262,7 +279,7 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Institute Field Examiner',
         icon: { type: 'trainer', id: 'researcher-f' },
-        message: 'Twelve correct identifications within the field limit. More importantly, you stayed precise under pressure. That is the standard we expect beyond the gate.',
+        message: 'Twenty correct identifications within thirty-five seconds. More importantly, you stayed precise under pressure. That is the standard we expect beyond the gate.',
         buttons: [{ text: 'Did I Pass?', type: 'navigate', id: 2 }],
       },
       {
@@ -320,7 +337,7 @@ export const safariZoneTasks: Task[] = [
     category: 'Kanto',
     subCategory: 'Safari Zone',
     icon: rangerIcon,
-    background: '/backgrounds/safari.avif',
+    background: '/backgrounds/safari-reserve.avif',
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
@@ -334,7 +351,7 @@ export const safariZoneTasks: Task[] = [
     enterModal: [
       {
         id: 1,
-        background: '/backgrounds/safari.avif',
+        background: '/backgrounds/safari-reserve.avif',
         title: 'Safari Zone Ranger',
         icon: rangerIcon,
         message: 'Researcher’s Pass confirmed. I have added you to today’s field register, so you may enter under the Institute charter. Stay on the survey routes and report any damaged habitat markers.',
@@ -342,7 +359,7 @@ export const safariZoneTasks: Task[] = [
       },
       {
         id: 2,
-        background: '/backgrounds/safari.avif',
+        background: '/backgrounds/safari-reserve.avif',
         title: 'Safari Zone Ranger',
         icon: rangerIcon,
         message: 'Koga and Janine signed in before dawn. The Institute keeps a duplicate of our sign-out archive, including their declared starting area. Check that record before you search the reserve itself.',
@@ -350,7 +367,7 @@ export const safariZoneTasks: Task[] = [
       },
       {
         id: 3,
-        background: '/backgrounds/safari.avif',
+        background: '/backgrounds/safari-reserve.avif',
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
         message: 'Good, the pass gets us inside. The Institute also has a copy of Koga and Janine’s sign-out record. Let’s check where they started.',
@@ -358,26 +375,43 @@ export const safariZoneTasks: Task[] = [
       },
     ],
   },
-  hiddenDiscovery('safari-discovery-central', 'safari-zone-search-begins'),
-  hiddenDiscovery('safari-discovery-east', 'safari-discovery-central'),
-  hiddenDiscovery('safari-discovery-west', 'safari-discovery-east'),
-  hiddenDiscovery('safari-discovery-north', 'safari-discovery-west'),
-  hiddenDiscovery('safari-discovery-search-complete', 'safari-discovery-north'),
+  hiddenDiscovery({
+    id: 'safari-discovery-east',
+    name: 'Eastern Trail Found',
+    requirement: 'safari-clue-last-sign-out',
+    message: 'One detail in the survey notes stands out. Return to Explore and inspect the tied reeds in Safari Central.',
+  }),
+  hiddenDiscovery({
+    id: 'safari-discovery-west',
+    name: 'Western Trail Found',
+    requirement: 'safari-clue-reed-twice',
+    message: 'The eastern survey has revealed another trace. Return to Explore and examine the powder on the boardwalk.',
+  }),
+  hiddenDiscovery({
+    id: 'safari-discovery-north',
+    name: 'Northern Trail Found',
+    requirement: 'safari-clue-powder-boardwalk',
+    message: 'Something in the western survey deserves a closer look. Return to Explore and inspect the purple thread caught in the brush.',
+  }),
+  hiddenDiscovery({
+    id: 'safari-discovery-search-complete',
+    name: 'Search Route Completed',
+    requirement: 'safari-clue-purple-thread',
+    message: 'We have covered every trail the evidence gave us. Return to Explore and inspect the last observation blind with me.',
+  }),
   {
     id: 'safari-clue-last-sign-out',
     name: 'The Last Sign-Out',
     description: 'The Institute archive should tell me where Koga and Janine started their survey.',
     category: 'Kanto',
     subCategory: 'Safari Zone',
-    icon: { type: 'trainer', id: 'researcher-f' },
+    icon: detectiveIcon,
     background: '/backgrounds/lab.avif',
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
     completeButtonText: 'Read the Archive',
-    requirements: [
-      { type: 'task_completed', targetId: 'safari-discovery-central' },
-    ],
+    requirements: [{ type: 'task_completed', targetId: 'safari-zone-search-begins' }],
     criteria: [],
     rewards: [],
     enterModal: [
@@ -405,8 +439,8 @@ export const safariZoneTasks: Task[] = [
     description: 'That tied reed does not look accidental. Maybe it points toward the next area.',
     category: 'Kanto',
     subCategory: 'Safari Zone',
-    icon: rangerIcon,
-    background: '/backgrounds/safari.avif',
+    icon: detectiveIcon,
+    background: '/backgrounds/safari-reserve.avif',
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
@@ -419,7 +453,7 @@ export const safariZoneTasks: Task[] = [
     enterModal: [
       {
         id: 1,
-        background: '/backgrounds/safari.avif',
+        background: '/backgrounds/safari-reserve.avif',
         title: 'Safari Central',
         icon: rangerIcon,
         message: 'Two reeds have been tied around an eastern fence post. The knot is clean, tight, and far too deliberate to be storm damage.',
@@ -427,10 +461,10 @@ export const safariZoneTasks: Task[] = [
       },
       {
         id: 2,
-        background: '/backgrounds/safari.avif',
+        background: '/backgrounds/safari-reserve.avif',
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
-        message: 'This was tied deliberately, and it points east. Koga or Janine may have left it for us.',
+        message: 'This was tied deliberately, and it points east. It must have been used to mark their route.',
         buttons: [{ text: 'Head East', type: 'success' }],
       },
     ],
@@ -441,8 +475,8 @@ export const safariZoneTasks: Task[] = [
     description: 'There is something pale on the eastern boardwalk. Could Koga or Janine have left it behind?',
     category: 'Kanto',
     subCategory: 'Safari Zone',
-    icon: { type: 'item', id: 'antidote' },
-    background: '/backgrounds/safari.avif',
+    icon: detectiveIcon,
+    background: '/backgrounds/safari-reserve.avif',
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
@@ -455,7 +489,7 @@ export const safariZoneTasks: Task[] = [
     enterModal: [
       {
         id: 1,
-        background: '/backgrounds/safari.avif',
+        background: '/backgrounds/safari-reserve.avif',
         title: 'Safari East',
         icon: { type: 'item', id: 'antidote' },
         message: 'A fine line of pale antidote powder crosses the damp boardwalk and disappears onto the western trail.',
@@ -463,7 +497,7 @@ export const safariZoneTasks: Task[] = [
       },
       {
         id: 2,
-        background: '/backgrounds/safari.avif',
+        background: '/backgrounds/safari-reserve.avif',
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
         message: 'This is antidote powder, and the trail runs west. We should follow it.',
@@ -477,8 +511,8 @@ export const safariZoneTasks: Task[] = [
     description: 'That purple thread caught in the brush points north. I must be getting close.',
     category: 'Kanto',
     subCategory: 'Safari Zone',
-    icon: rangerIcon,
-    background: '/backgrounds/safari.avif',
+    icon: detectiveIcon,
+    background: '/backgrounds/safari-reserve.avif',
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
@@ -491,7 +525,7 @@ export const safariZoneTasks: Task[] = [
     enterModal: [
       {
         id: 1,
-        background: '/backgrounds/safari.avif',
+        background: '/backgrounds/safari-reserve.avif',
         title: 'Safari West',
         icon: rangerIcon,
         message: 'A short purple training thread is snagged high in the brush. The bent branch beside it faces north.',
@@ -499,7 +533,7 @@ export const safariZoneTasks: Task[] = [
       },
       {
         id: 2,
-        background: '/backgrounds/safari.avif',
+        background: '/backgrounds/safari-reserve.avif',
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
         message: 'The thread and bent branch both point north. They came through here without rushing.',
@@ -510,11 +544,11 @@ export const safariZoneTasks: Task[] = [
   {
     id: 'safari-zone-cant-find-them',
     name: 'Trail Gone Cold',
-    description: 'Nothing. No return trail, no sign of either of them. Ray is right, we should try the Gym again.',
+    description: 'The trail ends at an empty observation blind. There has to be another place to look.',
     category: 'Kanto',
     subCategory: 'Safari Zone',
     icon: detectiveIcon,
-    background: '/backgrounds/safari.avif',
+    background: '/backgrounds/safari-reserve.avif',
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
@@ -525,7 +559,7 @@ export const safariZoneTasks: Task[] = [
     enterModal: [
       {
         id: 1,
-        background: '/backgrounds/safari.avif',
+        background: '/backgrounds/safari-reserve.avif',
         title: 'Safari North',
         icon: rangerIcon,
         message: 'Two sets of prints reach an empty observation blind. None leave it, and the ground around the blind is undisturbed.',
@@ -533,18 +567,18 @@ export const safariZoneTasks: Task[] = [
       },
       {
         id: 2,
-        background: '/backgrounds/safari.avif',
+        background: '/backgrounds/safari-reserve.avif',
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
-        message: 'No tracks leave the blind, and there is no sign of a struggle. We have searched every lead we have. Let’s go back to the Gym.',
+        message: 'The tracks stop here, but Koga and Janine clearly did not. We have followed the whole trail and found nothing. Let’s check the Gym again.',
         buttons: [{ text: 'Return to the Gym', type: 'success' }],
       },
     ],
   },
   {
     id: 'fuchsia-gym-trial-ready',
-    name: 'The Ninja’s Gym Trial',
-    description: 'Of course Koga was back at the Gym the whole time. If passing his trial is the only way he will talk, let us do this.',
+    name: 'Returning to the Gym',
+    description: 'Back to the Gym. Hopefully someone there can finally tell me where Koga went.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: kogaIcon,
@@ -577,8 +611,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/gym-poison.avif',
         title: 'Janine',
         icon: janineIcon,
-        message: 'Then reach him. The floor is poisoned, the walls are invisible, and his students will not step aside. Koga calls it a trial. I call it how he avoids interruptions.',
-        buttons: [{ text: 'Begin the trial', type: 'success' }],
+        message: 'Then reach him. The floor is poisoned, the walls are invisible, and his students will not step aside. Make it through the Gym and Koga will hear what you have to say.',
+        buttons: [{ text: 'Take on the Gym', type: 'success' }],
       },
     ],
     rewards: [],
@@ -759,25 +793,19 @@ export const safariZoneTasks: Task[] = [
     ],
   },
   {
-    id: 'safari-area-five-strength-cache',
+    id: 'safari-north-strength-cache',
     name: 'The Abandoned Cache',
     description: 'There is an old supply locker buried under all that growth. I wonder what is inside.',
     category: 'Secret',
     subCategory: 'Safari Zone',
     icon: { type: 'item', id: 'tm-strength' },
-    background: '/backgrounds/safari.avif',
+    background: '/backgrounds/safari-reserve.avif',
     repeatable: true,
     secret: true,
     completionTrigger: 'manual',
     completeButtonText: 'Open the Cache',
     requirements: [
       { type: 'item_owned', targetId: 'safari-catching-permit' },
-      {
-        type: 'expedition_result',
-        targetId: 'safari-north-expedition',
-        expeditionStatus: 'completed',
-        count: 5,
-      },
       { type: 'item_owned', targetId: 'tm-strength', inverse: true },
     ],
     criteria: [],
@@ -785,8 +813,8 @@ export const safariZoneTasks: Task[] = [
     enterModal: [
       {
         id: 1,
-        background: '/backgrounds/safari.avif',
-        title: 'Area 5 Supply Cache',
+        background: '/backgrounds/safari-reserve.avif',
+        title: 'Northern Supply Cache',
         icon: { type: 'item', id: 'tm-strength' },
         message: 'Behind a fallen shelf sits a sealed field manual stamped HM04. Its cover shows a Pokémon shifting a boulder from a blocked trail.',
         buttons: [{ text: 'Recover HM04 Strength', type: 'success' }],
@@ -800,7 +828,7 @@ export const safariZoneTasks: Task[] = [
     category: 'Kanto',
     subCategory: 'Safari Zone',
     icon: detectiveIcon,
-    background: '/backgrounds/safari.avif',
+    background: '/backgrounds/safari-reserve.avif',
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
@@ -814,7 +842,7 @@ export const safariZoneTasks: Task[] = [
     enterModal: [
       {
         id: 1,
-        background: '/backgrounds/safari.avif',
+        background: '/backgrounds/safari-reserve.avif',
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
         message: 'Strength may help us later, but it is not why we came to Fuchsia. Koga has had enough time with the vial.',
@@ -822,7 +850,7 @@ export const safariZoneTasks: Task[] = [
       },
       {
         id: 2,
-        background: '/backgrounds/safari.avif',
+        background: '/backgrounds/safari-reserve.avif',
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
         message: 'Agreed. Let’s head back and see what he found.',
@@ -913,7 +941,7 @@ export const safariZoneTasks: Task[] = [
     category: 'Kanto',
     subCategory: 'Safari Zone',
     icon: { type: 'pokemon', id: '113' },
-    background: '/backgrounds/safari.avif',
+    background: '/backgrounds/safari-reserve.avif',
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',

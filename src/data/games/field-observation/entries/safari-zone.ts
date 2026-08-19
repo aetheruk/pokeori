@@ -1,17 +1,74 @@
-import type { FieldObservationConfig } from '../types'
+import type {
+  FieldObservationConfig,
+  FieldObservationPokemonPoolEntry,
+} from '../types'
 
-const basePool = [
-  { speciesId: 29, formId: '29', weight: 12 },
-  { speciesId: 32, formId: '32', weight: 12 },
-  { speciesId: 46, formId: '46', weight: 12 },
-  { speciesId: 48, formId: '48', weight: 12 },
-  { speciesId: 102, formId: '102', weight: 12 },
-  { speciesId: 111, formId: '111', weight: 10 },
-  { speciesId: 113, formId: '113', weight: 4 },
-  { speciesId: 115, formId: '115', weight: 8 },
-  { speciesId: 123, formId: '123', weight: 5 },
-  { speciesId: 127, formId: '127', weight: 5 },
-  { speciesId: 128, formId: '128', weight: 8 },
+const centralPool: FieldObservationPokemonPoolEntry[] = [
+  { speciesId: 102, formId: '102', weight: 18 },
+  { speciesId: 111, formId: '111', weight: 17 },
+  { speciesId: 29, formId: '29', weight: 14 },
+  { speciesId: 32, formId: '32', weight: 14 },
+  { speciesId: 48, formId: '48', weight: 10 },
+  { speciesId: 33, formId: '33', weight: 8 },
+  { speciesId: 47, formId: '47', weight: 8 },
+  { speciesId: 30, formId: '30', weight: 5 },
+  { speciesId: 46, formId: '46', weight: 2 },
+  { speciesId: 114, formId: '114', weight: 1 },
+  { speciesId: 123, formId: '123', weight: 1 },
+  { speciesId: 127, formId: '127', weight: 1 },
+  { speciesId: 113, formId: '113', weight: 1 },
+]
+
+const eastPool: FieldObservationPokemonPoolEntry[] = [
+  { speciesId: 102, formId: '102', weight: 20 },
+  { speciesId: 29, formId: '29', weight: 15 },
+  { speciesId: 32, formId: '32', weight: 15 },
+  { speciesId: 84, formId: '84', weight: 13 },
+  { speciesId: 46, formId: '46', weight: 10 },
+  { speciesId: 30, formId: '30', weight: 7 },
+  { speciesId: 33, formId: '33', weight: 3 },
+  { speciesId: 47, formId: '47', weight: 3 },
+  { speciesId: 104, formId: '104', weight: 3 },
+  { speciesId: 128, formId: '128', weight: 3 },
+  { speciesId: 105, formId: '105', weight: 2 },
+  { speciesId: 123, formId: '123', weight: 2 },
+  { speciesId: 115, formId: '115', weight: 2 },
+  { speciesId: 127, formId: '127', weight: 1 },
+  { speciesId: 113, formId: '113', weight: 1 },
+]
+
+const westPool: FieldObservationPokemonPoolEntry[] = [
+  { speciesId: 102, formId: '102', weight: 20 },
+  { speciesId: 29, formId: '29', weight: 15 },
+  { speciesId: 32, formId: '32', weight: 15 },
+  { speciesId: 84, formId: '84', weight: 13 },
+  { speciesId: 48, formId: '48', weight: 10 },
+  { speciesId: 33, formId: '33', weight: 6 },
+  { speciesId: 128, formId: '128', weight: 6 },
+  { speciesId: 30, formId: '30', weight: 3 },
+  { speciesId: 49, formId: '49', weight: 3 },
+  { speciesId: 104, formId: '104', weight: 3 },
+  { speciesId: 105, formId: '105', weight: 2 },
+  { speciesId: 115, formId: '115', weight: 2 },
+  { speciesId: 114, formId: '114', weight: 1 },
+  { speciesId: 127, formId: '127', weight: 1 },
+]
+
+const northPool: FieldObservationPokemonPoolEntry[] = [
+  { speciesId: 102, formId: '102', weight: 18 },
+  { speciesId: 111, formId: '111', weight: 17 },
+  { speciesId: 29, formId: '29', weight: 13 },
+  { speciesId: 32, formId: '32', weight: 13 },
+  { speciesId: 46, formId: '46', weight: 10 },
+  { speciesId: 30, formId: '30', weight: 8 },
+  { speciesId: 33, formId: '33', weight: 5 },
+  { speciesId: 115, formId: '115', weight: 5 },
+  { speciesId: 49, formId: '49', weight: 3 },
+  { speciesId: 104, formId: '104', weight: 2 },
+  { speciesId: 128, formId: '128', weight: 2 },
+  { speciesId: 113, formId: '113', weight: 2 },
+  { speciesId: 127, formId: '127', weight: 1 },
+  { speciesId: 123, formId: '123', weight: 1 },
 ]
 
 function discoveryReward(studyId: string, taskId: string) {
@@ -19,7 +76,6 @@ function discoveryReward(studyId: string, taskId: string) {
     type: 'task_complete' as const,
     targetId: taskId,
     dropChance: 15,
-    secret: true,
     requirements: [
       {
         type: 'field_research_result' as const,
@@ -37,6 +93,7 @@ function safariStudy({
   name,
   description,
   icon,
+  pokemonPool,
   requirements,
   discoveryTask,
 }: {
@@ -44,8 +101,9 @@ function safariStudy({
   name: string
   description: string
   icon: string
+  pokemonPool: FieldObservationPokemonPoolEntry[]
   requirements: FieldObservationConfig['requirements']
-  discoveryTask?: string
+  discoveryTask: string
 }): FieldObservationConfig {
   return {
     id,
@@ -54,12 +112,13 @@ function safariStudy({
     category: 'Kanto',
     subCategory: 'Safari Zone',
     icon: { type: 'pokemon', id: icon },
-    background: '/backgrounds/safari.avif',
+    background: '/backgrounds/safari-reserve.avif',
+    hide: 'fuchsia-koga-study-toxin',
     requirements,
-    rewards: discoveryTask ? [discoveryReward(id, discoveryTask)] : [],
+    rewards: [discoveryReward(id, discoveryTask)],
     skillXp: { skill: 'researching', level: 30 },
     settings: {
-      pokemonPool: basePool,
+      pokemonPool,
       levelRange: { min: 25, max: 35 },
       timeLimit: 12,
       answerTimeLimit: 12,
@@ -68,28 +127,19 @@ function safariStudy({
   }
 }
 
-const passRequirement = { type: 'item_owned' as const, targetId: 'safari-research-pass' }
-const permitRequirement = { type: 'item_owned' as const, targetId: 'safari-catching-permit' }
+const passRequirement = {
+  type: 'item_owned' as const,
+  targetId: 'safari-research-pass',
+}
 
 export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
-  safariStudy({
-    id: 'safari-institute-field-observation',
-    name: 'Institute Sightings Archive',
-    description:
-      'Work through the institute’s recent sightings and ranger reports to find where Koga and Janine signed in last.',
-    icon: '113',
-    requirements: [
-      passRequirement,
-      { type: 'task_completed', targetId: 'safari-zone-search-begins' },
-    ],
-    discoveryTask: 'safari-discovery-central',
-  }),
   safariStudy({
     id: 'safari-central-field-observation',
     name: 'Central Habitat Survey',
     description:
-      'Read the busy central paths for a quieter trail: bent grass, hurried footprints, and a reed tied twice.',
+      'Study the open grass, busy paths, and mixed habitats around Safari Central.',
     icon: '111',
+    pokemonPool: centralPool,
     requirements: [
       passRequirement,
       { type: 'task_completed', targetId: 'safari-clue-last-sign-out' },
@@ -100,8 +150,9 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
     id: 'safari-east-field-observation',
     name: 'Eastern Habitat Survey',
     description:
-      'Compare the eastern ponds and boardwalks for the powder trail hidden among the water Pokémon’s movements.',
+      'Observe the Pokémon living around the eastern ponds, tall grass, and raised boardwalks.',
     icon: '115',
+    pokemonPool: eastPool,
     requirements: [
       passRequirement,
       { type: 'task_completed', targetId: 'safari-clue-reed-twice' },
@@ -112,8 +163,9 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
     id: 'safari-west-field-observation',
     name: 'Western Habitat Survey',
     description:
-      'Examine the shaded western shelters and wooded lanes for a trace the resident Bug Pokémon did not leave.',
+      'Record the Pokémon sheltering among the western woods and quiet rest houses.',
     icon: '123',
+    pokemonPool: westPool,
     requirements: [
       passRequirement,
       { type: 'task_completed', targetId: 'safari-clue-powder-boardwalk' },
@@ -124,28 +176,13 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
     id: 'safari-north-field-observation',
     name: 'Northern Habitat Survey',
     description:
-      'Search the rocky northern channels for the final thread of Koga and Janine’s disappearing trail.',
+      'Survey the rocky ledges and narrow channels that shape Safari North.',
     icon: '128',
+    pokemonPool: northPool,
     requirements: [
       passRequirement,
       { type: 'task_completed', targetId: 'safari-clue-purple-thread' },
     ],
     discoveryTask: 'safari-discovery-search-complete',
-  }),
-  safariStudy({
-    id: 'safari-area-five-field-observation',
-    name: 'Area 5 Habitat Survey',
-    description:
-      'Document the secluded fifth area, where old service trails and dense growth conceal unusually rare finds.',
-    icon: '113',
-    requirements: [
-      permitRequirement,
-      {
-        type: 'expedition_result',
-        targetId: 'safari-north-expedition',
-        expeditionStatus: 'completed',
-        count: 5,
-      },
-    ],
   }),
 ]

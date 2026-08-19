@@ -103,6 +103,8 @@ export type LocationCategory = string
 export interface Location {
   id: string
   hide?: string
+  /** Keep this encounter available to expedition paths without listing it separately in Explore. */
+  expeditionOnly?: boolean
   overrides?: string
   name: string
   description: string

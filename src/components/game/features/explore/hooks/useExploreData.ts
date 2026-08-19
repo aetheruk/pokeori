@@ -171,6 +171,10 @@ export function useExploreData(
       // Filter out Secret category items (never show on explore list)
       if (item.category === 'Secret') return false
 
+      if ((item.originalData as { expeditionOnly?: boolean }).expeditionOnly) {
+        return false
+      }
+
       // Check Hide Condition
       if (item.hide) {
         const isHidden = completedTaskIds.has(item.hide)

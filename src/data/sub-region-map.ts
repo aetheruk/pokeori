@@ -279,7 +279,7 @@ export const subCategories: Record<string, RegionData> = {
     category: 'Safari Zone',
     region: 'Kanto',
     order: 180,
-    image: '/backgrounds/safari.avif',
+    image: '/backgrounds/safari-reserve.avif',
     description: 'A huge nature reserve packed with Rare Pokemon.',
     music: '/music/viridian_forest.mp3',
     unlockRequirements: [{ type: 'task_completed', targetId: 'fuchsia-gym-search-for-koga' }],

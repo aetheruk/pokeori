@@ -27,6 +27,8 @@ export interface BaseGameConfig {
   skillXp?: SkillXpConfig
   /** Whether the configured skill XP is also awarded when the game is failed. */
   skillXpOnFailure?: boolean
+  /** Keep this activity available to expedition paths without listing it separately in Explore. */
+  expeditionOnly?: boolean
 }
 
 export type EndlessScoreInterval =
