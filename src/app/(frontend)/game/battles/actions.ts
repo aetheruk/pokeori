@@ -162,13 +162,14 @@ export async function submitTurn(
 export async function useBattleItem(
   itemId: string,
   clientActionId?: string,
+  targetPokemonIndex?: number,
 ): Promise<{
   success: boolean
   error?: string
   state?: BattleState
   message?: string
 }> {
-  return useItem(itemId, clientActionId)
+  return useItem(itemId, clientActionId, targetPokemonIndex)
 }
 
 export async function swapPokemon(
