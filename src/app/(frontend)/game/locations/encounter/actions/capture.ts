@@ -67,6 +67,7 @@ import {
   buildCaptureResearchXpRewards,
 } from '@/utilities/research/capture-research-rewards'
 import { buildArtisanMaterialRewards } from '@/utilities/artisan/material-drops'
+import { calculateGemRewards } from '@/utilities/rewards/gem-logic'
 import { registerAbilityDexEntry } from '@/utilities/pokemon/abilitydex'
 import {
   getPokemonRarityLegacyFields,
@@ -795,6 +796,7 @@ export async function attemptCapture(
         'capture',
       ),
     )
+    rewardsToGrant.push(...calculateGemRewards(formData?.types || []))
 
     const abilityRewards = getCaptureAbilityRewards({
       state,

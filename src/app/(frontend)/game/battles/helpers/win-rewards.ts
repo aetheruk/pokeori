@@ -2,8 +2,10 @@ import type { User } from '@/payload-types'
 import type { BattleState } from '@/utilities/battle/types'
 import { getPokemonForm, getPokemonSpecies } from '@/utilities/pokemon/pokedex'
 import { calculateCandyRewards } from '@/utilities/rewards/candy-logic'
-import { calculateGemRewards } from '@/utilities/rewards/gem-logic'
-import { buildBrokenBallRewards } from '@/utilities/artisan/material-drops'
+import {
+  buildArtisanMaterialRewards,
+  buildBrokenBallRewards,
+} from '@/utilities/artisan/material-drops'
 import { getInvolvedPlayerPokemon } from '@/utilities/battle/participants'
 import {
   calculatePokemonContentSkillXp,
@@ -140,8 +142,17 @@ export function buildBattleWinRewards(
           ? Math.min(highestEnemyLevel, battleConfig.levelCap)
           : highestEnemyLevel
       if (allEnemyTypes.length > 0) {
-        const gemRewards = calculateGemRewards(battleConfig, allEnemyTypes)
-        rewardsToGrant.push(...gemRewards)
+        rewardsToGrant.push(
+          ...buildArtisanMaterialRewards(
+            {
+              speciesId: 0,
+              level: effectiveBrokenBallLevel,
+              types: allEnemyTypes,
+              researchingLevel,
+            },
+            'battle',
+          ),
+        )
       }
       rewardsToGrant.push(
         ...buildBrokenBallRewards(

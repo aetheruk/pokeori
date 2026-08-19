@@ -7,6 +7,10 @@ import {
   getFieldObservationPrimaryMaterialLimit,
 } from '@/utilities/artisan/material-drops'
 import {
+  calculateGemRewards,
+  FIELD_OBSERVATION_GEM_DROP_CHANCE,
+} from '@/utilities/rewards/gem-logic'
+import {
   buildFieldObservationBerryRewards,
   buildFieldObservationMintRewards,
   FIELD_OBSERVATION_NUTS,
@@ -83,6 +87,17 @@ export function buildFieldObservationCollectibleDrops({
         ? 1.1
         : 1) * getDropChanceMultiplier(collectibleModifiers),
   )
+  const gemRewards = resolveDropChances(
+    calculateGemRewards(
+      materialRewardContexts.flatMap((context) => context.types),
+      random,
+    ).map((reward) => ({
+      ...reward,
+      dropChance: FIELD_OBSERVATION_GEM_DROP_CHANCE,
+    })),
+    random,
+    getDropChanceMultiplier(collectibleModifiers),
+  )
   const berryRewards = buildFieldObservationBerryRewards(
     rewardSubjects,
     pokemonData as any[],
@@ -124,6 +139,7 @@ export function buildFieldObservationCollectibleDrops({
     kind: FieldObservationCollectibleKind
   }[] = [
     ...materialRewards.map((reward) => ({ reward, kind: 'material' as const })),
+    ...gemRewards.map((reward) => ({ reward, kind: 'item' as const })),
     ...focusedBerryRewards.map((reward) => ({
       reward,
       kind: nutPool.has(String(reward.targetId))

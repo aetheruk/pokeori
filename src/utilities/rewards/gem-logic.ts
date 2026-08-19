@@ -1,4 +1,6 @@
-import { BattleConfig, LocationReward } from '@/data/types'
+import type { LocationReward } from '@/data/types'
+
+export const FIELD_OBSERVATION_GEM_DROP_CHANCE = 35
 
 // Map Pokemon type to Gem IDs
 const TypeToGemMap: Record<string, { base: string; shining: string; pristine: string }> = {
@@ -95,31 +97,35 @@ const TypeToGemMap: Record<string, { base: string; shining: string; pristine: st
 }
 
 export function calculateGemRewards(
-  battleConfig: BattleConfig,
   pokemonTypes: string[],
+  random: () => number = Math.random,
 ): LocationReward[] {
-  // Only for random encounters
-  if (!battleConfig.isWildBattle) {
-    return []
-  }
+  const availableTypes = Array.from(
+    new Set(
+      (pokemonTypes || [])
+        .map((type) => type.toLowerCase())
+        .filter((type) => TypeToGemMap[type]),
+    ),
+  )
+  if (availableTypes.length === 0) return []
 
-  const rewards: LocationReward[] = []
-
-  // Randomly select one type from the Pokemon's types
-  if (!pokemonTypes || pokemonTypes.length === 0) return []
-  const selectedType = pokemonTypes[Math.floor(Math.random() * pokemonTypes.length)].toLowerCase()
+  const selectedType =
+    availableTypes[
+      Math.min(
+        Math.floor(random() * availableTypes.length),
+        availableTypes.length - 1,
+      )
+    ]
 
   const gems = TypeToGemMap[selectedType]
   if (!gems) return []
 
-  const gemCount = 1
-
-  rewards.push({
-    type: 'item',
-    targetId: gems.base,
-    quantity: { min: gemCount, max: gemCount },
-    dropChance: 100,
-  })
-
-  return rewards
+  return [
+    {
+      type: 'item',
+      targetId: gems.base,
+      quantity: { min: 1, max: 1 },
+      dropChance: 100,
+    },
+  ]
 }
