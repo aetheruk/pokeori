@@ -1155,19 +1155,11 @@ describe('static data references', () => {
         req.type === 'pokemon_owned' &&
         req.pokemonCriteria?.speciesId === 132 &&
         req.pokemonCriteria?.formId === '132' &&
-        (req.pokemonCriteria?.nature === 'lonely' ||
-          req.pokemonCriteria?.nature === 'brave'),
+        req.pokemonCriteria?.nature === 'brave',
     )
-    expect(
-      dittoNatureCriteria?.some(
-        (req) => req.pokemonCriteria?.nature === 'lonely',
-      ),
-    ).toBe(true)
-    expect(
-      dittoNatureCriteria?.some(
-        (req) => req.pokemonCriteria?.nature === 'brave',
-      ),
-    ).toBe(true)
+    expect(dittoNatureCriteria).toHaveLength(1)
+    expect(study?.description).toContain('Brave nature')
+    expect(study?.completeButtonText).toBe('Show Fern the Brave Ditto')
   })
 
   test('the 5F Lick Off requires Explorer 40 and a Gengar partner, and unlocks Lickitung', () => {
@@ -1303,6 +1295,14 @@ describe('static data references', () => {
           (req) =>
             req.type === 'task_completed' &&
             req.targetId === 'route-14-bikers-cleared',
+        ),
+      ).toBe(true)
+      expect(
+        reward.requirements?.some(
+          (req) =>
+            req.type === 'task_completed' &&
+            req.targetId === 'cerulean-bike-shop-worst-customer' &&
+            req.inverse === true,
         ),
       ).toBe(true)
       expect(
