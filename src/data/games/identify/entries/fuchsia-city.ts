@@ -3,15 +3,15 @@ import { IdentifyConfig } from '../types'
 export const fuchsiaCityidentifyEntries: IdentifyConfig[] = [
   {
     id: 'fuchsia-research-institute-identify',
-    name: 'Institute Membership Assessment',
+    name: 'Chartered Researcher Examination',
     description:
-      'Identify the Pokémon in the institute’s Safari records to prove you can conduct fieldwork without disturbing the habitats.',
+      'Record twelve correct identifications from the Institute’s Safari records within the field time limit.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: { type: 'trainer', id: 'researcher-f' },
     background: '/backgrounds/lab.avif',
     requirements: [
-      { type: 'task_completed', targetId: 'safari-zone-entry-denied' },
+      { type: 'task_completed', targetId: 'fuchsia-research-institute-exam-briefing' },
       { type: 'skill_level', targetId: 'researching', count: 30 },
     ],
     rewards: [],

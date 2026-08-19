@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { battles } from '@/data/battles'
 import { expeditions } from '@/data/expeditions'
 import { fieldObservationGames } from '@/data/games/field-observation'
+import { identifyEntries } from '@/data/games/identify'
 import { basicEntries } from '@/data/games/rock-push'
 import { items } from '@/data/items'
 import { locations } from '@/data/locations'
@@ -59,6 +60,99 @@ describe('Fuchsia Gym and Safari progression', () => {
       tasks.find((task) => task.id === 'safari-zone-entry-denied')
         ?.requirements,
     ).toContainEqual(emptyGymRequirement)
+  })
+
+  test('Safari admission paces the Ranger, detective, credentials, exam, and fee', () => {
+    const taskChain = [
+      ['safari-zone-entry-denied', 'fuchsia-gym-search-for-koga'],
+      ['safari-zone-report-to-ray', 'safari-zone-entry-denied'],
+      ['fuchsia-research-institute-enquiry', 'safari-zone-report-to-ray'],
+      [
+        'fuchsia-research-institute-credentials',
+        'fuchsia-research-institute-enquiry',
+      ],
+      [
+        'fuchsia-research-institute-exam-briefing',
+        'fuchsia-research-institute-credentials',
+      ],
+      [
+        'fuchsia-research-institute-exam-results',
+        'fuchsia-research-institute-exam-briefing',
+      ],
+      [
+        'fuchsia-research-institute-membership',
+        'fuchsia-research-institute-exam-results',
+      ],
+      ['safari-zone-search-begins', 'fuchsia-research-institute-membership'],
+    ]
+
+    for (const [taskId, priorTaskId] of taskChain) {
+      const task = tasks.find((entry) => entry.id === taskId)
+      expect(task, taskId).toBeDefined()
+      expect(task?.secret, taskId).toBe(false)
+      expect(task?.requirements, taskId).toContainEqual({
+        type: 'task_completed',
+        targetId: priorTaskId,
+      })
+    }
+
+    expect(
+      tasks.find(
+        (task) => task.id === 'fuchsia-research-institute-credentials',
+      )?.criteria,
+    ).toEqual([
+      { type: 'skill_level', targetId: 'researching', count: 30 },
+    ])
+    expect(
+      tasks.find(
+        (task) => task.id === 'fuchsia-research-institute-exam-results',
+      )?.criteria,
+    ).toEqual([
+      {
+        type: 'game_result',
+        targetId: 'fuchsia-research-institute-identify',
+        battleStatus: 'win',
+        count: 1,
+      },
+    ])
+    expect(
+      tasks.find(
+        (task) => task.id === 'fuchsia-research-institute-membership',
+      )?.criteria,
+    ).toEqual([
+      {
+        type: 'currency_owned',
+        targetId: 'pokedollars',
+        count: 2000,
+        consume: true,
+      },
+    ])
+
+    const exam = identifyEntries.find(
+      (entry) => entry.id === 'fuchsia-research-institute-identify',
+    )
+    expect(exam?.requirements).toContainEqual({
+      type: 'task_completed',
+      targetId: 'fuchsia-research-institute-exam-briefing',
+    })
+    expect(exam?.settings).toMatchObject({
+      timeLimit: 45,
+      winRate: 12,
+    })
+
+    const admissionProse = JSON.stringify(
+      taskChain.map(([taskId]) =>
+        tasks.find((task) => task.id === taskId),
+      ),
+    )
+    expect(admissionProse).toContain('Only Chartered Researchers may enter')
+    expect(admissionProse).toContain(
+      'Are you a member of the Fuchsia Research Institute?',
+    )
+    expect(admissionProse).toContain('We do not issue visitor passes')
+    expect(admissionProse).toContain('We will take each step in order')
+    expect(admissionProse).toContain('You passed')
+    expect(admissionProse).toContain('Pay 2,000 PokéDollars')
   })
 
   test('Koga Gym uses the FRLG trainers around solvable invisible mazes', () => {
