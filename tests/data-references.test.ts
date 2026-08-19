@@ -22,6 +22,7 @@ import { icons } from '@/data/user/icons'
 import { KANTO_TRAINER_BASE_PAYOUTS } from '@/data/battles/trainer-payouts'
 import { globalFishingItemPools } from '@/data/games/fishing/item-pools'
 import type { FishingGameConfig } from '@/data/games/fishing/types'
+import type { PrizeWheelGameConfig } from '@/data/games/prize-wheel/types'
 import { subCategories } from '@/data/sub-region-map'
 import { ALL_MOVE_DEX_ENTRIES } from '@/utilities/pokemon/movedex'
 import pokemonResearchLevelRewards from '@/data/pokemon-research-level-rewards.json'
@@ -2489,6 +2490,83 @@ describe('static data references', () => {
     expect(greatBallBundle?.rewards).toEqual([
       { type: 'item', quantity: 3, targetId: 'great-ball', dropChance: 100 },
     ])
+  })
+
+  test('Fuchsia City mart starts Rocket Ball and revive stock without copied bundles', () => {
+    const mart = shops.find((shop) => shop.id === 'fuchsia-city-mart')
+    const itemIds = mart?.items.map((item) => item.id) || []
+    const rewardIds =
+      mart?.items.flatMap((item) => item.rewards.map((reward) => reward.targetId)) || []
+    const reviveBundle = mart?.items.find((item) => item.id === 'revive-daily-bundle')
+
+    expect(mart?.requirements).toContainEqual({
+      type: 'task_completed',
+      targetId: 'explore-fuchsia-city',
+    })
+    expect(itemIds).not.toContain('poke-ball')
+    expect(itemIds).not.toContain('poke-ball-bundle')
+    expect(itemIds).not.toContain('great-ball')
+    expect(itemIds).not.toContain('great-ball-daily-bundle')
+    expect(itemIds).toContain('rocket-ball')
+    expect(itemIds).not.toContain('rocket-ball-bundle')
+    expect(itemIds).not.toContain('fresh-berries')
+    expect(itemIds).not.toContain('escape-rope-sale')
+    expect(rewardIds).toContain('revive')
+
+    const rocketBall = mart?.items.find((item) => item.id === 'rocket-ball')
+    expect(rocketBall?.cost).toEqual([
+      { type: 'currency', id: 'pokedollars', amount: 350 },
+    ])
+    expect(rocketBall?.rewards).toEqual([
+      { type: 'item', targetId: 'rocket-ball', quantity: 1, dropChance: 100 },
+    ])
+
+    const revive = mart?.items.find((item) => item.id === 'revive')
+    expect(revive?.cost).toEqual([
+      { type: 'currency', id: 'pokedollars', amount: 2000 },
+    ])
+    expect(revive?.rewards).toEqual([
+      { type: 'item', targetId: 'revive', quantity: 1, dropChance: 100 },
+    ])
+    expect(reviveBundle).toMatchObject({
+      name: 'Revive Bundle',
+      stock: 1,
+      daily: true,
+      cost: [{ type: 'currency', id: 'pokedollars', amount: 2500 }],
+      rewards: [{ type: 'item', targetId: 'revive', quantity: 3, dropChance: 100 }],
+    })
+  })
+
+  test('Fuchsia Chansey Wheel awards X items and a rare Revive recipe', () => {
+    const wheel = allGames.find((game) => game.id === 'chansey-wheel-fuchsia')
+    const slots =
+      wheel?.gameType === 'prize-wheel'
+        ? (wheel.settings as PrizeWheelGameConfig['settings']).slots
+        : []
+    const xItemIds = ['x-attack', 'x-defense', 'x-sp-atk', 'x-sp-def', 'x-speed', 'dire-hit']
+    const recipeSlot = slots.find((slot) => slot.id === 'revive-recipe')
+
+    expect(wheel?.requirements).toContainEqual({
+      type: 'task_completed',
+      targetId: 'explore-fuchsia-city',
+    })
+    expect(slots.map((slot) => slot.id)).toEqual([...xItemIds, 'revive-recipe'])
+    expect(recipeSlot?.percentage).toBe(5)
+    expect(recipeSlot?.rewards).toEqual([
+      {
+        type: 'task_complete',
+        targetId: 'revive-recipe-discovery',
+        quantity: 1,
+        dropChance: 100,
+      },
+      {
+        type: 'task_complete',
+        targetId: 'revive-recipe',
+        quantity: 1,
+        dropChance: 100,
+      },
+    ])
+    expect(slots.reduce((total, slot) => total + slot.percentage, 0)).toBe(100)
   })
 
   test("Diglett's Cave unlocks from the sailor warning", () => {

@@ -757,6 +757,22 @@ const POKE_POWDER_RECIPES: ArtisanRecipeDraft[] = candyItems.map((candy, index) 
 })
 
 const ITEM_RECIPES: ArtisanRecipeDraft[] = [
+  {
+    id: 'craft-revive',
+    name: 'Revive',
+    description: 'Balance a restorative tonic that can bring a fainted Pokemon back into the fight.',
+    artisanLevel: 36,
+    costs: [{ id: 'crystals', amount: 100, type: 'currency' }],
+    rewards: [{ type: 'item', targetId: 'revive', quantity: 1, dropChance: 100 }],
+    craftType: 'balance',
+    outputQuantity: { min: 0, max: 1 },
+    qualityOutputQuantity: { bad: 0, good: 0, perfect: 1 },
+    minimumQuality: 'perfect',
+    materialFailQualities: ['bad', 'good'],
+    iconItemId: 'revive',
+    requirements: [{ type: 'task_completed', targetId: 'revive-recipe' }],
+    bulk: 3,
+  },
   ...[
     {
       id: 'x-attack',

@@ -99,6 +99,8 @@ export function ItemSelector() {
         if (effect.healFull) return 'Fully restore HP'
         if (effect.healAmount) return `Heal ${effect.healAmount} HP`
         return 'Heals HP'
+      case 'revive':
+        return `Revive to ${effect.reviveHpPercent || 50}% HP`
       case 'buff':
         return `+${effect.buffStages || 1} ${effect.buffStat?.replace(/([A-Z])/g, ' $1').toLowerCase() || 'stat'}`
       case 'tera':
@@ -115,6 +117,7 @@ export function ItemSelector() {
     if (activePlayerMon.status?.id === 'vanished') return true
 
     const effect = item.battleEffect
+    if (effect.type === 'revive') return activePlayerMon.currentHp <= 0
     if (effect.type === 'heal') {
       const missingHp = Math.max(
         0,
@@ -151,9 +154,10 @@ export function ItemSelector() {
     {} as Record<string, BattleInventoryItem[]>,
   )
 
-  const effectOrder = ['heal', 'buff', 'reveal-stance']
+  const effectOrder = ['heal', 'revive', 'buff', 'reveal-stance']
   const effectLabels: Record<string, string> = {
     heal: 'Healing',
+    revive: 'Revival',
     buff: 'Stat Boosts',
     'reveal-stance': 'Intel',
   }

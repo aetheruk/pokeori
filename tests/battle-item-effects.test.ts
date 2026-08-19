@@ -44,6 +44,26 @@ describe('battle item effects', () => {
     expect(pokemon.currentHp).toBe(100)
   })
 
+  test('Revive restores half HP only when the target is fainted', () => {
+    const pokemon = makeBattlePokemon({ currentHp: 0, maxHp: 120 })
+
+    const result = applyBattleItemEffect({
+      pokemon,
+      battleEffect: { type: 'revive', reviveHpPercent: 50 },
+    })
+
+    expect(result.applied).toBe(true)
+    expect(result.message).toBe('Bulbasaur was revived with 60 HP!')
+    expect(pokemon.currentHp).toBe(60)
+
+    const secondUse = applyBattleItemEffect({
+      pokemon,
+      battleEffect: { type: 'revive', reviveHpPercent: 50 },
+    })
+    expect(secondUse.applied).toBe(false)
+    expect(pokemon.currentHp).toBe(60)
+  })
+
   test('does not apply status cure when the status is absent', () => {
     const pokemon = makeBattlePokemon()
 

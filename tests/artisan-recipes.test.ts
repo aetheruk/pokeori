@@ -502,6 +502,33 @@ describe('artisan recipes', () => {
     }
   })
 
+  test('Fuchsia Revive recipe is a Perfect-only Balance craft with bulk output', () => {
+    const recipe = artisanRecipes.find((entry) => entry.id === 'craft-revive')
+
+    expect(recipe).toMatchObject({
+      category: 'items',
+      artisanLevel: 36,
+      craftType: 'balance',
+      costs: [{ id: 'crystals', amount: 100, type: 'currency' }],
+      outputQuantity: { min: 0, max: 1 },
+      qualityOutputQuantity: { bad: 0, good: 0, perfect: 1 },
+      minimumQuality: 'perfect',
+      bulk: 3,
+      requirements: [{ type: 'task_completed', targetId: 'revive-recipe' }],
+    })
+    expect(resolveCraftRewards(recipe!, 'bad')).toEqual([])
+    expect(resolveCraftRewards(recipe!, 'good')).toEqual([])
+    expect(resolveCraftRewards(recipe!, 'perfect')[0]).toMatchObject({
+      targetId: 'revive',
+      quantity: 1,
+    })
+    expect(resolveCraftRewards(recipe!, 'perfect', 3)[0]).toMatchObject({
+      targetId: 'revive',
+      quantity: 3,
+    })
+    expect(getArtisanCraftRequiredLevel(recipe!, 3)).toBe(41)
+  })
+
   test('status remedy recipes unlock together and use berries, candy dust, and typed materials', () => {
     const expectedRecipes = [
       {

@@ -7,6 +7,7 @@ import { ceruleanCitychanseyEntries } from './entries/cerulean-city'
 import { vermillionCitychanseyEntries } from './entries/vermillion-city'
 import { lavenderTownchanseyEntries } from './entries/lavender-town'
 import { celadonGameCornerPrizeWheelEntries } from './entries/celadon-game-corner'
+import { fuchsiaCitychanseyEntries } from './entries/fuchsia-city'
 
 export const chanseyEntries: PrizeWheelGameConfig[] = [
   ...viridianCitychanseyEntries,
@@ -14,5 +15,6 @@ export const chanseyEntries: PrizeWheelGameConfig[] = [
   ...ceruleanCitychanseyEntries,
   ...vermillionCitychanseyEntries,
   ...lavenderTownchanseyEntries,
+  ...fuchsiaCitychanseyEntries,
   ...celadonGameCornerPrizeWheelEntries,
 ]
