@@ -1,5 +1,6 @@
 # Current Game State
 
+- Release `0.13.47` fixes the GHCR release-history query used by the local deployment script so the three-image retention policy works with the installed GitHub CLI.
 - Release `0.13.46` tunes the Route 14 Junkyard Crew parts: the battle spark plug drop is 10%, the catching carburetor drop is 30%, and the Field Research chain-link drop is 16%; the post-clear secret rusty-bike-parts drop remains 1%. Battle Pokemon chips now show pink female or blue male symbols beside gendered names.
 - Release `0.13.45` fixes the Fuchsia/Cerulean progression polish and enemy Metronome presentation: Route 15's location, wild battle, and Field Research cards now use Venonat; `explore-fuchsia-city` uses the shorter arrival description and Koga-focused exit message; the Nature Module intro appears alongside Explore Fuchsia after the final Route 15 trainer; the Cerulean Cycles Worst Customer task is a normal requirement-gated task that appears after `bike-shop-trade` and owning `rusty-bike-parts`; and enemy Metronome now wins over the generic stance fallback when it resolves a valid called move, so the battle log names the called move instead of showing `Attack`.
 - Release `0.13.34` tunes the Celadon post-Snorlax guidance narrative:

@@ -167,13 +167,14 @@ main() {
   esac
 
   local package_versions
-  package_versions="$(GH_TOKEN="$GHCR_TOKEN" gh api --paginate --slurp \
+  package_versions="$(GH_TOKEN="$GHCR_TOKEN" gh api --paginate \
     "${package_versions_endpoint}?per_page=100" \
-    --jq 'add | sort_by(.created_at) | reverse | .[] | [(.id | tostring), ((.metadata.container.tags // []) | join(","))] | @tsv')" ||
+    --jq '.[] | [(.id | tostring), .created_at, ((.metadata.container.tags // []) | join(","))] | @tsv' |
+    sort -t $'\t' -k2,2r)" ||
     fail "Unable to list GHCR package versions. The release token needs package read/admin access."
 
-  local release_count=0 version_id tags
-  while IFS=$'\t' read -r version_id tags; do
+  local release_count=0 version_id created_at tags
+  while IFS=$'\t' read -r version_id created_at tags; do
     [[ -n "$version_id" ]] || continue
     [[ ",${tags}," == *,buildcache,* ]] && continue
 
