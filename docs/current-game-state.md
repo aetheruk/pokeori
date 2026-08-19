@@ -1,5 +1,6 @@
 # Current Game State
 
+- Release `0.13.48` standardizes player-facing typography with a self-hosted Next.js Nunito Sans import across player and dev layouts, applies it to display headings and body copy, replaces platform-dependent battle gender glyphs with stable Venus/Mars icons, refreshes the Nature Module quest names and Fern dialogue while keeping progression and rewards unchanged, uses the female `researcher-f` sprite consistently for Fern, and replaces Saffron takeover uses of the player-reward `rocket` icon with gendered `rocket-grunt-m` or `rocket-grunt-f` sprites.
 - Release `0.13.47` fixes the GHCR release-history query used by the local deployment script so the three-image retention policy works with the installed GitHub CLI.
 - Release `0.13.46` tunes the Route 14 Junkyard Crew parts: the battle spark plug drop is 10%, the catching carburetor drop is 30%, and the Field Research chain-link drop is 16%; the post-clear secret rusty-bike-parts drop remains 1%. Battle Pokemon chips now show pink female or blue male symbols beside gendered names.
 - Release `0.13.45` fixes the Fuchsia/Cerulean progression polish and enemy Metronome presentation: Route 15's location, wild battle, and Field Research cards now use Venonat; `explore-fuchsia-city` uses the shorter arrival description and Koga-focused exit message; the Nature Module intro appears alongside Explore Fuchsia after the final Route 15 trainer; the Cerulean Cycles Worst Customer task is a normal requirement-gated task that appears after `bike-shop-trade` and owning `rusty-bike-parts`; and enemy Metronome now wins over the generic stance fallback when it resolves a valid called move, so the battle log names the called move instead of showing `Attack`.
@@ -680,7 +681,7 @@ Route 15 unlocks after `route-15-choo-rest` (*Catching His Breath*), Detective C
 ### 14. Fuchsia City
 
 - `explore-fuchsia-city` appears after the final Route 15 trainer (Picnicker Yazmin) is defeated and requires 3 Route 15 wild battle wins, 3 Route 15 catches, and 1 successful Route 15 Field Observation before entering Fuchsia City.
-- `route-15-nature-module-intro` (*The Nature Module*) and `route-15-nature-module-study` (*The Lonely and the Brave*) are an optional humorous Researcher Fern quest after entering Fuchsia: own a Lonely-natured Ditto and a Brave-natured Ditto (both catchable on Route 15) to calibrate and earn the **Nature Module** (`nature-scanner`) Pokedex upgrade plus 1000 Researching XP. Pokemon ownership criteria now support `nature` matching alongside species, mirroring the size-based Mankey study.
+- `route-15-nature-module-intro` (*Fern's Big Ditto Theory*) and `route-15-nature-module-study` (*Two Ditto, One Theory*) are an optional humorous Researcher Fern quest after entering Fuchsia: own a Lonely-natured Ditto and a Brave-natured Ditto (both catchable on Route 15) to calibrate and earn the **Nature Module** (`nature-scanner`) Pokedex upgrade plus 1000 Researching XP. Pokemon ownership criteria now support `nature` matching alongside species, mirroring the size-based Mankey study.
 
 ## Known Future Gates
 

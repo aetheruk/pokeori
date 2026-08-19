@@ -479,6 +479,30 @@ describe('static data references', () => {
     expect(broken).toEqual([])
   })
 
+  test('authored content does not use the player reward Team Rocket icon', () => {
+    const legacyUsages: string[] = []
+    const visit = (value: unknown, owner: string): void => {
+      if (Array.isArray(value)) {
+        value.forEach((item, index) => visit(item, `${owner}[${index}]`))
+        return
+      }
+      if (!value || typeof value !== 'object') return
+
+      const record = value as Record<string, unknown>
+      if (record.type === 'trainer' && record.id === 'rocket') {
+        legacyUsages.push(owner)
+      }
+
+      Object.entries(record).forEach(([key, child]) =>
+        visit(child, `${owner}.${key}`),
+      )
+    }
+
+    exploreItems.forEach((entry) => visit(entry, `${entry.kind}:${entry.id}`))
+
+    expect(legacyUsages).toEqual([])
+  })
+
   test('expedition path activities resolve to authored content', () => {
     const broken: Array<{
       expeditionId: string

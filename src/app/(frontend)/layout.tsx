@@ -1,5 +1,6 @@
 import { PwaRegister } from '@/components/pwa-register'
 import { PwaEdgeNavigationGuard } from '@/components/pwa-edge-navigation-guard'
+import { appSans } from '@/app/fonts'
 import '@/styles/globals.css'
 import type { Metadata, Viewport } from 'next'
 import { ThemeProvider } from '@/components/theme-provider'
@@ -34,7 +35,7 @@ export default function RootLayout({
       <head>
         <meta name="apple-mobile-web-app-title" content="Pokeori" />
       </head>
-      <body className="bg-game-canvas text-game-ink antialiased">
+      <body className={`${appSans.variable} bg-game-canvas text-game-ink antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

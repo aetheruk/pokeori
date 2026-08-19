@@ -922,21 +922,21 @@ export const fuchsiaCityTasks: Task[] = [
   },
   {
     id: 'route-15-nature-module-intro',
-    name: 'The Nature Module',
+    name: "Fern's Big Ditto Theory",
     description:
-      'A Researcher near Fuchsia needs proof that even Ditto have personalities.',
+      'Researcher Fern has a theory about Ditto and needs two very different examples to prove it.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {
       type: 'trainer',
-      id: 'researcher',
+      id: 'researcher-f',
     },
     background: '/backgrounds/grassy-route.avif',
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
     chat: true,
-    completeButtonText: 'Talk to the Researcher',
+    completeButtonText: 'Hear Fern Out',
     requirements: [
       fuchsiaArrivalGate,
     ],
@@ -949,13 +949,13 @@ export const fuchsiaCityTasks: Task[] = [
         title: 'Researcher Fern',
         icon: {
           type: 'trainer',
-          id: 'researcher',
+          id: 'researcher-f',
         },
         message:
-          "Oh! A Trainer! Perfect timing. I'm calibrating the Nature Module - the last Pokedex tool that can read a Pokemon's personality. Some say it's not real science. THEY are not real scientists.",
+          "Hey, you! Sorry, I nearly walked right past you. I'm Fern. I'm trying to finish a little project, and I could use a hand. This is the Nature Module. It should be able to pick up on a Pokemon's nature, but I need to test it properly before I trust it.",
         buttons: [
           {
-            text: 'What do you need?',
+            text: 'What kind of test?',
             type: 'navigate',
             id: 2,
           },
@@ -967,13 +967,13 @@ export const fuchsiaCityTasks: Task[] = [
         title: 'Researcher Fern',
         icon: {
           type: 'trainer',
-          id: 'researcher',
+          id: 'researcher-f',
         },
         message:
-          "I need proof that Pokemon have personalities. Not just 'hmm, that Raticate looks grumpy'. Look at a Ditto - same face, same smile, every single time. If Ditto can feel anything, EVERYONE can. So bring me a Ditto that is, by nature, LONELY, and a Ditto that is, by nature, BRAVE. Catching either one is luck. Catching both is destiny. Or a really long afternoon.",
+          "Ditto seemed like the perfect place to start. Same face, same little blob, completely different personalities. I need one that's Lonely and one that's Brave. Route 15 is a good place to look, but natures are unpredictable. You might get lucky. Or you might spend the afternoon meeting a lot of very similar Ditto.",
         buttons: [
           {
-            text: 'Catching both it is',
+            text: "I'll look for them",
             type: 'success',
           },
         ],
@@ -984,18 +984,18 @@ export const fuchsiaCityTasks: Task[] = [
       title: 'Researcher Fern',
       icon: {
         type: 'trainer',
-        id: 'researcher',
+        id: 'researcher-f',
       },
       message:
-        "Fern hands you a checklist that says 'LONELY DITTO' and 'BRAVE DITTO' in increasingly large letters. 'Bring them to me when you find them. I will be here. I am always here.'",
-      closeButtonText: 'Start Hunting',
+        "Fern writes down 'Lonely Ditto' and 'Brave Ditto', then adds a note underneath: 'Do not accept two Ditto who are both just vibing.' 'Bring them back when you find them,' she says. 'I'll see what the module can make of them.'",
+      closeButtonText: 'Find the Ditto',
     },
   },
   {
     id: 'route-15-nature-module-study',
-    name: 'The Lonely and the Brave',
+    name: 'Two Ditto, One Theory',
     description:
-      'Researcher Fern needs a Lonely Ditto and a Brave Ditto to calibrate the Nature Module.',
+      'Fern is ready to test the Nature Module, if you can bring her a Lonely Ditto and a Brave Ditto.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {
@@ -1006,7 +1006,7 @@ export const fuchsiaCityTasks: Task[] = [
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Show the Pokemon',
+    completeButtonText: 'Show Fern the Ditto',
     requirements: [
       {
         type: 'task_completed',
@@ -1055,8 +1055,8 @@ export const fuchsiaCityTasks: Task[] = [
         id: 'nature-scanner',
       },
       message:
-        "Fern holds the Nature Module up to the Lonely Ditto, then the Brave Ditto, scribbles furiously, and beams. 'The data is PERFECT. Take it - the Nature Module is yours. Now go tell everyone what their Pokemon are really feeling. Even the blank-faced ones.'",
-      closeButtonText: 'Take Nature Module',
+        "Fern checks the module against the Lonely Ditto, then the Brave one. The screen flickers, chirps, and finally lights up. 'It works!' she says. 'They really are different. Same face, different feelings.' She presses the Nature Module into your hands. 'Take it. You found the proof, so you should get to use it.'",
+      closeButtonText: 'Take the Nature Module',
     },
   },
 ]

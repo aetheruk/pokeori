@@ -10,7 +10,7 @@ export const saffronCityTasks: Task[] = [
     subCategory: 'Saffron City',
     icon: {
       type: 'trainer',
-      id: 'rocket',
+      id: 'rocket-grunt-m',
     },
     background: '/backgrounds/saffron.avif',
     repeatable: false,
@@ -39,7 +39,7 @@ export const saffronCityTasks: Task[] = [
         background: '/backgrounds/saffron.avif',
         icon: {
           type: 'trainer',
-          id: 'rocket',
+          id: 'rocket-grunt-m',
         },
         buttons: [
           {
@@ -54,7 +54,7 @@ export const saffronCityTasks: Task[] = [
       title: 'Sabrina?',
       icon: {
         type: 'trainer',
-        id: 'rocket',
+        id: 'rocket-grunt-f',
       },
       message: 'Hello is anyo.........',
       closeButtonText: '....',
@@ -372,7 +372,7 @@ export const saffronCityTasks: Task[] = [
     subCategory: 'Saffron City',
     icon: {
       type: 'trainer',
-      id: 'rocket',
+      id: 'rocket-grunt-f',
     },
     background: '/backgrounds/saffron.avif',
     repeatable: true,
@@ -399,7 +399,7 @@ export const saffronCityTasks: Task[] = [
         message:
           'The shadows close in as rain begins to fall on Saffron City. The order is carried out in absolute silence.',
         background: '/backgrounds/saffron.avif',
-        icon: { type: 'trainer', id: 'rocket' },
+        icon: { type: 'trainer', id: 'rocket-grunt-f' },
         buttons: [{ text: 'Conclude Memory', type: 'success' }],
       },
     ],
@@ -549,7 +549,7 @@ export const saffronCityTasks: Task[] = [
         message:
           'From the darkened doorway, a poisoned needle glints in the rain, striking {trainer} before they can react. {trainer} stumbles, collapsing onto the rain-slick pavement as shadows scatter.',
         background: '/backgrounds/saffron.avif',
-        icon: { type: 'trainer', id: 'rocket' },
+        icon: { type: 'trainer', id: 'rocket-grunt-f' },
         buttons: [{ text: 'Ray Rushes In', type: 'navigate', id: 3 }],
       },
       {
@@ -566,7 +566,7 @@ export const saffronCityTasks: Task[] = [
         message:
           'Ray lunges forward, but from the mist beside the doorway, a second needle flashes. Ray gasps as a sudden, paralyzing chill tears through his veins.',
         background: '/backgrounds/saffron.avif',
-        icon: { type: 'trainer', id: 'rocket' },
+        icon: { type: 'trainer', id: 'rocket-grunt-f' },
         buttons: [{ text: 'Collapse', type: 'navigate', id: 5 }],
       },
       {
@@ -804,7 +804,7 @@ export const saffronCityTasks: Task[] = [
     subCategory: 'Saffron City',
     icon: {
       type: 'trainer',
-      id: 'rocket',
+      id: 'rocket-grunt-m',
     },
     background: '/backgrounds/saffron.avif',
     repeatable: true,
@@ -827,7 +827,7 @@ export const saffronCityTasks: Task[] = [
         message:
           'You look toward the fortified checkpoints of Saffron City. Team Rocket patrols the perimeter in force, and the memory of the lethal poisoned needle is still burned into your mind.',
         background: '/backgrounds/saffron.avif',
-        icon: { type: 'trainer', id: 'rocket' },
+        icon: { type: 'trainer', id: 'rocket-grunt-m' },
         buttons: [{ text: 'Think Ahead', type: 'navigate', id: 2 }],
       },
       {
@@ -836,14 +836,14 @@ export const saffronCityTasks: Task[] = [
         message:
           'Entering Saffron right now would be walking straight into another assassination trap. You have no intention of going here until you unravel the Rocket toxin and return fully prepared.',
         background: '/backgrounds/saffron.avif',
-        icon: { type: 'trainer', id: 'rocket' },
+        icon: { type: 'trainer', id: 'rocket-grunt-m' },
         buttons: [{ text: 'Turn Away', type: 'success' }],
       },
     ],
     exitModal: {
       background: '/backgrounds/saffron.avif',
       title: 'Saffron Under Lockdown',
-      icon: { type: 'trainer', id: 'rocket' },
+      icon: { type: 'trainer', id: 'rocket-grunt-m' },
       message:
         'You keep your distance from Saffron City. Your priority lies southward toward Fuchsia City with Master Koga.',
       closeButtonText: 'Plan Your Route',
