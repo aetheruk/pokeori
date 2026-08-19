@@ -6,6 +6,7 @@ import { basicEntries } from '@/data/games/rock-push'
 import { items } from '@/data/items'
 import { locations } from '@/data/locations'
 import { getMove } from '@/data/moves'
+import { subCategories } from '@/data/sub-region-map'
 import { tasks } from '@/data/tasks'
 import { buildExpeditionSteps } from '@/utilities/expeditions/path-builder'
 import type { RequirementData } from '@/utilities/requirements'
@@ -45,6 +46,21 @@ function mazeHasRoute(gameId: string) {
 }
 
 describe('Fuchsia Gym and Safari progression', () => {
+  test('the Empty Gym handoff unlocks the Safari Zone and its entry task', () => {
+    const emptyGymRequirement = {
+      type: 'task_completed' as const,
+      targetId: 'fuchsia-gym-search-for-koga',
+    }
+
+    expect(subCategories['Safari Zone']?.unlockRequirements).toContainEqual(
+      emptyGymRequirement,
+    )
+    expect(
+      tasks.find((task) => task.id === 'safari-zone-entry-denied')
+        ?.requirements,
+    ).toContainEqual(emptyGymRequirement)
+  })
+
   test('Koga Gym uses the FRLG trainers around solvable invisible mazes', () => {
     const trial = expeditions.find(
       (entry) => entry.id === 'fuchsia-gym-trial-expedition',

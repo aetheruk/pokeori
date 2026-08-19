@@ -282,6 +282,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/safari.avif',
     description: 'A huge nature reserve packed with Rare Pokemon.',
     music: '/music/viridian_forest.mp3',
+    unlockRequirements: [{ type: 'task_completed', targetId: 'fuchsia-gym-search-for-koga' }],
             weatherSlots: {
       1: 'rain',
       2: 'rain',
