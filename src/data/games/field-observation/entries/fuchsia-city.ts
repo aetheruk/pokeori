@@ -100,7 +100,7 @@ export const fuchsiaCityFieldObservationEntries: FieldObservationConfig[] = [
         {
           id: 'route-14-snapped-chain-link',
           itemId: 'snapped-chain-link',
-          dropChance: 10,
+          dropChance: 16,
           requirements: [
             {
               type: 'task_completed',
@@ -142,7 +142,7 @@ export const fuchsiaCityFieldObservationEntries: FieldObservationConfig[] = [
     subCategory: 'Fuchsia City',
     icon: {
       type: 'pokemon',
-      id: '85',
+      id: '48',
     },
     background: '/backgrounds/grassy-route.avif',
     requirements: [

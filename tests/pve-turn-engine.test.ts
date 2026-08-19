@@ -820,6 +820,38 @@ describe('PVE turn engine helpers', () => {
     expect(canEnemyPokemonUseAiMove(clefairy, getMove('metronome')!)).toBe(true)
   })
 
+  test('enemy AI uses Metronome instead of falling back to a basic Attack', () => {
+    const player = makePokemon({ name: 'Player', types: ['normal'] })
+    const enemy = makePokemon({
+      id: 'clefairy-enemy',
+      name: 'Clefairy',
+      speciesId: 35,
+      formId: '35',
+      types: ['fairy'],
+      aiMoves: ['metronome'],
+      aiMoveLoadout: ['metronome'],
+      moveUsesRemaining: 1,
+    })
+    const state = makeState(player, enemy)
+    state.enemyMoveUsesRemaining = 1
+    state.ai = { version: 1, profile: 'trainer' }
+
+    const action = chooseEnemyBattleAction({
+      state,
+      enemyMon: enemy,
+      playerMon: player,
+      canUseItems: false,
+      canSwitch: false,
+      consumeMoveUse: false,
+      random: () => 0.5,
+    })
+
+    expect(action.kind).toBe('move')
+    if (action.kind !== 'move') return
+    expect(action.move.calledByMetronome).toBe(true)
+    expect(action.move.move.id).not.toBe('metronome')
+  })
+
   test('advanced enemy AI can generate Hidden Power outside authored form list', () => {
     const charizard = makePokemon({
       speciesId: 6,

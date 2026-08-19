@@ -100,6 +100,7 @@ export function BattleHeader({
               activeEnemyMon.name
             }
             level={activeEnemyMon.level}
+            gender={activeEnemyMon.gender}
             align="right"
             status={activeEnemyMon.status}
             preferredStance={activeEnemyMon.observedPreferredStance}
@@ -119,6 +120,7 @@ export function BattleHeader({
                 activePlayerMon.name
               }
               level={activePlayerMon.level}
+              gender={activePlayerMon.gender}
               isPlayer
               align="left"
               status={activePlayerMon.status}

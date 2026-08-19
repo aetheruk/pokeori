@@ -40,7 +40,8 @@ export const fuchsiaCityBattles: BattleConfig[] = [
   {
     id: 'route-13-battle',
     name: 'Route 13',
-    description: 'Wild Pokemon crowd the tall grass along the long east-west road toward Fuchsia City.',
+    description:
+      'Wild Pokemon crowd the tall grass along the long east-west road toward Fuchsia City.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {
@@ -437,7 +438,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
         type: 'item',
         targetId: 'greasy-spark-plug',
         quantity: 1,
-        dropChance: 8,
+        dropChance: 10,
         requirements: [
           {
             type: 'task_completed',
@@ -641,8 +642,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     trainerClassId: 'bird-keeper',
     trainerName: 'Donald',
     name: 'Bird Champion Donald',
-    description:
-      'The Bird Champion of Route 14. His level 31 Farfetch\u2019d leads the flock.',
+    description: 'The Bird Champion of Route 14. His level 31 Farfetch\u2019d leads the flock.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {
@@ -986,7 +986,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     subCategory: 'Fuchsia City',
     icon: {
       type: 'pokemon',
-      id: '85',
+      id: '48',
     },
     background: '/backgrounds/grassy-route.avif',
     requirements: [route15Gate],
@@ -1034,9 +1034,8 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     id: 'route-15-crush-kin-ron-mya',
     trainerClassId: 'old-couple',
     trainerName: 'Ron & Mya',
-    name: 'Crush Kin Ron & Mya',
-    description:
-      'A fighting duo whose Hitmons carry Black Belts they never train without.',
+    name: 'Ron & Mya',
+    description: 'A fighting duo whose Hitmons carry Black Belts they never train without.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {

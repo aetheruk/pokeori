@@ -9,6 +9,7 @@ interface HealthDisplayProps {
   maxHp: number
   name: string
   level: number
+  gender?: string | null
   isPlayer?: boolean
   centered?: boolean
   align?: 'left' | 'right' | 'center'
@@ -21,6 +22,7 @@ export function HealthDisplay({
   maxHp,
   name,
   level,
+  gender,
   isPlayer,
   centered,
   align,
@@ -35,6 +37,7 @@ export function HealthDisplay({
   const identityChip = (
     <span className="inline-flex min-w-0 items-center gap-1.5 rounded-full border border-game-border bg-game-surface-raised px-2.5 py-1 text-[11px] font-bold text-game-ink shadow-sm">
       <span className="truncate">{name}</span>
+      <GenderBadge gender={gender} />
       {preferredStance && <StanceBadge stance={preferredStance} />}
       <span className="font-mono text-[10px] text-game-muted">Lv. {level}</span>
     </span>
@@ -97,6 +100,28 @@ export function HealthDisplay({
         )}
       </div>
     </div>
+  )
+}
+
+function GenderBadge({ gender }: { gender?: string | null }) {
+  const config =
+    gender === 'female'
+      ? { label: 'Female', symbol: '♀', className: 'text-pink-600' }
+      : gender === 'male'
+        ? { label: 'Male', symbol: '♂', className: 'text-blue-600' }
+        : null
+
+  if (!config) return null
+
+  return (
+    <span
+      className={cn('shrink-0 text-sm font-black leading-none', config.className)}
+      role="img"
+      aria-label={config.label}
+      title={config.label}
+    >
+      {config.symbol}
+    </span>
   )
 }
 

@@ -326,7 +326,7 @@ export const ceruleanCityTasks: Task[] = [
     },
     background: '/backgrounds/bike-shop.avif',
     repeatable: false,
-    secret: true,
+    secret: false,
     completionTrigger: 'manual',
     chat: true,
     completeButtonText: 'Hand Over the Parts',

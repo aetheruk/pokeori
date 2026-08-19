@@ -825,9 +825,14 @@ function calledMoveScore(params: {
         move: resolved,
         weather: params.weather,
       })
+  // Metronome is itself the enemy's authored special move. Keep it above a
+  // generic stance action so a valid called move is actually used instead of
+  // silently rendering as the fallback Attack action.
+  const scoredMove =
+    params.move.id === 'metronome' ? Math.max(score, 45) : score
 
   return {
-    score: score - getProfileConfig(params.profile).resourcePenalty,
+    score: scoredMove - getProfileConfig(params.profile).resourcePenalty,
     stance,
     attackType,
     effectOnly,

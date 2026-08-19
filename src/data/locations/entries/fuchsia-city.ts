@@ -93,7 +93,7 @@ export const fuchsiaCityLocations: Location[] = [
         type: 'item',
         quantity: 1,
         targetId: 'bent-carburetor',
-        dropChance: 10,
+        dropChance: 30,
         requirements: [
           {
             type: 'task_completed',
@@ -136,7 +136,7 @@ export const fuchsiaCityLocations: Location[] = [
     subCategory: 'Fuchsia City',
     icon: {
       type: 'pokemon',
-      id: '85',
+      id: '48',
     },
     background: '/backgrounds/grassy-route.avif',
     levelRange: {
