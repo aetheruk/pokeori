@@ -1245,4 +1245,25 @@ describe('generated game data schemas', () => {
       ).toBe(false)
     }
   })
+
+  test('Chansey wheels use icon-only faces without changing Rocket wheels', () => {
+    const chanseyWheels = allGames.filter(
+      (entry): entry is PrizeWheelGameConfig =>
+        entry.gameType === 'prize-wheel' &&
+        entry.id.startsWith('chansey-wheel-'),
+    )
+    expect(chanseyWheels).toHaveLength(6)
+    expect(
+      chanseyWheels.every((entry) => entry.settings.showSlotLabels === false),
+    ).toBe(true)
+
+    const rocketWheels = allGames.filter(
+      (entry): entry is PrizeWheelGameConfig =>
+        entry.gameType === 'prize-wheel' && entry.id.includes('rocket'),
+    )
+    expect(rocketWheels.length).toBeGreaterThan(0)
+    expect(
+      rocketWheels.every((entry) => entry.settings.showSlotLabels !== false),
+    ).toBe(true)
+  })
 })

@@ -2551,6 +2551,20 @@ describe('static data references', () => {
       targetId: 'explore-fuchsia-city',
     })
     expect(slots.map((slot) => slot.id)).toEqual([...xItemIds, 'revive-recipe'])
+    expect(
+      wheel?.gameType === 'prize-wheel'
+        ? wheel.settings.showSlotLabels
+        : undefined,
+    ).toBe(false)
+    expect(slots.map((slot) => slot.color)).toEqual([
+      '#F1AEC6',
+      '#E8F3E2',
+      '#F1AEC6',
+      '#E8F3E2',
+      '#F1AEC6',
+      '#E8F3E2',
+      '#f7cf05',
+    ])
     expect(recipeSlot?.percentage).toBe(5)
     expect(recipeSlot?.requirements).toEqual([
       {

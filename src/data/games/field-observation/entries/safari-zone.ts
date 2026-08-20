@@ -95,7 +95,9 @@ function safariStudy({
   icon,
   pokemonPool,
   requirements,
-  discoveryTask,
+  category = 'Secret',
+  hide,
+  rewards = [],
 }: {
   id: string
   name: string
@@ -103,18 +105,21 @@ function safariStudy({
   icon: string
   pokemonPool: FieldObservationPokemonPoolEntry[]
   requirements: FieldObservationConfig['requirements']
-  discoveryTask: string
+  category?: string
+  hide?: string
+  rewards?: FieldObservationConfig['rewards']
 }): FieldObservationConfig {
   return {
     id,
     name,
     description,
-    category: 'Secret',
+    category,
     subCategory: 'Safari Zone',
     icon: { type: 'pokemon', id: icon },
     background: '/backgrounds/safari-reserve.avif',
     requirements,
-    rewards: [discoveryReward(id, discoveryTask)],
+    rewards,
+    ...(hide ? { hide } : {}),
     skillXp: { skill: 'researching', level: 30 },
     settings: {
       pokemonPool,
@@ -131,6 +136,11 @@ const passRequirement = {
   targetId: 'safari-research-pass',
 }
 
+const catchingPermitRequirement = {
+  type: 'item_owned' as const,
+  targetId: 'safari-catching-permit',
+}
+
 export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
   safariStudy({
     id: 'safari-central-field-observation',
@@ -139,11 +149,18 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
       'Study the open grass, busy paths, and mixed habitats around Safari Central.',
     icon: '111',
     pokemonPool: centralPool,
+    category: 'Kanto',
+    hide: 'safari-discovery-east',
     requirements: [
       passRequirement,
       { type: 'task_completed', targetId: 'safari-clue-last-sign-out' },
     ],
-    discoveryTask: 'safari-discovery-east',
+    rewards: [
+      discoveryReward(
+        'safari-central-field-observation',
+        'safari-discovery-east',
+      ),
+    ],
   }),
   safariStudy({
     id: 'safari-east-field-observation',
@@ -152,11 +169,18 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
       'Observe the Pokémon living around the eastern ponds, tall grass, and raised boardwalks.',
     icon: '115',
     pokemonPool: eastPool,
+    category: 'Kanto',
+    hide: 'safari-discovery-west',
     requirements: [
       passRequirement,
       { type: 'task_completed', targetId: 'safari-clue-reed-twice' },
     ],
-    discoveryTask: 'safari-discovery-west',
+    rewards: [
+      discoveryReward(
+        'safari-east-field-observation',
+        'safari-discovery-west',
+      ),
+    ],
   }),
   safariStudy({
     id: 'safari-west-field-observation',
@@ -165,11 +189,18 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
       'Record the Pokémon sheltering among the western woods and quiet rest houses.',
     icon: '123',
     pokemonPool: westPool,
+    category: 'Kanto',
+    hide: 'safari-discovery-north',
     requirements: [
       passRequirement,
       { type: 'task_completed', targetId: 'safari-clue-powder-boardwalk' },
     ],
-    discoveryTask: 'safari-discovery-north',
+    rewards: [
+      discoveryReward(
+        'safari-west-field-observation',
+        'safari-discovery-north',
+      ),
+    ],
   }),
   safariStudy({
     id: 'safari-north-field-observation',
@@ -178,10 +209,53 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
       'Survey the rocky ledges and narrow channels that shape Safari North.',
     icon: '128',
     pokemonPool: northPool,
+    category: 'Kanto',
+    hide: 'safari-discovery-search-complete',
     requirements: [
       passRequirement,
       { type: 'task_completed', targetId: 'safari-clue-purple-thread' },
     ],
-    discoveryTask: 'safari-discovery-search-complete',
+    rewards: [
+      discoveryReward(
+        'safari-north-field-observation',
+        'safari-discovery-search-complete',
+      ),
+    ],
+  }),
+  safariStudy({
+    id: 'safari-central-expedition-field-observation',
+    name: 'Central Habitat Survey',
+    description:
+      'Study the open grass, busy paths, and mixed habitats around Safari Central.',
+    icon: '111',
+    pokemonPool: centralPool,
+    requirements: [catchingPermitRequirement],
+  }),
+  safariStudy({
+    id: 'safari-east-expedition-field-observation',
+    name: 'Eastern Habitat Survey',
+    description:
+      'Observe the Pokémon living around the eastern ponds, tall grass, and raised boardwalks.',
+    icon: '115',
+    pokemonPool: eastPool,
+    requirements: [catchingPermitRequirement],
+  }),
+  safariStudy({
+    id: 'safari-west-expedition-field-observation',
+    name: 'Western Habitat Survey',
+    description:
+      'Record the Pokémon sheltering among the western woods and quiet rest houses.',
+    icon: '123',
+    pokemonPool: westPool,
+    requirements: [catchingPermitRequirement],
+  }),
+  safariStudy({
+    id: 'safari-north-expedition-field-observation',
+    name: 'Northern Habitat Survey',
+    description:
+      'Survey the rocky ledges and narrow channels that shape Safari North.',
+    icon: '128',
+    pokemonPool: northPool,
+    requirements: [catchingPermitRequirement],
   }),
 ]

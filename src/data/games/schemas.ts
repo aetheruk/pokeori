@@ -664,6 +664,7 @@ const settingsByGameType: Record<string, z.ZodTypeAny> = {
     .object({
       slots: z.array(z.object({ id: z.string(), percentage: z.number().min(0).max(100) }).passthrough()),
       spinTime: z.object({ min: z.number().positive(), max: z.number().positive() }),
+      showSlotLabels: z.boolean().optional(),
       cost: costSchema.optional(),
     })
     .passthrough(),

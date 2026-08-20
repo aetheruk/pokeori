@@ -21,6 +21,7 @@ export interface PrizeWheelGameConfig extends BaseGameConfig {
     }
     background?: string
     themeColour?: string // Hex color for wheel theming (border, buttons, etc.)
+    showSlotLabels?: boolean // Defaults to true; labels remain available to assistive technology.
     cost?: {
       amount: number
       currencyType:

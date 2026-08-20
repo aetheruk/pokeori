@@ -134,6 +134,7 @@ export function PrizeWheelGame({
   const slots: PrizeWheelSlot[] =
     initialState?.roundData?.prizeWheelSlots || encounter.settings.slots || []
   const sliceSize = 360 / slots.length
+  const showSlotLabels = encounter.settings.showSlotLabels !== false
 
   // Cost info
   const cost = encounter.settings.cost
@@ -386,9 +387,13 @@ export function PrizeWheelGame({
                       className="w-full h-full"
                     />
                   </div>
-                  <span className="max-w-16 text-center text-[10px] font-black leading-none drop-shadow-md">
-                    {slot.label}
-                  </span>
+                  {showSlotLabels ? (
+                    <span className="max-w-16 text-center text-[10px] font-black leading-none drop-shadow-md">
+                      {slot.label}
+                    </span>
+                  ) : (
+                    <span className="sr-only">{slot.label}</span>
+                  )}
                 </div>
               )
             })}

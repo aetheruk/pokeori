@@ -2,6 +2,7 @@ import type {
   FieldObservationGlobalItemEvent,
   FieldObservationGlobalPokemonEvent,
 } from './types'
+import { FIELD_OBSERVATION_RESEARCH_KIT_DROP_CHANCE } from './rewards'
 
 const notOwned = (itemId: string) => ({
   type: 'item_owned' as const,
@@ -83,6 +84,16 @@ export const fieldObservationGlobalPokemonEvents: FieldObservationGlobalPokemonE
 ]
 
 export const fieldObservationGlobalItemEvents: FieldObservationGlobalItemEvent[] = [
+  {
+    id: 'global-field-observation-research-kit',
+    itemId: 'research-kit',
+    dropChance: FIELD_OBSERVATION_RESEARCH_KIT_DROP_CHANCE,
+    quantity: 1,
+    guaranteed: true,
+    requirements: [
+      { type: 'skill_level', targetId: 'researching', count: 35 },
+    ],
+  },
   {
     id: 'global-field-observation-neutral-stone',
     itemId: 'neutral-stone',

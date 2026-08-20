@@ -95,7 +95,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
     name: 'Central Survey',
     description:
       'Survey the busy gate paths and trampled grass, then make a Safari catch before returning with your field notes.',
-    fieldResearchId: 'safari-central-field-observation',
+    fieldResearchId: 'safari-central-expedition-field-observation',
     locationId: 'safari-central-catch',
     icon: '111',
   }),
@@ -104,7 +104,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
     name: 'Eastern Survey',
     description:
       'Follow the eastern boardwalks through tall grass and pond edges, recording wildlife before attempting a catch.',
-    fieldResearchId: 'safari-east-field-observation',
+    fieldResearchId: 'safari-east-expedition-field-observation',
     locationId: 'safari-east-catch',
     icon: '115',
     requirements: [fiveClears('safari-central-expedition')],
@@ -114,7 +114,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
     name: 'Western Survey',
     description:
       'Work through shaded woodland lanes and old shelters, gathering observations and attempting a Safari catch.',
-    fieldResearchId: 'safari-west-field-observation',
+    fieldResearchId: 'safari-west-expedition-field-observation',
     locationId: 'safari-west-catch',
     icon: '123',
     requirements: [fiveClears('safari-east-expedition')],
@@ -124,7 +124,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
     name: 'Northern Survey',
     description:
       'Cross the northern ledges and old service paths, complete a habitat survey, and attempt a Safari catch.',
-    fieldResearchId: 'safari-north-field-observation',
+    fieldResearchId: 'safari-north-expedition-field-observation',
     locationId: 'safari-north-catch',
     icon: '128',
     requirements: [fiveClears('safari-west-expedition')],
