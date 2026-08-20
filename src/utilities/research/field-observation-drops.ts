@@ -27,6 +27,13 @@ import type {
 
 type RandomFn = () => number
 
+type CollectibleReward = {
+  reward: Reward
+  kind: FieldObservationCollectibleKind
+  displayItemId?: string
+  displayLabel?: string
+}
+
 export interface FieldObservationCollectibleModifier {
   dropChanceMultiplier?: number
   quantityBonus?: number
@@ -134,10 +141,7 @@ export function buildFieldObservationCollectibleDrops({
   )
 
   const nutPool = new Set<string>(FIELD_OBSERVATION_NUTS)
-  const rewardsWithKinds: {
-    reward: Reward
-    kind: FieldObservationCollectibleKind
-  }[] = [
+  const rewardsWithKinds: CollectibleReward[] = [
     ...materialRewards.map((reward) => ({ reward, kind: 'material' as const })),
     ...gemRewards.map((reward) => ({ reward, kind: 'item' as const })),
     ...focusedBerryRewards.map((reward) => ({
@@ -155,7 +159,7 @@ export function buildFieldObservationCollectibleDrops({
       kind: 'broken-ball' as const,
     })),
     ...globalItemEvents.map((event) => ({
-      reward: {
+      reward: event.reward || {
         type: 'item' as const,
         targetId: event.itemId,
         quantity: event.quantity || 1,
@@ -164,10 +168,13 @@ export function buildFieldObservationCollectibleDrops({
         secret: event.secret,
       },
       kind: 'item' as const,
+      displayItemId: event.itemId,
+      displayLabel: event.label,
     })),
   ].filter(
     ({ reward }) =>
-      reward.type === 'item' && typeof reward.targetId === 'string',
+      (reward.type === 'item' || reward.type === 'currency') &&
+      typeof reward.targetId === 'string',
   )
 
   const maxDrops = surveyFocus === 'swarm-survey' ? 8 : 6
@@ -183,10 +190,13 @@ export function buildFieldObservationCollectibleDrops({
   ]
   const durationMultiplier = getDurationMultiplier(collectibleModifiers)
 
-  return selectedRewards.map(({ reward, kind }, index) =>
+  return selectedRewards.map(
+    ({ reward, kind, displayItemId, displayLabel }, index) =>
     scheduleCollectibleDrop({
       reward: { ...applyQuantityBonus(reward, collectibleModifiers), dropChance: 100 },
       kind,
+      displayItemId,
+      displayLabel,
       index,
       spawns,
       observationDurationMs,
@@ -268,6 +278,8 @@ function isGuaranteedReward(reward: Reward) {
 function scheduleCollectibleDrop({
   reward,
   kind,
+  displayItemId,
+  displayLabel,
   index,
   spawns,
   observationDurationMs,
@@ -276,13 +288,15 @@ function scheduleCollectibleDrop({
 }: {
   reward: Reward
   kind: FieldObservationCollectibleKind
+  displayItemId?: string
+  displayLabel?: string
   index: number
   spawns: FieldObservationSpawn[]
   observationDurationMs: number
   durationMultiplier: number
   random: RandomFn
 }): FieldObservationPrivateCollectibleDrop {
-  const itemId = String(reward.targetId)
+  const itemId = displayItemId || String(reward.targetId)
   const sourceSpawn = pickSourceSpawn(itemId, spawns, random)
   const durationMs = Math.round(randomRange(1700, 2600, random) * durationMultiplier)
   const latestStart = Math.max(0, observationDurationMs - durationMs - 800)
@@ -300,7 +314,7 @@ function scheduleCollectibleDrop({
   return {
     id: `drop-${index}-${itemId}`,
     itemId,
-    label: getItemName(itemId),
+    label: displayLabel || getItemName(itemId),
     kind,
     startMs,
     durationMs,

@@ -821,7 +821,7 @@ export function getFormattedRewards(
     const fieldObservationItemDrops =
       selectedItem.originalData.settings?.itemDrops || []
     fieldObservationItemDrops.forEach((drop: any) => {
-      const reward = {
+      const reward = drop.reward || {
         type: 'item',
         targetId: drop.itemId,
         quantity: drop.quantity || 1,

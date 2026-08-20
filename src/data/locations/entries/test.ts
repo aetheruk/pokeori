@@ -5,7 +5,7 @@ export const testLocations: Location[] = [
     id: 'test-safari-catching',
     name: 'Safari Catching Test',
     description:
-      'A controlled Safari encounter for testing the Oran Berry, small stone, and Safari Ball interactions.',
+      'A controlled Safari encounter for testing the Oran Berry, Tamato Berry, and Safari Ball interactions.',
     category: 'Kanto',
     subCategory: 'Test',
     icon: {

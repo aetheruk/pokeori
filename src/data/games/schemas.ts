@@ -10,6 +10,7 @@ const currencyTypeSchema = z.enum([
   'berry-powder',
   'prof-scrip',
   'league-ticket',
+  'safari-notes',
 ])
 
 const taskIconSchema = z.object({
@@ -327,6 +328,8 @@ const fieldObservationItemDropSchema = z
   .object({
     id: z.string().min(1).max(80),
     itemId: z.string().min(1),
+    reward: rewardSchema.optional(),
+    label: z.string().optional(),
     dropChance: z.number().min(0).max(100),
     secret: z.boolean().optional(),
     quantity: z

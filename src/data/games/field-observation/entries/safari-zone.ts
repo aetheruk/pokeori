@@ -79,6 +79,19 @@ function discoveryReward(taskId: string) {
   }
 }
 
+const safariNoteBubble = {
+  id: 'safari-note-bubble',
+  itemId: 'researchers-journal-page',
+  label: 'Safari Note',
+  dropChance: 20,
+  reward: {
+    type: 'currency' as const,
+    targetId: 'safari-notes',
+    quantity: 1,
+    dropChance: 100,
+  },
+}
+
 function safariStudy({
   id,
   name,
@@ -89,6 +102,7 @@ function safariStudy({
   category = 'Secret',
   hide,
   rewards = [],
+  itemDrops = [],
   expeditionOnly = false,
 }: {
   id: string
@@ -100,6 +114,7 @@ function safariStudy({
   category?: string
   hide?: string
   rewards?: FieldObservationConfig['rewards']
+  itemDrops?: FieldObservationConfig['settings']['itemDrops']
   expeditionOnly?: boolean
 }): FieldObservationConfig {
   return {
@@ -121,6 +136,7 @@ function safariStudy({
       timeLimit: 12,
       answerTimeLimit: 12,
       difficulty: 2,
+      ...(itemDrops.length > 0 ? { itemDrops } : {}),
     },
   }
 }
@@ -148,6 +164,7 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
     rewards: [
       discoveryReward('safari-discovery-east'),
     ],
+    itemDrops: [safariNoteBubble],
   }),
   safariStudy({
     id: 'safari-east-field-observation',
@@ -161,6 +178,7 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
     rewards: [
       discoveryReward('safari-discovery-west'),
     ],
+    itemDrops: [safariNoteBubble],
   }),
   safariStudy({
     id: 'safari-west-field-observation',
@@ -174,6 +192,7 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
     rewards: [
       discoveryReward('safari-discovery-north'),
     ],
+    itemDrops: [safariNoteBubble],
   }),
   safariStudy({
     id: 'safari-north-field-observation',
@@ -187,6 +206,7 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
     rewards: [
       discoveryReward('safari-discovery-search-complete'),
     ],
+    itemDrops: [safariNoteBubble],
   }),
   safariStudy({
     id: 'safari-central-expedition-field-observation',

@@ -78,6 +78,11 @@ export const icons: IconConfig[] = [
     icon: { type: 'trainer', id: 'gb-blue-2' },
   },
   { id: 'nugget', name: 'Nugget', icon: { type: 'item', id: 'nugget' } },
+  {
+    id: 'safari-ball',
+    name: 'Safari Ball',
+    icon: { type: 'item', id: 'safari-ball' },
+  },
   { id: 'nidoking', name: 'Nidoking', icon: { type: 'pokemon', id: '34' } },
   { id: 'nidoqueen', name: 'Nidoqueen', icon: { type: 'pokemon', id: '31' } },
   // Gen 2

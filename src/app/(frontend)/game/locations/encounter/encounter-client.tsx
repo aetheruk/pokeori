@@ -822,7 +822,7 @@ export default function EncounterPage() {
   }
 
   const handleSafariAction = useCallback(
-    async (action: 'feed' | 'rock') => {
+    async (action: 'feed' | 'tamato') => {
       if (!encounter || submittingSafariAction) return
       setSubmittingSafariAction(true)
       playSelectSfx()
@@ -1931,11 +1931,11 @@ export default function EncounterPage() {
                   repeatable
                   options={[
                     { id: 'oran-berry', label: 'Oran Berry' },
-                    { id: 'small-stone-t1', label: 'Small Stone' },
+                    { id: 'tamato-berry', label: 'Tamato Berry' },
                   ]}
                   onThrow={(itemId) =>
                     void handleSafariAction(
-                      itemId === 'oran-berry' ? 'feed' : 'rock',
+                      itemId === 'oran-berry' ? 'feed' : 'tamato',
                     )
                   }
                 />

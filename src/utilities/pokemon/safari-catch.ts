@@ -1,6 +1,6 @@
 import { getCatchStageValue } from './catch-balance'
 
-export type SafariEncounterAction = 'feed' | 'rock'
+export type SafariEncounterAction = 'feed' | 'tamato'
 
 export const SAFARI_BALL_ID = 'safari-ball'
 export const SAFARI_BALL_ALLOWANCE = 30
@@ -49,7 +49,7 @@ export function resolveSafariAction({
   baseFleeRate: number
   random?: () => number
 }) {
-  const catchAnswerEquivalent = action === 'rock' ? 5 : 1
+  const catchAnswerEquivalent = action === 'tamato' ? 5 : 1
   const stage = currentStage + catchAnswerEquivalent
   const catchRate = clamp(
     currentCatchRate +
@@ -58,7 +58,7 @@ export function resolveSafariAction({
     255,
   )
   const fleeRate =
-    action === 'rock'
+    action === 'tamato'
       ? getSafariFleeChance({ baseFleeRate: baseFleeRate + 10 })
       : getSafariFleeChance({
           baseFleeRate: baseFleeRate - (Math.floor(random() * 3) + 1),

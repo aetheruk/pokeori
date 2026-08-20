@@ -1,5 +1,6 @@
 import { BaseGameConfig } from '../shared'
 import type { TaskCondition } from '@/data/tasks/types'
+import type { Reward } from '@/data/types'
 
 export interface FieldObservationPokemonPoolEntry {
   speciesId: number
@@ -40,6 +41,10 @@ export interface FieldObservationGlobalPokemonEvent {
 export interface FieldObservationItemDrop {
   id: string
   itemId: string
+  /** Optional direct reward override for authored collectible bubbles. */
+  reward?: Reward
+  /** Label shown on the collectible bubble instead of the item name. */
+  label?: string
   dropChance: number
   quantity?: number | { min: number; max: number }
   /** Preserve a drop that has already won its chance roll when the round is full. */

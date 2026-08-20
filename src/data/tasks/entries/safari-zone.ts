@@ -6,6 +6,7 @@ const janineIcon = { type: 'trainer' as const, id: 'chronicle-janine' }
 const rangerIcon = { type: 'trainer' as const, id: 'ranger' }
 const detectiveIcon = { type: 'trainer' as const, id: 'detective' }
 const billiamIcon = { type: 'trainer' as const, id: 'gamer' }
+const researcherIcon = { type: 'trainer' as const, id: 'researcher-f' }
 
 const retiredSafariExpeditionTaskIds = new Set([
   'safari-expedition-supply-case',
@@ -96,6 +97,179 @@ const hiddenDiscovery = ({
     closeButtonText,
   },
 })
+
+const safariCreditMarkerTask = ({
+  id,
+  name,
+  description,
+  icon,
+}: {
+  id: string
+  name: string
+  description: string
+  icon: Task['icon']
+}): Task => ({
+  id,
+  name,
+  description,
+  category: 'Secret',
+  subCategory: 'Safari Zone',
+  icon,
+  background: '/backgrounds/safari-reserve.avif',
+  repeatable: false,
+  secret: true,
+  completionTrigger: 'manual',
+  requirements: [],
+  criteria: [],
+  rewards: [],
+})
+
+const safariCreditTasks: Task[] = [
+  {
+    id: 'safari-researcher-responsibility',
+    name: "A Researcher's Responsibility",
+    description: 'A Researcher from the institute seems keen to share notes.',
+    category: 'Kanto',
+    subCategory: 'Safari Zone',
+    icon: researcherIcon,
+    background: '/backgrounds/safari-reserve.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Talk to the Researcher',
+    requirements: [
+      {
+        type: 'expedition_result',
+        targetId: 'safari-zone-grand-expedition',
+        expeditionStatus: 'completed',
+        count: 1,
+      },
+    ],
+    criteria: [],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        background: '/backgrounds/safari-reserve.avif',
+        title: 'Safari Zone Researcher',
+        icon: researcherIcon,
+        message: 'Hey {Trainer} It is {Trainer} right?',
+        buttons: [{ text: 'Yup.', type: 'navigate', id: 2 }],
+      },
+      {
+        id: 2,
+        background: '/backgrounds/safari-reserve.avif',
+        title: 'Safari Zone Researcher',
+        icon: researcherIcon,
+        message:
+          "Sorry you left in such a rush before we didn't get to explain the institute's share-and-share-alike policy. Basically, any notes you make while researching the Safari Zone are invaluable to the institute, and we look after our top researchers.",
+        buttons: [{ text: 'Sounds Good!', type: 'success' }],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/safari-reserve.avif',
+      title: 'Research Credit',
+      icon: researcherIcon,
+      message:
+        'Apparently just by jotting down my notes I can get rewarded, excellent!',
+      closeButtonText: 'Visit the Research Credit Store',
+    },
+  },
+  {
+    id: 'safari-rewilding',
+    name: 'Rewilding',
+    description: 'Time to rehome the pokemon I researched in the Safari Zone',
+    category: 'Kanto',
+    subCategory: 'Safari Zone',
+    icon: { type: 'pokemon', id: '128' },
+    background: '/backgrounds/safari-reserve.avif',
+    repeatable: true,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Rehome the Pokémon',
+    requirements: [
+      { type: 'task_completed', targetId: 'safari-researcher-responsibility' },
+    ],
+    criteria: [
+      {
+        type: 'pokemon_owned',
+        count: 1,
+        consume: true,
+        pokemonCriteria: { ballType: 'safari-ball' },
+        label: 'Hand over a Pokémon caught in a Safari Ball',
+      },
+    ],
+    rewards: [
+      { type: 'currency', targetId: 'safari-notes', quantity: 2, dropChance: 100 },
+    ],
+  },
+  {
+    id: 'safari-explorers-research-notes',
+    name: 'Explorers Research Notes',
+    description: 'A record of the reserve routes still waiting to be explored.',
+    category: 'Secret',
+    subCategory: 'Safari Zone',
+    icon: { type: 'item', id: 'explorers-journal' },
+    background: '/backgrounds/safari-reserve.avif',
+    repeatable: false,
+    secret: true,
+    completionTrigger: 'manual',
+    requirements: [],
+    criteria: [],
+    rewards: [],
+  },
+  {
+    id: 'safari-fishing-research-notes',
+    name: 'Fishing Research Notes',
+    description: 'A record of the reserve waters still waiting to be studied.',
+    category: 'Secret',
+    subCategory: 'Safari Zone',
+    icon: { type: 'item', id: 'researchers-journal-page' },
+    background: '/backgrounds/safari-reserve.avif',
+    repeatable: false,
+    secret: true,
+    completionTrigger: 'manual',
+    requirements: [],
+    criteria: [],
+    rewards: [],
+  },
+  safariCreditMarkerTask({
+    id: 'safari-extra-habitat-field-notes',
+    name: 'Extra Habitat Field Notes',
+    description: 'A permanent record of additional habitat notes available to the Grand Expedition.',
+    icon: { type: 'item', id: 'researchers-journal-volume' },
+  }),
+  safariCreditMarkerTask({
+    id: 'safari-material-deposit-reports',
+    name: 'Material Deposit Reports',
+    description: 'A permanent record of useful material deposits reported by other researchers.',
+    icon: { type: 'item', id: 'metal-scrap-t1' },
+  }),
+  safariCreditMarkerTask({
+    id: 'safari-ball-cache-info',
+    name: 'Safari Ball Cache Info',
+    description: 'A permanent record of reserve Safari Ball caches reported by other researchers.',
+    icon: { type: 'item', id: 'safari-ball' },
+  }),
+  safariCreditMarkerTask({
+    id: 'safari-unusual-pokemon-sightings',
+    name: 'Unusual Pokémon Sightings',
+    description: 'A permanent record of unusual Pokémon sightings reported from the reserve.',
+    icon: { type: 'pokemon', id: '113' },
+  }),
+  safariCreditMarkerTask({
+    id: 'safari-rare-item-rumours',
+    name: 'Rare Item Rumours',
+    description: 'A permanent record of the rare finds other researchers claim to have made.',
+    icon: { type: 'item', id: 'nugget' },
+  }),
+  safariCreditMarkerTask({
+    id: 'safari-wardens-permit',
+    name: "Warden's Permit",
+    description: 'Permanent authorization to use the reserve’s standard catching and fishing records.',
+    icon: { type: 'item', id: 'safari-catching-permit' },
+  }),
+]
 
 export const safariZoneTasks: Task[] = ([
   {
@@ -1414,4 +1588,5 @@ export const safariZoneTasks: Task[] = ([
   }),
 ].filter((task) => !retiredSafariExpeditionTaskIds.has(task.id)) as Task[]).concat(
   safariExpeditionContentTasks,
+  safariCreditTasks,
 )
