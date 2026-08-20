@@ -27,7 +27,7 @@ export async function performSafariAction(
 ) {
   const user = await getUser()
   if (!user) return { success: false, error: 'Unauthorized' }
-  if (action !== 'bait' && action !== 'shout') {
+  if (action !== 'feed' && action !== 'rock') {
     return { success: false, error: 'Invalid Safari action' }
   }
 
@@ -93,9 +93,9 @@ export async function performSafariAction(
         success: true,
         encounterFailed: true,
         failMessage:
-          action === 'shout'
-            ? 'Your shout startled the Pokemon and it fled!'
-            : 'The Pokemon took the bait, then slipped away!',
+          action === 'rock'
+            ? 'The rock startled the Pokémon and it fled!'
+            : 'The Pokémon took the Oran Berry, then slipped away!',
         pokemonId: state.pokemonId,
         formId: state.formId,
         expeditionProgress,
@@ -113,9 +113,9 @@ export async function performSafariAction(
       newCatchRate: resolved.catchRate,
       safari: state.safari,
       message:
-        action === 'shout'
+        action === 'rock'
           ? 'The Pokémon is rattled. It is easier to catch, but much more likely to flee.'
-          : 'The Pokémon settles. It is a little easier to catch and less likely to flee.',
+          : 'The Pokémon settles after eating. It is a little easier to catch and less likely to flee.',
     }
     await setIdempotentResult(resultKey, response, 300)
     return response

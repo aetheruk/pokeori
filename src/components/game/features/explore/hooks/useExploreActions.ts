@@ -36,7 +36,6 @@ import { ShopConfig } from '@/data/shops/types'
 import { VoyageConfig } from '@/data/voyages/types'
 import {
   clearExpeditionReturn,
-  markExpeditionReturn,
 } from '../expedition-return'
 
 export function useExploreActions(
@@ -331,7 +330,6 @@ export function useExploreActions(
       if (currentStep.activityType === 'location') {
         const result = await startEncounter(currentStep.activityId)
         if (result.success) {
-          markExpeditionReturn(expeditionId)
           router.push('/game/locations/encounter')
           return
         }
@@ -343,7 +341,6 @@ export function useExploreActions(
       if (currentStep.activityType === 'battle') {
         const result = await startBattle(currentStep.activityId)
         if (result.success) {
-          markExpeditionReturn(expeditionId)
           router.push('/game/battles/encounter')
           return
         }
@@ -373,7 +370,6 @@ export function useExploreActions(
             ? await startGame(currentStep.activityId)
             : await startFieldResearch(currentStep.activityId)
         if (result.success) {
-          markExpeditionReturn(expeditionId)
           router.push(
             currentStep.activityType === 'game'
               ? getGameActivityRouteForId(currentStep.activityId) || '/game'
@@ -523,9 +519,6 @@ export function useExploreActions(
             ? await completeCurrentUserExpeditionTaskStep(task.id)
             : await completeTask(task.id, undefined, crypto.randomUUID())
           if (result.success) {
-            if (isExpeditionTaskFlow) {
-              markExpeditionReturn(getActiveExpeditionRun()?.expeditionId)
-            }
             refreshUser()
           } else toast.error(result.message || 'Failed to complete task')
         } catch (e) {

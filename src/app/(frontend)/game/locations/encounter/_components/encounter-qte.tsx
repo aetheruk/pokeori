@@ -5,7 +5,6 @@ import { Footprints } from 'lucide-react'
 import Image from 'next/image'
 import type React from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ItemSprite } from '@/components/ui/item-sprite'
 import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { items } from '@/data/items'
@@ -22,6 +21,7 @@ import {
 } from '@/utilities/pokemon/focus-qte'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
+import { ItemFlickQte } from './item-flick-qte'
 
 interface EncounterQteProps {
   qte: PublicEncounterQte
@@ -52,14 +52,6 @@ export function EncounterQte({
     Array<{ id: number; points: CaptureThrowPoint[]; success: boolean }>
   >([])
   const [focusLoopProgress, setFocusLoopProgress] = useState(0)
-  const [calmDrag, setCalmDrag] = useState<{
-    berryId: string
-    dx: number
-    dy: number
-  } | null>(null)
-  const [calmThrownBerryId, setCalmThrownBerryId] = useState<string | null>(
-    null,
-  )
   const [scared, setScared] = useState(0)
   const [scaredDecoys, setScaredDecoys] = useState<Set<number>>(new Set())
   const [chaseTaps, setChaseTaps] = useState(0)
@@ -67,7 +59,6 @@ export function EncounterQte({
   const pathRef = useRef<CaptureThrowPoint[]>([])
   const focusAreaRef = useRef<HTMLDivElement | null>(null)
   const lastCompletedCircleAtRef = useRef(0)
-  const calmDragStartRef = useRef<CaptureThrowPoint | null>(null)
   const scareTimeoutsRef = useRef<number[]>([])
 
   const decoys = useMemo(
@@ -87,13 +78,10 @@ export function EncounterQte({
     setFocusPath([])
     setFocusTrails([])
     setFocusLoopProgress(0)
-    setCalmDrag(null)
-    setCalmThrownBerryId(null)
     setScared(0)
     setScaredDecoys(new Set())
     setChaseTaps(0)
     pathRef.current = []
-    calmDragStartRef.current = null
     scareTimeoutsRef.current.forEach((timeoutId) =>
       window.clearTimeout(timeoutId),
     )
@@ -188,110 +176,17 @@ export function EncounterQte({
     if (success) setFocusCircles((current) => Math.min(3, current + 1))
   }
 
-  const startCalmFlick = (
-    event: React.PointerEvent<HTMLButtonElement>,
-    berryId: string,
-  ) => {
-    if (completedRef.current) return
-    calmDragStartRef.current = { x: event.clientX, y: event.clientY }
-    setCalmDrag({ berryId, dx: 0, dy: 0 })
-    event.currentTarget.setPointerCapture(event.pointerId)
-  }
-
-  const moveCalmFlick = (
-    event: React.PointerEvent<HTMLButtonElement>,
-    berryId: string,
-  ) => {
-    const start = calmDragStartRef.current
-    if (!start || calmDrag?.berryId !== berryId) return
-    setCalmDrag({
-      berryId,
-      dx: event.clientX - start.x,
-      dy: event.clientY - start.y,
-    })
-  }
-
-  const finishCalmFlick = (berryId: string) => {
-    const drag = calmDrag?.berryId === berryId ? calmDrag : null
-    calmDragStartRef.current = null
-    setCalmDrag(null)
-
-    if (!drag) return
-
-    const upwardDistance = -drag.dy
-    const sidewaysDistance = Math.abs(drag.dx)
-    if (upwardDistance >= 48 && upwardDistance > sidewaysDistance * 1.15) {
-      if (completedRef.current) return
-      completedRef.current = true
-      setCalmThrownBerryId(berryId)
-      window.setTimeout(() => onComplete({ type: 'calm', berryId }), 180)
-    }
-  }
-
   if (qte.type === 'calm') {
     return (
-      <motion.div
-        key={`qte-${qte.id}`}
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -16 }}
-        transition={{ duration: 0.2 }}
-        className="relative z-10 flex h-full w-full max-w-3xl mx-auto flex-col justify-center"
-      >
-        <SectionDivider
-          className="mb-4 min-h-8 [&>div:first-child]:text-base [&>div:first-child]:font-bold [&>div:first-child]:leading-tight [&>div:first-child]:tracking-[0.04em]"
-          textColor="text-game-ink"
-        >
-          Calm with {getItemName(qte.correctBerryId || '')}
-        </SectionDivider>
-        <div className="relative flex flex-1 items-center justify-center overflow-visible p-5">
-          <div className="relative flex items-end justify-center gap-9 sm:gap-14">
-            {qte.berryOptions?.map((berryId) => {
-              const isDragging = calmDrag?.berryId === berryId
-              const isThrown = calmThrownBerryId === berryId
-              return (
-                <button
-                  key={berryId}
-                  type="button"
-                  aria-label={`Flick ${getItemName(berryId)}`}
-                  className="group relative flex h-24 w-20 touch-none cursor-grab items-center justify-center active:cursor-grabbing"
-                  onPointerDown={(event) => startCalmFlick(event, berryId)}
-                  onPointerMove={(event) => moveCalmFlick(event, berryId)}
-                  onPointerUp={() => finishCalmFlick(berryId)}
-                  onPointerCancel={() => {
-                    calmDragStartRef.current = null
-                    setCalmDrag(null)
-                  }}
-                >
-                  <motion.span
-                    className="relative block h-16 w-16"
-                    animate={{
-                      x: isDragging ? calmDrag.dx : 0,
-                      y: isThrown ? -180 : isDragging ? calmDrag.dy : 0,
-                      opacity:
-                        calmThrownBerryId && !isThrown
-                          ? 0.35
-                          : isThrown
-                            ? 0
-                            : 1,
-                      scale: isDragging || isThrown ? 1.1 : 1,
-                    }}
-                    transition={{ type: 'spring', stiffness: 520, damping: 32 }}
-                  >
-                    <ItemSprite
-                      itemId={berryId}
-                      alt=""
-                      width={64}
-                      height={64}
-                      className="h-16 w-16 object-contain"
-                    />
-                  </motion.span>
-                </button>
-              )
-            })}
-          </div>
-        </div>
-      </motion.div>
+      <ItemFlickQte
+        title={`Calm with ${getItemName(qte.correctBerryId || '')}`}
+        instruction="Flick a Berry upward towards the Pokémon."
+        options={(qte.berryOptions || []).map((berryId) => ({
+          id: berryId,
+          label: getItemName(berryId),
+        }))}
+        onThrow={(berryId) => onComplete({ type: 'calm', berryId })}
+      />
     )
   }
 

@@ -189,7 +189,7 @@ function researchTask(
   species: ResearchSpecies,
   variant: 'common' | 'uncommon' | 'rare',
 ): Task {
-  const rewardXp = variant === 'common' ? 0 : variant === 'uncommon' ? 10 : 20
+  const rewardXp = variant === 'common' ? 2 : variant === 'uncommon' ? 10 : 20
   return safariTask({
     id: `safari-research-${species.id}-${variant}`,
     name:
@@ -200,17 +200,14 @@ function researchTask(
           : `A Remarkable ${species.name}`,
     description: species[variant],
     icon: { type: 'pokemon', id: species.id },
-    rewards:
-      rewardXp > 0
-        ? [
-            {
-              type: 'pokemon_research_xp',
-              targetId: species.id,
-              quantity: rewardXp,
-              dropChance: 100,
-            },
-          ]
-        : [],
+    rewards: [
+      {
+        type: 'pokemon_research_xp',
+        targetId: species.id,
+        quantity: rewardXp,
+        dropChance: 100,
+      },
+    ],
     completeButtonText: 'Record Observation',
   })
 }
@@ -228,30 +225,31 @@ export const safariResearchTaskPoolIds = {
 }
 
 const flavorDefinitions = [
-  ['central', 'A Ranger’s Chalk Mark', 'I find a fresh chalk mark on the central signpost and copy it into my notebook.', 'Copy the Mark'],
-  ['central', 'A Bent Trail Marker', 'The central marker is pointing at the sky. I set it straight before the next survey team arrives.', 'Straighten the Marker'],
-  ['central', 'A Warm Patch of Grass', 'I find a warm patch in the grass and give it a moment before deciding what made it.', 'Check the Grass'],
-  ['central', 'The Missing Clipboard', 'A clipboard is wedged beneath the central bench. I brush it off and return it to the supply crate.', 'Return the Clipboard'],
-  ['east', 'A Reed-Caught Ribbon', 'A faded ribbon is caught in the eastern reeds. I pull it free without disturbing the bank.', 'Free the Ribbon'],
-  ['east', 'Rain in the Pond', 'The pond is perfectly still except for one set of ripples. I wait until they fade before moving on.', 'Watch the Ripples'],
-  ['east', 'A Boardwalk Creak', 'One board gives a loud creak under my foot. I mark it with a strip of survey tape.', 'Mark the Board'],
-  ['east', 'The Empty Bait Tin', 'I find an empty bait tin near the water and carry it back to the nearest collection point.', 'Collect the Tin'],
-  ['west', 'A Leaf-Covered Bench', 'The western bench is almost swallowed by leaves. I clear enough space to sit and check my map.', 'Clear the Bench'],
-  ['west', 'A Broken Umbrella', 'Someone left a broken umbrella against the rest house. I fold it away from the path.', 'Move the Umbrella'],
-  ['west', 'A Scent on the Bark', 'There is a sharp scent on the bark beside the trail. I note it and leave the tree untouched.', 'Note the Scent'],
-  ['west', 'A Quiet Hollow', 'I find a hollow beneath the roots and lower my voice before passing it.', 'Pass Quietly'],
-  ['north', 'A Stone Cairn', 'Someone has stacked three stones beside the northern track. I sketch the little cairn before leaving it alone.', 'Sketch the Cairn'],
-  ['north', 'A Loose Trail Rope', 'A length of rope has come loose beside the ledge. I tie it back before the next person reaches the drop.', 'Secure the Rope'],
-  ['north', 'Wind through the Pass', 'The wind funnels through the northern pass hard enough to rattle my notes. I find shelter and wait it out.', 'Wait in Shelter'],
-  ['north', 'A Fresh Scrape', 'A fresh scrape crosses the trail, but there is no sign of what made it. I mark the location and move on.', 'Mark the Scrape'],
+  ['central', 'A Ranger’s Chalk Mark', 'I find a fresh chalk mark on the central signpost and copy it into my notebook.', 'Copy the Mark', { type: 'trainer', id: 'ranger' }],
+  ['central', 'A Bent Trail Marker', 'The central marker is pointing at the sky. I set it straight before the next survey team arrives.', 'Straighten the Marker', { type: 'local', id: '/sprites/sign.avif' }],
+  ['central', 'A Warm Patch of Grass', 'I find a warm patch in the grass and give it a moment before deciding what made it.', 'Check the Grass', { type: 'local', id: '/sprites/tall_grass-v2.avif' }],
+  ['central', 'The Missing Clipboard', 'A clipboard is wedged beneath the central bench. I brush it off and return it to the supply crate.', 'Return the Clipboard', { type: 'item', id: 'researchers-journal' }],
+  ['east', 'A Reed-Caught Ribbon', 'A faded ribbon is caught in the eastern reeds. I pull it free without disturbing the bank.', 'Free the Ribbon', { type: 'item', id: 'pretty-feather' }],
+  ['east', 'Rain in the Pond', 'The pond is perfectly still except for one set of ripples. I wait until they fade before moving on.', 'Watch the Ripples', { type: 'item', id: 'pearl' }],
+  ['east', 'A Boardwalk Creak', 'One board gives a loud creak under my foot. I mark it with a strip of survey tape.', 'Mark the Board', { type: 'item', id: 'wood-scraps-t1' }],
+  ['east', 'The Empty Bait Tin', 'I find an empty bait tin near the water and carry it back to the nearest collection point.', 'Collect the Tin', { type: 'item', id: 'metal-scrap-t1' }],
+  ['west', 'A Leaf-Covered Bench', 'The western bench is almost swallowed by leaves. I clear enough space to sit and check my map.', 'Clear the Bench', { type: 'item', id: 'grass-gem' }],
+  ['west', 'A Broken Umbrella', 'Someone left a broken umbrella against the rest house. I fold it away from the path.', 'Move the Umbrella', { type: 'trainer', id: 'ranger' }],
+  ['west', 'A Scent on the Bark', 'There is a sharp scent on the bark beside the trail. I note it and leave the tree untouched.', 'Note the Scent', { type: 'pokemon', id: '48' }],
+  ['west', 'A Quiet Hollow', 'I find a hollow beneath the roots and lower my voice before passing it.', 'Pass Quietly', { type: 'pokemon', id: '46' }],
+  ['north', 'A Stone Cairn', 'Someone has stacked three stones beside the northern track. I sketch the little cairn before leaving it alone.', 'Sketch the Cairn', { type: 'item', id: 'small-stone-t1' }],
+  ['north', 'A Loose Trail Rope', 'A length of rope has come loose beside the ledge. I tie it back before the next person reaches the drop.', 'Secure the Rope', { type: 'item', id: 'escape-rope' }],
+  ['north', 'Wind through the Pass', 'The wind funnels through the northern pass hard enough to rattle my notes. I find shelter and wait it out.', 'Wait in Shelter', { type: 'item', id: 'wing-feather-t1' }],
+  ['north', 'A Fresh Scrape', 'A fresh scrape crosses the trail, but there is no sign of what made it. I mark the location and move on.', 'Mark the Scrape', { type: 'pokemon', id: '111' }],
 ] as const
 
-const flavorTasks = flavorDefinitions.map(([area, name, description, completeButtonText]) =>
+const flavorTasks = flavorDefinitions.map(([area, name, description, completeButtonText, icon]) =>
   safariTask({
     id: `safari-flavor-${area}-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
     name,
     description,
-    icon: { type: 'lucide', id: 'Footprints' },
+    icon,
+    rewards: [{ type: 'xp', skill: 'researching', quantity: { min: 20, max: 50 }, dropChance: 100 }],
     completeButtonText,
   }),
 )
@@ -267,14 +265,14 @@ function itemTask(
   id: string,
   name: string,
   description: string,
-  icon: string,
+  icon: string | Task['icon'],
   reward: Reward,
 ): Task {
   return safariTask({
     id,
     name,
     description,
-    icon: { type: 'item', id: icon },
+    icon: typeof icon === 'string' ? { type: 'item', id: icon } : icon,
     rewards: [reward],
     completeButtonText: 'Search the Find',
   })
@@ -333,9 +331,9 @@ const gemTasks = gemIds.map((type) =>
 )
 
 const currencyTasks = [
-  itemTask('safari-item-coins-central', 'Coins in the Grass', 'A few coins shine beneath the central grass where a careless visitor dropped them.', 'pokedollar', { type: 'currency', targetId: 'pokedollars', quantity: { min: 100, max: 300 }, dropChance: 60 }),
-  itemTask('safari-item-coins-boardwalk', 'Coins under the Boardwalk', 'Something metallic glints between two boardwalk planks. I fish it out with my pencil.', 'pokedollar', { type: 'currency', targetId: 'pokedollars', quantity: { min: 100, max: 300 }, dropChance: 60 }),
-  itemTask('safari-item-coins-north', 'Coins by the Cairn', 'A small handful of coins rests beside the northern stone cairn.', 'pokedollar', { type: 'currency', targetId: 'pokedollars', quantity: { min: 100, max: 300 }, dropChance: 60 }),
+  itemTask('safari-item-coins-central', 'Coins in the Grass', 'A few coins shine beneath the central grass where a careless visitor dropped them.', { type: 'item', id: 'gimmighoul-coin' }, { type: 'currency', targetId: 'pokedollars', quantity: { min: 100, max: 300 }, dropChance: 60 }),
+  itemTask('safari-item-coins-boardwalk', 'Coins under the Boardwalk', 'Something metallic glints between two boardwalk planks. I fish it out with my pencil.', { type: 'item', id: 'gimmighoul-coin' }, { type: 'currency', targetId: 'pokedollars', quantity: { min: 100, max: 300 }, dropChance: 60 }),
+  itemTask('safari-item-coins-north', 'Coins by the Cairn', 'A small handful of coins rests beside the northern stone cairn.', { type: 'item', id: 'gimmighoul-coin' }, { type: 'currency', targetId: 'pokedollars', quantity: { min: 100, max: 300 }, dropChance: 60 }),
 ]
 
 const safariBallTasks = [

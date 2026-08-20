@@ -1,7 +1,7 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
-import { Backpack, Cookie, Megaphone, Sparkles } from 'lucide-react'
+import { Backpack, Sparkles } from 'lucide-react'
 import nextDynamic from 'next/dynamic'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -112,6 +112,7 @@ import { CaptureScene } from './_components/capture-scene'
 import type { CaptureThrowPayload } from './_components/draggable-pokeball'
 import { EncounterQte } from './_components/encounter-qte'
 import { EncounterResults } from './_components/encounter-results'
+import { ItemFlickQte } from './_components/item-flick-qte'
 import { QuestionPrompt } from './_components/question-prompt'
 
 interface EncounterData {
@@ -559,8 +560,8 @@ export default function EncounterPage() {
           (i) =>
             i.category === 'ball' &&
             canUseItemWithSkillRequirements(i, user?.skills) &&
-            (encounter.inventory.find((inv) => inv.itemId === i.id)
-              ?.quantity || 0) > 0,
+            (encounter.inventory.find((inv) => inv.itemId === i.id)?.quantity ||
+              0) > 0,
         )
     : []
 
@@ -744,7 +745,10 @@ export default function EncounterPage() {
       setTimeLeft(remaining)
 
       if (remaining <= 0 && (phase === 'quiz' || phase === 'safari')) {
-        if (phase === 'safari' && (encounter.safari?.ballsRemaining || 0) <= 0) {
+        if (
+          phase === 'safari' &&
+          (encounter.safari?.ballsRemaining || 0) <= 0
+        ) {
           setPhase('safari')
         } else {
           setPhase('capture')
@@ -772,7 +776,7 @@ export default function EncounterPage() {
   }
 
   const handleSafariAction = useCallback(
-    async (action: 'bait' | 'shout') => {
+    async (action: 'feed' | 'rock') => {
       if (!encounter || submittingSafariAction) return
       setSubmittingSafariAction(true)
       playSelectSfx()
@@ -1836,66 +1840,85 @@ export default function EncounterPage() {
             key="safari-actions"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mx-auto flex w-full max-w-md flex-col gap-4 rounded-2xl border border-game-border bg-game-surface-raised p-4 shadow-sm"
+            className="mx-auto flex h-full w-full max-w-xl flex-col rounded-2xl border border-game-border bg-game-surface-raised p-4 shadow-sm sm:p-5"
           >
-          <div>
+            <div className="text-center">
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-game-muted">
                 Safari encounter
               </p>
               <h2 className="mt-1 text-xl font-bold text-game-ink">
-                Choose your approach
+                What will you throw?
               </h2>
-              <p className="mt-1 text-sm text-game-muted">
-                Bait is a gentle lure. Shout to make a catch much easier, but
-                risk startling the Pokémon into fleeing.
+              <p className="mx-auto mt-1 max-w-md text-sm text-game-muted">
+                Feed the Pokémon to calm it, or throw a rock to make it easier
+                to catch at greater risk of losing it.
               </p>
             </div>
-            <p className="rounded-xl border border-game-border bg-game-canvas px-3 py-2 text-center text-sm font-semibold text-game-ink">
-              Safari Balls remaining: {encounter.safari?.ballsRemaining || 0}
-            </p>
+            <div className="mt-4 grid grid-cols-2 gap-3 text-center text-xs font-semibold text-game-muted">
+              <div className="rounded-lg border border-game-border bg-game-canvas px-3 py-2">
+                Safari Balls
+                <span className="ml-1 text-game-ink">
+                  {encounter.safari?.ballsRemaining || 0}
+                </span>
+              </div>
+              <div className="rounded-lg border border-game-border bg-game-canvas px-3 py-2">
+                Actions
+                <span className="ml-1 text-game-ink">
+                  {encounter.safari?.actions || 0}
+                </span>
+              </div>
+            </div>
             {(encounter.safari?.ballsRemaining || 0) > 0 ? (
-              <>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="min-h-14 gap-2 border-game-moss/45 bg-game-moss/10 text-game-moss-strong hover:bg-game-moss/15"
+              <div className="flex min-h-0 flex-1 flex-col">
+                <div className="min-h-0 flex-1">
+                  <ItemFlickQte
+                    title="Choose your approach"
+                    instruction="Drag an item upward towards the Pokémon to throw it."
                     disabled={submittingSafariAction}
-                    onClick={() => handleSafariAction('bait')}
-                  >
-                    <Cookie className="h-5 w-5" />
-                    Bait
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="min-h-14 gap-2 border-game-ochre/50 bg-game-ochre/10 text-game-ink hover:bg-game-ochre/15"
-                    disabled={submittingSafariAction}
-                    onClick={() => handleSafariAction('shout')}
-                  >
-                    <Megaphone className="h-5 w-5 text-game-ochre" />
-                    Shout
-                  </Button>
+                    options={[
+                      {
+                        id: 'oran-berry',
+                        label: 'Feed Oran Berry',
+                        description: 'Small catch boost, lower flee risk',
+                      },
+                      {
+                        id: 'small-stone-t1',
+                        label: 'Throw Rock',
+                        description: 'Large catch boost, higher flee risk',
+                      },
+                    ]}
+                    onThrow={(itemId) =>
+                      void handleSafariAction(
+                        itemId === 'oran-berry' ? 'feed' : 'rock',
+                      )
+                    }
+                  />
                 </div>
                 <Button
                   type="button"
-                  className="min-h-14 bg-game-clay text-game-cream hover:bg-game-clay/90"
+                  className="mt-3 min-h-12 bg-game-clay text-game-cream hover:bg-game-clay/90"
                   disabled={submittingSafariAction || balls.length === 0}
                   onClick={() => setPhase('capture')}
                 >
-                  Throw a Safari Ball
+                  Choose Safari Ball
                 </Button>
-              </>
+              </div>
             ) : (
-              <Button
-                type="button"
-                variant="outline"
-                className="min-h-14 border-game-clay/60 bg-game-clay/10 text-game-clay hover:bg-game-clay/15"
-                disabled={submittingSafariAction}
-                onClick={handleEndSafariExpedition}
-              >
-                End Expedition
-              </Button>
+              <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
+                <p className="text-sm text-game-muted">
+                  You have no Safari Balls left. Return to the gate before the
+                  reserve closes.
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="min-h-12 border-game-clay/60 bg-game-clay/10 text-game-clay hover:bg-game-clay/15"
+                  disabled={submittingSafariAction}
+                  onClick={handleEndSafariExpedition}
+                >
+                  End Expedition
+                </Button>
+              </div>
             )}
           </motion.div>
         )}
@@ -1920,33 +1943,31 @@ export default function EncounterPage() {
       </div>
 
       {/* Global Encounter Buttons (Footer) */}
-      {!isSilphScopeGhostLocked && (
+      {!isSilphScopeGhostLocked && encounter.encounterMode !== 'safari' && (
         <div className="relative shrink-0 border-t border-game-border bg-game-surface/96 pb-[env(safe-area-inset-bottom)] text-game-ink backdrop-blur-xl xl:col-start-1 xl:row-start-2 xl:border-t xl:border-r-0">
           <div className="relative z-10 flex items-center justify-between gap-3 px-4 py-3">
             {/* Items Button */}
-            {encounter.encounterMode !== 'safari' && (
-              <Button
-                type="button"
-                variant="outline"
-                className={cn(
-                  'h-12 flex-1 gap-2 border-game-border bg-game-surface-raised text-game-ink hover:border-game-moss/35 hover:bg-game-canvas',
-                  encounterItemsRemaining <= 0 && 'opacity-50',
-                )}
-                onClick={() => setShowItemsModal(true)}
-                disabled={isCapturing || encounterItemsRemaining <= 0}
-                aria-busy={isCapturing}
-              >
-                <Backpack className="h-5 w-5 text-game-moss-strong" />
-                <span className="text-xs font-bold uppercase tracking-wider">
-                  Items
+            <Button
+              type="button"
+              variant="outline"
+              className={cn(
+                'h-12 flex-1 gap-2 border-game-border bg-game-surface-raised text-game-ink hover:border-game-moss/35 hover:bg-game-canvas',
+                encounterItemsRemaining <= 0 && 'opacity-50',
+              )}
+              onClick={() => setShowItemsModal(true)}
+              disabled={isCapturing || encounterItemsRemaining <= 0}
+              aria-busy={isCapturing}
+            >
+              <Backpack className="h-5 w-5 text-game-moss-strong" />
+              <span className="text-xs font-bold uppercase tracking-wider">
+                Items
+              </span>
+              {encounterItemsRemaining > 0 && (
+                <span className="ml-1 text-[10px] font-bold text-game-muted">
+                  ({encounterItemsRemaining})
                 </span>
-                {encounterItemsRemaining > 0 && (
-                  <span className="ml-1 text-[10px] font-bold text-game-muted">
-                    ({encounterItemsRemaining})
-                  </span>
-                )}
-              </Button>
-            )}
+              )}
+            </Button>
 
             {/* Run Button */}
             {(() => {
