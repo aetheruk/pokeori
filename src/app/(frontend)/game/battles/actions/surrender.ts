@@ -69,6 +69,7 @@ export async function surrenderBattle(): Promise<{
     'battle',
     state.battleId,
     false,
+    { revalidatePaths: false },
   )
   if (!state.isPvp && expeditionResult.expedition) {
     state.expeditionProgress = expeditionResult.expedition

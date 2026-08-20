@@ -117,6 +117,7 @@ function mapRunDocToActiveRun(runDoc: ExpeditionRunDoc): ActiveExpeditionRun {
 interface ExpeditionOperationOptions {
   payload?: any
   req?: PayloadRequest
+  revalidatePaths?: boolean
 }
 
 async function consumeMapItem(
@@ -181,6 +182,7 @@ async function endExpeditionRun(
   canFail: boolean,
   status: 'ready_to_claim' | 'failed',
   req?: PayloadRequest,
+  revalidatePaths = true,
 ): Promise<{
   success: true
   updated: true
@@ -227,8 +229,10 @@ async function endExpeditionRun(
     })
   }
 
-  revalidatePath('/game')
-  revalidatePath('/game/explore')
+  if (revalidatePaths) {
+    revalidatePath('/game')
+    revalidatePath('/game/explore')
+  }
 
   return {
     success: true,
@@ -326,6 +330,7 @@ export async function grantExpeditionSafariBallsForTask(
   taskId: string,
   reward: Reward & { type: 'expedition_safari_balls' },
   req?: PayloadRequest,
+  revalidatePaths = true,
 ): Promise<number> {
   const run = await getActiveRunForUser(payload, userId)
   if (!run || (run.status !== 'active' && run.status !== 'ready_to_claim')) {
@@ -352,14 +357,17 @@ export async function grantExpeditionSafariBallsForTask(
     data: { safariBallsRemaining: newRemaining },
     req,
   })
-  revalidatePath('/game')
-  revalidatePath('/game/explore')
+  if (revalidatePaths) {
+    revalidatePath('/game')
+    revalidatePath('/game/explore')
+  }
   return quantity
 }
 
 export async function setSafariBallsRemaining(
   userId: string,
   remaining: number,
+  revalidatePaths = true,
 ): Promise<boolean> {
   const payload = await getPayload({ config: configPromise })
   const run = await getActiveRunForUser(payload as any, userId)
@@ -370,8 +378,10 @@ export async function setSafariBallsRemaining(
     id: run.id,
     data: { safariBallsRemaining: Math.max(0, remaining) },
   })
-  revalidatePath('/game')
-  revalidatePath('/game/explore')
+  if (revalidatePaths) {
+    revalidatePath('/game')
+    revalidatePath('/game/explore')
+  }
   return true
 }
 
@@ -720,6 +730,7 @@ export async function failCurrentUserExpeditionTaskStep(taskId: string): Promise
     'task',
     taskId,
     false,
+    { revalidatePaths: false },
   )
 
   if (!result.success) {
@@ -761,6 +772,7 @@ export async function completeCurrentUserExpeditionTaskStep(
     'task',
     taskId,
     true,
+    { revalidatePaths: false },
   )
 
   if (!result.success) {
@@ -814,6 +826,7 @@ export async function recordExpeditionActivityResult(
 }> {
   const payload = options.payload || (await getPayload({ config: configPromise }))
   const { req } = options
+  const revalidatePaths = options.revalidatePaths !== false
 
   const lock = req
     ? null
@@ -871,6 +884,7 @@ export async function recordExpeditionActivityResult(
           canFail,
           routedResult.end === 'complete' ? 'ready_to_claim' : 'failed',
           req,
+          revalidatePaths,
         )
       }
 
@@ -907,8 +921,10 @@ export async function recordExpeditionActivityResult(
           req,
         })
 
-        revalidatePath('/game')
-        revalidatePath('/game/explore')
+        if (revalidatePaths) {
+          revalidatePath('/game')
+          revalidatePath('/game/explore')
+        }
 
         return { success: true, updated: true, completed: true, expedition }
       }
@@ -938,8 +954,10 @@ export async function recordExpeditionActivityResult(
         req,
       })
 
-      revalidatePath('/game')
-      revalidatePath('/game/explore')
+      if (revalidatePaths) {
+        revalidatePath('/game')
+        revalidatePath('/game/explore')
+      }
 
       return { success: true, updated: true, expedition }
     }
@@ -961,6 +979,7 @@ export async function recordExpeditionActivityResult(
           canFail,
           routedLoss.end === 'complete' ? 'ready_to_claim' : 'failed',
           req,
+          revalidatePaths,
         )
       }
 
@@ -997,8 +1016,10 @@ export async function recordExpeditionActivityResult(
           req,
         })
 
-        revalidatePath('/game')
-        revalidatePath('/game/explore')
+        if (revalidatePaths) {
+          revalidatePath('/game')
+          revalidatePath('/game/explore')
+        }
 
         return { success: true, updated: true, completed: true, expedition }
       }
@@ -1028,8 +1049,10 @@ export async function recordExpeditionActivityResult(
         req,
       })
 
-      revalidatePath('/game')
-      revalidatePath('/game/explore')
+      if (revalidatePaths) {
+        revalidatePath('/game')
+        revalidatePath('/game/explore')
+      }
 
       return { success: true, updated: true, expedition }
     }
@@ -1058,8 +1081,10 @@ export async function recordExpeditionActivityResult(
         req,
       })
 
-      revalidatePath('/game')
-      revalidatePath('/game/explore')
+      if (revalidatePaths) {
+        revalidatePath('/game')
+        revalidatePath('/game/explore')
+      }
 
       return { success: true, updated: true, expedition }
     }
@@ -1090,8 +1115,10 @@ export async function recordExpeditionActivityResult(
         req,
       })
 
-      revalidatePath('/game')
-      revalidatePath('/game/explore')
+      if (revalidatePaths) {
+        revalidatePath('/game')
+        revalidatePath('/game/explore')
+      }
 
       return { success: true, updated: true, failed: true, expedition }
     }
@@ -1120,8 +1147,10 @@ export async function recordExpeditionActivityResult(
       req,
     })
 
-    revalidatePath('/game')
-    revalidatePath('/game/explore')
+    if (revalidatePaths) {
+      revalidatePath('/game')
+      revalidatePath('/game/explore')
+    }
 
     return { success: true, updated: true, expedition }
   } finally {

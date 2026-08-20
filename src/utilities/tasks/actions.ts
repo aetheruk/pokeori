@@ -418,7 +418,7 @@ export async function completeTask(
     'task',
     taskId,
     true,
-    { payload, req },
+    { payload, req, revalidatePaths: false },
   )
 
   for (const reward of safariBallRewards) {
@@ -428,6 +428,7 @@ export async function completeTask(
       taskId,
       reward as Reward & { type: 'expedition_safari_balls' },
       req,
+      false,
     )
     if (quantity > 0) {
       summary.notices?.push({

@@ -48,6 +48,7 @@ export async function failEncounter(
     'location',
     state.locationId,
     false,
+    { revalidatePaths: false },
   )
 
   return expeditionResult.expedition

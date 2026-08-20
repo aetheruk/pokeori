@@ -8,7 +8,10 @@ import {
   releaseActionLock,
   setIdempotentResult,
 } from '@/utilities/game-integrity'
-import type { EncounterState } from './types'
+import {
+  getEncounterRedisTtlSeconds,
+  type EncounterState,
+} from './types'
 import { getUser } from './utils'
 import {
   completeEncounterQteState,
@@ -95,7 +98,7 @@ export async function completeEncounterQte(
 
     if (!(response as any).encounterFailed) {
       await redis.set(encounterId, state, {
-        ex: Math.floor((state.expiry - Date.now()) / 1000) + 60,
+        ex: getEncounterRedisTtlSeconds(state),
       })
     }
 

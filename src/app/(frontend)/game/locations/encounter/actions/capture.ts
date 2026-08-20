@@ -50,13 +50,17 @@ import {
   recordExpeditionActivityResult,
   setSafariBallsRemaining,
 } from '@/utilities/expeditions/actions'
-import type { EncounterState } from './types'
+import {
+  getEncounterRedisTtlSeconds,
+  type EncounterState,
+} from './types'
 import { rollAbility, getUser } from './utils'
 import { refreshEncounterShield } from './shield'
 import { failEncounter } from './failure'
 import {
   resolveSafariFlee,
   SAFARI_BALL_ID,
+  SAFARI_BASE_FLEE_RATE,
 } from '@/utilities/pokemon/safari-catch'
 import {
   getItemSkillLockReason,
@@ -238,6 +242,7 @@ export async function attemptCapture(
         'location',
         state.locationId,
         false,
+        { revalidatePaths: false },
       )
       response.expeditionProgress = expeditionResult.expedition
 
@@ -257,7 +262,7 @@ export async function attemptCapture(
         0,
         state.safari!.ballsRemaining - 1,
       )
-      await setSafariBallsRemaining(user.id, state.safari!.ballsRemaining)
+      await setSafariBallsRemaining(user.id, state.safari!.ballsRemaining, false)
     } else {
       inventory[ballItemId] = qty - 1
       if (!isChronicle) {
@@ -409,8 +414,7 @@ export async function attemptCapture(
 
     if (isSafari && !caught) {
       const flee = resolveSafariFlee({
-        currentStage: state.safari!.stage,
-        baseFleeRate: state.fleeRate || 10,
+        baseFleeRate: state.fleeRate || SAFARI_BASE_FLEE_RATE,
       })
       state.captureAttempts = captureAttempt + 1
 
@@ -435,7 +439,7 @@ export async function attemptCapture(
       }
 
       await redis.set(encounterId, state, {
-        ex: Math.floor((state.expiry - Date.now()) / 1000) + 60,
+        ex: getEncounterRedisTtlSeconds(state),
       })
       const response = {
         success: true,
@@ -456,7 +460,7 @@ export async function attemptCapture(
         state.secondChanceUsed = true
         state.captureAttempts = captureAttempt + 1
         await redis.set(encounterId, state, {
-          ex: Math.floor((state.expiry - Date.now()) / 1000) + 60,
+          ex: getEncounterRedisTtlSeconds(state),
         })
 
         const response = {
@@ -505,6 +509,7 @@ export async function attemptCapture(
         'location',
         state.locationId,
         caught,
+        { revalidatePaths: false },
       )
       response.expeditionProgress = expeditionResult.expedition
 
@@ -521,7 +526,7 @@ export async function attemptCapture(
       state.secondChanceUsed = true
       state.captureAttempts = captureAttempt + 1
       await redis.set(encounterId, state, {
-        ex: Math.floor((state.expiry - Date.now()) / 1000) + 60,
+        ex: getEncounterRedisTtlSeconds(state),
       })
 
       const response = {
@@ -654,6 +659,7 @@ export async function attemptCapture(
         'location',
         state.locationId,
         false,
+        { revalidatePaths: false },
       )
       response.expeditionProgress = expeditionResult.expedition
 
@@ -945,6 +951,7 @@ export async function attemptCapture(
       'location',
       state.locationId,
       true,
+      { revalidatePaths: false },
     )
     response.expeditionProgress = expeditionResult.expedition
 

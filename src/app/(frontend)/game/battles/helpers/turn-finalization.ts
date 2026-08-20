@@ -206,6 +206,7 @@ export async function finalizeTurn(
             'battle',
             state.battleId,
             false,
+            { revalidatePaths: false },
           ),
       )
       if (expeditionResult.expedition) {

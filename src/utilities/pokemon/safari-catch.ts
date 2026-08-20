@@ -1,55 +1,32 @@
+import { getCatchStageValue } from './catch-balance'
+
 export type SafariEncounterAction = 'feed' | 'rock'
 
 export const SAFARI_BALL_ID = 'safari-ball'
 export const SAFARI_BALL_ALLOWANCE = 30
-export const MIN_SAFARI_STAGE = -3
-export const MAX_SAFARI_STAGE = 3
-
+export const SAFARI_BASE_FLEE_RATE = 20
+// Safari encounters have no gameplay timer. This is only an inactivity lease
+// for the Redis encounter state so an abandoned run cannot remain forever.
+export const SAFARI_ENCOUNTER_TTL_SECONDS = 30 * 60
 const clamp = (value: number, min: number, max: number) =>
   Math.max(min, Math.min(max, value))
 
-/**
- * Safari flee chance is target-specific while still allowing an area to tune
- * the overall reserve danger. Low-capture-rate Pokémon are more skittish.
- */
-export function deriveSafariBaseFleeRate({
-  captureRate,
-  locationFleeRate = 10,
+export function getSafariFleeChance({
+  baseFleeRate,
 }: {
-  captureRate: number
-  locationFleeRate?: number
+  baseFleeRate: number
 }) {
-  const rarityPressure = clamp((255 - captureRate) / 255, 0, 1)
-  return clamp(locationFleeRate * (1 + rarityPressure), 5, 35)
-}
-
-function getStageMultipliers(stage: number) {
-  if (stage < 0) {
-    const feedStages = Math.abs(stage)
-    return {
-      catchMultiplier: 1.05 ** feedStages,
-      fleeMultiplier: 0.85 ** feedStages,
-    }
-  }
-
-  return {
-    catchMultiplier: 1.35 ** stage,
-    fleeMultiplier: 1.5 ** stage,
-  }
+  return clamp(baseFleeRate, 10, 50)
 }
 
 export function resolveSafariFlee({
-  currentStage,
   baseFleeRate,
   random = Math.random,
 }: {
-  currentStage: number
   baseFleeRate: number
   random?: () => number
 }) {
-  const stage = clamp(currentStage, MIN_SAFARI_STAGE, MAX_SAFARI_STAGE)
-  const { fleeMultiplier } = getStageMultipliers(stage)
-  const fleeChance = clamp(baseFleeRate * fleeMultiplier, 1, 90)
+  const fleeChance = getSafariFleeChance({ baseFleeRate })
 
   return {
     fleeChance,
@@ -60,27 +37,37 @@ export function resolveSafariFlee({
 export function resolveSafariAction({
   action,
   currentStage,
-  baseCatchRate,
+  baseCaptureRate,
+  currentCatchRate,
   baseFleeRate,
   random = Math.random,
 }: {
   action: SafariEncounterAction
   currentStage: number
-  baseCatchRate: number
+  baseCaptureRate: number
+  currentCatchRate: number
   baseFleeRate: number
   random?: () => number
 }) {
-  const stage = clamp(
-    currentStage + (action === 'rock' ? 1 : -1),
-    MIN_SAFARI_STAGE,
-    MAX_SAFARI_STAGE,
+  const catchAnswerEquivalent = action === 'rock' ? 5 : 1
+  const stage = currentStage + catchAnswerEquivalent
+  const catchRate = clamp(
+    currentCatchRate +
+      getCatchStageValue(baseCaptureRate) * catchAnswerEquivalent,
+    0,
+    255,
   )
-  const { catchMultiplier } = getStageMultipliers(stage)
-  const flee = resolveSafariFlee({ currentStage: stage, baseFleeRate, random })
+  const fleeRate =
+    action === 'rock'
+      ? getSafariFleeChance({ baseFleeRate: baseFleeRate + 10 })
+      : getSafariFleeChance({
+          baseFleeRate: baseFleeRate - (Math.floor(random() * 3) + 1),
+        })
+  const flee = resolveSafariFlee({ baseFleeRate: fleeRate, random })
 
   return {
     stage,
-    catchRate: clamp(Math.round(baseCatchRate * catchMultiplier), 1, 255),
+    catchRate,
     fleeChance: flee.fleeChance,
     fled: flee.fled,
   }

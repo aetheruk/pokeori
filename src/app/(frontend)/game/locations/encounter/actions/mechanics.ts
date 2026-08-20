@@ -42,7 +42,10 @@ import {
   releaseActionLock,
   setIdempotentResult,
 } from '@/utilities/game-integrity'
-import type { EncounterState } from './types'
+import {
+  getEncounterRedisTtlSeconds,
+  type EncounterState,
+} from './types'
 import { rollAbility, getUser } from './utils'
 import { runAway } from './escape'
 import {
@@ -413,7 +416,7 @@ export async function submitAnswer(
 
       if (!(response as any).encounterFailed) {
         await redis.set(encounterId, state, {
-          ex: Math.floor((state.expiry - Date.now()) / 1000) + 60,
+          ex: getEncounterRedisTtlSeconds(state),
         })
       }
       const ttl = (response as any).encounterFailed ? 300 : 120

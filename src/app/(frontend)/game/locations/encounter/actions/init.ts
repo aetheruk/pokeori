@@ -51,9 +51,16 @@ import { getActiveChronicleContext } from '@/utilities/chronicles'
 import { getActiveExpeditionForUser, setSafariBallsRemaining } from '@/utilities/expeditions/actions'
 import { rollPokemonGender } from '@/utilities/pokemon/gender'
 import { resolvePokemonRarity } from '@/utilities/pokemon/rarity-effects'
-import { deriveSafariBaseFleeRate, SAFARI_BALL_ALLOWANCE } from '@/utilities/pokemon/safari-catch'
+import {
+  SAFARI_BALL_ALLOWANCE,
+  SAFARI_BASE_FLEE_RATE,
+  SAFARI_ENCOUNTER_TTL_SECONDS,
+} from '@/utilities/pokemon/safari-catch'
 import { getShinyChance, rollShiny } from '@/utilities/pokemon/shiny-odds'
-import type { EncounterState } from './types'
+import {
+  getEncounterRedisTtlSeconds,
+  type EncounterState,
+} from './types'
 import { rollAbility, getUser } from './utils'
 import { refreshEncounterShield, serializeEncounterShield } from './shield'
 import {
@@ -172,7 +179,8 @@ export async function startEncounter(
       activeEncounterState &&
       activeEncounterState.locationId === locationId &&
       activeEncounterState.startTime === cachedStartResult.startTime &&
-      Date.now() < activeEncounterState.expiry
+      (activeEncounterState.encounterMode === 'safari' ||
+        Date.now() < activeEncounterState.expiry)
     ) {
       return cachedStartResult
     }
@@ -203,22 +211,31 @@ export async function startEncounter(
       activeExpedition?.status === 'active'
         ? activeExpedition.steps[activeExpedition.currentStepIndex]
         : undefined
+    const isSafariTestLocation =
+      location.encounterMode === 'safari' && location.subCategory === 'Test'
     const isActiveSafariStep =
       location.encounterMode === 'safari' &&
       activeExpedition?.status === 'active' &&
       activeExpeditionStep?.activityType === 'location' &&
       activeExpeditionStep.activityId === location.id
 
-    if (location.encounterMode === 'safari' && !isActiveSafariStep) {
+    if (
+      location.encounterMode === 'safari' &&
+      !isActiveSafariStep &&
+      !isSafariTestLocation
+    ) {
       throw new Error('Safari catches are only available from an active expedition.')
     }
 
     const safariBallsRemaining =
       location.encounterMode === 'safari'
-        ? activeExpedition?.safariBallsRemaining ?? SAFARI_BALL_ALLOWANCE
+        ? isActiveSafariStep
+          ? activeExpedition?.safariBallsRemaining ?? SAFARI_BALL_ALLOWANCE
+          : SAFARI_BALL_ALLOWANCE
         : undefined
     if (
       location.encounterMode === 'safari' &&
+      isActiveSafariStep &&
       activeExpedition?.safariBallsRemaining === undefined
     ) {
       await setSafariBallsRemaining(user.id, SAFARI_BALL_ALLOWANCE)
@@ -257,7 +274,11 @@ export async function startEncounter(
 
     const existingState = activeEncounterState
 
-    if (existingState && Date.now() < existingState.expiry) {
+    if (
+      existingState &&
+      (existingState.encounterMode === 'safari' ||
+        Date.now() < existingState.expiry)
+    ) {
       const response = {
         success: true,
         pokemonId: existingState.pokemonId,
@@ -622,7 +643,12 @@ export async function startEncounter(
     )
 
     const startTime = Date.now()
-    const expiry = startTime + duration * 1000
+    const expiry =
+      startTime +
+      (location.encounterMode === 'safari'
+        ? SAFARI_ENCOUNTER_TTL_SECONDS
+        : duration) *
+        1000
 
     const state: EncounterState = {
       userId: user.id,
@@ -651,10 +677,7 @@ export async function startEncounter(
         : undefined,
       fleeRate:
         location.encounterMode === 'safari'
-          ? deriveSafariBaseFleeRate({
-              captureRate: baseRate,
-              locationFleeRate: location.fleeRate,
-            })
+          ? SAFARI_BASE_FLEE_RATE
           : location.fleeRate,
       levelRange: location.levelRange,
       catchRateModifier: location.catchRateModifier || 0,
@@ -816,7 +839,7 @@ export const getEncounter = cache(async () => {
   if (!state) return null
   if (refreshEncounterShield(state)) {
     await redis.set(encounterId, state, {
-      ex: Math.floor((state.expiry - Date.now()) / 1000) + 60,
+      ex: getEncounterRedisTtlSeconds(state),
     })
   }
 

@@ -1065,6 +1065,33 @@ function chronicleBattleIsWinnable(
 }
 
 describe('Chronicle gameplay balance', () => {
+  test('defers Explore revalidation while activity results are displayed', async () => {
+    const [activitySource, expeditionSource, fieldPageSource, captureSource, taskSource] = await Promise.all([
+      Bun.file('src/app/(frontend)/game/_shared/activity-actions.ts').text(),
+      Bun.file('src/utilities/expeditions/actions.ts').text(),
+      Bun.file('src/app/(frontend)/game/field-research/page.tsx').text(),
+      Bun.file(
+        'src/app/(frontend)/game/locations/encounter/actions/capture.ts',
+      ).text(),
+      Bun.file('src/utilities/tasks/actions.ts').text(),
+    ])
+
+    expect(activitySource).toContain('{ revalidatePaths: false }')
+    expect(expeditionSource).toContain(
+      'const revalidatePaths = options.revalidatePaths !== false',
+    )
+    expect(expeditionSource).toContain('if (revalidatePaths)')
+    expect(captureSource).toContain(
+      'setSafariBallsRemaining(user.id, state.safari!.ballsRemaining, false)',
+    )
+    expect(taskSource).toContain(
+      "reward as Reward & { type: 'expedition_safari_balls' }",
+    )
+    expect(taskSource).toContain('req,\n      false,')
+    expect(fieldPageSource).toContain("export const dynamic = 'force-dynamic'")
+    expect(fieldPageSource).toContain("redirect('/game/explore')")
+  })
+
   test('procedure-order UI keeps its controls reachable in a fixed viewport', async () => {
     const source = await Bun.file(
       'src/app/(frontend)/game/research/encounter/procedure-order.tsx',

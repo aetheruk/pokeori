@@ -1,10 +1,12 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { Fragment } from 'react'
 import type React from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { SectionDivider } from '@/components/ui/section-divider'
+import { cn } from '@/lib/utils'
 
 export interface ItemFlickOption {
   id: string
@@ -13,11 +15,14 @@ export interface ItemFlickOption {
 }
 
 interface ItemFlickQteProps {
-  title: string
-  instruction: string
+  title?: string
+  instruction?: string
   options: ItemFlickOption[]
   onThrow: (itemId: string) => void
   disabled?: boolean
+  compact?: boolean
+  centerContent?: React.ReactNode
+  repeatable?: boolean
 }
 
 export function ItemFlickQte({
@@ -26,6 +31,9 @@ export function ItemFlickQte({
   options,
   onThrow,
   disabled = false,
+  compact = false,
+  centerContent,
+  repeatable = false,
 }: ItemFlickQteProps) {
   const [drag, setDrag] = useState<{
     itemId: string
@@ -78,7 +86,13 @@ export function ItemFlickQte({
 
     completedRef.current = true
     setThrownItemId(itemId)
-    window.setTimeout(() => onThrow(itemId), 180)
+    window.setTimeout(() => {
+      onThrow(itemId)
+      if (repeatable) {
+        completedRef.current = false
+        setThrownItemId(null)
+      }
+    }, 180)
   }
 
   const handleKeyDown = (
@@ -90,69 +104,123 @@ export function ItemFlickQte({
     event.preventDefault()
     completedRef.current = true
     setThrownItemId(itemId)
-    window.setTimeout(() => onThrow(itemId), 180)
+    window.setTimeout(() => {
+      onThrow(itemId)
+      if (repeatable) {
+        completedRef.current = false
+        setThrownItemId(null)
+      }
+    }, 180)
   }
 
   return (
-    <div className="relative z-10 flex h-full w-full max-w-3xl mx-auto flex-col justify-center">
-      <SectionDivider
-        className="mb-3 min-h-8 [&>div:first-child]:text-base [&>div:first-child]:font-bold [&>div:first-child]:leading-tight [&>div:first-child]:tracking-[0.04em]"
-        textColor="text-game-ink"
+    <div
+      className={cn(
+        'relative z-10 flex w-full',
+        compact
+          ? 'items-center justify-center gap-2 px-2 py-4 sm:gap-4 sm:px-4'
+          : 'mx-auto h-full max-w-3xl flex-col justify-center',
+      )}
+    >
+      {!compact && title && (
+        <SectionDivider
+          className="mb-3 min-h-8 [&>div:first-child]:text-base [&>div:first-child]:font-bold [&>div:first-child]:leading-tight [&>div:first-child]:tracking-[0.04em]"
+          textColor="text-game-ink"
+        >
+          {title}
+        </SectionDivider>
+      )}
+      {!compact && instruction && (
+        <p className="mx-auto mb-4 max-w-sm text-center text-sm text-game-muted">
+          {instruction}
+        </p>
+      )}
+      <div
+        className={cn(
+          compact
+            ? 'contents'
+            : 'relative flex flex-1 items-center justify-center overflow-visible p-5',
+        )}
       >
-        {title}
-      </SectionDivider>
-      <p className="mx-auto mb-4 max-w-sm text-center text-sm text-game-muted">
-        {instruction}
-      </p>
-      <div className="relative flex flex-1 items-center justify-center overflow-visible p-5">
-        <div className="grid w-full max-w-md grid-cols-2 gap-3 sm:gap-6">
-          {options.map((option) => {
+        <div
+          className={cn(
+            compact
+              ? 'flex items-center justify-center gap-2 sm:gap-4'
+              : 'grid w-full max-w-md grid-cols-2 gap-3 sm:gap-6',
+          )}
+        >
+          {options.map((option, index) => {
             const isDragging = drag?.itemId === option.id
             const isThrown = thrownItemId === option.id
             return (
-              <button
-                key={option.id}
-                type="button"
-                aria-label={`Throw ${option.label}`}
-                className="group relative flex min-h-40 touch-none flex-col items-center justify-center rounded-xl border border-game-border bg-game-surface-raised p-4 text-center shadow-sm transition-colors hover:border-game-moss/50 hover:bg-game-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-game-moss disabled:cursor-not-allowed disabled:opacity-50"
-                disabled={disabled || completedRef.current}
-                onPointerDown={(event) => startDrag(event, option.id)}
-                onPointerMove={(event) => moveDrag(event, option.id)}
-                onPointerUp={() => finishDrag(option.id)}
-                onPointerCancel={() => {
-                  dragStartRef.current = null
-                  setDrag(null)
-                }}
-                onKeyDown={(event) => handleKeyDown(event, option.id)}
-              >
-                <motion.span
-                  className="relative block h-20 w-20"
-                  animate={{
-                    x: isDragging ? drag.dx : 0,
-                    y: isThrown ? -180 : isDragging ? drag.dy : 0,
-                    opacity:
-                      thrownItemId && !isThrown ? 0.35 : isThrown ? 0 : 1,
-                    scale: isDragging || isThrown ? 1.1 : 1,
+              <Fragment key={option.id}>
+                {compact && index === 1 && centerContent}
+                <button
+                  type="button"
+                  aria-label={`Throw ${option.label}`}
+                  className={cn(
+                    'group touch-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-game-moss disabled:cursor-not-allowed disabled:opacity-50',
+                    compact
+                      ? 'relative flex h-20 w-20 items-center justify-center rounded-full border border-game-border/70 bg-game-surface/55 p-2 hover:border-game-moss/50 hover:bg-game-surface-raised sm:h-24 sm:w-24 sm:p-3'
+                      : 'relative flex min-h-40 flex-col items-center justify-center rounded-xl border border-game-border bg-game-surface-raised p-4 text-center shadow-sm hover:border-game-moss/50 hover:bg-game-canvas',
+                  )}
+                  disabled={disabled || completedRef.current}
+                  onPointerDown={(event) => startDrag(event, option.id)}
+                  onPointerMove={(event) => moveDrag(event, option.id)}
+                  onPointerUp={() => finishDrag(option.id)}
+                  onPointerCancel={() => {
+                    dragStartRef.current = null
+                    setDrag(null)
                   }}
-                  transition={{ type: 'spring', stiffness: 520, damping: 32 }}
+                  onKeyDown={(event) => handleKeyDown(event, option.id)}
                 >
-                  <ItemSprite
-                    itemId={option.id}
-                    alt={option.label}
-                    width={80}
-                    height={80}
-                    className="h-20 w-20 object-contain"
-                  />
-                </motion.span>
-                <span className="mt-2 text-sm font-bold text-game-ink">
-                  {option.label}
-                </span>
-                {option.description && (
-                  <span className="mt-1 text-xs leading-tight text-game-muted">
-                    {option.description}
-                  </span>
-                )}
-              </button>
+                  <motion.span
+                    className={cn(
+                      'relative block',
+                      compact ? 'h-14 w-14 sm:h-16 sm:w-16' : 'h-20 w-20',
+                    )}
+                    animate={{
+                      x: isDragging ? drag.dx : 0,
+                      y: isThrown ? -180 : isDragging ? drag.dy : 0,
+                      opacity:
+                        thrownItemId && !isThrown ? 0.35 : isThrown ? 0 : 1,
+                      scale: isDragging || isThrown ? 1.1 : 1,
+                    }}
+                    transition={{ type: 'spring', stiffness: 520, damping: 32 }}
+                  >
+                    <ItemSprite
+                      itemId={option.id}
+                      alt={option.label}
+                      width={compact ? 56 : 80}
+                      height={compact ? 56 : 80}
+                      className={cn(
+                        'object-contain',
+                        compact ? 'h-14 w-14 sm:h-16 sm:w-16' : 'h-20 w-20',
+                      )}
+                    />
+                  </motion.span>
+                  {!compact && (
+                    <>
+                      <span className="mt-2 text-sm font-bold text-game-ink">
+                        {option.label}
+                      </span>
+                      {option.description && (
+                        <span className="mt-1 text-xs leading-tight text-game-muted">
+                          {option.description}
+                        </span>
+                      )}
+                    </>
+                  )}
+                  {compact && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute -bottom-2 left-1/2 inline-flex h-6 min-w-6 -translate-x-1/2 items-center justify-center rounded-full border border-game-border bg-game-surface-raised px-1.5 text-sm font-black leading-none text-game-muted shadow-sm"
+                    >
+                      ∞
+                    </span>
+                  )}
+                </button>
+              </Fragment>
             )
           })}
         </div>

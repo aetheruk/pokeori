@@ -14,6 +14,20 @@ const permitRequirement = {
   targetId: 'safari-catching-permit',
 }
 
+const grandExpeditionCompletionRequirement = {
+  type: 'expedition_result' as const,
+  targetId: 'safari-zone-grand-expedition',
+  expeditionStatus: 'completed' as const,
+  count: 1,
+}
+
+const safariEntranceFee = {
+  type: 'currency_owned' as const,
+  targetId: 'pokedollars',
+  count: 500,
+  consume: true,
+}
+
 const researchTaskPool: ExpeditionTaskPoolEntry[] = [
   ...safariResearchTaskPoolIds.common.map((id) => ({ id, weight: 70 / safariResearchTaskPoolIds.common.length })),
   ...safariResearchTaskPoolIds.uncommon.map((id) => ({ id, weight: 25 / safariResearchTaskPoolIds.uncommon.length })),
@@ -90,12 +104,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
     canAbandon: true,
     requirements: [permitRequirement],
     criteria: [
-      {
-        type: 'currency_owned',
-        targetId: 'pokedollars',
-        count: 500,
-        consume: true,
-      },
+      safariEntranceFee,
     ],
     activityPool: {
       task: allTaskIds,
@@ -270,8 +279,8 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
       },
     ],
     rewards: [
-      { type: 'xp', skill: 'researching', quantity: 250, dropChance: 100 },
-      { type: 'xp', skill: 'catching', quantity: 250, dropChance: 100 },
+      { type: 'xp', skill: 'researching', quantity: 1000, dropChance: 100 },
+      { type: 'xp', skill: 'catching', quantity: 1000, dropChance: 100 },
       {
         type: 'item',
         targetId: 'tm-strength',
@@ -283,5 +292,74 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
         ],
       },
     ],
+  },
+  {
+    id: 'safari-zone-catching-expedition',
+    name: 'Safari Zone Catching Expedition',
+    description:
+      'Return to the reserve with a full case of Safari Balls. Make two careful catches in each habitat, then try your luck in the prize habitat at the end.',
+    category: 'Kanto',
+    subCategory: 'Safari Zone',
+    buttonText: 'Begin Catching Expedition',
+    icon: { type: 'pokemon', id: '113' },
+    background: '/backgrounds/safari-reserve.avif',
+    maxLosses: 5,
+    safariBallAllowance: 30,
+    canAbandon: true,
+    requirements: [permitRequirement, grandExpeditionCompletionRequirement],
+    criteria: [safariEntranceFee],
+    activityPool: {
+      location: [
+        'safari-central-catch',
+        'safari-east-catch',
+        'safari-west-catch',
+        'safari-north-catch',
+        'safari-grand-finale-catch',
+      ],
+    },
+    path: [
+      secretActivity('safari-catching-step-01-central', 'location', 'safari-central-catch'),
+      secretActivity('safari-catching-step-02-central', 'location', 'safari-central-catch'),
+      secretActivity('safari-catching-step-03-east', 'location', 'safari-east-catch'),
+      secretActivity('safari-catching-step-04-east', 'location', 'safari-east-catch'),
+      secretActivity('safari-catching-step-05-west', 'location', 'safari-west-catch'),
+      secretActivity('safari-catching-step-06-west', 'location', 'safari-west-catch'),
+      secretActivity('safari-catching-step-07-north', 'location', 'safari-north-catch'),
+      secretActivity('safari-catching-step-08-north', 'location', 'safari-north-catch'),
+      secretActivity('safari-catching-step-09-finale', 'location', 'safari-grand-finale-catch'),
+    ],
+    rewards: [{ type: 'xp', skill: 'catching', quantity: 500, dropChance: 100 }],
+  },
+  {
+    id: 'safari-zone-fishing-expedition',
+    name: 'Safari Zone Fishing Expedition',
+    description:
+      'Work the reserve’s ponds from one end to the other. Ten Safari Ball encounters draw from every Pokémon available through the Old, Good, or Super Rod in the original Safari Zone.',
+    category: 'Kanto',
+    subCategory: 'Safari Zone',
+    buttonText: 'Begin Fishing Expedition',
+    icon: { type: 'item', id: 'super-rod' },
+    background: '/backgrounds/safari-reserve.avif',
+    maxLosses: 5,
+    safariBallAllowance: 30,
+    canAbandon: true,
+    requirements: [permitRequirement, grandExpeditionCompletionRequirement],
+    criteria: [
+      safariEntranceFee,
+      { type: 'item_owned', targetId: 'old-rod' },
+      { type: 'item_owned', targetId: 'good-rod' },
+      { type: 'item_owned', targetId: 'super-rod' },
+    ],
+    activityPool: {
+      location: ['safari-fishing-expedition-catch'],
+    },
+    path: Array.from({ length: 10 }, (_, index) =>
+      secretActivity(
+        `safari-fishing-step-${String(index + 1).padStart(2, '0')}`,
+        'location',
+        'safari-fishing-expedition-catch',
+      ),
+    ),
+    rewards: [{ type: 'xp', skill: 'catching', quantity: 500, dropChance: 100 }],
   },
 ]

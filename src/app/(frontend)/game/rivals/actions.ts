@@ -3,7 +3,6 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { headers } from 'next/headers'
-import { revalidatePath } from 'next/cache'
 import type { User } from '@/payload-types'
 import {
   KID_MODE_ACCESS_ERROR,
@@ -132,11 +131,9 @@ export async function selectRivalTrainer(
         'task',
         taskId,
         true,
+        { revalidatePaths: false },
       )
     : undefined
-
-  revalidatePath('/game')
-  revalidatePath('/game/explore')
 
   return {
     success: true,
