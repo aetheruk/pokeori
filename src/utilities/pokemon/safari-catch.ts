@@ -1,4 +1,4 @@
-export type SafariEncounterAction = 'bait' | 'shout'
+export type SafariEncounterAction = 'feed' | 'rock'
 
 export const SAFARI_BALL_ID = 'safari-ball'
 export const SAFARI_BALL_ALLOWANCE = 30
@@ -25,10 +25,10 @@ export function deriveSafariBaseFleeRate({
 
 function getStageMultipliers(stage: number) {
   if (stage < 0) {
-    const baitStages = Math.abs(stage)
+    const feedStages = Math.abs(stage)
     return {
-      catchMultiplier: 1.05 ** baitStages,
-      fleeMultiplier: 0.85 ** baitStages,
+      catchMultiplier: 1.05 ** feedStages,
+      fleeMultiplier: 0.85 ** feedStages,
     }
   }
 
@@ -71,7 +71,7 @@ export function resolveSafariAction({
   random?: () => number
 }) {
   const stage = clamp(
-    currentStage + (action === 'shout' ? 1 : -1),
+    currentStage + (action === 'rock' ? 1 : -1),
     MIN_SAFARI_STAGE,
     MAX_SAFARI_STAGE,
   )

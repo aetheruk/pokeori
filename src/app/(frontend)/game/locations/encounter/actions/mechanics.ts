@@ -483,7 +483,7 @@ export async function useEncounterItem(itemId: string) {
         return {
           success: false,
           error:
-            'Safari encounters use Bait and Shout instead of encounter items.',
+            'Safari encounters use Oran Berries and rocks instead of encounter items.',
         }
       }
 

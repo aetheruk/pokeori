@@ -7,9 +7,9 @@ import {
 } from '@/utilities/pokemon/safari-catch'
 
 describe('Safari catch actions', () => {
-  test('Bait slightly improves catch chance and lowers flee risk', () => {
+  test('Feed slightly improves catch chance and lowers flee risk', () => {
     const result = resolveSafariAction({
-      action: 'bait',
+      action: 'feed',
       currentStage: 0,
       baseCatchRate: 100,
       baseFleeRate: 20,
@@ -22,9 +22,9 @@ describe('Safari catch actions', () => {
     expect(result.fled).toBe(false)
   })
 
-  test('Shout raises catch chance and flee risk', () => {
+  test('Rock raises catch chance and flee risk', () => {
     const result = resolveSafariAction({
-      action: 'shout',
+      action: 'rock',
       currentStage: 0,
       baseCatchRate: 100,
       baseFleeRate: 20,
@@ -38,27 +38,27 @@ describe('Safari catch actions', () => {
   })
 
   test('stacking stays within the authored stage and percentage bounds', () => {
-    const bait = resolveSafariAction({
-      action: 'bait',
+    const feed = resolveSafariAction({
+      action: 'feed',
       currentStage: MIN_SAFARI_STAGE,
       baseCatchRate: 1,
       baseFleeRate: 1,
       random: () => 0.99,
     })
-    const shout = resolveSafariAction({
-      action: 'shout',
+    const rock = resolveSafariAction({
+      action: 'rock',
       currentStage: MAX_SAFARI_STAGE,
       baseCatchRate: 255,
       baseFleeRate: 100,
       random: () => 0.99,
     })
 
-    expect(bait.stage).toBe(MIN_SAFARI_STAGE)
-    expect(bait.catchRate).toBeGreaterThanOrEqual(1)
-    expect(bait.fleeChance).toBeGreaterThanOrEqual(1)
-    expect(shout.stage).toBe(MAX_SAFARI_STAGE)
-    expect(shout.catchRate).toBeLessThanOrEqual(255)
-    expect(shout.fleeChance).toBeLessThanOrEqual(90)
+    expect(feed.stage).toBe(MIN_SAFARI_STAGE)
+    expect(feed.catchRate).toBeGreaterThanOrEqual(1)
+    expect(feed.fleeChance).toBeGreaterThanOrEqual(1)
+    expect(rock.stage).toBe(MAX_SAFARI_STAGE)
+    expect(rock.catchRate).toBeLessThanOrEqual(255)
+    expect(rock.fleeChance).toBeLessThanOrEqual(90)
   })
 
   test('flee pressure is species-based and actions remain unlimited at the cap', () => {
@@ -71,7 +71,7 @@ describe('Safari catch actions', () => {
     let stage = MAX_SAFARI_STAGE
     for (let index = 0; index < 20; index += 1) {
       const result = resolveSafariAction({
-        action: 'shout',
+        action: 'rock',
         currentStage: stage,
         baseCatchRate: 100,
         baseFleeRate: 10,

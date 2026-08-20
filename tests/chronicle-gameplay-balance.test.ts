@@ -91,18 +91,11 @@ function solveSokoban(settings: any): number | null {
         x: current.player.x + delta.x,
         y: current.player.y + delta.y,
       }
-      if (
-        blockedForPlayer(next)
-      )
-        continue
+      if (blockedForPlayer(next)) continue
       const nextBoulders = [...current.boulders]
       if (boulders.has(key(next))) {
         const pushed = { x: next.x + delta.x, y: next.y + delta.y }
-        if (
-          blockedForRock(pushed) ||
-          boulders.has(key(pushed))
-        )
-          continue
+        if (blockedForRock(pushed) || boulders.has(key(pushed))) continue
         nextBoulders[nextBoulders.indexOf(key(next))] = key(pushed)
         nextBoulders.sort()
       }
@@ -154,7 +147,9 @@ function insideGrid(position: Point, gridSize: { cols: number; rows: number }) {
   )
 }
 
-function solveVoltorbGrid(settings: VoltorbGridGameConfig['settings']): number | null {
+function solveVoltorbGrid(
+  settings: VoltorbGridGameConfig['settings'],
+): number | null {
   const { cols, rows } = settings.gridSize
   const wallKeys = new Set((settings.walls || []).map(key))
   const initialDebris = new Set((settings.debris || []).map(key))
@@ -206,11 +201,7 @@ function solveVoltorbGrid(settings: VoltorbGridGameConfig['settings']): number |
     state.volts.find((voltorb) => samePosition(voltorb, position))
   const protectedAt = (state: State, position: Point) =>
     state.prot.find((pokemon) => samePosition(pokemon, position))
-  const canVoltorbOccupy = (
-    state: State,
-    position: Point,
-    movingId: string,
-  ) =>
+  const canVoltorbOccupy = (state: State, position: Point, movingId: string) =>
     insideGrid(position, settings.gridSize) &&
     !wallKeys.has(key(position)) &&
     !state.debris.has(key(position)) &&
@@ -252,9 +243,7 @@ function solveVoltorbGrid(settings: VoltorbGridGameConfig['settings']): number |
     const voltorbByPosition = new Map(
       state.volts.map((voltorb) => [key(voltorb), voltorb]),
     )
-    const firstVoltorb = state.volts.find(
-      (voltorb) => voltorb.id === detonator,
-    )
+    const firstVoltorb = state.volts.find((voltorb) => voltorb.id === detonator)
     const queue = firstVoltorb ? [firstVoltorb] : []
 
     for (let index = 0; index < queue.length; index += 1) {
@@ -296,11 +285,7 @@ function solveVoltorbGrid(settings: VoltorbGridGameConfig['settings']): number |
       discharges: state.discharges + 1,
     }
     if (blast.has(key(state.player)) || hitProtected) return 'fail'
-    if (
-      maxDischarges &&
-      next.discharges >= maxDischarges &&
-      !exitOpen(next)
-    ) {
+    if (maxDischarges && next.discharges >= maxDischarges && !exitOpen(next)) {
       return 'fail'
     }
     return next
@@ -437,9 +422,7 @@ function getMagnemitePoweredTiles(
       const nextTile = tilesByKey.get(key(next))
       if (
         nextTile &&
-        getMagnemiteConnections(nextTile).includes(
-          oppositeDirection[direction],
-        )
+        getMagnemiteConnections(nextTile).includes(oppositeDirection[direction])
       ) {
         queue.push(key(next))
       }
@@ -863,7 +846,11 @@ function chronicleBattleMatchup(
     )
     let playerExpected = 0
     let enemyExpected = 0
-    for (const enemyStance of ['power', 'speed', 'tech'] as BattleStanceChoice[]) {
+    for (const enemyStance of [
+      'power',
+      'speed',
+      'tech',
+    ] as BattleStanceChoice[]) {
       const chance = weights[enemyStance] / total
       const enemyMove = chronicleBattleBestMoveInStance(
         defender,
@@ -1059,14 +1046,7 @@ function chronicleBattleIsWinnable(
       nextPlayerHps[index] = Math.max(0, nextPlayerHps[index] - enemyDamage)
       if (
         nextPlayerHps[index] > 0 &&
-        search(
-          index,
-          nextPlayerHps,
-          enemyIndex,
-          enemyHps,
-          potions,
-          turn + 1,
-        )
+        search(index, nextPlayerHps, enemyIndex, enemyHps, potions, turn + 1)
       ) {
         return true
       }
@@ -1104,25 +1084,26 @@ describe('Chronicle gameplay balance', () => {
       battleSource,
       encounterSource,
       exploreSource,
+      exploreActionsSource,
       expeditionSource,
       taskActionSource,
-    ] =
-      await Promise.all([
-        Bun.file(
-          'src/components/game/shared/RewardResultOverlay.tsx',
-        ).text(),
-        Bun.file(
-          'src/app/(frontend)/game/battles/_components/battle-interface.tsx',
-        ).text(),
-        Bun.file(
-          'src/app/(frontend)/game/locations/encounter/_components/encounter-results.tsx',
-        ).text(),
-        Bun.file('src/components/game/features/explore/index.tsx').text(),
-        Bun.file(
-          'src/components/game/features/explore/ExpeditionModal.tsx',
-        ).text(),
-        Bun.file('src/utilities/tasks/actions.ts').text(),
-      ])
+    ] = await Promise.all([
+      Bun.file('src/components/game/shared/RewardResultOverlay.tsx').text(),
+      Bun.file(
+        'src/app/(frontend)/game/battles/_components/battle-interface.tsx',
+      ).text(),
+      Bun.file(
+        'src/app/(frontend)/game/locations/encounter/_components/encounter-results.tsx',
+      ).text(),
+      Bun.file('src/components/game/features/explore/index.tsx').text(),
+      Bun.file(
+        'src/components/game/features/explore/hooks/useExploreActions.ts',
+      ).text(),
+      Bun.file(
+        'src/components/game/features/explore/ExpeditionModal.tsx',
+      ).text(),
+      Bun.file('src/utilities/tasks/actions.ts').text(),
+    ])
 
     expect(resultSource).toContain(
       'markExpeditionReturn(expeditionProgress?.expeditionId)',
@@ -1136,8 +1117,11 @@ describe('Chronicle gameplay balance', () => {
     expect(exploreSource).toContain(
       'void actions.reopenExpeditionPanel(expeditionId)',
     )
+    expect(exploreActionsSource).not.toContain(
+      'markExpeditionReturn(expeditionId)',
+    )
     expect(expeditionSource).toContain(
-      "currentStepRef.current?.scrollIntoView({",
+      'currentStepRef.current?.scrollIntoView({',
     )
     expect(expeditionSource).toContain(
       "data-expedition-current-step={isCurrent ? 'true' : undefined}",
@@ -1209,7 +1193,10 @@ describe('Chronicle gameplay balance', () => {
     )
 
     const minimum = solveVoltorbGrid(settings)
-    expect(minimum, 'the chronicle Voltorb Grid must be winnable').not.toBeNull()
+    expect(
+      minimum,
+      'the chronicle Voltorb Grid must be winnable',
+    ).not.toBeNull()
     expect(minimum!, game!.id).toBeGreaterThanOrEqual(12)
     expect(minimum!, game!.id).toBeLessThanOrEqual(settings.maxMoves ?? 30)
   })
