@@ -36,6 +36,7 @@ import {
   attemptAbilityEscape,
   attemptCapture,
   completeEncounterQte,
+  endSafariExpedition,
   getEncounter,
   getQuizQuestion,
   performSafariAction,
@@ -164,6 +165,7 @@ interface EncounterData {
   safari?: {
     stage: number
     actions: number
+    ballsRemaining: number
   }
 }
 
@@ -202,12 +204,17 @@ function getBallAdjustedCatchRate(
   const hour = new Date().getHours()
   const baseRate = species?.capture_rate || 100
   const isUltraBeast = ULTRA_BEASTS.includes(pokemonId)
-  const hardCatchRate = getHardBallCatchRate({ ballId, isUltraBeast, isShadow })
+  const effectiveBallId = ballId === 'safari-ball' ? 'poke-ball' : ballId
+  const hardCatchRate = getHardBallCatchRate({
+    ballId: effectiveBallId,
+    isUltraBeast,
+    isShadow,
+  })
   if (hardCatchRate !== undefined) return hardCatchRate
   if (ballId === 'master-ball') return 255
 
   const questionBonus = getBallQuestionBonus({
-    ballId,
+    ballId: effectiveBallId,
     species,
     turnCount,
     targetLevel,
@@ -449,6 +456,8 @@ export default function EncounterPage() {
     rewards?: RewardSummary
     messages?: string[]
     failMessage?: string
+    encounterFailed?: boolean
+    safariRetry?: boolean
     secondChance?: boolean
     throwQuality?: ThrowQuality
     throwStageBonus?: number
@@ -482,6 +491,9 @@ export default function EncounterPage() {
     ballId: string
     status: CaptureAnimationStatus
     caught?: boolean
+    encounterFailed?: boolean
+    safariRetry?: boolean
+    failMessage?: string
     pokemonName?: string
     rewards?: RewardSummary
     messages?: string[]
@@ -536,13 +548,20 @@ export default function EncounterPage() {
   // Ball selection state
   // Filter balls to only show those the user has in inventory
   const balls = encounter
-    ? items.filter(
-        (i) =>
-          i.category === 'ball' &&
-          canUseItemWithSkillRequirements(i, user?.skills) &&
-          (encounter.inventory.find((inv) => inv.itemId === i.id)?.quantity ||
-            0) > 0,
-      )
+    ? encounter.encounterMode === 'safari'
+      ? items.filter(
+          (i) =>
+            i.id === 'safari-ball' &&
+            canUseItemWithSkillRequirements(i, user?.skills) &&
+            (encounter.safari?.ballsRemaining || 0) > 0,
+        )
+      : items.filter(
+          (i) =>
+            i.category === 'ball' &&
+            canUseItemWithSkillRequirements(i, user?.skills) &&
+            (encounter.inventory.find((inv) => inv.itemId === i.id)
+              ?.quantity || 0) > 0,
+        )
     : []
 
   const species = encounter
@@ -725,7 +744,11 @@ export default function EncounterPage() {
       setTimeLeft(remaining)
 
       if (remaining <= 0 && (phase === 'quiz' || phase === 'safari')) {
-        setPhase('capture')
+        if (phase === 'safari' && (encounter.safari?.ballsRemaining || 0) <= 0) {
+          setPhase('safari')
+        } else {
+          setPhase('capture')
+        }
       }
     }, 100)
 
@@ -783,7 +806,6 @@ export default function EncounterPage() {
               : current,
           )
           toast.success(response.message)
-          if (response.enterCapture) setPhase('capture')
         } else if (shouldEnterCaptureFromResponse(response)) {
           setPhase('capture')
         } else if (isExpiredEncounterResponse(response)) {
@@ -797,6 +819,30 @@ export default function EncounterPage() {
     },
     [encounter, exitExpiredEncounter, submittingSafariAction],
   )
+
+  const handleEndSafariExpedition = useCallback(async () => {
+    if (submittingSafariAction) return
+    setSubmittingSafariAction(true)
+    try {
+      const response = await endSafariExpedition()
+      if (!response.success) {
+        toast.error(response.message || 'Unable to end the expedition.')
+        return
+      }
+
+      toast.error('The Safari Balls are gone. The expedition has ended.')
+      setCaptureResult({
+        success: true,
+        caught: false,
+        failMessage: 'The expedition ended after you ran out of Safari Balls.',
+        pokemonName: encounter?.pokemonName,
+        expeditionProgress: response.expedition,
+      })
+      setPhase('result')
+    } finally {
+      setSubmittingSafariAction(false)
+    }
+  }, [encounter?.pokemonName, submittingSafariAction])
 
   const showBundledNextQuestion = useCallback(
     (question: Question) => {
@@ -1003,6 +1049,9 @@ export default function EncounterPage() {
             pokemonName: captureData.pokemonName,
             rewards: captureData.rewards,
             messages: captureData.messages,
+            encounterFailed: (captureData as any).encounterFailed,
+            safariRetry: (captureData as any).safariRetry,
+            failMessage: (captureData as any).failMessage,
             secondChance: captureData.secondChance,
             throwQuality: captureData.throwQuality,
             throwStageBonus: captureData.throwStageBonus,
@@ -1143,12 +1192,31 @@ export default function EncounterPage() {
         return
       }
 
+      if (!captureAnimationData?.caught && captureAnimationData?.safariRetry) {
+        toast.success('The Pokémon stayed nearby. You can try again.')
+        setHasAttemptedCapture(false)
+        setCaptureAnimationData(null)
+        setCaptureBallContacted(false)
+        setThrowFeedback(null)
+        setIsCapturing(false)
+        void getEncounter().then((latest) => {
+          if (latest) {
+            setEncounter(latest)
+            setCatchRate(latest.currentCatchRate)
+            setPhase('safari')
+          }
+        })
+        return
+      }
+
       setCaptureResult({
         success: true,
         caught: captureAnimationData?.caught || false,
         pokemonName: captureAnimationData?.pokemonName,
         rewards,
         messages: captureAnimationData?.messages,
+        failMessage: captureAnimationData?.failMessage,
+        encounterFailed: captureAnimationData?.encounterFailed,
         secondChance: captureAnimationData?.secondChance,
         expeditionProgress: captureAnimationData?.expeditionProgress,
       })
@@ -1770,7 +1838,7 @@ export default function EncounterPage() {
             animate={{ opacity: 1, y: 0 }}
             className="mx-auto flex w-full max-w-md flex-col gap-4 rounded-2xl border border-game-border bg-game-surface-raised p-4 shadow-sm"
           >
-            <div>
+          <div>
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-game-muted">
                 Safari encounter
               </p>
@@ -1778,43 +1846,57 @@ export default function EncounterPage() {
                 Choose your approach
               </h2>
               <p className="mt-1 text-sm text-game-muted">
-                Bait keeps the Pokemon calm but makes it harder to catch.
-                Shouting does the opposite.
+                Bait is a gentle lure. Shout to make a catch much easier, but
+                risk startling the Pokémon into fleeing.
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                className="min-h-14 gap-2 border-game-moss/45 bg-game-moss/10 text-game-moss-strong hover:bg-game-moss/15"
-                disabled={submittingSafariAction}
-                onClick={() => handleSafariAction('bait')}
-              >
-                <Cookie className="h-5 w-5" />
-                Bait
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="min-h-14 gap-2 border-game-ochre/50 bg-game-ochre/10 text-game-ink hover:bg-game-ochre/15"
-                disabled={submittingSafariAction}
-                onClick={() => handleSafariAction('shout')}
-              >
-                <Megaphone className="h-5 w-5 text-game-ochre" />
-                Shout
-              </Button>
-            </div>
-            <Button
-              type="button"
-              className="min-h-14 bg-game-clay text-game-cream hover:bg-game-clay/90"
-              disabled={submittingSafariAction || balls.length === 0}
-              onClick={() => setPhase('capture')}
-            >
-              Throw a Ball
-            </Button>
-            <p className="text-center text-xs text-game-muted">
-              Actions used: {encounter.safari?.actions || 0} / 5
+            <p className="rounded-xl border border-game-border bg-game-canvas px-3 py-2 text-center text-sm font-semibold text-game-ink">
+              Safari Balls remaining: {encounter.safari?.ballsRemaining || 0}
             </p>
+            {(encounter.safari?.ballsRemaining || 0) > 0 ? (
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="min-h-14 gap-2 border-game-moss/45 bg-game-moss/10 text-game-moss-strong hover:bg-game-moss/15"
+                    disabled={submittingSafariAction}
+                    onClick={() => handleSafariAction('bait')}
+                  >
+                    <Cookie className="h-5 w-5" />
+                    Bait
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="min-h-14 gap-2 border-game-ochre/50 bg-game-ochre/10 text-game-ink hover:bg-game-ochre/15"
+                    disabled={submittingSafariAction}
+                    onClick={() => handleSafariAction('shout')}
+                  >
+                    <Megaphone className="h-5 w-5 text-game-ochre" />
+                    Shout
+                  </Button>
+                </div>
+                <Button
+                  type="button"
+                  className="min-h-14 bg-game-clay text-game-cream hover:bg-game-clay/90"
+                  disabled={submittingSafariAction || balls.length === 0}
+                  onClick={() => setPhase('capture')}
+                >
+                  Throw a Safari Ball
+                </Button>
+              </>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                className="min-h-14 border-game-clay/60 bg-game-clay/10 text-game-clay hover:bg-game-clay/15"
+                disabled={submittingSafariAction}
+                onClick={handleEndSafariExpedition}
+              >
+                End Expedition
+              </Button>
+            )}
           </motion.div>
         )}
 

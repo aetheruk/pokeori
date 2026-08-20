@@ -17,6 +17,8 @@ import type { Pokemon, User } from '@/payload-types'
 import { getGameUserData } from '@/utilities/game-data'
 import { analyzeRequirements } from '@/utilities/requirements/analysis'
 import {
+  grantExpeditionSafariBallsForTask,
+  isCurrentExpeditionTask,
   recordExpeditionActivityResult,
   type ExpeditionProgressSnapshot,
 } from '@/utilities/expeditions/actions'
@@ -116,6 +118,16 @@ export async function completeTask(
       return { success: false, message: 'Task not found' }
     }
     isGeneratedDaily = true
+  }
+
+  if (
+    task.expeditionOnly &&
+    !(await isCurrentExpeditionTask(payload, user.id, taskId))
+  ) {
+    return {
+      success: false,
+      message: 'This task is only available in its expedition.',
+    }
   }
 
   // Fetch requirements + criteria + inventory/pokemon for consumption
@@ -291,7 +303,11 @@ export async function completeTask(
     }
 
   // 5. Grant Rewards
+  const safariBallRewards = task.rewards.filter(
+    (reward) => reward.type === 'expedition_safari_balls',
+  )
   const rewardsToGrant: Reward[] = task.rewards.flatMap((r) => {
+    if (r.type === 'expedition_safari_balls') return []
     if (r.type === 'active_companion_friendship') return []
 
     const pokemonOrigin = r.type === 'pokemon' ? resolveTaskPokemonOrigin(task, r) : undefined
@@ -404,6 +420,23 @@ export async function completeTask(
     true,
     { payload, req },
   )
+
+  for (const reward of safariBallRewards) {
+    const quantity = await grantExpeditionSafariBallsForTask(
+      payload,
+      user.id,
+      taskId,
+      reward as Reward & { type: 'expedition_safari_balls' },
+      req,
+    )
+    if (quantity > 0) {
+      summary.notices?.push({
+        id: `safari-balls-${taskId}`,
+        title: 'Safari Balls found',
+        message: `+${quantity} Safari Ball${quantity === 1 ? '' : 's'} added to this expedition.`,
+      })
+    }
+  }
 
   ;(summary as RewardSummary & {
     expeditionProgress?: ExpeditionProgressSnapshot

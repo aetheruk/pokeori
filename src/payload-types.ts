@@ -636,6 +636,7 @@ export interface ExpeditionRun {
   mapItemId?: string | null;
   maxLosses: number;
   losses: number;
+  safariBallsRemaining?: number | null;
   currentStepIndex: number;
   totalSteps: number;
   steps:
@@ -1186,6 +1187,7 @@ export interface ExpeditionRunsSelect<T extends boolean = true> {
   mapItemId?: T;
   maxLosses?: T;
   losses?: T;
+  safariBallsRemaining?: T;
   currentStepIndex?: T;
   totalSteps?: T;
   steps?: T;

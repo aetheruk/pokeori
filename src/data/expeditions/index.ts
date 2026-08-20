@@ -10,6 +10,7 @@ import { gymLeaderChronicleExpeditions } from './entries/gym-leader-chronicles'
 import { blackoutChronicleExpeditions } from './entries/blackout-chronicles'
 import { fuchsiaCityExpeditions } from './entries/fuchsia-city'
 import { safariZoneExpeditions } from './entries/safari-zone'
+import { legacySafariZoneExpeditions } from './entries/safari-zone-legacy'
 
 export * from './types'
 
@@ -28,5 +29,10 @@ export const expeditions: ExpeditionConfig[] = [
 ]
 
 export function getExpedition(id: string): ExpeditionConfig | undefined {
-  return expeditions.find((expedition) => expedition.id === id)
+  return (
+    expeditions.find((expedition) => expedition.id === id) ||
+    legacySafariZoneExpeditions.find((expedition) => expedition.id === id)
+  )
 }
+
+export { legacySafariZoneExpeditions }

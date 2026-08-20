@@ -227,7 +227,7 @@ Field TMs/HMs are inventory items generated in `src/data/items/entries/tms.ts`. 
 | `tm-cut` / HM01 Cut           | Rewarded by the one-time `ss-anne-repair-duty` expedition after the Pikachu power-on task. Used as a gate for Viridian, Pewter, Vermilion Gym, and Route 9 shrub tasks. Also unlocks the assignable Cut battle move for forms 5, 6, 28, 31, 34, 47, 83, 123, and 141. |
 | `tm-fly` / HM02 Fly           | Secret reward from Celadon's `nesting-season` task after delivering 20 Nest Ball Pidgey and 20 Nest Ball Spearow to the Birdkeeper. Unlocks the assignable Fly battle move for forms 6, 18, 22, 142, 144, 145, and 146 if owned.                                      |
 | `tm-surf` / HM03 Surf         | Defined, but no current player-facing task gate or authored reward. Unlocks the assignable Surf battle move for forms 9, 73, 130, and 131 if owned.                                                                         |
-| `tm-strength` / HM04 Strength | Defined, but not currently rewarded. Unlocks the assignable Strength battle move for forms 9, 31, 34, 67, 68, 76, and 112 if owned.                                                                                                                                   |
+| `tm-strength` / HM04 Strength | One-time first-completion reward from the `safari-zone-grand-expedition`. Unlocks the assignable Strength battle move for forms 9, 31, 34, 67, 68, 76, and 112 if owned.                                                                                                                                   |
 | `tm-flash` / HM05 Flash       | Rewarded by `a-light-in-the-dark`; unlocks the assignable Flash battle move for forms 25, 26, 81, 82, 100, 101, 120, 121, 125, 135, and 145.                                                                                                                          |
 
 Other notable progression key items include `unknown-tm`, a unique blue Water TM decoy from Vermilion fishing; `squirtle-squad`, a unique diary key item from the 1% Squirtle random event gated by `unknown-tm`; `clear-bell`, a unique key item that gates the Ho-Oh and Legendary Beast random Snap/Battle/Field Observation loops; `rainbow-feather`, a non-unique key item from the Clear Bell-gated 1:256 Ho-Oh shadow Snap random event capped at three successful snaps; `silver-feather`, a non-unique key item from the ungated 1:256 Lugia shadow Snap counterpart capped at three successful snaps; `proof-of-fire`, `proof-of-thunder`, and `proof-of-water`, proof key items from the one-time successful 1:256 Legendary Beast shadow Snap random events; the Lifeless/Concentrated Fire, Thunder, and Water key item chain from beast-stone fusion tasks and Artisan recipes; and the Flaming/Charged/Frozen Branch, Bough, Twig, Lifeless Branch, and Concentrated Branch key item chain from the matching Legendary Bird random events, branch-fusion tasks, and Silver Feather Artisan recipes.
@@ -273,7 +273,7 @@ Attacks whose effects exist only in the physical game's deck, hand, prize-card, 
 
 The following are defined in data or engine support but not yet naturally obtainable through authored progression:
 
-- Surf and Strength HM rewards, including the already-gated `tm-surf`.
+- Surf HM rewards, including the already-gated `tm-surf`.
 - Power key items: `tera-orb`, `mega-bracelet`, `z-ring`, `dynamax-band`, `book-of-shouts`, `circadian-stone`, `v-crown`, `griseous-orb`, `adamant-orb`, `lustrous-orb`, `blue-orb`, `red-orb`.
 - Tera Shards.
 - Mega Stones/Primal orbs as normal progression rewards.

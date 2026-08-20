@@ -48,8 +48,10 @@ import {
 import { isActivityEligibleForReplay } from '@/utilities/activity-replay'
 import { canApplyEncounterAbilityOverride } from '@/utilities/pokemon/encounter-abilities'
 import { getActiveChronicleContext } from '@/utilities/chronicles'
+import { getActiveExpeditionForUser, setSafariBallsRemaining } from '@/utilities/expeditions/actions'
 import { rollPokemonGender } from '@/utilities/pokemon/gender'
 import { resolvePokemonRarity } from '@/utilities/pokemon/rarity-effects'
+import { deriveSafariBaseFleeRate, SAFARI_BALL_ALLOWANCE } from '@/utilities/pokemon/safari-catch'
 import { getShinyChance, rollShiny } from '@/utilities/pokemon/shiny-odds'
 import type { EncounterState } from './types'
 import { rollAbility, getUser } from './utils'
@@ -192,6 +194,35 @@ export async function startEncounter(
       activityType: 'location',
       activityId: location.id,
     })
+
+    const activeExpedition =
+      location.encounterMode === 'safari'
+        ? await getActiveExpeditionForUser(user.id)
+        : null
+    const activeExpeditionStep =
+      activeExpedition?.status === 'active'
+        ? activeExpedition.steps[activeExpedition.currentStepIndex]
+        : undefined
+    const isActiveSafariStep =
+      location.encounterMode === 'safari' &&
+      activeExpedition?.status === 'active' &&
+      activeExpeditionStep?.activityType === 'location' &&
+      activeExpeditionStep.activityId === location.id
+
+    if (location.encounterMode === 'safari' && !isActiveSafariStep) {
+      throw new Error('Safari catches are only available from an active expedition.')
+    }
+
+    const safariBallsRemaining =
+      location.encounterMode === 'safari'
+        ? activeExpedition?.safariBallsRemaining ?? SAFARI_BALL_ALLOWANCE
+        : undefined
+    if (
+      location.encounterMode === 'safari' &&
+      activeExpedition?.safariBallsRemaining === undefined
+    ) {
+      await setSafariBallsRemaining(user.id, SAFARI_BALL_ALLOWANCE)
+    }
 
     // Active Pokemon Ability Check
     const activePoke = chronicleContext
@@ -618,7 +649,13 @@ export async function startEncounter(
             brokenCount: 0,
           }
         : undefined,
-      fleeRate: location.fleeRate,
+      fleeRate:
+        location.encounterMode === 'safari'
+          ? deriveSafariBaseFleeRate({
+              captureRate: baseRate,
+              locationFleeRate: location.fleeRate,
+            })
+          : location.fleeRate,
       levelRange: location.levelRange,
       catchRateModifier: location.catchRateModifier || 0,
       captureAttempts: 0,
@@ -636,6 +673,7 @@ export async function startEncounter(
           ? {
               stage: 0,
               actions: 0,
+              ballsRemaining: safariBallsRemaining ?? SAFARI_BALL_ALLOWANCE,
             }
           : undefined,
       activeAbilityId,
@@ -789,6 +827,13 @@ export const getEncounter = cache(async () => {
   const inventoryArray = Object.entries(inventoryMap)
     .filter(([_, qty]) => qty > 0)
     .map(([id, qty]) => ({ itemId: id, quantity: qty })) as any[]
+
+  if (state.encounterMode === 'safari' && state.safari) {
+    inventoryArray.push({
+      itemId: 'safari-ball',
+      quantity: state.safari.ballsRemaining,
+    })
+  }
 
   const speciesData =
     getPokemonForm(state.formId) || getPokemonSpecies(state.pokemonId)

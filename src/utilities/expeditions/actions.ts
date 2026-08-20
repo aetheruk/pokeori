@@ -29,6 +29,7 @@ import {
   resolveResultBranchAfterStep,
 } from '@/utilities/expeditions/path-builder'
 import type { User } from '@/payload-types'
+import type { Reward } from '@/data/types'
 import { getEconomyActionErrorMessage, runEconomyAction } from '@/utilities/economy/transactions'
 
 interface ExpeditionRunDoc {
@@ -40,11 +41,22 @@ interface ExpeditionRunDoc {
   mapItemId?: string
   maxLosses: number
   losses: number
+  safariBallsRemaining?: number
   currentStepIndex: number
   totalSteps: number
   steps: ExpeditionGeneratedStep[]
   startedAt: string
   completedAt?: string
+}
+
+function resolveRewardQuantity(quantity: Reward['quantity']): number {
+  if (typeof quantity === 'number') return Math.max(0, quantity)
+  if (quantity && typeof quantity === 'object') {
+    return Math.floor(
+      Math.random() * (quantity.max - quantity.min + 1),
+    ) + quantity.min
+  }
+  return 1
 }
 
 interface ExpeditionActionResult {
@@ -96,6 +108,7 @@ function mapRunDocToActiveRun(runDoc: ExpeditionRunDoc): ActiveExpeditionRun {
     totalSteps: runDoc.totalSteps,
     losses: runDoc.losses,
     maxLosses: runDoc.maxLosses,
+    safariBallsRemaining: runDoc.safariBallsRemaining,
     mapItemId: runDoc.mapItemId,
     steps: runDoc.steps || [],
   }
@@ -289,6 +302,106 @@ async function getActiveRunForUser(payload: any, userId: string): Promise<Expedi
   return runs.find((run) => run.status === 'active' || run.status === 'ready_to_claim') || null
 }
 
+export async function isCurrentExpeditionTask(
+  payload: any,
+  userId: string,
+  taskId: string,
+): Promise<boolean> {
+  const run = await getActiveRunForUser(payload, userId)
+  if (!run || (run.status !== 'active' && run.status !== 'ready_to_claim')) {
+    return false
+  }
+
+  const completedStep = run.steps[run.currentStepIndex - 1]
+  const currentStep = run.steps[run.currentStepIndex]
+  return (
+    (completedStep?.activityType === 'task' && completedStep.activityId === taskId) ||
+    (currentStep?.activityType === 'task' && currentStep.activityId === taskId)
+  )
+}
+
+export async function grantExpeditionSafariBallsForTask(
+  payload: any,
+  userId: string,
+  taskId: string,
+  reward: Reward & { type: 'expedition_safari_balls' },
+  req?: PayloadRequest,
+): Promise<number> {
+  const run = await getActiveRunForUser(payload, userId)
+  if (!run || (run.status !== 'active' && run.status !== 'ready_to_claim')) {
+    return 0
+  }
+
+  const completedStep = run.steps[run.currentStepIndex - 1]
+  const currentStep = run.steps[run.currentStepIndex]
+  const belongsToTask =
+    (completedStep?.activityType === 'task' && completedStep.activityId === taskId) ||
+    (currentStep?.activityType === 'task' && currentStep.activityId === taskId)
+  if (!belongsToTask) return 0
+
+  const dropChance = reward.dropChance ?? 100
+  if (dropChance < 100 && Math.random() * 100 > dropChance) return 0
+
+  const quantity = resolveRewardQuantity(reward.quantity)
+  if (quantity <= 0) return 0
+
+  const newRemaining = (run.safariBallsRemaining || 0) + quantity
+  await payload.update({
+    collection: 'expedition-runs',
+    id: run.id,
+    data: { safariBallsRemaining: newRemaining },
+    req,
+  })
+  revalidatePath('/game')
+  revalidatePath('/game/explore')
+  return quantity
+}
+
+export async function setSafariBallsRemaining(
+  userId: string,
+  remaining: number,
+): Promise<boolean> {
+  const payload = await getPayload({ config: configPromise })
+  const run = await getActiveRunForUser(payload as any, userId)
+  if (run?.status !== 'active') return false
+
+  await (payload as any).update({
+    collection: 'expedition-runs',
+    id: run.id,
+    data: { safariBallsRemaining: Math.max(0, remaining) },
+  })
+  revalidatePath('/game')
+  revalidatePath('/game/explore')
+  return true
+}
+
+export async function endSafariExpeditionWithoutBalls(userId: string) {
+  const lock = await acquireActionLock(getLockKey(userId), EXPEDITION_PROGRESS_LOCK_TTL)
+  if (!lock.acquired) return { success: false as const, message: 'Another expedition action is being processed.' }
+
+  try {
+    const payload = await getPayload({ config: configPromise })
+    const run = await getActiveRunForUser(payload as any, userId)
+    if (run?.status !== 'active') {
+      return { success: false as const, message: 'No active expedition is available.' }
+    }
+
+    const expedition = getExpedition(run.expeditionId)
+    const failedRun = { ...run, losses: run.maxLosses }
+    return endExpeditionRun(
+      payload,
+      userId,
+      failedRun,
+      run.steps,
+      run.currentStepIndex,
+      expedition?.canFail !== false,
+      'failed',
+    )
+  } finally {
+    await releaseActionLock(lock)
+  }
+}
+
 async function getAuthedPayloadUser(): Promise<{ payload: any; user: User | null }> {
   const payload = await getPayload({ config: configPromise })
   const { user } = await payload.auth({ headers: await headers() })
@@ -319,6 +432,9 @@ export async function startExpedition(
   const expedition = getExpedition(expeditionId)
   if (!expedition) {
     return { success: false, message: 'Expedition not found' }
+  }
+  if (expedition.legacyOnly) {
+    return { success: false, message: 'That expedition is no longer available.' }
   }
   if (!clientActionId) return { success: false, message: 'Missing action identifier' }
 
@@ -382,6 +498,7 @@ export async function startExpedition(
         mapItemId: expedition.mapItemId,
         maxLosses: expedition.maxLosses,
         losses: 0,
+        safariBallsRemaining: expedition.safariBallAllowance,
         currentStepIndex: 0,
         totalSteps: generatedSteps.length,
         steps: generatedSteps,

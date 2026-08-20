@@ -9,7 +9,6 @@ import {
   setIdempotentResult,
 } from '@/utilities/game-integrity'
 import {
-  MAX_SAFARI_ACTIONS,
   resolveSafariAction,
   type SafariEncounterAction,
 } from '@/utilities/pokemon/safari-catch'
@@ -20,6 +19,7 @@ import {
 import { failEncounter } from './failure'
 import type { EncounterState } from './types'
 import { getUser } from './utils'
+import { endSafariExpeditionWithoutBalls } from '@/utilities/expeditions/actions'
 
 export async function performSafariAction(
   action: SafariEncounterAction,
@@ -66,11 +66,11 @@ export async function performSafariAction(
     if (Date.now() >= state.expiry) {
       return { success: false, enterCapture: true, error: 'Time is up!' }
     }
-    if (state.safari.actions >= MAX_SAFARI_ACTIONS) {
+    if (state.safari.ballsRemaining <= 0) {
       return {
         success: false,
-        enterCapture: true,
-        error: 'It is time to throw a ball.',
+        noSafariBalls: true,
+        error: 'No Safari Balls remain.',
       }
     }
 
@@ -83,6 +83,7 @@ export async function performSafariAction(
     state.safari = {
       stage: resolved.stage,
       actions: state.safari.actions + 1,
+      ballsRemaining: state.safari.ballsRemaining,
     }
     state.currentCatchRate = resolved.catchRate
 
@@ -110,17 +111,22 @@ export async function performSafariAction(
       success: true,
       action,
       newCatchRate: resolved.catchRate,
-      fleeChance: resolved.fleeChance,
       safari: state.safari,
       message:
         action === 'shout'
-          ? 'The Pokemon is startled. It will be easier to catch, but more likely to flee.'
-          : 'The Pokemon settles down for the bait. It is less likely to flee, but harder to catch.',
-      enterCapture: state.safari.actions >= MAX_SAFARI_ACTIONS,
+          ? 'The Pokémon is rattled. It is easier to catch, but much more likely to flee.'
+          : 'The Pokémon settles. It is a little easier to catch and less likely to flee.',
     }
     await setIdempotentResult(resultKey, response, 300)
     return response
   } finally {
     await releaseActionLock(lock)
   }
+}
+
+export async function endSafariExpedition() {
+  const user = await getUser()
+  if (!user) return { success: false as const, message: 'Unauthorized' }
+
+  return endSafariExpeditionWithoutBalls(user.id)
 }

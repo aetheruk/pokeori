@@ -60,6 +60,11 @@ export const ExpeditionRuns: CollectionConfig = {
       defaultValue: 0,
     },
     {
+      name: 'safariBallsRemaining',
+      type: 'number',
+      required: false,
+    },
+    {
       name: 'currentStepIndex',
       type: 'number',
       required: true,

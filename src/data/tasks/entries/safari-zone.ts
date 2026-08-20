@@ -1,10 +1,68 @@
 import { Task } from '../../types'
+import { safariExpeditionContentTasks } from './safari-zone-expedition'
 
 const kogaIcon = { type: 'trainer' as const, id: 'gym-kanto-koga' }
 const janineIcon = { type: 'trainer' as const, id: 'chronicle-janine' }
 const rangerIcon = { type: 'trainer' as const, id: 'ranger' }
 const detectiveIcon = { type: 'trainer' as const, id: 'detective' }
 const billiamIcon = { type: 'trainer' as const, id: 'gamer' }
+
+const retiredSafariExpeditionTaskIds = new Set([
+  'safari-expedition-supply-case',
+  'safari-central-trampled-grass',
+  'safari-central-broken-sign',
+  'safari-central-field-notes',
+  'safari-central-to-east-marker',
+  'safari-east-reed-bed',
+  'safari-east-pond-glimmer',
+  'safari-east-boardwalk-cache',
+  'safari-east-to-west-marker',
+  'safari-west-rest-house',
+  'safari-west-powder-trail',
+  'safari-west-old-lure',
+  'safari-west-to-north-marker',
+  'safari-north-boulder-track',
+  'safari-north-service-locker',
+  'safari-north-rare-nest',
+  'safari-north-return-marker',
+  'safari-expedition-final-notes',
+])
+
+const safariExpeditionTask = ({
+  id,
+  name,
+  description,
+  icon,
+  rewards,
+  completeButtonText = 'Record the Finding',
+  repeatable = true,
+  requirements = [],
+}: {
+  id: string
+  name: string
+  description: string
+  icon: Task['icon']
+  rewards: Task['rewards']
+  completeButtonText?: string
+  repeatable?: boolean
+  requirements?: Task['requirements']
+}): Task => ({
+  id,
+  name,
+  description,
+  category: 'Secret',
+  subCategory: 'Safari Zone',
+  icon,
+  background: '/backgrounds/safari-reserve.avif',
+  repeatable,
+  expeditionOnly: true,
+  secret: true,
+  completionTrigger: 'manual',
+  completeButtonText,
+  requirements,
+  criteria: [],
+  rewards,
+})
 
 const hiddenDiscovery = ({
   id,
@@ -39,7 +97,7 @@ const hiddenDiscovery = ({
   },
 })
 
-export const safariZoneTasks: Task[] = [
+export const safariZoneTasks: Task[] = ([
   {
     id: 'fuchsia-gym-search-for-koga',
     name: 'The Empty Gym',
@@ -1209,4 +1267,151 @@ export const safariZoneTasks: Task[] = [
       },
     ],
   },
-]
+  safariExpeditionTask({
+    id: 'safari-expedition-supply-case',
+    name: 'The Ranger’s Supply Case',
+    description: 'The Ranger left a sealed case beside the trail. I should check the issue before heading deeper into the reserve.',
+    icon: rangerIcon,
+    completeButtonText: 'Check the Supplies',
+    rewards: [{ type: 'pokemon_research_xp', targetId: '111', quantity: 20, dropChance: 100 }],
+  }),
+  safariExpeditionTask({
+    id: 'safari-central-trampled-grass',
+    name: 'A Trail Through the Grass',
+    description: 'Something heavy moved through the grass recently. The flattened stems still point towards the central path.',
+    icon: { type: 'pokemon', id: '111' },
+    rewards: [{ type: 'pokemon_research_xp', targetId: '111', quantity: 25, dropChance: 100 }],
+  }),
+  safariExpeditionTask({
+    id: 'safari-central-broken-sign',
+    name: 'A Broken Signpost',
+    description: 'The direction board has been knocked sideways. The damage looks fresh, and the splinters are too clean for weather.',
+    icon: { type: 'lucide', id: 'Signpost' },
+    rewards: [{ type: 'item', targetId: 'stardust', quantity: 1, dropChance: 100 }],
+    completeButtonText: 'Inspect the Sign',
+  }),
+  safariExpeditionTask({
+    id: 'safari-central-field-notes',
+    name: 'Tracks by the Path',
+    description: 'A few careful measurements should tell me whether the tracks belong to a single Pokémon or a whole group.',
+    icon: { type: 'pokemon', id: '30' },
+    rewards: [{ type: 'pokemon_research_xp', targetId: '30', quantity: 30, dropChance: 100 }],
+  }),
+  safariExpeditionTask({
+    id: 'safari-central-to-east-marker',
+    name: 'The Eastern Marker',
+    description: 'The central trail opens onto a raised boardwalk. I can hear water somewhere beyond the reeds.',
+    icon: { type: 'pokemon', id: '102' },
+    rewards: [{ type: 'pokemon_research_xp', targetId: '102', quantity: 25, dropChance: 100 }],
+    completeButtonText: 'Follow the Boardwalk',
+  }),
+  safariExpeditionTask({
+    id: 'safari-east-reed-bed',
+    name: 'Movement in the Reeds',
+    description: 'The reeds keep bending after the breeze has stopped. I should watch quietly before I disturb whatever is hiding there.',
+    icon: { type: 'pokemon', id: '84' },
+    rewards: [{ type: 'pokemon_research_xp', targetId: '84', quantity: 30, dropChance: 100 }],
+    completeButtonText: 'Watch the Reeds',
+  }),
+  safariExpeditionTask({
+    id: 'safari-east-pond-glimmer',
+    name: 'A Glimmer Beneath the Pond',
+    description: 'Something bright flashes below the surface near the bank. It may be a discarded lure, or something worth taking back to the archive.',
+    icon: { type: 'item', id: 'pearl' },
+    rewards: [{ type: 'item', targetId: 'pearl', quantity: 1, dropChance: 100 }],
+    completeButtonText: 'Reach into the Water',
+  }),
+  safariExpeditionTask({
+    id: 'safari-east-boardwalk-cache',
+    name: 'A Cache under the Boards',
+    description: 'There is a small field tin wedged below the boardwalk. Someone marked it with the Institute’s old survey symbol.',
+    icon: { type: 'item', id: 'toxic-resin-t1' },
+    rewards: [{ type: 'item', targetId: 'toxic-resin-t1', quantity: 1, dropChance: 100 }],
+    completeButtonText: 'Open the Field Tin',
+  }),
+  safariExpeditionTask({
+    id: 'safari-east-to-west-marker',
+    name: 'The Western Footbridge',
+    description: 'The boardwalk ends at a narrow footbridge leading into thicker cover. The western woods look much quieter than the ponds.',
+    icon: { type: 'pokemon', id: '115' },
+    rewards: [{ type: 'pokemon_research_xp', targetId: '115', quantity: 25, dropChance: 100 }],
+    completeButtonText: 'Cross the Footbridge',
+  }),
+  safariExpeditionTask({
+    id: 'safari-west-rest-house',
+    name: 'The Empty Rest House',
+    description: 'The old rest house is empty, but a cup on the sill is still warm. I am not the first person to pass through here today.',
+    icon: { type: 'lucide', id: 'Home' },
+    rewards: [{ type: 'pokemon_research_xp', targetId: '49', quantity: 25, dropChance: 100 }],
+    completeButtonText: 'Search the Rest House',
+  }),
+  safariExpeditionTask({
+    id: 'safari-west-powder-trail',
+    name: 'Powder on the Trail',
+    description: 'A fine powder dusts the leaves beside the trail. It looks like a Pokémon brushed past in a hurry.',
+    icon: { type: 'pokemon', id: '49' },
+    rewards: [{ type: 'pokemon_research_xp', targetId: '49', quantity: 35, dropChance: 100 }],
+    completeButtonText: 'Collect a Sample',
+  }),
+  safariExpeditionTask({
+    id: 'safari-west-old-lure',
+    name: 'An Old Lure',
+    description: 'Someone left a homemade lure hanging from a branch. It is too worn to use, but the scent has attracted plenty of attention.',
+    icon: { type: 'pokemon', id: '123' },
+    rewards: [{ type: 'item', targetId: 'soft-fluff-t1', quantity: 1, dropChance: 100 }],
+    completeButtonText: 'Take the Lure Down',
+  }),
+  safariExpeditionTask({
+    id: 'safari-west-to-north-marker',
+    name: 'The Northern Service Track',
+    description: 'A narrow service track climbs away from the western shelters. Fresh wheel marks disappear beneath the stones.',
+    icon: { type: 'pokemon', id: '128' },
+    rewards: [{ type: 'pokemon_research_xp', targetId: '128', quantity: 25, dropChance: 100 }],
+    completeButtonText: 'Take the Service Track',
+  }),
+  safariExpeditionTask({
+    id: 'safari-north-boulder-track',
+    name: 'Marks around the Boulder',
+    description: 'The northern trail is blocked by a boulder with fresh scrape marks around its base. Something has been trying to move it.',
+    icon: { type: 'pokemon', id: '128' },
+    rewards: [{ type: 'pokemon_research_xp', targetId: '128', quantity: 35, dropChance: 100 }],
+    completeButtonText: 'Study the Scrapes',
+  }),
+  safariExpeditionTask({
+    id: 'safari-north-service-locker',
+    name: 'The Service Locker',
+    description: 'A rusted locker sits behind the northern trail marker. The lock has already been forced open, but whoever did it left something behind.',
+    icon: { type: 'item', id: 'great-ball' },
+    rewards: [
+      { type: 'item', targetId: 'great-ball', quantity: 2, dropChance: 100 },
+      { type: 'item', targetId: 'stardust', quantity: 1, dropChance: 100 },
+    ],
+    completeButtonText: 'Search the Locker',
+  }),
+  safariExpeditionTask({
+    id: 'safari-north-rare-nest',
+    name: 'A Quiet Nest',
+    description: 'The ledge ahead is unusually still. There are signs of a nest nearby, so I should keep my steps light and my notes brief.',
+    icon: { type: 'pokemon', id: '113' },
+    rewards: [{ type: 'pokemon_research_xp', targetId: '113', quantity: 40, dropChance: 100 }],
+    completeButtonText: 'Record the Nest',
+  }),
+  safariExpeditionTask({
+    id: 'safari-north-return-marker',
+    name: 'The Route Home',
+    description: 'The trail marker points back towards the gate. I have crossed the reserve, but the notes still need one final check before I leave.',
+    icon: detectiveIcon,
+    rewards: [{ type: 'pokemon_research_xp', targetId: '111', quantity: 30, dropChance: 100 }],
+    completeButtonText: 'Mark the Route Home',
+  }),
+  safariExpeditionTask({
+    id: 'safari-expedition-final-notes',
+    name: 'The Last Page',
+    description: 'The reserve has given me more leads than answers. I should finish the field notes while every detail is still fresh.',
+    icon: { type: 'trainer', id: 'researcher-f' },
+    rewards: [{ type: 'pokemon_research_xp', targetId: '102', quantity: 50, dropChance: 100 }],
+    completeButtonText: 'Finish the Notes',
+  }),
+].filter((task) => !retiredSafariExpeditionTaskIds.has(task.id)) as Task[]).concat(
+  safariExpeditionContentTasks,
+)

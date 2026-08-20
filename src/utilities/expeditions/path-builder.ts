@@ -10,6 +10,7 @@ import {
   type ExpeditionGeneratedStep,
   type ExpeditionPathNode,
   type ExpeditionResultBranchResult,
+  type ExpeditionTaskPoolEntry,
 } from '@/data/expeditions'
 import {
   checkRequirement,
@@ -19,6 +20,7 @@ import {
 interface ActivityCandidate {
   activityType: ExpeditionActivityType
   activityId: string
+  weight?: number
 }
 
 const ALL_EXPEDITION_ACTIVITY_TYPES: ExpeditionActivityType[] = [
@@ -311,12 +313,32 @@ function pickActivityForNode(
 
   const categories = getNodeCategories(expedition, node)
 
+  let taskPoolEntries: ExpeditionTaskPoolEntry[] | undefined
+  if (categories.length === 1 && categories[0] === 'task') {
+    const poolChoices = node.taskPoolChoices
+    const poolNames = poolChoices?.length
+      ? [weightedPick(poolChoices, (choice) => choice.weight ?? 1).pool]
+      : node.taskPool
+        ? [node.taskPool]
+        : []
+
+    if (poolNames.length > 0) {
+      taskPoolEntries = poolNames.flatMap(
+        (poolName) => expedition.taskPools?.[poolName] || [],
+      )
+    }
+  }
+
   const candidates: ActivityCandidate[] = []
   const seen = new Set<string>()
 
   for (const category of categories) {
-    const categoryIds = expedition.activityPool?.[category] || []
-    for (const activityId of categoryIds) {
+    const categoryEntries =
+      category === 'task' && taskPoolEntries
+        ? taskPoolEntries
+        : (expedition.activityPool?.[category] || []).map((id) => ({ id }))
+    for (const entry of categoryEntries) {
+      const activityId = entry.id
       const key = `${category}:${activityId}`
       if (seen.has(key)) continue
       seen.add(key)
@@ -331,6 +353,10 @@ function pickActivityForNode(
       candidates.push({
         activityType: category,
         activityId,
+        weight:
+          'weight' in entry
+            ? (entry as ExpeditionTaskPoolEntry).weight
+            : undefined,
       })
     }
   }
@@ -348,7 +374,7 @@ function pickActivityForNode(
   const finalCandidates =
     primaryCandidates.length > 0 ? primaryCandidates : candidates
 
-  const picked = weightedPick(finalCandidates, () => 1)
+  const picked = weightedPick(finalCandidates, (candidate) => candidate.weight ?? 1)
   usedActivityKeys.add(`${picked.activityType}:${picked.activityId}`)
   return picked
 }

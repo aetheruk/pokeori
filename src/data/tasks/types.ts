@@ -222,6 +222,7 @@ export interface Task {
   hide?: string
   background?: string
   daily?: boolean
+  expeditionOnly?: boolean
   isRandomEvent?: boolean
   dailyMetadata?: DailyTaskMetadata
 }
