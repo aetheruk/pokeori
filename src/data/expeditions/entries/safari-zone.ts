@@ -4,6 +4,7 @@ import type {
   ExpeditionTaskPoolEntry,
 } from '../types'
 import {
+  safariExtraTaskPoolIds,
   safariFlavorTaskPoolIds,
   safariItemTaskPoolIds,
   safariResearchTaskPoolIds,
@@ -14,11 +15,14 @@ const permitRequirement = {
   targetId: 'safari-catching-permit',
 }
 
-const grandExpeditionCompletionRequirement = {
-  type: 'expedition_result' as const,
-  targetId: 'safari-zone-grand-expedition',
-  expeditionStatus: 'completed' as const,
-  count: 1,
+const explorerResearchNotesRequirement = {
+  type: 'task_completed' as const,
+  targetId: 'safari-explorers-research-notes',
+}
+
+const fishingResearchNotesRequirement = {
+  type: 'task_completed' as const,
+  targetId: 'safari-fishing-research-notes',
 }
 
 const safariEntranceFee = {
@@ -46,10 +50,27 @@ const itemTaskPool: ExpeditionTaskPoolEntry[] = [
   ...weightedIds(safariItemTaskPoolIds.rare, 2),
 ]
 
+const scalePoolWeights = (
+  entries: ExpeditionTaskPoolEntry[],
+  targetWeight: number,
+) => entries.map((entry) => ({
+  ...entry,
+  weight: ((entry.weight ?? 0) * targetWeight) / 100,
+}))
+
+const safariRewardTaskPool: ExpeditionTaskPoolEntry[] = [
+  ...scalePoolWeights(researchTaskPool, 40),
+  ...weightedIds(safariExtraTaskPoolIds.research, 5),
+  ...scalePoolWeights(itemTaskPool, 40),
+  ...weightedIds(safariExtraTaskPoolIds.materials, 5),
+  ...weightedIds(safariExtraTaskPoolIds.safariBalls, 4),
+  ...weightedIds(safariExtraTaskPoolIds.rare, 2),
+  ...weightedIds(Object.values(safariFlavorTaskPoolIds).flat(), 20),
+  ...weightedIds(safariExtraTaskPoolIds.flavor, 4),
+]
+
 const allTaskIds = [
-  ...researchTaskPool.map((entry) => entry.id),
-  ...Object.values(safariFlavorTaskPoolIds).flat(),
-  ...itemTaskPool.map((entry) => entry.id),
+  ...safariRewardTaskPool.map((entry) => entry.id),
 ]
 
 const secretActivity = (
@@ -66,27 +87,20 @@ const secretActivity = (
 
 const taskActivity = (
   id: string,
-  taskPool: string,
-  taskPoolChoices?: ExpeditionTaskPoolChoice[],
+  _legacyTaskPool?: string,
+  _legacyTaskPoolChoices?: ExpeditionTaskPoolChoice[],
 ) => ({
   type: 'activity' as const,
   id,
   activityType: 'task' as const,
   secret: true,
-  ...(taskPoolChoices ? { taskPoolChoices } : { taskPool }),
+  taskPool: 'safari-rewards',
 })
 
-const researchOrFlavor = (id: string, area: keyof typeof safariFlavorTaskPoolIds) =>
-  taskActivity(id, 'research', [
-    { pool: 'research', weight: 1 },
-    { pool: `flavor-${area}`, weight: 1 },
-  ])
+const researchOrFlavor = (id: string, _area: keyof typeof safariFlavorTaskPoolIds) =>
+  taskActivity(id)
 
-const itemOrFlavor = (id: string) =>
-  taskActivity(id, 'items', [
-    { pool: 'items', weight: 1 },
-    { pool: 'flavor-north', weight: 1 },
-  ])
+const itemOrFlavor = (id: string) => taskActivity(id)
 
 export const safariZoneExpeditions: ExpeditionConfig[] = [
   {
@@ -129,12 +143,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
       ],
     },
     taskPools: {
-      research: researchTaskPool,
-      items: itemTaskPool,
-      'flavor-central': safariFlavorTaskPoolIds.central.map((id) => ({ id, weight: 1 })),
-      'flavor-east': safariFlavorTaskPoolIds.east.map((id) => ({ id, weight: 1 })),
-      'flavor-west': safariFlavorTaskPoolIds.west.map((id) => ({ id, weight: 1 })),
-      'flavor-north': safariFlavorTaskPoolIds.north.map((id) => ({ id, weight: 1 })),
+      'safari-rewards': safariRewardTaskPool,
     },
     path: [
       taskActivity('safari-grand-step-01-research', 'research'),
@@ -281,6 +290,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
     rewards: [
       { type: 'xp', skill: 'researching', quantity: 1000, dropChance: 100 },
       { type: 'xp', skill: 'catching', quantity: 1000, dropChance: 100 },
+      { type: 'currency', targetId: 'safari-notes', quantity: 10, dropChance: 100 },
       {
         type: 'item',
         targetId: 'tm-strength',
@@ -306,7 +316,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
     maxLosses: 5,
     safariBallAllowance: 30,
     canAbandon: true,
-    requirements: [permitRequirement, grandExpeditionCompletionRequirement],
+    requirements: [permitRequirement, explorerResearchNotesRequirement],
     criteria: [safariEntranceFee],
     activityPool: {
       location: [
@@ -343,7 +353,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
     maxLosses: 5,
     safariBallAllowance: 30,
     canAbandon: true,
-    requirements: [permitRequirement, grandExpeditionCompletionRequirement],
+    requirements: [permitRequirement, fishingResearchNotesRequirement],
     criteria: [
       safariEntranceFee,
       { type: 'item_owned', targetId: 'old-rod' },

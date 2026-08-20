@@ -148,6 +148,11 @@ export const Users: CollectionConfig = {
           type: 'number',
           defaultValue: 0,
         },
+        {
+          name: 'safari-notes',
+          type: 'number',
+          defaultValue: 0,
+        },
       ],
     },
     {

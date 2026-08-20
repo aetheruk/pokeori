@@ -50,6 +50,11 @@ export const currencies: Currency[] = [
     name: 'Shadow Crystals',
     iconId: 'tera-shard-poison',
   },
+  {
+    id: 'safari-notes',
+    name: 'Safari Notes',
+    iconId: 'researchers-journal-page',
+  },
 ]
 
 export function getCurrency(id: string): Currency | undefined {

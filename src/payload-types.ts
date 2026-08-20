@@ -228,6 +228,7 @@ export interface User {
     'berry-powder'?: number | null;
     'prof-scrip'?: number | null;
     'league-ticket'?: number | null;
+    'safari-notes'?: number | null;
   };
   /**
    * Maximum number of Pokemon this user can hold
@@ -1019,6 +1020,7 @@ export interface UsersSelect<T extends boolean = true> {
         'berry-powder'?: T;
         'prof-scrip'?: T;
         'league-ticket'?: T;
+        'safari-notes'?: T;
       };
   maxPokemon?: T;
   maxBoxes?: T;

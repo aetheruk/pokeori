@@ -44,9 +44,9 @@ describe('Safari catch actions', () => {
     expect(result.fled).toBe(false)
   })
 
-  test('Rock uses five normal correct-answer increases and raises flee by 10%', () => {
+  test('Tamato Berry uses five normal correct-answer increases and raises flee by 10%', () => {
     const result = resolveSafariAction({
-      action: 'rock',
+      action: 'tamato',
       currentStage: 0,
       baseCaptureRate: 45,
       currentCatchRate: 45,
@@ -70,7 +70,7 @@ describe('Safari catch actions', () => {
       random: () => 0.99,
     })
     const rock = resolveSafariAction({
-      action: 'rock',
+      action: 'tamato',
       currentStage: 0,
       baseCaptureRate: 30,
       currentCatchRate: 30,
@@ -86,7 +86,7 @@ describe('Safari catch actions', () => {
 
   test('repeated actions add their normal answer equivalents', () => {
     const first = resolveSafariAction({
-      action: 'rock',
+      action: 'tamato',
       currentStage: 0,
       baseCaptureRate: 100,
       currentCatchRate: 100,

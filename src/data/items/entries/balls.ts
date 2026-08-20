@@ -13,7 +13,7 @@ export const ballItems: Item[] = [
     id: 'safari-ball',
     name: 'Safari Ball',
     description:
-      'A reserve-issued Ball used only during Safari Zone expeditions. Its supply belongs to the current expedition rather than the Trainer’s bag.',
+      'A Ball issued by the Safari Zone. It works like a standard Poké Ball outside reserve expeditions.',
     category: 'ball',
     spriteId: '/balls/safari-ball',
   },

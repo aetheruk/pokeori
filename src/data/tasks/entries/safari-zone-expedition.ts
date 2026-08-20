@@ -249,8 +249,90 @@ const flavorTasks = flavorDefinitions.map(([area, name, description, completeBut
     name,
     description,
     icon,
-    rewards: [{ type: 'xp', skill: 'researching', quantity: { min: 20, max: 50 }, dropChance: 100 }],
+    rewards: [
+      { type: 'xp', skill: 'researching', quantity: 50, dropChance: 100 },
+      { type: 'currency', targetId: 'safari-notes', quantity: 1, dropChance: 100 },
+    ],
     completeButtonText,
+  }),
+)
+
+const extraHabitatRequirement = {
+  type: 'task_completed' as const,
+  targetId: 'safari-extra-habitat-field-notes',
+}
+
+const unusualSightingsRequirement = {
+  type: 'task_completed' as const,
+  targetId: 'safari-unusual-pokemon-sightings',
+}
+
+const materialReportsRequirement = {
+  type: 'task_completed' as const,
+  targetId: 'safari-material-deposit-reports',
+}
+
+const safariBallCacheRequirement = {
+  type: 'task_completed' as const,
+  targetId: 'safari-ball-cache-info',
+}
+
+const rareRumoursRequirement = {
+  type: 'task_completed' as const,
+  targetId: 'safari-rare-item-rumours',
+}
+
+const extraFlavorDefinitions = [
+  ['central', 'A Surveyor’s String', 'A length of survey string has come loose around the central signpost. I wind it back onto the reel before it catches on anyone’s boots.', 'Wind the String', { type: 'item', id: 'wood-scraps-t1' }],
+  ['central', 'A Feather in the Grass', 'A bright feather is tucked beneath the central path marker. I sketch its shape before leaving it where I found it.', 'Sketch the Feather', { type: 'item', id: 'wing-feather-t1' }],
+  ['east', 'A Ripple beside the Bank', 'The eastern pond ripples once, then settles. I wait quietly and note the direction before moving on.', 'Note the Ripple', { type: 'pokemon', id: '84' }],
+  ['east', 'A Muddy Footprint', 'A small footprint presses into the mud beside the reeds. I measure it, then leave the bank undisturbed.', 'Measure the Print', { type: 'pokemon', id: '30' }],
+  ['west', 'A Moth-Eaten Leaf', 'A leaf has been nibbled into a lacework of veins. I add it to the western habitat notes.', 'Record the Leaf', { type: 'pokemon', id: '49' }],
+  ['west', 'A Fallen Signpost', 'A short signpost has fallen across the western path. I move it clear and prop it against the nearest tree.', 'Clear the Path', { type: 'trainer', id: 'ranger' }],
+  ['north', 'A Stone with Scratches', 'Three fresh scratches cross a stone beside the northern ledge. I copy them into my notebook and keep walking.', 'Copy the Scratches', { type: 'item', id: 'small-stone-t1' }],
+  ['north', 'A Quiet Lookout', 'The northern lookout is empty for once. I take a moment to check the horizon before returning to the trail.', 'Check the Horizon', { type: 'pokemon', id: '111' }],
+] as const
+
+const extraFlavorTasks = extraFlavorDefinitions.map(([area, name, description, completeButtonText, icon]) =>
+  safariTask({
+    id: `safari-flavor-extra-${area}-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+    name,
+    description,
+    icon,
+    requirements: [extraHabitatRequirement],
+    rewards: [
+      { type: 'xp', skill: 'researching', quantity: 50, dropChance: 100 },
+      { type: 'currency', targetId: 'safari-notes', quantity: 1, dropChance: 100 },
+    ],
+    completeButtonText,
+  }),
+)
+
+const unusualSightings = [
+  ['113', 'A Familiar Shape', 'A Chansey appears at the edge of the reeds, carrying an egg far larger than any I have seen in the reserve.'],
+  ['115', 'A Protective Shadow', 'A Kangaskhan crosses the western grass with a second set of footprints tucked safely behind her.'],
+  ['123', 'A Silver Flash', 'A Scyther cuts through the northern grass so quickly that I only catch the light along its blades.'],
+  ['127', 'The Heavy Footfall', 'Something large has left deep paired prints beneath the western trees. The marks end at a broken branch.'],
+  ['128', 'A Restless Herd', 'A Tauros herd changes direction together when a single member raises its head towards the eastern path.'],
+  ['111', 'The Ground Trembles', 'The central trail shudders beneath a distant Rhyhorn charge, though the herd never comes into view.'],
+] as const
+
+const unusualSightingsTasks = unusualSightings.map(([speciesId, name, description]) =>
+  safariTask({
+    id: `safari-research-unusual-${speciesId}`,
+    name,
+    description,
+    icon: { type: 'pokemon', id: speciesId },
+    requirements: [unusualSightingsRequirement],
+    rewards: [
+      {
+        type: 'pokemon_research_xp',
+        targetId: speciesId,
+        quantity: 20,
+        dropChance: 100,
+      },
+    ],
+    completeButtonText: 'Record the Sighting',
   }),
 )
 
@@ -273,7 +355,7 @@ function itemTask(
     name,
     description,
     icon: typeof icon === 'string' ? { type: 'item', id: icon } : icon,
-    rewards: [reward],
+    rewards: [{ ...reward, dropChance: 100 }],
     completeButtonText: 'Search the Find',
   })
 }
@@ -309,6 +391,32 @@ const materialTasks = materialFinds.map(([itemId, name, description]) =>
   ),
 )
 
+const extraMaterialFinds = [
+  ['grass-gem', 'A Green Mineral Vein', 'A green mineral seam runs through the damp soil beneath the central grass.'],
+  ['metal-scrap-t1', 'A Buried Metal Plate', 'A broad metal plate is buried beside the eastern boardwalk.'],
+  ['soft-fluff-t1', 'A Soft Nest Lining', 'A large bundle of soft fluff has gathered beneath the western shelter.'],
+  ['chitin-fragment-t1', 'A Chitin Shedding', 'Fresh chitin fragments glitter beneath a western tree.'],
+  ['terra-dust-t1', 'A Clay-Banked Hollow', 'A pocket of clean clay has been exposed by the northern rain.'],
+  ['small-stone-t1', 'A Stone Pocket', 'A vein of dense stones runs through the side of the northern track.'],
+  ['wing-feather-t1', 'A Fallen Feather Bed', 'The grass beneath the lookout is thick with clean wing feathers.'],
+  ['toxic-resin-t1', 'A Resin-Rich Branch', 'A damaged branch has left a useful pool of hardened resin behind.'],
+] as const
+
+const extraMaterialTasks = extraMaterialFinds.map(([itemId, name, description]) =>
+  itemTask(
+    `safari-item-extra-material-${itemId.replace('-t1', '')}`,
+    name,
+    description,
+    itemId,
+    {
+      type: 'item',
+      targetId: itemId,
+      quantity: 5,
+      dropChance: 100,
+    },
+  ),
+).map((task) => ({ ...task, requirements: [materialReportsRequirement] }))
+
 const ballTasks = [
   itemTask('safari-item-poke-ball-cache', 'A Few Poké Balls', 'A weatherproof pouch contains a few usable Poké Balls beneath the central path.', 'poke-ball', { type: 'item', targetId: 'poke-ball', quantity: { min: 1, max: 3 }, dropChance: 75 }),
   itemTask('safari-item-great-ball-cache', 'A Great Ball Cache', 'A Ranger’s old cache holds several Great Balls in a dry compartment.', 'great-ball', { type: 'item', targetId: 'great-ball', quantity: { min: 1, max: 3 }, dropChance: 60 }),
@@ -340,6 +448,13 @@ const safariBallTasks = [
   itemTask('safari-item-extra-balls', 'A Reserve Ball Tin', 'A sealed tin contains a few reserve Safari Balls. I should keep them for something that will not wait around.', 'safari-ball', { type: 'expedition_safari_balls', quantity: { min: 1, max: 3 }, dropChance: 35 }),
 ]
 
+const extraSafariBallTasks = [
+  itemTask('safari-item-extra-balls-central-cache', 'A Central Ball Cache', 'A ranger’s old central cache contains a few reserve Safari Balls.', 'safari-ball', { type: 'expedition_safari_balls', quantity: { min: 1, max: 3 }, dropChance: 100 }),
+  itemTask('safari-item-extra-balls-east-cache', 'A Pondside Ball Cache', 'A weatherproof case beneath the eastern boardwalk holds spare Safari Balls.', 'safari-ball', { type: 'expedition_safari_balls', quantity: { min: 1, max: 3 }, dropChance: 100 }),
+  itemTask('safari-item-extra-balls-west-cache', 'A Rest House Ball Cache', 'A forgotten western supply box still contains a few reserve Safari Balls.', 'safari-ball', { type: 'expedition_safari_balls', quantity: { min: 1, max: 3 }, dropChance: 100 }),
+  itemTask('safari-item-extra-balls-north-cache', 'A Ledge-Side Ball Cache', 'A sealed tin is tucked beneath the northern trail rope with extra Safari Balls inside.', 'safari-ball', { type: 'expedition_safari_balls', quantity: { min: 1, max: 3 }, dropChance: 100 }),
+].map((task) => ({ ...task, requirements: [safariBallCacheRequirement] }))
+
 const rareItemTasks = [
   safariTask({
     id: 'safari-rare-nugget-find',
@@ -349,7 +464,7 @@ const rareItemTasks = [
     completeButtonText: 'Dig Carefully',
     repeatable: false,
     requirements: [{ type: 'task_completed', targetId: 'safari-rare-nugget-find', inverse: true }],
-    rewards: [{ type: 'item', targetId: 'nugget', quantity: 1, dropChance: 50 }],
+    rewards: [{ type: 'item', targetId: 'nugget', quantity: 1, dropChance: 100 }],
   }),
   safariTask({
     id: 'safari-rare-metal-seam',
@@ -359,7 +474,40 @@ const rareItemTasks = [
     completeButtonText: 'Collect the Deposit',
     repeatable: false,
     requirements: [{ type: 'task_completed', targetId: 'safari-rare-metal-seam', inverse: true }],
-    rewards: [{ type: 'item', targetId: 'metal-scrap-t1', quantity: 50, dropChance: 60 }],
+    rewards: [{ type: 'item', targetId: 'metal-scrap-t1', quantity: 50, dropChance: 100 }],
+  }),
+]
+
+const extraRareItemTasks = [
+  safariTask({
+    id: 'safari-rare-reported-nugget',
+    name: 'A Rumoured Nugget',
+    description: 'Another researcher marked a patch of ground where something valuable was supposedly buried. The soil still looks freshly disturbed.',
+    icon: { type: 'item', id: 'nugget' },
+    repeatable: false,
+    requirements: [rareRumoursRequirement, { type: 'task_completed', targetId: 'safari-rare-reported-nugget', inverse: true }],
+    rewards: [{ type: 'item', targetId: 'nugget', quantity: 1, dropChance: 100 }],
+    completeButtonText: 'Search the Rumoured Patch',
+  }),
+  safariTask({
+    id: 'safari-rare-revive-cache',
+    name: 'A Sealed Medical Cache',
+    description: 'A sealed field case has survived beneath the northern stones. The label is faded, but the contents may still be useful.',
+    icon: { type: 'item', id: 'revive' },
+    repeatable: false,
+    requirements: [rareRumoursRequirement, { type: 'task_completed', targetId: 'safari-rare-revive-cache', inverse: true }],
+    rewards: [{ type: 'item', targetId: 'revive', quantity: 1, dropChance: 100 }],
+    completeButtonText: 'Open the Medical Cache',
+  }),
+  safariTask({
+    id: 'safari-rare-metal-seam-reported',
+    name: 'A Second Metal Seam',
+    description: 'A researcher’s map points to a deep metal seam beneath the service path. This deposit could keep the workshop supplied for weeks.',
+    icon: { type: 'item', id: 'metal-scrap-t1' },
+    repeatable: false,
+    requirements: [rareRumoursRequirement, { type: 'task_completed', targetId: 'safari-rare-metal-seam-reported', inverse: true }],
+    rewards: [{ type: 'item', targetId: 'metal-scrap-t1', quantity: 50, dropChance: 100 }],
+    completeButtonText: 'Collect the Metal Seam',
   }),
 ]
 
@@ -372,6 +520,14 @@ export const safariItemTaskPoolIds = {
   rare: rareItemTasks.map((task) => task.id),
 }
 
+export const safariExtraTaskPoolIds = {
+  flavor: extraFlavorTasks.map((task) => task.id),
+  research: unusualSightingsTasks.map((task) => task.id),
+  materials: extraMaterialTasks.map((task) => task.id),
+  safariBalls: extraSafariBallTasks.map((task) => task.id),
+  rare: extraRareItemTasks.map((task) => task.id),
+}
+
 export const safariExpeditionContentTasks: Task[] = [
   ...researchTasks,
   ...flavorTasks,
@@ -381,4 +537,9 @@ export const safariExpeditionContentTasks: Task[] = [
   ...currencyTasks,
   ...safariBallTasks,
   ...rareItemTasks,
+  ...extraFlavorTasks,
+  ...unusualSightingsTasks,
+  ...extraMaterialTasks,
+  ...extraSafariBallTasks,
+  ...extraRareItemTasks,
 ]

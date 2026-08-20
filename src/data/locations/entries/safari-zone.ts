@@ -40,7 +40,7 @@ function safariArea({
   }
 }
 
-export const safariZoneLocations: Location[] = [
+const expeditionSafariLocations: Location[] = [
   safariArea({
     id: 'safari-central-catch',
     name: 'Safari Central',
@@ -178,4 +178,65 @@ export const safariZoneLocations: Location[] = [
       { speciesId: 148, formId: '148', chance: 2 },
     ],
   }),
+]
+
+const wardenPermitRequirement = {
+  type: 'task_completed' as const,
+  targetId: 'safari-wardens-permit',
+}
+
+const standardSafariAreaDefinitions = [
+  {
+    sourceId: 'safari-central-catch',
+    id: 'safari-central-standard-catch',
+    name: 'Central Habitat Survey',
+    description: 'Catch Pokémon from the open grass and mixed habitats around Safari Central using the standard catching method.',
+  },
+  {
+    sourceId: 'safari-east-catch',
+    id: 'safari-east-standard-catch',
+    name: 'Eastern Habitat Survey',
+    description: 'Catch Pokémon from the eastern ponds, tall grass, and raised boardwalks using the standard catching method.',
+  },
+  {
+    sourceId: 'safari-west-catch',
+    id: 'safari-west-standard-catch',
+    name: 'Western Habitat Survey',
+    description: 'Catch Pokémon from the western woods and quiet rest houses using the standard catching method.',
+  },
+  {
+    sourceId: 'safari-north-catch',
+    id: 'safari-north-standard-catch',
+    name: 'Northern Habitat Survey',
+    description: 'Catch Pokémon from the rocky ledges and narrow channels around Safari North using the standard catching method.',
+  },
+] as const
+
+const standardSafariLocations: Location[] = standardSafariAreaDefinitions.map(
+  ({ sourceId, id, name, description }) => {
+    const source = expeditionSafariLocations.find((location) => location.id === sourceId)
+    if (!source) throw new Error(`Missing Safari source location: ${sourceId}`)
+
+    const {
+      encounterMode: _encounterMode,
+      expeditionOnly: _expeditionOnly,
+      fleeRate: _fleeRate,
+      timer: _timer,
+      ...standardSource
+    } = source
+
+    return {
+      ...standardSource,
+      id,
+      name,
+      description,
+      category: 'Kanto',
+      requirements: [wardenPermitRequirement],
+    }
+  },
+)
+
+export const safariZoneLocations: Location[] = [
+  ...expeditionSafariLocations,
+  ...standardSafariLocations,
 ]

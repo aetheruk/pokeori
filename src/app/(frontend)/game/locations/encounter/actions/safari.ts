@@ -32,7 +32,7 @@ export async function performSafariAction(
 ) {
   const user = await getUser()
   if (!user) return { success: false, error: 'Unauthorized' }
-  if (action !== 'feed' && action !== 'rock') {
+  if (action !== 'feed' && action !== 'tamato') {
     return { success: false, error: 'Invalid Safari action' }
   }
 
@@ -99,8 +99,8 @@ export async function performSafariAction(
         success: true,
         encounterFailed: true,
         failMessage:
-          action === 'rock'
-            ? 'The rock startled the Pokémon and it fled!'
+          action === 'tamato'
+            ? 'The Tamato Berry startled the Pokémon and it fled!'
             : 'The Pokémon took the Oran Berry, then slipped away!',
         pokemonId: state.pokemonId,
         formId: state.formId,
@@ -120,7 +120,7 @@ export async function performSafariAction(
       fleeRate: resolved.fleeChance,
       safari: state.safari,
       message:
-        action === 'rock'
+        action === 'tamato'
           ? 'The Pokémon is rattled. It is easier to catch, but much more likely to flee.'
           : 'The Pokémon settles after eating. It is a little easier to catch and less likely to flee.',
     }

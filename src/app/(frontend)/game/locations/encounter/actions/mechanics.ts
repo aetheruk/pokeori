@@ -486,7 +486,7 @@ export async function useEncounterItem(itemId: string) {
         return {
           success: false,
           error:
-            'Safari encounters use Oran Berries and rocks instead of encounter items.',
+            'Safari encounters use Oran Berries and Tamato Berries instead of encounter items.',
         }
       }
 
