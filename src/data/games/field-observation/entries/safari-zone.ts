@@ -89,6 +89,7 @@ function safariStudy({
   category = 'Secret',
   hide,
   rewards = [],
+  expeditionOnly = false,
 }: {
   id: string
   name: string
@@ -99,6 +100,7 @@ function safariStudy({
   category?: string
   hide?: string
   rewards?: FieldObservationConfig['rewards']
+  expeditionOnly?: boolean
 }): FieldObservationConfig {
   return {
     id,
@@ -111,6 +113,7 @@ function safariStudy({
     requirements,
     rewards,
     ...(hide ? { hide } : {}),
+    ...(expeditionOnly ? { expeditionOnly: true } : {}),
     skillXp: { skill: 'researching', level: 30 },
     settings: {
       pokemonPool,
@@ -141,11 +144,7 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
     icon: '111',
     pokemonPool: centralPool,
     category: 'Kanto',
-    hide: 'safari-discovery-east',
-    requirements: [
-      passRequirement,
-      { type: 'task_completed', targetId: 'safari-clue-last-sign-out' },
-    ],
+    requirements: [passRequirement],
     rewards: [
       discoveryReward('safari-discovery-east'),
     ],
@@ -158,11 +157,7 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
     icon: '115',
     pokemonPool: eastPool,
     category: 'Kanto',
-    hide: 'safari-discovery-west',
-    requirements: [
-      passRequirement,
-      { type: 'task_completed', targetId: 'safari-clue-reed-twice' },
-    ],
+    requirements: [passRequirement],
     rewards: [
       discoveryReward('safari-discovery-west'),
     ],
@@ -175,11 +170,7 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
     icon: '123',
     pokemonPool: westPool,
     category: 'Kanto',
-    hide: 'safari-discovery-north',
-    requirements: [
-      passRequirement,
-      { type: 'task_completed', targetId: 'safari-clue-powder-boardwalk' },
-    ],
+    requirements: [passRequirement],
     rewards: [
       discoveryReward('safari-discovery-north'),
     ],
@@ -192,11 +183,7 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
     icon: '128',
     pokemonPool: northPool,
     category: 'Kanto',
-    hide: 'safari-discovery-search-complete',
-    requirements: [
-      passRequirement,
-      { type: 'task_completed', targetId: 'safari-clue-purple-thread' },
-    ],
+    requirements: [passRequirement],
     rewards: [
       discoveryReward('safari-discovery-search-complete'),
     ],
@@ -209,6 +196,7 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
     icon: '111',
     pokemonPool: centralPool,
     requirements: [catchingPermitRequirement],
+    expeditionOnly: true,
   }),
   safariStudy({
     id: 'safari-east-expedition-field-observation',
@@ -218,6 +206,7 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
     icon: '115',
     pokemonPool: eastPool,
     requirements: [catchingPermitRequirement],
+    expeditionOnly: true,
   }),
   safariStudy({
     id: 'safari-west-expedition-field-observation',
@@ -227,6 +216,7 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
     icon: '123',
     pokemonPool: westPool,
     requirements: [catchingPermitRequirement],
+    expeditionOnly: true,
   }),
   safariStudy({
     id: 'safari-north-expedition-field-observation',
@@ -236,5 +226,6 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
     icon: '128',
     pokemonPool: northPool,
     requirements: [catchingPermitRequirement],
+    expeditionOnly: true,
   }),
 ]

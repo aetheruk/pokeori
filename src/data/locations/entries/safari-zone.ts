@@ -40,13 +40,6 @@ function safariArea({
   }
 }
 
-const fiveClears = (expeditionId: string): Location['requirements'][number] => ({
-  type: 'expedition_result',
-  targetId: expeditionId,
-  expeditionStatus: 'completed',
-  count: 5,
-})
-
 export const safariZoneLocations: Location[] = [
   safariArea({
     id: 'safari-central-catch',
@@ -76,7 +69,6 @@ export const safariZoneLocations: Location[] = [
     description:
       'Tall grass crowds the eastern ponds and raised boardwalks. Use Bait or Shout to manage a nervous Pokémon before throwing.',
     icon: '115',
-    requirements: [fiveClears('safari-central-expedition')],
     encounters: [
       { speciesId: 102, formId: '102', chance: 20 },
       { speciesId: 29, formId: '29', chance: 15 },
@@ -101,7 +93,6 @@ export const safariZoneLocations: Location[] = [
     description:
       'Wooded lanes and abandoned shelters give wary Pokémon plenty of cover. Choose Bait or Shout carefully before your throw.',
     icon: '123',
-    requirements: [fiveClears('safari-east-expedition')],
     encounters: [
       { speciesId: 102, formId: '102', chance: 20 },
       { speciesId: 29, formId: '29', chance: 15 },
@@ -125,7 +116,6 @@ export const safariZoneLocations: Location[] = [
     description:
       'Rocky ledges funnel Pokémon through narrow northern channels. Use Bait or Shout, then time the throw before they bolt.',
     icon: '128',
-    requirements: [fiveClears('safari-west-expedition')],
     encounters: [
       { speciesId: 102, formId: '102', chance: 18 },
       { speciesId: 111, formId: '111', chance: 17 },
@@ -141,6 +131,34 @@ export const safariZoneLocations: Location[] = [
       { speciesId: 113, formId: '113', chance: 2 },
       { speciesId: 127, formId: '127', chance: 1 },
       { speciesId: 123, formId: '123', chance: 1 },
+    ],
+  }),
+  safariArea({
+    id: 'safari-grand-finale-catch',
+    name: 'Safari Grand Finale',
+    description:
+      'A secluded habitat opens at the end of the expedition. Before Strength, the usual northern species gather here; afterwards, only the reserve’s prized encounters remain.',
+    icon: '113',
+    encounters: [
+      { speciesId: 102, formId: '102', chance: 18, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
+      { speciesId: 111, formId: '111', chance: 17, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
+      { speciesId: 29, formId: '29', chance: 13, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
+      { speciesId: 32, formId: '32', chance: 13, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
+      { speciesId: 46, formId: '46', chance: 10, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
+      { speciesId: 30, formId: '30', chance: 8, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
+      { speciesId: 33, formId: '33', chance: 5, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
+      { speciesId: 115, formId: '115', chance: 5, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
+      { speciesId: 49, formId: '49', chance: 3, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
+      { speciesId: 104, formId: '104', chance: 2, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
+      { speciesId: 128, formId: '128', chance: 2, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
+      { speciesId: 113, formId: '113', chance: 2, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
+      { speciesId: 127, formId: '127', chance: 1, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
+      { speciesId: 123, formId: '123', chance: 1, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
+      { speciesId: 113, formId: '113', chance: 20, requirements: [{ type: 'item_owned', targetId: 'tm-strength' }] },
+      { speciesId: 115, formId: '115', chance: 20, requirements: [{ type: 'item_owned', targetId: 'tm-strength' }] },
+      { speciesId: 128, formId: '128', chance: 20, requirements: [{ type: 'item_owned', targetId: 'tm-strength' }] },
+      { speciesId: 123, formId: '123', chance: 20, requirements: [{ type: 'item_owned', targetId: 'tm-strength' }] },
+      { speciesId: 127, formId: '127', chance: 20, requirements: [{ type: 'item_owned', targetId: 'tm-strength' }] },
     ],
   }),
 ]

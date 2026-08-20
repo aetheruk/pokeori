@@ -50,6 +50,7 @@ export interface EncounterState {
   safari?: {
     stage: number
     actions: number
+    ballsRemaining: number
   }
 
   activeAbilityId?: string

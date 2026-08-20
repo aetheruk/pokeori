@@ -28,6 +28,7 @@ interface ActiveExpeditionData {
   mapItemId?: string
   maxLosses: number
   losses: number
+  safariBallsRemaining?: number
   currentStepIndex: number
   totalSteps: number
   steps: any[]
@@ -167,6 +168,7 @@ export async function getGameUserData(
         mapItemId: true,
         maxLosses: true,
         losses: true,
+        safariBallsRemaining: true,
         currentStepIndex: true,
         totalSteps: true,
         steps: true,
@@ -203,6 +205,7 @@ export async function getGameUserData(
         mapItemId: runDoc.mapItemId,
         maxLosses: runDoc.maxLosses || 0,
         losses: runDoc.losses || 0,
+        safariBallsRemaining: runDoc.safariBallsRemaining,
         currentStepIndex: normalized.currentStepIndex,
         totalSteps: normalized.steps.length,
         steps: normalized.steps,

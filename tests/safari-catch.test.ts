@@ -1,12 +1,13 @@
 import { describe, expect, test } from 'bun:test'
 import {
+  deriveSafariBaseFleeRate,
   MAX_SAFARI_STAGE,
   MIN_SAFARI_STAGE,
   resolveSafariAction,
 } from '@/utilities/pokemon/safari-catch'
 
 describe('Safari catch actions', () => {
-  test('Bait lowers catch chance and flee risk', () => {
+  test('Bait slightly improves catch chance and lowers flee risk', () => {
     const result = resolveSafariAction({
       action: 'bait',
       currentStage: 0,
@@ -16,7 +17,7 @@ describe('Safari catch actions', () => {
     })
 
     expect(result.stage).toBe(-1)
-    expect(result.catchRate).toBeLessThan(100)
+    expect(result.catchRate).toBeGreaterThan(100)
     expect(result.fleeChance).toBeLessThan(20)
     expect(result.fled).toBe(false)
   })
@@ -58,5 +59,27 @@ describe('Safari catch actions', () => {
     expect(shout.stage).toBe(MAX_SAFARI_STAGE)
     expect(shout.catchRate).toBeLessThanOrEqual(255)
     expect(shout.fleeChance).toBeLessThanOrEqual(90)
+  })
+
+  test('flee pressure is species-based and actions remain unlimited at the cap', () => {
+    expect(
+      deriveSafariBaseFleeRate({ captureRate: 190, locationFleeRate: 10 }),
+    ).toBeLessThan(
+      deriveSafariBaseFleeRate({ captureRate: 45, locationFleeRate: 10 }),
+    )
+
+    let stage = MAX_SAFARI_STAGE
+    for (let index = 0; index < 20; index += 1) {
+      const result = resolveSafariAction({
+        action: 'shout',
+        currentStage: stage,
+        baseCatchRate: 100,
+        baseFleeRate: 10,
+        random: () => 0.99,
+      })
+      stage = result.stage
+    }
+
+    expect(stage).toBe(MAX_SAFARI_STAGE)
   })
 })

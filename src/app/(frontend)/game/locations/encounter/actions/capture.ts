@@ -46,10 +46,18 @@ import {
   releaseActionLock,
   setIdempotentResult,
 } from '@/utilities/game-integrity'
-import { recordExpeditionActivityResult } from '@/utilities/expeditions/actions'
+import {
+  recordExpeditionActivityResult,
+  setSafariBallsRemaining,
+} from '@/utilities/expeditions/actions'
 import type { EncounterState } from './types'
 import { rollAbility, getUser } from './utils'
 import { refreshEncounterShield } from './shield'
+import { failEncounter } from './failure'
+import {
+  resolveSafariFlee,
+  SAFARI_BALL_ID,
+} from '@/utilities/pokemon/safari-catch'
 import {
   getItemSkillLockReason,
   getResearcherAbilityRolls,
@@ -146,6 +154,7 @@ export async function attemptCapture(
 
     // Data Prefetch
     const isChronicle = !!state.chronicle
+    const isSafari = state.encounterMode === 'safari' && !!state.safari
     const inventory = isChronicle
       ? { ...(state.chronicle?.balls || {}) }
       : await getUserInventoryMap(payload as any, user.id)
@@ -172,12 +181,19 @@ export async function attemptCapture(
     // Validate ball
     const ball = items.find((i) => i.id === ballItemId && i.category === 'ball')
     if (!ball) return { success: false, message: 'Invalid ball' }
+    if (isSafari && ballItemId !== SAFARI_BALL_ID) {
+      return { success: false, message: 'Safari encounters only allow Safari Balls.' }
+    }
     const ballLockReason = getItemSkillLockReason(ball, user.skills)
     if (ballLockReason) return { success: false, message: ballLockReason }
 
     // Check inventory
     const qty = inventory[ballItemId] || 0
-    if (qty < 1) {
+    if (isSafari) {
+      if ((state.safari?.ballsRemaining || 0) < 1) {
+        return { success: false, message: 'You have no Safari Balls remaining.' }
+      }
+    } else if (qty < 1) {
       return { success: false, message: `You don't have any ${ball.name}s!` }
     }
 
@@ -235,10 +251,18 @@ export async function attemptCapture(
       return response
     }
 
-    // Decrement Ball & Update User
-    inventory[ballItemId] = qty - 1
-    if (!isChronicle) {
-      await setUserInventoryMap(payload as any, user.id, inventory)
+    // Safari Balls belong to the expedition run rather than the player bag.
+    if (isSafari) {
+      state.safari!.ballsRemaining = Math.max(
+        0,
+        state.safari!.ballsRemaining - 1,
+      )
+      await setSafariBallsRemaining(user.id, state.safari!.ballsRemaining)
+    } else {
+      inventory[ballItemId] = qty - 1
+      if (!isChronicle) {
+        await setUserInventoryMap(payload as any, user.id, inventory)
+      }
     }
 
     // Calculate Capture
@@ -304,8 +328,9 @@ export async function attemptCapture(
     const isUltraBeast = ULTRA_BEASTS.includes(state.pokemonId)
     const throwQuality = getThrowQuality(throwInput)
     const throwStageBonus = getThrowStageBonus(throwQuality)
+    const effectiveBallId = ballItemId === SAFARI_BALL_ID ? 'poke-ball' : ballItemId
     const questionBonus = getBallQuestionBonus({
-      ballId: ballItemId,
+      ballId: effectiveBallId,
       species,
       turnCount,
       targetLevel:
@@ -324,7 +349,7 @@ export async function attemptCapture(
     })
     const isShadow = targetRarity === 'shadow'
     const hardCatchRate = getHardBallCatchRate({
-      ballId: ballItemId,
+      ballId: effectiveBallId,
       isUltraBeast,
       isShadow,
     })
@@ -381,6 +406,50 @@ export async function attemptCapture(
       !caught &&
       !state.secondChanceUsed &&
       Math.random() * 100 < secondChanceRate
+
+    if (isSafari && !caught) {
+      const flee = resolveSafariFlee({
+        currentStage: state.safari!.stage,
+        baseFleeRate: state.fleeRate || 10,
+      })
+      state.captureAttempts = captureAttempt + 1
+
+      if (flee.fled) {
+        const expeditionProgress = await failEncounter(user, state)
+        const response = {
+          success: true,
+          caught: false,
+          encounterFailed: true,
+          failMessage: 'The Pokémon broke free and fled the reserve!',
+          formId: state.formId,
+          pokemonId: state.pokemonId,
+          expeditionProgress,
+        }
+        await setIdempotentResult(captureResultKey, response, 300)
+        await setIdempotentResult(
+          `encounter:capture:last:${user.id}`,
+          response,
+          300,
+        )
+        return response
+      }
+
+      await redis.set(encounterId, state, {
+        ex: Math.floor((state.expiry - Date.now()) / 1000) + 60,
+      })
+      const response = {
+        success: true,
+        caught: false,
+        safariRetry: true,
+        message: 'The Pokémon stayed nearby. You can throw again or try another approach.',
+        formId: state.formId,
+        pokemonId: state.pokemonId,
+        safari: state.safari,
+        expeditionProgress: undefined as any,
+      }
+      await setIdempotentResult(captureResultKey, response, 300)
+      return response
+    }
 
     if (isChronicle) {
       if (secondChanceTriggered) {

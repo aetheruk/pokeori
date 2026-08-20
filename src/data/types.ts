@@ -40,6 +40,7 @@ export interface Reward {
     | 'pokemon_research_xp'
     | 'active_companion_friendship'
     | 'active_companion_research_xp'
+    | 'expedition_safari_balls'
     | 'egg'
   targetId?: string | number // Changed: Now used for currency type (e.g. 'crystals')
   skill?: string

@@ -14,6 +14,16 @@ export type ChronicleNarrativePhase =
 
 export type ExpeditionActivityPool = Partial<Record<ExpeditionActivityType, string[]>>
 
+export interface ExpeditionTaskPoolEntry {
+  id: string
+  weight?: number
+}
+
+export interface ExpeditionTaskPoolChoice {
+  pool: string
+  weight?: number
+}
+
 export interface ExpeditionActivityNode {
   type: 'activity'
   id: string
@@ -29,6 +39,10 @@ export interface ExpeditionActivityNode {
   categories?: ExpeditionActivityType[]
   // Backward-compatible alias for categories.
   activityTypes?: ExpeditionActivityType[]
+  // Named task pool to sample when this is a task activity.
+  taskPool?: string
+  // Weighted task pools to choose between for this task activity.
+  taskPoolChoices?: ExpeditionTaskPoolChoice[]
   phase?: ChronicleNarrativePhase
   phaseTitle?: string
 }
@@ -148,12 +162,16 @@ export interface ExpeditionConfig {
   criteria?: TaskCondition[]
   mapItemId?: string
   maxLosses: number
+  safariBallAllowance?: number
   activityPool: ExpeditionActivityPool
+  taskPools?: Record<string, ExpeditionTaskPoolEntry[]>
   path: ExpeditionPathNode[]
   rewards: Reward[]
   daily?: boolean
   canAbandon?: boolean
   canFail?: boolean
+  /** Retained only so runs created before a content replacement can finish safely. */
+  legacyOnly?: boolean
   background?: string
   isRandomEvent?: boolean
   chronicle?: boolean | ExpeditionChronicleConfig
@@ -190,6 +208,7 @@ export interface ActiveExpeditionRun {
   totalSteps: number
   losses: number
   maxLosses: number
+  safariBallsRemaining?: number
   mapItemId?: string
   steps: ExpeditionGeneratedStep[]
 }
