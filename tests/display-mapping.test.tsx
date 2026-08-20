@@ -76,6 +76,19 @@ describe('display mapping copy', () => {
     expect((targetSecretReward!.icon as any).type).not.toBe(TaskIconDisplay)
   })
 
+  test('Safari discovery rewards remain visibly secret before their Field Research drop', () => {
+    const reward = mapRewardToDisplayItem(
+      {
+        type: 'task_complete',
+        targetId: 'safari-discovery-east',
+        dropChance: 25,
+      },
+      { checkRequirements: (requirements) => (requirements?.length || 0) === 0, completedTasks: [] },
+    )
+
+    expect(reward?.label).toBe('Secret to Unlock')
+  })
+
   test('companion criteria can use authored requirement copy', () => {
     const requirement = mapCriteriaToDisplayItem({
       type: 'companion',

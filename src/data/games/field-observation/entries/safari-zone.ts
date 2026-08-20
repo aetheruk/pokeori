@@ -71,20 +71,11 @@ const northPool: FieldObservationPokemonPoolEntry[] = [
   { speciesId: 123, formId: '123', weight: 1 },
 ]
 
-function discoveryReward(studyId: string, taskId: string) {
+function discoveryReward(taskId: string) {
   return {
     type: 'task_complete' as const,
     targetId: taskId,
     dropChance: 25,
-    requirements: [
-      {
-        type: 'field_research_result' as const,
-        targetId: studyId,
-        battleStatus: 'win' as const,
-        count: 1,
-      },
-      { type: 'task_completed' as const, targetId: taskId, inverse: true },
-    ],
   }
 }
 
@@ -156,10 +147,7 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
       { type: 'task_completed', targetId: 'safari-clue-last-sign-out' },
     ],
     rewards: [
-      discoveryReward(
-        'safari-central-field-observation',
-        'safari-discovery-east',
-      ),
+      discoveryReward('safari-discovery-east'),
     ],
   }),
   safariStudy({
@@ -176,10 +164,7 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
       { type: 'task_completed', targetId: 'safari-clue-reed-twice' },
     ],
     rewards: [
-      discoveryReward(
-        'safari-east-field-observation',
-        'safari-discovery-west',
-      ),
+      discoveryReward('safari-discovery-west'),
     ],
   }),
   safariStudy({
@@ -196,10 +181,7 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
       { type: 'task_completed', targetId: 'safari-clue-powder-boardwalk' },
     ],
     rewards: [
-      discoveryReward(
-        'safari-west-field-observation',
-        'safari-discovery-north',
-      ),
+      discoveryReward('safari-discovery-north'),
     ],
   }),
   safariStudy({
@@ -216,10 +198,7 @@ export const safariZoneFieldObservationEntries: FieldObservationConfig[] = [
       { type: 'task_completed', targetId: 'safari-clue-purple-thread' },
     ],
     rewards: [
-      discoveryReward(
-        'safari-north-field-observation',
-        'safari-discovery-search-complete',
-      ),
+      discoveryReward('safari-discovery-search-complete'),
     ],
   }),
   safariStudy({
