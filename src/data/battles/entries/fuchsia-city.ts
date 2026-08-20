@@ -1528,7 +1528,7 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     trainerItems: [{ itemId: 'battle-hyper-potion', quantity: 2 }],
     rewards: [],
     maxPokemon: 4,
-    levelCap: 45,
+    levelCap: 40,
     aiProfile: 'boss',
     playerTeamInitialStatus: 'poison',
     enemyAttackTelegraphChance: 2,

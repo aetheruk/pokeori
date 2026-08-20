@@ -207,6 +207,10 @@ describe('Fuchsia Gym and Safari progression', () => {
           battles.find((battle) => battle.id === id)?.playerTeamInitialStatus,
       ),
     ).toEqual(Array(7).fill('poison'))
+    expect(trial?.maxLosses).toBe(3)
+    expect(
+      battleIds.map((id) => battles.find((battle) => battle.id === id)?.levelCap),
+    ).toEqual(Array(7).fill(40))
 
     const canonicalTrainers = [
       {

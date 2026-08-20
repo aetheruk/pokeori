@@ -98,7 +98,7 @@ export const fuchsiaCityExpeditions: ExpeditionConfig[] = [
     subCategory: 'Fuchsia City',
     icon: { type: 'trainer', id: 'gym-kanto-koga' },
     background: '/backgrounds/gym-poison.avif',
-    maxLosses: 1,
+    maxLosses: 3,
     requirements: [
       { type: 'task_completed', targetId: 'fuchsia-gym-trial-ready' },
       { type: 'item_owned', targetId: 'badge-kanto-soul', inverse: true },
