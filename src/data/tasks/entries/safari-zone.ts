@@ -4,6 +4,7 @@ const kogaIcon = { type: 'trainer' as const, id: 'gym-kanto-koga' }
 const janineIcon = { type: 'trainer' as const, id: 'chronicle-janine' }
 const rangerIcon = { type: 'trainer' as const, id: 'ranger' }
 const detectiveIcon = { type: 'trainer' as const, id: 'detective' }
+const billiamIcon = { type: 'trainer' as const, id: 'gamer' }
 
 const hiddenDiscovery = ({
   id,
@@ -842,6 +843,134 @@ export const safariZoneTasks: Task[] = [
         dropChance: 100,
       },
     ],
+  },
+  {
+    id: 'fuchsia-crudely-drawn-flyer',
+    name: 'A Crudely Drawn Flyer',
+    description: "Hmm... what's this?",
+    category: 'Kanto',
+    subCategory: 'Fuchsia City',
+    icon: { type: 'lucide', id: 'FileText' },
+    background: '/backgrounds/fuchsia-tavern.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Pick It Up',
+    requirements: [{ type: 'task_completed', targetId: 'fuchsia-koga-study-toxin' }],
+    criteria: [],
+    rewards: [],
+    exitModal: {
+      background: '/backgrounds/fuchsia-tavern.avif',
+      title: 'A Crudely Drawn Flyer',
+      icon: { type: 'lucide', id: 'FileText' },
+      message:
+        'This flyer is atrocious, but it promises totally legal Pokémon Box Storage Expansion for low, low prices. Just ask for Billiam at the bar.',
+      closeButtonText: 'Ask for Billiam',
+    },
+  },
+  {
+    id: 'fuchsia-billiam-storage-upgrade',
+    name: 'A Grey Area',
+    description: 'It says to ask for Billiam.',
+    category: 'Kanto',
+    subCategory: 'Fuchsia City',
+    icon: billiamIcon,
+    background: '/backgrounds/fuchsia-tavern.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Billiam!',
+    requirements: [{ type: 'task_completed', targetId: 'fuchsia-crudely-drawn-flyer' }],
+    criteria: [{ type: 'currency_owned', targetId: 'pokedollars', count: 20000, consume: true }],
+    rewards: [{ type: 'increase_max_pokemon', quantity: 100, dropChance: 100 }],
+    enterModal: [
+      {
+        id: 1,
+        background: '/backgrounds/fuchsia-tavern.avif',
+        title: 'Billiam',
+        icon: billiamIcon,
+        message: 'Whoa, whoa, whoa. Keep your voice down, kid.',
+        buttons: [{ text: 'Sorry.', type: 'navigate', id: 2 }],
+      },
+      {
+        id: 2,
+        background: '/backgrounds/fuchsia-tavern.avif',
+        title: 'Billiam',
+        icon: billiamIcon,
+        message: "I'm guessing you're here about the additional storage. You've got the money?",
+        buttons: [{ text: 'Yup.', type: 'navigate', id: 3 }],
+      },
+      {
+        id: 3,
+        background: '/backgrounds/fuchsia-tavern.avif',
+        title: 'Billiam',
+        icon: billiamIcon,
+        message:
+          "Okay, great. I've got family connections, you see. I can get these upgrades, no problem. It's very, very important, though, that you absolutely never mention it, or me.",
+        buttons: [{ text: 'Erm... sure?', type: 'success' }],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/fuchsia-tavern.avif',
+      title: 'Billiam',
+      icon: billiamIcon,
+      message:
+        "Well, I think that was all above board. Either way, I've now got way more Pokémon Storage!",
+      closeButtonText: 'Keep Quiet',
+    },
+  },
+  {
+    id: 'fuchsia-accidental-offense',
+    name: 'Accidental Offense',
+    description: "Wow... this guy really isn't happy.",
+    category: 'Kanto',
+    subCategory: 'Fuchsia City',
+    icon: { type: 'trainer', id: 'fisherman' },
+    background: '/backgrounds/fishing-pond-portrait.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Hello?',
+    requirements: [{ type: 'task_completed', targetId: 'fuchsia-koga-study-toxin' }],
+    criteria: [],
+    rewards: [{ type: 'task_complete', targetId: 'good-rod-recipe', dropChance: 100 }],
+    enterModal: [
+      {
+        id: 1,
+        background: '/backgrounds/fishing-pond-portrait.avif',
+        title: 'Fisherman',
+        icon: { type: 'trainer', id: 'fisherman' },
+        message:
+          "What on earth, kid! That has to be just about THE WORST fishing rod I've ever seen. I'd be surprised if you could cast it into a still pool, never mind a river or the ocean.",
+        buttons: [{ text: 'Funny you should say that...', type: 'navigate', id: 2 }],
+      },
+      {
+        id: 2,
+        background: '/backgrounds/fishing-pond-portrait.avif',
+        title: 'Fisherman',
+        icon: { type: 'trainer', id: 'fisherman' },
+        message:
+          "Look, kid, it's genuinely hurting my eyes. I've a good mind to report you to the police and get you banned from any body of water over one metre.",
+        buttons: [{ text: 'Okay, I get it.', type: 'navigate', id: 3 }],
+      },
+      {
+        id: 3,
+        background: '/backgrounds/fishing-pond-portrait.avif',
+        title: 'Fisherman',
+        icon: { type: 'trainer', id: 'fisherman' },
+        message:
+          "Fortunately, I'm a good guy. When I'm not fishing, I'm whittling, and I'm going to show you how.",
+        buttons: [{ text: 'Thanks?', type: 'success' }],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/fishing-pond-portrait.avif',
+      title: 'Fisherman',
+      icon: { type: 'trainer', id: 'fisherman' },
+      message:
+        "Well, he was quite the character. I had no idea anyone still whittled. Looks like I can make myself a new rod with Pokémon materials. Maybe I should get round to that at some point.",
+      closeButtonText: 'Make a New Rod',
+    },
   },
   {
     id: 'safari-north-strength-cache',

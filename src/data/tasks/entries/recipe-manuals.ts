@@ -112,6 +112,24 @@ const battleItemRecipeManuals = [
 
 export const recipeManualTasks: Task[] = [
   {
+    id: 'good-rod-recipe',
+    name: 'Good Rod Recipe',
+    description: 'A hidden artisan note that unlocks the Good Rod crafting recipe.',
+    category: 'Secret',
+    subCategory: 'Recipe Manuals',
+    icon: {
+      type: 'item' as const,
+      id: 'good-rod',
+    },
+    repeatable: false,
+    secret: true,
+    completionTrigger: 'auto' as const,
+    completeButtonText: 'Read Recipe',
+    requirements: [],
+    criteria: [],
+    rewards: [],
+  },
+  {
     id: 'revive-recipe-discovery',
     name: 'Revive Recipe Discovery',
     description: 'A hidden marker for Chansey’s rare Revive recipe discovery.',

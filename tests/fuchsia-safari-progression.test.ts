@@ -813,4 +813,39 @@ describe('Fuchsia Gym and Safari progression', () => {
     )
     expect(study).toContain('stand over my workbench')
   })
+
+  test('Sealed Toxin unlocks Billiam storage and the Good Rod side tasks', () => {
+    const flyer = tasks.find((task) => task.id === 'fuchsia-crudely-drawn-flyer')
+    const storage = tasks.find((task) => task.id === 'fuchsia-billiam-storage-upgrade')
+    const rod = tasks.find((task) => task.id === 'fuchsia-accidental-offense')
+
+    expect(flyer?.requirements).toContainEqual({
+      type: 'task_completed',
+      targetId: 'fuchsia-koga-study-toxin',
+    })
+    expect(storage).toMatchObject({
+      background: '/backgrounds/fuchsia-tavern.avif',
+      icon: { type: 'trainer', id: 'gamer' },
+      requirements: [
+        { type: 'task_completed', targetId: 'fuchsia-crudely-drawn-flyer' },
+      ],
+      criteria: [
+        {
+          type: 'currency_owned',
+          targetId: 'pokedollars',
+          count: 20000,
+          consume: true,
+        },
+      ],
+      rewards: [{ type: 'increase_max_pokemon', quantity: 100, dropChance: 100 }],
+    })
+    expect(rod).toMatchObject({
+      requirements: [
+        { type: 'task_completed', targetId: 'fuchsia-koga-study-toxin' },
+      ],
+      rewards: [{ type: 'task_complete', targetId: 'good-rod-recipe', dropChance: 100 }],
+    })
+    expect(JSON.stringify(storage)).toContain('Whoa, whoa, whoa')
+    expect(JSON.stringify(rod)).toContain('THE WORST fishing rod')
+  })
 })

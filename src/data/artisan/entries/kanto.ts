@@ -758,6 +758,25 @@ const POKE_POWDER_RECIPES: ArtisanRecipeDraft[] = candyItems.map((candy, index) 
 
 const ITEM_RECIPES: ArtisanRecipeDraft[] = [
   {
+    id: 'craft-good-rod',
+    name: 'Good Rod',
+    description: 'Balance wood, metal, and soft fluff into a dependable Good Rod.',
+    artisanLevel: 1,
+    costs: [
+      { id: 'wood-scraps-t1', amount: 100 },
+      { id: 'metal-scrap-t1', amount: 20 },
+      { id: 'soft-fluff-t1', amount: 10 },
+    ],
+    rewards: [{ type: 'item', targetId: 'good-rod', quantity: 1, dropChance: 100 }],
+    craftType: 'balance',
+    outputQuantity: { min: 1, max: 1 },
+    iconItemId: 'good-rod',
+    requirements: [
+      { type: 'task_completed', targetId: 'good-rod-recipe' },
+      { type: 'item_owned', targetId: 'good-rod', inverse: true },
+    ],
+  },
+  {
     id: 'craft-revive',
     name: 'Revive',
     description: 'Balance a restorative tonic that can bring a fainted Pokemon back into the fight.',
