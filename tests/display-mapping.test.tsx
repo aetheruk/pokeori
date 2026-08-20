@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { mapCriteriaToDisplayItem } from '@/components/game/shared/criteria-mapping'
 import { mapRewardToDisplayItem } from '@/components/game/shared/reward-mapping'
+import { ItemSprite } from '@/components/ui/item-sprite'
 
 describe('display mapping copy', () => {
   test('location and wild battle result criteria use activity-specific language', () => {
@@ -121,6 +122,18 @@ describe('display mapping copy', () => {
     expect(research?.label).toBe('Companion Research XP +25')
     expect(research?.icon).toBeTruthy()
     expect(research?.subLabel).toBe('Active Companion')
+  })
+
+  test('expedition Safari Ball rewards use the Safari Ball sprite', () => {
+    const reward = mapRewardToDisplayItem({
+      type: 'expedition_safari_balls',
+      quantity: { min: 1, max: 3 },
+    })
+
+    expect(reward?.label).toBe('Safari Ball x1-3')
+    expect(reward?.subLabel).toBe('Added to this expedition')
+    expect((reward?.icon as any)?.props.children.type).toBe(ItemSprite)
+    expect((reward?.icon as any)?.props.children.props.itemId).toBe('safari-ball')
   })
 
   test('set collection criteria use set names without duplicating progress counts', () => {

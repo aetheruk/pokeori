@@ -113,7 +113,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
     buttonText: 'Begin Grand Expedition',
     icon: { type: 'pokemon', id: '128' },
     background: '/backgrounds/safari-reserve.avif',
-    maxLosses: 5,
+    maxLosses: 10,
     safariBallAllowance: 30,
     canAbandon: true,
     requirements: [permitRequirement],

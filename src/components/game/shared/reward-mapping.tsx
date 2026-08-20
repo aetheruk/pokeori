@@ -118,6 +118,23 @@ export function mapRewardToDisplayItem(
       }
       break
     }
+    case 'expedition_safari_balls': {
+      label = 'Safari Ball'
+      if (quantityStr) label += ` ${quantityStr}`
+      icon = (
+        <div className="relative w-8 h-8">
+          <ItemSprite
+            itemId="safari-ball"
+            alt="Safari Ball"
+            className="object-contain pixelated"
+            width={32}
+            height={32}
+          />
+        </div>
+      )
+      subLabel = 'Added to this expedition'
+      break
+    }
     case 'pokemon': {
       // Look up pokemon data
       const targetId = reward.targetId || '1'

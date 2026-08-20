@@ -44,6 +44,7 @@ export interface GenericResult {
     pokemon: any[]
     currency: any[]
     cards: any[]
+    notices?: { id: string; title: string; message?: string; icon?: TaskIcon }[]
     levelUp?: any
     tasksCompleted?: any[]
     taskExitModals?: TaskExitModal[]

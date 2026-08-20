@@ -28,7 +28,7 @@ import {
 } from '@/utilities/research/research-levels'
 
 import { tasks } from '@/data/tasks'
-import type { TaskExitModal } from '@/data/tasks'
+import type { TaskExitModal, TaskIcon } from '@/data/tasks'
 import { battles } from '@/data/battles'
 import { allGames } from '@/data/games'
 import { locations } from '@/data/locations'
@@ -105,7 +105,7 @@ export interface RewardSummary {
   icons: { id: string; name: string }[]
   titles: { id: string; name: string }[]
   upgrades: { type: 'storage' | 'boxes'; value: number; label: string }[]
-  notices?: { id: string; title: string; message?: string }[]
+  notices?: { id: string; title: string; message?: string; icon?: TaskIcon }[]
   researchXp?: {
     formId: string
     formName: string

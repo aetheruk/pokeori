@@ -174,7 +174,11 @@ export function RewardSummaryDisplay({
                 }`}
               >
                 <div className="w-8 h-8 rounded-lg bg-game-ochre/10 flex items-center justify-center flex-shrink-0">
-                  <Search className="w-4 h-4 text-game-ochre" />
+                  {notice.icon ? (
+                    <TaskIconDisplay icon={notice.icon} className="h-6 w-6" />
+                  ) : (
+                    <Search className="w-4 h-4 text-game-ochre" />
+                  )}
                 </div>
                 <div className="flex-1 min-w-0 pr-2 text-left">
                   <div className="font-medium text-game-ink text-sm truncate">
