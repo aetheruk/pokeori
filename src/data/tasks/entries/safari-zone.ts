@@ -42,7 +42,8 @@ export const safariZoneTasks: Task[] = [
   {
     id: 'fuchsia-gym-search-for-koga',
     name: 'The Empty Gym',
-    description: 'Koga has to be our best chance of understanding this sealed poison... but where is he?',
+    description:
+      'Koga has to be our best chance of understanding this sealed poison... but where is he?',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: kogaIcon,
@@ -58,14 +59,16 @@ export const safariZoneTasks: Task[] = [
       background: '/backgrounds/gym-poison.avif',
       title: 'Gym Attendant',
       icon: { type: 'trainer', id: 'psychic-f' },
-      message: 'You are looking for Koga? He left for the Safari Zone with Janine before sunrise. Neither of them said when they would be back.',
+      message:
+        'You are looking for Koga? He left for the Safari Zone with Janine before sunrise. Neither of them said when they would be back.',
       closeButtonText: 'Head to the Safari Zone',
     },
   },
   {
     id: 'safari-zone-entry-denied',
     name: 'At the Safari Gate',
-    description: 'Koga and Janine got into this closed reserve somehow. Maybe the Ranger knows where they went.',
+    description:
+      'Koga and Janine got into this closed reserve somehow. Maybe the Ranger knows where they went.',
     category: 'Kanto',
     subCategory: 'Safari Zone',
     icon: rangerIcon,
@@ -83,7 +86,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/safari-reserve.avif',
         title: 'Safari Zone Ranger',
         icon: rangerIcon,
-        message: 'Sorry, the reserve is closed to general visitors while field surveys are underway. Only Chartered Researchers may enter this part of the Safari Zone. Are you a member of the Fuchsia Research Institute?',
+        message:
+          'Sorry, the reserve is closed to general visitors while field surveys are underway. Only Chartered Researchers may enter this part of the Safari Zone. Are you a member of the Fuchsia Research Institute?',
         buttons: [{ text: 'Not Yet', type: 'navigate', id: 2 }],
       },
       {
@@ -91,7 +95,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/safari-reserve.avif',
         title: 'Safari Zone Ranger',
         icon: rangerIcon,
-        message: 'Then I cannot sign you into the reserve. Koga and Janine entered before sunrise under the Institute charter, which is why they were allowed beyond this gate.',
+        message:
+          'Then I cannot sign you into the reserve. Koga and Janine entered before sunrise under the Institute charter, which is why they were allowed beyond this gate.',
         buttons: [{ text: 'They May Be in Danger', type: 'navigate', id: 3 }],
       },
       {
@@ -99,7 +104,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/safari-reserve.avif',
         title: 'Safari Zone Ranger',
         icon: rangerIcon,
-        message: 'I understand, and I will watch for them. If you need to conduct your own search, speak to the Institute in Fuchsia City about membership. Return with a valid Researcher’s Pass and I can admit you properly.',
+        message:
+          'I understand, and I will watch for them. If you need to conduct your own search, speak to the Institute in Fuchsia City about membership. Return with a valid Researcher’s Pass and I can admit you properly.',
         buttons: [{ text: 'Speak to Ray', type: 'success' }],
       },
     ],
@@ -125,7 +131,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/safari-reserve.avif',
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
-        message: 'Koga and Janine signed in as Institute researchers, so they did not enter in secret. The Institute should have their records and may know what they were working on.',
+        message:
+          'Koga and Janine signed in as Institute researchers, so they did not enter in secret. The Institute should have their records and may know what they were working on.',
         buttons: [{ text: 'We Need a Pass', type: 'navigate', id: 2 }],
       },
       {
@@ -133,7 +140,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/safari-reserve.avif',
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
-        message: 'Go to the Fuchsia Research Institute and find out how to get a Researcher’s Pass. I will stay here and ask the Ranger whether he noticed anything else.',
+        message:
+          'Go to the Fuchsia Research Institute and find out how to get a Researcher’s Pass. I will stay here and ask the Ranger whether he noticed anything else.',
         buttons: [{ text: 'Visit the Institute', type: 'success' }],
       },
     ],
@@ -141,7 +149,8 @@ export const safariZoneTasks: Task[] = [
   {
     id: 'fuchsia-research-institute-enquiry',
     name: 'The Research Institute',
-    description: 'If joining the Institute gets me into the Safari Zone, it is worth asking what it takes.',
+    description:
+      'If joining the Institute gets me into the Safari Zone, it is worth asking what it takes.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: { type: 'trainer', id: 'researcher-f' },
@@ -159,7 +168,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Institute Registrar',
         icon: { type: 'trainer', id: 'researcher-f' },
-        message: 'Welcome to the Fuchsia Research Institute. We coordinate habitat surveys, maintain the Safari field archive, and charter researchers who are qualified to work inside protected areas. How may I help?',
+        message:
+          'Welcome to the Fuchsia Research Institute. We coordinate habitat surveys, maintain the Safari field archive, and charter researchers who are qualified to work inside protected areas. How may I help?',
         buttons: [{ text: 'I Need a Researcher’s Pass', type: 'navigate', id: 2 }],
       },
       {
@@ -167,7 +177,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Institute Registrar',
         icon: { type: 'trainer', id: 'researcher-f' },
-        message: 'We do not issue visitor passes. A Researcher’s Pass identifies a full Institute member and carries responsibility for every habitat they enter. If you wish to join, we can assess your field credentials.',
+        message:
+          'We do not issue visitor passes. A Researcher’s Pass identifies a full Institute member and carries responsibility for every habitat they enter. If you wish to join, we can assess your field credentials.',
         buttons: [{ text: 'Can I Apply?', type: 'navigate', id: 3 }],
       },
       {
@@ -175,7 +186,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Institute Registrar',
         icon: { type: 'trainer', id: 'researcher-f' },
-        message: 'Membership is open to researchers with a substantial record of independent fieldwork. Qualified applicants must also pass a practical identification examination and pay a 2,000 PokéDollar registration fee. We will take each step in order. First, bring me your research record.',
+        message:
+          'Membership is open to researchers with a substantial record of independent fieldwork. Qualified applicants must also pass a practical identification examination and pay a 2,000 PokéDollar registration fee. We will take each step in order. First, bring me your research record.',
         buttons: [{ text: 'Present My Record', type: 'success' }],
       },
     ],
@@ -183,7 +195,8 @@ export const safariZoneTasks: Task[] = [
   {
     id: 'fuchsia-research-institute-credentials',
     name: 'A Researcher’s Record',
-    description: 'They want proof I can handle myself in the field. My research record should speak for itself.',
+    description:
+      'They want proof I can handle myself in the field. My research record should speak for itself.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: { type: 'trainer', id: 'researcher-f' },
@@ -201,7 +214,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Institute Registrar',
         icon: { type: 'trainer', id: 'researcher-f' },
-        message: 'Independent studies across Kanto, careful field notes, and enough completed observations to show you can work without supervision. Your record meets the Institute’s experience standard.',
+        message:
+          'Independent studies across Kanto, careful field notes, and enough completed observations to show you can work without supervision. Your record meets the Institute’s experience standard.',
         buttons: [{ text: 'What Comes Next?', type: 'navigate', id: 2 }],
       },
       {
@@ -209,7 +223,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Institute Registrar',
         icon: { type: 'trainer', id: 'researcher-f' },
-        message: 'Experience opens the door, but protected fieldwork depends on fast, accurate identification. Our examiner will explain the practical assessment.',
+        message:
+          'Experience opens the door, but protected fieldwork depends on fast, accurate identification. Our examiner will explain the practical assessment.',
         buttons: [{ text: 'Meet the Examiner', type: 'success' }],
       },
     ],
@@ -235,7 +250,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Institute Field Examiner',
         icon: { type: 'trainer', id: 'researcher-f' },
-        message: 'Inside the Safari Zone, a careless identification can disturb a nest, separate a herd, or put an entire survey team in danger. A Chartered Researcher must recognize what is in front of them before taking action.',
+        message:
+          'Inside the Safari Zone, a careless identification can disturb a nest, separate a herd, or put an entire survey team in danger. A Chartered Researcher must recognize what is in front of them before taking action.',
         buttons: [{ text: 'How Does the Exam Work?', type: 'navigate', id: 2 }],
       },
       {
@@ -243,7 +259,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Institute Field Examiner',
         icon: { type: 'trainer', id: 'researcher-f' },
-        message: 'You will identify Pokémon drawn from our Safari records. Six possibilities will appear at a time, and you must make twenty correct identifications in thirty-five seconds. Decide carefully, but keep moving.',
+        message:
+          'You will identify Pokémon drawn from our Safari records. Six possibilities will appear at a time, and you must make twenty correct identifications in thirty-five seconds. Decide carefully, but keep moving.',
         buttons: [{ text: 'I’m Ready', type: 'navigate', id: 3 }],
       },
       {
@@ -251,7 +268,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Institute Field Examiner',
         icon: { type: 'trainer', id: 'researcher-f' },
-        message: 'The examination terminal is prepared. Take a breath, study each silhouette, and submit your identifications before the field clock expires.',
+        message:
+          'The examination terminal is prepared. Take a breath, study each silhouette, and submit your identifications before the field clock expires.',
         buttons: [{ text: 'Begin the Assessment', type: 'success' }],
       },
     ],
@@ -268,9 +286,16 @@ export const safariZoneTasks: Task[] = [
     secret: false,
     completionTrigger: 'manual',
     completeButtonText: 'Submit Exam Record',
-    requirements: [{ type: 'task_completed', targetId: 'fuchsia-research-institute-exam-briefing' }],
+    requirements: [
+      { type: 'task_completed', targetId: 'fuchsia-research-institute-exam-briefing' },
+    ],
     criteria: [
-      { type: 'game_result', targetId: 'fuchsia-research-institute-identify', battleStatus: 'win', count: 1 },
+      {
+        type: 'game_result',
+        targetId: 'fuchsia-research-institute-identify',
+        battleStatus: 'win',
+        count: 1,
+      },
     ],
     rewards: [],
     enterModal: [
@@ -279,7 +304,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Institute Field Examiner',
         icon: { type: 'trainer', id: 'researcher-f' },
-        message: 'Twenty correct identifications within thirty-five seconds. More importantly, you stayed precise under pressure. That is the standard we expect beyond the gate.',
+        message:
+          'Twenty correct identifications within thirty-five seconds. More importantly, you stayed precise under pressure. That is the standard we expect beyond the gate.',
         buttons: [{ text: 'Did I Pass?', type: 'navigate', id: 2 }],
       },
       {
@@ -287,7 +313,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Institute Field Examiner',
         icon: { type: 'trainer', id: 'researcher-f' },
-        message: 'You passed. The Registrar can now enter you onto the Institute charter. Once your membership is registered, your Researcher’s Pass will be issued immediately.',
+        message:
+          'You passed. The Registrar can now enter you onto the Institute charter. Once your membership is registered, your Researcher’s Pass will be issued immediately.',
         buttons: [{ text: 'Return to the Registrar', type: 'success' }],
       },
     ],
@@ -295,7 +322,8 @@ export const safariZoneTasks: Task[] = [
   {
     id: 'fuchsia-research-institute-membership',
     name: 'Chartered Membership',
-    description: 'I passed! Just the registration fee left before the Institute will issue my pass.',
+    description:
+      'I passed! Just the registration fee left before the Institute will issue my pass.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: { type: 'trainer', id: 'researcher-f' },
@@ -305,19 +333,16 @@ export const safariZoneTasks: Task[] = [
     completionTrigger: 'manual',
     completeButtonText: 'Register for Membership',
     requirements: [{ type: 'task_completed', targetId: 'fuchsia-research-institute-exam-results' }],
-    criteria: [
-      { type: 'currency_owned', targetId: 'pokedollars', count: 2000, consume: true },
-    ],
-    rewards: [
-      { type: 'item', targetId: 'safari-research-pass', quantity: 1, dropChance: 100 },
-    ],
+    criteria: [{ type: 'currency_owned', targetId: 'pokedollars', count: 2000, consume: true }],
+    rewards: [{ type: 'item', targetId: 'safari-research-pass', quantity: 1, dropChance: 100 }],
     enterModal: [
       {
         id: 1,
         background: '/backgrounds/lab.avif',
         title: 'Institute Registrar',
         icon: { type: 'trainer', id: 'researcher-f' },
-        message: 'Your credentials and examination are approved. The final step is the 2,000 PokéDollar registration fee, which supports the field archive and reserve monitoring programme. Shall I enter you onto the charter?',
+        message:
+          'Your credentials and examination are approved. The final step is the 2,000 PokéDollar registration fee, which supports the field archive and reserve monitoring programme. Shall I enter you onto the charter?',
         buttons: [{ text: 'Pay 2,000 PokéDollars', type: 'navigate', id: 2 }],
       },
       {
@@ -325,7 +350,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Institute Registrar',
         icon: { type: 'trainer', id: 'researcher-f' },
-        message: 'Welcome to the Fuchsia Research Institute. Your membership is registered, and this Researcher’s Pass authorizes you to sign into protected survey areas. Keep it visible and remember that the charter makes you responsible for every habitat you enter.',
+        message:
+          'Welcome to the Fuchsia Research Institute. Your membership is registered, and this Researcher’s Pass authorizes you to sign into protected survey areas. Keep it visible and remember that the charter makes you responsible for every habitat you enter.',
         buttons: [{ text: 'Take the Researcher’s Pass', type: 'success' }],
       },
     ],
@@ -354,7 +380,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/safari-reserve.avif',
         title: 'Safari Zone Ranger',
         icon: rangerIcon,
-        message: 'Researcher’s Pass confirmed. I have added you to today’s field register, so you may enter under the Institute charter. Stay on the survey routes and report any damaged habitat markers.',
+        message:
+          'Researcher’s Pass confirmed. I have added you to today’s field register, so you may enter under the Institute charter. Stay on the survey routes and report any damaged habitat markers.',
         buttons: [{ text: 'Where Did Koga Begin?', type: 'navigate', id: 2 }],
       },
       {
@@ -362,7 +389,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/safari-reserve.avif',
         title: 'Safari Zone Ranger',
         icon: rangerIcon,
-        message: 'Koga and Janine signed in before dawn. The Institute keeps a duplicate of our sign-out archive, including their declared starting area. Check that record before you search the reserve itself.',
+        message:
+          'Koga and Janine signed in before dawn. The Institute keeps a duplicate of our sign-out archive, including their declared starting area. Check that record before you search the reserve itself.',
         buttons: [{ text: 'We Have a Route', type: 'navigate', id: 3 }],
       },
       {
@@ -370,7 +398,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/safari-reserve.avif',
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
-        message: 'Good, the pass gets us inside. The Institute also has a copy of Koga and Janine’s sign-out record. Let’s check where they started.',
+        message:
+          'Good, the pass gets us inside. The Institute also has a copy of Koga and Janine’s sign-out record. Let’s check where they started.',
         buttons: [{ text: 'Check the Sign-Out Archive', type: 'success' }],
       },
     ],
@@ -424,7 +453,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Ranger Sign-Out Archive',
         icon: { type: 'item', id: 'safari-research-pass' },
-        message: 'Koga and Janine signed into Safari Central before dawn. The return-time boxes beside both names are blank.',
+        message:
+          'Koga and Janine signed into Safari Central before dawn. The return-time boxes beside both names are blank.',
         buttons: [{ text: 'Show Ray', type: 'navigate', id: 2 }],
       },
       {
@@ -432,7 +462,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
-        message: 'The record puts them in Safari Central before dawn, and neither one signed out. That is where we start.',
+        message:
+          'The record puts them in Safari Central before dawn, and neither one signed out. That is where we start.',
         buttons: [{ text: 'Search Central', type: 'success' }],
       },
     ],
@@ -449,9 +480,7 @@ export const safariZoneTasks: Task[] = [
     secret: false,
     completionTrigger: 'manual',
     completeButtonText: 'Inspect the Marker',
-    requirements: [
-      { type: 'task_completed', targetId: 'safari-discovery-east' },
-    ],
+    requirements: [{ type: 'task_completed', targetId: 'safari-discovery-east' }],
     criteria: [],
     rewards: [],
     enterModal: [
@@ -460,7 +489,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/safari-reserve.avif',
         title: 'Safari Central',
         icon: rangerIcon,
-        message: 'Two reeds have been tied around an eastern fence post. The knot is clean, tight, and far too deliberate to be storm damage.',
+        message:
+          'Two reeds have been tied around an eastern fence post. The knot is clean, tight, and far too deliberate to be storm damage.',
         buttons: [{ text: 'Ask Ray', type: 'navigate', id: 2 }],
       },
       {
@@ -468,7 +498,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/safari-reserve.avif',
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
-        message: 'This was tied deliberately, and it points east. It must have been used to mark their route.',
+        message:
+          'This was tied deliberately, and it points east. It must have been used to mark their route.',
         buttons: [{ text: 'Head East', type: 'success' }],
       },
     ],
@@ -476,7 +507,8 @@ export const safariZoneTasks: Task[] = [
   {
     id: 'safari-clue-powder-boardwalk',
     name: 'Powder on the Boardwalk',
-    description: 'There is something pale on the eastern boardwalk. Could Koga or Janine have left it behind?',
+    description:
+      'There is something pale on the eastern boardwalk. Could Koga or Janine have left it behind?',
     category: 'Kanto',
     subCategory: 'Safari Zone',
     icon: detectiveIcon,
@@ -485,9 +517,7 @@ export const safariZoneTasks: Task[] = [
     secret: false,
     completionTrigger: 'manual',
     completeButtonText: 'Examine the Powder',
-    requirements: [
-      { type: 'task_completed', targetId: 'safari-discovery-west' },
-    ],
+    requirements: [{ type: 'task_completed', targetId: 'safari-discovery-west' }],
     criteria: [],
     rewards: [],
     enterModal: [
@@ -496,7 +526,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/safari-reserve.avif',
         title: 'Safari East',
         icon: { type: 'item', id: 'antidote' },
-        message: 'A fine line of pale antidote powder crosses the damp boardwalk and disappears onto the western trail.',
+        message:
+          'A fine line of pale antidote powder crosses the damp boardwalk and disappears onto the western trail.',
         buttons: [{ text: 'Follow the Trace', type: 'navigate', id: 2 }],
       },
       {
@@ -521,9 +552,7 @@ export const safariZoneTasks: Task[] = [
     secret: false,
     completionTrigger: 'manual',
     completeButtonText: 'Inspect the Thread',
-    requirements: [
-      { type: 'task_completed', targetId: 'safari-discovery-north' },
-    ],
+    requirements: [{ type: 'task_completed', targetId: 'safari-discovery-north' }],
     criteria: [],
     rewards: [],
     enterModal: [
@@ -532,7 +561,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/safari-reserve.avif',
         title: 'Safari West',
         icon: rangerIcon,
-        message: 'A short purple training thread is snagged high in the brush. The bent branch beside it faces north.',
+        message:
+          'A short purple training thread is snagged high in the brush. The bent branch beside it faces north.',
         buttons: [{ text: 'Show Ray', type: 'navigate', id: 2 }],
       },
       {
@@ -540,7 +570,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/safari-reserve.avif',
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
-        message: 'The thread and bent branch both point north. They came through here without rushing.',
+        message:
+          'The thread and bent branch both point north. They came through here without rushing.',
         buttons: [{ text: 'Follow North', type: 'success' }],
       },
     ],
@@ -548,7 +579,8 @@ export const safariZoneTasks: Task[] = [
   {
     id: 'safari-zone-cant-find-them',
     name: 'Trail Gone Cold',
-    description: 'The trail ends at an empty observation blind. There has to be another place to look.',
+    description:
+      'The trail ends at an empty observation blind. There has to be another place to look.',
     category: 'Kanto',
     subCategory: 'Safari Zone',
     icon: detectiveIcon,
@@ -566,7 +598,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/safari-reserve.avif',
         title: 'Safari North',
         icon: rangerIcon,
-        message: 'Two sets of prints reach an empty observation blind. None leave it, and the ground around the blind is undisturbed.',
+        message:
+          'Two sets of prints reach an empty observation blind. None leave it, and the ground around the blind is undisturbed.',
         buttons: [{ text: 'Ask Ray', type: 'navigate', id: 2 }],
       },
       {
@@ -574,7 +607,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/safari-reserve.avif',
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
-        message: 'The tracks stop here, but Koga and Janine clearly did not. We have followed the whole trail and found nothing. Let’s check the Gym again.',
+        message:
+          'The tracks stop here, but Koga and Janine clearly did not. We have followed the whole trail and found nothing. Let’s check the Gym again.',
         buttons: [{ text: 'Return to the Gym', type: 'success' }],
       },
     ],
@@ -599,7 +633,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/gym-poison.avif',
         title: 'Gym Attendant',
         icon: { type: 'trainer', id: 'psychic-f' },
-        message: 'They have been back for hours. Of course you couldn’t find them. They are ninjas.',
+        message:
+          'They have been back for hours. Of course you couldn’t find them. They are ninjas.',
         buttons: [{ text: 'They were here?', type: 'navigate', id: 2 }],
       },
       {
@@ -607,7 +642,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/gym-poison.avif',
         title: 'Janine',
         icon: janineIcon,
-        message: 'You found every place we had been. Just never while we were still there. That is not bad for a first attempt.',
+        message:
+          'You found every place we had been. Just never while we were still there. That is not bad for a first attempt.',
         buttons: [{ text: 'I need to speak with Koga', type: 'navigate', id: 3 }],
       },
       {
@@ -615,7 +651,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/gym-poison.avif',
         title: 'Janine',
         icon: janineIcon,
-        message: 'Then reach him. The floor is poisoned, the walls are invisible, and his students will not step aside. Make it through the Gym and Koga will hear what you have to say.',
+        message:
+          'Then reach him. The floor is poisoned, the walls are invisible, and his students will not step aside. Make it through the Gym and Koga will hear what you have to say.',
         buttons: [{ text: 'Take on the Gym', type: 'success' }],
       },
     ],
@@ -624,19 +661,16 @@ export const safariZoneTasks: Task[] = [
   {
     id: 'fuchsia-gym-koga-rewards',
     name: 'The Soul Badge',
-    description:
-      'I made it through the poisoned Gym. Now Koga had better have some answers.',
+    description: 'I made it through the Gym finally! I really hope Koga is willing to hear me out',
     category: 'Secret',
     subCategory: 'Fuchsia City',
-    icon: { type: 'item', id: 'tm-swift-poison' },
+    icon: { type: 'item', id: 'badge-kanto-soul' },
     background: '/backgrounds/gym-poison.avif',
     repeatable: true,
     secret: true,
     completionTrigger: 'manual',
     completeButtonText: 'Receive Gym Rewards',
-    requirements: [
-      { type: 'task_completed', targetId: 'fuchsia-gym-trial-ready' },
-    ],
+    requirements: [{ type: 'task_completed', targetId: 'fuchsia-gym-trial-ready' }],
     criteria: [],
     rewards: [],
     exitModal: {
@@ -651,8 +685,7 @@ export const safariZoneTasks: Task[] = [
   {
     id: 'koga-daily-antidote-practice',
     name: "Koga's Antidote Practice",
-    description:
-      'Looks like Koga is running low on Toxic Resin and Crystal energy again.',
+    description: 'Looks like Koga is running low on Toxic Resin and Crystal energy again.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: kogaIcon,
@@ -746,14 +779,14 @@ export const safariZoneTasks: Task[] = [
       title: 'Gym Leader Koga',
       icon: kogaIcon,
       message:
-        'Five measures. Good. These will be mixed before tomorrow’s trial, not after somebody collapses. Your work kept the next challengers safe. Take what you earned.',
+        'Five measures. Good. These will be mixed before tomorrow’s trial, Your work helps keep the next challengers safe. Take what you earned.',
       closeButtonText: 'Receive Rewards',
     },
   },
   {
     id: 'fuchsia-koga-study-toxin',
     name: 'The Sealed Toxin',
-    description: 'Finally. Koga can take a proper look at the poison we recovered from Team Rocket.',
+    description: 'Finally. An audience with Koga!',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: { type: 'item', id: 'rocket-poison-vial' },
@@ -761,9 +794,14 @@ export const safariZoneTasks: Task[] = [
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Give Koga the Sample',
+    completeButtonText: 'Explain the situation',
     requirements: [
-      { type: 'expedition_result', targetId: 'fuchsia-gym-trial-expedition', expeditionStatus: 'completed', count: 1 },
+      {
+        type: 'expedition_result',
+        targetId: 'fuchsia-gym-trial-expedition',
+        expeditionStatus: 'completed',
+        count: 1,
+      },
     ],
     criteria: [{ type: 'item_owned', targetId: 'rocket-poison-vial', count: 1, consume: true }],
     enterModal: [
@@ -772,7 +810,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/gym-poison.avif',
         title: 'Koga',
         icon: kogaIcon,
-        message: 'Do not open it. The seal is part of the evidence. I can separate the compounds, but not while you stand over my workbench.',
+        message:
+          'Thats quite the tale, WAIT! Do not open it. Im more than happy to help I have history with them, but not while you stand over my workbench.',
         buttons: [{ text: 'How long will it take?', type: 'navigate', id: 2 }],
       },
       {
@@ -780,7 +819,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/gym-poison.avif',
         title: 'Koga',
         icon: kogaIcon,
-        message: 'Long enough that waiting here helps nobody. Janine has something that will keep you occupied and nearby.',
+        message:
+          'Long enough that waiting here helps nobody. Janine has something that will keep you occupied and nearby.',
         buttons: [{ text: 'Janine?', type: 'navigate', id: 3 }],
       },
       {
@@ -788,18 +828,26 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/gym-poison.avif',
         title: 'Janine',
         icon: janineIcon,
-        message: 'A Safari Catching Permit. Complete five expeditions in an area and the Rangers will open the next one. Try not to shout at everything you meet.',
+        message:
+          'A Safari Catching Permit. You clearly proved yourself and you already have the necessary paperwork.',
         buttons: [{ text: 'Take the permit', type: 'success' }],
       },
     ],
     rewards: [
-      { type: 'item', targetId: 'safari-catching-permit', quantity: 1, dropChance: 100 },
+      {
+        type: 'item',
+        secret: true,
+        targetId: 'safari-catching-permit',
+        quantity: 1,
+        dropChance: 100,
+      },
     ],
   },
   {
     id: 'safari-north-strength-cache',
     name: 'The Abandoned Cache',
-    description: 'There is an old supply locker buried under all that growth. I wonder what is inside.',
+    description:
+      'There is an old supply locker buried under all that growth. I wonder what is inside.',
     category: 'Secret',
     subCategory: 'Safari Zone',
     icon: { type: 'item', id: 'tm-strength' },
@@ -820,15 +868,16 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/safari-reserve.avif',
         title: 'Northern Supply Cache',
         icon: { type: 'item', id: 'tm-strength' },
-        message: 'Behind a fallen shelf sits a sealed field manual stamped HM04. Its cover shows a Pokémon shifting a boulder from a blocked trail.',
+        message:
+          'Behind a fallen shelf sits a sealed field manual stamped HM04. Its cover shows a Pokémon shifting a boulder from a blocked trail.',
         buttons: [{ text: 'Recover HM04 Strength', type: 'success' }],
       },
     ],
   },
   {
     id: 'safari-strength-check-on-koga',
-    name: 'Back to the Case',
-    description: 'HM Strength is safe. Now I need to see whether Koga has made any progress.',
+    name: 'So long Safari',
+    description: 'Weve been gone quite some time I should check if Koga has made any progress.',
     category: 'Kanto',
     subCategory: 'Safari Zone',
     icon: detectiveIcon,
@@ -849,15 +898,17 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/safari-reserve.avif',
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
-        message: 'Strength may help us later, but it is not why we came to Fuchsia. Koga has had enough time with the vial.',
-        buttons: [{ text: 'Koga has had enough time', type: 'navigate', id: 2 }],
+        message:
+          'Agreed, Koga has had enough time with the vial and the longer we are out here without a cure the longer we are in danger. I cant imagine you will get another shot at coming back.',
+        buttons: [{ text: 'Agreed', type: 'navigate', id: 2 }],
       },
       {
         id: 2,
         background: '/backgrounds/safari-reserve.avif',
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
-        message: 'Agreed. Let’s head back and see what he found.',
+        message:
+          'Ray, has got me feeling nervous again I kinda forgot about the impending danger with all the fun in the Safari Zone',
         buttons: [{ text: 'Return to Koga', type: 'success' }],
       },
     ],
@@ -865,7 +916,7 @@ export const safariZoneTasks: Task[] = [
   {
     id: 'fuchsia-koga-unknown-compound',
     name: 'The Unknown Compound',
-    description: 'Koga thinks the Unknown Compound changes Pokémon energy. Fifty Crystals should prove it.',
+    description: 'Koga thinks the Unknown Compound changes Pokémon energy.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: kogaIcon,
@@ -873,19 +924,18 @@ export const safariZoneTasks: Task[] = [
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Power the Test',
+    completeButtonText: 'Test the theory',
     requirements: [{ type: 'task_completed', targetId: 'safari-strength-check-on-koga' }],
     criteria: [{ type: 'currency_owned', targetId: 'crystals', count: 50, consume: true }],
-    rewards: [
-      { type: 'currency', targetId: 'shadow-crystals', quantity: 50, dropChance: 100 },
-    ],
+    rewards: [{ type: 'currency', targetId: 'shadow-crystals', quantity: 50, dropChance: 100 }],
     enterModal: [
       {
         id: 1,
         background: '/backgrounds/lab.avif',
         title: 'Koga',
         icon: kogaIcon,
-        message: 'I separated two active compounds. The first is Toxicroak toxin. That is what makes the road poison dangerous to people. The second matches nothing in any record I trust.',
+        message:
+          'I separated two active compounds. The first is Toxicroak toxin. That is what if I were to believe you caused your untimely end. The second... Im unsure.',
         buttons: [{ text: 'The Unknown Compound?', type: 'navigate', id: 2 }],
       },
       {
@@ -893,7 +943,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Koga',
         icon: kogaIcon,
-        message: 'It barely reacts with human tissue. Pokémon energy is another matter. Fifty Crystals will let us test the effect without exposing a Pokémon.',
+        message:
+          'It has no reaction to human tissue. Pokémon energy is another matter. Fifty Crystals will let us test the effect without exposing a Pokémon.',
         buttons: [{ text: 'That is safe?', type: 'navigate', id: 3 }],
       },
       {
@@ -901,15 +952,16 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Janine',
         icon: janineIcon,
-        message: 'Safe for us is not the same as harmless. Keep the vial sealed and use the smallest sample that will give us an answer.',
-        buttons: [{ text: 'Run the Crystal test', type: 'navigate', id: 4 }],
+        message: 'Safer than not knowing. The smallest sample that will give us an answer.',
+        buttons: [{ text: 'Watch', type: 'navigate', id: 4 }],
       },
       {
         id: 4,
         background: '/backgrounds/lab.avif',
         title: 'The Crystal Test',
         icon: { type: 'item', id: 'rocket-poison-vial' },
-        message: 'Koga adds a trace of the Unknown Compound to the Crystals. Their clear light darkens into a restless violet pulse.',
+        message:
+          'Koga adds a trace of the Unknown Compound to the Crystals. Their clear light darkens into a restless violet pulse.',
         buttons: [{ text: 'Examine the Crystals', type: 'navigate', id: 5 }],
       },
       {
@@ -917,15 +969,17 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Koga',
         icon: kogaIcon,
-        message: 'Shadow Crystals. The Unknown Compound does not appear to threaten humans, but it distorts Pokémon energy. That is the effect we needed to prove.',
-        buttons: [{ text: 'This is Rocket’s Shadow work', type: 'navigate', id: 6 }],
+        message:
+          'Shadowy Crystals. The Unknown Compound does not appear to threaten humans, but it distorts Pokémon energy.',
+        buttons: [{ text: 'Oh dear', type: 'navigate', id: 6 }],
       },
       {
         id: 6,
         background: '/backgrounds/lab.avif',
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
-        message: 'The vial combines a poison that harms people with a compound that changes Pokémon. That sounds like Operation Shadow Force.',
+        message:
+          'The vial combines a poison that harms people with a compound that changes Pokémon. This has to be connected to the Shadow Pokemon',
         buttons: [{ text: 'Koga?', type: 'navigate', id: 7 }],
       },
       {
@@ -933,15 +987,17 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Koga',
         icon: kogaIcon,
-        message: 'It proves what the compound does, not who made it. For the human poison, I can neutralize the Toxicroak toxin. I need fresh yolk from a Chansey egg. Find a Chansey in the Safari Zone and earn its trust as your partner.',
-        buttons: [{ text: 'I’ll find a Chansey', type: 'success' }],
+        message:
+          'For the first compound I can neutralize the Toxicroak toxin. I need fresh yolk from a Chansey egg. Find a Chansey in the Safari Zone and earn its trust as your partner.',
+        buttons: [{ text: 'On it!', type: 'success' }],
       },
     ],
   },
   {
     id: 'safari-catch-partner-chansey',
     name: 'An Egg for the Antidote',
-    description: 'A Chansey egg is the last thing Koga needs for the antidote. Time to find a partner I can trust.',
+    description:
+      'A Chansey egg is the last thing Koga needs for the antidote. Time to find a partner I can trust.',
     category: 'Kanto',
     subCategory: 'Safari Zone',
     icon: { type: 'pokemon', id: '113' },
@@ -965,7 +1021,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Janine',
         icon: janineIcon,
-        message: 'Chansey is calm around you. Keep it close and let it decide when it is comfortable. We need an egg, not a frightened Pokémon.',
+        message:
+          'Chansey is calm around you. Keep it close and let it decide when it is comfortable.',
         buttons: [{ text: 'Stay beside Chansey', type: 'navigate', id: 2 }],
       },
       {
@@ -973,7 +1030,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'A Fresh Egg',
         icon: { type: 'pokemon', id: '113' },
-        message: 'Chansey settles beside the workbench and produces a fresh egg, nudging it carefully toward Koga before returning to your side.',
+        message:
+          'Chansey settles beside the workbench and produces a fresh egg, nudging it carefully toward Koga before returning to your side.',
         buttons: [{ text: 'Give Koga the Egg', type: 'navigate', id: 3 }],
       },
       {
@@ -981,7 +1039,7 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Koga',
         icon: kogaIcon,
-        message: 'Good. The yolk will bind to the Toxicroak toxin without reacting to the Unknown Compound. I can manufacture the antidote now.',
+        message: 'Good. The yolk is the last regeant I need for the antidote.',
         buttons: [{ text: 'Watch Koga Work', type: 'navigate', id: 4 }],
       },
       {
@@ -989,7 +1047,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'The Pre-emptive Antidote',
         icon: { type: 'item', id: 'antidote' },
-        message: 'Koga separates the yolk, mixes it with his prepared reagents, and seals a single clear dose in a small glass vial.',
+        message:
+          'Koga separates the yolk, mixes it with his prepared reagents, and seals it in a small glass vial.',
         buttons: [{ text: 'Take the Dose', type: 'navigate', id: 5 }],
       },
       {
@@ -997,7 +1056,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Koga',
         icon: kogaIcon,
-        message: 'Drink it now. This is pre-emptive; taking it after exposure would be much less pleasant.',
+        message:
+          'Drink it now. This is pre-emptive; taking it after exposure would be much less pleasant.',
         buttons: [{ text: 'Drink the Antidote', type: 'navigate', id: 6 }],
       },
       {
@@ -1005,7 +1065,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Koga',
         icon: kogaIcon,
-        message: 'Done. The Toxicroak toxin used on the road will not affect you now. The Unknown Compound does not appear to affect humans; the Crystal test showed the danger it poses to Pokémon.',
+        message:
+          'Done. thats enough to last a lifetime for both of you. The Unknown Compound does not appear to affect humans; the Crystal test showed the danger it poses to Pokémon.',
         buttons: [{ text: 'Then the Pokémon are still at risk', type: 'navigate', id: 7 }],
       },
       {
@@ -1013,7 +1074,8 @@ export const safariZoneTasks: Task[] = [
         background: '/backgrounds/lab.avif',
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
-        message: 'You are protected from the road poison, and now we understand what the rest of the vial does. The Pokémon are still at risk, so we need to keep moving.',
+        message:
+          'That feels like a burden lifted, I feel safer, but not safe. The Pokémon are still at risk, so we need to keep moving.',
         buttons: [{ text: 'Continue the Investigation', type: 'success' }],
       },
     ],

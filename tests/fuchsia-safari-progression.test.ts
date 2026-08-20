@@ -311,6 +311,9 @@ describe('Fuchsia Gym and Safari progression', () => {
     ).toBe(false)
     expect(items.some((item) => item.id === 'tm-swift-poison')).toBe(true)
     expect(items.some((item) => item.id === 'binder-gym2')).toBe(true)
+    expect(
+      tasks.find((task) => task.id === 'fuchsia-gym-koga-rewards')?.icon,
+    ).toEqual({ type: 'item', id: 'badge-kanto-soul' })
 
     const swiftPoison = getMove('swift-poison')
     expect(swiftPoison).toMatchObject({
@@ -752,10 +755,9 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(prose).toContain('Unknown Compound')
     expect(prose).not.toContain('Unown Compound')
     expect(prose).toContain('Toxicroak toxin')
-    expect(prose).toContain('dangerous to people')
-    expect(prose).toContain('barely reacts with human tissue')
+    expect(prose).toContain('no reaction to human tissue')
     expect(prose).toContain('Fifty Crystals')
-    expect(prose).toContain('Shadow Crystals')
+    expect(prose).toContain('Shadowy Crystals')
     expect(prose).toContain('distorts Pokémon energy')
     expect(prose).toContain('fresh yolk from a Chansey egg')
 
@@ -771,9 +773,10 @@ describe('Fuchsia Gym and Safari progression', () => {
     const chanseyProse = JSON.stringify(chansey)
     expect(chanseyProse).toContain('produces a fresh egg')
     expect(chanseyProse).toContain('yolk')
-    expect(chanseyProse).toContain('manufacture the antidote')
+    expect(chanseyProse).toContain('last regeant')
+    expect(chanseyProse).toContain('antidote')
     expect(chanseyProse).toContain('Drink it now')
-    expect(chanseyProse).toContain('will not affect you now')
+    expect(chanseyProse).toContain('burden lifted')
     expect(chanseyProse).toContain('does not appear to affect humans')
     expect(chanseyProse).not.toContain('Leave Chansey')
     expect(chanseyProse).not.toContain('Rocket is expecting its poison')
