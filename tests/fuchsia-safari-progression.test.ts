@@ -512,6 +512,12 @@ describe('Fuchsia Gym and Safari progression', () => {
           dropChance: 25,
         }),
       )
+      const discoveryReward = study?.rewards.find(
+        (reward) =>
+          reward.type === 'task_complete' && reward.targetId === discoveryId,
+      )
+      expect(discoveryReward?.requirements).toBeUndefined()
+      expect(tasks.find((task) => task.id === discoveryId)?.requirements).toEqual([])
       expect(tasks.find((task) => task.id === clueId)?.secret).toBe(false)
     }
 
@@ -565,17 +571,39 @@ describe('Fuchsia Gym and Safari progression', () => {
       'safari-discovery-north',
       'safari-discovery-search-complete',
     ]
+    const discoveryModalExpectations = new Map([
+      [
+        'safari-discovery-east',
+        ['Inspect the Eastern Trail', 'Return to Explore'],
+      ],
+      [
+        'safari-discovery-west',
+        ['Follow the Powder Trail', 'Return to Explore'],
+      ],
+      [
+        'safari-discovery-north',
+        ['Search the Northern Trail', 'Return to Explore'],
+      ],
+      ['safari-discovery-search-complete', ['Check the Gym', 'Return to Explore']],
+    ])
     for (const discoveryId of discoveryIds) {
       const discovery = tasks.find((task) => task.id === discoveryId)
       expect(discovery?.secret, discoveryId).toBe(true)
+      expect(discovery?.requirements, discoveryId).toEqual([])
       expect(discovery?.icon, discoveryId).toEqual({
         type: 'trainer',
         id: 'detective',
       })
+      const [closeButtonText, forbiddenText] = discoveryModalExpectations.get(
+        discoveryId,
+      )!
       expect(discovery?.exitModal, discoveryId).toMatchObject({
         title: 'Det. Ray Choo',
-        closeButtonText: 'Return to Explore',
+        closeButtonText,
       })
+      expect(discovery?.exitModal?.message, discoveryId).not.toContain(
+        forbiddenText,
+      )
     }
 
     expect(

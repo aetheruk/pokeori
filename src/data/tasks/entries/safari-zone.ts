@@ -8,13 +8,13 @@ const detectiveIcon = { type: 'trainer' as const, id: 'detective' }
 const hiddenDiscovery = ({
   id,
   name,
-  requirement,
   message,
+  closeButtonText,
 }: {
   id: string
   name: string
-  requirement: string
   message: string
+  closeButtonText: string
 }): Task => ({
   id,
   name,
@@ -26,7 +26,7 @@ const hiddenDiscovery = ({
   repeatable: false,
   secret: true,
   completionTrigger: 'manual',
-  requirements: [{ type: 'task_completed', targetId: requirement }],
+  requirements: [],
   criteria: [],
   rewards: [],
   exitModal: {
@@ -34,7 +34,7 @@ const hiddenDiscovery = ({
     title: 'Det. Ray Choo',
     icon: detectiveIcon,
     message,
-    closeButtonText: 'Return to Explore',
+    closeButtonText,
   },
 })
 
@@ -378,26 +378,30 @@ export const safariZoneTasks: Task[] = [
   hiddenDiscovery({
     id: 'safari-discovery-east',
     name: 'Eastern Trail Found',
-    requirement: 'safari-clue-last-sign-out',
-    message: 'One detail in the survey notes stands out. Return to Explore and inspect the tied reeds in Safari Central.',
+    message:
+      "Ray studies the sign-out record again, then taps a rough sketch in the margin. 'Those reeds were tied deliberately. Let’s check the eastern trail in Central.'",
+    closeButtonText: 'Inspect the Eastern Trail',
   }),
   hiddenDiscovery({
     id: 'safari-discovery-west',
     name: 'Western Trail Found',
-    requirement: 'safari-clue-reed-twice',
-    message: 'The eastern survey has revealed another trace. Return to Explore and examine the powder on the boardwalk.',
+    message:
+      "Ray turns the eastern notes over in his hands. 'The reeds were a marker. There’s powder on the boardwalk now. Let’s follow it before the trail fades.'",
+    closeButtonText: 'Follow the Powder Trail',
   }),
   hiddenDiscovery({
     id: 'safari-discovery-north',
     name: 'Northern Trail Found',
-    requirement: 'safari-clue-powder-boardwalk',
-    message: 'Something in the western survey deserves a closer look. Return to Explore and inspect the purple thread caught in the brush.',
+    message:
+      "Ray carefully folds the western survey. 'Someone caught their clothing on the brush here. That thread is pointing us north.'",
+    closeButtonText: 'Search the Northern Trail',
   }),
   hiddenDiscovery({
     id: 'safari-discovery-search-complete',
     name: 'Search Route Completed',
-    requirement: 'safari-clue-purple-thread',
-    message: 'We have covered every trail the evidence gave us. Return to Explore and inspect the last observation blind with me.',
+    message:
+      "Ray kneels beside the empty observation blind and studies the ground. 'The trail ends here, but Koga and Janine are nowhere in sight. Let’s check the Gym. They may already be back.'",
+    closeButtonText: 'Check the Gym',
   }),
   {
     id: 'safari-clue-last-sign-out',
