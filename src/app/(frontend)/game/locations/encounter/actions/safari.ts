@@ -1,6 +1,7 @@
 'use server'
 
 import { redis } from '@/utilities/redis'
+import { getPokemonForm, getPokemonSpecies } from '@/utilities/pokemon/pokedex'
 import {
   acquireActionLock,
   checkActionRateLimit,
@@ -10,6 +11,7 @@ import {
 } from '@/utilities/game-integrity'
 import {
   resolveSafariAction,
+  SAFARI_BASE_FLEE_RATE,
   type SafariEncounterAction,
 } from '@/utilities/pokemon/safari-catch'
 import {
@@ -17,7 +19,10 @@ import {
   getEncounterMechanicsLockKey,
 } from './lock'
 import { failEncounter } from './failure'
-import type { EncounterState } from './types'
+import {
+  getEncounterRedisTtlSeconds,
+  type EncounterState,
+} from './types'
 import { getUser } from './utils'
 import { endSafariExpeditionWithoutBalls } from '@/utilities/expeditions/actions'
 
@@ -63,9 +68,6 @@ export async function performSafariAction(
     if (state.encounterMode !== 'safari' || !state.safari) {
       return { success: false, error: 'This is not a Safari encounter.' }
     }
-    if (Date.now() >= state.expiry) {
-      return { success: false, enterCapture: true, error: 'Time is up!' }
-    }
     if (state.safari.ballsRemaining <= 0) {
       return {
         success: false,
@@ -74,11 +76,14 @@ export async function performSafariAction(
       }
     }
 
+    const species =
+      getPokemonForm(state.formId) || getPokemonSpecies(state.pokemonId)
     const resolved = resolveSafariAction({
       action,
       currentStage: state.safari.stage,
-      baseCatchRate: state.baseCatchRate,
-      baseFleeRate: state.fleeRate || 10,
+      baseCaptureRate: species?.capture_rate || 100,
+      currentCatchRate: state.currentCatchRate,
+      baseFleeRate: state.fleeRate || SAFARI_BASE_FLEE_RATE,
     })
     state.safari = {
       stage: resolved.stage,
@@ -86,6 +91,7 @@ export async function performSafariAction(
       ballsRemaining: state.safari.ballsRemaining,
     }
     state.currentCatchRate = resolved.catchRate
+    state.fleeRate = resolved.fleeChance
 
     if (resolved.fled) {
       const expeditionProgress = await failEncounter(user, state)
@@ -105,12 +111,13 @@ export async function performSafariAction(
     }
 
     await redis.set(encounterId, state, {
-      ex: Math.max(60, Math.floor((state.expiry - Date.now()) / 1000) + 60),
+      ex: getEncounterRedisTtlSeconds(state),
     })
     const response = {
       success: true,
       action,
       newCatchRate: resolved.catchRate,
+      fleeRate: resolved.fleeChance,
       safari: state.safari,
       message:
         action === 'rock'

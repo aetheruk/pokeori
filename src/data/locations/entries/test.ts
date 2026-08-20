@@ -2,6 +2,36 @@ import { Location } from '../../types'
 
 export const testLocations: Location[] = [
   {
+    id: 'test-safari-catching',
+    name: 'Safari Catching Test',
+    description:
+      'A controlled Safari encounter for testing the Oran Berry, small stone, and Safari Ball interactions.',
+    category: 'Kanto',
+    subCategory: 'Test',
+    icon: {
+      type: 'pokemon',
+      id: '128',
+    },
+    background: '/backgrounds/safari-reserve.avif',
+    encounterMode: 'safari',
+    timer: 90,
+    fleeRate: 10,
+    keyEncounter: true,
+    levelRange: {
+      min: 25,
+      max: 25,
+    },
+    requirements: [],
+    encounters: [
+      {
+        speciesId: 128,
+        formId: '128',
+        chance: 100,
+      },
+    ],
+    rewards: [],
+  },
+  {
     id: 'test-mewtwo-consecutive-shield',
     name: 'Mewtwo Shield Test: Consecutive',
     description: 'A Mewtwo catch test using a shield broken by consecutive correct answers.',

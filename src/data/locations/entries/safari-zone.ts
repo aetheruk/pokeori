@@ -161,4 +161,21 @@ export const safariZoneLocations: Location[] = [
       { speciesId: 127, formId: '127', chance: 20, requirements: [{ type: 'item_owned', targetId: 'tm-strength' }] },
     ],
   }),
+  safariArea({
+    id: 'safari-fishing-expedition-catch',
+    name: 'Safari Fishing Pools',
+    description:
+      'The reserve ponds hold every Pokémon available through its Old, Good, and Super Rod. Cast your line and be ready with a Safari Ball.',
+    icon: '129',
+    encounters: [
+      { speciesId: 129, formId: '129', chance: 30 },
+      { speciesId: 60, formId: '60', chance: 15 },
+      { speciesId: 118, formId: '118', chance: 15 },
+      { speciesId: 54, formId: '54', chance: 10 },
+      { speciesId: 79, formId: '79', chance: 10 },
+      { speciesId: 98, formId: '98', chance: 10 },
+      { speciesId: 147, formId: '147', chance: 8 },
+      { speciesId: 148, formId: '148', chance: 2 },
+    ],
+  }),
 ]

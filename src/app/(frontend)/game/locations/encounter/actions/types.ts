@@ -2,6 +2,7 @@ import type { LocationEncounterShield } from '@/data/locations'
 import type { EncounterQteState } from '@/utilities/pokemon/encounter-qte'
 import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
 import type { WeatherSnapshot } from '@/utilities/weather'
+import { SAFARI_ENCOUNTER_TTL_SECONDS } from '@/utilities/pokemon/safari-catch'
 
 export interface EncounterShieldState {
   config: LocationEncounterShield
@@ -82,4 +83,11 @@ export interface EncounterState {
     expeditionName: string
     balls?: Record<string, number>
   }
+}
+
+export function getEncounterRedisTtlSeconds(
+  state: Pick<EncounterState, 'encounterMode' | 'expiry'>,
+) {
+  if (state.encounterMode === 'safari') return SAFARI_ENCOUNTER_TTL_SECONDS
+  return Math.max(60, Math.floor((state.expiry - Date.now()) / 1000) + 60)
 }

@@ -447,7 +447,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(expedition).toBeDefined()
     expect(
       expeditions.filter((entry) => entry.id.startsWith('safari-')),
-    ).toHaveLength(1)
+    ).toHaveLength(3)
     expect(expedition?.maxLosses).toBe(5)
     expect(expedition?.safariBallAllowance).toBe(30)
     expect(expedition?.requirements).toContainEqual({
@@ -542,12 +542,12 @@ describe('Fuchsia Gym and Safari progression', () => {
         expect.objectContaining({
           type: 'xp',
           skill: 'researching',
-          quantity: 250,
+          quantity: 1000,
         }),
         expect.objectContaining({
           type: 'xp',
           skill: 'catching',
-          quantity: 250,
+          quantity: 1000,
         }),
         expect.objectContaining({
           type: 'item',
@@ -557,6 +557,99 @@ describe('Fuchsia Gym and Safari progression', () => {
       ]),
     )
     expect(JSON.stringify(expedition?.path)).toContain('rocket-poacher')
+
+    const catchingExpedition = expeditions.find(
+      (entry) => entry.id === 'safari-zone-catching-expedition',
+    )
+    expect(catchingExpedition?.requirements).toContainEqual({
+      type: 'expedition_result',
+      targetId: 'safari-zone-grand-expedition',
+      expeditionStatus: 'completed',
+      count: 1,
+    })
+    expect(catchingExpedition?.safariBallAllowance).toBe(30)
+    expect(catchingExpedition?.criteria).toContainEqual({
+      type: 'currency_owned',
+      targetId: 'pokedollars',
+      count: 500,
+      consume: true,
+    })
+    const catchingSteps = buildExpeditionSteps(catchingExpedition!, {
+      inventory: [{ itemId: 'safari-catching-permit', quantity: 1 }],
+      completedTasks: [],
+      expeditionResults: [
+        {
+          expeditionId: 'safari-zone-grand-expedition',
+          wins: 1,
+          losses: 0,
+        },
+      ],
+    } as unknown as RequirementData)
+    expect(catchingSteps).toHaveLength(9)
+    expect(catchingSteps.every((step) => step.activityType === 'location')).toBe(true)
+    expect(catchingSteps.slice(0, 8).map((step) => step.activityId)).toEqual([
+      'safari-central-catch',
+      'safari-central-catch',
+      'safari-east-catch',
+      'safari-east-catch',
+      'safari-west-catch',
+      'safari-west-catch',
+      'safari-north-catch',
+      'safari-north-catch',
+    ])
+    expect(catchingSteps[8]?.activityId).toBe('safari-grand-finale-catch')
+    expect(catchingExpedition?.rewards).toEqual([
+      { type: 'xp', skill: 'catching', quantity: 500, dropChance: 100 },
+    ])
+
+    const fishingExpedition = expeditions.find(
+      (entry) => entry.id === 'safari-zone-fishing-expedition',
+    )
+    expect(fishingExpedition?.requirements).toContainEqual({
+      type: 'expedition_result',
+      targetId: 'safari-zone-grand-expedition',
+      expeditionStatus: 'completed',
+      count: 1,
+    })
+    expect(fishingExpedition?.criteria).toEqual([
+      expect.objectContaining({ type: 'currency_owned', count: 500, consume: true }),
+      { type: 'item_owned', targetId: 'old-rod' },
+      { type: 'item_owned', targetId: 'good-rod' },
+      { type: 'item_owned', targetId: 'super-rod' },
+    ])
+    expect(fishingExpedition?.safariBallAllowance).toBe(30)
+    const fishingSteps = buildExpeditionSteps(fishingExpedition!, {
+      inventory: [
+        { itemId: 'safari-catching-permit', quantity: 1 },
+        { itemId: 'old-rod', quantity: 1 },
+        { itemId: 'good-rod', quantity: 1 },
+        { itemId: 'super-rod', quantity: 1 },
+      ],
+      completedTasks: [],
+      expeditionResults: [
+        {
+          expeditionId: 'safari-zone-grand-expedition',
+          wins: 1,
+          losses: 0,
+        },
+      ],
+    } as unknown as RequirementData)
+    expect(fishingSteps).toHaveLength(10)
+    expect(fishingSteps.every((step) => step.activityType === 'location')).toBe(true)
+    expect(new Set(fishingSteps.map((step) => step.activityId))).toEqual(
+      new Set(['safari-fishing-expedition-catch']),
+    )
+    expect(fishingExpedition?.rewards).toEqual([
+      { type: 'xp', skill: 'catching', quantity: 500, dropChance: 100 },
+    ])
+    const fishingLocation = locations.find(
+      (entry) => entry.id === 'safari-fishing-expedition-catch',
+    )
+    expect(fishingLocation?.encounterMode).toBe('safari')
+    expect(fishingLocation?.expeditionOnly).toBe(true)
+    expect(fishingLocation?.encounters.map((entry) => entry.speciesId).sort((a, b) => a - b)).toEqual([
+      54, 60, 79, 98, 118, 129, 147, 148,
+    ])
   })
 
   test('Safari expedition pools sharply reduce research XP and randomize item finds', () => {
@@ -650,9 +743,17 @@ describe('Fuchsia Gym and Safari progression', () => {
     ).text()
 
     expect(source).toContain('ItemFlickQte')
+    expect(source).toContain('SafariBallControl')
+    expect(source).toContain('compact')
+    expect(source).toContain('onThrow={handleCapture}')
+    expect(source).toContain('SafariOdds')
+    expect(source).toContain('repeatable')
     expect(source).toContain("id: 'oran-berry'")
     expect(source).toContain("id: 'small-stone-t1'")
     expect(source).toContain("encounter.encounterMode !== 'safari'")
+    expect(source).not.toContain('Choose Safari Ball')
+    expect(source).not.toContain('What will you throw?')
+    expect(source).not.toContain('onBeginCapture')
     expect(source).not.toContain("handleSafariAction('bait')")
     expect(source).not.toContain("handleSafariAction('shout')")
   })
@@ -815,6 +916,8 @@ describe('Fuchsia Gym and Safari progression', () => {
     const expeditionIds = [
       'fuchsia-gym-trial-expedition',
       'safari-zone-grand-expedition',
+      'safari-zone-catching-expedition',
+      'safari-zone-fishing-expedition',
     ]
 
     for (const expeditionId of expeditionIds) {

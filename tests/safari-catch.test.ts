@@ -1,85 +1,111 @@
 import { describe, expect, test } from 'bun:test'
+import { locations } from '@/data/locations'
 import {
-  deriveSafariBaseFleeRate,
-  MAX_SAFARI_STAGE,
-  MIN_SAFARI_STAGE,
+  SAFARI_BASE_FLEE_RATE,
+  getSafariFleeChance,
   resolveSafariAction,
+  SAFARI_ENCOUNTER_TTL_SECONDS,
 } from '@/utilities/pokemon/safari-catch'
+import { getCatchStageValue } from '@/utilities/pokemon/catch-balance'
 
 describe('Safari catch actions', () => {
-  test('Feed slightly improves catch chance and lowers flee risk', () => {
+  test('provides an isolated Safari visual test location', () => {
+    const location = locations.find((entry) => entry.id === 'test-safari-catching')
+
+    expect(location).toMatchObject({
+      category: 'Kanto',
+      subCategory: 'Test',
+      encounterMode: 'safari',
+      background: '/backgrounds/safari-reserve.avif',
+      requirements: [],
+    })
+    expect(location?.expeditionOnly).toBeUndefined()
+    expect(location?.encounters).toEqual([
+      { speciesId: 128, formId: '128', chance: 100 },
+    ])
+    expect(SAFARI_ENCOUNTER_TTL_SECONDS).toBe(30 * 60)
+    expect(SAFARI_BASE_FLEE_RATE).toBe(20)
+  })
+
+  test('Berry uses one normal correct-answer increase and lowers flee by 1-3%', () => {
+    const rolls = [0, 0.99]
     const result = resolveSafariAction({
       action: 'feed',
       currentStage: 0,
-      baseCatchRate: 100,
+      baseCaptureRate: 45,
+      currentCatchRate: 45,
       baseFleeRate: 20,
-      random: () => 0.99,
-    })
-
-    expect(result.stage).toBe(-1)
-    expect(result.catchRate).toBeGreaterThan(100)
-    expect(result.fleeChance).toBeLessThan(20)
-    expect(result.fled).toBe(false)
-  })
-
-  test('Rock raises catch chance and flee risk', () => {
-    const result = resolveSafariAction({
-      action: 'rock',
-      currentStage: 0,
-      baseCatchRate: 100,
-      baseFleeRate: 20,
-      random: () => 0.99,
+      random: () => rolls.shift() || 0,
     })
 
     expect(result.stage).toBe(1)
-    expect(result.catchRate).toBeGreaterThan(100)
-    expect(result.fleeChance).toBeGreaterThan(20)
+    expect(result.catchRate).toBe(45 + getCatchStageValue(45))
+    expect(result.fleeChance).toBe(19)
     expect(result.fled).toBe(false)
   })
 
-  test('stacking stays within the authored stage and percentage bounds', () => {
+  test('Rock uses five normal correct-answer increases and raises flee by 10%', () => {
+    const result = resolveSafariAction({
+      action: 'rock',
+      currentStage: 0,
+      baseCaptureRate: 45,
+      currentCatchRate: 45,
+      baseFleeRate: 20,
+      random: () => 0.99,
+    })
+
+    expect(result.stage).toBe(5)
+    expect(result.catchRate).toBe(45 + getCatchStageValue(45) * 5)
+    expect(result.fleeChance).toBe(30)
+    expect(result.fled).toBe(false)
+  })
+
+  test('flee chance stays between 10% and 50%', () => {
     const feed = resolveSafariAction({
       action: 'feed',
-      currentStage: MIN_SAFARI_STAGE,
-      baseCatchRate: 1,
-      baseFleeRate: 1,
+      currentStage: 0,
+      baseCaptureRate: 30,
+      currentCatchRate: 30,
+      baseFleeRate: 10,
       random: () => 0.99,
     })
     const rock = resolveSafariAction({
       action: 'rock',
-      currentStage: MAX_SAFARI_STAGE,
-      baseCatchRate: 255,
-      baseFleeRate: 100,
+      currentStage: 0,
+      baseCaptureRate: 30,
+      currentCatchRate: 30,
+      baseFleeRate: 50,
       random: () => 0.99,
     })
 
-    expect(feed.stage).toBe(MIN_SAFARI_STAGE)
-    expect(feed.catchRate).toBeGreaterThanOrEqual(1)
-    expect(feed.fleeChance).toBeGreaterThanOrEqual(1)
-    expect(rock.stage).toBe(MAX_SAFARI_STAGE)
-    expect(rock.catchRate).toBeLessThanOrEqual(255)
-    expect(rock.fleeChance).toBeLessThanOrEqual(90)
+    expect(feed.fleeChance).toBe(10)
+    expect(rock.fleeChance).toBe(50)
+    expect(getSafariFleeChance({ baseFleeRate: 5 })).toBe(10)
+    expect(getSafariFleeChance({ baseFleeRate: 90 })).toBe(50)
   })
 
-  test('flee pressure is species-based and actions remain unlimited at the cap', () => {
-    expect(
-      deriveSafariBaseFleeRate({ captureRate: 190, locationFleeRate: 10 }),
-    ).toBeLessThan(
-      deriveSafariBaseFleeRate({ captureRate: 45, locationFleeRate: 10 }),
+  test('repeated actions add their normal answer equivalents', () => {
+    const first = resolveSafariAction({
+      action: 'rock',
+      currentStage: 0,
+      baseCaptureRate: 100,
+      currentCatchRate: 100,
+      baseFleeRate: 20,
+      random: () => 0.99,
+    })
+    const second = resolveSafariAction({
+      action: 'feed',
+      currentStage: first.stage,
+      baseCaptureRate: 100,
+      currentCatchRate: first.catchRate,
+      baseFleeRate: first.fleeChance,
+      random: () => 0.99,
+    })
+
+    expect(first.catchRate).toBe(100 + getCatchStageValue(100) * 5)
+    expect(second.catchRate).toBe(
+      first.catchRate + getCatchStageValue(100),
     )
-
-    let stage = MAX_SAFARI_STAGE
-    for (let index = 0; index < 20; index += 1) {
-      const result = resolveSafariAction({
-        action: 'rock',
-        currentStage: stage,
-        baseCatchRate: 100,
-        baseFleeRate: 10,
-        random: () => 0.99,
-      })
-      stage = result.stage
-    }
-
-    expect(stage).toBe(MAX_SAFARI_STAGE)
+    expect(second.fleeChance).toBe(27)
   })
 })

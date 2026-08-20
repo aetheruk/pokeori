@@ -90,6 +90,7 @@ import {
   getExplorerEncounterItemLimit,
   getSkillLevel,
 } from '@/utilities/skills/unlocks'
+import { getSafariFleeChance } from '@/utilities/pokemon/safari-catch'
 
 // Dynamic import for LevelUpModal to avoid bundling canvas-confetti in initial load
 const LevelUpModal = nextDynamic(
@@ -114,6 +115,7 @@ import { EncounterQte } from './_components/encounter-qte'
 import { EncounterResults } from './_components/encounter-results'
 import { ItemFlickQte } from './_components/item-flick-qte'
 import { QuestionPrompt } from './_components/question-prompt'
+import { SafariBallControl } from './_components/safari-ball-control'
 
 interface EncounterData {
   pokemonId: number
@@ -325,6 +327,47 @@ function CatchRateRing({ percentage }: { percentage: number }) {
         <span className="text-[10px] font-bold leading-none" style={{ color }}>
           {percentage}%
         </span>
+      </div>
+    </div>
+  )
+}
+
+function SafariOdds({
+  catchChance,
+  fleeChance,
+}: {
+  catchChance: number
+  fleeChance: number
+}) {
+  return (
+    <div
+      className="mb-3 grid w-full max-w-xs grid-cols-2 gap-2"
+      role="group"
+      aria-label={`Catch chance ${catchChance} percent. Flee chance ${fleeChance} percent.`}
+    >
+      <div className="rounded-lg border border-game-moss/35 bg-game-surface-raised px-3 py-2 shadow-sm">
+        <div className="flex items-center justify-between gap-2 text-xs font-bold text-game-moss-strong">
+          <span>Catch chance</span>
+          <span className="font-mono tabular-nums">{catchChance}%</span>
+        </div>
+        <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-game-moss/15">
+          <div
+            className="h-full rounded-full bg-game-moss transition-[width] duration-300"
+            style={{ width: `${catchChance}%` }}
+          />
+        </div>
+      </div>
+      <div className="rounded-lg border border-game-clay/35 bg-game-surface-raised px-3 py-2 shadow-sm">
+        <div className="flex items-center justify-between gap-2 text-xs font-bold text-game-clay">
+          <span>Flee chance</span>
+          <span className="font-mono tabular-nums">{fleeChance}%</span>
+        </div>
+        <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-game-clay/15">
+          <div
+            className="h-full rounded-full bg-game-clay transition-[width] duration-300"
+            style={{ width: `${fleeChance}%` }}
+          />
+        </div>
       </div>
     </div>
   )
@@ -737,7 +780,10 @@ export default function EncounterPage() {
   }, [isSilphScopeGhostLocked, encounter])
 
   useEffect(() => {
-    if (!encounter) return
+    if (!encounter || encounter.encounterMode === 'safari') {
+      setTimeLeft(0)
+      return
+    }
 
     const interval = setInterval(() => {
       const now = Date.now()
@@ -805,11 +851,11 @@ export default function EncounterPage() {
               ? {
                   ...current,
                   currentCatchRate: response.newCatchRate,
+                  fleeRate: response.fleeRate,
                   safari: response.safari,
                 }
               : current,
           )
-          toast.success(response.message)
         } else if (shouldEnterCaptureFromResponse(response)) {
           setPhase('capture')
         } else if (isExpiredEncounterResponse(response)) {
@@ -830,6 +876,10 @@ export default function EncounterPage() {
     try {
       const response = await endSafariExpedition()
       if (!response.success) {
+        if (response.message === 'No active expedition is available.') {
+          exitExpiredEncounter(response)
+          return
+        }
         toast.error(response.message || 'Unable to end the expedition.')
         return
       }
@@ -846,7 +896,7 @@ export default function EncounterPage() {
     } finally {
       setSubmittingSafariAction(false)
     }
-  }, [encounter?.pokemonName, submittingSafariAction])
+  }, [encounter?.pokemonName, exitExpiredEncounter, submittingSafariAction])
 
   const showBundledNextQuestion = useCallback(
     (question: Question) => {
@@ -1459,10 +1509,12 @@ export default function EncounterPage() {
   const encounterRarity =
     encounter.rarity ?? (encounter.isShiny ? 'shiny' : 'normal')
   const encounterRarityLabel = getPokemonRarityEffect(encounterRarity).label
+  const isSafariEncounter = encounter.encounterMode === 'safari'
   const selectedBall =
-    phase === 'capture' && balls[selectedBallIndex]
+    (isSafariEncounter && balls[0]) ||
+    (phase === 'capture' && balls[selectedBallIndex]
       ? balls[selectedBallIndex]
-      : null
+      : null)
   const targetLevel =
     currentLocation?.levelRange?.min ?? encounter?.encounterLevel ?? 1
   const levelBallTargetLevel =
@@ -1513,6 +1565,13 @@ export default function EncounterPage() {
     100,
     Math.round((adjustedCatchRate / 255) * 100),
   )
+  const safariFleePercentage = isSafariEncounter
+    ? Math.round(
+        getSafariFleeChance({
+          baseFleeRate: encounter.fleeRate || 20,
+        }),
+      )
+    : 0
   const currentThrowQuality = getThrowQuality({ ringScale: captureRingScale })
   const movingRingScale = 0.14 + captureRingScale
   const movingRingClass =
@@ -1617,14 +1676,14 @@ export default function EncounterPage() {
 
         {/* Timer - Top Right */}
         {/* Timer - Top Right */}
-        {!isSilphScopeGhostLocked && (
+        {!isSilphScopeGhostLocked && !isSafariEncounter && (
           <div className="absolute top-4 right-4 z-10">
             <GameTimer timeLeft={timeLeft} totalTime={encounter.duration} />
           </div>
         )}
 
         {/* Catch Rate Arc Ring - Top Left */}
-        {!isSilphScopeGhostLocked && (
+        {!isSilphScopeGhostLocked && !isSafariEncounter && (
           <div className="absolute top-3 left-3 z-10">
             <CatchRateRing percentage={catchPercentage} />
           </div>
@@ -1668,6 +1727,7 @@ export default function EncounterPage() {
           )}
           <div ref={pokemonTargetRef} className="relative w-40 h-40">
             {phase === 'capture' &&
+              !isSafariEncounter &&
               !showCaptureAnimation &&
               !isCapturing &&
               !hasAttemptedCapture &&
@@ -1840,75 +1900,48 @@ export default function EncounterPage() {
             key="safari-actions"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mx-auto flex h-full w-full max-w-xl flex-col rounded-2xl border border-game-border bg-game-surface-raised p-4 shadow-sm sm:p-5"
+            className="mx-auto flex h-full w-full max-w-xl flex-col items-center justify-end"
           >
-            <div className="text-center">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-game-muted">
-                Safari encounter
-              </p>
-              <h2 className="mt-1 text-xl font-bold text-game-ink">
-                What will you throw?
-              </h2>
-              <p className="mx-auto mt-1 max-w-md text-sm text-game-muted">
-                Feed the Pokémon to calm it, or throw a rock to make it easier
-                to catch at greater risk of losing it.
-              </p>
-            </div>
-            <div className="mt-4 grid grid-cols-2 gap-3 text-center text-xs font-semibold text-game-muted">
-              <div className="rounded-lg border border-game-border bg-game-canvas px-3 py-2">
-                Safari Balls
-                <span className="ml-1 text-game-ink">
-                  {encounter.safari?.ballsRemaining || 0}
-                </span>
-              </div>
-              <div className="rounded-lg border border-game-border bg-game-canvas px-3 py-2">
-                Actions
-                <span className="ml-1 text-game-ink">
-                  {encounter.safari?.actions || 0}
-                </span>
-              </div>
-            </div>
             {(encounter.safari?.ballsRemaining || 0) > 0 ? (
-              <div className="flex min-h-0 flex-1 flex-col">
-                <div className="min-h-0 flex-1">
-                  <ItemFlickQte
-                    title="Choose your approach"
-                    instruction="Drag an item upward towards the Pokémon to throw it."
-                    disabled={submittingSafariAction}
-                    options={[
-                      {
-                        id: 'oran-berry',
-                        label: 'Feed Oran Berry',
-                        description: 'Small catch boost, lower flee risk',
-                      },
-                      {
-                        id: 'small-stone-t1',
-                        label: 'Throw Rock',
-                        description: 'Large catch boost, higher flee risk',
-                      },
-                    ]}
-                    onThrow={(itemId) =>
-                      void handleSafariAction(
-                        itemId === 'oran-berry' ? 'feed' : 'rock',
-                      )
-                    }
-                  />
-                </div>
-                <Button
-                  type="button"
-                  className="mt-3 min-h-12 bg-game-clay text-game-cream hover:bg-game-clay/90"
-                  disabled={submittingSafariAction || balls.length === 0}
-                  onClick={() => setPhase('capture')}
-                >
-                  Choose Safari Ball
-                </Button>
+              <div className="flex w-full flex-col items-center justify-end">
+                <SafariOdds
+                  catchChance={catchPercentage}
+                  fleeChance={safariFleePercentage}
+                />
+                <ItemFlickQte
+                  compact
+                  centerContent={
+                    <SafariBallControl
+                      ball={balls[0]}
+                      quantity={encounter.safari?.ballsRemaining || 0}
+                      targetRef={pokemonTargetRef}
+                      disabled={
+                        submittingSafariAction ||
+                        isCapturing ||
+                        showCaptureAnimation
+                      }
+                      onThrow={handleCapture}
+                    />
+                  }
+                  disabled={
+                    submittingSafariAction ||
+                    isCapturing ||
+                    showCaptureAnimation
+                  }
+                  repeatable
+                  options={[
+                    { id: 'oran-berry', label: 'Oran Berry' },
+                    { id: 'small-stone-t1', label: 'Small Stone' },
+                  ]}
+                  onThrow={(itemId) =>
+                    void handleSafariAction(
+                      itemId === 'oran-berry' ? 'feed' : 'rock',
+                    )
+                  }
+                />
               </div>
             ) : (
               <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
-                <p className="text-sm text-game-muted">
-                  You have no Safari Balls left. Return to the gate before the
-                  reserve closes.
-                </p>
                 <Button
                   type="button"
                   variant="outline"

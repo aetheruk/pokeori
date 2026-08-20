@@ -2670,6 +2670,7 @@ export async function completeGameActivity(
         domain,
         validatedEncounterId,
         actualSuccess || isEndlessWin,
+        { revalidatePaths: false },
       )
 
       const summaryWithExpedition = {

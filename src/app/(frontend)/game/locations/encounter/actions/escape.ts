@@ -37,7 +37,10 @@ import {
 } from '@/utilities/game-integrity'
 import { recordExpeditionActivityResult } from '@/utilities/expeditions/actions'
 import type { ExpeditionProgressSnapshot } from '@/utilities/expeditions/actions'
-import type { EncounterState } from './types'
+import {
+  getEncounterRedisTtlSeconds,
+  type EncounterState,
+} from './types'
 import { rollAbility, getUser } from './utils'
 import {
   getUserPokedexMap,
@@ -67,6 +70,7 @@ async function performRunAway(
       'location',
       state.locationId,
       false,
+      { revalidatePaths: false },
     )
     return expeditionResult.expedition
   }
@@ -91,12 +95,13 @@ async function performRunAway(
     )
   }
 
-  const expeditionResult = await recordExpeditionActivityResult(
-    user.id,
-    'location',
-    state.locationId,
-    false,
-  )
+    const expeditionResult = await recordExpeditionActivityResult(
+      user.id,
+      'location',
+      state.locationId,
+      false,
+      { revalidatePaths: false },
+    )
   return expeditionResult.expedition
 }
 
@@ -264,7 +269,7 @@ export async function attemptAbilityEscape() {
     // Mark as attempted immediately
     state.abilityEscapeAttempted = true
     await redis.set(encounterId, state, {
-      ex: Math.floor((state.expiry - Date.now()) / 1000) + 60,
+      ex: getEncounterRedisTtlSeconds(state),
     })
 
     // Check Rate

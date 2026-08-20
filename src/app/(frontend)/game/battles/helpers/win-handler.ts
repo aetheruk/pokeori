@@ -28,6 +28,7 @@ export async function handleWin(
     'battle',
     state.battleId,
     true,
+    { revalidatePaths: false },
   )
   if (expeditionResult.expedition) {
     state.expeditionProgress = expeditionResult.expedition
