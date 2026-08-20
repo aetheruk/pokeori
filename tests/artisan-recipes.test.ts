@@ -529,6 +529,37 @@ describe('artisan recipes', () => {
     expect(getArtisanCraftRequiredLevel(recipe!, 3)).toBe(41)
   })
 
+  test('Good Rod is a one-time Balance craft that only fails on bad quality', () => {
+    const recipe = artisanRecipes.find((entry) => entry.id === 'craft-good-rod')
+
+    expect(recipe).toMatchObject({
+      category: 'items',
+      artisanLevel: 1,
+      craftType: 'balance',
+      costs: [
+        { id: 'wood-scraps-t1', amount: 100 },
+        { id: 'metal-scrap-t1', amount: 20 },
+        { id: 'soft-fluff-t1', amount: 10 },
+      ],
+      outputQuantity: { min: 1, max: 1 },
+      requirements: [
+        { type: 'task_completed', targetId: 'good-rod-recipe' },
+        { type: 'item_owned', targetId: 'good-rod', inverse: true },
+      ],
+    })
+    expect(resolveCraftRewards(recipe!, 'bad')).toEqual([])
+    expect(resolveCraftRewards(recipe!, 'good')[0]).toMatchObject({
+      targetId: 'good-rod',
+      quantity: 1,
+    })
+    expect(resolveCraftRewards(recipe!, 'perfect')[0]).toMatchObject({
+      targetId: 'good-rod',
+      quantity: 1,
+    })
+    expect(shouldConsumeCraftCosts(recipe!, 'bad')).toBe(false)
+    expect(shouldConsumeCraftCosts(recipe!, 'good')).toBe(true)
+  })
+
   test('status remedy recipes unlock together and use berries, candy dust, and typed materials', () => {
     const expectedRecipes = [
       {
