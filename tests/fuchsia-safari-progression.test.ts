@@ -471,7 +471,7 @@ describe('Fuchsia Gym and Safari progression', () => {
         entry.rewards.some(
           (reward) =>
             reward.type === 'task_complete' &&
-            reward.dropChance === 15 &&
+            reward.dropChance === 25 &&
             !reward.secret,
         ),
       ),
@@ -509,7 +509,7 @@ describe('Fuchsia Gym and Safari progression', () => {
         expect.objectContaining({
           type: 'task_complete',
           targetId: discoveryId,
-          dropChance: 15,
+          dropChance: 25,
         }),
       )
       expect(tasks.find((task) => task.id === clueId)?.secret).toBe(false)

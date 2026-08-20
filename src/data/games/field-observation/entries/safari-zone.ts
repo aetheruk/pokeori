@@ -75,7 +75,7 @@ function discoveryReward(studyId: string, taskId: string) {
   return {
     type: 'task_complete' as const,
     targetId: taskId,
-    dropChance: 15,
+    dropChance: 25,
     requirements: [
       {
         type: 'field_research_result' as const,
