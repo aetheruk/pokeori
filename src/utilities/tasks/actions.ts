@@ -435,6 +435,7 @@ export async function completeTask(
         id: `safari-balls-${taskId}`,
         title: 'Safari Balls found',
         message: `+${quantity} Safari Ball${quantity === 1 ? '' : 's'} added to this expedition.`,
+        icon: { type: 'item', id: 'safari-ball' },
       })
     }
   }

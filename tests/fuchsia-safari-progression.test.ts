@@ -455,7 +455,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(
       expeditions.filter((entry) => entry.id.startsWith('safari-')),
     ).toHaveLength(3)
-    expect(expedition?.maxLosses).toBe(5)
+    expect(expedition?.maxLosses).toBe(10)
     expect(expedition?.safariBallAllowance).toBe(30)
     expect(expedition?.requirements).toContainEqual({
       type: 'item_owned',
