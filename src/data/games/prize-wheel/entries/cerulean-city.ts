@@ -24,6 +24,7 @@ export const ceruleanCitychanseyEntries: PrizeWheelGameConfig[] = [
       spinTime: { min: 5, max: 10 },
       background: '/scratchcard/chansey.avif',
       themeColour: '#FAC0CC', // ChanseyPink
+      showSlotLabels: false,
       cost: { amount: 2, currencyType: 'league-ticket' },
       slots: [
         {

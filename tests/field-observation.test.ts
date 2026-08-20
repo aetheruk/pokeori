@@ -996,20 +996,94 @@ describe('field observation research mode', () => {
     expect(drops.some((drop) => drop.itemId.endsWith('-gem'))).toBe(false)
   })
 
-  test('adds default Research Kit rewards without direct currency to every study entry', () => {
+  test('Research Kits roll into active collectibles at Researcher 35', () => {
+    const baseData = {
+      inventory: [],
+      pokemon: [],
+      tcg: [],
+      pokedex: [],
+      completedTasks: [],
+      battleResults: [],
+      locationEncounterResults: [],
+      gameResults: [],
+      fieldResearchResults: [],
+      user: { skills: { researching: { level: 34 } } },
+    } as any
+    const researchKitDrop = fieldObservationGlobalItemEvents.find(
+      (event) => event.id === 'global-field-observation-research-kit',
+    )
+    if (!researchKitDrop) throw new Error('Missing global Research Kit drop')
+
+    expect(researchKitDrop).toMatchObject({
+      itemId: 'research-kit',
+      quantity: 1,
+      dropChance: FIELD_OBSERVATION_RESEARCH_KIT_DROP_CHANCE,
+      guaranteed: true,
+      requirements: [
+        { type: 'skill_level', targetId: 'researching', count: 35 },
+      ],
+    })
+    expect(
+      rollFieldObservationItemDrops(
+        [researchKitDrop],
+        baseData,
+        'Kanto',
+        () => 0,
+      ),
+    ).toEqual([])
+
+    const eligibleData = {
+      ...baseData,
+      user: { skills: { researching: { level: 35 } } },
+    }
+    expect(
+      rollFieldObservationItemDrops(
+        [researchKitDrop],
+        eligibleData,
+        'Kanto',
+        () => 0,
+      ),
+    ).toEqual([researchKitDrop])
+    expect(
+      rollFieldObservationItemDrops(
+        [researchKitDrop],
+        eligibleData,
+        'Kanto',
+        () => 0.99,
+      ),
+    ).toEqual([])
+
+    const drops = buildFieldObservationCollectibleDrops({
+      rewardSubjects: [],
+      spawns: [],
+      researchingLevel: 35,
+      surveyFocus: 'standard',
+      observationDurationMs: 20_000,
+      globalItemEvents: [researchKitDrop],
+      random: () => 0.99,
+    })
+    expect(drops).toContainEqual(
+      expect.objectContaining({
+        itemId: 'research-kit',
+        kind: 'item',
+        reward: expect.objectContaining({
+          targetId: 'research-kit',
+          dropChance: 100,
+          guaranteed: true,
+        }),
+      }),
+    )
+
     for (const study of fieldObservationGames) {
       expect(study.rewards.some((reward) => reward.type === 'currency')).toBe(
         false,
       )
-      expect(study.rewards).toContainEqual({
-        type: 'item',
-        targetId: 'research-kit',
-        quantity: 1,
-        dropChance: FIELD_OBSERVATION_RESEARCH_KIT_DROP_CHANCE,
-        requirements: [
-          { type: 'skill_level', targetId: 'researching', count: 35 },
-        ],
-      })
+      expect(
+        study.rewards.some(
+          (reward) =>
+            reward.type === 'item' && reward.targetId === 'research-kit',
+        ),
+      ).toBe(false)
     }
   })
 

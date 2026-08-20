@@ -476,23 +476,87 @@ describe('Fuchsia Gym and Safari progression', () => {
         ),
       ),
     ).toBe(true)
-    expect(searchStudies.every((entry) => entry.category === 'Secret')).toBe(
+    expect(searchStudies.every((entry) => entry.category === 'Kanto')).toBe(
       true,
     )
 
-    const clueGates = new Map([
-      ['safari-central-field-observation', 'safari-clue-last-sign-out'],
-      ['safari-east-field-observation', 'safari-clue-reed-twice'],
-      ['safari-west-field-observation', 'safari-clue-powder-boardwalk'],
-      ['safari-north-field-observation', 'safari-clue-purple-thread'],
+    const storyStudyGates = new Map([
+      [
+        'safari-central-field-observation',
+        ['safari-clue-last-sign-out', 'safari-discovery-east'],
+      ],
+      [
+        'safari-east-field-observation',
+        ['safari-clue-reed-twice', 'safari-discovery-west'],
+      ],
+      [
+        'safari-west-field-observation',
+        ['safari-clue-powder-boardwalk', 'safari-discovery-north'],
+      ],
+      [
+        'safari-north-field-observation',
+        ['safari-clue-purple-thread', 'safari-discovery-search-complete'],
+      ],
     ])
-    for (const [studyId, clueId] of clueGates) {
+    for (const [studyId, [clueId, discoveryId]] of storyStudyGates) {
       const study = fieldObservationGames.find((entry) => entry.id === studyId)
       expect(study?.requirements).toContainEqual({
         type: 'task_completed',
         targetId: clueId,
       })
+      expect(study?.hide).toBe(discoveryId)
+      expect(study?.rewards).toContainEqual(
+        expect.objectContaining({
+          type: 'task_complete',
+          targetId: discoveryId,
+          dropChance: 15,
+        }),
+      )
       expect(tasks.find((task) => task.id === clueId)?.secret).toBe(false)
+    }
+
+    const expeditionStudyIds = [
+      'safari-central-expedition-field-observation',
+      'safari-east-expedition-field-observation',
+      'safari-west-expedition-field-observation',
+      'safari-north-expedition-field-observation',
+    ]
+    for (const studyId of expeditionStudyIds) {
+      const study = fieldObservationGames.find((entry) => entry.id === studyId)
+      expect(study, studyId).toBeDefined()
+      expect(study?.category, studyId).toBe('Secret')
+      expect(study?.requirements, studyId).toContainEqual({
+        type: 'item_owned',
+        targetId: 'safari-catching-permit',
+      })
+      expect(
+        study?.rewards.some((reward) => reward.type === 'task_complete'),
+        studyId,
+      ).toBe(false)
+    }
+
+    for (const area of ['central', 'east', 'west', 'north']) {
+      const story = fieldObservationGames.find(
+        (entry) => entry.id === `safari-${area}-field-observation`,
+      )
+      const expeditionStudy = fieldObservationGames.find(
+        (entry) => entry.id === `safari-${area}-expedition-field-observation`,
+      )
+      expect(expeditionStudy?.settings.pokemonPool, area).toEqual(
+        story?.settings.pokemonPool,
+      )
+      const expedition = expeditions.find(
+        (entry) => entry.id === `safari-${area}-expedition`,
+      )
+      expect(
+        expedition?.path.some(
+          (step) =>
+            step.type === 'activity' &&
+            step.activityType === 'field-research' &&
+            step.activityId === `safari-${area}-expedition-field-observation`,
+        ),
+        area,
+      ).toBe(true)
     }
 
     const discoveryIds = [

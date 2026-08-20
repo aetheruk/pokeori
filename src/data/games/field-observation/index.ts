@@ -1,6 +1,5 @@
 export * from './types'
 import { FieldObservationConfig } from './types'
-import { withDefaultFieldObservationRewards } from './rewards'
 
 import { palletTownFieldObservationEntries } from './entries/pallet-town'
 import { viridianCityFieldObservationEntries } from './entries/viridian-city'
@@ -34,4 +33,4 @@ export const fieldObservationGames: FieldObservationConfig[] = [
   ...celadonCityFieldObservationEntries,
   ...fuchsiaCityFieldObservationEntries,
   ...safariZoneFieldObservationEntries,
-].map(withDefaultFieldObservationRewards)
+]

@@ -27,12 +27,13 @@ export const fuchsiaCitychanseyEntries: PrizeWheelGameConfig[] = [
       spinTime: { min: 5, max: 10 },
       background: '/scratchcard/chansey.avif',
       themeColour: '#FAC0CC',
+      showSlotLabels: false,
       cost: { amount: 2, currencyType: 'league-ticket' },
       slots: [
-        ...xItemSlots.map((slot) => ({
+        ...xItemSlots.map((slot, index) => ({
           id: slot.id,
           label: slot.label,
-          color: '#F1AEC6',
+          color: index % 2 === 0 ? '#F1AEC6' : '#E8F3E2',
           percentage: slot.percentage,
           icon: { type: 'item' as const, id: slot.id },
           rewards: [{ type: 'item' as const, targetId: slot.id, quantity: 1, dropChance: 100 }],

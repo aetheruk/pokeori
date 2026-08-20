@@ -293,6 +293,7 @@ export interface GameSettings {
   // Prize Wheel specific
   slots?: import('./prize-wheel/types').PrizeWheelSlot[]
   spinTime?: { min: number; max: number }
+  showSlotLabels?: boolean
   // Pachinko specific
   board?: import('./pachinko/types').PachinkoBoard
   ballRadius?: number

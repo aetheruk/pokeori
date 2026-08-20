@@ -24,6 +24,7 @@ export const vermillionCitychanseyEntries: PrizeWheelGameConfig[] = [
       spinTime: { min: 5, max: 10 },
       background: '/scratchcard/chansey.avif',
       themeColour: '#FAC0CC',
+      showSlotLabels: false,
       cost: { amount: 5, currencyType: 'league-ticket' },
       slots: [
         {
