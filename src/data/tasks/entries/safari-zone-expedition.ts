@@ -414,7 +414,7 @@ const materialTasks = materialFinds.map(([itemId, name, description]) =>
     `A Find: ${name}`,
     description,
     itemId,
-    { type: 'item', targetId: itemId, quantity: 5, dropChance: 75 },
+    { type: 'item', targetId: itemId, quantity: 3, dropChance: 75 },
   ),
 )
 
@@ -438,7 +438,7 @@ const extraMaterialTasks = extraMaterialFinds.map(([itemId, name, description]) 
     {
       type: 'item',
       targetId: itemId,
-      quantity: 5,
+      quantity: 3,
       dropChance: 100,
     },
   ),
@@ -447,7 +447,6 @@ const extraMaterialTasks = extraMaterialFinds.map(([itemId, name, description]) 
 const ballTasks = [
   itemTask('safari-item-poke-ball-cache', 'A Few Poké Balls', 'A weatherproof pouch contains a few usable Poké Balls beneath the central path.', 'poke-ball', { type: 'item', targetId: 'poke-ball', quantity: { min: 1, max: 3 }, dropChance: 75 }),
   itemTask('safari-item-great-ball-cache', 'A Great Ball Cache', 'A Ranger’s old cache holds several Great Balls in a dry compartment.', 'great-ball', { type: 'item', targetId: 'great-ball', quantity: { min: 1, max: 3 }, dropChance: 60 }),
-  itemTask('safari-item-ultra-ball-cache', 'An Ultra Ball Cache', 'A locked field case has one of the reserve team’s better Ball supplies inside.', 'ultra-ball', { type: 'item', targetId: 'ultra-ball', quantity: { min: 1, max: 3 }, dropChance: 45 }),
 ]
 
 const gemIds = [
@@ -535,6 +534,16 @@ const extraRareItemTasks = [
     requirements: [rareRumoursRequirement, { type: 'task_completed', targetId: 'safari-rare-metal-seam-reported', inverse: true }],
     rewards: [{ type: 'item', targetId: 'metal-scrap-t1', quantity: 50, dropChance: 100 }],
     completeButtonText: 'Collect the Metal Seam',
+  }),
+  safariTask({
+    id: 'safari-rare-ultra-ball-find',
+    name: 'A Rumoured Ultra Ball',
+    description: 'A researcher’s notes mention a single Ultra Ball tucked away in a forgotten reserve case. I should check the marked spot.',
+    icon: { type: 'item', id: 'ultra-ball' },
+    repeatable: true,
+    requirements: [rareRumoursRequirement],
+    rewards: [{ type: 'item', targetId: 'ultra-ball', quantity: 1, dropChance: 100 }],
+    completeButtonText: 'Search the Marked Spot',
   }),
 ]
 

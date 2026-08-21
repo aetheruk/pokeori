@@ -89,6 +89,15 @@ export const safariZoneShops: ShopConfig[] = [
         rewards: [{ type: 'task_complete', targetId: 'safari-rare-item-rumours', quantity: 1, dropChance: 100 }],
       },
       {
+        id: 'safari-credit-notes-on-poachers',
+        name: 'Notes on Poachers',
+        description: 'A one-time institute record that opens a focused five-stop sweep against reserve poachers.',
+        icon: { type: 'trainer', id: 'rocket-grunt-m' },
+        cost: safariNotesCost(100),
+        stock: 1,
+        rewards: [{ type: 'task_complete', targetId: 'safari-notes-on-poachers', quantity: 1, dropChance: 100 }],
+      },
+      {
         id: 'safari-credit-wardens-permit',
         name: "Warden's Permit",
         description: 'A permanent authorization to use the reserve’s standard catching and fishing records outside expeditions.',

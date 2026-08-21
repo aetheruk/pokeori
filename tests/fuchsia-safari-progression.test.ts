@@ -454,7 +454,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(expedition).toBeDefined()
     expect(
       expeditions.filter((entry) => entry.id.startsWith('safari-')),
-    ).toHaveLength(3)
+    ).toHaveLength(4)
     expect(expedition?.maxLosses).toBe(10)
     expect(expedition?.safariBallAllowance).toBe(30)
     expect(expedition?.requirements).toContainEqual({
@@ -594,6 +594,35 @@ describe('Fuchsia Gym and Safari progression', () => {
       { type: 'xp', skill: 'catching', quantity: 500, dropChance: 100 },
     ])
 
+    const poacherWatch = expeditions.find(
+      (entry) => entry.id === 'safari-zone-poacher-watch-expedition',
+    )
+    expect(poacherWatch).toMatchObject({
+      maxLosses: 1,
+      criteria: [],
+      requirements: [
+        { type: 'item_owned', targetId: 'safari-catching-permit' },
+        { type: 'task_completed', targetId: 'safari-notes-on-poachers' },
+      ],
+      rewards: [
+        { type: 'currency', targetId: 'pokedollars', quantity: 1500, dropChance: 100 },
+        { type: 'item', targetId: 'rare-candy-l', quantity: 3, dropChance: 100 },
+      ],
+    })
+    const poacherSteps = buildExpeditionSteps(poacherWatch!, {
+      inventory: [{ itemId: 'safari-catching-permit', quantity: 1 }],
+      completedTasks: [{ taskId: 'safari-notes-on-poachers', count: 1 }],
+    } as unknown as RequirementData)
+    expect(poacherSteps).toHaveLength(5)
+    expect(poacherSteps.every((step) => step.activityType === 'battle')).toBe(true)
+    expect(poacherSteps.map((step) => step.activityId)).toEqual([
+      'safari-poacher-watch-one',
+      'safari-poacher-watch-two',
+      'safari-poacher-watch-three',
+      'safari-poacher-watch-four',
+      'safari-poacher-watch-five',
+    ])
+
     const fishingExpedition = expeditions.find(
       (entry) => entry.id === 'safari-zone-fishing-expedition',
     )
@@ -728,6 +757,33 @@ describe('Fuchsia Gym and Safari progression', () => {
         ),
     ).toBe(true)
     expect(
+      safariItemTaskPoolIds.materials
+        .map((id) => safariExpeditionContentTasks.find((task) => task.id === id))
+        .flatMap((task) => task?.rewards ?? [])
+        .every((reward) => reward.type === 'item' && reward.quantity === 3),
+    ).toBe(true)
+    expect(safariItemTaskPoolIds.balls).toHaveLength(2)
+    expect(
+      safariItemTaskPoolIds.balls.some((id) => id.includes('ultra-ball')),
+    ).toBe(false)
+    expect(
+      safariExpeditionContentTasks
+        .filter((task) => task.rewards.some((reward) => reward.targetId === 'ultra-ball'))
+        .map((task) => task.id),
+    ).toEqual(['safari-rare-ultra-ball-find'])
+    const repeatableUltraBallFind = safariExpeditionContentTasks.find(
+      (task) => task.id === 'safari-rare-ultra-ball-find',
+    )
+    expect(repeatableUltraBallFind).toMatchObject({
+      repeatable: true,
+      requirements: [
+        { type: 'task_completed', targetId: 'safari-rare-item-rumours' },
+      ],
+      rewards: [
+        { type: 'item', targetId: 'ultra-ball', quantity: 1, dropChance: 100 },
+      ],
+    })
+    expect(
       safariExpeditionContentTasks.find(
         (task) => task.id === 'safari-rare-nugget-find',
       )?.repeatable,
@@ -844,6 +900,7 @@ describe('Fuchsia Gym and Safari progression', () => {
       ['Safari Ball Cache Info', [{ type: 'currency', id: 'safari-notes', amount: 55 }], 1],
       ['Unusual Pokémon Sightings', [{ type: 'currency', id: 'safari-notes', amount: 65 }], 1],
       ['Rare Item Rumours', [{ type: 'currency', id: 'safari-notes', amount: 90 }], 1],
+      ['Notes on Poachers', [{ type: 'currency', id: 'safari-notes', amount: 100 }], 1],
       ["Warden's Permit", [{ type: 'currency', id: 'safari-notes', amount: 2000 }], 1],
       ['Stamina Notes', [{ type: 'currency', id: 'safari-notes', amount: 20 }], 5],
       ['Commemorative Safari Ball', [{ type: 'currency', id: 'safari-notes', amount: 1000 }], 1],
@@ -1119,6 +1176,7 @@ describe('Fuchsia Gym and Safari progression', () => {
       'fuchsia-gym-trial-expedition',
       'safari-zone-grand-expedition',
       'safari-zone-catching-expedition',
+      'safari-zone-poacher-watch-expedition',
       'safari-zone-fishing-expedition',
     ]
 
@@ -1154,6 +1212,36 @@ describe('Fuchsia Gym and Safari progression', () => {
         )
       }
     }
+  })
+
+  test('Poacher Watch uses level-31 teams and Safari species', () => {
+    const existingPoacherBattles = battles.filter((battle) =>
+      battle.id.endsWith('rocket-poacher'),
+    )
+    expect(existingPoacherBattles).toHaveLength(4)
+    expect(
+      existingPoacherBattles.every((battle) =>
+        battle.enemyTeam.some((enemy) => enemy.level === 31),
+      ),
+    ).toBe(true)
+
+    const poacherBattles = battles.filter((battle) =>
+      battle.id.startsWith('safari-poacher-watch-'),
+    )
+    expect(poacherBattles).toHaveLength(5)
+    expect(
+      poacherBattles.every((battle) =>
+        battle.enemyTeam.some((enemy) => enemy.level === 31),
+      ),
+    ).toBe(true)
+    const safariSpecies = new Set([
+      29, 32, 46, 48, 49, 84, 102, 104, 105, 111, 113, 114, 115, 123, 127, 128,
+    ])
+    expect(
+      poacherBattles.every((battle) =>
+        battle.enemyTeam.some((enemy) => safariSpecies.has(enemy.speciesId)),
+      ),
+    ).toBe(true)
   })
 
   test('Koga identifies an Unknown Compound and requests a partner Chansey', () => {
