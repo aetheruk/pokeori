@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
+import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -433,8 +434,8 @@ export function PrizeWheelGame({
 
         {cost && costCurrency && !canClaim ? (
           <div className="flex items-center gap-2 rounded-full border border-game-border bg-game-surface-raised px-4 py-2 text-sm font-semibold text-game-ink shadow-sm">
-            <ItemSprite
-              itemId={costCurrency.iconId}
+            <CurrencySprite
+              currencyId={costCurrency.id}
               alt={costCurrency.name}
               className="h-5 w-5"
             />

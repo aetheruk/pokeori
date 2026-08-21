@@ -13,6 +13,7 @@ import Image from 'next/image'
 import React from 'react'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { Badge } from '@/components/ui/badge'
+import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { getCurrency } from '@/data/currencies'
 import { items } from '@/data/items'
@@ -135,6 +136,23 @@ export function mapRewardToDisplayItem(
       subLabel = 'Added to this expedition'
       break
     }
+    case 'expedition_lives': {
+      label = 'Expedition lives restored'
+      if (quantityStr) label += ` ${quantityStr}`
+      icon = (
+        <div className="relative w-8 h-8">
+          <ItemSprite
+            itemId="revive"
+            alt="Expedition lives"
+            className="object-contain pixelated"
+            width={32}
+            height={32}
+          />
+        </div>
+      )
+      subLabel = 'Restores lost lives during this expedition'
+      break
+    }
     case 'pokemon': {
       // Look up pokemon data
       const targetId = reward.targetId || '1'
@@ -240,8 +258,8 @@ export function mapRewardToDisplayItem(
       if (currency?.iconId) {
         icon = (
           <div className="relative w-8 h-8">
-            <ItemSprite
-              itemId={currency.iconId}
+            <CurrencySprite
+              currencyId={lookupId as string}
               alt={currency.name}
               className="object-contain pixelated"
               width={32}

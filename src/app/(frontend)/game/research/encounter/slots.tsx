@@ -19,6 +19,7 @@ import { toast } from 'sonner'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
+import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -356,8 +357,8 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
           <div className="flex -translate-y-2 items-center gap-3 rounded-full border border-game-border bg-game-surface-raised px-4 py-1.5 shadow-lg backdrop-blur-sm">
             <div className="flex items-center gap-1.5 font-mono text-sm font-bold text-game-ink">
               {currencyConfig ? (
-                <ItemSprite
-                  itemId={currencyConfig.iconId}
+                <CurrencySprite
+                  currencyId={currencyConfig.id}
                   alt={currencyConfig.name}
                   className="w-5 h-5 object-contain pixelated"
                   width={20}

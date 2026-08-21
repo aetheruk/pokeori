@@ -24,7 +24,7 @@ describe('Safari catch actions', () => {
       { speciesId: 128, formId: '128', chance: 100 },
     ])
     expect(SAFARI_ENCOUNTER_TTL_SECONDS).toBe(30 * 60)
-    expect(SAFARI_BASE_FLEE_RATE).toBe(20)
+    expect(SAFARI_BASE_FLEE_RATE).toBe(14)
   })
 
   test('Berry uses one normal correct-answer increase and lowers flee by 1-3%', () => {
@@ -34,13 +34,13 @@ describe('Safari catch actions', () => {
       currentStage: 0,
       baseCaptureRate: 45,
       currentCatchRate: 45,
-      baseFleeRate: 20,
+      baseFleeRate: 14,
       random: () => rolls.shift() || 0,
     })
 
     expect(result.stage).toBe(1)
     expect(result.catchRate).toBe(45 + getCatchStageValue(45))
-    expect(result.fleeChance).toBe(19)
+    expect(result.fleeChance).toBe(13)
     expect(result.fled).toBe(false)
   })
 
@@ -50,13 +50,13 @@ describe('Safari catch actions', () => {
       currentStage: 0,
       baseCaptureRate: 45,
       currentCatchRate: 45,
-      baseFleeRate: 20,
+      baseFleeRate: 14,
       random: () => 0.99,
     })
 
     expect(result.stage).toBe(5)
     expect(result.catchRate).toBe(45 + getCatchStageValue(45) * 5)
-    expect(result.fleeChance).toBe(30)
+    expect(result.fleeChance).toBe(24)
     expect(result.fled).toBe(false)
   })
 
@@ -90,7 +90,7 @@ describe('Safari catch actions', () => {
       currentStage: 0,
       baseCaptureRate: 100,
       currentCatchRate: 100,
-      baseFleeRate: 20,
+      baseFleeRate: 14,
       random: () => 0.99,
     })
     const second = resolveSafariAction({
@@ -106,6 +106,6 @@ describe('Safari catch actions', () => {
     expect(second.catchRate).toBe(
       first.catchRate + getCatchStageValue(100),
     )
-    expect(second.fleeChance).toBe(27)
+    expect(second.fleeChance).toBe(21)
   })
 })

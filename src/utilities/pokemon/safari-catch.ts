@@ -4,7 +4,7 @@ export type SafariEncounterAction = 'feed' | 'tamato'
 
 export const SAFARI_BALL_ID = 'safari-ball'
 export const SAFARI_BALL_ALLOWANCE = 30
-export const SAFARI_BASE_FLEE_RATE = 20
+export const SAFARI_BASE_FLEE_RATE = 14
 // Safari encounters have no gameplay timer. This is only an inactivity lease
 // for the Redis encounter state so an abandoned run cannot remain forever.
 export const SAFARI_ENCOUNTER_TTL_SECONDS = 30 * 60

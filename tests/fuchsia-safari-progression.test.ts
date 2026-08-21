@@ -518,20 +518,16 @@ describe('Fuchsia Gym and Safari progression', () => {
     const finale = locations.find(
       (entry) => entry.id === 'safari-grand-finale-catch',
     )
-    expect(finale?.encounters).toHaveLength(19)
+    expect(finale?.name).toBe('Safari Reserve')
+    expect(finale?.description).not.toMatch(/Strength|prized|finale/i)
+    expect(finale?.encounters).toHaveLength(5)
     expect(
       finale?.encounters
-        .filter((encounter) =>
-          encounter.requirements?.some(
-            (requirement) =>
-              requirement.type === 'item_owned' &&
-              requirement.targetId === 'tm-strength' &&
-              requirement.inverse !== true,
-          ),
-        )
         .map((encounter) => encounter.speciesId)
         .sort((a, b) => a - b),
     ).toEqual([113, 115, 123, 127, 128])
+    expect(finale?.encounters.every((encounter) => !encounter.requirements)).toBe(true)
+    expect(finale?.encounters.reduce((total, encounter) => total + encounter.chance, 0)).toBe(100)
     expect(expedition?.rewards).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -736,6 +732,15 @@ describe('Fuchsia Gym and Safari progression', () => {
         (task) => task.id === 'safari-rare-nugget-find',
       )?.repeatable,
     ).toBe(false)
+    const restTasks = safariExpeditionContentTasks.filter((task) =>
+      safariExtraTaskPoolIds.rests.includes(task.id),
+    )
+    expect(restTasks).toHaveLength(3)
+    expect(restTasks.map((task) => task.rewards[0])).toEqual([
+      { type: 'expedition_lives', quantity: 1, dropChance: 100 },
+      { type: 'expedition_lives', quantity: 2, dropChance: 100 },
+      { type: 'expedition_lives', quantity: 3, dropChance: 100 },
+    ])
     expect(
       safariExpeditionContentTasks.find(
         (task) => task.id === 'safari-rare-metal-seam',
@@ -771,6 +776,12 @@ describe('Fuchsia Gym and Safari progression', () => {
       name: 'Safari Notes',
       iconId: 'researchers-journal-page',
     })
+    expect(currencies).toContainEqual({
+      id: 'shadow-crystals',
+      name: 'Shadow Crystals',
+      iconId: 'revive',
+      iconHueRotate: 250,
+    })
     expect(getIcon('safari-ball')).toBeDefined()
     expect(getTitle('the-warden')?.name).toBe('The Warden')
 
@@ -805,7 +816,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(rewilding?.criteria).toContainEqual(
       expect.objectContaining({
         type: 'pokemon_owned',
-        count: 1,
+        count: 10,
         consume: true,
         pokemonCriteria: { ballType: 'safari-ball' },
       }),
@@ -813,7 +824,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(rewilding?.rewards).toContainEqual({
       type: 'currency',
       targetId: 'safari-notes',
-      quantity: 2,
+      quantity: 15,
       dropChance: 100,
     })
 
@@ -833,7 +844,8 @@ describe('Fuchsia Gym and Safari progression', () => {
       ['Safari Ball Cache Info', [{ type: 'currency', id: 'safari-notes', amount: 55 }], 1],
       ['Unusual Pokémon Sightings', [{ type: 'currency', id: 'safari-notes', amount: 65 }], 1],
       ['Rare Item Rumours', [{ type: 'currency', id: 'safari-notes', amount: 90 }], 1],
-      ["Warden's Permit", [{ type: 'currency', id: 'safari-notes', amount: 5000 }], 1],
+      ["Warden's Permit", [{ type: 'currency', id: 'safari-notes', amount: 500 }], 1],
+      ['Stamina Notes', [{ type: 'currency', id: 'safari-notes', amount: 20 }], 5],
       ['Commemorative Safari Ball', [{ type: 'currency', id: 'safari-notes', amount: 100 }], 1],
       ['Honorary Title', [{ type: 'currency', id: 'safari-notes', amount: 250 }], 1],
     ])

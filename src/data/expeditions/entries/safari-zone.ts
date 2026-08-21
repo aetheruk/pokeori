@@ -58,7 +58,7 @@ const scalePoolWeights = (
   weight: ((entry.weight ?? 0) * targetWeight) / 100,
 }))
 
-const safariRewardTaskPool: ExpeditionTaskPoolEntry[] = [
+const safariBaseRewardTaskPool: ExpeditionTaskPoolEntry[] = [
   ...scalePoolWeights(researchTaskPool, 40),
   ...weightedIds(safariExtraTaskPoolIds.research, 5),
   ...scalePoolWeights(itemTaskPool, 40),
@@ -69,9 +69,28 @@ const safariRewardTaskPool: ExpeditionTaskPoolEntry[] = [
   ...weightedIds(safariExtraTaskPoolIds.flavor, 4),
 ]
 
-const allTaskIds = [
-  ...safariRewardTaskPool.map((entry) => entry.id),
+const normalizePoolWeights = (
+  entries: ExpeditionTaskPoolEntry[],
+  targetWeight: number,
+) => {
+  const totalWeight = entries.reduce((sum, entry) => sum + (entry.weight ?? 0), 0)
+  return entries.map((entry) => ({
+    ...entry,
+    weight: totalWeight > 0 ? ((entry.weight ?? 0) * targetWeight) / totalWeight : 0,
+  }))
+}
+
+const safariRewardTaskPoolWithRests: ExpeditionTaskPoolEntry[] = [
+  ...normalizePoolWeights(safariBaseRewardTaskPool, 94),
+  ...weightedIds(safariExtraTaskPoolIds.rests, 6),
 ]
+
+const safariRewardTaskPool = safariRewardTaskPoolWithRests
+
+const allTaskIds = [
+  ...safariRewardTaskPoolWithRests.map((entry) => entry.id),
+]
+
 
 const secretActivity = (
   id: string,

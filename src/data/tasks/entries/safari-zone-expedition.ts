@@ -232,7 +232,7 @@ const flavorDefinitions = [
   ['east', 'A Reed-Caught Ribbon', 'A faded ribbon is caught in the eastern reeds. I pull it free without disturbing the bank.', 'Free the Ribbon', { type: 'item', id: 'pretty-feather' }],
   ['east', 'Rain in the Pond', 'The pond is perfectly still except for one set of ripples. I wait until they fade before moving on.', 'Watch the Ripples', { type: 'item', id: 'pearl' }],
   ['east', 'A Boardwalk Creak', 'One board gives a loud creak under my foot. I mark it with a strip of survey tape.', 'Mark the Board', { type: 'item', id: 'wood-scraps-t1' }],
-  ['east', 'The Empty Bait Tin', 'I find an empty bait tin near the water and carry it back to the nearest collection point.', 'Collect the Tin', { type: 'item', id: 'metal-scrap-t1' }],
+  ['east', 'An Empty Berry Basket', 'I find an empty berry basket near the water and carry it back to the nearest collection point.', 'Collect the Basket', { type: 'item', id: 'metal-scrap-t1' }],
   ['west', 'A Leaf-Covered Bench', 'The western bench is almost swallowed by leaves. I clear enough space to sit and check my map.', 'Clear the Bench', { type: 'item', id: 'grass-gem' }],
   ['west', 'A Broken Umbrella', 'Someone left a broken umbrella against the rest house. I fold it away from the path.', 'Move the Umbrella', { type: 'trainer', id: 'ranger' }],
   ['west', 'A Scent on the Bark', 'There is a sharp scent on the bark beside the trail. I note it and leave the tree untouched.', 'Note the Scent', { type: 'pokemon', id: '48' }],
@@ -307,6 +307,33 @@ const extraFlavorTasks = extraFlavorDefinitions.map(([area, name, description, c
     completeButtonText,
   }),
 )
+
+const restTasks = [
+  safariTask({
+    id: 'safari-rest-ranger-bedroll',
+    name: "A Ranger's Bedroll",
+    description: 'A ranger has left a bedroll beneath the trees. I take a short rest, check my notes, and feel ready to continue.',
+    icon: { type: 'trainer', id: 'ranger' },
+    completeButtonText: 'Take a Short Rest',
+    rewards: [{ type: 'expedition_lives', quantity: 1, dropChance: 100 }],
+  }),
+  safariTask({
+    id: 'safari-rest-habitat-shelter',
+    name: 'The Habitat Shelter',
+    description: 'The reserve shelter is quiet and cool. I refill my water and give my legs a proper break before heading back out.',
+    icon: { type: 'trainer', id: 'ranger' },
+    completeButtonText: 'Rest at the Shelter',
+    rewards: [{ type: 'expedition_lives', quantity: 2, dropChance: 100 }],
+  }),
+  safariTask({
+    id: 'safari-rest-shaded-clearing',
+    name: 'A Shaded Clearing',
+    description: 'A shaded clearing opens beside the trail. I settle in long enough to recover before the next stretch of reserve.',
+    icon: { type: 'trainer', id: 'ranger' },
+    completeButtonText: 'Make Camp',
+    rewards: [{ type: 'expedition_lives', quantity: 3, dropChance: 100 }],
+  }),
+]
 
 const unusualSightings = [
   ['113', 'A Familiar Shape', 'A Chansey appears at the edge of the reeds, carrying an egg far larger than any I have seen in the reserve.'],
@@ -526,6 +553,7 @@ export const safariExtraTaskPoolIds = {
   materials: extraMaterialTasks.map((task) => task.id),
   safariBalls: extraSafariBallTasks.map((task) => task.id),
   rare: extraRareItemTasks.map((task) => task.id),
+  rests: restTasks.map((task) => task.id),
 }
 
 export const safariExpeditionContentTasks: Task[] = [
@@ -542,4 +570,5 @@ export const safariExpeditionContentTasks: Task[] = [
   ...extraMaterialTasks,
   ...extraSafariBallTasks,
   ...extraRareItemTasks,
+  ...restTasks,
 ]

@@ -3,6 +3,7 @@
 import { Suspense, useMemo } from 'react'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { GameInfoModal } from '@/components/game/shared/GameInfoModal'
+import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { ExpeditionModal } from './ExpeditionModal'
 import { parseText } from '@/utilities/text-parsing'
@@ -202,8 +203,8 @@ export function ExploreDetailsModal({
 
       criteriaItems.push({
         icon: currency?.iconId ? (
-          <ItemSprite
-            itemId={currency.iconId}
+          <CurrencySprite
+            currencyId={currency.id}
             alt={currency.name}
             className="h-8 w-8"
           />

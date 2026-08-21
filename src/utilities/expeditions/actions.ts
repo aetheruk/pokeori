@@ -364,6 +364,46 @@ export async function grantExpeditionSafariBallsForTask(
   return quantity
 }
 
+export async function grantExpeditionLivesForTask(
+  payload: any,
+  userId: string,
+  taskId: string,
+  reward: Reward & { type: 'expedition_lives' },
+  req?: PayloadRequest,
+  revalidatePaths = true,
+): Promise<number> {
+  const run = await getActiveRunForUser(payload, userId)
+  if (!run || (run.status !== 'active' && run.status !== 'ready_to_claim')) {
+    return 0
+  }
+
+  const completedStep = run.steps[run.currentStepIndex - 1]
+  const currentStep = run.steps[run.currentStepIndex]
+  const belongsToTask =
+    (completedStep?.activityType === 'task' && completedStep.activityId === taskId) ||
+    (currentStep?.activityType === 'task' && currentStep.activityId === taskId)
+  if (!belongsToTask) return 0
+
+  const dropChance = reward.dropChance ?? 100
+  if (dropChance < 100 && Math.random() * 100 > dropChance) return 0
+
+  const quantity = resolveRewardQuantity(reward.quantity)
+  const restored = Math.min(quantity, Math.max(0, run.losses || 0))
+  if (restored <= 0) return 0
+
+  await payload.update({
+    collection: 'expedition-runs',
+    id: run.id,
+    data: { losses: Math.max(0, (run.losses || 0) - restored) },
+    req,
+  })
+  if (revalidatePaths) {
+    revalidatePath('/game')
+    revalidatePath('/game/explore')
+  }
+  return restored
+}
+
 export async function setSafariBallsRemaining(
   userId: string,
   remaining: number,
@@ -497,6 +537,14 @@ export async function startExpedition(
     }
 
     const now = new Date().toISOString()
+    const staminaNotes = expedition.id === 'safari-zone-grand-expedition'
+      ? Math.min(
+          5,
+          userData.completedTasks.find(
+            (task) => task.taskId === 'safari-stamina-notes',
+          )?.count || 0,
+        )
+      : 0
 
     const created = (await (payload as any).create({
       collection: 'expedition-runs',
@@ -506,7 +554,7 @@ export async function startExpedition(
         expeditionName: expedition.name,
         status: 'active',
         mapItemId: expedition.mapItemId,
-        maxLosses: expedition.maxLosses,
+        maxLosses: expedition.maxLosses + staminaNotes,
         losses: 0,
         safariBallsRemaining: expedition.safariBallAllowance,
         currentStepIndex: 0,
