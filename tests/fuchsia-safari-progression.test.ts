@@ -826,6 +826,16 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(source).not.toContain("handleSafariAction('shout')")
   })
 
+  test('repeatable Safari expedition tasks use the reward completion path on replay', async () => {
+    const source = await Bun.file(
+      'src/components/game/features/explore/hooks/useExploreActions.ts',
+    ).text()
+
+    expect(source).toContain(
+      'isExpeditionTaskFlow && isDone && !task.repeatable',
+    )
+  })
+
   test('Safari Notes progression and Research Credit Store are authored', () => {
     expect(currencies).toContainEqual({
       id: 'safari-notes',

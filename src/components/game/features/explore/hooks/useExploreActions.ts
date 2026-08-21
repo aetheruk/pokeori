@@ -459,7 +459,11 @@ export function useExploreActions(
       )
       const isDone = !!existingCompletion
       const isDoneForModalFlow = isDone && !isExpeditionTaskFlow
-      const isCompletedExpeditionReplay = isExpeditionTaskFlow && isDone
+      // Repeatable expedition tasks must use the normal completion path so
+      // their rewards are granted on every run. Only already-completed,
+      // non-repeatable tasks need the progress-only replay path.
+      const isCompletedExpeditionReplay =
+        isExpeditionTaskFlow && isDone && !task.repeatable
 
       if (task.rivalSelection && !isDoneForModalFlow) {
         if (isExpeditionTaskFlow) {
