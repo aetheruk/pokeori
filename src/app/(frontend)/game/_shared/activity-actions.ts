@@ -2572,7 +2572,7 @@ export async function completeGameActivity(
           if (egg) {
             summary.eggs = [
               ...(summary.eggs || []),
-              { id: egg.id, hatchAt: egg.hatchAt, rarity: 'normal' },
+              { id: egg.id, hatchAt: egg.hatchAt, rarity: egg.rarity },
             ]
           }
           rewardSummary = summary
