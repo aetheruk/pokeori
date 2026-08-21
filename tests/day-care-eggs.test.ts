@@ -4,6 +4,8 @@ import {
   DAY_CARE_EGG_POOLS,
   DAY_CARE_EGG_RARITIES,
   DAY_CARE_EGG_SHINY_MULTIPLIER,
+  FIELD_OBSERVATION_EGG_DENOMINATOR,
+  FIELD_OBSERVATION_EGG_SHINY_DENOMINATOR,
   getEggPoolCandidates,
   rollEggHatch,
 } from '@/utilities/day-care/eggs'
@@ -24,6 +26,8 @@ describe('Day Care eggs', () => {
   test('uses the configured pool weights and resolves at hatch time', () => {
     expect(DAY_CARE_EGG_POOLS.map((pool) => pool.weight)).toEqual([74, 25, 1])
     expect(DAY_CARE_EGG_SHINY_MULTIPLIER).toBe(2)
+    expect(FIELD_OBSERVATION_EGG_DENOMINATOR).toBe(16)
+    expect(FIELD_OBSERVATION_EGG_SHINY_DENOMINATOR).toBe(256)
     expect(DAY_CARE_EGG_MAX_OWNED).toBe(10)
     const result = rollEggHatch(pokedex, 1, () => 0, DAY_CARE_EGG_POOLS)
     expect(result).toMatchObject({ poolId: 'caught', formId: '1', speciesId: 1 })

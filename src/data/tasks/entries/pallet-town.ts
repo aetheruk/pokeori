@@ -3248,4 +3248,83 @@ export const palletTownTasks: Task[] = [
     },
     id: 'champions-path-1',
   },
+  {
+    id: 'pallet-town-taurus-parking',
+    name: "You Can't Park There",
+    description:
+      "Why won't my Tauros stay in their balls? They're gonna trash the place!",
+    category: 'Kanto',
+    subCategory: 'Pallet Town',
+    background: '/backgrounds/lab.avif',
+    icon: {
+      type: 'pokemon',
+      id: '128',
+    },
+    repeatable: false,
+    secret: true,
+    completionTrigger: 'manual',
+    completeButtonText: 'Hand Over the Tauros',
+    requirements: [
+      {
+        type: 'pokemon_owned',
+        targetId: '128',
+        count: 30,
+      },
+    ],
+    criteria: [
+      {
+        type: 'pokemon_owned',
+        targetId: '128',
+        count: 30,
+        consume: true,
+        label: 'Hand over 30 Tauros',
+      },
+    ],
+    rewards: [
+      {
+        type: 'pokemon_research_xp',
+        targetId: '128',
+        quantity: 500,
+        dropChance: 100,
+        secret: true,
+      },
+    ],
+    enterModal: [
+      {
+        id: 1,
+        background: '/backgrounds/lab.avif',
+        title: 'Professor Oak',
+        icon: {
+          type: 'trainer',
+          id: 'oak',
+        },
+        message:
+          'What on earth are you doing? Why are there so many Tauros following you?',
+        buttons: [{ text: 'I caught them.', type: 'navigate', id: 2 }],
+      },
+      {
+        id: 2,
+        background: '/backgrounds/lab.avif',
+        title: 'Professor Oak',
+        icon: {
+          type: 'trainer',
+          id: 'oak',
+        },
+        message:
+          "Well, you can't leave them all roaming about like that. They're going to trash the place. What do you mean they won't stay in their balls?!",
+        buttons: [{ text: 'Sorry.', type: 'success' }],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/lab.avif',
+      title: 'Tauros Wrangled',
+      icon: {
+        type: 'trainer',
+        id: 'oak',
+      },
+      message:
+        'The Professor helps me wrangle up my Tauros into the field behind the lab. I guess they are his problem now?',
+      closeButtonText: 'Leave Them to Oak',
+    },
+  },
 ]

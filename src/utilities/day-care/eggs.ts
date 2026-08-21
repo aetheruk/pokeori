@@ -16,7 +16,8 @@ export const DAY_CARE_EGG_HATCH_DELAY_MS = 12 * 60 * 60 * 1000
 export const DAY_CARE_EGG_HATCH_COST_CRYSTALS = 50
 export const DAY_CARE_EGG_HATCH_LEVEL = 5
 export const DAY_CARE_EGG_RESEARCH_XP = 15
-export const FIELD_OBSERVATION_EGG_DENOMINATOR = 26
+export const FIELD_OBSERVATION_EGG_DENOMINATOR = 16
+export const FIELD_OBSERVATION_EGG_SHINY_DENOMINATOR = 256
 export const DAY_CARE_EGG_MAX_OWNED = 10
 export const DAY_CARE_EGG_SHINY_MULTIPLIER = 2
 /** Derived from the central rarity registry so new rarities gain an egg variant automatically. */
@@ -170,6 +171,10 @@ export async function maybeCreateFieldObservationEgg(payload: Payload, user: any
     sourceBackground: research?.background,
     sourceRegion: research?.category,
     sourceLocation: research?.subCategory || research?.name,
+    rarity:
+      Math.floor(Math.random() * FIELD_OBSERVATION_EGG_SHINY_DENOMINATOR) === 0
+        ? 'shiny'
+        : 'normal',
   })
 }
 
