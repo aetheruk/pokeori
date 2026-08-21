@@ -592,6 +592,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(catchingSteps[8]?.activityId).toBe('safari-grand-finale-catch')
     expect(catchingExpedition?.rewards).toEqual([
       { type: 'xp', skill: 'catching', quantity: 500, dropChance: 100 },
+      { type: 'currency', targetId: 'safari-notes', quantity: 3, dropChance: 100 },
     ])
 
     const poacherWatch = expeditions.find(
@@ -607,6 +608,7 @@ describe('Fuchsia Gym and Safari progression', () => {
       rewards: [
         { type: 'currency', targetId: 'pokedollars', quantity: 1500, dropChance: 100 },
         { type: 'item', targetId: 'rare-candy-l', quantity: 3, dropChance: 100 },
+        { type: 'currency', targetId: 'safari-notes', quantity: 1, dropChance: 100 },
       ],
     })
     const poacherSteps = buildExpeditionSteps(poacherWatch!, {
@@ -660,6 +662,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     )
     expect(fishingExpedition?.rewards).toEqual([
       { type: 'xp', skill: 'catching', quantity: 500, dropChance: 100 },
+      { type: 'currency', targetId: 'safari-notes', quantity: 3, dropChance: 100 },
     ])
     const fishingLocation = locations.find(
       (entry) => entry.id === 'safari-fishing-expedition-catch',
