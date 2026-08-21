@@ -23,6 +23,7 @@ import { toast } from 'sonner'
 import { purchaseShopItem, PurchaseItemResult } from '@/utilities/shops/actions'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
+import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { cn } from '@/lib/utils'
 import { useGameUserData } from '@/hooks/useGameUserData'
 import { getCurrency } from '@/data/currencies'
@@ -189,7 +190,7 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
                 key={id}
                 className="flex items-center gap-1.5 rounded-full border border-game-border bg-game-surface-raised px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-game-muted"
               >
-                <TaskIconDisplay icon={{ type: 'item', id: currency!.iconId }} className="h-4 w-4" />
+                <CurrencySprite currencyId={currency!.id} width={16} height={16} />
                 <span className="text-game-ink">{amount.toLocaleString()}</span>
                 <span className="text-game-muted">{currency!.name}</span>
               </div>

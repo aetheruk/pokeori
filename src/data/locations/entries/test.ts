@@ -15,7 +15,7 @@ export const testLocations: Location[] = [
     background: '/backgrounds/safari-reserve.avif',
     encounterMode: 'safari',
     timer: 90,
-    fleeRate: 10,
+    fleeRate: 14,
     keyEncounter: true,
     levelRange: {
       min: 25,

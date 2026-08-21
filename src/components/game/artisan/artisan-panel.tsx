@@ -36,6 +36,7 @@ import {
 import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
 import { AppButton, Button } from '@/components/ui/app-button'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
@@ -463,8 +464,8 @@ function RecipeCostChip({
       )}
     >
       {cost.type === 'currency' ? (
-        <ItemSprite
-          itemId={getCurrency(cost.id)?.iconId || cost.id}
+        <CurrencySprite
+          currencyId={cost.id}
           alt={getCurrencyName(cost.id)}
           width={20}
           height={20}
@@ -2457,8 +2458,8 @@ export function ArtisanPanel() {
                   >
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
                       {cost.type === 'currency' ? (
-                        <ItemSprite
-                          itemId={getCurrency(cost.id)?.iconId || cost.id}
+                        <CurrencySprite
+                          currencyId={cost.id}
                           alt={getCurrencyName(cost.id)}
                           width={40}
                           height={40}

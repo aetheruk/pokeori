@@ -41,6 +41,7 @@ export interface Reward {
     | 'active_companion_friendship'
     | 'active_companion_research_xp'
     | 'expedition_safari_balls'
+    | 'expedition_lives'
     | 'egg'
   targetId?: string | number // Changed: Now used for currency type (e.g. 'crystals')
   skill?: string

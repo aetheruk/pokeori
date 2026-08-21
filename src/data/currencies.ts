@@ -2,6 +2,7 @@ export interface Currency {
   id: string
   name: string
   iconId: string
+  iconHueRotate?: number
 }
 
 export const currencies: Currency[] = [
@@ -48,7 +49,8 @@ export const currencies: Currency[] = [
   {
     id: 'shadow-crystals',
     name: 'Shadow Crystals',
-    iconId: 'tera-shard-poison',
+    iconId: 'revive',
+    iconHueRotate: 250,
   },
   {
     id: 'safari-notes',

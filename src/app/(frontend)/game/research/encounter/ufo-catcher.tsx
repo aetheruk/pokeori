@@ -14,6 +14,7 @@ import {
 import { toast } from 'sonner'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
+import { CurrencySprite } from '@/components/ui/currency-sprite'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -460,8 +461,8 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
         <div className="flex items-center gap-2">
           <div className="flex min-h-10 items-center gap-2 rounded-full border border-game-border bg-game-surface-raised/95 px-3 font-mono text-xs font-bold text-game-ink shadow-sm backdrop-blur-sm">
             {currency ? (
-              <ItemSprite
-                itemId={currency.iconId}
+              <CurrencySprite
+                currencyId={currency.id}
                 alt={currency.name}
                 width={18}
                 height={18}

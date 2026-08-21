@@ -33,6 +33,7 @@ import type React from 'react'
 import { MdCatchingPokemon } from 'react-icons/md'
 import { RewardItem } from '@/components/game/reward-carousel'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
+import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { battles } from '@/data/battles'
 import { getCurrency } from '@/data/currencies'
@@ -284,8 +285,8 @@ export function mapCriteriaToDisplayItem(
       const currency = getCurrency(currencyId)
       return {
         icon: currency?.iconId ? (
-          <ItemSprite
-            itemId={currency.iconId}
+          <CurrencySprite
+            currencyId={currencyId}
             alt={currency.name}
             className="w-6 h-6 object-contain"
           />

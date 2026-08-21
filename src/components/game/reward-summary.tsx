@@ -11,6 +11,7 @@ import { PokemonRarityEggSprite } from '@/components/game/shared/PokemonRarityEg
 import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { Card } from '@/components/ui/card'
+import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { getCurrency } from '@/data/currencies'
 import { items } from '@/data/items'
 import { getSkill } from '@/data/skills'
@@ -134,8 +135,8 @@ export function RewardSummaryDisplay({
               >
                 <div className="w-8 h-8 rounded-lg bg-game-canvas flex items-center justify-center text-game-ochre flex-shrink-0">
                   {currencyDef ? (
-                    <ItemSprite
-                      itemId={currencyDef.iconId}
+                    <CurrencySprite
+                      currencyId={curr.type}
                       alt={currencyDef.name}
                       width={20}
                       height={20}

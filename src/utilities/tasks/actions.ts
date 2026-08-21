@@ -17,6 +17,7 @@ import type { Pokemon, User } from '@/payload-types'
 import { getGameUserData } from '@/utilities/game-data'
 import { analyzeRequirements } from '@/utilities/requirements/analysis'
 import {
+  grantExpeditionLivesForTask,
   grantExpeditionSafariBallsForTask,
   isCurrentExpeditionTask,
   recordExpeditionActivityResult,
@@ -306,8 +307,12 @@ export async function completeTask(
   const safariBallRewards = task.rewards.filter(
     (reward) => reward.type === 'expedition_safari_balls',
   )
+  const expeditionLivesRewards = task.rewards.filter(
+    (reward) => reward.type === 'expedition_lives',
+  )
   const rewardsToGrant: Reward[] = task.rewards.flatMap((r) => {
     if (r.type === 'expedition_safari_balls') return []
+    if (r.type === 'expedition_lives') return []
     if (r.type === 'active_companion_friendship') return []
 
     const pokemonOrigin = r.type === 'pokemon' ? resolveTaskPokemonOrigin(task, r) : undefined
@@ -410,6 +415,25 @@ export async function completeTask(
       id: user.id,
       data: updateData,
       req,
+    })
+  }
+
+  for (const reward of expeditionLivesRewards) {
+    const quantity = await grantExpeditionLivesForTask(
+      payload,
+      user.id,
+      taskId,
+      reward as Reward & { type: 'expedition_lives' },
+      req,
+      false,
+    )
+    summary.notices?.push({
+      id: `expedition-lives-${taskId}`,
+      title: quantity > 0 ? 'Expedition lives restored' : 'No lives needed',
+      message: quantity > 0
+        ? `+${quantity} expedition ${quantity === 1 ? 'life' : 'lives'} restored.`
+        : 'This expedition already has all its lives.',
+      icon: { type: 'item', id: 'revive' },
     })
   }
 

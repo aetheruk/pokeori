@@ -90,7 +90,10 @@ import {
   getExplorerEncounterItemLimit,
   getSkillLevel,
 } from '@/utilities/skills/unlocks'
-import { getSafariFleeChance } from '@/utilities/pokemon/safari-catch'
+import {
+  getSafariFleeChance,
+  SAFARI_BASE_FLEE_RATE,
+} from '@/utilities/pokemon/safari-catch'
 
 // Dynamic import for LevelUpModal to avoid bundling canvas-confetti in initial load
 const LevelUpModal = nextDynamic(
@@ -1568,7 +1571,7 @@ export default function EncounterPage() {
   const safariFleePercentage = isSafariEncounter
     ? Math.round(
         getSafariFleeChance({
-          baseFleeRate: encounter.fleeRate || 20,
+          baseFleeRate: encounter.fleeRate || SAFARI_BASE_FLEE_RATE,
         }),
       )
     : 0

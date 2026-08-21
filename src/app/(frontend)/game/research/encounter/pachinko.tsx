@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import { completeGame, startGame } from '@/app/(frontend)/game/games/actions'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
+import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -777,8 +778,8 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
           >
             <div className="flex items-center gap-1.5 font-mono text-sm font-bold text-game-cream">
               {cost?.currencyType && getCurrency(cost.currencyType) ? (
-                <ItemSprite
-                  itemId={getCurrency(cost.currencyType)!.iconId}
+                <CurrencySprite
+                  currencyId={cost.currencyType}
                   alt={getCurrency(cost.currencyType)!.name}
                   className="w-5 h-5 object-contain pixelated"
                   width={20}

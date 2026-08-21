@@ -36,6 +36,7 @@ import {
 } from '@/components/game/shared/stance-icon'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { CurrencySprite } from '@/components/ui/currency-sprite'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -357,8 +358,8 @@ export function InventoryList() {
       .map((currency) => ({
         icon: (
           <div className="relative">
-            <ItemSprite
-              itemId={currency.iconId}
+            <CurrencySprite
+              currencyId={currency.id}
               alt={currency.name}
               width={28}
               height={28}

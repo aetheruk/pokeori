@@ -103,11 +103,13 @@ const safariCreditMarkerTask = ({
   name,
   description,
   icon,
+  repeatable = false,
 }: {
   id: string
   name: string
   description: string
   icon: Task['icon']
+  repeatable?: boolean
 }): Task => ({
   id,
   name,
@@ -116,7 +118,7 @@ const safariCreditMarkerTask = ({
   subCategory: 'Safari Zone',
   icon,
   background: '/backgrounds/safari-reserve.avif',
-  repeatable: false,
+  repeatable,
   secret: true,
   completionTrigger: 'manual',
   requirements: [],
@@ -178,7 +180,7 @@ const safariCreditTasks: Task[] = [
   {
     id: 'safari-rewilding',
     name: 'Rewilding',
-    description: 'Time to rehome the pokemon I researched in the Safari Zone',
+    description: 'Time to rehome 10 Pokémon I researched in the Safari Zone',
     category: 'Kanto',
     subCategory: 'Safari Zone',
     icon: { type: 'pokemon', id: '128' },
@@ -193,14 +195,14 @@ const safariCreditTasks: Task[] = [
     criteria: [
       {
         type: 'pokemon_owned',
-        count: 1,
+        count: 10,
         consume: true,
         pokemonCriteria: { ballType: 'safari-ball' },
-        label: 'Hand over a Pokémon caught in a Safari Ball',
+        label: 'Hand over 10 Pokémon caught in Safari Balls',
       },
     ],
     rewards: [
-      { type: 'currency', targetId: 'safari-notes', quantity: 2, dropChance: 100 },
+      { type: 'currency', targetId: 'safari-notes', quantity: 15, dropChance: 100 },
     ],
   },
   {
@@ -268,6 +270,13 @@ const safariCreditTasks: Task[] = [
     name: "Warden's Permit",
     description: 'Permanent authorization to use the reserve’s standard catching and fishing records.',
     icon: { type: 'item', id: 'safari-catching-permit' },
+  }),
+  safariCreditMarkerTask({
+    id: 'safari-stamina-notes',
+    name: 'Stamina Notes',
+    description: 'A repeatable record of reserve stamina advice purchased from other researchers.',
+    icon: { type: 'trainer', id: 'ranger' },
+    repeatable: true,
   }),
 ]
 

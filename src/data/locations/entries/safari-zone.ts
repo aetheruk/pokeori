@@ -31,7 +31,7 @@ function safariArea({
     encounterMode: 'safari',
     expeditionOnly: true,
     timer: 45,
-    fleeRate: 10,
+    fleeRate: 14,
     levelRange: { min: 25, max: 35 },
     requirements: [permitRequirement, ...requirements],
     encounters,
@@ -45,7 +45,7 @@ const expeditionSafariLocations: Location[] = [
     id: 'safari-central-catch',
     name: 'Safari Central',
     description:
-      'Open grass and well-travelled paths make Pokémon easier to spot here. Use Bait or Shout before committing to a throw.',
+      'Open grass and well-travelled paths make Pokémon easier to spot here. Choose a berry before committing to a throw.',
     icon: '111',
     encounters: [
       { speciesId: 102, formId: '102', chance: 18 },
@@ -67,7 +67,7 @@ const expeditionSafariLocations: Location[] = [
     id: 'safari-east-catch',
     name: 'Safari East',
     description:
-      'Tall grass crowds the eastern ponds and raised boardwalks. Use Bait or Shout to manage a nervous Pokémon before throwing.',
+      'Tall grass crowds the eastern ponds and raised boardwalks. An Oran or Tamato Berry may help before you throw.',
     icon: '115',
     encounters: [
       { speciesId: 102, formId: '102', chance: 20 },
@@ -91,7 +91,7 @@ const expeditionSafariLocations: Location[] = [
     id: 'safari-west-catch',
     name: 'Safari West',
     description:
-      'Wooded lanes and abandoned shelters give wary Pokémon plenty of cover. Choose Bait or Shout carefully before your throw.',
+      'Wooded lanes and abandoned shelters give wary Pokémon plenty of cover. Choose your berry carefully before the throw.',
     icon: '123',
     encounters: [
       { speciesId: 102, formId: '102', chance: 20 },
@@ -114,7 +114,7 @@ const expeditionSafariLocations: Location[] = [
     id: 'safari-north-catch',
     name: 'Safari North',
     description:
-      'Rocky ledges funnel Pokémon through narrow northern channels. Use Bait or Shout, then time the throw before they bolt.',
+      'Rocky ledges funnel Pokémon through narrow northern channels. Pick a berry and time the throw before they bolt.',
     icon: '128',
     encounters: [
       { speciesId: 102, formId: '102', chance: 18 },
@@ -135,30 +135,16 @@ const expeditionSafariLocations: Location[] = [
   }),
   safariArea({
     id: 'safari-grand-finale-catch',
-    name: 'Safari Grand Finale',
+    name: 'Safari Reserve',
     description:
-      'A secluded habitat opens at the end of the expedition. Before Strength, the usual northern species gather here; afterwards, only the reserve’s prized encounters remain.',
+      'A quiet stretch of reserve habitat where Pokémon move through the grass and brush. Take your time and make the throw count.',
     icon: '113',
     encounters: [
-      { speciesId: 102, formId: '102', chance: 18, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
-      { speciesId: 111, formId: '111', chance: 17, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
-      { speciesId: 29, formId: '29', chance: 13, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
-      { speciesId: 32, formId: '32', chance: 13, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
-      { speciesId: 46, formId: '46', chance: 10, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
-      { speciesId: 30, formId: '30', chance: 8, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
-      { speciesId: 33, formId: '33', chance: 5, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
-      { speciesId: 115, formId: '115', chance: 5, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
-      { speciesId: 49, formId: '49', chance: 3, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
-      { speciesId: 104, formId: '104', chance: 2, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
-      { speciesId: 128, formId: '128', chance: 2, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
-      { speciesId: 113, formId: '113', chance: 2, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
-      { speciesId: 127, formId: '127', chance: 1, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
-      { speciesId: 123, formId: '123', chance: 1, requirements: [{ type: 'item_owned', targetId: 'tm-strength', inverse: true }] },
-      { speciesId: 113, formId: '113', chance: 20, requirements: [{ type: 'item_owned', targetId: 'tm-strength' }] },
-      { speciesId: 115, formId: '115', chance: 20, requirements: [{ type: 'item_owned', targetId: 'tm-strength' }] },
-      { speciesId: 128, formId: '128', chance: 20, requirements: [{ type: 'item_owned', targetId: 'tm-strength' }] },
-      { speciesId: 123, formId: '123', chance: 20, requirements: [{ type: 'item_owned', targetId: 'tm-strength' }] },
-      { speciesId: 127, formId: '127', chance: 20, requirements: [{ type: 'item_owned', targetId: 'tm-strength' }] },
+      { speciesId: 113, formId: '113', chance: 20 },
+      { speciesId: 115, formId: '115', chance: 20 },
+      { speciesId: 128, formId: '128', chance: 20 },
+      { speciesId: 123, formId: '123', chance: 20 },
+      { speciesId: 127, formId: '127', chance: 20 },
     ],
   }),
   safariArea({
