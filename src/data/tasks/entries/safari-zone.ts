@@ -278,6 +278,12 @@ const safariCreditTasks: Task[] = [
     icon: { type: 'trainer', id: 'ranger' },
     repeatable: true,
   }),
+  safariCreditMarkerTask({
+    id: 'safari-notes-on-poachers',
+    name: 'Notes on Poachers',
+    description: 'A permanent record of poacher activity that opens a focused reserve sweep.',
+    icon: { type: 'trainer', id: 'rocket-grunt-m' },
+  }),
 ]
 
 export const safariZoneTasks: Task[] = ([

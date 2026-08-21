@@ -25,6 +25,11 @@ const fishingResearchNotesRequirement = {
   targetId: 'safari-fishing-research-notes',
 }
 
+const poacherNotesRequirement = {
+  type: 'task_completed' as const,
+  targetId: 'safari-notes-on-poachers',
+}
+
 const safariEntranceFee = {
   type: 'currency_owned' as const,
   targetId: 'pokedollars',
@@ -358,6 +363,41 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
       secretActivity('safari-catching-step-09-finale', 'location', 'safari-grand-finale-catch'),
     ],
     rewards: [{ type: 'xp', skill: 'catching', quantity: 500, dropChance: 100 }],
+  },
+  {
+    id: 'safari-zone-poacher-watch-expedition',
+    name: 'Poacher Watch',
+    description:
+      'A focused sweep through the reserve. Five poachers have been spotted, and every one of them needs to be driven away from the habitats.',
+    category: 'Kanto',
+    subCategory: 'Safari Zone',
+    buttonText: 'Start the Sweep',
+    icon: { type: 'trainer', id: 'rocket-grunt-m' },
+    background: '/backgrounds/safari-reserve.avif',
+    maxLosses: 1,
+    canAbandon: true,
+    requirements: [permitRequirement, poacherNotesRequirement],
+    criteria: [],
+    activityPool: {
+      battle: [
+        'safari-poacher-watch-one',
+        'safari-poacher-watch-two',
+        'safari-poacher-watch-three',
+        'safari-poacher-watch-four',
+        'safari-poacher-watch-five',
+      ],
+    },
+    path: [
+      secretActivity('safari-poacher-watch-step-01', 'battle', 'safari-poacher-watch-one'),
+      secretActivity('safari-poacher-watch-step-02', 'battle', 'safari-poacher-watch-two'),
+      secretActivity('safari-poacher-watch-step-03', 'battle', 'safari-poacher-watch-three'),
+      secretActivity('safari-poacher-watch-step-04', 'battle', 'safari-poacher-watch-four'),
+      secretActivity('safari-poacher-watch-step-05', 'battle', 'safari-poacher-watch-five'),
+    ],
+    rewards: [
+      { type: 'currency', targetId: 'pokedollars', quantity: 1500, dropChance: 100 },
+      { type: 'item', targetId: 'rare-candy-l', quantity: 3, dropChance: 100 },
+    ],
   },
   {
     id: 'safari-zone-fishing-expedition',
