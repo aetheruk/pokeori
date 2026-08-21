@@ -362,7 +362,10 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
       secretActivity('safari-catching-step-08-north', 'location', 'safari-north-catch'),
       secretActivity('safari-catching-step-09-finale', 'location', 'safari-grand-finale-catch'),
     ],
-    rewards: [{ type: 'xp', skill: 'catching', quantity: 500, dropChance: 100 }],
+    rewards: [
+      { type: 'xp', skill: 'catching', quantity: 500, dropChance: 100 },
+      { type: 'currency', targetId: 'safari-notes', quantity: 3, dropChance: 100 },
+    ],
   },
   {
     id: 'safari-zone-poacher-watch-expedition',
@@ -397,6 +400,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
     rewards: [
       { type: 'currency', targetId: 'pokedollars', quantity: 1500, dropChance: 100 },
       { type: 'item', targetId: 'rare-candy-l', quantity: 3, dropChance: 100 },
+      { type: 'currency', targetId: 'safari-notes', quantity: 1, dropChance: 100 },
     ],
   },
   {
@@ -429,6 +433,9 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
         'safari-fishing-expedition-catch',
       ),
     ),
-    rewards: [{ type: 'xp', skill: 'catching', quantity: 500, dropChance: 100 }],
+    rewards: [
+      { type: 'xp', skill: 'catching', quantity: 500, dropChance: 100 },
+      { type: 'currency', targetId: 'safari-notes', quantity: 3, dropChance: 100 },
+    ],
   },
 ]
