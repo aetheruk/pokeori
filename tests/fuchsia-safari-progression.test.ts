@@ -836,7 +836,7 @@ describe('Fuchsia Gym and Safari progression', () => {
       targetId: 'safari-researcher-responsibility',
     })
     expect(store?.items.map((item) => [item.name, item.cost, item.stock])).toEqual([
-      ['Safari Ball', [{ type: 'currency', id: 'safari-notes', amount: 5 }], undefined],
+      ['Safari Ball', [{ type: 'currency', id: 'safari-notes', amount: 30 }], undefined],
       ['Explorers Research Notes', [{ type: 'currency', id: 'safari-notes', amount: 10 }], 1],
       ['Fishing Research Notes', [{ type: 'currency', id: 'safari-notes', amount: 50 }], 1],
       ['Extra Habitat Field Notes', [{ type: 'currency', id: 'safari-notes', amount: 35 }], 1],
@@ -844,10 +844,10 @@ describe('Fuchsia Gym and Safari progression', () => {
       ['Safari Ball Cache Info', [{ type: 'currency', id: 'safari-notes', amount: 55 }], 1],
       ['Unusual Pokémon Sightings', [{ type: 'currency', id: 'safari-notes', amount: 65 }], 1],
       ['Rare Item Rumours', [{ type: 'currency', id: 'safari-notes', amount: 90 }], 1],
-      ["Warden's Permit", [{ type: 'currency', id: 'safari-notes', amount: 500 }], 1],
+      ["Warden's Permit", [{ type: 'currency', id: 'safari-notes', amount: 2000 }], 1],
       ['Stamina Notes', [{ type: 'currency', id: 'safari-notes', amount: 20 }], 5],
-      ['Commemorative Safari Ball', [{ type: 'currency', id: 'safari-notes', amount: 100 }], 1],
-      ['Honorary Title', [{ type: 'currency', id: 'safari-notes', amount: 250 }], 1],
+      ['Commemorative Safari Ball', [{ type: 'currency', id: 'safari-notes', amount: 1000 }], 1],
+      ['Honorary Title', [{ type: 'currency', id: 'safari-notes', amount: 2500 }], 1],
     ])
 
     const wardenPermit = tasks.find(
