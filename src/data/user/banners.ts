@@ -11,7 +11,7 @@ export const banners: BannerConfig[] = [
   {
     id: 'celadon-game-corner',
     name: 'Celadon Game Corner',
-    imagePath: '/backgrounds/celadon-game-corner-arcade.avif',
+    imagePath: '/backgrounds/game-corner.avif',
   },
   {
     id: 'chronicle-brock',
