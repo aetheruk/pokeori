@@ -178,15 +178,20 @@ export function EncounterQte({
 
   if (qte.type === 'calm') {
     return (
-      <ItemFlickQte
-        compact
-        showInfinity={false}
-        options={(qte.berryOptions || []).map((berryId) => ({
-          id: berryId,
-          label: getItemName(berryId),
-        }))}
-        onThrow={(berryId) => onComplete({ type: 'calm', berryId })}
-      />
+      <div className="flex w-full flex-col items-center gap-2">
+        <p className="text-center text-sm font-bold text-game-ink">
+          Calm with {getItemName(qte.correctBerryId || 'the right berry')}
+        </p>
+        <ItemFlickQte
+          compact
+          showInfinity={false}
+          options={(qte.berryOptions || []).map((berryId) => ({
+            id: berryId,
+            label: getItemName(berryId),
+          }))}
+          onThrow={(berryId) => onComplete({ type: 'calm', berryId })}
+        />
+      </div>
     )
   }
 

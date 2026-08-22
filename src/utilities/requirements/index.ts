@@ -320,6 +320,13 @@ export function isPokemonEligible(
   return true
 }
 
+function inferTcgSetId(cardId: string): string | undefined {
+  const parts = String(cardId || '').split('-')
+  return parts.length > 1
+    ? parts.slice(0, -1).join('-').trim().toLowerCase()
+    : undefined
+}
+
 export function getRequirementProgress(
   data: RequirementData,
   condition: TaskCondition,
@@ -386,7 +393,12 @@ export function getRequirementProgress(
     }
 
     case 'card_collected_set': {
-      const setCards = tcg.filter((entry) => entry.setId === condition.targetId)
+      const targetSetId = String(condition.targetId || '').trim().toLowerCase()
+      const setCards = tcg.filter((entry) => {
+        const explicitSetId = String(entry.setId || '').trim().toLowerCase()
+        const inferredSetId = inferTcgSetId(entry.cardId)
+        return explicitSetId === targetSetId || inferredSetId === targetSetId
+      })
       if (condition.unique) {
         current = setCards.filter((entry) => (entry.quantity || 0) > 0).length
       } else {

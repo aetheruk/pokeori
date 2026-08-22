@@ -108,7 +108,11 @@ const definitions: Record<KantoGymChronicleKey, ChronicleBattleDefinition[]> = {
     {
       id: 'tunnel-culprit', name: 'The Toxin Evacuation', description: 'Clear the exposed courtyard by trusting Janine’s unmarked route.',
       trainerClassId: 'chronicle-janine', trainerName: 'Janine', icon: { type: 'trainer', id: 'chronicle-janine' }, background: '/backgrounds/chronicle-koga-training-courtyard.avif', maxPokemon: 3, aiProfile: 'advanced',
-      enemyTeam: [{ speciesId: 24, formId: '24', level: 32, aiMoves: ['glare', 'acid', 'bite'] }, { speciesId: 110, formId: '110', level: 32, aiMoves: ['sludge', 'smokescreen', 'smog'] }],
+      // This encounter is a mid-route poison mirror match, not the Chronicle
+      // finale. Keep the poison identity, but remove the high-damage Bite /
+      // accuracy-stall pairing that made the fixed memory team depend almost
+      // entirely on Venonat's Psychic moves.
+      enemyTeam: [{ speciesId: 24, formId: '24', level: 30, aiMoves: ['glare', 'acid', 'poison-sting'] }, { speciesId: 110, formId: '110', level: 30, aiMoves: ['sludge', 'acid', 'smog'] }],
     },
     {
       id: 'ren-succession', name: "Ren's Succession Match", description: 'Face the inherited method after its author changes every expected opening.',

@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import {
   calculateFieldObservationSkillXp,
+  FIELD_OBSERVATION_COUNT_SPECIES_LIMIT,
   generateFieldObservationRound,
   getFieldObservationBaseExperienceXpModifier,
   getFieldObservationCollectedItemXpModifier,
@@ -789,6 +790,60 @@ describe('field observation research mode', () => {
         counts: { ...correctCounts, [firstKey]: correctCounts[firstKey] + 1 },
       }),
     ).toBe(false)
+  })
+
+  test('count surveys expose no more than six different species', () => {
+    const settings: FieldObservationSettings = {
+      ...routeOneSettings,
+      pokemonPool: Array.from({ length: 10 }, (_, index) => ({
+        speciesId: index + 1,
+        formId: String(index + 1),
+        weight: 10,
+      })),
+    }
+    const round = generateFieldObservationRound(
+      settings,
+      sequencedRandom([0.4], 23),
+    )
+    const availableSpecies = new Set(
+      round.publicRoundData.availablePokemon.map((pokemon) => pokemon.speciesId),
+    )
+    const countedSpecies = new Set(
+      Object.keys(round.privateRoundData.countAnswer || {}).map((key) =>
+        Number(key.split(':')[0]),
+      ),
+    )
+
+    expect(round.publicRoundData.surveyFocus).toBe('count-survey')
+    expect(availableSpecies.size).toBeLessThanOrEqual(
+      FIELD_OBSERVATION_COUNT_SPECIES_LIMIT,
+    )
+    expect(countedSpecies.size).toBeLessThanOrEqual(
+      FIELD_OBSERVATION_COUNT_SPECIES_LIMIT,
+    )
+    expect(availableSpecies.size).toBe(countedSpecies.size)
+
+    const roundWithGlobalEvent = generateFieldObservationRound(
+      settings,
+      sequencedRandom([0.4], 23),
+      {
+        globalPokemonEvent: {
+          id: 'count-survey-special',
+          speciesId: 150,
+          formId: '150',
+          odds: 100,
+        },
+      },
+    )
+    const globalEventSpecies = new Set(
+      roundWithGlobalEvent.publicRoundData.availablePokemon.map(
+        (pokemon) => pokemon.speciesId,
+      ),
+    )
+    expect(globalEventSpecies.size).toBeLessThanOrEqual(
+      FIELD_OBSERVATION_COUNT_SPECIES_LIMIT,
+    )
+    expect(globalEventSpecies.has(150)).toBe(true)
   })
 
   test('Kid Mode always asks who appeared most with tappable Pokemon options', () => {

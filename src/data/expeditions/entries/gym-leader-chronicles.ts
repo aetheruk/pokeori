@@ -100,7 +100,23 @@ const activityLoadouts: Record<KantoGymChronicleKey, ChronicleActivityLoadout> =
   },
   koga: {
     'chronicle-v2-koga-decoy-thief': { battleTeam: battleTeams.koga.slice(0, 2) },
-    'chronicle-v2-koga-tunnel-culprit': { battleTeam: battleTeams.koga },
+    'chronicle-v2-koga-tunnel-culprit': {
+      battleTeam: [
+        {
+          ...battleTeams.koga[0],
+          assignedMoves: ['confusion', 'psybeam', 'psychic', 'poison-sting'],
+        },
+        {
+          ...battleTeams.koga[1],
+          assignedMoves: ['sludge', 'acid', 'smog'],
+        },
+        {
+          ...battleTeams.koga[2],
+          assignedMoves: ['sludge', 'acid', 'poison-sting'],
+        },
+      ],
+      battleItems: { 'battle-potion': 3, 'battle-super-potion': 2 },
+    },
     'chronicle-v2-koga-ren-succession': {
       battleTeam: [...battleTeams.koga, { speciesId: 24, formId: '24', name: 'Arbok', level: 35, assignedMoves: ['glare', 'acid', 'bite', 'screech'] }],
     },
