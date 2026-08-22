@@ -920,7 +920,20 @@ export const safariZoneTasks: Task[] = ([
     completeButtonText: 'Receive Gym Rewards',
     requirements: [{ type: 'task_completed', targetId: 'fuchsia-gym-trial-ready' }],
     criteria: [],
-    rewards: [],
+    rewards: [
+      {
+        type: 'icon',
+        targetId: 'koga',
+        quantity: 1,
+        dropChance: 100,
+      },
+      {
+        type: 'title',
+        targetId: 'poison-pro',
+        quantity: 1,
+        dropChance: 100,
+      },
+    ],
     exitModal: {
       background: '/backgrounds/gym-poison.avif',
       title: 'Gym Leader Koga',
