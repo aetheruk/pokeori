@@ -6,12 +6,12 @@ export interface BannerConfig {
 
 export const banners: BannerConfig[] = [
   { id: 'lab', name: "Professor's Lab", imagePath: '/backgrounds/lab.avif' },
-  { id: 'grassy-route', name: 'Grassy Route', imagePath: '/backgrounds/forest.avif' },
+  { id: 'grassy-route', name: 'Grassy Route', imagePath: '/backgrounds/grassy-route.avif' },
   { id: 'ss-anne', name: 'S.S. Anne', imagePath: '/backgrounds/ss-anne.avif' },
   {
     id: 'celadon-game-corner',
     name: 'Celadon Game Corner',
-    imagePath: '/backgrounds/game-corner.avif',
+    imagePath: '/backgrounds/celadon-game-corner-arcade.avif',
   },
   {
     id: 'chronicle-brock',

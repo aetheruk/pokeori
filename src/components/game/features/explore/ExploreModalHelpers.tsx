@@ -40,6 +40,7 @@ import {
   getPokemonImageUrl,
   getPokemonSpecies,
 } from '@/utilities/pokemon/pokedex'
+import { FISHING_SECRET_POKEMON } from '@/utilities/fishing/secret-pokemon'
 import {
   checkRequirement,
   getRequirementProgress,
@@ -1478,6 +1479,10 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
                           {[levelLabel, timeLabel].filter(Boolean).join(' · ')}
                         </span>
                       )}
+                      <span className="mt-1 inline-flex items-center justify-center gap-1 text-[10px] font-semibold text-game-ochre">
+                        <Sparkles className="h-3 w-3" />
+                        Shiny possible
+                      </span>
                     </div>
                   </div>
                 )
@@ -1485,6 +1490,49 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
             </div>
           </div>
         ))}
+        <div className="space-y-4">
+          <SectionDivider>Rare catches</SectionDivider>
+          <div className="flex gap-3 overflow-x-auto pb-6 pt-2 custom-scrollbar px-1">
+            {FISHING_SECRET_POKEMON.map((secret) => {
+              const pokemon = getPokemonForm(secret.formId)
+              const name = pokemon?.name || `#${secret.speciesId}`
+
+              return (
+                <div
+                  key={secret.formId}
+                  className="flex min-w-[150px] flex-shrink-0 flex-col items-center rounded-lg border border-game-ochre/45 bg-game-ochre/10 p-3 text-center"
+                >
+                  <div className="flex h-16 items-center justify-center gap-1">
+                    <Image
+                      src={getPokemonImageUrl(secret.formId, 'sprite')}
+                      alt={name}
+                      width={64}
+                      height={64}
+                      className="h-16 w-16 object-contain pixelated"
+                    />
+                    <Image
+                      src={getPokemonImageUrl(secret.formId, 'sprite', true)}
+                      alt={`Shiny ${name}`}
+                      width={48}
+                      height={48}
+                      className="h-12 w-12 object-contain pixelated"
+                    />
+                  </div>
+                  <span className="mt-2 text-sm font-bold text-game-ink">
+                    {name}
+                  </span>
+                  <span className="mt-1 text-[10px] font-mono text-game-muted">
+                    {secret.chanceLabel}
+                  </span>
+                  <span className="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold text-game-ochre">
+                    <Sparkles className="h-3 w-3" />
+                    Shiny possible
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
       </div>
     )
   }
