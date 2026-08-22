@@ -11,7 +11,7 @@ export const mtMoonShops: ShopConfig[] = [
       type: 'trainer',
       id: 'rocket-grunt-m',
     },
-    background: '/backgrounds/center.avif',
+    background: '/backgrounds/pokemon-center.avif',
     requirements: [
       {
         type: 'task_completed',

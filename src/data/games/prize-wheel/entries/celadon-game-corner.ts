@@ -14,7 +14,7 @@ export const celadonGameCornerPrizeWheelEntries: PrizeWheelGameConfig[] = [
     criteria: [],
     rewards: [],
     settings: {
-      background: '/backgrounds/celadon-game-corner-prize-wheel.avif',
+      background: '/scratchcard/celadon-game-corner-prize-wheel.avif',
       themeColour: '#9f1239',
       cost: { currencyType: 'fun-tokens', amount: 25 },
       spinTime: { min: 4, max: 7 },
@@ -41,7 +41,7 @@ export const celadonGameCornerPrizeWheelEntries: PrizeWheelGameConfig[] = [
     criteria: [],
     rewards: [],
     settings: {
-      background: '/backgrounds/celadon-game-corner-prize-wheel.avif',
+      background: '/scratchcard/celadon-game-corner-prize-wheel.avif',
       themeColour: '#f59e0b',
       cost: { currencyType: 'fun-tokens', amount: 125 },
       spinTime: { min: 4, max: 7 },
