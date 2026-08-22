@@ -1,9 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import type { FishingPokemonEntry } from '@/data/games/fishing/types'
-import {
-  applySecretFishingPokemonReplacement,
-  FISHING_SECRET_POKEMON,
-} from '@/utilities/fishing/secret-pokemon'
+import { applySecretFishingPokemonReplacement } from '@/utilities/fishing/secret-pokemon'
 
 const baseEntry: FishingPokemonEntry = {
   speciesId: 129,
@@ -16,13 +13,6 @@ const baseEntry: FishingPokemonEntry = {
 
 describe('secret fishing Pokemon replacements', () => {
   const rodTypes = ['old', 'good', 'super'] as const
-
-  test('preview metadata exposes both global rare catches and their shiny possibility', () => {
-    expect(FISHING_SECRET_POKEMON).toEqual([
-      { speciesId: 349, formId: '349', chanceLabel: '1 in 256 hook replacement' },
-      { speciesId: 369, formId: '369', chanceLabel: '1 in 512 hook replacement' },
-    ])
-  })
 
   test('any rod can secretly replace a Pokemon result with Relicanth', () => {
     for (const rodType of rodTypes) {
@@ -79,7 +69,7 @@ describe('secret fishing Pokemon replacements', () => {
         applySecretFishingPokemonReplacement({
           rodType,
           entry: baseEntry,
-          random: () => 1 / 256,
+          random: () => 1 / 128,
         }),
       ).toBe(baseEntry)
 
@@ -90,6 +80,26 @@ describe('secret fishing Pokemon replacements', () => {
           random: () => 1,
         }),
       ).toBe(baseEntry)
+    }
+  })
+
+  test('Feebas uses the new 1 in 128 replacement chance', () => {
+    for (const rodType of rodTypes) {
+      expect(
+        applySecretFishingPokemonReplacement({
+          rodType,
+          entry: baseEntry,
+          random: () => 1 / 256,
+        }).speciesId,
+      ).toBe(349)
+
+      expect(
+        applySecretFishingPokemonReplacement({
+          rodType,
+          entry: baseEntry,
+          random: () => 1 / 128,
+        }).speciesId,
+      ).toBe(129)
     }
   })
 })
