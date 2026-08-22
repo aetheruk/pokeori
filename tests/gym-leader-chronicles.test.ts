@@ -255,6 +255,11 @@ describe('Kanto Gym Leader Chronicles gold-tier anthology', () => {
         (entry) => entry.id === 'chronicle-v2-erika-exhibition-rival',
       )?.trainerName,
     ).toBe('Celia')
+    expect(
+      battles
+        .find((entry) => entry.id === 'chronicle-v2-erika-exhibition-rival')
+        ?.enemyTeam.map((pokemon) => pokemon.level),
+    ).toEqual([29, 18, 30])
   })
 
   test('Koga Chronicle battles use the reduced pressure tuning', () => {

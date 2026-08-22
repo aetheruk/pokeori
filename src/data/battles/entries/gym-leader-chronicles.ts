@@ -85,7 +85,7 @@ const definitions: Record<KantoGymChronicleKey, ChronicleBattleDefinition[]> = {
       trainerClassId: 'chronicle-celia', trainerName: 'Celia', icon: { type: 'trainer', id: 'chronicle-celia' }, background: '/backgrounds/chronicle-erika-flower-exhibition.avif', maxPokemon: 3, aiProfile: 'advanced',
       enemyTeam: [
         { speciesId: 70, formId: '70', level: 29, aiMoves: ['acid', 'sleep-powder', 'vine-whip'] },
-        { speciesId: 46, formId: '46', level: 29, aiMoves: ['leech-life', 'stun-spore', 'slash'] },
+        { speciesId: 46, formId: '46', level: 18, aiMoves: ['leech-life', 'stun-spore', 'slash'] },
         { speciesId: 35, formId: '35', level: 30, aiMoves: ['sing', 'double-slap', 'metronome'] },
       ],
     },

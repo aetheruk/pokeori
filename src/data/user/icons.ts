@@ -16,6 +16,7 @@ export const icons: IconConfig[] = [
   { id: 'brock', name: 'Brock', icon: { type: 'trainer', id: 'gym-kanto-brock' } },
   { id: 'misty', name: 'Misty', icon: { type: 'trainer', id: 'gym-kanto-misty' } },
   { id: 'lt-surge', name: 'Lt. Surge', icon: { type: 'trainer', id: 'gym-kanto-ltsurge' } },
+  { id: 'koga', name: 'Koga', icon: { type: 'trainer', id: 'gym-kanto-koga' } },
   {
     id: 'rocket-m',
     name: 'Team Rocket Grunt',

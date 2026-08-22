@@ -351,6 +351,19 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(
       tasks.find((task) => task.id === 'fuchsia-gym-koga-rewards')?.icon,
     ).toEqual({ type: 'item', id: 'badge-kanto-soul' })
+    expect(
+      tasks
+        .find((task) => task.id === 'fuchsia-gym-koga-rewards')
+        ?.rewards.map((reward) => reward.targetId),
+    ).toEqual(['koga', 'poison-pro'])
+    expect(getIcon('koga')).toMatchObject({
+      name: 'Koga',
+      icon: { type: 'trainer', id: 'gym-kanto-koga' },
+    })
+    expect(getTitle('poison-pro')).toEqual({
+      id: 'poison-pro',
+      name: 'Poison Pro',
+    })
 
     const swiftPoison = getMove('swift-poison')
     expect(swiftPoison).toMatchObject({

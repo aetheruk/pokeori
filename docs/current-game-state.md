@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased: Erika's Chronicle Exhibition Challenge now fields Paras at level 18. Completing Koga's Gym Trial reward task now awards the Koga trainer icon and the Poison Pro title alongside the existing Soul Badge, Swift Poison TM, and Gym Challenge binder rewards.
 - Unreleased: The eight Gym Leader Chronicles receive a second narrative naturalization pass across scene summaries, dialogue, and narration. The revised prose uses more direct spoken language and clearer immediate stakes while preserving the authored scenes, activity IDs, battles, rewards, unlock gates, and progression order.
 - Unreleased: Pics for Benny now loads the user's TCG card rows before resolving its conditional reward, and completed set checks can infer the set from card IDs when legacy rows have no setId, so a complete Jungle set reliably grants the Net Ball instead of falling through to only the PokéDollar reward. Normal catch Calm QTEs again show the required berry in their prompt; Safari's icon-only controls remain unchanged.
 - Unreleased: Field Research count surveys now select at most six different Pokémon species for each round, keeping the tappable counter grid readable while the server validates the same capped species set.
