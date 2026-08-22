@@ -42,6 +42,7 @@ import {
   acquireActionLock,
   checkActionRateLimit,
   getIdempotentResult,
+  reserveIdempotentResult,
   releaseActionLock,
   setIdempotentResult,
 } from '@/utilities/game-integrity'
@@ -504,6 +505,9 @@ export async function claimFishingItem() {
       }
     }
 
+    let claimReservationKey: string | undefined
+    let claimCompleted = false
+
     try {
       const payload = await getPayload({ config: configPromise })
 
@@ -526,8 +530,23 @@ export async function claimFishingItem() {
         return cachedClaimResult
       }
 
+      claimReservationKey = `${claimResultKey}:processing`
+      const claimReserved = await reserveIdempotentResult(
+        claimReservationKey,
+        60,
+      )
+      if (!claimReserved) {
+        const inFlightClaimResult = await getIdempotentResult<any>(claimResultKey)
+        if (inFlightClaimResult) return inFlightClaimResult
+        return {
+          success: false,
+          error: 'This item claim is already being processed. Please try again shortly.',
+        }
+      }
+
       const result = fishingState.hookedResult
       if (result?.type !== 'item') {
+        await redis.deleteIfValue(claimReservationKey, 'processing')
         return { success: false, error: 'Not an item' }
       }
 
@@ -537,6 +556,10 @@ export async function claimFishingItem() {
       const { summary } = await grantRewards(user.id, [
         { type: 'item', targetId: itemEntry.itemId, quantity: 1 },
       ], { idempotencyKey: claimResultKey })
+      // Keep the reservation if anything after the durable grant fails. This
+      // prevents a retry from replaying the same economy action while the
+      // fishing result is being finalized.
+      claimCompleted = true
 
       // Update stats in Redis (legacy/backup)
       const researchState = (await redis.get(
@@ -577,6 +600,9 @@ export async function claimFishingItem() {
 
       return response
     } finally {
+      if (claimReservationKey && !claimCompleted) {
+        await redis.deleteIfValue(claimReservationKey, 'processing')
+      }
       await releaseActionLock(actionLock)
     }
   } catch (error) {

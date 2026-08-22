@@ -59,3 +59,14 @@ export async function setIdempotentResult<T>(
 ): Promise<void> {
   await redis.set(key, value, { ex: ttlSeconds })
 }
+
+/**
+ * Claims a short-lived idempotency reservation before performing a grant.
+ * Redis NX makes this safe when duplicate requests arrive concurrently.
+ */
+export async function reserveIdempotentResult(
+  key: string,
+  ttlSeconds = 60,
+): Promise<boolean> {
+  return (await redis.set(key, 'processing', { nx: true, ex: ttlSeconds })) === 'OK'
+}

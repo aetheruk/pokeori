@@ -273,6 +273,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
     itemId?: string
     symbol: string
   } | null>(null)
+  const [isClaimingItem, setIsClaimingItem] = useState(false)
 
   // Refs
   const timerRef = useRef<NodeJS.Timeout | null>(null)
@@ -412,21 +413,27 @@ export function FishingGame({ encounter }: FishingGameProps) {
   }, [])
 
   const handleClaimItem = useCallback(async () => {
-    const res = await claimFishingItem()
-    if (!res.success) {
-      toast.error(res.error || 'Failed to claim item')
-      return
-    }
+    if (isClaimingItem) return
+    setIsClaimingItem(true)
+    try {
+      const res = await claimFishingItem()
+      if (!res.success) {
+        toast.error(res.error || 'Failed to claim item')
+        return
+      }
 
-    refreshUser()
-    toast.success('Item added to bag.')
-    setPhase('idle')
-    setHookedData(null)
-    setCastTime(null)
-    setAppearTime(null)
-    setTimeUntilAppear(null)
-    setNibbleSymbol(null)
-  }, [refreshUser])
+      refreshUser()
+      toast.success('Item added to bag.')
+      setPhase('idle')
+      setHookedData(null)
+      setCastTime(null)
+      setAppearTime(null)
+      setTimeUntilAppear(null)
+      setNibbleSymbol(null)
+    } finally {
+      setIsClaimingItem(false)
+    }
+  }, [isClaimingItem, refreshUser])
 
   const handleAttemptCatch = useCallback(async () => {
     const res = await startFishingCatch()
@@ -771,8 +778,9 @@ export function FishingGame({ encounter }: FishingGameProps) {
                     <Button
                       className="h-11 w-full rounded-xl bg-game-clay text-base font-semibold tracking-wide text-game-cream shadow-sm hover:bg-game-clay/90"
                       onClick={handleClaimItem}
+                      disabled={isClaimingItem}
                     >
-                      Nice!
+                      {isClaimingItem ? 'Adding...' : 'Nice!'}
                     </Button>
                   </div>
                 </>

@@ -3,6 +3,17 @@ import type { FishingPokemonEntry, RodType } from '@/data/games/fishing/types'
 const FEEBAS_REPLACEMENT_CHANCE = 1 / 256
 const RELICANTH_REPLACEMENT_CHANCE = 1 / 512
 
+export interface FishingSecretPokemonPreview {
+  speciesId: number
+  formId: string
+  chanceLabel: string
+}
+
+export const FISHING_SECRET_POKEMON: FishingSecretPokemonPreview[] = [
+  { speciesId: 349, formId: '349', chanceLabel: '1 in 256 hook replacement' },
+  { speciesId: 369, formId: '369', chanceLabel: '1 in 512 hook replacement' },
+]
+
 const RELICANTH = {
   speciesId: 369,
   formId: '369',
