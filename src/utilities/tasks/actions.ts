@@ -140,6 +140,15 @@ export async function completeTask(
     ...rewardConditions,
   ]
   const requiredKeys = analyzeRequirements(allConditions)
+  const hasCardSetRewardCondition = rewardConditions.some(
+    (condition) =>
+      condition.type === 'card_collected_set' ||
+      condition.type === 'card_collected_total' ||
+      condition.type === 'card_collected_specific',
+  )
+  if (hasCardSetRewardCondition && !requiredKeys.includes('tcg')) {
+    requiredKeys.push('tcg')
+  }
 
   if (!requiredKeys.includes('completedTasks')) requiredKeys.push('completedTasks')
   if (

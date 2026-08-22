@@ -137,6 +137,8 @@ export interface FieldObservationSpawnModifiers {
   eventChanceMultiplier?: number
 }
 
+export const FIELD_OBSERVATION_COUNT_SPECIES_LIMIT = 6
+
 export interface GeneratedFieldObservationRound {
   publicRoundData: FieldObservationPublicRoundData
   privateRoundData: FieldObservationPrivateRoundData
@@ -217,20 +219,39 @@ export function generateFieldObservationRound(
     resolveFieldObservationDurationSeconds(settings.answerTimeLimit, 15, 'roll', random) * 1000
   const pool = normalizePool(settings.pokemonPool)
   const surveyFocus = pickSurveyFocus(random)
+  const countSurveyPool =
+    surveyFocus === 'count-survey'
+      ? limitCountSurveyPool(pool, options.globalPokemonEvent, random)
+      : pool
+  const globalPokemonEvent =
+    surveyFocus === 'count-survey' && options.globalPokemonEvent
+      ? {
+          ...options.globalPokemonEvent,
+          formId:
+            countSurveyPool.find(
+              (entry) => entry.speciesId === options.globalPokemonEvent?.speciesId,
+            )?.formId || options.globalPokemonEvent.formId,
+        }
+      : options.globalPokemonEvent
   const spawnModifiers = options.spawnModifierResolver
     ? options.spawnModifierResolver(surveyFocus)
     : options.spawnModifiers
   let spawns = [
     ...generateSpawns(
       settings,
-      pool,
+      countSurveyPool,
       difficulty,
       observationDurationMs,
       surveyFocus,
       random,
       spawnModifiers,
     ),
-    ...generateGlobalPokemonSpawns(settings, observationDurationMs, options.globalPokemonEvent, random),
+    ...generateGlobalPokemonSpawns(
+      settings,
+      observationDurationMs,
+      globalPokemonEvent,
+      random,
+    ),
   ].sort((a, b) => a.startMs - b.startMs)
   if (options.kidModeQuestion) {
     spawns = ensureUniqueMostAppeared(spawns)
@@ -250,14 +271,17 @@ export function generateFieldObservationRound(
       difficulty,
       surveyFocus,
       spawns,
-      availablePokemon: buildAvailablePokemon(pool, spawns),
+      availablePokemon: buildAvailablePokemon(countSurveyPool, spawns),
       collectibleDrops: [],
       question: selected.question,
     },
     privateRoundData: {
       correctOptionId: selected.correctOptionId,
       questionType: selected.question.type,
-      countAnswer: surveyFocus === 'count-survey' ? buildCountAnswer(spawns, pool) : undefined,
+      countAnswer:
+        surveyFocus === 'count-survey'
+          ? buildCountAnswer(spawns, countSurveyPool)
+          : undefined,
       rewardSubjects,
       surveyFocus,
       collectibleDrops: [],
@@ -380,6 +404,58 @@ function normalizePool(pool: FieldObservationPokemonPoolEntry[]): NormalizedFiel
       formId: entry.formId || entry.speciesId.toString(),
       weight: entry.weight,
     }))
+}
+
+function limitCountSurveyPool(
+  pool: NormalizedFieldObservationPoolEntry[],
+  globalPokemonEvent: FieldObservationGlobalPokemonEvent | null | undefined,
+  random: RandomFn,
+): NormalizedFieldObservationPoolEntry[] {
+  const entriesBySpecies = new Map<number, NormalizedFieldObservationPoolEntry[]>()
+  for (const entry of pool) {
+    const entries = entriesBySpecies.get(entry.speciesId) || []
+    entries.push(entry)
+    entriesBySpecies.set(entry.speciesId, entries)
+  }
+
+  const selected: NormalizedFieldObservationPoolEntry[] = []
+  const eventSpeciesId = globalPokemonEvent?.speciesId
+  const eventFormId = globalPokemonEvent?.formId
+  const eventEntries =
+    eventSpeciesId === undefined ? undefined : entriesBySpecies.get(eventSpeciesId)
+
+  if (eventSpeciesId !== undefined && eventEntries) {
+    selected.push(
+      eventEntries.find((entry) => entry.formId === eventFormId) ||
+        eventEntries[0],
+    )
+    entriesBySpecies.delete(eventSpeciesId)
+  }
+
+  const reservedSpeciesCount = eventSpeciesId !== undefined && !eventEntries ? 1 : 0
+  const regularSpeciesLimit = Math.max(
+    0,
+    FIELD_OBSERVATION_COUNT_SPECIES_LIMIT - reservedSpeciesCount,
+  )
+
+  while (selected.length < regularSpeciesLimit + (eventEntries ? 1 : 0)) {
+    const candidates = Array.from(entriesBySpecies.values()).map((entries) => ({
+      entry: entries.reduce((best, current) =>
+        current.weight > best.weight ? current : best,
+      ),
+      weight: entries.reduce((total, entry) => total + entry.weight, 0),
+    }))
+    if (candidates.length === 0) break
+
+    const selectedCandidate = pickWeighted(
+      candidates.map(({ entry, weight }) => ({ ...entry, weight })),
+      random,
+    )
+    selected.push(selectedCandidate)
+    entriesBySpecies.delete(selectedCandidate.speciesId)
+  }
+
+  return selected
 }
 
 function buildAvailablePokemon(

@@ -271,9 +271,28 @@ describe('Kanto Gym Leader Chronicles gold-tier anthology', () => {
       ),
     ).toEqual([
       [30, 28],
-      [32, 32],
+      [30, 30],
       [33, 34, 35],
     ])
+    const tunnelBattle = kogaBattles.find(
+      (entry) => entry.id === 'chronicle-v2-koga-tunnel-culprit',
+    )!
+    expect(tunnelBattle.enemyTeam.map((pokemon) => pokemon.aiMoves)).toEqual([
+      ['glare', 'acid', 'poison-sting'],
+      ['sludge', 'acid', 'smog'],
+    ])
+    const koga = KANTO_GYM_CHRONICLES.find((entry) => entry.key === 'koga')!
+    const kogaExpedition = expeditions.find(
+      (entry) => entry.id === koga.expeditionId,
+    )!
+    const tunnelLoadout = (
+      kogaExpedition.chronicle as any
+    ).activityLoadouts['chronicle-v2-koga-tunnel-culprit']
+    expect(tunnelLoadout.battleTeam[0].assignedMoves).toContain('psychic')
+    expect(tunnelLoadout.battleItems).toEqual({
+      'battle-potion': 3,
+      'battle-super-potion': 2,
+    })
     expect(
       allGames.find(
         (entry) => entry.id === 'chronicle-v2-koga-read-the-shadow-marks',
