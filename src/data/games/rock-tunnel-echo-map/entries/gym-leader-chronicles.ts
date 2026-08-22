@@ -25,7 +25,7 @@ export const gymLeaderChronicleEchoMapEntries: RockTunnelEchoMapGameConfig[] = [
   {
     id: 'chronicle-v2-koga-cross-the-unmarked-roofs',
     name: 'Cross the Unmarked Roofs',
-    description: 'Memorise Janine’s unmarked route across the Fuchsia rooftops.',
+    description: 'Trace Janine\'s route from memory. She never wrote it down.',
     category: 'Secret', subCategory: 'Koga Chronicle',
     icon: { type: 'trainer', id: 'chronicle-janine' },
     background: '/backgrounds/chronicle-koga-fuchsia-rooftops.avif',
@@ -36,7 +36,7 @@ export const gymLeaderChronicleEchoMapEntries: RockTunnelEchoMapGameConfig[] = [
   {
     id: 'chronicle-v2-sabrina-enter-the-quiet-room',
     name: 'Enter the Quiet Room',
-    description: 'Hold Sabrina’s mental route long enough to reach the door she controls.',
+    description: 'Find the exit Sabrina mapped before anyone gave her a proper room to work in.',
     category: 'Secret', subCategory: 'Sabrina Chronicle',
     icon: { type: 'trainer', id: 'gym-kanto-sabrina' },
     background: '/backgrounds/chronicle-sabrina-quiet-mindscape.avif',
@@ -47,7 +47,7 @@ export const gymLeaderChronicleEchoMapEntries: RockTunnelEchoMapGameConfig[] = [
   {
     id: 'chronicle-v2-blaine-evacuate-the-lab',
     name: 'Evacuate the Laboratory',
-    description: 'Follow the remembered floor plan through the smoke and account for every occupied room.',
+    description: 'Follow the floor plan from memory and get everyone out before the smoke fills the corridor.',
     category: 'Secret', subCategory: 'Blaine Chronicle',
     icon: { type: 'item', id: 'burn-heal' },
     background: '/backgrounds/chronicle-blaine-cinnabar-lab.avif',

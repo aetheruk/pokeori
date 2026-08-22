@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased: The eight Gym Leader Chronicles receive a second narrative naturalization pass across scene summaries, dialogue, and narration. The revised prose uses more direct spoken language and clearer immediate stakes while preserving the authored scenes, activity IDs, battles, rewards, unlock gates, and progression order.
 - Unreleased: Pics for Benny now loads the user's TCG card rows before resolving its conditional reward, and completed set checks can infer the set from card IDs when legacy rows have no setId, so a complete Jungle set reliably grants the Net Ball instead of falling through to only the PokéDollar reward. Normal catch Calm QTEs again show the required berry in their prompt; Safari's icon-only controls remain unchanged.
 - Unreleased: Field Research count surveys now select at most six different Pokémon species for each round, keeping the tappable counter grid readable while the server validates the same capped species set.
 - Unreleased: Pokemon Tower now uses a new 800x500 hand-painted interior background with an open central floor, memorial architecture, and lavender window light. It contains no visible Pokemon, people, text, or UI, so the same scene remains readable beneath battles, research games, and dialogue.
