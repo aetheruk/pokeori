@@ -1,7 +1,7 @@
 import type { FishingPokemonEntry, RodType } from '@/data/games/fishing/types'
 
-const FEEBAS_REPLACEMENT_CHANCE = 1 / 512
-const RELICANTH_REPLACEMENT_CHANCE = 1 / 1024
+const FEEBAS_REPLACEMENT_CHANCE = 1 / 256
+const RELICANTH_REPLACEMENT_CHANCE = 1 / 512
 
 const RELICANTH = {
   speciesId: 369,
@@ -20,7 +20,7 @@ export function applySecretFishingPokemonReplacement(params: {
 }): FishingPokemonEntry {
   const random = params.random ?? Math.random
 
-  // Relicanth's rarer 1:1024 roll takes priority over Feebas.
+  // Relicanth's rarer 1:512 roll takes priority over Feebas.
   if (random() < RELICANTH_REPLACEMENT_CHANCE) {
     return {
       ...params.entry,
@@ -28,7 +28,7 @@ export function applySecretFishingPokemonReplacement(params: {
     }
   }
 
-  // Feebas can replace any rod hook at 1:512.
+  // Feebas can replace any rod hook at 1:256.
   if (random() < FEEBAS_REPLACEMENT_CHANCE) {
     return {
       ...params.entry,

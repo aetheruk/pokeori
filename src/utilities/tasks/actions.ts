@@ -12,6 +12,7 @@ import {
   type UserTaskData,
 } from '@/utilities/tasks/task-logic'
 import { grantRewards, type Reward, type RewardSummary } from '@/utilities/rewards/reward-logic'
+import { filterEligibleRewards } from '@/utilities/rewards/conditional-rewards'
 import { revalidatePath } from 'next/cache'
 import type { Pokemon, User } from '@/payload-types'
 import { getGameUserData } from '@/utilities/game-data'
@@ -310,7 +311,11 @@ export async function completeTask(
   const expeditionLivesRewards = task.rewards.filter(
     (reward) => reward.type === 'expedition_lives',
   )
-  const rewardsToGrant: Reward[] = task.rewards.flatMap((r) => {
+  const rewardsToGrant: Reward[] = filterEligibleRewards(
+    task.rewards as Reward[],
+    userData as any,
+    { category: task.category, subCategory: task.subCategory },
+  ).flatMap((r) => {
     if (r.type === 'expedition_safari_balls') return []
     if (r.type === 'expedition_lives') return []
     if (r.type === 'active_companion_friendship') return []

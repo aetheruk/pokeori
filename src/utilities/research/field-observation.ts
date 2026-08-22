@@ -12,6 +12,7 @@ import {
 import { getPokemonForm, getPokemonSpecies } from '@/utilities/pokemon/pokedex'
 import { rollPokemonGender, type PokemonGender } from '@/utilities/pokemon/gender'
 import type { Reward } from '@/data/types'
+import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
 
 type NormalizedFieldObservationPoolEntry = Required<
   Omit<FieldObservationPokemonPoolEntry, 'requirements'>
@@ -34,7 +35,13 @@ export type FieldObservationSurveyFocus =
   | 'swarm-survey'
   | 'rare-trace'
 
-export type FieldObservationCollectibleKind = 'material' | 'nut' | 'berry' | 'broken-ball' | 'item'
+export type FieldObservationCollectibleKind =
+  | 'material'
+  | 'nut'
+  | 'berry'
+  | 'broken-ball'
+  | 'item'
+  | 'egg'
 
 export interface FieldObservationSpawn {
   id: string
@@ -81,6 +88,7 @@ export interface FieldObservationPublicCollectibleDrop {
   itemId: string
   label: string
   kind: FieldObservationCollectibleKind
+  rarity?: PokemonRarityId | string | null
   startMs: number
   durationMs: number
   x: number

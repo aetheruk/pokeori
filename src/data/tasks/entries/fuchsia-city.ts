@@ -921,6 +921,84 @@ export const fuchsiaCityTasks: Task[] = [
     },
   },
   {
+    id: 'fuchsia-trade-lickitung',
+    name: 'A Fuchsia Trade',
+    description:
+      'Someone at the gatehouse is looking for a Golduck. I wonder what they have to offer.',
+    category: 'Kanto',
+    subCategory: 'Fuchsia City',
+    icon: {
+      type: 'pokemon',
+      id: '108',
+    },
+    background: '/backgrounds/inside-house.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    chat: true,
+    completeButtonText: 'Make the Trade',
+    requirements: [
+      {
+        type: 'task_completed',
+        targetId: 'explore-fuchsia-city',
+      },
+    ],
+    criteria: [
+      {
+        type: 'pokemon_owned',
+        pokemonCriteria: {
+          speciesId: 55,
+          formId: '55',
+        },
+        count: 1,
+        consume: true,
+      },
+    ],
+    rewards: [
+      {
+        type: 'pokemon',
+        targetId: 108,
+        pokemonData: {
+          formId: '108',
+          level: 25,
+          ballType: 'poke-ball',
+          obtainedMethod: 'trade',
+          background: '/backgrounds/inside-house.avif',
+        },
+      },
+    ],
+    enterModal: [
+      {
+        id: 1,
+        background: '/backgrounds/inside-house.avif',
+        title: 'Gatehouse Trader',
+        icon: {
+          type: 'trainer',
+          id: 'gentleman',
+        },
+        message:
+          'Excuse me! Is that a Golduck with you? I have been looking for one for ages. I can offer you a Lickitung in return. It is a very good listener, although it does have a habit of licking everything.',
+        buttons: [
+          {
+            text: 'I’ll make the trade',
+            type: 'success',
+          },
+        ],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/inside-house.avif',
+      title: 'Trade Complete',
+      icon: {
+        type: 'pokemon',
+        id: '108',
+      },
+      message:
+        'The trade is done. My Golduck has gone to a new trainer, and I now have a Lickitung of my own. It immediately licked the gatehouse sign.',
+      closeButtonText: 'Welcome, Lickitung',
+    },
+  },
+  {
     id: 'route-15-nature-module-intro',
     name: "Fern's Big Ditto Theory",
     description:

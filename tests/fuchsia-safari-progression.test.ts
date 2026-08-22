@@ -74,6 +74,29 @@ describe('Fuchsia Gym and Safari progression', () => {
     ).toContainEqual(emptyGymRequirement)
   })
 
+  test('Fuchsia includes the FRLG gatehouse Golduck-for-Lickitung trade', () => {
+    const trade = tasks.find((task) => task.id === 'fuchsia-trade-lickitung')!
+
+    expect(trade.requirements).toContainEqual({
+      type: 'task_completed',
+      targetId: 'explore-fuchsia-city',
+    })
+    expect(trade.criteria).toContainEqual(
+      expect.objectContaining({
+        type: 'pokemon_owned',
+        consume: true,
+        pokemonCriteria: { speciesId: 55, formId: '55' },
+      }),
+    )
+    expect(trade.rewards).toContainEqual(
+      expect.objectContaining({
+        type: 'pokemon',
+        targetId: 108,
+        pokemonData: expect.objectContaining({ level: 25, obtainedMethod: 'trade' }),
+      }),
+    )
+  })
+
   test('Safari admission paces the Ranger, detective, credentials, exam, and fee', () => {
     const taskChain = [
       ['safari-zone-entry-denied', 'fuchsia-gym-search-for-koga'],

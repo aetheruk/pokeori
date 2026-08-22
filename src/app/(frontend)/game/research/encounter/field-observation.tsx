@@ -22,6 +22,7 @@ import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
 import { ItemSprite } from '@/components/ui/item-sprite'
+import { PokemonRarityEggSprite } from '@/components/game/shared/PokemonRarityEggSprite'
 import { useAudio } from '@/context/AudioContext'
 import { cn } from '@/lib/utils'
 import { useUser } from '@/context/UserContext'
@@ -845,14 +846,24 @@ function FieldDropButton({
       }}
     >
       <span className="absolute inset-1 rounded-full border border-amber-200/35 animate-ping" />
-      <ItemSprite
-        itemId={drop.itemId}
-        alt={drop.label}
-        width={40}
-        height={40}
-        className="relative z-10 object-contain drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)]"
-        priority
-      />
+      {drop.kind === 'egg' ? (
+        <PokemonRarityEggSprite
+          rarity={drop.rarity}
+          alt={drop.label}
+          className="relative z-10 h-10 w-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)]"
+          imageClassName="h-full w-full"
+          sizes="40px"
+        />
+      ) : (
+        <ItemSprite
+          itemId={drop.itemId}
+          alt={drop.label}
+          width={40}
+          height={40}
+          className="relative z-10 object-contain drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)]"
+          priority
+        />
+      )}
     </button>
   )
 }

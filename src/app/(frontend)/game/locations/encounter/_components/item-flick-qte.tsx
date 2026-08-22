@@ -23,6 +23,7 @@ interface ItemFlickQteProps {
   compact?: boolean
   centerContent?: React.ReactNode
   repeatable?: boolean
+  showInfinity?: boolean
 }
 
 export function ItemFlickQte({
@@ -34,6 +35,7 @@ export function ItemFlickQte({
   compact = false,
   centerContent,
   repeatable = false,
+  showInfinity = false,
 }: ItemFlickQteProps) {
   const [drag, setDrag] = useState<{
     itemId: string
@@ -211,7 +213,7 @@ export function ItemFlickQte({
                       )}
                     </>
                   )}
-                  {compact && (
+                  {compact && showInfinity && (
                     <span
                       aria-hidden="true"
                       className="absolute -bottom-2 left-1/2 inline-flex h-6 min-w-6 -translate-x-1/2 items-center justify-center rounded-full border border-game-border bg-game-surface-raised px-1.5 text-sm font-black leading-none text-game-muted shadow-sm"
