@@ -11,7 +11,7 @@ export const mtMoonTasks: Task[] = [
       type: 'local',
       id: '/sprites/center.avif',
     },
-    background: '/backgrounds/center.avif',
+    background: '/backgrounds/pokemon-center.avif',
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
@@ -33,7 +33,7 @@ export const mtMoonTasks: Task[] = [
         title: 'Mt Moon Pokemon Center',
         message:
           'The lobby is busier than expected. Hikers are buying Escape Ropes, a few trainers are whispering about fossils, and two people in black uniforms go quiet as soon as Nurse Joy looks their way.',
-        background: '/backgrounds/center.avif',
+        background: '/backgrounds/pokemon-center.avif',
         icon: {
           type: 'local',
           id: '/sprites/center.avif',
@@ -51,7 +51,7 @@ export const mtMoonTasks: Task[] = [
         title: 'Nurse Joy',
         message:
           'Please be careful in Mt. Moon. Researcher Miguel from Pewter Museum went inside to record the fossil beds, but he has not checked back in. Those suspicious trainers have been asking about dig sites all morning.',
-        background: '/backgrounds/center.avif',
+        background: '/backgrounds/pokemon-center.avif',
         icon: {
           type: 'trainer',
           id: 'nurse',
@@ -69,7 +69,7 @@ export const mtMoonTasks: Task[] = [
         title: 'Nurse Joy',
         message:
           'I cannot prove anything, but they were selling scratch cards, bragging about rare Pokemon, and buying supplies with dirty coins. If Miguel found something important, he may need help.',
-        background: '/backgrounds/center.avif',
+        background: '/backgrounds/pokemon-center.avif',
         icon: {
           type: 'trainer',
           id: 'nurse',
@@ -83,7 +83,7 @@ export const mtMoonTasks: Task[] = [
       },
     ],
     exitModal: {
-      background: '/backgrounds/center.avif',
+      background: '/backgrounds/pokemon-center.avif',
       title: 'Mt Moon Pokemon Center',
       icon: {
         type: 'local',
@@ -105,7 +105,7 @@ export const mtMoonTasks: Task[] = [
       type: 'trainer',
       id: 'rocket-grunt-m',
     },
-    background: '/backgrounds/center.avif',
+    background: '/backgrounds/pokemon-center.avif',
     repeatable: false,
     completionTrigger: 'manual',
     requirements: [
@@ -130,7 +130,7 @@ export const mtMoonTasks: Task[] = [
           level: 5,
           formId: '129',
           ballType: 'rocket-ball',
-          background: '/backgrounds/center.avif',
+          background: '/backgrounds/pokemon-center.avif',
           isShadow: true,
         },
         dropChance: 100,
@@ -139,7 +139,7 @@ export const mtMoonTasks: Task[] = [
     ],
     completeButtonText: 'Buy Pokemon',
     exitModal: {
-      background: '/backgrounds/center.avif',
+      background: '/backgrounds/pokemon-center.avif',
       title: 'Mysterious Gentleman',
       icon: {
         type: 'pokemon',
