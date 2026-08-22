@@ -4,7 +4,7 @@ export const gymLeaderChronicleSilhouetteEntries: SilhouetteConfig[] = [
   {
     id: 'chronicle-v2-koga-read-the-shadow-marks',
     name: 'Read the Shadow Marks',
-    description: 'Identify the Pokémon represented in Koga’s succession exercises.',
+    description: 'Identify the Pokemon in Ren\'s training exercises, the ones Koga can name without thinking.',
     category: 'Secret',
     subCategory: 'Koga Chronicle',
     icon: { type: 'trainer', id: 'gym-kanto-koga' },

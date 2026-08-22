@@ -14,13 +14,13 @@ const child = character('Niko', trainer('youngster'))
 export const surgeChronicleStory: KantoGymChronicleStory = {
   sequence: [
     scene('backstory', 'storm-transport', 'The Last Transport', 'Lightning knocks out every instrument on the transport, and Surge has to keep the medical deck powered.', transport, [
-      narration('Years before Vermilion knew him as a Gym Leader, Surge worked aboard a storm transport that carried field medics and wounded Pokémon. Lightning turned the sea white. Then every instrument on the bridge failed at once.'),
+      narration('Years before Vermilion knew him as a Gym Leader, Surge worked aboard a storm transport that carried field medics and wounded Pokemon. Lightning turned the sea white. Then every instrument on the bridge failed at once.'),
       speech(mako, 'Main power is gone. I am trying to isolate the backup cells, but they are flooding faster than I can keep up.'),
       speech(surge, 'Then stop trying to save the whole board. Give me one live route to the medical deck and kill everything else.'),
       speech(mako, 'That means we lose navigation.'),
       speech(surge, 'For ninety seconds. The people below do not have ninety seconds to spare.'),
     ]),
-    scene('backstory', 'voices-below-deck', 'Commands in the Dark', 'Surge’s authority keeps the transport moving but leaves no room for fear.', transport, [
+    scene('backstory', 'voices-below-deck', 'Commands in the Dark', 'Surge\'s authority keeps the transport moving but leaves no room for fear.', transport, [
       narration('Smoke filled the corridor and everyone talked at once. Surge learned to sort the voices by urgency: an engineer quoting voltage, a medic asking for light, and a wounded soldier just asking if anyone could hear him.'),
       speech(nurse, 'The incubator battery is failing. I need steady current, and I need it now.'),
       speech(surge, 'You will have it. Mako, east conduit. Everyone else, hold where you are and count off.'),
@@ -46,11 +46,11 @@ export const surgeChronicleStory: KantoGymChronicleStory = {
     scene('development', 'gym-and-shelter', 'Two Uses for One Building', 'Surge turns the old Gym into both a challenge hall and a storm shelter.', shelter, [
       narration('The old Gym had thick walls, its own generator, and enough open floor for cots. Surge drew a battle circuit on one side and marked emergency lanes on the other.'),
       speech(surge, 'Clear weather, trainers learn to handle Electric types. When a storm warning goes out, we fold the barriers back and this floor becomes a shelter.'),
-      speech(nurse, 'People will come in with babies, medication, frightened Pokémon, and no interest in military lines.'),
+      speech(nurse, 'People will come in with babies, medication, frightened Pokemon, and no interest in military lines.'),
       speech(surge, 'Lines keep the exits clear.'),
       speech(mako, 'Panicking people ignore lines on a floor, Surge. They need to know where they are going.'),
     ]),
-    scene('development', 'makos-drill', 'The Drill as Written', 'Mako tests whether Surge’s plan survives disagreement.', shelter, [
+    scene('development', 'makos-drill', 'The Drill as Written', 'Mako tests whether Surge\'s plan survives disagreement.', shelter, [
       speech(mako, 'Scenario. East door is jammed, generator at sixty percent, thirty civilians in the yellow lane.'),
       speech(surge, 'Move them west. Voltorb holds the auxiliary relay while Raichu gets the door back.'),
       speech(mako, 'The west lane has the medical station.'),
@@ -75,18 +75,18 @@ export const surgeChronicleStory: KantoGymChronicleStory = {
     game('development', 'restore-the-east-grid'),
 
     scene('conflict', 'blackout', 'After the Thunder', 'The repaired circuit fails elsewhere and Vermilion goes dark.', streets, [
-      narration('The east grid came back for eleven minutes. Then a transformer blew past the repaired section. The darkness rolled block by block toward the harbour, with alarms and Pokémon cries following it.'),
+      narration('The east grid came back for eleven minutes. Then a transformer blew past the repaired section. The darkness rolled block by block toward the harbour, with alarms and Pokemon cries following it.'),
       speech(surge, 'Shelter team, blackout protocol. Yellow lane to the west wall. Nobody stops in the entrance.'),
       speech(child, 'My Pikachu ran toward the substation! It hates thunder, and it thinks the wires are calling it!'),
       speech(surge, 'You stay here. I will send someone.'),
       speech(child, 'Who? Everyone you send already has a job.'),
     ]),
     game('conflict', 'voices-in-the-dark'),
-    scene('conflict', 'mako-refuses-an-order', 'Not This Time', 'Mako refuses to repeat the transport’s most dangerous lesson.', shelter, [
+    scene('conflict', 'mako-refuses-an-order', 'Not This Time', 'Mako refuses to repeat the transport\'s most dangerous lesson.', shelter, [
       speech(surge, 'Mako, cross the maintenance trench and isolate the live bank. Raichu and I will cover you.'),
       speech(mako, 'No.'),
       speech(surge, 'That bank can catch fire.'),
-      speech(mako, 'Then ask me what I can see before you order it. The trench is flooded. Raichu’s cover would turn it into the conduit all over again.'),
+      speech(mako, 'Then ask me what I can see before you order it. The trench is flooded. Raichu\'s cover would turn it into the conduit all over again.'),
       speech(surge, 'On the transport, hesitation cost lives.'),
       speech(mako, 'And following orders cost burns. Both of those things are true.'),
     ]),
@@ -113,8 +113,8 @@ export const surgeChronicleStory: KantoGymChronicleStory = {
       speech(mako, 'Magneton is stable. The flooded bank stayed isolated. Nobody crossed the trench.'),
       speech(surge, 'I nearly sent you across it.'),
       speech(mako, 'You did send me. I said no, and you listened before it came to that.'),
-      speech(surge, 'That is a pretty small improvement.'),
-      speech(mako, 'It is a start. At least nobody got burned today.'),
+      speech(surge, 'Not much of an improvement.'),
+      speech(mako, 'Nobody got burned today. That is something.'),
     ]),
 
     scene('contemplation', 'the-commendation', 'The Sentence in the Report', 'Surge finally reads the transport report beyond its successful outcome.', shelter, [
@@ -122,10 +122,10 @@ export const surgeChronicleStory: KantoGymChronicleStory = {
       speech(surge, 'I remembered the power staying on. I did not let myself remember you dropping that wrench because your hand was burned.'),
       speech(mako, 'I remembered both. That is why I came to Vermilion. I thought maybe we could build what we needed back then.'),
       speech(surge, 'A better generator?'),
-      speech(mako, 'A room where saying no is part of the procedure.'),
+      speech(mako, 'Something where saying no was part of how we worked.'),
     ]),
     scene('contemplation', 'nikos-question', 'Why Is the Gym a Shelter?', 'A child asks for an explanation no regulation required.', shelter, [
-      speech(child, 'If this is a Pokémon Gym, why are there cots behind the battle wall?'),
+      speech(child, 'If this is a Pokemon Gym, why are there cots behind the battle wall?'),
       speech(surge, 'Because when a hurricane hits, people need a roof, not a battle arena.'),
       speech(child, 'Then why make challengers practise switches and warning calls?'),
       speech(surge, 'Because out in a real storm, quick reflexes and clear calls keep you alive.'),
@@ -155,7 +155,7 @@ export const surgeChronicleStory: KantoGymChronicleStory = {
       speech(steward, 'I am learning the dialect.'),
       speech(nurse, 'Then your first official duty is helping put thirty cots back in storage without shouting at the volunteers.'),
     ]),
-    scene('resolution', 'first-challenger', 'A Battle With a Stop Word', 'Vermilion’s first challenger is taught how to interrupt the Leader.', shelter, [
+    scene('resolution', 'first-challenger', 'A Battle With a Stop Word', 'Vermilion\'s first challenger is taught how to interrupt the Leader.', shelter, [
       speech(surge, 'Before we start, either of us can call hold. Say the word back so I know you heard it.'),
       speech(child, 'Hold.'),
       speech(surge, 'Louder.'),
