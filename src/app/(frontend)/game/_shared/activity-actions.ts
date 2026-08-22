@@ -76,7 +76,7 @@ import {
   getFieldObservationResearchXpAmount,
   shouldAwardFieldObservationResearchXp,
 } from '@/utilities/research/research-levels'
-import { maybeCreateFieldObservationEgg } from '@/utilities/day-care/eggs'
+import { maybeBuildFieldObservationEggReward } from '@/utilities/day-care/eggs'
 import { getRequiredResearchWins } from '@/utilities/research/required-wins'
 import { validateProcedureOrder } from '@/utilities/research/procedure-order'
 import type { FieldObservationSettings } from '@/data/games/field-observation'
@@ -1159,6 +1159,11 @@ export async function startGameActivity(
             quantity: reward.quantity,
           }))
         const researchingLevel = (user.skills as any)?.researching?.level || 1
+        const fieldObservationEggReward = await maybeBuildFieldObservationEggReward(
+          payload as any,
+          user,
+          validatedEncounterId,
+        )
         const collectibleDrops = buildFieldObservationCollectibleDrops({
           rewardSubjects: generated.privateRoundData.rewardSubjects,
           spawns: generated.publicRoundData.spawns,
@@ -1171,6 +1176,20 @@ export async function startGameActivity(
             ...authoredItemDrops,
             ...abilityExtraDrops,
           ],
+          additionalRewards: fieldObservationEggReward
+            ? [
+                {
+                  reward: fieldObservationEggReward,
+                  kind: 'egg',
+                  displayItemId: 'egg',
+                  displayLabel:
+                    fieldObservationEggReward.eggData?.rarity === 'shiny'
+                      ? 'Shiny Pokémon Egg'
+                      : 'Pokémon Egg',
+                  displayRarity: fieldObservationEggReward.eggData?.rarity,
+                },
+              ]
+            : [],
           collectibleModifiers:
             getFieldObservationCollectibleModifiers(surveyFocusContext),
         })
@@ -2564,17 +2583,6 @@ export async function completeGameActivity(
             requirementContext: rewardRequirementContext,
             idempotencyKey: resultKey,
           })
-          const egg = await maybeCreateFieldObservationEgg(
-            payload as any,
-            user,
-            validatedEncounterId,
-          )
-          if (egg) {
-            summary.eggs = [
-              ...(summary.eggs || []),
-              { id: egg.id, hatchAt: egg.hatchAt, rarity: egg.rarity },
-            ]
-          }
           rewardSummary = summary
         } else if (
           (encounter.rewards && encounter.rewards.length > 0) ||

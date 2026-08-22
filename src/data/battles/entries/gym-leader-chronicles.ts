@@ -103,17 +103,17 @@ const definitions: Record<KantoGymChronicleKey, ChronicleBattleDefinition[]> = {
     {
       id: 'decoy-thief', name: 'The Perfect Decoy', description: 'Test Jiro’s rehearsed confession instead of accepting the convenient ending.',
       trainerClassId: 'super-nerd', trainerName: 'Jiro', icon: { type: 'trainer', id: 'super-nerd' }, background: '/backgrounds/chronicle-koga-fuchsia-rooftops.avif', maxPokemon: 3, aiProfile: 'advanced',
-      enemyTeam: [{ speciesId: 88, formId: '88', level: 33, aiMoves: ['sludge', 'acid-armor', 'disable'] }, { speciesId: 42, formId: '42', level: 30, aiMoves: ['wing-attack', 'confuse-ray', 'bite'] }],
+      enemyTeam: [{ speciesId: 88, formId: '88', level: 30, aiMoves: ['sludge', 'acid-armor', 'disable'] }, { speciesId: 42, formId: '42', level: 28, aiMoves: ['wing-attack', 'confuse-ray', 'bite'] }],
     },
     {
       id: 'tunnel-culprit', name: 'The Toxin Evacuation', description: 'Clear the exposed courtyard by trusting Janine’s unmarked route.',
       trainerClassId: 'chronicle-janine', trainerName: 'Janine', icon: { type: 'trainer', id: 'chronicle-janine' }, background: '/backgrounds/chronicle-koga-training-courtyard.avif', maxPokemon: 3, aiProfile: 'advanced',
-      enemyTeam: [{ speciesId: 24, formId: '24', level: 35, aiMoves: ['glare', 'acid', 'bite'] }, { speciesId: 110, formId: '110', level: 35, aiMoves: ['sludge', 'smokescreen', 'smog'] }],
+      enemyTeam: [{ speciesId: 24, formId: '24', level: 32, aiMoves: ['glare', 'acid', 'bite'] }, { speciesId: 110, formId: '110', level: 32, aiMoves: ['sludge', 'smokescreen', 'smog'] }],
     },
     {
       id: 'ren-succession', name: "Ren's Succession Match", description: 'Face the inherited method after its author changes every expected opening.',
       trainerClassId: 'chronicle-ren', trainerName: 'Master Ren', icon: { type: 'trainer', id: 'chronicle-ren' }, background: '/backgrounds/chronicle-koga-training-courtyard.avif', maxPokemon: 4, aiProfile: 'boss',
-      enemyTeam: [{ speciesId: 49, formId: '49', level: 36, aiMoves: ['psybeam', 'stun-spore', 'supersonic'] }, { speciesId: 89, formId: '89', level: 37, aiMoves: ['sludge', 'acid-armor', 'disable'] }, { speciesId: 110, formId: '110', level: 38, aiMoves: ['sludge', 'smokescreen', 'smog'] }],
+      enemyTeam: [{ speciesId: 49, formId: '49', level: 33, aiMoves: ['psybeam', 'stun-spore', 'supersonic'] }, { speciesId: 89, formId: '89', level: 34, aiMoves: ['sludge', 'acid-armor', 'disable'] }, { speciesId: 110, formId: '110', level: 35, aiMoves: ['sludge', 'smokescreen', 'smog'] }],
     },
   ],
   sabrina: [
@@ -160,7 +160,7 @@ const definitions: Record<KantoGymChronicleKey, ChronicleBattleDefinition[]> = {
 }
 
 const telegraphChance: Record<KantoGymChronicleKey, number> = {
-  brock: 70, misty: 60, surge: 55, erika: 50, koga: 40, sabrina: 35, blaine: 25, giovanni: 20,
+  brock: 70, misty: 60, surge: 55, erika: 50, koga: 30, sabrina: 35, blaine: 25, giovanni: 20,
 }
 
 export const gymLeaderChronicleBattles: BattleConfig[] = KANTO_GYM_CHRONICLES.flatMap(

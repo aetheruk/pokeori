@@ -68,7 +68,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 
 ## Fishing
 - Every fishing cast rolls Pokemon at 80% and items at 20%.
-- After a Pokemon result is rolled, Old Rod hooks have a hidden 1:512 chance to replace that Pokemon with Relicanth and Good Rod hooks have a hidden 1:512 chance to replace that Pokemon with Feebas. These secret replacements are runtime-only and do not appear in Explore fishing previews.
+- After a Pokemon result is rolled, any rod hook has a hidden 1:256 chance to replace that Pokemon with Feebas and a separate hidden 1:512 chance to replace it with Relicanth, with Relicanth taking priority when both rolls hit. These secret replacements are runtime-only and do not appear in Explore fishing previews.
 - Fishing item hooks grant the item immediately and return the player to the fishing screen. Pokemon hooks still start the catch encounter.
 - Day/night Pokemon filters use the fishing entry's authored category timezone, matching Explore region time.
 - Fishing sessions inherit the Mini Game entry's weather snapshot; Pokemon hooks pass that weather into the reused location-style catch state.

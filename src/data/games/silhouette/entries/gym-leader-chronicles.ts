@@ -16,7 +16,7 @@ export const gymLeaderChronicleSilhouetteEntries: SilhouetteConfig[] = [
       pokemonPool: [23, 24, 48, 49, 88, 109],
       optionsPool: [],
       timeLimit: 45,
-      winRate: 8,
+      winRate: 6,
     },
   },
   {

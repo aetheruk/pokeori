@@ -20,7 +20,7 @@ describe('secret fishing Pokemon replacements', () => {
         applySecretFishingPokemonReplacement({
           rodType,
           entry: baseEntry,
-          random: () => 0,
+          random: () => 1 / 1024,
         }),
       ).toEqual({
         ...baseEntry,
@@ -37,7 +37,7 @@ describe('secret fishing Pokemon replacements', () => {
         applySecretFishingPokemonReplacement({
           rodType,
           entry: baseEntry,
-          random: () => (calls++ === 0 ? 1 / 1024 : 0),
+          random: () => (calls++ === 0 ? 1 / 512 : 1 / 512),
         }),
       ).toEqual({
         ...baseEntry,
@@ -69,7 +69,7 @@ describe('secret fishing Pokemon replacements', () => {
         applySecretFishingPokemonReplacement({
           rodType,
           entry: baseEntry,
-          random: () => 1 / 512,
+          random: () => 1 / 256,
         }),
       ).toBe(baseEntry)
 

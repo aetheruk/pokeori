@@ -1913,6 +1913,7 @@ export default function EncounterPage() {
                 />
                 <ItemFlickQte
                   compact
+                  showInfinity
                   centerContent={
                     <SafariBallControl
                       ball={balls[0]}

@@ -232,7 +232,7 @@ describe('Kanto Gym Leader Chronicles gold-tier anthology', () => {
       misty: 60,
       surge: 55,
       erika: 50,
-      koga: 40,
+      koga: 30,
       sabrina: 35,
       blaine: 25,
       giovanni: 20,
@@ -255,6 +255,30 @@ describe('Kanto Gym Leader Chronicles gold-tier anthology', () => {
         (entry) => entry.id === 'chronicle-v2-erika-exhibition-rival',
       )?.trainerName,
     ).toBe('Celia')
+  })
+
+  test('Koga Chronicle battles use the reduced pressure tuning', () => {
+    const kogaBattles = battles.filter((entry) =>
+      entry.id.startsWith('chronicle-v2-koga-'),
+    )
+
+    expect(kogaBattles.map((entry) => entry.enemyAttackTelegraphChance)).toEqual(
+      [30, 30, 30],
+    )
+    expect(
+      kogaBattles.map((entry) =>
+        entry.enemyTeam.map((pokemon) => pokemon.level),
+      ),
+    ).toEqual([
+      [30, 28],
+      [32, 32],
+      [33, 34, 35],
+    ])
+    expect(
+      allGames.find(
+        (entry) => entry.id === 'chronicle-v2-koga-read-the-shadow-marks',
+      )?.settings,
+    ).toMatchObject({ winRate: 6 })
   })
 
   test('the Rainbow Assessment has answers to its counter matchups', () => {

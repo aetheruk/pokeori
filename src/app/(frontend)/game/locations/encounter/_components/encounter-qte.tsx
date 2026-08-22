@@ -179,8 +179,8 @@ export function EncounterQte({
   if (qte.type === 'calm') {
     return (
       <ItemFlickQte
-        title={`Calm with ${getItemName(qte.correctBerryId || '')}`}
-        instruction="Flick a Berry upward towards the Pokémon."
+        compact
+        showInfinity={false}
         options={(qte.berryOptions || []).map((berryId) => ({
           id: berryId,
           label: getItemName(berryId),

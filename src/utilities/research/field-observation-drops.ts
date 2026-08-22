@@ -32,6 +32,7 @@ type CollectibleReward = {
   kind: FieldObservationCollectibleKind
   displayItemId?: string
   displayLabel?: string
+  displayRarity?: string | null
 }
 
 export interface FieldObservationCollectibleModifier {
@@ -47,6 +48,7 @@ export function buildFieldObservationCollectibleDrops({
   surveyFocus,
   observationDurationMs,
   globalItemEvents = [],
+  additionalRewards = [],
   collectibleModifiers = [],
   random = Math.random,
 }: {
@@ -56,11 +58,14 @@ export function buildFieldObservationCollectibleDrops({
   surveyFocus: FieldObservationSurveyFocus
   observationDurationMs: number
   globalItemEvents?: FieldObservationGlobalItemEvent[]
+  additionalRewards?: CollectibleReward[]
   collectibleModifiers?: FieldObservationCollectibleModifier[]
   random?: RandomFn
 }): FieldObservationPrivateCollectibleDrop[] {
   if (
-    (rewardSubjects.length === 0 && globalItemEvents.length === 0) ||
+    (rewardSubjects.length === 0 &&
+      globalItemEvents.length === 0 &&
+      additionalRewards.length === 0) ||
     observationDurationMs <= 0
   )
     return []
@@ -171,10 +176,12 @@ export function buildFieldObservationCollectibleDrops({
       displayItemId: event.itemId,
       displayLabel: event.label,
     })),
+    ...additionalRewards,
   ].filter(
     ({ reward }) =>
-      (reward.type === 'item' || reward.type === 'currency') &&
-      typeof reward.targetId === 'string',
+      reward.type === 'egg' ||
+      ((reward.type === 'item' || reward.type === 'currency') &&
+        typeof reward.targetId === 'string'),
   )
 
   const maxDrops = surveyFocus === 'swarm-survey' ? 8 : 6
@@ -191,12 +198,13 @@ export function buildFieldObservationCollectibleDrops({
   const durationMultiplier = getDurationMultiplier(collectibleModifiers)
 
   return selectedRewards.map(
-    ({ reward, kind, displayItemId, displayLabel }, index) =>
+    ({ reward, kind, displayItemId, displayLabel, displayRarity }, index) =>
     scheduleCollectibleDrop({
       reward: { ...applyQuantityBonus(reward, collectibleModifiers), dropChance: 100 },
       kind,
       displayItemId,
       displayLabel,
+      displayRarity,
       index,
       spawns,
       observationDurationMs,
@@ -214,6 +222,7 @@ export function toPublicFieldObservationCollectibleDrop(
     itemId: drop.itemId,
     label: drop.label,
     kind: drop.kind,
+    rarity: drop.rarity,
     startMs: drop.startMs,
     durationMs: drop.durationMs,
     x: drop.x,
@@ -280,6 +289,7 @@ function scheduleCollectibleDrop({
   kind,
   displayItemId,
   displayLabel,
+  displayRarity,
   index,
   spawns,
   observationDurationMs,
@@ -290,6 +300,7 @@ function scheduleCollectibleDrop({
   kind: FieldObservationCollectibleKind
   displayItemId?: string
   displayLabel?: string
+  displayRarity?: string | null
   index: number
   spawns: FieldObservationSpawn[]
   observationDurationMs: number
@@ -316,6 +327,7 @@ function scheduleCollectibleDrop({
     itemId,
     label: displayLabel || getItemName(itemId),
     kind,
+    rarity: displayRarity,
     startMs,
     durationMs,
     x: sourceSpawn

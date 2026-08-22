@@ -1,6 +1,7 @@
 import type { Payload, PayloadRequest } from 'payload'
 import pokemonData, { type PokemonData } from '@/data/pokemon-data'
 import { allGames } from '@/data/games'
+import type { Reward } from '@/data/types'
 import { getPokemonForm, getSpeciesIdForForm } from '@/utilities/pokemon/pokedex'
 import {
   isPokemonRarityId,
@@ -160,22 +161,55 @@ export async function createUserEgg(
 }
 
 export async function maybeCreateFieldObservationEgg(payload: Payload, user: any, researchId: string) {
+  const reward = await maybeBuildFieldObservationEggReward(payload, user, researchId)
+  if (!reward) return null
+  return createUserEgg(payload, user.id, reward.eggData)
+}
+
+/**
+ * Rolls the field-research egg as a collectible reward. The egg is only
+ * created when the player collects the resulting bubble and completes the
+ * research round, so an uncollected bubble never becomes an end-of-round gift.
+ */
+export async function maybeBuildFieldObservationEggReward(
+  payload: Payload,
+  user: any,
+  researchId: string,
+): Promise<Reward | null> {
   if (!(await canUseDayCareEggs(payload, user))) return null
   const eggCount = await getActiveEggCount(payload, user.id)
-  if (eggCount >= DAY_CARE_EGG_MAX_OWNED || Math.floor(Math.random() * FIELD_OBSERVATION_EGG_DENOMINATOR) !== 0) return null
-  const pokemonCount = (await payload.count({ collection: 'pokemon', where: { user: { equals: user.id } } })).totalDocs
+  if (
+    eggCount >= DAY_CARE_EGG_MAX_OWNED ||
+    Math.floor(Math.random() * FIELD_OBSERVATION_EGG_DENOMINATOR) !== 0
+  ) {
+    return null
+  }
+  const pokemonCount = (
+    await payload.count({
+      collection: 'pokemon',
+      where: { user: { equals: user.id } },
+    })
+  ).totalDocs
   if (pokemonCount + eggCount >= (user.maxPokemon || 50)) return null
+
   const research = allGames.find((game) => game.id === researchId)
-  return createUserEgg(payload, user.id, {
-    sourceResearchId: researchId,
-    sourceBackground: research?.background,
-    sourceRegion: research?.category,
-    sourceLocation: research?.subCategory || research?.name,
-    rarity:
-      Math.floor(Math.random() * FIELD_OBSERVATION_EGG_SHINY_DENOMINATOR) === 0
-        ? 'shiny'
-        : 'normal',
-  })
+  const rarity =
+    Math.floor(Math.random() * FIELD_OBSERVATION_EGG_SHINY_DENOMINATOR) === 0
+      ? 'shiny'
+      : 'normal'
+  return {
+    type: 'egg',
+    quantity: 1,
+    dropChance: 100,
+    guaranteed: true,
+    eggData: {
+      sourceResearchId: researchId,
+      sourceBackground: research?.background,
+      sourceRegion: research?.category,
+      sourceLocation: research?.subCategory || research?.name,
+      rarity,
+    },
+  }
 }
 
 export async function getEggHatchOutcome(

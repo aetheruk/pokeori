@@ -324,6 +324,51 @@ describe('field observation research mode', () => {
     )
   })
 
+  test('field observation can surface an unlocked Pokemon egg as a collectible bubble', () => {
+    const eggReward = {
+      type: 'egg' as const,
+      quantity: 1,
+      dropChance: 100,
+      guaranteed: true,
+      eggData: {
+        rarity: 'shiny' as const,
+        sourceResearchId: 'route-24-field-observation',
+      },
+    }
+    const drops = buildFieldObservationCollectibleDrops({
+      rewardSubjects: [],
+      spawns: [],
+      researchingLevel: 32,
+      surveyFocus: 'standard',
+      observationDurationMs: 20_000,
+      additionalRewards: [
+        {
+          reward: eggReward,
+          kind: 'egg',
+          displayItemId: 'egg',
+          displayLabel: 'Shiny Pokémon Egg',
+          displayRarity: 'shiny',
+        },
+      ],
+      random: () => 0,
+    })
+
+    expect(drops).toContainEqual(
+      expect.objectContaining({
+        itemId: 'egg',
+        kind: 'egg',
+        rarity: 'shiny',
+        label: 'Shiny Pokémon Egg',
+        reward: expect.objectContaining({ type: 'egg' }),
+      }),
+    )
+    expect(toPublicFieldObservationCollectibleDrop(drops[0]!)).toMatchObject({
+      itemId: 'egg',
+      kind: 'egg',
+      rarity: 'shiny',
+    })
+  })
+
   test('Viridian Forest study can bubble Broken Bike only until it is owned or traded', () => {
     const baseData = {
       inventory: [],
