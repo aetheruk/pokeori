@@ -1340,6 +1340,7 @@ const gathererEffects: readonly AbilityEffect[] = [
 ]
 
 const berryGathererEffects: readonly AbilityEffect[] = [
+  ...captureItemEffects(['oran-berry', 'sitrus-berry', 'razz-berry'], 10),
   fieldExtraItemEffect('oran-berry', 8, 'berry'),
   {
     type: 'field-observation-collectible-modifier',
@@ -1414,7 +1415,7 @@ export const ABILITY_SECONDARY_EFFECTS_BY_ID: Record<string, readonly AbilityEff
   // Gatherer and luck abilities add low-chance side rewards.
   pickup: gathererEffects,
   honey_gather: [
-    ...captureItemEffects(['tiny-mushroom'], 10),
+    ...captureItemEffects(['razz-berry', 'oran-berry', 'tiny-mushroom'], 10),
     fieldExtraItemEffect('razz-berry', 8, 'berry'),
     {
       type: 'battle-no-single-battle-effect',
