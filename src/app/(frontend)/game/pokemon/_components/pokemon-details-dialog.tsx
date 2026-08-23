@@ -87,6 +87,7 @@ import {
 import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
 import {
   MAX_RESEARCH_LEVEL,
+  getPokemonResearchLevelTmUnlocks,
   RESEARCH_LEVEL_REWARDS,
   RESEARCH_LEVEL_THRESHOLDS,
 } from '@/utilities/research/research-levels'
@@ -292,10 +293,12 @@ function ResearchSection({
   formId,
   researchXp,
   researchLevel,
+  inventoryMap,
 }: {
   formId: string
   researchXp: number
   researchLevel: number
+  inventoryMap: Record<string, number>
 }) {
   const isMaxLevel = researchLevel >= MAX_RESEARCH_LEVEL
 
@@ -312,6 +315,18 @@ function ResearchSection({
       level: parseInt(levelStr),
       reward,
     }))
+
+  const remainingTmUnlockLevels = Array.from(
+    new Set(
+      getPokemonResearchLevelTmUnlocks(formId)
+        .filter(
+          (unlock) =>
+            researchLevel < unlock.level &&
+            (inventoryMap[unlock.itemId] || 0) <= 0,
+        )
+        .map((unlock) => unlock.level),
+    ),
+  )
 
   return (
     <div className="w-full max-w-md space-y-4 pt-4">
@@ -402,6 +417,25 @@ function ResearchSection({
                     <CarouselNext className="!static !h-9 !w-9 !shrink-0 !translate-y-0 border-game-border bg-game-surface-raised text-game-muted hover:text-game-moss" />
                   </div>
                 </Carousel>
+              </div>
+            </div>
+          )}
+
+          {remainingTmUnlockLevels.length > 0 && (
+            <div className="pt-2">
+              <span className="mb-2 block text-center text-[10px] font-bold uppercase tracking-widest text-game-muted">
+                TM unlocks remaining
+              </span>
+              <div className="flex flex-wrap justify-center gap-2">
+                {remainingTmUnlockLevels.map((level) => (
+                  <Badge
+                    key={`${formId}-tm-${level}`}
+                    variant="secondary"
+                    className="border-game-border bg-game-canvas px-2 py-1 font-mono text-[10px] font-bold text-game-muted"
+                  >
+                    Research Level {level}
+                  </Badge>
+                ))}
               </div>
             </div>
           )}
@@ -584,6 +618,30 @@ export function PokemonDetailsDialog({
         inventory: effectiveInventoryMap,
       }),
     [effectiveInventoryMap, formInfo?.types, pokemon.formId, pokemon.level],
+  )
+  const allMoveInventoryMap = useMemo(
+    () =>
+      Object.fromEntries(
+        items
+          .filter((item) => item.moveId)
+          .map((item) => [item.id, 1]),
+      ),
+    [],
+  )
+  const maxPossibleMoves = useMemo(
+    () =>
+      getAvailableMoveOptions({
+        pokemonTypes: formInfo?.types || [],
+        pokemonFormId: pokemon.formId,
+        pokemonLevel: pokemon.level,
+        inventory: allMoveInventoryMap,
+      }).length,
+    [
+      allMoveInventoryMap,
+      formInfo?.types,
+      pokemon.formId,
+      pokemon.level,
+    ],
   )
   const availablePokemonPowers = useMemo(
     () =>
@@ -1421,20 +1479,28 @@ export function PokemonDetailsDialog({
               </SectionDivider>
               <div className="space-y-4 rounded-2xl border border-game-border bg-game-surface-raised p-4 shadow-sm">
                 <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <div className="text-[10px] font-black uppercase tracking-widest text-game-moss-strong">
-                      {battleMovesUnlockMessage
-                        ? 'Locked'
-                        : `Assigned ${selectedMoveIds.length}/${maxAssignableMoves}`}
-                    </div>
-                    <div className="text-[11px] font-medium text-game-muted">
-                      {battleMovesUnlockMessage
-                        ? 'Battle Moves unavailable'
-                        : maxAssignableMoves > 0
-                          ? `Researcher level allows ${maxAssignableMoves} assigned move${
-                              maxAssignableMoves === 1 ? '' : 's'
-                            }`
-                          : `Researcher Level ${RESEARCHER_MOVE_ASSIGN_LEVEL} required`}
+                  <div className="flex min-w-0 items-start gap-2">
+                    <Badge
+                      variant="secondary"
+                      className="mt-0.5 shrink-0 border-game-border bg-game-canvas px-2 py-1 font-mono text-[10px] font-bold text-game-muted"
+                    >
+                      Moves {assignableMoves.length}/{maxPossibleMoves}
+                    </Badge>
+                    <div>
+                      <div className="text-[10px] font-black uppercase tracking-widest text-game-moss-strong">
+                        {battleMovesUnlockMessage
+                          ? 'Locked'
+                          : `Assigned ${selectedMoveIds.length}/${maxAssignableMoves}`}
+                      </div>
+                      <div className="text-[11px] font-medium text-game-muted">
+                        {battleMovesUnlockMessage
+                          ? 'Battle Moves unavailable'
+                          : maxAssignableMoves > 0
+                            ? `Researcher level allows ${maxAssignableMoves} assigned move${
+                                maxAssignableMoves === 1 ? '' : 's'
+                              }`
+                            : `Researcher Level ${RESEARCHER_MOVE_ASSIGN_LEVEL} required`}
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -1808,6 +1874,7 @@ export function PokemonDetailsDialog({
               formId={pokemon.formId}
               researchXp={pokemonResearchProgress.researchXp}
               researchLevel={pokemonResearchProgress.researchLevel}
+              inventoryMap={effectiveInventoryMap}
             />
           </div>
         </div>
