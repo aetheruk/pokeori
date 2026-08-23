@@ -5,6 +5,11 @@ const permitRequirement = {
   targetId: 'safari-catching-permit',
 }
 
+const strangeSightingsRequirement = {
+  type: 'task_completed' as const,
+  targetId: 'safari-strange-sightings',
+}
+
 function safariArea({
   id,
   name,
@@ -145,6 +150,9 @@ const expeditionSafariLocations: Location[] = [
       { speciesId: 128, formId: '128', chance: 20 },
       { speciesId: 123, formId: '123', chance: 20 },
       { speciesId: 127, formId: '127', chance: 20 },
+      { speciesId: 128, formId: '10250', chance: 20, requirements: [strangeSightingsRequirement] },
+      { speciesId: 128, formId: '10251', chance: 20, requirements: [strangeSightingsRequirement] },
+      { speciesId: 128, formId: '10252', chance: 20, requirements: [strangeSightingsRequirement] },
     ],
   }),
   safariArea({

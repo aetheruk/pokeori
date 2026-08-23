@@ -83,7 +83,7 @@ const safariNoteBubble = {
   id: 'safari-note-bubble',
   itemId: 'researchers-journal-page',
   label: 'Safari Note',
-  dropChance: 20,
+  dropChance: 100,
   reward: {
     type: 'currency' as const,
     targetId: 'safari-notes',
@@ -136,7 +136,7 @@ function safariStudy({
       timeLimit: 12,
       answerTimeLimit: 12,
       difficulty: 2,
-      ...(itemDrops.length > 0 ? { itemDrops } : {}),
+      itemDrops: itemDrops.length > 0 ? itemDrops : [safariNoteBubble],
     },
   }
 }

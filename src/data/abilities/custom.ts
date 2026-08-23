@@ -22,13 +22,23 @@ export const customAbilities: AbilityConfig[] = [
     id: 'lets_go',
     name: "Let's Go",
     description:
-      'While Pikachu is your partner, normal catch encounters have a 1-in-32 chance to be replaced by Eevee.',
+      'While Pikachu is your partner, normal catch encounters have a 1-in-32 chance to be replaced by Eevee and a 1-in-512 chance to be replaced by Mimikyu.',
     type: 'encounter',
     value: 1,
     rate: 3.125,
     forms: ['25'],
     encounters: [{ speciesId: 133, formId: '133', chance: 100 }],
     effects: [
+      {
+        type: 'encounter-replacement',
+        chance: 3.125,
+        encounters: [{ speciesId: 133, formId: '133', chance: 100 }],
+      },
+      {
+        type: 'encounter-replacement',
+        chance: 100 / 512,
+        encounters: [{ speciesId: 778, formId: '778', chance: 100 }],
+      },
       {
         type: 'battle-no-single-battle-effect',
         reason: 'Let’s Go is a companion encounter ability.',

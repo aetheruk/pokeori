@@ -8,6 +8,13 @@ const detectiveIcon = { type: 'trainer' as const, id: 'detective' }
 const billiamIcon = { type: 'trainer' as const, id: 'gamer' }
 const researcherIcon = { type: 'trainer' as const, id: 'researcher-f' }
 
+const safariNoteReward = {
+  type: 'currency' as const,
+  targetId: 'safari-notes',
+  quantity: 1,
+  dropChance: 100,
+}
+
 const retiredSafariExpeditionTaskIds = new Set([
   'safari-expedition-supply-case',
   'safari-central-trampled-grass',
@@ -62,7 +69,9 @@ const safariExpeditionTask = ({
   completeButtonText,
   requirements,
   criteria: [],
-  rewards,
+  rewards: rewards.some((reward) => reward.type === 'pokemon_research_xp')
+    ? [...rewards, safariNoteReward]
+    : rewards,
 })
 
 const hiddenDiscovery = ({
@@ -202,7 +211,7 @@ const safariCreditTasks: Task[] = [
       },
     ],
     rewards: [
-      { type: 'currency', targetId: 'safari-notes', quantity: 15, dropChance: 100 },
+      { type: 'currency', targetId: 'safari-notes', quantity: 10, dropChance: 100 },
     ],
   },
   {
@@ -258,6 +267,12 @@ const safariCreditTasks: Task[] = [
     name: 'Unusual Pokémon Sightings',
     description: 'A permanent record of unusual Pokémon sightings reported from the reserve.',
     icon: { type: 'pokemon', id: '113' },
+  }),
+  safariCreditMarkerTask({
+    id: 'safari-strange-sightings',
+    name: 'Strange Sightings',
+    description: 'A permanent record of three unusual Tauros varieties reported beyond Kanto.',
+    icon: { type: 'pokemon', id: '10250' },
   }),
   safariCreditMarkerTask({
     id: 'safari-rare-item-rumours',
