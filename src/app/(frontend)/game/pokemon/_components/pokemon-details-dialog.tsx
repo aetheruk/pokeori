@@ -51,6 +51,7 @@ import {
 import { Vortex } from '@/components/ui/vortex'
 import { useUser } from '@/context/UserContext'
 import { ABILITIES } from '@/data/abilities'
+import { getLevelEvolutionCatalystForEvolution } from '@/data/evolution-catalysts'
 import { EVOLUTIONS } from '@/data/evolutions'
 import { items } from '@/data/items'
 import { DEED_POLL_ITEM_ID } from '@/data/items/special-item-ids'
@@ -919,7 +920,12 @@ export function PokemonDetailsDialog({
                 else if (conditions.knownMoveId) requiredItemId = 'charged-tm'
                 else if (conditions.heldItem) requiredItemId = conditions.heldItem
                 const hasRequiredItem = requiredItemId ? hasItem(requiredItemId) : true
+                const evolutionCatalyst = getLevelEvolutionCatalystForEvolution(evo)
+                const hasEvolutionCatalyst = evolutionCatalyst
+                  ? hasItem(evolutionCatalyst.id)
+                  : true
                 if (!hasRequiredItem) return false
+                if (!hasEvolutionCatalyst) return false
                 const canEvolveLevel = conditions.minLevel
                   ? (pokemon.level || 1) >= conditions.minLevel
                   : true
@@ -966,6 +972,10 @@ export function PokemonDetailsDialog({
                       else if (conditions.knownMoveId) requiredItemId = 'charged-tm'
                       else if (conditions.heldItem) requiredItemId = conditions.heldItem
                       const hasRequiredItem = requiredItemId ? hasItem(requiredItemId) : true
+                      const evolutionCatalyst = getLevelEvolutionCatalystForEvolution(evo)
+                      const hasEvolutionCatalyst = evolutionCatalyst
+                        ? hasItem(evolutionCatalyst.id)
+                        : true
                       const canEvolveLevel = conditions.minLevel
                         ? (pokemon.level || 1) >= conditions.minLevel
                         : true
@@ -978,10 +988,17 @@ export function PokemonDetailsDialog({
                           )} (${getEvolutionTimeRegionLabel(evolutionTimeRegion)})`
                         : ''
                       const canEvolve =
-                        canEvolveLevel && canEvolveFriendship && hasRequiredItem && timeConditionMet
+                        canEvolveLevel &&
+                        canEvolveFriendship &&
+                        hasRequiredItem &&
+                        hasEvolutionCatalyst &&
+                        timeConditionMet
                       let requirementText = ''
                       if (conditions.minLevel) {
                         requirementText = `Level ${conditions.minLevel}`
+                        if (evolutionCatalyst) {
+                          requirementText += ` + ${evolutionCatalyst.name}`
+                        }
                         if (conditions.timeOfDay) {
                           requirementText += ` (${timeRequirementLabel})`
                         }

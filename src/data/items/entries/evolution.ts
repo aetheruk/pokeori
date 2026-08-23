@@ -1,6 +1,19 @@
 import { Item } from '../types'
+import { LEVEL_EVOLUTION_CATALYSTS } from '@/data/evolution-catalysts'
+
+const levelEvolutionCatalystItems: Item[] = LEVEL_EVOLUTION_CATALYSTS.map(
+  (catalyst, index) => ({
+    id: catalyst.id,
+    name: catalyst.name,
+    description: catalyst.description,
+    category: 'evolution',
+    spriteId: 'silver-powder',
+    hueRotate: index * 40,
+  }),
+)
 
 export const evolutionItems: Item[] = [
+  ...levelEvolutionCatalystItems,
   // Evolution Items
   {
     id: 'thunder-stone',

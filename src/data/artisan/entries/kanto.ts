@@ -1,5 +1,6 @@
 import type { ArtisanRecipe, ArtisanRecipeCategory } from '../types'
 import { candyItems } from '@/data/items/entries/candies'
+import { LEVEL_EVOLUTION_CATALYSTS } from '@/data/evolution-catalysts'
 
 type ArtisanRecipeDraft = Omit<ArtisanRecipe, 'category' | 'craftType' | 'outputQuantity'> & {
   outputQuantity?: ArtisanRecipe['outputQuantity']
@@ -755,6 +756,23 @@ const POKE_POWDER_RECIPES: ArtisanRecipeDraft[] = candyItems.map((candy, index) 
     bulk: 5,
   }
 })
+
+const LEVEL_EVOLUTION_CATALYST_RECIPES: ArtisanRecipeDraft[] =
+  LEVEL_EVOLUTION_CATALYSTS.map((catalyst) => ({
+    id: `craft-${catalyst.id}`,
+    name: catalyst.name,
+    description: `Focus crystals and ${catalyst.powderId.replace('poke-powder-', '').toUpperCase()} PokePowder into a reliable evolution catalyst.`,
+    artisanLevel: catalyst.artisanLevel,
+    costs: [
+      { id: 'crystals', amount: catalyst.crystalCost, type: 'currency' },
+      { id: catalyst.powderId, amount: catalyst.powderCost },
+    ],
+    rewards: [{ type: 'item', targetId: catalyst.id, quantity: 1, dropChance: 100 }],
+    craftType: 'balance',
+    fail: false,
+    outputQuantity: { min: 1, max: 1 },
+    iconItemId: catalyst.id,
+  }))
 
 const ITEM_RECIPES: ArtisanRecipeDraft[] = [
   {
@@ -1657,7 +1675,7 @@ export const kantoArtisanRecipes: ArtisanRecipe[] = [
   ),
   ...withCraftDefaults('lures', LURE_RECIPES),
   ...withCraftDefaults('held', [...HELD_RECIPES, ...ELEMENTAL_STONE_HELD_RECIPES]),
-  ...withCraftDefaults('items', ITEM_RECIPES),
+  ...withCraftDefaults('items', [...LEVEL_EVOLUTION_CATALYST_RECIPES, ...ITEM_RECIPES]),
   ...withCraftDefaults('quests', QUEST_RECIPES),
   ...withCraftDefaults('tcg', TCG_RECIPES),
 ]
