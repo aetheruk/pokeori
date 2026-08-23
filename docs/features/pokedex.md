@@ -28,6 +28,7 @@ Release `0.1.1` includes a one-time rarity backfill in the performance-index mig
 - Search by name/number
 - Research level tracking per species/form, with automatic breakthroughs at 25, 75, 200, 500, and 1000 XP.
 - Research levels unlock species-specific gameplay: level 1 battle moves and held items, level 2 release materials and Battle Observation stance reads, level 3 catch crystals, free escape, and Pokemon Powers, level 4 better IV behavior, raises the hidden ability roll from 5% to 10% when hidden abilities are globally unlocked, plus a 2% survival bond for the player's side only in PvE (both player sides in PvP), and level 5 shiny bonus. Releasing a Pokemon returns its held item before adding any candy, casing, or research-material release rewards.
+- Pure level-based evolutions now also consume an Artisan-crafted Evolution Catalyst: the required catalyst tier is based on the evolution level band (0-20, 21-40, or 41+). Friendship, item, move, location, time, gender, and trade evolutions remain on their existing routes.
 - Maintenance note: if these Pokemon Research rank benefits change, update the Pewter School `pewter-school-pokemon-research-ranks` tutor text and the matching summary docs in the same change.
 - Shiny/shadow status indicators
 - Owned Pokemon evolution always rolls a fresh natural ability for the evolved form, including the normal hidden-ability chance.

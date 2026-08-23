@@ -28,6 +28,7 @@ import {
 import { items } from '@/data/items'
 import { rollResearchXp } from '@/utilities/research/research-levels'
 import { EVOLUTIONS, type EvolutionCondition } from '@/data/evolutions'
+import { getLevelEvolutionCatalystForEvolution } from '@/data/evolution-catalysts'
 import { resolveEvolvedAbility } from '@/data/abilities'
 import { resolveEvolutionTargetForm } from '@/utilities/pokemon/evolution-targets'
 import {
@@ -177,6 +178,11 @@ export async function evolvePokemon(
 
   // Item Check Logic (including simplified mechanics)
   const requiredItem = getRequiredEvolutionItem(conditions)
+  const evolutionCatalyst = getLevelEvolutionCatalystForEvolution(targetEvolution)
+  const userInventory =
+    requiredItem || evolutionCatalyst
+      ? await getUserInventoryMap(payload as any, user.id, { req })
+      : null
 
   if (requiredItem) {
     // If specific item triggers it (for multi-path evolutions like Eevee items), verify match
@@ -193,8 +199,7 @@ export async function evolvePokemon(
     }
 
     // Check Inventory
-    const userInventory = await getUserInventoryMap(payload as any, user.id, { req })
-    if ((userInventory[requiredItem] || 0) < 1) {
+    if (!userInventory || (userInventory[requiredItem] || 0) < 1) {
       // Create readable names for custom items
       let itemName = requiredItem
       const itemDef = items.find((i) => i.id === requiredItem)
@@ -203,8 +208,18 @@ export async function evolvePokemon(
       throw new Error(`You need a ${itemName} to evolve`)
     }
 
-    // Consume Item
-    userInventory[requiredItem] -= 1
+  }
+
+  if (evolutionCatalyst) {
+    if (!userInventory || (userInventory[evolutionCatalyst.id] || 0) < 1) {
+      const itemDef = items.find((item) => item.id === evolutionCatalyst.id)
+      throw new Error(`You need a ${itemDef?.name || evolutionCatalyst.name} to evolve`)
+    }
+  }
+
+  if (userInventory) {
+    if (requiredItem) userInventory[requiredItem] -= 1
+    if (evolutionCatalyst) userInventory[evolutionCatalyst.id] -= 1
     await setUserInventoryMap(payload as any, user.id, userInventory, { req })
   }
 
