@@ -43,37 +43,6 @@ export const FIELD_OBSERVATION_EV_BERRIES = FIELD_OBSERVATION_EV_BERRY_UNLOCKS.m
   (unlock) => unlock.itemId,
 )
 
-export const FIELD_OBSERVATION_MINT_UNLOCK_LEVEL = 55
-export const FIELD_OBSERVATION_MINT_DROP_CHANCE = 3
-
-export const FIELD_OBSERVATION_MINT_UNLOCKS = [
-  { itemId: 'adamant-mint', level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL },
-  { itemId: 'bold-mint', level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL },
-  { itemId: 'brave-mint', level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL },
-  { itemId: 'calm-mint', level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL },
-  { itemId: 'careful-mint', level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL },
-  { itemId: 'gentle-mint', level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL },
-  { itemId: 'hasty-mint', level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL },
-  { itemId: 'impish-mint', level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL },
-  { itemId: 'jolly-mint', level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL },
-  { itemId: 'lax-mint', level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL },
-  { itemId: 'lonely-mint', level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL },
-  { itemId: 'mild-mint', level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL },
-  { itemId: 'modest-mint', level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL },
-  { itemId: 'naive-mint', level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL },
-  { itemId: 'naughty-mint', level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL },
-  { itemId: 'quiet-mint', level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL },
-  { itemId: 'rash-mint', level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL },
-  { itemId: 'relaxed-mint', level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL },
-  { itemId: 'sassy-mint', level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL },
-  { itemId: 'serious-mint', level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL },
-  { itemId: 'timid-mint', level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL },
-] as const
-
-export const FIELD_OBSERVATION_MINTS = FIELD_OBSERVATION_MINT_UNLOCKS.map(
-  (unlock) => unlock.itemId,
-)
-
 const FIELD_OBSERVATION_STANDARD_NUT_WEIGHT = 6
 const FIELD_OBSERVATION_RAZZ_BERRY_WEIGHT = 1
 
@@ -110,13 +79,6 @@ export function getFieldObservationEvBerries(
 ): string[] {
   const safeLevel = Math.max(1, Math.floor(researchingLevel || 1))
   return FIELD_OBSERVATION_EV_BERRY_UNLOCKS.filter(
-    (unlock) => safeLevel >= unlock.level,
-  ).map((unlock) => unlock.itemId)
-}
-
-export function getFieldObservationMints(researchingLevel: number): string[] {
-  const safeLevel = Math.max(1, Math.floor(researchingLevel || 1))
-  return FIELD_OBSERVATION_MINT_UNLOCKS.filter(
     (unlock) => safeLevel >= unlock.level,
   ).map((unlock) => unlock.itemId)
 }
@@ -194,11 +156,6 @@ function pickWeightedBerries(
   return berries
 }
 
-function pickItem(pool: string[], random = Math.random): string | null {
-  if (pool.length === 0) return null
-  return pool[Math.floor(random() * pool.length)] || null
-}
-
 export function buildFieldObservationBerryRewards(
   rewardSubjects: FieldObservationRewardSubject[],
   _pokemonData: any[],
@@ -225,30 +182,4 @@ export function buildFieldObservationBerryRewards(
     quantity: 1,
     dropChance: 100,
   }))
-}
-
-export function buildFieldObservationMintRewards(
-  rewardSubjects: FieldObservationRewardSubject[],
-  _pokemonData: any[],
-  researchingLevel = 1,
-  random = Math.random,
-): Reward[] {
-  if (rewardSubjects.length === 0) return []
-
-  const pool = getFieldObservationMints(researchingLevel)
-  if (pool.length === 0) return []
-  if (random() >= FIELD_OBSERVATION_MINT_DROP_CHANCE / 100) return []
-
-  const mintId = pickItem(pool, random)
-  if (!mintId) return []
-
-  return [
-    {
-      type: 'item',
-      targetId: mintId,
-      quantity: 1,
-      dropChance: 100,
-      guaranteed: true,
-    },
-  ]
 }

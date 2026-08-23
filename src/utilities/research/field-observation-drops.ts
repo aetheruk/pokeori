@@ -12,7 +12,6 @@ import {
 } from '@/utilities/rewards/gem-logic'
 import {
   buildFieldObservationBerryRewards,
-  buildFieldObservationMintRewards,
   FIELD_OBSERVATION_NUTS,
 } from '@/utilities/research/berry-drops'
 import type { FieldObservationGlobalItemEvent } from '@/data/games/field-observation/types'
@@ -122,12 +121,6 @@ export function buildFieldObservationCollectibleDrops({
           berryRewards[Math.floor(random() * berryRewards.length)],
         ]
       : berryRewards
-  const mintRewards = buildFieldObservationMintRewards(
-    rewardSubjects,
-    pokemonData as any[],
-    researchingLevel,
-    random,
-  )
   const highestSubjectLevel = Math.max(
     1,
     ...rewardSubjects.map((subject) => subject.level || 1),
@@ -155,10 +148,6 @@ export function buildFieldObservationCollectibleDrops({
         ? ('nut' as const)
         : ('berry' as const),
     })),
-    ...mintRewards.map((reward) => ({
-      reward,
-      kind: 'item' as const,
-    })),
     ...brokenBallRewards.map((reward) => ({
       reward,
       kind: 'broken-ball' as const,
@@ -184,17 +173,9 @@ export function buildFieldObservationCollectibleDrops({
         typeof reward.targetId === 'string'),
   )
 
-  const maxDrops = surveyFocus === 'swarm-survey' ? 8 : 6
-  const guaranteedRewards = rewardsWithKinds.filter(({ reward }) =>
-    isGuaranteedReward(reward),
-  )
-  const normalRewards = rewardsWithKinds.filter(
-    ({ reward }) => !isGuaranteedReward(reward),
-  )
-  const selectedRewards = [
-    ...guaranteedRewards,
-    ...normalRewards.slice(0, Math.max(0, maxDrops - guaranteedRewards.length)),
-  ]
+  // Each authored pool already applies its own level, unlock, and chance
+  // rules. Do not apply a second global cap after combining those pools.
+  const selectedRewards = rewardsWithKinds
   const durationMultiplier = getDurationMultiplier(collectibleModifiers)
 
   return selectedRewards.map(

@@ -692,14 +692,6 @@ describe('skill unlock helpers', () => {
     )
     expect(researcherGuide).toContainEqual(
       expect.objectContaining({
-        label: 'Nature Mints',
-        itemId: 'adamant-mint',
-        level: 55,
-        source: 'authored',
-      }),
-    )
-    expect(researcherGuide).toContainEqual(
-      expect.objectContaining({
         label: 'Stats Module',
         level: 7,
         source: 'authored',

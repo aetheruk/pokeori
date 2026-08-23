@@ -361,6 +361,8 @@ function shouldHideExploreRewardPreview(selectedItem: any, reward: any) {
     return true
   }
 
+  if (isFieldObservation && reward?.secret) return true
+
   if (reward?.type !== 'item') return false
 
   if (selectedItem.type === 'location') {
@@ -821,6 +823,8 @@ export function getFormattedRewards(
     const fieldObservationItemDrops =
       selectedItem.originalData.settings?.itemDrops || []
     fieldObservationItemDrops.forEach((drop: any) => {
+      if (drop.secret) return
+
       const reward = drop.reward || {
         type: 'item',
         targetId: drop.itemId,
