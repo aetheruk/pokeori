@@ -133,14 +133,6 @@ export const ceruleanCityFishing: FishingGameConfig[] = [
                 reactionTime: 800,
                 appearTime: { min: 1500, max: 4000 },
               },
-              {
-                speciesId: 118,
-                formId: '118',
-                weight: 15,
-                symbol: '!',
-                reactionTime: 750,
-                appearTime: { min: 1500, max: 4000 },
-              },
             ],
           },
           items: {

@@ -115,10 +115,10 @@ Hidden natural assignments are ignored for wild rolls until Ability Insight at R
 | `sturdy-ability-patch`        | `sturdy`        | Obtainable from `pewter-gym-tm-reward` after beating Brock.                                                                                                                                                                                                      |
 | `water-absorb-ability-patch`  | `water_absorb`  | Obtainable from `cerulean-gym-tm-reward` after beating Misty.                                                                                                                                                                                                    |
 | `lightning-rod-ability-patch` | `lightning_rod` | Obtainable from `vermilion-gym-challenge` after beating Lt. Surge.                                                                                                                                                                                               |
-| `lets-go-ability-patch`       | `lets_go`       | Awarded by Celadon's `a-classy-guy` task after `tea-time-at-pokemansion`; further copies cost 1,000 Pokedollars at Viridian City Poké Mart. Pikachu-only; while it is the active partner, normal catch encounters have a 1-in-32 chance to be replaced by Eevee. |
+| `lets-go-ability-patch`       | `lets_go`       | Awarded by Celadon's `a-classy-guy` task after `tea-time-at-pokemansion`; further copies cost 1,000 Pokedollars at Viridian City Poké Mart. Pikachu-only; while it is the active partner, normal catch encounters have a 1-in-32 chance to be replaced by Eevee and a 1-in-512 chance to be replaced by Mimikyu. Key encounters remain protected. |
 | `<ability-id>-ability-patch`  | `<ability-id>`  | Defined for all other abilities in `ABILITIES` with standard patch descriptions.                                                                                                                                                                                 |
 
-Location encounters marked `keyEncounter: true` remain protected against future encounter-replacement ability effects, but no active canonical ability currently performs encounter replacement.
+Location encounters marked `keyEncounter: true` remain protected against encounter-replacement ability effects. The custom Let's Go partner ability now performs the authored Eevee and Mimikyu encounter replacements for Pikachu.
 
 ## Moves
 

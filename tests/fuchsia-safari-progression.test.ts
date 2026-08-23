@@ -556,14 +556,19 @@ describe('Fuchsia Gym and Safari progression', () => {
     )
     expect(finale?.name).toBe('Safari Reserve')
     expect(finale?.description).not.toMatch(/Strength|prized|finale/i)
-    expect(finale?.encounters).toHaveLength(5)
+    expect(finale?.encounters).toHaveLength(8)
     expect(
       finale?.encounters
         .map((encounter) => encounter.speciesId)
         .sort((a, b) => a - b),
-    ).toEqual([113, 115, 123, 127, 128])
-    expect(finale?.encounters.every((encounter) => !encounter.requirements)).toBe(true)
-    expect(finale?.encounters.reduce((total, encounter) => total + encounter.chance, 0)).toBe(100)
+    ).toEqual([113, 115, 123, 127, 128, 128, 128, 128])
+    expect(finale?.encounters.filter((encounter) => !encounter.requirements)).toHaveLength(5)
+    expect(finale?.encounters.filter((encounter) => encounter.requirements)).toEqual([
+      expect.objectContaining({ formId: '10250', requirements: [{ type: 'task_completed', targetId: 'safari-strange-sightings' }] }),
+      expect.objectContaining({ formId: '10251', requirements: [{ type: 'task_completed', targetId: 'safari-strange-sightings' }] }),
+      expect.objectContaining({ formId: '10252', requirements: [{ type: 'task_completed', targetId: 'safari-strange-sightings' }] }),
+    ])
+    expect(finale?.encounters.reduce((total, encounter) => total + encounter.chance, 0)).toBe(160)
     expect(expedition?.rewards).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -628,7 +633,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(catchingSteps[8]?.activityId).toBe('safari-grand-finale-catch')
     expect(catchingExpedition?.rewards).toEqual([
       { type: 'xp', skill: 'catching', quantity: 500, dropChance: 100 },
-      { type: 'currency', targetId: 'safari-notes', quantity: 3, dropChance: 100 },
+      { type: 'currency', targetId: 'safari-notes', quantity: 10, dropChance: 100 },
     ])
 
     const poacherWatch = expeditions.find(
@@ -645,6 +650,17 @@ describe('Fuchsia Gym and Safari progression', () => {
         { type: 'currency', targetId: 'pokedollars', quantity: 1500, dropChance: 100 },
         { type: 'item', targetId: 'rare-candy-l', quantity: 3, dropChance: 100 },
         { type: 'currency', targetId: 'safari-notes', quantity: 1, dropChance: 100 },
+        {
+          type: 'item',
+          targetId: 'pack-base5',
+          quantity: 1,
+          dropChance: 100,
+          label: 'Team Rocket Booster Pack',
+          requirements: [
+            { type: 'item_owned', targetId: 'binder-base5' },
+            { type: 'card_collected_set', targetId: 'base5', count: 83, unique: true, inverse: true },
+          ],
+        },
       ],
     })
     const poacherSteps = buildExpeditionSteps(poacherWatch!, {
@@ -698,7 +714,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     )
     expect(fishingExpedition?.rewards).toEqual([
       { type: 'xp', skill: 'catching', quantity: 500, dropChance: 100 },
-      { type: 'currency', targetId: 'safari-notes', quantity: 3, dropChance: 100 },
+      { type: 'currency', targetId: 'safari-notes', quantity: 10, dropChance: 100 },
     ])
     const fishingLocation = locations.find(
       (entry) => entry.id === 'safari-fishing-expedition-catch',
@@ -724,13 +740,24 @@ describe('Fuchsia Gym and Safari progression', () => {
     )
     expect(
       researchTasks
-        .flatMap((task) => task.rewards.map((reward) => reward.quantity || 0))
+        .flatMap((task) => task.rewards.filter((reward) => reward.type === 'pokemon_research_xp').map((reward) => reward.quantity || 0))
         .sort((a, b) => Number(a) - Number(b)),
     ).toEqual([
       ...Array(19).fill(2),
       ...Array(19).fill(10),
       ...Array(25).fill(20),
     ])
+    expect(
+      researchTasks.every((task) =>
+        task.rewards.some(
+          (reward) =>
+            reward.type === 'currency' &&
+            reward.targetId === 'safari-notes' &&
+            reward.quantity === 1 &&
+            reward.dropChance === 100,
+        ),
+      ),
+    ).toBe(true)
 
     const flavorTasks = safariExpeditionContentTasks.filter((task) =>
       task.id.startsWith('safari-flavor-'),
@@ -896,7 +923,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(grandExpedition?.rewards).toContainEqual({
       type: 'currency',
       targetId: 'safari-notes',
-      quantity: 10,
+      quantity: 25,
       dropChance: 100,
     })
 
@@ -929,7 +956,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(rewilding?.rewards).toContainEqual({
       type: 'currency',
       targetId: 'safari-notes',
-      quantity: 15,
+      quantity: 10,
       dropChance: 100,
     })
 
@@ -948,12 +975,13 @@ describe('Fuchsia Gym and Safari progression', () => {
       ['Material Deposit Reports', [{ type: 'currency', id: 'safari-notes', amount: 45 }], 1],
       ['Safari Ball Cache Info', [{ type: 'currency', id: 'safari-notes', amount: 55 }], 1],
       ['Unusual Pokémon Sightings', [{ type: 'currency', id: 'safari-notes', amount: 65 }], 1],
-      ['Rare Item Rumours', [{ type: 'currency', id: 'safari-notes', amount: 90 }], 1],
+      ['Rare Item Rumours', [{ type: 'currency', id: 'safari-notes', amount: 200 }], 1],
+      ['Strange Sightings', [{ type: 'currency', id: 'safari-notes', amount: 1000 }], 1],
       ['Notes on Poachers', [{ type: 'currency', id: 'safari-notes', amount: 100 }], 1],
       ["Warden's Permit", [{ type: 'currency', id: 'safari-notes', amount: 2000 }], 1],
-      ['Stamina Notes', [{ type: 'currency', id: 'safari-notes', amount: 20 }], 5],
-      ['Commemorative Safari Ball', [{ type: 'currency', id: 'safari-notes', amount: 1000 }], 1],
-      ['Honorary Title', [{ type: 'currency', id: 'safari-notes', amount: 2500 }], 1],
+      ['Stamina Notes', [{ type: 'currency', id: 'safari-notes', amount: 50 }], 5],
+      ['Safari Ball Icon', [{ type: 'currency', id: 'safari-notes', amount: 1000 }], 1],
+      ['Warden Title', [{ type: 'currency', id: 'safari-notes', amount: 2500 }], 1],
     ])
 
     const wardenPermit = tasks.find(
@@ -973,7 +1001,7 @@ describe('Fuchsia Gym and Safari progression', () => {
       )
       expect(study?.settings.itemDrops).toContainEqual(
         expect.objectContaining({
-          dropChance: 20,
+          dropChance: 100,
           reward: expect.objectContaining({
             type: 'currency',
             targetId: 'safari-notes',

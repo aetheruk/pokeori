@@ -3,6 +3,13 @@ import type { Task } from '../../types'
 
 const background = '/backgrounds/safari-reserve.avif'
 
+const safariNoteReward = {
+  type: 'currency' as const,
+  targetId: 'safari-notes',
+  quantity: 1,
+  dropChance: 100,
+}
+
 function safariTask({
   id,
   name,
@@ -22,6 +29,10 @@ function safariTask({
   repeatable?: boolean
   requirements?: Task['requirements']
 }): Task {
+  const taskRewards = rewards.some((reward) => reward.type === 'pokemon_research_xp')
+    ? [...rewards, safariNoteReward]
+    : rewards
+
   return {
     id,
     name,
@@ -37,7 +48,7 @@ function safariTask({
     completeButtonText,
     requirements,
     criteria: [],
-    rewards,
+    rewards: taskRewards,
   }
 }
 

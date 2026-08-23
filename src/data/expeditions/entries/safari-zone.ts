@@ -314,7 +314,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
     rewards: [
       { type: 'xp', skill: 'researching', quantity: 1000, dropChance: 100 },
       { type: 'xp', skill: 'catching', quantity: 1000, dropChance: 100 },
-      { type: 'currency', targetId: 'safari-notes', quantity: 10, dropChance: 100 },
+      { type: 'currency', targetId: 'safari-notes', quantity: 25, dropChance: 100 },
       {
         type: 'item',
         targetId: 'tm-strength',
@@ -364,7 +364,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
     ],
     rewards: [
       { type: 'xp', skill: 'catching', quantity: 500, dropChance: 100 },
-      { type: 'currency', targetId: 'safari-notes', quantity: 3, dropChance: 100 },
+      { type: 'currency', targetId: 'safari-notes', quantity: 10, dropChance: 100 },
     ],
   },
   {
@@ -401,6 +401,23 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
       { type: 'currency', targetId: 'pokedollars', quantity: 1500, dropChance: 100 },
       { type: 'item', targetId: 'rare-candy-l', quantity: 3, dropChance: 100 },
       { type: 'currency', targetId: 'safari-notes', quantity: 1, dropChance: 100 },
+      {
+        type: 'item',
+        targetId: 'pack-base5',
+        quantity: 1,
+        dropChance: 100,
+        label: 'Team Rocket Booster Pack',
+        requirements: [
+          { type: 'item_owned', targetId: 'binder-base5' },
+          {
+            type: 'card_collected_set',
+            targetId: 'base5',
+            count: 83,
+            unique: true,
+            inverse: true,
+          },
+        ],
+      },
     ],
   },
   {
@@ -435,7 +452,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
     ),
     rewards: [
       { type: 'xp', skill: 'catching', quantity: 500, dropChance: 100 },
-      { type: 'currency', targetId: 'safari-notes', quantity: 3, dropChance: 100 },
+      { type: 'currency', targetId: 'safari-notes', quantity: 10, dropChance: 100 },
     ],
   },
 ]

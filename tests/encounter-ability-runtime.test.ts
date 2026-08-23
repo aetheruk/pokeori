@@ -62,6 +62,26 @@ describe('encounter ability runtime', () => {
     }
   })
 
+  test("Let's Go can replace a normal catch encounter with Mimikyu at 1-in-512", () => {
+    const originalRandom = Math.random
+    const rolls = [0.1, 0, 0]
+    Math.random = () => rolls.shift() ?? 1
+    try {
+      expect(
+        chooseAbilityEncounterReplacement({
+          ability: ABILITIES.lets_go,
+          formId: '25',
+          speciesId: 25,
+          locationId: 'route-7',
+          category: 'Kanto',
+          subCategory: 'Celadon City',
+        }),
+      ).toMatchObject({ speciesId: 778, formId: '778' })
+    } finally {
+      Math.random = originalRandom
+    }
+  })
+
   test('Backup replaces normal catch encounters with Porygon at 1-in-50', () => {
     const originalRandom = Math.random
     Math.random = () => 0
