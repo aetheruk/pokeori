@@ -1349,6 +1349,8 @@ describe('Fuchsia Gym and Safari progression', () => {
       battle.id.startsWith('safari-poacher-watch-'),
     )
     expect(poacherBattles).toHaveLength(5)
+    expect(poacherBattles.every((battle) => battle.rewards.length === 0)).toBe(true)
+    expect(poacherBattles.every((battle) => battle.disableRewards === true)).toBe(true)
     expect(
       poacherBattles.every((battle) =>
         battle.enemyTeam.some((enemy) => enemy.level === 31),
