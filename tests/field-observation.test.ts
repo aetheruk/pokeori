@@ -298,27 +298,47 @@ describe('field observation research mode', () => {
     expect(JSON.stringify(publicDrops)).not.toContain('reward')
   })
 
-  test('level 55 field observation can bubble a rare mint drop', () => {
+  test('field observation keeps authored drop pools independent', () => {
+    const ordinaryDrops = Array.from({ length: 6 }, (_, index) => ({
+      id: `ordinary-drop-${index}`,
+      itemId: 'charred-wood',
+      dropChance: 100,
+    }))
+    const safariNoteDrop = {
+      id: 'safari-note-bubble',
+      itemId: 'researchers-journal-page',
+      label: 'Safari Note',
+      dropChance: 100,
+      guaranteed: true,
+      secret: true,
+      reward: {
+        type: 'currency' as const,
+        targetId: 'safari-notes',
+        quantity: 1,
+        dropChance: 100,
+        guaranteed: true,
+        secret: true,
+      },
+    }
+
     const drops = buildFieldObservationCollectibleDrops({
-      rewardSubjects: [
-        { speciesId: 16, formId: '16', level: 20, pokemonResearchXp: 1 },
-      ],
+      rewardSubjects: [],
       spawns: [],
-      researchingLevel: 55,
+      researchingLevel: 1,
       surveyFocus: 'standard',
       observationDurationMs: 20_000,
-      random: () => 0,
+      globalItemEvents: [...ordinaryDrops, safariNoteDrop],
+      random: () => 0.99,
     })
 
+    expect(drops).toHaveLength(7)
     expect(drops).toContainEqual(
       expect.objectContaining({
-        itemId: 'adamant-mint',
-        kind: 'item',
+        itemId: 'researchers-journal-page',
+        label: 'Safari Note',
         reward: expect.objectContaining({
-          type: 'item',
-          targetId: 'adamant-mint',
-          quantity: 1,
-          dropChance: 100,
+          type: 'currency',
+          targetId: 'safari-notes',
           guaranteed: true,
         }),
       }),
@@ -363,7 +383,9 @@ describe('field observation research mode', () => {
         reward: expect.objectContaining({ type: 'egg' }),
       }),
     )
-    expect(toPublicFieldObservationCollectibleDrop(drops[0]!)).toMatchObject({
+    const eggDrop = drops.find((drop) => drop.itemId === 'egg')
+    expect(eggDrop).toBeDefined()
+    expect(toPublicFieldObservationCollectibleDrop(eggDrop!)).toMatchObject({
       itemId: 'egg',
       kind: 'egg',
       rarity: 'shiny',

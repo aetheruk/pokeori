@@ -272,4 +272,5 @@ describe('encounter ability runtime', () => {
       }
     }
   })
+
 })

@@ -1,15 +1,12 @@
 import { describe, expect, test } from 'bun:test'
 import {
   buildFieldObservationBerryRewards,
-  buildFieldObservationMintRewards,
   FIELD_OBSERVATION_ADDITIONAL_NUT_DROP_LEVEL,
   FIELD_OBSERVATION_EV_BERRIES,
   FIELD_OBSERVATION_EV_BERRY_UNLOCKS,
   FIELD_OBSERVATION_HEALING_BERRY_UNLOCKS,
-  FIELD_OBSERVATION_MINTS,
   getFieldObservationEvBerries,
   getFieldObservationHealingBerries,
-  getFieldObservationMints,
   FIELD_OBSERVATION_NUTS,
   getFieldObservationNutDropWeights,
   getFieldObservationNuts,
@@ -291,31 +288,4 @@ describe('field observation berry drops', () => {
     }
   })
 
-  test('nature mints unlock as a very rare Researcher field pool', () => {
-    expect(getFieldObservationMints(54)).toEqual([])
-    expect(getFieldObservationMints(55)).toEqual(FIELD_OBSERVATION_MINTS)
-
-    const missedReward = buildFieldObservationMintRewards(
-      [{ speciesId: 1, formId: '1', level: 10, pokemonResearchXp: 1 }],
-      pokemonData as any[],
-      55,
-      () => 0.03,
-    )
-    expect(missedReward).toEqual([])
-
-    const rolls = [0.029, 0]
-    const [mintReward] = buildFieldObservationMintRewards(
-      [{ speciesId: 1, formId: '1', level: 10, pokemonResearchXp: 1 }],
-      pokemonData as any[],
-      55,
-      () => rolls.shift() ?? 0,
-    )
-    expect(mintReward).toMatchObject({
-      type: 'item',
-      targetId: 'adamant-mint',
-      quantity: 1,
-      dropChance: 100,
-      guaranteed: true,
-    })
-  })
 })

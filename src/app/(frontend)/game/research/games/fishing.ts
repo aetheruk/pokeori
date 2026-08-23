@@ -57,6 +57,7 @@ import {
 } from '@/utilities/user-state'
 import type { WeatherSnapshot } from '@/utilities/weather'
 import { applySecretFishingPokemonReplacement } from '@/utilities/fishing/secret-pokemon'
+import { getAvailableFishingItemEntries } from '@/utilities/fishing/item-pool'
 
 export interface FishingState {
   userId: string
@@ -261,10 +262,21 @@ export async function castFishingLine(rodType: RodType) {
         resultType = 'pokemon'
       } else {
         // Item pool. Local entries are reserved for quest/location-specific drops.
-        const itemPool =
+        const configuredItemPool =
           rodConfig.items?.entries && rodConfig.items.entries.length > 0
             ? rodConfig.items.entries
-            : globalFishingItemPools[rodType]
+            : undefined
+        const availableConfiguredItemPool = configuredItemPool
+          ? getAvailableFishingItemEntries(configuredItemPool, inventory)
+          : []
+        const availableGlobalItemPool = getAvailableFishingItemEntries(
+          globalFishingItemPools[rodType],
+          inventory,
+        )
+        const itemPool =
+          availableConfiguredItemPool.length > 0
+            ? availableConfiguredItemPool
+            : availableGlobalItemPool
         selectedEntry = rollWeightedEntry(itemPool)
         resultType = 'item'
       }

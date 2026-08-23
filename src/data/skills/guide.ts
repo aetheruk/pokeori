@@ -23,8 +23,6 @@ import {
   FIELD_OBSERVATION_ADDITIONAL_NUT_DROP_LEVEL,
   FIELD_OBSERVATION_EV_BERRY_UNLOCKS,
   FIELD_OBSERVATION_HEALING_BERRY_UNLOCKS,
-  FIELD_OBSERVATION_MINT_DROP_CHANCE,
-  FIELD_OBSERVATION_MINT_UNLOCK_LEVEL,
   FIELD_OBSERVATION_NUT_UNLOCKS,
 } from '@/utilities/research/berry-drops'
 
@@ -207,19 +205,6 @@ const evBerryUnlocks: SkillGuideUnlock[] = FIELD_OBSERVATION_EV_BERRY_UNLOCKS.ma
     icon: itemIcon(unlock.itemId),
   }
 })
-
-const fieldObservationMintUnlocks: SkillGuideUnlock[] = [
-  {
-    skillId: 'researching',
-    level: FIELD_OBSERVATION_MINT_UNLOCK_LEVEL,
-    category: 'items',
-    label: 'Nature Mints',
-    description: `Field Observation has a ${FIELD_OBSERVATION_MINT_DROP_CHANCE}% chance to drop one nature mint.`,
-    source: 'authored',
-    itemId: 'adamant-mint',
-    icon: itemIcon('adamant-mint'),
-  },
-]
 
 export const authoredSkillGuideUnlocks: SkillGuideUnlock[] = [
   ...trainerBattleItemUseUnlocks,
@@ -457,7 +442,6 @@ export const authoredSkillGuideUnlocks: SkillGuideUnlock[] = [
   additionalNutDropUnlock,
   ...healingBerryUnlocks,
   ...evBerryUnlocks,
-  ...fieldObservationMintUnlocks,
   ...researcherMoveSlotUnlocks,
   {
     skillId: 'researching',

@@ -272,7 +272,7 @@ const safariCreditTasks: Task[] = [
     id: 'safari-strange-sightings',
     name: 'Strange Sightings',
     description: 'A permanent record of three unusual Tauros varieties reported beyond Kanto.',
-    icon: { type: 'pokemon', id: '10250' },
+    icon: { type: 'pokemon', id: '128' },
   }),
   safariCreditMarkerTask({
     id: 'safari-rare-item-rumours',

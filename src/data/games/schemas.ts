@@ -331,6 +331,7 @@ const fieldObservationItemDropSchema = z
     reward: rewardSchema.optional(),
     label: z.string().optional(),
     dropChance: z.number().min(0).max(100),
+    guaranteed: z.boolean().optional(),
     secret: z.boolean().optional(),
     quantity: z
       .union([

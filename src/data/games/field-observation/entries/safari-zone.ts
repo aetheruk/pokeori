@@ -84,11 +84,15 @@ const safariNoteBubble = {
   itemId: 'researchers-journal-page',
   label: 'Safari Note',
   dropChance: 100,
+  guaranteed: true,
+  secret: true,
   reward: {
     type: 'currency' as const,
     targetId: 'safari-notes',
     quantity: 1,
     dropChance: 100,
+    guaranteed: true,
+    secret: true,
   },
 }
 

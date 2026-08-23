@@ -932,6 +932,34 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(getIcon('safari-ball')).toBeDefined()
     expect(getTitle('the-warden')?.name).toBe('The Warden')
 
+    const safariFieldResearch = fieldObservationGames.filter(
+      (entry) => entry.subCategory === 'Safari Zone',
+    )
+    expect(safariFieldResearch).toHaveLength(8)
+    expect(
+      safariFieldResearch.every((entry) =>
+        entry.settings.itemDrops?.some(
+          (drop) =>
+            drop.itemId === 'researchers-journal-page' &&
+            drop.dropChance === 100 &&
+            drop.guaranteed === true &&
+            drop.secret === true &&
+            drop.reward?.type === 'currency' &&
+            drop.reward.targetId === 'safari-notes' &&
+            drop.reward.guaranteed === true &&
+            drop.reward.secret === true,
+        ),
+      ),
+    ).toBe(true)
+
+    const strangeSightings = safariZoneShops[0]?.items.find(
+      (item) => item.id === 'safari-credit-strange-sightings',
+    )
+    expect(strangeSightings?.icon).toEqual({ type: 'pokemon', id: '128' })
+    expect(
+      tasks.find((task) => task.id === 'safari-strange-sightings')?.icon,
+    ).toEqual({ type: 'pokemon', id: '128' })
+
     const grandExpedition = expeditions.find(
       (entry) => entry.id === 'safari-zone-grand-expedition',
     )
