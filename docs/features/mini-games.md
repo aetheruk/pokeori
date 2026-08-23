@@ -74,6 +74,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 - Fishing sessions inherit the Mini Game entry's weather snapshot; Pokemon hooks pass that weather into the reused location-style catch state.
 - The fishing play screen is portrait-first and scene-led. Entries can author `settings.scene` with a portrait background, optional landscape background, water style, and waterline; the client adds time-of-day tinting plus subtle water shimmer/ripple overlays.
 - Generic item drops use the global Old, Good, and Super Rod pools in `src/data/games/fishing/item-pools.ts`.
+- Unique fishing items are removed from the active pool once the player owns them; if a local item pool is exhausted this way, fishing falls back to the available global pool.
 - Location `items.entries` are reserved for quest or location-specific override drops.
 - Explore fishing details show rod-specific Pokemon previews and only manually authored `items.entries` drops. Global fallback rod item pools stay hidden from reward previews and do not count as unclaimed location collectibles. Secret authored fishing item entries display as secret rewards until found.
 
