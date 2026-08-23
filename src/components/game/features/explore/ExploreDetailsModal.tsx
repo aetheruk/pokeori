@@ -302,6 +302,7 @@ export function ExploreDetailsModal({
         expeditionResult={selectedExpeditionResult}
         rewards={rewards}
         criteria={criteria}
+        userData={userData}
         actionButton={actionButton}
         loadingId={loadingId}
         onChooseBranch={onChooseBranch}

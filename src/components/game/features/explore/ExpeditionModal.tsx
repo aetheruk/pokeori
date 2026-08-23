@@ -37,6 +37,10 @@ import {
   getPokemonImageUrl,
   getPokemonSpecies,
 } from '@/utilities/pokemon/pokedex'
+import {
+  checkRequirement,
+  type RequirementData,
+} from '@/utilities/requirements'
 import { getExpeditionDisplayName, isChronicleExploreItem } from './utils'
 
 interface ExpeditionModalProps {
@@ -49,6 +53,7 @@ interface ExpeditionModalProps {
   criteria?: RewardItem[]
   actionButton?: ReactNode
   loadingId?: string | null
+  userData: RequirementData
   onChooseBranch?: (
     expeditionId: string,
     branchNodeStepId: string,
@@ -190,6 +195,7 @@ function formatLevelLabel(level: unknown): string | undefined {
 }
 
 function getStepActivityDetails(
+  userData: RequirementData,
   activityType?: string,
   activityId?: string,
 ): ExpeditionActivityDetail | null {
@@ -219,9 +225,18 @@ function getStepActivityDetails(
       return null
     }
 
+    const visibleEncounters = entry.encounters.filter((encounter) =>
+      (encounter.requirements || []).every((requirement) =>
+        checkRequirement(userData, requirement, {
+          category: entry.category,
+          subCategory: entry.subCategory,
+        }),
+      ),
+    )
+
     return {
       title: 'Possible Encounters',
-      entries: entry.encounters.map((encounter: any) => ({
+      entries: visibleEncounters.map((encounter: any) => ({
         name: getPokemonDisplayName(encounter?.formId, encounter?.speciesId),
         extra:
           typeof encounter?.chance === 'number'
@@ -245,6 +260,7 @@ export function ExpeditionModal({
   criteria,
   actionButton,
   loadingId,
+  userData,
   onChooseBranch,
   onRequestAbandonExpedition,
 }: ExpeditionModalProps) {
@@ -497,6 +513,7 @@ export function ExpeditionModal({
                     const activityDetails =
                       !shouldHideSecret && stepType === 'activity'
                         ? getStepActivityDetails(
+                            userData,
                             step.activityType,
                             step.activityId,
                           )
