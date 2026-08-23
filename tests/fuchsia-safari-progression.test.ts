@@ -59,6 +59,21 @@ function mazeHasRoute(gameId: string) {
 }
 
 describe('Fuchsia Gym and Safari progression', () => {
+  test('Cerulean Gym fishing keeps only Magikarp encounters', () => {
+    const gymFishing = fishingGames.filter((entry) =>
+      entry.id === 'cerulean-gym-pool' || entry.id === 'cerulean-gym-pool-daily',
+    )
+
+    expect(gymFishing).toHaveLength(2)
+    expect(
+      gymFishing.flatMap((entry) =>
+        Object.values(entry.settings.rods).flatMap((rod) =>
+          rod?.encounters.entries.map((encounter) => encounter.speciesId),
+        ),
+      ),
+    ).toEqual([129, 129])
+  })
+
   test('the Empty Gym handoff unlocks the Safari Zone and its entry task', () => {
     const emptyGymRequirement = {
       type: 'task_completed' as const,
