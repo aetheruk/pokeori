@@ -1,12 +1,10 @@
 import { describe, expect, test } from 'bun:test'
 import {
   buildCaptureEscapeRopeReward,
-  buildCaptureHealingBerryRewards,
   buildCaptureCrystalReward,
   buildCaptureRepelRewards,
   buildCaptureResearchXpRewards,
   CATCH_ESCAPE_ROPE_DROP_CHANCE,
-  CATCH_EXTRA_HEALING_BERRY_DROP_CHANCE,
   CATCH_CRYSTAL_RESEARCH_BONUS,
   CATCH_COMPANION_RESEARCH_XP_REWARD,
   CATCH_REPEL_DROP_CHANCE,
@@ -59,44 +57,6 @@ describe('capture research XP rewards', () => {
     expect(getCaptureCrystalRewardAmount(15, 2)).toBe(15)
     expect(getCaptureCrystalRewardAmount(15, 3)).toBe(
       15 + CATCH_CRYSTAL_RESEARCH_BONUS,
-    )
-  })
-
-  test('adds no healing berry before the shared berry pool unlocks', () => {
-    expect(buildCaptureHealingBerryRewards(15, () => 0)).toEqual([])
-  })
-
-  test('adds one guaranteed healing berry and a 10 percent extra roll after unlock', () => {
-    const rolls = [0, 0.99]
-    const rewards = buildCaptureHealingBerryRewards(
-      16,
-      () => rolls.shift() ?? 0,
-    )
-
-    expect(rewards).toEqual([
-      {
-        type: 'item',
-        targetId: 'oran-berry',
-        quantity: 1,
-        dropChance: 100,
-      },
-      {
-        type: 'item',
-        targetId: 'persim-berry',
-        quantity: 1,
-        dropChance: CATCH_EXTRA_HEALING_BERRY_DROP_CHANCE,
-      },
-    ])
-  })
-
-  test('does not add EV-reducing berries to the catch healing pool', () => {
-    const rewards = buildCaptureHealingBerryRewards(100, () => 0.99)
-    expect(rewards.map((reward) => reward.targetId)).toEqual([
-      'lum-berry',
-      'lum-berry',
-    ])
-    expect(rewards.map((reward) => reward.targetId)).not.toContain(
-      'pomeg-berry',
     )
   })
 

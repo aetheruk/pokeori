@@ -272,4 +272,19 @@ describe('encounter ability runtime', () => {
       }
     }
   })
+
+  test('capture ability item pools do not award berries', () => {
+    const berryIds = new Set(
+      items
+        .filter((item) => item.category === 'berry')
+        .map((item) => item.id),
+    )
+
+    for (const ability of Object.values(ABILITIES)) {
+      for (const effect of ability.effects || []) {
+        if (effect.type !== 'capture-random-item') continue
+        expect(effect.itemIds.some((itemId) => berryIds.has(itemId))).toBe(false)
+      }
+    }
+  })
 })
