@@ -15,7 +15,7 @@ Core skill progression for Trainer, Explorer, and Researcher.
 | `catching` | Explorer | Exploration utility items and authored exploration gates. |
 | `researching` | Researcher | Move slots, capture tools, encounter quality bonuses, and authored research gates. |
 
-The Trainer menu shows a skill guide for Trainer, Explorer, Researcher, and Artisan in the shared game drawer. Guide rows combine fixed authored milestones with dynamic item unlock rows from item `skillRequirements`. The drawer renders upcoming unlocks immediately, while the full level-by-level guide is expandable and uses lazy-loaded row icons. The Trainer guide includes Gym Challenge milestones at Trainer 5 for Brock, 10 for Misty, and 15 for Lt. Surge. Ranked battling remains tracked separately where needed, but it is not part of the core guide grid.
+The Trainer menu shows a skill guide for Trainer, Explorer, Researcher, and Artisan in the shared game drawer. Guide rows combine fixed authored milestones with dynamic item unlock rows from item `skillRequirements`. The drawer renders upcoming unlocks immediately, while the full level-by-level guide is expandable and uses lazy-loaded row icons. All four core skill guides list Mystery of the Branches at level 50. The Trainer guide includes Gym Challenge milestones at Trainer 5 for Brock, 10 for Misty, and 15 for Lt. Surge. Ranked battling remains tracked separately where needed, but it is not part of the core guide grid.
 
 ## Skill XP
 - Generated core skill XP uses `20 + 2 * (contentLevel - 1)`, clamped to content levels 1-100.

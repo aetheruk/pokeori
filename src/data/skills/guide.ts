@@ -206,9 +206,22 @@ const evBerryUnlocks: SkillGuideUnlock[] = FIELD_OBSERVATION_EV_BERRY_UNLOCKS.ma
   }
 })
 
+const mysteryOfTheFeathersUnlocks: SkillGuideUnlock[] = (
+  ['battling', 'catching', 'researching', 'artisan'] as const
+).map((skillId) => ({
+  skillId,
+  level: 50,
+  category: 'progression' as const,
+  label: 'Mystery of the Branches',
+  description: 'Discover the secrets surrounding the legendary branches.',
+  source: 'authored' as const,
+  icon: itemIcon('silver-feather'),
+}))
+
 export const authoredSkillGuideUnlocks: SkillGuideUnlock[] = [
   ...trainerBattleItemUseUnlocks,
   ...trainerBattleMoveUseUnlocks,
+  ...mysteryOfTheFeathersUnlocks,
   {
     skillId: 'battling',
     level: 5,

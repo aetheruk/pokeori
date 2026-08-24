@@ -489,6 +489,17 @@ describe('skill unlock helpers', () => {
     ).toBe(70)
 
     const trainerGuide = getSkillGuideUnlocks('battling')
+    for (const skillId of ['battling', 'catching', 'researching', 'artisan'] as const) {
+      expect(getSkillGuideUnlocks(skillId)).toContainEqual(
+        expect.objectContaining({
+          label: 'Mystery of the Branches',
+          level: 50,
+          category: 'progression',
+          source: 'authored',
+          icon: { type: 'item', id: 'silver-feather' },
+        }),
+      )
+    }
     expect(trainerGuide).toContainEqual(
       expect.objectContaining({
         label: '2 Battle Items',

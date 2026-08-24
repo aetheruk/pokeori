@@ -4315,6 +4315,11 @@ describe('static data references', () => {
         targetId: 'clear-bell',
       })
       expect(battle?.requirements).toContainEqual({
+        type: 'skill_level',
+        targetId: 'battling',
+        count: 50,
+      })
+      expect(battle?.requirements).toContainEqual({
         type: 'battle_result',
         targetId: expected.id,
         battleStatus: 'win',
@@ -4344,6 +4349,11 @@ describe('static data references', () => {
         targetId: 'clear-bell',
       })
       expect(snap?.requirements).toContainEqual({
+        type: 'skill_level',
+        targetId: 'catching',
+        count: 50,
+      })
+      expect(snap?.requirements).toContainEqual({
         type: 'game_result',
         targetId: expected.id,
         battleStatus: 'win',
@@ -4368,6 +4378,11 @@ describe('static data references', () => {
     expect(lugiaSnap?.requirements).not.toContainEqual({
       type: 'item_owned',
       targetId: 'clear-bell',
+    })
+    expect(lugiaSnap?.requirements).not.toContainEqual({
+      type: 'skill_level',
+      targetId: 'catching',
+      count: 50,
     })
     expect(lugiaSnap?.requirements).toContainEqual({
       type: 'game_result',
@@ -4542,6 +4557,11 @@ describe('static data references', () => {
       expect(event?.requirements).not.toContainEqual({
         type: 'item_owned',
         targetId: 'clear-bell',
+      })
+      expect(event?.requirements).toContainEqual({
+        type: 'skill_level',
+        targetId: 'researching',
+        count: 50,
       })
       expect(event?.requirements).toContainEqual({
         type: 'item_owned',

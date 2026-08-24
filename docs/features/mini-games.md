@@ -94,6 +94,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 ## Snap
 - Standard Snap asks the player to photograph randomly requested Pokemon from `settings.pokemonPool`.
 - Target Snap is enabled with `settings.target`. The server generates one random target appearance window in `roundData.snapTargetAppearAtMs`, using `settings.successThreshold` as the visible duration. Snapping the target wins; missing that window or snapping an optional decoy from `settings.pokemonPool` immediately fails. `settings.targetMissMessage` can override the failure text.
+- The Legendary Bird special Snap events for Moltres, Zapdos, and Articuno require Explorer level 50 before they can appear.
 - Snap result overlays include expedition progress on normal completions and server time-up failures, so expedition steps return through the same result screen before Explore.
 
 ## Field Observation

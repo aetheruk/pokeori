@@ -133,7 +133,7 @@ describe('field observation research mode', () => {
     )
   })
 
-  test('global special Pokemon requirements require Clear Bell for beasts and block owned token, lifeless, or concentrated items', () => {
+  test('global special Pokemon requirements require Clear Bell for beasts and gate birds by Researcher level', () => {
     const enteiEvent = fieldObservationGlobalPokemonEvents.find(
       (event) => event.id === 'field-observation-entei',
     )
@@ -220,7 +220,15 @@ describe('field observation research mode', () => {
     expect(
       rollFieldObservationGlobalPokemonEvent(
         [moltresEvent],
-        baseData,
+        { ...baseData, user: { skills: { researching: { level: 49 } } } },
+        'Kanto',
+        () => 0,
+      ),
+    ).toBeNull()
+    expect(
+      rollFieldObservationGlobalPokemonEvent(
+        [moltresEvent],
+        { ...baseData, user: { skills: { researching: { level: 50 } } } },
         'Kanto',
         () => 0,
       ),
@@ -228,7 +236,11 @@ describe('field observation research mode', () => {
     expect(
       rollFieldObservationGlobalPokemonEvent(
         [moltresEvent],
-        { ...baseData, inventory: [{ itemId: 'flaming-twig', quantity: 1 }] },
+        {
+          ...baseData,
+          user: { skills: { researching: { level: 50 } } },
+          inventory: [{ itemId: 'flaming-twig', quantity: 1 }],
+        },
         'Kanto',
         () => 0,
       ),

@@ -8,6 +8,11 @@ const legendaryBeastRollRequirement = {
   count: oneIn(256),
 }
 const clearBellRequirement = { type: 'item_owned' as const, targetId: 'clear-bell' }
+const legendaryBirdTrainerRequirement = {
+  type: 'skill_level' as const,
+  targetId: 'battling',
+  count: 50,
+}
 
 type LegendaryBirdBattle = {
   id: string
@@ -201,6 +206,7 @@ export const specialEventBattles: BattleConfig[] = [
     isWildBattle: true,
     enemyAttackTelegraphChance: 2,
     requirements: [
+      legendaryBirdTrainerRequirement,
       legendaryBeastRollRequirement,
       {
         type: 'battle_result' as const,

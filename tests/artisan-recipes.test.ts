@@ -359,7 +359,7 @@ describe('artisan recipes', () => {
       })
       expect(recipe).toBeDefined()
       expect(recipe?.category).toBe('quests')
-      expect(recipe?.artisanLevel).toBe(35)
+      expect(recipe?.artisanLevel).toBe(50)
       expect(recipe?.craftType).toBe('mix')
       expect(recipe?.outputQuantity).toEqual({ min: 1, max: 1 })
       expect(recipe?.costs).toEqual([
