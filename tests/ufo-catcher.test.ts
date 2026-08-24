@@ -10,6 +10,7 @@ import { validateGameItem } from '@/data/games/schemas'
 import { getIcon } from '@/data/user/icons'
 import { getTitle } from '@/data/user/titles'
 import { getGameActivityRoute } from '@/utilities/games/activity-domain'
+import { isDailyExcludedGameType } from '@/utilities/tasks/daily-activity'
 import {
   buildUfoCatcherPrizeLayout,
   getEligibleUfoCatcherTiers,
@@ -38,6 +39,13 @@ function getItemReward(tierId: string) {
 }
 
 describe('UFO Catcher authored balance', () => {
+  test('UFO Catcher remains eligible for daily completion tracking', () => {
+    expect(isDailyExcludedGameType('ufo-catcher')).toBe(false)
+    expect(isDailyExcludedGameType('slots')).toBe(true)
+    expect(isDailyExcludedGameType('pachinko')).toBe(true)
+    expect(isDailyExcludedGameType('prize-wheel')).toBe(true)
+  })
+
   test('authors one 30-token non-currency machine with five prizes per play', () => {
     expect(celadonGameCornerUfoCatcherEntries.map((entry) => entry.id)).toEqual(
       ['celadon-rocket-ufo-catcher'],

@@ -19,6 +19,7 @@ import {
   type RequirementData,
 } from '@/utilities/requirements'
 import { getSkillLevel } from '@/utilities/skills/unlocks'
+import { isDailyExcludedGameType } from '@/utilities/tasks/daily-activity'
 import { isOutOfStock } from '@/utilities/shops/stock'
 
 type GenerateDailyTasksOptions = {
@@ -73,8 +74,6 @@ const BASE_GEM_IDS = new Set(
     'fairy',
   ].map((type) => `${type}-gem`),
 )
-
-const GAMBLING_GAME_TYPES = new Set(['slots', 'pachinko', 'prize-wheel'])
 
 function randomInt(random: () => number, min: number, max: number): number {
   return Math.floor(random() * (max - min + 1)) + min
@@ -214,7 +213,7 @@ function getRewardSources(userData: RequirementData): RewardSource[] {
 
   for (const game of allGames) {
     if (
-      !GAMBLING_GAME_TYPES.has(game.gameType) &&
+      !isDailyExcludedGameType(game.gameType) &&
       isVisibleSource(game, userData)
     ) {
       const domain =
@@ -367,7 +366,7 @@ function buildCandidates(
     if (
       game.gameType === 'fishing' ||
       game.gameType === 'tcg-battle' ||
-      GAMBLING_GAME_TYPES.has(game.gameType) ||
+      isDailyExcludedGameType(game.gameType) ||
       !isVisibleSource(game, userData)
     )
       continue
