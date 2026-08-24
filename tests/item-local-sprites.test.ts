@@ -173,6 +173,13 @@ describe('local item sprites', () => {
       '/sprites/items/relic-gold.avif',
     )
     expect(getItemSpriteUrl('revive')).toBe('/sprites/items/revive.avif')
+    expect(getItemSpriteUrl('max-revive')).toBe(
+      '/sprites/items/max-revive.avif',
+    )
+    expect(getItemSpriteUrl('lucky-egg')).toBe('/sprites/items/lucky-egg.avif')
+    expect(getItemSpriteUrl('lucky-punch')).toBe(
+      '/sprites/items/lucky-punch.avif',
+    )
     expect(
       currencyIconIds.every((iconId) =>
         publicPathExists(getItemSpriteUrl(iconId)),

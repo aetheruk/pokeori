@@ -20,7 +20,10 @@ import {
 import { calculateReleaseRewards } from '@/utilities/rewards/candy-logic'
 import type { NatureName } from '@/data/natures'
 import type { Pokemon, User } from '@/payload-types'
-import { grantRewards, type RewardSummary } from '@/utilities/rewards/reward-logic'
+import {
+  grantRewards,
+  type RewardSummary,
+} from '@/utilities/rewards/reward-logic'
 import { getPokemonForm, getPokemonSpecies } from '@/utilities/pokemon/pokedex'
 import { items } from '@/data/items'
 import { ABILITIES } from '@/data/abilities'
@@ -167,523 +170,575 @@ export async function applyItemToPokemon(
   clientActionId?: string,
 ) {
   const authenticatedUser = await getUser()
-  if (!authenticatedUser) return { success: false as const, error: 'Unauthorized' }
-  if (!clientActionId) return { success: false as const, error: 'Missing action identifier' }
+  if (!authenticatedUser)
+    return { success: false as const, error: 'Unauthorized' }
+  if (!clientActionId)
+    return { success: false as const, error: 'Missing action identifier' }
 
   try {
     const result = await runEconomyAction(
-      { userId: authenticatedUser.id, action: 'apply-pokemon-item', requestId: clientActionId },
+      {
+        userId: authenticatedUser.id,
+        action: 'apply-pokemon-item',
+        requestId: clientActionId,
+      },
       async ({ payload: basePayload, req }) => {
-      const payload = createTransactionPayload(basePayload, req)
-      const user = await payload.findByID({ collection: 'users', id: authenticatedUser.id })
-      const pokemon = await payload.findByID({
-        collection: 'pokemon',
-        id: pokemonId,
-      })
-
-    const userInventory = await getUserInventoryMap(payload as any, user.id, { req })
-    const currentQuantity = userInventory[itemId] || 0
-
-    if (currentQuantity <= 0) {
-      throw new Error('Item not found in inventory')
-    }
-
-    const itemDef = items.find((i) => i.id === itemId)
-
-    if (!itemDef?.effects) {
-      throw new Error('Item has no effect')
-    }
-    const skillLockReason = getItemSkillLockReason(itemDef, user.skills)
-    if (skillLockReason) {
-      throw new Error(skillLockReason)
-    }
-
-    if (
-      typeof pokemon.user === 'object'
-        ? pokemon.user.id !== user.id
-        : pokemon.user !== user.id
-    ) {
-      throw new Error('Pokemon not owned by user')
-    }
-    const unavailableReason = getPokemonItemUnavailableReason(
-      itemDef,
-      pokemon,
-      user.skills,
-    )
-    if (unavailableReason) {
-      throw new Error(unavailableReason)
-    }
-
-    let updatedPokemon: typeof pokemon | null = null
-    let rewardSummary: RewardSummary | undefined
-
-    // 3. Apply Effect
-    if (itemDef.effects.increaseEv) {
-      const { stat, amount } = itemDef.effects.increaseEv
-      const currentEv = pokemon.evs?.[stat] || 0
-
-      // Calculate total EVs
-      const totalEvs = Object.values(pokemon.evs || {}).reduce(
-        (a: number, b) => a + (b || 0),
-        0,
-      )
-
-      if (currentEv >= 255) {
-        throw new Error(`${stat} is already maxed out!`)
-      }
-
-      if (totalEvs >= 510) {
-        throw new Error(`Total EVs are maxed out!`)
-      }
-
-      // Cap increase to not exceed 255 or 510 total
-      let actualAmount = amount
-      if (currentEv + actualAmount > 255) {
-        actualAmount = 255 - currentEv
-      }
-      if (totalEvs + actualAmount > 510) {
-        actualAmount = 510 - totalEvs
-      }
-
-      if (actualAmount <= 0) {
-        throw new Error("It won't have any effect.")
-      }
-
-      // Update Pokemon
-      updatedPokemon = await increaseEVUtil(
-        payload,
-        pokemonId,
-        stat,
-        actualAmount,
-      )
-    } else if (itemDef.effects.decreaseEv) {
-      const { stat, amount } = itemDef.effects.decreaseEv
-      const currentEv = pokemon.evs?.[stat] || 0
-
-      if (currentEv <= 0) {
-        throw new Error(`${stat} EVs are already at 0!`)
-      }
-
-      // Cap decrease to not go below 0
-      let actualAmount = amount
-      if (currentEv - actualAmount < 0) {
-        actualAmount = currentEv
-      }
-
-      if (actualAmount <= 0) {
-        throw new Error("It won't have any effect.")
-      }
-
-      // Update Pokemon
-      updatedPokemon = await decreaseEVUtil(
-        payload,
-        pokemonId,
-        stat,
-        actualAmount,
-      )
-    } else if (itemDef.effects.increaseLevel) {
-      const { increaseLevel, maxLevel, minLevel } = itemDef.effects
-      const currentLevel = pokemon.level || 1
-
-      if (currentLevel >= 100) {
-        throw new Error('Pokemon is already at max level!')
-      }
-
-      if (maxLevel !== undefined && currentLevel > maxLevel) {
-        throw new Error(`This candy can only be used up to level ${maxLevel}.`)
-      }
-
-      if (minLevel !== undefined && currentLevel < minLevel) {
-        throw new Error(`This candy can only be used from level ${minLevel}.`)
-      }
-
-      // Update Pokemon
-      updatedPokemon = await levelUpUtil(payload, pokemonId, increaseLevel || 1)
-    } else if (itemDef.effects.changeNature) {
-      const { changeNature } = itemDef.effects
-      const currentNature = pokemon.nature
-
-      if (currentNature === changeNature) {
-        throw new Error(`This Pokemon is already ${changeNature}!`)
-      }
-
-      // Update Pokemon
-      await changeNatureUtil(payload, pokemonId, changeNature)
-      updatedPokemon = await payload.findByID({
-        collection: 'pokemon',
-        id: pokemonId,
-      })
-    } else if (itemDef.effects.fusePokemon) {
-      const fusionConfig = itemDef.effects.fusePokemon
-      const existingFusion = getFusionOptionForFusedForm(
-        fusionConfig,
-        pokemon.formId,
-      )
-
-      if (existingFusion) {
-        if (
-          pokemon.fusionItemId !== itemDef.id ||
-          !pokemon.fusedWithPokemonId ||
-          pokemon.fusionBaseFormId !== fusionConfig.baseFormId
-        ) {
-          throw new Error('This fused Pokemon is missing fusion partner data.')
-        }
-
-        const partner = await payload.findByID({
+        const payload = createTransactionPayload(basePayload, req)
+        const user = await payload.findByID({
+          collection: 'users',
+          id: authenticatedUser.id,
+        })
+        const pokemon = await payload.findByID({
           collection: 'pokemon',
-          id: pokemon.fusedWithPokemonId,
-          depth: 0,
+          id: pokemonId,
         })
 
-        if (
-          (typeof partner.user === 'object'
-            ? partner.user.id
-            : partner.user) !== user.id
-        ) {
-          throw new Error('Fusion partner is not owned by user.')
-        }
-
-        if (partner.fusedIntoPokemonId !== pokemon.id) {
-          throw new Error('Fusion partner data is out of sync.')
-        }
-
-        await payload.update({
-            collection: 'pokemon',
-            id: pokemonId,
-            data: {
-              formId: pokemon.fusionBaseFormId,
-              fusionItemId: null,
-              fusionBaseFormId: null,
-              fusedWithPokemonId: null,
-            },
-            depth: 0,
-          })
-        await payload.update({
-            collection: 'pokemon',
-            id: partner.id,
-            data: {
-              fusedIntoPokemonId: null,
-            },
-            depth: 0,
-          })
-      } else {
-        if (!options?.partnerPokemonId) {
-          throw new Error('Choose a compatible Pokemon to fuse with.')
-        }
-
-        const partner = await payload.findByID({
-          collection: 'pokemon',
-          id: options.partnerPokemonId,
-          depth: 0,
-        })
-
-        if (
-          (typeof partner.user === 'object'
-            ? partner.user.id
-            : partner.user) !== user.id
-        ) {
-          throw new Error('Fusion partner is not owned by user.')
-        }
-
-        if (!isValidFusionPartner(fusionConfig, pokemon, partner)) {
-          throw new Error('That Pokemon cannot be fused with this Pokemon.')
-        }
-
-        const fusion = getFusionOptionForPartnerForm(
-          fusionConfig,
-          partner.formId,
+        const userInventory = await getUserInventoryMap(
+          payload as any,
+          user.id,
+          { req },
         )
-        if (!fusion) {
-          throw new Error('That Pokemon cannot be fused with this Pokemon.')
+        const currentQuantity = userInventory[itemId] || 0
+
+        if (currentQuantity <= 0) {
+          throw new Error('Item not found in inventory')
         }
 
-        await payload.update({
-            collection: 'pokemon',
-            id: pokemonId,
-            data: {
-              formId: fusion.fusedFormId,
-              fusionItemId: itemDef.id,
-              fusionBaseFormId: fusionConfig.baseFormId,
-              fusedWithPokemonId: partner.id,
-            },
-            depth: 0,
-          })
-        await payload.update({
-            collection: 'pokemon',
-            id: partner.id,
-            data: {
-              fusedIntoPokemonId: pokemonId,
-              onBattleTeam: false,
-              battleTeamPosition: null,
-              isCompanion: false,
-            },
-            depth: 0,
-          })
-      }
+        const itemDef = items.find((i) => i.id === itemId)
 
-      updatedPokemon = await payload.findByID({
-        collection: 'pokemon',
-        id: pokemonId,
-      })
-    } else if (itemDef.effects.changeForm) {
-      const { changeForm } = itemDef.effects
-      const transition = changeForm.transitions.find(
-        (entry) => entry.fromFormId === pokemon.formId,
-      )
-      if (!transition) {
-        throw new Error('This item cannot be used on this Pokemon.')
-      }
+        if (!itemDef?.effects) {
+          throw new Error('Item has no effect')
+        }
+        const skillLockReason = getItemSkillLockReason(itemDef, user.skills)
+        if (skillLockReason) {
+          throw new Error(skillLockReason)
+        }
 
-      if (pokemon.formId === transition.toFormId) {
-        throw new Error("It won't have any effect.")
-      }
+        if (
+          typeof pokemon.user === 'object'
+            ? pokemon.user.id !== user.id
+            : pokemon.user !== user.id
+        ) {
+          throw new Error('Pokemon not owned by user')
+        }
+        const unavailableReason = getPokemonItemUnavailableReason(
+          itemDef,
+          pokemon,
+          user.skills,
+        )
+        if (unavailableReason) {
+          throw new Error(unavailableReason)
+        }
 
-      const targetForm = getPokemonForm(transition.toFormId)
-      if (!targetForm) {
-        throw new Error('Target Pokemon form could not be found.')
-      }
+        let updatedPokemon: typeof pokemon | null = null
+        let rewardSummary: RewardSummary | undefined
 
-      await payload.update({
-        collection: 'pokemon',
-        id: pokemonId,
-        data: {
-          formId: transition.toFormId,
-        },
-      })
-      updatedPokemon = await payload.findByID({
-        collection: 'pokemon',
-        id: pokemonId,
-      })
-    } else if (itemDef.effects.setTeraType) {
-      const teraType = itemDef.effects.setTeraType
+        // 3. Apply Effect
+        if (itemDef.effects.increaseEv) {
+          const { stat, amount } = itemDef.effects.increaseEv
+          const currentEv = pokemon.evs?.[stat] || 0
 
-      if (pokemon.teraType === teraType) {
-        throw new Error(`This Pokemon already has ${teraType} Tera type.`)
-      }
-
-      await payload.update({
-        collection: 'pokemon',
-        id: pokemonId,
-        data: {
-          teraType,
-        },
-      })
-      updatedPokemon = await payload.findByID({
-        collection: 'pokemon',
-        id: pokemonId,
-      })
-    } else if (itemDef.effects.maximizeIv) {
-      // Gold Bottle Cap: Maximize all IVs
-
-      // Check if already maxed
-      const allMaxed = Object.values(pokemon.ivs || {}).every((iv) => iv === 31)
-      if (allMaxed) {
-        throw new Error('All IVs are already maximized!')
-      }
-
-      // Update all IVs
-      await payload.update({
-        collection: 'pokemon',
-        id: pokemonId,
-        data: {
-          ivs: {
-            hp: 31,
-            attack: 31,
-            defense: 31,
-            specialAttack: 31,
-            specialDefense: 31,
-            speed: 31,
-          },
-        },
-      })
-
-      updatedPokemon = await payload.findByID({
-        collection: 'pokemon',
-        id: pokemonId,
-      })
-    } else if (itemDef.effects.maximizeOneIv) {
-      // Bottle Cap: Maximize one IV
-
-      if (!options?.targetStat) {
-        throw new Error('Target stat is required for this item.')
-      }
-
-      const stat = options.targetStat
-      const currentIv = pokemon.ivs?.[stat] || 0
-
-      if (currentIv >= 31) {
-        throw new Error(`${stat} IV is already maximized!`)
-      }
-
-      // Update specific IV
-      await increaseIVUtil(payload, pokemonId, stat, 31 - currentIv)
-
-      updatedPokemon = await payload.findByID({
-        collection: 'pokemon',
-        id: pokemonId,
-      })
-    } else if (itemDef.effects.increaseFriendship) {
-      const amount = itemDef.effects.increaseFriendship
-      const currentFriendship = pokemon.friendship || 0
-
-      if (currentFriendship >= 255) {
-        throw new Error('Pokemon is already max friendship!')
-      }
-
-      updatedPokemon = await increaseFriendshipUtil(payload, pokemonId, amount)
-    } else if (itemDef.effects.teachAbility) {
-      const { teachAbility, usableByForms, usableByTypes } = itemDef.effects
-
-      // Validate requirements if any
-      if (usableByForms || usableByTypes) {
-        // 1. Get Species/Form data to check types
-        // pokemon.formId is stored on the pokemon doc (usually).
-        // Check if pokemon.formId is available. serialization says "formId" might be missing in Type?
-        // "Pokemon" type from payload-types usually has formId.
-        // Let's get the form definition.
-        const formId = pokemon.formId
-        const speciesId = pokemon.speciesId
-        const speciesData =
-          getPokemonForm(formId) || getPokemonSpecies(speciesId)
-
-        if (!speciesData) {
-          throw new Error(
-            'Could not retrieve species data to validate item usage.',
+          // Calculate total EVs
+          const totalEvs = Object.values(pokemon.evs || {}).reduce(
+            (a: number, b) => a + (b || 0),
+            0,
           )
-        }
 
-        let allowed = false
-
-        // Check Form ID
-        if (usableByForms?.includes(formId)) {
-          allowed = true
-        }
-
-        // Check Types
-        if (!allowed && usableByTypes && speciesData.types) {
-          // If pokemon has ANY of the allowed types
-          const hasType = speciesData.types.some((t: string) =>
-            usableByTypes.includes(t.toLowerCase() as any),
-          )
-          if (hasType) {
-            allowed = true
+          if (currentEv >= 255) {
+            throw new Error(`${stat} is already maxed out!`)
           }
-        }
 
-        if (!allowed) {
-          throw new Error('This item cannot be used on this Pokemon.')
-        }
-      }
+          if (totalEvs >= 510) {
+            throw new Error(`Total EVs are maxed out!`)
+          }
 
-      const newAbilityId = teachAbility
-      const currentAbilityId =
-        typeof pokemon.ability === 'string' ? pokemon.ability : undefined
-      const currentAbility = currentAbilityId
-        ? ABILITIES[currentAbilityId]
-        : undefined
-      if (currentAbility?.locked) {
-        throw new Error(`${currentAbility.name} cannot be overwritten.`)
-      }
+          // Cap increase to not exceed 255 or 510 total
+          let actualAmount = amount
+          if (currentEv + actualAmount > 255) {
+            actualAmount = 255 - currentEv
+          }
+          if (totalEvs + actualAmount > 510) {
+            actualAmount = 510 - totalEvs
+          }
 
-      // Update Pokemon with new ability
-      await payload.update({
-        collection: 'pokemon',
-        id: pokemonId,
-        data: {
-          ability: newAbilityId,
-        },
-      })
-      updatedPokemon = await payload.findByID({
-        collection: 'pokemon',
-        id: pokemonId,
-      })
-      await registerAbilityDexEntry(
-        payload as any,
-        user.id,
-        newAbilityId,
-        'ability-patch',
-        req,
-      )
-    } else if (itemDef.effects.grantPokemonResearchXp) {
-      // Only allow if no formId specified in item def, or if it matches the pokemon's form
-      const {
-        formId: effectFormId,
-        amount,
-        minSkillLevel,
-      } = itemDef.effects.grantPokemonResearchXp
+          if (actualAmount <= 0) {
+            throw new Error("It won't have any effect.")
+          }
 
-      // Check skill level requirement
-      if (minSkillLevel) {
-        const researcherLevel = user.skills?.researching?.level || 1
-        if (researcherLevel < minSkillLevel) {
-          throw new Error(
-            `Researcher Level ${minSkillLevel} required to use this item.`,
+          // Update Pokemon
+          updatedPokemon = await increaseEVUtil(
+            payload,
+            pokemonId,
+            stat,
+            actualAmount,
           )
+        } else if (itemDef.effects.decreaseEv) {
+          const { stat, amount } = itemDef.effects.decreaseEv
+          const currentEv = pokemon.evs?.[stat] || 0
+
+          if (currentEv <= 0) {
+            throw new Error(`${stat} EVs are already at 0!`)
+          }
+
+          // Cap decrease to not go below 0
+          let actualAmount = amount
+          if (currentEv - actualAmount < 0) {
+            actualAmount = currentEv
+          }
+
+          if (actualAmount <= 0) {
+            throw new Error("It won't have any effect.")
+          }
+
+          // Update Pokemon
+          updatedPokemon = await decreaseEVUtil(
+            payload,
+            pokemonId,
+            stat,
+            actualAmount,
+          )
+        } else if (itemDef.effects.setLevel !== undefined) {
+          const { setLevel } = itemDef.effects
+          const currentLevel = pokemon.level || 1
+
+          if (setLevel <= currentLevel) {
+            throw new Error("This item would not raise this Pokemon's level.")
+          }
+
+          updatedPokemon = await levelUpUtil(
+            payload,
+            pokemonId,
+            setLevel - currentLevel,
+          )
+        } else if (itemDef.effects.increaseLevel) {
+          const { increaseLevel, maxLevel, minLevel } = itemDef.effects
+          const currentLevel = pokemon.level || 1
+
+          if (currentLevel >= 100) {
+            throw new Error('Pokemon is already at max level!')
+          }
+
+          if (maxLevel !== undefined && currentLevel > maxLevel) {
+            throw new Error(
+              `This candy can only be used up to level ${maxLevel}.`,
+            )
+          }
+
+          if (minLevel !== undefined && currentLevel < minLevel) {
+            throw new Error(
+              `This candy can only be used from level ${minLevel}.`,
+            )
+          }
+
+          // Update Pokemon
+          updatedPokemon = await levelUpUtil(
+            payload,
+            pokemonId,
+            increaseLevel || 1,
+          )
+        } else if (itemDef.effects.changeNature) {
+          const { changeNature } = itemDef.effects
+          const currentNature = pokemon.nature
+
+          if (currentNature === changeNature) {
+            throw new Error(`This Pokemon is already ${changeNature}!`)
+          }
+
+          // Update Pokemon
+          await changeNatureUtil(payload, pokemonId, changeNature)
+          updatedPokemon = await payload.findByID({
+            collection: 'pokemon',
+            id: pokemonId,
+          })
+        } else if (itemDef.effects.fusePokemon) {
+          const fusionConfig = itemDef.effects.fusePokemon
+          const existingFusion = getFusionOptionForFusedForm(
+            fusionConfig,
+            pokemon.formId,
+          )
+
+          if (existingFusion) {
+            if (
+              pokemon.fusionItemId !== itemDef.id ||
+              !pokemon.fusedWithPokemonId ||
+              pokemon.fusionBaseFormId !== fusionConfig.baseFormId
+            ) {
+              throw new Error(
+                'This fused Pokemon is missing fusion partner data.',
+              )
+            }
+
+            const partner = await payload.findByID({
+              collection: 'pokemon',
+              id: pokemon.fusedWithPokemonId,
+              depth: 0,
+            })
+
+            if (
+              (typeof partner.user === 'object'
+                ? partner.user.id
+                : partner.user) !== user.id
+            ) {
+              throw new Error('Fusion partner is not owned by user.')
+            }
+
+            if (partner.fusedIntoPokemonId !== pokemon.id) {
+              throw new Error('Fusion partner data is out of sync.')
+            }
+
+            await payload.update({
+              collection: 'pokemon',
+              id: pokemonId,
+              data: {
+                formId: pokemon.fusionBaseFormId,
+                fusionItemId: null,
+                fusionBaseFormId: null,
+                fusedWithPokemonId: null,
+              },
+              depth: 0,
+            })
+            await payload.update({
+              collection: 'pokemon',
+              id: partner.id,
+              data: {
+                fusedIntoPokemonId: null,
+              },
+              depth: 0,
+            })
+          } else {
+            if (!options?.partnerPokemonId) {
+              throw new Error('Choose a compatible Pokemon to fuse with.')
+            }
+
+            const partner = await payload.findByID({
+              collection: 'pokemon',
+              id: options.partnerPokemonId,
+              depth: 0,
+            })
+
+            if (
+              (typeof partner.user === 'object'
+                ? partner.user.id
+                : partner.user) !== user.id
+            ) {
+              throw new Error('Fusion partner is not owned by user.')
+            }
+
+            if (!isValidFusionPartner(fusionConfig, pokemon, partner)) {
+              throw new Error('That Pokemon cannot be fused with this Pokemon.')
+            }
+
+            const fusion = getFusionOptionForPartnerForm(
+              fusionConfig,
+              partner.formId,
+            )
+            if (!fusion) {
+              throw new Error('That Pokemon cannot be fused with this Pokemon.')
+            }
+
+            await payload.update({
+              collection: 'pokemon',
+              id: pokemonId,
+              data: {
+                formId: fusion.fusedFormId,
+                fusionItemId: itemDef.id,
+                fusionBaseFormId: fusionConfig.baseFormId,
+                fusedWithPokemonId: partner.id,
+              },
+              depth: 0,
+            })
+            await payload.update({
+              collection: 'pokemon',
+              id: partner.id,
+              data: {
+                fusedIntoPokemonId: pokemonId,
+                onBattleTeam: false,
+                battleTeamPosition: null,
+                isCompanion: false,
+              },
+              depth: 0,
+            })
+          }
+
+          updatedPokemon = await payload.findByID({
+            collection: 'pokemon',
+            id: pokemonId,
+          })
+        } else if (itemDef.effects.changeForm) {
+          const { changeForm } = itemDef.effects
+          const transition = changeForm.transitions.find(
+            (entry) => entry.fromFormId === pokemon.formId,
+          )
+          if (!transition) {
+            throw new Error('This item cannot be used on this Pokemon.')
+          }
+
+          if (pokemon.formId === transition.toFormId) {
+            throw new Error("It won't have any effect.")
+          }
+
+          const targetForm = getPokemonForm(transition.toFormId)
+          if (!targetForm) {
+            throw new Error('Target Pokemon form could not be found.')
+          }
+
+          await payload.update({
+            collection: 'pokemon',
+            id: pokemonId,
+            data: {
+              formId: transition.toFormId,
+            },
+          })
+          updatedPokemon = await payload.findByID({
+            collection: 'pokemon',
+            id: pokemonId,
+          })
+        } else if (itemDef.effects.setTeraType) {
+          const teraType = itemDef.effects.setTeraType
+
+          if (pokemon.teraType === teraType) {
+            throw new Error(`This Pokemon already has ${teraType} Tera type.`)
+          }
+
+          await payload.update({
+            collection: 'pokemon',
+            id: pokemonId,
+            data: {
+              teraType,
+            },
+          })
+          updatedPokemon = await payload.findByID({
+            collection: 'pokemon',
+            id: pokemonId,
+          })
+        } else if (itemDef.effects.maximizeIv) {
+          // Gold Bottle Cap: Maximize all IVs
+
+          // Check if already maxed
+          const allMaxed = Object.values(pokemon.ivs || {}).every(
+            (iv) => iv === 31,
+          )
+          if (allMaxed) {
+            throw new Error('All IVs are already maximized!')
+          }
+
+          // Update all IVs
+          await payload.update({
+            collection: 'pokemon',
+            id: pokemonId,
+            data: {
+              ivs: {
+                hp: 31,
+                attack: 31,
+                defense: 31,
+                specialAttack: 31,
+                specialDefense: 31,
+                speed: 31,
+              },
+            },
+          })
+
+          updatedPokemon = await payload.findByID({
+            collection: 'pokemon',
+            id: pokemonId,
+          })
+        } else if (itemDef.effects.maximizeOneIv) {
+          // Bottle Cap: Maximize one IV
+
+          if (!options?.targetStat) {
+            throw new Error('Target stat is required for this item.')
+          }
+
+          const stat = options.targetStat
+          const currentIv = pokemon.ivs?.[stat] || 0
+
+          if (currentIv >= 31) {
+            throw new Error(`${stat} IV is already maximized!`)
+          }
+
+          // Update specific IV
+          await increaseIVUtil(payload, pokemonId, stat, 31 - currentIv)
+
+          updatedPokemon = await payload.findByID({
+            collection: 'pokemon',
+            id: pokemonId,
+          })
+        } else if (itemDef.effects.increaseFriendship) {
+          const amount = itemDef.effects.increaseFriendship
+          const currentFriendship = pokemon.friendship || 0
+
+          if (currentFriendship >= 255) {
+            throw new Error('Pokemon is already max friendship!')
+          }
+
+          updatedPokemon = await increaseFriendshipUtil(
+            payload,
+            pokemonId,
+            amount,
+          )
+        } else if (itemDef.effects.teachAbility) {
+          const { teachAbility, usableByForms, usableByTypes } = itemDef.effects
+
+          // Validate requirements if any
+          if (usableByForms || usableByTypes) {
+            // 1. Get Species/Form data to check types
+            // pokemon.formId is stored on the pokemon doc (usually).
+            // Check if pokemon.formId is available. serialization says "formId" might be missing in Type?
+            // "Pokemon" type from payload-types usually has formId.
+            // Let's get the form definition.
+            const formId = pokemon.formId
+            const speciesId = pokemon.speciesId
+            const speciesData =
+              getPokemonForm(formId) || getPokemonSpecies(speciesId)
+
+            if (!speciesData) {
+              throw new Error(
+                'Could not retrieve species data to validate item usage.',
+              )
+            }
+
+            let allowed = false
+
+            // Check Form ID
+            if (usableByForms?.includes(formId)) {
+              allowed = true
+            }
+
+            // Check Types
+            if (!allowed && usableByTypes && speciesData.types) {
+              // If pokemon has ANY of the allowed types
+              const hasType = speciesData.types.some((t: string) =>
+                usableByTypes.includes(t.toLowerCase() as any),
+              )
+              if (hasType) {
+                allowed = true
+              }
+            }
+
+            if (!allowed) {
+              throw new Error('This item cannot be used on this Pokemon.')
+            }
+          }
+
+          const newAbilityId = teachAbility
+          const currentAbilityId =
+            typeof pokemon.ability === 'string' ? pokemon.ability : undefined
+          const currentAbility = currentAbilityId
+            ? ABILITIES[currentAbilityId]
+            : undefined
+          if (currentAbility?.locked) {
+            throw new Error(`${currentAbility.name} cannot be overwritten.`)
+          }
+
+          // Update Pokemon with new ability
+          await payload.update({
+            collection: 'pokemon',
+            id: pokemonId,
+            data: {
+              ability: newAbilityId,
+            },
+          })
+          updatedPokemon = await payload.findByID({
+            collection: 'pokemon',
+            id: pokemonId,
+          })
+          await registerAbilityDexEntry(
+            payload as any,
+            user.id,
+            newAbilityId,
+            'ability-patch',
+            req,
+          )
+        } else if (itemDef.effects.grantPokemonResearchXp) {
+          // Only allow if no formId specified in item def, or if it matches the pokemon's form
+          const {
+            formId: effectFormId,
+            amount,
+            minSkillLevel,
+          } = itemDef.effects.grantPokemonResearchXp
+
+          // Check skill level requirement
+          if (minSkillLevel) {
+            const researcherLevel = user.skills?.researching?.level || 1
+            if (researcherLevel < minSkillLevel) {
+              throw new Error(
+                `Researcher Level ${minSkillLevel} required to use this item.`,
+              )
+            }
+          }
+
+          // Check if Legendary/Mythical
+          const formInfo = getPokemonForm(pokemon.formId)
+          if (
+            !effectFormId &&
+            (formInfo?.is_legendary || formInfo?.is_mythical)
+          ) {
+            throw new Error(
+              `${itemDef.name} cannot be used on Legendary or Mythical Pokemon.`,
+            )
+          }
+
+          const targetFormId = effectFormId || pokemon.formId
+
+          if (effectFormId && effectFormId !== pokemon.formId) {
+            throw new Error(`This item is specific to ${effectFormId}`)
+          }
+
+          // Resolve amount if it's a range
+          let actualAmount = 0
+          if (typeof amount === 'number') {
+            actualAmount = amount
+          } else {
+            actualAmount =
+              Math.floor(Math.random() * (amount.max - amount.min + 1)) +
+              amount.min
+          }
+
+          // Use grantRewards utility to grant research XP
+          const rewardResult = await grantRewards(
+            user.id,
+            [
+              {
+                type: 'pokemon_research_xp',
+                targetId: targetFormId,
+                quantity: actualAmount,
+              },
+            ],
+            { source: 'pokemon-item', payload: basePayload, req },
+          )
+
+          if (!rewardResult.success) {
+            throw new Error('Failed to grant research XP')
+          }
+          rewardSummary = rewardResult.summary
+
+          // Refresh pokemon data if needed (though research XP is on Pokedex, not Pokemon doc)
+          updatedPokemon = await payload.findByID({
+            collection: 'pokemon',
+            id: pokemonId,
+          })
+        } else {
+          throw new Error('Item has no implemented effect')
         }
-      }
 
-      // Check if Legendary/Mythical
-      const formInfo = getPokemonForm(pokemon.formId)
-      if (!effectFormId && (formInfo?.is_legendary || formInfo?.is_mythical)) {
-        throw new Error(
-          `${itemDef.name} cannot be used on Legendary or Mythical Pokemon.`,
-        )
-      }
+        if (itemDef.consume !== false) {
+          const nextQuantity = currentQuantity - 1
+          if (nextQuantity > 0) {
+            userInventory[itemId] = nextQuantity
+          } else {
+            delete userInventory[itemId]
+          }
+          await setUserInventoryMap(payload as any, user.id, userInventory, {
+            req,
+          })
+        }
 
-      const targetFormId = effectFormId || pokemon.formId
-
-      if (effectFormId && effectFormId !== pokemon.formId) {
-        throw new Error(`This item is specific to ${effectFormId}`)
-      }
-
-      // Resolve amount if it's a range
-      let actualAmount = 0
-      if (typeof amount === 'number') {
-        actualAmount = amount
-      } else {
-        actualAmount =
-          Math.floor(Math.random() * (amount.max - amount.min + 1)) + amount.min
-      }
-
-      // Use grantRewards utility to grant research XP
-      const rewardResult = await grantRewards(user.id, [
-        {
-          type: 'pokemon_research_xp',
-          targetId: targetFormId,
-          quantity: actualAmount,
-        },
-      ], { source: 'pokemon-item', payload: basePayload, req })
-
-      if (!rewardResult.success) {
-        throw new Error('Failed to grant research XP')
-      }
-      rewardSummary = rewardResult.summary
-
-      // Refresh pokemon data if needed (though research XP is on Pokedex, not Pokemon doc)
-      updatedPokemon = await payload.findByID({
-        collection: 'pokemon',
-        id: pokemonId,
-      })
-    } else {
-      throw new Error('Item has no implemented effect')
-    }
-
-    if (itemDef.consume !== false) {
-      const nextQuantity = currentQuantity - 1
-      if (nextQuantity > 0) {
-        userInventory[itemId] = nextQuantity
-      } else {
-        delete userInventory[itemId]
-      }
-      await setUserInventoryMap(payload as any, user.id, userInventory, { req })
-    }
-
-    return {
-      success: true as const,
-      message: `Used ${itemDef.name} on ${pokemon.name || 'Pokemon'}`,
-      pokemon: updatedPokemon,
-      summary: rewardSummary,
-    }
+        return {
+          success: true as const,
+          message: `Used ${itemDef.name} on ${pokemon.name || 'Pokemon'}`,
+          pokemon: updatedPokemon,
+          summary: rewardSummary,
+        }
       },
     )
     revalidatePath('/game/pokemon')

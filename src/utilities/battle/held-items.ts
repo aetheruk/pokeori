@@ -127,9 +127,7 @@ function shouldTriggerHeldItem(
             trigger.thresholdPercent,
           )
         : trigger.thresholdPercent
-    const thresholdHp = Math.floor(
-      pokemon.maxHp * (thresholdPercent / 100),
-    )
+    const thresholdHp = Math.floor(pokemon.maxHp * (thresholdPercent / 100))
     return (
       pokemon.currentHp > 0 && pokemon.currentHp <= Math.max(1, thresholdHp)
     )
@@ -148,7 +146,11 @@ function applyBerryEffectMultiplier(
   item: NonNullable<ReturnType<typeof getHeldItemDefinition>>,
 ): HeldItemConfig['effect'] {
   const effect = item.heldConfig.effect
-  if (item.category !== 'berry' || effect.type !== 'heal' || !effect.healAmount) {
+  if (
+    item.category !== 'berry' ||
+    effect.type !== 'heal' ||
+    !effect.healAmount
+  ) {
     return effect
   }
 
@@ -217,7 +219,8 @@ export function applyHeldDamageBlock(
     suppressesBattleHeldItemEffectsByAbility(pokemon) ||
     incomingDamage <= 0 ||
     pokemon.currentHp <= 0 ||
-    (pokemon.pokemonResearchLevel !== undefined && pokemon.pokemonResearchLevel < 1)
+    (pokemon.pokemonResearchLevel !== undefined &&
+      pokemon.pokemonResearchLevel < 1)
   ) {
     return {
       damage: incomingDamage,
@@ -227,7 +230,10 @@ export function applyHeldDamageBlock(
     }
   }
 
-  const blocked = Math.min(incomingDamage, item.heldConfig.effect.blockAmount || 0)
+  const blocked = Math.min(
+    incomingDamage,
+    item.heldConfig.effect.blockAmount || 0,
+  )
   if (blocked <= 0) {
     return {
       damage: incomingDamage,
@@ -265,13 +271,64 @@ export function getHeldAttackDamageMultiplier(
     suppressesBattleHeldItemEffectsByAbility(pokemon) ||
     effect?.type !== 'type-damage-boost' ||
     pokemon.currentHp <= 0 ||
-    (pokemon.pokemonResearchLevel !== undefined && pokemon.pokemonResearchLevel < 1) ||
+    (pokemon.pokemonResearchLevel !== undefined &&
+      pokemon.pokemonResearchLevel < 1) ||
     !attackTypeMatches(attackType, boostedAttackType)
   ) {
     return 1
   }
 
   return Math.max(0, effect.damageMultiplier ?? 1)
+}
+
+export function getHeldItemCritChanceMultiplier(
+  pokemon: BattlePokemon,
+): number {
+  const item = getHeldItemDefinition(getHeldItemId(pokemon))
+  const effect = item?.heldConfig.effect
+  if (
+    !item ||
+    effect?.type !== 'crit-chance-multiplier' ||
+    suppressesBattleHeldItemEffectsByAbility(pokemon) ||
+    pokemon.currentHp <= 0 ||
+    (pokemon.pokemonResearchLevel !== undefined &&
+      pokemon.pokemonResearchLevel < 1) ||
+    (effect.eligibleSpeciesIds?.length &&
+      !effect.eligibleSpeciesIds.includes(pokemon.speciesId))
+  ) {
+    return 1
+  }
+
+  return Math.max(1, effect.critChanceMultiplier ?? 1)
+}
+
+export function getWildBattleCandyMultiplier(
+  team: BattlePokemon[],
+  random: () => number = Math.random,
+): number {
+  let multiplier = 1
+
+  for (const pokemon of team) {
+    const item = getHeldItemDefinition(getHeldItemId(pokemon))
+    const effect = item?.heldConfig.effect
+    if (
+      !item ||
+      effect?.type !== 'reward-multiplier' ||
+      effect.rewardType !== 'wild-battle-candy' ||
+      suppressesBattleHeldItemEffectsByAbility(pokemon) ||
+      pokemon.currentHp <= 0 ||
+      (pokemon.pokemonResearchLevel !== undefined &&
+        pokemon.pokemonResearchLevel < 1)
+    ) {
+      continue
+    }
+
+    if (random() * 100 < (effect.rewardChance ?? 100)) {
+      multiplier = Math.max(multiplier, effect.rewardMultiplier ?? 1)
+    }
+  }
+
+  return multiplier
 }
 
 export function applyHeldAttackBreak(
@@ -291,7 +348,8 @@ export function applyHeldAttackBreak(
     item.heldConfig.consumeTrigger !== 'attack' ||
     getHeldAttackDamageMultiplier(pokemon, attackType) <= 1 ||
     pokemon.currentHp <= 0 ||
-    (pokemon.pokemonResearchLevel !== undefined && pokemon.pokemonResearchLevel < 1)
+    (pokemon.pokemonResearchLevel !== undefined &&
+      pokemon.pokemonResearchLevel < 1)
   ) {
     return { applied: false, message: '' }
   }
@@ -314,10 +372,15 @@ function getPersistentOwnerId(pokemon: BattlePokemon): string | null {
   if (!pokemon.id || pokemon.id.startsWith('enemy-')) return null
   if (pokemon.id.startsWith('chronicle:')) return null
   if (!pokemon.user || pokemon.user === 'enemy') return null
-  return typeof pokemon.user === 'object' ? (pokemon.user as any).id || null : pokemon.user
+  return typeof pokemon.user === 'object'
+    ? (pokemon.user as any).id || null
+    : pokemon.user
 }
 
-function isHourInWindow(hour: number, window: { startHour: number; endHour: number }): boolean {
+function isHourInWindow(
+  hour: number,
+  window: { startHour: number; endHour: number },
+): boolean {
   const start = Math.max(0, Math.min(23, Math.floor(window.startHour)))
   const end = Math.max(0, Math.min(24, Math.floor(window.endHour)))
   if (start === end) return true
@@ -326,7 +389,9 @@ function isHourInWindow(hour: number, window: { startHour: number; endHour: numb
 }
 
 function resolveChargeRewardItemId(
-  effect: NonNullable<ReturnType<typeof getHeldItemDefinition>>['heldConfig']['effect'],
+  effect: NonNullable<
+    ReturnType<typeof getHeldItemDefinition>
+  >['heldConfig']['effect'],
   now: Date,
 ): string | undefined {
   const hour = now.getHours()
@@ -352,11 +417,15 @@ export function applyHeldItemChargeOnHit(params: {
     item?.heldConfig.trigger.type !== 'permanent' ||
     effect?.type !== 'item-charge' ||
     suppressesBattleHeldItemEffectsByAbility(pokemon) ||
-    (effect.chargeOn !== 'hit-by-type' && effect.chargeOn !== 'damage-during-time') ||
+    (effect.chargeOn !== 'hit-by-type' &&
+      effect.chargeOn !== 'damage-during-time') ||
     damage <= 0 ||
-    (effect.chargeOn === 'hit-by-type' && !attackTypeMatches(attackType, effect.attackType)) ||
-    (effect.chargeActiveWindow && !isHourInWindow(hour, effect.chargeActiveWindow)) ||
-    (pokemon.pokemonResearchLevel !== undefined && pokemon.pokemonResearchLevel < 1)
+    (effect.chargeOn === 'hit-by-type' &&
+      !attackTypeMatches(attackType, effect.attackType)) ||
+    (effect.chargeActiveWindow &&
+      !isHourInWindow(hour, effect.chargeActiveWindow)) ||
+    (pokemon.pokemonResearchLevel !== undefined &&
+      pokemon.pokemonResearchLevel < 1)
   ) {
     return { applied: false, message: '' }
   }
@@ -364,7 +433,8 @@ export function applyHeldItemChargeOnHit(params: {
   const maxCharge = Math.max(1, effect.maxCharge ?? 100)
   const nextCharge = Math.min(
     maxCharge,
-    Math.max(0, pokemon.itemCharge || 0) + Math.max(1, effect.chargeAmount ?? 1),
+    Math.max(0, pokemon.itemCharge || 0) +
+      Math.max(1, effect.chargeAmount ?? 1),
   )
   pokemon.itemCharge = nextCharge
 

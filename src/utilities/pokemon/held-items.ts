@@ -95,6 +95,15 @@ export function formatHeldItemTrigger(item: HeldItemDefinition): string {
     return `Blocks up to ${item.heldConfig.effect.blockAmount || 0} damage once`
   }
 
+  if (effect.type === 'crit-chance-multiplier') {
+    const multiplier = effect.critChanceMultiplier || 1
+    return `Multiplies Chansey's critical-hit chance by ${multiplier}x`
+  }
+
+  if (effect.type === 'reward-multiplier' && effect.rewardType === 'wild-battle-candy') {
+    return `${effect.rewardChance || 100}% chance to double wild battle candy drops`
+  }
+
   if (item.id.endsWith('-memory') && effect.type === 'type-damage-boost' && effect.pokemonType) {
     const label =
       effect.pokemonType.charAt(0).toUpperCase() +

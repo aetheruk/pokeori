@@ -64,6 +64,7 @@ export function getWildBattleCandyDropChance(level: number): number {
 export function calculateCandyRewards(
   battleConfig: BattleConfig,
   enemyLevels: number[],
+  candyMultiplier = 1,
 ): LocationReward[] {
   if (battleConfig.disableCandyRewards) return []
   if (enemyLevels.length === 0) return []
@@ -83,7 +84,10 @@ export function calculateCandyRewards(
   }
 
   const dropRate = getWildBattleCandyDropChance(maxLevel)
-  const quantity = { min: 1, max: 1 }
+  const quantity = {
+    min: Math.max(1, Math.floor(candyMultiplier)),
+    max: Math.max(1, Math.floor(candyMultiplier)),
+  }
   const rewards: LocationReward[] = []
 
   rewards.push({
@@ -114,7 +118,10 @@ export function calculateCandyRewards(
   return rewards
 }
 
-export function calculateReleaseRewards(level: number): { itemId: string; quantity: number } {
+export function calculateReleaseRewards(level: number): {
+  itemId: string
+  quantity: number
+} {
   const candyId = getCandyIdForLevel(level)
 
   // Random quantity 1-2

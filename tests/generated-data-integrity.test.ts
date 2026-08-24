@@ -362,6 +362,8 @@ describe('generated data integrity', () => {
         item.heldConfig?.effect.type !== 'ev-training' &&
         item.heldConfig?.effect.type !== 'type-damage-boost' &&
         item.heldConfig?.effect.type !== 'attack-status-chance' &&
+        item.heldConfig?.effect.type !== 'crit-chance-multiplier' &&
+        item.heldConfig?.effect.type !== 'reward-multiplier' &&
         item.heldConfig?.effect.type !== 'item-charge'
       ) {
         expect(item.battleEffect, item.id).toBeDefined()
@@ -372,6 +374,8 @@ describe('generated data integrity', () => {
       expect(heldConfig?.effect, item.id).toBeDefined()
       if (
         heldConfig?.effect.type === 'attack-status-chance' ||
+        heldConfig?.effect.type === 'crit-chance-multiplier' ||
+        heldConfig?.effect.type === 'reward-multiplier' ||
         heldConfig?.effect.type === 'item-charge' ||
         (heldConfig?.effect.type === 'type-damage-boost' &&
           !item.id.startsWith('unstable-') &&
@@ -420,7 +424,9 @@ describe('generated data integrity', () => {
         const chargeOn = heldConfig.effect.chargeOn
         expect(chargeOn, item.id).toBeDefined()
         if (!chargeOn) continue
-        expect(['hit-by-type', 'damage-during-time'], item.id).toContain(chargeOn)
+        expect(['hit-by-type', 'damage-during-time'], item.id).toContain(
+          chargeOn,
+        )
         if (chargeOn === 'hit-by-type') {
           expect(heldConfig.effect.attackType, item.id).toBeDefined()
         }
@@ -908,7 +914,9 @@ describe('generated data integrity', () => {
     expect(ABILITIES.scavenge).toBeUndefined()
     expect(ABILITIES.secret_admirer).toBeUndefined()
     expect(ABILITIES.unstable).toBeUndefined()
-    expect(Object.values(ABILITIES).every((ability) => ability.effects?.length)).toBe(true)
+    expect(
+      Object.values(ABILITIES).every((ability) => ability.effects?.length),
+    ).toBe(true)
     expect(
       Object.values(ABILITIES).every((ability) =>
         ability.effects?.some((effect) => effect.type.startsWith('battle-')),
@@ -926,21 +934,39 @@ describe('generated data integrity', () => {
     expect(isNaturalFormAbilityForForm('17', 'keen_eye')).toBe(true)
     expect(isNaturalFormAbilityForForm('17', 'overgrow')).toBe(false)
 
-    expect(resolveEvolvedAbility('16', 'keen_eye', '17', () => 0)).toBe('keen_eye')
-    expect(resolveEvolvedAbility('16', 'tangled_feet', '17', () => 0)).toBe('tangled_feet')
-    expect(resolveEvolvedAbility('16', 'big_pecks', '17', () => 0.999999)).toBe('big_pecks')
-    expect(resolveEvolvedAbility('133', 'run_away', '134', () => 0.999999)).toBe('water_absorb')
-    expect(resolveEvolvedAbility('133', 'adaptability', '134', () => 0.999999)).toBe('water_absorb')
-    expect(resolveEvolvedAbility('133', 'anticipation', '134', () => 0.999999)).toBe('hydration')
-    expect(resolveEvolvedAbility('16', 'tiny_roar', '17', () => 0)).toBe('big_pecks')
+    expect(resolveEvolvedAbility('16', 'keen_eye', '17', () => 0)).toBe(
+      'keen_eye',
+    )
+    expect(resolveEvolvedAbility('16', 'tangled_feet', '17', () => 0)).toBe(
+      'tangled_feet',
+    )
+    expect(resolveEvolvedAbility('16', 'big_pecks', '17', () => 0.999999)).toBe(
+      'big_pecks',
+    )
+    expect(
+      resolveEvolvedAbility('133', 'run_away', '134', () => 0.999999),
+    ).toBe('water_absorb')
+    expect(
+      resolveEvolvedAbility('133', 'adaptability', '134', () => 0.999999),
+    ).toBe('water_absorb')
+    expect(
+      resolveEvolvedAbility('133', 'anticipation', '134', () => 0.999999),
+    ).toBe('hydration')
+    expect(resolveEvolvedAbility('16', 'tiny_roar', '17', () => 0)).toBe(
+      'big_pecks',
+    )
   })
 
   test('AbilityDex exposes authored partner effect text', () => {
-    expect(getAbilityDexPartnerEffectLines(ABILITIES.cute_charm)).toContainEqual({
+    expect(
+      getAbilityDexPartnerEffectLines(ABILITIES.cute_charm),
+    ).toContainEqual({
       id: 'catch-rate-multiplier-1',
       text: 'Capture: +8% catch rate.',
     })
-    expect(getAbilityDexPartnerEffectLines(ABILITIES.compound_eyes)).toContainEqual({
+    expect(
+      getAbilityDexPartnerEffectLines(ABILITIES.compound_eyes),
+    ).toContainEqual({
       id: 'field-observation-duration-delta-2',
       text: 'Field Observation: +2s observation time, +1s answer time.',
     })

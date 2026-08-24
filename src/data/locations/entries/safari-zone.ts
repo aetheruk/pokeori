@@ -10,6 +10,28 @@ const strangeSightingsRequirement = {
   targetId: 'safari-strange-sightings',
 }
 
+const rareItemRumoursRequirement = {
+  type: 'task_completed' as const,
+  targetId: 'safari-rare-item-rumours',
+}
+
+const rareSafariItemRewards: Location['rewards'] = [
+  {
+    type: 'item',
+    targetId: 'lucky-egg',
+    quantity: 1,
+    dropChance: 1,
+    requirements: [rareItemRumoursRequirement],
+  },
+  {
+    type: 'item',
+    targetId: 'lucky-punch',
+    quantity: 1,
+    dropChance: 1,
+    requirements: [rareItemRumoursRequirement],
+  },
+]
+
 function safariArea({
   id,
   name,
@@ -40,7 +62,7 @@ function safariArea({
     levelRange: { min: 25, max: 35 },
     requirements: [permitRequirement, ...requirements],
     encounters,
-    rewards: [],
+    rewards: [...rareSafariItemRewards],
     skillXp: { skill: 'catching', level: 32 },
   }
 }

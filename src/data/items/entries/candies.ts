@@ -2,7 +2,7 @@ import { Item } from '../types'
 
 const EX_CANDY_HUE_ROTATE = 80
 
-export const candyItems: Item[] = [
+const baseCandyItems: Item[] = [
   {
     id: 'rare-candy-xs',
     name: 'XS Candy',
@@ -144,3 +144,25 @@ export const candyItems: Item[] = [
     },
   },
 ]
+
+export const candyBagItems: Item[] = baseCandyItems.map((candy, index) => {
+  const minLevel = candy.effects?.minLevel || 1
+  const maxLevel = candy.effects?.maxLevel || 99
+  const targetLevel = maxLevel + 1
+
+  return {
+    id: `${candy.id}-bag`,
+    name: `${candy.name} Bag`,
+    description: `A carefully portioned bag of ${candy.name.toLowerCase()}. It raises a single Pokémon to level ${targetLevel}.`,
+    category: 'candy' as const,
+    spriteId: 'revive',
+    hueRotate: (index * 80) % 360,
+    effects: {
+      setLevel: targetLevel,
+      maxLevel,
+      minLevel,
+    },
+  }
+})
+
+export const candyItems: Item[] = baseCandyItems

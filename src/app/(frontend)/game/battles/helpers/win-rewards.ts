@@ -12,12 +12,16 @@ import {
   resolveSkillXpConfig,
 } from '@/data/skills/xp'
 import { getBattleAbilityWinRewards } from '@/utilities/battle/abilities'
+import { getWildBattleCandyMultiplier } from '@/utilities/battle/held-items'
 
 export const BATTLE_PARTICIPANT_RESEARCH_XP = 1
 export const BATTLE_WILD_TARGET_RESEARCH_XP = 1
 const SS_ANNE_EVENING_CRUISE_PAYOUT_MULTIPLIER = 0.2
 
-function scalePokedollarRewardQuantity(quantity: unknown, multiplier: number): unknown {
+function scalePokedollarRewardQuantity(
+  quantity: unknown,
+  multiplier: number,
+): unknown {
   if (typeof quantity !== 'number') return quantity
   return Math.max(1, Math.round(quantity * multiplier))
 }
@@ -50,10 +54,9 @@ export function buildBattleWinRewards(
   user: User,
   battleConfig: any,
 ) {
-  const rewardsToGrant = scaleRepeatBattleCashRewards(
-    state,
-    [...(battleConfig.rewards || [])],
-  )
+  const rewardsToGrant = scaleRepeatBattleCashRewards(state, [
+    ...(battleConfig.rewards || []),
+  ])
   rewardsToGrant.push(...(state.moveRewards || []))
   const userSkills = user.skills || {}
   const researchingLevel = (userSkills as any)?.researching?.level || 1
@@ -169,7 +172,13 @@ export function buildBattleWinRewards(
   const enemyLevels = state.enemyTeam.map((e) =>
     typeof e.level === 'number' ? e.level : 1,
   )
-  const candyRewards = calculateCandyRewards(battleConfig, enemyLevels)
+  const candyRewards = calculateCandyRewards(
+    battleConfig,
+    enemyLevels,
+    battleConfig.isWildBattle
+      ? getWildBattleCandyMultiplier(involvedPlayerPokemon)
+      : 1,
+  )
   rewardsToGrant.push(...candyRewards)
 
   return rewardsToGrant

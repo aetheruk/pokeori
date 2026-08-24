@@ -5,7 +5,10 @@ import {
   getCritChance,
   DEFAULT_STAT_STAGES,
 } from './stats-calc'
-import { getHeldAttackDamageMultiplier } from './held-items'
+import {
+  getHeldAttackDamageMultiplier,
+  getHeldItemCritChanceMultiplier,
+} from './held-items'
 import type { WeatherType } from '@/data/weather'
 import type { TerrainType } from '@/data/terrain'
 import { getEffectiveBattleTypes } from './tera'
@@ -39,13 +42,13 @@ export function calculateDamage(
   critChanceOverride?: number, // Optional 0-100 percentage. Uses the higher of staged crit and move crit.
   weather?: WeatherType,
   typeImmunityBypassAttackTypes?: string[] | true,
-	  options?: {
-	    ignoreDefenderStatStages?: boolean
-	    damageStatSource?: 'user' | 'target'
-	    moveId?: string
-	    currentTurn?: number
-	    terrain?: TerrainType
-	  },
+  options?: {
+    ignoreDefenderStatStages?: boolean
+    damageStatSource?: 'user' | 'target'
+    moveId?: string
+    currentTurn?: number
+    terrain?: TerrainType
+  },
 ): {
   damage: number
   typeEffectiveness: number
@@ -176,12 +179,8 @@ export function calculateDamage(
         opposingPokemon: defender,
         stage: rawDefenseStage,
       })
-  const attackMultiplier = getStatStageMultiplier(
-    attackStage,
-  )
-  const defenseMultiplier = getStatStageMultiplier(
-    defenseStage,
-  )
+  const attackMultiplier = getStatStageMultiplier(attackStage)
+  const defenseMultiplier = getStatStageMultiplier(defenseStage)
 
   attackStat = Math.floor(attackStat * attackMultiplier)
   defenseStat = Math.floor(defenseStat * defenseMultiplier)
@@ -196,10 +195,10 @@ export function calculateDamage(
               ? 'speed'
               : 'specialAttack',
         stance,
-	        attackType: usedType,
-	        weather,
-	        currentTurn: options?.currentTurn,
-	      }),
+        attackType: usedType,
+        weather,
+        currentTurn: options?.currentTurn,
+      }),
   )
   defenseStat = Math.floor(
     defenseStat *
@@ -212,10 +211,10 @@ export function calculateDamage(
               ? 'speed'
               : 'specialDefense',
         stance,
-	        attackType: usedType,
-	        weather,
-	        currentTurn: options?.currentTurn,
-	      }),
+        attackType: usedType,
+        weather,
+        currentTurn: options?.currentTurn,
+      }),
   )
   defenseStat = Math.floor(
     defenseStat * getWeatherDefenseMultiplier(defender, stance, weather),
@@ -296,7 +295,8 @@ export function calculateDamage(
     0,
     Math.min(
       1,
-      Math.max(stagedCritChance, moveCritChance) +
+      Math.max(stagedCritChance, moveCritChance) *
+        getHeldItemCritChanceMultiplier(attacker) +
         getBattleAbilityCritChanceDelta(attacker),
     ),
   )

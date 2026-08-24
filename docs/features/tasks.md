@@ -8,6 +8,8 @@ Daily, special, and Pokemon Research tasks.
 - Data: `src/data/tasks/`
 - Utilities: `src/utilities/tasks/`
 
+Fuchsia's `Build in bulk` task appears alongside the Billiam storage side task after the Crudely Drawn Flyer. It consumes 20 each of XS Candy, XS Candy EX, S Candy, and S Candy EX, then unlocks all ten Candy Bag Artisan recipes.
+
 ## Task Types
 
 - **Daily Tasks**: Reset on the UTC calendar day after `tutorial-16`. Six generated challenges are selected from player-accessible catches, battles, Mini Games, Field Research, fishing, Artisan work, shops, voyages, TCG, and renewable resource deliveries.

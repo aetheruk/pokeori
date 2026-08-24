@@ -15,6 +15,19 @@ export const healingItems: Item[] = [
     },
   },
   {
+    id: 'max-revive',
+    name: 'Max Revive',
+    description: 'A medicine that revives a fainted Pokémon and restores all of its maximum HP.',
+    category: 'potion',
+    spriteId: 'max-revive',
+    skillRequirements: { battling: 60 },
+    battleEffect: {
+      type: 'revive',
+      reviveHpPercent: 100,
+      skipsTurn: true,
+    },
+  },
+  {
     id: 'battle-potion',
     name: 'Potion',
     description: 'A spray-type medicine for treating wounds. It restores 20 HP to a Pokémon.',
