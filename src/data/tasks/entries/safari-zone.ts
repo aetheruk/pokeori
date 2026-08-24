@@ -1195,6 +1195,74 @@ export const safariZoneTasks: Task[] = ([
     },
   },
   {
+    id: 'fuchsia-build-in-bulk',
+    name: 'Build in bulk',
+    description:
+      'A trainer outside the Pokémon Center is claiming to have come up with a revolutionary new concept for Pokémon leveling.',
+    category: 'Kanto',
+    subCategory: 'Fuchsia City',
+    icon: billiamIcon,
+    background: '/backgrounds/fuchsia.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Listen to the trainer',
+    requirements: [{ type: 'task_completed', targetId: 'fuchsia-crudely-drawn-flyer' }],
+    criteria: [
+      { type: 'item_owned', targetId: 'rare-candy-xs', count: 20, consume: true },
+      { type: 'item_owned', targetId: 'rare-candy-s', count: 20, consume: true },
+      { type: 'item_owned', targetId: 'rare-candy-m', count: 20, consume: true },
+      { type: 'item_owned', targetId: 'rare-candy-l', count: 20, consume: true },
+    ],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        background: '/backgrounds/fuchsia.avif',
+        title: 'Candy Trainer',
+        icon: billiamIcon,
+        message:
+          'Hey! Yeah you! I can tell you’re interested. Fed up of how slow your pokemon are growing with candy? Btw: Not really.',
+        buttons: [{ text: 'Not really.', type: 'navigate', id: 2 }],
+      },
+      {
+        id: 2,
+        background: '/backgrounds/fuchsia.avif',
+        title: 'Candy Trainer',
+        icon: billiamIcon,
+        message:
+          'I hear your words but your eyes say different anyway hand over your candy let me show you.',
+        buttons: [{ text: 'Hand over the candy', type: 'navigate', id: 3 }],
+      },
+      {
+        id: 3,
+        background: '/backgrounds/fuchsia.avif',
+        title: 'Candy Trainer',
+        icon: billiamIcon,
+        message:
+          'The trainer slowly looks at the candy you gave him and 1 by 1 sorts them by colour into neat piles of 10, before placing the piles in a little bag.',
+        buttons: [{ text: 'Continue', type: 'navigate', id: 4 }],
+      },
+      {
+        id: 4,
+        background: '/backgrounds/fuchsia.avif',
+        title: 'Candy Trainer',
+        icon: billiamIcon,
+        message:
+          'Boom There we have it! Science! These carefully constructed portions are perfect to take your pokemon power to the max!',
+        buttons: [{ text: 'Okay…', type: 'success' }],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/fuchsia.avif',
+      title: 'Build in bulk',
+      icon: billiamIcon,
+      message:
+        'I think that may have just about been the dumbest thing I’ve ever seen… But then again I have been feeding my pokemon 1 at a time. Wait. That guys a genius.',
+      closeButtonText: 'Try a Candy Bag',
+    },
+  },
+  {
     id: 'fuchsia-accidental-offense',
     name: 'Accidental Offense',
     description: "Wow... this guy really isn't happy.",

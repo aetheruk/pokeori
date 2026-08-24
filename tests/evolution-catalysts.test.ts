@@ -32,6 +32,7 @@ describe('level evolution catalysts', () => {
         id: catalyst.id,
         name: catalyst.name,
         category: 'evolution',
+        spriteId: 'max-revive',
       })
       expect(recipe).toMatchObject({
         category: 'items',

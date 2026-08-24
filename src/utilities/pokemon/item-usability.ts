@@ -98,7 +98,8 @@ export type PokemonItemUseTarget = {
 export function getPokemonItemPickerGroup(item: Item): PokemonItemPickerGroup {
   const effects = item.effects
 
-  if (effects?.increaseLevel) return 'level-candy'
+  if (effects?.increaseLevel || effects?.setLevel !== undefined)
+    return 'level-candy'
   if (effects?.increaseFriendship) return 'friendship'
   if (
     effects?.increaseEv ||
@@ -165,6 +166,10 @@ export function getPokemonItemEffectLabel(item: Item): string {
 
   if (effects.increaseLevel) {
     return `Level +${effects.increaseLevel}`
+  }
+
+  if (effects.setLevel !== undefined) {
+    return `Level → ${effects.setLevel}`
   }
 
   if (effects.increaseEv) {
@@ -236,7 +241,7 @@ export function getPokemonItemUnavailableReason(
 
   const level = Math.max(1, Math.floor(pokemon.level || 1))
 
-  if (effects.increaseLevel) {
+  if (effects.increaseLevel || effects.setLevel !== undefined) {
     if (level >= 100) return 'Pokemon is already at max level.'
     if (effects.minLevel !== undefined && level < effects.minLevel) {
       return `This candy can only be used from level ${effects.minLevel}.`

@@ -334,7 +334,45 @@ const inferiorTimeStoneItems: Item[] = [
   },
 }))
 
+const specialHeldItems: Item[] = [
+  {
+    id: 'lucky-egg',
+    name: 'Lucky Egg',
+    description:
+      'An egg-shaped held item with a 20% chance to double candy drops from wild battles.',
+    category: 'battle',
+    spriteId: 'lucky-egg',
+    heldConfig: {
+      trigger: { type: 'permanent' },
+      consumeOnUse: false,
+      effect: {
+        type: 'reward-multiplier',
+        rewardType: 'wild-battle-candy',
+        rewardMultiplier: 2,
+        rewardChance: 20,
+      },
+    },
+  },
+  {
+    id: 'lucky-punch',
+    name: 'Lucky Punch',
+    description: "A held item that doubles Chansey's critical-hit chance.",
+    category: 'battle',
+    spriteId: 'lucky-punch',
+    heldConfig: {
+      trigger: { type: 'permanent' },
+      consumeOnUse: false,
+      effect: {
+        type: 'crit-chance-multiplier',
+        critChanceMultiplier: 2,
+        eligibleSpeciesIds: [113],
+      },
+    },
+  },
+]
+
 export const battleItems: Item[] = [
+  ...specialHeldItems,
   {
     id: 'health-band',
     name: 'Health Band',

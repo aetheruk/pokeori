@@ -6,6 +6,8 @@ import {
   applyHeldAttackBreak,
   applyHeldItemChargeOnHit,
   applyHeldItemIfTriggered,
+  getHeldItemCritChanceMultiplier,
+  getWildBattleCandyMultiplier,
   restoreConsumedBerryByAbility,
 } from '@/utilities/battle/held-items'
 import { applyBattleItemEffect } from '@/utilities/battle/item-effects'
@@ -62,6 +64,55 @@ describe('battle item effects', () => {
     })
     expect(secondUse.applied).toBe(false)
     expect(pokemon.currentHp).toBe(60)
+  })
+
+  test('Max Revive restores full HP when the target is fainted', () => {
+    const maxRevive = items.find((item) => item.id === 'max-revive')
+    const pokemon = makeBattlePokemon({ currentHp: 0, maxHp: 120 })
+
+    expect(maxRevive).toMatchObject({
+      name: 'Max Revive',
+      category: 'potion',
+      spriteId: 'max-revive',
+      skillRequirements: { battling: 60 },
+      battleEffect: {
+        type: 'revive',
+        reviveHpPercent: 100,
+      },
+    })
+
+    const result = applyBattleItemEffect({
+      pokemon,
+      battleEffect: maxRevive!.battleEffect!,
+    })
+
+    expect(result.applied).toBe(true)
+    expect(result.message).toBe('Bulbasaur was revived with 120 HP!')
+    expect(pokemon.currentHp).toBe(120)
+  })
+
+  test('Lucky Punch doubles Chansey critical-hit chance only for Chansey', () => {
+    const chansey = makeBattlePokemon({
+      speciesId: 113,
+      formId: '113',
+      name: 'Chansey',
+      heldItem: { id: 'lucky-punch', name: 'Lucky Punch' },
+    })
+    const otherPokemon = makeBattlePokemon({
+      heldItem: { id: 'lucky-punch', name: 'Lucky Punch' },
+    })
+
+    expect(getHeldItemCritChanceMultiplier(chansey)).toBe(2)
+    expect(getHeldItemCritChanceMultiplier(otherPokemon)).toBe(1)
+  })
+
+  test('Lucky Egg has a 20% chance to double wild battle candy', () => {
+    const pokemon = makeBattlePokemon({
+      heldItem: { id: 'lucky-egg', name: 'Lucky Egg' },
+    })
+
+    expect(getWildBattleCandyMultiplier([pokemon], () => 0.19)).toBe(2)
+    expect(getWildBattleCandyMultiplier([pokemon], () => 0.2)).toBe(1)
   })
 
   test('does not apply status cure when the status is absent', () => {

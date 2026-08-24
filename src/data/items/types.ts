@@ -44,6 +44,8 @@ export interface BattleEffect {
     | 'ev-training'
     | 'type-damage-boost'
     | 'attack-status-chance'
+    | 'crit-chance-multiplier'
+    | 'reward-multiplier'
     | 'item-charge'
   healAmount?: number // For potions - flat HP restore
   reviveHpPercent?: number // For Revive-style items used on a fainted Pokemon
@@ -63,6 +65,11 @@ export interface BattleEffect {
   damageMultiplier?: number // Damage multiplier for held offensive effects
   statusId?: string // Status applied by held offensive effects
   statusChance?: number // Percent chance for held offensive status effects
+  critChanceMultiplier?: number // Multiplies critical-hit chance for eligible held-item users
+  eligibleSpeciesIds?: number[] // Restricts a held effect to these species
+  rewardType?: 'wild-battle-candy' // Reward category affected by a held multiplier
+  rewardMultiplier?: number // Multiplier applied to the configured reward category
+  rewardChance?: number // Chance for a configured reward multiplier to activate
   chargeOn?: 'hit-by-type' | 'damage-during-time' // How a held charge item gains charge
   chargeAmount?: number // Percent charge gained per matching trigger
   maxCharge?: number // Percent charge required for the outcome
@@ -142,6 +149,7 @@ export interface Item {
       amount: number
     }
     increaseLevel?: number
+    setLevel?: number
     maxLevel?: number // Item can only be used if pokemon level is less than or equal to this (actually, usually it's "less than", but let's define it as "up to this level")
     minLevel?: number
     changeNature?: NatureName

@@ -7,8 +7,9 @@ const levelEvolutionCatalystItems: Item[] = LEVEL_EVOLUTION_CATALYSTS.map(
     name: catalyst.name,
     description: catalyst.description,
     category: 'evolution',
-    spriteId: 'silver-powder',
-    hueRotate: index * 40,
+    // Palette-swapped Max Revive sprites keep the catalysts visually distinct from powder.
+    spriteId: 'max-revive',
+    hueRotate: index * 80,
   }),
 )
 

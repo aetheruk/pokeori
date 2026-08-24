@@ -2,7 +2,7 @@ import { Item } from './types'
 import { ballItems } from './entries/balls'
 import { healingItems } from './entries/healing'
 import { vitaminItems } from './entries/vitamins'
-import { candyItems } from './entries/candies'
+import { candyBagItems, candyItems } from './entries/candies'
 import { keyItems } from './entries/key-items'
 import { battleItems } from './entries/battle'
 import { badgeItems } from './entries/badges'
@@ -24,6 +24,7 @@ export const items: Item[] = [
   ...keyItems,
   ...ballItems,
   ...candyItems,
+  ...candyBagItems,
   ...vitaminItems,
   ...healingItems,
   ...battleItems,

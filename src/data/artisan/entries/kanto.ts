@@ -757,6 +757,23 @@ const POKE_POWDER_RECIPES: ArtisanRecipeDraft[] = candyItems.map((candy, index) 
   }
 })
 
+const CANDY_BAG_RECIPES: ArtisanRecipeDraft[] = candyItems.map((candy, index) => ({
+  id: `craft-${candy.id}-bag`,
+  name: `${candy.name} Bag`,
+  description: `Bundle 10 ${candy.name.toLowerCase()} into a level ${(candy.effects?.maxLevel || 0) + 1} portion.`,
+  artisanLevel: POKE_POWDER_RECIPES[index].artisanLevel,
+  costs: [{ id: candy.id, amount: 10 }],
+  rewards: [{ type: 'item', targetId: `${candy.id}-bag`, quantity: 1, dropChance: 100 }],
+  craftType: 'balance',
+  fail: true,
+  materialFailQualities: [],
+  outputQuantity: { min: 0, max: 1 },
+  qualityOutputQuantity: { bad: 0, good: 1, perfect: 1 },
+  bulk: 2,
+  iconItemId: `${candy.id}-bag`,
+  requirements: [{ type: 'task_completed', targetId: 'fuchsia-build-in-bulk' }],
+}))
+
 const LEVEL_EVOLUTION_CATALYST_RECIPES: ArtisanRecipeDraft[] =
   LEVEL_EVOLUTION_CATALYSTS.map((catalyst) => ({
     id: `craft-${catalyst.id}`,
@@ -1675,7 +1692,11 @@ export const kantoArtisanRecipes: ArtisanRecipe[] = [
   ),
   ...withCraftDefaults('lures', LURE_RECIPES),
   ...withCraftDefaults('held', [...HELD_RECIPES, ...ELEMENTAL_STONE_HELD_RECIPES]),
-  ...withCraftDefaults('items', [...LEVEL_EVOLUTION_CATALYST_RECIPES, ...ITEM_RECIPES]),
+  ...withCraftDefaults('items', [
+    ...CANDY_BAG_RECIPES,
+    ...LEVEL_EVOLUTION_CATALYST_RECIPES,
+    ...ITEM_RECIPES,
+  ]),
   ...withCraftDefaults('quests', QUEST_RECIPES),
   ...withCraftDefaults('tcg', TCG_RECIPES),
 ]
