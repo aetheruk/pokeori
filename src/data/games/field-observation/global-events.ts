@@ -10,6 +10,11 @@ const notOwned = (itemId: string) => ({
   inverse: true,
 })
 const clearBellRequirement = { type: 'item_owned' as const, targetId: 'clear-bell' }
+const legendaryBirdResearcherRequirement = {
+  type: 'skill_level' as const,
+  targetId: 'researching',
+  count: 50,
+}
 
 export const fieldObservationGlobalPokemonEvents: FieldObservationGlobalPokemonEvent[] = [
   {
@@ -54,6 +59,7 @@ export const fieldObservationGlobalPokemonEvents: FieldObservationGlobalPokemonE
     formId: '146',
     odds: 256,
     requirements: [
+      legendaryBirdResearcherRequirement,
       notOwned('flaming-twig'),
       notOwned('lifeless-flaming-branch'),
       notOwned('concentrated-flaming-branch'),
@@ -65,6 +71,7 @@ export const fieldObservationGlobalPokemonEvents: FieldObservationGlobalPokemonE
     formId: '145',
     odds: 256,
     requirements: [
+      legendaryBirdResearcherRequirement,
       notOwned('charged-twig'),
       notOwned('lifeless-charged-branch'),
       notOwned('concentrated-charged-branch'),
@@ -76,6 +83,7 @@ export const fieldObservationGlobalPokemonEvents: FieldObservationGlobalPokemonE
     formId: '144',
     odds: 256,
     requirements: [
+      legendaryBirdResearcherRequirement,
       notOwned('frozen-twig'),
       notOwned('lifeless-frozen-branch'),
       notOwned('concentrated-frozen-branch'),

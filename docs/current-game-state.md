@@ -2,7 +2,11 @@
 
 - Unreleased: Regular M, L, and XL candies and their Candy Bags now have tiered chances to raise or set a Pokémon's level: 90% for levels 41-50, 80% for 51-60, 70% for 61-70, 60% for 71-80, 50% for 81-90, and 25% for 91-100. A failed use consumes the candy or bag without changing the level.
 
-- Unreleased: Evolution Catalysts now use palette-swapped Scarlet/Violet Max Revive sprites, and the full-heal Max Revive battle item is registered at Battling 60. Fuchsia's new `Build in bulk` task appears alongside the Billiam storage task after the Crudely Drawn Flyer, consumes 20 each of the first four candy tiers, and unlocks all ten Candy Bag recipes at Artisan 2 through 90 in ten-level steps. These x2 Balance recipes cost 10 matching candies, preserve materials on Bad failure, and set a Pokémon to the top level of the matching tier rather than adding ten levels.
+- Unreleased: Legendary Bird special events are skill-gated by activity: Moltres, Zapdos, and Articuno Field Observation events require Researcher 50, their Snap events require Explorer 50, and their battle events require Trainer 50.
+
+- Unreleased: The skill guide now lists Mystery of the Branches at level 50 for Trainer, Explorer, Researcher, and Artisan.
+
+- Unreleased: Evolution Catalysts now use palette-swapped Scarlet/Violet Max Revive sprites, and the full-heal Max Revive battle item is registered at Battling 60. Fuchsia's new `Build in bulk` task appears alongside the Billiam storage task after the Crudely Drawn Flyer, consumes 20 each of the first four candy tiers, and unlocks all ten Candy Bag recipes at Artisan 2 through 90 in ten-level steps. These x2 Balance recipes cost 10 matching candies, preserve materials on Bad failure, and set a Pokémon to the top level of the matching tier rather than adding ten levels. All three concentrated branch recipes now unlock at Artisan 50.
 
 - Unreleased: Automatically generated daily challenges now use the Lab background in their Explore panels instead of the default grassy scene.
 

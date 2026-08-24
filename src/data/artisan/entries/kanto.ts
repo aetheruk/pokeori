@@ -1288,7 +1288,7 @@ const CONCENTRATED_BRANCH_RECIPES: ArtisanRecipeDraft[] = [
     name: 'Concentrated Flaming Branch',
     description:
       'Refine a lifeless flaming branch with Silver Feather energy and dense PokePowder.',
-    artisanLevel: 35,
+    artisanLevel: 50,
     costs: [
       { id: 'silver-feather', amount: 1 },
       { id: 'poke-powder-s', amount: 100 },
@@ -1310,7 +1310,7 @@ const CONCENTRATED_BRANCH_RECIPES: ArtisanRecipeDraft[] = [
     name: 'Concentrated Charged Branch',
     description:
       'Refine a lifeless charged branch with Silver Feather energy and dense PokePowder.',
-    artisanLevel: 35,
+    artisanLevel: 50,
     costs: [
       { id: 'silver-feather', amount: 1 },
       { id: 'poke-powder-s', amount: 100 },
@@ -1331,7 +1331,7 @@ const CONCENTRATED_BRANCH_RECIPES: ArtisanRecipeDraft[] = [
     id: 'craft-concentrated-frozen-branch',
     name: 'Concentrated Frozen Branch',
     description: 'Refine a lifeless frozen branch with Silver Feather energy and dense PokePowder.',
-    artisanLevel: 35,
+    artisanLevel: 50,
     costs: [
       { id: 'silver-feather', amount: 1 },
       { id: 'poke-powder-s', amount: 100 },

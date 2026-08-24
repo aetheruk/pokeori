@@ -3,6 +3,11 @@ import { SnapConfig } from '../types'
 const RANDOM_ROLL_MAX = 1_000_000
 const oneIn = (odds: number) => Math.floor(RANDOM_ROLL_MAX / odds)
 const clearBellRequirement = { type: 'item_owned' as const, targetId: 'clear-bell' }
+const legendaryBirdExplorerRequirement = {
+  type: 'skill_level' as const,
+  targetId: 'catching',
+  count: 50,
+}
 
 type LegendaryBirdSnap = {
   id: string
@@ -61,6 +66,7 @@ const legendaryBirdSnapEntries: SnapConfig[] = legendaryBirdSnaps.map((entry) =>
   background: entry.background,
   isRandomEvent: true,
   requirements: [
+    legendaryBirdExplorerRequirement,
     {
       type: 'game_result',
       targetId: entry.id,
