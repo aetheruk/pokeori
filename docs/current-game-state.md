@@ -4,6 +4,8 @@
 
 - Unreleased: Automatically generated daily challenges now use the Lab background in their Explore panels instead of the default grassy scene.
 
+- Unreleased: Failed Field Research reports now retain gathered items 30% of the time, down from the previous 70% retention rate; ability-based protection remains unchanged.
+
 - Unreleased: Fuchsia City Poké Mart now uses the shared Poké Ball shop icon.
 
 - Unreleased: Safari catch locations now add independent 1% Lucky Egg and Lucky Punch item drops after the Rare Item Rumours upgrade is completed. Lucky Egg gives its holder a 20% chance to double wild-battle candy quantities; Lucky Punch doubles Chansey's critical-hit chance.
