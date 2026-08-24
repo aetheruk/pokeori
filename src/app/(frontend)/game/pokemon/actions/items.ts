@@ -32,6 +32,7 @@ import { EVOLUTIONS } from '@/data/evolutions'
 import { getUser, serializePokemon, type StatName } from './utils'
 import { cache } from 'react'
 import { getItemSkillLockReason } from '@/utilities/skills/unlocks'
+import { shouldCandyIncreaseLevel } from '@/utilities/pokemon/candy-leveling'
 import {
   getPokemonItemUnavailableReason,
   isPokemonTargetedInventoryItem,
@@ -232,6 +233,7 @@ export async function applyItemToPokemon(
 
         let updatedPokemon: typeof pokemon | null = null
         let rewardSummary: RewardSummary | undefined
+        let itemUseMessage: string | undefined
 
         // 3. Apply Effect
         if (itemDef.effects.increaseEv) {
@@ -305,11 +307,16 @@ export async function applyItemToPokemon(
             throw new Error("This item would not raise this Pokemon's level.")
           }
 
-          updatedPokemon = await levelUpUtil(
-            payload,
-            pokemonId,
-            setLevel - currentLevel,
-          )
+          if (shouldCandyIncreaseLevel(itemDef.effects.setLevelChance)) {
+            updatedPokemon = await levelUpUtil(
+              payload,
+              pokemonId,
+              setLevel - currentLevel,
+            )
+          } else {
+            updatedPokemon = pokemon
+            itemUseMessage = `Used ${itemDef.name} on ${pokemon.name || 'Pokemon'}, but it did not increase their level.`
+          }
         } else if (itemDef.effects.increaseLevel) {
           const { increaseLevel, maxLevel, minLevel } = itemDef.effects
           const currentLevel = pokemon.level || 1
@@ -330,12 +337,20 @@ export async function applyItemToPokemon(
             )
           }
 
-          // Update Pokemon
-          updatedPokemon = await levelUpUtil(
-            payload,
-            pokemonId,
-            increaseLevel || 1,
-          )
+          if (
+            shouldCandyIncreaseLevel(
+              itemDef.effects.increaseLevelChance,
+            )
+          ) {
+            updatedPokemon = await levelUpUtil(
+              payload,
+              pokemonId,
+              increaseLevel || 1,
+            )
+          } else {
+            updatedPokemon = pokemon
+            itemUseMessage = `Used ${itemDef.name} on ${pokemon.name || 'Pokemon'}, but it did not increase their level.`
+          }
         } else if (itemDef.effects.changeNature) {
           const { changeNature } = itemDef.effects
           const currentNature = pokemon.nature
@@ -735,7 +750,8 @@ export async function applyItemToPokemon(
 
         return {
           success: true as const,
-          message: `Used ${itemDef.name} on ${pokemon.name || 'Pokemon'}`,
+          message:
+            itemUseMessage || `Used ${itemDef.name} on ${pokemon.name || 'Pokemon'}`,
           pokemon: updatedPokemon,
           summary: rewardSummary,
         }

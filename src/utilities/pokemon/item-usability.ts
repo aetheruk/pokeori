@@ -165,11 +165,15 @@ export function getPokemonItemEffectLabel(item: Item): string {
   if (!effects) return 'Pokemon effect'
 
   if (effects.increaseLevel) {
-    return `Level +${effects.increaseLevel}`
+    return effects.increaseLevelChance === undefined
+      ? `Level +${effects.increaseLevel}`
+      : `Level +${effects.increaseLevel} (${effects.increaseLevelChance}% chance)`
   }
 
   if (effects.setLevel !== undefined) {
-    return `Level → ${effects.setLevel}`
+    return effects.setLevelChance === undefined
+      ? `Level → ${effects.setLevel}`
+      : `Level → ${effects.setLevel} (${effects.setLevelChance}% chance)`
   }
 
   if (effects.increaseEv) {

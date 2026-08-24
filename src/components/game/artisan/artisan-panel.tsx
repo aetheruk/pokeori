@@ -2227,7 +2227,7 @@ export function ArtisanPanel() {
               ]
             : undefined
         }
-        background="/backgrounds/bike-shop.avif"
+        background="/backgrounds/artisan-workshop.avif"
         presentation="drawer"
       >
         {selectedRecipeGroup ? (
@@ -2436,7 +2436,7 @@ export function ArtisanPanel() {
             </div>
           ) : null
         }
-        background="/backgrounds/bike-shop.avif"
+        background="/backgrounds/artisan-workshop.avif"
         presentation="drawer"
       >
         {selectedRecipe ? (

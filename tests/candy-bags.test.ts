@@ -12,16 +12,16 @@ import {
 } from '@/utilities/artisan/rewards'
 
 const BAG_CONFIGS = [
-  ['rare-candy-xs-bag', 10, 1, 9, 2, 'rare-candy-xs'],
-  ['rare-candy-s-bag', 20, 10, 19, 10, 'rare-candy-s'],
-  ['rare-candy-m-bag', 30, 20, 29, 20, 'rare-candy-m'],
-  ['rare-candy-l-bag', 40, 30, 39, 30, 'rare-candy-l'],
-  ['rare-candy-xl-bag', 50, 40, 49, 40, 'rare-candy-xl'],
-  ['rare-candy-xxl-bag', 60, 50, 59, 50, 'rare-candy-xxl'],
-  ['rare-candy-mega-bag', 70, 60, 69, 60, 'rare-candy-mega'],
-  ['rare-candy-giga-bag', 80, 70, 79, 70, 'rare-candy-giga'],
-  ['rare-candy-tera-bag', 90, 80, 89, 80, 'rare-candy-tera'],
-  ['rare-candy-max-bag', 100, 90, 99, 90, 'rare-candy-max'],
+  ['rare-candy-xs-bag', 10, 1, 9, 2, 'rare-candy-xs', undefined],
+  ['rare-candy-s-bag', 20, 10, 19, 10, 'rare-candy-s', undefined],
+  ['rare-candy-m-bag', 30, 20, 29, 20, 'rare-candy-m', undefined],
+  ['rare-candy-l-bag', 40, 30, 39, 30, 'rare-candy-l', undefined],
+  ['rare-candy-xl-bag', 50, 40, 49, 40, 'rare-candy-xl', 90],
+  ['rare-candy-xxl-bag', 60, 50, 59, 50, 'rare-candy-xxl', 80],
+  ['rare-candy-mega-bag', 70, 60, 69, 60, 'rare-candy-mega', 70],
+  ['rare-candy-giga-bag', 80, 70, 79, 70, 'rare-candy-giga', 60],
+  ['rare-candy-tera-bag', 90, 80, 89, 80, 'rare-candy-tera', 50],
+  ['rare-candy-max-bag', 100, 90, 99, 90, 'rare-candy-max', 25],
 ] as const
 
 describe('Candy Bags', () => {
@@ -33,6 +33,7 @@ describe('Candy Bags', () => {
       maxLevel,
       artisanLevel,
       candyId,
+      levelChance,
     ] of BAG_CONFIGS) {
       const item = items.find((entry) => entry.id === itemId)
       const recipe = artisanRecipes.find(
@@ -43,8 +44,12 @@ describe('Candy Bags', () => {
         id: itemId,
         name: expect.stringContaining('Bag'),
         category: 'candy',
-        spriteId: 'revive',
-        effects: { setLevel: targetLevel, minLevel, maxLevel },
+        effects: {
+          setLevel: targetLevel,
+          setLevelChance: levelChance,
+          minLevel,
+          maxLevel,
+        },
       })
       expect(recipe).toMatchObject({
         artisanLevel,

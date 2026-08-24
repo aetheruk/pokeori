@@ -3,7 +3,7 @@ import { existsSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { currencies } from '@/data/currencies'
 import itemSpriteManifest from '@/data/item-sprite-manifest.json'
-import { candyItems } from '@/data/items/entries/candies'
+import { candyBagItems, candyItems } from '@/data/items/entries/candies'
 import { getItemSpriteUrl, items } from '@/data/items'
 
 const repoRoot = process.cwd()
@@ -155,6 +155,27 @@ describe('local item sprites', () => {
         .filter((_, index) => index % 2 === 1)
         .every((item) => item.hueRotate === 80),
     ).toBe(true)
+  })
+
+  test('candy bags use layered candy sprites with the same tier palette swaps', () => {
+    expect(candyBagItems.map((item) => item.spriteId)).toEqual([
+      'materials/candy-bag-xs',
+      'materials/candy-bag-xs',
+      'materials/candy-bag-s',
+      'materials/candy-bag-s',
+      'materials/candy-bag-m',
+      'materials/candy-bag-m',
+      'materials/candy-bag-l',
+      'materials/candy-bag-l',
+      'materials/candy-bag-xl',
+      'materials/candy-bag-xl',
+    ])
+    expect(candyBagItems.map((item) => item.hueRotate)).toEqual([
+      0, 80, 0, 80, 0, 80, 0, 80, 0, 80,
+    ])
+    for (const item of candyBagItems) {
+      expect(publicPathExists(getItemSpriteUrl(item.id))).toBe(true)
+    }
   })
 
   test('missing evolution and mega sprites resolve to their grouped folders', () => {
