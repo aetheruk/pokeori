@@ -128,6 +128,7 @@ const DAILY_EXCLUDED_GAME_TYPES = new Set([
   'ufo-catcher',
   'prize-wheel',
 ])
+const FIELD_OBSERVATION_FAILURE_REWARD_LOSS_CHANCE = 0.7
 
 export async function getUser(): Promise<User | null> {
   const payload = await getPayload({ config: configPromise })
@@ -2424,7 +2425,7 @@ export async function completeGameActivity(
         encounter.gameType === 'field-observation' &&
         !actualSuccess &&
         collectedFieldObservationRewards.length > 0 &&
-        Math.random() < 0.3 &&
+        Math.random() < FIELD_OBSERVATION_FAILURE_REWARD_LOSS_CHANCE &&
         !shouldProtectFieldObservationRewards({
           ability: activeAbility,
           ...abilityContext,
