@@ -22,7 +22,7 @@ export const fuchsiaCityShops: ShopConfig[] = [
     description: 'A well-stocked shop for Trainers preparing to face Fuchsia City’s dangers.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
-    icon: { type: 'item', id: 'revive' },
+    icon: { type: 'item', id: 'poke-ball' },
     background: '/backgrounds/shop.avif',
     requirements: [{ type: 'task_completed', targetId: 'explore-fuchsia-city' }],
     items: [

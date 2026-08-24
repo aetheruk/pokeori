@@ -183,7 +183,7 @@ const safariCreditTasks: Task[] = [
       icon: researcherIcon,
       message:
         'Apparently just by jotting down my notes I can get rewarded, excellent!',
-      closeButtonText: 'Visit the Research Credit Store',
+      closeButtonText: 'Visit the Research Exchange',
     },
   },
   {

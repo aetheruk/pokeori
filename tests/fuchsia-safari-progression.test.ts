@@ -1011,7 +1011,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     )
   })
 
-  test('Safari Notes progression and Research Credit Store are authored', () => {
+  test('Safari Notes progression and Research Exchange are authored', () => {
     expect(currencies).toContainEqual({
       id: 'safari-notes',
       name: 'Safari Notes',

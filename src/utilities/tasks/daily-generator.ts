@@ -30,6 +30,7 @@ type GenerateDailyTasksOptions = {
 const DAILY_CHALLENGE_COUNT = 6
 const DAILY_STANDARD_SCRIP_REWARD = 5
 const DAILY_BONUS_SCRIP_REWARD = 25
+const DAILY_CHALLENGE_BACKGROUND = '/backgrounds/lab.avif'
 
 type DailyCandidate = {
   family: string
@@ -702,6 +703,7 @@ export function generateDailyTasks(
     description: candidate.description,
     category: 'Daily',
     icon: candidate.icon,
+    background: DAILY_CHALLENGE_BACKGROUND,
     repeatable: false,
     daily: true,
     completionTrigger: 'manual',

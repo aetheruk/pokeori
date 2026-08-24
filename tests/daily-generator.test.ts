@@ -32,6 +32,9 @@ describe('daily task generator', () => {
     })
 
     expect(generated).toHaveLength(6)
+    expect(
+      generated.every((task) => task.background === '/backgrounds/lab.avif'),
+    ).toBe(true)
     expect(generated.every((task) => task.dailyMetadata?.sourceHint)).toBe(true)
     expect(
       generated.some((task) => task.criteria[0]?.type === 'daily_activity'),
