@@ -74,6 +74,7 @@ import {
   getUserInventoryMap,
   getUserPokedexMap,
   setUserInventoryMap,
+  setUserPokedexMap,
 } from '@/utilities/user-state'
 import { cache } from 'react'
 import {
@@ -789,6 +790,10 @@ export async function startEncounter(
     }
 
     // Save Updates
+    if (updates.pokedex) {
+      await setUserPokedexMap(payload as any, user.id, updates.pokedex)
+      delete updates.pokedex
+    }
     if (Object.keys(updates).length > 0) {
       await payload.update({
         collection: 'users',

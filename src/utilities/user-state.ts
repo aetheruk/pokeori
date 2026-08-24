@@ -316,7 +316,14 @@ export function pokedexRowsToArray(rows: any[]): PokedexEntry[] {
   return rows.map((row) => {
     const caught = Boolean(row.caught)
     const totalCaught = toOptionalNumber(row.totalCaught)
-    const totalSeen = toOptionalNumber(row.totalSeen)
+    const recordedTotalSeen = toOptionalNumber(row.totalSeen)
+    // Every caught Pokemon must have been seen. Repair legacy rows where the
+    // old encounter writer left totalSeen behind while totalCaught continued
+    // to increase.
+    const totalSeen =
+      totalCaught === undefined
+        ? recordedTotalSeen
+        : Math.max(recordedTotalSeen || 0, totalCaught)
     const researchXp = toOptionalNumber(row.researchXp)
     const researchLevel = toOptionalNumber(row.researchLevel)
     const seen =

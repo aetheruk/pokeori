@@ -91,6 +91,27 @@ describe('user state storage compatibility', () => {
     ])
   })
 
+  test('pokedex hydration repairs seen totals that fell behind caught totals', () => {
+    expect(
+      pokedexRowsToArray([
+        {
+          speciesId: 25,
+          formId: '25',
+          seen: true,
+          caught: true,
+          totalSeen: 1,
+          totalCaught: 20,
+        },
+      ]),
+    ).toEqual([
+      expect.objectContaining({
+        formId: '25',
+        totalSeen: 20,
+        totalCaught: 20,
+      }),
+    ])
+  })
+
   test('Pokedex rarity collections retain each obtained variant and legacy shinies', () => {
     const entry = addPokedexCaughtRarity(
       {

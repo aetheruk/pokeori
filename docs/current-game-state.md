@@ -1,5 +1,7 @@
 # Current Game State
 
+- Unreleased: Location encounter starts now persist each repeated Pokedex sighting through normalized user state, so per-form `totalSeen` counters continue increasing instead of remaining at 1 while `totalCaught` grows. Pokedex hydration also repairs legacy rows where caught totals exceed seen totals.
+
 - Unreleased: Regular M, L, and XL candies and their Candy Bags now have tiered chances to raise or set a Pokémon's level: 90% for levels 41-50, 80% for 51-60, 70% for 61-70, 60% for 71-80, 50% for 81-90, and 25% for 91-100. A failed use consumes the candy or bag without changing the level.
 
 - Unreleased: Legendary Bird special events are skill-gated by activity: Moltres, Zapdos, and Articuno Field Observation events require Researcher 50, their Snap events require Explorer 50, and their battle events require Trainer 50.

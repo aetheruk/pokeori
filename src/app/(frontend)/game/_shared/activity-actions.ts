@@ -26,6 +26,7 @@ import {
   setIdempotentResult,
 } from '@/utilities/game-integrity'
 import { recordExpeditionActivityResult } from '@/utilities/expeditions/actions'
+import { isDailyExcludedGameType } from '@/utilities/tasks/daily-activity'
 import { recordDailyActivityProgress } from '@/utilities/tasks/daily-progress'
 import type { ExpeditionProgressSnapshot } from '@/utilities/expeditions/actions'
 import { isActivityEligibleForReplay } from '@/utilities/activity-replay'
@@ -122,12 +123,6 @@ import {
 } from '@/utilities/research/round-selection'
 import { getEligiblePrizeWheelSlots } from '@/utilities/research/prize-wheel'
 
-const DAILY_EXCLUDED_GAME_TYPES = new Set([
-  'slots',
-  'pachinko',
-  'ufo-catcher',
-  'prize-wheel',
-])
 const FIELD_OBSERVATION_FAILURE_REWARD_LOSS_CHANCE = 0.7
 
 export async function getUser(): Promise<User | null> {
@@ -2369,7 +2364,7 @@ export async function completeGameActivity(
       if (
         (actualSuccess || isEndlessWin) &&
         encounter.gameType !== 'fishing' &&
-        !DAILY_EXCLUDED_GAME_TYPES.has(encounter.gameType)
+        !isDailyExcludedGameType(encounter.gameType)
       ) {
         await recordDailyActivityProgress(user.id, {
           kind: domain === 'game' ? 'game_win' : 'field_research_win',
