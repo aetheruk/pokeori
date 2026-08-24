@@ -2,6 +2,8 @@
 
 import {
   Atom,
+  ArrowDown,
+  ArrowUp,
   Check,
   Circle,
   Clock,
@@ -86,6 +88,11 @@ import {
   type PokemonPowerId,
 } from '@/utilities/pokemon/pokemon-powers'
 import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
+import {
+  capitalizeFirstLetter,
+  getNatureStatEffect,
+  type NatureStatEffect,
+} from '@/utilities/pokemon/display'
 import {
   MAX_RESEARCH_LEVEL,
   getPokemonResearchLevelTmUnlocks,
@@ -488,6 +495,8 @@ export function PokemonDetailsDialog({
   const hasEvScanner = hasItem('ev-scanner')
   const hasPokeScales = hasItem('poke-scales')
   const hasNatureScanner = hasItem('nature-scanner')
+  const getVisibleNatureStatEffect = (stat: string): NatureStatEffect | undefined =>
+    hasNatureScanner ? getNatureStatEffect(pokemon.nature, stat) : undefined
 
   const handleToggleLock = async () => {
     const result = await toggleLock(pokemon.id)
@@ -954,7 +963,7 @@ export function PokemonDetailsDialog({
                       const hasSeenEvo =
                         Array.isArray(pokedex) &&
                         pokedex.some((p) => p.speciesId === evo.speciesId && (p.seen || p.caught))
-                      const evoName = hasSeenEvo ? evo.name : '???'
+                      const evoName = hasSeenEvo ? capitalizeFirstLetter(evo.name) : '???'
                       const currentFormName = formInfo?.form || 'base'
                       if (
                         conditions.requiredSourceForm &&
@@ -1202,7 +1211,9 @@ export function PokemonDetailsDialog({
                   },
                   {
                     label: 'Nature',
-                    value: hasNatureScanner ? pokemon.nature : '???',
+                    value: hasNatureScanner
+                      ? capitalizeFirstLetter(pokemon.nature)
+                      : '???',
                     icon: Info,
                     color: 'game-moss',
                   },
@@ -1724,40 +1735,65 @@ export function PokemonDetailsDialog({
                               value={effectiveStats?.attack ?? 0}
                               max={calculateMaxStat('other', baseStats?.attack ?? 0)}
                               color="bg-game-clay"
+                              natureEffect={getVisibleNatureStatEffect('attack')}
                             />
                             <StatBar
                               label="DEF"
                               value={effectiveStats?.defense ?? 0}
                               max={calculateMaxStat('other', baseStats?.defense ?? 0)}
                               color="bg-game-ochre"
+                              natureEffect={getVisibleNatureStatEffect('defense')}
                             />
                             <StatBar
                               label="SPA"
                               value={effectiveStats?.specialAttack ?? 0}
                               max={calculateMaxStat('other', baseStats?.['special-attack'] ?? 0)}
                               color="bg-game-moss"
+                              natureEffect={getVisibleNatureStatEffect('specialAttack')}
                             />
                             <StatBar
                               label="SPD"
                               value={effectiveStats?.specialDefense ?? 0}
                               max={calculateMaxStat('other', baseStats?.['special-defense'] ?? 0)}
                               color="bg-game-moss-strong"
+                              natureEffect={getVisibleNatureStatEffect('specialDefense')}
                             />
                             <StatBar
                               label="SPE"
                               value={effectiveStats?.speed ?? 0}
                               max={calculateMaxStat('other', baseStats?.speed ?? 0)}
                               color="bg-game-clay-strong"
+                              natureEffect={getVisibleNatureStatEffect('speed')}
                             />
                           </>
                         ) : (
                           <>
                             <ObfuscatedStatBar label="HP" color="bg-game-danger" />
-                            <ObfuscatedStatBar label="ATK" color="bg-game-clay" />
-                            <ObfuscatedStatBar label="DEF" color="bg-game-ochre" />
-                            <ObfuscatedStatBar label="SPA" color="bg-game-moss" />
-                            <ObfuscatedStatBar label="SPD" color="bg-game-moss-strong" />
-                            <ObfuscatedStatBar label="SPE" color="bg-game-clay-strong" />
+                            <ObfuscatedStatBar
+                              label="ATK"
+                              color="bg-game-clay"
+                              natureEffect={getVisibleNatureStatEffect('attack')}
+                            />
+                            <ObfuscatedStatBar
+                              label="DEF"
+                              color="bg-game-ochre"
+                              natureEffect={getVisibleNatureStatEffect('defense')}
+                            />
+                            <ObfuscatedStatBar
+                              label="SPA"
+                              color="bg-game-moss"
+                              natureEffect={getVisibleNatureStatEffect('specialAttack')}
+                            />
+                            <ObfuscatedStatBar
+                              label="SPD"
+                              color="bg-game-moss-strong"
+                              natureEffect={getVisibleNatureStatEffect('specialDefense')}
+                            />
+                            <ObfuscatedStatBar
+                              label="SPE"
+                              color="bg-game-clay-strong"
+                              natureEffect={getVisibleNatureStatEffect('speed')}
+                            />
                           </>
                         )}
                       </div>
@@ -1977,7 +2013,7 @@ function EvolutionOverlay({
   newFormattedEnd: string
   onComplete: () => void
 }) {
-  const displayPokemonName = pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1)
+  const displayPokemonName = capitalizeFirstLetter(pokemonName)
   const [phase, setPhase] = useState<'start' | 'flash' | 'reveal' | 'done'>('start')
 
   useEffect(() => {
@@ -2190,17 +2226,22 @@ function StatBar({
   value,
   max,
   color,
+  natureEffect,
 }: {
   label: string
   value: number
   max: number
   color: string
+  natureEffect?: NatureStatEffect
 }) {
   const percentage = Math.min((value / max) * 100, 100)
 
   return (
     <div className="flex items-center gap-4 text-xs">
-      <span className="w-8 text-[10px] font-black uppercase text-game-muted">{label}</span>
+      <span className="flex w-12 items-center gap-0.5 text-[10px] font-black uppercase text-game-muted">
+        <NatureStatArrow natureEffect={natureEffect} />
+        <span>{label}</span>
+      </span>
       <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-game-canvas">
         <div
           className={cn('h-full rounded-full opacity-80 transition-[width] duration-700', color)}
@@ -2212,7 +2253,15 @@ function StatBar({
   )
 }
 
-function ObfuscatedStatBar({ label, color }: { label: string; color: string }) {
+function ObfuscatedStatBar({
+  label,
+  color,
+  natureEffect,
+}: {
+  label: string
+  color: string
+  natureEffect?: NatureStatEffect
+}) {
   const [width, setWidth] = useState(50)
 
   useEffect(() => {
@@ -2227,7 +2276,10 @@ function ObfuscatedStatBar({ label, color }: { label: string; color: string }) {
 
   return (
     <div className="flex items-center gap-4 text-xs">
-      <span className="w-8 text-[10px] font-black uppercase text-game-muted">{label}</span>
+      <span className="flex w-12 items-center gap-0.5 text-[10px] font-black uppercase text-game-muted">
+        <NatureStatArrow natureEffect={natureEffect} />
+        <span>{label}</span>
+      </span>
       <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-game-canvas">
         <div
           className={cn(
@@ -2240,4 +2292,14 @@ function ObfuscatedStatBar({ label, color }: { label: string; color: string }) {
       <span className="w-8 text-right font-mono text-[10px] font-bold text-game-muted">??</span>
     </div>
   )
+}
+
+function NatureStatArrow({ natureEffect }: { natureEffect?: NatureStatEffect }) {
+  if (natureEffect === 'increased') {
+    return <ArrowUp aria-hidden="true" className="h-3 w-3 shrink-0 text-game-moss" />
+  }
+  if (natureEffect === 'decreased') {
+    return <ArrowDown aria-hidden="true" className="h-3 w-3 shrink-0 text-game-danger" />
+  }
+  return null
 }

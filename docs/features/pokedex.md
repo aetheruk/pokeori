@@ -31,6 +31,7 @@ Release `0.1.1` includes a one-time rarity backfill in the performance-index mig
 - Pure level-based evolutions now also consume an Artisan-crafted Evolution Catalyst: the required catalyst tier is based on the evolution level band (0-20, 21-40, or 41+). Friendship, item, move, location, time, gender, and trade evolutions remain on their existing routes.
 - Maintenance note: if these Pokemon Research rank benefits change, update the Pewter School `pewter-school-pokemon-research-ranks` tutor text and the matching summary docs in the same change.
 - Shiny/shadow status indicators
+- The owned Pokemon detail modal capitalizes revealed natures and, once the Nature Module is owned, marks nature-boosted stats with a green up arrow and nature-reduced stats with a red down arrow. Evolution previews capitalize the revealed evolved Pokemon name.
 - Owned Pokemon evolution always rolls a fresh natural ability for the evolved form, including the normal hidden-ability chance.
 - Pokemon detail battle-move assignment includes a clear action so stale assigned moves can be removed even if the Pokemon can no longer legally select them.
 - Source species data includes `gender_rate` and `has_gender_differences`; newly obtained Pokemon store `gender` as `male`, `female`, or `genderless`. Legacy owned Pokemon without the field are treated as male in UI helpers.
