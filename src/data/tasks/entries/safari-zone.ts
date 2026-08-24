@@ -1222,7 +1222,7 @@ export const safariZoneTasks: Task[] = ([
         title: 'Candy Trainer',
         icon: billiamIcon,
         message:
-          'Hey! Yeah you! I can tell you’re interested. Fed up of how slow your pokemon are growing with candy? Btw: Not really.',
+          'Hey! Yeah you! I can tell you’re interested. Fed up of how slow your pokemon are growing with candy?',
         buttons: [{ text: 'Not really.', type: 'navigate', id: 2 }],
       },
       {

@@ -94,6 +94,8 @@ describe('Fuchsia Gym and Safari progression', () => {
   test('Fuchsia includes the FRLG gatehouse Golduck-for-Lickitung trade', () => {
     const trade = tasks.find((task) => task.id === 'fuchsia-trade-lickitung')!
 
+    expect(trade.name).toBe('A Gold(uck) Opportunity')
+    expect(trade.icon).toEqual({ type: 'pokemon', id: '55' })
     expect(trade.requirements).toContainEqual({
       type: 'task_completed',
       targetId: 'explore-fuchsia-city',
@@ -109,6 +111,7 @@ describe('Fuchsia Gym and Safari progression', () => {
       expect.objectContaining({
         type: 'pokemon',
         targetId: 108,
+        secret: true,
         pokemonData: expect.objectContaining({
           level: 25,
           obtainedMethod: 'trade',
@@ -1690,6 +1693,8 @@ describe('Fuchsia Gym and Safari progression', () => {
     })
     expect(JSON.stringify(bulk)).toContain('revolutionary new concept')
     expect(JSON.stringify(bulk)).toContain('dumbest thing I’ve ever seen')
+    expect(JSON.stringify(bulk)).not.toContain('Btw: Not really.')
+    expect(JSON.stringify(bulk)).toContain('"text":"Not really."')
     expect(JSON.stringify(storage)).toContain('Whoa, whoa, whoa')
     expect(JSON.stringify(rod)).toContain('THE WORST fishing rod')
   })

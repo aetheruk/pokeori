@@ -922,14 +922,14 @@ export const fuchsiaCityTasks: Task[] = [
   },
   {
     id: 'fuchsia-trade-lickitung',
-    name: 'A Fuchsia Trade',
+    name: 'A Gold(uck) Opportunity',
     description:
       'Someone at the gatehouse is looking for a Golduck. I wonder what they have to offer.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: {
       type: 'pokemon',
-      id: '108',
+      id: '55',
     },
     background: '/backgrounds/inside-house.avif',
     repeatable: false,
@@ -958,6 +958,7 @@ export const fuchsiaCityTasks: Task[] = [
       {
         type: 'pokemon',
         targetId: 108,
+        secret: true,
         pokemonData: {
           formId: '108',
           level: 25,
