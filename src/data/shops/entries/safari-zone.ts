@@ -7,7 +7,7 @@ const safariNotesCost = (amount: number) => [
 export const safariZoneShops: ShopConfig[] = [
   {
     id: 'safari-zone-research-credit-store',
-    name: 'Research Credit Store',
+    name: 'Research Exchange',
     description: 'A small institute counter where careful Safari notes become useful supplies and honours.',
     category: 'Kanto',
     subCategory: 'Safari Zone',

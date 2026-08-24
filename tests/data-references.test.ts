@@ -2503,6 +2503,7 @@ describe('static data references', () => {
       type: 'task_completed',
       targetId: 'explore-fuchsia-city',
     })
+    expect(mart?.icon).toEqual({ type: 'item', id: 'poke-ball' })
     expect(itemIds).not.toContain('poke-ball')
     expect(itemIds).not.toContain('poke-ball-bundle')
     expect(itemIds).not.toContain('great-ball')
