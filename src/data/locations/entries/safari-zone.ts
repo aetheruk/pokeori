@@ -144,7 +144,7 @@ const expeditionSafariLocations: Location[] = [
       'Rocky ledges funnel Pokémon through narrow northern channels. Pick a berry and time the throw before they bolt.',
     icon: '128',
     encounters: [
-      { speciesId: 102, formId: '102', chance: 18 },
+      { speciesId: 102, formId: '102', chance: 15 },
       { speciesId: 111, formId: '111', chance: 17 },
       { speciesId: 29, formId: '29', chance: 13 },
       { speciesId: 32, formId: '32', chance: 13 },
@@ -158,6 +158,24 @@ const expeditionSafariLocations: Location[] = [
       { speciesId: 113, formId: '113', chance: 2 },
       { speciesId: 127, formId: '127', chance: 1 },
       { speciesId: 123, formId: '123', chance: 1 },
+      {
+        speciesId: 128,
+        formId: '10250',
+        chance: 1,
+        requirements: [strangeSightingsRequirement],
+      },
+      {
+        speciesId: 128,
+        formId: '10251',
+        chance: 1,
+        requirements: [strangeSightingsRequirement],
+      },
+      {
+        speciesId: 128,
+        formId: '10252',
+        chance: 1,
+        requirements: [strangeSightingsRequirement],
+      },
     ],
   }),
   safariArea({
@@ -189,25 +207,25 @@ const standardSafariAreaDefinitions = [
     sourceId: 'safari-central-catch',
     id: 'safari-central-standard-catch',
     name: 'Central Habitat Survey',
-    description: 'Catch Pokémon from the open grass and mixed habitats around Safari Central using the standard catching method.',
+    description: 'Enter Safari Central and catch Pokémon from the open grass and mixed habitats with reserve Safari supplies.',
   },
   {
     sourceId: 'safari-east-catch',
     id: 'safari-east-standard-catch',
     name: 'Eastern Habitat Survey',
-    description: 'Catch Pokémon from the eastern ponds, tall grass, and raised boardwalks using the standard catching method.',
+    description: 'Enter the eastern ponds, tall grass, and raised boardwalks to catch Pokémon with reserve Safari supplies.',
   },
   {
     sourceId: 'safari-west-catch',
     id: 'safari-west-standard-catch',
     name: 'Western Habitat Survey',
-    description: 'Catch Pokémon from the western woods and quiet rest houses using the standard catching method.',
+    description: 'Enter the western woods and quiet rest houses to catch Pokémon with reserve Safari supplies.',
   },
   {
     sourceId: 'safari-north-catch',
     id: 'safari-north-standard-catch',
     name: 'Northern Habitat Survey',
-    description: 'Catch Pokémon from the rocky ledges and narrow channels around Safari North using the standard catching method.',
+    description: 'Enter the rocky ledges and narrow channels around Safari North to catch Pokémon with reserve Safari supplies.',
   },
 ] as const
 
@@ -216,13 +234,7 @@ const standardSafariLocations: Location[] = standardSafariAreaDefinitions.map(
     const source = expeditionSafariLocations.find((location) => location.id === sourceId)
     if (!source) throw new Error(`Missing Safari source location: ${sourceId}`)
 
-    const {
-      encounterMode: _encounterMode,
-      expeditionOnly: _expeditionOnly,
-      fleeRate: _fleeRate,
-      timer: _timer,
-      ...standardSource
-    } = source
+    const { expeditionOnly: _expeditionOnly, ...standardSource } = source
 
     return {
       ...standardSource,
@@ -231,6 +243,15 @@ const standardSafariLocations: Location[] = standardSafariAreaDefinitions.map(
       description,
       category: 'Kanto',
       requirements: [wardenPermitRequirement],
+      criteria: [
+        {
+          type: 'currency_owned',
+          targetId: 'pokedollars',
+          count: 200,
+          consume: true,
+        },
+      ],
+      safariBallAllowance: 5,
     }
   },
 )

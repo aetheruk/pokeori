@@ -488,7 +488,10 @@ describe('Fuchsia Gym and Safari progression', () => {
       ['west', [29, 30, 32, 33, 48, 49, 84, 102, 104, 105, 114, 115, 127, 128]],
       [
         'north',
-        [29, 30, 32, 33, 46, 49, 102, 104, 111, 113, 115, 123, 127, 128],
+        [
+          29, 30, 32, 33, 46, 49, 102, 104, 111, 113, 115, 123, 127, 128, 128,
+          128, 128,
+        ],
       ],
     ])
     for (const [area, speciesIds] of canonicalSpecies) {
@@ -771,33 +774,11 @@ describe('Fuchsia Gym and Safari progression', () => {
       'safari-poacher-watch-five',
     ])
 
-    const fishingGame = fishingGames.find(
-      (entry) => entry.id === 'safari-zone-fishing-expedition',
-    )
     expect(
-      expeditions.some((entry) => entry.id === 'safari-zone-fishing-expedition'),
+      expeditions.some(
+        (entry) => entry.id === 'safari-zone-fishing-expedition',
+      ),
     ).toBe(false)
-    expect(fishingGame?.expeditionOnly).toBeUndefined()
-    expect(fishingGame).toMatchObject({
-      category: 'Kanto',
-      requirements: [
-        { type: 'task_completed', targetId: 'safari-wardens-permit' },
-        { type: 'task_completed', targetId: 'safari-fishing-research-notes' },
-      ],
-      rewards: [],
-    })
-    expect(fishingGame?.criteria).toEqual([
-      expect.objectContaining({
-        type: 'currency_owned',
-        targetId: 'pokedollars',
-        count: 250,
-        consume: true,
-      }),
-      { type: 'item_owned', targetId: 'old-rod' },
-      { type: 'item_owned', targetId: 'good-rod' },
-      { type: 'item_owned', targetId: 'super-rod' },
-    ])
-    expect(fishingGame?.settings.safariCapture).toEqual({ balls: 3 })
   })
 
   test('Safari expedition pools sharply reduce research XP and randomize item finds', () => {
@@ -938,7 +919,12 @@ describe('Fuchsia Gym and Safari progression', () => {
       ],
       rewards: [
         { type: 'item', targetId: 'ultra-ball', quantity: 1, dropChance: 100 },
-        { type: 'currency', targetId: 'safari-notes', quantity: 1, dropChance: 100 },
+        {
+          type: 'currency',
+          targetId: 'safari-notes',
+          quantity: 1,
+          dropChance: 100,
+        },
       ],
     })
     expect(
@@ -1104,7 +1090,7 @@ describe('Fuchsia Gym and Safari progression', () => {
       ],
       [
         'Fishing Research Notes',
-        [{ type: 'currency', id: 'safari-notes', amount: 50 }],
+        [{ type: 'currency', id: 'safari-notes', amount: 200 }],
         1,
       ],
       [
@@ -1144,7 +1130,7 @@ describe('Fuchsia Gym and Safari progression', () => {
       ],
       [
         "Warden's Permit",
-        [{ type: 'currency', id: 'safari-notes', amount: 2000 }],
+        [{ type: 'currency', id: 'safari-notes', amount: 500 }],
         1,
       ],
       [
@@ -1392,13 +1378,25 @@ describe('Fuchsia Gym and Safari progression', () => {
         (entry) =>
           entry.category === 'Kanto' &&
           entry.subCategory === 'Safari Zone' &&
-          entry.encounterMode === undefined &&
+          entry.encounterMode === 'safari' &&
           entry.expeditionOnly === undefined &&
+          entry.safariBallAllowance === 5 &&
           entry.requirements.some(
             (requirement) =>
               requirement.type === 'task_completed' &&
               requirement.targetId === 'safari-wardens-permit',
           ),
+      ),
+    ).toBe(true)
+    expect(
+      standardLocations.every((entry) =>
+        entry.criteria?.some(
+          (criterion) =>
+            criterion.type === 'currency_owned' &&
+            criterion.targetId === 'pokedollars' &&
+            criterion.count === 200 &&
+            criterion.consume === true,
+        ),
       ),
     ).toBe(true)
 
@@ -1417,15 +1415,28 @@ describe('Fuchsia Gym and Safari progression', () => {
       safariFishingGames.every(
         (entry) =>
           entry.gameType === 'fishing' &&
+          entry.settings.safariCapture?.balls === 5 &&
           entry.criteria?.some(
             (criterion) =>
               criterion.type === 'item_owned' &&
               criterion.targetId === 'old-rod',
           ) &&
+          entry.criteria?.some(
+            (criterion) =>
+              criterion.type === 'currency_owned' &&
+              criterion.targetId === 'pokedollars' &&
+              criterion.count === 250 &&
+              criterion.consume === true,
+          ) &&
           entry.requirements.some(
             (requirement) =>
               requirement.type === 'task_completed' &&
               requirement.targetId === 'safari-wardens-permit',
+          ) &&
+          entry.requirements.some(
+            (requirement) =>
+              requirement.type === 'task_completed' &&
+              requirement.targetId === 'safari-fishing-research-notes',
           ),
       ),
     ).toBe(true)
@@ -1452,25 +1463,41 @@ describe('Fuchsia Gym and Safari progression', () => {
         .map((entry) => entry.speciesId)
         .sort((a, b) => a - b),
     ).toEqual([54, 79, 98, 129, 147])
+    expect(
+      safariFishingGames
+        .find((entry) => entry.id === 'safari-north-fishing')
+        ?.settings.rods.super?.encounters.entries.filter((entry) =>
+          ['10250', '10251', '10252'].includes(entry.formId || ''),
+        ),
+    ).toEqual([
+      expect.objectContaining({ speciesId: 128, formId: '10250' }),
+      expect.objectContaining({ speciesId: 128, formId: '10251' }),
+      expect.objectContaining({ speciesId: 128, formId: '10252' }),
+    ])
+    expect(
+      centralFishing?.settings.rods.old?.items?.entries.map((entry) =>
+        entry.currencyId
+          ? [entry.currencyId, entry.weight]
+          : [entry.itemId, entry.weight],
+      ),
+    ).toEqual([
+      ['water-gem', 40],
+      ['aqua-solvent-t1', 20],
+      ['drake-scale-t1', 20],
+      ['safari-notes', 20],
+    ])
 
-    const expeditionFishing = fishingGames.find(
+    const legacyFishing = fishingGames.find(
       (entry) => entry.id === 'safari-zone-fishing-expedition',
     )
-    expect(expeditionFishing?.expeditionOnly).toBeUndefined()
-    expect(expeditionFishing?.category).toBe('Kanto')
-    expect(expeditionFishing?.criteria).toContainEqual(
-      expect.objectContaining({
-        type: 'currency_owned',
-        targetId: 'pokedollars',
-        count: 250,
-        consume: true,
-      }),
-    )
-    expect(expeditionFishing?.settings.safariCapture).toEqual({ balls: 3 })
+    expect(legacyFishing?.expeditionOnly).toBe(true)
+    expect(legacyFishing?.category).toBe('Secret')
+    expect(legacyFishing?.settings.safariCapture).toEqual({ balls: 5 })
     expect(
-      expeditionFishing?.settings.rods.super?.encounters.entries.map(
-        (entry) => [entry.speciesId, entry.weight],
-      ),
+      legacyFishing?.settings.rods.super?.encounters.entries.map((entry) => [
+        entry.speciesId,
+        entry.weight,
+      ]),
     ).toEqual([
       [129, 30],
       [60, 15],
@@ -1482,7 +1509,7 @@ describe('Fuchsia Gym and Safari progression', () => {
       [148, 2],
     ])
     expect(
-      expeditionFishing?.settings.rods.super?.items?.entries.map((entry) =>
+      legacyFishing?.settings.rods.super?.items?.entries.map((entry) =>
         entry.currencyId
           ? [entry.currencyId, entry.weight]
           : [entry.itemId, entry.weight],
@@ -1493,6 +1520,34 @@ describe('Fuchsia Gym and Safari progression', () => {
       ['drake-scale-t1', 20],
       ['safari-notes', 20],
     ])
+
+    const northernCatch = locations.find(
+      (entry) => entry.id === 'safari-north-catch',
+    )
+    expect(
+      northernCatch?.encounters.filter((entry) =>
+        ['10250', '10251', '10252'].includes(entry.formId || ''),
+      ),
+    ).toEqual([
+      expect.objectContaining({ speciesId: 128, formId: '10250', chance: 1 }),
+      expect.objectContaining({ speciesId: 128, formId: '10251', chance: 1 }),
+      expect.objectContaining({ speciesId: 128, formId: '10252', chance: 1 }),
+    ])
+    for (const studyId of [
+      'safari-north-field-observation',
+      'safari-north-expedition-field-observation',
+    ]) {
+      const study = fieldObservationGames.find((entry) => entry.id === studyId)
+      expect(
+        study?.settings.pokemonPool.filter((entry) =>
+          ['10250', '10251', '10252'].includes(entry.formId || ''),
+        ),
+      ).toEqual([
+        expect.objectContaining({ speciesId: 128, formId: '10250', weight: 1 }),
+        expect.objectContaining({ speciesId: 128, formId: '10251', weight: 1 }),
+        expect.objectContaining({ speciesId: 128, formId: '10252', weight: 1 }),
+      ])
+    }
   })
 
   test('Safari and Koga Gym expedition activities never appear as standalone Explore content', () => {
@@ -1521,7 +1576,7 @@ describe('Fuchsia Gym and Safari progression', () => {
             ? battles.find((entry) => entry.id === step.activityId)
             : step.activityType === 'location'
               ? locations.find((entry) => entry.id === step.activityId)
-            : step.activityType === 'game'
+              : step.activityType === 'game'
                 ? fishingGames.find((entry) => entry.id === step.activityId) ||
                   basicEntries.find((entry) => entry.id === step.activityId)
                 : step.activityType === 'field-research'

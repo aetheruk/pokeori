@@ -50,7 +50,10 @@ import {
 import {
   getRegionTimeZone,
   getTimeZoneClockTime,
+  checkRequirement,
 } from '@/utilities/requirements'
+import { analyzeRequirements } from '@/utilities/requirements/analysis'
+import { getGameUserData } from '@/utilities/game-data'
 import {
   getUserInventoryMap,
   getUserPokedexMap,
@@ -236,6 +239,15 @@ export async function castFishingLine(rodType: RodType) {
         return { success: false, error: 'Invalid rod type' }
       }
 
+      const poolRequirements = rodConfig.encounters.entries.flatMap(
+        (entry) => entry.requirements || [],
+      )
+      const userData = await getGameUserData(
+        user,
+        analyzeRequirements(poolRequirements),
+        { payload },
+      )
+
       // Roll which pool (Pokemon vs items). Fishing uses a global 80/20 split.
       const poolRoll =
         Math.random() * (FISHING_POKEMON_CHANCE + FISHING_ITEM_CHANCE)
@@ -247,7 +259,18 @@ export async function castFishingLine(rodType: RodType) {
         const isDay = isDaytimeForFishingCategory(encounter.category)
 
         // Filter entries valid for current time
-        const validEntries = rodConfig.encounters.entries.filter((e) => {
+        const eligibleEntries = rodConfig.encounters.entries.filter((e) => {
+          if (
+            e.requirements &&
+            !e.requirements.every((requirement) =>
+              checkRequirement(userData, requirement, {
+                category: encounter.category,
+                subCategory: encounter.subCategory,
+              }),
+            )
+          ) {
+            return false
+          }
           if (!e.time) return true
           if (e.time === 'day') return isDay
           if (e.time === 'night') return !isDay
@@ -256,7 +279,15 @@ export async function castFishingLine(rodType: RodType) {
 
         // Fallback to all entries if no valid ones found (to prevent checking empty pool)
         const pool =
-          validEntries.length > 0 ? validEntries : rodConfig.encounters.entries
+          eligibleEntries.length > 0
+            ? eligibleEntries
+            : rodConfig.encounters.entries.filter(
+                (entry) => !entry.requirements,
+              )
+
+        if (pool.length === 0) {
+          return { success: false, error: 'No eligible fishing encounters' }
+        }
 
         selectedEntry = applySecretFishingPokemonReplacement({
           rodType,
@@ -551,11 +582,13 @@ export async function claimFishingItem() {
         60,
       )
       if (!claimReserved) {
-        const inFlightClaimResult = await getIdempotentResult<any>(claimResultKey)
+        const inFlightClaimResult =
+          await getIdempotentResult<any>(claimResultKey)
         if (inFlightClaimResult) return inFlightClaimResult
         return {
           success: false,
-          error: 'This item claim is already being processed. Please try again shortly.',
+          error:
+            'This item claim is already being processed. Please try again shortly.',
         }
       }
 
