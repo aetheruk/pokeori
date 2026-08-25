@@ -1333,47 +1333,9 @@ export const safariZoneTasks: Task[] = ([
   },
   {
     id: 'safari-strength-check-on-koga',
-    name: 'So long Safari',
-    description: 'Weve been gone quite some time I should check if Koga has made any progress.',
-    category: 'Kanto',
-    subCategory: 'Safari Zone',
-    icon: detectiveIcon,
-    background: '/backgrounds/safari-reserve.avif',
-    repeatable: false,
-    secret: false,
-    completionTrigger: 'manual',
-    completeButtonText: 'Speak with Ray',
-    requirements: [
-      { type: 'task_completed', targetId: 'fuchsia-koga-study-toxin' },
-      { type: 'item_owned', targetId: 'tm-strength' },
-    ],
-    criteria: [],
-    rewards: [],
-    enterModal: [
-      {
-        id: 1,
-        background: '/backgrounds/safari-reserve.avif',
-        title: 'Det. Ray Choo',
-        icon: detectiveIcon,
-        message:
-          'Agreed, Koga has had enough time with the vial and the longer we are out here without a cure the longer we are in danger. I cant imagine you will get another shot at coming back.',
-        buttons: [{ text: 'Agreed', type: 'navigate', id: 2 }],
-      },
-      {
-        id: 2,
-        background: '/backgrounds/safari-reserve.avif',
-        title: 'Det. Ray Choo',
-        icon: detectiveIcon,
-        message:
-          'Ray, has got me feeling nervous again I kinda forgot about the impending danger with all the fun in the Safari Zone',
-        buttons: [{ text: 'Return to Koga', type: 'success' }],
-      },
-    ],
-  },
-  {
-    id: 'fuchsia-koga-egg-request',
-    name: 'A Useful Egg',
-    description: 'Koga has isolated the first toxin, but still needs one gentle ingredient for the antidote.',
+    name: 'Koga’s Findings',
+    description:
+      'The Grand Expedition gave Koga time to study the vial. I should return to the lab and see what he found.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: kogaIcon,
@@ -1381,8 +1343,15 @@ export const safariZoneTasks: Task[] = ([
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Talk to Koga',
-    requirements: [{ type: 'task_completed', targetId: 'safari-strength-check-on-koga' }],
+    completeButtonText: 'Check on Koga',
+    requirements: [
+      {
+        type: 'expedition_result',
+        targetId: 'safari-zone-grand-expedition',
+        expeditionStatus: 'completed',
+        count: 1,
+      },
+    ],
     criteria: [],
     rewards: [],
     enterModal: [
@@ -1392,7 +1361,53 @@ export const safariZoneTasks: Task[] = ([
         title: 'Koga',
         icon: kogaIcon,
         message:
-          'The Toxicroak toxin can be neutralized, but one ingredient must be fresh. A Chansey egg would give the antidote the balance it needs.',
+          'There you are. The expedition gave me the time I needed to separate the compounds in the vial. The first is Toxicroak toxin, and it is dangerous to humans.',
+        buttons: [{ text: 'And the second compound?', type: 'navigate', id: 2 }],
+      },
+      {
+        id: 2,
+        background: '/backgrounds/lab.avif',
+        title: 'Koga',
+        icon: kogaIcon,
+        message:
+          'The second has barely reacted to human tissue, but I do not trust it. I still do not know what it is; I only know that it may interfere with Pokémon energy.',
+        buttons: [{ text: 'How can we test it?', type: 'navigate', id: 3 }],
+      },
+      {
+        id: 3,
+        background: '/backgrounds/lab.avif',
+        title: 'Koga',
+        icon: kogaIcon,
+        message:
+          'Fifty Crystals should carry enough of the reaction for us to study it without exposing a Pokémon. Bring them to the lab when you are ready.',
+        buttons: [{ text: 'I’ll bring the Crystals', type: 'success' }],
+      },
+    ],
+  },
+  {
+    id: 'fuchsia-koga-egg-request',
+    name: 'A Useful Egg',
+    description:
+      'The Crystal test showed that the second compound affects Pokémon, but Koga still needs a Chansey egg to make an antidote for the Toxicroak toxin.',
+    category: 'Kanto',
+    subCategory: 'Fuchsia City',
+    icon: kogaIcon,
+    background: '/backgrounds/lab.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Talk to Koga',
+    requirements: [{ type: 'task_completed', targetId: 'fuchsia-koga-unknown-compound' }],
+    criteria: [],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        background: '/backgrounds/lab.avif',
+        title: 'Koga',
+        icon: kogaIcon,
+        message:
+          'The Crystal test confirms that the second compound interferes with Pokémon energy, but it is still unidentified. The first compound—the Toxicroak toxin—is the immediate danger to people, and I need a fresh Chansey egg to make its antidote.',
         buttons: [{ text: 'Where can I find one?', type: 'navigate', id: 2 }],
       },
       {
@@ -1564,7 +1579,8 @@ export const safariZoneTasks: Task[] = ([
   {
     id: 'fuchsia-koga-unknown-compound',
     name: 'The Unknown Compound',
-    description: 'With the Chansey egg safely delivered, Koga can test the Unknown Compound.',
+    description:
+      'Koga is ready to test the unidentified second compound. Bring 50 Crystals to the lab so he can study its effect without exposing a Pokémon.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: kogaIcon,
@@ -1573,7 +1589,7 @@ export const safariZoneTasks: Task[] = ([
     secret: false,
     completionTrigger: 'manual',
     completeButtonText: 'Test the theory',
-    requirements: [{ type: 'task_completed', targetId: 'safari-chansey-makes-friends' }],
+    requirements: [{ type: 'task_completed', targetId: 'safari-strength-check-on-koga' }],
     criteria: [{ type: 'currency_owned', targetId: 'crystals', count: 50, consume: true }],
     rewards: [{ type: 'currency', targetId: 'shadow-crystals', quantity: 50, dropChance: 100 }],
     enterModal: [
@@ -1583,8 +1599,8 @@ export const safariZoneTasks: Task[] = ([
         title: 'Koga',
         icon: kogaIcon,
         message:
-          'The egg you brought arrived in time. I have separated two active compounds: the first is Toxicroak toxin, and the second is still resisting every test I know.',
-        buttons: [{ text: 'The Unknown Compound?', type: 'navigate', id: 2 }],
+          'You have the fifty Crystals ready. Good. We can test the second compound without exposing a Pokémon.',
+        buttons: [{ text: 'Test the compound', type: 'navigate', id: 2 }],
       },
       {
         id: 2,
@@ -1592,7 +1608,7 @@ export const safariZoneTasks: Task[] = ([
         title: 'Koga',
         icon: kogaIcon,
         message:
-          'It has no reaction to human tissue. Pokémon energy is another matter. Fifty Crystals will let us test the effect without exposing a Pokémon.',
+          'The Toxicroak toxin is the first compound. This second one remains unidentified, but it has shown no reaction to human tissue, which does not make it harmless.',
         buttons: [{ text: 'That is safe?', type: 'navigate', id: 3 }],
       },
       {
@@ -1618,7 +1634,7 @@ export const safariZoneTasks: Task[] = ([
         title: 'Koga',
         icon: kogaIcon,
         message:
-          'Shadowy Crystals. The Unknown Compound does not appear to threaten humans, but it distorts Pokémon energy.',
+          'The Crystals have turned shadowy. The Unknown Compound distorts Pokémon energy, but I still do not know what it is or what it will do to a Pokémon.',
         buttons: [{ text: 'Oh dear', type: 'navigate', id: 6 }],
       },
       {
@@ -1627,7 +1643,7 @@ export const safariZoneTasks: Task[] = ([
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
         message:
-          'The vial combines a poison that harms people with a compound that changes Pokémon. This has to be connected to the Shadow Pokémon.',
+          'One compound threatens people, and the other threatens Pokémon. Whatever Rocket is planning, both parts of this vial matter.',
         buttons: [{ text: 'Koga?', type: 'navigate', id: 7 }],
       },
       {
@@ -1636,8 +1652,8 @@ export const safariZoneTasks: Task[] = ([
         title: 'Koga',
         icon: kogaIcon,
         message:
-          'The Chansey yolk will let me prepare the first antidote. You have the fifty Crystals ready, so we can test the second compound without exposing either of you.',
-        buttons: [{ text: 'Test the compound', type: 'success' }],
+          'I can continue studying the Unknown Compound, but the Toxicroak toxin is the immediate danger to you. To make a pre-emptive antidote for that first compound, I need a fresh Chansey egg.',
+        buttons: [{ text: 'Ask about the Chansey egg', type: 'success' }],
       },
     ],
   },
@@ -1645,53 +1661,54 @@ export const safariZoneTasks: Task[] = ([
     id: 'safari-catch-partner-chansey',
     name: 'The Pre-emptive Antidote',
     description:
-      'Koga has finished the antidote. Return to the lab and take the first dose before the investigation continues.',
+      'Koga has the Chansey egg and his reagents ready. Meet him at the Institute lab so he can prepare the first dose before the investigation continues.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
-    icon: { type: 'pokemon', id: '113' },
+    icon: { type: 'item', id: 'antidote' },
     background: '/backgrounds/safari-reserve.avif',
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
     completeButtonText: 'Receive the Antidote',
-    requirements: [{ type: 'task_completed', targetId: 'fuchsia-koga-unknown-compound' }],
+    requirements: [{ type: 'task_completed', targetId: 'safari-chansey-makes-friends' }],
     criteria: [],
     rewards: [],
     enterModal: [
       {
         id: 1,
         background: '/backgrounds/lab.avif',
-        title: 'Janine',
-        icon: janineIcon,
+        title: 'Koga',
+        icon: kogaIcon,
         message:
-          'You return to the lab alone. Somewhere in the reserve, Chansey is safe, and the egg has reached Koga.',
-        buttons: [{ text: 'See what Koga made', type: 'navigate', id: 2 }],
+          'Good, you’re back. Janine told me what happened in the reserve. The egg arrived safely, and we can finish the antidote here.',
+        buttons: [{ text: 'What do you need to do?', type: 'navigate', id: 2 }],
       },
       {
         id: 2,
         background: '/backgrounds/lab.avif',
-        title: 'A Fresh Egg',
-        icon: { type: 'pokemon', id: '113' },
+        title: 'Koga',
+        icon: kogaIcon,
         message:
-          'The warm egg is already in Koga’s hands. Chansey was never taken from the reserve; its gift is enough for Koga to finish the antidote.',
-        buttons: [{ text: 'Watch Koga Work', type: 'navigate', id: 3 }],
+          'The yolk is the last reagent. I’ll combine it with the neutralising agents I prepared while you were away.',
+        buttons: [{ text: 'Prepare the antidote', type: 'navigate', id: 3 }],
       },
       {
         id: 3,
         background: '/backgrounds/lab.avif',
-        title: 'Koga',
+        title: 'The Institute Lab',
         icon: kogaIcon,
-        message: 'Good. The yolk is the last reagent I need for the antidote.',
-        buttons: [{ text: 'Watch Koga Work', type: 'navigate', id: 4 }],
+        message:
+          'Koga separates the yolk, mixes it with the prepared reagents, and seals the finished antidote in a small glass vial.',
+        buttons: [{ text: 'Take the vial', type: 'navigate', id: 4 }],
       },
       {
         id: 4,
         background: '/backgrounds/lab.avif',
-        title: 'The Pre-emptive Antidote',
+        title: 'Koga',
         icon: { type: 'item', id: 'antidote' },
         message:
-          'Koga separates the yolk, mixes it with his prepared reagents, and seals it in a small glass vial.',
-        buttons: [{ text: 'Take the Dose', type: 'navigate', id: 5 }],
+          'There. The first antidote is ready. Drink it before we return to the reserve.',
+        buttons: [{ text: 'Drink the Antidote', type: 'navigate', id: 5 }],
       },
       {
         id: 5,
@@ -1699,8 +1716,8 @@ export const safariZoneTasks: Task[] = ([
         title: 'Koga',
         icon: kogaIcon,
         message:
-          'Drink it now. This is pre-emptive; taking it after exposure would be much less pleasant.',
-        buttons: [{ text: 'Drink the Antidote', type: 'navigate', id: 6 }],
+          'Drink it now. It will protect you from the Toxicroak toxin before we go back into the reserve. It cannot undo exposure, which is why we take it first.',
+        buttons: [{ text: 'Take the dose', type: 'navigate', id: 6 }],
       },
       {
         id: 6,
@@ -1708,7 +1725,7 @@ export const safariZoneTasks: Task[] = ([
         title: 'Koga',
         icon: kogaIcon,
         message:
-          'Done. That is enough to last you a lifetime. The Unknown Compound does not appear to affect humans; the Crystal test showed the danger it poses to Pokémon.',
+          'The dose is in your system. The Unknown Compound is different: it has not reacted with human tissue, but the Crystal test showed how it distorts Pokémon energy.',
         buttons: [{ text: 'Then the Pokémon are still at risk', type: 'navigate', id: 7 }],
       },
       {
@@ -1717,7 +1734,7 @@ export const safariZoneTasks: Task[] = ([
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
         message:
-          'That feels like a burden lifted, I feel safer, but not safe. The Pokémon are still at risk, so we need to keep moving.',
+          'Then we know what we are dealing with. You are protected from the toxin, but the Pokémon are not. We should return to the investigation while the trail is still warm.',
         buttons: [{ text: 'Continue the Investigation', type: 'success' }],
       },
     ],
