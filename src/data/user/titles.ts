@@ -43,6 +43,7 @@ export const titles: TitleConfig[] = [
   { id: 'the-nido-queen', name: 'The Nido Queen' },
   { id: 'worst-customer', name: 'Worst Customer' },
   { id: 'the-warden', name: 'The Warden' },
+  { id: 'public-nuisance', name: 'Public Nuisance' },
   ...skillTitleConfigs,
 ]
 

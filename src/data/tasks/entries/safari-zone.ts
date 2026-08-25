@@ -1371,9 +1371,200 @@ export const safariZoneTasks: Task[] = ([
     ],
   },
   {
+    id: 'fuchsia-koga-egg-request',
+    name: 'A Useful Egg',
+    description: 'Koga has isolated the first toxin, but still needs one gentle ingredient for the antidote.',
+    category: 'Kanto',
+    subCategory: 'Fuchsia City',
+    icon: { type: 'pokemon', id: '113' },
+    background: '/backgrounds/lab.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Ask the Institute',
+    requirements: [{ type: 'task_completed', targetId: 'safari-strength-check-on-koga' }],
+    criteria: [],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        background: '/backgrounds/lab.avif',
+        title: 'Koga',
+        icon: kogaIcon,
+        message:
+          'The Toxicroak toxin can be neutralized, but one ingredient must be fresh. A Chansey egg would give the antidote the balance it needs.',
+        buttons: [{ text: 'Where can I find one?', type: 'navigate', id: 2 }],
+      },
+      {
+        id: 2,
+        background: '/backgrounds/lab.avif',
+        title: 'Koga',
+        icon: kogaIcon,
+        message:
+          'Do not take one by force. Ask the Research Institute where the reserve Chansey gather, then earn the trust of one willing to help.',
+        buttons: [{ text: 'I’ll ask the Institute', type: 'success' }],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/lab.avif',
+      title: 'Koga',
+      icon: kogaIcon,
+      message: 'The Institute should know which reeds Chansey favour. Take the careful route, not the quick one.',
+      closeButtonText: 'Visit the Institute',
+    },
+  },
+  {
+    id: 'fuchsia-research-institute-chansey-request',
+    name: 'The Chansey Trail',
+    description: 'The Institute knows where a gentle Chansey has been visiting the reserve.',
+    category: 'Kanto',
+    subCategory: 'Fuchsia City',
+    icon: researcherIcon,
+    background: '/backgrounds/lab.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Take the Field Notes',
+    requirements: [
+      { type: 'task_completed', targetId: 'fuchsia-research-institute-membership' },
+      { type: 'task_completed', targetId: 'fuchsia-koga-egg-request' },
+    ],
+    criteria: [],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        background: '/backgrounds/lab.avif',
+        title: 'Research Institute',
+        icon: researcherIcon,
+        message:
+          'Chansey? There is one that visits the central reeds just after the paths quieten. It keeps away from the busiest trails, but it watches anyone carrying berries.',
+        buttons: [{ text: 'What should I do?', type: 'navigate', id: 2 }],
+      },
+      {
+        id: 2,
+        background: '/backgrounds/lab.avif',
+        title: 'Research Institute',
+        icon: researcherIcon,
+        message:
+          'Take a photograph first. Let it see that you are paying attention before you ask anything of it. If the picture catches its calm posture, you will know you found the right one.',
+        buttons: [{ text: 'I’ll look for it', type: 'success' }],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/lab.avif',
+      title: 'Research Institute',
+      icon: researcherIcon,
+      message: 'The central reeds are your best chance. Keep your movements slow and your camera ready.',
+      closeButtonText: 'Search the Reeds',
+    },
+  },
+  {
+    id: 'safari-chansey-search-complete',
+    name: 'A Familiar Shape',
+    description: 'A field photograph confirms where the gentle Chansey is hiding.',
+    category: 'Secret',
+    subCategory: 'Safari Zone',
+    icon: { type: 'pokemon', id: '113' },
+    background: '/backgrounds/safari-reserve.avif',
+    repeatable: false,
+    secret: true,
+    completionTrigger: 'manual',
+    requirements: [],
+    criteria: [],
+    rewards: [],
+  },
+  {
+    id: 'safari-chansey-lure',
+    name: 'A Gentle Lure',
+    description: 'Chansey has been found. Ten red berry candies may convince it that you mean no harm.',
+    category: 'Kanto',
+    subCategory: 'Safari Zone',
+    icon: { type: 'pokemon', id: '113' },
+    background: '/backgrounds/safari-reserve.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Offer the Candies',
+    requirements: [{ type: 'task_completed', targetId: 'safari-chansey-search-complete' }],
+    criteria: [
+      {
+        type: 'item_owned',
+        targetId: 'red-berry-candy',
+        count: 10,
+        consume: true,
+        label: 'Offer 10 Red Berry Candies',
+      },
+    ],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        background: '/backgrounds/safari-reserve.avif',
+        title: 'A Gentle Lure',
+        icon: { type: 'pokemon', id: '113' },
+        message:
+          'The Chansey watches from behind the reeds. Place all ten red berry candies down one at a time and give it room to decide.',
+        buttons: [{ text: 'Offer the candies', type: 'success' }],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/safari-reserve.avif',
+      title: 'A Gentle Lure',
+      icon: { type: 'pokemon', id: '113' },
+      message:
+        'Chansey takes the last candy, gives a soft cry, and slips back into the reeds. It has accepted your kindness, but it remains free.',
+      closeButtonText: 'Explain why you came',
+    },
+  },
+  {
+    id: 'safari-chansey-makes-friends',
+    name: 'A Gift for Koga',
+    description: 'Chansey has accepted your kindness. Explain why you need its help, and let it decide what to offer.',
+    category: 'Kanto',
+    subCategory: 'Safari Zone',
+    icon: { type: 'pokemon', id: '113' },
+    background: '/backgrounds/safari-reserve.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Explain the Antidote',
+    requirements: [{ type: 'task_completed', targetId: 'safari-chansey-lure' }],
+    criteria: [],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        background: '/backgrounds/safari-reserve.avif',
+        title: 'A Gift for Koga',
+        icon: { type: 'pokemon', id: '113' },
+        message:
+          'Chansey steps from the reeds while you explain Koga’s work, the toxin, and the egg he needs to finish the antidote. It remains wild, listening from the edge of the reeds.',
+        buttons: [{ text: 'Tell Chansey the truth', type: 'navigate', id: 2 }],
+      },
+      {
+        id: 2,
+        background: '/backgrounds/safari-reserve.avif',
+        title: 'A Gift for Koga',
+        icon: { type: 'pokemon', id: '113' },
+        message:
+          'Chansey listens without moving. Then it places a warm egg carefully at your feet and gives a soft, reassuring cry. It is helping because you asked, not because you took.',
+        buttons: [{ text: 'Accept the gift', type: 'success' }],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/safari-reserve.avif',
+      title: 'A Gift for Koga',
+      icon: { type: 'pokemon', id: '113' },
+      message:
+        'The egg is warm in your hands. Chansey watches from the edge of the reeds as you carry its gift back to Koga.',
+      closeButtonText: 'Return to Koga',
+    },
+  },
+  {
     id: 'fuchsia-koga-unknown-compound',
     name: 'The Unknown Compound',
-    description: 'Koga thinks the Unknown Compound changes Pokémon energy.',
+    description: 'With the Chansey egg safely delivered, Koga can test the Unknown Compound.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
     icon: kogaIcon,
@@ -1382,7 +1573,7 @@ export const safariZoneTasks: Task[] = ([
     secret: false,
     completionTrigger: 'manual',
     completeButtonText: 'Test the theory',
-    requirements: [{ type: 'task_completed', targetId: 'safari-strength-check-on-koga' }],
+    requirements: [{ type: 'task_completed', targetId: 'safari-chansey-makes-friends' }],
     criteria: [{ type: 'currency_owned', targetId: 'crystals', count: 50, consume: true }],
     rewards: [{ type: 'currency', targetId: 'shadow-crystals', quantity: 50, dropChance: 100 }],
     enterModal: [
@@ -1392,7 +1583,7 @@ export const safariZoneTasks: Task[] = ([
         title: 'Koga',
         icon: kogaIcon,
         message:
-          'I separated two active compounds. The first is Toxicroak toxin. That is what if I were to believe you caused your untimely end. The second... Im unsure.',
+          'The egg you brought arrived in time. I have separated two active compounds: the first is Toxicroak toxin, and the second is still resisting every test I know.',
         buttons: [{ text: 'The Unknown Compound?', type: 'navigate', id: 2 }],
       },
       {
@@ -1436,7 +1627,7 @@ export const safariZoneTasks: Task[] = ([
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
         message:
-          'The vial combines a poison that harms people with a compound that changes Pokémon. This has to be connected to the Shadow Pokemon',
+          'The vial combines a poison that harms people with a compound that changes Pokémon. This has to be connected to the Shadow Pokémon.',
         buttons: [{ text: 'Koga?', type: 'navigate', id: 7 }],
       },
       {
@@ -1445,16 +1636,16 @@ export const safariZoneTasks: Task[] = ([
         title: 'Koga',
         icon: kogaIcon,
         message:
-          'For the first compound I can neutralize the Toxicroak toxin. I need fresh yolk from a Chansey egg. Find a Chansey in the Safari Zone and earn its trust as your partner.',
-        buttons: [{ text: 'On it!', type: 'success' }],
+          'The Chansey yolk will let me prepare the first antidote. Now we can test the second compound without exposing either of you. Bring me fifty Crystals when you are ready.',
+        buttons: [{ text: 'Test the compound', type: 'success' }],
       },
     ],
   },
   {
     id: 'safari-catch-partner-chansey',
-    name: 'An Egg for the Antidote',
+    name: 'The Pre-emptive Antidote',
     description:
-      'A Chansey egg is the last thing Koga needs for the antidote. Time to find a partner I can trust.',
+      'Koga has finished the antidote. Return to the lab and take the first dose before the investigation continues.',
     category: 'Kanto',
     subCategory: 'Safari Zone',
     icon: { type: 'pokemon', id: '113' },
@@ -1462,15 +1653,9 @@ export const safariZoneTasks: Task[] = ([
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Bring Chansey to Koga',
+    completeButtonText: 'Receive the Antidote',
     requirements: [{ type: 'task_completed', targetId: 'fuchsia-koga-unknown-compound' }],
-    criteria: [
-      {
-        type: 'companion',
-        companionCheck: { speciesId: 113, formId: '113' },
-        label: 'Set Chansey as your partner',
-      },
-    ],
+    criteria: [],
     rewards: [],
     enterModal: [
       {
@@ -1479,8 +1664,8 @@ export const safariZoneTasks: Task[] = ([
         title: 'Janine',
         icon: janineIcon,
         message:
-          'Chansey is calm around you. Keep it close and let it decide when it is comfortable.',
-        buttons: [{ text: 'Stay beside Chansey', type: 'navigate', id: 2 }],
+          'You return to the lab alone. Somewhere in the reserve, Chansey is safe, and the egg has reached Koga.',
+        buttons: [{ text: 'See what Koga made', type: 'navigate', id: 2 }],
       },
       {
         id: 2,
@@ -1488,15 +1673,15 @@ export const safariZoneTasks: Task[] = ([
         title: 'A Fresh Egg',
         icon: { type: 'pokemon', id: '113' },
         message:
-          'Chansey settles beside the workbench and produces a fresh egg, nudging it carefully toward Koga before returning to your side.',
-        buttons: [{ text: 'Give Koga the Egg', type: 'navigate', id: 3 }],
+          'The warm egg is already in Koga’s hands. Chansey was never taken from the reserve; its gift is enough for Koga to finish the antidote.',
+        buttons: [{ text: 'Watch Koga Work', type: 'navigate', id: 3 }],
       },
       {
         id: 3,
         background: '/backgrounds/lab.avif',
         title: 'Koga',
         icon: kogaIcon,
-        message: 'Good. The yolk is the last regeant I need for the antidote.',
+        message: 'Good. The yolk is the last reagent I need for the antidote.',
         buttons: [{ text: 'Watch Koga Work', type: 'navigate', id: 4 }],
       },
       {
@@ -1523,7 +1708,7 @@ export const safariZoneTasks: Task[] = ([
         title: 'Koga',
         icon: kogaIcon,
         message:
-          'Done. thats enough to last a lifetime for both of you. The Unknown Compound does not appear to affect humans; the Crystal test showed the danger it poses to Pokémon.',
+          'Done. That is enough to last you a lifetime. The Unknown Compound does not appear to affect humans; the Crystal test showed the danger it poses to Pokémon.',
         buttons: [{ text: 'Then the Pokémon are still at risk', type: 'navigate', id: 7 }],
       },
       {
