@@ -6,7 +6,7 @@ export const safariZonesnapEntries: SnapConfig[] = [
     name: 'Find the Gentle Chansey',
     description:
       'The Institute has marked a quiet stretch of reeds where a particular Chansey was last seen. Keep the camera ready.',
-    category: 'Secret',
+    category: 'Kanto',
     subCategory: 'Safari Zone',
     icon: { type: 'pokemon', id: '113' },
     background: '/backgrounds/safari-reserve.avif',

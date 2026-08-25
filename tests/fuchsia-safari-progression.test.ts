@@ -1576,6 +1576,10 @@ describe('Fuchsia Gym and Safari progression', () => {
       (game) => game.id === 'safari-chansey-search-snap',
     )
     expect(chanseySnap).toBeDefined()
+    expect(chanseySnap).toMatchObject({
+      category: 'Kanto',
+      subCategory: 'Safari Zone',
+    })
     expect(chanseySnap?.settings).toMatchObject({
       target: 113,
       timeLimit: 60,
@@ -1585,6 +1589,13 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(chanseySnap?.requirements).toContainEqual({
       type: 'task_completed',
       targetId: 'fuchsia-research-institute-chansey-request',
+    })
+    expect(chanseySnap?.requirements).toContainEqual({
+      type: 'game_result',
+      targetId: 'safari-chansey-search-snap',
+      battleStatus: 'win',
+      count: 1,
+      inverse: true,
     })
     expect(chanseySnap?.rewards).toEqual([
       {
