@@ -168,19 +168,31 @@ export const safariZoneFishing: FishingGameConfig[] = [
   }),
   {
     id: 'safari-zone-fishing-expedition',
-    name: 'Safari Fishing Pools',
+    name: 'Safari Zone Fishing',
     description:
-      'Fish the reserve’s full rod pool. Every catch is followed by a short Safari Ball encounter, with three Safari Balls available for each fishing step.',
-    category: 'Secret',
+      'Fish the reserve’s full rod pool. Every hooked Pokémon is followed by a short Safari Ball encounter with three Safari Balls.',
+    category: 'Kanto',
     subCategory: 'Safari Zone',
     background: '/backgrounds/safari-reserve.avif',
     icon: { type: 'item', id: 'super-rod' },
-    expeditionOnly: true,
-    // The parent expedition owns the permit, research-note, and rod gate.
-    // Keeping this hidden child activity ungated lets the authored expedition
-    // step resolve without asking the player to satisfy the same gate twice.
-    requirements: [],
-    criteria: [],
+    requirements: [
+      permitRequirement,
+      {
+        type: 'task_completed',
+        targetId: 'safari-fishing-research-notes',
+      },
+    ],
+    criteria: [
+      {
+        type: 'currency_owned',
+        targetId: 'pokedollars',
+        count: 250,
+        consume: true,
+      },
+      { type: 'item_owned', targetId: 'old-rod' },
+      { type: 'item_owned', targetId: 'good-rod' },
+      { type: 'item_owned', targetId: 'super-rod' },
+    ],
     rewards: [],
     gameType: 'fishing',
     settings: {

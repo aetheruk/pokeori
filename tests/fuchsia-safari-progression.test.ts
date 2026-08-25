@@ -532,7 +532,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(expedition).toBeDefined()
     expect(
       expeditions.filter((entry) => entry.id.startsWith('safari-')),
-    ).toHaveLength(4)
+    ).toHaveLength(3)
     expect(expedition?.maxLosses).toBe(10)
     expect(expedition?.safariBallAllowance).toBe(30)
     expect(expedition?.requirements).toContainEqual({
@@ -771,59 +771,32 @@ describe('Fuchsia Gym and Safari progression', () => {
       'safari-poacher-watch-five',
     ])
 
-    const fishingExpedition = expeditions.find(
+    const fishingGame = fishingGames.find(
       (entry) => entry.id === 'safari-zone-fishing-expedition',
     )
-    expect(fishingExpedition?.requirements).toContainEqual({
-      type: 'task_completed',
-      targetId: 'safari-fishing-research-notes',
+    expect(
+      expeditions.some((entry) => entry.id === 'safari-zone-fishing-expedition'),
+    ).toBe(false)
+    expect(fishingGame?.expeditionOnly).toBeUndefined()
+    expect(fishingGame).toMatchObject({
+      category: 'Kanto',
+      requirements: [
+        { type: 'task_completed', targetId: 'safari-wardens-permit' },
+        { type: 'task_completed', targetId: 'safari-fishing-research-notes' },
+      ],
+      rewards: [],
     })
-    expect(fishingExpedition?.criteria).toEqual([
+    expect(fishingGame?.criteria).toEqual([
       expect.objectContaining({
         type: 'currency_owned',
-        count: 500,
+        targetId: 'pokedollars',
+        count: 250,
         consume: true,
       }),
       { type: 'item_owned', targetId: 'old-rod' },
       { type: 'item_owned', targetId: 'good-rod' },
       { type: 'item_owned', targetId: 'super-rod' },
     ])
-    expect(fishingExpedition?.safariBallAllowance).toBeUndefined()
-    const fishingSteps = buildExpeditionSteps(fishingExpedition!, {
-      inventory: [
-        { itemId: 'safari-catching-permit', quantity: 1 },
-        { itemId: 'old-rod', quantity: 1 },
-        { itemId: 'good-rod', quantity: 1 },
-        { itemId: 'super-rod', quantity: 1 },
-      ],
-      completedTasks: [],
-      expeditionResults: [
-        {
-          expeditionId: 'safari-zone-grand-expedition',
-          wins: 1,
-          losses: 0,
-        },
-      ],
-    } as unknown as RequirementData)
-    expect(fishingSteps).toHaveLength(5)
-    expect(fishingSteps.every((step) => step.activityType === 'game')).toBe(
-      true,
-    )
-    expect(new Set(fishingSteps.map((step) => step.activityId))).toEqual(
-      new Set(['safari-zone-fishing-expedition']),
-    )
-    expect(fishingExpedition?.rewards).toEqual([
-      { type: 'xp', skill: 'catching', quantity: 500, dropChance: 100 },
-      {
-        type: 'currency',
-        targetId: 'safari-notes',
-        quantity: 10,
-        dropChance: 100,
-      },
-    ])
-    const fishingGame = fishingGames.find(
-      (entry) => entry.id === 'safari-zone-fishing-expedition',
-    )
     expect(fishingGame?.settings.safariCapture).toEqual({ balls: 3 })
   })
 
@@ -1483,7 +1456,16 @@ describe('Fuchsia Gym and Safari progression', () => {
     const expeditionFishing = fishingGames.find(
       (entry) => entry.id === 'safari-zone-fishing-expedition',
     )
-    expect(expeditionFishing?.expeditionOnly).toBe(true)
+    expect(expeditionFishing?.expeditionOnly).toBeUndefined()
+    expect(expeditionFishing?.category).toBe('Kanto')
+    expect(expeditionFishing?.criteria).toContainEqual(
+      expect.objectContaining({
+        type: 'currency_owned',
+        targetId: 'pokedollars',
+        count: 250,
+        consume: true,
+      }),
+    )
     expect(expeditionFishing?.settings.safariCapture).toEqual({ balls: 3 })
     expect(
       expeditionFishing?.settings.rods.super?.encounters.entries.map(
@@ -1519,7 +1501,6 @@ describe('Fuchsia Gym and Safari progression', () => {
       'safari-zone-grand-expedition',
       'safari-zone-catching-expedition',
       'safari-zone-poacher-watch-expedition',
-      'safari-zone-fishing-expedition',
     ]
 
     for (const expeditionId of expeditionIds) {

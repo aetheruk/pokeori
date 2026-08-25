@@ -59,7 +59,6 @@ import {
 import type { WeatherSnapshot } from '@/utilities/weather'
 import { applySecretFishingPokemonReplacement } from '@/utilities/fishing/secret-pokemon'
 import { getAvailableFishingItemEntries } from '@/utilities/fishing/item-pool'
-import { recordExpeditionActivityResult } from '@/utilities/expeditions/actions'
 import { SAFARI_BASE_FLEE_RATE } from '@/utilities/pokemon/safari-catch'
 
 export interface FishingState {
@@ -588,12 +587,6 @@ export async function claimFishingItem() {
       const researchState = (await redis.get(
         `game:${user.id}`,
       )) as GameActivityState | null
-      const encounter = researchState
-        ? (allGames.find(
-            (entry) => entry.id === researchState.encounterId,
-          ) as FishingGameConfig | undefined)
-        : undefined
-      const expeditionFishing = !!encounter?.settings.safariCapture
       if (researchState) {
         researchState.wins += 1
         await redis.set(`game:${user.id}`, researchState, { ex: 900 })
@@ -610,26 +603,12 @@ export async function claimFishingItem() {
         }
       }
 
-      let expeditionProgress
-      if (expeditionFishing && researchState) {
-        const expeditionResult = await recordExpeditionActivityResult(
-          user.id,
-          'game',
-          researchState.encounterId,
-          true,
-          { revalidatePaths: false },
-        )
-        expeditionProgress = expeditionResult.expedition
-        await redis.del(`game:${user.id}`)
-      }
-
       const response = {
         success: true,
         claimed: true,
         itemId: itemEntry.itemId,
         currencyId: itemEntry.currencyId,
         summary,
-        expeditionProgress,
       }
 
       await setIdempotentResult(claimResultKey, response, 300)
@@ -691,35 +670,8 @@ export async function releaseFish() {
         `fishing:${user.id}`,
       )) as FishingState | null
 
-      const encounter = fishingState
-        ? (allGames.find(
-            (entry) => entry.id === fishingState.encounterId,
-          ) as FishingGameConfig | undefined)
-        : undefined
-      const expeditionFishing = !!encounter?.settings.safariCapture
-
       // Clear fishing state, keep research session for continued fishing
       await redis.del(`fishing:${user.id}`)
-
-      if (
-        expeditionFishing &&
-        fishingState?.phase === 'hooked' &&
-        fishingState
-      ) {
-        const expeditionResult = await recordExpeditionActivityResult(
-          user.id,
-          'game',
-          fishingState.encounterId,
-          false,
-          { revalidatePaths: false },
-        )
-        await redis.del(`game:${user.id}`)
-        return {
-          success: true,
-          message: 'Released back into the water.',
-          expeditionProgress: expeditionResult.expedition,
-        }
-      }
 
       // Refresh research session TTL to keep it alive
       await redis.expire(`game:${user.id}`, 900) // 15 min expiry
@@ -863,12 +815,6 @@ export async function startFishingCatch() {
               ballsRemaining: encounter.settings.safariCapture.balls,
               scope: 'encounter',
             }
-          : undefined,
-        expeditionActivityType: encounter.settings.safariCapture
-          ? 'game'
-          : undefined,
-        expeditionActivityId: encounter.settings.safariCapture
-          ? fishingState.encounterId
           : undefined,
       }
 
