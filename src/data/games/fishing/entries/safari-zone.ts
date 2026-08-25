@@ -5,11 +5,6 @@ import type {
   FishingRodConfig,
 } from '../types'
 
-const permitRequirement = {
-  type: 'task_completed' as const,
-  targetId: 'safari-wardens-permit',
-}
-
 const fishingResearchNotesRequirement = {
   type: 'task_completed' as const,
   targetId: 'safari-fishing-research-notes',
@@ -115,7 +110,7 @@ const standardSafariFishing = ({
   subCategory: 'Safari Zone',
   background: '/backgrounds/safari-reserve.avif',
   icon: { type: 'item', id: 'old-rod' },
-  requirements: [permitRequirement, fishingResearchNotesRequirement],
+  requirements: [fishingResearchNotesRequirement],
   criteria: [
     {
       type: 'currency_owned',
