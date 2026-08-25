@@ -1466,14 +1466,10 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(
       safariFishingGames
         .find((entry) => entry.id === 'safari-north-fishing')
-        ?.settings.rods.super?.encounters.entries.filter((entry) =>
+        ?.settings.rods.super?.encounters.entries.some((entry) =>
           ['10250', '10251', '10252'].includes(entry.formId || ''),
         ),
-    ).toEqual([
-      expect.objectContaining({ speciesId: 128, formId: '10250' }),
-      expect.objectContaining({ speciesId: 128, formId: '10251' }),
-      expect.objectContaining({ speciesId: 128, formId: '10252' }),
-    ])
+    ).toBe(false)
     expect(
       centralFishing?.settings.rods.old?.items?.entries.map((entry) =>
         entry.currencyId

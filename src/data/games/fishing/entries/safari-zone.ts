@@ -160,27 +160,7 @@ const areaSuperPool = [
   fishingEntry(147, 60),
 ]
 
-const northSuperPool = [
-  ...areaSuperPool,
-  {
-    ...fishingEntry(128, 1, '10250'),
-    requirements: [
-      { type: 'task_completed' as const, targetId: 'safari-strange-sightings' },
-    ],
-  },
-  {
-    ...fishingEntry(128, 1, '10251'),
-    requirements: [
-      { type: 'task_completed' as const, targetId: 'safari-strange-sightings' },
-    ],
-  },
-  {
-    ...fishingEntry(128, 1, '10252'),
-    requirements: [
-      { type: 'task_completed' as const, targetId: 'safari-strange-sightings' },
-    ],
-  },
-]
+const northSuperPool = areaSuperPool
 
 export const safariZoneFishing: FishingGameConfig[] = [
   standardSafariFishing({
