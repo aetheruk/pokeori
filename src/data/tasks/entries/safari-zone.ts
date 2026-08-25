@@ -1381,7 +1381,7 @@ export const safariZoneTasks: Task[] = ([
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'I’ll look into it',
+    completeButtonText: 'Talk to Koga',
     requirements: [{ type: 'task_completed', targetId: 'safari-strength-check-on-koga' }],
     criteria: [],
     rewards: [],

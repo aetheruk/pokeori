@@ -1608,6 +1608,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(chain.every(Boolean)).toBe(true)
 
     expect(chain[0]?.icon).toEqual({ type: 'trainer', id: 'gym-kanto-koga' })
+    expect(chain[0]?.completeButtonText).toBe('Talk to Koga')
     expect(JSON.stringify(chain[0])).toContain('I’ll find out where to look')
     expect(JSON.stringify(chain[0])).not.toContain('I’ll ask the Institute')
 
