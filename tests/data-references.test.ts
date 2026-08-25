@@ -719,6 +719,7 @@ describe('static data references', () => {
 
     for (const [rodType, pool] of Object.entries(globalFishingItemPools)) {
       for (const entry of pool) {
+        if (!entry.itemId) continue
         if (!ids.item.has(entry.itemId)) {
           broken.push({ owner: `global:${rodType}`, itemId: entry.itemId })
         }
@@ -733,6 +734,11 @@ describe('static data references', () => {
         fishingGame.settings.rods,
       )) {
         for (const entry of rodConfig?.items?.entries || []) {
+          if (!entry.itemId) {
+            expect(entry.currencyId).toBeDefined()
+            expect(ids.currency.has(entry.currencyId!)).toBe(true)
+            continue
+          }
           if (!ids.item.has(entry.itemId)) {
             broken.push({
               owner: `${game.id}:${rodType}`,

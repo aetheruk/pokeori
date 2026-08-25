@@ -6,6 +6,7 @@ export function getAvailableFishingItemEntries(
   inventory: Record<string, number>,
 ): FishingItemEntry[] {
   return entries.filter((entry) => {
+    if (!entry.itemId) return true
     const item = items.find((candidate) => candidate.id === entry.itemId)
     return !item?.unique || (inventory[entry.itemId] || 0) <= 0
   })

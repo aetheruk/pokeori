@@ -17,6 +17,7 @@ import {
   shouldUseExtraShinyRoll,
 } from '@/utilities/pokemon/encounter-ability-runtime'
 import { getPokemonForm } from '@/utilities/pokemon/pokedex'
+import { rollPokemonGender } from '@/utilities/pokemon/gender'
 import {
   resolvePokemonRarity,
   type PokemonRarityId,
@@ -58,6 +59,8 @@ import {
 import type { WeatherSnapshot } from '@/utilities/weather'
 import { applySecretFishingPokemonReplacement } from '@/utilities/fishing/secret-pokemon'
 import { getAvailableFishingItemEntries } from '@/utilities/fishing/item-pool'
+import { recordExpeditionActivityResult } from '@/utilities/expeditions/actions'
+import { SAFARI_BASE_FLEE_RATE } from '@/utilities/pokemon/safari-catch'
 
 export interface FishingState {
   userId: string
@@ -105,6 +108,7 @@ function buildHookedResponse(fishingState: FishingState) {
       hooked: true,
       type: 'item' as const,
       itemId: itemEntry.itemId,
+      currencyId: itemEntry.currencyId,
       symbol: itemEntry.symbol,
     }
   }
@@ -564,10 +568,17 @@ export async function claimFishingItem() {
 
       const itemEntry = result.entry as FishingItemEntry
 
-      // Grant the item
-      const { summary } = await grantRewards(user.id, [
-        { type: 'item', targetId: itemEntry.itemId, quantity: 1 },
-      ], { idempotencyKey: claimResultKey })
+      const reward: Reward = itemEntry.currencyId
+        ? { type: 'currency', targetId: itemEntry.currencyId, quantity: 1 }
+        : itemEntry.itemId
+          ? { type: 'item', targetId: itemEntry.itemId, quantity: 1 }
+          : (() => {
+              throw new Error('Fishing item has no reward target')
+            })()
+
+      const { summary } = await grantRewards(user.id, [reward], {
+        idempotencyKey: claimResultKey,
+      })
       // Keep the reservation if anything after the durable grant fails. This
       // prevents a retry from replaying the same economy action while the
       // fishing result is being finalized.
@@ -577,6 +588,12 @@ export async function claimFishingItem() {
       const researchState = (await redis.get(
         `game:${user.id}`,
       )) as GameActivityState | null
+      const encounter = researchState
+        ? (allGames.find(
+            (entry) => entry.id === researchState.encounterId,
+          ) as FishingGameConfig | undefined)
+        : undefined
+      const expeditionFishing = !!encounter?.settings.safariCapture
       if (researchState) {
         researchState.wins += 1
         await redis.set(`game:${user.id}`, researchState, { ex: 900 })
@@ -593,11 +610,26 @@ export async function claimFishingItem() {
         }
       }
 
+      let expeditionProgress
+      if (expeditionFishing && researchState) {
+        const expeditionResult = await recordExpeditionActivityResult(
+          user.id,
+          'game',
+          researchState.encounterId,
+          true,
+          { revalidatePaths: false },
+        )
+        expeditionProgress = expeditionResult.expedition
+        await redis.del(`game:${user.id}`)
+      }
+
       const response = {
         success: true,
         claimed: true,
         itemId: itemEntry.itemId,
+        currencyId: itemEntry.currencyId,
         summary,
+        expeditionProgress,
       }
 
       await setIdempotentResult(claimResultKey, response, 300)
@@ -655,8 +687,39 @@ export async function releaseFish() {
     }
 
     try {
+      const fishingState = (await redis.get(
+        `fishing:${user.id}`,
+      )) as FishingState | null
+
+      const encounter = fishingState
+        ? (allGames.find(
+            (entry) => entry.id === fishingState.encounterId,
+          ) as FishingGameConfig | undefined)
+        : undefined
+      const expeditionFishing = !!encounter?.settings.safariCapture
+
       // Clear fishing state, keep research session for continued fishing
       await redis.del(`fishing:${user.id}`)
+
+      if (
+        expeditionFishing &&
+        fishingState?.phase === 'hooked' &&
+        fishingState
+      ) {
+        const expeditionResult = await recordExpeditionActivityResult(
+          user.id,
+          'game',
+          fishingState.encounterId,
+          false,
+          { revalidatePaths: false },
+        )
+        await redis.del(`game:${user.id}`)
+        return {
+          success: true,
+          message: 'Released back into the water.',
+          expeditionProgress: expeditionResult.expedition,
+        }
+      }
 
       // Refresh research session TTL to keep it alive
       await redis.expire(`game:${user.id}`, 900) // 15 min expiry
@@ -773,6 +836,7 @@ export async function startFishingCatch() {
         formId,
         isShiny: result.isShiny || false,
         rarity: result.rarity,
+        gender: rollPokemonGender(speciesId),
         startTime,
         expiry,
         baseCatchRate: modifiedBaseRate,
@@ -788,6 +852,24 @@ export async function startFishingCatch() {
           chance: entry.weight,
         })),
         weather: fishingState.weather,
+        encounterMode: encounter.settings.safariCapture ? 'safari' : 'standard',
+        fleeRate: encounter.settings.safariCapture
+          ? SAFARI_BASE_FLEE_RATE
+          : undefined,
+        safari: encounter.settings.safariCapture
+          ? {
+              stage: 0,
+              actions: 0,
+              ballsRemaining: encounter.settings.safariCapture.balls,
+              scope: 'encounter',
+            }
+          : undefined,
+        expeditionActivityType: encounter.settings.safariCapture
+          ? 'game'
+          : undefined,
+        expeditionActivityId: encounter.settings.safariCapture
+          ? fishingState.encounterId
+          : undefined,
       }
 
       // Store as location encounter for attemptCapture compatibility

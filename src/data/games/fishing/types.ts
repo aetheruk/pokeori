@@ -27,7 +27,8 @@ export interface FishingPokemonEntry {
 }
 
 export interface FishingItemEntry {
-  itemId: string
+  itemId?: string
+  currencyId?: string
   weight: number
   symbol: string
   reactionTime: number
@@ -63,5 +64,8 @@ export interface FishingGameConfig extends BaseGameConfig {
     scene?: FishingSceneConfig
     fishingSprite?: string // Character/rod sprite
     waterAnimationSpeed?: number // Optional animation speed
+    safariCapture?: {
+      balls: number
+    }
   }
 }

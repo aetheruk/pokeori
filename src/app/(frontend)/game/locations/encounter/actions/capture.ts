@@ -52,6 +52,7 @@ import {
 } from '@/utilities/expeditions/actions'
 import {
   getEncounterRedisTtlSeconds,
+  getEncounterActivityReference,
   type EncounterState,
 } from './types'
 import { rollAbility, getUser } from './utils'
@@ -84,6 +85,7 @@ import {
   getPokemonRarityLegacyFields,
   resolvePokemonRarity,
 } from '@/utilities/pokemon/rarity-effects'
+
 import {
   calculatePokemonContentSkillXp,
   resolveSkillXpConfig,
@@ -99,6 +101,27 @@ import {
   setUserInventoryMap,
   setUserPokedexMap,
 } from '@/utilities/user-state'
+
+async function recordEncounterExpeditionResult(
+  userId: string,
+  state: EncounterState,
+  didWin: boolean,
+) {
+  const reference = getEncounterActivityReference(state)
+  const result = await recordExpeditionActivityResult(
+    userId,
+    reference.activityType,
+    reference.activityId,
+    didWin,
+    { revalidatePaths: false },
+  )
+
+  if (reference.activityType === 'game') {
+    await redis.del(`game:${userId}`)
+  }
+
+  return result
+}
 
 export async function attemptCapture(
   ballItemId: string,
@@ -236,12 +259,10 @@ export async function attemptCapture(
         expeditionProgress: undefined as any,
       }
 
-      const expeditionResult = await recordExpeditionActivityResult(
+      const expeditionResult = await recordEncounterExpeditionResult(
         user.id,
-        'location',
-        state.locationId,
+        state,
         false,
-        { revalidatePaths: false },
       )
       response.expeditionProgress = expeditionResult.expedition
 
@@ -261,7 +282,9 @@ export async function attemptCapture(
         0,
         state.safari!.ballsRemaining - 1,
       )
-      await setSafariBallsRemaining(user.id, state.safari!.ballsRemaining, false)
+      if (state.safari?.scope !== 'encounter') {
+        await setSafariBallsRemaining(user.id, state.safari!.ballsRemaining, false)
+      }
     } else {
       inventory[ballItemId] = qty - 1
       if (!isChronicle) {
@@ -503,12 +526,10 @@ export async function attemptCapture(
             expeditionProgress: undefined as any,
           }
 
-      const expeditionResult = await recordExpeditionActivityResult(
+      const expeditionResult = await recordEncounterExpeditionResult(
         user.id,
-        'location',
-        state.locationId,
+        state,
         caught,
-        { revalidatePaths: false },
       )
       response.expeditionProgress = expeditionResult.expedition
 
@@ -653,12 +674,10 @@ export async function attemptCapture(
         expeditionProgress: undefined as any,
       }
 
-      const expeditionResult = await recordExpeditionActivityResult(
+      const expeditionResult = await recordEncounterExpeditionResult(
         user.id,
-        'location',
-        state.locationId,
+        state,
         false,
-        { revalidatePaths: false },
       )
       response.expeditionProgress = expeditionResult.expedition
 
@@ -944,12 +963,10 @@ export async function attemptCapture(
       expeditionProgress: undefined as any,
     }
 
-    const expeditionResult = await recordExpeditionActivityResult(
+    const expeditionResult = await recordEncounterExpeditionResult(
       user.id,
-      'location',
-      state.locationId,
+      state,
       true,
-      { revalidatePaths: false },
     )
     response.expeditionProgress = expeditionResult.expedition
 

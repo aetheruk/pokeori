@@ -169,11 +169,19 @@ function getCollectibleRewards(item: ExploreItem): RewardLike[] {
   if (item.type === 'game' && data.gameType === 'fishing') {
     for (const rodConfig of Object.values(data.settings?.rods || {})) {
       for (const entry of getAuthoredFishingItemRewards(rodConfig)) {
-        rewards.push({
-          type: 'item',
-          targetId: entry.itemId,
-          requirements: (entry as any).requirements,
-        })
+        if (entry.currencyId) {
+          rewards.push({
+            type: 'currency',
+            targetId: entry.currencyId,
+            requirements: (entry as any).requirements,
+          })
+        } else if (entry.itemId) {
+          rewards.push({
+            type: 'item',
+            targetId: entry.itemId,
+            requirements: (entry as any).requirements,
+          })
+        }
       }
     }
   }

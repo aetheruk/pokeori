@@ -39,6 +39,7 @@ import { recordExpeditionActivityResult } from '@/utilities/expeditions/actions'
 import type { ExpeditionProgressSnapshot } from '@/utilities/expeditions/actions'
 import {
   getEncounterRedisTtlSeconds,
+  getEncounterActivityReference,
   type EncounterState,
 } from './types'
 import { rollAbility, getUser } from './utils'
@@ -65,13 +66,17 @@ async function performRunAway(
   await redis.del(encounterId)
 
   if (!trackLoss || state.chronicle) {
+    const reference = getEncounterActivityReference(state)
     const expeditionResult = await recordExpeditionActivityResult(
       user.id,
-      'location',
-      state.locationId,
+      reference.activityType,
+      reference.activityId,
       false,
       { revalidatePaths: false },
     )
+    if (reference.activityType === 'game') {
+      await redis.del(`game:${user.id}`)
+    }
     return expeditionResult.expedition
   }
 
@@ -95,13 +100,17 @@ async function performRunAway(
     )
   }
 
-    const expeditionResult = await recordExpeditionActivityResult(
-      user.id,
-      'location',
-      state.locationId,
-      false,
-      { revalidatePaths: false },
-    )
+  const reference = getEncounterActivityReference(state)
+  const expeditionResult = await recordExpeditionActivityResult(
+    user.id,
+    reference.activityType,
+    reference.activityId,
+    false,
+    { revalidatePaths: false },
+  )
+  if (reference.activityType === 'game') {
+    await redis.del(`game:${user.id}`)
+  }
   return expeditionResult.expedition
 }
 

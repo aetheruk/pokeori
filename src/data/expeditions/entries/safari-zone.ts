@@ -99,7 +99,7 @@ const allTaskIds = [
 
 const secretActivity = (
   id: string,
-  activityType: 'task' | 'field-research' | 'location' | 'battle',
+  activityType: 'task' | 'field-research' | 'location' | 'battle' | 'game',
   activityId: string,
 ) => ({
   type: 'activity' as const,
@@ -424,14 +424,13 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
     id: 'safari-zone-fishing-expedition',
     name: 'Safari Zone Fishing Expedition',
     description:
-      'Work the reserve’s ponds from one end to the other. Ten Safari Ball encounters draw from every Pokémon available through the Old, Good, or Super Rod in the original Safari Zone.',
+      'Work the reserve’s ponds from one end to the other. Five fishing steps draw from every Pokémon available through the Old, Good, or Super Rod in the original Safari Zone.',
     category: 'Kanto',
     subCategory: 'Safari Zone',
     buttonText: 'Begin Fishing Expedition',
     icon: { type: 'item', id: 'super-rod' },
     background: '/backgrounds/safari-reserve.avif',
     maxLosses: 5,
-    safariBallAllowance: 30,
     canAbandon: true,
     requirements: [permitRequirement, fishingResearchNotesRequirement],
     criteria: [
@@ -441,13 +440,13 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
       { type: 'item_owned', targetId: 'super-rod' },
     ],
     activityPool: {
-      location: ['safari-fishing-expedition-catch'],
+      game: ['safari-zone-fishing-expedition'],
     },
-    path: Array.from({ length: 10 }, (_, index) =>
+    path: Array.from({ length: 5 }, (_, index) =>
       secretActivity(
         `safari-fishing-step-${String(index + 1).padStart(2, '0')}`,
-        'location',
-        'safari-fishing-expedition-catch',
+        'game',
+        'safari-zone-fishing-expedition',
       ),
     ),
     rewards: [

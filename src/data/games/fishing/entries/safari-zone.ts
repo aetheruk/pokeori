@@ -1,5 +1,6 @@
 import type {
   FishingGameConfig,
+  FishingItemEntry,
   FishingPokemonEntry,
   FishingRodConfig,
 } from '../types'
@@ -34,6 +35,57 @@ const fishingRod = (
   encounters: { entries },
 })
 
+const safariFishingPool = [
+  fishingEntry(129, 30),
+  fishingEntry(60, 15),
+  fishingEntry(118, 15),
+  fishingEntry(54, 10),
+  fishingEntry(79, 10),
+  fishingEntry(98, 10),
+  fishingEntry(147, 8),
+  fishingEntry(148, 2),
+]
+
+const safariFishingItems = (): FishingItemEntry[] => [
+  {
+    itemId: 'water-gem',
+    weight: 40,
+    symbol: '!',
+    reactionTime: 850,
+    appearTime: { min: 2000, max: 5000 },
+  },
+  {
+    itemId: 'aqua-solvent-t1',
+    weight: 20,
+    symbol: '!',
+    reactionTime: 850,
+    appearTime: { min: 2000, max: 5000 },
+  },
+  {
+    itemId: 'drake-scale-t1',
+    weight: 20,
+    symbol: '!',
+    reactionTime: 850,
+    appearTime: { min: 2000, max: 5000 },
+  },
+  {
+    currencyId: 'safari-notes',
+    weight: 20,
+    symbol: '!',
+    reactionTime: 850,
+    appearTime: { min: 2000, max: 5000 },
+  },
+]
+
+const safariFishingRod = (): FishingRodConfig => ({
+  levelRange: { min: 25, max: 35 },
+  shinyChanceModifier: 1,
+  catchRateModifier: 0,
+  timer: 30,
+  encounters: { entries: safariFishingPool },
+  items: { entries: safariFishingItems() },
+})
+
 const standardSafariFishing = ({
   id,
   name,
@@ -59,7 +111,7 @@ const standardSafariFishing = ({
   settings: {
     sky: '/games/run/backgrounds/sky.avif',
     scene: {
-      portraitBackground: '/backgrounds/fishing-pond-portrait.avif',
+      portraitBackground: '/backgrounds/fishing-safari-reserve-portrait.avif',
       waterStyle: 'pond',
       waterline: { portrait: 55 },
     },
@@ -114,4 +166,37 @@ export const safariZoneFishing: FishingGameConfig[] = [
     description: 'Fish the northern channels and study the Pokémon drawn from the reserve’s original rod tables.',
     superEntries: areaSuperPool,
   }),
+  {
+    id: 'safari-zone-fishing-expedition',
+    name: 'Safari Fishing Pools',
+    description:
+      'Fish the reserve’s full rod pool. Every catch is followed by a short Safari Ball encounter, with three Safari Balls available for each fishing step.',
+    category: 'Secret',
+    subCategory: 'Safari Zone',
+    background: '/backgrounds/safari-reserve.avif',
+    icon: { type: 'item', id: 'super-rod' },
+    expeditionOnly: true,
+    // The parent expedition owns the permit, research-note, and rod gate.
+    // Keeping this hidden child activity ungated lets the authored expedition
+    // step resolve without asking the player to satisfy the same gate twice.
+    requirements: [],
+    criteria: [],
+    rewards: [],
+    gameType: 'fishing',
+    settings: {
+      sky: '/games/run/backgrounds/sky.avif',
+      scene: {
+        portraitBackground: '/backgrounds/fishing-safari-reserve-portrait.avif',
+        waterStyle: 'pond',
+        waterline: { portrait: 55 },
+      },
+      waterAnimationSpeed: 1.15,
+      safariCapture: { balls: 3 },
+      rods: {
+        old: safariFishingRod(),
+        good: safariFishingRod(),
+        super: safariFishingRod(),
+      },
+    },
+  },
 ]
