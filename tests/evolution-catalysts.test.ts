@@ -1,11 +1,13 @@
 import { describe, expect, test } from 'bun:test'
 import { artisanRecipes } from '@/data/artisan'
+import { battles } from '@/data/battles'
 import {
   getLevelEvolutionCatalystForEvolution,
   LEVEL_EVOLUTION_CATALYSTS,
 } from '@/data/evolution-catalysts'
 import { EVOLUTIONS } from '@/data/evolutions'
 import { items } from '@/data/items'
+import { tasks } from '@/data/tasks'
 
 describe('level evolution catalysts', () => {
   test('uses the three authored level bands and Artisan unlocks', () => {
@@ -48,7 +50,78 @@ describe('level evolution catalysts', () => {
           { type: 'item', targetId: catalyst.id, quantity: 1, dropChance: 100 },
         ],
       })
+      expect(recipe?.requirements).toContainEqual({
+        type: 'task_completed',
+        targetId: 'evolution-catalyst-recipe',
+      })
     }
+  })
+
+  test('the Jungle Binder victory awards the first catalyst and unlocks all recipes', () => {
+    const battle = battles.find((entry) => entry.id === 'buggy-4-battle-4')
+    expect(battle?.rewards).toContainEqual({
+      type: 'item',
+      targetId: 'evolution-catalyst',
+      quantity: 1,
+      dropChance: 100,
+    })
+    expect(battle?.rewards).toContainEqual({
+      type: 'task_complete',
+      targetId: 'evolution-catalyst-recipe',
+      dropChance: 100,
+    })
+
+    const recipeMarker = tasks.find((task) => task.id === 'evolution-catalyst-recipe')
+    expect(recipeMarker).toMatchObject({
+      secret: true,
+      completionTrigger: 'auto',
+    })
+  })
+
+  test('Benny offers an optional thematic explanation for using the catalyst', () => {
+    const tutorial = tasks.find((task) => task.id === 'evolution-catalyst-tutorial')
+    expect(tutorial).toMatchObject({
+      secret: false,
+      repeatable: false,
+      completionTrigger: 'manual',
+      requirements: [{ type: 'item_owned', targetId: 'evolution-catalyst' }],
+    })
+
+    const dialogue = (tutorial?.enterModal || []).map((step) => step.message).join(' ')
+    expect(tutorial?.enterModal).toHaveLength(3)
+    expect(dialogue).toContain('old skin')
+    expect(dialogue).toContain('Use it when the moment comes')
+    expect(dialogue.toLowerCase()).not.toContain('recipe')
+    expect(dialogue.toLowerCase()).not.toContain('unlock')
+    expect(dialogue.toLowerCase()).not.toContain('artisan level')
+    expect(dialogue.toLowerCase()).not.toContain('tier')
+  })
+
+  test('existing Jungle Binder owners receive a one-time catalyst handoff', () => {
+    const handoff = tasks.find((task) => task.id === 'evolution-catalyst-handoff')
+    expect(handoff).toMatchObject({
+      secret: false,
+      repeatable: false,
+      completionTrigger: 'manual',
+      requirements: [
+        { type: 'item_owned', targetId: 'binder-base2' },
+        { type: 'item_owned', targetId: 'evolution-catalyst', inverse: true },
+        {
+          type: 'task_completed',
+          targetId: 'evolution-catalyst-recipe',
+          inverse: true,
+        },
+      ],
+    })
+    expect(handoff?.rewards).toContainEqual({
+      type: 'item',
+      targetId: 'evolution-catalyst',
+      quantity: 1,
+    })
+    expect(handoff?.rewards).toContainEqual({
+      type: 'task_complete',
+      targetId: 'evolution-catalyst-recipe',
+    })
   })
 
   test('selects catalysts only for level-only evolutions', () => {

@@ -174,6 +174,35 @@ export const recipeManualTasks: Task[] = [
       closeButtonText: 'Got it',
     },
   },
+  {
+    id: 'evolution-catalyst-recipe',
+    name: 'A Forest-Born Focus',
+    description: 'Benny’s notes on a strange crystal that helps Pokémon through a difficult change.',
+    category: 'Secret',
+    subCategory: 'Recipe Manuals',
+    icon: {
+      type: 'item' as const,
+      id: 'evolution-catalyst',
+    },
+    repeatable: false,
+    secret: true,
+    completionTrigger: 'auto' as const,
+    completeButtonText: 'Keep It Safe',
+    requirements: [],
+    criteria: [],
+    rewards: [],
+    exitModal: {
+      background: '/backgrounds/forest.avif',
+      title: 'A Forest-Born Focus',
+      message:
+        'Benny turns the crystal over in his hands. “That little thing came from the forest floor. Keep it close. When one of your Pokémon is ready for a big change, it may help them find their way through it.”',
+      closeButtonText: 'Keep It Safe',
+      icon: {
+        type: 'trainer',
+        id: 'bug-catcher',
+      },
+    },
+  },
   ...craftableSpecialtyBalls.map((ball) => ({
     id: `${ball.id}-manual`,
     name: `${ball.name} Manual`,

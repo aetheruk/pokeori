@@ -151,6 +151,17 @@ export const viridianForestBattles: BattleConfig[] = [
         targetId: 'binder-base2', // Jungle Binder
         quantity: 1,
       },
+      {
+        type: 'item',
+        dropChance: 100,
+        targetId: 'evolution-catalyst',
+        quantity: 1,
+      },
+      {
+        type: 'task_complete',
+        dropChance: 100,
+        targetId: 'evolution-catalyst-recipe',
+      },
     ],
   },
   {

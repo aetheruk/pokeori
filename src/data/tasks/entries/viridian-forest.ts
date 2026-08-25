@@ -34,6 +34,155 @@ export const viridianForestTasks: Task[] = [
     },
   },
   {
+    id: 'evolution-catalyst-tutorial',
+    name: 'A Little Help Growing',
+    description:
+      'Benny has more to say about the strange crystal he found beneath the forest canopy.',
+    category: 'Kanto',
+    subCategory: 'Viridian Forest',
+    icon: {
+      type: 'trainer',
+      id: 'bug-catcher',
+    },
+    background: '/backgrounds/forest.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    chat: true,
+    completeButtonText: 'Listen to Benny',
+    requirements: [
+      {
+        type: 'item_owned',
+        targetId: 'evolution-catalyst',
+      },
+    ],
+    criteria: [],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        title: 'A Little Help Growing',
+        message:
+          'Benny keeps glancing at the bright crystal in your pack. “Funny thing about bugs,” he says. “They spend ages looking like they’re doing nothing, then one day they split their old skin and come out completely different.”',
+        background: '/backgrounds/forest.avif',
+        icon: {
+          type: 'trainer',
+          id: 'bug-catcher',
+        },
+        buttons: [
+          {
+            text: 'Go On',
+            type: 'navigate',
+            id: 2,
+          },
+        ],
+      },
+      {
+        id: 2,
+        title: 'A Little Help Growing',
+        message:
+          '“Some Pokémon hit that moment and need a bit of help finding the next shape of themselves. That crystal doesn’t do the growing for them. It just gives the change somewhere steady to begin.”',
+        background: '/backgrounds/forest.avif',
+        icon: {
+          type: 'trainer',
+          id: 'bug-catcher',
+        },
+        buttons: [
+          {
+            text: 'And Then?',
+            type: 'navigate',
+            id: 3,
+          },
+        ],
+      },
+      {
+        id: 3,
+        title: 'A Little Help Growing',
+        message:
+          '“Use it when the moment comes, and don’t expect to see it again afterwards. The little one spends the whole crystal in the change. If you ever meet a Pokémon that’s grown much further, there are stronger pieces out there too.”',
+        background: '/backgrounds/forest.avif',
+        icon: {
+          type: 'trainer',
+          id: 'bug-catcher',
+        },
+        buttons: [
+          {
+            text: 'I’ll Remember',
+            type: 'success',
+          },
+        ],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/forest.avif',
+      title: 'A Little Help Growing',
+      message:
+        'Benny nods toward the path out of the forest. “That’s all it is. A steady place for a big change to start.”',
+      closeButtonText: 'Thanks, Benny',
+      icon: {
+        type: 'trainer',
+        id: 'bug-catcher',
+      },
+    },
+  },
+  {
+    id: 'evolution-catalyst-handoff',
+    name: 'Benny’s Spare Find',
+    description:
+      'Benny kept one last strange crystal aside for anyone who left the forest before he could explain it.',
+    category: 'Kanto',
+    subCategory: 'Viridian Forest',
+    icon: {
+      type: 'trainer',
+      id: 'bug-catcher',
+    },
+    background: '/backgrounds/forest.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    chat: true,
+    completeButtonText: 'Take the Crystal',
+    requirements: [
+      {
+        type: 'item_owned',
+        targetId: 'binder-base2',
+      },
+      {
+        type: 'item_owned',
+        targetId: 'evolution-catalyst',
+        inverse: true,
+      },
+      {
+        type: 'task_completed',
+        targetId: 'evolution-catalyst-recipe',
+        inverse: true,
+      },
+    ],
+    criteria: [],
+    rewards: [
+      {
+        type: 'item',
+        targetId: 'evolution-catalyst',
+        quantity: 1,
+      },
+      {
+        type: 'task_complete',
+        targetId: 'evolution-catalyst-recipe',
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/forest.avif',
+      title: 'Benny’s Spare Find',
+      message:
+        '“You made it out with the binder, but I never got to show you this.” Benny places the bright crystal in your hand. “Keep it for one of those big changes. It’s better than letting it sit under a leaf forever.”',
+      closeButtonText: 'Thank Benny',
+      icon: {
+        type: 'trainer',
+        id: 'bug-catcher',
+      },
+    },
+  },
+  {
     name: 'Bugs for the Bug God I',
     description: 'Wow, this guy is intense. He wants five Bug Pokemon for some kind of collection.',
     category: 'Kanto',
