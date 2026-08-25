@@ -84,6 +84,7 @@ export const icons: IconConfig[] = [
     name: 'Safari Ball',
     icon: { type: 'item', id: 'safari-ball' },
   },
+  { id: 'tauros', name: 'Tauros', icon: { type: 'pokemon', id: '128' } },
   { id: 'nidoking', name: 'Nidoking', icon: { type: 'pokemon', id: '34' } },
   { id: 'nidoqueen', name: 'Nidoqueen', icon: { type: 'pokemon', id: '31' } },
   // Gen 2

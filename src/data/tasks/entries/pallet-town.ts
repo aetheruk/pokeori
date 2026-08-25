@@ -3288,6 +3288,20 @@ export const palletTownTasks: Task[] = [
         dropChance: 100,
         secret: true,
       },
+      {
+        type: 'icon',
+        targetId: 'tauros',
+        quantity: 1,
+        dropChance: 100,
+        secret: true,
+      },
+      {
+        type: 'title',
+        targetId: 'public-nuisance',
+        quantity: 1,
+        dropChance: 100,
+        secret: true,
+      },
     ],
     enterModal: [
       {
