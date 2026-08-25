@@ -215,23 +215,8 @@ const safariCreditTasks: Task[] = [
     ],
   },
   {
-    id: 'safari-explorers-research-notes',
-    name: 'Explorers Research Notes',
-    description: 'A record of the reserve routes still waiting to be explored.',
-    category: 'Secret',
-    subCategory: 'Safari Zone',
-    icon: { type: 'item', id: 'explorers-journal' },
-    background: '/backgrounds/safari-reserve.avif',
-    repeatable: false,
-    secret: true,
-    completionTrigger: 'manual',
-    requirements: [],
-    criteria: [],
-    rewards: [],
-  },
-  {
     id: 'safari-fishing-research-notes',
-    name: 'Fishing Research Notes',
+    name: 'Fishing Permit',
     description: 'A record of the reserve waters still waiting to be studied.',
     category: 'Secret',
     subCategory: 'Safari Zone',
@@ -282,8 +267,8 @@ const safariCreditTasks: Task[] = [
   }),
   safariCreditMarkerTask({
     id: 'safari-wardens-permit',
-    name: "Warden's Permit",
-    description: 'Permanent authorization to use the reserve’s standard catching and fishing records.',
+    name: 'Catching Permit',
+    description: 'Permanent authorization to use the reserve’s standard catching records.',
     icon: { type: 'item', id: 'safari-catching-permit' },
   }),
   safariCreditMarkerTask({
@@ -295,8 +280,8 @@ const safariCreditTasks: Task[] = [
   }),
   safariCreditMarkerTask({
     id: 'safari-notes-on-poachers',
-    name: 'Notes on Poachers',
-    description: 'A permanent record of poacher activity that opens a focused reserve sweep.',
+    name: 'Security Permit',
+    description: 'A permanent authorization for the reserve’s focused security sweep.',
     icon: { type: 'trainer', id: 'rocket-grunt-m' },
   }),
 ]

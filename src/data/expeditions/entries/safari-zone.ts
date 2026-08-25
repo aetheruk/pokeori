@@ -15,11 +15,6 @@ const permitRequirement = {
   targetId: 'safari-catching-permit',
 }
 
-const explorerResearchNotesRequirement = {
-  type: 'task_completed' as const,
-  targetId: 'safari-explorers-research-notes',
-}
-
 const poacherNotesRequirement = {
   type: 'task_completed' as const,
   targetId: 'safari-notes-on-poachers',
@@ -320,46 +315,6 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
           { type: 'item_owned', targetId: 'tm-strength', inverse: true },
         ],
       },
-    ],
-  },
-  {
-    id: 'safari-zone-catching-expedition',
-    name: 'Safari Zone Catching Expedition',
-    description:
-      'Return to the reserve with a full case of Safari Balls. Make two careful catches in each habitat, then try your luck in the prize habitat at the end.',
-    category: 'Kanto',
-    subCategory: 'Safari Zone',
-    buttonText: 'Begin Catching Expedition',
-    icon: { type: 'pokemon', id: '113' },
-    background: '/backgrounds/safari-reserve.avif',
-    maxLosses: 5,
-    safariBallAllowance: 30,
-    canAbandon: true,
-    requirements: [permitRequirement, explorerResearchNotesRequirement],
-    criteria: [safariEntranceFee],
-    activityPool: {
-      location: [
-        'safari-central-catch',
-        'safari-east-catch',
-        'safari-west-catch',
-        'safari-north-catch',
-        'safari-grand-finale-catch',
-      ],
-    },
-    path: [
-      secretActivity('safari-catching-step-01-central', 'location', 'safari-central-catch'),
-      secretActivity('safari-catching-step-02-central', 'location', 'safari-central-catch'),
-      secretActivity('safari-catching-step-03-east', 'location', 'safari-east-catch'),
-      secretActivity('safari-catching-step-04-east', 'location', 'safari-east-catch'),
-      secretActivity('safari-catching-step-05-west', 'location', 'safari-west-catch'),
-      secretActivity('safari-catching-step-06-west', 'location', 'safari-west-catch'),
-      secretActivity('safari-catching-step-07-north', 'location', 'safari-north-catch'),
-      secretActivity('safari-catching-step-08-north', 'location', 'safari-north-catch'),
-      secretActivity('safari-catching-step-09-finale', 'location', 'safari-grand-finale-catch'),
-    ],
-    rewards: [
-      { type: 'xp', skill: 'catching', quantity: 500, dropChance: 100 },
-      { type: 'currency', targetId: 'safari-notes', quantity: 10, dropChance: 100 },
     ],
   },
   {
