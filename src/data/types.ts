@@ -117,6 +117,8 @@ export interface Location {
   criteria?: TaskCondition[]
   /** Replaces the standard research quiz with Safari Bait/Shout choices. */
   encounterMode?: 'standard' | 'safari'
+  /** Safari Balls issued for a standalone Safari encounter outside an expedition. */
+  safariBallAllowance?: number
   requiredItem?: {
     id: string
     useOnCatch?: boolean

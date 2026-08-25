@@ -55,7 +55,7 @@ const westPool: FieldObservationPokemonPoolEntry[] = [
 ]
 
 const northPool: FieldObservationPokemonPoolEntry[] = [
-  { speciesId: 102, formId: '102', weight: 18 },
+  { speciesId: 102, formId: '102', weight: 15 },
   { speciesId: 111, formId: '111', weight: 17 },
   { speciesId: 29, formId: '29', weight: 13 },
   { speciesId: 32, formId: '32', weight: 13 },
@@ -69,6 +69,9 @@ const northPool: FieldObservationPokemonPoolEntry[] = [
   { speciesId: 113, formId: '113', weight: 2 },
   { speciesId: 127, formId: '127', weight: 1 },
   { speciesId: 123, formId: '123', weight: 1 },
+  { speciesId: 128, formId: '10250', weight: 1, requirements: [{ type: 'task_completed', targetId: 'safari-strange-sightings' }] },
+  { speciesId: 128, formId: '10251', weight: 1, requirements: [{ type: 'task_completed', targetId: 'safari-strange-sightings' }] },
+  { speciesId: 128, formId: '10252', weight: 1, requirements: [{ type: 'task_completed', targetId: 'safari-strange-sightings' }] },
 ]
 
 function discoveryReward(taskId: string) {

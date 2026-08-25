@@ -107,6 +107,10 @@ async function recordEncounterExpeditionResult(
   state: EncounterState,
   didWin: boolean,
 ) {
+  if (state.safari?.scope === 'encounter') {
+    return { expedition: undefined }
+  }
+
   const reference = getEncounterActivityReference(state)
   const result = await recordExpeditionActivityResult(
     userId,
@@ -208,7 +212,10 @@ export async function attemptCapture(
     const ball = items.find((i) => i.id === ballItemId && i.category === 'ball')
     if (!ball) return { success: false, message: 'Invalid ball' }
     if (isSafari && ballItemId !== SAFARI_BALL_ID) {
-      return { success: false, message: 'Safari encounters only allow Safari Balls.' }
+      return {
+        success: false,
+        message: 'Safari encounters only allow Safari Balls.',
+      }
     }
     const ballLockReason = getItemSkillLockReason(ball, user.skills)
     if (ballLockReason) return { success: false, message: ballLockReason }
@@ -217,7 +224,10 @@ export async function attemptCapture(
     const qty = inventory[ballItemId] || 0
     if (isSafari) {
       if ((state.safari?.ballsRemaining || 0) < 1) {
-        return { success: false, message: 'You have no Safari Balls remaining.' }
+        return {
+          success: false,
+          message: 'You have no Safari Balls remaining.',
+        }
       }
     } else if (qty < 1) {
       return { success: false, message: `You don't have any ${ball.name}s!` }
@@ -355,7 +365,8 @@ export async function attemptCapture(
     const isUltraBeast = ULTRA_BEASTS.includes(state.pokemonId)
     const throwQuality = getThrowQuality(throwInput)
     const throwStageBonus = getThrowStageBonus(throwQuality)
-    const effectiveBallId = ballItemId === SAFARI_BALL_ID ? 'poke-ball' : ballItemId
+    const effectiveBallId =
+      ballItemId === SAFARI_BALL_ID ? 'poke-ball' : ballItemId
     const questionBonus = getBallQuestionBonus({
       ballId: effectiveBallId,
       species,
@@ -467,7 +478,8 @@ export async function attemptCapture(
         success: true,
         caught: false,
         safariRetry: true,
-        message: 'The Pokémon stayed nearby. You can throw again or try another approach.',
+        message:
+          'The Pokémon stayed nearby. You can throw again or try another approach.',
         formId: state.formId,
         pokemonId: state.pokemonId,
         safari: state.safari,

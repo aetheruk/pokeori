@@ -48,7 +48,10 @@ import {
 import { isActivityEligibleForReplay } from '@/utilities/activity-replay'
 import { canApplyEncounterAbilityOverride } from '@/utilities/pokemon/encounter-abilities'
 import { getActiveChronicleContext } from '@/utilities/chronicles'
-import { getActiveExpeditionForUser, setSafariBallsRemaining } from '@/utilities/expeditions/actions'
+import {
+  getActiveExpeditionForUser,
+  setSafariBallsRemaining,
+} from '@/utilities/expeditions/actions'
 import { rollPokemonGender } from '@/utilities/pokemon/gender'
 import { resolvePokemonRarity } from '@/utilities/pokemon/rarity-effects'
 import {
@@ -57,10 +60,7 @@ import {
   SAFARI_ENCOUNTER_TTL_SECONDS,
 } from '@/utilities/pokemon/safari-catch'
 import { getShinyChance, rollShiny } from '@/utilities/pokemon/shiny-odds'
-import {
-  getEncounterRedisTtlSeconds,
-  type EncounterState,
-} from './types'
+import { getEncounterRedisTtlSeconds, type EncounterState } from './types'
 import { rollAbility, getUser } from './utils'
 import { refreshEncounterShield, serializeEncounterShield } from './shield'
 import {
@@ -223,16 +223,19 @@ export async function startEncounter(
     if (
       location.encounterMode === 'safari' &&
       !isActiveSafariStep &&
-      !isSafariTestLocation
+      !isSafariTestLocation &&
+      location.safariBallAllowance === undefined
     ) {
-      throw new Error('Safari catches are only available from an active expedition.')
+      throw new Error(
+        'Safari catches are only available from an active expedition.',
+      )
     }
 
     const safariBallsRemaining =
       location.encounterMode === 'safari'
         ? isActiveSafariStep
-          ? activeExpedition?.safariBallsRemaining ?? SAFARI_BALL_ALLOWANCE
-          : SAFARI_BALL_ALLOWANCE
+          ? (activeExpedition?.safariBallsRemaining ?? SAFARI_BALL_ALLOWANCE)
+          : (location.safariBallAllowance ?? SAFARI_BALL_ALLOWANCE)
         : undefined
     if (
       location.encounterMode === 'safari' &&
@@ -506,6 +509,42 @@ export async function startEncounter(
       await setUserInventoryMap(payload as any, user.id, newInventory)
     }
 
+    const currenciesToConsume: Record<string, number> = {}
+    for (const req of allReqsAndCriteria) {
+      if (
+        req.consume &&
+        req.type === 'currency_owned' &&
+        typeof req.targetId === 'string'
+      ) {
+        currenciesToConsume[req.targetId] =
+          (currenciesToConsume[req.targetId] || 0) + (req.count || 1)
+      }
+    }
+
+    if (Object.keys(currenciesToConsume).length > 0) {
+      const freshUser = await payload.findByID({
+        collection: 'users',
+        id: user.id,
+      })
+      const updatedCurrency = {
+        ...((freshUser.currency as Record<string, number>) || {}),
+      }
+
+      for (const [currencyId, count] of Object.entries(currenciesToConsume)) {
+        const current = updatedCurrency[currencyId] || 0
+        if (current < count) {
+          throw new Error(`Not enough currency: ${currencyId}`)
+        }
+        updatedCurrency[currencyId] = current - count
+      }
+
+      await payload.update({
+        collection: 'users',
+        id: user.id,
+        data: { currency: updatedCurrency },
+      })
+    }
+
     const eligibleEncounters = getEligibleEncounters(
       location.encounters,
       userData,
@@ -698,6 +737,7 @@ export async function startEncounter(
               stage: 0,
               actions: 0,
               ballsRemaining: safariBallsRemaining ?? SAFARI_BALL_ALLOWANCE,
+              scope: isActiveSafariStep ? 'expedition' : 'encounter',
             }
           : undefined,
       activeAbilityId,

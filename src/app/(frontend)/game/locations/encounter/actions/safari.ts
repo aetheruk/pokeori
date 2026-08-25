@@ -19,10 +19,7 @@ import {
   getEncounterMechanicsLockKey,
 } from './lock'
 import { failEncounter } from './failure'
-import {
-  getEncounterRedisTtlSeconds,
-  type EncounterState,
-} from './types'
+import { getEncounterRedisTtlSeconds, type EncounterState } from './types'
 import { getUser } from './utils'
 import { endSafariExpeditionWithoutBalls } from '@/utilities/expeditions/actions'
 
@@ -134,6 +131,19 @@ export async function performSafariAction(
 export async function endSafariExpedition() {
   const user = await getUser()
   if (!user) return { success: false as const, message: 'Unauthorized' }
+
+  const encounterId = `encounter:${user.id}`
+  const state = (await redis.get(encounterId)) as EncounterState | null
+  if (
+    state?.encounterMode === 'safari' &&
+    state.safari?.scope === 'encounter'
+  ) {
+    await redis.del(encounterId)
+    return {
+      success: false as const,
+      message: 'No active expedition is available.',
+    }
+  }
 
   return endSafariExpeditionWithoutBalls(user.id)
 }
