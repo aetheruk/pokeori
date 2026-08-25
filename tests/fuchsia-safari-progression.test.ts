@@ -1612,6 +1612,13 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(JSON.stringify(chain[0])).toContain('I’ll find out where to look')
     expect(JSON.stringify(chain[0])).not.toContain('I’ll ask the Institute')
 
+    const instituteRequest = chain[1]!
+    const instituteProse = JSON.stringify(instituteRequest)
+    expect(instituteProse).toContain('central reeds')
+    expect(instituteProse).toContain('marked the stretch on your field map')
+    expect(instituteProse).toContain('search that stretch of reeds')
+    expect(instituteProse).not.toContain('calm posture')
+
     const lure = chain[3]!
     expect(lure.requirements).toContainEqual({
       type: 'task_completed',

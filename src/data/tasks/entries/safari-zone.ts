@@ -1438,7 +1438,7 @@ export const safariZoneTasks: Task[] = ([
         title: 'Research Institute',
         icon: researcherIcon,
         message:
-          'Chansey? There is one that visits the central reeds just after the paths quieten. It keeps away from the busiest trails, but it watches anyone carrying berries.',
+          'Chansey? There is one that visits the central reeds just after the paths quieten. We have marked the stretch on your field map. It keeps away from the busiest trails, so you may only catch a glimpse of it.',
         buttons: [{ text: 'What should I do?', type: 'navigate', id: 2 }],
       },
       {
@@ -1447,8 +1447,8 @@ export const safariZoneTasks: Task[] = ([
         title: 'Research Institute',
         icon: researcherIcon,
         message:
-          'Take a photograph first. Let it see that you are paying attention before you ask anything of it. If the picture catches its calm posture, you will know you found the right one.',
-        buttons: [{ text: 'I’ll look for it', type: 'success' }],
+          'Use the camera to search that stretch of reeds. Chansey may only show itself for a moment, so watch carefully and take the photograph when you spot it. That will confirm you found the right one.',
+        buttons: [{ text: 'I’ll search the marked reeds', type: 'success' }],
       },
     ],
     exitModal: {
