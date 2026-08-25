@@ -1362,7 +1362,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     )
   })
 
-  test('Warden’s Permit adds standard catching and fishing to merged habitat surveys', () => {
+  test('Warden’s Permit adds catching while Fishing Research Notes adds fishing', () => {
     const standardLocations = locations.filter((entry) =>
       entry.id.endsWith('-standard-catch'),
     )
@@ -1431,12 +1431,12 @@ describe('Fuchsia Gym and Safari progression', () => {
           entry.requirements.some(
             (requirement) =>
               requirement.type === 'task_completed' &&
-              requirement.targetId === 'safari-wardens-permit',
+              requirement.targetId === 'safari-fishing-research-notes',
           ) &&
-          entry.requirements.some(
+          !entry.requirements.some(
             (requirement) =>
               requirement.type === 'task_completed' &&
-              requirement.targetId === 'safari-fishing-research-notes',
+              requirement.targetId === 'safari-wardens-permit',
           ),
       ),
     ).toBe(true)
