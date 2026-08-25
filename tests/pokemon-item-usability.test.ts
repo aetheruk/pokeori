@@ -105,7 +105,7 @@ describe('Pokemon item usability', () => {
       'New Ability',
     )
     expect(getPokemonItemEffectLabel(item('research-kit'))).toBe(
-      'Research XP + 5',
+      'Research XP + 3',
     )
     expect(getPokemonItemEffectLabel(item('tera-shard-fire'))).toBe(
       'Fire Tera Type',

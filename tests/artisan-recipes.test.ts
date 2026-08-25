@@ -1138,7 +1138,7 @@ describe('artisan recipes', () => {
         name: `${color[0].toUpperCase()}${color.slice(1)} Berry Candy`,
         category: 'candy',
         spriteId: itemId,
-        effects: { increaseFriendship: 5, encounterSecondChanceModifier: 10 },
+        effects: { increaseFriendship: 2, encounterSecondChanceModifier: 10 },
       })
       expect(recipe).toBeDefined()
       expect(recipe?.category).toBe('items')
