@@ -1376,12 +1376,12 @@ export const safariZoneTasks: Task[] = ([
     description: 'Koga has isolated the first toxin, but still needs one gentle ingredient for the antidote.',
     category: 'Kanto',
     subCategory: 'Fuchsia City',
-    icon: { type: 'pokemon', id: '113' },
+    icon: kogaIcon,
     background: '/backgrounds/lab.avif',
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Ask the Institute',
+    completeButtonText: 'I’ll look into it',
     requirements: [{ type: 'task_completed', targetId: 'safari-strength-check-on-koga' }],
     criteria: [],
     rewards: [],
@@ -1402,7 +1402,7 @@ export const safariZoneTasks: Task[] = ([
         icon: kogaIcon,
         message:
           'Do not take one by force. Ask the Research Institute where the reserve Chansey gather, then earn the trust of one willing to help.',
-        buttons: [{ text: 'I’ll ask the Institute', type: 'success' }],
+        buttons: [{ text: 'I’ll find out where to look', type: 'success' }],
       },
     ],
     exitModal: {

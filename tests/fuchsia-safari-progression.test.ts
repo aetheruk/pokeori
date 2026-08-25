@@ -1607,6 +1607,10 @@ describe('Fuchsia Gym and Safari progression', () => {
     const chain = chainIds.map((id) => tasks.find((task) => task.id === id))
     expect(chain.every(Boolean)).toBe(true)
 
+    expect(chain[0]?.icon).toEqual({ type: 'trainer', id: 'gym-kanto-koga' })
+    expect(JSON.stringify(chain[0])).toContain('I’ll find out where to look')
+    expect(JSON.stringify(chain[0])).not.toContain('I’ll ask the Institute')
+
     const lure = chain[3]!
     expect(lure.requirements).toContainEqual({
       type: 'task_completed',
