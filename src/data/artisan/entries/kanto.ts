@@ -789,6 +789,7 @@ const LEVEL_EVOLUTION_CATALYST_RECIPES: ArtisanRecipeDraft[] =
     fail: false,
     outputQuantity: { min: 1, max: 1 },
     iconItemId: catalyst.id,
+    requirements: [{ type: 'task_completed', targetId: 'evolution-catalyst-recipe' }],
   }))
 
 const ITEM_RECIPES: ArtisanRecipeDraft[] = [
