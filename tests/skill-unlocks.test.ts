@@ -459,7 +459,7 @@ describe('skill unlock helpers', () => {
       true,
     )
     expect(lemonade?.skillRequirements?.battling).toBe(34)
-    expect(researchKit?.effects?.grantPokemonResearchXp?.amount).toBe(5)
+    expect(researchKit?.effects?.grantPokemonResearchXp?.amount).toBe(3)
     expect(researchKit?.skillRequirements?.researching).toBe(35)
     expect(researchKit?.effects?.grantPokemonResearchXp?.minSkillLevel).toBe(35)
     expect(repel?.skillRequirements?.catching).toBe(20)
