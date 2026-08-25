@@ -1636,7 +1636,7 @@ export const safariZoneTasks: Task[] = ([
         title: 'Koga',
         icon: kogaIcon,
         message:
-          'The Chansey yolk will let me prepare the first antidote. Now we can test the second compound without exposing either of you. Bring me fifty Crystals when you are ready.',
+          'The Chansey yolk will let me prepare the first antidote. You have the fifty Crystals ready, so we can test the second compound without exposing either of you.',
         buttons: [{ text: 'Test the compound', type: 'success' }],
       },
     ],
@@ -1647,7 +1647,7 @@ export const safariZoneTasks: Task[] = ([
     description:
       'Koga has finished the antidote. Return to the lab and take the first dose before the investigation continues.',
     category: 'Kanto',
-    subCategory: 'Safari Zone',
+    subCategory: 'Fuchsia City',
     icon: { type: 'pokemon', id: '113' },
     background: '/backgrounds/safari-reserve.avif',
     repeatable: false,
