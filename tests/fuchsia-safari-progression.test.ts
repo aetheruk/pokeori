@@ -931,11 +931,23 @@ describe('Fuchsia Gym and Safari progression', () => {
         .every((reward) => reward.dropChance === 100),
     ).toBe(true)
     expect(
+      itemTasks.every((task) =>
+        task.rewards.some(
+          (reward) =>
+            reward.type === 'currency' &&
+            reward.targetId === 'safari-notes' &&
+            reward.quantity === 1 &&
+            reward.dropChance === 100,
+        ),
+      ),
+    ).toBe(true)
+    expect(
       safariItemTaskPoolIds.materials
         .map((id) =>
           safariExpeditionContentTasks.find((task) => task.id === id),
         )
         .flatMap((task) => task?.rewards ?? [])
+        .filter((reward) => reward.type === 'item')
         .every((reward) => reward.type === 'item' && reward.quantity === 3),
     ).toBe(true)
     expect(safariItemTaskPoolIds.balls).toHaveLength(2)
@@ -959,6 +971,7 @@ describe('Fuchsia Gym and Safari progression', () => {
       ],
       rewards: [
         { type: 'item', targetId: 'ultra-ball', quantity: 1, dropChance: 100 },
+        { type: 'currency', targetId: 'safari-notes', quantity: 1, dropChance: 100 },
       ],
     })
     expect(
