@@ -19,6 +19,7 @@ function safariTask({
   completeButtonText = 'Record the Finding',
   repeatable = true,
   requirements = [],
+  includeSafariNote = false,
 }: {
   id: string
   name: string
@@ -28,8 +29,11 @@ function safariTask({
   completeButtonText?: string
   repeatable?: boolean
   requirements?: Task['requirements']
+  includeSafariNote?: boolean
 }): Task {
-  const taskRewards = rewards.some((reward) => reward.type === 'pokemon_research_xp')
+  const taskRewards =
+    (includeSafariNote ||
+      rewards.some((reward) => reward.type === 'pokemon_research_xp'))
     ? [...rewards, safariNoteReward]
     : rewards
 
@@ -394,6 +398,7 @@ function itemTask(
     description,
     icon: typeof icon === 'string' ? { type: 'item', id: icon } : icon,
     rewards: [{ ...reward, dropChance: 100 }],
+    includeSafariNote: true,
     completeButtonText: 'Search the Find',
   })
 }
@@ -500,6 +505,7 @@ const rareItemTasks = [
     icon: { type: 'item', id: 'nugget' },
     completeButtonText: 'Dig Carefully',
     repeatable: false,
+    includeSafariNote: true,
     requirements: [{ type: 'task_completed', targetId: 'safari-rare-nugget-find', inverse: true }],
     rewards: [{ type: 'item', targetId: 'nugget', quantity: 1, dropChance: 100 }],
   }),
@@ -510,6 +516,7 @@ const rareItemTasks = [
     icon: { type: 'item', id: 'metal-scrap-t1' },
     completeButtonText: 'Collect the Deposit',
     repeatable: false,
+    includeSafariNote: true,
     requirements: [{ type: 'task_completed', targetId: 'safari-rare-metal-seam', inverse: true }],
     rewards: [{ type: 'item', targetId: 'metal-scrap-t1', quantity: 50, dropChance: 100 }],
   }),
@@ -522,6 +529,7 @@ const extraRareItemTasks = [
     description: 'Another researcher marked a patch of ground where something valuable was supposedly buried. The soil still looks freshly disturbed.',
     icon: { type: 'item', id: 'nugget' },
     repeatable: false,
+    includeSafariNote: true,
     requirements: [rareRumoursRequirement, { type: 'task_completed', targetId: 'safari-rare-reported-nugget', inverse: true }],
     rewards: [{ type: 'item', targetId: 'nugget', quantity: 1, dropChance: 100 }],
     completeButtonText: 'Search the Rumoured Patch',
@@ -532,6 +540,7 @@ const extraRareItemTasks = [
     description: 'A sealed field case has survived beneath the northern stones. The label is faded, but the contents may still be useful.',
     icon: { type: 'item', id: 'revive' },
     repeatable: false,
+    includeSafariNote: true,
     requirements: [rareRumoursRequirement, { type: 'task_completed', targetId: 'safari-rare-revive-cache', inverse: true }],
     rewards: [{ type: 'item', targetId: 'revive', quantity: 1, dropChance: 100 }],
     completeButtonText: 'Open the Medical Cache',
@@ -542,6 +551,7 @@ const extraRareItemTasks = [
     description: 'A researcher’s map points to a deep metal seam beneath the service path. This deposit could keep the workshop supplied for weeks.',
     icon: { type: 'item', id: 'metal-scrap-t1' },
     repeatable: false,
+    includeSafariNote: true,
     requirements: [rareRumoursRequirement, { type: 'task_completed', targetId: 'safari-rare-metal-seam-reported', inverse: true }],
     rewards: [{ type: 'item', targetId: 'metal-scrap-t1', quantity: 50, dropChance: 100 }],
     completeButtonText: 'Collect the Metal Seam',
@@ -552,6 +562,7 @@ const extraRareItemTasks = [
     description: 'A researcher’s notes mention a single Ultra Ball tucked away in a forgotten reserve case. I should check the marked spot.',
     icon: { type: 'item', id: 'ultra-ball' },
     repeatable: true,
+    includeSafariNote: true,
     requirements: [rareRumoursRequirement],
     rewards: [{ type: 'item', targetId: 'ultra-ball', quantity: 1, dropChance: 100 }],
     completeButtonText: 'Search the Marked Spot',
