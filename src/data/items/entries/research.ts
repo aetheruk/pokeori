@@ -12,13 +12,13 @@ export const researchItems: Item[] = [
     id: 'research-kit',
     name: 'Research Kit',
     description:
-      'A professional kit for field research. Grants 5 Research XP to a Pokémon of your choice. Requires Researcher Level 35.',
+      'A professional kit for field research. Grants 3 Research XP to a Pokémon of your choice. Requires Researcher Level 35.',
     category: 'misc',
     spriteId: 'eject-pack',
     skillRequirements: { researching: 35 },
     effects: {
       grantPokemonResearchXp: {
-        amount: 5,
+        amount: 3,
         minSkillLevel: 35,
       },
     },
