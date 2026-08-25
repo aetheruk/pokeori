@@ -20,11 +20,6 @@ const explorerResearchNotesRequirement = {
   targetId: 'safari-explorers-research-notes',
 }
 
-const fishingResearchNotesRequirement = {
-  type: 'task_completed' as const,
-  targetId: 'safari-fishing-research-notes',
-}
-
 const poacherNotesRequirement = {
   type: 'task_completed' as const,
   targetId: 'safari-notes-on-poachers',
@@ -418,40 +413,6 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
           },
         ],
       },
-    ],
-  },
-  {
-    id: 'safari-zone-fishing-expedition',
-    name: 'Safari Zone Fishing Expedition',
-    description:
-      'Work the reserve’s ponds from one end to the other. Five fishing steps draw from every Pokémon available through the Old, Good, or Super Rod in the original Safari Zone.',
-    category: 'Kanto',
-    subCategory: 'Safari Zone',
-    buttonText: 'Begin Fishing Expedition',
-    icon: { type: 'item', id: 'super-rod' },
-    background: '/backgrounds/safari-reserve.avif',
-    maxLosses: 5,
-    canAbandon: true,
-    requirements: [permitRequirement, fishingResearchNotesRequirement],
-    criteria: [
-      safariEntranceFee,
-      { type: 'item_owned', targetId: 'old-rod' },
-      { type: 'item_owned', targetId: 'good-rod' },
-      { type: 'item_owned', targetId: 'super-rod' },
-    ],
-    activityPool: {
-      game: ['safari-zone-fishing-expedition'],
-    },
-    path: Array.from({ length: 5 }, (_, index) =>
-      secretActivity(
-        `safari-fishing-step-${String(index + 1).padStart(2, '0')}`,
-        'game',
-        'safari-zone-fishing-expedition',
-      ),
-    ),
-    rewards: [
-      { type: 'xp', skill: 'catching', quantity: 500, dropChance: 100 },
-      { type: 'currency', targetId: 'safari-notes', quantity: 10, dropChance: 100 },
     ],
   },
 ]

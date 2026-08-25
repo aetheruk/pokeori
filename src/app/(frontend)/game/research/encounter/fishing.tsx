@@ -23,7 +23,6 @@ import {
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { SectionDivider } from '@/components/ui/section-divider'
-import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
 import { items } from '@/data/items'
@@ -278,7 +277,6 @@ export function FishingGame({ encounter }: FishingGameProps) {
     symbol: string
   } | null>(null)
   const [isClaimingItem, setIsClaimingItem] = useState(false)
-  const [result, setResult] = useState<any | null>(null)
 
   // Refs
   const timerRef = useRef<NodeJS.Timeout | null>(null)
@@ -419,15 +417,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
     }
     setPhase('idle')
     setHookedData(null)
-    if (res.expeditionProgress) {
-      setResult({
-        success: false,
-        message: 'The fishing step ended when the Pokémon was released.',
-        expeditionProgress: res.expeditionProgress,
-      })
-    } else {
-      toast.success('Released back into the water.')
-    }
+    toast.success('Released back into the water.')
   }, [])
 
   const handleClaimItem = useCallback(async () => {
@@ -447,16 +437,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
       setAppearTime(null)
       setTimeUntilAppear(null)
       setNibbleSymbol(null)
-      if (res.expeditionProgress) {
-        setResult({
-          success: true,
-          message: 'The fishing find has been recorded.',
-          summary: res.summary,
-          expeditionProgress: res.expeditionProgress,
-        })
-      } else {
-        toast.success(res.currencyId ? 'Safari Notes added.' : 'Item added to bag.')
-      }
+      toast.success(res.currencyId ? 'Safari Notes added.' : 'Item added to bag.')
     } finally {
       setIsClaimingItem(false)
     }
@@ -829,16 +810,6 @@ export function FishingGame({ encounter }: FishingGameProps) {
           </div>
         )}
       </div>
-
-      <RewardResultOverlay
-        result={result}
-        title={result?.success ? 'Fishing step complete' : 'Fishing step ended'}
-        onClose={() => {
-          const shouldReturnToExplore = !!result?.expeditionProgress
-          setResult(null)
-          if (shouldReturnToExplore) router.push('/game/explore')
-        }}
-      />
 
       {/* 
           ACTION BUTTON (Fixed Bottom)
