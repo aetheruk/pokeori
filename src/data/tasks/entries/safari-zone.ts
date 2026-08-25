@@ -1519,7 +1519,7 @@ export const safariZoneTasks: Task[] = ([
   },
   {
     id: 'safari-chansey-makes-friends',
-    name: 'A Gift for Koga',
+    name: 'A Chansey’s Gift',
     description: 'Chansey has accepted your kindness. Explain why you need its help, and let it decide what to offer.',
     category: 'Kanto',
     subCategory: 'Safari Zone',
@@ -1536,28 +1536,28 @@ export const safariZoneTasks: Task[] = ([
       {
         id: 1,
         background: '/backgrounds/safari-reserve.avif',
-        title: 'A Gift for Koga',
+        title: 'A Chansey’s Gift',
         icon: { type: 'pokemon', id: '113' },
         message:
-          'Chansey steps from the reeds while you explain Koga’s work, the toxin, and the egg he needs to finish the antidote. It remains wild, listening from the edge of the reeds.',
+          'Chansey steps from the reeds while you explain Koga’s work, the toxin, and why the egg could help finish the antidote. It listens quietly.',
         buttons: [{ text: 'Tell Chansey the truth', type: 'navigate', id: 2 }],
       },
       {
         id: 2,
         background: '/backgrounds/safari-reserve.avif',
-        title: 'A Gift for Koga',
+        title: 'A Chansey’s Gift',
         icon: { type: 'pokemon', id: '113' },
         message:
-          'Chansey listens without moving. Then it places a warm egg carefully at your feet and gives a soft, reassuring cry. It is helping because you asked, not because you took.',
+          'After a long moment, Chansey places a warm egg carefully at your feet and gives a soft cry before stepping back into the reeds.',
         buttons: [{ text: 'Accept the gift', type: 'success' }],
       },
     ],
     exitModal: {
       background: '/backgrounds/safari-reserve.avif',
-      title: 'A Gift for Koga',
+      title: 'A Chansey’s Gift',
       icon: { type: 'pokemon', id: '113' },
       message:
-        'The egg is warm in your hands. Chansey watches from the edge of the reeds as you carry its gift back to Koga.',
+        'The egg is warm in your hands. Chansey has slipped back among the reeds by the time you look up. You return to Koga with the gift.',
       closeButtonText: 'Return to Koga',
     },
   },

@@ -1679,6 +1679,12 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(prose).toContain('Chansey yolk')
     expect(prose).toContain('safari-chansey-makes-friends')
 
+    const giftProse = JSON.stringify(chain[4])
+    expect(chain[4]?.name).toBe('A Chansey’s Gift')
+    expect(giftProse).toContain('stepping back into the reeds')
+    expect(giftProse).not.toContain('remains wild')
+    expect(giftProse).not.toContain('because you asked')
+
     const chansey = tasks.find(
       (task) => task.id === 'safari-catch-partner-chansey',
     )
