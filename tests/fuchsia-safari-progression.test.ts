@@ -1655,6 +1655,7 @@ describe('Fuchsia Gym and Safari progression', () => {
       type: 'task_completed',
       targetId: 'fuchsia-koga-unknown-compound',
     })
+    expect(chain[6]?.subCategory).toBe('Fuchsia City')
 
     const taskRewards = chain.flatMap((task) => task?.rewards || [])
     expect(taskRewards.some((reward) => reward.type === 'pokemon')).toBe(false)
@@ -1677,6 +1678,8 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(prose).toContain('Shadowy Crystals')
     expect(prose).toContain('distorts Pokémon energy')
     expect(prose).toContain('Chansey yolk')
+    expect(prose).toContain('You have the fifty Crystals ready')
+    expect(prose).not.toContain('Bring me fifty Crystals')
     expect(prose).toContain('safari-chansey-makes-friends')
 
     const giftProse = JSON.stringify(chain[4])
