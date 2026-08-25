@@ -2,6 +2,8 @@
 
 - Unreleased: Friendship berry candies now grant +2 friendship (down from +5), and Research Kits now grant 3 Pokémon Research XP (down from 5).
 
+- Unreleased: Safari Zone habitat fishing pools now use a dedicated reserve wetland portrait background with reed-lined water, a reserve footbridge, and distant Safari hills instead of the generic garden pond scene.
+
 - Unreleased: Location encounter starts now persist each repeated Pokedex sighting through normalized user state, so per-form `totalSeen` counters continue increasing instead of remaining at 1 while `totalCaught` grows. Pokedex hydration also repairs legacy rows where caught totals exceed seen totals.
 
 - Unreleased: Safari expedition item-find tasks now grant one Safari Note alongside their materials, balls, gems, PokéDollar finds, extra Safari Balls, and rare item rewards.

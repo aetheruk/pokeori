@@ -59,7 +59,7 @@ const standardSafariFishing = ({
   settings: {
     sky: '/games/run/backgrounds/sky.avif',
     scene: {
-      portraitBackground: '/backgrounds/fishing-pond-portrait.avif',
+      portraitBackground: '/backgrounds/fishing-safari-reserve-portrait.avif',
       waterStyle: 'pond',
       waterline: { portrait: 55 },
     },
