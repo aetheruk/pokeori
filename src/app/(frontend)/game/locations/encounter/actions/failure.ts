@@ -4,7 +4,10 @@ import { getPayload } from 'payload'
 import { recordExpeditionActivityResult } from '@/utilities/expeditions/actions'
 import { redis } from '@/utilities/redis'
 import { incrementUserActivityResult } from '@/utilities/user-state'
-import type { EncounterState } from './types'
+import {
+  getEncounterActivityReference,
+  type EncounterState,
+} from './types'
 
 export async function failEncounter(
   user: User,
@@ -43,13 +46,18 @@ export async function failEncounter(
     )
   }
 
+  const reference = getEncounterActivityReference(state)
   const expeditionResult = await recordExpeditionActivityResult(
     user.id,
-    'location',
-    state.locationId,
+    reference.activityType,
+    reference.activityId,
     false,
     { revalidatePaths: false },
   )
+
+  if (reference.activityType === 'game') {
+    await redis.del(`game:${user.id}`)
+  }
 
   return expeditionResult.expedition
 }

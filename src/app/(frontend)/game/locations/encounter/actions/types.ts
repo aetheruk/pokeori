@@ -52,7 +52,12 @@ export interface EncounterState {
     stage: number
     actions: number
     ballsRemaining: number
+    scope?: 'expedition' | 'encounter'
   }
+
+  /** Override the default location activity for synthetic encounters. */
+  expeditionActivityType?: 'location' | 'game'
+  expeditionActivityId?: string
 
   activeAbilityId?: string
   activeAbilitySourcePokemonId?: string
@@ -82,6 +87,23 @@ export interface EncounterState {
     expeditionId: string
     expeditionName: string
     balls?: Record<string, number>
+  }
+}
+
+export function getEncounterActivityReference(state: EncounterState): {
+  activityType: 'location' | 'game'
+  activityId: string
+} {
+  if (state.expeditionActivityType && state.expeditionActivityId) {
+    return {
+      activityType: state.expeditionActivityType,
+      activityId: state.expeditionActivityId,
+    }
+  }
+
+  return {
+    activityType: 'location',
+    activityId: state.locationId,
   }
 }
 

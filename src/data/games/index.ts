@@ -313,6 +313,9 @@ export interface GameSettings {
   sky?: string
   fishingSprite?: string
   waterAnimationSpeed?: number
+  safariCapture?: {
+    balls: number
+  }
   // Match-3 specific
   gridSize?: { cols: number; rows: number } | number
   crystalTypes?: import('./match3/types').Match3Crystal[]

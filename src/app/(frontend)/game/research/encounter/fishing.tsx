@@ -21,10 +21,13 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel'
 import { ItemSprite } from '@/components/ui/item-sprite'
+import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { SectionDivider } from '@/components/ui/section-divider'
+import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
 import { items } from '@/data/items'
+import { getCurrency } from '@/data/currencies'
 import type {
   FishingGameConfig,
   FishingSceneConfig,
@@ -271,9 +274,11 @@ export function FishingGame({ encounter }: FishingGameProps) {
     formId?: string
     isShiny?: boolean
     itemId?: string
+    currencyId?: string
     symbol: string
   } | null>(null)
   const [isClaimingItem, setIsClaimingItem] = useState(false)
+  const [result, setResult] = useState<any | null>(null)
 
   // Refs
   const timerRef = useRef<NodeJS.Timeout | null>(null)
@@ -396,6 +401,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
           formId: res.formId,
           isShiny: res.isShiny,
           itemId: res.itemId,
+          currencyId: res.currencyId,
           symbol: res.symbol || '?',
         })
       } else {
@@ -406,10 +412,22 @@ export function FishingGame({ encounter }: FishingGameProps) {
   }, [phase, handleCast])
 
   const handleRelease = useCallback(async () => {
-    await releaseFish()
+    const res = await releaseFish()
+    if (!res.success) {
+      toast.error(res.error || 'Failed to release the catch')
+      return
+    }
     setPhase('idle')
     setHookedData(null)
-    toast.success('Released back into the water.')
+    if (res.expeditionProgress) {
+      setResult({
+        success: false,
+        message: 'The fishing step ended when the Pokémon was released.',
+        expeditionProgress: res.expeditionProgress,
+      })
+    } else {
+      toast.success('Released back into the water.')
+    }
   }, [])
 
   const handleClaimItem = useCallback(async () => {
@@ -423,13 +441,22 @@ export function FishingGame({ encounter }: FishingGameProps) {
       }
 
       refreshUser()
-      toast.success('Item added to bag.')
       setPhase('idle')
       setHookedData(null)
       setCastTime(null)
       setAppearTime(null)
       setTimeUntilAppear(null)
       setNibbleSymbol(null)
+      if (res.expeditionProgress) {
+        setResult({
+          success: true,
+          message: 'The fishing find has been recorded.',
+          summary: res.summary,
+          expeditionProgress: res.expeditionProgress,
+        })
+      } else {
+        toast.success(res.currencyId ? 'Safari Notes added.' : 'Item added to bag.')
+      }
     } finally {
       setIsClaimingItem(false)
     }
@@ -749,7 +776,8 @@ export function FishingGame({ encounter }: FishingGameProps) {
                 </>
               )}
 
-              {hookedData.type === 'item' && hookedData.itemId && (
+              {hookedData.type === 'item' &&
+                (hookedData.itemId || hookedData.currencyId) && (
                 <>
                   <div className="w-full">
                     <SectionDivider>Item Found!</SectionDivider>
@@ -757,20 +785,32 @@ export function FishingGame({ encounter }: FishingGameProps) {
 
                   <div className="relative flex h-[150px] w-[150px] items-center justify-center rounded-xl border border-game-border bg-game-surface-raised">
                     <div className="w-3/4 h-3/4 relative">
-                      <ItemSprite
-                        itemId={hookedData.itemId}
-                        alt="Item"
-                        className="w-full h-full object-contain drop-shadow-lg"
-                        width={96}
-                        height={96}
-                      />
+                      {hookedData.itemId ? (
+                        <ItemSprite
+                          itemId={hookedData.itemId}
+                          alt="Item"
+                          className="w-full h-full object-contain drop-shadow-lg"
+                          width={96}
+                          height={96}
+                        />
+                      ) : (
+                        <CurrencySprite
+                          currencyId={hookedData.currencyId!}
+                          alt={getCurrency(hookedData.currencyId!)?.name}
+                          className="w-full h-full object-contain drop-shadow-lg"
+                          width={96}
+                          height={96}
+                        />
+                      )}
                     </div>
                   </div>
 
                   <div className="flex flex-col items-center gap-1">
                     <h3 className="line-clamp-1 font-display text-lg font-semibold capitalize tracking-wide text-game-ink">
-                      {itemNames.get(hookedData.itemId) ||
-                        hookedData.itemId.replace(/-/g, ' ')}
+                      {hookedData.currencyId
+                        ? getCurrency(hookedData.currencyId)?.name || 'Currency'
+                        : itemNames.get(hookedData.itemId!) ||
+                          hookedData.itemId!.replace(/-/g, ' ')}
                     </h3>
                   </div>
 
@@ -789,6 +829,16 @@ export function FishingGame({ encounter }: FishingGameProps) {
           </div>
         )}
       </div>
+
+      <RewardResultOverlay
+        result={result}
+        title={result?.success ? 'Fishing step complete' : 'Fishing step ended'}
+        onClose={() => {
+          const shouldReturnToExplore = !!result?.expeditionProgress
+          setResult(null)
+          if (shouldReturnToExplore) router.push('/game/explore')
+        }}
+      />
 
       {/* 
           ACTION BUTTON (Fixed Bottom)

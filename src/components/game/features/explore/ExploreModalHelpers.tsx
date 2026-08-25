@@ -925,6 +925,7 @@ export function getFormattedRewards(
       let secretRewardAdded = false
 
       for (const entry of itemPool) {
+        if (!entry.itemId) continue
         const item = items.find((candidate) => candidate.id === entry.itemId)
         const isUnclaimedUnique =
           !!item?.unique && (userInventory[item.id] || 0) <= 0
