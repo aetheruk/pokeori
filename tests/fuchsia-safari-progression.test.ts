@@ -1607,30 +1607,69 @@ describe('Fuchsia Gym and Safari progression', () => {
     ])
 
     const chainIds = [
+      'safari-strength-check-on-koga',
+      'fuchsia-koga-unknown-compound',
       'fuchsia-koga-egg-request',
       'fuchsia-research-institute-chansey-request',
       'safari-chansey-search-complete',
       'safari-chansey-lure',
       'safari-chansey-makes-friends',
-      'fuchsia-koga-unknown-compound',
       'safari-catch-partner-chansey',
     ]
     const chain = chainIds.map((id) => tasks.find((task) => task.id === id))
     expect(chain.every(Boolean)).toBe(true)
 
-    expect(chain[0]?.icon).toEqual({ type: 'trainer', id: 'gym-kanto-koga' })
-    expect(chain[0]?.completeButtonText).toBe('Talk to Koga')
-    expect(JSON.stringify(chain[0])).toContain('I’ll find out where to look')
-    expect(JSON.stringify(chain[0])).not.toContain('I’ll ask the Institute')
+    const returnToKoga = chain[0]!
+    expect(returnToKoga.icon).toEqual({ type: 'trainer', id: 'gym-kanto-koga' })
+    expect(returnToKoga.subCategory).toBe('Fuchsia City')
+    expect(returnToKoga.requirements).toContainEqual({
+      type: 'expedition_result',
+      targetId: 'safari-zone-grand-expedition',
+      expeditionStatus: 'completed',
+      count: 1,
+    })
+    expect(returnToKoga.requirements).not.toContainEqual({
+      type: 'item_owned',
+      targetId: 'tm-strength',
+    })
+    expect(JSON.stringify(returnToKoga)).toContain('separate the compounds')
+    expect(JSON.stringify(returnToKoga)).toContain('Fifty Crystals')
+    expect(JSON.stringify(returnToKoga)).not.toContain('Return to Koga')
 
-    const instituteRequest = chain[1]!
+    const analysis = chain[1]!
+    expect(analysis.requirements).toContainEqual({
+      type: 'task_completed',
+      targetId: 'safari-strength-check-on-koga',
+    })
+    expect(analysis.criteria).toContainEqual({
+      type: 'currency_owned',
+      targetId: 'crystals',
+      count: 50,
+      consume: true,
+    })
+    expect(JSON.stringify(analysis)).not.toContain('egg you brought')
+    expect(JSON.stringify(analysis)).toContain('remains unidentified')
+    expect(JSON.stringify(analysis)).toContain('Toxicroak toxin')
+
+    const eggRequest = chain[2]!
+    expect(eggRequest.requirements).toContainEqual({
+      type: 'task_completed',
+      targetId: 'fuchsia-koga-unknown-compound',
+    })
+    expect(JSON.stringify(eggRequest)).toContain('Chansey egg')
+    expect(JSON.stringify(eggRequest)).toContain('Toxicroak toxin')
+
+    expect(JSON.stringify(eggRequest)).toContain('I’ll find out where to look')
+    expect(JSON.stringify(eggRequest)).not.toContain('I’ll ask the Institute')
+
+    const instituteRequest = chain[3]!
     const instituteProse = JSON.stringify(instituteRequest)
     expect(instituteProse).toContain('central reeds')
     expect(instituteProse).toContain('marked the stretch on your field map')
     expect(instituteProse).toContain('search that stretch of reeds')
     expect(instituteProse).not.toContain('calm posture')
 
-    const lure = chain[3]!
+    const lure = chain[5]!
     expect(lure.requirements).toContainEqual({
       type: 'task_completed',
       targetId: 'safari-chansey-search-complete',
@@ -1643,19 +1682,15 @@ describe('Fuchsia Gym and Safari progression', () => {
       label: 'Offer 10 Red Berry Candies',
     })
 
-    expect(chain[4]?.requirements).toContainEqual({
+    expect(chain[6]?.requirements).toContainEqual({
       type: 'task_completed',
       targetId: 'safari-chansey-lure',
     })
-    expect(chain[5]?.requirements).toContainEqual({
+    expect(chain[7]?.requirements).toContainEqual({
       type: 'task_completed',
       targetId: 'safari-chansey-makes-friends',
     })
-    expect(chain[6]?.requirements).toContainEqual({
-      type: 'task_completed',
-      targetId: 'fuchsia-koga-unknown-compound',
-    })
-    expect(chain[6]?.subCategory).toBe('Fuchsia City')
+    expect(chain[7]?.subCategory).toBe('Fuchsia City')
 
     const taskRewards = chain.flatMap((task) => task?.rewards || [])
     expect(taskRewards.some((reward) => reward.type === 'pokemon')).toBe(false)
@@ -1666,24 +1701,19 @@ describe('Fuchsia Gym and Safari progression', () => {
       ),
     ).toBe(false)
 
-    const analysis = tasks.find(
-      (task) => task.id === 'fuchsia-koga-unknown-compound',
-    )
     const prose = JSON.stringify(analysis)
     expect(prose).toContain('Unknown Compound')
     expect(prose).not.toContain('Unown Compound')
-    expect(prose).toContain('Toxicroak toxin')
     expect(prose).toContain('no reaction to human tissue')
-    expect(prose).toContain('Fifty Crystals')
-    expect(prose).toContain('Shadowy Crystals')
+    expect(prose).toContain('fifty Crystals')
+    expect(prose).toContain('turned shadowy')
     expect(prose).toContain('distorts Pokémon energy')
-    expect(prose).toContain('Chansey yolk')
-    expect(prose).toContain('You have the fifty Crystals ready')
-    expect(prose).not.toContain('Bring me fifty Crystals')
-    expect(prose).toContain('safari-chansey-makes-friends')
+    expect(prose).not.toContain('Chansey yolk')
+    expect(prose).not.toContain('egg you brought')
+    expect(prose).toContain('fresh Chansey egg')
 
-    const giftProse = JSON.stringify(chain[4])
-    expect(chain[4]?.name).toBe('A Chansey’s Gift')
+    const giftProse = JSON.stringify(chain[6])
+    expect(chain[6]?.name).toBe('A Chansey’s Gift')
     expect(giftProse).toContain('stepping back into the reeds')
     expect(giftProse).not.toContain('remains wild')
     expect(giftProse).not.toContain('because you asked')
@@ -1692,18 +1722,25 @@ describe('Fuchsia Gym and Safari progression', () => {
       (task) => task.id === 'safari-catch-partner-chansey',
     )
     expect(chansey?.criteria).toEqual([])
+    expect(chansey?.icon).toEqual({ type: 'item', id: 'antidote' })
     const chanseyProse = JSON.stringify(chansey)
+    expect(chansey?.description).toContain('Meet him at the Institute lab')
+    expect(chansey?.enterModal?.[0]).toMatchObject({
+      title: 'Koga',
+      icon: { type: 'trainer', id: 'gym-kanto-koga' },
+    })
+    expect(chansey?.enterModal?.some((modal) => modal.title === 'Janine')).toBe(
+      false,
+    )
     expect(chanseyProse).toContain('yolk')
     expect(chanseyProse).toContain('last reagent')
     expect(chanseyProse).toContain('antidote')
     expect(chanseyProse).toContain('Drink it now')
-    expect(chanseyProse).toContain('burden lifted')
-    expect(chanseyProse).toContain('does not appear to affect humans')
-    expect(chanseyProse).not.toContain('Leave Chansey')
-    expect(chanseyProse).not.toContain('Rocket is expecting its poison')
-    expect(chanseyProse).toContain('return to the lab alone')
+    expect(chanseyProse).toContain('trail is still warm')
+    expect(chanseyProse).not.toContain('return to the lab alone')
+    expect(chanseyProse).not.toContain('Koga has finished the antidote')
 
-    const narrative = JSON.stringify([chain[3], chain[4], analysis, chansey])
+    const narrative = JSON.stringify([chain[5], chain[6], chain[7], analysis, chansey])
     expect(narrative).not.toContain('Return with Chansey')
     expect(narrative).not.toContain('stays beside you')
     expect(narrative).not.toContain('you and Chansey brought')
