@@ -1620,21 +1620,28 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(chain.every(Boolean)).toBe(true)
 
     const returnToKoga = chain[0]!
-    expect(returnToKoga.icon).toEqual({ type: 'trainer', id: 'gym-kanto-koga' })
-    expect(returnToKoga.subCategory).toBe('Fuchsia City')
+    expect(returnToKoga.name).toBe('So long Safari')
+    expect(returnToKoga.description).toBe(
+      'Weve been gone quite some time I should check if Koga has made any progress.',
+    )
+    expect(returnToKoga.icon).toEqual({ type: 'trainer', id: 'detective' })
+    expect(returnToKoga.subCategory).toBe('Safari Zone')
     expect(returnToKoga.requirements).toContainEqual({
-      type: 'expedition_result',
-      targetId: 'safari-zone-grand-expedition',
-      expeditionStatus: 'completed',
-      count: 1,
+      type: 'task_completed',
+      targetId: 'fuchsia-koga-study-toxin',
     })
-    expect(returnToKoga.requirements).not.toContainEqual({
+    expect(returnToKoga.requirements).toContainEqual({
       type: 'item_owned',
       targetId: 'tm-strength',
     })
-    expect(JSON.stringify(returnToKoga)).toContain('separate the compounds')
-    expect(JSON.stringify(returnToKoga)).toContain('Fifty Crystals')
-    expect(JSON.stringify(returnToKoga)).not.toContain('Return to Koga')
+    expect(JSON.stringify(returnToKoga)).toContain(
+      'I cant imagine you will get another shot at coming back.',
+    )
+    expect(JSON.stringify(returnToKoga)).toContain(
+      'Ray, has got me feeling nervous again',
+    )
+    expect(JSON.stringify(returnToKoga)).toContain('Return to Koga')
+    expect(JSON.stringify(returnToKoga)).not.toContain('Fifty Crystals')
 
     const analysis = chain[1]!
     expect(analysis.requirements).toContainEqual({
