@@ -47,12 +47,6 @@ export const currencies: Currency[] = [
     iconId: 'league-ticket',
   },
   {
-    id: 'shadow-crystals',
-    name: 'Shadow Crystals',
-    iconId: 'revive',
-    iconHueRotate: 250,
-  },
-  {
     id: 'safari-notes',
     name: 'Safari Notes',
     iconId: 'researchers-journal-page',
