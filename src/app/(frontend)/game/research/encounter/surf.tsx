@@ -459,7 +459,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
       setObstacles(nextObstacles)
       setCollectibles(nextCollectibles)
       setWaterOffset(
-        (current) => (current + speedRef.current * deltaSeconds) % 160,
+        (current) => (current + speedRef.current * deltaSeconds) % 2400,
       )
       animationFrameRef.current = requestAnimationFrame(gameLoop)
     }
@@ -499,6 +499,14 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
     else router.push('/game/explore')
   }
 
+  const scenePhase = (waterOffset / 2400) * Math.PI * 2
+  const skyDrift = Math.sin(scenePhase) * 18
+  const waterSway = Math.sin(scenePhase * 3) * 10
+  const steeringLean = Math.max(
+    -1,
+    Math.min(1, (targetXRef.current - playerX) * 7),
+  )
+
   return (
     <main className="game-night relative flex h-dvh min-h-0 w-full overflow-hidden bg-game-night-canvas text-game-night-ink">
       <Image
@@ -537,11 +545,44 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
 
         <div
           aria-hidden
+          className="absolute inset-x-0 top-[7%] h-[28%] overflow-hidden opacity-55 motion-reduce:hidden"
+        >
+          <div
+            className="absolute left-[-20%] top-[8%] h-12 w-[82%] rounded-[50%] bg-white/24 blur-2xl"
+            style={{ transform: `translateX(${skyDrift}px)` }}
+          />
+          <div
+            className="absolute right-[-24%] top-[42%] h-9 w-[74%] rounded-[50%] bg-[#d7f4ef]/20 blur-xl"
+            style={{ transform: `translateX(${-skyDrift * 0.72}px)` }}
+          />
+        </div>
+
+        <div
+          aria-hidden
           className="absolute inset-x-0 bottom-0 top-[38%] opacity-35 mix-blend-screen motion-reduce:hidden"
           style={{
             backgroundImage:
               'repeating-linear-gradient(176deg, transparent 0 34px, rgba(255,255,255,0.3) 36px, transparent 40px 68px)',
             backgroundPosition: `center ${waterOffset}px`,
+          }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-x-0 bottom-0 top-[43%] opacity-30 mix-blend-screen motion-reduce:hidden"
+          style={{
+            backgroundImage:
+              'radial-gradient(ellipse at 50% 0%, transparent 0 30%, rgba(219,252,255,0.3) 32%, transparent 36%), repeating-linear-gradient(4deg, transparent 0 44px, rgba(202,248,250,0.2) 46px, transparent 50px 82px)',
+            backgroundPosition: `${waterSway}px ${waterOffset * 0.68}px`,
+            backgroundSize: '150% 118px, 112% 132px',
+          }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-x-[-12%] bottom-[-8%] h-[44%] opacity-35 mix-blend-screen motion-reduce:hidden"
+          style={{
+            backgroundImage:
+              'repeating-radial-gradient(ellipse at center top, transparent 0 29px, rgba(238,255,255,0.27) 31px, transparent 35px 65px)',
+            backgroundPosition: `${-waterSway}px ${waterOffset * 1.12}px`,
           }}
         />
         <div
@@ -610,15 +651,27 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
             height: playerHeight,
           }}
         >
-          <div className="absolute left-1/2 top-[62%] h-[78%] w-[115%] -translate-x-1/2 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.72),rgba(191,242,248,0.28)_36%,transparent_72%)] blur-[2px] motion-reduce:opacity-60" />
-          <Image
-            src={settings.sprite}
-            alt=""
-            fill
-            priority
-            sizes={`${playerWidth}px`}
-            className="object-contain [image-rendering:pixelated] drop-shadow-[0_8px_5px_rgba(1,35,47,0.38)]"
-          />
+          <div className="surf-wake absolute left-1/2 top-[50%] h-[164%] w-[122%] -translate-x-1/2 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.92),rgba(191,242,248,0.42)_29%,rgba(125,224,237,0.16)_50%,transparent_72%)] blur-[2px] motion-reduce:opacity-65" />
+          <div className="surf-wake-trail absolute left-1/2 top-[68%] h-[156%] w-[92%] -translate-x-1/2 bg-[linear-gradient(to_bottom,rgba(242,255,255,0.76),rgba(177,239,246,0.3)_44%,transparent_100%)] opacity-80 blur-[2px] [clip-path:polygon(38%_0,62%_0,96%_100%,4%_100%)] motion-reduce:opacity-55" />
+          <div className="surf-spray surf-spray-left absolute left-[3%] top-[68%] h-3 w-3 rounded-full border border-white/55 bg-white/70 shadow-[18px_14px_0_-3px_rgba(232,255,255,0.72),-8px_24px_0_-4px_rgba(232,255,255,0.62)] motion-reduce:hidden" />
+          <div className="surf-spray surf-spray-right absolute right-[3%] top-[68%] h-3 w-3 rounded-full border border-white/55 bg-white/70 shadow-[-18px_14px_0_-3px_rgba(232,255,255,0.72),8px_24px_0_-4px_rgba(232,255,255,0.62)] motion-reduce:hidden" />
+          <div
+            className="absolute left-1/2 top-1/2 h-[166%] w-[138%]"
+            style={{
+              transform: `translate(-50%, -50%) rotate(${steeringLean * 4}deg)`,
+            }}
+          >
+            <div className="surf-lapras-art relative h-full w-full">
+              <Image
+                src={settings.sprite}
+                alt=""
+                fill
+                priority
+                sizes={`${Math.ceil(playerWidth * 1.4)}px`}
+                className="object-contain drop-shadow-[0_10px_7px_rgba(1,35,47,0.42)]"
+              />
+            </div>
+          </div>
         </div>
 
         <header className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-start justify-between gap-3 px-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
@@ -707,6 +760,42 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
           }
         />
       ) : null}
+      <style>{`
+        @keyframes surf-lapras-bob {
+          0%, 100% { transform: translateY(0) scaleY(1); }
+          50% { transform: translateY(-3px) scaleY(1.012); }
+        }
+        @keyframes surf-wake-breathe {
+          0%, 100% { transform: translateX(-50%) scaleX(0.92); opacity: 0.72; }
+          50% { transform: translateX(-50%) scaleX(1.08); opacity: 0.96; }
+        }
+        @keyframes surf-trail-rush {
+          0%, 100% { transform: translateX(-50%) scaleY(0.94); opacity: 0.62; }
+          50% { transform: translateX(-50%) scaleY(1.08); opacity: 0.88; }
+        }
+        @keyframes surf-spray-left {
+          0% { transform: translate(10px, 4px) scale(0.55); opacity: 0; }
+          35% { opacity: 0.9; }
+          100% { transform: translate(-18px, 34px) scale(1.1); opacity: 0; }
+        }
+        @keyframes surf-spray-right {
+          0% { transform: translate(-10px, 4px) scale(0.55); opacity: 0; }
+          35% { opacity: 0.9; }
+          100% { transform: translate(18px, 34px) scale(1.1); opacity: 0; }
+        }
+        .surf-lapras-art { animation: surf-lapras-bob 1.05s ease-in-out infinite; }
+        .surf-wake { animation: surf-wake-breathe 0.82s ease-in-out infinite; }
+        .surf-wake-trail { animation: surf-trail-rush 0.72s ease-in-out infinite; }
+        .surf-spray-left { animation: surf-spray-left 0.9s ease-out infinite; }
+        .surf-spray-right { animation: surf-spray-right 0.9s 0.24s ease-out infinite; }
+        @media (prefers-reduced-motion: reduce) {
+          .surf-lapras-art,
+          .surf-wake,
+          .surf-wake-trail,
+          .surf-spray-left,
+          .surf-spray-right { animation: none; }
+        }
+      `}</style>
     </main>
   )
 }
