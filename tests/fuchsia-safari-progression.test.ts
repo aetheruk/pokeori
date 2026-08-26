@@ -941,8 +941,8 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(currencies.some((currency) => currency.id === 'shadow-crystals')).toBe(false)
     expect(items).toContainEqual(
       expect.objectContaining({
-        id: 'shadow-crystal-key',
-        name: 'Shadow Crystal Key',
+        id: 'shadow-crystal',
+        name: 'Shadow Crystal',
       }),
     )
     expect(getIcon('safari-ball')).toBeDefined()
@@ -1610,7 +1610,6 @@ describe('Fuchsia Gym and Safari progression', () => {
     const chainIds = [
       'safari-strength-check-on-koga',
       'fuchsia-koga-unknown-compound',
-      'fuchsia-koga-egg-request',
       'fuchsia-research-institute-chansey-request',
       'safari-chansey-search-complete',
       'safari-chansey-lure',
@@ -1658,7 +1657,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(analysis.rewards).toEqual([
       {
         type: 'item',
-        targetId: 'shadow-crystal-key',
+        targetId: 'shadow-crystal',
         quantity: 1,
         dropChance: 100,
         secret: true,
@@ -1670,25 +1669,18 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(JSON.stringify(analysis)).toContain('fresh yolk from a Chansey egg')
     expect(JSON.stringify(analysis)).toContain('On it!')
 
-    const eggRequest = chain[2]!
-    expect(eggRequest.requirements).toContainEqual({
+    const instituteRequest = chain[2]!
+    expect(instituteRequest.requirements).toContainEqual({
       type: 'task_completed',
       targetId: 'fuchsia-koga-unknown-compound',
     })
-    expect(JSON.stringify(eggRequest)).toContain('Chansey egg')
-    expect(JSON.stringify(eggRequest)).toContain('Toxicroak toxin')
-
-    expect(JSON.stringify(eggRequest)).toContain('I’ll find out where to look')
-    expect(JSON.stringify(eggRequest)).not.toContain('I’ll ask the Institute')
-
-    const instituteRequest = chain[3]!
     const instituteProse = JSON.stringify(instituteRequest)
     expect(instituteProse).toContain('central reeds')
     expect(instituteProse).toContain('marked the stretch on your field map')
     expect(instituteProse).toContain('search that stretch of reeds')
     expect(instituteProse).not.toContain('calm posture')
 
-    const lure = chain[5]!
+    const lure = chain[4]!
     expect(lure.requirements).toContainEqual({
       type: 'task_completed',
       targetId: 'safari-chansey-search-complete',
@@ -1701,15 +1693,15 @@ describe('Fuchsia Gym and Safari progression', () => {
       label: 'Offer 10 Red Berry Candies',
     })
 
-    expect(chain[6]?.requirements).toContainEqual({
+    expect(chain[5]?.requirements).toContainEqual({
       type: 'task_completed',
       targetId: 'safari-chansey-lure',
     })
-    expect(chain[7]?.requirements).toContainEqual({
+    expect(chain[6]?.requirements).toContainEqual({
       type: 'task_completed',
       targetId: 'safari-chansey-makes-friends',
     })
-    expect(chain[7]?.subCategory).toBe('Fuchsia City')
+    expect(chain[6]?.subCategory).toBe('Fuchsia City')
 
     const taskRewards = chain.flatMap((task) => task?.rewards || [])
     expect(taskRewards.some((reward) => reward.type === 'pokemon')).toBe(false)
@@ -1728,7 +1720,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     )
     expect(prose).toContain('no reaction to human tissue')
     expect(prose).toContain('Fifty Crystals')
-    expect(prose).toContain('shadow-crystal-key')
+    expect(prose).toContain('shadow-crystal')
     expect(prose).toContain('distorts Pokémon energy')
     expect(prose).toContain(
       'That is what if I were to believe you caused your untimely end',
@@ -1738,8 +1730,8 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(prose).toContain('On it!')
     expect(prose).not.toContain('as your partner')
 
-    const giftProse = JSON.stringify(chain[6])
-    expect(chain[6]?.name).toBe('A Chansey’s Gift')
+    const giftProse = JSON.stringify(chain[5])
+    expect(chain[5]?.name).toBe('A Chansey’s Gift')
     expect(giftProse).toContain('stepping back into the reeds')
     expect(giftProse).not.toContain('remains wild')
     expect(giftProse).not.toContain('because you asked')
@@ -1766,7 +1758,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(chanseyProse).not.toContain('return to the lab alone')
     expect(chanseyProse).not.toContain('Koga has finished the antidote')
 
-    const narrative = JSON.stringify([chain[5], chain[6], chain[7], analysis, chansey])
+    const narrative = JSON.stringify([chain[4], chain[5], chain[6], analysis, chansey])
     expect(narrative).not.toContain('Return with Chansey')
     expect(narrative).not.toContain('stays beside you')
     expect(narrative).not.toContain('you and Chansey brought')

@@ -974,13 +974,14 @@ export const keyItems: Item[] = [
     spriteId: 'materials/poison-resin',
   },
   {
-    id: 'shadow-crystal-key',
-    name: 'Shadow Crystal Key',
+    id: 'shadow-crystal',
+    name: 'Shadow Crystal',
     unique: true,
     consume: false,
-    description: 'A dark key crystallized from the Unknown Compound’s reaction. It may unlock something connected to Shadow Pokémon.',
+    description: 'A dark crystal formed by the Unknown Compound’s reaction. It may unlock something connected to Shadow Pokémon.',
     category: 'key',
-    spriteId: 'key/prison-bottle',
+    spriteId: 'max-revive',
+    hueRotate: 250,
   },
   {
     id: 'charred-wood',
