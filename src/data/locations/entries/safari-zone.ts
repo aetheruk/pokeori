@@ -10,6 +10,11 @@ const strangeSightingsRequirement = {
   targetId: 'safari-strange-sightings',
 }
 
+const chanseyAvailabilityRequirement = {
+  type: 'task_completed' as const,
+  targetId: 'safari-catch-partner-chansey',
+}
+
 const rareItemRumoursRequirement = {
   type: 'task_completed' as const,
   targetId: 'safari-rare-item-rumours',
@@ -87,7 +92,12 @@ const expeditionSafariLocations: Location[] = [
       { speciesId: 114, formId: '114', chance: 1 },
       { speciesId: 123, formId: '123', chance: 1 },
       { speciesId: 127, formId: '127', chance: 1 },
-      { speciesId: 113, formId: '113', chance: 1 },
+      {
+        speciesId: 113,
+        formId: '113',
+        chance: 1,
+        requirements: [chanseyAvailabilityRequirement],
+      },
     ],
   }),
   safariArea({
@@ -111,7 +121,12 @@ const expeditionSafariLocations: Location[] = [
       { speciesId: 123, formId: '123', chance: 2 },
       { speciesId: 115, formId: '115', chance: 2 },
       { speciesId: 127, formId: '127', chance: 1 },
-      { speciesId: 113, formId: '113', chance: 1 },
+      {
+        speciesId: 113,
+        formId: '113',
+        chance: 1,
+        requirements: [chanseyAvailabilityRequirement],
+      },
     ],
   }),
   safariArea({
@@ -155,7 +170,12 @@ const expeditionSafariLocations: Location[] = [
       { speciesId: 49, formId: '49', chance: 3 },
       { speciesId: 104, formId: '104', chance: 2 },
       { speciesId: 128, formId: '128', chance: 2 },
-      { speciesId: 113, formId: '113', chance: 2 },
+      {
+        speciesId: 113,
+        formId: '113',
+        chance: 2,
+        requirements: [chanseyAvailabilityRequirement],
+      },
       { speciesId: 127, formId: '127', chance: 1 },
       { speciesId: 123, formId: '123', chance: 1 },
       {
@@ -185,7 +205,12 @@ const expeditionSafariLocations: Location[] = [
       'A quiet stretch of reserve habitat where Pokémon move through the grass and brush. Take your time and make the throw count.',
     icon: '113',
     encounters: [
-      { speciesId: 113, formId: '113', chance: 20 },
+      {
+        speciesId: 113,
+        formId: '113',
+        chance: 20,
+        requirements: [chanseyAvailabilityRequirement],
+      },
       { speciesId: 115, formId: '115', chance: 20 },
       { speciesId: 128, formId: '128', chance: 20 },
       { speciesId: 123, formId: '123', chance: 20 },

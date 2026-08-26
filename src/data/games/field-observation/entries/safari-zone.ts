@@ -3,6 +3,11 @@ import type {
   FieldObservationPokemonPoolEntry,
 } from '../types'
 
+const chanseyAvailabilityRequirement = {
+  type: 'task_completed' as const,
+  targetId: 'safari-catch-partner-chansey',
+}
+
 const centralPool: FieldObservationPokemonPoolEntry[] = [
   { speciesId: 102, formId: '102', weight: 18 },
   { speciesId: 111, formId: '111', weight: 17 },
@@ -16,7 +21,12 @@ const centralPool: FieldObservationPokemonPoolEntry[] = [
   { speciesId: 114, formId: '114', weight: 1 },
   { speciesId: 123, formId: '123', weight: 1 },
   { speciesId: 127, formId: '127', weight: 1 },
-  { speciesId: 113, formId: '113', weight: 1 },
+  {
+    speciesId: 113,
+    formId: '113',
+    weight: 1,
+    requirements: [chanseyAvailabilityRequirement],
+  },
 ]
 
 const eastPool: FieldObservationPokemonPoolEntry[] = [
@@ -34,7 +44,12 @@ const eastPool: FieldObservationPokemonPoolEntry[] = [
   { speciesId: 123, formId: '123', weight: 2 },
   { speciesId: 115, formId: '115', weight: 2 },
   { speciesId: 127, formId: '127', weight: 1 },
-  { speciesId: 113, formId: '113', weight: 1 },
+  {
+    speciesId: 113,
+    formId: '113',
+    weight: 1,
+    requirements: [chanseyAvailabilityRequirement],
+  },
 ]
 
 const westPool: FieldObservationPokemonPoolEntry[] = [
@@ -66,7 +81,12 @@ const northPool: FieldObservationPokemonPoolEntry[] = [
   { speciesId: 49, formId: '49', weight: 3 },
   { speciesId: 104, formId: '104', weight: 2 },
   { speciesId: 128, formId: '128', weight: 2 },
-  { speciesId: 113, formId: '113', weight: 2 },
+  {
+    speciesId: 113,
+    formId: '113',
+    weight: 2,
+    requirements: [chanseyAvailabilityRequirement],
+  },
   { speciesId: 127, formId: '127', weight: 1 },
   { speciesId: 123, formId: '123', weight: 1 },
   { speciesId: 128, formId: '10250', weight: 1, requirements: [{ type: 'task_completed', targetId: 'safari-strange-sightings' }] },

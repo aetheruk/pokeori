@@ -608,10 +608,17 @@ describe('Fuchsia Gym and Safari progression', () => {
     ).toEqual([113, 115, 123, 127, 128, 128, 128, 128])
     expect(
       finale?.encounters.filter((encounter) => !encounter.requirements),
-    ).toHaveLength(5)
+    ).toHaveLength(4)
     expect(
       finale?.encounters.filter((encounter) => encounter.requirements),
     ).toEqual([
+      expect.objectContaining({
+        speciesId: 113,
+        formId: '113',
+        requirements: [
+          { type: 'task_completed', targetId: 'safari-catch-partner-chansey' },
+        ],
+      }),
       expect.objectContaining({
         formId: '10250',
         requirements: [
@@ -1494,6 +1501,41 @@ describe('Fuchsia Gym and Safari progression', () => {
     }
   })
 
+  test('Safari Chansey encounters unlock only after the egg handoff task', () => {
+    const chanseyRequirement = {
+      type: 'task_completed',
+      targetId: 'safari-catch-partner-chansey',
+    }
+    const safariLocationEntries = locations
+      .filter((entry) => entry.subCategory === 'Safari Zone')
+      .flatMap((entry) => entry.encounters)
+      .filter((entry) => entry.speciesId === 113 && entry.formId === '113')
+    expect(safariLocationEntries.length).toBeGreaterThan(0)
+    expect(
+      safariLocationEntries.every((entry) =>
+        entry.requirements?.some(
+          (requirement) =>
+            requirement.type === chanseyRequirement.type &&
+            requirement.targetId === chanseyRequirement.targetId,
+        ),
+      ),
+    ).toBe(true)
+
+    const safariObservationEntries = fieldObservationGames
+      .flatMap((game) => game.settings.pokemonPool)
+      .filter((entry) => entry.speciesId === 113 && entry.formId === '113')
+    expect(safariObservationEntries.length).toBeGreaterThan(0)
+    expect(
+      safariObservationEntries.every((entry) =>
+        entry.requirements?.some(
+          (requirement) =>
+            requirement.type === chanseyRequirement.type &&
+            requirement.targetId === chanseyRequirement.targetId,
+        ),
+      ),
+    ).toBe(true)
+  })
+
   test('Safari and Koga Gym expedition activities never appear as standalone Explore content', () => {
     const expeditionIds = [
       'fuchsia-gym-trial-expedition',
@@ -1740,23 +1782,21 @@ describe('Fuchsia Gym and Safari progression', () => {
       (task) => task.id === 'safari-catch-partner-chansey',
     )
     expect(chansey?.criteria).toEqual([])
-    expect(chansey?.icon).toEqual({ type: 'item', id: 'antidote' })
+    expect(chansey?.icon).toEqual({ type: 'pokemon', id: '113' })
     const chanseyProse = JSON.stringify(chansey)
-    expect(chansey?.description).toContain('Meet him at the Institute lab')
+    expect(chansey?.name).toBe('An Egg for the Antidote')
+    expect(chansey?.description).toContain('hand over the gift')
     expect(chansey?.enterModal?.[0]).toMatchObject({
-      title: 'Koga',
-      icon: { type: 'trainer', id: 'gym-kanto-koga' },
+      title: 'Det. Ray Choo',
+      icon: { type: 'trainer', id: 'detective' },
     })
-    expect(chansey?.enterModal?.some((modal) => modal.title === 'Janine')).toBe(
-      false,
-    )
+    expect(chansey?.enterModal?.some((modal) => modal.title === 'Koga')).toBe(true)
     expect(chanseyProse).toContain('yolk')
     expect(chanseyProse).toContain('last reagent')
     expect(chanseyProse).toContain('antidote')
     expect(chanseyProse).toContain('Drink it now')
-    expect(chanseyProse).toContain('trail is still warm')
-    expect(chanseyProse).not.toContain('return to the lab alone')
-    expect(chanseyProse).not.toContain('Koga has finished the antidote')
+    expect(chanseyProse).toContain('We have the egg Chansey gave us')
+    expect(chanseyProse).toContain('place the warm egg in Koga’s hands')
 
     const narrative = JSON.stringify([chain[4], chain[5], chain[6], analysis, chansey])
     expect(narrative).not.toContain('Return with Chansey')
