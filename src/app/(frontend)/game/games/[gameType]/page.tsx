@@ -20,6 +20,7 @@ import { RhythmGame } from '@/app/(frontend)/game/research/encounter/rhythm'
 import { RockPushGame } from '@/app/(frontend)/game/research/encounter/rock-push'
 import { RockTunnelEchoMapGame } from '@/app/(frontend)/game/research/encounter/rock-tunnel-echo-map'
 import { RunGame } from '@/app/(frontend)/game/research/encounter/run'
+import { SurfGame } from '@/app/(frontend)/game/research/encounter/surf'
 import { SlidingPuzzleGame } from '@/app/(frontend)/game/research/encounter/sliding-puzzle'
 import { SlotGame } from '@/app/(frontend)/game/research/encounter/slots'
 import { SpellingGame } from '@/app/(frontend)/game/research/encounter/spelling'
@@ -56,6 +57,7 @@ const GAME_COMPONENTS: Partial<Record<GameType, ComponentType<GameProps>>> = {
   'rock-push': RockPushGame as unknown as ComponentType<GameProps>,
   run: RunGame as unknown as ComponentType<GameProps>,
   flap: FlapGame as unknown as ComponentType<GameProps>,
+  surf: SurfGame as unknown as ComponentType<GameProps>,
   slots: SlotGame as unknown as ComponentType<GameProps>,
   pachinko: PachinkoGame as unknown as ComponentType<GameProps>,
   'ufo-catcher': UfoCatcherGame as unknown as ComponentType<GameProps>,

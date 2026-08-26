@@ -92,6 +92,7 @@ const submitAnswerSchemas: Partial<Record<GameType, z.ZodType>> = {
   compare: idAnswerSchema,
   run: booleanAnswerSchema,
   flap: booleanAnswerSchema,
+  surf: booleanAnswerSchema,
   'rock-push': booleanAnswerSchema,
   rhythm: booleanAnswerSchema,
   mining: booleanAnswerSchema,

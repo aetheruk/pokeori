@@ -31,6 +31,7 @@ import {
   Radar,
   Paintbrush,
   Joystick,
+  Waves,
 } from 'lucide-react'
 import { MdCatchingPokemon } from 'react-icons/md'
 import type { ExploreItem } from './types'
@@ -85,6 +86,8 @@ export const getTypeIcon = (item: ExploreItem) => {
         return <ChevronsRight className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'flap')
         return <Plane className="w-4 h-4 text-game-moss-strong" />
+      if (gameType === 'surf')
+        return <Waves className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'slots')
         return <Coins className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'pachinko')
@@ -179,6 +182,8 @@ export const getGameTypeLabel = (item: ExploreItem) => {
       return 'RUN'
     case 'flap':
       return 'FLAP'
+    case 'surf':
+      return 'SURF'
     case 'slots':
       return 'SLOTS'
     case 'pachinko':

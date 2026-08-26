@@ -159,6 +159,7 @@ describe('endless milestone helpers', () => {
 
   test('calculates bounded anti-cheat scores by game type', () => {
     expect(getMaxAllowedEndlessScore('run', {}, 10)).toBe(150)
+    expect(getMaxAllowedEndlessScore('surf', {}, 10)).toBe(150)
     expect(getMaxAllowedEndlessScore('rhythm', { spawnRate: { min: 0.5 } }, 10)).toBe(900)
     expect(getMaxAllowedEndlessScore('match3', {}, 10)).toBeNull()
   })

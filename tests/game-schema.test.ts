@@ -398,6 +398,29 @@ describe('generated game data schemas', () => {
     expect(brokenOverrides).toEqual([])
   })
 
+  test('Lapras Surf is registered as a configurable Kanto Test game', () => {
+    const game = allGames.find((entry) => entry.id === 'lapras-surf-test')
+
+    expect(game?.gameType).toBe('surf')
+    expect(game?.subCategory).toBe('Test')
+    expect(game?.icon).toEqual({ type: 'pokemon', id: '131' })
+    expect(game?.settings.difficulty).toBe(4)
+    expect(game?.settings.obstacles).toHaveLength(3)
+    expect(game?.settings.endless?.repeatingRewards).toContainEqual(
+      expect.objectContaining({ random: true }),
+    )
+
+    const invalidDifficulty = structuredClone(game)
+    if (invalidDifficulty) invalidDifficulty.settings.difficulty = 11
+    expect(validateGameItem(invalidDifficulty).success).toBe(false)
+
+    const invalidFrequency = structuredClone(game)
+    if (invalidFrequency) {
+      invalidFrequency.settings.obstacleFrequency = { min: 2, max: 1 }
+    }
+    expect(validateGameItem(invalidFrequency).success).toBe(false)
+  })
+
   test('Art Academy has a configurable Test study entry', () => {
     const game = allGames.find((entry) => entry.id === 'art-academy-test')
     const settings = game?.settings as

@@ -36,6 +36,14 @@ export { runGames } from './run'
 export type { FlapGameConfig } from './flap/types'
 export { basicEntries as flapGames } from './flap'
 
+// Surf game (portrait obstacle course)
+export type {
+  SurfGameConfig,
+  SurfGameSettings,
+  SurfObstacleConfig,
+} from './surf/types'
+export { surfGames } from './surf'
+
 // Slot game (slot-machine)
 export type { SlotGameConfig, SlotGameSettings, SlotSymbol, SlotPayline } from './slots/types'
 export { slotGames } from './slots'
@@ -158,6 +166,7 @@ import { compareEntries as compareGames } from './compare'
 import { basicEntries as rockPushGames } from './rock-push'
 import { runGames } from './run'
 import { basicEntries as flapGames } from './flap'
+import { surfGames } from './surf'
 import { slotGames } from './slots'
 import { pachinkoGames } from './pachinko'
 import { ufoCatcherGames } from './ufo-catcher'
@@ -189,6 +198,7 @@ export type GameType =
   | 'rock-push'
   | 'run'
   | 'flap'
+  | 'surf'
   | 'slots'
   | 'pachinko'
   | 'ufo-catcher'
@@ -266,6 +276,11 @@ export interface GameSettings {
   player?: SpriteConfig
   jumpSprite?: string | SpriteConfig
   enemySprite?: string | SpriteConfig
+  steeringSpeed?: number
+  maxSpeed?: number
+  acceleration?: number
+  obstacleFrequency?: { min: number; max: number }
+  obstacles?: import('./surf/types').SurfObstacleConfig[]
   obstacleSprite?: string
   aerialObstacleSprite?: string
   parallaxLayers?: ParallaxLayer[]
@@ -416,6 +431,7 @@ export const allGames: GameItem[] = [
   ...rockPushGames.map((g) => ({ ...g, gameType: 'rock-push' as const })),
   ...runGames.map((g) => ({ ...g, gameType: 'run' as const })),
   ...flapGames.map((g) => ({ ...g, gameType: 'flap' as const })),
+  ...surfGames.map((g) => ({ ...g, gameType: 'surf' as const })),
   ...slotGames.map((g) => ({ ...g, gameType: 'slots' as const })),
   ...pachinkoGames.map((g) => ({ ...g, gameType: 'pachinko' as const })),
   ...ufoCatcherGames.map(
