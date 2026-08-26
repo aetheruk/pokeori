@@ -1664,11 +1664,11 @@ describe('Fuchsia Gym and Safari progression', () => {
         secret: true,
       },
     ])
-    expect(JSON.stringify(analysis)).toContain('remains unidentified')
-    expect(JSON.stringify(analysis)).toContain('The Crystals have turned shadowy')
-    expect(JSON.stringify(analysis)).toContain('One compound threatens people')
-    expect(JSON.stringify(analysis)).toContain('fresh Chansey egg')
-    expect(JSON.stringify(analysis)).toContain('Ask about the Chansey egg')
+    expect(JSON.stringify(analysis)).toContain('The second... Im unsure')
+    expect(JSON.stringify(analysis)).toContain('Shadowy Crystals')
+    expect(JSON.stringify(analysis)).toContain('connected to the Shadow Pokemon')
+    expect(JSON.stringify(analysis)).toContain('fresh yolk from a Chansey egg')
+    expect(JSON.stringify(analysis)).toContain('On it!')
 
     const eggRequest = chain[2]!
     expect(eggRequest.requirements).toContainEqual({
@@ -1723,12 +1723,20 @@ describe('Fuchsia Gym and Safari progression', () => {
     const prose = JSON.stringify(analysis)
     expect(prose).toContain('Unknown Compound')
     expect(prose).not.toContain('Unown Compound')
+    expect(analysis.description).toBe(
+      'Koga looks like he’s made significant progress time to check in with him.',
+    )
     expect(prose).toContain('no reaction to human tissue')
-    expect(prose).toContain('fifty Crystals')
+    expect(prose).toContain('Fifty Crystals')
     expect(prose).toContain('shadow-crystal-key')
     expect(prose).toContain('distorts Pokémon energy')
-    expect(prose).not.toContain('egg you brought')
-    expect(prose).toContain('fresh Chansey egg')
+    expect(prose).toContain(
+      'That is what if I were to believe you caused your untimely end',
+    )
+    expect(prose).toContain('connected to the Shadow Pokemon')
+    expect(prose).toContain('fresh yolk from a Chansey egg')
+    expect(prose).toContain('On it!')
+    expect(prose).not.toContain('as your partner')
 
     const giftProse = JSON.stringify(chain[6])
     expect(chain[6]?.name).toBe('A Chansey’s Gift')
