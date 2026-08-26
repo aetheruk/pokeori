@@ -1,6 +1,8 @@
 # Current Game State
 
-- Unreleased: Lapras Surf adds a portrait, full-screen mobile Mini Game with drag-to-steer controls, desktop Arrow/A/D support, forward-perspective coastal hazards, configurable speed and difficulty, endless scoring, collectible prizes, milestones, and server-bounded score rewards. The initial replayable `Lapras Surf Test` activity is available under Kanto's Test sub-region with new hand-painted coastal, rock, reef, and buoy artwork.
+- Unreleased: Lapras Surf now uses a custom hand-painted rear-view Lapras sprite with steering lean, a longer animated wake, trailing spray, slow sky drift, and layered moving water. Decorative motion stops for reduced-motion players.
+
+- Release `0.17.0` adds a portrait, full-screen mobile Lapras Surf Mini Game with drag-to-steer controls, desktop Arrow/A/D support, forward-perspective coastal hazards, configurable speed and difficulty, endless scoring, collectible prizes, milestones, and server-bounded score rewards. The initial replayable `Lapras Surf Test` activity is available under Kanto's Test sub-region with new hand-painted coastal, rock, reef, and buoy artwork.
 
 - Unreleased: Friendship berry candies now grant +2 friendship (down from +5), and Research Kits now grant 3 Pokémon Research XP (down from 5).
 

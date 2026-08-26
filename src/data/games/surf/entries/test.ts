@@ -19,7 +19,7 @@ export const testSurfEntries: SurfGameConfig[] = [
       acceleration: 2.2,
       steeringSpeed: 380,
       difficulty: 4,
-      sprite: '/sprites/pokemon/gen-v/back/normal/131.avif',
+      sprite: '/games/surf/sprites/lapras-rear.png',
       playerWidth: 104,
       playerHeight: 104,
       obstacleFrequency: { min: 0.9, max: 1.45 },
