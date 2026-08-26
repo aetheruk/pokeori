@@ -974,6 +974,15 @@ export const keyItems: Item[] = [
     spriteId: 'materials/poison-resin',
   },
   {
+    id: 'shadow-crystal-key',
+    name: 'Shadow Crystal Key',
+    unique: true,
+    consume: false,
+    description: 'A dark key crystallized from the Unknown Compound’s reaction. It may unlock something connected to Shadow Pokémon.',
+    category: 'key',
+    spriteId: 'key/prison-bottle',
+  },
+  {
     id: 'charred-wood',
     name: 'CHARred Wood',
     description: "A piece of wood found on Route 24 that's been burnt.",

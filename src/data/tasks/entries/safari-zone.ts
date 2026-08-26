@@ -1578,7 +1578,15 @@ export const safariZoneTasks: Task[] = ([
     completeButtonText: 'Test the theory',
     requirements: [{ type: 'task_completed', targetId: 'safari-strength-check-on-koga' }],
     criteria: [{ type: 'currency_owned', targetId: 'crystals', count: 50, consume: true }],
-    rewards: [{ type: 'currency', targetId: 'shadow-crystals', quantity: 50, dropChance: 100 }],
+    rewards: [
+      {
+        type: 'item',
+        targetId: 'shadow-crystal-key',
+        quantity: 1,
+        dropChance: 100,
+        secret: true,
+      },
+    ],
     enterModal: [
       {
         id: 1,
@@ -1586,8 +1594,8 @@ export const safariZoneTasks: Task[] = ([
         title: 'Koga',
         icon: kogaIcon,
         message:
-          'You have the fifty Crystals ready. Good. We can test the second compound without exposing a Pokémon.',
-        buttons: [{ text: 'Test the compound', type: 'navigate', id: 2 }],
+          'I separated two active compounds. The first is Toxicroak toxin. That is what makes the road poison dangerous to people. The second matches nothing in any record I trust.',
+        buttons: [{ text: 'The Unknown Compound?', type: 'navigate', id: 2 }],
       },
       {
         id: 2,
@@ -1595,7 +1603,7 @@ export const safariZoneTasks: Task[] = ([
         title: 'Koga',
         icon: kogaIcon,
         message:
-          'The Toxicroak toxin is the first compound. This second one remains unidentified, but it has shown no reaction to human tissue, which does not make it harmless.',
+          'It has no reaction to human tissue. Pokémon energy is another matter. Fifty Crystals will let us test the effect without exposing a Pokémon.',
         buttons: [{ text: 'That is safe?', type: 'navigate', id: 3 }],
       },
       {
@@ -1621,8 +1629,8 @@ export const safariZoneTasks: Task[] = ([
         title: 'Koga',
         icon: kogaIcon,
         message:
-          'The Crystals have turned shadowy. The Unknown Compound distorts Pokémon energy, but I still do not know what it is or what it will do to a Pokémon.',
-        buttons: [{ text: 'Oh dear', type: 'navigate', id: 6 }],
+          'Shadow Crystals. The Unknown Compound does not appear to threaten humans, but it distorts Pokémon energy. That is the effect we needed to prove.',
+        buttons: [{ text: 'This is Rocket’s Shadow work', type: 'navigate', id: 6 }],
       },
       {
         id: 6,
@@ -1630,7 +1638,7 @@ export const safariZoneTasks: Task[] = ([
         title: 'Det. Ray Choo',
         icon: detectiveIcon,
         message:
-          'One compound threatens people, and the other threatens Pokémon. Whatever Rocket is planning, both parts of this vial matter.',
+          'A poison for people and something that twists Pokémon packed into the same vial. That fits Operation Shadow Force far too neatly for my liking.',
         buttons: [{ text: 'Koga?', type: 'navigate', id: 7 }],
       },
       {
@@ -1639,8 +1647,8 @@ export const safariZoneTasks: Task[] = ([
         title: 'Koga',
         icon: kogaIcon,
         message:
-          'I can continue studying the Unknown Compound, but the Toxicroak toxin is the immediate danger to you. To make a pre-emptive antidote for that first compound, I need a fresh Chansey egg.',
-        buttons: [{ text: 'Ask about the Chansey egg', type: 'success' }],
+          'It proves what the compound does, not who made it. For the human poison, I can neutralize the Toxicroak toxin. I need fresh yolk from a Chansey egg. Find a Chansey in the Safari Zone and earn its trust as your partner.',
+        buttons: [{ text: 'I’ll find a Chansey', type: 'success' }],
       },
     ],
   },

@@ -938,12 +938,13 @@ describe('Fuchsia Gym and Safari progression', () => {
       name: 'Safari Notes',
       iconId: 'researchers-journal-page',
     })
-    expect(currencies).toContainEqual({
-      id: 'shadow-crystals',
-      name: 'Shadow Crystals',
-      iconId: 'revive',
-      iconHueRotate: 250,
-    })
+    expect(currencies.some((currency) => currency.id === 'shadow-crystals')).toBe(false)
+    expect(items).toContainEqual(
+      expect.objectContaining({
+        id: 'shadow-crystal-key',
+        name: 'Shadow Crystal Key',
+      }),
+    )
     expect(getIcon('safari-ball')).toBeDefined()
     expect(getTitle('the-warden')?.name).toBe('The Warden')
 
@@ -1654,9 +1655,24 @@ describe('Fuchsia Gym and Safari progression', () => {
       count: 50,
       consume: true,
     })
-    expect(JSON.stringify(analysis)).not.toContain('egg you brought')
-    expect(JSON.stringify(analysis)).toContain('remains unidentified')
-    expect(JSON.stringify(analysis)).toContain('Toxicroak toxin')
+    expect(analysis.rewards).toEqual([
+      {
+        type: 'item',
+        targetId: 'shadow-crystal-key',
+        quantity: 1,
+        dropChance: 100,
+        secret: true,
+      },
+    ])
+    expect(JSON.stringify(analysis)).toContain(
+      'I separated two active compounds. The first is Toxicroak toxin.',
+    )
+    expect(JSON.stringify(analysis)).toContain(
+      'The Unknown Compound does not appear to threaten humans, but it distorts Pokémon energy.',
+    )
+    expect(JSON.stringify(analysis)).toContain('Operation Shadow Force')
+    expect(JSON.stringify(analysis)).toContain('fresh yolk from a Chansey egg')
+    expect(JSON.stringify(analysis)).toContain('I’ll find a Chansey')
 
     const eggRequest = chain[2]!
     expect(eggRequest.requirements).toContainEqual({
@@ -1712,12 +1728,12 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(prose).toContain('Unknown Compound')
     expect(prose).not.toContain('Unown Compound')
     expect(prose).toContain('no reaction to human tissue')
-    expect(prose).toContain('fifty Crystals')
-    expect(prose).toContain('turned shadowy')
+    expect(prose).toContain('Fifty Crystals')
+    expect(prose).toContain('Shadow Crystals')
     expect(prose).toContain('distorts Pokémon energy')
-    expect(prose).not.toContain('Chansey yolk')
+    expect(prose).toContain('fresh yolk')
     expect(prose).not.toContain('egg you brought')
-    expect(prose).toContain('fresh Chansey egg')
+    expect(prose).toContain('Find a Chansey in the Safari Zone')
 
     const giftProse = JSON.stringify(chain[6])
     expect(chain[6]?.name).toBe('A Chansey’s Gift')
