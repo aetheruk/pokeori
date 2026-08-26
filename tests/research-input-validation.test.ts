@@ -36,6 +36,7 @@ describe('research input validation', () => {
   test('accepts boolean answers for realtime games', () => {
     expect(validateResearchAnswer('run', true).success).toBe(true)
     expect(validateResearchAnswer('flap', false).success).toBe(true)
+    expect(validateResearchAnswer('surf', true).success).toBe(true)
     expect(validateResearchAnswer('mining', 'true').success).toBe(false)
   })
 

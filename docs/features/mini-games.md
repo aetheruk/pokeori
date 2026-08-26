@@ -43,6 +43,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 | Field Observation | `/game/field-research` | Watch a timed research frame with route and global random spawns, then answer a server-generated observation question |
 | TCG Battle | `src/data/games/tcg-battle` | Server-resolved simplified card battles using saved 15-card TCG decks |
 | Run | `src/data/games/run` | Endless runner |
+| Surf | `/game/games/surf` | Portrait forward-scrolling Lapras obstacle course |
 | Rock Push | `src/data/games/rock-push` | Puzzle game |
 | Prize Wheel | `src/data/games/prize-wheel` | Spin for rewards |
 | Pachinko | `src/data/games/pachinko` | Physics ball drop with bucket rewards |
@@ -61,10 +62,11 @@ WebKit, which may still permit history swipes despite that CSS property.
 - Pokedollars
 - Items
 - Research XP, either authored as a flat one-off reward or generated from `skillXp`
-- Endless score games author one-time rewards under `settings.endless.milestones` and score-scaled rewards under `settings.endless.repeatingRewards`. Repeating rewards can set `random: true` for Run/Flap collectible spawns; these must be touched by the player and can use either a numeric interval with 25% variance or an authored `{ min, max }` score interval for explicit random cadence. Random collectible rewards show in Explore details by reward name only without point or chance labels. Non-random score rewards show the full score reward range and label each previewed reward with either the score threshold or repeating point interval.
+- Endless score games author one-time rewards under `settings.endless.milestones` and score-scaled rewards under `settings.endless.repeatingRewards`. Repeating rewards can set `random: true` for Run, Flap, or Surf collectible spawns; these must be touched by the player and can use either a numeric interval with 25% variance or an authored `{ min, max }` score interval for explicit random cadence. Random collectible rewards show in Explore details by reward name only without point or chance labels. Non-random score rewards show the full score reward range and label each previewed reward with either the score threshold or repeating point interval.
 - Identify games default to four unique answer choices and can author `settings.optionCount` for a larger pool. The server builds the configured number for the opening and every following round, always includes the target, and caps safely at the available unique options; the client switches six-choice rounds to a responsive three-column layout.
 - Paid Run and Flap entries use the shared `currency_owned` criterion with `consume: true`. The server checks and deducts the authored amount only when creating a new session; restoring an active session does not charge again.
 - Run and Flap use a shared side-scroller stage shell. Their gameplay coordinates remain a fixed 600x600 layer, while the visible stage scales responsively inside a full-screen painted backdrop with authored `settings.scene` art, premium repeat-x `parallaxLayers`, and region-time tinting. Tapping outside the square playfield triggers the primary action for both games, and Run uses a horizontal outside-playfield swipe for boost. Layer `style.backgroundPosition` is treated as the vertical anchor; the client always owns the animated X offset.
+- Surf uses a dedicated portrait course that fills the mobile viewport and becomes a framed 9:16 stage on desktop. The player drags anywhere in the course to steer side to side, with Arrow/A/D keyboard controls as a desktop alternative. Lapras stays near the bottom while obstacles and collectible rewards travel from the horizon toward the player with perspective scaling. Authored settings control speed, maximum speed, acceleration, steering speed, difficulty, obstacle cadence and weighting, scene art, finite score targets, and the shared endless reward model.
 
 ## Fishing
 - Every fishing cast rolls Pokemon at 80% and items at 20%.

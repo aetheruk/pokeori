@@ -655,6 +655,45 @@ const settingsByGameType: Record<string, z.ZodTypeAny> = {
       speed: z.number().positive().optional(),
     })
     .passthrough(),
+  surf: z
+    .object({
+      speed: z.number().positive(),
+      maxSpeed: z.number().positive().optional(),
+      acceleration: z.number().nonnegative().optional(),
+      steeringSpeed: z.number().positive(),
+      difficulty: z.number().int().min(1).max(10),
+      sprite: z.string().min(1),
+      playerWidth: z.number().positive().optional(),
+      playerHeight: z.number().positive().optional(),
+      obstacleFrequency: z.object({
+        min: z.number().positive(),
+        max: z.number().positive(),
+      }),
+      obstacles: z
+        .array(
+          z
+            .object({
+              sprite: z.string().min(1),
+              width: z.number().positive(),
+              height: z.number().positive(),
+              weight: z.number().positive().optional(),
+              minDifficulty: z.number().int().min(1).max(10).optional(),
+              collisionScale: z.number().positive().max(1).optional(),
+            })
+            .strict(),
+        )
+        .min(1),
+      scene: z.object({ backdrop: z.string().min(1) }).strict(),
+    })
+    .passthrough()
+    .refine(
+      (settings) => settings.obstacleFrequency.max >= settings.obstacleFrequency.min,
+      { path: ['obstacleFrequency'], message: 'Surf obstacle frequency max must be at least min.' },
+    )
+    .refine(
+      (settings) => !settings.maxSpeed || settings.maxSpeed >= settings.speed,
+      { path: ['maxSpeed'], message: 'Surf max speed must be at least base speed.' },
+    ),
   slots: z
     .object({
       symbols: z.array(z.object({ id: z.string(), icon: taskIconSchema }).passthrough()).min(1),

@@ -1,5 +1,7 @@
 # Current Game State
 
+- Unreleased: Lapras Surf adds a portrait, full-screen mobile Mini Game with drag-to-steer controls, desktop Arrow/A/D support, forward-perspective coastal hazards, configurable speed and difficulty, endless scoring, collectible prizes, milestones, and server-bounded score rewards. The initial replayable `Lapras Surf Test` activity is available under Kanto's Test sub-region with new hand-painted coastal, rock, reef, and buoy artwork.
+
 - Unreleased: Friendship berry candies now grant +2 friendship (down from +5), and Research Kits now grant 3 Pokémon Research XP (down from 5).
 
 - Unreleased: Safari Zone habitat fishing pools now use a dedicated reserve wetland portrait background with reed-lined water, a reserve footbridge, and distant Safari hills instead of the generic garden pond scene.

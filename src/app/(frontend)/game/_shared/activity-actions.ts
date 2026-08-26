@@ -1458,6 +1458,7 @@ export async function submitGameActivityAnswer(
       }
     } else if (
       encounter.gameType === 'flap' ||
+      encounter.gameType === 'surf' ||
       encounter.gameType === 'mining'
     ) {
       isCorrect = Boolean(validatedAnswer)
@@ -1695,6 +1696,7 @@ export async function submitGameActivityAnswer(
       snapTargetId !== undefined ||
       encounter.gameType === 'rock-push' ||
       encounter.gameType === 'run' ||
+      encounter.gameType === 'surf' ||
       encounter.gameType === 'field-observation'
     ) {
       // No next target
