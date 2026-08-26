@@ -1372,50 +1372,6 @@ export const safariZoneTasks: Task[] = ([
     ],
   },
   {
-    id: 'fuchsia-koga-egg-request',
-    name: 'A Useful Egg',
-    description:
-      'The Crystal test showed that the second compound affects Pokémon, but Koga still needs a Chansey egg to make an antidote for the Toxicroak toxin.',
-    category: 'Kanto',
-    subCategory: 'Fuchsia City',
-    icon: kogaIcon,
-    background: '/backgrounds/lab.avif',
-    repeatable: false,
-    secret: false,
-    completionTrigger: 'manual',
-    completeButtonText: 'Talk to Koga',
-    requirements: [{ type: 'task_completed', targetId: 'fuchsia-koga-unknown-compound' }],
-    criteria: [],
-    rewards: [],
-    enterModal: [
-      {
-        id: 1,
-        background: '/backgrounds/lab.avif',
-        title: 'Koga',
-        icon: kogaIcon,
-        message:
-          'The Crystal test confirms that the second compound interferes with Pokémon energy, but it is still unidentified. The first compound—the Toxicroak toxin—is the immediate danger to people, and I need a fresh Chansey egg to make its antidote.',
-        buttons: [{ text: 'Where can I find one?', type: 'navigate', id: 2 }],
-      },
-      {
-        id: 2,
-        background: '/backgrounds/lab.avif',
-        title: 'Koga',
-        icon: kogaIcon,
-        message:
-          'Do not take one by force. Ask the Research Institute where the reserve Chansey gather, then earn the trust of one willing to help.',
-        buttons: [{ text: 'I’ll find out where to look', type: 'success' }],
-      },
-    ],
-    exitModal: {
-      background: '/backgrounds/lab.avif',
-      title: 'Koga',
-      icon: kogaIcon,
-      message: 'The Institute should know which reeds Chansey favour. Take the careful route, not the quick one.',
-      closeButtonText: 'Visit the Institute',
-    },
-  },
-  {
     id: 'fuchsia-research-institute-chansey-request',
     name: 'The Chansey Trail',
     description: 'The Institute knows where a gentle Chansey has been visiting the reserve.',
@@ -1429,7 +1385,7 @@ export const safariZoneTasks: Task[] = ([
     completeButtonText: 'Take the Field Notes',
     requirements: [
       { type: 'task_completed', targetId: 'fuchsia-research-institute-membership' },
-      { type: 'task_completed', targetId: 'fuchsia-koga-egg-request' },
+      { type: 'task_completed', targetId: 'fuchsia-koga-unknown-compound' },
     ],
     criteria: [],
     rewards: [],
@@ -1581,7 +1537,7 @@ export const safariZoneTasks: Task[] = ([
     rewards: [
       {
         type: 'item',
-        targetId: 'shadow-crystal-key',
+        targetId: 'shadow-crystal',
         quantity: 1,
         dropChance: 100,
         secret: true,
