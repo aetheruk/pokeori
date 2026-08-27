@@ -1,9 +1,8 @@
 # syntax=docker/dockerfile:1.7
 
-# Bun is the package manager, build runtime, and production runtime. Canary is
-# intentional while waiting for the node:v8 MongoDB compatibility fix to land
-# in a stable Bun release.
-FROM oven/bun:canary-alpine AS base
+# Bun is the package manager, build runtime, and production runtime. Keep the
+# image on the stable Bun 1.4 release line used by packageManager in package.json.
+FROM oven/bun:1.4-alpine AS base
 WORKDIR /app
 
 RUN apk add --no-cache libc6-compat
