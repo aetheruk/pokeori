@@ -29,6 +29,8 @@ import { useGameMusic } from '@/hooks/useGameMusic'
 import { usePageVisibility } from '@/hooks/usePageVisibility'
 import {
   clampSurfPlayerX,
+  getSurfCoursePosition,
+  getSurfEmergenceOpacity,
   getSurfObstacleInterval,
   moveSurfPlayerTowards,
   pickSurfObstacle,
@@ -44,7 +46,6 @@ import {
 const DESIGN_WIDTH = 390
 const DESIGN_HEIGHT = 844
 const SCORE_PER_SECOND = 10
-const HORIZON_Y = 0.17
 const PLAYER_Y = 0.79
 
 interface SurfGameProps {
@@ -65,15 +66,6 @@ interface ActiveCollectible {
   progress: number
   rewardKey: string
   reward: any
-}
-
-function getCoursePosition(x: number, progress: number) {
-  const perspective = 0.24 + Math.max(0, progress) * 0.76
-  return {
-    x: 0.5 + (x - 0.5) * perspective,
-    y: HORIZON_Y + progress * (1.05 - HORIZON_Y),
-    scale: 0.3 + Math.max(0, progress) * 0.82,
-  }
 }
 
 function hasRewardSummary(summary: any) {
@@ -398,7 +390,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
         height: normalizedPlayerHeight * 0.56,
       }
       const collision = nextObstacles.some((obstacle) => {
-        const position = getCoursePosition(obstacle.x, obstacle.progress)
+        const position = getSurfCoursePosition(obstacle.x, obstacle.progress)
         const collisionScale = obstacle.config.collisionScale || 0.7
         const width =
           (obstacle.config.width / DESIGN_WIDTH) *
@@ -422,7 +414,10 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
 
       const collectedIds = new Set<number>()
       for (const collectible of nextCollectibles) {
-        const position = getCoursePosition(collectible.x, collectible.progress)
+        const position = getSurfCoursePosition(
+          collectible.x,
+          collectible.progress,
+        )
         const size = (46 / DESIGN_WIDTH) * position.scale
         if (
           surfBoxesOverlap(playerBox, {
@@ -585,7 +580,8 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
         />
 
         {obstacles.map((obstacle) => {
-          const position = getCoursePosition(obstacle.x, obstacle.progress)
+          const position = getSurfCoursePosition(obstacle.x, obstacle.progress)
+          const emergenceOpacity = getSurfEmergenceOpacity(obstacle.progress)
           const width = obstacle.config.width * position.scale
           const height = obstacle.config.height * position.scale
           return (
@@ -597,24 +593,42 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
                 top: `${position.y * 100}%`,
                 width,
                 height,
+                opacity: emergenceOpacity,
+                filter: `blur(${(1 - emergenceOpacity) * 1.4}px) saturate(${0.82 + emergenceOpacity * 0.18})`,
               }}
             >
+              <div className="absolute inset-x-[14%] bottom-[8%] z-0 h-[18%] rounded-[50%] bg-[#073b49]/35 blur-[2px] mix-blend-multiply" />
               <Image
                 src={obstacle.config.sprite}
                 alt=""
                 fill
                 sizes={`${Math.ceil(width)}px`}
-                className="object-contain drop-shadow-[0_10px_9px_rgba(0,36,48,0.28)]"
+                className="z-10 object-contain drop-shadow-[0_10px_9px_rgba(0,36,48,0.28)]"
+              />
+              <div
+                aria-hidden
+                className="absolute inset-0 z-20 bg-[linear-gradient(to_top,rgba(189,247,250,0.34),rgba(157,231,239,0.1)_38%,transparent_66%)] mix-blend-screen"
+                style={{
+                  WebkitMaskImage: `url("${obstacle.config.sprite}")`,
+                  maskImage: `url("${obstacle.config.sprite}")`,
+                  WebkitMaskPosition: 'center',
+                  maskPosition: 'center',
+                  WebkitMaskRepeat: 'no-repeat',
+                  maskRepeat: 'no-repeat',
+                  WebkitMaskSize: 'contain',
+                  maskSize: 'contain',
+                }}
               />
             </div>
           )
         })}
 
         {collectibles.map((collectible) => {
-          const position = getCoursePosition(
+          const position = getSurfCoursePosition(
             collectible.x,
             collectible.progress,
           )
+          const emergenceOpacity = getSurfEmergenceOpacity(collectible.progress)
           const size = 46 * position.scale
           return (
             <div
@@ -625,12 +639,17 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
                 top: `${position.y * 100}%`,
                 width: size,
                 height: size,
+                opacity: emergenceOpacity,
+                filter: `blur(${(1 - emergenceOpacity) * 1.2}px) saturate(${0.86 + emergenceOpacity * 0.14})`,
               }}
             >
-              <EndlessCollectibleSprite
-                reward={collectible.reward}
-                size={size}
-              />
+              <div className="absolute inset-x-[12%] bottom-[-2%] h-[22%] rounded-[50%] bg-[#073b49]/30 blur-[2px] mix-blend-multiply" />
+              <div className="relative z-10 h-full w-full">
+                <EndlessCollectibleSprite
+                  reward={collectible.reward}
+                  size={size}
+                />
+              </div>
             </div>
           )
         })}

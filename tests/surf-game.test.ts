@@ -2,7 +2,9 @@ import { describe, expect, test } from 'bun:test'
 import type { SurfObstacleConfig } from '@/data/games/surf/types'
 import {
   clampSurfPlayerX,
+  getSurfCoursePosition,
   getSurfDifficultyMultiplier,
+  getSurfEmergenceOpacity,
   getSurfObstacleInterval,
   moveSurfPlayerTowards,
   pickSurfObstacle,
@@ -55,6 +57,23 @@ describe('Surf game mechanics', () => {
     const rolls = [0.5, 0, 1]
     let index = 0
     expect(pickSurfSpawnX([0.5], () => rolls[index++], 0.2)).toBe(0.13)
+  })
+
+  test('introduces course objects at the waterline with distant scale and fade', () => {
+    const horizon = getSurfCoursePosition(0.2, 0)
+    const emerged = getSurfCoursePosition(0.2, 0.16)
+    const nearPlayer = getSurfCoursePosition(0.2, 1)
+
+    expect(horizon.y).toBe(0.42)
+    expect(horizon.scale).toBe(0.12)
+    expect(horizon.x).toBeCloseTo(0.476)
+    expect(emerged.scale).toBeGreaterThan(horizon.scale)
+    expect(getSurfCoursePosition(0.5, 0.7).y).toBeCloseTo(0.791)
+    expect(nearPlayer.y).toBe(0.95)
+    expect(nearPlayer.scale).toBeCloseTo(1.12)
+    expect(getSurfEmergenceOpacity(0)).toBe(0.1)
+    expect(getSurfEmergenceOpacity(0.08)).toBeCloseTo(0.55)
+    expect(getSurfEmergenceOpacity(0.16)).toBe(1)
   })
 
   test('detects overlap without treating touching edges as collisions', () => {
