@@ -23,6 +23,12 @@ export interface SurfGameSettings {
   obstacles: SurfObstacleConfig[]
   scene: {
     backdrop: string
+    parallax?: {
+      islands: string
+      cloudsFar: string
+      cloudsNear: string
+      horizonY?: number
+    }
   }
   winScore?: number
   timeLimit?: number

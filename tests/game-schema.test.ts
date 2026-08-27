@@ -8,6 +8,7 @@ import {
   type MagnemiteCircuitTileType,
   type PachinkoGameConfig,
   type PrizeWheelGameConfig,
+  type SurfGameConfig,
   type VoltorbGridGameConfig,
   type VoltorbGridPosition,
   type VoltorbGridVoltorb,
@@ -400,6 +401,7 @@ describe('generated game data schemas', () => {
 
   test('Lapras Surf is registered as a configurable Kanto Test game', () => {
     const game = allGames.find((entry) => entry.id === 'lapras-surf-test')
+    const surfGame = game as SurfGameConfig | undefined
 
     expect(game?.gameType).toBe('surf')
     expect(game?.subCategory).toBe('Test')
@@ -407,6 +409,12 @@ describe('generated game data schemas', () => {
     expect(game?.settings.sprite).toBe('/games/surf/sprites/lapras-rear.png')
     expect(game?.settings.difficulty).toBe(4)
     expect(game?.settings.obstacles).toHaveLength(3)
+    expect(surfGame?.settings.scene.parallax).toEqual({
+      islands: '/games/surf/backgrounds/kanto-coast-islands.png',
+      cloudsFar: '/games/surf/backgrounds/kanto-coast-clouds-far.png',
+      cloudsNear: '/games/surf/backgrounds/kanto-coast-clouds-near.png',
+      horizonY: 0.28,
+    })
     expect(game?.settings.endless?.repeatingRewards).toContainEqual(
       expect.objectContaining({ random: true }),
     )

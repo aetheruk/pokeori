@@ -19,9 +19,7 @@ export function getSurfCoursePosition(x: number, progress: number) {
 
   return {
     x: 0.5 + (x - 0.5) * perspectiveSpread,
-    y:
-      SURF_WATERLINE_Y +
-      travelDepth * (SURF_COURSE_END_Y - SURF_WATERLINE_Y),
+    y: SURF_WATERLINE_Y + travelDepth * (SURF_COURSE_END_Y - SURF_WATERLINE_Y),
     scale: 0.12 + perspectiveDepth,
   }
 }
@@ -30,6 +28,36 @@ export function getSurfEmergenceOpacity(progress: number) {
   const emergence = Math.min(1, Math.max(0, progress / 0.16))
   const smoothed = emergence * emergence * (3 - 2 * emergence)
   return 0.1 + smoothed * 0.9
+}
+
+export interface SurfParallaxFrame {
+  phase: number
+  opacity: number
+}
+
+export function getSurfParallaxFrames(
+  distance: number,
+  cycleDistance: number,
+  fadeFraction = 0.14,
+): [SurfParallaxFrame, SurfParallaxFrame] {
+  const safeDistance = Math.max(0, distance)
+  const safeCycleDistance = Math.max(1, cycleDistance)
+  const cycle = Math.floor(safeDistance / safeCycleDistance)
+  const phase = (safeDistance % safeCycleDistance) / safeCycleDistance
+  const fadeProgress = Math.min(
+    1,
+    Math.max(0, phase / Math.max(0.01, fadeFraction)),
+  )
+  const smoothedFade = fadeProgress * fadeProgress * (3 - 2 * fadeProgress)
+  const isFirstCycle = cycle === 0
+
+  return [
+    { phase, opacity: isFirstCycle ? 1 : smoothedFade },
+    {
+      phase: phase + 1,
+      opacity: isFirstCycle ? 0 : 1 - smoothedFade,
+    },
+  ]
 }
 
 export function clampSurfPlayerX(x: number, playerWidth: number) {
