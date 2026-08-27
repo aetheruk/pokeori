@@ -116,6 +116,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
   const [obstacles, setObstacles] = useState<ActiveObstacle[]>([])
   const [collectibles, setCollectibles] = useState<ActiveCollectible[]>([])
   const [waterOffset, setWaterOffset] = useState(0)
+  const [spriteFramesFailed, setSpriteFramesFailed] = useState(false)
   const [result, setResult] = useState<any | null>(null)
 
   const settings = encounter.settings
@@ -157,6 +158,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
     setObstacles([])
     setCollectibles([])
     setWaterOffset(0)
+    setSpriteFramesFailed(false)
     setCountdown(3)
     setGameEnded(false)
     setResult(null)
@@ -769,7 +771,11 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
                 fill
                 priority
                 sizes={`${Math.ceil(playerWidth * 1.4)}px`}
-                className="object-contain drop-shadow-[0_10px_7px_rgba(1,35,47,0.42)]"
+                className={`object-contain drop-shadow-[0_10px_7px_rgba(1,35,47,0.42)] ${
+                  settings.spriteFrames?.length && !spriteFramesFailed
+                    ? 'hidden motion-reduce:block'
+                    : ''
+                }`}
               />
               {settings.spriteFrames?.map((frame, index) => (
                 <Image
@@ -779,8 +785,13 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
                   fill
                   loading="eager"
                   sizes={`${Math.ceil(playerWidth * 1.4)}px`}
+                  onError={() => setSpriteFramesFailed(true)}
                   className={`surf-player-frame object-contain drop-shadow-[0_10px_7px_rgba(1,35,47,0.42)] motion-reduce:hidden ${
-                    index === spriteFrameIndex ? 'opacity-100' : 'opacity-0'
+                    spriteFramesFailed
+                      ? 'hidden'
+                      : index === spriteFrameIndex
+                        ? 'opacity-100'
+                        : 'opacity-0'
                   }`}
                 />
               ))}
