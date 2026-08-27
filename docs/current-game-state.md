@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.18.0` adds a second Kanto Test Surf configuration, `Wooden Boat Surf Test`. It uses a new transparent, hand-painted rear-view wooden motorboat sprite and completes when the player reaches 800 points; the original Lapras course remains endless and unchanged. Shared Surf prompts, collision copy, accessible labels, and player animation names are vehicle-neutral so both configurations render naturally.
+
 - Release `0.17.5` removes a duplicate horizontal transform from Lapras Surf's animated soft wake. Tailwind's centring translation and the wake keyframes had stacked, moving the wake another half-width left even though it correctly followed Lapras. The wake retains its original shape and forward/back position, and the temporary backdrop veil from `0.17.4` is removed.
 
 - Release `0.17.3` anchors Lapras Surf's complete wake and spray composition to the same centred, steering-aware visual transform as Lapras, preventing the foam trail from appearing offset from the larger rendered sprite. Mirrored spray bursts now remain in phase.
