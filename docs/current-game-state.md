@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.18.6` makes Kanto Surf's cloud banks move as one calm weather system instead of oscillating in opposing directions. Their lateral drift is slower and their depth expansion is restrained across longer recycle cycles, removing the abrupt zooming and crossfade jumps while leaving the island/cliff approach unchanged.
+
 - Release `0.18.5` strengthens the Kanto Surf depth illusion for phone displays: the distant cliff layer now approaches more than twice as far per pass, both cloud depths expand substantially further, and cloud drift travels four times wider on shorter speed-linked cycles while remaining anchored to the sea horizon.
 - Release `0.18.4` rebuilds the Kanto Surf scene as speed-linked depth layers. A new open-sea clean plate sits beneath separately extracted high cloud, low cloud, and island/cliff artwork; clouds expand outward from the vanishing point at two rates, the horizon landforms grow subtly as the player advances, and crossfaded layer recycling is concealed by sea mist. The original complete `kanto-coast.avif` painting remains available as the activity-card and fallback background, while reduced-motion players receive the same recomposed scene without ambient transforms.
 
