@@ -4,6 +4,8 @@
 
 - Release `0.17.2` gives Lapras Surf's custom rear-view sprite a more readable buoyant bob and steering lean. Its wake uses soft, mirrored plumes without hard-edged cutoffs, the spray is diffused, and independently animated cloud banks make sky movement visible alongside the layered moving water. Decorative motion stops for reduced-motion players, and the original still sprite remains available as `lapras-rear-flat.png` for fallback.
 
+- Release `0.17.4` preserves Lapras Surf's soft diffused wake shape but now begins the foam and spray beneath the tail. A restrained water-tone veil separates the backdrop's fixed central sunlight reflection from the player-anchored trail when Lapras steers sideways. The persistent bottom steering hint is removed, and the leave control now uses the standard open-door icon at the top right.
+
 - Release `0.17.0` adds a portrait, full-screen mobile Lapras Surf Mini Game with drag-to-steer controls, desktop Arrow/A/D support, forward-perspective coastal hazards, configurable speed and difficulty, endless scoring, collectible prizes, milestones, and server-bounded score rewards. The initial replayable `Lapras Surf Test` activity is available under Kanto's Test sub-region with new hand-painted coastal, rock, reef, and buoy artwork.
 
 - Unreleased: Friendship berry candies now grant +2 friendship (down from +5), and Research Kits now grant 3 Pokémon Research XP (down from 5).
