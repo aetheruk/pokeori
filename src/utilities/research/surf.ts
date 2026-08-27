@@ -7,6 +7,27 @@ export interface SurfBox {
   height: number
 }
 
+export const SURF_WATERLINE_Y = 0.42
+const SURF_COURSE_END_Y = 0.95
+
+export function getSurfCoursePosition(x: number, progress: number) {
+  const depth = Math.max(0, progress)
+  const perspectiveDepth = depth ** 1.15
+  const perspectiveSpread = 0.08 + perspectiveDepth * 0.92
+
+  return {
+    x: 0.5 + (x - 0.5) * perspectiveSpread,
+    y: SURF_WATERLINE_Y + depth * (SURF_COURSE_END_Y - SURF_WATERLINE_Y),
+    scale: 0.12 + perspectiveDepth,
+  }
+}
+
+export function getSurfEmergenceOpacity(progress: number) {
+  const emergence = Math.min(1, Math.max(0, progress / 0.16))
+  const smoothed = emergence * emergence * (3 - 2 * emergence)
+  return 0.1 + smoothed * 0.9
+}
+
 export function clampSurfPlayerX(x: number, playerWidth: number) {
   const halfWidth = playerWidth / 2
   return Math.min(1 - halfWidth, Math.max(halfWidth, x))
