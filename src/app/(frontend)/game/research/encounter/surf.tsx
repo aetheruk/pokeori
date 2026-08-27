@@ -168,7 +168,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
   const initGame = useCallback(async () => {
     const response = await startGame(encounter.id)
     if (!response.success) {
-      setStartError(response.error || 'Unable to start Lapras Surf.')
+      setStartError(response.error || `Unable to start ${encounter.name}.`)
       return
     }
 
@@ -416,7 +416,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
         })
       })
       if (collision) {
-        void finishGame(false, 'Lapras hit an obstacle!')
+        void finishGame(false, 'You hit an obstacle!')
         return
       }
 
@@ -521,7 +521,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
       <div
         ref={stageRef}
         role="application"
-        aria-label="Lapras Surf. Drag horizontally or use the left and right arrow keys to steer."
+        aria-label={`${encounter.name}. Drag horizontally or use the left and right arrow keys to steer.`}
         className="relative mx-auto h-dvh w-full max-w-[520px] touch-none overflow-hidden bg-[#1d8da8] shadow-[0_0_60px_rgba(2,20,31,0.65)] select-none"
         onPointerDown={(event) => {
           event.currentTarget.setPointerCapture(event.pointerId)
@@ -663,7 +663,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
               transform: `translate(-50%, -50%) rotate(${steeringLean * 4}deg)`,
             }}
           >
-            <div className="surf-lapras-art relative h-full w-full">
+            <div className="surf-player-art relative h-full w-full">
               <Image
                 src={settings.sprite}
                 alt=""
@@ -697,7 +697,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
             type="button"
             size="icon"
             variant="ghost"
-            aria-label="Leave Lapras Surf"
+            aria-label={`Leave ${encounter.name}`}
             className="pointer-events-auto justify-self-end rounded-full border border-game-night-border/60 bg-game-night-surface/85 text-game-night-ink shadow-lg backdrop-blur-md transition-colors hover:bg-game-night-surface-raised hover:text-game-night-ink"
             onClick={() => router.push('/game/explore')}
           >
@@ -715,7 +715,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
               colorOverride="text-[#f0cc75]"
             />
             <p className="mt-5 rounded-lg border border-[#fff8e8]/25 bg-[#102f3a]/75 px-4 py-2 text-center text-sm font-semibold text-[#fff8e8] shadow-lg">
-              Drag side to side to steer Lapras
+              Drag side to side to steer
             </p>
           </div>
         ) : null}
@@ -757,7 +757,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
         />
       ) : null}
       <style>{`
-        @keyframes surf-lapras-bob {
+        @keyframes surf-player-bob {
           0%, 100% { transform: translateY(2px) rotate(-0.65deg) scaleY(0.992); }
           50% { transform: translateY(-6px) rotate(0.65deg) scaleY(1.014); }
         }
@@ -800,7 +800,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
         .surf-sky-drift-near { animation: surf-sky-drift-near 13s linear infinite alternate; }
         .surf-sky-drift-far { animation: surf-sky-drift-far 18s linear infinite alternate; }
         .surf-sky-glint { animation: surf-sky-glint 8s ease-in-out infinite; }
-        .surf-lapras-art { animation: surf-lapras-bob 1.18s ease-in-out infinite; transform-origin: 50% 58%; }
+        .surf-player-art { animation: surf-player-bob 1.18s ease-in-out infinite; transform-origin: 50% 58%; }
         .surf-wake-soft {
           animation: surf-wake-breathe 1.04s ease-in-out infinite;
           transform: translateX(-50%);
@@ -821,7 +821,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
         @media (prefers-reduced-motion: reduce) {
           .surf-sky-drift,
           .surf-sky-glint,
-          .surf-lapras-art,
+          .surf-player-art,
           .surf-wake-soft,
           .surf-wake-plume,
           .surf-spray-left,

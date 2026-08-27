@@ -422,6 +422,21 @@ describe('generated game data schemas', () => {
     expect(validateGameItem(invalidFrequency).success).toBe(false)
   })
 
+  test('Wooden Boat Surf is an 800-point finite Kanto Test course', () => {
+    const game = allGames.find((entry) => entry.id === 'wooden-boat-surf-test')
+
+    expect(game?.gameType).toBe('surf')
+    expect(game?.subCategory).toBe('Test')
+    expect(game?.icon).toEqual({ type: 'item', id: 'old-rod' })
+    expect(game?.settings.sprite).toBe(
+      '/games/surf/sprites/wooden-motorboat.png',
+    )
+    expect(game?.settings.winScore).toBe(800)
+    expect(game?.settings.timeLimit).toBe(120)
+    expect(game?.settings.endless).toBeUndefined()
+    expect(game?.settings.obstacles).toHaveLength(3)
+  })
+
   test('Art Academy has a configurable Test study entry', () => {
     const game = allGames.find((entry) => entry.id === 'art-academy-test')
     const settings = game?.settings as
