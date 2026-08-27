@@ -544,11 +544,6 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
 
         <div
           aria-hidden
-          className="absolute inset-x-0 bottom-0 top-[38%] bg-[radial-gradient(ellipse_at_50%_58%,rgba(14,126,151,0.2)_0%,rgba(10,112,138,0.1)_28%,transparent_58%)] mix-blend-multiply"
-        />
-
-        <div
-          aria-hidden
           className="absolute inset-x-0 top-[4%] h-[34%] overflow-hidden motion-reduce:hidden"
         >
           <div className="surf-sky-drift surf-sky-drift-near absolute left-[-38%] top-[5%] h-14 w-[92%] rounded-[50%] bg-white/32 blur-xl" />
@@ -656,11 +651,11 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
               transform: `translate(-50%, -50%) rotate(${steeringLean * 4}deg)`,
             }}
           >
-            <div className="surf-wake-soft absolute left-1/2 top-[68%] h-[112%] w-[118%] -translate-x-1/2 motion-reduce:opacity-60" />
-            <div className="surf-wake-plume surf-wake-plume-left absolute left-[15%] top-[72%] h-[116%] w-[42%] motion-reduce:opacity-40" />
-            <div className="surf-wake-plume surf-wake-plume-right absolute right-[15%] top-[72%] h-[116%] w-[42%] motion-reduce:opacity-40" />
-            <div className="surf-spray surf-spray-left absolute left-[8%] top-[67%] h-2.5 w-2.5 rounded-full bg-white/55 shadow-[16px_13px_5px_-2px_rgba(232,255,255,0.58),-7px_27px_6px_-3px_rgba(232,255,255,0.46)] blur-[1px] motion-reduce:hidden" />
-            <div className="surf-spray surf-spray-right absolute right-[8%] top-[67%] h-2.5 w-2.5 rounded-full bg-white/55 shadow-[-16px_13px_5px_-2px_rgba(232,255,255,0.58),7px_27px_6px_-3px_rgba(232,255,255,0.46)] blur-[1px] motion-reduce:hidden" />
+            <div className="surf-wake-soft absolute left-1/2 top-[43%] h-[112%] w-[118%] motion-reduce:opacity-60" />
+            <div className="surf-wake-plume surf-wake-plume-left absolute left-[15%] top-[62%] h-[116%] w-[42%] motion-reduce:opacity-40" />
+            <div className="surf-wake-plume surf-wake-plume-right absolute right-[15%] top-[62%] h-[116%] w-[42%] motion-reduce:opacity-40" />
+            <div className="surf-spray surf-spray-left absolute left-[8%] top-[57%] h-2.5 w-2.5 rounded-full bg-white/55 shadow-[16px_13px_5px_-2px_rgba(232,255,255,0.58),-7px_27px_6px_-3px_rgba(232,255,255,0.46)] blur-[1px] motion-reduce:hidden" />
+            <div className="surf-spray surf-spray-right absolute right-[8%] top-[57%] h-2.5 w-2.5 rounded-full bg-white/55 shadow-[-16px_13px_5px_-2px_rgba(232,255,255,0.58),7px_27px_6px_-3px_rgba(232,255,255,0.46)] blur-[1px] motion-reduce:hidden" />
           </div>
           <div
             className="absolute left-1/2 top-1/2 h-[166%] w-[138%]"
@@ -808,6 +803,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
         .surf-lapras-art { animation: surf-lapras-bob 1.18s ease-in-out infinite; transform-origin: 50% 58%; }
         .surf-wake-soft {
           animation: surf-wake-breathe 1.04s ease-in-out infinite;
+          transform: translateX(-50%);
           background:
             radial-gradient(ellipse at 50% 8%, transparent 0 4%, rgba(247,255,255,0.78) 15%, rgba(199,244,248,0.38) 34%, rgba(122,218,231,0.12) 56%, transparent 76%),
             radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.38), rgba(190,241,247,0.12) 48%, transparent 72%);
