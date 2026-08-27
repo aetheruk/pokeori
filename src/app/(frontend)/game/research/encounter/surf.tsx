@@ -48,6 +48,8 @@ const DESIGN_WIDTH = 390
 const DESIGN_HEIGHT = 844
 const SCORE_PER_SECOND = 10
 const PLAYER_Y = 0.79
+const WATER_DEPTH_CYCLE_DISTANCE = 1600
+const WATER_DEPTH_SCALE_TRAVEL = 0.16
 
 interface SurfGameProps {
   encounter: SurfGameConfig
@@ -498,7 +500,11 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
   const waterSway = Math.sin(scenePhase * 3) * 10
   const parallax = settings.scene.parallax
   const horizonY = parallax?.horizonY ?? 0.28
-  const waterDepthFrames = getSurfParallaxFrames(waterOffset, 3200, 0.22)
+  const waterDepthFrames = getSurfParallaxFrames(
+    waterOffset,
+    WATER_DEPTH_CYCLE_DISTANCE,
+    0.18,
+  )
   const islandFrames = getSurfParallaxFrames(waterOffset, 3000)
   const farCloudFrames = getSurfParallaxFrames(waterOffset, 5200)
   const nearCloudFrames = getSurfParallaxFrames(waterOffset, 4200)
@@ -558,7 +564,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
                 className={`surf-parallax-layer absolute inset-0 ${index === 1 ? 'surf-parallax-previous' : ''}`}
                 style={{
                   opacity: frame.opacity,
-                  transform: `scale(${1 + frame.phase * 0.075})`,
+                  transform: `scale(${1 + frame.phase * WATER_DEPTH_SCALE_TRAVEL})`,
                   transformOrigin: `50% ${horizonY * 100}%`,
                 }}
               >
