@@ -160,8 +160,8 @@ describe('Surf wake layout', () => {
   })
 })
 
-describe('Surf water depth layout', () => {
-  test('clips moving painted water to the horizon', async () => {
+describe('Surf painted water layout', () => {
+  test('keeps the painted water static without a crossfading duplicate', async () => {
     const componentSource = await Bun.file(
       new URL(
         '../src/app/(frontend)/game/research/encounter/surf.tsx',
@@ -169,14 +169,8 @@ describe('Surf water depth layout', () => {
       ),
     ).text()
 
-    expect(componentSource).toContain('WATER_DEPTH_CYCLE_DISTANCE = 1600')
-    expect(componentSource).toContain('WATER_DEPTH_SCALE_TRAVEL = 0.16')
-    expect(componentSource).toContain('WATER_DEPTH_CYCLE_DISTANCE,')
-    expect(componentSource).toContain('clipPath: `inset(')
-    expect(componentSource).toContain('horizonY * 100')
-    expect(componentSource).toContain('key={`water-depth-')
-    expect(componentSource).toContain(
-      'frame.phase * WATER_DEPTH_SCALE_TRAVEL',
-    )
+    expect(componentSource).not.toContain('WATER_DEPTH_CYCLE_DISTANCE')
+    expect(componentSource).not.toContain('WATER_DEPTH_SCALE_TRAVEL')
+    expect(componentSource).not.toContain('key={`water-depth-')
   })
 })
