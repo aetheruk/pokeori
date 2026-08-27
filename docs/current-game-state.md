@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.17.3` anchors Lapras Surf's complete wake and spray composition to the same centred, steering-aware visual transform as Lapras, preventing the foam trail from appearing offset from the larger rendered sprite. Mirrored spray bursts now remain in phase.
+
 - Release `0.17.2` gives Lapras Surf's custom rear-view sprite a more readable buoyant bob and steering lean. Its wake uses soft, mirrored plumes without hard-edged cutoffs, the spray is diffused, and independently animated cloud banks make sky movement visible alongside the layered moving water. Decorative motion stops for reduced-motion players, and the original still sprite remains available as `lapras-rear-flat.png` for fallback.
 
 - Release `0.17.0` adds a portrait, full-screen mobile Lapras Surf Mini Game with drag-to-steer controls, desktop Arrow/A/D support, forward-perspective coastal hazards, configurable speed and difficulty, endless scoring, collectible prizes, milestones, and server-bounded score rewards. The initial replayable `Lapras Surf Test` activity is available under Kanto's Test sub-region with new hand-painted coastal, rock, reef, and buoy artwork.

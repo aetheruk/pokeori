@@ -645,11 +645,18 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
             height: playerHeight,
           }}
         >
-          <div className="surf-wake-soft absolute left-1/2 top-[40%] h-[184%] w-[154%] -translate-x-1/2 motion-reduce:opacity-60" />
-          <div className="surf-wake-plume surf-wake-plume-left absolute left-[12%] top-[72%] h-[190%] w-[48%] motion-reduce:opacity-40" />
-          <div className="surf-wake-plume surf-wake-plume-right absolute right-[12%] top-[72%] h-[190%] w-[48%] motion-reduce:opacity-40" />
-          <div className="surf-spray surf-spray-left absolute left-[5%] top-[67%] h-2.5 w-2.5 rounded-full bg-white/55 shadow-[16px_13px_5px_-2px_rgba(232,255,255,0.58),-7px_27px_6px_-3px_rgba(232,255,255,0.46)] blur-[1px] motion-reduce:hidden" />
-          <div className="surf-spray surf-spray-right absolute right-[5%] top-[67%] h-2.5 w-2.5 rounded-full bg-white/55 shadow-[-16px_13px_5px_-2px_rgba(232,255,255,0.58),7px_27px_6px_-3px_rgba(232,255,255,0.46)] blur-[1px] motion-reduce:hidden" />
+          <div
+            className="absolute left-1/2 top-1/2 h-[166%] w-[138%]"
+            style={{
+              transform: `translate(-50%, -50%) rotate(${steeringLean * 4}deg)`,
+            }}
+          >
+            <div className="surf-wake-soft absolute left-1/2 top-[43%] h-[112%] w-[118%] -translate-x-1/2 motion-reduce:opacity-60" />
+            <div className="surf-wake-plume surf-wake-plume-left absolute left-[15%] top-[62%] h-[116%] w-[42%] motion-reduce:opacity-40" />
+            <div className="surf-wake-plume surf-wake-plume-right absolute right-[15%] top-[62%] h-[116%] w-[42%] motion-reduce:opacity-40" />
+            <div className="surf-spray surf-spray-left absolute left-[8%] top-[57%] h-2.5 w-2.5 rounded-full bg-white/55 shadow-[16px_13px_5px_-2px_rgba(232,255,255,0.58),-7px_27px_6px_-3px_rgba(232,255,255,0.46)] blur-[1px] motion-reduce:hidden" />
+            <div className="surf-spray surf-spray-right absolute right-[8%] top-[57%] h-2.5 w-2.5 rounded-full bg-white/55 shadow-[-16px_13px_5px_-2px_rgba(232,255,255,0.58),7px_27px_6px_-3px_rgba(232,255,255,0.46)] blur-[1px] motion-reduce:hidden" />
+          </div>
           <div
             className="absolute left-1/2 top-1/2 h-[166%] w-[138%]"
             style={{
@@ -815,7 +822,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
         .surf-wake-plume-left { animation: surf-plume-left 0.86s ease-in-out infinite; }
         .surf-wake-plume-right { animation: surf-plume-right 0.86s ease-in-out infinite; }
         .surf-spray-left { animation: surf-spray-left 1.05s ease-out infinite; }
-        .surf-spray-right { animation: surf-spray-right 1.05s 0.28s ease-out infinite; }
+        .surf-spray-right { animation: surf-spray-right 1.05s ease-out infinite; }
         @media (prefers-reduced-motion: reduce) {
           .surf-sky-drift,
           .surf-sky-glint,
