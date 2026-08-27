@@ -32,6 +32,7 @@ import {
   getSurfCoursePosition,
   getSurfEmergenceOpacity,
   getSurfObstacleInterval,
+  getSurfParallaxFrames,
   moveSurfPlayerTowards,
   pickSurfObstacle,
   pickSurfSpawnX,
@@ -453,9 +454,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
       setScore(nextScore)
       setObstacles(nextObstacles)
       setCollectibles(nextCollectibles)
-      setWaterOffset(
-        (current) => (current + speedRef.current * deltaSeconds) % 2400,
-      )
+      setWaterOffset((current) => current + speedRef.current * deltaSeconds)
       animationFrameRef.current = requestAnimationFrame(gameLoop)
     }
 
@@ -494,8 +493,15 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
     else router.push('/game/explore')
   }
 
-  const scenePhase = (waterOffset / 2400) * Math.PI * 2
+  const waterMotionOffset = waterOffset % 2400
+  const scenePhase = (waterMotionOffset / 2400) * Math.PI * 2
   const waterSway = Math.sin(scenePhase * 3) * 10
+  const parallax = settings.scene.parallax
+  const horizonY = parallax?.horizonY ?? 0.28
+  const islandFrames = getSurfParallaxFrames(waterOffset, 5200)
+  const farCloudFrames = getSurfParallaxFrames(waterOffset, 4600)
+  const nearCloudFrames = getSurfParallaxFrames(waterOffset, 3200)
+  const cloudDrift = Math.sin(waterOffset / 680) * 0.8
   const steeringLean = Math.max(
     -1,
     Math.min(1, (targetXRef.current - playerX) * 7),
@@ -504,7 +510,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
   return (
     <main className="game-night relative flex h-dvh min-h-0 w-full overflow-hidden bg-game-night-canvas text-game-night-ink">
       <Image
-        src={settings.scene.backdrop}
+        src={encounter.background || settings.scene.backdrop}
         alt=""
         fill
         priority
@@ -537,14 +543,84 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
           className="object-cover"
         />
 
-        <div
-          aria-hidden
-          className="absolute inset-x-0 top-[4%] h-[34%] overflow-hidden motion-reduce:hidden"
-        >
-          <div className="surf-sky-drift surf-sky-drift-near absolute left-[-38%] top-[5%] h-14 w-[92%] rounded-[50%] bg-white/32 blur-xl" />
-          <div className="surf-sky-drift surf-sky-drift-far absolute right-[-42%] top-[45%] h-10 w-[80%] rounded-[50%] bg-[#e5faf5]/28 blur-lg" />
-          <div className="surf-sky-glint absolute left-[-18%] top-[24%] h-20 w-[136%] bg-[linear-gradient(105deg,transparent_22%,rgba(255,249,218,0.16)_43%,transparent_61%)] blur-xl" />
-        </div>
+        {parallax ? (
+          <div aria-hidden className="pointer-events-none absolute inset-0">
+            {farCloudFrames.map((frame, index) => (
+              <div
+                key={`far-cloud-${index}`}
+                className={`surf-parallax-layer absolute inset-0 ${index === 1 ? 'surf-parallax-previous' : ''}`}
+                style={{
+                  opacity: frame.opacity,
+                  transform: `translate3d(${cloudDrift}%, 0, 0) scale(${1 + frame.phase * 0.08})`,
+                  transformOrigin: `50% ${horizonY * 100}%`,
+                }}
+              >
+                <Image
+                  src={parallax.cloudsFar}
+                  alt=""
+                  fill
+                  priority
+                  sizes="(max-width: 520px) 100vw, 520px"
+                  className="object-cover"
+                />
+              </div>
+            ))}
+
+            <div
+              className="absolute inset-x-0 top-0 overflow-hidden"
+              style={{ height: `${horizonY * 100}%` }}
+            >
+              {nearCloudFrames.map((frame, index) => (
+                <div
+                  key={`near-cloud-${index}`}
+                  className={`surf-parallax-layer absolute inset-0 ${index === 1 ? 'surf-parallax-previous' : ''}`}
+                  style={{
+                    opacity: frame.opacity,
+                    transform: `translate3d(${-cloudDrift * 0.55}%, 0, 0) scale(${1 + frame.phase * 0.14})`,
+                    transformOrigin: '50% 100%',
+                  }}
+                >
+                  <div className="absolute inset-x-0 top-[-35%] h-[351%]">
+                    <Image
+                      src={parallax.cloudsNear}
+                      alt=""
+                      fill
+                      priority
+                      sizes="(max-width: 520px) 100vw, 520px"
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {islandFrames.map((frame, index) => (
+              <div
+                key={`islands-${index}`}
+                className={`surf-parallax-layer absolute inset-0 ${index === 1 ? 'surf-parallax-previous' : ''}`}
+                style={{
+                  opacity: frame.opacity,
+                  transform: `scale(${1 + frame.phase * 0.09})`,
+                  transformOrigin: `50% ${horizonY * 100}%`,
+                }}
+              >
+                <Image
+                  src={parallax.islands}
+                  alt=""
+                  fill
+                  priority
+                  sizes="(max-width: 520px) 100vw, 520px"
+                  className="object-cover"
+                />
+              </div>
+            ))}
+
+            <div
+              className="absolute inset-x-[-8%] h-[5%] bg-[linear-gradient(to_bottom,transparent,rgba(228,251,250,0.34)_48%,transparent)] blur-[3px] mix-blend-screen"
+              style={{ top: `${(horizonY - 0.022) * 100}%` }}
+            />
+          </div>
+        ) : null}
 
         <div
           aria-hidden
@@ -552,7 +628,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
           style={{
             backgroundImage:
               'repeating-linear-gradient(176deg, transparent 0 34px, rgba(255,255,255,0.3) 36px, transparent 40px 68px)',
-            backgroundPosition: `center ${waterOffset}px`,
+            backgroundPosition: `center ${waterMotionOffset}px`,
           }}
         />
         <div
@@ -561,7 +637,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
           style={{
             backgroundImage:
               'radial-gradient(ellipse at 50% 0%, transparent 0 30%, rgba(219,252,255,0.3) 32%, transparent 36%), repeating-linear-gradient(4deg, transparent 0 44px, rgba(202,248,250,0.2) 46px, transparent 50px 82px)',
-            backgroundPosition: `${waterSway}px ${waterOffset * 0.68}px`,
+            backgroundPosition: `${waterSway}px ${waterMotionOffset * 0.68}px`,
             backgroundSize: '150% 118px, 112% 132px',
           }}
         />
@@ -571,7 +647,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
           style={{
             backgroundImage:
               'repeating-radial-gradient(ellipse at center top, transparent 0 29px, rgba(238,255,255,0.27) 31px, transparent 35px 65px)',
-            backgroundPosition: `${-waterSway}px ${waterOffset * 1.12}px`,
+            backgroundPosition: `${-waterSway}px ${waterMotionOffset * 1.12}px`,
           }}
         />
         <div
@@ -780,20 +856,6 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
           0%, 100% { transform: translateY(2px) rotate(-0.65deg) scaleY(0.992); }
           50% { transform: translateY(-6px) rotate(0.65deg) scaleY(1.014); }
         }
-        @keyframes surf-sky-drift-near {
-          0% { transform: translateX(-8%); opacity: 0.24; }
-          45% { opacity: 0.58; }
-          100% { transform: translateX(78%); opacity: 0.28; }
-        }
-        @keyframes surf-sky-drift-far {
-          0% { transform: translateX(12%); opacity: 0.2; }
-          50% { opacity: 0.48; }
-          100% { transform: translateX(-84%); opacity: 0.22; }
-        }
-        @keyframes surf-sky-glint {
-          0%, 100% { transform: translateX(-12%); opacity: 0.25; }
-          50% { transform: translateX(12%); opacity: 0.7; }
-        }
         @keyframes surf-wake-breathe {
           0%, 100% { transform: translateX(-50%) scale(0.94, 0.97); opacity: 0.62; }
           50% { transform: translateX(-50%) scale(1.05, 1.03); opacity: 0.86; }
@@ -816,9 +878,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
           35% { opacity: 0.9; }
           100% { transform: translate(18px, 34px) scale(1.1); opacity: 0; }
         }
-        .surf-sky-drift-near { animation: surf-sky-drift-near 13s linear infinite alternate; }
-        .surf-sky-drift-far { animation: surf-sky-drift-far 18s linear infinite alternate; }
-        .surf-sky-glint { animation: surf-sky-glint 8s ease-in-out infinite; }
+        .surf-parallax-layer { will-change: transform, opacity; }
         .surf-player-art { animation: surf-player-bob 1.18s ease-in-out infinite; transform-origin: 50% 58%; }
         .surf-wake-soft {
           animation: surf-wake-breathe 1.04s ease-in-out infinite;
@@ -838,13 +898,14 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
         .surf-spray-left { animation: surf-spray-left 1.05s ease-out infinite; }
         .surf-spray-right { animation: surf-spray-right 1.05s ease-out infinite; }
         @media (prefers-reduced-motion: reduce) {
-          .surf-sky-drift,
-          .surf-sky-glint,
+          .surf-parallax-layer,
           .surf-player-art,
           .surf-wake-soft,
           .surf-wake-plume,
           .surf-spray-left,
           .surf-spray-right { animation: none; }
+          .surf-parallax-layer { transform: none !important; opacity: 1 !important; }
+          .surf-parallax-previous { display: none; }
         }
       `}</style>
     </main>

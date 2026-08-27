@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test'
+import sharp from 'sharp'
 import type { SurfObstacleConfig } from '@/data/games/surf/types'
 import {
   clampSurfPlayerX,
@@ -6,6 +7,7 @@ import {
   getSurfDifficultyMultiplier,
   getSurfEmergenceOpacity,
   getSurfObstacleInterval,
+  getSurfParallaxFrames,
   moveSurfPlayerTowards,
   pickSurfObstacle,
   pickSurfSpawnX,
@@ -80,13 +82,26 @@ describe('Surf game mechanics', () => {
     const positions = [0, 0.25, 0.5, 0.75, 1].map(
       (progress) => getSurfCoursePosition(0.5, progress).y,
     )
-    const travelSteps = positions.slice(1).map((position, index) =>
-      position - positions[index],
-    )
+    const travelSteps = positions
+      .slice(1)
+      .map((position, index) => position - positions[index])
 
     expect(travelSteps[1]).toBeGreaterThan(travelSteps[0])
     expect(travelSteps[2]).toBeGreaterThan(travelSteps[1])
     expect(travelSteps[3]).toBeGreaterThan(travelSteps[2])
+  })
+
+  test('crossfades looping scenery without resetting the first frame', () => {
+    expect(getSurfParallaxFrames(0, 1000)).toEqual([
+      { phase: 0, opacity: 1 },
+      { phase: 1, opacity: 0 },
+    ])
+
+    const [newFrame, previousFrame] = getSurfParallaxFrames(1050, 1000, 0.1)
+    expect(newFrame.phase).toBeCloseTo(0.05)
+    expect(previousFrame.phase).toBeCloseTo(1.05)
+    expect(newFrame.opacity).toBeCloseTo(0.5)
+    expect(previousFrame.opacity).toBeCloseTo(0.5)
   })
 
   test('detects overlap without treating touching edges as collisions', () => {
@@ -97,6 +112,33 @@ describe('Surf game mechanics', () => {
     expect(
       surfBoxesOverlap(player, { x: 0.61, y: 0.7, width: 0.1, height: 0.1 }),
     ).toBe(false)
+  })
+
+  test('uses full-size transparent scenery layers over the open-sea plate', async () => {
+    const backgroundDirectory = 'public/games/surf/backgrounds'
+    const base = await sharp(
+      `${backgroundDirectory}/kanto-coast-open-sea.avif`,
+    ).metadata()
+
+    expect(base.width).toBe(1024)
+    expect(base.height).toBe(1536)
+
+    for (const filename of [
+      'kanto-coast-islands.png',
+      'kanto-coast-clouds-far.png',
+      'kanto-coast-clouds-near.png',
+    ]) {
+      const asset = sharp(`${backgroundDirectory}/${filename}`)
+      const metadata = await asset.metadata()
+      const stats = await asset.stats()
+      const alpha = stats.channels[3]
+
+      expect(metadata.width, filename).toBe(1024)
+      expect(metadata.height, filename).toBe(1536)
+      expect(metadata.hasAlpha, filename).toBe(true)
+      expect(alpha?.min, filename).toBe(0)
+      expect(alpha?.max, filename).toBeGreaterThanOrEqual(200)
+    }
   })
 })
 

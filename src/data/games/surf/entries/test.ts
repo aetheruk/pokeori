@@ -26,6 +26,16 @@ const kantoCoastObstacles: SurfObstacleConfig[] = [
   },
 ]
 
+const kantoCoastScene = {
+  backdrop: '/games/surf/backgrounds/kanto-coast-open-sea.avif',
+  parallax: {
+    islands: '/games/surf/backgrounds/kanto-coast-islands.png',
+    cloudsFar: '/games/surf/backgrounds/kanto-coast-clouds-far.png',
+    cloudsNear: '/games/surf/backgrounds/kanto-coast-clouds-near.png',
+    horizonY: 0.28,
+  },
+}
+
 export const testSurfEntries: SurfGameConfig[] = [
   {
     id: 'lapras-surf-test',
@@ -50,9 +60,7 @@ export const testSurfEntries: SurfGameConfig[] = [
       playerHeight: 104,
       obstacleFrequency: { min: 0.9, max: 1.45 },
       obstacles: kantoCoastObstacles,
-      scene: {
-        backdrop: '/games/surf/backgrounds/kanto-coast.avif',
-      },
+      scene: kantoCoastScene,
       endless: {
         enabled: true,
         repeatingRewards: [
@@ -124,9 +132,7 @@ export const testSurfEntries: SurfGameConfig[] = [
       playerHeight: 112,
       obstacleFrequency: { min: 0.9, max: 1.45 },
       obstacles: kantoCoastObstacles,
-      scene: {
-        backdrop: '/games/surf/backgrounds/kanto-coast.avif',
-      },
+      scene: kantoCoastScene,
       winScore: 800,
       timeLimit: 120,
     },

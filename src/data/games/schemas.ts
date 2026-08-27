@@ -683,7 +683,20 @@ const settingsByGameType: Record<string, z.ZodTypeAny> = {
             .strict(),
         )
         .min(1),
-      scene: z.object({ backdrop: z.string().min(1) }).strict(),
+      scene: z
+        .object({
+          backdrop: z.string().min(1),
+          parallax: z
+            .object({
+              islands: z.string().min(1),
+              cloudsFar: z.string().min(1),
+              cloudsNear: z.string().min(1),
+              horizonY: z.number().min(0.1).max(0.5).optional(),
+            })
+            .strict()
+            .optional(),
+        })
+        .strict(),
     })
     .passthrough()
     .refine(
