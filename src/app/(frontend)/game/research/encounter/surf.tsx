@@ -500,7 +500,6 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
   }
 
   const scenePhase = (waterOffset / 2400) * Math.PI * 2
-  const skyDrift = Math.sin(scenePhase) * 18
   const waterSway = Math.sin(scenePhase * 3) * 10
   const steeringLean = Math.max(
     -1,
@@ -545,16 +544,11 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
 
         <div
           aria-hidden
-          className="absolute inset-x-0 top-[7%] h-[28%] overflow-hidden opacity-55 motion-reduce:hidden"
+          className="absolute inset-x-0 top-[4%] h-[34%] overflow-hidden motion-reduce:hidden"
         >
-          <div
-            className="absolute left-[-20%] top-[8%] h-12 w-[82%] rounded-[50%] bg-white/24 blur-2xl"
-            style={{ transform: `translateX(${skyDrift}px)` }}
-          />
-          <div
-            className="absolute right-[-24%] top-[42%] h-9 w-[74%] rounded-[50%] bg-[#d7f4ef]/20 blur-xl"
-            style={{ transform: `translateX(${-skyDrift * 0.72}px)` }}
-          />
+          <div className="surf-sky-drift surf-sky-drift-near absolute left-[-38%] top-[5%] h-14 w-[92%] rounded-[50%] bg-white/32 blur-xl" />
+          <div className="surf-sky-drift surf-sky-drift-far absolute right-[-42%] top-[45%] h-10 w-[80%] rounded-[50%] bg-[#e5faf5]/28 blur-lg" />
+          <div className="surf-sky-glint absolute left-[-18%] top-[24%] h-20 w-[136%] bg-[linear-gradient(105deg,transparent_22%,rgba(255,249,218,0.16)_43%,transparent_61%)] blur-xl" />
         </div>
 
         <div
@@ -651,10 +645,11 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
             height: playerHeight,
           }}
         >
-          <div className="surf-wake absolute left-1/2 top-[50%] h-[164%] w-[122%] -translate-x-1/2 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.92),rgba(191,242,248,0.42)_29%,rgba(125,224,237,0.16)_50%,transparent_72%)] blur-[2px] motion-reduce:opacity-65" />
-          <div className="surf-wake-trail absolute left-1/2 top-[68%] h-[156%] w-[92%] -translate-x-1/2 bg-[linear-gradient(to_bottom,rgba(242,255,255,0.76),rgba(177,239,246,0.3)_44%,transparent_100%)] opacity-80 blur-[2px] [clip-path:polygon(38%_0,62%_0,96%_100%,4%_100%)] motion-reduce:opacity-55" />
-          <div className="surf-spray surf-spray-left absolute left-[3%] top-[68%] h-3 w-3 rounded-full border border-white/55 bg-white/70 shadow-[18px_14px_0_-3px_rgba(232,255,255,0.72),-8px_24px_0_-4px_rgba(232,255,255,0.62)] motion-reduce:hidden" />
-          <div className="surf-spray surf-spray-right absolute right-[3%] top-[68%] h-3 w-3 rounded-full border border-white/55 bg-white/70 shadow-[-18px_14px_0_-3px_rgba(232,255,255,0.72),8px_24px_0_-4px_rgba(232,255,255,0.62)] motion-reduce:hidden" />
+          <div className="surf-wake-soft absolute left-1/2 top-[40%] h-[184%] w-[154%] -translate-x-1/2 motion-reduce:opacity-60" />
+          <div className="surf-wake-plume surf-wake-plume-left absolute left-[12%] top-[72%] h-[190%] w-[48%] motion-reduce:opacity-40" />
+          <div className="surf-wake-plume surf-wake-plume-right absolute right-[12%] top-[72%] h-[190%] w-[48%] motion-reduce:opacity-40" />
+          <div className="surf-spray surf-spray-left absolute left-[5%] top-[67%] h-2.5 w-2.5 rounded-full bg-white/55 shadow-[16px_13px_5px_-2px_rgba(232,255,255,0.58),-7px_27px_6px_-3px_rgba(232,255,255,0.46)] blur-[1px] motion-reduce:hidden" />
+          <div className="surf-spray surf-spray-right absolute right-[5%] top-[67%] h-2.5 w-2.5 rounded-full bg-white/55 shadow-[-16px_13px_5px_-2px_rgba(232,255,255,0.58),7px_27px_6px_-3px_rgba(232,255,255,0.46)] blur-[1px] motion-reduce:hidden" />
           <div
             className="absolute left-1/2 top-1/2 h-[166%] w-[138%]"
             style={{
@@ -762,16 +757,34 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
       ) : null}
       <style>{`
         @keyframes surf-lapras-bob {
-          0%, 100% { transform: translateY(0) scaleY(1); }
-          50% { transform: translateY(-3px) scaleY(1.012); }
+          0%, 100% { transform: translateY(2px) rotate(-0.65deg) scaleY(0.992); }
+          50% { transform: translateY(-6px) rotate(0.65deg) scaleY(1.014); }
+        }
+        @keyframes surf-sky-drift-near {
+          0% { transform: translateX(-8%); opacity: 0.24; }
+          45% { opacity: 0.58; }
+          100% { transform: translateX(78%); opacity: 0.28; }
+        }
+        @keyframes surf-sky-drift-far {
+          0% { transform: translateX(12%); opacity: 0.2; }
+          50% { opacity: 0.48; }
+          100% { transform: translateX(-84%); opacity: 0.22; }
+        }
+        @keyframes surf-sky-glint {
+          0%, 100% { transform: translateX(-12%); opacity: 0.25; }
+          50% { transform: translateX(12%); opacity: 0.7; }
         }
         @keyframes surf-wake-breathe {
-          0%, 100% { transform: translateX(-50%) scaleX(0.92); opacity: 0.72; }
-          50% { transform: translateX(-50%) scaleX(1.08); opacity: 0.96; }
+          0%, 100% { transform: translateX(-50%) scale(0.94, 0.97); opacity: 0.62; }
+          50% { transform: translateX(-50%) scale(1.05, 1.03); opacity: 0.86; }
         }
-        @keyframes surf-trail-rush {
-          0%, 100% { transform: translateX(-50%) scaleY(0.94); opacity: 0.62; }
-          50% { transform: translateX(-50%) scaleY(1.08); opacity: 0.88; }
+        @keyframes surf-plume-left {
+          0%, 100% { transform: rotate(9deg) scaleX(0.86); opacity: 0.42; }
+          50% { transform: rotate(12deg) scaleX(1.08); opacity: 0.68; }
+        }
+        @keyframes surf-plume-right {
+          0%, 100% { transform: rotate(-9deg) scaleX(0.86); opacity: 0.42; }
+          50% { transform: rotate(-12deg) scaleX(1.08); opacity: 0.68; }
         }
         @keyframes surf-spray-left {
           0% { transform: translate(10px, 4px) scale(0.55); opacity: 0; }
@@ -783,15 +796,32 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
           35% { opacity: 0.9; }
           100% { transform: translate(18px, 34px) scale(1.1); opacity: 0; }
         }
-        .surf-lapras-art { animation: surf-lapras-bob 1.05s ease-in-out infinite; }
-        .surf-wake { animation: surf-wake-breathe 0.82s ease-in-out infinite; }
-        .surf-wake-trail { animation: surf-trail-rush 0.72s ease-in-out infinite; }
-        .surf-spray-left { animation: surf-spray-left 0.9s ease-out infinite; }
-        .surf-spray-right { animation: surf-spray-right 0.9s 0.24s ease-out infinite; }
+        .surf-sky-drift-near { animation: surf-sky-drift-near 13s linear infinite alternate; }
+        .surf-sky-drift-far { animation: surf-sky-drift-far 18s linear infinite alternate; }
+        .surf-sky-glint { animation: surf-sky-glint 8s ease-in-out infinite; }
+        .surf-lapras-art { animation: surf-lapras-bob 1.18s ease-in-out infinite; transform-origin: 50% 58%; }
+        .surf-wake-soft {
+          animation: surf-wake-breathe 1.04s ease-in-out infinite;
+          background:
+            radial-gradient(ellipse at 50% 8%, transparent 0 4%, rgba(247,255,255,0.78) 15%, rgba(199,244,248,0.38) 34%, rgba(122,218,231,0.12) 56%, transparent 76%),
+            radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.38), rgba(190,241,247,0.12) 48%, transparent 72%);
+          filter: blur(7px);
+        }
+        .surf-wake-plume {
+          background: radial-gradient(ellipse at 50% 8%, transparent 0 3%, rgba(241,255,255,0.52) 14%, rgba(181,237,245,0.2) 35%, rgba(121,213,227,0.07) 58%, transparent 76%);
+          filter: blur(9px);
+          transform-origin: 50% 5%;
+        }
+        .surf-wake-plume-left { animation: surf-plume-left 0.86s ease-in-out infinite; }
+        .surf-wake-plume-right { animation: surf-plume-right 0.86s ease-in-out infinite; }
+        .surf-spray-left { animation: surf-spray-left 1.05s ease-out infinite; }
+        .surf-spray-right { animation: surf-spray-right 1.05s 0.28s ease-out infinite; }
         @media (prefers-reduced-motion: reduce) {
+          .surf-sky-drift,
+          .surf-sky-glint,
           .surf-lapras-art,
-          .surf-wake,
-          .surf-wake-trail,
+          .surf-wake-soft,
+          .surf-wake-plume,
           .surf-spray-left,
           .surf-spray-right { animation: none; }
         }
