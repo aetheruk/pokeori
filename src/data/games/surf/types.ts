@@ -17,6 +17,8 @@ export interface SurfGameSettings {
   steeringSpeed: number
   difficulty: number
   sprite: string
+  spriteFrames?: string[]
+  spriteFrameDistance?: number
   playerWidth?: number
   playerHeight?: number
   obstacleFrequency: { min: number; max: number }

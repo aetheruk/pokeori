@@ -407,6 +407,8 @@ describe('generated game data schemas', () => {
     expect(game?.subCategory).toBe('Test')
     expect(game?.icon).toEqual({ type: 'pokemon', id: '131' })
     expect(game?.settings.sprite).toBe('/games/surf/sprites/lapras-rear.png')
+    expect(surfGame?.settings.spriteFrames).toHaveLength(10)
+    expect(surfGame?.settings.spriteFrameDistance).toBe(24)
     expect(game?.settings.difficulty).toBe(4)
     expect(game?.settings.obstacles).toHaveLength(3)
     expect(surfGame?.settings.scene.parallax).toEqual({

@@ -128,6 +128,10 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
   const playerHeight = settings.playerHeight || 104
   const normalizedPlayerWidth = playerWidth / DESIGN_WIDTH
   const normalizedPlayerHeight = playerHeight / DESIGN_HEIGHT
+  const spriteFrameIndex = settings.spriteFrames?.length
+    ? Math.floor(waterOffset / (settings.spriteFrameDistance || 24)) %
+      settings.spriteFrames.length
+    : 0
 
   const resetLocalGame = useCallback(() => {
     playerXRef.current = 0.5
@@ -767,6 +771,19 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
                 sizes={`${Math.ceil(playerWidth * 1.4)}px`}
                 className="object-contain drop-shadow-[0_10px_7px_rgba(1,35,47,0.42)]"
               />
+              {settings.spriteFrames?.map((frame, index) => (
+                <Image
+                  key={frame}
+                  src={frame}
+                  alt=""
+                  fill
+                  loading="eager"
+                  sizes={`${Math.ceil(playerWidth * 1.4)}px`}
+                  className={`surf-player-frame object-contain drop-shadow-[0_10px_7px_rgba(1,35,47,0.42)] motion-reduce:hidden ${
+                    index === spriteFrameIndex ? 'opacity-100' : 'opacity-0'
+                  }`}
+                />
+              ))}
             </div>
           </div>
         </div>

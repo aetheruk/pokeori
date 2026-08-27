@@ -140,6 +140,24 @@ describe('Surf game mechanics', () => {
       expect(alpha?.max, filename).toBeGreaterThanOrEqual(200)
     }
   })
+
+  test('uses a consistent transparent ten-frame Lapras swim cycle', async () => {
+    const spriteDirectory = 'public/games/surf/sprites/lapras-swim'
+
+    for (let frame = 1; frame <= 10; frame += 1) {
+      const filename = `frame_${String(frame).padStart(3, '0')}.png`
+      const asset = sharp(`${spriteDirectory}/${filename}`)
+      const metadata = await asset.metadata()
+      const stats = await asset.stats()
+      const alpha = stats.channels[3]
+
+      expect(metadata.width, filename).toBe(544)
+      expect(metadata.height, filename).toBe(736)
+      expect(metadata.hasAlpha, filename).toBe(true)
+      expect(alpha?.min, filename).toBe(0)
+      expect(alpha?.max, filename).toBe(255)
+    }
+  })
 })
 
 describe('Surf wake layout', () => {
