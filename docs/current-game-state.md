@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.18.2` moves Surf hazard and prize emergence from 42% to the painted sea horizon at 28% stage depth, providing substantially more reaction distance. The course now extends slightly below the viewport to preserve the established player-arrival and collision cadence; the existing perspective growth, fade-in, soft-focus emergence, and water-blending treatment is unchanged.
+
 - Release `0.18.1` moves Surf hazards and collectible prizes from the sky to the visible waterline. They now emerge at 12% scale with a short distance-driven fade and soft focus, grow along a stronger perspective curve, and use multiply contact shadows plus a masked cyan surface sheen to sit naturally in the moving water while preserving readable collision silhouettes.
 
 - Release `0.18.0` adds a second Kanto Test Surf configuration, `Wooden Boat Surf Test`. It uses a new transparent, hand-painted rear-view wooden motorboat sprite and completes when the player reaches 800 points; the original Lapras course remains endless and unchanged. Shared Surf prompts, collision copy, accessible labels, and player animation names are vehicle-neutral so both configurations render naturally.
