@@ -1,5 +1,6 @@
 # Current Game State
 
+- Release `0.18.5` strengthens the Kanto Surf depth illusion for phone displays: the distant cliff layer now approaches more than twice as far per pass, both cloud depths expand substantially further, and cloud drift travels four times wider on shorter speed-linked cycles while remaining anchored to the sea horizon.
 - Release `0.18.4` rebuilds the Kanto Surf scene as speed-linked depth layers. A new open-sea clean plate sits beneath separately extracted high cloud, low cloud, and island/cliff artwork; clouds expand outward from the vanishing point at two rates, the horizon landforms grow subtly as the player advances, and crossfaded layer recycling is concealed by sea mist. The original complete `kanto-coast.avif` painting remains available as the activity-card and fallback background, while reduced-motion players receive the same recomposed scene without ambient transforms.
 
 - Release `0.18.3` changes Surf hazard and prize travel from constant screen-space movement to an ease-in depth curve: objects move slowly near the horizon and accelerate as they approach the observer. The off-screen endpoint is recalibrated so the existing collision zone still arrives at approximately 70% course progress, preserving reaction time and authored difficulty.

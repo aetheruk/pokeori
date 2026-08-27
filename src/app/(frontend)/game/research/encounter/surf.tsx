@@ -498,10 +498,10 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
   const waterSway = Math.sin(scenePhase * 3) * 10
   const parallax = settings.scene.parallax
   const horizonY = parallax?.horizonY ?? 0.28
-  const islandFrames = getSurfParallaxFrames(waterOffset, 5200)
-  const farCloudFrames = getSurfParallaxFrames(waterOffset, 4600)
-  const nearCloudFrames = getSurfParallaxFrames(waterOffset, 3200)
-  const cloudDrift = Math.sin(waterOffset / 680) * 0.8
+  const islandFrames = getSurfParallaxFrames(waterOffset, 3000)
+  const farCloudFrames = getSurfParallaxFrames(waterOffset, 2800)
+  const nearCloudFrames = getSurfParallaxFrames(waterOffset, 1900)
+  const cloudDrift = Math.sin(waterOffset / 300) * 3.2
   const steeringLean = Math.max(
     -1,
     Math.min(1, (targetXRef.current - playerX) * 7),
@@ -551,7 +551,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
                 className={`surf-parallax-layer absolute inset-0 ${index === 1 ? 'surf-parallax-previous' : ''}`}
                 style={{
                   opacity: frame.opacity,
-                  transform: `translate3d(${cloudDrift}%, 0, 0) scale(${1 + frame.phase * 0.08})`,
+                  transform: `translate3d(${cloudDrift}%, 0, 0) scale(${1 + frame.phase * 0.16})`,
                   transformOrigin: `50% ${horizonY * 100}%`,
                 }}
               >
@@ -576,7 +576,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
                   className={`surf-parallax-layer absolute inset-0 ${index === 1 ? 'surf-parallax-previous' : ''}`}
                   style={{
                     opacity: frame.opacity,
-                    transform: `translate3d(${-cloudDrift * 0.55}%, 0, 0) scale(${1 + frame.phase * 0.14})`,
+                    transform: `translate3d(${-cloudDrift * 0.8}%, 0, 0) scale(${1 + frame.phase * 0.27})`,
                     transformOrigin: '50% 100%',
                   }}
                 >
@@ -600,7 +600,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
                 className={`surf-parallax-layer absolute inset-0 ${index === 1 ? 'surf-parallax-previous' : ''}`}
                 style={{
                   opacity: frame.opacity,
-                  transform: `scale(${1 + frame.phase * 0.09})`,
+                  transform: `scale(${1 + frame.phase * 0.23})`,
                   transformOrigin: `50% ${horizonY * 100}%`,
                 }}
               >
