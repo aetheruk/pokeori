@@ -67,3 +67,21 @@ describe('Surf game mechanics', () => {
     ).toBe(false)
   })
 })
+
+describe('Surf wake layout', () => {
+  test('centres the animated soft wake exactly once', async () => {
+    const componentSource = await Bun.file(
+      new URL(
+        '../src/app/(frontend)/game/research/encounter/surf.tsx',
+        import.meta.url,
+      ),
+    ).text()
+
+    const softWakeElement =
+      componentSource.match(/<div className="surf-wake-soft[^\n]+/)?.[0] || ''
+
+    expect(softWakeElement).toContain('left-1/2')
+    expect(softWakeElement).not.toContain('-translate-x-1/2')
+    expect(componentSource).toContain('transform: translateX(-50%);')
+  })
+})

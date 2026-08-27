@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.17.5` removes a duplicate horizontal transform from Lapras Surf's animated soft wake. Tailwind's centring translation and the wake keyframes had stacked, moving the wake another half-width left even though it correctly followed Lapras. The wake retains its original shape and forward/back position, and the temporary backdrop veil from `0.17.4` is removed.
+
 - Release `0.17.3` anchors Lapras Surf's complete wake and spray composition to the same centred, steering-aware visual transform as Lapras, preventing the foam trail from appearing offset from the larger rendered sprite. Mirrored spray bursts now remain in phase.
 
 - Release `0.17.2` gives Lapras Surf's custom rear-view sprite a more readable buoyant bob and steering lean. Its wake uses soft, mirrored plumes without hard-edged cutoffs, the spray is diffused, and independently animated cloud banks make sky movement visible alongside the layered moving water. Decorative motion stops for reduced-motion players, and the original still sprite remains available as `lapras-rear-flat.png` for fallback.
