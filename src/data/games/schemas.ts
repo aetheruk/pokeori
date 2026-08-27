@@ -663,6 +663,8 @@ const settingsByGameType: Record<string, z.ZodTypeAny> = {
       steeringSpeed: z.number().positive(),
       difficulty: z.number().int().min(1).max(10),
       sprite: z.string().min(1),
+      spriteFrames: z.array(z.string().min(1)).min(2).max(24).optional(),
+      spriteFrameDistance: z.number().positive().optional(),
       playerWidth: z.number().positive().optional(),
       playerHeight: z.number().positive().optional(),
       obstacleFrequency: z.object({

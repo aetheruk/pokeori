@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.18.10` animates Kanto Surf's rear-view Lapras with ten cleaned transparent swim frames. The configurable cycle advances with course travel so it pauses whenever gameplay pauses, while the existing still Lapras remains underneath as a loading fallback and replaces the animation for reduced-motion players; Wooden Boat Surf remains unchanged.
+
 - Release `0.18.9` removes Kanto Surf's duplicated painted-water perspective pass and its scene-wide crossfade because the recycle transition was visually jarring. The open-sea painting is stable again while the existing lightweight surface ripples, cloud drift, approaching islands, player wake, and all gameplay behavior remain unchanged.
 
 - Release `0.18.8` makes Kanto Surf's painted-water depth pass complete in half the previous travel distance and expand 16% from the sea horizon instead of 7.5%. This makes the foreground water visibly stream toward the player on phone displays while retaining the seamless crossfade, independent cloud and island motion, and reduced-motion fallback.

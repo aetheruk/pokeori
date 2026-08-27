@@ -36,6 +36,12 @@ const kantoCoastScene = {
   },
 }
 
+const laprasSwimFrames = Array.from(
+  { length: 10 },
+  (_, index) =>
+    `/games/surf/sprites/lapras-swim/frame_${String(index + 1).padStart(3, '0')}.png`,
+)
+
 export const testSurfEntries: SurfGameConfig[] = [
   {
     id: 'lapras-surf-test',
@@ -56,6 +62,8 @@ export const testSurfEntries: SurfGameConfig[] = [
       steeringSpeed: 380,
       difficulty: 4,
       sprite: '/games/surf/sprites/lapras-rear.png',
+      spriteFrames: laprasSwimFrames,
+      spriteFrameDistance: 24,
       playerWidth: 104,
       playerHeight: 104,
       obstacleFrequency: { min: 0.9, max: 1.45 },
