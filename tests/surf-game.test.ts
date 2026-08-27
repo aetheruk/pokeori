@@ -159,3 +159,22 @@ describe('Surf wake layout', () => {
     expect(componentSource).toContain('transform: translateX(-50%);')
   })
 })
+
+describe('Surf water depth layout', () => {
+  test('clips moving painted water to the horizon', async () => {
+    const componentSource = await Bun.file(
+      new URL(
+        '../src/app/(frontend)/game/research/encounter/surf.tsx',
+        import.meta.url,
+      ),
+    ).text()
+
+    expect(componentSource).toContain(
+      'getSurfParallaxFrames(waterOffset, 3200, 0.22)',
+    )
+    expect(componentSource).toContain('clipPath: `inset(')
+    expect(componentSource).toContain('horizonY * 100')
+    expect(componentSource).toContain('key={`water-depth-')
+    expect(componentSource).toContain('frame.phase * 0.075')
+  })
+})
