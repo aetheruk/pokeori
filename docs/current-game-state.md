@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.18.3` changes Surf hazard and prize travel from constant screen-space movement to an ease-in depth curve: objects move slowly near the horizon and accelerate as they approach the observer. The off-screen endpoint is recalibrated so the existing collision zone still arrives at approximately 70% course progress, preserving reaction time and authored difficulty.
+
 - Release `0.18.2` moves Surf hazard and prize emergence from 42% to the painted sea horizon at 28% stage depth, providing substantially more reaction distance. The course now extends slightly below the viewport to preserve the established player-arrival and collision cadence; the existing perspective growth, fade-in, soft-focus emergence, and water-blending treatment is unchanged.
 
 - Release `0.18.1` moves Surf hazards and collectible prizes from the sky to the visible waterline. They now emerge at 12% scale with a short distance-driven fade and soft focus, grow along a stronger perspective curve, and use multiply contact shadows plus a masked cyan surface sheen to sit naturally in the moving water while preserving readable collision silhouettes.
