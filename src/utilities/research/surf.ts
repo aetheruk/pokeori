@@ -7,8 +7,8 @@ export interface SurfBox {
   height: number
 }
 
-export const SURF_WATERLINE_Y = 0.42
-const SURF_COURSE_END_Y = 0.95
+export const SURF_WATERLINE_Y = 0.28
+const SURF_COURSE_END_Y = 1.02
 
 export function getSurfCoursePosition(x: number, progress: number) {
   const depth = Math.max(0, progress)
