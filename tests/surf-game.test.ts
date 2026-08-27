@@ -169,12 +169,14 @@ describe('Surf water depth layout', () => {
       ),
     ).text()
 
-    expect(componentSource).toContain(
-      'getSurfParallaxFrames(waterOffset, 3200, 0.22)',
-    )
+    expect(componentSource).toContain('WATER_DEPTH_CYCLE_DISTANCE = 1600')
+    expect(componentSource).toContain('WATER_DEPTH_SCALE_TRAVEL = 0.16')
+    expect(componentSource).toContain('WATER_DEPTH_CYCLE_DISTANCE,')
     expect(componentSource).toContain('clipPath: `inset(')
     expect(componentSource).toContain('horizonY * 100')
     expect(componentSource).toContain('key={`water-depth-')
-    expect(componentSource).toContain('frame.phase * 0.075')
+    expect(componentSource).toContain(
+      'frame.phase * WATER_DEPTH_SCALE_TRAVEL',
+    )
   })
 })

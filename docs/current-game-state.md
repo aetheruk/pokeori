@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.18.8` makes Kanto Surf's painted-water depth pass complete in half the previous travel distance and expand 16% from the sea horizon instead of 7.5%. This makes the foreground water visibly stream toward the player on phone displays while retaining the seamless crossfade, independent cloud and island motion, and reduced-motion fallback.
+
 - Release `0.18.7` makes Kanto Surf move the detailed painted water itself instead of relying only on translucent ripple overlays. A duplicate of the open-sea plate is clipped exactly below the authored horizon, expands gently toward the observer, and crossfades before recycling; the sky, calm cloud drift, and island/cliff approach remain independent and unchanged.
 
 - Release `0.18.6` makes Kanto Surf's cloud banks move as one calm weather system instead of oscillating in opposing directions. Their lateral drift is slower and their depth expansion is restrained across longer recycle cycles, removing the abrupt zooming and crossfade jumps while leaving the island/cliff approach unchanged.
