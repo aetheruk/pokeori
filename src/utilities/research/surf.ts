@@ -8,16 +8,20 @@ export interface SurfBox {
 }
 
 export const SURF_WATERLINE_Y = 0.28
-const SURF_COURSE_END_Y = 1.02
+const SURF_COURSE_END_Y = 1.12
+const SURF_TRAVEL_DEPTH_EXPONENT = 1.35
 
 export function getSurfCoursePosition(x: number, progress: number) {
   const depth = Math.max(0, progress)
   const perspectiveDepth = depth ** 1.15
+  const travelDepth = depth ** SURF_TRAVEL_DEPTH_EXPONENT
   const perspectiveSpread = 0.08 + perspectiveDepth * 0.92
 
   return {
     x: 0.5 + (x - 0.5) * perspectiveSpread,
-    y: SURF_WATERLINE_Y + depth * (SURF_COURSE_END_Y - SURF_WATERLINE_Y),
+    y:
+      SURF_WATERLINE_Y +
+      travelDepth * (SURF_COURSE_END_Y - SURF_WATERLINE_Y),
     scale: 0.12 + perspectiveDepth,
   }
 }

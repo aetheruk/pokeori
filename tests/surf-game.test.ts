@@ -68,12 +68,25 @@ describe('Surf game mechanics', () => {
     expect(horizon.scale).toBe(0.12)
     expect(horizon.x).toBeCloseTo(0.476)
     expect(emerged.scale).toBeGreaterThan(horizon.scale)
-    expect(getSurfCoursePosition(0.5, 0.7).y).toBeCloseTo(0.798)
-    expect(nearPlayer.y).toBe(1.02)
+    expect(getSurfCoursePosition(0.5, 0.7).y).toBeCloseTo(0.799, 2)
+    expect(nearPlayer.y).toBe(1.12)
     expect(nearPlayer.scale).toBeCloseTo(1.12)
     expect(getSurfEmergenceOpacity(0)).toBe(0.1)
     expect(getSurfEmergenceOpacity(0.08)).toBeCloseTo(0.55)
     expect(getSurfEmergenceOpacity(0.16)).toBe(1)
+  })
+
+  test('accelerates course objects as they approach the observer', () => {
+    const positions = [0, 0.25, 0.5, 0.75, 1].map(
+      (progress) => getSurfCoursePosition(0.5, progress).y,
+    )
+    const travelSteps = positions.slice(1).map((position, index) =>
+      position - positions[index],
+    )
+
+    expect(travelSteps[1]).toBeGreaterThan(travelSteps[0])
+    expect(travelSteps[2]).toBeGreaterThan(travelSteps[1])
+    expect(travelSteps[3]).toBeGreaterThan(travelSteps[2])
   })
 
   test('detects overlap without treating touching edges as collisions', () => {
