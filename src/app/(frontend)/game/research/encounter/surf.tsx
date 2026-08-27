@@ -48,8 +48,6 @@ const DESIGN_WIDTH = 390
 const DESIGN_HEIGHT = 844
 const SCORE_PER_SECOND = 10
 const PLAYER_Y = 0.79
-const WATER_DEPTH_CYCLE_DISTANCE = 1600
-const WATER_DEPTH_SCALE_TRAVEL = 0.16
 
 interface SurfGameProps {
   encounter: SurfGameConfig
@@ -500,11 +498,6 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
   const waterSway = Math.sin(scenePhase * 3) * 10
   const parallax = settings.scene.parallax
   const horizonY = parallax?.horizonY ?? 0.28
-  const waterDepthFrames = getSurfParallaxFrames(
-    waterOffset,
-    WATER_DEPTH_CYCLE_DISTANCE,
-    0.18,
-  )
   const islandFrames = getSurfParallaxFrames(waterOffset, 3000)
   const farCloudFrames = getSurfParallaxFrames(waterOffset, 5200)
   const nearCloudFrames = getSurfParallaxFrames(waterOffset, 4200)
@@ -549,37 +542,6 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
           sizes="(max-width: 520px) 100vw, 520px"
           className="object-cover"
         />
-
-        {parallax ? (
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{
-              clipPath: `inset(${horizonY * 100}% 0 0 0)`,
-            }}
-          >
-            {waterDepthFrames.map((frame, index) => (
-              <div
-                key={`water-depth-${index}`}
-                className={`surf-parallax-layer absolute inset-0 ${index === 1 ? 'surf-parallax-previous' : ''}`}
-                style={{
-                  opacity: frame.opacity,
-                  transform: `scale(${1 + frame.phase * WATER_DEPTH_SCALE_TRAVEL})`,
-                  transformOrigin: `50% ${horizonY * 100}%`,
-                }}
-              >
-                <Image
-                  src={settings.scene.backdrop}
-                  alt=""
-                  fill
-                  priority
-                  sizes="(max-width: 520px) 100vw, 520px"
-                  className="object-cover"
-                />
-              </div>
-            ))}
-          </div>
-        ) : null}
 
         {parallax ? (
           <div aria-hidden className="pointer-events-none absolute inset-0">
