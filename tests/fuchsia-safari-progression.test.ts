@@ -857,6 +857,39 @@ describe('Fuchsia Gym and Safari progression', () => {
         .filter((reward) => reward.type === 'item')
         .every((reward) => reward.type === 'item' && reward.quantity === 3),
     ).toBe(true)
+    const pokemonMaterialIds = new Set(
+      safariExpeditionContentTasks
+        .flatMap((task) => task.rewards)
+        .filter(
+          (reward) =>
+            reward.type === 'item' &&
+            typeof reward.targetId === 'string' &&
+            reward.targetId.endsWith('-t1'),
+        )
+        .map((reward) => reward.targetId),
+    )
+    const nonMaterialItemDrops = safariExpeditionContentTasks
+      .flatMap((task) => task.rewards)
+      .filter(
+        (reward) =>
+          reward.type === 'item' &&
+          !pokemonMaterialIds.has(reward.targetId),
+      )
+    expect(nonMaterialItemDrops.length).toBeGreaterThan(20)
+    expect(
+      nonMaterialItemDrops.every((reward) => reward.quantity === 1),
+    ).toBe(true)
+    expect(
+      safariExpeditionContentTasks
+        .flatMap((task) => task.rewards)
+        .filter((reward) => reward.type === 'expedition_safari_balls')
+        .every(
+          (reward) =>
+            typeof reward.quantity === 'object' &&
+            reward.quantity.min === 1 &&
+            reward.quantity.max === 3,
+        ),
+    ).toBe(true)
     expect(safariItemTaskPoolIds.balls).toHaveLength(2)
     expect(
       safariItemTaskPoolIds.balls.some((id) => id.includes('ultra-ball')),

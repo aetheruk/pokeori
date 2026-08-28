@@ -1805,7 +1805,7 @@ export const safariZoneTasks: Task[] = ([
     description: 'A rusted locker sits behind the northern trail marker. The lock has already been forced open, but whoever did it left something behind.',
     icon: { type: 'item', id: 'great-ball' },
     rewards: [
-      { type: 'item', targetId: 'great-ball', quantity: 2, dropChance: 100 },
+      { type: 'item', targetId: 'great-ball', quantity: 1, dropChance: 100 },
       { type: 'item', targetId: 'stardust', quantity: 1, dropChance: 100 },
     ],
     completeButtonText: 'Search the Locker',

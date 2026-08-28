@@ -454,15 +454,15 @@ const extraMaterialTasks = extraMaterialFinds.map(([itemId, name, description]) 
     {
       type: 'item',
       targetId: itemId,
-      quantity: 3,
+      quantity: itemId.endsWith('-t1') ? 3 : 1,
       dropChance: 100,
     },
   ),
 ).map((task) => ({ ...task, requirements: [materialReportsRequirement] }))
 
 const ballTasks = [
-  itemTask('safari-item-poke-ball-cache', 'A Few Poké Balls', 'A weatherproof pouch contains a few usable Poké Balls beneath the central path.', 'poke-ball', { type: 'item', targetId: 'poke-ball', quantity: { min: 1, max: 3 }, dropChance: 75 }),
-  itemTask('safari-item-great-ball-cache', 'A Great Ball Cache', 'A Ranger’s old cache holds several Great Balls in a dry compartment.', 'great-ball', { type: 'item', targetId: 'great-ball', quantity: { min: 1, max: 3 }, dropChance: 60 }),
+  itemTask('safari-item-poke-ball-cache', 'A Poké Ball', 'A weatherproof pouch contains a usable Poké Ball beneath the central path.', 'poke-ball', { type: 'item', targetId: 'poke-ball', quantity: 1, dropChance: 75 }),
+  itemTask('safari-item-great-ball-cache', 'A Great Ball', 'A Ranger’s old cache holds a Great Ball in a dry compartment.', 'great-ball', { type: 'item', targetId: 'great-ball', quantity: 1, dropChance: 60 }),
 ]
 
 const gemIds = [
@@ -476,7 +476,7 @@ const gemTasks = gemIds.map((type) =>
     `A ${type[0].toUpperCase()}${type.slice(1)} Gem`,
     `A small ${type} gem catches the light between the roots. I should mark exactly where I found it.`,
     `${type}-gem`,
-    { type: 'item', targetId: `${type}-gem`, quantity: { min: 1, max: 3 }, dropChance: 50 },
+    { type: 'item', targetId: `${type}-gem`, quantity: 1, dropChance: 50 },
   ),
 )
 

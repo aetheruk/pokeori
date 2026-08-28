@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import {
+  getAllMoves,
   getMove,
   getMoveDamageMultiplier,
   resolveMoveDamageMultiplier,
@@ -788,6 +789,80 @@ describe('move damage helpers', () => {
     expect(strength?.damage).toBe(1)
     expect(strength?.target).toBe('enemy')
     expect(strength?.accuracy).toBe(100)
+    expect(strength?.contest).toMatchObject({
+      attackerMetric: 'weight',
+      defenderMetric: 'weight',
+      comparison: 'greaterThan',
+      success: { damageMultiplier: 1.4 },
+      failure: { damageMultiplier: 1 },
+    })
+
+    const heavierUser = resolveMoveContest({
+      move: strength,
+      attacker: makeBattlePokemon({ weight: 1_000 }),
+      defender: makeBattlePokemon({ weight: 500 }),
+    })
+    const lighterUser = resolveMoveContest({
+      move: strength,
+      attacker: makeBattlePokemon({ weight: 500 }),
+      defender: makeBattlePokemon({ weight: 1_000 }),
+    })
+    expect(heavierUser.damageMultiplier).toBe(1.4)
+    expect(lighterUser.damageMultiplier).toBe(1)
+  })
+
+  test('guaranteed critical-hit moves deterministically crit', () => {
+    const guaranteedCritMoveIds = [
+      'flower-trick',
+      'frost-breath',
+      'storm-throw',
+      'surging-strikes',
+      'wicked-blow',
+      'zippy-zap',
+    ]
+    expect(
+      getAllMoves()
+        .filter((move) => move.critChance === 100)
+        .map((move) => move.id)
+        .sort(),
+    ).toEqual([...guaranteedCritMoveIds].sort())
+
+    const originalRandom = Math.random
+    try {
+      // Exercise the exact upper boundary a random roll must never control.
+      Math.random = () => 1
+      for (const moveId of guaranteedCritMoveIds) {
+        const move = getMove(moveId)!
+        const result = calculateDamage(
+          makeBattlePokemon(),
+          makeBattlePokemon(),
+          move.stance === 'random' ? 'power' : move.stance,
+          1,
+          move.forcedType === 'random' ? 'normal' : move.forcedType,
+          undefined,
+          undefined,
+          move.critChance,
+        )
+        expect(result.isCrit).toBe(true)
+      }
+    } finally {
+      Math.random = originalRandom
+    }
+  })
+
+  test('Seismic Toss deals damage equal to the user level', () => {
+    const move = getMove('seismic-toss')
+    const attacker = makeBattlePokemon({ level: 37 })
+    const defender = makeBattlePokemon()
+
+    expect(move?.damageRule).toEqual({ type: 'user-level' })
+    expect(
+      resolveDamageRuleDamage({
+        rule: move?.damageRule,
+        attacker,
+        defender,
+      }).damage,
+    ).toBe(37)
   })
 
   test('Rest forcefully replaces the user main status with sleep', () => {
