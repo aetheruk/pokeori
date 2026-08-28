@@ -20,10 +20,24 @@ const poacherNotesRequirement = {
   targetId: 'safari-notes-on-poachers',
 }
 
+const grandExpeditionRequirement = {
+  type: 'expedition_result' as const,
+  targetId: 'safari-zone-grand-expedition',
+  expeditionStatus: 'completed' as const,
+  count: 1,
+}
+
 const safariEntranceFee = {
   type: 'currency_owned' as const,
   targetId: 'pokedollars',
   count: 500,
+  consume: true,
+}
+
+const safariHabitatFee = {
+  type: 'currency_owned' as const,
+  targetId: 'pokedollars',
+  count: 250,
   consume: true,
 }
 
@@ -86,6 +100,30 @@ const allTaskIds = [
   ...safariRewardTaskPoolWithRests.map((entry) => entry.id),
 ]
 
+type SafariArea = keyof typeof safariFlavorTaskPoolIds
+
+const safariHabitatRewardTaskPool = (
+  area: SafariArea,
+): ExpeditionTaskPoolEntry[] => {
+  const areaExtraFlavorIds = safariExtraTaskPoolIds.flavor.filter((id) =>
+    id.startsWith(`safari-flavor-extra-${area}-`),
+  )
+  const areaPool = [
+    ...scalePoolWeights(researchTaskPool, 40),
+    ...weightedIds(safariExtraTaskPoolIds.research, 5),
+    ...scalePoolWeights(itemTaskPool, 40),
+    ...weightedIds(safariExtraTaskPoolIds.materials, 5),
+    ...weightedIds(safariExtraTaskPoolIds.safariBalls, 4),
+    ...weightedIds(safariExtraTaskPoolIds.rare, 2),
+    ...weightedIds(safariFlavorTaskPoolIds[area], 20),
+    ...weightedIds(areaExtraFlavorIds, 4),
+  ]
+
+  return [
+    ...normalizePoolWeights(areaPool, 94),
+    ...weightedIds(safariExtraTaskPoolIds.rests, 6),
+  ]
+}
 
 const secretActivity = (
   id: string,
@@ -116,6 +154,130 @@ const researchOrFlavor = (id: string, _area: keyof typeof safariFlavorTaskPoolId
 
 const itemOrFlavor = (id: string) => taskActivity(id)
 
+type SafariHabitatExpeditionDefinition = {
+  id: string
+  name: string
+  area: SafariArea
+  areaName: string
+  icon: string
+  fieldResearchId: string
+  locationId: string
+  battleId: string
+}
+
+const safariHabitatExpedition = ({
+  id,
+  name,
+  area,
+  areaName,
+  icon,
+  fieldResearchId,
+  locationId,
+  battleId,
+}: SafariHabitatExpeditionDefinition): ExpeditionConfig => {
+  const rewardTaskPool = safariHabitatRewardTaskPool(area)
+
+  return {
+    id,
+    name,
+    description: `A shorter return survey through Safari ${areaName}. Record the habitat, check the ranger caches, and make a few careful catches without crossing the full reserve.`,
+    category: 'Kanto',
+    subCategory: 'Safari Zone',
+    buttonText: `Survey Safari ${areaName}`,
+    icon: { type: 'pokemon', id: icon },
+    background: '/backgrounds/safari-reserve.avif',
+    maxLosses: 4,
+    staminaNoteLimit: 5,
+    safariBallAllowance: 8,
+    canAbandon: true,
+    requirements: [permitRequirement, grandExpeditionRequirement],
+    criteria: [safariHabitatFee],
+    activityPool: {
+      task: rewardTaskPool.map((entry) => entry.id),
+      'field-research': [fieldResearchId],
+      location: [locationId],
+      battle: [battleId],
+    },
+    taskPools: {
+      'safari-rewards': rewardTaskPool,
+    },
+    path: [
+      secretActivity(`${id}-step-01-habitat-survey`, 'field-research', fieldResearchId),
+      secretActivity(`${id}-step-02-catch`, 'location', locationId),
+      taskActivity(`${id}-step-03-reward`),
+      {
+        type: 'branch',
+        id: `${id}-detour`,
+        selection: 'random',
+        branches: [
+          {
+            id: `${id}-poacher-trail`,
+            nodes: [
+              secretActivity(`${id}-step-04a-poacher`, 'battle', battleId),
+            ],
+          },
+          {
+            id: `${id}-ranger-trail`,
+            nodes: [
+              secretActivity(`${id}-step-04b-catch`, 'location', locationId),
+            ],
+          },
+        ],
+      },
+      secretActivity(`${id}-step-05-catch`, 'location', locationId),
+      taskActivity(`${id}-step-06-reward`),
+    ],
+    rewards: [
+      { type: 'xp', skill: 'researching', quantity: 150, dropChance: 100 },
+      { type: 'xp', skill: 'catching', quantity: 150, dropChance: 100 },
+      { type: 'currency', targetId: 'safari-notes', quantity: 10, dropChance: 100 },
+    ],
+  }
+}
+
+const safariHabitatExpeditions: ExpeditionConfig[] = [
+  safariHabitatExpedition({
+    id: 'safari-central-habitat-expedition',
+    name: 'Safari Central Survey',
+    area: 'central',
+    areaName: 'Central',
+    icon: '111',
+    fieldResearchId: 'safari-central-expedition-field-observation',
+    locationId: 'safari-central-catch',
+    battleId: 'safari-central-rocket-poacher',
+  }),
+  safariHabitatExpedition({
+    id: 'safari-east-habitat-expedition',
+    name: 'Safari East Survey',
+    area: 'east',
+    areaName: 'East',
+    icon: '115',
+    fieldResearchId: 'safari-east-expedition-field-observation',
+    locationId: 'safari-east-catch',
+    battleId: 'safari-east-rocket-poacher',
+  }),
+  safariHabitatExpedition({
+    id: 'safari-west-habitat-expedition',
+    name: 'Safari West Survey',
+    area: 'west',
+    areaName: 'West',
+    icon: '123',
+    fieldResearchId: 'safari-west-expedition-field-observation',
+    locationId: 'safari-west-catch',
+    battleId: 'safari-west-rocket-poacher',
+  }),
+  safariHabitatExpedition({
+    id: 'safari-north-habitat-expedition',
+    name: 'Safari North Survey',
+    area: 'north',
+    areaName: 'North',
+    icon: '128',
+    fieldResearchId: 'safari-north-expedition-field-observation',
+    locationId: 'safari-north-catch',
+    battleId: 'safari-north-rocket-poacher',
+  }),
+]
+
 export const safariZoneExpeditions: ExpeditionConfig[] = [
   {
     id: 'safari-zone-grand-expedition',
@@ -128,6 +290,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
     icon: { type: 'pokemon', id: '128' },
     background: '/backgrounds/safari-reserve.avif',
     maxLosses: 10,
+    staminaNoteLimit: 5,
     safariBallAllowance: 30,
     canAbandon: true,
     requirements: [permitRequirement],
@@ -304,7 +467,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
     rewards: [
       { type: 'xp', skill: 'researching', quantity: 1000, dropChance: 100 },
       { type: 'xp', skill: 'catching', quantity: 1000, dropChance: 100 },
-      { type: 'currency', targetId: 'safari-notes', quantity: 25, dropChance: 100 },
+      { type: 'currency', targetId: 'safari-notes', quantity: 50, dropChance: 100 },
       {
         type: 'item',
         targetId: 'tm-strength',
@@ -317,6 +480,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
       },
     ],
   },
+  ...safariHabitatExpeditions,
   {
     id: 'safari-zone-poacher-watch-expedition',
     name: 'Poacher Watch',

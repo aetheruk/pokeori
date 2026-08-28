@@ -537,9 +537,9 @@ export async function startExpedition(
     }
 
     const now = new Date().toISOString()
-    const staminaNotes = expedition.id === 'safari-zone-grand-expedition'
+    const staminaNotes = expedition.staminaNoteLimit
       ? Math.min(
-          5,
+          expedition.staminaNoteLimit,
           userData.completedTasks.find(
             (task) => task.taskId === 'safari-stamina-notes',
           )?.count || 0,

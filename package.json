@@ -1,6 +1,6 @@
 {
   "name": "pokeori",
-  "version": "0.18.13",
+  "version": "0.19.0",
   "description": "Pokeori field-journal adventure game",
   "license": "MIT",
   "type": "module",
