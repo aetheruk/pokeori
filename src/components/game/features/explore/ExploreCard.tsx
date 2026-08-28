@@ -37,8 +37,12 @@ function ExploreCardComponent({
   centered = false,
 }: ExploreCardProps) {
   const item = entry.kind === 'single' ? entry.item : entry.group.items[0]!
-  const isChronicle = isChronicleExploreItem(item)
   const groupedItems = entry.kind === 'group' ? entry.group.items : []
+  const expeditionItem =
+    item.type === 'expedition'
+      ? item
+      : groupedItems.find((groupedItem) => groupedItem.type === 'expedition')
+  const isChronicle = isChronicleExploreItem(expeditionItem || item)
   const displayName = entry.kind === 'group' ? entry.group.name : item.name
   const displayIcon =
     entry.kind === 'group'
@@ -48,9 +52,9 @@ function ExploreCardComponent({
   const isActiveVoyage =
     item.type === 'voyage' && activeVoyages.some((v) => v.voyageId === item.id)
   const isActiveExpedition =
-    item.type === 'expedition' &&
+    expeditionItem &&
     activeExpedition &&
-    activeExpedition.expeditionId === item.id &&
+    activeExpedition.expeditionId === expeditionItem.id &&
     (activeExpedition.status === 'active' ||
       activeExpedition.status === 'ready_to_claim')
   const isHighlighted = isActiveVoyage || isActiveExpedition
@@ -66,6 +70,7 @@ function ExploreCardComponent({
     if (modeItem.type === 'field-research') {
       return 'Study'
     }
+    if (modeItem.type === 'expedition') return 'Expedition'
     if (
       modeItem.type === 'game' &&
       (modeItem.originalData as any).gameType === 'fishing'
@@ -180,7 +185,13 @@ function ExploreCardComponent({
               <button
                 key={groupedItem.id}
                 type="button"
-                className="relative z-20 inline-flex min-h-10 min-w-20 items-center justify-center gap-1.5 rounded-md border border-game-border bg-game-surface-raised px-2.5 text-[10px] font-black uppercase tracking-wider text-game-muted transition-colors hover:border-game-moss/60 hover:text-game-moss-strong"
+                className={cn(
+                  'relative z-20 inline-flex min-h-10 min-w-20 items-center justify-center gap-1.5 rounded-md border bg-game-surface-raised px-2.5 text-[10px] font-black uppercase tracking-wider transition-colors',
+                  groupedItem.type === 'expedition' &&
+                    activeExpedition?.expeditionId === groupedItem.id
+                    ? 'border-game-ochre/60 text-game-ochre'
+                    : 'border-game-border text-game-muted hover:border-game-moss/60 hover:text-game-moss-strong',
+                )}
                 onClick={(event) => {
                   event.stopPropagation()
                   selectItem(groupedItem)
@@ -216,9 +227,9 @@ function ExploreCardComponent({
             }
 
             if (
-              item.type === 'expedition' &&
+              expeditionItem &&
               activeExpedition &&
-              activeExpedition.expeditionId === item.id
+              activeExpedition.expeditionId === expeditionItem.id
             ) {
               if (activeExpedition.status === 'ready_to_claim') {
                 return (

@@ -681,6 +681,17 @@ describe('Fuchsia Gym and Safari progression', () => {
       'safari-west-habitat-expedition',
     ])
 
+    expect(
+      Object.fromEntries(
+        habitatExpeditions.map((entry) => [entry.id, entry.exploreGroupName]),
+      ),
+    ).toEqual({
+      'safari-central-habitat-expedition': 'Central Habitat Survey',
+      'safari-east-habitat-expedition': 'Eastern Habitat Survey',
+      'safari-north-habitat-expedition': 'Northern Habitat Survey',
+      'safari-west-habitat-expedition': 'Western Habitat Survey',
+    })
+
     for (const habitatExpedition of habitatExpeditions) {
       const area = habitatExpedition.id.split('-')[1]
       expect(habitatExpedition).toMatchObject({

@@ -45,6 +45,7 @@
 
 - Unreleased: Safari expedition item-find tasks now grant one Safari Note alongside their materials, balls, gems, PokéDollar finds, extra Safari Balls, and rare item rewards.
 - Unreleased: Safari fishing now appears inside the existing Central, Eastern, Western, and Northern Habitat Survey Explore cards after Fishing Permit is purchased. Each habitat keeps its authored Old/Good/Super Rod Pokémon pool, charges 250 Pokédollars per session, uses the global 80% Pokémon / 20% item split with Water Gem 40%, Aqua Solvent T1 20%, Drake Scale T1 20%, and Safari Notes 20% on the item branch, and sends hooked Pokémon into Safari catching with exactly five encounter-scoped Safari Balls. The fishing activities have no expedition completion or failure state.
+- Unreleased: The four short Safari habitat expeditions now appear as Expedition actions inside their matching Central, Eastern, Western, and Northern Habitat Survey Explore cards alongside Study, Catch, and Fish. An active short expedition highlights its habitat card and continues to show step and life progress there; the Grand Expedition remains a separate card.
 
 - Unreleased: Regular M, L, and XL candies and their Candy Bags now have tiered chances to raise or set a Pokémon's level: 90% for levels 41-50, 80% for 51-60, 70% for 61-70, 60% for 71-80, 50% for 81-90, and 25% for 91-100. A failed use consumes the candy or bag without changing the level.
 

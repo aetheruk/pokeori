@@ -159,6 +159,7 @@ type SafariHabitatExpeditionDefinition = {
   name: string
   area: SafariArea
   areaName: string
+  exploreGroupName: string
   icon: string
   fieldResearchId: string
   locationId: string
@@ -170,6 +171,7 @@ const safariHabitatExpedition = ({
   name,
   area,
   areaName,
+  exploreGroupName,
   icon,
   fieldResearchId,
   locationId,
@@ -183,6 +185,7 @@ const safariHabitatExpedition = ({
     description: `A shorter return survey through Safari ${areaName}. Record the habitat, check the ranger caches, and make a few careful catches without crossing the full reserve.`,
     category: 'Kanto',
     subCategory: 'Safari Zone',
+    exploreGroupName,
     buttonText: `Survey Safari ${areaName}`,
     icon: { type: 'pokemon', id: icon },
     background: '/backgrounds/safari-reserve.avif',
@@ -241,6 +244,7 @@ const safariHabitatExpeditions: ExpeditionConfig[] = [
     name: 'Safari Central Survey',
     area: 'central',
     areaName: 'Central',
+    exploreGroupName: 'Central Habitat Survey',
     icon: '111',
     fieldResearchId: 'safari-central-expedition-field-observation',
     locationId: 'safari-central-catch',
@@ -251,6 +255,7 @@ const safariHabitatExpeditions: ExpeditionConfig[] = [
     name: 'Safari East Survey',
     area: 'east',
     areaName: 'East',
+    exploreGroupName: 'Eastern Habitat Survey',
     icon: '115',
     fieldResearchId: 'safari-east-expedition-field-observation',
     locationId: 'safari-east-catch',
@@ -261,6 +266,7 @@ const safariHabitatExpeditions: ExpeditionConfig[] = [
     name: 'Safari West Survey',
     area: 'west',
     areaName: 'West',
+    exploreGroupName: 'Western Habitat Survey',
     icon: '123',
     fieldResearchId: 'safari-west-expedition-field-observation',
     locationId: 'safari-west-catch',
@@ -271,6 +277,7 @@ const safariHabitatExpeditions: ExpeditionConfig[] = [
     name: 'Safari North Survey',
     area: 'north',
     areaName: 'North',
+    exploreGroupName: 'Northern Habitat Survey',
     icon: '128',
     fieldResearchId: 'safari-north-expedition-field-observation',
     locationId: 'safari-north-catch',
