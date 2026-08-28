@@ -300,7 +300,10 @@ export function calculateDamage(
         getBattleAbilityCritChanceDelta(attacker),
     ),
   )
-  let isCrit = Math.random() < critChance
+  // A move-authored 100% critical-hit chance is deterministic. Keeping it out
+  // of the random comparison also makes the guarantee explicit at the runtime
+  // boundary (critical-hit immunity can still block it below).
+  let isCrit = moveCritChance >= 1 || Math.random() < critChance
 
   // Victory Status: Guarantee Crit
   if (attacker.status?.id === 'victory') {
