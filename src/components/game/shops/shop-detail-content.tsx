@@ -27,7 +27,12 @@ import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { cn } from '@/lib/utils'
 import { useGameUserData } from '@/hooks/useGameUserData'
 import { getCurrency } from '@/data/currencies'
-import { getRemainingStock, isOutOfStock, type ShopPurchaseData } from '@/utilities/shops/stock'
+import {
+  getRemainingStock,
+  isOutOfStock,
+  shouldDisplayShopItem,
+  type ShopPurchaseData,
+} from '@/utilities/shops/stock'
 import { checkShopItemRequirements, checkShopRequirements } from '@/utilities/shops/requirements'
 
 interface ShopDetailContentProps {
@@ -105,14 +110,16 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
     setPendingPurchase(item)
   }
 
-  const visibleItems = shop.items.filter((item) => {
-    return checkShopItemRequirements(userData, shop, item)
-  })
-
   const shopPurchases = {
     ...((userData.shopPurchases || {}) as Record<string, ShopPurchaseData>),
     ...purchaseOverrides,
   }
+  const visibleItems = shop.items.filter((item) => {
+    return (
+      checkShopItemRequirements(userData, shop, item) &&
+      shouldDisplayShopItem(item, shopPurchases[item.id])
+    )
+  })
   const userCurrency = (userData.user.currency || {}) as Record<string, number>
   const shopCurrencyBalances = Array.from(
     new Set(

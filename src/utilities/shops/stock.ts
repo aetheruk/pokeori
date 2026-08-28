@@ -33,6 +33,13 @@ export function isOutOfStock(
   return getEffectivePurchaseCount(item, purchaseData) >= stockLimit
 }
 
+export function shouldDisplayShopItem(
+  item: Pick<ShopItem, 'stock' | 'daily'>,
+  purchaseData?: ShopPurchaseData | null,
+): boolean {
+  return item.daily === true || !isOutOfStock(item, purchaseData)
+}
+
 export function getRemainingStock(
   item: Pick<ShopItem, 'stock' | 'daily'>,
   purchaseData?: ShopPurchaseData | null,
