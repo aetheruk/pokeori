@@ -1461,6 +1461,18 @@ describe('static data references', () => {
     })
   })
 
+  test('Moonlit Nidos grants the Love Ball bundle promised by its exit scene', () => {
+    const task = tasks.find((entry) => entry.id === 'nido-moonstone-promise')
+
+    expect(task?.rewards).toContainEqual({
+      type: 'item',
+      targetId: 'love-ball',
+      quantity: 3,
+      dropChance: 100,
+    })
+    expect(task?.exitModal?.message).toContain('bundle of Love Balls')
+  })
+
   test('special and starter TMs are developed through Pokemon Research rewards', () => {
     const route11Location = locations.find(
       (location) => location.id === 'route-11',

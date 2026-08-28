@@ -738,6 +738,12 @@ export const vermilionCityTasks: Task[] = [
     ],
     rewards: [
       {
+        type: 'item',
+        targetId: 'love-ball',
+        quantity: 3,
+        dropChance: 100,
+      },
+      {
         type: 'pokemon_research_xp',
         targetId: '34',
         quantity: 200,
