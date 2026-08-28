@@ -1,5 +1,7 @@
 # Current Game State
 
+- Unreleased: Shop inventories now hide permanently exhausted limited items instead of leaving disabled out-of-stock rows behind. Exhausted daily items remain visible with their out-of-stock and restock indicators because they will become purchasable again after the daily reset.
+
 - Release `0.18.13` routes successful non-expedition chat-task completions through the normal ordered result flow, so their exit scene is followed by the complete rewards screen and failed server completions cannot show success dialogue. Moonlit Nidos now authors the three Love Balls promised by its scene alongside its existing Nidoking/Nidoqueen research XP, titles, and profile icons.
 
 - Release `0.18.12` limits Safari Zone item finds to one non-material item at a time: Poké Ball, Great Ball, type-gem, and story-locker finds now grant exactly one, while Pokémon material deposits retain their authored quantities. Run-scoped Safari Ball additions and expedition life restorations retain their 1-3 rolls because they are counters rather than item drops. Guaranteed-critical-hit moves now resolve deterministically at 100% (subject to defender critical-hit immunity); Strength's existing weight contest is verified to grant its 1.4x modifier only when the user is heavier, and Seismic Toss is verified to deal damage equal to the user's level.
