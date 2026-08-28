@@ -162,6 +162,8 @@ export interface ExpeditionConfig {
   criteria?: TaskCondition[]
   mapItemId?: string
   maxLosses: number
+  /** Maximum purchased Safari Stamina Notes added to this expedition's starting lives. */
+  staminaNoteLimit?: number
   safariBallAllowance?: number
   activityPool: ExpeditionActivityPool
   taskPools?: Record<string, ExpeditionTaskPoolEntry[]>

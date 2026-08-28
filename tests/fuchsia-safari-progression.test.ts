@@ -536,8 +536,9 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(expedition).toBeDefined()
     expect(
       expeditions.filter((entry) => entry.id.startsWith('safari-')),
-    ).toHaveLength(2)
+    ).toHaveLength(6)
     expect(expedition?.maxLosses).toBe(10)
+    expect(expedition?.staminaNoteLimit).toBe(5)
     expect(expedition?.safariBallAllowance).toBe(30)
     expect(expedition?.requirements).toContainEqual({
       type: 'item_owned',
@@ -668,6 +669,115 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(
       expeditions.some((entry) => entry.id === 'safari-zone-catching-expedition'),
     ).toBe(false)
+
+    const habitatExpeditions = expeditions.filter((entry) =>
+      entry.id.endsWith('-habitat-expedition'),
+    )
+    expect(habitatExpeditions).toHaveLength(4)
+    expect(habitatExpeditions.map((entry) => entry.id).sort()).toEqual([
+      'safari-central-habitat-expedition',
+      'safari-east-habitat-expedition',
+      'safari-north-habitat-expedition',
+      'safari-west-habitat-expedition',
+    ])
+
+    for (const habitatExpedition of habitatExpeditions) {
+      const area = habitatExpedition.id.split('-')[1]
+      expect(habitatExpedition).toMatchObject({
+        maxLosses: 4,
+        staminaNoteLimit: 5,
+        safariBallAllowance: 8,
+        criteria: [
+          {
+            type: 'currency_owned',
+            targetId: 'pokedollars',
+            count: 250,
+            consume: true,
+          },
+        ],
+        rewards: [
+          {
+            type: 'xp',
+            skill: 'researching',
+            quantity: 150,
+            dropChance: 100,
+          },
+          {
+            type: 'xp',
+            skill: 'catching',
+            quantity: 150,
+            dropChance: 100,
+          },
+          {
+            type: 'currency',
+            targetId: 'safari-notes',
+            quantity: 10,
+            dropChance: 100,
+          },
+        ],
+      })
+      expect(habitatExpedition.requirements).toEqual([
+        { type: 'item_owned', targetId: 'safari-catching-permit' },
+        {
+          type: 'expedition_result',
+          targetId: 'safari-zone-grand-expedition',
+          expeditionStatus: 'completed',
+          count: 1,
+        },
+      ])
+      expect(
+        habitatExpedition.taskPools?.['safari-rewards']
+          .map((entry) => entry.id)
+          .filter((id) => id.startsWith('safari-flavor-'))
+          .every(
+            (id) =>
+              id.startsWith(`safari-flavor-${area}-`) ||
+              id.startsWith(`safari-flavor-extra-${area}-`),
+          ),
+      ).toBe(true)
+
+      const habitatSteps = buildExpeditionSteps(habitatExpedition, {
+        inventory: [{ itemId: 'safari-catching-permit', quantity: 1 }],
+        completedTasks: [],
+        expeditionResults: [
+          {
+            expeditionId: 'safari-zone-grand-expedition',
+            wins: 1,
+            losses: 0,
+          },
+        ],
+      } as unknown as RequirementData)
+      expect(habitatSteps).toHaveLength(6)
+      expect(habitatSteps.map((step) => step.activityType)).toEqual([
+        'field-research',
+        'location',
+        'task',
+        expect.stringMatching(/^(battle|location)$/),
+        'location',
+        'task',
+      ])
+      expect(
+        habitatSteps.filter((step) => step.activityType === 'field-research'),
+      ).toHaveLength(1)
+      expect(
+        habitatSteps.filter((step) => step.activityType === 'task'),
+      ).toHaveLength(2)
+      const catchSteps = habitatSteps.filter(
+        (step) => step.activityType === 'location',
+      )
+      const battleSteps = habitatSteps.filter(
+        (step) => step.activityType === 'battle',
+      )
+      expect(catchSteps.length + battleSteps.length).toBe(3)
+      expect(catchSteps.length).toBeGreaterThanOrEqual(2)
+      expect(catchSteps.length).toBeLessThanOrEqual(3)
+      expect(
+        habitatSteps.filter(
+          (step) => step.activityId === 'safari-grand-finale-catch',
+        ),
+      ).toHaveLength(0)
+      expect(battleSteps.length).toBeLessThanOrEqual(1)
+    }
 
     const poacherWatch = expeditions.find(
       (entry) => entry.id === 'safari-zone-poacher-watch-expedition',
@@ -972,6 +1082,18 @@ describe('Fuchsia Gym and Safari progression', () => {
     )
   })
 
+  test('Safari Stamina Notes apply through expedition configuration', async () => {
+    const source = await Bun.file(
+      'src/utilities/expeditions/actions.ts',
+    ).text()
+
+    expect(source).toContain('const staminaNotes = expedition.staminaNoteLimit')
+    expect(source).toContain('expedition.staminaNoteLimit,')
+    expect(source).not.toContain(
+      "expedition.id === 'safari-zone-grand-expedition'",
+    )
+  })
+
   test('Safari Notes progression and Research Exchange are authored', () => {
     expect(currencies).toContainEqual({
       id: 'safari-notes',
@@ -1022,7 +1144,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(grandExpedition?.rewards).toContainEqual({
       type: 'currency',
       targetId: 'safari-notes',
-      quantity: 25,
+      quantity: 50,
       dropChance: 100,
     })
 
@@ -1573,6 +1695,10 @@ describe('Fuchsia Gym and Safari progression', () => {
     const expeditionIds = [
       'fuchsia-gym-trial-expedition',
       'safari-zone-grand-expedition',
+      'safari-central-habitat-expedition',
+      'safari-east-habitat-expedition',
+      'safari-west-habitat-expedition',
+      'safari-north-habitat-expedition',
       'safari-zone-poacher-watch-expedition',
     ]
 
