@@ -515,15 +515,16 @@ export function useExploreActions(
           return
         }
 
-        setExitModalData(task.exitModal)
-        setIsExitModalOpen(true)
         setCompletingTaskId(task.id)
         try {
           const result = isCompletedExpeditionReplay
             ? await completeCurrentUserExpeditionTaskStep(task.id)
             : await completeTask(task.id, undefined, crypto.randomUUID())
           if (result.success) {
-            refreshUser()
+            setSelectedItem(null)
+            setCompletionResult(result)
+            setLastCompletedTask(task)
+            await refreshUser()
           } else toast.error(result.message || 'Failed to complete task')
         } catch (e) {
           toast.error('Error completing task')

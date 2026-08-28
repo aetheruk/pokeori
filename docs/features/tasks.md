@@ -42,6 +42,8 @@ Requirement cards show progress and completion in a fixed right-side status area
 requirements use a filling circular counter, while completed requirements use a teal check mark.
 
 ## Rewards
+
+- Successful task completions use the shared ordered result flow. For chat tasks, the authored exit scene is shown first and the reward summary follows; a failed server completion does not show the success scene.
 - Gems
 - Pokedollars
 - Items

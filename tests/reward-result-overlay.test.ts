@@ -7,6 +7,26 @@ import {
 } from '@/components/game/shared/RewardResultOverlay'
 
 describe('reward result exit modal ordering', () => {
+  test('successful chat tasks retain their completion result for the ordered reward flow', async () => {
+    const source = await Bun.file(
+      'src/components/game/features/explore/hooks/useExploreActions.ts',
+    ).text()
+    const chatFlowStart = source.indexOf(
+      'if (task.chat && task.exitModal && !isDoneForModalFlow)',
+    )
+    const completedReplayStart = source.indexOf(
+      'if (isDoneForModalFlow && !task.repeatable && task.exitModal)',
+      chatFlowStart,
+    )
+    const chatFlow = source.slice(chatFlowStart, completedReplayStart)
+
+    expect(chatFlowStart).toBeGreaterThan(-1)
+    expect(completedReplayStart).toBeGreaterThan(chatFlowStart)
+    expect(chatFlow).toContain('setCompletionResult(result)')
+    expect(chatFlow).toContain('setLastCompletedTask(task)')
+    expect(chatFlow).not.toContain('setIsExitModalOpen(true)')
+  })
+
   test('opens currency-only results directly on the summary step', () => {
     expect(
       getRewardResultInitialStep({
