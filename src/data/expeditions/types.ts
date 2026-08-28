@@ -156,6 +156,8 @@ export interface ExpeditionConfig {
   description: string
   category: string
   subCategory?: string
+  /** Optional Explore location-card title used to present this expedition as another habitat action. */
+  exploreGroupName?: string
   buttonText?: string
   icon: TaskIcon
   requirements?: TaskCondition[]

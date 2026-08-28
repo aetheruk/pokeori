@@ -4,6 +4,10 @@ import type { ExploreDisplayItem, ExploreItem, ExploreItemGroup } from './types'
 import type { RequirementData } from '@/utilities/requirements'
 import { cn } from '@/lib/utils'
 import { memo, useMemo } from 'react'
+import {
+  getLocationCardGroupName,
+  isLocationCardMode,
+} from './grouping'
 
 interface ExploreGridProps {
   filteredItems: ExploreItem[]
@@ -85,15 +89,7 @@ function ExploreGridComponent({
     filteredItems.forEach((item) => {
       // Group route-style activities under their location card.
       let groupType = item.type as string
-      if (
-        item.type === 'field-research' ||
-        (item.type === 'game' &&
-          (item.originalData as any).gameType === 'fishing')
-      ) {
-        groupType = 'location'
-      }
-      // Group wild battles under locations
-      if (item.type === 'battle' && (item.originalData as any).isWildBattle) {
+      if (isLocationCardMode(item)) {
         groupType = 'location'
       }
       if (item.type === 'task' && item.isChallenge) {
@@ -183,21 +179,14 @@ function ExploreGridComponent({
         return displayItems
       }
 
-      const isGroupableLocationMode = (item: ExploreItem) =>
-        item.type === 'location' ||
-        (item.type === 'battle' && (item.originalData as any).isWildBattle) ||
-        item.type === 'field-research' ||
-        (item.type === 'game' &&
-          (item.originalData as any).gameType === 'fishing')
-
       const displayItems: ExploreDisplayItem[] = []
       const handledIds = new Set<string>()
-      const groupableItems = items.filter(isGroupableLocationMode)
+      const groupableItems = items.filter(isLocationCardMode)
 
       items.forEach((item) => {
         if (handledIds.has(item.id)) return
 
-        if (!isGroupableLocationMode(item)) {
+        if (!isLocationCardMode(item)) {
           displayItems.push({ kind: 'single', item })
           handledIds.add(item.id)
           return
@@ -205,7 +194,8 @@ function ExploreGridComponent({
 
         const matchingItems = groupableItems.filter(
           (candidate) =>
-            candidate.name === item.name &&
+            getLocationCardGroupName(candidate) ===
+              getLocationCardGroupName(item) &&
             candidate.category === item.category &&
             (candidate.subCategory || 'unassigned') ===
               (item.subCategory || 'unassigned'),
@@ -226,10 +216,17 @@ function ExploreGridComponent({
         const hasStudy = matchingItems.some(
           (candidate) => candidate.type === 'field-research',
         )
+        const hasExpedition = matchingItems.some(
+          (candidate) => candidate.type === 'expedition',
+        )
 
         if (
           matchingItems.length > 1 &&
-          (hasLocation || hasWildBattle || hasFishing || hasStudy)
+          (hasLocation ||
+            hasWildBattle ||
+            hasFishing ||
+            hasStudy ||
+            hasExpedition)
         ) {
           matchingItems.forEach((candidate) => handledIds.add(candidate.id))
           const sortedModes = [...matchingItems].sort((a, b) => {
@@ -237,14 +234,16 @@ function ExploreGridComponent({
               if (mode.type === 'location') return 0
               if (mode.type === 'battle') return 1
               if (mode.type === 'field-research') return 2
-              return 3
+              if (mode.type === 'game') return 3
+              return 4
             }
             return rank(a) - rank(b) || a.name.localeCompare(b.name)
           })
           const primary = sortedModes[0]!
+          const groupName = getLocationCardGroupName(primary)
           const group: ExploreItemGroup = {
-            id: `group:${primary.category}:${primary.subCategory || 'unassigned'}:${primary.name}`,
-            name: primary.name,
+            id: `group:${primary.category}:${primary.subCategory || 'unassigned'}:${groupName}`,
+            name: groupName,
             category: primary.category,
             subCategory: primary.subCategory,
             icon: primary.icon,
