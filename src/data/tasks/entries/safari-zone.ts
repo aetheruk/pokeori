@@ -112,12 +112,16 @@ const safariCreditMarkerTask = ({
   name,
   description,
   icon,
+  message,
+  closeButtonText,
   repeatable = false,
 }: {
   id: string
   name: string
   description: string
   icon: Task['icon']
+  message: string
+  closeButtonText: string
   repeatable?: boolean
 }): Task => ({
   id,
@@ -133,6 +137,13 @@ const safariCreditMarkerTask = ({
   requirements: [],
   criteria: [],
   rewards: [],
+  exitModal: {
+    background: '/backgrounds/safari-reserve.avif',
+    title: name,
+    icon,
+    message,
+    closeButtonText,
+  },
 })
 
 const safariCreditTasks: Task[] = [
@@ -228,54 +239,86 @@ const safariCreditTasks: Task[] = [
     requirements: [],
     criteria: [],
     rewards: [],
+    exitModal: {
+      background: '/backgrounds/safari-reserve.avif',
+      title: 'Fishing Permit',
+      icon: { type: 'item', id: 'researchers-journal-page' },
+      message:
+        'This permit covers the waters in all four habitats. Next time I bring my Old Rod, I can see what is moving beneath the reeds.',
+      closeButtonText: 'Plan a Fishing Trip',
+    },
   },
   safariCreditMarkerTask({
     id: 'safari-extra-habitat-field-notes',
     name: 'Extra Habitat Field Notes',
     description: 'A permanent record of additional habitat notes available to the Grand Expedition.',
     icon: { type: 'item', id: 'researchers-journal-volume' },
+    message:
+      'These pages are full of small details other researchers nearly missed. I should keep my eyes open for more signs and observations on future expeditions.',
+    closeButtonText: 'Add Them to My Journal',
   }),
   safariCreditMarkerTask({
     id: 'safari-material-deposit-reports',
     name: 'Material Deposit Reports',
     description: 'A permanent record of useful material deposits reported by other researchers.',
     icon: { type: 'item', id: 'metal-scrap-t1' },
+    message:
+      'These reports mark rich patches of useful materials throughout the reserve. I should check the ground, branches, and shelters they point out if I pass them.',
+    closeButtonText: 'Study the Markings',
   }),
   safariCreditMarkerTask({
     id: 'safari-ball-cache-info',
     name: 'Safari Ball Cache Info',
     description: 'A permanent record of reserve Safari Ball caches reported by other researchers.',
     icon: { type: 'item', id: 'safari-ball' },
+    message:
+      'These notes show clearly marked caches of Safari Balls. I should make sure to grab them if I pass one on my next expedition.',
+    closeButtonText: 'Mark the Caches',
   }),
   safariCreditMarkerTask({
     id: 'safari-unusual-pokemon-sightings',
     name: 'Unusual Pokémon Sightings',
     description: 'A permanent record of unusual Pokémon sightings reported from the reserve.',
     icon: { type: 'pokemon', id: '113' },
+    message:
+      'These reports describe unusual Pokémon and tracks that most visitors would overlook. I should watch for those signs on future expeditions; a careful observation could teach me a lot.',
+    closeButtonText: 'Remember the Signs',
   }),
   safariCreditMarkerTask({
     id: 'safari-strange-sightings',
     name: 'Strange Sightings',
     description: 'A permanent record of three unusual Tauros varieties reported beyond Kanto.',
     icon: { type: 'pokemon', id: '128' },
+    message:
+      'Three reports describe unfamiliar Tauros with very different coats and temperaments. I should watch the northern habitat and the Grand Expedition’s final reserve closely.',
+    closeButtonText: 'Note the Tauros',
   }),
   safariCreditMarkerTask({
     id: 'safari-rare-item-rumours',
     name: 'Rare Item Rumours',
     description: 'A permanent record of the rare finds other researchers claim to have made.',
     icon: { type: 'item', id: 'nugget' },
+    message:
+      'These rumours point to buried valuables, old field caches, and rare items that might turn up while catching Pokémon. I should investigate any marked spot I pass.',
+    closeButtonText: 'Keep the Rumours Close',
   }),
   safariCreditMarkerTask({
     id: 'safari-wardens-permit',
     name: 'Catching Permit',
     description: 'Permanent authorization to use the reserve’s standard catching records.',
     icon: { type: 'item', id: 'safari-catching-permit' },
+    message:
+      'This permit lets me visit any of the four habitats for a focused catching trip, without committing to a full expedition. The reserve will issue me five Safari Balls each time.',
+    closeButtonText: 'Prepare to Catch',
   }),
   safariCreditMarkerTask({
     id: 'safari-stamina-notes',
     name: 'Stamina Notes',
     description: 'A repeatable record of reserve stamina advice purchased from other researchers.',
     icon: { type: 'trainer', id: 'ranger' },
+    message:
+      'I can use this advice to weather one extra setback on future habitat surveys and Grand Expeditions.',
+    closeButtonText: 'Keep the Advice',
     repeatable: true,
   }),
   safariCreditMarkerTask({
@@ -283,6 +326,9 @@ const safariCreditTasks: Task[] = [
     name: 'Security Permit',
     description: 'A permanent authorization for the reserve’s focused security sweep.',
     icon: { type: 'trainer', id: 'rocket-grunt-m' },
+    message:
+      'This authorizes me to join the rangers’ Poacher Watch. I can take on their five-part sweep when I am ready.',
+    closeButtonText: 'Prepare for the Sweep',
   }),
 ]
 
