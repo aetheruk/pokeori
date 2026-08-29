@@ -83,6 +83,7 @@ export async function performSafariAction(
       baseFleeRate: state.fleeRate || SAFARI_BASE_FLEE_RATE,
     })
     state.safari = {
+      ...state.safari,
       stage: resolved.stage,
       actions: state.safari.actions + 1,
       ballsRemaining: state.safari.ballsRemaining,
@@ -145,5 +146,9 @@ export async function endSafariExpedition() {
     }
   }
 
-  return endSafariExpeditionWithoutBalls(user.id)
+  const result = await endSafariExpeditionWithoutBalls(user.id)
+  if (result.success) {
+    await redis.del(encounterId)
+  }
+  return result
 }

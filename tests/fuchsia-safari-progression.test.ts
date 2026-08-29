@@ -1083,6 +1083,41 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(source).not.toContain("handleSafariAction('shout')")
   })
 
+  test('ending a depleted Safari expedition clears its encounter state', async () => {
+    const safariActionSource = await Bun.file(
+      'src/app/(frontend)/game/locations/encounter/actions/safari.ts',
+    ).text()
+    const encounterInitSource = await Bun.file(
+      'src/app/(frontend)/game/locations/encounter/actions/init.ts',
+    ).text()
+    const functionStart = safariActionSource.indexOf(
+      'export async function endSafariExpedition()',
+    )
+    const functionSource = safariActionSource.slice(functionStart)
+    const endRunIndex = functionSource.indexOf(
+      'await endSafariExpeditionWithoutBalls(user.id)',
+    )
+    const clearEncounterIndex = functionSource.indexOf(
+      'await redis.del(encounterId)',
+      endRunIndex,
+    )
+
+    expect(functionStart).toBeGreaterThanOrEqual(0)
+    expect(endRunIndex).toBeGreaterThanOrEqual(0)
+    expect(clearEncounterIndex).toBeGreaterThan(endRunIndex)
+    expect(functionSource).toContain('if (result.success)')
+    expect(safariActionSource).toContain(
+      'state.safari = {\n      ...state.safari,',
+    )
+    expect(encounterInitSource).toContain(
+      "state.safari.scope !== 'encounter'",
+    )
+    expect(encounterInitSource).toContain(
+      'state.safari.ballsRemaining = expeditionBallsRemaining',
+    )
+    expect(encounterInitSource).toContain('if (!belongsToActiveStep)')
+  })
+
   test('repeatable Safari expedition tasks use the reward completion path on replay', async () => {
     const source = await Bun.file(
       'src/components/game/features/explore/hooks/useExploreActions.ts',

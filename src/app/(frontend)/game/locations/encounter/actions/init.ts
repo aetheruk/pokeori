@@ -60,7 +60,11 @@ import {
   SAFARI_ENCOUNTER_TTL_SECONDS,
 } from '@/utilities/pokemon/safari-catch'
 import { getShinyChance, rollShiny } from '@/utilities/pokemon/shiny-odds'
-import { getEncounterRedisTtlSeconds, type EncounterState } from './types'
+import {
+  getEncounterActivityReference,
+  getEncounterRedisTtlSeconds,
+  type EncounterState,
+} from './types'
 import { rollAbility, getUser } from './utils'
 import { refreshEncounterShield, serializeEncounterShield } from './shield'
 import {
@@ -882,7 +886,37 @@ export const getEncounter = cache(async () => {
   const state = (await redis.get(encounterId)) as EncounterState | null
 
   if (!state) return null
-  if (refreshEncounterShield(state)) {
+  let stateChanged = refreshEncounterShield(state)
+
+  if (
+    state.encounterMode === 'safari' &&
+    state.safari &&
+    state.safari.scope !== 'encounter'
+  ) {
+    const activeExpedition = await getActiveExpeditionForUser(user.id)
+    const activeStep =
+      activeExpedition?.status === 'active'
+        ? activeExpedition.steps[activeExpedition.currentStepIndex]
+        : undefined
+    const reference = getEncounterActivityReference(state)
+    const belongsToActiveStep =
+      activeStep?.activityType === reference.activityType &&
+      activeStep.activityId === reference.activityId
+
+    if (!belongsToActiveStep) {
+      await redis.del(encounterId)
+      return null
+    }
+
+    const expeditionBallsRemaining =
+      activeExpedition?.safariBallsRemaining ?? SAFARI_BALL_ALLOWANCE
+    if (state.safari.ballsRemaining !== expeditionBallsRemaining) {
+      state.safari.ballsRemaining = expeditionBallsRemaining
+      stateChanged = true
+    }
+  }
+
+  if (stateChanged) {
     await redis.set(encounterId, state, {
       ex: getEncounterRedisTtlSeconds(state),
     })
