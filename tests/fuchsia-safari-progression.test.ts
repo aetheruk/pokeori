@@ -1271,6 +1271,24 @@ describe('Fuchsia Gym and Safari progression', () => {
       ],
     ])
 
+    const taskUnlockItems = store?.items.filter((item) =>
+      item.rewards.some((reward) => reward.type === 'task_complete'),
+    )
+    expect(taskUnlockItems).toHaveLength(10)
+    for (const item of taskUnlockItems || []) {
+      const taskReward = item.rewards.find(
+        (reward) => reward.type === 'task_complete',
+      )
+      const unlockTask = tasks.find(
+        (task) => task.id === String(taskReward?.targetId),
+      )
+      expect(unlockTask?.exitModal?.title, item.id).toBe(item.name)
+      expect(unlockTask?.exitModal?.message, item.id).toMatch(
+        /\b(?:I|me|my)\b/,
+      )
+      expect(unlockTask?.exitModal?.closeButtonText, item.id).toBeTruthy()
+    }
+
     const wardenPermit = tasks.find(
       (task) => task.id === 'safari-wardens-permit',
     )

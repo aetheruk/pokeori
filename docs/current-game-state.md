@@ -1,5 +1,7 @@
 # Current Game State
 
+- Unreleased: Shop purchases that complete a task with an exit modal now enter the shared purchase-result flow even when no cards are awarded, so the exit note appears after the purchase summary instead of being lost behind a toast. All ten task-backed Research Exchange purchases now end with a first-person trainer reflection explaining the fishing, expedition-find, rare-sighting, catching, security, or extra-life content just unlocked; simple item and cosmetic purchases retain the compact toast flow.
+
 - Unreleased: Shop inventories now hide permanently exhausted limited items instead of leaving disabled out-of-stock rows behind. Exhausted daily items remain visible with their out-of-stock and restock indicators because they will become purchasable again after the daily reset.
 
 - Release `0.18.13` routes successful non-expedition chat-task completions through the normal ordered result flow, so their exit scene is followed by the complete rewards screen and failed server completions cannot show success dialogue. Moonlit Nidos now authors the three Love Balls promised by its scene alongside its existing Nidoking/Nidoqueen research XP, titles, and profile icons.

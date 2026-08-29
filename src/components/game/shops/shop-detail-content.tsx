@@ -33,6 +33,7 @@ import {
   shouldDisplayShopItem,
   type ShopPurchaseData,
 } from '@/utilities/shops/stock'
+import { shouldShowShopPurchaseOverlay } from '@/utilities/shops/purchase-presentation'
 import { checkShopItemRequirements, checkShopRequirements } from '@/utilities/shops/requirements'
 
 interface ShopDetailContentProps {
@@ -88,11 +89,9 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
         setLastPurchasedItemName(itemName)
         refreshUser()
 
-        // If we got cards, show the overlay (Card Reveal)
-        if (result.rewards?.cards && result.rewards.cards.length > 0) {
+        if (shouldShowShopPurchaseOverlay(result)) {
           setPurchaseResult(result)
         } else {
-          // Otherwise just toast
           toast.success(`Purchased ${itemName}!`)
         }
       } else {
