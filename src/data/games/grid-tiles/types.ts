@@ -6,12 +6,11 @@ export type GridTileRole =
   | 'boulder'
   | 'ice'
   | 'hole'
-  | 'filledHole'
   | 'goal'
   | 'teleporter'
   | 'player'
 
-export type GridGameplayTileRole = 'boulder' | 'ice' | 'hole' | 'filledHole'
+export type GridGameplayTileRole = 'boulder' | 'ice' | 'hole'
 
 export interface GridTileAsset {
   src: string

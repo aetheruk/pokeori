@@ -56,7 +56,7 @@ interface RockPushGameProps {
   initialState?: any
 }
 
-type CellType = 'empty' | 'wall' | 'hole' | 'filled' | 'ice'
+type CellType = 'empty' | 'wall' | 'hole' | 'ice'
 
 interface Position {
   x: number
@@ -835,9 +835,9 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
           const newSolved = rocksSolved + 1
           setRocksSolved(newSolved)
 
-          // Generate new grid with filled hole
+          // Return the solved hole to the set's normal floor tile.
           const newGrid = grid.map((row) => [...row])
-          newGrid[rockSlide.position.y][rockSlide.position.x] = 'filled'
+          newGrid[rockSlide.position.y][rockSlide.position.x] = 'empty'
           setGrid(newGrid)
           setDeadlockedRockIds(detectDeadlockedRocks(newGrid, newRocks))
           const nextScreenStates = {
@@ -1005,7 +1005,6 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     barrier: encounter.settings.barrierSprite,
     boulder: encounter.settings.boulderSprite,
     hole: encounter.settings.holeSprite,
-    filledHole: encounter.settings.filledHoleSprite,
     goal: encounter.settings.winTileSprite,
     teleporter: encounter.settings.teleporterSprite,
     player: encounter.settings.playerSprite,
@@ -1015,7 +1014,6 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     ice: iceSprite,
     boulder: boulderSprite,
     hole: holeSprite,
-    filledHole: filledHoleSprite,
     goal: winTileSprite,
     teleporter: teleporterSprite,
     player: playerSprite,
@@ -1075,6 +1073,18 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
           }
           50% {
             opacity: 0.85;
+          }
+        }
+
+        @keyframes rock-push-prize-pulse {
+          0%,
+          100% {
+            opacity: 0.92;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.08);
           }
         }
       `}</style>
@@ -1181,8 +1191,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
                             : cell === 'empty' ||
                                 cell === 'wall' ||
                                 hideBarrier ||
-                                cell === 'hole' ||
-                                cell === 'filled'
+                                cell === 'hole'
                               ? `url('${cellFloorSprite}')`
                               : undefined,
                     }}
@@ -1221,21 +1230,6 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
                       </div>
                     )}
 
-                    {cell === 'filled' && (
-                      <div className="absolute inset-[16%]">
-                        {filledHoleSprite ? (
-                          <Image
-                            src={filledHoleSprite}
-                            alt=""
-                            fill
-                            sizes="64px"
-                            className="object-contain [image-rendering:pixelated]"
-                          />
-                        ) : (
-                          <div className="h-full w-full rounded-full border border-[#081014]/40 bg-[#46545a]/85 shadow-[inset_0_4px_6px_rgba(255,255,255,0.12),inset_0_-5px_8px_rgba(0,0,0,0.45)]" />
-                        )}
-                      </div>
-                    )}
                   </div>
                 )
               }),
@@ -1287,15 +1281,14 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
                 return (
                   <div
                     key={`${prizeId}:${getRockPushPositionKey(prize)}`}
-                    className="absolute z-10 p-[0.34rem]"
+                    className="absolute z-10 p-[0.08rem]"
                     style={entityStyle(prize)}
                     aria-hidden="true"
                   >
-                    <div className="absolute inset-[18%] rounded-full bg-game-ochre/20 blur-sm" />
-                    <div className="relative h-full w-full rounded-md border border-game-ochre/45 bg-[#081014]/20 p-1">
+                    <div className="relative h-full w-full motion-safe:[animation:rock-push-prize-pulse_1.8s_ease-in-out_infinite]">
                       <EndlessCollectibleSprite
                         reward={getRockPushPrizeReward(prize)}
-                        size={42}
+                        size={52}
                       />
                     </div>
                   </div>

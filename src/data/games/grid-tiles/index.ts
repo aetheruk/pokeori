@@ -52,7 +52,6 @@ export const gridTilePalettes = {
       boulder: { src: '/games/rockpush/boulder.avif' },
       ice: { src: '/games/grid-tiles/grass/gameplay/ice.avif' },
       hole: { src: '/games/grid-tiles/grass/gameplay/hole.png' },
-      filledHole: { src: '/games/rockpush/filled-hole.avif' },
     },
     credits: [{
       label: 'Pokeori Grass Field tile set',
@@ -84,37 +83,10 @@ export const gridTilePalettes = {
       boulder: { src: '/games/rockpush/boulder.avif' },
       ice: { src: '/games/grid-tiles/basic-cave/gameplay/ice.png' },
       hole: { src: '/games/grid-tiles/basic-cave/gameplay/hole.png' },
-      filledHole: { src: '/games/rockpush/filled-hole.avif' },
     },
     credits: [{
       label: 'Pokeori Basic Cave tile set',
       notice: 'Supplied 16×16 test tiles and existing Pokeori puzzle artwork used for the reusable default set.',
-      external: false,
-    }],
-  },
-  'rock-cave': {
-    id: 'rock-cave',
-    name: 'Rock Cave compatibility set',
-    logicalTileSize: GRID_LOGICAL_TILE_SIZE,
-    floor: {
-      common: { src: '/games/rockpush/floor.avif' },
-      rare: [],
-      rareChance: 0,
-      blockers: { small: { src: '/games/rockpush/barrier.avif' } },
-      markers: {
-        goal: { src: '/games/rockpush/win-tile.avif' },
-        teleporter: { src: '/games/rockpush/teleporter.avif' },
-      },
-    },
-    gameplay: {
-      boulder: { src: '/games/rockpush/boulder.avif' },
-      ice: { src: '/games/rockpush/ice.avif' },
-      hole: { src: '/games/rockpush/hole.avif' },
-      filledHole: { src: '/games/rockpush/filled-hole.avif' },
-    },
-    credits: [{
-      label: 'Pokeori Rock Cave puzzle tiles',
-      notice: 'Existing project artwork retained as the compatibility sprite set.',
       external: false,
     }],
   },
