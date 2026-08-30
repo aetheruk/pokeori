@@ -64,7 +64,6 @@ export interface RockPushGameConfig extends BaseGameConfig {
     floorSprite?: string
     iceSprite?: string
     holeSprite?: string
-    filledHoleSprite?: string
     winTileSprite?: string
     teleporterSprite?: string
     playerSprite?: string

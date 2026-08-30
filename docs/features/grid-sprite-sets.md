@@ -23,7 +23,6 @@ public/games/grid-tiles/<set-id>/
     boulder.png
     ice.png
     hole.png
-    filled-hole.png
 ```
 
 Reusable objects are not nested under a tile set; register them in `src/data/games/grid-tiles/objects.ts`:
@@ -78,7 +77,6 @@ const caveSet: GridTilePalette = {
     boulder: { src: '/games/grid-tiles/johto-dark-cave/gameplay/boulder.png' },
     ice: { src: '/games/grid-tiles/johto-dark-cave/gameplay/ice.png' },
     hole: { src: '/games/grid-tiles/johto-dark-cave/gameplay/hole.png' },
-    filledHole: { src: '/games/grid-tiles/johto-dark-cave/gameplay/filled-hole.png' },
   },
 
   credits: [{
@@ -143,4 +141,4 @@ Player art is supplied by the game/runtime through the game-specific player spri
 - Rock Tunnel Echo Map keeps its current `walls` field as legacy collision data until maps are manually classified. Architectural boundaries should become scene walls; rocks or rubble should become floor blockers or shared objects as appropriate.
 - Voltorb Grid treats debris as gameplay entities and existing blockers as legacy floor blockers. New room boundaries use scene walls.
 
-The current authored games use local themed sets: `basic-cave` for cave-oriented Echo/Voltorb boards and `grass` for outdoor Rock Push tests and the Western Road chronicle. Both sets deliberately contain only a common floor and repeated back wall, plus the generic blockers and gameplay tiles needed by the existing spatial games. The older `rock-cave` id remains registered as a compatibility alias for saved content. No external sprite pack is bundled. When an external set is selected, add its credit metadata to the manifest and `ATTRIBUTIONS.md` before assigning it to live content.
+The current authored games use local themed sets: `basic-cave` for cave-oriented Echo/Voltorb boards and `grass` for outdoor Rock Push tests and the Western Road chronicle. Both sets deliberately contain only a common floor and repeated back wall, plus the generic blockers and gameplay tiles needed by the existing spatial games. There is no legacy `rock-cave` palette; unknown or retired ids resolve to the default palette. A solved Rock Push hole returns to the set's common floor after the drop animation, so sprite sets do not need a filled-hole asset. No external sprite pack is bundled. When an external set is selected, add its credit metadata to the manifest and `ATTRIBUTIONS.md` before assigning it to live content.

@@ -149,7 +149,7 @@ describe('shared grid sprite sets', () => {
 
   test('rare floor selection is deterministic and leaves common tiles dominant', () => {
     const palette: GridTilePalette = {
-      ...getGridTilePalette('rock-cave'),
+      ...getGridTilePalette('basic-cave'),
       id: 'floor-test',
       floor: {
         common: { src: '/common.png' },
@@ -218,17 +218,17 @@ describe('shared grid sprite sets', () => {
     expect(getGridTilePackCredits({ externalOnly: true })).toEqual([])
   })
 
-  test('legacy role overrides take precedence without mutating the manifest', () => {
-    const originalFloor = getGridTilePalette('rock-cave').floor.common.src
+  test('retired palette ids fall back while role overrides remain isolated', () => {
+    const originalFloor = getGridTilePalette('basic-cave').floor.common.src
     const sources = resolveGridTileSources('rock-cave', {
       floor: '/custom/floor.png',
     })
     expect(sources.floor).toBe('/custom/floor.png')
     expect(sources.barrier).toBe(
-      getGridTilePalette('rock-cave').floor.blockers!.small.src,
+      getGridTilePalette('basic-cave').floor.blockers!.small.src,
     )
-    expect(getGridTilePalette('rock-cave').floor.common.src).toBe(originalFloor)
-    expect(GRID_TILE_PALETTE_IDS).toContain('rock-cave')
+    expect(getGridTilePalette('basic-cave').floor.common.src).toBe(originalFloor)
+    expect(GRID_TILE_PALETTE_IDS).not.toContain('rock-cave')
   })
 
   test('responsive board sizing uses whole-number 16px scales', () => {

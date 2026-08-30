@@ -266,7 +266,6 @@ export interface GameSettings {
   floorSprite?: string
   iceSprite?: string
   holeSprite?: string
-  filledHoleSprite?: string
   winTileSprite?: string
   teleporterSprite?: string
   playerSprite?: string
