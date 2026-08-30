@@ -29,8 +29,8 @@ const safariExpeditionSnapEntries: SnapConfig[] =
       },
     ],
     settings: {
-      pokemonPool: [...pokemonPool],
-      timeLimit: 30,
+      pokemonPool: pokemonPool.slice(0, 5),
+      timeLimit: 45,
       winRate: 1,
       successThreshold: 700,
     },
