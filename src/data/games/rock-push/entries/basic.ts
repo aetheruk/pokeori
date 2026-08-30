@@ -18,6 +18,7 @@ export const basicEntries: RockPushGameConfig[] = [
       },
     ],
     settings: {
+      tilePaletteId: 'grass',
       timeLimit: 90,
       grid_size: 9,
       maxMoves: 80,
@@ -51,12 +52,6 @@ export const basicEntries: RockPushGameConfig[] = [
           quantity: 1,
         },
       ],
-      playerSprite: '/games/rockpush/trainer.avif',
-      boulderSprite: '/games/rockpush/boulder.avif',
-      barrierSprite: '/games/rockpush/barrier.avif',
-      floorSprite: '/games/rockpush/floor.avif',
-      holeSprite: '/games/rockpush/hole.avif',
-      filledHoleSprite: '/games/rockpush/filled-hole.avif',
     },
   },
 ]

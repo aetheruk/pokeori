@@ -1,13 +1,9 @@
 import { VoltorbGridGameConfig } from '../types'
 
 const caveSprites = {
+  tilePaletteId: 'basic-cave' as const,
   themeColour: '#facc15',
   background: '/backgrounds/rocky-path.avif',
-  floorSprite: '/games/rockpush/floor.avif',
-  boulderSprite: '/games/rockpush/boulder.avif',
-  barrierSprite: '/games/rockpush/barrier.avif',
-  winTileSprite: '/games/rockpush/win-tile.avif',
-  playerSprite: '/games/rockpush/trainer.avif',
 }
 
 export const route10VoltorbGridEntries: VoltorbGridGameConfig[] = [

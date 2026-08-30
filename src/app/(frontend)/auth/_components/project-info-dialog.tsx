@@ -9,6 +9,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { getGridTilePackCredits } from '@/data/games/grid-tiles'
+import { APP_VERSION } from '@/utilities/app-version'
 
 const sourceLinks = [
   { label: 'PokeAPI', href: 'https://pokeapi.co/' },
@@ -30,6 +32,8 @@ const softwareLinks = [
   { label: 'Tailwind CSS', href: 'https://tailwindcss.com/' },
   { label: 'Radix UI', href: 'https://www.radix-ui.com/' },
 ]
+
+const tilePackCredits = getGridTilePackCredits()
 
 function SourceList({ links }: { links: typeof sourceLinks }) {
   return (
@@ -68,46 +72,90 @@ export function ProjectInfoDialog() {
           <p className="game-field-label">Field notes</p>
           <DialogTitle>About Pokeori</DialogTitle>
           <DialogDescription>
-            An open-source, unofficial Pokémon fan project, currently released as v0.0.1.
+            An open-source, unofficial Pokémon fan project, currently released
+            as v{APP_VERSION}.
           </DialogDescription>
         </DialogHeader>
 
         <section className="rounded-lg border border-game-clay/35 bg-game-clay/10 p-4">
-          <h2 className="font-display text-base font-semibold text-game-ink">Important notice</h2>
+          <h2 className="font-display text-base font-semibold text-game-ink">
+            Important notice
+          </h2>
           <p className="mt-2 text-sm leading-relaxed text-game-ink">
-            Pokeori is not affiliated with, endorsed by, sponsored by, or otherwise associated with
-            Nintendo, Creatures Inc., GAME FREAK inc., or The Pokémon Company. Pokémon, its
-            characters, names, artwork, marks, and related intellectual property belong to their
-            respective owners. This is a fan-made project, not an official Pokémon product.
+            Pokeori is not affiliated with, endorsed by, sponsored by, or
+            otherwise associated with Nintendo, Creatures Inc., GAME FREAK inc.,
+            or The Pokémon Company. Pokémon, its characters, names, artwork,
+            marks, and related intellectual property belong to their respective
+            owners. This is a fan-made project, not an official Pokémon product.
           </p>
         </section>
 
         <section className="space-y-2">
-          <h2 className="font-display text-base font-semibold text-game-ink">Open-source license</h2>
+          <h2 className="font-display text-base font-semibold text-game-ink">
+            Open-source license
+          </h2>
           <p className="text-sm leading-relaxed text-game-muted">
-            Original Pokeori source code is available under the MIT License. The full license is in
-            the repository’s <code className="rounded bg-game-surface-raised px-1 py-0.5">LICENSE</code>{' '}
-            file. Third-party software, data, media, and Pokémon intellectual property remain under
-            their own terms and are not relicensed by Pokeori.
+            Original Pokeori source code is available under the MIT License. The
+            full license is in the repository’s{' '}
+            <code className="rounded bg-game-surface-raised px-1 py-0.5">
+              LICENSE
+            </code>{' '}
+            file. Third-party software, data, media, and Pokémon intellectual
+            property remain under their own terms and are not relicensed by
+            Pokeori.
           </p>
         </section>
 
         <section className="space-y-2">
-          <h2 className="font-display text-base font-semibold text-game-ink">Data and media sources</h2>
+          <h2 className="font-display text-base font-semibold text-game-ink">
+            Data and media sources
+          </h2>
           <p className="text-sm leading-relaxed text-game-muted">
-            With thanks to the maintainers and contributors who make these community projects and
-            services available:
+            With thanks to the maintainers and contributors who make these
+            community projects and services available:
           </p>
           <SourceList links={sourceLinks} />
         </section>
 
         <section className="space-y-2">
-          <h2 className="font-display text-base font-semibold text-game-ink">Open-source software</h2>
+          <h2 className="font-display text-base font-semibold text-game-ink">
+            Tile and environment packs
+          </h2>
+          <ul className="space-y-2 text-sm text-game-muted">
+            {tilePackCredits.map((credit) => (
+              <li key={`${credit.label}:${credit.href || 'local'}`}>
+                {credit.href ? (
+                  <a
+                    href={credit.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-medium text-game-moss-strong underline decoration-game-moss/40 underline-offset-2 hover:text-game-clay"
+                  >
+                    {credit.label}
+                  </a>
+                ) : (
+                  <span className="font-medium text-game-ink">
+                    {credit.label}
+                  </span>
+                )}
+                {credit.creator ? ` by ${credit.creator}` : ''}
+                {credit.license ? ` — ${credit.license}` : ''}
+                {credit.notice ? ` — ${credit.notice}` : ''}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="space-y-2">
+          <h2 className="font-display text-base font-semibold text-game-ink">
+            Open-source software
+          </h2>
           <SourceList links={softwareLinks} />
         </section>
 
         <p className="text-xs leading-relaxed text-game-muted">
-          See <code>ATTRIBUTIONS.md</code> in the repository for the complete source list and notices.
+          See <code>ATTRIBUTIONS.md</code> in the repository for the complete
+          source list and notices.
         </p>
       </DialogContent>
     </Dialog>

@@ -11,6 +11,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { GameTimer } from '@/components/game/shared/game-timer'
+import { PixelGridBoard } from '@/components/game/shared/pixel-grid-board'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
 import { useAudio } from '@/context/AudioContext'
@@ -19,6 +20,14 @@ import type {
   RockTunnelEchoMapGameConfig,
   RockTunnelEchoPosition,
 } from '@/data/games/rock-tunnel-echo-map'
+import {
+  getGridObstacleParts,
+  resolveGridBackWallSource,
+  resolveGridFloorSource,
+  resolveGridFrameSource,
+  resolveGridObstacleSources,
+  resolveGridTileSources,
+} from '@/data/games/grid-tiles'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
@@ -63,20 +72,33 @@ export function RockTunnelEchoMapGame({
   const maxMoves = encounter.settings.maxMoves
   const revealDurationMs = encounter.settings.revealDurationMs || 1400
   const themeColour = encounter.settings.themeColour || '#818cf8'
-  const floorSprite =
-    encounter.settings.floorSprite || '/games/rockpush/floor.avif'
-  const barrierSprite =
-    encounter.settings.barrierSprite || '/games/rockpush/barrier.avif'
-  const holeSprite =
-    encounter.settings.holeSprite || '/games/rockpush/hole.avif'
-  const winTileSprite =
-    encounter.settings.winTileSprite || '/games/rockpush/win-tile.avif'
-  const playerSprite =
-    encounter.settings.playerSprite || '/games/rockpush/trainer.avif'
+  const tileSources = resolveGridTileSources(encounter.settings.tilePaletteId, {
+    floor: encounter.settings.floorSprite,
+    barrier: encounter.settings.barrierSprite,
+    hole: encounter.settings.holeSprite,
+    goal: encounter.settings.winTileSprite,
+    player: encounter.settings.playerSprite,
+  })
+  const {
+    floor: floorSprite,
+    hole: holeSprite,
+    goal: winTileSprite,
+    player: playerSprite,
+  } = tileSources
   const wallKeys = useMemo(
     () => new Set(encounter.settings.walls.map(positionKey)),
     [encounter.settings.walls],
   )
+  const obstacleParts = useMemo(
+    () => getGridObstacleParts(encounter.settings.walls),
+    [encounter.settings.walls],
+  )
+  const obstacleSources = resolveGridObstacleSources(
+    encounter.settings.tilePaletteId,
+    encounter.settings.barrierSprite,
+  )
+  const frameSprite = resolveGridFrameSource(encounter.settings.tilePaletteId)
+  const backWallSprite = resolveGridBackWallSource(encounter.settings.tilePaletteId)
   const holeKeys = useMemo(
     () => new Set((encounter.settings.holes || []).map(positionKey)),
     [encounter.settings.holes],
@@ -353,19 +375,29 @@ export function RockTunnelEchoMapGame({
         </div>
 
         <div className="flex flex-1 flex-col items-center justify-center gap-4 px-4 pb-6">
-          <div
-            className="grid max-w-[92vw] overflow-hidden rounded-lg bg-[#0d1820] shadow-2xl ring-4 ring-[#081014]/40"
-            style={{
-              gridTemplateColumns: `repeat(${cols}, 1fr)`,
-              gridTemplateRows: `repeat(${rows}, 1fr)`,
-              width: 'min(90vw, 500px)',
-              aspectRatio: `${cols} / ${rows}`,
-              gap: 0,
-            }}
+          <PixelGridBoard
+            cols={cols}
+            rows={rows}
+            frameSrc={frameSprite}
+            ariaLabel="Rock Tunnel Echo Map board"
+            className="overflow-hidden rounded-lg bg-[#0d1820] shadow-2xl ring-4 ring-[#081014]/40"
           >
             {cells.map((cell) => {
               const key = positionKey(cell)
+              const cellFloorSprite = encounter.settings.floorSprite
+                ? floorSprite
+                : resolveGridFloorSource(
+                    encounter.settings.tilePaletteId,
+                    cell.x,
+                    cell.y,
+                    {
+                      seed:
+                        encounter.settings.floorVariation?.seed || encounter.id,
+                      rareChance: encounter.settings.floorVariation?.rareChance,
+                    },
+                  )
               const wall = wallKeys.has(key)
+              const obstaclePart = obstacleParts.get(key)
               const hole = holeKeys.has(key)
               const playerHere = samePosition(player, cell)
               const exitHere = samePosition(encounter.settings.exit, cell)
@@ -377,18 +409,36 @@ export function RockTunnelEchoMapGame({
                   className={cn(
                     'relative h-full w-full overflow-hidden [image-rendering:pixelated] bg-[length:100%_100%] transition duration-300',
                     visible ? 'opacity-100' : 'opacity-95',
-                    wall &&
-                      visible &&
-                      'shadow-[inset_0_-6px_10px_rgba(0,0,0,0.35)]',
                     playerHere && 'ring-2 ring-sky-200/80 ring-inset',
                   )}
                   style={{
-                    backgroundImage: `url('${visible && wall ? barrierSprite : floorSprite}')`,
+                    backgroundImage:
+                      backWallSprite && cell.y === 0
+                        ? `url('${backWallSprite}'), url('${cellFloorSprite}')`
+                        : `url('${cellFloorSprite}')`,
                     boxShadow: revealActive
                       ? `0 0 14px color-mix(in srgb, ${themeColour} 30%, transparent)`
                       : undefined,
                   }}
                 >
+                  {visible && wall && obstaclePart && (
+                    <div
+                      className="pointer-events-none absolute inset-0 z-10 bg-no-repeat [image-rendering:pixelated]"
+                      style={{
+                        backgroundImage: `url('${
+                          obstaclePart.size === 2
+                            ? obstacleSources.large
+                            : obstacleSources.small
+                        }')`,
+                        backgroundSize:
+                          obstaclePart.size === 2 ? '200% 200%' : '100% 100%',
+                        backgroundPosition: `${obstaclePart.offsetX * 100}% ${
+                          obstaclePart.offsetY * 100
+                        }%`,
+                      }}
+                      aria-hidden="true"
+                    />
+                  )}
                   {!visible && (
                     <div className="absolute inset-0 z-30 bg-[#081014]/95" />
                   )}
@@ -449,7 +499,7 @@ export function RockTunnelEchoMapGame({
                 </div>
               )
             })}
-          </div>
+          </PixelGridBoard>
 
           <div className="flex-none max-w-[200px] w-full z-40 mb-8">
             <div className="grid grid-cols-3 gap-2 mx-auto">

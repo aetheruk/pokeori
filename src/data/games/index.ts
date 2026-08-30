@@ -2,6 +2,7 @@
 
 // Shared types
 export * from './shared'
+export * from './grid-tiles'
 import { SpriteConfig, ParallaxLayer } from './shared'
 
 // Silhouette game (whos-that-pokemon)

@@ -1,5 +1,8 @@
 import { z } from 'zod'
 import { isPokemonRarityId } from '@/utilities/pokemon/rarity-effects'
+import { GRID_TILE_PALETTE_IDS, gridFloorRenderConfigSchema } from './grid-tiles'
+
+const gridTilePaletteIdSchema = z.enum(GRID_TILE_PALETTE_IDS as [string, ...string[]])
 
 const currencyTypeSchema = z.enum([
   'crystals',
@@ -313,6 +316,8 @@ const rockPushTeleporterSchema = rockPushPositionSchema
 const rockPushScreenSchema = z
   .object({
     id: z.string().min(1).max(80),
+    tilePaletteId: gridTilePaletteIdSchema.optional(),
+    floorVariation: gridFloorRenderConfigSchema.optional(),
     grid_size: z.number().int().min(6).max(15).optional(),
     boulders: z.array(rockPushPositionSchema).optional(),
     holes: z.array(rockPushPositionSchema).optional(),
@@ -633,6 +638,8 @@ const settingsByGameType: Record<string, z.ZodTypeAny> = {
   }),
   'rock-push': z
     .object({
+      tilePaletteId: gridTilePaletteIdSchema.optional(),
+      floorVariation: gridFloorRenderConfigSchema.optional(),
       grid_size: z.number().int().min(6).max(15).optional(),
       playerStart: rockPushPositionSchema,
       startScreen: z.string().min(1).max(80).optional(),
@@ -865,6 +872,8 @@ const settingsByGameType: Record<string, z.ZodTypeAny> = {
     .passthrough(),
   'voltorb-grid': z
     .object({
+      tilePaletteId: gridTilePaletteIdSchema.optional(),
+      floorVariation: gridFloorRenderConfigSchema.optional(),
       gridSize: z
         .object({
           cols: z.number().int().min(5).max(12),
@@ -1011,6 +1020,8 @@ const settingsByGameType: Record<string, z.ZodTypeAny> = {
     }),
   'rock-tunnel-echo-map': z
     .object({
+      tilePaletteId: gridTilePaletteIdSchema.optional(),
+      floorVariation: gridFloorRenderConfigSchema.optional(),
       gridSize: z
         .object({
           cols: z.number().int().min(5).max(12),

@@ -1,6 +1,7 @@
 import type { RockTunnelEchoMapGameConfig } from '../types'
 
 const common = {
+  tilePaletteId: 'basic-cave',
   gridSize: { cols: 7, rows: 7 },
   playerStart: { x: 0, y: 6 },
   exit: { x: 6, y: 0 },
@@ -14,12 +15,7 @@ const common = {
   maxMoves: 30,
   revealDurationMs: 1100,
   winRate: 1,
-  floorSprite: '/games/rockpush/floor.avif',
-  barrierSprite: '/games/rockpush/barrier.avif',
-  holeSprite: '/games/rockpush/hole.avif',
-  winTileSprite: '/games/rockpush/win-tile.avif',
-  playerSprite: '/games/rockpush/trainer.avif',
-}
+} satisfies RockTunnelEchoMapGameConfig['settings']
 
 export const gymLeaderChronicleEchoMapEntries: RockTunnelEchoMapGameConfig[] = [
   {

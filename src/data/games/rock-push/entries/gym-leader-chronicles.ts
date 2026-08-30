@@ -11,11 +11,12 @@ export const gymLeaderChronicleRockPushEntries: RockPushGameConfig[] = [
     requirements: [{ type: 'task_completed', targetId: 'boulder-badge-memory-revealed' }],
     criteria: [], rewards: [],
     settings: {
+      tilePaletteId: 'basic-cave',
       timeLimit: 110, grid_size: 8, maxMoves: 40,
       playerStart: { x: 1, y: 6 },
       boulders: [{ x: 3, y: 5 }], holes: [{ x: 6, y: 1 }],
       barriers: [{ x: 3, y: 2 }, { x: 3, y: 3 }, { x: 3, y: 4 }, { x: 5, y: 4 }, { x: 6, y: 4 }],
-      prizes: [], playerSprite: '/games/rockpush/trainer.avif', boulderSprite: '/games/rockpush/boulder.avif', barrierSprite: '/games/rockpush/barrier.avif', floorSprite: '/games/rockpush/floor.avif', holeSprite: '/games/rockpush/hole.avif', filledHoleSprite: '/games/rockpush/filled-hole.avif',
+      prizes: [],
     },
   },
   {
@@ -28,18 +29,13 @@ export const gymLeaderChronicleRockPushEntries: RockPushGameConfig[] = [
     requirements: [{ type: 'task_completed', targetId: 'earth-badge-memory-revealed' }],
     criteria: [], rewards: [],
     settings: {
+      tilePaletteId: 'grass',
       timeLimit: 110, grid_size: 8, maxMoves: 40,
       playerStart: { x: 1, y: 6 },
       boulders: [{ x: 3, y: 5 }],
       holes: [{ x: 6, y: 1 }],
       barriers: [{ x: 3, y: 2 }, { x: 3, y: 3 }, { x: 4, y: 5 }, { x: 5, y: 5 }],
       prizes: [],
-      playerSprite: '/games/rockpush/trainer.avif',
-      boulderSprite: '/games/rockpush/boulder.avif',
-      barrierSprite: '/games/rockpush/barrier.avif',
-      floorSprite: '/games/rockpush/floor.avif',
-      holeSprite: '/games/rockpush/hole.avif',
-      filledHoleSprite: '/games/rockpush/filled-hole.avif',
     },
   },
 ]

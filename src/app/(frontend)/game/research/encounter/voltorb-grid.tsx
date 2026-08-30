@@ -12,6 +12,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { GameTimer } from '@/components/game/shared/game-timer'
+import { PixelGridBoard } from '@/components/game/shared/pixel-grid-board'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
 import { useAudio } from '@/context/AudioContext'
@@ -22,6 +23,14 @@ import type {
   VoltorbGridProtectedPokemon,
   VoltorbGridVoltorb,
 } from '@/data/games/voltorb-grid'
+import {
+  getGridObstacleParts,
+  resolveGridBackWallSource,
+  resolveGridFloorSource,
+  resolveGridFrameSource,
+  resolveGridObstacleSources,
+  resolveGridTileSources,
+} from '@/data/games/grid-tiles'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
@@ -103,21 +112,34 @@ export function VoltorbGridGame({
   const maxDischarges = encounter.settings.maxDischarges
   const themeColour = encounter.settings.themeColour || '#facc15'
   const timeLimit = encounter.settings.timeLimit || 90
-  const floorSprite =
-    encounter.settings.floorSprite || '/games/rockpush/floor.avif'
-  const barrierSprite =
-    encounter.settings.barrierSprite || '/games/rockpush/barrier.avif'
-  const boulderSprite =
-    encounter.settings.boulderSprite || '/games/rockpush/boulder.avif'
-  const winTileSprite =
-    encounter.settings.winTileSprite || '/games/rockpush/win-tile.avif'
-  const playerSprite =
-    encounter.settings.playerSprite || '/games/rockpush/trainer.avif'
+  const tileSources = resolveGridTileSources(encounter.settings.tilePaletteId, {
+    floor: encounter.settings.floorSprite,
+    barrier: encounter.settings.barrierSprite,
+    boulder: encounter.settings.boulderSprite,
+    goal: encounter.settings.winTileSprite,
+    player: encounter.settings.playerSprite,
+  })
+  const {
+    floor: floorSprite,
+    boulder: boulderSprite,
+    goal: winTileSprite,
+    player: playerSprite,
+  } = tileSources
 
   const wallKeys = useMemo(
     () => new Set((encounter.settings.walls || []).map(positionKey)),
     [encounter.settings.walls],
   )
+  const obstacleParts = useMemo(
+    () => getGridObstacleParts(encounter.settings.walls || []),
+    [encounter.settings.walls],
+  )
+  const obstacleSources = resolveGridObstacleSources(
+    encounter.settings.tilePaletteId,
+    encounter.settings.barrierSprite,
+  )
+  const frameSprite = resolveGridFrameSource(encounter.settings.tilePaletteId)
+  const backWallSprite = resolveGridBackWallSource(encounter.settings.tilePaletteId)
   const initialDebrisKeys = useMemo(
     () => new Set((encounter.settings.debris || []).map(positionKey)),
     [encounter.settings.debris],
@@ -672,19 +694,29 @@ export function VoltorbGridGame({
         </div>
 
         <div className="flex flex-1 flex-col items-center justify-center gap-4 px-4 pb-4">
-          <div
-            className="grid max-w-[92vw] overflow-hidden rounded-lg bg-game-night-surface shadow-2xl ring-4 ring-[#081014]/35"
-            style={{
-              gridTemplateColumns: `repeat(${cols}, 1fr)`,
-              gridTemplateRows: `repeat(${rows}, 1fr)`,
-              width: 'min(90vw, 500px)',
-              aspectRatio: `${cols} / ${rows}`,
-              gap: 0,
-            }}
+          <PixelGridBoard
+            cols={cols}
+            rows={rows}
+            frameSrc={frameSprite}
+            ariaLabel="Voltorb Grid board"
+            className="overflow-hidden rounded-lg bg-game-night-surface shadow-2xl ring-4 ring-[#081014]/35"
           >
             {boardCells.map((position) => {
               const key = positionKey(position)
+              const cellFloorSprite = encounter.settings.floorSprite
+                ? floorSprite
+                : resolveGridFloorSource(
+                    encounter.settings.tilePaletteId,
+                    position.x,
+                    position.y,
+                    {
+                      seed:
+                        encounter.settings.floorVariation?.seed || encounter.id,
+                      rareChance: encounter.settings.floorVariation?.rareChance,
+                    },
+                  )
               const isWall = wallKeys.has(key)
+              const obstaclePart = obstacleParts.get(key)
               const isDebris = debrisKeys.has(key)
               const voltorb = voltorbByKey.get(key)
               const protectedPokemon = protectedPokemonByKey.get(key)
@@ -695,14 +727,32 @@ export function VoltorbGridGame({
               return (
                 <div
                   key={key}
-                  className={cn(
-                    'relative h-full w-full overflow-hidden [image-rendering:pixelated] bg-[length:100%_100%]',
-                    isWall && 'shadow-[inset_0_-6px_10px_rgba(0,0,0,0.35)]',
-                  )}
+                  className="relative h-full w-full overflow-hidden [image-rendering:pixelated] bg-[length:100%_100%]"
                   style={{
-                    backgroundImage: `url('${isWall ? barrierSprite : floorSprite}')`,
+                    backgroundImage:
+                      backWallSprite && position.y === 0
+                        ? `url('${backWallSprite}'), url('${cellFloorSprite}')`
+                        : `url('${cellFloorSprite}')`,
                   }}
                 >
+                  {isWall && obstaclePart && (
+                    <div
+                      className="pointer-events-none absolute inset-0 z-10 bg-no-repeat [image-rendering:pixelated]"
+                      style={{
+                        backgroundImage: `url('${
+                          obstaclePart.size === 2
+                            ? obstacleSources.large
+                            : obstacleSources.small
+                        }')`,
+                        backgroundSize:
+                          obstaclePart.size === 2 ? '200% 200%' : '100% 100%',
+                        backgroundPosition: `${obstaclePart.offsetX * 100}% ${
+                          obstaclePart.offsetY * 100
+                        }%`,
+                      }}
+                      aria-hidden="true"
+                    />
+                  )}
                   {isExit && (
                     <div
                       className={cn(
@@ -800,7 +850,7 @@ export function VoltorbGridGame({
                 </div>
               )
             })}
-          </div>
+          </PixelGridBoard>
 
           <div className="flex-none z-50 flex items-center gap-3">
             <Button
