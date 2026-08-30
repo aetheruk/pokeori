@@ -361,6 +361,8 @@ describe('generated data integrity', () => {
         item.heldConfig?.effect.type !== 'damage-block' &&
         item.heldConfig?.effect.type !== 'ev-training' &&
         item.heldConfig?.effect.type !== 'type-damage-boost' &&
+        item.heldConfig?.effect.type !== 'stance-damage-multiplier' &&
+        item.heldConfig?.effect.type !== 'held-stat-multiplier' &&
         item.heldConfig?.effect.type !== 'attack-status-chance' &&
         item.heldConfig?.effect.type !== 'crit-chance-multiplier' &&
         item.heldConfig?.effect.type !== 'reward-multiplier' &&
@@ -374,6 +376,8 @@ describe('generated data integrity', () => {
       expect(heldConfig?.effect, item.id).toBeDefined()
       if (
         heldConfig?.effect.type === 'attack-status-chance' ||
+        heldConfig?.effect.type === 'stance-damage-multiplier' ||
+        heldConfig?.effect.type === 'held-stat-multiplier' ||
         heldConfig?.effect.type === 'crit-chance-multiplier' ||
         heldConfig?.effect.type === 'reward-multiplier' ||
         heldConfig?.effect.type === 'item-charge' ||
@@ -418,6 +422,25 @@ describe('generated data integrity', () => {
         expect(heldConfig.effect.evAmount, item.id).toBeGreaterThan(0)
         expect(heldConfig.effect.statPenaltyPercent, item.id).toBeGreaterThan(0)
         expect(heldConfig.effect.statPenaltyPercent, item.id).toBeLessThan(100)
+      }
+      if (heldConfig?.effect.type === 'stance-damage-multiplier') {
+        expect(heldConfig.effect.damageMultiplier, item.id).toBeGreaterThan(0)
+        expect(
+          heldConfig.effect.eligibleSpeciesIds?.length,
+          item.id,
+        ).toBeGreaterThan(0)
+        expect(
+          heldConfig.effect.eligibleStances?.length,
+          item.id,
+        ).toBeGreaterThan(0)
+      }
+      if (heldConfig?.effect.type === 'held-stat-multiplier') {
+        expect(heldConfig.effect.heldStat, item.id).toBeDefined()
+        expect(heldConfig.effect.statMultiplier, item.id).toBeGreaterThan(0)
+        expect(
+          heldConfig.effect.eligibleSpeciesIds?.length,
+          item.id,
+        ).toBeGreaterThan(0)
       }
       if (heldConfig?.effect.type === 'item-charge') {
         expect(heldConfig.consumeOnUse, item.id).toBe(false)

@@ -42,7 +42,9 @@ export interface BattleEffect {
     | 'z-move'
     | 'damage-block'
     | 'ev-training'
+    | 'held-stat-multiplier'
     | 'type-damage-boost'
+    | 'stance-damage-multiplier'
     | 'attack-status-chance'
     | 'crit-chance-multiplier'
     | 'reward-multiplier'
@@ -63,10 +65,15 @@ export interface BattleEffect {
   pokemonType?: PokemonTypeName // Holder type required for held offensive effects
   attackType?: PokemonTypeName // Attack type required for held offensive effects
   damageMultiplier?: number // Damage multiplier for held offensive effects
+  eligibleStances?: ('power' | 'tech' | 'speed')[] // Restricts held damage effects to these stances
   statusId?: string // Status applied by held offensive effects
   statusChance?: number // Percent chance for held offensive status effects
   critChanceMultiplier?: number // Multiplies critical-hit chance for eligible held-item users
+  critStageBonus?: number // Adds critical-hit stages for eligible held-item users
   eligibleSpeciesIds?: number[] // Restricts a held effect to these species
+  heldStat?: PokemonStatType // Battle stat multiplied by a permanent held effect
+  statMultiplier?: number // Multiplier applied to heldStat
+  inactiveWhenTransformed?: boolean // Suppresses the effect after the holder transforms
   rewardType?: 'wild-battle-candy' // Reward category affected by a held multiplier
   rewardMultiplier?: number // Multiplier applied to the configured reward category
   rewardChance?: number // Chance for a configured reward multiplier to activate

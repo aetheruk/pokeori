@@ -26,6 +26,7 @@ import type { PrizeWheelGameConfig } from '@/data/games/prize-wheel/types'
 import { subCategories } from '@/data/sub-region-map'
 import { ALL_MOVE_DEX_ENTRIES } from '@/utilities/pokemon/movedex'
 import pokemonResearchLevelRewards from '@/data/pokemon-research-level-rewards.json'
+import { SPECIAL_POKEMON_DROPS } from '@/data/pokemon/special-drops'
 import { getPokemonForm } from '@/utilities/pokemon/pokedex'
 import { existsSync } from 'node:fs'
 import path from 'node:path'
@@ -119,6 +120,17 @@ const eachCondition = (
       }
     }
   }
+
+  for (const [formId, drops] of Object.entries(SPECIAL_POKEMON_DROPS)) {
+    for (const [index, drop] of drops.entries()) {
+      for (const condition of drop.requirements || []) {
+        visitCondition(condition, {
+          id: `${formId}.specialDrop.${index}`,
+          kind: 'special-pokemon-drop',
+        })
+      }
+    }
+  }
 }
 
 const eachReward = (
@@ -183,6 +195,24 @@ const eachReward = (
 }
 
 describe('static data references', () => {
+  test('special Pokemon drop tables reference valid forms and items', () => {
+    const broken = Object.entries(SPECIAL_POKEMON_DROPS).flatMap(
+      ([formId, drops]) => [
+        ...(!getPokemonForm(formId) ? [`form:${formId}`] : []),
+        ...drops
+          .filter((drop) => !ids.item.has(drop.itemId))
+          .map((drop) => `item:${formId}:${drop.itemId}`),
+        ...drops
+          .filter(
+            (drop) => drop.dropChance < 0 || drop.dropChance > 100,
+          )
+          .map((drop) => `chance:${formId}:${drop.itemId}`),
+      ],
+    )
+
+    expect(broken).toEqual([])
+  })
+
   test('ids are unique within each content type', () => {
     const duplicateIds = exploreItems
       .map((entry) => `${entry.kind}:${entry.id}`)

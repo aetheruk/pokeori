@@ -7,6 +7,7 @@ import {
 } from './stats-calc'
 import {
   getHeldAttackDamageMultiplier,
+  getHeldItemCritStageBonus,
   getHeldItemCritChanceMultiplier,
 } from './held-items'
 import type { WeatherType } from '@/data/weather'
@@ -259,7 +260,7 @@ export function calculateDamage(
   damage *= multiplier
   damage *= typeEffectiveness
   damage *= statusDamageReduction // Apply Status Reduction
-  damage *= getHeldAttackDamageMultiplier(attacker, usedType)
+  damage *= getHeldAttackDamageMultiplier(attacker, usedType, stance)
   damage *= weatherMultiplier
   damage *= terrainMultiplier
   damage *= getBattleAbilityDamageMultiplier({
@@ -286,7 +287,9 @@ export function calculateDamage(
   })
 
   // Check for critical hit
-  const stagedCritChance = getCritChance(attackerStages.crit || 0)
+  const stagedCritChance = getCritChance(
+    (attackerStages.crit || 0) + getHeldItemCritStageBonus(attacker),
+  )
   const moveCritChance =
     typeof critChanceOverride === 'number'
       ? Math.max(0, Math.min(100, critChanceOverride)) / 100

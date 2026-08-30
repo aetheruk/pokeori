@@ -6,7 +6,9 @@ import {
   applyHeldAttackBreak,
   applyHeldItemChargeOnHit,
   applyHeldItemIfTriggered,
+  getHeldAttackDamageMultiplier,
   getHeldItemCritChanceMultiplier,
+  getHeldItemCritStageBonus,
   getWildBattleCandyMultiplier,
   restoreConsumedBerryByAbility,
 } from '@/utilities/battle/held-items'
@@ -20,6 +22,94 @@ import {
 } from '@/app/(frontend)/game/battles/helpers/held-items'
 
 describe('battle item effects', () => {
+  test('Light Ball doubles Pikachu Power and Tech damage only', () => {
+    const pikachu = makeBattlePokemon({
+      speciesId: 25,
+      formId: '25',
+      name: 'Pikachu',
+      heldItem: { id: 'light-ball', name: 'Light Ball' },
+    })
+    const otherPokemon = makeBattlePokemon({
+      heldItem: { id: 'light-ball', name: 'Light Ball' },
+    })
+
+    expect(getHeldAttackDamageMultiplier(pikachu, 'electric', 'power')).toBe(2)
+    expect(getHeldAttackDamageMultiplier(pikachu, 'electric', 'tech')).toBe(2)
+    expect(getHeldAttackDamageMultiplier(pikachu, 'electric', 'speed')).toBe(1)
+    expect(
+      getHeldAttackDamageMultiplier(otherPokemon, 'electric', 'power'),
+    ).toBe(1)
+  })
+
+  test("Leek raises Farfetch'd and Sirfetch'd critical-hit ratio by two stages", () => {
+    const farfetchd = makeBattlePokemon({
+      speciesId: 83,
+      heldItem: { id: 'leek', name: 'Leek' },
+    })
+    const sirfetchd = makeBattlePokemon({
+      speciesId: 865,
+      heldItem: { id: 'leek', name: 'Leek' },
+    })
+    const ineligible = makeBattlePokemon({
+      speciesId: 1,
+      heldItem: { id: 'leek', name: 'Leek' },
+    })
+
+    expect(getHeldItemCritStageBonus(farfetchd)).toBe(2)
+    expect(getHeldItemCritStageBonus(sirfetchd)).toBe(2)
+    expect(getHeldItemCritStageBonus(ineligible)).toBe(0)
+  })
+
+  test('Thick Club doubles Attack for Cubone and every Marowak form', () => {
+    const stats = {
+      hp: 120,
+      attack: 80,
+      defense: 70,
+      specialAttack: 60,
+      specialDefense: 70,
+      speed: 50,
+    }
+
+    expect(
+      applyHeldItemStatModifiers(stats, 'thick-club', { speciesId: 104 }),
+    ).toEqual({ ...stats, attack: 160 })
+    expect(
+      applyHeldItemStatModifiers(stats, 'thick-club', { speciesId: 105 }),
+    ).toEqual({ ...stats, attack: 160 })
+    expect(
+      applyHeldItemStatModifiers(stats, 'thick-club', { speciesId: 1 }),
+    ).toEqual(stats)
+  })
+
+  test('Ditto powders double their stat only while Ditto is untransformed', () => {
+    const stats = {
+      hp: 120,
+      attack: 80,
+      defense: 70,
+      specialAttack: 60,
+      specialDefense: 70,
+      speed: 50,
+    }
+
+    expect(
+      applyHeldItemStatModifiers(stats, 'quick-powder', { speciesId: 132 }),
+    ).toEqual({ ...stats, speed: 100 })
+    expect(
+      applyHeldItemStatModifiers(stats, 'metal-powder', { speciesId: 132 }),
+    ).toEqual({ ...stats, defense: 140 })
+    expect(
+      applyHeldItemStatModifiers(stats, 'quick-powder', {
+        speciesId: 132,
+        transformed: true,
+      }),
+    ).toEqual(stats)
+    expect(
+      applyHeldItemStatModifiers(stats, 'metal-powder', {
+        speciesId: 1,
+      }),
+    ).toEqual(stats)
+  })
+
   test('does not apply or consume no-effect healing at full HP', () => {
     const pokemon = makeBattlePokemon({ currentHp: 120, maxHp: 120 })
 

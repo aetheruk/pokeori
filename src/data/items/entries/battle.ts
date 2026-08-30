@@ -336,6 +336,97 @@ const inferiorTimeStoneItems: Item[] = [
 
 const specialHeldItems: Item[] = [
   {
+    id: 'leek',
+    name: 'Leek',
+    description:
+      "A held item that raises Farfetch'd and Sirfetch'd's critical-hit ratio by two stages.",
+    category: 'battle',
+    spriteId: 'leek',
+    heldConfig: {
+      trigger: { type: 'permanent' },
+      consumeOnUse: false,
+      effect: {
+        type: 'crit-chance-multiplier',
+        critStageBonus: 2,
+        eligibleSpeciesIds: [83, 865],
+      },
+    },
+  },
+  {
+    id: 'thick-club',
+    name: 'Thick Club',
+    description:
+      "A held item that doubles Cubone and Marowak's Attack stat.",
+    category: 'battle',
+    spriteId: 'thick-club',
+    heldConfig: {
+      trigger: { type: 'permanent' },
+      consumeOnUse: false,
+      effect: {
+        type: 'held-stat-multiplier',
+        heldStat: 'attack',
+        statMultiplier: 2,
+        eligibleSpeciesIds: [104, 105],
+      },
+    },
+  },
+  {
+    id: 'quick-powder',
+    name: 'Quick Powder',
+    description:
+      "A held item that doubles Ditto's Speed stat while it is untransformed.",
+    category: 'battle',
+    spriteId: 'quick-powder',
+    heldConfig: {
+      trigger: { type: 'permanent' },
+      consumeOnUse: false,
+      effect: {
+        type: 'held-stat-multiplier',
+        heldStat: 'speed',
+        statMultiplier: 2,
+        eligibleSpeciesIds: [132],
+        inactiveWhenTransformed: true,
+      },
+    },
+  },
+  {
+    id: 'metal-powder',
+    name: 'Metal Powder',
+    description:
+      "A held item that doubles Ditto's Defense stat while it is untransformed.",
+    category: 'battle',
+    spriteId: 'metal-powder',
+    heldConfig: {
+      trigger: { type: 'permanent' },
+      consumeOnUse: false,
+      effect: {
+        type: 'held-stat-multiplier',
+        heldStat: 'defense',
+        statMultiplier: 2,
+        eligibleSpeciesIds: [132],
+        inactiveWhenTransformed: true,
+      },
+    },
+  },
+  {
+    id: 'light-ball',
+    name: 'Light Ball',
+    description:
+      "A held item that doubles Pikachu's Power and Tech attack damage.",
+    category: 'battle',
+    spriteId: 'light-ball',
+    heldConfig: {
+      trigger: { type: 'permanent' },
+      consumeOnUse: false,
+      effect: {
+        type: 'stance-damage-multiplier',
+        damageMultiplier: 2,
+        eligibleSpeciesIds: [25],
+        eligibleStances: ['power', 'tech'],
+      },
+    },
+  },
+  {
     id: 'lucky-egg',
     name: 'Lucky Egg',
     description:

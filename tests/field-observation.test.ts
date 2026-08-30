@@ -27,6 +27,7 @@ import {
   rollFieldObservationItemDrops,
 } from '@/utilities/research/field-observation-global-events'
 import type { FieldObservationSettings } from '@/data/games/field-observation/types'
+import { SPECIAL_POKEMON_DROPS } from '@/data/pokemon/special-drops'
 
 const routeOneSettings: FieldObservationSettings = {
   pokemonPool: [
@@ -1089,6 +1090,36 @@ describe('field observation research mode', () => {
         }),
       }),
     )
+  })
+
+  test('field observation filters form-specific drops before scheduling them', () => {
+    SPECIAL_POKEMON_DROPS['25-special'] = [
+      {
+        itemId: 'research-kit',
+        dropChance: 100,
+        requirements: [{ type: 'item_owned', targetId: 'research-kit' }],
+      },
+      { itemId: 'escape-rope', dropChance: 100 },
+    ]
+
+    try {
+      const drops = buildFieldObservationCollectibleDrops({
+        rewardSubjects: [
+          { speciesId: 25, formId: '25-special', level: 20, pokemonResearchXp: 1 },
+        ],
+        spawns: [],
+        researchingLevel: 1,
+        surveyFocus: 'standard',
+        observationDurationMs: 20_000,
+        rewardEligibility: (reward) => reward.targetId !== 'research-kit',
+        random: () => 0.99,
+      })
+
+      expect(drops.some((drop) => drop.itemId === 'research-kit')).toBe(false)
+      expect(drops.some((drop) => drop.itemId === 'escape-rope')).toBe(true)
+    } finally {
+      delete SPECIAL_POKEMON_DROPS['25-special']
+    }
   })
 
   test('field observation can reveal one gem from the observed Pokemon type pool', () => {

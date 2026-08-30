@@ -8,6 +8,7 @@ import {
   fieldObservationGlobalItemEvents,
   fieldObservationGlobalPokemonEvents,
 } from '@/data/games/field-observation/global-events'
+import { SPECIAL_POKEMON_DROPS } from '@/data/pokemon/special-drops'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { headers } from 'next/headers'
@@ -621,6 +622,12 @@ export async function startGameActivity(
               ),
             ]
           : []
+      const fieldObservationSpecialDropRequirements =
+        encounter.gameType === 'field-observation'
+          ? Object.values(SPECIAL_POKEMON_DROPS).flatMap((drops) =>
+              drops.flatMap((drop) => drop.requirements || []),
+            )
+          : []
       const prizeWheelSlotRequirements =
         encounter.gameType === 'prize-wheel'
           ? (encounter.settings.slots || []).flatMap(
@@ -632,6 +639,7 @@ export async function startGameActivity(
         ...(encounter.criteria || []),
         ...fieldObservationPoolRequirements,
         ...fieldObservationGlobalRequirements,
+        ...fieldObservationSpecialDropRequirements,
         ...prizeWheelSlotRequirements,
       ])
       const userData = await getGameUserData(user as User, requiredKeys)
@@ -1188,6 +1196,15 @@ export async function startGameActivity(
             : [],
           collectibleModifiers:
             getFieldObservationCollectibleModifiers(surveyFocusContext),
+          rewardEligibility: (reward) =>
+            !reward.requirements?.length ||
+            reward.requirements.every((requirement) =>
+              checkRequirement(userData, requirement, {
+                category: encounter.category,
+                subCategory: encounter.subCategory,
+                weather: weatherSnapshot.weather,
+              }),
+            ),
         })
         generated.privateRoundData.collectibleDrops = collectibleDrops
         generated.publicRoundData.collectibleDrops = collectibleDrops.map(

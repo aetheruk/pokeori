@@ -4,6 +4,11 @@ export type HeldItemDefinition = Item & {
   heldConfig: NonNullable<Item['heldConfig']>
 }
 
+export interface HeldItemStatContext {
+  speciesId?: number
+  transformed?: boolean
+}
+
 export function isHeldItemDefinition(item: Item | undefined): item is HeldItemDefinition {
   return !!item?.heldConfig
 }
@@ -57,16 +62,40 @@ export function getHeldItemTrainingEffect(itemId: string | null | undefined):
 export function applyHeldItemStatModifiers<T extends Record<PokemonStatType, number>>(
   stats: T,
   itemId: string | null | undefined,
+  context: HeldItemStatContext = {},
 ): T {
   const trainingEffect = getHeldItemTrainingEffect(itemId)
-  if (!trainingEffect || trainingEffect.statPenaltyPercent <= 0) return stats
+  if (trainingEffect && trainingEffect.statPenaltyPercent > 0) {
+    const multiplier = Math.max(0, 1 - trainingEffect.statPenaltyPercent / 100)
+    return {
+      ...stats,
+      [trainingEffect.stat]: Math.max(
+        1,
+        Math.floor((stats[trainingEffect.stat] || 0) * multiplier),
+      ),
+    }
+  }
 
-  const multiplier = Math.max(0, 1 - trainingEffect.statPenaltyPercent / 100)
+  const item = getHeldItemDefinition(itemId)
+  const effect = item?.heldConfig.effect
+  if (
+    !item ||
+    effect?.type !== 'held-stat-multiplier' ||
+    !effect.heldStat ||
+    (effect.eligibleSpeciesIds?.length &&
+      (context.speciesId === undefined ||
+        !effect.eligibleSpeciesIds.includes(context.speciesId))) ||
+    (effect.inactiveWhenTransformed && context.transformed)
+  ) {
+    return stats
+  }
+
+  const multiplier = Math.max(0, effect.statMultiplier ?? 1)
   return {
     ...stats,
-    [trainingEffect.stat]: Math.max(
+    [effect.heldStat]: Math.max(
       1,
-      Math.floor((stats[trainingEffect.stat] || 0) * multiplier),
+      Math.floor((stats[effect.heldStat] || 0) * multiplier),
     ),
   }
 }
@@ -96,12 +125,32 @@ export function formatHeldItemTrigger(item: HeldItemDefinition): string {
   }
 
   if (effect.type === 'crit-chance-multiplier') {
+    if (effect.critStageBonus) {
+      return `Raises critical-hit ratio by ${effect.critStageBonus} stages`
+    }
     const multiplier = effect.critChanceMultiplier || 1
     return `Multiplies Chansey's critical-hit chance by ${multiplier}x`
   }
 
   if (effect.type === 'reward-multiplier' && effect.rewardType === 'wild-battle-candy') {
     return `${effect.rewardChance || 100}% chance to double wild battle candy drops`
+  }
+
+  if (effect.type === 'stance-damage-multiplier') {
+    const multiplier = effect.damageMultiplier || 1
+    const stances = (effect.eligibleStances || [])
+      .map((stance) => stance.charAt(0).toUpperCase() + stance.slice(1))
+      .join(' and ')
+    return `${multiplier}x ${stances || 'Attack'} Damage for Pikachu`
+  }
+
+  if (effect.type === 'held-stat-multiplier' && effect.heldStat) {
+    const statName = HELD_ITEM_STAT_LABELS[effect.heldStat]
+    const multiplier = effect.statMultiplier || 1
+    const transformed = effect.inactiveWhenTransformed
+      ? ' while untransformed'
+      : ''
+    return `${multiplier}x ${statName}${transformed}`
   }
 
   if (item.id.endsWith('-memory') && effect.type === 'type-damage-boost' && effect.pokemonType) {
@@ -135,8 +184,9 @@ export function formatHeldItemTrigger(item: HeldItemDefinition): string {
   }
 
   if (effect.type === 'attack-status-chance' && effect.attackType &&
-      typeof effect.statusChance === 'number' &&
-      effect.statusId) {
+    typeof effect.statusChance === 'number' &&
+    effect.statusId
+  ) {
     const label =
       effect.attackType.charAt(0).toUpperCase() +
       effect.attackType.slice(1)

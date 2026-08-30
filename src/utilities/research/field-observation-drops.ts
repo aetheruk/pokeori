@@ -49,6 +49,7 @@ export function buildFieldObservationCollectibleDrops({
   globalItemEvents = [],
   additionalRewards = [],
   collectibleModifiers = [],
+  rewardEligibility = () => true,
   random = Math.random,
 }: {
   rewardSubjects: FieldObservationRewardSubject[]
@@ -59,6 +60,7 @@ export function buildFieldObservationCollectibleDrops({
   globalItemEvents?: FieldObservationGlobalItemEvent[]
   additionalRewards?: CollectibleReward[]
   collectibleModifiers?: FieldObservationCollectibleModifier[]
+  rewardEligibility?: (reward: Reward) => boolean
   random?: RandomFn
 }): FieldObservationPrivateCollectibleDrop[] {
   if (
@@ -90,7 +92,10 @@ export function buildFieldObservationCollectibleDrops({
   const materialLimit =
     getFieldObservationPrimaryMaterialLimit(researchingLevel)
   const materialRewards = resolveDropChances(
-    buildFieldObservationMaterialRewards(materialRewardContexts, materialLimit),
+    buildFieldObservationMaterialRewards(
+      materialRewardContexts,
+      materialLimit,
+    ).filter(rewardEligibility),
     random,
     (surveyFocus === 'material-survey'
       ? 1.25
