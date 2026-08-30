@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { battles } from '@/data/battles'
 import { currencies } from '@/data/currencies'
-import { snapGames } from '@/data/games'
+import { silhouetteGames, snapGames } from '@/data/games'
 import { expeditions } from '@/data/expeditions'
 import { fishingGames } from '@/data/games/fishing'
 import { fieldObservationGames } from '@/data/games/field-observation'
@@ -557,7 +557,10 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(generatedSteps.length).toBe(36)
     expect(
       generatedSteps.filter((step) => step.activityType === 'field-research'),
-    ).toHaveLength(8)
+    ).toHaveLength(4)
+    expect(
+      generatedSteps.filter((step) => step.activityType === 'game'),
+    ).toHaveLength(4)
     expect(
       generatedSteps.filter((step) => step.activityType === 'location'),
     ).toHaveLength(10)
@@ -591,7 +594,10 @@ describe('Fuchsia Gym and Safari progression', () => {
       postStrengthSteps.filter(
         (step) => step.activityType === 'field-research',
       ),
-    ).toHaveLength(8)
+    ).toHaveLength(4)
+    expect(
+      postStrengthSteps.filter((step) => step.activityType === 'game'),
+    ).toHaveLength(4)
     expect(
       postStrengthSteps.filter((step) => step.activityType === 'location'),
     ).toHaveLength(10)
@@ -1459,7 +1465,7 @@ describe('Fuchsia Gym and Safari progression', () => {
       ).toBe(true)
 
       const expeditionStudyId = `safari-${area}-expedition-field-observation`
-      const generatedStudyCount = buildExpeditionSteps(
+      const generatedAreaSteps = buildExpeditionSteps(
         expeditions.find(
           (entry) => entry.id === 'safari-zone-grand-expedition',
         )!,
@@ -1467,8 +1473,20 @@ describe('Fuchsia Gym and Safari progression', () => {
           inventory: [{ itemId: 'safari-catching-permit', quantity: 1 }],
           completedTasks: [],
         } as unknown as RequirementData,
-      ).filter((step) => step.activityId === expeditionStudyId).length
-      expect(generatedStudyCount, area).toBe(2)
+      )
+      const generatedStudyCount = generatedAreaSteps.filter(
+        (step) => step.activityId === expeditionStudyId,
+      ).length
+      expect(generatedStudyCount, area).toBe(1)
+      expect(
+        generatedAreaSteps.filter((step) =>
+          [
+            `safari-${area}-expedition-snap`,
+            `safari-${area}-expedition-silhouette`,
+          ].includes(step.activityId || ''),
+        ),
+        area,
+      ).toHaveLength(1)
     }
 
     const discoveryIds = [
@@ -1534,6 +1552,65 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(locations.some((entry) => entry.id.includes('area-five'))).toBe(
       false,
     )
+  })
+
+  test('Grand Expedition area mini-games are short, rewarding, and expedition-only', () => {
+    const areas = ['central', 'east', 'west', 'north']
+    const expectedRewards = [
+      {
+        type: 'xp',
+        skill: 'researching',
+        quantity: 50,
+        dropChance: 100,
+      },
+      {
+        type: 'currency',
+        targetId: 'safari-notes',
+        quantity: 1,
+        dropChance: 100,
+      },
+    ]
+
+    for (const area of areas) {
+      const snap = snapGames.find(
+        (entry) => entry.id === `safari-${area}-expedition-snap`,
+      )
+      const silhouette = silhouetteGames.find(
+        (entry) => entry.id === `safari-${area}-expedition-silhouette`,
+      )
+
+      expect(snap, `${area} Snap`).toMatchObject({
+        category: 'Secret',
+        expeditionOnly: true,
+        requirements: [
+          { type: 'item_owned', targetId: 'safari-catching-permit' },
+        ],
+        rewards: expectedRewards,
+        settings: {
+          timeLimit: 30,
+          winRate: 1,
+        },
+      })
+      expect(silhouette, `${area} silhouette`).toMatchObject({
+        category: 'Secret',
+        expeditionOnly: true,
+        requirements: [
+          { type: 'item_owned', targetId: 'safari-catching-permit' },
+        ],
+        rewards: expectedRewards,
+        settings: {
+          winRate: 1,
+        },
+      })
+      expect(
+        snap?.settings.pokemonPool?.length,
+        `${area} Snap pool`,
+      ).toBeGreaterThan(0)
+      expect(
+        silhouette?.settings.pokemonPool?.length,
+        `${area} silhouette pool`,
+      ).toBeGreaterThan(0)
+    }
   })
 
   test('Catching Permit adds catching while Fishing Permit adds fishing', () => {
@@ -1785,7 +1862,11 @@ describe('Fuchsia Gym and Safari progression', () => {
             : step.activityType === 'location'
               ? locations.find((entry) => entry.id === step.activityId)
               : step.activityType === 'game'
-                ? fishingGames.find((entry) => entry.id === step.activityId) ||
+                ? snapGames.find((entry) => entry.id === step.activityId) ||
+                  silhouetteGames.find(
+                    (entry) => entry.id === step.activityId,
+                  ) ||
+                  fishingGames.find((entry) => entry.id === step.activityId) ||
                   basicEntries.find((entry) => entry.id === step.activityId)
                 : step.activityType === 'field-research'
                   ? fieldObservationGames.find(
