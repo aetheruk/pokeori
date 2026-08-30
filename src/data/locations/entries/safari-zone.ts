@@ -94,11 +94,17 @@ const expeditionSafariLocations: Location[] = [
       { speciesId: 33, formId: '33', chance: 3 },
       { speciesId: 47, formId: '47', chance: 3 },
       { speciesId: 104, formId: '104', chance: 3 },
-      { speciesId: 128, formId: '128', chance: 3 },
+      { speciesId: 128, formId: '128', chance: 2 },
       { speciesId: 105, formId: '105', chance: 2 },
       { speciesId: 123, formId: '123', chance: 2 },
       { speciesId: 115, formId: '115', chance: 2 },
       { speciesId: 127, formId: '127', chance: 1 },
+      {
+        speciesId: 128,
+        formId: '10252',
+        chance: 1,
+        requirements: [strangeSightingsRequirement],
+      },
       {
         speciesId: 113,
         formId: '113',
@@ -120,7 +126,7 @@ const expeditionSafariLocations: Location[] = [
       { speciesId: 84, formId: '84', chance: 13 },
       { speciesId: 48, formId: '48', chance: 10 },
       { speciesId: 33, formId: '33', chance: 6 },
-      { speciesId: 128, formId: '128', chance: 6 },
+      { speciesId: 128, formId: '128', chance: 5 },
       { speciesId: 30, formId: '30', chance: 3 },
       { speciesId: 49, formId: '49', chance: 3 },
       { speciesId: 104, formId: '104', chance: 3 },
@@ -128,6 +134,12 @@ const expeditionSafariLocations: Location[] = [
       { speciesId: 115, formId: '115', chance: 2 },
       { speciesId: 114, formId: '114', chance: 1 },
       { speciesId: 127, formId: '127', chance: 1 },
+      {
+        speciesId: 128,
+        formId: '10251',
+        chance: 1,
+        requirements: [strangeSightingsRequirement],
+      },
     ],
   }),
   safariArea({
@@ -147,7 +159,7 @@ const expeditionSafariLocations: Location[] = [
       { speciesId: 115, formId: '115', chance: 5 },
       { speciesId: 49, formId: '49', chance: 3 },
       { speciesId: 104, formId: '104', chance: 2 },
-      { speciesId: 128, formId: '128', chance: 2 },
+      { speciesId: 128, formId: '128', chance: 4 },
       {
         speciesId: 113,
         formId: '113',
@@ -159,18 +171,6 @@ const expeditionSafariLocations: Location[] = [
       {
         speciesId: 128,
         formId: '10250',
-        chance: 1,
-        requirements: [strangeSightingsRequirement],
-      },
-      {
-        speciesId: 128,
-        formId: '10251',
-        chance: 1,
-        requirements: [strangeSightingsRequirement],
-      },
-      {
-        speciesId: 128,
-        formId: '10252',
         chance: 1,
         requirements: [strangeSightingsRequirement],
       },

@@ -82,7 +82,7 @@ export const safariZoneShops: ShopConfig[] = [
       {
         id: 'safari-credit-strange-sightings',
         name: 'Strange Sightings',
-        description: 'A one-time report on three unusual Tauros varieties that may appear in the reserve’s final habitat.',
+        description: 'A one-time report on three unusual Tauros varieties sighted across the eastern, western, and northern habitats.',
         icon: { type: 'pokemon', id: '128' },
         cost: safariNotesCost(1000),
         stock: 1,

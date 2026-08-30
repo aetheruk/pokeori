@@ -290,7 +290,7 @@ const safariCreditTasks: Task[] = [
     description: 'A permanent record of three unusual Tauros varieties reported beyond Kanto.',
     icon: { type: 'pokemon', id: '128' },
     message:
-      'Three reports describe unfamiliar Tauros with very different coats and temperaments. I should watch the northern habitat and the Grand Expedition’s final reserve closely.',
+      'Three reports describe unfamiliar Tauros with very different coats and temperaments. I should watch the eastern, western, and northern habitats, as well as the Grand Expedition’s final reserve.',
     closeButtonText: 'Note the Tauros',
   }),
   safariCreditMarkerTask({

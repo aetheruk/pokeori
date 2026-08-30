@@ -8,6 +8,11 @@ const chanseyAvailabilityRequirement = {
   targetId: 'safari-catch-partner-chansey',
 }
 
+const strangeSightingsRequirement = {
+  type: 'task_completed' as const,
+  targetId: 'safari-strange-sightings',
+}
+
 const centralPool: FieldObservationPokemonPoolEntry[] = [
   { speciesId: 102, formId: '102', weight: 18 },
   { speciesId: 111, formId: '111', weight: 17 },
@@ -39,11 +44,17 @@ const eastPool: FieldObservationPokemonPoolEntry[] = [
   { speciesId: 33, formId: '33', weight: 3 },
   { speciesId: 47, formId: '47', weight: 3 },
   { speciesId: 104, formId: '104', weight: 3 },
-  { speciesId: 128, formId: '128', weight: 3 },
+  { speciesId: 128, formId: '128', weight: 2 },
   { speciesId: 105, formId: '105', weight: 2 },
   { speciesId: 123, formId: '123', weight: 2 },
   { speciesId: 115, formId: '115', weight: 2 },
   { speciesId: 127, formId: '127', weight: 1 },
+  {
+    speciesId: 128,
+    formId: '10252',
+    weight: 1,
+    requirements: [strangeSightingsRequirement],
+  },
   {
     speciesId: 113,
     formId: '113',
@@ -59,7 +70,7 @@ const westPool: FieldObservationPokemonPoolEntry[] = [
   { speciesId: 84, formId: '84', weight: 13 },
   { speciesId: 48, formId: '48', weight: 10 },
   { speciesId: 33, formId: '33', weight: 6 },
-  { speciesId: 128, formId: '128', weight: 6 },
+  { speciesId: 128, formId: '128', weight: 5 },
   { speciesId: 30, formId: '30', weight: 3 },
   { speciesId: 49, formId: '49', weight: 3 },
   { speciesId: 104, formId: '104', weight: 3 },
@@ -67,6 +78,12 @@ const westPool: FieldObservationPokemonPoolEntry[] = [
   { speciesId: 115, formId: '115', weight: 2 },
   { speciesId: 114, formId: '114', weight: 1 },
   { speciesId: 127, formId: '127', weight: 1 },
+  {
+    speciesId: 128,
+    formId: '10251',
+    weight: 1,
+    requirements: [strangeSightingsRequirement],
+  },
 ]
 
 const northPool: FieldObservationPokemonPoolEntry[] = [
@@ -80,7 +97,7 @@ const northPool: FieldObservationPokemonPoolEntry[] = [
   { speciesId: 115, formId: '115', weight: 5 },
   { speciesId: 49, formId: '49', weight: 3 },
   { speciesId: 104, formId: '104', weight: 2 },
-  { speciesId: 128, formId: '128', weight: 2 },
+  { speciesId: 128, formId: '128', weight: 4 },
   {
     speciesId: 113,
     formId: '113',
@@ -89,9 +106,12 @@ const northPool: FieldObservationPokemonPoolEntry[] = [
   },
   { speciesId: 127, formId: '127', weight: 1 },
   { speciesId: 123, formId: '123', weight: 1 },
-  { speciesId: 128, formId: '10250', weight: 1, requirements: [{ type: 'task_completed', targetId: 'safari-strange-sightings' }] },
-  { speciesId: 128, formId: '10251', weight: 1, requirements: [{ type: 'task_completed', targetId: 'safari-strange-sightings' }] },
-  { speciesId: 128, formId: '10252', weight: 1, requirements: [{ type: 'task_completed', targetId: 'safari-strange-sightings' }] },
+  {
+    speciesId: 128,
+    formId: '10250',
+    weight: 1,
+    requirements: [strangeSightingsRequirement],
+  },
 ]
 
 function discoveryReward(taskId: string) {

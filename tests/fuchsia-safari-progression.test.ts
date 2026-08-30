@@ -494,15 +494,18 @@ describe('Fuchsia Gym and Safari progression', () => {
       ['central', [29, 30, 32, 33, 46, 47, 48, 102, 111, 113, 114, 123, 127]],
       [
         'east',
-        [29, 30, 32, 33, 46, 47, 84, 102, 104, 105, 113, 115, 123, 127, 128],
+        [
+          29, 30, 32, 33, 46, 47, 84, 102, 104, 105, 113, 115, 123, 127, 128,
+          128,
+        ],
       ],
-      ['west', [29, 30, 32, 33, 48, 49, 84, 102, 104, 105, 114, 115, 127, 128]],
+      [
+        'west',
+        [29, 30, 32, 33, 48, 49, 84, 102, 104, 105, 114, 115, 127, 128, 128],
+      ],
       [
         'north',
-        [
-          29, 30, 32, 33, 46, 49, 102, 104, 111, 113, 115, 123, 127, 128, 128,
-          128, 128,
-        ],
+        [29, 30, 32, 33, 46, 49, 102, 104, 111, 113, 115, 123, 127, 128, 128],
       ],
     ])
     for (const [area, speciesIds] of canonicalSpecies) {
@@ -683,7 +686,9 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(JSON.stringify(expedition?.path)).toContain('rocket-poacher')
 
     expect(
-      expeditions.some((entry) => entry.id === 'safari-zone-catching-expedition'),
+      expeditions.some(
+        (entry) => entry.id === 'safari-zone-catching-expedition',
+      ),
     ).toBe(false)
 
     const habitatExpeditions = expeditions.filter((entry) =>
@@ -1009,13 +1014,12 @@ describe('Fuchsia Gym and Safari progression', () => {
       .flatMap((task) => task.rewards)
       .filter(
         (reward) =>
-          reward.type === 'item' &&
-          !pokemonMaterialIds.has(reward.targetId),
+          reward.type === 'item' && !pokemonMaterialIds.has(reward.targetId),
       )
     expect(nonMaterialItemDrops.length).toBeGreaterThan(20)
-    expect(
-      nonMaterialItemDrops.every((reward) => reward.quantity === 1),
-    ).toBe(true)
+    expect(nonMaterialItemDrops.every((reward) => reward.quantity === 1)).toBe(
+      true,
+    )
     expect(
       safariExpeditionContentTasks
         .flatMap((task) => task.rewards)
@@ -1125,9 +1129,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(safariActionSource).toContain(
       'state.safari = {\n      ...state.safari,',
     )
-    expect(encounterInitSource).toContain(
-      "state.safari.scope !== 'encounter'",
-    )
+    expect(encounterInitSource).toContain("state.safari.scope !== 'encounter'")
     expect(encounterInitSource).toContain(
       'state.safari.ballsRemaining = expeditionBallsRemaining',
     )
@@ -1145,9 +1147,7 @@ describe('Fuchsia Gym and Safari progression', () => {
   })
 
   test('Safari Stamina Notes apply through expedition configuration', async () => {
-    const source = await Bun.file(
-      'src/utilities/expeditions/actions.ts',
-    ).text()
+    const source = await Bun.file('src/utilities/expeditions/actions.ts').text()
 
     expect(source).toContain('const staminaNotes = expedition.staminaNoteLimit')
     expect(source).toContain('expedition.staminaNoteLimit,')
@@ -1162,7 +1162,9 @@ describe('Fuchsia Gym and Safari progression', () => {
       name: 'Safari Notes',
       iconId: 'researchers-journal-page',
     })
-    expect(currencies.some((currency) => currency.id === 'shadow-crystals')).toBe(false)
+    expect(
+      currencies.some((currency) => currency.id === 'shadow-crystals'),
+    ).toBe(false)
     expect(items).toContainEqual(
       expect.objectContaining({
         id: 'shadow-crystal',
@@ -1334,9 +1336,7 @@ describe('Fuchsia Gym and Safari progression', () => {
         (task) => task.id === String(taskReward?.targetId),
       )
       expect(unlockTask?.exitModal?.title, item.id).toBe(item.name)
-      expect(unlockTask?.exitModal?.message, item.id).toMatch(
-        /\b(?:I|me|my)\b/,
-      )
+      expect(unlockTask?.exitModal?.message, item.id).toMatch(/\b(?:I|me|my)\b/)
       expect(unlockTask?.exitModal?.closeButtonText, item.id).toBeTruthy()
     }
 
@@ -1783,32 +1783,57 @@ describe('Fuchsia Gym and Safari progression', () => {
       ['safari-notes', 20],
     ])
 
-    const northernCatch = locations.find(
-      (entry) => entry.id === 'safari-north-catch',
-    )
-    expect(
-      northernCatch?.encounters.filter((entry) =>
-        ['10250', '10251', '10252'].includes(entry.formId || ''),
-      ),
-    ).toEqual([
-      expect.objectContaining({ speciesId: 128, formId: '10250', chance: 1 }),
-      expect.objectContaining({ speciesId: 128, formId: '10251', chance: 1 }),
-      expect.objectContaining({ speciesId: 128, formId: '10252', chance: 1 }),
-    ])
-    for (const studyId of [
-      'safari-north-field-observation',
-      'safari-north-expedition-field-observation',
-    ]) {
-      const study = fieldObservationGames.find((entry) => entry.id === studyId)
+    const paldeanTaurosByArea = {
+      east: '10252',
+      west: '10251',
+      north: '10250',
+    } as const
+    for (const [area, formId] of Object.entries(paldeanTaurosByArea)) {
+      const catchLocation = locations.find(
+        (entry) => entry.id === `safari-${area}-catch`,
+      )
       expect(
-        study?.settings.pokemonPool.filter((entry) =>
+        catchLocation?.encounters.filter((entry) =>
           ['10250', '10251', '10252'].includes(entry.formId || ''),
         ),
       ).toEqual([
-        expect.objectContaining({ speciesId: 128, formId: '10250', weight: 1 }),
-        expect.objectContaining({ speciesId: 128, formId: '10251', weight: 1 }),
-        expect.objectContaining({ speciesId: 128, formId: '10252', weight: 1 }),
+        expect.objectContaining({
+          speciesId: 128,
+          formId,
+          chance: 1,
+          requirements: [
+            {
+              type: 'task_completed',
+              targetId: 'safari-strange-sightings',
+            },
+          ],
+        }),
       ])
+      for (const studyId of [
+        `safari-${area}-field-observation`,
+        `safari-${area}-expedition-field-observation`,
+      ]) {
+        const study = fieldObservationGames.find(
+          (entry) => entry.id === studyId,
+        )
+        expect(
+          study?.settings.pokemonPool.filter((entry) =>
+            ['10250', '10251', '10252'].includes(entry.formId || ''),
+          ),
+        ).toEqual([
+          expect.objectContaining({
+            speciesId: 128,
+            formId,
+            weight: 1,
+            requirements: [
+              {
+                type: 'task_completed',
+                targetId: 'safari-strange-sightings',
+              },
+            ],
+          }),
+        ])
+      }
     }
   })
 
@@ -2026,7 +2051,9 @@ describe('Fuchsia Gym and Safari progression', () => {
     ])
     expect(JSON.stringify(analysis)).toContain('The second... Im unsure')
     expect(JSON.stringify(analysis)).toContain('Shadowy Crystals')
-    expect(JSON.stringify(analysis)).toContain('connected to the Shadow Pokemon')
+    expect(JSON.stringify(analysis)).toContain(
+      'connected to the Shadow Pokemon',
+    )
     expect(JSON.stringify(analysis)).toContain('fresh yolk from a Chansey egg')
     expect(JSON.stringify(analysis)).toContain('On it!')
 
@@ -2068,9 +2095,9 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(taskRewards.some((reward) => reward.type === 'pokemon')).toBe(false)
     expect(taskRewards.some((reward) => reward.type === 'egg')).toBe(false)
     expect(
-      chain.flatMap((task) => task?.criteria || []).some(
-        (criterion) => criterion.type === 'companion',
-      ),
+      chain
+        .flatMap((task) => task?.criteria || [])
+        .some((criterion) => criterion.type === 'companion'),
     ).toBe(false)
 
     const prose = JSON.stringify(analysis)
@@ -2109,7 +2136,9 @@ describe('Fuchsia Gym and Safari progression', () => {
       title: 'Det. Ray Choo',
       icon: { type: 'trainer', id: 'detective' },
     })
-    expect(chansey?.enterModal?.some((modal) => modal.title === 'Koga')).toBe(true)
+    expect(chansey?.enterModal?.some((modal) => modal.title === 'Koga')).toBe(
+      true,
+    )
     expect(chanseyProse).toContain('yolk')
     expect(chanseyProse).toContain('last reagent')
     expect(chanseyProse).toContain('antidote')
@@ -2117,7 +2146,13 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(chanseyProse).toContain('We have the egg Chansey gave us')
     expect(chanseyProse).toContain('place the warm egg in Koga’s hands')
 
-    const narrative = JSON.stringify([chain[4], chain[5], chain[6], analysis, chansey])
+    const narrative = JSON.stringify([
+      chain[4],
+      chain[5],
+      chain[6],
+      analysis,
+      chansey,
+    ])
     expect(narrative).not.toContain('Return with Chansey')
     expect(narrative).not.toContain('stays beside you')
     expect(narrative).not.toContain('you and Chansey brought')
