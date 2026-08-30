@@ -506,7 +506,7 @@ export function RockTunnelEchoMapGame({
               <div />
               <Button
                 size="lg"
-                className="h-16 border border-game-moss bg-game-surface-raised text-game-moss hover:bg-game-moss/10"
+                className="h-16 border border-game-moss bg-game-surface-raised text-game-ink hover:bg-game-moss/10"
                 onClick={() => movePlayer('up')}
                 disabled={!movementEnabled}
                 aria-label="Move up"
@@ -516,7 +516,7 @@ export function RockTunnelEchoMapGame({
               <div />
               <Button
                 size="lg"
-                className="h-16 border border-game-moss bg-game-surface-raised text-game-moss hover:bg-game-moss/10"
+                className="h-16 border border-game-moss bg-game-surface-raised text-game-ink hover:bg-game-moss/10"
                 onClick={() => movePlayer('left')}
                 disabled={!movementEnabled}
                 aria-label="Move left"
@@ -525,7 +525,7 @@ export function RockTunnelEchoMapGame({
               </Button>
               <Button
                 size="lg"
-                className="h-16 border border-game-moss bg-game-surface-raised text-game-moss hover:bg-game-moss/10"
+                className="h-16 border border-game-moss bg-game-surface-raised text-game-ink hover:bg-game-moss/10"
                 onClick={() => movePlayer('down')}
                 disabled={!movementEnabled}
                 aria-label="Move down"
@@ -534,7 +534,7 @@ export function RockTunnelEchoMapGame({
               </Button>
               <Button
                 size="lg"
-                className="h-16 border border-game-moss bg-game-surface-raised text-game-moss hover:bg-game-moss/10"
+                className="h-16 border border-game-moss bg-game-surface-raised text-game-ink hover:bg-game-moss/10"
                 onClick={() => movePlayer('right')}
                 disabled={!movementEnabled}
                 aria-label="Move right"

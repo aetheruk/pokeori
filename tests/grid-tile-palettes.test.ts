@@ -52,6 +52,12 @@ describe('shared grid sprite sets', () => {
     expect(getGridTilePalette('basic-cave').walls?.back?.src).toBe(
       '/games/grid-tiles/basic-cave/walls/back.png',
     )
+    expect(gridTilePalettes.grass.floor.markers?.goal?.src).toBe(
+      gridTilePalettes.grass.floor.markers?.teleporter?.src,
+    )
+    expect(gridTilePalettes.grass.floor.markers?.goal?.src).not.toBe(
+      '/games/rockpush/win-tile.avif',
+    )
   })
 
   test('wall masks encode connected north, east, south, and west terrain', () => {
@@ -212,6 +218,16 @@ describe('shared grid sprite sets', () => {
           (game.settings as { tilePaletteId?: string }).tilePaletteId === 'grass',
       ),
     ).toBe(true)
+    const rendererTest = spatialGames.find(
+      (game) => game.id === 'voltorb-grid-renderer-test',
+    )
+    expect(rendererTest).toBeDefined()
+    expect(rendererTest?.subCategory).toBe('Test')
+    expect(rendererTest?.requirements).toEqual([])
+    if (!rendererTest) throw new Error('Voltorb Grid renderer test entry is missing')
+    expect((rendererTest.settings as { tilePaletteId?: string }).tilePaletteId).toBe(
+      'basic-cave',
+    )
   })
 
   test('no external sprite pack is bundled', () => {
