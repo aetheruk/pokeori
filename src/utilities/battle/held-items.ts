@@ -261,6 +261,7 @@ export function applyHeldDamageBlock(
 export function getHeldAttackDamageMultiplier(
   pokemon: BattlePokemon,
   attackType?: string,
+  stance?: 'power' | 'tech' | 'speed',
 ): number {
   const item = getHeldItemDefinition(getHeldItemId(pokemon))
   const effect = item?.heldConfig.effect
@@ -269,10 +270,25 @@ export function getHeldAttackDamageMultiplier(
   if (
     !item ||
     suppressesBattleHeldItemEffectsByAbility(pokemon) ||
-    effect?.type !== 'type-damage-boost' ||
     pokemon.currentHp <= 0 ||
     (pokemon.pokemonResearchLevel !== undefined &&
       pokemon.pokemonResearchLevel < 1) ||
+    (effect?.eligibleSpeciesIds?.length &&
+      !effect.eligibleSpeciesIds.includes(pokemon.speciesId))
+  ) {
+    return 1
+  }
+
+  if (
+    effect?.type === 'stance-damage-multiplier' &&
+    (!effect.eligibleStances?.length ||
+      (stance !== undefined && effect.eligibleStances.includes(stance)))
+  ) {
+    return Math.max(0, effect.damageMultiplier ?? 1)
+  }
+
+  if (
+    effect?.type !== 'type-damage-boost' ||
     !attackTypeMatches(attackType, boostedAttackType)
   ) {
     return 1
@@ -300,6 +316,25 @@ export function getHeldItemCritChanceMultiplier(
   }
 
   return Math.max(1, effect.critChanceMultiplier ?? 1)
+}
+
+export function getHeldItemCritStageBonus(pokemon: BattlePokemon): number {
+  const item = getHeldItemDefinition(getHeldItemId(pokemon))
+  const effect = item?.heldConfig.effect
+  if (
+    !item ||
+    effect?.type !== 'crit-chance-multiplier' ||
+    suppressesBattleHeldItemEffectsByAbility(pokemon) ||
+    pokemon.currentHp <= 0 ||
+    (pokemon.pokemonResearchLevel !== undefined &&
+      pokemon.pokemonResearchLevel < 1) ||
+    (effect.eligibleSpeciesIds?.length &&
+      !effect.eligibleSpeciesIds.includes(pokemon.speciesId))
+  ) {
+    return 0
+  }
+
+  return Math.max(0, Math.floor(effect.critStageBonus ?? 0))
 }
 
 export function getWildBattleCandyMultiplier(

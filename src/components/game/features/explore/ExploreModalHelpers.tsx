@@ -32,6 +32,7 @@ import type {
   FishingItemEntry,
 } from '@/data/games/fishing/types'
 import { items } from '@/data/items'
+import { SPECIAL_POKEMON_DROPS } from '@/data/pokemon/special-drops'
 import { calculateContentSkillXp, resolveSkillXpConfig } from '@/data/skills/xp'
 import { cn } from '@/lib/utils'
 import { TYPE_MATERIAL_CONFIG } from '@/utilities/artisan/material-drops'
@@ -101,11 +102,9 @@ const pokemonMaterialFamilies = Array.from(
   new Set(Object.values(TYPE_MATERIAL_CONFIG).map((config) => config.family)),
 )
 
-const specialPokemonMaterialIds = new Set(
-  Object.values(TYPE_MATERIAL_CONFIG).flatMap((config) =>
-    Object.values(config.specialFormMaterials).map(
-      (material) => material.materialId,
-    ),
+const specialPokemonDropItemIds = new Set(
+  Object.values(SPECIAL_POKEMON_DROPS).flatMap((drops) =>
+    drops.map((drop) => drop.itemId),
   ),
 )
 
@@ -321,7 +320,7 @@ function getRewardItem(reward: any) {
 function isPokemonMaterialReward(reward: any): boolean {
   const targetId = getRewardTargetId(reward)
   if (!targetId) return false
-  if (specialPokemonMaterialIds.has(targetId)) return true
+  if (specialPokemonDropItemIds.has(targetId)) return true
 
   return pokemonMaterialFamilies.some((family) =>
     new RegExp(`^${family}-t[1-3]$`).test(targetId),

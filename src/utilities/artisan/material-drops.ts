@@ -1,3 +1,4 @@
+import { SPECIAL_POKEMON_DROPS } from '@/data/pokemon/special-drops'
 import type { LocationReward } from '@/data/types'
 
 type Tier = 1 | 2 | 3
@@ -30,61 +31,27 @@ interface MaterialRewardOptions {
 
 interface TypeMaterialConfig {
   family: string
-  specialFormMaterials: Record<
-    string,
-    { materialId: string; dropChance: number; guaranteed?: boolean }
-  >
 }
 
 export const TYPE_MATERIAL_CONFIG: Record<string, TypeMaterialConfig> = {
-  normal: { family: 'soft-fluff', specialFormMaterials: {} },
-  fire: {
-    family: 'cinder-shard',
-    specialFormMaterials: {
-      '146': { materialId: 'flaming-twig', dropChance: 100, guaranteed: true },
-      '244': { materialId: 'token-of-fire', dropChance: 100, guaranteed: true },
-    },
-  },
-  water: {
-    family: 'aqua-solvent',
-    specialFormMaterials: {
-      '245': {
-        materialId: 'token-of-water',
-        dropChance: 100,
-        guaranteed: true,
-      },
-    },
-  },
-  electric: {
-    family: 'electric-component',
-    specialFormMaterials: {
-      '145': { materialId: 'charged-twig', dropChance: 100, guaranteed: true },
-      '243': {
-        materialId: 'token-of-thunder',
-        dropChance: 100,
-        guaranteed: true,
-      },
-    },
-  },
-  grass: { family: 'wood-scraps', specialFormMaterials: {} },
-  ice: {
-    family: 'frost-crystal',
-    specialFormMaterials: {
-      '144': { materialId: 'frozen-twig', dropChance: 100, guaranteed: true },
-    },
-  },
-  fighting: { family: 'grip-weave', specialFormMaterials: {} },
-  poison: { family: 'toxic-resin', specialFormMaterials: {} },
-  ground: { family: 'terra-dust', specialFormMaterials: {} },
-  flying: { family: 'wing-feather', specialFormMaterials: {} },
-  psychic: { family: 'mind-thread', specialFormMaterials: {} },
-  bug: { family: 'chitin-fragment', specialFormMaterials: {} },
-  rock: { family: 'small-stone', specialFormMaterials: {} },
-  ghost: { family: 'spirit-wisp', specialFormMaterials: {} },
-  dragon: { family: 'drake-scale', specialFormMaterials: {} },
-  dark: { family: 'shadow-fiber', specialFormMaterials: {} },
-  steel: { family: 'metal-scrap', specialFormMaterials: {} },
-  fairy: { family: 'pixie-powder', specialFormMaterials: {} },
+  normal: { family: 'soft-fluff' },
+  fire: { family: 'cinder-shard' },
+  water: { family: 'aqua-solvent' },
+  electric: { family: 'electric-component' },
+  grass: { family: 'wood-scraps' },
+  ice: { family: 'frost-crystal' },
+  fighting: { family: 'grip-weave' },
+  poison: { family: 'toxic-resin' },
+  ground: { family: 'terra-dust' },
+  flying: { family: 'wing-feather' },
+  psychic: { family: 'mind-thread' },
+  bug: { family: 'chitin-fragment' },
+  rock: { family: 'small-stone' },
+  ghost: { family: 'spirit-wisp' },
+  dragon: { family: 'drake-scale' },
+  dark: { family: 'shadow-fiber' },
+  steel: { family: 'metal-scrap' },
+  fairy: { family: 'pixie-powder' },
 }
 
 export function baseMaterialTierFromLevel(level: number): Tier {
@@ -162,22 +129,20 @@ function resolveCapturePrimaryMaterialQuantity(rng: () => number): number {
   return 1
 }
 
-function getSpecialFormMaterials(
-  context: DropContext,
-  configs = getTypeMaterialConfigs(context.types),
-) {
+function buildSpecialPokemonDropRewards(
+  context: Pick<DropContext, 'formId'>,
+): LocationReward[] {
   if (!context.formId) return []
-  return configs
-    .map((config) => config.specialFormMaterials[context.formId as string])
-    .filter(
-      (
-        material,
-      ): material is {
-        materialId: string
-        dropChance: number
-        guaranteed?: boolean
-      } => !!material,
-    )
+
+  return (SPECIAL_POKEMON_DROPS[context.formId] || []).map((drop) => ({
+    type: 'item',
+    targetId: drop.itemId,
+    quantity: drop.quantity ?? 1,
+    dropChance: drop.guaranteed ? 100 : drop.dropChance,
+    ...(drop.guaranteed ? { guaranteed: true } : {}),
+    ...(drop.secret ? { secret: true } : {}),
+    ...(drop.requirements?.length ? { requirements: drop.requirements } : {}),
+  }))
 }
 
 export function buildArtisanMaterialRewards(
@@ -193,7 +158,6 @@ export function buildArtisanMaterialRewards(
   const primaryMaterialIds = primaryConfigs.map((config) =>
     familyId(config.family, tier),
   )
-  const specialMaterials = getSpecialFormMaterials(context, primaryConfigs)
 
   const rewards: LocationReward[] = primaryMaterialIds.map(
     (primaryMaterialId) => ({
@@ -208,15 +172,7 @@ export function buildArtisanMaterialRewards(
     }),
   )
 
-  for (const specialMaterial of specialMaterials) {
-    rewards.push({
-      type: 'item',
-      targetId: specialMaterial.materialId,
-      quantity: 1,
-      dropChance: specialMaterial.guaranteed ? 100 : specialMaterial.dropChance,
-      ...(specialMaterial.guaranteed ? { guaranteed: true } : {}),
-    } as LocationReward)
-  }
+  rewards.push(...buildSpecialPokemonDropRewards(context))
 
   return rewards
 }

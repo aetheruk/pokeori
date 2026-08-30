@@ -364,6 +364,10 @@ export function recalculateBattlePokemonStats(
     suppressesBattleHeldItemEffectsByAbility(pokemon)
       ? undefined
       : pokemon.heldItem?.id || pokemon.heldItemId,
+    {
+      speciesId: pokemon.speciesId,
+      transformed: Boolean(pokemon.battleAbilityState?.originalTransform),
+    },
   )
   const boosted = applyBattleStatMultiplier(
     recalculated,
@@ -395,6 +399,7 @@ export function initializeBattlePokemon(
       suppressesBattleHeldItemEffectsByAbility(pokemon as BattlePokemon)
         ? undefined
         : heldItem?.id,
+      { speciesId: pokemon.speciesId, transformed: false },
     ),
     battleStatMultiplier,
   )

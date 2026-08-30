@@ -10,6 +10,7 @@ import { basicEntries } from '@/data/games/rock-push'
 import { items } from '@/data/items'
 import { locations } from '@/data/locations'
 import { getMove } from '@/data/moves'
+import { SPECIAL_POKEMON_DROPS } from '@/data/pokemon/special-drops'
 import { celadonGameCornerShops } from '@/data/shops/entries/celadon-game-corner'
 import { safariZoneShops } from '@/data/shops/entries/safari-zone'
 import { subCategories } from '@/data/sub-region-map'
@@ -468,17 +469,26 @@ describe('Fuchsia Gym and Safari progression', () => {
       safariCatchLocations.every((entry) =>
         entry.rewards.every(
           (reward) =>
-            reward.type === 'item' &&
-            ['lucky-egg', 'lucky-punch'].includes(String(reward.targetId)) &&
-            reward.dropChance === 1 &&
-            reward.requirements?.some(
-              (requirement) =>
-                requirement.type === 'task_completed' &&
-                requirement.targetId === 'safari-rare-item-rumours',
-            ),
+            !['lucky-egg', 'lucky-punch'].includes(String(reward.targetId)),
         ),
       ),
     ).toBe(true)
+    expect(SPECIAL_POKEMON_DROPS['113']).toEqual([
+      {
+        itemId: 'lucky-egg',
+        dropChance: 1,
+        requirements: [
+          { type: 'task_completed', targetId: 'safari-rare-item-rumours' },
+        ],
+      },
+      {
+        itemId: 'lucky-punch',
+        dropChance: 1,
+        requirements: [
+          { type: 'task_completed', targetId: 'safari-rare-item-rumours' },
+        ],
+      },
+    ])
 
     const canonicalSpecies = new Map([
       ['central', [29, 30, 32, 33, 46, 47, 48, 102, 111, 113, 114, 123, 127]],

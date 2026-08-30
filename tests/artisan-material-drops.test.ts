@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test'
+import { SPECIAL_POKEMON_DROPS } from '@/data/pokemon/special-drops'
 import {
   buildArtisanMaterialRewards,
   buildBrokenBallRewards,
@@ -16,6 +17,52 @@ function rngSequence(...values: number[]) {
 }
 
 describe('artisan material drops', () => {
+  test('Pikachu has an unconditional one-percent Light Ball roll', () => {
+    expect(SPECIAL_POKEMON_DROPS['25']).toEqual([
+      { itemId: 'light-ball', dropChance: 1 },
+    ])
+    expect(
+      buildArtisanMaterialRewards(
+        {
+          speciesId: 25,
+          formId: '25',
+          level: 20,
+          types: ['Electric'],
+          researchingLevel: 1,
+        },
+        'capture',
+        { rng: rngSequence(0, 0.9) },
+      ),
+    ).toContainEqual({
+      type: 'item',
+      targetId: 'light-ball',
+      quantity: 1,
+      dropChance: 1,
+    })
+  })
+
+  test('signature held items have independent one-percent form drops', () => {
+    expect(SPECIAL_POKEMON_DROPS['83']).toEqual([
+      { itemId: 'leek', dropChance: 1 },
+    ])
+    expect(SPECIAL_POKEMON_DROPS['10166']).toEqual([
+      { itemId: 'leek', dropChance: 1 },
+    ])
+    expect(SPECIAL_POKEMON_DROPS['104']).toEqual([
+      { itemId: 'thick-club', dropChance: 1 },
+    ])
+    expect(SPECIAL_POKEMON_DROPS['105']).toEqual([
+      { itemId: 'thick-club', dropChance: 1 },
+    ])
+    expect(SPECIAL_POKEMON_DROPS['10115']).toEqual([
+      { itemId: 'thick-club', dropChance: 1 },
+    ])
+    expect(SPECIAL_POKEMON_DROPS['132']).toEqual([
+      { itemId: 'quick-powder', dropChance: 1 },
+      { itemId: 'metal-powder', dropChance: 1 },
+    ])
+  })
+
   test('every pokemon type maps to a primary material family', () => {
     const cases: Array<{ type: string; expected: string }> = [
       { type: 'Normal', expected: 'soft-fluff-t1' },
@@ -193,19 +240,19 @@ describe('artisan material drops', () => {
     ])
   })
 
-  test('legendary beast special materials are guaranteed type-configured drops', () => {
-    expect(TYPE_MATERIAL_CONFIG.fire.specialFormMaterials['244']).toEqual({
-      materialId: 'token-of-fire',
+  test('legendary beast special materials are guaranteed form-configured drops', () => {
+    expect(SPECIAL_POKEMON_DROPS['244']).toContainEqual({
+      itemId: 'token-of-fire',
       dropChance: 100,
       guaranteed: true,
     })
-    expect(TYPE_MATERIAL_CONFIG.electric.specialFormMaterials['243']).toEqual({
-      materialId: 'token-of-thunder',
+    expect(SPECIAL_POKEMON_DROPS['243']).toContainEqual({
+      itemId: 'token-of-thunder',
       dropChance: 100,
       guaranteed: true,
     })
-    expect(TYPE_MATERIAL_CONFIG.water.specialFormMaterials['245']).toEqual({
-      materialId: 'token-of-water',
+    expect(SPECIAL_POKEMON_DROPS['245']).toContainEqual({
+      itemId: 'token-of-water',
       dropChance: 100,
       guaranteed: true,
     })
@@ -230,18 +277,18 @@ describe('artisan material drops', () => {
     })
   })
 
-  test('capture and field observation can add a type-configured form-specific material alongside primary material', () => {
-    TYPE_MATERIAL_CONFIG.electric.specialFormMaterials['25-special'] = {
-      materialId: 'static-pelt',
-      dropChance: 35,
-    }
-    TYPE_MATERIAL_CONFIG.flying.specialFormMaterials['25-special'] = {
-      materialId: 'charged-feather',
-      dropChance: 15,
-    }
+  test('form-specific drops are independent of the selected primary material type', () => {
+    SPECIAL_POKEMON_DROPS['25-special'] = [
+      {
+        itemId: 'static-pelt',
+        dropChance: 35,
+        requirements: [{ type: 'item_owned', targetId: 'research-kit' }],
+      },
+      { itemId: 'charged-feather', dropChance: 15 },
+    ]
 
     try {
-      const specialRewards = buildArtisanMaterialRewards(
+      const fieldRewards = buildArtisanMaterialRewards(
         {
           speciesId: 25,
           formId: '25-special',
@@ -251,19 +298,7 @@ describe('artisan material drops', () => {
         },
         'field-observation',
       )
-
-      const normalRewards = buildArtisanMaterialRewards(
-        {
-          speciesId: 25,
-          formId: '25-special',
-          level: 20,
-          types: ['Electric', 'Flying'],
-          researchingLevel: 1,
-        },
-        'field-observation',
-      )
-
-      const captureSpecialRewards = buildArtisanMaterialRewards(
+      const electricCaptureRewards = buildArtisanMaterialRewards(
         {
           speciesId: 25,
           formId: '25-special',
@@ -274,8 +309,7 @@ describe('artisan material drops', () => {
         'capture',
         { rng: rngSequence(0, 0.9) },
       )
-
-      const captureNormalRewards = buildArtisanMaterialRewards(
+      const flyingCaptureRewards = buildArtisanMaterialRewards(
         {
           speciesId: 25,
           formId: '25-special',
@@ -287,29 +321,29 @@ describe('artisan material drops', () => {
         { rng: rngSequence(0.75, 0.9) },
       )
 
-      expect(specialRewards).toEqual([
-        { type: 'item', targetId: 'electric-component-t1', quantity: 1, dropChance: FIELD_OBSERVATION_PRIMARY_MATERIAL_DROP_CHANCE },
-        { type: 'item', targetId: 'wing-feather-t1', quantity: 1, dropChance: FIELD_OBSERVATION_PRIMARY_MATERIAL_DROP_CHANCE },
-        { type: 'item', targetId: 'static-pelt', quantity: 1, dropChance: 35 },
-        { type: 'item', targetId: 'charged-feather', quantity: 1, dropChance: 15 },
+      expect(fieldRewards.map((reward) => reward.targetId)).toEqual([
+        'electric-component-t1',
+        'wing-feather-t1',
+        'static-pelt',
+        'charged-feather',
       ])
-      expect(normalRewards).toEqual([
-        { type: 'item', targetId: 'electric-component-t1', quantity: 1, dropChance: FIELD_OBSERVATION_PRIMARY_MATERIAL_DROP_CHANCE },
-        { type: 'item', targetId: 'wing-feather-t1', quantity: 1, dropChance: FIELD_OBSERVATION_PRIMARY_MATERIAL_DROP_CHANCE },
-        { type: 'item', targetId: 'static-pelt', quantity: 1, dropChance: 35 },
-        { type: 'item', targetId: 'charged-feather', quantity: 1, dropChance: 15 },
+      expect(electricCaptureRewards.map((reward) => reward.targetId)).toEqual([
+        'electric-component-t1',
+        'static-pelt',
+        'charged-feather',
       ])
-      expect(captureSpecialRewards).toEqual([
-        { type: 'item', targetId: 'electric-component-t1', quantity: 1, dropChance: 100 },
-        { type: 'item', targetId: 'static-pelt', quantity: 1, dropChance: 35 },
+      expect(flyingCaptureRewards.map((reward) => reward.targetId)).toEqual([
+        'wing-feather-t1',
+        'static-pelt',
+        'charged-feather',
       ])
-      expect(captureNormalRewards).toEqual([
-        { type: 'item', targetId: 'wing-feather-t1', quantity: 1, dropChance: 100 },
-        { type: 'item', targetId: 'charged-feather', quantity: 1, dropChance: 15 },
-      ])
+      expect(
+        electricCaptureRewards.find(
+          (reward) => reward.targetId === 'static-pelt',
+        )?.requirements,
+      ).toEqual([{ type: 'item_owned', targetId: 'research-kit' }])
     } finally {
-      delete TYPE_MATERIAL_CONFIG.electric.specialFormMaterials['25-special']
-      delete TYPE_MATERIAL_CONFIG.flying.specialFormMaterials['25-special']
+      delete SPECIAL_POKEMON_DROPS['25-special']
     }
   })
 

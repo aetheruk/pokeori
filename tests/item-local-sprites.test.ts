@@ -95,6 +95,16 @@ describe('local item sprites', () => {
     expect(getItemSpriteUrl('incense-memory')).toBe(
       '/sprites/items/key/incense-memory.avif',
     )
+    expect(getItemSpriteUrl('leek')).toBe('/sprites/items/leek.avif')
+    expect(getItemSpriteUrl('thick-club')).toBe(
+      '/sprites/items/thick-club.avif',
+    )
+    expect(getItemSpriteUrl('quick-powder')).toBe(
+      '/sprites/items/quick-powder.avif',
+    )
+    expect(getItemSpriteUrl('metal-powder')).toBe(
+      '/sprites/items/metal-powder.avif',
+    )
   })
 
   test('resolves bundled PokeAPI item sprites without using the sprite proxy', () => {
@@ -200,6 +210,9 @@ describe('local item sprites', () => {
     expect(getItemSpriteUrl('lucky-egg')).toBe('/sprites/items/lucky-egg.avif')
     expect(getItemSpriteUrl('lucky-punch')).toBe(
       '/sprites/items/lucky-punch.avif',
+    )
+    expect(getItemSpriteUrl('light-ball')).toBe(
+      '/sprites/items/light-ball.avif',
     )
     expect(
       currencyIconIds.every((iconId) =>
