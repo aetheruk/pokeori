@@ -41,8 +41,9 @@ export const gridTilePalettes = {
         large: { src: '/games/grid-tiles/grass/floor/blockers/large.png' },
       },
       markers: {
-        goal: { src: '/games/rockpush/win-tile.avif' },
         teleporter: { src: '/games/grid-tiles/grass/floor/markers/teleporter.png' },
+        // Grass has no dedicated goal artwork yet; use the authored teleporter marker for both roles.
+        goal: { src: '/games/grid-tiles/grass/floor/markers/teleporter.png' },
       },
     },
     walls: {

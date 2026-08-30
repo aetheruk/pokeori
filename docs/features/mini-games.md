@@ -12,6 +12,7 @@
 - Floor rendering uses one required common tile and optional weighted rare tiles. Rare placement is deterministic from the set id, scene seed and coordinates, defaults to 8%, and never affects collision.
 - Every registered set includes source and licensing metadata. Credits are rendered in the in-app Credits & Legal dialog, and third-party packs must also be recorded in `ATTRIBUTIONS.md`.
 - Cave-oriented Echo and Voltorb boards use the local `basic-cave` working set, while outdoor Rock Push tests and the Western Road chronicle use the local `grass` set. Retired palette ids fall back to the default set; no external sprite pack is bundled or assigned to live content.
+- `voltorb-grid-renderer-test` is an always-available Kanto/Test copy of the introductory Voltorb board for previewing renderer and tile-set changes after the authored route boards have been completed.
 
 ## Locations
 - Mini Game routes: `/game/games/[gameType]`
@@ -103,7 +104,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 - Optional `settings.screens[*].prizes` entries work like board-level prizes and are validated with screen-scoped ids.
 - Board item prizes render as enlarged, borderless sprites with a subtle pulse so they remain readable without looking like placed objects.
 - `settings.invisibleMaze: true` turns authored internal obstacles into contact-revealed props. The architectural outer boundary remains visible, bumping an internal obstacle permanently reveals its 1×1 prop for that attempt, and a `winTiles` exit can complete a maze with no boulders.
-- The working `basic-cave` and `grass` sets use native logical tiles under `public/games/grid-tiles`: each provides a common floor, repeated back wall, 1×1 and 2×2 blockers, teleporter marker, and hole; the grass set uses the supplied grass artwork, while ice is shared for Rock Push ice boards. Existing Pokeori boulder, goal, and player artwork remains available through the manifests/runtime. Individual roles can still be overridden through legacy sprite settings for bespoke boards.
+- The working `basic-cave` and `grass` sets use native logical tiles under `public/games/grid-tiles`: each provides a common floor, repeated back wall, 1×1 and 2×2 blockers, teleporter marker, and hole; the grass set uses the supplied grass artwork, while ice is shared for Rock Push ice boards. Grass currently reuses its teleporter marker for both goal and teleporter roles until dedicated grass goal art is authored. Existing Pokeori boulder, goal, and player artwork remains available through the manifests/runtime. Individual roles can still be overridden through legacy sprite settings for bespoke boards.
 
 ## Snap
 - Standard Snap asks the player to photograph randomly requested Pokemon from `settings.pokemonPool`.

@@ -1420,7 +1420,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
             <div />
             <Button
               size="lg"
-              className="h-16 border border-game-moss bg-game-surface-raised text-game-moss hover:bg-game-moss/10"
+              className="h-16 border border-game-moss bg-game-surface-raised text-game-ink hover:bg-game-moss/10"
               onClick={() => move(0, -1)}
               disabled={isSliding}
               aria-label="Move up"
@@ -1431,7 +1431,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
             <div />
             <Button
               size="lg"
-              className="h-16 border border-game-moss bg-game-surface-raised text-game-moss hover:bg-game-moss/10"
+              className="h-16 border border-game-moss bg-game-surface-raised text-game-ink hover:bg-game-moss/10"
               onClick={() => move(-1, 0)}
               disabled={isSliding}
               aria-label="Move left"
@@ -1441,7 +1441,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
             </Button>
             <Button
               size="lg"
-              className="h-16 border border-game-moss bg-game-surface-raised text-game-moss hover:bg-game-moss/10"
+              className="h-16 border border-game-moss bg-game-surface-raised text-game-ink hover:bg-game-moss/10"
               onClick={() => move(0, 1)}
               disabled={isSliding}
               aria-label="Move down"
@@ -1451,7 +1451,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
             </Button>
             <Button
               size="lg"
-              className="h-16 border border-game-moss bg-game-surface-raised text-game-moss hover:bg-game-moss/10"
+              className="h-16 border border-game-moss bg-game-surface-raised text-game-ink hover:bg-game-moss/10"
               onClick={() => move(1, 0)}
               disabled={isSliding}
               aria-label="Move right"
