@@ -102,6 +102,39 @@ const allTaskIds = [
 
 type SafariArea = keyof typeof safariFlavorTaskPoolIds
 
+const safariAreaMiniGameIds = (area: SafariArea) => [
+  `safari-${area}-expedition-snap`,
+  `safari-${area}-expedition-silhouette`,
+]
+
+const safariMiniGameBranch = (id: string, area: SafariArea) => ({
+  type: 'branch' as const,
+  id,
+  selection: 'random' as const,
+  branches: [
+    {
+      id: `${area}-snap-survey`,
+      nodes: [
+        secretActivity(
+          `${id}-snap`,
+          'game',
+          `safari-${area}-expedition-snap`,
+        ),
+      ],
+    },
+    {
+      id: `${area}-silhouette-survey`,
+      nodes: [
+        secretActivity(
+          `${id}-silhouette`,
+          'game',
+          `safari-${area}-expedition-silhouette`,
+        ),
+      ],
+    },
+  ],
+})
+
 const safariHabitatRewardTaskPool = (
   area: SafariArea,
 ): ExpeditionTaskPoolEntry[] => {
@@ -325,13 +358,19 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
         'safari-west-rocket-poacher',
         'safari-north-rocket-poacher',
       ],
+      game: [
+        ...safariAreaMiniGameIds('central'),
+        ...safariAreaMiniGameIds('east'),
+        ...safariAreaMiniGameIds('west'),
+        ...safariAreaMiniGameIds('north'),
+      ],
     },
     taskPools: {
       'safari-rewards': safariRewardTaskPool,
     },
     path: [
       taskActivity('safari-grand-step-01-research', 'research'),
-      secretActivity('safari-grand-step-02-central-survey', 'field-research', 'safari-central-expedition-field-observation'),
+      safariMiniGameBranch('safari-grand-step-02-central-mini-game', 'central'),
       secretActivity('safari-grand-step-03-central-survey', 'field-research', 'safari-central-expedition-field-observation'),
       taskActivity('safari-grand-step-04-central-find', 'items'),
       secretActivity('safari-grand-step-05-central-catch', 'location', 'safari-central-catch'),
@@ -360,7 +399,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
           },
         ],
       },
-      secretActivity('safari-grand-step-10-east-survey', 'field-research', 'safari-east-expedition-field-observation'),
+      safariMiniGameBranch('safari-grand-step-10-east-mini-game', 'east'),
       secretActivity('safari-grand-step-11-east-survey', 'field-research', 'safari-east-expedition-field-observation'),
       taskActivity('safari-grand-step-12-east-research', 'research'),
       secretActivity('safari-grand-step-13-east-catch', 'location', 'safari-east-catch'),
@@ -389,7 +428,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
           },
         ],
       },
-      secretActivity('safari-grand-step-18-west-survey', 'field-research', 'safari-west-expedition-field-observation'),
+      safariMiniGameBranch('safari-grand-step-18-west-mini-game', 'west'),
       secretActivity('safari-grand-step-19-west-survey', 'field-research', 'safari-west-expedition-field-observation'),
       taskActivity('safari-grand-step-20-west-research', 'research'),
       secretActivity('safari-grand-step-21-west-catch', 'location', 'safari-west-catch'),
@@ -418,7 +457,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
           },
         ],
       },
-      secretActivity('safari-grand-step-26-north-survey', 'field-research', 'safari-north-expedition-field-observation'),
+      safariMiniGameBranch('safari-grand-step-26-north-mini-game', 'north'),
       secretActivity('safari-grand-step-27-north-survey', 'field-research', 'safari-north-expedition-field-observation'),
       taskActivity('safari-grand-step-28-north-research', 'research'),
       secretActivity('safari-grand-step-29-north-catch', 'location', 'safari-north-catch'),
