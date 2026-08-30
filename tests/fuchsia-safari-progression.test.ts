@@ -1556,6 +1556,12 @@ describe('Fuchsia Gym and Safari progression', () => {
 
   test('Grand Expedition area mini-games are short, rewarding, and expedition-only', () => {
     const areas = ['central', 'east', 'west', 'north']
+    const expectedSnapPools: Record<string, number[]> = {
+      central: [102, 111, 29, 32, 48],
+      east: [102, 29, 32, 84, 46],
+      west: [102, 29, 32, 84, 48],
+      north: [102, 111, 29, 32, 46],
+    }
     const expectedRewards = [
       {
         type: 'xp',
@@ -1587,7 +1593,7 @@ describe('Fuchsia Gym and Safari progression', () => {
         ],
         rewards: expectedRewards,
         settings: {
-          timeLimit: 30,
+          timeLimit: 45,
           winRate: 1,
         },
       })
@@ -1602,14 +1608,13 @@ describe('Fuchsia Gym and Safari progression', () => {
           winRate: 1,
         },
       })
-      expect(
-        snap?.settings.pokemonPool?.length,
-        `${area} Snap pool`,
-      ).toBeGreaterThan(0)
+      expect(snap?.settings.pokemonPool, `${area} Snap pool`).toEqual(
+        expectedSnapPools[area],
+      )
       expect(
         silhouette?.settings.pokemonPool?.length,
         `${area} silhouette pool`,
-      ).toBeGreaterThan(0)
+      ).toBeGreaterThan(5)
     }
   })
 
