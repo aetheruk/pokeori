@@ -1,12 +1,11 @@
 import { describe, expect, test } from 'bun:test'
 import { battles } from '@/data/battles'
 import { currencies } from '@/data/currencies'
-import { silhouetteGames, snapGames } from '@/data/games'
+import { gridPuzzleGames, silhouetteGames, snapGames } from '@/data/games'
 import { expeditions } from '@/data/expeditions'
 import { fishingGames } from '@/data/games/fishing'
 import { fieldObservationGames } from '@/data/games/field-observation'
 import { identifyEntries } from '@/data/games/identify'
-import { basicEntries } from '@/data/games/rock-push'
 import { items } from '@/data/items'
 import { locations } from '@/data/locations'
 import { getMove } from '@/data/moves'
@@ -27,16 +26,17 @@ import { buildExpeditionSteps } from '@/utilities/expeditions/path-builder'
 import type { RequirementData } from '@/utilities/requirements'
 
 function mazeHasRoute(gameId: string) {
-  const game = basicEntries.find((entry) => entry.id === gameId)
+  const game = gridPuzzleGames.find((entry) => entry.id === gameId)
   if (!game) return false
-  const size = game.settings.grid_size || 8
+  const settings = game.settings as any
+  const size = settings.grid_size || 8
   const blocked = new Set(
-    (game.settings.barriers || []).map(({ x, y }) => `${x}:${y}`),
+    (settings.barriers || []).map(({ x, y }: { x: number; y: number }) => `${x}:${y}`),
   )
   const goals = new Set(
-    (game.settings.winTiles || []).map(({ x, y }) => `${x}:${y}`),
+    (settings.winTiles || []).map(({ x, y }: { x: number; y: number }) => `${x}:${y}`),
   )
-  const queue = [game.settings.playerStart]
+  const queue = [settings.playerStart]
   const seen = new Set([`${queue[0].x}:${queue[0].y}`])
 
   while (queue.length) {
@@ -343,8 +343,8 @@ describe('Fuchsia Gym and Safari progression', () => {
       'fuchsia-gym-invisible-maze-two',
     ]) {
       expect(
-        basicEntries.find((entry) => entry.id === gameId)?.settings
-          .invisibleMaze,
+        (gridPuzzleGames.find((entry) => entry.id === gameId)?.settings as any)
+          ?.invisibleMaze,
       ).toBe(true)
       expect(mazeHasRoute(gameId), gameId).toBe(true)
     }
@@ -1907,7 +1907,7 @@ describe('Fuchsia Gym and Safari progression', () => {
                     (entry) => entry.id === step.activityId,
                   ) ||
                   fishingGames.find((entry) => entry.id === step.activityId) ||
-                  basicEntries.find((entry) => entry.id === step.activityId)
+                  gridPuzzleGames.find((entry) => entry.id === step.activityId)
                 : step.activityType === 'field-research'
                   ? fieldObservationGames.find(
                       (entry) => entry.id === step.activityId,

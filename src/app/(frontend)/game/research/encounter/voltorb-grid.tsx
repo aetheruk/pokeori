@@ -18,13 +18,14 @@ import { Button } from '@/components/ui/button'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
 import type {
-  VoltorbGridGameConfig,
+  GridPuzzleVoltorbGameConfig,
   VoltorbGridPosition,
   VoltorbGridProtectedPokemon,
   VoltorbGridVoltorb,
-} from '@/data/games/voltorb-grid'
+} from '@/data/games'
 import {
   getGridObstacleParts,
+  gridObjects,
   resolveGridBackWallSource,
   resolveGridFloorSource,
   resolveGridFrameSource,
@@ -40,7 +41,7 @@ import {
 } from '@/app/(frontend)/game/games/actions'
 
 interface VoltorbGridGameProps {
-  encounter: VoltorbGridGameConfig & { isEligibleForReplay?: boolean }
+  encounter: GridPuzzleVoltorbGameConfig & { isEligibleForReplay?: boolean }
   initialState?: any
 }
 
@@ -121,10 +122,11 @@ export function VoltorbGridGame({
   })
   const {
     floor: floorSprite,
-    boulder: boulderSprite,
     goal: winTileSprite,
     player: playerSprite,
   } = tileSources
+  const breakableRockSprite =
+    encounter.settings.boulderSprite || gridObjects.breakableRock.asset.src
 
   const wallKeys = useMemo(
     () => new Set((encounter.settings.walls || []).map(positionKey)),
@@ -735,7 +737,7 @@ export function VoltorbGridGame({
                         : `url('${cellFloorSprite}')`,
                   }}
                 >
-                  {isWall && obstaclePart && (
+                  {isWall && obstaclePart && position.y > 0 && (
                     <div
                       className="pointer-events-none absolute inset-0 z-10 bg-no-repeat [image-rendering:pixelated]"
                       style={{
@@ -773,7 +775,7 @@ export function VoltorbGridGame({
                   {isDebris && (
                     <div className="absolute inset-[10%] z-20">
                       <Image
-                        src={boulderSprite}
+                        src={breakableRockSprite}
                         alt=""
                         fill
                         sizes="64px"
@@ -807,7 +809,7 @@ export function VoltorbGridGame({
                         }}
                       />
                       <Image
-                        src={getPokemonImageUrl('100', 'home')}
+                        src={gridObjects.voltorb.asset.src}
                         alt="Voltorb"
                         fill
                         sizes="64px"
@@ -876,6 +878,7 @@ export function VoltorbGridGame({
             <div className="grid grid-cols-3 gap-2 mx-auto">
               <div />
               <Button
+                variant="outline"
                 size="lg"
                 className="h-16 border border-game-moss bg-game-surface-raised text-game-ink hover:bg-game-moss/10"
                 onClick={() => movePlayer('up')}
@@ -886,6 +889,7 @@ export function VoltorbGridGame({
               </Button>
               <div />
               <Button
+                variant="outline"
                 size="lg"
                 className="h-16 border border-game-moss bg-game-surface-raised text-game-ink hover:bg-game-moss/10"
                 onClick={() => movePlayer('left')}
@@ -895,6 +899,7 @@ export function VoltorbGridGame({
                 <ArrowLeft />
               </Button>
               <Button
+                variant="outline"
                 size="lg"
                 className="h-16 border border-game-moss bg-game-surface-raised text-game-ink hover:bg-game-moss/10"
                 onClick={() => movePlayer('down')}
@@ -904,6 +909,7 @@ export function VoltorbGridGame({
                 <ArrowDown />
               </Button>
               <Button
+                variant="outline"
                 size="lg"
                 className="h-16 border border-game-moss bg-game-surface-raised text-game-ink hover:bg-game-moss/10"
                 onClick={() => movePlayer('right')}

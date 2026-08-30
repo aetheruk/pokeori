@@ -7,12 +7,12 @@
 - Spatial puzzle games use sprite-set manifests registered in `src/data/games/grid-tiles`. The complete asset and scene contract is documented in [grid-sprite-sets.md](./grid-sprite-sets.md).
 - The renderer uses a 16×16 logical tile and selects the largest whole-number pixel scale that fits the board up to 500px. This keeps pixel art crisp on mobile and desktop while all movement and collision logic remains cell-based.
 - Architectural walls, floor blockers, and reusable objects are separate layers. Walls use connected sides and corners selected from a four-bit north/east/south/west mask. Generic blockers are explicitly authored as 1×1 or 2×2 floor-layer props; entities reference the shared object library by id and carry their own footprint and purpose.
-- Rock Push, Rock Tunnel Echo Map, and Voltorb Grid use the shared palette resolver and pixel-grid board. Rock Push screens may override the parent palette with `settings.screens[*].tilePaletteId`.
-- Legacy per-role sprite settings remain supported as overrides for bespoke boards, with precedence over the selected palette.
+- Grid Puzzle is the shared spatial game mode. Its `settings.variant` selects Rock Push, Rock Tunnel Echo Map, or Voltorb rules while all variants use the same palette resolver and pixel-grid board. Rock Push screens may override the parent palette with `settings.screens[*].tilePaletteId`.
+- Optional per-role sprite settings remain available as explicit overrides for bespoke boards, with precedence over the selected palette.
 - Floor rendering uses one required common tile and optional weighted rare tiles. Rare placement is deterministic from the set id, scene seed and coordinates, defaults to 8%, and never affects collision.
 - Every registered set includes source and licensing metadata. Credits are rendered in the in-app Credits & Legal dialog, and third-party packs must also be recorded in `ATTRIBUTIONS.md`.
-- Cave-oriented Echo and Voltorb boards use the local `basic-cave` working set, while outdoor Rock Push tests and the Western Road chronicle use the local `grass` set. Retired palette ids fall back to the default set; no external sprite pack is bundled or assigned to live content.
-- `voltorb-grid-renderer-test` is an always-available Kanto/Test copy of the introductory Voltorb board for previewing renderer and tile-set changes after the authored route boards have been completed.
+- Cave-oriented Echo and Voltorb boards use the local `basic-cave` working set, while outdoor Rock Push tests and the Western Road chronicle use the local `grass` set. Unknown palette ids resolve to the default set; no external sprite pack is bundled or assigned to live content.
+- `voltorb-grid-renderer-test` is an always-available Kanto/Test Grid Puzzle entry using the Voltorb variant for previewing renderer and tile-set changes after the authored route boards have been completed.
 
 ## Locations
 - Mini Game routes: `/game/games/[gameType]`
@@ -56,13 +56,13 @@ WebKit, which may still permit history swipes despite that CSS property.
 | TCG Battle | `src/data/games/tcg-battle` | Server-resolved simplified card battles using saved 15-card TCG decks |
 | Run | `src/data/games/run` | Endless runner |
 | Surf | `/game/games/surf` | Portrait forward-scrolling Lapras obstacle course |
-| Rock Push | `src/data/games/rock-push` | Puzzle game |
+| Grid Puzzle (Rock Push) | `/game/games/grid-puzzle` | Shared grid puzzle ruleset for pushing boulders into holes and goals |
 | Prize Wheel | `src/data/games/prize-wheel` | Spin for rewards |
 | Pachinko | `src/data/games/pachinko` | Physics ball drop with bucket rewards |
-| Voltorb Grid | `src/data/games/voltorb-grid` | Sokoban-style cave puzzle where Voltorb are shoved into discharge positions to clear rubble and open an exit |
+| Grid Puzzle (Voltorb) | `/game/games/grid-puzzle` | Voltorb discharge ruleset that clears rubble and opens an exit |
 | Diglett Tunnel Tap | `src/data/games/diglett-tunnel-tap` | Reflex tunnel game where Diglett score and Dugtrio punish rushed taps |
 | Magnemite Circuit | `src/data/games/magnemite-circuit` | Rotating circuit puzzle for powering route machinery |
-| Rock Tunnel Echo Map | `src/data/games/rock-tunnel-echo-map` | Dark movement maze with one opening echo reveal and hidden hole traps |
+| Grid Puzzle (Echo Map) | `/game/games/grid-puzzle` | Dark movement maze with one opening echo reveal and hidden hole traps |
 | Art Academy | `src/data/games/art-academy` | Timed Pokemon sprite-copying study with an extracted artwork palette and server-scored canvas |
 | Battle Bets | `/game/games/battle-bets` | Single-stake Fun Token wagering on AI-vs-AI Shadow battles |
 | TCG Memory | `src/data/games/tcg-memory` | Memory match with TCG cards |
@@ -92,7 +92,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 - Location `items.entries` are reserved for quest or location-specific override drops.
 - Explore fishing details show rod-specific Pokemon previews and only manually authored `items.entries` drops. Global fallback rod item pools stay hidden from reward previews and do not count as unclaimed location collectibles. Secret authored fishing item entries display as secret rewards until found.
 
-## Rock Push
+## Grid Puzzle: Rock Push variant
 - Rock Push renders tile backgrounds separately from moving entities so the player and boulders slide between cells.
 - Players can undo successful movement with the undo control or `Z`; invalid moves play a short bump animation and do not increment move count.
 - Boulders that fall into holes are removed after the drop animation and return that cell to the active set's normal floor tile; simple corner deadlocks are highlighted on the boulder as a warning.
@@ -104,7 +104,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 - Optional `settings.screens[*].prizes` entries work like board-level prizes and are validated with screen-scoped ids.
 - Board item prizes render as enlarged, borderless sprites with a subtle pulse so they remain readable without looking like placed objects.
 - `settings.invisibleMaze: true` turns authored internal obstacles into contact-revealed props. The architectural outer boundary remains visible, bumping an internal obstacle permanently reveals its 1×1 prop for that attempt, and a `winTiles` exit can complete a maze with no boulders.
-- The working `basic-cave` and `grass` sets use native logical tiles under `public/games/grid-tiles`: each provides a common floor, repeated back wall, 1×1 and 2×2 blockers, teleporter marker, and hole; the grass set uses the supplied grass artwork, while ice is shared for Rock Push ice boards. Grass currently reuses its teleporter marker for both goal and teleporter roles until dedicated grass goal art is authored. Existing Pokeori boulder, goal, and player artwork remains available through the manifests/runtime. Individual roles can still be overridden through legacy sprite settings for bespoke boards.
+- The working `basic-cave` and `grass` sets use native logical tiles under `public/games/grid-tiles`: each provides a common floor, repeated back wall, 1×1 and 2×2 blockers, teleporter marker, and hole; the grass set uses the supplied grass artwork, while ice is shared for Rock Push ice boards. Both sets currently reuse their teleporter marker for goal and teleporter roles until dedicated goal art is authored. Existing Pokeori boulder, goal, and player artwork remains available through the manifests/runtime. Individual roles can still be overridden through explicit sprite settings for bespoke boards.
 
 ## Snap
 - Standard Snap asks the player to photograph randomly requested Pokemon from `settings.pokemonPool`.
@@ -146,7 +146,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 - Each paid round carries one idempotency id. Normal rounds submit one prize-slot or miss outcome; bonus rounds submit the triggering bonus-slot id plus exactly five prize-slot or miss outcomes. The server validates the authored slots, deducts one stake, aggregates all payouts, records one win or loss, and returns one session summary.
 - Boards are authored through `settings.board` with dimensions, pegs, buckets, optional obstacles, bouncer pegs, bucket labels, bucket colors, and bucket rewards. Validation requires bucket ids to be unique and pegs/buckets to fit inside the board.
 
-## Voltorb Grid
+## Grid Puzzle: Voltorb variant
 - Voltorb Grid entries are authored through `settings.gridSize`, `playerStart`, `exit`, optional `walls`, optional `debris`, `voltorbs`, optional `protectedPokemon`, `requiredCleared`, `timeLimit`, `maxMoves`, optional `maxDischarges`, and a shared `tilePaletteId`.
 - Players move around a tile board and shove Voltorb one tile at a time. The Discharge action fires a cross-shaped blast from the first authored Voltorb only; other Voltorb explode only when that blast chain touches them.
 - Exploded Voltorb disappear after the blast resolves, so multi-Voltorb layouts can require building a chain before pressing Discharge.
@@ -161,7 +161,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 - Tiles are `straight`, `corner`, `tee`, or `cross`, with authored starting rotations and optional locks. The player rotates open tiles until all targets connect to the source.
 - `magnemite-circuit-test` is a no-requirement Test sub-region entry for Power Plant or route equipment puzzle tuning, currently using a 6x6 three-target circuit.
 
-## Rock Tunnel Echo Map
+## Grid Puzzle: Echo Map variant
 - Rock Tunnel Echo Map entries are authored through `settings.gridSize`, `playerStart`, `exit`, `walls`, optional `holes`, optional `timeLimit`, optional `maxMoves`, opening echo reveal timing, and a shared `tilePaletteId`.
 - The maze reveals once at the start, then goes dark except for the tile under the player. Hole tiles are shown during the opening echo and instantly fail the run when stepped on.
 

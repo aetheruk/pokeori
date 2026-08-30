@@ -1,6 +1,7 @@
 import { VoltorbGridGameConfig } from '../types'
 
 const caveSprites = {
+  variant: 'voltorb' as const,
   tilePaletteId: 'basic-cave' as const,
   themeColour: '#facc15',
   background: '/backgrounds/rocky-path.avif',

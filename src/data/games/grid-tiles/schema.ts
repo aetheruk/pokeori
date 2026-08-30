@@ -39,6 +39,7 @@ export const gridObjectDefinitionSchema = z
       .strict(),
     asset: gridTileAssetSchema,
     collision: z.enum(['none', 'solid', 'pushable']).optional(),
+    properties: z.record(z.string(), z.unknown()).optional(),
   })
   .strict()
 
@@ -55,6 +56,7 @@ export const gridObjectPlacementSchema = gridPositionSchema
   .extend({
     id: z.string().min(1).max(80).optional(),
     objectId: z.string().min(1).max(80),
+    properties: z.record(z.string(), z.unknown()).optional(),
   })
   .strict()
 

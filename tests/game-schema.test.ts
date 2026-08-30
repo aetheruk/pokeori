@@ -9,10 +9,10 @@ import {
   type PachinkoGameConfig,
   type PrizeWheelGameConfig,
   type SurfGameConfig,
-  type VoltorbGridGameConfig,
   type VoltorbGridPosition,
   type VoltorbGridVoltorb,
 } from '@/data/games'
+import type { GridPuzzleVoltorbGameConfig } from '@/data/games/grid-puzzle'
 import { validateGameItem } from '@/data/games/schemas'
 import {
   decodeArtAcademyCells,
@@ -66,7 +66,7 @@ function isInsideGrid(
 }
 
 function simulateVoltorbGrid(
-  settings: VoltorbGridGameConfig['settings'],
+  settings: GridPuzzleVoltorbGameConfig['settings'],
   commands: Array<Direction | 'discharge'>,
 ) {
   const wallKeys = new Set((settings.walls || []).map(gridKey))
@@ -390,6 +390,21 @@ describe('generated game data schemas', () => {
     ).toEqual([])
   })
 
+  test('spatial entries use the unified Grid Puzzle game type', () => {
+    const spatialEntries = allGames.filter((game) =>
+      ['rock-push', 'voltorb', 'echo-map'].includes(
+        (game.settings as { variant?: string }).variant || '',
+      ),
+    )
+    expect(spatialEntries.length).toBeGreaterThan(0)
+    expect(spatialEntries.every((entry) => entry.gameType === 'grid-puzzle')).toBe(
+      true,
+    )
+    expect(
+      validateGameItem({ ...spatialEntries[0], gameType: 'rock-push' }).success,
+    ).toBe(false)
+  })
+
   test('unlock replacement references point to existing game entries', () => {
     const ids = new Set(allGames.map((game) => game.id))
     const brokenOverrides = allGames
@@ -628,11 +643,12 @@ describe('generated game data schemas', () => {
     expect(outOfBoundsResult.success).toBe(false)
     expect(
       outOfBoundsResult.error?.issues.map((issue) => issue.message),
-    ).toContain('Voltorb Grid position must fit inside the board')
+    ).toContain('Grid Puzzle Voltorb position must fit inside the board')
   })
 
   test('Voltorb Grid discharges only the first Voltorb until blasts chain into others', () => {
-    const settings: VoltorbGridGameConfig['settings'] = {
+    const settings: GridPuzzleVoltorbGameConfig['settings'] = {
+      variant: 'voltorb',
       gridSize: { cols: 7, rows: 3 },
       playerStart: { x: 3, y: 2 },
       exit: { x: 6, y: 2 },
@@ -669,7 +685,8 @@ describe('generated game data schemas', () => {
   })
 
   test('Voltorb Grid protected Pokemon can be pushed and fail if caught in blasts', () => {
-    const settings: VoltorbGridGameConfig['settings'] = {
+    const settings: GridPuzzleVoltorbGameConfig['settings'] = {
+      variant: 'voltorb',
       gridSize: { cols: 5, rows: 5 },
       playerStart: { x: 0, y: 4 },
       exit: { x: 4, y: 4 },
@@ -719,9 +736,9 @@ describe('generated game data schemas', () => {
       (entry) => entry.id === 'route-10-voltorb-landslide',
     )
 
-    expect(primer?.gameType).toBe('voltorb-grid')
-    expect(relay?.gameType).toBe('voltorb-grid')
-    expect(landslide?.gameType).toBe('voltorb-grid')
+    expect(primer?.gameType).toBe('grid-puzzle')
+    expect(relay?.gameType).toBe('grid-puzzle')
+    expect(landslide?.gameType).toBe('grid-puzzle')
     expect(relay?.requirements).toContainEqual({
       type: 'game_result',
       targetId: 'route-10-voltorb-primer',
@@ -736,7 +753,7 @@ describe('generated game data schemas', () => {
     })
 
     const primerResult = simulateVoltorbGrid(
-      primer!.settings as VoltorbGridGameConfig['settings'],
+      primer!.settings as GridPuzzleVoltorbGameConfig['settings'],
       ['up', 'right', 'up', 'down', 'discharge', 'up', 'right', 'up'],
     )
     expect(primerResult.failed).toBe(false)
@@ -745,7 +762,7 @@ describe('generated game data schemas', () => {
     expect(primerResult.protectedPokemon[0]).toMatchObject({ x: 3, y: 1 })
 
     const relayResult = simulateVoltorbGrid(
-      relay!.settings as VoltorbGridGameConfig['settings'],
+      relay!.settings as GridPuzzleVoltorbGameConfig['settings'],
       [
         'right',
         'right',
@@ -770,7 +787,7 @@ describe('generated game data schemas', () => {
     expect(relayResult.protectedPokemon[0]).toMatchObject({ x: 5, y: 4 })
 
     const landslideResult = simulateVoltorbGrid(
-      landslide!.settings as VoltorbGridGameConfig['settings'],
+      landslide!.settings as GridPuzzleVoltorbGameConfig['settings'],
       [
         'right',
         'right',
@@ -815,11 +832,11 @@ describe('generated game data schemas', () => {
     )
 
     expect(demolitionGames.map((game) => game?.gameType)).toEqual([
-      'voltorb-grid',
-      'voltorb-grid',
-      'voltorb-grid',
-      'voltorb-grid',
-      'voltorb-grid',
+      'grid-puzzle',
+      'grid-puzzle',
+      'grid-puzzle',
+      'grid-puzzle',
+      'grid-puzzle',
     ])
     expect(demolitionGames[0]?.requirements).toContainEqual({
       type: 'task_completed',
@@ -834,7 +851,7 @@ describe('generated game data schemas', () => {
       })
     }
     const demolitionSettings = demolitionGames.map(
-      (game) => game!.settings as VoltorbGridGameConfig['settings'],
+      (game) => game!.settings as GridPuzzleVoltorbGameConfig['settings'],
     )
     expect(
       demolitionSettings.map((settings) => settings.voltorbs.length),
@@ -1117,7 +1134,7 @@ describe('generated game data schemas', () => {
     })
 
     const finalResult = simulateVoltorbGrid(
-      demolitionGames[4]!.settings as VoltorbGridGameConfig['settings'],
+      demolitionGames[4]!.settings as GridPuzzleVoltorbGameConfig['settings'],
       solutions[4],
     )
     expect(finalResult.protectedPokemon[0]).toMatchObject({ x: 3, y: 1 })

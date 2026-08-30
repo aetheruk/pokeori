@@ -34,7 +34,12 @@ public/games/grid-objects/
   dialogue-sign.png
 ```
 
-The object library defines each object’s purpose, native footprint, collision behavior, and sprite. This lets the same Voltorb, pushable stone, decoration, or future dialogue object appear in multiple map sets. A 1×1 object uses a 16×16 canvas; a 2×2 object uses 32×32; larger dimensions remain possible for future content.
+The object library defines each object’s purpose (for example entity, hazard,
+destructible, pushable, decoration, or dialogue), native footprint, collision
+behaviour, and sprite. This lets the same Voltorb, breakable rock, pushable
+stone, decoration, or future dialogue object appear in multiple map sets. A
+1×1 object uses a 16×16 canvas; a 2×2 object uses 32×32; larger dimensions
+remain possible for future content.
 
 Wall filenames are four-bit cardinal masks: north `1`, east `2`, south `4`, west `8`. For example, north + east is `3`, east + west is `10`, and all four directions is `15`. Each mask should be deliberately authored with the correct corners and side faces.
 
@@ -135,10 +140,18 @@ Generic blockers are floor-layer assets and are authored separately from entitie
 
 Player art is supplied by the game/runtime through the game-specific player sprite setting. It is deliberately not part of a tile set or scene manifest.
 
-## Existing-game adapters
+## Grid Puzzle integration
 
-- Rock Push keeps `barriers` as legacy 1×1 floor blockers. New layouts can use explicit `blockers`; boulders remain gameplay entities.
-- Rock Tunnel Echo Map keeps its current `walls` field as legacy collision data until maps are manually classified. Architectural boundaries should become scene walls; rocks or rubble should become floor blockers or shared objects as appropriate.
-- Voltorb Grid treats debris as gameplay entities and existing blockers as legacy floor blockers. New room boundaries use scene walls.
+All three spatial rulesets run under `gameType: 'grid-puzzle'` and select their
+behaviour with `settings.variant`: `rock-push`, `voltorb`, or `echo-map`.
+Their current authored coordinate fields remain deliberately small and map to
+the shared layers: architectural `walls`, floor-layer `blockers`, and reusable
+`objects`. Variant-specific state (blast radius, destruction, chain reactions,
+or Flash reveal timing) stays in the ruleset rather than in the object library.
+
+Voltorb and breakable rock are registered in `grid-tiles/objects.ts`, so future
+scene-authored boards can reference the same entities without duplicating sprite
+paths or footprints. Placement `properties` are available for per-instance
+state, while the shared definition remains terrain-independent.
 
 The current authored games use local themed sets: `basic-cave` for cave-oriented Echo/Voltorb boards and `grass` for outdoor Rock Push tests and the Western Road chronicle. Both sets deliberately contain only a common floor and repeated back wall, plus the generic blockers and gameplay tiles needed by the existing spatial games. There is no legacy `rock-cave` palette; unknown or retired ids resolve to the default palette. A solved Rock Push hole returns to the set's common floor after the drop animation, so sprite sets do not need a filled-hole asset. No external sprite pack is bundled. When an external set is selected, add its credit metadata to the manifest and `ATTRIBUTIONS.md` before assigning it to live content.

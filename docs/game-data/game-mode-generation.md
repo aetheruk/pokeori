@@ -75,7 +75,7 @@ Milestone scores must be stable integers. Runtime completion grants only
 unclaimed achieved milestones, and claim/completion anti-cheat ceilings are
 calculated server-side from the active session duration.
 
-Physics/puzzle games (`rock-push`, `sliding-puzzle`, `pachinko`) define board,
+Physics/puzzle games (`grid-puzzle`, `sliding-puzzle`, `pachinko`) define board,
 grid, seed, shuffle, bucket, or physics settings. Sliding puzzles may use the
 default Pokemon-plus-background image or a custom `settings.image` asset for
 the preview and tiles. Pachinko boards must define bounded pegs and unique

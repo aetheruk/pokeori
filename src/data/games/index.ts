@@ -25,9 +25,9 @@ export { cryEntries as cryGames } from './cry'
 export * from './compare/types'
 export { compareEntries as compareGames } from './compare'
 
-// Rock Push game
+// Shared Grid Puzzle game and its authored rulesets
+export * from './grid-puzzle'
 export * from './rock-push/types'
-export { basicEntries as rockPushGames } from './rock-push'
 
 // Run game (endless runner)
 export * from './run/types'
@@ -111,7 +111,7 @@ export type {
 } from './field-observation/types'
 export { fieldObservationGames } from './field-observation'
 
-// Voltorb Grid game
+// Voltorb Grid ruleset types remain exported for the ruleset renderer.
 export type {
   VoltorbGridGameConfig,
   VoltorbGridPosition,
@@ -119,7 +119,6 @@ export type {
   VoltorbGridSettings,
   VoltorbGridVoltorb,
 } from './voltorb-grid'
-export { voltorbGridGames } from './voltorb-grid'
 
 // Diglett Tunnel Tap game
 export type { DiglettTunnelTapGameConfig, DiglettTunnelTapSettings } from './diglett-tunnel-tap'
@@ -141,7 +140,6 @@ export type {
   RockTunnelEchoMapSettings,
   RockTunnelEchoPosition,
 } from './rock-tunnel-echo-map'
-export { rockTunnelEchoMapGames } from './rock-tunnel-echo-map'
 
 // Art Academy game
 export type { ArtAcademyGameConfig, ArtAcademySettings } from './art-academy'
@@ -164,7 +162,7 @@ import { identifyEntries as identifyGames } from './identify'
 import { snapEntries as snapGames } from './snap'
 import { cryEntries as cryGames } from './cry'
 import { compareEntries as compareGames } from './compare'
-import { basicEntries as rockPushGames } from './rock-push'
+import { gridPuzzleGames } from './grid-puzzle'
 import { runGames } from './run'
 import { basicEntries as flapGames } from './flap'
 import { surfGames } from './surf'
@@ -181,10 +179,8 @@ import { miningEntries as miningGames } from './mining'
 import { tcgInspectionGames } from './tcg-inspection'
 import { tcgBattleGames } from './tcg-battle'
 import { fieldObservationGames } from './field-observation'
-import { voltorbGridGames } from './voltorb-grid'
 import { diglettTunnelTapGames } from './diglett-tunnel-tap'
 import { magnemiteCircuitGames } from './magnemite-circuit'
-import { rockTunnelEchoMapGames } from './rock-tunnel-echo-map'
 import { artAcademyGames } from './art-academy'
 import { procedureOrderGames } from './procedure-order'
 import { battleBetsGames } from './battle-bets'
@@ -196,7 +192,7 @@ export type GameType =
   | 'snap'
   | 'cry'
   | 'compare'
-  | 'rock-push'
+  | 'grid-puzzle'
   | 'run'
   | 'flap'
   | 'surf'
@@ -213,10 +209,8 @@ export type GameType =
   | 'tcg-inspection'
   | 'tcg-battle'
   | 'field-observation'
-  | 'voltorb-grid'
   | 'diglett-tunnel-tap'
   | 'magnemite-circuit'
-  | 'rock-tunnel-echo-map'
   | 'art-academy'
   | 'procedure-order'
   | 'battle-bets'
@@ -235,6 +229,8 @@ export interface GameSettings {
   timeLimit?: number
   winRate?: number | { min: number; max: number }
   successThreshold?: number
+  // Shared Grid Puzzle ruleset selector
+  variant?: import('./grid-puzzle').GridPuzzleVariant
   maxPokemonShown?: number
   comparisonOperator?: (
     | 'height'
@@ -428,7 +424,7 @@ export const allGames: GameItem[] = [
   ...snapGames.map((g) => ({ ...g, gameType: 'snap' as const })),
   ...cryGames.map((g) => ({ ...g, gameType: 'cry' as const })),
   ...compareGames.map((g) => ({ ...g, gameType: 'compare' as const })),
-  ...rockPushGames.map((g) => ({ ...g, gameType: 'rock-push' as const })),
+  ...gridPuzzleGames,
   ...runGames.map((g) => ({ ...g, gameType: 'run' as const })),
   ...flapGames.map((g) => ({ ...g, gameType: 'flap' as const })),
   ...surfGames.map((g) => ({ ...g, gameType: 'surf' as const })),
@@ -448,10 +444,8 @@ export const allGames: GameItem[] = [
   ...tcgInspectionGames.map((g) => ({ ...g, gameType: 'tcg-inspection' as const })),
   ...tcgBattleGames.map((g) => ({ ...g, gameType: 'tcg-battle' as const })),
   ...fieldObservationGames.map((g) => ({ ...g, gameType: 'field-observation' as const } as unknown as GameItem)),
-  ...voltorbGridGames.map((g) => ({ ...g, gameType: 'voltorb-grid' as const })),
   ...diglettTunnelTapGames.map((g) => ({ ...g, gameType: 'diglett-tunnel-tap' as const })),
   ...magnemiteCircuitGames.map((g) => ({ ...g, gameType: 'magnemite-circuit' as const })),
-  ...rockTunnelEchoMapGames.map((g) => ({ ...g, gameType: 'rock-tunnel-echo-map' as const })),
   ...artAcademyGames.map((g) => ({ ...g, gameType: 'art-academy' as const })),
   ...procedureOrderGames.map((g) => ({ ...g, gameType: 'procedure-order' as const })),
   ...battleBetsGames.map((g) => ({ ...g, gameType: 'battle-bets' as const })),

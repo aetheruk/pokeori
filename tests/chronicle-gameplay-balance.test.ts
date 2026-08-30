@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { allGames } from '@/data/games'
 import type { MagnemiteCircuitGameConfig } from '@/data/games'
 import type { MagnemiteCircuitTile } from '@/data/games/magnemite-circuit'
-import type { VoltorbGridGameConfig } from '@/data/games/voltorb-grid'
+import type { GridPuzzleVoltorbGameConfig } from '@/data/games/grid-puzzle'
 import { gymLeaderChronicleBattles } from '@/data/battles/entries/gym-leader-chronicles'
 import {
   KANTO_GYM_CHRONICLES,
@@ -148,7 +148,7 @@ function insideGrid(position: Point, gridSize: { cols: number; rows: number }) {
 }
 
 function solveVoltorbGrid(
-  settings: VoltorbGridGameConfig['settings'],
+  settings: GridPuzzleVoltorbGameConfig['settings'],
 ): number | null {
   const { cols, rows } = settings.gridSize
   const wallKeys = new Set((settings.walls || []).map(key))
@@ -1184,7 +1184,8 @@ describe('Chronicle gameplay balance', () => {
     for (const game of allGames.filter(
       (entry) =>
         entry.id.startsWith('chronicle-v2-') &&
-        entry.gameType === 'rock-tunnel-echo-map',
+        entry.gameType === 'grid-puzzle' &&
+        (entry.settings as { variant?: string }).variant === 'echo-map',
     )) {
       const distance = shortestGridPath(game.settings)
       expect(distance, game.id).not.toBeNull()
@@ -1197,7 +1198,9 @@ describe('Chronicle gameplay balance', () => {
   test('rock-push boards are solvable within the authored move budget', () => {
     for (const game of allGames.filter(
       (entry) =>
-        entry.id.startsWith('chronicle-v2-') && entry.gameType === 'rock-push',
+        entry.id.startsWith('chronicle-v2-') &&
+        entry.gameType === 'grid-puzzle' &&
+        (entry.settings as { variant?: string }).variant === 'rock-push',
     )) {
       const distance = solveSokoban(game.settings)
       expect(distance, game.id).not.toBeNull()
@@ -1210,7 +1213,7 @@ describe('Chronicle gameplay balance', () => {
   test('the Surge Voltorb Grid is solvable and requires a real blast setup', () => {
     const game = allGames.find(
       (entry) => entry.id === 'chronicle-v2-surge-cross-the-substation',
-    ) as VoltorbGridGameConfig | undefined
+    ) as GridPuzzleVoltorbGameConfig | undefined
     expect(game).toBeDefined()
 
     const settings = game!.settings

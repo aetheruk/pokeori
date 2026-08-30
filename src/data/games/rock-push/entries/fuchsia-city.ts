@@ -17,6 +17,7 @@ export const fuchsiaCitybasicEntries: RockPushGameConfig[] = [
     requirements: trialRequirements,
     rewards: [],
     settings: {
+      variant: 'rock-push',
       tilePaletteId: 'basic-cave',
       playerStart: { x: 1, y: 1 },
       grid_size: 8,
@@ -43,6 +44,7 @@ export const fuchsiaCitybasicEntries: RockPushGameConfig[] = [
     requirements: trialRequirements,
     rewards: [],
     settings: {
+      variant: 'rock-push',
       tilePaletteId: 'basic-cave',
       playerStart: { x: 1, y: 1 },
       grid_size: 8,

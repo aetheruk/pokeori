@@ -40,6 +40,8 @@ export interface RockPushScreenConfig {
 
 export interface RockPushGameConfig extends BaseGameConfig {
   settings: {
+    /** Ruleset executed by the shared Grid Puzzle game mode. */
+    variant: 'rock-push'
     /** Semantic 16x16 tile palette. Legacy sprite fields override individual roles. */
     tilePaletteId?: GridTilePaletteId
     floorVariation?: GridFloorRenderConfig

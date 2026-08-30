@@ -1440,7 +1440,7 @@ export async function submitGameActivityAnswer(
           isCorrect = String(validatedAnswer) === String(state.currentPokemonId)
         }
       }
-    } else if (encounter.gameType === 'rock-push') {
+    } else if (encounter.gameType === 'grid-puzzle') {
       isCorrect = Boolean(validatedAnswer)
     } else if (encounter.gameType === 'rhythm') {
       isCorrect = Boolean(validatedAnswer)
@@ -1711,7 +1711,7 @@ export async function submitGameActivityAnswer(
 
     if (
       snapTargetId !== undefined ||
-      encounter.gameType === 'rock-push' ||
+      encounter.gameType === 'grid-puzzle' ||
       encounter.gameType === 'run' ||
       encounter.gameType === 'surf' ||
       encounter.gameType === 'field-observation'
@@ -2029,7 +2029,11 @@ function getCollectedRockPushRewards(
   encounter: (typeof allGames)[number],
   collectedPrizeIds?: string[],
 ): Reward[] {
-  if (encounter.gameType !== 'rock-push' || !collectedPrizeIds?.length) {
+  if (
+    encounter.gameType !== 'grid-puzzle' ||
+    encounter.settings.variant !== 'rock-push' ||
+    !collectedPrizeIds?.length
+  ) {
     return []
   }
 
@@ -2429,7 +2433,7 @@ export async function completeGameActivity(
           ? getCollectedFieldObservationRewards(state)
           : []
       const collectedRockPushRewards =
-        encounter.gameType === 'rock-push'
+        encounter.gameType === 'grid-puzzle'
           ? getCollectedRockPushRewards(
               encounter,
               validatedCollectedRockPushRewardIds,

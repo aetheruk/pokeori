@@ -22,13 +22,15 @@ import { Button } from '@/components/ui/button'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
 import type {
-  RockPushGameConfig,
-  RockPushScreenConfig,
-} from '@/data/games/rock-push/types'
+  GridPuzzleRockPushGameConfig,
+  GridPuzzleRockPushSettings,
+} from '@/data/games/grid-puzzle'
+import type { RockPushScreenConfig } from '@/data/games/rock-push/types'
 import {
   getGridObstacleParts,
   getGridWallMask,
   isGridBackWallOnly,
+  gridObjects,
   resolveGridFloorSource,
   resolveGridBackWallSource,
   resolveGridObstacleSources,
@@ -52,7 +54,7 @@ import {
 import { EndlessCollectibleSprite } from './endless-collectibles'
 
 interface RockPushGameProps {
-  encounter: RockPushGameConfig
+  encounter: GridPuzzleRockPushGameConfig
   initialState?: any
 }
 
@@ -151,7 +153,7 @@ const detectDeadlockedRocks = (grid: CellType[][], rocks: RockState[]) => {
 }
 
 const getRockPushScreens = (
-  settings: RockPushGameConfig['settings'],
+  settings: GridPuzzleRockPushSettings,
 ): RockPushScreenConfig[] => {
   if (settings.screens?.length) return settings.screens
 
@@ -1012,12 +1014,13 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   const {
     floor: floorSprite,
     ice: iceSprite,
-    boulder: boulderSprite,
     hole: holeSprite,
     goal: winTileSprite,
     teleporter: teleporterSprite,
     player: playerSprite,
   } = tileSources
+  const boulderSprite =
+    encounter.settings.boulderSprite || gridObjects.pushableBoulder.asset.src
   const authoredBarriers = activeScreenConfig?.barriers || []
   const authoredBarrierKeys = new Set(
     authoredBarriers.map(getRockPushPositionKey),
@@ -1419,6 +1422,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
           <div className="grid grid-cols-3 gap-2 mx-auto">
             <div />
             <Button
+              variant="outline"
               size="lg"
               className="h-16 border border-game-moss bg-game-surface-raised text-game-ink hover:bg-game-moss/10"
               onClick={() => move(0, -1)}
@@ -1430,6 +1434,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
             </Button>
             <div />
             <Button
+              variant="outline"
               size="lg"
               className="h-16 border border-game-moss bg-game-surface-raised text-game-ink hover:bg-game-moss/10"
               onClick={() => move(-1, 0)}
@@ -1440,6 +1445,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
               <ArrowLeft />
             </Button>
             <Button
+              variant="outline"
               size="lg"
               className="h-16 border border-game-moss bg-game-surface-raised text-game-ink hover:bg-game-moss/10"
               onClick={() => move(0, 1)}
@@ -1450,6 +1456,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
               <ArrowDown />
             </Button>
             <Button
+              variant="outline"
               size="lg"
               className="h-16 border border-game-moss bg-game-surface-raised text-game-ink hover:bg-game-moss/10"
               onClick={() => move(1, 0)}

@@ -80,7 +80,10 @@ export const getTypeIcon = (item: ExploreItem) => {
         return <Search className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'compare')
         return <BarChart className="w-4 h-4 text-game-moss-strong" />
-      if (gameType === 'rock-push')
+      if (
+        gameType === 'grid-puzzle' &&
+        (item.originalData as any).settings?.variant === 'rock-push'
+      )
         return <CornerRightDown className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'run')
         return <ChevronsRight className="w-4 h-4 text-game-moss-strong" />
@@ -116,13 +119,19 @@ export const getTypeIcon = (item: ExploreItem) => {
         return <CreditCard className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'field-observation')
         return <Search className="w-4 h-4 text-game-moss-strong" />
-      if (gameType === 'voltorb-grid')
+      if (
+        gameType === 'grid-puzzle' &&
+        (item.originalData as any).settings?.variant === 'voltorb'
+      )
         return <Bomb className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'diglett-tunnel-tap')
         return <MousePointerClick className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'magnemite-circuit')
         return <CircuitBoard className="w-4 h-4 text-game-moss-strong" />
-      if (gameType === 'rock-tunnel-echo-map')
+      if (
+        gameType === 'grid-puzzle' &&
+        (item.originalData as any).settings?.variant === 'echo-map'
+      )
         return <Radar className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'art-academy')
         return <Paintbrush className="w-4 h-4 text-game-moss-strong" />
@@ -176,8 +185,12 @@ export const getGameTypeLabel = (item: ExploreItem) => {
       return 'CRY'
     case 'compare':
       return 'COMPARE'
-    case 'rock-push':
+    case 'grid-puzzle': {
+      const variant = (item.originalData as any).settings?.variant
+      if (variant === 'voltorb') return 'VOLTORB'
+      if (variant === 'echo-map') return 'ECHO MAP'
       return 'ROCK PUSH'
+    }
     case 'run':
       return 'RUN'
     case 'flap':
