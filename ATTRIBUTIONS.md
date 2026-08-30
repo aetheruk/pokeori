@@ -41,6 +41,13 @@ Pokeori is built with and thanks the maintainers of:
 
 Each dependency remains under its own license. Their license texts are available from their respective repositories or package distributions.
 
+## Tile and environment packs
+
+- **Pokeori Basic Cave tile set** — supplied 16×16 test tiles arranged under `public/games/grid-tiles/basic-cave`, with existing Pokeori boulder, filled-hole, goal, and player artwork retained for gameplay compatibility.
+- **Pokeori Grass Field tile set** — supplied 16×16 and 32×32 grass test tiles arranged under `public/games/grid-tiles/grass`, with existing Pokeori gameplay artwork retained where the grass pack has no equivalent.
+
+Every sprite set records its source, creator, link, license, and required notice in `src/data/games/grid-tiles`. External packs must be added both to that registry, which feeds the in-app Credits & Legal dialog, and to this file before their assets are used.
+
 ## Pokeori-original material
 
 Unless a file or source is identified above as third-party or generated from third-party data, Pokeori-authored code, documentation, interface styling, and original artwork are covered by the MIT License. Generated files may include source metadata or references that should remain intact.

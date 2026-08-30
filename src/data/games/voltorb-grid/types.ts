@@ -1,4 +1,5 @@
 import { BaseGameConfig } from '../shared'
+import type { GridFloorRenderConfig, GridTilePaletteId } from '../grid-tiles'
 
 export interface VoltorbGridPosition {
   x: number
@@ -17,6 +18,9 @@ export interface VoltorbGridProtectedPokemon extends VoltorbGridPosition {
 }
 
 export interface VoltorbGridSettings {
+  /** Semantic 16x16 tile palette. Legacy sprite fields override individual roles. */
+  tilePaletteId?: GridTilePaletteId
+  floorVariation?: GridFloorRenderConfig
   gridSize: {
     cols: number
     rows: number

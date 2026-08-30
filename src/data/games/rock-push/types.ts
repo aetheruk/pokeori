@@ -1,4 +1,5 @@
 import { BaseGameConfig } from '../shared'
+import type { GridFloorRenderConfig, GridTilePaletteId } from '../grid-tiles'
 import type { LocationReward } from '@/data/types'
 
 export interface RockPushPosition {
@@ -25,6 +26,8 @@ export interface RockPushPrizeSquare extends RockPushPosition {
 
 export interface RockPushScreenConfig {
   id: string
+  tilePaletteId?: GridTilePaletteId
+  floorVariation?: GridFloorRenderConfig
   grid_size?: number
   boulders?: RockPushPosition[]
   holes?: RockPushPosition[]
@@ -37,6 +40,9 @@ export interface RockPushScreenConfig {
 
 export interface RockPushGameConfig extends BaseGameConfig {
   settings: {
+    /** Semantic 16x16 tile palette. Legacy sprite fields override individual roles. */
+    tilePaletteId?: GridTilePaletteId
+    floorVariation?: GridFloorRenderConfig
     playerStart: RockPushPosition
     startScreen?: string
     boulders?: RockPushPosition[]

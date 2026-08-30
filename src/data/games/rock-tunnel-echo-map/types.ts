@@ -1,4 +1,5 @@
 import { BaseGameConfig } from '../shared'
+import type { GridFloorRenderConfig, GridTilePaletteId } from '../grid-tiles'
 
 export interface RockTunnelEchoPosition {
   x: number
@@ -6,6 +7,9 @@ export interface RockTunnelEchoPosition {
 }
 
 export interface RockTunnelEchoMapSettings {
+  /** Semantic 16x16 tile palette. Legacy sprite fields override individual roles. */
+  tilePaletteId?: GridTilePaletteId
+  floorVariation?: GridFloorRenderConfig
   gridSize: {
     cols: number
     rows: number

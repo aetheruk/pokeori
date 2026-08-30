@@ -12,6 +12,7 @@ export const gymLeaderChronicleVoltorbGridEntries: VoltorbGridGameConfig[] = [
     requirements: [{ type: 'task_completed', targetId: 'thunder-badge-memory-revealed' }],
     criteria: [], rewards: [],
     settings: {
+      tilePaletteId: 'basic-cave',
       gridSize: { cols: 7, rows: 7 }, playerStart: { x: 1, y: 6 }, exit: { x: 6, y: 0 },
       walls: [{ x: 2, y: 0 }, { x: 2, y: 1 }, { x: 4, y: 1 }, { x: 1, y: 4 }, { x: 2, y: 4 }],
       debris: [{ x: 3, y: 1 }, { x: 5, y: 1 }],
@@ -19,7 +20,6 @@ export const gymLeaderChronicleVoltorbGridEntries: VoltorbGridGameConfig[] = [
       protectedPokemon: [{ id: 'magnemite', speciesId: 81, x: 5, y: 4 }, { id: 'pikachu', speciesId: 25, x: 6, y: 5 }],
       requiredCleared: 2, timeLimit: 100, maxMoves: 30, maxDischarges: 1, winRate: 1,
       themeColour: '#b58a43', background: '/backgrounds/chronicle-surge-blackout-streets.avif',
-      floorSprite: '/games/rockpush/floor.avif', boulderSprite: '/games/rockpush/boulder.avif', barrierSprite: '/games/rockpush/barrier.avif', winTileSprite: '/games/rockpush/win-tile.avif', playerSprite: '/games/rockpush/trainer.avif',
     },
   },
 ]

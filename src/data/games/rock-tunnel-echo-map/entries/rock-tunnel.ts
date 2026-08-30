@@ -1,13 +1,9 @@
 import { RockTunnelEchoMapGameConfig } from '../types'
 
 const caveSprites = {
+  tilePaletteId: 'basic-cave' as const,
   themeColour: '#818cf8',
   background: '/backgrounds/cave.avif',
-  floorSprite: '/games/rockpush/floor.avif',
-  barrierSprite: '/games/rockpush/barrier.avif',
-  holeSprite: '/games/rockpush/hole.avif',
-  winTileSprite: '/games/rockpush/win-tile.avif',
-  playerSprite: '/games/rockpush/trainer.avif',
 }
 
 const flashCriteria = [

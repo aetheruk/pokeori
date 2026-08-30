@@ -15,6 +15,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { GameTimer } from '@/components/game/shared/game-timer'
+import { PixelGridBoard } from '@/components/game/shared/pixel-grid-board'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { Button } from '@/components/ui/button'
@@ -24,6 +25,16 @@ import type {
   RockPushGameConfig,
   RockPushScreenConfig,
 } from '@/data/games/rock-push/types'
+import {
+  getGridObstacleParts,
+  getGridWallMask,
+  isGridBackWallOnly,
+  resolveGridFloorSource,
+  resolveGridBackWallSource,
+  resolveGridObstacleSources,
+  resolveGridTileSources,
+  resolveGridWallSource,
+} from '@/data/games/grid-tiles'
 import { getIcon } from '@/data/user'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
@@ -986,21 +997,40 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playerPos, rocks, gameEnded, history])
 
-  const floorSprite =
-    encounter.settings.floorSprite || '/games/rockpush/floor.avif'
-  const iceSprite = encounter.settings.iceSprite || '/games/rockpush/ice.avif'
-  const barrierSprite =
-    encounter.settings.barrierSprite || '/games/rockpush/barrier.avif'
-  const boulderSprite =
-    encounter.settings.boulderSprite || '/games/rockpush/boulder.avif'
-  const holeSprite =
-    encounter.settings.holeSprite || '/games/rockpush/hole.avif'
-  const filledHoleSprite =
-    encounter.settings.filledHoleSprite || '/games/rockpush/filled-hole.avif'
-  const winTileSprite =
-    encounter.settings.winTileSprite || '/games/rockpush/win-tile.avif'
-  const teleporterSprite =
-    encounter.settings.teleporterSprite || '/games/rockpush/teleporter.avif'
+  const activeTilePaletteId =
+    activeScreenConfig?.tilePaletteId || encounter.settings.tilePaletteId
+  const tileSources = resolveGridTileSources(activeTilePaletteId, {
+    floor: encounter.settings.floorSprite,
+    ice: encounter.settings.iceSprite,
+    barrier: encounter.settings.barrierSprite,
+    boulder: encounter.settings.boulderSprite,
+    hole: encounter.settings.holeSprite,
+    filledHole: encounter.settings.filledHoleSprite,
+    goal: encounter.settings.winTileSprite,
+    teleporter: encounter.settings.teleporterSprite,
+    player: encounter.settings.playerSprite,
+  })
+  const {
+    floor: floorSprite,
+    ice: iceSprite,
+    boulder: boulderSprite,
+    hole: holeSprite,
+    filledHole: filledHoleSprite,
+    goal: winTileSprite,
+    teleporter: teleporterSprite,
+    player: playerSprite,
+  } = tileSources
+  const authoredBarriers = activeScreenConfig?.barriers || []
+  const authoredBarrierKeys = new Set(
+    authoredBarriers.map(getRockPushPositionKey),
+  )
+  const obstacleParts = getGridObstacleParts(authoredBarriers)
+  const obstacleSources = resolveGridObstacleSources(
+    activeTilePaletteId,
+    encounter.settings.barrierSprite,
+  )
+  const backWallSprite = resolveGridBackWallSource(activeTilePaletteId)
+  const backWallOnly = isGridBackWallOnly(activeTilePaletteId)
   const cellWidth = `${100 / Math.max(gridSize.w, 1)}%`
   const cellHeight = `${100 / Math.max(gridSize.h, 1)}%`
   const entityStyle = (
@@ -1015,12 +1045,12 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   })
   const isInvisibleAuthoredBarrier = (position: Position) =>
     encounter.settings.invisibleMaze === true &&
-    (activeScreenConfig?.barriers || []).some((barrier) =>
-      isSamePosition(barrier, position),
-    ) &&
+    authoredBarrierKeys.has(getRockPushPositionKey(position)) &&
     !revealedBarrierKeys.has(
       `${activeScreenId}:${getRockPushPositionKey(position)}`,
     )
+  const isRenderedWall = (x: number, y: number) =>
+    grid[y]?.[x] === 'wall' && !authoredBarrierKeys.has(`${x},${y}`)
 
   return (
     <div className="relative min-h-dvh flex flex-col font-sans overflow-hidden game-night bg-game-night-canvas">
@@ -1104,43 +1134,77 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
 
         {/* Game Board Container */}
         <div className="flex-1 flex items-center justify-center w-full z-40 my-4">
-          <div
+          <PixelGridBoard
+            cols={gridSize.w}
+            rows={gridSize.h}
+            ariaLabel="Rock Push puzzle board"
             className="relative isolate overflow-hidden rounded-lg bg-game-night-surface shadow-2xl ring-4 ring-[#081014]/35"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: `repeat(${gridSize.w}, 1fr)`,
-              gridTemplateRows: `repeat(${gridSize.h}, 1fr)`,
-              width: 'min(90vw, 500px)',
-              aspectRatio: '1/1',
-              gap: '0',
-            }}
           >
             {grid.map((row, y) =>
               row.map((cell, x) => {
                 const hideBarrier = isInvisibleAuthoredBarrier({ x, y })
+                const obstaclePart = obstacleParts.get(`${x},${y}`)
+                const visibleObstacle = obstaclePart && !hideBarrier
+                const visibleWall =
+                  cell === 'wall' &&
+                  !authoredBarrierKeys.has(`${x},${y}`) &&
+                  (!backWallOnly || y === 0)
+                const cellFloorSprite = encounter.settings.floorSprite
+                  ? floorSprite
+                  : resolveGridFloorSource(
+                      activeTilePaletteId,
+                      x,
+                      y,
+                      activeScreenConfig?.floorVariation ||
+                        encounter.settings.floorVariation || {
+                          seed: `${encounter.id}:${activeScreenId}`,
+                        },
+                    )
+                const wallSprite = visibleWall
+                  ? backWallOnly
+                    ? backWallSprite
+                    : resolveGridWallSource(
+                        activeTilePaletteId,
+                        getGridWallMask(x, y, isRenderedWall),
+                      )
+                  : undefined
                 return (
                   <div
                     key={`${x}-${y}`}
-                    className={cn(
-                      'relative w-full h-full flex items-center justify-center [image-rendering:pixelated] bg-[length:100%_100%]',
-                      cell === 'wall' &&
-                        !hideBarrier &&
-                        'shadow-[inset_0_-6px_10px_rgba(0,0,0,0.35)]',
-                    )}
+                    className="relative w-full h-full flex items-center justify-center [image-rendering:pixelated] bg-[length:100%_100%]"
                     style={{
                       backgroundImage:
-                        cell === 'wall' && !hideBarrier
-                          ? `url('${barrierSprite}')`
+                        visibleWall && wallSprite
+                          ? `url('${wallSprite}'), url('${cellFloorSprite}')`
                           : cell === 'ice'
                             ? `url('${iceSprite}')`
                             : cell === 'empty' ||
+                                cell === 'wall' ||
                                 hideBarrier ||
                                 cell === 'hole' ||
                                 cell === 'filled'
-                              ? `url('${floorSprite}')`
+                              ? `url('${cellFloorSprite}')`
                               : undefined,
                     }}
                   >
+                    {visibleObstacle && (
+                      <div
+                        className="pointer-events-none absolute inset-0 z-10 bg-no-repeat [image-rendering:pixelated]"
+                        style={{
+                          backgroundImage: `url('${
+                            obstaclePart.size === 2
+                              ? obstacleSources.large
+                              : obstacleSources.small
+                          }')`,
+                          backgroundSize:
+                            obstaclePart.size === 2 ? '200% 200%' : '100% 100%',
+                          backgroundPosition: `${obstaclePart.offsetX * 100}% ${
+                            obstaclePart.offsetY * 100
+                          }%`,
+                        }}
+                        aria-hidden="true"
+                      />
+                    )}
                     {cell === 'hole' && (
                       <div className="absolute inset-[12%]">
                         {holeSprite ? (
@@ -1304,11 +1368,11 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
               >
                 <div className="relative h-full w-full">
                   <div className="absolute inset-[20%] translate-y-[18%] rounded-full bg-[#081014]/25 blur-[3px]" />
-                  {encounter.settings.playerSprite ? (
+                  {playerSprite ? (
                     <div
                       className="relative h-full w-full [image-rendering:pixelated]"
                       style={{
-                        backgroundImage: `url('${encounter.settings.playerSprite}')`,
+                        backgroundImage: `url('${playerSprite}')`,
                         backgroundSize: '200% 200%',
                         backgroundPosition:
                           facing === 'down'
@@ -1329,7 +1393,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
                 </div>
               </div>
             </div>
-          </div>
+          </PixelGridBoard>
         </div>
 
         {/* Board Actions */}
