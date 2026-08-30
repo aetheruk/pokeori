@@ -11,6 +11,7 @@ export const gymLeaderChronicleRockPushEntries: RockPushGameConfig[] = [
     requirements: [{ type: 'task_completed', targetId: 'boulder-badge-memory-revealed' }],
     criteria: [], rewards: [],
     settings: {
+      variant: 'rock-push',
       tilePaletteId: 'basic-cave',
       timeLimit: 110, grid_size: 8, maxMoves: 40,
       playerStart: { x: 1, y: 6 },
@@ -29,6 +30,7 @@ export const gymLeaderChronicleRockPushEntries: RockPushGameConfig[] = [
     requirements: [{ type: 'task_completed', targetId: 'earth-badge-memory-revealed' }],
     criteria: [], rewards: [],
     settings: {
+      variant: 'rock-push',
       tilePaletteId: 'grass',
       timeLimit: 110, grid_size: 8, maxMoves: 40,
       playerStart: { x: 1, y: 6 },

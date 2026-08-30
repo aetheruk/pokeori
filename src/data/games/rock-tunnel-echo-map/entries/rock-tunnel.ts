@@ -1,6 +1,7 @@
 import { RockTunnelEchoMapGameConfig } from '../types'
 
 const caveSprites = {
+  variant: 'echo-map' as const,
   tilePaletteId: 'basic-cave' as const,
   themeColour: '#818cf8',
   background: '/backgrounds/cave.avif',

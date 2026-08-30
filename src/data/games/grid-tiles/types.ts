@@ -76,6 +76,8 @@ export interface GridWallSet {
 
 export type GridObjectPurpose =
   | 'entity'
+  | 'hazard'
+  | 'destructible'
   | 'pushable'
   | 'decoration'
   | 'dialogue'
@@ -94,6 +96,8 @@ export interface GridObjectDefinition {
   size: GridObjectSize
   asset: GridTileAsset
   collision?: 'none' | 'solid' | 'pushable'
+  /** Optional renderer hints; gameplay rules remain owned by the active variant. */
+  properties?: Record<string, unknown>
 }
 
 export type GridObjectLibrary = Record<string, GridObjectDefinition>
@@ -134,6 +138,8 @@ export interface GridBlockerPlacement extends GridPosition {
 export interface GridObjectPlacement extends GridPosition {
   id?: string
   objectId: string
+  /** Per-placement state or renderer hints interpreted by the active variant. */
+  properties?: Record<string, unknown>
 }
 
 /** Reusable visual scene contract. Games may adapt their existing collision maps into it. */

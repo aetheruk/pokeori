@@ -44,5 +44,5 @@ export function getRequiredResearchWins(encounter: ResearchGameConfig): number {
 
   if (isScoreCompletionGame) return 1
 
-  return winRate || (encounter.gameType === 'rock-push' ? 1 : 5)
+  return winRate || (encounter.gameType === 'grid-puzzle' ? 1 : 5)
 }

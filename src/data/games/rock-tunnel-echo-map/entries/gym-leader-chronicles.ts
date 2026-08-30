@@ -1,6 +1,7 @@
 import type { RockTunnelEchoMapGameConfig } from '../types'
 
 const common = {
+  variant: 'echo-map' as const,
   tilePaletteId: 'basic-cave',
   gridSize: { cols: 7, rows: 7 },
   playerStart: { x: 0, y: 6 },

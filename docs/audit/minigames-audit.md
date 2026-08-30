@@ -32,7 +32,7 @@ This document provides an audit of all mini-games in the Pokeori application. It
 | Spelling | `spelling.tsx` | Knowledge | Name spelling |
 | Whos That | `whos-that-pokemon.tsx` | Knowledge | Silhouette reveal |
 | Cry Recognition | `cry-recognition.tsx` | Knowledge | Sound ID |
-| Rock Push | `rock-push.tsx` | Physics | Push rocks |
+| Grid Puzzle | `grid-puzzle.tsx` + variant renderers | Physics/puzzle | Rock Push, Voltorb, and Echo Map rulesets |
 | Fishing | `fishing.tsx` | Timing | Multiple rods |
 
 ---
@@ -421,7 +421,10 @@ src/app/(frontend)/game/research/encounter/
 ├── spelling.tsx         # Name spelling
 ├── whos-that-pokemon.tsx # Whos that Pokemon
 ├── cry-recognition.tsx  # Cry recognition
-├── rock-push.tsx        # Rock push
+├── grid-puzzle.tsx      # Shared Grid Puzzle dispatcher
+├── rock-push.tsx        # Rock Push variant renderer
+├── voltorb-grid.tsx     # Voltorb variant renderer
+├── rock-tunnel-echo-map.tsx # Echo Map variant renderer
 └── actions.ts           # Shared actions
 ```
 

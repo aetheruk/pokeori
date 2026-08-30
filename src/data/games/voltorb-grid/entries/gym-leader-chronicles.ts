@@ -12,6 +12,7 @@ export const gymLeaderChronicleVoltorbGridEntries: VoltorbGridGameConfig[] = [
     requirements: [{ type: 'task_completed', targetId: 'thunder-badge-memory-revealed' }],
     criteria: [], rewards: [],
     settings: {
+      variant: 'voltorb',
       tilePaletteId: 'basic-cave',
       gridSize: { cols: 7, rows: 7 }, playerStart: { x: 1, y: 6 }, exit: { x: 6, y: 0 },
       walls: [{ x: 2, y: 0 }, { x: 2, y: 1 }, { x: 4, y: 1 }, { x: 1, y: 4 }, { x: 2, y: 4 }],

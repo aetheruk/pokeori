@@ -17,9 +17,9 @@ import { Button } from '@/components/ui/button'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
 import type {
-  RockTunnelEchoMapGameConfig,
+  GridPuzzleEchoMapGameConfig,
   RockTunnelEchoPosition,
-} from '@/data/games/rock-tunnel-echo-map'
+} from '@/data/games'
 import {
   getGridObstacleParts,
   resolveGridBackWallSource,
@@ -37,7 +37,7 @@ import {
 } from '@/app/(frontend)/game/games/actions'
 
 interface RockTunnelEchoMapGameProps {
-  encounter: RockTunnelEchoMapGameConfig & { isEligibleForReplay?: boolean }
+  encounter: GridPuzzleEchoMapGameConfig & { isEligibleForReplay?: boolean }
   initialState?: any
 }
 
@@ -505,6 +505,7 @@ export function RockTunnelEchoMapGame({
             <div className="grid grid-cols-3 gap-2 mx-auto">
               <div />
               <Button
+                variant="outline"
                 size="lg"
                 className="h-16 border border-game-moss bg-game-surface-raised text-game-ink hover:bg-game-moss/10"
                 onClick={() => movePlayer('up')}
@@ -515,6 +516,7 @@ export function RockTunnelEchoMapGame({
               </Button>
               <div />
               <Button
+                variant="outline"
                 size="lg"
                 className="h-16 border border-game-moss bg-game-surface-raised text-game-ink hover:bg-game-moss/10"
                 onClick={() => movePlayer('left')}
@@ -524,6 +526,7 @@ export function RockTunnelEchoMapGame({
                 <ArrowLeft />
               </Button>
               <Button
+                variant="outline"
                 size="lg"
                 className="h-16 border border-game-moss bg-game-surface-raised text-game-ink hover:bg-game-moss/10"
                 onClick={() => movePlayer('down')}
@@ -533,6 +536,7 @@ export function RockTunnelEchoMapGame({
                 <ArrowDown />
               </Button>
               <Button
+                variant="outline"
                 size="lg"
                 className="h-16 border border-game-moss bg-game-surface-raised text-game-ink hover:bg-game-moss/10"
                 onClick={() => movePlayer('right')}

@@ -17,8 +17,7 @@ import { ProcedureOrderGame } from '@/app/(frontend)/game/research/encounter/pro
 import { QuickIdentifyGame } from '@/app/(frontend)/game/research/encounter/quick-identify'
 import { ResearchCompareGame } from '@/app/(frontend)/game/research/encounter/research-compare'
 import { RhythmGame } from '@/app/(frontend)/game/research/encounter/rhythm'
-import { RockPushGame } from '@/app/(frontend)/game/research/encounter/rock-push'
-import { RockTunnelEchoMapGame } from '@/app/(frontend)/game/research/encounter/rock-tunnel-echo-map'
+import { GridPuzzleGame } from '@/app/(frontend)/game/research/encounter/grid-puzzle'
 import { RunGame } from '@/app/(frontend)/game/research/encounter/run'
 import { SurfGame } from '@/app/(frontend)/game/research/encounter/surf'
 import { SlidingPuzzleGame } from '@/app/(frontend)/game/research/encounter/sliding-puzzle'
@@ -27,7 +26,6 @@ import { SpellingGame } from '@/app/(frontend)/game/research/encounter/spelling'
 import { TcgBattleGame } from '@/app/(frontend)/game/research/encounter/tcg-battle'
 import { TcgInspectionGame } from '@/app/(frontend)/game/research/encounter/tcg-inspection'
 import { UfoCatcherGame } from '@/app/(frontend)/game/research/encounter/ufo-catcher'
-import { VoltorbGridGame } from '@/app/(frontend)/game/research/encounter/voltorb-grid'
 import { WhosThatPokemonGame } from '@/app/(frontend)/game/research/encounter/whos-that-pokemon'
 import { GameRouteDataBoundary } from '@/components/game/shared/GameRouteDataBoundary'
 import type { GameItem, GameType } from '@/data/games'
@@ -54,7 +52,7 @@ const GAME_COMPONENTS: Partial<Record<GameType, ComponentType<GameProps>>> = {
   snap: PokemonSnapGame as unknown as ComponentType<GameProps>,
   cry: CryRecognitionGame as unknown as ComponentType<GameProps>,
   compare: ResearchCompareGame as unknown as ComponentType<GameProps>,
-  'rock-push': RockPushGame as unknown as ComponentType<GameProps>,
+  'grid-puzzle': GridPuzzleGame as unknown as ComponentType<GameProps>,
   run: RunGame as unknown as ComponentType<GameProps>,
   flap: FlapGame as unknown as ComponentType<GameProps>,
   surf: SurfGame as unknown as ComponentType<GameProps>,
@@ -70,13 +68,10 @@ const GAME_COMPONENTS: Partial<Record<GameType, ComponentType<GameProps>>> = {
   mining: MiningGame as unknown as ComponentType<GameProps>,
   'tcg-inspection': TcgInspectionGame as unknown as ComponentType<GameProps>,
   'tcg-battle': TcgBattleGame as unknown as ComponentType<GameProps>,
-  'voltorb-grid': VoltorbGridGame as unknown as ComponentType<GameProps>,
   'diglett-tunnel-tap':
     DiglettTunnelTapGame as unknown as ComponentType<GameProps>,
   'magnemite-circuit':
     MagnemiteCircuitGame as unknown as ComponentType<GameProps>,
-  'rock-tunnel-echo-map':
-    RockTunnelEchoMapGame as unknown as ComponentType<GameProps>,
   'art-academy': ArtAcademyGame as unknown as ComponentType<GameProps>,
   'procedure-order': ProcedureOrderGame as unknown as ComponentType<GameProps>,
   'battle-bets': BattleBetsGame as unknown as ComponentType<GameProps>,

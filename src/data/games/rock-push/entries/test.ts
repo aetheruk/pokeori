@@ -18,6 +18,7 @@ export const testbasicEntries: RockPushGameConfig[] = [
       },
     ],
     settings: {
+      variant: 'rock-push',
       tilePaletteId: 'grass',
       timeLimit: 90,
       grid_size: 9,
@@ -71,6 +72,7 @@ export const testbasicEntries: RockPushGameConfig[] = [
       },
     ],
     settings: {
+      variant: 'rock-push',
       tilePaletteId: 'grass',
       timeLimit: 90,
       grid_size: 9,
@@ -127,6 +129,7 @@ export const testbasicEntries: RockPushGameConfig[] = [
       },
     ],
     settings: {
+      variant: 'rock-push',
       tilePaletteId: 'grass',
       timeLimit: 120,
       grid_size: 9,

@@ -7,6 +7,8 @@ export interface RockTunnelEchoPosition {
 }
 
 export interface RockTunnelEchoMapSettings {
+  /** Ruleset executed by the shared Grid Puzzle game mode. */
+  variant: 'echo-map'
   /** Semantic 16x16 tile palette. Legacy sprite fields override individual roles. */
   tilePaletteId?: GridTilePaletteId
   floorVariation?: GridFloorRenderConfig

@@ -3759,9 +3759,9 @@ describe('static data references', () => {
       dropChance: 100,
     })
     expect(voltorbGames.map((game) => game?.gameType)).toEqual([
-      'voltorb-grid',
-      'voltorb-grid',
-      'voltorb-grid',
+      'grid-puzzle',
+      'grid-puzzle',
+      'grid-puzzle',
     ])
     expect(voltorbGames[0]?.requirements).toContainEqual({
       type: 'task_completed',
@@ -3875,11 +3875,11 @@ describe('static data references', () => {
       consume: true,
     })
     expect(demolitionGames.map((game) => game?.gameType)).toEqual([
-      'voltorb-grid',
-      'voltorb-grid',
-      'voltorb-grid',
-      'voltorb-grid',
-      'voltorb-grid',
+      'grid-puzzle',
+      'grid-puzzle',
+      'grid-puzzle',
+      'grid-puzzle',
+      'grid-puzzle',
     ])
     expect(demolitionGames[0]?.requirements).toContainEqual({
       type: 'task_completed',
@@ -3992,7 +3992,7 @@ describe('static data references', () => {
     )
     const screens = game?.settings.screens || []
 
-    expect(game?.gameType).toBe('rock-push')
+    expect(game?.gameType).toBe('grid-puzzle')
     expect(game?.settings.startScreen).toBe('entry')
     expect(screens.map((screen) => screen.id).sort()).toEqual([
       'entry',
@@ -5186,7 +5186,8 @@ describe('static data references', () => {
     )
     const echoMaps = allGames.filter(
       (entry) =>
-        entry.gameType === 'rock-tunnel-echo-map' &&
+        entry.gameType === 'grid-puzzle' &&
+        (entry.settings as { variant?: string }).variant === 'echo-map' &&
         entry.subCategory === 'Rock Tunnel',
     )
     const cacheExpectations = [

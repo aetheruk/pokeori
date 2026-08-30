@@ -108,7 +108,7 @@ function formatGameAction(gameType?: string): string {
     snap: 'Photograph',
     cry: 'Complete',
     compare: 'Compare',
-    'rock-push': 'Solve',
+    'grid-puzzle': 'Solve',
     run: 'Run',
     flap: 'Score in',
     slots: 'Play',

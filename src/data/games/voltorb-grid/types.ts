@@ -18,6 +18,8 @@ export interface VoltorbGridProtectedPokemon extends VoltorbGridPosition {
 }
 
 export interface VoltorbGridSettings {
+  /** Ruleset executed by the shared Grid Puzzle game mode. */
+  variant: 'voltorb'
   /** Semantic 16x16 tile palette. Legacy sprite fields override individual roles. */
   tilePaletteId?: GridTilePaletteId
   floorVariation?: GridFloorRenderConfig

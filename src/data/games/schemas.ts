@@ -614,6 +614,146 @@ const ufoCatcherSettingsSchema = z
     }
   })
 
+const gridPuzzleSettingsSchema = z.union([
+  z
+    .object({
+      variant: z.literal('rock-push'),
+      tilePaletteId: gridTilePaletteIdSchema.optional(),
+      floorVariation: gridFloorRenderConfigSchema.optional(),
+      grid_size: z.number().int().min(6).max(15).optional(),
+      playerStart: rockPushPositionSchema,
+      startScreen: z.string().min(1).max(80).optional(),
+      boulders: z.array(rockPushPositionSchema).optional(),
+      holes: z.array(rockPushPositionSchema).optional(),
+      barriers: z.array(rockPushPositionSchema).optional(),
+      ice: z.array(rockPushPositionSchema).optional(),
+      winTiles: z.array(rockPushPositionSchema).optional(),
+      teleporters: z.array(rockPushTeleporterSchema).optional(),
+      screens: z.array(rockPushScreenSchema).optional(),
+      prizes: z.array(rockPushPrizeSchema).optional(),
+      timeLimit: z.number().positive().optional(),
+      maxMoves: z.number().int().positive().optional(),
+      invisibleMaze: z.boolean().optional(),
+    })
+    .passthrough(),
+  z
+    .object({
+      variant: z.literal('voltorb'),
+      tilePaletteId: gridTilePaletteIdSchema.optional(),
+      floorVariation: gridFloorRenderConfigSchema.optional(),
+      gridSize: z
+        .object({
+          cols: z.number().int().min(5).max(12),
+          rows: z.number().int().min(5).max(12),
+        })
+        .strict(),
+      playerStart: voltorbGridPositionSchema,
+      exit: voltorbGridPositionSchema,
+      walls: z.array(voltorbGridPositionSchema).optional(),
+      debris: z.array(voltorbGridPositionSchema).optional(),
+      voltorbs: z.array(voltorbGridVoltorbSchema).min(1),
+      protectedPokemon: z.array(voltorbGridProtectedPokemonSchema).optional(),
+      requiredCleared: z.number().int().nonnegative().optional(),
+      timeLimit: z.number().positive().optional(),
+      maxMoves: z.number().int().positive().optional(),
+      maxDischarges: z.number().int().positive().optional(),
+      winRate: z.number().positive().optional(),
+      themeColour: z.string().min(1).optional(),
+      background: z.string().optional(),
+      floorSprite: z.string().optional(),
+      boulderSprite: z.string().optional(),
+      barrierSprite: z.string().optional(),
+      winTileSprite: z.string().optional(),
+      playerSprite: z.string().optional(),
+    })
+    .passthrough()
+    .superRefine((settings, ctx) => {
+      addGridPositionBoundsIssues(
+        ctx,
+        settings.gridSize,
+        [
+          { label: 'playerStart', position: settings.playerStart },
+          { label: 'exit', position: settings.exit },
+          ...(settings.walls || []).map((position, index) => ({
+            label: `walls.${index}`,
+            position,
+          })),
+          ...(settings.debris || []).map((position, index) => ({
+            label: `debris.${index}`,
+            position,
+          })),
+          ...settings.voltorbs.map((position, index) => ({
+            label: `voltorbs.${index}`,
+            position,
+          })),
+          ...(settings.protectedPokemon || []).map((position, index) => ({
+            label: `protectedPokemon.${index}`,
+            position,
+          })),
+        ],
+        'Grid Puzzle Voltorb position must fit inside the board',
+      )
+
+      if (
+        typeof settings.requiredCleared === 'number' &&
+        settings.requiredCleared > (settings.debris || []).length
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['requiredCleared'],
+          message: 'requiredCleared cannot exceed authored debris count',
+        })
+      }
+    }),
+  z
+    .object({
+      variant: z.literal('echo-map'),
+      tilePaletteId: gridTilePaletteIdSchema.optional(),
+      floorVariation: gridFloorRenderConfigSchema.optional(),
+      gridSize: z
+        .object({
+          cols: z.number().int().min(5).max(12),
+          rows: z.number().int().min(5).max(12),
+        })
+        .strict(),
+      playerStart: voltorbGridPositionSchema,
+      exit: voltorbGridPositionSchema,
+      walls: z.array(voltorbGridPositionSchema),
+      holes: z.array(voltorbGridPositionSchema).optional(),
+      timeLimit: z.number().positive().optional(),
+      maxMoves: z.number().int().positive().optional(),
+      revealDurationMs: z.number().int().min(250).max(10000).optional(),
+      winRate: z.number().positive().optional(),
+      themeColour: z.string().min(1).optional(),
+      background: z.string().optional(),
+      floorSprite: z.string().optional(),
+      barrierSprite: z.string().optional(),
+      holeSprite: z.string().optional(),
+      winTileSprite: z.string().optional(),
+      playerSprite: z.string().optional(),
+    })
+    .passthrough()
+    .superRefine((settings, ctx) => {
+      addGridPositionBoundsIssues(
+        ctx,
+        settings.gridSize,
+        [
+          { label: 'playerStart', position: settings.playerStart },
+          { label: 'exit', position: settings.exit },
+          ...settings.walls.map((position, index) => ({
+            label: `walls.${index}`,
+            position,
+          })),
+          ...(settings.holes || []).map((position, index) => ({
+            label: `holes.${index}`,
+            position,
+          })),
+        ],
+        'Grid Puzzle Echo Map position must fit inside the board',
+      )
+    }),
+])
+
 const settingsByGameType: Record<string, z.ZodTypeAny> = {
   silhouette: commonKnowledgeSettings,
   identify: commonKnowledgeSettings,
@@ -636,26 +776,7 @@ const settingsByGameType: Record<string, z.ZodTypeAny> = {
       )
       .optional(),
   }),
-  'rock-push': z
-    .object({
-      tilePaletteId: gridTilePaletteIdSchema.optional(),
-      floorVariation: gridFloorRenderConfigSchema.optional(),
-      grid_size: z.number().int().min(6).max(15).optional(),
-      playerStart: rockPushPositionSchema,
-      startScreen: z.string().min(1).max(80).optional(),
-      boulders: z.array(rockPushPositionSchema).optional(),
-      holes: z.array(rockPushPositionSchema).optional(),
-      barriers: z.array(rockPushPositionSchema).optional(),
-      ice: z.array(rockPushPositionSchema).optional(),
-      winTiles: z.array(rockPushPositionSchema).optional(),
-      teleporters: z.array(rockPushTeleporterSchema).optional(),
-      screens: z.array(rockPushScreenSchema).optional(),
-      prizes: z.array(rockPushPrizeSchema).optional(),
-      timeLimit: z.number().positive().optional(),
-      maxMoves: z.number().int().positive().optional(),
-      invisibleMaze: z.boolean().optional(),
-    })
-    .passthrough(),
+  'grid-puzzle': gridPuzzleSettingsSchema,
   run: z.object({ speed: z.number().positive() }).passthrough(),
   flap: z
     .object({
@@ -870,74 +991,6 @@ const settingsByGameType: Record<string, z.ZodTypeAny> = {
       itemDrops: z.array(fieldObservationItemDropSchema).optional(),
     })
     .passthrough(),
-  'voltorb-grid': z
-    .object({
-      tilePaletteId: gridTilePaletteIdSchema.optional(),
-      floorVariation: gridFloorRenderConfigSchema.optional(),
-      gridSize: z
-        .object({
-          cols: z.number().int().min(5).max(12),
-          rows: z.number().int().min(5).max(12),
-        })
-        .strict(),
-      playerStart: voltorbGridPositionSchema,
-      exit: voltorbGridPositionSchema,
-      walls: z.array(voltorbGridPositionSchema).optional(),
-      debris: z.array(voltorbGridPositionSchema).optional(),
-      voltorbs: z.array(voltorbGridVoltorbSchema).min(1),
-      protectedPokemon: z.array(voltorbGridProtectedPokemonSchema).optional(),
-      requiredCleared: z.number().int().nonnegative().optional(),
-      timeLimit: z.number().positive().optional(),
-      maxMoves: z.number().int().positive().optional(),
-      maxDischarges: z.number().int().positive().optional(),
-      winRate: z.number().positive().optional(),
-      themeColour: z.string().min(1).optional(),
-      background: z.string().optional(),
-      floorSprite: z.string().optional(),
-      boulderSprite: z.string().optional(),
-      barrierSprite: z.string().optional(),
-      winTileSprite: z.string().optional(),
-      playerSprite: z.string().optional(),
-    })
-    .passthrough()
-    .superRefine((settings, ctx) => {
-      addGridPositionBoundsIssues(
-        ctx,
-        settings.gridSize,
-        [
-          { label: 'playerStart', position: settings.playerStart },
-          { label: 'exit', position: settings.exit },
-          ...(settings.walls || []).map((position, index) => ({
-            label: `walls.${index}`,
-            position,
-          })),
-          ...(settings.debris || []).map((position, index) => ({
-            label: `debris.${index}`,
-            position,
-          })),
-          ...settings.voltorbs.map((position, index) => ({
-            label: `voltorbs.${index}`,
-            position,
-          })),
-          ...(settings.protectedPokemon || []).map((position, index) => ({
-            label: `protectedPokemon.${index}`,
-            position,
-          })),
-        ],
-        'Voltorb Grid position must fit inside the board',
-      )
-
-      if (
-        typeof settings.requiredCleared === 'number' &&
-        settings.requiredCleared > (settings.debris || []).length
-      ) {
-        ctx.addIssue({
-          code: 'custom',
-          path: ['requiredCleared'],
-          message: 'requiredCleared cannot exceed authored debris count',
-        })
-      }
-    }),
   'diglett-tunnel-tap': z
     .object({
       gridSize: z
@@ -1017,52 +1070,6 @@ const settingsByGameType: Record<string, z.ZodTypeAny> = {
           })
         }
       })
-    }),
-  'rock-tunnel-echo-map': z
-    .object({
-      tilePaletteId: gridTilePaletteIdSchema.optional(),
-      floorVariation: gridFloorRenderConfigSchema.optional(),
-      gridSize: z
-        .object({
-          cols: z.number().int().min(5).max(12),
-          rows: z.number().int().min(5).max(12),
-        })
-        .strict(),
-      playerStart: voltorbGridPositionSchema,
-      exit: voltorbGridPositionSchema,
-      walls: z.array(voltorbGridPositionSchema),
-      holes: z.array(voltorbGridPositionSchema).optional(),
-      timeLimit: z.number().positive().optional(),
-      maxMoves: z.number().int().positive().optional(),
-      revealDurationMs: z.number().int().min(250).max(10000).optional(),
-      winRate: z.number().positive().optional(),
-      themeColour: z.string().min(1).optional(),
-      background: z.string().optional(),
-      floorSprite: z.string().optional(),
-      barrierSprite: z.string().optional(),
-      holeSprite: z.string().optional(),
-      winTileSprite: z.string().optional(),
-      playerSprite: z.string().optional(),
-    })
-    .passthrough()
-    .superRefine((settings, ctx) => {
-      addGridPositionBoundsIssues(
-        ctx,
-        settings.gridSize,
-        [
-          { label: 'playerStart', position: settings.playerStart },
-          { label: 'exit', position: settings.exit },
-          ...settings.walls.map((position, index) => ({
-            label: `walls.${index}`,
-            position,
-          })),
-          ...(settings.holes || []).map((position, index) => ({
-            label: `holes.${index}`,
-            position,
-          })),
-        ],
-        'Rock Tunnel Echo Map position must fit inside the board',
-      )
     }),
   'art-academy': z
     .object({

@@ -73,7 +73,8 @@ export const gridTilePalettes = {
         large: { src: '/games/grid-tiles/basic-cave/floor/blockers/large.png' },
       },
       markers: {
-        goal: { src: '/games/rockpush/win-tile.avif' },
+        // The cave marker is currently shared for goal and teleporter roles until dedicated goal art is authored.
+        goal: { src: '/games/grid-tiles/basic-cave/floor/markers/teleporter.png' },
         teleporter: { src: '/games/grid-tiles/basic-cave/floor/markers/teleporter.png' },
       },
     },

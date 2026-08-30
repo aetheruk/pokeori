@@ -40,14 +40,14 @@ const expectedBannerNames = {
 } as const
 
 const expectedGameTypes = {
-  brock: ['mining', 'procedure-order', 'rock-push'],
+  brock: ['grid-puzzle', 'mining', 'procedure-order'],
   misty: ['cry', 'rhythm', 'sliding-puzzle'],
-  surge: ['cry', 'magnemite-circuit', 'voltorb-grid'],
+  surge: ['cry', 'grid-puzzle', 'magnemite-circuit'],
   erika: ['identify', 'procedure-order'],
-  koga: ['identify', 'rock-tunnel-echo-map', 'silhouette'],
-  sabrina: ['rock-tunnel-echo-map', 'silhouette', 'sliding-puzzle'],
-  blaine: ['compare', 'procedure-order', 'rock-tunnel-echo-map'],
-  giovanni: ['rock-push', 'sliding-puzzle'],
+  koga: ['grid-puzzle', 'identify', 'silhouette'],
+  sabrina: ['grid-puzzle', 'silhouette', 'sliding-puzzle'],
+  blaine: ['compare', 'grid-puzzle', 'procedure-order'],
+  giovanni: ['grid-puzzle', 'sliding-puzzle'],
 } as const
 
 const phases: ChronicleNarrativePhase[] = [

@@ -18,6 +18,7 @@ export const basicEntries: RockPushGameConfig[] = [
       },
     ],
     settings: {
+      variant: 'rock-push',
       tilePaletteId: 'grass',
       timeLimit: 90,
       grid_size: 9,

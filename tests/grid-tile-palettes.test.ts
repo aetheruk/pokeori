@@ -15,6 +15,7 @@ import {
   createGridSceneConfigSchema,
   gridObjectLibrarySchema,
   gridObjectDefinitionSchema,
+  gridObjects,
   gridSceneConfigSchema,
   gridTilePalettes,
   isGridTilePaletteId,
@@ -56,6 +57,12 @@ describe('shared grid sprite sets', () => {
       gridTilePalettes.grass.floor.markers?.teleporter?.src,
     )
     expect(gridTilePalettes.grass.floor.markers?.goal?.src).not.toBe(
+      '/games/rockpush/win-tile.avif',
+    )
+    expect(gridTilePalettes['basic-cave'].floor.markers?.goal?.src).toBe(
+      gridTilePalettes['basic-cave'].floor.markers?.teleporter?.src,
+    )
+    expect(gridTilePalettes['basic-cave'].floor.markers?.goal?.src).not.toBe(
       '/games/rockpush/win-tile.avif',
     )
   })
@@ -181,15 +188,17 @@ describe('shared grid sprite sets', () => {
   })
 
   test('spatial games use registered palettes by authored theme', () => {
-    const spatialTypes = new Set([
-      'rock-push',
-      'rock-tunnel-echo-map',
-      'voltorb-grid',
-    ])
-    const spatialGames = allGames.filter((game) =>
-      spatialTypes.has(game.gameType),
+    const spatialGames = allGames.filter(
+      (game) => game.gameType === 'grid-puzzle',
     )
     expect(spatialGames.length).toBeGreaterThan(0)
+    expect(
+      spatialGames.every((game) =>
+        ['rock-push', 'voltorb', 'echo-map'].includes(
+          (game.settings as { variant?: string }).variant || '',
+        ),
+      ),
+    ).toBe(true)
     for (const game of spatialGames) {
       const settings = game.settings as {
         tilePaletteId?: string
@@ -203,18 +212,29 @@ describe('shared grid sprite sets', () => {
     }
     expect(
       spatialGames
-        .filter((game) => game.gameType === 'voltorb-grid')
+        .filter((game) => (game.settings as { variant?: string }).variant === 'voltorb')
         .every((game) => (game.settings as { tilePaletteId?: string }).tilePaletteId === 'basic-cave'),
     ).toBe(true)
     expect(
       spatialGames
-        .filter((game) => game.gameType === 'rock-tunnel-echo-map')
+        .filter((game) => (game.settings as { variant?: string }).variant === 'voltorb')
+        .every((game) => {
+          const settings = game.settings as {
+            tilePaletteId?: string
+            winTileSprite?: string
+          }
+          return settings.tilePaletteId === 'basic-cave' && !settings.winTileSprite
+        }),
+    ).toBe(true)
+    expect(
+      spatialGames
+        .filter((game) => (game.settings as { variant?: string }).variant === 'echo-map')
         .every((game) => (game.settings as { tilePaletteId?: string }).tilePaletteId === 'basic-cave'),
     ).toBe(true)
     expect(
       spatialGames.some(
         (game) =>
-          game.gameType === 'rock-push' &&
+          (game.settings as { variant?: string }).variant === 'rock-push' &&
           (game.settings as { tilePaletteId?: string }).tilePaletteId === 'grass',
       ),
     ).toBe(true)
@@ -230,13 +250,26 @@ describe('shared grid sprite sets', () => {
     )
   })
 
+  test('shared object definitions cover the spatial gameplay entities', () => {
+    expect(Object.keys(gridObjects)).toEqual([
+      'voltorb',
+      'breakableRock',
+      'pushableBoulder',
+    ])
+    for (const object of Object.values(gridObjects)) {
+      expect(object.size).toEqual({ cols: 1, rows: 1 })
+      expectAssetExists(object.asset)
+      expect(gridObjectDefinitionSchema.safeParse(object).success).toBe(true)
+    }
+  })
+
   test('no external sprite pack is bundled', () => {
     expect(getGridTilePackCredits({ externalOnly: true })).toEqual([])
   })
 
-  test('retired palette ids fall back while role overrides remain isolated', () => {
+  test('unknown palette ids use the default palette while role overrides remain isolated', () => {
     const originalFloor = getGridTilePalette('basic-cave').floor.common.src
-    const sources = resolveGridTileSources('rock-cave', {
+    const sources = resolveGridTileSources('not-a-registered-palette', {
       floor: '/custom/floor.png',
     })
     expect(sources.floor).toBe('/custom/floor.png')
@@ -244,7 +277,7 @@ describe('shared grid sprite sets', () => {
       getGridTilePalette('basic-cave').floor.blockers!.small.src,
     )
     expect(getGridTilePalette('basic-cave').floor.common.src).toBe(originalFloor)
-    expect(GRID_TILE_PALETTE_IDS).not.toContain('rock-cave')
+    expect(GRID_TILE_PALETTE_IDS).not.toContain('not-a-registered-palette')
   })
 
   test('responsive board sizing uses whole-number 16px scales', () => {
