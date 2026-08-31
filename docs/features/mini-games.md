@@ -94,6 +94,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 
 ## Grid Puzzle: Rock Push variant
 - Rock Push renders tile backgrounds separately from moving entities so the player and boulders slide between cells.
+- Rock Push object placements resolve shared definitions by stable `objectId`, allowing reusable battle and encounter markers to render and trigger regardless of the registry's internal property names.
 - Players can undo successful movement with the undo control or `Z`; invalid moves play a short bump animation and do not increment move count.
 - Boulders that fall into holes are removed after the drop animation and return that cell to the active set's normal floor tile; simple corner deadlocks are highlighted on the boulder as a warning.
 - Rock Push boards are fully authored in `settings` with `grid_size`, `playerStart`, `boulders`, `holes`, and `barriers`; there is no automatic puzzle generator.

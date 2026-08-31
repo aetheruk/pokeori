@@ -15,7 +15,7 @@ import {
 } from './types'
 export * from './types'
 export * from './schema'
-export { gridObjects } from './objects'
+export { getGridObjectDefinition, gridObjects } from './objects'
 
 export const DEFAULT_GRID_TILE_PALETTE_ID = 'basic-cave'
 export const DEFAULT_GRID_PLAYER_SPRITE = '/games/rockpush/trainer.avif'
