@@ -29,4 +29,22 @@ export const gridObjects = {
     asset: { src: '/games/rockpush/boulder.avif' },
     collision: 'pushable',
   },
+  battleTrigger: {
+    id: 'battle-trigger',
+    name: 'Battle Trigger',
+    purpose: 'battle-trigger',
+    size: { cols: 1, rows: 1 },
+    asset: { src: '/games/rockpush/trainer.avif' },
+    collision: 'none',
+    interaction: 'battle',
+  },
+  encounterTrigger: {
+    id: 'encounter-trigger',
+    name: 'Encounter Trigger',
+    purpose: 'encounter-trigger',
+    size: { cols: 1, rows: 1 },
+    asset: { src: '/sprites/pokemon/gen-v/front/normal/666-poke-ball.avif' },
+    collision: 'none',
+    interaction: 'encounter',
+  },
 } satisfies GridObjectLibrary

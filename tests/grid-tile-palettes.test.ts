@@ -3,7 +3,9 @@ import { existsSync } from 'node:fs'
 import path from 'node:path'
 import sharp from 'sharp'
 import { getPixelGridMetrics } from '@/components/game/shared/pixel-grid-board'
+import { battles } from '@/data/battles'
 import { allGames } from '@/data/games'
+import { locations } from '@/data/locations'
 import {
   GRID_LOGICAL_TILE_SIZE,
   GRID_TILE_PALETTE_IDS,
@@ -21,6 +23,7 @@ import {
   gridSceneConfigSchema,
   gridTilePalettes,
   isGridTilePaletteId,
+  isGridBoundaryWall,
   resolveGridFloorSourceFromPalette,
   resolveGridGoalSource,
   resolveGridTileSources,
@@ -207,6 +210,14 @@ describe('shared grid sprite sets', () => {
     expect(GRID_WALL_MASKS).toHaveLength(16)
   })
 
+  test('simple palettes reserve only the top row as an automatic wall', () => {
+    expect(isGridBoundaryWall('basic-cave', 0, 0, 8)).toBe(true)
+    expect(isGridBoundaryWall('basic-cave', 7, 0, 8)).toBe(true)
+    expect(isGridBoundaryWall('basic-cave', 0, 4, 8)).toBe(false)
+    expect(isGridBoundaryWall('basic-cave', 7, 7, 8)).toBe(false)
+    expect(isGridBoundaryWall('basic-cave', 4, 7, 8)).toBe(false)
+  })
+
   test('legacy coordinates stay 1x1 unless large grouping is explicitly requested', () => {
     const square = [
       { x: 1, y: 1 },
@@ -261,6 +272,50 @@ describe('shared grid sprite sets', () => {
         objects: [{ id: 'voltorb-1', objectId: 'voltorb', x: 4, y: 4 }],
       }).success,
     ).toBe(true)
+    const interactiveScene = createGridSceneConfigSchema({
+      'battle-trigger': {
+        id: 'battle-trigger',
+        name: 'Battle Trigger',
+        purpose: 'battle-trigger',
+        size: { cols: 1, rows: 1 },
+        asset: { src: '/objects/battle.png' },
+        interaction: 'battle',
+      },
+    }).safeParse({
+      cols: 8,
+      rows: 8,
+      rendering: { spriteSetId: 'future-cave' },
+      objects: [
+        {
+          objectId: 'battle-trigger',
+          x: 4,
+          y: 4,
+          interaction: {
+            type: 'battle',
+            targetId: 'test-battle',
+            victory: 'clear',
+          },
+        },
+      ],
+    })
+    expect(interactiveScene.success).toBe(true)
+    expect(
+      createGridSceneConfigSchema({
+        'battle-trigger': {
+          id: 'battle-trigger',
+          name: 'Battle Trigger',
+          purpose: 'battle-trigger',
+          size: { cols: 1, rows: 1 },
+          asset: { src: '/objects/battle.png' },
+          interaction: 'battle',
+        },
+      }).safeParse({
+        cols: 8,
+        rows: 8,
+        rendering: { spriteSetId: 'future-cave' },
+        objects: [{ objectId: 'battle-trigger', x: 4, y: 4 }],
+      }).success,
+    ).toBe(false)
     expect(
       gridSceneConfigSchema.safeParse({
         cols: 8,
@@ -407,6 +462,43 @@ describe('shared grid sprite sets', () => {
     )
   })
 
+  test('grid object trigger tests author battle win and encounter clear flows', () => {
+    const battleTest = allGames.find((game) => game.id === 'grid-object-battle-test')
+    const encounterTest = allGames.find(
+      (game) => game.id === 'grid-object-encounter-test',
+    )
+    expect(battleTest?.gameType).toBe('grid-puzzle')
+    expect(encounterTest?.gameType).toBe('grid-puzzle')
+    if (!battleTest || !encounterTest) {
+      throw new Error('Grid object test entries are missing')
+    }
+    const battleObjects = (battleTest.settings as any).objects || []
+    const encounterObjects = (encounterTest.settings as any).objects || []
+    expect(battleObjects).toHaveLength(1)
+    expect(battleObjects[0].objectId).toBe('battle-trigger')
+    expect(battleObjects[0].interaction).toEqual({
+      type: 'battle',
+      targetId: 'safari-central-rocket-poacher',
+      victory: 'win',
+    })
+    expect(
+      battles.some(
+        (battle) =>
+          battle.id === battleObjects[0].interaction.targetId,
+      ),
+    ).toBe(true)
+    expect(encounterObjects).toHaveLength(2)
+    expect(encounterObjects.every((object: any) => object.objectId === 'encounter-trigger')).toBe(true)
+    expect(encounterObjects.every((object: any) => object.interaction.victory === 'clear')).toBe(true)
+    expect(
+      encounterObjects.every((object: any) =>
+        locations.some(
+          (location) => location.id === object.interaction.targetId,
+        ),
+      ),
+    ).toBe(true)
+  })
+
   test('back-wall row is reserved for the wall surface and exit markers', () => {
     const spatialGames = allGames.filter((game) => game.gameType === 'grid-puzzle')
     for (const game of spatialGames) {
@@ -433,6 +525,8 @@ describe('shared grid sprite sets', () => {
       'voltorb',
       'breakableRock',
       'pushableBoulder',
+      'battleTrigger',
+      'encounterTrigger',
     ])
     for (const object of Object.values(gridObjects)) {
       expect(object.size).toEqual({ cols: 1, rows: 1 })
@@ -440,6 +534,8 @@ describe('shared grid sprite sets', () => {
       expect(gridObjectDefinitionSchema.safeParse(object).success).toBe(true)
     }
     expect(gridObjects.breakableRock.asset.src).toBe('/games/rockpush/breakable-rock.png')
+    expect(gridObjects.battleTrigger.interaction).toBe('battle')
+    expect(gridObjects.encounterTrigger.interaction).toBe('encounter')
   })
 
   test('breakable rock preserves a transparent silhouette', async () => {

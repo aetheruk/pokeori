@@ -81,6 +81,7 @@ interface EncounterResultsProps {
   cardsToReveal: TcgCard[]
   setCardsToReveal: (cards: TcgCard[]) => void
   setPhase: (phase: 'quiz' | 'capture' | 'result') => void
+  returnPath?: string | null
 }
 
 export function EncounterResults({
@@ -103,6 +104,7 @@ export function EncounterResults({
   cardsToReveal,
   setCardsToReveal,
   setPhase,
+  returnPath,
 }: EncounterResultsProps) {
   const router = useRouter()
   const [replayLoading, setReplayLoading] = useState(false)
@@ -264,7 +266,14 @@ export function EncounterResults({
         onReturn={() => {
           markExpeditionReturn(expeditionProgress?.expeditionId)
           refreshUser()
-          router.push('/game/explore')
+          if (returnPath) {
+            const separator = returnPath.includes('?') ? '&' : '?'
+            router.push(
+              `${returnPath}${separator}outcome=${captureResult.caught ? 'won' : 'lost'}`,
+            )
+          } else {
+            router.push('/game/explore')
+          }
         }}
         secondaryAction={
           encounter.isEligibleForReplay ? (

@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Backpack, Sparkles } from 'lucide-react'
 import nextDynamic from 'next/dynamic'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AiOutlineLoading3Quarters as Loader2 } from 'react-icons/ai'
 import { FaRunning } from 'react-icons/fa'
@@ -473,6 +473,12 @@ function SilphScopeGhostSequence({ stage }: { stage: 'glitch' | 'black' }) {
 
 export default function EncounterPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const returnPathParam = searchParams.get('returnTo')
+  const returnPath =
+    returnPathParam?.startsWith('/') && !returnPathParam.startsWith('//')
+      ? returnPathParam
+      : null
   const { user, refreshUser } = useUser()
   const [encounter, setEncounter] = useState<EncounterData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -652,9 +658,14 @@ export default function EncounterPage() {
       setEncounter(null)
       setLoading(true)
       stopMusic({ fade: true })
-      router.replace('/game/explore')
+      if (returnPath) {
+        const separator = returnPath.includes('?') ? '&' : '?'
+        router.replace(`${returnPath}${separator}outcome=lost`)
+      } else {
+        router.replace('/game/explore')
+      }
     },
-    [clearAnswerFeedbackTimer, router, stopMusic],
+    [clearAnswerFeedbackTimer, returnPath, router, stopMusic],
   )
 
   const enterCaptureFromTimeUp = useCallback(() => {
@@ -1610,6 +1621,7 @@ export default function EncounterPage() {
         cardsToReveal={cardsToReveal}
         setCardsToReveal={setCardsToReveal}
         setPhase={setPhase as any}
+        returnPath={returnPath}
       />
     )
   }

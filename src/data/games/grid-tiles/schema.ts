@@ -15,6 +15,14 @@ const gridTileAssetSchema = z
   })
   .strict()
 
+const gridObjectInteractionSchema = z
+  .object({
+    type: z.enum(['battle', 'encounter']),
+    targetId: z.string().min(1).max(120),
+    victory: z.enum(['win', 'clear']),
+  })
+  .strict()
+
 export const gridFloorRenderConfigSchema = z
   .object({
     seed: z.string().min(1).max(120).optional(),
@@ -53,6 +61,7 @@ export const gridObjectDefinitionSchema = z
       .strict(),
     asset: gridTileAssetSchema,
     collision: z.enum(['none', 'solid', 'pushable']).optional(),
+    interaction: z.enum(['battle', 'encounter']).optional(),
     properties: z.record(z.string(), z.unknown()).optional(),
   })
   .strict()
@@ -70,6 +79,7 @@ export const gridObjectPlacementSchema = gridPositionSchema
   .extend({
     id: z.string().min(1).max(80).optional(),
     objectId: z.string().min(1).max(80),
+    interaction: gridObjectInteractionSchema.optional(),
     properties: z.record(z.string(), z.unknown()).optional(),
   })
   .strict()
@@ -125,6 +135,20 @@ export function createGridSceneConfigSchema(objectLibrary: GridObjectLibrary) {
       if (!definition) {
         ctx.addIssue({ code: 'custom', path: ['objects', index, 'objectId'], message: 'Unknown object id' })
         return
+      }
+      if (definition.interaction && !object.interaction) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['objects', index, 'interaction'],
+          message: 'Interactive objects require a placement interaction',
+        })
+      }
+      if (object.interaction && definition.interaction !== object.interaction.type) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['objects', index, 'interaction', 'type'],
+          message: 'Placement interaction does not match the object type',
+        })
       }
       for (let offsetY = 0; offsetY < definition.size.rows; offsetY += 1) {
         for (let offsetX = 0; offsetX < definition.size.cols; offsetX += 1) {

@@ -1,7 +1,7 @@
 'use client'
 
 import { Heart, Loader2, RefreshCw } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Component,
   type ErrorInfo,
@@ -128,6 +128,10 @@ class CardRevealErrorBoundary extends Component<
 
 export function BattleInterface({ initialState }: BattleInterfaceProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const returnTo = searchParams.get('returnTo')
+  const gridPuzzleReturnTo =
+    returnTo?.startsWith('/') && !returnTo.startsWith('//') ? returnTo : null
   const { refreshUser } = useUser()
   const {
     battleState,
@@ -927,7 +931,15 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
               markExpeditionReturn(expeditionProgress?.expeditionId)
               await clearBattleState()
               refreshUser(true)
-              router.replace('/game/explore')
+              if (gridPuzzleReturnTo) {
+                const outcome = battleState.status === 'won' ? 'won' : 'lost'
+                const separator = gridPuzzleReturnTo.includes('?') ? '&' : '?'
+                router.replace(
+                  `${gridPuzzleReturnTo}${separator}outcome=${outcome}`,
+                )
+              } else {
+                router.replace('/game/explore')
+              }
             }}
             secondaryAction={
               (battleState as any).isEligibleForReplay ? (

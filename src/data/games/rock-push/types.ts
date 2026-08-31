@@ -1,5 +1,9 @@
 import { BaseGameConfig } from '../shared'
-import type { GridFloorRenderConfig, GridTilePaletteId } from '../grid-tiles'
+import type {
+  GridFloorRenderConfig,
+  GridObjectPlacement,
+  GridTilePaletteId,
+} from '../grid-tiles'
 import type { LocationReward } from '@/data/types'
 
 export interface RockPushPosition {
@@ -37,6 +41,7 @@ export interface RockPushScreenConfig {
   winTiles?: RockPushPosition[]
   teleporters?: RockPushTeleporter[]
   prizes?: RockPushPrizeSquare[]
+  objects?: GridObjectPlacement[]
 }
 
 export interface RockPushGameConfig extends BaseGameConfig {
@@ -56,6 +61,7 @@ export interface RockPushGameConfig extends BaseGameConfig {
     teleporters?: RockPushTeleporter[]
     screens?: RockPushScreenConfig[]
     prizes?: RockPushPrizeSquare[]
+    objects?: GridObjectPlacement[]
     grid_size?: number // 6-15
     winRate?: number
     timeLimit?: number
