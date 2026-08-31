@@ -11,6 +11,7 @@ import {
 import { gymLeaderChronicleExpeditions } from '@/data/expeditions/entries/gym-leader-chronicles'
 import { getMove } from '@/data/moves'
 import { procedureOrderGames } from '@/data/games/procedure-order'
+import { isGridBoundaryWall } from '@/data/games/grid-tiles'
 import { validateProcedureOrder } from '@/utilities/research/procedure-order'
 import { getDualTypeEffectiveness } from '@/utilities/battle/type-chart'
 import { calculateStats } from '@/utilities/battle/stats-calc'
@@ -63,14 +64,10 @@ function solveSokoban(settings: any): number | null {
   const barriers = new Set((settings.barriers || []).map(key))
   const holes = new Set((settings.holes || []).map(key))
   const startBoulders = (settings.boulders || []).map(key).sort()
-  // The rock-push client always walls the outer ring of the grid, and the
-  // player cannot walk onto a hole cell. Mirrors isBlockedCellForPlayer and
-  // the border walls authored in buildScreenRuntimeState.
+  // Mirrors the shared boundary adapter used by buildScreenRuntimeState:
+  // simple palettes reserve only the top row for the back wall.
   const isBorder = (position: Point) =>
-    position.x <= 0 ||
-    position.y <= 0 ||
-    position.x >= size - 1 ||
-    position.y >= size - 1
+    isGridBoundaryWall(settings.tilePaletteId, position.x, position.y, size)
   const blockedForRock = (position: Point) =>
     isBorder(position) || barriers.has(key(position))
   const blockedForPlayer = (position: Point) =>

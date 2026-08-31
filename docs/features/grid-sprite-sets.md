@@ -40,8 +40,32 @@ destructible, pushable, decoration, or dialogue), native footprint, collision
 behaviour, and sprite. This lets the same Voltorb, breakable rock, pushable
   stone, decoration, or future dialogue object appear in multiple map sets. A
   1×1 object uses a 64×64 native canvas; a 2×2 object uses 128×128; larger
-  dimensions remain possible for future content. The logical footprint remains
-  one or two 16px cells.
+dimensions remain possible for future content. The logical footprint remains
+one or two 16px cells.
+
+Interactive object types can opt into `interaction: 'battle'` or
+`interaction: 'encounter'` on their shared definition. A map placement then
+provides the target id and `victory: 'win' | 'clear'`:
+
+```ts
+objects: [{
+  id: 'wild-encounter-a',
+  objectId: 'encounter-trigger',
+  x: 4,
+  y: 3,
+  interaction: {
+    type: 'encounter',
+    targetId: 'route-10',
+    victory: 'clear',
+  },
+}]
+```
+
+`win` completes the active Grid Puzzle after the external activity succeeds;
+`clear` removes only that placement, allowing additional battles or catches
+to be authored on the same board. Rock Push persists its board snapshot while
+the battle or encounter screen is open and restores it when the result returns
+to `/game/games/grid-puzzle`.
 
 Wall filenames are four-bit cardinal masks: north `1`, east `2`, south `4`, west `8`. For example, north + east is `3`, east + west is `10`, and all four directions is `15`. Each mask should be deliberately authored with the correct corners and side faces.
 

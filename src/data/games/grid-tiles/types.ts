@@ -83,6 +83,16 @@ export type GridObjectPurpose =
   | 'dialogue'
   | (string & {})
 
+/** Interaction started when a player steps onto a placed object. */
+export type GridObjectInteractionType = 'battle' | 'encounter'
+export type GridObjectVictoryMode = 'win' | 'clear'
+
+export interface GridObjectInteractionPlacement {
+  type: GridObjectInteractionType
+  targetId: string
+  victory: GridObjectVictoryMode
+}
+
 export interface GridObjectSize {
   cols: number
   rows: number
@@ -96,6 +106,8 @@ export interface GridObjectDefinition {
   size: GridObjectSize
   asset: GridTileAsset
   collision?: 'none' | 'solid' | 'pushable'
+  /** Optional activity trigger supported by this reusable object type. */
+  interaction?: GridObjectInteractionType
   /** Optional renderer hints; gameplay rules remain owned by the active variant. */
   properties?: Record<string, unknown>
 }
@@ -143,6 +155,8 @@ export interface GridBlockerPlacement extends GridPosition {
 export interface GridObjectPlacement extends GridPosition {
   id?: string
   objectId: string
+  /** Optional map-specific activity target and post-victory behaviour. */
+  interaction?: GridObjectInteractionPlacement
   /** Per-placement state or renderer hints interpreted by the active variant. */
   properties?: Record<string, unknown>
 }

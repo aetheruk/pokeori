@@ -28,6 +28,7 @@ import type {
 import type { RockPushScreenConfig } from '@/data/games/rock-push/types'
 import {
   getGridObstacleParts,
+  isGridBoundaryWall,
   getGridWallMask,
   isGridBackWallOnly,
   gridObjects,
@@ -37,6 +38,12 @@ import {
   resolveGridObstacleSources,
   resolveGridTileSources,
   resolveGridWallSource,
+} from '@/data/games/grid-tiles'
+import type {
+  GridObjectDefinition,
+  GridObjectLibrary,
+  GridObjectPlacement,
+  GridObjectVictoryMode,
 } from '@/data/games/grid-tiles'
 import { getIcon } from '@/data/user'
 import { useGameMusic } from '@/hooks/useGameMusic'
@@ -52,6 +59,8 @@ import {
   startGame,
   submitGameAnswer,
 } from '@/app/(frontend)/game/games/actions'
+import { startBattle } from '@/app/(frontend)/game/battles/actions'
+import { startEncounter } from '@/app/(frontend)/game/locations/encounter/actions'
 import { EndlessCollectibleSprite } from './endless-collectibles'
 
 interface RockPushGameProps {
@@ -79,6 +88,7 @@ interface MoveSnapshot {
   rocksSolved: number
   moves: number
   collectedPrizeIds: string[]
+  clearedObjectKeys: string[]
 }
 
 interface ScreenRuntimeState {
@@ -87,6 +97,22 @@ interface ScreenRuntimeState {
   rocks: RockState[]
   rocksSolved: number
   gridSize: { w: number; h: number }
+}
+
+interface GridObjectResumeState {
+  encounterId: string
+  activeScreenId: string
+  grid: CellType[][]
+  rocks: RockState[]
+  playerPos: Position
+  rocksSolved: number
+  moves: number
+  collectedPrizeIds: string[]
+  clearedObjectKeys: string[]
+  pendingObjectKey: string
+  pendingVictory: GridObjectVictoryMode
+  pendingOutcome?: 'won' | 'lost'
+  screenStates?: Record<string, ScreenRuntimeState>
 }
 
 interface SlideResult {
@@ -169,6 +195,7 @@ const getRockPushScreens = (
       winTiles: settings.winTiles || [],
       teleporters: settings.teleporters || [],
       prizes: settings.prizes || [],
+      objects: settings.objects || [],
     },
   ]
 }
@@ -176,17 +203,17 @@ const getRockPushScreens = (
 const buildScreenRuntimeState = (
   screen: RockPushScreenConfig,
   fallbackGridSize: number,
+  fallbackTilePaletteId?: RockPushScreenConfig['tilePaletteId'],
 ): ScreenRuntimeState => {
   const size = screen.grid_size || fallbackGridSize || 8
+  const tilePaletteId = screen.tilePaletteId || fallbackTilePaletteId
   const authoredGrid: CellType[][] = []
 
   for (let y = 0; y < size; y++) {
     const row: CellType[] = []
     for (let x = 0; x < size; x++) {
       row.push(
-        x === 0 || x === size - 1 || y === 0 || y === size - 1
-          ? 'wall'
-          : 'empty',
+        isGridBoundaryWall(tilePaletteId, x, y, size) ? 'wall' : 'empty',
       )
     }
     authoredGrid.push(row)
@@ -262,6 +289,14 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   const [collectedPrizeIds, setCollectedPrizeIds] = useState<Set<string>>(
     new Set(),
   )
+  const [clearedObjectKeys, setClearedObjectKeys] = useState<Set<string>>(
+    new Set(),
+  )
+  const [pendingObjectResult, setPendingObjectResult] = useState<{
+    key: string
+    victory: GridObjectVictoryMode
+    outcome: 'won' | 'lost'
+  } | null>(null)
   const [revealedBarrierKeys, setRevealedBarrierKeys] = useState<Set<string>>(
     new Set(),
   )
@@ -286,6 +321,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     screenConfigs.find((screen) => screen.id === activeScreenId) ||
     screenConfigs[0]
   const prizes = activeScreenConfig?.prizes || []
+  const objects = activeScreenConfig?.objects || []
   const teleporters = activeScreenConfig?.teleporters || []
   const winTiles = activeScreenConfig?.winTiles || []
   // A win tile in the reserved back-wall row is still a playable doorway.
@@ -305,6 +341,50 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     0,
   )
 
+  const getGridObjectKey = (
+    placement: GridObjectPlacement,
+    index: number,
+    screenId = activeScreenId,
+  ) => `${screenId}:${placement.id || `${placement.objectId}-${index}`}`
+
+  const getGridObjectInteraction = (
+    position: Position,
+    screenId = activeScreenId,
+  ): {
+    key: string
+    placement: GridObjectPlacement
+    definition: GridObjectDefinition
+    type: 'battle' | 'encounter'
+    targetId: string
+    victory: GridObjectVictoryMode
+  } | null => {
+    const screen = screenConfigs.find((entry) => entry.id === screenId)
+    for (const [index, placement] of (screen?.objects || []).entries()) {
+      const definition = (gridObjects as GridObjectLibrary)[placement.objectId]
+      const interaction = placement.interaction
+      if (!definition || !interaction || definition.interaction !== interaction.type) {
+        continue
+      }
+      const key = getGridObjectKey(placement, index, screenId)
+      if (clearedObjectKeys.has(key)) continue
+      const inFootprint =
+        position.x >= placement.x &&
+        position.x < placement.x + definition.size.cols &&
+        position.y >= placement.y &&
+        position.y < placement.y + definition.size.rows
+      if (!inFootprint) continue
+      return {
+        key,
+        placement,
+        definition,
+        type: interaction.type,
+        targetId: interaction.targetId,
+        victory: interaction.victory,
+      }
+    }
+    return null
+  }
+
   // Resolve Player Icon
   const currentIcon = getIcon(user?.icon || 'ditto')
   const iconData = currentIcon?.icon || { type: 'pokemon', id: '132' }
@@ -320,6 +400,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     setGameStarted(true)
     setGameEnded(false)
     setResult(null)
+    setPendingObjectResult(null)
     setMoves(0)
     setRocksSolved(0) // Reset logical progress for the puzzle
     setHistory([])
@@ -334,6 +415,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       rocks: {},
     })
     setCollectedPrizeIds(new Set())
+    setClearedObjectKeys(new Set())
     setRevealedBarrierKeys(new Set())
 
     if (res.restored && res.expiry) {
@@ -349,9 +431,79 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     const nextScreenStates = Object.fromEntries(
       screenConfigs.map((screen) => [
         screen.id,
-        buildScreenRuntimeState(screen, encounter.settings.grid_size || 8),
+        buildScreenRuntimeState(
+          screen,
+          encounter.settings.grid_size || 8,
+          encounter.settings.tilePaletteId,
+        ),
       ]),
     )
+
+    let resumeState: GridObjectResumeState | null = null
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href)
+      if (url.searchParams.get('gridReturn') === '1') {
+        try {
+          const serialized = window.sessionStorage.getItem(
+            `grid-puzzle-resume:${encounter.id}`,
+          )
+          if (serialized) {
+            const parsed = JSON.parse(serialized) as GridObjectResumeState
+            if (
+              parsed.encounterId === encounter.id &&
+              parsed.grid?.length &&
+              parsed.playerPos &&
+              parsed.pendingObjectKey &&
+              (parsed.pendingVictory === 'win' ||
+                parsed.pendingVictory === 'clear')
+            ) {
+              const outcome = url.searchParams.get('outcome')
+              if (outcome === 'won' || outcome === 'lost') {
+                parsed.pendingOutcome = outcome
+              }
+              resumeState = parsed
+              window.sessionStorage.removeItem(
+                `grid-puzzle-resume:${encounter.id}`,
+              )
+            }
+          }
+        } catch {
+          // Ignore malformed or unavailable browser session state.
+        }
+      }
+    }
+
+    if (resumeState) {
+      const restoredScreenStates = resumeState.screenStates || nextScreenStates
+      const restoredActiveState =
+        restoredScreenStates[resumeState.activeScreenId]
+      setScreenStates(restoredScreenStates)
+      setActiveScreenId(resumeState.activeScreenId)
+      setGrid(cloneGrid(resumeState.grid))
+      setRocks(cloneRocks(resumeState.rocks || []))
+      setPlayerPos({ ...resumeState.playerPos })
+      setGridSize(restoredActiveState?.gridSize || {
+        w: resumeState.grid[0]?.length || 8,
+        h: resumeState.grid.length || 8,
+      })
+      setRocksSolved(resumeState.rocksSolved || 0)
+      setMoves(resumeState.moves || 0)
+      setCollectedPrizeIds(new Set(resumeState.collectedPrizeIds || []))
+      setClearedObjectKeys(new Set(resumeState.clearedObjectKeys || []))
+      if (resumeState.pendingOutcome) {
+        setPendingObjectResult({
+          key: resumeState.pendingObjectKey,
+          victory: resumeState.pendingVictory,
+          outcome: resumeState.pendingOutcome,
+        })
+      }
+      setDeadlockedRockIds(
+        detectDeadlockedRocks(resumeState.grid, resumeState.rocks || []),
+      )
+      setMaxMoves(encounter.settings.maxMoves || null)
+      return
+    }
+
     const startScreenId =
       encounter.settings.startScreen &&
       nextScreenStates[encounter.settings.startScreen]
@@ -431,6 +583,133 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     })
   }
 
+  const saveGridObjectResume = (
+    interaction: {
+      key: string
+      victory: GridObjectVictoryMode
+    },
+    overrides: Partial<
+      Pick<
+        GridObjectResumeState,
+        | 'activeScreenId'
+        | 'grid'
+        | 'rocks'
+        | 'playerPos'
+        | 'rocksSolved'
+        | 'moves'
+        | 'collectedPrizeIds'
+        | 'clearedObjectKeys'
+        | 'screenStates'
+      >
+    > = {},
+  ) => {
+    if (typeof window === 'undefined') return
+    const resumeActiveScreenId = overrides.activeScreenId || activeScreenId
+    const activeState: ScreenRuntimeState = {
+      id: resumeActiveScreenId,
+      grid: cloneGrid(overrides.grid || grid),
+      rocks: cloneRocks(overrides.rocks || rocks),
+      rocksSolved: overrides.rocksSolved ?? rocksSolved,
+      gridSize: { ...gridSize },
+    }
+    const resume: GridObjectResumeState = {
+      encounterId: encounter.id,
+      activeScreenId: resumeActiveScreenId,
+      grid: cloneGrid(overrides.grid || grid),
+      rocks: cloneRocks(overrides.rocks || rocks),
+      playerPos: { ...(overrides.playerPos || playerPos) },
+      rocksSolved: overrides.rocksSolved ?? rocksSolved,
+      moves: overrides.moves ?? moves,
+      collectedPrizeIds: overrides.collectedPrizeIds || Array.from(collectedPrizeIds),
+      clearedObjectKeys:
+        overrides.clearedObjectKeys || Array.from(clearedObjectKeys),
+      pendingObjectKey: interaction.key,
+      pendingVictory: interaction.victory,
+      screenStates: {
+        ...cloneScreenStates(overrides.screenStates || screenStates),
+        [resumeActiveScreenId]: activeState,
+      },
+    }
+    window.sessionStorage.setItem(
+      `grid-puzzle-resume:${encounter.id}`,
+      JSON.stringify(resume),
+    )
+  }
+
+  const launchGridObjectInteraction = async (
+    interaction: {
+      type: 'battle' | 'encounter'
+      targetId: string
+      victory: GridObjectVictoryMode
+      key: string
+    },
+    overrides: Parameters<typeof saveGridObjectResume>[1] = {},
+  ) => {
+    saveGridObjectResume(interaction, overrides)
+    const returnTo = `/game/games/grid-puzzle?gridReturn=1&gameId=${encodeURIComponent(encounter.id)}`
+    try {
+      if (interaction.type === 'battle') {
+        const result = await startBattle(interaction.targetId)
+        if (!result.success) {
+          window.sessionStorage.removeItem(`grid-puzzle-resume:${encounter.id}`)
+          setResult({ success: false, message: result.error || 'Battle could not start.' })
+          return
+        }
+        router.push(
+          `/game/battles/encounter?returnTo=${encodeURIComponent(returnTo)}`,
+        )
+        return
+      }
+
+      const result = await startEncounter(interaction.targetId)
+      if (!result?.success) {
+        window.sessionStorage.removeItem(`grid-puzzle-resume:${encounter.id}`)
+        setResult({ success: false, message: 'Encounter could not start.' })
+        return
+      }
+      router.push(
+        `/game/locations/encounter?returnTo=${encodeURIComponent(returnTo)}`,
+      )
+    } catch (error) {
+      window.sessionStorage.removeItem(`grid-puzzle-resume:${encounter.id}`)
+      setResult({
+        success: false,
+        message: error instanceof Error ? error.message : 'Object interaction failed.',
+      })
+    }
+  }
+
+  const scheduleGridObjectInteraction = (
+    position: Position,
+    delayMs: number,
+    overrides: Parameters<typeof saveGridObjectResume>[1] = {},
+  ) => {
+    const interaction = getGridObjectInteraction(position)
+    if (!interaction) return false
+    window.setTimeout(
+      () => void launchGridObjectInteraction(interaction, overrides),
+      delayMs,
+    )
+    return true
+  }
+
+  useEffect(() => {
+    if (!gameStarted || !pendingObjectResult || gameEnded) return
+    const pending = pendingObjectResult
+    setPendingObjectResult(null)
+    if (pending.outcome !== 'won') return
+    if (pending.victory === 'win') {
+      void handleWin()
+      return
+    }
+    playSfx('good')
+    setClearedObjectKeys((current) => {
+      const next = new Set(current)
+      next.add(pending.key)
+      return next
+    })
+  }, [gameEnded, gameStarted, handleWin, pendingObjectResult, playSfx])
+
   const signalBlocked = (dx: number, dy: number) => {
     if (blockedTimerRef.current) clearTimeout(blockedTimerRef.current)
     setBlockedOffset({ x: dx * 8, y: dy * 8 })
@@ -508,6 +787,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
         rocksSolved,
         moves,
         collectedPrizeIds: Array.from(collectedPrizeIds),
+        clearedObjectKeys: Array.from(clearedObjectKeys),
       },
     ])
   }
@@ -744,6 +1024,27 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
 
     if (isWinTile(target.position, target.screenId)) {
       setTimeout(() => handleWin(targetCollected), defaultMoveDurationMs)
+      return
+    }
+
+    const targetInteraction = getGridObjectInteraction(
+      target.position,
+      target.screenId,
+    )
+    if (targetInteraction) {
+      setTimeout(
+        () =>
+          void launchGridObjectInteraction(targetInteraction, {
+            activeScreenId: target.screenId,
+            grid: targetState.grid,
+            rocks: targetState.rocks,
+            playerPos: target.position,
+            rocksSolved: targetState.rocksSolved,
+            screenStates: nextScreenStates,
+            collectedPrizeIds: Array.from(targetCollected),
+          }),
+        defaultMoveDurationMs,
+      )
     }
   }
 
@@ -770,6 +1071,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       rocks: {},
     })
     setCollectedPrizeIds(new Set(snapshot.collectedPrizeIds))
+    setClearedObjectKeys(new Set(snapshot.clearedObjectKeys))
     setDeadlockedRockIds(detectDeadlockedRocks(snapshot.grid, snapshot.rocks))
   }
 
@@ -835,6 +1137,17 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
         applyCollectedPrizeIds(nextCollectedPrizeIds)
         const nextMoves = moves + 1
         setMoves(nextMoves)
+
+        if (
+          scheduleGridObjectInteraction(movedPlayerPos, moveDuration, {
+            rocks: movingRocks,
+            playerPos: movedPlayerPos,
+            moves: nextMoves,
+            collectedPrizeIds: Array.from(nextCollectedPrizeIds),
+          })
+        ) {
+          return
+        }
 
         if (winsByTile) {
           setTimeout(() => handleWin(nextCollectedPrizeIds), moveDuration)
@@ -908,6 +1221,17 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
         const nextMoves = moves + 1
         setMoves(nextMoves)
 
+        if (
+          scheduleGridObjectInteraction(movedPlayerPos, moveDuration, {
+            rocks: newRocks,
+            playerPos: movedPlayerPos,
+            moves: nextMoves,
+            collectedPrizeIds: Array.from(nextCollectedPrizeIds),
+          })
+        ) {
+          return
+        }
+
         if (winsByTile) {
           setTimeout(() => handleWin(nextCollectedPrizeIds), moveDuration)
           return
@@ -954,6 +1278,16 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       applyCollectedPrizeIds(nextCollectedPrizeIds)
       const nextMoves = moves + 1
       setMoves(nextMoves)
+
+      if (
+        scheduleGridObjectInteraction(movedPlayerPos, moveDuration, {
+          playerPos: movedPlayerPos,
+          moves: nextMoves,
+          collectedPrizeIds: Array.from(nextCollectedPrizeIds),
+        })
+      ) {
+        return
+      }
 
       if (winsByTile) {
         setTimeout(() => handleWin(nextCollectedPrizeIds), moveDuration)
@@ -1316,6 +1650,36 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
                       <EndlessCollectibleSprite
                         reward={getRockPushPrizeReward(prize)}
                         size={52}
+                      />
+                    </div>
+                  </div>
+                )
+              })}
+
+              {objects.map((placement, index) => {
+                const definition =
+                  (gridObjects as GridObjectLibrary)[placement.objectId]
+                if (!definition) return null
+                const objectKey = getGridObjectKey(placement, index)
+                if (clearedObjectKeys.has(objectKey)) return null
+                return (
+                  <div
+                    key={`object:${objectKey}`}
+                    className="absolute z-10 p-[0.12rem]"
+                    style={{
+                      left: `${(placement.x * 100) / Math.max(gridSize.w, 1)}%`,
+                      top: `${(placement.y * 100) / Math.max(gridSize.h, 1)}%`,
+                      width: `${(definition.size.cols * 100) / Math.max(gridSize.w, 1)}%`,
+                      height: `${(definition.size.rows * 100) / Math.max(gridSize.h, 1)}%`,
+                    }}
+                  >
+                    <div className="relative h-full w-full motion-safe:animate-pulse">
+                      <Image
+                        src={definition.asset.src}
+                        alt={definition.name}
+                        fill
+                        sizes="128px"
+                        className="object-contain drop-shadow-lg [image-rendering:pixelated]"
                       />
                     </div>
                   </div>

@@ -2,6 +2,80 @@ import { RockPushGameConfig } from '../types'
 
 export const testbasicEntries: RockPushGameConfig[] = [
   {
+    id: 'grid-object-battle-test',
+    name: 'Grid Object Battle Test',
+    description: 'Step onto the trainer marker to launch a battle and finish the grid when it is won.',
+    category: 'Kanto',
+    subCategory: 'Test',
+    icon: { type: 'trainer', id: 'rocket-grunt-m' },
+    requirements: [],
+    rewards: [],
+    settings: {
+      variant: 'rock-push',
+      tilePaletteId: 'basic-cave',
+      timeLimit: 180,
+      grid_size: 7,
+      maxMoves: 100,
+      playerStart: { x: 1, y: 1 },
+      objects: [
+        {
+          id: 'battle-trigger-test',
+          objectId: 'battle-trigger',
+          x: 3,
+          y: 1,
+          interaction: {
+            type: 'battle',
+            targetId: 'safari-central-rocket-poacher',
+            victory: 'win',
+          },
+        },
+      ],
+    },
+  },
+  {
+    id: 'grid-object-encounter-test',
+    name: 'Grid Object Encounter Test',
+    description: 'Clear encounter markers from the board, then walk to the wall exit.',
+    category: 'Kanto',
+    subCategory: 'Test',
+    icon: { type: 'pokemon', id: '150' },
+    requirements: [],
+    rewards: [],
+    settings: {
+      variant: 'rock-push',
+      tilePaletteId: 'basic-cave',
+      timeLimit: 240,
+      grid_size: 9,
+      maxMoves: 140,
+      playerStart: { x: 1, y: 7 },
+      winTiles: [{ x: 7, y: 0 }],
+      objects: [
+        {
+          id: 'encounter-trigger-test-a',
+          objectId: 'encounter-trigger',
+          x: 3,
+          y: 7,
+          interaction: {
+            type: 'encounter',
+            targetId: 'test-safari-catching',
+            victory: 'clear',
+          },
+        },
+        {
+          id: 'encounter-trigger-test-b',
+          objectId: 'encounter-trigger',
+          x: 5,
+          y: 5,
+          interaction: {
+            type: 'encounter',
+            targetId: 'test-safari-catching',
+            victory: 'clear',
+          },
+        },
+      ],
+    },
+  },
+  {
     id: 'pallet-rock-test',
     name: 'Pallet Town Rock Test',
     description: 'Test the rock push mechanics in Pallet Town.',

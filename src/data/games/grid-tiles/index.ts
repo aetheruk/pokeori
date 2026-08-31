@@ -379,6 +379,23 @@ export function isGridBackWallOnly(paletteId: string | undefined): boolean {
   return Boolean(walls?.back && !walls.variants)
 }
 
+/**
+ * Return whether a cell belongs to the automatically supplied boundary for a
+ * palette. Simple back-wall sets reserve only the top row for wall art; the
+ * remaining board edges are ordinary floor cells bounded by the grid itself.
+ * Connected architectural sets retain the legacy full outer boundary so their
+ * authored wall masks continue to render correctly.
+ */
+export function isGridBoundaryWall(
+  paletteId: string | undefined,
+  x: number,
+  y: number,
+  size: number,
+): boolean {
+  if (isGridBackWallOnly(paletteId)) return y === 0
+  return x === 0 || x === size - 1 || y === 0 || y === size - 1
+}
+
 export function resolveGridObstacleSources(
   paletteId: string | undefined,
   smallOverride?: string,
