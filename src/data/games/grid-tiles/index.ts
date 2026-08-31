@@ -1,6 +1,7 @@
 import {
   GRID_LOGICAL_TILE_SIZE,
   type GridFloorRenderConfig,
+  type GridGoalSurface,
   type GridObjectDefinition,
   type GridObjectPlacement,
   type GridObstaclePlacement,
@@ -32,31 +33,201 @@ export const gridTilePalettes = {
     id: 'grass',
     name: 'Grass field tile set',
     logicalTileSize: GRID_LOGICAL_TILE_SIZE,
+    nativeTileSize: 64,
     floor: {
       common: { src: '/games/grid-tiles/grass/floor/common.png' },
-      rare: [],
-      rareChance: 0,
+      rare: [{
+        id: 'clover',
+        asset: { src: '/games/grid-tiles/grass/floor/rare-clover.png' },
+        weight: 1,
+      }],
+      rareChance: 0.08,
       blockers: {
         small: { src: '/games/grid-tiles/grass/floor/blockers/small.png' },
         large: { src: '/games/grid-tiles/grass/floor/blockers/large.png' },
       },
       markers: {
         teleporter: { src: '/games/grid-tiles/grass/floor/markers/teleporter.png' },
-        // Grass has no dedicated goal artwork yet; use the authored teleporter marker for both roles.
-        goal: { src: '/games/grid-tiles/grass/floor/markers/teleporter.png' },
+        goal: { src: '/games/grid-tiles/grass/floor/markers/goal.png' },
       },
     },
     walls: {
       back: { src: '/games/grid-tiles/grass/walls/back.png' },
+      markers: {
+        goal: { src: '/games/grid-tiles/grass/walls/markers/goal.png' },
+        teleporter: { src: '/games/grid-tiles/grass/walls/markers/teleporter.png' },
+      },
     },
     gameplay: {
       boulder: { src: '/games/rockpush/boulder.avif' },
-      ice: { src: '/games/grid-tiles/grass/gameplay/ice.avif' },
+      ice: { src: '/games/grid-tiles/grass/gameplay/ice.png' },
       hole: { src: '/games/grid-tiles/grass/gameplay/hole.png' },
     },
     credits: [{
       label: 'Pokeori Grass Field tile set',
-      notice: 'Supplied 16×16 and 32×32 test tiles arranged for the reusable grass-themed puzzle set.',
+      notice: 'Generated 64×64 native tiles (128×128 for 2×2 blockers) on a 16×16 logical grid for the reusable grass-themed puzzle set.',
+      external: false,
+    }],
+  },
+  'psychic-quiet-room': {
+    id: 'psychic-quiet-room',
+    name: 'Psychic Quiet Room tile set',
+    logicalTileSize: GRID_LOGICAL_TILE_SIZE,
+    nativeTileSize: 64,
+    floor: {
+      common: { src: '/games/grid-tiles/psychic-quiet-room/floor/common.png' },
+      rare: [
+        {
+          id: 'constellation',
+          asset: { src: '/games/grid-tiles/psychic-quiet-room/floor/rare-constellation.png' },
+          weight: 1,
+        },
+      ],
+      rareChance: 0.08,
+      blockers: {
+        small: { src: '/games/grid-tiles/psychic-quiet-room/floor/blockers/small.png' },
+        large: { src: '/games/grid-tiles/psychic-quiet-room/floor/blockers/large.png' },
+      },
+      markers: {
+        goal: { src: '/games/grid-tiles/psychic-quiet-room/floor/markers/goal.png' },
+        teleporter: { src: '/games/grid-tiles/psychic-quiet-room/floor/markers/teleporter.png' },
+      },
+    },
+    walls: {
+      back: { src: '/games/grid-tiles/psychic-quiet-room/walls/back.png' },
+      markers: {
+        goal: { src: '/games/grid-tiles/psychic-quiet-room/walls/markers/goal.png' },
+        teleporter: { src: '/games/grid-tiles/psychic-quiet-room/walls/markers/teleporter.png' },
+      },
+    },
+    gameplay: {
+      boulder: { src: '/games/rockpush/boulder.avif' },
+      ice: { src: '/games/grid-tiles/psychic-quiet-room/gameplay/ice.png' },
+      hole: { src: '/games/grid-tiles/psychic-quiet-room/gameplay/hole.png' },
+    },
+    credits: [{
+      label: 'Pokeori Psychic Quiet Room tile set',
+      notice: 'Generated 64×64 native tiles (128×128 for 2×2 blockers) for the Sabrina Chronicle on the shared 16×16 logical grid.',
+      external: false,
+    }],
+  },
+  'wooden-interior': {
+    id: 'wooden-interior',
+    name: 'Wooden Gym Interior tile set',
+    logicalTileSize: GRID_LOGICAL_TILE_SIZE,
+    nativeTileSize: 64,
+    floor: {
+      common: { src: '/games/grid-tiles/wooden-interior/floor/common.png' },
+      rare: [{
+        id: 'amber-plank',
+        asset: { src: '/games/grid-tiles/wooden-interior/floor/rare-amber.png' },
+        weight: 1,
+      }],
+      rareChance: 0.08,
+      blockers: {
+        small: { src: '/games/grid-tiles/wooden-interior/floor/blockers/small.png' },
+        large: { src: '/games/grid-tiles/wooden-interior/floor/blockers/large.png' },
+      },
+      markers: {
+        teleporter: { src: '/games/grid-tiles/wooden-interior/floor/markers/teleporter.png' },
+        goal: { src: '/games/grid-tiles/wooden-interior/floor/markers/goal.png' },
+      },
+    },
+    walls: {
+      back: { src: '/games/grid-tiles/wooden-interior/walls/back.png' },
+      markers: {
+        goal: { src: '/games/grid-tiles/wooden-interior/walls/markers/goal.png' },
+        teleporter: { src: '/games/grid-tiles/wooden-interior/walls/markers/teleporter.png' },
+      },
+    },
+    gameplay: {
+      boulder: { src: '/games/rockpush/boulder.avif' },
+      ice: { src: '/games/grid-tiles/wooden-interior/gameplay/ice.png' },
+      hole: { src: '/games/grid-tiles/wooden-interior/gameplay/hole.png' },
+    },
+    credits: [{
+      label: 'Pokeori Wooden Gym Interior tile set',
+      notice: 'Generated 64×64 native tiles (128×128 for 2×2 blockers) for reusable indoor maze scenes on the shared 16×16 logical grid.',
+      external: false,
+    }],
+  },
+  'industrial-power': {
+    id: 'industrial-power',
+    name: 'Industrial Power Plant tile set',
+    logicalTileSize: GRID_LOGICAL_TILE_SIZE,
+    nativeTileSize: 64,
+    floor: {
+      common: { src: '/games/grid-tiles/industrial-power/floor/common.png' },
+      rare: [{
+        id: 'warning-plate',
+        asset: { src: '/games/grid-tiles/industrial-power/floor/rare-warning.png' },
+        weight: 1,
+      }],
+      rareChance: 0.08,
+      blockers: {
+        small: { src: '/games/grid-tiles/industrial-power/floor/blockers/small.png' },
+        large: { src: '/games/grid-tiles/industrial-power/floor/blockers/large.png' },
+      },
+      markers: {
+        teleporter: { src: '/games/grid-tiles/industrial-power/floor/markers/teleporter.png' },
+        goal: { src: '/games/grid-tiles/industrial-power/floor/markers/goal.png' },
+      },
+    },
+    walls: {
+      back: { src: '/games/grid-tiles/industrial-power/walls/back.png' },
+      markers: {
+        goal: { src: '/games/grid-tiles/industrial-power/walls/markers/goal.png' },
+        teleporter: { src: '/games/grid-tiles/industrial-power/walls/markers/teleporter.png' },
+      },
+    },
+    gameplay: {
+      boulder: { src: '/games/rockpush/boulder.avif' },
+      ice: { src: '/games/grid-tiles/industrial-power/gameplay/ice.png' },
+      hole: { src: '/games/grid-tiles/industrial-power/gameplay/hole.png' },
+    },
+    credits: [{
+      label: 'Pokeori Industrial Power Plant tile set',
+      notice: 'Generated 64×64 native tiles (128×128 for 2×2 blockers) for reusable substation and power-plant scenes on the shared 16×16 logical grid.',
+      external: false,
+    }],
+  },
+  laboratory: {
+    id: 'laboratory',
+    name: 'Research Laboratory tile set',
+    logicalTileSize: GRID_LOGICAL_TILE_SIZE,
+    nativeTileSize: 64,
+    floor: {
+      common: { src: '/games/grid-tiles/laboratory/floor/common.png' },
+      rare: [{
+        id: 'starlight-tile',
+        asset: { src: '/games/grid-tiles/laboratory/floor/rare-starlight.png' },
+        weight: 1,
+      }],
+      rareChance: 0.08,
+      blockers: {
+        small: { src: '/games/grid-tiles/laboratory/floor/blockers/small.png' },
+        large: { src: '/games/grid-tiles/laboratory/floor/blockers/large.png' },
+      },
+      markers: {
+        teleporter: { src: '/games/grid-tiles/laboratory/floor/markers/teleporter.png' },
+        goal: { src: '/games/grid-tiles/laboratory/floor/markers/goal.png' },
+      },
+    },
+    walls: {
+      back: { src: '/games/grid-tiles/laboratory/walls/back.png' },
+      markers: {
+        goal: { src: '/games/grid-tiles/laboratory/walls/markers/goal.png' },
+        teleporter: { src: '/games/grid-tiles/laboratory/walls/markers/teleporter.png' },
+      },
+    },
+    gameplay: {
+      boulder: { src: '/games/rockpush/boulder.avif' },
+      ice: { src: '/games/grid-tiles/laboratory/gameplay/ice.png' },
+      hole: { src: '/games/grid-tiles/laboratory/gameplay/hole.png' },
+    },
+    credits: [{
+      label: 'Pokeori Research Laboratory tile set',
+      notice: 'Generated 64×64 native tiles (128×128 for 2×2 blockers) for reusable lab and containment scenes on the shared 16×16 logical grid.',
       external: false,
     }],
   },
@@ -64,22 +235,30 @@ export const gridTilePalettes = {
     id: 'basic-cave',
     name: 'Basic Cave tile set',
     logicalTileSize: GRID_LOGICAL_TILE_SIZE,
+    nativeTileSize: 64,
     floor: {
       common: { src: '/games/grid-tiles/basic-cave/floor/common.png' },
-      rare: [],
-      rareChance: 0,
+      rare: [{
+        id: 'mineral',
+        asset: { src: '/games/grid-tiles/basic-cave/floor/rare-mineral.png' },
+        weight: 1,
+      }],
+      rareChance: 0.08,
       blockers: {
         small: { src: '/games/grid-tiles/basic-cave/floor/blockers/small.png' },
         large: { src: '/games/grid-tiles/basic-cave/floor/blockers/large.png' },
       },
       markers: {
-        // The cave marker is currently shared for goal and teleporter roles until dedicated goal art is authored.
-        goal: { src: '/games/grid-tiles/basic-cave/floor/markers/teleporter.png' },
         teleporter: { src: '/games/grid-tiles/basic-cave/floor/markers/teleporter.png' },
+        goal: { src: '/games/grid-tiles/basic-cave/floor/markers/goal.png' },
       },
     },
     walls: {
       back: { src: '/games/grid-tiles/basic-cave/walls/back.png' },
+      markers: {
+        goal: { src: '/games/grid-tiles/basic-cave/walls/markers/goal.png' },
+        teleporter: { src: '/games/grid-tiles/basic-cave/walls/markers/teleporter.png' },
+      },
     },
     gameplay: {
       boulder: { src: '/games/rockpush/boulder.avif' },
@@ -88,7 +267,7 @@ export const gridTilePalettes = {
     },
     credits: [{
       label: 'Pokeori Basic Cave tile set',
-      notice: 'Supplied 16×16 test tiles and existing Pokeori puzzle artwork used for the reusable default set.',
+      notice: 'Generated 64×64 native tiles (128×128 for 2×2 blockers) on a 16×16 logical grid for the reusable default set.',
       external: false,
     }],
   },
@@ -213,6 +392,10 @@ export function resolveGridFrameSource(paletteId: string | undefined): string | 
   return getGridTilePalette(paletteId).walls?.frame?.src
 }
 
+export function resolveGridFrameSlice(paletteId: string | undefined): number {
+  return getGridTilePalette(paletteId).nativeTileSize
+}
+
 export function resolveGridWallMarkerSource(
   paletteId: string | undefined,
   marker: 'goal' | 'teleporter',
@@ -225,6 +408,18 @@ export function resolveGridFloorMarkerSource(
   marker: 'goal' | 'teleporter',
 ): string | undefined {
   return getGridTilePalette(paletteId).floor.markers?.[marker]?.src
+}
+
+/** Resolve a goal marker by the surface it occupies; floor and wall art never cross-fallback. */
+export function resolveGridGoalSource(
+  paletteId: string | undefined,
+  surface: GridGoalSurface,
+  override?: string,
+): string | undefined {
+  if (override) return override
+  return surface === 'wall'
+    ? resolveGridWallMarkerSource(paletteId, 'goal')
+    : resolveGridFloorMarkerSource(paletteId, 'goal')
 }
 
 function obstacleKey(position: GridObstaclePosition): string { return `${position.x},${position.y}` }

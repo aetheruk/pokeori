@@ -323,6 +323,7 @@ const rockPushScreenSchema = z
     holes: z.array(rockPushPositionSchema).optional(),
     barriers: z.array(rockPushPositionSchema).optional(),
     ice: z.array(rockPushPositionSchema).optional(),
+    wallGoalSprite: z.string().optional(),
     winTiles: z.array(rockPushPositionSchema).optional(),
     teleporters: z.array(rockPushTeleporterSchema).optional(),
     prizes: z.array(rockPushPrizeSchema).optional(),
@@ -627,6 +628,7 @@ const gridPuzzleSettingsSchema = z.union([
       holes: z.array(rockPushPositionSchema).optional(),
       barriers: z.array(rockPushPositionSchema).optional(),
       ice: z.array(rockPushPositionSchema).optional(),
+      wallGoalSprite: z.string().optional(),
       winTiles: z.array(rockPushPositionSchema).optional(),
       teleporters: z.array(rockPushTeleporterSchema).optional(),
       screens: z.array(rockPushScreenSchema).optional(),
@@ -663,6 +665,7 @@ const gridPuzzleSettingsSchema = z.union([
       floorSprite: z.string().optional(),
       boulderSprite: z.string().optional(),
       barrierSprite: z.string().optional(),
+      wallGoalSprite: z.string().optional(),
       winTileSprite: z.string().optional(),
       playerSprite: z.string().optional(),
     })
@@ -729,6 +732,7 @@ const gridPuzzleSettingsSchema = z.union([
       floorSprite: z.string().optional(),
       barrierSprite: z.string().optional(),
       holeSprite: z.string().optional(),
+      wallGoalSprite: z.string().optional(),
       winTileSprite: z.string().optional(),
       playerSprite: z.string().optional(),
     })

@@ -7,7 +7,7 @@ const common = {
   playerStart: { x: 0, y: 6 },
   exit: { x: 6, y: 0 },
   walls: [
-    { x: 1, y: 0 }, { x: 4, y: 0 }, { x: 1, y: 1 }, { x: 4, y: 1 },
+    { x: 1, y: 1 }, { x: 4, y: 1 },
     { x: 1, y: 2 }, { x: 3, y: 3 }, { x: 4, y: 3 }, { x: 2, y: 4 },
     { x: 5, y: 4 }, { x: 6, y: 5 }, { x: 3, y: 6 }, { x: 4, y: 6 },
   ],
@@ -28,18 +28,18 @@ export const gymLeaderChronicleEchoMapEntries: RockTunnelEchoMapGameConfig[] = [
     background: '/backgrounds/chronicle-koga-fuchsia-rooftops.avif',
     requirements: [{ type: 'task_completed', targetId: 'soul-badge-memory-revealed' }],
     criteria: [], rewards: [],
-    settings: { ...common, themeColour: '#6f5b7e', background: '/backgrounds/chronicle-koga-fuchsia-rooftops.avif' },
+    settings: { ...common, tilePaletteId: 'grass', themeColour: '#6f5b7e', background: '/backgrounds/chronicle-koga-fuchsia-rooftops.avif' },
   },
   {
     id: 'chronicle-v2-sabrina-enter-the-quiet-room',
     name: 'Enter the Quiet Room',
-    description: 'Find the exit Sabrina mapped before anyone gave her a proper room to work in.',
+    description: 'Avoid the memory rifts and reach the gold doorway in the back wall—the exit Sabrina mapped before anyone gave her a proper room to work in.',
     category: 'Secret', subCategory: 'Sabrina Chronicle',
     icon: { type: 'trainer', id: 'gym-kanto-sabrina' },
     background: '/backgrounds/chronicle-sabrina-quiet-mindscape.avif',
     requirements: [{ type: 'task_completed', targetId: 'marsh-badge-memory-revealed' }],
     criteria: [], rewards: [],
-    settings: { ...common, revealDurationMs: 1000, themeColour: '#9b718f', background: '/backgrounds/chronicle-sabrina-quiet-mindscape.avif' },
+    settings: { ...common, tilePaletteId: 'psychic-quiet-room', revealDurationMs: 1000, themeColour: '#9b718f', background: '/backgrounds/chronicle-sabrina-quiet-mindscape.avif' },
   },
   {
     id: 'chronicle-v2-blaine-evacuate-the-lab',
@@ -50,6 +50,6 @@ export const gymLeaderChronicleEchoMapEntries: RockTunnelEchoMapGameConfig[] = [
     background: '/backgrounds/chronicle-blaine-cinnabar-lab.avif',
     requirements: [{ type: 'task_completed', targetId: 'volcano-badge-memory-revealed' }],
     criteria: [], rewards: [],
-    settings: { ...common, revealDurationMs: 1200, themeColour: '#b86148', background: '/backgrounds/chronicle-blaine-cinnabar-lab.avif' },
+    settings: { ...common, tilePaletteId: 'laboratory', revealDurationMs: 1200, themeColour: '#b86148', background: '/backgrounds/chronicle-blaine-cinnabar-lab.avif' },
   },
 ]

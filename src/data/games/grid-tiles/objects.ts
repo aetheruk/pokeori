@@ -18,7 +18,7 @@ export const gridObjects = {
     name: 'Breakable Rock',
     purpose: 'destructible',
     size: { cols: 1, rows: 1 },
-    asset: { src: '/games/rockpush/boulder.avif' },
+    asset: { src: '/games/rockpush/breakable-rock.png' },
     collision: 'solid',
   },
   pushableBoulder: {

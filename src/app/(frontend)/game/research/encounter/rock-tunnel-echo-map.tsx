@@ -24,7 +24,9 @@ import {
   getGridObstacleParts,
   resolveGridBackWallSource,
   resolveGridFloorSource,
+  resolveGridFrameSlice,
   resolveGridFrameSource,
+  resolveGridGoalSource,
   resolveGridObstacleSources,
   resolveGridTileSources,
 } from '@/data/games/grid-tiles'
@@ -85,12 +87,18 @@ export function RockTunnelEchoMapGame({
     goal: winTileSprite,
     player: playerSprite,
   } = tileSources
+  const wallGoalSprite =
+    resolveGridGoalSource(
+      encounter.settings.tilePaletteId,
+      'wall',
+      encounter.settings.wallGoalSprite,
+    )
   const wallKeys = useMemo(
-    () => new Set(encounter.settings.walls.map(positionKey)),
+    () => new Set(encounter.settings.walls.filter(({ y }) => y > 0).map(positionKey)),
     [encounter.settings.walls],
   )
   const obstacleParts = useMemo(
-    () => getGridObstacleParts(encounter.settings.walls),
+    () => getGridObstacleParts(encounter.settings.walls.filter(({ y }) => y > 0)),
     [encounter.settings.walls],
   )
   const obstacleSources = resolveGridObstacleSources(
@@ -100,7 +108,7 @@ export function RockTunnelEchoMapGame({
   const frameSprite = resolveGridFrameSource(encounter.settings.tilePaletteId)
   const backWallSprite = resolveGridBackWallSource(encounter.settings.tilePaletteId)
   const holeKeys = useMemo(
-    () => new Set((encounter.settings.holes || []).map(positionKey)),
+    () => new Set((encounter.settings.holes || []).filter(({ y }) => y > 0).map(positionKey)),
     [encounter.settings.holes],
   )
 
@@ -379,7 +387,8 @@ export function RockTunnelEchoMapGame({
             cols={cols}
             rows={rows}
             frameSrc={frameSprite}
-            ariaLabel="Rock Tunnel Echo Map board"
+            frameSlice={frameSprite ? resolveGridFrameSlice(encounter.settings.tilePaletteId) : undefined}
+            ariaLabel="Rock Tunnel Echo Map board. Reach the gold doorway in the back wall. Violet rifts are hazards that end the run."
             className="overflow-hidden rounded-lg bg-[#0d1820] shadow-2xl ring-4 ring-[#081014]/40"
           >
             {cells.map((cell) => {
@@ -401,6 +410,7 @@ export function RockTunnelEchoMapGame({
               const hole = holeKeys.has(key)
               const playerHere = samePosition(player, cell)
               const exitHere = samePosition(encounter.settings.exit, cell)
+              const exitSprite = cell.y === 0 ? wallGoalSprite : winTileSprite
               const visible = !introBlocksMap && (revealActive || playerHere)
 
               return (
@@ -443,10 +453,10 @@ export function RockTunnelEchoMapGame({
                     <div className="absolute inset-0 z-30 bg-[#081014]/95" />
                   )}
 
-                  {exitHere && visible && (
+                  {exitHere && visible && exitSprite && (
                     <div className="absolute inset-[12%] z-10">
                       <Image
-                        src={winTileSprite}
+                        src={exitSprite}
                         alt=""
                         fill
                         sizes="64px"
@@ -500,6 +510,10 @@ export function RockTunnelEchoMapGame({
               )
             })}
           </PixelGridBoard>
+
+          <p className="max-w-[min(92vw,32rem)] text-center text-xs font-semibold uppercase tracking-[0.16em] text-game-cream/85">
+            Reach the gold doorway in the back wall. Violet rifts are hazards — stepping on one ends the run.
+          </p>
 
           <div className="flex-none max-w-[200px] w-full z-40 mb-8">
             <div className="grid grid-cols-3 gap-2 mx-auto">

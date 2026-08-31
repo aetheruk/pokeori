@@ -29,6 +29,20 @@ export const gridTileRenderConfigSchema = z
   })
   .strict()
 
+export const gridTilePaletteSchema = z
+  .object({
+    id: z.string().min(1).max(80),
+    name: z.string().min(1).max(120),
+    logicalTileSize: z.literal(16),
+    nativeTileSize: z
+      .number()
+      .int()
+      .min(16)
+      .max(1024)
+      .refine((size) => size % 16 === 0, 'Native tile size must be a multiple of the logical 16px cell'),
+  })
+  .passthrough()
+
 export const gridObjectDefinitionSchema = z
   .object({
     id: z.string().min(1).max(80),

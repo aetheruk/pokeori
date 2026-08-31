@@ -28,7 +28,9 @@ import {
   gridObjects,
   resolveGridBackWallSource,
   resolveGridFloorSource,
+  resolveGridFrameSlice,
   resolveGridFrameSource,
+  resolveGridGoalSource,
   resolveGridObstacleSources,
   resolveGridTileSources,
 } from '@/data/games/grid-tiles'
@@ -127,13 +129,19 @@ export function VoltorbGridGame({
   } = tileSources
   const breakableRockSprite =
     encounter.settings.boulderSprite || gridObjects.breakableRock.asset.src
+  const wallGoalSprite =
+    resolveGridGoalSource(
+      encounter.settings.tilePaletteId,
+      'wall',
+      encounter.settings.wallGoalSprite,
+    )
 
   const wallKeys = useMemo(
-    () => new Set((encounter.settings.walls || []).map(positionKey)),
+    () => new Set((encounter.settings.walls || []).filter(({ y }) => y > 0).map(positionKey)),
     [encounter.settings.walls],
   )
   const obstacleParts = useMemo(
-    () => getGridObstacleParts(encounter.settings.walls || []),
+    () => getGridObstacleParts((encounter.settings.walls || []).filter(({ y }) => y > 0)),
     [encounter.settings.walls],
   )
   const obstacleSources = resolveGridObstacleSources(
@@ -143,15 +151,15 @@ export function VoltorbGridGame({
   const frameSprite = resolveGridFrameSource(encounter.settings.tilePaletteId)
   const backWallSprite = resolveGridBackWallSource(encounter.settings.tilePaletteId)
   const initialDebrisKeys = useMemo(
-    () => new Set((encounter.settings.debris || []).map(positionKey)),
+    () => new Set((encounter.settings.debris || []).filter(({ y }) => y > 0).map(positionKey)),
     [encounter.settings.debris],
   )
   const initialVoltorbs = useMemo(
-    () => buildRuntimeVoltorbs(encounter.settings.voltorbs),
+    () => buildRuntimeVoltorbs(encounter.settings.voltorbs.filter(({ y }) => y > 0)),
     [encounter.settings.voltorbs],
   )
   const initialProtectedPokemon = useMemo(
-    () => buildRuntimeProtectedPokemon(encounter.settings.protectedPokemon),
+    () => buildRuntimeProtectedPokemon((encounter.settings.protectedPokemon || []).filter(({ y }) => y > 0)),
     [encounter.settings.protectedPokemon],
   )
   const detonatingVoltorbId = initialVoltorbs[0]?.id
@@ -700,6 +708,7 @@ export function VoltorbGridGame({
             cols={cols}
             rows={rows}
             frameSrc={frameSprite}
+            frameSlice={frameSprite ? resolveGridFrameSlice(encounter.settings.tilePaletteId) : undefined}
             ariaLabel="Voltorb Grid board"
             className="overflow-hidden rounded-lg bg-game-night-surface shadow-2xl ring-4 ring-[#081014]/35"
           >
@@ -724,6 +733,7 @@ export function VoltorbGridGame({
               const protectedPokemon = protectedPokemonByKey.get(key)
               const isPlayer = samePosition(player, position)
               const isExit = samePosition(encounter.settings.exit, position)
+              const exitSprite = position.y === 0 ? wallGoalSprite : winTileSprite
               const isBlast = blastKeys.has(key)
 
               return (
@@ -755,7 +765,7 @@ export function VoltorbGridGame({
                       aria-hidden="true"
                     />
                   )}
-                  {isExit && (
+                  {isExit && exitSprite && (
                     <div
                       className={cn(
                         'absolute inset-[12%] z-10 transition-opacity',
@@ -763,7 +773,7 @@ export function VoltorbGridGame({
                       )}
                     >
                       <Image
-                        src={winTileSprite}
+                        src={exitSprite}
                         alt=""
                         fill
                         sizes="64px"
