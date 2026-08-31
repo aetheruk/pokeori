@@ -33,6 +33,7 @@ import {
   gridObjects,
   resolveGridFloorSource,
   resolveGridBackWallSource,
+  resolveGridGoalSource,
   resolveGridObstacleSources,
   resolveGridTileSources,
   resolveGridWallSource,
@@ -287,6 +288,17 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   const prizes = activeScreenConfig?.prizes || []
   const teleporters = activeScreenConfig?.teleporters || []
   const winTiles = activeScreenConfig?.winTiles || []
+  // A win tile in the reserved back-wall row is still a playable doorway.
+  // Keep the architectural wall art, but let the player enter that cell.
+  const wallGoalKeys = useMemo(
+    () =>
+      new Set(
+        winTiles
+          .filter(({ y }) => y === 0)
+          .map(getRockPushPositionKey),
+      ),
+    [winTiles],
+  )
   const displayRocksSolved = Object.entries(screenStates).reduce(
     (sum, [screenId, state]) =>
       sum + (screenId === activeScreenId ? rocksSolved : state.rocksSolved),
@@ -536,7 +548,8 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     position.x >= gridSize.w ||
     position.y < 0 ||
     position.y >= gridSize.h ||
-    grid[position.y][position.x] === 'wall' ||
+    (grid[position.y][position.x] === 'wall' &&
+      !wallGoalKeys.has(getRockPushPositionKey(position))) ||
     grid[position.y][position.x] === 'hole' ||
     rockList.some((rock) => isSamePosition(rock, position))
 
@@ -545,7 +558,8 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     position.x >= gridSize.w ||
     position.y < 0 ||
     position.y >= gridSize.h ||
-    grid[position.y][position.x] === 'wall' ||
+    (grid[position.y][position.x] === 'wall' &&
+      !wallGoalKeys.has(getRockPushPositionKey(position))) ||
     grid[position.y][position.x] === 'hole'
 
   const isBlockedForRock = (
@@ -558,6 +572,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     position.y < 0 ||
     position.y >= gridSize.h ||
     grid[position.y][position.x] === 'wall' ||
+    wallGoalKeys.has(getRockPushPositionKey(position)) ||
     rockList.some(
       (rock) => rock.id !== ignoredRockId && isSamePosition(rock, position),
     )
@@ -1031,6 +1046,11 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     encounter.settings.barrierSprite,
   )
   const backWallSprite = resolveGridBackWallSource(activeTilePaletteId)
+  const wallGoalSprite = resolveGridGoalSource(
+    activeTilePaletteId,
+    'wall',
+    activeScreenConfig?.wallGoalSprite || encounter.settings.wallGoalSprite,
+  )
   const backWallOnly = isGridBackWallOnly(activeTilePaletteId)
   const cellWidth = `${100 / Math.max(gridSize.w, 1)}%`
   const cellHeight = `${100 / Math.max(gridSize.h, 1)}%`
@@ -1239,24 +1259,28 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
             )}
 
             <div className="pointer-events-none absolute inset-0 z-20">
-              {winTiles.map((tile, index) => (
-                <div
-                  key={`win:${activeScreenId}:${index}:${getRockPushPositionKey(tile)}`}
-                  className="absolute z-0 p-[0.12rem]"
-                  style={entityStyle(tile)}
-                  aria-hidden="true"
-                >
-                  <div className="relative h-full w-full">
-                    <Image
-                      src={winTileSprite}
-                      alt=""
-                      fill
-                      sizes="64px"
-                      className="object-contain [image-rendering:pixelated]"
-                    />
+              {winTiles.map((tile, index) => {
+                const goalSprite = tile.y === 0 ? wallGoalSprite : winTileSprite
+                if (!goalSprite) return null
+                return (
+                  <div
+                    key={`win:${activeScreenId}:${index}:${getRockPushPositionKey(tile)}`}
+                    className="absolute z-0 p-[0.12rem]"
+                    style={entityStyle(tile)}
+                    aria-hidden="true"
+                  >
+                    <div className="relative h-full w-full">
+                      <Image
+                        src={goalSprite}
+                        alt=""
+                        fill
+                        sizes="64px"
+                        className="object-contain [image-rendering:pixelated]"
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
 
               {teleporters.map((teleporter) => (
                 <div

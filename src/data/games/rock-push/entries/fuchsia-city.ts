@@ -18,7 +18,7 @@ export const fuchsiaCitybasicEntries: RockPushGameConfig[] = [
     rewards: [],
     settings: {
       variant: 'rock-push',
-      tilePaletteId: 'basic-cave',
+      tilePaletteId: 'wooden-interior',
       playerStart: { x: 1, y: 1 },
       grid_size: 8,
       invisibleMaze: true,
@@ -45,7 +45,7 @@ export const fuchsiaCitybasicEntries: RockPushGameConfig[] = [
     rewards: [],
     settings: {
       variant: 'rock-push',
-      tilePaletteId: 'basic-cave',
+      tilePaletteId: 'wooden-interior',
       playerStart: { x: 1, y: 1 },
       grid_size: 8,
       invisibleMaze: true,

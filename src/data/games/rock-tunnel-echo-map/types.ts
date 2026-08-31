@@ -18,7 +18,9 @@ export interface RockTunnelEchoMapSettings {
   }
   playerStart: RockTunnelEchoPosition
   exit: RockTunnelEchoPosition
+  /** Interior blockers only; y=0 is reserved for the repeated back wall. */
   walls: RockTunnelEchoPosition[]
+  /** Floor hazards only; y=0 is reserved for the repeated back wall and exit marker. */
   holes?: RockTunnelEchoPosition[]
   timeLimit?: number
   maxMoves?: number
@@ -29,6 +31,9 @@ export interface RockTunnelEchoMapSettings {
   floorSprite?: string
   barrierSprite?: string
   holeSprite?: string
+  /** Optional override for a goal occupying the reserved wall row. */
+  wallGoalSprite?: string
+  /** Floor goal override; wall goals use the palette wall marker instead. */
   winTileSprite?: string
   playerSprite?: string
 }

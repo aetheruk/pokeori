@@ -29,7 +29,9 @@ export interface VoltorbGridSettings {
   }
   playerStart: VoltorbGridPosition
   exit: VoltorbGridPosition
+  /** Interior blockers only; y=0 is reserved for the repeated back wall. */
   walls?: VoltorbGridPosition[]
+  /** Breakable floor objects only; y=0 is reserved for the repeated back wall. */
   debris?: VoltorbGridPosition[]
   voltorbs: VoltorbGridVoltorb[]
   protectedPokemon?: VoltorbGridProtectedPokemon[]
@@ -43,6 +45,9 @@ export interface VoltorbGridSettings {
   floorSprite?: string
   boulderSprite?: string
   barrierSprite?: string
+  /** Optional override for a goal occupying the reserved wall row. */
+  wallGoalSprite?: string
+  /** Floor goal override; wall goals use the palette wall marker instead. */
   winTileSprite?: string
   playerSprite?: string
 }

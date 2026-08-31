@@ -13,6 +13,8 @@ interface PixelGridBoardProps {
   maxWidth?: number
   ariaLabel?: string
   frameSrc?: string
+  /** Source-pixel slice for a 3×3 frame atlas. Defaults to the logical 16px slice. */
+  frameSlice?: number
 }
 
 export function getPixelGridMetrics(
@@ -53,6 +55,7 @@ export function PixelGridBoard({
   maxWidth = 500,
   ariaLabel,
   frameSrc,
+  frameSlice,
 }: PixelGridBoardProps) {
   const measureRef = useRef<HTMLDivElement>(null)
   const [availableWidth, setAvailableWidth] = useState(maxWidth)
@@ -91,9 +94,9 @@ export function PixelGridBoard({
           borderStyle: 'solid',
           borderWidth: 'var(--grid-tile-px)',
           borderImageSource: `url('${frameSrc}')`,
-          borderImageSlice: '16',
-          // The source is a 3x3 16px atlas. Repeating preserves native pixels
-          // across arbitrarily wide boards; stretching would blur/distort edges.
+          borderImageSlice: String(frameSlice ?? GRID_LOGICAL_TILE_SIZE),
+          // Repeating preserves native pixels across arbitrarily wide boards;
+          // stretching would blur/distort edges. High-res atlases use a 64px slice.
           borderImageRepeat: 'repeat',
         }
       : {}),

@@ -54,8 +54,6 @@ export const rockTunnelEchoMapEntries: RockTunnelEchoMapGameConfig[] = [
       playerStart: { x: 0, y: 5 },
       exit: { x: 5, y: 0 },
       walls: [
-        { x: 1, y: 0 },
-        { x: 4, y: 0 },
         { x: 1, y: 1 },
         { x: 3, y: 1 },
         { x: 3, y: 2 },
@@ -68,7 +66,6 @@ export const rockTunnelEchoMapEntries: RockTunnelEchoMapGameConfig[] = [
         { x: 4, y: 5 },
       ],
       holes: [
-        { x: 2, y: 0 },
         { x: 0, y: 2 },
         { x: 5, y: 3 },
       ],
@@ -95,9 +92,6 @@ export const rockTunnelEchoMapEntries: RockTunnelEchoMapGameConfig[] = [
       playerStart: { x: 1, y: 6 },
       exit: { x: 6, y: 1 },
       walls: [
-        { x: 1, y: 0 },
-        { x: 2, y: 0 },
-        { x: 4, y: 0 },
         { x: 1, y: 1 },
         { x: 4, y: 1 },
         { x: 1, y: 2 },
@@ -138,9 +132,6 @@ export const rockTunnelEchoMapEntries: RockTunnelEchoMapGameConfig[] = [
       playerStart: { x: 0, y: 6 },
       exit: { x: 6, y: 0 },
       walls: [
-        { x: 1, y: 0 },
-        { x: 2, y: 0 },
-        { x: 5, y: 0 },
         { x: 2, y: 1 },
         { x: 4, y: 1 },
         { x: 1, y: 3 },
@@ -153,7 +144,6 @@ export const rockTunnelEchoMapEntries: RockTunnelEchoMapGameConfig[] = [
       ],
       holes: [
         { x: 0, y: 1 },
-        { x: 3, y: 0 },
         { x: 0, y: 4 },
         { x: 6, y: 4 },
       ],
@@ -180,7 +170,6 @@ export const rockTunnelEchoMapEntries: RockTunnelEchoMapGameConfig[] = [
       playerStart: { x: 1, y: 6 },
       exit: { x: 6, y: 1 },
       walls: [
-        { x: 1, y: 0 },
         { x: 4, y: 1 },
         { x: 1, y: 1 },
         { x: 3, y: 1 },
@@ -201,7 +190,6 @@ export const rockTunnelEchoMapEntries: RockTunnelEchoMapGameConfig[] = [
       ],
       holes: [
         { x: 0, y: 1 },
-        { x: 5, y: 0 },
         { x: 7, y: 2 },
         { x: 2, y: 4 },
         { x: 6, y: 6 },
@@ -229,9 +217,6 @@ export const rockTunnelEchoMapEntries: RockTunnelEchoMapGameConfig[] = [
       playerStart: { x: 1, y: 7 },
       exit: { x: 6, y: 0 },
       walls: [
-        { x: 1, y: 0 },
-        { x: 2, y: 0 },
-        { x: 5, y: 0 },
         { x: 1, y: 1 },
         { x: 3, y: 1 },
         { x: 3, y: 2 },
@@ -251,7 +236,6 @@ export const rockTunnelEchoMapEntries: RockTunnelEchoMapGameConfig[] = [
         { x: 5, y: 7 },
       ],
       holes: [
-        { x: 3, y: 0 },
         { x: 7, y: 1 },
         { x: 4, y: 2 },
         { x: 7, y: 3 },
@@ -280,10 +264,6 @@ export const rockTunnelEchoMapEntries: RockTunnelEchoMapGameConfig[] = [
       playerStart: { x: 1, y: 8 },
       exit: { x: 7, y: 0 },
       walls: [
-        { x: 1, y: 0 },
-        { x: 2, y: 0 },
-        { x: 4, y: 0 },
-        { x: 5, y: 0 },
         { x: 1, y: 1 },
         { x: 3, y: 1 },
         { x: 5, y: 1 },

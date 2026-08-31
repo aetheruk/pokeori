@@ -42,7 +42,7 @@ export interface GridFloorBlockers {
 }
 
 export interface GridFloorMarkers {
-  /** Markers rendered inside a normal floor cell. */
+  /** Floor-surface markers rendered inside a normal walkable cell. */
   goal?: GridTileAsset
   teleporter?: GridTileAsset
 }
@@ -59,13 +59,13 @@ export interface GridFloorSet {
 export type GridWallMask = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15
 
 export interface GridWallMarkers {
-  /** Door/entrance markers rendered into architectural wall cells. */
+  /** Wall-surface markers rendered into architectural wall cells. */
   goal?: GridTileAsset
   teleporter?: GridTileAsset
 }
 
 export interface GridWallSet {
-  /** Single 16x16 back wall repeated along the far/top edge of simple scenes. */
+  /** Single native tile repeated along the far/top edge of simple scenes. */
   back?: GridTileAsset
   /** N=1, E=2, S=4, W=8. All 16 variants are required when supplied. */
   variants?: Record<GridWallMask, GridTileAsset>
@@ -107,6 +107,8 @@ export interface GridTilePalette {
   id: string
   name: string
   logicalTileSize: typeof GRID_LOGICAL_TILE_SIZE
+  /** Native source-art width/height for one logical cell (64 for the current sets). */
+  nativeTileSize: number
   floor: GridFloorSet
   walls?: GridWallSet
   gameplay: Record<GridGameplayTileRole, GridTileAsset>
@@ -126,6 +128,9 @@ export interface GridTileRenderConfig {
   spriteSetId: string
   floor?: GridFloorRenderConfig
 }
+
+/** Surface on which a goal/exit marker is authored. */
+export type GridGoalSurface = 'floor' | 'wall'
 
 export interface GridPosition { x: number; y: number }
 export interface GridWallPosition extends GridPosition {}
