@@ -28,6 +28,7 @@ import type {
 import type { RockPushScreenConfig } from '@/data/games/rock-push/types'
 import {
   getGridObstacleParts,
+  getGridObjectDefinition,
   isGridBoundaryWall,
   getGridWallMask,
   isGridBackWallOnly,
@@ -212,9 +213,7 @@ const buildScreenRuntimeState = (
   for (let y = 0; y < size; y++) {
     const row: CellType[] = []
     for (let x = 0; x < size; x++) {
-      row.push(
-        isGridBoundaryWall(tilePaletteId, x, y, size) ? 'wall' : 'empty',
-      )
+      row.push(isGridBoundaryWall(tilePaletteId, x, y, size) ? 'wall' : 'empty')
     }
     authoredGrid.push(row)
   }
@@ -328,11 +327,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   // Keep the architectural wall art, but let the player enter that cell.
   const wallGoalKeys = useMemo(
     () =>
-      new Set(
-        winTiles
-          .filter(({ y }) => y === 0)
-          .map(getRockPushPositionKey),
-      ),
+      new Set(winTiles.filter(({ y }) => y === 0).map(getRockPushPositionKey)),
     [winTiles],
   )
   const displayRocksSolved = Object.entries(screenStates).reduce(
@@ -360,9 +355,16 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   } | null => {
     const screen = screenConfigs.find((entry) => entry.id === screenId)
     for (const [index, placement] of (screen?.objects || []).entries()) {
-      const definition = (gridObjects as GridObjectLibrary)[placement.objectId]
+      const definition = getGridObjectDefinition(
+        gridObjects as GridObjectLibrary,
+        placement.objectId,
+      )
       const interaction = placement.interaction
-      if (!definition || !interaction || definition.interaction !== interaction.type) {
+      if (
+        !definition ||
+        !interaction ||
+        definition.interaction !== interaction.type
+      ) {
         continue
       }
       const key = getGridObjectKey(placement, index, screenId)
@@ -482,10 +484,12 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       setGrid(cloneGrid(resumeState.grid))
       setRocks(cloneRocks(resumeState.rocks || []))
       setPlayerPos({ ...resumeState.playerPos })
-      setGridSize(restoredActiveState?.gridSize || {
-        w: resumeState.grid[0]?.length || 8,
-        h: resumeState.grid.length || 8,
-      })
+      setGridSize(
+        restoredActiveState?.gridSize || {
+          w: resumeState.grid[0]?.length || 8,
+          h: resumeState.grid.length || 8,
+        },
+      )
       setRocksSolved(resumeState.rocksSolved || 0)
       setMoves(resumeState.moves || 0)
       setCollectedPrizeIds(new Set(resumeState.collectedPrizeIds || []))
@@ -620,7 +624,8 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       playerPos: { ...(overrides.playerPos || playerPos) },
       rocksSolved: overrides.rocksSolved ?? rocksSolved,
       moves: overrides.moves ?? moves,
-      collectedPrizeIds: overrides.collectedPrizeIds || Array.from(collectedPrizeIds),
+      collectedPrizeIds:
+        overrides.collectedPrizeIds || Array.from(collectedPrizeIds),
       clearedObjectKeys:
         overrides.clearedObjectKeys || Array.from(clearedObjectKeys),
       pendingObjectKey: interaction.key,
@@ -652,7 +657,10 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
         const result = await startBattle(interaction.targetId)
         if (!result.success) {
           window.sessionStorage.removeItem(`grid-puzzle-resume:${encounter.id}`)
-          setResult({ success: false, message: result.error || 'Battle could not start.' })
+          setResult({
+            success: false,
+            message: result.error || 'Battle could not start.',
+          })
           return
         }
         router.push(
@@ -674,7 +682,8 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       window.sessionStorage.removeItem(`grid-puzzle-resume:${encounter.id}`)
       setResult({
         success: false,
-        message: error instanceof Error ? error.message : 'Object interaction failed.',
+        message:
+          error instanceof Error ? error.message : 'Object interaction failed.',
       })
     }
   }
@@ -1586,7 +1595,6 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
                         )}
                       </div>
                     )}
-
                   </div>
                 )
               }),
@@ -1657,8 +1665,10 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
               })}
 
               {objects.map((placement, index) => {
-                const definition =
-                  (gridObjects as GridObjectLibrary)[placement.objectId]
+                const definition = getGridObjectDefinition(
+                  gridObjects as GridObjectLibrary,
+                  placement.objectId,
+                )
                 if (!definition) return null
                 const objectKey = getGridObjectKey(placement, index)
                 if (clearedObjectKeys.has(objectKey)) return null

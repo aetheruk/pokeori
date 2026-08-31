@@ -18,6 +18,7 @@ import {
   createGridSceneConfigSchema,
   gridObjectLibrarySchema,
   gridObjectDefinitionSchema,
+  getGridObjectDefinition,
   gridObjects,
   gridTilePaletteSchema,
   gridSceneConfigSchema,
@@ -56,8 +57,10 @@ describe('shared grid sprite sets', () => {
       if (palette.walls?.back) expectAssetExists(palette.walls.back)
       Object.values(palette.walls?.variants || {}).forEach(expectAssetExists)
       if (palette.walls?.frame) expectAssetExists(palette.walls.frame)
-      if (palette.walls?.markers?.goal) expectAssetExists(palette.walls.markers.goal)
-      if (palette.walls?.markers?.teleporter) expectAssetExists(palette.walls.markers.teleporter)
+      if (palette.walls?.markers?.goal)
+        expectAssetExists(palette.walls.markers.goal)
+      if (palette.walls?.markers?.teleporter)
+        expectAssetExists(palette.walls.markers.teleporter)
     }
     expect(getGridTilePalette('basic-cave').walls?.back?.src).toBe(
       '/games/grid-tiles/basic-cave/walls/back.png',
@@ -81,20 +84,77 @@ describe('shared grid sprite sets', () => {
     const checks = palettes.flatMap((palette) => {
       const assets: Array<[GridTileAsset, number]> = [
         [palette.floor.common, palette.nativeTileSize],
-        ...(palette.floor.rare || []).map((variant) => [variant.asset, palette.nativeTileSize] as [GridTileAsset, number]),
-        ...(palette.floor.blockers?.small ? [[palette.floor.blockers.small, palette.nativeTileSize] as [GridTileAsset, number]] : []),
-        ...(palette.floor.blockers?.large ? [[palette.floor.blockers.large, palette.nativeTileSize * 2] as [GridTileAsset, number]] : []),
-        ...(palette.floor.markers?.goal ? [[palette.floor.markers.goal, palette.nativeTileSize] as [GridTileAsset, number]] : []),
-        ...(palette.floor.markers?.teleporter ? [[palette.floor.markers.teleporter, palette.nativeTileSize] as [GridTileAsset, number]] : []),
-        ...(palette.walls?.back ? [[palette.walls.back, palette.nativeTileSize] as [GridTileAsset, number]] : []),
-        ...(palette.walls?.markers?.goal ? [[palette.walls.markers.goal, palette.nativeTileSize] as [GridTileAsset, number]] : []),
-        ...(palette.walls?.markers?.teleporter ? [[palette.walls.markers.teleporter, palette.nativeTileSize] as [GridTileAsset, number]] : []),
+        ...(palette.floor.rare || []).map(
+          (variant) =>
+            [variant.asset, palette.nativeTileSize] as [GridTileAsset, number],
+        ),
+        ...(palette.floor.blockers?.small
+          ? [
+              [palette.floor.blockers.small, palette.nativeTileSize] as [
+                GridTileAsset,
+                number,
+              ],
+            ]
+          : []),
+        ...(palette.floor.blockers?.large
+          ? [
+              [palette.floor.blockers.large, palette.nativeTileSize * 2] as [
+                GridTileAsset,
+                number,
+              ],
+            ]
+          : []),
+        ...(palette.floor.markers?.goal
+          ? [
+              [palette.floor.markers.goal, palette.nativeTileSize] as [
+                GridTileAsset,
+                number,
+              ],
+            ]
+          : []),
+        ...(palette.floor.markers?.teleporter
+          ? [
+              [palette.floor.markers.teleporter, palette.nativeTileSize] as [
+                GridTileAsset,
+                number,
+              ],
+            ]
+          : []),
+        ...(palette.walls?.back
+          ? [
+              [palette.walls.back, palette.nativeTileSize] as [
+                GridTileAsset,
+                number,
+              ],
+            ]
+          : []),
+        ...(palette.walls?.markers?.goal
+          ? [
+              [palette.walls.markers.goal, palette.nativeTileSize] as [
+                GridTileAsset,
+                number,
+              ],
+            ]
+          : []),
+        ...(palette.walls?.markers?.teleporter
+          ? [
+              [palette.walls.markers.teleporter, palette.nativeTileSize] as [
+                GridTileAsset,
+                number,
+              ],
+            ]
+          : []),
         ...Object.values(palette.gameplay)
           .filter((asset) => asset.src !== '/games/rockpush/boulder.avif')
-          .map((asset) => [asset, palette.nativeTileSize] as [GridTileAsset, number]),
+          .map(
+            (asset) =>
+              [asset, palette.nativeTileSize] as [GridTileAsset, number],
+          ),
       ]
       return assets.map(async ([asset, expectedSize]) => {
-        const metadata = await sharp(path.join(process.cwd(), 'public', asset.src)).metadata()
+        const metadata = await sharp(
+          path.join(process.cwd(), 'public', asset.src),
+        ).metadata()
         expect(metadata.width).toBe(expectedSize)
         expect(metadata.height).toBe(expectedSize)
       })
@@ -103,7 +163,9 @@ describe('shared grid sprite sets', () => {
   })
 
   test('native tile metadata stays compatible with the logical grid', () => {
-    expect(gridTilePaletteSchema.safeParse(getGridTilePalette('grass')).success).toBe(true)
+    expect(
+      gridTilePaletteSchema.safeParse(getGridTilePalette('grass')).success,
+    ).toBe(true)
     expect(
       gridTilePaletteSchema.safeParse({
         ...getGridTilePalette('grass'),
@@ -129,11 +191,21 @@ describe('shared grid sprite sets', () => {
     ] as const) {
       const palette = gridTilePalettes[paletteId]
       const teleporter = await sharp(
-        path.join(process.cwd(), 'public', palette.floor.markers!.teleporter!.src),
-      ).ensureAlpha().raw().toBuffer()
+        path.join(
+          process.cwd(),
+          'public',
+          palette.floor.markers!.teleporter!.src,
+        ),
+      )
+        .ensureAlpha()
+        .raw()
+        .toBuffer()
       const goal = await sharp(
         path.join(process.cwd(), 'public', palette.floor.markers!.goal!.src),
-      ).ensureAlpha().raw().toBuffer()
+      )
+        .ensureAlpha()
+        .raw()
+        .toBuffer()
       expect(goal.length).toBe(teleporter.length)
       for (let index = 3; index < goal.length; index += 4) {
         expect(goal[index]).toBe(teleporter[index])
@@ -142,7 +214,9 @@ describe('shared grid sprite sets', () => {
   })
 
   test('floor and wall goals resolve to their own surface markers', () => {
-    for (const palette of Object.values(gridTilePalettes) as GridTilePalette[]) {
+    for (const palette of Object.values(
+      gridTilePalettes,
+    ) as GridTilePalette[]) {
       const floorGoal = resolveGridGoalSource(palette.id, 'floor')
       const wallGoal = resolveGridGoalSource(palette.id, 'wall')
       expect(floorGoal).toBe(palette.floor.markers?.goal?.src)
@@ -153,14 +227,22 @@ describe('shared grid sprite sets', () => {
   })
 
   test('rare floors retain the common tile with a sparse texture overlay', async () => {
-    for (const palette of Object.values(gridTilePalettes) as GridTilePalette[]) {
+    for (const palette of Object.values(
+      gridTilePalettes,
+    ) as GridTilePalette[]) {
       for (const variant of palette.floor.rare || []) {
         const common = await sharp(
           path.join(process.cwd(), 'public', palette.floor.common.src),
-        ).removeAlpha().raw().toBuffer()
+        )
+          .removeAlpha()
+          .raw()
+          .toBuffer()
         const rare = await sharp(
           path.join(process.cwd(), 'public', variant.asset.src),
-        ).removeAlpha().raw().toBuffer()
+        )
+          .removeAlpha()
+          .raw()
+          .toBuffer()
         expect(rare.length).toBe(common.length)
         let changedPixels = 0
         for (let index = 0; index < common.length; index += 3) {
@@ -179,15 +261,20 @@ describe('shared grid sprite sets', () => {
   })
 
   test('ice gameplay tiles fill the square and tile at every edge', async () => {
-    for (const palette of Object.values(gridTilePalettes) as GridTilePalette[]) {
+    for (const palette of Object.values(
+      gridTilePalettes,
+    ) as GridTilePalette[]) {
       const ice = await sharp(
         path.join(process.cwd(), 'public', palette.gameplay.ice.src),
-      ).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+      )
+        .ensureAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true })
       expect(ice.info.width).toBe(palette.nativeTileSize)
       expect(ice.info.height).toBe(palette.nativeTileSize)
       const { data, info } = ice
       for (let coordinate = 0; coordinate < info.height; coordinate += 1) {
-        const left = (coordinate * info.width) * 4
+        const left = coordinate * info.width * 4
         const right = (coordinate * info.width + info.width - 1) * 4
         expect(Array.from(data.slice(left, left + 4))).toEqual(
           Array.from(data.slice(right, right + 4)),
@@ -395,12 +482,16 @@ describe('shared grid sprite sets', () => {
       expect(settings.tilePaletteId).toBeDefined()
       expect(isGridTilePaletteId(settings.tilePaletteId || '')).toBe(true)
       settings.screens?.forEach((screen) => {
-        if (screen.tilePaletteId) expect(isGridTilePaletteId(screen.tilePaletteId)).toBe(true)
+        if (screen.tilePaletteId)
+          expect(isGridTilePaletteId(screen.tilePaletteId)).toBe(true)
       })
     }
     expect(
       spatialGames
-        .filter((game) => (game.settings as { variant?: string }).variant === 'voltorb')
+        .filter(
+          (game) =>
+            (game.settings as { variant?: string }).variant === 'voltorb',
+        )
         .every((game) => {
           const settings = game.settings as { tilePaletteId?: string }
           return game.id === 'chronicle-v2-surge-cross-the-substation'
@@ -410,21 +501,31 @@ describe('shared grid sprite sets', () => {
     ).toBe(true)
     expect(
       spatialGames
-        .filter((game) => (game.settings as { variant?: string }).variant === 'voltorb')
+        .filter(
+          (game) =>
+            (game.settings as { variant?: string }).variant === 'voltorb',
+        )
         .every((game) => {
           const settings = game.settings as {
             tilePaletteId?: string
             winTileSprite?: string
           }
-          const expectedPalette = game.id === 'chronicle-v2-surge-cross-the-substation'
-            ? 'industrial-power'
-            : 'basic-cave'
-          return settings.tilePaletteId === expectedPalette && !settings.winTileSprite
+          const expectedPalette =
+            game.id === 'chronicle-v2-surge-cross-the-substation'
+              ? 'industrial-power'
+              : 'basic-cave'
+          return (
+            settings.tilePaletteId === expectedPalette &&
+            !settings.winTileSprite
+          )
         }),
     ).toBe(true)
     expect(
       spatialGames
-        .filter((game) => (game.settings as { variant?: string }).variant === 'echo-map')
+        .filter(
+          (game) =>
+            (game.settings as { variant?: string }).variant === 'echo-map',
+        )
         .every((game) => {
           const settings = game.settings as { tilePaletteId?: string }
           if (game.id === 'chronicle-v2-sabrina-enter-the-quiet-room') {
@@ -442,13 +543,18 @@ describe('shared grid sprite sets', () => {
       spatialGames.some(
         (game) =>
           (game.settings as { variant?: string }).variant === 'rock-push' &&
-          (game.settings as { tilePaletteId?: string }).tilePaletteId === 'grass',
+          (game.settings as { tilePaletteId?: string }).tilePaletteId ===
+            'grass',
       ),
     ).toBe(true)
     expect(
       spatialGames
         .filter((game) => game.id.startsWith('fuchsia-gym-invisible-maze-'))
-        .every((game) => (game.settings as { tilePaletteId?: string }).tilePaletteId === 'wooden-interior'),
+        .every(
+          (game) =>
+            (game.settings as { tilePaletteId?: string }).tilePaletteId ===
+            'wooden-interior',
+        ),
     ).toBe(true)
     const rendererTest = spatialGames.find(
       (game) => game.id === 'voltorb-grid-renderer-test',
@@ -456,14 +562,17 @@ describe('shared grid sprite sets', () => {
     expect(rendererTest).toBeDefined()
     expect(rendererTest?.subCategory).toBe('Test')
     expect(rendererTest?.requirements).toEqual([])
-    if (!rendererTest) throw new Error('Voltorb Grid renderer test entry is missing')
-    expect((rendererTest.settings as { tilePaletteId?: string }).tilePaletteId).toBe(
-      'basic-cave',
-    )
+    if (!rendererTest)
+      throw new Error('Voltorb Grid renderer test entry is missing')
+    expect(
+      (rendererTest.settings as { tilePaletteId?: string }).tilePaletteId,
+    ).toBe('basic-cave')
   })
 
   test('grid object trigger tests author battle win and encounter clear flows', () => {
-    const battleTest = allGames.find((game) => game.id === 'grid-object-battle-test')
+    const battleTest = allGames.find(
+      (game) => game.id === 'grid-object-battle-test',
+    )
     const encounterTest = allGames.find(
       (game) => game.id === 'grid-object-encounter-test',
     )
@@ -483,13 +592,20 @@ describe('shared grid sprite sets', () => {
     })
     expect(
       battles.some(
-        (battle) =>
-          battle.id === battleObjects[0].interaction.targetId,
+        (battle) => battle.id === battleObjects[0].interaction.targetId,
       ),
     ).toBe(true)
     expect(encounterObjects).toHaveLength(2)
-    expect(encounterObjects.every((object: any) => object.objectId === 'encounter-trigger')).toBe(true)
-    expect(encounterObjects.every((object: any) => object.interaction.victory === 'clear')).toBe(true)
+    expect(
+      encounterObjects.every(
+        (object: any) => object.objectId === 'encounter-trigger',
+      ),
+    ).toBe(true)
+    expect(
+      encounterObjects.every(
+        (object: any) => object.interaction.victory === 'clear',
+      ),
+    ).toBe(true)
     expect(
       encounterObjects.every((object: any) =>
         locations.some(
@@ -500,17 +616,31 @@ describe('shared grid sprite sets', () => {
   })
 
   test('back-wall row is reserved for the wall surface and exit markers', () => {
-    const spatialGames = allGames.filter((game) => game.gameType === 'grid-puzzle')
+    const spatialGames = allGames.filter(
+      (game) => game.gameType === 'grid-puzzle',
+    )
     for (const game of spatialGames) {
       const settings = game.settings as Record<string, any>
       const scenes = [settings, ...(settings.screens || [])]
       for (const scene of scenes) {
         const variant = scene.variant || settings.variant
-        const objectCollections = variant === 'echo-map'
-          ? [scene.walls, scene.holes]
-          : variant === 'voltorb'
-            ? [scene.walls, scene.debris, scene.voltorbs, scene.protectedPokemon]
-            : [scene.barriers, scene.boulders, scene.holes, scene.ice, scene.prizes]
+        const objectCollections =
+          variant === 'echo-map'
+            ? [scene.walls, scene.holes]
+            : variant === 'voltorb'
+              ? [
+                  scene.walls,
+                  scene.debris,
+                  scene.voltorbs,
+                  scene.protectedPokemon,
+                ]
+              : [
+                  scene.barriers,
+                  scene.boulders,
+                  scene.holes,
+                  scene.ice,
+                  scene.prizes,
+                ]
         for (const collection of objectCollections) {
           for (const position of collection || []) {
             expect(position.y).toBeGreaterThan(0)
@@ -533,14 +663,43 @@ describe('shared grid sprite sets', () => {
       expectAssetExists(object.asset)
       expect(gridObjectDefinitionSchema.safeParse(object).success).toBe(true)
     }
-    expect(gridObjects.breakableRock.asset.src).toBe('/games/rockpush/breakable-rock.png')
+    expect(gridObjects.breakableRock.asset.src).toBe(
+      '/games/rockpush/breakable-rock.png',
+    )
     expect(gridObjects.battleTrigger.interaction).toBe('battle')
     expect(gridObjects.encounterTrigger.interaction).toBe('encounter')
+    expect(getGridObjectDefinition(gridObjects, 'battle-trigger')).toBe(
+      gridObjects.battleTrigger,
+    )
+    expect(getGridObjectDefinition(gridObjects, 'encounter-trigger')).toBe(
+      gridObjects.encounterTrigger,
+    )
+    expect(
+      createGridSceneConfigSchema(gridObjects).safeParse({
+        cols: 7,
+        rows: 7,
+        rendering: { spriteSetId: 'basic-cave' },
+        objects: [
+          {
+            objectId: 'battle-trigger',
+            x: 3,
+            y: 1,
+            interaction: {
+              type: 'battle',
+              targetId: 'test-battle',
+              victory: 'win',
+            },
+          },
+        ],
+      }).success,
+    ).toBe(true)
   })
 
   test('breakable rock preserves a transparent silhouette', async () => {
     const asset = gridObjects.breakableRock.asset.src
-    const metadata = await sharp(path.join(process.cwd(), 'public', asset)).metadata()
+    const metadata = await sharp(
+      path.join(process.cwd(), 'public', asset),
+    ).metadata()
     expect(metadata.width).toBe(128)
     expect(metadata.height).toBe(128)
     expect(metadata.hasAlpha).toBe(true)
@@ -559,7 +718,9 @@ describe('shared grid sprite sets', () => {
     expect(sources.barrier).toBe(
       getGridTilePalette('basic-cave').floor.blockers!.small.src,
     )
-    expect(getGridTilePalette('basic-cave').floor.common.src).toBe(originalFloor)
+    expect(getGridTilePalette('basic-cave').floor.common.src).toBe(
+      originalFloor,
+    )
     expect(GRID_TILE_PALETTE_IDS).not.toContain('not-a-registered-palette')
   })
 

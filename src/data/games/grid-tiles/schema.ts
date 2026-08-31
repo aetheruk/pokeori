@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { getGridObjectDefinition } from './objects'
 import type { GridObjectLibrary } from './types'
 
 const gridPositionSchema = z
@@ -131,7 +132,7 @@ export function createGridSceneConfigSchema(objectLibrary: GridObjectLibrary) {
       }
     })
     scene.objects?.forEach((object, index) => {
-      const definition = objectLibrary[object.objectId]
+      const definition = getGridObjectDefinition(objectLibrary, object.objectId)
       if (!definition) {
         ctx.addIssue({ code: 'custom', path: ['objects', index, 'objectId'], message: 'Unknown object id' })
         return

@@ -1,4 +1,4 @@
-import type { GridObjectLibrary } from './types'
+import type { GridObjectDefinition, GridObjectLibrary } from './types'
 
 /**
  * Shared gameplay entities. Keep them independent of terrain sets so the same
@@ -48,3 +48,21 @@ export const gridObjects = {
     interaction: 'encounter',
   },
 } satisfies GridObjectLibrary
+
+/**
+ * Resolve a shared object by its stable authored id.
+ *
+ * Libraries are often authored with ergonomic property names (for example
+ * `battleTrigger`) while map placements use the serialized `id`
+ * (`battle-trigger`). Looking up by both keeps the registry pleasant to use
+ * in code without making placement ids depend on object property names.
+ */
+export function getGridObjectDefinition(
+  library: GridObjectLibrary,
+  objectId: string,
+): GridObjectDefinition | undefined {
+  return (
+    library[objectId] ||
+    Object.values(library).find((object) => object.id === objectId)
+  )
+}
