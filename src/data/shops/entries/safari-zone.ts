@@ -18,14 +18,6 @@ export const safariZoneShops: ShopConfig[] = [
     ],
     items: [
       {
-        id: 'safari-credit-safari-ball',
-        name: 'Safari Ball',
-        description: 'A Safari Ball from the reserve stores. Outside Safari Zone encounters, it works like a standard Poké Ball.',
-        icon: { type: 'item', id: 'safari-ball' },
-        cost: safariNotesCost(30),
-        rewards: [{ type: 'item', targetId: 'safari-ball', quantity: 1, dropChance: 100 }],
-      },
-      {
         id: 'safari-credit-fishing-research-notes',
         name: 'Fishing Permit',
         description: 'A one-time institute record that opens fishing across the four reserve habitat records.',

@@ -825,25 +825,19 @@ describe('Fuchsia Gym and Safari progression', () => {
         {
           type: 'currency',
           targetId: 'pokedollars',
-          quantity: 1500,
-          dropChance: 100,
-        },
-        {
-          type: 'item',
-          targetId: 'rare-candy-l',
-          quantity: 3,
+          quantity: 500,
           dropChance: 100,
         },
         {
           type: 'currency',
           targetId: 'safari-notes',
-          quantity: 1,
+          quantity: 10,
           dropChance: 100,
         },
         {
           type: 'item',
           targetId: 'pack-base5',
-          quantity: 1,
+          quantity: 3,
           dropChance: 100,
           label: 'Team Rocket Booster Pack',
           requirements: [
@@ -1257,11 +1251,6 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(
       store?.items.map((item) => [item.name, item.cost, item.stock]),
     ).toEqual([
-      [
-        'Safari Ball',
-        [{ type: 'currency', id: 'safari-notes', amount: 30 }],
-        undefined,
-      ],
       [
         'Fishing Permit',
         [{ type: 'currency', id: 'safari-notes', amount: 200 }],

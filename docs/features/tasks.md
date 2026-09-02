@@ -20,6 +20,7 @@ Fuchsia's `Build in bulk` task appears alongside the Billiam storage side task a
 
 - The generator evaluates authored unlocks, encounter-level gates, shop stock, TCG duplicate state, and eligible reward sources before offering an objective. Secret, random, test, gambling, and unavailable sources are excluded.
 - Challenges prefer distinct activity families and avoid the prior UTC day's family/target where alternatives exist. Test/debug, secret, and random-event sources are excluded. Each daily stores a source hint shown in its Explore detail drawer.
+- Wild and trainer battle challenges accept any unlocked battle of the requested type; their source hints are intentionally generic rather than pointing to the first authored battle (Route 1).
 - Five generated challenges award 5 Professor Scrip each. Exactly one is marked as the Daily Bonus and awards 25 Professor Scrip, for a 50-scrip daily cap. Rewards are the same every UTC day, including Sunday.
 - `daily_activity` is the shared progress criterion for successful catches, battle wins, Mini Game wins, Field Research completions, fishing catches, crafts, purchases, voyages, and TCG actions. Mini Games use `game_win`; Field Research uses `field_research_win`.
 - Resource deliveries consume 1–3 base type gems or tier-one Pokemon materials, or 2–4 berries. Gem and berry deliveries require a reachable guaranteed reward source; Pokemon materials are sourced from the guaranteed tier-one material awarded by compatible catches.

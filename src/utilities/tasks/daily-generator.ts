@@ -358,7 +358,10 @@ function buildCandidates(
           : `Win ${count} battles against trainers.`,
       icon: { type: 'item', id: 'vs-seeker' },
       criteria: [toDailyActivity('battle_win', count, { battleType })],
-      sourceHint: `Available at ${battle.name}`,
+      sourceHint:
+        battleType === 'wild'
+          ? 'Available from any unlocked wild battle.'
+          : 'Available from any unlocked trainer battle.',
     })
   }
 

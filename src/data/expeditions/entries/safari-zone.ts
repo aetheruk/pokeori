@@ -558,13 +558,12 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
       secretActivity('safari-poacher-watch-step-05', 'battle', 'safari-poacher-watch-five'),
     ],
     rewards: [
-      { type: 'currency', targetId: 'pokedollars', quantity: 1500, dropChance: 100 },
-      { type: 'item', targetId: 'rare-candy-l', quantity: 3, dropChance: 100 },
-      { type: 'currency', targetId: 'safari-notes', quantity: 1, dropChance: 100 },
+      { type: 'currency', targetId: 'pokedollars', quantity: 500, dropChance: 100 },
+      { type: 'currency', targetId: 'safari-notes', quantity: 10, dropChance: 100 },
       {
         type: 'item',
         targetId: 'pack-base5',
-        quantity: 1,
+        quantity: 3,
         dropChance: 100,
         label: 'Team Rocket Booster Pack',
         requirements: [

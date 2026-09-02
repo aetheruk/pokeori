@@ -60,13 +60,6 @@ export const route10Locations: Location[] = [
       },
     ],
     encounters: [{ speciesId: 239, formId: '239', chance: 100 }],
-    rewards: [
-      {
-        type: 'item',
-        targetId: 'thunder-stone',
-        quantity: 1,
-        dropChance: 1,
-      },
-    ],
+    rewards: [],
   },
 ]
