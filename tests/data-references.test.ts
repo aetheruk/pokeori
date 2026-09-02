@@ -3945,12 +3945,7 @@ describe('static data references', () => {
     expect(plantStoreRoom?.encounters).toEqual([
       { speciesId: 239, formId: '239', chance: 100 },
     ])
-    expect(plantStoreRoom?.rewards).toContainEqual({
-      type: 'item',
-      targetId: 'thunder-stone',
-      quantity: 1,
-      dropChance: 1,
-    })
+    expect(plantStoreRoom?.rewards).toEqual([])
     expect(weakMagnetRecipeTask?.secret).toBe(false)
     expect(route10Location?.rewards).toContainEqual({
       type: 'task_complete',

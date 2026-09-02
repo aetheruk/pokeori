@@ -28,7 +28,7 @@ describe('daily task generator', () => {
   test('creates six source-hinted challenges with typed daily activity criteria', () => {
     const generated = generateDailyTasks(userData, {
       date: new Date('2026-05-27T12:00:00'),
-      random: () => 0.25,
+      random: () => 0,
     })
 
     expect(generated).toHaveLength(6)
@@ -45,6 +45,17 @@ describe('daily task generator', () => {
     expect(
       generated.filter((task) => task.dailyMetadata?.isBonus),
     ).toHaveLength(1)
+    const battleTasks = generated.filter(
+      (task) => task.criteria[0]?.dailyActivity?.kind === 'battle_win',
+    )
+    expect(battleTasks.length).toBeGreaterThan(0)
+    expect(
+      battleTasks.every(
+        (task) =>
+          !task.dailyMetadata?.sourceHint.includes('Route 1') &&
+          task.dailyMetadata?.sourceHint.includes('any unlocked'),
+      ),
+    ).toBe(true)
   })
 
   test('never selects development Test content as a daily challenge source', () => {
