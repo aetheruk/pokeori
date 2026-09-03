@@ -1,4 +1,272 @@
-import { ShopConfig } from '../types'
+import type { ShopConfig, ShopItem } from '../types'
+
+const starterShopChoices = [
+  {
+    id: 'bulbasaur',
+    name: 'Bulbasaur',
+    pokemonId: '1',
+    taskId: 'starter-bulbasaur',
+    titleId: 'starter-grass',
+  },
+  {
+    id: 'charmander',
+    name: 'Charmander',
+    pokemonId: '4',
+    taskId: 'starter-charmander',
+    titleId: 'starter-fire',
+  },
+  {
+    id: 'squirtle',
+    name: 'Squirtle',
+    pokemonId: '7',
+    taskId: 'starter-squirtle',
+    titleId: 'starter-water',
+  },
+  {
+    id: 'chikorita',
+    name: 'Chikorita',
+    pokemonId: '152',
+    taskId: 'starter-chikorita',
+    titleId: 'starter-grass',
+  },
+  {
+    id: 'cyndaquil',
+    name: 'Cyndaquil',
+    pokemonId: '155',
+    taskId: 'starter-cyndaquil',
+    titleId: 'starter-fire',
+  },
+  {
+    id: 'totodile',
+    name: 'Totodile',
+    pokemonId: '158',
+    taskId: 'starter-totodile',
+    titleId: 'starter-water',
+  },
+  {
+    id: 'treecko',
+    name: 'Treecko',
+    pokemonId: '252',
+    taskId: 'starter-treecko',
+    titleId: 'starter-grass',
+  },
+  {
+    id: 'torchic',
+    name: 'Torchic',
+    pokemonId: '255',
+    taskId: 'starter-torchic',
+    titleId: 'starter-fire',
+  },
+  {
+    id: 'mudkip',
+    name: 'Mudkip',
+    pokemonId: '258',
+    taskId: 'starter-mudkip',
+    titleId: 'starter-water',
+  },
+  {
+    id: 'turtwig',
+    name: 'Turtwig',
+    pokemonId: '387',
+    taskId: 'starter-turtwig',
+    titleId: 'starter-grass',
+  },
+  {
+    id: 'chimchar',
+    name: 'Chimchar',
+    pokemonId: '390',
+    taskId: 'starter-chimchar',
+    titleId: 'starter-fire',
+  },
+  {
+    id: 'piplup',
+    name: 'Piplup',
+    pokemonId: '393',
+    taskId: 'starter-piplup',
+    titleId: 'starter-water',
+  },
+  {
+    id: 'snivy',
+    name: 'Snivy',
+    pokemonId: '495',
+    taskId: 'starter-snivy',
+    titleId: 'starter-grass',
+  },
+  {
+    id: 'tepig',
+    name: 'Tepig',
+    pokemonId: '498',
+    taskId: 'starter-tepig',
+    titleId: 'starter-fire',
+  },
+  {
+    id: 'oshawott',
+    name: 'Oshawott',
+    pokemonId: '501',
+    taskId: 'starter-oshawott',
+    titleId: 'starter-water',
+  },
+  {
+    id: 'chespin',
+    name: 'Chespin',
+    pokemonId: '650',
+    taskId: 'starter-chespin',
+    titleId: 'starter-grass',
+  },
+  {
+    id: 'fennekin',
+    name: 'Fennekin',
+    pokemonId: '653',
+    taskId: 'starter-fennekin',
+    titleId: 'starter-fire',
+  },
+  {
+    id: 'froakie',
+    name: 'Froakie',
+    pokemonId: '656',
+    taskId: 'starter-froakie',
+    titleId: 'starter-water',
+  },
+  {
+    id: 'rowlet',
+    name: 'Rowlet',
+    pokemonId: '722',
+    taskId: 'starter-rowlet',
+    titleId: 'starter-grass',
+  },
+  {
+    id: 'litten',
+    name: 'Litten',
+    pokemonId: '725',
+    taskId: 'starter-litten',
+    titleId: 'starter-fire',
+  },
+  {
+    id: 'popplio',
+    name: 'Popplio',
+    pokemonId: '728',
+    taskId: 'starter-popplio',
+    titleId: 'starter-water',
+  },
+  {
+    id: 'grookey',
+    name: 'Grookey',
+    pokemonId: '810',
+    taskId: 'starter-grookey',
+    titleId: 'starter-grass',
+  },
+  {
+    id: 'scorbunny',
+    name: 'Scorbunny',
+    pokemonId: '813',
+    taskId: 'starter-scorbunny',
+    titleId: 'starter-fire',
+  },
+  {
+    id: 'sobble',
+    name: 'Sobble',
+    pokemonId: '816',
+    taskId: 'starter-sobble',
+    titleId: 'starter-water',
+  },
+  {
+    id: 'sprigatito',
+    name: 'Sprigatito',
+    pokemonId: '906',
+    taskId: 'starter-sprigatito',
+    titleId: 'starter-grass',
+  },
+  {
+    id: 'fuecoco',
+    name: 'Fuecoco',
+    pokemonId: '909',
+    taskId: 'starter-fuecoco',
+    titleId: 'starter-fire',
+  },
+  {
+    id: 'quaxly',
+    name: 'Quaxly',
+    pokemonId: '912',
+    taskId: 'starter-quaxly',
+    titleId: 'starter-water',
+  },
+] as const
+
+const starterShopTitles = [
+  { id: 'starter-grass', name: 'New Leaf' },
+  { id: 'starter-fire', name: 'Tiny Ember' },
+  { id: 'starter-water', name: 'Bubble Blower' },
+] as const
+
+const profScripStarterCost = (): ShopItem['cost'] => [
+  {
+    type: 'currency',
+    id: 'prof-scrip',
+    amount: 500,
+  },
+]
+
+const starterChoiceExclusion = (taskId: string): ShopItem['requirements'] => [
+  {
+    type: 'task_completed',
+    targetId: taskId,
+    inverse: true,
+  },
+]
+
+const starterTitleRequirement = (titleId: string): ShopItem['requirements'] => [
+  {
+    type: 'any_of',
+    conditions: starterShopChoices
+      .filter((starter) => starter.titleId !== titleId)
+      .map((starter) => ({
+        type: 'task_completed' as const,
+        targetId: starter.taskId,
+      })),
+  },
+]
+
+const starterExclusiveShopItems: ShopItem[] = [
+  ...starterShopChoices.map((starter) => ({
+    id: `icon-${starter.id}`,
+    name: `Icon: ${starter.name}`,
+    description: `Unlock the ${starter.name} trainer icon.`,
+    icon: {
+      type: 'pokemon' as const,
+      id: starter.pokemonId,
+    },
+    cost: profScripStarterCost(),
+    stock: 1,
+    requirements: starterChoiceExclusion(starter.taskId),
+    rewards: [
+      {
+        type: 'icon' as const,
+        targetId: starter.id,
+        quantity: 1,
+        dropChance: 100,
+      },
+    ],
+  })),
+  ...starterShopTitles.map((title) => ({
+    id: `title-${title.id}`,
+    name: `Title: ${title.name}`,
+    description: `Unlock the title "${title.name}".`,
+    icon: {
+      type: 'local' as const,
+      id: '/sprites/items/certificate.avif',
+    },
+    cost: profScripStarterCost(),
+    stock: 1,
+    requirements: starterTitleRequirement(title.id),
+    rewards: [
+      {
+        type: 'title' as const,
+        targetId: title.id,
+        dropChance: 100,
+      },
+    ],
+  })),
+]
 
 export const palletTownShops: ShopConfig[] = [
   {
@@ -44,6 +312,7 @@ export const palletTownShops: ShopConfig[] = [
           },
         ],
       },
+      ...starterExclusiveShopItems,
       {
         id: 'trainer-gb-red',
         name: 'Red (Red)',
