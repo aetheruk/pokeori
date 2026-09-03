@@ -1,6 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 import type { ShopConfig } from '@/data/shops/types'
 import type { RequirementData } from '@/utilities/requirements'
+import { tasks } from '@/data/tasks'
+import { shops } from '@/data/shops'
 import {
   checkShopItemRequirements,
   checkShopRequirements,
@@ -58,5 +60,58 @@ describe('shop requirements', () => {
 
     expect(checkShopRequirements(data, shop)).toBe(true)
     expect(checkShopItemRequirements(data, shop, shop.items[0])).toBe(true)
+  })
+
+  test("Prof's Scrip Shop only exposes starter cosmetics the player missed", () => {
+    const shop = shops.find((entry) => entry.id === 'retro-trainer-cards')
+    const starterTasks = tasks.filter((task) => task.id.startsWith('starter-'))
+
+    expect(shop).toBeDefined()
+    expect(starterTasks).toHaveLength(27)
+    const starterIconItemIds = new Set(
+      starterTasks.flatMap((task) =>
+        task.rewards
+          .filter((reward) => reward.type === 'icon')
+          .map((reward) => `icon-${String(reward.targetId)}`),
+      ),
+    )
+
+    for (const starterTask of starterTasks) {
+      const data = {
+        ...baseRequirementData,
+        completedTasks: [
+          {
+            taskId: 'tutorial-16',
+            completedAt: new Date().toISOString(),
+            count: 1,
+          },
+          {
+            taskId: starterTask.id,
+            completedAt: new Date().toISOString(),
+            count: 1,
+          },
+        ],
+      } as RequirementData
+      const starterIconId = String(
+        starterTask.rewards.find((reward) => reward.type === 'icon')?.targetId,
+      )
+      const starterTitleId = String(
+        starterTask.rewards.find((reward) => reward.type === 'title')?.targetId,
+      )
+
+      for (const item of shop!.items.filter(
+        (entry) =>
+          starterIconItemIds.has(entry.id) ||
+          entry.id.startsWith('title-starter-'),
+      )) {
+        const expectedAvailable = starterIconItemIds.has(item.id)
+          ? item.id !== `icon-${starterIconId}`
+          : item.id !== `title-${starterTitleId}`
+
+        expect(checkShopItemRequirements(data, shop!, item)).toBe(
+          expectedAvailable,
+        )
+      }
+    }
   })
 })

@@ -1748,14 +1748,31 @@ describe('static data references', () => {
     const iconItems = scripShop?.items.filter((item) =>
       item.rewards.some((reward) => reward.type === 'icon'),
     )
+    const starterIconItemIds = tasks
+      .filter((task) => task.id.startsWith('starter-'))
+      .flatMap((task) =>
+        task.rewards
+          .filter((reward) => reward.type === 'icon')
+          .map((reward) => `icon-${String(reward.targetId)}`),
+      )
 
     expect(
-      iconItems?.map((item) => [
-        item.id,
-        item.name,
-        item.stock,
-        item.daily || false,
+      iconItems
+        ?.filter((item) => starterIconItemIds.includes(item.id))
+        .map((item) => [item.id, item.name, item.stock, item.daily || false]),
+    ).toEqual(
+      starterIconItemIds.map((id) => [
+        id,
+        `Icon: ${id.replace('icon-', '').replace(/^./, (letter) => letter.toUpperCase())}`,
+        1,
+        false,
       ]),
+    )
+
+    expect(
+      iconItems
+        ?.filter((item) => !starterIconItemIds.includes(item.id))
+        .map((item) => [item.id, item.name, item.stock, item.daily || false]),
     ).toEqual([
       ['trainer-gb-red', 'Red (Red)', 1, false],
       ['trainer-gb-blue', 'Blue (Red)', 1, false],
@@ -1765,6 +1782,76 @@ describe('static data references', () => {
       ['icon-rocket-m', 'Icon: Rocket Grunt (M)', 1, false],
       ['icon-rocket-f', 'Icon: Rocket Grunt (F)', 1, false],
     ])
+  })
+
+  test("Prof's Scrip Shop starter cosmetics use one-time 500-scrip purchases", () => {
+    const scripShop = shops.find((shop) => shop.id === 'retro-trainer-cards')
+    const starterTasks = tasks.filter((task) => task.id.startsWith('starter-'))
+    const starterIconItems = scripShop?.items.filter(
+      (item) =>
+        item.id.startsWith('icon-') &&
+        starterTasks.some((task) =>
+          task.rewards.some(
+            (reward) =>
+              reward.type === 'icon' &&
+              `icon-${String(reward.targetId)}` === item.id,
+          ),
+        ),
+    )
+    const starterTitleIds = Array.from(
+      new Set(
+        starterTasks.flatMap((task) =>
+          task.rewards
+            .filter((reward) => reward.type === 'title')
+            .map((reward) => String(reward.targetId)),
+        ),
+      ),
+    )
+    const starterTitleItems = scripShop?.items.filter((item) =>
+      starterTitleIds.includes(item.id.replace('title-', '')),
+    )
+
+    expect(starterIconItems).toHaveLength(starterTasks.length)
+    expect(starterTitleItems).toHaveLength(starterTitleIds.length)
+
+    for (const task of starterTasks) {
+      const reward = task.rewards.find((entry) => entry.type === 'icon')
+      const item = starterIconItems?.find(
+        (entry) => entry.id === `icon-${String(reward?.targetId)}`,
+      )
+
+      expect(item?.cost).toEqual([
+        { type: 'currency', id: 'prof-scrip', amount: 500 },
+      ])
+      expect(item?.stock).toBe(1)
+      expect(item?.daily || false).toBe(false)
+      expect(item?.requirements).toEqual([
+        { type: 'task_completed', targetId: task.id, inverse: true },
+      ])
+      expect(item?.rewards).toEqual([
+        {
+          type: 'icon',
+          targetId: reward?.targetId,
+          quantity: 1,
+          dropChance: 100,
+        },
+      ])
+    }
+
+    for (const titleId of starterTitleIds) {
+      const item = starterTitleItems?.find(
+        (entry) => entry.id === `title-${titleId}`,
+      )
+
+      expect(item?.cost).toEqual([
+        { type: 'currency', id: 'prof-scrip', amount: 500 },
+      ])
+      expect(item?.stock).toBe(1)
+      expect(item?.daily || false).toBe(false)
+      expect(item?.rewards).toEqual([
+        { type: 'title', targetId: titleId, dropChance: 100 },
+      ])
+    }
   })
 
   test("Prof's Scrip Shop prices and missed Nugget Bridge choice items are configured correctly", () => {
