@@ -1793,20 +1793,19 @@ function EggCard({
                   strokeDashoffset={progressOffset}
                 />
               </svg>
-              <div
-                className={cn(
-                  'absolute inset-5 flex items-center justify-center rounded-full bg-game-surface-raised',
-                  !ready && 'pokeori-egg-wobble',
-                )}
-                style={wobbleStyle}
-              >
-                <PokemonRarityEggSprite
-                  rarity={rarity}
-                  alt={isVariantEgg ? `${rarityEffect.label} Pokemon Egg` : 'Mystery Pokemon Egg'}
-                  className="h-36 w-36"
-                  imageClassName="h-full w-full"
-                  sizes="144px"
-                />
+              <div className="absolute inset-5 flex items-center justify-center rounded-full bg-game-surface-raised">
+                <div
+                  className={cn(!ready && 'pokeori-egg-wobble')}
+                  style={wobbleStyle}
+                >
+                  <PokemonRarityEggSprite
+                    rarity={rarity}
+                    alt={isVariantEgg ? `${rarityEffect.label} Pokemon Egg` : 'Mystery Pokemon Egg'}
+                    className="h-36 w-36"
+                    imageClassName="h-full w-full"
+                    sizes="144px"
+                  />
+                </div>
               </div>
             </div>
 

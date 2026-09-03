@@ -1,6 +1,6 @@
 # Current Game State
 
-- Unreleased: Pokémon Box egg dialogs now use a cleaner mystery-egg presentation without placeholder stat chips, with a circular warming countdown and progress bar. The waiting egg wobble accelerates and grows as hatch time approaches, while the full-screen hatch sequence now holds a smooth reveal state, adds an aggressive pre-flash wobble, and covers the complete viewport.
+- Unreleased: Pokémon Box egg dialogs now use a cleaner mystery-egg presentation without placeholder stat chips, with a circular warming countdown and progress bar. The waiting egg wobble accelerates and grows as hatch time approaches while its support disc stays still, and the full-screen hatch sequence now holds a smooth reveal state, adds an aggressive pre-flash wobble, and covers the complete viewport.
 
 - Spatial mini-games now share the `grid-puzzle` game mode. Authored entries select `settings.variant` (`rock-push`, `voltorb`, or `echo-map`) and render through the shared Grid Puzzle dispatcher. Existing activity result rows remain keyed by encounter id, so this development migration does not require a player-data rewrite.
 
