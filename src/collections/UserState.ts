@@ -169,6 +169,33 @@ export const UserAbilityDexEntries: CollectionConfig = {
   ],
 }
 
+export const UserSketchedMoves: CollectionConfig = {
+  slug: 'user-sketched-moves',
+  admin: {
+    useAsTitle: 'moveId',
+  },
+  access: serverOwnedAccess,
+  fields: [
+    {
+      name: 'user',
+      type: 'relationship',
+      relationTo: 'users',
+      required: true,
+      index: true,
+    },
+    {
+      name: 'moveId',
+      type: 'text',
+      required: true,
+      index: true,
+    },
+    {
+      name: 'firstSketchedAt',
+      type: 'date',
+    },
+  ],
+}
+
 export const UserTaskProgress: CollectionConfig = {
   slug: 'user-task-progress',
   admin: {

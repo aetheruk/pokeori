@@ -15,7 +15,11 @@ import {
 } from '@/utilities/skills/unlocks'
 import { getPokemonResearchLevel } from '@/utilities/research/research-levels'
 import { getUser, serializePokemon } from './utils'
-import { getUserInventoryMap, getUserPokedexMap } from '@/utilities/user-state'
+import {
+  getUserInventoryMap,
+  getUserPokedexMap,
+  getUserSketchedMoveIds,
+} from '@/utilities/user-state'
 
 export async function setAssignedMoves(pokemonId: string, moveIds: string[]) {
   const user = await getUser()
@@ -35,9 +39,10 @@ export async function setAssignedMoves(pokemonId: string, moveIds: string[]) {
   }
 
   const form = getPokemonForm(pokemon.formId)
-  const [inventory, pokedex] = await Promise.all([
+  const [inventory, pokedex, sketchedMoveIds] = await Promise.all([
     getUserInventoryMap(payload as any, user.id),
     getUserPokedexMap(payload as any, user.id),
+    getUserSketchedMoveIds(payload as any, user.id),
   ])
   const researcherLevel = getSkillLevel(user.skills, 'researching')
   const maxAssignedMoves = getResearcherMoveSlotCount(researcherLevel)
@@ -67,6 +72,7 @@ export async function setAssignedMoves(pokemonId: string, moveIds: string[]) {
     pokemonFormId: pokemon.formId,
     pokemonLevel: pokemon.level,
     inventory,
+    sketchedMoveIds,
     maxAssignedMoves,
   })
 

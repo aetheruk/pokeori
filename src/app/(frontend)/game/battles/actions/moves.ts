@@ -19,7 +19,10 @@ import type { BattleState } from '@/utilities/battle/types'
 import type { User } from '@/payload-types'
 import { getUser } from '../helpers/user'
 import { getActiveBattleState } from '../helpers/state-management'
-import { getUserInventoryMap } from '@/utilities/user-state'
+import {
+  getUserInventoryMap,
+  getUserSketchedMoveIds,
+} from '@/utilities/user-state'
 
 /**
  * Get available moves for a Pokemon based on form and level.
@@ -70,12 +73,13 @@ export async function getAvailableMoves(
     })
   }
 
+  const payload = await getPayload({ config: configPromise })
   const userInventory = state?.chronicle
     ? state.chronicleInventory || {}
-    : await getUserInventoryMap(
-        (await getPayload({ config: configPromise })) as any,
-        user.id,
-      )
+    : await getUserInventoryMap(payload as any, user.id)
+  const sketchedMoveIds = state?.chronicle
+    ? []
+    : await getUserSketchedMoveIds(payload as any, user.id)
 
   if (assignedMoves !== undefined) {
     const researcherLevel = getSkillLevel(user.skills, 'researching')
@@ -88,6 +92,7 @@ export async function getAvailableMoves(
       pokemonFormId: activeMon?.formId || pokemonFormId,
       pokemonLevel: battleLevel,
       inventory: userInventory,
+      sketchedMoveIds,
       maxAssignedMoves: isChronicle
         ? undefined
         : getResearcherMoveSlotCount(researcherLevel),
@@ -102,5 +107,6 @@ export async function getAvailableMoves(
     pokemonFormId,
     pokemonLevel,
     inventory: userInventory,
+    sketchedMoveIds,
   })
 }

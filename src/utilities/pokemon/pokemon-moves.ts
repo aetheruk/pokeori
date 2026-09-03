@@ -5,6 +5,7 @@ import type { BattleAiProfileId } from '@/data/types'
 import { selectBattleMoveLoadoutFromCandidates } from '@/utilities/battle/enemy-ai'
 import type { BattlePokemon } from '@/utilities/battle/types'
 import { MAX_RESEARCHER_MOVE_SLOTS } from '@/utilities/skills/unlocks'
+import { isSmeargle } from '@/utilities/pokemon/sketch'
 
 export const MAX_ASSIGNED_MOVES = MAX_RESEARCHER_MOVE_SLOTS
 
@@ -71,6 +72,7 @@ export function canPokemonUseMove(params: {
   pokemonFormId?: string | null
   pokemonLevel?: number | null
   inventory?: Record<string, number>
+  sketchedMoveIds?: string[]
   enforceLevel?: boolean
 }): boolean {
   const {
@@ -78,17 +80,28 @@ export function canPokemonUseMove(params: {
     pokemonFormId,
     pokemonLevel,
     inventory = {},
+    sketchedMoveIds = [],
     enforceLevel = false,
   } = params
   if (move.aiOnly || move.manualOnly) return false
 
   const tmItem = items.find((item) => item.moveId === move.id)
-  const isAvailable = tmItem ? (inventory[tmItem.id] || 0) > 0 : false
+  const isSketchedMove =
+    isSmeargle(pokemonFormId) && sketchedMoveIds.includes(move.id)
+  const isAvailable = isSketchedMove || (tmItem ? (inventory[tmItem.id] || 0) > 0 : false)
   if (!isAvailable) return false
 
-  if (move.formId && move.formId.length > 0) {
+  if (!isSketchedMove && move.formId && move.formId.length > 0) {
     if (!pokemonFormId) return false
     if (!move.formId.includes(pokemonFormId)) return false
+  }
+
+  if (
+    !isSketchedMove &&
+    pokemonFormId &&
+    move.excludedFormIds?.some((formId) => String(formId) === String(pokemonFormId))
+  ) {
+    return false
   }
 
   if (enforceLevel && move.level) {
@@ -104,6 +117,7 @@ export function getAvailableMoveOptions(params: {
   pokemonFormId?: string | null
   pokemonLevel?: number | null
   inventory?: Record<string, number>
+  sketchedMoveIds?: string[]
   enforceLevel?: boolean
 }): PokemonMoveOption[] {
   const {
@@ -111,6 +125,7 @@ export function getAvailableMoveOptions(params: {
     pokemonFormId,
     pokemonLevel,
     inventory,
+    sketchedMoveIds,
     enforceLevel = false,
   } = params
 
@@ -122,6 +137,7 @@ export function getAvailableMoveOptions(params: {
         pokemonFormId,
         pokemonLevel,
         inventory,
+        sketchedMoveIds,
         enforceLevel,
       }),
     )
@@ -134,6 +150,7 @@ export function getAssignedMoveOptions(params: {
   pokemonFormId?: string | null
   pokemonLevel?: number | null
   inventory?: Record<string, number>
+  sketchedMoveIds?: string[]
   maxAssignedMoves?: number
   allowUnavailableMoves?: boolean
 }): PokemonMoveOption[] {
@@ -154,6 +171,7 @@ export function getAssignedMoveOptions(params: {
         pokemonFormId: params.pokemonFormId,
         pokemonLevel: params.pokemonLevel,
         inventory: params.inventory,
+        sketchedMoveIds: params.sketchedMoveIds,
         enforceLevel: false,
       })
     ) {
@@ -169,6 +187,7 @@ export function getBattleMoveOptions(params: {
   pokemonFormId?: string | null
   pokemonLevel?: number | null
   inventory?: Record<string, number>
+  sketchedMoveIds?: string[]
   maxAssignedMoves?: number
   allowUnavailableAssignedMoves?: boolean
   pokemon?: BattlePokemon
@@ -181,6 +200,7 @@ export function getBattleMoveOptions(params: {
     pokemonFormId: params.pokemonFormId,
     pokemonLevel: params.pokemonLevel,
     inventory: params.inventory,
+    sketchedMoveIds: params.sketchedMoveIds,
     maxAssignedMoves,
     allowUnavailableMoves: params.allowUnavailableAssignedMoves,
   })
@@ -195,6 +215,7 @@ export function getBattleMoveOptions(params: {
     pokemonFormId: params.pokemonFormId,
     pokemonLevel: params.pokemonLevel,
     inventory: params.inventory,
+    sketchedMoveIds: params.sketchedMoveIds,
     // Player-selected moves may ignore authored learn levels, but an empty
     // slot should not silently auto-equip a late-game move.
     enforceLevel: true,
@@ -224,6 +245,7 @@ export function validateAssignedMoveIds(params: {
   pokemonFormId?: string | null
   pokemonLevel?: number | null
   inventory?: Record<string, number>
+  sketchedMoveIds?: string[]
   maxAssignedMoves?: number
 }): { success: true; moveIds: string[] } | { success: false; error: string } {
   const moveIds = normalizeAssignedMoveIds(params.moveIds)
@@ -239,6 +261,7 @@ export function validateAssignedMoveIds(params: {
       pokemonFormId: params.pokemonFormId,
       pokemonLevel: params.pokemonLevel,
       inventory: params.inventory,
+      sketchedMoveIds: params.sketchedMoveIds,
     }).map((move) => move.id),
   )
 

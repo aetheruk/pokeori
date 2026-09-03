@@ -51,7 +51,15 @@ import {
   applyStanceDisable,
   getDisabledStanceMessage,
 } from '@/utilities/battle/stance-disable'
-import { getUserInventoryMap } from '@/utilities/user-state'
+import {
+  getUserInventoryMap,
+  getUserSketchedMoveIds,
+  registerUserSketchedMove,
+} from '@/utilities/user-state'
+import {
+  attemptSmeargleSketch,
+  SKETCH_MOVE_ID,
+} from '@/utilities/pokemon/sketch'
 import {
   needsPlayerLeadSelection,
   needsPlayerReplacement,
@@ -428,12 +436,12 @@ export async function useMove(
       } else {
         // Backward compatibility for battles created before move loadouts were
         // snapshotted into battle state.
+        const payload = state.chronicle
+          ? undefined
+          : await getPayload({ config: configPromise })
         if (!state.chronicle) {
-          userInventory = await timer.time('loadInventory', async () =>
-            getUserInventoryMap(
-              (await getPayload({ config: configPromise })) as any,
-              user.id,
-            ),
+          userInventory = await timer.time('loadInventory', () =>
+            getUserInventoryMap(payload as any, user.id),
           )
         }
 
@@ -444,6 +452,9 @@ export async function useMove(
           pokemonFormId: playerMon.formId,
           pokemonLevel: playerMon.level,
           inventory: userInventory,
+          sketchedMoveIds: payload
+            ? await getUserSketchedMoveIds(payload as any, user.id)
+            : [],
           maxAssignedMoves: state.chronicle
             ? undefined
             : getResearcherMoveSlotCount(researcherLevel),
@@ -2377,6 +2388,35 @@ export async function useMove(
     }
 
     const moveSucceeded = !moveMissed && !moveFailed && !continuousInterrupted
+    if (moveSucceeded && move.id === SKETCH_MOVE_ID) {
+      const payload = await getPayload({ config: configPromise })
+      const existingSketchedMoveIds = await getUserSketchedMoveIds(
+        payload as any,
+        user.id,
+      )
+      const sketchedMoveId = attemptSmeargleSketch({
+        attacker: playerMon,
+        opponent: enemyMon,
+        alreadySketchedMoveIds: existingSketchedMoveIds,
+      })
+
+      if (sketchedMoveId) {
+        try {
+          const registration = await registerUserSketchedMove(
+            payload as any,
+            user.id,
+            sketchedMoveId,
+          )
+          if (registration.isNew) {
+            const { getMove } = await import('@/data/moves')
+            const sketchedMove = getMove(sketchedMoveId)
+            message += `\n${playerMon.name} sketched ${sketchedMove?.name || sketchedMoveId}! It is now available to every Smeargle on your account.`
+          }
+        } catch (error) {
+          logger.error('Failed to persist Smeargle Sketch unlock', error)
+        }
+      }
+    }
     if (moveSucceeded) {
       const rageMessages = applyMoveOnUserDamagedSameTurnEffects({
         move,

@@ -34,11 +34,11 @@ export const GAME_DATA_SCOPE_KEYS: Record<GameDataScope, GameDataKeys[]> = {
   core: ['storyState'],
   trainer: ['inventory'],
   'trainer-collection': TRAINER_COLLECTION_KEYS,
-  'pokemon-box': ['inventory', 'pokedex'],
+  'pokemon-box': ['inventory', 'pokedex', 'sketchedMoves'],
   inventory: ['inventory', 'pokedex', 'gameResults'],
   tcg: ['inventory', 'tcg'],
   pokedex: ['inventory', 'pokedex'],
-  movedex: ['inventory'],
+  movedex: ['inventory', 'pokedex', 'sketchedMoves'],
   abilitydex: ['abilityDex'],
   explore: [
     'pokemon',

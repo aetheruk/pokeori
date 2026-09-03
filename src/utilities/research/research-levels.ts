@@ -41,6 +41,14 @@ function canResearchFormUseTm(itemId: string, formId: string): boolean {
   const move = getMove(item.moveId)
   if (!move) return false
 
+  if (
+    move.excludedFormIds?.some(
+      (excludedFormId) => String(excludedFormId) === formId,
+    )
+  ) {
+    return false
+  }
+
   return move.formId?.some((candidateFormId) => String(candidateFormId) === formId) ?? false
 }
 

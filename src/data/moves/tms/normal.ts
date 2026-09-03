@@ -4,6 +4,16 @@ import pokemonData, { type PokemonData } from '@/data/pokemon-data'
 const ALL_POKEMON_FORM_IDS = (pokemonData as PokemonData).flatMap((species) =>
   species.forms.map((form) => form.id),
 )
+const UNIVERSAL_MOVE_EXCEPTION_SPECIES_IDS = new Set([132, 235, 201])
+const UNIVERSAL_MOVE_EXCLUDED_FORM_IDS = (pokemonData as PokemonData)
+  .filter((species) => UNIVERSAL_MOVE_EXCEPTION_SPECIES_IDS.has(species.id))
+  .flatMap((species) => species.forms.map((form) => form.id))
+
+// These moves are authored for every form except species whose defining move
+// mechanics make the universal stat-contest moves inappropriate.
+const UNIVERSAL_MOVE_FORM_IDS = ALL_POKEMON_FORM_IDS.filter(
+  (formId) => !UNIVERSAL_MOVE_EXCLUDED_FORM_IDS.includes(formId),
+)
 
 export const NORMAL_TM_MOVES: MoveConfig[] = [
   {
@@ -676,7 +686,8 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
         message: '{attacker} was not faster, so {move} failed!',
       },
     },
-    formId: ALL_POKEMON_FORM_IDS,
+    formId: UNIVERSAL_MOVE_FORM_IDS,
+    excludedFormIds: UNIVERSAL_MOVE_EXCLUDED_FORM_IDS,
   },
   {
     id: 'slow-strike',
@@ -705,7 +716,8 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
         message: '{attacker} was not slower, so {move} failed!',
       },
     },
-    formId: ALL_POKEMON_FORM_IDS,
+    formId: UNIVERSAL_MOVE_FORM_IDS,
+    excludedFormIds: UNIVERSAL_MOVE_EXCLUDED_FORM_IDS,
   },
   {
     id: 'mighty-charge',
@@ -734,7 +746,8 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
         message: '{attacker} was not stronger, so {move} failed!',
       },
     },
-    formId: ALL_POKEMON_FORM_IDS,
+    formId: UNIVERSAL_MOVE_FORM_IDS,
+    excludedFormIds: UNIVERSAL_MOVE_EXCLUDED_FORM_IDS,
   },
   {
     id: 'accidental-tap',
@@ -763,7 +776,8 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
         message: '{attacker} was not weaker, so {move} failed!',
       },
     },
-    formId: ALL_POKEMON_FORM_IDS,
+    formId: UNIVERSAL_MOVE_FORM_IDS,
+    excludedFormIds: UNIVERSAL_MOVE_EXCLUDED_FORM_IDS,
   },
   {
     id: 'cunning-trap',
@@ -792,7 +806,8 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
         message: '{attacker} was not cleverer, so {move} failed!',
       },
     },
-    formId: ALL_POKEMON_FORM_IDS,
+    formId: UNIVERSAL_MOVE_FORM_IDS,
+    excludedFormIds: UNIVERSAL_MOVE_EXCLUDED_FORM_IDS,
   },
   {
     id: 'play-dumb',
@@ -821,7 +836,8 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
         message: '{attacker} was not less clever, so {move} failed!',
       },
     },
-    formId: ALL_POKEMON_FORM_IDS,
+    formId: UNIVERSAL_MOVE_FORM_IDS,
+    excludedFormIds: UNIVERSAL_MOVE_EXCLUDED_FORM_IDS,
   },
   /*
   {
@@ -26761,7 +26777,7 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
   {
     id: 'sketch',
     name: 'Sketch',
-    description: "The user sketches the target's last move.",
+    description: "The user studies one of the target's battle moves. It has a 25% chance to permanently copy that move for every Smeargle on the account.",
     stance: 'tech',
     target: 'enemy',
     forcedType: 'normal',

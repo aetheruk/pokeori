@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/dialog'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { SectionDivider } from '@/components/ui/section-divider'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useUser } from '@/context/UserContext'
 import type { MoveConfig } from '@/data/moves/types'
 import { usePokedex } from '@/hooks/usePokedex'
@@ -71,14 +72,18 @@ type PokedexProgressByForm = Record<
   }
 >
 
+type MoveDexView = 'tms' | 'sketched'
+
 export default function MoveDexPage() {
   const { gameData, refreshUser } = useUser()
   const { entriesByForm } = usePokedex()
   const [isRecovering, startRecovery] = useTransition()
+  const [selectedView, setSelectedView] = useState<MoveDexView>('tms')
   const [selectedMoveType, setSelectedMoveType] = useState<string>('all')
   const [selectedMove, setSelectedMove] = useState<{
     entry: MoveDexEntry
     isKnown: boolean
+    isSketched: boolean
   } | null>(null)
 
   const inventory = useMemo(
@@ -94,6 +99,35 @@ export default function MoveDexPage() {
         .length,
     [inventory],
   )
+  const sketchedMoveIds = useMemo(
+    () => new Set(gameData?.sketchedMoves || []),
+    [gameData?.sketchedMoves],
+  )
+  const sketchedMoveEntries = useMemo(
+    () =>
+      ALL_MOVE_DEX_ENTRIES.filter((entry) => sketchedMoveIds.has(entry.move.id)),
+    [sketchedMoveIds],
+  )
+  const smeargleResearchLevel = useMemo(
+    () =>
+      Math.max(
+        0,
+        ...(gameData?.pokedex || [])
+          .filter((entry) => String(entry.formId) === '235')
+          .map((entry) => Number(entry.researchLevel || 0)),
+      ),
+    [gameData?.pokedex],
+  )
+  const canViewSketchedMoves = smeargleResearchLevel >= 1
+  const viewOptions = useMemo(
+    () => [
+      { id: 'tms', label: 'TM library' },
+      ...(canViewSketchedMoves
+        ? [{ id: 'sketched', label: `Sketched (${sketchedMoveEntries.length})` }]
+        : []),
+    ],
+    [canViewSketchedMoves, sketchedMoveEntries.length],
+  )
   const typeOptions = useMemo(() => {
     const types = Array.from(
       new Set(ALL_MOVE_DEX_ENTRIES.map((entry) => entry.moveType)),
@@ -107,14 +141,24 @@ export default function MoveDexPage() {
     ]
   }, [])
   const filteredMoves = useMemo(
-    () =>
-      selectedMoveType === 'all'
-        ? ALL_MOVE_DEX_ENTRIES
-        : ALL_MOVE_DEX_ENTRIES.filter(
-            (entry) => entry.moveType === selectedMoveType,
-          ),
-    [selectedMoveType],
+    () => {
+      const sourceEntries =
+        selectedView === 'sketched'
+          ? sketchedMoveEntries
+          : ALL_MOVE_DEX_ENTRIES
+      return selectedMoveType === 'all'
+        ? sourceEntries
+        : sourceEntries.filter((entry) => entry.moveType === selectedMoveType)
+    },
+    [selectedMoveType, selectedView, sketchedMoveEntries],
   )
+
+  const handleViewChange = (value: string) => {
+    if (value !== 'tms' && value !== 'sketched') return
+    if (value === 'sketched' && !canViewSketchedMoves) return
+    setSelectedView(value)
+    setSelectedMoveType('all')
+  }
 
   const handleRecoverLostTms = () => {
     startRecovery(async () => {
@@ -142,10 +186,31 @@ export default function MoveDexPage() {
     <div className="game-paper-first game-paper-background flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
       <PremiumHeader
         title="MoveDex"
-        subtitle={`${ownedMoveCount} / ${ALL_MOVE_DEX_ENTRIES.length}`}
+        subtitle={
+          selectedView === 'sketched'
+            ? `${sketchedMoveEntries.length} sketched`
+            : `${ownedMoveCount} / ${ALL_MOVE_DEX_ENTRIES.length}`
+        }
       />
 
       <div className="hidden items-center gap-3 border-b border-game-border bg-game-surface/70 px-6 py-3 xl:flex">
+        <Tabs
+          value={selectedView}
+          onValueChange={handleViewChange}
+          className="shrink-0"
+        >
+          <TabsList className="h-11">
+            <TabsTrigger value="tms">TM library</TabsTrigger>
+            {canViewSketchedMoves && (
+              <TabsTrigger value="sketched">
+                Sketched
+                <Badge className="ml-1 border-game-ochre/30 bg-game-ochre/10 px-1.5 py-0 text-[10px] text-game-ochre-strong">
+                  {sketchedMoveEntries.length}
+                </Badge>
+              </TabsTrigger>
+            )}
+          </TabsList>
+        </Tabs>
         <div className="w-64 shrink-0">
           <PremiumSelect
             value={selectedMoveType}
@@ -172,53 +237,84 @@ export default function MoveDexPage() {
               </div>
               <div className="flex items-center gap-2" title="Total">
                 <span className="text-[11px] font-black uppercase tracking-normal text-game-muted">
-                  Total
+                  {selectedView === 'sketched' ? 'Moves' : 'Total'}
                 </span>
                 <span className="font-mono text-sm font-bold text-game-ink">
-                  {ALL_MOVE_DEX_ENTRIES.length}
+                  {selectedView === 'sketched'
+                    ? sketchedMoveEntries.length
+                    : ALL_MOVE_DEX_ENTRIES.length}
                 </span>
               </div>
-              <Button
-                type="button"
-                size="sm"
-                variant="secondary"
-                onClick={handleRecoverLostTms}
-                disabled={isRecovering}
-                aria-busy={isRecovering}
-                className="ml-auto min-h-11"
-              >
-                <RotateCcw
-                  className={cn('h-3.5 w-3.5', isRecovering && 'animate-spin')}
-                />
-                {isRecovering ? 'Recovering' : "Recover Lost TM's"}
-              </Button>
+              {selectedView === 'tms' && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  onClick={handleRecoverLostTms}
+                  disabled={isRecovering}
+                  aria-busy={isRecovering}
+                  className="ml-auto min-h-11"
+                >
+                  <RotateCcw
+                    className={cn('h-3.5 w-3.5', isRecovering && 'animate-spin')}
+                  />
+                  {isRecovering ? 'Recovering' : "Recover Lost TM's"}
+                </Button>
+              )}
             </div>
           </SectionDivider>
         </div>
 
-        <div className="grid gap-2 lg:grid-cols-2 2xl:grid-cols-3 pb-8">
-          {filteredMoves.map((entry) => {
-            const isKnown = (inventory[entry.itemId] || 0) > 0
-            return (
-              <MoveDexListItem
-                key={entry.itemId}
-                entry={entry}
-                isKnown={isKnown}
-                onSelect={() => {
-                  setSelectedMove({ entry, isKnown })
-                }}
-              />
-            )
-          })}
-        </div>
+        {filteredMoves.length > 0 ? (
+          <div className="grid gap-2 pb-8 lg:grid-cols-2 2xl:grid-cols-3">
+            {filteredMoves.map((entry) => {
+              const isSketched = selectedView === 'sketched'
+              const isKnown = isSketched || (inventory[entry.itemId] || 0) > 0
+              return (
+                <MoveDexListItem
+                  key={entry.itemId}
+                  entry={entry}
+                  isKnown={isKnown}
+                  isSketched={isSketched}
+                  onSelect={() => {
+                    setSelectedMove({ entry, isKnown, isSketched })
+                  }}
+                />
+              )
+            })}
+          </div>
+        ) : (
+          <div className="game-panel mb-8 flex min-h-48 items-center justify-center p-6 text-center">
+            <div className="max-w-md">
+              <CircleHelp className="mx-auto h-8 w-8 text-game-ochre" />
+              <h2 className="mt-3 font-display text-lg text-game-ink">
+                {selectedView === 'sketched'
+                  ? 'No moves sketched yet'
+                  : 'No moves match this filter'}
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-game-muted">
+                {selectedView === 'sketched'
+                  ? 'Use Sketch with Smeargle in battle. A successful copy becomes a permanent move option for every Smeargle on your account.'
+                  : 'Try choosing a different move type.'}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       <SecondaryControlBar className="xl:hidden">
-        <PremiumSelect
-          value={selectedMoveType}
-          onValueChange={setSelectedMoveType}
-          options={typeOptions}
-        />
+        <div className="grid gap-2 sm:grid-cols-2">
+          <PremiumSelect
+            value={selectedView}
+            onValueChange={handleViewChange}
+            options={viewOptions}
+          />
+          <PremiumSelect
+            value={selectedMoveType}
+            onValueChange={setSelectedMoveType}
+            options={typeOptions}
+          />
+        </div>
       </SecondaryControlBar>
 
       <Dialog
@@ -238,7 +334,9 @@ export default function MoveDexPage() {
             </DialogTitle>
             <DialogDescription>
               {selectedMove?.isKnown
-                ? `TM Type: ${getMoveTypeLabel(selectedMove.entry.moveType)}`
+                ? selectedMove.isSketched
+                  ? 'Sketched move · available to every Smeargle'
+                  : `TM Type: ${getMoveTypeLabel(selectedMove.entry.moveType)}`
                 : 'A clue has been added to your MoveDex.'}
             </DialogDescription>
           </DialogHeader>
@@ -249,6 +347,7 @@ export default function MoveDexPage() {
               <MoveDexLearnerList
                 move={selectedMove.entry.move}
                 entriesByForm={entriesByForm}
+                isSketched={selectedMove.isSketched}
               />
             </div>
           )}
@@ -281,10 +380,12 @@ export default function MoveDexPage() {
 function MoveDexListItem({
   entry,
   isKnown,
+  isSketched,
   onSelect,
 }: {
   entry: MoveDexEntry
   isKnown: boolean
+  isSketched: boolean
   onSelect: () => void
 }) {
   const stanceConfig = STANCE_ICON_CONFIG[entry.move.stance]
@@ -360,11 +461,13 @@ function MoveDexListItem({
         className={cn(
           'ml-auto shrink-0 border px-2.5 py-1 font-mono text-[10px] font-black uppercase tracking-normal',
           isKnown
-            ? 'border-game-moss/25 bg-game-moss/10 text-game-moss-strong'
+            ? isSketched
+              ? 'border-game-ochre/30 bg-game-ochre/10 text-game-ochre-strong'
+              : 'border-game-moss/25 bg-game-moss/10 text-game-moss-strong'
             : 'border-game-border bg-game-canvas text-game-muted',
         )}
       >
-        {isKnown ? 'Known' : '???'}
+        {isSketched ? 'Sketched' : isKnown ? 'Known' : '???'}
       </Badge>
     </button>
   )
@@ -461,9 +564,11 @@ function MoveDexMoveSummary({ move }: { move: MoveConfig }) {
 function MoveDexLearnerList({
   move,
   entriesByForm,
+  isSketched,
 }: {
   move: MoveConfig
   entriesByForm: PokedexProgressByForm
+  isSketched: boolean
 }) {
   const { learners, allPokemon } = useMemo(
     () => getMoveLearnersForMove(move),
@@ -474,7 +579,12 @@ function MoveDexLearnerList({
     <div className="space-y-4">
       <SectionDivider>Can learn</SectionDivider>
       <div className="game-panel p-3">
-        {allPokemon ? (
+        {isSketched ? (
+          <p className="text-sm text-game-ink">
+            Every Smeargle can use this sketched move. It is unlocked at the
+            account level and does not require owning its TM.
+          </p>
+        ) : allPokemon ? (
           <p className="text-sm text-game-ink">
             All Pokemon can use this move.
           </p>

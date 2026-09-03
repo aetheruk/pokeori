@@ -13,6 +13,7 @@ export const USER_STATE_COLLECTIONS = {
   inventory: 'user-inventory-items',
   pokedex: 'user-pokedex-entries',
   abilityDex: 'user-abilitydex-entries',
+  sketchedMoves: 'user-sketched-moves',
   tasks: 'user-task-progress',
   activityStats: 'user-activity-stats',
   tcg: 'user-tcg-cards',
@@ -34,6 +35,7 @@ export type UserStateDomain =
   | 'inventory'
   | 'pokedex'
   | 'abilityDex'
+  | 'sketchedMoves'
   | 'completedTasks'
   | 'battleResults'
   | 'locationEncounterResults'
@@ -49,6 +51,7 @@ type UserStateData = Pick<
   | 'tcg'
   | 'pokedex'
   | 'abilityDex'
+  | 'sketchedMoves'
   | 'completedTasks'
   | 'battleResults'
   | 'locationEncounterResults'
@@ -86,6 +89,7 @@ export type CompletedTasksMap = Record<
 export type PokedexMapEntry = Omit<PokedexEntry, 'speciesId' | 'formId'>
 export type PokedexMap = Record<string, Record<string, PokedexMapEntry>>
 export type AbilityDexMap = Record<string, AbilityDexEntry>
+export type SketchedMoveIds = string[]
 export type ShopPurchasesRecord = NonNullable<RequirementData['shopPurchases']>
 export type ActivityStatEntry = {
   wins?: number
@@ -433,6 +437,16 @@ export function abilityDexArrayToMap(
     entries
       .filter((entry) => entry.abilityId)
       .map((entry) => [entry.abilityId, entry]),
+  )
+}
+
+export function sketchedMoveRowsToArray(rows: any[]): SketchedMoveIds {
+  return Array.from(
+    new Set(
+      rows
+        .map((row) => String(row.moveId || '').trim())
+        .filter(Boolean),
+    ),
   )
 }
 
@@ -856,6 +870,56 @@ export async function getUserAbilityDexMap(
   )
 }
 
+export async function getUserSketchedMoveIds(
+  payload: PayloadLike,
+  userId: string,
+  options: UserStateOperationOptions = {},
+): Promise<SketchedMoveIds> {
+  return sketchedMoveRowsToArray(
+    await findRows(
+      payload,
+      USER_STATE_COLLECTIONS.sketchedMoves,
+      userId,
+      [],
+      { moveId: true },
+      options.req,
+    ),
+  )
+}
+
+export async function registerUserSketchedMove(
+  payload: PayloadLike,
+  userId: string,
+  moveId: string | null | undefined,
+  options: UserStateOperationOptions = {},
+): Promise<{ unlocked: boolean; isNew: boolean }> {
+  const normalizedMoveId = String(moveId || '').trim()
+  if (!normalizedMoveId) return { unlocked: false, isNew: false }
+
+  const existing = await findRows(
+    payload,
+    USER_STATE_COLLECTIONS.sketchedMoves,
+    userId,
+    [{ moveId: { equals: normalizedMoveId } }],
+    { moveId: true },
+    options.req,
+  )
+  if (existing[0]) return { unlocked: true, isNew: false }
+
+  await payload.create({
+    collection: USER_STATE_COLLECTIONS.sketchedMoves,
+    data: {
+      user: userId,
+      moveId: normalizedMoveId,
+      firstSketchedAt: new Date().toISOString(),
+    },
+    overrideAccess: true,
+    ...(options.req ? { req: options.req } : {}),
+  })
+
+  return { unlocked: true, isNew: true }
+}
+
 export async function setUserPokedexMap(
   payload: PayloadLike,
   userId: string,
@@ -1131,6 +1195,7 @@ export async function getUserStateData(
     inventoryRows,
     pokedexRows,
     abilityDexRows,
+    sketchedMoveRows,
     taskRows,
     activityRows,
     tcgRows,
@@ -1165,6 +1230,11 @@ export async function getUserStateData(
           source: true,
           firstRegisteredAt: true,
           createdAt: true,
+        }, options.req)
+      : Promise.resolve([]),
+    hasRequiredKey(requiredData, 'sketchedMoves')
+      ? findRows(payload, USER_STATE_COLLECTIONS.sketchedMoves, user.id, [], {
+          moveId: true,
         }, options.req)
       : Promise.resolve([]),
     hasRequiredKey(requiredData, 'completedTasks')
@@ -1231,6 +1301,8 @@ export async function getUserStateData(
     result.pokedex = pokedexRowsToArray(pokedexRows)
   if (hasRequiredKey(requiredData, 'abilityDex'))
     result.abilityDex = abilityDexRowsToArray(abilityDexRows)
+  if (hasRequiredKey(requiredData, 'sketchedMoves'))
+    result.sketchedMoves = sketchedMoveRowsToArray(sketchedMoveRows)
   if (hasRequiredKey(requiredData, 'completedTasks'))
     result.completedTasks = taskRowsToArray(taskRows)
   if (hasRequiredKey(requiredData, 'battleResults'))

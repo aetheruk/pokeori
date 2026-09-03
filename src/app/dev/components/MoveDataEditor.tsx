@@ -819,10 +819,14 @@ function normalizeFormIds(formIds: string[] | undefined, allFormIds: Set<string>
 
 function normalizeMoveForEditor(move: MoveConfig): MoveConfig {
   const formId = move.formId ? Array.from(new Set(move.formId.map((id) => id.toString()).filter(Boolean))) : []
+  const excludedFormIds = move.excludedFormIds
+    ? Array.from(new Set(move.excludedFormIds.map((id) => id.toString()).filter(Boolean)))
+    : []
 
   return {
     ...move,
     formId,
+    excludedFormIds,
     interruptEnemyMove: normalizeInterruptEnemyMoveChanceValue(move.interruptEnemyMove),
     status: move.status
       ? {
@@ -840,11 +844,13 @@ function normalizeMoveForEditor(move: MoveConfig): MoveConfig {
 
 function normalizeMoveForSave(move: MoveConfig, allFormIds: Set<string>): MoveConfig {
   const formId = normalizeFormIds(move.formId, allFormIds)
+  const excludedFormIds = normalizeFormIds(move.excludedFormIds, allFormIds)
 
   return {
     ...move,
     id: move.id,
     formId: formId.length ? formId : undefined,
+    excludedFormIds: excludedFormIds.length ? excludedFormIds : undefined,
     absorb: normalizePercentValue(move.absorb),
     interruptEnemyMove: normalizeInterruptEnemyMoveChanceValue(move.interruptEnemyMove),
   }
@@ -1036,6 +1042,13 @@ export function MoveDataEditor() {
       for (const formId of targetFormIds) {
         const normalizedFormId = formId.toString()
         if (!allFormIds.has(normalizedFormId)) continue
+        if (
+          move.excludedFormIds?.some(
+            (excludedFormId) => String(excludedFormId) === normalizedFormId,
+          )
+        ) {
+          continue
+        }
         const moveIds = moveIdsByFormId.get(normalizedFormId) ?? new Set<string>()
         moveIds.add(move.id)
         moveIdsByFormId.set(normalizedFormId, moveIds)

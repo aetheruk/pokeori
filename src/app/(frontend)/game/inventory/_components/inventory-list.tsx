@@ -278,6 +278,13 @@ function getMoveLearners(move: MoveConfig): {
   for (const species of pokemonData as PokemonData) {
     for (const form of species.forms) {
       if (!allowedForms.has(String(form.id))) continue
+      if (
+        move.excludedFormIds?.some(
+          (excludedFormId) => String(excludedFormId) === String(form.id),
+        )
+      ) {
+        continue
+      }
       learners.push({ species, form })
     }
   }

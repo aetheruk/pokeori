@@ -47,7 +47,11 @@ import {
   persistPokemonBattleKOs,
   recordPokemonKO,
 } from '../helpers/pokemon-ko-credit'
-import { incrementUserActivityResult } from '@/utilities/user-state'
+import {
+  getUserSketchedMoveIds,
+  incrementUserActivityResult,
+  registerUserSketchedMove,
+} from '@/utilities/user-state'
 import { getEffectiveBattleSpeed } from '@/utilities/battle/battle-logic'
 import {
   activateZMoveCharge,
@@ -67,6 +71,10 @@ import {
   finalizeBattlePresentation,
 } from '@/utilities/battle/presentation'
 import { processTerrainTurnEffects } from '@/utilities/battle/terrain-effects'
+import {
+  attemptSmeargleSketch,
+  SKETCH_MOVE_ID,
+} from '@/utilities/pokemon/sketch'
 
 export interface PvpMove {
   stance: BattleStance
@@ -518,6 +526,62 @@ export async function resolvePvpTurn(
         pokemon: p2Mon,
         attackType: p2Resolution.usedType,
       })
+    }
+  }
+
+  const sketchAttempts = [
+    {
+      attacker: p1Mon,
+      opponent: p2Mon,
+      userId: p1Id,
+      moveId: p1Move.specialMoveId,
+      didAttack: p1Resolution.didAttack && !!p1Resolution.usedType,
+    },
+    {
+      attacker: p2Mon,
+      opponent: p1Mon,
+      userId: p2Id,
+      moveId: p2Move.specialMoveId,
+      didAttack: p2Resolution.didAttack && !!p2Resolution.usedType,
+    },
+  ].filter(
+    (attempt) => attempt.didAttack && attempt.moveId === SKETCH_MOVE_ID,
+  )
+
+  if (sketchAttempts.length > 0) {
+    const payload = shouldPersist
+      ? await getPayload({ config: configPromise })
+      : undefined
+    const existingByUser = new Map<string, string[]>()
+
+    for (const attempt of sketchAttempts) {
+      const existing = existingByUser.get(attempt.userId) ??
+        (payload
+          ? await getUserSketchedMoveIds(payload as any, attempt.userId)
+          : [])
+      existingByUser.set(attempt.userId, existing)
+      const sketchedMoveId = attemptSmeargleSketch({
+        attacker: attempt.attacker,
+        opponent: attempt.opponent,
+        alreadySketchedMoveIds: existing,
+        random,
+      })
+      if (!sketchedMoveId || !payload) continue
+
+      try {
+        const registration = await registerUserSketchedMove(
+          payload as any,
+          attempt.userId,
+          sketchedMoveId,
+        )
+        if (!registration.isNew) continue
+
+        existing.push(sketchedMoveId)
+        const sketchedMove = getMove(sketchedMoveId)
+        logMessage += `\n${attempt.attacker.name} sketched ${sketchedMove?.name || sketchedMoveId}! It is now available to every Smeargle on that account.`
+      } catch (error) {
+        console.error('Failed to persist PVP Smeargle Sketch unlock', error)
+      }
     }
   }
 

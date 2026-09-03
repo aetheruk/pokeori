@@ -12,7 +12,11 @@ import {
   resolveTrainerBattleMoveUseLimit,
 } from '@/utilities/skills/unlocks'
 import { getPokemonResearchLevel } from '@/utilities/research/research-levels'
-import { getUserInventoryMap, getUserPokedexMap } from '@/utilities/user-state'
+import {
+  getUserInventoryMap,
+  getUserPokedexMap,
+  getUserSketchedMoveIds,
+} from '@/utilities/user-state'
 import { initializeTeamMoveUses } from '@/utilities/battle/move-uses'
 import { applyBattleRarityEntryEffects } from '@/utilities/battle/rarity-effects'
 import { getBattleMoveOptions } from '@/utilities/pokemon/pokemon-moves'
@@ -53,6 +57,8 @@ export async function initializeSharedPvpBattle(
     p2Pokedex,
     p1Inventory,
     p2Inventory,
+    p1SketchedMoveIds,
+    p2SketchedMoveIds,
   ] = await Promise.all([
     getTeam(matchData.player1),
     getTeam(matchData.player2),
@@ -62,6 +68,8 @@ export async function initializeSharedPvpBattle(
     getUserPokedexMap(payload as any, matchData.player2),
     getUserInventoryMap(payload as any, matchData.player1),
     getUserInventoryMap(payload as any, matchData.player2),
+    getUserSketchedMoveIds(payload as any, matchData.player1),
+    getUserSketchedMoveIds(payload as any, matchData.player2),
   ])
 
   if (!p1Details || !p2Details || p1Docs.length === 0 || p2Docs.length === 0)
@@ -143,6 +151,7 @@ export async function initializeSharedPvpBattle(
       pokemonFormId: pokemon.formId,
       pokemonLevel: pokemon.level,
       inventory: p1Inventory,
+      sketchedMoveIds: p1SketchedMoveIds,
       maxAssignedMoves: p1ResearcherMoveSlots,
       pokemon,
     }).map((move) => move.id)
@@ -154,6 +163,7 @@ export async function initializeSharedPvpBattle(
       pokemonFormId: pokemon.formId,
       pokemonLevel: pokemon.level,
       inventory: p2Inventory,
+      sketchedMoveIds: p2SketchedMoveIds,
       maxAssignedMoves: p2ResearcherMoveSlots,
       pokemon,
     }).map((move) => move.id)

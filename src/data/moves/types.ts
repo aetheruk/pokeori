@@ -536,6 +536,7 @@ export interface MoveConfig {
   ignoreDefenderStatStages?: boolean
   damageStatSource?: 'user' | 'target'
   formId?: string[] // Authored form IDs that can learn this move; missing/empty means no learners
+  excludedFormIds?: string[] // Form IDs that cannot use this move, even when included in formId
   level?: number // Minimum level required to use this move
   accuracy: number // 0-100 percentage
   alwaysHits?: boolean // If true, bypasses normal move accuracy checks.

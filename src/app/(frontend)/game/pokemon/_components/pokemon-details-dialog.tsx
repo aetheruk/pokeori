@@ -626,8 +626,15 @@ export function PokemonDetailsDialog({
         pokemonFormId: pokemon.formId,
         pokemonLevel: pokemon.level,
         inventory: effectiveInventoryMap,
+        sketchedMoveIds: gameData?.sketchedMoves,
       }),
-    [effectiveInventoryMap, formInfo?.types, pokemon.formId, pokemon.level],
+    [
+      effectiveInventoryMap,
+      formInfo?.types,
+      gameData?.sketchedMoves,
+      pokemon.formId,
+      pokemon.level,
+    ],
   )
   const allMoveInventoryMap = useMemo(
     () =>
@@ -645,10 +652,12 @@ export function PokemonDetailsDialog({
         pokemonFormId: pokemon.formId,
         pokemonLevel: pokemon.level,
         inventory: allMoveInventoryMap,
+        sketchedMoveIds: gameData?.sketchedMoves,
       }).length,
     [
       allMoveInventoryMap,
       formInfo?.types,
+      gameData?.sketchedMoves,
       pokemon.formId,
       pokemon.level,
     ],
