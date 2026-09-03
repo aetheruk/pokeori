@@ -950,7 +950,13 @@ function PreferredStanceBadge({
 
 function getCompatibleMovesForForm(formId: string): MoveConfig[] {
   return getAllMoves()
-    .filter((move) => move.formId?.includes(formId) ?? false)
+    .filter(
+      (move) =>
+        (move.formId?.includes(formId) ?? false) &&
+        !move.excludedFormIds?.some(
+          (excludedFormId) => String(excludedFormId) === String(formId),
+        ),
+    )
     .sort((a, b) => a.name.localeCompare(b.name))
 }
 

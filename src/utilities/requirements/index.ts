@@ -98,6 +98,7 @@ export interface RequirementData {
     firstRegisteredAt?: string
     source?: string
   }[]
+  sketchedMoves?: string[]
   completedTasks: {
     taskId: string
     completedAt: string

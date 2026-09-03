@@ -1550,7 +1550,14 @@ export function canEnemyPokemonUseAiMove(
     (options.profile === 'advanced' || options.profile === 'boss')
 
   if (!options.manualAssignment && !canIgnoreFormGate) {
-    if (!(move.formId?.includes(pokemon.formId) ?? false)) return false
+    if (
+      !(move.formId?.includes(pokemon.formId) ?? false) ||
+      move.excludedFormIds?.some(
+        (formId) => String(formId) === String(pokemon.formId),
+      )
+    ) {
+      return false
+    }
   }
 
   if (

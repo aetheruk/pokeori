@@ -60,6 +60,7 @@ import {
 import {
   getUserInventoryMap,
   getUserPokedexMap,
+  getUserSketchedMoveIds,
   setUserInventoryMap,
   setUserPokedexMap,
 } from '@/utilities/user-state'
@@ -387,11 +388,12 @@ export async function startBattleFromConfig(
         battleConfig.movesPerBattle,
       )
   const playerTrainerLevel = chronicleContext ? 100 : trainerLevel
-  const [pokedex, playerMoveInventory] = await Promise.all([
+  const [pokedex, playerMoveInventory, sketchedMoveIds] = await Promise.all([
     getUserPokedexMap(payload as any, user.id),
     chronicleContext
       ? Promise.resolve(chronicleBattleItems)
       : getUserInventoryMap(payload as any, user.id),
+    getUserSketchedMoveIds(payload as any, user.id),
   ])
   const playerTeam = initializeTeamMoveUses(
     battleTeamDocs.map((p) =>
@@ -548,6 +550,7 @@ export async function startBattleFromConfig(
       pokemonFormId: pokemon.formId,
       pokemonLevel: pokemon.level,
       inventory: playerMoveInventory,
+      sketchedMoveIds,
       maxAssignedMoves: researcherMoveSlots,
       allowUnavailableAssignedMoves: !!chronicleContext,
       pokemon,

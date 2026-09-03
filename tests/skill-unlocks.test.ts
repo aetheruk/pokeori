@@ -256,6 +256,14 @@ describe('skill unlock helpers', () => {
     ])
   })
 
+  test('Smeargle receives Sketch at Research Level 1', () => {
+    expect(getPokemonResearchLevelTmUnlocks('235')).toContainEqual({
+      formId: '235',
+      level: 1,
+      itemId: 'tm-sketch',
+    })
+  })
+
   test('pokemon research level TM unlock notes list all authored TMs for a form', () => {
     expect(
       getPokemonResearchLevelTmUnlocks('25', [

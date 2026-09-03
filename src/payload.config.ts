@@ -15,6 +15,7 @@ import {
   UserPokedexEntries,
   UserEggs,
   UserShopPurchases,
+  UserSketchedMoves,
   UserTaskProgress,
   UserTcgCards,
 } from './collections/UserState'
@@ -50,6 +51,7 @@ export default buildConfig({
     UserInventoryItems,
     UserPokedexEntries,
     UserAbilityDexEntries,
+    UserSketchedMoves,
     UserTaskProgress,
     UserActivityStats,
     UserTcgCards,

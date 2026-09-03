@@ -513,10 +513,14 @@ function normalizeMoveRecord(move: MoveConfig): MoveConfig {
   const formId = Array.isArray(move.formId)
     ? move.formId.map((id) => id.toString()).filter(Boolean)
     : []
+  const excludedFormIds = Array.isArray(move.excludedFormIds)
+    ? move.excludedFormIds.map((id) => id.toString()).filter(Boolean)
+    : []
 
   return {
     ...move,
     formId: formId.length ? formId : undefined,
+    excludedFormIds: excludedFormIds.length ? excludedFormIds : undefined,
   }
 }
 

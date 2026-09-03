@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { items } from '@/data/items'
 import { getAllMoves, getMove } from '@/data/moves'
+import pokemonData from '@/data/pokemon-data'
 import { canEnemyPokemonUseAiMove } from '@/utilities/battle/enemy-ai'
 import {
   getAssignedMoveOptions,
@@ -9,6 +10,10 @@ import {
   normalizeAssignedMoveIds,
   validateAssignedMoveIds,
 } from '@/utilities/pokemon/pokemon-moves'
+import {
+  attemptSmeargleSketch,
+  getSketchableOpponentMoveIds,
+} from '@/utilities/pokemon/sketch'
 import type { BattlePokemon } from '@/utilities/battle/types'
 
 function makeBattlePokemon(overrides: Partial<BattlePokemon> = {}): BattlePokemon {
@@ -38,6 +43,104 @@ function makeBattlePokemon(overrides: Partial<BattlePokemon> = {}): BattlePokemo
 }
 
 describe('pokemon move assignment helpers', () => {
+  test('Smeargle can use a sketched move without its TM and only Smeargle can use that unlock', () => {
+    expect(
+      getAvailableMoveOptions({
+        pokemonTypes: ['normal'],
+        pokemonFormId: '235',
+        pokemonLevel: 30,
+        inventory: {},
+        sketchedMoveIds: ['aerial-ace'],
+      }).some((move) => move.id === 'aerial-ace'),
+    ).toBe(true)
+
+    expect(
+      getAvailableMoveOptions({
+        pokemonTypes: ['normal'],
+        pokemonFormId: '25',
+        pokemonLevel: 30,
+        inventory: {},
+        sketchedMoveIds: ['aerial-ace'],
+      }).some((move) => move.id === 'aerial-ace'),
+    ).toBe(false)
+
+    expect(
+      getAssignedMoveOptions({
+        assignedMoves: ['aerial-ace'],
+        pokemonTypes: ['normal'],
+        pokemonFormId: '235',
+        pokemonLevel: 30,
+        inventory: {},
+        sketchedMoveIds: ['aerial-ace'],
+      }).map((move) => move.id),
+    ).toEqual(['aerial-ace'])
+  })
+
+  test('Sketch has a 25 percent chance to copy an available opponent move', () => {
+    const smeargle = makeBattlePokemon({
+      formId: '235',
+      speciesId: 235,
+      name: 'Smeargle',
+      types: ['Normal'],
+    })
+    const opponent = makeBattlePokemon({
+      battleMoveIds: ['thunderbolt', 'sketch'],
+    })
+
+    expect(getSketchableOpponentMoveIds(opponent)).toContain('thunderbolt')
+    expect(
+      attemptSmeargleSketch({
+        attacker: smeargle,
+        opponent,
+        random: (() => {
+          const rolls = [0.24, 0]
+          return () => rolls.shift() ?? 0
+        })(),
+      }),
+    ).toBe('thunderbolt')
+    expect(
+      attemptSmeargleSketch({
+        attacker: smeargle,
+        opponent,
+        random: () => 0.25,
+      }),
+    ).toBeUndefined()
+  })
+
+  test('universal stat-contest moves exclude Ditto, Smeargle, and every Unown form', () => {
+    const universalMoveIds = [
+      'quick-attack',
+      'slow-strike',
+      'mighty-charge',
+      'accidental-tap',
+      'cunning-trap',
+      'play-dumb',
+    ]
+    const inventory = Object.fromEntries(
+      universalMoveIds.map((moveId) => [`tm-${moveId}`, 1]),
+    )
+    const unownFormIds = pokemonData
+      .find((species) => species.id === 201)!
+      .forms.map((form) => form.id)
+
+    for (const moveId of universalMoveIds) {
+      const availableForms = (formId: string) =>
+        getAvailableMoveOptions({
+          pokemonTypes: ['normal'],
+          pokemonFormId: formId,
+          pokemonLevel: 30,
+          inventory,
+        }).some((move) => move.id === moveId)
+
+      expect(availableForms('132'), moveId).toBe(false)
+      expect(availableForms('235'), moveId).toBe(false)
+      for (const formId of unownFormIds) {
+        expect(availableForms(formId), `${moveId}:${formId}`).toBe(false)
+      }
+      expect(availableForms('25'), moveId).toBe(true)
+    }
+  })
+
   test('normalizes Payload move rows and removes duplicates', () => {
     expect(
       normalizeAssignedMoveIds([

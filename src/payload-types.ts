@@ -73,6 +73,7 @@ export interface Config {
     'user-inventory-items': UserInventoryItem;
     'user-pokedex-entries': UserPokedexEntry;
     'user-abilitydex-entries': UserAbilitydexEntry;
+    'user-sketched-moves': UserSketchedMove;
     'user-task-progress': UserTaskProgress;
     'user-activity-stats': UserActivityStat;
     'user-tcg-cards': UserTcgCard;
@@ -96,6 +97,7 @@ export interface Config {
     'user-inventory-items': UserInventoryItemsSelect<false> | UserInventoryItemsSelect<true>;
     'user-pokedex-entries': UserPokedexEntriesSelect<false> | UserPokedexEntriesSelect<true>;
     'user-abilitydex-entries': UserAbilitydexEntriesSelect<false> | UserAbilitydexEntriesSelect<true>;
+    'user-sketched-moves': UserSketchedMovesSelect<false> | UserSketchedMovesSelect<true>;
     'user-task-progress': UserTaskProgressSelect<false> | UserTaskProgressSelect<true>;
     'user-activity-stats': UserActivityStatsSelect<false> | UserActivityStatsSelect<true>;
     'user-tcg-cards': UserTcgCardsSelect<false> | UserTcgCardsSelect<true>;
@@ -715,6 +717,18 @@ export interface UserAbilitydexEntry {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user-sketched-moves".
+ */
+export interface UserSketchedMove {
+  id: string;
+  user: string | User;
+  moveId: string;
+  firstSketchedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "user-task-progress".
  */
 export interface UserTaskProgress {
@@ -895,6 +909,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'user-abilitydex-entries';
         value: string | UserAbilitydexEntry;
+      } | null)
+    | ({
+        relationTo: 'user-sketched-moves';
+        value: string | UserSketchedMove;
       } | null)
     | ({
         relationTo: 'user-task-progress';
@@ -1240,6 +1258,17 @@ export interface UserAbilitydexEntriesSelect<T extends boolean = true> {
   registered?: T;
   source?: T;
   firstRegisteredAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user-sketched-moves_select".
+ */
+export interface UserSketchedMovesSelect<T extends boolean = true> {
+  user?: T;
+  moveId?: T;
+  firstSketchedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

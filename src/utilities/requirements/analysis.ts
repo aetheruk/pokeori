@@ -5,6 +5,7 @@ export type GameDataKeys =
   | 'pokemon'
   | 'tcg'
   | 'abilityDex'
+  | 'sketchedMoves'
   | 'pokedex'
   | 'completedTasks'
   | 'battleResults'
