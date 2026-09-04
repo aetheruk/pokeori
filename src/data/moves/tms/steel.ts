@@ -2565,6 +2565,7 @@ export const STEEL_TM_MOVES: MoveConfig[] = [
     accuracy: 95,
     selfDamage: {
       fraction: 2,
+      trigger: 'on-use',
     },
     level: 50,
     formId: [

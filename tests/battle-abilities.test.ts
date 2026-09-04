@@ -1,62 +1,66 @@
 import { describe, expect, test } from 'bun:test'
-import { ABILITIES, ABILITY_FORM_MAP, rollNaturalFormAbility } from '@/data/abilities'
+import {
+  ABILITIES,
+  ABILITY_FORM_MAP,
+  rollNaturalFormAbility,
+} from '@/data/abilities'
 import { getMove, getMoveDamageMultiplier } from '@/data/moves'
 import {
   applyBattleAbilityAfterKoStatStages,
   applyBattleAbilityBeforeAttackTypeChange,
+  applyBattleAbilityDamageModifiers,
+  applyBattleAbilityOnDamagedStatStages,
   applyBattleAbilityOpponentStatStageBoostCopy,
-	  applyBattleAbilityStatStageDropReflection,
-	  applyBattleAbilityStatusReflection,
-	  applyBattleAbilityStatStageDropTriggers,
-	  applyBattleAbilityDamageModifiers,
-	  applyBattleAbilityOnDamagedStatStages,
-	  applyBattleAbilityOpposingMoveUseDepletion,
-	  applyBattleAbilitySwitchOutEffects,
+  applyBattleAbilityOpposingMoveUseDepletion,
+  applyBattleAbilityStatStageDropReflection,
+  applyBattleAbilityStatStageDropTriggers,
+  applyBattleAbilityStatusReflection,
+  applyBattleAbilitySwitchOutEffects,
   blocksBattleForcedSwitchByAbility,
   blocksBattleStatStageDropByAbility,
-  getBattleAbilityMoveAccuracy,
-  getBattleAbilityEntryFormChange,
-  getBattleAbilityHpThresholdFormChange,
   getBattleAbilityAddedEffectMoveDamageMultiplier,
+  getBattleAbilityEntryFormChange,
   getBattleAbilityExtraHitDamageMultiplier,
-  getBattleAbilityMoveInterruptChance,
+  getBattleAbilityHpThresholdFormChange,
+  getBattleAbilityLowHpSelfSwitchMessage,
+  getBattleAbilityMoveAccuracy,
   getBattleAbilityMoveBlockMessage,
+  getBattleAbilityMoveInterruptChance,
   getBattleAbilityRecoilMoveDamageMultiplier,
   getBattleAbilitySecondaryEffectChance,
   getBattleAbilityStatusCounterStep,
+  getBattleAbilitySwitchPreventionMessage,
+  getBattleRecoilDamageBlockMessage,
   getBattleSecondaryEffectBlockMessage,
-	  getBattleAbilityLowHpSelfSwitchMessage,
-	  getBattleRecoilDamageBlockMessage,
-	  getBattleAbilitySwitchPreventionMessage,
   processBattleAbilityEntryCopiesForState,
   processBattleAbilitySuppressionForState,
-  processBattleAbilityTurnEndEffects,
   processBattleAbilityTeraActivation,
   processBattleAbilityTerrainSet,
-	  processBattleAbilityWeatherSet,
-	  processBattleAbilityWeatherTypeChangesForState,
-	  resolveBattleAbilityBeforeMove,
-    suppressesBattleHeldItemEffectsByAbility,
-    suppressesBattleCounterPreventionByAbility,
-    suppressesBattleMoveAddedEffectsByAbility,
-    usesBattleAbilityMaxMultiHitDamage,
-	} from '@/utilities/battle/abilities'
+  processBattleAbilityTurnEndEffects,
+  processBattleAbilityWeatherSet,
+  processBattleAbilityWeatherTypeChangesForState,
+  resolveBattleAbilityBeforeMove,
+  suppressesBattleCounterPreventionByAbility,
+  suppressesBattleHeldItemEffectsByAbility,
+  suppressesBattleMoveAddedEffectsByAbility,
+  usesBattleAbilityMaxMultiHitDamage,
+} from '@/utilities/battle/abilities'
 import { calculateDamage } from '@/utilities/battle/damage-calc'
+import {
+  applyEnemyAiMoveEffects,
+  shouldInterruptEnemyAiMove,
+} from '@/utilities/battle/enemy-ai'
 import {
   applyHeldItemIfTriggered,
   getHeldAttackDamageMultiplier,
 } from '@/utilities/battle/held-items'
+import { resolveMoveContest } from '@/utilities/battle/move-contest'
 import {
   applyMoveRuntimeEffects,
   getMoveLockMessage,
   recordSuccessfulMoveUse,
   tickMoveLock,
 } from '@/utilities/battle/move-effects'
-import {
-  applyEnemyAiMoveEffects,
-  shouldInterruptEnemyAiMove,
-} from '@/utilities/battle/enemy-ai'
-import { resolveMoveContest } from '@/utilities/battle/move-contest'
 import {
   applySecondaryStatusDamageModifiers,
   applySecondaryStatusesFromMove,
@@ -65,19 +69,22 @@ import {
   processSecondaryStatusesForTurnEnd,
 } from '@/utilities/battle/secondary-statuses'
 import {
-  canApplyStatus,
-  resolveBeforeMoveStatus,
-} from '@/utilities/battle/status-effects-logic'
-import {
   applyBattleFormChange,
   DEFAULT_STAT_STAGES,
   getEffectiveBattleSpeed,
 } from '@/utilities/battle/stats-calc'
+import {
+  canApplyStatus,
+  resolveBeforeMoveStatus,
+} from '@/utilities/battle/status-effects-logic'
 import { processBattleAbilitySwitchOut } from '@/utilities/battle/switching'
 import { resetBattleTypeChange } from '@/utilities/battle/tera'
 import { processEndTurnStatusDamage } from '@/utilities/battle/turn-logic'
 import { processEndTurnWeatherDamage } from '@/utilities/battle/weather-effects'
-import { makeBattlePokemon, makePveBattleState } from './helpers/battle-fixtures'
+import {
+  makeBattlePokemon,
+  makePveBattleState,
+} from './helpers/battle-fixtures'
 
 describe('canonical battle abilities', () => {
   test('canonical natural rolls prefer rare hidden abilities before guaranteed base slots', () => {
@@ -217,7 +224,10 @@ describe('canonical battle abilities', () => {
         name: 'Reshiram',
         ability: 'turboblaze',
       })
-      const normalTarget = makeBattlePokemon({ name: 'Target', types: ['Normal'] })
+      const normalTarget = makeBattlePokemon({
+        name: 'Target',
+        types: ['Normal'],
+      })
 
       expect(
         calculateDamage(moldBreaker, normalTarget, 'power', 1, 'normal').damage,
@@ -633,9 +643,9 @@ describe('canonical battle abilities', () => {
       })
       const defender = makeBattlePokemon({ name: 'Defender' })
 
-      expect(calculateDamage(receiver, defender, 'power', 1, 'normal').damage).toBe(
-        calculateDamage(baseline, defender, 'power', 1, 'normal').damage,
-      )
+      expect(
+        calculateDamage(receiver, defender, 'power', 1, 'normal').damage,
+      ).toBe(calculateDamage(baseline, defender, 'power', 1, 'normal').damage)
     } finally {
       Math.random = originalRandom
     }
@@ -699,9 +709,9 @@ describe('canonical battle abilities', () => {
         },
       })
 
-      expect(calculateDamage(attacker, forewarn, 'power', 1, 'normal').damage).toBe(
-        calculateDamage(attacker, baseline, 'power', 1, 'normal').damage,
-      )
+      expect(
+        calculateDamage(attacker, forewarn, 'power', 1, 'normal').damage,
+      ).toBe(calculateDamage(attacker, baseline, 'power', 1, 'normal').damage)
     } finally {
       Math.random = originalRandom
     }
@@ -746,9 +756,9 @@ describe('canonical battle abilities', () => {
         types: anticipation.types,
         stats: anticipation.stats,
       })
-      expect(calculateDamage(attacker, anticipation, 'power', 1, 'ground').damage).toBe(
-        calculateDamage(attacker, baseline, 'power', 1, 'ground').damage,
-      )
+      expect(
+        calculateDamage(attacker, anticipation, 'power', 1, 'ground').damage,
+      ).toBe(calculateDamage(attacker, baseline, 'power', 1, 'ground').damage)
     } finally {
       Math.random = originalRandom
     }
@@ -947,9 +957,9 @@ describe('canonical battle abilities', () => {
         },
       })
 
-      expect(calculateDamage(attacker, illusion, 'power', 1, 'normal').damage).toBe(
-        calculateDamage(attacker, baseline, 'power', 1, 'normal').damage,
-      )
+      expect(
+        calculateDamage(attacker, illusion, 'power', 1, 'normal').damage,
+      ).toBe(calculateDamage(attacker, baseline, 'power', 1, 'normal').damage)
     } finally {
       Math.random = originalRandom
     }
@@ -1117,12 +1127,30 @@ describe('canonical battle abilities', () => {
       const attacker = makeBattlePokemon({ name: 'Attacker', stats })
       const defender = makeBattlePokemon({ name: 'Defender', stats })
 
-      const neutralDamage = calculateDamage(attacker, defender, 'power', 1, 'normal').damage
+      const neutralDamage = calculateDamage(
+        attacker,
+        defender,
+        'power',
+        1,
+        'normal',
+      ).damage
 
       attacker.statStages = { ...DEFAULT_STAT_STAGES, attack: 4 }
-      const boostedAttackDamage = calculateDamage(attacker, defender, 'power', 1, 'normal').damage
+      const boostedAttackDamage = calculateDamage(
+        attacker,
+        defender,
+        'power',
+        1,
+        'normal',
+      ).damage
       defender.ability = 'unaware'
-      const unawareDefenderDamage = calculateDamage(attacker, defender, 'power', 1, 'normal').damage
+      const unawareDefenderDamage = calculateDamage(
+        attacker,
+        defender,
+        'power',
+        1,
+        'normal',
+      ).damage
 
       expect(boostedAttackDamage).toBeGreaterThan(neutralDamage)
       expect(unawareDefenderDamage).toBe(neutralDamage)
@@ -1130,15 +1158,33 @@ describe('canonical battle abilities', () => {
       attacker.statStages = { ...DEFAULT_STAT_STAGES }
       defender.ability = undefined
       defender.statStages = { ...DEFAULT_STAT_STAGES, defense: 4 }
-      const boostedDefenseDamage = calculateDamage(attacker, defender, 'power', 1, 'normal').damage
+      const boostedDefenseDamage = calculateDamage(
+        attacker,
+        defender,
+        'power',
+        1,
+        'normal',
+      ).damage
       attacker.ability = 'unaware'
-      const unawareAttackerDamage = calculateDamage(attacker, defender, 'power', 1, 'normal').damage
+      const unawareAttackerDamage = calculateDamage(
+        attacker,
+        defender,
+        'power',
+        1,
+        'normal',
+      ).damage
 
       expect(boostedDefenseDamage).toBeLessThan(neutralDamage)
       expect(unawareAttackerDamage).toBe(neutralDamage)
 
       defender.statStages = { ...DEFAULT_STAT_STAGES }
-      const unboostedUnawareDamage = calculateDamage(attacker, defender, 'power', 1, 'normal').damage
+      const unboostedUnawareDamage = calculateDamage(
+        attacker,
+        defender,
+        'power',
+        1,
+        'normal',
+      ).damage
 
       expect(unboostedUnawareDamage).toBe(neutralDamage)
     } finally {
@@ -1735,9 +1781,9 @@ describe('canonical battle abilities', () => {
       currentHp: 40,
       maxHp: 100,
     })
-    expect(getBattleAbilityHpThresholdFormChange(zygardeTenPercent).formId).toBe(
-      '10120',
-    )
+    expect(
+      getBattleAbilityHpThresholdFormChange(zygardeTenPercent).formId,
+    ).toBe('10120')
   })
 
   test('Terapagos form abilities use battle form and field hooks', () => {
@@ -1853,7 +1899,13 @@ describe('canonical battle abilities', () => {
       types: ['Fighting'],
     })
     terapagos.currentHp = terapagos.maxHp
-    const bypassed = calculateDamage(moldBreaker, terapagos, 'power', 1, 'fighting')
+    const bypassed = calculateDamage(
+      moldBreaker,
+      terapagos,
+      'power',
+      1,
+      'fighting',
+    )
     expect(bypassed.typeEffectiveness).toBe(2)
   })
 
@@ -2110,22 +2162,36 @@ describe('canonical battle abilities', () => {
     expect(doubleKick).toBeDefined()
     expect(ember).toBeDefined()
 
-    expect(usesBattleAbilityMaxMultiHitDamage(skillLink, icicleSpear!)).toBe(true)
-    expect(usesBattleAbilityMaxMultiHitDamage(baseline, icicleSpear!)).toBe(false)
-    expect(usesBattleAbilityMaxMultiHitDamage(skillLink, doubleKick!)).toBe(false)
+    expect(usesBattleAbilityMaxMultiHitDamage(skillLink, icicleSpear!)).toBe(
+      true,
+    )
+    expect(usesBattleAbilityMaxMultiHitDamage(baseline, icicleSpear!)).toBe(
+      false,
+    )
+    expect(usesBattleAbilityMaxMultiHitDamage(skillLink, doubleKick!)).toBe(
+      false,
+    )
     expect(usesBattleAbilityMaxMultiHitDamage(skillLink, ember!)).toBe(false)
 
     expect(
       getMoveDamageMultiplier(icicleSpear!, ['normal'], () => 0, undefined, {
-        forceMaxDamageRange: usesBattleAbilityMaxMultiHitDamage(skillLink, icicleSpear!),
+        forceMaxDamageRange: usesBattleAbilityMaxMultiHitDamage(
+          skillLink,
+          icicleSpear!,
+        ),
       }),
     ).toBe(2.5)
     expect(
       getMoveDamageMultiplier(icicleSpear!, ['normal'], () => 0, undefined, {
-        forceMaxDamageRange: usesBattleAbilityMaxMultiHitDamage(baseline, icicleSpear!),
+        forceMaxDamageRange: usesBattleAbilityMaxMultiHitDamage(
+          baseline,
+          icicleSpear!,
+        ),
       }),
     ).toBe(1)
-    expect(getMoveDamageMultiplier(ember!, ['normal'], () => 0)).toBe(ember!.damage)
+    expect(getMoveDamageMultiplier(ember!, ['normal'], () => 0)).toBe(
+      ember!.damage,
+    )
   })
 
   test('Parental Bond grants a follow-up hit instead of a generic damage boost', () => {
@@ -2133,7 +2199,14 @@ describe('canonical battle abilities', () => {
       name: 'Kangaskhan',
       ability: 'parental_bond',
       types: ['Normal'],
-      stats: { hp: 100, attack: 100, defense: 100, specialAttack: 100, specialDefense: 100, speed: 100 },
+      stats: {
+        hp: 100,
+        attack: 100,
+        defense: 100,
+        specialAttack: 100,
+        specialDefense: 100,
+        speed: 100,
+      },
     })
     const baseline = makeBattlePokemon({
       name: 'Baseline',
@@ -2150,15 +2223,19 @@ describe('canonical battle abilities', () => {
     expect(ember).toBeDefined()
     expect(icicleSpear).toBeDefined()
 
-    expect(getBattleAbilityExtraHitDamageMultiplier(parentalBond, ember!)).toBe(0.25)
-    expect(getBattleAbilityExtraHitDamageMultiplier(parentalBond, icicleSpear!)).toBe(0)
+    expect(getBattleAbilityExtraHitDamageMultiplier(parentalBond, ember!)).toBe(
+      0.25,
+    )
+    expect(
+      getBattleAbilityExtraHitDamageMultiplier(parentalBond, icicleSpear!),
+    ).toBe(0)
 
     const originalRandom = Math.random
     try {
       Math.random = () => 0.5
-      expect(calculateDamage(parentalBond, target, 'power', 1, 'normal').damage).toBe(
-        calculateDamage(baseline, target, 'power', 1, 'normal').damage,
-      )
+      expect(
+        calculateDamage(parentalBond, target, 'power', 1, 'normal').damage,
+      ).toBe(calculateDamage(baseline, target, 'power', 1, 'normal').damage)
     } finally {
       Math.random = originalRandom
     }
@@ -2246,9 +2323,7 @@ describe('canonical battle abilities', () => {
       })
       expect(
         calculateDamage(attacker, cherrim, 'power', 1, 'grass').damage,
-      ).toBe(
-        calculateDamage(attacker, baseline, 'power', 1, 'grass').damage,
-      )
+      ).toBe(calculateDamage(attacker, baseline, 'power', 1, 'grass').damage)
     } finally {
       Math.random = originalRandom
     }
@@ -2299,7 +2374,10 @@ describe('canonical battle abilities', () => {
     try {
       const attacker = makeBattlePokemon({ name: 'Attacker' })
       const sniper = makeBattlePokemon({ name: 'Sniper', ability: 'sniper' })
-      const superLuck = makeBattlePokemon({ name: 'Lucky', ability: 'super_luck' })
+      const superLuck = makeBattlePokemon({
+        name: 'Lucky',
+        ability: 'super_luck',
+      })
       const merciless = makeBattlePokemon({
         name: 'Merciless',
         ability: 'merciless',
@@ -2848,10 +2926,7 @@ describe('canonical battle abilities', () => {
         previousHp: 70,
         random: () => 0,
       }),
-    ).toEqual([
-      "Clefairy's Cute Charm activated!",
-      'Infatuation took hold.',
-    ])
+    ).toEqual(["Clefairy's Cute Charm activated!", 'Infatuation took hold.'])
     expect(attacker.secondaryStatuses?.[0]).toMatchObject({
       id: 'infatuation',
       effects: [{ type: 'infatuation', chance: 50 }],
@@ -2966,10 +3041,7 @@ describe('canonical battle abilities', () => {
         previousHp: 100,
         random: () => 0,
       }),
-    ).toEqual([
-      "Cursola's Perish Body activated!",
-      'Perish Song took hold.',
-    ])
+    ).toEqual(["Cursola's Perish Body activated!", 'Perish Song took hold.'])
     expect(attacker.secondaryStatuses?.[0]).toMatchObject({
       id: 'perish-song',
       delayTurns: 2,
@@ -3013,9 +3085,7 @@ describe('canonical battle abilities', () => {
         previousHp: 100,
         random: () => 0,
       }),
-    ).toEqual([
-      "Cofagrigus's Mummy changed Slaking's ability to Mummy!",
-    ])
+    ).toEqual(["Cofagrigus's Mummy changed Slaking's ability to Mummy!"])
     expect(attacker.ability).toBe('mummy')
     expect(processBattleAbilitySwitchOut(attacker)).toEqual([
       "Slaking's ability returned to Truant.",
@@ -3136,9 +3206,7 @@ describe('canonical battle abilities', () => {
         damage: 40,
         previousHp: 40,
       }),
-    ).toEqual([
-      "Attacker was hurt by Sharpedo's Rough Skin! [icon:damage:15]",
-    ])
+    ).toEqual(["Attacker was hurt by Sharpedo's Rough Skin! [icon:damage:15]"])
     expect(attacker.currentHp).toBe(65)
 
     const ferrothorn = makeBattlePokemon({
@@ -3166,7 +3234,14 @@ describe('canonical battle abilities', () => {
       currentHp: 90,
       maxHp: 120,
       types: ['Normal'],
-      stats: { hp: 120, attack: 100, defense: 100, specialAttack: 100, specialDefense: 100, speed: 100 },
+      stats: {
+        hp: 120,
+        attack: 100,
+        defense: 100,
+        specialAttack: 100,
+        specialDefense: 100,
+        speed: 100,
+      },
     })
     const aftermath = makeBattlePokemon({
       name: 'Drifblim',
@@ -3189,9 +3264,7 @@ describe('canonical battle abilities', () => {
         damage: 40,
         previousHp: 40,
       }),
-    ).toEqual([
-      "Attacker was hurt by Drifblim's Aftermath! [icon:damage:30]",
-    ])
+    ).toEqual(["Attacker was hurt by Drifblim's Aftermath! [icon:damage:30]"])
     expect(attacker.currentHp).toBe(60)
 
     const longReachAttacker = makeBattlePokemon({
@@ -3242,12 +3315,12 @@ describe('canonical battle abilities', () => {
     const originalRandom = Math.random
     try {
       Math.random = () => 0.5
-      expect(calculateDamage(attacker, aftermath, 'power', 1, 'normal').damage).toBe(
-        calculateDamage(attacker, baseline, 'power', 1, 'normal').damage,
-      )
-      expect(calculateDamage(attacker, pyukumuku, 'power', 1, 'normal').damage).toBe(
-        calculateDamage(attacker, baseline, 'power', 1, 'normal').damage,
-      )
+      expect(
+        calculateDamage(attacker, aftermath, 'power', 1, 'normal').damage,
+      ).toBe(calculateDamage(attacker, baseline, 'power', 1, 'normal').damage)
+      expect(
+        calculateDamage(attacker, pyukumuku, 'power', 1, 'normal').damage,
+      ).toBe(calculateDamage(attacker, baseline, 'power', 1, 'normal').damage)
     } finally {
       Math.random = originalRandom
     }
@@ -3295,9 +3368,7 @@ describe('canonical battle abilities', () => {
         damage: 20,
         previousHp: 60,
       }),
-    ).toEqual([
-      "Attacker was hurt by Sharpedo's Rough Skin! [icon:damage:12]",
-    ])
+    ).toEqual(["Attacker was hurt by Sharpedo's Rough Skin! [icon:damage:12]"])
     expect(normalAttacker.currentHp).toBe(68)
 
     expect(
@@ -3332,7 +3403,10 @@ describe('canonical battle abilities', () => {
         previousHp: 100,
       }),
     ).toEqual(["Weavile's Pickpocket stole Attacker's Hard Stone!"])
-    expect(pickpocket.heldItem).toEqual({ id: 'hard-stone', name: 'Hard Stone' })
+    expect(pickpocket.heldItem).toEqual({
+      id: 'hard-stone',
+      name: 'Hard Stone',
+    })
     expect(pickpocket.heldItemBattleOnly).toBe(true)
     expect(attacker.heldItem).toBeUndefined()
     expect(attacker.battleAbilityState?.heldItemLost).toBe(true)
@@ -3357,7 +3431,10 @@ describe('canonical battle abilities', () => {
       }),
     ).toEqual([])
     expect(secondPickpocket.heldItem).toBeUndefined()
-    expect(longReachAttacker.heldItem).toEqual({ id: 'oran-berry', name: 'Oran Berry' })
+    expect(longReachAttacker.heldItem).toEqual({
+      id: 'oran-berry',
+      name: 'Oran Berry',
+    })
 
     const magician = makeBattlePokemon({
       name: 'Delphox',
@@ -3375,7 +3452,10 @@ describe('canonical battle abilities', () => {
         previousHp: 100,
       }),
     ).toEqual(["Delphox's Magician stole Target's Sitrus Berry!"])
-    expect(magician.heldItem).toEqual({ id: 'sitrus-berry', name: 'Sitrus Berry' })
+    expect(magician.heldItem).toEqual({
+      id: 'sitrus-berry',
+      name: 'Sitrus Berry',
+    })
     expect(target.heldItem).toBeUndefined()
 
     const stickyHolder = makeBattlePokemon({
@@ -3396,7 +3476,10 @@ describe('canonical battle abilities', () => {
       }),
     ).toEqual(["Sticky Holder's Sticky Hold protected its held item!"])
     expect(secondMagician.heldItem).toBeUndefined()
-    expect(stickyHolder.heldItem).toEqual({ id: 'oran-berry', name: 'Oran Berry' })
+    expect(stickyHolder.heldItem).toEqual({
+      id: 'oran-berry',
+      name: 'Oran Berry',
+    })
 
     const klutz = makeBattlePokemon({
       name: 'Lopunny',
@@ -3431,23 +3514,42 @@ describe('canonical battle abilities', () => {
     try {
       const attacker = makeBattlePokemon({
         name: 'Attacker',
-        stats: { hp: 100, attack: 100, defense: 100, specialAttack: 100, specialDefense: 100, speed: 100 },
+        stats: {
+          hp: 100,
+          attack: 100,
+          defense: 100,
+          specialAttack: 100,
+          specialDefense: 100,
+          speed: 100,
+        },
       })
       const pickup = makeBattlePokemon({
         name: 'Meowth',
         ability: 'pickup',
-        stats: { hp: 100, attack: 100, defense: 100, specialAttack: 100, specialDefense: 100, speed: 100 },
+        stats: {
+          hp: 100,
+          attack: 100,
+          defense: 100,
+          specialAttack: 100,
+          specialDefense: 100,
+          speed: 100,
+        },
       })
       const baseline = makeBattlePokemon({
         name: 'Baseline',
-        stats: { hp: 100, attack: 100, defense: 100, specialAttack: 100, specialDefense: 100, speed: 100 },
+        stats: {
+          hp: 100,
+          attack: 100,
+          defense: 100,
+          specialAttack: 100,
+          specialDefense: 100,
+          speed: 100,
+        },
       })
 
       expect(
         calculateDamage(attacker, pickup, 'power', 1, 'normal').damage,
-      ).toBe(
-        calculateDamage(attacker, baseline, 'power', 1, 'normal').damage,
-      )
+      ).toBe(calculateDamage(attacker, baseline, 'power', 1, 'normal').damage)
     } finally {
       Math.random = originalRandom
     }
@@ -3537,15 +3639,15 @@ describe('canonical battle abilities', () => {
           stats: baseline.stats,
         })
 
-        expect(calculateDamage(attacker, holder, 'power', 1, 'normal').damage).toBe(
-          baselineIncomingPower,
-        )
-        expect(calculateDamage(holder, attacker, 'power', 1, 'normal').damage).toBe(
-          baselineOutgoingPower,
-        )
-        expect(calculateDamage(holder, attacker, 'tech', 1, 'normal').damage).toBe(
-          baselineOutgoingTech,
-        )
+        expect(
+          calculateDamage(attacker, holder, 'power', 1, 'normal').damage,
+        ).toBe(baselineIncomingPower)
+        expect(
+          calculateDamage(holder, attacker, 'power', 1, 'normal').damage,
+        ).toBe(baselineOutgoingPower)
+        expect(
+          calculateDamage(holder, attacker, 'tech', 1, 'normal').damage,
+        ).toBe(baselineOutgoingTech)
       }
     } finally {
       Math.random = originalRandom
@@ -3593,8 +3695,16 @@ describe('canonical battle abilities', () => {
     const originalRandom = Math.random
     try {
       Math.random = () => 0.5
-      expect(calculateDamage(earlyBird, defender, 'power', 1, 'normal').damage).toBe(
-        calculateDamage(makeBattlePokemon({ name: 'Baseline', stats }), defender, 'power', 1, 'normal').damage,
+      expect(
+        calculateDamage(earlyBird, defender, 'power', 1, 'normal').damage,
+      ).toBe(
+        calculateDamage(
+          makeBattlePokemon({ name: 'Baseline', stats }),
+          defender,
+          'power',
+          1,
+          'normal',
+        ).damage,
       )
     } finally {
       Math.random = originalRandom
@@ -3615,10 +3725,12 @@ describe('canonical battle abilities', () => {
       ability: 'reckless',
     })
     const doubleEdge = getMove('double-edge')
+    const jumpKick = getMove('jump-kick')
     const steelBeam = getMove('steel-beam')
     const rockShield = getMove('rock-shield')
 
     expect(doubleEdge).toBeDefined()
+    expect(jumpKick).toBeDefined()
     expect(steelBeam).toBeDefined()
     expect(rockShield).toBeDefined()
     expect(getBattleRecoilDamageBlockMessage(rockHead, doubleEdge!)).toBe(
@@ -3627,15 +3739,29 @@ describe('canonical battle abilities', () => {
     expect(getBattleRecoilDamageBlockMessage(magicGuard, doubleEdge!)).toBe(
       "Clefable's Magic Guard prevented recoil damage!",
     )
-    expect(getBattleAbilityRecoilMoveDamageMultiplier(reckless, doubleEdge!)).toBe(
-      1.2,
-    )
+    expect(
+      getBattleAbilityRecoilMoveDamageMultiplier(reckless, doubleEdge!),
+    ).toBe(1.2)
+    const descriptionlessDoubleEdge = { ...doubleEdge!, description: '' }
+    expect(
+      getBattleAbilityRecoilMoveDamageMultiplier(
+        reckless,
+        descriptionlessDoubleEdge,
+      ),
+    ).toBe(1.2)
+    expect(
+      getBattleRecoilDamageBlockMessage(rockHead, jumpKick!),
+    ).toBeUndefined()
 
-    expect(getBattleRecoilDamageBlockMessage(rockHead, steelBeam!)).toBeUndefined()
-    expect(getBattleRecoilDamageBlockMessage(magicGuard, rockShield!)).toBeUndefined()
-    expect(getBattleAbilityRecoilMoveDamageMultiplier(reckless, steelBeam!)).toBe(
-      1,
-    )
+    expect(
+      getBattleRecoilDamageBlockMessage(rockHead, steelBeam!),
+    ).toBeUndefined()
+    expect(
+      getBattleRecoilDamageBlockMessage(magicGuard, rockShield!),
+    ).toBeUndefined()
+    expect(
+      getBattleAbilityRecoilMoveDamageMultiplier(reckless, steelBeam!),
+    ).toBe(1)
   })
 
   test('soundproof blocks authored sound moves only', () => {
@@ -3651,7 +3777,9 @@ describe('canonical battle abilities', () => {
     expect(getBattleAbilityMoveBlockMessage(soundproof, hyperVoice!)).toBe(
       "Exploud's Soundproof blocked Hyper Voice!",
     )
-    expect(getBattleAbilityMoveBlockMessage(soundproof, doubleEdge!)).toBeUndefined()
+    expect(
+      getBattleAbilityMoveBlockMessage(soundproof, doubleEdge!),
+    ).toBeUndefined()
   })
 
   test('bulletproof and overcoat block authored move categories', () => {
@@ -3678,17 +3806,28 @@ describe('canonical battle abilities', () => {
     expect(getBattleAbilityMoveBlockMessage(bulletproof, sludgeBomb!)).toBe(
       "Chesnaught's Bulletproof blocked Sludge Bomb!",
     )
-    expect(getBattleAbilityMoveBlockMessage(bulletproof, doubleEdge!)).toBeUndefined()
+    expect(
+      getBattleAbilityMoveBlockMessage(bulletproof, doubleEdge!),
+    ).toBeUndefined()
     expect(getBattleAbilityMoveBlockMessage(overcoat, sleepPowder!)).toBe(
       "Mandibuzz's Overcoat blocked Sleep Powder!",
     )
-    expect(getBattleAbilityMoveBlockMessage(overcoat, shadowBall!)).toBeUndefined()
+    expect(
+      getBattleAbilityMoveBlockMessage(overcoat, shadowBall!),
+    ).toBeUndefined()
   })
 
   test('good as gold and magic bounce block incoming status moves without damage reduction', () => {
     const attacker = makeBattlePokemon({
       name: 'Pikachu',
-      stats: { hp: 100, attack: 100, defense: 100, specialAttack: 100, specialDefense: 100, speed: 100 },
+      stats: {
+        hp: 100,
+        attack: 100,
+        defense: 100,
+        specialAttack: 100,
+        specialDefense: 100,
+        speed: 100,
+      },
     })
     const moldBreaker = makeBattlePokemon({
       name: 'Haxorus',
@@ -3715,24 +3854,26 @@ describe('canonical battle abilities', () => {
     const thunderWave = getMove('thunder-wave')
 
     expect(thunderWave).toBeDefined()
-    expect(getBattleAbilityMoveBlockMessage(gholdengo, thunderWave!, attacker)).toBe(
-      "Gholdengo's Good as Gold blocked Thunder Wave!",
-    )
-    expect(getBattleAbilityMoveBlockMessage(espeon, thunderWave!, attacker)).toBe(
-      "Espeon's Magic Bounce bounced back Thunder Wave!",
-    )
-    expect(getBattleAbilityMoveBlockMessage(gholdengo, thunderWave!, moldBreaker)).toBeUndefined()
+    expect(
+      getBattleAbilityMoveBlockMessage(gholdengo, thunderWave!, attacker),
+    ).toBe("Gholdengo's Good as Gold blocked Thunder Wave!")
+    expect(
+      getBattleAbilityMoveBlockMessage(espeon, thunderWave!, attacker),
+    ).toBe("Espeon's Magic Bounce bounced back Thunder Wave!")
+    expect(
+      getBattleAbilityMoveBlockMessage(gholdengo, thunderWave!, moldBreaker),
+    ).toBeUndefined()
     expect(canApplyStatus(gholdengo, 'burn')).toBe(true)
 
     const originalRandom = Math.random
     try {
       Math.random = () => 0.5
-      expect(calculateDamage(attacker, gholdengo, 'power', 1, 'normal').damage).toBe(
-        calculateDamage(attacker, baseline, 'power', 1, 'normal').damage,
-      )
-      expect(calculateDamage(attacker, espeon, 'power', 1, 'normal').damage).toBe(
-        calculateDamage(attacker, baseline, 'power', 1, 'normal').damage,
-      )
+      expect(
+        calculateDamage(attacker, gholdengo, 'power', 1, 'normal').damage,
+      ).toBe(calculateDamage(attacker, baseline, 'power', 1, 'normal').damage)
+      expect(
+        calculateDamage(attacker, espeon, 'power', 1, 'normal').damage,
+      ).toBe(calculateDamage(attacker, baseline, 'power', 1, 'normal').damage)
     } finally {
       Math.random = originalRandom
     }
@@ -3741,7 +3882,14 @@ describe('canonical battle abilities', () => {
   test('shield dust blocks secondary effects without reducing damage', () => {
     const attacker = makeBattlePokemon({
       name: 'Charmander',
-      stats: { hp: 100, attack: 100, defense: 100, specialAttack: 100, specialDefense: 100, speed: 100 },
+      stats: {
+        hp: 100,
+        attack: 100,
+        defense: 100,
+        specialAttack: 100,
+        specialDefense: 100,
+        speed: 100,
+      },
     })
     const dustox = makeBattlePokemon({
       name: 'Dustox',
@@ -3769,18 +3917,23 @@ describe('canonical battle abilities', () => {
       move: ember!,
       self: attacker,
       opponent: dustox,
-      state: makePveBattleState({ playerTeam: [dustox], enemyTeam: [attacker] }),
+      state: makePveBattleState({
+        playerTeam: [dustox],
+        enemyTeam: [attacker],
+      }),
       damageDealt: 20,
       random: () => 0,
     })
-    expect(messages).toContain("Dustox's Shield Dust blocked the added effects!")
+    expect(messages).toContain(
+      "Dustox's Shield Dust blocked the added effects!",
+    )
     expect(dustox.status).toBeUndefined()
     const originalRandom = Math.random
     try {
       Math.random = () => 0.5
-      expect(calculateDamage(attacker, dustox, 'power', 1, 'normal').damage).toBe(
-        calculateDamage(attacker, baseline, 'power', 1, 'normal').damage,
-      )
+      expect(
+        calculateDamage(attacker, dustox, 'power', 1, 'normal').damage,
+      ).toBe(calculateDamage(attacker, baseline, 'power', 1, 'normal').damage)
     } finally {
       Math.random = originalRandom
     }
@@ -3791,7 +3944,14 @@ describe('canonical battle abilities', () => {
       name: 'Togekiss',
       ability: 'serene_grace',
       types: ['Normal'],
-      stats: { hp: 100, attack: 100, defense: 100, specialAttack: 100, specialDefense: 100, speed: 100 },
+      stats: {
+        hp: 100,
+        attack: 100,
+        defense: 100,
+        specialAttack: 100,
+        specialDefense: 100,
+        speed: 100,
+      },
     })
     const baseline = makeBattlePokemon({
       name: 'Baseline',
@@ -3802,10 +3962,15 @@ describe('canonical battle abilities', () => {
     const ember = getMove('ember')
 
     expect(ember).toBeDefined()
-    expect(getBattleAbilitySecondaryEffectChance(sereneGrace, ember!, 10)).toBe(20)
+    expect(getBattleAbilitySecondaryEffectChance(sereneGrace, ember!, 10)).toBe(
+      20,
+    )
     expect(getBattleAbilitySecondaryEffectChance(baseline, ember!, 10)).toBe(10)
 
-    const boostedTarget = makeBattlePokemon({ name: 'Boosted Target', types: ['Normal'] })
+    const boostedTarget = makeBattlePokemon({
+      name: 'Boosted Target',
+      types: ['Normal'],
+    })
     const boostedMessages = applyEnemyAiMoveEffects({
       move: ember!,
       self: sereneGrace,
@@ -3813,7 +3978,9 @@ describe('canonical battle abilities', () => {
       damageDealt: 20,
       random: () => 0.15,
     })
-    expect(boostedMessages).toContain('Boosted Target was inflicted with Burn! [icon:status:burn]')
+    expect(boostedMessages).toContain(
+      'Boosted Target was inflicted with Burn! [icon:status:burn]',
+    )
 
     const normalMessages = applyEnemyAiMoveEffects({
       move: ember!,
@@ -3822,14 +3989,16 @@ describe('canonical battle abilities', () => {
       damageDealt: 20,
       random: () => 0.15,
     })
-    expect(normalMessages).not.toContain('Target was inflicted with Burn! [icon:status:burn]')
+    expect(normalMessages).not.toContain(
+      'Target was inflicted with Burn! [icon:status:burn]',
+    )
 
     const originalRandom = Math.random
     try {
       Math.random = () => 0.5
-      expect(calculateDamage(sereneGrace, target, 'power', 1, 'normal').damage).toBe(
-        calculateDamage(baseline, target, 'power', 1, 'normal').damage,
-      )
+      expect(
+        calculateDamage(sereneGrace, target, 'power', 1, 'normal').damage,
+      ).toBe(calculateDamage(baseline, target, 'power', 1, 'normal').damage)
     } finally {
       Math.random = originalRandom
     }
@@ -3840,7 +4009,14 @@ describe('canonical battle abilities', () => {
       name: 'Nidoking',
       ability: 'sheer_force',
       types: ['Normal'],
-      stats: { hp: 100, attack: 100, defense: 100, specialAttack: 100, specialDefense: 100, speed: 100 },
+      stats: {
+        hp: 100,
+        attack: 100,
+        defense: 100,
+        specialAttack: 100,
+        specialDefense: 100,
+        speed: 100,
+      },
     })
     const baseline = makeBattlePokemon({
       name: 'Baseline',
@@ -3853,9 +4029,15 @@ describe('canonical battle abilities', () => {
 
     expect(ember).toBeDefined()
     expect(doubleEdge).toBeDefined()
-    expect(getBattleAbilityAddedEffectMoveDamageMultiplier(sheerForce, ember!)).toBe(1.3)
-    expect(getBattleAbilityAddedEffectMoveDamageMultiplier(sheerForce, doubleEdge!)).toBe(1)
-    expect(suppressesBattleMoveAddedEffectsByAbility(sheerForce, ember!)).toBe(true)
+    expect(
+      getBattleAbilityAddedEffectMoveDamageMultiplier(sheerForce, ember!),
+    ).toBe(1.3)
+    expect(
+      getBattleAbilityAddedEffectMoveDamageMultiplier(sheerForce, doubleEdge!),
+    ).toBe(1)
+    expect(suppressesBattleMoveAddedEffectsByAbility(sheerForce, ember!)).toBe(
+      true,
+    )
 
     const messages = applyEnemyAiMoveEffects({
       move: ember!,
@@ -3869,8 +4051,20 @@ describe('canonical battle abilities', () => {
     const originalRandom = Math.random
     try {
       Math.random = () => 0.5
-      const boosted = calculateDamage(sheerForce, target, 'power', 1.3, 'normal').damage
-      const normal = calculateDamage(baseline, target, 'power', 1, 'normal').damage
+      const boosted = calculateDamage(
+        sheerForce,
+        target,
+        'power',
+        1.3,
+        'normal',
+      ).damage
+      const normal = calculateDamage(
+        baseline,
+        target,
+        'power',
+        1,
+        'normal',
+      ).damage
       expect(boosted).toBeGreaterThan(normal)
     } finally {
       Math.random = originalRandom
@@ -3882,7 +4076,14 @@ describe('canonical battle abilities', () => {
       name: 'Muk',
       ability: 'stench',
       types: ['Normal'],
-      stats: { hp: 100, attack: 100, defense: 100, specialAttack: 100, specialDefense: 100, speed: 100 },
+      stats: {
+        hp: 100,
+        attack: 100,
+        defense: 100,
+        specialAttack: 100,
+        specialDefense: 100,
+        speed: 100,
+      },
     })
     const baseline = makeBattlePokemon({
       name: 'Baseline',
@@ -3895,8 +4096,12 @@ describe('canonical battle abilities', () => {
     expect(doubleEdge).toBeDefined()
     expect(thunderWave).toBeDefined()
 
-    expect(getBattleAbilityMoveInterruptChance(stench, doubleEdge!, undefined)).toBe(10)
-    expect(getBattleAbilityMoveInterruptChance(stench, thunderWave!, undefined)).toBe(0)
+    expect(
+      getBattleAbilityMoveInterruptChance(stench, doubleEdge!, undefined),
+    ).toBe(10)
+    expect(
+      getBattleAbilityMoveInterruptChance(stench, thunderWave!, undefined),
+    ).toBe(0)
     expect(
       shouldInterruptEnemyAiMove({
         move: doubleEdge!,
@@ -3928,7 +4133,14 @@ describe('canonical battle abilities', () => {
   })
 
   test('post-damage poison abilities apply statuses without boosting poison damage', () => {
-    const stats = { hp: 100, attack: 100, defense: 100, specialAttack: 100, specialDefense: 100, speed: 100 }
+    const stats = {
+      hp: 100,
+      attack: 100,
+      defense: 100,
+      specialAttack: 100,
+      specialDefense: 100,
+      speed: 100,
+    }
     const poisonTouch = makeBattlePokemon({
       name: 'Muk',
       ability: 'poison_touch',
@@ -4004,24 +4216,41 @@ describe('canonical battle abilities', () => {
     ).toEqual([])
     expect(steelTarget.status).toBeUndefined()
 
-    const damageTarget = makeBattlePokemon({ name: 'Damage Target', types: ['Normal'], stats })
+    const damageTarget = makeBattlePokemon({
+      name: 'Damage Target',
+      types: ['Normal'],
+      stats,
+    })
     const originalRandom = Math.random
     try {
       Math.random = () => 0.5
-      const baselineDamage = calculateDamage(baseline, damageTarget, 'power', 1, 'poison').damage
-      expect(calculateDamage(poisonTouch, damageTarget, 'power', 1, 'poison').damage).toBe(
-        baselineDamage,
-      )
-      expect(calculateDamage(toxicChain, damageTarget, 'power', 1, 'poison').damage).toBe(
-        baselineDamage,
-      )
+      const baselineDamage = calculateDamage(
+        baseline,
+        damageTarget,
+        'power',
+        1,
+        'poison',
+      ).damage
+      expect(
+        calculateDamage(poisonTouch, damageTarget, 'power', 1, 'poison').damage,
+      ).toBe(baselineDamage)
+      expect(
+        calculateDamage(toxicChain, damageTarget, 'power', 1, 'poison').damage,
+      ).toBe(baselineDamage)
     } finally {
       Math.random = originalRandom
     }
   })
 
   test('Synchronize reflects status without reducing incoming damage', () => {
-    const stats = { hp: 100, attack: 100, defense: 100, specialAttack: 100, specialDefense: 100, speed: 100 }
+    const stats = {
+      hp: 100,
+      attack: 100,
+      defense: 100,
+      specialAttack: 100,
+      specialDefense: 100,
+      speed: 100,
+    }
     const synchronizer = makeBattlePokemon({
       name: 'Espeon',
       ability: 'synchronize',
@@ -4077,9 +4306,10 @@ describe('canonical battle abilities', () => {
     const originalRandom = Math.random
     try {
       Math.random = () => 0.5
-      expect(calculateDamage(attacker, statusedSynchronizer, 'power', 1, 'normal').damage).toBe(
-        calculateDamage(attacker, baseline, 'power', 1, 'normal').damage,
-      )
+      expect(
+        calculateDamage(attacker, statusedSynchronizer, 'power', 1, 'normal')
+          .damage,
+      ).toBe(calculateDamage(attacker, baseline, 'power', 1, 'normal').damage)
     } finally {
       Math.random = originalRandom
     }
@@ -4090,7 +4320,14 @@ describe('canonical battle abilities', () => {
       name: 'Pecharunt',
       ability: 'poison_puppeteer',
       types: ['Normal'],
-      stats: { hp: 100, attack: 100, defense: 100, specialAttack: 100, specialDefense: 100, speed: 100 },
+      stats: {
+        hp: 100,
+        attack: 100,
+        defense: 100,
+        specialAttack: 100,
+        specialDefense: 100,
+        speed: 100,
+      },
     })
     const baseline = makeBattlePokemon({
       name: 'Baseline',
@@ -4112,9 +4349,9 @@ describe('canonical battle abilities', () => {
     const originalRandom = Math.random
     try {
       Math.random = () => 0.5
-      expect(calculateDamage(poisonPuppeteer, target, 'power', 1, 'poison').damage).toBe(
-        calculateDamage(baseline, target, 'power', 1, 'poison').damage,
-      )
+      expect(
+        calculateDamage(poisonPuppeteer, target, 'power', 1, 'poison').damage,
+      ).toBe(calculateDamage(baseline, target, 'power', 1, 'poison').damage)
     } finally {
       Math.random = originalRandom
     }
@@ -4170,23 +4407,53 @@ describe('canonical battle abilities', () => {
 
     const attacker = makeBattlePokemon({
       name: 'Attacker',
-      stats: { hp: 100, attack: 100, defense: 100, specialAttack: 100, specialDefense: 100, speed: 100 },
+      stats: {
+        hp: 100,
+        attack: 100,
+        defense: 100,
+        specialAttack: 100,
+        specialDefense: 100,
+        speed: 100,
+      },
     })
     const baseline = makeBattlePokemon({
       name: 'Baseline',
-      stats: { hp: 100, attack: 100, defense: 100, specialAttack: 100, specialDefense: 100, speed: 100 },
+      stats: {
+        hp: 100,
+        attack: 100,
+        defense: 100,
+        specialAttack: 100,
+        specialDefense: 100,
+        speed: 100,
+      },
     })
 
     const originalRandom = Math.random
     Math.random = () => 0.5
-    const baselinePower = calculateDamage(attacker, baseline, 'power', 1, 'normal').damage
-    const baselineTech = calculateDamage(attacker, baseline, 'tech', 1, 'normal').damage
+    const baselinePower = calculateDamage(
+      attacker,
+      baseline,
+      'power',
+      1,
+      'normal',
+    ).damage
+    const baselineTech = calculateDamage(
+      attacker,
+      baseline,
+      'tech',
+      1,
+      'normal',
+    ).damage
     try {
       for (const abilityId of noCombatAbilities) {
         const ability = ABILITIES[abilityId]
         expect(ability).toBeDefined()
         const effects = ability?.effects ?? []
-        expect(effects.some((effect) => effect.type === 'battle-no-single-battle-effect')).toBe(true)
+        expect(
+          effects.some(
+            (effect) => effect.type === 'battle-no-single-battle-effect',
+          ),
+        ).toBe(true)
         expect(
           effects.some(
             (effect) =>
@@ -4201,9 +4468,15 @@ describe('canonical battle abilities', () => {
           stats: baseline.stats,
         })
 
-        expect(calculateDamage(attacker, holder, 'power', 1, 'normal').damage).toBe(baselinePower)
-        expect(calculateDamage(holder, attacker, 'power', 1, 'normal').damage).toBe(baselinePower)
-        expect(calculateDamage(holder, attacker, 'tech', 1, 'normal').damage).toBe(baselineTech)
+        expect(
+          calculateDamage(attacker, holder, 'power', 1, 'normal').damage,
+        ).toBe(baselinePower)
+        expect(
+          calculateDamage(holder, attacker, 'power', 1, 'normal').damage,
+        ).toBe(baselinePower)
+        expect(
+          calculateDamage(holder, attacker, 'tech', 1, 'normal').damage,
+        ).toBe(baselineTech)
       }
     } finally {
       Math.random = originalRandom
@@ -4241,7 +4514,9 @@ describe('canonical battle abilities', () => {
     expect(getBattleAbilityMoveBlockMessage(dazzling, machPunch!)).toBe(
       "Bruxish's Dazzling blocked Mach Punch!",
     )
-    expect(getBattleAbilityMoveBlockMessage(armorTail, doubleEdge!)).toBeUndefined()
+    expect(
+      getBattleAbilityMoveBlockMessage(armorTail, doubleEdge!),
+    ).toBeUndefined()
   })
 
   test('accuracy abilities modify authored move accuracy instead of damage', () => {
@@ -4444,24 +4719,43 @@ describe('canonical battle abilities', () => {
     try {
       const attacker = makeBattlePokemon({
         name: 'Attacker',
-        stats: { hp: 100, attack: 100, defense: 100, specialAttack: 100, specialDefense: 100, speed: 100 },
+        stats: {
+          hp: 100,
+          attack: 100,
+          defense: 100,
+          specialAttack: 100,
+          specialDefense: 100,
+          speed: 100,
+        },
       })
       const baseline = makeBattlePokemon({
         name: 'Baseline',
         status: { id: 'burn', counter: 0 },
-        stats: { hp: 100, attack: 100, defense: 100, specialAttack: 100, specialDefense: 100, speed: 100 },
+        stats: {
+          hp: 100,
+          attack: 100,
+          defense: 100,
+          specialAttack: 100,
+          specialDefense: 100,
+          speed: 100,
+        },
       })
       const healer = makeBattlePokemon({
         name: 'Audino',
         ability: 'healer',
         status: { id: 'burn', counter: 0 },
-        stats: { hp: 100, attack: 100, defense: 100, specialAttack: 100, specialDefense: 100, speed: 100 },
+        stats: {
+          hp: 100,
+          attack: 100,
+          defense: 100,
+          specialAttack: 100,
+          specialDefense: 100,
+          speed: 100,
+        },
       })
       expect(
         calculateDamage(attacker, healer, 'power', 1, 'normal').damage,
-      ).toBe(
-        calculateDamage(attacker, baseline, 'power', 1, 'normal').damage,
-      )
+      ).toBe(calculateDamage(attacker, baseline, 'power', 1, 'normal').damage)
     } finally {
       Math.random = originalRandom
     }
@@ -4534,7 +4828,10 @@ describe('canonical battle abilities', () => {
       ],
     })
 
-    const switchMessages = processSecondaryStatusesForSwitch(switchState, 'enemy')
+    const switchMessages = processSecondaryStatusesForSwitch(
+      switchState,
+      'enemy',
+    )
 
     expect(magicGuardSwitchIn.currentHp).toBe(80)
     expect(switchMessages).toEqual([
@@ -4694,7 +4991,9 @@ describe('canonical battle abilities', () => {
     })
 
     expect(
-      canApplyStatus(groundedTarget, 'sleep', undefined, { terrain: 'electric' }),
+      canApplyStatus(groundedTarget, 'sleep', undefined, {
+        terrain: 'electric',
+      }),
     ).toBe(false)
     expect(
       canApplyStatus(flyingTarget, 'sleep', undefined, { terrain: 'electric' }),
@@ -4703,7 +5002,9 @@ describe('canonical battle abilities', () => {
       canApplyStatus(groundedTarget, 'burn', undefined, { terrain: 'misty' }),
     ).toBe(false)
     expect(
-      canApplyStatus(groundedTarget, 'confusion', undefined, { terrain: 'misty' }),
+      canApplyStatus(groundedTarget, 'confusion', undefined, {
+        terrain: 'misty',
+      }),
     ).toBe(true)
 
     const quickAttack = getMove('quick-attack')
@@ -4809,7 +5110,9 @@ describe('canonical battle abilities', () => {
     expect(greninja.types).toEqual(['ice'])
     expect(greninja.battleTypeOverride).toEqual(['ice'])
     expect(greninja.battleTypeOriginalTypes).toEqual(['Water', 'Dark'])
-    expect(greninja.battleAbilityState?.beforeAttackTypeChangeActivated).toBe(true)
+    expect(greninja.battleAbilityState?.beforeAttackTypeChangeActivated).toBe(
+      true,
+    )
 
     expect(
       applyBattleAbilityBeforeAttackTypeChange({

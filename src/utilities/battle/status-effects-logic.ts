@@ -116,6 +116,15 @@ export interface MoveAbsorbHealingResult {
   message: string
 }
 
+export function shouldApplyMoveSelfDamage(
+  selfDamage: MoveSelfDamageConfig | undefined,
+  outcome: 'hit' | 'miss',
+): boolean {
+  if (!selfDamage) return false
+  const trigger = selfDamage.trigger ?? 'on-hit'
+  return trigger === 'on-use' || trigger === `on-${outcome}`
+}
+
 function normalizeSelfDamageChance(chance: number | undefined): number {
   if (chance === undefined) return 100
   return Math.max(0, Math.min(100, chance))

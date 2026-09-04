@@ -3005,6 +3005,10 @@ export const PSYCHIC_TM_MOVES: MoveConfig[] = [
     accuracy: 100,
     level: 20,
     heal: true,
+    statusCure: {
+      target: 'self',
+      statuses: 'all',
+    },
     formId: ['488'],
   },
   {

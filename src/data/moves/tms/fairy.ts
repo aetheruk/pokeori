@@ -1030,6 +1030,7 @@ export const FAIRY_TM_MOVES: MoveConfig[] = [
     forcedType: 'fairy',
     damage: 1,
     accuracy: 100,
+    absorb: 75,
     level: 25,
     formId: [
       '12',
@@ -1277,6 +1278,16 @@ export const FAIRY_TM_MOVES: MoveConfig[] = [
         stages: 2,
         chance: 100,
       },
+      {
+        stat: 'specialDefense',
+        stages: 2,
+        chance: 100,
+      },
+      {
+        stat: 'speed',
+        stages: 2,
+        chance: 100,
+      },
     ],
     formId: ['716'],
   },
@@ -1443,6 +1454,23 @@ export const FAIRY_TM_MOVES: MoveConfig[] = [
     accuracy: 100,
     level: 20,
     heal: true,
+    weatherHeal: {
+      defaultPercent: 50,
+      weather: {
+        'harsh-sunlight': 66,
+        'extremely-harsh-sunlight': 66,
+        rain: 25,
+        'heavy-rain': 25,
+        thunderstorm: 25,
+        sandstorm: 25,
+        hail: 25,
+        snow: 25,
+        snowstorm: 25,
+        fog: 25,
+        'strong-winds': 25,
+        'shadowy-aura': 25,
+      },
+    },
     formId: [
       '35',
       '36',

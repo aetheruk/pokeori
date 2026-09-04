@@ -835,6 +835,7 @@ export const GRASS_TM_MOVES: MoveConfig[] = [
     level: 50,
     selfDamage: {
       fraction: 4,
+      trigger: 'on-use',
     },
     formId: ['10232'],
   },
@@ -2382,7 +2383,8 @@ export const GRASS_TM_MOVES: MoveConfig[] = [
   {
     id: 'jungle-healing',
     name: 'Jungle Healing',
-    description: "Restores the user's HP and cures status conditions.",
+    description:
+      "Restores the user's HP and cures status conditions affecting the user and their party.",
     stance: 'tech',
     target: 'self',
     forcedType: 'grass',
@@ -4115,6 +4117,7 @@ export const GRASS_TM_MOVES: MoveConfig[] = [
     accuracy: 100,
     level: 20,
     heal: true,
+    healByTargetStat: 'attack',
     debuffs: [
       {
         stat: 'attack',
@@ -4226,6 +4229,23 @@ export const GRASS_TM_MOVES: MoveConfig[] = [
     accuracy: 100,
     level: 20,
     heal: true,
+    weatherHeal: {
+      defaultPercent: 50,
+      weather: {
+        'harsh-sunlight': 66,
+        'extremely-harsh-sunlight': 66,
+        rain: 25,
+        'heavy-rain': 25,
+        thunderstorm: 25,
+        sandstorm: 25,
+        hail: 25,
+        snow: 25,
+        snowstorm: 25,
+        fog: 25,
+        'strong-winds': 25,
+        'shadowy-aura': 25,
+      },
+    },
     formId: [
       '1',
       '2',

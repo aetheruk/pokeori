@@ -1300,6 +1300,47 @@ describe('PVP turn engine helpers', () => {
     )
   })
 
+  test('PVP crash damage applies on a miss but not on a hit', () => {
+    const missedAttacker = makePokemon({
+      name: 'MissedKickUser',
+      currentHp: 100,
+      maxHp: 100,
+    })
+    const missed = resolvePvpCombat({
+      attacker: missedAttacker,
+      defender: makePokemon({ name: 'Defender' }),
+      move: { stance: 'power', specialMoveId: 'jump-kick' },
+      attackerName: 'Player',
+      attackerSide: 'player',
+      playerMove: { stance: 'power', specialMoveId: 'jump-kick' },
+      enemyMove: { stance: 'tech' },
+      random: () => 0.99,
+    })
+
+    expect(missed.didAttack).toBe(false)
+    expect(missedAttacker.currentHp).toBe(50)
+    expect(missed.message).toContain('hurt itself! [icon:damage:50]')
+
+    const hitAttacker = makePokemon({
+      name: 'LandedKickUser',
+      currentHp: 100,
+      maxHp: 100,
+    })
+    const hit = resolvePvpCombat({
+      attacker: hitAttacker,
+      defender: makePokemon({ name: 'Defender' }),
+      move: { stance: 'power', specialMoveId: 'jump-kick' },
+      attackerName: 'Player',
+      attackerSide: 'player',
+      playerMove: { stance: 'power', specialMoveId: 'jump-kick' },
+      enemyMove: { stance: 'tech' },
+      random: () => 0,
+    })
+
+    expect(hit.didAttack).toBe(true)
+    expect(hitAttacker.currentHp).toBe(100)
+  })
+
   test('PVP soundproof blocks incoming sound moves', () => {
     const attacker = makePokemon({
       name: 'Attacker',

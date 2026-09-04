@@ -75,8 +75,84 @@ import { makePveBattleState } from './helpers/battle-fixtures'
 import { makeBattlePokemon } from './helpers/battle-fixtures'
 import { shouldFailMoveFromStance } from '@/utilities/battle/move-contest'
 import { processBattleAbilitySwitchOut } from '@/utilities/battle/switching'
+import { shouldApplyMoveSelfDamage } from '@/utilities/battle/status-effects-logic'
 
 describe('move damage helpers', () => {
+  test('uses structured self-damage triggers instead of move descriptions', () => {
+    expect(shouldApplyMoveSelfDamage({ fraction: 4 }, 'hit')).toBe(true)
+    expect(shouldApplyMoveSelfDamage({ fraction: 4 }, 'miss')).toBe(false)
+    expect(
+      shouldApplyMoveSelfDamage(
+        { fraction: 2, trigger: 'on-miss' },
+        'miss',
+      ),
+    ).toBe(true)
+    expect(
+      shouldApplyMoveSelfDamage(
+        { fraction: 2, trigger: 'on-miss' },
+        'hit',
+      ),
+    ).toBe(false)
+    expect(
+      shouldApplyMoveSelfDamage(
+        { fraction: 2, trigger: 'on-use' },
+        'miss',
+      ),
+    ).toBe(true)
+  })
+
+  test('models corrected move mechanics with structured data', () => {
+    expect(getMove('nuzzle')?.description).not.toBe('')
+    expect(getMove('geomancy')?.buffs).toEqual([
+      { stat: 'specialAttack', stages: 2, chance: 100 },
+      { stat: 'specialDefense', stages: 2, chance: 100 },
+      { stat: 'speed', stages: 2, chance: 100 },
+    ])
+    expect(getMove('draining-kiss')?.absorb).toBe(75)
+    expect(getMove('lunar-blessing')?.statusCure).toEqual({
+      target: 'self',
+      statuses: 'all',
+    })
+    expect(getMove('shell-side-arm')?.status?.chance).toBe(20)
+    expect(getMove('fiery-wrath')?.charged).toBeUndefined()
+    for (const id of ['axe-kick', 'high-jump-kick', 'jump-kick']) {
+      expect(getMove(id)?.selfDamage).toMatchObject({
+        fraction: 2,
+        trigger: 'on-miss',
+      })
+    }
+  })
+
+  test('weather recovery and Strength Sap use their authored heal source', () => {
+    const user = makeBattlePokemon({ currentHp: 20, maxHp: 120 })
+    const target = makeBattlePokemon({
+      stats: { ...makeBattlePokemon().stats, attack: 73 },
+    })
+    const synthesis = getMove('synthesis')!
+    const moonlight = getMove('moonlight')!
+    const strengthSap = getMove('strength-sap')!
+
+    expect(
+      getMoveHealAmount({
+        move: synthesis,
+        pokemon: user,
+        weather: 'clear',
+      }),
+    ).toBe(60)
+    expect(
+      getMoveHealAmount({
+        move: moonlight,
+        pokemon: user,
+        weather: 'harsh-sunlight',
+      }),
+    ).toBe(79)
+    expect(
+      getMoveHealAmount({ move: synthesis, pokemon: user, weather: 'rain' }),
+    ).toBe(30)
+    expect(
+      getMoveHealAmount({ move: strengthSap, pokemon: user, target }),
+    ).toBe(73)
+  })
   test('basic stance attacks use 100 base accuracy with combined accuracy and evasion stages', () => {
     const state = makePveBattleState()
     const attacker = state.playerTeam[0]
@@ -4016,7 +4092,10 @@ describe('move damage helpers', () => {
       { stat: 'attack', stages: 1, chance: 100 },
       { stat: 'speed', stages: 2, chance: 100 },
     ])
-    expect(getMove('steel-beam')?.selfDamage).toEqual({ fraction: 2 })
+    expect(getMove('steel-beam')?.selfDamage).toEqual({
+      fraction: 2,
+      trigger: 'on-use',
+    })
     expect(getMove('tachyon-cutter')?.damageRange).toEqual({ min: 2, max: 2 })
 
     expect(getMove('baddy-bad')?.secondaryStatuses?.[0]).toMatchObject({

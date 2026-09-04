@@ -23,6 +23,8 @@ import {
   useState,
 } from 'react'
 import { toast } from 'sonner'
+import { MoveFieldNote } from '@/components/game/moves'
+import { MoveLearnerList } from '@/components/game/moves/move-learner-list'
 import { RewardCarousel } from '@/components/game/reward-carousel'
 import { GameInfoModal } from '@/components/game/shared/GameInfoModal'
 import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
@@ -30,13 +32,6 @@ import { PremiumSearch } from '@/components/game/shared/PremiumSearch'
 import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
-import {
-  STANCE_ICON_CONFIG,
-  StanceIcon,
-} from '@/components/game/shared/stance-icon'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { CurrencySprite } from '@/components/ui/currency-sprite'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,6 +42,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { Button } from '@/components/ui/button'
+import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
@@ -63,12 +60,6 @@ import {
 } from '@/data/items/types'
 import { getMove } from '@/data/moves'
 import type { MoveConfig } from '@/data/moves/types'
-import type {
-  PokemonData,
-  PokemonForm,
-  PokemonSpecies,
-} from '@/data/pokemon-data'
-import pokemonData from '@/data/pokemon-data'
 import {
   BOOK_OF_CHANNELING_ITEM_ID,
   getSpiritChannelingActivityId,
@@ -78,12 +69,7 @@ import {
 import { TaskIcon } from '@/data/types'
 import { cn } from '@/lib/utils'
 import { isPokemonTargetedInventoryItem } from '@/utilities/pokemon/item-usability'
-import {
-  getMoveDisplayType,
-  getMoveInfoTags,
-  getMoveTypeSpriteItemId,
-} from '@/utilities/pokemon/move-display'
-import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
+import { getMovePresentation } from '@/utilities/pokemon/move-display'
 import { RewardSummary } from '@/utilities/rewards/reward-logic'
 import { getItemSkillLockReason } from '@/utilities/skills/unlocks'
 import {
@@ -126,12 +112,6 @@ type PokedexProgressByForm = Record<
     caught?: boolean | null
   }
 >
-
-interface MoveLearner {
-  species: PokemonSpecies
-  form: PokemonForm
-  progress?: PokedexProgressByForm[string]
-}
 
 const RECENT_INVENTORY_STORAGE_KEY = 'pokemon-app:recent-inventory-items'
 
@@ -264,38 +244,6 @@ function getInventoryDisplayLabel(
   if (activeGroup === 'tms' && activeSubCategory === 'tms') return groupLabel
 
   return `${groupLabel} · ${subLabel}`
-}
-
-function getMoveLearners(move: MoveConfig): {
-  learners: MoveLearner[]
-  allPokemon: boolean
-} {
-  const allowedForms = new Set(
-    move.formId?.map((formId) => String(formId)) ?? [],
-  )
-  const learners: MoveLearner[] = []
-
-  for (const species of pokemonData as PokemonData) {
-    for (const form of species.forms) {
-      if (!allowedForms.has(String(form.id))) continue
-      if (
-        move.excludedFormIds?.some(
-          (excludedFormId) => String(excludedFormId) === String(form.id),
-        )
-      ) {
-        continue
-      }
-      learners.push({ species, form })
-    }
-  }
-
-  return {
-    learners: learners.sort((a, b) => {
-      if (a.species.id !== b.species.id) return a.species.id - b.species.id
-      return Number(a.form.id) - Number(b.form.id)
-    }),
-    allPokemon: false,
-  }
 }
 
 export function InventoryList() {
@@ -777,10 +725,7 @@ export function InventoryList() {
 
       setIsUsing(true)
       try {
-        const result = await useAllBoosterPacks(
-          item.id,
-          crypto.randomUUID(),
-        )
+        const result = await useAllBoosterPacks(item.id, crypto.randomUUID())
         if (result.success && result.cards) {
           setSelectedItem(null)
           refreshUser()
@@ -1281,147 +1226,19 @@ function TmMoveDetails({
   move: MoveConfig
   pokedexByForm: PokedexProgressByForm
 }) {
-  const { learners, allPokemon } = useMemo(() => getMoveLearners(move), [move])
-  const tags = useMemo(() => getMoveInfoTags(move), [move])
-  const moveType = getMoveDisplayType(move)
-  const moveTypeLabel = moveType === 'random' ? 'Random' : moveType
-  const filteredTags = useMemo(
+  const sourceKind = item.name.startsWith('HM') ? 'hm' : 'tm'
+  const presentation = useMemo(
     () =>
-      tags.filter(
-        (tag) =>
-          tag.label !== 'Level' &&
-          tag.label !== 'Stance' &&
-          tag.label !== 'Type',
-      ),
-    [tags],
+      getMovePresentation(move, {
+        source: { kind: sourceKind, label: item.name },
+      }),
+    [item.name, move, sourceKind],
   )
-  const stanceConfig = STANCE_ICON_CONFIG[move.stance]
 
   return (
-    <div className="space-y-8">
-      <div className="space-y-4">
-        <SectionDivider>Move data</SectionDivider>
-        <div className="rounded-lg border border-game-border bg-game-surface p-4 md:p-5">
-          <div className="flex items-start gap-4">
-            <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
-              <ItemSprite
-                itemId={getMoveTypeSpriteItemId(move)}
-                alt={`${moveType} TM`}
-                width={44}
-                height={44}
-                className="h-10 w-10 object-contain"
-              />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <h3 className="font-display text-xl font-semibold text-game-ink">
-                  {move.name}
-                </h3>
-              </div>
-              <div className="mt-2 flex items-center gap-2">
-                <StanceIcon
-                  stance={move.stance}
-                  className={cn(
-                    'h-4 w-4',
-                    stanceConfig?.tone || 'text-game-ochre',
-                  )}
-                />
-                <Badge className="border-game-border bg-game-canvas px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-game-ink">
-                  {moveTypeLabel}
-                </Badge>
-              </div>
-              <p className="mt-2 text-sm leading-relaxed text-game-muted">
-                {move.description || item.description}
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {filteredTags.map((tag) => (
-              <div
-                key={`${tag.label}-${tag.value}`}
-                className="rounded-lg border border-game-border bg-game-surface-raised px-3 py-2"
-              >
-                <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-game-muted">
-                  {tag.label}
-                </div>
-                <div className="mt-0.5 truncate text-xs font-bold capitalize text-game-ink">
-                  {tag.value}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <SectionDivider>Can learn</SectionDivider>
-        <div className="rounded-lg border border-game-border bg-game-surface p-3">
-          {allPokemon ? (
-            <p className="text-sm text-game-ink">
-              All Pokemon can use this move.
-            </p>
-          ) : (
-            <div className="max-h-[min(22rem,45dvh)] overflow-y-auto pr-1 custom-scrollbar">
-              <div className="grid grid-cols-[repeat(auto-fill,minmax(4.5rem,4.5rem))] justify-start gap-2">
-                {learners.map((learner) => (
-                  <TmLearnerTile
-                    key={`${learner.species.id}-${learner.form.id}`}
-                    learner={learner}
-                    progress={pokedexByForm[String(learner.form.id)]}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function TmLearnerTile({
-  learner,
-  progress,
-}: {
-  learner: MoveLearner
-  progress?: PokedexProgressByForm[string]
-}) {
-  const hasSeen = !!(progress?.seen || progress?.caught)
-  const hasCaught = !!progress?.caught
-
-  return (
-    <div
-      className={cn(
-        'relative h-[4.5rem] w-[4.5rem] overflow-hidden rounded-lg border bg-game-surface-raised p-1.5',
-        hasCaught
-          ? 'border-game-moss/40'
-          : hasSeen
-            ? 'border-game-border-strong'
-            : 'border-game-border',
-      )}
-      title={hasSeen ? learner.form.name : 'Unknown Pokemon'}
-    >
-      {hasSeen ? (
-        <Image
-          src={getPokemonImageUrl(String(learner.form.id), 'sprite')}
-          alt={learner.form.name}
-          fill
-          sizes="80px"
-          className="object-contain p-1"
-          style={{
-            filter: hasCaught ? undefined : 'grayscale(1) opacity(0.75)',
-          }}
-        />
-      ) : (
-        <div className="flex h-full w-full items-center justify-center text-game-muted">
-          <span className="text-2xl font-bold text-game-muted">?</span>
-        </div>
-      )}
-      <div className="absolute bottom-1 right-1 rounded bg-game-surface/90 px-1 py-0.5 font-mono text-[10px] font-bold leading-none text-game-muted">
-        #{learner.species.id}
-      </div>
-    </div>
+    <MoveFieldNote presentation={presentation}>
+      <MoveLearnerList move={move} progressByForm={pokedexByForm} />
+    </MoveFieldNote>
   )
 }
 

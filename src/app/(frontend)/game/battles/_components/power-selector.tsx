@@ -11,32 +11,31 @@ import {
   Sparkles,
   Zap,
 } from 'lucide-react'
-import Image from 'next/image'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { MoveDecisionCard, MoveFieldNote } from '@/components/game/moves'
 import { StanceIcon } from '@/components/game/shared/stance-icon'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { SectionDivider } from '@/components/ui/section-divider'
+import type { PokemonTypeName } from '@/data/items/types'
+import { getMove, type MoveConfig } from '@/data/moves'
 import { DYNAMAX_UNLOCK_TURNS } from '@/data/powers'
 import { cn } from '@/lib/utils'
+import { resolveHiddenPower } from '@/utilities/battle/hidden-power'
+import { resolveDynamicMoveType } from '@/utilities/battle/move-effects'
 import { getMoveEffectivePower } from '@/utilities/battle/move-presentation'
 import { getPokemonMoveUsesRemaining } from '@/utilities/battle/move-uses'
+import type {
+  BattlePokemon,
+  BattleStance,
+  BattleState,
+} from '@/utilities/battle/types'
 import {
-  getMoveDisplayType,
-  getMoveInfoTags,
-  getMoveTypeSpriteItemId,
+  getMovePresentation,
+  type MovePresentation,
 } from '@/utilities/pokemon/move-display'
-import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
-import { getMove } from '@/data/moves'
-import type { BattleStance } from '@/utilities/battle/types'
 import {
   POKEMON_POWER_OPTIONS,
   type PokemonPowerId,
@@ -44,45 +43,48 @@ import {
 
 import { useBattleContext } from './battle-context'
 
-const MOVE_TYPE_IDS: Record<string, number> = {
-  normal: 1,
-  fighting: 2,
-  flying: 3,
-  poison: 4,
-  ground: 5,
-  rock: 6,
-  bug: 7,
-  ghost: 8,
-  steel: 9,
-  fire: 10,
-  water: 11,
-  grass: 12,
-  electric: 13,
-  psychic: 14,
-  ice: 15,
-  dragon: 16,
-  dark: 17,
-  fairy: 18,
-}
+function getBattleMovePresentation(
+  move: MoveConfig,
+  pokemon: BattlePokemon,
+  state: BattleState,
+  selectedType?: string | null,
+): MovePresentation {
+  const fallbackType =
+    selectedType?.toLowerCase() || pokemon.types?.[0]?.toLowerCase() || 'normal'
+  const hiddenPowerType =
+    move.id === 'hidden-power'
+      ? resolveHiddenPower(pokemon).attackType
+      : undefined
+  const authoredType =
+    move.forcedType === 'random' ? undefined : move.forcedType || fallbackType
+  const baseType = hiddenPowerType || authoredType
+  const opponent = state.enemyTeam[state.activeEnemyIndex]
+  const currentType = move.dynamicType
+    ? resolveDynamicMoveType({
+        move,
+        attacker: pokemon,
+        defender: opponent,
+        weather: state.weather?.weather,
+        fallbackType: baseType || fallbackType,
+      })
+    : baseType
+  const effectivePower = getMoveEffectivePower(
+    move,
+    pokemon.stats,
+    pokemon.statStages,
+  )
 
-const MOVE_STANCE_TONES = {
-  power: {
-    chip: 'border-game-clay/40 bg-game-clay/10 text-game-clay-strong',
-    value: 'text-game-clay-strong',
-  },
-  speed: {
-    chip: 'border-game-stance-blue/45 bg-game-stance-blue/10 text-game-stance-blue-strong',
-    value: 'text-game-stance-blue-strong',
-  },
-  tech: {
-    chip: 'border-game-moss/40 bg-game-moss/10 text-game-moss-strong',
-    value: 'text-game-moss-strong',
-  },
-  random: {
-    chip: 'border-game-ochre/45 bg-game-ochre/10 text-game-ochre',
-    value: 'text-game-ochre',
-  },
-} as const
+  return getMovePresentation(move, {
+    resolvedType: currentType as PokemonTypeName | undefined,
+    offensiveValue:
+      effectivePower === 'Status'
+        ? undefined
+        : {
+            label: 'Current offensive value',
+            value: effectivePower,
+          },
+  })
+}
 
 export function PowerSelector() {
   const {
@@ -120,17 +122,6 @@ export function PowerSelector() {
   const powersData = battlePowersData
   const [using, setUsing] = useState<string | null>(null)
   const [moveInfoId, setMoveInfoId] = useState<string | null>(null)
-  const moveHoldTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const longPressTriggered = useRef(false)
-
-  const clearMoveHold = () => {
-    if (moveHoldTimer.current) {
-      clearTimeout(moveHoldTimer.current)
-      moveHoldTimer.current = null
-    }
-  }
-
-  useEffect(() => clearMoveHold, [])
 
   // Check if any powers are available
   const hasAnyMoves = availableMoves.length > 0
@@ -201,18 +192,6 @@ export function PowerSelector() {
     } finally {
       setUsing(null)
     }
-  }
-
-  const openMoveInfo = (moveId: string) => {
-    clearMoveHold()
-    longPressTriggered.current = true
-    setMoveInfoId(moveId)
-  }
-
-  const startMoveHold = (moveId: string) => {
-    clearMoveHold()
-    longPressTriggered.current = false
-    moveHoldTimer.current = setTimeout(() => openMoveInfo(moveId), 500)
   }
 
   const handleUseVictory = async (itemId: string) => {
@@ -394,95 +373,46 @@ export function PowerSelector() {
               No move uses remaining this battle
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-2 pb-1">
+            <div className="grid gap-3 pb-1 sm:grid-cols-2">
               {availableMoves.map((move) => {
-                const moveType =
-                  move.forcedType?.toLowerCase() ||
-                  selectedType?.toLowerCase() ||
-                  activePlayerMon.types?.[0]?.toLowerCase() ||
-                  'normal'
-                const moveTypeId = MOVE_TYPE_IDS[moveType]
-                const effectivePower = getMoveEffectivePower(
-                  move,
-                  activePlayerMon.stats,
-                  activePlayerMon.statStages,
+                const moveConfig = getMove(move.id)
+                if (!moveConfig) return null
+                const presentation = getBattleMovePresentation(
+                  moveConfig,
+                  activePlayerMon,
+                  battleState,
+                  selectedType,
                 )
-                const stanceTone = MOVE_STANCE_TONES[move.stance]
 
                 return (
-                  <Button
+                  <MoveDecisionCard
                     key={move.id}
-                    variant="outline"
-                    className="group h-28 w-full min-w-0 flex-col items-stretch justify-between gap-2 rounded-lg border border-game-border bg-game-surface-raised px-3 py-3 text-left shadow-sm transition-colors hover:border-game-moss/60 hover:bg-game-moss/10"
-                    disabled={using !== null}
-                    title={`Use ${move.name}. Press and hold for move details.`}
-                    aria-description="Press and hold for move details."
-                    onPointerDown={(event) => {
-                      if (event.pointerType !== 'mouse' || event.button === 0) {
-                        startMoveHold(move.id)
-                      }
-                    }}
-                    onPointerUp={clearMoveHold}
-                    onPointerCancel={clearMoveHold}
-                    onPointerLeave={clearMoveHold}
-                    onContextMenu={(event) => {
-                      event.preventDefault()
-                      openMoveInfo(move.id)
-                    }}
-                    onClick={() => {
-                      if (longPressTriggered.current) {
-                        longPressTriggered.current = false
-                        return
-                      }
-                      void handleUseMove(move.id)
-                    }}
-                  >
-                    <div className="flex w-full items-center justify-between gap-2">
-                      <div className="flex h-6 min-w-0 items-center">
-                        {moveTypeId ? (
-                          <Image
-                            src={getPokemonTypeIconUrl(moveTypeId)}
-                            alt={`${moveType} type`}
-                            width={64}
-                            height={28}
-                            className="h-5 w-auto object-contain"
-                            unoptimized
-                          />
-                        ) : (
-                          <span className="truncate rounded-full border border-game-ochre/40 bg-game-ochre/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-game-ochre">
-                            {moveType}
-                          </span>
-                        )}
-                      </div>
-                      <span
-                        className={cn(
-                          'inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-1 text-[9px] font-black uppercase tracking-wider',
-                          stanceTone.chip,
-                        )}
+                    presentation={presentation}
+                    className="h-full"
+                    detailsAction={
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="min-h-11"
+                        onClick={() => setMoveInfoId(move.id)}
                       >
-                        <StanceIcon stance={move.stance} className="size-3" />
-                        {move.stance}
-                      </span>
-                    </div>
-                    <div className="flex w-full min-w-0 items-end justify-between gap-2">
-                      <span className="line-clamp-2 min-w-0 flex-1 text-sm font-bold leading-tight text-game-ink">
-                        {move.name}
-                      </span>
-                      <div
-                        className={cn(
-                          'shrink-0 text-right font-black leading-none',
-                          effectivePower === 'Status'
-                            ? 'text-lg'
-                            : effectivePower.includes('–')
-                              ? 'text-2xl sm:text-3xl'
-                              : 'text-3xl sm:text-4xl',
-                          stanceTone.value,
-                        )}
+                        Details
+                      </Button>
+                    }
+                    primaryAction={
+                      <Button
+                        type="button"
+                        className="min-h-11"
+                        disabled={using !== null}
+                        onClick={() => void handleUseMove(move.id)}
                       >
-                        {effectivePower}
-                      </div>
-                    </div>
-                  </Button>
+                        {using === move.id ? (
+                          <Loader2 className="size-4 animate-spin" />
+                        ) : null}
+                        Use {move.name}
+                      </Button>
+                    }
+                  />
                 )
               })}
             </div>
@@ -528,10 +458,26 @@ export function PowerSelector() {
       )}
 
       <MoveInfoDialog
-        moveId={moveInfoId}
+        presentation={
+          moveInfoId
+            ? (() => {
+                const moveOption = availableMoves.find(
+                  (candidate) => candidate.id === moveInfoId,
+                )
+                const move = moveOption ? getMove(moveOption.id) : undefined
+                return move
+                  ? getBattleMovePresentation(
+                      move,
+                      activePlayerMon,
+                      battleState,
+                      selectedType,
+                    )
+                  : null
+              })()
+            : null
+        }
         onOpenChange={(open) => {
           if (!open) {
-            longPressTriggered.current = false
             setMoveInfoId(null)
           }
         }}
@@ -1148,71 +1094,19 @@ export function PowerSelector() {
 }
 
 function MoveInfoDialog({
-  moveId,
+  presentation,
   onOpenChange,
 }: {
-  moveId: string | null
+  presentation: MovePresentation | null
   onOpenChange: (open: boolean) => void
 }) {
-  const move = moveId ? getMove(moveId) : undefined
-  const moveType = move ? getMoveDisplayType(move) : 'normal'
-  const tags = move ? getMoveInfoTags(move) : []
-
   return (
-    <Dialog open={moveId !== null} onOpenChange={onOpenChange}>
+    <Dialog open={presentation !== null} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[88dvh] overflow-y-auto border-game-border bg-game-surface text-game-ink sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>{move?.name || 'Move details'}</DialogTitle>
-          <DialogDescription>
-            {move
-              ? 'Battle move information'
-              : 'This move is no longer available.'}
-          </DialogDescription>
-        </DialogHeader>
-        {move && (
-          <div className="space-y-4">
-            <div className="game-panel flex items-start gap-4 p-4">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
-                <ItemSprite
-                  itemId={getMoveTypeSpriteItemId(move)}
-                  alt={`${moveType} TM`}
-                  width={44}
-                  height={44}
-                  className="h-10 w-10 object-contain"
-                />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <StanceIcon
-                    stance={move.stance}
-                    className="h-4 w-4 text-game-moss-strong"
-                  />
-                  <span className="rounded-full border border-game-border bg-game-canvas px-2 py-0.5 text-[10px] font-semibold uppercase text-game-ink">
-                    {moveType}
-                  </span>
-                </div>
-                <p className="mt-3 text-sm leading-relaxed text-game-muted">
-                  {move.description}
-                </p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {tags.map((tag) => (
-                <div
-                  key={`${move.id}-${tag.label}`}
-                  className="rounded-lg border border-game-border bg-game-surface-raised px-3 py-2"
-                >
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-game-muted">
-                    {tag.label}
-                  </div>
-                  <div className="mt-0.5 truncate text-xs font-bold capitalize text-game-ink">
-                    {tag.value}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        <DialogTitle className="sr-only">
+          {presentation?.identity.name ?? 'Move details'}
+        </DialogTitle>
+        {presentation ? <MoveFieldNote presentation={presentation} /> : null}
       </DialogContent>
     </Dialog>
   )

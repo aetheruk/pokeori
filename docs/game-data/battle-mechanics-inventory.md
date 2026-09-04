@@ -1,6 +1,8 @@
 # Battle Mechanics Inventory
 
-Last reviewed: 2026-08-19
+Last reviewed: 2026-09-04
+
+Release 0.26.0 introduces a shared structured move presentation used by MoveDex/Sketchbook, TM and HM inventory notes, Pokédex compatibility notes, Pokémon loadouts, and battle decisions. It distinguishes base power from special fixed/OHKO/delayed models, exposes always-hit behavior, targets, chances, durations, scopes, use conditions, charge/recharge, multi-hit behavior, dynamic type rules, and costs. Move descriptions are no longer runtime inputs for healing or recoil classification. Self damage now authors an explicit `on-hit`, `on-miss`, or `on-use` trigger, and Strength Sap authors target-Attack healing. The corrected catalog entries include Nuzzle, Geomancy, Heal Bell, Jungle Healing, Lunar Blessing, Draining Kiss, Synthesis, Moonlight, Strength Sap, Shell Side Arm, Fiery Wrath, High Jump Kick, Jump Kick, and Axe Kick.
 
 Release 0.14.0 adds Koga's original `swift-poison` Gym TM. It is a 90%-accuracy Poison Speed move that deals 0.2x damage, poisons on a successful hit, succeeds only when the user's effective Speed is higher than the target's, and prevents the target's same-turn counterattack when successful.
 

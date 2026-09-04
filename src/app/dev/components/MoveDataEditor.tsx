@@ -1988,7 +1988,10 @@ export function MoveDataEditor() {
     updateWorkingMove({ selfDamage: next })
   }
 
-  const handleSelfDamageValue = (field: keyof SelfDamageConfig, value: string) => {
+  const handleSelfDamageValue = (
+    field: 'chance' | 'fraction',
+    value: string,
+  ) => {
     if (!workingMove?.selfDamage) return
 
     const parsed = parseNumericValue(value)

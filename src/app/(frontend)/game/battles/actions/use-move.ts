@@ -29,6 +29,7 @@ import {
 import {
   applyMoveAbsorbHealing,
   applyMoveSelfDamage,
+  shouldApplyMoveSelfDamage,
 } from '@/utilities/battle/status-effects-logic'
 import { logger } from '@/utilities/logger'
 import { getUser } from '../helpers/user'
@@ -1141,6 +1142,7 @@ export async function useMove(
       const healAmount = getMoveHealAmount({
         move,
         pokemon: playerMon,
+        target: enemyMon,
         weather: state.weather?.weather,
       })
       // Primary healing is a temporary HP credit. It is capped only after the
@@ -1779,7 +1781,10 @@ export async function useMove(
         }
       }
 
-      if (!moveFailed && move.selfDamage) {
+      if (
+        !moveFailed &&
+        shouldApplyMoveSelfDamage(move.selfDamage, moveMissed ? 'miss' : 'hit')
+      ) {
         const recoilBlockMessage = getBattleRecoilDamageBlockMessage(
           playerMon,
           move,
@@ -2133,6 +2138,7 @@ export async function useMove(
         enemyPrimaryHealing = getMoveHealAmount({
           move: enemyBattleAction.move,
           pokemon: enemyMon,
+          target: playerMon,
           weather: state.weather?.weather,
         })
         const primaryOverkill = Math.max(
@@ -2360,6 +2366,20 @@ export async function useMove(
         if (enemyContestMessage) message += `\n${enemyContestMessage}`
       } else if (enemyMoveMissed && !enemyBattleAction.isBasicAttack) {
         message += ` ${enemyBattleAction.move.name} missed!`
+        if (
+          shouldApplyMoveSelfDamage(
+            enemyBattleAction.move.selfDamage,
+            'miss',
+          )
+        ) {
+          const selfDamageResult = applyMoveSelfDamage(
+            enemyMon,
+            enemyBattleAction.move.selfDamage,
+          )
+          if (selfDamageResult.applied) {
+            message += `\n${selfDamageResult.message}`
+          }
+        }
       } else if (enemyBattleAction.effectOnly) {
         if (enemyAiEffectMessages.length) {
           message += `\n${enemyAiEffectMessages.join('\n')}`

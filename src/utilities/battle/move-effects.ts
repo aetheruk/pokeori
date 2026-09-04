@@ -555,10 +555,14 @@ export function getConditionalDamageMultiplier(params: {
 export function getMoveHealAmount(params: {
   move: MoveConfig
   pokemon: BattlePokemon
+  target?: BattlePokemon
   weather?: WeatherType
 }): number {
   if (params.move.healFull)
     return params.pokemon.maxHp - params.pokemon.currentHp
+  if (params.move.healByTargetStat === 'attack') {
+    return Math.max(0, Math.floor(params.target?.stats.attack ?? 0))
+  }
   const weatherHeal = params.move.weatherHeal
   const percent = weatherHeal
     ? (weatherHeal.weather?.[params.weather ?? 'clear'] ??
