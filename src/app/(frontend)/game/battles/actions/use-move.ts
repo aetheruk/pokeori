@@ -58,6 +58,7 @@ import {
 } from '@/utilities/user-state'
 import {
   attemptSmeargleSketch,
+  getAvailableSketchMoveIds,
   getSketchableOpponentMoveIds,
   SKETCH_MOVE_ID,
 } from '@/utilities/pokemon/sketch'
@@ -2428,33 +2429,36 @@ export async function useMove(
             ...existingSketchedMoveIds,
             ...pendingSketchedMoveIds,
           ])
-          const sketchedMoveId = attemptSmeargleSketch({
-            attacker: playerMon,
-            opponent: enemyMon,
-            alreadySketchedMoveIds: [
-              ...existingSketchedMoveIds,
-              ...pendingSketchedMoveIds,
-            ],
-          })
+          const availableSketchMoveIds = getAvailableSketchMoveIds(enemyMon, [
+            ...knownSketchedMoveIds,
+          ])
 
-          if (!sketchedMoveId) {
-            message += `\n${playerMon.name}'s Sketch failed to capture a move.`
-          } else if (knownSketchedMoveIds.has(sketchedMoveId)) {
-            message += `\n${playerMon.name}'s Sketch found no new move.`
+          if (availableSketchMoveIds.length === 0) {
+            message += `\n${enemyMon.name} has no new move that can be sketched.`
           } else {
-            const { getMove } = await import('@/data/moves')
-            const sketchedMove = getMove(sketchedMoveId)
-            const sketchedMoveName = sketchedMove?.name || sketchedMoveId
-            state.pendingSketchedMoves = [
-              ...(state.pendingSketchedMoves || []),
-              {
-                id: sketchedMoveId,
-                name: sketchedMoveName,
-                userId: user.id,
-                attackerName: playerMon.name,
-              },
-            ]
-            message += `\n${playerMon.name} sketched ${sketchedMoveName}!`
+            const sketchedMoveId = attemptSmeargleSketch({
+              attacker: playerMon,
+              opponent: enemyMon,
+              alreadySketchedMoveIds: [...knownSketchedMoveIds],
+            })
+
+            if (!sketchedMoveId) {
+              message += `\n${playerMon.name}'s Sketch failed to capture a move.`
+            } else {
+              const { getMove } = await import('@/data/moves')
+              const sketchedMove = getMove(sketchedMoveId)
+              const sketchedMoveName = sketchedMove?.name || sketchedMoveId
+              state.pendingSketchedMoves = [
+                ...(state.pendingSketchedMoves || []),
+                {
+                  id: sketchedMoveId,
+                  name: sketchedMoveName,
+                  userId: user.id,
+                  attackerName: playerMon.name,
+                },
+              ]
+              message += `\n${playerMon.name} sketched ${sketchedMoveName}!`
+            }
           }
         }
       }

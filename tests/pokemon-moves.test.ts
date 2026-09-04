@@ -12,6 +12,7 @@ import {
 } from '@/utilities/pokemon/pokemon-moves'
 import {
   attemptSmeargleSketch,
+  getAvailableSketchMoveIds,
   getSketchableOpponentMoveIds,
 } from '@/utilities/pokemon/sketch'
 import type { BattlePokemon } from '@/utilities/battle/types'
@@ -129,6 +130,33 @@ describe('pokemon move assignment helpers', () => {
         })(),
       }),
     ).toBe('thunderbolt')
+  })
+
+  test('Sketch checks for a new opposing move before rolling its capture chance', () => {
+    const smeargle = makeBattlePokemon({
+      formId: '235',
+      speciesId: 235,
+      name: 'Smeargle',
+      types: ['Normal'],
+    })
+    const opponent = makeBattlePokemon({
+      battleMoveIds: ['thunderbolt', 'sketch'],
+    })
+    let randomCalls = 0
+
+    expect(getAvailableSketchMoveIds(opponent, ['thunderbolt'])).toEqual([])
+    expect(
+      attemptSmeargleSketch({
+        attacker: smeargle,
+        opponent,
+        alreadySketchedMoveIds: ['thunderbolt'],
+        random: () => {
+          randomCalls += 1
+          return 0
+        },
+      }),
+    ).toBeUndefined()
+    expect(randomCalls).toBe(0)
   })
 
   test('universal stat-contest moves exclude Ditto, Smeargle, and every Unown form', () => {

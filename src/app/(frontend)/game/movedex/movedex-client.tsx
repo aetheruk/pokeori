@@ -380,9 +380,9 @@ export default function MoveDexPage() {
                 Smeargle&apos;s field notes
               </h2>
               <p className="mt-1 text-xs leading-relaxed text-game-muted sm:text-sm">
-                When Smeargle uses Sketch, it has a 25% chance to record the
-                foe&apos;s move. Win the battle to keep the record; Sketched
-                moves can only be assigned to Smeargle.
+                When the foe has a new eligible move, Smeargle&apos;s Sketch has
+                a 25% chance to record it. Win the battle to keep the record;
+                Sketched moves can only be assigned to Smeargle.
               </p>
             </div>
           </div>

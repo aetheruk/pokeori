@@ -15,11 +15,12 @@ import {
   Lock,
   Maximize2,
   Megaphone,
+  SlidersHorizontal,
   Sparkles,
   Square,
   Swords,
-  Trash2,
   Triangle,
+  X,
   Zap,
 } from 'lucide-react'
 import Image from 'next/image'
@@ -27,7 +28,7 @@ import { useRouter } from 'next/navigation'
 import * as React from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { MoveCompactRow, MoveFieldNote } from '@/components/game/moves'
+import { MoveFieldNote, MoveLoadoutWorkspace } from '@/components/game/moves'
 import { RewardSummaryDisplay } from '@/components/game/reward-summary'
 import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { StanceIcon } from '@/components/game/shared/stance-icon'
@@ -68,6 +69,7 @@ import type { MoveConfig } from '@/data/moves/types'
 import { NATURES } from '@/data/natures'
 import { cn } from '@/lib/utils'
 import type { Pokemon, User } from '@/payload-types'
+import type { BattlePokemon } from '@/utilities/battle/types'
 import { getAbilityDexPartnerEffectLines } from '@/utilities/pokemon/abilitydex'
 import {
   capitalizeFirstLetter,
@@ -90,7 +92,14 @@ import {
   getHeldItemDefinition,
   getHeldItemOptions,
 } from '@/utilities/pokemon/held-items'
-import { getMovePresentation } from '@/utilities/pokemon/move-display'
+import {
+  getMovePresentation,
+  getMoveTypeSpriteItemId,
+} from '@/utilities/pokemon/move-display'
+import {
+  autoPickMoveLoadout,
+  type MoveLoadoutEntry,
+} from '@/utilities/pokemon/move-loadout'
 import { getPokemonForm, getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import {
   getAvailableMoveOptions,
@@ -740,6 +749,7 @@ export function PokemonDetailsDialog({
     currentAssignedMoveIds,
   )
   const [moveDetail, setMoveDetail] = useState<MoveConfig | null>(null)
+  const [moveWorkspaceOpen, setMoveWorkspaceOpen] = useState(false)
   const [isSavingMoves, setIsSavingMoves] = useState(false)
   useEffect(() => {
     setSelectedMoveIds(currentAssignedMoveIds)
@@ -809,7 +819,73 @@ export function PokemonDetailsDialog({
     }
   }
 
-  const handleSaveAssignedMoves = async () => {
+  const moveLoadoutEntries = useMemo<MoveLoadoutEntry[]>(
+    () =>
+      assignableMoves.flatMap((move) => {
+        const fullMove = getMove(move.id)
+        if (!fullMove) return []
+        const ownedMoveItem = items.find(
+          (item) =>
+            item.moveId === move.id &&
+            (effectiveInventoryMap[item.id] || 0) > 0,
+        )
+        const isSketched = Boolean(
+          gameData?.sketchedMoves?.includes(move.id) && !ownedMoveItem,
+        )
+        const isResearchMove = move.id === 'sketch'
+        const source = isResearchMove
+          ? 'level'
+          : isSketched
+            ? 'sketch'
+            : ownedMoveItem?.id.startsWith('hm-')
+              ? 'hm'
+              : 'tm'
+        const sourceLabel = isResearchMove
+          ? 'Research move'
+          : isSketched
+            ? 'Sketchbook'
+            : source === 'hm'
+              ? 'Owned HM'
+              : 'Owned TM'
+
+        return [{ move: fullMove, source, sourceLabel }]
+      }),
+    [assignableMoves, effectiveInventoryMap, gameData?.sketchedMoves],
+  )
+
+  const handleAutoPickAssignedMoves = () => {
+    if (battleMovesUnlockMessage) {
+      toast.error(battleMovesUnlockMessage)
+      return
+    }
+    if (
+      maxAssignableMoves <= 0 ||
+      moveLoadoutEntries.length === 0 ||
+      !effectiveStats
+    )
+      return
+
+    const self = {
+      ...pokemon,
+      name: pokemon.name || formInfo?.name || 'Pokemon',
+      types: formInfo?.types || [],
+      stats: effectiveStats,
+      currentHp: effectiveStats.hp,
+      maxHp: effectiveStats.hp,
+    } as BattlePokemon
+    const filled = autoPickMoveLoadout({
+      pokemon: self,
+      moveIds: moveLoadoutEntries.map((entry) => entry.move.id),
+      maxMoves: maxAssignableMoves,
+    })
+
+    setSelectedMoveIds(filled)
+    toast.success(
+      `Auto-picked ${filled.length} balanced move${filled.length === 1 ? '' : 's'}. Review, then save.`,
+    )
+  }
+
+  const handleSaveAssignedMoves = async (closeWorkspace = false) => {
     if (isSavingMoves) return
     setIsSavingMoves(true)
     try {
@@ -817,6 +893,7 @@ export function PokemonDetailsDialog({
       if (result.success) {
         toast.success('Moves assigned')
         if (result.pokemon && onRename) onRename(result.pokemon)
+        if (closeWorkspace) setMoveWorkspaceOpen(false)
       } else {
         toast.error(result.message || 'Could not assign moves')
       }
@@ -825,21 +902,9 @@ export function PokemonDetailsDialog({
     }
   }
 
-  const handleClearAssignedMoves = async () => {
+  const handleClearAssignedMoves = () => {
     if (isSavingMoves || !hasAssignedMoves) return
-    setIsSavingMoves(true)
-    try {
-      const result = await setAssignedMoves(pokemon.id, [])
-      if (result.success) {
-        setSelectedMoveIds([])
-        toast.success('Moves cleared')
-        if (result.pokemon && onRename) onRename(result.pokemon)
-      } else {
-        toast.error(result.message || 'Could not clear moves')
-      }
-    } finally {
-      setIsSavingMoves(false)
-    }
+    setSelectedMoveIds([])
   }
 
   const calculateMaxStat = (statName: 'hp' | 'other', base: number) => {
@@ -873,7 +938,10 @@ export function PokemonDetailsDialog({
     <>
       <ResponsivePanel
         open={isOpen}
-        onOpenChange={setIsOpen}
+        onOpenChange={(open) => {
+          setIsOpen(open)
+          if (!open) setMoveWorkspaceOpen(false)
+        }}
         trigger={panelTrigger}
         title="Details"
         description={`Pokemon details for ${pokemon.name}`}
@@ -1636,7 +1704,7 @@ export function PokemonDetailsDialog({
               <SectionDivider className="uppercase tracking-[0.2em] font-black text-[10px]">
                 Battle Moves
               </SectionDivider>
-              <div className="space-y-4 rounded-2xl border border-game-border bg-game-surface-raised p-4 shadow-sm">
+              <div className="space-y-3 rounded-2xl border border-game-border bg-game-surface-raised p-4 shadow-sm">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex min-w-0 items-start gap-2">
                     <Badge
@@ -1662,41 +1730,11 @@ export function PokemonDetailsDialog({
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      type="button"
-                      onClick={handleClearAssignedMoves}
-                      disabled={isSavingMoves || !hasAssignedMoves}
-                      variant="outline"
-                      size="icon"
-                      className="h-10 w-10 rounded-xl border-game-border bg-game-surface-raised text-game-muted hover:border-game-clay hover:bg-game-clay/10 hover:text-game-clay-strong"
-                      title="Clear assigned moves"
-                    >
-                      {isSavingMoves ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      ) : (
-                        <Trash2 className="w-3.5 h-3.5" />
-                      )}
-                      <span className="sr-only">Clear assigned moves</span>
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={handleSaveAssignedMoves}
-                      disabled={
-                        Boolean(battleMovesUnlockMessage) ||
-                        !selectedMovesChanged ||
-                        isSavingMoves ||
-                        (maxAssignableMoves <= 0 && selectedMoveIds.length > 0)
-                      }
-                      className="h-10 rounded-xl bg-game-clay text-[10px] font-black uppercase tracking-widest text-game-cream hover:bg-game-clay/90 disabled:bg-game-canvas disabled:text-game-muted"
-                    >
-                      {isSavingMoves ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      ) : (
-                        'Save'
-                      )}
-                    </Button>
-                  </div>
+                  {selectedMovesChanged ? (
+                    <Badge className="border-game-ochre/35 bg-game-ochre/10 text-game-ochre-strong">
+                      Unsaved
+                    </Badge>
+                  ) : null}
                 </div>
 
                 {battleMovesUnlockMessage ? (
@@ -1712,105 +1750,122 @@ export function PokemonDetailsDialog({
                     No eligible owned TMs/HMs.
                   </div>
                 ) : (
-                  <div className="grid gap-2 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
-                    {[...assignableMoves]
-                      .sort((a, b) => {
-                        const assignedDifference =
-                          Number(selectedMoveIds.includes(b.id)) -
-                          Number(selectedMoveIds.includes(a.id))
-                        return (
-                          assignedDifference || a.name.localeCompare(b.name)
-                        )
-                      })
-                      .map((move) => {
-                        const selected = selectedMoveIds.includes(move.id)
-                        const disabled =
-                          maxAssignableMoves <= 0 ||
-                          (!selected &&
-                            selectedMoveIds.length >= maxAssignableMoves)
-                        const fullMove = getMove(move.id)
-                        const isSketched = Boolean(
-                          gameData?.sketchedMoves?.includes(move.id) &&
-                            !items.some(
-                              (item) =>
-                                item.moveId === move.id &&
-                                (effectiveInventoryMap[item.id] || 0) > 0,
-                            ),
-                        )
-                        const presentation = fullMove
-                          ? getMovePresentation(fullMove, {
-                              source: {
-                                kind:
-                                  move.id === 'sketch'
-                                    ? 'level'
-                                    : isSketched
-                                      ? 'sketch'
-                                      : 'tm',
-                                label:
-                                  move.id === 'sketch'
-                                    ? 'Research move'
-                                    : isSketched
-                                      ? 'Sketchbook'
-                                      : 'Owned TM/HM',
-                              },
-                            })
-                          : null
+                  <>
+                    <ol
+                      className="grid grid-cols-2 gap-2"
+                      aria-label="Assigned battle move slots"
+                    >
+                      {Array.from(
+                        { length: maxAssignableMoves },
+                        (_, index) => {
+                          const moveId = selectedMoveIds[index]
+                          const move = moveId ? getMove(moveId) : undefined
+                          return (
+                            <li
+                              key={`summary-move-slot-${index + 1}`}
+                              className={cn(
+                                'flex min-h-14 items-center gap-2 rounded-lg border px-2 py-2',
+                                move
+                                  ? 'border-game-moss/40 bg-game-moss/10'
+                                  : 'border-dashed border-game-border bg-game-canvas',
+                              )}
+                            >
+                              <span className="font-mono text-[9px] font-bold text-game-muted">
+                                {String(index + 1).padStart(2, '0')}
+                              </span>
+                              {move ? (
+                                <>
+                                  <ItemSprite
+                                    itemId={getMoveTypeSpriteItemId(move)}
+                                    alt=""
+                                    width={28}
+                                    height={28}
+                                    className="size-7 shrink-0 object-contain"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => setMoveDetail(move)}
+                                    className="min-w-0 flex-1 truncate text-left text-xs font-bold text-game-ink outline-none hover:text-game-moss-strong focus-visible:ring-2 focus-visible:ring-game-moss/50"
+                                  >
+                                    {move.name}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleToggleMoveAssignment(move.id)
+                                    }
+                                    aria-label={`Remove ${move.name}`}
+                                    className="flex size-8 shrink-0 items-center justify-center rounded-md text-game-muted hover:bg-game-clay/10 hover:text-game-clay-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-game-moss/50"
+                                  >
+                                    <X
+                                      className="size-3.5"
+                                      aria-hidden="true"
+                                    />
+                                  </button>
+                                </>
+                              ) : (
+                                <span className="text-xs text-game-muted">
+                                  Open slot
+                                </span>
+                              )}
+                            </li>
+                          )
+                        },
+                      )}
+                    </ol>
 
-                        const assignmentAction = (
-                          <Button
-                            key={`assignment-${move.id}`}
-                            type="button"
-                            variant={selected ? 'secondary' : 'outline'}
-                            onClick={() => handleToggleMoveAssignment(move.id)}
-                            disabled={disabled}
-                            aria-pressed={selected}
-                            aria-label={
-                              selected
-                                ? `Remove ${move.name} from assigned moves`
-                                : disabled
-                                  ? `No open move slot for ${move.name}`
-                                  : `Assign ${move.name}`
-                            }
-                            className="min-h-11 px-3"
-                          >
-                            {selected ? (
-                              <>
-                                <Check aria-hidden="true" /> Assigned
-                              </>
-                            ) : disabled ? (
-                              'Slots full'
-                            ) : (
-                              'Assign'
-                            )}
-                          </Button>
-                        )
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={handleAutoPickAssignedMoves}
+                        className="min-h-11"
+                      >
+                        <Sparkles className="size-4" aria-hidden="true" />
+                        Auto-pick
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setMoveWorkspaceOpen(true)}
+                        className="min-h-11"
+                      >
+                        <SlidersHorizontal
+                          className="size-4"
+                          aria-hidden="true"
+                        />
+                        Manage moves
+                      </Button>
+                    </div>
 
-                        return presentation ? (
-                          <MoveCompactRow
-                            key={move.id}
-                            presentation={presentation}
-                            density="tight"
-                            detailsText="Info"
-                            onDetails={() => setMoveDetail(fullMove ?? null)}
-                            primaryAction={assignmentAction}
-                            className={cn(
-                              'transition-colors',
-                              selected && 'border-game-moss bg-game-moss/10',
-                            )}
-                          />
-                        ) : (
-                          <div
-                            key={move.id}
-                            className="game-panel flex items-center justify-between gap-2 p-3"
-                          >
-                            <p className="min-w-0 truncate text-sm font-bold text-game-ink">
-                              {move.name}
-                            </p>
-                            {assignmentAction}
-                          </div>
-                        )
-                      })}
-                  </div>
+                    {selectedMovesChanged ? (
+                      <div className="flex items-center gap-2 border-t border-game-border pt-3">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() =>
+                            setSelectedMoveIds(currentAssignedMoveIds)
+                          }
+                          disabled={isSavingMoves}
+                          className="min-h-10 flex-1"
+                        >
+                          Undo
+                        </Button>
+                        <Button
+                          type="button"
+                          onClick={() => handleSaveAssignedMoves()}
+                          disabled={isSavingMoves}
+                          className="min-h-10 flex-1 bg-game-clay text-game-cream hover:bg-game-clay/90"
+                        >
+                          {isSavingMoves ? (
+                            <Loader2 className="size-4 animate-spin motion-reduce:animate-none" />
+                          ) : (
+                            'Save loadout'
+                          )}
+                        </Button>
+                      </div>
+                    ) : null}
+                  </>
                 )}
               </div>
             </div>
@@ -2167,6 +2222,22 @@ export function PokemonDetailsDialog({
           </div>
         </div>
       </ResponsivePanel>
+
+      <MoveLoadoutWorkspace
+        open={moveWorkspaceOpen}
+        onOpenChange={setMoveWorkspaceOpen}
+        pokemonName={pokemon.name || 'Pokemon'}
+        entries={moveLoadoutEntries}
+        selectedMoveIds={selectedMoveIds}
+        maxMoves={maxAssignableMoves}
+        hasChanges={selectedMovesChanged}
+        isSaving={isSavingMoves}
+        onToggleMove={handleToggleMoveAssignment}
+        onClear={handleClearAssignedMoves}
+        onAutoPick={handleAutoPickAssignedMoves}
+        onSave={() => handleSaveAssignedMoves(true)}
+        onDetails={(moveId) => setMoveDetail(getMove(moveId) ?? null)}
+      />
 
       <ResponsivePanel
         open={moveDetail !== null}

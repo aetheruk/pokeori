@@ -46,6 +46,16 @@ export function getSketchableOpponentMoveIds(
   return normalizeBattleMoveIds(opponent).filter(isSketchableMoveId)
 }
 
+export function getAvailableSketchMoveIds(
+  opponent: BattlePokemon,
+  alreadySketchedMoveIds: string[] = [],
+): string[] {
+  const alreadySketched = new Set(alreadySketchedMoveIds)
+  return getSketchableOpponentMoveIds(opponent).filter(
+    (moveId) => !alreadySketched.has(moveId),
+  )
+}
+
 export function attemptSmeargleSketch(params: {
   attacker: BattlePokemon
   opponent: BattlePokemon
@@ -54,16 +64,14 @@ export function attemptSmeargleSketch(params: {
 }): string | undefined {
   if (!isSmeargle(params.attacker.formId)) return undefined
 
+  const candidateMoveIds = getAvailableSketchMoveIds(
+    params.opponent,
+    params.alreadySketchedMoveIds,
+  )
+  if (candidateMoveIds.length === 0) return undefined
+
   const random = params.random ?? Math.random
   if (random() >= SMEARGLE_SKETCH_CHANCE) return undefined
-
-  const alreadySketched = new Set(params.alreadySketchedMoveIds || [])
-  const opponentMoveIds = getSketchableOpponentMoveIds(params.opponent)
-  const newMoveIds = opponentMoveIds.filter(
-    (moveId) => !alreadySketched.has(moveId),
-  )
-  const candidateMoveIds = newMoveIds.length > 0 ? newMoveIds : opponentMoveIds
-  if (candidateMoveIds.length === 0) return undefined
 
   const index = Math.min(
     candidateMoveIds.length - 1,
