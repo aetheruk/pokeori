@@ -1,5 +1,7 @@
 # Current Game State
 
+- Unreleased: MoveDex entries now have unique move-granting TM identities. Sing uses its Fairy, form-restricted definition from the Jigglypuff Research reward, while the stray duplicate Normal definition has been removed so MoveDex rows, counts, and move assignment data remain consistent.
+
 - Unreleased: Pokémon Box egg dialogs now use a cleaner mystery-egg presentation without placeholder stat chips, with a circular warming countdown and progress bar. The waiting egg wobble accelerates and grows as hatch time approaches while its support disc stays still, and the full-screen hatch sequence now holds a smooth reveal state, adds an aggressive pre-flash wobble, and covers the complete viewport.
 
 - Unreleased: Universal stat-contest moves now support explicit excluded forms. Quick Attack, Slow Strike, Mighty Charge, Accidental Tap, Cunning Trap, and Play Dumb remain available to all other forms but are unavailable to Ditto, Smeargle, and every Unown form across assignment, AI, research unlock validation, MoveDex, Pokédex notes, and inventory previews.

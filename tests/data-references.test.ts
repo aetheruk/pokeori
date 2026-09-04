@@ -16,6 +16,7 @@ import { artisanRecipes } from '@/data/artisan'
 import { items } from '@/data/items/all-items'
 import { currencies } from '@/data/currencies'
 import { getAllMoves } from '@/data/moves'
+import { ALL_TM_MOVES } from '@/data/moves/tms'
 import { ABILITIES, rollNaturalFormAbility } from '@/data/abilities'
 import { trainerClasses, trainerSprites } from '@/data/trainers'
 import { icons } from '@/data/user/icons'
@@ -195,6 +196,24 @@ const eachReward = (
 }
 
 describe('static data references', () => {
+  test('move-granting TMs have unique move and item IDs', () => {
+    const duplicateMoveIds = ALL_TM_MOVES.map((move) => move.id).filter(
+      (id, index, all) => all.indexOf(id) !== index,
+    )
+    const tmItemIds = items
+      .filter((item) => item.category === 'tm' && !!item.moveId)
+      .map((item) => item.id)
+    const duplicateTmItemIds = tmItemIds.filter(
+      (id, index, all) => all.indexOf(id) !== index,
+    )
+
+    expect([...new Set(duplicateMoveIds)]).toEqual([])
+    expect([...new Set(duplicateTmItemIds)]).toEqual([])
+    expect(new Set(ALL_MOVE_DEX_ENTRIES.map((entry) => entry.itemId)).size).toBe(
+      ALL_MOVE_DEX_ENTRIES.length,
+    )
+  })
+
   test('special Pokemon drop tables reference valid forms and items', () => {
     const broken = Object.entries(SPECIAL_POKEMON_DROPS).flatMap(
       ([formId, drops]) => [
