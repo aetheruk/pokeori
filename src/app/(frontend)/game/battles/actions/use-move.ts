@@ -58,6 +58,7 @@ import {
 } from '@/utilities/user-state'
 import {
   attemptSmeargleSketch,
+  getSketchableOpponentMoveIds,
   SKETCH_MOVE_ID,
 } from '@/utilities/pokemon/sketch'
 import {
@@ -2388,6 +2389,13 @@ export async function useMove(
     }
 
     const moveSucceeded = !moveMissed && !moveFailed && !continuousInterrupted
+    if (move.id === SKETCH_MOVE_ID) {
+      if (!moveSucceeded) {
+        message += `\n${playerMon.name}'s Sketch failed.`
+      } else if (getSketchableOpponentMoveIds(enemyMon).length === 0) {
+        message += `\n${enemyMon.name} has no eligible move for Sketch.`
+      }
+    }
     if (moveSucceeded && move.id === SKETCH_MOVE_ID) {
       const payload = await getPayload({ config: configPromise })
       const existingSketchedMoveIds = await getUserSketchedMoveIds(
@@ -2411,6 +2419,10 @@ export async function useMove(
             const { getMove } = await import('@/data/moves')
             const sketchedMove = getMove(sketchedMoveId)
             message += `\n${playerMon.name} sketched ${sketchedMove?.name || sketchedMoveId}! It is now available to every Smeargle on your account.`
+            state.sketchedMoves = [
+              ...(state.sketchedMoves || []),
+              { id: sketchedMoveId, name: sketchedMove?.name || sketchedMoveId },
+            ]
           }
         } catch (error) {
           logger.error('Failed to persist Smeargle Sketch unlock', error)

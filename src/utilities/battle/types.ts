@@ -346,6 +346,7 @@ export interface BattleState {
   playerName: string
   enemyName: string
   rewards?: RewardSummary
+  sketchedMoves?: { id: string; name: string }[]
   moveRewards?: Reward[]
   expeditionProgress?: BattleExpeditionProgress
   expeditionContext?: {

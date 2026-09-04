@@ -88,6 +88,7 @@ export interface RewardSummary {
     shiny: boolean
     rarity: string
   }[]
+  sketchedMoves?: { id: string; name: string }[]
   currency: { type: string; quantity: number }[]
   cards: {
     id: string
