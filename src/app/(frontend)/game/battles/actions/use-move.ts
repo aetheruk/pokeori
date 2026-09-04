@@ -54,7 +54,6 @@ import {
 import {
   getUserInventoryMap,
   getUserSketchedMoveIds,
-  registerUserSketchedMove,
 } from '@/utilities/user-state'
 import {
   attemptSmeargleSketch,
@@ -2392,40 +2391,51 @@ export async function useMove(
     if (move.id === SKETCH_MOVE_ID) {
       if (!moveSucceeded) {
         message += `\n${playerMon.name}'s Sketch failed.`
-      } else if (getSketchableOpponentMoveIds(enemyMon).length === 0) {
-        message += `\n${enemyMon.name} has no eligible move for Sketch.`
-      }
-    }
-    if (moveSucceeded && move.id === SKETCH_MOVE_ID) {
-      const payload = await getPayload({ config: configPromise })
-      const existingSketchedMoveIds = await getUserSketchedMoveIds(
-        payload as any,
-        user.id,
-      )
-      const sketchedMoveId = attemptSmeargleSketch({
-        attacker: playerMon,
-        opponent: enemyMon,
-        alreadySketchedMoveIds: existingSketchedMoveIds,
-      })
-
-      if (sketchedMoveId) {
-        try {
-          const registration = await registerUserSketchedMove(
+      } else {
+        const sketchableOpponentMoveIds = getSketchableOpponentMoveIds(enemyMon)
+        if (sketchableOpponentMoveIds.length === 0) {
+          message += `\n${enemyMon.name} has no move that can be sketched.`
+        } else {
+          const payload = await getPayload({ config: configPromise })
+          const existingSketchedMoveIds = await getUserSketchedMoveIds(
             payload as any,
             user.id,
-            sketchedMoveId,
           )
-          if (registration.isNew) {
+          const pendingSketchedMoveIds = (state.pendingSketchedMoves || [])
+            .filter((entry) => entry.userId === user.id)
+            .map((entry) => entry.id)
+          const knownSketchedMoveIds = new Set([
+            ...existingSketchedMoveIds,
+            ...pendingSketchedMoveIds,
+          ])
+          const sketchedMoveId = attemptSmeargleSketch({
+            attacker: playerMon,
+            opponent: enemyMon,
+            alreadySketchedMoveIds: [
+              ...existingSketchedMoveIds,
+              ...pendingSketchedMoveIds,
+            ],
+          })
+
+          if (!sketchedMoveId) {
+            message += `\n${playerMon.name}'s Sketch failed to capture a move.`
+          } else if (knownSketchedMoveIds.has(sketchedMoveId)) {
+            message += `\n${playerMon.name}'s Sketch found no new move.`
+          } else {
             const { getMove } = await import('@/data/moves')
             const sketchedMove = getMove(sketchedMoveId)
-            message += `\n${playerMon.name} sketched ${sketchedMove?.name || sketchedMoveId}! It is now available to every Smeargle on your account.`
-            state.sketchedMoves = [
-              ...(state.sketchedMoves || []),
-              { id: sketchedMoveId, name: sketchedMove?.name || sketchedMoveId },
+            const sketchedMoveName = sketchedMove?.name || sketchedMoveId
+            state.pendingSketchedMoves = [
+              ...(state.pendingSketchedMoves || []),
+              {
+                id: sketchedMoveId,
+                name: sketchedMoveName,
+                userId: user.id,
+                attackerName: playerMon.name,
+              },
             ]
+            message += `\n${playerMon.name} sketched ${sketchedMoveName}!`
           }
-        } catch (error) {
-          logger.error('Failed to persist Smeargle Sketch unlock', error)
         }
       }
     }

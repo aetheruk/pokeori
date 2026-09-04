@@ -294,7 +294,7 @@ export default function MoveDexPage() {
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-game-muted">
                 {selectedView === 'sketched'
-                  ? 'Use Sketch with Smeargle in battle. A successful copy becomes a permanent move option for every Smeargle on your account.'
+                  ? 'Use Sketch with Smeargle in battle to record a move.'
                   : 'Try choosing a different move type.'}
               </p>
             </div>
@@ -335,7 +335,7 @@ export default function MoveDexPage() {
             <DialogDescription>
               {selectedMove?.isKnown
                 ? selectedMove.isSketched
-                  ? 'Sketched move · available to every Smeargle'
+                  ? 'Sketched move'
                   : `TM Type: ${getMoveTypeLabel(selectedMove.entry.moveType)}`
                 : 'A clue has been added to your MoveDex.'}
             </DialogDescription>
@@ -575,16 +575,13 @@ function MoveDexLearnerList({
     [move],
   )
 
+  if (isSketched) return null
+
   return (
     <div className="space-y-4">
       <SectionDivider>Can learn</SectionDivider>
       <div className="game-panel p-3">
-        {isSketched ? (
-          <p className="text-sm text-game-ink">
-            Every Smeargle can use this sketched move. It is unlocked at the
-            account level and does not require owning its TM.
-          </p>
-        ) : allPokemon ? (
+        {allPokemon ? (
           <p className="text-sm text-game-ink">
             All Pokemon can use this move.
           </p>

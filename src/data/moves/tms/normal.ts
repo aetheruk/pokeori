@@ -26761,7 +26761,7 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
   {
     id: 'sketch',
     name: 'Sketch',
-    description: "The user studies one of the target's battle moves. It has a 25% chance to permanently copy that move for every Smeargle on the account.",
+    description: "The user studies one of the target's battle moves. It has a 25% chance to permanently copy that move.",
     stance: 'tech',
     target: 'enemy',
     forcedType: 'normal',
