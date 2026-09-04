@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { renderToStaticMarkup } from 'react-dom/server'
 
 import {
+  MoveBattleCommand,
   MoveCompactRow,
   MoveDecisionCard,
   MoveFieldNote,
@@ -182,5 +183,65 @@ describe('move presentation', () => {
     expect(note).toContain('Move field note')
     expect(note).toContain('Can be learned by Bulbasaur.')
     expect(note).toContain('Always hits')
+  })
+
+  test('keeps battle commands brief while making details explicit', () => {
+    const presentation = getMovePresentation(
+      move({
+        description:
+          'A deliberately long summary that belongs in the field note.',
+      }),
+      {
+        offensiveValue: { label: 'Current offensive value', value: 142 },
+      },
+    )
+    const command = renderToStaticMarkup(
+      <MoveBattleCommand
+        presentation={presentation}
+        onDetails={() => undefined}
+        primaryAction={<button type="button">Use</button>}
+      />,
+    )
+
+    expect(command).toContain('View Field Test details')
+    expect(command).toContain('Grass type')
+    expect(command).toContain('75 power')
+    expect(command).toContain('90%')
+    expect(command).toContain('Tech')
+    expect(command).toContain('Use')
+    expect(command).not.toContain('deliberately long summary')
+    expect(command).not.toContain('Current offensive value')
+  })
+
+  test('surfaces only a move condition as a compact battle warning', () => {
+    const presentation = getMovePresentation(
+      move({ battleCondition: { type: 'first-active-turn' } }),
+    )
+    const command = renderToStaticMarkup(
+      <MoveBattleCommand
+        presentation={presentation}
+        onDetails={() => undefined}
+        primaryAction={<button type="button">Use</button>}
+      />,
+    )
+
+    expect(command).toContain('first active turn')
+    expect(command).not.toContain('A precise test move')
+  })
+
+  test('condenses battle self-damage warnings', () => {
+    const presentation = getMovePresentation(
+      move({ selfDamage: { fraction: 2, trigger: 'on-miss' } }),
+    )
+    const command = renderToStaticMarkup(
+      <MoveBattleCommand
+        presentation={presentation}
+        onDetails={() => undefined}
+        primaryAction={<button type="button">Use</button>}
+      />,
+    )
+
+    expect(command).toContain('Miss: lose 1/2 max HP')
+    expect(command).not.toContain('If this move misses')
   })
 })

@@ -12,7 +12,7 @@ import {
   Zap,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { MoveCompactRow, MoveFieldNote } from '@/components/game/moves'
+import { MoveBattleCommand, MoveFieldNote } from '@/components/game/moves'
 import { StanceIcon } from '@/components/game/shared/stance-icon'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
@@ -25,7 +25,6 @@ import { DYNAMAX_UNLOCK_TURNS } from '@/data/powers'
 import { cn } from '@/lib/utils'
 import { resolveHiddenPower } from '@/utilities/battle/hidden-power'
 import { resolveDynamicMoveType } from '@/utilities/battle/move-effects'
-import { getMoveEffectivePower } from '@/utilities/battle/move-presentation'
 import { getPokemonMoveUsesRemaining } from '@/utilities/battle/move-uses'
 import type {
   BattlePokemon,
@@ -68,21 +67,8 @@ function getBattleMovePresentation(
         fallbackType: baseType || fallbackType,
       })
     : baseType
-  const effectivePower = getMoveEffectivePower(
-    move,
-    pokemon.stats,
-    pokemon.statStages,
-  )
-
   return getMovePresentation(move, {
     resolvedType: currentType as PokemonTypeName | undefined,
-    offensiveValue:
-      effectivePower === 'Status'
-        ? undefined
-        : {
-            label: 'Current offensive value',
-            value: effectivePower,
-          },
   })
 }
 
@@ -385,16 +371,14 @@ export function PowerSelector() {
                 )
 
                 return (
-                  <MoveCompactRow
+                  <MoveBattleCommand
                     key={move.id}
                     presentation={presentation}
-                    density="tight"
-                    detailsText="Details"
                     onDetails={() => setMoveInfoId(move.id)}
                     primaryAction={
                       <Button
                         type="button"
-                        className="min-h-10 px-3"
+                        className="h-11 min-w-14 px-3"
                         disabled={using !== null}
                         onClick={() => void handleUseMove(move.id)}
                         aria-label={`Use ${move.name}`}

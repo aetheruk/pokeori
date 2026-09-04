@@ -1,4 +1,8 @@
 export {
+  MoveBattleCommand,
+  type MoveBattleCommandProps,
+} from './move-battle-command'
+export {
   MoveCompactRow,
   type MoveCompactRowProps,
 } from './move-compact-row'
