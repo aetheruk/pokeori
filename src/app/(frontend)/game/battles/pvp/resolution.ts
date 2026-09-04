@@ -392,6 +392,7 @@ export async function resolvePvpTurn(
 
   const applyPrimaryHealingCredit = (
     pokemon: BattlePokemon,
+    target: BattlePokemon,
     move: PvpMove,
     eligible: boolean,
   ): number => {
@@ -402,6 +403,7 @@ export async function resolvePvpTurn(
     const amount = getMoveHealAmount({
       move: authoredMove,
       pokemon,
+      target,
       weather: state.weather?.weather,
     })
     // Deliberately allow a temporary over-max pool. The authoritative commit
@@ -411,11 +413,13 @@ export async function resolvePvpTurn(
   }
   const p1PrimaryHealing = applyPrimaryHealingCredit(
     p1Mon,
+    p2Mon,
     p1Move,
     p1Eligibility?.canMove === true,
   )
   const p2PrimaryHealing = applyPrimaryHealingCredit(
     p2Mon,
+    p1Mon,
     p2Move,
     p2Eligibility?.canMove === true,
   )

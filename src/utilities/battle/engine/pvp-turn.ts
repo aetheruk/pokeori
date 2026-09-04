@@ -17,6 +17,7 @@ import {
   resolveBeforeMoveStatus,
   applyMoveAbsorbHealing,
   applyMoveSelfDamage,
+  shouldApplyMoveSelfDamage,
 } from '@/utilities/battle/status-effects-logic'
 import type {
   BattlePokemon,
@@ -1112,6 +1113,7 @@ export function resolvePvpCombat(params: {
     const healAmount = getMoveHealAmount({
       move: specialMove,
       pokemon: attacker,
+      target: defender,
       weather,
     })
     attacker.currentHp = Math.min(
@@ -1431,7 +1433,14 @@ export function resolvePvpCombat(params: {
     }
   }
 
-  if (!moveFailed && specialMove?.selfDamage) {
+  if (
+    specialMove?.selfDamage &&
+    (!moveFailed || moveMissed) &&
+    shouldApplyMoveSelfDamage(
+      specialMove.selfDamage,
+      moveMissed ? 'miss' : 'hit',
+    )
+  ) {
     const recoilBlockMessage = getBattleRecoilDamageBlockMessage(
       attacker,
       specialMove,

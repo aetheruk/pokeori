@@ -12783,6 +12783,7 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
     accuracy: 100,
     selfDamage: {
       fraction: 1,
+      trigger: 'on-use',
     },
     level: 35,
     formId: [
@@ -17432,7 +17433,8 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
   {
     id: 'heal-bell',
     name: 'Heal Bell',
-    description: 'A soothing bell chime restores the user.',
+    description:
+      'A soothing bell chime cures status conditions affecting the user and their party.',
     stance: 'tech',
     target: 'self',
     forcedType: 'normal',
@@ -26518,6 +26520,7 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
     accuracy: 100,
     selfDamage: {
       fraction: 1,
+      trigger: 'on-use',
     },
     level: 25,
     formId: [

@@ -1957,7 +1957,6 @@ export const DARK_TM_MOVES: MoveConfig[] = [
     interruptEnemyMove: 20,
     level: 45,
     formId: ['10171'],
-    charged: 6,
   },
   {
     id: 'flatter',
@@ -3680,6 +3679,7 @@ export const DARK_TM_MOVES: MoveConfig[] = [
     ],
     selfDamage: {
       fraction: 1,
+      trigger: 'on-use',
     },
     formId: [
       '37',

@@ -217,19 +217,13 @@ function rememberOriginalBattleAbility(pokemon: BattlePokemon): void {
 }
 
 function isRecoilSelfDamageMove(
-  move: Pick<MoveConfig, 'damage' | 'description' | 'selfDamage' | 'target'>,
+  move: Pick<MoveConfig, 'damage' | 'selfDamage' | 'target'>,
 ): boolean {
-  if (!move.selfDamage || move.target !== 'enemy' || (move.damage ?? 0) <= 0) {
-    return false
-  }
-
-  const description = move.description.toLowerCase()
-  return (
-    description.includes('recoil') ||
-    description.includes('reckless') ||
-    description.includes('also hurts') ||
-    description.includes('hurts the user') ||
-    description.includes('damages the user')
+  return Boolean(
+    move.selfDamage &&
+      (move.selfDamage.trigger ?? 'on-hit') === 'on-hit' &&
+      move.target === 'enemy' &&
+      (move.damage ?? 0) > 0,
   )
 }
 
@@ -531,18 +525,21 @@ export function clearBattleAbilitySelfMoveLock(pokemon: BattlePokemon): void {
 function isHealingMove(
   move: Pick<
     MoveConfig,
-    'absorb' | 'description' | 'heal' | 'healFull' | 'weatherHeal'
+    | 'absorb'
+    | 'heal'
+    | 'healByTargetStat'
+    | 'healFull'
+    | 'statusCure'
+    | 'weatherHeal'
   >,
 ): boolean {
-  const description = move.description.toLowerCase()
   return Boolean(
     move.heal ||
       move.healFull ||
+      move.healByTargetStat ||
       move.weatherHeal ||
       (move.absorb ?? 0) > 0 ||
-      description.includes('recover') ||
-      description.includes('restore') ||
-      description.includes('heal'),
+      (move.statusCure?.healUserPercent ?? 0) > 0,
   )
 }
 
@@ -559,11 +556,12 @@ export function getBattleAbilityPriorityMoveContest(params: {
     | 'absorb'
     | 'damage'
     | 'damageRule'
-    | 'description'
     | 'forcedType'
     | 'heal'
+    | 'healByTargetStat'
     | 'healFull'
     | 'id'
+    | 'statusCure'
     | 'weatherHeal'
   >
   attackType?: string
@@ -1564,7 +1562,7 @@ export function applyBattleAbilityStatusReflection(params: {
 
 export function blocksBattleRecoilDamageByAbility(
   pokemon: BattlePokemon,
-  move: Pick<MoveConfig, 'damage' | 'description' | 'selfDamage' | 'target'>,
+  move: Pick<MoveConfig, 'damage' | 'selfDamage' | 'target'>,
 ): boolean {
   if (!isRecoilSelfDamageMove(move)) return false
   return getAbilityEffects(pokemon).some(
@@ -1574,7 +1572,7 @@ export function blocksBattleRecoilDamageByAbility(
 
 export function getBattleRecoilDamageBlockMessage(
   pokemon: BattlePokemon,
-  move: Pick<MoveConfig, 'damage' | 'description' | 'selfDamage' | 'target'>,
+  move: Pick<MoveConfig, 'damage' | 'selfDamage' | 'target'>,
 ): string | undefined {
   if (!blocksBattleRecoilDamageByAbility(pokemon, move)) return undefined
   return `${pokemon.name}'s ${getAbilityName(pokemon)} prevented recoil damage!`
@@ -1599,7 +1597,7 @@ export function getBattleIndirectDamageBlockMessage(
 
 export function getBattleAbilityRecoilMoveDamageMultiplier(
   pokemon: BattlePokemon,
-  move: Pick<MoveConfig, 'damage' | 'description' | 'selfDamage' | 'target'>,
+  move: Pick<MoveConfig, 'damage' | 'selfDamage' | 'target'>,
 ): number {
   if (!isRecoilSelfDamageMove(move)) return 1
 

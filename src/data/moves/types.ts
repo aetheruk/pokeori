@@ -139,6 +139,7 @@ export interface BuffConfig {
 export interface MoveSelfDamageConfig {
   chance?: number // 0-100, defaults to 100
   fraction?: number // 1/X of max HP (1 => full HP, 8 => 1/8 HP, etc.)
+  trigger?: 'on-hit' | 'on-miss' | 'on-use' // Defaults to on-hit.
 }
 
 export interface MoveContestOutcomeConfig {
@@ -530,6 +531,7 @@ export interface MoveConfig {
   heal?: boolean // If true, heals instead of damages
   healFull?: boolean // If true with heal, restores the user to full HP
   weatherHeal?: MoveWeatherHealConfig
+  healByTargetStat?: 'attack'
   absorb?: number // Percentage of damage dealt restored to the attacker.
   forcedType?: MoveForcedType // If set, attack always uses this type, or random when configured
   ignoreTypeEffectiveness?: boolean

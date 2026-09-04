@@ -1518,7 +1518,8 @@ export const POISON_TM_MOVES: MoveConfig[] = [
   {
     id: 'shell-side-arm',
     name: 'Shell Side Arm',
-    description: 'May poison opponent.',
+    description:
+      'Attacks with a physical or special blast, whichever is stronger. May poison the target.',
     stance: 'tech',
     target: 'enemy',
     forcedType: 'poison',
@@ -1527,7 +1528,7 @@ export const POISON_TM_MOVES: MoveConfig[] = [
     level: 45,
     status: {
       id: 'poison',
-      chance: 100,
+      chance: 20,
       target: 'enemy',
     },
     formId: ['10165'],

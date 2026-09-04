@@ -138,7 +138,8 @@ export const FIGHTING_TM_MOVES: MoveConfig[] = [
       target: 'enemy',
     },
     selfDamage: {
-      fraction: 4,
+      fraction: 2,
+      trigger: 'on-miss',
     },
     formId: ['106', '308', '920', '10237'],
   },
@@ -2291,6 +2292,7 @@ export const FIGHTING_TM_MOVES: MoveConfig[] = [
     level: 40,
     selfDamage: {
       fraction: 1,
+      trigger: 'on-use',
     },
     damageRule: {
       type: 'user-current-hp',
@@ -3093,6 +3095,7 @@ export const FIGHTING_TM_MOVES: MoveConfig[] = [
     level: 35,
     selfDamage: {
       fraction: 2,
+      trigger: 'on-miss',
     },
     formId: [
       '106',
@@ -3131,6 +3134,7 @@ export const FIGHTING_TM_MOVES: MoveConfig[] = [
     level: 50,
     selfDamage: {
       fraction: 2,
+      trigger: 'on-miss',
     },
     formId: [
       '84',

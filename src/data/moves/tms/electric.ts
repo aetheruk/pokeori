@@ -643,7 +643,8 @@ export const ELECTRIC_TM_MOVES: MoveConfig[] = [
   {
     id: 'nuzzle',
     name: 'Nuzzle',
-    description: '',
+    description:
+      'The user nuzzles the target with an electrified cheek, dealing damage and paralyzing it.',
     stance: 'speed',
     target: 'enemy',
     forcedType: 'electric',

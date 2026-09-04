@@ -1,9 +1,9 @@
 'use client'
 
 import {
-  Atom,
   ArrowDown,
   ArrowUp,
+  Atom,
   Check,
   Circle,
   Clock,
@@ -27,6 +27,7 @@ import { useRouter } from 'next/navigation'
 import * as React from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
+import { MoveCompactRow, MoveFieldNote } from '@/components/game/moves'
 import { RewardSummaryDisplay } from '@/components/game/reward-summary'
 import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { StanceIcon } from '@/components/game/shared/stance-icon'
@@ -39,7 +40,12 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel'
-import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { SectionDivider } from '@/components/ui/section-divider'
@@ -57,11 +63,17 @@ import { getLevelEvolutionCatalystForEvolution } from '@/data/evolution-catalyst
 import { EVOLUTIONS } from '@/data/evolutions'
 import { items } from '@/data/items'
 import { DEED_POLL_ITEM_ID } from '@/data/items/special-item-ids'
+import { getMove } from '@/data/moves'
+import type { MoveConfig } from '@/data/moves/types'
 import { NATURES } from '@/data/natures'
 import { cn } from '@/lib/utils'
 import type { Pokemon, User } from '@/payload-types'
-import { BASE_BATTLE_POWER } from '@/utilities/battle/constants'
 import { getAbilityDexPartnerEffectLines } from '@/utilities/pokemon/abilitydex'
+import {
+  capitalizeFirstLetter,
+  getNatureStatEffect,
+  type NatureStatEffect,
+} from '@/utilities/pokemon/display'
 import {
   getEvolutionTimeOfDayLabel,
   getEvolutionTimeRegionLabel,
@@ -69,33 +81,35 @@ import {
   matchesEvolutionTimeOfDayForRegion,
   resolveEvolutionTimeRegion,
 } from '@/utilities/pokemon/evolution-conditions'
-import { formatPokemonGenderLabel, getOwnedPokemonGender } from '@/utilities/pokemon/gender'
+import {
+  formatPokemonGenderLabel,
+  getOwnedPokemonGender,
+} from '@/utilities/pokemon/gender'
 import {
   formatHeldItemTrigger,
   getHeldItemDefinition,
   getHeldItemOptions,
 } from '@/utilities/pokemon/held-items'
+import { getMovePresentation } from '@/utilities/pokemon/move-display'
 import { getPokemonForm, getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import {
   getAvailableMoveOptions,
   normalizeAssignedMoveIds,
 } from '@/utilities/pokemon/pokemon-moves'
-import { getPokemonRarityEffect, resolvePokemonRarity } from '@/utilities/pokemon/rarity-effects'
 import {
   getAvailablePokemonPowerOptions,
   normalizeSelectedPokemonPower,
   POKEMON_POWER_OPTIONS,
   type PokemonPowerId,
 } from '@/utilities/pokemon/pokemon-powers'
+import {
+  getPokemonRarityEffect,
+  resolvePokemonRarity,
+} from '@/utilities/pokemon/rarity-effects'
 import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
 import {
-  capitalizeFirstLetter,
-  getNatureStatEffect,
-  type NatureStatEffect,
-} from '@/utilities/pokemon/display'
-import {
-  MAX_RESEARCH_LEVEL,
   getPokemonResearchLevelTmUnlocks,
+  MAX_RESEARCH_LEVEL,
   RESEARCH_LEVEL_REWARDS,
   RESEARCH_LEVEL_THRESHOLDS,
 } from '@/utilities/research/research-levels'
@@ -124,11 +138,6 @@ import { UseItemDialog } from './use-item-dialog'
 
 const POKEMON_LOADOUT_RESEARCH_LEVEL = 1
 const RESEARCHER_MOVE_ASSIGN_LEVEL = RESEARCHER_MOVE_SLOT_UNLOCKS[0].level
-
-function formatAssignedMovePower(damage: number): string {
-  if (damage <= 0) return 'No Damage'
-  return `${Math.round(BASE_BATTLE_POWER * damage)}`
-}
 
 const typeIdMap: Record<string, number> = {
   normal: 1,
@@ -167,9 +176,12 @@ function getFormPokedexProgress(
   const entry = Array.isArray(pokedex)
     ? pokedex.find(
         (row: any) =>
-          String(row?.speciesId) === String(speciesId) && String(row?.formId) === String(formId),
+          String(row?.speciesId) === String(speciesId) &&
+          String(row?.formId) === String(formId),
       )
-    : (pokedex as Record<string, Record<string, any>>)?.[String(speciesId)]?.[String(formId)]
+    : (pokedex as Record<string, Record<string, any>>)?.[String(speciesId)]?.[
+        String(formId)
+      ]
 
   const rawLevel = Number(entry?.researchLevel || 0)
   const rawXp = Number(entry?.researchXp || 0)
@@ -198,12 +210,16 @@ function formatPokemonOrigin(pokemon: Pokemon) {
       return { title: 'Received as a Gift' }
     case 'caught':
       return {
-        title: origin.obtainedRegion ? `Caught in ${origin.obtainedRegion}` : 'Caught',
+        title: origin.obtainedRegion
+          ? `Caught in ${origin.obtainedRegion}`
+          : 'Caught',
         subtitle: origin.obtainedLocation || undefined,
       }
     case 'purchased':
       return {
-        title: origin.obtainedRegion ? `Purchased in ${origin.obtainedRegion}` : 'Purchased',
+        title: origin.obtainedRegion
+          ? `Purchased in ${origin.obtainedRegion}`
+          : 'Purchased',
         subtitle: origin.obtainedLocation || undefined,
       }
     case 'reward':
@@ -229,7 +245,9 @@ function normalizePokemonBackgroundPath(path?: string | null) {
   const filename = path.split('/').pop()
   if (!filename) return '/backgrounds/forest.avif'
 
-  const normalizedFilename = filename.replace(/\.(png|jpe?g|webp)$/i, '.avif').replaceAll('_', '-')
+  const normalizedFilename = filename
+    .replace(/\.(png|jpe?g|webp)$/i, '.avif')
+    .replaceAll('_', '-')
 
   return `/backgrounds/${normalizedFilename}`
 }
@@ -248,7 +266,8 @@ function getLoadoutUnlockMessage({
   pokemonResearchLevel: number
 }) {
   const needsSkillLevel = skillLevel < requiredSkillLevel
-  const needsResearchLevel = pokemonResearchLevel < POKEMON_LOADOUT_RESEARCH_LEVEL
+  const needsResearchLevel =
+    pokemonResearchLevel < POKEMON_LOADOUT_RESEARCH_LEVEL
 
   if (needsSkillLevel && needsResearchLevel) {
     return `Reach ${skillName} Level ${requiredSkillLevel} and Research Level ${POKEMON_LOADOUT_RESEARCH_LEVEL} with this Pokemon to unlock ${featureName}.`
@@ -367,7 +386,8 @@ function ResearchSection({
                   Rank
                 </span>
                 <span className="font-mono text-xs font-bold text-game-ink">
-                  {researchLevel} <span className="text-game-muted">/</span> {MAX_RESEARCH_LEVEL}
+                  {researchLevel} <span className="text-game-muted">/</span>{' '}
+                  {MAX_RESEARCH_LEVEL}
                 </span>
               </div>
             )}
@@ -480,11 +500,17 @@ export function PokemonDetailsDialog({
   const rarityVariant = getPokemonRarityEffect(resolvePokemonRarity(pokemon))
   const pokemonOrigin = formatPokemonOrigin(pokemon)
   const evolutionTimeRegion = resolveEvolutionTimeRegion(pokemon)
-  const backgroundUrl = normalizePokemonBackgroundPath((pokemon as any).background)
+  const backgroundUrl = normalizePokemonBackgroundPath(
+    (pokemon as any).background,
+  )
 
-  const effectiveInventory = inventory.length > 0 ? inventory : gameData?.inventory || []
+  const effectiveInventory =
+    inventory.length > 0 ? inventory : gameData?.inventory || []
   const effectiveInventoryMap = useMemo(
-    () => Object.fromEntries(effectiveInventory.map((entry) => [entry.itemId, entry.quantity])),
+    () =>
+      Object.fromEntries(
+        effectiveInventory.map((entry) => [entry.itemId, entry.quantity]),
+      ),
     [effectiveInventory],
   )
   const hasItem = (itemId: string) =>
@@ -495,7 +521,9 @@ export function PokemonDetailsDialog({
   const hasEvScanner = hasItem('ev-scanner')
   const hasPokeScales = hasItem('poke-scales')
   const hasNatureScanner = hasItem('nature-scanner')
-  const getVisibleNatureStatEffect = (stat: string): NatureStatEffect | undefined =>
+  const getVisibleNatureStatEffect = (
+    stat: string,
+  ): NatureStatEffect | undefined =>
     hasNatureScanner ? getNatureStatEffect(pokemon.nature, stat) : undefined
 
   const handleToggleLock = async () => {
@@ -505,9 +533,14 @@ export function PokemonDetailsDialog({
     }
   }
 
-  const handleToggleMarking = async (marking: 'Square' | 'Circle' | 'Triangle' | 'Diamond') => {
+  const handleToggleMarking = async (
+    marking: 'Square' | 'Circle' | 'Triangle' | 'Diamond',
+  ) => {
     const markingKey = `marking${marking}` as
-      'markingSquare' | 'markingCircle' | 'markingTriangle' | 'markingDiamond'
+      | 'markingSquare'
+      | 'markingCircle'
+      | 'markingTriangle'
+      | 'markingDiamond'
     const result = await toggleMarking(pokemon.id, markingKey)
     if (result.success && onRename) {
       onRename({ ...pokemon, [markingKey]: result[markingKey] })
@@ -540,7 +573,8 @@ export function PokemonDetailsDialog({
     formId: string
   } | null>(null)
   const [evolvedPokemon, setEvolvedPokemon] = useState<Pokemon | null>(null)
-  const [evolutionRewards, setEvolutionRewards] = useState<RewardSummary | null>(null)
+  const [evolutionRewards, setEvolutionRewards] =
+    useState<RewardSummary | null>(null)
   const [isEvolving, setIsEvolving] = useState<number | null>(null)
   const [isOpen, setIsOpen] = useState(false)
 
@@ -550,7 +584,12 @@ export function PokemonDetailsDialog({
   const researcherLevel = getSkillLevel(user?.skills, 'researching')
   const maxAssignableMoves = getResearcherMoveSlotCount(researcherLevel)
   const pokemonResearchProgress = useMemo(
-    () => getFormPokedexProgress(gameData?.pokedex as any, pokemon.speciesId, pokemon.formId),
+    () =>
+      getFormPokedexProgress(
+        gameData?.pokedex as any,
+        pokemon.speciesId,
+        pokemon.formId,
+      ),
     [gameData?.pokedex, pokemon.formId, pokemon.speciesId],
   )
   const pokemonResearchLevel = pokemonResearchProgress.researchLevel
@@ -568,7 +607,8 @@ export function PokemonDetailsDialog({
     requiredSkillLevel: TRAINER_HELD_ITEM_LEVEL,
     pokemonResearchLevel,
   })
-  const canAssignHeldItems = !heldItemsUnlockMessage && canUseTrainerHeldItems(trainerLevel)
+  const canAssignHeldItems =
+    !heldItemsUnlockMessage && canUseTrainerHeldItems(trainerLevel)
   const trainerIvCap = getTrainerIvCap(trainerLevel)
   const effectiveIvs = useMemo(
     () => getEffectivePokemonIvs(pokemon.ivs, trainerLevel),
@@ -594,7 +634,9 @@ export function PokemonDetailsDialog({
     }
     const calcHp = () =>
       Math.floor(
-        ((2 * baseStats.hp + effectiveIvs.hp + Math.floor((evs.hp || 0) / 4)) * level) / 100,
+        ((2 * baseStats.hp + effectiveIvs.hp + Math.floor((evs.hp || 0) / 4)) *
+          level) /
+          100,
       ) +
       level +
       10
@@ -604,7 +646,9 @@ export function PokemonDetailsDialog({
     ) =>
       Math.floor(
         (Math.floor(
-          ((2 * base + effectiveIvs[stat] + Math.floor((evs[stat] || 0) / 4)) * level) / 100,
+          ((2 * base + effectiveIvs[stat] + Math.floor((evs[stat] || 0) / 4)) *
+            level) /
+            100,
         ) +
           5) *
           getNatureMultiplier(stat),
@@ -618,7 +662,14 @@ export function PokemonDetailsDialog({
       specialDefense: calcOther('specialDefense', baseStats['special-defense']),
       speed: calcOther('speed', baseStats.speed),
     }
-  }, [baseStats, effectiveIvs, pokemon.evs, pokemon.level, pokemon.nature, pokemon.stats])
+  }, [
+    baseStats,
+    effectiveIvs,
+    pokemon.evs,
+    pokemon.level,
+    pokemon.nature,
+    pokemon.stats,
+  ])
   const assignableMoves = useMemo(
     () =>
       getAvailableMoveOptions({
@@ -639,9 +690,7 @@ export function PokemonDetailsDialog({
   const allMoveInventoryMap = useMemo(
     () =>
       Object.fromEntries(
-        items
-          .filter((item) => item.moveId)
-          .map((item) => [item.id, 1]),
+        items.filter((item) => item.moveId).map((item) => [item.id, 1]),
       ),
     [],
   )
@@ -671,20 +720,26 @@ export function PokemonDetailsDialog({
       }),
     [effectiveInventoryMap, pokemon.formId, trainerLevel],
   )
-  const heldItemId = ((pokemon as any).heldItemId as string | null | undefined) || null
+  const heldItemId =
+    ((pokemon as any).heldItemId as string | null | undefined) || null
   const currentHeldItem = getHeldItemDefinition(heldItemId)
   const heldItemOptions = useMemo(
     () => getHeldItemOptions(effectiveInventoryMap),
     [effectiveInventoryMap],
   )
-  const selectedPokemonPower = normalizeSelectedPokemonPower(pokemon.selectedPokemonPower)
+  const selectedPokemonPower = normalizeSelectedPokemonPower(
+    pokemon.selectedPokemonPower,
+  )
   const [isSavingPower, setIsSavingPower] = useState<string | null>(null)
   const [isSavingHeldItem, setIsSavingHeldItem] = useState<string | null>(null)
   const currentAssignedMoveIds = useMemo(
     () => normalizeAssignedMoveIds(pokemon.assignedMoves),
     [pokemon.assignedMoves],
   )
-  const [selectedMoveIds, setSelectedMoveIds] = useState<string[]>(currentAssignedMoveIds)
+  const [selectedMoveIds, setSelectedMoveIds] = useState<string[]>(
+    currentAssignedMoveIds,
+  )
+  const [moveDetail, setMoveDetail] = useState<MoveConfig | null>(null)
   const [isSavingMoves, setIsSavingMoves] = useState(false)
   useEffect(() => {
     setSelectedMoveIds(currentAssignedMoveIds)
@@ -692,8 +747,11 @@ export function PokemonDetailsDialog({
 
   const selectedMovesChanged =
     selectedMoveIds.length !== currentAssignedMoveIds.length ||
-    selectedMoveIds.some((moveId, index) => moveId !== currentAssignedMoveIds[index])
-  const hasAssignedMoves = selectedMoveIds.length > 0 || currentAssignedMoveIds.length > 0
+    selectedMoveIds.some(
+      (moveId, index) => moveId !== currentAssignedMoveIds[index],
+    )
+  const hasAssignedMoves =
+    selectedMoveIds.length > 0 || currentAssignedMoveIds.length > 0
 
   const handleToggleMoveAssignment = (moveId: string) => {
     setSelectedMoveIds((current) => {
@@ -722,7 +780,9 @@ export function PokemonDetailsDialog({
     try {
       const result = await setSelectedPokemonPower(pokemon.id, powerId)
       if (result.success) {
-        toast.success(powerId ? 'Pokemon Power selected' : 'Pokemon Power cleared')
+        toast.success(
+          powerId ? 'Pokemon Power selected' : 'Pokemon Power cleared',
+        )
         if (result.pokemon && onRename) onRename(result.pokemon)
       } else {
         toast.error(result.message || 'Could not select Pokemon Power')
@@ -789,7 +849,9 @@ export function PokemonDetailsDialog({
       return Math.floor(((2 * base + 31 + 63) * level) / 100) + level + 10
     } else {
       // Nature 1.1
-      return Math.floor((Math.floor(((2 * base + 31 + 63) * level) / 100) + 5) * 1.1)
+      return Math.floor(
+        (Math.floor(((2 * base + 31 + 63) * level) / 100) + 5) * 1.1,
+      )
     }
   }
 
@@ -844,7 +906,8 @@ export function PokemonDetailsDialog({
                 sizes="100vw"
                 className={cn(
                   'object-cover opacity-55',
-                  pokemon.isShadow && 'shadow-aura grayscale scale-110 opacity-40',
+                  pokemon.isShadow &&
+                    'shadow-aura grayscale scale-110 opacity-40',
                   pokemon.isRadiant && 'radiant-aura scale-110 opacity-45',
                 )}
               />
@@ -930,15 +993,26 @@ export function PokemonDetailsDialog({
                   conditions.requiredSourceForm !== currentFormName
                 )
                   return false
-                if (!matchesEvolutionGender(conditions, pokemonGender)) return false
-                if (!matchesEvolutionTimeOfDayForRegion(conditions, evolutionTimeRegion))
+                if (!matchesEvolutionGender(conditions, pokemonGender))
                   return false
-                let requiredItemId = conditions.itemId || (conditions.trade ? 'link-cable' : null)
+                if (
+                  !matchesEvolutionTimeOfDayForRegion(
+                    conditions,
+                    evolutionTimeRegion,
+                  )
+                )
+                  return false
+                let requiredItemId =
+                  conditions.itemId || (conditions.trade ? 'link-cable' : null)
                 if (conditions.locationId) requiredItemId = 'evolution-compass'
                 else if (conditions.knownMoveId) requiredItemId = 'charged-tm'
-                else if (conditions.heldItem) requiredItemId = conditions.heldItem
-                const hasRequiredItem = requiredItemId ? hasItem(requiredItemId) : true
-                const evolutionCatalyst = getLevelEvolutionCatalystForEvolution(evo)
+                else if (conditions.heldItem)
+                  requiredItemId = conditions.heldItem
+                const hasRequiredItem = requiredItemId
+                  ? hasItem(requiredItemId)
+                  : true
+                const evolutionCatalyst =
+                  getLevelEvolutionCatalystForEvolution(evo)
                 const hasEvolutionCatalyst = evolutionCatalyst
                   ? hasItem(evolutionCatalyst.id)
                   : true
@@ -949,7 +1023,8 @@ export function PokemonDetailsDialog({
                   : true
                 if (!canEvolveLevel) return false
                 const canEvolveFriendship = conditions.minHappiness
-                  ? ((pokemon as any).friendship || 0) >= conditions.minHappiness
+                  ? ((pokemon as any).friendship || 0) >=
+                    conditions.minHappiness
                   : true
                 if (!canEvolveFriendship) return false
                 return true
@@ -957,7 +1032,8 @@ export function PokemonDetailsDialog({
 
               // This panel is an actionable prompt, so never surface a
               // branch that the current Pokemon cannot evolve into now.
-              const readyEvolutions = possibleEvolutions.filter(isEvolutionReady)
+              const readyEvolutions =
+                possibleEvolutions.filter(isEvolutionReady)
               if (readyEvolutions.length === 0) return null
 
               return (
@@ -971,26 +1047,41 @@ export function PokemonDetailsDialog({
                       const pokedex = (gameData?.pokedex || []) as any[]
                       const hasSeenEvo =
                         Array.isArray(pokedex) &&
-                        pokedex.some((p) => p.speciesId === evo.speciesId && (p.seen || p.caught))
-                      const evoName = hasSeenEvo ? capitalizeFirstLetter(evo.name) : '???'
+                        pokedex.some(
+                          (p) =>
+                            p.speciesId === evo.speciesId &&
+                            (p.seen || p.caught),
+                        )
+                      const evoName = hasSeenEvo
+                        ? capitalizeFirstLetter(evo.name)
+                        : '???'
                       const currentFormName = formInfo?.form || 'base'
                       if (
                         conditions.requiredSourceForm &&
                         conditions.requiredSourceForm !== currentFormName
                       )
                         return null
-                      if (!matchesEvolutionGender(conditions, pokemonGender)) return null
-                      const timeConditionMet = matchesEvolutionTimeOfDayForRegion(
-                        conditions,
-                        evolutionTimeRegion,
-                      )
+                      if (!matchesEvolutionGender(conditions, pokemonGender))
+                        return null
+                      const timeConditionMet =
+                        matchesEvolutionTimeOfDayForRegion(
+                          conditions,
+                          evolutionTimeRegion,
+                        )
                       let requiredItemId =
-                        conditions.itemId || (conditions.trade ? 'link-cable' : null)
-                      if (conditions.locationId) requiredItemId = 'evolution-compass'
-                      else if (conditions.knownMoveId) requiredItemId = 'charged-tm'
-                      else if (conditions.heldItem) requiredItemId = conditions.heldItem
-                      const hasRequiredItem = requiredItemId ? hasItem(requiredItemId) : true
-                      const evolutionCatalyst = getLevelEvolutionCatalystForEvolution(evo)
+                        conditions.itemId ||
+                        (conditions.trade ? 'link-cable' : null)
+                      if (conditions.locationId)
+                        requiredItemId = 'evolution-compass'
+                      else if (conditions.knownMoveId)
+                        requiredItemId = 'charged-tm'
+                      else if (conditions.heldItem)
+                        requiredItemId = conditions.heldItem
+                      const hasRequiredItem = requiredItemId
+                        ? hasItem(requiredItemId)
+                        : true
+                      const evolutionCatalyst =
+                        getLevelEvolutionCatalystForEvolution(evo)
                       const hasEvolutionCatalyst = evolutionCatalyst
                         ? hasItem(evolutionCatalyst.id)
                         : true
@@ -998,7 +1089,8 @@ export function PokemonDetailsDialog({
                         ? (pokemon.level || 1) >= conditions.minLevel
                         : true
                       const canEvolveFriendship = conditions.minHappiness
-                        ? ((pokemon as any).friendship || 0) >= conditions.minHappiness
+                        ? ((pokemon as any).friendship || 0) >=
+                          conditions.minHappiness
                         : true
                       const timeRequirementLabel = conditions.timeOfDay
                         ? `${getEvolutionTimeOfDayLabel(
@@ -1057,16 +1149,26 @@ export function PokemonDetailsDialog({
                               name: evo.name,
                               shiny: !!pokemon.shiny,
                               formId:
-                                result.newFormId || result.newSpeciesId?.toString() || evo.name,
+                                result.newFormId ||
+                                result.newSpeciesId?.toString() ||
+                                evo.name,
                             })
-                            if (result.pokemon) setEvolvedPokemon(result.pokemon)
-                            if (result.rewards) setEvolutionRewards(result.rewards as RewardSummary)
+                            if (result.pokemon)
+                              setEvolvedPokemon(result.pokemon)
+                            if (result.rewards)
+                              setEvolutionRewards(
+                                result.rewards as RewardSummary,
+                              )
                           } else {
                             toast.error(result.message || 'Evolution failed')
                             setEvolutionTarget(null)
                           }
                         } catch (error: any) {
-                          toast.error(error instanceof Error ? error.message : 'Evolution failed')
+                          toast.error(
+                            error instanceof Error
+                              ? error.message
+                              : 'Evolution failed',
+                          )
                           setEvolutionTarget(null)
                         } finally {
                           setIsEvolving(null)
@@ -1109,7 +1211,9 @@ export function PokemonDetailsDialog({
                                   <div
                                     className={cn(
                                       'h-1.5 w-1.5 rounded-full',
-                                      canEvolve ? 'bg-game-surface-raised' : 'bg-game-muted',
+                                      canEvolve
+                                        ? 'bg-game-surface-raised'
+                                        : 'bg-game-muted',
                                     )}
                                   />
                                 )}
@@ -1240,7 +1344,9 @@ export function PokemonDetailsDialog({
                   },
                   {
                     label: 'Friendship',
-                    value: hasStatsScanner ? ((pokemon as any).friendship ?? 70) : '???',
+                    value: hasStatsScanner
+                      ? ((pokemon as any).friendship ?? 70)
+                      : '???',
                     icon: Info,
                     color: 'game-moss',
                   },
@@ -1331,7 +1437,9 @@ export function PokemonDetailsDialog({
                         )}
                         <div className="min-w-0">
                           <div className="truncate text-[10px] font-black uppercase tracking-widest text-game-moss-strong">
-                            {currentHeldItem ? currentHeldItem.name : 'No Held Item'}
+                            {currentHeldItem
+                              ? currentHeldItem.name
+                              : 'No Held Item'}
                           </div>
                           <div className="text-[11px] font-medium text-game-muted">
                             Reserved from your Bag while held
@@ -1377,7 +1485,10 @@ export function PokemonDetailsDialog({
                           const selected = heldItemId === item.id
                           const saving = isSavingHeldItem === item.id
                           const quantity = effectiveInventoryMap[item.id] || 0
-                          const skillLockReason = getItemSkillLockReason(item, user?.skills)
+                          const skillLockReason = getItemSkillLockReason(
+                            item,
+                            user?.skills,
+                          )
                           const itemLocked = Boolean(skillLockReason)
 
                           return (
@@ -1396,7 +1507,8 @@ export function PokemonDetailsDialog({
                                 selected
                                   ? 'border-game-moss bg-game-moss/10 text-game-ink'
                                   : 'border-game-border bg-game-surface-raised text-game-ink hover:border-game-moss',
-                                isSavingHeldItem !== null && 'opacity-60 cursor-wait',
+                                isSavingHeldItem !== null &&
+                                  'opacity-60 cursor-wait',
                                 (!canAssignHeldItems || itemLocked) &&
                                   'cursor-not-allowed opacity-45 hover:border-game-border',
                               )}
@@ -1423,10 +1535,13 @@ export function PokemonDetailsDialog({
                                   <span className="rounded-full border border-game-border bg-game-canvas px-2 py-0.5 text-[10px] font-bold text-game-muted">
                                     x{quantity}
                                   </span>
-                                  {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                                  {saving && (
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                  )}
                                 </div>
                                 <div className="mt-1 line-clamp-2 text-[11px] leading-snug text-game-muted">
-                                  {skillLockReason || formatHeldItemTrigger(item)}
+                                  {skillLockReason ||
+                                    formatHeldItemTrigger(item)}
                                 </div>
                               </div>
                             </button>
@@ -1488,14 +1603,21 @@ export function PokemonDetailsDialog({
                             isSavingPower !== null && 'opacity-60 cursor-wait',
                           )}
                         >
-                          <PokemonPowerIcon powerId={power.id} className="h-9 w-9" />
+                          <PokemonPowerIcon
+                            powerId={power.id}
+                            className="h-9 w-9"
+                          />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
                               <span className="truncate text-sm font-black uppercase tracking-tight">
                                 {power.name}
                               </span>
-                              {selected && <Check className="h-3.5 w-3.5 text-game-ochre" />}
-                              {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                              {selected && (
+                                <Check className="h-3.5 w-3.5 text-game-ochre" />
+                              )}
+                              {saving && (
+                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              )}
                             </div>
                             <div className="mt-1 line-clamp-2 text-[11px] leading-snug text-game-muted">
                               {power.description}
@@ -1568,7 +1690,11 @@ export function PokemonDetailsDialog({
                       }
                       className="h-10 rounded-xl bg-game-clay text-[10px] font-black uppercase tracking-widest text-game-cream hover:bg-game-clay/90 disabled:bg-game-canvas disabled:text-game-muted"
                     >
-                      {isSavingMoves ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Save'}
+                      {isSavingMoves ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        'Save'
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -1587,86 +1713,95 @@ export function PokemonDetailsDialog({
                   </div>
                 ) : (
                   <div className="grid gap-2 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
-                    {assignableMoves.map((move) => {
-                      const selected = selectedMoveIds.includes(move.id)
-                      const disabled =
-                        maxAssignableMoves <= 0 ||
-                        (!selected && selectedMoveIds.length >= maxAssignableMoves)
-                      const moveType =
-                        (move.forcedType && move.forcedType !== 'random'
-                          ? move.forcedType.toLowerCase()
-                          : undefined) || 'normal'
+                    {[...assignableMoves]
+                      .sort((a, b) => {
+                        const assignedDifference =
+                          Number(selectedMoveIds.includes(b.id)) -
+                          Number(selectedMoveIds.includes(a.id))
+                        return (
+                          assignedDifference || a.name.localeCompare(b.name)
+                        )
+                      })
+                      .map((move) => {
+                        const selected = selectedMoveIds.includes(move.id)
+                        const disabled =
+                          maxAssignableMoves <= 0 ||
+                          (!selected &&
+                            selectedMoveIds.length >= maxAssignableMoves)
+                        const fullMove = getMove(move.id)
+                        const isSketched = Boolean(
+                          gameData?.sketchedMoves?.includes(move.id) &&
+                            !items.some(
+                              (item) =>
+                                item.moveId === move.id &&
+                                (effectiveInventoryMap[item.id] || 0) > 0,
+                            ),
+                        )
+                        const presentation = fullMove
+                          ? getMovePresentation(fullMove, {
+                              source: {
+                                kind:
+                                  move.id === 'sketch'
+                                    ? 'level'
+                                    : isSketched
+                                      ? 'sketch'
+                                      : 'tm',
+                                label:
+                                  move.id === 'sketch'
+                                    ? 'Research move'
+                                    : isSketched
+                                      ? 'Sketchbook'
+                                      : 'Owned TM/HM',
+                              },
+                            })
+                          : null
 
-                      return (
-                        <button
-                          key={move.id}
-                          type="button"
-                          onClick={() => handleToggleMoveAssignment(move.id)}
-                          disabled={disabled}
-                          className={cn(
-                            'min-h-16 w-full rounded-xl border px-3 py-2 text-left transition-all flex items-center gap-3',
-                            selected
-                              ? 'border-game-moss bg-game-moss/10 text-game-ink'
-                              : 'border-game-border bg-game-surface-raised text-game-ink hover:border-game-moss',
-                            disabled && 'cursor-not-allowed opacity-45 hover:border-game-border',
-                          )}
-                        >
-                          <div className="relative flex h-10 w-10 flex-shrink-0 items-center justify-center">
-                            <ItemSprite
-                              itemId={`tm-${moveType}`}
-                              alt={moveType}
-                              width={40}
-                              height={40}
-                              className="object-contain drop-shadow-md"
-                            />
-                            {selected && (
-                              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-game-moss text-game-cream">
-                                <Check className="h-3 w-3" />
-                              </span>
+                        return (
+                          <div
+                            key={move.id}
+                            className={cn(
+                              'rounded-xl border p-2 transition-colors',
+                              selected
+                                ? 'border-game-moss bg-game-moss/10'
+                                : 'border-game-border bg-game-surface-raised',
                             )}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-1.5">
-                              {move.stance === 'power' && (
-                                <StanceIcon
-                                  stance="power"
-                                  className="h-3.5 w-3.5 text-game-danger"
-                                />
-                              )}
-                              {move.stance === 'speed' && (
-                                <StanceIcon
-                                  stance="speed"
-                                  className="h-3.5 w-3.5 text-game-moss-strong"
-                                />
-                              )}
-                              {move.stance === 'tech' && (
-                                <StanceIcon
-                                  stance="tech"
-                                  className="h-3.5 w-3.5 text-game-ochre-strong"
-                                />
-                              )}
-                              {move.stance === 'random' && (
-                                <StanceIcon
-                                  stance="random"
-                                  className="h-3.5 w-3.5 text-game-ochre"
-                                />
-                              )}
-                              <span className="truncate text-sm font-black uppercase tracking-tight">
+                          >
+                            {presentation ? (
+                              <MoveCompactRow
+                                presentation={presentation}
+                                onDetails={() =>
+                                  setMoveDetail(fullMove ?? null)
+                                }
+                                className="border-0 bg-transparent shadow-none"
+                              />
+                            ) : (
+                              <p className="p-2 text-sm font-bold text-game-ink">
                                 {move.name}
-                              </span>
-                            </div>
-                            <div className="mt-1 flex flex-wrap gap-1">
-                              <span className="rounded-full border border-game-border bg-game-canvas px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-game-muted">
-                                Power {formatAssignedMovePower(move.damage)}
-                              </span>
-                            </div>
-                            <div className="mt-1 line-clamp-2 text-[11px] leading-snug text-game-muted">
-                              {move.description}
-                            </div>
+                              </p>
+                            )}
+                            <Button
+                              type="button"
+                              variant={selected ? 'secondary' : 'outline'}
+                              onClick={() =>
+                                handleToggleMoveAssignment(move.id)
+                              }
+                              disabled={disabled}
+                              aria-pressed={selected}
+                              className="mt-2 min-h-11 w-full"
+                            >
+                              {selected ? (
+                                <>
+                                  <Check aria-hidden="true" /> Assigned
+                                </>
+                              ) : disabled ? (
+                                'Move slots full'
+                              ) : (
+                                'Assign move'
+                              )}
+                            </Button>
                           </div>
-                        </button>
-                      )
-                    })}
+                        )
+                      })}
                   </div>
                 )}
               </div>
@@ -1742,61 +1877,95 @@ export function PokemonDetailsDialog({
                             <StatBar
                               label="ATK"
                               value={effectiveStats?.attack ?? 0}
-                              max={calculateMaxStat('other', baseStats?.attack ?? 0)}
+                              max={calculateMaxStat(
+                                'other',
+                                baseStats?.attack ?? 0,
+                              )}
                               color="bg-game-clay"
-                              natureEffect={getVisibleNatureStatEffect('attack')}
+                              natureEffect={getVisibleNatureStatEffect(
+                                'attack',
+                              )}
                             />
                             <StatBar
                               label="DEF"
                               value={effectiveStats?.defense ?? 0}
-                              max={calculateMaxStat('other', baseStats?.defense ?? 0)}
+                              max={calculateMaxStat(
+                                'other',
+                                baseStats?.defense ?? 0,
+                              )}
                               color="bg-game-ochre"
-                              natureEffect={getVisibleNatureStatEffect('defense')}
+                              natureEffect={getVisibleNatureStatEffect(
+                                'defense',
+                              )}
                             />
                             <StatBar
                               label="SPA"
                               value={effectiveStats?.specialAttack ?? 0}
-                              max={calculateMaxStat('other', baseStats?.['special-attack'] ?? 0)}
+                              max={calculateMaxStat(
+                                'other',
+                                baseStats?.['special-attack'] ?? 0,
+                              )}
                               color="bg-game-moss"
-                              natureEffect={getVisibleNatureStatEffect('specialAttack')}
+                              natureEffect={getVisibleNatureStatEffect(
+                                'specialAttack',
+                              )}
                             />
                             <StatBar
                               label="SPD"
                               value={effectiveStats?.specialDefense ?? 0}
-                              max={calculateMaxStat('other', baseStats?.['special-defense'] ?? 0)}
+                              max={calculateMaxStat(
+                                'other',
+                                baseStats?.['special-defense'] ?? 0,
+                              )}
                               color="bg-game-moss-strong"
-                              natureEffect={getVisibleNatureStatEffect('specialDefense')}
+                              natureEffect={getVisibleNatureStatEffect(
+                                'specialDefense',
+                              )}
                             />
                             <StatBar
                               label="SPE"
                               value={effectiveStats?.speed ?? 0}
-                              max={calculateMaxStat('other', baseStats?.speed ?? 0)}
+                              max={calculateMaxStat(
+                                'other',
+                                baseStats?.speed ?? 0,
+                              )}
                               color="bg-game-clay-strong"
                               natureEffect={getVisibleNatureStatEffect('speed')}
                             />
                           </>
                         ) : (
                           <>
-                            <ObfuscatedStatBar label="HP" color="bg-game-danger" />
+                            <ObfuscatedStatBar
+                              label="HP"
+                              color="bg-game-danger"
+                            />
                             <ObfuscatedStatBar
                               label="ATK"
                               color="bg-game-clay"
-                              natureEffect={getVisibleNatureStatEffect('attack')}
+                              natureEffect={getVisibleNatureStatEffect(
+                                'attack',
+                              )}
                             />
                             <ObfuscatedStatBar
                               label="DEF"
                               color="bg-game-ochre"
-                              natureEffect={getVisibleNatureStatEffect('defense')}
+                              natureEffect={getVisibleNatureStatEffect(
+                                'defense',
+                              )}
                             />
                             <ObfuscatedStatBar
                               label="SPA"
                               color="bg-game-moss"
-                              natureEffect={getVisibleNatureStatEffect('specialAttack')}
+                              natureEffect={getVisibleNatureStatEffect(
+                                'specialAttack',
+                              )}
                             />
                             <ObfuscatedStatBar
                               label="SPD"
                               color="bg-game-moss-strong"
-                              natureEffect={getVisibleNatureStatEffect('specialDefense')}
+                              natureEffect={getVisibleNatureStatEffect(
+                                'specialDefense',
+                              )}
                             />
                             <ObfuscatedStatBar
                               label="SPE"
@@ -1855,12 +2024,30 @@ export function PokemonDetailsDialog({
                           </>
                         ) : (
                           <>
-                            <ObfuscatedStatBar label="HP" color="bg-game-danger" />
-                            <ObfuscatedStatBar label="ATK" color="bg-game-clay" />
-                            <ObfuscatedStatBar label="DEF" color="bg-game-ochre" />
-                            <ObfuscatedStatBar label="SPA" color="bg-game-moss" />
-                            <ObfuscatedStatBar label="SPD" color="bg-game-moss-strong" />
-                            <ObfuscatedStatBar label="SPE" color="bg-game-clay-strong" />
+                            <ObfuscatedStatBar
+                              label="HP"
+                              color="bg-game-danger"
+                            />
+                            <ObfuscatedStatBar
+                              label="ATK"
+                              color="bg-game-clay"
+                            />
+                            <ObfuscatedStatBar
+                              label="DEF"
+                              color="bg-game-ochre"
+                            />
+                            <ObfuscatedStatBar
+                              label="SPA"
+                              color="bg-game-moss"
+                            />
+                            <ObfuscatedStatBar
+                              label="SPD"
+                              color="bg-game-moss-strong"
+                            />
+                            <ObfuscatedStatBar
+                              label="SPE"
+                              color="bg-game-clay-strong"
+                            />
                           </>
                         )}
                       </div>
@@ -1913,12 +2100,30 @@ export function PokemonDetailsDialog({
                           </>
                         ) : (
                           <>
-                            <ObfuscatedStatBar label="HP" color="bg-game-danger" />
-                            <ObfuscatedStatBar label="ATK" color="bg-game-clay" />
-                            <ObfuscatedStatBar label="DEF" color="bg-game-ochre" />
-                            <ObfuscatedStatBar label="SPA" color="bg-game-moss" />
-                            <ObfuscatedStatBar label="SPD" color="bg-game-moss-strong" />
-                            <ObfuscatedStatBar label="SPE" color="bg-game-clay-strong" />
+                            <ObfuscatedStatBar
+                              label="HP"
+                              color="bg-game-danger"
+                            />
+                            <ObfuscatedStatBar
+                              label="ATK"
+                              color="bg-game-clay"
+                            />
+                            <ObfuscatedStatBar
+                              label="DEF"
+                              color="bg-game-ochre"
+                            />
+                            <ObfuscatedStatBar
+                              label="SPA"
+                              color="bg-game-moss"
+                            />
+                            <ObfuscatedStatBar
+                              label="SPD"
+                              color="bg-game-moss-strong"
+                            />
+                            <ObfuscatedStatBar
+                              label="SPE"
+                              color="bg-game-clay-strong"
+                            />
                           </>
                         )}
                       </div>
@@ -1955,6 +2160,23 @@ export function PokemonDetailsDialog({
         </div>
       </ResponsivePanel>
 
+      <ResponsivePanel
+        open={moveDetail !== null}
+        onOpenChange={(open) => !open && setMoveDetail(null)}
+        title={moveDetail?.name || 'Move details'}
+        description="Battle move field note"
+      >
+        <div className="h-full overflow-y-auto p-4 custom-scrollbar">
+          {moveDetail ? (
+            <MoveFieldNote
+              presentation={getMovePresentation(moveDetail, {
+                source: { kind: 'other', label: 'Assignable move' },
+              })}
+            />
+          ) : null}
+        </div>
+      </ResponsivePanel>
+
       {/* Evolution Rewards Dialog */}
       <Dialog
         open={!!evolutionRewards && !evolutionTarget}
@@ -1968,7 +2190,9 @@ export function PokemonDetailsDialog({
             </h2>
           </div>
           <div className="max-h-[60vh] overflow-y-auto custom-scrollbar">
-            {evolutionRewards && <RewardSummaryDisplay summary={evolutionRewards} title="" />}
+            {evolutionRewards && (
+              <RewardSummaryDisplay summary={evolutionRewards} title="" />
+            )}
           </div>
           <DialogFooter className="p-6 pt-2">
             <Button
@@ -1994,7 +2218,11 @@ export function PokemonDetailsDialog({
                 !!pokemon.shiny,
                 pokemonGender,
               )}
-              newFormattedEnd={getPokemonImageUrl(target.formId, 'home', target.shiny)}
+              newFormattedEnd={getPokemonImageUrl(
+                target.formId,
+                'home',
+                target.shiny,
+              )}
               onComplete={() => {
                 setEvolutionTarget(null)
                 setIsOpen(false)
@@ -2023,7 +2251,9 @@ function EvolutionOverlay({
   onComplete: () => void
 }) {
   const displayPokemonName = capitalizeFirstLetter(pokemonName)
-  const [phase, setPhase] = useState<'start' | 'flash' | 'reveal' | 'done'>('start')
+  const [phase, setPhase] = useState<'start' | 'flash' | 'reveal' | 'done'>(
+    'start',
+  )
 
   useEffect(() => {
     const t1 = setTimeout(() => setPhase('flash'), 2000)
@@ -2043,7 +2273,9 @@ function EvolutionOverlay({
         showCloseButton={false}
         className="fixed !left-0 !top-0 inset-0 z-[100] m-0 flex h-[100dvh] w-screen max-w-none !translate-x-0 !translate-y-0 flex-col items-center justify-center gap-0 rounded-none border-none bg-[#0d1820] p-0 data-[state=closed]:slide-out-to-bottom-0 data-[state=open]:slide-in-from-bottom-0"
       >
-        <DialogTitle className="sr-only">{displayPokemonName} Evolution</DialogTitle>
+        <DialogTitle className="sr-only">
+          {displayPokemonName} Evolution
+        </DialogTitle>
         {/* Background Effects */}
         <div className="absolute inset-0 z-0">
           <Vortex
@@ -2119,7 +2351,9 @@ function EvolutionOverlay({
                 <p className="font-display text-4xl font-semibold text-[#e8b85b]">
                   Congratulations!
                 </p>
-                <p className="text-xl text-[#f5ead7]">Your {displayPokemonName} evolved!</p>
+                <p className="text-xl text-[#f5ead7]">
+                  Your {displayPokemonName} evolved!
+                </p>
               </div>
 
               {phase === 'done' && (
@@ -2202,32 +2436,62 @@ function MarkingButton({
   )
 }
 
-function PokemonPowerIcon({ powerId, className }: { powerId: PokemonPowerId; className?: string }) {
+function PokemonPowerIcon({
+  powerId,
+  className,
+}: {
+  powerId: PokemonPowerId
+  className?: string
+}) {
   const baseClass = cn('flex-shrink-0 rounded-xl border p-2', className)
 
   if (powerId === 'tera') {
-    return <Sparkles className={cn(baseClass, 'border-purple-400/30 text-purple-300')} />
+    return (
+      <Sparkles
+        className={cn(baseClass, 'border-purple-400/30 text-purple-300')}
+      />
+    )
   }
   if (powerId === 'mega') {
-    return <Atom className={cn(baseClass, 'border-pink-400/30 text-pink-300')} />
+    return (
+      <Atom className={cn(baseClass, 'border-pink-400/30 text-pink-300')} />
+    )
   }
   if (powerId === 'z-move') {
-    return <Zap className={cn(baseClass, 'border-yellow-400/30 text-yellow-300')} />
+    return (
+      <Zap className={cn(baseClass, 'border-yellow-400/30 text-yellow-300')} />
+    )
   }
   if (powerId === 'dynamax') {
-    return <Maximize2 className={cn(baseClass, 'border-game-danger/30 text-game-danger')} />
+    return (
+      <Maximize2
+        className={cn(baseClass, 'border-game-danger/30 text-game-danger')}
+      />
+    )
   }
   if (powerId === 'victory') {
-    return <Flag className={cn(baseClass, 'border-amber-400/30 text-amber-300')} />
+    return (
+      <Flag className={cn(baseClass, 'border-amber-400/30 text-amber-300')} />
+    )
   }
   if (powerId === 'shout') {
-    return <Megaphone className={cn(baseClass, 'border-cyan-400/30 text-cyan-300')} />
+    return (
+      <Megaphone
+        className={cn(baseClass, 'border-cyan-400/30 text-cyan-300')}
+      />
+    )
   }
   if (powerId === 'circadian') {
-    return <Clock className={cn(baseClass, 'border-orange-400/30 text-orange-300')} />
+    return (
+      <Clock
+        className={cn(baseClass, 'border-orange-400/30 text-orange-300')}
+      />
+    )
   }
 
-  return <Atom className={cn(baseClass, 'border-fuchsia-400/30 text-fuchsia-300')} />
+  return (
+    <Atom className={cn(baseClass, 'border-fuchsia-400/30 text-fuchsia-300')} />
+  )
 }
 
 function StatBar({
@@ -2253,11 +2517,16 @@ function StatBar({
       </span>
       <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-game-canvas">
         <div
-          className={cn('h-full rounded-full opacity-80 transition-[width] duration-700', color)}
+          className={cn(
+            'h-full rounded-full opacity-80 transition-[width] duration-700',
+            color,
+          )}
           style={{ width: `${percentage}%` }}
         />
       </div>
-      <span className="w-8 text-right font-mono text-[10px] font-bold text-game-ink">{value}</span>
+      <span className="w-8 text-right font-mono text-[10px] font-bold text-game-ink">
+        {value}
+      </span>
     </div>
   )
 }
@@ -2298,17 +2567,30 @@ function ObfuscatedStatBar({
           style={{ width: `${width}%` }}
         />
       </div>
-      <span className="w-8 text-right font-mono text-[10px] font-bold text-game-muted">??</span>
+      <span className="w-8 text-right font-mono text-[10px] font-bold text-game-muted">
+        ??
+      </span>
     </div>
   )
 }
 
-function NatureStatArrow({ natureEffect }: { natureEffect?: NatureStatEffect }) {
+function NatureStatArrow({
+  natureEffect,
+}: {
+  natureEffect?: NatureStatEffect
+}) {
   if (natureEffect === 'increased') {
-    return <ArrowUp aria-hidden="true" className="h-3 w-3 shrink-0 text-game-moss" />
+    return (
+      <ArrowUp aria-hidden="true" className="h-3 w-3 shrink-0 text-game-moss" />
+    )
   }
   if (natureEffect === 'decreased') {
-    return <ArrowDown aria-hidden="true" className="h-3 w-3 shrink-0 text-game-danger" />
+    return (
+      <ArrowDown
+        aria-hidden="true"
+        className="h-3 w-3 shrink-0 text-game-danger"
+      />
+    )
   }
   return null
 }

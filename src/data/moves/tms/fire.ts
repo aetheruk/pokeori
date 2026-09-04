@@ -2657,6 +2657,7 @@ export const FIRE_TM_MOVES: MoveConfig[] = [
     accuracy: 100,
     selfDamage: {
       fraction: 2,
+      trigger: 'on-use',
     },
     level: 50,
     formId: ['806'],

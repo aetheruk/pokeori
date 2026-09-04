@@ -28,6 +28,7 @@ import {
   applyStatus,
   applyMoveSelfDamage,
   canApplyStatus,
+  shouldApplyMoveSelfDamage,
   STATUS_EFFECTS,
 } from './status-effects-logic'
 import { BASE_BATTLE_POWER } from './constants'
@@ -1207,8 +1208,20 @@ function scoreMove(params: {
 
   if (move.selfDamage && !blocksBattleRecoilDamageByAbility(self, move)) {
     const selfDamageChance = (move.selfDamage.chance ?? 100) / 100
+    const hitChance = move.alwaysHits
+      ? 1
+      : Math.max(0, Math.min(1, move.accuracy / 100))
+    const triggerChance =
+      move.selfDamage.trigger === 'on-miss'
+        ? 1 - hitChance
+        : move.selfDamage.trigger === 'on-use'
+          ? 1
+          : hitChance
     const fraction = move.selfDamage.fraction ?? 1
-    score -= Math.max(1, self.maxHp / Math.max(1, fraction)) * selfDamageChance
+    score -=
+      Math.max(1, self.maxHp / Math.max(1, fraction)) *
+      selfDamageChance *
+      triggerChance
   }
 
   const accuracy = move.alwaysHits
@@ -1317,7 +1330,18 @@ function scoreMoveForNeutralLoadout(params: {
   if (move.absorb) score += 8
   if (move.charged) score /= Math.max(2, move.charged + 1)
   if (move.recharge) score /= Math.max(2, move.recharge + 1)
-  if (move.selfDamage) score -= 18
+  if (move.selfDamage) {
+    const hitChance = move.alwaysHits
+      ? 1
+      : Math.max(0, Math.min(1, move.accuracy / 100))
+    const triggerChance =
+      move.selfDamage.trigger === 'on-miss'
+        ? 1 - hitChance
+        : move.selfDamage.trigger === 'on-use'
+          ? 1
+          : hitChance
+    score -= 18 * triggerChance
+  }
 
   return { score: score * accuracy, stance, attackType }
 }
@@ -2471,6 +2495,7 @@ export function applyEnemyAiMoveEffects(params: {
     const healAmount = getMoveHealAmount({
       move,
       pokemon: self,
+      target: opponent,
       weather,
     })
     self.currentHp = Math.min(self.maxHp, self.currentHp + healAmount)
@@ -2663,7 +2688,7 @@ export function applyEnemyAiMoveEffects(params: {
     }
   }
 
-  if (move.selfDamage) {
+  if (shouldApplyMoveSelfDamage(move.selfDamage, 'hit')) {
     const recoilBlockMessage = getBattleRecoilDamageBlockMessage(self, move)
     if (recoilBlockMessage) {
       messages.push(recoilBlockMessage)

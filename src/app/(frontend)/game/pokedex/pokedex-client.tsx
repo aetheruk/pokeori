@@ -26,6 +26,7 @@ import {
 import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
 import { GameErrorBoundary } from '@/components/game/GameErrorBoundary'
+import { MoveCompactRow, MoveFieldNote } from '@/components/game/moves'
 import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
 import { PremiumSearch } from '@/components/game/shared/PremiumSearch'
@@ -75,7 +76,7 @@ import {
 import type { BattleStance } from '@/utilities/battle/types'
 import {
   getMoveDisplayType,
-  getMoveInfoTags,
+  getMovePresentation,
   getMoveTmItem,
   getMoveTypeSpriteItemId,
 } from '@/utilities/pokemon/move-display'
@@ -967,110 +968,104 @@ function ObservedMoveListButton({
   pokemon: PokemonForm
   inventoryMap: Record<string, number>
 }) {
+  const [selectedMove, setSelectedMove] = useState<MoveConfig | null>(null)
   const compatibleMoves = useMemo(
     () => getCompatibleMovesForForm(pokemon.id),
     [pokemon.id],
   )
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <button
-          type="button"
-          className="game-focus-ring inline-flex min-h-10 items-center gap-2 rounded-full border border-game-moss/25 bg-game-moss/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-game-moss-strong"
-        >
-          <List className="h-3.5 w-3.5" />
-          Move notes
-        </button>
-      </DialogTrigger>
-      <DialogContent className="max-h-[85dvh] overflow-hidden border-game-border bg-game-surface p-0 text-game-ink sm:max-w-md">
-        <DialogHeader className="border-b border-game-border px-5 pt-5 pb-4">
-          <DialogTitle>{pokemon.name} move notes</DialogTitle>
-          <DialogDescription>
-            Battle Observer data can identify compatible TMs for this species.
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog>
+        <DialogTrigger asChild>
+          <button
+            type="button"
+            className="game-focus-ring inline-flex min-h-10 items-center gap-2 rounded-full border border-game-moss/25 bg-game-moss/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-game-moss-strong"
+          >
+            <List className="h-3.5 w-3.5" />
+            Move notes
+          </button>
+        </DialogTrigger>
+        <DialogContent className="max-h-[85dvh] overflow-hidden border-game-border bg-game-surface p-0 text-game-ink sm:max-w-md">
+          <DialogHeader className="border-b border-game-border px-5 pt-5 pb-4">
+            <DialogTitle>{pokemon.name} move notes</DialogTitle>
+            <DialogDescription>
+              Battle Observer data can identify compatible TMs for this species.
+            </DialogDescription>
+          </DialogHeader>
 
-        <div className="max-h-[65dvh] overflow-y-auto p-4 custom-scrollbar">
-          {compatibleMoves.length === 0 ? (
-            <div
-              className="rounded-lg border border-dashed border-game-border bg-game-canvas px-4 py-6 text-center text-sm text-game-muted"
-              role="status"
-              aria-live="polite"
-            >
-              No compatible TMs authored.
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {compatibleMoves.map((move) => (
-                <ObservedMoveRow
-                  key={move.id}
-                  move={move}
-                  inventoryMap={inventoryMap}
-                />
-              ))}
-            </div>
+          <div className="max-h-[65dvh] overflow-y-auto p-4 custom-scrollbar">
+            {compatibleMoves.length === 0 ? (
+              <div
+                className="rounded-lg border border-dashed border-game-border bg-game-canvas px-4 py-6 text-center text-sm text-game-muted"
+                role="status"
+                aria-live="polite"
+              >
+                No compatible TMs authored.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {compatibleMoves.map((move) => (
+                  <ObservedMoveRow
+                    key={move.id}
+                    move={move}
+                    inventoryMap={inventoryMap}
+                    onDetails={() => setSelectedMove(move)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+      <ResponsivePanel
+        open={selectedMove !== null}
+        onOpenChange={(open) => !open && setSelectedMove(null)}
+        title={selectedMove?.name || 'Move details'}
+        description="Battle Observer field note"
+      >
+        <div className="h-full overflow-y-auto p-4 custom-scrollbar">
+          {selectedMove && (
+            <MoveFieldNote
+              presentation={getMovePresentation(selectedMove, {
+                source: { kind: 'tm', label: 'Compatible TM' },
+              })}
+            />
           )}
         </div>
-      </DialogContent>
-    </Dialog>
+      </ResponsivePanel>
+    </>
   )
 }
 
 function ObservedMoveRow({
   move,
   inventoryMap,
+  onDetails,
 }: {
   move: MoveConfig
   inventoryMap: Record<string, number>
+  onDetails: () => void
 }) {
   const tmItem = getMoveTmItem(move.id)
   const isKnown = tmItem ? (inventoryMap[tmItem.id] || 0) > 0 : false
-  const tags = getMoveInfoTags(move)
-  const type = getMoveDisplayType(move)
+  const presentation = getMovePresentation(move, {
+    source: { kind: 'tm', label: tmItem?.name || 'TM' },
+  })
 
-  return (
-    <div
-      className={cn(
-        'rounded-lg border p-3 transition-colors',
-        isKnown
-          ? 'border-game-border bg-game-surface-raised'
-          : 'border-game-border bg-game-canvas',
-      )}
-    >
+  return isKnown ? (
+    <MoveCompactRow presentation={presentation} onDetails={onDetails} />
+  ) : (
+    <div className="rounded-lg border border-game-border bg-game-canvas p-3">
       <div className="flex items-center gap-3">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface">
-          {isKnown ? (
-            <ItemSprite
-              itemId={getMoveTypeSpriteItemId(move)}
-              alt={`${type} TM`}
-              width={34}
-              height={34}
-              className="h-8 w-8 object-contain"
-            />
-          ) : (
-            <CircleHelp className="h-6 w-6 text-game-muted" />
-          )}
+          <CircleHelp className="h-6 w-6 text-game-muted" />
         </div>
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <h4 className="truncate text-sm font-semibold text-game-ink">
-              {isKnown ? move.name : 'TM Not found'}
-            </h4>
-          </div>
-          <div className="mt-1 flex flex-wrap gap-1">
-            {(isKnown
-              ? tags.slice(0, 4)
-              : [{ label: 'Type', value: type }]
-            ).map((tag) => (
-              <span
-                key={`${move.id}-${tag.label}-${tag.value}`}
-                className="rounded-full border border-game-border bg-game-surface px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.08em] text-game-muted"
-              >
-                {tag.value}
-              </span>
-            ))}
-          </div>
+          <h4 className="text-sm font-semibold text-game-ink">Unknown TM</h4>
+          <p className="mt-1 text-xs text-game-muted">
+            Find this TM to reveal its move and battle details.
+          </p>
         </div>
       </div>
     </div>
