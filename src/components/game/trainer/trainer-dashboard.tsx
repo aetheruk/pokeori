@@ -1,7 +1,9 @@
 'use client'
 
-import { useEffect, useState, Suspense, lazy } from 'react'
+import { useRouter } from 'next/navigation'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { GamePageSkeleton } from '@/components/game/shared/GamePageSkeleton'
+
 const TrainerLeveling = lazy(() =>
   import('@/components/game/trainer-leveling').then((module) => ({
     default: module.TrainerLeveling,
@@ -40,48 +42,57 @@ function LazyWrapper({ children }: { children: React.ReactNode }) {
     </Suspense>
   )
 }
-import { useUser } from '@/context/UserContext'
+
 import {
   Gift,
-  LayoutGrid,
   Layers3,
+  LayoutGrid,
   Search,
   Trophy,
   UserRound,
   UsersRound,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { ResponsivePanel } from '@/components/ui/responsive-panel'
-import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
+import { DesktopSectionEmblem } from '@/components/game/shared/DesktopSectionEmblem'
 import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
+import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
+import { ResponsivePanel } from '@/components/ui/responsive-panel'
+import { useUser } from '@/context/UserContext'
 import { skills } from '@/data/skills'
 import { tcgSetSummaries } from '@/data/tcg/summaries'
-import { DesktopSectionEmblem } from '@/components/game/shared/DesktopSectionEmblem'
+import { cn } from '@/lib/utils'
 import { getTcgSeriesInReleaseOrder } from '@/utilities/tcg/set-order'
+import {
+  getTrainerSectionHref,
+  resolveTrainerSection,
+  type TrainerSection,
+} from './trainer-sections'
 
 type DeckFormat = 'baby' | 'champions' | 'masters'
-type Tab =
-  | 'profile'
-  | 'decks'
-  | 'trainers'
-  | 'friends'
-  | 'gift'
-  | 'scores'
 
-export function TrainerDashboard() {
+export function TrainerDashboard({
+  initialSection = 'profile',
+}: {
+  initialSection?: string
+}) {
   const { user, gameData } = useUser()
-  const [activeTab, setActiveTab] = useState<Tab>('profile')
-  const [sectionDrawerOpen, setSectionDrawerOpen] = useState(false)
-  const [rankingSkill, setRankingSkill] = useState(skills[0].id)
-  const deckGenerations = getTcgSeriesInReleaseOrder(tcgSetSummaries)
-  const [deckGeneration, setDeckGeneration] = useState(deckGenerations[0] || '')
-  const [deckFormat, setDeckFormat] = useState<DeckFormat>('baby')
+  const router = useRouter()
   const inventory = Object.fromEntries(
     (gameData?.inventory || []).map((item) => [item.itemId, item.quantity]),
   )
   const hasDeckBox = (inventory['deck-box'] || 0) > 0
   const isKidMode = user?.kidMode === true
-
+  const normalizedInitialSection = resolveTrainerSection(initialSection, {
+    hasDeckBox,
+    isKidMode,
+  })
+  const [activeTab, setActiveTab] = useState<TrainerSection>(
+    normalizedInitialSection,
+  )
+  const [sectionDrawerOpen, setSectionDrawerOpen] = useState(false)
+  const [rankingSkill, setRankingSkill] = useState(skills[0].id)
+  const deckGenerations = getTcgSeriesInReleaseOrder(tcgSetSummaries)
+  const [deckGeneration, setDeckGeneration] = useState(deckGenerations[0] || '')
+  const [deckFormat, setDeckFormat] = useState<DeckFormat>('baby')
   const TABS = [
     {
       id: 'profile' as const,
@@ -140,8 +151,8 @@ export function TrainerDashboard() {
             ),
           },
           {
-            id: 'scores' as const,
-            label: 'High Scores',
+            id: 'rankings' as const,
+            label: 'Skill Rankings',
             component: (
               <LazyWrapper>
                 <HighScores activeSkill={rankingSkill} />
@@ -153,24 +164,40 @@ export function TrainerDashboard() {
   ]
   const activeComponent =
     TABS.find((tab) => tab.id === activeTab)?.component || TABS[0].component
-  const tabIcons: Record<Tab, React.ComponentType<{ className?: string }>> = {
+  const tabIcons: Record<
+    TrainerSection,
+    React.ComponentType<{ className?: string }>
+  > = {
     profile: UserRound,
     decks: Layers3,
     trainers: Search,
     friends: UsersRound,
     gift: Gift,
-    scores: Trophy,
+    rankings: Trophy,
+  }
+
+  const selectSection = (section: TrainerSection) => {
+    setActiveTab(section)
+    router.push(getTrainerSectionHref(section), { scroll: false })
   }
 
   useEffect(() => {
-    if (
-      (!hasDeckBox && activeTab === 'decks') ||
-      (isKidMode &&
-        ['trainers', 'friends', 'gift', 'scores'].includes(activeTab))
-    ) {
-      setActiveTab('profile')
+    setActiveTab(normalizedInitialSection)
+    if (initialSection && normalizedInitialSection !== initialSection) {
+      router.replace('/game', { scroll: false })
     }
-  }, [activeTab, hasDeckBox, isKidMode])
+  }, [initialSection, normalizedInitialSection, router])
+
+  useEffect(() => {
+    const availableSection = resolveTrainerSection(activeTab, {
+      hasDeckBox,
+      isKidMode,
+    })
+    if (availableSection !== activeTab) {
+      setActiveTab(availableSection)
+      router.replace('/game', { scroll: false })
+    }
+  }, [activeTab, hasDeckBox, isKidMode, router])
 
   const activeSection = TABS.find((tab) => tab.id === activeTab) || TABS[0]
   const ActiveIcon = tabIcons[activeSection.id]
@@ -185,7 +212,9 @@ export function TrainerDashboard() {
               <ActiveIcon className="h-5 w-5" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-game-moss-strong">Trainer hub</p>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-game-moss-strong">
+                Trainer hub
+              </p>
               <h1 className="truncate font-display text-xl font-bold leading-tight text-game-ink">
                 {activeSection.label}
               </h1>
@@ -193,13 +222,16 @@ export function TrainerDashboard() {
           </div>
         </div>
       )}
-      <div className="min-h-0 flex-1 overflow-hidden xl:grid xl:grid-cols-[16rem_minmax(0,1fr)]">
-        <aside className="hidden min-h-0 overflow-y-auto border-r border-game-border bg-game-surface/60 p-4 shadow-[10px_0_24px_rgb(75_62_39_/_0.05)] xl:block">
+      <div className="min-h-0 flex-1 overflow-hidden lg:grid lg:grid-cols-[16rem_minmax(0,1fr)]">
+        <aside className="hidden min-h-0 overflow-y-auto border-r border-game-border bg-game-surface/60 p-4 shadow-[10px_0_24px_rgb(75_62_39_/_0.05)] lg:block">
           <div className="mb-4 flex items-center justify-between gap-3 border-b border-game-border pb-4">
             <p className="px-2 text-[11px] font-bold uppercase tracking-[0.16em] text-game-muted">
               Trainer journal
             </p>
-            <DesktopSectionEmblem section="trainer" className="h-14 w-14 opacity-90" />
+            <DesktopSectionEmblem
+              section="trainer"
+              className="h-14 w-14 opacity-90"
+            />
           </div>
           <nav className="space-y-1" aria-label="Trainer sections">
             {TABS.map((tab) => {
@@ -210,7 +242,7 @@ export function TrainerDashboard() {
                   key={tab.id}
                   type="button"
                   aria-current={selected ? 'page' : undefined}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => selectSection(tab.id)}
                   className={cn(
                     'game-focus-ring flex min-h-11 w-full items-center gap-3 rounded-lg border px-3 text-left text-sm font-semibold transition-colors',
                     selected
@@ -218,30 +250,45 @@ export function TrainerDashboard() {
                       : 'border-transparent text-game-muted hover:border-game-border hover:bg-game-surface-raised hover:text-game-ink',
                   )}
                 >
-                  <Icon className={cn('h-4 w-4 shrink-0', selected ? 'text-game-moss-strong' : 'text-game-muted')} />
+                  <Icon
+                    className={cn(
+                      'h-4 w-4 shrink-0',
+                      selected ? 'text-game-moss-strong' : 'text-game-muted',
+                    )}
+                  />
                   <span className="truncate">{tab.label}</span>
                 </button>
               )
             })}
           </nav>
-          {activeTab === 'scores' && (
+          {activeTab === 'rankings' && (
             <div className="mt-6 border-t border-game-border pt-4">
-            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-game-muted">Ranking skill</p>
+              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-game-muted">
+                Ranking skill
+              </p>
               <PremiumSelect
                 value={rankingSkill}
                 onValueChange={setRankingSkill}
-                options={skills.map((skill) => ({ id: skill.id, label: skill.name }))}
+                options={skills.map((skill) => ({
+                  id: skill.id,
+                  label: skill.name,
+                }))}
               />
             </div>
           )}
           {activeTab === 'decks' && (
             <div className="mt-6 space-y-3 border-t border-game-border pt-4">
               <div>
-                <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-game-muted">Deck generation</p>
+                <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-game-muted">
+                  Deck generation
+                </p>
                 <PremiumSelect
                   value={deckGeneration}
                   onValueChange={setDeckGeneration}
-                  options={deckGenerations.map((generation) => ({ id: generation, label: generation.replace('&', 'and') }))}
+                  options={deckGenerations.map((generation) => ({
+                    id: generation,
+                    label: generation.replace('&', 'and'),
+                  }))}
                 />
               </div>
               <div className="grid grid-cols-3 gap-1.5">
@@ -265,16 +312,27 @@ export function TrainerDashboard() {
             </div>
           )}
         </aside>
-        <div className="h-full min-h-0 min-w-0 overflow-hidden">{activeComponent}</div>
+        <div className="h-full min-h-0 min-w-0 overflow-hidden">
+          {activeComponent}
+        </div>
       </div>
 
-      <SecondaryControlBar className="xl:hidden">
-        <div className={cn('grid min-w-0 gap-2', (activeTab === 'scores' || activeTab === 'decks') && 'grid-cols-[minmax(0,1fr)_auto]')}>
-          {activeTab === 'scores' && (
+      <SecondaryControlBar className="lg:hidden">
+        <div
+          className={cn(
+            'grid min-w-0 gap-2',
+            (activeTab === 'rankings' || activeTab === 'decks') &&
+              'grid-cols-[minmax(0,1fr)_auto]',
+          )}
+        >
+          {activeTab === 'rankings' && (
             <PremiumSelect
               value={rankingSkill}
               onValueChange={setRankingSkill}
-              options={skills.map((skill) => ({ id: skill.id, label: skill.name }))}
+              options={skills.map((skill) => ({
+                id: skill.id,
+                label: skill.name,
+              }))}
             />
           )}
           {activeTab === 'decks' && (
@@ -292,16 +350,26 @@ export function TrainerDashboard() {
             onClick={() => setSectionDrawerOpen(true)}
             className={cn(
               'game-focus-ring flex min-w-0 h-12 items-center gap-3 rounded-lg border border-game-border bg-game-surface px-3 text-left transition-colors hover:border-game-moss/45 hover:bg-game-surface-raised',
-              activeTab !== 'scores' && activeTab !== 'decks' && 'w-full',
+              activeTab !== 'rankings' && activeTab !== 'decks' && 'w-full',
             )}
             aria-label="Choose trainer section"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-game-moss/10 text-game-moss-strong">
               <ActiveIcon className="h-4 w-4" />
             </div>
-            <div className={cn('min-w-0 flex-1', (activeTab === 'scores' || activeTab === 'decks') && 'hidden sm:block')}>
-              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-game-muted">Trainer section</p>
-              <p className="truncate text-sm font-bold text-game-ink">{activeSection.label}</p>
+            <div
+              className={cn(
+                'min-w-0 flex-1',
+                (activeTab === 'rankings' || activeTab === 'decks') &&
+                  'hidden sm:block',
+              )}
+            >
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-game-muted">
+                Trainer section
+              </p>
+              <p className="truncate text-sm font-bold text-game-ink">
+                {activeSection.label}
+              </p>
             </div>
             <LayoutGrid className="h-5 w-5 text-game-moss-strong" />
           </button>
@@ -336,32 +404,37 @@ export function TrainerDashboard() {
         desktopWidth="min(32vw, 420px)"
         className="pb-[env(safe-area-inset-bottom)]"
       >
-          <div className="grid grid-cols-2 gap-2 overflow-y-auto p-4 sm:grid-cols-3">
-            {TABS.map((tab) => {
-              const Icon = tabIcons[tab.id]
-              const selected = tab.id === activeTab
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  aria-pressed={selected}
-                  onClick={() => {
-                    setActiveTab(tab.id)
-                    setSectionDrawerOpen(false)
-                  }}
+        <div className="grid grid-cols-2 gap-2 overflow-y-auto p-4 sm:grid-cols-3">
+          {TABS.map((tab) => {
+            const Icon = tabIcons[tab.id]
+            const selected = tab.id === activeTab
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => {
+                  selectSection(tab.id)
+                  setSectionDrawerOpen(false)
+                }}
+                className={cn(
+                  'game-focus-ring flex min-h-24 flex-col items-start justify-between rounded-lg border p-3 text-left transition-colors',
+                  selected
+                    ? 'border-game-moss/45 bg-game-moss/12 text-game-ink'
+                    : 'border-game-border bg-game-surface text-game-muted hover:border-game-moss/30 hover:bg-game-surface-raised',
+                )}
+              >
+                <Icon
                   className={cn(
-                    'game-focus-ring flex min-h-24 flex-col items-start justify-between rounded-lg border p-3 text-left transition-colors',
-                    selected
-                      ? 'border-game-moss/45 bg-game-moss/12 text-game-ink'
-                      : 'border-game-border bg-game-surface text-game-muted hover:border-game-moss/30 hover:bg-game-surface-raised',
+                    'h-5 w-5',
+                    selected ? 'text-game-moss-strong' : 'text-game-muted',
                   )}
-                >
-                  <Icon className={cn('h-5 w-5', selected ? 'text-game-moss-strong' : 'text-game-muted')} />
-                  <span className="text-sm font-bold">{tab.label}</span>
-                </button>
-              )
-            })}
-          </div>
+                />
+                <span className="text-sm font-bold">{tab.label}</span>
+              </button>
+            )
+          })}
+        </div>
       </ResponsivePanel>
     </div>
   )

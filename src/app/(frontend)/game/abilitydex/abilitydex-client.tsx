@@ -1,17 +1,22 @@
 'use client'
 
-import { CircleHelp, Sparkles } from 'lucide-react'
+import { BookOpen, CircleHelp, Search, Sparkles, X } from 'lucide-react'
 import Image from 'next/image'
+import type { CSSProperties } from 'react'
 import { useMemo, useState } from 'react'
-import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
+import { List, type RowComponentProps, useDynamicRowHeight } from 'react-window'
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import { SectionDivider } from '@/components/ui/section-divider'
+  DexCountSummary,
+  DexEmptyState,
+  DexFilterBar,
+  DexInspectorSection,
+  DexPageShell,
+  DexStatusChip,
+} from '@/components/game/dex'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { ResponsivePanel } from '@/components/ui/responsive-panel'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useUser } from '@/context/UserContext'
 import { usePokedex } from '@/hooks/usePokedex'
 import { cn } from '@/lib/utils'
@@ -22,31 +27,37 @@ import {
   getAbilityDexPartnerEffectLines,
   getAbilityLearnersForAbility,
 } from '@/utilities/pokemon/abilitydex'
+import {
+  type AbilityDexView,
+  type DisplayAbility,
+  getAbilityDexDisplayEntries,
+} from '@/utilities/pokemon/abilitydex-view'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 
 type PokedexProgressByForm = Record<
   string,
-  {
-    seen?: boolean | null
-    caught?: boolean | null
-  }
+  { seen?: boolean | null; caught?: boolean | null }
 >
+type AbilityListData = {
+  abilities: DisplayAbility[]
+  entriesByForm: PokedexProgressByForm
+  selectedAbilityId?: string
+  onSelect: (ability: DisplayAbility) => void
+}
 
 const UNIVERSAL_ABILITY_REPRESENTATIVE: AbilityDexLearner = {
   speciesId: 132,
-  form: {
-    id: '132',
-    name: 'Ditto',
-  },
+  form: { id: '132', name: 'Ditto' },
 }
 
 export default function AbilityDexPage() {
   const { gameData } = useUser()
   const { entriesByForm } = usePokedex()
-  const [selectedAbility, setSelectedAbility] = useState<{
-    entry: AbilityDexEntry
-    isKnown: boolean
-  } | null>(null)
+  const [selectedView, setSelectedView] = useState<AbilityDexView>('known')
+  const [query, setQuery] = useState('')
+  const [selectedAbility, setSelectedAbility] = useState<DisplayAbility | null>(
+    null,
+  )
 
   const registeredAbilityIds = useMemo(
     () =>
@@ -57,86 +68,187 @@ export default function AbilityDexPage() {
       ),
     [gameData?.abilityDex],
   )
-
   const knownAbilityCount = registeredAbilityIds.size
+  const displayedAbilities = useMemo(
+    () =>
+      getAbilityDexDisplayEntries({
+        entries: ALL_ABILITY_DEX_ENTRIES,
+        registeredAbilityIds,
+        view: selectedView,
+        query,
+      }),
+    [query, registeredAbilityIds, selectedView],
+  )
+  const dynamicRowHeight = useDynamicRowHeight({
+    defaultRowHeight: 88,
+    key: `${selectedView}:${query}`,
+  })
 
   return (
-    <div className="game-paper-first game-paper-background flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
-      <PremiumHeader
-        title="AbilityDex"
-        subtitle={`${knownAbilityCount} / ${ALL_ABILITY_DEX_ENTRIES.length}`}
-      />
+    <DexPageShell
+      title="AbilityDex"
+      subtitle={`${knownAbilityCount} of ${ALL_ABILITY_DEX_ENTRIES.length} registered`}
+    >
+      <Tabs
+        value={selectedView}
+        onValueChange={(value) => setSelectedView(value as AbilityDexView)}
+      >
+        <TabsList className="grid h-auto min-h-11 w-full grid-cols-2">
+          <TabsTrigger value="known">Known abilities</TabsTrigger>
+          <TabsTrigger value="all">All discoveries</TabsTrigger>
+        </TabsList>
+      </Tabs>
 
-      <div className="flex-1 min-h-0 overflow-y-auto px-4 pt-4 md:px-6">
-        <div className="grid grid-cols-2 gap-2 pb-8 2xl:grid-cols-3">
-          {ALL_ABILITY_DEX_ENTRIES.map((entry) => {
-            const isKnown = registeredAbilityIds.has(entry.abilityId)
-            return (
-              <AbilityDexListItem
-                key={entry.abilityId}
-                entry={entry}
-                isKnown={isKnown}
-                entriesByForm={entriesByForm}
-                onSelect={() => setSelectedAbility({ entry, isKnown })}
-              />
-            )
-          })}
+      <DexFilterBar
+        label="Ability filters"
+        className="mt-3"
+        footer={
+          <>
+            <Search className="size-3.5 text-game-muted" aria-hidden="true" />
+            <DexCountSummary
+              count={displayedAbilities.length}
+              detail={
+                selectedView === 'all' && query
+                  ? 'unknown records hide their names from search'
+                  : undefined
+              }
+            />
+            {query ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setQuery('')}
+                className="ml-auto min-h-8 px-2 text-xs"
+              >
+                <X className="size-3.5" aria-hidden="true" />
+                Clear
+              </Button>
+            ) : null}
+          </>
+        }
+      >
+        <label htmlFor="abilitydex-search" className="text-xs text-game-muted">
+          Search registered abilities
+        </label>
+        <div className="relative mt-2">
+          <Search
+            className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-game-muted"
+            aria-hidden="true"
+          />
+          <Input
+            id="abilitydex-search"
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search ability names"
+            className="pl-9"
+          />
         </div>
-      </div>
+      </DexFilterBar>
 
-      <Dialog
+      <section className="mt-3 min-h-0 flex-1" aria-label="Ability records">
+        {displayedAbilities.length ? (
+          <List
+            rowComponent={AbilityListRow}
+            rowCount={displayedAbilities.length}
+            rowHeight={dynamicRowHeight}
+            rowProps={{
+              abilities: displayedAbilities,
+              entriesByForm,
+              selectedAbilityId: selectedAbility?.entry.abilityId,
+              onSelect: setSelectedAbility,
+            }}
+            rowKey={(index, data) =>
+              data.abilities[index]?.entry.abilityId ?? index
+            }
+            overscanCount={6}
+            defaultHeight={560}
+            className="custom-scrollbar"
+            style={{ height: '100%', minHeight: 260 }}
+          />
+        ) : (
+          <DexEmptyState
+            title={
+              selectedView === 'known'
+                ? 'No registered abilities match'
+                : 'No ability records match'
+            }
+            description="Clear the search to return to your field notes."
+            action={
+              query ? (
+                <Button variant="outline" onClick={() => setQuery('')}>
+                  Clear search
+                </Button>
+              ) : undefined
+            }
+          />
+        )}
+      </section>
+
+      <ResponsivePanel
         open={selectedAbility !== null}
         onOpenChange={(open) => {
           if (!open) setSelectedAbility(null)
         }}
+        title={
+          selectedAbility?.isKnown
+            ? selectedAbility.entry.ability.name
+            : 'Unregistered ability'
+        }
+        description={
+          selectedAbility?.isKnown
+            ? 'Ability field note and compatible Pokémon forms.'
+            : 'Find a Pokémon with this ability to complete the record.'
+        }
+        desktopBreakpoint="lg"
+        desktopWidth="min(42vw, 620px)"
+        className="overflow-hidden"
       >
-        <DialogContent className="max-h-[88dvh] overflow-hidden border-game-border bg-game-surface p-0 text-game-ink sm:max-w-xl">
-          <DialogHeader className="border-b border-game-border px-5 pb-4 pt-5">
-            <DialogTitle className="font-display text-game-ink">
-              {selectedAbility
-                ? selectedAbility.isKnown
-                  ? selectedAbility.entry.ability.name
-                  : 'Ability Not Registered'
-                : 'Ability Details'}
-            </DialogTitle>
-            <DialogDescription>
-              {selectedAbility?.isKnown
-                ? 'Known ability details and compatible Pokemon forms.'
-                : 'Catch, receive, or purchase a Pokemon with this ability to register it.'}
-            </DialogDescription>
-          </DialogHeader>
-
-          {selectedAbility?.isKnown && (
-            <div className="space-y-6 overflow-y-auto px-5 py-4 custom-scrollbar">
+        <div className="game-page-scroll min-h-0 flex-1 space-y-6 px-5 py-4">
+          {selectedAbility?.isKnown ? (
+            <>
               <AbilityDexSummary entry={selectedAbility.entry} />
               <AbilityDexLearnerList
                 ability={selectedAbility.entry.ability}
                 entriesByForm={entriesByForm}
               />
-            </div>
-          )}
+            </>
+          ) : selectedAbility ? (
+            <DexEmptyState
+              title="Ability not registered"
+              description="Catch, receive, or purchase a Pokémon with this ability to reveal its field note."
+              className="mt-2"
+            />
+          ) : null}
+        </div>
+      </ResponsivePanel>
+    </DexPageShell>
+  )
+}
 
-          {selectedAbility && !selectedAbility.isKnown && (
-            <div className="space-y-4 overflow-y-auto px-5 py-4 custom-scrollbar">
-              <div className="game-panel p-4">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-game-border bg-game-surface-raised">
-                    <CircleHelp className="h-7 w-7 text-game-muted" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-display text-lg font-bold text-game-ink">
-                      Unknown Ability
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-game-muted">
-                      This ability has not been seen on one of your Pokemon yet.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+function AbilityListRow({
+  index,
+  style,
+  ariaAttributes,
+  abilities,
+  entriesByForm,
+  selectedAbilityId,
+  onSelect,
+}: RowComponentProps<AbilityListData>) {
+  const ability = abilities[index]
+  if (!ability) return null
+
+  return (
+    <div style={style as CSSProperties} {...ariaAttributes} className="pb-2">
+      <AbilityDexListItem
+        entry={ability.entry}
+        isKnown={ability.isKnown}
+        isSelected={selectedAbilityId === ability.entry.abilityId}
+        recordNumber={index + 1}
+        entriesByForm={entriesByForm}
+        onSelect={() => onSelect(ability)}
+      />
     </div>
   )
 }
@@ -144,11 +256,15 @@ export default function AbilityDexPage() {
 function AbilityDexListItem({
   entry,
   isKnown,
+  isSelected,
+  recordNumber,
   entriesByForm,
   onSelect,
 }: {
   entry: AbilityDexEntry
   isKnown: boolean
+  isSelected: boolean
+  recordNumber: number
   entriesByForm: PokedexProgressByForm
   onSelect: () => void
 }) {
@@ -162,47 +278,61 @@ function AbilityDexListItem({
     <button
       type="button"
       aria-label={
-        isKnown ? `View ${entry.ability.name}` : 'Unknown ability'
+        isKnown
+          ? `View ${entry.ability.name}`
+          : `Unknown ability record ${recordNumber}`
       }
+      aria-pressed={isSelected}
       onClick={onSelect}
       className={cn(
-        'group relative flex min-h-16 w-full items-center gap-3 overflow-hidden rounded-lg border px-3 py-2.5 text-left transition-colors sm:px-4',
-        isKnown
-          ? 'border-game-border bg-game-surface hover:border-game-ochre/45 hover:bg-game-surface-raised'
-          : 'border-game-border bg-game-surface/60 hover:border-game-moss/30 hover:bg-game-surface',
+        'game-focus-ring group flex h-full min-h-20 w-full items-center gap-3 overflow-hidden rounded-xl border px-3 py-2.5 text-left transition-colors sm:px-4',
+        isSelected
+          ? 'border-game-moss bg-game-moss/10 ring-1 ring-game-moss/30'
+          : isKnown
+            ? 'border-game-border bg-game-surface hover:border-game-moss/40 hover:bg-game-surface-raised'
+            : 'border-dashed border-game-border-strong bg-game-surface/55 hover:bg-game-surface',
       )}
-      title={isKnown ? entry.ability.name : 'Unknown Ability'}
     >
-      <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
+      <div className="relative flex size-12 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
         {representative ? (
           <Image
             src={getPokemonImageUrl(representative.form.id, 'sprite')}
-            alt={representative.form.name}
+            alt=""
             fill
-            sizes="44px"
+            sizes="48px"
             className="object-contain p-1"
             style={{
               filter: isKnown ? undefined : 'grayscale(1) opacity(0.65)',
             }}
           />
+        ) : isKnown ? (
+          <Sparkles className="size-6 text-game-ochre" aria-hidden="true" />
         ) : (
-          <CircleHelp className="h-6 w-6 text-game-muted" />
+          <CircleHelp className="size-6 text-game-muted" aria-hidden="true" />
         )}
       </div>
 
       <div className="min-w-0 flex-1">
-        {isKnown ? (
-          <h3 className="truncate text-sm font-bold text-game-ink sm:text-base">
-            {entry.ability.name}
-          </h3>
-        ) : (
-          <h3 className="text-sm font-bold text-game-muted sm:text-base">
-            ???
-          </h3>
-        )}
-        <p className="mt-1 truncate text-xs font-bold text-game-muted">
-          {isKnown ? 'Registered' : 'Unknown'}
+        <h2
+          className={cn(
+            'truncate font-display text-base font-semibold',
+            isKnown ? 'text-game-ink' : 'text-game-muted',
+          )}
+        >
+          {isKnown ? entry.ability.name : 'Unknown ability'}
+        </h2>
+        <p className="mt-1 line-clamp-1 text-xs leading-relaxed text-game-muted sm:text-sm">
+          {isKnown
+            ? entry.ability.description
+            : 'Register this ability to reveal its field note.'}
         </p>
+      </div>
+
+      <div className="flex shrink-0 flex-col items-end gap-1.5">
+        <DexStatusChip tone={isKnown ? 'registered' : 'unknown'}>
+          {isKnown ? 'Registered' : 'Unknown'}
+        </DexStatusChip>
+        <BookOpen className="size-4 text-game-muted" aria-hidden="true" />
       </div>
     </button>
   )
@@ -231,42 +361,39 @@ function AbilityDexSummary({ entry }: { entry: AbilityDexEntry }) {
   const partnerEffects = getAbilityDexPartnerEffectLines(ability)
 
   return (
-    <div className="space-y-4">
-      <SectionDivider>Ability data</SectionDivider>
-      <div className="game-panel p-4">
-        <div className="flex items-start gap-4">
-          <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
-            <Sparkles className="h-7 w-7 text-game-ochre" />
+    <>
+      <article className="game-panel-raised min-w-0 p-4 sm:p-5">
+        <header className="flex items-start gap-4">
+          <div className="flex size-12 shrink-0 items-center justify-center rounded-lg border border-game-ochre/30 bg-game-ochre/10">
+            <Sparkles className="size-6 text-game-ochre" aria-hidden="true" />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="font-display text-xl font-semibold text-game-ink">
+            <p className="game-field-label mb-1.5">Ability field note</p>
+            <h2 className="font-display text-xl font-semibold text-game-ink">
               {ability.name}
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-game-muted">
-              {ability.description}
-            </p>
+            </h2>
           </div>
-        </div>
-      </div>
+        </header>
+        <p className="mt-4 border-t border-game-border pt-4 text-sm leading-relaxed text-game-ink">
+          {ability.description}
+        </p>
+      </article>
 
-      {partnerEffects.length > 0 && (
-        <>
-          <SectionDivider>Partner effect</SectionDivider>
-          <div className="rounded-lg border border-game-moss/25 bg-game-moss/10 p-4">
-            <ul className="space-y-2">
-              {partnerEffects.map((effect) => (
-                <li
-                  key={effect.id}
-                  className="text-sm leading-relaxed text-game-moss-strong"
-                >
-                  {effect.text}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </>
-      )}
-    </div>
+      {partnerEffects.length ? (
+        <DexInspectorSection title="Partner effect">
+          <ul className="space-y-2 rounded-lg border border-game-moss/25 bg-game-moss/10 p-4">
+            {partnerEffects.map((effect) => (
+              <li
+                key={effect.id}
+                className="text-sm leading-relaxed text-game-moss-strong"
+              >
+                {effect.text}
+              </li>
+            ))}
+          </ul>
+        </DexInspectorSection>
+      ) : null}
+    </>
   )
 }
 
@@ -283,76 +410,64 @@ function AbilityDexLearnerList({
   )
 
   return (
-    <div className="space-y-4">
-      <SectionDivider>Supported forms</SectionDivider>
-      <div className="game-panel p-3">
-        {allPokemon ? (
-          <p className="text-sm text-game-ink">
-            Any Pokemon can hold this ability.
-          </p>
-        ) : (
-          <div className="max-h-[min(22rem,45dvh)] overflow-y-auto pr-1 custom-scrollbar">
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(4.5rem,4.5rem))] justify-start gap-2">
-              {learners.map((learner) => (
-                <AbilityDexLearnerTile
-                  key={`${learner.speciesId}-${learner.form.id}`}
-                  learner={learner}
-                  progress={entriesByForm[learner.form.id]}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+    <DexInspectorSection title="Supported forms">
+      {allPokemon ? (
+        <div className="game-panel p-4 text-sm leading-relaxed text-game-ink">
+          Any Pokémon can hold this ability.
+        </div>
+      ) : (
+        <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          {learners.map((learner) => (
+            <AbilityDexLearnerRow
+              key={`${learner.speciesId}-${learner.form.id}`}
+              learner={learner}
+              progress={entriesByForm[learner.form.id]}
+            />
+          ))}
+        </ul>
+      )}
+    </DexInspectorSection>
   )
 }
 
-function AbilityDexLearnerTile({
+function AbilityDexLearnerRow({
   learner,
   progress,
 }: {
   learner: AbilityDexLearner
-  progress?: {
-    seen?: boolean | null
-    caught?: boolean | null
-  }
+  progress?: { seen?: boolean | null; caught?: boolean | null }
 }) {
   const hasSeen = !!(progress?.seen || progress?.caught)
   const hasCaught = !!progress?.caught
 
   return (
-    <div
-      className={cn(
-        'relative h-[4.5rem] w-[4.5rem] overflow-hidden rounded-lg border bg-game-surface-raised p-1.5',
-        hasCaught
-          ? 'border-game-moss/40'
-          : hasSeen
-            ? 'border-game-border-strong'
-            : 'border-game-border',
-      )}
-      title={hasSeen ? learner.form.name : 'Unknown Pokemon'}
-    >
-      {hasSeen ? (
-        <Image
-          src={getPokemonImageUrl(learner.form.id, 'sprite')}
-          alt={learner.form.name}
-          fill
-          sizes="80px"
-          className="object-contain p-1"
-          style={{
-            filter: hasCaught ? undefined : 'grayscale(1) opacity(0.75)',
-          }}
-        />
-      ) : (
-        <div className="flex h-full w-full items-center justify-center text-game-muted">
-              <span className="text-2xl font-bold text-game-muted">?</span>
-        </div>
-      )}
-
-      <div className="absolute inset-x-1 bottom-1 rounded bg-game-surface/90 px-1 py-0.5 text-center font-mono text-[10px] font-bold leading-none text-game-muted">
-        #{learner.speciesId}
+    <li className="game-panel flex min-h-16 items-center gap-3 p-2.5">
+      <div className="relative flex size-11 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
+        {hasSeen ? (
+          <Image
+            src={getPokemonImageUrl(learner.form.id, 'sprite')}
+            alt=""
+            fill
+            sizes="44px"
+            className="object-contain p-1"
+            style={{
+              filter: hasCaught ? undefined : 'grayscale(1) opacity(0.75)',
+            }}
+          />
+        ) : (
+          <CircleHelp className="size-5 text-game-muted" aria-hidden="true" />
+        )}
       </div>
-    </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold text-game-ink">
+          {hasSeen
+            ? learner.form.name
+            : `Unknown Pokémon #${learner.speciesId}`}
+        </p>
+        <p className="mt-0.5 text-xs text-game-muted">
+          {hasCaught ? 'Caught' : hasSeen ? 'Observed' : 'Not observed'}
+        </p>
+      </div>
+    </li>
   )
 }

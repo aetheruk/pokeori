@@ -3,31 +3,33 @@
 import { Loader2, Search, ShieldAlert, Users } from 'lucide-react'
 import { useState } from 'react'
 import { searchTrainers } from '@/app/(frontend)/game/trainer/actions'
-import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { SectionDivider } from '@/components/ui/section-divider'
-import { getIcon, getTitle } from '@/data/user'
 import { TrainerModal } from './trainer-modal'
+import { TrainerRow } from './trainer-row'
+import type { PublicTrainerSummary } from './types'
 
 export function TrainerSearch() {
   const [query, setQuery] = useState('')
-  const [results, setResults] = useState<any[]>([])
+  const [results, setResults] = useState<PublicTrainerSummary[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const [selectedTrainer, setSelectedTrainer] = useState<any | null>(null)
+  const [selectedTrainer, setSelectedTrainer] =
+    useState<PublicTrainerSummary | null>(null)
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!query.trim() || query.length < 3) return
+    const normalizedQuery = query.trim()
+    if (normalizedQuery.length < 3) return
 
     setIsLoading(true)
     setError(null)
     setResults([])
 
     try {
-      const result = await searchTrainers(query)
+      const result = await searchTrainers(normalizedQuery)
       if (result.success && result.data) {
         setResults(result.data)
         if (result.data.length === 0) {
@@ -46,21 +48,7 @@ export function TrainerSearch() {
   return (
     <div className="game-paper-first game-paper-background flex flex-col h-full overflow-hidden bg-game-canvas text-game-ink">
       <div className="relative z-10 mx-auto min-h-0 w-full max-w-3xl flex-1 space-y-6 overflow-y-auto px-4 py-5 md:px-6">
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 border-b border-game-border pb-4">
-            <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-game-moss/35 bg-game-moss/10 text-game-moss-strong">
-              <Search className="h-5 w-5" />
-            </div>
-            <div className="min-w-0">
-              <h2 className="font-display text-lg font-semibold text-game-ink">
-                Trainer registry
-              </h2>
-              <p className="text-xs text-game-muted">
-                League network directory
-              </p>
-            </div>
-          </div>
-
+        <div className="space-y-3">
           <form onSubmit={handleSearch} className="relative">
             <div className="flex gap-2 rounded-lg border border-game-border bg-game-surface p-1.5 focus-within:border-game-moss/35">
               <div className="relative flex-1">
@@ -75,7 +63,7 @@ export function TrainerSearch() {
               </div>
               <Button
                 type="submit"
-                disabled={isLoading || query.length < 3}
+                disabled={isLoading || query.trim().length < 3}
                 aria-busy={isLoading}
               >
                 {isLoading ? (
@@ -85,6 +73,9 @@ export function TrainerSearch() {
                 )}
               </Button>
             </div>
+            <p className="mt-2 px-1 text-xs text-game-muted">
+              Enter at least three characters from a trainer name.
+            </p>
           </form>
         </div>
 
@@ -108,7 +99,10 @@ export function TrainerSearch() {
               {error === 'No trainers found.' ? (
                 <Users className="h-7 w-7" aria-hidden="true" />
               ) : (
-                <ShieldAlert className="h-7 w-7 text-game-danger" aria-hidden="true" />
+                <ShieldAlert
+                  className="h-7 w-7 text-game-danger"
+                  aria-hidden="true"
+                />
               )}
             </div>
             <p
@@ -130,46 +124,13 @@ export function TrainerSearch() {
               <SectionDivider>Results Found ({results.length})</SectionDivider>
             </div>
             <div className="grid gap-3">
-              {results.map((trainer) => {
-                const iconData = getIcon(trainer.icon || 'ditto')
-                const titleData = getTitle(trainer.title || 'new-beginnings')
-
-                return (
-                  <button
-                    type="button"
-                    key={trainer.id}
-                    aria-haspopup="dialog"
-                    onClick={() => setSelectedTrainer(trainer)}
-                    className="game-focus-ring flex w-full cursor-pointer items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 text-left transition-colors hover:border-game-moss/40 hover:bg-game-surface-raised"
-                  >
-                    <div>
-                      <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
-                        {iconData?.icon && (
-                          <TaskIconDisplay
-                            icon={iconData.icon}
-                            className="w-9 h-9"
-                          />
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="truncate text-base font-semibold text-game-ink">
-                        {trainer.trainerName}
-                      </div>
-                      <div className="mt-0.5 text-xs font-medium text-game-moss-strong">
-                        {titleData?.name || 'Trainer'}
-                      </div>
-                    </div>
-
-                    {/* Right Accent */}
-                    <div
-                      className="h-8 w-1 rounded-full bg-game-moss/45"
-                      aria-hidden="true"
-                    />
-                  </button>
-                )
-              })}
+              {results.map((trainer) => (
+                <TrainerRow
+                  key={trainer.id}
+                  trainer={trainer}
+                  onSelect={() => setSelectedTrainer(trainer)}
+                />
+              ))}
             </div>
           </div>
         )}

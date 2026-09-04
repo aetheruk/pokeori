@@ -13,7 +13,7 @@ Player-owned game state is split out of the `users` document into normalized Pay
 
 The `users` collection remains the source for auth, admin flags, trainer profile display, cosmetics, skills, currency, capacities, kid mode, battle power usage, active daily task state, active voyages, voyage stats, rival selection, and `lastRoll`.
 
-Kid Mode defaults off and can be selected during signup; after account creation it is admin-managed. Kid Mode Trainer navigation retains Profile and unlocked TCG Decks but removes Trainers, Friends, Mystery Gift, and High Scores. Those server actions also reject Kid Mode actors, and Kid Mode accounts are excluded from trainer searches, friend/rival candidates, friend displays, and leaderboard queries before ranking limits are applied. Existing social, rival, and score records remain stored but dormant.
+Kid Mode defaults off and can be selected during signup; after account creation it is admin-managed. Kid Mode Trainer navigation retains Profile and unlocked TCG Decks but removes Trainers, Friends, Mystery Gift, and Skill Rankings. Those server actions also reject Kid Mode actors, and Kid Mode accounts are excluded from trainer searches, friend/rival candidates, friend displays, and leaderboard queries before ranking limits are applied. Existing social, rival, and score records remain stored but dormant.
 
 ## Read Path
 

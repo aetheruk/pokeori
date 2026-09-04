@@ -7,6 +7,7 @@ import {
   RewardCarousel,
   type RewardItem,
 } from '@/components/game/reward-carousel'
+import { ExploreDrawerHeader } from '@/components/game/shared/ExploreDrawerHeader'
 import {
   Dialog,
   DialogClose,
@@ -17,7 +18,6 @@ import {
 import { Progress } from '@/components/ui/progress'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { SectionDivider } from '@/components/ui/section-divider'
-import { ExploreDrawerHeader } from '@/components/game/shared/ExploreDrawerHeader'
 import { cn } from '@/lib/utils'
 
 export interface TaskProgressData {
@@ -90,6 +90,7 @@ interface GameInfoModalProps {
   autoScrollRewards?: boolean
   presentation?: 'dialog' | 'drawer'
   modal?: boolean
+  desktopBreakpoint?: 'lg' | 'xl'
 }
 
 export function GameInfoModal({
@@ -114,6 +115,7 @@ export function GameInfoModal({
   autoScrollRewards = false,
   presentation = 'dialog',
   modal = true,
+  desktopBreakpoint = 'xl',
 }: GameInfoModalProps) {
   const isDrawer = presentation === 'drawer'
   const Header = ({
@@ -394,6 +396,7 @@ export function GameInfoModal({
       <ResponsivePanel
         open={open}
         onOpenChange={onOpenChange}
+        desktopBreakpoint={desktopBreakpoint}
         title={title}
         description={description}
         showHeader={false}

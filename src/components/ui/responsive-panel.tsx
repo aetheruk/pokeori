@@ -1,5 +1,6 @@
 'use client'
 
+import { XIcon } from 'lucide-react'
 import * as React from 'react'
 import {
   Dialog,
@@ -16,7 +17,6 @@ import {
   DrawerTitle,
 } from '@/components/ui/drawer'
 import { cn } from '@/lib/utils'
-import { XIcon } from 'lucide-react'
 
 export interface ResponsivePanelProps {
   open: boolean
@@ -26,6 +26,7 @@ export interface ResponsivePanelProps {
   children: React.ReactNode
   trigger?: React.ReactElement
   desktopWidth?: string
+  desktopBreakpoint?: 'lg' | 'xl'
   mobileMaxHeight?: string
   mobileHeader?: boolean
   showHandle?: boolean
@@ -62,6 +63,7 @@ export function ResponsivePanel({
   children,
   trigger,
   desktopWidth = 'min(38vw, 560px)',
+  desktopBreakpoint = 'xl',
   mobileMaxHeight = '92dvh',
   mobileHeader = true,
   showHandle = true,
@@ -70,10 +72,11 @@ export function ResponsivePanel({
   headerClassName,
   className,
 }: ResponsivePanelProps) {
-  // Keep the inspector in its touch-friendly sheet mode through small desktop
-  // widths; the wide right rail starts at the same xl breakpoint as the game
-  // shell's expanded navigation.
-  const isDesktop = useMediaQuery('(min-width: 1280px)')
+  // Keep the existing xl transition by default. Pages with a useful inspector
+  // can opt into the style guide's lg desktop workspace breakpoint.
+  const isDesktop = useMediaQuery(
+    desktopBreakpoint === 'lg' ? '(min-width: 1024px)' : '(min-width: 1280px)',
+  )
   const header =
     title || description ? (
       <>
@@ -148,10 +151,7 @@ export function ResponsivePanel({
       <Drawer open={open} onOpenChange={onOpenChange}>
         <DrawerContent
           showHandle={showHandle}
-          className={cn(
-            'game-paper-modal game-paper-background',
-            className,
-          )}
+          className={cn('game-paper-modal game-paper-background', className)}
           style={{ maxHeight: mobileMaxHeight }}
         >
           {showCloseButton && (

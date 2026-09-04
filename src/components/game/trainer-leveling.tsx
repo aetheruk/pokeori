@@ -26,13 +26,8 @@ import { GameInfoModal } from '@/components/game/shared/GameInfoModal'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { BadgeShowcase } from '@/components/game/trainer/badge-showcase'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { SectionDivider } from '@/components/ui/section-divider'
 import {
   Select,
@@ -166,7 +161,7 @@ const SkillUnlockList = memo(function SkillUnlockList({
               <div
                 key={`${unlock.source}:${unlock.level}:${unlock.label}:${unlock.itemId || ''}`}
                 className={cn(
-                  'flex min-h-16 items-center gap-3 rounded-2xl border px-3 py-2',
+                  'flex min-h-16 items-center gap-3 rounded-lg border px-3 py-2',
                   unlocked
                     ? 'border-game-moss/35 bg-game-moss/10 text-game-ink'
                     : 'border-game-border bg-game-surface text-game-muted',
@@ -292,11 +287,14 @@ function SkillModalContent({
   const currentLevelTotalExp = getTotalExpForLevel(level)
   const progress =
     nextLevelTotalExp > currentLevelTotalExp
-      ? Math.min(
-          ((exp - currentLevelTotalExp) /
-            (nextLevelTotalExp - currentLevelTotalExp)) *
+      ? Math.max(
+          0,
+          Math.min(
+            ((exp - currentLevelTotalExp) /
+              (nextLevelTotalExp - currentLevelTotalExp)) *
+              100,
             100,
-          100,
+          ),
         )
       : 100
   const skillId = selectedSkill.id
@@ -348,9 +346,16 @@ function SkillModalContent({
             </span>
           </span>
         </div>
-        <div className="h-3 overflow-hidden rounded-full border border-game-border bg-game-canvas">
+        <div
+          className="h-3 overflow-hidden rounded-full border border-game-border bg-game-canvas"
+          role="progressbar"
+          aria-label={`${selectedSkill.name} rank progress`}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(progress)}
+        >
           <div
-            className="h-full bg-game-ochre transition-all duration-1000"
+            className="h-full bg-game-ochre transition-all duration-500 motion-reduce:transition-none"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -432,76 +437,70 @@ function BannerPickerDialog({
   }, [availableBanners, query])
 
   return (
-    <Dialog
+    <ResponsivePanel
       open={open}
       onOpenChange={(nextOpen) => {
         onOpenChange(nextOpen)
         if (!nextOpen) setQuery('')
       }}
+      title="Choose a banner"
+      description="Select one of your unlocked trainer-card backgrounds."
+      desktopBreakpoint="lg"
+      desktopWidth="min(42vw, 640px)"
+      className="flex flex-col overflow-hidden"
     >
-      <DialogContent className="flex h-[min(760px,calc(100dvh-2rem))] max-h-none flex-col overflow-hidden rounded-xl border-game-border bg-game-surface p-0 text-game-ink shadow-lg sm:max-w-2xl">
-        <DialogHeader className="shrink-0 border-b border-game-border px-5 pb-4 pt-5 text-left sm:px-6 sm:pt-6">
-          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-game-moss-strong">
-            Trainer kit
-          </p>
-          <DialogTitle className="font-display text-2xl font-bold tracking-tight text-game-ink">
-            Choose a banner
-          </DialogTitle>
-        </DialogHeader>
+      <div className="shrink-0 px-5 pt-4">
+        <div className="relative">
+          <Search
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-game-muted"
+            aria-hidden="true"
+          />
+          <Input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search banners"
+            aria-label="Search unlocked banners"
+            className="pl-9"
+          />
+        </div>
+      </div>
 
-        <div className="shrink-0 px-5 pt-4 sm:px-6">
-          <div className="relative">
-            <Search
-              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-game-muted"
-              aria-hidden="true"
-            />
-            <Input
-              type="search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search banners"
-              aria-label="Search unlocked banners"
-              className="pl-9"
-            />
+      <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-6 pt-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-game-border">
+        {filteredBanners.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-game-border bg-game-surface-raised/55 py-10 text-center text-sm text-game-muted">
+            No banners match that search.
           </div>
-        </div>
-
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-6 pt-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-game-border sm:px-6">
-          {filteredBanners.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-game-border bg-game-surface-raised/55 py-10 text-center text-sm text-game-muted">
-              No banners match that search.
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {filteredBanners.map((banner) => (
-                <button
-                  key={banner.id}
-                  type="button"
-                  onClick={() => onSelect(banner.id)}
-                  aria-pressed={selectedBannerId === banner.id}
-                  className={cn(
-                    'game-focus-ring group/banner relative aspect-[8/3] min-h-24 w-full overflow-hidden rounded-lg border-2 text-left transition-colors',
-                    selectedBannerId === banner.id
-                      ? 'border-game-moss ring-2 ring-game-moss/20'
-                      : 'border-game-border hover:border-game-moss/45',
-                  )}
-                >
-                  <span
-                    className="absolute inset-0 bg-cover bg-center transition-opacity group-hover/banner:opacity-90"
-                    style={{ backgroundImage: `url(${banner.imagePath})` }}
-                  />
-                  <span className="absolute inset-0 flex items-end bg-gradient-to-t from-game-night-canvas/90 via-game-night-canvas/15 to-transparent p-3">
-                    <span className="font-display text-sm font-semibold text-game-cream drop-shadow-sm">
-                      {banner.name}
-                    </span>
+        ) : (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {filteredBanners.map((banner) => (
+              <button
+                key={banner.id}
+                type="button"
+                onClick={() => onSelect(banner.id)}
+                aria-pressed={selectedBannerId === banner.id}
+                className={cn(
+                  'game-focus-ring group/banner relative aspect-[8/3] min-h-24 w-full overflow-hidden rounded-lg border-2 text-left transition-colors',
+                  selectedBannerId === banner.id
+                    ? 'border-game-moss ring-2 ring-game-moss/20'
+                    : 'border-game-border hover:border-game-moss/45',
+                )}
+              >
+                <span
+                  className="absolute inset-0 bg-cover bg-center transition-opacity group-hover/banner:opacity-90"
+                  style={{ backgroundImage: `url(${banner.imagePath})` }}
+                />
+                <span className="absolute inset-0 flex items-end bg-gradient-to-t from-game-night-canvas/90 via-game-night-canvas/15 to-transparent p-3">
+                  <span className="font-display text-sm font-semibold text-game-cream drop-shadow-sm">
+                    {banner.name}
                   </span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </ResponsivePanel>
   )
 }
 
@@ -588,12 +587,12 @@ export function TrainerLeveling() {
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col space-y-10 overflow-y-auto px-4 pb-20 pt-6 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-game-border md:px-6 md:pt-8">
+      <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col space-y-6 overflow-y-auto px-4 pb-20 pt-5 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-game-border md:px-6">
         <div className="space-y-4">
           <SectionDivider>Inventory</SectionDivider>
           <Link
             href="/game/inventory"
-            className="game-focus-ring group flex w-full items-center gap-4 rounded-lg border border-game-border bg-game-surface p-4 text-left transition-colors hover:border-game-moss/35 hover:bg-game-surface-raised"
+            className="game-focus-ring group flex min-h-16 w-full items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 text-left transition-colors hover:border-game-moss/35 hover:bg-game-surface-raised"
           >
             <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-game-moss/30 bg-game-moss/10 text-game-moss-strong">
               <Image
@@ -601,7 +600,7 @@ export function TrainerLeveling() {
                 alt=""
                 width={56}
                 height={56}
-                className="h-14 w-14 object-contain"
+                className="h-12 w-12 object-contain"
                 aria-hidden="true"
               />
             </div>
@@ -617,7 +616,7 @@ export function TrainerLeveling() {
         {/* Skills Section */}
         <div className="space-y-4">
           <SectionDivider>Skills</SectionDivider>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
             {coreSkills.map((skill) => {
               const skillData = userSkills[skill.id] || { level: 1, exp: 0 }
               const level = skillData.level || 1
@@ -628,11 +627,14 @@ export function TrainerLeveling() {
 
               const progress =
                 nextLevelTotalExp > currentLevelTotalExp
-                  ? Math.min(
-                      ((exp - currentLevelTotalExp) /
-                        (nextLevelTotalExp - currentLevelTotalExp)) *
+                  ? Math.max(
+                      0,
+                      Math.min(
+                        ((exp - currentLevelTotalExp) /
+                          (nextLevelTotalExp - currentLevelTotalExp)) *
+                          100,
                         100,
-                      100,
+                      ),
                     )
                   : 100
 
@@ -645,13 +647,13 @@ export function TrainerLeveling() {
                     setSelectedSkill(skill)
                     setIsSkillModalOpen(true)
                   }}
-                  className="game-focus-ring group flex w-full cursor-pointer items-center gap-4 rounded-lg border border-game-border bg-game-surface p-4 text-left transition-colors hover:border-game-moss/35 hover:bg-game-surface-raised"
+                  className="game-focus-ring group flex min-h-16 w-full cursor-pointer items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 text-left transition-colors hover:border-game-moss/35 hover:bg-game-surface-raised"
                 >
                   <SkillDisplayIcon
                     skill={skill}
                     width={56}
                     height={56}
-                    className="h-14 w-14 shrink-0 object-contain"
+                    className="h-12 w-12 shrink-0 object-contain"
                     fallbackClassName="h-10 w-10 shrink-0 text-game-muted"
                   />
 
@@ -676,9 +678,16 @@ export function TrainerLeveling() {
                       </div>
                     </div>
 
-                    <div className="relative h-1.5 w-full overflow-hidden rounded-full border border-game-border bg-game-surface-raised">
+                    <div
+                      className="relative h-1.5 w-full overflow-hidden rounded-full border border-game-border bg-game-surface-raised"
+                      role="progressbar"
+                      aria-label={`${skill.name} rank progress`}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-valuenow={Math.round(progress)}
+                    >
                       <div
-                        className="absolute inset-y-0 left-0 rounded-full bg-game-ochre transition-all duration-500"
+                        className="absolute inset-y-0 left-0 rounded-full bg-game-ochre transition-all duration-500 motion-reduce:transition-none"
                         style={{ width: `${progress}%` }}
                       />
                     </div>
@@ -700,6 +709,7 @@ export function TrainerLeveling() {
         open={isSkillModalOpen && Boolean(selectedSkill)}
         onOpenChange={setIsSkillModalOpen}
         presentation="drawer"
+        desktopBreakpoint="lg"
         title={selectedSkill?.name || 'Skill Guide'}
         description={selectedSkill?.description}
         category="Skill Guide"
@@ -726,176 +736,170 @@ export function TrainerLeveling() {
         ) : null}
       </GameInfoModal>
 
-      {/* Customize Modal */}
-      <Dialog
+      <ResponsivePanel
         open={isCustomizeModalOpen}
         onOpenChange={(open) => {
           setIsCustomizeModalOpen(open)
           if (!open) setIsBannerPickerOpen(false)
         }}
+        title="Customize identity"
+        description="Choose how your trainer card appears to other players."
+        desktopBreakpoint="lg"
+        desktopWidth="min(40vw, 560px)"
+        className="flex flex-col overflow-hidden"
       >
-        <DialogContent className="h-[min(720px,calc(100dvh-2rem))] max-h-none overflow-hidden rounded-xl border-game-border bg-game-surface p-0 text-game-ink shadow-lg sm:max-w-lg">
-          <div className="relative flex h-full flex-col overflow-hidden p-5 sm:p-6">
-            <DialogHeader className="relative z-10 border-b border-game-border pb-4 text-left">
-              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-game-moss-strong">
-                Trainer kit
-              </p>
-              <DialogTitle className="font-display text-2xl font-bold tracking-tight text-game-ink">
-                Customize Identity
-              </DialogTitle>
-            </DialogHeader>
-
-            <div className="relative z-10 flex-1 space-y-6 overflow-y-auto py-5 pr-1 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-game-border">
-              {/* Banner Selection */}
-              <div className="space-y-3">
-                <SectionDivider textColor="text-game-moss-strong">
-                  Background Banner
-                </SectionDivider>
-                <button
-                  type="button"
-                  onClick={() => setIsBannerPickerOpen(true)}
-                  className="game-focus-ring group/banner relative aspect-[8/3] min-h-28 w-full overflow-hidden rounded-lg border-2 border-game-border text-left transition-colors hover:border-game-moss/45"
-                >
-                  {selectedBannerDefinition ? (
-                    <span
-                      className="absolute inset-0 bg-cover bg-center"
-                      style={{
-                        backgroundImage: `url(${selectedBannerDefinition.imagePath})`,
-                      }}
-                    />
-                  ) : null}
-                  <span className="absolute inset-0 flex items-end justify-between gap-3 bg-gradient-to-t from-game-night-canvas/90 via-game-night-canvas/15 to-transparent p-4">
-                    <span className="min-w-0 truncate font-display text-sm font-semibold text-game-cream">
-                      {selectedBannerDefinition?.name || 'Choose a banner'}
-                    </span>
-                    <span className="shrink-0 rounded-md border border-game-border/70 bg-game-surface-raised/90 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-game-clay-strong">
-                      Browse
-                    </span>
+        <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden px-5">
+          <div className="relative z-10 flex-1 space-y-6 overflow-y-auto py-5 pr-1 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-game-border">
+            {/* Banner Selection */}
+            <div className="space-y-3">
+              <SectionDivider textColor="text-game-moss-strong">
+                Background Banner
+              </SectionDivider>
+              <button
+                type="button"
+                onClick={() => setIsBannerPickerOpen(true)}
+                className="game-focus-ring group/banner relative aspect-[8/3] min-h-28 w-full overflow-hidden rounded-lg border-2 border-game-border text-left transition-colors hover:border-game-moss/45"
+              >
+                {selectedBannerDefinition ? (
+                  <span
+                    className="absolute inset-0 bg-cover bg-center"
+                    style={{
+                      backgroundImage: `url(${selectedBannerDefinition.imagePath})`,
+                    }}
+                  />
+                ) : null}
+                <span className="absolute inset-0 flex items-end justify-between gap-3 bg-gradient-to-t from-game-night-canvas/90 via-game-night-canvas/15 to-transparent p-4">
+                  <span className="min-w-0 truncate font-display text-sm font-semibold text-game-cream">
+                    {selectedBannerDefinition?.name || 'Choose a banner'}
                   </span>
-                </button>
-              </div>
+                  <span className="shrink-0 rounded-md border border-game-border/70 bg-game-surface-raised/90 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-game-clay-strong">
+                    Browse
+                  </span>
+                </span>
+              </button>
+            </div>
 
-              {/* Icon Selection */}
-              <div className="space-y-3">
-                <SectionDivider textColor="text-game-moss-strong">
-                  Trainer Avatar
-                </SectionDivider>
-                <div className="grid grid-cols-5 gap-2">
-                  {icons
-                    .filter((i) =>
-                      (
-                        (user as any).unlockedIcons || [
-                          'ditto',
-                          'trainer-red',
-                          'trainer-leaf',
-                        ]
-                      ).includes(i.id),
-                    )
-                    .map((icon) => (
-                      <button
-                        key={icon.id}
-                        type="button"
-                        onClick={() => setSelectedIcon(icon.id)}
-                        aria-pressed={selectedIcon === icon.id}
-                        className={cn(
-                          'group/icon relative flex h-14 w-full items-center justify-center rounded-lg border-2 bg-game-surface-raised transition-colors',
-                          selectedIcon === icon.id
-                            ? 'border-game-moss ring-2 ring-game-moss/20'
-                            : 'border-game-border opacity-60 hover:border-game-moss/40 hover:opacity-100',
-                        )}
-                        title={icon.name}
-                      >
-                        <div className="relative z-10">
-                          <TaskIconDisplay
-                            icon={icon.icon}
-                            className="w-10 h-10"
-                          />
-                        </div>
-                        {selectedIcon === icon.id && (
-                          <div className="absolute inset-0 bg-game-moss/5" />
-                        )}
-                      </button>
-                    ))}
-                </div>
-              </div>
-
-              {/* Title Selection */}
-              <div className="space-y-3">
-                <SectionDivider textColor="text-game-moss-strong">
-                  Personal Title
-                </SectionDivider>
-                <Select
-                  value={selectedTitle || ''}
-                  onValueChange={setSelectedTitle}
-                >
-                  <SelectTrigger className="h-14 w-full rounded-lg border-game-border bg-game-surface-raised px-6 font-bold tracking-tight text-game-ink focus:ring-game-moss/30">
-                    <SelectValue placeholder="Select a title" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-lg border-game-border bg-game-surface-raised p-2 shadow-2xl">
-                    {titles
-                      .filter((t) => equipableTitleIdSet.has(t.id))
-                      .map((title) => (
-                        <SelectItem
-                          key={title.id}
-                          value={title.id}
-                          className="mb-1 cursor-pointer rounded-lg py-3 focus:bg-game-moss/10 focus:text-game-moss-strong last:mb-0"
-                        >
-                          <span className="font-bold tracking-tight">
-                            {title.name}
-                          </span>
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
+            {/* Icon Selection */}
+            <div className="space-y-3">
+              <SectionDivider textColor="text-game-moss-strong">
+                Trainer Avatar
+              </SectionDivider>
+              <div className="grid grid-cols-5 gap-2">
+                {icons
+                  .filter((i) =>
+                    (
+                      (user as any).unlockedIcons || [
+                        'ditto',
+                        'trainer-red',
+                        'trainer-leaf',
+                      ]
+                    ).includes(i.id),
+                  )
+                  .map((icon) => (
+                    <button
+                      key={icon.id}
+                      type="button"
+                      onClick={() => setSelectedIcon(icon.id)}
+                      aria-pressed={selectedIcon === icon.id}
+                      className={cn(
+                        'game-focus-ring group/icon relative flex h-14 w-full items-center justify-center rounded-lg border-2 bg-game-surface-raised transition-colors',
+                        selectedIcon === icon.id
+                          ? 'border-game-moss ring-2 ring-game-moss/20'
+                          : 'border-game-border opacity-60 hover:border-game-moss/40 hover:opacity-100',
+                      )}
+                      title={icon.name}
+                      aria-label={`Use ${icon.name} trainer avatar`}
+                    >
+                      <div className="relative z-10">
+                        <TaskIconDisplay
+                          icon={icon.icon}
+                          className="w-10 h-10"
+                        />
+                      </div>
+                      {selectedIcon === icon.id && (
+                        <div className="absolute inset-0 bg-game-moss/5" />
+                      )}
+                    </button>
+                  ))}
               </div>
             </div>
 
-            {/* Save Button */}
-            <div className="relative z-10 mt-auto border-t border-game-border pt-4">
-              <Button
-                onClick={async () => {
-                  setIsSaving(true)
-                  try {
-                    const result = await updateUserCustomization({
-                      banner: selectedBanner || undefined,
-                      icon: selectedIcon || undefined,
-                      title: selectedTitle || undefined,
-                    })
-
-                    if (result.success) {
-                      updateUserContext({
-                        banner: selectedBanner || (user as any).banner || 'lab',
-                        icon: selectedIcon || (user as any).icon || 'ditto',
-                        title:
-                          selectedTitle ||
-                          (user as any).title ||
-                          'new-beginnings',
-                      })
-                      refreshUser(true)
-                      setIsCustomizeModalOpen(false)
-                      toast.success('Profile updated')
-                    } else {
-                      toast.error(result.error || 'Failed to update profile')
-                    }
-                  } catch {
-                    toast.error('Failed to update profile')
-                  } finally {
-                    setIsSaving(false)
-                  }
-                }}
-                disabled={isSaving}
-                className="h-12 w-full rounded-lg bg-game-clay font-black uppercase tracking-widest text-game-cream transition-colors hover:bg-game-clay/90"
+            {/* Title Selection */}
+            <div className="space-y-3">
+              <SectionDivider textColor="text-game-moss-strong">
+                Personal Title
+              </SectionDivider>
+              <Select
+                value={selectedTitle || ''}
+                onValueChange={setSelectedTitle}
               >
-                {isSaving ? (
-                  <Loader2 className="w-6 h-6 animate-spin" />
-                ) : (
-                  'SAVE PROFILE'
-                )}
-              </Button>
+                <SelectTrigger className="h-14 w-full rounded-lg border-game-border bg-game-surface-raised px-6 font-bold tracking-tight text-game-ink focus:ring-game-moss/30">
+                  <SelectValue placeholder="Select a title" />
+                </SelectTrigger>
+                <SelectContent className="rounded-lg border-game-border bg-game-surface-raised p-2 shadow-2xl">
+                  {titles
+                    .filter((t) => equipableTitleIdSet.has(t.id))
+                    .map((title) => (
+                      <SelectItem
+                        key={title.id}
+                        value={title.id}
+                        className="mb-1 cursor-pointer rounded-lg py-3 focus:bg-game-moss/10 focus:text-game-moss-strong last:mb-0"
+                      >
+                        <span className="font-bold tracking-tight">
+                          {title.name}
+                        </span>
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+
+          {/* Save Button */}
+          <div className="relative z-10 mt-auto border-t border-game-border py-4">
+            <Button
+              onClick={async () => {
+                setIsSaving(true)
+                try {
+                  const result = await updateUserCustomization({
+                    banner: selectedBanner || undefined,
+                    icon: selectedIcon || undefined,
+                    title: selectedTitle || undefined,
+                  })
+
+                  if (result.success) {
+                    updateUserContext({
+                      banner: selectedBanner || (user as any).banner || 'lab',
+                      icon: selectedIcon || (user as any).icon || 'ditto',
+                      title:
+                        selectedTitle ||
+                        (user as any).title ||
+                        'new-beginnings',
+                    })
+                    refreshUser(true)
+                    setIsCustomizeModalOpen(false)
+                    toast.success('Profile updated')
+                  } else {
+                    toast.error(result.error || 'Failed to update profile')
+                  }
+                } catch {
+                  toast.error('Failed to update profile')
+                } finally {
+                  setIsSaving(false)
+                }
+              }}
+              disabled={isSaving}
+              className="h-12 w-full rounded-lg bg-game-clay font-black uppercase tracking-widest text-game-cream transition-colors hover:bg-game-clay/90"
+            >
+              {isSaving ? (
+                <Loader2 className="w-6 h-6 animate-spin" />
+              ) : (
+                'Save profile'
+              )}
+            </Button>
+          </div>
+        </div>
+      </ResponsivePanel>
 
       <BannerPickerDialog
         open={isBannerPickerOpen}

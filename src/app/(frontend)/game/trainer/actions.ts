@@ -1,17 +1,17 @@
 'use server'
 
-import { getPayload } from 'payload'
 import configPromise from '@payload-config'
-import { headers } from 'next/headers'
-import { mysteryGifts } from '@/data/mystery-gifts'
 import { revalidatePath } from 'next/cache'
-import { getUserPokedexMap, getUserTcgMap } from '@/utilities/user-state'
+import { headers } from 'next/headers'
+import { getPayload } from 'payload'
+import { mysteryGifts } from '@/data/mystery-gifts'
 import type { User } from '@/payload-types'
 import {
-  KID_MODE_ACCESS_ERROR,
-  isKidModeUser,
-} from '@/utilities/kid-mode'
-import { getEconomyActionErrorMessage, runEconomyAction } from '@/utilities/economy/transactions'
+  getEconomyActionErrorMessage,
+  runEconomyAction,
+} from '@/utilities/economy/transactions'
+import { isKidModeUser, KID_MODE_ACCESS_ERROR } from '@/utilities/kid-mode'
+import { buildPublicTrainerSummaries } from '@/utilities/trainers/public-summary'
 
 async function getFreshAuthenticatedUser(payload: any): Promise<User | null> {
   const { user } = await payload.auth({ headers: await headers() })
@@ -21,28 +21,6 @@ async function getFreshAuthenticatedUser(payload: any): Promise<User | null> {
     id: user.id,
     depth: 0,
   }) as Promise<User>
-}
-
-async function getTrainerCollectionCounts(payload: any, userId: string) {
-  const [tcg, pokedex] = await Promise.all([
-    getUserTcgMap(payload, userId),
-    getUserPokedexMap(payload, userId),
-  ])
-
-  let seenCount = 0
-  let caughtCount = 0
-  Object.values(pokedex).forEach((species: any) => {
-    Object.values(species).forEach((form: any) => {
-      if (form.seen) seenCount++
-      if (form.caught) caughtCount++
-    })
-  })
-
-  return {
-    uniqueCards: Object.keys(tcg).length,
-    pokedexSeen: seenCount,
-    pokedexCaught: caughtCount,
-  }
 }
 
 // --- Search Trainers ---
@@ -72,37 +50,21 @@ export async function searchTrainers(query: string) {
         ],
       },
       limit: 10,
+      depth: 0,
+      select: {
+        trainerName: true,
+        icon: true,
+        banner: true,
+        title: true,
+        skills: true,
+      },
     })
 
-    const currentUserFriends = currentUser ? (currentUser as any).friends || [] : []
-    const currentUserRequests = currentUser ? (currentUser as any).friendRequests || [] : []
-
-    const results = await Promise.all(users.docs.map(async (user) => {
-      const collectionCounts = await getTrainerCollectionCounts(payload, user.id)
-      // Check friend status
-      const isFriend = currentUserFriends.includes(user.id)
-      const hasPendingRequest = currentUserRequests.some(
-        (req: any) =>
-          ((req.from === currentUser?.id && req.to === user.id) ||
-            (req.from === user.id && req.to === currentUser?.id)) &&
-          req.status === 'pending',
-      )
-
-      return {
-        id: user.id,
-        trainerName: user.trainerName,
-        icon: (user as any).icon || 'ditto',
-        banner: (user as any).banner || 'lab',
-        title: (user as any).title || 'new-beginnings',
-        skills: user.skills,
-        battleTeam: (user as any).battleTeam || [],
-        stats: {
-          ...collectionCounts,
-        },
-        isFriend,
-        hasPendingRequest,
-      }
-    }))
+    const results = await buildPublicTrainerSummaries({
+      payload,
+      trainers: users.docs,
+      viewer: currentUser,
+    })
 
     return { success: true, data: results }
   } catch (error) {
@@ -114,7 +76,12 @@ export async function searchTrainers(query: string) {
 // --- High Scores ---
 
 export async function getHighScores(
-  skill: 'catching' | 'battling' | 'researching' | 'artisan' | 'ranked-battling',
+  skill:
+    | 'catching'
+    | 'battling'
+    | 'researching'
+    | 'artisan'
+    | 'ranked-battling',
 ) {
   const payload = await getPayload({ config: configPromise })
   const currentUser = await getFreshAuthenticatedUser(payload)
@@ -136,38 +103,25 @@ export async function getHighScores(
       },
       sort: `-skills.${skill}.level`,
       limit: 20,
+      depth: 0,
+      select: {
+        trainerName: true,
+        icon: true,
+        banner: true,
+        title: true,
+        skills: true,
+      },
     })
 
-    const currentUserFriends = currentUser ? (currentUser as any).friends || [] : []
-    const currentUserRequests = currentUser ? (currentUser as any).friendRequests || [] : []
-
-    const results = await Promise.all(sortedUsers.docs.map(async (user) => {
-      const collectionCounts = await getTrainerCollectionCounts(payload, user.id)
-      // Check friend status
-      const isFriend = currentUserFriends.includes(user.id)
-      const hasPendingRequest = currentUserRequests.some(
-        (req: any) =>
-          ((req.from === currentUser?.id && req.to === user.id) ||
-            (req.from === user.id && req.to === currentUser?.id)) &&
-          req.status === 'pending',
-      )
-
-      return {
-        id: user.id,
-        trainerName: user.trainerName,
-        icon: (user as any).icon || 'ditto',
-        banner: (user as any).banner || 'lab',
-        title: (user as any).title || 'new-beginnings',
-        skills: user.skills,
-        battleTeam: (user as any).battleTeam || [],
-        stats: {
-          ...collectionCounts,
-        },
-        isFriend,
-        hasPendingRequest,
-        level: user.skills?.[skill]?.level || 1,
-        exp: user.skills?.[skill]?.exp || 0,
-      }
+    const summaries = await buildPublicTrainerSummaries({
+      payload,
+      trainers: sortedUsers.docs,
+      viewer: currentUser,
+    })
+    const results = summaries.map((summary) => ({
+      ...summary,
+      level: currentSkill(summary.skills, skill)?.level || 1,
+      exp: currentSkill(summary.skills, skill)?.exp || 0,
     }))
 
     return { success: true, data: results }
@@ -175,6 +129,10 @@ export async function getHighScores(
     console.error('High scores error:', error)
     return { success: false, error: 'Failed to get high scores' }
   }
+}
+
+function currentSkill(skills: User['skills'], skill: string) {
+  return skills?.[skill as keyof NonNullable<User['skills']>]
 }
 
 // --- Mystery Gift ---
@@ -189,7 +147,8 @@ export async function redeemMysteryGift(code: string, clientActionId: string) {
   if (isKidModeUser(user)) {
     return { success: false, error: KID_MODE_ACCESS_ERROR }
   }
-  if (!clientActionId) return { success: false, error: 'Missing action identifier' }
+  if (!clientActionId)
+    return { success: false, error: 'Missing action identifier' }
 
   const normalizedCode = code.toUpperCase().trim()
   const gift = mysteryGifts.find((g) => g.code === normalizedCode)
@@ -208,7 +167,11 @@ export async function redeemMysteryGift(code: string, clientActionId: string) {
 
   try {
     const result = await runEconomyAction(
-      { userId: user.id, action: 'redeem-mystery-gift', requestId: clientActionId },
+      {
+        userId: user.id,
+        action: 'redeem-mystery-gift',
+        requestId: clientActionId,
+      },
       async ({ payload: transactionPayload, req }) => {
         const freshUser = await transactionPayload.findByID({
           collection: 'users',
@@ -218,10 +181,15 @@ export async function redeemMysteryGift(code: string, clientActionId: string) {
         })
         const redeemedCodes = (freshUser as any).redeemedCodes || []
         if (redeemedCodes.includes(normalizedCode)) {
-          return { success: false, error: 'You have already redeemed this code' }
+          return {
+            success: false,
+            error: 'You have already redeemed this code',
+          }
         }
 
-        const { grantRewards } = await import('@/utilities/rewards/reward-logic')
+        const { grantRewards } = await import(
+          '@/utilities/rewards/reward-logic'
+        )
         const { summary } = await grantRewards(user.id, gift.rewards, {
           source: 'mystery-gift',
           payload: transactionPayload,

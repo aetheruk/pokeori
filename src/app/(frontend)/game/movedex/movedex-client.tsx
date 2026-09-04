@@ -11,12 +11,12 @@ import {
 import Image from 'next/image'
 import type { CSSProperties } from 'react'
 import { useCallback, useMemo, useState, useTransition } from 'react'
-import { List, type RowComponentProps } from 'react-window'
+import { List, type RowComponentProps, useDynamicRowHeight } from 'react-window'
 import { toast } from 'sonner'
-import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
-import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
-import { MoveLearnerList } from '@/components/game/moves/move-learner-list'
+import { DexFilterBar, DexPageShell } from '@/components/game/dex'
 import { MoveFieldNote } from '@/components/game/moves/move-field-note'
+import { MoveLearnerList } from '@/components/game/moves/move-learner-list'
+import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
 import {
   STANCE_ICON_CONFIG,
   StanceIcon,
@@ -341,206 +341,201 @@ export default function MoveDexPage() {
     selectedView === 'sketchbook'
       ? `${sketchedMoveCount} recorded`
       : `${ownedMoveCount} of ${ALL_MOVE_DEX_ENTRIES.length} TMs known`
+  const dynamicRowHeight = useDynamicRowHeight({
+    defaultRowHeight: 104,
+    key: `${selectedView}:${selectedMoveType}:${selectedStance}:${selectedRole}:${ownership}:${sortOrder}:${query}`,
+  })
 
   return (
-    <div className="game-paper-first game-paper-background flex h-full min-h-0 flex-col overflow-hidden bg-game-canvas text-game-ink">
-      <PremiumHeader title="MoveDex" subtitle={subtitle} />
-      <main className="game-desktop-workspace flex min-h-0 w-full flex-1 flex-col px-4 pb-3 pt-4 md:px-6">
-        <Tabs value={selectedView} onValueChange={handleViewChange}>
-          <TabsList className="grid h-auto min-h-11 w-full grid-cols-3">
-            <TabsTrigger value="known">Known moves</TabsTrigger>
-            <TabsTrigger value="all">All discoveries</TabsTrigger>
-            <TabsTrigger value="sketchbook" disabled={!canViewSketchbook}>
-              Sketchbook
-              {canViewSketchbook && (
-                <Badge className="ml-1 hidden border-game-ochre/30 bg-game-ochre/10 px-1.5 py-0 text-[10px] text-game-ochre-strong sm:inline-flex">
-                  {sketchedMoveCount}
-                </Badge>
-              )}
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+    <DexPageShell title="MoveDex" subtitle={subtitle}>
+      <Tabs value={selectedView} onValueChange={handleViewChange}>
+        <TabsList className="grid h-auto min-h-11 w-full grid-cols-3">
+          <TabsTrigger value="known">Known moves</TabsTrigger>
+          <TabsTrigger value="all">All discoveries</TabsTrigger>
+          <TabsTrigger value="sketchbook" disabled={!canViewSketchbook}>
+            Sketchbook
+            {canViewSketchbook && (
+              <Badge className="ml-1 hidden border-game-ochre/30 bg-game-ochre/10 px-1.5 py-0 text-[10px] text-game-ochre-strong sm:inline-flex">
+                {sketchedMoveCount}
+              </Badge>
+            )}
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
 
-        {selectedView === 'sketchbook' && (
-          <section
-            className="mt-3 rounded-xl border border-game-ochre/35 bg-game-ochre/10 px-4 py-3"
-            aria-labelledby="sketchbook-note-title"
-          >
-            <div className="flex items-start gap-3">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-game-ochre/30 bg-game-surface-raised text-game-ochre-strong">
-                <BookOpen className="size-5" aria-hidden="true" />
-              </div>
-              <div>
-                <h2
-                  id="sketchbook-note-title"
-                  className="font-display text-base font-semibold text-game-ink"
-                >
-                  Smeargle&apos;s field notes
-                </h2>
-                <p className="mt-1 text-xs leading-relaxed text-game-muted sm:text-sm">
-                  When Smeargle uses Sketch, it has a 25% chance to record the
-                  foe&apos;s move. Win the battle to keep the record; Sketched
-                  moves can only be assigned to Smeargle.
-                </p>
-              </div>
-            </div>
-          </section>
-        )}
-
+      {selectedView === 'sketchbook' && (
         <section
-          className="mt-3 rounded-xl border border-game-border bg-game-surface/80 p-3"
-          aria-label="Move filters"
+          className="mt-3 rounded-xl border border-game-ochre/35 bg-game-ochre/10 px-4 py-3"
+          aria-labelledby="sketchbook-note-title"
         >
-          <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 md:grid-cols-2 xl:grid-cols-[minmax(14rem,1.5fr)_repeat(5,minmax(8rem,1fr))]">
-            <div className="space-y-2">
-              <label
-                htmlFor="movedex-search"
-                className="text-xs font-medium text-game-muted"
-              >
-                Search
-              </label>
-              <div className="relative">
-                <Search
-                  className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-game-muted"
-                  aria-hidden="true"
-                />
-                <Input
-                  id="movedex-search"
-                  type="search"
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder={
-                    selectedView === 'all'
-                      ? 'Search names or visible clues'
-                      : 'Search moves'
-                  }
-                  className="pl-9"
-                />
-              </div>
+          <div className="flex items-start gap-3">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-game-ochre/30 bg-game-surface-raised text-game-ochre-strong">
+              <BookOpen className="size-5" aria-hidden="true" />
             </div>
+            <div>
+              <h2
+                id="sketchbook-note-title"
+                className="font-display text-base font-semibold text-game-ink"
+              >
+                Smeargle&apos;s field notes
+              </h2>
+              <p className="mt-1 text-xs leading-relaxed text-game-muted sm:text-sm">
+                When Smeargle uses Sketch, it has a 25% chance to record the
+                foe&apos;s move. Win the battle to keep the record; Sketched
+                moves can only be assigned to Smeargle.
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
+
+      <DexFilterBar label="Move filters" className="mt-3">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 md:grid-cols-2 xl:grid-cols-[minmax(14rem,1.5fr)_repeat(5,minmax(8rem,1fr))]">
+          <div className="space-y-2">
+            <label
+              htmlFor="movedex-search"
+              className="text-xs font-medium text-game-muted"
+            >
+              Search
+            </label>
+            <div className="relative">
+              <Search
+                className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-game-muted"
+                aria-hidden="true"
+              />
+              <Input
+                id="movedex-search"
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={
+                  selectedView === 'all'
+                    ? 'Search names or visible clues'
+                    : 'Search moves'
+                }
+                className="pl-9"
+              />
+            </div>
+          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            aria-expanded={filtersExpanded}
+            onClick={() => setFiltersExpanded((current) => !current)}
+            className="mt-[1.625rem] min-h-11 px-3 md:hidden"
+          >
+            <SlidersHorizontal className="size-4" aria-hidden="true" />
+            Filters
+          </Button>
+          <div
+            className={cn(
+              'col-span-2 grid grid-cols-2 gap-2 md:contents',
+              !filtersExpanded && 'hidden md:contents',
+            )}
+          >
+            <PremiumSelect
+              label="Type"
+              value={selectedMoveType}
+              onValueChange={setSelectedMoveType}
+              options={typeOptions}
+            />
+            <PremiumSelect
+              label="Stance"
+              value={selectedStance}
+              onValueChange={setSelectedStance}
+              options={stanceOptions}
+            />
+            <PremiumSelect
+              label="Effect"
+              value={selectedRole}
+              onValueChange={setSelectedRole}
+              options={roleOptions}
+            />
+            <PremiumSelect
+              label="Ownership"
+              value={ownership}
+              onValueChange={(value) => setOwnership(value as OwnershipFilter)}
+              options={ownershipOptions}
+            />
+            <PremiumSelect
+              label="Sort"
+              value={sortOrder}
+              onValueChange={(value) => setSortOrder(value as SortOrder)}
+              options={sortOptions}
+            />
+          </div>
+        </div>
+        <div className="mt-2 flex min-h-8 flex-wrap items-center gap-2 border-t border-game-border pt-2 text-xs text-game-muted">
+          <SlidersHorizontal className="size-3.5" aria-hidden="true" />
+          <span aria-live="polite">
+            {filteredMoves.length}{' '}
+            {filteredMoves.length === 1 ? 'record' : 'records'}
+            {selectedView === 'all' &&
+              ' — unknown records only use visible clue text'}
+          </span>
+          {hasActiveFilters && (
             <Button
               type="button"
-              variant="secondary"
-              aria-expanded={filtersExpanded}
-              onClick={() => setFiltersExpanded((current) => !current)}
-              className="mt-[1.625rem] min-h-11 px-3 md:hidden"
+              variant="ghost"
+              size="sm"
+              onClick={clearFilters}
+              className="ml-auto min-h-8 px-2 text-xs"
             >
-              <SlidersHorizontal className="size-4" aria-hidden="true" />
-              Filters
+              <X className="size-3.5" aria-hidden="true" />
+              Clear
             </Button>
-            <div
-              className={cn(
-                'col-span-2 grid grid-cols-2 gap-2 md:contents',
-                !filtersExpanded && 'hidden md:contents',
-              )}
-            >
-              <PremiumSelect
-                label="Type"
-                value={selectedMoveType}
-                onValueChange={setSelectedMoveType}
-                options={typeOptions}
-              />
-              <PremiumSelect
-                label="Stance"
-                value={selectedStance}
-                onValueChange={setSelectedStance}
-                options={stanceOptions}
-              />
-              <PremiumSelect
-                label="Effect"
-                value={selectedRole}
-                onValueChange={setSelectedRole}
-                options={roleOptions}
-              />
-              <PremiumSelect
-                label="Ownership"
-                value={ownership}
-                onValueChange={(value) =>
-                  setOwnership(value as OwnershipFilter)
-                }
-                options={ownershipOptions}
-              />
-              <PremiumSelect
-                label="Sort"
-                value={sortOrder}
-                onValueChange={(value) => setSortOrder(value as SortOrder)}
-                options={sortOptions}
-              />
-            </div>
-          </div>
-          <div className="mt-2 flex min-h-8 flex-wrap items-center gap-2 border-t border-game-border pt-2 text-xs text-game-muted">
-            <SlidersHorizontal className="size-3.5" aria-hidden="true" />
-            <span aria-live="polite">
-              {filteredMoves.length}{' '}
-              {filteredMoves.length === 1 ? 'record' : 'records'}
-              {selectedView === 'all' &&
-                ' — unknown records only use visible clue text'}
-            </span>
-            {hasActiveFilters && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={clearFilters}
-                className="ml-auto min-h-8 px-2 text-xs"
-              >
-                <X className="size-3.5" aria-hidden="true" />
-                Clear
-              </Button>
-            )}
-            {selectedView !== 'sketchbook' && (
-              <Button
-                type="button"
-                size="sm"
-                variant="secondary"
-                onClick={handleRecoverLostTms}
-                disabled={isRecovering}
-                aria-busy={isRecovering}
-                className="ml-auto min-h-9"
-              >
-                <RotateCcw
-                  className={cn(
-                    'size-3.5',
-                    isRecovering && 'animate-spin motion-reduce:animate-none',
-                  )}
-                  aria-hidden="true"
-                />
-                {isRecovering ? 'Recovering' : 'Recover lost TMs'}
-              </Button>
-            )}
-          </div>
-        </section>
-
-        <section
-          className="mt-3 min-h-0 flex-1"
-          aria-label={`${viewOptions.find((view) => view.id === selectedView)?.label} list`}
-        >
-          {filteredMoves.length ? (
-            <List
-              rowComponent={MoveListRow}
-              rowCount={filteredMoves.length}
-              rowHeight={104}
-              rowProps={{
-                moves: filteredMoves,
-                onSelect: setSelectedMove,
-                selectedView,
-              }}
-              rowKey={rowKey}
-              overscanCount={6}
-              defaultHeight={560}
-              className="custom-scrollbar"
-              style={{ height: '100%', minHeight: 260 }}
-            />
-          ) : (
-            <MoveDexEmptyState
-              selectedView={selectedView}
-              hasActiveFilters={hasActiveFilters}
-              onClear={clearFilters}
-            />
           )}
-        </section>
-      </main>
+          {selectedView !== 'sketchbook' && (
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={handleRecoverLostTms}
+              disabled={isRecovering}
+              aria-busy={isRecovering}
+              className="ml-auto min-h-9"
+            >
+              <RotateCcw
+                className={cn(
+                  'size-3.5',
+                  isRecovering && 'animate-spin motion-reduce:animate-none',
+                )}
+                aria-hidden="true"
+              />
+              {isRecovering ? 'Recovering' : 'Recover lost TMs'}
+            </Button>
+          )}
+        </div>
+      </DexFilterBar>
 
+      <section
+        className="mt-3 min-h-0 flex-1"
+        aria-label={`${viewOptions.find((view) => view.id === selectedView)?.label} list`}
+      >
+        {filteredMoves.length ? (
+          <List
+            rowComponent={MoveListRow}
+            rowCount={filteredMoves.length}
+            rowHeight={dynamicRowHeight}
+            rowProps={{
+              moves: filteredMoves,
+              onSelect: setSelectedMove,
+              selectedView,
+            }}
+            rowKey={rowKey}
+            overscanCount={6}
+            defaultHeight={560}
+            className="custom-scrollbar"
+            style={{ height: '100%', minHeight: 260 }}
+          />
+        ) : (
+          <MoveDexEmptyState
+            selectedView={selectedView}
+            hasActiveFilters={hasActiveFilters}
+            onClear={clearFilters}
+          />
+        )}
+      </section>
       <ResponsivePanel
         open={selectedMove !== null}
         onOpenChange={(open) => {
@@ -559,6 +554,7 @@ export default function MoveDexPage() {
             : 'A field clue points towards this move.'
         }
         desktopWidth="min(42vw, 620px)"
+        desktopBreakpoint="lg"
         className="overflow-hidden"
       >
         <div className="game-page-scroll min-h-0 flex-1 space-y-6 px-5 py-4">
@@ -599,7 +595,7 @@ export default function MoveDexPage() {
           ) : null}
         </div>
       </ResponsivePanel>
-    </div>
+    </DexPageShell>
   )
 }
 

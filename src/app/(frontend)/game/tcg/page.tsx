@@ -1,5 +1,5 @@
-import { GameRouteDataBoundary } from '@/components/game/shared/GameRouteDataBoundary'
 import { redirect } from 'next/navigation'
+import { GameRouteDataBoundary } from '@/components/game/shared/GameRouteDataBoundary'
 import { tcgSetSummaries } from '@/data/tcg/summaries'
 import { getGameRouteData } from '@/utilities/game-route-data'
 import { getTcgCatalogPage } from '@/utilities/tcg/catalog'
@@ -10,16 +10,21 @@ export default async function TcgExplorerPage() {
   const initialGameData = await getGameRouteData('tcg')
   if (!initialGameData) redirect('/auth')
   const inventory = Object.fromEntries(
-    (initialGameData.inventory || []).map((item) => [item.itemId, item.quantity]),
+    (initialGameData.inventory || []).map((item) => [
+      item.itemId,
+      item.quantity,
+    ]),
   )
   const initialSetId =
     sortTcgSetsByReleaseDate(
-      tcgSetSummaries.filter(
-        (set) => (inventory[`binder-${set.id}`] || 0) > 0,
-      ),
+      tcgSetSummaries.filter((set) => (inventory[`binder-${set.id}`] || 0) > 0),
     )[0]?.id || ''
   const initialCatalog = initialSetId
-    ? await getTcgCatalogPage({ setIds: [initialSetId], limit: 80 })
+    ? await getTcgCatalogPage({
+        setIds: [initialSetId],
+        limit: 80,
+        ownedCardIds: (initialGameData.tcg || []).map((entry) => entry.cardId),
+      })
     : null
 
   return (

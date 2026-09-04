@@ -13,16 +13,19 @@ import {
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { Button } from '@/components/ui/button'
 import { SectionDivider } from '@/components/ui/section-divider'
-import { getIcon, getTitle } from '@/data/user'
+import { getIcon } from '@/data/user'
 import { TrainerModal } from './trainer-modal'
+import { TrainerRow } from './trainer-row'
+import type { PublicTrainerSummary } from './types'
 
 export function FriendsList() {
-  const [friends, setFriends] = useState<any[]>([])
+  const [friends, setFriends] = useState<PublicTrainerSummary[]>([])
   const [pendingRequests, setPendingRequests] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [pendingActionId, setPendingActionId] = useState<string | null>(null)
-  const [selectedTrainer, setSelectedTrainer] = useState<any | null>(null)
+  const [selectedTrainer, setSelectedTrainer] =
+    useState<PublicTrainerSummary | null>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -50,7 +53,9 @@ export function FriendsList() {
       }
     } catch (error) {
       console.error(error)
-      setLoadError('Friends could not be loaded. Check your connection and try again.')
+      setLoadError(
+        'Friends could not be loaded. Check your connection and try again.',
+      )
     } finally {
       setIsLoading(false)
     }
@@ -234,52 +239,13 @@ export function FriendsList() {
                 </div>
               ) : (
                 <div className="grid gap-3">
-                  {friends.map((friend) => {
-                    const iconData = getIcon(friend.icon || 'ditto')
-                    const titleData = getTitle(friend.title || 'new-beginnings')
-
-                    return (
-                      <button
-                        type="button"
-                        key={friend.id}
-                        aria-haspopup="dialog"
-                        onClick={() =>
-                          setSelectedTrainer({
-                            ...friend,
-                            isFriend: true,
-                            hasPendingRequest: false,
-                            stats: {
-                              uniqueCards: 0,
-                              pokedexSeen: 0,
-                              pokedexCaught: 0,
-                            },
-                            battleTeam: [],
-                          })
-                        }
-                        className="game-focus-ring flex w-full cursor-pointer items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 text-left transition-colors hover:border-game-moss/40 hover:bg-game-surface-raised"
-                      >
-                        <div>
-                          <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
-                            {iconData?.icon && (
-                              <TaskIconDisplay
-                                icon={iconData.icon}
-                                className="w-9 h-9"
-                              />
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="flex-1 min-w-0">
-                          <div className="truncate text-base font-semibold text-game-ink">
-                            {friend.trainerName}
-                          </div>
-                          <div className="mt-0.5 text-xs font-medium text-game-moss-strong">
-                            {titleData?.name || 'Trainer'}
-                          </div>
-                        </div>
-                      </button>
-                    )
-                  })}
+                  {friends.map((friend) => (
+                    <TrainerRow
+                      key={friend.id}
+                      trainer={friend}
+                      onSelect={() => setSelectedTrainer(friend)}
+                    />
+                  ))}
                 </div>
               )}
             </div>

@@ -7,7 +7,6 @@ import {
   Eye,
   FlaskConical,
   List,
-  Loader2,
   Mars,
   Ruler,
   Venus,
@@ -20,10 +19,11 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   useTransition,
 } from 'react'
-import { useInView } from 'react-intersection-observer'
+import { type CellComponentProps, Grid, useGridRef } from 'react-window'
 import { toast } from 'sonner'
 import { GameErrorBoundary } from '@/components/game/GameErrorBoundary'
 import { MoveCompactRow, MoveFieldNote } from '@/components/game/moves'
@@ -94,6 +94,11 @@ import {
   RESEARCH_LEVEL_THRESHOLDS,
 } from '@/utilities/research/research-levels'
 import { ResearchLevelUpModal } from './_components/ResearchLevelUpModal'
+import {
+  type PokedexDiscoveryFilter as DiscoveryFilter,
+  getPokedexDiscoveryAccess,
+  matchesPokedexDiscoveryFilters,
+} from './pokedex-discovery'
 
 const typeIdMap: Record<string, number> = {
   normal: 1,
@@ -153,9 +158,20 @@ const ALL_POKEMON_TYPES = (() => {
   return Array.from(types).sort()
 })()
 
-// Initial batch size for progressive loading
-const INITIAL_BATCH_SIZE = 100
-const BATCH_INCREMENT = 100
+const DISCOVERY_FILTER_OPTIONS = [
+  { id: 'all', label: 'All records' },
+  { id: 'seen', label: 'Seen' },
+  { id: 'caught', label: 'Caught' },
+  { id: 'undiscovered', label: 'Undiscovered' },
+]
+
+const TYPE_FILTER_OPTIONS = [
+  { id: 'all', label: 'All types' },
+  ...ALL_POKEMON_TYPES.map((type) => ({
+    id: type,
+    label: type.charAt(0).toUpperCase() + type.slice(1),
+  })),
+]
 
 export default function Pokedex() {
   const [selectedSpeciesId, setSelectedSpeciesId] = useState<number | null>(
@@ -163,12 +179,15 @@ export default function Pokedex() {
   )
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedType, setSelectedType] = useState<string>('all')
-  const [visibleCount, setVisibleCount] = useState(INITIAL_BATCH_SIZE)
+  const [discoveryFilter, setDiscoveryFilter] = useState<DiscoveryFilter>('all')
+  const [viewportWidth, setViewportWidth] = useState(390)
+  const [gridWidth, setGridWidth] = useState(390)
+  const gridRef = useGridRef(null)
+  const gridContainerRef = useRef<HTMLDivElement>(null)
   const {
     entriesByForm,
     isLoading: progressLoading,
     error: progressError,
-    summary,
   } = usePokedex()
   const { gameData } = useUser()
   const inventoryMap = useMemo(
@@ -179,33 +198,51 @@ export default function Pokedex() {
     [gameData?.inventory],
   )
 
-  // Intersection observer for infinite scroll
-  const { ref: loadMoreRef, inView } = useInView({
-    threshold: 0,
-    rootMargin: '200px',
-  })
-
-  // Load more items when scrolled to bottom
   useEffect(() => {
-    if (inView) {
-      setVisibleCount((prev) => prev + BATCH_INCREMENT)
+    const updateViewportWidth = () => setViewportWidth(window.innerWidth)
+    updateViewportWidth()
+    window.addEventListener('resize', updateViewportWidth)
+    return () => window.removeEventListener('resize', updateViewportWidth)
+  }, [])
+
+  const columnCount =
+    viewportWidth >= 1536
+      ? 12
+      : viewportWidth >= 1024
+        ? 10
+        : viewportWidth >= 768
+          ? 8
+          : viewportWidth >= 640
+            ? 6
+            : 5
+  const cellSize = Math.max(64, gridWidth / columnCount)
+
+  useEffect(() => {
+    if (gridRef.current) {
+      gridRef.current.scrollToCell({
+        columnIndex: 0,
+        rowIndex: 0,
+        behavior: 'instant',
+      })
     }
-  }, [inView])
-
-  // Reset visible count when filters change
-  useEffect(() => {
-    setVisibleCount(INITIAL_BATCH_SIZE)
-  }, [searchQuery, selectedType])
+  }, [discoveryFilter, gridRef, searchQuery, selectedType])
 
   // Memoized handler for selecting species
   const handleSelectSpecies = useCallback((id: number) => {
     setSelectedSpeciesId(id)
   }, [])
 
-  // Handler for closing drawer
-  const handleCloseDrawer = useCallback((open: boolean) => {
-    if (!open) setSelectedSpeciesId(null)
-  }, [])
+  const speciesProgressSummary = useMemo(() => {
+    let seen = 0
+    let caught = 0
+    for (const species of pokemonData as PokemonData) {
+      const baseForm = species.forms.find((form) => form.form === 'base')
+      const progress = baseForm ? entriesByForm[baseForm.id] : undefined
+      if (progress?.seen || progress?.caught) seen += 1
+      if (progress?.caught) caught += 1
+    }
+    return { seen, caught }
+  }, [entriesByForm])
 
   // Filter species based on search and type
   const filteredSpecies = useMemo(() => {
@@ -213,34 +250,54 @@ export default function Pokedex() {
       const baseForm = species.forms.find((f) => f.form === 'base')
       if (!baseForm) return false
 
-      // Filter by type
-      if (
-        selectedType &&
-        selectedType !== 'all' &&
-        !baseForm.types.includes(selectedType)
-      ) {
-        return false
-      }
-
-      // Filter by search query
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase()
-        return (
-          baseForm.name.toLowerCase().includes(query) ||
-          species.id.toString() === query
-        )
-      }
-
-      return true
+      return matchesPokedexDiscoveryFilters({
+        speciesId: species.id,
+        name: baseForm.name,
+        types: baseForm.types,
+        progress: entriesByForm[baseForm.id],
+        discoveryFilter,
+        selectedType,
+        searchQuery,
+      })
     })
-  }, [searchQuery, selectedType])
+  }, [discoveryFilter, entriesByForm, searchQuery, selectedType])
 
-  // Slice to show only visible items (progressive loading)
-  const visibleSpecies = useMemo(() => {
-    return filteredSpecies.slice(0, visibleCount)
-  }, [filteredSpecies, visibleCount])
+  useEffect(() => {
+    const container = gridContainerRef.current
+    if (!container) return
+    const updateGridWidth = () => {
+      if (container.clientWidth > 0) setGridWidth(container.clientWidth)
+    }
+    updateGridWidth()
+    const observer = new ResizeObserver(updateGridWidth)
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [filteredSpecies.length])
 
-  const hasMoreToLoad = visibleCount < filteredSpecies.length
+  const handleCloseDrawer = useCallback(
+    (open: boolean) => {
+      if (open) return
+      setSelectedSpeciesId((currentId) => {
+        if (currentId !== null) {
+          const index = filteredSpecies.findIndex(
+            (species) => species.id === currentId,
+          )
+          if (index >= 0) {
+            gridRef.current?.scrollToCell({
+              columnIndex: index % columnCount,
+              rowIndex: Math.floor(index / columnCount),
+              behavior: 'instant',
+            })
+            requestAnimationFrame(() => {
+              document.getElementById(`pokedex-entry-${currentId}`)?.focus()
+            })
+          }
+        }
+        return null
+      })
+    },
+    [columnCount, filteredSpecies, gridRef],
+  )
 
   // Get selected species details
   const selectedSpecies = useMemo(() => {
@@ -252,7 +309,7 @@ export default function Pokedex() {
   const baseProgress = selectedBaseForm
     ? entriesByForm[selectedBaseForm.id]
     : undefined
-  const isBaseSeen = !!(baseProgress?.seen || baseProgress?.caught)
+  const isBaseSeen = getPokedexDiscoveryAccess(baseProgress).identity
 
   // Ensure data exists
   if (!pokemonData || (pokemonData as PokemonData).length === 0) {
@@ -268,33 +325,45 @@ export default function Pokedex() {
       <div className="game-paper-first game-paper-background flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
         <PremiumHeader title="Pokédex" subtitle="Specimen index" />
 
-        <div className="hidden items-center gap-3 border-b border-game-border bg-game-surface/70 px-6 py-3 xl:flex">
+        <div className="hidden items-end gap-3 border-b border-game-border bg-game-surface/70 px-6 py-3 lg:flex">
           <div className="min-w-0 flex-1">
+            <p className="mb-2 text-xs font-medium text-game-muted">
+              Search known names or any Pokédex number
+            </p>
             <PremiumSearch
-              placeholder="Search Pokédex"
+              placeholder="Name or number"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               showClear={!!searchQuery}
               onClear={() => setSearchQuery('')}
             />
           </div>
-          <div className="w-52 shrink-0">
+          <div
+            className="w-48 shrink-0"
+            role="group"
+            aria-label="Discovery status"
+          >
             <PremiumSelect
+              label="Discovery"
+              value={discoveryFilter}
+              onValueChange={(value) =>
+                setDiscoveryFilter(value as DiscoveryFilter)
+              }
+              options={DISCOVERY_FILTER_OPTIONS}
+            />
+          </div>
+          <div className="w-48 shrink-0" role="group" aria-label="Pokémon type">
+            <PremiumSelect
+              label="Type"
               value={selectedType}
               onValueChange={setSelectedType}
-              options={[
-                { id: 'all', label: 'All Types' },
-                ...ALL_POKEMON_TYPES.map((type) => ({
-                  id: type,
-                  label: type.charAt(0).toUpperCase() + type.slice(1),
-                })),
-              ]}
+              options={TYPE_FILTER_OPTIONS}
             />
           </div>
         </div>
 
-        {/* Main Content - Scrollable with padding */}
-        <div className="flex-1 min-h-0 overflow-y-auto px-4 md:px-6 pt-4">
+        {/* Main Content - bounded virtual grid with a fixed progress header */}
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-4 pt-4 md:px-6">
           {/* Progress Stats Header */}
           <div className="mb-4">
             <SectionDivider className="mb-0 flex-1">
@@ -303,17 +372,29 @@ export default function Pokedex() {
                   <span className="text-sm text-game-muted">Loading…</span>
                 ) : (
                   <>
-                    <div className="flex items-center gap-2" title="Seen">
+                    <div className="flex items-center gap-2">
                       <Eye className="h-4 w-4 text-game-moss-strong" />
+                      <span className="text-xs font-semibold text-game-muted">
+                        Seen
+                      </span>
                       <span className="font-mono text-game-ink">
-                        {summary.seen}
+                        {speciesProgressSummary.seen}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2" title="Caught">
+                    <div className="flex items-center gap-2">
                       <CircleDot className="h-4 w-4 text-game-ochre" />
-                      <span className="font-mono text-game-ink">
-                        {summary.caught}
+                      <span className="text-xs font-semibold text-game-muted">
+                        Caught
                       </span>
+                      <span className="font-mono text-game-ink">
+                        {speciesProgressSummary.caught}
+                      </span>
+                    </div>
+                    <div
+                      className="ml-auto font-mono text-xs text-game-muted"
+                      aria-live="polite"
+                    >
+                      {filteredSpecies.length} shown
                     </div>
                   </>
                 )}
@@ -330,7 +411,7 @@ export default function Pokedex() {
                 Check your connection and reopen this page.
               </p>
             </div>
-          ) : visibleSpecies.length === 0 ? (
+          ) : filteredSpecies.length === 0 ? (
             <div className="game-folio-section mx-auto max-w-xl p-6 text-center">
               <p className="font-display text-lg font-semibold text-game-ink">
                 No Pokémon match these notes
@@ -344,61 +425,66 @@ export default function Pokedex() {
                 onClick={() => {
                   setSearchQuery('')
                   setSelectedType('all')
+                  setDiscoveryFilter('all')
                 }}
               >
                 Clear filters
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-5 gap-2 pb-8 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 2xl:grid-cols-12">
-              {visibleSpecies.map((species) => {
-                const baseForm = species.forms.find((f) => f.form === 'base')
-                if (!baseForm) return null
-
-                const baseProgress = entriesByForm[baseForm.id]
-
-                return (
-                  <PokedexGridItem
-                    key={species.id}
-                    speciesId={species.id}
-                    baseForm={baseForm}
-                    baseProgress={baseProgress}
-                    isSelected={selectedSpeciesId === species.id}
-                    onSelect={handleSelectSpecies}
-                  />
-                )
-              })}
-            </div>
-          )}
-
-          {/* Load more trigger */}
-          {hasMoreToLoad && (
-            <div ref={loadMoreRef} className="flex justify-center py-4">
-              <Loader2 className="h-5 w-5 animate-spin text-game-moss" />
+            <div ref={gridContainerRef} className="min-h-0 flex-1 pb-2">
+              <Grid
+                gridRef={gridRef}
+                cellComponent={PokedexGridCell}
+                cellProps={{
+                  columns: columnCount,
+                  entriesByForm,
+                  onSelect: handleSelectSpecies,
+                  selectedSpeciesId,
+                  species: filteredSpecies,
+                }}
+                columnCount={columnCount}
+                columnWidth={cellSize}
+                rowCount={Math.ceil(filteredSpecies.length / columnCount)}
+                rowHeight={cellSize}
+                overscanCount={2}
+                defaultHeight={600}
+                defaultWidth={390}
+                className="custom-scrollbar"
+                style={{ height: '100%', width: gridWidth }}
+                aria-label="Pokédex records"
+              />
             </div>
           )}
         </div>
 
-        <SecondaryControlBar className="xl:hidden">
-          <div className="grid grid-cols-[minmax(0,1fr)_minmax(8rem,0.45fr)] gap-2">
+        <SecondaryControlBar className="lg:hidden">
+          <div className="grid gap-2">
             <PremiumSearch
-              placeholder="Search Pokédex"
+              placeholder="Known name or Pokédex number"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               showClear={!!searchQuery}
               onClear={() => setSearchQuery('')}
             />
-            <PremiumSelect
-              value={selectedType}
-              onValueChange={setSelectedType}
-              options={[
-                { id: 'all', label: 'All Types' },
-                ...ALL_POKEMON_TYPES.map((type) => ({
-                  id: type,
-                  label: type.charAt(0).toUpperCase() + type.slice(1),
-                })),
-              ]}
-            />
+            <div className="grid grid-cols-2 gap-2">
+              <div role="group" aria-label="Discovery status">
+                <PremiumSelect
+                  value={discoveryFilter}
+                  onValueChange={(value) =>
+                    setDiscoveryFilter(value as DiscoveryFilter)
+                  }
+                  options={DISCOVERY_FILTER_OPTIONS}
+                />
+              </div>
+              <div role="group" aria-label="Pokémon type">
+                <PremiumSelect
+                  value={selectedType}
+                  onValueChange={setSelectedType}
+                  options={TYPE_FILTER_OPTIONS}
+                />
+              </div>
+            </div>
           </div>
         </SecondaryControlBar>
 
@@ -413,66 +499,113 @@ export default function Pokedex() {
               : 'Record details are not yet available.'
           }
           desktopWidth="min(42vw, 620px)"
+          desktopBreakpoint="lg"
           mobileHeader={false}
           className="game-paper-first game-paper-background flex flex-col gap-0 overflow-x-hidden bg-game-canvas p-0 text-game-ink"
         >
-          {selectedSpecies && selectedBaseForm && (
-            <div className="w-full overflow-y-auto flex-1 min-h-0 custom-scrollbar">
-              {/* Forms Carousel */}
-              <div className="w-full">
-                {(() => {
-                  const visibleForms = selectedSpecies.forms.filter((form) => {
-                    const progress = entriesByForm[form.id]
-                    const isSeen = !!(progress?.seen || progress?.caught)
-                    return form.form === 'base' || isSeen
-                  })
+          {selectedSpecies &&
+            selectedBaseForm &&
+            (isBaseSeen ? (
+              <div className="w-full overflow-y-auto flex-1 min-h-0 custom-scrollbar">
+                {/* Forms Carousel */}
+                <div className="w-full">
+                  {(() => {
+                    const visibleForms = selectedSpecies.forms.filter(
+                      (form) => {
+                        const progress = entriesByForm[form.id]
+                        const isSeen = !!(progress?.seen || progress?.caught)
+                        return form.form === 'base' || isSeen
+                      },
+                    )
 
-                  if (visibleForms.length === 1) {
-                    const form = visibleForms[0]
+                    if (visibleForms.length === 1) {
+                      const form = visibleForms[0]
+                      return (
+                        <div className="w-full">
+                          <PokemonCard
+                            pokemon={form}
+                            species={selectedSpecies}
+                            progress={entriesByForm[form.id]}
+                            inventoryMap={inventoryMap}
+                          />
+                        </div>
+                      )
+                    }
+
                     return (
-                      <div className="w-full">
-                        <PokemonCard
-                          pokemon={form}
-                          species={selectedSpecies}
-                          progress={entriesByForm[form.id]}
-                          inventoryMap={inventoryMap}
-                        />
+                      <div className="w-full relative">
+                        <Carousel
+                          className="w-full"
+                          opts={{ align: 'start', loop: true }}
+                        >
+                          <CarouselContent>
+                            {visibleForms.map((form) => (
+                              <CarouselItem
+                                key={form.id}
+                                className="basis-full"
+                              >
+                                <PokemonCard
+                                  pokemon={form}
+                                  species={selectedSpecies}
+                                  progress={entriesByForm[form.id]}
+                                  inventoryMap={inventoryMap}
+                                />
+                              </CarouselItem>
+                            ))}
+                          </CarouselContent>
+                          <div className="hidden sm:block">
+                            <CarouselPrevious className="left-4 border-game-border bg-game-surface/90 text-game-ink backdrop-blur-md hover:bg-game-surface-raised hover:text-game-moss-strong" />
+                            <CarouselNext className="right-4 border-game-border bg-game-surface/90 text-game-ink backdrop-blur-md hover:bg-game-surface-raised hover:text-game-moss-strong" />
+                          </div>
+                        </Carousel>
                       </div>
                     )
-                  }
-
-                  return (
-                    <div className="w-full relative">
-                      <Carousel
-                        className="w-full"
-                        opts={{ align: 'start', loop: true }}
-                      >
-                        <CarouselContent>
-                          {visibleForms.map((form) => (
-                            <CarouselItem key={form.id} className="basis-full">
-                              <PokemonCard
-                                pokemon={form}
-                                species={selectedSpecies}
-                                progress={entriesByForm[form.id]}
-                                inventoryMap={inventoryMap}
-                              />
-                            </CarouselItem>
-                          ))}
-                        </CarouselContent>
-                        <div className="hidden sm:block">
-                          <CarouselPrevious className="left-4 border-game-border bg-game-surface/90 text-game-ink backdrop-blur-md hover:bg-game-surface-raised hover:text-game-moss-strong" />
-                          <CarouselNext className="right-4 border-game-border bg-game-surface/90 text-game-ink backdrop-blur-md hover:bg-game-surface-raised hover:text-game-moss-strong" />
-                        </div>
-                      </Carousel>
-                    </div>
-                  )
-                })()}
+                  })()}
+                </div>
               </div>
-            </div>
-          )}
+            ) : (
+              <UnknownPokemonFieldNote speciesId={selectedSpecies.id} />
+            ))}
         </ResponsivePanel>
       </div>
     </GameErrorBoundary>
+  )
+}
+
+function UnknownPokemonFieldNote({ speciesId }: { speciesId: number }) {
+  return (
+    <div className="game-page-scroll min-h-0 flex-1 p-5 sm:p-6">
+      <section className="game-panel-raised mx-auto max-w-md p-5 text-center">
+        <div className="mx-auto flex size-24 items-center justify-center rounded-xl border border-dashed border-game-ochre/45 bg-game-ochre/10">
+          <CircleHelp className="size-10 text-game-ochre" aria-hidden="true" />
+        </div>
+        <p className="game-field-label mt-5">Pokédex #{speciesId}</p>
+        <h2 className="mt-2 font-display text-2xl font-semibold text-game-ink">
+          Undiscovered Pokémon
+        </h2>
+        <p className="mt-3 text-sm leading-relaxed text-game-muted">
+          Encounter this Pokémon to record its name, appearance, and type. Catch
+          it to complete its measurements, base stats, research notes, and known
+          variants.
+        </p>
+        <div className="mt-5 grid grid-cols-2 gap-2 text-left">
+          <div className="rounded-lg border border-game-border bg-game-surface p-3">
+            <span className="text-[10px] font-bold uppercase tracking-[0.08em] text-game-muted">
+              First step
+            </span>
+            <p className="mt-1 text-xs font-semibold text-game-ink">
+              Encounter
+            </p>
+          </div>
+          <div className="rounded-lg border border-game-border bg-game-surface p-3">
+            <span className="text-[10px] font-bold uppercase tracking-[0.08em] text-game-muted">
+              Full record
+            </span>
+            <p className="mt-1 text-xs font-semibold text-game-ink">Catch</p>
+          </div>
+        </div>
+      </section>
+    </div>
   )
 }
 
@@ -487,8 +620,9 @@ function PokemonCard({
   progress?: PokedexEntry
   inventoryMap: Record<string, number>
 }) {
-  const hasSeen = !!(progress?.seen || progress?.caught)
-  const hasCaught = !!progress?.caught
+  const discoveryAccess = getPokedexDiscoveryAccess(progress)
+  const hasSeen = discoveryAccess.identity
+  const hasCaught = discoveryAccess.stats
   const hasGenderToggle = hasSeen && species.has_gender_differences
   const habitatBackground = getPokedexHabitatBackground(
     hasSeen ? species.habitat : undefined,
@@ -666,60 +800,77 @@ function PokemonCard({
           )}
         </div>
 
-        {/* Stats Grid */}
-        <div className="space-y-4">
-          <SectionDivider>Base stats</SectionDivider>
-          <div className="space-y-3 rounded-lg border border-game-border bg-game-surface p-4">
-            {[
-              { label: 'HP', value: pokemon.stats.hp, color: 'bg-game-danger' },
-              {
-                label: 'ATK',
-                value: pokemon.stats.attack,
-                color: 'bg-game-clay',
-              },
-              {
-                label: 'DEF',
-                value: pokemon.stats.defense,
-                color: 'bg-game-ochre',
-              },
-              {
-                label: 'SPA',
-                value: pokemon.stats['special-attack'],
-                color: 'bg-game-moss',
-              },
-              {
-                label: 'SPD',
-                value: pokemon.stats['special-defense'],
-                color: 'bg-game-moss-strong',
-              },
-              {
-                label: 'SPE',
-                value: pokemon.stats.speed,
-                color: 'bg-game-clay-strong',
-              },
-            ].map((stat) => (
-              <div key={stat.label} className="group flex items-center gap-4">
-                <span className="w-8 text-[11px] font-bold uppercase text-game-muted">
-                  {stat.label}
-                </span>
-                <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-game-canvas">
-                  <div
-                    className={cn(
-                      'h-full rounded-full transition-all duration-700 opacity-75',
-                      stat.color,
-                    )}
-                    style={{
-                      width: `${Math.min((stat.value / 255) * 100, 100)}%`,
-                    }}
-                  />
-                </div>
-                <span className="w-8 text-right font-mono text-xs font-bold text-game-ink">
-                  {stat.value}
-                </span>
-              </div>
-            ))}
+        {/* Capturing completes measurements and battle data. */}
+        {!hasCaught && (
+          <div className="rounded-xl border border-game-ochre/35 bg-game-ochre/10 p-4 text-left">
+            <p className="game-field-label">Seen in the field</p>
+            <p className="mt-2 text-sm leading-relaxed text-game-muted">
+              Catch this Pokémon to reveal its measurements, base stats,
+              research levels, and variant record.
+            </p>
           </div>
-        </div>
+        )}
+
+        {/* Stats Grid */}
+        {hasCaught && (
+          <div className="space-y-4">
+            <SectionDivider>Base stats</SectionDivider>
+            <div className="space-y-3 rounded-lg border border-game-border bg-game-surface p-4">
+              {[
+                {
+                  label: 'HP',
+                  value: pokemon.stats.hp,
+                  color: 'bg-game-danger',
+                },
+                {
+                  label: 'ATK',
+                  value: pokemon.stats.attack,
+                  color: 'bg-game-clay',
+                },
+                {
+                  label: 'DEF',
+                  value: pokemon.stats.defense,
+                  color: 'bg-game-ochre',
+                },
+                {
+                  label: 'SPA',
+                  value: pokemon.stats['special-attack'],
+                  color: 'bg-game-moss',
+                },
+                {
+                  label: 'SPD',
+                  value: pokemon.stats['special-defense'],
+                  color: 'bg-game-moss-strong',
+                },
+                {
+                  label: 'SPE',
+                  value: pokemon.stats.speed,
+                  color: 'bg-game-clay-strong',
+                },
+              ].map((stat) => (
+                <div key={stat.label} className="group flex items-center gap-4">
+                  <span className="w-8 text-[11px] font-bold uppercase text-game-muted">
+                    {stat.label}
+                  </span>
+                  <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-game-canvas">
+                    <div
+                      className={cn(
+                        'h-full rounded-full transition-all duration-700 opacity-75 motion-reduce:transition-none',
+                        stat.color,
+                      )}
+                      style={{
+                        width: `${Math.min((stat.value / 255) * 100, 100)}%`,
+                      }}
+                    />
+                  </div>
+                  <span className="w-8 text-right font-mono text-xs font-bold text-game-ink">
+                    {stat.value}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Research Level */}
         {hasCaught && (
@@ -732,30 +883,34 @@ function PokemonCard({
           />
         )}
 
-        <VariantSection
-          formId={pokemon.id}
-          pokemonName={pokemon.name}
-          progress={progress}
-        />
+        {hasCaught && (
+          <VariantSection
+            formId={pokemon.id}
+            pokemonName={pokemon.name}
+            progress={progress}
+          />
+        )}
 
         {/* Special Badges */}
-        <div className="flex flex-wrap gap-2 pt-4">
-          {species.is_legendary && (
-            <Badge className="rounded-full border-game-ochre/40 bg-game-ochre/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-game-ochre">
-              Legendary
-            </Badge>
-          )}
-          {species.is_mythical && (
-            <Badge className="rounded-full border-game-moss-strong/35 bg-game-moss-strong/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-game-moss-strong">
-              Mythical
-            </Badge>
-          )}
-          {species.is_baby && (
-            <Badge className="rounded-full border-game-clay-strong/35 bg-game-clay-strong/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-game-clay-strong">
-              Baby
-            </Badge>
-          )}
-        </div>
+        {hasCaught && (
+          <div className="flex flex-wrap gap-2 pt-4">
+            {species.is_legendary && (
+              <Badge className="rounded-full border-game-ochre/40 bg-game-ochre/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-game-ochre">
+                Legendary
+              </Badge>
+            )}
+            {species.is_mythical && (
+              <Badge className="rounded-full border-game-moss-strong/35 bg-game-moss-strong/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-game-moss-strong">
+                Mythical
+              </Badge>
+            )}
+            {species.is_baby && (
+              <Badge className="rounded-full border-game-clay-strong/35 bg-game-clay-strong/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-game-clay-strong">
+                Baby
+              </Badge>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )
@@ -1023,6 +1178,7 @@ function ObservedMoveListButton({
         onOpenChange={(open) => !open && setSelectedMove(null)}
         title={selectedMove?.name || 'Move details'}
         description="Battle Observer field note"
+        desktopBreakpoint="lg"
       >
         <div className="h-full overflow-y-auto p-4 custom-scrollbar">
           {selectedMove && (
@@ -1353,6 +1509,43 @@ function PokemonImage({
   )
 }
 
+type PokedexGridCellData = {
+  columns: number
+  entriesByForm: Record<string, PokedexEntry>
+  onSelect: (id: number) => void
+  selectedSpeciesId: number | null
+  species: PokemonSpecies[]
+}
+
+function PokedexGridCell({
+  ariaAttributes,
+  columnIndex,
+  columns,
+  entriesByForm,
+  onSelect,
+  rowIndex,
+  selectedSpeciesId,
+  species,
+  style,
+}: CellComponentProps<PokedexGridCellData>) {
+  const entry = species[rowIndex * columns + columnIndex]
+  if (!entry) return null
+  const baseForm = entry.forms.find((form) => form.form === 'base')
+  if (!baseForm) return null
+
+  return (
+    <div style={style} {...ariaAttributes} className="p-1">
+      <PokedexGridItem
+        speciesId={entry.id}
+        baseForm={baseForm}
+        baseProgress={entriesByForm[baseForm.id]}
+        isSelected={selectedSpeciesId === entry.id}
+        onSelect={onSelect}
+      />
+    </div>
+  )
+}
+
 // Memoized grid item to prevent unnecessary re-renders when other items change
 const PokedexGridItem = memo(function PokedexGridItem({
   speciesId,
@@ -1372,7 +1565,9 @@ const PokedexGridItem = memo(function PokedexGridItem({
   isSelected: boolean
   onSelect: (id: number) => void
 }) {
-  const hasSeen = !!(baseProgress?.seen || baseProgress?.caught)
+  const discoveryAccess = getPokedexDiscoveryAccess(baseProgress)
+  const hasSeen = discoveryAccess.identity
+  const hasCaught = discoveryAccess.stats
   const spriteId = hasSeen ? baseForm.id : '0'
   const shouldDesaturate = hasSeen && !baseProgress?.caught
 
@@ -1384,14 +1579,19 @@ const PokedexGridItem = memo(function PokedexGridItem({
 
   return (
     <button
+      id={`pokedex-entry-${speciesId}`}
       type="button"
       aria-pressed={isSelected}
       aria-label={
-        hasSeen ? `View ${baseForm.name}` : `Unknown Pokémon #${speciesId}`
+        hasCaught
+          ? `View caught ${baseForm.name}`
+          : hasSeen
+            ? `View seen ${baseForm.name}`
+            : `View undiscovered Pokémon #${speciesId}`
       }
       title={hasSeen ? baseForm.name : `Unknown Pokémon #${speciesId}`}
       onClick={() => onSelect(speciesId)}
-      className={`game-focus-ring relative flex aspect-square items-center justify-center overflow-hidden rounded-lg border transition-colors ${
+      className={`game-focus-ring relative flex h-full w-full items-center justify-center overflow-hidden rounded-lg border transition-colors motion-reduce:transition-none ${
         isSelected
           ? 'border-game-moss bg-game-moss/12 ring-1 ring-game-moss/35'
           : canLevelUp
@@ -1420,6 +1620,23 @@ const PokedexGridItem = memo(function PokedexGridItem({
           </div>
         )}
       </div>
+      {hasSeen && (
+        <div
+          className={cn(
+            'absolute left-1 top-1 flex size-5 items-center justify-center rounded-md border bg-game-surface/90',
+            hasCaught
+              ? 'border-game-ochre/40 text-game-ochre'
+              : 'border-game-moss/35 text-game-moss-strong',
+          )}
+        >
+          {hasCaught ? (
+            <CircleDot className="size-3" aria-hidden="true" />
+          ) : (
+            <Eye className="size-3" aria-hidden="true" />
+          )}
+          <span className="sr-only">{hasCaught ? 'Caught' : 'Seen'}</span>
+        </div>
+      )}
       {/* ID Overlay */}
       <div className="absolute bottom-1 right-1 rounded bg-game-surface/90 px-1 py-0.5 font-mono text-[10px] font-bold leading-none text-game-muted">
         #{speciesId}

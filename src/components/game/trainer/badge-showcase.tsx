@@ -89,7 +89,20 @@ export function BadgeShowcase() {
       })
   }, [inventory])
 
-  if (badgeGroups.length === 0) return null
+  if (badgeGroups.length === 0) {
+    return (
+      <div className="rounded-lg border border-dashed border-game-border bg-game-surface px-4 py-7 text-center">
+        <Award className="mx-auto h-7 w-7 text-game-muted" aria-hidden="true" />
+        <p className="mt-2 text-sm font-semibold text-game-ink">
+          No badge case yet
+        </p>
+        <p className="mt-1 text-xs text-game-muted">
+          Your regional badges will be recorded here once you receive a badge
+          case.
+        </p>
+      </div>
+    )
+  }
 
   // Function to check ownership
   const hasBadge = (badgeId: string) => {
@@ -170,12 +183,12 @@ export function BadgeShowcase() {
                             />
                           </div>
 
-                          {/* Subtle name on hover */}
-                          <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 opacity-0 group-hover/badge:opacity-100 transition-opacity whitespace-nowrap z-20">
-                            <span className="rounded border border-game-moss/30 bg-game-surface-raised px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-game-moss-strong">
-                              {badge.name}
-                            </span>
-                          </div>
+                          <span
+                            className="mt-1.5 block max-w-16 truncate text-center text-[10px] font-semibold text-game-muted"
+                            title={badge.name}
+                          >
+                            {badge.name}
+                          </span>
                         </div>
                       )
                     })}

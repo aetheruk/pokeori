@@ -12,7 +12,7 @@ import {
   Zap,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { MoveDecisionCard, MoveFieldNote } from '@/components/game/moves'
+import { MoveCompactRow, MoveFieldNote } from '@/components/game/moves'
 import { StanceIcon } from '@/components/game/shared/stance-icon'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
@@ -373,7 +373,7 @@ export function PowerSelector() {
               No move uses remaining this battle
             </div>
           ) : (
-            <div className="grid gap-3 pb-1 sm:grid-cols-2">
+            <div className="grid gap-2 pb-1">
               {availableMoves.map((move) => {
                 const moveConfig = getMove(move.id)
                 if (!moveConfig) return null
@@ -385,31 +385,24 @@ export function PowerSelector() {
                 )
 
                 return (
-                  <MoveDecisionCard
+                  <MoveCompactRow
                     key={move.id}
                     presentation={presentation}
-                    className="h-full"
-                    detailsAction={
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="min-h-11"
-                        onClick={() => setMoveInfoId(move.id)}
-                      >
-                        Details
-                      </Button>
-                    }
+                    density="tight"
+                    detailsText="Details"
+                    onDetails={() => setMoveInfoId(move.id)}
                     primaryAction={
                       <Button
                         type="button"
-                        className="min-h-11"
+                        className="min-h-10 px-3"
                         disabled={using !== null}
                         onClick={() => void handleUseMove(move.id)}
+                        aria-label={`Use ${move.name}`}
                       >
                         {using === move.id ? (
                           <Loader2 className="size-4 animate-spin" />
                         ) : null}
-                        Use {move.name}
+                        Use
                       </Button>
                     }
                   />

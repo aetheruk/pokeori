@@ -1,16 +1,17 @@
 import { Loader2, Medal, Star, Trophy } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { getHighScores } from '@/app/(frontend)/game/trainer/actions'
-import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
-import { getIcon, getTitle } from '@/data/user'
 import { cn } from '@/lib/utils'
 import { TrainerModal } from './trainer-modal'
+import { TrainerRow } from './trainer-row'
+import type { PublicTrainerSummary } from './types'
 
 export function HighScores({ activeSkill }: { activeSkill: string }) {
-  const [scores, setScores] = useState<any[]>([])
+  const [scores, setScores] = useState<PublicTrainerSummary[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [loadError, setLoadError] = useState('')
-  const [selectedTrainer, setSelectedTrainer] = useState<any | null>(null)
+  const [selectedTrainer, setSelectedTrainer] =
+    useState<PublicTrainerSummary | null>(null)
 
   useEffect(() => {
     let mounted = true
@@ -55,7 +56,7 @@ export function HighScores({ activeSkill }: { activeSkill: string }) {
           >
             <Loader2 className="h-7 w-7 animate-spin text-game-moss" />
             <p className="text-sm font-medium text-game-muted">
-              Opening the league ledger…
+              Opening the skill rankings…
             </p>
           </div>
         ) : loadError ? (
@@ -72,13 +73,11 @@ export function HighScores({ activeSkill }: { activeSkill: string }) {
             role="status"
             aria-live="polite"
           >
-            No scores have reached the league ledger yet.
+            No trainers have reached these skill rankings yet.
           </div>
         ) : (
           <div className="grid gap-3">
             {scores.map((score, index) => {
-              const iconData = getIcon(score.icon || 'ditto')
-              const titleData = getTitle(score.title || 'new-beginnings')
               const rank = index + 1
 
               const isTop3 = rank <= 3
@@ -107,71 +106,44 @@ export function HighScores({ activeSkill }: { activeSkill: string }) {
                       ? 'border-game-clay/35'
                       : 'border-transparent'
 
+              const rankIcon =
+                rank === 1 ? (
+                  <Trophy className="h-3.5 w-3.5" />
+                ) : rank === 2 ? (
+                  <Medal className="h-3.5 w-3.5" />
+                ) : rank === 3 ? (
+                  <Star className="h-3.5 w-3.5" />
+                ) : null
               return (
-                <button
-                  type="button"
+                <TrainerRow
                   key={score.id || index}
-                  aria-haspopup="dialog"
-                  onClick={() => setSelectedTrainer(score)}
-                  className={cn(
-                    'game-focus-ring group flex w-full cursor-pointer items-center gap-3 rounded-lg border bg-game-surface p-3 text-left transition-colors',
-                    isTop3 ? 'border-game-ochre/45' : 'border-game-border',
-                    'hover:border-game-moss/40 hover:bg-game-surface-raised',
-                  )}
-                >
-                  {/* Rank Badge */}
-                  <div
-                    className={cn(
-                      'flex h-12 w-12 flex-shrink-0 flex-col items-center justify-center rounded-lg border font-black',
-                      rankBg,
-                      rankBorder,
-                      rankColor,
-                    )}
-                  >
-                    <span className="text-[11px] leading-none font-bold uppercase tracking-[0.08em] text-game-muted mb-0.5">
-                      Pos.
+                  trainer={score}
+                  onSelect={() => setSelectedTrainer(score)}
+                  className={isTop3 ? 'border-game-ochre/45' : undefined}
+                  prefix={
+                    <span
+                      className={cn(
+                        'flex h-11 w-11 shrink-0 items-center justify-center gap-1 rounded-lg border font-mono text-base font-bold',
+                        rankBg,
+                        rankBorder,
+                        rankColor,
+                      )}
+                    >
+                      {rankIcon}
+                      {rank}
                     </span>
-                    <span className="text-xl leading-none">{index + 1}</span>
-                  </div>
-
-                  {/* Icon */}
-                  <div className="relative flex-shrink-0">
-                    <div className="relative z-10 flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg border border-game-border bg-game-surface-raised">
-                      {iconData?.icon && (
-                        <TaskIconDisplay
-                          icon={iconData.icon}
-                          className="w-9 h-9"
-                        />
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="truncate font-display text-lg font-semibold tracking-tight text-game-ink">
-                        {score.trainerName}
+                  }
+                  meta={
+                    <>
+                      <span className="block font-mono text-xs font-bold text-game-moss-strong">
+                        Rank {score.level || 1}
                       </span>
-                      {rank === 1 && (
-                        <Trophy className="h-4 w-4 shrink-0 text-game-ochre" />
-                      )}
-                      {rank === 2 && (
-                        <Medal className="h-4 w-4 shrink-0 text-game-muted" />
-                      )}
-                      {rank === 3 && (
-                        <Star className="h-4 w-4 shrink-0 text-game-clay-strong" />
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2 text-xs font-bold tracking-wide">
-                      <span className="text-game-moss-strong">
-                        Level {score.level}
+                      <span className="block font-mono text-[11px] text-game-muted">
+                        {(score.exp || 0).toLocaleString()} XP
                       </span>
-                      <span className="h-1 w-1 rounded-full bg-game-border" />
-                      <span className="uppercase tracking-widest text-game-muted">
-                        {score.exp.toLocaleString()} XP
-                      </span>
-                    </div>
-                  </div>
-                </button>
+                    </>
+                  }
+                />
               )
             })}
           </div>

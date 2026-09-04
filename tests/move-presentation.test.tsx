@@ -157,6 +157,9 @@ describe('move presentation', () => {
       <MoveCompactRow
         presentation={presentation}
         onDetails={() => undefined}
+        detailsText="Info"
+        density="tight"
+        primaryAction={<button type="button">Assign</button>}
       />,
     )
     const decision = renderToStaticMarkup(
@@ -172,6 +175,8 @@ describe('move presentation', () => {
     )
 
     expect(compact).toContain('View Field Test details')
+    expect(compact).toContain('Info')
+    expect(compact).toContain('Assign')
     expect(compact).toContain('Grass type')
     expect(decision).toContain('Choose move')
     expect(note).toContain('Move field note')

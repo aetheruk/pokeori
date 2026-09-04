@@ -66,4 +66,8 @@ describe('game data sync scopes', () => {
   test('artisan sync includes TCG data for card-gated recipes', () => {
     expect(GAME_DATA_SCOPE_KEYS.artisan).toContain('tcg')
   })
+
+  test('abilitydex sync includes discovery state for compatible Pokemon forms', () => {
+    expect(GAME_DATA_SCOPE_KEYS.abilitydex).toEqual(['abilityDex', 'pokedex'])
+  })
 })
