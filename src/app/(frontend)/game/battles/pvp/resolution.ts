@@ -73,6 +73,7 @@ import {
 import { processTerrainTurnEffects } from '@/utilities/battle/terrain-effects'
 import {
   attemptSmeargleSketch,
+  getSketchableOpponentMoveIds,
   SKETCH_MOVE_ID,
 } from '@/utilities/pokemon/sketch'
 
@@ -529,6 +530,24 @@ export async function resolvePvpTurn(
     }
   }
 
+  const sketchFailures = [
+    {
+      attacker: p1Mon,
+      moveId: p1Move.specialMoveId,
+      didAttack: p1Resolution.didAttack,
+    },
+    {
+      attacker: p2Mon,
+      moveId: p2Move.specialMoveId,
+      didAttack: p2Resolution.didAttack,
+    },
+  ].filter(
+    (attempt) => attempt.moveId === SKETCH_MOVE_ID && !attempt.didAttack,
+  )
+  for (const attempt of sketchFailures) {
+    logMessage += `\n${attempt.attacker.name}'s Sketch failed.`
+  }
+
   const sketchAttempts = [
     {
       attacker: p1Mon,
@@ -559,28 +578,44 @@ export async function resolvePvpTurn(
         (payload
           ? await getUserSketchedMoveIds(payload as any, attempt.userId)
           : [])
-      existingByUser.set(attempt.userId, existing)
+      const pendingForUser = (state.pendingSketchedMoves || [])
+        .filter((entry) => entry.userId === attempt.userId)
+        .map((entry) => entry.id)
+      const knownMoveIds = new Set([...existing, ...pendingForUser])
+      existingByUser.set(attempt.userId, [...existing, ...pendingForUser])
+      const sketchableOpponentMoveIds = getSketchableOpponentMoveIds(
+        attempt.opponent,
+      )
+      if (sketchableOpponentMoveIds.length === 0) {
+        logMessage += `\n${attempt.opponent.name} has no move that can be sketched.`
+        continue
+      }
+
       const sketchedMoveId = attemptSmeargleSketch({
         attacker: attempt.attacker,
         opponent: attempt.opponent,
-        alreadySketchedMoveIds: existing,
+        alreadySketchedMoveIds: [...knownMoveIds],
         random,
       })
-      if (!sketchedMoveId || !payload) continue
 
-      try {
-        const registration = await registerUserSketchedMove(
-          payload as any,
-          attempt.userId,
-          sketchedMoveId,
-        )
-        if (!registration.isNew) continue
-
-        existing.push(sketchedMoveId)
+      if (!sketchedMoveId) {
+        logMessage += `\n${attempt.attacker.name}'s Sketch failed to capture a move.`
+      } else if (knownMoveIds.has(sketchedMoveId)) {
+        logMessage += `\n${attempt.attacker.name}'s Sketch found no new move.`
+      } else {
         const sketchedMove = getMove(sketchedMoveId)
-        logMessage += `\n${attempt.attacker.name} sketched ${sketchedMove?.name || sketchedMoveId}! It is now available to every Smeargle on that account.`
-      } catch (error) {
-        console.error('Failed to persist PVP Smeargle Sketch unlock', error)
+        const sketchedMoveName = sketchedMove?.name || sketchedMoveId
+        state.pendingSketchedMoves = [
+          ...(state.pendingSketchedMoves || []),
+          {
+            id: sketchedMoveId,
+            name: sketchedMoveName,
+            userId: attempt.userId,
+            attackerName: attempt.attacker.name,
+          },
+        ]
+        existing.push(sketchedMoveId)
+        logMessage += `\n${attempt.attacker.name} sketched ${sketchedMoveName}!`
       }
     }
   }
@@ -746,6 +781,27 @@ export async function resolvePvpTurn(
     const winningTeam =
       state.status === 'won' ? state.playerTeam : state.enemyTeam
 
+    if (winnerId && state.pendingSketchedMoves?.length) {
+      const winnerPendingMoves = state.pendingSketchedMoves.filter(
+        (entry) => entry.userId === winnerId,
+      )
+      for (const pendingMove of winnerPendingMoves) {
+        try {
+          const registration = await registerUserSketchedMove(
+            payload as any,
+            winnerId,
+            pendingMove.id,
+          )
+          if (registration.isNew) {
+            logMessage += `\nThe MoveDex recorded ${pendingMove.name}.`
+          }
+        } catch (error) {
+          console.error('Failed to persist PVP Smeargle Sketch unlock', error)
+        }
+      }
+    }
+    state.pendingSketchedMoves = undefined
+
     const updateStats = async (uid: string, isWin: boolean) => {
       try {
         await incrementUserActivityResult(
@@ -774,6 +830,10 @@ export async function resolvePvpTurn(
       persistHeldItemBattleWinEffects(winningTeam),
       persistPokemonBattleKOs(state),
     ])
+  }
+
+  if (state.status !== 'ongoing') {
+    state.pendingSketchedMoves = undefined
   }
 
   // --- LOG ---

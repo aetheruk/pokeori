@@ -288,6 +288,9 @@ export async function finalizeTurn(
   state.history = trimBattleHistory(state.history)
   state.turn += 1
   if (state.status !== 'ongoing') {
+    if (state.status === 'lost') {
+      state.pendingSketchedMoves = undefined
+    }
     const battleConfig = getBattleConfigForState(state)
     const payload = await timer.time('getPayload:replayEligibility', () =>
       getPayload({ config: configPromise }),

@@ -136,6 +136,7 @@ export function flipPvpState(state: BattleState, battleId: string): BattleState 
     config: getPerspectiveConfig(state, p2Id),
     isPvp: true,
     pvpBattleId: battleId,
+    pendingSketchedMoves: undefined,
     status:
       state.status === 'won'
         ? 'lost'
@@ -159,6 +160,7 @@ export function toPerspectivePvpState(
       config: getPerspectiveConfig(state, p1Id),
       isPvp: true,
       pvpBattleId: battleId,
+      pendingSketchedMoves: undefined,
     }
   }
 
@@ -166,5 +168,10 @@ export function toPerspectivePvpState(
     return flipPvpState(state, battleId)
   }
 
-  return { ...state, isPvp: true, pvpBattleId: battleId }
+  return {
+    ...state,
+    isPvp: true,
+    pvpBattleId: battleId,
+    pendingSketchedMoves: undefined,
+  }
 }

@@ -265,7 +265,13 @@ export function RewardSummaryDisplay({
           {(summary.sketchedMoves || []).map((move, i) => (
             <Card key={`sketched-move-${i}`} className="h-12 flex-row items-center gap-3 border-game-ochre/40 bg-game-ochre/10 p-2">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-game-ochre/20 text-game-ochre">
-                <Search className="h-4 w-4" />
+                <Image
+                  src={getPokemonImageUrl('235', 'sprite')}
+                  alt="Smeargle"
+                  width={28}
+                  height={28}
+                  className="h-7 w-7 object-contain pixelated"
+                />
               </div>
               <div className="flex min-w-0 flex-1 items-center justify-between pr-2">
                 <span className="truncate text-sm font-medium text-game-ink">{move.name}</span>

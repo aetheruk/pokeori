@@ -13,11 +13,14 @@ import { getUser } from '../helpers/user'
 import { getActiveBattleState } from '../helpers/state-management'
 import { trimBattleHistory } from '@/utilities/battle/history'
 import { recordExpeditionActivityResult } from '@/utilities/expeditions/actions'
-import { isBattleUser } from '../pvp/state-utils'
+import { isBattleUser, normalizeBattleUserId } from '../pvp/state-utils'
 import { battles } from '@/data/battles'
 import { applyTrainerBattleLossPayout } from '../helpers/loss-payout'
 import { persistConsumedHeldItems } from '../helpers/held-items'
-import { incrementUserActivityResult } from '@/utilities/user-state'
+import {
+  incrementUserActivityResult,
+  registerUserSketchedMove,
+} from '@/utilities/user-state'
 import { persistPokemonBattleKOs } from '../helpers/pokemon-ko-credit'
 
 const PVP_BATTLE_PREFIX = 'pvp:battle:'
@@ -123,6 +126,30 @@ async function handlePvpSurrender(user: User, state: BattleState): Promise<void>
     damageTaken: 0,
     message: `${user.trainerName || 'Opponent'} surrendered!`,
   })
+
+  const winnerId = isP1
+    ? normalizeBattleUserId((sharedState.enemyTeam[0] as any)?.user)
+    : normalizeBattleUserId((sharedState.playerTeam[0] as any)?.user)
+  if (winnerId && sharedState.pendingSketchedMoves?.length) {
+    const payload = await getPayload({ config: configPromise })
+    for (const pendingMove of sharedState.pendingSketchedMoves) {
+      if (pendingMove.userId !== winnerId) continue
+
+      try {
+        const registration = await registerUserSketchedMove(
+          payload as any,
+          winnerId,
+          pendingMove.id,
+        )
+        if (registration.isNew) {
+          sharedState.history[0].message += `\nThe MoveDex recorded ${pendingMove.name}.`
+        }
+      } catch (error) {
+        console.error('Failed to persist PVP Smeargle Sketch unlock', error)
+      }
+    }
+  }
+  sharedState.pendingSketchedMoves = undefined
   sharedState.history = trimBattleHistory(sharedState.history)
 
   await persistPokemonBattleKOs(sharedState)

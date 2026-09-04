@@ -325,6 +325,13 @@ export interface PendingBattleMoveSwitch {
   passStatStages?: StatStages
 }
 
+export interface PendingBattleSketch {
+  id: string
+  name: string
+  userId: string
+  attackerName?: string
+}
+
 export interface BattleState {
   playerTeam: BattlePokemon[]
   enemyTeam: BattlePokemon[]
@@ -347,6 +354,7 @@ export interface BattleState {
   enemyName: string
   rewards?: RewardSummary
   sketchedMoves?: { id: string; name: string }[]
+  pendingSketchedMoves?: PendingBattleSketch[]
   moveRewards?: Reward[]
   expeditionProgress?: BattleExpeditionProgress
   expeditionContext?: {

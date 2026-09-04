@@ -52,6 +52,7 @@ export async function surrenderBattle(): Promise<{
   } else {
     // PVE Surrender
     state.status = 'lost'
+    state.pendingSketchedMoves = undefined
     state.history.unshift({
       turn: state.turn,
       playerStance: 'tech', // Dummy
