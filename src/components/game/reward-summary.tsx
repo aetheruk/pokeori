@@ -40,6 +40,7 @@ export function RewardSummaryDisplay({
     xpEntries.length > 0 ||
     (summary.items || []).length > 0 ||
     (summary.pokemon || []).length > 0 ||
+    (summary.sketchedMoves || []).length > 0 ||
     (summary.currency || []).length > 0 ||
     (summary.cards || []).length > 0 ||
     (summary.tasksCompleted || []).length > 0 ||
@@ -257,6 +258,18 @@ export function RewardSummaryDisplay({
                 <span className="font-bold text-game-muted text-xs">
                   Lvl {p.level}
                 </span>
+              </div>
+            </Card>
+          ))}
+
+          {(summary.sketchedMoves || []).map((move, i) => (
+            <Card key={`sketched-move-${i}`} className="h-12 flex-row items-center gap-3 border-game-ochre/40 bg-game-ochre/10 p-2">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-game-ochre/20 text-game-ochre">
+                <Search className="h-4 w-4" />
+              </div>
+              <div className="flex min-w-0 flex-1 items-center justify-between pr-2">
+                <span className="truncate text-sm font-medium text-game-ink">{move.name}</span>
+                <span className="text-xs font-bold text-game-ochre">Sketched</span>
               </div>
             </Card>
           ))}

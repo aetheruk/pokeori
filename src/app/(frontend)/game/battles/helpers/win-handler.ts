@@ -56,6 +56,9 @@ export async function handleWin(
       weather: state.weather?.weather,
     },
   })
+  if (state.sketchedMoves?.length) {
+    summary.sketchedMoves = state.sketchedMoves
+  }
   state.rewards = summary
 
   // Explicit Daily Battle Tracking
