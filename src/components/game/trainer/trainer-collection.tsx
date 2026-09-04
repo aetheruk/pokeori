@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { type ComponentType, useMemo } from 'react'
+import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
@@ -155,6 +156,7 @@ export function TrainerCollection() {
       className="flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink"
       aria-busy={loading}
     >
+      <PremiumHeader title="Field index" subtitle="Collections" />
       <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4 md:px-6 md:py-6">
         <section>
           <div className="game-folio-section relative overflow-hidden p-4 md:p-5">
@@ -181,7 +183,12 @@ export function TrainerCollection() {
 
             <div className="mt-5 h-2 overflow-hidden rounded-full border border-game-border bg-game-canvas">
               <div
-                className="h-full rounded-full bg-game-moss transition-all"
+                role="progressbar"
+                aria-label="Overall collection completion"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={overallCompletion}
+                className="h-full rounded-full bg-game-moss transition-[width] motion-reduce:transition-none"
                 style={{ width: `${overallCompletion}%` }}
               />
             </div>
@@ -215,7 +222,7 @@ export function TrainerCollection() {
             title="Pokedex"
             subtitle="Pokemon Records"
             iconItemId="poke-ball"
-            accent="sky"
+            accent="moss"
             completion={pokemonCompletion}
             stats={[
               {
@@ -240,7 +247,7 @@ export function TrainerCollection() {
             title="Carddex"
             subtitle="Card Binders"
             iconItemId="pack-base1"
-            accent="amber"
+            accent="ochre"
             completion={cardCompletion}
             stats={[
               {
@@ -266,7 +273,7 @@ export function TrainerCollection() {
             title="MoveDex"
             subtitle="TM / HM Moves"
             iconItemId="tm-normal"
-            accent="sky"
+            accent="moss"
             completion={moveDexCompletion}
             stats={[
               {
@@ -288,7 +295,7 @@ export function TrainerCollection() {
             title="AbilityDex"
             subtitle="Pokemon Abilities"
             iconItemId="ability-patch"
-            accent="amber"
+            accent="ochre"
             completion={abilityDexCompletion}
             stats={[
               {
@@ -306,13 +313,13 @@ export function TrainerCollection() {
           />
         </section>
 
-        <SectionDivider className="my-4">At a Glance</SectionDivider>
+        <SectionDivider className="my-4">Journal activity</SectionDivider>
 
         <section className="game-folio-section min-w-0 overflow-hidden p-4 md:p-5">
           <div className="flex items-center justify-between gap-3">
             <div className="game-field-label flex items-center gap-2">
               <Sparkles className="h-3.5 w-3.5 text-game-ochre" />
-              Trainer Snapshot
+              Recent fieldwork
             </div>
             <Trophy className="h-4 w-4 text-game-muted" />
           </div>
@@ -379,12 +386,12 @@ function CollectionPanel({
   title: string
   subtitle: string
   iconItemId: string
-  accent: 'sky' | 'amber'
+  accent: 'moss' | 'ochre'
   completion: number
   stats: { label: string; value: string }[]
   railStats: { label: string; value: number }[]
 }) {
-  const isSky = accent === 'sky'
+  const isMoss = accent === 'moss'
 
   return (
     <Link
@@ -394,7 +401,7 @@ function CollectionPanel({
       <div
         className={cn(
           'absolute inset-y-0 left-0 w-1',
-          isSky ? 'bg-game-moss' : 'bg-game-ochre',
+          isMoss ? 'bg-game-moss' : 'bg-game-ochre',
         )}
       />
       <div className="flex items-start justify-between gap-3">
@@ -402,7 +409,7 @@ function CollectionPanel({
           <div
             className={cn(
               'flex h-11 w-11 shrink-0 items-center justify-center rounded-md border bg-game-surface-raised',
-              isSky
+              isMoss
                 ? 'border-game-moss/30 text-game-moss-strong'
                 : 'border-game-ochre/35 text-game-ochre',
             )}
@@ -435,7 +442,7 @@ function CollectionPanel({
               key={stat.label}
               label={stat.label}
               value={stat.value}
-              className={isSky ? 'bg-game-moss' : 'bg-game-ochre'}
+              className={isMoss ? 'bg-game-moss' : 'bg-game-ochre'}
             />
           ))}
         </div>
@@ -453,6 +460,11 @@ function CollectionPanel({
 function ProgressDial({ value, label }: { value: number; label: string }) {
   return (
     <div
+      role="progressbar"
+      aria-label={`${label} completion`}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={value}
       className="grid h-16 w-16 shrink-0 place-items-center rounded-full border border-game-border"
       style={{
         background: `conic-gradient(var(--game-moss) ${value * 3.6}deg, var(--game-canvas) 0deg)`,
@@ -489,7 +501,15 @@ function ProgressRail({
       </div>
       <div className="h-1.5 overflow-hidden rounded-full border border-game-border bg-game-canvas">
         <div
-          className={cn('h-full rounded-full transition-all', className)}
+          role="progressbar"
+          aria-label={`${label} completion`}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={value}
+          className={cn(
+            'h-full rounded-full transition-[width] motion-reduce:transition-none',
+            className,
+          )}
           style={{ width: `${value}%` }}
         />
       </div>

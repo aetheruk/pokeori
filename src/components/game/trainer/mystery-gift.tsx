@@ -1,16 +1,17 @@
-import { useState } from 'react'
-import { redeemMysteryGift } from '@/app/(frontend)/game/trainer/actions'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Loader2, Gift } from 'lucide-react'
-import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
-import { toast } from 'sonner'
+import { Gift, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { redeemMysteryGift } from '@/app/(frontend)/game/trainer/actions'
+import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 export function MysteryGift() {
   const [code, setCode] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<any | null>(null)
+  const [error, setError] = useState('')
   const router = useRouter()
 
   const handleRedeem = async (e: React.FormEvent) => {
@@ -18,6 +19,7 @@ export function MysteryGift() {
     if (!code.trim()) return
 
     setIsLoading(true)
+    setError('')
     try {
       const response = await redeemMysteryGift(code, crypto.randomUUID())
       if (response.success) {
@@ -29,10 +31,15 @@ export function MysteryGift() {
         setCode('')
         router.refresh()
       } else {
-        toast.error(response.error || 'Failed to redeem code')
+        const message = response.error || 'Gift code could not be redeemed'
+        setError(message)
+        toast.error(message)
       }
-    } catch (err) {
-      toast.error('An error occurred')
+    } catch {
+      const message =
+        'Gift code could not be redeemed. Check your connection and try again.'
+      setError(message)
+      toast.error(message)
     } finally {
       setIsLoading(false)
     }
@@ -49,8 +56,12 @@ export function MysteryGift() {
                   <Gift className="h-6 w-6 text-game-clay" />
                 </div>
                 <div>
-                  <p className="text-xs font-black uppercase text-game-clay">League delivery</p>
-                  <h2 className="font-display text-xl font-black text-game-ink">Mystery Gift Terminal</h2>
+                  <p className="text-xs font-black uppercase text-game-clay">
+                    League delivery
+                  </p>
+                  <h2 className="font-display text-xl font-black text-game-ink">
+                    Mystery Gift Terminal
+                  </h2>
                 </div>
               </div>
             </div>
@@ -70,8 +81,26 @@ export function MysteryGift() {
                     value={code}
                     onChange={(e) => setCode(e.target.value.toUpperCase())}
                     className="h-14 border-game-border bg-game-surface-raised text-center font-mono text-lg font-bold uppercase tracking-normal placeholder:text-game-muted"
+                    aria-describedby="mystery-gift-help mystery-gift-error"
                   />
+                  <p
+                    id="mystery-gift-help"
+                    className="mt-2 text-xs text-game-muted"
+                  >
+                    Enter the letters, numbers, and dashes exactly as shown.
+                    Letter case does not matter.
+                  </p>
                 </div>
+
+                {error && (
+                  <p
+                    id="mystery-gift-error"
+                    className="rounded-lg border border-game-danger/25 bg-game-danger/5 px-3 py-2 text-sm text-game-danger"
+                    role="alert"
+                  >
+                    {error}
+                  </p>
+                )}
 
                 <Button
                   type="submit"

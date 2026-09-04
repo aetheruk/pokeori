@@ -11,8 +11,13 @@ import {
   useState,
 } from 'react'
 import { useInView } from 'react-intersection-observer'
+import {
+  DexCountSummary,
+  DexEmptyState,
+  DexFilterBar,
+  DexPageShell,
+} from '@/components/game/dex'
 import { RewardSummaryDisplay } from '@/components/game/reward-summary'
-import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
 import { PremiumSearch } from '@/components/game/shared/PremiumSearch'
 import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
 import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
@@ -25,14 +30,18 @@ import type { TcgCard, TcgSet } from '@/data/tcg/types'
 import { useGameUserData } from '@/hooks/useGameUserData'
 import { useTCG } from '@/hooks/useTCG'
 import { APP_VERSION } from '@/utilities/app-version'
-import { sortTcgSetsByReleaseDate } from '@/utilities/tcg/set-order'
 import type { RewardSummary } from '@/utilities/rewards/reward-logic'
+import type { TcgCatalogPage } from '@/utilities/tcg/catalog'
+import {
+  getNextAutocompleteIndex,
+  getTcgCardAccessibleLabel,
+} from '@/utilities/tcg/presentation'
+import { sortTcgSetsByReleaseDate } from '@/utilities/tcg/set-order'
 import {
   calculateTcgBattleCardCost,
   TCG_BATTLE_FORMATS,
   type TcgBattleEnergyType,
 } from '@/utilities/tcg/tcg-battle'
-import type { TcgCatalogPage } from '@/utilities/tcg/catalog'
 import { getTcgDecks, redistributeDuplicateCards, saveTcgDeck } from './actions'
 
 const CARD_BATCH_SIZE = 80
@@ -48,6 +57,7 @@ type CatalogCard = { card: TcgCard; set: TcgSet }
 type CatalogResponse<T> = {
   items: T[]
   total: number
+  ownedTotal?: number
   nextCursor: string | null
 }
 type PokemonSummary = { id: number; name: string }
@@ -101,12 +111,16 @@ export default function TcgExplorerPage({
     initialCatalog?.items || [],
   )
   const [catalogTotal, setCatalogTotal] = useState(initialCatalog?.total || 0)
+  const [catalogOwnedTotal, setCatalogOwnedTotal] = useState(
+    initialCatalog?.ownedTotal || 0,
+  )
   const [nextCursor, setNextCursor] = useState<string | null>(
     initialCatalog?.nextCursor || null,
   )
   const [catalogLoading, setCatalogLoading] = useState(false)
   const [catalogError, setCatalogError] = useState(false)
   const [filteredPokemon, setFilteredPokemon] = useState<PokemonSummary[]>([])
+  const [activePokemonIndex, setActivePokemonIndex] = useState(-1)
   const loadingMoreRef = useRef(false)
   const deferredSearch = useDeferredValue(searchQuery.trim())
   const inventory = useMemo(
@@ -126,9 +140,7 @@ export default function TcgExplorerPage({
   const sets = useMemo(() => {
     if (!gameData) return []
     return sortTcgSetsByReleaseDate(
-      tcgSetSummaries.filter(
-        (set) => (inventory[`binder-${set.id}`] || 0) > 0,
-      ),
+      tcgSetSummaries.filter((set) => (inventory[`binder-${set.id}`] || 0) > 0),
     )
   }, [gameData, inventory])
 
@@ -145,6 +157,7 @@ export default function TcgExplorerPage({
   useEffect(() => {
     if (!deferredSearch || selectedPokemonId) {
       setFilteredPokemon([])
+      setActivePokemonIndex(-1)
       return
     }
     const controller = new AbortController()
@@ -159,6 +172,7 @@ export default function TcgExplorerPage({
       .then((response) => response.json())
       .then((result: CatalogResponse<PokemonSummary>) => {
         setFilteredPokemon(result.items || [])
+        setActivePokemonIndex((result.items || []).length > 0 ? 0 : -1)
       })
       .catch((error) => {
         if (error?.name !== 'AbortError') setFilteredPokemon([])
@@ -186,6 +200,32 @@ export default function TcgExplorerPage({
     setSelectedPokemonId(pokemon.id)
     setSearchQuery(pokemon.name)
     setShowDropdown(false)
+  }
+
+  const handleSearchKeyDown = (
+    event: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (!showDropdown || filteredPokemon.length === 0) {
+      if (event.key === 'ArrowDown') setShowDropdown(true)
+      return
+    }
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault()
+      const direction = event.key === 'ArrowDown' ? 1 : -1
+      setActivePokemonIndex((current) =>
+        getNextAutocompleteIndex({
+          current,
+          direction,
+          count: filteredPokemon.length,
+        }),
+      )
+    } else if (event.key === 'Enter' && activePokemonIndex >= 0) {
+      event.preventDefault()
+      handlePokemonSelect(filteredPokemon[activePokemonIndex])
+    } else if (event.key === 'Escape') {
+      event.preventDefault()
+      setShowDropdown(false)
+    }
   }
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -225,6 +265,7 @@ export default function TcgExplorerPage({
     if (!catalogUrl) {
       setCatalogCards([])
       setCatalogTotal(0)
+      setCatalogOwnedTotal(0)
       setNextCursor(null)
       return
     }
@@ -239,6 +280,7 @@ export default function TcgExplorerPage({
       .then((result: CatalogResponse<CatalogCard>) => {
         setCatalogCards(result.items || [])
         setCatalogTotal(result.total || 0)
+        setCatalogOwnedTotal(result.ownedTotal || 0)
         setNextCursor(result.nextCursor)
       })
       .catch((error) => {
@@ -402,10 +444,7 @@ export default function TcgExplorerPage({
 
   const currentSetStats = useMemo(() => {
     if (searchQuery.trim()) {
-      const unique = catalogCards.reduce((count, { card }) => {
-        return count + ((entriesByCard[card.id]?.quantity || 0) > 0 ? 1 : 0)
-      }, 0)
-      return { unique, total: catalogTotal }
+      return { unique: catalogOwnedTotal, total: catalogTotal }
     }
 
     if (!selectedSetId || selectedSetId === 'all') {
@@ -434,7 +473,7 @@ export default function TcgExplorerPage({
     selectedSetId,
     sets,
     collectionSummary,
-    entriesByCard,
+    catalogOwnedTotal,
     selectedPokemonId,
     searchQuery,
     catalogCards,
@@ -443,27 +482,49 @@ export default function TcgExplorerPage({
   ])
 
   return (
-    <div className="game-paper-first game-paper-background flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
-      <PremiumHeader title="Carddex" subtitle="Collection" />
-
-      <div className="hidden items-center gap-3 border-b border-game-border bg-game-surface/70 px-6 py-3 xl:flex">
+    <DexPageShell
+      title="Carddex"
+      subtitle="Card collection"
+      contentClassName="p-0 md:p-0"
+    >
+      <DexFilterBar
+        label="Carddex filters"
+        className="hidden items-center gap-3 rounded-none border-x-0 border-t-0 px-6 py-3 lg:flex"
+      >
         <div className="relative min-w-0 flex-1">
           <PremiumSearch
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded={showDropdown && filteredPokemon.length > 0}
+            aria-controls="tcg-pokemon-options-desktop"
+            aria-activedescendant={
+              activePokemonIndex >= 0
+                ? `tcg-pokemon-desktop-${filteredPokemon[activePokemonIndex]?.id}`
+                : undefined
+            }
             placeholder="Search Pokémon"
             value={searchQuery}
             onChange={handleSearchChange}
             onFocus={() => setShowDropdown(true)}
+            onKeyDown={handleSearchKeyDown}
             showClear={!!searchQuery}
             onClear={clearSearch}
           />
           {showDropdown && filteredPokemon.length > 0 && (
-            <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-60 overflow-auto rounded-lg border border-game-border bg-game-surface-raised shadow-xl">
-              {filteredPokemon.map((p) => (
+            <div
+              id="tcg-pokemon-options-desktop"
+              role="listbox"
+              className="absolute left-0 right-0 top-full z-50 mt-2 max-h-60 overflow-auto rounded-lg border border-game-border bg-game-surface-raised shadow-xl"
+            >
+              {filteredPokemon.map((p, index) => (
                 <button
                   type="button"
+                  id={`tcg-pokemon-desktop-${p.id}`}
+                  role="option"
+                  aria-selected={index === activePokemonIndex}
                   key={`desktop-${p.id}`}
                   onClick={() => handlePokemonSelect(p)}
-                  className="game-focus-ring block min-h-10 w-full px-4 py-2 text-left text-sm transition-colors hover:bg-game-surface"
+                  className={`game-focus-ring block min-h-10 w-full px-4 py-2 text-left text-sm transition-colors hover:bg-game-surface ${index === activePokemonIndex ? 'bg-game-moss/10' : ''}`}
                 >
                   {p.name}
                 </button>
@@ -479,7 +540,7 @@ export default function TcgExplorerPage({
             options={sets.map((set) => ({ id: set.id, label: set.name }))}
           />
         </div>
-      </div>
+      </DexFilterBar>
 
       {/* Main Content - Scrollable with padding */}
       <div className="flex-1 min-h-0 overflow-y-auto px-4 md:px-6 pt-4">
@@ -491,35 +552,30 @@ export default function TcgExplorerPage({
               : selectedSetId
                 ? sets.find((s) => s.id === selectedSetId)?.name || 'All Cards'
                 : 'All Cards'}
-            <span className="ml-2 text-xs font-normal text-game-muted">
-              (
-              {collectionLoading || catalogLoading ? (
-                '...'
-              ) : (
-                <>
-                  <span className="text-game-ink">
-                    {currentSetStats.unique}
-                  </span>{' '}
-                  / {currentSetStats.total}
-                </>
-              )}
-              )
-            </span>
+            <DexCountSummary
+              className="ml-2 inline"
+              count={currentSetStats.total}
+              singular="card"
+              plural="cards"
+              detail={
+                collectionLoading || catalogLoading
+                  ? 'Checking collection…'
+                  : `${currentSetStats.unique} collected`
+              }
+            />
           </SectionDivider>
         </div>
 
         {collectionError || catalogError ? (
-          <div className="game-folio-section mx-auto max-w-xl p-6 text-center">
-            <p className="font-display text-lg font-semibold text-game-ink">
-              The Carddex could not be opened
-            </p>
-            <p className="mt-2 text-sm text-game-muted">
-              Check your connection, then reload the collection.
-            </p>
-            <Button className="mt-4" onClick={() => refreshCollection()}>
-              Reload collection
-            </Button>
-          </div>
+          <DexEmptyState
+            title="The Carddex could not be opened"
+            description="Check your connection, then reload the collection."
+            action={
+              <Button onClick={() => refreshCollection()}>
+                Reload collection
+              </Button>
+            }
+          />
         ) : sets.length === 0 && !collectionLoading ? (
           <div className="game-folio-section mx-auto max-w-xl p-6 text-center">
             <p className="font-display text-lg font-semibold text-game-ink">
@@ -547,12 +603,13 @@ export default function TcgExplorerPage({
           </div>
         ) : (
           <div className="grid grid-cols-4 gap-2 pb-8 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 2xl:grid-cols-10">
-            {catalogCards.map(({ card, set }) => (
+            {catalogCards.map(({ card, set }, index) => (
               <TcgCardItem
                 key={card.id}
                 card={card}
                 set={set}
                 entry={entriesByCard[card.id]}
+                slot={index + 1}
                 onClick={() => setSelectedCard({ card, set })}
               />
             ))}
@@ -579,28 +636,45 @@ export default function TcgExplorerPage({
         )}
       </div>
 
-      <SecondaryControlBar className="xl:hidden">
+      <SecondaryControlBar className="lg:hidden">
         <div
           className="grid grid-cols-[minmax(0,1fr)_minmax(8rem,0.5fr)] gap-2"
           ref={dropdownRef}
         >
           <div className="relative">
             <PremiumSearch
+              role="combobox"
+              aria-autocomplete="list"
+              aria-expanded={showDropdown && filteredPokemon.length > 0}
+              aria-controls="tcg-pokemon-options-mobile"
+              aria-activedescendant={
+                activePokemonIndex >= 0
+                  ? `tcg-pokemon-mobile-${filteredPokemon[activePokemonIndex]?.id}`
+                  : undefined
+              }
               placeholder="Search Pokémon"
               value={searchQuery}
               onChange={handleSearchChange}
               onFocus={() => setShowDropdown(true)}
+              onKeyDown={handleSearchKeyDown}
               showClear={!!searchQuery}
               onClear={clearSearch}
             />
             {showDropdown && filteredPokemon.length > 0 && (
-              <div className="absolute bottom-full left-0 right-0 z-50 mb-2 max-h-60 overflow-auto rounded-lg border border-game-border bg-game-surface-raised shadow-lg">
-                {filteredPokemon.map((p) => (
+              <div
+                id="tcg-pokemon-options-mobile"
+                role="listbox"
+                className="absolute bottom-full left-0 right-0 z-50 mb-2 max-h-60 overflow-auto rounded-lg border border-game-border bg-game-surface-raised shadow-lg"
+              >
+                {filteredPokemon.map((p, index) => (
                   <button
                     type="button"
+                    id={`tcg-pokemon-mobile-${p.id}`}
+                    role="option"
+                    aria-selected={index === activePokemonIndex}
                     key={p.id}
                     onClick={() => handlePokemonSelect(p)}
-                    className="game-focus-ring block min-h-10 w-full cursor-pointer px-4 py-2 text-left text-sm text-game-ink transition-colors hover:bg-game-surface"
+                    className={`game-focus-ring block min-h-10 w-full cursor-pointer px-4 py-2 text-left text-sm text-game-ink transition-colors hover:bg-game-surface ${index === activePokemonIndex ? 'bg-game-moss/10' : ''}`}
                   >
                     {p.name}
                   </button>
@@ -631,15 +705,16 @@ export default function TcgExplorerPage({
           selectedCard ? `Details for ${selectedCard.card.name}` : undefined
         }
         desktopWidth="min(42vw, 620px)"
+        desktopBreakpoint="lg"
         mobileHeader={false}
         className="gap-0 overflow-hidden bg-game-surface p-0 text-game-ink"
       >
         {selectedCard && (
-          <div className="custom-scrollbar w-full space-y-6 overflow-y-auto p-5 md:p-6">
-            <div className="flex flex-col items-center gap-6">
+          <div className="custom-scrollbar w-full overflow-y-auto p-5 md:p-6">
+            <div className="grid items-start gap-5 lg:grid-cols-[minmax(12rem,0.8fr)_minmax(0,1fr)]">
               {/* Large Card Image */}
-              <div>
-                <div className="relative aspect-[240/330] w-56 overflow-hidden rounded-lg border border-game-border bg-game-canvas md:w-72">
+              <div className="mx-auto w-full max-w-64 lg:sticky lg:top-0">
+                <div className="relative aspect-[240/330] w-full overflow-hidden rounded-lg border border-game-border bg-game-canvas shadow-sm">
                   <Image
                     src={
                       selectedCard.card.images.large ||
@@ -654,13 +729,13 @@ export default function TcgExplorerPage({
               </div>
 
               {/* Card Details */}
-              <div className="w-full max-w-md space-y-6">
-                <div className="text-center space-y-2">
-                  <h2 className="font-display text-2xl font-semibold text-game-ink md:text-3xl">
+              <div className="w-full min-w-0 space-y-5">
+                <div className="space-y-2 text-center lg:text-left">
+                  <div className="game-field-label">Card record</div>
+                  <h2 className="font-display text-2xl font-semibold text-game-ink">
                     {selectedCard.card.name}
                   </h2>
-                  <div className="flex items-center justify-center gap-3">
-                    <span className="h-px w-4 bg-game-ochre/45" />
+                  <div className="flex items-center justify-center gap-3 lg:justify-start">
                     <p className="text-xs font-medium text-game-moss-strong">
                       {selectedCard.card.supertype}
                       {selectedCard.card.supertype &&
@@ -672,30 +747,33 @@ export default function TcgExplorerPage({
                         )}
                       {selectedCard.card.subtypes?.join(', ')}
                     </p>
-                    <span className="h-px w-4 bg-game-ochre/45" />
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="rounded-lg border border-game-border bg-game-surface-raised p-4">
-                      <SectionDivider className="mb-2">Set</SectionDivider>
-                      <p className="text-center font-bold tracking-tight text-game-ink">
-                        {selectedCard.set.name}
-                      </p>
-                    </div>
-                    <div className="rounded-lg border border-game-border bg-game-surface-raised p-4">
-                      <SectionDivider className="mb-2">Number</SectionDivider>
-                      <p className="text-center font-mono font-bold text-game-ink">
-                        {selectedCard.card.number}
-                      </p>
-                    </div>
+                <div className="divide-y divide-game-border rounded-lg border border-game-border bg-game-surface-raised px-4">
+                  <div className="grid min-h-12 grid-cols-[5rem_1fr] items-center gap-3 py-2">
+                    <span className="text-xs font-semibold text-game-muted">
+                      Set
+                    </span>
+                    <p className="text-right text-sm font-semibold text-game-ink">
+                      {selectedCard.set.name}
+                    </p>
+                  </div>
+                  <div className="grid min-h-12 grid-cols-[5rem_1fr] items-center gap-3 py-2">
+                    <span className="text-xs font-semibold text-game-muted">
+                      Number
+                    </span>
+                    <p className="text-right font-mono text-sm font-bold text-game-ink">
+                      {selectedCard.card.number}
+                    </p>
                   </div>
 
                   {selectedCard.card.artist && (
-                    <div className="rounded-lg border border-game-border bg-game-surface-raised p-4">
-                      <SectionDivider className="mb-2">Artist</SectionDivider>
-                      <p className="text-center font-bold italic tracking-tight text-game-ink">
+                    <div className="grid min-h-12 grid-cols-[5rem_1fr] items-center gap-3 py-2">
+                      <span className="text-xs font-semibold text-game-muted">
+                        Artist
+                      </span>
+                      <p className="text-right text-sm font-semibold text-game-ink">
                         {selectedCard.card.artist}
                       </p>
                     </div>
@@ -830,18 +908,20 @@ export default function TcgExplorerPage({
           </div>
         )}
       </ResponsivePanel>
-    </div>
+    </DexPageShell>
   )
 }
 
 const TcgCardItem = memo(function TcgCardItem({
   card,
   entry,
+  slot,
   onClick,
 }: {
   card: TcgCard
   set: TcgSet
   entry?: { quantity: number }
+  slot: number
   onClick: () => void
 }) {
   const ownedQuantity = entry?.quantity ?? 0
@@ -855,11 +935,12 @@ const TcgCardItem = memo(function TcgCardItem({
       type="button"
       onClick={isOwned ? onClick : undefined}
       disabled={!isOwned}
-      aria-label={
-        isOwned
-          ? `View ${card.name} card ${card.number}`
-          : `${card.name} card ${card.number}, not owned`
-      }
+      aria-label={getTcgCardAccessibleLabel({
+        isOwned,
+        name: card.name,
+        number: card.number,
+        slot,
+      })}
       className={`game-focus-ring relative aspect-[240/330] w-full overflow-hidden rounded-sm border border-transparent transition-colors ${
         isOwned
           ? 'cursor-pointer hover:border-game-moss/45'
@@ -869,7 +950,7 @@ const TcgCardItem = memo(function TcgCardItem({
       {imageSrc && (
         <Image
           src={imageSrc}
-          alt={card.name}
+          alt={isOwned ? card.name : ''}
           fill
           sizes="(max-width: 640px) 25vw, (max-width: 1024px) 20vw, 15vw"
           className="object-contain"

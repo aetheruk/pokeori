@@ -55,6 +55,9 @@ export function TcgDecksPanel({
   const [cardsById, setCardsById] = useState<Map<string, TcgCard>>(
     () => new Map(),
   )
+  const [cardCatalogState, setCardCatalogState] = useState<
+    'idle' | 'loading' | 'error'
+  >('idle')
 
   const inventory = useMemo(
     () =>
@@ -117,8 +120,10 @@ export function TcgDecksPanel({
   useEffect(() => {
     if (activeDeck.length === 0) {
       setCardsById(new Map())
+      setCardCatalogState('idle')
       return
     }
+    setCardCatalogState('loading')
     const controller = new AbortController()
     const params = new URLSearchParams({
       v: APP_VERSION,
@@ -133,8 +138,12 @@ export function TcgDecksPanel({
         setCardsById(
           new Map((result.items || []).map(({ card }) => [card.id, card])),
         )
+        setCardCatalogState('idle')
       })
-      .catch(() => {})
+      .catch((error) => {
+        if (error instanceof DOMException && error.name === 'AbortError') return
+        setCardCatalogState('error')
+      })
     return () => controller.abort()
   }, [activeDeckKey])
   const activeCost = useMemo(() => {
@@ -277,7 +286,7 @@ export function TcgDecksPanel({
                   className="game-focus-ring group min-w-0 text-left"
                   onClick={() => removeCardFromDeck(cardId)}
                 >
-                  <div className="relative aspect-[2.5/3.5] overflow-hidden rounded-md border border-game-border bg-game-surface-raised shadow-sm transition-transform group-hover:-translate-y-0.5 group-hover:border-game-clay">
+                  <div className="relative aspect-[2.5/3.5] overflow-hidden rounded-md border border-game-border bg-game-surface-raised shadow-sm transition-colors group-hover:border-game-clay">
                     <Image
                       src={
                         card?.images.large ||
@@ -293,7 +302,7 @@ export function TcgDecksPanel({
                     <span className="absolute left-1 top-1 rounded bg-game-ink/85 px-1.5 py-0.5 text-[10px] font-bold text-game-cream">
                       {cardCost === null ? '…' : `Cost ${cardCost}`}
                     </span>
-                    <span className="absolute right-1 top-1 rounded-full bg-game-clay p-1 text-game-cream opacity-0 transition-opacity group-hover:opacity-100">
+                    <span className="absolute right-1 top-1 rounded-md bg-game-clay p-1 text-game-cream">
                       <X className="h-3 w-3" />
                     </span>
                   </div>
@@ -305,6 +314,25 @@ export function TcgDecksPanel({
             })
           )}
         </div>
+
+        {cardCatalogState === 'loading' && (
+          <p
+            className="text-xs text-game-muted"
+            role="status"
+            aria-live="polite"
+          >
+            Loading card details…
+          </p>
+        )}
+        {cardCatalogState === 'error' && (
+          <p
+            className="rounded-lg border border-game-danger/25 bg-game-danger/5 px-3 py-2 text-xs text-game-danger"
+            role="alert"
+          >
+            Card art and costs could not be loaded. You can still edit and save
+            this deck.
+          </p>
+        )}
 
         {activeValidation &&
           !activeValidation.valid &&

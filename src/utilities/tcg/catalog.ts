@@ -12,6 +12,8 @@ export type TcgCatalogItem = {
 export type TcgCatalogPage = {
   items: TcgCatalogItem[]
   total: number
+  /** Number of matching cards present in the current trainer's collection. */
+  ownedTotal: number
   nextCursor: string | null
 }
 
@@ -22,6 +24,7 @@ export type TcgCatalogQuery = {
   sampleSeed?: string
   rarities?: string[]
   pokemonId?: number
+  ownedCardIds?: string[]
   offset?: number
   limit?: number
 }
@@ -55,6 +58,7 @@ export async function getTcgCatalogPage({
   sampleSeed = '',
   rarities = [],
   pokemonId,
+  ownedCardIds = [],
   offset = 0,
   limit = 40,
 }: TcgCatalogQuery): Promise<TcgCatalogPage> {
@@ -71,7 +75,7 @@ export async function getTcgCatalogPage({
       : Array.from(new Set(setIds.filter((setId) => validSetIds.has(setId))))
 
   if (requestedSetIds.length === 0) {
-    return { items: [], total: 0, nextCursor: null }
+    return { items: [], total: 0, ownedTotal: 0, nextCursor: null }
   }
 
   const sets = (
@@ -81,20 +85,27 @@ export async function getTcgCatalogPage({
   const raritySet = new Set(rarities)
   const hasPokemonId = Number.isInteger(pokemonId) && (pokemonId || 0) > 0
   const matches: TcgCatalogItem[] = []
+  const ownedIds = new Set(ownedCardIds)
 
   for (const set of sets) {
     const setSummary = compactSet(set)
     for (const card of set.cards) {
       if (requestedCardIds.size > 0 && !requestedCardIds.has(card.id)) continue
-      if (raritySet.size > 0 && (!card.rarity || !raritySet.has(card.rarity))) continue
-      if (hasPokemonId && !card.nationalPokedexNumbers.includes(pokemonId as number)) continue
+      if (raritySet.size > 0 && (!card.rarity || !raritySet.has(card.rarity)))
+        continue
+      if (
+        hasPokemonId &&
+        !card.nationalPokedexNumbers.includes(pokemonId as number)
+      )
+        continue
       if (
         !hasPokemonId &&
         normalizedQuery &&
         ![card.name, card.id, card.number].some((value) =>
           value?.toLowerCase().includes(normalizedQuery),
         )
-      ) continue
+      )
+        continue
       matches.push({ card, set: setSummary })
     }
   }
@@ -112,6 +123,10 @@ export async function getTcgCatalogPage({
   return {
     items,
     total: matches.length,
+    ownedTotal: matches.reduce(
+      (count, item) => count + (ownedIds.has(item.card.id) ? 1 : 0),
+      0,
+    ),
     nextCursor: nextOffset < matches.length ? String(nextOffset) : null,
   }
 }

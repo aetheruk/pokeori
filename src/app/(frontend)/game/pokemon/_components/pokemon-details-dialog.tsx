@@ -1756,49 +1756,57 @@ export function PokemonDetailsDialog({
                             })
                           : null
 
-                        return (
+                        const assignmentAction = (
+                          <Button
+                            key={`assignment-${move.id}`}
+                            type="button"
+                            variant={selected ? 'secondary' : 'outline'}
+                            onClick={() => handleToggleMoveAssignment(move.id)}
+                            disabled={disabled}
+                            aria-pressed={selected}
+                            aria-label={
+                              selected
+                                ? `Remove ${move.name} from assigned moves`
+                                : disabled
+                                  ? `No open move slot for ${move.name}`
+                                  : `Assign ${move.name}`
+                            }
+                            className="min-h-11 px-3"
+                          >
+                            {selected ? (
+                              <>
+                                <Check aria-hidden="true" /> Assigned
+                              </>
+                            ) : disabled ? (
+                              'Slots full'
+                            ) : (
+                              'Assign'
+                            )}
+                          </Button>
+                        )
+
+                        return presentation ? (
+                          <MoveCompactRow
+                            key={move.id}
+                            presentation={presentation}
+                            density="tight"
+                            detailsText="Info"
+                            onDetails={() => setMoveDetail(fullMove ?? null)}
+                            primaryAction={assignmentAction}
+                            className={cn(
+                              'transition-colors',
+                              selected && 'border-game-moss bg-game-moss/10',
+                            )}
+                          />
+                        ) : (
                           <div
                             key={move.id}
-                            className={cn(
-                              'rounded-xl border p-2 transition-colors',
-                              selected
-                                ? 'border-game-moss bg-game-moss/10'
-                                : 'border-game-border bg-game-surface-raised',
-                            )}
+                            className="game-panel flex items-center justify-between gap-2 p-3"
                           >
-                            {presentation ? (
-                              <MoveCompactRow
-                                presentation={presentation}
-                                onDetails={() =>
-                                  setMoveDetail(fullMove ?? null)
-                                }
-                                className="border-0 bg-transparent shadow-none"
-                              />
-                            ) : (
-                              <p className="p-2 text-sm font-bold text-game-ink">
-                                {move.name}
-                              </p>
-                            )}
-                            <Button
-                              type="button"
-                              variant={selected ? 'secondary' : 'outline'}
-                              onClick={() =>
-                                handleToggleMoveAssignment(move.id)
-                              }
-                              disabled={disabled}
-                              aria-pressed={selected}
-                              className="mt-2 min-h-11 w-full"
-                            >
-                              {selected ? (
-                                <>
-                                  <Check aria-hidden="true" /> Assigned
-                                </>
-                              ) : disabled ? (
-                                'Move slots full'
-                              ) : (
-                                'Assign move'
-                              )}
-                            </Button>
+                            <p className="min-w-0 truncate text-sm font-bold text-game-ink">
+                              {move.name}
+                            </p>
+                            {assignmentAction}
                           </div>
                         )
                       })}

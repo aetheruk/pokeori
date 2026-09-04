@@ -1,15 +1,6 @@
 'use client'
 
-import {
-  Clock,
-  Loader2,
-  Sword,
-  Trophy,
-  UserMinus,
-  UserPlus,
-  Zap,
-} from 'lucide-react'
-import Image from 'next/image'
+import { Clock, Loader2, UserMinus, UserPlus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -18,7 +9,7 @@ import {
   sendFriendRequest,
 } from '@/app/(frontend)/game/trainer/friend-actions'
 import { TrainerCard } from '@/components/game/battles/TrainerCard'
-import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
+import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,23 +21,15 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import {
-  Carousel,
-  type CarouselApi,
-  CarouselContent,
-  CarouselItem,
-} from '@/components/ui/carousel'
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
-import { ItemSprite } from '@/components/ui/item-sprite'
-import { Progress } from '@/components/ui/progress'
+import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
 import { getTotalExpForLevel, skills } from '@/data/skills'
-import { getIcon, getTitle } from '@/data/user'
 import { cn } from '@/lib/utils'
+import type { PublicTrainerSummary } from './types'
 
 interface TrainerModalProps {
-  trainer: any | null
+  trainer: PublicTrainerSummary | null
   open: boolean
   onOpenChange: (open: boolean) => void
 }
@@ -57,57 +40,49 @@ export function TrainerModal({
   onOpenChange,
 }: TrainerModalProps) {
   const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
-  const { user } = useUser()
-  const [api, setApi] = useState<CarouselApi>()
-
-  useEffect(() => {
-    if (!api) {
-      return
-    }
-
-    const intervalId = setInterval(() => {
-      api.scrollNext()
-    }, 3000)
-
-    return () => clearInterval(intervalId)
-  }, [api])
-
-  /* State for optimistic UI updates */
   const [friendStatus, setFriendStatus] = useState<
     'none' | 'pending' | 'friend'
   >('none')
+  const [showRemoveConfirmation, setShowRemoveConfirmation] = useState(false)
+  const router = useRouter()
+  const { user } = useUser()
 
-  // Initialize status from props
   useEffect(() => {
-    if (trainer) {
-      if (trainer.isFriend) setFriendStatus('friend')
-      else if (trainer.hasPendingRequest) setFriendStatus('pending')
-      else setFriendStatus('none')
-    }
+    if (!trainer) return
+    setFriendStatus(
+      trainer.isFriend
+        ? 'friend'
+        : trainer.hasPendingRequest
+          ? 'pending'
+          : 'none',
+    )
   }, [trainer])
 
-  const [showRemoveConfirmation, setShowRemoveConfirmation] = useState(false)
+  if (!trainer) return null
+  const isSelf = user?.id === trainer.id
 
   const handleFriendAction = async () => {
     if (friendStatus === 'friend') {
       setShowRemoveConfirmation(true)
-    } else if (friendStatus === 'none') {
-      setIsLoading(true)
-      try {
-        const result = await sendFriendRequest(trainer.id)
-        if (result.success) {
-          setFriendStatus('pending')
-          toast.success('Friend request sent!')
-          router.refresh()
-        } else {
-          toast.error(result.error || 'Failed to send request')
-        }
-      } catch (error) {
-        toast.error('An error occurred')
-      } finally {
-        setIsLoading(false)
+      return
+    }
+    if (friendStatus !== 'none') return
+    setIsLoading(true)
+    try {
+      const result = await sendFriendRequest(trainer.id)
+      if (!result.success) {
+        toast.error(result.error || 'Friend request could not be sent')
+        return
       }
+      setFriendStatus('pending')
+      toast.success('Friend request sent')
+      router.refresh()
+    } catch {
+      toast.error(
+        'Friend request could not be sent. Check your connection and try again.',
+      )
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -115,294 +90,214 @@ export function TrainerModal({
     setIsLoading(true)
     try {
       const result = await removeFriend(trainer.id)
-      if (result.success) {
-        setFriendStatus('none')
-        toast.success('Friend removed')
-        router.refresh()
-        onOpenChange(false)
-      } else {
-        toast.error(result.error || 'Failed to remove friend')
+      if (!result.success) {
+        toast.error(result.error || 'Friend could not be removed')
+        return
       }
-    } catch (error) {
-      toast.error('An error occurred')
+      setFriendStatus('none')
+      toast.success('Friend removed')
+      router.refresh()
+      onOpenChange(false)
+    } catch {
+      toast.error(
+        'Friend could not be removed. Check your connection and try again.',
+      )
     } finally {
       setIsLoading(false)
       setShowRemoveConfirmation(false)
     }
   }
 
-  if (!trainer) return null
-
-  const isSelf = user?.id === trainer.id
-
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90dvh] overflow-hidden p-0 sm:max-w-md">
-        <DialogTitle className="sr-only">
-          {trainer.trainerName
-            ? `${trainer.trainerName} Trainer Profile`
-            : 'Trainer Profile'}
-        </DialogTitle>
-        <div className="relative flex h-full flex-col overflow-y-auto bg-game-canvas p-5 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-game-border md:p-6">
-          <div className="space-y-10 relative z-10">
-            <div className="relative group">
-              <TrainerCard
-                name={trainer.trainerName}
-                icon={trainer.icon}
-                banner={trainer.banner}
-                title={trainer.title}
-                className="relative z-10 aspect-[8/5] h-auto w-full border border-game-border"
-              />
-            </div>
+    <>
+      <ResponsivePanel
+        open={open}
+        onOpenChange={onOpenChange}
+        title={`${trainer.trainerName}'s field note`}
+        description="Public trainer profile"
+        desktopWidth="min(40vw, 560px)"
+        desktopBreakpoint="lg"
+        className="overflow-hidden"
+      >
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-5 pt-4 sm:px-5">
+          <TrainerCard
+            name={trainer.trainerName}
+            icon={trainer.icon}
+            banner={trainer.banner}
+            title={trainer.title}
+            className="h-44 w-full rounded-lg"
+          />
 
-            {/* Stats Grid */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Trophy className="w-4 h-4 text-game-ochre" />
-                <SectionDivider>Stats</SectionDivider>
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  {
-                    label: 'TCG Cards',
-                    value: trainer.stats.uniqueCards,
-                    icon: <Zap className="w-3 h-3" />,
-                  },
-                  {
-                    label: 'Seen',
-                    value: trainer.stats.pokedexSeen,
-                    icon: <Clock className="w-3 h-3" />,
-                  },
-                  {
-                    label: 'Caught',
-                    value: trainer.stats.pokedexCaught,
-                    icon: <Trophy className="w-3 h-3" />,
-                  },
-                ].map((stat, i) => (
-                  <div key={i} className="relative group/stat">
-                    <div className="relative z-10 rounded-xl border border-game-border bg-game-surface-raised p-4 text-center transition-colors group-hover:border-game-moss/45">
-                      <div className="text-2xl font-black tracking-tighter text-game-ink">
-                        {stat.value}
-                      </div>
-                      <div className="mt-1 flex items-center justify-center gap-1 text-[10px] font-black uppercase tracking-[0.08em] text-game-muted">
-                        {stat.icon}
-                        {stat.label}
-                      </div>
+          <SectionDivider className="my-5">Trainer record</SectionDivider>
+          <div className="grid grid-cols-3 divide-x divide-game-border rounded-lg border border-game-border bg-game-surface">
+            <ProfileMetric label="Cards" value={trainer.stats.uniqueCards} />
+            <ProfileMetric label="Seen" value={trainer.stats.pokedexSeen} />
+            <ProfileMetric label="Caught" value={trainer.stats.pokedexCaught} />
+          </div>
+
+          <SectionDivider className="my-5">Battle team</SectionDivider>
+          {trainer.battleTeam.length === 0 ? (
+            <p className="rounded-lg border border-dashed border-game-border bg-game-surface px-4 py-6 text-center text-sm text-game-muted">
+              No public battle team is currently assigned.
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {trainer.battleTeam.slice(0, 6).map((pokemon) => (
+                <div
+                  key={`${pokemon.position}-${pokemon.formId}`}
+                  className="flex min-w-0 items-center gap-2 rounded-lg border border-game-border bg-game-surface p-2"
+                >
+                  <PokemonRaritySprite
+                    formId={pokemon.formId}
+                    view="home"
+                    rarity={pokemon.rarity}
+                    alt={pokemon.name}
+                    className="h-11 w-11 shrink-0"
+                    sizes="44px"
+                  />
+                  <div className="min-w-0">
+                    <p className="truncate text-xs font-semibold text-game-ink">
+                      {pokemon.name}
+                    </p>
+                    <p className="font-mono text-[11px] text-game-muted">
+                      Lv. {pokemon.level}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <SectionDivider className="my-5">Skills</SectionDivider>
+          <div className="divide-y divide-game-border overflow-hidden rounded-lg border border-game-border bg-game-surface">
+            {skills.map((skill) => {
+              const skillData =
+                trainer.skills?.[
+                  skill.id as keyof NonNullable<PublicTrainerSummary['skills']>
+                ]
+              const level = skillData?.level || 1
+              const exp = skillData?.exp || 0
+              const current = getTotalExpForLevel(level)
+              const next = getTotalExpForLevel(level + 1)
+              const progress =
+                next > current
+                  ? Math.max(
+                      0,
+                      Math.min(100, ((exp - current) / (next - current)) * 100),
+                    )
+                  : 100
+              return (
+                <div
+                  key={skill.id}
+                  className="grid min-h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-3 py-2"
+                >
+                  <div className="min-w-0">
+                    <div className="flex items-center justify-between gap-3 text-xs">
+                      <span className="truncate font-semibold text-game-ink">
+                        {skill.name}
+                      </span>
+                      <span className="shrink-0 font-mono text-game-moss-strong">
+                        Rank {level}
+                      </span>
+                    </div>
+                    <div
+                      className="mt-2 h-1.5 overflow-hidden rounded-full border border-game-border bg-game-canvas"
+                      role="progressbar"
+                      aria-label={`${skill.name} rank progress`}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-valuenow={Math.round(progress)}
+                    >
+                      <div
+                        className="h-full bg-game-ochre motion-reduce:transition-none"
+                        style={{ width: `${progress}%` }}
+                      />
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Battle Team Slots */}
-            {trainer.battleTeam && trainer.battleTeam.length > 0 && (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Sword className="w-4 h-4 text-game-moss-strong" />
-                  <SectionDivider>Battle Formation</SectionDivider>
+                  <span className="font-mono text-[11px] text-game-muted">
+                    {exp.toLocaleString()} XP
+                  </span>
                 </div>
-                <div className="grid grid-cols-3 gap-3">
-                  {trainer.battleTeam
-                    .slice(0, 6)
-                    .map((pokemonId: string, index: number) => (
-                      <div
-                        key={index}
-                        className="group/slot flex aspect-square cursor-help flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-game-border bg-game-surface transition-colors hover:border-game-moss/35 hover:bg-game-surface-raised"
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full border border-game-border bg-game-canvas">
-                          <Sword className="h-4 w-4 text-game-muted transition-colors group-hover/slot:text-game-moss" />
-                        </div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.08em] text-game-muted">
-                          Slot {index + 1}
-                        </span>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            )}
-
-            {/* Skills Carousel */}
-            <div className="space-y-4 min-w-0">
-              <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-game-ochre" />
-                <SectionDivider>Skills</SectionDivider>
-              </div>
-              <Carousel
-                opts={{
-                  align: 'start',
-                  loop: true,
-                }}
-                setApi={setApi}
-                className="w-full max-w-full"
-              >
-                <CarouselContent>
-                  {skills.map((skill) => {
-                    const skillData = trainer.skills?.[skill.id] || {
-                      level: 1,
-                      exp: 0,
-                    }
-                    const level = skillData.level || 1
-                    const exp = skillData.exp || 0
-                    const nextLevelExp = getTotalExpForLevel(level + 1)
-                    const currentLevelExp = getTotalExpForLevel(level)
-                    const progress =
-                      nextLevelExp > currentLevelExp
-                        ? ((exp - currentLevelExp) /
-                            (nextLevelExp - currentLevelExp)) *
-                          100
-                        : 100
-
-                    return (
-                      <CarouselItem
-                        key={skill.id}
-                        className="basis-full min-w-0"
-                      >
-                        <div className="group relative flex items-center gap-5 overflow-hidden rounded-xl border border-game-border bg-game-surface-raised p-5">
-                          <div className="relative">
-                            <div className="relative z-10 flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-game-border bg-game-surface">
-                              {skill.iconId ? (
-                                skill.iconId.match(
-                                  /\.(?:avif|png|webp|jpe?g)$/,
-                                ) ? (
-                                  <Image
-                                    src={`/fallback/skills/${skill.iconId}`}
-                                    alt={skill.name}
-                                    width={32}
-                                    height={32}
-                                    className="w-8 h-8 object-contain"
-                                  />
-                                ) : (
-                                  <ItemSprite
-                                    itemId={skill.iconId}
-                                    alt={skill.name}
-                                    width={32}
-                                    height={32}
-                                    className="w-8 h-8 object-contain"
-                                  />
-                                )
-                              ) : null}
-                            </div>
-                          </div>
-
-                          <div className="flex flex-col flex-1 min-w-0 gap-3">
-                            <div className="flex items-center justify-between px-1">
-                              <span className="text-sm font-black uppercase tracking-wider text-game-ink">
-                                {skill.name}
-                              </span>
-                              <div className="flex items-baseline gap-1">
-                                <span className="text-[10px] font-black uppercase text-game-muted">
-                                  Rank
-                                </span>
-                                <span className="text-xl font-black tracking-tighter text-game-moss-strong">
-                                  {level}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="relative">
-                              <div className="h-2 overflow-hidden rounded-full border border-game-border bg-game-canvas">
-                                <div
-                                  className="h-full bg-game-ochre transition-all duration-1000"
-                                  style={{
-                                    width: `${Math.min(progress, 100)}%`,
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </CarouselItem>
-                    )
-                  })}
-                </CarouselContent>
-              </Carousel>
-            </div>
-
-            {/* Confirmation Dialog */}
-            <AlertDialog
-              open={showRemoveConfirmation}
-              onOpenChange={setShowRemoveConfirmation}
-            >
-              <AlertDialogContent className="border-game-border bg-game-surface p-6">
-                <AlertDialogHeader>
-                  <AlertDialogTitle className="font-display text-2xl font-black tracking-tighter text-game-ink">
-                    Remove friend?
-                  </AlertDialogTitle>
-                  <AlertDialogDescription className="font-medium text-game-muted">
-                    Remove{' '}
-                    <span className="font-bold text-game-ink">
-                      {trainer.trainerName}
-                    </span>{' '}
-                    from your friends list?
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter className="gap-3 mt-6">
-                  <AlertDialogCancel
-                    disabled={isLoading}
-                    className="h-11 border-game-border bg-game-surface-raised text-game-ink hover:bg-game-moss/10"
-                  >
-                    Return
-                  </AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={(e) => {
-                      e.preventDefault()
-                      handleRemoveFriend()
-                    }}
-                    disabled={isLoading}
-                    aria-busy={isLoading}
-                    className="h-11 bg-game-clay text-game-cream hover:bg-game-clay/90"
-                  >
-                    {isLoading ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : (
-                      'Remove friend'
-                    )}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-
-            {/* Friend Action Button */}
-            {!isSelf && (
-              <Button
-                onClick={handleFriendAction}
-                disabled={isLoading || friendStatus === 'pending'}
-                aria-busy={isLoading}
-                className={cn(
-                  'h-11 w-full',
-                  friendStatus === 'friend'
-                    ? 'border border-game-border bg-game-surface text-game-muted hover:border-game-danger/40 hover:bg-game-danger/10 hover:text-game-danger'
-                    : friendStatus === 'pending'
-                      ? 'cursor-not-allowed border border-game-border bg-game-surface text-game-muted'
-                      : 'bg-game-clay text-game-cream hover:bg-game-clay/90',
-                )}
-              >
-                <div className="relative z-10 flex items-center justify-center gap-2">
-                  {friendStatus === 'friend' ? (
-                    <>
-                      <UserMinus className="h-5 w-5" />
-                      Remove Friend
-                    </>
-                  ) : friendStatus === 'pending' ? (
-                    <>
-                      <Clock className="w-5 h-5" />
-                      Friend request pending
-                    </>
-                  ) : (
-                    <>
-                      {isLoading ? (
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                      ) : (
-                        <UserPlus className="h-5 w-5" />
-                      )}
-                      Add friend
-                    </>
-                  )}
-                </div>
-              </Button>
-            )}
+              )
+            })}
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+
+        {!isSelf && (
+          <div className="shrink-0 border-t border-game-border bg-game-surface px-4 py-3 sm:px-5">
+            <Button
+              type="button"
+              onClick={handleFriendAction}
+              disabled={isLoading || friendStatus === 'pending'}
+              aria-busy={isLoading}
+              className={cn(
+                'min-h-11 w-full',
+                friendStatus === 'friend' &&
+                  'border border-game-border bg-game-surface-raised text-game-muted hover:border-game-danger/40 hover:bg-game-danger/10 hover:text-game-danger',
+              )}
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none" />
+              ) : friendStatus === 'friend' ? (
+                <UserMinus className="h-4 w-4" />
+              ) : friendStatus === 'pending' ? (
+                <Clock className="h-4 w-4" />
+              ) : (
+                <UserPlus className="h-4 w-4" />
+              )}
+              {friendStatus === 'friend'
+                ? 'Remove friend'
+                : friendStatus === 'pending'
+                  ? 'Friend request pending'
+                  : 'Add friend'}
+            </Button>
+          </div>
+        )}
+      </ResponsivePanel>
+
+      <AlertDialog
+        open={showRemoveConfirmation}
+        onOpenChange={setShowRemoveConfirmation}
+      >
+        <AlertDialogContent className="border-game-border bg-game-surface">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-display text-xl text-game-ink">
+              Remove friend?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-game-muted">
+              Remove {trainer.trainerName} from your friends list?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isLoading}>
+              Keep friend
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(event) => {
+                event.preventDefault()
+                void handleRemoveFriend()
+              }}
+              disabled={isLoading}
+              className="bg-game-clay text-game-cream"
+            >
+              Remove friend
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  )
+}
+
+function ProfileMetric({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="min-w-0 px-2 py-3 text-center">
+      <p className="font-mono text-lg font-bold text-game-ink">
+        {value.toLocaleString()}
+      </p>
+      <p className="truncate text-[11px] font-semibold uppercase tracking-[0.08em] text-game-muted">
+        {label}
+      </p>
+    </div>
   )
 }

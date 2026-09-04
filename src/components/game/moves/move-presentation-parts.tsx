@@ -13,20 +13,28 @@ import type {
 export function MoveIdentity({
   presentation,
   compact = false,
+  stackSource = false,
 }: {
   presentation: MovePresentation
   compact?: boolean
+  stackSource?: boolean
 }) {
   const stance = presentation.identity.stance
   const type = presentation.identity.type
 
   return (
     <div className="min-w-0">
-      <div className="flex min-w-0 items-center gap-2">
+      <div
+        className={cn(
+          'flex min-w-0 gap-2',
+          stackSource ? 'flex-col items-start gap-0' : 'items-center',
+        )}
+      >
         <h3
           className={cn(
             'truncate font-display font-bold text-game-ink',
             compact ? 'text-sm' : 'text-lg',
+            stackSource && 'w-full',
           )}
         >
           {presentation.identity.name}
@@ -61,9 +69,11 @@ export function MoveIdentity({
 export function MoveMetrics({
   presentation,
   compact = false,
+  inline = false,
 }: {
   presentation: MovePresentation
   compact?: boolean
+  inline?: boolean
 }) {
   const metrics = [
     presentation.essentials.power,
@@ -75,23 +85,41 @@ export function MoveMetrics({
   return (
     <dl
       className={cn(
-        'grid gap-px overflow-hidden rounded-lg border border-game-border bg-game-border',
-        compact
-          ? 'grid-cols-2'
-          : metrics.length >= 4
-            ? 'grid-cols-2 sm:grid-cols-4'
-            : 'grid-cols-2 sm:grid-cols-3',
+        inline
+          ? 'flex flex-wrap items-baseline gap-x-3 gap-y-1'
+          : 'grid gap-px overflow-hidden rounded-lg border border-game-border bg-game-border',
+        !inline &&
+          (compact
+            ? 'grid-cols-2'
+            : metrics.length >= 4
+              ? 'grid-cols-2 sm:grid-cols-4'
+              : 'grid-cols-2 sm:grid-cols-3'),
       )}
     >
       {metrics.map((metric) => (
         <div
           key={metric.label}
-          className="min-w-0 bg-game-surface-raised px-2.5 py-2"
+          className={cn(
+            'min-w-0',
+            inline
+              ? 'flex items-baseline gap-1'
+              : 'bg-game-surface-raised px-2.5 py-2',
+          )}
         >
-          <dt className="text-[0.65rem] font-bold uppercase tracking-[0.06em] text-game-muted">
+          <dt
+            className={cn(
+              'font-bold uppercase tracking-[0.06em] text-game-muted',
+              inline ? 'text-[0.6rem]' : 'text-[0.65rem]',
+            )}
+          >
             {metric.label}
           </dt>
-          <dd className="mt-0.5 break-words font-mono text-sm font-bold text-game-ink">
+          <dd
+            className={cn(
+              'break-words font-mono font-bold text-game-ink',
+              inline ? 'text-xs' : 'mt-0.5 text-sm',
+            )}
+          >
             {metric.value}
           </dd>
         </div>

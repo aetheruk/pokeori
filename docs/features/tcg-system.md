@@ -43,9 +43,11 @@ Card ownership is stored in normalized `user-tcg-cards` rows, each containing a 
 
 ## Catalog Delivery
 
-The browser no longer downloads the complete authored TCG catalog with the game bundle. The trainer TCG screen loads compact set summaries first, then requests cards from `/api/game/catalog/tcg` in bounded pages. Deck cards are resolved by ID through the same endpoint.
+The browser no longer downloads the complete authored TCG catalog with the game bundle. The Carddex loads compact set summaries first, then requests cards from `/api/game/catalog/tcg` in bounded pages. Deck cards are resolved by ID through the same authenticated endpoint.
 
-Catalog responses are versioned with the application release, cached privately in the browser, and cacheable at the shared edge for immutable release URLs. Search results and set pagination are bounded to keep response size and rendering work predictable.
+TCG catalog responses are versioned with the application release and privately returned without shared caching because they include `ownedTotal`, the authenticated trainer's ownership count across the complete matching query. That count remains stable as cursor pages append. Search results and set pagination are bounded to keep response size and rendering work predictable, while uncollected cards use discovery-safe visual and accessible labels.
+
+The Carddex preserves an artwork-first index and opens owned cards in a responsive field note. Desktop notes pair the card with compact metadata and collection/deck actions; touch layouts stack the same information. Pokémon autocomplete follows combobox/listbox keyboard behavior, including arrow navigation, Enter selection, and Escape dismissal.
 
 ## TCG Battle
 - Decks require exactly 15 unique owned Pokemon cards with HP, type, image, and attacks.
