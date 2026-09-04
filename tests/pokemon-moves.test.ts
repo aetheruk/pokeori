@@ -107,6 +107,30 @@ describe('pokemon move assignment helpers', () => {
     ).toBeUndefined()
   })
 
+  test('Sketch can copy a move from a wild Pokemon AI loadout', () => {
+    const smeargle = makeBattlePokemon({
+      formId: '235',
+      speciesId: 235,
+      name: 'Smeargle',
+      types: ['Normal'],
+    })
+    const wildOpponent = makeBattlePokemon({
+      aiMoveLoadout: ['thunderbolt'],
+    })
+
+    expect(getSketchableOpponentMoveIds(wildOpponent)).toEqual(['thunderbolt'])
+    expect(
+      attemptSmeargleSketch({
+        attacker: smeargle,
+        opponent: wildOpponent,
+        random: (() => {
+          const rolls = [0.1, 0]
+          return () => rolls.shift() ?? 0
+        })(),
+      }),
+    ).toBe('thunderbolt')
+  })
+
   test('universal stat-contest moves exclude Ditto, Smeargle, and every Unown form', () => {
     const universalMoveIds = [
       'quick-attack',

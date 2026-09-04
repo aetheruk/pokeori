@@ -1416,7 +1416,7 @@ function generatedOpponentStatusMoveChance(
   profile: BattleAiProfileId | undefined,
   isWildBattle: boolean | undefined,
 ): number {
-  if (isWildBattle || profile === 'wild') return 0
+  if (isWildBattle || profile === 'wild') return 10
 
   switch (profile ?? 'trainer') {
     case 'trainer':

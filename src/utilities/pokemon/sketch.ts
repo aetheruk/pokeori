@@ -7,9 +7,14 @@ export const SKETCH_MOVE_ID = 'sketch'
 export const SMEARGLE_SKETCH_CHANCE = 0.25
 
 function normalizeBattleMoveIds(pokemon: BattlePokemon): string[] {
-  const source = Array.isArray(pokemon.battleMoveIds)
-    ? pokemon.battleMoveIds
-    : pokemon.assignedMoves?.map((entry) => entry.moveId)
+  const source =
+    pokemon.battleMoveIds?.length
+      ? pokemon.battleMoveIds
+      : pokemon.aiMoveLoadout?.length
+        ? pokemon.aiMoveLoadout
+        : pokemon.aiMoves?.length
+          ? pokemon.aiMoves
+          : pokemon.assignedMoves?.map((entry) => entry.moveId)
 
   if (!Array.isArray(source)) return []
 
