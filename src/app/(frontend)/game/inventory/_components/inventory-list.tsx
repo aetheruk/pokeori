@@ -805,7 +805,7 @@ export function InventoryList() {
     <div className="game-paper-first game-paper-background flex flex-col h-full overflow-hidden bg-game-canvas text-game-ink">
       <PremiumHeader title="INVENTORY" subtitle="Storage" />
 
-      <div className="hidden items-center gap-3 border-b border-game-border bg-game-surface/70 px-6 py-3 xl:flex">
+      <div className="hidden items-center gap-3 border-b border-game-border bg-game-surface/70 px-6 py-3 lg:flex">
         <div className="min-w-0 flex-1">
           <PremiumSearch
             value={searchQuery}
@@ -815,7 +815,7 @@ export function InventoryList() {
             placeholder="Search items"
           />
         </div>
-        <div className="w-64 shrink-0">
+        <div className="w-52 shrink-0 xl:w-64">
           <PremiumSelect
             value={activeGroup || ''}
             onValueChange={(value) =>
@@ -827,6 +827,21 @@ export function InventoryList() {
             }))}
           />
         </div>
+        {subCategories.length > 1 && (
+          <div className="w-52 shrink-0 xl:w-64">
+            <PremiumSelect
+              value={activeSubCategory || ''}
+              onValueChange={(value) =>
+                setActiveSubCategory(value as InventoryDisplaySubCategory)
+              }
+              placeholder="Select subcategory"
+              options={subCategories.map((subCategory) => ({
+                id: subCategory,
+                label: getInventorySubCategoryLabel(subCategory),
+              }))}
+            />
+          </div>
+        )}
       </div>
 
       {/* Main Content - Scrollable with padding */}
@@ -912,7 +927,7 @@ export function InventoryList() {
         )}
       </div>
 
-      <SecondaryControlBar className="xl:hidden">
+      <SecondaryControlBar className="lg:hidden">
         <div className="grid grid-cols-[minmax(0,1fr)_minmax(8rem,0.55fr)] gap-2">
           <PremiumSearch
             value={searchQuery}
