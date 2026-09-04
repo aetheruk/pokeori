@@ -26759,22 +26759,6 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
     ],
   },
   {
-    id: 'sing',
-    name: 'Sing',
-    description: 'A soothing song puts the target to sleep.',
-    stance: 'tech',
-    target: 'enemy',
-    forcedType: 'normal',
-    damage: 0,
-    accuracy: 55,
-    status: {
-      id: 'sleep',
-      chance: 100,
-      target: 'enemy',
-    },
-    level: 12,
-  },
-  {
     id: 'sketch',
     name: 'Sketch',
     description: "The user studies one of the target's battle moves. It has a 25% chance to permanently copy that move for every Smeargle on the account.",
