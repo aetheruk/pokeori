@@ -207,6 +207,41 @@ describe('PVP turn engine helpers', () => {
     )
   })
 
+  test('Sketch reports an exhausted opposing move pool before its chance result', async () => {
+    const state = makeBattleState()
+    state.playerTeam[0] = makePokemon({
+      id: 'player-smeargle',
+      user: 'player',
+      speciesId: 235,
+      formId: '235',
+      name: 'Smeargle',
+      types: ['Normal'],
+      battleMoveIds: ['sketch'],
+    })
+    state.enemyTeam[0].battleMoveIds = ['thunderbolt']
+    state.pendingSketchedMoves = [
+      {
+        id: 'thunderbolt',
+        name: 'Thunderbolt',
+        userId: 'player',
+        attackerName: 'Smeargle',
+      },
+    ]
+
+    await resolvePvpTurn(
+      state,
+      { stance: 'tech', specialMoveId: 'sketch' },
+      { stance: 'power', attackType: 'normal' },
+      { persist: false, random: () => 0 },
+    )
+
+    expect(state.history[0]?.message).toContain(
+      'Enemy One has no new move that can be sketched.',
+    )
+    expect(state.history[0]?.message).not.toContain('failed to capture a move')
+    expect(state.history[0]?.message).not.toContain('found no new move')
+  })
+
   test('initial powers default to trained move uses and one use per power system', () => {
     const powers = createInitialPowersState()
 

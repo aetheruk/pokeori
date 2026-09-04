@@ -14,3 +14,7 @@ export {
   MoveFieldNote,
   type MoveFieldNoteProps,
 } from './move-field-note'
+export {
+  MoveLoadoutWorkspace,
+  type MoveLoadoutWorkspaceProps,
+} from './move-loadout-workspace'

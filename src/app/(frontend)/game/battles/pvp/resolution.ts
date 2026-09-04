@@ -73,6 +73,7 @@ import {
 import { processTerrainTurnEffects } from '@/utilities/battle/terrain-effects'
 import {
   attemptSmeargleSketch,
+  getAvailableSketchMoveIds,
   getSketchableOpponentMoveIds,
   SKETCH_MOVE_ID,
 } from '@/utilities/pokemon/sketch'
@@ -595,6 +596,15 @@ export async function resolvePvpTurn(
         continue
       }
 
+      const availableSketchMoveIds = getAvailableSketchMoveIds(
+        attempt.opponent,
+        [...knownMoveIds],
+      )
+      if (availableSketchMoveIds.length === 0) {
+        logMessage += `\n${attempt.opponent.name} has no new move that can be sketched.`
+        continue
+      }
+
       const sketchedMoveId = attemptSmeargleSketch({
         attacker: attempt.attacker,
         opponent: attempt.opponent,
@@ -604,8 +614,6 @@ export async function resolvePvpTurn(
 
       if (!sketchedMoveId) {
         logMessage += `\n${attempt.attacker.name}'s Sketch failed to capture a move.`
-      } else if (knownMoveIds.has(sketchedMoveId)) {
-        logMessage += `\n${attempt.attacker.name}'s Sketch found no new move.`
       } else {
         const sketchedMove = getMove(sketchedMoveId)
         const sketchedMoveName = sketchedMove?.name || sketchedMoveId
