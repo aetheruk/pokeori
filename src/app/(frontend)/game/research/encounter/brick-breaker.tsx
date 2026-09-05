@@ -473,7 +473,11 @@ export function BrickBreakerGame({
         ref={stageRef}
         role="application"
         aria-label="Brick Breaker. Drag or use Left and Right to move. Tap or press Space to launch."
-        className="relative z-10 mx-auto h-full w-full max-w-[calc(100dvh*0.609375)] touch-none overflow-hidden select-none"
+        className="absolute left-1/2 top-1/2 z-10 w-full -translate-x-1/2 -translate-y-1/2 touch-none overflow-hidden select-none"
+        style={{
+          aspectRatio: `${width} / ${height}`,
+          maxWidth: `${(width / height) * 100}dvh`,
+        }}
         onPointerDown={(event) => {
           event.currentTarget.setPointerCapture(event.pointerId)
           movePaddleToPointer(event)
@@ -495,25 +499,30 @@ export function BrickBreakerGame({
             <div
               key={brick.id}
               aria-hidden
-              className={`absolute overflow-hidden border shadow-[inset_0_2px_4px_rgba(255,255,255,0.38),0_3px_5px_rgba(18,26,23,0.45)] ${brick.indestructible ? 'border-[#777269] bg-[#414945]' : brick.durability >= 3 ? 'border-[#f0b96e] bg-[#b56342]' : brick.durability === 2 ? 'border-[#dfc071] bg-[#9a7643]' : 'border-[#b8d09c] bg-[#617b52]'}`}
+              className={`absolute flex items-center justify-center overflow-hidden border shadow-[inset_2px_2px_4px_rgba(255,255,255,0.3),inset_-2px_-2px_4px_rgba(0,0,0,0.3),0_2px_4px_rgba(0,0,0,0.3)] ${brick.indestructible ? 'border-[#8a857b]' : brick.durability >= 3 ? 'border-[#f0b96e]' : brick.durability === 2 ? 'border-[#dfc071]' : 'border-[#b8d09c]'}`}
               style={{
                 left: `${(brick.x / width) * 100}%`,
                 top: `${(brick.y / height) * 100}%`,
                 width: `${(brick.width / width) * 100}%`,
-                height: `${(brick.height / height) * 100}%`,
+                aspectRatio: '1 / 1',
+                background: brick.indestructible
+                  ? 'linear-gradient(135deg, #a29b8c 0%, #5c625d 35%, #343b38 72%, #222926 100%)'
+                  : brick.durability >= 3
+                    ? 'linear-gradient(135deg, #f0c47d 0%, #b56342 34%, #79422f 72%, #48291f 100%)'
+                    : brick.durability === 2
+                      ? 'linear-gradient(135deg, #f0d58a 0%, #9a7643 34%, #67502f 72%, #3e321f 100%)'
+                      : 'linear-gradient(135deg, #d8ebbd 0%, #6f8c5e 34%, #49603f 72%, #293b2a 100%)',
                 clipPath:
                   'polygon(12% 0,88% 0,100% 12%,100% 88%,88% 100%,12% 100%,0 88%,0 12%)',
               }}
             >
-              <div className="absolute inset-[10%] opacity-90 drop-shadow-[0_1px_1px_rgba(255,255,255,0.45)]">
-                <Image
-                  src={getPokemonImageUrl(pokemonId, 'sprite')}
-                  alt=""
-                  fill
-                  sizes="48px"
-                  className="pixelated object-contain"
-                />
-              </div>
+              <Image
+                src={getPokemonImageUrl(pokemonId, 'sprite')}
+                alt=""
+                width={64}
+                height={64}
+                className="pixelated relative z-10 h-[78%] w-[78%] object-contain opacity-90 drop-shadow-[0_1px_1px_rgba(255,255,255,0.45)]"
+              />
               <span className="absolute left-[14%] top-[10%] h-[10%] w-[42%] -rotate-12 rounded-full bg-white/35" />
             </div>
           )

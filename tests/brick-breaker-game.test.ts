@@ -166,8 +166,18 @@ describe('Brick Breaker presentation', () => {
 
     expect(source).toContain('settings.brickPokemonIds[')
     expect(source).toContain("getPokemonImageUrl(pokemonId, 'sprite')")
-    expect(source).toContain('max-w-[calc(100dvh*0.609375)]')
+    expect(source).toContain(
+      ['aspectRatio: `', '$', '{width} / ', '$', '{height}`'].join(''),
+    )
+    expect(source).toContain(
+      ['maxWidth: `', '$', '{(width / height) * 100}dvh`'].join(''),
+    )
     expect(source).not.toContain('game-activity-panel')
+    expect(source).toContain("aspectRatio: '1 / 1'")
+    expect(source).toContain('width={64}')
+    expect(source).toContain('height={64}')
+    expect(source).toContain('h-[78%] w-[78%] object-contain')
+    expect(source).not.toContain('max-w-[calc(100dvh*0.609375)]')
     expect(source).toContain('bg-[#c84d43]')
     expect(source).toContain('rounded-full border-2 border-[#202826] bg-white')
     expect(source).toContain(
