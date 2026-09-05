@@ -1,11 +1,13 @@
 import type { LocationReward } from '@/data/types'
 import type { BaseGameConfig, EndlessScoreInterval } from '../shared'
 
-export type SnakeDirection = 'up' | 'down' | 'left' | 'right'
-
 export interface SnakePosition {
   x: number
   y: number
+}
+
+export interface SnakeObstacle extends SnakePosition {
+  radius: number
 }
 
 export interface SnakeMilestone {
@@ -20,17 +22,28 @@ export interface SnakeRepeatingReward {
 }
 
 export interface SnakeGameSettings {
-  gridSize: { columns: number; rows: number }
+  /** Coordinate space used by the responsive scene renderer. */
+  playfield: { width: number; height: number }
   initialLength: number
   initialPosition: SnakePosition
-  initialDirection: SnakeDirection
-  tickMs: number
+  /** Initial travel angle in degrees. Zero points right. */
+  initialHeading: number
+  segmentSpacing: number
+  moveSpeed: number
+  maxSpeed: number
   speedUpEvery: number
-  speedUpByMs: number
-  minTickMs: number
+  speedUpBy: number
+  /** Maximum steering speed in degrees per second. */
+  turnRate: number
+  headRadius: number
+  bodyRadius: number
+  foodRadius: number
+  rewardRadius: number
+  /** Minimum centre-to-centre distance between the head and a new pickup. */
+  minimumSpawnDistance: number
   foodScore: number
   wrapBoundaries?: boolean
-  walls?: SnakePosition[]
+  obstacles?: SnakeObstacle[]
   sprites: {
     head: string
     body: string

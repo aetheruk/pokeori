@@ -1,6 +1,6 @@
 # Mini-Games
 
-23+ mini-games available in Pokeori.
+28 mini-game types plus the separate Field Research activity are available in Pokeori.
 
 ## Shared spatial tile rendering
 
@@ -66,7 +66,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 | Art Academy | `src/data/games/art-academy` | Timed Pokemon sprite-copying study with an extracted artwork palette and server-scored canvas |
 | Battle Bets | `/game/games/battle-bets` | Single-stake Fun Token wagering on AI-vs-AI Shadow battles |
 | Brick Breaker | `/game/games/brick-breaker` | Paddle-and-ball mineral survey with authored brick layouts, waves, and collectible rewards |
-| Onix Snake | `/game/games/snake` | Grid-based Onix cave survey with growth, speed progression, and collectible rewards |
+| Onix Snake | `/game/games/snake` | Free-turning Onix cave survey with growth, speed progression, and collectible rewards |
 | TCG Memory | `src/data/games/tcg-memory` | Memory match with TCG cards |
 | Voltorb Flip | `src/data/games/voltorb-flip` | Puzzle game |
 | And more... | | |
@@ -77,7 +77,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 - Items
 - Research XP, either authored as a flat one-off reward or generated from `skillXp`
 - Endless score games author one-time rewards under `settings.endless.milestones` and score-scaled rewards under `settings.endless.repeatingRewards`. Repeating rewards can set `random: true` for Run, Flap, or Surf collectible spawns; these must be touched by the player and can use either a numeric interval with 25% variance or an authored `{ min, max }` score interval for explicit random cadence. Random collectible rewards show in Explore details by reward name only without point or chance labels. Non-random score rewards show the full score reward range and label each previewed reward with either the score threshold or repeating point interval.
-- Brick Breaker and Snake use the same random repeating-reward contract. Brick Breaker places the selected reward in an ochre specimen orb that must be popped by the ball; Snake places it on a vacant grid cell that must be reached by Onix's head. The client reports collected reward keys and the server caps grants against the final score and minimum authored spawn interval.
+- Brick Breaker and Snake use the same random repeating-reward contract. Brick Breaker places the selected reward in an ochre specimen orb that must be popped by the ball; Snake places it at a safe open point that must be reached by Onix's head. The client reports collected reward keys and the server caps grants against the final score and minimum authored spawn interval.
 - Identify games default to four unique answer choices and can author `settings.optionCount` for a larger pool. The server builds the configured number for the opening and every following round, always includes the target, and caps safely at the available unique options; the client switches six-choice rounds to a responsive three-column layout.
 - Paid Run and Flap entries use the shared `currency_owned` criterion with `consume: true`. The server checks and deducts the authored amount only when creating a new session; restoring an active session does not charge again.
 - Run and Flap use a shared side-scroller stage shell. Their gameplay coordinates remain a fixed 600x600 layer, while the visible stage scales responsively inside a full-screen painted backdrop with authored `settings.scene` art, premium repeat-x `parallaxLayers`, and region-time tinting. Tapping outside the square playfield triggers the primary action for both games, and Run uses a horizontal outside-playfield swipe for boost. Layer `style.backgroundPosition` is treated as the vertical anchor; the client always owns the animated X offset.
@@ -85,15 +85,15 @@ WebKit, which may still permit history swipes despite that CSS property.
 
 ## Brick Breaker
 
-- Brick Breaker uses a fixed portrait playfield that scales into the available mobile viewport and a framed desktop activity stage. Pointer or touch movement steers the paddle directly; Arrow Left/Right and A/D provide keyboard steering, while tap or Space launches a docked ball.
-- Layout rows are authored with `.` for empty cells, `1`–`3` for destructible durability, and `#` for indestructible dividers. Settings control playfield geometry, board spacing, paddle and ball dimensions, acceleration, lives, points, reward lifetime, optional time limits, and endless wave speed increases.
+- Brick Breaker plays directly over its full-background scene with a minimal floating score, lives, wave, and exit HUD. Pointer or touch movement steers the Poké Ball-styled paddle directly; Arrow Left/Right and A/D provide keyboard steering, while tap or Space launches a docked ball.
+- Layout rows are authored with `.` for empty cells, `1`–`3` for destructible durability, and `#` for indestructible dividers. Each occupied cell is a square, faceted Match3-style gem containing a small Pokémon sprite cycled from configurable `brickPokemonIds`. Settings also control playfield geometry, board spacing, paddle and ball dimensions, acceleration, lives, points, reward lifetime, optional time limits, and endless wave speed increases.
 - Finite configurations finish when every destructible brick is cleared. Endless configurations rebuild the authored board as a new wave and continue until the player loses every ball. Physics use capped frame deltas and substeps so tab restoration and high ball speeds do not tunnel through thin bricks.
 
 ## Onix Snake
 
-- Snake runs on an authored rectangular grid with a fixed-step simulation. Arrow/WASD input, swipe gestures, and a visible touch D-pad all feed one buffered turn; direct reversals are rejected. Settings control starting position, length and direction, movement cadence, acceleration floor, food score, wrapping, optional wall cells, sprite roles, reward lifetime, finite score targets, and endless rewards.
-- The test configuration uses dedicated transparent head, body, and tail artwork for an original faceted rock serpent. Each part rotates with its travel direction, while the player-facing activity retains its Onix identity and icon.
-- Ordinary mineral food grows Onix and advances the score. Reward items never replace food or grow the body, spawn only on unoccupied cells, expire cleanly, and are collected once by the head. Finite games finish at `winScore`; endless games continue until Onix hits a boundary, wall, or its own trail.
+- Snake uses continuous movement and rate-limited free steering inside an authored rectangular playfield. Pointer hover aims toward the cursor, touch or pen dragging aims toward the contact point, and held Left/Right or A/D input curves continuously; Start or Space begins play. Settings control the starting position and heading, segment spacing, initial and maximum speed, acceleration cadence, turn rate, collision radii, minimum pickup spawn distance, boundary wrapping, optional circular obstacles, sprite roles, reward lifetime, finite score targets, and endless rewards.
+- The test configuration uses dedicated transparent head, body, and tail artwork for an original faceted rock serpent. Segments follow one another through smooth curves instead of snapping to cells, while the player-facing activity retains its Onix identity and icon.
+- Ordinary mineral food grows Onix and advances the score. Reward items never replace food or grow the body, spawn at safe points clear of Onix and obstacles, expire cleanly, and are collected once by the head. Finite games finish at `winScore`; endless games continue until Onix hits a boundary, obstacle, or its own trail.
 
 ## Fishing
 - Every fishing cast rolls Pokemon at 80% and items at 20%.

@@ -25,6 +25,7 @@ export const brickBreakerGames: BrickBreakerGameConfig[] = [
         '.12222221.',
         '..111111..',
       ],
+      brickPokemonIds: ['74', '95', '50', '27'],
       brickGap: 5,
       boardPadding: 18,
       boardTop: 92,

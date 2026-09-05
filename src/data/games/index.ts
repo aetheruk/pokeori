@@ -291,7 +291,10 @@ export interface GameSettings {
   maxSpeed?: number
   acceleration?: number
   obstacleFrequency?: { min: number; max: number }
-  obstacles?: import('./surf/types').SurfObstacleConfig[]
+  obstacles?: Array<
+    | import('./surf/types').SurfObstacleConfig
+    | import('./snake/types').SnakeObstacle
+  >
   obstacleSprite?: string
   aerialObstacleSprite?: string
   parallaxLayers?: ParallaxLayer[]
@@ -343,10 +346,7 @@ export interface GameSettings {
     balls: number
   }
   // Match-3 specific
-  gridSize?:
-    | { cols: number; rows: number }
-    | { columns: number; rows: number }
-    | number
+  gridSize?: { cols: number; rows: number } | number
   crystalTypes?: import('./match3/types').Match3Crystal[]
   pointsPerMatch?: number
   cascadeMultiplier?: number
@@ -432,6 +432,7 @@ export interface GameSettings {
   // Brick Breaker specific
   playfield?: import('./brick-breaker/types').BrickBreakerGameSettings['playfield']
   layout?: string[]
+  brickPokemonIds?: string[]
   brickGap?: number
   boardPadding?: number
   boardTop?: number
@@ -442,11 +443,17 @@ export interface GameSettings {
   // Snake specific
   initialLength?: number
   initialPosition?: import('./snake/types').SnakePosition
-  initialDirection?: import('./snake/types').SnakeDirection
-  tickMs?: number
+  initialHeading?: number
+  segmentSpacing?: number
+  moveSpeed?: number
   speedUpEvery?: number
-  speedUpByMs?: number
-  minTickMs?: number
+  speedUpBy?: number
+  turnRate?: number
+  headRadius?: number
+  bodyRadius?: number
+  foodRadius?: number
+  rewardRadius?: number
+  minimumSpawnDistance?: number
   foodScore?: number
   wrapBoundaries?: boolean
   sprites?: import('./snake/types').SnakeGameSettings['sprites']

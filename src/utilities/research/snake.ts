@@ -1,156 +1,226 @@
-import type { SnakeDirection, SnakePosition } from '@/data/games/snake/types'
+import type {
+  SnakeObstacle,
+  SnakePosition,
+} from '@/data/games/snake/types'
 
-export interface SnakeStepInput {
+export interface SnakeCircle extends SnakePosition {
+  radius: number
+}
+
+export interface ContinuousSnakeStepInput {
   snake: SnakePosition[]
-  direction: SnakeDirection
-  food: SnakePosition | null
-  walls?: SnakePosition[]
-  columns: number
-  rows: number
+  heading: number
+  targetHeading: number
+  speed: number
+  turnRate: number
+  deltaSeconds: number
+  segmentSpacing: number
+  headRadius: number
+  bodyRadius: number
+  playfield: { width: number; height: number }
+  obstacles?: SnakeObstacle[]
   wrapBoundaries?: boolean
 }
 
-export interface SnakeStepResult {
+export interface ContinuousSnakeStepResult {
   snake: SnakePosition[]
-  ateFood: boolean
-  collision: 'boundary' | 'self' | 'wall' | null
+  heading: number
+  collision: 'boundary' | 'self' | 'obstacle' | null
 }
 
-const DIRECTION_VECTOR: Record<SnakeDirection, SnakePosition> = {
-  up: { x: 0, y: -1 },
-  down: { x: 0, y: 1 },
-  left: { x: -1, y: 0 },
-  right: { x: 1, y: 0 },
+export function distanceBetween(a: SnakePosition, b: SnakePosition) {
+  return Math.hypot(a.x - b.x, a.y - b.y)
 }
 
-const OPPOSITE_DIRECTION: Record<SnakeDirection, SnakeDirection> = {
-  up: 'down',
-  down: 'up',
-  left: 'right',
-  right: 'left',
+export function circlesOverlap(a: SnakeCircle, b: SnakeCircle) {
+  return distanceBetween(a, b) < a.radius + b.radius
 }
 
-export function positionsEqual(a: SnakePosition, b: SnakePosition) {
-  return a.x === b.x && a.y === b.y
+export function normalizeAngle(angle: number) {
+  return ((angle % 360) + 360) % 360
 }
 
-export function canTurn(
-  currentDirection: SnakeDirection,
-  nextDirection: SnakeDirection,
+export function shortestAngleDelta(from: number, to: number) {
+  return ((normalizeAngle(to) - normalizeAngle(from) + 540) % 360) - 180
+}
+
+export function turnToward(
+  heading: number,
+  targetHeading: number,
+  maximumTurn: number,
 ) {
-  return OPPOSITE_DIRECTION[currentDirection] !== nextDirection
+  const delta = shortestAngleDelta(heading, targetHeading)
+  return normalizeAngle(
+    heading + Math.max(-maximumTurn, Math.min(maximumTurn, delta)),
+  )
+}
+
+export function headingToward(from: SnakePosition, to: SnakePosition) {
+  return normalizeAngle(
+    (Math.atan2(to.y - from.y, to.x - from.x) * 180) / Math.PI,
+  )
 }
 
 export function createInitialSnake(
   head: SnakePosition,
   length: number,
-  direction: SnakeDirection,
+  heading: number,
+  segmentSpacing: number,
 ): SnakePosition[] {
-  const vector = DIRECTION_VECTOR[direction]
+  const radians = (heading * Math.PI) / 180
   return Array.from({ length }, (_, index) => ({
-    x: head.x - vector.x * index,
-    y: head.y - vector.y * index,
+    x: head.x - Math.cos(radians) * segmentSpacing * index,
+    y: head.y - Math.sin(radians) * segmentSpacing * index,
   }))
 }
 
-export function getSnakeTickMs(
-  initialTickMs: number,
-  minTickMs: number,
+export function getSnakeSpeed(
+  initialSpeed: number,
+  maxSpeed: number,
   speedUpEvery: number,
-  speedUpByMs: number,
+  speedUpBy: number,
   foodEaten: number,
 ) {
-  const increases = speedUpEvery > 0 ? Math.floor(foodEaten / speedUpEvery) : 0
-  return Math.max(minTickMs, initialTickMs - increases * speedUpByMs)
+  const increases =
+    speedUpEvery > 0 ? Math.floor(foodEaten / speedUpEvery) : 0
+  return Math.min(maxSpeed, initialSpeed + increases * speedUpBy)
 }
 
-export function advanceSnake({
+export function advanceContinuousSnake({
   snake,
-  direction,
-  food,
-  walls = [],
-  columns,
-  rows,
+  heading,
+  targetHeading,
+  speed,
+  turnRate,
+  deltaSeconds,
+  segmentSpacing,
+  headRadius,
+  bodyRadius,
+  playfield,
+  obstacles = [],
   wrapBoundaries = false,
-}: SnakeStepInput): SnakeStepResult {
+}: ContinuousSnakeStepInput): ContinuousSnakeStepResult {
   if (snake.length === 0) {
-    return { snake, ateFood: false, collision: 'self' }
+    return { snake, heading, collision: 'self' }
   }
 
-  const vector = DIRECTION_VECTOR[direction]
-  let nextHead = {
-    x: snake[0].x + vector.x,
-    y: snake[0].y + vector.y,
+  const safeDelta = Math.max(0, Math.min(deltaSeconds, 0.05))
+  const nextHeading = turnToward(
+    heading,
+    targetHeading,
+    turnRate * safeDelta,
+  )
+  const radians = (nextHeading * Math.PI) / 180
+  let bodySource = snake
+  let head = {
+    x: snake[0].x + Math.cos(radians) * speed * safeDelta,
+    y: snake[0].y + Math.sin(radians) * speed * safeDelta,
   }
 
   const outside =
-    nextHead.x < 0 ||
-    nextHead.x >= columns ||
-    nextHead.y < 0 ||
-    nextHead.y >= rows
-
+    head.x < headRadius ||
+    head.x > playfield.width - headRadius ||
+    head.y < headRadius ||
+    head.y > playfield.height - headRadius
   if (outside && !wrapBoundaries) {
-    return { snake, ateFood: false, collision: 'boundary' }
+    return { snake, heading: nextHeading, collision: 'boundary' }
   }
-
   if (wrapBoundaries) {
-    nextHead = {
-      x: (nextHead.x + columns) % columns,
-      y: (nextHead.y + rows) % rows,
+    const wrappedHead = {
+      x: (head.x + playfield.width) % playfield.width,
+      y: (head.y + playfield.height) % playfield.height,
     }
+    if (outside) {
+      const shiftX = wrappedHead.x - head.x
+      const shiftY = wrappedHead.y - head.y
+      bodySource = snake.map((segment) => ({
+        x: (segment.x + shiftX + playfield.width) % playfield.width,
+        y: (segment.y + shiftY + playfield.height) % playfield.height,
+      }))
+    }
+    head = wrappedHead
   }
 
-  if (walls.some((wall) => positionsEqual(wall, nextHead))) {
-    return { snake, ateFood: false, collision: 'wall' }
+  if (
+    obstacles.some((obstacle) =>
+      circlesOverlap({ ...head, radius: headRadius }, obstacle),
+    )
+  ) {
+    return { snake, heading: nextHeading, collision: 'obstacle' }
   }
 
-  const ateFood = food !== null && positionsEqual(nextHead, food)
-  // Moving into the old tail cell is legal when the tail advances this tick.
-  const occupiedBody = ateFood ? snake : snake.slice(0, -1)
-  if (occupiedBody.some((segment) => positionsEqual(segment, nextHead))) {
-    return { snake, ateFood: false, collision: 'self' }
+  const nextSnake = [head]
+  for (let index = 1; index < bodySource.length; index += 1) {
+    const leader = nextSnake[index - 1]
+    const follower = bodySource[index]
+    const distance = distanceBetween(leader, follower)
+    if (distance <= segmentSpacing) {
+      nextSnake.push(follower)
+      continue
+    }
+    const ratio = segmentSpacing / distance
+    nextSnake.push({
+      x: leader.x + (follower.x - leader.x) * ratio,
+      y: leader.y + (follower.y - leader.y) * ratio,
+    })
   }
 
+  // Ignore the neck so adjacent art can overlap without causing a false hit.
+  const selfCollision = nextSnake
+    .slice(4)
+    .some(
+      (segment) =>
+        distanceBetween(head, segment) < (headRadius + bodyRadius) * 0.72,
+    )
   return {
-    snake: [nextHead, ...(ateFood ? snake : snake.slice(0, -1))],
-    ateFood,
-    collision: null,
+    snake: nextSnake,
+    heading: nextHeading,
+    collision: selfCollision ? 'self' : null,
   }
 }
 
-export function findSafeSnakeCell(
-  columns: number,
-  rows: number,
-  occupiedGroups: ReadonlyArray<ReadonlyArray<SnakePosition>>,
+export function growSnake(snake: SnakePosition[]) {
+  if (snake.length === 0) return snake
+  return [...snake, { ...snake[snake.length - 1] }]
+}
+
+export function findSafeSnakePosition(
+  playfield: { width: number; height: number },
+  radius: number,
+  occupied: ReadonlyArray<SnakeCircle>,
+  minimumHeadDistance: number,
+  head: SnakePosition,
   random: () => number = Math.random,
 ): SnakePosition | null {
-  const occupied = new Set(
-    occupiedGroups.flatMap((group) =>
-      group.map((position) => `${position.x}:${position.y}`),
-    ),
-  )
-  const available: SnakePosition[] = []
+  const padding = radius + 8
+  const isSafe = (position: SnakePosition) =>
+    distanceBetween(position, head) >= minimumHeadDistance &&
+    occupied.every(
+      (circle) =>
+        distanceBetween(position, circle) >= radius + circle.radius + 4,
+    )
 
-  for (let y = 0; y < rows; y += 1) {
-    for (let x = 0; x < columns; x += 1) {
-      if (!occupied.has(`${x}:${y}`)) available.push({ x, y })
+  for (let attempt = 0; attempt < 80; attempt += 1) {
+    const candidate = {
+      x: padding + random() * Math.max(0, playfield.width - padding * 2),
+      y: padding + random() * Math.max(0, playfield.height - padding * 2),
     }
+    if (isSafe(candidate)) return candidate
   }
 
-  if (available.length === 0) return null
-  const index = Math.min(
-    available.length - 1,
-    Math.max(0, Math.floor(random() * available.length)),
-  )
-  return available[index]
+  const step = Math.max(radius * 2 + 8, 24)
+  for (let y = padding; y <= playfield.height - padding; y += step) {
+    for (let x = padding; x <= playfield.width - padding; x += step) {
+      const candidate = { x, y }
+      if (isSafe(candidate)) return candidate
+    }
+  }
+  return null
 }
 
-export function directionBetween(
-  from: SnakePosition,
-  to: SnakePosition,
-): SnakeDirection {
-  if (to.x > from.x) return 'right'
-  if (to.x < from.x) return 'left'
-  if (to.y > from.y) return 'down'
-  return 'up'
+export function getSegmentHeading(
+  segment: SnakePosition,
+  towardHead: SnakePosition,
+) {
+  return headingToward(segment, towardHead)
 }
