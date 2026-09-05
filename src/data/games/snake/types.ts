@@ -48,7 +48,8 @@ export interface SnakeGameSettings {
     head: string
     body: string
     tail: string
-    food?: string
+    /** Bare scene sprite used for the ordinary growth pickup. */
+    food: string
   }
   rewardLifetimeMs?: number
   winScore?: number

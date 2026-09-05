@@ -38,6 +38,7 @@ export const snakeGames: SnakeGameConfig[] = [
         head: '/games/snake/sprites/rock-serpent-head.avif',
         body: '/games/snake/sprites/rock-serpent-body.avif',
         tail: '/games/snake/sprites/rock-serpent-tail.avif',
+        food: '/sprites/items/everstone.avif',
       },
       rewardLifetimeMs: 7500,
       endless: {

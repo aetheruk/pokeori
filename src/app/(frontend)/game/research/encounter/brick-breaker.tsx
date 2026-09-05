@@ -16,6 +16,7 @@ import {
   startGame,
   submitGameAnswer,
 } from '@/app/(frontend)/game/games/actions'
+import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
 import { useAudio } from '@/context/AudioContext'
@@ -587,10 +588,10 @@ export function BrickBreakerGame({
 
         {countdown > 0 && (
           <div
-            className="absolute inset-0 grid place-items-center bg-[#18211e]/25 text-6xl font-black text-[#fff8e8] drop-shadow-lg"
+            className="absolute inset-0 grid place-items-center bg-game-ink/25 backdrop-blur-[1px]"
             aria-live="polite"
           >
-            {countdown}
+            <GameTimer timeLeft={countdown} totalTime={3} size="xl" />
           </div>
         )}
         {!ended && countdown === 0 && docked && (

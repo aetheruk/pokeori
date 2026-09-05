@@ -936,7 +936,7 @@ const snakeSettingsSchema = z
         head: z.string().min(1),
         body: z.string().min(1),
         tail: z.string().min(1),
-        food: z.string().min(1).optional(),
+        food: z.string().min(1),
       })
       .strict(),
     rewardLifetimeMs: z.number().int().min(500).max(60_000).optional(),

@@ -7,8 +7,9 @@ import {
   createInitialSnake,
   distanceBetween,
   findSafeSnakePosition,
-  getSegmentHeading,
   getResponsiveSnakePlayfield,
+  getSegmentHeading,
+  getSnakePointerHeading,
   getSnakeSpeed,
   growSnake,
   normalizeAngle,
@@ -58,22 +59,29 @@ describe('continuous Snake mechanics', () => {
     expect(turnToward(10, 350, 5)).toBe(5)
   })
 
+  test('commits to the current course inside the pointer arrival zone', () => {
+    expect(
+      getSnakePointerHeading({ x: 50, y: 50 }, { x: 55, y: 55 }, 10),
+    ).toBeNull()
+    expect(
+      getSnakePointerHeading({ x: 50, y: 50 }, { x: 100, y: 50 }, 10),
+    ).toBe(0)
+  })
+
   test('sweeps the head path through pickups between frames', () => {
     expect(
-      sweptCircleIntersects(
-        { x: 0, y: 20 },
-        { x: 100, y: 20 },
-        8,
-        { x: 50, y: 30, radius: 3 },
-      ),
+      sweptCircleIntersects({ x: 0, y: 20 }, { x: 100, y: 20 }, 8, {
+        x: 50,
+        y: 30,
+        radius: 3,
+      }),
     ).toBe(true)
     expect(
-      sweptCircleIntersects(
-        { x: 0, y: 20 },
-        { x: 100, y: 20 },
-        8,
-        { x: 50, y: 40, radius: 3 },
-      ),
+      sweptCircleIntersects({ x: 0, y: 20 }, { x: 100, y: 20 }, 8, {
+        x: 50,
+        y: 40,
+        radius: 3,
+      }),
     ).toBe(false)
   })
 
@@ -220,10 +228,7 @@ describe('continuous Snake mechanics', () => {
     expect(position).not.toBeNull()
     expect(distanceBetween(position!, head)).toBeGreaterThanOrEqual(80)
     expect(
-      circlesOverlap(
-        { ...position!, radius: 10 },
-        { x: 18, y: 18, radius: 8 },
-      ),
+      circlesOverlap({ ...position!, radius: 10 }, { x: 18, y: 18, radius: 8 }),
     ).toBe(false)
   })
 
@@ -243,6 +248,7 @@ describe('Onix Snake test entry and scene', () => {
     expect(game?.settings.turnRate).toBeGreaterThan(0)
     expect(game?.settings.moveSpeed).toBe(150)
     expect(game?.settings.maxSpeed).toBe(225)
+    expect(game?.settings.sprites.food).toBe('/sprites/items/everstone.avif')
     expect(game?.settings.endless?.repeatingRewards?.[0].random).toBe(true)
     expect(
       game?.settings.endless?.repeatingRewards?.[0].rewards.map(
@@ -263,8 +269,11 @@ describe('Onix Snake test entry and scene', () => {
     expect(source).toContain("kind === 'tail' ? 180 : 0")
     expect(source).toContain('bg-game-ochre/20')
     expect(source).toContain('motion-safe:animate-ping')
+    expect(source).toContain('h-[72%] w-[72%]')
     expect(source).toContain('pointerTargetRef.current')
-    expect(source).toContain('overflow-hidden rounded-full')
+    expect(source).toContain('settings.sprites.food')
+    expect(source).toContain('getSnakePointerHeading(')
+    expect(source).toContain('bg-game-surface-raised/95')
     expect(source).toContain('settings.rewardRadius * 2')
     expect(source).toContain('className="absolute inset-0 z-10')
     expect(source).toContain('runtimePlayfieldRef.current.width')
@@ -278,8 +287,9 @@ describe('Onix Snake test entry and scene', () => {
       ),
     ).text()
     const releaseHandler =
-      source.split('const clearPointerSteering = ')[1]?.split('\n\n  useEffect')[0] ??
-      ''
+      source
+        .split('const clearPointerSteering = ')[1]
+        ?.split('\n\n  useEffect')[0] ?? ''
 
     expect(releaseHandler).toContain('pointerTargetRef.current = null')
     expect(releaseHandler).toContain(

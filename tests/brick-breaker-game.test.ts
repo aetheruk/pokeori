@@ -192,5 +192,11 @@ describe('Brick Breaker presentation', () => {
     expect(source).toContain("void finish(false, 'Survey ended early.')")
     expect(source).toContain('disabled={!started || ended || Boolean(result)}')
     expect(source).not.toContain("onClick={() => router.push('/game/explore')}")
+    expect(source).toContain(
+      "import { GameTimer } from '@/components/game/shared/game-timer'",
+    )
+    expect(source).toContain(
+      '<GameTimer timeLeft={countdown} totalTime={3} size="xl" />',
+    )
   })
 })
