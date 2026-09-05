@@ -11,6 +11,7 @@ import {
   growSnake,
   normalizeAngle,
   shortestAngleDelta,
+  sweptCircleIntersects,
   turnToward,
 } from '@/utilities/research/snake'
 
@@ -29,6 +30,46 @@ describe('continuous Snake mechanics', () => {
     expect(shortestAngleDelta(350, 10)).toBe(20)
     expect(turnToward(350, 10, 5)).toBe(355)
     expect(turnToward(10, 350, 5)).toBe(5)
+  })
+
+  test('sweeps the head path through pickups between frames', () => {
+    expect(
+      sweptCircleIntersects(
+        { x: 0, y: 20 },
+        { x: 100, y: 20 },
+        8,
+        { x: 50, y: 30, radius: 3 },
+      ),
+    ).toBe(true)
+    expect(
+      sweptCircleIntersects(
+        { x: 0, y: 20 },
+        { x: 100, y: 20 },
+        8,
+        { x: 50, y: 40, radius: 3 },
+      ),
+    ).toBe(false)
+  })
+
+  test('does not sweep a false collision chord across a wrap seam', () => {
+    expect(
+      sweptCircleIntersects(
+        { x: 385, y: 100 },
+        { x: 5, y: 100 },
+        8,
+        { x: 195, y: 100, radius: 3 },
+        20,
+      ),
+    ).toBe(false)
+    expect(
+      sweptCircleIntersects(
+        { x: 385, y: 100 },
+        { x: 5, y: 100 },
+        8,
+        { x: 10, y: 100, radius: 3 },
+        20,
+      ),
+    ).toBe(true)
   })
 
   test('moves freely at curved headings and maintains segment spacing', () => {
@@ -174,6 +215,8 @@ describe('Onix Snake test entry and scene', () => {
     expect(game?.isEligibleForReplay).toBe(true)
     expect(game?.settings.playfield).toEqual({ width: 390, height: 700 })
     expect(game?.settings.turnRate).toBeGreaterThan(0)
+    expect(game?.settings.moveSpeed).toBe(150)
+    expect(game?.settings.maxSpeed).toBe(225)
     expect(game?.settings.endless?.repeatingRewards?.[0].random).toBe(true)
     expect(
       game?.settings.endless?.repeatingRewards?.[0].rewards.map(
@@ -194,5 +237,8 @@ describe('Onix Snake test entry and scene', () => {
     expect(source).toContain("kind === 'tail' ? 180 : 0")
     expect(source).toContain('bg-game-ochre/20')
     expect(source).toContain('motion-safe:animate-ping')
+    expect(source).toContain('pointerTargetRef.current')
+    expect(source).toContain('overflow-hidden rounded-full')
+    expect(source).toContain('settings.rewardRadius * 2')
   })
 })

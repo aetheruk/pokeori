@@ -22,7 +22,6 @@ import { usePageVisibility } from '@/hooks/usePageVisibility'
 import { getLowestEndlessRewardScore } from '@/utilities/research/endless-milestones'
 import {
   advanceContinuousSnake,
-  circlesOverlap,
   createInitialSnake,
   findSafeSnakePosition,
   getSegmentHeading,
@@ -30,6 +29,7 @@ import {
   growSnake,
   headingToward,
   normalizeAngle,
+  sweptCircleIntersects,
   type SnakeCircle,
 } from '@/utilities/research/snake'
 import {
@@ -94,6 +94,7 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
   const rewardsRef = useRef<SceneReward[]>([])
   const headingRef = useRef(settings.initialHeading)
   const targetHeadingRef = useRef(settings.initialHeading)
+  const pointerTargetRef = useRef<SnakePosition | null>(null)
   const scoreRef = useRef(0)
   const foodEatenRef = useRef(0)
   const lastFrameRef = useRef(0)
@@ -196,6 +197,7 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
     setSnake(nextSnake)
     headingRef.current = normalizeAngle(settings.initialHeading)
     targetHeadingRef.current = normalizeAngle(settings.initialHeading)
+    pointerTargetRef.current = null
     setHeading(normalizeAngle(settings.initialHeading))
     scoreRef.current = 0
     setScore(0)
@@ -246,6 +248,7 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
     const onKeyDown = (event: KeyboardEvent) => {
       if (['ArrowLeft', 'ArrowRight', 'a', 'A', 'd', 'D'].includes(event.key)) {
         event.preventDefault()
+        pointerTargetRef.current = null
         pressedKeysRef.current.add(event.key.toLowerCase())
       }
       if (event.code === 'Space' && phase === 'ready') {
@@ -272,6 +275,7 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
       x: ((event.clientX - bounds.left) / bounds.width) * settings.playfield.width,
       y: ((event.clientY - bounds.top) / bounds.height) * settings.playfield.height,
     }
+    pointerTargetRef.current = target
     targetHeadingRef.current = headingToward(snakeRef.current[0], target)
   }
 
@@ -291,6 +295,11 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
         targetHeadingRef.current = normalizeAngle(
           headingRef.current + (steerLeft ? -1 : 1) * settings.turnRate * deltaSeconds,
         )
+      } else if (pointerTargetRef.current) {
+        targetHeadingRef.current = headingToward(
+          snakeRef.current[0],
+          pointerTargetRef.current,
+        )
       }
 
       const speed = getSnakeSpeed(
@@ -300,6 +309,7 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
         settings.speedUpBy,
         foodEatenRef.current,
       )
+      const previousHead = snakeRef.current[0]
       const step = advanceContinuousSnake({
         snake: snakeRef.current,
         heading: headingRef.current,
@@ -334,10 +344,10 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
 
       const headCircle = { ...nextSnake[0], radius: settings.headRadius }
       const collected = activeRewards.filter((reward) =>
-        circlesOverlap(headCircle, {
+        sweptCircleIntersects(previousHead, headCircle, settings.headRadius, {
           ...reward.position,
           radius: settings.rewardRadius,
-        }),
+        }, settings.maxSpeed * 0.06),
       )
       if (collected.length > 0) {
         const ids = new Set(collected.map((reward) => reward.id))
@@ -352,10 +362,10 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
 
       const ateFood =
         foodRef.current !== null &&
-        circlesOverlap(headCircle, {
+        sweptCircleIntersects(previousHead, headCircle, settings.headRadius, {
           ...foodRef.current,
           radius: settings.foodRadius,
-        })
+        }, settings.maxSpeed * 0.06)
       if (ateFood) {
         nextSnake = growSnake(nextSnake)
         const nextFoodCount = foodEatenRef.current + 1
@@ -463,8 +473,17 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
 
   return (
     <div
-      className="game-activity-chrome relative h-dvh overflow-hidden bg-cover bg-center text-game-raised select-none"
+      className="game-activity-chrome relative h-dvh touch-none overflow-hidden bg-cover bg-center text-game-raised select-none"
       style={{ backgroundImage: `url(${encounter.background})` }}
+      onPointerDown={(event) => {
+        if ((event.target as HTMLElement).closest('button')) return
+        event.currentTarget.setPointerCapture(event.pointerId)
+        steerTowardPointer(event)
+      }}
+      onPointerMove={(event) => {
+        if ((event.target as HTMLElement).closest('button')) return
+        steerTowardPointer(event)
+      }}
     >
       <div className="pointer-events-none absolute inset-0 bg-game-ink/25" />
       <header className="pointer-events-none absolute inset-x-0 top-0 z-[60] flex items-start justify-end gap-2 p-3 sm:p-5">
@@ -492,11 +511,6 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
         aria-label="Onix tunnel survey playfield"
         aria-describedby="snake-controls snake-status"
         className="absolute left-1/2 top-1/2 z-10 h-[min(100dvh,179.487vw)] w-[min(100vw,55.714dvh)] -translate-x-1/2 -translate-y-1/2 touch-none overflow-hidden"
-        onPointerDown={(event) => {
-          event.currentTarget.setPointerCapture(event.pointerId)
-          steerTowardPointer(event)
-        }}
-        onPointerMove={steerTowardPointer}
       >
         {(settings.obstacles ?? []).map((obstacle, index) => (
           <div
@@ -509,7 +523,7 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
         {food ? (
           <div
             className="absolute z-10 -translate-x-1/2 -translate-y-1/2"
-            style={sceneCircleStyle(food, settings.foodRadius * 2.5, settings.playfield)}
+            style={sceneCircleStyle(food, settings.foodRadius * 2, settings.playfield)}
           >
             {settings.sprites.food ? (
               <Image src={settings.sprites.food} alt="Cave food" fill sizes="48px" className="object-contain" />
@@ -522,11 +536,11 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
         {sceneRewards.map((reward) => (
           <div
             key={reward.id}
-            className="absolute z-20 -translate-x-1/2 -translate-y-1/2 rounded-full border border-game-ochre/70 bg-game-ochre/20 p-[12%] shadow-[0_0_18px_rgba(181,138,67,0.55)]"
-            style={sceneCircleStyle(reward.position, settings.rewardRadius * 2.5, settings.playfield)}
+            className="absolute z-20 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border border-game-ochre/70 bg-game-ochre/20 shadow-[0_0_14px_rgba(181,138,67,0.48)]"
+            style={sceneCircleStyle(reward.position, settings.rewardRadius * 2, settings.playfield)}
           >
             <div className="pointer-events-none absolute inset-[10%] rounded-full border border-amber-200/35 motion-safe:animate-ping" />
-            <div className="relative h-full w-full">
+            <div className="absolute inset-[20%]">
               <EndlessCollectibleSprite reward={reward.reward} size={50} />
             </div>
           </div>
@@ -628,7 +642,7 @@ function SnakeSegment({
   playfield: { width: number; height: number }
 }) {
   const [imageAvailable, setImageAvailable] = useState(true)
-  const widthMultiplier = kind === 'head' ? 2.8 : kind === 'tail' ? 2.65 : 2.45
+  const widthMultiplier = kind === 'tail' ? 2.1 : 2
   return (
     <div
       className="pointer-events-none absolute z-30 -translate-x-1/2 -translate-y-1/2"

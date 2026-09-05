@@ -36,6 +36,41 @@ export function circlesOverlap(a: SnakeCircle, b: SnakeCircle) {
   return distanceBetween(a, b) < a.radius + b.radius
 }
 
+/** Detect a moving circle crossing a stationary pickup between render frames. */
+export function sweptCircleIntersects(
+  start: SnakePosition,
+  end: SnakePosition,
+  movingRadius: number,
+  target: SnakeCircle,
+  maximumSweepDistance = Number.POSITIVE_INFINITY,
+) {
+  const travelX = end.x - start.x
+  const travelY = end.y - start.y
+  const travelSquared = travelX * travelX + travelY * travelY
+  if (travelSquared > maximumSweepDistance * maximumSweepDistance) {
+    // A boundary wrap teleports the head across the seam; it must not sweep a
+    // collision chord through the middle of the playfield.
+    return circlesOverlap({ ...end, radius: movingRadius }, target)
+  }
+  const projection =
+    travelSquared === 0
+      ? 0
+      : Math.max(
+          0,
+          Math.min(
+            1,
+            ((target.x - start.x) * travelX +
+              (target.y - start.y) * travelY) /
+              travelSquared,
+          ),
+        )
+  const closest = {
+    x: start.x + travelX * projection,
+    y: start.y + travelY * projection,
+  }
+  return distanceBetween(closest, target) <= movingRadius + target.radius
+}
+
 export function normalizeAngle(angle: number) {
   return ((angle % 360) + 360) % 360
 }
