@@ -36,6 +36,8 @@ export interface SnakeGameSettings {
   /** Maximum steering speed in degrees per second. */
   turnRate: number
   headRadius: number
+  /** Viewport-edge collision radius, tuned to the opaque head artwork. */
+  boundaryRadius: number
   bodyRadius: number
   foodRadius: number
   rewardRadius: number

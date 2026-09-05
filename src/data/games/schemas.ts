@@ -924,6 +924,7 @@ const snakeSettingsSchema = z
     speedUpBy: z.number().nonnegative().max(500),
     turnRate: z.number().positive().max(720),
     headRadius: z.number().positive().max(100),
+    boundaryRadius: z.number().positive().max(100),
     bodyRadius: z.number().positive().max(100),
     foodRadius: z.number().positive().max(100),
     rewardRadius: z.number().positive().max(100),
@@ -960,6 +961,14 @@ const snakeSettingsSchema = z
       }),
     )
     const initialRadius = Math.max(settings.headRadius, settings.bodyRadius)
+
+    if (settings.boundaryRadius > settings.headRadius) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['boundaryRadius'],
+        message: 'Snake boundary radius cannot exceed its head radius',
+      })
+    }
 
     if (
       settings.initialPosition.x >= width ||

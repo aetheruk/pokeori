@@ -562,6 +562,12 @@ describe('generated game data schemas', () => {
     if (unsafeSpawnDistance) unsafeSpawnDistance.settings.minimumSpawnDistance = 20
     expect(validateGameItem(unsafeSpawnDistance).success).toBe(false)
 
+    const oversizedBoundaryRadius = structuredClone(game)
+    if (oversizedBoundaryRadius) {
+      oversizedBoundaryRadius.settings.boundaryRadius = 23
+    }
+    expect(validateGameItem(oversizedBoundaryRadius).success).toBe(false)
+
     const missingSprite = structuredClone(game)
     if (missingSprite) missingSprite.settings.sprites!.head = ''
     expect(validateGameItem(missingSprite).success).toBe(false)
