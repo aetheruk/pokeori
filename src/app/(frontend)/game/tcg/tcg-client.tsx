@@ -1,9 +1,17 @@
 'use client'
 
-import { Loader2 } from 'lucide-react'
+import {
+  ChevronLeft,
+  ChevronRight,
+  Library,
+  Loader2,
+  SlidersHorizontal,
+  X,
+} from 'lucide-react'
 import Image from 'next/image'
 import {
   memo,
+  useCallback,
   useDeferredValue,
   useEffect,
   useMemo,
@@ -22,20 +30,34 @@ import { PremiumSearch } from '@/components/game/shared/PremiumSearch'
 import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
 import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
 import { Button } from '@/components/ui/button'
+import { ItemSprite } from '@/components/ui/item-sprite'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
-import { tcgSetSummaries } from '@/data/tcg/summaries'
+import { type TcgSetSummary, tcgSetSummaries } from '@/data/tcg/summaries'
 import type { TcgCard, TcgSet } from '@/data/tcg/types'
 import { useGameUserData } from '@/hooks/useGameUserData'
 import { useTCG } from '@/hooks/useTCG'
 import { APP_VERSION } from '@/utilities/app-version'
 import type { RewardSummary } from '@/utilities/rewards/reward-logic'
-import type { TcgCatalogPage } from '@/utilities/tcg/catalog'
 import {
-  getNextAutocompleteIndex,
-  getTcgCardAccessibleLabel,
-} from '@/utilities/tcg/presentation'
+  CARDDEX_OWNERSHIP_OPTIONS,
+  CARDDEX_RARITY_OPTIONS,
+  CARDDEX_SORT_OPTIONS,
+  CARDDEX_SUPERTYPE_OPTIONS,
+  CARDDEX_TYPE_OPTIONS,
+  type CarddexScope,
+  type CarddexSeriesGroup,
+  type CarddexViewFilters,
+  DEFAULT_CARDDEX_FILTERS,
+  getCarddexActiveFilterCount,
+  getCarddexScopedSets,
+  getCarddexSeriesGroups,
+  getCarddexSetProgress,
+  resolveCarddexScope,
+} from '@/utilities/tcg/carddex-view'
+import type { TcgCatalogPage } from '@/utilities/tcg/catalog'
+import { getTcgCardAccessibleLabel } from '@/utilities/tcg/presentation'
 import { sortTcgSetsByReleaseDate } from '@/utilities/tcg/set-order'
 import {
   calculateTcgBattleCardCost,
@@ -60,36 +82,33 @@ type CatalogResponse<T> = {
   ownedTotal?: number
   nextCursor: string | null
 }
-type PokemonSummary = { id: number; name: string }
 
 export default function TcgExplorerPage({
-  initialSetId = '',
+  initialScope,
+  initialFilters,
   initialCatalog = null,
 }: {
-  initialSetId?: string
+  initialScope: CarddexScope
+  initialFilters: CarddexViewFilters
   initialCatalog?: TcgCatalogPage | null
 }) {
   const {
     entriesByCard,
     isLoading: collectionLoading,
     error: collectionError,
-    summary: collectionSummary,
     refreshCollection,
   } = useTCG()
   const { refreshUser } = useUser()
   const gameData = useGameUserData()
 
-  const [selectedSetId, setSelectedSetId] = useState<string>(initialSetId)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedPokemonId, setSelectedPokemonId] = useState<number | null>(
-    null,
-  )
+  const [scope, setScope] = useState<CarddexScope>(initialScope)
+  const [filters, setFilters] = useState<CarddexViewFilters>(initialFilters)
+  const [filtersExpanded, setFiltersExpanded] = useState(false)
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const [selectedCard, setSelectedCard] = useState<{
     card: TcgCard
     set: TcgSet
   } | null>(null)
-  const [showDropdown, setShowDropdown] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
   const [redistributing, setRedistributing] = useState(false)
   const [rewardSummary, setRewardSummary] = useState<RewardSummary | null>(null)
   const [generationDecks, setGenerationDecks] = useState<
@@ -119,10 +138,10 @@ export default function TcgExplorerPage({
   )
   const [catalogLoading, setCatalogLoading] = useState(false)
   const [catalogError, setCatalogError] = useState(false)
-  const [filteredPokemon, setFilteredPokemon] = useState<PokemonSummary[]>([])
-  const [activePokemonIndex, setActivePokemonIndex] = useState(-1)
   const loadingMoreRef = useRef(false)
-  const deferredSearch = useDeferredValue(searchQuery.trim())
+  const catalogRequestRef = useRef(0)
+  const skipInitialFetchRef = useRef(Boolean(initialCatalog))
+  const deferredSearch = useDeferredValue(filters.query.trim())
   const inventory = useMemo(
     () =>
       Object.fromEntries(
@@ -144,124 +163,111 @@ export default function TcgExplorerPage({
     )
   }, [gameData, inventory])
 
-  // Select first set if none selected and sets are available
   useEffect(() => {
-    if (
-      (!selectedSetId || !sets.find((s) => s.id === selectedSetId)) &&
-      sets.length > 0
-    ) {
-      setSelectedSetId(sets[0].id)
+    const resolved = resolveCarddexScope({
+      sets,
+      requestedSeries: scope.series,
+      requestedSetId: scope.setId,
+    })
+    if (resolved.series !== scope.series || resolved.setId !== scope.setId) {
+      setScope(resolved)
     }
-  }, [sets, selectedSetId])
+  }, [scope.series, scope.setId, sets])
 
-  useEffect(() => {
-    if (!deferredSearch || selectedPokemonId) {
-      setFilteredPokemon([])
-      setActivePokemonIndex(-1)
+  const scopedSets = useMemo(
+    () => getCarddexScopedSets(sets, scope),
+    [scope, sets],
+  )
+  const progressBySet = useMemo(
+    () => getCarddexSetProgress(sets, Object.values(entriesByCard)),
+    [entriesByCard, sets],
+  )
+  const seriesGroups = useMemo(
+    () => getCarddexSeriesGroups(sets, progressBySet),
+    [progressBySet, sets],
+  )
+  const activeFilterCount = getCarddexActiveFilterCount(filters)
+
+  const updateFilter = <K extends keyof CarddexViewFilters>(
+    key: K,
+    value: CarddexViewFilters[K],
+  ) => setFilters((current) => ({ ...current, [key]: value }))
+
+  const clearFilters = () => setFilters(DEFAULT_CARDDEX_FILTERS)
+
+  const selectSeries = (series: string) => setScope({ series, setId: 'all' })
+
+  const selectSet = (setId: string) => {
+    if (setId === 'all') {
+      setScope((current) => ({ ...current, setId }))
       return
     }
-    const controller = new AbortController()
-    const params = new URLSearchParams({
-      v: APP_VERSION,
-      q: deferredSearch,
-      limit: '50',
-    })
-    fetch(`/api/game/catalog/pokemon?${params}`, {
-      signal: controller.signal,
-    })
-      .then((response) => response.json())
-      .then((result: CatalogResponse<PokemonSummary>) => {
-        setFilteredPokemon(result.items || [])
-        setActivePokemonIndex((result.items || []).length > 0 ? 0 : -1)
-      })
-      .catch((error) => {
-        if (error?.name !== 'AbortError') setFilteredPokemon([])
-      })
-    return () => controller.abort()
-  }, [deferredSearch, selectedPokemonId])
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setShowDropdown(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
-
-  const handlePokemonSelect = (pokemon: { id: number; name: string }) => {
-    setSelectedPokemonId(pokemon.id)
-    setSearchQuery(pokemon.name)
-    setShowDropdown(false)
-  }
-
-  const handleSearchKeyDown = (
-    event: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
-    if (!showDropdown || filteredPokemon.length === 0) {
-      if (event.key === 'ArrowDown') setShowDropdown(true)
-      return
-    }
-    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-      event.preventDefault()
-      const direction = event.key === 'ArrowDown' ? 1 : -1
-      setActivePokemonIndex((current) =>
-        getNextAutocompleteIndex({
-          current,
-          direction,
-          count: filteredPokemon.length,
-        }),
-      )
-    } else if (event.key === 'Enter' && activePokemonIndex >= 0) {
-      event.preventDefault()
-      handlePokemonSelect(filteredPokemon[activePokemonIndex])
-    } else if (event.key === 'Escape') {
-      event.preventDefault()
-      setShowDropdown(false)
-    }
-  }
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value)
-    setSelectedPokemonId(null)
-    setShowDropdown(true)
-  }
-
-  const clearSearch = () => {
-    setSearchQuery('')
-    setSelectedPokemonId(null)
-    setShowDropdown(false)
+    const set = sets.find((candidate) => candidate.id === setId)
+    if (set) setScope({ series: set.series, setId })
   }
 
   const catalogUrl = useMemo(() => {
-    const isGlobalSearch = Boolean(selectedPokemonId || deferredSearch)
-    const requestedSetIds = isGlobalSearch
-      ? sets.map((set) => set.id)
-      : selectedSetId
-        ? [selectedSetId]
-        : []
+    const requestedSetIds = scopedSets.map((set) => set.id)
     if (requestedSetIds.length === 0) return null
     const params = new URLSearchParams({
       v: APP_VERSION,
       setIds: requestedSetIds.join(','),
       limit: String(CARD_BATCH_SIZE),
     })
-    if (selectedPokemonId) {
-      params.set('pokemonId', String(selectedPokemonId))
-    } else if (deferredSearch) {
-      params.set('q', deferredSearch)
-    }
+    if (deferredSearch) params.set('q', deferredSearch)
+    params.set('ownership', filters.ownership)
+    params.set('supertype', filters.supertype)
+    params.set('type', filters.type)
+    params.set('rarity', filters.rarity)
+    params.set('sort', filters.sort)
     return `/api/game/catalog/tcg?${params}`
-  }, [deferredSearch, selectedPokemonId, selectedSetId, sets])
+  }, [deferredSearch, filters, scopedSets])
 
   useEffect(() => {
+    const url = new URL(window.location.href)
+    for (const key of [
+      'series',
+      'set',
+      'q',
+      'ownership',
+      'supertype',
+      'type',
+      'rarity',
+      'sort',
+    ]) {
+      url.searchParams.delete(key)
+    }
+    if (scope.series !== 'all') url.searchParams.set('series', scope.series)
+    if (scope.setId !== 'all') url.searchParams.set('set', scope.setId)
+    if (deferredSearch) url.searchParams.set('q', deferredSearch)
+    if (filters.ownership !== DEFAULT_CARDDEX_FILTERS.ownership) {
+      url.searchParams.set('ownership', filters.ownership)
+    }
+    if (filters.supertype !== DEFAULT_CARDDEX_FILTERS.supertype) {
+      url.searchParams.set('supertype', filters.supertype)
+    }
+    if (filters.type !== DEFAULT_CARDDEX_FILTERS.type) {
+      url.searchParams.set('type', filters.type)
+    }
+    if (filters.rarity !== DEFAULT_CARDDEX_FILTERS.rarity) {
+      url.searchParams.set('rarity', filters.rarity)
+    }
+    if (filters.sort !== DEFAULT_CARDDEX_FILTERS.sort) {
+      url.searchParams.set('sort', filters.sort)
+    }
+    window.history.replaceState(
+      null,
+      '',
+      `${url.pathname}${url.search}${url.hash}`,
+    )
+  }, [deferredSearch, filters, scope])
+
+  useEffect(() => {
+    catalogRequestRef.current += 1
+    if (skipInitialFetchRef.current) {
+      skipInitialFetchRef.current = false
+      return
+    }
     if (!catalogUrl) {
       setCatalogCards([])
       setCatalogTotal(0)
@@ -270,6 +276,7 @@ export default function TcgExplorerPage({
       return
     }
     const controller = new AbortController()
+    setSelectedCard(null)
     setCatalogLoading(true)
     setCatalogError(false)
     fetch(catalogUrl, { signal: controller.signal })
@@ -293,33 +300,36 @@ export default function TcgExplorerPage({
         if (!controller.signal.aborted) setCatalogLoading(false)
       })
     return () => controller.abort()
-  }, [catalogUrl])
+  }, [catalogUrl, entriesByCard])
 
-  useEffect(() => {
-    if (!inView || !nextCursor || !catalogUrl || loadingMoreRef.current) return
-    const controller = new AbortController()
+  const loadMoreCards = useCallback(async () => {
+    if (!nextCursor || !catalogUrl || loadingMoreRef.current) return []
+    const requestVersion = catalogRequestRef.current
     const nextUrl = new URL(catalogUrl, window.location.origin)
     nextUrl.searchParams.set('cursor', nextCursor)
     loadingMoreRef.current = true
-    fetch(`${nextUrl.pathname}?${nextUrl.searchParams}`, {
-      signal: controller.signal,
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error('Catalog request failed')
-        return response.json()
-      })
-      .then((result: CatalogResponse<CatalogCard>) => {
-        setCatalogCards((current) => [...current, ...(result.items || [])])
-        setNextCursor(result.nextCursor)
-      })
-      .catch((error) => {
-        if (error?.name !== 'AbortError') setCatalogError(true)
-      })
-      .finally(() => {
-        loadingMoreRef.current = false
-      })
-    return () => controller.abort()
-  }, [catalogUrl, inView, nextCursor])
+    try {
+      const response = await fetch(
+        `${nextUrl.pathname}?${nextUrl.searchParams}`,
+      )
+      if (!response.ok) throw new Error('Catalog request failed')
+      const result: CatalogResponse<CatalogCard> = await response.json()
+      if (requestVersion !== catalogRequestRef.current) return []
+      const newItems = result.items || []
+      setCatalogCards((current) => [...current, ...newItems])
+      setNextCursor(result.nextCursor)
+      return newItems
+    } catch {
+      if (requestVersion === catalogRequestRef.current) setCatalogError(true)
+      return []
+    } finally {
+      loadingMoreRef.current = false
+    }
+  }, [catalogUrl, nextCursor])
+
+  useEffect(() => {
+    if (inView) void loadMoreCards()
+  }, [inView, loadMoreCards])
 
   const hasMoreCards = Boolean(nextCursor)
 
@@ -437,133 +447,218 @@ export default function TcgExplorerPage({
     setDeckMessage(result.error || 'Unable to update deck.')
   }
 
-  const totalCards = useMemo(
-    () => sets.reduce((sum, set) => sum + set.total, 0),
-    [sets],
+  const scopeProgress = useMemo(
+    () =>
+      scopedSets.reduce(
+        (progress, set) => ({
+          unique: progress.unique + (progressBySet.get(set.id)?.unique || 0),
+          total: progress.total + set.total,
+        }),
+        { unique: 0, total: 0 },
+      ),
+    [progressBySet, scopedSets],
   )
+  const selectedSet = sets.find((set) => set.id === scope.setId)
+  const scopeTitle =
+    selectedSet?.name || (scope.series === 'all' ? 'All binders' : scope.series)
+  const setOptions = [
+    {
+      id: 'all',
+      label:
+        scope.series === 'all' ? 'All unlocked sets' : `All ${scope.series}`,
+    },
+    ...sets
+      .filter((set) => scope.series === 'all' || set.series === scope.series)
+      .map((set) => ({
+        id: set.id,
+        label:
+          scope.series === 'all' ? `${set.series} · ${set.name}` : set.name,
+      })),
+  ]
+  const seriesOptions = [
+    { id: 'all', label: 'All series' },
+    ...seriesGroups.map((group) => ({
+      id: group.series,
+      label: `${group.series} · ${group.sets.length}`,
+    })),
+  ]
+  const selectedCardIndex = selectedCard
+    ? catalogCards.findIndex((item) => item.card.id === selectedCard.card.id)
+    : -1
+  const hasPreviousCard = catalogCards
+    .slice(0, selectedCardIndex)
+    .some((item) => (entriesByCard[item.card.id]?.quantity || 0) > 0)
+  const hasNextCard =
+    catalogCards
+      .slice(selectedCardIndex + 1)
+      .some((item) => (entriesByCard[item.card.id]?.quantity || 0) > 0) ||
+    Boolean(nextCursor)
 
-  const currentSetStats = useMemo(() => {
-    if (searchQuery.trim()) {
-      return { unique: catalogOwnedTotal, total: catalogTotal }
+  const selectAdjacentCard = async (direction: -1 | 1) => {
+    if (selectedCardIndex < 0) return
+    let candidateIndex = selectedCardIndex + direction
+    while (
+      candidateIndex >= 0 &&
+      candidateIndex < catalogCards.length &&
+      !entriesByCard[catalogCards[candidateIndex].card.id]
+    ) {
+      candidateIndex += direction
     }
-
-    if (!selectedSetId || selectedSetId === 'all') {
-      return {
-        unique: collectionSummary.uniqueCards,
-        total: totalCards,
+    const candidate = catalogCards[candidateIndex]
+    if (candidate) {
+      setSelectedCard(candidate)
+      setRewardSummary(null)
+      setDeckMessage('')
+      return
+    }
+    if (direction === 1 && nextCursor) {
+      const newItems = await loadMoreCards()
+      const nextOwnedCard = newItems.find(
+        (item) => (entriesByCard[item.card.id]?.quantity || 0) > 0,
+      )
+      if (nextOwnedCard) {
+        setSelectedCard(nextOwnedCard)
+        setRewardSummary(null)
+        setDeckMessage('')
       }
     }
-
-    const set = sets.find((s) => s.id === selectedSetId)
-    if (!set) return { unique: 0, total: 0 }
-
-    const total = set.total
-    const unique = (gameData?.tcg || []).reduce(
-      (count, entry) =>
-        count +
-        (entry.setId === selectedSetId ||
-        entry.cardId.startsWith(`${selectedSetId}-`)
-          ? 1
-          : 0),
-      0,
-    )
-
-    return { unique, total }
-  }, [
-    selectedSetId,
-    sets,
-    collectionSummary,
-    catalogOwnedTotal,
-    selectedPokemonId,
-    searchQuery,
-    catalogCards,
-    catalogTotal,
-    gameData?.tcg,
-  ])
+  }
 
   return (
     <DexPageShell
       title="Carddex"
-      subtitle="Card collection"
+      subtitle="Binder archive"
       contentClassName="p-0 md:p-0"
     >
       <DexFilterBar
         label="Carddex filters"
-        className="hidden items-center gap-3 rounded-none border-x-0 border-t-0 px-6 py-3 lg:flex"
+        className="hidden rounded-none border-x-0 border-t-0 px-6 py-3 lg:block"
+        footer={
+          <>
+            <SlidersHorizontal className="size-3.5" aria-hidden="true" />
+            <span className="text-xs text-game-muted" aria-live="polite">
+              {catalogTotal} {catalogTotal === 1 ? 'card' : 'cards'} in this
+              view
+            </span>
+            {activeFilterCount > 0 && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={clearFilters}
+                className="ml-auto min-h-8 px-2 text-xs"
+              >
+                <X className="size-3.5" aria-hidden="true" />
+                Clear {activeFilterCount}
+              </Button>
+            )}
+          </>
+        }
       >
-        <div className="relative min-w-0 flex-1">
-          <PremiumSearch
-            role="combobox"
-            aria-autocomplete="list"
-            aria-expanded={showDropdown && filteredPokemon.length > 0}
-            aria-controls="tcg-pokemon-options-desktop"
-            aria-activedescendant={
-              activePokemonIndex >= 0
-                ? `tcg-pokemon-desktop-${filteredPokemon[activePokemonIndex]?.id}`
-                : undefined
-            }
-            placeholder="Search Pokémon"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            onFocus={() => setShowDropdown(true)}
-            onKeyDown={handleSearchKeyDown}
-            showClear={!!searchQuery}
-            onClear={clearSearch}
-          />
-          {showDropdown && filteredPokemon.length > 0 && (
-            <div
-              id="tcg-pokemon-options-desktop"
-              role="listbox"
-              className="absolute left-0 right-0 top-full z-50 mt-2 max-h-60 overflow-auto rounded-lg border border-game-border bg-game-surface-raised shadow-xl"
+        <div className="grid grid-cols-[minmax(14rem,1.5fr)_minmax(10rem,0.8fr)_minmax(12rem,1fr)_auto] gap-2">
+          <div className="space-y-2">
+            <label
+              htmlFor="carddex-search"
+              className="text-xs font-medium text-game-muted"
             >
-              {filteredPokemon.map((p, index) => (
-                <button
-                  type="button"
-                  id={`tcg-pokemon-desktop-${p.id}`}
-                  role="option"
-                  aria-selected={index === activePokemonIndex}
-                  key={`desktop-${p.id}`}
-                  onClick={() => handlePokemonSelect(p)}
-                  className={`game-focus-ring block min-h-10 w-full px-4 py-2 text-left text-sm transition-colors hover:bg-game-surface ${index === activePokemonIndex ? 'bg-game-moss/10' : ''}`}
-                >
-                  {p.name}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="w-64 shrink-0">
+              Search
+            </label>
+            <PremiumSearch
+              id="carddex-search"
+              placeholder="Cards, numbers, or sets"
+              value={filters.query}
+              onChange={(event) => updateFilter('query', event.target.value)}
+              showClear={Boolean(filters.query)}
+              onClear={() => updateFilter('query', '')}
+            />
+          </div>
           <PremiumSelect
-            value={selectedSetId}
-            onValueChange={setSelectedSetId}
-            placeholder="Select a set"
-            options={sets.map((set) => ({ id: set.id, label: set.name }))}
+            label="Series"
+            value={scope.series}
+            onValueChange={selectSeries}
+            options={seriesOptions}
+            placeholder="Choose a series"
           />
+          <PremiumSelect
+            label="Binder"
+            value={scope.setId}
+            onValueChange={selectSet}
+            options={setOptions}
+            placeholder="Choose a binder"
+          />
+          <Button
+            type="button"
+            variant="secondary"
+            aria-expanded={filtersExpanded}
+            aria-controls="carddex-advanced-filters"
+            onClick={() => setFiltersExpanded((current) => !current)}
+            className="mt-[1.625rem] min-h-11 px-3"
+          >
+            <SlidersHorizontal className="size-4" aria-hidden="true" />
+            Filters
+            {activeFilterCount > 0 && (
+              <span className="rounded-full bg-game-moss px-1.5 py-0.5 font-mono text-[10px] text-game-cream">
+                {activeFilterCount}
+              </span>
+            )}
+          </Button>
+        </div>
+        <div
+          id="carddex-advanced-filters"
+          className={filtersExpanded ? 'mt-3' : 'hidden'}
+        >
+          <CarddexFilterFields filters={filters} onChange={updateFilter} />
         </div>
       </DexFilterBar>
 
-      {/* Main Content - Scrollable with padding */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-4 md:px-6 pt-4">
-        {/* Section Divider with Set Name/Pokemon Name and Stats */}
-        <div className="mb-4">
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 md:px-6">
+        {sets.length > 0 && (
+          <CarddexBinderShelf
+            seriesGroups={seriesGroups}
+            progressBySet={progressBySet}
+            scope={scope}
+            onSelectSeries={selectSeries}
+            onSelectSet={selectSet}
+          />
+        )}
+
+        <div className="mb-4 mt-5">
           <SectionDivider className="mb-0 flex-1">
-            {searchQuery
-              ? searchQuery
-              : selectedSetId
-                ? sets.find((s) => s.id === selectedSetId)?.name || 'All Cards'
-                : 'All Cards'}
+            {scopeTitle}
             <DexCountSummary
               className="ml-2 inline"
-              count={currentSetStats.total}
+              count={catalogTotal}
               singular="card"
               plural="cards"
               detail={
                 collectionLoading || catalogLoading
                   ? 'Checking collection…'
-                  : `${currentSetStats.unique} collected`
+                  : `${catalogOwnedTotal} collected in results`
               }
             />
           </SectionDivider>
+          {scopeProgress.total > 0 && (
+            <div className="mt-2 flex items-center gap-3 text-xs text-game-muted">
+              <div
+                role="progressbar"
+                aria-label={`${scopeTitle} collection progress`}
+                aria-valuemin={0}
+                aria-valuemax={scopeProgress.total}
+                aria-valuenow={scopeProgress.unique}
+                className="h-1.5 min-w-24 flex-1 overflow-hidden rounded-full bg-game-border/70"
+              >
+                <div
+                  className="h-full rounded-full bg-game-moss transition-[width] motion-reduce:transition-none"
+                  style={{
+                    width: `${Math.min(100, (scopeProgress.unique / scopeProgress.total) * 100)}%`,
+                  }}
+                />
+              </div>
+              <span className="shrink-0 font-mono">
+                {scopeProgress.unique}/{scopeProgress.total} recorded
+              </span>
+            </div>
+          )}
         </div>
 
         {collectionError || catalogError ? (
@@ -588,31 +683,55 @@ export default function TcgExplorerPage({
         ) : catalogCards.length === 0 &&
           !collectionLoading &&
           !catalogLoading ? (
-          <div className="game-folio-section mx-auto max-w-xl p-6 text-center">
-            <p className="font-display text-lg font-semibold text-game-ink">
-              No cards match this search
-            </p>
-            <p className="mt-2 text-sm text-game-muted">
-              Clear your search or choose another binder.
-            </p>
-            {searchQuery && (
-              <Button variant="outline" className="mt-4" onClick={clearSearch}>
-                Clear search
-              </Button>
-            )}
-          </div>
+          <DexEmptyState
+            title="No cards match this view"
+            description="Try another binder or clear the active filters."
+            action={
+              activeFilterCount > 0 ? (
+                <Button variant="outline" onClick={clearFilters}>
+                  Clear filters
+                </Button>
+              ) : undefined
+            }
+          />
         ) : (
           <div className="grid grid-cols-4 gap-2 pb-8 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 2xl:grid-cols-10">
-            {catalogCards.map(({ card, set }, index) => (
-              <TcgCardItem
-                key={card.id}
-                card={card}
-                set={set}
-                entry={entriesByCard[card.id]}
-                slot={index + 1}
-                onClick={() => setSelectedCard({ card, set })}
-              />
-            ))}
+            {catalogCards.map(({ card, set }, index) => {
+              const showSetHeading =
+                scopedSets.length > 1 &&
+                filters.sort === 'set-number' &&
+                catalogCards[index - 1]?.set.id !== set.id
+              return (
+                <div key={card.id} className="contents">
+                  {showSetHeading && (
+                    <div className="col-span-full flex items-center gap-3 border-b border-game-border pb-2 pt-3">
+                      <ItemSprite
+                        itemId={`binder-${set.id}`}
+                        alt=""
+                        width={30}
+                        height={30}
+                        className="size-7 shrink-0"
+                      />
+                      <div className="min-w-0">
+                        <h3 className="truncate font-display text-sm font-semibold text-game-ink">
+                          {set.name}
+                        </h3>
+                        <p className="truncate text-[11px] text-game-muted">
+                          {set.series}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  <TcgCardItem
+                    card={card}
+                    set={set}
+                    entry={entriesByCard[card.id]}
+                    slot={index + 1}
+                    onClick={() => setSelectedCard({ card, set })}
+                  />
+                </div>
+              )
+            })}
           </div>
         )}
         {catalogLoading && catalogCards.length === 0 && (
@@ -637,61 +756,78 @@ export default function TcgExplorerPage({
       </div>
 
       <SecondaryControlBar className="lg:hidden">
-        <div
-          className="grid grid-cols-[minmax(0,1fr)_minmax(8rem,0.5fr)] gap-2"
-          ref={dropdownRef}
-        >
-          <div className="relative">
-            <PremiumSearch
-              role="combobox"
-              aria-autocomplete="list"
-              aria-expanded={showDropdown && filteredPokemon.length > 0}
-              aria-controls="tcg-pokemon-options-mobile"
-              aria-activedescendant={
-                activePokemonIndex >= 0
-                  ? `tcg-pokemon-mobile-${filteredPokemon[activePokemonIndex]?.id}`
-                  : undefined
-              }
-              placeholder="Search Pokémon"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              onFocus={() => setShowDropdown(true)}
-              onKeyDown={handleSearchKeyDown}
-              showClear={!!searchQuery}
-              onClear={clearSearch}
-            />
-            {showDropdown && filteredPokemon.length > 0 && (
-              <div
-                id="tcg-pokemon-options-mobile"
-                role="listbox"
-                className="absolute bottom-full left-0 right-0 z-50 mb-2 max-h-60 overflow-auto rounded-lg border border-game-border bg-game-surface-raised shadow-lg"
-              >
-                {filteredPokemon.map((p, index) => (
-                  <button
-                    type="button"
-                    id={`tcg-pokemon-mobile-${p.id}`}
-                    role="option"
-                    aria-selected={index === activePokemonIndex}
-                    key={p.id}
-                    onClick={() => handlePokemonSelect(p)}
-                    className={`game-focus-ring block min-h-10 w-full cursor-pointer px-4 py-2 text-left text-sm text-game-ink transition-colors hover:bg-game-surface ${index === activePokemonIndex ? 'bg-game-moss/10' : ''}`}
-                  >
-                    {p.name}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-          <PremiumSelect
-            value={selectedSetId}
-            onValueChange={setSelectedSetId}
-            placeholder="Select a set"
-            options={sets.map((set) => ({ id: set.id, label: set.name }))}
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
+          <PremiumSearch
+            placeholder="Search cards"
+            value={filters.query}
+            onChange={(event) => updateFilter('query', event.target.value)}
+            showClear={Boolean(filters.query)}
+            onClear={() => updateFilter('query', '')}
           />
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => setMobileFiltersOpen(true)}
+            className="min-h-11 px-3"
+            aria-label={`Open Carddex filters${activeFilterCount ? `, ${activeFilterCount} active` : ''}`}
+          >
+            <SlidersHorizontal className="size-4" aria-hidden="true" />
+            Filters
+            {activeFilterCount > 0 && (
+              <span className="rounded-full bg-game-moss px-1.5 py-0.5 font-mono text-[10px] text-game-cream">
+                {activeFilterCount}
+              </span>
+            )}
+          </Button>
         </div>
       </SecondaryControlBar>
 
-      {/* Card Details Drawer */}
+      <ResponsivePanel
+        open={mobileFiltersOpen}
+        onOpenChange={setMobileFiltersOpen}
+        title="Browse the Carddex"
+        description="Choose a shelf, binder, and the cards you want to see."
+        desktopBreakpoint="lg"
+        mobileMaxHeight="100dvh"
+        className="gap-0 overflow-hidden bg-game-surface text-game-ink"
+      >
+        <div className="custom-scrollbar min-h-0 flex-1 space-y-5 overflow-y-auto p-5">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <PremiumSelect
+              label="Series"
+              value={scope.series}
+              onValueChange={selectSeries}
+              options={seriesOptions}
+            />
+            <PremiumSelect
+              label="Binder"
+              value={scope.setId}
+              onValueChange={selectSet}
+              options={setOptions}
+            />
+          </div>
+          <CarddexFilterFields filters={filters} onChange={updateFilter} />
+        </div>
+        <div className="flex gap-2 border-t border-game-border p-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={clearFilters}
+            disabled={activeFilterCount === 0}
+            className="flex-1"
+          >
+            Clear filters
+          </Button>
+          <Button
+            type="button"
+            onClick={() => setMobileFiltersOpen(false)}
+            className="flex-1"
+          >
+            Show {catalogTotal} cards
+          </Button>
+        </div>
+      </ResponsivePanel>
+
       <ResponsivePanel
         open={!!selectedCard}
         onOpenChange={(open) => {
@@ -711,6 +847,31 @@ export default function TcgExplorerPage({
       >
         {selectedCard && (
           <div className="custom-scrollbar w-full overflow-y-auto p-5 md:p-6">
+            <div className="mb-5 flex items-center justify-between gap-3 border-b border-game-border pb-3">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                disabled={!hasPreviousCard}
+                onClick={() => void selectAdjacentCard(-1)}
+              >
+                <ChevronLeft className="size-4" aria-hidden="true" />
+                Previous
+              </Button>
+              <span className="font-mono text-[11px] text-game-muted">
+                {selectedCardIndex + 1} of {catalogTotal}
+              </span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                disabled={!hasNextCard || catalogLoading}
+                onClick={() => void selectAdjacentCard(1)}
+              >
+                Next
+                <ChevronRight className="size-4" aria-hidden="true" />
+              </Button>
+            </div>
             <div className="grid items-start gap-5 lg:grid-cols-[minmax(12rem,0.8fr)_minmax(0,1fr)]">
               {/* Large Card Image */}
               <div className="mx-auto w-full max-w-64 lg:sticky lg:top-0">
@@ -767,6 +928,26 @@ export default function TcgExplorerPage({
                       {selectedCard.card.number}
                     </p>
                   </div>
+
+                  <div className="grid min-h-12 grid-cols-[5rem_1fr] items-center gap-3 py-2">
+                    <span className="text-xs font-semibold text-game-muted">
+                      Collected
+                    </span>
+                    <p className="text-right font-mono text-sm font-bold text-game-ink">
+                      {entriesByCard[selectedCard.card.id]?.quantity || 0}
+                    </p>
+                  </div>
+
+                  {selectedCard.card.rarity && (
+                    <div className="grid min-h-12 grid-cols-[5rem_1fr] items-center gap-3 py-2">
+                      <span className="text-xs font-semibold text-game-muted">
+                        Rarity
+                      </span>
+                      <p className="text-right text-sm font-semibold text-game-ink">
+                        {selectedCard.card.rarity}
+                      </p>
+                    </div>
+                  )}
 
                   {selectedCard.card.artist && (
                     <div className="grid min-h-12 grid-cols-[5rem_1fr] items-center gap-3 py-2">
@@ -909,6 +1090,211 @@ export default function TcgExplorerPage({
         )}
       </ResponsivePanel>
     </DexPageShell>
+  )
+}
+
+type CarddexFilterChange = <K extends keyof CarddexViewFilters>(
+  key: K,
+  value: CarddexViewFilters[K],
+) => void
+
+function CarddexFilterFields({
+  filters,
+  onChange,
+}: {
+  filters: CarddexViewFilters
+  onChange: CarddexFilterChange
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+      <PremiumSelect
+        label="Ownership"
+        value={filters.ownership}
+        onValueChange={(value) =>
+          onChange('ownership', value as CarddexViewFilters['ownership'])
+        }
+        options={[...CARDDEX_OWNERSHIP_OPTIONS]}
+      />
+      <PremiumSelect
+        label="Card kind"
+        value={filters.supertype}
+        onValueChange={(value) =>
+          onChange('supertype', value as CarddexViewFilters['supertype'])
+        }
+        options={[...CARDDEX_SUPERTYPE_OPTIONS]}
+      />
+      <PremiumSelect
+        label="Pokémon type"
+        value={filters.type}
+        onValueChange={(value) => onChange('type', value)}
+        options={[...CARDDEX_TYPE_OPTIONS]}
+      />
+      <PremiumSelect
+        label="Rarity"
+        value={filters.rarity}
+        onValueChange={(value) =>
+          onChange('rarity', value as CarddexViewFilters['rarity'])
+        }
+        options={[...CARDDEX_RARITY_OPTIONS]}
+      />
+      <PremiumSelect
+        label="Sort"
+        value={filters.sort}
+        onValueChange={(value) =>
+          onChange('sort', value as CarddexViewFilters['sort'])
+        }
+        options={[...CARDDEX_SORT_OPTIONS]}
+      />
+    </div>
+  )
+}
+
+function CarddexBinderShelf({
+  seriesGroups,
+  progressBySet,
+  scope,
+  onSelectSeries,
+  onSelectSet,
+}: {
+  seriesGroups: CarddexSeriesGroup<TcgSetSummary>[]
+  progressBySet: Map<string, { unique: number; total: number }>
+  scope: CarddexScope
+  onSelectSeries: (series: string) => void
+  onSelectSet: (setId: string) => void
+}) {
+  const activeSeries = seriesGroups.find(
+    (group) => group.series === scope.series,
+  )
+  const totalUnique = seriesGroups.reduce(
+    (total, group) => total + group.unique,
+    0,
+  )
+  const totalCards = seriesGroups.reduce(
+    (total, group) => total + group.total,
+    0,
+  )
+
+  return (
+    <section aria-labelledby="carddex-binder-shelf" className="space-y-3">
+      <div className="flex items-center gap-2">
+        <Library className="size-4 text-game-ochre-strong" aria-hidden="true" />
+        <h2
+          id="carddex-binder-shelf"
+          className="game-field-label text-game-ink"
+        >
+          Binder shelf
+        </h2>
+        <span className="ml-auto text-[11px] text-game-muted">
+          Series first, then set
+        </span>
+      </div>
+
+      <div
+        className="custom-scrollbar flex snap-x gap-2 overflow-x-auto pb-1"
+        role="group"
+        aria-label="Card series"
+      >
+        <button
+          type="button"
+          aria-pressed={scope.series === 'all'}
+          onClick={() => onSelectSeries('all')}
+          className={`game-focus-ring min-h-16 w-36 shrink-0 snap-start rounded-lg border px-3 py-2 text-left transition-colors ${
+            scope.series === 'all'
+              ? 'border-game-moss bg-game-moss/10'
+              : 'border-game-border bg-game-surface-raised hover:border-game-moss/40'
+          }`}
+        >
+          <span className="block truncate font-display text-sm font-semibold text-game-ink">
+            All series
+          </span>
+          <span className="mt-1 block font-mono text-[10px] text-game-muted">
+            {totalUnique}/{totalCards}
+          </span>
+        </button>
+        {seriesGroups.map((group) => (
+          <button
+            type="button"
+            key={group.series}
+            aria-pressed={scope.series === group.series}
+            onClick={() => onSelectSeries(group.series)}
+            className={`game-focus-ring min-h-16 w-44 shrink-0 snap-start rounded-lg border px-3 py-2 text-left transition-colors ${
+              scope.series === group.series
+                ? 'border-game-moss bg-game-moss/10'
+                : 'border-game-border bg-game-surface-raised hover:border-game-moss/40'
+            }`}
+          >
+            <span className="block truncate font-display text-sm font-semibold text-game-ink">
+              {group.series}
+            </span>
+            <span className="mt-1 block font-mono text-[10px] text-game-muted">
+              {group.sets.length} {group.sets.length === 1 ? 'set' : 'sets'} ·{' '}
+              {group.unique}/{group.total}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {activeSeries && (
+        <div
+          className="custom-scrollbar flex snap-x gap-2 overflow-x-auto border-t border-game-border pt-3 pb-1"
+          role="group"
+          aria-label={`${activeSeries.series} binders`}
+        >
+          <button
+            type="button"
+            aria-pressed={scope.setId === 'all'}
+            onClick={() => onSelectSet('all')}
+            className={`game-focus-ring min-h-16 w-36 shrink-0 snap-start rounded-lg border px-3 py-2 text-left transition-colors ${
+              scope.setId === 'all'
+                ? 'border-game-ochre bg-game-ochre/10'
+                : 'border-game-border bg-game-surface-raised hover:border-game-ochre/40'
+            }`}
+          >
+            <span className="block truncate font-display text-sm font-semibold text-game-ink">
+              Whole series
+            </span>
+            <span className="mt-1 block font-mono text-[10px] text-game-muted">
+              {activeSeries.unique}/{activeSeries.total}
+            </span>
+          </button>
+          {activeSeries.sets.map((set) => {
+            const progress = progressBySet.get(set.id) || {
+              unique: 0,
+              total: set.total,
+            }
+            return (
+              <button
+                type="button"
+                key={set.id}
+                aria-pressed={scope.setId === set.id}
+                onClick={() => onSelectSet(set.id)}
+                className={`game-focus-ring flex min-h-16 w-48 shrink-0 snap-start items-center gap-2 rounded-lg border px-3 py-2 text-left transition-colors ${
+                  scope.setId === set.id
+                    ? 'border-game-ochre bg-game-ochre/10'
+                    : 'border-game-border bg-game-surface-raised hover:border-game-ochre/40'
+                }`}
+              >
+                <ItemSprite
+                  itemId={`binder-${set.id}`}
+                  alt=""
+                  width={40}
+                  height={40}
+                  className="size-10 shrink-0"
+                />
+                <span className="min-w-0">
+                  <span className="block truncate font-display text-sm font-semibold text-game-ink">
+                    {set.name}
+                  </span>
+                  <span className="mt-1 block font-mono text-[10px] text-game-muted">
+                    {progress.unique}/{progress.total} cards
+                  </span>
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      )}
+    </section>
   )
 }
 

@@ -1,6 +1,13 @@
 import { getTcgSetByIdLazy } from '@/data/tcg/set-loader'
 import { tcgSetSummaries } from '@/data/tcg/summaries'
 import type { TcgCard, TcgSet } from '@/data/tcg/types'
+import type {
+  CarddexOwnershipFilter,
+  CarddexRarityFilter,
+  CarddexSort,
+  CarddexSupertypeFilter,
+} from '@/utilities/tcg/carddex-view'
+import { normalizeTcgPackRarity } from '@/utilities/tcg/tcg-card-draw'
 
 const validSetIds = new Set(tcgSetSummaries.map((set) => set.id))
 
@@ -23,11 +30,22 @@ export type TcgCatalogQuery = {
   query?: string
   sampleSeed?: string
   rarities?: string[]
+  rarityBucket?: CarddexRarityFilter
+  ownership?: CarddexOwnershipFilter
+  supertype?: CarddexSupertypeFilter
+  type?: string
+  sort?: CarddexSort
   pokemonId?: number
   ownedCardIds?: string[]
+  ownedCardQuantities?: Record<string, number>
   offset?: number
   limit?: number
 }
+
+const collectorNumberCollator = new Intl.Collator('en', {
+  numeric: true,
+  sensitivity: 'base',
+})
 
 function stableHash(value: string) {
   let hash = 2166136261
@@ -57,8 +75,14 @@ export async function getTcgCatalogPage({
   query = '',
   sampleSeed = '',
   rarities = [],
+  rarityBucket = 'all',
+  ownership = 'all',
+  supertype = 'all',
+  type = 'all',
+  sort = 'set-number',
   pokemonId,
   ownedCardIds = [],
+  ownedCardQuantities = {},
   offset = 0,
   limit = 40,
 }: TcgCatalogQuery): Promise<TcgCatalogPage> {
@@ -86,6 +110,9 @@ export async function getTcgCatalogPage({
   const hasPokemonId = Number.isInteger(pokemonId) && (pokemonId || 0) > 0
   const matches: TcgCatalogItem[] = []
   const ownedIds = new Set(ownedCardIds)
+  const getOwnedQuantity = (cardId: string) =>
+    ownedCardQuantities[cardId] ?? (ownedIds.has(cardId) ? 1 : 0)
+  const normalizedType = type.trim().toLowerCase()
 
   for (const set of sets) {
     const setSummary = compactSet(set)
@@ -94,6 +121,27 @@ export async function getTcgCatalogPage({
       if (raritySet.size > 0 && (!card.rarity || !raritySet.has(card.rarity)))
         continue
       if (
+        rarityBucket !== 'all' &&
+        normalizeTcgPackRarity(card.rarity) !== rarityBucket
+      )
+        continue
+      const normalizedSupertype = card.supertype
+        .normalize('NFD')
+        .replaceAll(/\p{Diacritic}/gu, '')
+        .toLowerCase()
+      if (supertype !== 'all' && normalizedSupertype !== supertype) continue
+      if (
+        normalizedType !== 'all' &&
+        !(card.types || []).some(
+          (cardType) => cardType.toLowerCase() === normalizedType,
+        )
+      )
+        continue
+      const ownedQuantity = getOwnedQuantity(card.id)
+      if (ownership === 'owned' && ownedQuantity <= 0) continue
+      if (ownership === 'missing' && ownedQuantity > 0) continue
+      if (ownership === 'duplicates' && ownedQuantity <= 1) continue
+      if (
         hasPokemonId &&
         !card.nationalPokedexNumbers.includes(pokemonId as number)
       )
@@ -101,7 +149,7 @@ export async function getTcgCatalogPage({
       if (
         !hasPokemonId &&
         normalizedQuery &&
-        ![card.name, card.id, card.number].some((value) =>
+        ![card.name, card.id, card.number, set.name, set.series].some((value) =>
           value?.toLowerCase().includes(normalizedQuery),
         )
       )
@@ -116,6 +164,47 @@ export async function getTcgCatalogPage({
         stableHash(`${sampleSeed}:${left.card.id}`) -
         stableHash(`${sampleSeed}:${right.card.id}`),
     )
+  } else {
+    const setOrder = new Map(sets.map((set, index) => [set.id, index]))
+    const compareSetNumber = (left: TcgCatalogItem, right: TcgCatalogItem) => {
+      const setDelta =
+        (setOrder.get(left.set.id) || 0) - (setOrder.get(right.set.id) || 0)
+      if (setDelta !== 0) return setDelta
+      return collectorNumberCollator.compare(
+        left.card.number,
+        right.card.number,
+      )
+    }
+    const rarityRank = { common: 0, uncommon: 1, rare: 2, chase: 3 }
+    matches.sort((left, right) => {
+      if (sort === 'name') {
+        return (
+          left.card.name.localeCompare(right.card.name) ||
+          compareSetNumber(left, right)
+        )
+      }
+      if (sort === 'rarity') {
+        return (
+          rarityRank[normalizeTcgPackRarity(right.card.rarity)] -
+            rarityRank[normalizeTcgPackRarity(left.card.rarity)] ||
+          compareSetNumber(left, right)
+        )
+      }
+      if (sort === 'missing-first') {
+        return (
+          Number(getOwnedQuantity(left.card.id) > 0) -
+            Number(getOwnedQuantity(right.card.id) > 0) ||
+          compareSetNumber(left, right)
+        )
+      }
+      if (sort === 'duplicates-first') {
+        return (
+          getOwnedQuantity(right.card.id) - getOwnedQuantity(left.card.id) ||
+          compareSetNumber(left, right)
+        )
+      }
+      return compareSetNumber(left, right)
+    })
   }
 
   const items = matches.slice(offset, offset + limit)
@@ -124,7 +213,7 @@ export async function getTcgCatalogPage({
     items,
     total: matches.length,
     ownedTotal: matches.reduce(
-      (count, item) => count + (ownedIds.has(item.card.id) ? 1 : 0),
+      (count, item) => count + (getOwnedQuantity(item.card.id) > 0 ? 1 : 0),
       0,
     ),
     nextCursor: nextOffset < matches.length ? String(nextOffset) : null,

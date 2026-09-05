@@ -5,6 +5,7 @@ import { tcgSetSummaries } from '@/data/tcg/summaries'
 import { APP_VERSION } from '@/utilities/app-version'
 import { parseCatalogPage } from '@/utilities/catalog-response'
 import { rateLimit } from '@/utilities/rate-limiter'
+import { normalizeCarddexFilters } from '@/utilities/tcg/carddex-view'
 import { getTcgCatalogPage } from '@/utilities/tcg/catalog'
 import { getUserTcgMap } from '@/utilities/user-state'
 
@@ -44,7 +45,14 @@ export async function GET(request: Request) {
         .filter(Boolean),
     ),
   ).slice(0, 80)
-  const query = (searchParams.get('q') || '').trim().toLowerCase().slice(0, 80)
+  const viewFilters = normalizeCarddexFilters({
+    query: searchParams.get('q') || '',
+    ownership: searchParams.get('ownership') || undefined,
+    supertype: searchParams.get('supertype') || undefined,
+    type: searchParams.get('type') || undefined,
+    rarity: searchParams.get('rarity') || undefined,
+    sort: searchParams.get('sort') || undefined,
+  })
   const sampleSeed = (searchParams.get('sampleSeed') || '').slice(0, 80)
   const rarities = new Set(
     (searchParams.get('rarities') || '')
@@ -60,11 +68,17 @@ export async function GET(request: Request) {
   const page = await getTcgCatalogPage({
     setIds,
     cardIds,
-    query,
+    query: viewFilters.query,
     sampleSeed,
     rarities: Array.from(rarities),
+    rarityBucket: viewFilters.rarity,
+    ownership: viewFilters.ownership,
+    supertype: viewFilters.supertype,
+    type: viewFilters.type,
+    sort: viewFilters.sort,
     pokemonId: hasPokemonId ? pokemonId : undefined,
     ownedCardIds: Object.keys(ownedCards),
+    ownedCardQuantities: ownedCards,
     offset,
     limit,
   })
