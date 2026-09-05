@@ -12,9 +12,20 @@ import {
 } from '@/utilities/research/endless-milestones'
 
 const milestones = [
-  { score: 300, rewards: [{ type: 'item' as const, targetId: 'potion', quantity: 1 }] },
-  { score: 100, rewards: [{ type: 'currency' as const, targetId: 'pokedollars', quantity: 50 }] },
-  { score: 700, rewards: [{ type: 'item' as const, targetId: 'poke-ball', quantity: 1 }] },
+  {
+    score: 300,
+    rewards: [{ type: 'item' as const, targetId: 'potion', quantity: 1 }],
+  },
+  {
+    score: 100,
+    rewards: [
+      { type: 'currency' as const, targetId: 'pokedollars', quantity: 50 },
+    ],
+  },
+  {
+    score: 700,
+    rewards: [{ type: 'item' as const, targetId: 'poke-ball', quantity: 1 }],
+  },
 ]
 
 describe('endless milestone helpers', () => {
@@ -26,14 +37,17 @@ describe('endless milestone helpers', () => {
   })
 
   test('returns achieved milestones sorted by score and excludes claimed milestones', () => {
-    expect(getAchievedUnclaimedMilestones(milestones, 700, [300]).map((m) => m.score)).toEqual([
-      100,
-      700,
-    ])
+    expect(
+      getAchievedUnclaimedMilestones(milestones, 700, [300]).map(
+        (m) => m.score,
+      ),
+    ).toEqual([100, 700])
   })
 
   test('returns no completion rewards for already claimed milestone scores', () => {
-    expect(getAchievedUnclaimedMilestones(milestones, 700, [100, 300, 700])).toEqual([])
+    expect(
+      getAchievedUnclaimedMilestones(milestones, 700, [100, 300, 700]),
+    ).toEqual([])
   })
 
   test('finds the lowest milestone without requiring sorted config data', () => {
@@ -53,7 +67,9 @@ describe('endless milestone helpers', () => {
         ],
       }),
     ).toBe(50)
-    expect(getLowestEndlessRewardScore({ milestones: [], repeatingRewards: [] })).toBeNull()
+    expect(
+      getLowestEndlessRewardScore({ milestones: [], repeatingRewards: [] }),
+    ).toBeNull()
   })
 
   test('supports authored random repeating reward score ranges', () => {
@@ -84,11 +100,15 @@ describe('endless milestone helpers', () => {
           {
             everyScore: 350,
             random: true,
-            rewards: [{ type: 'item', targetId: 'broken-ball-t1', quantity: 1 }],
+            rewards: [
+              { type: 'item', targetId: 'broken-ball-t1', quantity: 1 },
+            ],
           },
           {
             everyScore: 150,
-            rewards: [{ type: 'pokemon_research_xp', targetId: '19', quantity: 1 }],
+            rewards: [
+              { type: 'pokemon_research_xp', targetId: '19', quantity: 1 },
+            ],
           },
         ],
         1050,
@@ -115,7 +135,9 @@ describe('endless milestone helpers', () => {
           {
             everyScore: 350,
             random: true,
-            rewards: [{ type: 'item', targetId: 'broken-ball-t1', quantity: 1 }],
+            rewards: [
+              { type: 'item', targetId: 'broken-ball-t1', quantity: 1 },
+            ],
           },
         ],
         finalScore: 1050,
@@ -127,8 +149,18 @@ describe('endless milestone helpers', () => {
       }),
     ).toEqual([
       { type: 'item', targetId: 'soft-fluff-t1', quantity: 2, dropChance: 100 },
-      { type: 'item', targetId: 'wing-feather-t1', quantity: 4, dropChance: 100 },
-      { type: 'item', targetId: 'broken-ball-t1', quantity: 4, dropChance: 100 },
+      {
+        type: 'item',
+        targetId: 'wing-feather-t1',
+        quantity: 4,
+        dropChance: 100,
+      },
+      {
+        type: 'item',
+        targetId: 'broken-ball-t1',
+        quantity: 4,
+        dropChance: 100,
+      },
     ])
   })
 
@@ -139,9 +171,7 @@ describe('endless milestone helpers', () => {
           {
             everyScore: { min: 50, max: 75 },
             random: true,
-            rewards: [
-              { type: 'item', targetId: 'swift-feather', quantity: 1 },
-            ],
+            rewards: [{ type: 'item', targetId: 'swift-feather', quantity: 1 }],
           },
         ],
         finalScore: 250,
@@ -160,7 +190,20 @@ describe('endless milestone helpers', () => {
   test('calculates bounded anti-cheat scores by game type', () => {
     expect(getMaxAllowedEndlessScore('run', {}, 10)).toBe(150)
     expect(getMaxAllowedEndlessScore('surf', {}, 10)).toBe(150)
-    expect(getMaxAllowedEndlessScore('rhythm', { spawnRate: { min: 0.5 } }, 10)).toBe(900)
+    expect(
+      getMaxAllowedEndlessScore('rhythm', { spawnRate: { min: 0.5 } }, 10),
+    ).toBe(900)
     expect(getMaxAllowedEndlessScore('match3', {}, 10)).toBeNull()
+    expect(
+      getMaxAllowedEndlessScore('snake', { minTickMs: 100, foodScore: 10 }, 10),
+    ).toBe(1500)
+    expect(
+      getMaxAllowedEndlessScore(
+        'brick-breaker',
+        { ball: { maxSpeed: 400, radius: 10 }, pointsPerHit: 10 },
+        10,
+      ),
+    ).toBe(3000)
+    expect(getMaxAllowedEndlessScore('snake', {}, -1)).toBe(0)
   })
 })

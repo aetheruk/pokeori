@@ -15,7 +15,9 @@ export function getRequiredResearchWins(encounter: ResearchGameConfig): number {
   if (
     encounter.gameType === 'field-observation' ||
     encounter.gameType === 'tcg-battle' ||
-    encounter.gameType === 'procedure-order'
+    encounter.gameType === 'procedure-order' ||
+    encounter.gameType === 'brick-breaker' ||
+    encounter.gameType === 'snake'
   ) {
     return 1
   }

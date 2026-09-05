@@ -758,6 +758,242 @@ const gridPuzzleSettingsSchema = z.union([
     }),
 ])
 
+const endlessScoreIntervalSchema = z.union([
+  z.number().positive(),
+  z
+    .object({
+      min: z.number().positive(),
+      max: z.number().positive(),
+    })
+    .strict()
+    .refine((range) => range.max >= range.min, {
+      message: 'max must be greater than or equal to min',
+    }),
+])
+
+const endlessSettingsSchema = z
+  .object({
+    enabled: z.boolean(),
+    waveSpeedIncrease: z.number().nonnegative().optional(),
+    milestones: z.array(
+      z
+        .object({
+          score: z.number().nonnegative(),
+          rewards: z.array(rewardSchema),
+        })
+        .strict(),
+    ),
+    repeatingRewards: z
+      .array(
+        z
+          .object({
+            everyScore: endlessScoreIntervalSchema,
+            random: z.boolean().optional(),
+            rewards: z.array(rewardSchema).min(1),
+          })
+          .strict(),
+      )
+      .optional(),
+  })
+  .strict()
+
+const brickBreakerSettingsSchema = z
+  .object({
+    playfield: z
+      .object({
+        width: z.number().int().min(280).max(1000),
+        height: z.number().int().min(360).max(1200),
+      })
+      .strict(),
+    layout: z.array(z.string().regex(/^[.123#]+$/)).min(1).max(20),
+    brickGap: z.number().min(0).max(20),
+    boardPadding: z.number().min(0).max(100),
+    boardTop: z.number().min(0).max(400),
+    paddle: z
+      .object({
+        width: z.number().positive().max(400),
+        height: z.number().positive().max(80),
+        speed: z.number().positive().max(2000),
+      })
+      .strict(),
+    ball: z
+      .object({
+        radius: z.number().positive().max(40),
+        initialSpeed: z.number().positive().max(2000),
+        maxSpeed: z.number().positive().max(3000),
+        accelerationPerHit: z.number().nonnegative().max(100),
+      })
+      .strict(),
+    lives: z.number().int().min(1).max(20),
+    pointsPerHit: z.number().int().min(1).max(10_000),
+    rewardLifetimeMs: z.number().int().min(500).max(60_000).optional(),
+    timeLimit: z.number().positive().max(3600).optional(),
+    endless: endlessSettingsSchema.optional(),
+  })
+  .strict()
+  .superRefine((settings, ctx) => {
+    const width = settings.layout[0]?.length || 0
+    settings.layout.forEach((row, index) => {
+      if (row.length !== width) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['layout', index],
+          message: 'Brick Breaker layout rows must have equal widths',
+        })
+      }
+    })
+    if (!settings.layout.some((row) => /[123]/.test(row))) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['layout'],
+        message: 'Brick Breaker requires at least one destructible brick',
+      })
+    }
+    if (settings.ball.maxSpeed < settings.ball.initialSpeed) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['ball', 'maxSpeed'],
+        message: 'Brick Breaker max speed must be at least initial speed',
+      })
+    }
+    if (settings.paddle.width >= settings.playfield.width) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['paddle', 'width'],
+        message: 'Brick Breaker paddle must fit inside the playfield',
+      })
+    }
+    const boardWidth = settings.playfield.width - settings.boardPadding * 2
+    if (boardWidth <= 0 || settings.boardTop >= settings.playfield.height) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['playfield'],
+        message: 'Brick Breaker board must fit inside the playfield',
+      })
+    }
+  })
+
+const snakePositionSchema = z
+  .object({
+    x: z.number().int().nonnegative(),
+    y: z.number().int().nonnegative(),
+  })
+  .strict()
+
+const snakeSettingsSchema = z
+  .object({
+    gridSize: z
+      .object({
+        columns: z.number().int().min(8).max(40),
+        rows: z.number().int().min(8).max(40),
+      })
+      .strict(),
+    initialLength: z.number().int().min(2).max(20),
+    initialPosition: snakePositionSchema,
+    initialDirection: z.enum(['up', 'down', 'left', 'right']),
+    tickMs: z.number().int().min(40).max(1000),
+    speedUpEvery: z.number().int().positive().max(1000),
+    speedUpByMs: z.number().int().nonnegative().max(500),
+    minTickMs: z.number().int().min(30).max(1000),
+    foodScore: z.number().int().positive().max(10_000),
+    wrapBoundaries: z.boolean().optional(),
+    walls: z.array(snakePositionSchema).max(400).optional(),
+    sprites: z
+      .object({
+        head: z.string().min(1),
+        body: z.string().min(1),
+        tail: z.string().min(1),
+        food: z.string().min(1).optional(),
+      })
+      .strict(),
+    rewardLifetimeMs: z.number().int().min(500).max(60_000).optional(),
+    winScore: z.number().int().positive().optional(),
+    timeLimit: z.number().positive().max(3600).optional(),
+    endless: endlessSettingsSchema.omit({ waveSpeedIncrease: true }).optional(),
+  })
+  .strict()
+  .superRefine((settings, ctx) => {
+    const { columns, rows } = settings.gridSize
+    const directionVectors = {
+      up: { x: 0, y: -1 },
+      down: { x: 0, y: 1 },
+      left: { x: -1, y: 0 },
+      right: { x: 1, y: 0 },
+    } as const
+    const vector = directionVectors[settings.initialDirection]
+    const tail = {
+      x: settings.initialPosition.x - vector.x * (settings.initialLength - 1),
+      y: settings.initialPosition.y - vector.y * (settings.initialLength - 1),
+    }
+    const positions = [
+      { path: ['initialPosition'] as (string | number)[], value: settings.initialPosition },
+      ...(settings.walls || []).map((value, index) => ({
+        path: ['walls', index] as (string | number)[],
+        value,
+      })),
+    ]
+    positions.forEach(({ path, value }) => {
+      if (value.x >= columns || value.y >= rows) {
+        ctx.addIssue({
+          code: 'custom',
+          path,
+          message: 'Snake position must fit inside the grid',
+        })
+      }
+    })
+    if (settings.initialLength >= Math.max(columns, rows)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['initialLength'],
+        message: 'Snake initial length must fit inside the grid',
+      })
+    }
+    if (tail.x < 0 || tail.x >= columns || tail.y < 0 || tail.y >= rows) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['initialPosition'],
+        message: 'Snake initial body must fit inside the grid',
+      })
+    }
+    const wallKeys = new Set<string>()
+    for (const [index, wall] of (settings.walls || []).entries()) {
+      const key = `${wall.x}:${wall.y}`
+      if (wallKeys.has(key)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['walls', index],
+          message: 'Snake wall positions must be unique',
+        })
+      }
+      wallKeys.add(key)
+    }
+    for (let index = 0; index < settings.initialLength; index += 1) {
+      const key = `${settings.initialPosition.x - vector.x * index}:${settings.initialPosition.y - vector.y * index}`
+      if (wallKeys.has(key)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['walls'],
+          message: 'Snake walls cannot overlap the initial body',
+        })
+        break
+      }
+    }
+    if (settings.minTickMs > settings.tickMs) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['minTickMs'],
+        message: 'Snake minimum tick must not exceed its initial tick',
+      })
+    }
+    if (!settings.endless?.enabled && typeof settings.winScore !== 'number') {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['winScore'],
+        message: 'Finite Snake games require a win score',
+      })
+    }
+  })
+
 const settingsByGameType: Record<string, z.ZodTypeAny> = {
   silhouette: commonKnowledgeSettings,
   identify: commonKnowledgeSettings,
@@ -1123,6 +1359,8 @@ const settingsByGameType: Record<string, z.ZodTypeAny> = {
     })
     .strict()
     .refine((settings) => settings.minimumWinChance < settings.maximumWinChance),
+  'brick-breaker': brickBreakerSettingsSchema,
+  snake: snakeSettingsSchema,
 }
 
 export const gameItemSchema = baseGameSchema

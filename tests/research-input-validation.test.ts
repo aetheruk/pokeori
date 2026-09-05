@@ -37,6 +37,10 @@ describe('research input validation', () => {
     expect(validateResearchAnswer('run', true).success).toBe(true)
     expect(validateResearchAnswer('flap', false).success).toBe(true)
     expect(validateResearchAnswer('surf', true).success).toBe(true)
+    expect(validateResearchAnswer('brick-breaker', true).success).toBe(true)
+    expect(validateResearchAnswer('snake', false).success).toBe(true)
+    expect(validateResearchAnswer('brick-breaker', 'true').success).toBe(false)
+    expect(validateResearchAnswer('snake', 1).success).toBe(false)
     expect(validateResearchAnswer('mining', 'true').success).toBe(false)
   })
 

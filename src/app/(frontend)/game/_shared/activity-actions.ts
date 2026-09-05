@@ -1163,11 +1163,12 @@ export async function startGameActivity(
             quantity: reward.quantity,
           }))
         const researchingLevel = (user.skills as any)?.researching?.level || 1
-        const fieldObservationEggReward = await maybeBuildFieldObservationEggReward(
-          payload as any,
-          user,
-          validatedEncounterId,
-        )
+        const fieldObservationEggReward =
+          await maybeBuildFieldObservationEggReward(
+            payload as any,
+            user,
+            validatedEncounterId,
+          )
         const collectibleDrops = buildFieldObservationCollectibleDrops({
           rewardSubjects: generated.privateRoundData.rewardSubjects,
           spawns: generated.publicRoundData.spawns,
@@ -2288,6 +2289,8 @@ export async function completeGameActivity(
         encounter.gameType === 'prize-wheel'
       const isScoreCompletionGame =
         (encounter.gameType === 'match3' &&
+          typeof encounter.settings.winScore === 'number') ||
+        (encounter.gameType === 'snake' &&
           typeof encounter.settings.winScore === 'number') ||
         (encounter.gameType === 'tcg-inspection' &&
           typeof encounter.settings.requiredAnswers === 'number') ||

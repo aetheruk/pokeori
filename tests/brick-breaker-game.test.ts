@@ -1,0 +1,154 @@
+import { describe, expect, test } from 'bun:test'
+import type { BrickBreakerGameSettings } from '@/data/games/brick-breaker/types'
+import {
+  clampBrickBreakerPaddleX,
+  createBrickBreakerBoard,
+  getBrickBreakerBallSpeed,
+  getBrickBreakerLaunchBall,
+  reflectBrickBreakerPaddle,
+  stepBrickBreaker,
+} from '@/utilities/research/brick-breaker'
+
+const settings: BrickBreakerGameSettings = {
+  playfield: { width: 390, height: 640 },
+  layout: ['12#'],
+  brickGap: 5,
+  boardPadding: 15,
+  boardTop: 80,
+  paddle: { width: 80, height: 14, speed: 400 },
+  ball: {
+    radius: 7,
+    initialSpeed: 280,
+    maxSpeed: 420,
+    accelerationPerHit: 4,
+  },
+  lives: 3,
+  pointsPerHit: 10,
+}
+
+describe('Brick Breaker mechanics', () => {
+  test('builds durability and indestructible bricks from the character layout', () => {
+    const bricks = createBrickBreakerBoard(settings)
+    expect(
+      bricks.map(({ durability, indestructible }) => ({
+        durability,
+        indestructible,
+      })),
+    ).toEqual([
+      { durability: 1, indestructible: false },
+      { durability: 2, indestructible: false },
+      { durability: Infinity, indestructible: true },
+    ])
+    expect(bricks[2].x + bricks[2].width).toBeCloseTo(375)
+  })
+
+  test('clamps the paddle within both field edges', () => {
+    expect(clampBrickBreakerPaddleX(-20, 80, 390)).toBe(0)
+    expect(clampBrickBreakerPaddleX(500, 80, 390)).toBe(310)
+    expect(clampBrickBreakerPaddleX(120, 80, 390)).toBe(120)
+  })
+
+  test('launches a speed-normalized ball from the paddle', () => {
+    const ball = getBrickBreakerLaunchBall(
+      { x: 100, y: 600, width: 80, height: 14 },
+      7,
+      280,
+    )
+    expect(ball.x).toBe(140)
+    expect(ball.vy).toBeLessThan(0)
+    expect(getBrickBreakerBallSpeed(ball)).toBeCloseTo(280)
+  })
+
+  test('uses paddle contact position to aim the rebound', () => {
+    const paddle = { x: 100, y: 600, width: 100, height: 14 }
+    const left = reflectBrickBreakerPaddle(
+      { x: 105, y: 598, vx: 0, vy: 300, radius: 7 },
+      paddle,
+      400,
+    )
+    const right = reflectBrickBreakerPaddle(
+      { x: 195, y: 598, vx: 0, vy: 300, radius: 7 },
+      paddle,
+      400,
+    )
+    expect(left.vx).toBeLessThan(0)
+    expect(right.vx).toBeGreaterThan(0)
+    expect(left.vy).toBeLessThan(0)
+  })
+
+  test('damages a brick, scores a hit, and accelerates the ball', () => {
+    const brick = {
+      id: 'brick',
+      x: 100,
+      y: 100,
+      width: 80,
+      height: 25,
+      durability: 2,
+      indestructible: false,
+    }
+    const result = stepBrickBreaker(
+      { x: 140, y: 140, vx: 0, vy: -300, radius: 7 },
+      [brick],
+      { x: 100, y: 600, width: 80, height: 14 },
+      settings,
+      0.12,
+    )
+    expect(result.hits).toBe(1)
+    expect(result.bricks[0].durability).toBe(1)
+    expect(getBrickBreakerBallSpeed(result.ball)).toBeGreaterThan(300)
+  })
+
+  test('substeps fast movement so a thin brick cannot be tunnelled through', () => {
+    const brick = {
+      id: 'brick',
+      x: 100,
+      y: 100,
+      width: 80,
+      height: 18,
+      durability: 1,
+      indestructible: false,
+    }
+    const result = stepBrickBreaker(
+      { x: 140, y: 170, vx: 0, vy: -900, radius: 5 },
+      [brick],
+      { x: 100, y: 600, width: 80, height: 14 },
+      { ...settings, ball: { ...settings.ball, maxSpeed: 900 } },
+      0.1,
+    )
+    expect(result.hits).toBe(1)
+    expect(result.cleared).toBe(true)
+  })
+
+  test('keeps indestructible bricks and does not award points for them', () => {
+    const brick = {
+      id: 'wall',
+      x: 100,
+      y: 100,
+      width: 80,
+      height: 25,
+      durability: Infinity,
+      indestructible: true,
+    }
+    const result = stepBrickBreaker(
+      { x: 140, y: 140, vx: 0, vy: -300, radius: 7 },
+      [brick],
+      { x: 100, y: 600, width: 80, height: 14 },
+      settings,
+      0.12,
+    )
+    expect(result.hits).toBe(0)
+    expect(result.bricks).toHaveLength(1)
+    expect(result.ball.vy).toBeGreaterThan(0)
+  })
+
+  test('reports a lost ball below the playfield', () => {
+    const result = stepBrickBreaker(
+      { x: 200, y: 635, vx: 0, vy: 300, radius: 7 },
+      createBrickBreakerBoard(settings),
+      { x: 0, y: 600, width: 80, height: 14 },
+      settings,
+      0.1,
+    )
+    expect(result.lost).toBe(true)
+  })
+})

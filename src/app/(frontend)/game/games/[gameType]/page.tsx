@@ -3,6 +3,7 @@ import type { ComponentType } from 'react'
 import { getBattleBetsState } from '@/app/(frontend)/game/games/battle-bets-actions'
 import { ArtAcademyGame } from '@/app/(frontend)/game/research/encounter/art-academy'
 import { BattleBetsGame } from '@/app/(frontend)/game/research/encounter/battle-bets'
+import { BrickBreakerGame } from '@/app/(frontend)/game/research/encounter/brick-breaker'
 import { CryRecognitionGame } from '@/app/(frontend)/game/research/encounter/cry-recognition'
 import { DiglettTunnelTapGame } from '@/app/(frontend)/game/research/encounter/diglett-tunnel-tap'
 import { FishingGame } from '@/app/(frontend)/game/research/encounter/fishing'
@@ -22,6 +23,7 @@ import { RunGame } from '@/app/(frontend)/game/research/encounter/run'
 import { SurfGame } from '@/app/(frontend)/game/research/encounter/surf'
 import { SlidingPuzzleGame } from '@/app/(frontend)/game/research/encounter/sliding-puzzle'
 import { SlotGame } from '@/app/(frontend)/game/research/encounter/slots'
+import { SnakeGame } from '@/app/(frontend)/game/research/encounter/snake'
 import { SpellingGame } from '@/app/(frontend)/game/research/encounter/spelling'
 import { TcgBattleGame } from '@/app/(frontend)/game/research/encounter/tcg-battle'
 import { TcgInspectionGame } from '@/app/(frontend)/game/research/encounter/tcg-inspection'
@@ -75,6 +77,8 @@ const GAME_COMPONENTS: Partial<Record<GameType, ComponentType<GameProps>>> = {
   'art-academy': ArtAcademyGame as unknown as ComponentType<GameProps>,
   'procedure-order': ProcedureOrderGame as unknown as ComponentType<GameProps>,
   'battle-bets': BattleBetsGame as unknown as ComponentType<GameProps>,
+  'brick-breaker': BrickBreakerGame as unknown as ComponentType<GameProps>,
+  snake: SnakeGame as unknown as ComponentType<GameProps>,
 }
 
 export default async function GamePage({
