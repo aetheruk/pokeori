@@ -158,7 +158,15 @@ describe('continuous Snake mechanics', () => {
     expect(
       advanceContinuousSnake({
         ...base,
+        boundaryRadius: 6,
         snake: [{ x: 12, y: 100 }],
+      }).collision,
+    ).toBeNull()
+    expect(
+      advanceContinuousSnake({
+        ...base,
+        boundaryRadius: 6,
+        snake: [{ x: 8, y: 100 }],
       }).collision,
     ).toBe('boundary')
     expect(
@@ -245,7 +253,8 @@ describe('Onix Snake test entry and scene', () => {
     expect(game?.subCategory).toBe('Test')
     expect(game?.isEligibleForReplay).toBe(true)
     expect(game?.settings.playfield).toEqual({ width: 390, height: 700 })
-    expect(game?.settings.turnRate).toBeGreaterThan(0)
+    expect(game?.settings.turnRate).toBe(360)
+    expect(game?.settings.boundaryRadius).toBe(20)
     expect(game?.settings.moveSpeed).toBe(150)
     expect(game?.settings.maxSpeed).toBe(225)
     expect(game?.settings.sprites.food).toBe('/sprites/items/everstone.avif')
@@ -277,6 +286,17 @@ describe('Onix Snake test entry and scene', () => {
     expect(source).toContain('settings.rewardRadius * 2')
     expect(source).toContain('className="absolute inset-0 z-10')
     expect(source).toContain('runtimePlayfieldRef.current.width')
+    expect(source).toContain('settings.headRadius * 2.75')
+    expect(source).toContain('boundaryRadius: settings.boundaryRadius')
+
+    const foodMarkup =
+      source.split('{food ? (')[1]?.split('{sceneRewards.map')[0] ?? ''
+    const rewardMarkup = source.split('{sceneRewards.map')[1] ?? ''
+    expect(foodMarkup).toContain('settings.sprites.food')
+    expect(foodMarkup).not.toContain('bg-game-ochre/20')
+    expect(foodMarkup).not.toContain('motion-safe:animate-ping')
+    expect(rewardMarkup).toContain('bg-game-ochre/20')
+    expect(rewardMarkup).toContain('motion-safe:animate-ping')
   })
 
   test('releases pointer steering without retaining an orbit target', async () => {

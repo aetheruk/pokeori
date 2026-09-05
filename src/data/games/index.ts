@@ -450,6 +450,7 @@ export interface GameSettings {
   speedUpBy?: number
   turnRate?: number
   headRadius?: number
+  boundaryRadius?: number
   bodyRadius?: number
   foodRadius?: number
   rewardRadius?: number

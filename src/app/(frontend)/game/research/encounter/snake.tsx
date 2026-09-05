@@ -347,7 +347,7 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
     const targetHeading = getSnakePointerHeading(
       snakeRef.current[0],
       target,
-      settings.headRadius * 1.75,
+      settings.headRadius * 2.75,
     )
     if (targetHeading === null) {
       pointerTargetRef.current = null
@@ -390,7 +390,7 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
         const pointerHeading = getSnakePointerHeading(
           snakeRef.current[0],
           pointerTargetRef.current,
-          settings.headRadius * 1.75,
+          settings.headRadius * 2.75,
         )
         if (pointerHeading === null) {
           pointerTargetRef.current = null
@@ -415,6 +415,7 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
         deltaSeconds,
         segmentSpacing: settings.segmentSpacing,
         headRadius: settings.headRadius,
+        boundaryRadius: settings.boundaryRadius,
         bodyRadius: settings.bodyRadius,
         playfield: runtimePlayfieldRef.current,
         obstacles: getRuntimeObstacles(),
@@ -646,23 +647,20 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
 
         {food ? (
           <div
-            className="absolute z-10 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-game-ochre/70 bg-game-ochre/20 shadow-[0_0_14px_rgba(181,138,67,0.48)]"
+            className="absolute z-10 -translate-x-1/2 -translate-y-1/2"
             style={sceneCircleStyle(
               food,
               settings.foodRadius * 2,
               runtimePlayfield,
             )}
           >
-            <span className="pointer-events-none absolute inset-[10%] rounded-full border border-amber-200/35 motion-safe:animate-ping" />
-            <span className="relative z-10 h-[72%] w-[72%]">
-              <Image
-                src={settings.sprites.food}
-                alt="Cave stone"
-                fill
-                sizes="48px"
-                className="object-contain drop-shadow-md"
-              />
-            </span>
+            <Image
+              src={settings.sprites.food}
+              alt="Cave stone"
+              fill
+              sizes="48px"
+              className="object-contain drop-shadow-md"
+            />
           </div>
         ) : null}
 

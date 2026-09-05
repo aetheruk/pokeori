@@ -36,6 +36,7 @@ export interface ContinuousSnakeStepInput {
   deltaSeconds: number
   segmentSpacing: number
   headRadius: number
+  boundaryRadius?: number
   bodyRadius: number
   playfield: { width: number; height: number }
   obstacles?: SnakeObstacle[]
@@ -162,6 +163,7 @@ export function advanceContinuousSnake({
   deltaSeconds,
   segmentSpacing,
   headRadius,
+  boundaryRadius = headRadius,
   bodyRadius,
   playfield,
   obstacles = [],
@@ -181,10 +183,10 @@ export function advanceContinuousSnake({
   }
 
   const outside =
-    head.x < headRadius ||
-    head.x > playfield.width - headRadius ||
-    head.y < headRadius ||
-    head.y > playfield.height - headRadius
+    head.x < boundaryRadius ||
+    head.x > playfield.width - boundaryRadius ||
+    head.y < boundaryRadius ||
+    head.y > playfield.height - boundaryRadius
   if (outside && !wrapBoundaries) {
     return { snake, heading: nextHeading, collision: 'boundary' }
   }
