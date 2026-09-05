@@ -7,6 +7,29 @@ export interface SnakeCircle extends SnakePosition {
   radius: number
 }
 
+export function getResponsiveSnakePlayfield(
+  authoredPlayfield: { width: number; height: number },
+  viewportWidth: number,
+  viewportHeight: number,
+) {
+  if (viewportWidth <= 0 || viewportHeight <= 0) return authoredPlayfield
+  return {
+    width: authoredPlayfield.height * (viewportWidth / viewportHeight),
+    height: authoredPlayfield.height,
+  }
+}
+
+export function centerSnakePositionForPlayfield(
+  position: SnakePosition,
+  authoredPlayfield: { width: number; height: number },
+  runtimePlayfield: { width: number; height: number },
+) {
+  return {
+    x: position.x + (runtimePlayfield.width - authoredPlayfield.width) / 2,
+    y: position.y + (runtimePlayfield.height - authoredPlayfield.height) / 2,
+  }
+}
+
 export interface ContinuousSnakeStepInput {
   snake: SnakePosition[]
   heading: number

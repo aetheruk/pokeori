@@ -22,8 +22,10 @@ import { usePageVisibility } from '@/hooks/usePageVisibility'
 import { getLowestEndlessRewardScore } from '@/utilities/research/endless-milestones'
 import {
   advanceContinuousSnake,
+  centerSnakePositionForPlayfield,
   createInitialSnake,
   findSafeSnakePosition,
+  getResponsiveSnakePlayfield,
   getSegmentHeading,
   getSnakeSpeed,
   growSnake,
@@ -62,10 +64,16 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
   const visible = usePageVisibility()
   const settings = encounter.settings
   const stageRef = useRef<HTMLElement>(null)
+  const [runtimePlayfield, setRuntimePlayfield] = useState(settings.playfield)
+  const runtimePlayfieldRef = useRef(settings.playfield)
   const initialSnake = useMemo(
     () =>
       createInitialSnake(
-        settings.initialPosition,
+        centerSnakePositionForPlayfield(
+          settings.initialPosition,
+          settings.playfield,
+          runtimePlayfieldRef.current,
+        ),
         settings.initialLength,
         settings.initialHeading,
         settings.segmentSpacing,
@@ -105,6 +113,19 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
   const collectedRewardsRef = useRef<Record<string, number>>({})
   const pressedKeysRef = useRef(new Set<string>())
 
+  const getRuntimeObstacles = useCallback(
+    () =>
+      (settings.obstacles ?? []).map((obstacle) => ({
+        ...centerSnakePositionForPlayfield(
+          obstacle,
+          settings.playfield,
+          runtimePlayfieldRef.current,
+        ),
+        radius: obstacle.radius,
+      })),
+    [settings],
+  )
+
   const pickupCircles = useCallback(
     (
       nextSnake: SnakePosition[],
@@ -115,7 +136,7 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
         ...position,
         radius: index === 0 ? settings.headRadius : settings.bodyRadius,
       })),
-      ...(settings.obstacles ?? []),
+      ...getRuntimeObstacles(),
       ...rewards.map((reward) => ({
         ...reward.position,
         radius: settings.rewardRadius,
@@ -124,13 +145,13 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
         ? [{ ...foodRef.current, radius: settings.foodRadius }]
         : []),
     ],
-    [settings],
+    [getRuntimeObstacles, settings],
   )
 
   const placeFood = useCallback(
     (nextSnake: SnakePosition[], rewards: SceneReward[]) => {
       const nextFood = findSafeSnakePosition(
-        settings.playfield,
+        runtimePlayfieldRef.current,
         settings.foodRadius,
         pickupCircles(nextSnake, rewards),
         settings.minimumSpawnDistance,
@@ -188,7 +209,11 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
 
   const resetLocalGame = useCallback(() => {
     const nextSnake = createInitialSnake(
-      settings.initialPosition,
+      centerSnakePositionForPlayfield(
+        settings.initialPosition,
+        settings.playfield,
+        runtimePlayfieldRef.current,
+      ),
       settings.initialLength,
       settings.initialHeading,
       settings.segmentSpacing,
@@ -219,6 +244,47 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
     setTimeLeft(settings.timeLimit ?? 0)
     placeFood(nextSnake, [])
   }, [placeFood, rewardConfigs, settings])
+
+  useEffect(() => {
+    const stage = stageRef.current
+    if (!stage) return
+    const updatePlayfield = () => {
+      const bounds = stage.getBoundingClientRect()
+      const next = getResponsiveSnakePlayfield(
+        settings.playfield,
+        bounds.width,
+        bounds.height,
+      )
+      const previous = runtimePlayfieldRef.current
+      if (Math.abs(next.width - previous.width) < 0.1) return
+      const shiftX = (next.width - previous.width) / 2
+      const translate = (position: SnakePosition) => ({
+        x: position.x + shiftX,
+        y: position.y,
+      })
+      const nextSnake = snakeRef.current.map(translate)
+      const nextFood = foodRef.current ? translate(foodRef.current) : null
+      const nextRewards = rewardsRef.current.map((reward) => ({
+        ...reward,
+        position: translate(reward.position),
+      }))
+
+      runtimePlayfieldRef.current = next
+      snakeRef.current = nextSnake
+      foodRef.current = nextFood
+      rewardsRef.current = nextRewards
+      pointerTargetRef.current = null
+      targetHeadingRef.current = headingRef.current
+      setRuntimePlayfield(next)
+      setSnake(nextSnake)
+      setFood(nextFood)
+      setSceneRewards(nextRewards)
+    }
+    updatePlayfield()
+    const observer = new ResizeObserver(updatePlayfield)
+    observer.observe(stage)
+    return () => observer.disconnect()
+  }, [settings.playfield])
 
   useEffect(() => {
     let cancelled = false
@@ -272,11 +338,23 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
     const bounds = stageRef.current?.getBoundingClientRect()
     if (!bounds) return
     const target = {
-      x: ((event.clientX - bounds.left) / bounds.width) * settings.playfield.width,
-      y: ((event.clientY - bounds.top) / bounds.height) * settings.playfield.height,
+      x:
+        ((event.clientX - bounds.left) / bounds.width) *
+        runtimePlayfieldRef.current.width,
+      y:
+        ((event.clientY - bounds.top) / bounds.height) *
+        runtimePlayfieldRef.current.height,
     }
     pointerTargetRef.current = target
     targetHeadingRef.current = headingToward(snakeRef.current[0], target)
+  }
+
+  const clearPointerSteering = (event: React.PointerEvent<HTMLElement>) => {
+    pointerTargetRef.current = null
+    targetHeadingRef.current = headingRef.current
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
   }
 
   useEffect(() => {
@@ -320,8 +398,8 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
         segmentSpacing: settings.segmentSpacing,
         headRadius: settings.headRadius,
         bodyRadius: settings.bodyRadius,
-        playfield: settings.playfield,
-        obstacles: settings.obstacles,
+        playfield: runtimePlayfieldRef.current,
+        obstacles: getRuntimeObstacles(),
         wrapBoundaries: settings.wrapBoundaries,
       })
       if (step.collision) {
@@ -381,7 +459,7 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
           const scheduledScore = rewardSchedulesRef.current[config.key]
           if (scheduledScore === undefined || nextScore < scheduledScore) continue
           const position = findSafeSnakePosition(
-            settings.playfield,
+            runtimePlayfieldRef.current,
             settings.rewardRadius,
             pickupCircles(nextSnake, activeRewards, true),
             settings.minimumSpawnDistance,
@@ -442,6 +520,7 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
     placeFood,
     playSfx,
     rewardConfigs,
+    getRuntimeObstacles,
     settings,
     visible,
   ])
@@ -471,6 +550,8 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
     setStatus('Press Start or Space, then steer toward the cave floor.')
   }
 
+  const runtimeObstacles = getRuntimeObstacles()
+
   return (
     <div
       className="game-activity-chrome relative h-dvh touch-none overflow-hidden bg-cover bg-center text-game-raised select-none"
@@ -483,6 +564,13 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
       onPointerMove={(event) => {
         if ((event.target as HTMLElement).closest('button')) return
         steerTowardPointer(event)
+      }}
+      onPointerUp={clearPointerSteering}
+      onPointerCancel={clearPointerSteering}
+      onPointerLeave={(event) => {
+        if (!event.currentTarget.hasPointerCapture(event.pointerId)) {
+          clearPointerSteering(event)
+        }
       }}
     >
       <div className="pointer-events-none absolute inset-0 bg-game-ink/25" />
@@ -510,20 +598,20 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
         ref={stageRef}
         aria-label="Onix tunnel survey playfield"
         aria-describedby="snake-controls snake-status"
-        className="absolute left-1/2 top-1/2 z-10 h-[min(100dvh,179.487vw)] w-[min(100vw,55.714dvh)] -translate-x-1/2 -translate-y-1/2 touch-none overflow-hidden"
+        className="absolute inset-0 z-10 touch-none overflow-hidden"
       >
-        {(settings.obstacles ?? []).map((obstacle, index) => (
+        {runtimeObstacles.map((obstacle, index) => (
           <div
             key={`${obstacle.x}:${obstacle.y}:${index}`}
             className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-game-line/30 bg-game-ink/75 shadow-lg"
-            style={sceneCircleStyle(obstacle, obstacle.radius * 2, settings.playfield)}
+            style={sceneCircleStyle(obstacle, obstacle.radius * 2, runtimePlayfield)}
           />
         ))}
 
         {food ? (
           <div
             className="absolute z-10 -translate-x-1/2 -translate-y-1/2"
-            style={sceneCircleStyle(food, settings.foodRadius * 2, settings.playfield)}
+            style={sceneCircleStyle(food, settings.foodRadius * 2, runtimePlayfield)}
           >
             {settings.sprites.food ? (
               <Image src={settings.sprites.food} alt="Cave food" fill sizes="48px" className="object-contain" />
@@ -537,7 +625,7 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
           <div
             key={reward.id}
             className="absolute z-20 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border border-game-ochre/70 bg-game-ochre/20 shadow-[0_0_14px_rgba(181,138,67,0.48)]"
-            style={sceneCircleStyle(reward.position, settings.rewardRadius * 2, settings.playfield)}
+            style={sceneCircleStyle(reward.position, settings.rewardRadius * 2, runtimePlayfield)}
           >
             <div className="pointer-events-none absolute inset-[10%] rounded-full border border-amber-200/35 motion-safe:animate-ping" />
             <div className="absolute inset-[20%]">
@@ -563,7 +651,7 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
               position={segment}
               heading={segmentHeading}
               radius={radius}
-              playfield={settings.playfield}
+              playfield={runtimePlayfield}
             />
           )
         })}
