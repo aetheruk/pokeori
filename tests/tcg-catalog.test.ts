@@ -30,6 +30,56 @@ describe('TCG catalog ownership totals', () => {
     expect(secondPage.ownedTotal).toBe(2)
     expect(firstPage.total).toBe(secondPage.total)
   })
+
+  test('filters ownership before paging and sorts duplicate quantities first', async () => {
+    const setId = tcgSetSummaries[0].id
+    const sample = await getTcgCatalogPage({ setIds: [setId], limit: 3 })
+    const [duplicate, owned] = sample.items
+    const quantities = {
+      [duplicate.card.id]: 3,
+      [owned.card.id]: 1,
+    }
+
+    const duplicates = await getTcgCatalogPage({
+      setIds: [setId],
+      ownership: 'duplicates',
+      ownedCardQuantities: quantities,
+      limit: 1,
+    })
+    const missing = await getTcgCatalogPage({
+      setIds: [setId],
+      ownership: 'missing',
+      ownedCardQuantities: quantities,
+      limit: 1,
+    })
+    const duplicateFirst = await getTcgCatalogPage({
+      setIds: [setId],
+      sort: 'duplicates-first',
+      ownedCardQuantities: quantities,
+      limit: 3,
+    })
+
+    expect(duplicates.total).toBe(1)
+    expect(duplicates.items[0].card.id).toBe(duplicate.card.id)
+    expect(missing.total).toBe(sample.total - 2)
+    expect(missing.ownedTotal).toBe(0)
+    expect(duplicateFirst.items[0].card.id).toBe(duplicate.card.id)
+  })
+
+  test('searches card, number, set, and series metadata within scope', async () => {
+    const set = tcgSetSummaries[0]
+    const sample = await getTcgCatalogPage({ setIds: [set.id], limit: 1 })
+    const card = sample.items[0].card
+
+    for (const query of [card.name, card.number, set.name, set.series]) {
+      const result = await getTcgCatalogPage({
+        setIds: [set.id],
+        query,
+        limit: 1,
+      })
+      expect(result.total).toBeGreaterThan(0)
+    }
+  })
 })
 
 describe('Carddex discovery and keyboard presentation', () => {

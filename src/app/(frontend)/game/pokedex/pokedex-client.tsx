@@ -1620,23 +1620,6 @@ const PokedexGridItem = memo(function PokedexGridItem({
           </div>
         )}
       </div>
-      {hasSeen && (
-        <div
-          className={cn(
-            'absolute left-1 top-1 flex size-5 items-center justify-center rounded-md border bg-game-surface/90',
-            hasCaught
-              ? 'border-game-ochre/40 text-game-ochre'
-              : 'border-game-moss/35 text-game-moss-strong',
-          )}
-        >
-          {hasCaught ? (
-            <CircleDot className="size-3" aria-hidden="true" />
-          ) : (
-            <Eye className="size-3" aria-hidden="true" />
-          )}
-          <span className="sr-only">{hasCaught ? 'Caught' : 'Seen'}</span>
-        </div>
-      )}
       {/* ID Overlay */}
       <div className="absolute bottom-1 right-1 rounded bg-game-surface/90 px-1 py-0.5 font-mono text-[10px] font-bold leading-none text-game-muted">
         #{speciesId}
