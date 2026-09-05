@@ -1,5 +1,10 @@
 # Current Game State
 
+## Kanto Test arcade activities
+
+- `brick-breaker-test` adds an always-available, replayable endless mineral-breaking trial. Its configuration authors the brick pattern, durability, paddle and ball physics, lives, scoring, wave acceleration, collectible lifetime, milestones, and random repeating Rock Gem/Ground Gem rewards. Reward specimens must be popped by the ball before completion to be granted.
+- `onix-snake-test` adds an always-available, replayable endless Onix tunnel survey. Its configuration authors the grid, starting body and direction, speed curve, food score, collision behavior, sprite roles, collectible lifetime, milestones, and random repeating Rock Gem/Ground Gem rewards. The moving creature uses a dedicated original three-part rock-serpent sprite set, supports swipe, keyboard, and touch D-pad controls, and must reach reward items with its head.
+
 - Release `0.28.1`: Carddex browsing now works as a collector's binder shelf. Unlocked expansions are grouped newest-first by series and set, each shelf reports real collection progress, and URLs preserve the selected scope plus search, ownership, card-kind, Pokémon-type, rarity, and sort controls. Filtering and stable sorting happen before cursor pagination, search stays inside the chosen shelf, mobile uses a full-height filter field note, multi-set results retain set dividers, and owned-card inspectors add previous/next navigation with collection quantity and rarity. Pokédex grid tiles no longer repeat seen/caught icons when the existing sprite treatment already communicates discovery, leaving more room for the Pokémon artwork.
 
 - Release `0.28.0`: Sketch now checks the opposing Pokémon's currently available new moves before rolling its 25% capture chance. If the target has no eligible move, or every eligible move is already recorded, the battle log reports that immediately instead of showing a random capture failure and revealing the empty pool only after a successful roll. PvE and PvP use the same ordering.

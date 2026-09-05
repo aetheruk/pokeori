@@ -156,6 +156,17 @@ export { procedureOrderGames } from './procedure-order'
 export type { BattleBetsGameConfig, BattleBetsSettings } from './battle-bets/types'
 export { battleBetsGames } from './battle-bets'
 
+// Brick Breaker game
+export type {
+  BrickBreakerGameConfig,
+  BrickBreakerGameSettings,
+} from './brick-breaker/types'
+export { brickBreakerGames } from './brick-breaker'
+
+// Onix Snake game
+export * from './snake/types'
+export { snakeGames } from './snake'
+
 // All games combined (useful for explore-list)
 import { silhouetteEntries as silhouetteGames } from './silhouette'
 import { identifyEntries as identifyGames } from './identify'
@@ -184,6 +195,8 @@ import { magnemiteCircuitGames } from './magnemite-circuit'
 import { artAcademyGames } from './art-academy'
 import { procedureOrderGames } from './procedure-order'
 import { battleBetsGames } from './battle-bets'
+import { brickBreakerGames } from './brick-breaker'
+import { snakeGames } from './snake'
 import type { BaseGameConfig } from './shared'
 
 export type GameType =
@@ -214,6 +227,8 @@ export type GameType =
   | 'art-academy'
   | 'procedure-order'
   | 'battle-bets'
+  | 'brick-breaker'
+  | 'snake'
 
 export type FieldResearchGameType = Extract<GameType, 'field-observation'>
 export type MiniGameType = Exclude<GameType, FieldResearchGameType>
@@ -328,7 +343,10 @@ export interface GameSettings {
     balls: number
   }
   // Match-3 specific
-  gridSize?: { cols: number; rows: number } | number
+  gridSize?:
+    | { cols: number; rows: number }
+    | { columns: number; rows: number }
+    | number
   crystalTypes?: import('./match3/types').Match3Crystal[]
   pointsPerMatch?: number
   cascadeMultiplier?: number
@@ -411,6 +429,27 @@ export interface GameSettings {
   simulationCount?: number
   minimumWinChance?: number
   maximumWinChance?: number
+  // Brick Breaker specific
+  playfield?: import('./brick-breaker/types').BrickBreakerGameSettings['playfield']
+  layout?: string[]
+  brickGap?: number
+  boardPadding?: number
+  boardTop?: number
+  paddle?: import('./brick-breaker/types').BrickBreakerGameSettings['paddle']
+  ball?: import('./brick-breaker/types').BrickBreakerGameSettings['ball']
+  pointsPerHit?: number
+  rewardLifetimeMs?: number
+  // Snake specific
+  initialLength?: number
+  initialPosition?: import('./snake/types').SnakePosition
+  initialDirection?: import('./snake/types').SnakeDirection
+  tickMs?: number
+  speedUpEvery?: number
+  speedUpByMs?: number
+  minTickMs?: number
+  foodScore?: number
+  wrapBoundaries?: boolean
+  sprites?: import('./snake/types').SnakeGameSettings['sprites']
 }
 
 export interface GameItem extends BaseGameConfig {
@@ -449,6 +488,8 @@ export const allGames: GameItem[] = [
   ...artAcademyGames.map((g) => ({ ...g, gameType: 'art-academy' as const })),
   ...procedureOrderGames.map((g) => ({ ...g, gameType: 'procedure-order' as const })),
   ...battleBetsGames.map((g) => ({ ...g, gameType: 'battle-bets' as const })),
+  ...brickBreakerGames.map((g) => ({ ...g, gameType: 'brick-breaker' as const })),
+  ...snakeGames.map((g) => ({ ...g, gameType: 'snake' as const })),
 ]
 
 export const fieldResearchGames = allGames.filter(

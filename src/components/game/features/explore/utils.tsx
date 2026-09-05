@@ -32,6 +32,8 @@ import {
   Paintbrush,
   Joystick,
   Waves,
+  BrickWall,
+  Worm,
 } from 'lucide-react'
 import { MdCatchingPokemon } from 'react-icons/md'
 import type { ExploreItem } from './types'
@@ -101,6 +103,10 @@ export const getTypeIcon = (item: ExploreItem) => {
         return <Disc className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'battle-bets')
         return <Swords className="w-4 h-4 text-game-moss-strong" />
+      if (gameType === 'brick-breaker')
+        return <BrickWall className="w-4 h-4 text-game-moss-strong" />
+      if (gameType === 'snake')
+        return <Worm className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'fishing')
         return <Fish className="w-4 h-4 text-game-moss-strong" />
       if (gameType === 'match3')
@@ -207,6 +213,10 @@ export const getGameTypeLabel = (item: ExploreItem) => {
       return 'WHEEL'
     case 'battle-bets':
       return 'BATTLE BETS'
+    case 'brick-breaker':
+      return 'BRICK BREAKER'
+    case 'snake':
+      return 'ONIX SNAKE'
     case 'fishing':
       return 'FISHING'
     case 'match3':

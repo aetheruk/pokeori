@@ -45,7 +45,9 @@ export function normalizeFinalScore(score: number | undefined): number | null {
   return Math.max(0, Math.floor(score))
 }
 
-export function getLowestMilestoneScore(milestones: EndlessMilestone[]): number | null {
+export function getLowestMilestoneScore(
+  milestones: EndlessMilestone[],
+): number | null {
   if (milestones.length === 0) return null
   return Math.min(...milestones.map((milestone) => milestone.score))
 }
@@ -78,7 +80,10 @@ export function getAchievedUnclaimedMilestones(
 
   const claimed = new Set(claimedScores)
   return milestones
-    .filter((milestone) => normalizedScore >= milestone.score && !claimed.has(milestone.score))
+    .filter(
+      (milestone) =>
+        normalizedScore >= milestone.score && !claimed.has(milestone.score),
+    )
     .sort((a, b) => a.score - b.score)
 }
 
@@ -177,6 +182,28 @@ export function getMaxAllowedEndlessScore(
   if (gameType === 'rhythm') {
     const minSpawnRate = settings.spawnRate?.min || 1
     return (elapsedSeconds / minSpawnRate) * 30 * 1.5
+  }
+
+  if (gameType === 'snake') {
+    const minimumTickSeconds = Math.max(
+      0.03,
+      Number(settings.minTickMs || 100) / 1000,
+    )
+    const pointsPerFood = Math.max(1, Number(settings.foodScore || 1))
+    // A food pickup cannot happen more often than one movement tick. Keep the
+    // shared safety margin for timer jitter and completion latency.
+    return (elapsedSeconds / minimumTickSeconds) * pointsPerFood * 1.5
+  }
+
+  if (gameType === 'brick-breaker') {
+    const maximumBallSpeed = Math.max(1, Number(settings.ball?.maxSpeed || 1))
+    const ballDiameter = Math.max(2, Number(settings.ball?.radius || 1) * 2)
+    const pointsPerHit = Math.max(1, Number(settings.pointsPerHit || 1))
+    // The client resolves at most one brick impact per substep; travelling one
+    // ball diameter is therefore a deliberately generous physical hit bound.
+    return (
+      (elapsedSeconds * maximumBallSpeed * pointsPerHit * 1.5) / ballDiameter
+    )
   }
 
   const scorePerSecond = 10

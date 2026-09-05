@@ -397,9 +397,9 @@ describe('generated game data schemas', () => {
       ),
     )
     expect(spatialEntries.length).toBeGreaterThan(0)
-    expect(spatialEntries.every((entry) => entry.gameType === 'grid-puzzle')).toBe(
-      true,
-    )
+    expect(
+      spatialEntries.every((entry) => entry.gameType === 'grid-puzzle'),
+    ).toBe(true)
     expect(
       validateGameItem({ ...spatialEntries[0], gameType: 'rock-push' }).success,
     ).toBe(false)
@@ -460,6 +460,45 @@ describe('generated game data schemas', () => {
     expect(game?.settings.timeLimit).toBe(120)
     expect(game?.settings.endless).toBeUndefined()
     expect(game?.settings.obstacles).toHaveLength(3)
+  })
+
+  test('Brick Breaker has a strict replayable endless Test configuration', () => {
+    const game = allGames.find((entry) => entry.id === 'brick-breaker-test')
+
+    expect(game?.gameType).toBe('brick-breaker')
+    expect(game?.subCategory).toBe('Test')
+    expect(game?.isEligibleForReplay).toBe(true)
+    expect(game?.settings.endless?.enabled).toBe(true)
+    expect(game?.settings.endless?.repeatingRewards).toContainEqual(
+      expect.objectContaining({ random: true }),
+    )
+
+    const unevenLayout = structuredClone(game)
+    if (unevenLayout) unevenLayout.settings.layout![0] = '1'
+    expect(validateGameItem(unevenLayout).success).toBe(false)
+
+    const invalidSpeed = structuredClone(game)
+    if (invalidSpeed) invalidSpeed.settings.ball!.maxSpeed = 1
+    expect(validateGameItem(invalidSpeed).success).toBe(false)
+  })
+
+  test('Onix Snake has a strict replayable endless Test configuration', () => {
+    const game = allGames.find((entry) => entry.id === 'onix-snake-test')
+
+    expect(game?.gameType).toBe('snake')
+    expect(game?.subCategory).toBe('Test')
+    expect(game?.icon).toEqual({ type: 'pokemon', id: '95' })
+    expect(game?.isEligibleForReplay).toBe(true)
+    expect(game?.settings.gridSize).toEqual({ columns: 18, rows: 18 })
+    expect(game?.settings.endless?.enabled).toBe(true)
+
+    const outsideGrid = structuredClone(game)
+    if (outsideGrid) outsideGrid.settings.initialPosition!.x = 18
+    expect(validateGameItem(outsideGrid).success).toBe(false)
+
+    const invalidTickFloor = structuredClone(game)
+    if (invalidTickFloor) invalidTickFloor.settings.minTickMs = 151
+    expect(validateGameItem(invalidTickFloor).success).toBe(false)
   })
 
   test('Art Academy has a configurable Test study entry', () => {
