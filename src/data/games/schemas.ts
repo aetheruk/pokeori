@@ -805,14 +805,18 @@ const brickBreakerSettingsSchema = z
         height: z.number().int().min(360).max(1200),
       })
       .strict(),
-    layout: z.array(z.string().regex(/^[.123#]+$/)).min(1).max(20),
+    layout: z
+      .array(z.string().min(1).max(24).regex(/^[.123#]+$/))
+      .min(1)
+      .max(20),
+    brickPokemonIds: z.array(z.string().min(1)).min(1).max(20),
     brickGap: z.number().min(0).max(20),
     boardPadding: z.number().min(0).max(100),
     boardTop: z.number().min(0).max(400),
     paddle: z
       .object({
         width: z.number().positive().max(400),
-        height: z.number().positive().max(80),
+        height: z.number().positive().max(48),
         speed: z.number().positive().max(2000),
       })
       .strict(),
@@ -871,33 +875,62 @@ const brickBreakerSettingsSchema = z
         message: 'Brick Breaker board must fit inside the playfield',
       })
     }
+    const brickWidth =
+      (boardWidth - settings.brickGap * Math.max(0, width - 1)) / width
+    const boardBottom =
+      settings.boardTop +
+      settings.layout.length * brickWidth +
+      Math.max(0, settings.layout.length - 1) * settings.brickGap
+    if (
+      !Number.isFinite(brickWidth) ||
+      brickWidth < settings.ball.radius * 2 ||
+      boardBottom >= settings.playfield.height - 48
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['layout'],
+        message:
+          'Brick Breaker layout must leave positive ball-sized bricks and paddle clearance',
+      })
+    }
   })
 
 const snakePositionSchema = z
   .object({
-    x: z.number().int().nonnegative(),
-    y: z.number().int().nonnegative(),
+    x: z.number().finite().nonnegative(),
+    y: z.number().finite().nonnegative(),
   })
+  .strict()
+
+const snakeObstacleSchema = snakePositionSchema
+  .extend({ radius: z.number().positive().max(200) })
   .strict()
 
 const snakeSettingsSchema = z
   .object({
-    gridSize: z
+    playfield: z
       .object({
-        columns: z.number().int().min(8).max(40),
-        rows: z.number().int().min(8).max(40),
+        width: z.number().int().min(320).max(2000),
+        height: z.number().int().min(320).max(2000),
       })
       .strict(),
-    initialLength: z.number().int().min(2).max(20),
+    initialLength: z.number().int().min(2).max(50),
     initialPosition: snakePositionSchema,
-    initialDirection: z.enum(['up', 'down', 'left', 'right']),
-    tickMs: z.number().int().min(40).max(1000),
+    initialHeading: z.number().finite().min(-360).lt(360),
+    segmentSpacing: z.number().positive().max(200),
+    moveSpeed: z.number().positive().max(1000),
+    maxSpeed: z.number().positive().max(1500),
     speedUpEvery: z.number().int().positive().max(1000),
-    speedUpByMs: z.number().int().nonnegative().max(500),
-    minTickMs: z.number().int().min(30).max(1000),
+    speedUpBy: z.number().nonnegative().max(500),
+    turnRate: z.number().positive().max(720),
+    headRadius: z.number().positive().max(100),
+    bodyRadius: z.number().positive().max(100),
+    foodRadius: z.number().positive().max(100),
+    rewardRadius: z.number().positive().max(100),
+    minimumSpawnDistance: z.number().positive().max(2000),
     foodScore: z.number().int().positive().max(10_000),
     wrapBoundaries: z.boolean().optional(),
-    walls: z.array(snakePositionSchema).max(400).optional(),
+    obstacles: z.array(snakeObstacleSchema).max(100).optional(),
     sprites: z
       .object({
         head: z.string().min(1),
@@ -913,76 +946,103 @@ const snakeSettingsSchema = z
   })
   .strict()
   .superRefine((settings, ctx) => {
-    const { columns, rows } = settings.gridSize
-    const directionVectors = {
-      up: { x: 0, y: -1 },
-      down: { x: 0, y: 1 },
-      left: { x: -1, y: 0 },
-      right: { x: 1, y: 0 },
-    } as const
-    const vector = directionVectors[settings.initialDirection]
-    const tail = {
-      x: settings.initialPosition.x - vector.x * (settings.initialLength - 1),
-      y: settings.initialPosition.y - vector.y * (settings.initialLength - 1),
-    }
-    const positions = [
-      { path: ['initialPosition'] as (string | number)[], value: settings.initialPosition },
-      ...(settings.walls || []).map((value, index) => ({
-        path: ['walls', index] as (string | number)[],
-        value,
-      })),
-    ]
-    positions.forEach(({ path, value }) => {
-      if (value.x >= columns || value.y >= rows) {
-        ctx.addIssue({
-          code: 'custom',
-          path,
-          message: 'Snake position must fit inside the grid',
-        })
-      }
-    })
-    if (settings.initialLength >= Math.max(columns, rows)) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['initialLength'],
-        message: 'Snake initial length must fit inside the grid',
-      })
-    }
-    if (tail.x < 0 || tail.x >= columns || tail.y < 0 || tail.y >= rows) {
+    const { width, height } = settings.playfield
+    const headingRadians = (settings.initialHeading * Math.PI) / 180
+    const initialSegments = Array.from(
+      { length: settings.initialLength },
+      (_, index) => ({
+        x:
+          settings.initialPosition.x -
+          Math.cos(headingRadians) * settings.segmentSpacing * index,
+        y:
+          settings.initialPosition.y -
+          Math.sin(headingRadians) * settings.segmentSpacing * index,
+      }),
+    )
+    const initialRadius = Math.max(settings.headRadius, settings.bodyRadius)
+
+    if (
+      settings.initialPosition.x >= width ||
+      settings.initialPosition.y >= height
+    ) {
       ctx.addIssue({
         code: 'custom',
         path: ['initialPosition'],
-        message: 'Snake initial body must fit inside the grid',
+        message: 'Snake initial position must fit inside the playfield',
       })
     }
-    const wallKeys = new Set<string>()
-    for (const [index, wall] of (settings.walls || []).entries()) {
-      const key = `${wall.x}:${wall.y}`
-      if (wallKeys.has(key)) {
-        ctx.addIssue({
-          code: 'custom',
-          path: ['walls', index],
-          message: 'Snake wall positions must be unique',
-        })
-      }
-      wallKeys.add(key)
-    }
-    for (let index = 0; index < settings.initialLength; index += 1) {
-      const key = `${settings.initialPosition.x - vector.x * index}:${settings.initialPosition.y - vector.y * index}`
-      if (wallKeys.has(key)) {
-        ctx.addIssue({
-          code: 'custom',
-          path: ['walls'],
-          message: 'Snake walls cannot overlap the initial body',
-        })
-        break
-      }
-    }
-    if (settings.minTickMs > settings.tickMs) {
+    if (
+      initialSegments.some(
+        (segment) =>
+          segment.x - initialRadius < 0 ||
+          segment.x + initialRadius > width ||
+          segment.y - initialRadius < 0 ||
+          segment.y + initialRadius > height,
+      )
+    ) {
       ctx.addIssue({
         code: 'custom',
-        path: ['minTickMs'],
-        message: 'Snake minimum tick must not exceed its initial tick',
+        path: ['initialPosition'],
+        message: 'Snake initial body must fit inside the playfield',
+      })
+    }
+    for (const [index, obstacle] of (settings.obstacles || []).entries()) {
+      if (
+        obstacle.x - obstacle.radius < 0 ||
+        obstacle.x + obstacle.radius > width ||
+        obstacle.y - obstacle.radius < 0 ||
+        obstacle.y + obstacle.radius > height
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['obstacles', index],
+          message: 'Snake obstacle must fit inside the playfield',
+        })
+      }
+      if (
+        initialSegments.some(
+          (segment) =>
+            Math.hypot(segment.x - obstacle.x, segment.y - obstacle.y) <=
+            initialRadius + obstacle.radius,
+        )
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['obstacles', index],
+          message: 'Snake obstacles cannot overlap the initial body',
+        })
+      }
+    }
+    if (settings.maxSpeed < settings.moveSpeed) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['maxSpeed'],
+        message: 'Snake maximum speed must be at least its initial speed',
+      })
+    }
+    const pickupClearance =
+      settings.headRadius + Math.max(settings.foodRadius, settings.rewardRadius)
+    if (settings.minimumSpawnDistance < pickupClearance) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['minimumSpawnDistance'],
+        message: 'Snake pickup spawn distance must clear the head',
+      })
+    }
+    const farthestInitialCorner = Math.max(
+      Math.hypot(settings.initialPosition.x, settings.initialPosition.y),
+      Math.hypot(width - settings.initialPosition.x, settings.initialPosition.y),
+      Math.hypot(settings.initialPosition.x, height - settings.initialPosition.y),
+      Math.hypot(
+        width - settings.initialPosition.x,
+        height - settings.initialPosition.y,
+      ),
+    )
+    if (settings.minimumSpawnDistance >= farthestInitialCorner) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['minimumSpawnDistance'],
+        message: 'Snake pickup spawn distance must leave a valid spawn area',
       })
     }
     if (!settings.endless?.enabled && typeof settings.winScore !== 'number') {

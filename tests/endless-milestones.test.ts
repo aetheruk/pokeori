@@ -195,8 +195,12 @@ describe('endless milestone helpers', () => {
     ).toBe(900)
     expect(getMaxAllowedEndlessScore('match3', {}, 10)).toBeNull()
     expect(
-      getMaxAllowedEndlessScore('snake', { minTickMs: 100, foodScore: 10 }, 10),
-    ).toBe(1500)
+      getMaxAllowedEndlessScore(
+        'snake',
+        { maxSpeed: 240, minimumSpawnDistance: 120, foodScore: 10 },
+        10,
+      ),
+    ).toBe(315)
     expect(
       getMaxAllowedEndlessScore(
         'brick-breaker',
@@ -205,5 +209,6 @@ describe('endless milestone helpers', () => {
       ),
     ).toBe(3000)
     expect(getMaxAllowedEndlessScore('snake', {}, -1)).toBe(0)
+    expect(getMaxAllowedEndlessScore('snake', {}, Number.NaN)).toBe(0)
   })
 })

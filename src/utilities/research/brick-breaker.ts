@@ -53,7 +53,7 @@ export function createBrickBreakerBoard(
   const columns = Math.max(...settings.layout.map((row) => row.length))
   const availableWidth = settings.playfield.width - settings.boardPadding * 2
   const width = (availableWidth - settings.brickGap * (columns - 1)) / columns
-  const height = Math.max(18, Math.min(30, width * 0.48))
+  const height = width
 
   return settings.layout.flatMap((row, rowIndex) =>
     [...row].flatMap((cell, columnIndex) => {

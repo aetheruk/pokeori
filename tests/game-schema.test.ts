@@ -2,12 +2,14 @@ import { describe, expect, test } from 'bun:test'
 import {
   type ArtAcademyGameConfig,
   allGames,
+  type BrickBreakerGameConfig,
   type MagnemiteCircuitGameConfig,
   type MagnemiteCircuitPosition,
   type MagnemiteCircuitTile,
   type MagnemiteCircuitTileType,
   type PachinkoGameConfig,
   type PrizeWheelGameConfig,
+  type SnakeGameConfig,
   type SurfGameConfig,
   type VoltorbGridPosition,
   type VoltorbGridVoltorb,
@@ -464,12 +466,16 @@ describe('generated game data schemas', () => {
 
   test('Brick Breaker has a strict replayable endless Test configuration', () => {
     const game = allGames.find((entry) => entry.id === 'brick-breaker-test')
+    const settings = game?.settings as
+      | BrickBreakerGameConfig['settings']
+      | undefined
 
     expect(game?.gameType).toBe('brick-breaker')
     expect(game?.subCategory).toBe('Test')
     expect(game?.isEligibleForReplay).toBe(true)
-    expect(game?.settings.endless?.enabled).toBe(true)
-    expect(game?.settings.endless?.repeatingRewards).toContainEqual(
+    expect(settings?.brickPokemonIds).toEqual(['74', '95', '50', '27'])
+    expect(settings?.endless?.enabled).toBe(true)
+    expect(settings?.endless?.repeatingRewards).toContainEqual(
       expect.objectContaining({ random: true }),
     )
 
@@ -480,25 +486,103 @@ describe('generated game data schemas', () => {
     const invalidSpeed = structuredClone(game)
     if (invalidSpeed) invalidSpeed.settings.ball!.maxSpeed = 1
     expect(validateGameItem(invalidSpeed).success).toBe(false)
+
+    const missingPokemon = structuredClone(game)
+    if (missingPokemon) missingPokemon.settings.brickPokemonIds = []
+    expect(validateGameItem(missingPokemon).success).toBe(false)
+
+    const invalidLayoutSymbol = structuredClone(game)
+    if (invalidLayoutSymbol) invalidLayoutSymbol.settings.layout![0] = '..X..'
+    expect(validateGameItem(invalidLayoutSymbol).success).toBe(false)
+
+    const noDestructibleBricks = structuredClone(game)
+    if (noDestructibleBricks) {
+      noDestructibleBricks.settings.layout = ['..##..', '.####.']
+    }
+    expect(validateGameItem(noDestructibleBricks).success).toBe(false)
+
+    const overcrowdedLayout = structuredClone(game)
+    if (overcrowdedLayout) {
+      overcrowdedLayout.settings.layout = Array(20).fill('1'.repeat(24))
+      overcrowdedLayout.settings.brickGap = 20
+    }
+    expect(validateGameItem(overcrowdedLayout).success).toBe(false)
+
+    const impossibleRewardRange = structuredClone(game)
+    if (impossibleRewardRange) {
+      const repeatingReward =
+        impossibleRewardRange.settings.endless?.repeatingRewards?.[0]
+      if (repeatingReward) repeatingReward.everyScore = { min: 100, max: 50 }
+    }
+    expect(validateGameItem(impossibleRewardRange).success).toBe(false)
   })
 
   test('Onix Snake has a strict replayable endless Test configuration', () => {
     const game = allGames.find((entry) => entry.id === 'onix-snake-test')
+    const settings = game?.settings as SnakeGameConfig['settings'] | undefined
 
     expect(game?.gameType).toBe('snake')
     expect(game?.subCategory).toBe('Test')
     expect(game?.icon).toEqual({ type: 'pokemon', id: '95' })
     expect(game?.isEligibleForReplay).toBe(true)
-    expect(game?.settings.gridSize).toEqual({ columns: 18, rows: 18 })
-    expect(game?.settings.endless?.enabled).toBe(true)
+    expect(settings?.playfield).toEqual({ width: 390, height: 700 })
+    expect(settings?.initialHeading).toBe(-90)
+    expect(settings?.moveSpeed).toBeLessThan(settings?.maxSpeed || 0)
+    expect(settings?.endless?.enabled).toBe(true)
 
-    const outsideGrid = structuredClone(game)
-    if (outsideGrid) outsideGrid.settings.initialPosition!.x = 18
-    expect(validateGameItem(outsideGrid).success).toBe(false)
+    const outsidePlayfield = structuredClone(game)
+    if (outsidePlayfield) outsidePlayfield.settings.initialPosition!.x = 391
+    expect(validateGameItem(outsidePlayfield).success).toBe(false)
 
-    const invalidTickFloor = structuredClone(game)
-    if (invalidTickFloor) invalidTickFloor.settings.minTickMs = 151
-    expect(validateGameItem(invalidTickFloor).success).toBe(false)
+    const trailingBodyOutsidePlayfield = structuredClone(game)
+    if (trailingBodyOutsidePlayfield) {
+      trailingBodyOutsidePlayfield.settings.initialPosition!.y = 680
+    }
+    expect(validateGameItem(trailingBodyOutsidePlayfield).success).toBe(false)
+
+    const invalidSpeedRange = structuredClone(game)
+    if (invalidSpeedRange) invalidSpeedRange.settings.maxSpeed = 100
+    expect(validateGameItem(invalidSpeedRange).success).toBe(false)
+
+    const invalidObstacle = structuredClone(game)
+    if (invalidObstacle) {
+      invalidObstacle.settings.obstacles = [{ x: 10, y: 10, radius: 20 }]
+    }
+    expect(validateGameItem(invalidObstacle).success).toBe(false)
+
+    const overlappingObstacle = structuredClone(game)
+    if (overlappingObstacle) {
+      overlappingObstacle.settings.obstacles = [
+        { x: 195, y: 380, radius: 20 },
+      ]
+    }
+    expect(validateGameItem(overlappingObstacle).success).toBe(false)
+
+    const unsafeSpawnDistance = structuredClone(game)
+    if (unsafeSpawnDistance) unsafeSpawnDistance.settings.minimumSpawnDistance = 20
+    expect(validateGameItem(unsafeSpawnDistance).success).toBe(false)
+
+    const missingSprite = structuredClone(game)
+    if (missingSprite) missingSprite.settings.sprites!.head = ''
+    expect(validateGameItem(missingSprite).success).toBe(false)
+
+    const invalidHeading = structuredClone(game)
+    if (invalidHeading) invalidHeading.settings.initialHeading = 360
+    expect(validateGameItem(invalidHeading).success).toBe(false)
+
+    const finiteWithoutTarget = structuredClone(game)
+    if (finiteWithoutTarget) {
+      finiteWithoutTarget.settings.endless = undefined
+      finiteWithoutTarget.settings.winScore = undefined
+    }
+    expect(validateGameItem(finiteWithoutTarget).success).toBe(false)
+
+    const finiteWithTarget = structuredClone(game)
+    if (finiteWithTarget) {
+      finiteWithTarget.settings.endless = undefined
+      finiteWithTarget.settings.winScore = 100
+    }
+    expect(validateGameItem(finiteWithTarget).success).toBe(true)
   })
 
   test('Art Academy has a configurable Test study entry', () => {

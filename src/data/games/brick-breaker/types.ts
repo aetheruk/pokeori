@@ -6,6 +6,8 @@ export type BrickBreakerLayoutCell = '.' | '1' | '2' | '3' | '#'
 export interface BrickBreakerGameSettings {
   playfield: { width: number; height: number }
   layout: string[]
+  /** Pokemon forms shown inside the gem bricks, cycled across occupied cells. */
+  brickPokemonIds: string[]
   brickGap: number
   boardPadding: number
   boardTop: number

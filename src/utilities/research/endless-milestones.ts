@@ -185,14 +185,21 @@ export function getMaxAllowedEndlessScore(
   }
 
   if (gameType === 'snake') {
-    const minimumTickSeconds = Math.max(
-      0.03,
-      Number(settings.minTickMs || 100) / 1000,
+    const maximumMoveSpeed = Math.max(1, Number(settings.maxSpeed || 1))
+    const minimumSpawnDistance = Math.max(
+      1,
+      Number(settings.minimumSpawnDistance || 1),
     )
     const pointsPerFood = Math.max(1, Number(settings.foodScore || 1))
-    // A food pickup cannot happen more often than one movement tick. Keep the
-    // shared safety margin for timer jitter and completion latency.
-    return (elapsedSeconds / minimumTickSeconds) * pointsPerFood * 1.5
+    // Include the food that can be present at the start, then bound subsequent
+    // pickups by maximum travel speed and the configured spawn separation.
+    // The shared margin allows steering shortcuts, timer jitter, and completion
+    // latency without permitting physically impossible reward claims.
+    return (
+      (1 + (elapsedSeconds * maximumMoveSpeed) / minimumSpawnDistance) *
+      pointsPerFood *
+      1.5
+    )
   }
 
   if (gameType === 'brick-breaker') {

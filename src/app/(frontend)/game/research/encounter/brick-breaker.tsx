@@ -1,6 +1,6 @@
 'use client'
 
-import { DoorOpen, Heart, Pickaxe } from 'lucide-react'
+import { DoorOpen, Heart } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import {
@@ -24,6 +24,7 @@ import type { BrickBreakerGameConfig } from '@/data/games/brick-breaker/types'
 import type { LocationReward } from '@/data/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { usePageVisibility } from '@/hooks/usePageVisibility'
+import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import {
   type BrickBreakerBall,
   type BrickBreakerBrick,
@@ -426,37 +427,21 @@ export function BrickBreakerGame({
   }
 
   return (
-    <main className="game-activity-chrome relative flex min-h-dvh items-center justify-center overflow-hidden p-3 sm:p-6">
+    <main className="relative h-dvh min-h-0 w-full overflow-hidden bg-[#18211e] text-[#fff8e8]">
       <Image
         src={encounter.background || '/backgrounds/cave.avif'}
-        alt=""
+        alt="A dim geological survey cave"
         fill
         priority
         sizes="100vw"
-        className="object-cover opacity-35 blur-sm"
+        className="object-cover"
       />
-      <section className="game-activity-panel relative z-10 flex w-full max-w-[470px] flex-col gap-3 p-3 sm:p-4">
-        <header className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-xs font-bold text-game-muted">
-              Oak field trial · Wave {wave}
-            </p>
-            <h1 className="text-lg font-extrabold text-game-ink">
-              {encounter.name}
-            </h1>
-          </div>
-          <Button
-            variant="outline"
-            size="icon"
-            aria-label="Leave game"
-            onClick={() => router.push('/game/explore')}
-          >
-            <DoorOpen className="size-5" />
-          </Button>
-        </header>
+      <div className="absolute inset-0 bg-[#18211e]/28" />
 
-        <div className="flex items-center justify-between rounded-lg border border-game-border bg-game-surface-raised px-3 py-2 text-sm font-bold">
+      <header className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-start justify-between gap-3 p-[max(0.75rem,env(safe-area-inset-top))]">
+        <div className="flex items-center gap-2 rounded-lg border border-game-border/80 bg-game-surface-raised/95 px-3 py-2 text-sm font-bold text-game-ink shadow-md backdrop-blur-sm">
           <span className="font-mono tabular-nums">Score {score}</span>
+          <span aria-hidden className="h-4 w-px bg-game-border" />
           <span className="flex items-center gap-1">
             <span className="sr-only">{lives} survey balls remaining</span>
             {Array.from({ length: lives }, (_, index) => (
@@ -466,118 +451,146 @@ export function BrickBreakerGame({
               />
             ))}
           </span>
+          <span aria-hidden className="h-4 w-px bg-game-border" />
           {settings.timeLimit ? (
             <span className="font-mono tabular-nums">{timeLeft}s</span>
           ) : (
             <span>Wave {wave}</span>
           )}
         </div>
-
-        <div
-          ref={stageRef}
-          role="application"
-          aria-label="Brick Breaker. Drag or use Left and Right to move. Tap or press Space to launch."
-          className="relative mx-auto aspect-[390/640] max-h-[calc(100dvh-185px)] w-full touch-none overflow-hidden rounded-lg border border-game-border bg-[#26332f] shadow-inner select-none"
-          onPointerDown={(event) => {
-            event.currentTarget.setPointerCapture(event.pointerId)
-            movePaddleToPointer(event)
-            launch()
-          }}
-          onPointerMove={(event) => {
-            if (event.currentTarget.hasPointerCapture(event.pointerId))
-              movePaddleToPointer(event)
-          }}
+        <Button
+          variant="outline"
+          size="icon"
+          className="pointer-events-auto bg-game-surface-raised/95 text-game-ink shadow-md backdrop-blur-sm"
+          aria-label="Leave game"
+          onClick={() => router.push('/game/explore')}
         >
-          <Image
-            src="/backgrounds/cave.avif"
-            alt="A dim geological survey cave"
-            fill
-            sizes="470px"
-            className="object-cover opacity-45"
-          />
-          <div className="absolute inset-0 bg-[#243029]/50" />
-          {bricks.map((brick) => (
+          <DoorOpen className="size-5" />
+        </Button>
+      </header>
+
+      <div
+        ref={stageRef}
+        role="application"
+        aria-label="Brick Breaker. Drag or use Left and Right to move. Tap or press Space to launch."
+        className="relative z-10 mx-auto h-full w-full max-w-[calc(100dvh*0.609375)] touch-none overflow-hidden select-none"
+        onPointerDown={(event) => {
+          event.currentTarget.setPointerCapture(event.pointerId)
+          movePaddleToPointer(event)
+          launch()
+        }}
+        onPointerMove={(event) => {
+          if (event.currentTarget.hasPointerCapture(event.pointerId))
+            movePaddleToPointer(event)
+        }}
+      >
+        {bricks.map((brick) => {
+          const [row, column] = brick.id.split(':').map(Number)
+          const pokemonId =
+            settings.brickPokemonIds[
+              (row * settings.layout[0].length + column) %
+                settings.brickPokemonIds.length
+            ]
+          return (
             <div
               key={brick.id}
-              className={`absolute border shadow-sm ${brick.indestructible ? 'border-[#625849] bg-[#373c38]' : brick.durability >= 3 ? 'border-[#d0a660] bg-[#9b683d]' : brick.durability === 2 ? 'border-[#c39554] bg-[#786848]' : 'border-[#b7a27d] bg-[#596d4d]'}`}
+              aria-hidden
+              className={`absolute overflow-hidden border shadow-[inset_0_2px_4px_rgba(255,255,255,0.38),0_3px_5px_rgba(18,26,23,0.45)] ${brick.indestructible ? 'border-[#777269] bg-[#414945]' : brick.durability >= 3 ? 'border-[#f0b96e] bg-[#b56342]' : brick.durability === 2 ? 'border-[#dfc071] bg-[#9a7643]' : 'border-[#b8d09c] bg-[#617b52]'}`}
               style={{
                 left: `${(brick.x / width) * 100}%`,
                 top: `${(brick.y / height) * 100}%`,
                 width: `${(brick.width / width) * 100}%`,
                 height: `${(brick.height / height) * 100}%`,
-              }}
-            />
-          ))}
-          {specimens.map((specimen) => (
-            <div
-              key={specimen.id}
-              className="absolute rounded-full border-2 border-game-ochre bg-game-surface-raised p-1 shadow-md"
-              style={{
-                left: `${((specimen.x - specimen.size / 2) / width) * 100}%`,
-                top: `${((specimen.y - specimen.size / 2) / height) * 100}%`,
-                width: `${(specimen.size / width) * 100}%`,
-                aspectRatio: '1',
+                clipPath:
+                  'polygon(12% 0,88% 0,100% 12%,100% 88%,88% 100%,12% 100%,0 88%,0 12%)',
               }}
             >
+              <div className="absolute inset-[10%] opacity-90 drop-shadow-[0_1px_1px_rgba(255,255,255,0.45)]">
+                <Image
+                  src={getPokemonImageUrl(pokemonId, 'sprite')}
+                  alt=""
+                  fill
+                  sizes="48px"
+                  className="pixelated object-contain"
+                />
+              </div>
+              <span className="absolute left-[14%] top-[10%] h-[10%] w-[42%] -rotate-12 rounded-full bg-white/35" />
+            </div>
+          )
+        })}
+        {specimens.map((specimen) => (
+          <div
+            key={specimen.id}
+            className="absolute flex items-center justify-center rounded-full border border-game-ochre/70 bg-game-ochre/20 shadow-[0_0_18px_rgba(181,138,67,0.55)]"
+            style={{
+              left: `${((specimen.x - specimen.size / 2) / width) * 100}%`,
+              top: `${((specimen.y - specimen.size / 2) / height) * 100}%`,
+              width: `${(specimen.size / width) * 100}%`,
+              aspectRatio: '1',
+            }}
+          >
+            <span className="absolute inset-1 rounded-full border border-amber-200/35 motion-safe:animate-ping" />
+            <span className="relative z-10 h-[76%] w-[76%] drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)]">
               <EndlessCollectibleSprite
                 reward={specimen.reward}
-                size={specimen.size}
+                size={Math.round(specimen.size * 0.76)}
               />
-            </div>
-          ))}
+            </span>
+          </div>
+        ))}
+        <div
+          aria-hidden
+          className="absolute overflow-hidden rounded-full border-2 border-[#202826] bg-white shadow-[0_3px_6px_rgba(13,20,18,0.55)]"
+          style={{
+            left: `${(paddleX / width) * 100}%`,
+            top: `${(paddleY / height) * 100}%`,
+            width: `${(settings.paddle.width / width) * 100}%`,
+            height: `${(settings.paddle.height / height) * 100}%`,
+          }}
+        >
+          <span className="absolute inset-x-0 top-0 h-1/2 bg-[#c84d43]" />
+          <span className="absolute inset-x-0 top-1/2 h-[18%] -translate-y-1/2 bg-[#202826]" />
+          <span className="absolute left-1/2 top-1/2 aspect-square h-[85%] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[#202826] bg-white" />
+        </div>
+        {ball && (
           <div
-            className="absolute rounded bg-game-clay shadow-[0_2px_0_#774334]"
+            className="absolute rounded-full border border-[#f8e7b4] bg-[#f4d276] shadow-[0_0_8px_rgba(244,210,118,0.8)]"
             style={{
-              left: `${(paddleX / width) * 100}%`,
-              top: `${(paddleY / height) * 100}%`,
-              width: `${(settings.paddle.width / width) * 100}%`,
-              height: `${(settings.paddle.height / height) * 100}%`,
+              left: `${((ball.x - ball.radius) / width) * 100}%`,
+              top: `${((ball.y - ball.radius) / height) * 100}%`,
+              width: `${((ball.radius * 2) / width) * 100}%`,
+              aspectRatio: '1',
             }}
           />
-          {ball && (
-            <div
-              className="absolute rounded-full border border-[#f7df9c] bg-game-ochre shadow-[0_0_8px_rgba(181,138,67,0.75)]"
-              style={{
-                left: `${((ball.x - ball.radius) / width) * 100}%`,
-                top: `${((ball.y - ball.radius) / height) * 100}%`,
-                width: `${((ball.radius * 2) / width) * 100}%`,
-                aspectRatio: '1',
-              }}
-            />
-          )}
-
-          {countdown > 0 && (
-            <div
-              className="absolute inset-0 grid place-items-center bg-[#18211e]/45 text-6xl font-black text-[#fff8e8]"
-              aria-live="polite"
-            >
-              {countdown}
-            </div>
-          )}
-          {!ended && countdown === 0 && docked && (
-            <button
-              type="button"
-              onClick={launch}
-              className="absolute inset-x-10 bottom-[20%] min-h-11 rounded-lg border border-game-border bg-game-surface-raised px-4 py-2 font-bold text-game-ink shadow-md focus-visible:outline-2 focus-visible:outline-game-clay"
-            >
-              <Pickaxe className="mr-2 inline size-5" />
-              Tap or press Space to launch
-            </button>
-          )}
-        </div>
-        <p className="text-center text-xs text-game-muted" aria-live="polite">
-          Move with touch, pointer, Arrow keys, or A/D. Reward specimens must be
-          struck before they fade.
-        </p>
-        {error && (
-          <p
-            role="alert"
-            className="rounded-lg border border-red-700/30 bg-red-50 p-3 text-sm text-red-800"
-          >
-            {error}
-          </p>
         )}
-      </section>
+
+        {countdown > 0 && (
+          <div
+            className="absolute inset-0 grid place-items-center bg-[#18211e]/25 text-6xl font-black text-[#fff8e8] drop-shadow-lg"
+            aria-live="polite"
+          >
+            {countdown}
+          </div>
+        )}
+        {!ended && countdown === 0 && docked && (
+          <button
+            type="button"
+            onClick={launch}
+            className="absolute bottom-[20%] left-1/2 min-h-11 -translate-x-1/2 whitespace-nowrap rounded-lg border border-game-border bg-game-surface-raised/95 px-4 py-2 font-bold text-game-ink shadow-md backdrop-blur-sm focus-visible:outline-2 focus-visible:outline-game-clay"
+          >
+            Tap or Space to launch
+          </button>
+        )}
+      </div>
+
+      {error && (
+        <p
+          role="alert"
+          className="absolute bottom-4 left-1/2 z-30 -translate-x-1/2 rounded-lg border border-red-700/30 bg-red-50 p-3 text-sm text-red-800 shadow-md"
+        >
+          {error}
+        </p>
+      )}
 
       {result && (
         <RewardResultOverlay

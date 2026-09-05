@@ -12,6 +12,7 @@ import {
 const settings: BrickBreakerGameSettings = {
   playfield: { width: 390, height: 640 },
   layout: ['12#'],
+  brickPokemonIds: ['74', '95'],
   brickGap: 5,
   boardPadding: 15,
   boardTop: 80,
@@ -40,6 +41,7 @@ describe('Brick Breaker mechanics', () => {
       { durability: Infinity, indestructible: true },
     ])
     expect(bricks[2].x + bricks[2].width).toBeCloseTo(375)
+    expect(bricks[0].height).toBeCloseTo(bricks[0].width)
   })
 
   test('clamps the paddle within both field edges', () => {
@@ -150,5 +152,27 @@ describe('Brick Breaker mechanics', () => {
       0.1,
     )
     expect(result.lost).toBe(true)
+  })
+})
+
+describe('Brick Breaker presentation', () => {
+  test('renders configurable Pokemon gems over a full-scene playfield with a Poké Ball paddle', async () => {
+    const source = await Bun.file(
+      new URL(
+        '../src/app/(frontend)/game/research/encounter/brick-breaker.tsx',
+        import.meta.url,
+      ),
+    ).text()
+
+    expect(source).toContain('settings.brickPokemonIds[')
+    expect(source).toContain("getPokemonImageUrl(pokemonId, 'sprite')")
+    expect(source).toContain('max-w-[calc(100dvh*0.609375)]')
+    expect(source).not.toContain('game-activity-panel')
+    expect(source).toContain('bg-[#c84d43]')
+    expect(source).toContain('rounded-full border-2 border-[#202826] bg-white')
+    expect(source).toContain(
+      'border border-game-ochre/70 bg-game-ochre/20 shadow-[0_0_18px_rgba(181,138,67,0.55)]',
+    )
+    expect(source).toContain('motion-safe:animate-ping')
   })
 })

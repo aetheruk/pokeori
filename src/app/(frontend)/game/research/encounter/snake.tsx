@@ -1,7 +1,7 @@
 'use client'
 
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp } from 'lucide-react'
 import Image from 'next/image'
+import { DoorOpen } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -9,13 +9,11 @@ import {
   startGame,
   submitGameAnswer,
 } from '@/app/(frontend)/game/games/actions'
-import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
 import type {
-  SnakeDirection,
   SnakeGameConfig,
   SnakePosition,
 } from '@/data/games/snake/types'
@@ -23,13 +21,16 @@ import { useGameMusic } from '@/hooks/useGameMusic'
 import { usePageVisibility } from '@/hooks/usePageVisibility'
 import { getLowestEndlessRewardScore } from '@/utilities/research/endless-milestones'
 import {
-  advanceSnake,
-  canTurn,
+  advanceContinuousSnake,
+  circlesOverlap,
   createInitialSnake,
-  directionBetween,
-  findSafeSnakeCell,
-  getSnakeTickMs,
-  positionsEqual,
+  findSafeSnakePosition,
+  getSegmentHeading,
+  getSnakeSpeed,
+  growSnake,
+  headingToward,
+  normalizeAngle,
+  type SnakeCircle,
 } from '@/utilities/research/snake'
 import {
   type EndlessCollectibleRewardConfig,
@@ -43,7 +44,7 @@ interface SnakeGameProps {
   initialState?: any
 }
 
-interface GridReward {
+interface SceneReward {
   id: number
   rewardKey: string
   reward: EndlessCollectibleRewardConfig['rewardOptions'][number]['reward']
@@ -51,12 +52,7 @@ interface GridReward {
   expiresAt: number
 }
 
-const ROTATION: Record<SnakeDirection, number> = {
-  right: 0,
-  down: 90,
-  left: 180,
-  up: -90,
-}
+type GamePhase = 'loading' | 'ready' | 'playing' | 'ended'
 
 export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
   useGameMusic(encounter)
@@ -65,19 +61,16 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
   const { playSfx } = useAudio()
   const visible = usePageVisibility()
   const settings = encounter.settings
-  const { columns, rows } = settings.gridSize
+  const stageRef = useRef<HTMLElement>(null)
   const initialSnake = useMemo(
     () =>
       createInitialSnake(
         settings.initialPosition,
         settings.initialLength,
-        settings.initialDirection,
+        settings.initialHeading,
+        settings.segmentSpacing,
       ),
-    [
-      settings.initialDirection,
-      settings.initialLength,
-      settings.initialPosition,
-    ],
+    [settings],
   )
   const rewardConfigs = useMemo(
     () => getEndlessCollectibleRewardConfigs(settings),
@@ -86,13 +79,11 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
 
   const [snake, setSnake] = useState(initialSnake)
   const [food, setFood] = useState<SnakePosition | null>(null)
-  const [gridRewards, setGridRewards] = useState<GridReward[]>([])
+  const [sceneRewards, setSceneRewards] = useState<SceneReward[]>([])
   const [score, setScore] = useState(0)
   const [foodEaten, setFoodEaten] = useState(0)
-  const [phase, setPhase] = useState<'loading' | 'ready' | 'playing' | 'ended'>(
-    'loading',
-  )
-  const [direction, setDirection] = useState(settings.initialDirection)
+  const [heading, setHeading] = useState(settings.initialHeading)
+  const [phase, setPhase] = useState<GamePhase>('loading')
   const [timeLeft, setTimeLeft] = useState(settings.timeLimit ?? 0)
   const [status, setStatus] = useState('Preparing the tunnel survey.')
   const [startError, setStartError] = useState<string | null>(null)
@@ -100,29 +91,55 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
 
   const snakeRef = useRef(initialSnake)
   const foodRef = useRef<SnakePosition | null>(null)
-  const rewardsRef = useRef<GridReward[]>([])
+  const rewardsRef = useRef<SceneReward[]>([])
+  const headingRef = useRef(settings.initialHeading)
+  const targetHeadingRef = useRef(settings.initialHeading)
   const scoreRef = useRef(0)
   const foodEatenRef = useRef(0)
-  const directionRef = useRef<SnakeDirection>(settings.initialDirection)
-  const bufferedDirectionRef = useRef<SnakeDirection>(settings.initialDirection)
+  const lastFrameRef = useRef(0)
+  const animationRef = useRef<number | null>(null)
   const endingRef = useRef(false)
   const rewardIdRef = useRef(0)
   const rewardSchedulesRef = useRef<Record<string, number>>({})
   const collectedRewardsRef = useRef<Record<string, number>>({})
-  const pointerStartRef = useRef<SnakePosition | null>(null)
+  const pressedKeysRef = useRef(new Set<string>())
+
+  const pickupCircles = useCallback(
+    (
+      nextSnake: SnakePosition[],
+      rewards: SceneReward[],
+      includeFood = false,
+    ): SnakeCircle[] => [
+      ...nextSnake.map((position, index) => ({
+        ...position,
+        radius: index === 0 ? settings.headRadius : settings.bodyRadius,
+      })),
+      ...(settings.obstacles ?? []),
+      ...rewards.map((reward) => ({
+        ...reward.position,
+        radius: settings.rewardRadius,
+      })),
+      ...(includeFood && foodRef.current
+        ? [{ ...foodRef.current, radius: settings.foodRadius }]
+        : []),
+    ],
+    [settings],
+  )
 
   const placeFood = useCallback(
-    (nextSnake: SnakePosition[], rewards = rewardsRef.current) => {
-      const nextFood = findSafeSnakeCell(columns, rows, [
-        nextSnake,
-        settings.walls ?? [],
-        rewards.map((reward) => reward.position),
-      ])
+    (nextSnake: SnakePosition[], rewards: SceneReward[]) => {
+      const nextFood = findSafeSnakePosition(
+        settings.playfield,
+        settings.foodRadius,
+        pickupCircles(nextSnake, rewards),
+        settings.minimumSpawnDistance,
+        nextSnake[0],
+      )
       foodRef.current = nextFood
       setFood(nextFood)
       return nextFood
     },
-    [columns, rows, settings.walls],
+    [pickupCircles, settings],
   )
 
   const finishGame = useCallback(
@@ -130,16 +147,20 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
       if (endingRef.current) return
       endingRef.current = true
       setPhase('ended')
+      if (animationRef.current !== null) {
+        cancelAnimationFrame(animationRef.current)
+        animationRef.current = null
+      }
       const finalScore = scoreRef.current
       const endless = settings.endless?.enabled === true
-      const firstEndlessReward = getLowestEndlessRewardScore({
-        milestones: settings.endless?.milestones || [],
-        repeatingRewards: settings.endless?.repeatingRewards || [],
+      const firstReward = getLowestEndlessRewardScore({
+        milestones: settings.endless?.milestones ?? [],
+        repeatingRewards: settings.endless?.repeatingRewards ?? [],
       })
       const success =
         forcedSuccess ||
         (endless
-          ? firstEndlessReward !== null && finalScore >= firstEndlessReward
+          ? firstReward !== null && finalScore >= firstReward
           : settings.winScore !== undefined && finalScore >= settings.winScore)
 
       await submitGameAnswer(success)
@@ -162,27 +183,26 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
             : 'Survey incomplete',
         rewards: response.summary,
       })
-    },
-    [encounter.id, playSfx, settings.endless, settings.winScore],
-  )
+    }, [encounter.id, playSfx, settings])
 
   const resetLocalGame = useCallback(() => {
     const nextSnake = createInitialSnake(
       settings.initialPosition,
       settings.initialLength,
-      settings.initialDirection,
+      settings.initialHeading,
+      settings.segmentSpacing,
     )
     snakeRef.current = nextSnake
     setSnake(nextSnake)
+    headingRef.current = normalizeAngle(settings.initialHeading)
+    targetHeadingRef.current = normalizeAngle(settings.initialHeading)
+    setHeading(normalizeAngle(settings.initialHeading))
     scoreRef.current = 0
     setScore(0)
     foodEatenRef.current = 0
     setFoodEaten(0)
-    directionRef.current = settings.initialDirection
-    bufferedDirectionRef.current = settings.initialDirection
-    setDirection(settings.initialDirection)
     rewardsRef.current = []
-    setGridRewards([])
+    setSceneRewards([])
     rewardIdRef.current = 0
     collectedRewardsRef.current = {}
     rewardSchedulesRef.current = Object.fromEntries(
@@ -191,9 +211,10 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
         getNextCollectibleScore(0, config.everyScore),
       ]),
     )
-    setTimeLeft(settings.timeLimit ?? 0)
+    lastFrameRef.current = 0
     endingRef.current = false
     setResult(null)
+    setTimeLeft(settings.timeLimit ?? 0)
     placeFood(nextSnake, [])
   }, [placeFood, rewardConfigs, settings])
 
@@ -214,88 +235,85 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
       }
       setStartError(null)
       setPhase('ready')
-      setStatus('Press Start, Space, or an arrow to guide Onix.')
+      setStatus('Press Start or Space, then steer toward the cave floor.')
     })
     return () => {
       cancelled = true
     }
   }, [encounter.id, resetLocalGame, settings.timeLimit])
 
-  const requestTurn = useCallback(
-    (nextDirection: SnakeDirection) => {
-      if (phase === 'ready') setPhase('playing')
-      if (phase !== 'playing' && phase !== 'ready') return
-      // Retain at most one turn between simulation ticks.
-      if (bufferedDirectionRef.current !== directionRef.current) return
-      if (canTurn(directionRef.current, nextDirection)) {
-        bufferedDirectionRef.current = nextDirection
-      }
-    },
-    [phase],
-  )
-
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      const keyDirections: Partial<Record<string, SnakeDirection>> = {
-        ArrowUp: 'up',
-        w: 'up',
-        W: 'up',
-        ArrowDown: 'down',
-        s: 'down',
-        S: 'down',
-        ArrowLeft: 'left',
-        a: 'left',
-        A: 'left',
-        ArrowRight: 'right',
-        d: 'right',
-        D: 'right',
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (['ArrowLeft', 'ArrowRight', 'a', 'A', 'd', 'D'].includes(event.key)) {
+        event.preventDefault()
+        pressedKeysRef.current.add(event.key.toLowerCase())
       }
       if (event.code === 'Space' && phase === 'ready') {
         event.preventDefault()
         setPhase('playing')
-        return
-      }
-      const nextDirection = keyDirections[event.key]
-      if (nextDirection) {
-        event.preventDefault()
-        requestTurn(nextDirection)
       }
     }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [phase, requestTurn])
+    const onKeyUp = (event: KeyboardEvent) => {
+      pressedKeysRef.current.delete(event.key.toLowerCase())
+    }
+    window.addEventListener('keydown', onKeyDown)
+    window.addEventListener('keyup', onKeyUp)
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('keyup', onKeyUp)
+    }
+  }, [phase])
 
-  const tickMs = getSnakeTickMs(
-    settings.tickMs,
-    settings.minTickMs,
-    settings.speedUpEvery,
-    settings.speedUpByMs,
-    foodEaten,
-  )
+  const steerTowardPointer = (event: React.PointerEvent<HTMLElement>) => {
+    if (phase !== 'playing') return
+    const bounds = stageRef.current?.getBoundingClientRect()
+    if (!bounds) return
+    const target = {
+      x: ((event.clientX - bounds.left) / bounds.width) * settings.playfield.width,
+      y: ((event.clientY - bounds.top) / bounds.height) * settings.playfield.height,
+    }
+    targetHeadingRef.current = headingToward(snakeRef.current[0], target)
+  }
 
   useEffect(() => {
     if (phase !== 'playing' || !visible) return
-    const timer = window.setInterval(() => {
-      const now = Date.now()
-      const activeRewards = rewardsRef.current.filter(
-        (reward) => reward.expiresAt > now,
-      )
-      rewardsRef.current = activeRewards
-      setGridRewards(activeRewards)
 
-      const nextDirection = bufferedDirectionRef.current
-      directionRef.current = nextDirection
-      setDirection(nextDirection)
-      const step = advanceSnake({
+    const frame = (timestamp: number) => {
+      if (endingRef.current) return
+      if (lastFrameRef.current === 0) lastFrameRef.current = timestamp
+      const deltaSeconds = Math.min(0.05, (timestamp - lastFrameRef.current) / 1000)
+      lastFrameRef.current = timestamp
+
+      const keys = pressedKeysRef.current
+      const steerLeft = keys.has('arrowleft') || keys.has('a')
+      const steerRight = keys.has('arrowright') || keys.has('d')
+      if (steerLeft !== steerRight) {
+        targetHeadingRef.current = normalizeAngle(
+          headingRef.current + (steerLeft ? -1 : 1) * settings.turnRate * deltaSeconds,
+        )
+      }
+
+      const speed = getSnakeSpeed(
+        settings.moveSpeed,
+        settings.maxSpeed,
+        settings.speedUpEvery,
+        settings.speedUpBy,
+        foodEatenRef.current,
+      )
+      const step = advanceContinuousSnake({
         snake: snakeRef.current,
-        direction: nextDirection,
-        food: foodRef.current,
-        walls: settings.walls,
-        columns,
-        rows,
+        heading: headingRef.current,
+        targetHeading: targetHeadingRef.current,
+        speed,
+        turnRate: settings.turnRate,
+        deltaSeconds,
+        segmentSpacing: settings.segmentSpacing,
+        headRadius: settings.headRadius,
+        bodyRadius: settings.bodyRadius,
+        playfield: settings.playfield,
+        obstacles: settings.obstacles,
         wrapBoundaries: settings.wrapBoundaries,
       })
-
       if (step.collision) {
         setStatus(
           step.collision === 'self'
@@ -306,88 +324,115 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
         return
       }
 
-      snakeRef.current = step.snake
-      setSnake(step.snake)
-      const head = step.snake[0]
+      const now = Date.now()
+      let activeRewards = rewardsRef.current.filter(
+        (reward) => reward.expiresAt > now,
+      )
+      let nextSnake = step.snake
+      headingRef.current = step.heading
+      setHeading(step.heading)
+
+      const headCircle = { ...nextSnake[0], radius: settings.headRadius }
       const collected = activeRewards.filter((reward) =>
-        positionsEqual(reward.position, head),
+        circlesOverlap(headCircle, {
+          ...reward.position,
+          radius: settings.rewardRadius,
+        }),
       )
       if (collected.length > 0) {
-        const remaining = activeRewards.filter(
-          (reward) => !positionsEqual(reward.position, head),
-        )
+        const ids = new Set(collected.map((reward) => reward.id))
+        activeRewards = activeRewards.filter((reward) => !ids.has(reward.id))
         for (const reward of collected) {
           collectedRewardsRef.current[reward.rewardKey] =
             (collectedRewardsRef.current[reward.rewardKey] || 0) + 1
         }
-        rewardsRef.current = remaining
-        setGridRewards(remaining)
         playSfx('good')
         setStatus('Onix recovered a mineral sample.')
       }
 
-      if (!step.ateFood) return
-      const nextFoodCount = foodEatenRef.current + 1
-      foodEatenRef.current = nextFoodCount
-      setFoodEaten(nextFoodCount)
-      const nextScore = scoreRef.current + settings.foodScore
-      scoreRef.current = nextScore
-      setScore(nextScore)
-      playSfx('select')
-      setStatus(`Survey score ${nextScore}. Onix grew longer.`)
+      const ateFood =
+        foodRef.current !== null &&
+        circlesOverlap(headCircle, {
+          ...foodRef.current,
+          radius: settings.foodRadius,
+        })
+      if (ateFood) {
+        nextSnake = growSnake(nextSnake)
+        const nextFoodCount = foodEatenRef.current + 1
+        foodEatenRef.current = nextFoodCount
+        setFoodEaten(nextFoodCount)
+        const nextScore = scoreRef.current + settings.foodScore
+        scoreRef.current = nextScore
+        setScore(nextScore)
+        playSfx('select')
+        setStatus(`Survey score ${nextScore}. Onix grew longer.`)
 
-      let nextRewards = rewardsRef.current
-      for (const config of rewardConfigs) {
-        const scheduledScore = rewardSchedulesRef.current[config.key]
-        if (scheduledScore === undefined || nextScore < scheduledScore) continue
-        const rewardCell = findSafeSnakeCell(columns, rows, [
-          step.snake,
-          settings.walls ?? [],
-          nextRewards.map((reward) => reward.position),
-        ])
-        if (rewardCell) {
-          const rewardOption =
-            config.rewardOptions[
-              Math.floor(Math.random() * config.rewardOptions.length)
-            ]
-          nextRewards = [
-            ...nextRewards,
-            {
+        for (const config of rewardConfigs) {
+          const scheduledScore = rewardSchedulesRef.current[config.key]
+          if (scheduledScore === undefined || nextScore < scheduledScore) continue
+          const position = findSafeSnakePosition(
+            settings.playfield,
+            settings.rewardRadius,
+            pickupCircles(nextSnake, activeRewards, true),
+            settings.minimumSpawnDistance,
+            nextSnake[0],
+          )
+          if (position) {
+            const option =
+              config.rewardOptions[
+                Math.floor(Math.random() * config.rewardOptions.length)
+              ]
+            activeRewards.push({
               id: rewardIdRef.current++,
-              rewardKey: rewardOption.key,
-              reward: rewardOption.reward,
-              position: rewardCell,
+              rewardKey: option.key,
+              reward: option.reward,
+              position,
               expiresAt: now + (settings.rewardLifetimeMs ?? 8000),
-            },
-          ]
-          rewardsRef.current = nextRewards
-          setGridRewards(nextRewards)
-          setStatus('A mineral sample surfaced nearby.')
+            })
+            setStatus('A mineral sample surfaced nearby.')
+          }
+          rewardSchedulesRef.current[config.key] = getNextCollectibleScore(
+            scheduledScore,
+            config.everyScore,
+          )
         }
-        rewardSchedulesRef.current[config.key] = getNextCollectibleScore(
-          scheduledScore,
-          config.everyScore,
-        )
+
+        const nextFood = placeFood(nextSnake, activeRewards)
+        const reachedTarget =
+          !settings.endless?.enabled &&
+          settings.winScore !== undefined &&
+          nextScore >= settings.winScore
+        if (reachedTarget || nextFood === null) {
+          snakeRef.current = nextSnake
+          setSnake(nextSnake)
+          rewardsRef.current = activeRewards
+          setSceneRewards([...activeRewards])
+          void finishGame(true)
+          return
+        }
       }
 
-      const nextFood = placeFood(step.snake, nextRewards)
-      const reachedTarget =
-        !settings.endless?.enabled &&
-        settings.winScore !== undefined &&
-        nextScore >= settings.winScore
-      if (reachedTarget || nextFood === null) void finishGame(true)
-    }, tickMs)
-    return () => window.clearInterval(timer)
+      snakeRef.current = nextSnake
+      rewardsRef.current = activeRewards
+      setSnake(nextSnake)
+      setSceneRewards([...activeRewards])
+      animationRef.current = requestAnimationFrame(frame)
+    }
+
+    lastFrameRef.current = 0
+    animationRef.current = requestAnimationFrame(frame)
+    return () => {
+      if (animationRef.current !== null) cancelAnimationFrame(animationRef.current)
+      animationRef.current = null
+    }
   }, [
-    columns,
     finishGame,
     phase,
+    pickupCircles,
     placeFood,
     playSfx,
     rewardConfigs,
-    rows,
     settings,
-    tickMs,
     visible,
   ])
 
@@ -405,58 +450,6 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
     return () => window.clearInterval(timer)
   }, [finishGame, phase, settings.timeLimit, visible])
 
-  const handlePointerDown = (event: React.PointerEvent) => {
-    pointerStartRef.current = { x: event.clientX, y: event.clientY }
-  }
-  const handlePointerUp = (event: React.PointerEvent) => {
-    const start = pointerStartRef.current
-    pointerStartRef.current = null
-    if (!start) return
-    const dx = event.clientX - start.x
-    const dy = event.clientY - start.y
-    if (Math.max(Math.abs(dx), Math.abs(dy)) < 18) {
-      if (phase === 'ready') setPhase('playing')
-      return
-    }
-    requestTurn(
-      Math.abs(dx) > Math.abs(dy)
-        ? dx > 0
-          ? 'right'
-          : 'left'
-        : dy > 0
-          ? 'down'
-          : 'up',
-    )
-  }
-
-  const occupied = useMemo(
-    () =>
-      new Map(
-        snake.map((segment, index) => [`${segment.x}:${segment.y}`, index]),
-      ),
-    [snake],
-  )
-  const wallSet = useMemo(
-    () => new Set((settings.walls ?? []).map((wall) => `${wall.x}:${wall.y}`)),
-    [settings.walls],
-  )
-  const rewardMap = useMemo(
-    () =>
-      new Map(
-        gridRewards.map((reward) => [
-          `${reward.position.x}:${reward.position.y}`,
-          reward,
-        ]),
-      ),
-    [gridRewards],
-  )
-
-  const rotationForSegment = (index: number) => {
-    if (index === 0) return ROTATION[direction]
-    const towardHead = directionBetween(snake[index], snake[index - 1])
-    return ROTATION[towardHead]
-  }
-
   const playAgain = async () => {
     const response = await startGame(encounter.id, true)
     if (!response.success) {
@@ -465,171 +458,123 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
     }
     resetLocalGame()
     setPhase('ready')
-    setStatus('Press Start, Space, or an arrow to guide Onix.')
+    setStatus('Press Start or Space, then steer toward the cave floor.')
   }
 
   return (
-    <div className="game-activity-chrome relative flex min-h-dvh flex-col overflow-hidden bg-game-canvas text-game-ink">
-      <div
-        className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-20"
-        style={{ backgroundImage: `url(${encounter.background})` }}
-      />
-      <header className="relative z-10 mx-auto flex w-full max-w-3xl items-center justify-between gap-3 border-b border-game-line bg-game-paper/95 px-4 py-3 shadow-sm">
-        <div>
-          <p className="text-xs font-bold text-game-muted">
-            Field trial · Tunnel survey
-          </p>
-          <h1 className="text-lg font-extrabold sm:text-xl">
-            {encounter.name}
-          </h1>
-        </div>
-        <div className="flex items-center gap-2 font-mono text-sm">
-          <span className="rounded-full border border-game-line bg-game-raised px-3 py-1.5">
-            {score} pts
-          </span>
+    <div
+      className="game-activity-chrome relative h-dvh overflow-hidden bg-cover bg-center text-game-raised select-none"
+      style={{ backgroundImage: `url(${encounter.background})` }}
+    >
+      <div className="pointer-events-none absolute inset-0 bg-game-ink/25" />
+      <header className="pointer-events-none absolute inset-x-0 top-0 z-[60] flex items-start justify-end gap-2 p-3 sm:p-5">
+        <div className="flex items-center gap-2 rounded-full border border-game-line/50 bg-game-ink/80 px-3 py-2 font-mono text-sm font-bold text-game-raised shadow-md backdrop-blur-sm">
+          <output>{score} pts</output>
           {settings.timeLimit ? (
-            <GameTimer timeLeft={timeLeft} totalTime={settings.timeLimit} />
+            <>
+              <span aria-hidden className="h-4 w-px bg-game-line/50" />
+              <span>{timeLeft}s</span>
+            </>
           ) : null}
         </div>
+        <Button
+          variant="outline"
+          size="icon"
+          className="pointer-events-auto bg-game-raised/95 text-game-ink shadow-md backdrop-blur-sm"
+          aria-label="Leave game"
+          onClick={() => router.push('/game/explore')}
+        >
+          <DoorOpen className="size-5" />
+        </Button>
       </header>
-
-      <main className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center gap-3 p-3 sm:p-5">
-        <div
-          className="relative aspect-square w-full max-w-[min(72dvh,38rem)] touch-none overflow-hidden rounded-xl border-4 border-game-ink/70 bg-[#3f4939] p-1 shadow-[0_8px_24px_rgba(41,53,50,0.24)]"
-          role="application"
-          aria-label="Onix Snake playfield. Swipe or use arrow keys to turn."
-          onPointerDown={handlePointerDown}
-          onPointerUp={handlePointerUp}
-        >
+      <section
+        ref={stageRef}
+        aria-label="Onix tunnel survey playfield"
+        aria-describedby="snake-controls snake-status"
+        className="absolute left-1/2 top-1/2 z-10 h-[min(100dvh,179.487vw)] w-[min(100vw,55.714dvh)] -translate-x-1/2 -translate-y-1/2 touch-none overflow-hidden"
+        onPointerDown={(event) => {
+          event.currentTarget.setPointerCapture(event.pointerId)
+          steerTowardPointer(event)
+        }}
+        onPointerMove={steerTowardPointer}
+      >
+        {(settings.obstacles ?? []).map((obstacle, index) => (
           <div
-            className="grid h-full w-full gap-px rounded-md bg-[#252f29] p-1"
-            style={{
-              gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
-            }}
+            key={`${obstacle.x}:${obstacle.y}:${index}`}
+            className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-game-line/30 bg-game-ink/75 shadow-lg"
+            style={sceneCircleStyle(obstacle, obstacle.radius * 2, settings.playfield)}
+          />
+        ))}
+
+        {food ? (
+          <div
+            className="absolute z-10 -translate-x-1/2 -translate-y-1/2"
+            style={sceneCircleStyle(food, settings.foodRadius * 2.5, settings.playfield)}
           >
-            {Array.from({ length: columns * rows }, (_, cellIndex) => {
-              const x = cellIndex % columns
-              const y = Math.floor(cellIndex / columns)
-              const key = `${x}:${y}`
-              const segmentIndex = occupied.get(key)
-              const reward = rewardMap.get(key)
-              const isFood = food?.x === x && food.y === y
-              const isWall = wallSet.has(key)
-              return (
-                <div
-                  key={key}
-                  className={`relative aspect-square min-w-0 overflow-hidden ${
-                    (x + y) % 2 === 0 ? 'bg-[#6f7658]' : 'bg-[#646c50]'
-                  } ${isWall ? 'bg-[#30372f]' : ''}`}
-                >
-                  {segmentIndex !== undefined ? (
-                    <SnakeSegmentImage
-                      src={
-                        segmentIndex === 0
-                          ? settings.sprites.head
-                          : segmentIndex === snake.length - 1
-                            ? settings.sprites.tail
-                            : settings.sprites.body
-                      }
-                      kind={
-                        segmentIndex === 0
-                          ? 'head'
-                          : segmentIndex === snake.length - 1
-                            ? 'tail'
-                            : 'body'
-                      }
-                      rotation={rotationForSegment(segmentIndex)}
-                    />
-                  ) : reward ? (
-                    <div className="absolute inset-[12%] animate-pulse motion-reduce:animate-none">
-                      <EndlessCollectibleSprite
-                        reward={reward.reward}
-                        size={36}
-                      />
-                    </div>
-                  ) : isFood ? (
-                    settings.sprites.food ? (
-                      <Image
-                        src={settings.sprites.food}
-                        alt="Cave food"
-                        fill
-                        sizes="36px"
-                        className="object-contain"
-                      />
-                    ) : (
-                      <div className="absolute inset-[25%] rotate-45 rounded-sm border-2 border-[#ffe4a3] bg-game-ochre shadow-sm" />
-                    )
-                  ) : null}
-                </div>
-              )
-            })}
+            {settings.sprites.food ? (
+              <Image src={settings.sprites.food} alt="Cave food" fill sizes="48px" className="object-contain" />
+            ) : (
+              <div className="absolute inset-[22%] rotate-45 rounded-sm border-2 border-[#ffe4a3] bg-game-ochre shadow-md" />
+            )}
           </div>
+        ) : null}
 
-          {phase !== 'playing' ? (
-            <div className="absolute inset-0 grid place-items-center bg-game-ink/70 p-6 text-center">
-              <div className="game-panel max-w-sm space-y-3 bg-game-raised p-5">
-                <p className="font-bold">
-                  {phase === 'loading'
-                    ? 'Preparing survey…'
-                    : startError || 'Guide Onix through the tunnel.'}
-                </p>
-                {phase === 'ready' ? (
-                  <Button
-                    className="min-h-11 w-full"
-                    onClick={() => setPhase('playing')}
-                  >
-                    Start survey
-                  </Button>
-                ) : null}
-              </div>
+        {sceneRewards.map((reward) => (
+          <div
+            key={reward.id}
+            className="absolute z-20 -translate-x-1/2 -translate-y-1/2 rounded-full border border-game-ochre/70 bg-game-ochre/20 p-[12%] shadow-[0_0_18px_rgba(181,138,67,0.55)]"
+            style={sceneCircleStyle(reward.position, settings.rewardRadius * 2.5, settings.playfield)}
+          >
+            <div className="pointer-events-none absolute inset-[10%] rounded-full border border-amber-200/35 motion-safe:animate-ping" />
+            <div className="relative h-full w-full">
+              <EndlessCollectibleSprite reward={reward.reward} size={50} />
             </div>
-          ) : null}
-        </div>
+          </div>
+        ))}
 
-        <p
-          className="min-h-5 text-center text-sm font-semibold text-game-muted"
-          aria-live="polite"
-        >
-          {!visible && phase === 'playing'
-            ? 'Survey paused while this page is hidden.'
-            : status}
-        </p>
+        {[...snake].reverse().map((segment, reverseIndex) => {
+          const index = snake.length - 1 - reverseIndex
+          const kind = index === 0 ? 'head' : index === snake.length - 1 ? 'tail' : 'body'
+          const segmentHeading =
+            kind === 'head'
+              ? heading
+              : getSegmentHeading(segment, snake[index - 1]) +
+                (kind === 'tail' ? 180 : 0)
+          const radius = kind === 'head' ? settings.headRadius : settings.bodyRadius
+          return (
+            <SnakeSegment
+              key={index}
+              src={settings.sprites[kind]}
+              kind={kind}
+              position={segment}
+              heading={segmentHeading}
+              radius={radius}
+              playfield={settings.playfield}
+            />
+          )
+        })}
 
-        <div
-          className="grid grid-cols-3 grid-rows-2 gap-1 sm:hidden"
-          role="group"
-          aria-label="Direction controls"
-        >
-          <DirectionButton
-            label="Turn up"
-            onClick={() => requestTurn('up')}
-            className="col-start-2"
-          >
-            <ArrowUp />
-          </DirectionButton>
-          <DirectionButton
-            label="Turn left"
-            onClick={() => requestTurn('left')}
-            className="row-start-2"
-          >
-            <ArrowLeft />
-          </DirectionButton>
-          <DirectionButton
-            label="Turn down"
-            onClick={() => requestTurn('down')}
-            className="row-start-2"
-          >
-            <ArrowDown />
-          </DirectionButton>
-          <DirectionButton
-            label="Turn right"
-            onClick={() => requestTurn('right')}
-            className="row-start-2"
-          >
-            <ArrowRight />
-          </DirectionButton>
-        </div>
-      </main>
+        {phase === 'loading' || phase === 'ready' ? (
+          <div className="absolute inset-0 z-50 grid place-items-center bg-game-ink/45 p-6 text-center">
+            {phase === 'ready' ? (
+              <Button className="pointer-events-auto min-h-11 min-w-40 shadow-lg" onClick={() => setPhase('playing')}>
+                Start
+              </Button>
+            ) : (
+              <p className="rounded-lg bg-game-ink/80 px-3 py-2 text-sm font-bold">
+                {startError || 'Preparing…'}
+              </p>
+            )}
+          </div>
+        ) : null}
+      </section>
+
+      <p id="snake-controls" className="sr-only">
+        Move the pointer or drag to steer. Left and Right arrow keys or A and D curve Onix.
+      </p>
+      <p id="snake-status" className="sr-only" aria-live="polite">
+        {!visible && phase === 'playing' ? 'Survey paused.' : status}
+      </p>
 
       {result ? (
         <RewardResultOverlay
@@ -642,13 +587,8 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
             router.push('/game/explore')
           }}
           secondaryAction={
-            initialState?.encounter?.isEligibleForReplay ||
-            encounter.isEligibleForReplay ? (
-              <Button
-                size="lg"
-                className="w-full"
-                onClick={() => void playAgain()}
-              >
+            initialState?.encounter?.isEligibleForReplay || encounter.isEligibleForReplay ? (
+              <Button size="lg" className="w-full" onClick={() => void playAgain()}>
                 Play again
               </Button>
             ) : undefined
@@ -659,30 +599,52 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
   )
 }
 
-function SnakeSegmentImage({
+function sceneCircleStyle(
+  position: SnakePosition,
+  diameter: number,
+  playfield: { width: number; height: number },
+) {
+  return {
+    left: `${(position.x / playfield.width) * 100}%`,
+    top: `${(position.y / playfield.height) * 100}%`,
+    width: `${(diameter / playfield.width) * 100}%`,
+    aspectRatio: '1',
+  }
+}
+
+function SnakeSegment({
   src,
   kind,
-  rotation,
+  position,
+  heading,
+  radius,
+  playfield,
 }: {
   src: string
   kind: 'head' | 'body' | 'tail'
-  rotation: number
+  position: SnakePosition
+  heading: number
+  radius: number
+  playfield: { width: number; height: number }
 }) {
-  const [imageAvailable, setImageAvailable] = useState(!src.startsWith('css:'))
-
+  const [imageAvailable, setImageAvailable] = useState(true)
+  const widthMultiplier = kind === 'head' ? 2.8 : kind === 'tail' ? 2.65 : 2.45
   return (
     <div
-      className="absolute inset-[3%]"
-      style={{ transform: `rotate(${rotation}deg)` }}
+      className="pointer-events-none absolute z-30 -translate-x-1/2 -translate-y-1/2"
+      style={{
+        ...sceneCircleStyle(position, radius * widthMultiplier, playfield),
+        transform: `translate(-50%, -50%) rotate(${heading}deg)`,
+      }}
     >
       {imageAvailable ? (
         <Image
           src={src}
           alt=""
           fill
-          sizes="36px"
+          sizes="80px"
           draggable={false}
-          className="object-contain drop-shadow-sm"
+          className="object-contain drop-shadow-md"
           onError={() => setImageAvailable(false)}
         />
       ) : kind === 'head' ? (
@@ -690,44 +652,13 @@ function SnakeSegmentImage({
           src="/sprites/pokemon/home/normal/95.avif"
           alt=""
           fill
-          sizes="36px"
+          sizes="80px"
           draggable={false}
-          className="object-contain drop-shadow-sm"
+          className="object-contain drop-shadow-md"
         />
       ) : (
-        <div
-          className={`absolute border-2 border-[#bfc3b4] bg-[#777d73] shadow-inner ${
-            kind === 'tail'
-              ? 'inset-[24%] rotate-45 rounded-sm'
-              : 'inset-[10%] rounded-full'
-          }`}
-        />
+        <div className={`absolute border-2 border-[#bfc3b4] bg-[#777d73] shadow-inner ${kind === 'tail' ? 'inset-[24%] rotate-45 rounded-sm' : 'inset-[10%] rounded-full'}`} />
       )}
     </div>
-  )
-}
-
-function DirectionButton({
-  label,
-  onClick,
-  className = '',
-  children,
-}: {
-  label: string
-  onClick: () => void
-  className?: string
-  children: React.ReactNode
-}) {
-  return (
-    <Button
-      type="button"
-      variant="outline"
-      size="icon"
-      aria-label={label}
-      onClick={onClick}
-      className={`h-12 w-12 border-game-line bg-game-raised text-game-ink ${className}`}
-    >
-      {children}
-    </Button>
   )
 }
