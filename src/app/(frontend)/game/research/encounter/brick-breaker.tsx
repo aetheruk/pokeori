@@ -463,7 +463,8 @@ export function BrickBreakerGame({
           size="icon"
           className="pointer-events-auto bg-game-surface-raised/95 text-game-ink shadow-md backdrop-blur-sm"
           aria-label="Leave game"
-          onClick={() => router.push('/game/explore')}
+          disabled={!started || ended || Boolean(result)}
+          onClick={() => void finish(false, 'Survey ended early.')}
         >
           <DoorOpen className="size-5" />
         </Button>
@@ -495,11 +496,17 @@ export function BrickBreakerGame({
               (row * settings.layout[0].length + column) %
                 settings.brickPokemonIds.length
             ]
+          const crystalColor =
+            brick.durability >= 3
+              ? '#b56342'
+              : brick.durability === 2
+                ? '#9a7643'
+                : '#6f8c5e'
           return (
             <div
               key={brick.id}
               aria-hidden
-              className={`absolute flex items-center justify-center overflow-hidden border shadow-[inset_2px_2px_4px_rgba(255,255,255,0.3),inset_-2px_-2px_4px_rgba(0,0,0,0.3),0_2px_4px_rgba(0,0,0,0.3)] ${brick.indestructible ? 'border-[#8a857b]' : brick.durability >= 3 ? 'border-[#f0b96e]' : brick.durability === 2 ? 'border-[#dfc071]' : 'border-[#b8d09c]'}`}
+              className="absolute flex items-center justify-center rounded-lg"
               style={{
                 left: `${(brick.x / width) * 100}%`,
                 top: `${(brick.y / height) * 100}%`,
@@ -507,22 +514,27 @@ export function BrickBreakerGame({
                 aspectRatio: '1 / 1',
                 background: brick.indestructible
                   ? 'linear-gradient(135deg, #a29b8c 0%, #5c625d 35%, #343b38 72%, #222926 100%)'
-                  : brick.durability >= 3
-                    ? 'linear-gradient(135deg, #f0c47d 0%, #b56342 34%, #79422f 72%, #48291f 100%)'
-                    : brick.durability === 2
-                      ? 'linear-gradient(135deg, #f0d58a 0%, #9a7643 34%, #67502f 72%, #3e321f 100%)'
-                      : 'linear-gradient(135deg, #d8ebbd 0%, #6f8c5e 34%, #49603f 72%, #293b2a 100%)',
-                clipPath:
-                  'polygon(12% 0,88% 0,100% 12%,100% 88%,88% 100%,12% 100%,0 88%,0 12%)',
+                  : `linear-gradient(135deg,
+                      color-mix(in srgb, ${crystalColor} 70%, white) 0%,
+                      ${crystalColor} 30%,
+                      color-mix(in srgb, ${crystalColor} 60%, black) 70%,
+                      color-mix(in srgb, ${crystalColor} 40%, black) 100%)`,
+                boxShadow:
+                  'inset 2px 2px 4px rgba(255,255,255,0.3), inset -2px -2px 4px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.3)',
+                border: brick.indestructible
+                  ? '1px solid #8a857b'
+                  : `1px solid color-mix(in srgb, ${crystalColor} 80%, white)`,
               }}
             >
-              <Image
-                src={getPokemonImageUrl(pokemonId, 'sprite')}
-                alt=""
-                width={64}
-                height={64}
-                className="pixelated relative z-10 h-[78%] w-[78%] object-contain opacity-90 drop-shadow-[0_1px_1px_rgba(255,255,255,0.45)]"
-              />
+              {!brick.indestructible && (
+                <Image
+                  src={getPokemonImageUrl(pokemonId, 'sprite')}
+                  alt=""
+                  width={64}
+                  height={64}
+                  className="pixelated relative z-10 h-[78%] w-[78%] object-contain opacity-90 drop-shadow-[0_1px_1px_rgba(255,255,255,0.45)]"
+                />
+              )}
               <span className="absolute left-[14%] top-[10%] h-[10%] w-[42%] -rotate-12 rounded-full bg-white/35" />
             </div>
           )

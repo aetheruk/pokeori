@@ -2,11 +2,13 @@ import { describe, expect, test } from 'bun:test'
 import { snakeGames } from '@/data/games/snake'
 import {
   advanceContinuousSnake,
+  centerSnakePositionForPlayfield,
   circlesOverlap,
   createInitialSnake,
   distanceBetween,
   findSafeSnakePosition,
   getSegmentHeading,
+  getResponsiveSnakePlayfield,
   getSnakeSpeed,
   growSnake,
   normalizeAngle,
@@ -16,6 +18,30 @@ import {
 } from '@/utilities/research/snake'
 
 describe('continuous Snake mechanics', () => {
+  test('matches the logical collision plane to any viewport without stretching', () => {
+    const authored = { width: 390, height: 700 }
+    const tallPhone = getResponsiveSnakePlayfield(authored, 390, 844)
+    const landscape = getResponsiveSnakePlayfield(authored, 1440, 900)
+
+    expect(tallPhone.height).toBe(700)
+    expect(tallPhone.width).toBeCloseTo(323.46, 2)
+    expect(390 / tallPhone.width).toBeCloseTo(844 / tallPhone.height)
+    expect(landscape).toEqual({ width: 1120, height: 700 })
+    expect(1440 / landscape.width).toBe(900 / landscape.height)
+  })
+
+  test('keeps authored positions centered as responsive world width changes', () => {
+    const authored = { width: 390, height: 700 }
+    const runtime = getResponsiveSnakePlayfield(authored, 390, 844)
+    const centered = centerSnakePositionForPlayfield(
+      { x: 195, y: 380 },
+      authored,
+      runtime,
+    )
+    expect(centered.x).toBeCloseTo(runtime.width / 2)
+    expect(centered.y).toBe(380)
+  })
+
   test('creates a spaced body behind any authored heading', () => {
     const snake = createInitialSnake({ x: 100, y: 100 }, 3, 45, 20)
     expect(snake).toHaveLength(3)
@@ -240,5 +266,27 @@ describe('Onix Snake test entry and scene', () => {
     expect(source).toContain('pointerTargetRef.current')
     expect(source).toContain('overflow-hidden rounded-full')
     expect(source).toContain('settings.rewardRadius * 2')
+    expect(source).toContain('className="absolute inset-0 z-10')
+    expect(source).toContain('runtimePlayfieldRef.current.width')
+  })
+
+  test('releases pointer steering without retaining an orbit target', async () => {
+    const source = await Bun.file(
+      new URL(
+        '../src/app/(frontend)/game/research/encounter/snake.tsx',
+        import.meta.url,
+      ),
+    ).text()
+    const releaseHandler =
+      source.split('const clearPointerSteering = ')[1]?.split('\n\n  useEffect')[0] ??
+      ''
+
+    expect(releaseHandler).toContain('pointerTargetRef.current = null')
+    expect(releaseHandler).toContain(
+      'targetHeadingRef.current = headingRef.current',
+    )
+    expect(releaseHandler).toContain('releasePointerCapture(event.pointerId)')
+    expect(source).toContain('onPointerUp={clearPointerSteering}')
+    expect(source).toContain('onPointerCancel={clearPointerSteering}')
   })
 })
