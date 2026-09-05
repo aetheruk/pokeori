@@ -1,7 +1,4 @@
-import type {
-  SnakeObstacle,
-  SnakePosition,
-} from '@/data/games/snake/types'
+import type { SnakeObstacle, SnakePosition } from '@/data/games/snake/types'
 
 export interface SnakeCircle extends SnakePosition {
   radius: number
@@ -82,8 +79,7 @@ export function sweptCircleIntersects(
           0,
           Math.min(
             1,
-            ((target.x - start.x) * travelX +
-              (target.y - start.y) * travelY) /
+            ((target.x - start.x) * travelX + (target.y - start.y) * travelY) /
               travelSquared,
           ),
         )
@@ -119,6 +115,20 @@ export function headingToward(from: SnakePosition, to: SnakePosition) {
   )
 }
 
+/**
+ * Aim at a pointer until the head reaches its arrival zone. Returning null
+ * commits the snake to its current course instead of letting it orbit a point
+ * hidden beneath the player's finger.
+ */
+export function getSnakePointerHeading(
+  head: SnakePosition,
+  target: SnakePosition,
+  arrivalRadius: number,
+) {
+  if (distanceBetween(head, target) <= Math.max(0, arrivalRadius)) return null
+  return headingToward(head, target)
+}
+
 export function createInitialSnake(
   head: SnakePosition,
   length: number,
@@ -139,8 +149,7 @@ export function getSnakeSpeed(
   speedUpBy: number,
   foodEaten: number,
 ) {
-  const increases =
-    speedUpEvery > 0 ? Math.floor(foodEaten / speedUpEvery) : 0
+  const increases = speedUpEvery > 0 ? Math.floor(foodEaten / speedUpEvery) : 0
   return Math.min(maxSpeed, initialSpeed + increases * speedUpBy)
 }
 
@@ -163,11 +172,7 @@ export function advanceContinuousSnake({
   }
 
   const safeDelta = Math.max(0, Math.min(deltaSeconds, 0.05))
-  const nextHeading = turnToward(
-    heading,
-    targetHeading,
-    turnRate * safeDelta,
-  )
+  const nextHeading = turnToward(heading, targetHeading, turnRate * safeDelta)
   const radians = (nextHeading * Math.PI) / 180
   let bodySource = snake
   let head = {

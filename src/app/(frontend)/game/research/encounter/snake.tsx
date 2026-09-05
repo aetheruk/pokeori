@@ -1,7 +1,7 @@
 'use client'
 
-import Image from 'next/image'
 import { DoorOpen } from 'lucide-react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -13,10 +13,7 @@ import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverla
 import { Button } from '@/components/ui/button'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
-import type {
-  SnakeGameConfig,
-  SnakePosition,
-} from '@/data/games/snake/types'
+import type { SnakeGameConfig, SnakePosition } from '@/data/games/snake/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { usePageVisibility } from '@/hooks/usePageVisibility'
 import { getLowestEndlessRewardScore } from '@/utilities/research/endless-milestones'
@@ -27,12 +24,12 @@ import {
   findSafeSnakePosition,
   getResponsiveSnakePlayfield,
   getSegmentHeading,
+  getSnakePointerHeading,
   getSnakeSpeed,
   growSnake,
-  headingToward,
   normalizeAngle,
-  sweptCircleIntersects,
   type SnakeCircle,
+  sweptCircleIntersects,
 } from '@/utilities/research/snake'
 import {
   type EndlessCollectibleRewardConfig,
@@ -205,7 +202,9 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
             : 'Survey incomplete',
         rewards: response.summary,
       })
-    }, [encounter.id, playSfx, settings])
+    },
+    [encounter.id, playSfx, settings],
+  )
 
   const resetLocalGame = useCallback(() => {
     const nextSnake = createInitialSnake(
@@ -345,8 +344,18 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
         ((event.clientY - bounds.top) / bounds.height) *
         runtimePlayfieldRef.current.height,
     }
+    const targetHeading = getSnakePointerHeading(
+      snakeRef.current[0],
+      target,
+      settings.headRadius * 1.75,
+    )
+    if (targetHeading === null) {
+      pointerTargetRef.current = null
+      targetHeadingRef.current = headingRef.current
+      return
+    }
     pointerTargetRef.current = target
-    targetHeadingRef.current = headingToward(snakeRef.current[0], target)
+    targetHeadingRef.current = targetHeading
   }
 
   const clearPointerSteering = (event: React.PointerEvent<HTMLElement>) => {
@@ -363,7 +372,10 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
     const frame = (timestamp: number) => {
       if (endingRef.current) return
       if (lastFrameRef.current === 0) lastFrameRef.current = timestamp
-      const deltaSeconds = Math.min(0.05, (timestamp - lastFrameRef.current) / 1000)
+      const deltaSeconds = Math.min(
+        0.05,
+        (timestamp - lastFrameRef.current) / 1000,
+      )
       lastFrameRef.current = timestamp
 
       const keys = pressedKeysRef.current
@@ -371,13 +383,19 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
       const steerRight = keys.has('arrowright') || keys.has('d')
       if (steerLeft !== steerRight) {
         targetHeadingRef.current = normalizeAngle(
-          headingRef.current + (steerLeft ? -1 : 1) * settings.turnRate * deltaSeconds,
+          headingRef.current +
+            (steerLeft ? -1 : 1) * settings.turnRate * deltaSeconds,
         )
       } else if (pointerTargetRef.current) {
-        targetHeadingRef.current = headingToward(
+        const pointerHeading = getSnakePointerHeading(
           snakeRef.current[0],
           pointerTargetRef.current,
+          settings.headRadius * 1.75,
         )
+        if (pointerHeading === null) {
+          pointerTargetRef.current = null
+          targetHeadingRef.current = headingRef.current
+        } else targetHeadingRef.current = pointerHeading
       }
 
       const speed = getSnakeSpeed(
@@ -422,10 +440,16 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
 
       const headCircle = { ...nextSnake[0], radius: settings.headRadius }
       const collected = activeRewards.filter((reward) =>
-        sweptCircleIntersects(previousHead, headCircle, settings.headRadius, {
-          ...reward.position,
-          radius: settings.rewardRadius,
-        }, settings.maxSpeed * 0.06),
+        sweptCircleIntersects(
+          previousHead,
+          headCircle,
+          settings.headRadius,
+          {
+            ...reward.position,
+            radius: settings.rewardRadius,
+          },
+          settings.maxSpeed * 0.06,
+        ),
       )
       if (collected.length > 0) {
         const ids = new Set(collected.map((reward) => reward.id))
@@ -440,10 +464,16 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
 
       const ateFood =
         foodRef.current !== null &&
-        sweptCircleIntersects(previousHead, headCircle, settings.headRadius, {
-          ...foodRef.current,
-          radius: settings.foodRadius,
-        }, settings.maxSpeed * 0.06)
+        sweptCircleIntersects(
+          previousHead,
+          headCircle,
+          settings.headRadius,
+          {
+            ...foodRef.current,
+            radius: settings.foodRadius,
+          },
+          settings.maxSpeed * 0.06,
+        )
       if (ateFood) {
         nextSnake = growSnake(nextSnake)
         const nextFoodCount = foodEatenRef.current + 1
@@ -457,7 +487,8 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
 
         for (const config of rewardConfigs) {
           const scheduledScore = rewardSchedulesRef.current[config.key]
-          if (scheduledScore === undefined || nextScore < scheduledScore) continue
+          if (scheduledScore === undefined || nextScore < scheduledScore)
+            continue
           const position = findSafeSnakePosition(
             runtimePlayfieldRef.current,
             settings.rewardRadius,
@@ -510,7 +541,8 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
     lastFrameRef.current = 0
     animationRef.current = requestAnimationFrame(frame)
     return () => {
-      if (animationRef.current !== null) cancelAnimationFrame(animationRef.current)
+      if (animationRef.current !== null)
+        cancelAnimationFrame(animationRef.current)
       animationRef.current = null
     }
   }, [
@@ -554,7 +586,7 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
 
   return (
     <div
-      className="game-activity-chrome relative h-dvh touch-none overflow-hidden bg-cover bg-center text-game-raised select-none"
+      className="game-activity-chrome relative h-dvh touch-none overflow-hidden bg-cover bg-center text-game-ink select-none"
       style={{ backgroundImage: `url(${encounter.background})` }}
       onPointerDown={(event) => {
         if ((event.target as HTMLElement).closest('button')) return
@@ -575,7 +607,7 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
     >
       <div className="pointer-events-none absolute inset-0 bg-game-ink/25" />
       <header className="pointer-events-none absolute inset-x-0 top-0 z-[60] flex items-start justify-end gap-2 p-3 sm:p-5">
-        <div className="flex items-center gap-2 rounded-full border border-game-line/50 bg-game-ink/80 px-3 py-2 font-mono text-sm font-bold text-game-raised shadow-md backdrop-blur-sm">
+        <div className="flex items-center gap-2 rounded-full border border-game-border bg-game-surface-raised/95 px-3 py-2 font-mono text-sm font-bold text-game-ink shadow-md backdrop-blur-sm">
           <output>{score} pts</output>
           {settings.timeLimit ? (
             <>
@@ -587,7 +619,7 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
         <Button
           variant="outline"
           size="icon"
-          className="pointer-events-auto bg-game-raised/95 text-game-ink shadow-md backdrop-blur-sm"
+          className="pointer-events-auto border-game-border bg-game-surface-raised/95 text-game-ink shadow-md backdrop-blur-sm"
           aria-label="Leave game"
           onClick={() => router.push('/game/explore')}
         >
@@ -604,45 +636,64 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
           <div
             key={`${obstacle.x}:${obstacle.y}:${index}`}
             className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-game-line/30 bg-game-ink/75 shadow-lg"
-            style={sceneCircleStyle(obstacle, obstacle.radius * 2, runtimePlayfield)}
+            style={sceneCircleStyle(
+              obstacle,
+              obstacle.radius * 2,
+              runtimePlayfield,
+            )}
           />
         ))}
 
         {food ? (
           <div
-            className="absolute z-10 -translate-x-1/2 -translate-y-1/2"
-            style={sceneCircleStyle(food, settings.foodRadius * 2, runtimePlayfield)}
-          >
-            {settings.sprites.food ? (
-              <Image src={settings.sprites.food} alt="Cave food" fill sizes="48px" className="object-contain" />
-            ) : (
-              <div className="absolute inset-[22%] rotate-45 rounded-sm border-2 border-[#ffe4a3] bg-game-ochre shadow-md" />
+            className="absolute z-10 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-game-ochre/70 bg-game-ochre/20 shadow-[0_0_14px_rgba(181,138,67,0.48)]"
+            style={sceneCircleStyle(
+              food,
+              settings.foodRadius * 2,
+              runtimePlayfield,
             )}
+          >
+            <span className="pointer-events-none absolute inset-[10%] rounded-full border border-amber-200/35 motion-safe:animate-ping" />
+            <span className="relative z-10 h-[72%] w-[72%]">
+              <Image
+                src={settings.sprites.food}
+                alt="Cave stone"
+                fill
+                sizes="48px"
+                className="object-contain drop-shadow-md"
+              />
+            </span>
           </div>
         ) : null}
 
         {sceneRewards.map((reward) => (
           <div
             key={reward.id}
-            className="absolute z-20 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border border-game-ochre/70 bg-game-ochre/20 shadow-[0_0_14px_rgba(181,138,67,0.48)]"
-            style={sceneCircleStyle(reward.position, settings.rewardRadius * 2, runtimePlayfield)}
+            className="absolute z-20 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-game-ochre/70 bg-game-ochre/20 shadow-[0_0_14px_rgba(181,138,67,0.48)]"
+            style={sceneCircleStyle(
+              reward.position,
+              settings.rewardRadius * 2,
+              runtimePlayfield,
+            )}
           >
-            <div className="pointer-events-none absolute inset-[10%] rounded-full border border-amber-200/35 motion-safe:animate-ping" />
-            <div className="absolute inset-[20%]">
+            <span className="pointer-events-none absolute inset-[10%] rounded-full border border-amber-200/35 motion-safe:animate-ping" />
+            <span className="relative z-10 h-[72%] w-[72%]">
               <EndlessCollectibleSprite reward={reward.reward} size={50} />
-            </div>
+            </span>
           </div>
         ))}
 
         {[...snake].reverse().map((segment, reverseIndex) => {
           const index = snake.length - 1 - reverseIndex
-          const kind = index === 0 ? 'head' : index === snake.length - 1 ? 'tail' : 'body'
+          const kind =
+            index === 0 ? 'head' : index === snake.length - 1 ? 'tail' : 'body'
           const segmentHeading =
             kind === 'head'
               ? heading
               : getSegmentHeading(segment, snake[index - 1]) +
                 (kind === 'tail' ? 180 : 0)
-          const radius = kind === 'head' ? settings.headRadius : settings.bodyRadius
+          const radius =
+            kind === 'head' ? settings.headRadius : settings.bodyRadius
           return (
             <SnakeSegment
               key={index}
@@ -659,11 +710,14 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
         {phase === 'loading' || phase === 'ready' ? (
           <div className="absolute inset-0 z-50 grid place-items-center bg-game-ink/45 p-6 text-center">
             {phase === 'ready' ? (
-              <Button className="pointer-events-auto min-h-11 min-w-40 shadow-lg" onClick={() => setPhase('playing')}>
+              <Button
+                className="pointer-events-auto min-h-11 min-w-40 shadow-lg"
+                onClick={() => setPhase('playing')}
+              >
                 Start
               </Button>
             ) : (
-              <p className="rounded-lg bg-game-ink/80 px-3 py-2 text-sm font-bold">
+              <p className="rounded-lg border border-game-border bg-game-surface-raised px-3 py-2 text-sm font-bold text-game-ink shadow-md">
                 {startError || 'Preparing…'}
               </p>
             )}
@@ -672,7 +726,8 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
       </section>
 
       <p id="snake-controls" className="sr-only">
-        Move the pointer or drag to steer. Left and Right arrow keys or A and D curve Onix.
+        Move the pointer or drag to steer. Left and Right arrow keys or A and D
+        curve Onix.
       </p>
       <p id="snake-status" className="sr-only" aria-live="polite">
         {!visible && phase === 'playing' ? 'Survey paused.' : status}
@@ -689,8 +744,13 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
             router.push('/game/explore')
           }}
           secondaryAction={
-            initialState?.encounter?.isEligibleForReplay || encounter.isEligibleForReplay ? (
-              <Button size="lg" className="w-full" onClick={() => void playAgain()}>
+            initialState?.encounter?.isEligibleForReplay ||
+            encounter.isEligibleForReplay ? (
+              <Button
+                size="lg"
+                className="w-full"
+                onClick={() => void playAgain()}
+              >
                 Play again
               </Button>
             ) : undefined
@@ -759,7 +819,9 @@ function SnakeSegment({
           className="object-contain drop-shadow-md"
         />
       ) : (
-        <div className={`absolute border-2 border-[#bfc3b4] bg-[#777d73] shadow-inner ${kind === 'tail' ? 'inset-[24%] rotate-45 rounded-sm' : 'inset-[10%] rounded-full'}`} />
+        <div
+          className={`absolute border-2 border-[#bfc3b4] bg-[#777d73] shadow-inner ${kind === 'tail' ? 'inset-[24%] rotate-45 rounded-sm' : 'inset-[10%] rounded-full'}`}
+        />
       )}
     </div>
   )
