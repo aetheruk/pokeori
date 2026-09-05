@@ -1154,6 +1154,7 @@ describe('PVP turn engine helpers', () => {
       attackerSide: 'player',
       playerMove: { stance: 'power' },
       enemyMove: { stance: 'tech' },
+      random: () => 0.5,
     })
 
     expect(result.didAttack).toBe(true)
