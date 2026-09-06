@@ -2179,6 +2179,47 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(study).toContain('stand over my workbench')
   })
 
+  test('What Now follows the antidote conclusion and sends the player to Oak', () => {
+    const whatNow = tasks.find((task) => task.id === 'fuchsia-what-now')
+
+    expect(whatNow).toMatchObject({
+      name: 'What Now',
+      description: 'Ray seems both fired up and nervous.',
+      completeButtonText: 'Ray?',
+      icon: { type: 'trainer', id: 'detective' },
+      requirements: [
+        { type: 'task_completed', targetId: 'safari-catch-partner-chansey' },
+      ],
+      exitModal: {
+        title: 'Professor Oak',
+        icon: { type: 'trainer', id: 'oak' },
+        message:
+          'It’s been a while since I saw the professor. I wonder if he’ll remember me.',
+      },
+    })
+
+    expect(whatNow?.enterModal).toHaveLength(9)
+    expect(
+      whatNow?.enterModal?.every(
+        (step) =>
+          step.icon &&
+          step.icon.type === 'trainer' &&
+          step.icon.id === 'detective',
+      ),
+    ).toBe(true)
+    expect(whatNow?.enterModal?.map((step) => step.buttons[0]?.text)).toEqual([
+      'I’m hanging in there',
+      'Yeah…',
+      'Next',
+      'Makes Sense',
+      'Right',
+      'No go on.',
+      'But who?',
+      'Who?',
+      'To Pallet Town',
+    ])
+  })
+
   test('Sealed Toxin unlocks Billiam storage, bulk candy, and the Good Rod side tasks', () => {
     const flyer = tasks.find(
       (task) => task.id === 'fuchsia-crudely-drawn-flyer',
