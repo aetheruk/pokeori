@@ -17,8 +17,10 @@ test('a saved result schedules an update, and a new game cancels that countdown'
   await page.clock.install()
   await page.evaluate(() => window.history.pushState({}, '', '/game/games/ui-test'))
   await expect.poll(() => versionChecks).toBeGreaterThan(1)
+  const versionChecksBeforeUpdate = versionChecks
   newer = true
   await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+  await expect.poll(() => versionChecks).toBeGreaterThan(versionChecksBeforeUpdate)
   await expect(page.getByRole('status').filter({ hasText: 'Update ready.' })).toBeVisible({ timeout: updateStatusTimeout })
   await page.evaluate(() => window.dispatchEvent(new Event('pokeori:activity-settled')))
   await expect(page.getByRole('status').filter({ hasText: 'Updating in 15 seconds' })).toBeVisible({ timeout: updateStatusTimeout })
