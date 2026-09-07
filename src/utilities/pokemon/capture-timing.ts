@@ -9,6 +9,18 @@ export type CaptureAimTiming = {
 }
 export type CaptureTimingProof = { challengeId: string; elapsedMs: number }
 
+/**
+ * The quiz timer ending moves a live encounter into its capture phase. The
+ * Redis session itself is the source of truth for whether that phase is still
+ * available; the quiz expiry must not reject the throw preparation request.
+ */
+export function isCaptureAimSessionValid<T extends { userId?: string }>(
+  state: T | null,
+  userId: string,
+): state is T & { userId: string } {
+  return state?.userId === userId
+}
+
 export function getCaptureRingScale(elapsedMs: number) {
   return 1 - (Math.max(0, elapsedMs) % CAPTURE_RING_PERIOD_MS) / CAPTURE_RING_PERIOD_MS
 }

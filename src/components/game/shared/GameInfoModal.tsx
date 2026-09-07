@@ -360,7 +360,7 @@ export function GameInfoModal({
       </div>
 
       {(actionButton || (rewards && rewards.length > 0)) && (
-        <div className="shrink-0 border-t border-game-border bg-game-surface/95 p-6 pb-8 md:backdrop-blur-xl">
+        <div className="shrink-0 border-t border-game-border bg-game-surface/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:p-6 md:pb-[max(1.5rem,env(safe-area-inset-bottom))] md:backdrop-blur-xl">
           <div className="max-w-3xl mx-auto">
             {rewards && rewards.length > 0 && (
               <div className="mb-6">

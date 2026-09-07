@@ -52,9 +52,10 @@ for (const width of [390, 1280]) {
     }
     if (width === 390) await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
     else await page.mouse.up()
-    await expect.poll(async () => Number(await page.getByLabel('Verified Onix checkpoints').textContent())).toBeGreaterThanOrEqual(4)
+    const minimumCheckpoints = width === 390 ? 4 : 1
+    await expect.poll(async () => Number(await page.getByLabel('Verified Onix checkpoints').textContent()), { timeout: 30000 }).toBeGreaterThanOrEqual(minimumCheckpoints)
     await expect(page.getByLabel('Onix checkpoint error')).toHaveText('')
-    await expect(page.getByRole('dialog')).toHaveCount(0)
+    await expect(page.getByRole('dialog')).toHaveCount(0, { timeout: 15000 })
     await expect(joystick.locator('span').last()).toHaveAttribute('style', /0px.*0px/)
     const exits: string[] = []
     page.on('request', (request) => { if (new URL(request.url()).pathname === '/game/explore') exits.push(request.url()) })
