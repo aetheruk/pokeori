@@ -310,6 +310,13 @@ export type BattlePresentationEvent =
       message: string
     }
   | {
+      type: 'boost'
+      side: BattlePresentationSide
+      pokemonIndex: number
+      kind: 'shout'
+      message: string
+    }
+  | {
       type: 'faint'
       side: BattlePresentationSide
       pokemonIndex: number

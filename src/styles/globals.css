@@ -2284,6 +2284,140 @@
   --effect-glow: rgba(244, 114, 182, 0.62);
 }
 
+@keyframes battle-boost-sprite {
+  0% {
+    transform: scale(1) translateY(0);
+  }
+  24% {
+    transform: scale(1.08) translateY(-5px);
+  }
+  48% {
+    transform: scale(1.12) translateY(0);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes battle-boost-ring {
+  0% {
+    transform: translate(-50%, -50%) scale(0.45);
+    opacity: 0;
+  }
+  22% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.35);
+    opacity: 0;
+  }
+}
+
+@keyframes battle-boost-flare {
+  0% {
+    transform: translate(-50%, -50%) scale(0.35);
+    opacity: 0;
+  }
+  28% {
+    transform: translate(-50%, -50%) scale(0.95);
+    opacity: 0.55;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0;
+  }
+}
+
+@keyframes battle-boost-spark {
+  0% {
+    transform: translate(-50%, -50%) scale(0.2) rotate(0deg);
+    opacity: 0;
+  }
+  22% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy)))
+      scale(0.8) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+.battle-boost-sprite {
+  animation: battle-boost-sprite 900ms ease-out both;
+  transform-origin: center bottom;
+}
+
+.battle-boost-aura {
+  position: absolute;
+  inset: -28%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.battle-boost-aura::before,
+.battle-boost-aura::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  content: '';
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.battle-boost-aura::before {
+  width: 70%;
+  height: 70%;
+  border: 2px solid var(--game-moss);
+  animation: battle-boost-ring 900ms ease-out both;
+}
+
+.battle-boost-aura::after {
+  width: 80%;
+  height: 80%;
+  background: var(--game-ochre);
+  filter: blur(14px);
+  animation: battle-boost-flare 900ms ease-out both;
+}
+
+.battle-boost-spark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--game-ochre);
+  box-shadow: 0 0 8px rgb(181 138 67 / 0.65);
+  animation: battle-boost-spark 900ms ease-out both;
+}
+
+.battle-boost-spark--one {
+  --dx: -30px;
+  --dy: -38px;
+}
+
+.battle-boost-spark--two {
+  --dx: 34px;
+  --dy: -30px;
+  animation-delay: 80ms;
+}
+
+.battle-boost-spark--three {
+  --dx: 42px;
+  --dy: 12px;
+  animation-delay: 140ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .battle-boost-sprite,
+  .battle-boost-aura::before,
+  .battle-boost-aura::after,
+  .battle-boost-spark {
+    animation: none;
+  }
+}
+
 @keyframes battle-type-fade {
   0% {
     opacity: 0;

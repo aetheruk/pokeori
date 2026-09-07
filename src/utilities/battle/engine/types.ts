@@ -21,6 +21,8 @@ export interface AnimationState {
   enemyAttacking: boolean
   playerHit: boolean
   enemyHit: boolean
+  playerBoosting: boolean
+  enemyBoosting: boolean
   playerFainting: boolean
   enemyFainting: boolean
   playerSwitchingOut: boolean
@@ -40,6 +42,8 @@ export const INITIAL_ANIMATION_STATE: AnimationState = {
   enemyAttacking: false,
   playerHit: false,
   enemyHit: false,
+  playerBoosting: false,
+  enemyBoosting: false,
   playerFainting: false,
   enemyFainting: false,
   playerSwitchingOut: false,
