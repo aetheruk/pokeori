@@ -60,6 +60,18 @@ export const DEFAULT_STAT_STAGES: StatStages = {
   evasion: 0,
 }
 
+/**
+ * Fainting removes every temporary stat-stage change from the Pokemon.
+ * Keep the stage object initialized so later battle effects can mutate it
+ * without needing a separate setup branch.
+ */
+export function resetBattleStatStages(
+  pokemon: Pick<BattlePokemon, 'statStages' | 'shoutBoost'>,
+): void {
+  pokemon.statStages = { ...DEFAULT_STAT_STAGES }
+  pokemon.shoutBoost = undefined
+}
+
 // Stat stage multipliers (stages -6 to +6)
 const STAT_STAGE_MULTIPLIERS: Record<number, number> = {
   [-6]: 2 / 8,

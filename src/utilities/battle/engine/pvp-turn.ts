@@ -9,7 +9,10 @@ import {
   resolveMoveContest,
   formatTypeEffectivenessMessage,
 } from '@/utilities/battle/battle-logic'
-import { recalculateBattlePokemonStats } from '@/utilities/battle/stats-calc'
+import {
+  recalculateBattlePokemonStats,
+  resetBattleStatStages,
+} from '@/utilities/battle/stats-calc'
 import { shouldFailMoveFromStance } from '@/utilities/battle/move-contest'
 import {
   applyStatus,
@@ -1566,6 +1569,7 @@ export function resolvePvpFaint(
 
   if (!activeMon || activeMon.currentHp > 0) return messages
 
+  resetBattleStatStages(activeMon)
   messages.push(`${activeMon.name} fainted!`)
 
   const nextIndex = team.findIndex(

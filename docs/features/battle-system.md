@@ -28,6 +28,10 @@ Turn-based Pokemon battle system with advanced mechanics.
 | Circadian Power | Circadian Stone + Trainer 95 | Time-themed battle effects |
 | Dimensional Shift | Orb key item + Trainer 95 | Time/space/chaos battle effects |
 
+All temporary stat-stage changes reset when a Pokemon faints, including when it
+is revived in place or by a party-revival move. Intentional stat-passing moves
+can still carry stages from a surviving Pokemon to its replacement.
+
 ### Pokemon Setup
 - PvE battle configs can set `playerTeamInitialStatus` to apply a forced main status to every loaded player-team member before turn one. This bypasses normal type and ability immunity because it represents an authored environmental condition; normal held-item status responses still resolve. Koga’s Gym uses this to poison the full team at the start of each trial battle.
 - Kid Mode gives the player's Pokemon a battle-instance-only 20% boost to HP, Attack, Defense, Special Attack, Special Defense, and Speed in PvE. The multiplier is applied once after normal stat modifiers, survives switches and form transformations, and is never persisted to the owned Pokemon. Enemy teams, PvP, and Battle Bets simulations do not receive it.

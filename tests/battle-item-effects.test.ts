@@ -156,6 +156,46 @@ describe('battle item effects', () => {
     expect(pokemon.currentHp).toBe(60)
   })
 
+  test('Revive resets all temporary stat stages', () => {
+    const pokemon = makeBattlePokemon({
+      currentHp: 0,
+      maxHp: 120,
+      statStages: {
+        attack: 2,
+        defense: -2,
+        specialAttack: 3,
+        specialDefense: -1,
+        speed: 2,
+        crit: 1,
+        accuracy: -2,
+        evasion: 2,
+      },
+    })
+    pokemon.shoutBoost = {
+      turnsRemaining: 2,
+      activatedTurn: 1,
+      appliedStages: { attack: 1, defense: 1 },
+    }
+
+    const result = applyBattleItemEffect({
+      pokemon,
+      battleEffect: { type: 'revive', reviveHpPercent: 50 },
+    })
+
+    expect(result.applied).toBe(true)
+    expect(pokemon.shoutBoost).toBeUndefined()
+    expect(pokemon.statStages).toEqual({
+      attack: 0,
+      defense: 0,
+      specialAttack: 0,
+      specialDefense: 0,
+      speed: 0,
+      crit: 0,
+      accuracy: 0,
+      evasion: 0,
+    })
+  })
+
   test('Max Revive restores full HP when the target is fainted', () => {
     const maxRevive = items.find((item) => item.id === 'max-revive')
     const pokemon = makeBattlePokemon({ currentHp: 0, maxHp: 120 })
