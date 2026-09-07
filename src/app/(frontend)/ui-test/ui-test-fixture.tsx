@@ -19,6 +19,7 @@ import { ArcadeFixture } from './arcade-fixture'
 import { CaptureFixture } from './capture-fixture'
 import { SyncFixture } from './sync-fixture'
 import { SnakeFixture } from './snake-fixture'
+import { UfoFixture } from './ufo-fixture'
 import { DexLayoutFixture } from './dex-layout-fixture'
 import { PokemonDetailsDialog } from '@/app/(frontend)/game/pokemon/_components/pokemon-details-dialog'
 import type { Pokemon } from '@/payload-types'
@@ -33,6 +34,7 @@ export function UiTestFixture() {
   const [capture, setCapture] = useState(false)
   const [sync, setSync] = useState(false)
   const [snake, setSnake] = useState(false)
+  const [ufo, setUfo] = useState(false)
   const [inspector, setInspector] = useState(false)
   const [navigation, setNavigation] = useState(false)
   const [dexLayout, setDexLayout] = useState(false)
@@ -63,6 +65,7 @@ export function UiTestFixture() {
       <Button onClick={() => setCapture(true)}>Test capture keyboard</Button>
       <Button onClick={() => setSync(true)}>Test scoped sync</Button>
       <Button onClick={() => setSnake(true)}>Test Onix joystick</Button>
+      <Button onClick={() => setUfo(true)}>Test UFO Catcher</Button>
       <Button onClick={() => setInspector(true)}>Test Pokemon inspector</Button>
       <Button onClick={() => setNavigation(true)}>Test game navigation</Button>
       <Button onClick={() => setDexLayout(true)}>Test dex layouts</Button>
@@ -86,6 +89,7 @@ export function UiTestFixture() {
     {capture && <CaptureFixture />}
     {sync && <SyncFixture />}
     {snake && <SnakeFixture />}
+    {ufo && <UfoFixture />}
     {inspector && <SWRConfig value={{ isPaused: () => true }}><UserProvider initialGameData={{ user: { id: 'ui-test', trainerName: 'Test trainer' }, inventory: [], pokemon: [] } as unknown as RequirementData}><PokemonDetailsDialog pokemon={{ id: 'ui-test-pokemon', speciesId: 19, formId: '19', name: 'Inspector fixture', level: 5, identified: true } as Pokemon} boxes={[]} trigger={<Button>Open fixture inspector</Button>} /></UserProvider></SWRConfig>}
     {arcade ? <SWRConfig value={{ isPaused: () => true }}><UserProvider initialGameData={{ user: { id: 'ui-test', trainerName: 'Test trainer' }, inventory: [], pokemon: [] } as unknown as RequirementData}><AudioProvider><ArcadeFixture /></AudioProvider></UserProvider></SWRConfig> : null}
     <ScratchCardModal open={scratch} onOpenChange={setScratch} onClose={() => setScratch(false)} background="" icon={{ type: 'item', id: 'poke-ball' }} rewards={[]} />

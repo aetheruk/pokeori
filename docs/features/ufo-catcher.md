@@ -15,6 +15,13 @@ until release, and suppresses selection, browser callouts, and context menus.
 Keyboard Space and Enter holds remain supported. The idle paid-play control is
 text-only; movement arrows appear only while positioning the claw.
 
+The control deck shows horizontal, depth, and drop steps, with travel meters and
+explicit release instructions. The button depresses during a hold; losing focus
+or pointer capture ends that hold. A restrained cabinet floor grid supports the
+existing crosshair, and the last completed catch, slip, or miss stays visible
+below the controls with guidance for the next attempt. This feedback does not
+change travel speed, capture footprints, grip odds, or server settlement.
+
 The cabinet selects five of seven authored anchor regions without replacement,
 then applies bounded horizontal and depth jitter. This gives every paid reveal a
 different arrangement without allowing prizes to overlap the claw's playable
