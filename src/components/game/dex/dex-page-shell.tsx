@@ -18,14 +18,14 @@ export function DexPageShell({
   return (
     <div
       className={cn(
-        'game-paper-first game-paper-background flex h-full min-h-0 flex-col overflow-hidden bg-game-canvas text-game-ink',
+        'game-paper-first game-paper-background flex h-full min-h-0 min-w-0 max-w-full flex-col overflow-hidden bg-game-canvas text-game-ink',
         className,
       )}
     >
       <PremiumHeader title={title} subtitle={subtitle} />
       <main
         className={cn(
-          'game-desktop-workspace flex min-h-0 w-full flex-1 flex-col px-4 pb-3 pt-4 md:px-6',
+          'game-desktop-workspace flex min-h-0 min-w-0 w-full flex-1 flex-col px-4 pb-3 pt-4 md:px-6',
           contentClassName,
         )}
       >

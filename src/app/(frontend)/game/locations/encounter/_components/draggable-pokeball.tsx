@@ -26,10 +26,12 @@ function DraggableBallInner({
   children,
   disabled,
   nodeRef,
+  onKeyboardThrow,
 }: {
   children: React.ReactNode
   disabled?: boolean
-  nodeRef: React.MutableRefObject<HTMLDivElement | null>
+  nodeRef: React.MutableRefObject<HTMLButtonElement | null>
+  onKeyboardThrow: () => void
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: 'pokeball-drag',
@@ -43,7 +45,7 @@ function DraggableBallInner({
   }
 
   return (
-    <div
+    <button
       ref={(node) => {
         nodeRef.current = node
         setNodeRef(node)
@@ -51,16 +53,25 @@ function DraggableBallInner({
       style={style}
       {...listeners}
       {...attributes}
-      className="cursor-grab active:cursor-grabbing w-full h-full"
+      type="button"
+      disabled={disabled}
+      aria-label={disabled ? 'Preparing Poké Ball' : 'Throw Poké Ball'}
+      aria-roledescription="Poké Ball"
+      onClick={(event) => {
+        // Native keyboard/assistive activation only. Touch and mouse users
+        // still throw by swiping upward, never by tapping the ball.
+        if (event.detail === 0 && !disabled) onKeyboardThrow()
+      }}
+      className="game-focus-ring cursor-grab active:cursor-grabbing w-full h-full rounded-full border-0 bg-transparent p-0"
     >
         {children}
-    </div>
+    </button>
   )
 }
 
 export function DraggablePokeball({ onThrow, ringScale = 1, targetRef, disabled, children }: DraggablePokeballProps) {
     const [isDragging, setIsDragging] = useState(false)
-    const ballNodeRef = useRef<HTMLDivElement | null>(null)
+    const ballNodeRef = useRef<HTMLButtonElement | null>(null)
     const dragStartCenterRef = useRef<CaptureThrowPoint | null>(null)
 
     const sensors = useSensors(
@@ -122,7 +133,16 @@ export function DraggablePokeball({ onThrow, ringScale = 1, targetRef, disabled,
             onDragStart={handleDragStart} 
             onDragEnd={handleDragEnd} 
         >
-            <DraggableBallInner disabled={disabled} nodeRef={ballNodeRef}>
+            <DraggableBallInner disabled={disabled} nodeRef={ballNodeRef} onKeyboardThrow={() => {
+                if (disabled) return
+                const source = ballNodeRef.current?.getBoundingClientRect()
+                const target = targetRef.current?.getBoundingClientRect()
+                if (!source || !target) return
+                onThrow({ ringScale, aimOffset: 0, visual: {
+                    from: { x: source.left + source.width / 2, y: source.top + source.height / 2 },
+                    target: { x: target.left + target.width / 2, y: target.top + target.height / 2 },
+                } })
+            }}>
                 {children}
             </DraggableBallInner>
         </DndContext>

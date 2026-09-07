@@ -3,16 +3,14 @@
 import {
   BookOpen,
   CircleHelp,
-  RotateCcw,
   Search,
   SlidersHorizontal,
   X,
 } from 'lucide-react'
 import Image from 'next/image'
 import type { CSSProperties } from 'react'
-import { useCallback, useMemo, useState, useTransition } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { List, type RowComponentProps, useDynamicRowHeight } from 'react-window'
-import { toast } from 'sonner'
 import { DexFilterBar, DexPageShell } from '@/components/game/dex'
 import { MoveFieldNote } from '@/components/game/moves/move-field-note'
 import { MoveLearnerList } from '@/components/game/moves/move-learner-list'
@@ -42,7 +40,6 @@ import {
   type MoveDexEntry,
 } from '@/utilities/pokemon/movedex'
 import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
-import { recoverLostResearchTms } from './actions'
 
 const typeIdMap: Record<string, number> = {
   normal: 1,
@@ -151,9 +148,8 @@ function getBasePower(move: MoveConfig) {
 }
 
 export default function MoveDexPage() {
-  const { gameData, refreshUser } = useUser()
+  const { gameData } = useUser()
   const { entriesByForm } = usePokedex()
-  const [isRecovering, startRecovery] = useTransition()
   const [selectedView, setSelectedView] = useState<MoveDexView>('known')
   const [query, setQuery] = useState('')
   const [selectedMoveType, setSelectedMoveType] = useState('all')
@@ -316,22 +312,6 @@ export default function MoveDexPage() {
     setSelectedView(value)
     clearFilters()
   }
-  const handleRecoverLostTms = () =>
-    startRecovery(async () => {
-      try {
-        const result = await recoverLostResearchTms()
-        if (!result.success) {
-          toast.error(result.message)
-          return
-        }
-        refreshUser(true)
-        result.recovered.length
-          ? toast.success(result.message)
-          : toast.info(result.message)
-      } catch {
-        toast.error('Could not recover missing research TMs.')
-      }
-    })
   const rowKey = useCallback(
     (index: number, data: MoveListRowData) =>
       data.moves[index]?.entry.itemId ?? index,
@@ -362,32 +342,6 @@ export default function MoveDexPage() {
           </TabsTrigger>
         </TabsList>
       </Tabs>
-
-      {selectedView === 'sketchbook' && (
-        <section
-          className="mt-3 rounded-xl border border-game-ochre/35 bg-game-ochre/10 px-4 py-3"
-          aria-labelledby="sketchbook-note-title"
-        >
-          <div className="flex items-start gap-3">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-game-ochre/30 bg-game-surface-raised text-game-ochre-strong">
-              <BookOpen className="size-5" aria-hidden="true" />
-            </div>
-            <div>
-              <h2
-                id="sketchbook-note-title"
-                className="font-display text-base font-semibold text-game-ink"
-              >
-                Smeargle&apos;s field notes
-              </h2>
-              <p className="mt-1 text-xs leading-relaxed text-game-muted sm:text-sm">
-                When the foe has a new eligible move, Smeargle&apos;s Sketch has
-                a 25% chance to record it. Win the battle to keep the record;
-                Sketched moves can only be assigned to Smeargle.
-              </p>
-            </div>
-          </div>
-        </section>
-      )}
 
       <DexFilterBar label="Move filters" className="mt-3">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 md:grid-cols-2 xl:grid-cols-[minmax(14rem,1.5fr)_repeat(5,minmax(8rem,1fr))]">
@@ -483,26 +437,6 @@ export default function MoveDexPage() {
             >
               <X className="size-3.5" aria-hidden="true" />
               Clear
-            </Button>
-          )}
-          {selectedView !== 'sketchbook' && (
-            <Button
-              type="button"
-              size="sm"
-              variant="secondary"
-              onClick={handleRecoverLostTms}
-              disabled={isRecovering}
-              aria-busy={isRecovering}
-              className="ml-auto min-h-9"
-            >
-              <RotateCcw
-                className={cn(
-                  'size-3.5',
-                  isRecovering && 'animate-spin motion-reduce:animate-none',
-                )}
-                aria-hidden="true"
-              />
-              {isRecovering ? 'Recovering' : 'Recover lost TMs'}
             </Button>
           )}
         </div>
