@@ -43,7 +43,7 @@ export function SnakeGame({ encounter, initialState, actions }: SnakeGameProps) 
   const score = simulation?.score || 0
   const sceneRewards = (state?.pickups || []).map((pickup) => ({ ...pickup, position: {x: pickup.x, y: pickup.y} }))
   const runtimeObstacles = settings.obstacles || []
-  const status = session.saving ? 'Saving survey progress.' : session.countdown ? 'Preparing survey.' : 'Survey in progress.'
+  const status = session.countdown ? 'Preparing survey.' : 'Survey in progress.'
   const playAgain = session.replay
   const clearSteering = useCallback(() => {
     pressedKeysRef.current.clear()

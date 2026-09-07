@@ -1,11 +1,21 @@
 import { describe, expect, test } from 'bun:test'
-import { clearGameRecovery, getGameRecovery, recoverGameAction } from '@/utilities/games/action-recovery'
+import {
+  clearGameRecovery,
+  getGameRecovery,
+  recoverGameAction,
+} from '@/utilities/games/action-recovery'
 import { isActivityUpdateDeferred } from '@/utilities/games/update-safety'
 
 describe('game action recovery', () => {
   test('discards recovery prompts from a departed route, including delayed failures', async () => {
     let fail: (() => void) | undefined
-    void recoverGameAction(() => new Promise((_resolve, reject) => { fail = () => reject(new Error('late failure')) }), 'Old game')
+    void recoverGameAction(
+      () =>
+        new Promise((_resolve, reject) => {
+          fail = () => reject(new Error('late failure'))
+        }),
+      'Old game',
+    )
     clearGameRecovery()
     fail?.()
     await Promise.resolve()
@@ -30,24 +40,66 @@ describe('game action recovery', () => {
 
   test('surfaces returned action errors without converting them into a lost game', async () => {
     let attempts = 0
-    const pending = recoverGameAction(async () => ++attempts === 1
-      ? { success: false, error: 'Completion already being processed' }
-      : { success: true, error: undefined }, 'Connection interrupted', (result) => result.error)
+    const pending = recoverGameAction(
+      async () =>
+        ++attempts === 1
+          ? { success: false, error: 'Completion already being processed' }
+          : { success: true, error: undefined },
+      'Connection interrupted',
+      (result) => result.error,
+    )
     await Promise.resolve()
-    expect(getGameRecovery()?.message).toBe('Completion already being processed')
+    expect(getGameRecovery()?.message).toBe(
+      'Completion already being processed',
+    )
     getGameRecovery()?.retry()
     expect((await pending).success).toBe(true)
   })
 
+  test('notifies transient failures before pausing and clears the pause on retry', async () => {
+    let attempts = 0
+    let failures = 0
+    let retries = 0
+    const pending = recoverGameAction(
+      async () => {
+        if (++attempts === 1) throw new Error('checkpoint response dropped')
+        return { success: true as const }
+      },
+      'Retry checkpoint',
+      undefined,
+      {
+        onFailure: () => {
+          failures += 1
+        },
+        onRetry: () => {
+          retries += 1
+        },
+      },
+    )
+    await Promise.resolve()
+    expect(failures).toBe(1)
+    expect(retries).toBe(0)
+    getGameRecovery()?.retry()
+    expect(await pending).toEqual({ success: true })
+    expect(retries).toBe(1)
+  })
+
   test('does not retry a legitimate losing result', async () => {
     const result = { success: false, message: 'Game over' }
-    expect(await recoverGameAction(async () => result, 'Connection interrupted')).toBe(result)
+    expect(
+      await recoverGameAction(async () => result, 'Connection interrupted'),
+    ).toBe(result)
     expect(getGameRecovery()).toBeNull()
   })
 })
 
 test('release updates defer during games and apply on return to ordinary pages', () => {
-  for (const route of ['/game/games/match3', '/game/battles/encounter', '/game/locations/encounter', '/game/field-research']) {
+  for (const route of [
+    '/game/games/match3',
+    '/game/battles/encounter',
+    '/game/locations/encounter',
+    '/game/field-research',
+  ]) {
     expect(isActivityUpdateDeferred(route)).toBe(true)
   }
   for (const route of ['/game/explore', '/game', '/auth', '/game/pokemon']) {

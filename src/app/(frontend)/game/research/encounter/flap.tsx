@@ -13,20 +13,25 @@ import { SideScrollerStage } from './side-scroller-stage'
 import { EndlessCollectibleSprite } from './endless-collectibles'
 import type { FlapGameConfig } from '@/data/games/flap/types'
 
-interface FlapGameProps { encounter: FlapGameConfig; initialState?: any }
+interface FlapGameProps {
+  encounter: FlapGameConfig
+  initialState?: any
+}
 
 export function FlapGame({ encounter, initialState }: FlapGameProps) {
   useGameMusic(encounter)
   const router = useRouter()
   const session = useArcadeSession('flap', encounter)
-  const { simulation, countdown, saving, result, timeLeft } = session
+  const { simulation, countdown, result, timeLeft } = session
   const canvasRef = useRef<HTMLDivElement>(null)
   // Sprite dimensions only; collisions are resolved by the shared simulator.
   const masksRef = useRef<Record<string, CollisionMask>>({})
   const score = simulation?.score || 0
   const playerY = simulation?.playerY ?? 200
   const collectibles = simulation?.collectibles || []
-  const parallaxOffsets = simulation?.parallaxOffsets || encounter.settings.parallaxLayers.map(() => 0)
+  const parallaxOffsets =
+    simulation?.parallaxOffsets ||
+    encounter.settings.parallaxLayers.map(() => 0)
   const isEndlessMode = encounter.settings.endless?.enabled || false
   const PLAYER_X = 100
   const PLAYER_SIZE = 60
@@ -74,7 +79,11 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, button, [role="dialog"]')) return
+      if (
+        event.target instanceof HTMLElement &&
+        event.target.closest('input, textarea, select, button, [role="dialog"]')
+      )
+        return
       if (event.repeat) return
       if (event.key === ' ' || event.key === 'ArrowUp' || event.key === 'w') {
         event.preventDefault()
@@ -362,7 +371,6 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
         })}
       </SideScrollerStage>
 
-      {saving && <p role="status" className="fixed left-1/2 top-16 z-50 -translate-x-1/2 rounded-lg bg-game-surface-raised px-3 py-2 text-sm text-game-ink">Saving progress…</p>}
       {result && (
         <RewardResultOverlay
           result={result}

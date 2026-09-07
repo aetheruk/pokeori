@@ -8,8 +8,14 @@ import { useUser } from '@/context/UserContext'
 import { recoverGameAction } from '@/utilities/games/action-recovery'
 import { completeGame, startGame } from '@/utilities/games/client-action-recovery'
 import {
-  ARCADE_TICK_RATE, type ArcadeGameType, type ArcadeInput, type ArcadeProof,
-  type ArcadeRound, type ArcadeSimulation, stepArcadeSimulation,
+  ARCADE_TICK_RATE,
+  MAX_ARCADE_CHECKPOINT_TICKS,
+  type ArcadeGameType,
+  type ArcadeInput,
+  type ArcadeProof,
+  type ArcadeRound,
+  type ArcadeSimulation,
+  stepArcadeSimulation,
 } from '@/utilities/research/arcade-authority'
 import type { GameDataKeys } from '@/utilities/requirements/analysis'
 import { normalizeArcadeInput } from '@/utilities/research/arcade-inputs'
@@ -45,6 +51,7 @@ export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: stri
     let accumulator = 0
     let readyAt = 0
     let completionStarted = false
+    let checkpointPaused = false
     let settings = encounter.settings
 
     const proof = (): ArcadeProof => {
@@ -68,13 +75,27 @@ export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: stri
         setResult({ success: Boolean(passed) && completion.success, message: `Final score: ${Math.floor(current.score)}`, rewards: completion.summary })
         playSfxRef.current(passed && completion.success ? 'good' : 'bad')
       } else {
-        const response = await recoverGameAction(() => actions.checkpoint(request), 'Progress could not be saved. Retry to continue this same run.', (response) => response.success ? undefined : response.error)
+        const response = await recoverGameAction(
+          () => actions.checkpoint(request),
+          'Progress could not be saved. Retry to continue this same run.',
+          (response) => response.success ? undefined : response.error,
+          {
+            onFailure: () => { checkpointPaused = true },
+            onRetry: () => { checkpointPaused = false },
+          },
+        )
         if (disposed || !response.success) return
         const acknowledged = response.roundData
-        roundRef.current = acknowledged
+        const localRound = roundRef.current
+        const localSimulation = localRound?.simulation
+        const hasUnacknowledgedPlay = Boolean(localSimulation && localSimulation.tick > acknowledged.simulation.tick)
+        roundRef.current = hasUnacknowledgedPlay && localSimulation
+          ? { ...acknowledged, simulation: localSimulation }
+          : acknowledged
         checkpointTickRef.current = acknowledged.simulation.tick
         inputsRef.current = inputsRef.current.filter((input) => input.tick > acknowledged.simulation.tick)
-        setSimulation(acknowledged.simulation)
+        if (!hasUnacknowledgedPlay) setSimulation(acknowledged.simulation)
+        checkpointPaused = false
       }
       busyRef.current = false
       setSaving(false)
@@ -92,7 +113,8 @@ export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: stri
         countdownRef.current = remaining
         setCountdown(remaining)
       }
-      if (remaining || busyRef.current || completionStarted || controlsRef.current?.paused || document.visibilityState === 'hidden') { lastTime = 0; return }
+      const checkpointWindowFull = busyRef.current && round.simulation.tick - checkpointTickRef.current >= MAX_ARCADE_CHECKPOINT_TICKS
+      if (remaining || checkpointPaused || checkpointWindowFull || completionStarted || controlsRef.current?.paused || document.visibilityState === 'hidden') { lastTime = 0; return }
       if (round.simulation.status !== 'playing') { void save(true); return }
       if (!lastTime) { lastTime = now; return }
       accumulator += Math.min(100, now - lastTime)
@@ -140,7 +162,7 @@ export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: stri
 
   const sendInput = useCallback((kind: ArcadeInput['kind'], value?: number) => {
     const round = roundRef.current
-    if (!round || busyRef.current || countdownRef.current || round.simulation.status !== 'playing') return
+    if (!round || countdownRef.current || round.simulation.status !== 'playing') return
     const tick = round.simulation.tick + 1
     // Pointer motion can deliver multiple targets before one simulation frame.
     if (kind === 'steer' || kind === 'heading' || kind === 'paddle') inputsRef.current = inputsRef.current.filter((input) => input.tick !== tick || input.kind !== kind)

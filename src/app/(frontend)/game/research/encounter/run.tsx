@@ -2,7 +2,6 @@
 
 import Image from 'next/image'
 import { useCallback, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
@@ -13,31 +12,40 @@ import { SideScrollerStage } from './side-scroller-stage'
 import { EndlessCollectibleSprite } from './endless-collectibles'
 import type { RunGameConfig } from '@/data/games/run/types'
 
-interface RunGameProps { encounter: RunGameConfig; initialState?: any }
+interface RunGameProps {
+  encounter: RunGameConfig
+  initialState?: any
+}
 
 export function RunGame({ encounter }: RunGameProps) {
   useGameMusic(encounter)
-  const router = useRouter()
   const session = useArcadeSession('run', encounter)
-  const { simulation, countdown, saving, result, timeLeft } = session
+  const { simulation, countdown, result, timeLeft } = session
   const canvasRef = useRef<HTMLDivElement>(null)
   // Sprite dimensions only; collisions are resolved by the shared simulator.
   const masksRef = useRef<Record<string, CollisionMask>>({})
   const score = simulation?.score || 0
   const playerY = simulation?.playerY ?? 0
   const collectibles = simulation?.collectibles || []
-  const parallaxOffsets = simulation?.parallaxOffsets || encounter.settings.parallaxLayers.map(() => 0)
+  const parallaxOffsets =
+    simulation?.parallaxOffsets ||
+    encounter.settings.parallaxLayers.map(() => 0)
   const isEndlessMode = encounter.settings.endless?.enabled || false
   const PLAYER_X = 100
   const PLAYER_SIZE = 60
   const GROUND_Y = 5
-  const renderedPlayerWidth = encounter.settings.player?.renderWidth || PLAYER_SIZE
-  const renderedPlayerHeight = encounter.settings.player?.renderHeight || PLAYER_SIZE
+  const renderedPlayerWidth =
+    encounter.settings.player?.renderWidth || PLAYER_SIZE
+  const renderedPlayerHeight =
+    encounter.settings.player?.renderHeight || PLAYER_SIZE
   const obstacles = simulation?.obstacles || []
   const isJumping = simulation?.isJumping || false
   const isBoosting = !!simulation && simulation.tick < simulation.boostUntil
   const jump = useCallback(() => session.sendInput('jump'), [session.sendInput])
-  const boost = useCallback(() => session.sendInput('boost'), [session.sendInput])
+  const boost = useCallback(
+    () => session.sendInput('boost'),
+    [session.sendInput],
+  )
   // Load masks
   useEffect(() => {
     const loadMasks = async () => {
@@ -76,12 +84,19 @@ export function RunGame({ encounter }: RunGameProps) {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, button, [role="dialog"]')) return
+      if (
+        event.target instanceof HTMLElement &&
+        event.target.closest('input, textarea, select, button, [role="dialog"]')
+      )
+        return
       if (event.repeat) return
       if (event.key === ' ' || event.key === 'ArrowUp' || event.key === 'w') {
         event.preventDefault()
         jump()
-      } else if (event.key === 'Shift') { event.preventDefault(); boost() }
+      } else if (event.key === 'Shift') {
+        event.preventDefault()
+        boost()
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -113,7 +128,13 @@ export function RunGame({ encounter }: RunGameProps) {
             />
           ) : undefined
         }
-        overlay={countdown > 0 ? <div className="absolute inset-0 z-50 flex items-center justify-center bg-game-ink/40"><GameTimer timeLeft={countdown} totalTime={3} size="xl" /></div> : undefined}
+        overlay={
+          countdown > 0 ? (
+            <div className="absolute inset-0 z-50 flex items-center justify-center bg-game-ink/40">
+              <GameTimer timeLeft={countdown} totalTime={3} size="xl" />
+            </div>
+          ) : undefined
+        }
         onOutsideTap={jump}
         onOutsideSwipe={boost}
       >
@@ -312,7 +333,6 @@ export function RunGame({ encounter }: RunGameProps) {
         })}
       </SideScrollerStage>
 
-      {saving && <p role="status" className="fixed left-1/2 top-16 z-50 -translate-x-1/2 rounded-lg bg-game-surface-raised px-3 py-2 text-sm text-game-ink">Saving progress…</p>}
       {result && (
         <RewardResultOverlay
           result={result}

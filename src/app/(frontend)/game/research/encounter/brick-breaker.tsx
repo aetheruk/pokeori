@@ -3,7 +3,11 @@
 import { DoorOpen, Heart } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { type PointerEvent as ReactPointerEvent, useEffect, useRef } from 'react'
+import {
+  type PointerEvent as ReactPointerEvent,
+  useEffect,
+  useRef,
+} from 'react'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
@@ -13,9 +17,15 @@ import { useArcadeSession } from '@/hooks/use-arcade-session'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import { EndlessCollectibleSprite } from './endless-collectibles'
 
-interface BrickBreakerGameProps { encounter: BrickBreakerGameConfig; initialState?: any }
+interface BrickBreakerGameProps {
+  encounter: BrickBreakerGameConfig
+  initialState?: any
+}
 
-export function BrickBreakerGame({ encounter, initialState }: BrickBreakerGameProps) {
+export function BrickBreakerGame({
+  encounter,
+  initialState,
+}: BrickBreakerGameProps) {
   useGameMusic(encounter)
   const router = useRouter()
   const settings = encounter.settings
@@ -23,11 +33,14 @@ export function BrickBreakerGame({ encounter, initialState }: BrickBreakerGamePr
   const paddleY = height - 48
   const stageRef = useRef<HTMLDivElement>(null)
   const keysRef = useRef(new Set<string>())
-  const session = useArcadeSession('brick-breaker', encounter, undefined, { inputForTick: () => {
-    const left = keysRef.current.has('ArrowLeft') || keysRef.current.has('a')
-    const right = keysRef.current.has('ArrowRight') || keysRef.current.has('d')
-    return left !== right ? [{ kind: 'paddle', value: left ? 0 : 1 }] : []
-  } })
+  const session = useArcadeSession('brick-breaker', encounter, undefined, {
+    inputForTick: () => {
+      const left = keysRef.current.has('ArrowLeft') || keysRef.current.has('a')
+      const right =
+        keysRef.current.has('ArrowRight') || keysRef.current.has('d')
+      return left !== right ? [{ kind: 'paddle', value: left ? 0 : 1 }] : []
+    },
+  })
   const { simulation, countdown, result, timeLeft } = session
   const state = simulation?.trajectory
   const score = simulation?.score || 0
@@ -46,24 +59,51 @@ export function BrickBreakerGame({ encounter, initialState }: BrickBreakerGamePr
   const replay = session.replay
   useEffect(() => {
     const keydown = (event: KeyboardEvent) => {
-      if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, button, [role="dialog"]')) return
-      if (['ArrowLeft', 'ArrowRight', 'a', 'd'].includes(event.key)) { event.preventDefault(); keysRef.current.add(event.key) }
-      if (event.code === 'Space' && !event.repeat) { event.preventDefault(); session.sendInput('launch') }
+      if (
+        event.target instanceof HTMLElement &&
+        event.target.closest('input, textarea, select, button, [role="dialog"]')
+      )
+        return
+      if (['ArrowLeft', 'ArrowRight', 'a', 'd'].includes(event.key)) {
+        event.preventDefault()
+        keysRef.current.add(event.key)
+      }
+      if (event.code === 'Space' && !event.repeat) {
+        event.preventDefault()
+        session.sendInput('launch')
+      }
     }
     const keyup = (event: KeyboardEvent) => {
       if (!keysRef.current.delete(event.key)) return
-      session.sendInput('paddle', paddleRef.current / (width - settings.paddle.width))
+      session.sendInput(
+        'paddle',
+        paddleRef.current / (width - settings.paddle.width),
+      )
     }
     const blur = () => keysRef.current.clear()
     window.addEventListener('keydown', keydown)
     window.addEventListener('keyup', keyup)
     window.addEventListener('blur', blur)
-    return () => { window.removeEventListener('keydown', keydown); window.removeEventListener('keyup', keyup); window.removeEventListener('blur', blur) }
+    return () => {
+      window.removeEventListener('keydown', keydown)
+      window.removeEventListener('keyup', keyup)
+      window.removeEventListener('blur', blur)
+    }
   }, [session.sendInput, settings.paddle.width, width])
   const movePaddleToPointer = (event: ReactPointerEvent<HTMLDivElement>) => {
     const bounds = event.currentTarget.getBoundingClientRect()
-    const designX = (event.clientX - bounds.left) / bounds.width * width
-    session.sendInput('paddle', Math.max(0, Math.min(1, (designX - settings.paddle.width / 2) / (width - settings.paddle.width))))
+    const designX = ((event.clientX - bounds.left) / bounds.width) * width
+    session.sendInput(
+      'paddle',
+      Math.max(
+        0,
+        Math.min(
+          1,
+          (designX - settings.paddle.width / 2) /
+            (width - settings.paddle.width),
+        ),
+      ),
+    )
   }
 
   return (
@@ -103,7 +143,7 @@ export function BrickBreakerGame({ encounter, initialState }: BrickBreakerGamePr
           size="icon"
           className="pointer-events-auto bg-game-surface-raised/95 text-game-ink shadow-md backdrop-blur-sm"
           aria-label="Leave game"
-          disabled={!simulation || ended || session.saving || Boolean(result)}
+          disabled={!simulation || ended || Boolean(result)}
           onClick={() => void session.abandon()}
         >
           <DoorOpen className="size-5" />
@@ -244,7 +284,6 @@ export function BrickBreakerGame({ encounter, initialState }: BrickBreakerGamePr
         )}
       </div>
 
-      {session.saving && <p role="status" className="absolute inset-x-0 top-20 z-40 text-center">Saving progress…</p>}
       {error && (
         <p
           role="alert"

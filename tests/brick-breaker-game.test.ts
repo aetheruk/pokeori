@@ -190,7 +190,7 @@ describe('Brick Breaker presentation', () => {
     )
     expect(source).toContain('motion-safe:animate-ping')
     expect(source).toContain('void session.abandon()')
-    expect(source).toContain('disabled={!simulation || ended || session.saving || Boolean(result)}')
+    expect(source).toContain('disabled={!simulation || ended || Boolean(result)}')
     expect(source).not.toContain("onClick={() => router.push('/game/explore')}")
     expect(source).toContain(
       "import { GameTimer } from '@/components/game/shared/game-timer'",
