@@ -1,6 +1,6 @@
 # Audit remediation progress
 
-Objective: implement and verify every finding in [the September application audit](application-audit-2026-09-07.md). Release version: **0.29.12**, including the Onix Snake artwork and controls. Changes are prepared on `audit/application-remediation-0.29.12`; no release has been merged or deployed. Operational verification below remains separate from implementation.
+Objective: implement and verify every finding in [the September application audit](application-audit-2026-09-07.md). Release version: **0.29.12**, including the Onix Snake artwork and controls. Prepared in [draft PR #348](https://github.com/aetheruk/pokeori/pull/348) on `audit/application-remediation-0.29.12`; no release has been merged or deployed. Operational verification below remains separate from implementation.
 
 | Findings | Implementation and evidence | Remaining verification |
 | --- | --- | --- |
@@ -15,12 +15,12 @@ Objective: implement and verify every finding in [the September application audi
 | U4–U9 | Keyboard scratch/Art, usable landscape board, reduced motion, PVP transport recovery, persistent auth errors, consistent navigation, restored semantic/keyboard/Hook lint rules. | Fixtures and sampled production routes are not complete screen-reader or every-surface certification |
 | P1–P2 | Parallel independent reads and reused tasks; complete, safely projected Explore read model with ownership/hook/default fallbacks; public relation DTOs and validated existing pagination. Exact Payload row parity at 1,002 Pokemon. Local Explore samples improve from 350–372ms to 71–73ms. | Production p50/p95; complete snapshots remain untruncated |
 | P3 | Reward-domain mutation hints update shared account state and invalidate affected scopes only. | Real UserProvider browser test verifies scoped refresh and cached wallet propagation; production route revisit makes zero sync requests |
-| P4–P5 | Native Turbopack analysis; per-mode dynamic client registry; compact item icon index with 3,236-ID parity. Run initial decoded JS falls 41.55%; reproducible gzip route budgets added to production smoke. | Budget smoke rerun and hosted execution |
+| P4–P5 | Native Turbopack analysis; per-mode dynamic client registry; compact item icon index with 3,236-ID parity. Run initial decoded JS falls 41.55%; reproducible gzip route budgets added to production smoke. | All five gzip budgets pass in the final Linux smoke; hosted CI pending |
 | P6 | Removed obsolete analyzer and unnecessary forced authoring-package tracing; Linux standalone runtime/admin/GraphQL/Sharp/email-adapter smoke passes. Image falls from 225,721,879 to 220,143,248 bytes. | No unsafe blanket removal of dependencies still traced by Next |
-| P7 | Pinned validation and isolated browser/security workflows. GitHub protected main now requires both jobs with an up-to-date branch; API readback confirmed. | Publish workflow on release branch and run hosted CI |
+| P7 | Pinned validation and isolated browser/security workflows. GitHub protected main now requires both jobs with an up-to-date branch; API readback confirmed. | Workflow published in draft PR #348; hosted CI running |
 | P8–P9 | Bun/Next/Docker caches preserved; local Linux builds and sync/query measurements recorded; privacy-safe performance logging and metadata-only storage tooling. | Privacy-safe action/lock telemetry and six focused tests pass; live idle resource/index/eviction and old-release build baseline verified; build-time peaks and complete ingress trust remain pending |
-| P10 | Current performance guidance replaces obsolete SWR/service-worker advice; Biome migrated and relevant checks restored. | Final consistency pass |
-| P11 | Navigation prefetch on intent, one media-selected auth image, existing paginated readers preserved. Mobile/desktop image network checks pass. | Measured 160-card browsing exposed eager closed-inspector calculations; lazy activation/focus fixes implemented, final production comparison pending |
+| P10 | Current performance guidance replaces obsolete SWR/service-worker advice; Biome migrated and relevant checks restored. | Current measurement and release-state documentation updated |
+| P11 | Navigation prefetch on intent, one media-selected auth image, existing paginated readers preserved. Mobile/desktop image network checks pass. | Same 160-card production comparison falls from eight 412–562ms long tasks to zero; keyboard focus return passes |
 | P12 | Lossless receipt compression with bounded decoding/encoding, permanent semantic keys and admin-only result access; actual Mongo replay/alias tests. Read-only storage report and bounded cursor-based old-result compactor. | Live metadata: 4,739 receipts, 12.4 MB logical / 2.85 MB allocated, unique permanent key and no TTL. No production compaction; growth trend needs repeat measurement |
 
 ## Verification recorded
@@ -28,7 +28,7 @@ Objective: implement and verify every finding in [the September application audi
 - Full Bun suite: **1,540 passed, 0 failed**, 78,563 assertions across 177 files.
 - Data validation: **424 passed, 0 failed**.
 - Actual isolated REST/GraphQL/Server Action and transaction integration: **141 assertions passed**.
-- Standard browser suite: **17 passed**, two intentionally skipped opt-in production tests. Separate production smoke passed Explore, Pokemon, Inventory, Run and Payload admin.
+- Standard browser suite: **17 passed**, two intentionally skipped opt-in production tests. Separate final production run passed three tests covering Explore, Pokemon, Inventory, Run, Payload admin, gzip budgets, populated-box interaction and scoped sync.
 - Typecheck, lint, dependency policy audit and diff whitespace checks passed. The dependency audit explicitly verifies the mitigation for one named Payload advisory; it does not report zero upstream advisories.
 - Linux health returned MongoDB, transaction and Redis readiness. Version endpoint returned **0.29.12** with no-store; production developer and UI fixture routes returned 404.
 - [Production browser evidence](production-browser-verification.md), [large-account baseline](large-account-query-baseline.json), and [after/parity evidence](large-account-query-after.json) describe measurement conditions.

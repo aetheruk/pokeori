@@ -13,7 +13,7 @@ production `unsafe-eval`.
 Run initially downloaded 42 scripts containing numerous unrelated game exports.
 After introducing the client dynamic registry, it downloaded 29 scripts and only
 the Run game export. Decoded JavaScript response bodies fell from 4,544,014 to
-2,656,088 bytes (41.55%). These are **uncompressed body sizes**, not compressed
+2,656,113 bytes (41.55%). These are **uncompressed body sizes**, not compressed
 transfer sizes or a measured page-latency improvement. Other sampled routes had
 roughly unchanged totals. See `production-browser-baseline.json` and
 `production-browser-final.json` for sanitized measurements.
@@ -33,6 +33,12 @@ test container, then run it again with `--seed-run`. Execute
 the setup helper's `--cleanup` mode. The helper rejects every database/Redis URL
 except the dedicated local standalone-test services. It does not start or deploy
 a production server.
+
+For the populated-box comparison, also run the helper's `--seed-pokemon` mode on
+the fresh fixture account and execute the opt-in `e2e/production-interactions.pw.ts`
+test. Cleanup deletes only those users' Pokémon and game sessions before removing
+the fixture users. CPU profile output and unsanitized network samples stay in
+temporary local files; the checked-in JSON reports contain aggregate evidence.
 
 ## Coverage against the original audit acceptance matrix
 
@@ -66,7 +72,8 @@ responses in `e2e/scoped-sync.pw.ts`. Visiting inventory, TCG, Abilitydex and co
 made one request per scope. Applying an acknowledged `gameResults` invalidation
 then requested core once, updated currency from 10 to 35, and made no unrelated
 cached-scope requests. Revisiting inventory after the deduplication window made
-one fresh request and retained the updated currency. This tests client refresh
+one fresh request and retained the updated currency. An immediate cached TCG
+revisit also showed 35 without fetching that scope. This tests client refresh
 behavior with a controlled response; it is not a browser reward transaction test.
 
 On the authenticated production fixture, no expensive navigation routes prefetched
@@ -81,5 +88,14 @@ rendered 160 cards/1,562 nodes through existing pagination. CPU sampling attribu
 Pokémon inspector. The inspector now defers those calculations and subscriptions
 until first activation, retaining its state afterward. Native dialog/drawer
 trigger association also fixes Escape focus return. Baseline measurements are in
-`populated-box-baseline.json`; final production comparison follows the rebuilt
-image. No virtualization or unmeasured scroll-speed improvement is claimed.
+`populated-box-baseline.json`. The rebuilt image repeated the same 160-Pokémon
+profile with the same final DOM count and **zero long tasks** during the measured
+scroll window (`populated-box-final.json`). Keyboard opening, Escape closing and
+focus return also passed in that production run. This is one controlled desktop
+sample, not a guarantee of frame rate on every device or collection size.
+
+The final opt-in production smoke and interaction tests plus scoped-sync test
+passed together (3 tests, 33.4 seconds). All five route budgets passed using
+deterministic gzip level 6 on downloaded script bodies: Explore 973,971 bytes,
+Pokémon 834,092, Inventory 948,402, Run 582,170 and admin 651,142. These are
+reproducible compressed-size estimates, not measured HTTP transfer sizes.
