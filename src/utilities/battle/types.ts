@@ -50,6 +50,19 @@ export interface StatStages {
   evasion: number
 }
 
+export type BattleCoreStat =
+  | 'attack'
+  | 'defense'
+  | 'specialAttack'
+  | 'specialDefense'
+  | 'speed'
+
+export interface BattleShoutBoost {
+  turnsRemaining: number
+  activatedTurn: number
+  appliedStages: Partial<Record<BattleCoreStat, number>>
+}
+
 export interface BattlePokemon extends Omit<Pokemon, 'stats'> {
   stats: {
     hp: number
@@ -66,6 +79,7 @@ export interface BattlePokemon extends Omit<Pokemon, 'stats'> {
   name: string // Ensure name is always present
   types: string[]
   statStages?: StatStages // Stat modifiers from X-items
+  shoutBoost?: BattleShoutBoost
   teraTypeOverride?: PokemonTypeName // Active battle type while Terastallized
   teraTurnsRemaining?: number
   teraActivatedTurn?: number
@@ -107,6 +121,7 @@ export interface BattlePokemon extends Omit<Pokemon, 'stats'> {
       types: string[]
       stats: BattlePokemon['stats']
       statStages?: StatStages
+      shoutBoost?: BattleShoutBoost
       assignedMoves?: { moveId: string; id?: string | null }[] | null
       battleMoveIds?: string[]
     }

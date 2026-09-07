@@ -625,18 +625,16 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
     [battleState.battleId, wrapAction],
   )
   const handleUseShout = useCallback(
-    (s: BattleStance) =>
+    () =>
       wrapAction(
         (clientActionId) =>
           submitBattleActionRequest({
             kind: 'shout',
-            stance: s,
             clientActionId,
           }),
         {
           kind: 'power',
-          label: 'Shout Command',
-          stance: s,
+          label: 'Battle Shout',
         },
       ),
     [wrapAction],

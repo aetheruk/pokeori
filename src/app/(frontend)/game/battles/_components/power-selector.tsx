@@ -13,7 +13,6 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { MoveBattleCommand, MoveFieldNote } from '@/components/game/moves'
-import { StanceIcon } from '@/components/game/shared/stance-icon'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
@@ -28,7 +27,6 @@ import { resolveDynamicMoveType } from '@/utilities/battle/move-effects'
 import { getPokemonMoveUsesRemaining } from '@/utilities/battle/move-uses'
 import type {
   BattlePokemon,
-  BattleStance,
   BattleState,
 } from '@/utilities/battle/types'
 import {
@@ -202,11 +200,11 @@ export function PowerSelector() {
     }
   }
 
-  const handleUseShout = async (stance: BattleStance) => {
+  const handleUseShout = async () => {
     if (using) return
-    setUsing(`shout-${stance}`)
+    setUsing('shout')
     try {
-      await onUseShout(stance)
+      await onUseShout()
       setPowerOpen(false)
     } finally {
       setUsing(null)
@@ -284,7 +282,10 @@ export function PowerSelector() {
   const canUseWeather =
     powersState && powersState.weatherUsesRemaining > 0 && !isAnyPowerActive
   const canUseShout =
-    powersState && powersState.shoutUsesRemaining > 0 && !isAnyPowerActive
+    powersState &&
+    powersState.shoutUsesRemaining > 0 &&
+    !isAnyPowerActive &&
+    !activePlayerMon.shoutBoost
   const canUseCircadian =
     powersState && powersState.circadianUsesRemaining > 0 && !isAnyPowerActive
 
@@ -880,54 +881,40 @@ export function PowerSelector() {
                           Battle Shouts
                         </span>
                       </SectionDivider>
-                      {!canUseShout ? (
+                      {activePlayerMon.shoutBoost ? (
+                        <div className="flex items-center justify-between gap-3 rounded-xl border border-game-ochre/40 bg-game-ochre/10 px-3 py-3 text-sm text-game-ochre-strong">
+                          <div className="flex items-center gap-2">
+                            <Megaphone className="h-4 w-4 shrink-0" />
+                            <span>Battle Shout is active</span>
+                          </div>
+                          <span className="font-mono text-xs">
+                            {activePlayerMon.shoutBoost.turnsRemaining} turns
+                          </span>
+                        </div>
+                      ) : !canUseShout ? (
                         <div className="text-sm text-game-muted py-2">
                           {powersState?.shoutUsesRemaining === 0
                             ? 'No shouts remaining'
                             : 'Cannot shout now'}
                         </div>
                       ) : (
-                        <div className="grid grid-cols-3 gap-2">
+                        <div className="space-y-2">
                           <Button
                             variant="outline"
-                            className="h-auto rounded-xl border border-game-border bg-game-surface-raised py-3 px-2 flex flex-col items-center gap-1 shadow-sm transition-colors hover:border-game-moss/60 hover:bg-game-moss/10"
+                            className="h-auto w-full rounded-xl border border-game-border bg-game-surface-raised px-3 py-3 text-left shadow-sm transition-colors hover:border-game-moss/60 hover:bg-game-moss/10"
                             disabled={using !== null}
-                            onClick={() => handleUseShout('power')}
+                            onClick={handleUseShout}
                           >
-                            <StanceIcon
-                              stance="power"
-                              className="w-6 h-6 text-game-clay-strong mb-1"
-                            />
-                            <span className="text-xs font-medium text-game-clay-strong">
-                              Power Shout
-                            </span>
-                          </Button>
-                          <Button
-                            variant="outline"
-                            className="h-auto rounded-xl border border-game-border bg-game-surface-raised py-3 px-2 flex flex-col items-center gap-1 shadow-sm transition-colors hover:border-game-moss/60 hover:bg-game-moss/10"
-                            disabled={using !== null}
-                            onClick={() => handleUseShout('speed')}
-                          >
-                            <StanceIcon
-                              stance="speed"
-                              className="w-6 h-6 text-game-stance-blue-strong mb-1"
-                            />
-                            <span className="text-xs font-medium text-game-stance-blue-strong">
-                              Speed Shout
-                            </span>
-                          </Button>
-                          <Button
-                            variant="outline"
-                            className="h-auto rounded-xl border border-game-border bg-game-surface-raised py-3 px-2 flex flex-col items-center gap-1 shadow-sm transition-colors hover:border-game-moss/60 hover:bg-game-moss/10"
-                            disabled={using !== null}
-                            onClick={() => handleUseShout('tech')}
-                          >
-                            <StanceIcon
-                              stance="tech"
-                              className="w-6 h-6 text-game-moss-strong mb-1"
-                            />
-                            <span className="text-xs font-medium text-game-moss-strong">
-                              Tech Shout
+                            <span className="flex items-center gap-3">
+                              <Megaphone className="h-6 w-6 shrink-0 text-game-ochre" />
+                              <span className="flex flex-col items-start gap-1">
+                                <span className="text-sm font-medium text-game-ink">
+                                  Raise all core stats
+                                </span>
+                                <span className="text-xs text-game-muted">
+                                  +1 Attack, Defense, Special Attack, Special Defense, and Speed for 3 turns
+                                </span>
+                              </span>
                             </span>
                           </Button>
                         </div>

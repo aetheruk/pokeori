@@ -63,6 +63,10 @@ import {
   applyBattleAbilityStatusReflection,
 } from './abilities'
 import { processBattleAbilitySwitchOut } from './switching'
+import {
+  clearShoutStatBoost,
+  removeShoutBoostFromStatStages,
+} from './shout-effects'
 
 const CALLABLE_MOVE_EXCLUSIONS = new Set(['metronome'])
 
@@ -958,6 +962,7 @@ function cloneStatStages(stages: StatStages | undefined): StatStages {
 }
 
 function resetStatStages(pokemon: BattlePokemon): void {
+  clearShoutStatBoost(pokemon)
   pokemon.statStages = { ...DEFAULT_STAT_STAGES }
 }
 
@@ -1789,6 +1794,8 @@ export function resolvePendingMoveSwitches(state: BattleState): string[] {
       state.pendingPlayerSwitch = true
       state.pendingPlayerSwitchReason = 'move'
       state.pendingPlayerSwitchStatStages = pending.passStatStages
+        ? removeShoutBoostFromStatStages(outgoing, pending.passStatStages)
+        : undefined
       messages.push(`Choose a Pokemon to switch in for ${outgoing.name}.`)
       continue
     }
@@ -1808,7 +1815,9 @@ export function resolvePendingMoveSwitches(state: BattleState): string[] {
     const replacement = team[replacementIndex]
     replacement.activeTurnStarted = state.turn + 1
     if (pending.passStatStages) {
-      replacement.statStages = cloneStatStages(pending.passStatStages)
+      replacement.statStages = cloneStatStages(
+        removeShoutBoostFromStatStages(outgoing, pending.passStatStages),
+      )
     }
 
     messages.push(

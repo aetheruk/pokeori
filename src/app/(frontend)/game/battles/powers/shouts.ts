@@ -1,37 +1,30 @@
 /**
- * Shouts power system.
- * Allows manipulating enemy AI stance selection with 80% success rate.
+ * Battle Shout power system.
+ * Raises the active Pokemon's five core battle stats for three turns.
  * PVE only.
  */
 
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
-import type { BattleState, BattleStance } from '@/utilities/battle/types'
+import type { BattleState } from '@/utilities/battle/types'
+import { SHOUT_DURATION } from '@/data/powers'
 import { getUser } from '../helpers/user'
 import { getActiveBattleState } from '../helpers/state-management'
-import { finalizeTurn } from '../helpers/turn-finalization'
 import { validateSelectedPokemonPower } from '@/utilities/pokemon/pokemon-powers'
 import { needsPlayerReplacement } from '@/utilities/battle/switching'
 import {
   getSkillLevel,
   validateBattlePowerSkillRequirement,
 } from '@/utilities/skills/unlocks'
-import {
-  applyPokemonResearchEndure,
-  canApplyPokemonResearchEndure,
-} from '@/utilities/battle/research-survival'
 import { getUserInventoryMap } from '@/utilities/user-state'
 import { runBattleActionWithGuard } from '../helpers/action-guard'
+import { applyShoutStatBoost } from '@/utilities/battle/shout-effects'
 
 /**
- * Use a Shout to influence enemy stance selection.
- * 80% chance to force enemy into a favorable stance.
- * Only works in PVE battles.
- *
- * @param stance - Player's chosen stance for the turn
+ * Activate Battle Shout. The activation consumes the player's action and the
+ * enemy receives a normal response, matching the other transformation powers.
  */
 export async function useShout(
-  stance: BattleStance,
   clientActionId?: string,
 ): Promise<{
   success: boolean
@@ -46,8 +39,12 @@ export async function useShout(
     const state = await getActiveBattleState(user)
     if (!state) return { success: false, error: 'No active battle' }
 
-    if (state.isPvp)
+    if (state.isPvp) {
       return { success: false, error: 'Shouts cannot be used in PVP' }
+    }
+    if (state.status !== 'ongoing') {
+      return { success: false, error: 'Battle has ended' }
+    }
     if (needsPlayerReplacement(state)) {
       return {
         success: false,
@@ -56,7 +53,30 @@ export async function useShout(
       }
     }
 
-    // Check for Book of Shouts
+    const playerMon = state.playerTeam[state.activePlayerIndex]
+    const enemyMon = state.enemyTeam[state.activeEnemyIndex]
+    if (!playerMon || playerMon.currentHp <= 0) {
+      return { success: false, error: 'Active Pokemon is fainted' }
+    }
+    if (!enemyMon || enemyMon.currentHp <= 0) {
+      return { success: false, error: 'No active enemy Pokemon' }
+    }
+    if (playerMon.isShadow) {
+      return { success: false, error: 'Shadow Pokemon cannot use Powers!' }
+    }
+
+    const selectedPowerError = validateSelectedPokemonPower({
+      selectedPokemonPower: playerMon.selectedPokemonPower,
+      requiredPower: 'shout',
+      pokemonName: playerMon.name,
+    })
+    if (selectedPowerError) {
+      return { success: false, error: selectedPowerError }
+    }
+    if (playerMon.shoutBoost) {
+      return { success: false, error: 'Battle Shout is already active' }
+    }
+
     const payload = await getPayload({ config: configPromise })
     const [userDoc, userInventory] = await Promise.all([
       payload.findByID({ collection: 'users', id: user.id }),
@@ -70,45 +90,23 @@ export async function useShout(
       'shout',
       getSkillLevel(userDoc.skills, 'battling'),
     )
-    if (skillRequirementError)
+    if (skillRequirementError) {
       return { success: false, error: skillRequirementError }
-
+    }
     if (!state.powers) {
       return { success: false, error: 'Power state error' }
     }
-
     if (state.powers.shoutUsesRemaining <= 0) {
       return { success: false, error: 'No Shout uses remaining' }
     }
 
-    // Stance manipulation logic
-    // Win: Enemy uses weak stance (Player wins)
-    // Loss: Enemy uses strong stance (Player loses)
-    const winStanceMap: Record<BattleStance, BattleStance> = {
-      power: 'tech',
-      speed: 'power',
-      tech: 'speed',
-    }
+    const boost = applyShoutStatBoost(playerMon, state.turn)
+    if (!boost.applied) return { success: false, error: boost.message, state }
 
-    const lossStanceMap: Record<BattleStance, BattleStance> = {
-      power: 'speed',
-      speed: 'tech',
-      tech: 'power',
-    }
-
-    const roll = Math.random()
-    const isWin = roll < 0.8 // 80% success rate
-
-    const forcedEnemyStance = isWin
-      ? winStanceMap[stance]
-      : lossStanceMap[stance]
-
-    // Decrement usage
     state.powers.shoutUsesRemaining -= 1
 
     const powerUsage =
       (userDoc.powerUsage as Record<string, number> | undefined) || {}
-
     await payload.update({
       collection: 'users',
       id: user.id,
@@ -120,151 +118,17 @@ export async function useShout(
       },
     })
 
-    const playerMon = state.playerTeam[state.activePlayerIndex]
-    if (playerMon.isShadow) {
-      return { success: false, error: 'Shadow Pokemon cannot use Powers!' }
-    }
-
-    const selectedPowerError = validateSelectedPokemonPower({
-      selectedPokemonPower: playerMon.selectedPokemonPower,
-      requiredPower: 'shout',
-      pokemonName: playerMon.name,
-    })
-    if (selectedPowerError) {
-      return { success: false, error: selectedPowerError }
-    }
-
-    const enemyMon = state.enemyTeam[state.activeEnemyIndex]
-    const playerName = state.playerName || 'Player'
-    const enemyName = state.enemyName || 'Enemy'
-
-    // Build shout message
-    const stanceAdjective =
-      stance === 'power'
-        ? 'Powerful'
-        : stance === 'speed'
-          ? 'Speedy'
-          : 'Technical'
-    const shoutLog = `${playerName} issues a ${stanceAdjective} Command to ${playerMon.name}!`
-
-    let reactionLog = ''
-    if (isWin) {
-      reactionLog = `${enemyName} is overwhelmed by the shout!`
-    } else {
-      reactionLog = `${enemyMon.name} sees through the shout!`
-    }
-
-    // Calculate battle resolution
-    const { calculateDamage, resolveStance, handleShieldInteraction } =
-      await import('@/utilities/battle/battle-logic')
-
-    const resolution = resolveStance(stance, forcedEnemyStance)
-
-    // Player attack
-    const playerDmgResult = calculateDamage(
+    const message = `${playerMon.name} unleashes a Battle Shout! ${boost.message} The effect lasts for ${SHOUT_DURATION} turns.`
+    const { processEnemyAttackOnly } = await import('../pve/enemy-attack')
+    await processEnemyAttackOnly(
+      state,
       playerMon,
       enemyMon,
-      stance,
-      resolution.damageMultiplier,
-      undefined,
-      60,
-      undefined,
-      undefined,
-      state.weather?.weather,
-      undefined,
-      { currentTurn: state.turn },
-    )
-    let playerDamage = playerDmgResult.damage
-    if (playerMon.status?.id === 'victory') playerMon.status = undefined
-
-    // Enemy shield check
-    const enemyShieldResult = handleShieldInteraction(
-      enemyMon,
-      playerDmgResult.isSuperEffective,
-      resolution.result === 'win',
-    )
-    if (enemyShieldResult.damageMultiplier === 0) playerDamage = 0
-
-    // Enemy attack
-    const enemyMultiplier = resolution.result === 'win' ? 0.5 : 2.0
-    const enemyDmgResult = calculateDamage(
-      enemyMon,
-      playerMon,
-      forcedEnemyStance,
-      enemyMultiplier,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      state.weather?.weather,
-      undefined,
-      { currentTurn: state.turn },
-    )
-    let enemyDamage = enemyDmgResult.damage
-    if (enemyMon.status?.id === 'victory') enemyMon.status = undefined
-
-    // Player shield check
-    const playerShieldResult = handleShieldInteraction(
-      playerMon,
-      enemyDmgResult.isSuperEffective,
-      resolution.result === 'loss',
-    )
-    if (playerShieldResult.damageMultiplier === 0) enemyDamage = 0
-
-    // Apply damage
-    const playerEndure = applyPokemonResearchEndure(
-      enemyMon,
-      playerDamage,
-      Math.random,
-      canApplyPokemonResearchEndure(state, 'enemy'),
-    )
-    const enemyEndure = applyPokemonResearchEndure(
-      playerMon,
-      enemyDamage,
-      Math.random,
-      canApplyPokemonResearchEndure(state, 'player'),
-    )
-    playerDamage = playerEndure.damage
-    enemyDamage = enemyEndure.damage
-    enemyMon.currentHp = Math.max(0, enemyMon.currentHp - playerDamage)
-    playerMon.currentHp = Math.max(0, playerMon.currentHp - enemyDamage)
-
-    // Build combat message
-    const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
-    let message = `${shoutLog}\n${reactionLog}`
-
-    message += `\n${playerName}: ${playerMon.name} uses a ${stanceAdjective} ${cap(playerDmgResult.usedType)} Attack dealing ${playerDamage} damage.`
-    if (playerDmgResult.isRadiantBoost)
-      message += `\n${playerMon.name}'s aura burns bright.`
-    if (playerDmgResult.weatherMessage)
-      message += `\n${playerDmgResult.weatherMessage}`
-    if (enemyShieldResult.message) message += enemyShieldResult.message
-
-    if (enemyMon.currentHp > 0) {
-      message += `\n${enemyName}: ${enemyMon.name} uses a ${cap(forcedEnemyStance)} Attack dealing ${enemyDamage} damage.`
-      if (enemyDmgResult.isRadiantBoost)
-        message += `\n${enemyMon.name}'s aura burns bright.`
-      if (enemyDmgResult.weatherMessage)
-        message += `\n${enemyDmgResult.weatherMessage}`
-      if (playerShieldResult.message) message += playerShieldResult.message
-    }
-    if (playerEndure.message) message += `\n${playerEndure.message}`
-    if (enemyEndure.message) message += `\n${enemyEndure.message}`
-
-    // Update history
-    state.history.unshift({
-      turn: state.turn,
-      playerStance: stance,
-      enemyStance: forcedEnemyStance,
-      result: resolution.result,
-      damageDealt: playerDamage,
-      damageTaken: enemyDamage,
-      playerAttackType: playerDmgResult.usedType,
-      enemyAttackType: enemyDmgResult.usedType,
+      user,
       message,
-    })
-
-    await finalizeTurn(state, user.id, user)
+      undefined,
+      { playerInventory: userInventory },
+    )
 
     return { success: true, state, message }
   })

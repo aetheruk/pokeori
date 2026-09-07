@@ -302,8 +302,8 @@ export async function useWeatherPower(
   return useWeather(battleId, weather, clientActionId)
 }
 
-export async function useShout(stance: BattleStance, clientActionId?: string) {
-  return useShoutPower(stance, clientActionId)
+export async function useShout(clientActionId?: string) {
+  return useShoutPower(clientActionId)
 }
 
 export async function useCircadian(battleId: string, clientActionId?: string) {

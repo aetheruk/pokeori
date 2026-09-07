@@ -62,7 +62,7 @@ const BattleActionSchema = z.discriminatedUnion('kind', [
     battleId: identifier,
     weather: identifier,
   }),
-  baseAction.extend({ kind: z.literal('shout'), stance: battleStance }),
+  baseAction.extend({ kind: z.literal('shout') }),
   baseAction.extend({ kind: z.literal('circadian'), battleId: identifier }),
   baseAction.extend({
     kind: z.literal('dimensional-shift'),
@@ -151,7 +151,7 @@ export async function POST(request: Request) {
         )
         break
       case 'shout':
-        result = await useShout(action.stance, action.clientActionId)
+        result = await useShout(action.clientActionId)
         break
       case 'circadian':
         result = await useCircadian(action.battleId, action.clientActionId)
