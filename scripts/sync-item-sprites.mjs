@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readdirSync, writeFileSync, statSync } from 'fs'
 import { basename, dirname, extname, join, relative } from 'path'
 import { fileURLToPath } from 'url'
+import { execFileSync } from 'node:child_process'
 import { items } from '../src/data/items/index.ts'
 import { evolutionItems } from '../src/data/items/entries/evolution.ts'
 import { megaStones } from '../src/data/items/entries/mega-stones.ts'
@@ -180,6 +181,7 @@ const manifest = {
 
 writeFileSync(`${manifestPath}\n`.trim(), `${JSON.stringify(manifest, null, 2)}\n`)
 writeMissingDoc(missing)
+execFileSync('bun', ['scripts/generate-item-sprite-index.ts'], { cwd: repoRoot, stdio: 'inherit' })
 
 console.log(`Item sprite sync complete.`)
 console.log('- copied sprites: 0')

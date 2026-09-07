@@ -51,7 +51,7 @@ import { getActiveChronicleContext } from '@/utilities/chronicles'
 import {
   getActiveExpeditionForUser,
   setSafariBallsRemaining,
-} from '@/utilities/expeditions/actions'
+} from '@/utilities/expeditions/server'
 import { rollPokemonGender } from '@/utilities/pokemon/gender'
 import { resolvePokemonRarity } from '@/utilities/pokemon/rarity-effects'
 import {

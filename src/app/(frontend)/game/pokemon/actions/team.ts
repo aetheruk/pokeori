@@ -31,6 +31,7 @@ import {
   validateBattleTeamPlacements,
 } from '@/utilities/pokemon/battle-team'
 import { getUser, serializePokemon, type StatName } from './utils'
+import { POKEMON_BOX_POPULATE } from '@/utilities/pokemon/box-query'
 
 export type PokemonRosterRole = 'box' | 'battle-team' | 'companion'
 
@@ -313,6 +314,7 @@ export async function getPokemonTeamLayout() {
         ],
       },
       depth: 1,
+      populate: POKEMON_BOX_POPULATE,
       limit: 6,
       sort: 'battleTeamPosition',
     }),
@@ -332,6 +334,7 @@ export async function getPokemonTeamLayout() {
         ],
       },
       depth: 1,
+      populate: POKEMON_BOX_POPULATE,
       limit: 1,
     }),
   ])

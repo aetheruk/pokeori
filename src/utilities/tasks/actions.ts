@@ -23,7 +23,8 @@ import {
   isCurrentExpeditionTask,
   recordExpeditionActivityResult,
   type ExpeditionProgressSnapshot,
-} from '@/utilities/expeditions/actions'
+} from '@/utilities/expeditions/server'
+import { redis } from '@/utilities/redis'
 import { resolveTaskPokemonOrigin } from '@/utilities/pokemon/origin'
 import {
   getUserCompletedTasksMap,
@@ -32,7 +33,7 @@ import {
   setUserInventoryMap,
 } from '@/utilities/user-state'
 import { isToday } from '@/utilities/date-utils'
-import { acquireActionLock, releaseActionLock } from '@/utilities/game-integrity'
+import { acquireActionLock, checkActionRateLimit, releaseActionLock } from '@/utilities/game-integrity'
 import {
   getEconomyActionErrorMessage,
   runEconomyAction,
@@ -60,6 +61,11 @@ export async function validateEnterModalPassword(
 ): Promise<{ success: boolean; correct: boolean }> {
   const { user } = await checkUserAuth()
   if (!user) return { success: false, correct: false }
+  if (typeof taskId !== 'string' || typeof password !== 'string' || password.length > 256) {
+    return { success: false, correct: false }
+  }
+  const rateLimit = await checkActionRateLimit(user.id, 'task-password', 20, 60)
+  if (!rateLimit.allowed) return { success: false, correct: false }
 
   const correctPasswords = TASK_PASSWORDS[taskId]
   if (!correctPasswords) return { success: false, correct: false }
@@ -68,7 +74,11 @@ export async function validateEnterModalPassword(
   const sanitizedInput = normalizeTaskPassword(password)
   const sanitizedCorrect = correctPasswords.map(normalizeTaskPassword)
 
-  return { success: true, correct: sanitizedCorrect.includes(sanitizedInput) }
+  const correct = sanitizedCorrect.includes(sanitizedInput)
+  if (correct) {
+    await redis.set(`task-password:${user.id}:${taskId}`, true, { ex: 600 })
+  }
+  return { success: true, correct }
 }
 
 export interface CompleteTaskResult {
@@ -120,6 +130,19 @@ export async function completeTask(
       return { success: false, message: 'Task not found' }
     }
     isGeneratedDaily = true
+    // Generated dailies keep their claim state on the daily itself, not in
+    // completedTasks. Check inside the account transaction so fresh request
+    // identifiers cannot claim the same daily again.
+    if ((task as any).completed) {
+      return { success: false, message: 'Task already completed' }
+    }
+    if (!isToday(user.lastDailyRefresh)) {
+      return { success: false, message: 'Refresh your daily challenges first' }
+    }
+  }
+
+  if (TASK_PASSWORDS[taskId] && !(await redis.get(`task-password:${user.id}:${taskId}`))) {
+    return { success: false, message: 'Solve this task’s password first' }
   }
 
   if (

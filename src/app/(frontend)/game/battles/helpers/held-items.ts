@@ -1,4 +1,4 @@
-import { getPayload } from 'payload'
+import { getPayload, type Payload } from 'payload'
 import configPromise from '@payload-config'
 import type { BattlePokemon, BattleState } from '@/utilities/battle/types'
 import { calculateStats } from '@/utilities/battle/stats-calc'
@@ -7,6 +7,7 @@ import {
   getHeldItemTrainingEffect,
 } from '@/utilities/pokemon/held-items'
 import { getUserInventoryMap, setUserInventoryMap } from '@/utilities/user-state'
+import { createEconomyRequestId, runEconomyAction } from '@/utilities/economy/transactions'
 
 const EV_CAP = 255
 
@@ -148,11 +149,12 @@ export function collectHeldItemBattleWinEffects(
 export async function persistHeldItemBattleWinEffects(
   team: BattlePokemon[],
   random: () => number = Math.random,
+  transactionPayload?: Payload,
 ): Promise<HeldItemBattleWinEffect[]> {
   const effects = collectHeldItemBattleWinEffects(team, random)
   if (effects.length === 0) return effects
 
-  const payload = await getPayload({ config: configPromise })
+  const payload = transactionPayload || await getPayload({ config: configPromise })
   await Promise.all(
     effects.map(async (effect) => {
       const pokemon = await payload.findByID({
@@ -192,9 +194,31 @@ export async function persistHeldItemBattleWinEffects(
 
 export async function persistConsumedHeldItems(
   state: BattleState,
+  transactionPayload?: Payload,
 ): Promise<void> {
   if (state.chronicle) return
   if (state.status === 'ongoing') return
+  if (state.heldItemsSettled) return
+  if (!(state.heldItemChargeRewards?.length || [...(state.playerTeam || []), ...(state.enemyTeam || [])].some((pokemon) =>
+    getPersistentPokemonId(pokemon) && (typeof pokemon.itemCharge === 'number' || pokemon.consumedHeldItems?.some((item) => item.persistent !== false)),
+  ))) return
+  if (!transactionPayload) {
+    const ownerIds = [...new Set([...(state.playerTeam || []), ...(state.enemyTeam || [])]
+      .filter((pokemon) => getPersistentPokemonId(pokemon))
+      .map((pokemon) => typeof pokemon.user === 'object' ? pokemon.user.id : pokemon.user)
+      .filter((owner): owner is string => typeof owner === 'string' && owner !== 'enemy'))].sort()
+    if (!ownerIds.length) return
+    const settled = await runEconomyAction({
+      userId: ownerIds[0], action: 'settle-battle-held-items',
+      requestId: createEconomyRequestId(`battle-held-items:${state.economyActionId || state.battleId}`),
+    }, async ({ payload }) => {
+      const nextState = structuredClone(state)
+      await persistConsumedHeldItems(nextState, payload)
+      return nextState
+    })
+    Object.assign(state, settled)
+    return
+  }
 
   const consumedItems: ConsumedHeldItemRecord[] = []
   const chargeUpdatesByPokemon: Record<string, number> = {}
@@ -238,7 +262,7 @@ export async function persistConsumedHeldItems(
     return
   }
 
-  const payload = await getPayload({ config: configPromise })
+  const payload = transactionPayload
   const ownerIds = [
     ...new Set([
       ...consumedItems.map((item) => item.ownerId),
@@ -291,4 +315,5 @@ export async function persistConsumedHeldItems(
     ),
   )
   state.heldItemChargeRewards = []
+  state.heldItemsSettled = true
 }

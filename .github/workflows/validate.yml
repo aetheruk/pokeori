@@ -1,0 +1,54 @@
+name: Validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  merge_group:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Typecheck, lint, tests and security
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version-file: package.json
+      - run: bun install --frozen-lockfile
+      - run: bun run typecheck
+      - run: bun run lint
+      - run: bun test
+      - run: bun run security:audit
+  integration:
+    name: Browser and security integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version-file: package.json
+      - run: bun install --frozen-lockfile
+      - run: bunx playwright install --with-deps chromium
+      - run: docker compose -p pokeori-audit-test -f compose.test.yml up -d --wait
+      - name: Initialize isolated MongoDB replica set
+        run: >-
+          docker compose -p pokeori-audit-test -f compose.test.yml exec -T mongo
+          mongosh --quiet --eval
+          'rs.initiate({_id:"audit-rs",members:[{_id:0,host:"localhost:27017"}]}); while (!db.hello().isWritablePrimary) { sleep(500) }'
+      - run: bun run test:security:integration
+      - run: bun run test:e2e
+      - if: always()
+        run: docker compose -p pokeori-audit-test -f compose.test.yml down

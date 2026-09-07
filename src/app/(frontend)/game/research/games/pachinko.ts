@@ -2,29 +2,30 @@
 
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
+import { randomInt } from 'node:crypto'
 import {
   type GameActivityState,
   getUser,
 } from '@/app/(frontend)/game/_shared/activity-actions'
 import { allGames } from '@/data/games'
+import type { PachinkoGameSettings } from '@/data/games/pachinko/types'
 import {
   acquireActionLock,
   checkActionRateLimit,
   getIdempotentResult,
   releaseActionLock,
-  setIdempotentResult,
 } from '@/utilities/game-integrity'
 import { redis } from '@/utilities/redis'
 import { splitGuaranteedPachinkoCurrencyRewards } from '@/utilities/research/pachinko-rewards'
 import {
-  type PachinkoRoundRequest,
   resolvePachinkoRound,
 } from '@/utilities/research/pachinko-round'
+import { simulatePachinkoRound, type PachinkoPlayback } from '@/utilities/research/pachinko-simulation'
 import type { Reward } from '@/utilities/rewards/reward-logic'
 import { grantRewards } from '@/utilities/rewards/reward-logic'
 import { incrementUserActivityResult } from '@/utilities/user-state'
 import { mergeSummaries } from '../utils'
-import { getEconomyActionErrorMessage, runEconomyAction } from '@/utilities/economy/transactions'
+import { createEconomyRequestId, getEconomyActionErrorMessage, runEconomyAction } from '@/utilities/economy/transactions'
 
 type PachinkoSettlementResult = {
   success: boolean
@@ -36,6 +37,7 @@ type PachinkoSettlementResult = {
   hitCount?: number
   hitCounts?: Record<string, number>
   isBonus?: boolean
+  playback?: PachinkoPlayback
 }
 
 function getRoundResultKey(userId: string, roundId: unknown) {
@@ -50,7 +52,7 @@ export async function completePachinkoRound({
   request,
 }: {
   encounterId: string
-  request: PachinkoRoundRequest
+  request: { roundId: string; arrowPosition: number }
 }): Promise<PachinkoSettlementResult> {
   try {
     const user = await getUser()
@@ -61,6 +63,11 @@ export async function completePachinkoRound({
     const idempotentResultKey = getRoundResultKey(user.id, request?.roundId)
     if (!idempotentResultKey) {
       return { success: false, error: 'Invalid round id' }
+    }
+    if (typeof request.arrowPosition !== 'number' || !Number.isFinite(request.arrowPosition) ||
+        request.arrowPosition < 0 || request.arrowPosition > 100 ||
+        'outcomeBucketIds' in request || 'triggerBucketId' in request) {
+      return { success: false, error: 'Invalid release. Reopen Pachinko to update the game.' }
     }
 
     const cachedResult =
@@ -81,8 +88,8 @@ export async function completePachinkoRound({
     }
 
     const actionLock = await acquireActionLock(
-      `lock:pachinko:action:${user.id}`,
-      10,
+      `lock:game:settle:${user.id}`,
+      60,
     )
     if (!actionLock.acquired) {
       return {
@@ -109,42 +116,24 @@ export async function completePachinkoRound({
       }
 
       const encounter = allGames.find((e) => e.id === encounterId)
-      if (encounter?.gameType !== 'pachinko') {
+      if (encounter?.gameType !== 'pachinko' || !encounter.settings.board) {
         return { success: false, error: 'Invalid game type' }
       }
 
-      const resolvedRound = resolvePachinkoRound(
-        encounter.settings.board?.buckets || [],
-        request,
-      )
-      if (!resolvedRound.valid) {
-        return { success: false, error: resolvedRound.error }
-      }
-
       const cost = encounter.settings.cost
-
-      const roundRewards = resolvedRound.hitBuckets.flatMap(
-        (bucket) => bucket.rewards,
-      )
-      const isWin = roundRewards.length > 0
-      const { guaranteedCurrencyPayout, deferredRewards } =
-        cost && roundRewards.length > 0
-          ? splitGuaranteedPachinkoCurrencyRewards(
-              roundRewards,
-              cost.currencyType,
-            )
-          : {
-              guaranteedCurrencyPayout: 0,
-              deferredRewards: roundRewards,
-            }
+      const settings = encounter.settings as PachinkoGameSettings
+      // Choose launch jitter only on the server. A request ID reuses its
+      // committed simulation and payout, including after a lost response.
+      const launchVelocity = randomInt(-1_000_000, 1_000_001) / 1_000_000
       const economyResult = await runEconomyAction(
         {
           userId: user.id,
           action: 'pachinko-round',
-          requestId: request.roundId,
+          requestId: createEconomyRequestId(`${state.startTime}:${encounter.id}:${request.roundId}`),
+          aliasRequestIds: [createEconomyRequestId(`${state.startTime}:${encounter.id}:turn:${state.wins}:${state.losses}`)],
           payload,
         },
-        async ({ req }) => {
+        async ({ payload, req }) => {
           const freshUser = await payload.findByID({ collection: 'users', id: user.id, req })
           const currentBalance = cost
             ? freshUser.currency?.[cost.currencyType] || 0
@@ -152,6 +141,18 @@ export async function completePachinkoRound({
           if (cost && currentBalance < cost.amount) {
             return { success: false as const, error: 'Insufficient funds' }
           }
+          const simulation = simulatePachinkoRound(settings, request.arrowPosition, launchVelocity)
+          const resolvedRound = resolvePachinkoRound(settings.board.buckets, {
+            roundId: request.roundId,
+            triggerBucketId: simulation.triggerBucketId,
+            outcomeBucketIds: simulation.outcomeBucketIds,
+          })
+          if (!resolvedRound.valid) throw new Error('Invalid simulated Pachinko outcome')
+          const roundRewards = resolvedRound.hitBuckets.flatMap((bucket) => bucket.rewards)
+          const isWin = roundRewards.length > 0
+          const { guaranteedCurrencyPayout, deferredRewards } = cost && roundRewards.length > 0
+            ? splitGuaranteedPachinkoCurrencyRewards(roundRewards, cost.currencyType)
+            : { guaranteedCurrencyPayout: 0, deferredRewards: roundRewards }
           const settledBalance = cost
             ? currentBalance - cost.amount + guaranteedCurrencyPayout
             : currentBalance
@@ -189,30 +190,24 @@ export async function completePachinkoRound({
             )
             roundSummary = mergeSummaries(roundSummary, res.summary)
           }
-          return { success: true as const, settledBalance, roundSummary }
+          const session = structuredClone(state.pachinkoSession || { totalRewards: {}, totalCost: 0 })
+          if (roundSummary) session.totalRewards = mergeSummaries(session.totalRewards, roundSummary)
+          session.totalCost += cost?.amount || 0
+          return {
+            success: true as const, settledBalance, roundSummary, session, previousState: structuredClone(state),
+            wins: state.wins + (isWin ? 1 : 0), losses: state.losses + (isWin ? 0 : 1),
+            hitCount: resolvedRound.hitBuckets.length, hitCounts: resolvedRound.hitCounts,
+            isBonus: resolvedRound.isBonus, playback: simulation.playback,
+          }
         },
       )
       if (!economyResult.success) return economyResult
-      const { settledBalance, roundSummary } = economyResult
+      const { settledBalance, roundSummary, session: currentSession } = economyResult
 
       // Update Redis
-      const currentSession = state.pachinkoSession || {
-        totalRewards: {},
-        totalCost: 0,
-      }
-      if (roundSummary) {
-        currentSession.totalRewards = mergeSummaries(
-          currentSession.totalRewards,
-          roundSummary,
-        )
-      }
-      currentSession.totalCost =
-        (currentSession.totalCost || 0) + (cost?.amount || 0)
       state.pachinkoSession = currentSession
-      if (isWin) state.wins += 1
-      else state.losses += 1
-
-      await redis.set(`game:${user.id}`, state, { ex: 3600 })
+      state.wins = economyResult.wins
+      state.losses = economyResult.losses
 
       const response = {
         success: true,
@@ -220,12 +215,16 @@ export async function completePachinkoRound({
         rewards: roundSummary,
         summary: currentSession.totalRewards,
         totalCost: currentSession.totalCost,
-        hitCount: resolvedRound.hitBuckets.length,
-        hitCounts: resolvedRound.hitCounts,
-        isBonus: resolvedRound.isBonus,
+        hitCount: economyResult.hitCount,
+        hitCounts: economyResult.hitCounts,
+        isBonus: economyResult.isBonus,
+        playback: economyResult.playback,
       }
 
-      await setIdempotentResult(idempotentResultKey, response, 600)
+      await redis.setManyIfValue(`game:${user.id}`, economyResult.previousState, [
+        { key: `game:${user.id}`, value: state, ttlSeconds: 3600 },
+        { key: idempotentResultKey, value: response, ttlSeconds: 3600 },
+      ])
 
       return response
     } finally {

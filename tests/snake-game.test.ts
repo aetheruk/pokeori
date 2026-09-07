@@ -9,6 +9,7 @@ import {
   findSafeSnakePosition,
   getResponsiveSnakePlayfield,
   getSegmentHeading,
+  getSnakeKeyboardHeading,
   getSnakePointerHeading,
   getSnakeSpeed,
   growSnake,
@@ -19,6 +20,19 @@ import {
 } from '@/utilities/research/snake'
 
 describe('continuous Snake mechanics', () => {
+  test('aims keyboard steering in screen directions and supports diagonal chords', () => {
+    expect(getSnakeKeyboardHeading(new Set(['arrowup']))).toBe(270)
+    expect(getSnakeKeyboardHeading(new Set(['d']))).toBe(0)
+    expect(getSnakeKeyboardHeading(new Set(['s']))).toBe(90)
+    expect(getSnakeKeyboardHeading(new Set(['a']))).toBe(180)
+    expect(getSnakeKeyboardHeading(new Set(['w', 'arrowright']))).toBe(315)
+    expect(getSnakeKeyboardHeading(new Set(['arrowdown', 'a']))).toBe(135)
+    expect(getSnakeKeyboardHeading(new Set(['w', 's']))).toBeNull()
+    expect(getSnakeKeyboardHeading(new Set())).toBeNull()
+    // Aliases must not double the weight of an axis.
+    expect(getSnakeKeyboardHeading(new Set(['w', 'arrowup', 'd']))).toBe(315)
+  })
+
   test('matches the logical collision plane to any viewport without stretching', () => {
     const authored = { width: 390, height: 700 }
     const tallPhone = getResponsiveSnakePlayfield(authored, 390, 844)
@@ -275,7 +289,9 @@ describe('Onix Snake test entry and scene', () => {
     ).text()
     expect(source).not.toContain('gridTemplateColumns')
     expect(source).not.toContain('DirectionButton')
-    expect(source).toContain("kind === 'tail' ? 180 : 0")
+    expect(source).toContain(
+      "(!onixArt && kind === 'tail') || (onixArt && kind === 'head')",
+    )
     expect(source).toContain('bg-game-ochre/20')
     expect(source).toContain('motion-safe:animate-ping')
     expect(source).toContain('h-[72%] w-[72%]')
@@ -284,10 +300,10 @@ describe('Onix Snake test entry and scene', () => {
     expect(source).toContain('getSnakePointerHeading(')
     expect(source).toContain('bg-game-surface-raised/95')
     expect(source).toContain('settings.rewardRadius * 2')
-    expect(source).toContain('className="absolute inset-0 z-10')
+    expect(source).toContain('aspectRatio:')
     expect(source).toContain('runtimePlayfieldRef.current.width')
     expect(source).toContain('settings.headRadius * 2.75')
-    expect(source).toContain('boundaryRadius: settings.boundaryRadius')
+    expect(source).toContain("useArcadeSession('snake'")
 
     const foodMarkup =
       source.split('{food ? (')[1]?.split('{sceneRewards.map')[0] ?? ''

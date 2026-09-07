@@ -1189,9 +1189,9 @@ function CarddexBinderShelf({
         </span>
       </div>
 
-      <div
+      <fieldset
         className="custom-scrollbar flex snap-x gap-2 overflow-x-auto pb-1"
-        role="group"
+
         aria-label="Card series"
       >
         <button
@@ -1232,12 +1232,12 @@ function CarddexBinderShelf({
             </span>
           </button>
         ))}
-      </div>
+      </fieldset>
 
       {activeSeries && (
-        <div
+        <fieldset
           className="custom-scrollbar flex snap-x gap-2 overflow-x-auto border-t border-game-border pt-3 pb-1"
-          role="group"
+
           aria-label={`${activeSeries.series} binders`}
         >
           <button
@@ -1292,7 +1292,7 @@ function CarddexBinderShelf({
               </button>
             )
           })}
-        </div>
+        </fieldset>
       )}
     </section>
   )

@@ -1,5 +1,7 @@
 'use client'
 
+import type { GameDataKeys } from '@/utilities/requirements/analysis'
+
 import {
   ArrowDown,
   ArrowLeft,
@@ -36,7 +38,7 @@ import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import {
   completeGame as completeGameActivity,
   startGame,
-} from '@/app/(frontend)/game/games/actions'
+} from '@/utilities/games/client-action-recovery'
 
 interface RockTunnelEchoMapGameProps {
   encounter: GridPuzzleEchoMapGameConfig & { isEligibleForReplay?: boolean }
@@ -68,6 +70,7 @@ export function RockTunnelEchoMapGame({
   useGameMusic(encounter)
   const { playSfx } = useAudio()
   const { gameData, refreshUser } = useUser()
+  const completionInvalidatesRef = useRef<GameDataKeys[] | undefined>(undefined)
   const router = useRouter()
   const { cols, rows } = encounter.settings.gridSize
   const timeLimit = encounter.settings.timeLimit || 80
@@ -124,6 +127,7 @@ export function RockTunnelEchoMapGame({
   const [gameEnded, setGameEnded] = useState(false)
   const [result, setResult] = useState<any | null>(null)
   const completionRef = useRef(false)
+  const moveProofRef = useRef<string[]>([])
   const partnerPokemon = useMemo(
     () =>
       ((gameData as any)?.pokemon || []).find(
@@ -159,7 +163,10 @@ export function RockTunnelEchoMapGame({
       completionRef.current = true
       setGameEnded(true)
 
-      const completion = await completeGameActivity(encounter.id, success)
+      const completion = await completeGameActivity(encounter.id, success, undefined, undefined, undefined, undefined, undefined, {
+        kind: 'echo-map', moves: [...moveProofRef.current],
+      })
+      completionInvalidatesRef.current = completion.invalidates
       const finalSuccess = success && completion.success
       setResult({
         success: finalSuccess,
@@ -182,6 +189,7 @@ export function RockTunnelEchoMapGame({
     }
 
     completionRef.current = false
+    moveProofRef.current = []
     setPlayer(encounter.settings.playerStart)
     setFacing('down')
     setMoves(0)
@@ -266,6 +274,7 @@ export function RockTunnelEchoMapGame({
       }
 
       const nextMoves = moves + 1
+      moveProofRef.current.push(direction)
       setPlayer(next)
       setMoves(nextMoves)
 
@@ -618,7 +627,7 @@ export function RockTunnelEchoMapGame({
         <RewardResultOverlay
           result={result}
           onClose={() => {
-            refreshUser()
+            refreshUser(true, completionInvalidatesRef.current)
             router.push('/game/explore')
           }}
           icon={encounter.icon}

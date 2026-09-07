@@ -1,5 +1,7 @@
 'use client'
 
+import type { GameDataKeys } from '@/utilities/requirements/analysis'
+
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -12,7 +14,10 @@ import { useUser } from '@/context/UserContext'
 import type { Match3Crystal, Match3GameConfig } from '@/data/games/match3/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
-import { completeGame, startGame } from '@/app/(frontend)/game/games/actions'
+import { completeGame, startGame } from '@/utilities/games/client-action-recovery'
+import { recoverGameAction } from '@/utilities/games/action-recovery'
+import { submitMatch3Move } from '../games/match3'
+import type { Match3RoundState } from '@/utilities/research/match3'
 
 interface Match3GameProps {
   encounter: Match3GameConfig
@@ -30,12 +35,11 @@ export function Match3Game({ encounter, initialState }: Match3GameProps) {
   useGameMusic(encounter)
   const { playSfx } = useAudio()
   const { refreshUser } = useUser()
+  const completionInvalidatesRef = useRef<GameDataKeys[] | undefined>(undefined)
   const router = useRouter()
 
   const { cols, rows } = encounter.settings.gridSize
   const crystalTypes = encounter.settings.crystalTypes
-  const pointsPerMatch = encounter.settings.pointsPerMatch || 10
-  const cascadeMultiplier = encounter.settings.cascadeMultiplier || 1.5
   const themeColour = encounter.settings.themeColour || '#14b8a6'
 
   const isEndlessMode = encounter.settings.endless?.enabled || false
@@ -55,13 +59,16 @@ export function Match3Game({ encounter, initialState }: Match3GameProps) {
   } | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [cascadeLevel, setCascadeLevel] = useState(0)
-  const [firstMoveMade, setFirstMoveMade] = useState(false) // For endless mode - timer starts after first move
   const [swappingCells, setSwappingCells] = useState<{
     from: { row: number; col: number }
     to: { row: number; col: number }
   } | null>(null)
 
-  const keyCounterRef = useRef(0)
+  const roundRef = useRef<Match3RoundState | null>(null)
+  const sessionStartRef = useRef(0)
+  const movePendingRef = useRef(false)
+  const mountedRef = useRef(true)
+  useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false } }, [])
   const scoreRef = useRef(0)
   const gameEndingRef = useRef(false) // Prevent duplicate handleGameEnd calls
   const touchStartRef = useRef<{
@@ -70,133 +77,6 @@ export function Match3Game({ encounter, initialState }: Match3GameProps) {
     x: number
     y: number
   } | null>(null)
-
-  // Calculate total spawn weight for weighted random
-  const totalSpawnWeight = crystalTypes.reduce(
-    (sum, c) => sum + (c.spawnWeight ?? 1),
-    0,
-  )
-
-  // Generate a random crystal using weighted spawn rates
-  const getRandomCrystal = useCallback((): Cell => {
-    let random = Math.random() * totalSpawnWeight
-    for (const crystal of crystalTypes) {
-      const weight = crystal.spawnWeight ?? 1
-      if (random < weight) {
-        return { crystalId: crystal.id, key: keyCounterRef.current++ }
-      }
-      random -= weight
-    }
-    // Fallback to last crystal
-    const lastCrystal = crystalTypes[crystalTypes.length - 1]
-    return { crystalId: lastCrystal.id, key: keyCounterRef.current++ }
-  }, [crystalTypes, totalSpawnWeight])
-
-  // Initialize grid
-  const initializeGrid = useCallback((): Cell[][] => {
-    const newGrid: Cell[][] = []
-    for (let r = 0; r < rows; r++) {
-      const row: Cell[] = []
-      for (let c = 0; c < cols; c++) {
-        let cell = getRandomCrystal()
-        // Avoid initial matches of 3+
-        while (
-          (c >= 2 &&
-            row[c - 1].crystalId === cell.crystalId &&
-            row[c - 2].crystalId === cell.crystalId) ||
-          (r >= 2 &&
-            newGrid[r - 1][c].crystalId === cell.crystalId &&
-            newGrid[r - 2][c].crystalId === cell.crystalId)
-        ) {
-          cell = getRandomCrystal()
-        }
-        row.push(cell)
-      }
-      newGrid.push(row)
-    }
-    return newGrid
-  }, [rows, cols, getRandomCrystal])
-
-  // Find all matches in the grid
-  const findMatches = useCallback(
-    (currentGrid: Cell[][]): Set<string> => {
-      const matches = new Set<string>()
-
-      // Check horizontal matches
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols - 2; c++) {
-          const id = currentGrid[r][c].crystalId
-          if (
-            id === currentGrid[r][c + 1].crystalId &&
-            id === currentGrid[r][c + 2].crystalId
-          ) {
-            matches.add(`${r},${c}`)
-            matches.add(`${r},${c + 1}`)
-            matches.add(`${r},${c + 2}`)
-            // Check for 4+ matches
-            let extend = c + 3
-            while (extend < cols && currentGrid[r][extend].crystalId === id) {
-              matches.add(`${r},${extend}`)
-              extend++
-            }
-          }
-        }
-      }
-
-      // Check vertical matches
-      for (let c = 0; c < cols; c++) {
-        for (let r = 0; r < rows - 2; r++) {
-          const id = currentGrid[r][c].crystalId
-          if (
-            id === currentGrid[r + 1][c].crystalId &&
-            id === currentGrid[r + 2][c].crystalId
-          ) {
-            matches.add(`${r},${c}`)
-            matches.add(`${r + 1},${c}`)
-            matches.add(`${r + 2},${c}`)
-            // Check for 4+ matches
-            let extend = r + 3
-            while (extend < rows && currentGrid[extend][c].crystalId === id) {
-              matches.add(`${extend},${c}`)
-              extend++
-            }
-          }
-        }
-      }
-
-      return matches
-    },
-    [rows, cols],
-  )
-
-  // Check if any valid moves exist
-  const hasValidMoves = useCallback(
-    (currentGrid: Cell[][]): boolean => {
-      // Try all possible swaps
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          // Try swap right
-          if (c < cols - 1) {
-            const testGrid = currentGrid.map((row) => [...row])
-            const temp = testGrid[r][c]
-            testGrid[r][c] = testGrid[r][c + 1]
-            testGrid[r][c + 1] = temp
-            if (findMatches(testGrid).size > 0) return true
-          }
-          // Try swap down
-          if (r < rows - 1) {
-            const testGrid = currentGrid.map((row) => [...row])
-            const temp = testGrid[r][c]
-            testGrid[r][c] = testGrid[r + 1][c]
-            testGrid[r + 1][c] = temp
-            if (findMatches(testGrid).size > 0) return true
-          }
-        }
-      }
-      return false
-    },
-    [rows, cols, findMatches],
-  )
 
   const handleGameEnd = useCallback(async () => {
     // Use ref to prevent race condition with duplicate calls
@@ -219,6 +99,7 @@ export function Match3Game({ encounter, initialState }: Match3GameProps) {
     // Always pass finalScore so score-based games can be verified server-side.
     const isSuccess = hasWonNormal || hasReachedMilestone
     const res = await completeGame(encounter.id, isSuccess, finalScore)
+    completionInvalidatesRef.current = res.invalidates
 
     setResult({
       success: isSuccess && res.success,
@@ -237,224 +118,77 @@ export function Match3Game({ encounter, initialState }: Match3GameProps) {
     }
   }, [encounter.id, isEndlessMode, milestones, playSfx, winScore])
 
-  // Process matches and cascades
-  const processMatches = useCallback(
-    async (currentGrid: Cell[][], level: number = 0) => {
-      if (gameEndingRef.current) return
+  // The server owns the board, score, deadline and refill RNG. The client only
+  // animates the committed move receipt, which is replayable after response loss.
+  const handleSwipeSwap = useCallback(async (startRow: number, startCol: number, endRow: number, endCol: number) => {
+    const current = roundRef.current
+    if (!current || movePendingRef.current || gameEnded || gameEndingRef.current) return
+    if (Math.abs(endRow - startRow) + Math.abs(endCol - startCol) !== 1) return
+    if (Date.now() < current.availableAt) return
+    movePendingRef.current = true
+    setIsProcessing(true)
+    setSelectedCell(null)
+    const from = { row: startRow, col: startCol }
+    const to = { row: endRow, col: endCol }
+    const request = { encounterId: encounter.id, startTime: sessionStartRef.current, revision: current.revision, from, to, actionId: crypto.randomUUID() }
+    const response = await recoverGameAction(
+      () => submitMatch3Move(request),
+      'The move could not be confirmed. Retry to recover the same board.',
+      (result) => result.error === 'Time is up' ? undefined : result.error || (!result.round ? 'Unable to recover the board.' : undefined),
+    )
+    if (!mountedRef.current) return
+    if (!response.round) {
+      setIsProcessing(false)
+      movePendingRef.current = false
+      void handleGameEnd()
+      return
+    }
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const pause = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, reducedMotion ? 0 : ms))
+    setSwappingCells({ from, to })
+    await pause(200)
+    if (!mountedRef.current) return
+    setSwappingCells(null)
+    if (!response.accepted) {
+      setSwappingCells({ from: to, to: from })
+      await pause(200)
+      setSwappingCells(null)
+    }
+    const cascades = response.cascades || []
+    for (let index = 0; index < cascades.length; index++) {
+      if (!mountedRef.current) return
+      const cascade = cascades[index]
+      const matches = new Set(cascade.matched.map(([row, col]) => `${row},${col}`))
+      setGrid(cascade.grid.map((row, r) => row.map((cell, c) => ({ ...cell, isMatched: matches.has(`${r},${c}`) }))))
+      setCascadeLevel(index + 1)
+      setScore(cascade.score)
+      await pause(300)
+      if (!mountedRef.current) return
+      setGrid(cascades[index + 1]?.grid || response.round.grid)
+      await pause(200)
+    }
+    if (!mountedRef.current) return
+    roundRef.current = response.round
+    scoreRef.current = response.round.score
+    setScore(response.round.score)
+    setGrid(response.round.grid)
+    setCascadeLevel(0)
+    const settleDelay = Math.max(0, response.round.availableAt - Date.now())
+    if (settleDelay) await new Promise<void>((resolve) => setTimeout(resolve, settleDelay))
+    if (!mountedRef.current) return
+    setIsProcessing(false)
+    movePendingRef.current = false
+    if (!isEndlessMode && winScore && response.round.score >= winScore) void handleGameEnd()
+  }, [encounter.id, gameEnded, handleGameEnd, isEndlessMode, winScore])
 
-      const matches = findMatches(currentGrid)
-
-      if (matches.size === 0) {
-        setCascadeLevel(0)
-        setIsProcessing(false)
-
-        // Check for valid moves - if none, reshuffle the board
-        if (!hasValidMoves(currentGrid)) {
-          // Reset the board with new crystals
-          setGrid(initializeGrid())
-        }
-        return
-      }
-
-      // In endless mode, reset the turn timer when a match is made (only on first level, not cascades)
-      if (isEndlessMode && level === 0 && encounter.settings.timeLimit) {
-        if (!firstMoveMade) {
-          setFirstMoveMade(true)
-        }
-        setTimeLeft(encounter.settings.timeLimit)
-      }
-
-      // Calculate points with cascade multiplier and per-crystal points
-      const multiplier = level > 0 ? cascadeMultiplier ** level : 1
-      // Sum up points for each matched crystal (using per-crystal points or default)
-      let basePoints = 0
-      matches.forEach((pos) => {
-        const [r, c] = pos.split(',').map(Number)
-        const cell = currentGrid[r]?.[c]
-        if (cell) {
-          const crystalType = crystalTypes.find(
-            (ct) => ct.id === cell.crystalId,
-          )
-          basePoints += crystalType?.points ?? pointsPerMatch
-        }
-      })
-      const points = Math.floor(basePoints * multiplier)
-      const newScore = scoreRef.current + points
-      scoreRef.current = newScore
-      setScore(newScore)
-
-      if (!isEndlessMode && winScore && newScore >= winScore) {
-        void handleGameEnd()
-        return
-      }
-
-      // Mark matched cells
-      const markedGrid = currentGrid.map((row, r) =>
-        row.map((cell, c) => ({
-          ...cell,
-          isMatched: matches.has(`${r},${c}`),
-        })),
-      )
-      setGrid(markedGrid)
-      setCascadeLevel(level + 1)
-
-      // Wait for match animation
-      await new Promise((resolve) => setTimeout(resolve, 300))
-
-      // Remove matched cells and apply gravity
-      const afterRemoval = markedGrid.map((row) =>
-        row.map((cell) => (cell.isMatched ? null : cell)),
-      ) as (Cell | null)[][]
-
-      // Apply gravity - move cells down
-      for (let c = 0; c < cols; c++) {
-        const column: (Cell | null)[] = []
-        for (let r = rows - 1; r >= 0; r--) {
-          if (afterRemoval[r][c] !== null) {
-            column.push(afterRemoval[r][c])
-          }
-        }
-        // Fill from bottom
-        for (let r = rows - 1; r >= 0; r--) {
-          afterRemoval[r][c] = column[rows - 1 - r] || null
-        }
-      }
-
-      // Fill empty cells with new crystals
-      const filledGrid = afterRemoval.map((row) =>
-        row.map((cell) => cell || getRandomCrystal()),
-      ) as Cell[][]
-
-      setGrid(filledGrid)
-
-      // Wait for fall animation
-      await new Promise((resolve) => setTimeout(resolve, 200))
-
-      // Recursively process new matches (cascade)
-      void processMatches(filledGrid, level + 1)
-    },
-    [
-      findMatches,
-      hasValidMoves,
-      cascadeMultiplier,
-      pointsPerMatch,
-      cols,
-      rows,
-      getRandomCrystal,
-      isEndlessMode,
-      winScore,
-      handleGameEnd,
-      firstMoveMade,
-      encounter.settings.timeLimit,
-      initializeGrid,
-    ],
-  )
-
-  // Handle cell selection and swap
-  const handleCellClick = useCallback(
-    (row: number, col: number) => {
-      if (isProcessing || gameEnded) return
-
-      if (!selectedCell) {
-        setSelectedCell({ row, col })
-        return
-      }
-
-      // Check if adjacent
-      const dr = Math.abs(selectedCell.row - row)
-      const dc = Math.abs(selectedCell.col - col)
-      const isAdjacent = (dr === 1 && dc === 0) || (dr === 0 && dc === 1)
-
-      if (!isAdjacent) {
-        // Select new cell instead
-        setSelectedCell({ row, col })
-        return
-      }
-
-      // Start visual swap animation
-      const startRow = selectedCell.row
-      const startCol = selectedCell.col
-      setSwappingCells({
-        from: { row: startRow, col: startCol },
-        to: { row, col },
-      })
-      setIsProcessing(true)
-
-      // After animation, perform actual swap
-      setTimeout(() => {
-        setSwappingCells(null)
-        const newGrid = grid.map((r) => [...r])
-        const temp = newGrid[startRow][startCol]
-        newGrid[startRow][startCol] = newGrid[row][col]
-        newGrid[row][col] = temp
-
-        // Check if swap creates a match
-        const matches = findMatches(newGrid)
-        if (matches.size === 0) {
-          // Swap back with animation
-          setSwappingCells({
-            from: { row, col },
-            to: { row: startRow, col: startCol },
-          })
-          setTimeout(() => {
-            setSwappingCells(null)
-            setIsProcessing(false)
-          }, 200)
-        } else {
-          setGrid(newGrid)
-          processMatches(newGrid, 0)
-        }
-        setSelectedCell(null)
-      }, 200)
-    },
-    [selectedCell, grid, isProcessing, gameEnded, findMatches, processMatches],
-  )
-
-  // Handle swipe - perform swap based on swipe direction
-  const handleSwipeSwap = useCallback(
-    (startRow: number, startCol: number, endRow: number, endCol: number) => {
-      if (isProcessing || gameEnded) return
-      // Only allow adjacent swaps
-      const dr = endRow - startRow
-      const dc = endCol - startCol
-      if (Math.abs(dr) + Math.abs(dc) !== 1) return
-
-      // Start visual swap animation
-      setSwappingCells({
-        from: { row: startRow, col: startCol },
-        to: { row: endRow, col: endCol },
-      })
-      setIsProcessing(true)
-
-      // After animation, perform actual swap
-      setTimeout(() => {
-        setSwappingCells(null)
-        const newGrid = grid.map((r) => [...r])
-        const temp = newGrid[startRow][startCol]
-        newGrid[startRow][startCol] = newGrid[endRow][endCol]
-        newGrid[endRow][endCol] = temp
-
-        // Check if swap creates a match
-        const matches = findMatches(newGrid)
-        if (matches.size === 0) {
-          // Swap back with animation
-          setSwappingCells({
-            from: { row: endRow, col: endCol },
-            to: { row: startRow, col: startCol },
-          })
-          setTimeout(() => {
-            setSwappingCells(null)
-            setIsProcessing(false)
-          }, 200)
-        } else {
-          setGrid(newGrid)
-          processMatches(newGrid, 0)
-        }
-        setSelectedCell(null)
-      }, 200)
-    },
-    [grid, isProcessing, gameEnded, findMatches, processMatches],
-  )
+  const handleCellClick = useCallback((row: number, col: number) => {
+    if (movePendingRef.current || gameEnded) return
+    if (!selectedCell || Math.abs(selectedCell.row - row) + Math.abs(selectedCell.col - col) !== 1) {
+      setSelectedCell({ row, col })
+      return
+    }
+    void handleSwipeSwap(selectedCell.row, selectedCell.col, row, col)
+  }, [gameEnded, handleSwipeSwap, selectedCell])
 
   // Touch handlers for swipe
   const handleTouchStart = useCallback(
@@ -502,17 +236,16 @@ export function Match3Game({ encounter, initialState }: Match3GameProps) {
     [cols, rows, isProcessing, gameEnded, handleSwipeSwap],
   )
 
-  // Initialize game
+  // Restoring a session restores its exact authoritative board and score.
   const initGame = useCallback(async () => {
-    const res = await startGame(encounter.id)
-    if (!res.success) {
-      console.error('Failed to start:', res.error)
-      return
-    }
-
-    setGrid(initializeGrid())
-    setScore(0)
-    scoreRef.current = 0
+    const response = await recoverGameAction(() => startGame(encounter.id), 'Unable to restore this board.', (result) => result.roundData?.kind === 'match3' ? undefined : 'The saved board is unavailable. Retry or return to Explore.')
+    const restored = response.roundData as Match3RoundState | undefined
+    if (!mountedRef.current || restored?.kind !== 'match3') return
+    roundRef.current = restored
+    sessionStartRef.current = response.startTime
+    setGrid(restored.grid)
+    setScore(restored.score)
+    scoreRef.current = restored.score
     setGameStarted(true)
     setGameEnded(false)
     gameEndingRef.current = false
@@ -520,56 +253,26 @@ export function Match3Game({ encounter, initialState }: Match3GameProps) {
     setSelectedCell(null)
     setIsProcessing(false)
     setCascadeLevel(0)
+    setTimeLeft(restored.deadline === null ? encounter.settings.timeLimit || 0 : Math.max(0, Math.ceil((restored.deadline - Date.now()) / 1000)))
+  }, [encounter.id, encounter.settings.timeLimit])
 
-    if (res.restored && res.expiry) {
-      const remaining = Math.max(
-        0,
-        Math.floor((res.expiry - Date.now()) / 1000),
-      )
+  useEffect(() => { if (!gameStarted) void initGame() }, [gameStarted, initGame])
+
+  useEffect(() => {
+    if (!gameStarted || gameEnded || isProcessing) return
+    const tick = () => {
+      const round = roundRef.current
+      if (!round) return
+      if (!isEndlessMode && winScore && round.score >= winScore) { void handleGameEnd(); return }
+      if (round.deadline === null) return
+      const remaining = Math.max(0, Math.ceil((round.deadline - Date.now()) / 1000))
       setTimeLeft(remaining)
-    } else {
-      setTimeLeft(encounter.settings.timeLimit || 0)
+      if (remaining === 0) void handleGameEnd()
     }
-  }, [encounter.id, encounter.settings.timeLimit, initializeGrid])
-
-  useEffect(() => {
-    if (!gameStarted) initGame()
-  }, [gameStarted, initGame])
-
-  // Timer
-  useEffect(() => {
-    // In endless mode, don't start timer until first move is made
-    if (
-      !gameStarted ||
-      gameEnded ||
-      !encounter.settings.timeLimit ||
-      timeLeft <= 0
-    )
-      return
-    if (isEndlessMode && !firstMoveMade) return
-    // Pause timer during cascade processing so player doesn't lose during chains
-    if (isProcessing) return
-
-    const timer = setInterval(() => {
-      setTimeLeft((p) => {
-        if (p <= 1) {
-          handleGameEnd()
-          return 0
-        }
-        return p - 1
-      })
-    }, 1000)
+    tick()
+    const timer = setInterval(tick, 250)
     return () => clearInterval(timer)
-  }, [
-    gameStarted,
-    gameEnded,
-    timeLeft,
-    encounter.settings.timeLimit,
-    isEndlessMode,
-    firstMoveMade,
-    isProcessing,
-    handleGameEnd,
-  ])
+  }, [gameStarted, gameEnded, isProcessing, handleGameEnd, isEndlessMode, winScore])
 
   // Get crystal config by ID
   const getCrystal = (id: string): Match3Crystal | undefined => {
@@ -752,7 +455,7 @@ export function Match3Game({ encounter, initialState }: Match3GameProps) {
         <RewardResultOverlay
           result={result}
           onClose={() => {
-            refreshUser()
+            refreshUser(true, completionInvalidatesRef.current)
             router.push('/game/explore')
           }}
           icon={encounter.icon}

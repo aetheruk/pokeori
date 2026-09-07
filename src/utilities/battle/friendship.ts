@@ -1,5 +1,6 @@
 import type { Payload } from 'payload'
 import type { BattlePokemon } from './types'
+import { createEconomyRequestId, runEconomyAction } from '@/utilities/economy/transactions'
 
 function normalizeRelationshipId(value: unknown): string | undefined {
   if (!value) return undefined
@@ -15,12 +16,25 @@ export async function decrementFaintedPokemonFriendship(params: {
   payload: Payload
   pokemon?: BattlePokemon
   userId?: string
+  eventId?: string
 }): Promise<void> {
   const { payload, pokemon, userId } = params
   if (!pokemon?.id) return
+  if (pokemon.id.startsWith('enemy-') || pokemon.id.startsWith('chronicle:')) return
 
   const pokemonUserId = normalizeRelationshipId((pokemon as any).user)
   if (userId && pokemonUserId && pokemonUserId !== userId) return
+  if (params.eventId && userId) {
+    const friendship = await runEconomyAction({ userId, action: 'battle-faint-friendship',
+      requestId: createEconomyRequestId(params.eventId), payload,
+    }, async ({ payload }) => {
+      const nextPokemon = structuredClone(pokemon)
+      await decrementFaintedPokemonFriendship({ payload, pokemon: nextPokemon, userId })
+      return { friendship: nextPokemon.friendship }
+    })
+    pokemon.friendship = friendship.friendship
+    return
+  }
 
   const currentFriendship = typeof pokemon.friendship === 'number' ? pokemon.friendship : 70
 
@@ -45,6 +59,7 @@ export async function decrementFaintedPokemonFriendship(params: {
       },
     })
   } catch (error) {
-    console.error('Failed to decrement fainted Pokemon friendship', error)
+    if (error && typeof error === 'object' && 'status' in error && error.status === 404) return
+    throw error
   }
 }

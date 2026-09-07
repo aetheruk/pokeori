@@ -4,22 +4,20 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Eye, Heart } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { completeGame, startGame } from '@/app/(frontend)/game/games/actions'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { completeGame, startGame } from '@/utilities/games/client-action-recovery'
 import { GameProgressChip } from '@/components/game/shared/game-progress-chip'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
-import type {
-  TcgInspectionGameConfig,
-  TcgInspectionQuestionType,
-} from '@/data/games'
-import { tcgSetSummaries } from '@/data/tcg/summaries'
-import type { TcgCard, TcgSet } from '@/data/tcg/types'
+import type { TcgInspectionGameConfig } from '@/data/games'
+import type { InspectionCard, InspectionQuestion, InspectionRound } from '@/utilities/research/tcg-inspection'
+import { submitTcgInspectionAnswer } from '../games/tcg-inspection'
+import { recoverGameAction } from '@/utilities/games/action-recovery'
+import type { GameDataKeys } from '@/utilities/requirements/analysis'
 import { useGameMusic } from '@/hooks/useGameMusic'
-import { APP_VERSION } from '@/utilities/app-version'
 import { QuestionPrompt } from '../../locations/encounter/_components/question-prompt'
 
 interface TcgInspectionGameProps {
@@ -27,239 +25,7 @@ interface TcgInspectionGameProps {
   initialState?: any
 }
 
-interface InspectionCard extends TcgCard {
-  setId: string
-  setName: string
-}
-
-interface InspectionQuestion {
-  type: TcgInspectionQuestionType
-  prompt: string
-  targetIndex: number
-  answer: string
-  options: string[]
-}
-
-type CatalogCard = { card: TcgCard; set: TcgSet }
-type CatalogResponse<T> = { items: T[] }
-
 type Phase = 'study' | 'question'
-
-const DEFAULT_QUESTION_TYPES: TcgInspectionQuestionType[] = [
-  'name',
-  'rarity',
-  'supertype',
-  'number',
-  'artist',
-  'pokemonType',
-  'hp',
-]
-
-function shuffle<T>(items: T[]): T[] {
-  return [...items].sort(() => Math.random() - 0.5)
-}
-
-function unique(values: string[]): string[] {
-  return Array.from(new Set(values.filter(Boolean)))
-}
-
-function sample<T>(items: T[], count: number): T[] {
-  return shuffle(items).slice(0, Math.min(count, items.length))
-}
-
-function buildCardPool(
-  catalogCards: CatalogCard[],
-  config: TcgInspectionGameConfig,
-): InspectionCard[] {
-  const allowedRarities = config.settings.allowedRarities
-
-  return catalogCards
-    .map(({ card, set }) => ({
-      ...card,
-      setId: set.id,
-      setName: set.name,
-    }))
-    .filter((card) => {
-      if (!card.images?.small) return false
-      if (
-        allowedRarities?.length &&
-        (!card.rarity || !allowedRarities.includes(card.rarity))
-      ) {
-        return false
-      }
-      return true
-    })
-}
-
-function buildOptions(
-  correct: string,
-  candidates: string[],
-  size = 4,
-): string[] {
-  const wrong = sample(
-    unique(candidates).filter((candidate) => candidate !== correct),
-    size - 1,
-  )
-  return shuffle(unique([correct, ...wrong])).slice(0, size)
-}
-
-function buildQuestion(
-  cards: InspectionCard[],
-  cardPool: InspectionCard[],
-  allSets: Array<{ name: string }>,
-  questionTypes: TcgInspectionQuestionType[],
-  previousQuestion?: InspectionQuestion,
-): InspectionQuestion {
-  for (let attempt = 0; attempt < 20; attempt += 1) {
-    const question = buildQuestionCandidate(
-      cards,
-      cardPool,
-      allSets,
-      questionTypes,
-    )
-    if (
-      question.options.length > 1 &&
-      (!previousQuestion ||
-        question.type !== previousQuestion.type ||
-        question.targetIndex !== previousQuestion.targetIndex ||
-        question.answer !== previousQuestion.answer)
-    ) {
-      return question
-    }
-  }
-
-  return buildQuestionCandidate(cards, cardPool, allSets, ['name'])
-}
-
-function buildQuestionCandidate(
-  cards: InspectionCard[],
-  cardPool: InspectionCard[],
-  allSets: Array<{ name: string }>,
-  questionTypes: TcgInspectionQuestionType[],
-): InspectionQuestion {
-  const targetIndex = Math.floor(Math.random() * cards.length)
-  const target = cards[targetIndex]
-  const possibleTypes = questionTypes.filter((type) => {
-    if (type === 'rarity') return !!target.rarity
-    if (type === 'supertype') return !!target.supertype
-    if (type === 'set')
-      return unique(cardPool.map((card) => card.setName)).length > 1
-    if (type === 'number') return !!target.number
-    if (type === 'artist') return !!target.artist
-    if (type === 'pokemonType') return !!target.types?.length
-    if (type === 'hp') return !!target.hp
-    return true
-  })
-  const type =
-    possibleTypes[Math.floor(Math.random() * possibleTypes.length)] || 'name'
-  const slot = targetIndex + 1
-
-  if (type === 'rarity') {
-    const answer = target.rarity || 'Unknown'
-    return {
-      type,
-      targetIndex,
-      answer,
-      prompt: `What rarity was card ${slot}?`,
-      options: buildOptions(
-        answer,
-        cardPool.map((card) => card.rarity || '').filter(Boolean),
-      ),
-    }
-  }
-
-  if (type === 'supertype') {
-    return {
-      type,
-      targetIndex,
-      answer: target.supertype,
-      prompt: `What type was card ${slot}?`,
-      options: buildOptions(
-        target.supertype,
-        cardPool.map((card) => card.supertype),
-      ),
-    }
-  }
-
-  if (type === 'set') {
-    return {
-      type,
-      targetIndex,
-      answer: target.setName,
-      prompt: `Which set was card ${slot} from?`,
-      options: buildOptions(
-        target.setName,
-        allSets.map((set) => set.name),
-      ),
-    }
-  }
-
-  if (type === 'artist') {
-    const answer = target.artist || 'Unknown'
-    return {
-      type,
-      targetIndex,
-      answer,
-      prompt: `Who illustrated card ${slot}?`,
-      options: buildOptions(
-        answer,
-        cardPool.map((card) => card.artist || '').filter(Boolean),
-      ),
-    }
-  }
-
-  if (type === 'pokemonType') {
-    const answer = target.types?.[0] || 'Unknown'
-    return {
-      type,
-      targetIndex,
-      answer,
-      prompt: `What Pokémon type was card ${slot}?`,
-      options: buildOptions(
-        answer,
-        cardPool.flatMap((card) => card.types || []),
-      ),
-    }
-  }
-
-  if (type === 'hp') {
-    const answer = target.hp || 'Unknown'
-    return {
-      type,
-      targetIndex,
-      answer,
-      prompt: `How much HP did card ${slot} have?`,
-      options: buildOptions(
-        answer,
-        cardPool.map((card) => card.hp || '').filter(Boolean),
-      ),
-    }
-  }
-
-  if (type === 'number') {
-    return {
-      type,
-      targetIndex,
-      answer: target.number,
-      prompt: `What collector number was card ${slot}?`,
-      options: buildOptions(
-        target.number,
-        cardPool.map((card) => card.number),
-      ),
-    }
-  }
-
-  return {
-    type: 'name',
-    targetIndex,
-    answer: target.name,
-    prompt: `Which card was shown as card ${slot}?`,
-    options: buildOptions(
-      target.name,
-      cardPool.map((card) => card.name),
-    ),
-  }
-}
 
 export function TcgInspectionGame({
   encounter,
@@ -276,26 +42,6 @@ export function TcgInspectionGame({
   const studySeconds = settings.studySeconds || 30
   const maxLives = settings.lives || 2
 
-  const selectedSetIds = useMemo(() => {
-    if (settings.allowedSetIds?.length) return settings.allowedSetIds
-
-    const start = Array.from(encounter.id).reduce(
-      (total, character) => total + character.charCodeAt(0),
-      0,
-    )
-    return Array.from(
-      { length: Math.min(8, tcgSetSummaries.length) },
-      (_, i) => tcgSetSummaries[(start + i) % tcgSetSummaries.length].id,
-    )
-  }, [encounter.id, settings.allowedSetIds])
-  const allSets = useMemo(
-    () => tcgSetSummaries.filter((set) => selectedSetIds.includes(set.id)),
-    [selectedSetIds],
-  )
-  const questionTypes = settings.questionTypes?.length
-    ? settings.questionTypes
-    : DEFAULT_QUESTION_TYPES
-
   const [gameStarted, setGameStarted] = useState(false)
   const [gameEnded, setGameEnded] = useState(false)
   const [phase, setPhase] = useState<Phase>('study')
@@ -310,7 +56,6 @@ export function TcgInspectionGame({
   )
   const [cards, setCards] = useState<InspectionCard[]>([])
   const [questions, setQuestions] = useState<InspectionQuestion[]>([])
-  const [questionPool, setQuestionPool] = useState<InspectionCard[]>([])
   const [answerStatus, setAnswerStatus] = useState<
     'correct' | 'incorrect' | null
   >(null)
@@ -319,44 +64,21 @@ export function TcgInspectionGame({
 
   const correctAnswersRef = useRef(0)
   const endingRef = useRef(false)
+  const roundRef = useRef<InspectionRound | null>(null)
+  const startTimeRef = useRef(0)
+  const submittingRef = useRef(false)
+  const completionInvalidatesRef = useRef<GameDataKeys[] | undefined>(undefined)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const createSession = useCallback(
-    (availableCards: InspectionCard[]) => {
-      if (availableCards.length < packSize) {
-        setError('Not enough TCG cards are available for this configuration.')
-        return
-      }
-
-      const sessionCards = sample(availableCards, packSize)
-      const firstQuestion = buildQuestion(
-        sessionCards,
-        availableCards,
-        allSets,
-        questionTypes,
-      )
-      setCards(sessionCards)
-      setQuestionPool(availableCards)
-      setQuestions([firstQuestion])
-      setAnswerStatus(null)
-      setPreviewIndex(0)
-      setPreviewDirection(1)
-      setQuestionIndex(0)
-      setCorrectAnswers(0)
-      correctAnswersRef.current = 0
-      setLives(maxLives)
-      setStudyLeft(studySeconds)
-      setTimeLeft(settings.timeLimit)
-      setPhase('study')
-    },
-    [
-      allSets,
-      maxLives,
-      packSize,
-      questionTypes,
-      settings.timeLimit,
-      studySeconds,
-    ],
-  )
+  const applyRound = useCallback((round: InspectionRound) => {
+    roundRef.current = round
+    setCards(round.cards)
+    setQuestions(round.questions)
+    setQuestionIndex(round.index)
+    setCorrectAnswers(round.score)
+    correctAnswersRef.current = round.score
+    setLives(round.lives)
+  }, [])
 
   const finishGame = useCallback(
     async (finalCorrectAnswers: number) => {
@@ -366,6 +88,7 @@ export function TcgInspectionGame({
 
       const success = finalCorrectAnswers >= requiredAnswers
       const res = await completeGame(encounter.id, success, finalCorrectAnswers)
+      completionInvalidatesRef.current = res.invalidates
       setResult({
         success: success && res.success,
         message:
@@ -379,109 +102,60 @@ export function TcgInspectionGame({
     [encounter.id, playSfx, requiredAnswers],
   )
 
-  const advanceQuestion = useCallback(
-    (nextCorrectAnswers: number, nextLives: number) => {
-      if (
-        endingRef.current ||
-        nextLives <= 0 ||
-        nextCorrectAnswers >= requiredAnswers
-      ) {
-        void finishGame(nextCorrectAnswers)
+  const handleAnswer = useCallback(async (answer: string) => {
+    const round = roundRef.current
+    if (!round || answerStatus || gameEnded || submittingRef.current) return
+    submittingRef.current = true
+    setIsSubmitting(true)
+    const request = { encounterId: encounter.id, startTime: startTimeRef.current,
+      revision: round.revision, answer, actionId: crypto.randomUUID() }
+    try {
+      const response = await recoverGameAction(
+        () => submitTcgInspectionAnswer(request),
+        'We could not confirm this answer. Retry to save the same answer.',
+        (result) => result.error === 'Time is up' ? undefined : result.success ? undefined : result.error,
+      )
+      if (!response.success || !response.round) {
+        if (response.error === 'Time is up') await finishGame(round.score)
         return
       }
-      setQuestions((currentQuestions) => [
-        ...currentQuestions,
-        buildQuestion(
-          cards,
-          questionPool,
-          allSets,
-          questionTypes,
-          currentQuestions.at(-1),
-        ),
-      ])
-      setQuestionIndex((value) => value + 1)
+      roundRef.current = response.round
+      setAnswerStatus(response.correct ? 'correct' : 'incorrect')
+      setCorrectAnswers(response.round.score)
+      correctAnswersRef.current = response.round.score
+      setLives(response.round.lives)
+      playSfx(response.correct ? 'good' : 'bad')
+      await new Promise((resolve) => setTimeout(resolve, Math.max(0, response.round!.availableAt - Date.now())))
+      applyRound(response.round)
       setAnswerStatus(null)
-    },
-    [allSets, cards, finishGame, questionPool, questionTypes, requiredAnswers],
-  )
-
-  const handleAnswer = useCallback(
-    (answer: string) => {
-      const question = questions[questionIndex]
-      if (!question || answerStatus || gameEnded) return
-
-      const correct = answer === question.answer
-      setAnswerStatus(correct ? 'correct' : 'incorrect')
-      const nextCorrectAnswers = correct
-        ? correctAnswersRef.current + 1
-        : correctAnswersRef.current
-      const nextLives = correct ? lives : Math.max(0, lives - 1)
-      setLives(nextLives)
-      if (correct) {
-        setCorrectAnswers(nextCorrectAnswers)
-        correctAnswersRef.current = nextCorrectAnswers
-        playSfx('good')
-      } else {
-        playSfx('bad')
-      }
-
-      window.setTimeout(
-        () => advanceQuestion(nextCorrectAnswers, nextLives),
-        1350,
-      )
-    },
-    [
-      advanceQuestion,
-      gameEnded,
-      lives,
-      playSfx,
-      questionIndex,
-      questions,
-      answerStatus,
-    ],
-  )
+      if (response.gameOver) await finishGame(response.round.score)
+    } finally {
+      submittingRef.current = false
+      setIsSubmitting(false)
+    }
+  }, [answerStatus, gameEnded, encounter.id, applyRound, finishGame, playSfx])
 
   useEffect(() => {
     let mounted = true
-
     async function start() {
-      const params = new URLSearchParams({
-        v: APP_VERSION,
-        setIds: selectedSetIds.join(','),
-        limit: '80',
-        sampleSeed: encounter.id,
-      })
-      if (settings.allowedRarities?.length) {
-        params.set('rarities', settings.allowedRarities.join(','))
-      }
-      const [res, catalogResponse] = await Promise.all([
-        startGame(encounter.id),
-        fetch(`/api/game/catalog/tcg?${params}`, {
-          cache: 'force-cache',
-        }),
-      ])
+      const res = await startGame(encounter.id)
       if (!mounted) return
-      if (!res.success) {
-        setError(res.error || 'Could not start booster inspection.')
+      if (!res.success || res.roundData?.kind !== 'tcg-inspection') {
+        setError(res.error || 'Could not restore this inspection.')
         return
       }
-      if (!catalogResponse.ok) {
-        setError('Could not load the inspection card catalog.')
-        return
-      }
-      const catalog =
-        (await catalogResponse.json()) as CatalogResponse<CatalogCard>
-      if (!mounted) return
-      const loadedPool = buildCardPool(catalog.items, encounter)
+      const round = res.roundData as InspectionRound
+      startTimeRef.current = res.startTime || 0
+      applyRound(round)
       setGameStarted(true)
-      createSession(loadedPool)
+      setStudyLeft(Math.max(0, Math.ceil((round.studyUntil - Date.now()) / 1000)))
+      setTimeLeft(Math.max(0, Math.ceil((round.deadline - Date.now()) / 1000)))
+      setPhase(round.index > 0 || Date.now() >= round.studyUntil ? 'question' : 'study')
+      if (round.lives <= 0 || round.score >= requiredAnswers) await finishGame(round.score)
     }
-
     void start()
-    return () => {
-      mounted = false
-    }
-  }, [createSession, encounter, selectedSetIds])
+    return () => { mounted = false }
+  }, [encounter.id, applyRound, finishGame, requiredAnswers])
 
   useEffect(() => {
     if (!gameStarted || gameEnded) return
@@ -529,7 +203,7 @@ export function TcgInspectionGame({
 
   const returnToExplore = async () => {
     try {
-      await refreshUser(false)
+      await refreshUser(false, completionInvalidatesRef.current)
     } catch (refreshError) {
       console.error('Failed to refresh TCG inspection progress', refreshError)
     }
@@ -697,7 +371,7 @@ export function TcgInspectionGame({
             <div className="relative z-10 mx-auto flex h-full min-h-[60dvh] w-full max-w-3xl flex-col justify-center">
               <QuestionPrompt
                 currentQuestion={promptQuestion}
-                questionLoading={false}
+                questionLoading={isSubmitting}
                 answerStatus={answerStatus}
                 handleAnswer={handleAnswer as any}
               />

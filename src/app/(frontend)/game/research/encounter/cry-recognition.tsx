@@ -1,5 +1,7 @@
 'use client'
 
+import type { GameDataKeys } from '@/utilities/requirements/analysis'
+
 import { AnimatePresence, motion } from 'framer-motion'
 import { Check, Loader2, Timer, Volume2, VolumeX, X } from 'lucide-react'
 import Image from 'next/image'
@@ -30,7 +32,7 @@ import {
   completeGame,
   startGame,
   submitGameAnswer,
-} from '@/app/(frontend)/game/games/actions'
+} from '@/utilities/games/client-action-recovery'
 
 interface CryRecognitionGameProps {
   encounter: GameItem
@@ -47,6 +49,7 @@ export function CryRecognitionGame({
   const { playSfx } = useAudio()
   const router = useRouter()
   const { refreshUser } = useUser()
+  const completionInvalidatesRef = useRef<GameDataKeys[] | undefined>(undefined)
   const winRateNum =
     typeof encounter.settings.winRate === 'number'
       ? encounter.settings.winRate
@@ -278,6 +281,7 @@ export function CryRecognitionGame({
           encounter.id,
           result.wins >= (result.requiredWins || 5),
         )
+        completionInvalidatesRef.current = completeResult.invalidates
         if (completeResult.success && completeResult.summary) {
           setSuccess(true)
           setResult({
@@ -318,6 +322,7 @@ export function CryRecognitionGame({
 
       if (result.gameOver) {
         const completeResult = await completeGame(encounter.id, false)
+        completionInvalidatesRef.current = completeResult.invalidates
         setSuccess(false)
         setResult({
           success: false,
@@ -585,7 +590,7 @@ export function CryRecognitionGame({
         <RewardResultOverlay
           result={result}
           onClose={() => {
-            refreshUser()
+            refreshUser(true, completionInvalidatesRef.current)
             router.push('/game/explore')
           }}
           icon={encounter.icon}

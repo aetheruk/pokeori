@@ -28,13 +28,29 @@ import { EVOLUTIONS } from '@/data/evolutions'
 import { DEED_POLL_ITEM_ID } from '@/data/items/special-item-ids'
 import { getUserInventoryMap } from '@/utilities/user-state'
 import { getUser, serializePokemon, type StatName } from './utils'
+import { acquireActionLock, checkActionRateLimit, releaseActionLock } from '@/utilities/game-integrity'
+import { POKEMON_BOX_POPULATE } from '@/utilities/pokemon/box-query'
 
-export async function identifyPokemon(pokemonId: string, userLevel: number) {
-  const payload = await getPayload({ config })
-  const updatedPokemon = await identifyPokemonUtil(payload, pokemonId, userLevel)
-  revalidatePath('/game/pokemon')
-
-  return updatedPokemon
+export async function identifyPokemon(pokemonId: string, _userLevel?: number) {
+  const user = await getUser()
+  if (!user) throw new Error('Unauthorized')
+  if (typeof pokemonId !== 'string' || !/^[a-f0-9]{24}$/i.test(pokemonId)) throw new Error('Invalid Pokemon')
+  const rate = await checkActionRateLimit(user.id, 'identify-pokemon', 60, 60)
+  if (!rate.allowed) throw new Error('Too many identification attempts')
+  const lock = await acquireActionLock(`lock:pokemon:identify:${pokemonId}`, 15)
+  if (!lock.acquired) throw new Error('Identification is already in progress')
+  try {
+    const payload = await getPayload({ config })
+    const pokemon = await payload.findByID({ collection: 'pokemon', id: pokemonId, depth: 0 })
+    const ownerId = typeof pokemon.user === 'string' ? pokemon.user : pokemon.user.id
+    if (ownerId !== user.id) throw new Error('Unauthorized')
+    const userLevel = Math.max(1, Math.min(50, user.skills?.catching?.level || 1))
+    await identifyPokemonUtil(payload, pokemonId, userLevel)
+    revalidatePath('/game/pokemon')
+    return payload.findByID({ collection: 'pokemon', id: pokemonId, depth: 1, populate: POKEMON_BOX_POPULATE })
+  } finally {
+    await releaseActionLock(lock)
+  }
 }
 
 export async function increaseEV(pokemonId: string, stat: StatName, amount: number) {

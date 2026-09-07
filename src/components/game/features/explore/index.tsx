@@ -359,8 +359,13 @@ function ExploreListContent({
   }
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: Delegated pointer taps have an equivalent native Struggle button for keyboard users.
     <div
+      role="presentation"
       onClick={handleBlackoutTap}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') event.stopPropagation()
+      }}
       onAnimationEnd={(event) => {
         if (event.animationName === 'pokeori-blackout-shake') {
           setBlackoutShaking(false)
@@ -375,6 +380,14 @@ function ExploreListContent({
     >
       {isTakeover && <BlackoutBackdrop />}
       {isTakeover && <BlackoutUnowns trainerName={trainerName} />}
+      {isTakeover && !struggleCompleted && !eggRevealed && (
+        <button
+          type="button"
+          className="sr-only focus:not-sr-only focus:absolute focus:bottom-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-game-surface focus:p-3 focus:text-game-ink"
+        >
+          Struggle free ({20 - goldenTapCount} presses remaining)
+        </button>
+      )}
       {isTakeover && (
         <BlackoutGoldenGlow
           tapCount={goldenTapCount}

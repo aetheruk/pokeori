@@ -88,6 +88,33 @@ class RedisWrapper {
     return await this.getClient().set(key, stringValue)
   }
 
+  /** Atomically advances a session and saves its retry receipt if it is unchanged. */
+  async setManyIfValue(
+    key: string,
+    expectedValue: unknown,
+    writes: Array<{ key: string; value: unknown; ttlSeconds: number }>,
+  ): Promise<boolean> {
+    if (!writes.length || writes.some((write) => !Number.isSafeInteger(write.ttlSeconds) || write.ttlSeconds <= 0)) {
+      throw new Error('Invalid atomic Redis writes')
+    }
+    const script = `
+      if redis.call('GET', KEYS[1]) ~= ARGV[1] then return 0 end
+      for i = 2, #KEYS do
+        redis.call('SET', KEYS[i], ARGV[2 * i - 2], 'EX', ARGV[2 * i - 1])
+      end
+      return 1
+    `
+    const result = await this.getClient().eval(
+      script,
+      writes.length + 1,
+      key,
+      ...writes.map((write) => write.key),
+      JSON.stringify(expectedValue),
+      ...writes.flatMap((write) => [JSON.stringify(write.value), write.ttlSeconds]),
+    )
+    return Number(result) === 1
+  }
+
   async del(key: string): Promise<number> {
     return await this.getClient().del(key)
   }

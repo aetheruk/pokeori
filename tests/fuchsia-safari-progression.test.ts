@@ -1141,7 +1141,7 @@ describe('Fuchsia Gym and Safari progression', () => {
   })
 
   test('Safari Stamina Notes apply through expedition configuration', async () => {
-    const source = await Bun.file('src/utilities/expeditions/actions.ts').text()
+    const source = await Bun.file('src/utilities/expeditions/server.ts').text()
 
     expect(source).toContain('const staminaNotes = expedition.staminaNoteLimit')
     expect(source).toContain('expedition.staminaNoteLimit,')

@@ -37,6 +37,7 @@ export async function completeGame(
   collectedEndlessRewards?: Record<string, number>,
   collectedRockPushRewardIds?: string[],
   artAcademyDrawing?: string,
+  gameplayProof?: unknown,
 ) {
   return completeGameActivity(
     'game',
@@ -47,6 +48,7 @@ export async function completeGame(
     collectedEndlessRewards,
     collectedRockPushRewardIds,
     artAcademyDrawing,
+    gameplayProof,
   )
 }
 

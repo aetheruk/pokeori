@@ -105,8 +105,8 @@ export async function submitPveTurn(
 
     // Dimensional Shift
     if (powerCommand.kind === 'dimensional-shift') {
-      const { useDimensionalShift } = await import('../powers/dimensional')
-      const result = await useDimensionalShift(
+      const { useDimensionalShift: applyDimensionalShift } = await import('../powers/dimensional')
+      const result = await applyDimensionalShift(
         state,
         user.id,
         powerCommand.shiftType,

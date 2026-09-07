@@ -2,6 +2,8 @@ import { createHash, randomUUID } from 'node:crypto'
 import configPromise from '@payload-config'
 import * as PayloadAPI from 'payload'
 import type { Payload, PayloadRequest } from 'payload'
+import { decodeReceiptResponse, encodeReceiptResponse } from './receipt-response'
+import { startActionPerformance } from '@/utilities/action-performance'
 import {
   acquireActionLock,
   releaseActionLock,
@@ -26,6 +28,8 @@ export interface RunEconomyActionOptions {
   action: string
   requestId: string
   payload?: Payload
+  /** Server-derived semantic identities for the same logical action. */
+  aliasRequestIds?: string[]
 }
 
 export class EconomyActionBusyError extends Error {
@@ -150,7 +154,7 @@ async function findReceipt<T>(
   payload: Payload,
   receiptKey: string,
   req?: PayloadRequest,
-): Promise<T | null> {
+): Promise<{ response: T } | null> {
   const result = await (payload as any).find({
     collection: RECEIPT_COLLECTION,
     where: { key: { equals: receiptKey } },
@@ -160,7 +164,22 @@ async function findReceipt<T>(
     overrideAccess: true,
     ...(req ? { req } : {}),
   })
-  return (result.docs?.[0]?.response as T | undefined) ?? null
+  const receipt = result.docs?.[0]
+  return receipt ? { response: await decodeReceiptResponse(receipt) as T } : null
+}
+
+/** Reads a durable settlement inside an optional existing transaction. */
+export async function getEconomyActionResult<T>(
+  options: RunEconomyActionOptions,
+  req?: PayloadRequest,
+): Promise<T | null> {
+  const payload = options.payload || (await PayloadAPI.getPayload({ config: configPromise }))
+  const receipt = await findReceipt<T>(
+    payload,
+    buildReceiptKey(options.userId, options.action, options.requestId),
+    req,
+  )
+  return receipt ? receipt.response : null
 }
 
 /**
@@ -171,9 +190,31 @@ export async function runEconomyAction<T>(
   options: RunEconomyActionOptions,
   operation: (context: EconomyTransactionContext) => Promise<T>,
 ): Promise<T> {
+  const timing = startActionPerformance('economy')
+  let replayed = false
+  try {
+    const response = await executeEconomyAction(options, operation, timing, () => { replayed = true })
+    timing.finish(replayed ? 'replay' : 'success')
+    return response
+  } catch (error) {
+    timing.finish(error instanceof EconomyActionBusyError ? 'busy' :
+      error instanceof EconomyTransactionsUnavailableError ? 'unavailable' : 'error')
+    throw error
+  }
+}
+
+async function executeEconomyAction<T>(
+  options: RunEconomyActionOptions,
+  operation: (context: EconomyTransactionContext) => Promise<T>,
+  timing: ReturnType<typeof startActionPerformance>,
+  replay: () => void,
+): Promise<T> {
   if (
     !isValidEconomyActionToken(options.action) ||
-    !isValidEconomyActionToken(options.requestId)
+    !isValidEconomyActionToken(options.requestId) ||
+    (options.aliasRequestIds !== undefined &&
+      (!Array.isArray(options.aliasRequestIds) || options.aliasRequestIds.length > 8 ||
+        options.aliasRequestIds.some((id) => !isValidEconomyActionToken(id))))
   ) {
     throw new Error('Invalid economy action identity.')
   }
@@ -189,8 +230,17 @@ export async function runEconomyAction<T>(
     options.action,
     options.requestId,
   )
-  const existing = await findReceipt<T>(payload, receiptKey)
-  if (existing !== null) return existing
+  const identities = [...new Set([options.requestId, ...(options.aliasRequestIds || [])])]
+  const receiptKeys = identities.map((id) => buildReceiptKey(options.userId, options.action, id))
+  async function findCommitted(req?: PayloadRequest): Promise<{ response: T } | null> {
+    for (const key of receiptKeys) {
+      const response = await findReceipt<T>(payload, key, req)
+      if (response !== null) return response
+    }
+    return null
+  }
+  const existing = await findCommitted()
+  if (existing !== null) { replay(); return existing.response }
 
   const lock = await acquireActionLock(
     `lock:economy:${options.userId}`,
@@ -199,23 +249,21 @@ export async function runEconomyAction<T>(
   if (!lock.acquired) throw new EconomyActionBusyError()
 
   try {
-    const repeated = await findReceipt<T>(payload, receiptKey)
-    if (repeated !== null) return repeated
+    const repeated = await findCommitted()
+    if (repeated !== null) { replay(); return repeated.response }
 
     for (let attempt = 1; attempt <= MAX_TRANSACTION_ATTEMPTS; attempt += 1) {
+      timing.attempt()
       const req = await PayloadAPI.createLocalReq({}, payload)
       const started = await PayloadAPI.initTransaction(req)
       if (!started) throw new EconomyTransactionsUnavailableError()
 
       try {
-        const transactionalReceipt = await findReceipt<T>(
-          payload,
-          receiptKey,
-          req,
-        )
+        const transactionalReceipt = await findCommitted(req)
         if (transactionalReceipt !== null) {
           await PayloadAPI.commitTransaction(req)
-          return transactionalReceipt
+          replay()
+          return transactionalReceipt.response
         }
 
         const response = await operation({
@@ -227,31 +275,32 @@ export async function runEconomyAction<T>(
           receiptKey,
         })
 
-        await (payload as any).create({
+        const storedResponse = await encodeReceiptResponse(response)
+        for (const [index, requestId] of identities.entries()) {
+          await (payload as any).create({
           collection: RECEIPT_COLLECTION,
           data: {
-            key: receiptKey,
+            key: receiptKeys[index],
             user: options.userId,
             action: options.action,
-            requestId: options.requestId,
-            response,
+            requestId,
+            ...storedResponse,
             committedAt: new Date().toISOString(),
           },
           depth: 0,
           overrideAccess: true,
           req,
         })
+        }
 
         await PayloadAPI.commitTransaction(req)
         return response
       } catch (error) {
         try {
           await PayloadAPI.killTransaction(req)
-        } catch (rollbackError) {
-          console.error(
-            'Failed to roll back economy transaction',
-            rollbackError,
-          )
+        } catch {
+          timing.rollbackError()
+          console.error('Failed to roll back economy transaction')
         }
 
         if (
@@ -261,14 +310,15 @@ export async function runEconomyAction<T>(
               'UnknownTransactionCommitResult',
             ))
         ) {
-          const committed = await findReceipt<T>(payload, receiptKey)
-          if (committed !== null) return committed
+          const committed = await findCommitted()
+          if (committed !== null) { replay(); return committed.response }
         }
 
         if (
           isTransientTransactionError(error) &&
           attempt < MAX_TRANSACTION_ATTEMPTS
         ) {
+          timing.retry()
           continue
         }
         throw error

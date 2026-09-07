@@ -42,19 +42,6 @@ function ExploreGridComponent({
   setActiveShop,
   setSelectedItem,
 }: ExploreGridProps) {
-  if (filteredItems.length === 0 && !randomEvent && !vsSeekerEvent) {
-    if (hideEmptyState) return null
-    return (
-      <div
-        className="mx-auto max-w-xl rounded-lg border border-dashed border-game-border-strong bg-game-canvas/60 px-4 py-10 text-center text-sm font-medium text-game-muted"
-        role="status"
-        aria-live="polite"
-      >
-        Nothing found in this area.
-      </div>
-    )
-  }
-
   const typeDisplayNames = useMemo<Record<string, string>>(
     () => ({
       challenge: 'Challenges',
@@ -273,6 +260,19 @@ function ExploreGridComponent({
       return [{ type, items: sortedItems }]
     })
   }, [filteredItems])
+
+  if (filteredItems.length === 0 && !randomEvent && !vsSeekerEvent) {
+    if (hideEmptyState) return null
+    return (
+      <div
+        className="mx-auto max-w-xl rounded-lg border border-dashed border-game-border-strong bg-game-canvas/60 px-4 py-10 text-center text-sm font-medium text-game-muted"
+        role="status"
+        aria-live="polite"
+      >
+        Nothing found in this area.
+      </div>
+    )
+  }
 
   return (
     <div

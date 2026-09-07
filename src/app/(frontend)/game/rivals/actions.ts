@@ -18,7 +18,7 @@ import {
 import {
   recordExpeditionActivityResult,
   type ExpeditionProgressSnapshot,
-} from '@/utilities/expeditions/actions'
+} from '@/utilities/expeditions/server'
 import { getUserCompletedTasksMap, setUserCompletedTasksMap } from '@/utilities/user-state'
 
 export type SelectRivalResult = {

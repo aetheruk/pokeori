@@ -1,12 +1,14 @@
 'use client'
 
+import type { GameDataKeys } from '@/utilities/requirements/analysis'
+
 import { ChevronDown, Coins, DoorOpen, Trophy } from 'lucide-react'
 import Matter from 'matter-js'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { completeGame, startGame } from '@/app/(frontend)/game/games/actions'
+import { completeGame, startGame } from '@/utilities/games/client-action-recovery'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { CurrencySprite } from '@/components/ui/currency-sprite'
@@ -30,30 +32,20 @@ import type {
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
 import {
-  getPachinkoBonusFan,
   getPachinkoBucketSensor,
-  getPachinkoDropX,
   PACHINKO_BONUS_BALL_COUNT,
   PACHINKO_BUCKET_RAIL_WIDTH,
-  PACHINKO_DROP_TIMEOUT_MS,
   PACHINKO_WALL_WIDTH,
 } from '@/utilities/research/pachinko-physics'
+import { recoverGameAction } from '@/utilities/games/action-recovery'
+import type { PachinkoPlayback } from '@/utilities/research/pachinko-simulation'
+import { samplePachinkoPosition } from '@/utilities/research/pachinko-playback'
 import { completePachinkoRound } from '../games/pachinko'
 
 interface PachinkoGameProps {
   encounter: PachinkoGameConfig
   initialState?: any
   state?: any
-}
-
-interface ActivePachinkoRound {
-  roundId: string
-  dropX: number
-  mode: 'normal' | 'bonus'
-  triggerBucketId?: string
-  pendingBodyIds: Set<number>
-  outcomeBucketIds: Array<string | null>
-  settlementStarted: boolean
 }
 
 function getRewardLabel(reward: any) {
@@ -139,16 +131,14 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
   const engineRef = useRef<Matter.Engine | null>(null)
   const runnerRef = useRef<Matter.Runner | null>(null)
   const renderRef = useRef<Matter.Render | null>(null)
-  const dropTimeoutsRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(
-    new Map(),
-  )
-  const activeRoundRef = useRef<ActivePachinkoRound | null>(null)
+  const playbackFrameRef = useRef(0)
+  const roundPendingRef = useRef(false)
   const bonusTargetBodiesRef = useRef<Map<string, Matter.Body[]>>(new Map())
   const bonusTargetsInWorldRef = useRef(true)
-  const settledBodyIdsRef = useRef<Set<number>>(new Set())
   const router = useRouter()
   const { playSfx } = useAudio()
   const { user, refreshUser } = useUser()
+  const completionInvalidatesRef = useRef<GameDataKeys[] | undefined>(undefined)
 
   const [isDropping, setIsDropping] = useState(false)
   const [arrowPosition, setArrowPosition] = useState(50) // Percentage 0-100
@@ -198,10 +188,7 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      for (const timeout of dropTimeoutsRef.current.values()) {
-        clearTimeout(timeout)
-      }
-      dropTimeoutsRef.current.clear()
+      cancelAnimationFrame(playbackFrameRef.current)
       if (renderRef.current) {
         Matter.Render.stop(renderRef.current)
         if (renderRef.current.canvas) {
@@ -228,8 +215,7 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
       Render = Matter.Render,
       Runner = Matter.Runner,
       Bodies = Matter.Bodies,
-      Composite = Matter.Composite,
-      Events = Matter.Events
+      Composite = Matter.Composite
 
     const engine = Engine.create()
     engineRef.current = engine
@@ -400,107 +386,11 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
       floorSensor,
     ])
 
-    // Collision Event
-    Events.on(engine, 'collisionStart', (event) => {
-      const pairs = event.pairs
-
-      pairs.forEach((pair) => {
-        const bodyA = pair.bodyA
-        const bodyB = pair.bodyB
-
-        const ball =
-          bodyA.label === 'BALL' ? bodyA : bodyB.label === 'BALL' ? bodyB : null
-        // Filter out bucket walls - only match bucket sensors (BUCKET_left, BUCKET_center, etc.)
-        const bucket =
-          bodyA.label.startsWith('BUCKET_') && bodyA.label !== 'BUCKET_WALL'
-            ? bodyA
-            : bodyB.label.startsWith('BUCKET_') && bodyB.label !== 'BUCKET_WALL'
-              ? bodyB
-              : null
-        const floor =
-          bodyA.label === 'FLOOR'
-            ? bodyA
-            : bodyB.label === 'FLOOR'
-              ? bodyB
-              : null
-
-        if (ball && bucket) {
-          const bucketId = bucket.label.replace('BUCKET_', '')
-          handleBucketEntry(bucketId, ball)
-        } else if (ball && floor) {
-          handleFloorHit(ball)
-        }
-      })
-    })
-
     Render.run(render)
     const runner = Runner.create()
     runnerRef.current = runner
     Runner.run(runner, engine)
   }, [config, themeColour])
-
-  const animateBallIntoBucket = (ballBody: Matter.Body, bucketId: string) => {
-    return new Promise<void>((resolve) => {
-      const engine = engineRef.current
-      if (!engine) {
-        resolve()
-        return
-      }
-
-      const bucket = config.board.buckets.find((entry) => entry.id === bucketId)
-      if (!bucket) {
-        resolve()
-        return
-      }
-
-      const targetX = bucket.x
-      const targetY = bucket.y
-
-      Matter.Body.setVelocity(ballBody, { x: 0, y: 0 })
-      Matter.Body.setAngularVelocity(ballBody, 0)
-      Matter.Body.setPosition(ballBody, { x: targetX, y: targetY })
-      Matter.Body.setStatic(ballBody, true)
-
-      const holdMs = 220
-      const shrinkMs = 420
-      const initialRadius = Math.max(1, config.ballRadius || 8)
-      let currentScale = 1
-      let start: number | null = null
-
-      const step = (timestamp: number) => {
-        if (!start) start = timestamp
-        const elapsed = timestamp - start
-
-        if (elapsed < holdMs) {
-          requestAnimationFrame(step)
-          return
-        }
-
-        const progress = Math.min(1, (elapsed - holdMs) / shrinkMs)
-        const nextScale = Math.max(0.02, 1 - progress)
-        Matter.Body.scale(
-          ballBody,
-          nextScale / currentScale,
-          nextScale / currentScale,
-        )
-        currentScale = nextScale
-        Matter.Body.setPosition(ballBody, {
-          x: targetX,
-          y: targetY + progress * initialRadius * 0.8,
-        })
-
-        if (progress < 1) {
-          requestAnimationFrame(step)
-          return
-        }
-
-        Matter.Composite.remove(engine.world, ballBody)
-        resolve()
-      }
-
-      requestAnimationFrame(step)
-    })
-  }
 
   const setBonusTargetsActive = (active: boolean) => {
     const engine = engineRef.current
@@ -517,60 +407,73 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
     bonusTargetsInWorldRef.current = active
   }
 
-  const spawnRoundBall = ({
-    round,
-    x,
-    xVelocity,
-  }: {
-    round: ActivePachinkoRound
-    x: number
-    xVelocity: number
-  }) => {
+  const playRound = async (playback: PachinkoPlayback) => {
     const engine = engineRef.current
     if (!engine) return
-
-    const ballRadius = config.ballRadius || 8
-    const ball = Matter.Bodies.circle(x, 20, ballRadius, {
-      restitution: config.ballBounciness || 0.6,
-      friction: 0.001,
-      mass: 5,
-      label: 'BALL',
-      plugin: { roundId: round.roundId },
-      render: { fillStyle: '#fff' },
-    })
-
-    round.pendingBodyIds.add(ball.id)
-    Matter.Composite.add(engine.world, ball)
-    Matter.Body.setVelocity(ball, { x: xVelocity, y: 0 })
-
-    const timeout = setTimeout(() => {
-      void resolvePachinkoBall({ ballBody: ball })
-    }, PACHINKO_DROP_TIMEOUT_MS)
-    dropTimeoutsRef.current.set(ball.id, timeout)
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    for (const phase of playback.phases) {
+      if (engineRef.current !== engine) return
+      setIsBonusDrop(phase.mode === 'bonus')
+      setBonusTargetsActive(phase.mode !== 'bonus')
+      if (phase.mode === 'bonus') setLastDropMessage('Bonus drop: five balls in play.')
+      const balls = phase.balls.map((trace) => {
+        const position = trace.positions[0] || [0, 0]
+        const body = Matter.Bodies.circle(position[0], position[1], config.ballRadius || 8, {
+          isStatic: true, isSensor: true, collisionFilter: { mask: 0 },
+          render: { fillStyle: '#fff' },
+        })
+        Matter.Composite.add(engine.world, body)
+        return body
+      })
+      await new Promise<void>((resolve) => {
+        const duration = Math.max(0, ...phase.balls.map((ball) => (ball.positions.length - 1) * playback.sampleIntervalMs))
+        let started: number | undefined
+        const frame = (timestamp: number) => {
+          if (engineRef.current !== engine) { resolve(); return }
+          started ??= timestamp
+          const elapsed = reducedMotion ? duration : timestamp - started
+          phase.balls.forEach((trace, index) => {
+            const position = samplePachinkoPosition(trace.positions, elapsed, playback.sampleIntervalMs)
+            if (position) Matter.Body.setPosition(balls[index], { x: position[0], y: position[1] })
+          })
+          if (elapsed >= duration) {
+            balls.forEach((body) => Matter.Composite.remove(engine.world, body))
+            resolve()
+          } else playbackFrameRef.current = requestAnimationFrame(frame)
+        }
+        playbackFrameRef.current = requestAnimationFrame(frame)
+      })
+    }
   }
 
-  const finishPachinkoRound = async (round: ActivePachinkoRound) => {
-    if (round.settlementStarted || round.pendingBodyIds.size > 0) return
-    if (activeRoundRef.current?.roundId !== round.roundId) return
-
-    round.settlementStarted = true
-
+  const handleDrop = async () => {
+    if (roundPendingRef.current || !engineRef.current) return
+    const currentBalance = (user?.currency as any)?.[cost?.currencyType || 'pokedollars'] || 0
+    if (currentBalance - pendingDrops * (cost?.amount || 0) < (cost?.amount || 0)) {
+      toast.error('Insufficient funds')
+      return
+    }
+    roundPendingRef.current = true
+    setIsDropping(true)
+    setPendingDrops((previous) => previous + 1)
+    setLastDropMessage('Preparing drop…')
+    // Retain one immutable request through response-loss retries. Outcomes and
+    // animation frames come from the already-settled server receipt.
+    const request = { roundId: crypto.randomUUID(), arrowPosition }
     try {
-      const result = await completePachinkoRound({
-        encounterId: encounter.id,
-        request: {
-          roundId: round.roundId,
-          triggerBucketId: round.triggerBucketId,
-          outcomeBucketIds: round.outcomeBucketIds,
-        },
-      })
-
+      const result = await recoverGameAction(
+        () => completePachinkoRound({ encounterId: encounter.id, request }),
+        'The drop could not be confirmed. Retry to recover this same drop.',
+        (response) => response.error || undefined,
+      )
       if (!result.success) {
         toast.error(result.error || 'Drop failed')
         setLastDropMessage(result.error || 'Drop failed')
         return
       }
-
+      setLastDropMessage('Dropping…')
+      if (result.playback) await playRound(result.playback)
+      if (!engineRef.current) return
       setSessionSummary(result.summary || {})
       setSessionCost(
         (current) => result.totalCost ?? current + (cost?.amount || 0),
@@ -609,131 +512,13 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
             : 'No prize this drop.',
         })
       }
-    } catch {
-      toast.error('Drop failed')
-      setLastDropMessage('Drop failed')
     } finally {
       setBonusTargetsActive(true)
       setIsBonusDrop(false)
       setPendingDrops((previous) => Math.max(0, previous - 1))
       setIsDropping(false)
-      activeRoundRef.current = null
+      roundPendingRef.current = false
     }
-  }
-
-  const startBonusDrop = (
-    round: ActivePachinkoRound,
-    triggerBucketId: string,
-  ) => {
-    round.mode = 'bonus'
-    round.triggerBucketId = triggerBucketId
-    setBonusTargetsActive(false)
-    setIsBonusDrop(true)
-    setLastDropMessage(
-      `BONUS DROP! ${PACHINKO_BONUS_BALL_COUNT} balls are in play.`,
-    )
-    playSfx('good')
-
-    const fan = getPachinkoBonusFan({
-      dropX: round.dropX,
-      boardWidth: config.board.width,
-      ballRadius: config.ballRadius || 8,
-    })
-    for (const ball of fan) {
-      spawnRoundBall({
-        round,
-        x: ball.x,
-        xVelocity: ball.xVelocity,
-      })
-    }
-  }
-
-  const resolvePachinkoBall = async ({
-    ballBody,
-    bucketId,
-  }: {
-    ballBody: Matter.Body
-    bucketId?: string
-  }) => {
-    const engine = engineRef.current
-    const round = activeRoundRef.current
-    if (!engine || !round?.pendingBodyIds.has(ballBody.id)) return
-    if (settledBodyIdsRef.current.has(ballBody.id)) return
-
-    settledBodyIdsRef.current.add(ballBody.id)
-    const timeout = dropTimeoutsRef.current.get(ballBody.id)
-    if (timeout) clearTimeout(timeout)
-    dropTimeoutsRef.current.delete(ballBody.id)
-
-    const bucket = bucketId
-      ? config.board.buckets.find((entry) => entry.id === bucketId)
-      : undefined
-
-    if (bucketId) {
-      await animateBallIntoBucket(ballBody, bucketId)
-    } else {
-      Matter.Composite.remove(engine.world, ballBody)
-    }
-    round.pendingBodyIds.delete(ballBody.id)
-
-    if (bucket?.kind === 'bonus' && round.mode === 'normal') {
-      startBonusDrop(round, bucket.id)
-      return
-    }
-
-    round.outcomeBucketIds.push(
-      bucket && bucket.kind !== 'bonus' ? bucket.id : null,
-    )
-    if (round.pendingBodyIds.size === 0) {
-      await finishPachinkoRound(round)
-    }
-  }
-
-  const handleFloorHit = (ballBody: Matter.Body) => {
-    void resolvePachinkoBall({ ballBody })
-  }
-
-  const handleBucketEntry = (bucketId: string, ballBody: Matter.Body) => {
-    void resolvePachinkoBall({ ballBody, bucketId })
-  }
-
-  const handleDrop = () => {
-    if (isDropping || !engineRef.current) return
-
-    const currentBalance =
-      (user?.currency as any)?.[cost?.currencyType || 'pokedollars'] || 0
-    const optimisticBalance =
-      currentBalance - pendingDrops * (cost?.amount || 0)
-
-    if (optimisticBalance < (cost?.amount || 0)) {
-      toast.error('Insufficient funds')
-      return
-    }
-
-    setIsDropping(true)
-    setPendingDrops((prev) => prev + 1)
-    setLastDropMessage('Dropping...')
-
-    const ballRadius = config.ballRadius || 8
-    const dropX = getPachinkoDropX({
-      arrowPosition,
-      boardWidth: config.board.width,
-      ballRadius,
-    })
-    const round: ActivePachinkoRound = {
-      roundId: crypto.randomUUID(),
-      dropX,
-      mode: 'normal',
-      pendingBodyIds: new Set(),
-      outcomeBucketIds: [],
-      settlementStarted: false,
-    }
-    activeRoundRef.current = round
-    spawnRoundBall({
-      round,
-      x: dropX,
-      xVelocity: (Math.random() - 0.5) * 2,
-    })
   }
 
   const [result, setResult] = useState<any | null>(null)
@@ -742,6 +527,7 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
     if (isDropping) return
 
     const res = await completeGame(encounter.id, true)
+    completionInvalidatesRef.current = res.invalidates
     setResult({
       success: true,
       message: 'Session Ended',
@@ -937,7 +723,7 @@ export function PachinkoGame({ encounter, state }: PachinkoGameProps) {
         <RewardResultOverlay
           result={result}
           onClose={() => {
-            refreshUser()
+            refreshUser(true, completionInvalidatesRef.current)
             router.push('/game/explore')
           }}
           icon={encounter.icon}

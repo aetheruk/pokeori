@@ -1,4 +1,5 @@
 import { redis } from '@/utilities/redis'
+import { startActionPerformance } from '@/utilities/action-performance'
 
 export interface RateLimitCheck {
   allowed: boolean
@@ -33,19 +34,33 @@ export async function checkActionRateLimit(
 }
 
 export async function acquireActionLock(key: string, ttlSeconds = 10): Promise<ActionLock> {
-  const token = crypto.randomUUID()
-  const res = await redis.set(key, token, { nx: true, ex: ttlSeconds })
+  const timing = startActionPerformance('lock-acquire')
+  try {
+    const token = crypto.randomUUID()
+    const res = await redis.set(key, token, { nx: true, ex: ttlSeconds })
+    timing.finish(res === 'OK' ? 'acquired' : 'busy')
 
-  return {
-    key,
-    token,
-    acquired: res === 'OK',
+    return {
+      key,
+      token,
+      acquired: res === 'OK',
+    }
+  } catch (error) {
+    timing.finish('error')
+    throw error
   }
 }
 
 export async function releaseActionLock(lock: ActionLock): Promise<void> {
   if (!lock.acquired) return
-  await redis.deleteIfValue(lock.key, lock.token)
+  const timing = startActionPerformance('lock-release')
+  try {
+    await redis.deleteIfValue(lock.key, lock.token)
+    timing.finish('released')
+  } catch (error) {
+    timing.finish('error')
+    throw error
+  }
 }
 
 export async function getIdempotentResult<T>(key: string): Promise<T | null> {

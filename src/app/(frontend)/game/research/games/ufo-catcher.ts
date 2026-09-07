@@ -31,6 +31,7 @@ import {
 } from '@/utilities/research/ufo-catcher'
 import type { Reward } from '@/utilities/rewards/reward-logic'
 import { grantRewards } from '@/utilities/rewards/reward-logic'
+import { createEconomyRequestId, getEconomyActionResult, runEconomyAction } from '@/utilities/economy/transactions'
 import {
   getUserInventoryMap,
   incrementUserActivityResult,
@@ -106,10 +107,12 @@ async function saveSessionState(
 
 export async function startUfoCatcherAttempt(
   encounterId: string,
+  clientActionId: string,
 ): Promise<UfoCatcherAttemptResult> {
   try {
     const user = await getUser()
     if (!user) return { success: false, error: 'Not authenticated' }
+    if (typeof clientActionId !== 'string' || !/^[a-zA-Z0-9-]{16,80}$/.test(clientActionId)) return {success: false, error: 'Invalid claw request'}
 
     const rateLimit = await checkActionRateLimit(
       user.id,
@@ -126,7 +129,7 @@ export async function startUfoCatcherAttempt(
 
     const actionLock = await acquireActionLock(
       `lock:ufo-catcher:action:${user.id}`,
-      12,
+      60,
     )
     if (!actionLock.acquired) {
       return {
@@ -162,15 +165,19 @@ export async function startUfoCatcherAttempt(
       }
       if (existing) await redis.del(attemptKey)
 
+      const settled = await getEconomyActionResult({userId: user.id, action: 'ufo-catcher-settle', requestId: createEconomyRequestId(getResultKey(user.id, clientActionId)!), payload})
+      if (settled) return {success: false, error: 'This claw attempt is already completed'}
+      const paid = await runEconomyAction({userId: user.id, action: 'ufo-catcher-start', requestId: clientActionId, payload}, async ({payload, req}) => {
       const freshUser = await payload.findByID({
         collection: 'users',
         id: user.id,
+        req,
       })
-      const freshInventory = await getUserInventoryMap(payload, freshUser.id)
+      const freshInventory = await getUserInventoryMap(payload, freshUser.id, {req})
       const { cost } = encounter.settings
       const currentBalance = getCurrencyBalance(freshUser, cost.currencyType)
       if (currentBalance < cost.amount) {
-        return { success: false, error: 'Insufficient funds' }
+        throw new Error('Insufficient funds')
       }
 
       const prizeCount = encounter.settings.prizeCount
@@ -183,7 +190,7 @@ export async function startUfoCatcherAttempt(
         },
       )
       const publicAttempt: UfoCatcherPublicAttempt = {
-        attemptId: crypto.randomUUID(),
+        attemptId: clientActionId,
         encounterId,
         createdAt: Date.now(),
         prizes: buildUfoCatcherPrizeLayout({
@@ -212,6 +219,7 @@ export async function startUfoCatcherAttempt(
       await payload.update({
         collection: 'users',
         id: user.id,
+        req,
         data: {
           currency: {
             ...freshUser.currency,
@@ -219,8 +227,10 @@ export async function startUfoCatcherAttempt(
           },
         },
       })
-
-      try {
+      return {privateAttempt, balance: currentBalance - cost.amount, sessionStart: state.startTime, cost: cost.amount}
+      })
+      if (paid.sessionStart !== state.startTime || paid.privateAttempt.publicAttempt.encounterId !== encounterId) return {success: false, error: 'Claw request belongs to a different session'}
+      const {privateAttempt} = paid
         await redis.set(attemptKey, privateAttempt, {
           ex: UFO_CATCHER_ATTEMPT_TTL_SECONDS,
         })
@@ -230,34 +240,15 @@ export async function startUfoCatcherAttempt(
         }
         state.ufoCatcherSession = {
           ...currentSession,
-          totalCost: currentSession.totalCost + cost.amount,
+          totalCost: currentSession.totalCost + ((state as any).lastUfoCharge === clientActionId ? 0 : paid.cost),
         }
+        ;(state as any).lastUfoCharge = clientActionId
         await saveSessionState(user.id, state)
-      } catch (error) {
-        await redis.del(attemptKey)
-        const rollbackUser = await payload.findByID({
-          collection: 'users',
-          id: user.id,
-        })
-        await payload.update({
-          collection: 'users',
-          id: user.id,
-          data: {
-            currency: {
-              ...rollbackUser.currency,
-              [cost.currencyType]:
-                getCurrencyBalance(rollbackUser, cost.currencyType) +
-                cost.amount,
-            },
-          },
-        })
-        throw error
-      }
 
       return {
         success: true,
-        attempt: publicAttempt,
-        balance: currentBalance - cost.amount,
+        attempt: privateAttempt.publicAttempt,
+        balance: paid.balance,
         summary: state.ufoCatcherSession.totalRewards,
         totalCost: state.ufoCatcherSession.totalCost,
       }
@@ -266,6 +257,7 @@ export async function startUfoCatcherAttempt(
     }
   } catch (error) {
     console.error('Error starting UFO Catcher attempt:', error)
+    if (error instanceof Error && error.message === 'Insufficient funds') return {success: false, error: 'Insufficient funds'}
     return { success: false, error: 'Unable to start the claw' }
   }
 }
@@ -304,7 +296,7 @@ export async function settleUfoCatcherAttempt({
 
     const actionLock = await acquireActionLock(
       `lock:ufo-catcher:action:${user.id}`,
-      15,
+      60,
     )
     if (!actionLock.acquired) {
       return { success: false, error: 'The claw is already resolving' }
@@ -355,6 +347,8 @@ export async function settleUfoCatcherAttempt({
       }
 
       const payload = await getPayload({ config: configPromise })
+      const settlement = await runEconomyAction({userId: user.id, action: 'ufo-catcher-settle', requestId: createEconomyRequestId(resultKey), payload}, async ({payload, req}) => {
+      const nextState = structuredClone(state)
       let rewardSummary = null
       if (resolution.outcome === 'caught') {
         const tier = encounter.settings.tiers.find(
@@ -363,11 +357,11 @@ export async function settleUfoCatcherAttempt({
         const rewards =
           attempt.rewardsByTierId?.[resolution.prize.tierId] || tier?.rewards
         if (!rewards)
-          return { success: false, error: 'Prize configuration changed' }
+          throw new Error('Prize configuration changed')
         const rewardResult = await grantRewards(
           user.id,
           rewards,
-          { idempotencyKey: resultKey },
+          { payload, req },
         )
         rewardSummary = rewardResult.summary
       }
@@ -379,9 +373,10 @@ export async function settleUfoCatcherAttempt({
         'gameResults',
         encounterId,
         won ? { wins: 1 } : { losses: 1 },
+        {req},
       )
 
-      const currentSession = state.ufoCatcherSession || {
+      const currentSession = nextState.ufoCatcherSession || {
         totalRewards: {},
         totalCost: 0,
       }
@@ -391,14 +386,14 @@ export async function settleUfoCatcherAttempt({
           rewardSummary,
         )
       }
-      state.ufoCatcherSession = currentSession
-      if (won) state.wins += 1
-      else state.losses += 1
-      await saveSessionState(user.id, state)
+      nextState.ufoCatcherSession = currentSession
+      if (won) nextState.wins += 1
+      else nextState.losses += 1
 
       const freshUser = await payload.findByID({
         collection: 'users',
         id: user.id,
+        req,
       })
       const response: UfoCatcherAttemptResult = {
         success: true,
@@ -414,7 +409,10 @@ export async function settleUfoCatcherAttempt({
           encounter.settings.cost.currencyType,
         ),
       }
-
+      return {response, nextState}
+      })
+      const {response, nextState} = settlement
+      await saveSessionState(user.id, nextState)
       await setIdempotentResult(
         resultKey,
         response,
@@ -437,8 +435,8 @@ export async function exitUfoCatcher(encounterId: string) {
     if (!user) return { success: false, error: 'Not authenticated' }
 
     const exitLock = await acquireActionLock(
-      `lock:ufo-catcher:exit:${user.id}`,
-      20,
+      `lock:ufo-catcher:action:${user.id}`,
+      60,
     )
     if (!exitLock.acquired) {
       return { success: false, error: 'UFO Catcher exit already in progress' }
@@ -455,15 +453,13 @@ export async function exitUfoCatcher(encounterId: string) {
       )
       if (pending?.publicAttempt.encounterId === encounterId) {
         const payload = await getPayload({ config: configPromise })
-        await incrementUserActivityResult(
-          payload as any,
-          user.id,
-          'gameResults',
-          encounterId,
-          { losses: 1 },
-        )
-        state.losses += 1
-        await saveSessionState(user.id, state)
+        const abandoned = await runEconomyAction({userId: user.id, action: 'ufo-catcher-settle', requestId: createEconomyRequestId(getResultKey(user.id, pending.publicAttempt.attemptId)!), payload}, async ({payload, req}) => {
+          await incrementUserActivityResult(payload as any, user.id, 'gameResults', encounterId, { losses: 1 }, {req})
+          const nextState = structuredClone(state)
+          nextState.losses += 1
+          return {response: {success: true, outcome: 'miss' as const}, nextState}
+        })
+        await saveSessionState(user.id, abandoned.nextState)
         await redis.del(getAttemptKey(user.id))
       }
 

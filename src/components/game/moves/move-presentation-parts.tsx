@@ -189,9 +189,9 @@ export function BattleContext({
   if (!battle) return null
 
   return (
-    <div
+    <section
       className="flex flex-wrap gap-2 rounded-lg border border-game-ochre/40 bg-game-ochre/10 p-2.5 text-xs text-game-ink"
-      role="group"
+
       aria-label="Current battle information"
     >
       {battle.resolvedType ? (
@@ -212,7 +212,7 @@ export function BattleContext({
           {battle.availability.reason ? ` — ${battle.availability.reason}` : ''}
         </span>
       ) : null}
-    </div>
+    </section>
   )
 }
 

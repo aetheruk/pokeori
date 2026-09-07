@@ -1,5 +1,7 @@
 'use client'
 
+import type { GameDataKeys } from '@/utilities/requirements/analysis'
+
 import {
   closestCenter,
   DndContext,
@@ -41,7 +43,7 @@ import {
   completeGame,
   startGame,
   submitGameAnswer,
-} from '@/app/(frontend)/game/games/actions'
+} from '@/utilities/games/client-action-recovery'
 
 // Types for stats
 type Stat =
@@ -296,6 +298,7 @@ export function ResearchCompareGame({
   const { playSfx } = useAudio()
   const router = useRouter()
   const { refreshUser } = useUser()
+  const completionInvalidatesRef = useRef<GameDataKeys[] | undefined>(undefined)
   const [gameStarted, setGameStarted] = useState(!!initialState)
   const winRateNum =
     typeof encounter.settings.winRate === 'number'
@@ -508,6 +511,7 @@ export function ResearchCompareGame({
     setSuccess(isWin)
 
     const result = await completeGame(encounter.id, isWin)
+    completionInvalidatesRef.current = result.invalidates
     if (result?.success && result.summary) {
       setSuccess(true)
       setResult({
@@ -717,7 +721,7 @@ export function ResearchCompareGame({
         <RewardResultOverlay
           result={result}
           onClose={() => {
-            refreshUser()
+            refreshUser(true, completionInvalidatesRef.current)
             router.push('/game/explore')
           }}
           icon={encounter.icon}

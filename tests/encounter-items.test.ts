@@ -381,6 +381,8 @@ describe('encounter QTE helpers', () => {
 
     expect(qte?.type).toBe('calm')
     expect(qte?.berryOptions).toHaveLength(3)
+    qte!.status = 'active'
+    qte!.offeredAt = Date.now()
     completeEncounterQteState(qte!, { type: 'calm', berryId: qte!.correctBerryId })
     expect(qte?.success).toBe(true)
     expect(qte?.catchStageBonus).toBe(1)
@@ -406,9 +408,11 @@ describe('encounter QTE helpers', () => {
       status: 'active' as const,
     }
 
-    completeEncounterQteState(focusQte, { type: 'focus', completedCircles: 3 })
-    completeEncounterQteState(chaseQte, { type: 'chase', tapCount: 12 })
-    completeEncounterQteState(scareQte, { type: 'scare', tappedDecoys: 6, hitTarget: false })
+    for (const qte of [focusQte, chaseQte, scareQte]) qte.offeredAt = 1000
+    const points = Array.from({length: 40}, (_, index) => ({x: Math.cos(index / 39 * Math.PI * 2) * 80, y: Math.sin(index / 39 * Math.PI * 2) * 80}))
+    completeEncounterQteState(focusQte, { type: 'focus', circles: [200, 400, 600].map((atMs) => ({atMs, points})) }, 2000)
+    completeEncounterQteState(chaseQte, { type: 'chase', taps: Array.from({length: 12}, (_, i) => i * 40) }, 2000)
+    completeEncounterQteState(scareQte, { type: 'scare', taps: Array.from({length: 6}, (_, index) => ({atMs: index * 40, index})) }, 2000)
     expect(focusQte.success).toBe(true)
     expect(focusQte.catchStageBonus).toBe(1.5)
     expect(chaseQte.success).toBe(true)
@@ -428,5 +432,17 @@ describe('encounter QTE helpers', () => {
     expect(qte.success).toBe(false)
     expect(qte.catchStageBonus).toBe(0)
     expect('xpBoost' in qte).toBe(false)
+  })
+
+  test('QTE authority rejects aggregate counters, impossible timestamps and repeated decoys', () => {
+    const complete = (type: 'focus' | 'chase' | 'scare', payload: any, now = 2000) => completeEncounterQteState({id: 'proof', type, status: 'active', offeredAt: 1000}, payload, now)
+    expect(complete('focus', {type: 'focus', completedCircles: 3}).success).toBe(false)
+    expect(complete('chase', {type: 'chase', tapCount: 12}).success).toBe(false)
+    expect(complete('scare', {type: 'scare', tappedDecoys: 6}).success).toBe(false)
+    expect(complete('chase', {type: 'chase', taps: Array(12).fill(0)}).success).toBe(false)
+    expect(complete('chase', {type: 'chase', taps: Array.from({length: 12}, (_, i) => i * 1000)}).success).toBe(false)
+    expect(complete('scare', {type: 'scare', taps: Array.from({length: 6}, (_, i) => ({atMs: i * 40, index: 0}))}).success).toBe(false)
+    expect(complete('focus', {type: 'focus', circles: [200, 400, 600].map((atMs) => ({atMs, points: Array(20).fill({x: 10, y: 10})}))}).success).toBe(false)
+    expect(complete('chase', {type: 'chase', taps: Array.from({length: 12}, (_, i) => i * 40)}, 122000).success).toBe(false)
   })
 })

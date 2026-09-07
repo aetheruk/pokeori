@@ -5,6 +5,7 @@ import { allGames } from '@/data/games'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { grantRewards } from '@/utilities/rewards/reward-logic'
+import { createEconomyRequestId, runEconomyAction } from '@/utilities/economy/transactions'
 import {
   getUser,
   type GameActivityState,
@@ -608,8 +609,13 @@ export async function claimFishingItem() {
               throw new Error('Fishing item has no reward target')
             })()
 
-      const { summary } = await grantRewards(user.id, [reward], {
-        idempotencyKey: claimResultKey,
+      const researchState = (await redis.get(`game:${user.id}`)) as GameActivityState | null
+      const { summary } = await runEconomyAction({ userId: user.id, action: 'fishing-item-claim', requestId: createEconomyRequestId(claimResultKey), payload }, async ({ payload, req }) => {
+        const result = await grantRewards(user.id, [reward], { payload, req })
+        if (researchState?.encounterId) {
+          await incrementUserActivityResult(payload as any, user.id, 'gameResults', researchState.encounterId, { wins: 1 }, { req })
+        }
+        return result
       })
       // Keep the reservation if anything after the durable grant fails. This
       // prevents a retry from replaying the same economy action while the
@@ -617,23 +623,11 @@ export async function claimFishingItem() {
       claimCompleted = true
 
       // Update stats in Redis (legacy/backup)
-      const researchState = (await redis.get(
-        `game:${user.id}`,
-      )) as GameActivityState | null
       if (researchState) {
-        researchState.wins += 1
+        const alreadyCounted = (researchState as any).lastFishingClaim === claimResultKey
+        if (!alreadyCounted) researchState.wins += 1
+        ;(researchState as any).lastFishingClaim = claimResultKey
         await redis.set(`game:${user.id}`, researchState, { ex: 900 })
-
-        const encounterId = researchState.encounterId
-        if (encounterId) {
-          await incrementUserActivityResult(
-            payload as any,
-            user.id,
-            'gameResults',
-            encounterId,
-            { wins: 1 },
-          )
-        }
       }
 
       const response = {

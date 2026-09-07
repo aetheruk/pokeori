@@ -1,204 +1,72 @@
-/**
- * Surrender and clear battle state actions.
- * Handles both PVE and PVP battle surrender with proper state updates.
- */
-
-import { getPayload } from 'payload'
-import configPromise from '@payload-config'
+import 'server-only'
 import { redis } from '@/utilities/redis'
 import { revalidatePath } from 'next/cache'
 import type { BattleState } from '@/utilities/battle/types'
-import type { User } from '@/payload-types'
 import { getUser } from '../helpers/user'
 import { getActiveBattleState } from '../helpers/state-management'
 import { trimBattleHistory } from '@/utilities/battle/history'
-import { recordExpeditionActivityResult } from '@/utilities/expeditions/actions'
-import { isBattleUser, normalizeBattleUserId } from '../pvp/state-utils'
+import { isBattleUser } from '../pvp/state-utils'
 import { battles } from '@/data/battles'
-import { applyTrainerBattleLossPayout } from '../helpers/loss-payout'
-import { persistConsumedHeldItems } from '../helpers/held-items'
-import {
-  incrementUserActivityResult,
-  registerUserSketchedMove,
-} from '@/utilities/user-state'
-import { persistPokemonBattleKOs } from '../helpers/pokemon-ko-credit'
+import { handleBattleLoss } from '../helpers/loss-handler'
+import { settlePvpOutcome } from '../pvp/outcome'
+import { acquireActionLock, releaseActionLock } from '@/utilities/game-integrity'
 
-const PVP_BATTLE_PREFIX = 'pvp:battle:'
 const BATTLE_TTL = 3600
 
-function getBattleConfigForState(state: BattleState) {
-  return (
-    state.dynamicBattleConfig ??
-    battles.find((battle) => battle.id === state.battleId)
-  )
-}
-
-/**
- * Surrender the current battle.
- * For PVP, updates shared state to reflect opponent's win.
- * For PVE, marks battle as lost.
- * Updates user stats with a loss.
- */
-export async function surrenderBattle(): Promise<{
-  success: boolean
-  message?: string
-  error?: string
-}> {
+export async function surrenderBattle(): Promise<{success: boolean; message?: string; error?: string}> {
   const user = await getUser()
-  if (!user) return { success: false, message: 'Not authenticated' }
-
-  const state = await getActiveBattleState(user)
-  if (!state) {
-    return { success: false, message: 'No active battle to surrender' }
-  }
-  if (state.status !== 'ongoing') {
-    return { success: false, message: 'Battle has ended' }
-  }
-
-  // Handle PVP surrender
-  if (state.isPvp && state.pvpBattleId) {
-    await handlePvpSurrender(user, state)
-  } else {
-    // Handle PVE surrender
-    await handlePveSurrender(user, state)
-  }
-
-  // Update user stats with loss
-  if (!state.chronicle) {
-    await updateSurrenderStats(user, state.battleId)
-  }
-  const expeditionResult = await recordExpeditionActivityResult(
-    user.id,
-    'battle',
-    state.battleId,
-    false,
-    { revalidatePaths: false },
-  )
-  if (!state.isPvp && expeditionResult.expedition) {
-    state.expeditionProgress = expeditionResult.expedition
-  }
-
-  if (!state.isPvp) {
-    const battleConfig = getBattleConfigForState(state)
-    if (battleConfig) {
-      const amountLost = await applyTrainerBattleLossPayout(
-        state,
-        user,
-        battleConfig,
-      )
-      if (amountLost > 0) {
-        state.history[0].message += `\nYou paid ${amountLost} Pokedollars.`
+  if (!user) return {success: false, message: 'Not authenticated'}
+  const actorLock = await acquireActionLock(`lock:battle:action:${user.id}`, 60)
+  if (!actorLock.acquired) return {success: false, error: 'Another battle action is in progress'}
+  try {
+    const perspective = await getActiveBattleState(user)
+    if (!perspective) return {success: false, message: 'No active battle to surrender'}
+    const battleLock = perspective.isPvp && perspective.pvpBattleId
+      ? await acquireActionLock(`pvp:resolve-lock:${perspective.pvpBattleId}`, 60)
+      : undefined
+    if (battleLock && !battleLock.acquired) return {success: false, error: 'The battle turn is resolving'}
+    try {
+      const key = perspective.isPvp && perspective.pvpBattleId
+        ? `pvp:battle:${perspective.pvpBattleId}` : `battle:${user.id}`
+      const previous = await redis.get<BattleState>(key)
+      if (previous?.status !== 'ongoing') return {success: false, message: 'Battle has ended'}
+      const state = structuredClone(previous)
+      let isP1 = true
+      if (state.isPvp) {
+        isP1 = isBattleUser((state.playerTeam[0] as any)?.user, user.id)
+        const isP2 = isBattleUser((state.enemyTeam[0] as any)?.user, user.id)
+        if (!isP1 && !isP2) return {success: false, error: 'Not a battle participant'}
       }
-    }
-    await persistPokemonBattleKOs(state)
-    await persistConsumedHeldItems(state)
-    await redis.set(`battle:${user.id}`, state, { ex: BATTLE_TTL })
-  }
-
-  revalidatePath('/game/battles/encounter')
-  return { success: true }
-}
-
-/**
- * Handle surrender in a PVP battle.
- * Updates the shared battle state to reflect the opponent's victory.
- */
-async function handlePvpSurrender(user: User, state: BattleState): Promise<void> {
-  if (!state.pvpBattleId) return
-
-  const sharedState = await redis.get<BattleState>(`${PVP_BATTLE_PREFIX}${state.pvpBattleId}`)
-  if (!sharedState) return
-
-  const isP1 = isBattleUser((sharedState.playerTeam[0] as any)?.user, user.id)
-
-  // If P1 surrenders, P1 loses -> status 'lost'
-  // If P2 surrenders, P1 wins -> status 'won'
-  const newStatus = isP1 ? 'lost' : 'won'
-
-  // Update shared state
-  sharedState.status = newStatus
-  sharedState.history.unshift({
-    turn: sharedState.turn,
-    playerStance: 'tech',
-    enemyStance: 'tech',
-    result: isP1 ? 'loss' : 'win', // From P1 perspective
-    damageDealt: 0,
-    damageTaken: 0,
-    message: `${user.trainerName || 'Opponent'} surrendered!`,
-  })
-
-  const winnerId = isP1
-    ? normalizeBattleUserId((sharedState.enemyTeam[0] as any)?.user)
-    : normalizeBattleUserId((sharedState.playerTeam[0] as any)?.user)
-  if (winnerId && sharedState.pendingSketchedMoves?.length) {
-    const payload = await getPayload({ config: configPromise })
-    for (const pendingMove of sharedState.pendingSketchedMoves) {
-      if (pendingMove.userId !== winnerId) continue
-
-      try {
-        const registration = await registerUserSketchedMove(
-          payload as any,
-          winnerId,
-          pendingMove.id,
-        )
-        if (registration.isNew) {
-          sharedState.history[0].message += `\nThe MoveDex recorded ${pendingMove.name}.`
-        }
-      } catch (error) {
-        console.error('Failed to persist PVP Smeargle Sketch unlock', error)
+      state.status = state.isPvp && !isP1 ? 'won' : 'lost'
+      state.history.unshift({turn: state.turn, playerStance: 'tech', enemyStance: 'tech',
+        result: state.status === 'won' ? 'win' : 'loss', damageDealt: 0, damageTaken: 0,
+        message: `${user.trainerName || 'Player'} surrendered!`})
+      state.history = trimBattleHistory(state.history)
+      let settled = state
+      if (state.isPvp) settled = await settlePvpOutcome(state)
+      else {
+        state.pendingSketchedMoves = undefined
+        const config = state.dynamicBattleConfig ?? battles.find((entry) => entry.id === state.battleId)
+        await handleBattleLoss(state, user, config)
       }
-    }
-  }
-  sharedState.pendingSketchedMoves = undefined
-  sharedState.history = trimBattleHistory(sharedState.history)
-
-  await persistPokemonBattleKOs(sharedState)
-  await persistConsumedHeldItems(sharedState)
-  await redis.set(`${PVP_BATTLE_PREFIX}${state.pvpBattleId}`, sharedState, { ex: 3600 })
+      const published = await redis.setManyIfValue(key, previous, [{key, value: settled, ttlSeconds: BATTLE_TTL}])
+      if (!published) return {success: false, error: 'Battle changed while settling. Retry to restore the result.'}
+      revalidatePath('/game/battles/encounter')
+      return {success: true}
+    } finally { if (battleLock) await releaseActionLock(battleLock) }
+  } finally { await releaseActionLock(actorLock) }
 }
 
-/**
- * Handle surrender in a PVE battle.
- * Updates the battle state to reflect a loss.
- */
-async function handlePveSurrender(user: User, state: BattleState): Promise<void> {
-  state.status = 'lost'
-  state.history.unshift({
-    turn: state.turn,
-    playerStance: 'tech',
-    enemyStance: 'tech',
-    result: 'loss',
-    damageDealt: 0,
-    damageTaken: 0,
-    message: `${state.playerName || 'Player'} surrendered.`,
-  })
-  state.history = trimBattleHistory(state.history)
-
-  // Save updated state so UI sees the loss
-  await redis.set(`battle:${user.id}`, state, { ex: BATTLE_TTL })
-}
-
-/**
- * Update user battle statistics with a loss from surrender.
- */
-async function updateSurrenderStats(user: User, battleId: string): Promise<void> {
-  const payload = await getPayload({ config: configPromise })
-  await incrementUserActivityResult(payload as any, user.id, 'battleResults', battleId, {
-    losses: 1,
-  })
-}
-
-/**
- * Clear all battle state for the current user.
- * Removes both PVE battle state and PVP status.
- */
-export async function clearBattleState(): Promise<{ success: boolean }> {
+export async function clearBattleState(): Promise<{success: boolean}> {
   const user = await getUser()
-  if (!user) return { success: false }
-
-  await redis.del(`battle:${user.id}`)
-  // Also clear PVP status
-  await redis.del(`pvp:status:${user.id}`)
-
-  return { success: true }
+  if (!user) return {success: false}
+  const lock = await acquireActionLock(`lock:battle:action:${user.id}`, 60)
+  if (!lock.acquired) return {success: false}
+  try {
+    const state = await getActiveBattleState(user)
+    if (state?.status === 'ongoing') return {success: false}
+    await redis.del(`battle:${user.id}`)
+    await redis.del(`pvp:status:${user.id}`)
+    return {success: true}
+  } finally { await releaseActionLock(lock) }
 }

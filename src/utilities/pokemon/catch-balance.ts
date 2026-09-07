@@ -6,6 +6,7 @@ export type ThrowQuality = 'poor' | 'nice' | 'great' | 'excellent'
 export interface CaptureThrowInput {
   ringScale?: number
   aimOffset?: number
+  timing?: import('./capture-timing').CaptureTimingProof
 }
 
 export interface CaptureThrowPoint {

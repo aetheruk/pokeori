@@ -1,322 +1,101 @@
 'use client'
 
-import { DoorOpen } from 'lucide-react'
+import { DoorOpen, RotateCcw, RotateCw } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import {
-  completeGame,
-  startGame,
-  submitGameAnswer,
-} from '@/app/(frontend)/game/games/actions'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
-import { useAudio } from '@/context/AudioContext'
-import { useUser } from '@/context/UserContext'
 import type { SnakeGameConfig, SnakePosition } from '@/data/games/snake/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { usePageVisibility } from '@/hooks/usePageVisibility'
-import { getLowestEndlessRewardScore } from '@/utilities/research/endless-milestones'
-import {
-  advanceContinuousSnake,
-  centerSnakePositionForPlayfield,
-  createInitialSnake,
-  findSafeSnakePosition,
-  getResponsiveSnakePlayfield,
-  getSegmentHeading,
-  getSnakePointerHeading,
-  getSnakeSpeed,
-  growSnake,
-  normalizeAngle,
-  type SnakeCircle,
-  sweptCircleIntersects,
-} from '@/utilities/research/snake'
-import {
-  type EndlessCollectibleRewardConfig,
-  EndlessCollectibleSprite,
-  getEndlessCollectibleRewardConfigs,
-  getNextCollectibleScore,
-} from './endless-collectibles'
+import { useArcadeSession } from '@/hooks/use-arcade-session'
+import { getSegmentHeading, getSnakeKeyboardHeading, getSnakePointerHeading, normalizeAngle } from '@/utilities/research/snake'
+import { EndlessCollectibleSprite } from './endless-collectibles'
 
-interface SnakeGameProps {
-  encounter: SnakeGameConfig
-  initialState?: any
-}
-
-interface SceneReward {
-  id: number
-  rewardKey: string
-  reward: EndlessCollectibleRewardConfig['rewardOptions'][number]['reward']
-  position: SnakePosition
-  expiresAt: number
-}
-
+interface SnakeGameProps { encounter: SnakeGameConfig; initialState?: any }
 type GamePhase = 'loading' | 'ready' | 'playing' | 'ended'
 
 export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
   useGameMusic(encounter)
   const router = useRouter()
-  const { refreshUser } = useUser()
-  const { playSfx } = useAudio()
   const visible = usePageVisibility()
   const settings = encounter.settings
   const stageRef = useRef<HTMLElement>(null)
-  const [runtimePlayfield, setRuntimePlayfield] = useState(settings.playfield)
+  const runtimePlayfield = settings.playfield
   const runtimePlayfieldRef = useRef(settings.playfield)
-  const initialSnake = useMemo(
-    () =>
-      createInitialSnake(
-        centerSnakePositionForPlayfield(
-          settings.initialPosition,
-          settings.playfield,
-          runtimePlayfieldRef.current,
-        ),
-        settings.initialLength,
-        settings.initialHeading,
-        settings.segmentSpacing,
-      ),
-    [settings],
-  )
-  const rewardConfigs = useMemo(
-    () => getEndlessCollectibleRewardConfigs(settings),
-    [settings],
-  )
-
-  const [snake, setSnake] = useState(initialSnake)
-  const [food, setFood] = useState<SnakePosition | null>(null)
-  const [sceneRewards, setSceneRewards] = useState<SceneReward[]>([])
-  const [score, setScore] = useState(0)
-  const [foodEaten, setFoodEaten] = useState(0)
-  const [heading, setHeading] = useState(settings.initialHeading)
-  const [phase, setPhase] = useState<GamePhase>('loading')
-  const [timeLeft, setTimeLeft] = useState(settings.timeLimit ?? 0)
-  const [status, setStatus] = useState('Preparing the tunnel survey.')
-  const [startError, setStartError] = useState<string | null>(null)
-  const [result, setResult] = useState<any | null>(null)
-
-  const snakeRef = useRef(initialSnake)
-  const foodRef = useRef<SnakePosition | null>(null)
-  const rewardsRef = useRef<SceneReward[]>([])
+  const [phase, setPhase] = useState<GamePhase>('ready')
+  const pressedKeysRef = useRef(new Set<string>())
+  const touchTurnsRef = useRef(new Map<number, number>())
+  const pointerTargetRef = useRef<SnakePosition | null>(null)
   const headingRef = useRef(settings.initialHeading)
   const targetHeadingRef = useRef(settings.initialHeading)
-  const pointerTargetRef = useRef<SnakePosition | null>(null)
-  const scoreRef = useRef(0)
-  const foodEatenRef = useRef(0)
-  const lastFrameRef = useRef(0)
-  const animationRef = useRef<number | null>(null)
-  const endingRef = useRef(false)
-  const rewardIdRef = useRef(0)
-  const rewardSchedulesRef = useRef<Record<string, number>>({})
-  const collectedRewardsRef = useRef<Record<string, number>>({})
-  const pressedKeysRef = useRef(new Set<string>())
-
-  const getRuntimeObstacles = useCallback(
-    () =>
-      (settings.obstacles ?? []).map((obstacle) => ({
-        ...centerSnakePositionForPlayfield(
-          obstacle,
-          settings.playfield,
-          runtimePlayfieldRef.current,
-        ),
-        radius: obstacle.radius,
-      })),
-    [settings],
-  )
-
-  const pickupCircles = useCallback(
-    (
-      nextSnake: SnakePosition[],
-      rewards: SceneReward[],
-      includeFood = false,
-    ): SnakeCircle[] => [
-      ...nextSnake.map((position, index) => ({
-        ...position,
-        radius: index === 0 ? settings.headRadius : settings.bodyRadius,
-      })),
-      ...getRuntimeObstacles(),
-      ...rewards.map((reward) => ({
-        ...reward.position,
-        radius: settings.rewardRadius,
-      })),
-      ...(includeFood && foodRef.current
-        ? [{ ...foodRef.current, radius: settings.foodRadius }]
-        : []),
-    ],
-    [getRuntimeObstacles, settings],
-  )
-
-  const placeFood = useCallback(
-    (nextSnake: SnakePosition[], rewards: SceneReward[]) => {
-      const nextFood = findSafeSnakePosition(
-        runtimePlayfieldRef.current,
-        settings.foodRadius,
-        pickupCircles(nextSnake, rewards),
-        settings.minimumSpawnDistance,
-        nextSnake[0],
-      )
-      foodRef.current = nextFood
-      setFood(nextFood)
-      return nextFood
-    },
-    [pickupCircles, settings],
-  )
-
-  const finishGame = useCallback(
-    async (forcedSuccess = false) => {
-      if (endingRef.current) return
-      endingRef.current = true
-      setPhase('ended')
-      if (animationRef.current !== null) {
-        cancelAnimationFrame(animationRef.current)
-        animationRef.current = null
-      }
-      const finalScore = scoreRef.current
-      const endless = settings.endless?.enabled === true
-      const firstReward = getLowestEndlessRewardScore({
-        milestones: settings.endless?.milestones ?? [],
-        repeatingRewards: settings.endless?.repeatingRewards ?? [],
-      })
-      const success =
-        forcedSuccess ||
-        (endless
-          ? firstReward !== null && finalScore >= firstReward
-          : settings.winScore !== undefined && finalScore >= settings.winScore)
-
-      await submitGameAnswer(success)
-      const response = await completeGame(
-        encounter.id,
-        success,
-        finalScore,
-        undefined,
-        collectedRewardsRef.current,
-      )
-      const confirmedSuccess = success && response.success
-      playSfx(confirmedSuccess ? 'good' : 'bad')
-      setStatus(`Survey ended with ${finalScore} points.`)
-      setResult({
-        success: confirmedSuccess,
-        message: endless
-          ? `Final score: ${finalScore}`
-          : confirmedSuccess
-            ? 'Survey complete!'
-            : 'Survey incomplete',
-        rewards: response.summary,
-      })
-    },
-    [encounter.id, playSfx, settings],
-  )
-
-  const resetLocalGame = useCallback(() => {
-    const nextSnake = createInitialSnake(
-      centerSnakePositionForPlayfield(
-        settings.initialPosition,
-        settings.playfield,
-        runtimePlayfieldRef.current,
-      ),
-      settings.initialLength,
-      settings.initialHeading,
-      settings.segmentSpacing,
-    )
-    snakeRef.current = nextSnake
-    setSnake(nextSnake)
-    headingRef.current = normalizeAngle(settings.initialHeading)
-    targetHeadingRef.current = normalizeAngle(settings.initialHeading)
+  const snakeRef = useRef<SnakePosition[]>([])
+  const session = useArcadeSession('snake', encounter, undefined, { paused: phase !== 'playing', inputForTick: (simulation) => {
+    const state = simulation.trajectory
+    if (!state) return []
+    const turn = Math.sign([...touchTurnsRef.current.values()].reduce((sum, value) => sum + value, 0))
+    const keyboard = getSnakeKeyboardHeading(pressedKeysRef.current)
+    if (turn) targetHeadingRef.current = normalizeAngle(state.heading + turn * settings.turnRate / 60)
+    else if (keyboard !== null) targetHeadingRef.current = keyboard
+    else if (pointerTargetRef.current) targetHeadingRef.current = getSnakePointerHeading(state.snake[0], pointerTargetRef.current, settings.headRadius * 2.75) ?? state.heading
+    return [{ kind: 'heading', value: targetHeadingRef.current }]
+  } })
+  const { simulation, result, timeLeft } = session
+  const state = simulation?.trajectory
+  const snake = state?.snake || []
+  const heading = state?.heading ?? settings.initialHeading
+  headingRef.current = heading
+  snakeRef.current = snake
+  const food = state?.food || null
+  const score = simulation?.score || 0
+  const sceneRewards = (state?.pickups || []).map((pickup) => ({ ...pickup, position: {x: pickup.x, y: pickup.y} }))
+  const runtimeObstacles = settings.obstacles || []
+  const startError: string | null = null
+  const status = session.saving ? 'Saving survey progress.' : session.countdown ? 'Preparing survey.' : 'Survey in progress.'
+  const playAgain = session.replay
+  const clearSteering = useCallback(() => {
+    pressedKeysRef.current.clear()
+    touchTurnsRef.current.clear()
     pointerTargetRef.current = null
-    setHeading(normalizeAngle(settings.initialHeading))
-    scoreRef.current = 0
-    setScore(0)
-    foodEatenRef.current = 0
-    setFoodEaten(0)
-    rewardsRef.current = []
-    setSceneRewards([])
-    rewardIdRef.current = 0
-    collectedRewardsRef.current = {}
-    rewardSchedulesRef.current = Object.fromEntries(
-      rewardConfigs.map((config) => [
-        config.key,
-        getNextCollectibleScore(0, config.everyScore),
-      ]),
-    )
-    lastFrameRef.current = 0
-    endingRef.current = false
-    setResult(null)
-    setTimeLeft(settings.timeLimit ?? 0)
-    placeFood(nextSnake, [])
-  }, [placeFood, rewardConfigs, settings])
-
-  useEffect(() => {
-    const stage = stageRef.current
-    if (!stage) return
-    const updatePlayfield = () => {
-      const bounds = stage.getBoundingClientRect()
-      const next = getResponsiveSnakePlayfield(
-        settings.playfield,
-        bounds.width,
-        bounds.height,
-      )
-      const previous = runtimePlayfieldRef.current
-      if (Math.abs(next.width - previous.width) < 0.1) return
-      const shiftX = (next.width - previous.width) / 2
-      const translate = (position: SnakePosition) => ({
-        x: position.x + shiftX,
-        y: position.y,
-      })
-      const nextSnake = snakeRef.current.map(translate)
-      const nextFood = foodRef.current ? translate(foodRef.current) : null
-      const nextRewards = rewardsRef.current.map((reward) => ({
-        ...reward,
-        position: translate(reward.position),
-      }))
-
-      runtimePlayfieldRef.current = next
-      snakeRef.current = nextSnake
-      foodRef.current = nextFood
-      rewardsRef.current = nextRewards
-      pointerTargetRef.current = null
-      targetHeadingRef.current = headingRef.current
-      setRuntimePlayfield(next)
-      setSnake(nextSnake)
-      setFood(nextFood)
-      setSceneRewards(nextRewards)
-    }
-    updatePlayfield()
-    const observer = new ResizeObserver(updatePlayfield)
-    observer.observe(stage)
-    return () => observer.disconnect()
-  }, [settings.playfield])
-
-  useEffect(() => {
-    let cancelled = false
-    void startGame(encounter.id).then((response) => {
-      if (cancelled) return
-      if (!response.success) {
-        setStartError(response.error || 'Unable to start the tunnel survey.')
-        setStatus('The tunnel survey could not start.')
-        return
-      }
-      resetLocalGame()
-      if (response.restored && response.expiry && settings.timeLimit) {
-        setTimeLeft(
-          Math.max(0, Math.floor((response.expiry - Date.now()) / 1000)),
-        )
-      }
-      setStartError(null)
-      setPhase('ready')
-      setStatus('Press Start or Space, then steer toward the cave floor.')
-    })
-    return () => {
-      cancelled = true
-    }
-  }, [encounter.id, resetLocalGame, settings.timeLimit])
-
+    targetHeadingRef.current = headingRef.current
+  }, [])
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (['ArrowLeft', 'ArrowRight', 'a', 'A', 'd', 'D'].includes(event.key)) {
+      if (phase !== 'ready' && phase !== 'playing') return
+      if (event.altKey || event.ctrlKey || event.metaKey) return
+      if (
+        event.target instanceof HTMLElement &&
+        event.target.closest(
+          'input, textarea, select, [contenteditable="true"]',
+        )
+      )
+        return
+      const key = event.key.toLowerCase()
+      if (
+        [
+          'arrowleft',
+          'arrowright',
+          'arrowup',
+          'arrowdown',
+          'w',
+          'a',
+          's',
+          'd',
+        ].includes(key)
+      ) {
         event.preventDefault()
         pointerTargetRef.current = null
-        pressedKeysRef.current.add(event.key.toLowerCase())
+        touchTurnsRef.current.clear()
+        pressedKeysRef.current.add(key)
+        const nextHeading = getSnakeKeyboardHeading(pressedKeysRef.current)
+        if (nextHeading !== null) targetHeadingRef.current = nextHeading
       }
-      if (event.code === 'Space' && phase === 'ready') {
+      if (
+        event.code === 'Space' &&
+        phase === 'ready' &&
+        !(event.target instanceof HTMLElement && event.target.closest('button'))
+      ) {
         event.preventDefault()
         setPhase('playing')
       }
@@ -326,14 +105,23 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
     }
     window.addEventListener('keydown', onKeyDown)
     window.addEventListener('keyup', onKeyUp)
+    window.addEventListener('blur', clearSteering)
     return () => {
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('keyup', onKeyUp)
+      window.removeEventListener('blur', clearSteering)
     }
-  }, [phase])
+  }, [clearSteering, phase])
+
+  useEffect(() => {
+    if (!visible || phase !== 'playing') clearSteering()
+  }, [clearSteering, phase, visible])
 
   const steerTowardPointer = (event: React.PointerEvent<HTMLElement>) => {
     if (phase !== 'playing') return
+    if (event.pointerType !== 'mouse' && event.buttons === 0) return
+    if (touchTurnsRef.current.size > 0 || pressedKeysRef.current.size > 0)
+      return
     const bounds = stageRef.current?.getBoundingClientRect()
     if (!bounds) return
     const target = {
@@ -365,225 +153,6 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
       event.currentTarget.releasePointerCapture(event.pointerId)
     }
   }
-
-  useEffect(() => {
-    if (phase !== 'playing' || !visible) return
-
-    const frame = (timestamp: number) => {
-      if (endingRef.current) return
-      if (lastFrameRef.current === 0) lastFrameRef.current = timestamp
-      const deltaSeconds = Math.min(
-        0.05,
-        (timestamp - lastFrameRef.current) / 1000,
-      )
-      lastFrameRef.current = timestamp
-
-      const keys = pressedKeysRef.current
-      const steerLeft = keys.has('arrowleft') || keys.has('a')
-      const steerRight = keys.has('arrowright') || keys.has('d')
-      if (steerLeft !== steerRight) {
-        targetHeadingRef.current = normalizeAngle(
-          headingRef.current +
-            (steerLeft ? -1 : 1) * settings.turnRate * deltaSeconds,
-        )
-      } else if (pointerTargetRef.current) {
-        const pointerHeading = getSnakePointerHeading(
-          snakeRef.current[0],
-          pointerTargetRef.current,
-          settings.headRadius * 2.75,
-        )
-        if (pointerHeading === null) {
-          pointerTargetRef.current = null
-          targetHeadingRef.current = headingRef.current
-        } else targetHeadingRef.current = pointerHeading
-      }
-
-      const speed = getSnakeSpeed(
-        settings.moveSpeed,
-        settings.maxSpeed,
-        settings.speedUpEvery,
-        settings.speedUpBy,
-        foodEatenRef.current,
-      )
-      const previousHead = snakeRef.current[0]
-      const step = advanceContinuousSnake({
-        snake: snakeRef.current,
-        heading: headingRef.current,
-        targetHeading: targetHeadingRef.current,
-        speed,
-        turnRate: settings.turnRate,
-        deltaSeconds,
-        segmentSpacing: settings.segmentSpacing,
-        headRadius: settings.headRadius,
-        boundaryRadius: settings.boundaryRadius,
-        bodyRadius: settings.bodyRadius,
-        playfield: runtimePlayfieldRef.current,
-        obstacles: getRuntimeObstacles(),
-        wrapBoundaries: settings.wrapBoundaries,
-      })
-      if (step.collision) {
-        setStatus(
-          step.collision === 'self'
-            ? 'Onix crossed its own trail.'
-            : 'Onix struck the tunnel wall.',
-        )
-        void finishGame()
-        return
-      }
-
-      const now = Date.now()
-      let activeRewards = rewardsRef.current.filter(
-        (reward) => reward.expiresAt > now,
-      )
-      let nextSnake = step.snake
-      headingRef.current = step.heading
-      setHeading(step.heading)
-
-      const headCircle = { ...nextSnake[0], radius: settings.headRadius }
-      const collected = activeRewards.filter((reward) =>
-        sweptCircleIntersects(
-          previousHead,
-          headCircle,
-          settings.headRadius,
-          {
-            ...reward.position,
-            radius: settings.rewardRadius,
-          },
-          settings.maxSpeed * 0.06,
-        ),
-      )
-      if (collected.length > 0) {
-        const ids = new Set(collected.map((reward) => reward.id))
-        activeRewards = activeRewards.filter((reward) => !ids.has(reward.id))
-        for (const reward of collected) {
-          collectedRewardsRef.current[reward.rewardKey] =
-            (collectedRewardsRef.current[reward.rewardKey] || 0) + 1
-        }
-        playSfx('good')
-        setStatus('Onix recovered a mineral sample.')
-      }
-
-      const ateFood =
-        foodRef.current !== null &&
-        sweptCircleIntersects(
-          previousHead,
-          headCircle,
-          settings.headRadius,
-          {
-            ...foodRef.current,
-            radius: settings.foodRadius,
-          },
-          settings.maxSpeed * 0.06,
-        )
-      if (ateFood) {
-        nextSnake = growSnake(nextSnake)
-        const nextFoodCount = foodEatenRef.current + 1
-        foodEatenRef.current = nextFoodCount
-        setFoodEaten(nextFoodCount)
-        const nextScore = scoreRef.current + settings.foodScore
-        scoreRef.current = nextScore
-        setScore(nextScore)
-        playSfx('select')
-        setStatus(`Survey score ${nextScore}. Onix grew longer.`)
-
-        for (const config of rewardConfigs) {
-          const scheduledScore = rewardSchedulesRef.current[config.key]
-          if (scheduledScore === undefined || nextScore < scheduledScore)
-            continue
-          const position = findSafeSnakePosition(
-            runtimePlayfieldRef.current,
-            settings.rewardRadius,
-            pickupCircles(nextSnake, activeRewards, true),
-            settings.minimumSpawnDistance,
-            nextSnake[0],
-          )
-          if (position) {
-            const option =
-              config.rewardOptions[
-                Math.floor(Math.random() * config.rewardOptions.length)
-              ]
-            activeRewards.push({
-              id: rewardIdRef.current++,
-              rewardKey: option.key,
-              reward: option.reward,
-              position,
-              expiresAt: now + (settings.rewardLifetimeMs ?? 8000),
-            })
-            setStatus('A mineral sample surfaced nearby.')
-          }
-          rewardSchedulesRef.current[config.key] = getNextCollectibleScore(
-            scheduledScore,
-            config.everyScore,
-          )
-        }
-
-        const nextFood = placeFood(nextSnake, activeRewards)
-        const reachedTarget =
-          !settings.endless?.enabled &&
-          settings.winScore !== undefined &&
-          nextScore >= settings.winScore
-        if (reachedTarget || nextFood === null) {
-          snakeRef.current = nextSnake
-          setSnake(nextSnake)
-          rewardsRef.current = activeRewards
-          setSceneRewards([...activeRewards])
-          void finishGame(true)
-          return
-        }
-      }
-
-      snakeRef.current = nextSnake
-      rewardsRef.current = activeRewards
-      setSnake(nextSnake)
-      setSceneRewards([...activeRewards])
-      animationRef.current = requestAnimationFrame(frame)
-    }
-
-    lastFrameRef.current = 0
-    animationRef.current = requestAnimationFrame(frame)
-    return () => {
-      if (animationRef.current !== null)
-        cancelAnimationFrame(animationRef.current)
-      animationRef.current = null
-    }
-  }, [
-    finishGame,
-    phase,
-    pickupCircles,
-    placeFood,
-    playSfx,
-    rewardConfigs,
-    getRuntimeObstacles,
-    settings,
-    visible,
-  ])
-
-  useEffect(() => {
-    if (phase !== 'playing' || !visible || !settings.timeLimit) return
-    const timer = window.setInterval(() => {
-      setTimeLeft((current) => {
-        if (current <= 1) {
-          void finishGame()
-          return 0
-        }
-        return current - 1
-      })
-    }, 1000)
-    return () => window.clearInterval(timer)
-  }, [finishGame, phase, settings.timeLimit, visible])
-
-  const playAgain = async () => {
-    const response = await startGame(encounter.id, true)
-    if (!response.success) {
-      router.push('/game/explore')
-      return
-    }
-    resetLocalGame()
-    setPhase('ready')
-    setStatus('Press Start or Space, then steer toward the cave floor.')
-  }
-
-  const runtimeObstacles = getRuntimeObstacles()
 
   return (
     <div
@@ -631,7 +200,8 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
         ref={stageRef}
         aria-label="Onix tunnel survey playfield"
         aria-describedby="snake-controls snake-status"
-        className="absolute inset-0 z-10 touch-none overflow-hidden"
+        className="absolute left-1/2 top-1/2 z-10 w-full -translate-x-1/2 -translate-y-1/2 touch-none overflow-hidden"
+        style={{ aspectRatio: `${runtimePlayfield.width} / ${runtimePlayfield.height}`, maxWidth: `${runtimePlayfield.width / runtimePlayfield.height * 100}dvh` }}
       >
         {runtimeObstacles.map((obstacle, index) => (
           <div
@@ -688,8 +258,7 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
           const segmentHeading =
             kind === 'head'
               ? heading
-              : getSegmentHeading(segment, snake[index - 1]) +
-                (kind === 'tail' ? 180 : 0)
+              : getSegmentHeading(segment, snake[index - 1])
           const radius =
             kind === 'head' ? settings.headRadius : settings.bodyRadius
           return (
@@ -708,12 +277,23 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
         {phase === 'loading' || phase === 'ready' ? (
           <div className="absolute inset-0 z-50 grid place-items-center bg-game-ink/45 p-6 text-center">
             {phase === 'ready' ? (
-              <Button
-                className="pointer-events-auto min-h-11 min-w-40 shadow-lg"
-                onClick={() => setPhase('playing')}
-              >
-                Start
-              </Button>
+              <div className="max-w-xs space-y-4 rounded-xl border border-game-border bg-game-surface-raised p-5 text-game-ink shadow-lg">
+                <h2 className="text-lg font-bold">Onix tunnel survey</h2>
+                <p id="snake-controls" className="text-sm">
+                  Aim with the pointer or drag. Arrow keys / WASD steer in any
+                  direction. Hold the turn buttons to curve left or right.
+                </p>
+                <p className="text-sm text-game-muted">
+                  Eat cave stones to grow. Avoid the walls and your own tail.
+                </p>
+                <Button
+                  className="pointer-events-auto min-h-11 w-full"
+                  onClick={() => setPhase('playing')}
+                >
+                  Start survey
+                </Button>
+                <p className="text-xs text-game-muted">Or press Space</p>
+              </div>
             ) : (
               <p className="rounded-lg border border-game-border bg-game-surface-raised px-3 py-2 text-sm font-bold text-game-ink shadow-md">
                 {startError || 'Preparing…'}
@@ -723,10 +303,63 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
         ) : null}
       </section>
 
-      <p id="snake-controls" className="sr-only">
-        Move the pointer or drag to steer. Left and Right arrow keys or A and D
-        curve Onix.
-      </p>
+      {phase === 'playing' ? (
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 flex justify-between gap-3 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          {([-1, 1] as const).map((turn) => (
+            <Button
+              key={turn}
+              variant="outline"
+              className="pointer-events-auto min-h-14 min-w-20 touch-none border-game-border bg-game-surface-raised/95 text-game-ink shadow-md active:bg-game-moss active:text-game-surface-raised"
+              aria-label={turn === -1 ? 'Curve left' : 'Curve right'}
+              onPointerDown={(event) => {
+                event.stopPropagation()
+                event.preventDefault()
+                event.currentTarget.setPointerCapture(event.pointerId)
+                pressedKeysRef.current.clear()
+                pointerTargetRef.current = null
+                touchTurnsRef.current.set(event.pointerId, turn)
+              }}
+              onPointerUp={(event) => {
+                event.stopPropagation()
+                touchTurnsRef.current.delete(event.pointerId)
+                targetHeadingRef.current = headingRef.current
+                if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+                  event.currentTarget.releasePointerCapture(event.pointerId)
+                }
+              }}
+              onPointerCancel={(event) => {
+                touchTurnsRef.current.delete(event.pointerId)
+                targetHeadingRef.current = headingRef.current
+              }}
+              onLostPointerCapture={(event) => {
+                touchTurnsRef.current.delete(event.pointerId)
+                targetHeadingRef.current = headingRef.current
+              }}
+              onClick={(event) => {
+                if (event.detail === 0) {
+                  pointerTargetRef.current = null
+                  targetHeadingRef.current = normalizeAngle(
+                    headingRef.current + turn * 45,
+                  )
+                }
+              }}
+            >
+              {turn === -1 ? (
+                <RotateCcw className="size-6" />
+              ) : (
+                <RotateCw className="size-6" />
+              )}
+              <span>{turn === -1 ? 'Left' : 'Right'}</span>
+            </Button>
+          ))}
+        </div>
+      ) : null}
+      {phase !== 'ready' ? (
+        <p id="snake-controls" className="sr-only">
+          Move the pointer or drag to steer. Arrow keys or WASD aim in any
+          direction. Hold the turn buttons to curve left or right.
+        </p>
+      ) : null}
       <p id="snake-status" className="sr-only" aria-live="polite">
         {!visible && phase === 'playing' ? 'Survey paused.' : status}
       </p>
@@ -737,10 +370,7 @@ export function SnakeGame({ encounter, initialState }: SnakeGameProps) {
           icon={encounter.icon}
           iconAlt={encounter.name}
           title={result.success ? 'Survey complete' : 'Survey ended'}
-          onClose={() => {
-            refreshUser()
-            router.push('/game/explore')
-          }}
+          onClose={session.close}
           secondaryAction={
             initialState?.encounter?.isEligibleForReplay ||
             encounter.isEligibleForReplay ? (
@@ -788,13 +418,30 @@ function SnakeSegment({
   playfield: { width: number; height: number }
 }) {
   const [imageAvailable, setImageAvailable] = useState(true)
-  const widthMultiplier = kind === 'tail' ? 2.1 : 2
+  // The supplied head faces left; its face sits below the horn. The tail's
+  // attachment is the large right-hand rock, with its tip extending backwards.
+  const onixArt = src.startsWith('/games/snake/sprites/onix-')
+  const width = radius * (onixArt && kind === 'tail' ? 4.2 : 2)
+  const aspectRatio = onixArt
+    ? kind === 'head'
+      ? '107 / 158'
+      : kind === 'tail'
+        ? '81 / 34'
+        : '55 / 49'
+    : '1'
+  const anchorX = onixArt && kind === 'tail' ? '82%' : '50%'
+  const anchorY = onixArt && kind === 'head' ? '72%' : '50%'
+  const rotation =
+    heading +
+    ((!onixArt && kind === 'tail') || (onixArt && kind === 'head') ? 180 : 0)
   return (
     <div
-      className="pointer-events-none absolute z-30 -translate-x-1/2 -translate-y-1/2"
+      className="pointer-events-none absolute z-30"
       style={{
-        ...sceneCircleStyle(position, radius * widthMultiplier, playfield),
-        transform: `translate(-50%, -50%) rotate(${heading}deg)`,
+        ...sceneCircleStyle(position, width, playfield),
+        aspectRatio,
+        transformOrigin: `${anchorX} ${anchorY}`,
+        transform: `translate(-${anchorX}, -${anchorY}) rotate(${rotation}deg)`,
       }}
     >
       {imageAvailable ? (

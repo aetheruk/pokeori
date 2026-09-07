@@ -1,7 +1,6 @@
 'use server'
 
 import type { BattleState, BattleStance } from '@/utilities/battle/types'
-import type { User } from '@/payload-types'
 
 // Module Imports
 import { startBattle as startPveBattle } from './pve/start-battle'
@@ -13,8 +12,6 @@ import { swapPokemon as swap } from './actions/pokemon-swap'
 import { getBattleInventory as getInventory } from './actions/inventory'
 import { getUser as fetchUser } from './helpers/user'
 import { getActiveBattleState as fetchState } from './helpers/state-management'
-import { handleWin as processWin } from './helpers/win-handler'
-import { finalizeTurn as processFinalize } from './helpers/turn-finalization'
 
 // Additional Actions from Refactor
 import { getBattlePowers as fetchPowers } from './powers/powers-data'
@@ -42,10 +39,6 @@ import { runBattleActionWithGuard } from './helpers/action-guard'
 
 export async function getUser() {
   return fetchUser()
-}
-
-export async function getActiveBattleState(user: User) {
-  return fetchState(user)
 }
 
 export async function clearBattleState() {
@@ -193,23 +186,6 @@ export async function getBattleState(): Promise<BattleState | null> {
   const user = await fetchUser()
   if (!user) return null
   return fetchState(user)
-}
-
-// Internal helpers potentially used by UI or other actions
-export async function handleWin(
-  state: BattleState,
-  user: User,
-  battleConfig: any,
-) {
-  return processWin(state, user, battleConfig)
-}
-
-export async function finalizeTurn(
-  state: BattleState,
-  userId: string,
-  user: User,
-) {
-  return processFinalize(state, userId, user)
 }
 
 // Power Actions (Proxies to submitTurn)

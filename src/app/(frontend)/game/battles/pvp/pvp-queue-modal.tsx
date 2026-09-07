@@ -2,8 +2,7 @@
 
 import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -19,70 +18,97 @@ interface PvpQueueModalProps {
   onOpenChange: (open: boolean) => void
   configId: string
   userId: string
+  actions?: { join: typeof joinRankedQueue; leave: typeof leaveRankedQueue; check: typeof checkPvpStatus }
 }
+
+const queueActions = { join: joinRankedQueue, leave: leaveRankedQueue, check: checkPvpStatus }
 
 export function PvpQueueModal({
   open,
   onOpenChange,
   configId,
   userId,
+  actions = queueActions,
 }: PvpQueueModalProps) {
   const router = useRouter()
   const [status, setStatus] = useState<'idle' | 'queueing' | 'matched'>('idle')
   const [elapsed, setElapsed] = useState(0)
 
-  // Start Queue on Open
-  useEffect(() => {
-    if (open && status === 'idle') {
-      setStatus('queueing')
-      joinRankedQueue(configId, userId).then((res) => {
-        if (res.success) {
-          if (res.status === 'matched') {
-            setStatus('matched')
-            toast.success('Match Found!')
-            setTimeout(() => router.push('/game/battles/encounter'), 500) // Delay for UX
-          }
-          // Else, we are in queue.
-        } else {
-          toast.error('Failed to join queue')
-          onOpenChange(false)
-        }
-      })
-    }
-  }, [open, status, configId, userId, onOpenChange, router])
+  const [error, setError] = useState<string | null>(null)
+  const [attempt, setAttempt] = useState(0)
+  const [cancelling, setCancelling] = useState(false)
+  const joinRequest = useRef<Promise<unknown> | null>(null)
+  const cancelled = useRef(false)
 
-  // Timer
   useEffect(() => {
-    if (status === 'queueing') {
-      const timer = setInterval(() => setElapsed((e) => e + 1), 1000)
-      return () => clearInterval(timer)
-    } else {
-      setElapsed(0)
+    if (!open) return
+    let disposed = false
+    let timer: ReturnType<typeof setTimeout> | undefined
+    cancelled.current = false
+    setError(null)
+    setStatus('queueing')
+    setElapsed(0)
+    const matched = () => {
+      if (disposed || cancelled.current) return
+      setStatus('matched')
+      router.push('/game/battles/encounter')
     }
-  }, [status])
+    const poll = async () => {
+      if (disposed || cancelled.current) return
+      try {
+        const result = await actions.check(userId)
+        if (disposed || cancelled.current) return
+        if (result.status === 'matched') { matched(); return }
+        setError(null)
+      } catch {
+        if (!disposed) setError('Connection interrupted. Checking again shortly…')
+      }
+      if (!disposed && !cancelled.current) timer = setTimeout(poll, 3000)
+    }
+    const join = async () => {
+      try {
+        const result = await actions.join(configId, userId)
+        if (disposed || cancelled.current) return
+        if (!result.success) {
+          setStatus('idle')
+          setError('Unable to join the queue. Please retry.')
+          return
+        }
+        if (result.status === 'matched') matched()
+        else timer = setTimeout(poll, 2000)
+      } catch {
+        if (!disposed && !cancelled.current) {
+          setStatus('idle')
+          setError('Unable to confirm your queue entry. Retry or cancel to check it.')
+        }
+      }
+    }
+    joinRequest.current = join()
+    return () => { disposed = true; clearTimeout(timer) }
+  }, [open, attempt, configId, userId, router, actions])
+
+  useEffect(() => {
+    if (!open || status !== 'queueing') return
+    const timer = setInterval(() => setElapsed((value) => value + 1), 1000)
+    return () => clearInterval(timer)
+  }, [open, status])
 
   const closeQueue = async () => {
-    if (status === 'queueing') {
-      await leaveRankedQueue(configId, userId)
+    if (cancelling) return
+    cancelled.current = true
+    setCancelling(true)
+    try {
+      // A pending join must finish before cancellation, or it could rejoin after leaving.
+      await joinRequest.current
+      await actions.leave(configId, userId)
       setStatus('idle')
+      onOpenChange(false)
+    } catch {
+      setError('Cancellation could not be confirmed. Please retry Cancel.')
+    } finally {
+      setCancelling(false)
     }
-    onOpenChange(false)
   }
-
-  // Polling
-  useEffect(() => {
-    if (status === 'queueing') {
-      const interval = setInterval(async () => {
-        const res = await checkPvpStatus(userId)
-        if (res.status === 'matched') {
-          setStatus('matched')
-          toast.success('Match Found!')
-          router.push('/game/battles/encounter')
-        }
-      }, 2000)
-      return () => clearInterval(interval)
-    }
-  }, [status, userId, router])
 
   return (
     <Dialog
@@ -106,6 +132,8 @@ export function PvpQueueModal({
         </DialogHeader>
 
         <div className="flex flex-col items-center justify-center py-8 space-y-4">
+          {error && <p role="alert" className="text-sm text-game-danger">{error}</p>}
+          {status === 'idle' && <Button onClick={() => setAttempt((value) => value + 1)}>Retry queue</Button>}
           {status === 'queueing' && (
             <>
               <div className="relative">
@@ -117,15 +145,18 @@ export function PvpQueueModal({
                 {(elapsed % 60).toString().padStart(2, '0')}
               </div>
               <Button
+                disabled={cancelling}
                 type="button"
                 variant="ghost"
                 className="text-game-muted hover:text-game-clay-strong"
                 onClick={closeQueue}
               >
-                Cancel
+                {cancelling ? 'Cancelling…' : 'Cancel'}
               </Button>
             </>
           )}
+
+          {status === 'idle' && <Button variant="outline" disabled={cancelling} onClick={() => void closeQueue()}>Cancel</Button>}
 
           {status === 'matched' && (
             <>

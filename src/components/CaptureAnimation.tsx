@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { RewardSummary } from '@/utilities/rewards/reward-logic'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import type { CaptureThrowPoint } from '@/utilities/pokemon/catch-balance'
@@ -29,6 +29,7 @@ export function CaptureAnimation({
   onContact,
   onResolve,
 }: CaptureAnimationProps) {
+  const reducedMotion = useReducedMotion()
   const [phase, setPhase] = useState<'throw' | 'rock' | 'success' | 'fail'>('throw')
   const [contacted, setContacted] = useState(false)
   const [canResolve, setCanResolve] = useState(false)
@@ -80,15 +81,15 @@ export function CaptureAnimation({
       <motion.div
         className="absolute flex h-28 w-28 items-center justify-center"
         initial={{
-          x: start.x - 56,
-          y: start.y - 56,
-          scale: 0.72,
+          x: (reducedMotion ? target.x : start.x) - 56,
+          y: (reducedMotion ? target.y : start.y) - 56,
+          scale: reducedMotion ? 1 : 0.72,
           opacity: 1,
         }}
         animate={{
           x: target.x - 56,
           y: target.y - 56,
-          scale: phase === 'throw' ? 1 : phase === 'fail' ? 1.12 : 1,
+          scale: reducedMotion ? 1 : phase === 'throw' ? 1 : phase === 'fail' ? 1.12 : 1,
           opacity: phase === 'fail' ? 0 : 1,
         }}
         transition={{

@@ -19,6 +19,7 @@ import {
   setIdempotentResult,
 } from '@/utilities/game-integrity'
 import { incrementUserActivityResult } from '@/utilities/user-state'
+import { createEconomyRequestId, getEconomyActionResult, runEconomyAction } from '@/utilities/economy/transactions'
 
 interface PrizeWheelSpinData {
   spinId: string
@@ -78,7 +79,7 @@ async function settlePrizeWheelSpin({
 
   const claimLock = await acquireActionLock(
     `lock:prize-wheel:claim:${userId}:${spinId}`,
-    12,
+    60,
   )
   if (!claimLock.acquired) {
     return { success: false, error: 'Reward claim already in progress' }
@@ -111,29 +112,12 @@ async function settlePrizeWheelSpin({
     }
 
     const hasRewards = Boolean(targetSlot.rewards?.length)
-    let rewardSummary = null
-    if (hasRewards) {
-      const rewardResult = await grantRewards(userId, targetSlot.rewards, {
-        idempotencyKey: idempotentResultKey,
-      })
-      rewardSummary = rewardResult.summary
-    }
-
     const payload = await getPayload({ config: configPromise })
-    await incrementUserActivityResult(
-      payload as any,
-      userId,
-      'gameResults',
-      encounterId,
-      hasRewards ? { wins: 1 } : { losses: 1 },
-    )
-
-    const response: PrizeWheelClaimResult = {
-      success: true,
-      summary: rewardSummary,
-      message: hasRewards ? 'Prize Claimed!' : 'Better luck next time!',
-      hasRewards,
-    }
+    const response = await runEconomyAction<PrizeWheelClaimResult>({userId, action: 'prize-wheel-claim', requestId: createEconomyRequestId(idempotentResultKey), payload}, async ({payload, req}) => {
+      const rewardSummary = hasRewards ? (await grantRewards(userId, targetSlot.rewards, {payload, req})).summary : null
+      await incrementUserActivityResult(payload as any, userId, 'gameResults', encounterId, hasRewards ? { wins: 1 } : { losses: 1 }, {req})
+      return {success: true, summary: rewardSummary, message: hasRewards ? 'Prize Claimed!' : 'Better luck next time!', hasRewards}
+    })
     await setIdempotentResult(idempotentResultKey, response, 600)
     if (deleteSpinOnSuccess) await redis.del(spinKey)
     return response
@@ -142,12 +126,13 @@ async function settlePrizeWheelSpin({
   }
 }
 
-export async function initiatePrizeWheelSpin() {
+export async function initiatePrizeWheelSpin(clientActionId: string) {
   try {
     const user = await getUser()
     if (!user) {
       return { success: false, error: 'Not authenticated' }
     }
+    if (typeof clientActionId !== 'string' || !/^[a-zA-Z0-9_-]{16,128}$/.test(clientActionId)) return {success: false, error: 'Invalid spin request'}
 
     const rateLimit = await checkActionRateLimit(
       user.id,
@@ -163,8 +148,8 @@ export async function initiatePrizeWheelSpin() {
     }
 
     const spinLock = await acquireActionLock(
-      `lock:prize-wheel:spin:${user.id}`,
-      10,
+      `lock:prize-wheel:action:${user.id}`,
+      60,
     )
     if (!spinLock.acquired) {
       return {
@@ -179,7 +164,7 @@ export async function initiatePrizeWheelSpin() {
       const existingSpin = await redis.get<PrizeWheelSpinData>(
         `prizewheel:${user.id}`,
       )
-      if (existingSpin) {
+      if (existingSpin && existingSpin.spinId !== clientActionId) {
         return {
           success: false,
           error: 'Please claim your existing spin first',
@@ -198,11 +183,19 @@ export async function initiatePrizeWheelSpin() {
         return { success: false, error: 'Invalid game type' }
       }
 
-      // Cost Check with fresh user state
       const cost = encounter.settings.cost
+      const settled = await getEconomyActionResult({userId: user.id, action: 'prize-wheel-claim', requestId: createEconomyRequestId(`prizewheel:claim-result:${user.id}:${clientActionId}`), payload})
+      if (settled) return {success: false, error: 'This spin has already been claimed'}
+      const paidSpin = await runEconomyAction({userId: user.id, action: 'prize-wheel-start', requestId: clientActionId, payload}, async ({payload, req}) => {
+      // Validate the configuration before charging the wallet.
+      const slots = Array.isArray(state.roundData?.prizeWheelSlots)
+        ? state.roundData.prizeWheelSlots
+        : encounter.settings.slots || []
+      if (slots.length === 0) throw new Error('Configuration error: No slots')
       const freshUser = await payload.findByID({
         collection: 'users',
         id: user.id,
+        req,
       })
       let updatedBalance = 0
 
@@ -210,7 +203,7 @@ export async function initiatePrizeWheelSpin() {
         const currentBalance =
           (freshUser.currency as any)?.[cost.currencyType] || 0
         if (currentBalance < cost.amount) {
-          return { success: false, error: 'Insufficient funds' }
+          throw new Error('Insufficient funds')
         }
 
         updatedBalance = currentBalance - cost.amount
@@ -218,6 +211,7 @@ export async function initiatePrizeWheelSpin() {
         await payload.update({
           collection: 'users',
           id: user.id,
+          req,
           data: {
             currency: {
               ...freshUser.currency,
@@ -228,13 +222,6 @@ export async function initiatePrizeWheelSpin() {
       }
 
       // Determine Result
-      const slots = Array.isArray(state.roundData?.prizeWheelSlots)
-        ? state.roundData.prizeWheelSlots
-        : encounter.settings.slots || []
-      if (slots.length === 0) {
-        return { success: false, error: 'Configuration error: No slots' }
-      }
-
       const totalWeight = slots.reduce(
         (sum: number, slot: { percentage: number }) => sum + slot.percentage,
         0,
@@ -256,51 +243,32 @@ export async function initiatePrizeWheelSpin() {
       const spinDuration = minTime + Math.random() * (maxTime - minTime)
 
       const spinData: PrizeWheelSpinData = {
-        spinId: crypto.randomUUID(),
+        spinId: clientActionId,
         encounterId: encounter.id,
         targetIndex,
         spinDuration,
         timestamp: Date.now(),
       }
-
-      try {
-        // Save state to Redis (waiting for claim)
-        await redis.set(`prizewheel:${user.id}`, spinData, { ex: 120 })
-      } catch (spinError) {
-        // Best-effort rollback if we already charged but failed to persist spin.
-        if (cost) {
-          const rollbackUser = await payload.findByID({
-            collection: 'users',
-            id: user.id,
-          })
-          const rollbackBalance =
-            (rollbackUser.currency as any)?.[cost.currencyType] || 0
-          await payload.update({
-            collection: 'users',
-            id: user.id,
-            data: {
-              currency: {
-                ...rollbackUser.currency,
-                [cost.currencyType]: rollbackBalance + cost.amount,
-              },
-            },
-          })
-        }
-        throw spinError
-      }
-
+      return {spinData, balance: cost ? updatedBalance : undefined, sessionStart: state.startTime}
+      })
+      const {spinData, balance} = paidSpin
+      if (spinData.encounterId !== encounter.id || paidSpin.sessionStart !== state.startTime) return {success: false, error: 'Spin request belongs to a different session'}
+      // Durable receipt contains the paid spin, so a failed Redis write can be
+      // retried with the same request without another charge or a new outcome.
+      await redis.set(`prizewheel:${user.id}`, spinData, { ex: 900 })
       return {
         success: true,
-        targetIndex,
-        spinDuration,
+        targetIndex: spinData.targetIndex,
+        spinDuration: spinData.spinDuration,
         spinId: spinData.spinId,
-        balance: cost ? updatedBalance : undefined,
+        balance,
       }
     } finally {
       await releaseActionLock(spinLock)
     }
   } catch (error) {
     console.error('Error initiating prize wheel spin:', error)
+    if (error instanceof Error && error.message === 'Insufficient funds') return {success: false, error: 'Insufficient funds'}
     return { success: false, error: 'Internal server error' }
   }
 }
@@ -325,6 +293,9 @@ export async function claimPrizeWheelReward(encounterId: string) {
       }
     }
 
+    const actionLock = await acquireActionLock(`lock:prize-wheel:action:${user.id}`, 60)
+    if (!actionLock.acquired) return {success: false, error: 'Another wheel action is being processed'}
+    try {
     const spinKey = `prizewheel:${user.id}`
     const spinDataRaw = await redis.get<PrizeWheelSpinData | string>(spinKey)
     if (!spinDataRaw) {
@@ -336,12 +307,13 @@ export async function claimPrizeWheelReward(encounterId: string) {
       return { success: false, error: 'Invalid spin session data' }
     }
 
-    return settlePrizeWheelSpin({
+    return await settlePrizeWheelSpin({
       userId: user.id,
       encounterId,
       spinData,
       deleteSpinOnSuccess: true,
     })
+    } finally { await releaseActionLock(actionLock) }
   } catch (error) {
     console.error('Error claiming prize wheel reward:', error)
     return { success: false, error: 'Internal server error' }
@@ -354,8 +326,8 @@ export async function exitPrizeWheel(encounterId: string) {
     if (!user) return { success: false, error: 'Not authenticated' }
 
     const exitLock = await acquireActionLock(
-      `lock:prize-wheel:exit:${user.id}`,
-      20,
+      `lock:prize-wheel:action:${user.id}`,
+      60,
     )
     if (!exitLock.acquired) {
       return { success: false, error: 'Prize wheel exit already in progress' }

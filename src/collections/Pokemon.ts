@@ -19,8 +19,8 @@ export const Pokemon: CollectionConfig = {
     admin: superAdminCheck,
     create: superAdminCheck,
     read: adminOrUserOwned,
-    update: adminOrUserOwned,
-    delete: adminOrUserOwned,
+    update: superAdminCheck,
+    delete: superAdminCheck,
   },
   hooks: {
     beforeChange: [

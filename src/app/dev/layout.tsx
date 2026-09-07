@@ -20,6 +20,7 @@ export default async function DevLayout({
 }: {
   children: React.ReactNode
 }) {
+  if (process.env.NODE_ENV === 'production') notFound()
   const payload = await getPayload({ config: configPromise })
   const { user } = await payload.auth({ headers: await headers() })
   if (!user?.isAdmin) notFound()

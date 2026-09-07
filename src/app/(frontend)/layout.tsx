@@ -5,6 +5,7 @@ import '@/styles/globals.css'
 import type { Metadata, Viewport } from 'next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
+import { headers } from 'next/headers'
 
 export const metadata: Metadata = {
   title: 'Pokeori',
@@ -20,16 +21,15 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   themeColor: '#efe4cf',
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const nonce = (await headers()).get('x-nonce') || undefined
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -37,6 +37,7 @@ export default function RootLayout({
       </head>
       <body className={`${appSans.variable} bg-game-canvas text-game-ink antialiased`}>
         <ThemeProvider
+          nonce={nonce}
           attribute="class"
           defaultTheme="light"
           enableSystem={false}

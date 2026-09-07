@@ -1,5 +1,7 @@
 'use server'
 
+import { requireDevAdmin } from '@/utilities/dev/authorization'
+
 import { execFile } from 'node:child_process'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
@@ -252,6 +254,7 @@ function getDirectory(type: EntryType) {
 }
 
 export async function runGameDataValidation() {
+  await requireDevAdmin()
   try {
     const { stdout, stderr } = await execFileAsync(
       'bun',
@@ -280,6 +283,7 @@ export async function runGameDataGeneration(options?: {
   skipFetch?: boolean
   dryRun?: boolean
 }) {
+  await requireDevAdmin()
   try {
     const { stdout, stderr } = await execFileAsync(
       'bun',
@@ -532,12 +536,14 @@ function ensureMoveType(type: string): MoveTypeFile {
 }
 
 export async function listMoveTypeFiles() {
+  await requireDevAdmin()
   return getMoveTypeList()
 }
 
 export async function readMoveTypeFile(
   type: string,
 ): Promise<MoveTypeFileData> {
+  await requireDevAdmin()
   const moveType = ensureMoveType(type)
   const filePath = getMoveTypePath(moveType)
   const content = await fs.readFile(filePath, 'utf-8')
@@ -561,6 +567,7 @@ export async function readMoveTypeFile(
 }
 
 export async function saveMoveTypeFile(type: string, moves: MoveConfig[]) {
+  await requireDevAdmin()
   const moveType = ensureMoveType(type)
   const filePath = getMoveTypePath(moveType)
   const config = MOVE_TYPE_BY_FILE[moveType]
@@ -626,6 +633,7 @@ function normalizePokemonResearchLevelReward(
 export async function readPokemonResearchLevelRewards(): Promise<
   PokemonResearchLevelReward[]
 > {
+  await requireDevAdmin()
   const content = await fs.readFile(
     POKEMON_RESEARCH_LEVEL_REWARDS_PATH,
     'utf-8',
@@ -644,6 +652,7 @@ export async function readPokemonResearchLevelRewards(): Promise<
 export async function savePokemonResearchLevelRewards(
   rewards: PokemonResearchLevelReward[],
 ) {
+  await requireDevAdmin()
   const normalized = sortPokemonResearchLevelRewards(
     rewards
       .map((reward) => normalizePokemonResearchLevelReward(reward))
@@ -681,6 +690,7 @@ export async function savePokemonResearchLevelRewards(
 export async function getMovePokemonFormList(): Promise<
   PokemonFormForMoveEditor[]
 > {
+  await requireDevAdmin()
   return allPokemon.map((species) => ({
     speciesId: species.id,
     speciesName: species.forms[0]?.name || `Pokemon #${species.id}`,
@@ -695,10 +705,12 @@ export async function getMovePokemonFormList(): Promise<
 export async function getAbilityPokemonFormList(): Promise<
   PokemonFormForMoveEditor[]
 > {
+  await requireDevAdmin()
   return getMovePokemonFormList()
 }
 
 export async function readAbilityEditorData(): Promise<AbilityEditorData> {
+  await requireDevAdmin()
   const abilities = Object.values(ABILITIES)
     .map(
       (ability): AbilityEditorEntry => ({
@@ -860,6 +872,7 @@ async function serializeAbilityForSource(ability: AbilityEditorSavePayload) {
 }
 
 export async function saveAbilityEntry(ability: AbilityEditorSavePayload) {
+  await requireDevAdmin()
   const normalized = normalizeAbilityForSave(ability)
   if (!normalized.id) return { success: false, error: 'Ability ID is required' }
   if (!normalized.name)
@@ -897,6 +910,7 @@ export async function saveAbilityEntry(ability: AbilityEditorSavePayload) {
 }
 
 export async function createAbilityEntry(ability: AbilityEditorSavePayload) {
+  await requireDevAdmin()
   const normalized = normalizeAbilityForSave(ability)
   if (!normalized.id) return { success: false, error: 'Ability ID is required' }
   if (!normalized.name)
@@ -938,6 +952,7 @@ export async function saveAbilityEffects(
   abilityId: string,
   effects: AbilityEffect[],
 ) {
+  await requireDevAdmin()
   const normalizedAbilityId = abilityId.trim()
   if (!normalizedAbilityId)
     return { success: false, error: 'Ability ID is required' }
@@ -1041,6 +1056,7 @@ function getEntryPath(type: EntryType, filename: string) {
 }
 
 export async function listEntries(type: EntryType) {
+  await requireDevAdmin()
   const dir = getDirectory(type)
   try {
     const files = await fs.readdir(dir)
@@ -1055,6 +1071,7 @@ export async function readEntry<T extends EntryType>(
   type: T,
   filename: string,
 ): Promise<EntryMap[T][] | null> {
+  await requireDevAdmin()
   const filePath = getEntryPath(type, filename)
   try {
     const content = await fs.readFile(filePath, 'utf-8')
@@ -1070,6 +1087,7 @@ export async function saveEntry<T extends EntryType>(
   filename: string,
   data: EntryMap[T][],
 ) {
+  await requireDevAdmin()
   const filePath = getEntryPath(type, filename)
   try {
     const existingContent = await fs
@@ -1178,6 +1196,7 @@ export async function saveEntry<T extends EntryType>(
 }
 
 export async function getPokemonList() {
+  await requireDevAdmin()
   return allPokemon.map((p) => ({
     id: p.id,
     name: p.forms[0]?.name || `Pokemon #${p.id}`,
@@ -1187,6 +1206,7 @@ export async function getPokemonList() {
 export async function getPokemonForms(
   speciesId: number,
 ): Promise<{ id: string; name: string }[]> {
+  await requireDevAdmin()
   const species = allPokemon.find((p) => p.id === speciesId)
   if (!species) return []
   return species.forms.map((f) => ({
@@ -1198,6 +1218,7 @@ export async function getPokemonForms(
 export async function getSpeciesIdForForm(
   formId: string,
 ): Promise<number | null> {
+  await requireDevAdmin()
   const targetId = formId.toString()
   for (const species of allPokemon) {
     const form = species.forms.find((f) => f.id === targetId)
@@ -1207,6 +1228,7 @@ export async function getSpeciesIdForForm(
 }
 
 export async function getItemList() {
+  await requireDevAdmin()
   return items.map((item) => ({
     id: item.id,
     name: item.name,
@@ -1214,6 +1236,7 @@ export async function getItemList() {
 }
 
 export async function getCurrencyList() {
+  await requireDevAdmin()
   return currencies.map((c) => ({
     id: c.id,
     name: c.name,
@@ -1221,6 +1244,7 @@ export async function getCurrencyList() {
 }
 
 export async function getTaskList() {
+  await requireDevAdmin()
   const filenames = await listEntries('tasks')
   const allTasks: { id: string; name: string }[] = []
 
@@ -1237,6 +1261,7 @@ export async function getTaskList() {
 }
 
 export async function getVoyageList() {
+  await requireDevAdmin()
   const filenames = await listEntries('voyages')
   const allVoyages: { id: string; name: string }[] = []
 
@@ -1253,6 +1278,7 @@ export async function getVoyageList() {
 }
 
 export async function getBannerList() {
+  await requireDevAdmin()
   return banners.map((b) => ({
     id: b.id,
     name: b.name,
@@ -1260,6 +1286,7 @@ export async function getBannerList() {
 }
 
 export async function getIconList() {
+  await requireDevAdmin()
   return icons.map((i) => ({
     id: i.id,
     name: i.name,
@@ -1267,6 +1294,7 @@ export async function getIconList() {
 }
 
 export async function getTitleList() {
+  await requireDevAdmin()
   return titles.map((t) => ({
     id: t.id,
     name: t.name,
@@ -1274,6 +1302,7 @@ export async function getTitleList() {
 }
 
 export async function getTcgSetList() {
+  await requireDevAdmin()
   return tcgSets.map((s) => ({
     id: s.id,
     name: s.name,
@@ -1281,6 +1310,7 @@ export async function getTcgSetList() {
 }
 
 export async function getTcgCardList(setIds?: string[]) {
+  await requireDevAdmin()
   const cards: { id: string; name: string }[] = []
   const targetSets = setIds?.length
     ? tcgSets.filter((s) => setIds.includes(s.id))
@@ -1299,6 +1329,7 @@ export async function getTcgCardList(setIds?: string[]) {
 }
 
 export async function getSkillList() {
+  await requireDevAdmin()
   return skills.map((s) => ({
     id: s.id,
     name: s.name,
@@ -1306,6 +1337,7 @@ export async function getSkillList() {
 }
 
 export async function getBattleList() {
+  await requireDevAdmin()
   const filenames = await listEntries('battles')
   const allBattles: { id: string; name: string }[] = []
 
@@ -1322,6 +1354,7 @@ export async function getBattleList() {
 }
 
 export async function getLocationList() {
+  await requireDevAdmin()
   const filenames = await listEntries('locations')
   const allLocations: { id: string; name: string }[] = []
 
@@ -1338,6 +1371,7 @@ export async function getLocationList() {
 }
 
 export async function getGameList() {
+  await requireDevAdmin()
   return miniGames.map((g) => ({
     id: g.id,
     name: g.name,
@@ -1345,6 +1379,7 @@ export async function getGameList() {
 }
 
 export async function getFieldResearchList() {
+  await requireDevAdmin()
   return fieldResearchGames.map((study) => ({
     id: study.id,
     name: study.name,
@@ -1352,6 +1387,7 @@ export async function getFieldResearchList() {
 }
 
 export async function getExpeditionList() {
+  await requireDevAdmin()
   return expeditions.map((entry) => ({
     id: entry.id,
     name: entry.name,
@@ -1359,6 +1395,7 @@ export async function getExpeditionList() {
 }
 
 export async function getPokemonTypeList() {
+  await requireDevAdmin()
   const types = [
     'normal',
     'fire',

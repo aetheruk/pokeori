@@ -1,5 +1,7 @@
 'use client'
 
+import type { GameDataKeys } from '@/utilities/requirements/analysis'
+
 import { RotateCw, Zap } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -21,7 +23,7 @@ import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import {
   completeGame as completeGameActivity,
   startGame,
-} from '@/app/(frontend)/game/games/actions'
+} from '@/utilities/games/client-action-recovery'
 
 interface MagnemiteCircuitGameProps {
   encounter: MagnemiteCircuitGameConfig & { isEligibleForReplay?: boolean }
@@ -122,6 +124,7 @@ export function MagnemiteCircuitGame({
   useGameMusic(encounter)
   const { playSfx } = useAudio()
   const { refreshUser } = useUser()
+  const completionInvalidatesRef = useRef<GameDataKeys[] | undefined>(undefined)
   const router = useRouter()
   const { cols, rows } = encounter.settings.gridSize
   const timeLimit = encounter.settings.timeLimit || 75
@@ -137,6 +140,7 @@ export function MagnemiteCircuitGame({
   const [gameEnded, setGameEnded] = useState(false)
   const [result, setResult] = useState<any | null>(null)
   const completionRef = useRef(false)
+  const moveProofRef = useRef<string[]>([])
 
   const tilesByKey = useMemo(
     () => new Map(tiles.map((tile) => [positionKey(tile), tile])),
@@ -159,7 +163,10 @@ export function MagnemiteCircuitGame({
       completionRef.current = true
       setGameEnded(true)
 
-      const completion = await completeGameActivity(encounter.id, success)
+      const completion = await completeGameActivity(encounter.id, success, undefined, undefined, undefined, undefined, undefined, {
+        kind: 'magnemite-circuit', moves: [...moveProofRef.current],
+      })
+      completionInvalidatesRef.current = completion.invalidates
       const finalSuccess = success && completion.success
       setResult({
         success: finalSuccess,
@@ -182,6 +189,7 @@ export function MagnemiteCircuitGame({
     }
 
     completionRef.current = false
+    moveProofRef.current = []
     setTiles(encounter.settings.tiles)
     setRotations(0)
     setGameStarted(true)
@@ -227,6 +235,7 @@ export function MagnemiteCircuitGame({
       if (!gameStarted || gameEnded) return
       const tile = tilesByKey.get(tileKey)
       if (!tile || tile.locked) return
+      moveProofRef.current.push(tileKey)
 
       const nextRotations = rotations + 1
       const nextTiles = tiles.map((entry) =>
@@ -438,7 +447,7 @@ export function MagnemiteCircuitGame({
         <RewardResultOverlay
           result={result}
           onClose={() => {
-            refreshUser()
+            refreshUser(true, completionInvalidatesRef.current)
             router.push('/game/explore')
           }}
           icon={encounter.icon}

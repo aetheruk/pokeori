@@ -1,5 +1,7 @@
 'use client'
 
+import type { GameDataKeys } from '@/utilities/requirements/analysis'
+
 import { AnimatePresence, motion } from 'framer-motion'
 import { Mic, MicOff } from 'lucide-react'
 import Image from 'next/image'
@@ -20,7 +22,7 @@ import {
   completeGame,
   startGame,
   submitGameAnswer,
-} from '@/app/(frontend)/game/games/actions'
+} from '@/utilities/games/client-action-recovery'
 
 interface WhosThatPokemonGameProps {
   encounter: GameItem
@@ -83,6 +85,7 @@ export function WhosThatPokemonGame({
   const { playSfx } = useAudio()
   const router = useRouter()
   const { refreshUser } = useUser()
+  const completionInvalidatesRef = useRef<GameDataKeys[] | undefined>(undefined)
   const winRateNum =
     typeof encounter.settings.winRate === 'number'
       ? encounter.settings.winRate
@@ -380,6 +383,7 @@ export function WhosThatPokemonGame({
             encounter.id,
             result.wins >= (result.requiredWins || 5),
           )
+          completionInvalidatesRef.current = completeResult.invalidates
           if (completeResult.success && completeResult.summary) {
             setResult({
               success: true,
@@ -696,7 +700,7 @@ export function WhosThatPokemonGame({
         <RewardResultOverlay
           result={result}
           onClose={() => {
-            refreshUser()
+            refreshUser(true, completionInvalidatesRef.current)
             router.push('/game/explore')
           }}
           icon={encounter.icon}

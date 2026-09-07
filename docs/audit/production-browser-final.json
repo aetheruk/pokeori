@@ -1,0 +1,60 @@
+{
+  "scope": "Final isolated Linux production container, default CSP enforcement (CSP_ENFORCE omitted), client registry split, Zod jitless, lazy inspectors and native dialog triggers. Fresh Chromium context per route, 1280px, synthetic accounts. Measurements after hydration plus 800ms without interaction; Run observed during initial countdown without charge. Pokemon fixture owns 160 entries; inventory empty. Separate populated-box profile records scroll behavior. Bytes are decoded JavaScript response bodies; gzip6Bytes is deterministic gzip level 6 size, not measured transferred bytes.",
+  "routes": [
+    {
+      "route": "/game/explore",
+      "scriptCount": 38,
+      "decodedScriptBodyBytes": 4417829,
+      "gzip6Bytes": 973971,
+      "pageErrors": [],
+      "cspViolations": [],
+      "downloadedGameSymbols": []
+    },
+    {
+      "route": "/game/pokemon",
+      "scriptCount": 39,
+      "decodedScriptBodyBytes": 3651783,
+      "gzip6Bytes": 834092,
+      "pageErrors": [],
+      "cspViolations": [],
+      "downloadedGameSymbols": []
+    },
+    {
+      "route": "/game/inventory",
+      "scriptCount": 38,
+      "decodedScriptBodyBytes": 4274749,
+      "gzip6Bytes": 948402,
+      "pageErrors": [],
+      "cspViolations": [],
+      "downloadedGameSymbols": []
+    },
+    {
+      "route": "/game/games/run",
+      "scriptCount": 29,
+      "decodedScriptBodyBytes": 2656113,
+      "gzip6Bytes": 582170,
+      "pageErrors": [],
+      "cspViolations": [],
+      "downloadedGameSymbols": [
+        "RunGame"
+      ]
+    },
+    {
+      "route": "/admin",
+      "scriptCount": 15,
+      "decodedScriptBodyBytes": 2207970,
+      "gzip6Bytes": 651142,
+      "pageErrors": [],
+      "cspViolations": [],
+      "downloadedGameSymbols": []
+    }
+  ],
+  "runComparison": {
+    "baselineBytes": 4544014,
+    "finalBytes": 2656113,
+    "bytesReduced": 1887901,
+    "percentReduced": 41.55,
+    "baselineScriptCount": 42,
+    "finalScriptCount": 29
+  }
+}

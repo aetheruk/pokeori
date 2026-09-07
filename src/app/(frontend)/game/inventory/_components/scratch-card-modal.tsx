@@ -198,7 +198,13 @@ function ScratchCardInterface({
       </div>
 
       <div className="flex flex-col items-center gap-2 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        {!isRevealed && (
+          <Button type="button" onClick={() => setIsRevealed(true)}>
+            Reveal card
+          </Button>
+        )}
         <Button
+          disabled={!isRevealed}
           onClick={() => setShowRewards(true)}
           className={`transition-all duration-300 font-bold ${
             isRevealed

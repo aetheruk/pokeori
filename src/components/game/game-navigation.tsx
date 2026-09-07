@@ -54,14 +54,14 @@ export function GameNavigation() {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="game-paper-background fixed left-0 top-0 z-40 hidden h-dvh w-20 flex-col border-r border-game-border bg-sidebar text-game-ink md:flex xl:w-56">
-        <div className="flex h-[4.5rem] items-center border-b border-game-border px-4 xl:px-5">
-          <BrandLockup compact className="xl:hidden" />
-          <BrandLockup className="ml-1 hidden w-full max-w-[168px] xl:block" />
+      <aside className="game-paper-background fixed left-0 top-0 z-40 hidden h-dvh w-56 flex-col border-r border-game-border bg-sidebar text-game-ink lg:flex lg:w-56">
+        <div className="flex h-[4.5rem] items-center border-b border-game-border px-4 lg:px-5">
+          <BrandLockup compact className="lg:hidden" />
+          <BrandLockup className="ml-1 hidden w-full max-w-[168px] lg:block" />
         </div>
         <nav
           aria-label="Game sections"
-          className="flex-1 space-y-1 overflow-y-auto px-3 py-4 xl:px-4"
+          className="flex-1 space-y-1 overflow-y-auto px-3 py-4 lg:px-4"
         >
           {navItems.map((item) => {
             const isActive =
@@ -71,13 +71,13 @@ export function GameNavigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                prefetch={true}
+                prefetch={false}
                 onPointerEnter={() => prefetchRoute(item.href)}
                 onFocus={() => prefetchRoute(item.href)}
                 onClick={playSelectSfx}
                 aria-current={isActive ? 'page' : undefined}
                 className={cn(
-                  'game-focus-ring relative flex h-11 items-center justify-center gap-3 overflow-hidden rounded-lg border px-3 text-sm font-medium transition-colors xl:justify-start',
+                  'game-focus-ring relative flex h-11 items-center justify-center gap-3 overflow-hidden rounded-lg border px-3 text-sm font-medium transition-colors lg:justify-start',
                   isActive
                     ? 'border-game-moss/35 bg-game-surface-raised text-game-moss-strong shadow-[0_4px_12px_rgb(75_62_39_/_0.08)] before:absolute before:bottom-2 before:left-0 before:top-2 before:w-1 before:rounded-r-sm before:bg-game-moss'
                     : 'border-transparent text-game-muted hover:bg-game-surface hover:text-game-ink',
@@ -85,13 +85,13 @@ export function GameNavigation() {
                 title={item.name}
               >
                 <item.icon className="h-5 w-5 shrink-0" />
-                <span className="hidden xl:block">{item.name}</span>
+                <span className="hidden lg:block">{item.name}</span>
               </Link>
             )
           })}
         </nav>
-        <div className="mt-auto border-t border-game-border p-3 xl:p-4">
-          <div className="mb-2 hidden grid-cols-2 gap-2 xl:grid">
+        <div className="mt-auto border-t border-game-border p-3 lg:p-4">
+          <div className="mb-2 hidden grid-cols-2 gap-2 lg:grid">
             <ResourceValue
               iconId={pokedollars?.iconId}
               value={user?.currency?.pokedollars || 0}
@@ -105,10 +105,10 @@ export function GameNavigation() {
           </div>
           <Link
             href="/game"
-            prefetch={true}
+            prefetch={false}
             onPointerEnter={() => prefetchRoute('/game')}
             onFocus={() => prefetchRoute('/game')}
-            className="game-focus-ring flex items-center justify-center gap-3 overflow-hidden rounded-lg px-2 py-2 transition-colors hover:bg-game-surface xl:justify-start"
+            className="game-focus-ring flex items-center justify-center gap-3 overflow-hidden rounded-lg px-2 py-2 transition-colors hover:bg-game-surface lg:justify-start"
           >
             <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-game-moss/30 bg-game-moss/10">
               {user ? (
@@ -123,7 +123,7 @@ export function GameNavigation() {
                 <span className="text-xs font-bold">TR</span>
               )}
             </div>
-            <div className="hidden min-w-0 text-sm xl:block">
+            <div className="hidden min-w-0 text-sm lg:block">
               <p className="truncate font-medium text-game-ink">
                 {user?.trainerName || 'Trainer'}
               </p>
@@ -136,7 +136,7 @@ export function GameNavigation() {
       {/* Mobile Bottom Nav */}
       <nav
         aria-label="Game sections"
-        className="fixed inset-x-0 bottom-0 z-50 flex h-[4.5rem] items-end justify-around border-t border-game-border bg-game-surface/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
+        className="fixed inset-x-0 bottom-0 z-50 flex h-[4.5rem] items-end justify-around border-t border-game-border bg-game-surface/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden"
       >
         {navItems.map((item) => {
           const isActive = isItemActive(item)
@@ -145,7 +145,7 @@ export function GameNavigation() {
             <Link
               key={item.href}
               href={item.href}
-              prefetch={true}
+              prefetch={false}
               onPointerDown={() => prefetchRoute(item.href)}
               onFocus={() => prefetchRoute(item.href)}
               onClick={playSelectSfx}

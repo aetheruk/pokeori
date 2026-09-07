@@ -1065,7 +1065,7 @@ describe('Chronicle gameplay balance', () => {
   test('defers Explore revalidation while activity results are displayed', async () => {
     const [activitySource, expeditionSource, fieldPageSource, captureSource, taskSource] = await Promise.all([
       Bun.file('src/app/(frontend)/game/_shared/activity-actions.ts').text(),
-      Bun.file('src/utilities/expeditions/actions.ts').text(),
+      Bun.file('src/utilities/expeditions/server.ts').text(),
       Bun.file('src/app/(frontend)/game/field-research/page.tsx').text(),
       Bun.file(
         'src/app/(frontend)/game/locations/encounter/actions/capture.ts',
@@ -1073,13 +1073,13 @@ describe('Chronicle gameplay balance', () => {
       Bun.file('src/utilities/tasks/actions.ts').text(),
     ])
 
-    expect(activitySource).toContain('{ revalidatePaths: false }')
+    expect(activitySource).toContain('{ payload, req, revalidatePaths: false }')
     expect(expeditionSource).toContain(
       'const revalidatePaths = options.revalidatePaths !== false',
     )
     expect(expeditionSource).toContain('if (revalidatePaths)')
     expect(captureSource).toContain(
-      'setSafariBallsRemaining(user.id, state.safari!.ballsRemaining, false)',
+      'setSafariBallsRemaining(user.id, state.safari!.ballsRemaining, false, payload)',
     )
     expect(taskSource).toContain(
       "reward as Reward & { type: 'expedition_safari_balls' }",

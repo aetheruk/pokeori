@@ -1998,6 +1998,7 @@ export function ArtisanPanel() {
                       : `Lv ${group.artisanLevel}`
 
                   return (
+                    // biome-ignore lint/a11y/useSemanticElements: The keyboard-accessible card includes its own separate recipe action button.
                     <div
                       key={group.id}
                       onClick={() => setSelectedRecipeGroup(group)}
@@ -2067,6 +2068,7 @@ export function ArtisanPanel() {
                 const recipe = entry.recipe
                 const state = recipeStates.get(recipe.id)!
                 return (
+                  // biome-ignore lint/a11y/useSemanticElements: The keyboard-accessible card contains separate crafting controls that cannot be nested in a button.
                   <div
                     key={recipe.id}
                     onClick={() => setSelectedRecipe(recipe)}

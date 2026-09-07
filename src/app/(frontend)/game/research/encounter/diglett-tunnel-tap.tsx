@@ -1,5 +1,10 @@
 'use client'
 
+import { submitDiglettTap } from '@/app/(frontend)/game/research/games/diglett-tunnel-tap'
+import { recoverGameAction } from '@/utilities/games/action-recovery'
+import type { DiglettRound } from '@/utilities/research/diglett-authority'
+import type { GameDataKeys } from '@/utilities/requirements/analysis'
+
 import { Heart, Trophy } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -16,7 +21,7 @@ import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import {
   completeGame as completeGameActivity,
   startGame,
-} from '@/app/(frontend)/game/games/actions'
+} from '@/utilities/games/client-action-recovery'
 
 interface DiglettTunnelTapGameProps {
   encounter: DiglettTunnelTapGameConfig & { isEligibleForReplay?: boolean }
@@ -38,6 +43,7 @@ export function DiglettTunnelTapGame({
   useGameMusic(encounter)
   const { playSfx } = useAudio()
   const { refreshUser } = useUser()
+  const completionInvalidatesRef = useRef<GameDataKeys[] | undefined>(undefined)
   const router = useRouter()
   const { cols, rows } = encounter.settings.gridSize
   const totalSlots = cols * rows
@@ -57,7 +63,9 @@ export function DiglettTunnelTapGame({
   const [activeMole, setActiveMole] = useState<ActiveMole | null>(null)
   const [result, setResult] = useState<any | null>(null)
   const completionRef = useRef(false)
-  const moleKeyRef = useRef(0)
+  const [round, setRound] = useState<DiglettRound | null>(null)
+  const startTimeRef = useRef(0)
+  const busyRef = useRef(false)
 
   const completeGame = useCallback(
     async (success: boolean, message: string, finalScore = score) => {
@@ -67,6 +75,7 @@ export function DiglettTunnelTapGame({
       setActiveMole(null)
 
       const completion = await completeGameActivity(encounter.id, success)
+      completionInvalidatesRef.current = completion.invalidates
       const finalSuccess = success && completion.success
       setResult({
         success: finalSuccess,
@@ -78,115 +87,50 @@ export function DiglettTunnelTapGame({
     [encounter.id, playSfx, score],
   )
 
-  const initGame = useCallback(async () => {
-    const start = await startGame(encounter.id)
-    if (!start.success) {
-      setResult({
-        success: false,
-        message: start.error || 'Could not start Diglett Tunnel Tap.',
-      })
-      return
-    }
-
-    completionRef.current = false
-    setGameStarted(true)
-    setGameEnded(false)
-    setScore(0)
-    setLives(maxLives)
-    setActiveMole(null)
-    setResult(null)
-    setTimeLeft(
-      start.restored && start.expiry
-        ? Math.max(0, Math.floor((start.expiry - Date.now()) / 1000))
-        : timeLimit,
-    )
-  }, [encounter.id, maxLives, timeLimit])
+  useEffect(() => {
+    let disposed = false
+    void (async () => {
+      const start = await recoverGameAction(() => startGame(encounter.id), 'Unable to restore the tunnel.', (value) => value.roundData?.kind === 'diglett-tunnel-tap' ? undefined : 'The saved tunnel is unavailable.')
+      if (disposed) return
+      const restored = start.roundData as DiglettRound
+      startTimeRef.current = start.startTime!
+      setRound(restored)
+      setScore(restored.score)
+      setLives(restored.lives)
+      setGameStarted(true)
+    })()
+    return () => { disposed = true }
+  }, [encounter.id])
 
   useEffect(() => {
-    if (!gameStarted) {
-      void initGame()
-    }
-  }, [gameStarted, initGame])
-
-  useEffect(() => {
-    if (!gameStarted || gameEnded || timeLeft <= 0) return
-
-    const timer = window.setInterval(() => {
-      setTimeLeft((current) => {
-        if (current <= 1) {
-          void completeGame(score >= targetScore, 'The tunnel went quiet.')
-          return 0
-        }
-        return current - 1
-      })
-    }, 1000)
-
-    return () => window.clearInterval(timer)
-  }, [completeGame, gameEnded, gameStarted, score, targetScore, timeLeft])
-
-  useEffect(() => {
-    if (!gameStarted || gameEnded) return
-
-    const spawn = () => {
-      const slot = Math.floor(Math.random() * totalSlots)
-      const kind: MoleKind = Math.random() < 0.78 ? 'diglett' : 'dugtrio'
-      const key = moleKeyRef.current++
-      setActiveMole({ slot, kind, key })
-      window.setTimeout(() => {
-        setActiveMole((current) => (current?.key === key ? null : current))
-      }, encounter.settings.visibleMs)
-    }
-
-    spawn()
-    const interval = window.setInterval(
-      spawn,
-      encounter.settings.spawnIntervalMs,
-    )
-    return () => window.clearInterval(interval)
-  }, [
-    encounter.settings.spawnIntervalMs,
-    encounter.settings.visibleMs,
-    gameEnded,
-    gameStarted,
-    totalSlots,
-  ])
-
-  const handleHoleTap = useCallback(
-    (slot: number) => {
-      if (gameEnded || !activeMole || activeMole.slot !== slot) return
-
-      if (activeMole.kind === 'diglett') {
-        const nextScore = score + diglettScore
-        setScore(nextScore)
-        setActiveMole(null)
-        playSfx('good')
-        if (nextScore >= targetScore) {
-          void completeGame(true, 'Tunnel mapped.', nextScore)
-        }
-      } else {
-        const nextLives = lives - 1
-        const nextScore = Math.max(0, score - dugtrioPenalty)
-        setLives(nextLives)
-        setScore(nextScore)
-        setActiveMole(null)
-        playSfx('bad')
-        if (nextLives <= 0) {
-          void completeGame(false, 'Too many cave-ins.')
-        }
+    if (!round || !gameStarted || gameEnded) return
+    const update = () => {
+      const now = Date.now()
+      setTimeLeft(Math.max(0, Math.ceil((round.deadline - now) / 1000)))
+      setActiveMole(busyRef.current ? null : round.spawns.find((spawn) => spawn.startsAt <= now && spawn.endsAt > now && !round.tapped.includes(spawn.key)) || null)
+      if (!busyRef.current && (now >= round.deadline || round.score >= targetScore || round.lives <= 0)) {
+        void completeGame(round.score >= targetScore, round.lives <= 0 ? 'Too many cave-ins.' : 'The tunnel went quiet.', round.score)
       }
-    },
-    [
-      activeMole,
-      completeGame,
-      diglettScore,
-      dugtrioPenalty,
-      gameEnded,
-      lives,
-      playSfx,
-      score,
-      targetScore,
-    ],
-  )
+    }
+    update()
+    const timer = window.setInterval(update, 50)
+    return () => window.clearInterval(timer)
+  }, [round, gameStarted, gameEnded, targetScore, completeGame])
+
+  const handleHoleTap = async (slot: number) => {
+    if (gameEnded || busyRef.current || !round || !activeMole || activeMole.slot !== slot) return
+    busyRef.current = true
+    const request = { encounterId: encounter.id, startTime: startTimeRef.current, revision: round.revision, spawnKey: activeMole.key, slot, actionId: crypto.randomUUID() }
+    setActiveMole(null)
+    const response = await recoverGameAction(() => submitDiglettTap(request), 'Your tap could not be confirmed. Retry this same tap.', (value) => value.success && value.round || ['Time is up', 'This Pokémon has returned underground', 'This hole is empty'].includes(value.error || '') ? undefined : value.error || 'Unable to save the tap.')
+    if (response.round) {
+      setRound(response.round)
+      setScore(response.round.score)
+      setLives(response.round.lives)
+      playSfx(response.correct ? 'good' : 'bad')
+    }
+    busyRef.current = false
+  }
 
   return (
     <div className="relative min-h-dvh overflow-hidden game-night bg-game-night-canvas text-game-night-ink">
@@ -291,7 +235,7 @@ export function DiglettTunnelTapGame({
         <RewardResultOverlay
           result={result}
           onClose={() => {
-            refreshUser()
+            refreshUser(true, completionInvalidatesRef.current)
             router.push('/game/explore')
           }}
           icon={encounter.icon}

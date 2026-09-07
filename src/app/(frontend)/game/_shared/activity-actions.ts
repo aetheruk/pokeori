@@ -1,4 +1,4 @@
-'use server'
+import 'server-only'
 
 // Shared server runtime for Mini Games and Field Research.
 
@@ -17,7 +17,7 @@ import { grantRewards, Reward } from '@/utilities/rewards/reward-logic'
 import { redis } from '@/utilities/redis'
 import type { User } from '@/payload-types'
 import { getGameUserData } from '@/utilities/game-data'
-import { analyzeRequirements } from '@/utilities/requirements/analysis'
+import { analyzeRequirements, type GameDataKeys } from '@/utilities/requirements/analysis'
 import pokemonData from '@/data/pokemon-data'
 import {
   acquireActionLock,
@@ -25,11 +25,13 @@ import {
   getIdempotentResult,
   releaseActionLock,
   setIdempotentResult,
+  type ActionLock,
 } from '@/utilities/game-integrity'
-import { recordExpeditionActivityResult } from '@/utilities/expeditions/actions'
+import { recordExpeditionActivityResult } from '@/utilities/expeditions/server'
+import { createEconomyRequestId, getEconomyActionResult, runEconomyAction } from '@/utilities/economy/transactions'
 import { isDailyExcludedGameType } from '@/utilities/tasks/daily-activity'
 import { recordDailyActivityProgress } from '@/utilities/tasks/daily-progress'
-import type { ExpeditionProgressSnapshot } from '@/utilities/expeditions/actions'
+import type { ExpeditionProgressSnapshot } from '@/utilities/expeditions/server'
 import { isActivityEligibleForReplay } from '@/utilities/activity-replay'
 import {
   getAchievedUnclaimedMilestones,
@@ -47,6 +49,7 @@ import {
 } from '@/utilities/research/input-validation'
 import {
   getUserInventoryMap,
+  getUserActivityStatsMap,
   incrementUserActivityResult,
   setUserInventoryMap,
 } from '@/utilities/user-state'
@@ -123,6 +126,21 @@ import {
   getRandomPokemonFromPool,
 } from '@/utilities/research/round-selection'
 import { getEligiblePrizeWheelSlots } from '@/utilities/research/prize-wheel'
+import { createMatch3Round } from '@/utilities/research/match3'
+import type { Match3GameSettings } from '@/data/games/match3/types'
+import { verifyCircuitProof, verifyEchoMapProof, verifyVoltorbProof } from '@/utilities/research/puzzle-verification'
+import type { MagnemiteCircuitSettings } from '@/data/games/magnemite-circuit/types'
+import type { RockTunnelEchoMapSettings } from '@/data/games/rock-tunnel-echo-map/types'
+import type { VoltorbGridSettings } from '@/data/games/voltorb-grid/types'
+import type { RockPushGameConfig } from '@/data/games/rock-push/types'
+import { getRockPushObjectProofTargets, verifyRockPushProof } from '@/utilities/research/rock-push-verification'
+import { generateInspectionRound } from '@/utilities/research/tcg-inspection-server'
+import type { TcgInspectionGameSettings } from '@/data/games/tcg-inspection/types'
+import { createDiglettRound } from '@/utilities/research/diglett-authority'
+import type { DiglettTunnelTapSettings } from '@/data/games/diglett-tunnel-tap/types'
+import { getGameCompletionInvalidations } from '@/utilities/games/completion-invalidation'
+import { randomInt } from 'node:crypto'
+import { createArcadeRound, isArcadeGameType, verifyArcadeCheckpoint } from '@/utilities/research/arcade-authority'
 
 const FIELD_OBSERVATION_FAILURE_REWARD_LOSS_CHANCE = 0.7
 
@@ -183,6 +201,7 @@ export interface GameActivityState {
 }
 
 export interface GameActivityCompletionResult {
+  invalidates?: GameDataKeys[]
   success: boolean
   summary?: any
   expeditionProgress?: ExpeditionProgressSnapshot
@@ -553,8 +572,8 @@ export async function startGameActivity(
     }
 
     const startLock = await acquireActionLock(
-      `lock:${domain}:start:${user.id}:${validatedEncounterId}`,
-      15,
+      `lock:${domain}:settle:${user.id}`,
+      60,
     )
     if (!startLock.acquired) {
       return { success: false, error: 'Encounter start already in progress' }
@@ -585,10 +604,15 @@ export async function startGameActivity(
         const isIncompatibleFieldObservation =
           isFieldObservation &&
           restoredRoundUsesKidModeQuestion !== (user.kidMode === true)
+        const isIncompatibleMatch3 = encounter.gameType === 'match3' && existingState.roundData?.kind !== 'match3'
+        const isIncompatibleRockPush = encounter.gameType === 'grid-puzzle' && encounter.settings.variant === 'rock-push' && existingState.roundData?.kind !== 'rock-push'
+        const isIncompatibleInspection = encounter.gameType === 'tcg-inspection' && existingState.roundData?.kind !== 'tcg-inspection'
+        const isIncompatibleDiglett = encounter.gameType === 'diglett-tunnel-tap' && existingState.roundData?.kind !== 'diglett-tunnel-tap'
+        const isIncompatibleArcade = isArcadeGameType(encounter.gameType) && (existingState.roundData?.kind !== 'arcade' || existingState.roundData?.version !== 1)
 
         if (
           existingState.expiry > Date.now() &&
-          !isIncompatibleFieldObservation
+          !isIncompatibleFieldObservation && !isIncompatibleMatch3 && !isIncompatibleRockPush && !isIncompatibleInspection && !isIncompatibleArcade && !isIncompatibleDiglett
         ) {
           return {
             success: true,
@@ -891,10 +915,33 @@ export async function startGameActivity(
           }),
       )
       const startTime = Date.now()
-      const expiry = startTime + sessionTimeLimit * 1000
+      let expiry = startTime + (
+        encounter.gameType === 'match3' && (encounter.settings.endless?.enabled || !encounter.settings.timeLimit)
+          ? 3_600_000 : sessionTimeLimit * 1000
+      )
 
       let roundData: any
-      if (snapTargetId !== undefined) {
+      if (isArcadeGameType(encounter.gameType)) {
+        const timedArcade = !encounter.settings.endless?.enabled && Boolean(encounter.settings.timeLimit)
+        roundData = createArcadeRound(encounter.gameType, { ...encounter.settings, timeLimit: timedArcade ? sessionTimeLimit : undefined }, startTime, randomInt(0, 2 ** 32))
+        // Simulation time bounds gameplay; the durable lifetime also permits
+        // paused tabs and network-recovery retries without consuming play time.
+        expiry = startTime + 7_200_000
+      } else if (encounter.gameType === 'match3') {
+        roundData = createMatch3Round(encounter.settings as unknown as Match3GameSettings, expiry)
+      } else if (encounter.gameType === 'tcg-inspection') {
+        roundData = await generateInspectionRound(encounter.id, encounter.settings as unknown as TcgInspectionGameSettings, startTime)
+        expiry = roundData.deadline
+      } else if (encounter.gameType === 'diglett-tunnel-tap') {
+        roundData = createDiglettRound(encounter.settings as unknown as DiglettTunnelTapSettings, startTime)
+        expiry = roundData.deadline + 1000
+      } else if (encounter.gameType === 'grid-puzzle' && encounter.settings.variant === 'rock-push') {
+        const targets = getRockPushObjectProofTargets(encounter.settings as unknown as RockPushGameConfig['settings'])
+        const stats = targets.length ? await getUserActivityStatsMap(payload, user.id, ['battleResults', 'locationEncounterResults']) : {}
+        roundData = { kind: 'rock-push', objectWins: Object.fromEntries(targets.map((target) => [
+          target.key, stats[target.type === 'battle' ? 'battles' : 'locations']?.[target.targetId]?.wins || 0,
+        ])) }
+      } else if (snapTargetId !== undefined) {
         roundData = generateSnapTargetRoundData(
           timeLimit,
           encounter.settings.successThreshold || 1500,
@@ -1305,7 +1352,9 @@ export async function startGameActivity(
       const isEndlessMode =
         (encounter as any).settings?.endless?.enabled || false
       const sessionTTL =
-        isEndlessMode || encounter.gameType === 'tcg-battle'
+        isArcadeGameType(encounter.gameType)
+          ? Math.ceil((expiry - startTime) / 1000) + 120
+          : isEndlessMode || encounter.gameType === 'tcg-battle'
           ? 3600
           : sessionTimeLimit + 120
 
@@ -1333,12 +1382,15 @@ export async function submitGameActivityAnswer(
   domain: GameActivityDomain,
   answer: any,
 ) {
+  let submissionLock: ActionLock | undefined
   try {
     const user = await getUser()
     if (!user) {
       return { success: false, error: 'Not authenticated' }
     }
 
+    submissionLock = await acquireActionLock(`lock:${domain}:settle:${user.id}`, 60)
+    if (!submissionLock.acquired) return { success: false, error: 'Game action already in progress' }
     const state = await getGameActivityStateForUser(user.id, domain)
     if (!state) {
       return {
@@ -1359,6 +1411,9 @@ export async function submitGameActivityAnswer(
       }
     }
 
+    if (!['snap', 'field-observation', 'silhouette', 'cry', 'identify', 'compare', 'spelling', 'sliding-puzzle', 'procedure-order'].includes(encounter.gameType)) {
+      return { success: false, error: 'This game requires verified input checkpoints' }
+    }
     const answerValidation = validateResearchAnswer(encounter.gameType, answer)
     if (!answerValidation.success) {
       return { success: false, error: answerValidation.error }
@@ -1382,6 +1437,15 @@ export async function submitGameActivityAnswer(
 
     if (Date.now() > gameEndTime) {
       return { success: false, message: 'Time is up!', gameOver: true }
+    }
+
+    if (
+      state.wins >= getRequiredWins(encounter) ||
+      (encounter.gameType === 'procedure-order' &&
+        Number(state.roundData?.submissions || 0) >= (encounter.settings.maxSubmissions ?? 3))
+    ) {
+      return { success: true, correct: state.wins >= getRequiredWins(encounter),
+        wins: state.wins, requiredWins: getRequiredWins(encounter), gameOver: true }
     }
 
     if (
@@ -1441,45 +1505,6 @@ export async function submitGameActivityAnswer(
           isCorrect = String(validatedAnswer) === String(state.currentPokemonId)
         }
       }
-    } else if (encounter.gameType === 'grid-puzzle') {
-      isCorrect = Boolean(validatedAnswer)
-    } else if (encounter.gameType === 'rhythm') {
-      isCorrect = Boolean(validatedAnswer)
-    } else if (encounter.gameType === 'run') {
-      // For run game, answer is a boolean indicating win/loss
-      // Validate using delta-time based scoring (100 points per second)
-      if (validatedAnswer) {
-        const elapsedTime = (Date.now() - state.startTime) / 1000 // seconds
-        const winScore = encounter.settings.winScore || 1000
-        const scorePerSecond = 10 // Must match SCORE_PER_SECOND in client
-
-        // Calculate minimum time needed to reach win score
-        const minTimeNeeded = winScore / scorePerSecond
-
-        // Add 20% tolerance for network latency and timing variations
-        const minTimeWithTolerance = minTimeNeeded * 0.8
-
-        if (elapsedTime < minTimeWithTolerance) {
-          if (process.env.NODE_ENV === 'development') {
-            console.warn(
-              `User ${user.id} attempted to cheat in run game ${state.encounterId}: ` +
-                `claimed win with score ${winScore} in ${elapsedTime.toFixed(2)}s ` +
-                `(minimum required: ${minTimeNeeded.toFixed(2)}s)`,
-            )
-          }
-          isCorrect = false
-        } else {
-          isCorrect = true
-        }
-      } else {
-        isCorrect = false
-      }
-    } else if (
-      encounter.gameType === 'flap' ||
-      encounter.gameType === 'surf' ||
-      encounter.gameType === 'mining'
-    ) {
-      isCorrect = Boolean(validatedAnswer)
     } else if (encounter.gameType === 'spelling') {
       // Spelling game - answer is { letter: string }
       const { letter } = validatedAnswer as { letter: string }
@@ -1712,7 +1737,6 @@ export async function submitGameActivityAnswer(
 
     if (
       snapTargetId !== undefined ||
-      encounter.gameType === 'grid-puzzle' ||
       encounter.gameType === 'run' ||
       encounter.gameType === 'surf' ||
       encounter.gameType === 'field-observation'
@@ -1918,6 +1942,8 @@ export async function submitGameActivityAnswer(
   } catch (error) {
     console.error('Error submitting answer:', error)
     return { success: false, error: 'Internal server error' }
+  } finally {
+    if (submissionLock) await releaseActionLock(submissionLock)
   }
 }
 
@@ -2075,6 +2101,7 @@ export async function completeGameActivity(
   collectedEndlessRewards?: Record<string, number>,
   collectedRockPushRewardIds?: string[],
   artAcademyDrawing?: string,
+  gameplayProof?: unknown,
 ): Promise<GameActivityCompletionResult> {
   try {
     const user = await getUser()
@@ -2114,6 +2141,7 @@ export async function completeGameActivity(
     const validatedSuccess = completionInput.value?.success as boolean
     const validatedFinalScore = completionInput.value?.finalScore
     const validatedAdditionalLosses = completionInput.value?.additionalLosses
+    if (validatedAdditionalLosses) return { success: false, error: 'Losses are recorded by the game server' }
     const validatedCollectedEndlessRewards =
       completionInput.value?.collectedEndlessRewards
     const validatedCollectedRockPushRewardIds =
@@ -2159,8 +2187,8 @@ export async function completeGameActivity(
     }
 
     const completionLock = await acquireActionLock(
-      `lock:${domain}:complete:${user.id}:${validatedEncounterId}`,
-      15,
+      `lock:${domain}:settle:${user.id}`,
+      60,
     )
     if (!completionLock.acquired) {
       return { success: false, error: 'Completion already being processed' }
@@ -2192,6 +2220,50 @@ export async function completeGameActivity(
         subCategory: encounter.subCategory,
         weather: state.weather?.weather,
       }
+      let arcadeResult: Extract<ReturnType<typeof verifyArcadeCheckpoint>, { success: true }> | undefined
+      if (isArcadeGameType(encounter.gameType)) {
+        const round = state.roundData
+        const verified = verifyArcadeCheckpoint(encounter.gameType, encounter.settings, round, gameplayProof ?? {
+          kind: 'arcade', sessionId: round?.sessionId, revision: round?.revision,
+          targetTick: round?.simulation?.tick, inputs: [],
+        })
+        if (!verified.success) return { success: false, error: verified.error }
+        arcadeResult = verified
+        state.roundData = verified.roundData
+      }
+      let rockPushVerification = { solved: false, prizeIds: [] as string[] }
+      if (encounter.gameType === 'grid-puzzle' && encounter.settings.variant === 'rock-push') {
+        const settings = encounter.settings as unknown as RockPushGameConfig['settings']
+        const targets = getRockPushObjectProofTargets(settings)
+        const stats = targets.length ? await getUserActivityStatsMap(payload, user.id, ['battleResults', 'locationEncounterResults']) : {}
+        const verifiedObjects = Object.fromEntries(targets.map((target) => {
+          const baseline = state.roundData?.objectWins?.[target.key]
+          return [target.key, typeof baseline === 'number'
+            ? Math.max(0, (stats[target.type === 'battle' ? 'battles' : 'locations']?.[target.targetId]?.wins || 0) - baseline)
+            : 0]
+        }))
+        rockPushVerification = verifyRockPushProof(settings, gameplayProof, verifiedObjects)
+      }
+      const isTranscriptPuzzle = encounter.gameType === 'magnemite-circuit' || encounter.gameType === 'grid-puzzle'
+      const transcriptVerified = encounter.gameType === 'magnemite-circuit'
+        ? verifyCircuitProof(encounter.settings as unknown as MagnemiteCircuitSettings, gameplayProof)
+        : encounter.gameType === 'grid-puzzle' && encounter.settings.variant === 'echo-map'
+          ? verifyEchoMapProof(encounter.settings as unknown as RockTunnelEchoMapSettings, gameplayProof)
+          : encounter.gameType === 'grid-puzzle' && encounter.settings.variant === 'voltorb'
+            ? verifyVoltorbProof(encounter.settings as unknown as VoltorbGridSettings, gameplayProof)
+            : rockPushVerification.solved
+      if (validatedSuccess && encounter.gameType === 'magnemite-circuit' && !transcriptVerified) {
+        return { success: false, error: 'The circuit solution could not be verified' }
+      }
+      if (validatedSuccess && encounter.gameType === 'grid-puzzle' && encounter.settings.variant === 'echo-map' && !transcriptVerified) {
+        return { success: false, error: 'The route to the exit could not be verified' }
+      }
+      if (validatedSuccess && encounter.gameType === 'grid-puzzle' && encounter.settings.variant === 'voltorb' && !transcriptVerified) {
+        return { success: false, error: 'The Voltorb solution could not be verified' }
+      }
+      if (validatedSuccess && encounter.gameType === 'grid-puzzle' && encounter.settings.variant === 'rock-push' && !transcriptVerified) {
+        return { success: false, error: 'The rock puzzle solution could not be verified' }
+      }
       const activeAbility = getResearchStateAbility(state)
       const abilityContext = getResearchAbilityContext(encounter, state)
       const researchSkillXpMultiplier = getResearchSkillXpMultiplier({
@@ -2204,6 +2276,7 @@ export async function completeGameActivity(
           ...abilityContext,
         })
 
+      let verifiedTcgBattleSuccess = false
       if (encounter.gameType === 'tcg-battle') {
         const battleState = (await redis.get(`tcg-battle:${user.id}`)) as {
           encounterId: string
@@ -2219,6 +2292,7 @@ export async function completeGameActivity(
         }
 
         const battleSuccess = battleState.winner === 'player'
+        verifiedTcgBattleSuccess = battleSuccess
         if (validatedSuccess !== battleSuccess) {
           return { success: false, error: 'Invalid TCG battle result' }
         }
@@ -2255,9 +2329,15 @@ export async function completeGameActivity(
       // For endless mode, validate the score with anti-cheat
       // Skip for match3 games - their score comes from matching crystals, not time-based
       const normalizedFinalScore = normalizeFinalScore(
-        artAcademyScore ?? validatedFinalScore,
+        arcadeResult ? arcadeResult.score : encounter.gameType === 'match3'
+          ? state.roundData?.kind === 'match3' ? state.roundData.score : 0
+          : encounter.gameType === 'tcg-inspection'
+            ? state.roundData?.kind === 'tcg-inspection' ? state.roundData.score : 0
+          : encounter.gameType === 'diglett-tunnel-tap'
+            ? state.roundData?.kind === 'diglett-tunnel-tap' ? state.roundData.score : 0
+          : artAcademyScore ?? validatedFinalScore,
       )
-      if (isEndlessMode && normalizedFinalScore !== null) {
+      if (isEndlessMode && normalizedFinalScore !== null && !arcadeResult) {
         const elapsedTime = (Date.now() - state.startTime) / 1000 // seconds
         const maxPossibleScore = getMaxAllowedEndlessScore(
           encounter.gameType,
@@ -2288,6 +2368,7 @@ export async function completeGameActivity(
         encounter.gameType === 'ufo-catcher' ||
         encounter.gameType === 'prize-wheel'
       const isScoreCompletionGame =
+        encounter.gameType === 'diglett-tunnel-tap' ||
         (encounter.gameType === 'match3' &&
           typeof encounter.settings.winScore === 'number') ||
         (encounter.gameType === 'snake' &&
@@ -2297,7 +2378,7 @@ export async function completeGameActivity(
         (encounter.gameType === 'art-academy' &&
           typeof encounter.settings.successThreshold === 'number')
       const scoreCompletionTarget =
-        encounter.gameType === 'tcg-inspection'
+        encounter.gameType === 'diglett-tunnel-tap' ? encounter.settings.targetScore : encounter.gameType === 'tcg-inspection'
           ? encounter.settings.requiredAnswers
           : encounter.gameType === 'art-academy'
             ? encounter.settings.successThreshold
@@ -2306,24 +2387,23 @@ export async function completeGameActivity(
       const isFieldObservation = encounter.gameType === 'field-observation'
       const requiredWins = getRequiredWins(encounter)
 
-      // Add any additional losses tracked locally (for pachinko misses)
-      if (validatedAdditionalLosses && validatedAdditionalLosses > 0) {
-        state.losses += validatedAdditionalLosses
-      }
-
       // Check if they meet requirements (including this potential win)
       const scoreCompletionSuccess =
         isScoreCompletionGame &&
         normalizedFinalScore !== null &&
         normalizedFinalScore >= scoreCompletionTarget!
-      const completionWin =
-        encounter.gameType === 'art-academy' || isScoreCompletionGame
-          ? scoreCompletionSuccess
-          : validatedSuccess || scoreCompletionSuccess
+      const usesVerifiedRounds = [
+        'silhouette', 'identify', 'snap', 'cry', 'compare', 'spelling',
+        'sliding-puzzle', 'procedure-order', 'field-observation',
+      ].includes(encounter.gameType)
       const currentWins =
-        isSnapTargetMode || isFieldObservation
+        encounter.gameType === 'tcg-battle' ? (verifiedTcgBattleSuccess ? requiredWins : 0)
+        : arcadeResult ? (arcadeResult.won ? requiredWins : 0)
+        : isTranscriptPuzzle ? (transcriptVerified && validatedSuccess ? requiredWins : 0)
+        : isScoreCompletionGame ? (scoreCompletionSuccess ? requiredWins : 0)
+        : isSnapTargetMode || isFieldObservation || usesVerifiedRounds
           ? state.wins
-          : state.wins + (completionWin ? 1 : 0)
+          : state.wins
       const actualSuccess = currentWins >= requiredWins
 
       if (validatedSuccess && !actualSuccess && !isEndlessMode) {
@@ -2350,29 +2430,18 @@ export async function completeGameActivity(
         }
       }
 
-      if (
-        encounter.gameType === 'slots' ||
-        encounter.gameType === 'pachinko' ||
-        encounter.gameType === 'ufo-catcher' ||
-        encounter.gameType === 'prize-wheel' ||
-        encounter.gameType === 'fishing'
-      ) {
-        // Chance games record stats per attempt
-        // But batch-reported losses (misses) for pachinko need to be added here
-        if (
-          encounter.gameType === 'pachinko' &&
-          validatedAdditionalLosses &&
-          validatedAdditionalLosses > 0
-        ) {
-          await incrementUserActivityResult(
-            payload as any,
-            user.id,
-            domain === 'game' ? 'gameResults' : 'fieldResearchResults',
-            validatedEncounterId,
-            { losses: validatedAdditionalLosses },
-          )
-        }
-      } else {
+      const settlementState = structuredClone(state)
+      const response = await runEconomyAction<GameActivityCompletionResult>(
+        {
+          userId: user.id,
+          action: 'settle-game',
+          requestId: createEconomyRequestId(resultKey),
+          payload,
+        },
+        async ({ payload, req }) => {
+      const state = structuredClone(settlementState)
+      // Chance games persist their attempts in their own paid settlement.
+      if (!['slots', 'pachinko', 'ufo-catcher', 'prize-wheel', 'fishing'].includes(encounter.gameType)) {
         await incrementUserActivityResult(
           payload as any,
           user.id,
@@ -2395,38 +2464,7 @@ export async function completeGameActivity(
         await recordDailyActivityProgress(user.id, {
           kind: domain === 'game' ? 'game_win' : 'field_research_win',
           sourceId: validatedEncounterId,
-        })
-      }
-
-      // Deduct cost for additional losses (misses) if any
-      const cost = encounter.settings.cost
-      const updateData: any = {}
-      if (cost && validatedAdditionalLosses && validatedAdditionalLosses > 0) {
-        const currentBalance = (user.currency as any)?.[cost.currencyType] || 0
-        const totalMissCost = cost.amount * validatedAdditionalLosses
-        updateData.currency = {
-          ...user.currency,
-          [cost.currencyType]: Math.max(0, currentBalance - totalMissCost),
-        }
-
-        // Update session cost for reward summary
-        if (encounter.gameType === 'pachinko') {
-          const currentSession = state.pachinkoSession || {
-            totalRewards: {},
-            totalCost: 0,
-          }
-          currentSession.totalCost =
-            (currentSession.totalCost || 0) + totalMissCost
-          state.pachinkoSession = currentSession
-        }
-      }
-
-      if (Object.keys(updateData).length > 0) {
-        await payload.update({
-          collection: 'users',
-          id: user.id,
-          data: updateData,
-        })
+        }, { payload, req })
       }
 
       let rewardSummary = null
@@ -2439,7 +2477,7 @@ export async function completeGameActivity(
         encounter.gameType === 'grid-puzzle'
           ? getCollectedRockPushRewards(
               encounter,
-              validatedCollectedRockPushRewardIds,
+              encounter.settings.variant === 'rock-push' ? rockPushVerification.prizeIds : validatedCollectedRockPushRewardIds,
             )
           : []
       const lostCollectedFieldObservationRewards =
@@ -2473,10 +2511,20 @@ export async function completeGameActivity(
         const endlessSettings = (encounter as any).settings.endless || {}
         const milestones = endlessSettings.milestones || []
         const repeatingRewards = endlessSettings.repeatingRewards || []
+        const durablyClaimedMilestones = [...(state.claimedMilestones || [])]
+        for (const milestone of milestones) {
+          const claimed = await getEconomyActionResult({
+            userId: user.id,
+            action: 'endless-milestone',
+            requestId: createEconomyRequestId(`game:endless:claim-result:${user.id}:${validatedEncounterId}:${state.startTime}:${milestone.score}`),
+            payload,
+          }, req)
+          if (claimed) durablyClaimedMilestones.push(milestone.score)
+        }
         const achievedMilestones = getAchievedUnclaimedMilestones(
           milestones,
           normalizedFinalScore,
-          state.claimedMilestones,
+          durablyClaimedMilestones,
         )
         const earnedRepeatingRewards = getEarnedRepeatingRewards(
           repeatingRewards,
@@ -2485,7 +2533,7 @@ export async function completeGameActivity(
         const earnedRandomRepeatingRewards = getEarnedRandomRepeatingRewards({
           repeatingRewards,
           finalScore: normalizedFinalScore,
-          collectedRewards: validatedCollectedEndlessRewards,
+          collectedRewards: arcadeResult?.collectedRewards ?? validatedCollectedEndlessRewards,
         })
 
         if (
@@ -2513,7 +2561,8 @@ export async function completeGameActivity(
           if (allRewards.length > 0) {
             const { summary } = await grantRewards(user.id, allRewards, {
               requirementContext: rewardRequirementContext,
-              idempotencyKey: resultKey,
+              payload,
+              req,
             })
             rewardSummary = summary
           }
@@ -2603,7 +2652,8 @@ export async function completeGameActivity(
 
           const { summary } = await grantRewards(user.id, rewardsToGrant, {
             requirementContext: rewardRequirementContext,
-            idempotencyKey: resultKey,
+              payload,
+              req,
           })
           rewardSummary = summary
         } else if (
@@ -2626,7 +2676,8 @@ export async function completeGameActivity(
           if (skillXpReward) rewardsToGrant.push(skillXpReward)
           const { summary } = await grantRewards(user.id, rewardsToGrant, {
             requirementContext: rewardRequirementContext,
-            idempotencyKey: resultKey,
+              payload,
+              req,
           })
           rewardSummary = summary
         }
@@ -2659,7 +2710,8 @@ export async function completeGameActivity(
           if (rewardsToGrant.length > 0) {
             const { summary } = await grantRewards(user.id, rewardsToGrant, {
               requirementContext: rewardRequirementContext,
-              idempotencyKey: resultKey,
+              payload,
+              req,
             })
             rewardSummary = summary
           }
@@ -2674,7 +2726,8 @@ export async function completeGameActivity(
           if (skillXpReward) {
             const { summary } = await grantRewards(user.id, [skillXpReward], {
               requirementContext: rewardRequirementContext,
-              idempotencyKey: resultKey,
+              payload,
+              req,
             })
             rewardSummary = summary
           }
@@ -2689,7 +2742,8 @@ export async function completeGameActivity(
           collectedFieldObservationRewards,
           {
             requirementContext: rewardRequirementContext,
-            idempotencyKey: resultKey,
+              payload,
+              req,
           },
         )
         rewardSummary = summary
@@ -2700,7 +2754,7 @@ export async function completeGameActivity(
         domain,
         validatedEncounterId,
         actualSuccess || isEndlessWin,
-        { revalidatePaths: false },
+        { payload, req, revalidatePaths: false },
       )
 
       const summaryWithExpedition = {
@@ -2714,16 +2768,19 @@ export async function completeGameActivity(
         expeditionProgress: expeditionResult.expedition,
       }
 
-      const response: GameActivityCompletionResult = {
+      return {
         success: true,
         summary: summaryWithExpedition,
         expeditionProgress: expeditionResult.expedition,
         message: completionMessage,
+        invalidates: getGameCompletionInvalidations(summaryWithExpedition, domain === 'game' ? 'game' : 'research', Boolean(expeditionResult.expedition)),
         finalScore:
           encounter.gameType === 'art-academy'
             ? normalizedFinalScore || undefined
             : undefined,
       }
+        },
+      )
       await setIdempotentResult(resultKey, response, 300)
       await redis.set(
         `${domain}:complete-last-start:${user.id}:${validatedEncounterId}`,
@@ -2817,7 +2874,7 @@ export async function claimGameActivityEndlessMilestone(
     }
 
     // Get current state before idempotency so claims are scoped to a specific run.
-    const state = await getGameActivityStateForUser(user.id, 'game')
+    let state = await getGameActivityStateForUser(user.id, 'game')
     if (!state || state.encounterId !== validatedEncounterId) {
       return { success: false, error: 'No active session' }
     }
@@ -2829,8 +2886,8 @@ export async function claimGameActivityEndlessMilestone(
     }
 
     const claimLock = await acquireActionLock(
-      `lock:endless:claim:${user.id}:${validatedEncounterId}:${state.startTime}:${normalizedScore}`,
-      12,
+      `lock:game:settle:${user.id}`,
+      60,
     )
     if (!claimLock.acquired) {
       return { success: false, error: 'Milestone claim already in progress' }
@@ -2842,6 +2899,18 @@ export async function claimGameActivityEndlessMilestone(
       if (cachedResultAfterLock) {
         return cachedResultAfterLock
       }
+
+      const lockedState = await getGameActivityStateForUser(user.id, 'game')
+      if (!lockedState || lockedState.encounterId !== validatedEncounterId || lockedState.startTime !== state.startTime) {
+        return { success: false, error: 'Game session changed' }
+      }
+      state = lockedState
+      const completed = await getEconomyActionResult({
+        userId: user.id,
+        action: 'settle-game',
+        requestId: createEconomyRequestId(`game:complete-result:${user.id}:${validatedEncounterId}:${state.startTime}`),
+      })
+      if (completed) return { success: false, error: 'Game session already completed' }
 
       // Get encounter config
       const encounter = allGames.find((e) => e.id === validatedEncounterId)
@@ -2871,6 +2940,14 @@ export async function claimGameActivityEndlessMilestone(
       }
 
       // Anti-cheat: Validate score is achievable
+      if (isArcadeGameType(encounter.gameType) &&
+          (state.roundData?.kind !== 'arcade' || state.roundData.simulation.score < normalizedScore)) {
+        return { success: false, error: 'Milestone score has not been reached' }
+      }
+      if (encounter.gameType === 'match3' &&
+          (state.roundData?.kind !== 'match3' || state.roundData.score < normalizedScore)) {
+        return { success: false, error: 'Milestone score has not been reached' }
+      }
       const elapsedTime = (Date.now() - state.startTime) / 1000 // seconds
       const maxPossibleScore = getMaxAllowedEndlessScore(
         encounter.gameType,
@@ -2890,14 +2967,22 @@ export async function claimGameActivityEndlessMilestone(
       }
 
       // Grant rewards
-      const { summary } = await grantRewards(user.id, milestone.rewards, {
-        idempotencyKey: idempotentResultKey,
-        requirementContext: {
-          category: encounter.category,
-          subCategory: encounter.subCategory,
-          weather: state.weather?.weather,
+      const { summary } = await runEconomyAction(
+        {
+          userId: user.id,
+          action: 'endless-milestone',
+          requestId: createEconomyRequestId(idempotentResultKey),
         },
-      })
+        ({ payload, req }) => grantRewards(user.id, milestone.rewards, {
+          payload,
+          req,
+          requirementContext: {
+            category: encounter.category,
+            subCategory: encounter.subCategory,
+            weather: lockedState.weather?.weather,
+          },
+        }),
+      )
 
       // Update state with claimed milestone
       const updatedState: GameActivityState = {

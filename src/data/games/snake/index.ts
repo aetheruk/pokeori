@@ -36,9 +36,9 @@ export const snakeGames: SnakeGameConfig[] = [
       foodScore: 10,
       wrapBoundaries: false,
       sprites: {
-        head: '/games/snake/sprites/rock-serpent-head.avif',
-        body: '/games/snake/sprites/rock-serpent-body.avif',
-        tail: '/games/snake/sprites/rock-serpent-tail.avif',
+        head: '/games/snake/sprites/onix-head.avif',
+        body: '/games/snake/sprites/onix-body.avif',
+        tail: '/games/snake/sprites/onix-tail.avif',
         food: '/sprites/items/everstone.avif',
       },
       rewardLifetimeMs: 7500,

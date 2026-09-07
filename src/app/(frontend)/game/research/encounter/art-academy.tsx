@@ -1,5 +1,7 @@
 'use client'
 
+import type { GameDataKeys } from '@/utilities/requirements/analysis'
+
 import { BrushCleaning, Eraser, Eye, EyeOff, Send } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -25,11 +27,12 @@ import {
   encodeArtAcademyCells,
   scoreArtAcademyDrawing,
 } from '@/utilities/research/art-academy'
-import { completeGame, startGame } from '@/app/(frontend)/game/games/actions'
+import { completeGame, startGame } from '@/utilities/games/client-action-recovery'
 
 interface ArtAcademyGameProps {
   encounter: ArtAcademyGameConfig & { isEligibleForReplay?: boolean }
   initialState?: any
+  actions?: { start: typeof startGame; complete: typeof completeGame }
 }
 
 interface ArtAcademyRound {
@@ -121,12 +124,18 @@ function hexToColor(hex: string) {
 export function ArtAcademyGame({
   encounter,
   initialState,
+  actions,
 }: ArtAcademyGameProps) {
+  const startAction = actions?.start || startGame
+  const completeAction = actions?.complete || completeGame
   useGameMusic(encounter)
   const { playSfx } = useAudio()
   const { refreshUser } = useUser()
+  const completionInvalidatesRef = useRef<GameDataKeys[] | undefined>(undefined)
   const router = useRouter()
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const [keyboardPoint, setKeyboardPoint] = useState({ x: 0.5, y: 0.5 })
+  const [keyboardDrawing, setKeyboardDrawing] = useState(false)
   const activeStrokeRef = useRef<Stroke | null>(null)
   const finishingRef = useRef(false)
   const [round, setRound] = useState<ArtAcademyRound | null>(
@@ -324,7 +333,7 @@ export function ArtAcademyGame({
       return
     }
 
-    const completion = await completeGame(
+    const completion = await completeAction(
       encounter.id,
       false,
       undefined,
@@ -333,6 +342,7 @@ export function ArtAcademyGame({
       undefined,
       drawing,
     )
+    completionInvalidatesRef.current = completion.invalidates
     const score = completion.finalScore
     const passed =
       completion.success &&
@@ -354,10 +364,11 @@ export function ArtAcademyGame({
     encounter.settings.successThreshold,
     playSfx,
     round,
+    completeAction,
   ])
 
   const beginGame = useCallback(async () => {
-    const start = await startGame(encounter.id)
+    const start = await startAction(encounter.id)
     if (!start.success) {
       setResult({
         success: false,
@@ -388,6 +399,7 @@ export function ArtAcademyGame({
     encounter.settings.timeLimit,
     initialState?.expiry,
     initialState?.roundData?.artAcademy,
+    startAction,
   ])
 
   useEffect(() => {
@@ -521,9 +533,8 @@ export function ArtAcademyGame({
             </Button>
           </div>
 
-          <div
+          <fieldset
             className="mb-2 flex flex-wrap gap-2"
-            role="group"
             aria-label="Available artwork colours"
           >
             {round?.palette.map((color, index) => (
@@ -547,11 +558,10 @@ export function ArtAcademyGame({
                 />
               </button>
             ))}
-          </div>
+          </fieldset>
 
-          <div
+          <fieldset
             className="mb-2 flex flex-wrap gap-2"
-            role="group"
             aria-label="Brush size"
           >
             {brushes.map((brush) => (
@@ -579,11 +589,11 @@ export function ArtAcademyGame({
                 {brush.label}
               </Button>
             ))}
-          </div>
+          </fieldset>
 
           <div
             className="relative mx-auto aspect-square max-w-[520px] overflow-hidden rounded-lg border border-game-border bg-game-canvas"
-            style={{ width: 'min(100%, calc(100dvh - 27rem))' }}
+            style={{ width: 'min(100%, max(240px, calc(100dvh - 27rem)))' }}
           >
             <GuideGrid count={guideCount} />
             <canvas
@@ -593,11 +603,34 @@ export function ArtAcademyGame({
                 showReference && 'pointer-events-none cursor-default',
               )}
               aria-label="Drawing canvas"
+              aria-describedby="drawing-keyboard-help"
+              tabIndex={0}
+              onFocus={() => setKeyboardDrawing(true)}
+              onBlur={() => setKeyboardDrawing(false)}
+              onKeyDown={(event) => {
+                if (gameEnded || showReference || !selectedColor) return
+                const directions: Record<string, Point> = {
+                  ArrowUp: { x: 0, y: -0.025 }, ArrowDown: { x: 0, y: 0.025 },
+                  ArrowLeft: { x: -0.025, y: 0 }, ArrowRight: { x: 0.025, y: 0 },
+                }
+                const direction = directions[event.key]
+                if (!direction && event.key !== ' ' && event.key !== 'Enter') return
+                event.preventDefault()
+                const point = direction ? {
+                  x: Math.min(1, Math.max(0, keyboardPoint.x + direction.x)),
+                  y: Math.min(1, Math.max(0, keyboardPoint.y + direction.y)),
+                } : keyboardPoint
+                setKeyboardPoint(point)
+                if (!direction || event.shiftKey) {
+                  setStrokes((current) => [...current, { color: selectedColor, brushSize: selectedBrushSize, points: direction ? [keyboardPoint, point] : [point] }])
+                }
+              }}
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
               onPointerUp={finishStroke}
               onPointerCancel={finishStroke}
             />
+            {keyboardDrawing && !showReference && <span aria-hidden="true" className="pointer-events-none absolute z-30 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-game-ink bg-game-cream/60" style={{ left: `${keyboardPoint.x * 100}%`, top: `${keyboardPoint.y * 100}%` }} />}
             {showReference && round && (
               <div className="absolute inset-0 z-30 bg-game-canvas">
                 <Image
@@ -611,6 +644,8 @@ export function ArtAcademyGame({
               </div>
             )}
           </div>
+
+          <p id="drawing-keyboard-help" className="text-center text-xs text-game-muted">Keyboard: focus the canvas, use arrows to move, Space to paint, or Shift + arrows to draw.</p>
 
           <Button
             type="button"
@@ -628,7 +663,7 @@ export function ArtAcademyGame({
         <RewardResultOverlay
           result={result}
           onClose={() => {
-            refreshUser()
+            refreshUser(true, completionInvalidatesRef.current)
             router.push('/game/explore')
           }}
           icon={encounter.icon}

@@ -23,13 +23,17 @@ export const Users: CollectionConfig = {
     useAsTitle: 'email',
   },
   auth: {
+    cookies: {
+      sameSite: 'Lax',
+      secure: process.env.NODE_ENV === 'production',
+    },
     // Keep installed/PWA players signed in between visits. The active game shell
     // refreshes this token before it expires.
     tokenExpiration: GAME_AUTH_TOKEN_EXPIRATION_SECONDS,
   },
   access: {
     admin: superAdminCheck,
-    create: () => true,
+    create: superAdminCheck,
     read: adminOrSelf,
     update: adminOrSelf,
     delete: superAdminCheck,

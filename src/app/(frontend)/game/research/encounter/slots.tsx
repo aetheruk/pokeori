@@ -1,5 +1,7 @@
 'use client'
 
+import type { GameDataKeys } from '@/utilities/requirements/analysis'
+
 import {
   Banknote,
   Check,
@@ -41,7 +43,7 @@ import {
 } from '@/data/games/slots/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
-import { completeGame, startGame } from '@/app/(frontend)/game/games/actions'
+import { completeGame, startGame } from '@/utilities/games/client-action-recovery'
 import { spinSlotMachine } from '../games/slots'
 
 interface SlotGameProps {
@@ -228,6 +230,7 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
   useGameMusic(encounter)
   const { playSfx } = useAudio()
   const { user, refreshUser } = useUser()
+  const completionInvalidatesRef = useRef<GameDataKeys[] | undefined>(undefined)
   const router = useRouter()
 
   const currencyConfig = getCurrency(encounter.settings.cost.currencyType)
@@ -325,6 +328,7 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
     setGameEnded(true)
 
     const res = await completeGame(encounter.id, true)
+    completionInvalidatesRef.current = res.invalidates
 
     setResult({
       success: true,
@@ -463,7 +467,7 @@ export function SlotGame({ encounter, initialState }: SlotGameProps) {
         <RewardResultOverlay
           result={result}
           onClose={() => {
-            refreshUser()
+            refreshUser(true, completionInvalidatesRef.current)
             router.push('/game/explore')
           }}
           icon={encounter.icon}

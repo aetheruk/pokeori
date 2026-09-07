@@ -3,6 +3,12 @@ node_modules
 
 # Build artifacts
 .next
+.next-e2e
+.next-security
+.next-security-bun
+e2e
+test-results
+playwright-report
 dist
 build
 

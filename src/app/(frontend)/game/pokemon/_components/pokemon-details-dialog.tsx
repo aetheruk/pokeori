@@ -493,7 +493,27 @@ interface PokemonDetailsDialogProps {
   highlightItemId?: string
 }
 
-export function PokemonDetailsDialog({
+export function PokemonDetailsDialog(props: PokemonDetailsDialogProps) {
+  const [activated, setActivated] = useState(false)
+  // A box can contain hundreds of closed inspectors. Defer move/evolution
+  // calculations and subscriptions until this inspector is actually requested.
+  // Keep it mounted thereafter so nested dialogs and pending actions retain state.
+  if (activated) return <MountedPokemonDetailsDialog {...props} initialOpen />
+  if (React.isValidElement<React.HTMLAttributes<HTMLElement>>(props.trigger)) {
+    const trigger = props.trigger
+    return React.cloneElement(trigger, {
+      onClick: (event) => {
+        trigger.props.onClick?.(event)
+        if (!event.defaultPrevented) setActivated(true)
+      },
+    })
+  }
+  return <Button variant="ghost" size="icon" className="h-10 w-10 text-game-muted hover:bg-game-moss/10 hover:text-game-moss" onClick={() => setActivated(true)}>
+    <Info className="h-5 w-5" /><span className="sr-only">View Details</span>
+  </Button>
+}
+
+function MountedPokemonDetailsDialog({
   pokemon,
   boxes,
   inventory = [],
@@ -502,7 +522,8 @@ export function PokemonDetailsDialog({
   onRelease,
   defaultOpenUseItem,
   highlightItemId,
-}: PokemonDetailsDialogProps) {
+  initialOpen,
+}: PokemonDetailsDialogProps & { initialOpen: boolean }) {
   const { user, gameData, refreshUser } = useUser()
   const router = useRouter()
   const pokemonGender = getOwnedPokemonGender(pokemon)
@@ -585,7 +606,7 @@ export function PokemonDetailsDialog({
   const [evolutionRewards, setEvolutionRewards] =
     useState<RewardSummary | null>(null)
   const [isEvolving, setIsEvolving] = useState<number | null>(null)
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(initialOpen)
 
   const formInfo = getPokemonForm(pokemon.formId)
   const baseStats = formInfo?.stats

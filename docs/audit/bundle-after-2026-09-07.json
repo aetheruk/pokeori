@@ -1,0 +1,273 @@
+{
+  "note": "Uncompressed module-attributed reachable route graph, including asynchronous chunks. These are not initial downloads or measured wire bytes.",
+  "summaries": [
+    {
+      "route": "auth",
+      "javascriptBytes": 1141092,
+      "cssBytes": 363317,
+      "largestSources": [
+        {
+          "source": "[project]/src/styles/globals.css",
+          "bytes": 361301
+        },
+        {
+          "source": "[project]/node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.production.js",
+          "bytes": 200706
+        },
+        {
+          "source": "[project]/node_modules/next/dist/build/polyfills/polyfill-nomodule.js",
+          "bytes": 112594
+        },
+        {
+          "source": "[project]/node_modules/zod/v4/core/compile.js",
+          "bytes": 53732
+        },
+        {
+          "source": "[project]/node_modules/zod/v4/core/schemas.js",
+          "bytes": 40832
+        },
+        {
+          "source": "[project]/node_modules/sonner/dist/index.mjs",
+          "bytes": 35221
+        },
+        {
+          "source": "[project]/node_modules/.pnpm/tailwind-merge@3.6.0/node_modules/tailwind-merge/dist/bundle-mjs.mjs",
+          "bytes": 27011
+        },
+        {
+          "source": "[project]/node_modules/zod/v4/classic/schemas.js",
+          "bytes": 25075
+        },
+        {
+          "source": "[project]/node_modules/next/dist/compiled/react-server-dom-turbopack/cjs/react-server-dom-turbopack-client.browser.production.js",
+          "bytes": 23171
+        },
+        {
+          "source": "[project]/node_modules/next/dist/client/components/segment-cache/cache.js",
+          "bytes": 23087
+        },
+        {
+          "source": "[project]/node_modules/next/dist/client/components/segment-cache/scheduler.js",
+          "bytes": 13529
+        },
+        {
+          "source": "[project]/node_modules/zod/v4/core/util.js",
+          "bytes": 13370
+        },
+        {
+          "source": "[project]/node_modules/zod/v4/core/json-schema-processors.js",
+          "bytes": 12318
+        },
+        {
+          "source": "[project]/node_modules/zod/v4/core/to-json-schema.js",
+          "bytes": 10812
+        },
+        {
+          "source": "[project]/node_modules/zod/v4/core/api.js",
+          "bytes": 10499
+        }
+      ]
+    },
+    {
+      "route": "game/explore",
+      "javascriptBytes": 4704547,
+      "cssBytes": 363317,
+      "largestSources": [
+        {
+          "source": "[project]/src/styles/globals.css",
+          "bytes": 361301
+        },
+        {
+          "source": "[project]/src/data/moves/tms/normal.ts",
+          "bytes": 263502
+        },
+        {
+          "source": "[project]/node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.production.js",
+          "bytes": 200706
+        },
+        {
+          "source": "[project]/src/data/abilities/canonical-generated.ts",
+          "bytes": 113650
+        },
+        {
+          "source": "[project]/node_modules/next/dist/build/polyfills/polyfill-nomodule.js",
+          "bytes": 112594
+        },
+        {
+          "source": "[project]/src/data/item-sprite-index.json.[json].cjs",
+          "bytes": 83895
+        },
+        {
+          "source": "[project]/src/data/tasks/entries/cerulean-city.ts",
+          "bytes": 79336
+        },
+        {
+          "source": "[project]/src/data/pokemon/gen1.ts",
+          "bytes": 69288
+        },
+        {
+          "source": "[project]/src/data/pokemon/gen5.ts",
+          "bytes": 59398
+        },
+        {
+          "source": "[project]/src/data/tasks/entries/safari-zone.ts",
+          "bytes": 57864
+        },
+        {
+          "source": "[project]/src/data/pokemon-research-level-rewards.json.[json].cjs",
+          "bytes": 55938
+        },
+        {
+          "source": "[project]/node_modules/zod/v4/core/compile.js",
+          "bytes": 53732
+        },
+        {
+          "source": "[project]/src/data/moves/tms/dark.ts",
+          "bytes": 53451
+        },
+        {
+          "source": "[project]/src/data/pokemon/gen3.ts",
+          "bytes": 53270
+        },
+        {
+          "source": "[project]/src/data/tasks/entries/pallet-town.ts",
+          "bytes": 52933
+        }
+      ]
+    },
+    {
+      "route": "game/games/[gameType]",
+      "javascriptBytes": 4678036,
+      "cssBytes": 363317,
+      "largestSources": [
+        {
+          "source": "[project]/src/styles/globals.css",
+          "bytes": 361301
+        },
+        {
+          "source": "[project]/src/data/moves/tms/normal.ts",
+          "bytes": 263502
+        },
+        {
+          "source": "[project]/node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.production.js",
+          "bytes": 200706
+        },
+        {
+          "source": "[project]/src/data/abilities/canonical-generated.ts",
+          "bytes": 113650
+        },
+        {
+          "source": "[project]/node_modules/next/dist/build/polyfills/polyfill-nomodule.js",
+          "bytes": 112594
+        },
+        {
+          "source": "[project]/src/data/item-sprite-index.json.[json].cjs",
+          "bytes": 83895
+        },
+        {
+          "source": "[project]/node_modules/.pnpm/matter-js@0.20.0/node_modules/matter-js/build/matter.js",
+          "bytes": 83089
+        },
+        {
+          "source": "[project]/src/data/tasks/entries/cerulean-city.ts",
+          "bytes": 79336
+        },
+        {
+          "source": "[project]/src/data/pokemon/gen1.ts",
+          "bytes": 69288
+        },
+        {
+          "source": "[project]/src/app/(frontend)/game/research/encounter/tcg-battle.tsx",
+          "bytes": 62540
+        },
+        {
+          "source": "[project]/src/data/pokemon/gen5.ts",
+          "bytes": 59398
+        },
+        {
+          "source": "[project]/src/data/tasks/entries/safari-zone.ts",
+          "bytes": 57864
+        },
+        {
+          "source": "[project]/src/data/pokemon-research-level-rewards.json.[json].cjs",
+          "bytes": 55938
+        },
+        {
+          "source": "[project]/node_modules/zod/v4/core/compile.js",
+          "bytes": 53732
+        },
+        {
+          "source": "[project]/src/data/moves/tms/dark.ts",
+          "bytes": 53451
+        }
+      ]
+    },
+    {
+      "route": "game/research/encounter",
+      "javascriptBytes": 2427236,
+      "cssBytes": 363317,
+      "largestSources": [
+        {
+          "source": "[project]/src/styles/globals.css",
+          "bytes": 361301
+        },
+        {
+          "source": "[project]/src/data/moves/tms/normal.ts",
+          "bytes": 263502
+        },
+        {
+          "source": "[project]/node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.production.js",
+          "bytes": 200706
+        },
+        {
+          "source": "[project]/src/data/abilities/canonical-generated.ts",
+          "bytes": 113650
+        },
+        {
+          "source": "[project]/node_modules/next/dist/build/polyfills/polyfill-nomodule.js",
+          "bytes": 112594
+        },
+        {
+          "source": "[project]/src/data/item-sprite-index.json.[json].cjs",
+          "bytes": 83895
+        },
+        {
+          "source": "[project]/src/data/pokemon/gen1.ts",
+          "bytes": 69288
+        },
+        {
+          "source": "[project]/src/data/pokemon/gen5.ts",
+          "bytes": 59398
+        },
+        {
+          "source": "[project]/src/data/moves/tms/dark.ts",
+          "bytes": 53451
+        },
+        {
+          "source": "[project]/src/data/pokemon/gen3.ts",
+          "bytes": 53270
+        },
+        {
+          "source": "[project]/src/data/moves/tms/psychic.ts",
+          "bytes": 49879
+        },
+        {
+          "source": "[project]/src/data/moves/tms/fighting.ts",
+          "bytes": 46296
+        },
+        {
+          "source": "[project]/src/data/pokemon/gen4.ts",
+          "bytes": 44145
+        },
+        {
+          "source": "[project]/src/data/pokemon/gen9.ts",
+          "bytes": 43947
+        },
+        {
+          "source": "[project]/src/data/abilities/effects.ts",
+          "bytes": 43596
+        }
+      ]
+    }
+  ]
+}

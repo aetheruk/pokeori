@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import superAdminCheck, { adminOrAuthenticated, adminOrUserOwned } from '@/utilities/access'
+import superAdminCheck, { adminOrUserOwned } from '@/utilities/access'
 
 export const ExpeditionRuns: CollectionConfig = {
   slug: 'expedition-runs',
@@ -8,10 +8,10 @@ export const ExpeditionRuns: CollectionConfig = {
   },
   access: {
     admin: superAdminCheck,
-    create: adminOrAuthenticated,
+    create: superAdminCheck,
     read: adminOrUserOwned,
-    update: adminOrUserOwned,
-    delete: adminOrUserOwned,
+    update: superAdminCheck,
+    delete: superAdminCheck,
   },
   fields: [
     {

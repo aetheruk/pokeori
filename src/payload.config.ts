@@ -40,6 +40,7 @@ const databaseUrl = requiredEnv('DATABASE_URI')
 export default buildConfig({
   admin: {
     user: Users.slug,
+    avatar: 'default',
     importMap: {
       baseDir: path.resolve(dirname),
     },

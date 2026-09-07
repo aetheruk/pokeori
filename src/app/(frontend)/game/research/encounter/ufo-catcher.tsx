@@ -1,4 +1,6 @@
 'use client'
+import { recoverGameAction } from '@/utilities/games/action-recovery'
+import { getPendingPaidAction, clearPendingPaidAction, hasPendingPaidAction } from '@/utilities/games/pending-paid-action'
 
 import { ArrowRight, ArrowUp, Coins, DoorOpen, Loader2 } from 'lucide-react'
 import Image from 'next/image'
@@ -141,7 +143,9 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
 
   const userBalance = Number((user?.currency as any)?.[cost.currencyType] || 0)
   const balance = displayBalance ?? userBalance
-  const canAfford = balance >= cost.amount
+  const [pendingPaidStart, setPendingPaidStart] = useState(false)
+  useEffect(() => { setPendingPaidStart(hasPendingPaidAction('ufo-catcher', encounter.id)) }, [encounter.id])
+  const canAfford = pendingPaidStart || balance >= cost.amount
 
   const clawCoordinates = useMemo(() => {
     const { clawBounds } = settings.board
@@ -282,13 +286,16 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
     setMotion('positioning')
     setPhase('resolving')
 
-    const result = await startUfoCatcherAttempt(encounter.id)
+    const actionId = getPendingPaidAction('ufo-catcher', encounter.id)
+    const result = await recoverGameAction(() => startUfoCatcherAttempt(encounter.id, actionId), 'The claw attempt could not be confirmed. Retry this same attempt.')
     if (!result.success || !result.attempt) {
       toast.error(result.error || 'Unable to start the claw')
       setPhase('idle')
       return
     }
 
+    clearPendingPaidAction('ufo-catcher', encounter.id)
+    setPendingPaidStart(false)
     setAttempt(result.attempt)
     setDisplayBalance(result.balance ?? null)
     setXProgress(0)
@@ -298,7 +305,7 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
     setShutterOpen(true)
     await sleep(720)
     setPhase('x')
-    await refreshUser(false)
+    await refreshUser(true)
   }
 
   const resolveAttempt = async (
@@ -306,11 +313,12 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
     input: { xHoldMs: number; yHoldMs: number },
   ) => {
     const requestStarted = performance.now()
-    const result = await settleUfoCatcherAttempt({
+    const request = {
       encounterId: encounter.id,
       attemptId: activeAttempt.attemptId,
       input,
-    })
+    }
+    const result = await recoverGameAction(() => settleUfoCatcherAttempt(request), 'The claw result could not be confirmed. Retry this same attempt.')
     const remainingDescent = 700 - (performance.now() - requestStarted)
     if (remainingDescent > 0) await sleep(remainingDescent)
 
@@ -359,7 +367,7 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
     setAttempt(null)
     setMotion('positioning')
     setPhase('idle')
-    await refreshUser(false)
+    await refreshUser(true)
   }
 
   const performExit = async () => {
@@ -376,7 +384,7 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
       message: 'Session ended',
       rewards: result.summary,
     })
-    await refreshUser(false)
+    await refreshUser(true)
   }
 
   const handleExitRequest = () => {

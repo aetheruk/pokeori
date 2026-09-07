@@ -1,3 +1,5 @@
+import 'server-only'
+
 import { redis } from '@/utilities/redis'
 import type { BattleState } from '@/utilities/battle/types'
 import type { User } from '@/payload-types'

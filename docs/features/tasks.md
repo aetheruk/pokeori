@@ -2,6 +2,8 @@
 
 Daily, special, and Pokemon Research tasks.
 
+Generated daily rewards require an uncompleted task from the current daily generation inside the economy transaction. Repeating a claim with a new request UUID cannot bypass that check. Authored dialogue passwords are verified on the server with a rate limit and an expiring user/task-bound proof checked during completion; they are progression checks, not account credentials.
+
 ## Locations
 - Route: `/game/explore` (including the Dailies category)
 - Components: `src/components/game/tasks/`

@@ -1,20 +1,30 @@
 import configPromise from '@payload-config'
 import type { User } from '@/payload-types'
 import { getPayload } from 'payload'
-import { recordExpeditionActivityResult } from '@/utilities/expeditions/actions'
+import { recordExpeditionActivityResult } from '@/utilities/expeditions/server'
 import { redis } from '@/utilities/redis'
 import { incrementUserActivityResult } from '@/utilities/user-state'
 import { getEncounterActivityReference, type EncounterState } from './types'
+import { runCaptureSettlement } from './capture-settlement'
 
 export async function failEncounter(
   user: User,
   state: EncounterState,
   activePokemonId?: string,
+  transaction?: Pick<import('./capture-settlement').CaptureSettlementContext, 'payload' | 'req' | 'redis'>,
 ) {
-  const payload = await getPayload({ config: configPromise })
+  if (!transaction) {
+    const previous = await redis.get<EncounterState>(`encounter:${user.id}`)
+    if (previous && previous.startTime !== state.startTime) return undefined
+    const result = await runCaptureSettlement(user.id, `failure:${state.locationId}:${state.startTime}`, previous || state, async (context) => ({
+      success: true, expeditionProgress: await failEncounter(context.user, state, activePokemonId, context),
+    }), 'failure')
+    return result.expeditionProgress
+  }
+  const payload = transaction?.payload || await getPayload({ config: configPromise })
   const encounterId = `encounter:${user.id}`
 
-  await redis.del(encounterId)
+  await (transaction?.redis || redis).del(encounterId)
 
   if (activePokemonId) {
     await payload.update({
@@ -54,12 +64,12 @@ export async function failEncounter(
             reference.activityType,
             reference.activityId,
             false,
-            { revalidatePaths: false },
+            { revalidatePaths: false, ...(transaction ? { payload, req: transaction.req } : {}) },
           )
         })()
 
   if (reference.activityType === 'game') {
-    await redis.del(`game:${user.id}`)
+    await (transaction?.redis || redis).del(`game:${user.id}`)
   }
 
   return expeditionResult?.expedition
