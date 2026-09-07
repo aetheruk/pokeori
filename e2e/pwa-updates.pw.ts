@@ -9,17 +9,13 @@ test('a saved result schedules an update, and a new game cancels that countdown'
     if (newer) await route.fulfill({ json: { version: '99.0.1-ui-test' } })
     else await route.continue()
   })
-  await page.goto('/ui-test')
+  await page.goto('/game/games/ui-test')
   await page.route('**/game/games/ui-test', async (route) => {
     if (route.request().isNavigationRequest()) await route.fulfill({ contentType: 'text/html', body: '<p>Updated test page</p>' })
     else await route.continue()
   })
   await page.clock.install()
-  await page.evaluate(() => {
-    window.history.pushState({}, '', '/game/games/ui-test')
-    window.dispatchEvent(new PopStateEvent('popstate'))
-  })
-  await expect(page).toHaveURL(/\/game\/games\/ui-test$/)
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')))
   await expect.poll(() => versionChecks).toBeGreaterThan(1)
   const versionChecksBeforeUpdate = versionChecks
   newer = true
