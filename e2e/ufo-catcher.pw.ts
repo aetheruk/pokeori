@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 for (const width of [390, 1280]) {
-  test(`UFO holds, release instructions and result fit at ${width}px`, async ({ page }) => {
+  test(`UFO holds and result above the button fit at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 844 })
     await page.goto('/ui-test')
     await page.getByRole('button', { name: 'Test UFO Catcher', exact: true }).click()
@@ -21,7 +21,6 @@ for (const width of [390, 1280]) {
     await page.keyboard.up('Space')
     const back = page.getByRole('button', { name: 'Hold to move toward the back', exact: true })
     await expect(back).toBeEnabled()
-    await expect(page.getByText('Release to drop. Aim for the centre of a prize.')).toBeVisible()
     const box = (await back.boundingBox())!
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
     await page.mouse.down()
@@ -30,5 +29,9 @@ for (const width of [390, 1280]) {
     await page.mouse.up()
     await expect(page.getByText('The claw came up empty')).toBeVisible({ timeout: 15000 })
     await expect(page.getByRole('button', { name: /Play for 30/ })).toBeEnabled()
+    const result = (await page.getByText('The claw came up empty').boundingBox())!
+    const play = (await page.getByRole('button', { name: /Play for 30/ }).boundingBox())!
+    expect(result.y + result.height).toBeLessThan(play.y)
+    await page.screenshot({ path: `/tmp/pokeori-ufo-result-${width}.png` })
   })
 }

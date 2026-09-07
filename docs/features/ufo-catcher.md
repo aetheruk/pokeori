@@ -15,11 +15,11 @@ until release, and suppresses selection, browser callouts, and context menus.
 Keyboard Space and Enter holds remain supported. The idle paid-play control is
 text-only; movement arrows appear only while positioning the claw.
 
-The control deck shows horizontal, depth, and drop steps, with travel meters and
-explicit release instructions. The button depresses during a hold; losing focus
-or pointer capture ends that hold. A restrained cabinet floor grid supports the
-existing crosshair, and the last completed catch, slip, or miss stays visible
-below the controls with guidance for the next attempt. This feedback does not
+The single control button gives the current movement instruction and depresses
+during a hold; losing focus or pointer capture ends that hold. The cabinet keeps
+its original ungridded floor and crosshair, without a separate page title or
+step panel. The last completed catch, slip, or miss stays visible above the play
+button with guidance for the next attempt. This feedback does not
 change travel speed, capture footprints, grip odds, or server settlement.
 
 The cabinet selects five of seven authored anchor regions without replacement,
