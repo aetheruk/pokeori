@@ -58,8 +58,7 @@ import {
 import {
   completeGame,
   startGame,
-  submitGameAnswer,
-} from '@/app/(frontend)/game/games/actions'
+} from '@/utilities/games/client-action-recovery'
 import { startBattle } from '@/app/(frontend)/game/battles/actions'
 import { startEncounter } from '@/app/(frontend)/game/locations/encounter/actions'
 import { EndlessCollectibleSprite } from './endless-collectibles'
@@ -101,6 +100,7 @@ interface ScreenRuntimeState {
 }
 
 interface GridObjectResumeState {
+  moveProof?: string[]
   encounterId: string
   activeScreenId: string
   grid: CellType[][]
@@ -251,6 +251,7 @@ const buildScreenRuntimeState = (
 export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   useGameMusic(encounter)
   const { user, refreshUser } = useUser()
+  const completionInvalidatesRef = useRef<import('@/utilities/requirements/analysis').GameDataKeys[] | undefined>(undefined)
   const { playSfx } = useAudio()
   const router = useRouter()
   const screenConfigs = useMemo(
@@ -303,6 +304,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   const pushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const slideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const slidingRef = useRef(false)
+  const moveProofRef = useRef<string[]>([])
 
   const [gameStarted, setGameStarted] = useState(false)
   const [gameEnded, setGameEnded] = useState(false)
@@ -404,6 +406,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     setResult(null)
     setPendingObjectResult(null)
     setMoves(0)
+    moveProofRef.current = []
     setRocksSolved(0) // Reset logical progress for the puzzle
     setHistory([])
     setBlockedOffset(null)
@@ -476,6 +479,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     }
 
     if (resumeState) {
+      moveProofRef.current = resumeState.moveProof || []
       const restoredScreenStates = resumeState.screenStates || nextScreenStates
       const restoredActiveState =
         restoredScreenStates[resumeState.activeScreenId]
@@ -555,8 +559,6 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
   const handleWin = async (prizeIds = collectedPrizeIds) => {
     playSfx('good')
     setGameEnded(true)
-    // Submit final answer to verify
-    await submitGameAnswer(true)
     const res = await completeGame(
       encounter.id,
       true,
@@ -564,11 +566,14 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       undefined,
       undefined,
       Array.from(prizeIds),
+      undefined,
+      { kind: 'rock-push', moves: [...moveProofRef.current] },
     )
 
+    completionInvalidatesRef.current = res.invalidates
     setResult({
-      success: true,
-      message: 'Level Complete!',
+      success: res.success,
+      message: res.success ? 'Level Complete!' : res.error || 'Unable to finish this level.',
       rewards: res.summary,
     })
   }
@@ -577,8 +582,8 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     playSfx('bad')
     setGameEnded(true)
     // Submit loss to clean up server state
-    await submitGameAnswer(false)
-    await completeGame(encounter.id, false)
+    const completion = await completeGame(encounter.id, false)
+    completionInvalidatesRef.current = completion.invalidates
 
     setResult({
       success: false,
@@ -617,6 +622,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       gridSize: { ...gridSize },
     }
     const resume: GridObjectResumeState = {
+      moveProof: [...moveProofRef.current],
       encounterId: encounter.id,
       activeScreenId: resumeActiveScreenId,
       grid: cloneGrid(overrides.grid || grid),
@@ -775,7 +781,8 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     return maxDuration
   }
 
-  const saveSnapshot = () => {
+  const saveSnapshot = (dx: number, dy: number) => {
+    moveProofRef.current.push(dx < 0 ? 'left' : dx > 0 ? 'right' : dy < 0 ? 'up' : 'down')
     setHistory((prev) => [
       ...prev.slice(-59),
       {
@@ -1059,6 +1066,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
 
   const undoMove = () => {
     if (gameEnded || isSliding || history.length === 0) return
+    moveProofRef.current.pop()
     const snapshot = history[history.length - 1]
     playSfx('select')
     setHistory((prev) => prev.slice(0, -1))
@@ -1086,6 +1094,10 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
 
   const move = async (dx: number, dy: number) => {
     if (gameEnded || slidingRef.current) return
+    if (maxMoves && moves >= maxMoves) {
+      await handleLoss()
+      return
+    }
 
     // Update facing
     if (dy < 0) setFacing('up')
@@ -1114,7 +1126,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
 
       const rockSlide = getRockSlide(initialRockPos, dx, dy, rock.id)
       setBlockedOffset(null)
-      saveSnapshot()
+      saveSnapshot(dx, dy)
       setPushedRockId(rock.id)
       if (pushTimerRef.current) clearTimeout(pushTimerRef.current)
       pushTimerRef.current = setTimeout(() => setPushedRockId(null), 160)
@@ -1272,7 +1284,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     } else {
       const playerSlide = getPlayerSlide(nextPlayerPos, dx, dy)
       setBlockedOffset(null)
-      saveSnapshot()
+      saveSnapshot(dx, dy)
       const movedPlayerPos = playerSlide.position
       const moveDuration = setMoveDurations({
         playerFrom: playerPos,
@@ -1872,7 +1884,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
         <RewardResultOverlay
           result={result}
           onClose={() => {
-            refreshUser()
+            refreshUser(false, completionInvalidatesRef.current)
             router.push('/game/explore')
           }}
           icon={encounter.icon}

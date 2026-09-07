@@ -16,6 +16,8 @@ import type { RequirementData } from '@/utilities/requirements'
 import { useGameDataScope } from '@/hooks/use-game-data-scope'
 import type { GameDataScope } from '@/utilities/game-data-scopes'
 import { selectFreshestGameData } from '@/utilities/game-data-snapshot'
+import { isAffectedGameScope, mergeRefreshedAccount } from '@/utilities/game-data-invalidation'
+import type { GameDataKeys } from '@/utilities/requirements/analysis'
 import {
   ApiResponseError,
   isAuthenticationError,
@@ -27,6 +29,7 @@ interface UserContextType {
   setUser: (user: User) => void
   refreshUser: (
     skipRouterRefresh?: boolean,
+    invalidates?: GameDataKeys[],
   ) => Promise<RequirementData | undefined>
   updateUserContext: (partialUser: Partial<User>) => void
   isLoading: boolean
@@ -196,12 +199,18 @@ export function UserProvider({
   const { mutate: globalMutate } = useSWRConfig()
 
   const refreshUser = useCallback(
-    async (skipRouterRefresh = true) => {
+    async (skipRouterRefresh = true, invalidates?: GameDataKeys[]) => {
       const refreshedData = await mutate()
+      if (refreshedData) {
+        await globalMutate(
+          (key) => typeof key === 'string' && key.startsWith('/api/game/sync?') && key !== syncUrl,
+          (cached: RequirementData | undefined) => mergeRefreshedAccount(cached, refreshedData),
+          { revalidate: false },
+        )
+      }
       void globalMutate(
         (key) =>
-          typeof key === 'string' &&
-          key.startsWith('/api/game/sync') &&
+          isAffectedGameScope(key, invalidates) &&
           key !== syncUrl,
       )
       if (skipRouterRefresh === false) {

@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import superAdminCheck, { adminOrUserOwned } from '@/utilities/access'
+import superAdminCheck from '@/utilities/access'
 
 /**
  * Durable idempotency receipts for player-facing economic actions.
@@ -16,7 +16,9 @@ export const EconomyActionReceipts: CollectionConfig = {
   access: {
     admin: superAdminCheck,
     create: superAdminCheck,
-    read: adminOrUserOwned,
+    // Receipts can contain private seeds and settlement snapshots. Players
+    // receive only the public action response, never the storage envelope.
+    read: superAdminCheck,
     update: superAdminCheck,
     delete: superAdminCheck,
   },
@@ -56,6 +58,12 @@ export const EconomyActionReceipts: CollectionConfig = {
       type: 'date',
       required: true,
       index: true,
+    },
+    {
+      name: 'responseEncoding',
+      type: 'select',
+      options: ['gzip-base64'],
+      admin: { readOnly: true, description: 'Lossless response compression; missing means legacy JSON.' },
     },
   ],
 }

@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { useActionState, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { BrandLockup } from '@/components/game/shared/BrandLockup'
@@ -52,24 +51,16 @@ export function AuthForm() {
 
   return (
     <div className="relative flex min-h-dvh w-full items-center justify-center overflow-x-hidden overflow-y-auto bg-game-night-canvas p-4 antialiased">
-      <Image
-        src="/backgrounds/pokeori-auth-mobile.avif"
-        alt=""
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover object-center md:hidden"
-        aria-hidden="true"
-      />
-      <Image
-        src="/backgrounds/pokeori-auth-desktop.avif"
-        alt=""
-        fill
-        priority
-        sizes="100vw"
-        className="hidden object-cover object-center md:block"
-        aria-hidden="true"
-      />
+      <picture className="pointer-events-none absolute inset-0">
+        <source media="(min-width: 768px)" srcSet="/backgrounds/pokeori-auth-desktop.avif" />
+        <img
+          src="/backgrounds/pokeori-auth-mobile.avif"
+          alt=""
+          fetchPriority="high"
+          decoding="async"
+          className="h-full w-full object-cover object-center"
+        />
+      </picture>
       <div className="pointer-events-none absolute inset-0 bg-[#172733]/35" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#172733]/20 via-transparent to-[#172733]/82" />
       <div className="absolute top-[calc(1rem+env(safe-area-inset-top))] left-4 z-20 sm:top-[calc(1.5rem+env(safe-area-inset-top))] sm:left-6">
@@ -106,6 +97,7 @@ export function AuthForm() {
                 </CardDescription>
               </CardHeader>
               <form action={loginAction}>
+                {loginState?.error && <p role="alert" className="mx-6 mb-4 text-sm text-game-danger">{loginState.error}</p>}
                 <CardContent className="space-y-4">
                   <div className="space-y-1.5">
                     <Label
@@ -116,6 +108,7 @@ export function AuthForm() {
                     </Label>
                     <Input
                       id="email"
+                      maxLength={254}
                       name="email"
                       type="email"
                       placeholder="trainer@example.com"
@@ -166,6 +159,7 @@ export function AuthForm() {
                 </CardDescription>
               </CardHeader>
               <form action={registerAction}>
+                {registerState?.error && <p role="alert" className="mx-6 mb-4 text-sm text-game-danger">{registerState.error}</p>}
                 <CardContent className="space-y-3.5">
                   <div className="space-y-1.5">
                     <Label
@@ -176,6 +170,7 @@ export function AuthForm() {
                     </Label>
                     <Input
                       id="trainer-name"
+                      maxLength={50}
                       name="trainerName"
                       type="text"
                       placeholder="How other trainers see you"
@@ -193,6 +188,7 @@ export function AuthForm() {
                     </Label>
                     <Input
                       id="register-email"
+                      maxLength={254}
                       name="email"
                       type="email"
                       placeholder="trainer@example.com"
@@ -210,12 +206,16 @@ export function AuthForm() {
                     </Label>
                     <Input
                       id="register-password"
+                      minLength={12}
+                      maxLength={128}
+                      aria-describedby="password-requirements"
                       name="password"
                       type="password"
                       autoComplete="new-password"
                       required
                       className="border-game-border bg-game-surface-raised/80"
                     />
+                    <p id="password-requirements" className="text-xs text-game-muted">Use 12–128 characters. A long, unique passphrase works well.</p>
                   </div>
                   <div className="space-y-1.5">
                     <Label

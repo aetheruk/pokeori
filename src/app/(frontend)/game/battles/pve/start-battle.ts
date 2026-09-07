@@ -64,7 +64,7 @@ import {
   setUserInventoryMap,
   setUserPokedexMap,
 } from '@/utilities/user-state'
-import { getActiveExpeditionForUser } from '@/utilities/expeditions/actions'
+import { getActiveExpeditionForUser } from '@/utilities/expeditions/server'
 import {
   ensureUserWeatherSlot,
   resolveSubRegionWeather,

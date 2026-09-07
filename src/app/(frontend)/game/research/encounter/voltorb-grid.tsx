@@ -1,5 +1,7 @@
 'use client'
 
+import type { GameDataKeys } from '@/utilities/requirements/analysis'
+
 import {
   ArrowDown,
   ArrowLeft,
@@ -40,7 +42,7 @@ import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import {
   completeGame as completeGameActivity,
   startGame,
-} from '@/app/(frontend)/game/games/actions'
+} from '@/utilities/games/client-action-recovery'
 
 interface VoltorbGridGameProps {
   encounter: GridPuzzleVoltorbGameConfig & { isEligibleForReplay?: boolean }
@@ -109,6 +111,7 @@ export function VoltorbGridGame({
   useGameMusic(encounter)
   const { playSfx } = useAudio()
   const { refreshUser } = useUser()
+  const completionInvalidatesRef = useRef<GameDataKeys[] | undefined>(undefined)
   const router = useRouter()
   const { cols, rows } = encounter.settings.gridSize
   const maxMoves = encounter.settings.maxMoves
@@ -188,6 +191,7 @@ export function VoltorbGridGame({
   const [isBlasting, setIsBlasting] = useState(false)
   const [result, setResult] = useState<any | null>(null)
   const completionRef = useRef(false)
+  const moveProofRef = useRef<string[]>([])
 
   const voltorbByKey = useMemo(
     () => new Map(voltorbs.map((voltorb) => [positionKey(voltorb), voltorb])),
@@ -210,7 +214,10 @@ export function VoltorbGridGame({
       setGameEnded(true)
       setIsBlasting(false)
 
-      const completion = await completeGameActivity(encounter.id, success)
+      const completion = await completeGameActivity(encounter.id, success, undefined, undefined, undefined, undefined, undefined, {
+        kind: 'voltorb', moves: [...moveProofRef.current],
+      })
+      completionInvalidatesRef.current = completion.invalidates
       const finalSuccess = success && completion.success
       setResult({
         success: finalSuccess,
@@ -237,6 +244,7 @@ export function VoltorbGridGame({
     setIsBlasting(false)
     setResult(null)
     completionRef.current = false
+    moveProofRef.current = []
   }, [
     encounter.settings.playerStart,
     initialDebrisKeys,
@@ -377,6 +385,7 @@ export function VoltorbGridGame({
         }
 
         const nextMoves = moves + 1
+        moveProofRef.current.push(direction)
         setMoves(nextMoves)
         setPlayer(next)
         setVoltorbs((current) =>
@@ -407,6 +416,7 @@ export function VoltorbGridGame({
         }
 
         const nextMoves = moves + 1
+        moveProofRef.current.push(direction)
         setMoves(nextMoves)
         setPlayer(next)
         setProtectedPokemon((current) =>
@@ -430,6 +440,7 @@ export function VoltorbGridGame({
       }
 
       const nextMoves = moves + 1
+      moveProofRef.current.push(direction)
       setMoves(nextMoves)
       setPlayer(next)
       playSfx('select')
@@ -534,6 +545,7 @@ export function VoltorbGridGame({
     const { blast, destroyed, hitProtectedPokemonKeys, triggeredVoltorbIds } =
       calculateBlast()
     const nextDischarges = discharges + 1
+    moveProofRef.current.push('discharge')
     const hitPlayer = blast.has(positionKey(player))
     const hitProtectedPokemon = hitProtectedPokemonKeys.size > 0
     const remainingDebris = debrisKeys.size - destroyed.size
@@ -937,7 +949,7 @@ export function VoltorbGridGame({
         <RewardResultOverlay
           result={result}
           onClose={() => {
-            refreshUser()
+            refreshUser(true, completionInvalidatesRef.current)
             router.push('/game/explore')
           }}
           icon={encounter.icon}

@@ -436,6 +436,7 @@ export interface BattleState {
   }
   pokemonBattleKOs?: Record<string, number>
   pokemonBattleKOsPersisted?: boolean
+  heldItemsSettled?: boolean
   heldItemChargeRewards?: {
     ownerId: string
     pokemonId: string

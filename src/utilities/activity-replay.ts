@@ -4,7 +4,7 @@ import type { ExpeditionActivityType } from '@/data/expeditions/types'
 import { getGameUserData } from '@/utilities/game-data'
 import { checkRequirement } from '@/utilities/requirements'
 import { analyzeRequirements } from '@/utilities/requirements/analysis'
-import { getActiveExpeditionForUser } from '@/utilities/expeditions/actions'
+import { getActiveExpeditionForUser } from '@/utilities/expeditions/server'
 
 type ReplayableActivity = {
   id: string

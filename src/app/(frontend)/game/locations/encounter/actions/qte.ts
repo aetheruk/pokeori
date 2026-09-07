@@ -17,7 +17,7 @@ import {
   completeEncounterQteState,
   type EncounterQteCompletionPayload,
 } from '@/utilities/pokemon/encounter-qte'
-import { applyEncounterPromptResult } from './mechanics'
+import { applyEncounterPromptResult } from './mechanics-server'
 import { buildEncounterQuizQuestion } from './quiz-question'
 import {
   ENCOUNTER_MECHANICS_LOCK_TTL,

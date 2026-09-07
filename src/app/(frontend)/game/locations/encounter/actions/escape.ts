@@ -35,8 +35,8 @@ import {
   releaseActionLock,
   setIdempotentResult,
 } from '@/utilities/game-integrity'
-import { recordExpeditionActivityResult } from '@/utilities/expeditions/actions'
-import type { ExpeditionProgressSnapshot } from '@/utilities/expeditions/actions'
+import { recordExpeditionActivityResult } from '@/utilities/expeditions/server'
+import type { ExpeditionProgressSnapshot } from '@/utilities/expeditions/server'
 import {
   getEncounterRedisTtlSeconds,
   getEncounterActivityReference,
@@ -47,11 +47,13 @@ import {
   getUserPokedexMap,
   incrementUserActivityResult,
 } from '@/utilities/user-state'
+import { runCaptureSettlement, type CaptureSettlementContext } from './capture-settlement'
+import { getEncounterMechanicsLockKey } from './lock'
 
-const ENCOUNTER_ESCAPE_LOCK_TTL = 12
+const ENCOUNTER_ESCAPE_LOCK_TTL = 60
 
 function getEncounterEscapeLockKey(userId: string): string {
-  return `lock:encounter:escape:${userId}`
+  return getEncounterMechanicsLockKey(userId)
 }
 
 async function performRunAway(
@@ -59,8 +61,10 @@ async function performRunAway(
   state: EncounterState,
   payload: any,
   trackLoss: boolean,
+  transaction: Pick<CaptureSettlementContext, 'payload' | 'req' | 'redis'>,
 ): Promise<ExpeditionProgressSnapshot | undefined> {
   const encounterId = `encounter:${user.id}`
+  const redis = transaction.redis
 
   // Clear encounter first to prevent duplicate action races.
   await redis.del(encounterId)
@@ -72,7 +76,7 @@ async function performRunAway(
       reference.activityType,
       reference.activityId,
       false,
-      { revalidatePaths: false },
+      { revalidatePaths: false, payload, req: transaction.req },
     )
     if (reference.activityType === 'game') {
       await redis.del(`game:${user.id}`)
@@ -106,7 +110,7 @@ async function performRunAway(
     reference.activityType,
     reference.activityId,
     false,
-    { revalidatePaths: false },
+    { revalidatePaths: false, payload, req: transaction.req },
   )
   if (reference.activityType === 'game') {
     await redis.del(`game:${user.id}`)
@@ -164,7 +168,8 @@ export async function runAway() {
       return cachedResult
     }
 
-    const expeditionProgress = await performRunAway(user, state, payload, true)
+    return await runCaptureSettlement(user.id, resultKey, state, async ({ payload, req, user, state, redis, setIdempotentResult }) => {
+    const expeditionProgress = await performRunAway(user, state, payload, true, { payload, req, redis })
 
     const response = {
       success: true,
@@ -179,6 +184,7 @@ export async function runAway() {
     )
 
     return response
+    }, 'escape')
   } finally {
     await releaseActionLock(escapeLock)
   }
@@ -234,6 +240,7 @@ export async function attemptAbilityEscape() {
       return cachedResult
     }
 
+    return await runCaptureSettlement(user.id, resultKey, state, async ({ payload, req, user, state, redis, setIdempotentResult }) => {
     // Check Active Pokemon Ability
     const activePoke = await payload.find({
       collection: 'pokemon',
@@ -292,6 +299,7 @@ export async function attemptAbilityEscape() {
         state,
         payload,
         true,
+        { payload, req, redis },
       )
       response = {
         success: true,
@@ -315,6 +323,7 @@ export async function attemptAbilityEscape() {
     )
 
     return response
+    }, 'ability-escape')
   } finally {
     await releaseActionLock(escapeLock)
   }
@@ -370,6 +379,7 @@ export async function researchEscape() {
       return cachedResult
     }
 
+    return await runCaptureSettlement(user.id, resultKey, state, async ({ payload, req, user, state, redis, setIdempotentResult }) => {
     // Check research level for the encountered form
     const pokedexMap = (await getUserPokedexMap(
       payload as any,
@@ -386,7 +396,7 @@ export async function researchEscape() {
     }
 
     // Clear encounter (free flee — no loss counter)
-    const expeditionProgress = await performRunAway(user, state, payload, false)
+    const expeditionProgress = await performRunAway(user, state, payload, false, { payload, req, redis })
 
     const response = {
       success: true,
@@ -403,6 +413,7 @@ export async function researchEscape() {
     )
 
     return response
+    }, 'research-escape')
   } finally {
     await releaseActionLock(escapeLock)
   }

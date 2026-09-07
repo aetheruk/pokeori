@@ -1,7 +1,8 @@
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { headers } from 'next/headers'
-import type { Pokemon, User } from '@/payload-types'
+import type { User } from '@/payload-types'
+export { serializePokemon } from '@/utilities/pokemon/serialize'
 
 export type StatName = 'hp' | 'attack' | 'defense' | 'specialAttack' | 'specialDefense' | 'speed'
 
@@ -15,15 +16,4 @@ export async function getUser(): Promise<User | null> {
     id: jwtUser.id,
   })
   return user as User
-}
-
-export function serializePokemon(pokemon: Pokemon): Pokemon {
-  return {
-    ...pokemon,
-    id: String(pokemon.id),
-    user: typeof pokemon.user === 'object' ? String(pokemon.user.id) : String(pokemon.user),
-    originalTrainer: pokemon.originalTrainer, // Keep as is - can be object or string
-    createdAt: pokemon.createdAt ? String(pokemon.createdAt) : '',
-    updatedAt: pokemon.updatedAt ? String(pokemon.updatedAt) : '',
-  }
 }

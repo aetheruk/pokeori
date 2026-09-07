@@ -4,16 +4,16 @@ import {
   submitTurn,
   surrenderBattle,
   swapPokemon,
-  useBattleItem,
-  useCircadian,
-  useDynamax,
-  useMegaEvolution,
-  useMove,
-  useShout,
-  useTeraOrb,
-  useVictoryPower,
-  useWeatherPower,
-  useZMove,
+  useBattleItem as applyBattleItem,
+  useCircadian as applyCircadian,
+  useDynamax as applyDynamax,
+  useMegaEvolution as applyMegaEvolution,
+  useMove as applyMove,
+  useShout as applyShout,
+  useTeraOrb as applyTeraOrb,
+  useVictoryPower as applyVictoryPower,
+  useWeatherPower as applyWeatherPower,
+  useZMove as applyZMove,
 } from '@/app/(frontend)/game/battles/actions'
 import {
   createRequestId,
@@ -112,14 +112,14 @@ export async function POST(request: Request) {
         )
         break
       case 'move':
-        result = await useMove(
+        result = await applyMove(
           action.moveId,
           action.selectedType,
           action.clientActionId,
         )
         break
       case 'item':
-        result = await useBattleItem(
+        result = await applyBattleItem(
           action.itemId,
           action.clientActionId,
           action.pokemonIndex,
@@ -129,32 +129,32 @@ export async function POST(request: Request) {
         result = await swapPokemon(action.pokemonIndex, action.clientActionId)
         break
       case 'tera':
-        result = await useTeraOrb(action.clientActionId)
+        result = await applyTeraOrb(action.clientActionId)
         break
       case 'mega':
-        result = await useMegaEvolution(action.formId, action.clientActionId)
+        result = await applyMegaEvolution(action.formId, action.clientActionId)
         break
       case 'z-move':
-        result = await useZMove(action.clientActionId)
+        result = await applyZMove(action.clientActionId)
         break
       case 'dynamax':
-        result = await useDynamax(action.formId, action.clientActionId)
+        result = await applyDynamax(action.formId, action.clientActionId)
         break
       case 'victory':
-        result = await useVictoryPower(action.itemId, action.clientActionId)
+        result = await applyVictoryPower(action.itemId, action.clientActionId)
         break
       case 'weather':
-        result = await useWeatherPower(
+        result = await applyWeatherPower(
           action.battleId,
           action.weather,
           action.clientActionId,
         )
         break
       case 'shout':
-        result = await useShout(action.clientActionId)
+        result = await applyShout(action.clientActionId)
         break
       case 'circadian':
-        result = await useCircadian(action.battleId, action.clientActionId)
+        result = await applyCircadian(action.battleId, action.clientActionId)
         break
       case 'dimensional-shift':
         result = await submitTurn(

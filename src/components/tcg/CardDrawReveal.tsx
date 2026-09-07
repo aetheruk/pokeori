@@ -622,7 +622,9 @@ export function CardDrawReveal({
 
       {/* ── CENTER: card ── */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 py-4">
-        <div
+        <button
+          type="button"
+          aria-label={isCurrentRevealed ? `${currentCard.name} revealed` : 'Reveal card'}
           className="relative cursor-pointer select-none active:scale-[0.98] transition-transform duration-200"
           style={{ width: 260, height: 364 }}
           onClick={handleReveal}
@@ -723,7 +725,7 @@ export function CardDrawReveal({
               </motion.div>
             </motion.div>
           </AnimatePresence>
-        </div>
+        </button>
 
         {/* Details Area */}
         <div className="min-h-[80px] flex items-start justify-center w-full mt-10">

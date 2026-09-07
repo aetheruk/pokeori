@@ -4,8 +4,6 @@ import { redis } from '@/utilities/redis'
 import { locations, type LocationReward } from '@/data/locations'
 import { items } from '@/data/items'
 import { getPokemonSpecies, getPokemonForm } from '@/utilities/pokemon/pokedex'
-import { getPayload } from 'payload'
-import configPromise from '@payload-config'
 import { headers } from 'next/headers'
 import { getQuizData } from '@/data/quiz'
 import {
@@ -44,12 +42,11 @@ import {
   checkActionRateLimit,
   getIdempotentResult,
   releaseActionLock,
-  setIdempotentResult,
 } from '@/utilities/game-integrity'
 import {
   recordExpeditionActivityResult,
   setSafariBallsRemaining,
-} from '@/utilities/expeditions/actions'
+} from '@/utilities/expeditions/server'
 import {
   getEncounterRedisTtlSeconds,
   getEncounterActivityReference,
@@ -85,6 +82,9 @@ import {
   getPokemonRarityLegacyFields,
   resolvePokemonRarity,
 } from '@/utilities/pokemon/rarity-effects'
+import { replayCaptureSettlement, runCaptureSettlement, type CaptureSettlementContext } from './capture-settlement'
+import { getEncounterMechanicsLockKey } from './lock'
+import { verifyCaptureRingScale } from '@/utilities/pokemon/capture-timing'
 
 import {
   calculatePokemonContentSkillXp,
@@ -106,6 +106,7 @@ async function recordEncounterExpeditionResult(
   userId: string,
   state: EncounterState,
   didWin: boolean,
+  transaction: Pick<CaptureSettlementContext, 'payload' | 'req' | 'redis'>,
 ) {
   if (state.safari?.scope === 'encounter') {
     return { expedition: undefined }
@@ -117,11 +118,11 @@ async function recordEncounterExpeditionResult(
     reference.activityType,
     reference.activityId,
     didWin,
-    { revalidatePaths: false },
+    { revalidatePaths: false, payload: transaction.payload, req: transaction.req },
   )
 
   if (reference.activityType === 'game') {
-    await redis.del(`game:${userId}`)
+    await transaction.redis.del(`game:${userId}`)
   }
 
   return result
@@ -130,9 +131,13 @@ async function recordEncounterExpeditionResult(
 export async function attemptCapture(
   ballItemId: string,
   throwInput?: CaptureThrowInput,
+  clientActionId?: string,
 ) {
   const user = await getUser()
   if (!user) throw new Error('Unauthorized')
+  if (typeof clientActionId !== 'string' || !/^[a-zA-Z0-9_-]{1,80}$/.test(clientActionId)) return { success: false, message: 'Invalid capture action' }
+  const replay = await replayCaptureSettlement(user.id, clientActionId)
+  if (replay) return replay
 
   const rateLimit = await checkActionRateLimit(
     user.id,
@@ -148,8 +153,8 @@ export async function attemptCapture(
   }
 
   const captureLock = await acquireActionLock(
-    `lock:encounter:capture:${user.id}`,
-    15,
+    getEncounterMechanicsLockKey(user.id),
+    60,
   )
   if (!captureLock.acquired) {
     return {
@@ -159,8 +164,6 @@ export async function attemptCapture(
   }
 
   try {
-    const payload = await getPayload({ config: configPromise })
-
     const encounterId = `encounter:${user.id}`
     const state = (await redis.get(encounterId)) as EncounterState | null
 
@@ -180,6 +183,14 @@ export async function attemptCapture(
     if (cachedCaptureResult) {
       return cachedCaptureResult
     }
+    let verifiedRingScale: number
+    try {
+      verifiedRingScale = verifyCaptureRingScale(state.captureTiming, throwInput?.timing, captureAttempt, Date.now())
+    } catch (error) {
+      return { success: false, message: error instanceof Error ? error.message : 'Invalid throw timing', code: 'CAPTURE_TIMING_INVALID', noCharge: true }
+    }
+    return await runCaptureSettlement(user.id, clientActionId, state, async ({ payload, req, user, state, redis, setIdempotentResult }) => {
+    const transaction = { payload, req, redis }
     refreshEncounterShield(state)
 
     // Data Prefetch
@@ -273,6 +284,7 @@ export async function attemptCapture(
         user.id,
         state,
         false,
+        transaction,
       )
       response.expeditionProgress = expeditionResult.expedition
 
@@ -293,7 +305,7 @@ export async function attemptCapture(
         state.safari!.ballsRemaining - 1,
       )
       if (state.safari?.scope !== 'encounter') {
-        await setSafariBallsRemaining(user.id, state.safari!.ballsRemaining, false)
+        await setSafariBallsRemaining(user.id, state.safari!.ballsRemaining, false, payload)
       }
     } else {
       inventory[ballItemId] = qty - 1
@@ -363,7 +375,7 @@ export async function attemptCapture(
     )
 
     const isUltraBeast = ULTRA_BEASTS.includes(state.pokemonId)
-    const throwQuality = getThrowQuality(throwInput)
+    const throwQuality = getThrowQuality({ ringScale: verifiedRingScale })
     const throwStageBonus = getThrowStageBonus(throwQuality)
     const effectiveBallId =
       ballItemId === SAFARI_BALL_ID ? 'poke-ball' : ballItemId
@@ -452,7 +464,7 @@ export async function attemptCapture(
       state.captureAttempts = captureAttempt + 1
 
       if (flee.fled) {
-        const expeditionProgress = await failEncounter(user, state)
+        const expeditionProgress = await failEncounter(user, state, undefined, transaction)
         const response = {
           success: true,
           caught: false,
@@ -542,6 +554,7 @@ export async function attemptCapture(
         user.id,
         state,
         caught,
+        transaction,
       )
       response.expeditionProgress = expeditionResult.expedition
 
@@ -671,7 +684,7 @@ export async function attemptCapture(
       rewardsToGrant.push(...abilityRewards.rewards)
       const { summary } = await grantRewards(user.id, rewardsToGrant, {
         requirementContext: rewardRequirementContext,
-        idempotencyKey: captureResultKey,
+        payload, req,
       })
 
       const response = {
@@ -690,6 +703,7 @@ export async function attemptCapture(
         user.id,
         state,
         false,
+        transaction,
       )
       response.expeditionProgress = expeditionResult.expedition
 
@@ -922,7 +936,7 @@ export async function attemptCapture(
 
     const { summary } = await grantRewards(user.id, rewardsToGrant, {
       requirementContext: rewardRequirementContext,
-      idempotencyKey: captureResultKey,
+      payload, req,
     })
 
     // Consolidate messages
@@ -938,10 +952,11 @@ export async function attemptCapture(
 
     // Handle Location Item Use On Catch
     if (location?.requiredItem?.useOnCatch) {
-      const item = inventory[location.requiredItem!.id] || 0
+      const currentInventory = await getUserInventoryMap(payload as any, user.id)
+      const item = currentInventory[location.requiredItem!.id] || 0
       if (item > 0) {
-        inventory[location.requiredItem!.id] = item - 1
-        await setUserInventoryMap(payload as any, user.id, inventory)
+        currentInventory[location.requiredItem!.id] = item - 1
+        await setUserInventoryMap(payload as any, user.id, currentInventory)
         const itemDef = items.find((i) => i.id === location.requiredItem!.id)
         const itemName = itemDef?.name || location.requiredItem!.id
         messages.push(`Your ${itemName} disappears!`)
@@ -959,7 +974,7 @@ export async function attemptCapture(
       amount: 1,
       speciesId: state.pokemonId,
       types: formData?.types || [],
-    })
+    }, { payload, req })
 
     const response = {
       success: true,
@@ -979,6 +994,7 @@ export async function attemptCapture(
       user.id,
       state,
       true,
+      transaction,
     )
     response.expeditionProgress = expeditionResult.expedition
 
@@ -990,6 +1006,7 @@ export async function attemptCapture(
     )
 
     return response
+    })
   } finally {
     await releaseActionLock(captureLock)
   }

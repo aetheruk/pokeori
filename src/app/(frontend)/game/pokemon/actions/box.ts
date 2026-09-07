@@ -30,12 +30,14 @@ import { setPokemonRosterRole } from './team'
 import { getEggsForBox } from './eggs'
 import { getPokemonTeamLayout } from './team'
 import { getUserPokemonCount } from './release'
+import { PokemonBoxQuery, POKEMON_BOX_POPULATE } from '@/utilities/pokemon/box-query'
 
 export async function getPokemon(
   page: number = 1,
   limit: number = 24,
   boxId?: string | null,
 ) {
+  const query = PokemonBoxQuery.parse({ page, limit, boxId })
   const user = await getUser()
   if (!user) throw new Error('Unauthorized')
   const payload = await getPayload({ config })
@@ -84,8 +86,9 @@ export async function getPokemon(
     collection: 'pokemon',
     where,
     depth: 1,
-    page,
-    limit,
+    populate: POKEMON_BOX_POPULATE,
+    page: query.page,
+    limit: query.limit,
     sort: boxId === 'battle-team' ? 'battleTeamPosition' : '-createdAt',
   })
 

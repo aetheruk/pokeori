@@ -3,500 +3,66 @@
 import { DoorOpen } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import {
-  type PointerEvent as ReactPointerEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
-import {
-  completeGame,
-  startGame,
-  submitGameAnswer,
-} from '@/app/(frontend)/game/games/actions'
+import { type PointerEvent as ReactPointerEvent, useEffect, useRef, useState } from 'react'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
-import { useAudio } from '@/context/AudioContext'
-import { useUser } from '@/context/UserContext'
-import type {
-  SurfGameConfig,
-  SurfObstacleConfig,
-} from '@/data/games/surf/types'
+import type { SurfGameConfig } from '@/data/games/surf/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
-import { usePageVisibility } from '@/hooks/usePageVisibility'
-import {
-  clampSurfPlayerX,
-  getSurfCoursePosition,
-  getSurfEmergenceOpacity,
-  getSurfObstacleInterval,
-  getSurfParallaxFrames,
-  moveSurfPlayerTowards,
-  pickSurfObstacle,
-  pickSurfSpawnX,
-  surfBoxesOverlap,
-} from '@/utilities/research/surf'
-import {
-  EndlessCollectibleSprite,
-  getEndlessCollectibleRewardConfigs,
-  getNextCollectibleScore,
-} from './endless-collectibles'
+import { useArcadeSession } from '@/hooks/use-arcade-session'
+import { clampSurfPlayerX, getSurfCoursePosition, getSurfEmergenceOpacity, getSurfParallaxFrames } from '@/utilities/research/surf'
+import { EndlessCollectibleSprite } from './endless-collectibles'
 
 const DESIGN_WIDTH = 390
 const DESIGN_HEIGHT = 844
-const SCORE_PER_SECOND = 10
 const PLAYER_Y = 0.79
-
-interface SurfGameProps {
-  encounter: SurfGameConfig
-  initialState?: any
-}
-
-interface ActiveObstacle {
-  id: number
-  x: number
-  progress: number
-  config: SurfObstacleConfig
-}
-
-interface ActiveCollectible {
-  id: number
-  x: number
-  progress: number
-  rewardKey: string
-  reward: any
-}
-
-function hasRewardSummary(summary: any) {
-  return (
-    summary &&
-    [
-      summary.items,
-      summary.pokemon,
-      summary.currency,
-      summary.cards,
-      summary.icons,
-      summary.titles,
-    ].some((entries) => entries?.length > 0)
-  )
-}
+interface SurfGameProps { encounter: SurfGameConfig; initialState?: any }
 
 export function SurfGame({ encounter, initialState }: SurfGameProps) {
   useGameMusic(encounter)
   const router = useRouter()
-  const { playSfx } = useAudio()
-  const { refreshUser } = useUser()
-  const isPageVisible = usePageVisibility()
-  const stageRef = useRef<HTMLDivElement>(null)
-  const animationFrameRef = useRef<number | null>(null)
-  const lastFrameTimeRef = useRef(0)
-  const obstacleIdRef = useRef(0)
-  const collectibleIdRef = useRef(0)
-  const obstacleTimerRef = useRef(1.25)
-  const playerXRef = useRef(0.5)
-  const targetXRef = useRef(0.5)
-  const scoreRef = useRef(0)
-  const speedRef = useRef(encounter.settings.speed)
-  const obstaclesRef = useRef<ActiveObstacle[]>([])
-  const collectiblesRef = useRef<ActiveCollectible[]>([])
-  const collectibleSchedulesRef = useRef<Record<string, number>>({})
-  const collectedRewardsRef = useRef<Record<string, number>>({})
-  const pressedKeysRef = useRef(new Set<string>())
-  const endingRef = useRef(false)
-
-  const [gameStarted, setGameStarted] = useState(false)
-  const [gameEnded, setGameEnded] = useState(false)
-  const [startError, setStartError] = useState<string | null>(null)
-  const [countdown, setCountdown] = useState(3)
-  const [timeLeft, setTimeLeft] = useState(encounter.settings.timeLimit || 0)
-  const [score, setScore] = useState(0)
-  const [playerX, setPlayerX] = useState(0.5)
-  const [obstacles, setObstacles] = useState<ActiveObstacle[]>([])
-  const [collectibles, setCollectibles] = useState<ActiveCollectible[]>([])
-  const [waterOffset, setWaterOffset] = useState(0)
-  const [spriteFramesFailed, setSpriteFramesFailed] = useState(false)
-  const [result, setResult] = useState<any | null>(null)
-
+  const session = useArcadeSession('surf', encounter)
+  const { simulation, countdown, saving, result, timeLeft } = session
   const settings = encounter.settings
+  const stageRef = useRef<HTMLDivElement>(null)
+  const targetXRef = useRef(0.5)
+  const playerXRef = useRef(0.5)
+  const [spriteFramesFailed, setSpriteFramesFailed] = useState(false)
+  const playerX = simulation?.playerX ?? 0.5
+  playerXRef.current = playerX
+  targetXRef.current = simulation?.targetX ?? 0.5
+  const waterOffset = simulation?.distance || 0
+  const score = simulation?.score || 0
+  const obstacles = simulation?.surfObstacles || []
+  const collectibles = simulation?.collectibles || []
+  const gameEnded = Boolean(simulation && simulation.status !== 'playing')
+  const startError: string | null = null
   const isEndlessMode = settings.endless?.enabled === true
-  const collectibleRewardConfigs = useMemo(
-    () => getEndlessCollectibleRewardConfigs(settings),
-    [settings],
-  )
   const playerWidth = settings.playerWidth || 104
   const playerHeight = settings.playerHeight || 104
   const normalizedPlayerWidth = playerWidth / DESIGN_WIDTH
   const normalizedPlayerHeight = playerHeight / DESIGN_HEIGHT
   const spriteFrameIndex = settings.spriteFrames?.length
-    ? Math.floor(waterOffset / (settings.spriteFrameDistance || 24)) %
-      settings.spriteFrames.length
-    : 0
-
-  const resetLocalGame = useCallback(() => {
-    playerXRef.current = 0.5
-    targetXRef.current = 0.5
-    scoreRef.current = 0
-    speedRef.current = settings.speed
-    obstacleTimerRef.current = 1.25
-    obstacleIdRef.current = 0
-    collectibleIdRef.current = 0
-    obstaclesRef.current = []
-    collectiblesRef.current = []
-    collectedRewardsRef.current = {}
-    collectibleSchedulesRef.current = Object.fromEntries(
-      collectibleRewardConfigs.map((config) => [
-        config.key,
-        getNextCollectibleScore(0, config.everyScore),
-      ]),
-    )
-    endingRef.current = false
-    lastFrameTimeRef.current = 0
-    setPlayerX(0.5)
-    setScore(0)
-    setObstacles([])
-    setCollectibles([])
-    setWaterOffset(0)
-    setSpriteFramesFailed(false)
-    setCountdown(3)
-    setGameEnded(false)
-    setResult(null)
-  }, [collectibleRewardConfigs, settings.speed])
-
-  const initGame = useCallback(async () => {
-    const response = await startGame(encounter.id)
-    if (!response.success) {
-      setStartError(response.error || `Unable to start ${encounter.name}.`)
-      return
-    }
-
-    resetLocalGame()
-    setStartError(null)
-    setGameStarted(true)
-    if (response.restored && response.expiry && settings.timeLimit) {
-      setTimeLeft(
-        Math.max(0, Math.floor((response.expiry - Date.now()) / 1000)),
-      )
-    } else {
-      setTimeLeft(settings.timeLimit || 0)
-    }
-  }, [encounter.id, resetLocalGame, settings.timeLimit])
+    ? Math.floor(waterOffset / (settings.spriteFrameDistance || 24)) % settings.spriteFrames.length : 0
+  const replay = session.replay
 
   useEffect(() => {
-    if (!gameStarted) void initGame()
-  }, [gameStarted, initGame])
-
-  useEffect(() => {
-    if (!gameStarted || gameEnded || !isPageVisible || countdown <= 0) return
-    const timeout = window.setTimeout(
-      () => setCountdown((current) => current - 1),
-      1000,
-    )
-    return () => window.clearTimeout(timeout)
-  }, [countdown, gameEnded, gameStarted, isPageVisible])
-
-  const finishGame = useCallback(
-    async (success: boolean, message: string) => {
-      if (endingRef.current) return
-      endingRef.current = true
-      setGameEnded(true)
-      playSfx(success ? 'good' : 'bad')
-      await submitGameAnswer(success)
-
-      const finalScore = isEndlessMode
-        ? Math.floor(scoreRef.current)
-        : undefined
-      const response = await completeGame(
-        encounter.id,
-        success,
-        finalScore,
-        undefined,
-        collectedRewardsRef.current,
-      )
-      const earnedRewards = hasRewardSummary(response.summary)
-
-      setResult({
-        success: isEndlessMode ? earnedRewards : success,
-        message:
-          response.success === false
-            ? response.error || 'The run could not be recorded.'
-            : isEndlessMode
-              ? `Final Score: ${Math.floor(scoreRef.current)}`
-              : message,
-        rewards: response.summary,
-      })
-    },
-    [encounter.id, isEndlessMode, playSfx],
-  )
-
-  useEffect(() => {
-    if (
-      !settings.timeLimit ||
-      !gameStarted ||
-      gameEnded ||
-      countdown > 0 ||
-      !isPageVisible
-    )
-      return
-
-    const timer = window.setInterval(() => {
-      setTimeLeft((current) => {
-        if (current <= 1) {
-          void finishGame(false, 'Time up!')
-          return 0
-        }
-        return current - 1
-      })
-    }, 1000)
-    return () => window.clearInterval(timer)
-  }, [
-    countdown,
-    finishGame,
-    gameEnded,
-    gameStarted,
-    isPageVisible,
-    settings.timeLimit,
-  ])
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (['ArrowLeft', 'ArrowRight', 'a', 'd'].includes(event.key)) {
-        event.preventDefault()
-        pressedKeysRef.current.add(event.key.toLowerCase())
-      }
+    const onKey = (event: KeyboardEvent) => {
+      if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, button, [role="dialog"]')) return
+      if (!['ArrowLeft', 'ArrowRight', 'a', 'd'].includes(event.key)) return
+      event.preventDefault()
+      if (event.repeat) return
+      session.sendInput('steer', event.type === 'keyup' ? playerXRef.current : ['ArrowLeft', 'a'].includes(event.key) ? 0 : 1)
     }
-    const handleKeyUp = (event: KeyboardEvent) => {
-      pressedKeysRef.current.delete(event.key.toLowerCase())
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('keyup', handleKeyUp)
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-      window.removeEventListener('keyup', handleKeyUp)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!isPageVisible) lastFrameTimeRef.current = 0
-  }, [isPageVisible])
-
-  useEffect(() => {
-    if (!gameStarted || gameEnded || countdown > 0 || !isPageVisible) return
-
-    const gameLoop = (now: number) => {
-      if (!lastFrameTimeRef.current) lastFrameTimeRef.current = now
-      const deltaSeconds = Math.min(
-        0.05,
-        (now - lastFrameTimeRef.current) / 1000,
-      )
-      lastFrameTimeRef.current = now
-
-      const stageWidth = stageRef.current?.clientWidth || DESIGN_WIDTH
-      const keyboardLeft =
-        pressedKeysRef.current.has('arrowleft') ||
-        pressedKeysRef.current.has('a')
-      const keyboardRight =
-        pressedKeysRef.current.has('arrowright') ||
-        pressedKeysRef.current.has('d')
-      if (keyboardLeft !== keyboardRight) {
-        targetXRef.current = clampSurfPlayerX(
-          playerXRef.current + (keyboardRight ? 1 : -1),
-          normalizedPlayerWidth,
-        )
-      }
-      playerXRef.current = clampSurfPlayerX(
-        moveSurfPlayerTowards(
-          playerXRef.current,
-          targetXRef.current,
-          settings.steeringSpeed,
-          deltaSeconds,
-          stageWidth,
-        ),
-        normalizedPlayerWidth,
-      )
-
-      speedRef.current = Math.min(
-        settings.maxSpeed || settings.speed,
-        speedRef.current + (settings.acceleration || 0) * deltaSeconds,
-      )
-      const courseStep = (speedRef.current / DESIGN_HEIGHT) * deltaSeconds
-      const nextScore = scoreRef.current + SCORE_PER_SECOND * deltaSeconds
-      scoreRef.current = nextScore
-
-      obstacleTimerRef.current -= deltaSeconds
-      let nextObstacles = obstaclesRef.current
-      if (obstacleTimerRef.current <= 0) {
-        const config = pickSurfObstacle(settings.obstacles, settings.difficulty)
-        if (config) {
-          const occupiedXs = collectiblesRef.current
-            .filter((collectible) => collectible.progress < 0.2)
-            .map((collectible) => collectible.x)
-          nextObstacles = [
-            ...nextObstacles,
-            {
-              id: obstacleIdRef.current++,
-              x: pickSurfSpawnX(occupiedXs),
-              progress: 0,
-              config,
-            },
-          ]
-        }
-        obstacleTimerRef.current = getSurfObstacleInterval(
-          settings.obstacleFrequency,
-          settings.difficulty,
-        )
-      }
-      nextObstacles = nextObstacles
-        .map((obstacle) => ({
-          ...obstacle,
-          progress: obstacle.progress + courseStep,
-        }))
-        .filter((obstacle) => obstacle.progress < 1.14)
-      obstaclesRef.current = nextObstacles
-
-      let nextCollectibles = collectiblesRef.current
-      for (const config of collectibleRewardConfigs) {
-        let nextRewardScore = collectibleSchedulesRef.current[config.key]
-        while (nextRewardScore !== undefined && nextScore >= nextRewardScore) {
-          const rewardOption =
-            config.rewardOptions[
-              Math.floor(Math.random() * config.rewardOptions.length)
-            ]
-          const occupiedXs = obstaclesRef.current
-            .filter((obstacle) => obstacle.progress < 0.2)
-            .map((obstacle) => obstacle.x)
-          nextCollectibles = [
-            ...nextCollectibles,
-            {
-              id: collectibleIdRef.current++,
-              x: pickSurfSpawnX(occupiedXs),
-              progress: 0,
-              rewardKey: rewardOption.key,
-              reward: rewardOption.reward,
-            },
-          ]
-          nextRewardScore = getNextCollectibleScore(
-            nextRewardScore,
-            config.everyScore,
-          )
-          collectibleSchedulesRef.current[config.key] = nextRewardScore
-        }
-      }
-      nextCollectibles = nextCollectibles
-        .map((collectible) => ({
-          ...collectible,
-          progress: collectible.progress + courseStep,
-        }))
-        .filter((collectible) => collectible.progress < 1.12)
-
-      const playerBox = {
-        x: playerXRef.current - normalizedPlayerWidth * 0.31,
-        y: PLAYER_Y - normalizedPlayerHeight * 0.28,
-        width: normalizedPlayerWidth * 0.62,
-        height: normalizedPlayerHeight * 0.56,
-      }
-      const collision = nextObstacles.some((obstacle) => {
-        const position = getSurfCoursePosition(obstacle.x, obstacle.progress)
-        const collisionScale = obstacle.config.collisionScale || 0.7
-        const width =
-          (obstacle.config.width / DESIGN_WIDTH) *
-          position.scale *
-          collisionScale
-        const height =
-          (obstacle.config.height / DESIGN_HEIGHT) *
-          position.scale *
-          collisionScale
-        return surfBoxesOverlap(playerBox, {
-          x: position.x - width / 2,
-          y: position.y - height / 2,
-          width,
-          height,
-        })
-      })
-      if (collision) {
-        void finishGame(false, 'You hit an obstacle!')
-        return
-      }
-
-      const collectedIds = new Set<number>()
-      for (const collectible of nextCollectibles) {
-        const position = getSurfCoursePosition(
-          collectible.x,
-          collectible.progress,
-        )
-        const size = (46 / DESIGN_WIDTH) * position.scale
-        if (
-          surfBoxesOverlap(playerBox, {
-            x: position.x - size / 2,
-            y: position.y - size / 2,
-            width: size,
-            height: size * (DESIGN_WIDTH / DESIGN_HEIGHT),
-          })
-        ) {
-          collectedIds.add(collectible.id)
-          collectedRewardsRef.current[collectible.rewardKey] =
-            (collectedRewardsRef.current[collectible.rewardKey] || 0) + 1
-          playSfx('select')
-        }
-      }
-      if (collectedIds.size > 0) {
-        nextCollectibles = nextCollectibles.filter(
-          (collectible) => !collectedIds.has(collectible.id),
-        )
-      }
-      collectiblesRef.current = nextCollectibles
-
-      if (
-        !isEndlessMode &&
-        settings.winScore &&
-        nextScore >= settings.winScore
-      ) {
-        void finishGame(true, 'Course complete!')
-        return
-      }
-
-      setPlayerX(playerXRef.current)
-      setScore(nextScore)
-      setObstacles(nextObstacles)
-      setCollectibles(nextCollectibles)
-      setWaterOffset((current) => current + speedRef.current * deltaSeconds)
-      animationFrameRef.current = requestAnimationFrame(gameLoop)
-    }
-
-    animationFrameRef.current = requestAnimationFrame(gameLoop)
-    return () => {
-      if (animationFrameRef.current !== null) {
-        cancelAnimationFrame(animationFrameRef.current)
-      }
-    }
-  }, [
-    collectibleRewardConfigs,
-    countdown,
-    finishGame,
-    gameEnded,
-    gameStarted,
-    isEndlessMode,
-    isPageVisible,
-    normalizedPlayerHeight,
-    normalizedPlayerWidth,
-    playSfx,
-    settings,
-  ])
+    window.addEventListener('keydown', onKey)
+    window.addEventListener('keyup', onKey)
+    return () => { window.removeEventListener('keydown', onKey); window.removeEventListener('keyup', onKey) }
+  }, [session.sendInput])
 
   const steerToPointer = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (gameEnded || countdown > 0) return
+    if (gameEnded || countdown > 0 || saving) return
     const bounds = event.currentTarget.getBoundingClientRect()
-    targetXRef.current = clampSurfPlayerX(
-      (event.clientX - bounds.left) / bounds.width,
-      normalizedPlayerWidth,
-    )
-  }
-
-  const replay = async () => {
-    const response = await startGame(encounter.id, true)
-    if (response.success) window.location.reload()
-    else router.push('/game/explore')
+    session.sendInput('steer', clampSurfPlayerX((event.clientX - bounds.left) / bounds.width, normalizedPlayerWidth))
   }
 
   const waterMotionOffset = waterOffset % 2400
@@ -859,13 +425,11 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
         ) : null}
       </div>
 
+      {saving ? <p role="status" className="absolute inset-x-0 top-20 z-50 text-center text-sm text-white">Saving progress…</p> : null}
       {result ? (
         <RewardResultOverlay
           result={result}
-          onClose={() => {
-            refreshUser()
-            router.push('/game/explore')
-          }}
+          onClose={session.close}
           icon={encounter.icon}
           iconAlt={encounter.name}
           title={result.success ? 'Surf complete' : 'Course ended'}

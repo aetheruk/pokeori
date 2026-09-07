@@ -1,9 +1,11 @@
 'use client'
 
+import type { GameDataKeys } from '@/utilities/requirements/analysis'
+
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useRef, useCallback, useEffect, useMemo, useState } from 'react'
 import { GameProgressChip } from '@/components/game/shared/game-progress-chip'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
@@ -19,7 +21,7 @@ import {
   completeGame,
   startGame,
   submitGameAnswer,
-} from '@/app/(frontend)/game/games/actions'
+} from '@/utilities/games/client-action-recovery'
 
 interface SpellingGameProps {
   encounter: GameItem
@@ -31,6 +33,7 @@ export function SpellingGame({ encounter, initialState }: SpellingGameProps) {
   const { playSfx } = useAudio()
   const router = useRouter()
   const { refreshUser } = useUser()
+  const completionInvalidatesRef = useRef<GameDataKeys[] | undefined>(undefined)
   const winRateNum =
     typeof encounter.settings.winRate === 'number'
       ? encounter.settings.winRate
@@ -171,6 +174,7 @@ export function SpellingGame({ encounter, initialState }: SpellingGameProps) {
               encounter.id,
               result.wins >= (result.requiredWins || 5),
             )
+            completionInvalidatesRef.current = completeResult.invalidates
             if (completeResult.success && completeResult.summary) {
               setResult({
                 success: true,
@@ -203,6 +207,7 @@ export function SpellingGame({ encounter, initialState }: SpellingGameProps) {
 
         if (result.gameOver) {
           const completeResult = await completeGame(encounter.id, false)
+          completionInvalidatesRef.current = completeResult.invalidates
           setResult({
             success: false,
             message: result.message || 'Game Over!',
@@ -453,7 +458,7 @@ export function SpellingGame({ encounter, initialState }: SpellingGameProps) {
         <RewardResultOverlay
           result={result}
           onClose={() => {
-            refreshUser()
+            refreshUser(true, completionInvalidatesRef.current)
             router.push('/game/explore')
           }}
           icon={encounter.icon}

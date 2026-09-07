@@ -8,6 +8,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from '@/components/ui/dialog'
 import {
   Drawer,
@@ -15,6 +16,7 @@ import {
   DrawerDescription,
   DrawerHeader,
   DrawerTitle,
+  DrawerTrigger,
 } from '@/components/ui/drawer'
 import { cn } from '@/lib/utils'
 
@@ -63,7 +65,7 @@ export function ResponsivePanel({
   children,
   trigger,
   desktopWidth = 'min(38vw, 560px)',
-  desktopBreakpoint = 'xl',
+  desktopBreakpoint = 'lg',
   mobileMaxHeight = '92dvh',
   mobileHeader = true,
   showHandle = true,
@@ -72,8 +74,7 @@ export function ResponsivePanel({
   headerClassName,
   className,
 }: ResponsivePanelProps) {
-  // Keep the existing xl transition by default. Pages with a useful inspector
-  // can opt into the style guide's lg desktop workspace breakpoint.
+  // Keep the journal navigation and inspector on the same desktop breakpoint.
   const isDesktop = useMediaQuery(
     desktopBreakpoint === 'lg' ? '(min-width: 1024px)' : '(min-width: 1280px)',
   )
@@ -103,9 +104,8 @@ export function ResponsivePanel({
 
   if (isDesktop) {
     return (
-      <>
-        {triggerElement}
         <Dialog open={open} onOpenChange={onOpenChange}>
+          {triggerElement && <DialogTrigger asChild>{triggerElement}</DialogTrigger>}
           <DialogContent
             className={cn(
               'game-paper-modal game-paper-background !left-auto !right-0 !top-0 h-dvh !max-h-none !w-[var(--responsive-panel-width)] !max-w-none !translate-x-0 !translate-y-0 rounded-l-xl rounded-r-none border-y-0 border-r-0 p-0 sm:p-0',
@@ -141,14 +141,12 @@ export function ResponsivePanel({
             {children}
           </DialogContent>
         </Dialog>
-      </>
     )
   }
 
   return (
-    <>
-      {triggerElement}
       <Drawer open={open} onOpenChange={onOpenChange}>
+        {triggerElement && <DrawerTrigger asChild>{triggerElement}</DrawerTrigger>}
         <DrawerContent
           showHandle={showHandle}
           className={cn('game-paper-modal game-paper-background', className)}
@@ -194,6 +192,5 @@ export function ResponsivePanel({
           {children}
         </DrawerContent>
       </Drawer>
-    </>
   )
 }

@@ -1,0 +1,67 @@
+{
+  "scope": "Isolated Linux production container, build pokeori-0-29-12 before client game-registry split; fresh Chromium context per route,1280px, authenticated synthetic accounts; measurements after hydration plus800ms without interaction. Body bytes are decoded JavaScript response bytes, not compressed transfer sizes.",
+  "routes": [
+    {
+      "route": "/game/explore",
+      "scriptCount": 38,
+      "decodedScriptBodyBytes": 4408535,
+      "pageErrors": [],
+      "cspDirectives": [
+        "script-src"
+      ],
+      "downloadedGameSymbols": [
+        "PvpQueueModal"
+      ]
+    },
+    {
+      "route": "/game/pokemon",
+      "scriptCount": 39,
+      "decodedScriptBodyBytes": 3641811,
+      "pageErrors": [],
+      "cspDirectives": [
+        "script-src"
+      ],
+      "downloadedGameSymbols": []
+    },
+    {
+      "route": "/game/inventory",
+      "scriptCount": 38,
+      "decodedScriptBodyBytes": 4265505,
+      "pageErrors": [],
+      "cspDirectives": [
+        "script-src"
+      ],
+      "downloadedGameSymbols": []
+    },
+    {
+      "route": "/game/games/run",
+      "scriptCount": 42,
+      "decodedScriptBodyBytes": 4544014,
+      "pageErrors": [],
+      "cspDirectives": [],
+      "downloadedGameSymbols": [
+        "ArtAcademyGame",
+        "BrickBreakerGame",
+        "FlapGame",
+        "Match3Game",
+        "MiningGame",
+        "PachinkoGame",
+        "RhythmGame",
+        "RunGame",
+        "SnakeGame",
+        "SurfGame"
+      ]
+    },
+    {
+      "route": "/admin",
+      "scriptCount": 15,
+      "decodedScriptBodyBytes": 2192870,
+      "pageErrors": [],
+      "cspDirectives": [
+        "img-src",
+        "img-src"
+      ],
+      "downloadedGameSymbols": []
+    }
+  ]
+}

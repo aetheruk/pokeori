@@ -30,9 +30,13 @@ test('game sync authenticates once, enforces ownership, and emits private timing
     assert.equal((await response.json()).user.id, 'player-1')
     assert.equal(response.headers.get('cache-control'), 'private, no-store')
     assert.match(response.headers.get('server-timing'), /^game-data;dur=/)
+    assert.match(response.headers.get('server-timing'), /auth;dur=/)
+    assert.match(response.headers.get('server-timing'), /serialize;dur=/)
+    assert.match(response.headers.get('server-timing'), /total;dur=/)
     signedIn = false
     const denied = await GET(new Request('https://example.test/api/game/sync'))
     assert.equal(denied.status, 401)
+    assert.equal(denied.headers.get('cache-control'), 'private, no-store')
     assert.equal(reads, 1)
   `], { cwd: process.cwd(), stdout: 'pipe', stderr: 'pipe' })
   const [exitCode, stderr] = await Promise.all([child.exited, new Response(child.stderr).text()])

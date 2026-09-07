@@ -1,8 +1,10 @@
 'use client'
 
+import type { GameDataKeys } from '@/utilities/requirements/analysis'
+
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { useRef, useCallback, useEffect, useState } from 'react'
 import { GameProgressChip } from '@/components/game/shared/game-progress-chip'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
@@ -19,7 +21,7 @@ import {
   completeGame,
   startGame,
   submitGameAnswer,
-} from '@/app/(frontend)/game/games/actions'
+} from '@/utilities/games/client-action-recovery'
 
 interface QuickIdentifyGameProps {
   encounter: GameItem
@@ -40,6 +42,7 @@ export function QuickIdentifyGame({
   useGameMusic(encounter)
   const { playSfx } = useAudio()
   const { refreshUser } = useUser()
+  const completionInvalidatesRef = useRef<GameDataKeys[] | undefined>(undefined)
   const winRateNum =
     typeof encounter.settings.winRate === 'number'
       ? encounter.settings.winRate
@@ -194,6 +197,7 @@ export function QuickIdentifyGame({
             encounter.id,
             (result.wins || 0) >= (result.requiredWins || 5),
           )
+          completionInvalidatesRef.current = completeResult.invalidates
           if (completeResult?.success && completeResult.summary) {
             setSuccess(true)
             setResult({
@@ -239,6 +243,7 @@ export function QuickIdentifyGame({
             encounter.id,
             (result.wins || 0) >= (result.requiredWins || 5),
           )
+          completionInvalidatesRef.current = completeResult.invalidates
           if (completeResult?.success && completeResult.summary) {
             setResult({
               success: false,
@@ -444,7 +449,7 @@ export function QuickIdentifyGame({
         <RewardResultOverlay
           result={result}
           onClose={() => {
-            refreshUser()
+            refreshUser(true, completionInvalidatesRef.current)
             router.push('/game/explore')
           }}
           icon={encounter.icon}

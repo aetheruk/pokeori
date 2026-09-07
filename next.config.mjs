@@ -1,12 +1,17 @@
 import { readFileSync } from 'node:fs'
 import { availableParallelism } from 'node:os'
-import withBundleAnalyzer from '@next/bundle-analyzer'
 import { withPayload } from '@payloadcms/next/withPayload'
 
 const packageVersion = JSON.parse(
   readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
 ).version
 const deploymentId = `pokeori-${packageVersion.replaceAll('.', '-')}`
+
+// Payload's source/type generation tools are not production runtime roots.
+// Next may still trace an individual file if a real runtime import needs it.
+const authoringOnlyPackages = new Set([
+  'typescript', 'typescript6', 'prettier', 'json-schema-to-typescript',
+])
 
 function runtimePackageGlobs(rootPackages) {
   const pending = [...rootPackages]
@@ -15,7 +20,7 @@ function runtimePackageGlobs(rootPackages) {
 
   while (pending.length > 0) {
     const packageName = pending.pop()
-    if (!packageName || visited.has(packageName)) continue
+    if (!packageName || visited.has(packageName) || authoringOnlyPackages.has(packageName)) continue
     visited.add(packageName)
 
     try {
@@ -46,13 +51,11 @@ const standaloneRuntimeGlobs = runtimePackageGlobs([
   'sharp',
 ])
 
-const bundleAnalyzer = withBundleAnalyzer({
-  enabled: process.env.ANALYZE === 'true',
-  openAnalyzer: true,
-})
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  ...(process.env.NODE_ENV !== 'production' && process.env.POKEORI_TEST_DIST_DIR
+    ? { distDir: process.env.POKEORI_TEST_DIST_DIR }
+    : {}),
   output: 'standalone',
   deploymentId,
   outputFileTracingIncludes: {
@@ -78,6 +81,11 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'images.pokemontcg.io',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.scrydex.com',
         pathname: '/**',
       },
     ],
@@ -159,6 +167,6 @@ const nextConfig = {
     ]
   },
 }
-export default withPayload(bundleAnalyzer(nextConfig), {
+export default withPayload(nextConfig, {
   devBundleServerPackages: false,
 })

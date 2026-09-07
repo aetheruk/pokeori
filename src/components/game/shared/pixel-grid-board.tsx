@@ -104,6 +104,7 @@ export function PixelGridBoard({
 
   return (
     <div ref={measureRef} className="flex w-full max-w-[92vw] justify-center">
+      {/* biome-ignore lint/a11y/useSemanticElements: This spatial game board positions interactive sprite tiles; it is not tabular data. */}
       <div
         role="grid"
         aria-label={ariaLabel}

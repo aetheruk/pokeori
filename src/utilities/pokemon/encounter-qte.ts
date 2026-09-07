@@ -1,4 +1,5 @@
 import type { Item } from '@/data/items'
+import { isFocusCircleProgressComplete } from './focus-qte'
 
 export type EncounterQteType = 'focus' | 'calm' | 'scare' | 'chase'
 export type EncounterQteStatus = 'pending' | 'active' | 'completed' | 'failed'
@@ -26,10 +27,10 @@ export interface PublicEncounterQte {
 }
 
 export type EncounterQteCompletionPayload =
-  | { type: 'focus'; completedCircles?: number }
+  | { type: 'focus'; completedCircles?: number; circles?: Array<{ atMs: number; points: Array<{x: number; y: number}> }> }
   | { type: 'calm'; berryId?: string }
-  | { type: 'scare'; tappedDecoys?: number; hitTarget?: boolean }
-  | { type: 'chase'; tapCount?: number }
+  | { type: 'scare'; tappedDecoys?: number; hitTarget?: boolean; taps?: Array<{atMs: number; index: number}> }
+  | { type: 'chase'; tapCount?: number; taps?: number[] }
 
 export const ENCOUNTER_QTE_CHANCE = 0.3
 export const ENCOUNTER_QTE_MIN_QUESTIONS = 2
@@ -188,17 +189,26 @@ export function activateEncounterQte(qte: EncounterQteState, now = Date.now()): 
 export function completeEncounterQteState(
   qte: EncounterQteState,
   payload: EncounterQteCompletionPayload,
+  now = Date.now(),
 ): EncounterQteState {
   let success = false
+  const elapsed = typeof qte.offeredAt === 'number' ? now - qte.offeredAt : -1
+  const validTimes = (times: number[], spacing: number) =>
+    elapsed >= 0 && elapsed <= 120000 && times.every((time, index) =>
+      Number.isFinite(time) && time >= 0 && time <= elapsed + 250 &&
+      (index === 0 || time - times[index - 1] >= spacing))
 
+  if (!payload || qte.status !== 'active') return qte
   if (qte.type === 'focus' && payload.type === 'focus') {
-    success = Math.floor(payload.completedCircles || 0) >= 3
+    const circles = payload.circles
+    success = Array.isArray(circles) && circles.length === 3 && circles.every((circle) => circle && Array.isArray(circle.points) && circle.points.length >= 12 && circle.points.length <= 512 && circle.points.every((point) => point && Number.isFinite(point.x) && Number.isFinite(point.y) && Math.abs(point.x) <= 512 && Math.abs(point.y) <= 512) && isFocusCircleProgressComplete(circle.points, {x: 0, y: 0})) && validTimes(circles.map((circle) => circle.atMs), 120)
   } else if (qte.type === 'calm' && payload.type === 'calm') {
-    success = !!payload.berryId && payload.berryId === qte.correctBerryId
+    success = elapsed >= 0 && elapsed <= 120000 && !!payload.berryId && payload.berryId === qte.correctBerryId
   } else if (qte.type === 'scare' && payload.type === 'scare') {
-    success = Math.floor(payload.tappedDecoys || 0) >= 6 && payload.hitTarget !== true
+    const taps = payload.taps
+    success = Array.isArray(taps) && taps.length === SCARE_QTE_DECOY_COUNT && taps.every((tap) => tap && Number.isInteger(tap.index) && tap.index >= 0 && tap.index < (qte.decoyFormIds?.length || SCARE_QTE_DECOY_COUNT)) && new Set(taps.map((tap) => tap.index)).size === SCARE_QTE_DECOY_COUNT && validTimes(taps.map((tap) => tap.atMs), 20)
   } else if (qte.type === 'chase' && payload.type === 'chase') {
-    success = Math.floor(payload.tapCount || 0) >= (qte.tapTarget || CHASE_QTE_TAP_COUNT)
+    success = Array.isArray(payload.taps) && payload.taps.length === (qte.tapTarget || CHASE_QTE_TAP_COUNT) && validTimes(payload.taps, 20)
   }
 
   qte.success = success

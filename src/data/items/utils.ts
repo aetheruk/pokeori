@@ -1,72 +1,28 @@
-import { items } from './all-items'
-import { evolutionItems } from './entries/evolution'
-import { megaStones } from './entries/mega-stones'
-import { tmItems } from './entries/tms'
-import itemSpriteManifest from '../item-sprite-manifest.json'
+import spriteIndex from '../item-sprite-index.json'
 
-type ItemSpriteManifest = {
-  items: Record<string, string>
-  sprites: Record<string, string>
+// Presentation must not import the authored move/ability/item mechanics graph.
+const paths = new Map<string, string>()
+for (const [path, ids] of Object.entries(spriteIndex.paths)) {
+  for (const id of ids) paths.set(id, `/sprites/items/${path}`)
 }
-
-const manifest = itemSpriteManifest as ItemSpriteManifest
-const evolutionItemIds = new Set(evolutionItems.map((item) => item.id))
-const megaStoneItemIds = new Set(megaStones.map((item) => item.id))
-const tmItemIds = new Set(tmItems.map((item) => item.id))
-const evolutionSpriteIds = new Set(evolutionItems.map((item) => sanitizeSpriteId(item.spriteId || item.id)))
-const megaStoneSpriteIds = new Set(megaStones.map((item) => sanitizeSpriteId(item.spriteId || item.id)))
-const tmSpriteIds = new Set(tmItems.map((item) => sanitizeSpriteId(item.spriteId || item.id)))
-const itemsById = new Map(items.map((item) => [item.id, item]))
-
-// Helper to strip leading slash if present
-function sanitizeSpriteId(id: string): string {
-  return id.replace(/^\/+/, '')
-}
-
-function getExpectedItemSpritePath(itemId: string, targetId: string): string {
-  const filename = targetId.includes('/') ? targetId.split('/').at(-1) || targetId : targetId
-  const expectedFilename = filename.includes('.') ? filename : `${filename}.avif`
-
-  if (itemId.startsWith('binder-') || itemId.startsWith('pack-')) {
-    return `/sprites/items/tcg/${targetId.includes('.') ? targetId : `${targetId}.avif`}`
-  }
-
-  if (megaStoneItemIds.has(itemId) || megaStoneSpriteIds.has(targetId)) {
-    return `/sprites/items/mega/${expectedFilename}`
-  }
-
-  if (
-    tmItemIds.has(itemId) ||
-    tmSpriteIds.has(targetId) ||
-    itemId.startsWith('tm-') ||
-    targetId.startsWith('tm-')
-  ) {
-    return `/sprites/items/tm/${expectedFilename}`
-  }
-
-  if (targetId.endsWith('-gem')) {
-    return `/sprites/items/materials/${expectedFilename}`
-  }
-
-  if (evolutionItemIds.has(itemId) || evolutionSpriteIds.has(targetId)) {
-    return `/sprites/items/evolution/${expectedFilename}`
-  }
-
-  return `/sprites/items/${targetId.includes('.') ? targetId : `${targetId}.avif`}`
-}
+const hues = spriteIndex.hues as Record<string, number>
 
 export function getItemSpriteUrl(itemId: string): string {
-  const item = itemsById.get(itemId)
-  const targetId = sanitizeSpriteId(item?.spriteId || itemId)
-  const expectedPath = getExpectedItemSpritePath(itemId, targetId)
-
-  return (
-    manifest.items[itemId] ||
-    manifest.sprites[targetId] ||
-    expectedPath
-  )
+  const known = paths.get(itemId)
+  if (known) return known
+  const target = itemId.replace(/^\/+/, '')
+  const alias = paths.get(target)
+  if (alias) return alias
+  const filename = target.split('/').at(-1) || target
+  const file = filename.includes('.') ? filename : `${filename}.avif`
+  if (itemId.startsWith('binder-') || itemId.startsWith('pack-')) {
+    return `/sprites/items/tcg/${target.includes('.') ? target : `${target}.avif`}`
+  }
+  if (target.startsWith('tm-')) return `/sprites/items/tm/${file}`
+  if (target.endsWith('-gem')) return `/sprites/items/materials/${file}`
+  return `/sprites/items/${target.includes('.') ? target : `${target}.avif`}`
 }
 
 export function getItemHueRotate(itemId: string): number | undefined {
-  return itemsById.get(itemId)?.hueRotate
+  return Object.hasOwn(hues, itemId) ? hues[itemId] : undefined
 }

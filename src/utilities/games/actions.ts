@@ -1,5 +1,3 @@
-'use server'
-
 import { allGames, type GameType } from '@/data/games'
 import {
   completeGame,

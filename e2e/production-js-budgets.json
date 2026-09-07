@@ -1,0 +1,10 @@
+{
+  "note": "Per-script gzip level 6, summed over fresh-browser initial downloads after hydration plus 800ms. Baseline is the isolated 0.29.12 Linux build; limits allow 10% rounded up to KiB. These are reproducible compressed body sizes, not measured network transfer sizes. Enforced by the opt-in production CSP smoke test.",
+  "routes": {
+    "/game/explore": { "baselineGzipBytes": 973955, "maxGzipBytes": 1072128 },
+    "/game/pokemon": { "baselineGzipBytes": 833946, "maxGzipBytes": 917504 },
+    "/game/inventory": { "baselineGzipBytes": 948386, "maxGzipBytes": 1043456 },
+    "/game/games/run": { "baselineGzipBytes": 582155, "maxGzipBytes": 641024 },
+    "/admin": { "baselineGzipBytes": 651142, "maxGzipBytes": 716800 }
+  }
+}

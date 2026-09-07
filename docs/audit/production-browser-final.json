@@ -1,0 +1,55 @@
+{
+  "scope": "Final isolated Linux production container, default CSP enforcement (CSP_ENFORCE omitted), client game-registry split and Zod jitless instrumentation. Fresh Chromium context per route,1280px, synthetic accounts. Measurements after hydration plus800ms without interaction; Run observed during initial countdown without charge. Bytes are decoded JavaScript response bodies, not compressed transfers. Empty Pokemon/inventory fixture lists; populated-list interaction performance was not measured.",
+  "routes": [
+    {
+      "route": "/game/explore",
+      "scriptCount": 38,
+      "decodedScriptBodyBytes": 4417804,
+      "pageErrors": [],
+      "cspViolations": [],
+      "downloadedGameSymbols": []
+    },
+    {
+      "route": "/game/pokemon",
+      "scriptCount": 39,
+      "decodedScriptBodyBytes": 3651243,
+      "pageErrors": [],
+      "cspViolations": [],
+      "downloadedGameSymbols": []
+    },
+    {
+      "route": "/game/inventory",
+      "scriptCount": 38,
+      "decodedScriptBodyBytes": 4274724,
+      "pageErrors": [],
+      "cspViolations": [],
+      "downloadedGameSymbols": []
+    },
+    {
+      "route": "/game/games/run",
+      "scriptCount": 29,
+      "decodedScriptBodyBytes": 2656088,
+      "pageErrors": [],
+      "cspViolations": [],
+      "downloadedGameSymbols": [
+        "RunGame"
+      ]
+    },
+    {
+      "route": "/admin",
+      "scriptCount": 15,
+      "decodedScriptBodyBytes": 2207970,
+      "pageErrors": [],
+      "cspViolations": [],
+      "downloadedGameSymbols": []
+    }
+  ],
+  "runComparison": {
+    "baselineBytes": 4544014,
+    "finalBytes": 2656088,
+    "bytesReduced": 1887926,
+    "percentReduced": 41.55,
+    "baselineScriptCount": 42,
+    "finalScriptCount": 29
+  }
+}

@@ -1,323 +1,37 @@
 'use client'
 
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useReducedMotion } from 'framer-motion'
+import { useRef } from 'react'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { Button } from '@/components/ui/button'
-import { useAudio } from '@/context/AudioContext'
-import { useUser } from '@/context/UserContext'
 import type { MiningConfig } from '@/data/games/mining/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
-import {
-  completeGame,
-  startGame,
-  submitGameAnswer,
-} from '@/app/(frontend)/game/games/actions'
+import { useArcadeSession } from '@/hooks/use-arcade-session'
 
-interface MiningGameProps {
-  encounter: MiningConfig
-  initialState?: any
-}
+interface MiningGameProps { encounter: MiningConfig; initialState?: any }
 
 export function MiningGame({ encounter, initialState }: MiningGameProps) {
   useGameMusic(encounter)
-  const { playSfx } = useAudio()
-  const { refreshUser } = useUser()
-  const router = useRouter()
-
-  // Game state
-  const [gameStarted, setGameStarted] = useState(!!initialState)
-  const [gameEnded, setGameEnded] = useState(false)
-  const [timeLeft, setTimeLeft] = useState(
-    initialState?.timeLeft ?? encounter.settings.timeLimit,
-  )
-  const [countdown, setCountdown] = useState(3)
-  const [result, setResult] = useState<any | null>(null)
-
-  // Mining state
-  const [currentHp, setCurrentHp] = useState(encounter.settings.itemHp)
-  const [swingsUsed, setSwingsUsed] = useState(0)
-  const [chevronPosition, setChevronPosition] = useState(0) // 0-100 percentage
-  const [targetZone, setTargetZone] = useState(() => {
-    // Initialize with random target zone based on config
-    const { min, max } = encounter.settings.targetSize
-    const size = min + Math.random() * (max - min)
-    const maxStart = 100 - size
-    const start = Math.random() * maxStart
-    return { start, end: start + size }
-  })
-  const [isMovingRight, setIsMovingRight] = useState(true)
-  const [lastHit, setLastHit] = useState<{ type: string } | null>(null)
-  const [shakeIntensity, setShakeIntensity] = useState(0)
-  const [crackLevel, setCrackLevel] = useState(0) // 0-100 percentage based on damage dealt
-  const [isShattered, setIsShattered] = useState(false)
-
-  // Refs
-  const gameLoopRef = useRef<number | null>(null)
-  const lastFrameTimeRef = useRef<number>(0)
-  const currentSpeedRef = useRef(encounter.settings.speed.min)
-  const gameEndedRef = useRef(false)
+  const reducedMotion = useReducedMotion()
+  const session = useArcadeSession('mining', encounter)
+  const { simulation, countdown, saving, result, timeLeft } = session
+  const gameStarted = Boolean(simulation)
+  const gameEnded = Boolean(simulation && simulation.status !== 'playing')
+  const lastHit = simulation?.lastHit && simulation.tick - simulation.lastHit.tick < 30 ? simulation.lastHit : null
   const barRef = useRef<HTMLDivElement>(null)
-
-  const {
-    itemHp,
-    perfectDamage,
-    okDamage,
-    maxSwings,
-    timeLimit,
-    buttonIcon,
-    miningTarget,
-  } = encounter.settings
-
-  // Generate random target zone
-  const generateTargetZone = useCallback(() => {
-    const { min, max } = encounter.settings.targetSize
-    const size = min + Math.random() * (max - min)
-    // Random position ensuring zone fits within bar
-    const maxStart = 100 - size
-    const start = Math.random() * maxStart
-    setTargetZone({ start, end: start + size })
-
-    // Also randomize speed for this swing
-    const { min: speedMin, max: speedMax } = encounter.settings.speed
-    currentSpeedRef.current = speedMin + Math.random() * (speedMax - speedMin)
-  }, [encounter.settings.targetSize, encounter.settings.speed])
-
-  // Calculate hit quality
-  const calculateHit = useCallback((): {
-    type: 'PERFECT' | 'OK' | 'MISS'
-    damage: number
-  } => {
-    const zoneSize = targetZone.end - targetZone.start
-    const okBoundary = zoneSize * 0.1 // 10% either side
-
-    // Check if in perfect zone (center)
-    if (
-      chevronPosition >= targetZone.start &&
-      chevronPosition <= targetZone.end
-    ) {
-      return { type: 'PERFECT', damage: perfectDamage }
-    }
-
-    // Check if in OK zone (10% either side)
-    if (
-      chevronPosition >= targetZone.start - okBoundary &&
-      chevronPosition <= targetZone.end + okBoundary
-    ) {
-      return { type: 'OK', damage: okDamage }
-    }
-
-    return { type: 'MISS', damage: 0 }
-  }, [chevronPosition, targetZone, perfectDamage, okDamage])
-
-  // Handle swing
-  const handleSwing = useCallback(() => {
-    if (gameEnded || gameEndedRef.current || countdown > 0) return
-
-    const hit = calculateHit()
-    setSwingsUsed((prev) => prev + 1)
-    setLastHit({ type: hit.type })
-    setTimeout(() => setLastHit(null), 500)
-
-    // Play SFX for miss only (good SFX handled when damage > 0)
-    if (hit.type === 'MISS') {
-      playSfx('bad')
-    }
-
-    if (hit.damage > 0) {
-      playSfx('good')
-      // Apply damage
-      const newHp = Math.max(0, currentHp - hit.damage)
-      setCurrentHp(newHp)
-
-      // Update crack level
-      const damageDealt = itemHp - newHp
-      setCrackLevel((damageDealt / itemHp) * 100)
-
-      // Shake effect
-      setShakeIntensity(hit.type === 'PERFECT' ? 8 : 4)
-      setTimeout(() => setShakeIntensity(0), 200)
-
-      // Check win
-      if (newHp <= 0) {
-        handleGameEnd(true)
-        return
-      }
-    }
-
-    // Check swing limit
-    if (maxSwings && swingsUsed + 1 >= maxSwings) {
-      handleGameEnd(false)
-      return
-    }
-
-    // Generate new target zone for next swing
-    generateTargetZone()
-  }, [
-    gameEnded,
-    countdown,
-    calculateHit,
-    currentHp,
-    itemHp,
-    maxSwings,
-    swingsUsed,
-    generateTargetZone,
-  ])
-
-  // Game loop
-  const gameLoop = useCallback(
-    (currentTime: number) => {
-      if (!gameStarted || gameEnded || gameEndedRef.current) return
-
-      gameLoopRef.current = requestAnimationFrame(gameLoop)
-
-      if (countdown > 0) {
-        lastFrameTimeRef.current = currentTime
-        return
-      }
-
-      const rawDeltaTime = (currentTime - lastFrameTimeRef.current) / 1000
-      const deltaTime = Math.min(rawDeltaTime, 0.1)
-      lastFrameTimeRef.current = currentTime
-
-      // Move chevron (ping-pong motion)
-      const speed = currentSpeedRef.current * 100 // Convert to percentage per second
-      setChevronPosition((prev) => {
-        let newPos =
-          prev + (isMovingRight ? speed * deltaTime : -speed * deltaTime)
-
-        // Bounce at edges
-        if (newPos >= 100) {
-          newPos = 100
-          setIsMovingRight(false)
-        } else if (newPos <= 0) {
-          newPos = 0
-          setIsMovingRight(true)
-        }
-
-        return newPos
-      })
-    },
-    [gameStarted, gameEnded, countdown, isMovingRight],
-  )
-
-  // Handle game end
-  const handleGameEnd = useCallback(
-    async (success: boolean) => {
-      if (gameEndedRef.current) return
-      gameEndedRef.current = true
-      setGameEnded(true)
-
-      if (success) {
-        setIsShattered(true)
-      }
-
-      if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current)
-
-      try {
-        await submitGameAnswer(success)
-        const res = await completeGame(encounter.id, success, 0)
-
-        const hasRewards =
-          res.summary &&
-          ((res.summary.items && res.summary.items.length > 0) ||
-            (res.summary.pokemon && res.summary.pokemon.length > 0) ||
-            (res.summary.currency && res.summary.currency.length > 0) ||
-            (res.summary.cards && res.summary.cards.length > 0))
-
-        setResult({
-          success,
-          message: success ? 'Nice Work' : 'Keep Trying!',
-          rewards: res.summary,
-        })
-      } catch (e) {
-        console.error('Game end error', e)
-      }
-    },
-    [encounter.id],
-  )
-
-  // Start game
-  const initGame = useCallback(async () => {
-    if (gameStarted) return
-
-    const result = await startGame(encounter.id)
-    if (!result.success) {
-      console.error('Failed to start encounter:', result.error)
-      return
-    }
-
-    setGameStarted(true)
-    setGameEnded(false)
-    setCurrentHp(itemHp)
-    setSwingsUsed(0)
-    setCrackLevel(0)
-    setIsShattered(false)
-    setTimeLeft(timeLimit)
-    setCountdown(3)
-    generateTargetZone()
-    lastFrameTimeRef.current = performance.now()
-  }, [encounter.id, itemHp, timeLimit, gameStarted, generateTargetZone])
-
-  // Start game loop
-  useEffect(() => {
-    if (gameStarted && !gameEnded) {
-      lastFrameTimeRef.current = performance.now()
-      gameLoopRef.current = requestAnimationFrame(gameLoop)
-    }
-
-    return () => {
-      if (gameLoopRef.current) {
-        cancelAnimationFrame(gameLoopRef.current)
-      }
-    }
-  }, [gameStarted, gameEnded, gameLoop])
-
-  // Timer effect
-  useEffect(() => {
-    if (!gameStarted || gameEnded || countdown > 0) return
-
-    const timer = setInterval(() => {
-      setTimeLeft((prev: number) => {
-        if (prev <= 1) {
-          handleGameEnd(false)
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [gameStarted, gameEnded, handleGameEnd, countdown])
-
-  // Countdown effect
-  useEffect(() => {
-    if (!gameStarted || gameEnded || countdown <= 0) return
-    const timer = setTimeout(() => {
-      setCountdown((prev) => prev - 1)
-    }, 1000)
-    return () => clearTimeout(timer)
-  }, [gameStarted, gameEnded, countdown])
-
-  // Reset timing when countdown finishes
-  useEffect(() => {
-    if (countdown === 0 && gameStarted && !gameEnded) {
-      lastFrameTimeRef.current = performance.now()
-    }
-  }, [countdown, gameStarted, gameEnded])
-
-  // Auto-start
-  useEffect(() => {
-    if (!gameStarted) {
-      initGame()
-    }
-  }, [gameStarted, initGame])
-
-  // HP percentage for bar
-  const hpPercentage = (currentHp / itemHp) * 100
+  const { itemHp, maxSwings, timeLimit, buttonIcon, miningTarget } = encounter.settings
+  const currentHp = simulation?.hp ?? itemHp
+  const swingsUsed = simulation?.swings || 0
+  const chevronPosition = simulation?.miningPosition || 0
+  const targetZone = { start: simulation?.targetStart || 0, end: (simulation?.targetStart || 0) + (simulation?.targetSize || 0) }
+  const hpPercentage = currentHp / itemHp * 100
+  const crackLevel = 100 - hpPercentage
+  const isShattered = currentHp <= 0
+  const shakeIntensity = !reducedMotion && lastHit?.type === 'PERFECT' ? 3 : 0
+  const handleSwing = () => session.sendInput('mine')
 
   return (
     <div className="min-h-dvh game-night bg-game-night-canvas text-game-night-ink">
@@ -415,7 +129,7 @@ export function MiningGame({ encounter, initialState }: MiningGameProps) {
                     return (
                       <div
                         key={i}
-                        className="absolute w-[200px] h-[200px] animate-[shatter_0.8s_ease-out_forwards]"
+                        className="absolute w-[200px] h-[200px] motion-safe:animate-[shatter_0.8s_ease-out_forwards]"
                         style={{
                           clipPath: `polygon(
                             ${col * 33.33}% ${row * 33.33}%,
@@ -526,7 +240,9 @@ export function MiningGame({ encounter, initialState }: MiningGameProps) {
                 e.preventDefault()
                 handleSwing()
               }}
-              disabled={gameEnded}
+              onClick={(event) => { if (event.detail === 0) handleSwing() }}
+              aria-label="Swing pickaxe"
+              disabled={gameEnded || countdown > 0 || saving}
             >
               <TaskIconDisplay icon={buttonIcon} className="w-12 h-12" />
             </Button>
@@ -534,13 +250,11 @@ export function MiningGame({ encounter, initialState }: MiningGameProps) {
         </div>
       </main>
 
+      {saving && <p role="status" className="fixed top-20 inset-x-0 text-center z-50">Saving progress…</p>}
       {result && (
         <RewardResultOverlay
           result={result}
-          onClose={() => {
-            refreshUser()
-            router.push('/game/explore')
-          }}
+          onClose={session.close}
           icon={encounter.icon}
           iconAlt={encounter.name}
           title={result.success ? 'Success' : 'Game Over'}
@@ -549,21 +263,7 @@ export function MiningGame({ encounter, initialState }: MiningGameProps) {
             encounter?.isEligibleForReplay ? (
               <Button
                 size="lg"
-                onClick={async () => {
-                  try {
-                    const res = await startGame(
-                      (initialState?.encounter || encounter).id,
-                      true,
-                    )
-                    if (res?.success) {
-                      window.location.reload()
-                    } else {
-                      window.location.href = '/game/explore'
-                    }
-                  } catch (e) {
-                    window.location.href = '/game/explore'
-                  }
-                }}
+                onClick={session.replay}
                 className="w-full"
               >
                 Play Again

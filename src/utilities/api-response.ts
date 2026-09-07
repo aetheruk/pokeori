@@ -4,7 +4,11 @@ export function createRequestId() {
   return crypto.randomUUID()
 }
 
-export function jsonResponse<T>(body: T, init: ResponseInit = {}, requestId = createRequestId()) {
+export function jsonResponse<T>(
+  body: T,
+  init: ResponseInit = {},
+  requestId = createRequestId(),
+) {
   const headers = new Headers(init.headers)
   headers.set('x-request-id', requestId)
 
@@ -20,5 +24,12 @@ export function errorResponse(
   requestId = createRequestId(),
   details?: unknown,
 ) {
-  return jsonResponse({ error, requestId, details }, { status }, requestId)
+  return jsonResponse(
+    { error, requestId, details },
+    {
+      status,
+      headers: { 'Cache-Control': 'private, no-store' },
+    },
+    requestId,
+  )
 }

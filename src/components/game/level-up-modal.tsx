@@ -74,13 +74,15 @@ export function LevelUpModal({
   skillId = 'battling',
 }: LevelUpModalProps) {
   useEffect(() => {
-    if (open) {
+    if (open && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      let frameId = 0
       // Trigger confetti
       const duration = 3000
       const end = Date.now() + duration
 
       const frame = () => {
         confetti({
+          disableForReducedMotion: true,
           particleCount: 2,
           angle: 60,
           spread: 55,
@@ -88,6 +90,7 @@ export function LevelUpModal({
           colors: ['#2dd4bf', '#14b8a6', '#0d9488'],
         })
         confetti({
+          disableForReducedMotion: true,
           particleCount: 2,
           angle: 120,
           spread: 55,
@@ -96,10 +99,11 @@ export function LevelUpModal({
         })
 
         if (Date.now() < end) {
-          requestAnimationFrame(frame)
+          frameId = requestAnimationFrame(frame)
         }
       }
       frame()
+      return () => cancelAnimationFrame(frameId)
     }
   }, [open])
 

@@ -3,9 +3,19 @@ import {
   createTransactionPayload,
   hasEconomyTransactionSupport,
   isValidEconomyActionToken,
+  runEconomyAction,
 } from '@/utilities/economy/transactions'
 
 describe('economy transaction infrastructure', () => {
+  test('a present legacy null receipt is not mistaken for an unused identity', async () => {
+    let calls = 0
+    const payload = {
+      db: {beginTransaction() {}, transactionOptions: {}},
+      async find() {return {docs: [{response: null}] }},
+    }
+    expect(await runEconomyAction({userId: 'user', action: 'test', requestId: 'receipt', payload: payload as any}, async () => {calls++; return {paid: true}})).toBeNull()
+    expect(calls).toBe(0)
+  })
   test('accepts bounded action identifiers and rejects unsafe values', () => {
     expect(isValidEconomyActionToken('purchase-shop-item')).toBe(true)
     expect(

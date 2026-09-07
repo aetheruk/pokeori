@@ -1,0 +1,14 @@
+{
+  "environment": "Isolated Linux standalone Chromium, 160 synthetic Rattata (form 19), CPU profiler enabled",
+  "viewport": { "width": 1280, "height": 900 },
+  "automaticNavPrefetch": [],
+  "intentNavPrefetch": ["/game/pokemon"],
+  "initialCards": 18,
+  "initialDomNodes": 429,
+  "finalCards": 160,
+  "finalDomNodes": 1562,
+  "scrollLongTasksMs": [429, 432, 440, 444, 452, 562, 448, 412],
+  "revisitSyncScopes": [],
+  "inspectorKeyboardOpen": "passed",
+  "inspectorEscapeFocusReturn": "failed before native trigger association"
+}

@@ -6,16 +6,13 @@ import { resolvePvpTurn, type PvpMove } from './resolution'
 import { getSharedBattleUserIds, normalizeBattleUserId, toPerspectivePvpState } from './state-utils'
 
 const TURN_ENTRY_TTL_SECONDS = 300
-const TURN_RESOLVE_LOCK_TTL_SECONDS = 6
+const TURN_RESOLVE_LOCK_TTL_SECONDS = 60
 const TURN_RESOLVE_LOCK_PREFIX = 'pvp:resolve-lock:'
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
 
 async function releaseLockIfOwned(lockKey: string, token: string) {
-  const lockValue = await redis.get<string>(lockKey)
-  if (lockValue === token) {
-    await redis.del(lockKey)
-  }
+  await redis.deleteIfValue(lockKey, token)
 }
 
 async function waitForResolvedTurn(
@@ -26,7 +23,7 @@ async function waitForResolvedTurn(
   for (let index = 0; index < attempts; index += 1) {
     const sharedState = await redis.get<BattleState>(`${PVP_BATTLE_PREFIX}${battleId}`)
     if (!sharedState) return null
-    if (sharedState.turn !== expectedTurn) return sharedState
+    if (sharedState.turn !== expectedTurn || sharedState.status !== 'ongoing') return sharedState
     await wait(120)
   }
 
@@ -41,7 +38,7 @@ async function resolveSharedTurnWithLock(params: {
   opponentMove: PvpMove
 }): Promise<BattleState | null> {
   const { battleId, expectedTurn, viewerId, viewerMove, opponentMove } = params
-  const lockKey = `${TURN_RESOLVE_LOCK_PREFIX}${battleId}:${expectedTurn}`
+  const lockKey = `${TURN_RESOLVE_LOCK_PREFIX}${battleId}`
   const token = `${viewerId}:${randomUUID()}`
 
   const acquired = await redis.set(lockKey, token, {
@@ -56,7 +53,7 @@ async function resolveSharedTurnWithLock(params: {
   try {
     const sharedState = await redis.get<BattleState>(`${PVP_BATTLE_PREFIX}${battleId}`)
     if (!sharedState) return null
-    if (sharedState.turn !== expectedTurn) return sharedState
+    if (sharedState.turn !== expectedTurn || sharedState.status !== 'ongoing') return sharedState
 
     const { p1Id, p2Id } = getSharedBattleUserIds(sharedState)
     if (!p1Id || !p2Id) {
@@ -66,9 +63,12 @@ async function resolveSharedTurnWithLock(params: {
     const p1Move = viewerId === p1Id ? viewerMove : opponentMove
     const p2Move = viewerId === p2Id ? viewerMove : opponentMove
 
+    const previous = structuredClone(sharedState)
     const nextState = await resolvePvpTurn(sharedState, p1Move, p2Move)
-
-    await redis.set(`${PVP_BATTLE_PREFIX}${battleId}`, nextState, { ex: BATTLE_TTL })
+    const stateKey = `${PVP_BATTLE_PREFIX}${battleId}`
+    if (!await redis.setManyIfValue(stateKey, previous, [{key: stateKey, value: nextState, ttlSeconds: BATTLE_TTL}])) {
+      return redis.get<BattleState>(stateKey)
+    }
 
     const turnKey = `${PVP_TURN_PREFIX}${battleId}:${expectedTurn}`
     await redis.del(`${turnKey}:${p1Id}`)
@@ -122,7 +122,7 @@ export async function queuePvpMoveAndResolveTurn(params: {
   const perspectiveState = toPerspectivePvpState(resolvedState, viewerId, battleId)
 
   return {
-    waiting: resolvedState.turn === expectedTurn,
+    waiting: resolvedState.status === 'ongoing' && resolvedState.turn === expectedTurn,
     state: perspectiveState,
   }
 }

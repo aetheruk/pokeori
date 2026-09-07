@@ -1,4 +1,5 @@
 import { redis } from '@/utilities/redis'
+import { isIP } from 'node:net'
 
 export type RateLimitResult = {
   allowed: boolean
@@ -11,11 +12,12 @@ export type RateLimitResult = {
 type ClientIpOptions = {
   trustCloudflare?: boolean
   trustProxy?: boolean
+  trustedProxyHops?: number
 }
 
-function firstAddress(value: string | null): string | null {
-  const address = value?.split(',')[0]?.trim()
-  return address || null
+function validAddress(value: string | null): string | null {
+  const address = value?.trim()
+  return address && isIP(address) ? address : null
 }
 
 export function getClientIp(
@@ -29,16 +31,17 @@ export function getClientIp(
     options.trustProxy ?? process.env.TRUST_PROXY_HEADERS === 'true'
 
   if (trustCloudflare) {
-    const cloudflareIp = firstAddress(headers.get('cf-connecting-ip'))
+    const cloudflareIp = validAddress(headers.get('cf-connecting-ip'))
     if (cloudflareIp) return cloudflareIp
   }
 
   if (trustProxy) {
-    return (
-      firstAddress(headers.get('x-forwarded-for')) ||
-      firstAddress(headers.get('x-real-ip')) ||
-      'unknown'
-    )
+    const hops = options.trustedProxyHops ?? Number(process.env.TRUSTED_PROXY_HOPS || 1)
+    if (!Number.isInteger(hops) || hops < 1 || hops > 10) return 'unknown'
+    const addresses = headers.get('x-forwarded-for')?.split(',') || []
+    // Count from the trusted end. A caller-controlled prepended address must
+    // not provide a fresh rate-limit identity through an appending proxy.
+    return validAddress(addresses.at(-hops) ?? null) || 'unknown'
   }
 
   return 'unknown'

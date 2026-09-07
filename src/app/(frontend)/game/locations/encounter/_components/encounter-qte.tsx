@@ -60,6 +60,10 @@ export function EncounterQte({
   const focusAreaRef = useRef<HTMLDivElement | null>(null)
   const lastCompletedCircleAtRef = useRef(0)
   const scareTimeoutsRef = useRef<number[]>([])
+  const offeredAtRef = useRef(0)
+  const circleProofRef = useRef<Array<{ atMs: number; points: CaptureThrowPoint[] }>>([])
+  const scareProofRef = useRef<Array<{ atMs: number; index: number }>>([])
+  const chaseProofRef = useRef<number[]>([])
 
   const decoys = useMemo(
     () => qte.decoyFormIds || ['10', '16', '19', '21', '25', '29'],
@@ -74,6 +78,10 @@ export function EncounterQte({
 
   useEffect(() => {
     completedRef.current = false
+    offeredAtRef.current = performance.now()
+    circleProofRef.current = []
+    scareProofRef.current = []
+    chaseProofRef.current = []
     setFocusCircles(0)
     setFocusPath([])
     setFocusTrails([])
@@ -90,18 +98,18 @@ export function EncounterQte({
 
   useEffect(() => {
     if (qte.type === 'focus' && focusCircles >= 3)
-      finish({ type: 'focus', completedCircles: focusCircles })
+      finish({ type: 'focus', circles: circleProofRef.current })
   }, [focusCircles, qte.type])
 
   useEffect(() => {
     if (qte.type === 'scare' && scared >= 6)
-      finish({ type: 'scare', tappedDecoys: scared })
+      finish({ type: 'scare', taps: scareProofRef.current })
   }, [qte.type, scared])
 
   useEffect(() => {
     const tapTarget = qte.tapTarget || 12
     if (qte.type === 'chase' && chaseTaps >= tapTarget)
-      finish({ type: 'chase', tapCount: chaseTaps })
+      finish({ type: 'chase', taps: chaseProofRef.current })
   }, [chaseTaps, qte.tapTarget, qte.type])
 
   const getFocusPoint = (
@@ -134,7 +142,9 @@ export function EncounterQte({
   }
 
   const scareDecoy = (index: number) => {
-    if (scaredDecoys.has(index)) return
+    const atMs = performance.now() - offeredAtRef.current
+    if (scareProofRef.current.some((tap) => tap.index === index) || atMs - (scareProofRef.current.at(-1)?.atMs ?? -20) < 20) return
+    scareProofRef.current.push({ atMs, index })
     setScaredDecoys((current) => {
       if (current.has(index)) return current
       const next = new Set(current)
@@ -151,6 +161,11 @@ export function EncounterQte({
   }
 
   const completeFocusCircle = (points: CaptureThrowPoint[]) => {
+    if (points.length < 12) return
+    const atMs = performance.now() - offeredAtRef.current
+    if (circleProofRef.current.length >= 3 || atMs - (circleProofRef.current.at(-1)?.atMs ?? -120) < 120) return
+    const center = getFocusCenter()
+    circleProofRef.current.push({ atMs, points: points.map((point) => ({ x: point.x - center.x, y: point.y - center.y })) })
     lastCompletedCircleAtRef.current = Date.now()
     addFocusTrail(points, true)
     setFocusCircles((current) => Math.min(3, current + 1))
@@ -168,12 +183,11 @@ export function EncounterQte({
     if (points.length < 12) return
 
     const center = getFocusCenter()
-    const success =
-      Date.now() - lastCompletedCircleAtRef.current < 120 ||
-      isFocusCircleGesture(points, center) ||
-      isFocusCircleProgressComplete(points, center)
-    addFocusTrail(points, success)
-    if (success) setFocusCircles((current) => Math.min(3, current + 1))
+    const success = isFocusCircleProgressComplete(points, center)
+    if (success) completeFocusCircle(points)
+    else addFocusTrail(points, false)
+    pathRef.current = []
+    setFocusPath([])
   }
 
   if (qte.type === 'calm') {
@@ -229,7 +243,7 @@ export function EncounterQte({
           onPointerMove={(event) => {
             if (pathRef.current.length === 0) return
             const point = getFocusPoint(event)
-            pathRef.current = [...pathRef.current, point]
+            pathRef.current = [...pathRef.current.slice(-511), point]
             setFocusPath(pathRef.current)
             const center = getFocusCenter()
             setFocusLoopProgress(
@@ -406,6 +420,9 @@ export function EncounterQte({
             aria-label={`Chase after ${pokemonName}`}
             onClick={() => {
               if (completedRef.current) return
+              const atMs = performance.now() - offeredAtRef.current
+              if (atMs - (chaseProofRef.current.at(-1) ?? -20) < 20) return
+              chaseProofRef.current.push(atMs)
               setChaseTaps((current) =>
                 Math.min(qte.tapTarget || 12, current + 1),
               )

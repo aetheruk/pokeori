@@ -1,370 +1,34 @@
 'use client'
 
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { Button } from '@/components/ui/button'
-import { useAudio } from '@/context/AudioContext'
-import { useUser } from '@/context/UserContext'
-import type { RhythmConfig, RhythmIcon } from '@/data/games/rhythm/types'
+import type { RhythmConfig } from '@/data/games/rhythm/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
-import {
-  completeGame,
-  startGame,
-  submitGameAnswer,
-} from '@/app/(frontend)/game/games/actions'
+import { useArcadeSession } from '@/hooks/use-arcade-session'
 
-interface RhythmGameProps {
-  encounter: RhythmConfig
-  initialState?: any
-}
-
-interface MovingIcon {
-  id: string
-  iconData: RhythmIcon
-  x: number // Current x position (0 = left edge)
-  createdAt: number
-}
-
-// Scoring thresholds (distance from target center in pixels)
-// Based on Taiko no Tatsujin Hard mode timing windows, converted to pixels at 300px/s
-// PERFECT: ±25ms = ±7.5px, GREAT: ±75ms = ±22.5px, GOOD: ±108ms = ±32.4px
-const PERFECT_THRESHOLD = 8 // ~±27ms - Taiko "GOOD" equivalent
-const GREAT_THRESHOLD = 23 // ~±77ms - Taiko "OK" equivalent
-const GOOD_THRESHOLD = 33 // ~±110ms - Taiko "BAD" threshold
-
-// Points
-const PERFECT_POINTS = 30
-const GREAT_POINTS = 20
-const GOOD_POINTS = 10
-const MISS_POINTS = -15
-
-// Track dimensions
-const TRACK_WIDTH = 100 // percentage
-const TARGET_POSITION = 85 // percentage from left where shadow sits
+interface RhythmGameProps { encounter: RhythmConfig; initialState?: any }
 
 export function RhythmGame({ encounter, initialState }: RhythmGameProps) {
   useGameMusic(encounter)
-  const { playSfx } = useAudio()
-  const { refreshUser } = useUser()
-  const router = useRouter()
-  const canvasRef = useRef<HTMLDivElement>(null)
-
-  // Game state
-  const [gameStarted, setGameStarted] = useState(!!initialState)
-  const [gameEnded, setGameEnded] = useState(false)
-  const [score, setScore] = useState(0)
-  const [timeLeft, setTimeLeft] = useState(
-    initialState?.timeLeft ?? encounter.settings.timeLimit,
-  )
-  const [countdown, setCountdown] = useState(3)
-  const [result, setResult] = useState<any | null>(null)
-  const [movingIcons, setMovingIcons] = useState<MovingIcon[]>([])
-  const [lastHit, setLastHit] = useState<{
-    type: string
-    x: number
-    y: number
-  } | null>(null)
-
-  // Refs for game loop
-  const gameLoopRef = useRef<number | null>(null)
-  const lastFrameTimeRef = useRef<number>(0)
-  const lastSpawnTimeRef = useRef<number>(0)
-  const nextSpawnDelayRef = useRef<number>(0)
+  const session = useArcadeSession('rhythm', encounter)
+  const { simulation, countdown, saving, result, timeLeft } = session
+  const gameStarted = Boolean(simulation)
+  const gameEnded = Boolean(simulation && simulation.status !== 'playing')
+  const lastHit = simulation?.lastHit && simulation.tick - simulation.lastHit.tick < 30 ? simulation.lastHit : null
   const trackRef = useRef<HTMLDivElement>(null)
-  const iconIdCounterRef = useRef<number>(0)
-
-  const { speed, spawnRate, icons, winScore } = encounter.settings
-  const isEndlessMode = (encounter.settings as any).endless?.enabled || false
-
-  // Get a random spawn delay within the range
-  const getRandomSpawnDelay = useCallback(() => {
-    return spawnRate.min + Math.random() * (spawnRate.max - spawnRate.min)
-  }, [spawnRate])
-
-  // Get a random icon from the pool
-  const getRandomIcon = useCallback(() => {
-    return icons[Math.floor(Math.random() * icons.length)]
-  }, [icons])
-
-  // Spawn a new icon
-  const spawnIcon = useCallback(() => {
-    const newIcon: MovingIcon = {
-      id: `icon-${iconIdCounterRef.current++}`,
-      iconData: getRandomIcon(),
-      x: 0,
-      createdAt: performance.now(),
-    }
-    setMovingIcons((prev) => [...prev, newIcon])
-    nextSpawnDelayRef.current = getRandomSpawnDelay()
-    lastSpawnTimeRef.current = performance.now()
-  }, [getRandomIcon, getRandomSpawnDelay])
-
-  const gameEndedRef = useRef(false)
-
-  // Calculate hit quality based on distance from target
-  const calculateHitQuality = useCallback(
-    (iconX: number): { type: string; points: number } => {
-      const trackWidth = trackRef.current?.offsetWidth || 300
-      const targetX = (TARGET_POSITION / 100) * trackWidth
-
-      // Icon is w-16 (64px). We want center-to-center distance.
-      // iconX is left edge. Center is iconX + 32.
-      const iconCenter = iconX + 32
-      const distance = Math.abs(iconCenter - targetX)
-
-      if (distance <= PERFECT_THRESHOLD) {
-        return { type: 'PERFECT', points: PERFECT_POINTS }
-      } else if (distance <= GREAT_THRESHOLD) {
-        return { type: 'GREAT', points: GREAT_POINTS }
-      } else if (distance <= GOOD_THRESHOLD) {
-        return { type: 'GOOD', points: GOOD_POINTS }
-      } else {
-        return { type: 'MISS', points: MISS_POINTS }
-      }
-    },
-    [],
-  )
-
-  // Handle icon button click
-  const handleIconClick = useCallback(
-    (clickedIconId: string) => {
-      if (gameEnded || gameEndedRef.current || countdown > 0) return
-
-      // Find the closest icon of this type to the target
-      const trackWidth = trackRef.current?.offsetWidth || 300
-      const targetX = (TARGET_POSITION / 100) * trackWidth
-
-      const matchingIcons = movingIcons.filter(
-        (icon) => icon.iconData.id === clickedIconId,
-      )
-
-      if (matchingIcons.length === 0) {
-        // Wrong icon or no icons of this type on track
-        setScore((prev) => prev + MISS_POINTS)
-        playSfx('bad')
-        setLastHit({ type: 'MISS', x: targetX, y: 50 })
-        setTimeout(() => setLastHit(null), 500)
-        return
-      }
-
-      // Find the icon closest to the target using reduce
-      const closestIcon = matchingIcons.reduce((closest, icon) => {
-        // Use center distance
-        const dist = Math.abs(icon.x + 32 - targetX)
-        const closestDist = Math.abs(closest.x + 32 - targetX)
-        return dist < closestDist ? icon : closest
-      }, matchingIcons[0])
-
-      const { type, points } = calculateHitQuality(closestIcon.x)
-      if (type === 'MISS') {
-        playSfx('bad')
-      } else {
-        playSfx('good')
-      }
-      setScore((prev) => prev + points)
-      setLastHit({ type, x: closestIcon.x + 32, y: 50 }) // Visual hit at center
-      setTimeout(() => setLastHit(null), 500)
-
-      // Remove the hit icon
-      setMovingIcons((prev) =>
-        prev.filter((icon) => icon.id !== closestIcon.id),
-      )
-    },
-    [gameEnded, movingIcons, calculateHitQuality, playSfx],
-  )
-
-  // Game loop with delta time
-  const gameLoop = useCallback(
-    (currentTime: number) => {
-      if (!gameStarted || gameEnded || gameEndedRef.current) return
-
-      // Always schedule next frame
-      gameLoopRef.current = requestAnimationFrame(gameLoop)
-
-      if (countdown > 0) {
-        lastFrameTimeRef.current = currentTime
-        return
-      }
-
-      const rawDeltaTime = (currentTime - lastFrameTimeRef.current) / 1000
-      // Clamp delta time to max 0.1s to prevent icons from jumping when tab is backgrounded
-      const deltaTime = Math.min(rawDeltaTime, 0.1)
-      lastFrameTimeRef.current = currentTime
-
-      // Update icon positions
-      setMovingIcons((prev) => {
-        const trackWidth = trackRef.current?.offsetWidth || 300
-        const updated = prev
-          .map((icon) => ({
-            ...icon,
-            x: icon.x + speed * deltaTime,
-          }))
-          .filter((icon) => {
-            // Remove icons that passed the right edge (missed)
-            if (icon.x > trackWidth) {
-              setScore((s) => s + MISS_POINTS)
-              playSfx('bad')
-              return false
-            }
-            return true
-          })
-        return updated
-      })
-
-      // Check if we should spawn a new icon
-      const timeSinceLastSpawn = (currentTime - lastSpawnTimeRef.current) / 1000
-      if (timeSinceLastSpawn >= nextSpawnDelayRef.current) {
-        spawnIcon()
-      }
-    },
-    [gameStarted, gameEnded, speed, spawnIcon, countdown, playSfx],
-  )
-
-  // Start the game
-  const initGame = useCallback(async () => {
-    if (gameStarted) return
-
-    const result = await startGame(encounter.id)
-    if (!result.success) {
-      console.error('Failed to start encounter:', result.error)
-      return
-    }
-
-    setGameStarted(true)
-    setGameEnded(false)
-    setScore(0)
-    setMovingIcons([])
-    setTimeLeft(encounter.settings.timeLimit)
-    setCountdown(3)
-
-    // Initialize spawn timing
-    lastSpawnTimeRef.current = performance.now()
-    nextSpawnDelayRef.current = getRandomSpawnDelay()
-    lastFrameTimeRef.current = performance.now()
-
-    // Spawn first icon will happen via game loop
-  }, [
-    encounter.id,
-    encounter.settings.timeLimit,
-    gameStarted,
-    getRandomSpawnDelay,
-    spawnIcon,
-  ])
-
-  // Start game loop when game starts
-  useEffect(() => {
-    if (gameStarted && !gameEnded) {
-      lastFrameTimeRef.current = performance.now()
-      gameLoopRef.current = requestAnimationFrame(gameLoop)
-    }
-
-    return () => {
-      if (gameLoopRef.current) {
-        cancelAnimationFrame(gameLoopRef.current)
-      }
-    }
-  }, [gameStarted, gameEnded, gameLoop])
-
-  // Handle Game End Logic
-  const handleGameEnd = useCallback(async () => {
-    if (gameEndedRef.current) return
-    gameEndedRef.current = true
-    setGameEnded(true)
-
-    // Stop loop
-    if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current)
-
-    // For normal mode, determine success if score >= winScore
-    const isNormalWin = !!(!isEndlessMode && winScore && score >= winScore)
-
-    try {
-      await submitGameAnswer(isNormalWin)
-      const res = await completeGame(
-        encounter.id,
-        isNormalWin,
-        Math.floor(score),
-      )
-
-      const hasRewards =
-        res.summary &&
-        ((res.summary.items && res.summary.items.length > 0) ||
-          (res.summary.pokemon && res.summary.pokemon.length > 0) ||
-          (res.summary.currency && res.summary.currency.length > 0) ||
-          (res.summary.cards && res.summary.cards.length > 0))
-
-      const finalSuccess = isEndlessMode ? hasRewards : isNormalWin
-
-      setResult({
-        success: finalSuccess,
-        message: isEndlessMode
-          ? `Final Score: ${Math.floor(score)}`
-          : finalSuccess
-            ? 'Level Complete!'
-            : 'Time Up!',
-        rewards: res.summary,
-      })
-    } catch (e) {
-      console.error('Game end error', e)
-    }
-  }, [encounter.id, score, winScore, isEndlessMode])
-
-  // Check win condition (Early Win for Normal Mode)
-  useEffect(() => {
-    if (
-      !isEndlessMode &&
-      gameStarted &&
-      !gameEnded &&
-      winScore &&
-      score >= winScore
-    ) {
-      handleGameEnd()
-    }
-  }, [gameStarted, gameEnded, score, winScore, handleGameEnd, isEndlessMode])
-
-  // Timer effect handles Game End
-  useEffect(() => {
-    if (!gameStarted || gameEnded || countdown > 0) return
-
-    const timer = setInterval(() => {
-      setTimeLeft((prev: number) => {
-        if (prev <= 1) {
-          handleGameEnd()
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [gameStarted, gameEnded, handleGameEnd, countdown])
-
-  // Countdown Effect
-  useEffect(() => {
-    if (!gameStarted || gameEnded || countdown <= 0) return
-    const timer = setTimeout(() => {
-      setCountdown((prev) => prev - 1)
-    }, 1000)
-    return () => clearTimeout(timer)
-  }, [gameStarted, gameEnded, countdown])
-
-  // Reset timing when countdown finishes
-  useEffect(() => {
-    if (countdown === 0 && gameStarted && !gameEnded) {
-      lastFrameTimeRef.current = performance.now()
-      lastSpawnTimeRef.current = performance.now()
-    }
-  }, [countdown, gameStarted, gameEnded])
-
-  // Auto-start
-  useEffect(() => {
-    if (!gameStarted) {
-      initGame()
-    }
-  }, [gameStarted, initGame])
+  const { icons, winScore } = encounter.settings
+  const isEndlessMode = encounter.settings.endless?.enabled || false
+  const score = simulation?.score || 0
+  const movingIcons = (simulation?.rhythmIcons || []).map((icon) => ({ ...icon, iconData: icons[icon.iconIndex] }))
+  const TARGET_POSITION = 85
+  const PERFECT_THRESHOLD = 8
+  const GREAT_THRESHOLD = 23
+  const GOOD_THRESHOLD = 33
+  const handleIconClick = (id: string) => session.sendInput('rhythm', icons.findIndex((icon) => icon.id === id))
 
   return (
     <div className="min-h-dvh game-night bg-game-night-canvas text-game-night-ink">
@@ -407,12 +71,12 @@ export function RhythmGame({ encounter, initialState }: RhythmGameProps) {
             {/* Track */}
             <div
               ref={trackRef}
-              className="absolute bottom-8 left-4 right-4 h-24 overflow-hidden rounded-lg border-2 border-[#5b686b] bg-[#22353d]/90"
+              className="absolute bottom-8 left-1/2 h-24 w-[calc(100%-2rem)] max-w-[450px] -translate-x-1/2 overflow-hidden rounded-lg border-2 border-[#5b686b] bg-[#22353d]/90"
             >
               {/* Target Shadow Zone - Dynamic color based on closest icon */}
               {(() => {
                 // Calculate what the current hit quality would be
-                const trackWidth = trackRef.current?.offsetWidth || 300
+                const trackWidth = 300
                 const targetX = (TARGET_POSITION / 100) * trackWidth
 
                 // Find the closest icon to target
@@ -440,11 +104,12 @@ export function RhythmGame({ encounter, initialState }: RhythmGameProps) {
                     className="absolute bottom-0 top-0 flex w-20 items-center justify-center border-l-2 border-r-2 border-dashed border-[#748083] bg-[#5b686b]/50"
                     style={{
                       left: `${TARGET_POSITION}%`,
+                      width: `${80 / 3}%`,
                       transform: 'translateX(-50%)',
                     }}
                   >
                     <div
-                      className={`w-16 h-16 rounded-full border-2 border-dashed transition-colors duration-100 ${ringColor}`}
+                      className={`w-4/5 aspect-square rounded-full border-2 border-dashed transition-colors duration-100 ${ringColor}`}
                     />
                   </div>
                 )
@@ -454,10 +119,11 @@ export function RhythmGame({ encounter, initialState }: RhythmGameProps) {
               {movingIcons.map((icon) => (
                 <div
                   key={icon.id}
-                  className="absolute top-1/2 flex h-16 w-16 items-center justify-center rounded-full border-2 border-[#5b686b] bg-[#22353d]/90 transition-none"
+                  className="absolute top-1/2 flex aspect-square items-center justify-center rounded-full border-2 border-[#5b686b] bg-[#22353d]/90 transition-none"
                   style={{
-                    left: 0,
-                    transform: `translate3d(${icon.x}px, -50%, 0)`,
+                    left: `${icon.x / 3}%`,
+                    width: `${64 / 3}%`,
+                    transform: 'translateY(-50%)',
                     willChange: 'transform',
                     backfaceVisibility: 'hidden',
                     WebkitBackfaceVisibility: 'hidden',
@@ -483,7 +149,7 @@ export function RhythmGame({ encounter, initialState }: RhythmGameProps) {
                           ? 'text-blue-400'
                           : 'text-red-400'
                   }`}
-                  style={{ left: lastHit.x }}
+                  style={{ left: '85%' }}
                 >
                   {lastHit.type}!
                 </div>
@@ -531,7 +197,9 @@ export function RhythmGame({ encounter, initialState }: RhythmGameProps) {
                         e.preventDefault()
                         handleIconClick(icon.id)
                       }}
-                      disabled={gameEnded}
+                      onClick={(event) => { if (event.detail === 0) handleIconClick(icon.id) }}
+                      aria-label={icon.label || `Play ${icon.id}`}
+                      disabled={gameEnded || countdown > 0 || saving}
                     >
                       <div className="w-20 h-20 relative flex items-center justify-center">
                         <TaskIconDisplay icon={icon} className="w-16 h-16" />
@@ -550,13 +218,11 @@ export function RhythmGame({ encounter, initialState }: RhythmGameProps) {
         </div>
       </main>
 
+      {saving && <p role="status" className="fixed top-20 inset-x-0 text-center z-50">Saving progress…</p>}
       {result && (
         <RewardResultOverlay
           result={result}
-          onClose={() => {
-            refreshUser()
-            router.push('/game/explore')
-          }}
+          onClose={session.close}
           icon={encounter.icon}
           iconAlt={encounter.name}
           title={result.success ? 'Success' : 'Game Over'}
@@ -565,21 +231,7 @@ export function RhythmGame({ encounter, initialState }: RhythmGameProps) {
             encounter?.isEligibleForReplay ? (
               <Button
                 size="lg"
-                onClick={async () => {
-                  try {
-                    const res = await startGame(
-                      (initialState?.encounter || encounter).id,
-                      true,
-                    )
-                    if (res?.success) {
-                      window.location.reload()
-                    } else {
-                      window.location.href = '/game/explore'
-                    }
-                  } catch (e) {
-                    window.location.href = '/game/explore'
-                  }
-                }}
+                onClick={session.replay}
                 className="w-full"
               >
                 Play Again

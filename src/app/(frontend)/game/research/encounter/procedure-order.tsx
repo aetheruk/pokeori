@@ -1,5 +1,7 @@
 'use client'
 
+import type { GameDataKeys } from '@/utilities/requirements/analysis'
+
 import {
   ArrowDown,
   ArrowUp,
@@ -14,7 +16,7 @@ import {
   completeGame,
   startGame,
   submitGameAnswer,
-} from '@/app/(frontend)/game/games/actions'
+} from '@/utilities/games/client-action-recovery'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
@@ -61,6 +63,7 @@ export function ProcedureOrderGame({
   useGameMusic(encounter)
   const { playSfx } = useAudio()
   const { refreshUser } = useUser()
+  const completionInvalidatesRef = useRef<GameDataKeys[] | undefined>(undefined)
   const router = useRouter()
   const completionRef = useRef(false)
   const dragIndexRef = useRef<number | null>(null)
@@ -87,6 +90,7 @@ export function ProcedureOrderGame({
       completionRef.current = true
       setGameEnded(true)
       const completion = await completeGame(encounter.id, success)
+      completionInvalidatesRef.current = completion.invalidates
       const finalSuccess = success && completion.success
       setResult({
         success: finalSuccess,
@@ -338,7 +342,7 @@ export function ProcedureOrderGame({
         <RewardResultOverlay
           result={result}
           onClose={async () => {
-            if (result.success) await refreshUser()
+            if (result.success) await refreshUser(true, completionInvalidatesRef.current)
             router.push('/game/explore')
           }}
           icon={encounter.icon}

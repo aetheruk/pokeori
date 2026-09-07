@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { GameErrorBoundary } from '@/components/game/GameErrorBoundary'
 import { GameNavigation } from '@/components/game/game-navigation'
+import { GameActionRecovery } from '@/components/game/shared/GameActionRecovery'
 import { AudioProvider } from '@/context/AudioContext'
 import { UserProvider, useUser } from '@/context/UserContext'
 import { useAuthSessionKeepalive } from '@/hooks/use-auth-session-keepalive'
@@ -139,6 +140,7 @@ function TakeoverActiveProbe({
       <TakeoverRouteGuard />
       <TakeoverActiveProbe onTakeoverChange={setTakeoverActive} />
       <AudioProvider>
+        <GameActionRecovery />
         <GameErrorBoundary>
           <div className="game-paper-background fixed inset-0 flex flex-col bg-game-canvas text-game-ink">
             <a href="#game-content" className="game-skip-link">
@@ -155,7 +157,7 @@ function TakeoverActiveProbe({
               className={cn(
                 'relative flex-1 min-h-0 overflow-hidden bg-game-canvas outline-none',
                 !isFullscreen && !takeoverActive
-                  ? 'pb-[4.5rem] md:pb-0 md:pl-20 xl:pl-56'
+                  ? 'pb-[4.5rem] lg:pb-0 lg:pl-56'
                   : '',
               )}
             >

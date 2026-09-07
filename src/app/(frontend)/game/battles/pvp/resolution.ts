@@ -1,15 +1,14 @@
 import { getPayload } from 'payload'
+import { settlePvpOutcome } from './outcome'
 import configPromise from '@payload-config'
 import { getMove } from '@/data/moves'
-import { useDimensionalShift } from '../powers/dimensional'
+import { useDimensionalShift as applyDimensionalShift } from '../powers/dimensional'
 import type {
   BattleState,
   BattlePokemon,
   BattleStance,
   PowersState,
 } from '@/utilities/battle/types'
-import { grantRewards } from '@/utilities/rewards/reward-logic'
-import { battles } from '@/data/battles'
 import { trimBattleHistory } from '@/utilities/battle/history'
 import { ensurePvpPowerStates, normalizeBattleUserId } from './state-utils'
 import {
@@ -41,16 +40,12 @@ import {
 import { applyBattleFormChange } from '@/utilities/battle/stats-calc'
 import {
   persistConsumedHeldItems,
-  persistHeldItemBattleWinEffects,
 } from '../helpers/held-items'
 import {
-  persistPokemonBattleKOs,
   recordPokemonKO,
 } from '../helpers/pokemon-ko-credit'
 import {
   getUserSketchedMoveIds,
-  incrementUserActivityResult,
-  registerUserSketchedMove,
 } from '@/utilities/user-state'
 import { getEffectiveBattleSpeed } from '@/utilities/battle/battle-logic'
 import {
@@ -96,24 +91,6 @@ export interface PvpMove {
   }
 }
 
-async function grantPvpRewards(
-  userId: string,
-  battleConfigId: string,
-  economyActionId: string,
-) {
-  const battleConfig = battles.find((b) => b.id === battleConfigId)
-  if (!battleConfig) return undefined
-
-  try {
-    const res = await grantRewards(userId, battleConfig.rewards || [], {
-      idempotencyKey: `pvp-win:${economyActionId}:${userId}`,
-    })
-    return res.summary
-  } catch (e) {
-    console.error('Error granting PVP rewards', e)
-    return undefined
-  }
-}
 
 export async function resolvePvpTurn(
   state: BattleState,
@@ -224,7 +201,7 @@ export async function resolvePvpTurn(
     if (move.attackType?.startsWith('power:dimensional-shift:')) {
       const type = move.attackType.split(':')[2] as 'time' | 'space' | 'chaos'
       const powerState = isP1 ? p1Powers : p2Powers
-      const res = await useDimensionalShift(
+      const res = await applyDimensionalShift(
         { ...state, powers: powerState },
         userId,
         type,
@@ -723,6 +700,7 @@ export async function resolvePvpTurn(
           payload,
           pokemon: p1FaintedMon,
           userId: p1Id,
+          eventId: `${state.economyActionId || state.pvpBattleId || state.battleId}:${state.turn}:${p1FaintedMon.id}`,
         }),
       )
     }
@@ -732,6 +710,7 @@ export async function resolvePvpTurn(
           payload,
           pokemon: p2FaintedMon,
           userId: p2Id,
+          eventId: `${state.economyActionId || state.pvpBattleId || state.battleId}:${state.turn}:${p2FaintedMon.id}`,
         }),
       )
     }
@@ -785,69 +764,6 @@ export async function resolvePvpTurn(
       logMessage += `\n${enemyFaintMessages.join('\n')}`
   }
 
-  // Update Stats if Over
-  if (shouldPersist && (state.status === 'won' || state.status === 'lost')) {
-    const payload = await getPayload({ config: configPromise })
-    const winnerId = state.status === 'won' ? p1Id : p2Id
-    const loserId = state.status === 'won' ? p2Id : p1Id
-    const winningTeam =
-      state.status === 'won' ? state.playerTeam : state.enemyTeam
-
-    if (winnerId && state.pendingSketchedMoves?.length) {
-      const winnerPendingMoves = state.pendingSketchedMoves.filter(
-        (entry) => entry.userId === winnerId,
-      )
-      for (const pendingMove of winnerPendingMoves) {
-        try {
-          const registration = await registerUserSketchedMove(
-            payload as any,
-            winnerId,
-            pendingMove.id,
-          )
-          if (registration.isNew) {
-            logMessage += `\nThe MoveDex recorded ${pendingMove.name}.`
-          }
-        } catch (error) {
-          console.error('Failed to persist PVP Smeargle Sketch unlock', error)
-        }
-      }
-    }
-    state.pendingSketchedMoves = undefined
-
-    const updateStats = async (uid: string, isWin: boolean) => {
-      try {
-        await incrementUserActivityResult(
-          payload as any,
-          uid,
-          'battleResults',
-          state.battleId,
-          {
-            wins: isWin ? 1 : 0,
-            losses: isWin ? 0 : 1,
-          },
-        )
-      } catch (e) {
-        console.error('Stats Update Fail', e)
-      }
-    }
-
-    await Promise.all([
-      updateStats(winnerId, true),
-      updateStats(loserId, false),
-      grantPvpRewards(
-        winnerId,
-        state.battleId,
-        state.economyActionId || state.pvpBattleId || state.battleId,
-      ),
-      persistHeldItemBattleWinEffects(winningTeam),
-      persistPokemonBattleKOs(state),
-    ])
-  }
-
-  if (state.status !== 'ongoing') {
-    state.pendingSketchedMoves = undefined
-  }
-
   // --- LOG ---
   // We append logMessage if not empty
   if (logMessage.trim()) {
@@ -884,9 +800,10 @@ export async function resolvePvpTurn(
 
   state.history = trimBattleHistory(state.history)
   state.turn += 1
-  if (shouldPersist) {
+  if (shouldPersist && state.status === 'ongoing') {
     await persistConsumedHeldItems(state)
   }
   finalizeBattlePresentation(state)
+  if (shouldPersist && state.status !== 'ongoing') return settlePvpOutcome(state)
   return state
 }

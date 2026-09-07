@@ -21,7 +21,7 @@ import {
 import { failEncounter } from './failure'
 import { getEncounterRedisTtlSeconds, type EncounterState } from './types'
 import { getUser } from './utils'
-import { endSafariExpeditionWithoutBalls } from '@/utilities/expeditions/actions'
+import { endSafariExpeditionWithoutBalls } from '@/utilities/expeditions/server'
 
 export async function performSafariAction(
   action: SafariEncounterAction,

@@ -74,10 +74,10 @@ import { RewardSummary } from '@/utilities/rewards/reward-logic'
 import { getItemSkillLockReason } from '@/utilities/skills/unlocks'
 import {
   sellItem,
-  useAllBoosterPacks,
-  useBoosterPack,
-  useConsumable,
-  useScratchCard,
+  useAllBoosterPacks as applyAllBoosterPacks,
+  useBoosterPack as applyBoosterPack,
+  useConsumable as applyConsumable,
+  useScratchCard as applyScratchCard,
 } from '../actions'
 import { ScratchCardModal } from './scratch-card-modal'
 
@@ -642,7 +642,7 @@ export function InventoryList() {
       setIsUsing(true)
       try {
         if (item.category === 'booster-pack') {
-          const result = await useBoosterPack(item.id, crypto.randomUUID())
+          const result = await applyBoosterPack(item.id, crypto.randomUUID())
           if (result.success && result.cards && item.boosterPack) {
             setSelectedItem(null)
             refreshUser()
@@ -657,7 +657,7 @@ export function InventoryList() {
         }
 
         if (item.category === 'scratch-card') {
-          const result = await useScratchCard(item.id, crypto.randomUUID())
+          const result = await applyScratchCard(item.id, crypto.randomUUID())
           if (
             result.success &&
             result.background &&
@@ -687,7 +687,7 @@ export function InventoryList() {
           item.effects?.startResearch ||
           item.effects?.startMinigame
         ) {
-          const result = await useConsumable(item.id, crypto.randomUUID())
+          const result = await applyConsumable(item.id, crypto.randomUUID())
           if (result.success && result.summary) {
             refreshUser()
             setRewardResult({
@@ -725,7 +725,7 @@ export function InventoryList() {
 
       setIsUsing(true)
       try {
-        const result = await useAllBoosterPacks(item.id, crypto.randomUUID())
+        const result = await applyAllBoosterPacks(item.id, crypto.randomUUID())
         if (result.success && result.cards) {
           setSelectedItem(null)
           refreshUser()
@@ -1264,6 +1264,7 @@ const InventoryItemCard = memo(function InventoryItemCard({
     !!onBulkAction
 
   return (
+    // biome-ignore lint/a11y/useSemanticElements: The card contains separate item-action buttons; a native outer button would nest interactive controls.
     <div
       onClick={() => onClick(item.details)}
       onKeyDown={(event) => {

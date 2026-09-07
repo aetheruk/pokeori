@@ -338,9 +338,9 @@ export default function Pokedex() {
               onClear={() => setSearchQuery('')}
             />
           </div>
-          <div
+          <fieldset
             className="w-48 shrink-0"
-            role="group"
+
             aria-label="Discovery status"
           >
             <PremiumSelect
@@ -351,15 +351,15 @@ export default function Pokedex() {
               }
               options={DISCOVERY_FILTER_OPTIONS}
             />
-          </div>
-          <div className="w-48 shrink-0" role="group" aria-label="Pokémon type">
+          </fieldset>
+          <fieldset className="w-48 shrink-0"  aria-label="Pokémon type">
             <PremiumSelect
               label="Type"
               value={selectedType}
               onValueChange={setSelectedType}
               options={TYPE_FILTER_OPTIONS}
             />
-          </div>
+          </fieldset>
         </div>
 
         {/* Main Content - bounded virtual grid with a fixed progress header */}
@@ -468,7 +468,7 @@ export default function Pokedex() {
               onClear={() => setSearchQuery('')}
             />
             <div className="grid grid-cols-2 gap-2">
-              <div role="group" aria-label="Discovery status">
+              <fieldset  aria-label="Discovery status">
                 <PremiumSelect
                   value={discoveryFilter}
                   onValueChange={(value) =>
@@ -476,14 +476,14 @@ export default function Pokedex() {
                   }
                   options={DISCOVERY_FILTER_OPTIONS}
                 />
-              </div>
-              <div role="group" aria-label="Pokémon type">
+              </fieldset>
+              <fieldset  aria-label="Pokémon type">
                 <PremiumSelect
                   value={selectedType}
                   onValueChange={setSelectedType}
                   options={TYPE_FILTER_OPTIONS}
                 />
-              </div>
+              </fieldset>
             </div>
           </div>
         </SecondaryControlBar>

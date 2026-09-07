@@ -7,15 +7,21 @@ import { getPayload } from 'payload'
 import type { PublicTrainerSummary } from '@/components/game/trainer/types'
 import type { User } from '@/payload-types'
 import { isKidModeUser, KID_MODE_ACCESS_ERROR } from '@/utilities/kid-mode'
+import { randomUUID } from 'node:crypto'
+import { checkActionRateLimit } from '@/utilities/game-integrity'
+import {
+  createEconomyRequestId,
+  getEconomyActionErrorMessage,
+  runEconomyAction,
+} from '@/utilities/economy/transactions'
+import {
+  friendRequests,
+  planFriendship,
+  type FriendRequest,
+} from '@/utilities/trainers/friendship'
 import { buildPublicTrainerSummaries } from '@/utilities/trainers/public-summary'
 
-export interface FriendRequest {
-  id: string
-  from: string
-  to: string
-  status: 'pending' | 'accepted' | 'rejected'
-  createdAt: string
-}
+export type { FriendRequest } from '@/utilities/trainers/friendship'
 
 async function getFreshAuthenticatedUser(payload: any): Promise<User | null> {
   const { user } = await payload.auth({ headers: await headers() })
@@ -33,263 +39,112 @@ function kidModeError(user: User | null) {
     : null
 }
 
-// Send a friend request
-export async function sendFriendRequest(
-  targetUserId: string,
+async function changeFriendship(
+  operation: 'send' | 'accept' | 'reject' | 'remove',
+  identifier: string,
 ): Promise<{ success: boolean; error?: string }> {
-  const payload = await getPayload({ config: configPromise })
-  const user = await getFreshAuthenticatedUser(payload)
-
-  if (!user) {
-    return { success: false, error: 'Not authenticated' }
+  if (
+    typeof identifier !== 'string' ||
+    !identifier ||
+    identifier.length > 200
+  ) {
+    return { success: false, error: 'Invalid trainer or request.' }
   }
-  const actorError = kidModeError(user)
-  if (actorError) return actorError
-
-  if (user.id === targetUserId) {
-    return { success: false, error: 'Cannot send friend request to yourself' }
-  }
-
   try {
-    const targetUser = await payload.findByID({
-      collection: 'users',
-      id: targetUserId,
-    })
-    if (!targetUser) {
-      return { success: false, error: 'User not found' }
-    }
-    if (isKidModeUser(targetUser)) {
-      return { success: false, error: 'That trainer is not available.' }
-    }
-
-    // Check if already friends
-    const friends = ((user as any).friends || []) as string[]
-    if (friends.includes(targetUserId)) {
-      return { success: false, error: 'Already friends' }
-    }
-
-    // Check if request already exists
-    const existingRequests = ((user as any).friendRequests ||
-      []) as FriendRequest[]
-    const hasExisting = existingRequests.some(
-      (req) =>
-        (req.from === user.id &&
-          req.to === targetUserId &&
-          req.status === 'pending') ||
-        (req.from === targetUserId &&
-          req.to === user.id &&
-          req.status === 'pending'),
+    const payload = await getPayload({ config: configPromise })
+    const { user } = await payload.auth({ headers: await headers() })
+    if (!user) return { success: false, error: 'Not authenticated' }
+    const limit = await checkActionRateLimit(
+      user.id,
+      `friend-${operation}`,
+      operation === 'send' ? 10 : 30,
+      60,
     )
+    if (!limit.allowed)
+      return { success: false, error: 'Too many requests. Try again shortly.' }
 
-    if (hasExisting) {
-      return { success: false, error: 'Friend request already pending' }
-    }
-
-    // Create friend request
-    const request: FriendRequest = {
-      id: `${user.id}-${targetUserId}-${Date.now()}`,
-      from: user.id,
-      to: targetUserId,
-      status: 'pending',
-      createdAt: new Date().toISOString(),
-    }
-
-    // Add to both users' friendRequests
-    const userRequests = [...existingRequests, request]
-    const targetRequests = [
-      ...((targetUser as any).friendRequests || []),
-      request,
-    ]
-
-    await payload.update({
-      collection: 'users',
-      id: user.id,
-      data: { friendRequests: userRequests },
-    })
-
-    await payload.update({
-      collection: 'users',
-      id: targetUserId,
-      data: { friendRequests: targetRequests },
-    })
-
-    revalidatePath('/game')
-    return { success: true }
-  } catch (error) {
-    console.error('Send friend request error:', error)
-    return { success: false, error: 'Failed to send friend request' }
-  }
-}
-
-// Accept a friend request
-export async function acceptFriendRequest(
-  requestId: string,
-): Promise<{ success: boolean; error?: string }> {
-  const payload = await getPayload({ config: configPromise })
-  const user = await getFreshAuthenticatedUser(payload)
-
-  if (!user) {
-    return { success: false, error: 'Not authenticated' }
-  }
-  const actorError = kidModeError(user)
-  if (actorError) return actorError
-
-  try {
-    const requests = ((user as any).friendRequests || []) as FriendRequest[]
-    const request = requests.find((r) => r.id === requestId && r.to === user.id)
-
-    if (!request) {
-      return { success: false, error: 'Friend request not found' }
-    }
-
-    // Update request status
-    const updatedRequests = requests.map((r) =>
-      r.id === requestId ? { ...r, status: 'accepted' as const } : r,
+    // Accept/reject retries refer to the same request; send/remove are new
+    // commands whose current eligibility is checked within the transaction.
+    const requestId =
+      operation === 'accept' || operation === 'reject'
+        ? createEconomyRequestId(identifier)
+        : randomUUID()
+    const result = await runEconomyAction(
+      { payload, userId: user.id, action: `friend-${operation}`, requestId },
+      async ({ payload: transactionalPayload }) => {
+        const actor = await transactionalPayload.findByID({
+          collection: 'users',
+          id: user.id,
+          depth: 0,
+        })
+        const actorError = kidModeError(actor)
+        if (actorError) return actorError
+        let otherId = identifier
+        if (operation === 'accept' || operation === 'reject') {
+          const request = friendRequests(actor).find(
+            (entry) =>
+              entry.id === identifier &&
+              entry.status === 'pending' &&
+              (entry.from === actor.id || entry.to === actor.id),
+          )
+          if (!request)
+            return {
+              success: false,
+              error: 'Friend request is no longer pending.',
+            }
+          otherId = request.from === actor.id ? request.to : request.from
+        }
+        if (otherId === actor.id)
+          return { success: false, error: 'Choose another trainer.' }
+        const other = await transactionalPayload.findByID({
+          collection: 'users',
+          id: otherId,
+          depth: 0,
+        })
+        const plan = planFriendship(
+          actor,
+          other,
+          operation,
+          operation === 'send' ? requestId : identifier,
+        )
+        if (!plan.success) return plan
+        // The transaction retries from fresh snapshots on a concurrent write
+        // conflict, and rolls both sides back if either update fails.
+        await transactionalPayload.update({
+          collection: 'users',
+          id: actor.id,
+          data: plan.actor,
+        })
+        await transactionalPayload.update({
+          collection: 'users',
+          id: other.id,
+          data: plan.other,
+        })
+        return { success: true }
+      },
     )
-
-    // Add to friends list
-    const friends = ((user as any).friends || []) as string[]
-    const updatedFriends = [...friends, request.from]
-
-    await payload.update({
-      collection: 'users',
-      id: user.id,
-      data: {
-        friendRequests: updatedRequests,
-        friends: updatedFriends,
-      },
-    })
-
-    // Update sender's data
-    const sender = await payload.findByID({
-      collection: 'users',
-      id: request.from,
-    })
-    if (isKidModeUser(sender)) {
-      return { success: false, error: 'That trainer is not available.' }
-    }
-    const senderRequests = ((sender as any).friendRequests ||
-      []) as FriendRequest[]
-    const senderFriends = ((sender as any).friends || []) as string[]
-
-    await payload.update({
-      collection: 'users',
-      id: request.from,
-      data: {
-        friendRequests: senderRequests.map((r) =>
-          r.id === requestId ? { ...r, status: 'accepted' as const } : r,
-        ),
-        friends: [...senderFriends, user.id],
-      },
-    })
-
-    revalidatePath('/game')
-    return { success: true }
+    if (result.success) revalidatePath('/game')
+    return result
   } catch (error) {
-    console.error('Accept friend request error:', error)
-    return { success: false, error: 'Failed to accept friend request' }
+    console.error('Friendship update failed:', error)
+    return { success: false, error: getEconomyActionErrorMessage(error) }
   }
 }
 
-// Reject a friend request
-export async function rejectFriendRequest(
-  requestId: string,
-): Promise<{ success: boolean; error?: string }> {
-  const payload = await getPayload({ config: configPromise })
-  const user = await getFreshAuthenticatedUser(payload)
-
-  if (!user) {
-    return { success: false, error: 'Not authenticated' }
-  }
-  const actorError = kidModeError(user)
-  if (actorError) return actorError
-
-  try {
-    const requests = ((user as any).friendRequests || []) as FriendRequest[]
-    const request = requests.find((r) => r.id === requestId)
-
-    if (!request) {
-      return { success: false, error: 'Friend request not found' }
-    }
-
-    // Remove request from both users
-    const updatedRequests = requests.filter((r) => r.id !== requestId)
-
-    await payload.update({
-      collection: 'users',
-      id: user.id,
-      data: { friendRequests: updatedRequests },
-    })
-
-    // Update other user
-    const otherUserId = request.from === user.id ? request.to : request.from
-    const otherUser = await payload.findByID({
-      collection: 'users',
-      id: otherUserId,
-    })
-    if (isKidModeUser(otherUser)) {
-      return { success: false, error: 'That trainer is not available.' }
-    }
-    const otherRequests = ((otherUser as any).friendRequests ||
-      []) as FriendRequest[]
-
-    await payload.update({
-      collection: 'users',
-      id: otherUserId,
-      data: { friendRequests: otherRequests.filter((r) => r.id !== requestId) },
-    })
-
-    revalidatePath('/game')
-    return { success: true }
-  } catch (error) {
-    console.error('Reject friend request error:', error)
-    return { success: false, error: 'Failed to reject friend request' }
-  }
+export async function sendFriendRequest(targetUserId: string) {
+  return changeFriendship('send', targetUserId)
 }
 
-// Remove a friend
-export async function removeFriend(
-  friendId: string,
-): Promise<{ success: boolean; error?: string }> {
-  const payload = await getPayload({ config: configPromise })
-  const user = await getFreshAuthenticatedUser(payload)
+export async function acceptFriendRequest(requestId: string) {
+  return changeFriendship('accept', requestId)
+}
 
-  if (!user) {
-    return { success: false, error: 'Not authenticated' }
-  }
-  const actorError = kidModeError(user)
-  if (actorError) return actorError
+export async function rejectFriendRequest(requestId: string) {
+  return changeFriendship('reject', requestId)
+}
 
-  try {
-    const friend = await payload.findByID({ collection: 'users', id: friendId })
-    if (isKidModeUser(friend)) {
-      return { success: false, error: 'That trainer is not available.' }
-    }
-
-    const friends = ((user as any).friends || []) as string[]
-    const updatedFriends = friends.filter((id) => id !== friendId)
-
-    await payload.update({
-      collection: 'users',
-      id: user.id,
-      data: { friends: updatedFriends },
-    })
-
-    // Remove from friend's list
-    const friendFriends = ((friend as any).friends || []) as string[]
-
-    await payload.update({
-      collection: 'users',
-      id: friendId,
-      data: { friends: friendFriends.filter((id) => id !== user.id) },
-    })
-
-    revalidatePath('/game')
-    return { success: true }
-  } catch (error) {
-    console.error('Remove friend error:', error)
-    return { success: false, error: 'Failed to remove friend' }
-  }
+export async function removeFriend(friendId: string) {
+  return changeFriendship('remove', friendId)
 }
 
 // Get friends list
@@ -380,6 +235,9 @@ export async function getPendingRequests(): Promise<{
       where: {
         and: [{ id: { in: senderIds } }, { kidMode: { not_equals: true } }],
       },
+      pagination: false,
+      depth: 0,
+      select: { trainerName: true, icon: true },
     })
 
     const requestsWithDetails = pendingIncoming.flatMap((request) => {

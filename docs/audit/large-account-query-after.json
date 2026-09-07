@@ -1,0 +1,191 @@
+{
+  "note": "Isolated local development fixture, two warm HTTP samples; not production p95. After run asserts complete lean DTO equals normal Payload DTO for every owned row.",
+  "reports": [
+    {
+      "event": "isolated-pokemon-query-profile",
+      "directReadMs": 36.51612500000192,
+      "rows": 1002,
+      "executionStats": {
+        "executionTimeMillis": 2,
+        "totalDocsExamined": 1002,
+        "totalKeysExamined": 1002,
+        "nReturned": 1002
+      },
+      "indexes": [
+        {
+          "key": {
+            "_id": 1
+          },
+          "unique": false
+        },
+        {
+          "key": {
+            "createdAt": 1
+          },
+          "unique": false
+        },
+        {
+          "key": {
+            "updatedAt": 1
+          },
+          "unique": false
+        },
+        {
+          "key": {
+            "user": 1
+          },
+          "unique": false
+        },
+        {
+          "key": {
+            "speciesId": 1
+          },
+          "unique": false
+        },
+        {
+          "key": {
+            "formId": 1
+          },
+          "unique": false
+        },
+        {
+          "key": {
+            "fusedIntoPokemonId": 1
+          },
+          "unique": false
+        },
+        {
+          "key": {
+            "boxId": 1
+          },
+          "unique": false
+        },
+        {
+          "key": {
+            "onBattleTeam": 1
+          },
+          "unique": false
+        },
+        {
+          "key": {
+            "isCompanion": 1
+          },
+          "unique": false
+        }
+      ]
+    },
+    {
+      "event": "isolated-game-sync-profile",
+      "measurements": [
+        {
+          "fixture": "minimal account",
+          "scope": "pokemon-box",
+          "sample": 1,
+          "elapsedMs": 37,
+          "bytes": 1945,
+          "serverTiming": "game-data;dur=9.1, auth;dur=8.7, serialize;dur=0.0, total;dur=30.6",
+          "pokemonRows": 0
+        },
+        {
+          "fixture": "minimal account",
+          "scope": "pokemon-box",
+          "sample": 2,
+          "elapsedMs": 25,
+          "bytes": 1945,
+          "serverTiming": "game-data;dur=8.0, auth;dur=7.4, serialize;dur=0.0, total;dur=18.8",
+          "pokemonRows": 0
+        },
+        {
+          "fixture": "minimal account",
+          "scope": "inventory",
+          "sample": 1,
+          "elapsedMs": 26,
+          "bytes": 2391,
+          "serverTiming": "game-data;dur=9.1, auth;dur=8.3, serialize;dur=0.0, total;dur=21.2",
+          "pokemonRows": 0
+        },
+        {
+          "fixture": "minimal account",
+          "scope": "inventory",
+          "sample": 2,
+          "elapsedMs": 29,
+          "bytes": 2391,
+          "serverTiming": "game-data;dur=9.9, auth;dur=8.1, serialize;dur=0.0, total;dur=21.6",
+          "pokemonRows": 0
+        },
+        {
+          "fixture": "minimal account",
+          "scope": "explore",
+          "sample": 1,
+          "elapsedMs": 29,
+          "bytes": 4486,
+          "serverTiming": "game-data;dur=12.3, auth;dur=8.6, serialize;dur=0.0, total;dur=24.4",
+          "pokemonRows": 2
+        },
+        {
+          "fixture": "minimal account",
+          "scope": "explore",
+          "sample": 2,
+          "elapsedMs": 42,
+          "bytes": 4486,
+          "serverTiming": "game-data;dur=23.7, auth;dur=8.5, serialize;dur=0.0, total;dur=35.7",
+          "pokemonRows": 2
+        },
+        {
+          "fixture": "1000 additional Pokemon",
+          "scope": "pokemon-box",
+          "sample": 1,
+          "elapsedMs": 89,
+          "bytes": 1945,
+          "serverTiming": "game-data;dur=32.5, auth;dur=43.9, serialize;dur=0.0, total;dur=81.6",
+          "pokemonRows": 0
+        },
+        {
+          "fixture": "1000 additional Pokemon",
+          "scope": "pokemon-box",
+          "sample": 2,
+          "elapsedMs": 60,
+          "bytes": 1945,
+          "serverTiming": "game-data;dur=12.4, auth;dur=35.4, serialize;dur=0.0, total;dur=53.1",
+          "pokemonRows": 0
+        },
+        {
+          "fixture": "1000 additional Pokemon",
+          "scope": "inventory",
+          "sample": 1,
+          "elapsedMs": 90,
+          "bytes": 2391,
+          "serverTiming": "game-data;dur=13.7, auth;dur=44.4, serialize;dur=0.0, total;dur=71.7",
+          "pokemonRows": 0
+        },
+        {
+          "fixture": "1000 additional Pokemon",
+          "scope": "inventory",
+          "sample": 2,
+          "elapsedMs": 70,
+          "bytes": 2391,
+          "serverTiming": "game-data;dur=29.6, auth;dur=19.1, serialize;dur=0.0, total;dur=57.0",
+          "pokemonRows": 0
+        },
+        {
+          "fixture": "1000 additional Pokemon",
+          "scope": "explore",
+          "sample": 1,
+          "elapsedMs": 71,
+          "bytes": 475486,
+          "serverTiming": "game-data;dur=34.5, auth;dur=16.6, serialize;dur=1.8, total;dur=57.1",
+          "pokemonRows": 1002
+        },
+        {
+          "fixture": "1000 additional Pokemon",
+          "scope": "explore",
+          "sample": 2,
+          "elapsedMs": 73,
+          "bytes": 475486,
+          "serverTiming": "game-data;dur=44.7, auth;dur=11.9, serialize;dur=1.3, total;dur=63.1",
+          "pokemonRows": 1002
+        }
+      ]
+    }
+  ]
+}

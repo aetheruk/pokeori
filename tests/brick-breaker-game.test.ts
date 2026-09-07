@@ -189,8 +189,8 @@ describe('Brick Breaker presentation', () => {
       'border border-game-ochre/70 bg-game-ochre/20 shadow-[0_0_18px_rgba(181,138,67,0.55)]',
     )
     expect(source).toContain('motion-safe:animate-ping')
-    expect(source).toContain("void finish(false, 'Survey ended early.')")
-    expect(source).toContain('disabled={!started || ended || Boolean(result)}')
+    expect(source).toContain('void session.abandon()')
+    expect(source).toContain('disabled={!simulation || ended || session.saving || Boolean(result)}')
     expect(source).not.toContain("onClick={() => router.push('/game/explore')}")
     expect(source).toContain(
       "import { GameTimer } from '@/components/game/shared/game-timer'",

@@ -1,3 +1,5 @@
+import 'server-only'
+
 import { getPayload, type Payload, type PayloadRequest } from 'payload'
 import payloadConfig from '@/payload.config'
 import { tcgRarityOdds } from '@/data/tcg-rarity'
@@ -400,7 +402,6 @@ export function buildTcgBoosterPackDraws({
 }
 
 export async function drawRandomTcgCard(params: CardDrawParams = {}): Promise<CardDrawResult> {
-  'use server'
   const { user } = await checkUserAuth()
   const userId = typeof user === 'string' ? user : user?.id
   if (!userId) {
@@ -604,7 +605,6 @@ export async function drawRandomTcgCard(params: CardDrawParams = {}): Promise<Ca
 export async function drawTcgBoosterPacks(
   params: TcgBoosterPackDrawParams,
 ): Promise<BoosterPackDrawResult> {
-  'use server'
   const { user } = await checkUserAuth()
   const userId = typeof user === 'string' ? user : user?.id
   if (!userId) {

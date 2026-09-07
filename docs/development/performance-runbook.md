@@ -73,6 +73,21 @@ public access that could spoof `CF-Connecting-IP`. Use
 `TRUST_PROXY_HEADERS=true` only for a separately trusted reverse proxy. Never
 enable both merely to make an unknown client address disappear.
 
+Forwarded addresses are now selected from the right of `X-Forwarded-For`, using
+`TRUSTED_PROXY_HOPS` (default 1, allowed 1–10). Set it to the verified number of
+trusted proxies that append addresses on every request path. A different path
+must not bypass one of those proxies. Malformed/short chains return `unknown`;
+the app does not trust a caller-prepended first entry or fall back to `X-Real-IP`.
+Verify the actual Coolify/Cloudflare chain and origin firewall before enabling
+trust. A setting in this repository is not evidence of the live proxy policy.
+
+Enable `GAME_PERFORMANCE_LOGS=true` for bounded observation windows. Sync emits
+request IDs, scope, timing and serialized response bytes without player data.
+Use Server-Timing to separate authentication, scoped reads and serialization;
+compare representative large accounts on identical routes and cache states.
+Receipt growth can be measured with `bun scripts/compact-economy-receipts.ts`;
+see [economy integrity](../features/economy-integrity.md) before compacting.
+
 ## Cloudflare Free
 
 Keep the DNS record proxied. Use the default cache key; it includes the full
@@ -113,7 +128,7 @@ releases. Verify a second request with `curl -I` shows the intended
 
 ## Release and smoke checks
 
-Game sync now authenticates once and reuses the same Payload instance through its data loader. Successful authenticated `/api/game/sync` responses include `Server-Timing: game-data;dur=...` and `Cache-Control: private, no-store`. The timing covers data loading, not authentication, rate limiting, JSON serialization, or network time. Use the browser Network timing panel to compare it with total response time.
+Game sync authenticates once and reuses the same Payload instance through its data loader. Successful authenticated `/api/game/sync` responses include `Server-Timing` entries for `game-data`, `auth`, `serialize`, and `total`, plus `Cache-Control: private, no-store`. `game-data` measures only scoped data loading; `total` measures server work up to response construction, including rate limiting, but excludes response transmission and browser rendering. Opt-in logs also include serialized response bytes. Compare these with browser Network timings; do not label either one as end-to-end interaction latency.
 
 For N150 profiling, record representative Explore, box, battle, and research flows on both small and large player accounts. Collect response size and p50/p95 latency, host CPU/RAM/swap during idle and deployment, and MongoDB connection checkout wait/failure counts. Check the actual container's `bun --version`, base OS, and image digest rather than inferring the running version from the Dockerfile. Scan that image's OS packages as well as running the dependency audit. Change connection-pool limits only after checking wait times and database utilization.
 
@@ -134,3 +149,16 @@ After rollout:
 4. Smoke login, Trainer, Explore, Pokémon box, Inventory, Carddex search and
    card details, Pokedex, one battle, one catch, fishing, and one research game.
 5. Keep an older PWA open and confirm it reloads to the new package version.
+
+## Reproducible acceptance captures
+
+Use the same revision, fixture account, viewport, runtime, and cache state when comparing changes. Keep cold navigation, warm navigation, and action-triggered refreshes separate. Record request counts and compressed transfer bytes independently from decoded JSON/JavaScript body bytes. Preserve raw sanitized measurements with the commit and scenario; a two-request sample is not a p95.
+
+- **Scoped refresh:** open Explore, box, and inventory in a fixed sequence, perform one item-only reward and one Pokémon/progression reward, then revisit each route. Count `/api/game/sync` by scope, Server Actions, and RSC navigation/prefetch requests. Confirm affected values change and unrelated scopes do not refetch. Include a dropped-response retry to separate intended replay traffic from redundant invalidation.
+- **Long lists:** use populated box, inventory, and Carddex fixtures; browse enough pages to reproduce accumulation, then revisit filters and scroll back. Record rendered row/DOM count, heap where the browser exposes it, long tasks, and scroll responsiveness at defined page counts. The initial production smoke's empty lists do not cover this scenario.
+- **Builds:** retain normal BuildKit/Bun/Next caches. Record install, compile, trace/copy, image assembly, and health-ready/restart durations separately for repeated builds on the same revision, including peak CPU, RSS, swap and background traffic. Never prune correctness/service caches or skip the required version bump to improve a benchmark. Treat changed-source diagnostic timings separately from controlled cache comparisons.
+- **Receipts and contention:** sample receipt row counts, encoded response sizes and age distributions; measure retries, failed transactions and lock waits/busy responses by action category without user IDs, lock keys, arguments or reward results. Use distribution/rate trends rather than isolated slow requests.
+
+`GAME_PERFORMANCE_LOGS=true` also emits JSON `game-action` events with bounded `operation` (`economy`, `lock-acquire`, `lock-release`), `outcome`, `durationMs`, `attempts`, `retries`, and `rollbackErrors`. Count busy acquisition outcomes for contention; these locks fail immediately instead of waiting. Economy duration includes receipt reads, transaction attempts and release; replay events distinguish retry traffic from new writes. Aggregate duration distributions and outcome/retry rates at the log collector. Events deliberately omit action names, account IDs, lock keys, request IDs, arguments, results and exception details. A failed telemetry sink does not change action results. Logs are disabled by default.
+
+Local evidence and its limits are recorded in [performance audit status](../audit/performance.md). Required checks on protected main were verified through the remote API. Live N150 measurements, deployed index state, and origin firewall rules remain deployment-environment verification rather than conclusions from local fixtures.

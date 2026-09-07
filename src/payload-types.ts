@@ -859,6 +859,7 @@ export interface EconomyActionReceipt {
     | boolean
     | null;
   committedAt: string;
+  responseEncoding?: 'gzip-base64' | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1358,6 +1359,7 @@ export interface EconomyActionReceiptsSelect<T extends boolean = true> {
   requestId?: T;
   response?: T;
   committedAt?: T;
+  responseEncoding?: T;
   updatedAt?: T;
   createdAt?: T;
 }

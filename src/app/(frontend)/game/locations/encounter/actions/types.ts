@@ -1,5 +1,6 @@
 import type { LocationEncounterShield } from '@/data/locations'
 import type { EncounterQteState } from '@/utilities/pokemon/encounter-qte'
+import type { CaptureAimTiming } from '@/utilities/pokemon/capture-timing'
 import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
 import type { WeatherSnapshot } from '@/utilities/weather'
 import { SAFARI_ENCOUNTER_TTL_SECONDS } from '@/utilities/pokemon/safari-catch'
@@ -23,6 +24,7 @@ export interface EncounterState {
   rarity?: PokemonRarityId
   gender?: 'male' | 'female' | 'genderless'
   startTime: number
+  settlementRevision?: number
   expiry: number
   baseCatchRate: number
   currentCatchRate: number
@@ -39,6 +41,7 @@ export interface EncounterState {
   }
   catchRateModifier?: number
   captureAttempts?: number
+  captureTiming?: CaptureAimTiming
   secondChanceUsed?: boolean
   secondChanceModifier?: number
   encounterPool?: {

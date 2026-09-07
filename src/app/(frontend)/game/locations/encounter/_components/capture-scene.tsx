@@ -19,6 +19,7 @@ interface CaptureSceneProps {
   isCapturing: boolean
   showCaptureAnimation: boolean
   ringScale: number
+  aimReady: boolean
   targetRef: React.RefObject<HTMLElement | null>
   inventory: { itemId: string; quantity: number }[]
   handleCapture: (input: CaptureThrowPayload) => void
@@ -33,6 +34,7 @@ export function CaptureScene({
   isCapturing,
   showCaptureAnimation,
   ringScale,
+  aimReady,
   targetRef,
   inventory,
   handleCapture,
@@ -81,7 +83,7 @@ export function CaptureScene({
                   onThrow={handleCapture}
                   ringScale={ringScale}
                   targetRef={targetRef}
-                  disabled={isCapturing}
+                  disabled={isCapturing || !aimReady}
                 >
                   <div
                     className={cn(
@@ -119,6 +121,20 @@ export function CaptureScene({
                   Swipe up
                 </span>
               </div>
+              <Button
+                type="button"
+                disabled={!aimReady || isCapturing}
+                onClick={(event) => {
+                  const source = event.currentTarget.getBoundingClientRect()
+                  const target = targetRef.current?.getBoundingClientRect()
+                  handleCapture({ ringScale, visual: {
+                    from: { x: source.left + source.width / 2, y: source.top },
+                    target: target ? { x: target.left + target.width / 2, y: target.top + target.height / 2 } : { x: window.innerWidth / 2, y: window.innerHeight * 0.24 },
+                  } })
+                }}
+              >
+                {aimReady ? 'Throw Poké Ball' : 'Preparing throw…'}
+              </Button>
             </div>
 
             <Button

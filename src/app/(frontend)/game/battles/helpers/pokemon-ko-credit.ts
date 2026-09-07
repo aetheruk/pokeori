@@ -1,4 +1,4 @@
-import { getPayload } from 'payload'
+import { getPayload, type Payload } from 'payload'
 import configPromise from '@payload-config'
 import type { BattlePokemon, BattleState } from '@/utilities/battle/types'
 import type { BattleSide } from '@/utilities/battle/item-use-limits'
@@ -46,6 +46,7 @@ export function recordPokemonKO(
 
 export async function persistPokemonBattleKOs(
   state: BattleState,
+  transactionPayload?: Payload,
 ): Promise<void> {
   if (state.chronicle || state.pokemonBattleKOsPersisted) return
 
@@ -54,7 +55,7 @@ export async function persistPokemonBattleKOs(
   )
   if (entries.length === 0) return
 
-  const payload = await getPayload({ config: configPromise })
+  const payload = transactionPayload || await getPayload({ config: configPromise })
   await Promise.all(
     entries.map(async ([pokemonId, count]) => {
       const pokemon = await payload.findByID({

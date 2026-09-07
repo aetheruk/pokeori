@@ -26,6 +26,9 @@ import {
   isMidEncounterUsableItem,
 } from '@/data/items/types'
 import { cn } from '@/lib/utils'
+import { recoverGameAction } from '@/utilities/games/action-recovery'
+import { getCaptureRingScale } from '@/utilities/pokemon/capture-timing'
+import { beginCaptureAim } from './actions/capture-aim'
 import {
   getPokemonForm,
   getPokemonImageUrl,
@@ -43,7 +46,7 @@ import {
   researchEscape,
   runAway,
   submitAnswer,
-  useEncounterItem,
+  useEncounterItem as applyEncounterItem,
 } from './actions'
 
 // Dynamic import for CardDrawReveal to reduce initial bundle (framer-motion + canvas-confetti)
@@ -343,9 +346,8 @@ function SafariOdds({
   fleeChance: number
 }) {
   return (
-    <div
+    <section
       className="mb-3 grid w-full max-w-xs grid-cols-2 gap-2"
-      role="group"
       aria-label={`Catch chance ${catchChance} percent. Flee chance ${fleeChance} percent.`}
     >
       <div className="rounded-lg border border-game-moss/35 bg-game-surface-raised px-3 py-2 shadow-sm">
@@ -372,7 +374,7 @@ function SafariOdds({
           />
         </div>
       </div>
-    </div>
+    </section>
   )
 }
 
@@ -586,6 +588,9 @@ export default function EncounterPage() {
   const [submittingQte, setSubmittingQte] = useState(false)
   const [submittingSafariAction, setSubmittingSafariAction] = useState(false)
   const [captureRingScale, setCaptureRingScale] = useState(1)
+  const [captureAimReady, setCaptureAimReady] = useState(false)
+  const captureTimingRef = useRef<{ id: string; age: number; receivedAt: number } | null>(null)
+  const captureInFlightRef = useRef(false)
   const pokemonTargetRef = useRef<HTMLDivElement | null>(null)
   const ghostSequenceStartedRef = useRef(false)
   const expiredExitStartedRef = useRef(false)
@@ -706,25 +711,35 @@ export default function EncounterPage() {
   const playBadSfx = () => playSfx('bad')
 
   useEffect(() => {
+    if (!isCapturing) captureInFlightRef.current = false
     if (
       phase !== 'capture' ||
       showCaptureAnimation ||
-      isCapturing ||
-      hasAttemptedCapture
+      isCapturing
     ) {
       setCaptureRingScale(1)
+      setCaptureAimReady(false)
+      captureTimingRef.current = null
       return
     }
 
     let frame = 0
-    const startedAt = Date.now()
+    let disposed = false
     const tick = () => {
-      const elapsed = (Date.now() - startedAt) % 2200
-      setCaptureRingScale(1 - elapsed / 2200)
+      const timing = captureTimingRef.current
+      if (disposed || !timing) return
+      const elapsed = timing.age + performance.now() - timing.receivedAt
+      setCaptureRingScale(getCaptureRingScale(elapsed))
       frame = window.requestAnimationFrame(tick)
     }
-    frame = window.requestAnimationFrame(tick)
-    return () => window.cancelAnimationFrame(frame)
+    void (async () => {
+      const response = await recoverGameAction(() => beginCaptureAim(), 'Unable to prepare this throw. Retry to aim.', (value) => value.success ? undefined : value.error || 'Unable to prepare this throw.')
+      if (disposed || !response.success || !response.timing) return
+      captureTimingRef.current = { id: response.timing.id, age: response.timing.serverNow - response.timing.startedAt, receivedAt: performance.now() }
+      setCaptureAimReady(true)
+      frame = window.requestAnimationFrame(tick)
+    })()
+    return () => { disposed = true; window.cancelAnimationFrame(frame) }
   }, [hasAttemptedCapture, isCapturing, phase, showCaptureAnimation])
 
   useEffect(() => {
@@ -1059,9 +1074,13 @@ export default function EncounterPage() {
 
   const handleCapture = useCallback(
     async (throwInput: CaptureThrowPayload) => {
-      if (isCapturing) return
+      if (isCapturing || captureInFlightRef.current) return
       const ball = balls[selectedBallIndex]
       if (!ball) return
+      captureInFlightRef.current = true
+      const timing = captureTimingRef.current
+      const proof = timing ? { challengeId: timing.id, elapsedMs: Math.round(timing.age + performance.now() - timing.receivedAt) } : undefined
+      const actionId = crypto.randomUUID()
 
       // Play select sound effect
       playSelectSfx()
@@ -1083,10 +1102,16 @@ export default function EncounterPage() {
       setShowCaptureAnimation(true)
 
       try {
-        const result = await attemptCapture(ball.id, {
-          ringScale: throwInput.ringScale,
-          aimOffset: throwInput.aimOffset,
-        })
+        const result = await recoverGameAction(() => attemptCapture(ball.id, { timing: proof }, actionId), 'The throw result could not be confirmed. Retry this same throw.')
+        if ('code' in result && result.code === 'ENCOUNTER_RESTORED') { window.location.reload(); return }
+        if ('code' in result && result.code === 'CAPTURE_TIMING_INVALID' && 'noCharge' in result && result.noCharge) {
+          setShowCaptureAnimation(false)
+          setCaptureAnimationData(null)
+          setIsCapturing(false)
+          setHasAttemptedCapture(false)
+          toast.error('Throw timing was interrupted. Aim again; no Poké Ball was used.')
+          return
+        }
         if (result.success && 'caught' in result) {
           const captureData = result as {
             success: boolean
@@ -1195,7 +1220,7 @@ export default function EncounterPage() {
       if (!activeQte || submittingQte) return
       setSubmittingQte(true)
       try {
-        const response = await completeEncounterQte(activeQte.id, payload)
+        const response = await recoverGameAction(() => completeEncounterQte(activeQte.id, payload), 'The encounter action could not be confirmed. Retry this same action.')
         if (response.success) {
           setActiveQte(null)
           const shouldLoadQuestion = applyPromptResult(response)
@@ -1396,7 +1421,9 @@ export default function EncounterPage() {
       if (usingItem || !encounter) return
       setUsingItem(true)
       try {
-        const result = await useEncounterItem(itemId)
+        const actionId = crypto.randomUUID()
+        const result = await recoverGameAction(() => applyEncounterItem(itemId, actionId), 'The item action could not be confirmed. Retry this same item use.')
+        if ('code' in result && result.code === 'ENCOUNTER_RESTORED') { window.location.reload(); return }
         if (result.success) {
           // Update local state
           const updatedEncounter = { ...encounter }
@@ -1979,6 +2006,7 @@ export default function EncounterPage() {
             isCapturing={isCapturing}
             showCaptureAnimation={showCaptureAnimation}
             ringScale={captureRingScale}
+            aimReady={captureAimReady}
             targetRef={pokemonTargetRef}
             inventory={
               encounter.inventory as { itemId: string; quantity: number }[]

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { TrainerCard } from './TrainerCard'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, MotionConfig } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 interface VSAnimationProps {
@@ -43,6 +43,7 @@ export function VSAnimation({ player, enemy, onComplete }: VSAnimationProps) {
   }, [onComplete])
 
   return (
+    <MotionConfig reducedMotion="user">
     <div className="absolute inset-0 z-50 overflow-hidden bg-black/90 backdrop-blur-md flex flex-col justify-center items-center pointer-events-auto p-6 gap-8">
       {/* Player Card (Slide Down) */}
       <motion.div
@@ -113,5 +114,6 @@ export function VSAnimation({ player, enemy, onComplete }: VSAnimationProps) {
         </div>
       </motion.div>
     </div>
+    </MotionConfig>
   )
 }

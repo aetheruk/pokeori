@@ -95,6 +95,19 @@ export function normalizeAngle(angle: number) {
   return ((angle % 360) + 360) % 360
 }
 
+/** Screen-relative steering, including diagonals; opposing keys cancel out. */
+export function getSnakeKeyboardHeading(keys: ReadonlySet<string>) {
+  const x =
+    Number(keys.has('arrowright') || keys.has('d')) -
+    Number(keys.has('arrowleft') || keys.has('a'))
+  const y =
+    Number(keys.has('arrowdown') || keys.has('s')) -
+    Number(keys.has('arrowup') || keys.has('w'))
+  return x === 0 && y === 0
+    ? null
+    : normalizeAngle((Math.atan2(y, x) * 180) / Math.PI)
+}
+
 export function shortestAngleDelta(from: number, to: number) {
   return ((normalizeAngle(to) - normalizeAngle(from) + 540) % 360) - 180
 }

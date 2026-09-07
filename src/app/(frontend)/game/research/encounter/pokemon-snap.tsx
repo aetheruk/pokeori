@@ -1,5 +1,7 @@
 'use client'
 
+import type { GameDataKeys } from '@/utilities/requirements/analysis'
+
 import { AnimatePresence, motion } from 'framer-motion'
 import { Camera } from 'lucide-react'
 import Image from 'next/image'
@@ -19,7 +21,7 @@ import {
   completeGame,
   startGame,
   submitGameAnswer,
-} from '@/app/(frontend)/game/games/actions'
+} from '@/utilities/games/client-action-recovery'
 
 interface PokemonSnapGameProps {
   encounter: GameItem
@@ -75,6 +77,7 @@ export function PokemonSnapGame({
   useGameMusic(encounter)
   const { playSfx } = useAudio()
   const { refreshUser } = useUser()
+  const completionInvalidatesRef = useRef<GameDataKeys[] | undefined>(undefined)
   const targetPokemonId =
     typeof encounter.settings.target === 'number'
       ? encounter.settings.target
@@ -232,6 +235,7 @@ export function PokemonSnapGame({
       playSfx(didWin ? 'good' : 'bad')
 
       const completeResult = await completeGame(encounter.id, didWin)
+      completionInvalidatesRef.current = completeResult.invalidates
       setResult({
         success: didWin && completeResult.success,
         rewards: completeResult.summary,
@@ -273,6 +277,7 @@ export function PokemonSnapGame({
       }
       if (result.gameOver) {
         const completeResult = await completeGame(encounter.id, false)
+        completionInvalidatesRef.current = completeResult.invalidates
         setGameEnded(true)
         setSuccess(false)
         setResult({
@@ -320,6 +325,7 @@ export function PokemonSnapGame({
       targetGameEndedRef.current = true
       setGameEnded(true)
       const completeResult = await completeGame(encounter.id, didWin)
+      completionInvalidatesRef.current = completeResult.invalidates
       if (didWin && completeResult.success && completeResult.summary) {
         setSuccess(true)
         playSfx('good')
@@ -775,7 +781,7 @@ export function PokemonSnapGame({
         <RewardResultOverlay
           result={result}
           onClose={() => {
-            refreshUser()
+            refreshUser(true, completionInvalidatesRef.current)
             router.push('/game/explore')
           }}
           icon={encounter.icon}

@@ -250,7 +250,12 @@ function getStepActivityDetails(
   return null
 }
 
-export function ExpeditionModal({
+export function ExpeditionModal(props: ExpeditionModalProps) {
+  if (!props.item) return null
+  return <ExpeditionModalContent {...props} item={props.item} />
+}
+
+function ExpeditionModalContent({
   open,
   onOpenChange,
   item,
@@ -263,9 +268,7 @@ export function ExpeditionModal({
   userData,
   onChooseBranch,
   onRequestAbandonExpedition,
-}: ExpeditionModalProps) {
-  if (!item) return null
-
+}: ExpeditionModalProps & { item: NonNullable<ExpeditionModalProps['item']> }) {
   const [expandedStepId, setExpandedStepId] = useState<string | null>(null)
   const currentStepRef = useRef<HTMLDivElement | null>(null)
 
@@ -679,8 +682,13 @@ export function ExpeditionModal({
                                     <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-game-muted">
                                       {activityDetails.title}
                                     </div>
+                                    {/* biome-ignore lint/a11y/noStaticElementInteractions: This container only stops the surrounding card toggle from consuming child interactions. */}
                                     <div
+                                      role="presentation"
                                       className="mt-2 flex gap-2 overflow-x-auto pb-1 pt-1 custom-scrollbar [touch-action:pan-x]"
+                                      onKeyDown={(event) => {
+                                        if (event.key === 'Enter' || event.key === ' ') event.stopPropagation()
+                                      }}
                                       onClick={(event) =>
                                         event.stopPropagation()
                                       }

@@ -112,6 +112,9 @@ export function RenameDialog({
       onSubmit={handleSubmit}
       onPointerDown={(event) => event.stopPropagation()}
       onClick={(event) => event.stopPropagation()}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') event.stopPropagation()
+      }}
       className="flex min-w-0 basis-full items-center justify-center gap-2"
     >
       <Input

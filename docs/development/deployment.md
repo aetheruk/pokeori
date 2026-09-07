@@ -25,6 +25,10 @@ Configure values in Coolify, never in committed environment files.
 | `PAYLOAD_SECRET` | Disabled; compiler uses a placeholder | Required, stable private secret |
 | `RESEND_API_KEY` | Disabled; compiler uses a placeholder | Required |
 | `NEXT_PUBLIC_APP_URL` | Production URL | Production URL |
+| `BETA_INVITATION_SECRET` | Disabled | Private signing secret, at least 32 characters; required for restricted registration |
+| `CSP_ENFORCE` | Disabled | Enforcement is the default; `false` explicitly selects report-only |
+| `TRUSTED_PROXY_HOPS` | Disabled | Number of trusted proxies counted from the right of X-Forwarded-For; default 1 |
+| `GAME_PERFORMANCE_LOGS` | Disabled | Optional privacy-safe timing/size diagnostics |
 | `TRUST_CLOUDFLARE_PROXY` | Disabled | `true` only when direct origin access is firewalled |
 
 The Dockerfile preserves injected environment values. It rejects a missing Server Actions key; Next embeds this key in server build output, so generated images must remain private even though the source repository is public. For an intentional local Docker diagnostic, the key can also be supplied with `--secret id=NEXT_SERVER_ACTIONS_ENCRYPTION_KEY,env=NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` from an exported variable. Do not print the key.
@@ -63,6 +67,6 @@ A successful Dockerfile syntax check does not establish that the application com
 
 ## Recovery
 
-For urgent recovery, use Coolify's rollback to a retained successful deployment if available and verify health. Reconcile `main` through a revert PR with a new package version so a subsequent automatic deployment preserves the correction. If no prior image remains, revert the faulty change through a PR and let Coolify rebuild. Do not reset or force-push main.
+For urgent recovery, use Coolify's rollback to a retained compatible deployment if available and verify health. From 0.29.12, economy receipts can contain compressed responses: rollback code must retain that decoder and semantic receipt identities. An older image without the decoder is not a safe rollback once compressed receipts exist. Reconcile `main` through a revert PR with a new package version so a subsequent automatic deployment preserves the correction. If no compatible prior image remains, revert the faulty behavior while preserving receipt compatibility through a PR and let Coolify rebuild. Do not reset or force-push main.
 
 Follow the [release checklist](/docs/development/release-checklist.md) for migrations and the [performance runbook](/docs/development/performance-runbook.md) for database/index and proxy setup.

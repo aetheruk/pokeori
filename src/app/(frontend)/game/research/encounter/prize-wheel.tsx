@@ -1,4 +1,6 @@
 'use client'
+import { recoverGameAction } from '@/utilities/games/action-recovery'
+import { getPendingPaidAction, clearPendingPaidAction, hasPendingPaidAction } from '@/utilities/games/pending-paid-action'
 
 import { ChevronDown, DoorOpen, Loader2, Trophy } from 'lucide-react'
 import Image from 'next/image'
@@ -27,7 +29,7 @@ import {
 } from '@/data/games/prize-wheel/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
-import { completeGame, startGame } from '@/app/(frontend)/game/games/actions'
+import { completeGame, startGame } from '@/utilities/games/client-action-recovery'
 import {
   claimPrizeWheelReward,
   exitPrizeWheel,
@@ -141,7 +143,9 @@ export function PrizeWheelGame({
   const cost = encounter.settings.cost
   const costCurrency = cost ? getCurrency(cost.currencyType) : undefined
   const userBalance = user?.currency?.[cost?.currencyType || 'pokedollars'] || 0
-  const canAfford = !cost || userBalance >= cost.amount
+  const [pendingPaidStart, setPendingPaidStart] = useState(false)
+  useEffect(() => { setPendingPaidStart(hasPendingPaidAction('prize-wheel', encounter.id)) }, [encounter.id])
+  const canAfford = pendingPaidStart || !cost || userBalance >= cost.amount
 
   const handleSpin = async () => {
     if (isSpinning || !canAfford) return
@@ -149,13 +153,16 @@ export function PrizeWheelGame({
     setIsSpinning(true)
 
     // Server Init
-    const res = await initiatePrizeWheelSpin()
+    const actionId = getPendingPaidAction('prize-wheel', encounter.id)
+    const res = await recoverGameAction(() => initiatePrizeWheelSpin(actionId), 'The spin could not be confirmed. Retry this same spin.')
     if (!res.success) {
       toast.error(res.error || 'Failed to start spin')
       setIsSpinning(false)
       return
     }
 
+    clearPendingPaidAction('prize-wheel', encounter.id)
+    setPendingPaidStart(false)
     setSpinResult({
       targetIndex: res.targetIndex || 0,
       spinDuration: res.spinDuration || 4,
@@ -223,7 +230,7 @@ export function PrizeWheelGame({
     if ((!canClaim && !autoClaim) || isClaiming) return
 
     setIsClaiming(true)
-    const claimRes = await claimPrizeWheelReward(encounter.id)
+    const claimRes = await recoverGameAction(() => claimPrizeWheelReward(encounter.id), 'The wheel reward could not be confirmed. Retry this same reward.')
 
     if (claimRes.success) {
       // Check if there are any rewards to determine win/loss

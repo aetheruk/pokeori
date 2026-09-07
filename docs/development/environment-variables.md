@@ -2,6 +2,10 @@
 
 Required environment variables for Pokeori.
 
+Audit remediation adds `BETA_INVITATION_SECRET` (at least 32 characters), required to issue/accept signed, expiring, single-use registration invitations. There is no shared public beta-code fallback. See [registration invitations](registration-invitations.md).
+
+The nonce CSP is enforced by default. `CSP_ENFORCE=false` temporarily switches to report-only for diagnosis; restore enforcement after resolving violations. Client Zod validation runs without dynamic code generation, and Payload uses its local default avatar. `GAME_PERFORMANCE_LOGS=true` emits structured sync timing/size measurements without user IDs or game payloads. Leave it off unless collecting a profiling window. `POKEORI_UI_TEST` and `POKEORI_TEST_DIST_DIR` are local test settings, not production deployment inputs.
+
 ## `.env.example`
 Create a `.env` file based on this template:
 
@@ -48,3 +52,11 @@ NEXT_PUBLIC_APP_URL=https://localhost:3000
 ## Security Notes
 ⚠️ Never commit `.env` to git. It is already added to `.gitignore`.
 ⚠️ Rotate secrets immediately if exposed (see [Security Report](/docs/audit/security-report.md))
+## Trusted proxy chain
+
+`TRUSTED_PROXY_HOPS` selects the address that many entries from the right of
+`X-Forwarded-For` when `TRUST_PROXY_HEADERS=true` (default 1, maximum 10).
+Only configure it after verifying every request crosses that many trusted,
+header-appending proxies. Cloudflare mode requires a firewall-protected origin
+and a single valid `CF-Connecting-IP`. Invalid addresses fail to the shared
+`unknown` rate-limit identity.

@@ -57,13 +57,14 @@ export async function applyTrainerBattleLossPayout(
   state: BattleState,
   user: User,
   battleConfig: BattleConfig,
+  transactionPayload?: import('payload').Payload,
 ): Promise<number> {
   if (state.chronicle) return 0
 
   const payout = buildTrainerBattleLossPayout(battleConfig)
   if (payout <= 0) return 0
 
-  const payload = await getPayload({ config: configPromise })
+  const payload = transactionPayload || await getPayload({ config: configPromise })
   const freshUser = await payload.findByID({
     collection: 'users',
     id: user.id,

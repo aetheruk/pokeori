@@ -2,6 +2,12 @@
 
 28 mini-game types plus the separate Field Research activity are available in Pokeori.
 
+Game results now use server-held answers, validated puzzle transcripts, server simulation, or server-scored artwork according to the mode. Match 3 owns its board, swaps, cascades, score and revision on the server; Pachinko settles the server-simulated launch before returning playback. TCG Inspection and Diglett use server-issued rounds and stored scores. The [authority inventory](../audit/game-authority-verification-2026-09-07.md) records the contract for every authored game type, including separate Field Research.
+
+Run, Flap, Surf, Rhythm, Mining, Snake and Brick Breaker predict the same seeded, fixed-60Hz simulation replayed by the server. Input checkpoints save every 300 ticks (five seconds), or earlier when the input buffer fills. Play pauses while saving, recovering a request, or hidden. Reload restores the last acknowledged checkpoint; up to five seconds of unacknowledged play may be replayed. Stored arcade sessions last at most two hours, while authored time limits still constrain simulation time. Run/Flap use deterministic padded collision geometry, and Snake/Brick Breaker use the authored playfield scaled to fit the display. These geometry changes need player difficulty testing; server verification does not prove human input or prevent automation.
+
+Shared startup/completion recovery retains pending results and retries the same operation. Paid Wheel/UFO starts retain their request identity across reload until acknowledgement. PWA updates defer on fullscreen activity routes; confirmed shared completion starts a 15-second update countdown, which a new run cancels. Custom flows without that completion signal defer until an ordinary route. This is bounded checkpoint recovery for the listed arcade modes, not universal restoration of every in-progress client animation or puzzle. See [browser verification and its coverage limits](../audit/production-browser-verification.md).
+
 ## Shared spatial tile rendering
 
 - Spatial puzzle games use sprite-set manifests registered in `src/data/games/grid-tiles`. The complete asset and scene contract is documented in [grid-sprite-sets.md](./grid-sprite-sets.md).
@@ -47,29 +53,32 @@ WebKit, which may still permit history swipes despite that CSS property.
 | Identify | `/game/games/identify` | Identify Pokemon from silhouette |
 | Silhouette | `/game/games/silhouette` | Similar to Identify |
 | Snap | `/game/games/snap` | Pokemon photography |
-| Slots | `src/data/games/slots` | Slot machine |
-| Berry Picker | `src/data/games/berry-picker` | Pick berries under time limit |
-| Mining | `src/data/games/mining` | Mine for items |
-| Spelling | `src/data/games/spelling` | Spell Pokemon names |
-| Fishing | `src/data/games/fishing` | Catch Pokemon while fishing |
+| Slots | `/game/games/slots` | Slot machine |
+| Flap | `/game/games/flap` | Flying obstacle course |
+| Mining | `/game/games/mining` | Mine for items |
+| Spelling | `/game/games/spelling` | Spell Pokemon names |
+| Fishing | `/game/games/fishing` | Catch Pokemon while fishing |
 | Field Observation | `/game/field-research` | Watch a timed research frame with route and global random spawns, then answer a server-generated observation question |
-| TCG Battle | `src/data/games/tcg-battle` | Server-resolved simplified card battles using saved 15-card TCG decks |
-| Run | `src/data/games/run` | Endless runner |
+| TCG Battle | `/game/games/tcg-battle` | Server-resolved simplified card battles using saved 15-card TCG decks |
+| Run | `/game/games/run` | Endless runner |
 | Surf | `/game/games/surf` | Portrait forward-scrolling Lapras obstacle course |
 | Grid Puzzle (Rock Push) | `/game/games/grid-puzzle` | Shared grid puzzle ruleset for pushing boulders into holes and goals |
-| Prize Wheel | `src/data/games/prize-wheel` | Spin for rewards |
-| Pachinko | `src/data/games/pachinko` | Physics ball drop with bucket rewards |
+| Prize Wheel | `/game/games/prize-wheel` | Spin for rewards |
+| Pachinko | `/game/games/pachinko` | Physics ball drop with bucket rewards |
 | Grid Puzzle (Voltorb) | `/game/games/grid-puzzle` | Voltorb discharge ruleset that clears rubble and opens an exit |
-| Diglett Tunnel Tap | `src/data/games/diglett-tunnel-tap` | Reflex tunnel game where Diglett score and Dugtrio punish rushed taps |
-| Magnemite Circuit | `src/data/games/magnemite-circuit` | Rotating circuit puzzle for powering route machinery |
+| Diglett Tunnel Tap | `/game/games/diglett-tunnel-tap` | Reflex tunnel game where Diglett score and Dugtrio punish rushed taps |
+| Magnemite Circuit | `/game/games/magnemite-circuit` | Rotating circuit puzzle for powering route machinery |
 | Grid Puzzle (Echo Map) | `/game/games/grid-puzzle` | Dark movement maze with one opening echo reveal and hidden hole traps |
-| Art Academy | `src/data/games/art-academy` | Timed Pokemon sprite-copying study with an extracted artwork palette and server-scored canvas |
+| Art Academy | `/game/games/art-academy` | Timed Pokemon sprite-copying study with an extracted artwork palette and server-scored canvas |
 | Battle Bets | `/game/games/battle-bets` | Single-stake Fun Token wagering on AI-vs-AI Shadow battles |
 | Brick Breaker | `/game/games/brick-breaker` | Paddle-and-ball mineral survey with authored brick layouts, waves, and collectible rewards |
 | Onix Snake | `/game/games/snake` | Free-turning Onix cave survey with growth, speed progression, and collectible rewards |
-| TCG Memory | `src/data/games/tcg-memory` | Memory match with TCG cards |
-| Voltorb Flip | `src/data/games/voltorb-flip` | Puzzle game |
-| And more... | | |
+| Match 3 | `/game/games/match3` | Crystal swaps and cascades |
+| Rhythm | `/game/games/rhythm` | Timed matching inputs |
+| Sliding Puzzle | `/game/games/sliding-puzzle` | Restore a picture by moving tiles |
+| Procedure Order | `/game/games/procedure-order` | Arrange a procedure in the correct order |
+| TCG Inspection | `/game/games/tcg-inspection` | Study cards and answer inspection questions |
+| UFO Catcher | `/game/games/ufo-catcher` | Timed claw controls and prize collection |
 
 ## Rewards
 - Berries
@@ -77,7 +86,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 - Items
 - Research XP, either authored as a flat one-off reward or generated from `skillXp`
 - Endless score games author one-time rewards under `settings.endless.milestones` and score-scaled rewards under `settings.endless.repeatingRewards`. Repeating rewards can set `random: true` for Run, Flap, or Surf collectible spawns; these must be touched by the player and can use either a numeric interval with 25% variance or an authored `{ min, max }` score interval for explicit random cadence. Random collectible rewards show in Explore details by reward name only without point or chance labels. Non-random score rewards show the full score reward range and label each previewed reward with either the score threshold or repeating point interval.
-- Brick Breaker and Snake use the same random repeating-reward contract. Brick Breaker places the selected reward in an ochre specimen orb that must be popped by the ball; Snake places it at a safe open point that must be reached by Onix's head. The client reports collected reward keys and the server caps grants against the final score and minimum authored spawn interval.
+- Brick Breaker and Snake use the same random repeating-reward contract. Brick Breaker places the selected reward in an ochre specimen orb that must be popped by the ball; Snake places it at a safe open point that must be reached by Onix's head. Server replay derives the actual pickups and score from the seeded simulation; submitted collectible counts cannot establish a reward.
 - Identify games default to four unique answer choices and can author `settings.optionCount` for a larger pool. The server builds the configured number for the opening and every following round, always includes the target, and caps safely at the available unique options; the client switches six-choice rounds to a responsive three-column layout.
 - Paid Run and Flap entries use the shared `currency_owned` criterion with `consume: true`. The server checks and deducts the authored amount only when creating a new session; restoring an active session does not charge again.
 - Run and Flap use a shared side-scroller stage shell. Their gameplay coordinates remain a fixed 600x600 layer, while the visible stage scales responsively inside a full-screen painted backdrop with authored `settings.scene` art, premium repeat-x `parallaxLayers`, and region-time tinting. Tapping outside the square playfield triggers the primary action for both games, and Run uses a horizontal outside-playfield swipe for boost. Layer `style.backgroundPosition` is treated as the vertical anchor; the client always owns the animated X offset.
@@ -85,14 +94,15 @@ WebKit, which may still permit history swipes despite that CSS property.
 
 ## Brick Breaker
 
-- Brick Breaker plays directly over its full-background scene with a minimal floating score, lives, wave, and exit HUD. Its three-second start uses the shared circular game countdown. Pointer or touch movement steers the Poké Ball-styled paddle directly; Arrow Left/Right and A/D provide keyboard steering, while tap or Space launches a docked ball.
+- Brick Breaker plays directly over its full-background scene with a minimal floating score, lives, wave, and exit HUD. Its three-second start uses the shared circular game countdown. Pointer or touch movement sets the Poké Ball-styled paddle's target; the paddle approaches it at the authored speed. Arrow Left/Right and A/D provide keyboard steering, while tap or Space launches a docked ball.
 - Layout rows are authored with `.` for empty cells, `1`–`3` for destructible durability, and `#` for neutral indestructible dividers. Destructible cells use the same rounded-square gradient and inset construction as Match3 tiles and contain a small Pokémon sprite cycled from configurable `brickPokemonIds`; indestructible dividers never show a Pokémon. Settings also control playfield geometry, board spacing, paddle and ball dimensions, acceleration, lives, points, reward lifetime, optional time limits, and endless wave speed increases. Leaving records the current score and collected specimens once, then opens the standard result summary.
-- Finite configurations finish when every destructible brick is cleared. Endless configurations rebuild the authored board as a new wave and continue until the player loses every ball. Physics use capped frame deltas and substeps so tab restoration and high ball speeds do not tunnel through thin bricks.
+- Finite configurations finish when every destructible brick is cleared. Endless configurations rebuild the authored board as a new wave and continue until the player loses every ball. Physics use deterministic fixed ticks with collision substeps. Hidden tabs pause simulation; restoring a tab does not advance an unbounded frame delta.
 
 ## Onix Snake
 
-- Snake uses continuous movement and rate-limited free steering inside an authored rectangular playfield. Pointer hover aims toward the cursor, touch or pen dragging aims toward the contact point, and held Left/Right or A/D input curves continuously; Start or Space begins play. A generous pointer arrival zone commits to the current course before the head can orbit beneath the contact point, and the test turn rate is restrained enough to preserve a readable curve. Settings control the starting position and heading, segment spacing, initial and maximum speed, acceleration cadence, turn rate, head/body/pickup radii, an artwork-tuned viewport boundary radius, minimum pickup spawn distance, boundary wrapping, optional circular obstacles, sprite roles, reward lifetime, finite score targets, and endless rewards.
-- The test configuration uses dedicated transparent head, body, and tail artwork for an original faceted rock serpent. Segments follow one another through smooth curves instead of snapping to cells, while the player-facing activity retains its Onix identity and icon.
+- Snake uses continuous movement and rate-limited free steering inside an authored rectangular playfield. Pointer hover aims toward the cursor, and touch or pen dragging aims toward the contact point. A generous pointer arrival zone commits to the current course before the head can orbit beneath the contact point, and the test turn rate is restrained enough to preserve a readable curve. Settings control the starting position and heading, segment spacing, initial and maximum speed, acceleration cadence, turn rate, head/body/pickup radii, an artwork-tuned viewport boundary radius, minimum pickup spawn distance, boundary wrapping, optional circular obstacles, sprite roles, reward lifetime, finite score targets, and endless rewards.
+- Arrow keys / WASD now aim in screen directions, including diagonal combinations, while retaining the rate-limited turn. Large Left/Right buttons curve continuously while held and straighten on release or pointer cancellation; keyboard activation of these buttons requests a 45-degree turn. Held keys and touch input clear on window blur, hidden tabs, and replay. The ready panel explains pointer, keyboard, and touch controls before Start or Space begins movement.
+- The test configuration uses the supplied transparent Onix head, body rock, and tapered tail, converted to AVIF under `public/games/snake/sprites/onix-*.avif`. The head pivots around the face below its horn; the tail pivots at its broad attachment rock and points away from the body. Native aspect ratios are preserved, with a single positioning transform keeping artwork aligned to logical segment centers. Segments follow one another through smooth curves instead of snapping to cells.
 - Ordinary mineral food grows Onix and advances the score, rendering the sprite authored by each game configuration directly in the cave without a bubble. Only reward items use the compact Field Research bubble treatment around their own item sprites; they never replace food or grow the body, spawn at safe points clear of Onix and obstacles, expire cleanly, and are collected once by the head. The compact HUD uses raised paper and ink over the cave scene. Finite games finish at `winScore`; endless games continue until Onix hits a boundary, obstacle, or its own trail.
 
 ## Fishing

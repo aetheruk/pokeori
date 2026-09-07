@@ -1,4 +1,4 @@
-'use server'
+import 'server-only'
 
 import { getPayload, type Payload, type PayloadRequest } from 'payload'
 import payloadConfig from '@/payload.config'

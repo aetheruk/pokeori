@@ -1,3 +1,5 @@
+import 'server-only'
+
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { redis } from '@/utilities/redis'
@@ -13,25 +15,23 @@ import {
 import { battles } from '@/data/battles'
 import { DYNAMAX_UNLOCK_TURNS } from '@/data/powers'
 import { handleWin } from './win-handler'
+import { handleBattleLoss } from './loss-handler'
 import { BATTLE_TTL } from './state-management'
 import { trimBattleHistory } from '@/utilities/battle/history'
-import { recordExpeditionActivityResult } from '@/utilities/expeditions/actions'
 import { isActivityEligibleForReplay } from '@/utilities/activity-replay'
 import { applyHeldItemIfTriggered } from '@/utilities/battle/held-items'
 import { persistConsumedHeldItems } from './held-items'
-import { incrementUserActivityResult } from '@/utilities/user-state'
 import {
   hasAvailableReplacement,
   resetPlayerPowerStateForReplacement,
 } from '@/utilities/battle/switching'
-import { applyTrainerBattleLossPayout } from './loss-payout'
 import { formatPokemonFaintedMessage } from '@/utilities/battle/messages'
 import { advanceBattleTypeChangeDuration, advanceTeraDuration, resetBattleTypeChange } from '@/utilities/battle/tera'
 import { chooseEnemyReplacementIndex } from '@/utilities/battle/enemy-ai'
 import { decrementFaintedPokemonFriendship } from '@/utilities/battle/friendship'
 import { clearDynamaxState } from '@/utilities/battle/dynamax'
 import { createBattleTurnTimer } from './timing'
-import { persistPokemonBattleKOs, recordPokemonKO } from './pokemon-ko-credit'
+import { recordPokemonKO } from './pokemon-ko-credit'
 import { processBattleAbilitySuppressionForState } from '@/utilities/battle/abilities'
 import { finalizeBattlePresentation } from '@/utilities/battle/presentation'
 import { resolvePendingMoveSwitches } from '@/utilities/battle/move-effects'
@@ -165,6 +165,7 @@ export async function finalizeTurn(
         payload,
         pokemon: playerMon,
         userId: user.id,
+        eventId: `${state.economyActionId || state.battleId}:${state.turn}:${playerMon.id}`,
       }),
     )
     state.history[0].message += `\n${formatPokemonFaintedMessage(playerName, playerMon.name)}`
@@ -181,6 +182,7 @@ export async function finalizeTurn(
         payload,
         pokemon: playerMon,
         userId: user.id,
+        eventId: `${state.economyActionId || state.battleId}:${state.turn}:${playerMon.id}`,
       }),
     )
 
@@ -202,49 +204,7 @@ export async function finalizeTurn(
       state.pendingPlayerSwitch = false
       state.pendingPlayerSwitchReason = undefined
       state.history[0].message += `\nYou were defeated by ${enemyName}...`
-      // Update Loss Stats
-      if (!state.chronicle) {
-        await timer.time('incrementLossStats', () =>
-          incrementUserActivityResult(payload as any, user.id, 'battleResults', state.battleId, {
-            losses: 1,
-          }),
-        )
-      }
-
-      const expeditionResult = await timer.time(
-        'recordExpeditionLoss',
-        () =>
-          recordExpeditionActivityResult(
-            user.id,
-            'battle',
-            state.battleId,
-            false,
-            { revalidatePaths: false },
-          ),
-      )
-      if (expeditionResult.expedition) {
-        state.expeditionProgress = expeditionResult.expedition
-      }
-
-      const battleConfig = getBattleConfigForState(state)
-      if (battleConfig) {
-        const amountLost = await timer.time(
-          'applyTrainerBattleLossPayout',
-          () =>
-            applyTrainerBattleLossPayout(
-              state,
-              user,
-              battleConfig,
-            ),
-        )
-        if (amountLost > 0) {
-          state.history[0].message += `\nYou paid ${amountLost} Pokedollars.`
-        }
-      }
-
-      await timer.time('persistPokemonBattleKOs', () =>
-        persistPokemonBattleKOs(state),
-      )
+      await timer.time('handleBattleLoss', () => handleBattleLoss(state, user, getBattleConfigForState(state)))
     }
   }
 

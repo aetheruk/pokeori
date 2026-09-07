@@ -79,7 +79,7 @@ import {
   isTcgBattleAttackDisabled,
   TCG_BATTLE_FORMATS,
 } from '@/utilities/tcg/tcg-battle'
-import type { GameCompletionResult } from '@/app/(frontend)/game/games/actions'
+import type { GameCompletionResult } from '@/utilities/games/client-action-recovery'
 import {
   arrangeTcgBattle,
   claimTcgBattleResult,

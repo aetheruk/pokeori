@@ -9,22 +9,22 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "correctness": {
         "noSwitchDeclarations": "off",
         "useParseIntRadix": "off",
         "useExhaustiveDependencies": "off",
-        "useHookAtTopLevel": "off",
+        "useHookAtTopLevel": "error",
         "noUnusedFunctionParameters": "off",
         "noUnusedImports": "off",
         "noUnusedVariables": "off"
       },
       "a11y": {
-        "noStaticElementInteractions": "off",
+        "noStaticElementInteractions": "error",
         "noSvgWithoutTitle": "off",
         "useButtonType": "off",
-        "useKeyWithClickEvents": "off",
-        "useSemanticElements": "off"
+        "useKeyWithClickEvents": "error",
+        "useSemanticElements": "error"
       },
       "style": {
         "noNonNullAssertion": "off",
