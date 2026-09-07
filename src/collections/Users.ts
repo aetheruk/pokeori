@@ -1,7 +1,21 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, Field } from 'payload'
 import { skills } from '../data/skills/index'
 import superAdminCheck, { adminOrSelf } from '@/utilities/access'
 import { GAME_AUTH_TOKEN_EXPIRATION_SECONDS } from '@/utilities/auth/session-policy'
+
+// Game actions validate ownership/costs and use the trusted Local API. The
+// generic REST/GraphQL API must not bypass those checks by writing user state.
+function protectGameFields(fields: Field[]): Field[] {
+  return fields.map((field) => {
+    if (!('name' in field) || field.type === 'join' || field.type === 'ui' || field.name === 'trainerName') {
+      return field
+    }
+    return {
+      ...field,
+      access: { ...field.access, create: superAdminCheck, update: superAdminCheck },
+    }
+  })
+}
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -19,14 +33,14 @@ export const Users: CollectionConfig = {
     read: adminOrSelf,
     update: adminOrSelf,
     delete: superAdminCheck,
+    unlock: superAdminCheck,
   },
-  fields: [
+  fields: protectGameFields([
     {
       name: 'isAdmin',
       type: 'checkbox',
       defaultValue: false,
       label: 'Is Admin',
-      access: {},
     },
     {
       name: 'trainerName',
@@ -415,5 +429,5 @@ export const Users: CollectionConfig = {
         description: 'When the current weather slot was last rolled',
       },
     },
-  ],
+  ]),
 }

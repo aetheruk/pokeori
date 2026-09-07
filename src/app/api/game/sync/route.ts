@@ -2,7 +2,7 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { headers } from 'next/headers'
 import { GAME_DATA_SCOPES, type GameDataScope } from '@/utilities/game-data-scopes'
-import { getGameRouteData } from '@/utilities/game-route-data'
+import { getGameRouteDataForUser } from '@/utilities/game-route-data'
 import { getClientIp, rateLimit } from '@/utilities/rate-limiter'
 import { validateQuery } from '@/utilities/validators'
 import { z } from 'zod'
@@ -42,9 +42,15 @@ export async function GET(request: Request) {
 
   try {
     const resolvedScope = scope as GameDataScope
-    const gameData = await getGameRouteData(resolvedScope, requestHeaders)
+    const startedAt = performance.now()
+    const gameData = await getGameRouteDataForUser(resolvedScope, payload, user)
     if (!gameData) return errorResponse('Unauthorized', 401, requestId)
-    return jsonResponse(gameData, {}, requestId)
+    return jsonResponse(gameData, {
+      headers: {
+        'Cache-Control': 'private, no-store',
+        'Server-Timing': `game-data;dur=${(performance.now() - startedAt).toFixed(1)}`,
+      },
+    }, requestId)
   } catch (error) {
     console.error(`[${requestId}] Error syncing game data:`, error)
     return errorResponse('Internal Server Error', 500, requestId)

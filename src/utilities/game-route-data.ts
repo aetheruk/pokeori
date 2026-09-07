@@ -1,4 +1,5 @@
-import { getPayload } from 'payload'
+import { getPayload, type Payload } from 'payload'
+import type { User } from '@/payload-types'
 import configPromise from '@payload-config'
 import { headers } from 'next/headers'
 import { getGameUserData } from '@/utilities/game-data'
@@ -18,6 +19,15 @@ export async function getGameRouteData(
 
   if (!user) return null
 
+  return getGameRouteDataForUser(scope, payload, user)
+}
+
+/** Server-only helper for callers that have already authenticated this request. */
+export async function getGameRouteDataForUser(
+  scope: GameDataScope,
+  payload: Payload,
+  user: Pick<User, 'id'>,
+) {
   const freshUser = await payload.findByID({
     collection: 'users',
     id: user.id,
@@ -55,6 +65,7 @@ export async function getGameRouteData(
   })
 
   return getGameUserData(freshUser, GAME_DATA_SCOPE_KEYS[scope], {
+    payload,
     pokemonPayload: getPokemonPayloadForScope(scope),
   })
 }

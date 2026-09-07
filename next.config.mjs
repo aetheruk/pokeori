@@ -58,6 +58,18 @@ const nextConfig = {
   outputFileTracingIncludes: {
     '/*': standaloneRuntimeGlobs,
   },
+  // Alpine uses Sharp's linuxmusl binaries. Its optional glibc binaries were
+  // also traced into the old image (~18 MiB of unused libvips alone).
+  ...(process.env.POKEORI_BUILD_LIBC === 'musl'
+    ? {
+        outputFileTracingExcludes: {
+          '/*': [
+            './node_modules/@img/sharp-linux-*/**/*',
+            './node_modules/@img/sharp-libvips-linux-*/**/*',
+          ],
+        },
+      }
+    : {}),
   typescript: {
     ignoreBuildErrors: process.env.NEXT_IGNORE_TYPECHECK === 'true',
   },

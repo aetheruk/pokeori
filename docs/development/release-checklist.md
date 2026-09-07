@@ -4,6 +4,7 @@ Use this checklist before deploying gameplay, schema, security, or generated-dat
 changes.
 
 ## Security
+- Run `bun audit`. Payload 3.88.0's account-unlock advisory remains reported upstream; verify the Users admin-only unlock policy and access tests until a patched release is available. Do not globally ignore the advisory.
 - Rotate any credentials that have ever appeared in `.env` or logs.
 - Confirm production has `DATABASE_URI`, `PAYLOAD_SECRET`, and `RESEND_API_KEY`.
 - Confirm Coolify has the same stable `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` enabled for build and runtime, with Docker Build Secrets enabled.

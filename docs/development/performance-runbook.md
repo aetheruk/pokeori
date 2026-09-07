@@ -113,6 +113,14 @@ releases. Verify a second request with `curl -I` shows the intended
 
 ## Release and smoke checks
 
+Game sync now authenticates once and reuses the same Payload instance through its data loader. Successful authenticated `/api/game/sync` responses include `Server-Timing: game-data;dur=...` and `Cache-Control: private, no-store`. The timing covers data loading, not authentication, rate limiting, JSON serialization, or network time. Use the browser Network timing panel to compare it with total response time.
+
+For N150 profiling, record representative Explore, box, battle, and research flows on both small and large player accounts. Collect response size and p50/p95 latency, host CPU/RAM/swap during idle and deployment, and MongoDB connection checkout wait/failure counts. Check the actual container's `bun --version`, base OS, and image digest rather than inferring the running version from the Dockerfile. Scan that image's OS packages as well as running the dependency audit. Change connection-pool limits only after checking wait times and database utilization.
+
+User-state reads use per-user filters, route scopes, and field projections. The complete snapshots also feed trusted write diffs and requirement checks; adding a limit to `findRows` can silently remove progress or corrupt updates. Separate paginated browsing reads from complete mechanics snapshots if profiling shows large accounts are slow. Do not claim those snapshots have been optimized solely by adding a row cap.
+
+As of the 0.29.11 preparation, the public health/version URLs returned 404 and the available Coolify token returned 403 for application/deployment reads. Host metrics, live image scanning, authenticated flow timings, and PWA refresh therefore remain unverified; use a Coolify session with read access and an authenticated player session to complete these checks.
+
 Run the release checklist before merging. Coolify builds and deploys from
 protected `main` automatically. Inspect its build logs and deployed commit,
 then verify the running image; see the [deployment guide](/docs/development/deployment.md).

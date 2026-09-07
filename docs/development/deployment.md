@@ -33,7 +33,13 @@ MongoDB must support replica-set transactions, and the application must reach Mo
 
 ## N150 build performance
 
-The image uses Bun for installation, Turbopack compilation, and the standalone server. Frozen installs include build dependencies even if Coolify injects production mode. Package downloads and `.next/cache` persist in BuildKit cache mounts, with locking to prevent concurrent writers. Next 16.3 enables Turbopack's filesystem build cache by default.
+The image pins Bun 1.4.2 for installation, Turbopack compilation, and the standalone server, matching `packageManager`. Frozen installs include build dependencies even if Coolify injects production mode. Package downloads and `.next/cache` persist in BuildKit cache mounts, with locking to prevent concurrent writers. Next 16.3 enables Turbopack's filesystem build cache by default.
+
+The Alpine builder sets `POKEORI_BUILD_LIBC=musl` so tracing excludes unused glibc Sharp packages while retaining linuxmusl Sharp/libvips. Remove/change this setting if switching to a glibc base. Broad Payload runtime includes remain: earlier runtime tracing fixes required them, so further narrowing needs a complete image smoke test. The inspected 0.29.9 image contained approximately 18 MiB of unused glibc libvips; this is not a measured final-image size for the new release.
+
+The base stage updates Alpine packages before installing compatibility libraries. The upstream Bun 1.4.2 image scan found CVE-2026-14456 in libcrypto3/libssl3 3.5.7-r0, fixed by Alpine 3.5.8-r0. A cached RUN does not recheck repositories: when future OS advisories appear, refresh/rebuild the base stage and rescan it. Preserve ordinary application/compiler caches during routine releases.
+
+On 2026-09-07, the rebuilt linux/amd64 base stage (Alpine 3.22.5, 21 OS packages) passed Trivy 0.74.0's HIGH/CRITICAL scan with zero findings after the OpenSSL update. This covers the base's OS packages, not the compiled Bun binary or the final application image.
 
 Page-generation workers are capped at four and respect smaller available CPU allocations; per-worker page concurrency is eight. This is a starting point for the N150, not a measured optimum, and does not limit every Turbopack thread. Keep one build active at a time and measure build duration, peak RAM, swap, and live request latency before further tuning. Installed RAM and competing workloads determine the safe build memory budget.
 

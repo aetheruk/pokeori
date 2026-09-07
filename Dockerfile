@@ -1,11 +1,13 @@
 # syntax=docker/dockerfile:1
 
 # Bun is the package manager, build runtime, and production runtime. Keep the
-# image on the stable Bun 1.4 release line used by packageManager in package.json.
-FROM oven/bun:1.4-alpine AS base
+# image on the same stable patch used by packageManager in package.json.
+FROM oven/bun:1.4.2-alpine AS base
 WORKDIR /app
 
-RUN apk add --no-cache libc6-compat
+# Refresh OS security packages when advancing this base stage. Bun's 1.4.2
+# image shipped OpenSSL 3.5.7; Alpine 3.5.8 fixes CVE-2026-14456.
+RUN apk upgrade --no-cache && apk add --no-cache libc6-compat
 
 # Copy lockfiles before application source so dependency installation is reused
 # unless the dependency graph changes. The cache mount retains Bun's package
@@ -26,6 +28,7 @@ COPY scripts/reset-gym-chronicles-v2.ts ./scripts/reset-gym-chronicles-v2.ts
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_IGNORE_TYPECHECK=true
+ENV POKEORI_BUILD_LIBC=musl
 # Coolify injects build secrets as environment mounts on RUN instructions.
 # Local Docker diagnostics can supply the same key using the file mount below;
 # prefer Coolify's environment value when present. Never compile a production

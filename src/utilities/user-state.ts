@@ -244,6 +244,10 @@ async function findRows(
   select?: Record<string, true>,
   req?: PayloadRequest,
 ): Promise<any[]> {
+  // These are complete ownership/progression snapshots, also used to diff
+  // trusted writes below. Truncating them would lose unlocks or mistake rows
+  // for deletions. Route scopes and field projections bound what is requested;
+  // client pagination needs a separate read model, not a limit on this helper.
   const and = [{ user: { equals: userId } }, ...extraWhere]
   const result = await runUserStateRead(req, () =>
     payload.find({
