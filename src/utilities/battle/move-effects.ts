@@ -18,7 +18,11 @@ import type {
   BattleStance,
   StatStages,
 } from './types'
-import { DEFAULT_STAT_STAGES, clampStatStage } from './stats-calc'
+import {
+  DEFAULT_STAT_STAGES,
+  clampStatStage,
+  resetBattleStatStages,
+} from './stats-calc'
 import {
   adjustBattleItemUsesRemaining,
   getBattleItemUsesRemaining,
@@ -63,10 +67,7 @@ import {
   applyBattleAbilityStatusReflection,
 } from './abilities'
 import { processBattleAbilitySwitchOut } from './switching'
-import {
-  clearShoutStatBoost,
-  removeShoutBoostFromStatStages,
-} from './shout-effects'
+import { removeShoutBoostFromStatStages } from './shout-effects'
 
 const CALLABLE_MOVE_EXCLUSIONS = new Set(['metronome'])
 
@@ -953,17 +954,13 @@ function revivePartyMember(
 ): string | undefined {
   const target = team.find((pokemon) => pokemon.currentHp <= 0)
   if (!target) return undefined
+  resetBattleStatStages(target)
   target.currentHp = Math.max(1, Math.floor(target.maxHp * (hpPercent / 100)))
   return `${target.name} was revived! [icon:heal:${target.currentHp}]`
 }
 
 function cloneStatStages(stages: StatStages | undefined): StatStages {
   return { ...(stages || DEFAULT_STAT_STAGES) }
-}
-
-function resetStatStages(pokemon: BattlePokemon): void {
-  clearShoutStatBoost(pokemon)
-  pokemon.statStages = { ...DEFAULT_STAT_STAGES }
 }
 
 function pokemonHasEffectiveType(
@@ -1183,7 +1180,7 @@ export function applyMoveRuntimeEffects(params: {
       move.statStageEffect.target === 'both'
         ? [attacker, defender]
         : [move.statStageEffect.target === 'enemy' ? defender : attacker]
-    for (const target of targets) resetStatStages(target)
+    for (const target of targets) resetBattleStatStages(target)
     messages.push(`${move.name} reset stat changes.`)
   }
 

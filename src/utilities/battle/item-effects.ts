@@ -1,5 +1,8 @@
 import type { BattlePokemon, StatStages } from '@/utilities/battle/types'
-import { DEFAULT_STAT_STAGES } from '@/utilities/battle/stats-calc'
+import {
+  DEFAULT_STAT_STAGES,
+  resetBattleStatStages,
+} from '@/utilities/battle/stats-calc'
 import type { BattleEffect } from '@/data/items'
 import { formatBattleStatName } from './stat-labels'
 
@@ -54,6 +57,10 @@ export function applyBattleItemEffect(params: {
     if (pokemon.currentHp > 0) {
       return { applied: false, message: `${pokemon.name} is not fainted.` }
     }
+
+    // A faint ends all temporary stat-stage changes even when the player
+    // revives the Pokemon in place instead of switching it out.
+    resetBattleStatStages(pokemon)
 
     const revivePercent = Math.max(1, Math.min(100, battleEffect.reviveHpPercent || 50))
     pokemon.currentHp = Math.max(1, Math.floor((pokemon.maxHp * revivePercent) / 100))
