@@ -1,8 +1,20 @@
 'use client'
 import { recoverGameAction } from '@/utilities/games/action-recovery'
-import { getPendingPaidAction, clearPendingPaidAction, hasPendingPaidAction } from '@/utilities/games/pending-paid-action'
+import {
+  getPendingPaidAction,
+  clearPendingPaidAction,
+  hasPendingPaidAction,
+} from '@/utilities/games/pending-paid-action'
 
-import { ArrowRight, ArrowUp, Coins, DoorOpen, Loader2 } from 'lucide-react'
+import {
+  ArrowDown,
+  ArrowRight,
+  ArrowUp,
+  Check,
+  Coins,
+  DoorOpen,
+  Loader2,
+} from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import {
@@ -28,13 +40,11 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { ItemSprite } from '@/components/ui/item-sprite'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
 import { getCurrency } from '@/data/currencies'
 import type {
   UfoCatcherGameConfig,
-  UfoCatcherPlacedPrize,
   UfoCatcherPublicAttempt,
 } from '@/data/games/ufo-catcher'
 import type { TaskIcon } from '@/data/tasks/types'
@@ -52,6 +62,17 @@ interface UfoCatcherGameProps {
   encounter: UfoCatcherGameConfig
   initialState?: any
   state?: any
+  actions?: {
+    start: typeof startUfoCatcherAttempt
+    settle: typeof settleUfoCatcherAttempt
+    exit: typeof exitUfoCatcher
+  }
+}
+
+const defaultActions = {
+  start: startUfoCatcherAttempt,
+  settle: settleUfoCatcherAttempt,
+  exit: exitUfoCatcher,
 }
 
 type ControlPhase = 'idle' | 'x' | 'y' | 'resolving'
@@ -109,7 +130,10 @@ function MachineScrew({ className }: { className: string }) {
   )
 }
 
-export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
+export function UfoCatcherGame({
+  encounter,
+  actions = defaultActions,
+}: UfoCatcherGameProps) {
   useGameMusic(encounter)
   const router = useRouter()
   const { user, refreshUser } = useUser()
@@ -131,6 +155,10 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
   const [exitPromptOpen, setExitPromptOpen] = useState(false)
   const [exitResult, setExitResult] = useState<any>(null)
   const [isExiting, setIsExiting] = useState(false)
+  const [holding, setHolding] = useState(false)
+  const [lastResult, setLastResult] = useState<UfoCatcherAttemptResult | null>(
+    null,
+  )
 
   const holdRef = useRef<{
     axis: Axis
@@ -144,7 +172,9 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
   const userBalance = Number((user?.currency as any)?.[cost.currencyType] || 0)
   const balance = displayBalance ?? userBalance
   const [pendingPaidStart, setPendingPaidStart] = useState(false)
-  useEffect(() => { setPendingPaidStart(hasPendingPaidAction('ufo-catcher', encounter.id)) }, [encounter.id])
+  useEffect(() => {
+    setPendingPaidStart(hasPendingPaidAction('ufo-catcher', encounter.id))
+  }, [encounter.id])
   const canAfford = pendingPaidStart || balance >= cost.amount
 
   const clawCoordinates = useMemo(() => {
@@ -193,6 +223,7 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
       Math.max(0, forcedDuration ?? performance.now() - hold.startedAt),
     )
     holdRef.current = null
+    setHolding(false)
 
     if (axis === 'x') {
       xHoldMsRef.current = Math.round(duration)
@@ -218,6 +249,7 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
       return
     }
     if (holdRef.current) return
+    setHolding(true)
 
     const travelMs = axis === 'x' ? settings.xTravelMs : settings.yTravelMs
     const startedAt = performance.now()
@@ -287,7 +319,10 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
     setPhase('resolving')
 
     const actionId = getPendingPaidAction('ufo-catcher', encounter.id)
-    const result = await recoverGameAction(() => startUfoCatcherAttempt(encounter.id, actionId), 'The claw attempt could not be confirmed. Retry this same attempt.')
+    const result = await recoverGameAction(
+      () => actions.start(encounter.id, actionId),
+      'The claw attempt could not be confirmed. Retry this same attempt.',
+    )
     if (!result.success || !result.attempt) {
       toast.error(result.error || 'Unable to start the claw')
       setPhase('idle')
@@ -318,7 +353,10 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
       attemptId: activeAttempt.attemptId,
       input,
     }
-    const result = await recoverGameAction(() => settleUfoCatcherAttempt(request), 'The claw result could not be confirmed. Retry this same attempt.')
+    const result = await recoverGameAction(
+      () => actions.settle(request),
+      'The claw result could not be confirmed. Retry this same attempt.',
+    )
     const remainingDescent = 700 - (performance.now() - requestStarted)
     if (remainingDescent > 0) await sleep(remainingDescent)
 
@@ -362,6 +400,7 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
     }
 
     setDisplayBalance(result.balance ?? null)
+    setLastResult(result)
     setShutterOpen(false)
     await sleep(720)
     setAttempt(null)
@@ -373,7 +412,7 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
   const performExit = async () => {
     if (isExiting || phase === 'resolving') return
     setIsExiting(true)
-    const result = await exitUfoCatcher(encounter.id)
+    const result = await actions.exit(encounter.id)
     setIsExiting(false)
     if (!result.success) {
       toast.error(result.error || 'Unable to leave the UFO Catcher')
@@ -435,22 +474,32 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
       : phase === 'y'
         ? 'Hold to move toward the back'
         : phase === 'resolving'
-          ? motion === 'descending'
-            ? 'Lowering claw'
-            : motion === 'gripping'
-              ? 'Closing claw'
-              : motion === 'lifting'
-                ? 'Lifting claw'
-                : motion === 'returning'
-                  ? 'Returning with prize'
-                  : motion === 'delivering'
-                    ? 'Delivering prize'
-                    : motion === 'slipping'
-                      ? 'Prize slipped'
-                      : 'Claw in motion'
+          ? !attempt
+            ? 'Opening cabinet'
+            : motion === 'descending'
+              ? 'Lowering claw'
+              : motion === 'gripping'
+                ? 'Closing claw'
+                : motion === 'lifting'
+                  ? 'Lifting claw'
+                  : motion === 'returning'
+                    ? 'Returning with prize'
+                    : motion === 'delivering'
+                      ? 'Delivering prize'
+                      : motion === 'slipping'
+                        ? 'Prize slipped'
+                        : 'Claw in motion'
           : canAfford
             ? `Play for ${cost.amount} ${currency?.name || 'tokens'}`
             : 'Not enough Fun Tokens'
+  const controlHint =
+    phase === 'x'
+      ? 'Release to lock your horizontal position.'
+      : phase === 'y'
+        ? 'Release to drop. Aim for the centre of a prize.'
+        : phase === 'resolving'
+          ? 'Watch the claw — every grip counts.'
+          : 'Hold right, then hold back. Release each time to lock your aim.'
 
   return (
     <div className="game-activity-chrome relative grid min-h-dvh grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden bg-game-canvas text-game-ink">
@@ -465,7 +514,13 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
         <div className="absolute inset-0 bg-game-canvas/70" />
       </div>
 
-      <header className="relative z-30 flex items-center justify-end gap-2 px-3 pb-1 pt-[max(0.5rem,env(safe-area-inset-top))] sm:px-5">
+      <header className="relative z-30 flex items-center justify-between gap-2 px-3 pb-1 pt-[max(0.5rem,env(safe-area-inset-top))] sm:px-5">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-game-muted">
+            Celadon Game Corner
+          </p>
+          <h1 className="text-lg font-extrabold text-game-ink">UFO Catcher</h1>
+        </div>
         <div className="flex items-center gap-2">
           <div className="flex min-h-10 items-center gap-2 rounded-full border border-game-border bg-game-surface-raised/95 px-3 font-mono text-xs font-bold text-game-ink shadow-sm backdrop-blur-sm">
             {currency ? (
@@ -504,7 +559,7 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
           aria-label="UFO Catcher cabinet"
           className="relative"
           style={{
-            width: 'min(96vw, 620px, calc((100dvh - 135px) * 1.3333333333))',
+            width: 'min(96vw, 720px, calc((100dvh - 265px) * 1.3333333333))',
             aspectRatio: '4 / 3',
           }}
         >
@@ -515,6 +570,9 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
             <MachineScrew className="bottom-1.5 right-1.5" />
 
             <div className="absolute inset-x-2 top-2 flex h-[13%] items-center justify-center rounded-t-md border border-[#d19a7b] bg-[#8a4739] shadow-inner">
+              <span className="mr-3 text-[clamp(10px,2vw,18px)] font-black tracking-[0.16em] text-game-cream">
+                UFO
+              </span>
               <div className="relative aspect-square h-[90%]">
                 <Image
                   src={getPokemonImageUrl('479', 'sprite')}
@@ -524,6 +582,9 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
                   className="object-contain drop-shadow-[0_3px_2px_rgba(62,28,24,0.45)] [image-rendering:pixelated]"
                 />
               </div>
+              <span className="ml-3 text-[clamp(10px,2vw,18px)] font-black tracking-[0.16em] text-game-cream">
+                CATCHER
+              </span>
             </div>
 
             <div className="absolute inset-x-2 bottom-[9%] top-[16%] overflow-hidden rounded-sm border border-[#c98267] bg-[#eadfc9] shadow-inner">
@@ -531,6 +592,7 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
               <div className="absolute inset-x-[4%] bottom-[4%] top-[8%] [clip-path:polygon(11%_0,89%_0,100%_100%,0_100%)] border border-[#b98567] bg-[#d3b995]" />
               <div className="absolute inset-x-[13%] top-[16%] h-px bg-[#b98567]" />
               <div className="absolute inset-x-[5%] bottom-[13%] h-px bg-[#c99f78]" />
+              <div className="pointer-events-none absolute inset-x-[5%] bottom-[4%] top-[27%] opacity-20 [background-image:linear-gradient(#8a4739_1px,transparent_1px),linear-gradient(90deg,#8a4739_1px,transparent_1px)] [background-size:12.5%_25%] [clip-path:polygon(7%_0,93%_0,100%_100%,0_100%)]" />
 
               <div className="absolute left-[6%] right-[6%] top-[7%] z-30 h-2 rounded-sm border border-[#7d4438] bg-[#b86148] shadow-md">
                 <div
@@ -724,6 +786,68 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
       </main>
 
       <footer className="relative z-30 mx-auto w-full max-w-[620px] px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
+        <div className="mb-2 rounded-lg border border-game-border bg-game-surface-raised px-3 py-2 shadow-sm">
+          <ol
+            className="grid grid-cols-3 gap-3"
+            aria-label="Claw positioning steps"
+          >
+            {(['x', 'y', 'resolving'] as const).map((step, index) => {
+              const active = Boolean(attempt) && phase === step
+              const complete =
+                Boolean(attempt) &&
+                (step === 'x'
+                  ? phase === 'y' || phase === 'resolving'
+                  : step === 'y' && phase === 'resolving')
+              const Icon = complete
+                ? Check
+                : step === 'x'
+                  ? ArrowRight
+                  : step === 'y'
+                    ? ArrowUp
+                    : ArrowDown
+              const progress =
+                step === 'x' ? xProgress : step === 'y' ? yProgress : 0
+              return (
+                <li
+                  key={step}
+                  aria-current={active ? 'step' : undefined}
+                  className={cn(
+                    'text-game-muted',
+                    active && 'text-game-moss',
+                    complete && 'text-game-ink',
+                  )}
+                >
+                  <span className="flex items-center gap-1 text-xs font-bold">
+                    <Icon className="size-3.5" />
+                    {index + 1}.{' '}
+                    {step === 'x'
+                      ? 'Move right'
+                      : step === 'y'
+                        ? 'Move back'
+                        : 'Drop'}
+                  </span>
+                  <span className="mt-1.5 block h-1 overflow-hidden rounded-full bg-game-border/50">
+                    <span
+                      className={cn(
+                        'block h-full bg-game-moss',
+                        step === 'resolving' && 'bg-game-ochre',
+                      )}
+                      style={{
+                        width: `${complete || (active && step === 'resolving') ? 100 : attempt ? progress * 100 : 0}%`,
+                      }}
+                    />
+                  </span>
+                </li>
+              )
+            })}
+          </ol>
+          <p
+            className="mt-2 text-center text-xs text-game-muted"
+            aria-live="polite"
+          >
+            {controlHint}
+          </p>
+        </div>
         <Button
           type="button"
           size="lg"
@@ -743,10 +867,15 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
           onPointerCancel={
             phase === 'x' || phase === 'y' ? handlePointerEnd : undefined
           }
+          onLostPointerCapture={handlePointerEnd}
+          onBlur={finishActiveHold}
           onContextMenu={(event) => event.preventDefault()}
           onKeyDown={phase === 'x' || phase === 'y' ? handleKeyDown : undefined}
           onKeyUp={phase === 'x' || phase === 'y' ? handleKeyUp : undefined}
-          className="min-h-14 w-full touch-none select-none text-base [-webkit-touch-callout:none]"
+          className={cn(
+            'min-h-14 w-full touch-none select-none border-b-4 border-[#7d4438] text-base shadow-sm transition-[transform,box-shadow] motion-reduce:transition-none [-webkit-touch-callout:none]',
+            holding && 'translate-y-0.5 border-b-2 shadow-inner',
+          )}
           aria-label={mainControlLabel}
         >
           {phase === 'resolving' ? (
@@ -758,6 +887,39 @@ export function UfoCatcherGame({ encounter }: UfoCatcherGameProps) {
           ) : null}
           {mainControlLabel}
         </Button>
+        <div className="mt-2 min-h-10 text-center" aria-live="polite">
+          {phase === 'idle' && lastResult ? (
+            <div className="flex items-center justify-center gap-2 text-sm">
+              {lastResult.prize && (
+                <PrizeSprite
+                  icon={lastResult.prize.icon}
+                  label={lastResult.prize.label}
+                  className="size-9 shrink-0"
+                />
+              )}
+              <div className="text-left">
+                <p className="font-bold">
+                  {lastResult.outcome === 'caught'
+                    ? `${lastResult.prize?.label ?? 'Prize'} caught!`
+                    : lastResult.outcome === 'slip'
+                      ? 'In the claw, then slipped free'
+                      : 'The claw came up empty'}
+                </p>
+                <p className="text-xs text-game-muted">
+                  {lastResult.outcome === 'caught'
+                    ? 'Added to your collection.'
+                    : lastResult.outcome === 'slip'
+                      ? 'A centred grip helps, but every prize can slip.'
+                      : 'Line up the floor crosshair with the centre of a prize.'}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <p className="pt-1 text-xs text-game-muted">
+              Touch and hold · or hold Space / Enter on the button
+            </p>
+          )}
+        </div>
       </footer>
 
       <AlertDialog open={exitPromptOpen} onOpenChange={setExitPromptOpen}>

@@ -65,6 +65,11 @@ using the [deployment guide](/docs/development/deployment.md).
 
 ## Isolated browser and security integration
 
+`e2e/ufo-catcher.pw.ts` exercises the real UFO cabinet at mobile and desktop
+widths using a deterministic local transport. It checks cabinet/control bounds,
+keyboard focus-loss release, pointer release outside the control, and persistent
+miss feedback. Run it with `bun run test:e2e e2e/ufo-catcher.pw.ts`.
+
 Start disposable services with `docker compose -p pokeori-audit-test -f compose.test.yml up -d --wait`.
 Initialize Mongo once with `docker compose -p pokeori-audit-test -f compose.test.yml exec -T mongo mongosh --quiet --eval 'rs.initiate({_id:"audit-rs",members:[{_id:0,host:"localhost:27017"}]})'`.
 Run `bunx playwright install chromium`, `bun run test:security:integration`, and
