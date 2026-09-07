@@ -853,6 +853,19 @@ export function useBattleManager(initialState: BattleState) {
                     continue
                   }
 
+                  if (presentationEvent.type === 'boost') {
+                    const boostKey =
+                      presentationEvent.side === 'player'
+                        ? 'playerBoosting'
+                        : 'enemyBoosting'
+                    revealMessage(presentationEvent.message)
+                    setAnim((prev) => ({ ...prev, [boostKey]: true }))
+                    await delay(900)
+                    if (shouldStop()) break
+                    setAnim((prev) => ({ ...prev, [boostKey]: false }))
+                    continue
+                  }
+
                   if (presentationEvent.type === 'attack') {
                     if (
                       presentationEvent.simultaneousGroup &&

@@ -14,6 +14,23 @@ export const SHOUT_BOOSTED_STATS: readonly BattleCoreStat[] = [
   'speed',
 ]
 
+export const BATTLE_SHOUT_MESSAGES = [
+  'Hey {Pokemon}, you can do this!',
+  "You've got this, {Pokemon}! Show them your strength!",
+  'Stand tall, {Pokemon}! Your next move can change everything!',
+  "That's it, {Pokemon}! Let your courage roar!",
+  "Together, {Pokemon}, we'll turn this battle around!",
+] as const
+
+export function getBattleShoutMessage(
+  pokemonName: string,
+  random: () => number = Math.random,
+): string {
+  const roll = Math.max(0, Math.min(0.999999, random()))
+  const template = BATTLE_SHOUT_MESSAGES[Math.floor(roll * BATTLE_SHOUT_MESSAGES.length)]
+  return template.replace('{Pokemon}', pokemonName)
+}
+
 function cloneShoutBoost(
   boost: BattlePokemon['shoutBoost'],
 ): BattlePokemon['shoutBoost'] {

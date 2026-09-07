@@ -355,6 +355,22 @@ function buildPresentation(
       continue
     }
 
+    if (/unleashes a Battle Shout!/i.test(line)) {
+      events.push({
+        type: 'boost',
+        side: 'player',
+        pokemonIndex: latestPresentedActiveIndex(
+          events,
+          'player',
+          originalActive.player,
+        ),
+        kind: 'shout',
+        message: line,
+      })
+      events.push({ type: 'message', message: line })
+      continue
+    }
+
     if (appendSwitchEventFromLine(line)) continue
 
     const stanceMatch = line.match(/\[icon:stance:([^\]]+)\]/i)

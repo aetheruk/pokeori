@@ -11,6 +11,44 @@ import { flipPvpState } from '@/app/(frontend)/game/battles/pvp/state-utils'
 import { makePvpBattleState } from './helpers/battle-fixtures'
 
 describe('battle presentation timeline', () => {
+  test('authors a boost event for Battle Shout encouragement', () => {
+    const state = makePvpBattleState()
+    beginBattlePresentation(state)
+    state.playerTeam[0].shoutBoost = {
+      turnsRemaining: 3,
+      activatedTurn: 1,
+      appliedStages: { attack: 1, defense: 1 },
+    }
+    state.history.unshift({
+      turn: 1,
+      playerStance: 'tech',
+      enemyStance: 'tech',
+      result: 'tie',
+      damageDealt: 0,
+      damageTaken: 0,
+      message:
+        'P1 Mon unleashes a Battle Shout! Hey P1 Mon, you can do this!',
+    })
+
+    finalizeBattlePresentation(state)
+
+    expect(state.presentation?.events).toEqual([
+      {
+        type: 'boost',
+        side: 'player',
+        pokemonIndex: 0,
+        kind: 'shout',
+        message:
+          'P1 Mon unleashes a Battle Shout! Hey P1 Mon, you can do this!',
+      },
+      {
+        type: 'message',
+        message:
+          'P1 Mon unleashes a Battle Shout! Hey P1 Mon, you can do this!',
+      },
+    ])
+  })
+
   test('authors attacks and residual HP changes in server resolution order', () => {
     const state = makePvpBattleState()
     beginBattlePresentation(state)

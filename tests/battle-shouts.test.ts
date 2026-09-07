@@ -1,14 +1,26 @@
 import { describe, expect, test } from 'bun:test'
 import { clearPokemonSecondaryStatuses } from '@/utilities/battle/secondary-statuses'
 import {
+  BATTLE_SHOUT_MESSAGES,
   advanceShoutStatBoostForTurn,
   applyShoutStatBoost,
   clearShoutStatBoost,
+  getBattleShoutMessage,
   removeShoutBoostFromStatStages,
 } from '@/utilities/battle/shout-effects'
 import { makeBattlePokemon } from './helpers/battle-fixtures'
 
 describe('Battle Shout stat effects', () => {
+  test('uses the five authored encouragement messages', () => {
+    expect(BATTLE_SHOUT_MESSAGES).toHaveLength(5)
+    expect(getBattleShoutMessage('Pikachu', () => 0)).toBe(
+      'Hey Pikachu, you can do this!',
+    )
+    expect(getBattleShoutMessage('Pikachu', () => 0.999)).toBe(
+      "Together, Pikachu, we'll turn this battle around!",
+    )
+  })
+
   test('raises the five core battle stats without touching crit, accuracy, or evasion', () => {
     const pokemon = makeBattlePokemon({
       statStages: {

@@ -18,7 +18,10 @@ import {
 } from '@/utilities/skills/unlocks'
 import { getUserInventoryMap } from '@/utilities/user-state'
 import { runBattleActionWithGuard } from '../helpers/action-guard'
-import { applyShoutStatBoost } from '@/utilities/battle/shout-effects'
+import {
+  applyShoutStatBoost,
+  getBattleShoutMessage,
+} from '@/utilities/battle/shout-effects'
 
 /**
  * Activate Battle Shout. The activation consumes the player's action and the
@@ -118,7 +121,8 @@ export async function useShout(
       },
     })
 
-    const message = `${playerMon.name} unleashes a Battle Shout! ${boost.message} The effect lasts for ${SHOUT_DURATION} turns.`
+    const encouragement = getBattleShoutMessage(playerMon.name)
+    const message = `${playerMon.name} unleashes a Battle Shout! ${encouragement} ${boost.message} The effect lasts for ${SHOUT_DURATION} turns.`
     const { processEnemyAttackOnly } = await import('../pve/enemy-attack')
     await processEnemyAttackOnly(
       state,

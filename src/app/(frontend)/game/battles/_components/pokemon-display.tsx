@@ -9,6 +9,7 @@ interface PokemonDisplayProps {
   isPlayer?: boolean
   isAttacking?: boolean
   isHit?: boolean
+  isBoosting?: boolean
   isFainting?: boolean
   isSwitchingOut?: boolean
   isSwitchingIn?: boolean
@@ -62,6 +63,7 @@ export function PokemonDisplay({
   isPlayer,
   isAttacking,
   isHit,
+  isBoosting,
   isFainting,
   isSwitchingOut,
   isSwitchingIn,
@@ -95,6 +97,7 @@ export function PokemonDisplay({
         isAttacking &&
           (isPlayer ? 'translate-x-12 -translate-y-12' : '-translate-x-12 translate-y-12'),
         isHit && 'animate-shake opacity-80 grayscale-[0.5]',
+        isBoosting && 'z-20',
         isFainting &&
           'translate-y-20 opacity-0 grayscale transition-all duration-1000 ease-in',
         isSwitchingOut &&
@@ -113,6 +116,14 @@ export function PokemonDisplay({
         <div className="absolute inset-0 rounded-full bg-game-ochre/20 animate-ping" />
       )}
 
+      {isBoosting && (
+        <div className="battle-boost-aura" aria-hidden="true">
+          <span className="battle-boost-spark battle-boost-spark--one" />
+          <span className="battle-boost-spark battle-boost-spark--two" />
+          <span className="battle-boost-spark battle-boost-spark--three" />
+        </div>
+      )}
+
       <PokemonRaritySprite
         key={formId} // Force re-render when formId changes
         formId={formId}
@@ -124,7 +135,10 @@ export function PokemonDisplay({
         female={gender === 'female'}
         alt="Pokemon"
         className="!absolute inset-0"
-        imageClassName="drop-shadow-xl"
+        imageClassName={cn(
+          'drop-shadow-xl',
+          isBoosting && 'battle-boost-sprite',
+        )}
       />
 
       <TypeAttackEffect type={attackEffectType} />
