@@ -15,7 +15,11 @@ test('a saved result schedules an update, and a new game cancels that countdown'
     else await route.continue()
   })
   await page.clock.install()
-  await page.evaluate(() => window.history.pushState({}, '', '/game/games/ui-test'))
+  await page.evaluate(() => {
+    window.history.pushState({}, '', '/game/games/ui-test')
+    window.dispatchEvent(new PopStateEvent('popstate'))
+  })
+  await expect(page).toHaveURL(/\/game\/games\/ui-test$/)
   await expect.poll(() => versionChecks).toBeGreaterThan(1)
   const versionChecksBeforeUpdate = versionChecks
   newer = true
