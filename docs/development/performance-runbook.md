@@ -1,23 +1,20 @@
 # Production Performance Runbook
 
-This is the production baseline for the single Hetzner CX33 running Pokeori,
+This is the production baseline for the single Intel N150 host running Pokeori,
 MongoDB, and Dragonfly through Coolify.
 
-## Coolify and CX33
+## Coolify and N150
 
 - Run one Pokeori replica. In-process Next.js state is not required for
   correctness, but a second replica on the same host adds memory pressure
   without adding host redundancy.
-- Configure Pokeori as an Application from the GHCR image. Do not publish a
+- Configure Pokeori as a public Git repository Application using the root Dockerfile and automatic deployment from `main`. Do not publish a
   host port; route only through Coolify's proxy.
-- Build the `linux/amd64` image on the release machine and push it to GHCR;
-  Coolify should pull the verified image rather than compile on the CX33.
-- Use `/api/health` as the health endpoint with a 30 second interval, 3 second
-  timeout, 20 second start period, and 3 retries. The image includes the same
+- Coolify builds natively on the N150. Preserve BuildKit caches and run one build at a time; see the [deployment guide](/docs/development/deployment.md).
+- Use `/api/health` as the health endpoint with a 30 second interval, 10 second
+  timeout, 60 second start period, and 3 retries. The image includes the same
   health check.
-- Starting resource envelope: Pokeori 2 vCPU / 3 GiB, MongoDB 1.5 vCPU / 3 GiB,
-  Dragonfly 0.5 vCPU / 512 MiB. Leave at least 1.5 GiB for the OS, Docker, and
-  Coolify. Treat these as ceilings, then tune from observed 95th-percentile use.
+- Size resource limits from the host's installed RAM and observed peak use. Leave headroom for the OS, Coolify, the compiler, and briefly overlapping app containers during rollout. Do not allocate all four cores or all memory to steady-state services.
 - Keep Dragonfly eviction disabled because battle, encounter, action-lock, and
   idempotency keys are correctness state. Alert before it approaches its memory
   limit.
@@ -116,10 +113,9 @@ releases. Verify a second request with `curl -I` shows the intended
 
 ## Release and smoke checks
 
-`bun run deploy:production` validates the repository, builds a local
-`linux/amd64` candidate, rejects an image over 350 MiB, starts that exact
-candidate, verifies `/api/app-version`, pushes immutable tags, and only then
-calls Coolify.
+Run the release checklist before merging. Coolify builds and deploys from
+protected `main` automatically. Inspect its build logs and deployed commit,
+then verify the running image; see the [deployment guide](/docs/development/deployment.md).
 
 After rollout:
 

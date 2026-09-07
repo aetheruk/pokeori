@@ -45,6 +45,14 @@ Use targeted tests when possible, then run `typecheck` and `lint` for cross-file
 - Treat the package version as the client release identifier. Do not ship a change without changing it, including hotfixes and content-only releases.
 - Confirm the PWA update check can read the deployed version from `/api/app-version`; an open client must reload when it detects a newer version.
 
+## Deployment
+
+- Coolify automatically builds the root `Dockerfile` from the public repository's protected `main` branch and deploys it on the N150 host after a merge.
+- Run validation before merging. A local production/package build, registry publish, and manual deploy webhook are not release steps.
+- Preserve Docker layer, Bun download, and Next compiler caches on the Coolify host; do not prune them before routine deployments.
+- Keep Dockerfile syntax compatible with Coolify's secret environment mounts (1.10+; the file tracks stable `:1`). Configure the stable `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` for both build and runtime in Coolify.
+- Follow `docs/development/deployment.md` for settings, health checks, and rollback. A merge to `main` is the production trigger; do not merge solely to test deployment configuration.
+
 ## Runtime State Patterns
 
 - Research encounters use Redis state under `research:${user.id}` from `src/app/(frontend)/game/research/actions.ts`.

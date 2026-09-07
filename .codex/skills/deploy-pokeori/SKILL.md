@@ -1,43 +1,27 @@
 ---
 name: deploy-pokeori
-description: Build, publish, and verify Pokeori production releases from the local release machine through GHCR and Coolify. Use when preparing a release PR, deploying a merged Pokeori feature, checking local deployment prerequisites, rolling back a container image, or changing this repository's deployment workflow.
+description: Prepare and verify Pokeori releases automatically built from public main by Coolify on the N150 host. Use for release PRs, Dockerfile deployment troubleshooting, rollout verification, rollback, and deployment workflow changes.
 ---
 
 # Deploy Pokeori
 
-The release boundary is a pull request merged to protected `main`. Never deploy an unmerged branch or bypass GitHub branch protection.
+Coolify builds the root Dockerfile from the public repository's protected `main` branch and deploys automatically after a merge. A local production build, package publish, and manual webhook are not release steps.
 
 ## Release workflow
 
-1. Confirm the checkout is clean. The deploy command prompts before switching to `main` and fast-forwarding it to `origin/main` when needed.
-2. Apply the `release-versioning` skill: increment `package.json` before the release PR and preserve the `/api/app-version` PWA-refresh check.
-3. Confirm Docker Desktop with Buildx, Bun 1.3.10+, Git, and curl are available on the release machine.
-4. Before building, reclaim Docker disk space on the release machine: run `docker builder prune -af` and `docker system prune -af` (do not use `--volumes`; local volumes may hold dev data). A host disk that is nearly full stops the Docker engine mid-deploy with `no space left on device` in `com.docker.backend.log`, so keep several GB free before starting.
-5. Authenticate the GitHub CLI with package-write permission. Store the Coolify webhook and token locally as `COOLIFY_WEBHOOK_URI` and `COOLIFY_WEBHOOK_TOKEN` in ignored `.env`, or export the canonical `COOLIFY_WEBHOOK` and `COOLIFY_TOKEN` names. Never commit them or add them to GitHub Actions secrets.
-6. Run `bun run deploy:production`. It validates the project, builds a `linux/amd64` image, reuses local and GHCR BuildKit caches, pushes `latest`, `v<package-version>`, and immutable `sha-<commit>` tags to GHCR, then triggers Coolify only after a successful push.
-7. Verify Coolify health, critical gameplay flows, `/api/app-version`, and a refresh of an already-open PWA session.
+1. Inspect the worktree and release diff; preserve unrelated changes.
+2. Apply `release-versioning`: increment `package.json` before the release PR and preserve the `/api/app-version` PWA refresh check.
+3. Run the relevant tests and pre-merge checks in `docs/development/release-checklist.md`. The Docker build skips typechecking, so run it before merging.
+4. When the user has authorized shipping, merge the reviewed PR through the protected-main workflow. This triggers production deployment; do not merge just to test configuration.
+5. Inspect Coolify's build/deployment result and verify the deployed commit, `/api/health`, `/api/app-version`, critical gameplay, and an already-open PWA refresh. If deployment access is unavailable, report verification as pending.
 
-## Release-machine execution
+## Dockerfile and host constraints
 
-Run release operations with host access, outside the restricted sandbox (or with
-an equivalent escalated execution context). The sandbox cannot reliably access
-the Git metadata needed by `git fetch`/`git push`, GitHub CLI credentials and
-network services, or the Docker Desktop socket. This applies to `gh auth
-status`, GitHub PR/push commands, `docker version`/Buildx, and
-`bun run deploy:production`. A sandbox permission error for one of these tools
-is an environment limitation, not evidence that the release-machine setup is
-missing.
+- Keep the Dockerfile frontend on stable `:1` (at least 1.10); Coolify injects secret mounts with `env=`.
+- Enable Docker Build Secrets. The stable `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` must be available during build and runtime. Never replace it with a public placeholder or print it. Next embeds this key in server build output, so keep images private.
+- Prefer runtime-only settings for database, Redis, Payload, and email credentials. Build placeholders allow compilation without connecting to production services.
+- Preserve Docker layers and the Bun/Next cache mounts on the Coolify host. Avoid routine cache pruning and no-cache builds; they make N150 deployments slower.
+- Keep one application replica and leave build-time CPU/memory headroom for the running app and databases. Tune from measured timings and memory, not assumed speedups.
+- Preserve main branch protection and require PRs; no force pushes or direct-push exceptions.
 
-Never print `.env` or credential values while checking prerequisites. Inspect
-only whether required variables are present, and rotate any credential that is
-accidentally exposed in command output.
-
-## Guardrails
-
-- Preserve GitHub protection for `main`: pull requests, admin enforcement, no force pushes/deletions, and resolved conversations.
-- Do not restore GitHub Actions for builds or deploys; the release machine is the build executor.
-- Do not tag an image from a dirty checkout or a commit that differs from `origin/main`.
-- Roll back in Coolify by selecting a known-good immutable `sha-` or `v` tag. Do not rewrite `latest` to conceal a rollback.
-- Keep the release machine's disk clear: prune Docker images and build cache before deploys so the engine never stops from a full host disk. If the engine does stop with `no space left on device`, free host space (regenerable app caches are a safe first target), restart Docker Desktop, then re-run the prune before deploying.
-
-See `docs/development/local-ghcr-coolify.md` for setup, credential scopes, exact commands, and recovery details.
+Use `docs/development/deployment.md` for the exact Coolify settings and recovery procedure. Roll back through Coolify's retained successful deployment when available, then reconcile main with a revert PR and a new package version.

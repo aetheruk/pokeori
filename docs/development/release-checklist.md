@@ -6,7 +6,7 @@ changes.
 ## Security
 - Rotate any credentials that have ever appeared in `.env` or logs.
 - Confirm production has `DATABASE_URI`, `PAYLOAD_SECRET`, and `RESEND_API_KEY`.
-- Confirm the release machine has the stable `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`.
+- Confirm Coolify has the same stable `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` enabled for build and runtime, with Docker Build Secrets enabled.
 - Confirm `.env` is ignored and no real secrets are committed.
 - Confirm `/dev` routes are inaccessible to non-admin users.
 - Confirm sensitive routes/actions are rate-limited or queued.
@@ -40,6 +40,7 @@ changes.
 - Confirm Redis is reachable and TLS settings match the deployment environment.
 - Confirm `/api/health` checks MongoDB, replica-set transaction support, and Dragonfly, and Coolify reports one healthy application replica.
 - Deploy to staging first when available.
+- Merge the validated release PR to protected `main`; Coolify automatically builds the Dockerfile and deploys. No local production build or publish step is required. Preserve the host's build caches.
 - Check server logs for request IDs on API failures.
 - Verify login, Explore, Pokemon box, one battle, one location encounter, one Mini Game, and one Field Research study.
 - With an already-open PWA session, confirm it detects the new `/api/app-version` response and reloads to the latest client bundle.
