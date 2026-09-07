@@ -6,15 +6,7 @@ import {
   hasPendingPaidAction,
 } from '@/utilities/games/pending-paid-action'
 
-import {
-  ArrowDown,
-  ArrowRight,
-  ArrowUp,
-  Check,
-  Coins,
-  DoorOpen,
-  Loader2,
-} from 'lucide-react'
+import { ArrowRight, ArrowUp, Coins, DoorOpen, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import {
@@ -492,14 +484,6 @@ export function UfoCatcherGame({
           : canAfford
             ? `Play for ${cost.amount} ${currency?.name || 'tokens'}`
             : 'Not enough Fun Tokens'
-  const controlHint =
-    phase === 'x'
-      ? 'Release to lock your horizontal position.'
-      : phase === 'y'
-        ? 'Release to drop. Aim for the centre of a prize.'
-        : phase === 'resolving'
-          ? 'Watch the claw — every grip counts.'
-          : 'Hold right, then hold back. Release each time to lock your aim.'
 
   return (
     <div className="game-activity-chrome relative grid min-h-dvh grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden bg-game-canvas text-game-ink">
@@ -514,13 +498,7 @@ export function UfoCatcherGame({
         <div className="absolute inset-0 bg-game-canvas/70" />
       </div>
 
-      <header className="relative z-30 flex items-center justify-between gap-2 px-3 pb-1 pt-[max(0.5rem,env(safe-area-inset-top))] sm:px-5">
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-game-muted">
-            Celadon Game Corner
-          </p>
-          <h1 className="text-lg font-extrabold text-game-ink">UFO Catcher</h1>
-        </div>
+      <header className="relative z-30 flex items-center justify-end gap-2 px-3 pb-1 pt-[max(0.5rem,env(safe-area-inset-top))] sm:px-5">
         <div className="flex items-center gap-2">
           <div className="flex min-h-10 items-center gap-2 rounded-full border border-game-border bg-game-surface-raised/95 px-3 font-mono text-xs font-bold text-game-ink shadow-sm backdrop-blur-sm">
             {currency ? (
@@ -559,7 +537,7 @@ export function UfoCatcherGame({
           aria-label="UFO Catcher cabinet"
           className="relative"
           style={{
-            width: 'min(96vw, 720px, calc((100dvh - 265px) * 1.3333333333))',
+            width: `min(96vw, 620px, calc((100dvh - ${phase === 'idle' && lastResult ? 195 : 135}px) * 1.3333333333))`,
             aspectRatio: '4 / 3',
           }}
         >
@@ -592,7 +570,6 @@ export function UfoCatcherGame({
               <div className="absolute inset-x-[4%] bottom-[4%] top-[8%] [clip-path:polygon(11%_0,89%_0,100%_100%,0_100%)] border border-[#b98567] bg-[#d3b995]" />
               <div className="absolute inset-x-[13%] top-[16%] h-px bg-[#b98567]" />
               <div className="absolute inset-x-[5%] bottom-[13%] h-px bg-[#c99f78]" />
-              <div className="pointer-events-none absolute inset-x-[5%] bottom-[4%] top-[27%] opacity-20 [background-image:linear-gradient(#8a4739_1px,transparent_1px),linear-gradient(90deg,#8a4739_1px,transparent_1px)] [background-size:12.5%_25%] [clip-path:polygon(7%_0,93%_0,100%_100%,0_100%)]" />
 
               <div className="absolute left-[6%] right-[6%] top-[7%] z-30 h-2 rounded-sm border border-[#7d4438] bg-[#b86148] shadow-md">
                 <div
@@ -786,67 +763,34 @@ export function UfoCatcherGame({
       </main>
 
       <footer className="relative z-30 mx-auto w-full max-w-[620px] px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
-        <div className="mb-2 rounded-lg border border-game-border bg-game-surface-raised px-3 py-2 shadow-sm">
-          <ol
-            className="grid grid-cols-3 gap-3"
-            aria-label="Claw positioning steps"
-          >
-            {(['x', 'y', 'resolving'] as const).map((step, index) => {
-              const active = Boolean(attempt) && phase === step
-              const complete =
-                Boolean(attempt) &&
-                (step === 'x'
-                  ? phase === 'y' || phase === 'resolving'
-                  : step === 'y' && phase === 'resolving')
-              const Icon = complete
-                ? Check
-                : step === 'x'
-                  ? ArrowRight
-                  : step === 'y'
-                    ? ArrowUp
-                    : ArrowDown
-              const progress =
-                step === 'x' ? xProgress : step === 'y' ? yProgress : 0
-              return (
-                <li
-                  key={step}
-                  aria-current={active ? 'step' : undefined}
-                  className={cn(
-                    'text-game-muted',
-                    active && 'text-game-moss',
-                    complete && 'text-game-ink',
-                  )}
-                >
-                  <span className="flex items-center gap-1 text-xs font-bold">
-                    <Icon className="size-3.5" />
-                    {index + 1}.{' '}
-                    {step === 'x'
-                      ? 'Move right'
-                      : step === 'y'
-                        ? 'Move back'
-                        : 'Drop'}
-                  </span>
-                  <span className="mt-1.5 block h-1 overflow-hidden rounded-full bg-game-border/50">
-                    <span
-                      className={cn(
-                        'block h-full bg-game-moss',
-                        step === 'resolving' && 'bg-game-ochre',
-                      )}
-                      style={{
-                        width: `${complete || (active && step === 'resolving') ? 100 : attempt ? progress * 100 : 0}%`,
-                      }}
-                    />
-                  </span>
-                </li>
-              )
-            })}
-          </ol>
-          <p
-            className="mt-2 text-center text-xs text-game-muted"
-            aria-live="polite"
-          >
-            {controlHint}
-          </p>
+        <div className="mb-3 text-center" aria-live="polite">
+          {phase === 'idle' && lastResult && (
+            <div className="flex items-center justify-center gap-2 text-sm">
+              {lastResult.prize && (
+                <PrizeSprite
+                  icon={lastResult.prize.icon}
+                  label={lastResult.prize.label}
+                  className="size-9 shrink-0"
+                />
+              )}
+              <div className="text-left">
+                <p className="font-bold">
+                  {lastResult.outcome === 'caught'
+                    ? `${lastResult.prize?.label ?? 'Prize'} caught!`
+                    : lastResult.outcome === 'slip'
+                      ? 'In the claw, then slipped free'
+                      : 'The claw came up empty'}
+                </p>
+                <p className="text-xs text-game-muted">
+                  {lastResult.outcome === 'caught'
+                    ? 'Added to your collection.'
+                    : lastResult.outcome === 'slip'
+                      ? 'A centred grip helps, but every prize can slip.'
+                      : 'Line up the floor crosshair with the centre of a prize.'}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
         <Button
           type="button"
@@ -887,39 +831,6 @@ export function UfoCatcherGame({
           ) : null}
           {mainControlLabel}
         </Button>
-        <div className="mt-2 min-h-10 text-center" aria-live="polite">
-          {phase === 'idle' && lastResult ? (
-            <div className="flex items-center justify-center gap-2 text-sm">
-              {lastResult.prize && (
-                <PrizeSprite
-                  icon={lastResult.prize.icon}
-                  label={lastResult.prize.label}
-                  className="size-9 shrink-0"
-                />
-              )}
-              <div className="text-left">
-                <p className="font-bold">
-                  {lastResult.outcome === 'caught'
-                    ? `${lastResult.prize?.label ?? 'Prize'} caught!`
-                    : lastResult.outcome === 'slip'
-                      ? 'In the claw, then slipped free'
-                      : 'The claw came up empty'}
-                </p>
-                <p className="text-xs text-game-muted">
-                  {lastResult.outcome === 'caught'
-                    ? 'Added to your collection.'
-                    : lastResult.outcome === 'slip'
-                      ? 'A centred grip helps, but every prize can slip.'
-                      : 'Line up the floor crosshair with the centre of a prize.'}
-                </p>
-              </div>
-            </div>
-          ) : (
-            <p className="pt-1 text-xs text-game-muted">
-              Touch and hold · or hold Space / Enter on the button
-            </p>
-          )}
-        </div>
       </footer>
 
       <AlertDialog open={exitPromptOpen} onOpenChange={setExitPromptOpen}>
