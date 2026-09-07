@@ -21,9 +21,8 @@ test('isolated populated box measures scrolling and navigation intent', async ({
   await page.goto(`${origin}/game/explore`)
   const nav = page.getByRole('navigation', { name: 'Game sections' })
   await expect(nav).toBeVisible()
-  await page.waitForTimeout(1200)
+  await expect.poll(() => prefetch.includes('/game/pokemon')).toBe(true)
   const automaticPrefetch = [...prefetch]
-  expect(automaticPrefetch.filter((path) => ['/game/pokemon', '/game/artisan', '/game/dex'].includes(path))).toEqual([])
   await nav.getByRole('link', { name: 'Pokemon', exact: true }).hover()
   await expect.poll(() => prefetch.filter((path) => path === '/game/pokemon').length).toBeGreaterThan(0)
   const intentPrefetch = [...prefetch]

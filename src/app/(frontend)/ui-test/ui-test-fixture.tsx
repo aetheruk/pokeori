@@ -5,6 +5,7 @@ import { SWRConfig } from 'swr'
 import { ArtAcademyGame } from '@/app/(frontend)/game/research/encounter/art-academy'
 import { PvpQueueModal } from '@/app/(frontend)/game/battles/pvp/pvp-queue-modal'
 import { AudioProvider } from '@/context/AudioContext'
+import { GameNavigation } from '@/components/game/game-navigation'
 import { UserProvider } from '@/context/UserContext'
 import type { RequirementData } from '@/utilities/requirements'
 import { encodeArtAcademyCells } from '@/utilities/research/art-academy'
@@ -32,6 +33,7 @@ export function UiTestFixture() {
   const [sync, setSync] = useState(false)
   const [snake, setSnake] = useState(false)
   const [inspector, setInspector] = useState(false)
+  const [navigation, setNavigation] = useState(false)
   const [status, setStatus] = useState('Ready')
   const artState = useMemo(() => ({ expiry: Date.now() + 3600000, roundData: { artAcademy: {
     spriteUrl: '/sprites/pokemon/home/normal/1.avif', palette: ['#293532', '#b86148'], referenceCells: encodeArtAcademyCells(new Uint8Array(1024)), scoreGridSize: 32, guideGridSize: 3,
@@ -60,6 +62,7 @@ export function UiTestFixture() {
       <Button onClick={() => setSync(true)}>Test scoped sync</Button>
       <Button onClick={() => setSnake(true)}>Test Onix joystick</Button>
       <Button onClick={() => setInspector(true)}>Test Pokemon inspector</Button>
+      <Button onClick={() => setNavigation(true)}>Test game navigation</Button>
       <Button onClick={() => {
         let attempts = 0
         setStatus('Waiting for result')
@@ -75,6 +78,7 @@ export function UiTestFixture() {
     </AudioProvider></UserProvider></SWRConfig> : <AuthForm />}
     <PvpQueueModal open={queue} onOpenChange={setQueue} configId="ui-test" userId="ui-test" actions={pvpActions} />
     <GameActionRecovery />
+    {navigation && <SWRConfig value={{ isPaused: () => true }}><UserProvider initialGameData={{ user: { id: 'ui-test', trainerName: 'Test trainer' }, inventory: [], pokemon: [] } as unknown as RequirementData}><AudioProvider><GameNavigation /></AudioProvider></UserProvider></SWRConfig>}
     {capture && <CaptureFixture />}
     {sync && <SyncFixture />}
     {snake && <SnakeFixture />}
