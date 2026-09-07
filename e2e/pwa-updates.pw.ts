@@ -2,7 +2,9 @@ import { expect, test } from '@playwright/test'
 
 test('a saved result schedules an update, and a new game cancels that countdown', async ({ page }) => {
   let newer = false
+  let versionChecks = 0
   await page.route('**/api/app-version', async (route) => {
+    versionChecks += 1
     if (newer) await route.fulfill({ json: { version: '99.0.1-ui-test' } })
     else await route.continue()
   })
@@ -13,6 +15,7 @@ test('a saved result schedules an update, and a new game cancels that countdown'
   })
   await page.clock.install()
   await page.evaluate(() => window.history.pushState({}, '', '/game/games/ui-test'))
+  await expect.poll(() => versionChecks).toBeGreaterThan(1)
   newer = true
   await page.evaluate(() => window.dispatchEvent(new Event('focus')))
   await expect(page.getByRole('status').filter({ hasText: 'Update ready.' })).toBeVisible()
@@ -30,24 +33,27 @@ test('a saved result schedules an update, and a new game cancels that countdown'
 })
 
 test('a delayed version response from a safe route cannot reload a newly entered game', async ({ page }) => {
-  await page.goto('/ui-test')
   let release: (() => void) | undefined
   let started: (() => void) | undefined
   const seen = new Promise<void>((resolve) => { started = resolve })
   const held = new Promise<void>((resolve) => { release = resolve })
-  let first = true
+  let holdNextVersionCheck = false
   await page.route('**/api/app-version', async (route) => {
-    if (first) {
-      first = false
-      started?.()
-      await held
+    if (!holdNextVersionCheck) {
+      await route.continue()
+      return
     }
+    holdNextVersionCheck = false
+    started?.()
+    await held
     await route.fulfill({ json: { version: '99.0.2-ui-test' } }).catch(() => {})
   })
+  await page.goto('/ui-test')
+  holdNextVersionCheck = true
   await page.evaluate(() => window.dispatchEvent(new Event('focus')))
   await seen
   await page.evaluate(() => window.history.pushState({}, '', '/game/games/ui-test'))
   release?.()
-  await expect(page.getByRole('status').filter({ hasText: 'Update ready.' })).toBeVisible()
+  await expect(page).toHaveURL(/\/game\/games\/ui-test$/)
   await expect(page.getByRole('button', { name: 'Test dropped result' })).toBeVisible()
 })
