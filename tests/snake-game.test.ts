@@ -295,14 +295,14 @@ describe('Onix Snake test entry and scene', () => {
     expect(source).toContain('bg-game-ochre/20')
     expect(source).toContain('motion-safe:animate-ping')
     expect(source).toContain('h-[72%] w-[72%]')
-    expect(source).toContain('pointerTargetRef.current')
+    expect(source).toContain('<SnakeJoystick')
     expect(source).toContain('settings.sprites.food')
-    expect(source).toContain('getSnakePointerHeading(')
+    expect(source).not.toContain('steerTowardPointer')
     expect(source).toContain('bg-game-surface-raised/95')
     expect(source).toContain('settings.rewardRadius * 2')
     expect(source).toContain('aspectRatio:')
-    expect(source).toContain('runtimePlayfieldRef.current.width')
-    expect(source).toContain('settings.headRadius * 2.75')
+    expect(source).toContain('runtimePlayfield.width')
+    expect(source).toContain('<GameTimer timeLeft={countdown}')
     expect(source).toContain("useArcadeSession('snake'")
 
     const foodMarkup =
@@ -315,24 +315,17 @@ describe('Onix Snake test entry and scene', () => {
     expect(rewardMarkup).toContain('motion-safe:animate-ping')
   })
 
-  test('releases pointer steering without retaining an orbit target', async () => {
+  test('restricts pointer steering to the circular joystick and releases capture', async () => {
     const source = await Bun.file(
       new URL(
-        '../src/app/(frontend)/game/research/encounter/snake.tsx',
+        '../src/app/(frontend)/game/research/encounter/snake-joystick.tsx',
         import.meta.url,
       ),
     ).text()
-    const releaseHandler =
-      source
-        .split('const clearPointerSteering = ')[1]
-        ?.split('\n\n  useEffect')[0] ?? ''
-
-    expect(releaseHandler).toContain('pointerTargetRef.current = null')
-    expect(releaseHandler).toContain(
-      'targetHeadingRef.current = headingRef.current',
-    )
-    expect(releaseHandler).toContain('releasePointerCapture(event.pointerId)')
-    expect(source).toContain('onPointerUp={clearPointerSteering}')
-    expect(source).toContain('onPointerCancel={clearPointerSteering}')
+    expect(source).toContain('Math.atan2(y, x)')
+    expect(source).toContain('length < 0.18')
+    expect(source).toContain('releasePointerCapture(event.pointerId)')
+    expect(source).toContain('onPointerCancel={release}')
+    expect(source).toContain('onLostPointerCapture={release}')
   })
 })
