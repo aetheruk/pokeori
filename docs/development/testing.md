@@ -21,6 +21,7 @@ schema validation tests.
 - Use Playwright (already has Playwright config in root)
 
 ## Current Coverage
+- Navigation feedback holds a cold route response and checks keyboard activation, stable link geometry, and responsive navigation at 390px/1280px with reduced motion (`e2e/navigation-feedback.pw.ts`). The optional standalone interaction check expects automatic shell prefetching; development tests cannot verify production prefetch timing.
 - User-field create/update and account-unlock permissions, including forged admin input.
 - Game sync authenticates once, keeps ownership tied to the authenticated user, and returns private timing metadata.
 - Game-mode schema validation for every `allGames` entry.

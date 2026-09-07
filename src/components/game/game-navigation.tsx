@@ -2,10 +2,11 @@
 
 import { BookOpen, Compass, Hammer, User } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import { TbPokeball } from 'react-icons/tb'
 import { BrandLockup } from '@/components/game/shared/BrandLockup'
+import { NavigationPending } from '@/components/game/navigation-pending'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
@@ -31,7 +32,6 @@ const navItems: NavItem[] = [
 
 export function GameNavigation() {
   const pathname = usePathname()
-  const router = useRouter()
   const { playSfx } = useAudio()
   const { user } = useUser()
 
@@ -47,7 +47,6 @@ export function GameNavigation() {
   }
 
   const playSelectSfx = () => playSfx('select')
-  const prefetchRoute = (href: string) => router.prefetch(href)
   const pokedollars = getCurrency('pokedollars')
   const crystals = getCurrency('crystals')
 
@@ -71,9 +70,6 @@ export function GameNavigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                prefetch={false}
-                onPointerEnter={() => prefetchRoute(item.href)}
-                onFocus={() => prefetchRoute(item.href)}
                 onClick={playSelectSfx}
                 aria-current={isActive ? 'page' : undefined}
                 className={cn(
@@ -86,6 +82,7 @@ export function GameNavigation() {
               >
                 <item.icon className="h-5 w-5 shrink-0" />
                 <span className="hidden lg:block">{item.name}</span>
+                <NavigationPending />
               </Link>
             )
           })}
@@ -105,10 +102,7 @@ export function GameNavigation() {
           </div>
           <Link
             href="/game"
-            prefetch={false}
-            onPointerEnter={() => prefetchRoute('/game')}
-            onFocus={() => prefetchRoute('/game')}
-            className="game-focus-ring flex items-center justify-center gap-3 overflow-hidden rounded-lg px-2 py-2 transition-colors hover:bg-game-surface lg:justify-start"
+            className="game-focus-ring relative flex items-center justify-center gap-3 overflow-hidden rounded-lg px-2 py-2 transition-colors hover:bg-game-surface lg:justify-start"
           >
             <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-game-moss/30 bg-game-moss/10">
               {user ? (
@@ -129,6 +123,7 @@ export function GameNavigation() {
               </p>
               <p className="text-[11px] text-game-muted">Trainer profile</p>
             </div>
+            <NavigationPending />
           </Link>
         </div>
       </aside>
@@ -145,9 +140,6 @@ export function GameNavigation() {
             <Link
               key={item.href}
               href={item.href}
-              prefetch={false}
-              onPointerDown={() => prefetchRoute(item.href)}
-              onFocus={() => prefetchRoute(item.href)}
               onClick={playSelectSfx}
               aria-current={isActive ? 'page' : undefined}
               className={cn(
@@ -178,6 +170,7 @@ export function GameNavigation() {
                   ? user?.trainerName || 'Trainer'
                   : item.mobileName || item.name}
               </span>
+              <NavigationPending />
             </Link>
           )
         })}
