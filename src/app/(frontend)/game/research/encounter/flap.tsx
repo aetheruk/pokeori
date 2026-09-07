@@ -13,10 +13,7 @@ import { SideScrollerStage } from './side-scroller-stage'
 import { EndlessCollectibleSprite } from './endless-collectibles'
 import type { FlapGameConfig } from '@/data/games/flap/types'
 
-interface FlapGameProps {
-  encounter: FlapGameConfig
-  initialState?: any
-}
+interface FlapGameProps { encounter: FlapGameConfig; initialState?: any }
 
 export function FlapGame({ encounter, initialState }: FlapGameProps) {
   useGameMusic(encounter)
@@ -29,9 +26,7 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
   const score = simulation?.score || 0
   const playerY = simulation?.playerY ?? 200
   const collectibles = simulation?.collectibles || []
-  const parallaxOffsets =
-    simulation?.parallaxOffsets ||
-    encounter.settings.parallaxLayers.map(() => 0)
+  const parallaxOffsets = simulation?.parallaxOffsets || encounter.settings.parallaxLayers.map(() => 0)
   const isEndlessMode = encounter.settings.endless?.enabled || false
   const PLAYER_X = 100
   const PLAYER_SIZE = 60
@@ -79,11 +74,7 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (
-        event.target instanceof HTMLElement &&
-        event.target.closest('input, textarea, select, button, [role="dialog"]')
-      )
-        return
+      if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, button, [role="dialog"]')) return
       if (event.repeat) return
       if (event.key === ' ' || event.key === 'ArrowUp' || event.key === 'w') {
         event.preventDefault()

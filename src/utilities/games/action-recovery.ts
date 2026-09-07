@@ -11,9 +11,7 @@ const notify = () => listeners.forEach((listener) => listener())
 
 export const subscribeToGameRecovery = (listener: () => void) => {
   listeners.add(listener)
-  return () => {
-    listeners.delete(listener)
-  }
+  return () => { listeners.delete(listener) }
 }
 export const getGameRecovery = () => failures[0] ?? null
 export const getServerGameRecovery = () => null
@@ -48,19 +46,16 @@ export async function recoverGameAction<T>(
     callbacks?.onFailure?.()
     await new Promise<void>((resolve) => {
       const id = ++nextId
-      failures = [
-        ...failures,
-        {
-          id,
-          message: failure,
-          retry: () => {
-            failures = failures.filter((entry) => entry.id !== id)
-            notify()
-            callbacks?.onRetry?.()
-            resolve()
-          },
+      failures = [...failures, {
+        id,
+        message: failure,
+        retry: () => {
+          failures = failures.filter((entry) => entry.id !== id)
+          notify()
+          callbacks?.onRetry?.()
+          resolve()
         },
-      ]
+      }]
       notify()
     })
   }

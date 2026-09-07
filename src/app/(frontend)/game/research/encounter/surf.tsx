@@ -3,33 +3,20 @@
 import { DoorOpen } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import {
-  type PointerEvent as ReactPointerEvent,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import { type PointerEvent as ReactPointerEvent, useEffect, useRef, useState } from 'react'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
 import type { SurfGameConfig } from '@/data/games/surf/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { useArcadeSession } from '@/hooks/use-arcade-session'
-import {
-  clampSurfPlayerX,
-  getSurfCoursePosition,
-  getSurfEmergenceOpacity,
-  getSurfParallaxFrames,
-} from '@/utilities/research/surf'
+import { clampSurfPlayerX, getSurfCoursePosition, getSurfEmergenceOpacity, getSurfParallaxFrames } from '@/utilities/research/surf'
 import { EndlessCollectibleSprite } from './endless-collectibles'
 
 const DESIGN_WIDTH = 390
 const DESIGN_HEIGHT = 844
 const PLAYER_Y = 0.79
-interface SurfGameProps {
-  encounter: SurfGameConfig
-  initialState?: any
-}
+interface SurfGameProps { encounter: SurfGameConfig; initialState?: any }
 
 export function SurfGame({ encounter, initialState }: SurfGameProps) {
   useGameMusic(encounter)
@@ -56,48 +43,26 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
   const normalizedPlayerWidth = playerWidth / DESIGN_WIDTH
   const normalizedPlayerHeight = playerHeight / DESIGN_HEIGHT
   const spriteFrameIndex = settings.spriteFrames?.length
-    ? Math.floor(waterOffset / (settings.spriteFrameDistance || 24)) %
-      settings.spriteFrames.length
-    : 0
+    ? Math.floor(waterOffset / (settings.spriteFrameDistance || 24)) % settings.spriteFrames.length : 0
   const replay = session.replay
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (
-        event.target instanceof HTMLElement &&
-        event.target.closest('input, textarea, select, button, [role="dialog"]')
-      )
-        return
+      if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, button, [role="dialog"]')) return
       if (!['ArrowLeft', 'ArrowRight', 'a', 'd'].includes(event.key)) return
       event.preventDefault()
       if (event.repeat) return
-      session.sendInput(
-        'steer',
-        event.type === 'keyup'
-          ? playerXRef.current
-          : ['ArrowLeft', 'a'].includes(event.key)
-            ? 0
-            : 1,
-      )
+      session.sendInput('steer', event.type === 'keyup' ? playerXRef.current : ['ArrowLeft', 'a'].includes(event.key) ? 0 : 1)
     }
     window.addEventListener('keydown', onKey)
     window.addEventListener('keyup', onKey)
-    return () => {
-      window.removeEventListener('keydown', onKey)
-      window.removeEventListener('keyup', onKey)
-    }
+    return () => { window.removeEventListener('keydown', onKey); window.removeEventListener('keyup', onKey) }
   }, [session.sendInput])
 
   const steerToPointer = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (gameEnded || countdown > 0) return
     const bounds = event.currentTarget.getBoundingClientRect()
-    session.sendInput(
-      'steer',
-      clampSurfPlayerX(
-        (event.clientX - bounds.left) / bounds.width,
-        normalizedPlayerWidth,
-      ),
-    )
+    session.sendInput('steer', clampSurfPlayerX((event.clientX - bounds.left) / bounds.width, normalizedPlayerWidth))
   }
 
   const waterMotionOffset = waterOffset % 2400

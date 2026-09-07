@@ -10,10 +10,7 @@ import type { RhythmConfig } from '@/data/games/rhythm/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { useArcadeSession } from '@/hooks/use-arcade-session'
 
-interface RhythmGameProps {
-  encounter: RhythmConfig
-  initialState?: any
-}
+interface RhythmGameProps { encounter: RhythmConfig; initialState?: any }
 
 export function RhythmGame({ encounter, initialState }: RhythmGameProps) {
   useGameMusic(encounter)
@@ -21,27 +18,17 @@ export function RhythmGame({ encounter, initialState }: RhythmGameProps) {
   const { simulation, countdown, result, timeLeft } = session
   const gameStarted = Boolean(simulation)
   const gameEnded = Boolean(simulation && simulation.status !== 'playing')
-  const lastHit =
-    simulation?.lastHit && simulation.tick - simulation.lastHit.tick < 30
-      ? simulation.lastHit
-      : null
+  const lastHit = simulation?.lastHit && simulation.tick - simulation.lastHit.tick < 30 ? simulation.lastHit : null
   const trackRef = useRef<HTMLDivElement>(null)
   const { icons, winScore } = encounter.settings
   const isEndlessMode = encounter.settings.endless?.enabled || false
   const score = simulation?.score || 0
-  const movingIcons = (simulation?.rhythmIcons || []).map((icon) => ({
-    ...icon,
-    iconData: icons[icon.iconIndex],
-  }))
+  const movingIcons = (simulation?.rhythmIcons || []).map((icon) => ({ ...icon, iconData: icons[icon.iconIndex] }))
   const TARGET_POSITION = 85
   const PERFECT_THRESHOLD = 8
   const GREAT_THRESHOLD = 23
   const GOOD_THRESHOLD = 33
-  const handleIconClick = (id: string) =>
-    session.sendInput(
-      'rhythm',
-      icons.findIndex((icon) => icon.id === id),
-    )
+  const handleIconClick = (id: string) => session.sendInput('rhythm', icons.findIndex((icon) => icon.id === id))
 
   return (
     <div className="min-h-dvh game-night bg-game-night-canvas text-game-night-ink">
@@ -210,9 +197,7 @@ export function RhythmGame({ encounter, initialState }: RhythmGameProps) {
                         e.preventDefault()
                         handleIconClick(icon.id)
                       }}
-                      onClick={(event) => {
-                        if (event.detail === 0) handleIconClick(icon.id)
-                      }}
+                      onClick={(event) => { if (event.detail === 0) handleIconClick(icon.id) }}
                       aria-label={icon.label || `Play ${icon.id}`}
                       disabled={gameEnded || countdown > 0}
                     >
@@ -243,7 +228,11 @@ export function RhythmGame({ encounter, initialState }: RhythmGameProps) {
           secondaryAction={
             initialState?.encounter?.isEligibleForReplay ||
             encounter?.isEligibleForReplay ? (
-              <Button size="lg" onClick={session.replay} className="w-full">
+              <Button
+                size="lg"
+                onClick={session.replay}
+                className="w-full"
+              >
                 Play Again
               </Button>
             ) : undefined

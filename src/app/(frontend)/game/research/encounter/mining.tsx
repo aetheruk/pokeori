@@ -11,10 +11,7 @@ import type { MiningConfig } from '@/data/games/mining/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { useArcadeSession } from '@/hooks/use-arcade-session'
 
-interface MiningGameProps {
-  encounter: MiningConfig
-  initialState?: any
-}
+interface MiningGameProps { encounter: MiningConfig; initialState?: any }
 
 export function MiningGame({ encounter, initialState }: MiningGameProps) {
   useGameMusic(encounter)
@@ -23,21 +20,14 @@ export function MiningGame({ encounter, initialState }: MiningGameProps) {
   const { simulation, countdown, result, timeLeft } = session
   const gameStarted = Boolean(simulation)
   const gameEnded = Boolean(simulation && simulation.status !== 'playing')
-  const lastHit =
-    simulation?.lastHit && simulation.tick - simulation.lastHit.tick < 30
-      ? simulation.lastHit
-      : null
+  const lastHit = simulation?.lastHit && simulation.tick - simulation.lastHit.tick < 30 ? simulation.lastHit : null
   const barRef = useRef<HTMLDivElement>(null)
-  const { itemHp, maxSwings, timeLimit, buttonIcon, miningTarget } =
-    encounter.settings
+  const { itemHp, maxSwings, timeLimit, buttonIcon, miningTarget } = encounter.settings
   const currentHp = simulation?.hp ?? itemHp
   const swingsUsed = simulation?.swings || 0
   const chevronPosition = simulation?.miningPosition || 0
-  const targetZone = {
-    start: simulation?.targetStart || 0,
-    end: (simulation?.targetStart || 0) + (simulation?.targetSize || 0),
-  }
-  const hpPercentage = (currentHp / itemHp) * 100
+  const targetZone = { start: simulation?.targetStart || 0, end: (simulation?.targetStart || 0) + (simulation?.targetSize || 0) }
+  const hpPercentage = currentHp / itemHp * 100
   const crackLevel = 100 - hpPercentage
   const isShattered = currentHp <= 0
   const shakeIntensity = !reducedMotion && lastHit?.type === 'PERFECT' ? 3 : 0
@@ -250,9 +240,7 @@ export function MiningGame({ encounter, initialState }: MiningGameProps) {
                 e.preventDefault()
                 handleSwing()
               }}
-              onClick={(event) => {
-                if (event.detail === 0) handleSwing()
-              }}
+              onClick={(event) => { if (event.detail === 0) handleSwing() }}
               aria-label="Swing pickaxe"
               disabled={gameEnded || countdown > 0}
             >
@@ -272,7 +260,11 @@ export function MiningGame({ encounter, initialState }: MiningGameProps) {
           secondaryAction={
             initialState?.encounter?.isEligibleForReplay ||
             encounter?.isEligibleForReplay ? (
-              <Button size="lg" onClick={session.replay} className="w-full">
+              <Button
+                size="lg"
+                onClick={session.replay}
+                className="w-full"
+              >
                 Play Again
               </Button>
             ) : undefined
