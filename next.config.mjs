@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { availableParallelism } from 'node:os'
 import withBundleAnalyzer from '@next/bundle-analyzer'
 import { withPayload } from '@payloadcms/next/withPayload'
 
@@ -77,9 +78,10 @@ const nextConfig = {
   // Optimize package imports to reduce bundle size
   experimental: {
     useTypeScriptCli: true,
-    cpus: 8,
+    // Cap page workers at the N150's four cores; respect smaller CPU allocations.
+    cpus: Math.min(4, availableParallelism()),
     staticGenerationRetryCount: 1,
-    staticGenerationMaxConcurrency: 20,
+    staticGenerationMaxConcurrency: 8,
     staticGenerationMinPagesPerWorker: 100,
     optimizePackageImports: [
       'lucide-react',

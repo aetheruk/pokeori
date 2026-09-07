@@ -92,7 +92,7 @@ Issues, documentation improvements, tests, accessibility fixes, and code contrib
 
 ## Deployment
 
-After a pull request is merged to protected `main`, build and publish the production image from the release machine; Coolify then deploys that GHCR image. See the [local GHCR and Coolify guide](./docs/development/local-ghcr-coolify.md).
+After a pull request is merged to protected `main`, Coolify automatically builds the root Dockerfile from the public repository and deploys it on the N150 host. See the [deployment guide](./docs/development/deployment.md).
 
 ## Versioning
 

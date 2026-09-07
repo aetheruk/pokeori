@@ -24,8 +24,7 @@ npm-debug.log*
 
 # Environment
 .env
-.env.local
-.env.*.local
+.env.*
 
 # Test
 coverage
@@ -48,3 +47,11 @@ tools/
 # Docs (optional - can keep for debugging)
 docs/
 README.md
+
+# Local tooling and validation are not production inputs.
+.codex
+.github
+.openai
+AGENTS.md
+tests
+*.tsbuildinfo

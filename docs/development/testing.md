@@ -48,6 +48,8 @@ bun run test:e2e      # E2E tests
 ```
 
 ## Release validation
-`bun run deploy:production` runs lint, typecheck, data validation, and the full
-Bun test suite, then enforces the container image budget and smokes the exact
-candidate before publishing it.
+Before merging a release PR, run lint, typecheck, data validation, and the full
+Bun test suite. Coolify builds the Dockerfile and deploys automatically from
+`main`; the image build skips typechecking, so pre-merge validation is required.
+Verify the deployed `/api/health`, `/api/app-version`, and an already-open PWA
+using the [deployment guide](/docs/development/deployment.md).

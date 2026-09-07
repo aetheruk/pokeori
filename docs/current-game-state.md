@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.29.10`: Coolify builds the Dockerfile automatically from public `main` on the N150 host. The Dockerfile accepts Coolify secret environment mounts, requires a private Server Actions build key, retains build caches, and gives dependency health checks enough startup/response time. Build page workers are capped at four. The package-version endpoint and PWA refresh remain the release verification path.
+
 - Release `0.29.6`: After the Chansey egg and antidote conclusion, the one-time `fuchsia-what-now` task opens in Fuchsia City. Ray Choo takes stock of Fuji, Operation Shadow Force, the dud Poké Ball factory, and the Saffron/Silph Co. connection before sending the player to Professor Oak in Pallet Town. The task uses Ray’s detective portrait throughout its enter dialogue and Oak’s portrait for the completion note.
 
 - Release `0.29.5`: Onix Snake now uses a separate artwork-tuned viewport collision radius so a run ends when the visible head reaches the screen edge instead of leaving an apparent gap. Its pointer arrival zone is wider and the test turn rate is slightly gentler, preventing tight stationary orbits while retaining direct continuous steering. Ordinary configured food is rendered as a bare cave sprite; only inventory reward drops retain the compact Field Research bubble treatment.
