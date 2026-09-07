@@ -1,4 +1,8 @@
 type Recovery = { id: number; message: string; retry: () => void }
+type RecoveryCallbacks = {
+  onFailure?: () => void
+  onRetry?: () => void
+}
 let nextId = 0
 let routeGeneration = 0
 let failures: Recovery[] = []
@@ -24,6 +28,7 @@ export async function recoverGameAction<T>(
   action: () => Promise<T>,
   message: string,
   getError?: (result: T) => string | undefined,
+  callbacks?: RecoveryCallbacks,
 ): Promise<T> {
   const generation = routeGeneration
   while (true) {
@@ -38,6 +43,7 @@ export async function recoverGameAction<T>(
       // The server may already have committed the action. Never reset the run.
     }
     if (generation !== routeGeneration) return new Promise<T>(() => {})
+    callbacks?.onFailure?.()
     await new Promise<void>((resolve) => {
       const id = ++nextId
       failures = [...failures, {
@@ -46,6 +52,7 @@ export async function recoverGameAction<T>(
         retry: () => {
           failures = failures.filter((entry) => entry.id !== id)
           notify()
+          callbacks?.onRetry?.()
           resolve()
         },
       }]

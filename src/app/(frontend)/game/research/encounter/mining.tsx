@@ -17,7 +17,7 @@ export function MiningGame({ encounter, initialState }: MiningGameProps) {
   useGameMusic(encounter)
   const reducedMotion = useReducedMotion()
   const session = useArcadeSession('mining', encounter)
-  const { simulation, countdown, saving, result, timeLeft } = session
+  const { simulation, countdown, result, timeLeft } = session
   const gameStarted = Boolean(simulation)
   const gameEnded = Boolean(simulation && simulation.status !== 'playing')
   const lastHit = simulation?.lastHit && simulation.tick - simulation.lastHit.tick < 30 ? simulation.lastHit : null
@@ -242,7 +242,7 @@ export function MiningGame({ encounter, initialState }: MiningGameProps) {
               }}
               onClick={(event) => { if (event.detail === 0) handleSwing() }}
               aria-label="Swing pickaxe"
-              disabled={gameEnded || countdown > 0 || saving}
+              disabled={gameEnded || countdown > 0}
             >
               <TaskIconDisplay icon={buttonIcon} className="w-12 h-12" />
             </Button>
@@ -250,7 +250,6 @@ export function MiningGame({ encounter, initialState }: MiningGameProps) {
         </div>
       </main>
 
-      {saving && <p role="status" className="fixed top-20 inset-x-0 text-center z-50">Saving progress…</p>}
       {result && (
         <RewardResultOverlay
           result={result}

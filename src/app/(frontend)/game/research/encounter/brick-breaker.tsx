@@ -103,7 +103,7 @@ export function BrickBreakerGame({ encounter, initialState }: BrickBreakerGamePr
           size="icon"
           className="pointer-events-auto bg-game-surface-raised/95 text-game-ink shadow-md backdrop-blur-sm"
           aria-label="Leave game"
-          disabled={!simulation || ended || session.saving || Boolean(result)}
+          disabled={!simulation || ended || Boolean(result)}
           onClick={() => void session.abandon()}
         >
           <DoorOpen className="size-5" />
@@ -244,7 +244,6 @@ export function BrickBreakerGame({ encounter, initialState }: BrickBreakerGamePr
         )}
       </div>
 
-      {session.saving && <p role="status" className="absolute inset-x-0 top-20 z-40 text-center">Saving progress…</p>}
       {error && (
         <p
           role="alert"

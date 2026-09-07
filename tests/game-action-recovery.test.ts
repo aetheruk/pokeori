@@ -39,6 +39,30 @@ describe('game action recovery', () => {
     expect((await pending).success).toBe(true)
   })
 
+  test('notifies transient failures before pausing and clears the pause on retry', async () => {
+    let attempts = 0
+    let failures = 0
+    let retries = 0
+    const pending = recoverGameAction(
+      async () => {
+        if (++attempts === 1) throw new Error('checkpoint response dropped')
+        return { success: true as const }
+      },
+      'Retry checkpoint',
+      undefined,
+      {
+        onFailure: () => { failures += 1 },
+        onRetry: () => { retries += 1 },
+      },
+    )
+    await Promise.resolve()
+    expect(failures).toBe(1)
+    expect(retries).toBe(0)
+    getGameRecovery()?.retry()
+    expect(await pending).toEqual({ success: true })
+    expect(retries).toBe(1)
+  })
+
   test('does not retry a legitimate losing result', async () => {
     const result = { success: false, message: 'Game over' }
     expect(await recoverGameAction(async () => result, 'Connection interrupted')).toBe(result)

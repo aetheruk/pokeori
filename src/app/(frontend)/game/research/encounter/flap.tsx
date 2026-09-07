@@ -19,7 +19,7 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
   useGameMusic(encounter)
   const router = useRouter()
   const session = useArcadeSession('flap', encounter)
-  const { simulation, countdown, saving, result, timeLeft } = session
+  const { simulation, countdown, result, timeLeft } = session
   const canvasRef = useRef<HTMLDivElement>(null)
   // Sprite dimensions only; collisions are resolved by the shared simulator.
   const masksRef = useRef<Record<string, CollisionMask>>({})
@@ -362,7 +362,6 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
         })}
       </SideScrollerStage>
 
-      {saving && <p role="status" className="fixed left-1/2 top-16 z-50 -translate-x-1/2 rounded-lg bg-game-surface-raised px-3 py-2 text-sm text-game-ink">Saving progress…</p>}
       {result && (
         <RewardResultOverlay
           result={result}

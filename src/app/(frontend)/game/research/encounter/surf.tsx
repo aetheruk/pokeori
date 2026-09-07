@@ -22,7 +22,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
   useGameMusic(encounter)
   const router = useRouter()
   const session = useArcadeSession('surf', encounter)
-  const { simulation, countdown, saving, result, timeLeft } = session
+  const { simulation, countdown, result, timeLeft } = session
   const settings = encounter.settings
   const stageRef = useRef<HTMLDivElement>(null)
   const targetXRef = useRef(0.5)
@@ -60,7 +60,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
   }, [session.sendInput])
 
   const steerToPointer = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (gameEnded || countdown > 0 || saving) return
+    if (gameEnded || countdown > 0) return
     const bounds = event.currentTarget.getBoundingClientRect()
     session.sendInput('steer', clampSurfPlayerX((event.clientX - bounds.left) / bounds.width, normalizedPlayerWidth))
   }
@@ -425,7 +425,6 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
         ) : null}
       </div>
 
-      {saving ? <p role="status" className="absolute inset-x-0 top-20 z-50 text-center text-sm text-white">Saving progress…</p> : null}
       {result ? (
         <RewardResultOverlay
           result={result}
