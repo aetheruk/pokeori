@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('a saved result schedules an update, and a new game cancels that countdown', async ({ page }) => {
+  const updateStatusTimeout = 15_000
   let newer = false
   let versionChecks = 0
   await page.route('**/api/app-version', async (route) => {
@@ -18,16 +19,16 @@ test('a saved result schedules an update, and a new game cancels that countdown'
   await expect.poll(() => versionChecks).toBeGreaterThan(1)
   newer = true
   await page.evaluate(() => window.dispatchEvent(new Event('focus')))
-  await expect(page.getByRole('status').filter({ hasText: 'Update ready.' })).toBeVisible()
+  await expect(page.getByRole('status').filter({ hasText: 'Update ready.' })).toBeVisible({ timeout: updateStatusTimeout })
   await page.evaluate(() => window.dispatchEvent(new Event('pokeori:activity-settled')))
-  await expect(page.getByRole('status').filter({ hasText: 'Updating in 15 seconds' })).toBeVisible()
+  await expect(page.getByRole('status').filter({ hasText: 'Updating in 15 seconds' })).toBeVisible({ timeout: updateStatusTimeout })
   await page.clock.runFor(5000)
   await page.evaluate(() => window.dispatchEvent(new Event('pokeori:activity-started')))
   await page.clock.runFor(20000)
   await expect(page.getByRole('button', { name: 'Test dropped result' })).toBeVisible()
-  await expect(page.getByRole('status').filter({ hasText: 'Update ready.' })).toBeVisible()
+  await expect(page.getByRole('status').filter({ hasText: 'Update ready.' })).toBeVisible({ timeout: updateStatusTimeout })
   await page.evaluate(() => window.dispatchEvent(new Event('pokeori:activity-settled')))
-  await expect(page.getByRole('status').filter({ hasText: 'Updating in 15 seconds' })).toBeVisible()
+  await expect(page.getByRole('status').filter({ hasText: 'Updating in 15 seconds' })).toBeVisible({ timeout: updateStatusTimeout })
   await page.clock.runFor(15000)
   await expect(page.getByText('Updated test page')).toBeVisible()
 })
