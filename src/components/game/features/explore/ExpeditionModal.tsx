@@ -138,6 +138,17 @@ function formatActivityLabel(activityType?: string): string {
   return activityType || 'Activity'
 }
 
+function getNextStepLabel(step?: any): string | null {
+  if (!step) return null
+  if (step.type === 'branch_choice') return 'Choose a route'
+  if (step.type === 'result_branch') return 'Resolve the outcome'
+  return (
+    step.activityName ||
+    getActivityMeta(step.activityType, step.activityId).name ||
+    formatActivityLabel(step.activityType)
+  )
+}
+
 function getPokemonDisplayName(
   formId?: string | number,
   speciesId?: string | number,
@@ -284,6 +295,15 @@ function ExpeditionModalContent({
       )
     : 0
   const progressTotal = activeRun?.totalSteps || 0
+  const progressPercent = activeRun
+    ? activeRun.status === 'ready_to_claim'
+      ? 100
+      : progressTotal > 0
+        ? Math.round((progressCurrent / progressTotal) * 100)
+        : 0
+    : 0
+  const nextStep = activeRun?.steps?.[activeRun.currentStepIndex]
+  const nextStepLabel = getNextStepLabel(nextStep)
   const losses = activeRun?.losses || 0
   const maxLosses = activeRun?.maxLosses ?? expedition?.maxLosses ?? 0
   const livesLeft = Math.max(0, maxLosses - losses)
@@ -779,8 +799,43 @@ function ExpeditionModalContent({
       </div>
 
       {actionButton && (
-        <div className="shrink-0 border-t border-game-border bg-game-surface p-5 md:p-6">
+        <div className="shrink-0 border-t border-game-border bg-game-surface p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:p-6 md:pb-[max(1.5rem,env(safe-area-inset-bottom))]">
           <div className="max-w-3xl mx-auto">
+            {activeRun && (
+              <div
+                className="mx-auto mb-3 max-w-md space-y-1.5"
+              >
+                <div className="flex items-center justify-between gap-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-game-muted">
+                  <span>
+                    {activeRun.status === 'ready_to_claim'
+                      ? 'Expedition complete'
+                      : 'Next part'}
+                  </span>
+                  <span className="font-mono tracking-normal text-game-ochre">
+                    {progressCurrent}/{progressTotal}
+                  </span>
+                </div>
+                <div
+                  className="h-1.5 overflow-hidden rounded-full bg-game-border/70"
+                  role="progressbar"
+                  aria-label="Expedition progress"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={progressPercent}
+                  aria-valuetext={`${progressCurrent} of ${progressTotal} parts`}
+                >
+                  <div
+                    className="h-full rounded-full bg-game-ochre transition-[width] duration-300 motion-reduce:transition-none"
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
+                <p className="truncate text-xs font-semibold text-game-ink">
+                  {activeRun.status === 'ready_to_claim'
+                    ? 'All parts complete'
+                    : nextStepLabel || 'Continue your expedition'}
+                </p>
+              </div>
+            )}
             <div className="max-w-md mx-auto">{actionButton}</div>
           </div>
         </div>

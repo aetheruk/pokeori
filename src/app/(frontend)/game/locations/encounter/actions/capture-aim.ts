@@ -3,7 +3,10 @@
 import { randomUUID } from 'node:crypto'
 import { redis } from '@/utilities/redis'
 import { acquireActionLock, checkActionRateLimit, releaseActionLock } from '@/utilities/game-integrity'
-import { CAPTURE_RING_PERIOD_MS } from '@/utilities/pokemon/capture-timing'
+import {
+  CAPTURE_RING_PERIOD_MS,
+  isCaptureAimSessionValid,
+} from '@/utilities/pokemon/capture-timing'
 import { getUser } from './utils'
 import { getEncounterRedisTtlSeconds, type EncounterState } from './types'
 import { getEncounterMechanicsLockKey } from './lock'
@@ -20,7 +23,7 @@ export async function beginCaptureAim() {
     const key = `encounter:${user.id}`
     const state = await redis.get<EncounterState>(key)
     const now = Date.now()
-    if (!state || state.userId !== user.id || state.expiry <= now) {
+    if (!isCaptureAimSessionValid(state, user.id)) {
       return { success: false as const, error: 'Encounter expired' }
     }
     const attempt = state.captureAttempts || 0
