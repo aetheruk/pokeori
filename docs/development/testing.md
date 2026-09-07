@@ -21,6 +21,8 @@ schema validation tests.
 - Use Playwright (already has Playwright config in root)
 
 ## Current Coverage
+- User-field create/update and account-unlock permissions, including forged admin input.
+- Game sync authenticates once, keeps ownership tied to the authenticated user, and returns private timing metadata.
 - Game-mode schema validation for every `allGames` entry.
 - Static reference checks for `hide`, `overrides`, typed requirements, and item/currency/task rewards.
 - Generated source-data checks for TCG binder/booster-pack coverage, mega-stone

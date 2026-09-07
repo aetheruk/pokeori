@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.29.11`: Generic user API writes can no longer set admin privileges, currency, skills, unlocks, or other authored game state; trusted validated game actions retain their Local API write path. Account unlocking is admin-only, mitigating Payload's current unlock-access advisory. Game sync authenticates once, reuses the Payload client, and exposes private server timing for profiling. Bun is pinned to stable 1.4.2, dependencies are updated, and Alpine tracing excludes unused glibc Sharp binaries. Full progression snapshots remain complete because reward diffs and unlock checks depend on them.
+
 - Release `0.29.10`: Coolify builds the Dockerfile automatically from public `main` on the N150 host. The Dockerfile accepts Coolify secret environment mounts, requires a private Server Actions build key, retains build caches, and gives dependency health checks enough startup/response time. Build page workers are capped at four. The package-version endpoint and PWA refresh remain the release verification path.
 
 - Release `0.29.6`: After the Chansey egg and antidote conclusion, the one-time `fuchsia-what-now` task opens in Fuchsia City. Ray Choo takes stock of Fuji, Operation Shadow Force, the dud Poké Ball factory, and the Saffron/Silph Co. connection before sending the player to Professor Oak in Pallet Town. The task uses Ray’s detective portrait throughout its enter dialogue and Oak’s portrait for the completion note.
