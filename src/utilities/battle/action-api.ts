@@ -33,7 +33,7 @@ export type BattleActionRequest =
       battleId: string
       weather: string
     })
-  | (BattleActionBase & { kind: 'shout'; stance: BattleStance })
+  | (BattleActionBase & { kind: 'shout' })
   | (BattleActionBase & { kind: 'circadian'; battleId: string })
   | (BattleActionBase & {
       kind: 'dimensional-shift'

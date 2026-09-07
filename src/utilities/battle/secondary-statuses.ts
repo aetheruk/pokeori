@@ -13,6 +13,7 @@ import {
 import { applyBattleRarityEntryEffects } from './rarity-effects'
 import { hasOppositeNonGenderlessGenders } from '@/utilities/pokemon/gender'
 import { DEFAULT_STAT_STAGES, clampStatStage } from './stats-calc'
+import { clearShoutStatBoost } from './shout-effects'
 import { lowerPokemonMoveUses } from './move-uses'
 import type {
   BattlePokemon,
@@ -404,6 +405,7 @@ function processStatusList(params: {
 
 export function clearPokemonSecondaryStatuses(pokemon: BattlePokemon): void {
   pokemon.secondaryStatuses = undefined
+  clearShoutStatBoost(pokemon)
 }
 
 function isSourceLinkedTrapStatus(

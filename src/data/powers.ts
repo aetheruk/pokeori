@@ -315,6 +315,11 @@ export function createInitialPowersState(config?: {
 export const DYNAMAX_HP_MULTIPLIER = 1.5
 
 /**
+ * Battle Shout duration after activation.
+ */
+export const SHOUT_DURATION = 3
+
+/**
  * Dynamax duration in turns
  */
 export const DYNAMAX_DURATION = 3

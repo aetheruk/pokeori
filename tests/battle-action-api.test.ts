@@ -53,6 +53,7 @@ describe('battle action API', () => {
   beforeEach(() => {
     submitTurnMock.mockClear()
     useMoveMock.mockClear()
+    useShoutMock.mockClear()
     surrenderBattleMock.mockClear()
     getBattleStateMock.mockClear()
   })
@@ -98,6 +99,19 @@ describe('battle action API', () => {
       'grass',
       'battle-action-2',
     )
+  })
+
+  test('dispatches Battle Shout without a stance selection', async () => {
+    const { POST } = await import('@/app/api/game/battles/action/route')
+    const response = await POST(
+      makeRequest({
+        kind: 'shout',
+        clientActionId: 'battle-action-shout',
+      }),
+    )
+
+    expect(response.status).toBe(200)
+    expect(useShoutMock).toHaveBeenCalledWith('battle-action-shout')
   })
 
   test('returns the terminal state with a surrender response', async () => {

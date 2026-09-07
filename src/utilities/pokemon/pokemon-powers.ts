@@ -68,7 +68,8 @@ export const POKEMON_POWER_OPTIONS: Record<PokemonPowerId, PokemonPowerOption> =
     shout: {
       id: 'shout',
       name: 'Battle Shout',
-      description: 'Command the flow of a PVE stance matchup.',
+      description:
+        'Raise Attack, Defense, Special Attack, Special Defense, and Speed by one stage for three turns.',
       itemId: 'book-of-shouts',
     },
     circadian: {

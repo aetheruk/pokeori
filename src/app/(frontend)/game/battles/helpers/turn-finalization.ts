@@ -35,6 +35,10 @@ import { persistPokemonBattleKOs, recordPokemonKO } from './pokemon-ko-credit'
 import { processBattleAbilitySuppressionForState } from '@/utilities/battle/abilities'
 import { finalizeBattlePresentation } from '@/utilities/battle/presentation'
 import { resolvePendingMoveSwitches } from '@/utilities/battle/move-effects'
+import {
+  advanceShoutStatBoostForTurn,
+  clearShoutStatBoost,
+} from '@/utilities/battle/shout-effects'
 
 function getBattleConfigForState(state: BattleState) {
   return (
@@ -133,6 +137,17 @@ export async function finalizeTurn(
   }
 
   advancePowerStateForTurn(state)
+
+  const shoutMessages = [
+    advanceShoutStatBoostForTurn(playerMon, state.turn),
+    advanceShoutStatBoostForTurn(enemyMon, state.turn),
+  ].filter((message): message is string => Boolean(message))
+  if (shoutMessages.length > 0) {
+    state.history[0].message += `\n${shoutMessages.join('\n')}`
+  }
+
+  if (playerMon.currentHp === 0) clearShoutStatBoost(playerMon)
+  if (enemyMon.currentHp === 0) clearShoutStatBoost(enemyMon)
 
   const bothTeamsExhausted =
     playerMon.currentHp === 0 &&

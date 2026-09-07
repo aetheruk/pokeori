@@ -1,4 +1,5 @@
 import type { BattlePokemon } from './types'
+import { cloneBattleShoutBoost } from './shout-effects'
 
 export function getKnownBattleMoveIds(pokemon: BattlePokemon): string[] {
   const assignedMoveIds = (pokemon.assignedMoves || [])
@@ -17,6 +18,7 @@ export function rememberOriginalTransform(pokemon: BattlePokemon): void {
     types: [...pokemon.types],
     stats: { ...pokemon.stats },
     statStages: pokemon.statStages ? { ...pokemon.statStages } : undefined,
+    shoutBoost: cloneBattleShoutBoost(pokemon.shoutBoost),
     assignedMoves: pokemon.assignedMoves ? [...pokemon.assignedMoves] : undefined,
     battleMoveIds: pokemon.battleMoveIds ? [...pokemon.battleMoveIds] : undefined,
   }
@@ -44,6 +46,7 @@ export function applyBattleTransform(
   pokemon.statStages = defender.statStages
     ? { ...defender.statStages }
     : undefined
+  pokemon.shoutBoost = cloneBattleShoutBoost(defender.shoutBoost)
   const copiedMoveIds = getKnownBattleMoveIds(defender)
   pokemon.assignedMoves = copiedMoveIds.map((moveId) => ({ moveId }))
   pokemon.battleMoveIds = copiedMoveIds
@@ -62,6 +65,7 @@ export function restoreOriginalTransform(pokemon: BattlePokemon): string[] {
   pokemon.statStages = originalTransform.statStages
     ? { ...originalTransform.statStages }
     : undefined
+  pokemon.shoutBoost = cloneBattleShoutBoost(originalTransform.shoutBoost)
   pokemon.assignedMoves = originalTransform.assignedMoves
     ? [...originalTransform.assignedMoves]
     : undefined

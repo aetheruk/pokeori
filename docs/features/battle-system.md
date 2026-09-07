@@ -18,7 +18,7 @@ Turn-based Pokemon battle system with advanced mechanics.
 ### Battle Powers
 | Power | Requirement | Effect |
 |-------|-------------|--------|
-| Battle Shouts | Book of Shouts + Trainer 35 | Battle-configured shout effects |
+| Battle Shouts | Book of Shouts + Trainer 35 | PVE setup action that raises the active Pokemon's five core battle stats by one stage for three turns; the enemy gets a normal response |
 | Weather Control | Weather Orb + Weather Core + Trainer 65 | Overwrite battle weather until another battle weather override |
 | Terastallization | Tera Orb + stored Tera type + Trainer 70 | Change Pokemon type for 3 turns |
 | Mega Evolution | Mega Stone + Trainer 75 | Transform for the rest of battle |

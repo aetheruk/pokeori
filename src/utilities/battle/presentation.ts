@@ -6,6 +6,7 @@ import type {
   BattlePresentationSide,
   BattleState,
 } from './types'
+import { cloneBattleShoutBoost } from './shout-effects'
 
 interface PresentationBaseline {
   activePlayerIndex: number
@@ -22,6 +23,7 @@ function cloneTeam(team: BattlePokemon[]): BattlePokemon[] {
     ...pokemon,
     stats: { ...pokemon.stats },
     statStages: pokemon.statStages ? { ...pokemon.statStages } : undefined,
+    shoutBoost: cloneBattleShoutBoost(pokemon.shoutBoost),
   }))
 }
 

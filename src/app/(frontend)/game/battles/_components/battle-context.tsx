@@ -49,7 +49,7 @@ export interface BattleContextType {
   handleUseMove: (moveId: string) => void | Promise<void>
   handleUseVictory: (itemId: string) => void | Promise<void>
   handleUseWeather: (weather: string) => void | Promise<void>
-  handleUseShout: (stance: BattleStance) => void | Promise<void>
+  handleUseShout: () => void | Promise<void>
   handleUseCircadian: () => void | Promise<void>
   handleUseDimensionalShift: (
     type: 'time' | 'space' | 'chaos',
