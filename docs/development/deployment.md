@@ -2,6 +2,32 @@
 
 Production builds and deploys automatically from the public repository's protected `main` branch on the Intel N150 host. Validate and merge a release PR; Coolify compiles the checked-in Dockerfile and starts the new container. No local production build or registry publish is required.
 
+## GitHub webhook through the local server's tunnel
+
+The Pokeori Cloudflare Tunnel publishes `deploy.pokeori.app` with the exact path
+rule `^/webhooks/source/github/events/manual$`, forwarding to
+`http://localhost:8000`. Its catch-all returns 404, so the Coolify dashboard,
+login and other API paths are not exposed through this hostname. The existing
+`pokeori.app` route continues forwarding to port 80.
+
+The repository's GitHub push webhook uses
+`https://deploy.pokeori.app/webhooks/source/github/events/manual`, JSON content
+and SSL verification. The same private signing secret must be saved in Coolify's
+GitHub manual-webhook field and GitHub's webhook configuration. Do not publish
+the secret or replace this with the token-based deploy API URL.
+
+GitHub's initial ping returned HTTP 200. Signature checks with a matching
+repository/main payload and a `[skip ci]` commit rejected absent/wrong signatures;
+the correctly signed request reached the skip response without queuing a build.
+Coolify returns HTTP 200 even for invalid signatures, so inspect its response
+body rather than treating the status alone as authentication success.
+
+Verify actual automatic deployment using
+the next validated main merge: check the GitHub push delivery response and confirm
+Coolify records a webhook deployment for the merged SHA. Do not add a throwaway
+main commit or disable caches merely to test the hook. The previous 0.29.12 merge
+needed a cached manual Redeploy because no GitHub webhook existed at that time.
+
 ## Coolify application settings
 
 - Source: the public Git repository, branch `main`, automatic deployment enabled. Confirm the repository push webhook targets this application.

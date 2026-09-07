@@ -12,6 +12,7 @@ import {
   type ArcadeRound, type ArcadeSimulation, stepArcadeSimulation,
 } from '@/utilities/research/arcade-authority'
 import type { GameDataKeys } from '@/utilities/requirements/analysis'
+import { normalizeArcadeInput } from '@/utilities/research/arcade-inputs'
 
 /** Predict locally using the same fixed-step engine the server verifies. Only
  * acknowledged checkpoints survive a reload; a failed save pauses this run. */
@@ -102,10 +103,14 @@ export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: stri
         for (const input of controlsRef.current?.inputForTick?.(next) || []) {
           const tick = next.tick + 1
           inputsRef.current = inputsRef.current.filter((queued) => queued.tick !== tick || queued.kind !== input.kind)
-          inputsRef.current.push({ ...input, tick })
+          inputsRef.current.push(normalizeArcadeInput({ ...input, tick }))
         }
         next = stepArcadeSimulation(gameType, settings, next, inputsRef.current.filter((input) => input.tick === next.tick + 1))
         accumulator -= tickMs
+        // Stop at a checkpoint boundary even when one animation frame catches
+        // up several simulation ticks. Do not overfill high-frequency controls.
+        if (next.tick - checkpointTickRef.current >= 300 ||
+            inputsRef.current.filter((input) => input.tick <= next.tick).length >= 250) break
       }
       round.simulation = next
       setSimulation(next)
@@ -141,7 +146,7 @@ export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: stri
     if (kind === 'steer' || kind === 'heading' || kind === 'paddle') inputsRef.current = inputsRef.current.filter((input) => input.tick !== tick || input.kind !== kind)
     else if (inputsRef.current.some((input) => input.tick === tick && input.kind === kind)) return
     if (inputsRef.current.length >= 300) return
-    inputsRef.current.push({ tick, kind, ...(value === undefined ? {} : { value }) })
+    inputsRef.current.push(normalizeArcadeInput({ tick, kind, ...(value === undefined ? {} : { value }) }))
   }, [])
 
   const close = () => {
