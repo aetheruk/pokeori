@@ -121,20 +121,6 @@ export function CaptureScene({
                   Swipe up
                 </span>
               </div>
-              <Button
-                type="button"
-                disabled={!aimReady || isCapturing}
-                onClick={(event) => {
-                  const source = event.currentTarget.getBoundingClientRect()
-                  const target = targetRef.current?.getBoundingClientRect()
-                  handleCapture({ ringScale, visual: {
-                    from: { x: source.left + source.width / 2, y: source.top },
-                    target: target ? { x: target.left + target.width / 2, y: target.top + target.height / 2 } : { x: window.innerWidth / 2, y: window.innerHeight * 0.24 },
-                  } })
-                }}
-              >
-                {aimReady ? 'Throw Poké Ball' : 'Preparing throw…'}
-              </Button>
             </div>
 
             <Button

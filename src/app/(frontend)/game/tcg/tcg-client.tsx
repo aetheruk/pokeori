@@ -1149,7 +1149,7 @@ function CarddexFilterFields({
   )
 }
 
-function CarddexBinderShelf({
+export function CarddexBinderShelf({
   seriesGroups,
   progressBySet,
   scope,
@@ -1175,7 +1175,7 @@ function CarddexBinderShelf({
   )
 
   return (
-    <section aria-labelledby="carddex-binder-shelf" className="space-y-3">
+    <section aria-labelledby="carddex-binder-shelf" className="min-w-0 max-w-full space-y-3">
       <div className="flex items-center gap-2">
         <Library className="size-4 text-game-ochre-strong" aria-hidden="true" />
         <h2
@@ -1190,7 +1190,7 @@ function CarddexBinderShelf({
       </div>
 
       <fieldset
-        className="custom-scrollbar flex snap-x gap-2 overflow-x-auto pb-1"
+        className="custom-scrollbar flex w-full min-w-0 snap-x gap-2 overflow-x-auto overscroll-x-contain pb-1"
 
         aria-label="Card series"
       >
@@ -1236,7 +1236,7 @@ function CarddexBinderShelf({
 
       {activeSeries && (
         <fieldset
-          className="custom-scrollbar flex snap-x gap-2 overflow-x-auto border-t border-game-border pt-3 pb-1"
+          className="custom-scrollbar flex w-full min-w-0 snap-x gap-2 overflow-x-auto overscroll-x-contain border-t border-game-border pt-3 pb-1"
 
           aria-label={`${activeSeries.series} binders`}
         >
