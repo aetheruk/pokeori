@@ -171,9 +171,10 @@ Player art is supplied by the game/runtime through the game-specific player spri
 
 Players render in a persistent board overlay through `GridPlayerToken`, so a
 cell move translates the same element rather than mounting it in a new tile.
-Normal moves take 150ms and cycle the four facing-row frames, then return to
-frame zero. Rock Push uses its existing longer ice-slide duration. Voltorb and
-Echo Map pace accepted movement inputs to one per 150ms to finish each cell
+Normal moves take 360ms and cycle the four facing-row frames at 90ms per frame,
+then return to frame zero. Rock Push ice slides take 360ms plus 160ms per extra
+cell, capped at 1200ms, with the same 90ms sprite cadence. Voltorb and
+Echo Map pace accepted movement inputs to one per 360ms to finish each cell
 before turning. Reduced motion disables translation and walking animation;
 undo/reset and screen changes snap to their destination. Logical positions,
 collision checks, and server move proofs still update in whole cells.
