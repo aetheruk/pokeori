@@ -10,7 +10,7 @@ export const gridObjects = {
     name: 'Voltorb',
     purpose: 'hazard',
     size: { cols: 1, rows: 1 },
-    asset: { src: '/sprites/pokemon/gen-v/front/normal/100.avif' },
+    asset: { src: '/games/overworld/voltorb-idle.png' },
     collision: 'pushable',
   },
   breakableRock: {

@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.31.3`: Ditto now uses a four-direction overworld walking sheet for the Neither trainer choice across all grid games. Voltorb and protected Rattata/Ditto use matching overworld sprites, with Following Pokémon EX credits in Credits & Legal. Movement timing and gameplay rules are unchanged.
+
 - Release `0.31.2`: Grid walking is slowed from 150ms to 360ms per tile, with each directional sprite frame held for 90ms. Rock Push shares the same normal movement timing; ice slides use a longer travel duration without speeding up the walking frames. Voltorb/Echo input pacing follows the new duration. Reduced motion and server move validation are unchanged.
 
 - Release `0.31.1`: Rock Push, Voltorb Grid, and Echo Map move the trainer smoothly between cells while cycling all four directional walking frames, returning to a standing frame at rest. Voltorb/Echo inputs are paced to the 150ms cell movement; Rock Push retains its slide timing. Reduced-motion users get immediate positioning, and resets, undo, and screen changes do not animate across the board. Server move proofs and collision rules are unchanged.

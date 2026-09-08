@@ -5,7 +5,7 @@ export type GridPlayerDirection = 'down' | 'left' | 'right' | 'up'
 export const GRID_TRAINER_SPRITES = {
   male: '/games/trainers/lucas.png',
   female: '/games/trainers/dawn.png',
-  neither: '/sprites/pokemon/gen-v/front/normal/132.avif',
+  neither: '/games/overworld/ditto.png',
 } as const
 
 export function getTrainerGender(value: unknown): TrainerGender {
@@ -22,10 +22,7 @@ export function getGridPlayerAppearance(
   const frame = ((Math.trunc(step) % 4) + 4) % 4
   return {
     src: GRID_TRAINER_SPRITES[selection],
-    backgroundSize: selection === 'neither' ? 'contain' : '400% 400%',
-    backgroundPosition:
-      selection === 'neither'
-        ? 'center'
-        : `${(frame * 100) / 3}% ${(row * 100) / 3}%`,
+    backgroundSize: '400% 400%',
+    backgroundPosition: `${(frame * 100) / 3}% ${(row * 100) / 3}%`,
   }
 }
