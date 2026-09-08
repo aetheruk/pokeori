@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.29.22`: MoveDex's Known moves tab again offers a small Get missing TMs action below its filters. It restores missing earned research TMs through the existing recovery action and refreshes the inventory-backed move list.
+
 - Release `0.29.21`: fixes move-workspace dismissal and replaces Charged TM evolution gates with the required equipped move, as detailed below.
 
 - Dialog dependencies are pinned to one shared Radix Dialog version, including Vaul's mobile drawers, so overlapping windows share focus and dismissal state. Mobile and desktop browser coverage exercises search, assignment, reopening, and Escape.
