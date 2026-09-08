@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { PixelGridBoard } from '@/components/game/shared/pixel-grid-board'
+import { GridPlayerSprite } from '@/components/game/shared/grid-player-sprite'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
 import { useAudio } from '@/context/AudioContext'
@@ -69,7 +70,7 @@ export function RockTunnelEchoMapGame({
 }: RockTunnelEchoMapGameProps) {
   useGameMusic(encounter)
   const { playSfx } = useAudio()
-  const { gameData, refreshUser } = useUser()
+  const { user, gameData, refreshUser } = useUser()
   const completionInvalidatesRef = useRef<GameDataKeys[] | undefined>(undefined)
   const router = useRouter()
   const { cols, rows } = encounter.settings.gridSize
@@ -82,13 +83,11 @@ export function RockTunnelEchoMapGame({
     barrier: encounter.settings.barrierSprite,
     hole: encounter.settings.holeSprite,
     goal: encounter.settings.winTileSprite,
-    player: encounter.settings.playerSprite,
   })
   const {
     floor: floorSprite,
     hole: holeSprite,
     goal: winTileSprite,
-    player: playerSprite,
   } = tileSources
   const wallGoalSprite =
     resolveGridGoalSource(
@@ -489,21 +488,7 @@ export function RockTunnelEchoMapGame({
                   {playerHere && (
                     <div className="absolute inset-0 z-40 p-0.5">
                       <div className="absolute inset-[20%] translate-y-[18%] rounded-full bg-[#081014]/30 blur-[3px]" />
-                      <div
-                        className="relative h-full w-full [image-rendering:pixelated]"
-                        style={{
-                          backgroundImage: `url('${playerSprite}')`,
-                          backgroundSize: '200% 200%',
-                          backgroundPosition:
-                            facing === 'down'
-                              ? '0% 0%'
-                              : facing === 'up'
-                                ? '0% 100%'
-                                : facing === 'left'
-                                  ? '100% 100%'
-                                  : '100% 0%',
-                        }}
-                      />
+                      <GridPlayerSprite gender={user?.trainerGender} facing={facing} step={moves} />
                     </div>
                   )}
 

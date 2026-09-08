@@ -17,7 +17,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { PixelGridBoard } from '@/components/game/shared/pixel-grid-board'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
-import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
+import { GridPlayerSprite } from '@/components/game/shared/grid-player-sprite'
 import { Button } from '@/components/ui/button'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
@@ -46,7 +46,6 @@ import type {
   GridObjectPlacement,
   GridObjectVictoryMode,
 } from '@/data/games/grid-tiles'
-import { getIcon } from '@/data/user'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
 import {
@@ -388,10 +387,6 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     }
     return null
   }
-
-  // Resolve Player Icon
-  const currentIcon = getIcon(user?.icon || 'ditto')
-  const iconData = currentIcon?.icon || { type: 'pokemon', id: '132' }
 
   // Initialize Game Logic
   const initGame = useCallback(async () => {
@@ -1379,7 +1374,6 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     hole: encounter.settings.holeSprite,
     goal: encounter.settings.winTileSprite,
     teleporter: encounter.settings.teleporterSprite,
-    player: encounter.settings.playerSprite,
   })
   const {
     floor: floorSprite,
@@ -1387,7 +1381,6 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     hole: holeSprite,
     goal: winTileSprite,
     teleporter: teleporterSprite,
-    player: playerSprite,
   } = tileSources
   const boulderSprite =
     encounter.settings.boulderSprite || gridObjects.pushableBoulder.asset.src
@@ -1774,28 +1767,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
               >
                 <div className="relative h-full w-full">
                   <div className="absolute inset-[20%] translate-y-[18%] rounded-full bg-[#081014]/25 blur-[3px]" />
-                  {playerSprite ? (
-                    <div
-                      className="relative h-full w-full [image-rendering:pixelated]"
-                      style={{
-                        backgroundImage: `url('${playerSprite}')`,
-                        backgroundSize: '200% 200%',
-                        backgroundPosition:
-                          facing === 'down'
-                            ? '0% 0%'
-                            : facing === 'up'
-                              ? '0% 100%'
-                              : facing === 'left'
-                                ? '100% 100%'
-                                : '100% 0%', // right
-                      }}
-                    />
-                  ) : (
-                    <TaskIconDisplay
-                      icon={iconData as any}
-                      className="relative h-full w-full drop-shadow-md"
-                    />
-                  )}
+                  <GridPlayerSprite gender={user?.trainerGender} facing={facing} step={moves} />
                 </div>
               </div>
             </div>

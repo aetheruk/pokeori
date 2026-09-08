@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { TRAINER_GENDERS } from './trainer-appearance'
 
 // User update validation schema
 export const UpdateUserSchema = z.object({
@@ -6,6 +7,7 @@ export const UpdateUserSchema = z.object({
   banner: z.string().optional(),
   icon: z.string().optional(),
   title: z.string().optional(),
+  trainerGender: z.enum(TRAINER_GENDERS).optional(),
 })
 
 // Pokemon catch validation schema

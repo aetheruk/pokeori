@@ -40,6 +40,7 @@ export async function getGameRouteDataForUser(
       isAdmin: true,
       trainerName: true,
       banner: true,
+      trainerGender: true,
       icon: true,
       title: true,
       unlockedBanners: true,

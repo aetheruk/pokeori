@@ -20,6 +20,8 @@ Thank you to the maintainers and contributors of these community projects and se
 
 Pokémon-related names, characters, artwork, sprites, sounds, card designs, and trademarks remain owned by their respective rights holders. Check upstream repositories and services for their current terms before using or redistributing any derived data or assets.
 
+The Lucas and Dawn overworld sheets in `public/games/trainers/` were supplied by the project owner as `NPC_198_Lucas.png` and `NPC_201_Dawn.png`. Pokémon character and sprite rights remain with their respective owners; no separate upstream source or license was supplied with these files.
+
 ## Open-source software
 
 Pokeori is built with and thanks the maintainers of:

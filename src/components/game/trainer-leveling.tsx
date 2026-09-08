@@ -6,7 +6,6 @@ import {
   Map as MapIcon,
   Package,
   Pencil,
-  Search,
   Shield,
   Sparkles,
   Swords,
@@ -24,8 +23,8 @@ import { GameInfoModal } from '@/components/game/shared/GameInfoModal'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { BadgeShowcase } from '@/components/game/trainer/badge-showcase'
 import { TrainerSettings } from '@/components/game/trainer/trainer-settings'
+import { TrainerGenderPicker } from '@/components/game/trainer/trainer-gender-picker'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { SectionDivider } from '@/components/ui/section-divider'
 import {
@@ -43,7 +42,8 @@ import {
   type SkillGuideUnlock,
 } from '@/data/skills/guide'
 import { getTotalExpForLevel } from '@/data/skills/xp'
-import { type BannerConfig, banners, icons, titles } from '@/data/user'
+import { banners, icons, titles } from '@/data/user'
+import { getTrainerGender, type TrainerGender } from '@/utilities/trainer-appearance'
 import { cn } from '@/lib/utils'
 import {
   type CoreSkillId,
@@ -412,105 +412,18 @@ function getSkillUnlockCategoryLabel(category: SkillGuideUnlock['category']) {
   }
 }
 
-function BannerPickerDialog({
-  open,
-  onOpenChange,
-  availableBanners,
-  selectedBannerId,
-  onSelect,
-}: {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  availableBanners: BannerConfig[]
-  selectedBannerId: string | null
-  onSelect: (bannerId: string) => void
-}) {
-  const [query, setQuery] = useState('')
-  const filteredBanners = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase()
-    if (!normalizedQuery) return availableBanners
-    return availableBanners.filter((banner) =>
-      banner.name.toLowerCase().includes(normalizedQuery),
-    )
-  }, [availableBanners, query])
 
-  return (
-    <ResponsivePanel
-      open={open}
-      onOpenChange={(nextOpen) => {
-        onOpenChange(nextOpen)
-        if (!nextOpen) setQuery('')
-      }}
-      title="Choose a banner"
-      description="Select one of your unlocked trainer-card backgrounds."
-      desktopBreakpoint="lg"
-      desktopWidth="min(42vw, 640px)"
-      className="flex flex-col overflow-hidden"
-    >
-      <div className="shrink-0 px-5 pt-4">
-        <div className="relative">
-          <Search
-            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-game-muted"
-            aria-hidden="true"
-          />
-          <Input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search banners"
-            aria-label="Search unlocked banners"
-            className="pl-9"
-          />
-        </div>
-      </div>
-
-      <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-6 pt-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-game-border">
-        {filteredBanners.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-game-border bg-game-surface-raised/55 py-10 text-center text-sm text-game-muted">
-            No banners match that search.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {filteredBanners.map((banner) => (
-              <button
-                key={banner.id}
-                type="button"
-                onClick={() => onSelect(banner.id)}
-                aria-pressed={selectedBannerId === banner.id}
-                className={cn(
-                  'game-focus-ring group/banner relative aspect-[8/3] min-h-24 w-full overflow-hidden rounded-lg border-2 text-left transition-colors',
-                  selectedBannerId === banner.id
-                    ? 'border-game-moss ring-2 ring-game-moss/20'
-                    : 'border-game-border hover:border-game-moss/45',
-                )}
-              >
-                <span
-                  className="absolute inset-0 bg-cover bg-center transition-opacity group-hover/banner:opacity-90"
-                  style={{ backgroundImage: `url(${banner.imagePath})` }}
-                />
-                <span className="absolute inset-0 flex items-end bg-gradient-to-t from-game-night-canvas/90 via-game-night-canvas/15 to-transparent p-3">
-                  <span className="font-display text-sm font-semibold text-game-cream drop-shadow-sm">
-                    {banner.name}
-                  </span>
-                </span>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-    </ResponsivePanel>
-  )
-}
-
-export function TrainerLeveling() {
+export function TrainerLeveling({ saveCustomization = updateUserCustomization }: {
+  saveCustomization?: typeof updateUserCustomization
+} = {}) {
   const { user, refreshUser, updateUserContext } = useUser()
   const [selectedSkill, setSelectedSkill] = useState<CoreSkill | null>(null)
   const [isSkillModalOpen, setIsSkillModalOpen] = useState(false)
   const [isCustomizeModalOpen, setIsCustomizeModalOpen] = useState(false)
-  const [isBannerPickerOpen, setIsBannerPickerOpen] = useState(false)
   const [selectedBanner, setSelectedBanner] = useState<string | null>(null)
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null)
   const [selectedTitle, setSelectedTitle] = useState<string | null>(null)
+  const [selectedGender, setSelectedGender] = useState<TrainerGender>('neither')
   const [isSaving, setIsSaving] = useState(false)
   const userSkills = (user?.skills || {}) as SkillDataMap
   const equipableTitleIdSet = useMemo(
@@ -523,9 +436,9 @@ export function TrainerLeveling() {
   const availableBanners = banners.filter((banner) =>
     ((user as any)?.unlockedBanners || ['lab']).includes(banner.id),
   )
-  const selectedBannerDefinition =
-    availableBanners.find((banner) => banner.id === selectedBanner) ||
-    availableBanners[0]
+  const availableIcons = icons.filter((icon) =>
+    ((user as any)?.unlockedIcons || ['ditto', 'trainer-red', 'trainer-leaf']).includes(icon.id),
+  )
 
   if (!user) return null
 
@@ -542,12 +455,11 @@ export function TrainerLeveling() {
               title={(user as any).title}
               className="aspect-[8/5] w-full overflow-hidden rounded-none border-b border-game-border bg-game-surface md:h-36 md:aspect-auto xl:h-44"
             >
-              <TrainerSettings />
-
-              {/* Edit button - bottom right */}
+              {/* Unframed edit icon; retain a full touch target. */}
               <button
                 type="button"
                 onClick={() => {
+                  setSelectedGender(getTrainerGender(user.trainerGender))
                   setSelectedBanner((user as any).banner || 'lab')
                   setSelectedIcon((user as any).icon || 'ditto')
                   const currentTitle = (user as any).title || 'new-beginnings'
@@ -561,9 +473,9 @@ export function TrainerLeveling() {
                 }}
                 aria-label="Customize trainer card"
                 title="Customize trainer card"
-                className="game-focus-ring absolute bottom-4 right-4 z-20 flex h-10 min-w-10 items-center justify-center gap-2 rounded-md border border-game-border bg-game-surface/85 px-3 text-game-ink backdrop-blur-md transition-colors hover:bg-game-surface-raised"
+                className="game-focus-ring absolute right-2 top-2 z-20 flex h-11 w-11 items-center justify-center rounded-md text-game-cream/85 transition-colors hover:text-game-cream"
               >
-                <Pencil className="h-4 w-4" aria-hidden="true" />
+                <Pencil className="h-5 w-5 drop-shadow-sm" strokeWidth={1.5} aria-hidden="true" />
               </button>
             </TrainerCard>
           </div>
@@ -686,6 +598,7 @@ export function TrainerLeveling() {
           <SectionDivider>Gym Badges</SectionDivider>
           <BadgeShowcase />
         </div>
+        <TrainerSettings />
       </div>
 
       <GameInfoModal
@@ -721,179 +634,112 @@ export function TrainerLeveling() {
 
       <ResponsivePanel
         open={isCustomizeModalOpen}
-        onOpenChange={(open) => {
-          setIsCustomizeModalOpen(open)
-          if (!open) setIsBannerPickerOpen(false)
-        }}
-        title="Customize identity"
-        description="Choose how your trainer card appears to other players."
+        onOpenChange={(open) => { if (!isSaving) setIsCustomizeModalOpen(open) }}
+        title="Edit trainer card"
         desktopBreakpoint="lg"
-        desktopWidth="min(40vw, 560px)"
+        desktopWidth="min(44vw, 560px)"
         className="flex flex-col overflow-hidden"
+        headerClassName="shrink-0"
+        dismissible={!isSaving}
+        showCloseButton={!isSaving}
       >
-        <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden px-5">
-          <div className="relative z-10 flex-1 space-y-6 overflow-y-auto py-5 pr-1 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-game-border">
-            {/* Banner Selection */}
-            <div className="space-y-3">
-              <SectionDivider textColor="text-game-moss-strong">
-                Background Banner
-              </SectionDivider>
-              <button
-                type="button"
-                onClick={() => setIsBannerPickerOpen(true)}
-                className="game-focus-ring group/banner relative aspect-[8/3] min-h-28 w-full overflow-hidden rounded-lg border-2 border-game-border text-left transition-colors hover:border-game-moss/45"
-              >
-                {selectedBannerDefinition ? (
-                  <span
-                    className="absolute inset-0 bg-cover bg-center"
-                    style={{
-                      backgroundImage: `url(${selectedBannerDefinition.imagePath})`,
-                    }}
-                  />
-                ) : null}
-                <span className="absolute inset-0 flex items-end justify-between gap-3 bg-gradient-to-t from-game-night-canvas/90 via-game-night-canvas/15 to-transparent p-4">
-                  <span className="min-w-0 truncate font-display text-sm font-semibold text-game-cream">
-                    {selectedBannerDefinition?.name || 'Choose a banner'}
-                  </span>
-                  <span className="shrink-0 rounded-md border border-game-border/70 bg-game-surface-raised/90 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-game-clay-strong">
-                    Browse
-                  </span>
-                </span>
-              </button>
-            </div>
+        <div className="min-h-0 flex-1 overflow-y-auto p-4">
+          <fieldset disabled={isSaving} className="min-w-0 space-y-4">
+            <TrainerCard
+              name={user.trainerName}
+              icon={selectedIcon || 'ditto'}
+              banner={selectedBanner || 'lab'}
+              title={selectedTitle || 'new-beginnings'}
+              className="h-48 w-full"
+            />
 
-            {/* Icon Selection */}
-            <div className="space-y-3">
-              <SectionDivider textColor="text-game-moss-strong">
-                Trainer Avatar
-              </SectionDivider>
-              <div className="grid grid-cols-5 gap-2">
-                {icons
-                  .filter((i) =>
-                    (
-                      (user as any).unlockedIcons || [
-                        'ditto',
-                        'trainer-red',
-                        'trainer-leaf',
-                      ]
-                    ).includes(i.id),
-                  )
-                  .map((icon) => (
-                    <button
-                      key={icon.id}
-                      type="button"
-                      onClick={() => setSelectedIcon(icon.id)}
-                      aria-pressed={selectedIcon === icon.id}
-                      className={cn(
-                        'game-focus-ring group/icon relative flex h-14 w-full items-center justify-center rounded-lg border-2 bg-game-surface-raised transition-colors',
-                        selectedIcon === icon.id
-                          ? 'border-game-moss ring-2 ring-game-moss/20'
-                          : 'border-game-border opacity-60 hover:border-game-moss/40 hover:opacity-100',
-                      )}
-                      title={icon.name}
-                      aria-label={`Use ${icon.name} trainer avatar`}
-                    >
-                      <div className="relative z-10">
-                        <TaskIconDisplay
-                          icon={icon.icon}
-                          className="w-10 h-10"
-                        />
-                      </div>
-                      {selectedIcon === icon.id && (
-                        <div className="absolute inset-0 bg-game-moss/5" />
-                      )}
-                    </button>
-                  ))}
-              </div>
-            </div>
+            <TrainerGenderPicker value={selectedGender} onChange={setSelectedGender} />
 
-            {/* Title Selection */}
-            <div className="space-y-3">
-              <SectionDivider textColor="text-game-moss-strong">
-                Personal Title
-              </SectionDivider>
-              <Select
-                value={selectedTitle || ''}
-                onValueChange={setSelectedTitle}
-              >
-                <SelectTrigger className="h-14 w-full rounded-lg border-game-border bg-game-surface-raised px-6 font-bold tracking-tight text-game-ink focus:ring-game-moss/30">
-                  <SelectValue placeholder="Select a title" />
+            <div className="space-y-2">
+              <label htmlFor="trainer-banner" className="text-sm font-semibold">Background</label>
+              <Select value={selectedBanner || 'lab'} onValueChange={setSelectedBanner} disabled={isSaving}>
+                <SelectTrigger id="trainer-banner" className="min-h-11 w-full">
+                  <SelectValue placeholder="Choose a background" />
                 </SelectTrigger>
-                <SelectContent className="rounded-lg border-game-border bg-game-surface-raised p-2 shadow-2xl">
-                  {titles
-                    .filter((t) => equipableTitleIdSet.has(t.id))
-                    .map((title) => (
-                      <SelectItem
-                        key={title.id}
-                        value={title.id}
-                        className="mb-1 cursor-pointer rounded-lg py-3 focus:bg-game-moss/10 focus:text-game-moss-strong last:mb-0"
-                      >
-                        <span className="font-bold tracking-tight">
-                          {title.name}
-                        </span>
-                      </SelectItem>
-                    ))}
+                <SelectContent>
+                  {availableBanners.map((banner) => <SelectItem key={banner.id} value={banner.id}>
+                    {banner.name}
+                  </SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
-          </div>
 
-          {/* Save Button */}
-          <div className="relative z-10 mt-auto border-t border-game-border py-4">
-            <Button
-              onClick={async () => {
-                setIsSaving(true)
-                try {
-                  const result = await updateUserCustomization({
-                    banner: selectedBanner || undefined,
-                    icon: selectedIcon || undefined,
-                    title: selectedTitle || undefined,
-                  })
+            <details className="rounded-lg border border-game-border bg-game-surface">
+              <summary className="game-focus-ring cursor-pointer rounded-lg p-3 text-sm font-semibold">
+                Avatar · {availableIcons.find((icon) => icon.id === selectedIcon)?.name || 'Ditto'}
+              </summary>
+              <div className="grid max-h-48 grid-cols-5 gap-2 overflow-y-auto px-3 pb-3">
+                {availableIcons.map((icon) => <button
+                  key={icon.id}
+                  type="button"
+                  onClick={() => setSelectedIcon(icon.id)}
+                  aria-pressed={selectedIcon === icon.id}
+                  aria-label={`Use ${icon.name} trainer avatar`}
+                  title={icon.name}
+                  className={cn(
+                    'game-focus-ring flex h-12 w-full items-center justify-center rounded-lg border bg-game-surface-raised',
+                    selectedIcon === icon.id ? 'border-game-moss bg-game-moss/10' : 'border-game-border hover:border-game-moss',
+                  )}
+                >
+                  <TaskIconDisplay icon={icon.icon} className="h-9 w-9" />
+                </button>)}
+              </div>
+            </details>
 
-                  if (result.success) {
-                    updateUserContext({
-                      banner: selectedBanner || (user as any).banner || 'lab',
-                      icon: selectedIcon || (user as any).icon || 'ditto',
-                      title:
-                        selectedTitle ||
-                        (user as any).title ||
-                        'new-beginnings',
-                    })
-                    refreshUser(true)
-                    setIsCustomizeModalOpen(false)
-                    toast.success('Profile updated')
-                  } else {
-                    toast.error(result.error || 'Failed to update profile')
-                  }
-                } catch {
-                  toast.error('Failed to update profile')
-                } finally {
-                  setIsSaving(false)
+            <div className="space-y-2">
+              <label htmlFor="trainer-title" className="text-sm font-semibold">Title</label>
+              <Select value={selectedTitle || 'new-beginnings'} onValueChange={setSelectedTitle} disabled={isSaving}>
+                <SelectTrigger id="trainer-title" className="min-h-11 w-full">
+                  <SelectValue placeholder="Choose a title" />
+                </SelectTrigger>
+                <SelectContent>
+                  {titles.filter((title) => equipableTitleIdSet.has(title.id)).map((title) => <SelectItem key={title.id} value={title.id}>
+                    {title.name}
+                  </SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          </fieldset>
+        </div>
+        <div className="flex shrink-0 gap-2 border-t border-game-border p-4">
+          <Button variant="outline" disabled={isSaving} onClick={() => setIsCustomizeModalOpen(false)} className="min-h-11">Cancel</Button>
+          <Button
+            disabled={isSaving}
+            className="min-h-11 flex-1"
+            onClick={async () => {
+              setIsSaving(true)
+              try {
+                const changes = {
+                  banner: selectedBanner || user.banner || 'lab',
+                  icon: selectedIcon || user.icon || 'ditto',
+                  title: selectedTitle || user.title || 'new-beginnings',
+                  trainerGender: selectedGender,
                 }
-              }}
-              disabled={isSaving}
-              className="h-12 w-full rounded-lg bg-game-clay font-black uppercase tracking-widest text-game-cream transition-colors hover:bg-game-clay/90"
-            >
-              {isSaving ? (
-                <Loader2 className="w-6 h-6 animate-spin" />
-              ) : (
-                'Save profile'
-              )}
-            </Button>
-          </div>
+                const result = await saveCustomization(changes)
+                if (result.success) {
+                  updateUserContext(changes)
+                  void refreshUser(true)
+                  setIsCustomizeModalOpen(false)
+                  toast.success('Trainer card updated')
+                } else {
+                  toast.error(result.error || 'Failed to update profile')
+                }
+              } catch {
+                toast.error('Failed to update profile')
+              } finally {
+                setIsSaving(false)
+              }
+            }}
+          >
+            {isSaving ? <><Loader2 className="h-4 w-4 animate-spin" />Saving…</> : 'Save changes'}
+          </Button>
         </div>
       </ResponsivePanel>
-
-      <BannerPickerDialog
-        open={isBannerPickerOpen}
-        onOpenChange={setIsBannerPickerOpen}
-        availableBanners={availableBanners}
-        selectedBannerId={selectedBanner}
-        onSelect={(bannerId) => {
-          setSelectedBanner(bannerId)
-          setIsBannerPickerOpen(false)
-        }}
-      />
     </div>
   )
 }

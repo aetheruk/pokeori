@@ -54,6 +54,16 @@ export const Users: CollectionConfig = {
     },
     // User Customization - Active selection
     {
+      name: 'trainerGender',
+      type: 'select',
+      defaultValue: 'neither',
+      options: [
+        { label: 'Male', value: 'male' },
+        { label: 'Female', value: 'female' },
+        { label: 'Neither', value: 'neither' },
+      ],
+    },
+    {
       name: 'banner',
       type: 'text',
       defaultValue: 'lab',
