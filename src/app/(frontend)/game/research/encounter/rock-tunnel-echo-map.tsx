@@ -14,7 +14,10 @@ import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { PixelGridBoard } from '@/components/game/shared/pixel-grid-board'
-import { GridPlayerSprite } from '@/components/game/shared/grid-player-sprite'
+import {
+  GRID_PLAYER_MOVE_MS,
+  GridPlayerToken,
+} from '@/components/game/shared/grid-player-sprite'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
 import { useAudio } from '@/context/AudioContext'
@@ -127,6 +130,7 @@ export function RockTunnelEchoMapGame({
   const [result, setResult] = useState<any | null>(null)
   const completionRef = useRef(false)
   const moveProofRef = useRef<string[]>([])
+  const nextMoveAtRef = useRef(0)
   const partnerPokemon = useMemo(
     () =>
       ((gameData as any)?.pokemon || []).find(
@@ -189,6 +193,7 @@ export function RockTunnelEchoMapGame({
 
     completionRef.current = false
     moveProofRef.current = []
+    nextMoveAtRef.current = 0
     setPlayer(encounter.settings.playerStart)
     setFacing('down')
     setMoves(0)
@@ -255,6 +260,7 @@ export function RockTunnelEchoMapGame({
   const movePlayer = useCallback(
     (direction: Direction) => {
       if (!movementEnabled) return
+      if (performance.now() < nextMoveAtRef.current) return
 
       setFacing(direction)
       const delta = directionDeltas[direction]
@@ -275,6 +281,7 @@ export function RockTunnelEchoMapGame({
       const nextMoves = moves + 1
       moveProofRef.current.push(direction)
       setPlayer(next)
+      nextMoveAtRef.current = performance.now() + GRID_PLAYER_MOVE_MS
       setMoves(nextMoves)
 
       if (holeKeys.has(nextKey)) {
@@ -397,7 +404,7 @@ export function RockTunnelEchoMapGame({
             frameSrc={frameSprite}
             frameSlice={frameSprite ? resolveGridFrameSlice(encounter.settings.tilePaletteId) : undefined}
             ariaLabel="Rock Tunnel Echo Map board. Reach the gold doorway in the back wall. Violet rifts are hazards that end the run."
-            className="overflow-hidden rounded-lg bg-[#0d1820] shadow-2xl ring-4 ring-[#081014]/40"
+            className="relative isolate overflow-hidden rounded-lg bg-[#0d1820] shadow-2xl ring-4 ring-[#081014]/40"
           >
             {cells.map((cell) => {
               const key = positionKey(cell)
@@ -484,14 +491,6 @@ export function RockTunnelEchoMapGame({
                       />
                     </div>
                   )}
-
-                  {playerHere && (
-                    <div className="absolute inset-0 z-40 p-0.5">
-                      <div className="absolute inset-[20%] translate-y-[18%] rounded-full bg-[#081014]/30 blur-[3px]" />
-                      <GridPlayerSprite gender={user?.trainerGender} facing={facing} step={moves} />
-                    </div>
-                  )}
-
                   {visible && !playerHere && (
                     <div
                       className={cn(
@@ -503,6 +502,13 @@ export function RockTunnelEchoMapGame({
                 </div>
               )
             })}
+            <GridPlayerToken
+              gender={user?.trainerGender}
+              facing={facing}
+              step={moves}
+              position={player}
+              className="z-40"
+            />
           </PixelGridBoard>
 
           <p className="max-w-[min(92vw,32rem)] text-center text-xs font-semibold uppercase tracking-[0.16em] text-game-cream/85">
