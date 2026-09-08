@@ -705,8 +705,12 @@ describe('shared grid sprite sets', () => {
     expect(metadata.hasAlpha).toBe(true)
   })
 
-  test('no external sprite pack is bundled', () => {
-    expect(getGridTilePackCredits({ externalOnly: true })).toEqual([])
+  test('bundled overworld sprites expose their upstream credit', () => {
+    const credits = getGridTilePackCredits({ externalOnly: true })
+    expect(credits).toHaveLength(1)
+    expect(credits[0].href).toBe('https://eeveeexpo.com/resources/516/')
+    expect(credits[0].creator).toContain('Golisopod User')
+    expect(credits[0].notice).toContain('credit')
   })
 
   test('unknown palette ids use the default palette while role overrides remain isolated', () => {

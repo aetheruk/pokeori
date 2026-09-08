@@ -816,14 +816,15 @@ export function VoltorbGridGame({
                   {protectedPokemon && (
                     <div className="absolute inset-[8%] z-[25]">
                       <Image
-                        src={getPokemonImageUrl(
-                          protectedPokemon.formId,
-                          'home',
-                        )}
+                        src={protectedPokemon.formId === '19'
+                          ? '/games/overworld/rattata-idle.png'
+                          : protectedPokemon.formId === '132'
+                            ? '/games/overworld/ditto-idle.png'
+                            : getPokemonImageUrl(protectedPokemon.formId, 'home')}
                         alt=""
                         fill
                         sizes="64px"
-                        className="object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.55)]"
+                        className="object-contain [image-rendering:pixelated] drop-shadow-[0_0_10px_rgba(255,255,255,0.55)]"
                       />
                     </div>
                   )}
@@ -843,7 +844,7 @@ export function VoltorbGridGame({
                         fill
                         sizes="64px"
                         className={cn(
-                          'object-contain drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]',
+                          'object-contain [image-rendering:pixelated] drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]',
                           voltorb.id === detonatingVoltorbId &&
                             !isBlasting &&
                             '[animation:voltorb-grid-detonator_540ms_ease-in-out_infinite]',

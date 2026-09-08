@@ -10,6 +10,17 @@ import {
 import { UpdateUserSchema } from '@/utilities/validators'
 
 describe('trainer appearance', () => {
+  test('overworld idle images preserve the first transparent source frame', async () => {
+    for (const name of ['ditto', 'rattata', 'voltorb']) {
+      const sheet = sharp(`public/games/overworld/${name}.png`)
+      const metadata = await sheet.metadata()
+      expect([metadata.width, metadata.height, metadata.hasAlpha]).toEqual([256, 256, true])
+      const expected = await sheet.extract({ left: 0, top: 0, width: 64, height: 64 }).raw().toBuffer()
+      const actual = await sharp(`public/games/overworld/${name}-idle.png`).raw().toBuffer()
+      expect(actual.equals(expected)).toBe(true)
+    }
+  })
+
   test('legacy profiles default to Neither and all explicit choices validate', () => {
     expect(getTrainerGender(undefined)).toBe('neither')
     expect(getTrainerGender(null)).toBe('neither')
@@ -23,8 +34,8 @@ describe('trainer appearance', () => {
     }
   })
 
-  test('human sheets use down/left/right/up rows and four walking columns', async () => {
-    for (const gender of ['male', 'female'] as const) {
+  test('all sheets use down/left/right/up rows and four walking columns', async () => {
+    for (const gender of TRAINER_GENDERS) {
       const metadata = await sharp(
         await readFile(`public${GRID_TRAINER_SPRITES[gender]}`),
       ).metadata()
@@ -46,7 +57,7 @@ describe('trainer appearance', () => {
     }
   })
 
-  test('Neither always renders a complete Ditto, never a cropped trainer frame', async () => {
+  test('Neither renders the selected directional Ditto frame', async () => {
     expect(
       (
         await sharp(
@@ -56,8 +67,8 @@ describe('trainer appearance', () => {
     ).toBeGreaterThan(0)
     expect(getGridPlayerAppearance('neither', 'up', 3)).toEqual({
       src: GRID_TRAINER_SPRITES.neither,
-      backgroundSize: 'contain',
-      backgroundPosition: 'center',
+      backgroundSize: '400% 400%',
+      backgroundPosition: '100% 100%',
     })
   })
 })

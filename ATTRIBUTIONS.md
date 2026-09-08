@@ -22,6 +22,10 @@ Pokémon-related names, characters, artwork, sprites, sounds, card designs, and 
 
 The Lucas and Dawn overworld sheets in `public/games/trainers/` were supplied by the project owner as `NPC_198_Lucas.png` and `NPC_201_Dawn.png`. Pokémon character and sprite rights remain with their respective owners; no separate upstream source or license was supplied with these files.
 
+## Pokémon overworld sprites
+
+The Ditto, Rattata and Voltorb overworld sheets in `public/games/overworld/` come from [Following Pokémon EX 2.5.1 on Eevee Expo](https://eeveeexpo.com/resources/516/), downloaded 8 September 2026. The full 256×256 sheets are unchanged; `*-idle.png` files extract the first 64×64 downward-facing frame. The resource requests credit when used: NoNonever, Golisopod User, Help-14, zingzags, Rayd12smitty, mej71, PurpleZaffre, Akizakura16, Thundaga, Armin (Fairies Resource Pack), and Maruno. No separate open-source artwork license is stated; Pokémon rights remain with their respective owners.
+
 ## Open-source software
 
 Pokeori is built with and thanks the maintainers of:

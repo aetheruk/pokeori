@@ -11,7 +11,7 @@ for (const width of [390, 1280]) {
     await page.goto('/ui-test')
     await page.getByRole('button', { name: 'Test grid appearance', exact: true }).click()
     const fixture = page.getByRole('region', { name: 'Grid appearance fixture', exact: true })
-    await fixture.getByRole('combobox', { name: 'Grid character' }).selectOption(width === 390 ? 'female' : 'male')
+    await fixture.getByRole('combobox', { name: 'Grid character' }).selectOption('neither')
     // Freeze real browser animations so intermediate positions can be checked
     // without relying on a screenshot landing inside a 360ms movement window.
     await page.evaluate(() => {
@@ -28,6 +28,13 @@ for (const width of [390, 1280]) {
       await fixture.getByRole('combobox', { name: 'Grid variant' }).selectOption(variant)
       const sprite = fixture.locator('[data-grid-player-sprite]')
       const token = sprite.locator('../..')
+      if (variant === 'voltorb') {
+        for (const name of ['rattata', 'voltorb']) {
+          const image = fixture.locator(`img[src*="${name}-idle.png"]`).first()
+          await expect(image).toBeVisible()
+          await expect.poll(() => image.evaluate((el) => (el as HTMLImageElement).naturalWidth)).toBeGreaterThan(0)
+        }
+      }
       const position = () => token.evaluate((el) => {
         const transform = new DOMMatrixReadOnly(getComputedStyle(el).transform)
         return { x: transform.m41, y: transform.m42, width: el.getBoundingClientRect().width }
@@ -115,7 +122,7 @@ for (const width of [390, 1280]) {
   })
 }
 
-test('every grid variant renders the saved character and human facing rows', async ({ page }) => {
+test('every grid variant renders the saved character and directional facing rows', async ({ page }) => {
   await page.route('**/ui-test', async (route) => {
     if (route.request().method() === 'POST') {
       await route.fulfill({ contentType: 'text/x-component', body: '0:{"a":"$@1","f":"","b":"development"}\n1:{"success":true}\n' })
@@ -126,11 +133,11 @@ test('every grid variant renders the saved character and human facing rows', asy
   const fixture = page.getByRole('region', { name: 'Grid appearance fixture', exact: true })
   for (const variant of ['rock-push', 'voltorb', 'echo-map']) {
     await fixture.getByRole('combobox', { name: 'Grid variant' }).selectOption(variant)
-    for (const [gender, asset] of [['male', 'lucas.png'], ['female', 'dawn.png'], ['neither', '132.avif']]) {
+    for (const [gender, asset] of [['male', 'lucas.png'], ['female', 'dawn.png'], ['neither', 'ditto.png']]) {
       await fixture.getByRole('combobox', { name: 'Grid character' }).selectOption(gender)
       const sprite = fixture.locator('[data-grid-player-sprite]')
       await expect(sprite).toHaveAttribute('data-grid-player-sprite', new RegExp(asset.replace('.', '\\.') + '$'))
-      await expect(sprite).toHaveCSS('background-size', gender === 'neither' ? 'contain' : '400% 400%')
+      await expect(sprite).toHaveCSS('background-size', '400% 400%')
       await expect(sprite).toBeVisible()
       if (variant === 'voltorb' && gender === 'male') {
         await expect(fixture.getByRole('button', { name: 'Move left', exact: true })).toBeEnabled()

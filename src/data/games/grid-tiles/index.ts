@@ -18,7 +18,7 @@ export * from './schema'
 export { getGridObjectDefinition, gridObjects } from './objects'
 
 export const DEFAULT_GRID_TILE_PALETTE_ID = 'basic-cave'
-export const DEFAULT_GRID_PLAYER_SPRITE = '/sprites/pokemon/gen-v/front/normal/132.avif'
+export const DEFAULT_GRID_PLAYER_SPRITE = '/games/overworld/ditto-idle.png'
 export const DEFAULT_RARE_FLOOR_CHANCE = 0.08
 export const GRID_WALL_MASKS: GridWallMask[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
 
@@ -488,5 +488,12 @@ export function getGridTilePackCredits(options?: { externalOnly?: boolean }): Gr
     (palette) => palette.credits,
   )
   const filtered = options?.externalOnly ? credits.filter((credit) => credit.external) : credits
+  filtered.push({
+    label: 'Following Pokémon EX — Ditto, Rattata and Voltorb overworld sprites',
+    creator: 'NoNonever, Golisopod User, Help-14, zingzags, Rayd12smitty, mej71, PurpleZaffre, Akizakura16, Thundaga, Armin and Maruno',
+    href: 'https://eeveeexpo.com/resources/516/',
+    notice: 'Resource requests credit when used. Pokémon artwork remains owned by its respective rights holders.',
+    external: true,
+  })
   return Array.from(new Map(filtered.map((credit) => [`${credit.label}:${credit.href || 'local'}`, credit])).values())
 }
