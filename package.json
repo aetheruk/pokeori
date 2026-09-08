@@ -1,6 +1,6 @@
 {
   "name": "pokeori",
-  "version": "0.29.20",
+  "version": "0.29.21",
   "description": "Pokeori field-journal adventure game",
   "license": "MIT",
   "type": "module",
@@ -140,6 +140,7 @@
   "private": false,
   "packageManager": "bun@1.4.2",
   "overrides": {
+    "@radix-ui/react-dialog": "1.1.23",
     "dompurify": "3.4.14",
     "nanoid": "3.3.18"
   }

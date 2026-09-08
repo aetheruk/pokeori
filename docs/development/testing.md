@@ -1,5 +1,7 @@
 # Testing Strategy
 
+`bun test tests/evolution-moves.test.ts` verifies all authored move-evolution requirements, source-form TM compatibility, saved assignment matching, unknown-move rejection, and preservation of other evolution item conditions.
+
 Pokeori uses Bun's built-in test runner for utility, data-integrity, and
 schema validation tests.
 
@@ -21,6 +23,7 @@ schema validation tests.
 - Use Playwright (already has Playwright config in root)
 
 ## Current Coverage
+- `e2e/move-workspace.pw.ts` covers Pokémon inspector search, Rollout assignment, close/reopen, Escape, and unsaved evolution gating at mobile and desktop widths.
 - Dex layout checks exercise horizontal series/set scrolling and selection with the full binder catalog at 390px/1280px, plus all ten page skeletons without page overflow or animated spinners. Capture checks cover native keyboard activation on the ball, ignored ordinary clicks, and upward drag throws.
 - Navigation feedback holds a cold route response and checks keyboard activation, stable link geometry, and responsive navigation at 390px/1280px with reduced motion (`e2e/navigation-feedback.pw.ts`). The optional standalone interaction check expects automatic shell prefetching; development tests cannot verify production prefetch timing.
 - User-field create/update and account-unlock permissions, including forged admin input.

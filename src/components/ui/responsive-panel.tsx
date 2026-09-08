@@ -34,6 +34,7 @@ export interface ResponsivePanelProps {
   showHandle?: boolean
   showHeader?: boolean
   showCloseButton?: boolean
+  dismissible?: boolean
   headerClassName?: string
   className?: string
 }
@@ -71,6 +72,7 @@ export function ResponsivePanel({
   showHandle = true,
   showHeader = true,
   showCloseButton = true,
+  dismissible = true,
   headerClassName,
   className,
 }: ResponsivePanelProps) {
@@ -107,6 +109,12 @@ export function ResponsivePanel({
         <Dialog open={open} onOpenChange={onOpenChange}>
           {triggerElement && <DialogTrigger asChild>{triggerElement}</DialogTrigger>}
           <DialogContent
+            onInteractOutside={(event) => {
+              if (!dismissible) event.preventDefault()
+            }}
+            onEscapeKeyDown={(event) => {
+              if (!dismissible) event.preventDefault()
+            }}
             className={cn(
               'game-paper-modal game-paper-background !left-auto !right-0 !top-0 h-dvh !max-h-none !w-[var(--responsive-panel-width)] !max-w-none !translate-x-0 !translate-y-0 rounded-l-xl rounded-r-none border-y-0 border-r-0 p-0 sm:p-0',
               'data-[state=open]:slide-in-from-right data-[state=closed]:slide-out-to-right',
@@ -145,7 +153,7 @@ export function ResponsivePanel({
   }
 
   return (
-      <Drawer open={open} onOpenChange={onOpenChange}>
+      <Drawer open={open} onOpenChange={onOpenChange} dismissible={dismissible}>
         {triggerElement && <DrawerTrigger asChild>{triggerElement}</DrawerTrigger>}
         <DrawerContent
           showHandle={showHandle}

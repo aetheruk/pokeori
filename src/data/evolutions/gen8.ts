@@ -256,7 +256,7 @@ export const gen8Evolutions: Record<number, Evolution[]> = {
       "name": "grapploct",
       "trigger": "level-up",
       "conditions": {
-        "knownMoveId": "269"
+        "knownMoveId": "taunt"
       }
     }
   ],

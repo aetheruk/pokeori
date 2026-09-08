@@ -373,7 +373,7 @@ export const gen9Evolutions: Record<number, Evolution[]> = {
       "name": "hydrapple",
       "trigger": "level-up",
       "conditions": {
-        "knownMoveId": "913"
+        "knownMoveId": "dragon-cheer"
       }
     }
   ],

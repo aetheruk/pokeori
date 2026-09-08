@@ -44,6 +44,22 @@ function makeBattlePokemon(overrides: Partial<BattlePokemon> = {}): BattlePokemo
 }
 
 describe('pokemon move assignment helpers', () => {
+  test('Lickitung can select and save owned Rollout regardless of its Normal type', () => {
+    const params = {
+      pokemonTypes: ['normal'],
+      pokemonFormId: '108',
+      pokemonLevel: 1,
+      inventory: { 'tm-rollout': 1 },
+    }
+    expect(getAvailableMoveOptions(params).some((move) => move.id === 'rollout')).toBe(true)
+    expect(validateAssignedMoveIds({ ...params, moveIds: ['rollout'] })).toEqual({
+      success: true,
+      moveIds: ['rollout'],
+    })
+    expect(getAssignedMoveOptions({ ...params, assignedMoves: ['rollout'] }).map((move) => move.id)).toEqual(['rollout'])
+    expect(validateAssignedMoveIds({ ...params, inventory: {}, moveIds: ['rollout'] }).success).toBe(false)
+  })
+
   test('Smeargle can use a sketched move without its TM and only Smeargle can use that unlock', () => {
     expect(
       getAvailableMoveOptions({

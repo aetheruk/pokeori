@@ -2,6 +2,8 @@
 
 Last reviewed: 2026-09-04
 
+Move-based evolution now checks the saved assigned move, not a Charged TM. Required moves are Rollout (Lickitung), Ancient Power (Tangela, Yanma, Piloswine), Double Hit (Aipom), Twin Beam (Girafarig), Hyper Drill (Dunsparce), Barb Barrage (Hisuian Qwilfish), Mimic (Bonsly, Mime Jr.), Stomp (Steenee), Dragon Pulse (Poipole), Taunt (Clobbopus), and Dragon Cheer (Dipplin). All are already compatible with their source forms and use normal TM ownership and assignment unlocks. Evolution does not consume the move or its TM.
+
 Release 0.26.0 introduces a shared structured move presentation used by MoveDex/Sketchbook, TM and HM inventory notes, Pokédex compatibility notes, Pokémon loadouts, and battle decisions. It distinguishes base power from special fixed/OHKO/delayed models, exposes always-hit behavior, targets, chances, durations, scopes, use conditions, charge/recharge, multi-hit behavior, dynamic type rules, and costs. Move descriptions are no longer runtime inputs for healing or recoil classification. Self damage now authors an explicit `on-hit`, `on-miss`, or `on-use` trigger, and Strength Sap authors target-Attack healing. The corrected catalog entries include Nuzzle, Geomancy, Heal Bell, Jungle Healing, Lunar Blessing, Draining Kiss, Synthesis, Moonlight, Strength Sap, Shell Side Arm, Fiery Wrath, High Jump Kick, Jump Kick, and Axe Kick.
 
 Sketch resolves target availability before its 25% capture chance in both PvE and PvP. Targets with no eligible TM-backed move and targets whose eligible moves are all already recorded produce their specific unavailable message without consuming the capture roll; only a non-empty pool of new moves can produce capture success or random failure.

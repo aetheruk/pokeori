@@ -49,6 +49,7 @@ const writeEvolutionModules = (evolutionMap) => {
   timeOfDay?: string
   gender?: number
   locationId?: string
+  /** Battle move slug that must be equipped in the saved loadout. */
   knownMoveId?: string
   heldItem?: string
   trade?: boolean
@@ -177,6 +178,7 @@ async function generate() {
   const evolutions = readJson('pokemon_evolution.json')
   const items = readJson('items.json')
   const triggers = readJson('evolution_triggers.json')
+  const moveMap = new Map(readJson('moves.json').map((move) => [move.id, move.identifier]))
 
   // Map Item ID -> Identifier
   const itemMap = new Map()
@@ -463,7 +465,7 @@ async function generate() {
         speciesId: 904,
         name: 'overqwil',
         trigger: 'level-up',
-        conditions: { knownMoveId: '839', requiredSourceForm: 'Hisuian Form' },
+        conditions: { knownMoveId: 'barb-barrage', requiredSourceForm: 'Hisuian Form' },
       },
     ],
     // Sneasel (215)
@@ -800,7 +802,11 @@ async function generate() {
         if (evo.time_of_day) conditions.timeOfDay = evo.time_of_day
         if (evo.gender_id) conditions.gender = parseInt(evo.gender_id) // 1=female, 2=male typically
         if (evo.location_id) conditions.locationId = evo.location_id // e.g. magnetic field
-        if (evo.known_move_id) conditions.knownMoveId = evo.known_move_id
+        if (evo.known_move_id) {
+          const moveId = moveMap.get(evo.known_move_id)
+          if (!moveId) throw new Error(`Unknown evolution move: ${evo.known_move_id}`)
+          conditions.knownMoveId = moveId
+        }
         if (evo.held_item_id) {
           const itemName = itemMap.get(evo.held_item_id)
           if (itemName) {

@@ -26,6 +26,7 @@ import {
   getSpeciesIdForForm,
 } from '@/utilities/pokemon/pokedex'
 import { items } from '@/data/items'
+import { getMove } from '@/data/moves'
 import { rollResearchXp } from '@/utilities/research/research-levels'
 import { EVOLUTIONS, type EvolutionCondition } from '@/data/evolutions'
 import { getLevelEvolutionCatalystForEvolution } from '@/data/evolution-catalysts'
@@ -33,11 +34,13 @@ import { resolveEvolvedAbility } from '@/data/abilities'
 import { resolveEvolutionTargetForm } from '@/utilities/pokemon/evolution-targets'
 import {
   getEvolutionTimeOfDayLabel,
+  getRequiredEvolutionItem,
   getEvolutionTimeRegionLabel,
   matchesEvolutionGender,
   matchesEvolutionTimeOfDayForRegion,
   resolveEvolutionTimeRegion,
 } from '@/utilities/pokemon/evolution-conditions'
+import { matchesEvolutionMove } from '@/utilities/pokemon/evolution-moves'
 import { getOwnedPokemonGender } from '@/utilities/pokemon/gender'
 import { resolvePokemonRarity } from '@/utilities/pokemon/rarity-effects'
 import { getUser, serializePokemon, type StatName } from './utils'
@@ -50,15 +53,6 @@ import {
   setUserPokedexMap,
 } from '@/utilities/user-state'
 import { getEconomyActionErrorMessage, runEconomyAction } from '@/utilities/economy/transactions'
-
-function getRequiredEvolutionItem(
-  conditions: EvolutionCondition,
-): string | null {
-  if (conditions.locationId) return 'evolution-compass'
-  if (conditions.knownMoveId) return 'charged-tm'
-  if (conditions.heldItem) return conditions.heldItem
-  return conditions.itemId || (conditions.trade ? 'link-cable' : null)
-}
 
 function matchesSourceForm(
   conditions: EvolutionCondition,
@@ -146,6 +140,11 @@ export async function evolvePokemon(
 
   // Check Conditions
   const { conditions } = targetEvolution
+
+  if (!matchesEvolutionMove(conditions, pokemon.assignedMoves)) {
+    const moveName = getMove(conditions.knownMoveId || '')?.name || 'the required move'
+    return { success: false, message: `Equip and save ${moveName} before evolving` }
+  }
 
   // Check Source Form Requirement (Regional variants)
   // Resolve current form name from ID
