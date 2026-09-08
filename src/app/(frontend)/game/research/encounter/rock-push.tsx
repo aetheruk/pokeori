@@ -17,7 +17,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { PixelGridBoard } from '@/components/game/shared/pixel-grid-board'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
-import { GridPlayerToken } from '@/components/game/shared/grid-player-sprite'
+import {
+  GRID_PLAYER_MOVE_MS,
+  GridPlayerToken,
+} from '@/components/game/shared/grid-player-sprite'
 import { Button } from '@/components/ui/button'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
@@ -143,7 +146,7 @@ const cloneScreenStates = (source: Record<string, ScreenRuntimeState>) =>
   )
 
 const blockerCells: CellType[] = ['wall']
-const defaultMoveDurationMs = 150
+const defaultMoveDurationMs = GRID_PLAYER_MOVE_MS
 
 const isSamePosition = (a: Position, b: Position) => a.x === b.x && a.y === b.y
 
@@ -153,7 +156,7 @@ const getTileDistance = (from: Position, to: Position) =>
 const getSlideDuration = (from: Position, to: Position) => {
   const distance = getTileDistance(from, to)
   if (distance <= 1) return defaultMoveDurationMs
-  return Math.min(720, 110 + distance * 95)
+  return Math.min(1200, defaultMoveDurationMs + (distance - 1) * 160)
 }
 
 const detectDeadlockedRocks = (grid: CellType[][], rocks: RockState[]) => {

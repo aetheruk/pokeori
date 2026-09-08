@@ -1,6 +1,6 @@
 # Testing Strategy
 
-Grid movement: `bun run test:e2e e2e/trainer-appearance.pw.ts -g 'grid walking'` checks all three grid variants at phone and desktop widths. Browser animations are paused at known times to verify half-cell translation, all four walking frames, the standing frame on arrival, and immediate movement with reduced motion enabled. Rock Push also checks undo, restart, and facing a blocked cell.
+Grid movement: `bun run test:e2e e2e/trainer-appearance.pw.ts -g 'grid walking'` checks all three grid variants at phone and desktop widths. Browser animations are paused at known times to verify the 360ms movement/cycle duration, half-cell translation, all four 90ms walking frames, the standing frame on arrival, and immediate movement with reduced motion enabled. Rock Push also checks undo, restart, and facing a blocked cell.
 
 Trainer appearance: `bun test tests/trainer-appearance.test.ts` covers gender validation, legacy defaults, sprite-sheet dimensions, and directional frames. `bun run test:e2e e2e/trainer-appearance.pw.ts e2e/trainer-settings.pw.ts` checks phone/desktop editing, cancel/save, keyboard selection, and all three characters across the real grid renderers. `bun run test:security:integration` also verifies authenticated customization persistence, invalid values, owner isolation, and trainer sync against disposable services.
 

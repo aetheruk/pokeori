@@ -13,13 +13,13 @@ for (const width of [390, 1280]) {
     const fixture = page.getByRole('region', { name: 'Grid appearance fixture', exact: true })
     await fixture.getByRole('combobox', { name: 'Grid character' }).selectOption(width === 390 ? 'female' : 'male')
     // Freeze real browser animations so intermediate positions can be checked
-    // without relying on a screenshot landing inside a 150ms movement window.
+    // without relying on a screenshot landing inside a 360ms movement window.
     await page.evaluate(() => {
       const animate = Element.prototype.animate
       Element.prototype.animate = function (...args) {
         const animation = animate.apply(this, args)
         animation.pause()
-        animation.currentTime = 75
+        animation.currentTime = 180
         return animation
       }
     })
@@ -38,10 +38,12 @@ for (const width of [390, 1280]) {
       await expect(control).toBeEnabled()
       await control.click()
       await expect.poll(() => token.evaluate((el) => el.getAnimations().length)).toBe(1)
+      expect(await token.evaluate((el) => el.getAnimations()[0].effect!.getTiming().duration)).toBe(360)
+      expect(await sprite.evaluate((el) => el.getAnimations()[0].effect!.getTiming().duration)).toBe(360)
       const middle = await position()
       expect(Math.abs(middle!.x - before!.x)).toBeCloseTo(before!.width / 2, 0)
       expect(middle!.y).toBeCloseTo(before!.y, 0)
-      for (const [time, frame] of [[10, 0], [45, 1], [80, 2], [120, 3]]) {
+      for (const [time, frame] of [[45, 0], [135, 1], [225, 2], [315, 3]]) {
         await sprite.evaluate((el, time) => { el.getAnimations()[0].currentTime = time }, time)
         const x = await sprite.evaluate((el) => parseFloat(getComputedStyle(el).backgroundPositionX))
         expect(x).toBeCloseTo(frame * 100 / 3, 2)
@@ -52,7 +54,7 @@ for (const width of [390, 1280]) {
       expect(Math.abs(after!.x - before!.x)).toBeCloseTo(before!.width, 0)
       await fixture.getByRole('grid').screenshot({ path: `/tmp/pokeori-grid-walk-${variant}-${width}.png` })
       await page.emulateMedia({ reducedMotion: 'reduce' })
-      await page.waitForTimeout(160)
+      await page.waitForTimeout(370)
       await fixture.getByRole('button', { name: `Move ${direction === 'left' ? 'right' : 'left'}`, exact: true }).click()
       await expect.poll(() => token.evaluate((el) => ({
         reduced: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
@@ -63,7 +65,7 @@ for (const width of [390, 1280]) {
       expect(returned!.x).toBeCloseTo(before!.x, 0)
       if (variant === 'rock-push') {
         await page.emulateMedia({ reducedMotion: 'no-preference' })
-        await page.waitForTimeout(160)
+        await page.waitForTimeout(370)
         await fixture.getByRole('button', { name: 'Undo move', exact: true }).click()
         await expect.poll(async () => (await position()).x).toBe(after.x)
         expect(await token.evaluate((el) => el.getAnimations({ subtree: true }).length)).toBe(0)

@@ -7,7 +7,8 @@ import {
 } from '@/utilities/trainer-appearance'
 import { cn } from '@/lib/utils'
 
-export const GRID_PLAYER_MOVE_MS = 150
+// Four readable 90ms poses per tile, shared by movement and input pacing.
+export const GRID_PLAYER_MOVE_MS = 360
 
 export function GridPlayerSprite({
   gender,
@@ -93,8 +94,8 @@ export function GridPlayerToken({
         easing: 'steps(1, end)',
       })),
       {
-        duration: durationMs / Math.ceil(durationMs / GRID_PLAYER_MOVE_MS),
-        iterations: Math.ceil(durationMs / GRID_PLAYER_MOVE_MS),
+        duration: GRID_PLAYER_MOVE_MS,
+        iterations: durationMs / GRID_PLAYER_MOVE_MS,
       },
     )
     const cancel = () => {
