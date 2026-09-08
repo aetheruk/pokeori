@@ -189,11 +189,12 @@ export function UserProvider({
   const updateUserContext = useCallback(
     (partialUser: Partial<User>) => {
       mutate((prev) => {
-        if (!prev?.user) return prev
-        return { ...prev, user: { ...prev.user, ...partialUser } }
+        const current = prev || resolvedData
+        if (!current?.user) return prev
+        return { ...current, user: { ...current.user, ...partialUser } }
       }, false)
     },
-    [mutate],
+    [mutate, resolvedData],
   )
 
   const { mutate: globalMutate } = useSWRConfig()

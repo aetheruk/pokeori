@@ -1,5 +1,9 @@
 # Current Game State
 
+- Release `0.31.0`: Trainer editor refinement adds a live preview, compact appearance controls, and a fixed Save action in place of the nested background picker. The saved gender choice selects Lucas (male), Dawn (female), or Ditto (neither) across Rock Push, Voltorb Grid, and Echo Map. Existing profiles default to neither; gameplay rules are unchanged.
+
+- Trainer layout refinement: Settings now sits inline below Gym Badges, with device audio and compact image-download controls. The trainer-card pencil is a light, unframed icon at the top right. Download persistence, cancellation, and resume behavior are preserved.
+
 - Release `0.30.0`: Trainer's gear icon opens device settings, including the existing game-audio toggle and an optional bundled-image download (about 79 MiB at release). Downloads report progress, resume saved files after cancellation/reopening, and can be removed. The service worker now keeps content-fingerprinted artwork across app releases, migrates matching legacy sprites, and refreshes only changed artwork. Online gameplay and externally hosted card images still require a connection; browser storage eviction can remove downloaded images. See [trainer settings](features/trainer-settings.md).
 
 - Release `0.29.22`: MoveDex's Known moves tab again offers a small Get missing TMs action below its filters. It restores missing earned research TMs through the existing recovery action and refreshes the inventory-backed move list.

@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { PixelGridBoard } from '@/components/game/shared/pixel-grid-board'
+import { GridPlayerSprite } from '@/components/game/shared/grid-player-sprite'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
 import { useAudio } from '@/context/AudioContext'
@@ -110,7 +111,7 @@ export function VoltorbGridGame({
 }: VoltorbGridGameProps) {
   useGameMusic(encounter)
   const { playSfx } = useAudio()
-  const { refreshUser } = useUser()
+  const { user, refreshUser } = useUser()
   const completionInvalidatesRef = useRef<GameDataKeys[] | undefined>(undefined)
   const router = useRouter()
   const { cols, rows } = encounter.settings.gridSize
@@ -123,12 +124,10 @@ export function VoltorbGridGame({
     barrier: encounter.settings.barrierSprite,
     boulder: encounter.settings.boulderSprite,
     goal: encounter.settings.winTileSprite,
-    player: encounter.settings.playerSprite,
   })
   const {
     floor: floorSprite,
     goal: winTileSprite,
-    player: playerSprite,
   } = tileSources
   const breakableRockSprite =
     encounter.settings.boulderSprite || gridObjects.breakableRock.asset.src
@@ -854,21 +853,7 @@ export function VoltorbGridGame({
                   {isPlayer && (
                     <div className="absolute inset-0 z-50 p-0.5">
                       <div className="absolute inset-[20%] translate-y-[18%] rounded-full bg-[#081014]/25 blur-[3px]" />
-                      <div
-                        className="relative h-full w-full [image-rendering:pixelated]"
-                        style={{
-                          backgroundImage: `url('${playerSprite}')`,
-                          backgroundSize: '200% 200%',
-                          backgroundPosition:
-                            facing === 'down'
-                              ? '0% 0%'
-                              : facing === 'up'
-                                ? '0% 100%'
-                                : facing === 'left'
-                                  ? '100% 100%'
-                                  : '100% 0%',
-                        }}
-                      />
+                      <GridPlayerSprite gender={user?.trainerGender} facing={facing} step={moves} />
                     </div>
                   )}
                 </div>

@@ -201,6 +201,22 @@ try {
       assert.ok(!body.includes('Failed to find Server Action'), 'Action identifier must resolve to the tested function')
       return { status: response.status, body }
     }
+    await fetch(`${origin}/game`, { headers: { authorization: `JWT ${ownerToken}` } })
+    const customizationId = await actionId('src/app/(frontend)/game/actions.ts', 'updateUserCustomization')
+    assert.ok((await invoke('/game', customizationId, [{ trainerGender: 'male' }])).body.includes('Not authenticated'))
+    for (const trainerGender of ['male', 'female', 'neither'] as const) {
+      const saved = await invoke('/game', customizationId, [{ trainerGender }], ownerToken)
+      assert.ok(saved.body.includes('"success":true'), saved.body)
+      assert.equal((await payload.findByID({ collection: 'users', id: owner.id })).trainerGender, trainerGender)
+    }
+    assert.ok((await invoke('/game', customizationId, [{ trainerGender: 'invalid' }], ownerToken)).body.includes('Invalid data'))
+    assert.equal((await payload.findByID({ collection: 'users', id: owner.id })).trainerGender, 'neither')
+    await invoke('/game', customizationId, [{ trainerGender: 'female', id: stranger.id }], ownerToken)
+    assert.equal((await payload.findByID({ collection: 'users', id: stranger.id })).trainerGender, 'neither', 'Customization cannot target another account')
+    const appearanceSync = await fetch(`${origin}/api/game/sync?scope=trainer`, { headers: { authorization: `JWT ${ownerToken}` } })
+    assert.equal((await appearanceSync.json() as any).user.trainerGender, 'female', 'Saved appearance must survive a fresh account read')
+    assertions += 11
+
     await fetch(`${origin}/auth`)
     const registerId = await actionId('src/app/(frontend)/auth/actions.ts', 'register')
     const signupToken = issueRegistrationInvitation(invitationSecret, 3600).token

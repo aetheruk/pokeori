@@ -1,6 +1,8 @@
 # Trainer settings and image downloads
 
-The gear on the Trainer card at `/game` opens the shared responsive settings panel. The audio toggle uses the existing AudioContext and its device-local preference. It controls game music, effects, and cries together.
+The trainer-card editor has a live preview, background and title selectors, a collapsible avatar grid, and a fixed Save action. Gender is saved with the other customization choices: Male uses Lucas, Female uses Dawn, and Neither uses Ditto in Rock Push, Voltorb Grid, and Echo Map. Neither has a green dash icon and is the fallback for existing profiles without a selection. Cancel discards draft choices. The authenticated customization action validates the selection; ordinary profile API writes cannot change protected game fields. The trainer sync includes the saved choice without adding it to public rival profiles.
+
+Settings appears inline below Gym Badges on the Trainer page at `/game`, with the device audio toggle and image downloads. The download section uses the compact heading “Download Images for a better experience.” alongside size, progress, and actions. The trainer-card customization control is an unframed light pencil at the top right, retaining a full touch target and keyboard focus. The audio toggle uses the existing AudioContext and its device-local preference. It controls game music, effects, and cries together.
 
 Players can opt to download all bundled images (11,026 files, about 79 MiB at release 0.30.0). The panel shows the full size, cached-file count, progress, cancellation, resume, and removal. Four requests run concurrently. Completed files remain available after cancellation, interruption, navigation, or app updates. Keep the app open while downloading; background execution is not guaranteed. Storage persistence is requested on a best-effort basis, and storage failures are surfaced without blocking online play. Externally hosted TCG artwork and audio are outside this download pack.
 
@@ -10,4 +12,4 @@ The small `/sw.js` script loads and caches the manifest once per release. `pokeo
 
 Activation migrates matching bytes from older `pokeori-sprites-*` caches and removes outdated image revisions and manifests. Ordinary code-only deploys retain all image bytes. Changed/new images load on use or through Resume download; they are not silently bulk-downloaded. The app-version endpoint and activity-safe PWA reload behavior remain independent of image storage.
 
-This is a loading-speed feature, not offline gameplay. Browser eviction, private-mode restrictions, and user-cleared site data can remove assets. Settings measures actual cache keys whenever it opens rather than trusting a saved completion flag.
+This is a loading-speed feature, not offline gameplay. Browser eviction, private-mode restrictions, and user-cleared site data can remove assets. Settings measures actual cache keys when the Trainer page mounts rather than trusting a saved completion flag.

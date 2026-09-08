@@ -5,11 +5,13 @@ import configPromise from '@payload-config'
 import { headers } from 'next/headers'
 import { UpdateUserSchema } from '@/utilities/validators'
 import { getEquipableTitleIds } from '@/utilities/skills/unlocks'
+import type { TrainerGender } from '@/utilities/trainer-appearance'
 
 export async function updateUserCustomization(data: {
   banner?: string
   icon?: string
   title?: string
+  trainerGender?: TrainerGender
 }) {
   const validated = UpdateUserSchema.safeParse(data)
   if (!validated.success) {
@@ -30,6 +32,9 @@ export async function updateUserCustomization(data: {
   const equipableTitles = getEquipableTitleIds((user as any).unlockedTitles, user.skills)
 
   const updateData: any = {}
+  if (validated.data.trainerGender !== undefined) {
+    updateData.trainerGender = validated.data.trainerGender
+  }
 
   if (data.banner) {
     if (!unlockedBanners.includes(data.banner)) {

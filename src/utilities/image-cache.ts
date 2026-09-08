@@ -42,7 +42,7 @@ export async function downloadGameImages(
             ).join('')
             if (revision !== image.revision)
               throw new Error(
-                'Artwork has been updated. Reopen settings and try again.',
+                'Artwork has been updated. Reload the page and try again.',
               )
             signal.throwIfAborted()
             await cache.put(key, response)

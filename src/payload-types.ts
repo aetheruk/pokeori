@@ -151,6 +151,7 @@ export interface User {
   id: string;
   isAdmin?: boolean | null;
   trainerName: string;
+  trainerGender?: ('male' | 'female' | 'neither') | null;
   /**
    * Currently active banner ID
    */
@@ -988,6 +989,7 @@ export interface PayloadMigration {
 export interface UsersSelect<T extends boolean = true> {
   isAdmin?: T;
   trainerName?: T;
+  trainerGender?: T;
   banner?: T;
   icon?: T;
   title?: T;
