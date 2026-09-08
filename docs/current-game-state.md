@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.30.0`: Trainer's gear icon opens device settings, including the existing game-audio toggle and an optional bundled-image download (about 79 MiB at release). Downloads report progress, resume saved files after cancellation/reopening, and can be removed. The service worker now keeps content-fingerprinted artwork across app releases, migrates matching legacy sprites, and refreshes only changed artwork. Online gameplay and externally hosted card images still require a connection; browser storage eviction can remove downloaded images. See [trainer settings](features/trainer-settings.md).
+
 - Release `0.29.22`: MoveDex's Known moves tab again offers a small Get missing TMs action below its filters. It restores missing earned research TMs through the existing recovery action and refreshes the inventory-backed move list.
 
 - Release `0.29.21`: fixes move-workspace dismissal and replaces Charged TM evolution gates with the required equipped move, as detailed below.

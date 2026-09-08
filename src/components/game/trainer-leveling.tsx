@@ -12,8 +12,6 @@ import {
   Swords,
   Trophy,
   User as UserIcon,
-  Volume2,
-  VolumeX,
   Zap,
 } from 'lucide-react'
 import Image from 'next/image'
@@ -25,6 +23,7 @@ import { TrainerCard } from '@/components/game/battles/TrainerCard'
 import { GameInfoModal } from '@/components/game/shared/GameInfoModal'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { BadgeShowcase } from '@/components/game/trainer/badge-showcase'
+import { TrainerSettings } from '@/components/game/trainer/trainer-settings'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
@@ -36,7 +35,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
 import { type Skill, skills } from '@/data/skills/definitions'
 import {
@@ -506,7 +504,6 @@ function BannerPickerDialog({
 
 export function TrainerLeveling() {
   const { user, refreshUser, updateUserContext } = useUser()
-  const { isAudioEnabled, toggleAudioEnabled } = useAudio()
   const [selectedSkill, setSelectedSkill] = useState<CoreSkill | null>(null)
   const [isSkillModalOpen, setIsSkillModalOpen] = useState(false)
   const [isCustomizeModalOpen, setIsCustomizeModalOpen] = useState(false)
@@ -545,21 +542,7 @@ export function TrainerLeveling() {
               title={(user as any).title}
               className="aspect-[8/5] w-full overflow-hidden rounded-none border-b border-game-border bg-game-surface md:h-36 md:aspect-auto xl:h-44"
             >
-              {/* Audio toggle - top left */}
-              <button
-                type="button"
-                onClick={toggleAudioEnabled}
-                aria-label={isAudioEnabled ? 'Disable audio' : 'Enable audio'}
-                aria-pressed={isAudioEnabled}
-                title={isAudioEnabled ? 'Disable audio' : 'Enable audio'}
-                className="game-focus-ring absolute left-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-md border border-game-border bg-game-surface/85 text-game-ink backdrop-blur-md transition-colors hover:bg-game-surface-raised"
-              >
-                {isAudioEnabled ? (
-                  <Volume2 className="w-4 h-4" />
-                ) : (
-                  <VolumeX className="w-4 h-4" />
-                )}
-              </button>
+              <TrainerSettings />
 
               {/* Edit button - bottom right */}
               <button
