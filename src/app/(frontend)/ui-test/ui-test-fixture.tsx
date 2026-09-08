@@ -5,6 +5,7 @@ import { SWRConfig } from 'swr'
 import { ArtAcademyGame } from '@/app/(frontend)/game/research/encounter/art-academy'
 import { PvpQueueModal } from '@/app/(frontend)/game/battles/pvp/pvp-queue-modal'
 import { AudioProvider } from '@/context/AudioContext'
+import { TrainerSettings } from '@/components/game/trainer/trainer-settings'
 import { GameNavigation } from '@/components/game/game-navigation'
 import { UserProvider } from '@/context/UserContext'
 import type { RequirementData } from '@/utilities/requirements'
@@ -38,6 +39,7 @@ export function UiTestFixture() {
   const [inspector, setInspector] = useState(false)
   const [navigation, setNavigation] = useState(false)
   const [dexLayout, setDexLayout] = useState(false)
+  const [settings, setSettings] = useState(false)
   const [status, setStatus] = useState('Ready')
   const artState = useMemo(() => ({ expiry: Date.now() + 3600000, roundData: { artAcademy: {
     spriteUrl: '/sprites/pokemon/home/normal/1.avif', palette: ['#293532', '#b86148'], referenceCells: encodeArtAcademyCells(new Uint8Array(1024)), scoreGridSize: 32, guideGridSize: 3,
@@ -69,6 +71,7 @@ export function UiTestFixture() {
       <Button onClick={() => setInspector(true)}>Test Pokemon inspector</Button>
       <Button onClick={() => setNavigation(true)}>Test game navigation</Button>
       <Button onClick={() => setDexLayout(true)}>Test dex layouts</Button>
+      <Button onClick={() => setSettings(true)}>Test trainer settings</Button>
       <Button onClick={() => {
         let attempts = 0
         setStatus('Waiting for result')
@@ -78,6 +81,7 @@ export function UiTestFixture() {
         }, 'The test response was interrupted. Retry the same score.').then(setStatus)
       }}>Test dropped result</Button>
       <p role="status">{status}</p>
+      {settings && <AudioProvider><div className="relative h-20 w-20"><TrainerSettings /></div></AudioProvider>}
     </div>
     {art ? <SWRConfig value={{ isPaused: () => true }}><UserProvider initialGameData={{ user: { id: 'ui-test', trainerName: 'Test trainer' }, inventory: [], pokemon: [] } as unknown as RequirementData}><AudioProvider>
       <ArtAcademyGame encounter={{ id: 'ui-test-art', name: 'Art Academy test', description: 'Local drawing fixture', category: 'game', icon: { type: 'item', id: 'poke-ball' }, requirements: [], rewards: [], settings: { formId: '1', timeLimit: 3600, successThreshold: 50 } }} initialState={artState} actions={artActions} />
