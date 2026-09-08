@@ -1,5 +1,11 @@
 # Current Game State
 
+- Release `0.29.21`: fixes move-workspace dismissal and replaces Charged TM evolution gates with the required equipped move, as detailed below.
+
+- Dialog dependencies are pinned to one shared Radix Dialog version, including Vaul's mobile drawers, so overlapping windows share focus and dismissal state. Mobile and desktop browser coverage exercises search, assignment, reopening, and Escape.
+
+- Pokémon details now suppresses inspector dismissal while the move workspace or move field note is open, so interactions with those portalled windows do not close move assignment. All 14 species with authored move-based evolutions now require their specific move in the saved loadout instead of consuming the unobtainable Charged TM. The panel identifies the required move and only offers evolution after it is saved; the server checks persisted assignments. This unblocks Lickitung (Rollout), Tangela/Yanma/Piloswine (Ancient Power), Aipom (Double Hit), Girafarig (Twin Beam), Dunsparce (Hyper Drill), Hisuian Qwilfish (Barb Barrage), Bonsly/Mime Jr. (Mimic), Steenee (Stomp), Poipole (Dragon Pulse), Clobbopus (Taunt), and Dipplin (Dragon Cheer). Normal move-assignment unlocks and regional-form gates remain in effect; no additional level-up, catalyst, or move-use counter is required for these branches.
+
 - Release `0.29.18`: main pages use distinct static skeletons matching their content instead of the shared journal spinner. Carddex series/set shelves scroll within the page width. MoveDex removes the lost-TM recovery control and large Sketchbook help panel. Capture returns to the ball-only swipe interface; keyboard/assistive activation remains on the ball itself, and ordinary clicks/taps do not throw.
 
 - Release `0.29.17`: game navigation automatically prefetches shared layouts and the journal loading boundary, keeping the shell responsive while authenticated page data streams in. Slow navigation has a delayed, accessible pending indicator on the selected link; loading spinners respect reduced motion. Gameplay data remains request-scoped. Cache Components/PPR remain disabled because the request-nonce CSP requires dynamic rendering; see [navigation performance](features/navigation-performance.md).

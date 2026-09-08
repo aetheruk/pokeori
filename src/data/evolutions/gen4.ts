@@ -319,7 +319,7 @@ export const gen4Evolutions: Record<number, Evolution[]> = {
       "name": "sudowoodo",
       "trigger": "level-up",
       "conditions": {
-        "knownMoveId": "102"
+        "knownMoveId": "mimic"
       }
     }
   ],
@@ -329,7 +329,7 @@ export const gen4Evolutions: Record<number, Evolution[]> = {
       "name": "mr-mime",
       "trigger": "level-up",
       "conditions": {
-        "knownMoveId": "102"
+        "knownMoveId": "mimic"
       }
     },
     {
@@ -337,7 +337,7 @@ export const gen4Evolutions: Record<number, Evolution[]> = {
       "name": "mr-mime",
       "trigger": "level-up",
       "conditions": {
-        "knownMoveId": "102"
+        "knownMoveId": "mimic"
       }
     }
   ],

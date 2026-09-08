@@ -78,11 +78,13 @@ import {
 } from '@/utilities/pokemon/display'
 import {
   getEvolutionTimeOfDayLabel,
+  getRequiredEvolutionItem,
   getEvolutionTimeRegionLabel,
   matchesEvolutionGender,
   matchesEvolutionTimeOfDayForRegion,
   resolveEvolutionTimeRegion,
 } from '@/utilities/pokemon/evolution-conditions'
+import { matchesEvolutionMove } from '@/utilities/pokemon/evolution-moves'
 import {
   formatPokemonGenderLabel,
   getOwnedPokemonGender,
@@ -770,6 +772,19 @@ function MountedPokemonDetailsDialog({
     currentAssignedMoveIds,
   )
   const [moveDetail, setMoveDetail] = useState<MoveConfig | null>(null)
+  const evolutionMoveNames = Array.from(
+    new Set(
+      (EVOLUTIONS[pokemon.speciesId] || []).flatMap(({ conditions }) => {
+        if (
+          !conditions.knownMoveId ||
+          (conditions.requiredSourceForm &&
+            conditions.requiredSourceForm !== (formInfo?.form || 'base'))
+        ) return []
+        const move = getMove(conditions.knownMoveId)
+        return move ? [move.name] : []
+      }),
+    ),
+  )
   const [moveWorkspaceOpen, setMoveWorkspaceOpen] = useState(false)
   const [isSavingMoves, setIsSavingMoves] = useState(false)
   useEffect(() => {
@@ -959,7 +974,11 @@ function MountedPokemonDetailsDialog({
     <>
       <ResponsivePanel
         open={isOpen}
+        dismissible={!moveWorkspaceOpen && !moveDetail}
         onOpenChange={(open) => {
+          // Portalled move dialogs sit outside the inspector's DOM tree.
+          // Only the topmost window should handle dismissal while editing.
+          if (!open && (moveWorkspaceOpen || moveDetail)) return
           setIsOpen(open)
           if (!open) setMoveWorkspaceOpen(false)
         }}
@@ -1091,12 +1110,9 @@ function MountedPokemonDetailsDialog({
                   )
                 )
                   return false
-                let requiredItemId =
-                  conditions.itemId || (conditions.trade ? 'link-cable' : null)
-                if (conditions.locationId) requiredItemId = 'evolution-compass'
-                else if (conditions.knownMoveId) requiredItemId = 'charged-tm'
-                else if (conditions.heldItem)
-                  requiredItemId = conditions.heldItem
+                if (!matchesEvolutionMove(conditions, pokemon.assignedMoves))
+                  return false
+                const requiredItemId = getRequiredEvolutionItem(conditions)
                 const hasRequiredItem = requiredItemId
                   ? hasItem(requiredItemId)
                   : true
@@ -1157,15 +1173,7 @@ function MountedPokemonDetailsDialog({
                           conditions,
                           evolutionTimeRegion,
                         )
-                      let requiredItemId =
-                        conditions.itemId ||
-                        (conditions.trade ? 'link-cable' : null)
-                      if (conditions.locationId)
-                        requiredItemId = 'evolution-compass'
-                      else if (conditions.knownMoveId)
-                        requiredItemId = 'charged-tm'
-                      else if (conditions.heldItem)
-                        requiredItemId = conditions.heldItem
+                      const requiredItemId = getRequiredEvolutionItem(conditions)
                       const hasRequiredItem = requiredItemId
                         ? hasItem(requiredItemId)
                         : true
@@ -1187,6 +1195,7 @@ function MountedPokemonDetailsDialog({
                           )} (${getEvolutionTimeRegionLabel(evolutionTimeRegion)})`
                         : ''
                       const canEvolve =
+                        matchesEvolutionMove(conditions, pokemon.assignedMoves) &&
                         canEvolveLevel &&
                         canEvolveFriendship &&
                         hasRequiredItem &&
@@ -1215,6 +1224,16 @@ function MountedPokemonDetailsDialog({
                       } else if (conditions.timeOfDay) {
                         requirementText = timeRequirementLabel
                       } else requirementText = 'Unknown Condition'
+
+                      if (conditions.knownMoveId) {
+                        const moveName =
+                          getMove(conditions.knownMoveId)?.name || conditions.knownMoveId
+                        const moveRequirement = `${moveName} equipped`
+                        requirementText =
+                          requirementText === 'Unknown Condition'
+                            ? moveRequirement
+                            : `${requirementText} + ${moveRequirement}`
+                      }
 
                       const handleEvolution = async () => {
                         if (!canEvolve) return
@@ -1757,6 +1776,13 @@ function MountedPokemonDetailsDialog({
                     </Badge>
                   ) : null}
                 </div>
+
+                {evolutionMoveNames.length > 0 && (
+                  <p className="text-xs text-game-muted">
+                    Evolution move: {evolutionMoveNames.join(' or ')}. Equip and save
+                    the move to meet this evolution requirement.
+                  </p>
+                )}
 
                 {battleMovesUnlockMessage ? (
                   <div className="rounded-xl border border-game-border bg-game-surface-raised px-4 py-3 text-xs text-game-muted">

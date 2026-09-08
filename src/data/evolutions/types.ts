@@ -5,6 +5,7 @@ export interface EvolutionCondition {
   timeOfDay?: string
   gender?: number
   locationId?: string
+  /** Battle move slug that must be equipped in the saved loadout. */
   knownMoveId?: string
   heldItem?: string
   trade?: boolean

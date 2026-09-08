@@ -902,7 +902,7 @@ export const gen1Evolutions: Record<number, Evolution[]> = {
       "name": "lickilicky",
       "trigger": "level-up",
       "conditions": {
-        "knownMoveId": "205"
+        "knownMoveId": "rollout"
       }
     }
   ],
@@ -961,7 +961,7 @@ export const gen1Evolutions: Record<number, Evolution[]> = {
       "name": "tangrowth",
       "trigger": "level-up",
       "conditions": {
-        "knownMoveId": "246"
+        "knownMoveId": "ancient-power"
       }
     }
   ],

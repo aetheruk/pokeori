@@ -246,7 +246,7 @@ export const gen2Evolutions: Record<number, Evolution[]> = {
       "name": "ambipom",
       "trigger": "level-up",
       "conditions": {
-        "knownMoveId": "458"
+        "knownMoveId": "double-hit"
       }
     }
   ],
@@ -266,7 +266,7 @@ export const gen2Evolutions: Record<number, Evolution[]> = {
       "name": "yanmega",
       "trigger": "level-up",
       "conditions": {
-        "knownMoveId": "246"
+        "knownMoveId": "ancient-power"
       }
     }
   ],
@@ -317,7 +317,7 @@ export const gen2Evolutions: Record<number, Evolution[]> = {
       "name": "farigiraf",
       "trigger": "level-up",
       "conditions": {
-        "knownMoveId": "888"
+        "knownMoveId": "twin-beam"
       }
     }
   ],
@@ -337,7 +337,7 @@ export const gen2Evolutions: Record<number, Evolution[]> = {
       "name": "dudunsparce",
       "trigger": "level-up",
       "conditions": {
-        "knownMoveId": "887"
+        "knownMoveId": "hyper-drill"
       }
     }
   ],
@@ -368,7 +368,7 @@ export const gen2Evolutions: Record<number, Evolution[]> = {
       "name": "overqwil",
       "trigger": "level-up",
       "conditions": {
-        "knownMoveId": "839",
+        "knownMoveId": "barb-barrage",
         "requiredSourceForm": "Hisuian Form"
       }
     }
@@ -442,7 +442,7 @@ export const gen2Evolutions: Record<number, Evolution[]> = {
       "name": "mamoswine",
       "trigger": "level-up",
       "conditions": {
-        "knownMoveId": "246"
+        "knownMoveId": "ancient-power"
       }
     }
   ],

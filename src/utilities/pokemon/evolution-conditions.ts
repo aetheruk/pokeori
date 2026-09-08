@@ -11,6 +11,14 @@ const EVOLUTION_GENDER_LABELS: Record<number, PokemonGender> = {
 const DEFAULT_EVOLUTION_TIME_REGION = 'Kanto'
 const UTC_TIME_ZONE = 'UTC'
 
+export function getRequiredEvolutionItem(
+  conditions: EvolutionCondition,
+): string | null {
+  if (conditions.locationId) return 'evolution-compass'
+  if (conditions.heldItem) return conditions.heldItem
+  return conditions.itemId || (conditions.trade ? 'link-cable' : null)
+}
+
 type EvolutionTimeRegionSource = Pick<Pokemon, 'obtainedRegion'>
 
 export function getEvolutionConditionGender(

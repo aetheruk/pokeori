@@ -284,7 +284,7 @@ export const gen7Evolutions: Record<number, Evolution[]> = {
       "name": "tsareena",
       "trigger": "level-up",
       "conditions": {
-        "knownMoveId": "23"
+        "knownMoveId": "stomp"
       }
     }
   ],
@@ -372,7 +372,7 @@ export const gen7Evolutions: Record<number, Evolution[]> = {
       "name": "naganadel",
       "trigger": "level-up",
       "conditions": {
-        "knownMoveId": "406"
+        "knownMoveId": "dragon-pulse"
       }
     }
   ]
