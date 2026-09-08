@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.31.1`: Rock Push, Voltorb Grid, and Echo Map move the trainer smoothly between cells while cycling all four directional walking frames, returning to a standing frame at rest. Voltorb/Echo inputs are paced to the 150ms cell movement; Rock Push retains its slide timing. Reduced-motion users get immediate positioning, and resets, undo, and screen changes do not animate across the board. Server move proofs and collision rules are unchanged.
+
 - Release `0.31.0`: Trainer editor refinement adds a live preview, compact appearance controls, and a fixed Save action in place of the nested background picker. The saved gender choice selects Lucas (male), Dawn (female), or Ditto (neither) across Rock Push, Voltorb Grid, and Echo Map. Existing profiles default to neither; gameplay rules are unchanged.
 
 - Trainer layout refinement: Settings now sits inline below Gym Badges, with device audio and compact image-download controls. The trainer-card pencil is a light, unframed icon at the top right. Download persistence, cancellation, and resume behavior are preserved.

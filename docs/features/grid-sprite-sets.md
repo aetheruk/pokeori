@@ -169,6 +169,15 @@ Player art is supplied by the game/runtime through the game-specific player spri
 
 ## Grid Puzzle integration
 
+Players render in a persistent board overlay through `GridPlayerToken`, so a
+cell move translates the same element rather than mounting it in a new tile.
+Normal moves take 150ms and cycle the four facing-row frames, then return to
+frame zero. Rock Push uses its existing longer ice-slide duration. Voltorb and
+Echo Map pace accepted movement inputs to one per 150ms to finish each cell
+before turning. Reduced motion disables translation and walking animation;
+undo/reset and screen changes snap to their destination. Logical positions,
+collision checks, and server move proofs still update in whole cells.
+
 All three spatial rulesets run under `gameType: 'grid-puzzle'` and select their
 behaviour with `settings.variant`: `rock-push`, `voltorb`, or `echo-map`.
 Their current authored coordinate fields remain deliberately small and map to

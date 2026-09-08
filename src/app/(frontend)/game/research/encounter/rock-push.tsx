@@ -17,7 +17,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { PixelGridBoard } from '@/components/game/shared/pixel-grid-board'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
-import { GridPlayerSprite } from '@/components/game/shared/grid-player-sprite'
+import { GridPlayerToken } from '@/components/game/shared/grid-player-sprite'
 import { Button } from '@/components/ui/button'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
@@ -1753,23 +1753,16 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
                 </div>
               )}
 
-              <div
-                className="absolute z-30 p-0.5 transition-transform duration-150 ease-out"
-                style={entityStyle(
-                  playerPos,
-                  blockedOffset
-                    ? ` translate(${blockedOffset.x}px, ${blockedOffset.y}px)`
-                    : '',
-                  blockedOffset
-                    ? defaultMoveDurationMs
-                    : movementDurations.player,
-                )}
-              >
-                <div className="relative h-full w-full">
-                  <div className="absolute inset-[20%] translate-y-[18%] rounded-full bg-[#081014]/25 blur-[3px]" />
-                  <GridPlayerSprite gender={user?.trainerGender} facing={facing} step={moves} />
-                </div>
-              </div>
+              <GridPlayerToken
+                key={activeScreenId}
+                gender={user?.trainerGender}
+                facing={facing}
+                step={moves}
+                position={playerPos}
+                durationMs={movementDurations.player}
+                blockedOffset={blockedOffset}
+                className="z-30"
+              />
             </div>
           </PixelGridBoard>
         </div>

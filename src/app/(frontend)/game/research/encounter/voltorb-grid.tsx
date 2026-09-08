@@ -15,7 +15,10 @@ import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { PixelGridBoard } from '@/components/game/shared/pixel-grid-board'
-import { GridPlayerSprite } from '@/components/game/shared/grid-player-sprite'
+import {
+  GRID_PLAYER_MOVE_MS,
+  GridPlayerToken,
+} from '@/components/game/shared/grid-player-sprite'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
 import { useAudio } from '@/context/AudioContext'
@@ -191,6 +194,7 @@ export function VoltorbGridGame({
   const [result, setResult] = useState<any | null>(null)
   const completionRef = useRef(false)
   const moveProofRef = useRef<string[]>([])
+  const nextMoveAtRef = useRef(0)
 
   const voltorbByKey = useMemo(
     () => new Map(voltorbs.map((voltorb) => [positionKey(voltorb), voltorb])),
@@ -244,6 +248,7 @@ export function VoltorbGridGame({
     setResult(null)
     completionRef.current = false
     moveProofRef.current = []
+    nextMoveAtRef.current = 0
   }, [
     encounter.settings.playerStart,
     initialDebrisKeys,
@@ -365,6 +370,7 @@ export function VoltorbGridGame({
   const movePlayer = useCallback(
     (direction: Direction) => {
       if (!gameStarted || gameEnded || isBlasting) return
+      if (performance.now() < nextMoveAtRef.current) return
 
       setFacing(direction)
       const delta = directions[direction]
@@ -387,6 +393,7 @@ export function VoltorbGridGame({
         moveProofRef.current.push(direction)
         setMoves(nextMoves)
         setPlayer(next)
+        nextMoveAtRef.current = performance.now() + GRID_PLAYER_MOVE_MS
         setVoltorbs((current) =>
           current.map((voltorb) =>
             voltorb.id === pushedVoltorb.id
@@ -418,6 +425,7 @@ export function VoltorbGridGame({
         moveProofRef.current.push(direction)
         setMoves(nextMoves)
         setPlayer(next)
+        nextMoveAtRef.current = performance.now() + GRID_PLAYER_MOVE_MS
         setProtectedPokemon((current) =>
           current.map((pokemon) =>
             pokemon.id === pushedProtectedPokemon.id
@@ -442,6 +450,7 @@ export function VoltorbGridGame({
       moveProofRef.current.push(direction)
       setMoves(nextMoves)
       setPlayer(next)
+      nextMoveAtRef.current = performance.now() + GRID_PLAYER_MOVE_MS
       playSfx('select')
 
       if (samePosition(next, encounter.settings.exit) && exitOpen) {
@@ -721,7 +730,7 @@ export function VoltorbGridGame({
             frameSrc={frameSprite}
             frameSlice={frameSprite ? resolveGridFrameSlice(encounter.settings.tilePaletteId) : undefined}
             ariaLabel="Voltorb Grid board"
-            className="overflow-hidden rounded-lg bg-game-night-surface shadow-2xl ring-4 ring-[#081014]/35"
+            className="relative isolate overflow-hidden rounded-lg bg-game-night-surface shadow-2xl ring-4 ring-[#081014]/35"
           >
             {boardCells.map((position) => {
               const key = positionKey(position)
@@ -742,7 +751,6 @@ export function VoltorbGridGame({
               const isDebris = debrisKeys.has(key)
               const voltorb = voltorbByKey.get(key)
               const protectedPokemon = protectedPokemonByKey.get(key)
-              const isPlayer = samePosition(player, position)
               const isExit = samePosition(encounter.settings.exit, position)
               const exitSprite = position.y === 0 ? wallGoalSprite : winTileSprite
               const isBlast = blastKeys.has(key)
@@ -849,16 +857,15 @@ export function VoltorbGridGame({
                       <div className="h-[58%] w-[58%] rounded-full bg-yellow-100 shadow-[0_0_22px_rgba(250,204,21,0.95)] [animation:voltorb-grid-blast_280ms_ease-in-out_infinite]" />
                     </div>
                   )}
-
-                  {isPlayer && (
-                    <div className="absolute inset-0 z-50 p-0.5">
-                      <div className="absolute inset-[20%] translate-y-[18%] rounded-full bg-[#081014]/25 blur-[3px]" />
-                      <GridPlayerSprite gender={user?.trainerGender} facing={facing} step={moves} />
-                    </div>
-                  )}
                 </div>
               )
             })}
+            <GridPlayerToken
+              gender={user?.trainerGender}
+              facing={facing}
+              step={moves}
+              position={player}
+            />
           </PixelGridBoard>
 
           <div className="flex-none z-50 flex items-center gap-3">
