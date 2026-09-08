@@ -3,13 +3,15 @@
 import {
   BookOpen,
   CircleHelp,
+  RotateCcw,
   Search,
   SlidersHorizontal,
   X,
 } from 'lucide-react'
 import Image from 'next/image'
 import type { CSSProperties } from 'react'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState, useTransition } from 'react'
+import { toast } from 'sonner'
 import { List, type RowComponentProps, useDynamicRowHeight } from 'react-window'
 import { DexFilterBar, DexPageShell } from '@/components/game/dex'
 import { MoveFieldNote } from '@/components/game/moves/move-field-note'
@@ -40,6 +42,7 @@ import {
   type MoveDexEntry,
 } from '@/utilities/pokemon/movedex'
 import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
+import { recoverLostResearchTms } from './actions'
 
 const typeIdMap: Record<string, number> = {
   normal: 1,
@@ -148,7 +151,8 @@ function getBasePower(move: MoveConfig) {
 }
 
 export default function MoveDexPage() {
-  const { gameData } = useUser()
+  const { gameData, refreshUser } = useUser()
+  const [isRecovering, startRecovery] = useTransition()
   const { entriesByForm } = usePokedex()
   const [selectedView, setSelectedView] = useState<MoveDexView>('known')
   const [query, setQuery] = useState('')
@@ -317,6 +321,26 @@ export default function MoveDexPage() {
       data.moves[index]?.entry.itemId ?? index,
     [],
   )
+  const handleRecoverMissingTms = () => {
+    if (isRecovering) return
+    startRecovery(async () => {
+      try {
+        const result = await recoverLostResearchTms()
+        if (!result.success) {
+          toast.error(result.message)
+          return
+        }
+        if (result.recovered.length > 0) {
+          await refreshUser(true, ['inventory'])
+          toast.success(result.message)
+        } else {
+          toast.info(result.message)
+        }
+      } catch {
+        toast.error('Could not recover missing research TMs. Please try again.')
+      }
+    })
+  }
   const subtitle =
     selectedView === 'sketchbook'
       ? `${sketchedMoveCount} recorded`
@@ -441,6 +465,29 @@ export default function MoveDexPage() {
           )}
         </div>
       </DexFilterBar>
+
+      {selectedView === 'known' && (
+        <div className="mt-1 flex justify-end">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="min-h-10 px-2 text-xs text-game-muted"
+            onClick={handleRecoverMissingTms}
+            disabled={isRecovering}
+            aria-busy={isRecovering}
+          >
+            <RotateCcw
+              className={cn(
+                'size-3.5',
+                isRecovering && 'animate-spin motion-reduce:animate-none',
+              )}
+              aria-hidden="true"
+            />
+            {isRecovering ? 'Checking TMs…' : 'Get missing TMs'}
+          </Button>
+        </div>
+      )}
 
       <section
         className="mt-3 min-h-0 flex-1"
