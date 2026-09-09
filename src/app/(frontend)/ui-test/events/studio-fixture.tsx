@@ -37,8 +37,14 @@ export function EventStudioFixture({
     }
   }, [schemas])
   return (
-    <main className="min-h-screen bg-game-canvas text-game-ink">
-      <EventStudio transport={transport} />
+    <main className="flex h-dvh flex-col overflow-hidden bg-game-canvas text-game-ink">
+      <header className="shrink-0 border-b border-game-border p-4">Trainer journal</header>
+      <div className="min-h-0 flex-1 overflow-hidden">
+        <div className="h-full min-h-0 min-w-0 overflow-hidden">
+          <EventStudio transport={transport} />
+        </div>
+      </div>
+      <footer className="shrink-0 border-t border-game-border p-4">Trainer sections</footer>
     </main>
   )
 }

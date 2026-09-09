@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 for (const width of [390, 1280]) {
   test(`event authoring, scheduling and rarity controls at ${width}px`, async ({ page }) => {
-    await page.setViewportSize({ width, height: 900 })
+    await page.setViewportSize({ width, height: 740 })
     await page.goto('/ui-test/events')
     await page.getByRole('button', { name: 'Create event', exact: true }).click()
     await page.getByLabel('Internal name').fill('Weekend outbreak')
@@ -21,6 +21,16 @@ for (const width of [390, 1280]) {
     await page.getByLabel('Silver (%)', { exact: true }).fill('1')
     await page.getByText('Resulting probabilities', { exact: false }).click()
     await expect(page.getByText('shadow: 9.0000%', { exact: true })).toBeVisible()
+    const studio = page.getByRole('region', { name: 'Event studio' })
+    await studio.evaluate((element) => { element.scrollTop = 0 })
+    const viewport = await studio.boundingBox()
+    if (!viewport) throw new Error('Event studio viewport is missing')
+    await page.mouse.move(viewport.x + viewport.width / 2, viewport.y + viewport.height / 2)
+    await page.mouse.wheel(0, 700)
+    await expect.poll(() => studio.evaluate((element) => element.scrollTop)).toBeGreaterThan(0)
+    await page.getByRole('button', { name: 'Save draft', exact: true }).scrollIntoViewIfNeeded()
+    await expect(page.getByRole('button', { name: 'Save draft', exact: true })).toBeInViewport()
+    expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBeLessThanOrEqual(740)
     await page.getByRole('button', { name: 'Schedule', exact: true }).click()
     await page.getByLabel('Notify opted-in devices at activation').check()
     await page.getByLabel('Notification message').fill('The outbreak is here!')
