@@ -68,6 +68,7 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
+    'push-subscriptions': PushSubscription;
     pokemon: Pokemon;
     'expedition-runs': ExpeditionRun;
     'user-inventory-items': UserInventoryItem;
@@ -92,6 +93,7 @@ export interface Config {
   };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    'push-subscriptions': PushSubscriptionsSelect<false> | PushSubscriptionsSelect<true>;
     pokemon: PokemonSelect<false> | PokemonSelect<true>;
     'expedition-runs': ExpeditionRunsSelect<false> | ExpeditionRunsSelect<true>;
     'user-inventory-items': UserInventoryItemsSelect<false> | UserInventoryItemsSelect<true>;
@@ -629,6 +631,40 @@ export interface Pokemon {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "push-subscriptions".
+ */
+export interface PushSubscription {
+  id: string;
+  user: string | User;
+  subscription:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  voyages?: boolean | null;
+  dailyReset?: boolean | null;
+  voyagesEnabledAt?: string | null;
+  dailyCursor: string;
+  sentVoyages?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  nextCheckAt: string;
+  failures?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "expedition-runs".
  */
 export interface ExpeditionRun {
@@ -860,6 +896,9 @@ export interface EconomyActionReceipt {
     | boolean
     | null;
   committedAt: string;
+  /**
+   * Lossless response compression; missing means legacy JSON.
+   */
   responseEncoding?: 'gzip-base64' | null;
   updatedAt: string;
   createdAt: string;
@@ -891,6 +930,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: string | User;
+      } | null)
+    | ({
+        relationTo: 'push-subscriptions';
+        value: string | PushSubscription;
       } | null)
     | ({
         relationTo: 'pokemon';
@@ -1109,6 +1152,24 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "push-subscriptions_select".
+ */
+export interface PushSubscriptionsSelect<T extends boolean = true> {
+  id?: T;
+  user?: T;
+  subscription?: T;
+  voyages?: T;
+  dailyReset?: T;
+  voyagesEnabledAt?: T;
+  dailyCursor?: T;
+  sentVoyages?: T;
+  nextCheckAt?: T;
+  failures?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

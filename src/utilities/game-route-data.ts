@@ -65,7 +65,7 @@ export async function getGameRouteDataForUser(
     },
   })
 
-  return getGameUserData(freshUser, GAME_DATA_SCOPE_KEYS[scope], {
+  return getGameUserData({ ...freshUser, collection: 'users' }, GAME_DATA_SCOPE_KEYS[scope], {
     payload,
     pokemonPayload: getPokemonPayloadForScope(scope),
   })

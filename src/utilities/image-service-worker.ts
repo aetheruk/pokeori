@@ -1,7 +1,8 @@
 import { IMAGE_CACHE_NAME } from './image-cache'
+import { notificationServiceWorker } from './notifications/service-worker'
 
 export function createImageServiceWorker(version: string) {
-  return `
+  return `${notificationServiceWorker}
 // Client release: ${version}
 const CACHE = ${JSON.stringify(IMAGE_CACHE_NAME)}
 const META_CACHE = 'pokeori-image-manifests-v1'
@@ -23,7 +24,8 @@ const getImages = () => {
 const keyFor = (path, revision) => path + '?revision=' + revision
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(getImages().then(() => self.skipWaiting()))
+  // Artwork availability must not prevent notification registration.
+  event.waitUntil(getImages().catch(() => undefined).then(() => self.skipWaiting()))
 })
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {

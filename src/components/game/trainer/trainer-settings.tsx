@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useAudio } from '@/context/AudioContext'
+import { NotificationSettings } from './notification-settings'
 import {
   type DownloadImage,
   downloadGameImages,
@@ -146,6 +147,7 @@ export function TrainerSettings() {
           </span>
           <span>{isAudioEnabled ? 'On' : 'Off'}</span>
         </Button>
+        <NotificationSettings />
         <section className="space-y-3 rounded-lg border border-game-border bg-game-surface p-4">
           <h3 className="text-sm font-semibold">
             Download Images for a better experience.
@@ -215,7 +217,7 @@ export function TrainerSettings() {
               </div>
             </>
           )}
-          <p role="status" className="text-sm text-game-muted">
+          <p role="status" aria-label="Image download status" className="text-sm text-game-muted">
             {message}
           </p>
         </section>

@@ -153,6 +153,8 @@ const uniqueIndexes: UniqueIndexPlan[] = [
 ]
 
 const queryIndexes: QueryIndexPlan[] = [
+  { slug: 'push-subscriptions', keys: { nextCheckAt: 1 }, name: 'nextCheckAt_1' },
+  { slug: 'push-subscriptions', keys: { user: 1 }, name: 'user_1' },
   {
     slug: 'user-tcg-cards',
     keys: { user: 1, setId: 1 },
