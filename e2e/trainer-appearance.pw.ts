@@ -40,7 +40,8 @@ for (const width of [390, 1280]) {
         return { x: transform.m41, y: transform.m42, width: el.getBoundingClientRect().width }
       })
       const before = await position()
-      const direction = variant === 'voltorb' ? 'left' : 'right'
+      const direction = variant === 'rock-push' ? 'down' : variant === 'voltorb' ? 'left' : 'right'
+      const axis = variant === 'rock-push' ? 'y' : 'x'
       const control = fixture.getByRole('button', { name: `Move ${direction}`, exact: true })
       await expect(control).toBeEnabled()
       await control.click()
@@ -48,8 +49,7 @@ for (const width of [390, 1280]) {
       expect(await token.evaluate((el) => el.getAnimations()[0].effect!.getTiming().duration)).toBe(360)
       expect(await sprite.evaluate((el) => el.getAnimations()[0].effect!.getTiming().duration)).toBe(360)
       const middle = await position()
-      expect(Math.abs(middle!.x - before!.x)).toBeCloseTo(before!.width / 2, 0)
-      expect(middle!.y).toBeCloseTo(before!.y, 0)
+      expect(Math.abs(middle![axis] - before![axis])).toBeCloseTo(before!.width / 2, 0)
       for (const [time, frame] of [[45, 0], [135, 1], [225, 2], [315, 3]]) {
         await sprite.evaluate((el, time) => { el.getAnimations()[0].currentTime = time }, time)
         const x = await sprite.evaluate((el) => parseFloat(getComputedStyle(el).backgroundPositionX))
@@ -58,26 +58,26 @@ for (const width of [390, 1280]) {
       await token.evaluate((el) => el.getAnimations({ subtree: true }).forEach((animation) => animation.finish()))
       await expect(sprite).toHaveCSS('background-position-x', '0%')
       const after = await position()
-      expect(Math.abs(after!.x - before!.x)).toBeCloseTo(before!.width, 0)
+      expect(Math.abs(after![axis] - before![axis])).toBeCloseTo(before!.width, 0)
       await fixture.getByRole('grid').screenshot({ path: `/tmp/pokeori-grid-walk-${variant}-${width}.png` })
       await page.emulateMedia({ reducedMotion: 'reduce' })
       await page.waitForTimeout(370)
-      await fixture.getByRole('button', { name: `Move ${direction === 'left' ? 'right' : 'left'}`, exact: true }).click()
+      await fixture.getByRole('button', { name: `Move ${direction === 'down' ? 'up' : direction === 'left' ? 'right' : 'left'}`, exact: true }).click()
       await expect.poll(() => token.evaluate((el) => ({
         reduced: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
         animations: [el, el.querySelector('[data-grid-player-sprite]')!]
           .flatMap((target) => target.getAnimations()).map((a) => a.playState),
       }))).toEqual({ reduced: true, animations: [] })
       const returned = await position()
-      expect(returned!.x).toBeCloseTo(before!.x, 0)
+      expect(returned![axis]).toBeCloseTo(before![axis], 0)
       if (variant === 'rock-push') {
         await page.emulateMedia({ reducedMotion: 'no-preference' })
         await page.waitForTimeout(370)
         await fixture.getByRole('button', { name: 'Undo move', exact: true }).click()
-        await expect.poll(async () => (await position()).x).toBe(after.x)
+        await expect.poll(async () => (await position())[axis]).toBe(after[axis])
         expect(await token.evaluate((el) => el.getAnimations({ subtree: true }).length)).toBe(0)
         await fixture.getByRole('button', { name: 'Restart puzzle', exact: true }).click()
-        await expect.poll(async () => (await position()).x).toBe(before.x)
+        await expect.poll(async () => (await position())[axis]).toBe(before[axis])
         await fixture.getByRole('button', { name: 'Move up', exact: true }).click()
         await expect(sprite).toHaveCSS('background-position-y', '100%')
         expect((await position()).y).toBe(before.y)

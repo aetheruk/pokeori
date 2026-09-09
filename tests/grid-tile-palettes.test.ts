@@ -556,63 +556,22 @@ describe('shared grid sprite sets', () => {
             'wooden-interior',
         ),
     ).toBe(true)
-    const rendererTest = spatialGames.find(
-      (game) => game.id === 'voltorb-grid-renderer-test',
-    )
-    expect(rendererTest).toBeDefined()
-    expect(rendererTest?.subCategory).toBe('Test')
-    expect(rendererTest?.requirements).toEqual([])
-    if (!rendererTest)
-      throw new Error('Voltorb Grid renderer test entry is missing')
-    expect(
-      (rendererTest.settings as { tilePaletteId?: string }).tilePaletteId,
-    ).toBe('basic-cave')
+    const course = spatialGames.find((game) => game.id === 'grid-adventure-test')
+    expect(course?.subCategory).toBe('Test')
+    expect(course?.requirements).toEqual([])
+    expect(spatialGames.filter((game) => game.subCategory === 'Test').map((game) => game.id)).toEqual(['grid-adventure-test'])
   })
 
-  test('grid object trigger tests author battle win and encounter clear flows', () => {
-    const battleTest = allGames.find(
-      (game) => game.id === 'grid-object-battle-test',
-    )
-    const encounterTest = allGames.find(
-      (game) => game.id === 'grid-object-encounter-test',
-    )
-    expect(battleTest?.gameType).toBe('grid-puzzle')
-    expect(encounterTest?.gameType).toBe('grid-puzzle')
-    if (!battleTest || !encounterTest) {
-      throw new Error('Grid object test entries are missing')
+  test('combined grid course references valid encounter and battle checkpoints', () => {
+    const course = allGames.find((game) => game.id === 'grid-adventure-test')
+    const objects = course?.settings.screens?.flatMap((screen) => screen.objects || []) || []
+    expect(objects).toHaveLength(2)
+    expect(objects.map((object) => object.interaction?.type).sort()).toEqual(['battle', 'encounter'])
+    for (const object of objects) {
+      expect(object.interaction?.victory).toBe('clear')
+      const targets = object.interaction?.type === 'battle' ? battles : locations
+      expect(targets.some((target) => target.id === object.interaction?.targetId)).toBe(true)
     }
-    const battleObjects = (battleTest.settings as any).objects || []
-    const encounterObjects = (encounterTest.settings as any).objects || []
-    expect(battleObjects).toHaveLength(1)
-    expect(battleObjects[0].objectId).toBe('battle-trigger')
-    expect(battleObjects[0].interaction).toEqual({
-      type: 'battle',
-      targetId: 'safari-central-rocket-poacher',
-      victory: 'win',
-    })
-    expect(
-      battles.some(
-        (battle) => battle.id === battleObjects[0].interaction.targetId,
-      ),
-    ).toBe(true)
-    expect(encounterObjects).toHaveLength(2)
-    expect(
-      encounterObjects.every(
-        (object: any) => object.objectId === 'encounter-trigger',
-      ),
-    ).toBe(true)
-    expect(
-      encounterObjects.every(
-        (object: any) => object.interaction.victory === 'clear',
-      ),
-    ).toBe(true)
-    expect(
-      encounterObjects.every((object: any) =>
-        locations.some(
-          (location) => location.id === object.interaction.targetId,
-        ),
-      ),
-    ).toBe(true)
   })
 
   test('back-wall row is reserved for the wall surface and exit markers', () => {

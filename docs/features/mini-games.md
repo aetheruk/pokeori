@@ -18,7 +18,7 @@ Shared startup/completion recovery retains pending results and retries the same 
 - Floor rendering uses one required common tile and optional weighted rare tiles. Rare placement is deterministic from the set id, scene seed and coordinates, defaults to 8%, and never affects collision.
 - Every registered set includes source and licensing metadata. Credits are rendered in the in-app Credits & Legal dialog, and third-party packs must also be recorded in `ATTRIBUTIONS.md`.
 - Cave-oriented Echo and Voltorb boards use the local `basic-cave` working set, Sabrina's Quiet Room uses `psychic-quiet-room`, Koga's Fuchsia Gym mazes use `wooden-interior`, Lt. Surge's substation uses `industrial-power`, Blaine's laboratory uses `laboratory`, and outdoor Rock Push/rooftop boards use `grass`. Unknown palette ids resolve to the default set; no external sprite pack is bundled or assigned to live content.
-- `voltorb-grid-renderer-test` is an always-available Kanto/Test Grid Puzzle entry using the Voltorb variant for previewing renderer and tile-set changes after the authored route boards have been completed.
+- `grid-adventure-test` is the single always-available Kanto/Test grid course. Three rooms combine ice slides for rocks and players, three item pickups, paired room travel, a one-way portal, an encounter checkpoint and a battle checkpoint. Both checkpoints use clear-and-resume behavior; filling the second hole finishes the course. The course allows 200 moves and 30 minutes including side activities. Separate battle, encounter, rock, ice, teleporter and Voltorb renderer test entries have been removed; authored story and route games remain.
 
 ## Locations
 - Mini Game routes: `/game/games/[gameType]`
@@ -192,6 +192,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 - The maze reveals once at the start, then goes dark except for the tile under the player. Hole tiles are shown during the opening echo and instantly fail the run when stepped on.
 
 ## Art Academy
+- Keyboard instructions are retained as a screen-reader description of the canvas, without a visible help line. Arrow/Space drawing controls remain supported.
 - Art Academy entries require `settings.formId`, `timeLimit`, and a 30–100 `successThreshold`; `paletteSize` is optional and defaults to 12 representative opaque HOME-sprite colours.
 - The reference plate and freehand drawing board share a visual 3×3 guide overlay. The guides help with proportion but do not limit the player to cells.
 - At session start, the server normalizes the normal bundled HOME sprite to a fixed 64×64 transparent raster and builds the round palette. The same indexed reference grid is sent with the already-visible reference artwork for live scoring and retained privately in Redis for authoritative completion scoring, eliminating browser-versus-server image-resampling differences. The client submits an indexed 64×64 version of its canvas, and the server scores exact palette matches only at reference-sprite pixels; paint outside the sprite is ignored.

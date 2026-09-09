@@ -1,303 +1,82 @@
-import { RockPushGameConfig } from '../types'
+import type { RockPushGameConfig, RockPushPosition } from '../types'
+
+// Keep a single connected route through each room so every mechanic is exercised.
+function corridor(cells: RockPushPosition[]): RockPushPosition[] {
+  const open = new Set(cells.map(({ x, y }) => `${x},${y}`))
+  return Array.from({ length: 72 }, (_, index) => ({
+    x: index % 9,
+    y: Math.floor(index / 9) + 1,
+  })).filter(({ x, y }) => !open.has(`${x},${y}`))
+}
 
 export const testbasicEntries: RockPushGameConfig[] = [
   {
-    id: 'grid-object-battle-test',
-    name: 'Grid Object Battle Test',
-    description: 'Step onto the trainer marker to launch a battle and finish the grid when it is won.',
+    id: 'grid-adventure-test',
+    name: 'Grid Adventure Test',
+    description: 'Explore three connected rooms. Slide rocks across ice, collect supplies, use teleporters, clear a wild encounter, and defeat the trainer before filling the final hole.',
     category: 'Kanto',
     subCategory: 'Test',
-    icon: { type: 'trainer', id: 'rocket-grunt-m' },
+    icon: { type: 'item', id: 'hard-stone' },
     requirements: [],
     rewards: [],
     settings: {
       variant: 'rock-push',
       tilePaletteId: 'basic-cave',
-      timeLimit: 180,
-      grid_size: 7,
-      maxMoves: 100,
+      timeLimit: 1800,
+      grid_size: 9,
+      maxMoves: 200,
       playerStart: { x: 1, y: 1 },
-      objects: [
-        {
-          id: 'battle-trigger-test',
-          objectId: 'battle-trigger',
-          x: 3,
-          y: 1,
-          interaction: {
-            type: 'battle',
-            targetId: 'safari-central-rocket-poacher',
-            victory: 'win',
-          },
-        },
-      ],
-    },
-  },
-  {
-    id: 'grid-object-encounter-test',
-    name: 'Grid Object Encounter Test',
-    description: 'Clear encounter markers from the board, then walk to the wall exit.',
-    category: 'Kanto',
-    subCategory: 'Test',
-    icon: { type: 'pokemon', id: '150' },
-    requirements: [],
-    rewards: [],
-    settings: {
-      variant: 'rock-push',
-      tilePaletteId: 'basic-cave',
-      timeLimit: 240,
-      grid_size: 9,
-      maxMoves: 140,
-      playerStart: { x: 1, y: 7 },
-      winTiles: [{ x: 7, y: 0 }],
-      objects: [
-        {
-          id: 'encounter-trigger-test-a',
-          objectId: 'encounter-trigger',
-          x: 3,
-          y: 7,
-          interaction: {
-            type: 'encounter',
-            targetId: 'test-safari-catching',
-            victory: 'clear',
-          },
-        },
-        {
-          id: 'encounter-trigger-test-b',
-          objectId: 'encounter-trigger',
-          x: 5,
-          y: 5,
-          interaction: {
-            type: 'encounter',
-            targetId: 'test-safari-catching',
-            victory: 'clear',
-          },
-        },
-      ],
-    },
-  },
-  {
-    id: 'pallet-rock-test',
-    name: 'Pallet Town Rock Test',
-    description: 'Test the rock push mechanics in Pallet Town.',
-    category: 'Kanto',
-    subCategory: 'Test',
-    icon: { type: 'item', id: 'hard-stone' },
-    requirements: [],
-    rewards: [
-      {
-        type: 'item',
-        targetId: 'pack-pgo',
-        quantity: 1,
-        dropChance: 100,
-      },
-    ],
-    settings: {
-      variant: 'rock-push',
-      tilePaletteId: 'grass',
-      timeLimit: 90,
-      grid_size: 9,
-      maxMoves: 80,
-      playerStart: { x: 1, y: 1 },
-      boulders: [
-        { x: 3, y: 1 },
-        { x: 3, y: 3 },
-        { x: 3, y: 5 },
-      ],
-      holes: [
-        { x: 6, y: 1 },
-        { x: 6, y: 3 },
-        { x: 6, y: 5 },
-      ],
-      barriers: [
-        { x: 2, y: 2 },
-        { x: 4, y: 2 },
-        { x: 2, y: 4 },
-        { x: 4, y: 4 },
-        { x: 2, y: 6 },
-        { x: 4, y: 6 },
-        { x: 6, y: 6 },
-      ],
-      prizes: [
-        { id: 'debug-poke-ball', x: 1, y: 3, itemId: 'poke-ball', quantity: 3 },
-        {
-          id: 'debug-battle-potion',
-          x: 5,
-          y: 7,
-          itemId: 'battle-potion',
-          quantity: 1,
-        },
-      ],
-    },
-  },
-  {
-    id: 'pallet-rock-ice-test',
-    name: 'Rock Push Ice Test',
-    description: 'Test authored ice sliding for players and boulders.',
-    category: 'Kanto',
-    subCategory: 'Test',
-    icon: { type: 'item', id: 'hard-stone' },
-    requirements: [],
-    rewards: [
-      {
-        type: 'item',
-        targetId: 'pack-pgo',
-        quantity: 1,
-        dropChance: 100,
-      },
-    ],
-    settings: {
-      variant: 'rock-push',
-      tilePaletteId: 'grass',
-      timeLimit: 90,
-      grid_size: 9,
-      maxMoves: 60,
-      playerStart: { x: 1, y: 7 },
-      boulders: [
-        { x: 2, y: 2 },
-        { x: 6, y: 4 },
-      ],
-      holes: [
-        { x: 5, y: 2 },
-        { x: 6, y: 6 },
-      ],
-      barriers: [
-        { x: 3, y: 4 },
-        { x: 4, y: 4 },
-        { x: 5, y: 4 },
-        { x: 2, y: 6 },
-        { x: 3, y: 6 },
-      ],
-      ice: [
-        { x: 3, y: 2 },
-        { x: 4, y: 2 },
-        { x: 6, y: 5 },
-        { x: 2, y: 7 },
-        { x: 3, y: 7 },
-        { x: 4, y: 7 },
-      ],
-      prizes: [
-        {
-          id: 'ice-test-slide-prize',
-          x: 3,
-          y: 7,
-          itemId: 'escape-rope',
-          quantity: 1,
-        },
-      ],
-    },
-  },
-  {
-    id: 'pallet-rock-teleport-test',
-    name: 'Rock Push Teleport Test',
-    description: 'Test win tiles, paired teleporters, one-way teleporters, and multi-screen boards.',
-    category: 'Kanto',
-    subCategory: 'Test',
-    icon: { type: 'item', id: 'hard-stone' },
-    requirements: [],
-    rewards: [
-      {
-        type: 'item',
-        targetId: 'pack-pgo',
-        quantity: 1,
-        dropChance: 100,
-      },
-    ],
-    settings: {
-      variant: 'rock-push',
-      tilePaletteId: 'grass',
-      timeLimit: 120,
-      grid_size: 9,
-      maxMoves: 90,
       startScreen: 'entry',
-      playerStart: { x: 1, y: 1 },
       screens: [
         {
           id: 'entry',
-          grid_size: 9,
-          boulders: [{ x: 3, y: 2 }],
-          holes: [{ x: 6, y: 2 }],
-          barriers: [
-            { x: 4, y: 1 },
+          barriers: corridor([
+            { x: 1, y: 1 },
+            ...Array.from({ length: 7 }, (_, i) => ({ x: i + 1, y: 2 })),
+          ]),
+          boulders: [{ x: 2, y: 2 }],
+          holes: [{ x: 5, y: 2 }],
+          ice: [{ x: 3, y: 2 }, { x: 4, y: 2 }],
+          prizes: [{ id: 'entry-supplies', x: 1, y: 2, itemId: 'poke-ball', quantity: 3 }],
+          teleporters: [{
+            id: 'entry-to-frost', x: 7, y: 2,
+            target: { screen: 'frost', x: 1, y: 1 },
+          }],
+        },
+        {
+          id: 'frost',
+          barriers: corridor([
+            { x: 1, y: 1 },
+            ...Array.from({ length: 4 }, (_, i) => ({ x: i + 1, y: 2 })),
             { x: 4, y: 3 },
-            { x: 4, y: 4 },
-            { x: 4, y: 5 },
-            { x: 4, y: 6 },
-          ],
-          winTiles: [{ x: 7, y: 7 }],
+            ...Array.from({ length: 4 }, (_, i) => ({ x: i + 4, y: 4 })),
+          ]),
+          ice: [{ x: 2, y: 2 }, { x: 3, y: 2 }],
+          prizes: [{ id: 'ice-supplies', x: 3, y: 2, itemId: 'battle-potion', quantity: 1 }],
           teleporters: [
-            {
-              id: 'entry-to-upper',
-              x: 1,
-              y: 4,
-              target: { screen: 'upper', x: 1, y: 1 },
-            },
-            {
-              id: 'entry-one-way',
-              x: 7,
-              y: 1,
-              target: { screen: 'treasure', x: 1, y: 1 },
-              oneWay: true,
-            },
+            { id: 'frost-to-entry', x: 1, y: 1, target: { screen: 'entry', x: 7, y: 2 } },
+            { id: 'frost-to-vault', x: 7, y: 4, target: { screen: 'vault', x: 1, y: 1 }, oneWay: true },
           ],
-          prizes: [
-            {
-              id: 'entry-teleport-prize',
-              x: 2,
-              y: 4,
-              itemId: 'battle-potion',
-              quantity: 1,
-            },
-          ],
+          objects: [{
+            id: 'wild-checkpoint', objectId: 'encounter-trigger', x: 4, y: 3,
+            interaction: { type: 'encounter', targetId: 'test-safari-catching', victory: 'clear' },
+          }],
         },
         {
-          id: 'upper',
-          grid_size: 9,
-          boulders: [{ x: 3, y: 5 }],
-          holes: [{ x: 6, y: 5 }],
-          barriers: [
-            { x: 2, y: 2 },
-            { x: 3, y: 2 },
-            { x: 4, y: 2 },
-            { x: 5, y: 2 },
-            { x: 6, y: 2 },
-          ],
-          teleporters: [
-            {
-              id: 'upper-to-entry',
-              x: 1,
-              y: 1,
-              target: { screen: 'entry', x: 1, y: 4 },
-            },
-          ],
-          prizes: [
-            {
-              id: 'upper-prize',
-              x: 7,
-              y: 6,
-              itemId: 'escape-rope',
-              quantity: 1,
-            },
-          ],
-        },
-        {
-          id: 'treasure',
-          grid_size: 9,
-          barriers: [
-            { x: 2, y: 1 },
-            { x: 2, y: 2 },
-            { x: 2, y: 3 },
-            { x: 2, y: 4 },
-          ],
-          winTiles: [{ x: 5, y: 5 }],
-          prizes: [
-            {
-              id: 'one-way-prize',
-              x: 3,
-              y: 1,
-              itemId: 'poke-ball',
-              quantity: 5,
-            },
-          ],
+          id: 'vault',
+          tilePaletteId: 'wooden-interior',
+          barriers: corridor([
+            { x: 1, y: 1 },
+            ...Array.from({ length: 4 }, (_, i) => ({ x: i + 1, y: 2 })),
+            { x: 4, y: 3 }, { x: 4, y: 4 },
+          ]),
+          boulders: [{ x: 4, y: 3 }],
+          holes: [{ x: 4, y: 4 }],
+          prizes: [{ id: 'vault-supplies', x: 3, y: 2, itemId: 'escape-rope', quantity: 1 }],
+          objects: [{
+            id: 'trainer-checkpoint', objectId: 'battle-trigger', x: 2, y: 2,
+            interaction: { type: 'battle', targetId: 'safari-central-rocket-poacher', victory: 'clear' },
+          }],
         },
       ],
     },

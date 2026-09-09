@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { isPokemonRarityId } from '@/utilities/pokemon/rarity-effects'
-import { GRID_TILE_PALETTE_IDS, gridFloorRenderConfigSchema } from './grid-tiles'
+import { GRID_TILE_PALETTE_IDS, gridFloorRenderConfigSchema, gridObjectPlacementSchema } from './grid-tiles'
 
 const gridTilePaletteIdSchema = z.enum(GRID_TILE_PALETTE_IDS as [string, ...string[]])
 
@@ -327,6 +327,7 @@ const rockPushScreenSchema = z
     winTiles: z.array(rockPushPositionSchema).optional(),
     teleporters: z.array(rockPushTeleporterSchema).optional(),
     prizes: z.array(rockPushPrizeSchema).optional(),
+    objects: z.array(gridObjectPlacementSchema).optional(),
   })
   .strict()
 
@@ -633,6 +634,7 @@ const gridPuzzleSettingsSchema = z.union([
       teleporters: z.array(rockPushTeleporterSchema).optional(),
       screens: z.array(rockPushScreenSchema).optional(),
       prizes: z.array(rockPushPrizeSchema).optional(),
+      objects: z.array(gridObjectPlacementSchema).optional(),
       timeLimit: z.number().positive().optional(),
       maxMoves: z.number().int().positive().optional(),
       invisibleMaze: z.boolean().optional(),

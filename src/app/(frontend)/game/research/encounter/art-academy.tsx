@@ -645,7 +645,7 @@ export function ArtAcademyGame({
             )}
           </div>
 
-          <p id="drawing-keyboard-help" className="text-center text-xs text-game-muted">Keyboard: focus the canvas, use arrows to move, Space to paint, or Shift + arrows to draw.</p>
+          <p id="drawing-keyboard-help" className="sr-only">Keyboard: focus the canvas, use arrows to move, Space to paint, or Shift + arrows to draw.</p>
 
           <Button
             type="button"
