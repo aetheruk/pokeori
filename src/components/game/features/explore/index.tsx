@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils'
 // Hooks
 import { useExploreState } from './hooks/useExploreState'
 import { useExploreData } from './hooks/useExploreData'
-import { PlayerEventAnnouncements, usePlayerEvents } from '@/components/game/events/player-events'
+import { PlayerEventsCard, usePlayerEvents } from '@/components/game/events/player-events'
 import type { ExploreItem } from './types'
 import { useExploreActions } from './hooks/useExploreActions'
 
@@ -384,7 +384,6 @@ function ExploreListContent({
       )}
     >
       {isTakeover && <BlackoutBackdrop />}
-      {!isTakeover && <PlayerEventAnnouncements {...playerEvents} />}
       {isTakeover && <BlackoutUnowns trainerName={trainerName} />}
       {isTakeover && !struggleCompleted && !eggRevealed && (
         <button
@@ -464,6 +463,9 @@ function ExploreListContent({
           filteredItems={filteredItems}
           randomEvent={isTakeover ? null : randomEvent}
           vsSeekerEvent={isTakeover ? null : vsSeekerEvent}
+          eventsCard={!isTakeover && (playerEvents.data?.announcements.length || playerEvents.error) ? (
+            <PlayerEventsCard {...playerEvents} userData={userData} trainerName={trainerName} playSelectSfx={actions.playSelectSfx} />
+          ) : null}
           activeCategory={displayCategory}
           takeoverStyle={isTakeover}
           activeVoyages={activeVoyages}

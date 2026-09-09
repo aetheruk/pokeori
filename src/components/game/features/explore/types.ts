@@ -7,6 +7,7 @@ export type ExploreItemType =
   | 'voyage'
   | 'expedition'
   | 'vs-seeker'
+  | 'events'
   | 'task'
 
 export interface ExploreItem {

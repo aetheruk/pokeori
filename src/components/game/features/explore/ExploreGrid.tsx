@@ -3,7 +3,7 @@ import { ExploreCard } from './ExploreCard'
 import type { ExploreDisplayItem, ExploreItem, ExploreItemGroup } from './types'
 import type { RequirementData } from '@/utilities/requirements'
 import { cn } from '@/lib/utils'
-import { memo, useMemo } from 'react'
+import { memo, useMemo, type ReactNode } from 'react'
 import {
   getLocationCardGroupName,
   isLocationCardMode,
@@ -13,6 +13,7 @@ interface ExploreGridProps {
   filteredItems: ExploreItem[]
   randomEvent?: ExploreItem | null
   vsSeekerEvent?: ExploreItem | null
+  eventsCard?: ReactNode
   activeCategory: string
   activeVoyages: { voyageId: string; endTime: string }[]
   activeExpedition: any | null
@@ -30,6 +31,7 @@ function ExploreGridComponent({
   filteredItems,
   randomEvent,
   vsSeekerEvent,
+  eventsCard,
   activeCategory,
   activeVoyages,
   activeExpedition,
@@ -261,7 +263,7 @@ function ExploreGridComponent({
     })
   }, [filteredItems])
 
-  if (filteredItems.length === 0 && !randomEvent && !vsSeekerEvent) {
+  if (filteredItems.length === 0 && !randomEvent && !vsSeekerEvent && !eventsCard) {
     if (hideEmptyState) return null
     return (
       <div
@@ -281,6 +283,7 @@ function ExploreGridComponent({
         takeoverStyle && 'flex w-full flex-col items-center pb-8 md:pb-10',
       )}
     >
+      {eventsCard}
       {vsSeekerEvent && (
         <div>
           <SectionDivider textColor="text-game-ochre">VS Seeker</SectionDivider>

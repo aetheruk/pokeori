@@ -1,6 +1,9 @@
 'use client'
 
-import { useEffect, useId, useState } from 'react'
+import { createContext, useContext, useEffect, useId, useState } from 'react'
+import { Search, Trash2 } from 'lucide-react'
+import { ItemSprite } from '@/components/ui/item-sprite'
+import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { searchEventReferences } from '@/utilities/events/actions'
 import { Button } from '@/components/ui/button'
 import {
@@ -11,6 +14,42 @@ import {
 import { getPokemonRarityEffect } from '@/utilities/pokemon/rarity-effects'
 
 export type FormSchema = Record<string, any>
+export const EventReferenceSearch = createContext(searchEventReferences)
+export function fieldLabel(key: string) {
+  const labels: Record<string, string> = {
+    name: 'Name',
+    description: 'Description',
+    category: 'Region',
+    subCategory: 'Area',
+    speciesId: 'Pokémon',
+    formId: 'Pokémon form',
+    enemyTeam: 'Opponent team',
+    encounters: 'Encounter Pokémon',
+    chance: 'Encounter weight',
+    rarityChances: 'Rarity chances',
+    requirements: 'Who can see this?',
+    criteria: 'Entry and completion conditions',
+    maxPokemon: 'Player team size',
+    isWildBattle: 'Wild Pokémon battle',
+    items: 'Shop offers',
+    aiMoves: 'Moves',
+    aiProfile: 'Opponent strategy',
+    requiredItem: 'Required tool',
+    levelRange: 'Pokémon levels',
+    rewards: 'Completion rewards',
+    id: 'Reference ID',
+    min: 'Minimum',
+    max: 'Maximum',
+    timer: 'Time limit (seconds)',
+  }
+  return (
+    labels[key] ||
+    key
+      .replace(/\./g, ' · ')
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/^./, (letter) => letter.toUpperCase())
+  )
+}
 export function formDefault(schema: FormSchema): any {
   if (schema.default !== undefined) return schema.default
   if (schema.const !== undefined) return schema.const
@@ -58,6 +97,96 @@ export function SchemaForm({
   depth?: number
 }) {
   const id = useId()
+  if (label === 'icon' && schema.properties)
+    return (
+      <div className="space-y-3">
+        <label className="block text-sm">
+          Card icon
+          <select
+            className={fieldClass}
+            value={value?.type || 'lucide'}
+            onChange={(event) =>
+              onChange({
+                type: event.target.value,
+                id:
+                  event.target.value === 'pokemon'
+                    ? '1'
+                    : event.target.value === 'lucide'
+                      ? 'MapPin'
+                      : '',
+              })
+            }
+          >
+            <option value="lucide">Activity symbol</option>
+            <option value="pokemon">Pokémon sprite</option>
+            <option value="item">Item sprite</option>
+            <option value="trainer">Trainer portrait</option>
+            <option value="local">Local artwork</option>
+          </select>
+        </label>
+        {value?.type === 'pokemon' || value?.type === 'item' ? (
+          <ReferenceField
+            type={value.type === 'pokemon' ? 'formId' : 'itemId'}
+            value={value.id}
+            numeric={false}
+            onChange={(next) => onChange({ ...value, id: next })}
+          />
+        ) : value?.type === 'lucide' ? (
+          <label className="block text-sm">
+            Activity symbol
+            <select
+              className={fieldClass}
+              value={value?.id || ''}
+              onChange={(event) =>
+                onChange({ ...value, id: event.target.value })
+              }
+            >
+              {Array.from(
+                new Set(
+                  [
+                    value?.id,
+                    'MapPin',
+                    'Swords',
+                    'ShoppingBag',
+                    'Search',
+                    'CalendarDays',
+                    'Star',
+                  ].filter(Boolean),
+                ),
+              ).map((symbol) => (
+                <option key={symbol} value={symbol}>
+                  {fieldLabel(symbol)}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : (
+          <label className="block text-sm">
+            Artwork reference
+            <input
+              className={fieldClass}
+              value={value?.id || ''}
+              onChange={(event) =>
+                onChange({ ...value, id: event.target.value })
+              }
+            />
+          </label>
+        )}
+      </div>
+    )
+  if (
+    ['encounters', 'enemyTeam', 'pokemonPool'].includes(label) &&
+    schema.type === 'array'
+  )
+    return (
+      <PokemonRoster
+        schema={schema}
+        value={value || []}
+        onChange={onChange}
+        label={label}
+        root={root}
+      />
+    )
   if (label.startsWith('rarityChances.'))
     return (
       <label className="block text-sm">
@@ -148,7 +277,7 @@ export function SchemaForm({
     return (
       <div className="space-y-2">
         <label htmlFor={id} className="text-sm">
-          {label} format
+          {fieldLabel(label)} selection
         </label>
         <select
           id={id}
@@ -160,7 +289,13 @@ export function SchemaForm({
         >
           {alternatives.map((entry: any, index: number) => (
             <option key={index} value={index}>
-              {entry.title || entry.type || `Option ${index + 1}`}
+              {entry.title ||
+                (entry.type === 'number' || entry.type === 'integer'
+                  ? 'Fixed value'
+                  : entry.type === 'object' && entry.properties?.min
+                    ? 'Random range'
+                    : entry.type) ||
+                `Option ${index + 1}`}
             </option>
           ))}
         </select>
@@ -182,18 +317,29 @@ export function SchemaForm({
     )
     const optional = Object.keys(fields).filter((key) => !present.includes(key))
     return (
-      <fieldset className="space-y-3 rounded-lg border border-game-border p-3">
-        <legend className="px-1 text-sm font-semibold">{label}</legend>
+      <fieldset className="min-w-0 space-y-3">
+        <legend className="px-1 text-sm font-semibold">
+          {fieldLabel(label)}
+        </legend>
         {present.map((key) => (
           <div key={key} className="space-y-1">
-            <SchemaForm
-              schema={fields[key]}
-              value={value?.[key]}
-              onChange={(next) => onChange({ ...value, [key]: next })}
-              label={key}
-              root={root}
-              depth={depth + 1}
-            />
+            {key === 'id' && ['item', 'pokemon'].includes(value?.type) ? (
+              <ReferenceField
+                type={value.type === 'pokemon' ? 'formId' : 'itemId'}
+                value={value[key]}
+                numeric={false}
+                onChange={(next) => onChange({ ...value, [key]: next })}
+              />
+            ) : (
+              <SchemaForm
+                schema={fields[key]}
+                value={value?.[key]}
+                onChange={(next) => onChange({ ...value, [key]: next })}
+                label={key}
+                root={root}
+                depth={depth + 1}
+              />
+            )}
             {!schema.required?.includes(key) && (
               <Button
                 type="button"
@@ -205,7 +351,7 @@ export function SchemaForm({
                   onChange(next)
                 }}
               >
-                Remove {key}
+                Reset {fieldLabel(key).toLowerCase()}
               </Button>
             )}
           </div>
@@ -223,7 +369,7 @@ export function SchemaForm({
             <option value="">Add optional setting…</option>
             {optional.map((key) => (
               <option key={key} value={key}>
-                {key}
+                {fieldLabel(key)}
               </option>
             ))}
           </select>
@@ -233,10 +379,13 @@ export function SchemaForm({
   }
   if (schema.type === 'array')
     return (
-      <fieldset className="space-y-3 rounded-lg border border-game-border p-3">
-        <legend className="text-sm font-semibold">{label}</legend>
+      <fieldset className="min-w-0 space-y-3">
+        <legend className="text-sm font-semibold">{fieldLabel(label)}</legend>
         {(value || []).map((entry: any, index: number) => (
-          <div key={index} className="space-y-2">
+          <div
+            key={index}
+            className="space-y-2 border-l-2 border-game-border pl-3"
+          >
             <SchemaForm
               schema={schema.items || { type: 'string' }}
               value={entry}
@@ -274,7 +423,7 @@ export function SchemaForm({
             onChange([...(value || []), formDefault(schema.items || {})])
           }
         >
-          Add {label}
+          Add {fieldLabel(label).toLowerCase()}
         </Button>
       </fieldset>
     )
@@ -286,13 +435,13 @@ export function SchemaForm({
           checked={value === true}
           onChange={(event) => onChange(event.target.checked)}
         />
-        {label}
+        {fieldLabel(label)}
       </label>
     )
   if (schema.enum || schema.const !== undefined)
     return (
       <label className="block space-y-1 text-sm">
-        {label}
+        {fieldLabel(label)}
         <select
           className={fieldClass}
           value={value ?? schema.const ?? ''}
@@ -330,7 +479,7 @@ export function SchemaForm({
     )
   return (
     <label htmlFor={id} className="block space-y-1 text-sm">
-      {label}
+      {fieldLabel(label)}
       {['description', 'message'].includes(label) ? (
         <textarea
           id={id}
@@ -356,7 +505,7 @@ export function SchemaForm({
   )
 }
 
-function ReferenceField({
+export function ReferenceField({
   type,
   value,
   onChange,
@@ -367,61 +516,286 @@ function ReferenceField({
   onChange: (value: any) => void
   numeric: boolean
 }) {
+  const search = useContext(EventReferenceSearch)
   const [query, setQuery] = useState('')
   const [options, setOptions] = useState<{ id: string; name: string }[]>([])
+  const [selectedName, setSelectedName] = useState('')
+  const [state, setState] = useState('')
+  const pokemon = ['speciesId', 'formId'].includes(type)
+  const item = ['itemId', 'heldItemId', 'allowedItems'].includes(type)
   useEffect(() => {
-    if (!query) return
     let cancelled = false
-    const timer = setTimeout(() => {
-      void searchEventReferences(type, query)
-        .then((result) => {
-          if (!cancelled) setOptions(result)
+    setSelectedName('')
+    if (value)
+      void search(type, String(value))
+        .then((results) => {
+          if (!cancelled)
+            setSelectedName(
+              results.find((entry) => entry.id === String(value))?.name || '',
+            )
         })
         .catch(() => {})
-    }, 300)
+    return () => {
+      cancelled = true
+    }
+  }, [value, type, search])
+  useEffect(() => {
+    let cancelled = false
+    setOptions([])
+    setState(query.trim() ? 'Searching…' : '')
+    if (!query.trim()) return
+    const timer = setTimeout(() => {
+      void search(type, query)
+        .then((result) => {
+          if (!cancelled) {
+            setOptions(result)
+            setState(result.length ? '' : 'No matches. Try another name or ID.')
+          }
+        })
+        .catch(() => {
+          if (!cancelled)
+            setState('Search unavailable. Try again or enter an ID below.')
+        })
+    }, 250)
     return () => {
       cancelled = true
       clearTimeout(timer)
     }
-  }, [query, type])
+  }, [query, type, search])
   return (
-    <fieldset className="space-y-2">
-      <legend className="text-sm">{type}</legend>
-      <input
-        className={fieldClass}
-        aria-label={`Search ${type}`}
-        value={query}
-        placeholder="Search by name or ID"
-        onChange={(event) => setQuery(event.target.value)}
-      />
-      {options.length > 0 && (
-        <select
-          className={fieldClass}
-          aria-label={`Choose ${type}`}
-          value=""
-          onChange={(event) => {
-            onChange(numeric ? Number(event.target.value) : event.target.value)
-            setQuery('')
-            setOptions([])
-          }}
-        >
-          <option value="">Choose a result…</option>
-          {options.map((option) => (
-            <option key={option.id} value={option.id}>
-              {option.name} ({option.id})
-            </option>
-          ))}
-        </select>
+    <div className="space-y-2">
+      {value && (
+        <div className="flex items-center gap-3">
+          {pokemon && (
+            <PokemonRaritySprite
+              formId={value}
+              view="home"
+              alt=""
+              className="h-12 w-12 shrink-0"
+              sizes="48px"
+            />
+          )}
+          <span className="text-sm font-semibold">
+            {item && (
+              <ItemSprite
+                itemId={String(value)}
+                alt=""
+                width={40}
+                height={40}
+                className="inline-block mr-2"
+              />
+            )}
+            {selectedName || `${fieldLabel(type)} #${value}`}
+          </span>
+        </div>
       )}
-      <input
-        className={fieldClass}
-        aria-label={`${type} ID`}
-        type={numeric ? 'number' : 'text'}
-        value={value ?? ''}
-        onChange={(event) =>
-          onChange(numeric ? Number(event.target.value) : event.target.value)
+      <label className="block space-y-1 text-sm">
+        Search {fieldLabel(type).toLowerCase()}
+        <span className="relative block">
+          <Search className="pointer-events-none absolute left-3 top-3 h-5 w-5 text-game-muted" />
+          <input
+            className={`${fieldClass} pl-10`}
+            value={query}
+            placeholder="Type a name or number…"
+            onChange={(event) => setQuery(event.target.value)}
+          />
+        </span>
+      </label>
+      {state && (
+        <p className="text-sm text-game-muted" role="status">
+          {state}
+        </p>
+      )}
+      {options.length > 0 && (
+        <div className="max-h-64 overflow-y-auto overscroll-contain rounded-lg border border-game-border">
+          {options.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              className="game-focus-ring flex min-h-12 w-full items-center gap-3 border-b border-game-border bg-game-surface px-3 py-2 text-left text-sm last:border-0 hover:bg-game-canvas"
+              onClick={() => {
+                onChange(numeric ? Number(option.id) : option.id)
+                setQuery('')
+                setOptions([])
+              }}
+            >
+              {pokemon && (
+                <PokemonRaritySprite
+                  formId={option.id}
+                  view="home"
+                  alt=""
+                  className="h-10 w-10 shrink-0"
+                  sizes="40px"
+                />
+              )}
+              <span className="min-w-0 flex-1">{option.name}</span>
+              {item && (
+                <ItemSprite itemId={option.id} alt="" width={40} height={40} />
+              )}
+              <span className="text-xs text-game-muted">#{option.id}</span>
+            </button>
+          ))}
+        </div>
+      )}
+      <details className="text-sm text-game-muted">
+        <summary className="cursor-pointer py-2">
+          Enter a reference ID manually
+        </summary>
+        <input
+          className={fieldClass}
+          aria-label={`${type} ID`}
+          type={numeric ? 'number' : 'text'}
+          value={value ?? ''}
+          onChange={(event) =>
+            onChange(numeric ? Number(event.target.value) : event.target.value)
+          }
+        />
+      </details>
+    </div>
+  )
+}
+
+function PokemonRoster({
+  schema,
+  value,
+  onChange,
+  label,
+  root,
+}: {
+  schema: FormSchema
+  value: any[]
+  onChange: (value: any[]) => void
+  label: string
+  root: FormSchema
+}) {
+  const encounter = label !== 'enemyTeam'
+  const weightKey = label === 'pokemonPool' ? 'weight' : 'chance'
+  const entrySchema = schema.items || {}
+  const update = (index: number, next: any) =>
+    onChange(
+      value.map((entry, position) => (position === index ? next : entry)),
+    )
+  const total = value.reduce(
+    (sum, entry) => sum + (Number(entry[weightKey]) || 0),
+    0,
+  )
+  return (
+    <div className="space-y-4">
+      <div>
+        <h4 className="font-semibold">{fieldLabel(label)}</h4>
+        <p className="text-sm text-game-muted">
+          {encounter
+            ? 'Choose who appears here. Weights are relative: two Pokémon with weight 1 each have an equal chance. Eligibility can change the final share.'
+            : 'Build the opposing team in battle order. Set each Pokémon’s level and optional equipment.'}
+        </p>
+      </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        {value.map((entry, index) => (
+          <article
+            key={index}
+            aria-label={`Pokémon slot ${index + 1}`}
+            className="space-y-3 rounded-lg border border-game-border bg-game-surface p-4"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <h5 className="text-sm font-semibold">Pokémon {index + 1}</h5>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                aria-label={`Remove Pokémon ${index + 1}`}
+                onClick={() =>
+                  onChange(value.filter((_, position) => position !== index))
+                }
+              >
+                <Trash2 className="h-4 w-4" />
+                Remove
+              </Button>
+            </div>
+            <ReferenceField
+              type="speciesId"
+              numeric
+              value={entry.speciesId}
+              onChange={(speciesId) => {
+                const { formId: _, ...rest } = entry
+                update(index, { ...rest, speciesId })
+              }}
+            />
+            {encounter ? (
+              <label className="block text-sm">
+                Encounter weight
+                <input
+                  className={fieldClass}
+                  type="number"
+                  min="0"
+                  max={entrySchema.properties?.[weightKey]?.maximum}
+                  step="any"
+                  value={entry[weightKey] ?? 1}
+                  onChange={(event) =>
+                    update(index, {
+                      ...entry,
+                      [weightKey]: Number(event.target.value),
+                    })
+                  }
+                />
+                <span className="text-xs text-game-muted">
+                  {total > 0
+                    ? `${(((entry[weightKey] || 0) / total) * 100).toFixed(1)}% of the listed encounter pool`
+                    : 'Set a positive weight to make Pokémon available.'}
+                </span>
+              </label>
+            ) : (
+              <SchemaForm
+                schema={entrySchema.properties?.level || { type: 'number' }}
+                value={entry.level}
+                onChange={(level) => update(index, { ...entry, level })}
+                label="level"
+                root={root}
+              />
+            )}
+            <details>
+              <summary className="cursor-pointer py-2 text-sm font-medium">
+                Form, rarity & other Pokémon settings
+              </summary>
+              <SchemaForm
+                schema={{
+                  ...entrySchema,
+                  properties: Object.fromEntries(
+                    Object.entries(entrySchema.properties || {}).filter(
+                      ([key]) =>
+                        ![
+                          'speciesId',
+                          encounter ? weightKey : 'level',
+                        ].includes(key),
+                    ),
+                  ),
+                  required: [],
+                }}
+                value={entry}
+                onChange={(next) => update(index, next)}
+                label="Pokémon settings"
+                root={root}
+              />
+            </details>
+          </article>
+        ))}
+      </div>
+      <Button
+        type="button"
+        variant="outline"
+        disabled={value.length >= (schema.maxItems || 200)}
+        onClick={() =>
+          onChange([
+            ...value,
+            {
+              ...formDefault(entrySchema),
+              speciesId: 1,
+              ...(encounter ? { [weightKey]: 1 } : { level: 5 }),
+            },
+          ])
         }
-      />
-    </fieldset>
+      >
+        Add Pokémon
+      </Button>
+    </div>
   )
 }

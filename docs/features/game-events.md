@@ -8,7 +8,11 @@ The Events panel owns its vertical scroll area within the Trainer layout, so lon
 
 Supported domains are standard PvE battles, capture locations, shops, Field Observation, and tasks. Structured forms provide source-content search, entity/asset lookup, optional advanced settings, and rarity previews. Other mini-game engines, copied rival teams, PvP, expedition orchestration, and custom password/script handlers are outside this editor. Permanent content remains authored in `src/data`.
 
+The creation flow uses persistent Details, Content, Schedule and Review navigation with next-step actions. Activity choices explain their purpose. Activity editors group Explore presentation, Pokémon, gameplay rules, offers/rewards, availability and scene settings; uncommon options remain in an advanced section. Capture, battle and Field Observation Pokémon pools use searchable sprite rows, with names, levels or relative weights and per-Pokémon options. Encounter shares describe the listed pool; trainer eligibility can change the final pool. Item lookups show sprites, and manual reference entry remains available. Defaults provide a working card icon and unique activity reference without exposing those details as mandatory setup steps.
+
 An event bundles additions and modifiers. Event requirements and normal content requirements both apply. Nullable `visibleAt` controls announcement visibility independently of activation. Silent events still label affected active content; activation push is separately optional.
+
+Visible announcements appear through one **Active Events** card in the scrolling Explore list, matching VS Seeker. Its count distinguishes active and upcoming events. Opening it shows descriptions and schedules in a scrollable mobile sheet or desktop side panel. Notification links open the panel at the matching event; closing it does not reopen it on periodic refresh.
 
 ## Resolution
 
@@ -42,6 +46,6 @@ Devices enabled after activation do not receive a replay. Eligibility is evaluat
 
 ## Validation and rollout
 
-Run `bun test tests/game-events.test.ts tests/event-runtime.test.ts tests/rarity-chances.test.ts tests/notifications.test.ts`, typecheck, lint, data validation, and the full Bun suite. `bun run test:e2e e2e/event-studio.pw.ts e2e/notification-settings.pw.ts` checks phone/desktop authoring with an isolated UI transport. Runtime fixtures cover participation and delivery behavior; they do not replace real MongoDB/Redis integration.
+Run `bun test tests/game-events.test.ts tests/event-runtime.test.ts tests/rarity-chances.test.ts tests/notifications.test.ts`, typecheck, lint, data validation, and the full Bun suite. `bun run test:e2e e2e/event-studio.pw.ts e2e/event-card.pw.ts e2e/notification-settings.pw.ts` checks phone/desktop authoring, Pokémon selection, validated configuration saves and Explore event panels with an isolated UI transport. Runtime fixtures cover participation and delivery behavior; they do not replace real MongoDB/Redis integration.
 
 Prepare the event/participation/audit/delivery indexes through the existing performance-index migration before enabling production authoring. Custom text primary keys provide participation/delivery identity. No events are seeded or launched automatically. Ship `0.33.0` or the next unused minor version through protected main/Coolify. Verify `/api/app-version`, open-PWA refresh, real start/end transitions, transactional purchases/claims, restarts, and a Home Screen push. Keep historical event, audit, and claim records; no destructive cleanup migration is included.
