@@ -55,11 +55,16 @@ Configure values in Coolify, never in committed environment files.
 | `CSP_ENFORCE` | Disabled | Enforcement is the default; `false` explicitly selects report-only |
 | `TRUSTED_PROXY_HOPS` | Disabled | Number of trusted proxies counted from the right of X-Forwarded-For; default 1 |
 | `GAME_PERFORMANCE_LOGS` | Disabled | Optional privacy-safe timing/size diagnostics |
+| `WEB_PUSH_PUBLIC_KEY` | Disabled | Optional stable VAPID public key; enables device notifications with the following two values |
+| `WEB_PUSH_PRIVATE_KEY` | Disabled | Matching private VAPID key; keep secret and retain across deployments |
+| `WEB_PUSH_SUBJECT` | Disabled | VAPID contact (`mailto:` or HTTPS URL) |
 | `TRUST_CLOUDFLARE_PROXY` | Disabled | `true` only when direct origin access is firewalled |
 
 The Dockerfile preserves injected environment values. It rejects a missing Server Actions key; Next embeds this key in server build output, so generated images must remain private even though the source repository is public. For an intentional local Docker diagnostic, the key can also be supplied with `--secret id=NEXT_SERVER_ACTIONS_ENCRYPTION_KEY,env=NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` from an exported variable. Do not print the key.
 
 MongoDB must support replica-set transactions, and the application must reach MongoDB and Dragonfly on the private network. The health endpoint checks both services and transaction support.
+
+For the 0.32.0 notification feature, follow [device notification setup](../features/notifications.md). Add the `push-subscriptions` due-time and user indexes through the existing prepare migration before enabling production dispatch. The dispatcher runs in the persistent Next process; no additional cron provider or paid push account is needed. Without the three runtime VAPID values, notifications remain unavailable and no dispatcher starts.
 
 ## N150 build performance
 

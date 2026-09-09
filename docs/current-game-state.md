@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.32.0` (implementation; deployment configuration and real-device delivery verification pending): Trainer settings adds per-device, default-off Web Push alerts for voyage completion and the midnight UTC daily task reset. Daily alerts require `tutorial-16`; voyages remain claimable through Explore and rewards are unchanged. Activity artwork is supplied where the operating system supports it. Persistent background dispatch requires the runtime VAPID configuration described in [Device notifications](features/notifications.md).
+
 - Release `0.31.4`: Kanto/Test now has one `grid-adventure-test` instead of the five separate Rock Push mechanic tests and Voltorb renderer test. Its three connected rooms require rock and player ice slides, item collection, paired and one-way teleporters, a wild encounter, and a trainer battle before the final hole completes the course. Story/route grid entries are retained. Art Academy no longer shows the keyboard instruction line; keyboard drawing and its screen-reader description remain available.
 
 - Release `0.31.3`: Ditto now uses a four-direction overworld walking sheet for the Neither trainer choice across all grid games. Voltorb and protected Rattata/Ditto use matching overworld sprites, with Following Pokémon EX credits in Credits & Legal. Movement timing and gameplay rules are unchanged.

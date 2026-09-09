@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
 
 import { Users } from './collections/Users'
+import { PushSubscriptions } from './collections/PushSubscriptions'
 import {
   UserActivityStats,
   UserAbilityDexEntries,
@@ -47,6 +48,7 @@ export default buildConfig({
   },
   collections: [
     Users,
+    PushSubscriptions,
     Pokemon,
     ExpeditionRuns,
     UserInventoryItems,

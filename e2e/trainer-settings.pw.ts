@@ -100,7 +100,7 @@ test('cancelled downloads retain completed files and resume only missing images'
   await panel.getByRole('button', { name: 'Download images', exact: true }).click()
   await expect(panel.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '1')
   await panel.getByRole('button', { name: 'Cancel download', exact: true }).click()
-  await expect(panel.getByRole('status')).toContainText('Download paused')
+  await expect(panel.getByRole('status', { name: 'Image download status' })).toContainText('Download paused')
   slow = false
   await panel.getByRole('button', { name: 'Resume download', exact: true }).click()
   await expect(panel.getByRole('button', { name: 'Images downloaded' })).toBeDisabled()
