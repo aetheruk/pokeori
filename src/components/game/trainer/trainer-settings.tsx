@@ -150,7 +150,7 @@ export function TrainerSettings() {
         <NotificationSettings />
         <section className="space-y-3 rounded-lg border border-game-border bg-game-surface p-4">
           <h3 className="text-sm font-semibold">
-            Download Images for a better experience.
+            Image downloads
           </h3>
           {!supported && !loading ? (
             <p className="text-sm">
@@ -161,7 +161,7 @@ export function TrainerSettings() {
               <p className="text-sm">
                 {loading
                   ? 'Checking images…'
-                  : `${images.length.toLocaleString()} images · ${megabytes} MB total`}
+                  : `${completed.toLocaleString()} / ${images.length.toLocaleString()} saved · ${megabytes} MB`}
               </p>
               <div
                 role="progressbar"
@@ -178,10 +178,6 @@ export function TrainerSettings() {
                   }}
                 />
               </div>
-              <p className="text-sm text-game-muted">
-                {completed.toLocaleString()} of {images.length.toLocaleString()}{' '}
-                saved
-              </p>
               <div className="flex flex-wrap gap-2">
                 <Button
                   disabled={loading || busy || !images.length || ready}
@@ -190,10 +186,10 @@ export function TrainerSettings() {
                 >
                   <Download className="mr-2 h-4 w-4" />
                   {ready
-                    ? 'Images downloaded'
+                    ? 'Downloaded'
                     : completed > 0
-                      ? 'Resume download'
-                      : 'Download images'}
+                      ? 'Resume'
+                      : 'Download'}
                 </Button>
                 {busy && download.current && (
                   <Button
@@ -201,7 +197,7 @@ export function TrainerSettings() {
                     onClick={() => download.current?.abort()}
                     className="min-h-11"
                   >
-                    Cancel download
+                    Pause
                   </Button>
                 )}
                 {!busy && completed > 0 && (
@@ -211,13 +207,13 @@ export function TrainerSettings() {
                     className="min-h-11"
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Remove downloads
+                    Remove
                   </Button>
                 )}
               </div>
             </>
           )}
-          <p role="status" aria-label="Image download status" className="text-sm text-game-muted">
+          <p role="status" aria-label="Image download status" className="text-sm text-game-muted empty:hidden">
             {message}
           </p>
         </section>

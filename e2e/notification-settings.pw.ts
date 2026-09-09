@@ -16,7 +16,10 @@ for (const width of [390, 1280]) {
       await expect(panel.getByRole('button', { name, exact: true })).toHaveAttribute('aria-pressed', 'false')
     }
     await expect(panel.getByRole('status', { name: 'Notification status' })).toContainText('Home Screen')
-    await expect(panel).toContainText('00:00 UTC')
+    await expect(panel.getByText('Daily reset: 00:00 UTC, after the tutorial.')).toBeHidden()
+    await panel.getByText('Details', { exact: true }).click()
+    await expect(panel.getByText('Daily reset: 00:00 UTC, after the tutorial.')).toBeVisible()
+    await panel.getByText('Details', { exact: true }).click()
     const bounds = await panel.boundingBox()
     expect(bounds!.x).toBeGreaterThanOrEqual(0)
     expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width)

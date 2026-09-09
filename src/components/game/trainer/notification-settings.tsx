@@ -3,7 +3,7 @@
 import { Bell } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { getNotificationSettings, resetDeviceNotifications, saveNotificationSettings, sendTestNotification } from '@/utilities/notifications/actions'
+import { getNotificationSettings, saveNotificationSettings } from '@/utilities/notifications/actions'
 import { notificationsOff, type NotificationPreferences } from '@/utilities/notifications/model'
 
 export function NotificationSettings() {
@@ -12,13 +12,13 @@ export function NotificationSettings() {
   const [subscription, setSubscription] = useState<PushSubscription | null>(null)
   const [publicKey, setPublicKey] = useState<string | null>(null)
   const [busy, setBusy] = useState(true)
-  const [message, setMessage] = useState('Checking notification support…')
+  const [message, setMessage] = useState('Checking availability…')
 
   useEffect(() => {
     let cancelled = false
     const load = async () => {
       if (!window.isSecureContext || !('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
-        setMessage('Notifications are unavailable here. On iPhone or iPad (iOS 16.4+), add Pokeori to your Home Screen, then open it from there.')
+        setMessage('Unavailable here. On iPhone or iPad, open Pokeori from your Home Screen (iOS 16.4+).')
         setBusy(false)
         return
       }
@@ -35,7 +35,7 @@ export function NotificationSettings() {
         setSubscription(current)
         setPublicKey(settings.publicKey)
         setPreferences(settings.preferences)
-        setMessage(!settings.publicKey ? 'Notifications are not configured on the server yet.' : Notification.permission === 'denied' ? 'Notifications are blocked. Allow them in your browser or device settings to enable alerts.' : '')
+        setMessage(!settings.publicKey ? 'Notifications are temporarily unavailable.' : Notification.permission === 'denied' ? 'Blocked. Allow notifications in browser or device settings.' : '')
       } catch (error) {
         if (!cancelled) setMessage(error instanceof Error ? error.message : 'Could not load notifications. Please reload to try again.')
       } finally { if (!cancelled) setBusy(false) }
@@ -76,42 +76,17 @@ export function NotificationSettings() {
       }
       setSubscription(current)
       setPreferences(next)
-      setMessage('Notification preferences saved for this device.')
+      setMessage('Saved for this device.')
     } catch (error) {
       if (created && current) await current.unsubscribe().catch(() => false)
       setMessage(error instanceof Error ? error.message : 'Could not save notifications. Please try again.')
     } finally { setBusy(false) }
   }
 
-  const reset = async () => {
-    if (!subscription) return
-    setBusy(true)
-    try {
-      await resetDeviceNotifications(subscription.toJSON())
-      await subscription.unsubscribe()
-      setSubscription(null)
-      setPreferences(notificationsOff)
-      setMessage('Notifications are off on this device.')
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Could not disable notifications. Please try again.')
-    } finally { setBusy(false) }
-  }
-
-  const test = async () => {
-    if (!subscription) return
-    setBusy(true)
-    try {
-      await sendTestNotification(subscription.toJSON())
-      setMessage('Test sent. Check your device notifications; Focus or Do Not Disturb may silence it.')
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Could not send a test notification.')
-    } finally { setBusy(false) }
-  }
-
   return (
     <section aria-label="Notifications" className="space-y-3 rounded-lg border border-game-border bg-game-surface p-4">
       <h3 className="flex items-center gap-2 text-sm font-semibold"><Bell className="h-4 w-4" aria-hidden="true" />Notifications</h3>
-      <p className="text-sm text-game-muted">Optional alerts on this device, even when Pokeori is closed. Both start off.</p>
+      <p className="text-sm text-game-muted">This device only.</p>
       {([
         ['voyages', 'Voyage completion'],
         ['dailyReset', 'Daily task reset'],
@@ -120,13 +95,12 @@ export function NotificationSettings() {
           <span>{label}</span><span>{preferences[key] ? 'On' : 'Off'}</span>
         </Button>
       ))}
-      <p className="text-sm text-game-muted">Daily tasks reset at 00:00 UTC. Daily alerts begin after you finish the tutorial. On iPhone and iPad, open Pokeori from your Home Screen.</p>
-      <p className="text-sm text-game-muted">Activity artwork appears where supported; your device may use the Pokeori app icon.</p>
-      {subscription && <div className="flex flex-wrap gap-2">
-        {(preferences.voyages || preferences.dailyReset) && <Button variant="outline" className="min-h-11" disabled={busy || !publicKey} onClick={() => void test()}>Send test notification</Button>}
-        <Button variant="outline" className="min-h-11" disabled={busy} onClick={() => void reset()}>Turn off all device notifications</Button>
-      </div>}
-      <p role="status" aria-label="Notification status" className="text-sm text-game-muted">{message}</p>
+      <details className="text-sm text-game-muted">
+        <summary className="game-focus-ring flex min-h-11 cursor-pointer items-center rounded-md font-medium">Details</summary>
+        <p>Daily reset: 00:00 UTC, after the tutorial.</p>
+        <p>iPhone/iPad: open from your Home Screen.</p>
+      </details>
+      <p role="status" aria-label="Notification status" className="text-sm text-game-muted empty:hidden">{message}</p>
     </section>
   )
 }

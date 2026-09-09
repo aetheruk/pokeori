@@ -6,7 +6,9 @@ Voyage notifications announce that a result is ready, not that the success roll 
 
 Daily reminders use the same UTC date boundary as daily task refresh (00:00 UTC), and require `tutorial-16` completion. Enabling does not immediately send today's reminder. After an outage only the current day's reminder is considered. Players still refresh tasks in Explore; push does not generate tasks or affect streaks.
 
-Notification clicks open Explore, or focus an existing Explore window. They do not deliberately navigate an active battle away. Voyage messages supply authored activity artwork; daily messages use the Explorer journal. The operating system controls presentation and may show only the installed app icon, especially on iOS. **Send test notification** helps verify the current device without waiting for an activity; Focus modes and OS delivery policies can delay or silence alerts.
+Notification clicks open Explore, or focus an existing Explore window. They do not deliberately navigate an active battle away. Voyage messages supply authored activity artwork; daily messages use the Explorer journal. The operating system controls presentation and may show only the installed app icon, especially on iOS. Focus modes and OS delivery policies can delay or silence alerts.
+
+Settings shows only the two alert toggles, a short device scope note, and a collapsed Details disclosure for reset timing and Home Screen guidance. Disable alerts individually; there are no test or disable-all buttons. Status messages appear only when needed.
 
 ## Storage and dispatch
 
