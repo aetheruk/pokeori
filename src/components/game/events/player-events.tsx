@@ -1,7 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { getPlayerEvents } from '@/utilities/events/actions'
+import { ExploreCard } from '@/components/game/features/explore/ExploreCard'
+import { ResponsivePanel } from '@/components/ui/responsive-panel'
+import { SectionDivider } from '@/components/ui/section-divider'
+import type { RequirementData } from '@/utilities/requirements'
+import type { ExploreItem } from '@/components/game/features/explore/types'
 
 export function usePlayerEvents() {
   const [data, setData] = useState<Awaited<
@@ -18,15 +23,6 @@ export function usePlayerEvents() {
         if (disposed) return
         setData(next)
         setError('')
-        const target = new URLSearchParams(window.location.search).get('event')
-        if (target)
-          requestAnimationFrame(() => {
-            const element = document.getElementById(`event-${target}`)
-            if (element instanceof HTMLDetailsElement) {
-              element.open = true
-              element.scrollIntoView({ block: 'nearest' })
-            }
-          })
         const boundaries = next.announcements
           .flatMap((event) => [
             Date.parse(event.startAt),
@@ -62,43 +58,112 @@ export function usePlayerEvents() {
   }, [])
   return { data, error }
 }
-export function PlayerEventAnnouncements({
+export function PlayerEventsCard({
   data,
   error,
-}: ReturnType<typeof usePlayerEvents>) {
+  userData,
+  trainerName,
+  playSelectSfx,
+}: ReturnType<typeof usePlayerEvents> & {
+  userData: RequirementData
+  trainerName: string
+  playSelectSfx: () => void
+}) {
+  const [open, setOpen] = useState(false)
+  const openedTarget = useRef<string | null>(null)
+  const scrolledTarget = useRef<string | null>(null)
+  useEffect(() => {
+    const target = new URLSearchParams(window.location.search).get('event')
+    if (
+      target &&
+      target !== openedTarget.current &&
+      data?.announcements.some((event) => event.id === target)
+    ) {
+      openedTarget.current = target
+      setOpen(true)
+    }
+  }, [data])
+  const targetRef = useCallback((element: HTMLElement | null) => {
+    if (
+      element &&
+      element.id === `event-${openedTarget.current}` &&
+      scrolledTarget.current !== element.id
+    ) {
+      scrolledTarget.current = element.id
+      element.scrollIntoView({ block: 'nearest' })
+    }
+  }, [])
   if (!data?.announcements.length && !error) return null
+  const active =
+    data?.announcements.filter((event) => event.phase === 'active').length || 0
+  const upcoming = (data?.announcements.length || 0) - active
+  const summary = error
+    ? 'Updates unavailable'
+    : [active ? `${active} active` : '', upcoming ? `${upcoming} upcoming` : '']
+        .filter(Boolean)
+        .join(' · ')
+  const item: ExploreItem = {
+    id: 'active-events',
+    name: 'Active Events',
+    description: 'See what is happening around the world.',
+    category: 'Events',
+    type: 'events',
+    icon: { type: 'lucide', id: 'CalendarDays' },
+    originalData: { summary },
+  }
   return (
-    <section
-      aria-label="Game events"
-      className="max-h-52 shrink-0 overflow-y-auto border-b border-game-border bg-game-surface px-4 py-3"
-    >
-      <h2 className="mb-2 font-semibold">Upcoming and active events</h2>
-      {error && (
-        <p role="status" className="text-sm text-game-muted">
-          {error}
-        </p>
-      )}
-      <div className="flex flex-wrap gap-3">
-        {data?.announcements.map((event) => (
-          <details
-            key={event.id}
-            id={`event-${event.id}`}
-            className="min-w-56 flex-1 rounded-lg border border-game-border p-3"
-          >
-            <summary className="cursor-pointer font-semibold">
-              {event.title}{' '}
-              <span className="text-xs font-normal text-game-muted">
-                {event.phase}
-              </span>
-            </summary>
-            <p className="mt-2 text-sm">{event.description}</p>
-            <p className="mt-1 text-xs text-game-muted">
-              {new Date(event.startAt).toLocaleString()} –{' '}
-              {new Date(event.endAt).toLocaleString()}
-            </p>
-          </details>
-        ))}
+    <section aria-label="Game events">
+      <SectionDivider>Events</SectionDivider>
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        <ExploreCard
+          entry={{ kind: 'single', item }}
+          trainerName={trainerName}
+          userData={userData}
+          activeVoyages={[]}
+          activeExpedition={null}
+          onAction={() => setOpen(true)}
+          playSelectSfx={playSelectSfx}
+          setActiveShop={() => {}}
+          setSelectedItem={() => setOpen(true)}
+        />
       </div>
+      <ResponsivePanel
+        open={open}
+        onOpenChange={setOpen}
+        title="Active Events"
+        description="Current events and upcoming adventures."
+        className="flex flex-col overflow-hidden"
+      >
+        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-4 pb-8 md:p-6">
+          {error && (
+            <p role="status" className="text-sm text-game-muted">
+              {error}
+            </p>
+          )}
+          {data?.announcements.map((event) => (
+            <article
+              key={event.id}
+              id={`event-${event.id}`}
+              ref={targetRef}
+              className="rounded-lg border border-game-border bg-game-surface p-4"
+            >
+              <p className="mb-1 text-xs font-semibold text-game-moss-strong">
+                {event.phase === 'active' ? 'Active now' : 'Upcoming'}
+              </p>
+              <h3 className="font-semibold">{event.title}</h3>
+              <p className="mt-2 whitespace-pre-wrap text-sm">
+                {event.description}
+              </p>
+              <p className="mt-3 text-xs text-game-muted">
+                Starts {new Date(event.startAt).toLocaleString()}
+              </p>
+              <p className="mt-1 text-xs text-game-muted">
+                Ends {new Date(event.endAt).toLocaleString()}
+              </p>
+            </article>
+          ))}
+        </div>
+      </ResponsivePanel>
     </section>
   )
 }

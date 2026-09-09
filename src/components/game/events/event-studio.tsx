@@ -1,6 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import {
+  Swords,
+  MapPin,
+  ShoppingBag,
+  Binoculars,
+  ScrollText,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   changeGameEvent,
@@ -16,7 +23,8 @@ import {
   type EventKind,
   type GameEventDefinition,
 } from '@/utilities/events/model'
-import { SchemaForm, formDefault } from './schema-form'
+import { SchemaForm, formDefault, fieldLabel } from './schema-form'
+import { ActivityEditor } from './activity-editor'
 import { RANDOM_POKEMON_RARITIES } from '@/utilities/pokemon/rarity-chances'
 
 const field =
@@ -34,6 +42,20 @@ const labels: Record<EventKind, string> = {
   shop: 'Shop',
   'field-research': 'Field research',
   task: 'Task',
+}
+const steps = ['Details', 'Content', 'Schedule', 'Review']
+const kindPresentation = {
+  battle: { icon: Swords, description: 'A trainer challenge or wild battle' },
+  location: { icon: MapPin, description: 'A place to find and catch Pokémon' },
+  shop: { icon: ShoppingBag, description: 'Limited-time offers and stock' },
+  'field-research': {
+    icon: Binoculars,
+    description: 'Pokémon to observe and study',
+  },
+  task: {
+    icon: ScrollText,
+    description: 'An objective with completion rewards',
+  },
 }
 function freshDraft(): EventDraft {
   const now = Date.now()
@@ -266,11 +288,12 @@ export function EventStudio({
         </>
       ) : (
         <>
-          <div className="flex flex-wrap gap-2">
-            {['Details', 'Content', 'Schedule', 'Review'].map((value) => (
+          <div className="sticky top-0 z-10 flex flex-wrap gap-2 border-b border-game-border bg-game-canvas py-3">
+            {steps.map((value) => (
               <Button
                 key={value}
                 variant={tab === value ? 'default' : 'outline'}
+                aria-current={tab === value ? 'step' : undefined}
                 onClick={() => setTab(value)}
               >
                 {value}
@@ -288,6 +311,9 @@ export function EventStudio({
               <>
                 <label className="block text-sm">
                   Internal name
+                  <span className="block text-xs text-game-muted">
+                    A private name to help you find this event later.
+                  </span>
                   <input
                     className={field}
                     disabled={Boolean(frozen)}
@@ -336,24 +362,64 @@ export function EventStudio({
             )}
             {tab === 'Content' && (
               <fieldset disabled={Boolean(frozen)} className="space-y-4">
-                <select
+                <div>
+                  <h3 className="font-semibold">
+                    What happens during this event?
+                  </h3>
+                  <p className="text-sm text-game-muted">
+                    Add a temporary activity, copy one as a starting point, or
+                    change an existing activity below.
+                  </p>
+                </div>
+                <fieldset
                   aria-label="Content type"
-                  className={field}
-                  value={kind}
-                  onChange={(event) => setKind(event.target.value as EventKind)}
+                  className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3"
                 >
-                  {kinds.map((value) => (
-                    <option key={value} value={value}>
-                      {labels[value]}
-                    </option>
-                  ))}
-                </select>
+                  {kinds.map((value) => {
+                    const Icon = kindPresentation[value].icon
+                    return (
+                      <button
+                        type="button"
+                        key={value}
+                        aria-pressed={kind === value}
+                        onClick={() => setKind(value)}
+                        className={`game-focus-ring flex min-h-20 items-center gap-3 rounded-lg border p-3 text-left ${kind === value ? 'border-game-moss bg-game-surface' : 'border-game-border bg-game-canvas'}`}
+                      >
+                        <Icon className="h-6 w-6 shrink-0" />
+                        <span>
+                          <span className="block text-sm font-semibold">
+                            {labels[value]}
+                          </span>
+                          <span className="block text-xs text-game-muted">
+                            {kindPresentation[value].description}
+                          </span>
+                        </span>
+                      </button>
+                    )
+                  })}
+                </fieldset>
                 <Button
                   variant="outline"
                   onClick={() => {
                     if (!studio) return
                     const config = formDefault(studio.schemas[kind])
-                    config.id = `activity-${draft.content.length + 1}`
+                    config.id = `activity-${crypto.randomUUID()}`
+                    config.icon = {
+                      type: 'lucide',
+                      id:
+                        kind === 'battle'
+                          ? 'Swords'
+                          : kind === 'shop'
+                            ? 'ShoppingBag'
+                            : 'MapPin',
+                    }
+                    config.category = 'Events'
+                    if (kind === 'location')
+                      config.encounters = [{ speciesId: 1, chance: 1 }]
+                    if (kind === 'battle') {
+                      config.enemyTeam = [{ speciesId: 1, level: 5 }]
+                      config.maxPokemon = 6
+                    }
                     setDraft({
                       ...draft,
                       content: [...draft.content, { kind, config }],
@@ -378,7 +444,7 @@ export function EventStudio({
                     if (id)
                       void run(async () => {
                         const config = await getEventContentTemplate(kind, id)
-                        config.id = `activity-${draft.content.length + 1}`
+                        config.id = `activity-${crypto.randomUUID()}`
                         setDraft({
                           ...draft,
                           content: [...draft.content, { kind, config }],
@@ -404,10 +470,9 @@ export function EventStudio({
                       {String(entry.config.name || 'New content')}
                     </summary>
                     {studio && (
-                      <SchemaForm
+                      <ActivityEditor
                         schema={studio.schemas[entry.kind]}
                         value={entry.config}
-                        label={labels[entry.kind]}
                         onChange={(config) =>
                           setDraft({
                             ...draft,
@@ -436,7 +501,12 @@ export function EventStudio({
                     </Button>
                   </details>
                 ))}
-                <h3 className="font-semibold">Modifiers</h3>
+                <h3 className="font-semibold">Change an existing activity</h3>
+                <p className="text-sm text-game-muted">
+                  Choose an activity to temporarily change its Pokémon, rarity
+                  chances, rewards or shop offers. Original settings return when
+                  the event ends.
+                </p>
                 <select
                   aria-label="Add modifier target"
                   className={field}
@@ -665,7 +735,12 @@ export function EventStudio({
               </article>
             )}
           </fieldset>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 border-t border-game-border pt-4">
+            {tab !== 'Review' && (
+              <Button onClick={() => setTab(steps[steps.indexOf(tab) + 1])}>
+                Continue to {steps[steps.indexOf(tab) + 1].toLowerCase()}
+              </Button>
+            )}
             {!frozen && (
               <>
                 <Button
@@ -893,7 +968,14 @@ function ModifierEditor({
       : schemaAt(modifier.field)
   return (
     <fieldset className="space-y-3 rounded-lg border border-game-border p-3">
-      <legend>{modifier.targetId}</legend>
+      <legend className="font-semibold">
+        {studio?.catalog[modifier.kind]?.find(
+          (entry: any) => entry.id === modifier.targetId,
+        )?.name || modifier.targetId}
+      </legend>
+      <p className="text-sm text-game-muted">
+        Choose what changes and how it applies during the event.
+      </p>
       <select
         aria-label="Modifier field"
         className={field}
@@ -909,7 +991,9 @@ function ModifierEditor({
         }}
       >
         {fields.map((key) => (
-          <option key={key}>{key}</option>
+          <option key={key} value={key}>
+            {fieldLabel(key)}
+          </option>
         ))}
       </select>
       <select

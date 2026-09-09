@@ -2,6 +2,7 @@
 
 import {
   Banknote,
+  CalendarDays,
   ChevronsDown,
   ChevronsRight,
   ChevronsUp,
@@ -11,6 +12,11 @@ import {
   Flame,
   HelpCircle,
   Leaf,
+  MapPin,
+  Swords,
+  ShoppingBag,
+  Search,
+  Star,
 } from 'lucide-react'
 import Image from 'next/image'
 import { ItemSprite } from '@/components/ui/item-sprite'
@@ -20,6 +26,12 @@ import { cn } from '@/lib/utils'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 
 const LUCIDE_ICONS: Record<string, any> = {
+  MapPin,
+  Swords,
+  ShoppingBag,
+  Search,
+  Star,
+  CalendarDays,
   ChevronsUp,
   ChevronsDown,
   ChevronsRight,

@@ -159,6 +159,7 @@ export const getTypeIcon = (item: ExploreItem) => {
 }
 
 export const getGameTypeLabel = (item: ExploreItem) => {
+  if (item.type === 'events') return item.originalData.summary || 'GAME EVENTS'
   if (item.type === 'location') return 'CATCH'
   if (item.type === 'vs-seeker') return 'TRAINER REMATCH'
   if (item.type === 'battle') {
