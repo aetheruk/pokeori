@@ -4,6 +4,7 @@ import { getPayload } from 'payload'
 import payloadConfig from '@/payload.config'
 import { checkUserAuth } from '@/utilities/auth/server-auth'
 import { shops } from '@/data/shops'
+import { getEffectiveContent } from '@/utilities/events/server'
 import { grantRewards, type Reward, type RewardSummary } from '@/utilities/rewards/reward-logic'
 import { revalidatePath } from 'next/cache'
 import { getGameUserData } from '@/utilities/game-data'
@@ -37,20 +38,11 @@ export async function purchaseShopItem(
   shopId: string,
   itemId: string,
   clientActionId: string,
+  expectedCost?: import('@/data/shops/types').ShopCost[],
 ): Promise<PurchaseItemResult> {
   const { user } = await checkUserAuth()
   if (!user) {
     return { success: false, message: 'Not authenticated' }
-  }
-
-  const shop = shops.find((s) => s.id === shopId)
-  if (!shop) {
-    return { success: false, message: 'Shop not found' }
-  }
-
-  const item = shop.items.find((i) => i.id === itemId)
-  if (!item) {
-    return { success: false, message: 'Item not found' }
   }
 
   try {
@@ -63,6 +55,11 @@ export async function purchaseShopItem(
         payload,
       },
       async ({ req }) => {
+        const shop = await getEffectiveContent('shop', shopId, user)
+        if (!shop) return { success: false, message: 'Shop is no longer available' }
+        const item = shop.items.find(entry => entry.id === itemId)
+        if (!item) return { success: false, message: 'Offer is no longer available' }
+        if (expectedCost && JSON.stringify(expectedCost) !== JSON.stringify(item.cost)) return { success: false, message: 'This offer changed. Reopen the shop to see its current price.' }
         const requirements = [
           ...(shop.requirements || []),
           ...(item.requirements || []),

@@ -77,6 +77,7 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
         shop.id,
         itemId,
         crypto.randomUUID(),
+        shop.items.find(item => item.id === itemId)?.cost,
       )
       if (result.success) {
         const purchaseData = result.purchaseData

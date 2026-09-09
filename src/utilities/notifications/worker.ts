@@ -35,7 +35,7 @@ async function processSubscription(payload: Payload, id: string) {
     const subscription = parsed.data
     const userId = typeof record.user === 'string' ? record.user : record.user.id
     const user = await payload.findByID({ collection: 'users', id: userId, depth: 0, disableErrors: true, select: { activeVoyages: true } })
-    if (!user || (!record.voyages && !record.dailyReset)) {
+    if (!user || (!record.voyages && !record.dailyReset && !record.gameEvents)) {
       await payload.delete({ collection: 'push-subscriptions', id })
       return
     }
@@ -66,6 +66,9 @@ async function processSubscription(payload: Payload, id: string) {
       }
       cursor = new Date(now).toISOString()
     }
+    if (record.gameEvents) await (await import('@/utilities/events/notifications')).dispatchEventNotifications(payload, record, async (message, ttl) => {
+      await webpush.sendNotification(subscription, JSON.stringify(message), { vapidDetails: settings, TTL: ttl, urgency: 'normal', timeout: 5000 })
+    })
     await payload.update({ collection: 'push-subscriptions', id, data: { sentVoyages: sent, dailyCursor: cursor, nextCheckAt: new Date(now + 60_000).toISOString(), failures: 0 } })
   } catch (error) {
     const status = error && typeof error === 'object' && 'statusCode' in error ? Number(error.statusCode) : 0

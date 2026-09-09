@@ -337,7 +337,7 @@ export async function attemptCapture(
       getStoredEncounterAbility(state) ||
       (activeAbilityId ? ABILITIES[activeAbilityId] : undefined)
 
-    const location = locations.find((l) => l.id === state.locationId)
+    const location = state.locationSnapshot || locations.find((l) => l.id === state.locationId)
     const rewardRequirementContext = {
       category: location?.category,
       subCategory: location?.subCategory,
@@ -796,7 +796,7 @@ export async function attemptCapture(
 
     const rarity = targetRarity
 
-    await payload.create({
+    const caughtPokemon = await payload.create({
       collection: 'pokemon',
       data: {
         user: user.id,
@@ -974,6 +974,7 @@ export async function attemptCapture(
       amount: 1,
       speciesId: state.pokemonId,
       types: formData?.types || [],
+      pokemon: caughtPokemon,
     }, { payload, req })
 
     const response = {

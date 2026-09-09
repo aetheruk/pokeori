@@ -1,6 +1,8 @@
 # Device notifications
 
-Trainer settings offers separate **Voyage completion** and **Daily task reset** controls. Both default off, independently on each browser/device. Permission is requested only after a player presses a control. The app must be served over HTTPS (localhost is also supported). iPhone/iPad require iOS/iPadOS 16.4 or later and a Home Screen installation opened from its icon.
+Trainer settings offers separate **Voyage completion**, **Daily task reset**, and **Game events** controls. All default off, independently on each browser/device. Permission is requested only after a player presses a control. The app must be served over HTTPS (localhost is also supported). iPhone/iPad require iOS/iPadOS 16.4 or later and a Home Screen installation opened from its icon.
+
+Game events may optionally broadcast at activation, independently of Explore announcement visibility. The worker records a sent or ineligible decision per event/device, excludes devices opted in after activation, and retries transient failures only while active and within 24 hours. Event-only subscriptions remain registered. Clicks open the event announcement in Explore. See [Game events](game-events.md).
 
 Voyage notifications announce that a result is ready, not that the success roll passed. They neither settle voyages nor grant rewards. An active voyage finishing after opt-in is eligible; already-finished voyages are not replayed when enabling. Claimed voyages disappear from the source of truth. Each run has its own delivery identity. Completions older than 24 hours are skipped after outages.
 
@@ -8,7 +10,7 @@ Daily reminders use the same UTC date boundary as daily task refresh (00:00 UTC)
 
 Notification clicks open Explore, or focus an existing Explore window. They do not deliberately navigate an active battle away. Voyage messages supply authored activity artwork; daily messages use the Explorer journal. The operating system controls presentation and may show only the installed app icon, especially on iOS. Focus modes and OS delivery policies can delay or silence alerts.
 
-Settings shows only the two alert toggles, a short device scope note, and a collapsed Details disclosure for reset timing and Home Screen guidance. Disable alerts individually; there are no test or disable-all buttons. Status messages appear only when needed.
+Settings shows the three alert toggles, a short device scope note, and a collapsed Details disclosure for reset timing and Home Screen guidance. Disable alerts individually; there are no test or disable-all buttons. Status messages appear only when needed.
 
 ## Storage and dispatch
 
@@ -18,7 +20,7 @@ The persistent Next server starts a dispatcher through `src/instrumentation.ts`.
 
 Redis leases serialize device preference writes with delivery across overlapping instances. MongoDB delivery cursors survive restarts and Redis loss. Successful voyage deliveries are recorded individually; transient errors retry with bounded exponential backoff. HTTP 404/410 and invalid/expired subscriptions are removed. Provider error bodies, endpoints, and keys are not logged. A crash after a provider accepts a message but before its receipt is stored can cause a retry: stable notification tags replace duplicate visible notifications where supported. This is best-effort Web Push, not guaranteed exact-once delivery.
 
-Disabling both controls removes the server subscription and unsubscribes the browser. Previously queued provider messages cannot be recalled. Another trainer cannot modify an existing endpoint's preferences; the explicit device reset requires possession of its complete browser credential and clears the old binding before re-enabling. Opt-in persists while the account is not actively open, so shared-device users should turn it off before handing over the device. Each account is limited to ten device records.
+Disabling all controls removes the server subscription and unsubscribes the browser. Previously queued provider messages cannot be recalled. Another trainer cannot modify an existing endpoint's preferences; the explicit device reset requires possession of its complete browser credential and clears the old binding before re-enabling. Opt-in persists while the account is not actively open, so shared-device users should turn it off before handing over the device. Each account is limited to ten device records.
 
 ## Deployment setup
 

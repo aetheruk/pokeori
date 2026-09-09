@@ -11,6 +11,8 @@ import { cn } from '@/lib/utils'
 // Hooks
 import { useExploreState } from './hooks/useExploreState'
 import { useExploreData } from './hooks/useExploreData'
+import { PlayerEventAnnouncements, usePlayerEvents } from '@/components/game/events/player-events'
+import type { ExploreItem } from './types'
 import { useExploreActions } from './hooks/useExploreActions'
 
 // Components
@@ -115,7 +117,9 @@ function ExploreListContent({
   userData: RequirementData
   refreshUser: () => Promise<RequirementData | undefined>
 }) {
-  const { availableItems: allUnlockedItems } = useExploreData(userData, '', '')
+  const playerEvents = usePlayerEvents()
+  const eventItems = (playerEvents.data?.content || []) as ExploreItem[]
+  const { availableItems: allUnlockedItems } = useExploreData(userData, '', '', eventItems)
   const [showDailyRefresh, setShowDailyRefresh] = useState(false)
   const [blackoutShaking, setBlackoutShaking] = useState(false)
   const [goldenTapCount, setGoldenTapCount] = useState(0)
@@ -178,6 +182,7 @@ function ExploreListContent({
     userData,
     displayCategory,
     displaySubCategory,
+    eventItems,
   )
 
   // 4. Actions & Modals State
@@ -379,6 +384,7 @@ function ExploreListContent({
       )}
     >
       {isTakeover && <BlackoutBackdrop />}
+      {!isTakeover && <PlayerEventAnnouncements {...playerEvents} />}
       {isTakeover && <BlackoutUnowns trainerName={trainerName} />}
       {isTakeover && !struggleCompleted && !eggRevealed && (
         <button

@@ -124,6 +124,7 @@ import { QuestionPrompt } from './_components/question-prompt'
 import { SafariBallControl } from './_components/safari-ball-control'
 
 interface EncounterData {
+  locationSnapshot?: import('@/data/types').Location
   pokemonId: number
   formId: string
   pokemonName: string
@@ -750,7 +751,7 @@ export default function EncounterPage() {
         return
       }
       setEncounter(data)
-      const location = locations.find((loc) => loc.id === data.locationId)
+      const location = data.locationSnapshot || locations.find((loc) => loc.id === data.locationId)
       setCurrentLocation(location || null)
       setCatchRate(data.currentCatchRate)
       setActiveQte(data.qte || null)
@@ -1626,7 +1627,7 @@ export default function EncounterPage() {
 
   // Show full-screen result screen
   if (phase === 'result' && captureResult) {
-    const location = locations.find((l) => l.id === encounter.locationId)
+    const location = encounter.locationSnapshot || locations.find((l) => l.id === encounter.locationId)
     return (
       <EncounterResults
         captureResult={captureResult as any}

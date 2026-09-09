@@ -4,6 +4,7 @@ import configPromise from '@payload-config'
 import { redis } from '@/utilities/redis'
 import { revalidatePath } from 'next/cache'
 import { battles } from '@/data/battles'
+import { getEffectiveContent } from '@/utilities/events/server'
 import { getPokemonForm } from '@/utilities/pokemon/pokedex'
 import {
   initializeBattlePokemon,
@@ -75,6 +76,7 @@ import {
   processBattleAbilityWeatherSet,
 } from '@/utilities/battle/abilities'
 import { applyBattleRarityEntryEffects } from '@/utilities/battle/rarity-effects'
+import { resolveGeneratedPokemonRarity, resolveRarityChances } from '@/utilities/pokemon/rarity-chances'
 import { getBattleMoveOptions } from '@/utilities/pokemon/pokemon-moves'
 import {
   KID_MODE_ACCESS_ERROR,
@@ -88,7 +90,7 @@ export async function startBattle(
   const user = await getUser({ fresh: true })
   if (!user) return { success: false, error: 'Not authenticated' }
 
-  const battleConfig = battles.find((b) => b.id === battleId)
+  const battleConfig = await getEffectiveContent('battle', battleId, user)
   if (!battleConfig) return { success: false, error: 'Battle not found' }
 
   // PVP Handling
@@ -451,7 +453,7 @@ export async function startBattleFromConfig(
                   Math.random() * (enemy.level.max - enemy.level.min + 1),
                 ) + enemy.level.min
 
-          const rarity = resolvePokemonRarity(enemy)
+          const rarity = resolveGeneratedPokemonRarity(enemy, resolveRarityChances(battleConfig.rarityChances, enemy.rarityChances, battleConfig.isWildBattle === true))
           const rarityLegacyFields = getPokemonRarityLegacyFields(rarity)
           const mockPokemon = {
             speciesId: enemy.speciesId,
@@ -636,7 +638,7 @@ export async function startBattleFromConfig(
           title: rivalContext?.trainer?.title || battleConfig.title,
         }
       : undefined,
-    dynamicBattleConfig: options.dynamic ? battleConfig : undefined,
+    dynamicBattleConfig: options.dynamic || (battleConfig as BattleConfig & { eventContexts?: unknown[] }).eventContexts?.length ? battleConfig : undefined,
   }
   initializeEnemyAiMoveLoadouts({ state: initialState, profile: aiProfile })
   normalizeChronicleBattleBudgets(initialState, battleConfig)

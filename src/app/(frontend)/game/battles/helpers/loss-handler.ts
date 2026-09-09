@@ -8,6 +8,7 @@ import { incrementUserActivityResult } from '@/utilities/user-state'
 import { persistConsumedHeldItems } from './held-items'
 import { applyTrainerBattleLossPayout } from './loss-payout'
 import { persistPokemonBattleKOs } from './pokemon-ko-credit'
+import { recordEventActivityProgress } from '@/utilities/events/participation'
 
 export async function handleBattleLoss(state: BattleState, user: User, battleConfig?: BattleConfig, applyPayout = true) {
   const settled = await runEconomyAction({ userId: user.id, action: 'settle-battle-outcome',
@@ -23,6 +24,7 @@ export async function handleBattleLoss(state: BattleState, user: User, battleCon
     }
     await persistPokemonBattleKOs(nextState, payload)
     await persistConsumedHeldItems(nextState, payload)
+    if (!nextState.chronicle) await recordEventActivityProgress(payload, user, { kind: 'battle_loss', sourceId: nextState.battleId, isTrainer: !battleConfig?.isWildBattle }, req)
     return nextState
   })
   Object.assign(state, settled)

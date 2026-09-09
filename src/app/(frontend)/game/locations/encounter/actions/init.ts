@@ -28,7 +28,7 @@ import {
   getStoredEncounterAbility,
   isNightHour,
   resolveStartAbilityId,
-  shouldUseExtraShinyRoll,
+  getExtraShinyRollChance,
 } from '@/utilities/pokemon/encounter-ability-runtime'
 import {
   checkRequirement,
@@ -59,7 +59,9 @@ import {
   SAFARI_BASE_FLEE_RATE,
   SAFARI_ENCOUNTER_TTL_SECONDS,
 } from '@/utilities/pokemon/safari-catch'
-import { getShinyChance, rollShiny } from '@/utilities/pokemon/shiny-odds'
+import { BASE_SHINY_CHANCE, getShinyChance } from '@/utilities/pokemon/shiny-odds'
+import { getEffectiveContent } from '@/utilities/events/server'
+import { combinedShinyChance, resolveRarityChances, resolveGeneratedPokemonRarity } from '@/utilities/pokemon/rarity-chances'
 import {
   getEncounterActivityReference,
   getEncounterRedisTtlSeconds,
@@ -190,7 +192,7 @@ export async function startEncounter(
       return cachedStartResult
     }
 
-    const location = locations.find((l) => l.id === locationId)
+    const location = await getEffectiveContent('location', locationId, user)
     if (!location) throw new Error('Location not found')
     if (repelItemId && !isRepelItemId(repelItemId)) {
       throw new Error('Invalid encounter item')
@@ -636,8 +638,9 @@ export async function startEncounter(
     // Roll for Shiny
     // Base rate: 1/512 (~0.195%), modified by location, Researcher level, and ability.
     const researcherLevel = getSkillLevel(user.skills, 'researching')
+    const rarityChances = resolveRarityChances(location.rarityChances, selectedEncounter.rarityChances)
     const shinyChance = getShinyChance({
-      sourceModifier: location.shinyChanceModifier || 1,
+      sourceModifier: (location.shinyChanceModifier ?? 1) * (rarityChances.shiny! / BASE_SHINY_CHANCE),
       researcherModifier: getResearcherShinyModifier(researcherLevel),
       abilityModifier: getAbilityShinyMultiplier({
         ability: effectiveAbility,
@@ -653,23 +656,15 @@ export async function startEncounter(
     // Research Level 5: Double Roll for Shiny
     const researchFormEntry = pokedexMap[pokemonId.toString()]?.[formId]
     const formResearchLvl = researchFormEntry?.researchLevel || 0
-    let isShiny = rollShiny(shinyChance, formResearchLvl >= 5 ? 2 : 1)
-    if (
-      !isShiny &&
-      shouldUseExtraShinyRoll({
+    rarityChances.shiny = rarityChances.shiny === 0 ? 0 : combinedShinyChance(shinyChance, formResearchLvl >= 5 ? 2 : 1,
+      getExtraShinyRollChance({
         ability: effectiveAbility,
         sourceFormId: activeAbilitySourceFormId,
         targetFormId: formId,
         shinyChance,
-      })
-    ) {
-      isShiny = true
-    }
-    const encounterRarity = resolvePokemonRarity({
-      rarity: selectedEncounter.rarity,
-      shiny: isShiny,
-    })
-    isShiny = encounterRarity === 'shiny'
+      }))
+    const encounterRarity = resolveGeneratedPokemonRarity(selectedEncounter, rarityChances)
+    const isShiny = encounterRarity === 'shiny'
 
     // Timer Modifier
     duration = Math.max(
@@ -701,6 +696,7 @@ export async function startEncounter(
       formId,
       isShiny,
       rarity: encounterRarity,
+      locationSnapshot: location,
       gender: rollPokemonGender(pokemonId),
       startTime,
       expiry,
@@ -973,7 +969,7 @@ export const getEncounter = cache(async () => {
   )
 
   let isEligibleForReplay = false
-  const location = locations.find((l) => l.id === state.locationId)
+  const location = (state.locationSnapshot as any)?.eventContexts?.length ? await getEffectiveContent('location', state.locationId, user) : state.locationSnapshot || locations.find((l) => l.id === state.locationId)
   if (location && !state.chronicle) {
     isEligibleForReplay = await isActivityEligibleForReplay(
       user as User,
@@ -998,6 +994,7 @@ export const getEncounter = cache(async () => {
     fleeRate: state.fleeRate,
     inventory: inventoryArray,
     locationId: state.locationId,
+    locationSnapshot: state.locationSnapshot,
     background: (state as any).background, // From fishing or location encounter
     encounterLevel: state.level,
     kidMode: user.kidMode || false,

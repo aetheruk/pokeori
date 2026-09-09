@@ -1,10 +1,11 @@
 import { mock } from 'bun:test'
 import { strict as assert } from 'node:assert'
 
-let database = { currency: { pokedollars: 100 }, losses: 0, expeditionLosses: 0 }
+let database = { currency: { pokedollars: 100 }, losses: 0, expeditionLosses: 0, eventLosses: 0 }
 let failKo = true
 const receipts = new Map<string, any>()
 mock.module('server-only', () => ({}))
+mock.module('@/utilities/events/participation', () => ({ recordEventActivityProgress: async (payload: any, _user: any, event: any, req: any) => { assert.ok(req); assert.equal(event.kind, 'battle_loss'); assert.equal(event.sourceId, 'trainer'); payload.next.eventLosses++ } }))
 mock.module('@payload-config', () => ({ default: {} }))
 mock.module('@/utilities/economy/transactions', () => ({
   createEconomyRequestId: (value: string) => value,
@@ -40,6 +41,7 @@ failKo = false
 await handleBattleLoss(state, user, config)
 assert.equal(database.currency.pokedollars, 80)
 assert.equal(database.losses, 1)
+assert.equal(database.eventLosses, 1)
 assert.equal(database.expeditionLosses, 1)
 assert.equal(state.heldItemsSettled, true)
 const retry = structuredClone(original)

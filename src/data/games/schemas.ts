@@ -1065,7 +1065,7 @@ const snakeSettingsSchema = z
     }
   })
 
-const settingsByGameType: Record<string, z.ZodTypeAny> = {
+export const settingsByGameType: Record<string, z.ZodTypeAny> = {
   silhouette: commonKnowledgeSettings,
   identify: commonKnowledgeSettings,
   snap: commonKnowledgeSettings,

@@ -129,10 +129,12 @@ export function useExploreData(
   userData: RequirementData | null,
   activeCategory: string,
   activeSubCategory: string,
+  eventItems: ExploreItem[] = [],
 ) {
   // Combined Data
   const allItems: ExploreItem[] = useMemo(() => {
-    const items: ExploreItem[] = [...STATIC_EXPLORE_ITEMS]
+    const replaced = new Set(eventItems.map(item => `${item.type}:${item.id}`))
+    const items: ExploreItem[] = [...STATIC_EXPLORE_ITEMS.filter(item => !replaced.has(`${item.type}:${item.id}`)), ...eventItems]
 
     // Active Daily Tasks (dynamically generated for the user)
     if (userData?.user && 'activeDailyTasks' in userData.user) {
@@ -148,7 +150,7 @@ export function useExploreData(
     }
 
     return items
-  }, [userData?.user])
+  }, [userData?.user, eventItems])
 
   // Filter Unlocked Items
   const availableItems = useMemo(() => {

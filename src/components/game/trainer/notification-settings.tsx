@@ -52,7 +52,7 @@ export function NotificationSettings() {
     let current = subscription
     let created = false
     try {
-      if (next.voyages || next.dailyReset) {
+      if (next.voyages || next.dailyReset || next.gameEvents) {
         // Must be the direct result of a tap for iOS; no server await before this call.
         if (next[key]) {
           const permission = await Notification.requestPermission()
@@ -69,7 +69,7 @@ export function NotificationSettings() {
         await saveNotificationSettings(current.toJSON(), next)
         setPreferences(next)
         setSubscription(current)
-        if (!next.voyages && !next.dailyReset) {
+        if (!next.voyages && !next.dailyReset && !next.gameEvents) {
           await current.unsubscribe()
           current = null
         }
@@ -90,6 +90,7 @@ export function NotificationSettings() {
       {([
         ['voyages', 'Voyage completion'],
         ['dailyReset', 'Daily task reset'],
+        ['gameEvents', 'Game events'],
       ] as const).map(([key, label]) => (
         <Button key={key} variant="outline" className="min-h-11 w-full justify-between gap-3" aria-pressed={preferences[key]} disabled={busy || !registration || (!publicKey && !preferences[key])} onClick={() => void toggle(key)}>
           <span>{label}</span><span>{preferences[key] ? 'On' : 'Off'}</span>

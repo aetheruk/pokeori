@@ -4,6 +4,8 @@ import { getPayload } from 'payload'
 import payloadConfig from '@/payload.config'
 import { checkUserAuth } from '@/utilities/auth/server-auth'
 import { tasks } from '@/data/tasks'
+import { getEffectiveContent } from '@/utilities/events/server'
+import { resolveEventTaskClaim } from '@/utilities/events/participation'
 import type { TaskExitModal } from '@/data/tasks'
 import {
   checkTaskRequirements,
@@ -116,7 +118,9 @@ export async function completeTask(
           req,
         })) as User
 
-  let task = tasks.find((t) => t.id === taskId)
+  const eventClaim = await resolveEventTaskClaim(payload, user, taskId, req)
+  let task = eventClaim?.task || await getEffectiveContent('task', taskId, user)
+  if (!eventClaim && task && (task as any).eventContexts?.length) return { success: false, message: 'Accept this event task first' }
   let isGeneratedDaily = false
   if (!task) {
     const userRefetched = await payload.findByID({
@@ -378,6 +382,7 @@ export async function completeTask(
   })
 
   const { summary } = await grantRewards(user.id, rewardsToGrant, { payload, req })
+  if (eventClaim) await payload.update({ collection: 'event-participation', id: eventClaim.record.id, data: { claimedAt: new Date().toISOString() }, req })
 
   if (activeCompanion && friendshipGain > 0) {
     const newFriendship = Math.min(255, (activeCompanion.friendship || 0) + friendshipGain)

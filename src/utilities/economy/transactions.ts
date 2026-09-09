@@ -275,6 +275,11 @@ async function executeEconomyAction<T>(
           receiptKey,
         })
 
+        if (!options.action.startsWith('event-')) {
+          const { recordEventStateProgress } = await import('@/utilities/events/participation')
+          await recordEventStateProgress(createTransactionPayload(payload, req), options.userId, req)
+        }
+
         const storedResponse = await encodeReceiptResponse(response)
         for (const [index, requestId] of identities.entries()) {
           await (payload as any).create({
