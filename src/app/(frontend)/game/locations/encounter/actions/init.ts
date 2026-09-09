@@ -275,7 +275,6 @@ export async function startEncounter(
     const requirements = location.requirements
     let duration = location.timer || 30
     const catchRateMod = location.catchRateModifier || 0
-    const shinyMod = location.shinyChanceModifier || 1
     const rewards = location.rewards
     const requiredItem = location.requiredItem
     const background = location.background
@@ -640,7 +639,7 @@ export async function startEncounter(
     const researcherLevel = getSkillLevel(user.skills, 'researching')
     const rarityChances = resolveRarityChances(location.rarityChances, selectedEncounter.rarityChances)
     const shinyChance = getShinyChance({
-      sourceModifier: (location.shinyChanceModifier ?? 1) * (rarityChances.shiny! / BASE_SHINY_CHANCE),
+      sourceModifier: rarityChances.shiny! / BASE_SHINY_CHANCE,
       researcherModifier: getResearcherShinyModifier(researcherLevel),
       abilityModifier: getAbilityShinyMultiplier({
         ability: effectiveAbility,

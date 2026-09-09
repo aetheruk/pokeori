@@ -34,7 +34,6 @@ export const palletTownFishing: FishingGameConfig[] = [
       rods: {
         old: {
           levelRange: { min: 5, max: 5 },
-          shinyChanceModifier: 1,
           catchRateModifier: 0,
           timer: 30,
           encounters: {
@@ -51,7 +50,6 @@ export const palletTownFishing: FishingGameConfig[] = [
         },
         good: {
           levelRange: { min: 10, max: 10 },
-          shinyChanceModifier: 1,
           catchRateModifier: 0,
           timer: 30,
           encounters: {
@@ -75,7 +73,6 @@ export const palletTownFishing: FishingGameConfig[] = [
         },
         super: {
           levelRange: { min: 5, max: 20 },
-          shinyChanceModifier: 1,
           catchRateModifier: 0,
           timer: 30,
           encounters: {

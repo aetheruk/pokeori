@@ -638,8 +638,7 @@ export async function previewEventRarity(
     const researchLevel =
       (dex[String(entry.speciesId)] as any)?.[formId]?.researchLevel || 0
     const shiny = getShinyChance({
-      sourceModifier:
-        (config.shinyChanceModifier ?? 1) * (base.shiny! / BASE_SHINY_CHANCE),
+      sourceModifier: base.shiny! / BASE_SHINY_CHANCE,
       researcherModifier: getResearcherShinyModifier(
         getSkillLevel(user.skills, 'researching'),
       ),
@@ -666,7 +665,6 @@ export async function previewEventRarity(
               shinyChance: shiny,
             }),
           )
-    base.shiny = Math.min(1, base.shiny! * (config.shinyChanceModifier ?? 1))
   }
   const probabilities = (chances: typeof base) => {
     const result = rarityProbabilities(chances)

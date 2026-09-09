@@ -13,7 +13,6 @@ export const viridianCityLocations: Location[] = [
     },
     background: '/backgrounds/rocky-path.avif',
     timer: 20,
-    shinyChanceModifier: 1,
     catchRateModifier: 1,
     levelRange: {
       min: 2,

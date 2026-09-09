@@ -39,7 +39,6 @@ export const ceruleanCityFishing: FishingGameConfig[] = [
       rods: {
         old: {
           levelRange: { min: 5, max: 10 },
-          shinyChanceModifier: 1,
           catchRateModifier: 15,
           timer: 25,
           encounters: {
@@ -104,7 +103,6 @@ export const ceruleanCityFishing: FishingGameConfig[] = [
       rods: {
         old: {
           levelRange: { min: 8, max: 14 },
-          shinyChanceModifier: 1,
           catchRateModifier: 10,
           timer: 25,
           encounters: {

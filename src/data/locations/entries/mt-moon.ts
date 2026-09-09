@@ -13,7 +13,6 @@ export const mtMoonLocations: Location[] = [
     },
     background: '/backgrounds/cave.avif',
     timer: 20,
-    shinyChanceModifier: 1,
     catchRateModifier: 1,
     levelRange: {
       min: 6,
@@ -58,7 +57,6 @@ export const mtMoonLocations: Location[] = [
     },
     background: '/backgrounds/cave.avif',
     timer: 18,
-    shinyChanceModifier: 1,
     catchRateModifier: 1,
     levelRange: {
       min: 8,
@@ -102,7 +100,6 @@ export const mtMoonLocations: Location[] = [
     },
     background: '/backgrounds/cave.avif',
     timer: 15,
-    shinyChanceModifier: 1,
     catchRateModifier: 1,
     levelRange: {
       min: 9,
@@ -152,7 +149,6 @@ export const mtMoonLocations: Location[] = [
     },
     background: '/backgrounds/cave.avif',
     timer: 25,
-    shinyChanceModifier: 1.1,
     catchRateModifier: 1,
     levelRange: {
       min: 10,

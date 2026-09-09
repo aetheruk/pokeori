@@ -43,7 +43,6 @@ export const testLocations: Location[] = [
     },
     background: '/backgrounds/cave.avif',
     timer: 45,
-    shinyChanceModifier: 1,
     catchRateModifier: 25,
     keyEncounter: true,
     shield: {
@@ -77,7 +76,6 @@ export const testLocations: Location[] = [
     },
     background: '/backgrounds/cave.avif',
     timer: 55,
-    shinyChanceModifier: 1,
     catchRateModifier: 25,
     keyEncounter: true,
     shield: {
@@ -112,7 +110,6 @@ export const testLocations: Location[] = [
     },
     background: '/backgrounds/cave.avif',
     timer: 55,
-    shinyChanceModifier: 1,
     catchRateModifier: 25,
     keyEncounter: true,
     shield: {

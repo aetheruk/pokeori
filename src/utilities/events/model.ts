@@ -256,7 +256,6 @@ export const eventLocationSchema = z
       .min(1)
       .max(200),
     rarityChances: rarityChancesSchema.optional(),
-    shinyChanceModifier: z.number().finite().nonnegative().optional(),
     catchRateModifier: z.number().min(0).max(255).optional(),
     fleeRate: percent.optional(),
     timer: positive.max(86400).optional(),

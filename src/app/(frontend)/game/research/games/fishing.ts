@@ -13,17 +13,22 @@ import {
 import { ABILITIES } from '@/data/abilities'
 import {
   getAbilityShinyMultiplier,
+  getExtraShinyRollChance,
   isNightHour,
   resolveStartAbilityId,
-  shouldUseExtraShinyRoll,
 } from '@/utilities/pokemon/encounter-ability-runtime'
 import { getPokemonForm } from '@/utilities/pokemon/pokedex'
 import { rollPokemonGender } from '@/utilities/pokemon/gender'
+import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
 import {
-  resolvePokemonRarity,
-  type PokemonRarityId,
-} from '@/utilities/pokemon/rarity-effects'
-import { getShinyChance, rollShiny } from '@/utilities/pokemon/shiny-odds'
+  combinedShinyChance,
+  resolveGeneratedPokemonRarity,
+  resolveRarityChances,
+} from '@/utilities/pokemon/rarity-chances'
+import {
+  BASE_SHINY_CHANCE,
+  getShinyChance,
+} from '@/utilities/pokemon/shiny-odds'
 import {
   getResearcherShinyModifier,
   getSkillLevel,
@@ -334,40 +339,45 @@ export async function castFishingLine(rodType: RodType) {
           ? ABILITIES[effectiveAbilityId]
           : undefined
         const researcherLevel = getSkillLevel(user.skills, 'researching')
-        const shinyChance = getShinyChance({
-          sourceModifier: rodConfig.shinyChanceModifier || 1,
-          researcherModifier: getResearcherShinyModifier(researcherLevel),
-          abilityModifier: getAbilityShinyMultiplier({
-            ability: effectiveAbility,
-            formId,
-            speciesId: pokemonEntry.speciesId,
-            sourceFormId: activeAbilitySourceFormId,
-            locationId: encounter.id,
-            targetTypes: speciesData?.types,
-            isNight: isNightHour(),
-          }),
-        })
+        const rarityChances = resolveRarityChances(
+          rodConfig.rarityChances,
+          pokemonEntry.rarityChances,
+        )
+        const shinyChance =
+          rarityChances.shiny === 0
+            ? 0
+            : getShinyChance({
+                sourceModifier: rarityChances.shiny! / BASE_SHINY_CHANCE,
+                researcherModifier: getResearcherShinyModifier(researcherLevel),
+                abilityModifier: getAbilityShinyMultiplier({
+                  ability: effectiveAbility,
+                  formId,
+                  speciesId: pokemonEntry.speciesId,
+                  sourceFormId: activeAbilitySourceFormId,
+                  locationId: encounter.id,
+                  targetTypes: speciesData?.types,
+                  isNight: isNightHour(),
+                }),
+              })
         const pokedexMap = await getUserPokedexMap(payload as any, user.id)
         const researchLevel =
           pokedexMap[pokemonEntry.speciesId.toString()]?.[formId]
             ?.researchLevel || 0
 
-        isShiny = rollShiny(shinyChance, researchLevel >= 5 ? 2 : 1)
-        if (
-          !isShiny &&
-          shouldUseExtraShinyRoll({
-            ability: effectiveAbility,
-            sourceFormId: activeAbilitySourceFormId,
-            targetFormId: formId,
-            shinyChance,
-          })
-        ) {
-          isShiny = true
-        }
-        rarity = resolvePokemonRarity({
-          rarity: pokemonEntry.rarity,
-          shiny: isShiny,
-        })
+        rarityChances.shiny =
+          rarityChances.shiny === 0
+            ? 0
+            : combinedShinyChance(
+                shinyChance,
+                researchLevel >= 5 ? 2 : 1,
+                getExtraShinyRollChance({
+                  ability: effectiveAbility,
+                  sourceFormId: activeAbilitySourceFormId,
+                  targetFormId: formId,
+                  shinyChance,
+                }),
+              )
+        rarity = resolveGeneratedPokemonRarity(pokemonEntry, rarityChances)
         isShiny = rarity === 'shiny'
       }
 

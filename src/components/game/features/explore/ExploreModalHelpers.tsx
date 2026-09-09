@@ -11,7 +11,6 @@ import {
   Heart,
   HelpCircle,
   Loader2,
-  Sparkles,
   ThumbsDown,
   ThumbsUp,
   Timer,
@@ -413,13 +412,6 @@ export function getFormattedProperties(selectedItem: any) {
         icon: <Timer className="w-4 h-4" />,
         label: 'Time Limit',
         value: `${loc.timer}s`,
-      })
-    }
-    if (loc.shinyChanceModifier) {
-      props.push({
-        icon: <Sparkles className="w-4 h-4" />,
-        label: 'Shiny Chance',
-        value: `${loc.shinyChanceModifier}x`,
       })
     }
     if (loc.levelRange) {

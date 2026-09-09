@@ -29,7 +29,6 @@ const forbiddenFields = new Set([
   'rivalSelection',
 ])
 const numericBoostFields = new Set([
-  'shinyChanceModifier',
   'generatedXpMultiplier',
 ])
 const appendFields = new Set([

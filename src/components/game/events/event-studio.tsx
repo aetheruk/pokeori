@@ -1125,9 +1125,9 @@ function ModifierEditor({
           <option value="append">Add entries</option>
         )}
         {(modifier.field.startsWith('rarityChances.') ||
-          ['shinyChanceModifier', 'generatedXpMultiplier'].includes(
-            modifier.field,
-          )) && <option value="boost">Strongest boost wins</option>}
+          modifier.field === 'generatedXpMultiplier') && (
+          <option value="boost">Strongest boost wins</option>
+        )}
         {modifier.kind === 'shop' && modifier.field === 'items' && (
           <option value="discount">Price factor (0–1)</option>
         )}

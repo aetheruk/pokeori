@@ -34,7 +34,6 @@ const fishingRod = (
   items?: FishingItemEntry[],
 ): FishingRodConfig => ({
   levelRange: { min: 25, max: 35 },
-  shinyChanceModifier: 1,
   catchRateModifier,
   timer: 25,
   encounters: { entries },
@@ -85,7 +84,6 @@ const safariFishingItems = (): FishingItemEntry[] => [
 
 const safariFishingRod = (): FishingRodConfig => ({
   levelRange: { min: 25, max: 35 },
-  shinyChanceModifier: 1,
   catchRateModifier: 0,
   timer: 30,
   encounters: { entries: safariFishingPool },
