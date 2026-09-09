@@ -34,7 +34,6 @@ export const vermilionCityFishing: FishingGameConfig[] = [
       rods: {
         old: {
           levelRange: { min: 5, max: 5 },
-          shinyChanceModifier: 1,
           catchRateModifier: 0,
           timer: 25,
           encounters: {
@@ -52,7 +51,6 @@ export const vermilionCityFishing: FishingGameConfig[] = [
         },
         good: {
           levelRange: { min: 10, max: 10 },
-          shinyChanceModifier: 1,
           catchRateModifier: 0,
           timer: 25,
           encounters: {
@@ -78,7 +76,6 @@ export const vermilionCityFishing: FishingGameConfig[] = [
         },
         super: {
           levelRange: { min: 15, max: 15 },
-          shinyChanceModifier: 1,
           catchRateModifier: 0,
           timer: 25,
           encounters: {
@@ -138,7 +135,6 @@ export const vermilionCityFishing: FishingGameConfig[] = [
       rods: {
         old: {
           levelRange: { min: 5, max: 5 },
-          shinyChanceModifier: 1,
           catchRateModifier: 0,
           timer: 25,
           encounters: {
@@ -175,7 +171,6 @@ export const vermilionCityFishing: FishingGameConfig[] = [
         },
         good: {
           levelRange: { min: 10, max: 10 },
-          shinyChanceModifier: 1,
           catchRateModifier: 0,
           timer: 25,
           encounters: {
@@ -220,7 +215,6 @@ export const vermilionCityFishing: FishingGameConfig[] = [
         },
         super: {
           levelRange: { min: 15, max: 15 },
-          shinyChanceModifier: 1,
           catchRateModifier: 0,
           timer: 25,
           encounters: {

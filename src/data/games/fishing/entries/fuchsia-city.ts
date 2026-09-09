@@ -34,7 +34,6 @@ export const fuchsiaCityFishing: FishingGameConfig[] = [
       rods: {
         old: {
           levelRange: { min: 5, max: 5 },
-          shinyChanceModifier: 1,
           catchRateModifier: 5,
           timer: 25,
           encounters: {
@@ -52,7 +51,6 @@ export const fuchsiaCityFishing: FishingGameConfig[] = [
         },
         good: {
           levelRange: { min: 5, max: 15 },
-          shinyChanceModifier: 1,
           catchRateModifier: 0,
           timer: 25,
           encounters: {
@@ -86,7 +84,6 @@ export const fuchsiaCityFishing: FishingGameConfig[] = [
         },
         super: {
           levelRange: { min: 15, max: 35 },
-          shinyChanceModifier: 1,
           catchRateModifier: 0,
           timer: 25,
           encounters: {

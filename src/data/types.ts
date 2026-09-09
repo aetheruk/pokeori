@@ -131,7 +131,6 @@ export interface Location {
   encounters: LocationEncounter[]
   rewards: LocationReward[]
   background?: string // Background image filename (e.g. 'forest.png', 'cave.png')
-  shinyChanceModifier?: number // Multiplier for shiny rate (e.g. 1.0 = standard, 2.0 = double)
   catchRateModifier?: number // 0-255, modifies the catch rate calculation
   shield?: LocationEncounterShield // Optional catch shield that blocks catch-rate progress until broken
   fleeRate?: number // Optional 0-100 chance for the Pokemon to flee after an incorrect answer

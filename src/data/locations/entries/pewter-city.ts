@@ -13,7 +13,6 @@ export const pewterCityLocations: Location[] = [
     },
     background: '/backgrounds/grassy-route.avif',
     timer: 20,
-    shinyChanceModifier: 1,
     catchRateModifier: 1,
     levelRange: {
       min: 3,
@@ -73,7 +72,6 @@ export const pewterCityLocations: Location[] = [
     },
     background: '/backgrounds/rocky-path.avif',
     timer: 20,
-    shinyChanceModifier: 1,
     catchRateModifier: 1,
     levelRange: {
       min: 6,

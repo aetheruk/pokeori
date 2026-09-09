@@ -2,6 +2,7 @@ import { BaseGameConfig, TaskIcon } from '../shared'
 import { LocationReward } from '@/data/types'
 import type { TaskCondition } from '@/data/tasks/types'
 import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
+import type { PokemonRarityChances } from '@/utilities/pokemon/rarity-chances'
 
 export type RodType = 'old' | 'good' | 'super'
 export type FishingWaterStyle = 'ocean' | 'pond' | 'pool' | 'harbor' | 'rocky-lake'
@@ -21,6 +22,7 @@ export interface FishingPokemonEntry {
   formId?: string
   requirements?: TaskCondition[]
   rarity?: PokemonRarityId
+  rarityChances?: PokemonRarityChances
   weight: number // Relative weight in pool
   symbol: string // Emoji/icon shown when hooked (e.g., "🐟", "⭐")
   reactionTime: number // MS window to press hook
@@ -49,7 +51,7 @@ export interface FishingRodConfig {
   }
   // Per-rod catch settings
   levelRange?: { min: number; max: number }
-  shinyChanceModifier?: number // Multiplier for shiny rate
+  rarityChances?: PokemonRarityChances
   catchRateModifier?: number // 0-255, modifies catch rate
   timer?: number // Duration for catch attempt in seconds
 }

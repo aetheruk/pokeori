@@ -36,7 +36,6 @@ export const route10Fishing: FishingGameConfig[] = [
       rods: {
         old: {
           levelRange: { min: 10, max: 14 },
-          shinyChanceModifier: 1,
           catchRateModifier: 5,
           timer: 25,
           encounters: {
@@ -54,7 +53,6 @@ export const route10Fishing: FishingGameConfig[] = [
         },
         good: {
           levelRange: { min: 14, max: 18 },
-          shinyChanceModifier: 1,
           catchRateModifier: 0,
           timer: 25,
           encounters: {
@@ -80,7 +78,6 @@ export const route10Fishing: FishingGameConfig[] = [
         },
         super: {
           levelRange: { min: 18, max: 22 },
-          shinyChanceModifier: 1,
           catchRateModifier: 0,
           timer: 25,
           encounters: {

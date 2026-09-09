@@ -32,7 +32,6 @@ export const palletTownLocations: Location[] = [
     },
     background: '/backgrounds/grassy-route.avif',
     timer: 20,
-    shinyChanceModifier: 1,
     catchRateModifier: 255,
     keyEncounter: true,
     levelRange: {
@@ -65,7 +64,6 @@ export const palletTownLocations: Location[] = [
     },
     background: '/backgrounds/grassy-route.avif',
     timer: 20,
-    shinyChanceModifier: 1,
     catchRateModifier: 30,
     levelRange: {
       min: 2,

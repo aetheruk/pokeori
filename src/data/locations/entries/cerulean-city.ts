@@ -286,7 +286,6 @@ export const ceruleanCityLocations: Location[] = [
       },
     ],
     timer: 30,
-    shinyChanceModifier: 1,
   },
   {
     id: 'charmander-den',
@@ -439,6 +438,5 @@ export const ceruleanCityLocations: Location[] = [
       },
     ],
     timer: 35,
-    shinyChanceModifier: 1,
   },
 ]

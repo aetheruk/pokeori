@@ -13,7 +13,6 @@ export const pokemonTowerLocations: Location[] = [
     },
     background: '/backgrounds/pkmn-tower.avif',
     timer: 20,
-    shinyChanceModifier: 1,
     catchRateModifier: 1,
     keyEncounter: true,
     specialEncounter: {
@@ -64,7 +63,6 @@ export const pokemonTowerLocations: Location[] = [
     },
     background: '/backgrounds/pkmn-tower.avif',
     timer: 45,
-    shinyChanceModifier: 1,
     catchRateModifier: 2,
     keyEncounter: true,
     levelRange: {
@@ -99,7 +97,6 @@ export const pokemonTowerLocations: Location[] = [
     },
     background: '/backgrounds/pkmn-tower.avif',
     timer: 45,
-    shinyChanceModifier: 1,
     catchRateModifier: 3,
     keyEncounter: true,
     levelRange: {
@@ -133,7 +130,6 @@ export const pokemonTowerLocations: Location[] = [
     },
     background: '/backgrounds/pkmn-tower.avif',
     timer: 20,
-    shinyChanceModifier: 1,
     catchRateModifier: 1,
     keyEncounter: false,
     levelRange: {
@@ -186,7 +182,6 @@ export const pokemonTowerLocations: Location[] = [
     },
     background: '/backgrounds/pkmn-tower.avif',
     timer: 20,
-    shinyChanceModifier: 1,
     catchRateModifier: 1,
     keyEncounter: false,
     levelRange: {
@@ -238,7 +233,6 @@ export const pokemonTowerLocations: Location[] = [
     },
     background: '/backgrounds/pkmn-tower.avif',
     timer: 20,
-    shinyChanceModifier: 1,
     catchRateModifier: 1,
     keyEncounter: false,
     levelRange: {
@@ -309,7 +303,6 @@ export const pokemonTowerLocations: Location[] = [
     },
     background: '/backgrounds/pkmn-tower.avif',
     timer: 20,
-    shinyChanceModifier: 1,
     catchRateModifier: 1,
     keyEncounter: false,
     levelRange: {

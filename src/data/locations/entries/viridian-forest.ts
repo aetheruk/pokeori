@@ -12,7 +12,6 @@ export const viridianForestLocations: Location[] = [
     },
     background: '/backgrounds/forest.avif',
     timer: 20,
-    shinyChanceModifier: 1,
     catchRateModifier: 1,
     levelRange: {
       min: 3,
@@ -147,7 +146,6 @@ export const viridianForestLocations: Location[] = [
     },
     background: '/backgrounds/forest.avif',
     timer: 20,
-    shinyChanceModifier: 1,
     catchRateModifier: 1,
     levelRange: {
       min: 5,
@@ -191,7 +189,6 @@ export const viridianForestLocations: Location[] = [
     },
     background: '/backgrounds/forest.avif',
     timer: 20,
-    shinyChanceModifier: 1,
     catchRateModifier: 1,
     levelRange: {
       min: 5,

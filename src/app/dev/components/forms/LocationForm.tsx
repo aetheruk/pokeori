@@ -179,22 +179,13 @@ export function LocationForm({ data, onChange }: LocationFormProps) {
           <CardTitle>Mechanics</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-6">
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Timer (seconds)</Label>
               <Input
                 type="number"
                 value={data.timer ?? 30}
                 onChange={(e) => handleChange('timer', parseInt(e.target.value))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Shiny Mod (1.0 = normal)</Label>
-              <Input
-                type="number"
-                step="0.1"
-                value={data.shinyChanceModifier ?? 1.0}
-                onChange={(e) => handleChange('shinyChanceModifier', parseFloat(e.target.value))}
               />
             </div>
             <div className="space-y-2">

@@ -28,7 +28,7 @@ Across overlapping events, the strongest boost wins per field and the lowest pri
 
 ## Rarity thresholds
 
-`rarityChances` maps every registered special rarity to a threshold from zero to one. Forms show percentages. Missing entries inherit their parent and system defaults; explicit zero disables. Capture and wild-battle shiny defaults to 1/512. Trainer enemies default all thresholds to zero. Normal is the fallback. Fixed rarity or positive legacy shiny/shadow/radiant flags take precedence.
+`rarityChances` maps every registered special rarity to a threshold from zero to one. Forms show percentages. Missing entries inherit their parent and system defaults; explicit zero disables. Capture and wild-battle shiny defaults to 1/512. Trainer enemies default all thresholds to zero. Normal is the fallback. Fixed rarity or explicit shiny/shadow/radiant flags take precedence.
 
 Roll uniformly once. Choose the smallest threshold greater than the roll; break equal-threshold ties uniformly. For Shadow 10%, Silver 1%, Shiny 1/512, final probabilities are Shadow 9%, Silver 0.8046875%, Shiny 0.1953125%, normal 90%. Thresholds need not sum to one.
 
