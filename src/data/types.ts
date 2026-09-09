@@ -3,12 +3,15 @@ import { StatusEffectId } from './moves/types'
 import type { SkillXpConfig } from './skills/xp'
 import type { TrainerClassId } from './trainers'
 import type { PokemonRarityId } from '@/utilities/pokemon/rarity-effects'
+import type { PokemonRarityChances } from '@/utilities/pokemon/rarity-chances'
+export type { PokemonRarityChances } from '@/utilities/pokemon/rarity-chances'
 import type { PokemonTypeName } from './items/types'
 
 export * from './tasks/types'
 export * from './moves/types'
 
 export interface LocationEncounter {
+  rarityChances?: PokemonRarityChances
   speciesId: number
   formId?: string
   rarity?: PokemonRarityId
@@ -103,6 +106,7 @@ export type LocationReward = Reward
 export type LocationCategory = string
 
 export interface Location {
+  rarityChances?: PokemonRarityChances
   id: string
   hide?: string
   /** Keep this encounter available to expedition paths without listing it separately in Explore. */
@@ -146,6 +150,7 @@ export interface Location {
 }
 
 export interface BattleEnemy {
+  rarityChances?: PokemonRarityChances
   speciesId: number
   formId?: string
   level: number | { min: number; max: number }
@@ -198,6 +203,7 @@ export interface TrainerBattleItemConfig {
 export type BattleAiProfileId = 'wild' | 'trainer' | 'advanced' | 'boss'
 
 export interface BattleConfig {
+  rarityChances?: PokemonRarityChances
   id: string
   hide?: string
   overrides?: string

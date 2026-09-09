@@ -28,7 +28,7 @@ export async function getBattleInventory(): Promise<{
         (await getPayload({ config: configPromise })) as any,
         user.id,
       )
-  const battleConfig = battles.find((battle) => battle.id === state.battleId)
+  const battleConfig = state.dynamicBattleConfig || battles.find((battle) => battle.id === state.battleId)
   const configuredAllowedItems =
     state.config?.allowedItems || battleConfig?.allowedItems
   const allowedItems = configuredAllowedItems?.length

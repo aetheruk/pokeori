@@ -1,4 +1,5 @@
 import { mock } from 'bun:test'
+mock.module('@/utilities/events/participation', () => ({ recordEventStateProgress: async () => {} }))
 import { strict as assert } from 'node:assert'
 
 let busy = false

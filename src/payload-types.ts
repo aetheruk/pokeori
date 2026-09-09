@@ -69,6 +69,10 @@ export interface Config {
   collections: {
     users: User;
     'push-subscriptions': PushSubscription;
+    'game-events': GameEvent;
+    'event-participation': EventParticipation;
+    'event-audit': EventAudit;
+    'event-deliveries': EventDelivery;
     pokemon: Pokemon;
     'expedition-runs': ExpeditionRun;
     'user-inventory-items': UserInventoryItem;
@@ -94,6 +98,10 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     'push-subscriptions': PushSubscriptionsSelect<false> | PushSubscriptionsSelect<true>;
+    'game-events': GameEventsSelect<false> | GameEventsSelect<true>;
+    'event-participation': EventParticipationSelect<false> | EventParticipationSelect<true>;
+    'event-audit': EventAuditSelect<false> | EventAuditSelect<true>;
+    'event-deliveries': EventDeliveriesSelect<false> | EventDeliveriesSelect<true>;
     pokemon: PokemonSelect<false> | PokemonSelect<true>;
     'expedition-runs': ExpeditionRunsSelect<false> | ExpeditionRunsSelect<true>;
     'user-inventory-items': UserInventoryItemsSelect<false> | UserInventoryItemsSelect<true>;
@@ -647,6 +655,8 @@ export interface PushSubscription {
     | null;
   voyages?: boolean | null;
   dailyReset?: boolean | null;
+  gameEvents?: boolean | null;
+  eventsEnabledAt?: string | null;
   voyagesEnabledAt?: string | null;
   dailyCursor: string;
   sentVoyages?:
@@ -660,6 +670,87 @@ export interface PushSubscription {
     | null;
   nextCheckAt: string;
   failures?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "game-events".
+ */
+export interface GameEvent {
+  id: string;
+  status: 'draft' | 'published' | 'cancelled';
+  startAt: string;
+  endAt: string;
+  definition:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  revision: number;
+  createdBy: string | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-participation".
+ */
+export interface EventParticipation {
+  id: string;
+  user: string | User;
+  eventId: string;
+  activityId: string;
+  acceptedAt: string;
+  readyAt?: string | null;
+  claimedAt?: string | null;
+  snapshot:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  progress?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-audit".
+ */
+export interface EventAudit {
+  id: string;
+  eventId: string;
+  actor: string | User;
+  action: string;
+  revision: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-deliveries".
+ */
+export interface EventDelivery {
+  id: string;
+  eventId: string;
+  subscriptionId: string;
+  outcome: 'sent' | 'ineligible';
   updatedAt: string;
   createdAt: string;
 }
@@ -936,6 +1027,22 @@ export interface PayloadLockedDocument {
         value: string | PushSubscription;
       } | null)
     | ({
+        relationTo: 'game-events';
+        value: string | GameEvent;
+      } | null)
+    | ({
+        relationTo: 'event-participation';
+        value: string | EventParticipation;
+      } | null)
+    | ({
+        relationTo: 'event-audit';
+        value: string | EventAudit;
+      } | null)
+    | ({
+        relationTo: 'event-deliveries';
+        value: string | EventDelivery;
+      } | null)
+    | ({
         relationTo: 'pokemon';
         value: string | Pokemon;
       } | null)
@@ -1163,11 +1270,69 @@ export interface PushSubscriptionsSelect<T extends boolean = true> {
   subscription?: T;
   voyages?: T;
   dailyReset?: T;
+  gameEvents?: T;
+  eventsEnabledAt?: T;
   voyagesEnabledAt?: T;
   dailyCursor?: T;
   sentVoyages?: T;
   nextCheckAt?: T;
   failures?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "game-events_select".
+ */
+export interface GameEventsSelect<T extends boolean = true> {
+  id?: T;
+  status?: T;
+  startAt?: T;
+  endAt?: T;
+  definition?: T;
+  revision?: T;
+  createdBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-participation_select".
+ */
+export interface EventParticipationSelect<T extends boolean = true> {
+  id?: T;
+  user?: T;
+  eventId?: T;
+  activityId?: T;
+  acceptedAt?: T;
+  readyAt?: T;
+  claimedAt?: T;
+  snapshot?: T;
+  progress?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-audit_select".
+ */
+export interface EventAuditSelect<T extends boolean = true> {
+  eventId?: T;
+  actor?: T;
+  action?: T;
+  revision?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-deliveries_select".
+ */
+export interface EventDeliveriesSelect<T extends boolean = true> {
+  id?: T;
+  eventId?: T;
+  subscriptionId?: T;
+  outcome?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -47,7 +47,7 @@ const curve = createECDH('prime256v1')
 curve.generateKeys()
 const subscription = { endpoint: 'https://web.push.apple.com/Q/test', keys: { p256dh: curve.getPublicKey().toString('base64url'), auth: randomBytes(16).toString('base64url') } }
 const id = createHash('sha256').update(subscription.endpoint).digest('hex')
-const off = { voyages: false, dailyReset: false }
+const off = { voyages: false, dailyReset: false, gameEvents: false }
 assert.deepEqual((await getNotificationSettings(subscription)).preferences, off)
 authenticated = null
 await assert.rejects(() => saveNotificationSettings(subscription, { voyages: true, dailyReset: false }), /sign in/)
@@ -58,7 +58,7 @@ allowRate = true
 await saveNotificationSettings(subscription, { voyages: true, dailyReset: true })
 assert.equal(records.size, 1)
 const enabledAt = records.get(id).voyagesEnabledAt
-assert.deepEqual((await getNotificationSettings(subscription)).preferences, { voyages: true, dailyReset: true })
+assert.deepEqual((await getNotificationSettings(subscription)).preferences, { voyages: true, dailyReset: true, gameEvents: false })
 await saveNotificationSettings(subscription, { voyages: true, dailyReset: false })
 assert.equal(records.get(id).voyagesEnabledAt, enabledAt)
 

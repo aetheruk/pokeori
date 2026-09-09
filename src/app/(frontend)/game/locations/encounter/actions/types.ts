@@ -16,6 +16,7 @@ export interface EncounterShieldState {
 }
 
 export interface EncounterState {
+  locationSnapshot?: import('@/data/types').Location
   userId: string
   locationId: string
   pokemonId: number

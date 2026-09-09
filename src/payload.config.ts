@@ -9,6 +9,7 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { PushSubscriptions } from './collections/PushSubscriptions'
+import { GameEvents, EventParticipation, EventAudit, EventDeliveries } from './collections/GameEvents'
 import {
   UserActivityStats,
   UserAbilityDexEntries,
@@ -49,6 +50,10 @@ export default buildConfig({
   collections: [
     Users,
     PushSubscriptions,
+    GameEvents,
+    EventParticipation,
+    EventAudit,
+    EventDeliveries,
     Pokemon,
     ExpeditionRuns,
     UserInventoryItems,

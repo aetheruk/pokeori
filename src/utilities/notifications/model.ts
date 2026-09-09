@@ -4,9 +4,10 @@ import { getUtcDateKey } from '@/utilities/date-utils'
 export const notificationPreferencesSchema = z.object({
   voyages: z.boolean(),
   dailyReset: z.boolean(),
+  gameEvents: z.boolean().default(false),
 }).strict()
 export type NotificationPreferences = z.infer<typeof notificationPreferencesSchema>
-export const notificationsOff: NotificationPreferences = { voyages: false, dailyReset: false }
+export const notificationsOff: NotificationPreferences = { voyages: false, dailyReset: false, gameEvents: false }
 
 // The server makes requests to these endpoints. Never accept arbitrary URLs.
 export function isPushEndpoint(value: string): boolean {

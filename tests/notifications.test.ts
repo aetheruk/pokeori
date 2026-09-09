@@ -5,8 +5,9 @@ import { notificationServiceWorker } from '@/utilities/notifications/service-wor
 import { PushSubscriptions } from '@/collections/PushSubscriptions'
 
 describe('notification subscriptions', () => {
-  test('both categories default off and cannot be truthy strings', () => {
-    expect(notificationsOff).toEqual({ voyages: false, dailyReset: false })
+  test('all categories default off and cannot be truthy strings', () => {
+    expect(notificationsOff).toEqual({ voyages: false, dailyReset: false, gameEvents: false })
+    expect(notificationPreferencesSchema.parse({ voyages: false, dailyReset: false }).gameEvents).toBe(false)
     expect(notificationPreferencesSchema.safeParse({ voyages: 'true', dailyReset: false }).success).toBe(false)
     expect(notificationPreferencesSchema.safeParse({ voyages: true, dailyReset: true, user: 'another' }).success).toBe(false)
   })

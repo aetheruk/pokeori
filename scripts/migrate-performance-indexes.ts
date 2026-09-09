@@ -153,6 +153,11 @@ const uniqueIndexes: UniqueIndexPlan[] = [
 ]
 
 const queryIndexes: QueryIndexPlan[] = [
+  { slug: 'game-events', keys: { status: 1, endAt: 1, startAt: 1 }, name: 'event_schedule' },
+  { slug: 'event-participation', keys: { user: 1, claimedAt: 1 }, name: 'event_user_claims' },
+  { slug: 'event-participation', keys: { eventId: 1 }, name: 'eventId_1' },
+  { slug: 'event-audit', keys: { eventId: 1, createdAt: -1 }, name: 'event_audit_history' },
+  { slug: 'event-deliveries', keys: { eventId: 1 }, name: 'eventId_1' },
   { slug: 'push-subscriptions', keys: { nextCheckAt: 1 }, name: 'nextCheckAt_1' },
   { slug: 'push-subscriptions', keys: { user: 1 }, name: 'user_1' },
   {

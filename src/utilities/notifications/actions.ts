@@ -34,7 +34,7 @@ export async function getNotificationSettings(value?: unknown) {
     const record = await payload.findByID({ collection: 'push-subscriptions', id, depth: 0, disableErrors: true })
     const stored = record ? pushSubscriptionSchema.safeParse(record.subscription) : null
     if (record && record.user === user.id && stored?.success && stored.data.keys.auth === subscription.keys.auth && stored.data.keys.p256dh === subscription.keys.p256dh) {
-      preferences = { voyages: Boolean(record.voyages), dailyReset: Boolean(record.dailyReset) }
+      preferences = { voyages: Boolean(record.voyages), dailyReset: Boolean(record.dailyReset), gameEvents: Boolean(record.gameEvents) }
     }
   }
   return { publicKey: getPushConfig()?.publicKey || null, preferences }
@@ -44,7 +44,7 @@ export async function saveNotificationSettings(value: unknown, input: unknown) {
   const { payload, user } = await context()
   const preferences = notificationPreferencesSchema.parse(input)
   const { subscription, id } = subscriptionInput(value)
-  if ((preferences.voyages || preferences.dailyReset) && !getPushConfig()) {
+  if ((preferences.voyages || preferences.dailyReset || preferences.gameEvents) && !getPushConfig()) {
     throw new Error('Notifications are not configured on the server yet.')
   }
   const lock = await acquireActionLock(`push:${id}`, 120)
@@ -53,7 +53,7 @@ export async function saveNotificationSettings(value: unknown, input: unknown) {
     const old = await payload.findByID({ collection: 'push-subscriptions', id, depth: 0, disableErrors: true })
     // A browser changing accounts must unsubscribe and obtain a fresh endpoint.
     if (old && old.user !== user.id) throw new Error('This device is subscribed to another trainer. Reset device notifications first.')
-    if (!preferences.voyages && !preferences.dailyReset) {
+    if (!preferences.voyages && !preferences.dailyReset && !preferences.gameEvents) {
       if (old) await payload.delete({ collection: 'push-subscriptions', id })
       return preferences
     }
@@ -61,6 +61,7 @@ export async function saveNotificationSettings(value: unknown, input: unknown) {
     const data = {
       user: user.id, subscription, ...preferences,
       voyagesEnabledAt: preferences.voyages ? old?.voyages ? old.voyagesEnabledAt : now : null,
+      eventsEnabledAt: preferences.gameEvents ? old?.gameEvents ? old.eventsEnabledAt : now : null,
       dailyCursor: preferences.dailyReset && old?.dailyReset ? old.dailyCursor : now,
       nextCheckAt: now, failures: 0,
       sentVoyages: old?.sentVoyages || [],
@@ -106,7 +107,7 @@ export async function sendTestNotification(value: unknown) {
   if (!lock.acquired) throw new Error('Notifications are being updated. Please try again shortly.')
   try {
     const record = await payload.findByID({ collection: 'push-subscriptions', id, depth: 0, disableErrors: true })
-    if (!record || record.user !== user.id || (!record.voyages && !record.dailyReset)) throw new Error('Enable a notification category on this device first.')
+    if (!record || record.user !== user.id || (!record.voyages && !record.dailyReset && !record.gameEvents)) throw new Error('Enable a notification category on this device first.')
     const stored = pushSubscriptionSchema.parse(record.subscription)
     if (stored.keys.auth !== subscription.keys.auth || stored.keys.p256dh !== subscription.keys.p256dh) throw new Error('Please reset device notifications and enable them again.')
     try {

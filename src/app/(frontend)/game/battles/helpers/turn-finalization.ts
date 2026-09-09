@@ -274,10 +274,12 @@ export async function finalizeTurn(
         id: user.id,
       }),
     )) as User
+    const eventBattle = Boolean((state.dynamicBattleConfig as any)?.eventContexts?.length)
+    const replayConfig = eventBattle ? await (await import('@/utilities/events/server')).getEffectiveContent('battle', state.battleId, replayUser) : battleConfig
     state.isEligibleForReplay =
-      battleConfig && !state.dynamicBattleConfig && !state.chronicle
+      replayConfig && (!state.dynamicBattleConfig || eventBattle) && !state.chronicle
         ? await timer.time('isActivityEligibleForReplay', () =>
-            isActivityEligibleForReplay(replayUser, battleConfig, 'battle'),
+            isActivityEligibleForReplay(replayUser, replayConfig, 'battle'),
           )
         : false
   }

@@ -663,7 +663,7 @@ export function getCaptureAbilityRewards(input: {
   return { rewards, abilityLost }
 }
 
-export function shouldUseExtraShinyRoll(input: {
+export function getExtraShinyRollChance(input: {
   ability?: AbilityConfig
   sourceFormId?: string
   targetFormId: string
@@ -673,15 +673,19 @@ export function shouldUseExtraShinyRoll(input: {
     if (effect.type !== 'extra-shiny-roll') continue
     if (effect.mode === 'same-source-form') {
       if (input.sourceFormId === input.targetFormId) {
-        return Math.random() < (input.shinyChance || 0)
+        return input.shinyChance || 0
       }
       continue
     }
     if (effect.mode === 'fixed-chance') {
-      return rollPercent(effect.chance)
+      return Math.max(0, Math.min(1, (effect.chance ?? 100) / 100))
     }
   }
-  return false
+  return 0
+}
+
+export function shouldUseExtraShinyRoll(input: Parameters<typeof getExtraShinyRollChance>[0]) {
+  return Math.random() < getExtraShinyRollChance(input)
 }
 
 export function getResearchSessionTimeDeltaSeconds(input: {

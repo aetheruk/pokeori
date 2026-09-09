@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { GamePageSkeleton } from '@/components/game/shared/GamePageSkeleton'
+const EventStudio = lazy(() => import('@/components/game/events/event-studio').then(module => ({ default: module.EventStudio })))
 
 const TrainerLeveling = lazy(() =>
   import('@/components/game/trainer-leveling').then((module) => ({
@@ -82,6 +83,7 @@ export function TrainerDashboard({
   const hasDeckBox = (inventory['deck-box'] || 0) > 0
   const isKidMode = user?.kidMode === true
   const normalizedInitialSection = resolveTrainerSection(initialSection, {
+    isAdmin: user?.isAdmin === true,
     hasDeckBox,
     isKidMode,
   })
@@ -94,6 +96,7 @@ export function TrainerDashboard({
   const [deckGeneration, setDeckGeneration] = useState(deckGenerations[0] || '')
   const [deckFormat, setDeckFormat] = useState<DeckFormat>('baby')
   const TABS = [
+    ...(user?.isAdmin ? [{ id: 'events' as const, label: 'Events', component: <LazyWrapper><EventStudio /></LazyWrapper> }] : []),
     {
       id: 'profile' as const,
       label: user?.trainerName || 'Trainer',
@@ -174,6 +177,7 @@ export function TrainerDashboard({
     friends: UsersRound,
     gift: Gift,
     rankings: Trophy,
+    events: Gift,
   }
 
   const selectSection = (section: TrainerSection) => {
@@ -190,6 +194,7 @@ export function TrainerDashboard({
 
   useEffect(() => {
     const availableSection = resolveTrainerSection(activeTab, {
+      isAdmin: user?.isAdmin === true,
       hasDeckBox,
       isKidMode,
     })
@@ -197,7 +202,7 @@ export function TrainerDashboard({
       setActiveTab(availableSection)
       router.replace('/game', { scroll: false })
     }
-  }, [activeTab, hasDeckBox, isKidMode, router])
+  }, [activeTab, hasDeckBox, isKidMode, router, user?.isAdmin])
 
   const activeSection = TABS.find((tab) => tab.id === activeTab) || TABS[0]
   const ActiveIcon = tabIcons[activeSection.id]

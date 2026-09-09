@@ -14,7 +14,8 @@ const proofs = new Map<string, unknown>()
 const completedTasks: Record<string, any> = {}
 let grants = 0
 const payload: any = {
-  findByID: async () => structuredClone(user),
+  findByID: async ({ collection }: any) => collection === 'users' ? structuredClone(user) : null,
+  find: async () => ({ docs: [] }),
   update: async ({ data }: any) => Object.assign(user, structuredClone(data)),
 }
 mock.module('server-only', () => ({}))

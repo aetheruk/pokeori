@@ -7,6 +7,7 @@ import {
   releaseActionLock,
 } from '@/utilities/game-integrity'
 import type { DailyActivityKind } from '@/data/tasks/types'
+import { recordEventActivityProgress } from '@/utilities/events/participation'
 
 export type DailyProgressType =
   | 'daily_catch'
@@ -15,6 +16,7 @@ export type DailyProgressType =
   | 'daily_crystalize'
 
 export type DailyActivityEvent = {
+  pokemon?: import('@/payload-types').Pokemon
   kind: DailyActivityKind
   amount?: number
   sourceId?: string
@@ -95,6 +97,7 @@ export async function recordDailyActivityProgress(
       ...requestOptions,
     })
     const activeTasks = ((user as any).activeDailyTasks as any[]) || []
+    await recordEventActivityProgress(payload, user, event, options.req)
     if (activeTasks.length === 0) return { success: false }
 
     let updated = false

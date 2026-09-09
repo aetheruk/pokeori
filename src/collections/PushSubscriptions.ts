@@ -17,6 +17,8 @@ export const PushSubscriptions: CollectionConfig = {
     { name: 'subscription', type: 'json', required: true },
     { name: 'voyages', type: 'checkbox', defaultValue: false },
     { name: 'dailyReset', type: 'checkbox', defaultValue: false },
+    { name: 'gameEvents', type: 'checkbox', defaultValue: false },
+    { name: 'eventsEnabledAt', type: 'date' },
     { name: 'voyagesEnabledAt', type: 'date' },
     { name: 'dailyCursor', type: 'date', required: true },
     { name: 'sentVoyages', type: 'json', defaultValue: [] },

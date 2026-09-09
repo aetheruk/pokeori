@@ -121,6 +121,7 @@ async function settleBattleWin(
   if (state.chronicle || battleConfig.disableRewards) {
     if (state.chronicle) return
     await incrementDailyTaskProgress(user.id, 'daily_battle', 1, {
+      sourceId: state.battleId,
       isTrainer: !battleConfig.isWildBattle,
     }, { payload, req })
     return
@@ -143,6 +144,7 @@ async function settleBattleWin(
 
   // Explicit Daily Battle Tracking
   await incrementDailyTaskProgress(user.id, 'daily_battle', 1, {
+    sourceId: state.battleId,
     isTrainer: !battleConfig.isWildBattle,
   }, { payload, req })
 }

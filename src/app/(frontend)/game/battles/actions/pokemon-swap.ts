@@ -58,7 +58,7 @@ export async function swapPokemon(
     if (state.status !== 'ongoing')
       return { success: false, error: 'Battle has ended' }
 
-    const battleConfig = battles.find((b) => b.id === state.battleId)
+    const battleConfig = state.dynamicBattleConfig || battles.find((b) => b.id === state.battleId)
     const isLeadSelection = !state.isPvp && needsPlayerLeadSelection(state)
     const isForcedReplacement = !state.isPvp && needsPlayerReplacement(state)
     const isMoveSwitch = !state.isPvp && needsPlayerMoveSwitch(state)

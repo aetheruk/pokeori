@@ -3,6 +3,7 @@ import 'server-only'
 // Shared server runtime for Mini Games and Field Research.
 
 import { allGames, GameType } from '@/data/games'
+import { getEffectiveContent } from '@/utilities/events/server'
 import { ABILITIES, type AbilityConfig } from '@/data/abilities'
 import {
   fieldObservationGlobalItemEvents,
@@ -156,6 +157,7 @@ export async function getUser(): Promise<User | null> {
   return user as User
 }
 export interface GameActivityState {
+  eventConfigSnapshot?: (typeof allGames)[number]
   userId: string
   encounterId: string
   startTime: number
@@ -368,7 +370,8 @@ function getResearchSessionTimeLimit(encounter: (typeof allGames)[number]) {
 function sanitizeResearchState(
   state: GameActivityState,
 ): Omit<GameActivityState, 'fieldObservationPrivate' | 'artAcademyPrivate'> {
-  const { fieldObservationPrivate, artAcademyPrivate, ...safeState } = state
+  const { fieldObservationPrivate, artAcademyPrivate, eventConfigSnapshot, ...safeState } = state
+  void eventConfigSnapshot
   void fieldObservationPrivate
   void artAcademyPrivate
   return safeState
@@ -582,7 +585,9 @@ export async function startGameActivity(
     try {
       const payload = await getPayload({ config: configPromise })
 
-      const encounter = allGames.find((e) => e.id === validatedEncounterId)
+      const encounter = domain === 'field-research'
+        ? await getEffectiveContent('field-research', validatedEncounterId, user) as unknown as (typeof allGames)[number] | undefined
+        : allGames.find((e) => e.id === validatedEncounterId)
       if (!encounter) {
         return { success: false, error: 'Game encounter not found' }
       }
@@ -1330,6 +1335,7 @@ export async function startGameActivity(
       const state: GameActivityState = {
         userId: user.id,
         encounterId: validatedEncounterId,
+        eventConfigSnapshot: domain === 'field-research' ? encounter : undefined,
         startTime,
         expiry: expiry,
         wins: 0,
@@ -1400,7 +1406,7 @@ export async function submitGameActivityAnswer(
       }
     }
 
-    const encounter = allGames.find((e) => e.id === state.encounterId)
+    const encounter = state.eventConfigSnapshot || allGames.find((e) => e.id === state.encounterId)
     if (!encounter) {
       return { success: false, error: 'Invalid encounter' }
     }
@@ -1983,7 +1989,7 @@ export async function collectFieldObservationDrop(dropId: string) {
         return { success: false, error: 'No active field survey' }
       }
 
-      const encounter = allGames.find((e) => e.id === state.encounterId)
+      const encounter = state.eventConfigSnapshot || allGames.find((e) => e.id === state.encounterId)
       if (encounter?.gameType !== 'field-observation') {
         return { success: false, error: 'No active field survey' }
       }
@@ -2114,7 +2120,8 @@ export async function completeGameActivity(
       return { success: false, error: encounterInput.error }
     }
     const validatedEncounterId = encounterInput.value as string
-    const configuredEncounter = allGames.find(
+    const completionState = await getGameActivityStateForUser(user.id, domain)
+    const configuredEncounter = (completionState?.encounterId === validatedEncounterId ? completionState.eventConfigSnapshot : undefined) || allGames.find(
       (entry) => entry.id === validatedEncounterId,
     )
     if (!configuredEncounter) {
@@ -2811,7 +2818,7 @@ export async function getGameActivityState(domain: GameActivityDomain) {
     const state = await getGameActivityStateForUser(user.id, domain)
     if (!state) return null
 
-    const encounter = allGames.find((e) => e.id === state.encounterId)
+    const encounter = state.eventConfigSnapshot || allGames.find((e) => e.id === state.encounterId)
     if (!encounter) return null
     if (getGameActivityDomain(encounter.gameType) !== domain) return null
 
@@ -2819,11 +2826,12 @@ export async function getGameActivityState(domain: GameActivityDomain) {
     const gameEndTime = state.startTime + timeLimit * 1000
     const timeLeft = Math.max(0, Math.floor((gameEndTime - Date.now()) / 1000))
 
-    const isEligibleForReplay = await isActivityEligibleForReplay(
+    const replayEncounter = (encounter as any).eventContexts?.length ? await getEffectiveContent('field-research', encounter.id, user) : encounter
+    const isEligibleForReplay = replayEncounter ? await isActivityEligibleForReplay(
       user as User,
-      encounter,
+      replayEncounter,
       domain,
-    )
+    ) : false
 
     return {
       ...sanitizeResearchState(state),

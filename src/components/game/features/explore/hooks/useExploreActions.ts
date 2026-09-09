@@ -29,6 +29,7 @@ import {
   startVsSeekerBattle,
 } from '@/app/(frontend)/game/battles/actions'
 import { tasks } from '@/data/tasks'
+import { acceptEventTask } from '@/utilities/events/actions'
 import { expeditions } from '@/data/expeditions'
 import type { RequirementData } from '@/utilities/requirements'
 import type { ExploreItem } from '../types'
@@ -446,6 +447,13 @@ export function useExploreActions(
     // Task Logic
     if (item.type === 'task') {
       const task = item.originalData
+      if (task.eventTaskState === 'accept') {
+        setLoadingId(task.id)
+        try { await acceptEventTask(task.id, crypto.randomUUID()); window.dispatchEvent(new Event('game-events-refresh')); toast.success('Event task accepted') }
+        catch (error) { toast.error(error instanceof Error ? error.message : 'Unable to accept task') }
+        finally { setLoadingId(null) }
+        return
+      }
       const isExpeditionTaskFlow =
         Boolean((item as any).fromExpeditionTaskStep) ||
         expeditionEnterModalTaskId === task.id

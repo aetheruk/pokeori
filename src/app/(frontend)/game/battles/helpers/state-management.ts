@@ -91,13 +91,14 @@ export async function getActiveBattleState(
     sanitized.state.isEligibleForReplay === undefined
 
   if (needsReplayEligibility) {
-    if (sanitized.state.dynamicBattleConfig) {
+    const eventBattle = Boolean((sanitized.state.dynamicBattleConfig as any)?.eventContexts?.length)
+    if (sanitized.state.dynamicBattleConfig && !eventBattle) {
       sanitized.state.isEligibleForReplay = false
       return sanitized.state
     }
 
     const { battles } = await import('@/data/battles')
-    const battleConfig = battles.find((b) => b.id === sanitized.state.battleId)
+    const battleConfig = eventBattle ? await (await import('@/utilities/events/server')).getEffectiveContent('battle', sanitized.state.battleId, user as User) : battles.find((b) => b.id === sanitized.state.battleId)
     if (battleConfig) {
       sanitized.state.isEligibleForReplay = await isActivityEligibleForReplay(
         user as User,

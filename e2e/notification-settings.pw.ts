@@ -11,7 +11,7 @@ for (const width of [390, 1280]) {
     await page.getByRole('button', { name: 'Test trainer settings', exact: true }).click()
     const panel = page.getByRole('region', { name: 'Notifications', exact: true })
     await panel.scrollIntoViewIfNeeded()
-    for (const name of ['Voyage completion Off', 'Daily task reset Off']) {
+    for (const name of ['Voyage completion Off', 'Daily task reset Off', 'Game events Off']) {
       await expect(panel.getByRole('button', { name, exact: true })).toBeDisabled()
       await expect(panel.getByRole('button', { name, exact: true })).toHaveAttribute('aria-pressed', 'false')
     }
