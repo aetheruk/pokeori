@@ -4,6 +4,8 @@
 
 Admins open **Trainer → Events**. Create a draft, set announcement details, create or copy content, add modifiers, and choose start/end timestamps. Times display in the browser timezone and persist as UTC; duration entry and immediate starts are supported. Scheduled events can be edited or cancelled. Active gameplay definitions freeze; admins can change announcement copy, extend the end time, or end immediately. Duplicating creates a fresh draft/run. Recurrence is not included.
 
+The Events panel owns its vertical scroll area within the Trainer layout, so long content forms and save/publish controls remain reachable on mobile and desktop.
+
 Supported domains are standard PvE battles, capture locations, shops, Field Observation, and tasks. Structured forms provide source-content search, entity/asset lookup, optional advanced settings, and rarity previews. Other mini-game engines, copied rival teams, PvP, expedition orchestration, and custom password/script handlers are outside this editor. Permanent content remains authored in `src/data`.
 
 An event bundles additions and modifiers. Event requirements and normal content requirements both apply. Nullable `visibleAt` controls announcement visibility independently of activation. Silent events still label affected active content; activation push is separately optional.

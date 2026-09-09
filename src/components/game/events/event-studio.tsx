@@ -191,7 +191,10 @@ export function EventStudio({
       .includes(query.toLowerCase()),
   )
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-5 p-4 md:p-6">
+    <section
+      aria-label="Event studio"
+      className="mx-auto h-full min-h-0 w-full max-w-6xl space-y-5 overflow-y-auto overscroll-contain p-4 md:p-6"
+    >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold">Events</h2>
@@ -750,7 +753,7 @@ export function EventStudio({
           </div>
         </>
       )}
-    </div>
+    </section>
   )
 }
 
