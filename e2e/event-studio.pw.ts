@@ -74,3 +74,32 @@ for (const activity of ['Battle', 'Field research']) {
     await expect(page.getByText('Pikachu', { exact: true })).toBeVisible()
   })
 }
+
+for (const width of [390, 1280]) {
+  test(`manual event can be published off, enabled and disabled at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 740 })
+    await page.goto('/ui-test/events')
+    await page.getByRole('button', { name: 'Create event', exact: true }).click()
+    await page.getByLabel('Internal name').fill('Manual adventure')
+    await page.getByLabel('Player title').fill('Admin adventure')
+    await page.getByRole('button', { name: 'Content', exact: true }).click()
+    await page.getByRole('button', { name: 'Create battle from scratch' }).click()
+    await page.getByLabel('Name', { exact: true }).fill('Manual battle')
+    await page.getByRole('button', { name: 'Schedule', exact: true }).click()
+    await page.getByLabel('Timing mode').selectOption('manual')
+    await expect(page.getByLabel('Starts', { exact: true })).toHaveCount(0)
+    await expect(page.getByLabel('Ends', { exact: true })).toHaveCount(0)
+    await expect(page.getByLabel('Enable when published')).not.toBeChecked()
+    await page.screenshot({ path: `/tmp/manual-event-${width}.png` })
+    await page.getByRole('button', { name: 'Review', exact: true }).click()
+    await page.getByRole('button', { name: 'Publish event', exact: true }).click()
+    await page.getByRole('button', { name: 'Enable event', exact: true }).click()
+    await expect(page.getByRole('button', { name: 'Disable event', exact: true })).toBeVisible()
+    await page.getByRole('button', { name: 'Disable event', exact: true }).click()
+    await expect(page.getByRole('button', { name: 'Enable event', exact: true })).toBeVisible()
+    await page.getByRole('button', { name: 'Enable event', exact: true }).click()
+    await page.getByRole('button', { name: 'Back to events' }).click()
+    await expect(page.getByText('active · Manual on/off', { exact: false })).toBeVisible()
+    await expect(page.getByText('9999', { exact: false })).toHaveCount(0)
+  })
+}

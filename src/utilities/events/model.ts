@@ -399,6 +399,8 @@ export const eventDraftSchema = z
     title: z.string().min(1).max(150),
     description: text,
     icon: icon.default({ type: 'local', id: 'app-icon.avif' }),
+    timingMode: z.enum(['scheduled', 'manual']).optional(),
+    enabled: z.boolean().optional(),
     startAt: z.iso.datetime(),
     endAt: z.iso.datetime(),
     visibleAt: z.iso.datetime().nullable(),
@@ -428,13 +430,17 @@ export const eventDraftSchema = z
   })
   .strict()
   .superRefine((event, ctx) => {
-    if (Date.parse(event.endAt) <= Date.parse(event.startAt))
+    if (
+      event.timingMode !== 'manual' &&
+      Date.parse(event.endAt) <= Date.parse(event.startAt)
+    )
       ctx.addIssue({
         code: 'custom',
         path: ['endAt'],
         message: 'End must follow start',
       })
     if (
+      event.timingMode !== 'manual' &&
       event.visibleAt &&
       Date.parse(event.visibleAt) > Date.parse(event.endAt)
     )
@@ -494,12 +500,44 @@ export type GameEventDefinition = EventDraft & {
   updatedAt?: string
 }
 export function eventPhase(
-  event: Pick<GameEventDefinition, 'status' | 'startAt' | 'endAt'>,
+  event: Pick<
+    GameEventDefinition,
+    'status' | 'startAt' | 'endAt' | 'timingMode' | 'enabled'
+  >,
   now = Date.now(),
 ) {
   if (event.status !== 'published') return event.status
+  if (event.timingMode === 'manual')
+    return event.enabled ? 'active' : 'disabled'
   if (now < Date.parse(event.startAt)) return 'scheduled'
   return now < Date.parse(event.endAt) ? 'active' : 'ended'
+}
+// An open upper bound keeps existing indexed schedule queries and accepted-session
+// snapshots compatible. Never expose this storage value as a player-facing date.
+export const MANUAL_EVENT_END = '9999-12-31T23:59:59.999Z'
+export function setManualEventEnabled(
+  event: GameEventDefinition,
+  enabled: boolean,
+  now = Date.now(),
+): GameEventDefinition {
+  if (event.timingMode !== 'manual' || event.status !== 'published')
+    throw new Error('Only published manual events can be switched on or off')
+  if (Boolean(event.enabled) === enabled)
+    throw new Error(
+      enabled ? 'Event is already enabled' : 'Event is already disabled',
+    )
+  return {
+    ...event,
+    enabled,
+    ...(enabled
+      ? { startAt: new Date(now).toISOString(), endAt: MANUAL_EVENT_END }
+      : { endAt: new Date(now).toISOString() }),
+  }
+}
+export function eventNotificationRun(event: GameEventDefinition) {
+  return event.timingMode === 'manual'
+    ? `${event.id}:${event.startAt}`
+    : event.id
 }
 export function eventContentId(eventId: string, localId: string) {
   return `event:${eventId}:${localId}`

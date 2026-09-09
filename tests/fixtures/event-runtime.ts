@@ -192,4 +192,34 @@ await dispatchEventNotifications(
   send,
 )
 assert.equal(messages.length, 1)
+event.timingMode = 'manual'
+event.enabled = false
+await dispatchEventNotifications(payload, subscription, send)
+assert.equal(messages.length, 1)
+event.enabled = true
+event.startAt = new Date(Date.now() - 10).toISOString()
+event.endAt = '9999-12-31T23:59:59.999Z'
+await dispatchEventNotifications(payload, subscription, send)
+await dispatchEventNotifications(payload, subscription, send)
+assert.equal(messages.length, 2)
+event.enabled = false
+await dispatchEventNotifications(payload, subscription, send)
+assert.equal(messages.length, 2)
+event.enabled = true
+event.startAt = new Date(Date.parse(event.startAt) + 1).toISOString()
+await dispatchEventNotifications(payload, subscription, send)
+await dispatchEventNotifications(payload, subscription, send)
+assert.equal(messages.length, 3)
+event.notify = false
+event.startAt = new Date(Date.parse(event.startAt) + 1).toISOString()
+await dispatchEventNotifications(payload, subscription, send)
+assert.equal(messages.length, 3)
+const { setManualEventEnabled } = await import('@/utilities/events/model')
+await payload.update({ collection: 'event-participation', id: accepted.id, data: { claimedAt: null, readyAt: null, progress: { '0': 0 } }, req })
+Object.assign(event, setManualEventEnabled(event, false))
+await recordEventActivityProgress(payload, user, { kind: 'catch', sourceId: 'route-1' }, req)
+assert.equal((participation.get(accepted.id)!.progress as any)['0'], 0)
+Object.assign(event, setManualEventEnabled(event, true))
+await recordEventActivityProgress(payload, user, { kind: 'catch', sourceId: 'route-1' }, req)
+assert.equal((participation.get(accepted.id)!.progress as any)['0'], 1)
 console.log('Event runtime checks passed')

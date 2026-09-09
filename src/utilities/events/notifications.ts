@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto'
 import type { Payload } from 'payload'
 import type { PushSubscription } from '@/payload-types'
 import { loadGameEvents } from './server'
-import { eventPhase } from './model'
+import { eventPhase, eventNotificationRun } from './model'
 import { getGameUserData } from '@/utilities/game-data'
 import { checkRequirement } from '@/utilities/requirements'
 import { analyzeRequirements } from '@/utilities/requirements/analysis'
@@ -44,7 +44,7 @@ export async function dispatchEventNotifications(
   let processed = 0
   for (const event of events) {
     const id = createHash('sha256')
-      .update(`${subscription.id}:${event.id}`)
+      .update(`${subscription.id}:${eventNotificationRun(event)}`)
       .digest('hex')
     if (
       await payload.findByID({

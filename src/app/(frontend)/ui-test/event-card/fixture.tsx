@@ -19,6 +19,7 @@ export function EventCardFixture() {
       startAt: '2026-09-10T12:00:00Z',
       endAt: '2026-09-11T12:00:00Z',
       phase: index === 0 ? ('active' as const) : ('scheduled' as const),
+      timingMode: index === 0 ? ('manual' as const) : ('scheduled' as const),
     })),
   }
   return (

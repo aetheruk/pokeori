@@ -158,7 +158,9 @@ export function PlayerEventsCard({
                 Starts {new Date(event.startAt).toLocaleString()}
               </p>
               <p className="mt-1 text-xs text-game-muted">
-                Ends {new Date(event.endAt).toLocaleString()}
+                {event.timingMode === 'manual'
+                  ? 'Until switched off by an admin'
+                  : `Ends ${new Date(event.endAt).toLocaleString()}`}
               </p>
             </article>
           ))}

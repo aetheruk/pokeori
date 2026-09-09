@@ -182,6 +182,7 @@ export function EventStudio({
       duplicate
         ? {
             ...value,
+            ...(value.timingMode === 'manual' ? { enabled: false } : {}),
             name: `${value.name} copy`,
             ...{
               startAt: freshDraft().startAt,
@@ -202,11 +203,13 @@ export function EventStudio({
         publish,
         requestId: crypto.randomUUID(),
       })
-      setSelected(saved)
+      edit(saved)
+      setTab(tab)
     })
   const live = selected && eventPhase(selected) === 'active'
   const frozen =
-    selected && !['draft', 'scheduled'].includes(eventPhase(selected))
+    selected &&
+    !['draft', 'scheduled', 'disabled'].includes(eventPhase(selected))
   const choices = (studio?.catalog[kind] || []).filter((entry: any) =>
     `${entry.name} ${entry.category} ${entry.subCategory}`
       .toLowerCase()
@@ -245,11 +248,17 @@ export function EventStudio({
             value={filter}
             onChange={(event) => setFilter(event.target.value)}
           >
-            {['all', 'draft', 'scheduled', 'active', 'ended', 'cancelled'].map(
-              (value) => (
-                <option key={value}>{value}</option>
-              ),
-            )}
+            {[
+              'all',
+              'draft',
+              'scheduled',
+              'active',
+              'disabled',
+              'ended',
+              'cancelled',
+            ].map((value) => (
+              <option key={value}>{value}</option>
+            ))}
           </select>
           <div className="space-y-3">
             {studio?.events
@@ -264,8 +273,9 @@ export function EventStudio({
                   <h3 className="font-semibold">{event.title}</h3>
                   <p className="text-sm text-game-muted">
                     {eventPhase(event)} ·{' '}
-                    {new Date(event.startAt).toLocaleString()} –{' '}
-                    {new Date(event.endAt).toLocaleString()}
+                    {event.timingMode === 'manual'
+                      ? 'Manual on/off'
+                      : `${new Date(event.startAt).toLocaleString()} – ${new Date(event.endAt).toLocaleString()}`}
                   </p>
                   <p className="text-sm">
                     {event.content.length} additions · {event.modifiers.length}{' '}
@@ -562,53 +572,116 @@ export function EventStudio({
             )}
             {tab === 'Schedule' && (
               <>
-                <p className="text-sm text-game-muted">
-                  Times shown in{' '}
-                  {Intl.DateTimeFormat().resolvedOptions().timeZone}.
-                </p>
-                <fieldset disabled={Boolean(frozen)} className="space-y-3">
-                  <DateField
-                    label="Starts"
-                    value={draft.startAt}
-                    onChange={(startAt) => setDraft({ ...draft, startAt })}
-                  />
-                  <Button
-                    variant="outline"
-                    onClick={() =>
-                      setDraft({ ...draft, startAt: new Date().toISOString() })
-                    }
-                  >
-                    Start now when published
-                  </Button>
-                </fieldset>
-                <DateField
-                  label="Ends"
-                  value={draft.endAt}
-                  onChange={(endAt) => setDraft({ ...draft, endAt })}
-                />
                 <label className="block text-sm">
-                  Duration (hours)
-                  <input
+                  Timing mode
+                  <select
                     className={field}
-                    type="number"
-                    min="0.01"
-                    step="any"
-                    value={
-                      (Date.parse(draft.endAt) - Date.parse(draft.startAt)) /
-                      3600000
-                    }
+                    disabled={selected?.status === 'published'}
+                    value={draft.timingMode || 'scheduled'}
                     onChange={(event) =>
                       setDraft({
                         ...draft,
-                        endAt: new Date(
-                          Date.parse(draft.startAt) +
-                            Math.max(0.01, Number(event.target.value)) *
-                              3600000,
-                        ).toISOString(),
+                        timingMode: event.target.value as
+                          | 'manual'
+                          | 'scheduled',
+                        enabled: false,
+                        startAt: freshDraft().startAt,
+                        endAt: freshDraft().endAt,
                       })
                     }
-                  />
+                  >
+                    <option value="scheduled">Scheduled start and end</option>
+                    <option value="manual">Manual on/off</option>
+                  </select>
                 </label>
+                {draft.timingMode === 'manual' ? (
+                  <div className="space-y-3 rounded-lg border border-game-border bg-game-surface p-4">
+                    <h3 className="font-semibold">
+                      Available until you switch it off
+                    </h3>
+                    <p className="text-sm text-game-muted">
+                      No dates or duration needed. Disabling hides the event and
+                      stops new entries. Existing battles and encounters can
+                      finish. Re-enabling keeps task progress and shop stock
+                      history.
+                    </p>
+                    {!selected || selected.status === 'draft' ? (
+                      <label className="flex min-h-11 items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={Boolean(draft.enabled)}
+                          onChange={(event) =>
+                            setDraft({
+                              ...draft,
+                              enabled: event.target.checked,
+                            })
+                          }
+                        />
+                        Enable when published
+                      </label>
+                    ) : (
+                      <p className="text-sm font-semibold">
+                        Currently {selected.enabled ? 'on' : 'off'}. Use{' '}
+                        {selected.enabled ? 'Disable event' : 'Enable event'}{' '}
+                        below.
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-sm text-game-muted">
+                      Times shown in{' '}
+                      {Intl.DateTimeFormat().resolvedOptions().timeZone}.
+                    </p>
+                    <fieldset disabled={Boolean(frozen)} className="space-y-3">
+                      <DateField
+                        label="Starts"
+                        value={draft.startAt}
+                        onChange={(startAt) => setDraft({ ...draft, startAt })}
+                      />
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          setDraft({
+                            ...draft,
+                            startAt: new Date().toISOString(),
+                          })
+                        }
+                      >
+                        Start now when published
+                      </Button>
+                    </fieldset>
+                    <DateField
+                      label="Ends"
+                      value={draft.endAt}
+                      onChange={(endAt) => setDraft({ ...draft, endAt })}
+                    />
+                    <label className="block text-sm">
+                      Duration (hours)
+                      <input
+                        className={field}
+                        type="number"
+                        min="0.01"
+                        step="any"
+                        value={
+                          (Date.parse(draft.endAt) -
+                            Date.parse(draft.startAt)) /
+                          3600000
+                        }
+                        onChange={(event) =>
+                          setDraft({
+                            ...draft,
+                            endAt: new Date(
+                              Date.parse(draft.startAt) +
+                                Math.max(0.01, Number(event.target.value)) *
+                                  3600000,
+                            ).toISOString(),
+                          })
+                        }
+                      />
+                    </label>
+                  </>
+                )}
                 <fieldset disabled={Boolean(frozen)} className="space-y-3">
                   <label className="flex min-h-11 items-center gap-2">
                     <input
@@ -625,7 +698,7 @@ export function EventStudio({
                     />
                     Show an Explore announcement
                   </label>
-                  {draft.visibleAt && (
+                  {draft.visibleAt && draft.timingMode !== 'manual' && (
                     <DateField
                       label="Announcement visible from"
                       value={draft.visibleAt}
@@ -707,8 +780,9 @@ export function EventStudio({
                 </h3>
                 <p>{draft.description}</p>
                 <p>
-                  {new Date(draft.startAt).toLocaleString()} –{' '}
-                  {new Date(draft.endAt).toLocaleString()}
+                  {draft.timingMode === 'manual'
+                    ? `Manual event · ${draft.enabled ? 'On until switched off' : 'Off until enabled by an admin'}`
+                    : `${new Date(draft.startAt).toLocaleString()} – ${new Date(draft.endAt).toLocaleString()}`}
                 </p>
                 {draft.content.map((entry, index) => (
                   <p key={index}>
@@ -748,18 +822,22 @@ export function EventStudio({
                   variant="outline"
                   onClick={() => void save(false)}
                 >
-                  Save draft
+                  {selected?.status === 'published'
+                    ? 'Save changes'
+                    : 'Save draft'}
                 </Button>
-                <Button
-                  disabled={
-                    busy ||
-                    tab !== 'Review' ||
-                    (draft.modifiers.length > 0 && !preview)
-                  }
-                  onClick={() => void save(true)}
-                >
-                  Publish event
-                </Button>
+                {selected?.status !== 'published' && (
+                  <Button
+                    disabled={
+                      busy ||
+                      tab !== 'Review' ||
+                      (draft.modifiers.length > 0 && !preview)
+                    }
+                    onClick={() => void save(true)}
+                  >
+                    Publish event
+                  </Button>
+                )}
               </>
             )}
             {live && (
@@ -776,7 +854,9 @@ export function EventStudio({
                             action: 'update',
                             title: draft.title,
                             description: draft.description,
-                            endAt: draft.endAt,
+                            ...(draft.timingMode !== 'manual'
+                              ? { endAt: draft.endAt }
+                              : {}),
                           },
                           crypto.randomUUID(),
                         ),
@@ -786,25 +866,47 @@ export function EventStudio({
                 >
                   Save live details
                 </Button>
+                {selected.timingMode !== 'manual' && (
+                  <Button
+                    disabled={busy}
+                    variant="outline"
+                    onClick={() =>
+                      void run(async () => {
+                        await changeGameEvent(
+                          selected.id,
+                          selected.revision,
+                          { action: 'end' },
+                          crypto.randomUUID(),
+                        )
+                        setDraft(null)
+                      })
+                    }
+                  >
+                    End now
+                  </Button>
+                )}
+              </>
+            )}
+            {selected?.status === 'published' &&
+              selected.timingMode === 'manual' && (
                 <Button
                   disabled={busy}
-                  variant="outline"
+                  variant={selected.enabled ? 'outline' : 'default'}
                   onClick={() =>
                     void run(async () => {
-                      await changeGameEvent(
+                      const next = await changeGameEvent(
                         selected.id,
                         selected.revision,
-                        { action: 'end' },
+                        { action: selected.enabled ? 'disable' : 'enable' },
                         crypto.randomUUID(),
                       )
-                      setDraft(null)
+                      edit(next)
                     })
                   }
                 >
-                  End now
+                  {selected.enabled ? 'Disable event' : 'Enable event'}
                 </Button>
-              </>
-            )}
+              )}
             {selected &&
               ['draft', 'scheduled'].includes(eventPhase(selected)) && (
                 <Button

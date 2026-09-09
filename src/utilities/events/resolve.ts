@@ -8,7 +8,12 @@ import {
   type GameEventDefinition,
 } from './model'
 
-export type EventContext = { id: string; title: string; endAt: string }
+export type EventContext = {
+  id: string
+  title: string
+  endAt: string
+  timingMode?: 'scheduled' | 'manual'
+}
 export type EffectiveConfig<K extends EventKind> = EventConfigMap[K] & {
   eventContexts?: EventContext[]
 }
@@ -178,10 +183,12 @@ export function assertNoEventConflicts(
       .slice(index + 1)
       .forEach((right) => check(left, right, candidate.title)),
   )
+  if (candidate.timingMode === 'manual' && !candidate.enabled) return
   for (const other of others) {
     if (
       other.id === candidate.id ||
       other.status !== 'published' ||
+      (other.timingMode === 'manual' && !other.enabled) ||
       Date.parse(candidate.startAt) >= Date.parse(other.endAt) ||
       Date.parse(other.startAt) >= Date.parse(candidate.endAt)
     )
@@ -245,7 +252,12 @@ export function resolveEventCatalog<K extends EventKind>(
       configs.push({
         ...config,
         eventContexts: [
-          { id: event.id, title: event.title, endAt: event.endAt },
+          {
+            id: event.id,
+            title: event.title,
+            endAt: event.endAt,
+            timingMode: event.timingMode,
+          },
         ],
       })
     }
@@ -266,10 +278,12 @@ export function resolveEventCatalog<K extends EventKind>(
           ...modifier,
           value: scopeReferences(
             modifier.value,
-            new Map(event.content.map((entry) => [
-              String(entry.config.id),
-              eventContentId(event.id, String(entry.config.id)),
-            ])),
+            new Map(
+              event.content.map((entry) => [
+                String(entry.config.id),
+                eventContentId(event.id, String(entry.config.id)),
+              ]),
+            ),
           ),
         }))
         .map((modifier) =>
@@ -302,6 +316,7 @@ export function resolveEventCatalog<K extends EventKind>(
           id: event.id,
           title: event.title,
           endAt: event.endAt,
+          timingMode: event.timingMode,
         })),
       ],
     }
