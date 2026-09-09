@@ -41,6 +41,15 @@ jobs:
         with:
           bun-version-file: package.json
       - run: bun install --frozen-lockfile
+      - name: Exclude unused Chrome apt source
+        # Playwright downloads its own Chromium. The runner's Google Chrome
+        # repository can have temporarily inconsistent indexes during updates.
+        run: |
+          for source in /etc/apt/sources.list.d/google-chrome.list /etc/apt/sources.list.d/google-chrome.sources; do
+            if [ -f "$source" ]; then
+              sudo mv "$source" "$RUNNER_TEMP/"
+            fi
+          done
       - run: bunx playwright install --with-deps chromium
       - run: docker compose -p pokeori-audit-test -f compose.test.yml up -d --wait
       - name: Initialize isolated MongoDB replica set
