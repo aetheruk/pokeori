@@ -44,6 +44,8 @@ import {
   eventPhase,
   type EventKind,
   type GameEventDefinition,
+  MANUAL_EVENT_END,
+  setManualEventEnabled,
 } from './model'
 import {
   assertNoEventConflicts,
@@ -54,21 +56,42 @@ import { eligibleGameEvents, loadGameEvents } from './server'
 import { acceptEventTaskForUser } from './participation'
 import { validateEventReferences } from './references'
 
-function validateEffectiveSchedule(candidate: GameEventDefinition, others: GameEventDefinition[]) {
+function validateEffectiveSchedule(
+  candidate: GameEventDefinition,
+  others: GameEventDefinition[],
+) {
   assertNoEventConflicts(candidate, others)
-  const events = [...others.filter((event) => event.id !== candidate.id), candidate]
+  const events = [
+    ...others.filter((event) => event.id !== candidate.id),
+    candidate,
+  ]
   const boundaries = new Set([
     Date.parse(candidate.startAt),
-    ...events.flatMap((event) => [Date.parse(event.startAt), Date.parse(event.endAt)]),
+    ...events.flatMap((event) => [
+      Date.parse(event.startAt),
+      Date.parse(event.endAt),
+    ]),
   ])
   for (const boundary of boundaries) {
-    if (boundary < Date.parse(candidate.startAt) || boundary >= Date.parse(candidate.endAt)) continue
+    if (
+      boundary < Date.parse(candidate.startAt) ||
+      boundary >= Date.parse(candidate.endAt)
+    )
+      continue
     for (const kind of Object.keys(eventCatalog) as EventKind[]) {
-      for (const effective of resolveEventCatalog(kind, eventCatalog[kind], events, boundary)) {
+      for (const effective of resolveEventCatalog(
+        kind,
+        eventCatalog[kind],
+        events,
+        boundary,
+      )) {
         if (!effective.eventContexts?.length) continue
         const { eventContexts: _, ...content } = effective
         const result = eventContentSchemas[kind].safeParse(content)
-        if (!result.success) throw new Error(`Invalid effective ${kind} ${effective.name}: ${result.error.message}`)
+        if (!result.success)
+          throw new Error(
+            `Invalid effective ${kind} ${effective.name}: ${result.error.message}`,
+          )
       }
     }
   }
@@ -196,19 +219,44 @@ export async function saveGameEvent(
         if (
           old &&
           eventPhase(definition(old)) !== 'draft' &&
+          eventPhase(definition(old)) !== 'disabled' &&
           eventPhase(definition(old)) !== 'scheduled'
         )
           throw new Error('Gameplay settings are frozen after activation')
         const id = old?.id || randomUUID()
         const status: GameEventDefinition['status'] =
           options.publish || old?.status === 'published' ? 'published' : 'draft'
+        if (
+          old?.status === 'published' &&
+          (definition(old).timingMode || 'scheduled') !==
+            (parsed.timingMode || 'scheduled')
+        )
+          throw new Error(
+            'Duplicate the event to change its timing mode after publication',
+          )
         const candidate: GameEventDefinition = {
           ...parsed,
           id,
           status,
           revision: (old?.revision || 0) + 1,
         }
-        if (status === 'published' && Date.parse(candidate.endAt) <= Date.now())
+        if (candidate.timingMode === 'manual') {
+          candidate.enabled = Boolean(parsed.enabled)
+          candidate.startAt = candidate.enabled
+            ? new Date().toISOString()
+            : old?.startAt || new Date().toISOString()
+          candidate.endAt = candidate.enabled
+            ? MANUAL_EVENT_END
+            : old?.status === 'published'
+              ? old.endAt
+              : new Date().toISOString()
+          candidate.visibleAt = parsed.visibleAt ? candidate.startAt : null
+        }
+        if (
+          candidate.timingMode !== 'manual' &&
+          status === 'published' &&
+          Date.parse(candidate.endAt) <= Date.now()
+        )
           throw new Error('Event must end in the future')
         const localIds = new Set(
           candidate.content.map((entry) => String(entry.config.id)),
@@ -224,7 +272,10 @@ export async function saveGameEvent(
           validateModifier(modifier, target)
           validateEventReferences(modifier.value, localIds)
         }
-        if (status === 'published') {
+        if (
+          status === 'published' &&
+          (candidate.timingMode !== 'manual' || candidate.enabled)
+        ) {
           const others = await payload.find({
             collection: 'game-events',
             where: {
@@ -241,7 +292,13 @@ export async function saveGameEvent(
           status,
           startAt: candidate.startAt,
           endAt: candidate.endAt,
-          definition: parsed,
+          definition: {
+            ...parsed,
+            startAt: candidate.startAt,
+            endAt: candidate.endAt,
+            visibleAt: candidate.visibleAt,
+            enabled: candidate.enabled,
+          },
           revision: candidate.revision,
           createdBy: old?.createdBy || user.id,
         }
@@ -273,7 +330,7 @@ export async function changeGameEvent(
   id: string,
   revision: number,
   change: {
-    action: 'cancel' | 'end' | 'update'
+    action: 'cancel' | 'end' | 'update' | 'enable' | 'disable'
     title?: string
     description?: string
     endAt?: string
@@ -295,22 +352,43 @@ export async function changeGameEvent(
         })
         if (old.revision !== revision)
           throw new Error('This event changed. Reload before saving.')
-        const event = definition(old)
+        let event = definition(old)
         const phase = eventPhase(event)
-        if (change.action === 'cancel') {
+        if (change.action === 'enable' || change.action === 'disable') {
+          event = setManualEventEnabled(event, change.action === 'enable')
+          if (event.enabled) {
+            if (event.visibleAt) event.visibleAt = event.startAt
+            const others = await payload.find({
+              collection: 'game-events',
+              where: {
+                status: { equals: 'published' },
+                endAt: { greater_than: event.startAt },
+                startAt: { less_than: event.endAt },
+              },
+              pagination: false,
+              req,
+            })
+            validateEffectiveSchedule(event, others.docs.map(definition))
+          }
+        } else if (change.action === 'cancel') {
           if (!['draft', 'scheduled'].includes(phase))
             throw new Error('Only unstarted events can be cancelled')
           event.status = 'cancelled'
         } else {
           if (phase !== 'active')
             throw new Error('Only active events can be changed here')
-          if (change.action === 'end') event.endAt = new Date().toISOString()
-          else {
+          if (change.action === 'end') {
+            if (event.timingMode === 'manual')
+              throw new Error('Use Disable event for manual events')
+            event.endAt = new Date().toISOString()
+          } else {
             if (change.title !== undefined)
               event.title = z.string().min(1).max(150).parse(change.title)
             if (change.description !== undefined)
               event.description = z.string().max(4000).parse(change.description)
             if (change.endAt !== undefined) {
+              if (event.timingMode === 'manual')
+                throw new Error('Manual events do not have an end date')
               const end = z.iso.datetime().parse(change.endAt)
               if (Date.parse(end) < Date.parse(event.endAt))
                 throw new Error('Use End now to shorten an active event')
@@ -343,6 +421,7 @@ export async function changeGameEvent(
           data: {
             status,
             revision: nextRevision,
+            startAt: event.startAt,
             endAt: event.endAt,
             definition: draft,
           },
@@ -451,6 +530,7 @@ export async function getPlayerEvents() {
       .filter(
         (event) =>
           event.visibleAt &&
+          ['active', 'scheduled'].includes(eventPhase(event, now)) &&
           Date.parse(event.visibleAt) <= now &&
           Date.parse(event.endAt) > now,
       )
@@ -461,6 +541,7 @@ export async function getPlayerEvents() {
         icon: event.icon,
         startAt: event.startAt,
         endAt: event.endAt,
+        timingMode: event.timingMode,
         phase: eventPhase(event, now),
       })),
     content,
@@ -607,6 +688,13 @@ export async function previewGameEvent(input: unknown, existingId?: string) {
   const draft = eventDraftSchema.parse(input)
   const candidate: GameEventDefinition = {
     ...draft,
+    ...(draft.timingMode === 'manual'
+      ? {
+          enabled: true,
+          startAt: new Date().toISOString(),
+          endAt: MANUAL_EVENT_END,
+        }
+      : {}),
     id: existingId || 'preview',
     status: 'published',
     revision: 1,

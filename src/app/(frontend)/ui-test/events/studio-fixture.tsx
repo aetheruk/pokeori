@@ -6,6 +6,8 @@ import { EventReferenceSearch } from '@/components/game/events/schema-form'
 import {
   eventDraftSchema,
   eventContentSchemas,
+  setManualEventEnabled,
+  MANUAL_EVENT_END,
   type GameEventDefinition,
 } from '@/utilities/events/model'
 
@@ -29,6 +31,14 @@ export function EventStudioFixture({
           eventContentSchemas[entry.kind].parse(entry.config)
         const event: GameEventDefinition = {
           ...draft,
+          ...(draft.timingMode === 'manual'
+            ? {
+                startAt: new Date().toISOString(),
+                endAt: draft.enabled
+                  ? MANUAL_EVENT_END
+                  : new Date().toISOString(),
+              }
+            : {}),
           id: 'fixture-event',
           status: options.publish ? 'published' : 'draft',
           revision: 1,
@@ -36,7 +46,17 @@ export function EventStudioFixture({
         events.splice(0, events.length, event)
         return event
       },
-      changeGameEvent: async () => events[0],
+      changeGameEvent: async (
+        _id: string,
+        _revision: number,
+        change: { action: string },
+      ) => {
+        events[0] = {
+          ...setManualEventEnabled(events[0], change.action === 'enable'),
+          revision: events[0].revision + 1,
+        }
+        return events[0]
+      },
       previewGameEvent: async () => [],
     }
   }, [schemas])

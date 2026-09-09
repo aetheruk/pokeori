@@ -2,6 +2,9 @@ import { describe, expect, test } from 'bun:test'
 import {
   eventDraftSchema,
   eventPhase,
+  setManualEventEnabled,
+  MANUAL_EVENT_END,
+  eventNotificationRun,
   type GameEventDefinition,
 } from '@/utilities/events/model'
 import {
@@ -55,6 +58,35 @@ function event(
   }
 }
 describe('game events', () => {
+  test('manual events toggle indefinitely without replacing content identities', () => {
+    const disabled = event({ timingMode: 'manual', enabled: false, content: [{ kind: 'location', config: encounter }] })
+    expect(eventPhase(disabled, now)).toBe('disabled')
+    expect(resolveEventCatalog('location', [], [disabled], now)).toHaveLength(0)
+    const enabled = setManualEventEnabled(disabled, true, now)
+    expect(enabled.endAt).toBe(MANUAL_EVENT_END)
+    const first = resolveEventCatalog('location', [], [enabled], now)[0]
+    expect(eventPhase(enabled, now + 365 * 86400000)).toBe('active')
+    expect(first.eventContexts?.[0].timingMode).toBe('manual')
+    const paused = setManualEventEnabled(enabled, false, now + 1000)
+    expect(Date.parse(paused.endAt)).toBe(now + 1000)
+    expect(resolveEventCatalog('location', [], [paused], now + 1000)).toHaveLength(0)
+    const resumed = setManualEventEnabled(paused, true, now + 2000)
+    expect(resolveEventCatalog('location', [], [resumed], now + 2000)[0].id).toBe(first.id)
+    expect(eventNotificationRun(resumed)).not.toBe(eventNotificationRun(enabled))
+    expect(eventNotificationRun(event())).toBe('test')
+    expect(() => setManualEventEnabled(event(), true)).toThrow('manual')
+    expect(() => setManualEventEnabled({ ...disabled, status: 'draft' }, true)).toThrow('published')
+    expect(() => setManualEventEnabled(enabled, true)).toThrow('already enabled')
+  })
+  test('manual events reserve future modifier windows only while enabled', () => {
+    const manual = setManualEventEnabled(event({ timingMode: 'manual', enabled: false, modifiers: [{ kind: 'location', targetId: 'route-1', field: 'timer', operation: 'replace', value: 30 }] }), true, now)
+    const future = event({ id: 'future', startAt: new Date(now + 86400000).toISOString(), endAt: new Date(now + 2 * 86400000).toISOString(), modifiers: [{ ...manual.modifiers[0], value: 60 }] })
+    expect(() => assertNoEventConflicts(manual, [future])).toThrow('Conflicting')
+    expect(() => assertNoEventConflicts(future, [manual])).toThrow('Conflicting')
+    const off = setManualEventEnabled(manual, false, now + 1000)
+    expect(() => assertNoEventConflicts(off, [future])).not.toThrow()
+    expect(() => assertNoEventConflicts(future, [off])).not.toThrow()
+  })
   test('modifier activity references use the run identity without rewriting item rewards', () => {
     const definition = event({
       content: [{ kind: 'location', config: encounter }],
