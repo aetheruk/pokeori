@@ -4087,9 +4087,9 @@ describe('static data references', () => {
     expect(route10Study?.settings.levelRange).toEqual({ min: 14, max: 18 })
   })
 
-  test('Rock Push teleport test covers win tiles and multi-screen teleporters', () => {
+  test('Grid Adventure Test combines multi-room mechanics', () => {
     const game = allGames.find(
-      (entry) => entry.id === 'pallet-rock-teleport-test',
+      (entry) => entry.id === 'grid-adventure-test',
     )
     const screens = game?.settings.screens || []
 
@@ -4097,12 +4097,12 @@ describe('static data references', () => {
     expect(game?.settings.startScreen).toBe('entry')
     expect(screens.map((screen) => screen.id).sort()).toEqual([
       'entry',
-      'treasure',
-      'upper',
+      'frost',
+      'vault',
     ])
-    expect(screens.some((screen) => (screen.winTiles || []).length > 0)).toBe(
-      true,
-    )
+    expect(screens.flatMap((screen) => screen.holes || [])).toHaveLength(2)
+    expect(screens.flatMap((screen) => screen.ice || []).length).toBeGreaterThan(0)
+    expect(screens.flatMap((screen) => screen.prizes || [])).toHaveLength(3)
     expect(
       screens
         .flatMap((screen) => screen.teleporters || [])

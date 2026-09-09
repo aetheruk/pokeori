@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.31.4`: Kanto/Test now has one `grid-adventure-test` instead of the five separate Rock Push mechanic tests and Voltorb renderer test. Its three connected rooms require rock and player ice slides, item collection, paired and one-way teleporters, a wild encounter, and a trainer battle before the final hole completes the course. Story/route grid entries are retained. Art Academy no longer shows the keyboard instruction line; keyboard drawing and its screen-reader description remain available.
+
 - Release `0.31.3`: Ditto now uses a four-direction overworld walking sheet for the Neither trainer choice across all grid games. Voltorb and protected Rattata/Ditto use matching overworld sprites, with Following Pokémon EX credits in Credits & Legal. Movement timing and gameplay rules are unchanged.
 
 - Release `0.31.2`: Grid walking is slowed from 150ms to 360ms per tile, with each directional sprite frame held for 90ms. Rock Push shares the same normal movement timing; ice slides use a longer travel duration without speeding up the walking frames. Voltorb/Echo input pacing follows the new duration. Reduced motion and server move validation are unchanged.

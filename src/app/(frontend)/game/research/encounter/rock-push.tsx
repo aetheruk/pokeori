@@ -391,146 +391,154 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
     return null
   }
 
-  // Initialize Game Logic
+  const initializingRef = useRef(false)
+
+  // A second start must not consume an already-restored room checkpoint.
   const initGame = useCallback(async () => {
-    const res = await startGame(encounter.id)
-    if (!res.success) {
-      console.error('Failed to start:', res.error)
-      return
-    }
+    if (initializingRef.current) return
+    initializingRef.current = true
+    try {
+      const res = await startGame(encounter.id)
+      if (!res.success) {
+        console.error('Failed to start:', res.error)
+        return
+      }
 
-    setGameStarted(true)
-    setGameEnded(false)
-    setResult(null)
-    setPendingObjectResult(null)
-    setMoves(0)
-    moveProofRef.current = []
-    setRocksSolved(0) // Reset logical progress for the puzzle
-    setHistory([])
-    setBlockedOffset(null)
-    setFallingRock(null)
-    setPushedRockId(null)
-    setIsSliding(false)
-    slidingRef.current = false
-    if (slideTimerRef.current) clearTimeout(slideTimerRef.current)
-    setMovementDurations({
-      player: defaultMoveDurationMs,
-      rocks: {},
-    })
-    setCollectedPrizeIds(new Set())
-    setClearedObjectKeys(new Set())
-    setRevealedBarrierKeys(new Set())
+      setGameStarted(true)
+      setGameEnded(false)
+      setResult(null)
+      setPendingObjectResult(null)
+      setMoves(0)
+      moveProofRef.current = []
+      setRocksSolved(0) // Reset logical progress for the puzzle
+      setHistory([])
+      setBlockedOffset(null)
+      setFallingRock(null)
+      setPushedRockId(null)
+      setIsSliding(false)
+      slidingRef.current = false
+      if (slideTimerRef.current) clearTimeout(slideTimerRef.current)
+      setMovementDurations({
+        player: defaultMoveDurationMs,
+        rocks: {},
+      })
+      setCollectedPrizeIds(new Set())
+      setClearedObjectKeys(new Set())
+      setRevealedBarrierKeys(new Set())
 
-    if (res.restored && res.expiry) {
-      const remaining = Math.max(
-        0,
-        Math.floor((res.expiry - Date.now()) / 1000),
+      if (res.restored && res.expiry) {
+        const remaining = Math.max(
+          0,
+          Math.floor((res.expiry - Date.now()) / 1000),
+        )
+        setTimeLeft(remaining)
+      } else {
+        setTimeLeft(encounter.settings.timeLimit || 120)
+      }
+
+      const nextScreenStates = Object.fromEntries(
+        screenConfigs.map((screen) => [
+          screen.id,
+          buildScreenRuntimeState(
+            screen,
+            encounter.settings.grid_size || 8,
+            encounter.settings.tilePaletteId,
+          ),
+        ]),
       )
-      setTimeLeft(remaining)
-    } else {
-      setTimeLeft(encounter.settings.timeLimit || 120)
-    }
 
-    const nextScreenStates = Object.fromEntries(
-      screenConfigs.map((screen) => [
-        screen.id,
-        buildScreenRuntimeState(
-          screen,
-          encounter.settings.grid_size || 8,
-          encounter.settings.tilePaletteId,
-        ),
-      ]),
-    )
-
-    let resumeState: GridObjectResumeState | null = null
-    if (typeof window !== 'undefined') {
-      const url = new URL(window.location.href)
-      if (url.searchParams.get('gridReturn') === '1') {
-        try {
-          const serialized = window.sessionStorage.getItem(
-            `grid-puzzle-resume:${encounter.id}`,
-          )
-          if (serialized) {
-            const parsed = JSON.parse(serialized) as GridObjectResumeState
-            if (
-              parsed.encounterId === encounter.id &&
-              parsed.grid?.length &&
-              parsed.playerPos &&
-              parsed.pendingObjectKey &&
-              (parsed.pendingVictory === 'win' ||
-                parsed.pendingVictory === 'clear')
-            ) {
-              const outcome = url.searchParams.get('outcome')
-              if (outcome === 'won' || outcome === 'lost') {
-                parsed.pendingOutcome = outcome
+      let resumeState: GridObjectResumeState | null = null
+      if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href)
+        if (url.searchParams.get('gridReturn') === '1') {
+          try {
+            const serialized = window.sessionStorage.getItem(
+              `grid-puzzle-resume:${encounter.id}`,
+            )
+            if (serialized) {
+              const parsed = JSON.parse(serialized) as GridObjectResumeState
+              if (
+                parsed.encounterId === encounter.id &&
+                parsed.grid?.length &&
+                parsed.playerPos &&
+                parsed.pendingObjectKey &&
+                (parsed.pendingVictory === 'win' ||
+                  parsed.pendingVictory === 'clear')
+              ) {
+                const outcome = url.searchParams.get('outcome')
+                if (outcome === 'won' || outcome === 'lost') {
+                  parsed.pendingOutcome = outcome
+                }
+                resumeState = parsed
+                window.sessionStorage.removeItem(
+                  `grid-puzzle-resume:${encounter.id}`,
+                )
               }
-              resumeState = parsed
-              window.sessionStorage.removeItem(
-                `grid-puzzle-resume:${encounter.id}`,
-              )
             }
+          } catch {
+            // Ignore malformed or unavailable browser session state.
           }
-        } catch {
-          // Ignore malformed or unavailable browser session state.
         }
       }
-    }
 
-    if (resumeState) {
-      moveProofRef.current = resumeState.moveProof || []
-      const restoredScreenStates = resumeState.screenStates || nextScreenStates
-      const restoredActiveState =
-        restoredScreenStates[resumeState.activeScreenId]
-      setScreenStates(restoredScreenStates)
-      setActiveScreenId(resumeState.activeScreenId)
-      setGrid(cloneGrid(resumeState.grid))
-      setRocks(cloneRocks(resumeState.rocks || []))
-      setPlayerPos({ ...resumeState.playerPos })
-      setGridSize(
-        restoredActiveState?.gridSize || {
-          w: resumeState.grid[0]?.length || 8,
-          h: resumeState.grid.length || 8,
-        },
-      )
-      setRocksSolved(resumeState.rocksSolved || 0)
-      setMoves(resumeState.moves || 0)
-      setCollectedPrizeIds(new Set(resumeState.collectedPrizeIds || []))
-      setClearedObjectKeys(new Set(resumeState.clearedObjectKeys || []))
-      if (resumeState.pendingOutcome) {
-        setPendingObjectResult({
-          key: resumeState.pendingObjectKey,
-          victory: resumeState.pendingVictory,
-          outcome: resumeState.pendingOutcome,
-        })
+      if (resumeState) {
+        moveProofRef.current = resumeState.moveProof || []
+        const restoredScreenStates = resumeState.screenStates || nextScreenStates
+        const restoredActiveState =
+          restoredScreenStates[resumeState.activeScreenId]
+        setScreenStates(restoredScreenStates)
+        setActiveScreenId(resumeState.activeScreenId)
+        setGrid(cloneGrid(resumeState.grid))
+        setRocks(cloneRocks(resumeState.rocks || []))
+        setPlayerPos({ ...resumeState.playerPos })
+        setGridSize(
+          restoredActiveState?.gridSize || {
+            w: resumeState.grid[0]?.length || 8,
+            h: resumeState.grid.length || 8,
+          },
+        )
+        setRocksSolved(resumeState.rocksSolved || 0)
+        setMoves(resumeState.moves || 0)
+        setCollectedPrizeIds(new Set(resumeState.collectedPrizeIds || []))
+        setClearedObjectKeys(new Set(resumeState.clearedObjectKeys || []))
+        if (resumeState.pendingOutcome) {
+          setPendingObjectResult({
+            key: resumeState.pendingObjectKey,
+            victory: resumeState.pendingVictory,
+            outcome: resumeState.pendingOutcome,
+          })
+        }
+        setDeadlockedRockIds(
+          detectDeadlockedRocks(resumeState.grid, resumeState.rocks || []),
+        )
+        setMaxMoves(encounter.settings.maxMoves || null)
+        return
       }
+
+      const startScreenId =
+        encounter.settings.startScreen &&
+        nextScreenStates[encounter.settings.startScreen]
+          ? encounter.settings.startScreen
+          : screenConfigs[0]?.id || 'main'
+      const startScreen = nextScreenStates[startScreenId]
+
+      setScreenStates(nextScreenStates)
+      setActiveScreenId(startScreenId)
+      setGrid(startScreen?.grid || [])
+      setRocks(startScreen?.rocks || [])
+      setPlayerPos({ ...encounter.settings.playerStart })
+      setGridSize(startScreen?.gridSize || { w: 8, h: 8 })
       setDeadlockedRockIds(
-        detectDeadlockedRocks(resumeState.grid, resumeState.rocks || []),
+        detectDeadlockedRocks(startScreen?.grid || [], startScreen?.rocks || []),
       )
-      setMaxMoves(encounter.settings.maxMoves || null)
-      return
-    }
 
-    const startScreenId =
-      encounter.settings.startScreen &&
-      nextScreenStates[encounter.settings.startScreen]
-        ? encounter.settings.startScreen
-        : screenConfigs[0]?.id || 'main'
-    const startScreen = nextScreenStates[startScreenId]
-
-    setScreenStates(nextScreenStates)
-    setActiveScreenId(startScreenId)
-    setGrid(startScreen?.grid || [])
-    setRocks(startScreen?.rocks || [])
-    setPlayerPos({ ...encounter.settings.playerStart })
-    setGridSize(startScreen?.gridSize || { w: 8, h: 8 })
-    setDeadlockedRockIds(
-      detectDeadlockedRocks(startScreen?.grid || [], startScreen?.rocks || []),
-    )
-
-    if (encounter.settings.maxMoves) {
-      setMaxMoves(encounter.settings.maxMoves)
-    } else {
-      setMaxMoves(null)
+      if (encounter.settings.maxMoves) {
+        setMaxMoves(encounter.settings.maxMoves)
+      } else {
+        setMaxMoves(null)
+      }
+    } finally {
+      initializingRef.current = false
     }
   }, [encounter, screenConfigs])
 
