@@ -179,7 +179,13 @@ function ExploreCardComponent({
         >
           {parseText(displayName, trainerName)}
         </h3>
-        {(item.originalData as any)?.eventContexts?.map((event: any) => <p key={event.id} className="mt-1 text-xs text-game-ochre">{event.title} · {event.timingMode === 'manual' ? 'Until switched off' : `Ends ${new Date(event.endAt).toLocaleString()}`}</p>)}
+        {(item.originalData as any)?.eventContexts?.map((event: any) => (
+          <p key={event.id} className="mt-1 text-xs text-game-ochre">
+            {event.title}
+            {event.timingMode !== 'manual' && event.endAt &&
+              ` · Ends ${new Date(event.endAt).toLocaleString()}`}
+          </p>
+        ))}
         {isGrouped && (
           <div className="mt-3 flex flex-wrap gap-2">
             {groupedItems.map((groupedItem) => (
