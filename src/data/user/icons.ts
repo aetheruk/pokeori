@@ -8,6 +8,7 @@ export interface IconConfig {
 
 export const icons: IconConfig[] = [
   { id: 'ditto', name: 'Ditto', icon: { type: 'pokemon', id: '132' } },
+  { id: 'raticate', name: 'Raticate', icon: { type: 'pokemon', id: '20' } },
   { id: 'trainer-red', name: 'Red', icon: { type: 'trainer', id: 'red' } },
   { id: 'trainer-leaf', name: 'Leaf', icon: { type: 'trainer', id: 'leaf' } },
   { id: 'charmander', name: 'Charmander', icon: { type: 'pokemon', id: '4' } },

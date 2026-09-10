@@ -19,6 +19,11 @@ const palletOrientationRequirements: BattleConfig['requirements'] = [
   },
 ]
 
+const savageRaticateRollRequirement = {
+  type: 'roll' as const,
+  count: 10_000, // 1-in-100 on the shared 1,000,000-point server roll
+}
+
 export const palletTownBattles: BattleConfig[] = [
   {
     id: 'pallet-orientation-lab-rattata',
@@ -435,5 +440,76 @@ export const palletTownBattles: BattleConfig[] = [
     ],
     rewards: [],
     id: 'tutorial-battle',
+  },
+  {
+    id: 'pallet-town-savage-raticate',
+    name: 'Savage Raticate',
+    description:
+      "Oh no, this Raticate doesn’t look happy, I think I may have ransacked one too many Rattata Burrows.",
+    category: 'Kanto',
+    subCategory: 'Pallet Town',
+    icon: {
+      type: 'pokemon',
+      id: '20',
+    },
+    background: '/backgrounds/grassy-route.avif',
+    title: 'Savage Raticate',
+    maxPokemon: 1,
+    levelCap: 50,
+    isRandomEvent: true,
+    enemyAttackTelegraphChance: 80,
+    requirements: [
+      {
+        type: 'voyage_completed',
+        targetId: 'rattata-scavenge',
+        count: 10,
+      },
+      savageRaticateRollRequirement,
+      {
+        type: 'battle_result',
+        targetId: 'pallet-town-savage-raticate',
+        battleStatus: 'win',
+        count: 1,
+        inverse: true,
+      },
+    ],
+    enemyTeam: [
+      {
+        speciesId: 20,
+        formId: '20',
+        level: 50,
+        name: 'Savage Raticate',
+        ivs: {
+          hp: 31,
+          attack: 31,
+          defense: 31,
+          specialAttack: 31,
+          specialDefense: 31,
+          speed: 31,
+        },
+        evs: {
+          hp: 255,
+          attack: 255,
+          defense: 255,
+          specialAttack: 255,
+          specialDefense: 255,
+          speed: 255,
+        },
+      },
+    ],
+    rewards: [
+      {
+        type: 'icon',
+        targetId: 'raticate',
+        quantity: 1,
+        secret: true,
+      },
+      {
+        type: 'xp',
+        skill: 'battling',
+        quantity: 2_000,
+        dropChance: 100,
+      },
+    ],
   },
 ]
