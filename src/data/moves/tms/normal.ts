@@ -26765,7 +26765,7 @@ export const NORMAL_TM_MOVES: MoveConfig[] = [
     id: 'sketch',
     name: 'Sketch',
     description:
-      "The user studies the target's battle moves. If one can be newly recorded, there is a 25% chance to add it to Smeargle's Sketchbook.",
+      "The user studies the target's battle moves. If one can be newly recorded, the chance to add it to Smeargle's Sketchbook scales with Research Level: 25% at Level 1, 30% at Level 2, 35% at Level 3, 40% at Level 4, and 50% at Level 5.",
     stance: 'tech',
     target: 'enemy',
     forcedType: 'normal',

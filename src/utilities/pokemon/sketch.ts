@@ -4,7 +4,23 @@ import type { BattlePokemon } from '@/utilities/battle/types'
 
 export const SMEARGLE_FORM_ID = '235'
 export const SKETCH_MOVE_ID = 'sketch'
-export const SMEARGLE_SKETCH_CHANCE = 0.25
+export const SMEARGLE_SKETCH_CHANCES = {
+  1: 0.25,
+  2: 0.3,
+  3: 0.35,
+  4: 0.4,
+  5: 0.5,
+} as const
+
+export function getSmeargleSketchChance(researchLevel?: number): number {
+  const normalizedLevel = Number.isFinite(researchLevel)
+    ? Math.max(1, Math.min(5, Math.floor(researchLevel!)))
+    : 1
+
+  return SMEARGLE_SKETCH_CHANCES[
+    normalizedLevel as keyof typeof SMEARGLE_SKETCH_CHANCES
+  ]
+}
 
 function normalizeBattleMoveIds(pokemon: BattlePokemon): string[] {
   const source =
@@ -71,7 +87,8 @@ export function attemptSmeargleSketch(params: {
   if (candidateMoveIds.length === 0) return undefined
 
   const random = params.random ?? Math.random
-  if (random() >= SMEARGLE_SKETCH_CHANCE) return undefined
+  if (random() >= getSmeargleSketchChance(params.attacker.pokemonResearchLevel))
+    return undefined
 
   const index = Math.min(
     candidateMoveIds.length - 1,

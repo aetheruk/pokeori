@@ -12,6 +12,7 @@ import {
 } from '@/utilities/pokemon/pokemon-moves'
 import {
   attemptSmeargleSketch,
+  getSmeargleSketchChance,
   getAvailableSketchMoveIds,
   getSketchableOpponentMoveIds,
 } from '@/utilities/pokemon/sketch'
@@ -93,12 +94,24 @@ describe('pokemon move assignment helpers', () => {
     ).toEqual(['aerial-ace'])
   })
 
-  test('Sketch has a 25 percent chance to copy an available opponent move', () => {
+  test('Sketch chance scales with Smeargle research level', () => {
+    expect([1, 2, 3, 4, 5].map(getSmeargleSketchChance)).toEqual([
+      0.25,
+      0.3,
+      0.35,
+      0.4,
+      0.5,
+    ])
+    expect(getSmeargleSketchChance()).toBe(0.25)
+  })
+
+  test('Sketch uses the Smeargle research-level chance to copy an available opponent move', () => {
     const smeargle = makeBattlePokemon({
       formId: '235',
       speciesId: 235,
       name: 'Smeargle',
       types: ['Normal'],
+      pokemonResearchLevel: 2,
     })
     const opponent = makeBattlePokemon({
       battleMoveIds: ['thunderbolt', 'sketch'],
@@ -110,7 +123,7 @@ describe('pokemon move assignment helpers', () => {
         attacker: smeargle,
         opponent,
         random: (() => {
-          const rolls = [0.24, 0]
+          const rolls = [0.29, 0]
           return () => rolls.shift() ?? 0
         })(),
       }),
@@ -119,7 +132,7 @@ describe('pokemon move assignment helpers', () => {
       attemptSmeargleSketch({
         attacker: smeargle,
         opponent,
-        random: () => 0.25,
+        random: () => 0.3,
       }),
     ).toBeUndefined()
   })
