@@ -7,8 +7,11 @@ import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverla
 import { Button } from '@/components/ui/button'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { useArcadeSession } from '@/hooks/use-arcade-session'
-import { getCollisionMask, type CollisionMask } from '@/utilities/collision'
-import { SideScrollerStage } from './side-scroller-stage'
+import {
+  SIDE_SCROLLER_TRANSITION,
+  SideScrollerParallaxLayer,
+  SideScrollerStage,
+} from './side-scroller-stage'
 import { EndlessCollectibleSprite } from './endless-collectibles'
 import type { RunGameConfig } from '@/data/games/run/types'
 
@@ -19,8 +22,7 @@ export function RunGame({ encounter }: RunGameProps) {
   const session = useArcadeSession('run', encounter)
   const { simulation, countdown, result, timeLeft } = session
   const canvasRef = useRef<HTMLDivElement>(null)
-  // Sprite dimensions only; collisions are resolved by the shared simulator.
-  const masksRef = useRef<Record<string, CollisionMask>>({})
+  const spriteSheetHeightsRef = useRef<Record<string, number>>({})
   const score = simulation?.score || 0
   const playerY = simulation?.playerY ?? 0
   const collectibles = simulation?.collectibles || []
@@ -36,40 +38,48 @@ export function RunGame({ encounter }: RunGameProps) {
   const isBoosting = !!simulation && simulation.tick < simulation.boostUntil
   const jump = useCallback(() => session.sendInput('jump'), [session.sendInput])
   const boost = useCallback(() => session.sendInput('boost'), [session.sendInput])
-  // Load masks
+  // Only the sheet height is needed to derive frame counts. Collision is
+  // resolved by the shared simulator, so avoid an expensive canvas readback.
   useEffect(() => {
-    const loadMasks = async () => {
-      const urls: string[] = []
+    let disposed = false
+
+    const loadSpriteSheetHeights = async () => {
+      const urls = new Set<string>()
       // Player
       if (encounter.settings.player?.sheetUrl)
-        urls.push(encounter.settings.player.sheetUrl)
-      else if (encounter.settings.sprite) urls.push(encounter.settings.sprite)
+        urls.add(encounter.settings.player.sheetUrl)
 
       // Obstacles
       if (encounter.settings.groundObstacle.spriteConfig?.sheetUrl) {
-        urls.push(encounter.settings.groundObstacle.spriteConfig.sheetUrl)
-      } else if (encounter.settings.groundObstacle.sprite) {
-        urls.push(encounter.settings.groundObstacle.sprite)
+        urls.add(encounter.settings.groundObstacle.spriteConfig.sheetUrl)
       }
 
-      if (encounter.settings.aerialObstacle) {
-        if (encounter.settings.aerialObstacle.spriteConfig?.sheetUrl) {
-          urls.push(encounter.settings.aerialObstacle.spriteConfig.sheetUrl)
-        } else if (encounter.settings.aerialObstacle.sprite) {
-          urls.push(encounter.settings.aerialObstacle.sprite)
-        }
+      if (encounter.settings.aerialObstacle?.spriteConfig?.sheetUrl) {
+        urls.add(encounter.settings.aerialObstacle.spriteConfig.sheetUrl)
       }
 
-      for (const url of urls) {
-        try {
-          const mask = await getCollisionMask(url)
-          masksRef.current[url] = mask
-        } catch (e) {
-          console.error('Failed to load mask:', url, e)
-        }
-      }
+      await Promise.all(
+        [...urls].map(
+          (url) =>
+            new Promise<void>((resolve) => {
+              const image = new window.Image()
+              image.onload = () => {
+                if (!disposed) {
+                  spriteSheetHeightsRef.current[url] = image.naturalHeight
+                }
+                resolve()
+              }
+              image.onerror = () => resolve()
+              image.src = url
+            }),
+        ),
+      )
     }
-    loadMasks()
+
+    void loadSpriteSheetHeights()
+    return () => {
+      disposed = true
+    }
   }, [encounter.settings])
 
   useEffect(() => {
@@ -127,24 +137,13 @@ export function RunGame({ encounter }: RunGameProps) {
           className="object-cover"
         />
         {/* Parallax Backgrounds */}
-        {encounter.settings.parallaxLayers.map((layer, i) => {
-          const { backgroundPosition: backgroundAnchor = '0', ...layerStyle } =
-            layer.style ?? {}
-
-          return (
-            <div
-              key={i}
-              className="absolute inset-0 bg-repeat-x"
-              style={{
-                ...layerStyle,
-                backgroundImage: `url(${layer.url})`,
-                backgroundPosition: `${-parallaxOffsets[i]}px ${backgroundAnchor}`,
-                backgroundSize: layerStyle.backgroundSize || 'auto 100%',
-                backgroundRepeat: layerStyle.backgroundRepeat || 'repeat-x',
-              }}
-            />
-          )
-        })}
+        {encounter.settings.parallaxLayers.map((layer, i) => (
+          <SideScrollerParallaxLayer
+            key={`${layer.url}:${i}`}
+            layer={layer}
+            offset={parallaxOffsets[i]}
+          />
+        ))}
 
         {/* Player */}
         <div
@@ -158,10 +157,12 @@ export function RunGame({ encounter }: RunGameProps) {
         />
         {isBoosting && (
           <div
-            className="absolute h-8 w-20 rounded-full bg-gradient-to-l from-white/0 via-white/34 to-white/0 blur-[2px]"
+            className="absolute h-8 w-20 rounded-full bg-gradient-to-l from-white/0 via-white/34 to-white/0 blur-[2px] will-change-transform"
             style={{
               left: `${PLAYER_X - 68}px`,
-              bottom: `${GROUND_Y + playerY + renderedPlayerHeight * 0.36}px`,
+              bottom: `${GROUND_Y + renderedPlayerHeight * 0.36}px`,
+              transform: `translate3d(0, ${-playerY}px, 0)`,
+              transition: SIDE_SCROLLER_TRANSITION,
             }}
           />
         )}
@@ -171,11 +172,12 @@ export function RunGame({ encounter }: RunGameProps) {
 
           if (playerConfig && !isJumpingSprite) {
             const frameDuration = playerConfig.frameRate || 100
-            const playerMask = masksRef.current[playerConfig.sheetUrl]
+            const sheetHeight =
+              spriteSheetHeightsRef.current[playerConfig.sheetUrl]
             const frameCount =
               playerConfig.frameCount ||
-              (playerMask
-                ? Math.floor(playerMask.height / playerConfig.frameHeight)
+              (sheetHeight
+                ? Math.floor(sheetHeight / playerConfig.frameHeight)
                 : 1) ||
               1
             const frameIndex =
@@ -187,17 +189,18 @@ export function RunGame({ encounter }: RunGameProps) {
 
             return (
               <div
-                className="absolute transition-none drop-shadow-lg"
+                className="absolute drop-shadow-lg will-change-transform"
                 style={{
                   left: `${PLAYER_X}px`,
-                  bottom: `${GROUND_Y + playerY}px`,
+                  bottom: `${GROUND_Y}px`,
                   width: `${playerConfig.renderWidth}px`,
                   height: `${playerConfig.renderHeight}px`,
                   backgroundImage: `url(${playerConfig.sheetUrl})`,
                   backgroundPosition: `0 -${frameIndex * scaledFrameHeight}px`,
                   backgroundSize: `${playerConfig.renderWidth}px auto`,
                   backgroundRepeat: 'no-repeat',
-                  transform: 'scaleX(-1)', // Flip player sprite
+                  transform: `translate3d(0, ${-playerY}px, 0) scaleX(-1)`,
+                  transition: SIDE_SCROLLER_TRANSITION,
                 }}
               />
             )
@@ -205,12 +208,14 @@ export function RunGame({ encounter }: RunGameProps) {
 
           return (
             <div
-              className="absolute transition-none"
+              className="absolute will-change-transform"
               style={{
                 left: `${PLAYER_X}px`,
-                bottom: `${GROUND_Y + playerY}px`,
+                bottom: `${GROUND_Y}px`,
                 width: `${PLAYER_SIZE}px`,
                 height: `${PLAYER_SIZE}px`,
+                transform: `translate3d(0, ${-playerY}px, 0)`,
+                transition: SIDE_SCROLLER_TRANSITION,
               }}
             >
               <Image
@@ -232,12 +237,14 @@ export function RunGame({ encounter }: RunGameProps) {
         {collectibles.map((collectible) => (
           <div
             key={collectible.id}
-            className="absolute z-20"
+            className="absolute z-20 will-change-transform"
             style={{
-              left: `${collectible.x}px`,
+              left: '0px',
               bottom: `${collectible.y}px`,
               width: `${collectible.size}px`,
               height: `${collectible.size}px`,
+              transform: `translate3d(${collectible.x}px, 0, 0)`,
+              transition: SIDE_SCROLLER_TRANSITION,
             }}
           >
             <EndlessCollectibleSprite
@@ -251,11 +258,12 @@ export function RunGame({ encounter }: RunGameProps) {
         {obstacles.map((obs) => {
           if (obs.spriteConfig) {
             const frameDuration = obs.spriteConfig.frameRate || 100
-            const obsMask = masksRef.current[obs.spriteConfig.sheetUrl]
+            const sheetHeight =
+              spriteSheetHeightsRef.current[obs.spriteConfig.sheetUrl]
             const frameCount =
               obs.spriteConfig.frameCount ||
-              (obsMask
-                ? Math.floor(obsMask.height / obs.spriteConfig.frameHeight)
+              (sheetHeight
+                ? Math.floor(sheetHeight / obs.spriteConfig.frameHeight)
                 : 1) ||
               1
             const frameIndex =
@@ -268,9 +276,9 @@ export function RunGame({ encounter }: RunGameProps) {
             return (
               <div
                 key={obs.id}
-                className="absolute"
+                className="absolute will-change-transform"
                 style={{
-                  left: `${obs.x}px`,
+                  left: '0px',
                   bottom: `${obs.y}px`,
                   width: `${obs.width}px`,
                   height: `${obs.height}px`,
@@ -278,6 +286,8 @@ export function RunGame({ encounter }: RunGameProps) {
                   backgroundPosition: `0 -${frameIndex * scaledFrameHeight}px`,
                   backgroundSize: `${obs.spriteConfig.renderWidth}px auto`,
                   backgroundRepeat: 'no-repeat',
+                  transform: `translate3d(${obs.x}px, 0, 0)`,
+                  transition: SIDE_SCROLLER_TRANSITION,
                 }}
               />
             )
@@ -286,12 +296,14 @@ export function RunGame({ encounter }: RunGameProps) {
           return (
             <div
               key={obs.id}
-              className="absolute"
+              className="absolute will-change-transform"
               style={{
-                left: `${obs.x}px`,
+                left: '0px',
                 bottom: `${obs.y}px`,
                 width: `${obs.width}px`,
                 height: `${obs.height}px`,
+                transform: `translate3d(${obs.x}px, 0, 0)`,
+                transition: SIDE_SCROLLER_TRANSITION,
               }}
             >
               <Image

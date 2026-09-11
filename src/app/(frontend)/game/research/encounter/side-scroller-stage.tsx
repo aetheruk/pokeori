@@ -5,10 +5,15 @@ import {
   type ReactNode,
   type PointerEvent as ReactPointerEvent,
   useEffect,
+  useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react'
-import type { SideScrollerSceneConfig } from '@/data/games/shared'
+import type {
+  ParallaxLayer,
+  SideScrollerSceneConfig,
+} from '@/data/games/shared'
 import { cn } from '@/lib/utils'
 import {
   getRegionTimeZone,
@@ -18,6 +23,8 @@ import {
 const STAGE_SIZE = 600
 const TAP_DISTANCE_PX = 24
 const SWIPE_DISTANCE_PX = 45
+const FIXED_STEP_TRANSITION_MS = 1000 / 60
+export const SIDE_SCROLLER_TRANSITION = `transform ${FIXED_STEP_TRANSITION_MS}ms linear`
 
 interface OutsidePointerStart {
   pointerId: number
@@ -57,6 +64,78 @@ function getAtmosphere(scene?: SideScrollerSceneConfig) {
   }
 }
 
+function getPixelTileWidth(backgroundSize?: string) {
+  const width = backgroundSize?.trim().split(/\s+/)[0]
+  const match = width?.match(/^(\d+(?:\.\d+)?)px$/)
+  if (!match) return null
+
+  const parsed = Number(match[1])
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null
+}
+
+export function SideScrollerParallaxLayer({
+  layer,
+  offset,
+}: {
+  layer: ParallaxLayer
+  offset: number
+}) {
+  const {
+    backgroundPosition: backgroundAnchor = 'center',
+    backgroundRepeat = 'repeat-x',
+    backgroundSize = 'auto 100%',
+    ...layerStyle
+  } = layer.style ?? {}
+  const tileWidth = getPixelTileWidth(backgroundSize)
+  const phase = tileWidth ? ((offset % tileWidth) + tileWidth) % tileWidth : 0
+  const previousPhaseRef = useRef(phase)
+  const crossedTileBoundary = Boolean(
+    tileWidth && Math.abs(phase - previousPhaseRef.current) > tileWidth / 2,
+  )
+
+  useLayoutEffect(() => {
+    previousPhaseRef.current = phase
+  }, [phase])
+
+  // Authored side-scroller layers use a fixed pixel tile width. Moving one
+  // pre-painted repeating track lets the compositor scroll the scenery
+  // without repainting the entire 600px playfield every simulation tick.
+  if (tileWidth && backgroundRepeat === 'repeat-x') {
+    const tileCount = Math.ceil(STAGE_SIZE / tileWidth) + 1
+
+    return (
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-0 top-0 h-full will-change-transform"
+        style={{
+          ...layerStyle,
+          width: `${tileWidth * tileCount}px`,
+          backgroundImage: `url(${layer.url})`,
+          backgroundPosition: `0 ${backgroundAnchor}`,
+          backgroundSize,
+          backgroundRepeat,
+          transform: `translate3d(${-phase}px, 0, 0)`,
+          transition: crossedTileBoundary ? 'none' : SIDE_SCROLLER_TRANSITION,
+        }}
+      />
+    )
+  }
+
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0"
+      style={{
+        ...layerStyle,
+        backgroundImage: `url(${layer.url})`,
+        backgroundPosition: `${-offset}px ${backgroundAnchor}`,
+        backgroundSize,
+        backgroundRepeat,
+      }}
+    />
+  )
+}
+
 interface SideScrollerStageProps {
   category: string
   scene?: SideScrollerSceneConfig
@@ -87,6 +166,8 @@ export function SideScrollerStage({
   const [stageSize, setStageSize] = useState(STAGE_SIZE)
   const backdrop = scene?.backdrop || fallbackBackdrop
   const scale = stageSize / STAGE_SIZE
+  const atmosphere = useMemo(() => getAtmosphere(scene), [scene])
+  const timeTint = useMemo(() => getTimeTint(category), [category])
 
   useEffect(() => {
     const node = wrapperRef.current
@@ -171,13 +252,13 @@ export function SideScrollerStage({
       <div
         className={cn(
           'absolute inset-0 bg-gradient-to-b',
-          getAtmosphere(scene),
+          atmosphere,
         )}
       />
       <div
         className={cn(
           'absolute inset-0 mix-blend-multiply',
-          getTimeTint(category),
+          timeTint,
         )}
       />
 
