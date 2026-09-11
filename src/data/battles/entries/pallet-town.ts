@@ -21,7 +21,7 @@ const palletOrientationRequirements: BattleConfig['requirements'] = [
 
 const savageRaticateRollRequirement = {
   type: 'roll' as const,
-  count: 10_000, // 1-in-100 on the shared 1,000,000-point server roll
+  count: 62_500, // 1-in-16 on the shared 1,000,000-point server roll
 }
 
 export const palletTownBattles: BattleConfig[] = [

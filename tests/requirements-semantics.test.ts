@@ -12,6 +12,7 @@ import {
 } from '@/utilities/tasks/task-logic'
 import type { Task, TaskCondition } from '@/data/tasks'
 import { rockTunnelTasks } from '@/data/tasks/entries/rock-tunnel'
+import { palletTownBattles } from '@/data/battles/entries/pallet-town'
 import { isToday } from '@/utilities/date-utils'
 
 const baseRequirementData = {
@@ -28,6 +29,17 @@ const baseRequirementData = {
 } as unknown as RequirementData
 
 describe('requirements and criteria semantics', () => {
+  test('Savage Raticate uses a one-in-sixteen shared roll', () => {
+    const battle = palletTownBattles.find(
+      (entry) => entry.id === 'pallet-town-savage-raticate',
+    )
+    const rollRequirement = battle?.requirements?.find(
+      (condition) => condition.type === 'roll',
+    )
+
+    expect(rollRequirement?.count).toBe(62_500)
+  })
+
   test('daily reset checks use UTC calendar days', () => {
     expect(
       isToday('2026-05-12T23:30:00.000Z', '2026-05-12T00:15:00.000Z'),
