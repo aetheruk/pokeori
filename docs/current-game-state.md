@@ -1,5 +1,6 @@
 # Current Game State
 
+- Release `0.34.5` makes the one-time Savage Raticate battle in Pallet Town more attainable by changing its shared server-roll requirement from 1-in-100 to 1-in-16 (62,500 of 1,000,000).
 - Release `0.34.4` fixes voyage-based unlock checks for random battles and other content. Requirements now accept the numeric `completedVoyages` values persisted by existing voyage completions as well as metadata records, so qualifying players are not treated as having zero voyages.
 
 - Rarity thresholds are now the single authored source for encounter, battle, and fishing shiny odds. The former location and fishing shiny multiplier fields have been removed; neutral values were dropped, and Mt. Moon now uses the global shiny threshold.
