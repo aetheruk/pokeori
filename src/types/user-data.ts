@@ -166,7 +166,12 @@ export interface PowerUsageData {
  * Voyage completion tracking
  */
 export interface VoyageStats {
-  completedVoyages?: Record<string, { completedAt: string; count: number }>
+  // Older records store each voyage count as a number. Newer records may also
+  // include completion metadata alongside the count.
+  completedVoyages?: Record<
+    string,
+    number | { completedAt?: string; count: number }
+  >
   totalCompleted?: number
 }
 

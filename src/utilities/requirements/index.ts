@@ -632,7 +632,12 @@ export function getRequirementProgress(
         // Check specific voyage
         const voyageData =
           voyageStats.completedVoyages?.[condition.targetId as string]
-        current = voyageData?.count || 0
+
+        // Voyage counts were historically persisted as bare numbers. Accept
+        // both that shape and the newer metadata object shape so existing
+        // player progress remains eligible.
+        current =
+          typeof voyageData === 'number' ? voyageData : voyageData?.count || 0
       } else {
         // Check total voyages
         current = voyageStats.totalCompleted || 0
