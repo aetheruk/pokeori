@@ -16,7 +16,7 @@ export interface ArcadeObstacle {
   id: number; x: number; y: number; width: number; height: number
   isAerial?: boolean; spriteConfig?: any; creationTime: number
 }
-export interface ArcadeWall { x: number; gapY: number; gapSize: number; width: number; passed: boolean }
+export interface ArcadeWall { id?: number; x: number; gapY: number; gapSize: number; width: number; passed: boolean }
 export interface ArcadeCollectible {
   id: number; x: number; y: number; size: number; progress: number
   rewardKey: string; reward: LocationReward
@@ -28,7 +28,7 @@ export interface ArcadeSimulation extends TimingSimulation {
   isJumping: boolean; hasDoubleJumped: boolean; boostUntil: number; boostReadyAt: number
   distance: number; speed: number; nextId: number
   nextGround: number; nextAerial: number; nextWall: number; nextEnemy: number; nextSurf: number
-  obstacles: ArcadeObstacle[]; walls: ArcadeWall[]; enemies: Array<{x: number; y: number; size: number}>
+  obstacles: ArcadeObstacle[]; walls: ArcadeWall[]; enemies: Array<{id?: number; x: number; y: number; size: number}>
   surfObstacles: Array<{id: number; x: number; progress: number; config: SurfObstacleConfig}>
   collectibles: ArcadeCollectible[]; parallaxOffsets: number[]
   collectibleSchedules: Record<string, number>; collectedRewards: Record<string, number>
@@ -109,6 +109,15 @@ export function stepArcadeSimulation(gameType: ArcadeGameType, settings: any, pr
     collectibles: previous.collectibles.map((c) => ({ ...c })),
     collectibleSchedules: { ...previous.collectibleSchedules }, collectedRewards: { ...previous.collectedRewards },
   }
+  // Sessions created before moving entities gained render identities can live
+  // in Redis for up to two hours. Upgrade them deterministically on the first
+  // resumed tick so keyed compositor layers remain stable.
+  for (const wall of sim.walls) {
+    if (wall.id === undefined) wall.id = sim.nextId++
+  }
+  for (const enemy of sim.enemies) {
+    if (enemy.id === undefined) enemy.id = sim.nextId++
+  }
   if (gameType === 'rhythm' || gameType === 'mining') return stepTiming(sim, gameType, settings, inputs)
   if (gameType === 'snake' || gameType === 'brick-breaker') {
     const trajectory = stepTrajectoryState(gameType, settings, previous.trajectory!, inputs)
@@ -152,7 +161,7 @@ export function stepArcadeSimulation(gameType: ArcadeGameType, settings: any, pr
     if (sim.playerY <= 0 || sim.playerY >= 540) sim.status = 'lost'
     if (sim.tick >= sim.nextWall) {
       const gapSize = settings.wallGap.min + random(sim) * Math.max(0, settings.wallGap.max - settings.wallGap.min)
-      sim.walls.push({ x: 600, gapY: gapSize / 2 + random(sim) * Math.max(0, 500 - gapSize) + 50, gapSize, width: settings.wallWidth || 60, passed: false })
+      sim.walls.push({ id: sim.nextId++, x: 600, gapY: gapSize / 2 + random(sim) * Math.max(0, 500 - gapSize) + 50, gapSize, width: settings.wallWidth || 60, passed: false })
       sim.nextWall = sim.tick + interval(sim, settings.wallFrequency)
     }
     sim.walls = sim.walls.map((wall) => {
@@ -162,7 +171,7 @@ export function stepArcadeSimulation(gameType: ArcadeGameType, settings: any, pr
     }).filter((w) => w.x + w.width > 0)
     if (sim.tick >= sim.nextEnemy) {
       const size = settings.enemySize || 50
-      sim.enemies.push({ x: 600, y: 50 + random(sim) * Math.max(0, 500 - size), size })
+      sim.enemies.push({ id: sim.nextId++, x: 600, y: 50 + random(sim) * Math.max(0, 500 - size), size })
       sim.nextEnemy = sim.tick + interval(sim, settings.enemyFrequency)
     }
     sim.enemies = sim.enemies.map((e) => ({ ...e, x: e.x - sim.speed * dt })).filter((e) => e.x + e.size > 0)

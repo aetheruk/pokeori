@@ -8,8 +8,11 @@ import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverla
 import { Button } from '@/components/ui/button'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { useArcadeSession } from '@/hooks/use-arcade-session'
-import { getCollisionMask, type CollisionMask } from '@/utilities/collision'
-import { SideScrollerStage } from './side-scroller-stage'
+import {
+  SIDE_SCROLLER_TRANSITION,
+  SideScrollerParallaxLayer,
+  SideScrollerStage,
+} from './side-scroller-stage'
 import { EndlessCollectibleSprite } from './endless-collectibles'
 import type { FlapGameConfig } from '@/data/games/flap/types'
 
@@ -21,8 +24,7 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
   const session = useArcadeSession('flap', encounter)
   const { simulation, countdown, result, timeLeft } = session
   const canvasRef = useRef<HTMLDivElement>(null)
-  // Sprite dimensions only; collisions are resolved by the shared simulator.
-  const masksRef = useRef<Record<string, CollisionMask>>({})
+  const spriteSheetHeightsRef = useRef<Record<string, number>>({})
   const score = simulation?.score || 0
   const playerY = simulation?.playerY ?? 200
   const collectibles = simulation?.collectibles || []
@@ -35,41 +37,47 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
   const enemies = simulation?.enemies || []
   const startError: string | null = null
   const flap = useCallback(() => session.sendInput('flap'), [session.sendInput])
-  // Load Sprites
+  // Only the sheet height is needed to derive frame counts. Collision is
+  // resolved by the shared simulator, so avoid an expensive canvas readback.
   useEffect(() => {
-    const loadMasks = async () => {
+    let disposed = false
+
+    const loadSpriteSheetHeights = async () => {
       const settings = encounter.settings
-      const toLoad: string[] = []
+      const toLoad = new Set<string>()
 
       // Player Sprite
       if (typeof settings.sprite !== 'string') {
-        toLoad.push(settings.sprite.sheetUrl)
-      } else {
-        toLoad.push(settings.sprite)
+        toLoad.add(settings.sprite.sheetUrl)
       }
 
       // Enemy Sprite
       if (typeof settings.enemySprite !== 'string') {
-        toLoad.push(settings.enemySprite.sheetUrl)
-      } else {
-        toLoad.push(settings.enemySprite)
+        toLoad.add(settings.enemySprite.sheetUrl)
       }
 
       await Promise.all(
-        toLoad.map(async (url) => {
-          if (!url) return
-          if (masksRef.current[url]) return
-          try {
-            const mask = await getCollisionMask(url)
-            masksRef.current[url] = mask
-          } catch (e) {
-            console.error('Failed to load mask:', url, e)
-          }
-        }),
+        [...toLoad].map(
+          (url) =>
+            new Promise<void>((resolve) => {
+              const image = new window.Image()
+              image.onload = () => {
+                if (!disposed) {
+                  spriteSheetHeightsRef.current[url] = image.naturalHeight
+                }
+                resolve()
+              }
+              image.onerror = () => resolve()
+              image.src = url
+            }),
+        ),
       )
     }
 
-    loadMasks()
+    void loadSpriteSheetHeights()
+    return () => {
+      disposed = true
+    }
   }, [encounter.settings])
 
   useEffect(() => {
@@ -153,34 +161,23 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
           className="object-cover"
         />
         {/* Parallax Backgrounds */}
-        {encounter.settings.parallaxLayers.map((layer, i) => {
-          const {
-            backgroundPosition: backgroundAnchor = 'center',
-            ...layerStyle
-          } = layer.style ?? {}
-
-          return (
-            <div
-              key={i}
-              className="absolute inset-0 bg-repeat-x"
-              style={{
-                ...layerStyle,
-                backgroundImage: `url(${layer.url})`,
-                backgroundPosition: `${-parallaxOffsets[i]}px ${backgroundAnchor}`,
-                backgroundSize: layerStyle.backgroundSize || 'auto 100%',
-                backgroundRepeat: layerStyle.backgroundRepeat || 'repeat-x',
-              }}
-            />
-          )
-        })}
+        {encounter.settings.parallaxLayers.map((layer, i) => (
+          <SideScrollerParallaxLayer
+            key={`${layer.url}:${i}`}
+            layer={layer}
+            offset={parallaxOffsets[i]}
+          />
+        ))}
 
         {/* Player */}
         {(simulation?.velocity || 0) < -1 && countdown <= 0 && (
           <div
-            className="absolute h-8 w-24 rounded-full bg-gradient-to-l from-white/0 via-white/32 to-white/0 blur-[2px]"
+            className="absolute h-8 w-24 rounded-full bg-gradient-to-l from-white/0 via-white/32 to-white/0 blur-[2px] will-change-transform"
             style={{
               left: `${PLAYER_X - 70}px`,
-              top: `${playerY + PLAYER_SIZE * 0.35}px`,
+              top: `${PLAYER_SIZE * 0.35}px`,
+              transform: `translate3d(0, ${playerY}px, 0)`,
+              transition: SIDE_SCROLLER_TRANSITION,
             }}
           />
         )}
@@ -188,10 +185,13 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
           const spriteConfig = encounter.settings.sprite
           if (typeof spriteConfig !== 'string') {
             const frameDuration = spriteConfig.frameRate || 100
-            const mask = masksRef.current[spriteConfig.sheetUrl]
+            const sheetHeight =
+              spriteSheetHeightsRef.current[spriteConfig.sheetUrl]
             const frameCount =
               spriteConfig.frameCount ||
-              (mask ? Math.floor(mask.height / spriteConfig.frameHeight) : 1) ||
+              (sheetHeight
+                ? Math.floor(sheetHeight / spriteConfig.frameHeight)
+                : 1) ||
               1
             const frameIndex =
               Math.floor(Date.now() / frameDuration) % frameCount
@@ -201,17 +201,18 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
 
             return (
               <div
-                className="absolute transition-none"
+                className="absolute will-change-transform"
                 style={{
                   left: `${PLAYER_X}px`,
-                  top: `${playerY}px`,
+                  top: '0px',
                   width: `${spriteConfig.renderWidth}px`,
                   height: `${spriteConfig.renderHeight}px`,
                   backgroundImage: `url(${spriteConfig.sheetUrl})`,
                   backgroundPosition: `0 -${frameIndex * scaledFrameHeight}px`,
                   backgroundSize: `${spriteConfig.renderWidth}px auto`,
                   backgroundRepeat: 'no-repeat',
-                  transform: 'scaleX(-1)',
+                  transform: `translate3d(0, ${playerY}px, 0) scaleX(-1)`,
+                  transition: SIDE_SCROLLER_TRANSITION,
                 }}
               />
             )
@@ -219,12 +220,14 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
 
           return (
             <div
-              className="absolute transition-none"
+              className="absolute will-change-transform"
               style={{
                 left: `${PLAYER_X}px`,
-                top: `${playerY}px`,
+                top: '0px',
                 width: `${PLAYER_SIZE}px`,
                 height: `${PLAYER_SIZE}px`,
+                transform: `translate3d(0, ${playerY}px, 0)`,
+                transition: SIDE_SCROLLER_TRANSITION,
               }}
             >
               <Image
@@ -242,12 +245,12 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
         {collectibles.map((collectible) => (
           <div
             key={collectible.id}
-            className="absolute z-20"
+            className="absolute left-0 top-0 z-20 will-change-transform"
             style={{
-              left: `${collectible.x}px`,
-              top: `${collectible.y}px`,
               width: `${collectible.size}px`,
               height: `${collectible.size}px`,
+              transform: `translate3d(${collectible.x}px, ${collectible.y}px, 0)`,
+              transition: SIDE_SCROLLER_TRANSITION,
             }}
           >
             <EndlessCollectibleSprite
@@ -258,15 +261,20 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
         ))}
 
         {/* Walls */}
-        {walls.map((wall, i) => (
-          <div key={i}>
+        {walls.map((wall, index) => (
+          <div
+            key={wall.id ?? `legacy-wall:${index}`}
+            className="absolute inset-y-0 left-0 will-change-transform"
+            style={{
+              width: `${wall.width}px`,
+              transform: `translate3d(${wall.x}px, 0, 0)`,
+              transition: SIDE_SCROLLER_TRANSITION,
+            }}
+          >
             {/* Top wall */}
             <div
-              className="absolute"
+              className="absolute left-0 top-0 w-full"
               style={{
-                left: `${wall.x}px`,
-                top: '0px',
-                width: `${wall.width}px`,
                 height: `${wall.gapY - wall.gapSize / 2}px`,
               }}
             >
@@ -283,11 +291,9 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
             </div>
             {/* Bottom wall */}
             <div
-              className="absolute"
+              className="absolute left-0 w-full"
               style={{
-                left: `${wall.x}px`,
                 top: `${wall.gapY + wall.gapSize / 2}px`,
-                width: `${wall.width}px`,
                 height: `${CANVAS_HEIGHT - (wall.gapY + wall.gapSize / 2)}px`,
               }}
             >
@@ -306,14 +312,17 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
         ))}
 
         {/* Enemies */}
-        {enemies.map((enemy, i) => {
+        {enemies.map((enemy, index) => {
           const enemyConfig = encounter.settings.enemySprite
           if (typeof enemyConfig !== 'string') {
             const frameDuration = enemyConfig.frameRate || 100
-            const mask = masksRef.current[enemyConfig.sheetUrl]
+            const sheetHeight =
+              spriteSheetHeightsRef.current[enemyConfig.sheetUrl]
             const frameCount =
               enemyConfig.frameCount ||
-              (mask ? Math.floor(mask.height / enemyConfig.frameHeight) : 1) ||
+              (sheetHeight
+                ? Math.floor(sheetHeight / enemyConfig.frameHeight)
+                : 1) ||
               1
             const frameIndex =
               Math.floor(Date.now() / frameDuration) % frameCount
@@ -323,17 +332,17 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
 
             return (
               <div
-                key={i}
-                className="absolute"
+                key={enemy.id ?? `legacy-enemy:${index}`}
+                className="absolute left-0 top-0 will-change-transform"
                 style={{
-                  left: `${enemy.x}px`,
-                  top: `${enemy.y}px`,
                   width: `${enemyConfig.renderWidth}px`,
                   height: `${enemyConfig.renderHeight}px`,
                   backgroundImage: `url(${enemyConfig.sheetUrl})`,
                   backgroundPosition: `0 -${frameIndex * scaledFrameHeight}px`,
                   backgroundSize: `${enemyConfig.renderWidth}px auto`,
                   backgroundRepeat: 'no-repeat',
+                  transform: `translate3d(${enemy.x}px, ${enemy.y}px, 0)`,
+                  transition: SIDE_SCROLLER_TRANSITION,
                 }}
               />
             )
@@ -341,13 +350,13 @@ export function FlapGame({ encounter, initialState }: FlapGameProps) {
 
           return (
             <div
-              key={i}
-              className="absolute"
+              key={enemy.id ?? `legacy-enemy:${index}`}
+              className="absolute left-0 top-0 will-change-transform"
               style={{
-                left: `${enemy.x}px`,
-                top: `${enemy.y}px`,
                 width: `${enemy.size}px`,
                 height: `${enemy.size}px`,
+                transform: `translate3d(${enemy.x}px, ${enemy.y}px, 0)`,
+                transition: SIDE_SCROLLER_TRANSITION,
               }}
             >
               <Image

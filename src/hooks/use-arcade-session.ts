@@ -117,9 +117,10 @@ export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: stri
       if (remaining || checkpointPaused || checkpointWindowFull || completionStarted || controlsRef.current?.paused || document.visibilityState === 'hidden') { lastTime = 0; return }
       if (round.simulation.status !== 'playing') { void save(true); return }
       if (!lastTime) { lastTime = now; return }
-      accumulator += Math.min(100, now - lastTime)
+      accumulator += Math.min(250, now - lastTime)
       lastTime = now
-      let next = round.simulation
+      const previous = round.simulation
+      let next = previous
       const tickMs = 1000 / ARCADE_TICK_RATE
       while (accumulator >= tickMs && next.status === 'playing') {
         for (const input of controlsRef.current?.inputForTick?.(next) || []) {
@@ -134,6 +135,7 @@ export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: stri
         if (next.tick - checkpointTickRef.current >= 300 ||
             inputsRef.current.filter((input) => input.tick <= next.tick).length >= 250) break
       }
+      if (next === previous) return
       round.simulation = next
       setSimulation(next)
       if (next.status !== 'playing') void save(true)

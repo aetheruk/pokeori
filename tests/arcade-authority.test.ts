@@ -118,4 +118,45 @@ describe('deterministic arcade authority', () => {
       expect(a.collectedRewards).toEqual({})
     }
   })
+
+  test('flap keeps stable identities for moving walls and enemies', () => {
+    const settings = {
+      ...flap,
+      wallFrequency: { min: 1, max: 1 },
+      wallGap: { min: 400, max: 400 },
+      enemyFrequency: { min: 1, max: 1 },
+      winScore: 1000,
+    }
+    const round = createArcadeRound('flap', settings, now, 42)
+    const first = stepArcadeSimulation('flap', settings, round.simulation)
+    const firstWallId = first.walls[0]?.id
+    const firstEnemyId = first.enemies[0]?.id
+    const second = stepArcadeSimulation('flap', settings, first)
+
+    expect(firstWallId).toBeNumber()
+    expect(firstEnemyId).toBeNumber()
+    expect(firstWallId).not.toBe(firstEnemyId)
+    expect(second.walls[0]?.id).toBe(firstWallId)
+    expect(second.enemies[0]?.id).toBe(firstEnemyId)
+
+    const legacy = {
+      ...round.simulation,
+      nextId: 7,
+      nextWall: 1000,
+      nextEnemy: 1000,
+      walls: [
+        {
+          x: 500,
+          gapY: 300,
+          gapSize: 400,
+          width: 60,
+          passed: false,
+        },
+      ],
+      enemies: [{ x: 500, y: 100, size: 50 }],
+    }
+    const resumed = stepArcadeSimulation('flap', settings, legacy)
+    expect(resumed.walls[0]?.id).toBe(7)
+    expect(resumed.enemies[0]?.id).toBe(8)
+  })
 })
