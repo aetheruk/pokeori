@@ -245,6 +245,33 @@ describe('requirements and criteria semantics', () => {
     ).toBe(true)
   })
 
+  test('voyage requirements accept legacy numeric completion counts', () => {
+    const requirement: TaskCondition = {
+      type: 'voyage_completed',
+      targetId: 'rattata-scavenge',
+      count: 10,
+    }
+
+    const data = {
+      ...baseRequirementData,
+      user: {
+        id: 'user-1',
+        voyageStats: {
+          completedVoyages: {
+            'rattata-scavenge': 32,
+          },
+        },
+      },
+    } as unknown as RequirementData
+
+    expect(getRequirementProgress(data, requirement)).toMatchObject({
+      current: 32,
+      target: 10,
+      completed: true,
+    })
+    expect(checkRequirement(data, requirement)).toBe(true)
+  })
+
   test('unique card set requirements count card ids instead of duplicate copies', () => {
     const duplicateHeavyCollection = [
       { cardId: 'base3-1', setId: 'base3', quantity: 20 },
