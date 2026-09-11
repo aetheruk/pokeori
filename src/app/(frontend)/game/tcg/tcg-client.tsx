@@ -33,7 +33,6 @@ import { Button } from '@/components/ui/button'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { SectionDivider } from '@/components/ui/section-divider'
-import { useUser } from '@/context/UserContext'
 import { type TcgSetSummary, tcgSetSummaries } from '@/data/tcg/summaries'
 import type { TcgCard, TcgSet } from '@/data/tcg/types'
 import { useGameUserData } from '@/hooks/useGameUserData'
@@ -76,6 +75,12 @@ const DECK_FORMATS: { id: DeckFormat; label: string }[] = [
 ]
 
 type CatalogCard = { card: TcgCard; set: TcgSet }
+interface TcgExplorerActions {
+  redistributeDuplicateCards: typeof redistributeDuplicateCards
+}
+
+const defaultActions: TcgExplorerActions = { redistributeDuplicateCards }
+
 type CatalogResponse<T> = {
   items: T[]
   total: number
@@ -87,10 +92,12 @@ export default function TcgExplorerPage({
   initialScope,
   initialFilters,
   initialCatalog = null,
+  actions = defaultActions,
 }: {
   initialScope: CarddexScope
   initialFilters: CarddexViewFilters
   initialCatalog?: TcgCatalogPage | null
+  actions?: TcgExplorerActions
 }) {
   const {
     entriesByCard,
@@ -98,7 +105,6 @@ export default function TcgExplorerPage({
     error: collectionError,
     refreshCollection,
   } = useTCG()
-  const { refreshUser } = useUser()
   const gameData = useGameUserData()
 
   const [scope, setScope] = useState<CarddexScope>(initialScope)
@@ -140,6 +146,7 @@ export default function TcgExplorerPage({
   const [catalogError, setCatalogError] = useState(false)
   const loadingMoreRef = useRef(false)
   const catalogRequestRef = useRef(0)
+  const previousCatalogUrlRef = useRef<string | null>(null)
   const skipInitialFetchRef = useRef(Boolean(initialCatalog))
   const deferredSearch = useDeferredValue(filters.query.trim())
   const inventory = useMemo(
@@ -264,6 +271,14 @@ export default function TcgExplorerPage({
 
   useEffect(() => {
     catalogRequestRef.current += 1
+    const viewChanged =
+      previousCatalogUrlRef.current !== null &&
+      previousCatalogUrlRef.current !== catalogUrl
+    previousCatalogUrlRef.current = catalogUrl
+    if (viewChanged) {
+      setSelectedCard(null)
+      setRewardSummary(null)
+    }
     if (skipInitialFetchRef.current) {
       skipInitialFetchRef.current = false
       return
@@ -276,7 +291,6 @@ export default function TcgExplorerPage({
       return
     }
     const controller = new AbortController()
-    setSelectedCard(null)
     setCatalogLoading(true)
     setCatalogError(false)
     fetch(catalogUrl, { signal: controller.signal })
@@ -485,14 +499,17 @@ export default function TcgExplorerPage({
   const selectedCardIndex = selectedCard
     ? catalogCards.findIndex((item) => item.card.id === selectedCard.card.id)
     : -1
-  const hasPreviousCard = catalogCards
-    .slice(0, selectedCardIndex)
-    .some((item) => (entriesByCard[item.card.id]?.quantity || 0) > 0)
-  const hasNextCard =
+  const hasPreviousCard =
+    selectedCardIndex > 0 &&
     catalogCards
+      .slice(0, selectedCardIndex)
+      .some((item) => (entriesByCard[item.card.id]?.quantity || 0) > 0)
+  const hasNextCard =
+    selectedCardIndex >= 0 &&
+    (catalogCards
       .slice(selectedCardIndex + 1)
       .some((item) => (entriesByCard[item.card.id]?.quantity || 0) > 0) ||
-    Boolean(nextCursor)
+      Boolean(nextCursor))
 
   const selectAdjacentCard = async (direction: -1 | 1) => {
     if (selectedCardIndex < 0) return
@@ -859,7 +876,9 @@ export default function TcgExplorerPage({
                 Previous
               </Button>
               <span className="font-mono text-[11px] text-game-muted">
-                {selectedCardIndex + 1} of {catalogTotal}
+                {selectedCardIndex >= 0
+                  ? `${selectedCardIndex + 1} of ${catalogTotal}`
+                  : 'No longer in this view'}
               </span>
               <Button
                 type="button"
@@ -983,14 +1002,13 @@ export default function TcgExplorerPage({
                             if (redistributing) return
                             setRedistributing(true)
                             try {
-                              const result = await redistributeDuplicateCards(
+                              const result = await actions.redistributeDuplicateCards(
                                 selectedCard.card.id,
                                 crypto.randomUUID(),
                               )
                               if (result.ok && result.summary) {
                                 setRewardSummary(result.summary)
-                                refreshCollection()
-                                refreshUser()
+                                void refreshCollection()
                               }
                             } catch (e) {
                               // Silent error

@@ -24,7 +24,13 @@ import { normalizeArcadeInput } from '@/utilities/research/arcade-inputs'
  * acknowledged checkpoints survive a reload; a failed save pauses this run. */
 const defaultActions = { start: startGame, checkpoint: checkpointArcade, complete: completeGame }
 
-export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: string; settings: any }, actions = defaultActions, controls?: { paused?: boolean; inputForTick?: (simulation: ArcadeSimulation) => Array<Omit<ArcadeInput, 'tick'>> }) {
+export interface ArcadeRenderFrame {
+  previous: ArcadeSimulation
+  current: ArcadeSimulation
+  alpha: number
+}
+
+export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: string; settings: any }, actions = defaultActions, controls?: { paused?: boolean; inputForTick?: (simulation: ArcadeSimulation) => Array<Omit<ArcadeInput, 'tick'>>; publishEveryTicks?: number }) {
   const router = useRouter()
   const { playSfx } = useAudio()
   const { refreshUser } = useUser()
@@ -33,6 +39,7 @@ export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: stri
   const [saving, setSaving] = useState(false)
   const [result, setResult] = useState<any | null>(null)
   const roundRef = useRef<ArcadeRound | null>(null)
+  const renderFrameRef = useRef<ArcadeRenderFrame | null>(null)
   const inputsRef = useRef<ArcadeInput[]>([])
   const checkpointTickRef = useRef(0)
   const busyRef = useRef(false)
@@ -94,13 +101,18 @@ export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: stri
           : acknowledged
         checkpointTickRef.current = acknowledged.simulation.tick
         inputsRef.current = inputsRef.current.filter((input) => input.tick > acknowledged.simulation.tick)
-        if (!hasUnacknowledgedPlay) setSimulation(acknowledged.simulation)
+        if (!hasUnacknowledgedPlay) {
+          renderFrameRef.current = {
+            previous: acknowledged.simulation,
+            current: acknowledged.simulation,
+            alpha: 1,
+          }
+          setSimulation(acknowledged.simulation)
+        }
         checkpointPaused = false
       }
       busyRef.current = false
       setSaving(false)
-      lastTime = 0
-      accumulator = 0
     }
 
     const frame = (now: number) => {
@@ -114,13 +126,19 @@ export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: stri
         setCountdown(remaining)
       }
       const checkpointWindowFull = busyRef.current && round.simulation.tick - checkpointTickRef.current >= MAX_ARCADE_CHECKPOINT_TICKS
-      if (remaining || checkpointPaused || checkpointWindowFull || completionStarted || controlsRef.current?.paused || document.visibilityState === 'hidden') { lastTime = 0; return }
+      if (remaining || checkpointPaused || checkpointWindowFull || completionStarted || controlsRef.current?.paused || document.visibilityState === 'hidden') {
+        lastTime = 0
+        accumulator = 0
+        if (renderFrameRef.current) renderFrameRef.current.alpha = 1
+        return
+      }
       if (round.simulation.status !== 'playing') { void save(true); return }
       if (!lastTime) { lastTime = now; return }
       accumulator += Math.min(250, now - lastTime)
       lastTime = now
       const previous = round.simulation
       let next = previous
+      let interpolationStart = previous
       const tickMs = 1000 / ARCADE_TICK_RATE
       while (accumulator >= tickMs && next.status === 'playing') {
         for (const input of controlsRef.current?.inputForTick?.(next) || []) {
@@ -128,6 +146,7 @@ export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: stri
           inputsRef.current = inputsRef.current.filter((queued) => queued.tick !== tick || queued.kind !== input.kind)
           inputsRef.current.push(normalizeArcadeInput({ ...input, tick }))
         }
+        interpolationStart = next
         next = stepArcadeSimulation(gameType, settings, next, inputsRef.current.filter((input) => input.tick === next.tick + 1))
         accumulator -= tickMs
         // Stop at a checkpoint boundary even when one animation frame catches
@@ -135,9 +154,26 @@ export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: stri
         if (next.tick - checkpointTickRef.current >= 300 ||
             inputsRef.current.filter((input) => input.tick <= next.tick).length >= 250) break
       }
-      if (next === previous) return
+      const alpha = Math.max(0, Math.min(1, accumulator / tickMs))
+      if (next === previous) {
+        if (renderFrameRef.current?.current === previous) {
+          renderFrameRef.current.alpha = alpha
+        }
+        return
+      }
       round.simulation = next
-      setSimulation(next)
+      renderFrameRef.current = {
+        previous: interpolationStart,
+        current: next,
+        alpha,
+      }
+      const publishEveryTicks = Math.max(
+        1,
+        Math.floor(controlsRef.current?.publishEveryTicks || 1),
+      )
+      if (next.status !== 'playing' || next.tick % publishEveryTicks === 0) {
+        setSimulation(next)
+      }
       if (next.status !== 'playing') void save(true)
       else if (next.tick - checkpointTickRef.current >= 300 || inputsRef.current.length >= 250) void save(false)
     }
@@ -155,6 +191,11 @@ export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: stri
       countdownRef.current = 3
       readyAt = performance.now() + 3000
       setCountdown(3)
+      renderFrameRef.current = {
+        previous: round.simulation,
+        current: round.simulation,
+        alpha: 1,
+      }
       setSimulation(round.simulation)
       frameId = requestAnimationFrame(frame)
     })()
@@ -178,7 +219,7 @@ export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: stri
     router.push('/game/explore')
   }
   const replay = async () => { await actions.start(encounter.id, true); window.location.reload() }
-  return { simulation, countdown, saving, result, sendInput, close, replay, abandon: () => abandonRef.current(),
+  return { simulation, renderFrameRef, countdown, saving, result, sendInput, close, replay, abandon: () => abandonRef.current(),
     timeLeft: Math.max(0, (roundRef.current?.settings.timeLimit || encounter.settings.timeLimit || 0) - Math.floor((simulation?.tick || 0) / ARCADE_TICK_RATE)),
   }
 }

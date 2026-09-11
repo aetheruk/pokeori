@@ -19,8 +19,10 @@ import { Button } from '@/components/ui/button'
 import { recoverGameAction } from '@/utilities/games/action-recovery'
 import { ArcadeFixture } from './arcade-fixture'
 import { CaptureFixture } from './capture-fixture'
+import { CarddexDuplicateFixture } from './carddex-duplicate-fixture'
 import { SyncFixture } from './sync-fixture'
 import { SnakeFixture } from './snake-fixture'
+import { SideScrollerGameFixture } from './side-scroller-game-fixture'
 import { UfoFixture } from './ufo-fixture'
 import { DexLayoutFixture } from './dex-layout-fixture'
 import { PokemonDetailsDialog } from '@/app/(frontend)/game/pokemon/_components/pokemon-details-dialog'
@@ -34,8 +36,10 @@ export function UiTestFixture() {
   const [queue, setQueue] = useState(false)
   const [arcade, setArcade] = useState(false)
   const [capture, setCapture] = useState(false)
+  const [carddexDuplicates, setCarddexDuplicates] = useState(false)
   const [sync, setSync] = useState(false)
   const [snake, setSnake] = useState(false)
+  const [sideScroller, setSideScroller] = useState<'run' | 'flap' | null>(null)
   const [ufo, setUfo] = useState(false)
   const [inspector, setInspector] = useState(false)
   const [navigation, setNavigation] = useState(false)
@@ -59,6 +63,26 @@ export function UiTestFixture() {
       leave: async () => { if (++leaves === 1) throw new Error('Test cancellation failure'); return { success: true } },
     }
   }, [])
+  if (sideScroller) {
+    return (
+      <SWRConfig value={{ isPaused: () => true }}>
+        <UserProvider
+          initialGameData={
+            {
+              user: { id: 'ui-test', trainerName: 'Test trainer' },
+              inventory: [],
+              pokemon: [],
+            } as unknown as RequirementData
+          }
+        >
+          <AudioProvider>
+            <SideScrollerGameFixture gameType={sideScroller} />
+          </AudioProvider>
+        </UserProvider>
+      </SWRConfig>
+    )
+  }
+  if (carddexDuplicates) return <CarddexDuplicateFixture />
   return <>
     <div className="flex flex-wrap gap-3 p-4">
       <Button onClick={() => setScratch(true)}>Test scratch card</Button>
@@ -67,8 +91,11 @@ export function UiTestFixture() {
       <Button onClick={() => setQueue(true)}>Test ranked queue</Button>
       <Button onClick={() => setArcade(true)}>Test arcade checkpoint</Button>
       <Button onClick={() => setCapture(true)}>Test capture keyboard</Button>
+      <Button onClick={() => setCarddexDuplicates(true)}>Test Carddex duplicates</Button>
       <Button onClick={() => setSync(true)}>Test scoped sync</Button>
       <Button onClick={() => setSnake(true)}>Test Onix joystick</Button>
+      <Button onClick={() => setSideScroller('run')}>Test Rattata canvas</Button>
+      <Button onClick={() => setSideScroller('flap')}>Test Flap canvas</Button>
       <Button onClick={() => setUfo(true)}>Test UFO Catcher</Button>
       <Button onClick={() => setInspector(true)}>Test Pokemon inspector</Button>
       <Button onClick={() => setNavigation(true)}>Test game navigation</Button>
