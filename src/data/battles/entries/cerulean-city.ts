@@ -437,14 +437,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     maxPokemon: 1,
     levelCap: 15,
-    rewards: [
-      {
-        type: 'item',
-        quantity: 1,
-        targetId: 'vital-spirit-ability-patch',
-        dropChance: 1,
-      },
-    ],
+    rewards: [],
   },
   {
     id: 'nugget-bridge-1',

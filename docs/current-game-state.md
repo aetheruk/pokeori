@@ -1,5 +1,6 @@
 # Current Game State
 
+- Release `0.34.13` removes the Vital Spirit Ability Patch from Route 4's catch, wild battle, and Field Observation reward tables. The patch remains a valid ability item, but Route 4 no longer awards it.
 - Release `0.34.12` hides Celadon Department Store's 2F TM Counter, 4F Crafting Notes, and Rooftop shop from Explore once every one-time offer in that shop has been purchased. Each shop remains visible while any permanent item is still available.
 - Release `0.34.11` adds an x3 bulk action to the Foil Pack Artisan recipe. The recipe still unlocks at Artisan 15 with its existing Scatter check and outputs, while the bulk action follows the shared five-level rule and unlocks at Artisan 20.
 - Release `0.34.10` makes the Artisan Balance lock respond on pointer-down and score the exact input time, removing the touch-release delay on mobile while preserving keyboard activation without double-counting the synthetic click. All seven Dried Dye recipes now use the Mix craft check instead of Balance; their levels, costs, output quality, and x3 bulk actions are unchanged.
@@ -677,7 +678,7 @@ Route 4 East now bridges into Cerulean with a two-task scientist chain:
 - `route-4-scared-scientist` unlocks as soon as Route 4 opens after `mt-moon-exit`.
 - `snake-science` follows it and requires Ekans research level 1.
 - `explore-cerulean-city` now requires `snake-science`.
-- Route 4 can drop `vital-spirit-ability-patch` from catch, wild battle, and Study; Study uses a 3% bubble drop.
+- Route 4 no longer awards the Vital Spirit Ability Patch from catch, wild battle, or Study.
 
 Early Cerulean beats:
 

@@ -3012,7 +3012,7 @@ describe('static data references', () => {
     }
   })
 
-  test('Route 4 and Route 24 local drops avoid manually authored berries', () => {
+  test('Route 4 and Route 24 local drops avoid retired and duplicate rewards', () => {
     const route4Study = allGames.find(
       (game) => game.id === 'route-4-field-observation',
     )
@@ -3025,6 +3025,9 @@ describe('static data references', () => {
     const route24Battle = battles.find(
       (battle) => battle.id === 'route-24-battle',
     )
+    const route4Location = locations.find(
+      (location) => location.id === 'route-4',
+    )
 
     expect(
       route4Study?.rewards?.map((reward) => reward.targetId),
@@ -3032,14 +3035,12 @@ describe('static data references', () => {
     expect(
       route24Study?.rewards?.map((reward) => reward.targetId),
     ).not.toContain('razz-berry')
-    expect(route4Study?.settings.itemDrops).toContainEqual({
-      id: 'route-4-vital-spirit-ability-patch',
-      itemId: 'vital-spirit-ability-patch',
-      dropChance: 3,
-    })
     expect(
       route4Study?.settings.itemDrops?.map((drop) => drop.itemId),
     ).not.toContain('razz-berry')
+    expect(
+      route4Study?.settings.itemDrops?.map((drop) => drop.itemId),
+    ).not.toContain('vital-spirit-ability-patch')
     expect(
       route24Study?.settings.itemDrops?.map((drop) => drop.itemId),
     ).not.toContain('tm-thunder-wave')
@@ -3086,12 +3087,12 @@ describe('static data references', () => {
     expect(
       route4Battle?.rewards?.map((reward) => reward.targetId),
     ).not.toContain('razz-berry')
-    expect(route4Battle?.rewards).toContainEqual({
-      type: 'item',
-      quantity: 1,
-      targetId: 'vital-spirit-ability-patch',
-      dropChance: 1,
-    })
+    expect(
+      route4Battle?.rewards?.map((reward) => reward.targetId),
+    ).not.toContain('vital-spirit-ability-patch')
+    expect(
+      route4Location?.rewards?.map((reward) => reward.targetId),
+    ).not.toContain('vital-spirit-ability-patch')
     const route24Location = locations.find(
       (location) => location.id === 'route-24',
     )
