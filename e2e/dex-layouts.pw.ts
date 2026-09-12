@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test'
 
 for (const width of [390, 1280]) {
-  test(`binder shelves scroll within the page at ${width}px`, async ({ page }) => {
+  test(`Carddex collection shelves scroll within the page at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 844 })
     await page.goto('/ui-test')
     await page.getByRole('button', { name: 'Test dex layouts' }).click()
-    for (const name of ['Card series', 'Base binders']) {
+    for (const name of ['Card series', 'Base sets']) {
       const shelf = page.getByRole('group', { name, exact: true })
       expect(await shelf.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true)
       await shelf.hover()
@@ -14,8 +14,10 @@ for (const width of [390, 1280]) {
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
       await shelf.getByRole('button').last().focus()
     }
-    await page.getByRole('group', { name: 'Base binders', exact: true }).getByRole('button').last().click()
-    await expect(page.getByRole('group', { name: 'Base binders', exact: true }).getByRole('button').last()).toHaveAttribute('aria-pressed', 'true')
+    await expect(page.locator('[data-tcg-mark^="logo-"]').first()).toBeVisible()
+    await expect(page.locator('[data-tcg-mark^="symbol-"]').first()).toBeVisible()
+    await page.getByRole('group', { name: 'Base sets', exact: true }).getByRole('button').last().click()
+    await expect(page.getByRole('group', { name: 'Base sets', exact: true }).getByRole('button').last()).toHaveAttribute('aria-pressed', 'true')
   })
 
   test(`page skeletons fit the viewport without spinners at ${width}px`, async ({ page }) => {

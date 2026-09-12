@@ -53,6 +53,8 @@ describe('generated data integrity', () => {
     for (const set of tcgSetSummaries) {
       expect(binderIds.has(`binder-${set.id}`)).toBe(true)
       expect(boosterPackIds.has(`pack-${set.id}`)).toBe(true)
+      expect(set.images.logo.startsWith('https://')).toBe(true)
+      expect(set.images.symbol.startsWith('https://')).toBe(true)
     }
 
     for (const pack of boosterPackItems) {

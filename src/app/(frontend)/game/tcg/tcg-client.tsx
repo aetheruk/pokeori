@@ -3,6 +3,7 @@
 import {
   ChevronLeft,
   ChevronRight,
+  Layers3,
   Library,
   Loader2,
   SlidersHorizontal,
@@ -30,7 +31,6 @@ import { PremiumSearch } from '@/components/game/shared/PremiumSearch'
 import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
 import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
 import { Button } from '@/components/ui/button'
-import { ItemSprite } from '@/components/ui/item-sprite'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { type TcgSetSummary, tcgSetSummaries } from '@/data/tcg/summaries'
@@ -56,7 +56,10 @@ import {
   resolveCarddexScope,
 } from '@/utilities/tcg/carddex-view'
 import type { TcgCatalogPage } from '@/utilities/tcg/catalog'
-import { getTcgCardAccessibleLabel } from '@/utilities/tcg/presentation'
+import {
+  getTcgCardAccessibleLabel,
+  getTcgSetArtworkUrl,
+} from '@/utilities/tcg/presentation'
 import { sortTcgSetsByReleaseDate } from '@/utilities/tcg/set-order'
 import {
   calculateTcgBattleCardCost,
@@ -67,6 +70,9 @@ import { getTcgDecks, redistributeDuplicateCards, saveTcgDeck } from './actions'
 
 const CARD_BATCH_SIZE = 80
 const CARD_CRYSTALIZER_ITEM_ID = 'card-crystalizer'
+const TCG_SET_ARTWORK_BY_ID = new Map(
+  tcgSetSummaries.map((set) => [set.id, set.images]),
+)
 type DeckFormat = 'baby' | 'champions' | 'masters'
 const DECK_FORMATS: { id: DeckFormat; label: string }[] = [
   { id: 'baby', label: 'Baby' },
@@ -474,7 +480,7 @@ export default function TcgExplorerPage({
   )
   const selectedSet = sets.find((set) => set.id === scope.setId)
   const scopeTitle =
-    selectedSet?.name || (scope.series === 'all' ? 'All binders' : scope.series)
+    selectedSet?.name || (scope.series === 'all' ? 'All sets' : scope.series)
   const setOptions = [
     {
       id: 'all',
@@ -572,7 +578,7 @@ export default function TcgExplorerPage({
           </>
         }
       >
-        <div className="grid grid-cols-[minmax(14rem,1.5fr)_minmax(10rem,0.8fr)_minmax(12rem,1fr)_auto] gap-2">
+        <div className="grid grid-cols-[minmax(14rem,1.5fr)_minmax(10rem,0.8fr)_minmax(12rem,1fr)_auto] items-end gap-2">
           <div className="space-y-2">
             <label
               htmlFor="carddex-search"
@@ -597,11 +603,11 @@ export default function TcgExplorerPage({
             placeholder="Choose a series"
           />
           <PremiumSelect
-            label="Binder"
+            label="Set"
             value={scope.setId}
             onValueChange={selectSet}
             options={setOptions}
-            placeholder="Choose a binder"
+            placeholder="Choose a set"
           />
           <Button
             type="button"
@@ -609,10 +615,10 @@ export default function TcgExplorerPage({
             aria-expanded={filtersExpanded}
             aria-controls="carddex-advanced-filters"
             onClick={() => setFiltersExpanded((current) => !current)}
-            className="mt-[1.625rem] min-h-11 px-3"
+            className="min-h-11 whitespace-nowrap px-3"
           >
             <SlidersHorizontal className="size-4" aria-hidden="true" />
-            Filters
+            More filters
             {activeFilterCount > 0 && (
               <span className="rounded-full bg-game-moss px-1.5 py-0.5 font-mono text-[10px] text-game-cream">
                 {activeFilterCount}
@@ -702,7 +708,7 @@ export default function TcgExplorerPage({
           !catalogLoading ? (
           <DexEmptyState
             title="No cards match this view"
-            description="Try another binder or clear the active filters."
+            description="Try another set or clear the active filters."
             action={
               activeFilterCount > 0 ? (
                 <Button variant="outline" onClick={clearFilters}>
@@ -722,12 +728,10 @@ export default function TcgExplorerPage({
                 <div key={card.id} className="contents">
                   {showSetHeading && (
                     <div className="col-span-full flex items-center gap-3 border-b border-game-border pb-2 pt-3">
-                      <ItemSprite
-                        itemId={`binder-${set.id}`}
-                        alt=""
-                        width={30}
-                        height={30}
-                        className="size-7 shrink-0"
+                      <TcgSetMark
+                        setId={set.id}
+                        kind="symbol"
+                        className="size-8 shrink-0"
                       />
                       <div className="min-w-0">
                         <h3 className="truncate font-display text-sm font-semibold text-game-ink">
@@ -803,27 +807,33 @@ export default function TcgExplorerPage({
         open={mobileFiltersOpen}
         onOpenChange={setMobileFiltersOpen}
         title="Browse the Carddex"
-        description="Choose a shelf, binder, and the cards you want to see."
+        description="Choose a series or set, then narrow the cards."
         desktopBreakpoint="lg"
         mobileMaxHeight="100dvh"
         className="gap-0 overflow-hidden bg-game-surface text-game-ink"
       >
-        <div className="custom-scrollbar min-h-0 flex-1 space-y-5 overflow-y-auto p-5">
-          <div className="grid gap-3 sm:grid-cols-2">
-            <PremiumSelect
-              label="Series"
-              value={scope.series}
-              onValueChange={selectSeries}
-              options={seriesOptions}
-            />
-            <PremiumSelect
-              label="Binder"
-              value={scope.setId}
-              onValueChange={selectSet}
-              options={setOptions}
-            />
+        <div className="custom-scrollbar min-h-0 flex-1 space-y-4 overflow-y-auto p-5">
+          <div className="space-y-3">
+            <div className="game-field-label text-game-ink">Collection</div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <PremiumSelect
+                label="Series"
+                value={scope.series}
+                onValueChange={selectSeries}
+                options={seriesOptions}
+              />
+              <PremiumSelect
+                label="Set"
+                value={scope.setId}
+                onValueChange={selectSet}
+                options={setOptions}
+              />
+            </div>
           </div>
-          <CarddexFilterFields filters={filters} onChange={updateFilter} />
+          <div className="space-y-3 border-t border-game-border pt-4">
+            <div className="game-field-label text-game-ink">Card details</div>
+            <CarddexFilterFields filters={filters} onChange={updateFilter} />
+          </div>
         </div>
         <div className="flex gap-2 border-t border-game-border p-4">
           <Button
@@ -840,7 +850,7 @@ export default function TcgExplorerPage({
             onClick={() => setMobileFiltersOpen(false)}
             className="flex-1"
           >
-            Show {catalogTotal} cards
+            Show {catalogTotal} {catalogTotal === 1 ? 'card' : 'cards'}
           </Button>
         </div>
       </ResponsivePanel>
@@ -902,6 +912,7 @@ export default function TcgExplorerPage({
                     }
                     alt={selectedCard.card.name}
                     fill
+                    sizes="(min-width: 1024px) 256px, 80vw"
                     className="object-contain"
                     priority
                   />
@@ -1002,10 +1013,11 @@ export default function TcgExplorerPage({
                             if (redistributing) return
                             setRedistributing(true)
                             try {
-                              const result = await actions.redistributeDuplicateCards(
-                                selectedCard.card.id,
-                                crypto.randomUUID(),
-                              )
+                              const result =
+                                await actions.redistributeDuplicateCards(
+                                  selectedCard.card.id,
+                                  crypto.randomUUID(),
+                                )
                               if (result.ok && result.summary) {
                                 setRewardSummary(result.summary)
                                 void refreshCollection()
@@ -1124,7 +1136,7 @@ function CarddexFilterFields({
   onChange: CarddexFilterChange
 }) {
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+    <div className="grid grid-cols-2 gap-2 lg:grid-cols-5">
       <PremiumSelect
         label="Ownership"
         value={filters.ownership}
@@ -1157,6 +1169,7 @@ function CarddexFilterFields({
       />
       <PremiumSelect
         label="Sort"
+        className="col-span-2 lg:col-span-1"
         value={filters.sort}
         onValueChange={(value) =>
           onChange('sort', value as CarddexViewFilters['sort'])
@@ -1193,86 +1206,115 @@ export function CarddexBinderShelf({
   )
 
   return (
-    <section aria-labelledby="carddex-binder-shelf" className="min-w-0 max-w-full space-y-3">
+    <section
+      aria-labelledby="carddex-collection-index"
+      className="min-w-0 max-w-full space-y-2.5"
+    >
       <div className="flex items-center gap-2">
         <Library className="size-4 text-game-ochre-strong" aria-hidden="true" />
         <h2
-          id="carddex-binder-shelf"
+          id="carddex-collection-index"
           className="game-field-label text-game-ink"
         >
-          Binder shelf
+          Collection index
         </h2>
         <span className="ml-auto text-[11px] text-game-muted">
-          Series first, then set
+          Series → set
         </span>
       </div>
 
       <fieldset
         className="custom-scrollbar flex w-full min-w-0 snap-x gap-2 overflow-x-auto overscroll-x-contain pb-1"
-
         aria-label="Card series"
       >
         <button
           type="button"
           aria-pressed={scope.series === 'all'}
           onClick={() => onSelectSeries('all')}
-          className={`game-focus-ring min-h-16 w-36 shrink-0 snap-start rounded-lg border px-3 py-2 text-left transition-colors ${
+          className={`game-focus-ring flex min-h-14 w-36 shrink-0 snap-start items-center gap-2 rounded-lg border px-2.5 py-2 text-left transition-colors ${
             scope.series === 'all'
               ? 'border-game-moss bg-game-moss/10'
               : 'border-game-border bg-game-surface-raised hover:border-game-moss/40'
           }`}
         >
-          <span className="block truncate font-display text-sm font-semibold text-game-ink">
-            All series
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-game-border bg-game-canvas">
+            <Library
+              className="size-4 text-game-moss-strong"
+              aria-hidden="true"
+            />
           </span>
-          <span className="mt-1 block font-mono text-[10px] text-game-muted">
-            {totalUnique}/{totalCards}
+          <span className="min-w-0">
+            <span className="block truncate font-display text-sm font-semibold text-game-ink">
+              All series
+            </span>
+            <span className="mt-0.5 block font-mono text-[10px] text-game-muted">
+              {totalUnique}/{totalCards}
+            </span>
           </span>
         </button>
-        {seriesGroups.map((group) => (
-          <button
-            type="button"
-            key={group.series}
-            aria-pressed={scope.series === group.series}
-            onClick={() => onSelectSeries(group.series)}
-            className={`game-focus-ring min-h-16 w-44 shrink-0 snap-start rounded-lg border px-3 py-2 text-left transition-colors ${
-              scope.series === group.series
-                ? 'border-game-moss bg-game-moss/10'
-                : 'border-game-border bg-game-surface-raised hover:border-game-moss/40'
-            }`}
-          >
-            <span className="block truncate font-display text-sm font-semibold text-game-ink">
-              {group.series}
-            </span>
-            <span className="mt-1 block font-mono text-[10px] text-game-muted">
-              {group.sets.length} {group.sets.length === 1 ? 'set' : 'sets'} ·{' '}
-              {group.unique}/{group.total}
-            </span>
-          </button>
-        ))}
+        {seriesGroups.map((group) => {
+          const representativeSet = group.sets.at(-1) || group.sets[0]
+          return (
+            <button
+              type="button"
+              key={group.series}
+              aria-pressed={scope.series === group.series}
+              onClick={() => onSelectSeries(group.series)}
+              className={`game-focus-ring flex min-h-14 w-44 shrink-0 snap-start items-center gap-2 rounded-lg border px-2.5 py-2 text-left transition-colors ${
+                scope.series === group.series
+                  ? 'border-game-moss bg-game-moss/10'
+                  : 'border-game-border bg-game-surface-raised hover:border-game-moss/40'
+              }`}
+            >
+              {representativeSet && (
+                <TcgSetMark
+                  setId={representativeSet.id}
+                  kind="logo"
+                  className="h-9 w-12 shrink-0"
+                />
+              )}
+              <span className="min-w-0">
+                <span className="block truncate font-display text-sm font-semibold text-game-ink">
+                  {group.series}
+                </span>
+                <span className="mt-0.5 block truncate font-mono text-[10px] text-game-muted">
+                  {group.sets.length} {group.sets.length === 1 ? 'set' : 'sets'}{' '}
+                  · {group.unique}/{group.total}
+                </span>
+              </span>
+            </button>
+          )
+        })}
       </fieldset>
 
       {activeSeries && (
         <fieldset
           className="custom-scrollbar flex w-full min-w-0 snap-x gap-2 overflow-x-auto overscroll-x-contain border-t border-game-border pt-3 pb-1"
-
-          aria-label={`${activeSeries.series} binders`}
+          aria-label={`${activeSeries.series} sets`}
         >
           <button
             type="button"
             aria-pressed={scope.setId === 'all'}
             onClick={() => onSelectSet('all')}
-            className={`game-focus-ring min-h-16 w-36 shrink-0 snap-start rounded-lg border px-3 py-2 text-left transition-colors ${
+            className={`game-focus-ring flex min-h-14 w-36 shrink-0 snap-start items-center gap-2 rounded-lg border px-2.5 py-2 text-left transition-colors ${
               scope.setId === 'all'
                 ? 'border-game-ochre bg-game-ochre/10'
                 : 'border-game-border bg-game-surface-raised hover:border-game-ochre/40'
             }`}
           >
-            <span className="block truncate font-display text-sm font-semibold text-game-ink">
-              Whole series
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-game-border bg-game-canvas">
+              <Layers3
+                className="size-4 text-game-ochre-strong"
+                aria-hidden="true"
+              />
             </span>
-            <span className="mt-1 block font-mono text-[10px] text-game-muted">
-              {activeSeries.unique}/{activeSeries.total}
+            <span className="min-w-0">
+              <span className="block truncate font-display text-sm font-semibold text-game-ink">
+                Whole series
+              </span>
+              <span className="mt-0.5 block font-mono text-[10px] text-game-muted">
+                {activeSeries.unique}/{activeSeries.total}
+              </span>
             </span>
           </button>
           {activeSeries.sets.map((set) => {
@@ -1286,24 +1328,22 @@ export function CarddexBinderShelf({
                 key={set.id}
                 aria-pressed={scope.setId === set.id}
                 onClick={() => onSelectSet(set.id)}
-                className={`game-focus-ring flex min-h-16 w-48 shrink-0 snap-start items-center gap-2 rounded-lg border px-3 py-2 text-left transition-colors ${
+                className={`game-focus-ring flex min-h-14 w-44 shrink-0 snap-start items-center gap-2 rounded-lg border px-2.5 py-2 text-left transition-colors ${
                   scope.setId === set.id
                     ? 'border-game-ochre bg-game-ochre/10'
                     : 'border-game-border bg-game-surface-raised hover:border-game-ochre/40'
                 }`}
               >
-                <ItemSprite
-                  itemId={`binder-${set.id}`}
-                  alt=""
-                  width={40}
-                  height={40}
-                  className="size-10 shrink-0"
+                <TcgSetMark
+                  setId={set.id}
+                  kind="symbol"
+                  className="size-9 shrink-0"
                 />
                 <span className="min-w-0">
                   <span className="block truncate font-display text-sm font-semibold text-game-ink">
                     {set.name}
                   </span>
-                  <span className="mt-1 block font-mono text-[10px] text-game-muted">
+                  <span className="mt-0.5 block font-mono text-[10px] text-game-muted">
                     {progress.unique}/{progress.total} cards
                   </span>
                 </span>
@@ -1313,6 +1353,45 @@ export function CarddexBinderShelf({
         </fieldset>
       )}
     </section>
+  )
+}
+
+function TcgSetMark({
+  setId,
+  kind,
+  className,
+}: {
+  setId: string
+  kind: 'logo' | 'symbol'
+  className: string
+}) {
+  const source = getTcgSetArtworkUrl(
+    setId,
+    kind,
+    TCG_SET_ARTWORK_BY_ID.get(setId)?.[kind],
+  )
+  const [failedSource, setFailedSource] = useState<string | null>(null)
+  const FallbackIcon = kind === 'logo' ? Library : Layers3
+
+  return (
+    <span
+      className={`flex items-center justify-center rounded-md border border-game-border bg-game-canvas p-1 ${className}`}
+      data-tcg-mark={`${kind}-${setId}`}
+      aria-hidden="true"
+    >
+      {failedSource === source ? (
+        <FallbackIcon className="size-4 text-game-muted" />
+      ) : (
+        <Image
+          src={source}
+          alt=""
+          width={kind === 'logo' ? 72 : 40}
+          height={kind === 'logo' ? 36 : 40}
+          className="max-h-full max-w-full object-contain"
+          onError={() => setFailedSource(source)}
+        />
+      )}
+    </span>
   )
 }
 

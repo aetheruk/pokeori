@@ -25,6 +25,21 @@ for (const width of [390, 1280]) {
     })
     await page.goto('/ui-test')
     await page.getByRole('button', { name: 'Test Carddex duplicates' }).click()
+
+    if (width < 1024) {
+      await page.getByRole('button', { name: /Open Carddex filters/ }).click()
+      const filters = page.getByRole('dialog', { name: 'Browse the Carddex' })
+      await expect(filters.getByText('Collection', { exact: true })).toBeVisible()
+      await expect(filters.getByText('Card details', { exact: true })).toBeVisible()
+      await expect(filters.getByText('Set', { exact: true })).toBeVisible()
+      await filters.getByRole('button', { name: /Show 1 card/ }).click()
+    } else {
+      const filters = page.getByRole('region', { name: 'Carddex filters' })
+      await expect(filters.getByText('Set', { exact: true })).toBeVisible()
+      await filters.getByRole('button', { name: /More filters/ }).click()
+      await expect(filters.getByText('Ownership', { exact: true })).toBeVisible()
+    }
+
     await page.getByRole('button', { name: 'View Alakazam card 1' }).click()
 
     const panel = page.getByRole('dialog', { name: 'Alakazam' })

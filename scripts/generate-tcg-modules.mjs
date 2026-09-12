@@ -275,6 +275,10 @@ function writeSetSummariesFile(setIds, setMetadataMap) {
         total: Number(metadata?.total) || 0,
         printedTotal: Number(metadata?.printedTotal) || null,
         releaseDate: metadata?.releaseDate || null,
+        images: {
+          symbol: metadata?.images?.symbol || '',
+          logo: metadata?.images?.logo || '',
+        },
       })},`
     })
     .join('\n')
@@ -286,6 +290,10 @@ function writeSetSummariesFile(setIds, setMetadataMap) {
   total: number
   printedTotal: number | null
   releaseDate: string | null
+  images: {
+    symbol: string
+    logo: string
+  }
 }
 
 export const tcgSetSummaries: TcgSetSummary[] = [

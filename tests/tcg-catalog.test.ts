@@ -4,6 +4,7 @@ import { getTcgCatalogPage } from '@/utilities/tcg/catalog'
 import {
   getNextAutocompleteIndex,
   getTcgCardAccessibleLabel,
+  getTcgSetArtworkUrl,
 } from '@/utilities/tcg/presentation'
 
 describe('TCG catalog ownership totals', () => {
@@ -83,6 +84,22 @@ describe('TCG catalog ownership totals', () => {
 })
 
 describe('Carddex discovery and keyboard presentation', () => {
+  test('builds canonical set logo and symbol URLs without bundling artwork', () => {
+    expect(getTcgSetArtworkUrl('base1', 'logo')).toBe(
+      'https://images.pokemontcg.io/base1/logo.png',
+    )
+    expect(getTcgSetArtworkUrl('gym2', 'symbol')).toBe(
+      'https://images.pokemontcg.io/gym2/symbol.png',
+    )
+    expect(
+      getTcgSetArtworkUrl(
+        'me5',
+        'logo',
+        'https://images.scrydex.com/pokemon/me5-logo/logo',
+      ),
+    ).toBe('https://images.scrydex.com/pokemon/me5-logo/logo')
+  })
+
   test('conceals uncollected card identity from accessible labels', () => {
     expect(
       getTcgCardAccessibleLabel({
