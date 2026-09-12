@@ -151,7 +151,7 @@ describe('artisan recipes', () => {
       expect(nut?.effects).toBeUndefined()
       expect(driedDye?.category).toBe('misc')
       expect(driedRecipe?.artisanLevel).toBe(recipe!.artisanLevel + 3)
-      expect(driedRecipe?.craftType).toBe('balance')
+      expect(driedRecipe?.craftType).toBe('mix')
       expect(driedRecipe?.costs).toEqual([{ id: paintId, amount: 3 }])
       expect(driedRecipe?.rewards).toContainEqual({
         type: 'item',

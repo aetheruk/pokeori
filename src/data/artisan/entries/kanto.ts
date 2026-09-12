@@ -709,11 +709,11 @@ const DRIED_DYE_RECIPES: ArtisanRecipeDraft[] = PAINT_RECIPES.map((recipe) => {
   return {
     id: `dried-${color}`,
     name: `Dried ${color[0].toUpperCase()}${color.slice(1)} Dye`,
-    description: `Balance and dry ${color} dye into a shelf-stable crafting pigment.`,
+    description: `Mix and dry ${color} dye into a shelf-stable crafting pigment.`,
     artisanLevel: recipe.artisanLevel + 3,
     costs: [{ id: recipe.id, amount: 3 }],
     rewards: [{ type: 'item' as const, targetId: `dried-${color}`, quantity: 1, dropChance: 100 }],
-    craftType: 'balance',
+    craftType: 'mix',
     fail: true,
     outputQuantity: { min: 0, max: 2 },
     bulk: 3,

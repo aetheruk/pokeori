@@ -1149,7 +1149,7 @@ interface BalanceDialogProps {
 
 const balanceStages = ['Lock in', 'Lock in', 'Lock in']
 
-function BalanceDialog({
+export function BalanceDialog({
   recipe,
   session,
   open,
@@ -1200,15 +1200,20 @@ function BalanceDialog({
   const position = getArtisanBalancePosition(elapsedMs, session.balancePeriodMs)
 
   const lockCurrent = () => {
+    const inputAt = Date.now()
     if (
-      !started ||
-      finished ||
+      inputAt < session.startAt ||
+      inputAt >= session.endAt ||
       completing ||
       completedRef.current ||
       locksRef.current.length >= 3
     )
       return
-    const nextLocks = [...locksRef.current, elapsedMs]
+    const lockElapsedMs = Math.min(
+      duration,
+      Math.max(0, inputAt - session.startAt),
+    )
+    const nextLocks = [...locksRef.current, lockElapsedMs]
     locksRef.current = nextLocks
     setLocks(nextLocks)
 
@@ -1275,7 +1280,7 @@ function BalanceDialog({
 
                 return (
                   <div
-                  key={`${stage}-${index}`}
+                    key={`${stage}-${index}`}
                     className={cn(
                       'rounded-lg border bg-game-surface p-3',
                       isActive ? 'border-game-ochre' : 'border-game-border',
@@ -1314,9 +1319,18 @@ function BalanceDialog({
               disabled={
                 !started || finished || completing || completedRef.current
               }
-              onClick={lockCurrent}
+              onPointerDown={(event) => {
+                if (!event.isPrimary || event.button !== 0) return
+                lockCurrent()
+              }}
+              onClick={(event) => {
+                // Pointer input is scored above at press time. Detail 0 keeps
+                // keyboard and assistive-technology activation available
+                // without counting the synthetic post-touch click twice.
+                if (event.detail === 0) lockCurrent()
+              }}
               className={cn(
-                'game-focus-ring mt-5 h-14 w-full rounded-xl border text-sm font-black uppercase tracking-[0.2em] transition-colors',
+                'game-focus-ring mt-5 h-14 w-full touch-manipulation select-none rounded-xl border text-sm font-black uppercase tracking-[0.2em] transition-colors',
                 started
                   ? 'border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90'
                   : 'border-game-border bg-game-canvas text-game-muted',

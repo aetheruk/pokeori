@@ -27,6 +27,7 @@ import { UfoFixture } from './ufo-fixture'
 import { DexLayoutFixture } from './dex-layout-fixture'
 import { PokemonDetailsDialog } from '@/app/(frontend)/game/pokemon/_components/pokemon-details-dialog'
 import type { Pokemon } from '@/payload-types'
+import { ArtisanBalanceFixture } from './artisan-balance-fixture'
 
 /** Local-only fixtures: no account, reward, database or gameplay actions are invoked. */
 export function UiTestFixture() {
@@ -46,6 +47,7 @@ export function UiTestFixture() {
   const [dexLayout, setDexLayout] = useState(false)
   const [settings, setSettings] = useState(false)
   const [gridAppearance, setGridAppearance] = useState(false)
+  const [artisanBalance, setArtisanBalance] = useState(false)
   const [status, setStatus] = useState('Ready')
   const artState = useMemo(() => ({ expiry: Date.now() + 3600000, roundData: { artAcademy: {
     spriteUrl: '/sprites/pokemon/home/normal/1.avif', palette: ['#293532', '#b86148'], referenceCells: encodeArtAcademyCells(new Uint8Array(1024)), scoreGridSize: 32, guideGridSize: 3,
@@ -83,6 +85,7 @@ export function UiTestFixture() {
     )
   }
   if (carddexDuplicates) return <CarddexDuplicateFixture />
+  if (artisanBalance) return <ArtisanBalanceFixture />
   return <>
     <div className="flex flex-wrap gap-3 p-4">
       <Button onClick={() => setScratch(true)}>Test scratch card</Button>
@@ -102,6 +105,7 @@ export function UiTestFixture() {
       <Button onClick={() => setDexLayout(true)}>Test dex layouts</Button>
       <Button onClick={() => setSettings(true)}>Test trainer settings</Button>
       <Button onClick={() => setGridAppearance(true)}>Test grid appearance</Button>
+      <Button onClick={() => setArtisanBalance(true)}>Test Artisan balance</Button>
       <Button onClick={() => {
         let attempts = 0
         setStatus('Waiting for result')
