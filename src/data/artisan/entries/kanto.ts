@@ -1559,6 +1559,7 @@ const TCG_RECIPES: ArtisanRecipeDraft[] = [
     outputQuantity: { min: 0, max: 5 },
     qualityOutputQuantity: { good: 3, perfect: 5 },
     minimumQuality: 'good',
+    bulk: 3,
     iconItemId: 'empty-foil-pack',
     requirements: [{ type: 'task_completed', targetId: 'underground-tcg-my-very-own-set' }],
   },
