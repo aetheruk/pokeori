@@ -56,6 +56,7 @@ export const celadonCityShops: ShopConfig[] = [
     icon: { type: 'item', id: 'tm-slow-strike' },
     background: '/backgrounds/shop.avif',
     requirements: afterStoreIntro,
+    hideWhenSoldOut: true,
     items: ['slow-strike', 'mighty-charge', 'accidental-tap', 'cunning-trap', 'play-dumb'].map(
       (move) => ({
         ...item(`tm-${move}`, `tm-${move}`, 5000),
@@ -72,6 +73,7 @@ export const celadonCityShops: ShopConfig[] = [
     icon: { type: 'item', id: 'x-attack' },
     background: '/backgrounds/shop.avif',
     requirements: afterRenovation,
+    hideWhenSoldOut: true,
     items: ['x-attack', 'x-defense', 'x-sp-atk', 'x-sp-def', 'x-speed', 'dire-hit'].map(
       (statItem) => ({
         ...item(`${statItem}-recipe`, statItem, 3000),
@@ -111,6 +113,7 @@ export const celadonCityShops: ShopConfig[] = [
     icon: { type: 'trainer', id: 'rocket-grunt' },
     background: '/backgrounds/celadon.avif',
     requirements: afterRooftopOffer,
+    hideWhenSoldOut: true,
     items: [
       {
         ...item('chaos-stone', 'chaos-stone', 50000),

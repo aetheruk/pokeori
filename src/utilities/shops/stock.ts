@@ -1,4 +1,4 @@
-import type { ShopItem } from '@/data/shops/types'
+import type { ShopConfig, ShopItem } from '@/data/shops/types'
 import { isToday } from '@/utilities/date-utils'
 
 export interface ShopPurchaseData {
@@ -38,6 +38,16 @@ export function shouldDisplayShopItem(
   purchaseData?: ShopPurchaseData | null,
 ): boolean {
   return item.daily === true || !isOutOfStock(item, purchaseData)
+}
+
+export function shouldDisplayShop(
+  shop: Pick<ShopConfig, 'hideWhenSoldOut'> & {
+    items: Array<Pick<ShopItem, 'id' | 'stock' | 'daily'>>
+  },
+  purchases?: Record<string, ShopPurchaseData | undefined>,
+): boolean {
+  if (!shop.hideWhenSoldOut) return true
+  return shop.items.some((item) => shouldDisplayShopItem(item, purchases?.[item.id]))
 }
 
 export function getRemainingStock(

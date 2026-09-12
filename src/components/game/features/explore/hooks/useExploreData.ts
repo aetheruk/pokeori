@@ -10,6 +10,7 @@ import { voyages } from '@/data/voyages'
 import type { RequirementData } from '@/utilities/requirements'
 import { checkRequirement } from '@/utilities/requirements'
 import { getTaskProgress } from '@/utilities/tasks/task-logic'
+import { shouldDisplayShop } from '@/utilities/shops/stock'
 import {
   getVsSeekerCandyRewards,
   getVsSeekerCurrencyRewards,
@@ -215,6 +216,13 @@ export function useExploreData(
       if (shouldHideIncompleteSecretTask(item, completedTaskIds)) return false
 
       if (!ownReqsMet) return false
+
+      if (
+        item.type === 'shop' &&
+        !shouldDisplayShop(item.originalData, userData.shopPurchases)
+      ) {
+        return false
+      }
 
       // Check Overrides (Recursive)
       if (item.overrides) {

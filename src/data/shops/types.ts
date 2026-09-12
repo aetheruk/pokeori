@@ -31,4 +31,5 @@ export interface ShopConfig {
   requirements?: TaskCondition[] // Logic to access the shop itself
   background?: string
   isRandomEvent?: boolean
+  hideWhenSoldOut?: boolean // If true, hide the shop from Explore once every permanent offer is exhausted
 }
