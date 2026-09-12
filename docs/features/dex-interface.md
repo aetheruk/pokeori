@@ -22,15 +22,17 @@ indexes to use the same entry geometry.
 
 ## Carddex
 
-- Unlocked sets are organized as a newest-first series shelf with a second
-  binder shelf for the selected series. Series, set, and overall cards report
+- Unlocked sets are organized as a newest-first series shelf with a second set
+  shelf for the selected series. Representative series logos and canonical set
+  symbols replace generic binder artwork; series, set, and overall cards report
   real collected/total progress.
 - Search matches card names, collector numbers, set names, and series while
   staying inside the chosen shelf. Ownership, card kind, Pokémon type, normalized
   rarity, and sort filters run before cursor pagination.
-- The current view is encoded in the URL. Desktop keeps scope and filters above
-  the artwork-first grid; mobile keeps search in the thumb zone and opens the
-  complete controls in a full-height field note.
+- The current view is encoded in the URL. Desktop keeps a compact scope row and
+  collapsible card-detail filters above the artwork-first grid; mobile keeps
+  search in the thumb zone and groups collection scope separately from card
+  details in a full-height field note.
 - Multi-set collector-number results retain visible set dividers. Owned-card
   field notes expose previous/next browsing, quantity, rarity, and existing
   duplicate/deck actions without exposing uncollected identities.

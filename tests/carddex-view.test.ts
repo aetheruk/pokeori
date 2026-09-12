@@ -18,6 +18,7 @@ const SETS: TcgSetSummary[] = [
     total: 10,
     printedTotal: 10,
     releaseDate: '2000/01/01',
+    images: { symbol: '', logo: '' },
   },
   {
     id: 'new1',
@@ -26,6 +27,7 @@ const SETS: TcgSetSummary[] = [
     total: 20,
     printedTotal: 20,
     releaseDate: '2025/01/01',
+    images: { symbol: '', logo: '' },
   },
   {
     id: 'new2',
@@ -34,6 +36,7 @@ const SETS: TcgSetSummary[] = [
     total: 30,
     printedTotal: 30,
     releaseDate: '2026/01/01',
+    images: { symbol: '', logo: '' },
   },
 ]
 

@@ -1,3 +1,14 @@
+export function getTcgSetArtworkUrl(
+  setId: string,
+  artwork: 'logo' | 'symbol',
+  source?: string,
+) {
+  return (
+    source ||
+    `https://images.pokemontcg.io/${encodeURIComponent(setId)}/${artwork}.png`
+  )
+}
+
 export function getTcgCardAccessibleLabel({
   isOwned,
   name,
