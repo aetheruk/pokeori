@@ -1,5 +1,6 @@
 # Current Game State
 
+- Release `0.34.14` removes the separate Scratch Card “Reveal card” control. Players scratch the card (or use the accessible scratch surface), then the Claim Prize action appears over the card artwork instead of creating a blank area below it.
 - Release `0.34.13` removes the Vital Spirit Ability Patch from Route 4's catch, wild battle, and Field Observation reward tables. The patch remains a valid ability item, but Route 4 no longer awards it.
 - Release `0.34.12` hides Celadon Department Store's 2F TM Counter, 4F Crafting Notes, and Rooftop shop from Explore once every one-time offer in that shop has been purchased. Each shop remains visible while any permanent item is still available.
 - Release `0.34.11` adds an x3 bulk action to the Foil Pack Artisan recipe. The recipe still unlocks at Artisan 15 with its existing Scatter check and outputs, while the bulk action follows the shared five-level rule and unlocks at Artisan 20.
