@@ -34,13 +34,7 @@ export const ceruleanCityFieldObservationEntries: FieldObservationConfig[] = [
       timeLimit: 12,
       answerTimeLimit: 12,
       difficulty: 2,
-      itemDrops: [
-        {
-          id: 'route-4-vital-spirit-ability-patch',
-          itemId: 'vital-spirit-ability-patch',
-          dropChance: 3,
-        },
-      ],
+      itemDrops: [],
     },
   },
   {

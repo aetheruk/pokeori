@@ -187,11 +187,6 @@ export const ceruleanCityLocations: Location[] = [
     },
     rewards: [
       {
-        type: 'item',
-        targetId: 'vital-spirit-ability-patch',
-        dropChance: 5,
-      },
-      {
         type: 'task_complete',
         targetId: 'razz-berry-discovery',
         dropChance: 5,
