@@ -4893,6 +4893,7 @@ describe('static data references', () => {
     ).toBe('Super Potion')
 
     expect(tmCounter?.items).toHaveLength(5)
+    expect(tmCounter?.hideWhenSoldOut).toBe(true)
     for (const item of tmCounter?.items || []) {
       expect(item.cost).toEqual([
         { type: 'currency', id: 'pokedollars', amount: 5000 },
@@ -4902,6 +4903,7 @@ describe('static data references', () => {
     }
 
     expect(recipeCounter?.items).toHaveLength(6)
+    expect(recipeCounter?.hideWhenSoldOut).toBe(true)
     for (const item of recipeCounter?.items || []) {
       expect(item.cost).toEqual([
         { type: 'currency', id: 'pokedollars', amount: 3000 },
@@ -4918,6 +4920,13 @@ describe('static data references', () => {
     for (const item of recipeCounter?.items || []) {
       expect(item.stock).toBe(1)
     }
+
+    const rooftop = shops.find(
+      (shop) => shop.id === 'celadon-department-store-rooftop',
+    )
+    expect(rooftop?.hideWhenSoldOut).toBe(true)
+    expect(rooftop?.items).toHaveLength(1)
+    expect(rooftop?.items[0]?.stock).toBe(1)
   })
 
   test('Celadon Gym limits every challenger battle to three player Pokemon', () => {
