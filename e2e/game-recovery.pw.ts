@@ -13,13 +13,25 @@ test('keyboard retry preserves the submitted game result', async ({ page }) => {
   await expect(page.getByRole('dialog')).toBeHidden()
 })
 
-test('scratch reveal and claim are operable using the keyboard', async ({ page }) => {
+test('scratch reveal has no separate reveal button and overlays the claim action', async ({ page }) => {
   await page.getByRole('button', { name: 'Test scratch card' }).click()
-  await expect(page.getByRole('button', { name: 'Claim Prize' })).toBeDisabled()
-  const reveal = page.getByRole('button', { name: 'Reveal card' })
-  await reveal.focus()
+  await expect(page.getByRole('button', { name: 'Reveal card' })).toHaveCount(0)
+  const claim = page.getByRole('button', { name: 'Claim Prize' })
+  await expect(claim).toHaveCount(0)
+  const scratchCard = page.getByRole('button', {
+    name: 'Scratch card to reveal prize',
+  })
+  await scratchCard.focus()
   await page.keyboard.press('Enter')
-  await expect(page.getByRole('button', { name: 'Claim Prize' })).toBeEnabled()
+  await expect(claim).toBeVisible()
+
+  const cardBox = await page.getByTestId('scratch-card').boundingBox()
+  const claimBox = await claim.boundingBox()
+  if (!cardBox || !claimBox) throw new Error('Scratch card geometry is unavailable')
+  expect(claimBox.y).toBeGreaterThanOrEqual(cardBox.y)
+  expect(claimBox.y + claimBox.height).toBeLessThanOrEqual(
+    cardBox.y + cardBox.height,
+  )
 })
 
 for (const viewport of [{ width: 390, height: 844 }, { width: 844, height: 390 }]) {

@@ -209,7 +209,7 @@ WebKit, which may still permit history swipes despite that CSS property.
 
 - Standard Rocket Slots cost 5 Fun Tokens and retain a 40% total win rate. Their common 5/15/50-token lines return 95.8%; the 100-token Porygon line and 1-in-1,000 1,100-token jackpot bring full RTP to 119.8%. High Stakes costs and every payout are exactly five times larger, including its 5,500-token jackpot, so it has the same odds and RTP. Every payline supplies a human-readable token reward label for both the prize table and win toast.
 - Celadon Slots, Prize Wheel, Pachinko, and Match 3 entries use game-specific Pokemon icons in Explore, with evolved variants distinguishing their High Stakes versions. Match 3 reward rules are unchanged by the chance-game balance pass.
-- A 100-token Rocket Scratch Card always pays something: 25% awards three Rocket Balls, 60% awards 50 Fun Tokens, 5% awards 250, 3% awards 500, 1% awards 1,000, 3% awards a Nugget, and three separate 1% outcomes unlock the Gambler icon, Gambler title, or Game Corner background.
+- A 100-token Rocket Scratch Card always pays something: 25% awards three Rocket Balls, 60% awards 50 Fun Tokens, 5% awards 250, 3% awards 500, 1% awards 1,000, 3% awards a Nugget, and three separate 1% outcomes unlock the Gambler icon, Gambler title, or Game Corner background. The scratch-card modal removes the separate Reveal card control; after scratching, Claim Prize appears as an overlay on the card artwork.
 
 ## Battle Bets
 

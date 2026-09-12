@@ -47,9 +47,10 @@ function ScratchCardInterface({
   onOpenChange,
 }: ScratchCardModalProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const claimButtonRef = useRef<HTMLButtonElement>(null)
+  const shouldFocusClaimRef = useRef(false)
   const [isRevealed, setIsRevealed] = useState(false)
   const [showRewards, setShowRewards] = useState(false)
-  const [isScratching, setIsScratching] = useState(false)
 
   // Initialize canvas only once on mount
   useEffect(() => {
@@ -74,6 +75,12 @@ function ScratchCardInterface({
       ctx.fillText('?', canvas.width / 2, canvas.height / 2)
     }
   }, []) // Empty dependency array = run once on mount
+
+  useEffect(() => {
+    if (!isRevealed || !shouldFocusClaimRef.current) return
+    shouldFocusClaimRef.current = false
+    claimButtonRef.current?.focus()
+  }, [isRevealed])
 
   const handleScratch = (e: React.MouseEvent | React.TouchEvent) => {
     if (isRevealed) return
@@ -103,13 +110,20 @@ function ScratchCardInterface({
     ctx.arc(x, y, 15, 0, Math.PI * 2)
     ctx.fill()
 
-    setIsScratching(true)
-
     // Check reveal percentage strictly
     if (Math.random() < 0.2) {
       // Check slightly more often
       checkReveal(canvas)
     }
+  }
+
+  const handleKeyboardScratch = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (isRevealed) return
+    if (e.key !== 'Enter' && e.key !== ' ') return
+
+    e.preventDefault()
+    shouldFocusClaimRef.current = true
+    setIsRevealed(true)
   }
 
   const checkReveal = (canvas: HTMLCanvasElement) => {
@@ -162,6 +176,7 @@ function ScratchCardInterface({
     <>
       {/* Card Container */}
       <div
+        data-testid="scratch-card"
         className="relative aspect-[1/2] animate-in overflow-hidden rounded-xl border border-game-border bg-game-night-canvas shadow-lg zoom-in-95 duration-300"
         style={{
           width: 'min(300px, calc(100vw - 4rem), calc((100dvh - 8rem) / 2))',
@@ -186,34 +201,32 @@ function ScratchCardInterface({
           </div>
 
           {/* Scratch Canvas */}
-          <canvas
-            ref={canvasRef}
-            className={`absolute inset-0 w-full h-full cursor-pointer touch-none transition-opacity duration-1000 z-20 ${isRevealed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+          <button
+            type="button"
+            aria-label="Scratch card to reveal prize"
+            className={`absolute inset-0 z-20 h-full w-full cursor-pointer touch-none border-0 bg-transparent p-0 transition-opacity duration-1000 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-game-ochre focus-visible:ring-offset-2 ${isRevealed ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
             onMouseDown={handleScratch}
             onMouseMove={(e) => hasButtonPressed(e) && handleScratch(e)}
             onTouchMove={handleScratch}
             onTouchStart={handleScratch}
-          />
+            onKeyDown={handleKeyboardScratch}
+          >
+            <canvas
+              ref={canvasRef}
+              className="absolute inset-0 h-full w-full"
+            />
+          </button>
         </div>
-      </div>
 
-      <div className="flex flex-col items-center gap-2 pb-[max(1rem,env(safe-area-inset-bottom))]">
-        {!isRevealed && (
-          <Button type="button" onClick={() => setIsRevealed(true)}>
-            Reveal card
+        {isRevealed && (
+          <Button
+            ref={claimButtonRef}
+            onClick={() => setShowRewards(true)}
+            className="absolute bottom-4 left-1/2 z-30 min-h-11 -translate-x-1/2 whitespace-nowrap bg-game-clay font-bold text-game-cream shadow-md hover:bg-game-clay/90"
+          >
+            Claim Prize
           </Button>
         )}
-        <Button
-          disabled={!isRevealed}
-          onClick={() => setShowRewards(true)}
-          className={`transition-all duration-300 font-bold ${
-            isRevealed
-              ? 'translate-y-0 bg-game-clay text-game-cream opacity-100 hover:bg-game-clay/90'
-              : 'opacity-0 translate-y-4 pointer-events-none'
-          }`}
-        >
-          Claim Prize
-        </Button>
       </div>
     </>
   )
