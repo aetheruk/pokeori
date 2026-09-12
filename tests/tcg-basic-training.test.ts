@@ -10,6 +10,7 @@ import {
   TCG_BOOSTER_BOX_REWARD,
 } from '@/data/tasks/entries/tcg-booster-box-deliveries'
 import {
+  getArtisanCraftRequiredLevel,
   resolveCraftRewards,
   shouldConsumeCraftCosts,
 } from '@/utilities/artisan/rewards'
@@ -475,9 +476,11 @@ describe('TCG Basic Training content', () => {
       description: 'Add Scrap Metal to the machine to press fresh foil packs.',
       artisanLevel: 15,
       craftType: 'scatter',
+      bulk: 3,
       outputQuantity: { min: 0, max: 5 },
       qualityOutputQuantity: { good: 3, perfect: 5 },
     })
+    expect(getArtisanCraftRequiredLevel(foil!, 3)).toBe(20)
     for (const { setId, dyeId, recipe } of packRecipes) {
       expect(recipe).toMatchObject({
         category: 'tcg',
