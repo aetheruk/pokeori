@@ -1,26 +1,19 @@
 'use client'
-import { recoverGameAction } from '@/utilities/games/action-recovery'
-import {
-  getPendingPaidAction,
-  clearPendingPaidAction,
-  hasPendingPaidAction,
-} from '@/utilities/games/pending-paid-action'
 
 import { ArrowRight, ArrowUp, Coins, DoorOpen, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import {
+  type KeyboardEvent,
+  type PointerEvent,
   useEffect,
   useMemo,
   useRef,
   useState,
-  type KeyboardEvent,
-  type PointerEvent,
 } from 'react'
 import { toast } from 'sonner'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
-import { CurrencySprite } from '@/components/ui/currency-sprite'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,6 +25,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
+import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
 import { getCurrency } from '@/data/currencies'
@@ -42,6 +36,12 @@ import type {
 import type { TaskIcon } from '@/data/tasks/types'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
+import { recoverGameAction } from '@/utilities/games/action-recovery'
+import {
+  clearPendingPaidAction,
+  getPendingPaidAction,
+  hasPendingPaidAction,
+} from '@/utilities/games/pending-paid-action'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import {
   exitUfoCatcher,
@@ -484,6 +484,22 @@ export function UfoCatcherGame({
           : canAfford
             ? `Play for ${cost.amount} ${currency?.name || 'tokens'}`
             : 'Not enough Fun Tokens'
+  const mainControlCaption =
+    phase === 'x' || phase === 'y'
+      ? 'Hold'
+      : phase === 'resolving'
+        ? 'Wait'
+        : canAfford
+          ? 'Play'
+          : 'Empty'
+  const mainControlDetail =
+    phase === 'x'
+      ? 'Right'
+      : phase === 'y'
+        ? 'Back'
+        : phase === 'idle' && canAfford
+          ? `${cost.amount} tokens`
+          : null
 
   return (
     <div className="game-activity-chrome relative grid min-h-dvh grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden bg-game-canvas text-game-ink">
@@ -762,7 +778,7 @@ export function UfoCatcherGame({
         </section>
       </main>
 
-      <footer className="relative z-30 mx-auto w-full max-w-[620px] px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
+      <footer className="relative z-30 mx-auto flex w-full max-w-[620px] flex-col items-center px-3 pb-[calc(env(safe-area-inset-bottom)+1.75rem)] pt-2">
         <div className="mb-3 text-center" aria-live="polite">
           {phase === 'idle' && lastResult && (
             <div className="flex items-center justify-center gap-2 text-sm">
@@ -817,19 +833,26 @@ export function UfoCatcherGame({
           onKeyDown={phase === 'x' || phase === 'y' ? handleKeyDown : undefined}
           onKeyUp={phase === 'x' || phase === 'y' ? handleKeyUp : undefined}
           className={cn(
-            'min-h-14 w-full touch-none select-none border-b-4 border-[#7d4438] text-base shadow-sm transition-[transform,box-shadow] motion-reduce:transition-none [-webkit-touch-callout:none]',
-            holding && 'translate-y-0.5 border-b-2 shadow-inner',
+            'size-[5.5rem] touch-none select-none flex-col gap-0.5 rounded-full border-b-[6px] border-[#7d4438] p-2 text-base shadow-md transition-[transform,box-shadow] motion-reduce:transition-none [-webkit-touch-callout:none]',
+            holding && 'translate-y-0.5 border-b-[3px] shadow-inner',
           )}
           aria-label={mainControlLabel}
         >
           {phase === 'resolving' ? (
-            <Loader2 className="animate-spin motion-reduce:animate-none" />
+            <Loader2 className="size-6 animate-spin motion-reduce:animate-none" />
           ) : phase === 'x' ? (
-            <ArrowRight />
+            <ArrowRight className="size-6" />
           ) : phase === 'y' ? (
-            <ArrowUp />
+            <ArrowUp className="size-6" />
           ) : null}
-          {mainControlLabel}
+          <span className="text-sm font-extrabold leading-none">
+            {mainControlCaption}
+          </span>
+          {mainControlDetail && (
+            <span className="text-[0.625rem] font-bold uppercase leading-none tracking-wide opacity-90">
+              {mainControlDetail}
+            </span>
+          )}
         </Button>
       </footer>
 
