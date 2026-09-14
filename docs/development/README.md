@@ -5,6 +5,9 @@ Guides for setting up and contributing to Pokeori.
 ## Getting Started
 Follow the [Setup Guide](/docs/development/getting-started.md) to run the project locally.
 
+The local [Pokeori Content Studio](./content-editor.md) runs separately from the
+game app and edits authored files without starting Payload, MongoDB, or Redis.
+
 ## Guides
 - [Environment Variables](/docs/development/environment-variables.md) - All required env vars
 - [Scripts](/docs/development/scripts.md) - Data fetch/generate scripts
@@ -25,6 +28,7 @@ Follow the [Setup Guide](/docs/development/getting-started.md) to run the projec
 | Script | Description |
 |--------|-------------|
 | `bun run dev` | Start dev server with Redis + Next.js |
+| `bun run content-editor` | Start the local Content Studio on port 3102 |
 | `bun run build` | Production build |
 | `bun run start` | Start production server |
 | `bun run fetch:pokemon` | Fetch Pokemon data from PokeAPI |

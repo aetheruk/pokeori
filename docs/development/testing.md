@@ -50,7 +50,7 @@ schema validation tests.
 - Game data sync scope checks.
 - Catalog pagination/version/cache checks and a 32 KiB client sprite-index budget.
 - Full compact-sprite parity against the authored manifest.
-- Source hygiene check preventing dev entry actions from reintroducing `eval`.
+- Source hygiene check preventing local content-editor actions from reintroducing `eval`, and ensuring the main app has no embedded authoring routes.
 - API response helper checks for request IDs.
 - Rate-limit helper checks for forwarded IP parsing.
 - Research action input validation for answer payloads, encounter IDs, reset
@@ -68,6 +68,8 @@ bun test              # Run all tests
 bun run validate:data # Run Bun-backed schema, reference, and hygiene checks
 bun run typecheck     # Run TypeScript without emitting files
 bun run lint          # Run Biome lint checks
+bun run content-editor:typecheck # Typecheck the local authoring app
+bun run content-editor:build # Build the local authoring app
 bun run test:int      # Integration tests
 bun run test:e2e      # E2E tests
 bun run test:security:integration # Real isolated API/transaction security tests

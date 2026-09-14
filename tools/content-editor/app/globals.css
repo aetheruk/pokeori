@@ -1,0 +1,6 @@
+@import '../../../src/styles/globals.css';
+
+/* The shared stylesheet lives outside this standalone app. Keep Tailwind's
+ * source graph explicit so the editor's own utility classes are generated. */
+@source '../../../src';
+@source '..';

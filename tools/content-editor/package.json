@@ -1,0 +1,9 @@
+{
+  "name": "@pokeori/content-editor",
+  "private": true,
+  "scripts": {
+    "dev": "POKEORI_CONTENT_EDITOR=1 bun --bun next dev --turbo --hostname 127.0.0.1 --port 3102",
+    "build": "POKEORI_CONTENT_EDITOR=1 bun --bun next build --turbopack",
+    "typecheck": "bun --bun tsc --noEmit"
+  }
+}

@@ -1,11 +1,12 @@
 'use server'
 
-import { requireDevAdmin } from '@/utilities/dev/authorization'
+import { requireDevAdmin } from '../server/authorization'
 
 import { execFile } from 'node:child_process'
-import { promises as fs } from 'node:fs'
+import { existsSync, promises as fs } from 'node:fs'
 import path from 'node:path'
 import { promisify } from 'node:util'
+import { fileURLToPath } from 'node:url'
 import { format } from 'prettier'
 import type * as TypeScriptCompilerApi from 'typescript6'
 import { BattleConfig, Location, Task } from '@/data/types'
@@ -15,6 +16,7 @@ import {
   type AbilityEffect,
 } from '@/data/abilities'
 import type { MoveConfig } from '@/data/moves/types'
+import { NORMAL_TM_MOVES } from '@/data/moves/tms/normal'
 import { ShopConfig } from '@/data/shops/types'
 import { VoyageConfig } from '@/data/voyages/types'
 import { allPokemon } from '@/data/pokemon'
@@ -32,10 +34,34 @@ import {
   formatDevCommandOutput,
   getGameDataGenerationCommand,
   getGameDataValidationCommand,
-} from '@/utilities/dev/game-data-tools'
+} from '../server/game-data-tools'
 
-const DATA_DIR = path.join(process.cwd(), 'src/data')
-const SOURCE_DATA_DIR = path.join(process.cwd(), 'source_data', 'pokemon')
+function findRepositoryRoot() {
+  const starts = [
+    process.cwd(),
+    path.dirname(fileURLToPath(import.meta.url)),
+  ]
+
+  for (const start of starts) {
+    let current = path.resolve(start)
+
+    for (let depth = 0; depth < 10; depth += 1) {
+      if (existsSync(path.join(current, 'src/data'))) {
+        return current
+      }
+
+      const parent = path.dirname(current)
+      if (parent === current) break
+      current = parent
+    }
+  }
+
+  return path.resolve(process.cwd())
+}
+
+const REPO_ROOT = findRepositoryRoot()
+const DATA_DIR = path.join(REPO_ROOT, 'src/data')
+const SOURCE_DATA_DIR = path.join(REPO_ROOT, 'source_data', 'pokemon')
 const SOURCE_POKEMON_MOVES_PATH = path.join(
   SOURCE_DATA_DIR,
   'pokemon_moves.json',
@@ -46,6 +72,18 @@ const POKEMON_RESEARCH_LEVEL_REWARDS_PATH = path.join(
   'pokemon-research-level-rewards.json',
 )
 const execFileAsync = promisify(execFile)
+const EVALUATE_ENTRY_MODULE_SCRIPT = `
+const { pathToFileURL } = await import('node:url')
+const filePath = process.argv[1]
+const exportSuffix = process.argv[2]
+const sourceModule = await import(pathToFileURL(filePath).href)
+const entry = Object.entries(sourceModule).find(
+  ([name, value]) => name.endsWith(exportSuffix) && Array.isArray(value),
+)
+
+if (!entry) throw new Error('No exported ' + exportSuffix + ' array found')
+process.stdout.write(JSON.stringify(entry[1]))
+`
 
 type TypeScriptCompilerApiModule = typeof TypeScriptCompilerApi
 
@@ -260,7 +298,7 @@ export async function runGameDataValidation() {
       'bun',
       getGameDataValidationCommand(),
       {
-        cwd: process.cwd(),
+        cwd: REPO_ROOT,
         timeout: 120_000,
         maxBuffer: 1024 * 1024 * 5,
       },
@@ -289,7 +327,7 @@ export async function runGameDataGeneration(options?: {
       'bun',
       getGameDataGenerationCommand(options),
       {
-        cwd: process.cwd(),
+        cwd: REPO_ROOT,
         timeout: 300_000,
         maxBuffer: 1024 * 1024 * 10,
       },
@@ -388,6 +426,48 @@ async function parseExportedEntryArray<T>(
   }
 
   return null
+}
+
+async function loadEvaluatedEntryArray<T>(
+  type: EntryType,
+  filePath: string,
+): Promise<T[] | null> {
+  const exportSuffix = `${type.charAt(0).toUpperCase()}${type.slice(1)}`
+  const { stdout } = await execFileAsync(
+    'bun',
+    ['--bun', '-e', EVALUATE_ENTRY_MODULE_SCRIPT, filePath, exportSuffix],
+    {
+      cwd: REPO_ROOT,
+      timeout: 120_000,
+      maxBuffer: 1024 * 1024 * 20,
+    },
+  )
+  const output = stdout.trim()
+  if (!output) return null
+
+  const parsed = JSON.parse(output) as unknown
+  if (!Array.isArray(parsed)) {
+    throw new Error(`Evaluated ${type} entry is not an array`)
+  }
+
+  return parsed as T[]
+}
+
+async function parseEntryArray<T>(
+  type: EntryType,
+  filePath: string,
+  content: string,
+): Promise<T[] | null> {
+  try {
+    const parsed = await parseExportedEntryArray<T>(content)
+    if (parsed !== null) return parsed
+  } catch {
+    // Some authored entries intentionally use helpers, spreads, or generated
+    // arrays. Fall back to evaluating the trusted local data module in a
+    // separate Bun process so those entries can still be edited.
+  }
+
+  return loadEvaluatedEntryArray<T>(type, filePath)
 }
 
 function getMoveTypeList() {
@@ -549,7 +629,14 @@ export async function readMoveTypeFile(
   const content = await fs.readFile(filePath, 'utf-8')
 
   try {
-    const parsed = await parseExportedEntryArray<MoveConfig>(content)
+    // normal.ts intentionally derives several form lists from pokemonData.
+    // Loading the authored module preserves those rules (and Sketch's custom
+    // entry) instead of asking the literal-only fallback parser to evaluate
+    // imported/computed identifiers.
+    const parsed =
+      moveType === 'normal'
+        ? NORMAL_TM_MOVES
+        : await parseExportedEntryArray<MoveConfig>(content)
     if (!parsed) return { moves: [], recommendationsByMoveId: {} }
     const normalizedMoves = parsed.map((move) => normalizeMoveRecord(move))
     const recommendationsByMoveId = await getRecommendationsForMoveIds(
@@ -573,20 +660,104 @@ export async function saveMoveTypeFile(type: string, moves: MoveConfig[]) {
   const config = MOVE_TYPE_BY_FILE[moveType]
 
   const normalized = moves.map((move) => normalizeMoveRecord(move))
-  const json = JSON.stringify(normalized, null, 2)
-  const fileContents = await format(
-    `import type { MoveConfig } from '../types'\n\nexport const ${config.variableName}: MoveConfig[] = ${json}\n`,
-    {
-      parser: 'typescript',
-      singleQuote: true,
-      semi: false,
-      trailingComma: 'all',
-      printWidth: 100,
-      quoteProps: 'as-needed',
-    },
-  )
 
   try {
+    const source = await fs.readFile(filePath, 'utf-8')
+    const originalMoves =
+      moveType === 'normal'
+        ? NORMAL_TM_MOVES
+        : await parseExportedEntryArray<MoveConfig>(source)
+    const ts = await getTypeScriptCompilerApi()
+    const sourceFile = ts.createSourceFile(
+      filePath,
+      source,
+      ts.ScriptTarget.Latest,
+      true,
+    )
+    let fileContents: string | null = null
+
+    for (const statement of sourceFile.statements) {
+      if (!ts.isVariableStatement(statement)) continue
+
+      for (const declaration of statement.declarationList.declarations) {
+        if (
+          !ts.isIdentifier(declaration.name) ||
+          declaration.name.text !== config.variableName ||
+          !declaration.initializer ||
+          !ts.isArrayLiteralExpression(declaration.initializer)
+        ) {
+          continue
+        }
+
+        const originalMovesById = new Map(
+          (originalMoves ?? []).map((move) => [
+            move.id,
+            JSON.stringify(normalizeMoveRecord(move)),
+          ]),
+        )
+        const originalSourceById = new Map<string, string>()
+
+        for (const element of declaration.initializer.elements) {
+          if (!ts.isObjectLiteralExpression(element)) continue
+
+          const idProperty = element.properties.find(
+            (property): property is TypeScriptCompilerApi.PropertyAssignment =>
+              ts.isPropertyAssignment(property) &&
+              ts.isIdentifier(property.name) &&
+              property.name.text === 'id' &&
+              ts.isStringLiteral(property.initializer),
+          )
+
+          if (idProperty && ts.isStringLiteral(idProperty.initializer)) {
+            originalSourceById.set(
+              idProperty.initializer.text,
+              element.getText(sourceFile),
+            )
+          }
+        }
+
+        const serializedEntries = normalized.map((move) => {
+          const original = originalMovesById.get(move.id)
+          const originalSource = originalSourceById.get(move.id)
+
+          // Keep authored expressions such as UNIVERSAL_MOVE_FORM_IDS when an
+          // entry was not edited. This keeps a save from flattening the
+          // source-level rules that make the Normal TM file dynamic.
+          if (
+            originalSource &&
+            original === JSON.stringify(move)
+          ) {
+            return originalSource
+          }
+
+          return JSON.stringify(move, null, 2)
+        })
+        const json = `[
+${serializedEntries.join(',\n')}
+]`
+        const start = declaration.initializer.getStart(sourceFile)
+        const end = declaration.initializer.getEnd()
+        fileContents = await format(
+          `${source.slice(0, start)}${json}${source.slice(end)}`,
+          {
+            parser: 'typescript',
+            singleQuote: true,
+            semi: false,
+            trailingComma: 'all',
+            printWidth: 100,
+            quoteProps: 'as-needed',
+          },
+        )
+        break
+      }
+
+      if (fileContents) break
+    }
+
+    if (!fileContents) {
+      throw new Error(`Could not locate ${config.variableName} in ${config.filename}`)
+    }
+
     await fs.writeFile(filePath, fileContents, 'utf-8')
     const recommendationsByMoveId = await getRecommendationsForMoveIds(
       normalized.map((move) => move.id),
@@ -1075,7 +1246,7 @@ export async function readEntry<T extends EntryType>(
   const filePath = getEntryPath(type, filename)
   try {
     const content = await fs.readFile(filePath, 'utf-8')
-    return await parseExportedEntryArray<EntryMap[T]>(content)
+    return await parseEntryArray<EntryMap[T]>(type, filePath, content)
   } catch (error) {
     console.error(`Error reading entry ${type}/${filename}:`, error)
     return null
@@ -1096,6 +1267,8 @@ export async function saveEntry<T extends EntryType>(
 
     let variableName = ''
     let typeName = ''
+    let initializerStart: number | null = null
+    let initializerEnd: number | null = null
 
     const typeMap: Record<string, { typeName: string; importLine: string }> = {
       battles: {
@@ -1124,9 +1297,44 @@ export async function saveEntry<T extends EntryType>(
     const importLine = typeMap[type]?.importLine || ''
 
     if (existingContent) {
-      const match = existingContent.match(/export const (\w+)\s*:/)
-      if (match) {
-        variableName = match[1]
+      const ts = await getTypeScriptCompilerApi()
+      const sourceFile = ts.createSourceFile(
+        filePath,
+        existingContent,
+        ts.ScriptTarget.Latest,
+        true,
+      )
+      const exportSuffix = `${type.charAt(0).toUpperCase()}${type.slice(1)}`
+
+      for (const statement of sourceFile.statements) {
+        if (!ts.isVariableStatement(statement)) continue
+        const isExported = statement.modifiers?.some(
+          (modifier: TypeScriptCompilerApi.ModifierLike) =>
+            modifier.kind === ts.SyntaxKind.ExportKeyword,
+        )
+        if (!isExported) continue
+
+        for (const declaration of statement.declarationList.declarations) {
+          if (
+            !ts.isIdentifier(declaration.name) ||
+            !declaration.name.text.endsWith(exportSuffix) ||
+            !declaration.initializer
+          ) {
+            continue
+          }
+
+          variableName = declaration.name.text
+          initializerStart = declaration.initializer.getStart(sourceFile)
+          initializerEnd = declaration.initializer.getEnd()
+          break
+        }
+
+        if (variableName) break
+      }
+
+      if (!variableName) {
+        const match = existingContent.match(/export const (\w+)\s*:/)
+        if (match) variableName = match[1]
       }
     }
 
@@ -1183,11 +1391,21 @@ export async function saveEntry<T extends EntryType>(
 
     const jsonString = JSON.stringify(dataWithDefaults, null, 2)
 
-    let newContent = importLine ? `${importLine}\n\n` : ''
+    const newContent =
+      existingContent && initializerStart !== null && initializerEnd !== null
+        ? `${existingContent.slice(0, initializerStart)}${jsonString}${existingContent.slice(initializerEnd)}`
+        : `${importLine ? `${importLine}\n\n` : ''}export const ${variableName}: ${typeName}[] = ${jsonString}\n`
 
-    newContent += `export const ${variableName}: ${typeName}[] = ${jsonString}\n`
+    const formatted = await format(newContent, {
+      parser: 'typescript',
+      singleQuote: true,
+      semi: false,
+      trailingComma: 'all',
+      printWidth: 100,
+      quoteProps: 'as-needed',
+    })
 
-    await fs.writeFile(filePath, newContent, 'utf-8')
+    await fs.writeFile(filePath, formatted, 'utf-8')
     return { success: true }
   } catch (error) {
     console.error(`Error saving entry ${type}/${filename}:`, error)

@@ -484,7 +484,6 @@ try {
     assert.equal(await redis.get(captureStateKey), null)
     assertions += 7
 
-    await fetch(`${origin}/dev/battles`)
     const {makePvpBattleState} = await import('../tests/helpers/battle-fixtures')
     const pvpId = `${prefix}-pvp`
     const pvpState = makePvpBattleState({pvpBattleId: pvpId, battleId: pvpId, economyActionId: randomUUID()})
@@ -518,14 +517,9 @@ try {
     assert.equal((await getUserActivityStatsMap(payload, owner.id, ['battleResults'])).battles?.[pvpId]?.losses, 1)
     assert.equal((await getUserActivityStatsMap(payload, stranger.id, ['battleResults'])).battles?.[pvpId]?.wins, 1)
     assertions += 9
-    const devId = await actionId('src/app/dev/actions.ts', 'getItemList')
-    assert.equal((await invoke('/dev/battles', devId, [], ownerToken)).status, 500)
-    assert.equal((await invoke('/dev/battles', devId, [])).status, 500)
-    assert.equal((await invoke('/dev/battles', devId, [], adminToken)).status, 200)
     const manifest = JSON.parse(await readFile('.next-security/dev/server/server-reference-manifest.json', 'utf8'))
     const forbidden = new Set(['getActiveBattleState', 'handleWin', 'finalizeTurn', 'recordDailyActivityProgress', 'incrementDailyTaskProgress', 'recordExpeditionActivityResult', 'setSafariBallsRemaining', 'endSafariExpeditionWithoutBalls', 'getActiveExpeditionForUser', 'getGameActivityStateForUser', 'setGameActivityStateForUser', 'clearGameActivityStateForUser', 'applyEncounterPromptResult', 'drawRandomTcgCard', 'drawTcgBoosterPacks'])
     for (const value of Object.values(manifest.node) as any[]) assert.ok(!forbidden.has(value.exportedName), `Unsafe emitted action: ${value.exportedName}`)
-    assertions += 4
   }
   if (origin && process.env.POKEORI_PROFILE_GAME_SYNC === '1') {
     const { profileIsolatedGameSync } = await import('./profile-isolated-game-sync')

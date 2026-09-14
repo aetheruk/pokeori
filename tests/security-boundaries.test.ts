@@ -82,7 +82,7 @@ describe('Server Action export boundary', () => {
   })
 
   test('every developer action checks authorization before accessing files or invoking tools', async () => {
-    const source = await parseSource('src/app/dev/actions.ts')
+    const source = await parseSource('tools/content-editor/app/actions.ts')
     const exported = publicFunctions(source)
     expect(exported.length).toBeGreaterThan(20)
     for (const fn of exported) {
@@ -90,31 +90,19 @@ describe('Server Action export boundary', () => {
     }
   })
 
-  test('developer authorization rejects production and nonadmins before any tool operation', async () => {
-    // Isolate framework mocks so other suites continue exercising their own adapters.
+  test('local editor authorization rejects production and missing opt-in before any tool operation', async () => {
     const script = `
       import { mock } from 'bun:test'
       import { strict as assert } from 'node:assert'
       mock.module('server-only', () => ({}))
-      mock.module('@/payload.config', () => ({ default: {} }))
-      mock.module('next/headers', () => ({ headers: async () => new Headers() }))
-      let user = null
-      let payloadCalls = 0
-      mock.module('payload', () => ({ getPayload: async () => {
-        payloadCalls++
-        return { auth: async () => ({ user }) }
-      } }))
-      const { requireDevAdmin } = await import('./src/utilities/dev/authorization.ts')
+      const { requireDevAdmin } = await import('./tools/content-editor/server/authorization.ts')
       process.env.NODE_ENV = 'production'
-      user = { id: 'admin', isAdmin: true }
+      process.env.POKEORI_CONTENT_EDITOR = '1'
       await assert.rejects(requireDevAdmin(), /disabled in production/)
-      assert.equal(payloadCalls, 0)
       process.env.NODE_ENV = 'development'
-      user = null
-      await assert.rejects(requireDevAdmin(), /Administrator access required/)
-      user = { id: 'player', isAdmin: false }
-      await assert.rejects(requireDevAdmin(), /Administrator access required/)
-      user = { id: 'admin', isAdmin: true }
+      delete process.env.POKEORI_CONTENT_EDITOR
+      await assert.rejects(requireDevAdmin(), /not enabled/)
+      process.env.POKEORI_CONTENT_EDITOR = '1'
       await requireDevAdmin()
     `
     const child = Bun.spawn([process.execPath, '-e', script], { stdout: 'pipe', stderr: 'pipe' })

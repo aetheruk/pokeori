@@ -3,7 +3,7 @@ import {
   formatDevCommandOutput,
   getGameDataGenerationCommand,
   getGameDataValidationCommand,
-} from '@/utilities/dev/game-data-tools'
+} from '../tools/content-editor/server/game-data-tools'
 
 describe('dev game data tools', () => {
   test('builds validation command', () => {
