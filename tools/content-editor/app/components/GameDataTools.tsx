@@ -46,7 +46,7 @@ export function GameDataTools() {
         <div>
           <h2 className="text-lg font-semibold">Game Data Pipeline</h2>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            Run the unified generation pipeline and integrity checks from the dev tools.
+            Run the unified generation pipeline and integrity checks from the studio.
           </p>
         </div>
 

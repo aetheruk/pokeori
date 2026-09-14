@@ -43,7 +43,13 @@ next-env.d.ts
 
 /media
 
-/tools
+/tools/*
+!/tools/content-editor/
+!/tools/content-editor/**
+/tools/content-editor/.next/
+/tools/content-editor/tsconfig.tsbuildinfo
+/tools/content-editor/AGENTS.md
+/tools/content-editor/CLAUDE.md
 
 # Playwright
 node_modules/

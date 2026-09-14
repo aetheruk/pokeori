@@ -10,7 +10,7 @@ changes.
 - Confirm Coolify has the same stable `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` enabled for build and runtime, with Docker Build Secrets enabled.
 - Confirm `.env` is ignored and no real secrets are committed.
 - Configure `BETA_INVITATION_SECRET` and use the signed, expiring, single-use invitation workflow for registration.
-- Confirm `/dev` and `/ui-test` routes are unavailable in production, including direct authoring actions.
+- Confirm the main app contains no `/dev` authoring routes. The local Content Studio is not part of the production image, and its direct file-writing actions require its local opt-in.
 - Confirm CSP is enforced; check legitimate player/admin flows without adding production `unsafe-eval`.
 - Confirm sensitive routes/actions are rate-limited or queued.
 

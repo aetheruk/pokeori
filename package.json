@@ -1,6 +1,6 @@
 {
   "name": "pokeori",
-  "version": "0.34.15",
+  "version": "0.34.16",
   "description": "Pokeori field-journal adventure game",
   "license": "MIT",
   "type": "module",
@@ -11,6 +11,9 @@
     "build": "bun --bun next build --turbopack",
     "build:standalone": "bun run build && cp -R public .next/standalone/public && mkdir -p .next/standalone/.next && cp -R .next/static .next/standalone/.next/static",
     "dev": "pkill redis-server || true; concurrently --kill-others -n redis,next -c blue,magenta \"./tools/redis-stable/src/redis-server\" \"bun --bun next dev --turbo --experimental-https\"",
+    "content-editor": "bun run --cwd tools/content-editor dev",
+    "content-editor:build": "bun run --cwd tools/content-editor build",
+    "content-editor:typecheck": "bun run --cwd tools/content-editor typecheck",
     "devsafe": "rm -rf .next && bun --bun next dev --turbo --experimental-https",
     "generate:importmap": "payload generate:importmap",
     "generate:types": "payload generate:types",

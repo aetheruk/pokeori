@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
 function sourceFiles(dir: string): string[] {
@@ -16,11 +16,16 @@ function sourceFiles(dir: string): string[] {
 }
 
 describe('source hygiene', () => {
-  test('dev entry actions do not evaluate entry file contents', () => {
-    const source = readFileSync(join(process.cwd(), 'src/app/dev/actions.ts'), 'utf-8')
+  test('local content editor actions do not evaluate entry file contents', () => {
+    const source = readFileSync(join(process.cwd(), 'tools/content-editor/app/actions.ts'), 'utf-8')
 
     expect(source).not.toContain('eval(')
     expect(source).not.toContain('new Function')
+  })
+
+  test('the main app has no embedded content editor routes', () => {
+    expect(existsSync(join(process.cwd(), 'src/app/dev'))).toBe(false)
+    expect(existsSync(join(process.cwd(), 'tools/content-editor/app'))).toBe(true)
   })
 
   test('Payload scripts invoke the CLI binary directly', () => {

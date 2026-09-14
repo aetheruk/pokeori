@@ -4,9 +4,9 @@ import Link from 'next/link'
 export default function DevPage() {
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-3xl font-bold tracking-tight">Pokemon App Dev Tools</h1>
+      <h1 className="text-3xl font-bold tracking-tight">Pokeori Content Studio</h1>
       <p className="text-muted-foreground">
-        Welcome to the developer tools. Use the navigation above to manage game data.
+        Shape the field journal by editing authored game data directly in this workspace.
       </p>
 
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
@@ -41,7 +41,7 @@ export default function DevPage() {
           </p>
         </div>
         <Link
-          href="/dev/moves"
+          href="/moves"
           className="rounded-lg border bg-card text-card-foreground shadow-sm p-6 block hover:bg-card/85"
         >
           <h3 className="font-semibold leading-none tracking-tight">Moves</h3>
@@ -50,7 +50,7 @@ export default function DevPage() {
           </p>
         </Link>
         <Link
-          href="/dev/abilities"
+          href="/abilities"
           className="rounded-lg border bg-card text-card-foreground shadow-sm p-6 block hover:bg-card/85"
         >
           <h3 className="font-semibold leading-none tracking-tight">Abilities</h3>
@@ -59,7 +59,7 @@ export default function DevPage() {
           </p>
         </Link>
         <Link
-          href="/dev/rarities"
+          href="/rarities"
           className="rounded-lg border bg-card text-card-foreground shadow-sm p-6 block hover:bg-card/85"
         >
           <h3 className="font-semibold leading-none tracking-tight">Rarities</h3>

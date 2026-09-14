@@ -1,9 +1,6 @@
-import { getPayload } from 'payload'
-import configPromise from '@payload-config'
-import { headers } from 'next/headers'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import '../../styles/globals.css'
+import './globals.css'
 import { appSans } from '@/app/fonts'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
@@ -11,8 +8,8 @@ import { Toaster } from '@/components/ui/sonner'
 export const dynamic = 'force-dynamic'
 
 export const metadata = {
-  title: 'Pokemon App Dev Tools',
-  description: 'Developer tools for Pokemon App',
+  title: 'Pokeori Content Studio',
+  description: 'Local authoring tools for Pokeori game data',
 }
 
 export default async function DevLayout({
@@ -20,10 +17,12 @@ export default async function DevLayout({
 }: {
   children: React.ReactNode
 }) {
-  if (process.env.NODE_ENV === 'production') notFound()
-  const payload = await getPayload({ config: configPromise })
-  const { user } = await payload.auth({ headers: await headers() })
-  if (!user?.isAdmin) notFound()
+  if (
+    process.env.NODE_ENV === 'production' ||
+    process.env.POKEORI_CONTENT_EDITOR !== '1'
+  ) {
+    notFound()
+  }
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -38,54 +37,54 @@ export default async function DevLayout({
             <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
               <div className="mx-auto flex h-14 w-full max-w-none items-center px-4 md:px-8">
                 <div className="mr-4 hidden md:flex">
-                  <Link className="mr-6 flex items-center space-x-2 font-bold" href="/dev">
-                    Dev Tools
+                  <Link className="mr-6 flex items-center space-x-2 font-bold" href="/">
+                    Content Studio
                   </Link>
                   <nav className="flex items-center gap-6 text-sm font-medium">
                     <Link
-                      href="/dev/battles"
+                      href="/battles"
                       className="transition-colors hover:text-foreground/80 text-foreground/60"
                     >
                       Battles
                     </Link>
                     <Link
-                      href="/dev/locations"
+                      href="/locations"
                       className="transition-colors hover:text-foreground/80 text-foreground/60"
                     >
                       Locations
                     </Link>
                     <Link
-                      href="/dev/tasks"
+                      href="/tasks"
                       className="transition-colors hover:text-foreground/80 text-foreground/60"
                     >
                       Tasks
                     </Link>
                     <Link
-                      href="/dev/shops"
+                      href="/shops"
                       className="transition-colors hover:text-foreground/80 text-foreground/60"
                     >
                       Shops
                     </Link>
                     <Link
-                      href="/dev/voyages"
+                      href="/voyages"
                       className="transition-colors hover:text-foreground/80 text-foreground/60"
                     >
                       Voyages
                     </Link>
                     <Link
-                      href="/dev/moves"
+                      href="/moves"
                       className="transition-colors hover:text-foreground/80 text-foreground/60"
                     >
                       Moves
                     </Link>
                     <Link
-                      href="/dev/abilities"
+                      href="/abilities"
                       className="transition-colors hover:text-foreground/80 text-foreground/60"
                     >
                       Abilities
                     </Link>
                     <Link
-                      href="/dev/rarities"
+                      href="/rarities"
                       className="transition-colors hover:text-foreground/80 text-foreground/60"
                     >
                       Rarities
