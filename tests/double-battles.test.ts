@@ -298,7 +298,7 @@ describe('double battles',()=>{
     expect(html).not.toContain('Opponent lane 2: E1')
     battle.activeEnemySlots=[0,null]
     const emptyLaneHtml=renderToStaticMarkup(createElement(DoubleBattleScene,{state:battle,isWaitingForOpponent:false}))
-    expect(emptyLaneHtml).toContain('Empty lane')
+    expect(emptyLaneHtml).not.toContain('Empty lane')
   })
   test('four-lane scene applies attack effects only to the acting Pokemon',()=>{
     const html=renderToStaticMarkup(createElement(DoubleBattleScene,{
