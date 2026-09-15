@@ -69,6 +69,10 @@ import {
   beginBattlePresentation,
   finalizeBattlePresentation,
 } from '@/utilities/battle/presentation'
+import {
+  settleDoublesSketchAttempts,
+  type DoublesSketchAttempt,
+} from '../helpers/doubles-sketch'
 import { processTerrainTurnEffects } from '@/utilities/battle/terrain-effects'
 import {
   attemptSmeargleSketch,
@@ -109,11 +113,39 @@ export async function resolvePvpTurn(
   if (state.format === 'double') {
     if (!p1Move.actions || !p2Move.actions) throw new Error('Both trainers must submit doubles actions')
     ensurePvpPowerStates(state)
+    const { p1Id, p2Id } = getSharedBattleUserIds(state)
+    const sketchAttempts: DoublesSketchAttempt[] = []
     resolveDoublesTurn(state, p1Move.actions, p2Move.actions, options.random ?? Math.random,
       ({state:next,side,actor,action}) => {
         if (action.kind === 'item') throw new Error('Trainer items are not available in PvP.')
         return applyDoublesPowerAction(next,side,actor,action)
-      })
+      },
+      (attempt) => {
+        const userId = attempt.side === 'player' ? p1Id : p2Id
+        if (!userId) return
+        sketchAttempts.push({
+          attacker: attempt.actor,
+          opponent: attempt.opponent,
+          succeeded: attempt.succeeded,
+          userId,
+        })
+      },
+    )
+    if (sketchAttempts.length > 0) {
+      const payload =
+        options.persist === false
+          ? undefined
+          : await getPayload({ config: configPromise })
+      const sketchMessages = await settleDoublesSketchAttempts(
+        state,
+        sketchAttempts,
+        payload,
+        options.random ?? Math.random,
+      )
+      if (sketchMessages.length > 0 && state.history[0]) {
+        state.history[0].message += `\n${sketchMessages.join('\n')}`
+      }
+    }
     for(const event of state.presentation?.events??[]) if(event.type==='faint') recordPokemonKOForPokemon(state,event.side,(event.side==='player'?state.playerTeam:state.enemyTeam)[event.pokemonIndex])
     if(options.persist!==false) {
       const faintEvents=(state.presentation?.events??[]).filter((event):event is Extract<BattlePresentationEvent,{type:'faint'}>=>event.type==='faint')

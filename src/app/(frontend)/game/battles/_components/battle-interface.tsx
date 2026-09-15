@@ -21,6 +21,7 @@ import { useAudio } from '@/context/AudioContext'
 import type { BattleStance, BattleState } from '@/utilities/battle/types'
 import {
   getDefaultDoublesTarget,
+  getEligibleDoublesActorSlots,
   stageDoublesAction,
   type DoublesAction,
   type DoublesTarget,
@@ -734,6 +735,35 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
     [battleState, doublesDraft, handleDoublesSubmit, isProcessing, isWaitingForServer, isWaitingForOpponent],
   )
 
+  const handleDoublesChooseActor = useCallback(
+    (slot: 0 | 1) => {
+      if (
+        isProcessing ||
+        isWaitingForServer ||
+        isWaitingForOpponent ||
+        battleState.status !== 'ongoing' ||
+        doublesDraft[slot]
+      )
+        return
+      setSelectedDoublesSlot(slot)
+      setSelectedDoublesTarget(getDefaultDoublesTarget(battleState))
+    },
+    [
+      battleState,
+      doublesDraft,
+      isProcessing,
+      isWaitingForOpponent,
+      isWaitingForServer,
+    ],
+  )
+
+  const selectableDoublesSlots =
+    battleState.format === 'double'
+      ? getEligibleDoublesActorSlots(battleState).filter(
+          (slot) => !doublesDraft[slot],
+        )
+      : []
+
   const playerHasTeraEffect = !!activePlayerMon?.teraTypeOverride
   const choosingLead = needsPlayerLeadSelection(battleState)
 
@@ -836,6 +866,8 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
           selectedDoublesSlot={selectedDoublesSlot}
           selectedDoublesTarget={selectedDoublesTarget}
           onChooseDoublesTarget={setSelectedDoublesTarget}
+          selectableDoublesSlots={selectableDoublesSlots}
+          onChooseDoublesActor={handleDoublesChooseActor}
           disableDoublesTargetSelection={
             isProcessing ||
             isWaitingForServer ||

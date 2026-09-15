@@ -9,7 +9,9 @@ export type DoublesAction =
   | {slot:DoublesSlot;kind:'switch';pokemonIndex:number}
   | {slot:DoublesSlot;kind:'item';itemId:string;targetPokemonIndex?:number}
   | {slot:DoublesSlot;kind:'power';powerId:'tera'|'mega'|'dynamax'|'z-move';formId?:string}
-export type DoublesDraft = Partial<Record<DoublesSlot, DoublesAction>>
+export type DoublesDraft = Partial<Record<DoublesSlot, DoublesAction>> & {
+  selectionOrder?: DoublesSlot[]
+}
 
 export function getDoublesSlots(state:BattleState,side:DoublesSide):[number|null,number|null] {
   const slots=side==='player'?state.activePlayerSlots:state.activeEnemySlots
@@ -48,11 +50,21 @@ export function stageDoublesAction(
 ): { draft: DoublesDraft; nextSlot?: DoublesSlot; actions?: DoublesAction[] } | undefined {
   const active = getEligibleDoublesActorSlots(state)
   if (!active.includes(action.slot)) return undefined
-  const nextDraft = { ...draft, [action.slot]: action }
+  const selectionOrder = draft.selectionOrder?.includes(action.slot)
+    ? draft.selectionOrder
+    : [...(draft.selectionOrder ?? []), action.slot]
+  const nextDraft = {
+    ...draft,
+    [action.slot]: action,
+    selectionOrder,
+  }
   const nextSlot = active.find((slot) => !nextDraft[slot])
   return {
     draft: nextDraft,
     nextSlot,
-    actions: nextSlot === undefined ? active.map((slot) => nextDraft[slot]!) : undefined,
+    actions:
+      nextSlot === undefined
+        ? selectionOrder.map((slot) => nextDraft[slot]!)
+        : undefined,
   }
 }

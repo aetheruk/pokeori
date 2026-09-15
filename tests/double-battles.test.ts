@@ -13,6 +13,7 @@ import { generateBattleEvents } from '@/utilities/battle/engine/event-generator'
 import { getDefaultDoublesTarget, stageDoublesAction } from '@/utilities/battle/doubles-state'
 import { canEnemyPokemonUseAiMove } from '@/utilities/battle/enemy-ai'
 import type { BattlePokemon, BattleState } from '@/utilities/battle/types'
+import { settleDoublesSketchAttempts } from '@/app/(frontend)/game/battles/helpers/doubles-sketch'
 
 function mon(id:string,side:'player'|'enemy',overrides:Partial<BattlePokemon>={}):BattlePokemon {
   return {id,user:side,originalTrainer:side,speciesId:1,formId:'1',level:50,name:id,types:['normal'],stats:{hp:999,attack:60,defense:60,specialAttack:60,specialDefense:60,speed:60},currentHp:999,maxHp:999,moveUsesRemaining:3,battleMoveIds:[],updatedAt:'2026-01-01T00:00:00.000Z',createdAt:'2026-01-01T00:00:00.000Z',...overrides}
@@ -47,6 +48,9 @@ describe('double battles',()=>{
     const second=stageDoublesAction(battle,first!.draft,hit(1,1))
     expect(second?.nextSlot).toBeUndefined()
     expect(second?.actions).toEqual([hit(0,1),hit(1,1)])
+    const reordered=stageDoublesAction(battle,{},hit(1,0))
+    const reorderedComplete=stageDoublesAction(battle,reordered!.draft,hit(0,0))
+    expect(reorderedComplete?.actions).toEqual([hit(1,0),hit(0,0)])
     battle.playerTeam[1].currentHp=0
     const lone=stageDoublesAction(battle,{},hit(0,1))
     expect(lone?.actions).toEqual([hit(0,1)])
@@ -58,6 +62,22 @@ describe('double battles',()=>{
     expect(next.enemyTeam[1].currentHp).toBeLessThan(999)
     expect(next.turn).toBe(2)
     expect(next.presentation?.events.filter(event=>event.type==='attack'&&event.actorSide==='player')).toHaveLength(2)
+  })
+  test('resolves ordered lane exchanges and lets a later lane be skipped after a KO',()=>{
+    const battle=state()
+    battle.enemyTeam[1].currentHp=1
+    const next=resolveDoublesTurn(
+      battle,
+      [hit(0,1),hit(1,0)],
+      [hit(0,0),hit(1,1)],
+      ()=>0.1,
+    )
+    const attacks=(next.presentation?.events ?? []).filter(
+      (event)=>event.type==='attack',
+    )
+    expect(attacks.some((event)=>event.actorSide==='player'&&event.actorIndex===0&&event.targetIndex===1)).toBe(true)
+    expect(attacks.some((event)=>event.actorSide==='enemy'&&event.actorIndex===0)).toBe(true)
+    expect(attacks.some((event)=>event.actorSide==='enemy'&&event.actorIndex===1)).toBe(false)
   })
   test('a fresh doubles presentation queues lane-specific playback before the final state',()=>{
     const before=state()
@@ -77,6 +97,61 @@ describe('double battles',()=>{
     expect(next.enemyTeam[1].currentHp).toBeLessThan(999)
     expect(next.playerTeam[1].currentHp).toBeLessThan(beforeAlly)
     expect(next.playerTeam[0].moveUsesRemaining).toBe(2)
+  })
+  test('stance matchup applies only to the opposing actor in a spread phase',()=>{
+    const stanceHit=(slot:0|1,target:0|1,stance:'power'|'tech'):DoublesAction=>({slot,kind:'basic',stance,attackType:'normal',target:{side:'opponent',slot:target}})
+    const resolveSpread=(pairedStance:'power'|'tech')=>{
+      const battle=state()
+      battle.playerTeam[0].battleMoveIds=['earthquake']
+      const next=resolveDoublesTurn(
+        battle,
+        [{slot:0,kind:'move',moveId:'earthquake'},hit(1,1)],
+        [stanceHit(0,0,pairedStance),stanceHit(1,1,'tech')],
+        ()=>0.1,
+      )
+      const spreadEvents=(next.presentation?.events ?? []).filter(
+        (event)=>event.type==='attack'&&event.actorSide==='player'&&event.actorIndex===0,
+      )
+      const damageAgainst=(targetSide:'player'|'enemy',targetIndex:number)=>{
+        const event=spreadEvents.find(
+          (candidate)=>candidate.type==='attack'&&candidate.targetSide===targetSide&&candidate.targetIndex===targetIndex,
+        )
+        return event?.type==='attack' ? event.damage : 0
+      }
+      return {
+        pairedOpponent:damageAgainst('enemy',0),
+        secondaryOpponent:damageAgainst('enemy',1),
+        ally:damageAgainst('player',1),
+      }
+    }
+    const matchupWin=resolveSpread('tech')
+    const matchupTie=resolveSpread('power')
+    const relativeDifference=(first:number,second:number)=>Math.abs(first-second)/Math.max(first,second,1)
+    expect(matchupWin.pairedOpponent).toBeGreaterThan(matchupTie.pairedOpponent)
+    expect(relativeDifference(matchupWin.secondaryOpponent,matchupTie.secondaryOpponent)).toBeLessThan(0.2)
+    expect(relativeDifference(matchupWin.ally,matchupTie.ally)).toBeLessThan(0.2)
+  })
+  test('Sketch captures a move from the selected opposing lane',async()=>{
+    const battle=state()
+    battle.playerTeam[0]=mon('Smeargle','player',{speciesId:235,formId:'235',pokemonResearchLevel:5,battleMoveIds:['sketch']})
+    battle.enemyTeam[1].battleMoveIds=['thunderbolt']
+    const attempts:Array<{attacker:BattlePokemon;opponent?:BattlePokemon;succeeded:boolean;userId:string}>=[]
+    resolveDoublesTurn(
+      battle,
+      [{slot:0,kind:'move',moveId:'sketch',target:{side:'opponent',slot:1}},hit(1,0)],
+      enemy,
+      ()=>0.1,
+      undefined,
+      (attempt)=>{
+        if(attempt.side==='player') attempts.push({attacker:attempt.actor,opponent:attempt.opponent,succeeded:attempt.succeeded,userId:'player'})
+      },
+    )
+    expect(attempts).toHaveLength(1)
+    expect(attempts[0].opponent?.name).toBe('E1')
+    expect(attempts[0].succeeded).toBe(true)
+    const messages=await settleDoublesSketchAttempts(battle,attempts,undefined,()=>0.1)
+    expect(messages).toContain('Smeargle sketched Thunderbolt!')
+    expect(battle.pendingSketchedMoves?.[0]?.id).toBe('thunderbolt')
   })
   test('Follow Me redirects single-target attacks but does not pull spread moves',()=>{
     const battle=state()
@@ -140,6 +215,25 @@ describe('double battles',()=>{
     const viewer=toPerspectivePvpState(next,'enemy','pvp-test')
     expect(viewer.playerTeam[0].id).toBe('E0')
     expect(viewer.enemyTeam[0].id).toBe('P0')
+  })
+  test('PvP doubles Sketch uses the selected opposing lane',async()=>{
+    const battle=state(true)
+    battle.playerTeam[0]=mon('Smeargle','player',{speciesId:235,formId:'235',pokemonResearchLevel:5,battleMoveIds:['sketch']})
+    battle.enemyTeam[1].battleMoveIds=['thunderbolt']
+    const next=await resolvePvpTurn(
+      battle,
+      {
+        stance:'tech',
+        actions:[{slot:0,kind:'move',moveId:'sketch',target:{side:'opponent',slot:1}},hit(1,0)],
+      },
+      {
+        stance:'tech',
+        actions:[hit(0,0),hit(1,1)],
+      },
+      {persist:false,random:()=>0.1},
+    )
+    expect(next.pendingSketchedMoves?.[0]?.id).toBe('thunderbolt')
+    expect(next.history[0]?.message).toContain('Smeargle sketched Thunderbolt!')
   })
   test('item or power commands never silently no-op without a real resolver',()=>{
     const battle=state()
@@ -213,6 +307,13 @@ describe('double battles',()=>{
     }))
     expect(html.match(/translate-x-12 -translate-y-12/g)).toHaveLength(1)
     expect(html.match(/selected-doubles-arrow/g)).toHaveLength(1)
+  })
+  test('own active sprites expose actor selection before their action is drafted',()=>{
+    const html=renderToStaticMarkup(createElement(DoubleBattleScene,{
+      state:state(),isWaitingForOpponent:false,selectablePlayerSlots:[1],onChooseActor:()=>{},
+    }))
+    expect(html).toContain('doubles-actor-player-1')
+    expect(html).toContain('Choose P1 to act next')
   })
   test('single-target commands expose only living eligible sprites with a red target arrow',()=>{
     const battle=state()
