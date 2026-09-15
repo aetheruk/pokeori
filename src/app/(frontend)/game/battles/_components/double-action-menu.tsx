@@ -14,6 +14,7 @@ import { ItemSprite } from '@/components/ui/item-sprite'
 import { cn } from '@/lib/utils'
 import { getMove } from '@/data/moves'
 import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
+import { getBattleMoveTriggerItemId } from '@/utilities/battle/move-presentation'
 import {
   getDefaultDoublesTarget,
   getDoublesPokemon,
@@ -111,6 +112,7 @@ export function DoubleActionMenu() {
   )
   const replacementSlots = battleState.pendingPlayerReplacementSlots ?? []
   const actor = getDoublesPokemon(battleState, 'player', selectedSlot)
+  const moveTriggerItemId = getBattleMoveTriggerItemId(actor?.types)
   const action = draft[selectedSlot]
   const partner = getDoublesPokemon(
     battleState,
@@ -359,7 +361,7 @@ export function DoubleActionMenu() {
                       onClick={() => setPanel('moves')}
                     >
                       <ItemSprite
-                        itemId={`tm-${actor.types[0] ?? 'normal'}`}
+                        itemId={moveTriggerItemId}
                         alt=""
                         width={22}
                         height={22}
@@ -427,7 +429,7 @@ export function DoubleActionMenu() {
               state={battleState}
               selectedType={selectedType}
               usesRemaining={actor.moveUsesRemaining ?? 0}
-              triggerItemId={`tm-${actor.types[0] ?? 'normal'}`}
+              triggerItemId={moveTriggerItemId}
               disabled={disabled}
               onDetails={setMoveInfoId}
               onUseMove={(moveId) => commit({

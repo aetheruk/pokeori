@@ -13,6 +13,10 @@ interface OffensiveStatStages {
   specialAttack?: number
 }
 
+export function getBattleMoveTriggerItemId(types?: string[]): string {
+  return `tm-${types?.[0]?.toLowerCase() || 'normal'}`
+}
+
 function effectiveStat(
   value: number,
   stage: number | undefined,

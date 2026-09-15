@@ -4,7 +4,8 @@ import { BattleLog } from '@/app/(frontend)/game/battles/_components/battle-log'
 import { HealthDisplay } from '@/app/(frontend)/game/battles/_components/health-display'
 import { StanceSelector } from '@/app/(frontend)/game/battles/_components/stance-selector'
 import { STANCE_ICON_CONFIG } from '@/components/game/shared/stance-icon'
-import { getMoveEffectivePower } from '@/utilities/battle/move-presentation'
+import { getBattleMoveTriggerItemId, getMoveEffectivePower } from '@/utilities/battle/move-presentation'
+import { getItemSpriteUrl } from '@/data/items'
 import { getBattleStatusChip } from '@/utilities/battle/status-presentation'
 import type { BattleLogEntry } from '@/utilities/battle/types'
 
@@ -51,6 +52,15 @@ describe('battle UI stance styling', () => {
 })
 
 describe('battle move and status presentation', () => {
+  test('resolves the same existing TM icon for single and double battle type names', () => {
+    for (const type of ['Normal', 'Fire', 'Electric', 'Ghost']) {
+      expect(getItemSpriteUrl(getBattleMoveTriggerItemId([type]))).toBe(
+        `/sprites/items/tm/tm-${type.toLowerCase()}.avif`,
+      )
+    }
+    expect(getBattleMoveTriggerItemId()).toBe('tm-normal')
+  })
+
   test('compares move power using the matching staged offensive stat', () => {
     const stats = {
       attack: 40,
