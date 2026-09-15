@@ -10,7 +10,7 @@ const isSameLogEntry = (
   b?: BattleState['history'][number],
 ) => {
   if (!a || !b) return false
-  return a.turn === b.turn && a.message === b.message
+  return a.turn === b.turn && a.phase === b.phase && a.message === b.message
 }
 
 const isCombatLog = (entry?: BattleState['history'][number]) => {

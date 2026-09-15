@@ -151,7 +151,8 @@ function getDoublesActionPriority(state:BattleState,side:DoublesSide,action:Doub
   return priority
 }
 
-function getActionStance(action: DoublesAction): BattleStance | undefined {
+function getActionStance(action?: DoublesAction): BattleStance | undefined {
+  if (!action) return undefined
   if (action.kind === 'basic') return action.stance
   if (action.kind === 'move') {
     const stance = getMove(action.moveId)?.stance
@@ -180,7 +181,11 @@ function targetList(state: BattleState, side: DoublesSide, action: DoublesAction
   return [{ side: otherSide(side), slot }]
 }
 
-function applySimpleMoveEffects(state: BattleState, side: DoublesSide, actor: BattlePokemon, target: BattlePokemon, move: MoveConfig, damage: number, random: () => number, messages: string[], applyRuntime:boolean) {
+type DoublesMessageCollector = {
+  push: (...messages: string[]) => void
+}
+
+function applySimpleMoveEffects(state: BattleState, side: DoublesSide, actor: BattlePokemon, target: BattlePokemon, move: MoveConfig, damage: number, random: () => number, messages: DoublesMessageCollector, applyRuntime:boolean) {
   const allyBenefit=move.doublesTarget==='ally'||move.doublesTarget==='both-allies'
   for (const buff of move.buffs ?? []) {
     const mon = allyBenefit ? target : buff.target === 'enemy' ? target : actor
@@ -220,9 +225,19 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
   if (error) throw new Error(error)
   if (!specialAction && [...playerActions,...enemyActions].some(action=>action.kind==='item'||action.kind==='power')) throw new Error('Trainer action resolver is unavailable.')
   const events: BattlePresentationEvent[] = []
-  const messages: string[] = []
-  let playerDamage = 0
-  let enemyDamage = 0
+  const phaseMessages: Record<'A' | 'B', string[]> = { A: [], B: [] }
+  const phaseDamage: Record<'A' | 'B', { damageDealt: number; damageTaken: number }> = {
+    A: { damageDealt: 0, damageTaken: 0 },
+    B: { damageDealt: 0, damageTaken: 0 },
+  }
+  const phaseStances: Record<'A' | 'B', { playerStance: BattleStance; enemyStance: BattleStance }> = {
+    A: { playerStance: 'tech', enemyStance: 'tech' },
+    B: { playerStance: 'tech', enemyStance: 'tech' },
+  }
+  const phaseResults: Record<'A' | 'B', 'win' | 'loss' | 'tie'> = {
+    A: 'tie',
+    B: 'tie',
+  }
   const redirection:Partial<Record<DoublesSide,{index:number;kind:'follow-me'|'rage-powder'}>>={}
   const guards:Partial<Record<DoublesSide,Set<string>>>={}
   const all: Scheduled[] = [...playerActions.map((action, phase) => ({side:'player' as const, action, phase, order: phase})), ...enemyActions.map((action, phase) => ({side:'enemy' as const, action, phase, order: phase + 2}))].map(entry => ({
@@ -234,6 +249,33 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
   all.sort((a,b) => a.phase-b.phase || b.priority-a.priority || b.speed-a.speed || a.order-b.order)
 
   let activePhase = -1
+  const phaseKey = (phase: number): 'A' | 'B' | undefined =>
+    phase === 0 ? 'A' : phase === 1 ? 'B' : undefined
+  const messages: DoublesMessageCollector = {
+    push: (...lines) => {
+      const currentPhase = phaseKey(activePhase)
+      if (currentPhase) phaseMessages[currentPhase].push(...lines)
+    },
+  }
+  const pushEvent = (event: BattlePresentationEvent) => {
+    const currentPhase = phaseKey(activePhase)
+    if (!currentPhase) {
+      events.push(event)
+      return
+    }
+
+    const phaseEvent = { ...event, phase: currentPhase } as BattlePresentationEvent
+    if (phaseEvent.type === 'attack') {
+      phaseEvent.simultaneousGroup ??= `doubles-impact:${state.turn}:${currentPhase}`
+      phaseEvent.animateActor =
+        phaseResults[currentPhase] === 'tie' ||
+        (phaseResults[currentPhase] === 'win' && phaseEvent.actorSide === 'player') ||
+        (phaseResults[currentPhase] === 'loss' && phaseEvent.actorSide === 'enemy')
+    } else if (phaseEvent.type === 'hp-change') {
+      phaseEvent.simultaneousGroup ??= `doubles-impact:${state.turn}:${currentPhase}`
+    }
+    events.push(phaseEvent)
+  }
   let phaseActors = new Set<string>()
   let phaseActions: Partial<Record<DoublesSide, DoublesAction>> = {}
   let phaseActorIndices: Partial<Record<DoublesSide, number>> = {}
@@ -248,6 +290,17 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
           phaseActions[entry.side] = entry.action
           phaseActorIndices[entry.side] = entry.actorIndex
         }
+      }
+      const currentPhase = phaseKey(phase)
+      if (currentPhase) {
+        phaseStances[currentPhase] = {
+          playerStance: getActionStance(phaseActions.player) ?? 'tech',
+          enemyStance: getActionStance(phaseActions.enemy) ?? 'tech',
+        }
+        phaseResults[currentPhase] = resolveStance(
+          phaseStances[currentPhase].playerStance,
+          phaseStances[currentPhase].enemyStance,
+        ).result
       }
       phaseActors = new Set(
         all
@@ -279,7 +332,7 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
       else state.activeEnemySlots = slots
       incoming.activeTurnStarted = state.turn + 1
       messages.push(...processDoublesEntry(state,side,currentSlot,random))
-      events.push({type:'switch', side, fromIndex:index, toIndex:action.pokemonIndex, hpOnEntry:incoming.currentHp, reason:'voluntary', message:`${actor.name} switched to ${incoming.name}.`})
+      pushEvent({type:'switch', side, fromIndex:index, toIndex:action.pokemonIndex, hpOnEntry:incoming.currentHp, reason:'voluntary', message:`${actor.name} switched to ${incoming.name}.`})
       messages.push(`${actor.name} switched to ${incoming.name}.`)
       continue
     }
@@ -408,14 +461,17 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
           }
           messages.push(combat.message)
           messages.push(...processDoublesPartnerProtection(state,t.side,t.slot,previousStatus,previousStages))
-          events.push({type:'attack',actorSide:side,targetSide:t.side,actorIndex:index,targetIndex,damage:combat.dmg,hpAfter:target.currentHp,attackType:combat.usedType??actor.types[0],message:combat.message})
-          if (side==='player') playerDamage+=combat.dmg
-          else enemyDamage+=combat.dmg
-          if (target.currentHp<=0) events.push({type:'faint',side:t.side,pokemonIndex:targetIndex,hpAfter:0,formId:target.formId,message:`${target.name} fainted!`})
+          pushEvent({type:'attack',actorSide:side,targetSide:t.side,actorIndex:index,targetIndex,damage:combat.dmg,hpAfter:target.currentHp,attackType:combat.usedType??actor.types[0],message:combat.message})
+          if (side==='player') {
+            if (phaseKey(activePhase)) phaseDamage[phaseKey(activePhase)!].damageDealt += combat.dmg
+          } else {
+            if (phaseKey(activePhase)) phaseDamage[phaseKey(activePhase)!].damageTaken += combat.dmg
+          }
+          if (target.currentHp<=0) pushEvent({type:'faint',side:t.side,pokemonIndex:targetIndex,hpAfter:0,formId:target.formId,message:`${target.name} fainted!`})
           const resultingTargetIndex=t.side==='player'?state.activePlayerIndex:state.activeEnemyIndex
           if(resultingTargetIndex!==targetIndex && getDoublesTeam(state,t.side)[resultingTargetIndex]?.currentHp>0 && !getDoublesSlots(state,t.side).includes(resultingTargetIndex)) {
             getDoublesSlots(state,t.side)[t.slot]=resultingTargetIndex
-            events.push({type:'switch',side:t.side,fromIndex:targetIndex,toIndex:resultingTargetIndex,hpOnEntry:getDoublesTeam(state,t.side)[resultingTargetIndex].currentHp,reason:'replacement',message:`${getDoublesTeam(state,t.side)[resultingTargetIndex].name} entered the battle.`})
+            pushEvent({type:'switch',side:t.side,fromIndex:targetIndex,toIndex:resultingTargetIndex,hpOnEntry:getDoublesTeam(state,t.side)[resultingTargetIndex].currentHp,reason:'replacement',message:`${getDoublesTeam(state,t.side)[resultingTargetIndex].name} entered the battle.`})
             messages.push(...processDoublesPartnerEntry(state,t.side,t.slot))
           }
           const transfer=processDoublesPartnerItemTransfer(state,side,currentSlot)
@@ -427,7 +483,7 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
         const before=target.currentHp
         target.currentHp=Math.min(target.maxHp,before+Math.max(1,Math.floor(target.maxHp/2)))
         messages.push(`${actor.name}'s Pollen Puff healed ${target.name} for ${target.currentHp-before} HP!`)
-        events.push({type:'hp-change',side:t.side,pokemonIndex:targetIndex,amount:target.currentHp-before,hpAfter:target.currentHp,kind:'heal',message:`${target.name} was healed.`})
+        pushEvent({type:'hp-change',side:t.side,pokemonIndex:targetIndex,amount:target.currentHp-before,hpAfter:target.currentHp,kind:'heal',message:`${target.name} was healed.`})
         continue
       }
       const stanceMultiplier = isPairedOpponent
@@ -450,19 +506,25 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
         damage = Math.min(target.currentHp,Math.floor(ability.damage*getDoublesDamageMultiplier(state,side,currentSlot,t.side,t.slot,stance,type)))
         target.currentHp -= damage
         messages.push(...ability.messages)
-        if (side === 'player' && t.side === 'enemy') playerDamage += damage
-        if (side === 'enemy' && t.side === 'player') enemyDamage += damage
+        if (side === 'player' && t.side === 'enemy') {
+          const currentPhase = phaseKey(activePhase)
+          if (currentPhase) phaseDamage[currentPhase].damageDealt += damage
+        }
+        if (side === 'enemy' && t.side === 'player') {
+          const currentPhase = phaseKey(activePhase)
+          if (currentPhase) phaseDamage[currentPhase].damageTaken += damage
+        }
       }
       const label = move?.name ?? `${stance} attack`
       const line = `${actor.name} used ${label} on ${target.name}!${damage ? ` [icon:damage:${damage}]` : ''}`
       messages.push(line)
-      events.push({type:'attack', actorSide:side, targetSide:t.side, actorIndex:index, targetIndex, damage, hpAfter:target.currentHp, attackType:type, message:line})
+      pushEvent({type:'attack', actorSide:side, targetSide:t.side, actorIndex:index, targetIndex, damage, hpAfter:target.currentHp, attackType:type, message:line})
       if (move) applySimpleMoveEffects(state, side, actor, target, move, damage, random, messages,targetPosition===0 || move.doublesTarget!=='both-allies')
       if (move?.absorb && damage > 0) {
         const absorb = applyMoveAbsorbHealing(actor, damage, move.absorb)
         if (absorb.applied) messages.push(absorb.message)
       }
-      if (target.currentHp <= 0) events.push({type:'faint', side:t.side, pokemonIndex:targetIndex, hpAfter:0, formId:target.formId, message:`${target.name} fainted!`})
+      if (target.currentHp <= 0) pushEvent({type:'faint', side:t.side, pokemonIndex:targetIndex, hpAfter:0, formId:target.formId, message:`${target.name} fainted!`})
     }
     if (move?.id === SKETCH_MOVE_ID) {
       moveResolved?.({
@@ -527,7 +589,7 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
     if(mon.nextDamageModifier?.sourceMoveName==='Helping Hand') mon.nextDamageModifier=undefined
     if(mon.currentHp<=0 && !events.some(event=>event.type==='faint'&&event.side===(state.playerTeam.includes(mon)?'player':'enemy')&&event.pokemonIndex===(state.playerTeam.includes(mon)?state.playerTeam:state.enemyTeam).indexOf(mon))) {
       const side=state.playerTeam.includes(mon)?'player':'enemy',team=side==='player'?state.playerTeam:state.enemyTeam
-      events.push({type:'faint',side,pokemonIndex:team.indexOf(mon),hpAfter:0,formId:mon.formId,message:`${mon.name} fainted!`})
+      pushEvent({type:'faint',side,pokemonIndex:team.indexOf(mon),hpAfter:0,formId:mon.formId,message:`${mon.name} fainted!`})
     }
   }
   const powerStates=state.isPvp?Object.values(state.pvpPowers??{}):state.powers?[state.powers]:[]
@@ -567,13 +629,38 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
       state.activeEnemySlots = slots
       if (reserve >= 0) {
         messages.push(...processDoublesEntry(state,'enemy',slot,random))
-        events.push({type:'switch', side:'enemy', fromIndex:mon ? state.enemyTeam.indexOf(mon) : 0, toIndex:reserve, hpOnEntry:state.enemyTeam[reserve].currentHp, reason:'replacement', message:`${state.enemyTeam[reserve].name} entered the battle.`})
+        pushEvent({type:'switch', side:'enemy', fromIndex:mon ? state.enemyTeam.indexOf(mon) : 0, toIndex:reserve, hpOnEntry:state.enemyTeam[reserve].currentHp, reason:'replacement', message:`${state.enemyTeam[reserve].name} entered the battle.`})
       }
     }
   }
   state.activePlayerIndex = getDoublesSlots(state,'player')[0] ?? 0
   state.activeEnemyIndex = getDoublesSlots(state,'enemy')[0] ?? 0
-  state.history.unshift({turn:state.turn, playerStance:'tech', enemyStance:'tech', result:'tie', damageDealt:playerDamage, damageTaken:enemyDamage, message:messages.join('\n') || 'Turn resolved.'})
+  const phasesForTurn = (['A', 'B'] as const).filter((phase) =>
+    all.some((entry) => phaseKey(entry.phase) === phase),
+  )
+  const phaseEntries = phasesForTurn.map((phase) => {
+    const phaseAttackEvents = events.filter(
+      (event): event is Extract<BattlePresentationEvent, { type: 'attack' }> =>
+        event.phase === phase && event.type === 'attack',
+    )
+    return {
+      turn: state.turn,
+      phase,
+      playerStance: phaseStances[phase].playerStance,
+      enemyStance: phaseStances[phase].enemyStance,
+      result: phaseResults[phase],
+      damageDealt: phaseDamage[phase].damageDealt,
+      damageTaken: phaseDamage[phase].damageTaken,
+      playerAttackType: phaseAttackEvents.find(
+        (event) => event.actorSide === 'player',
+      )?.attackType,
+      enemyAttackType: phaseAttackEvents.find(
+        (event) => event.actorSide === 'enemy',
+      )?.attackType,
+      message: phaseMessages[phase].join('\n') || 'Turn resolved.',
+    }
+  })
+  state.history.unshift(...phaseEntries.slice().reverse())
   state.presentation = {sequenceId:randomUUID(), turn:state.turn, events}
   state.turn += 1
   return state

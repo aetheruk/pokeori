@@ -30,6 +30,8 @@ export interface BattleExpeditionProgress {
 
 export type BattleStance = 'power' | 'speed' | 'tech'
 
+export type BattleTurnPhase = 'A' | 'B'
+
 export interface BattleTerrainSnapshot {
   terrain: TerrainType
   label: string
@@ -283,8 +285,12 @@ export interface PowersState {
 
 export type BattlePresentationSide = 'player' | 'enemy'
 
+type BattlePresentationEventBase = {
+  phase?: BattleTurnPhase
+}
+
 export type BattlePresentationEvent =
-  | {
+  | (BattlePresentationEventBase & {
       type: 'attack'
       actorSide: BattlePresentationSide
       targetSide: BattlePresentationSide
@@ -296,8 +302,8 @@ export type BattlePresentationEvent =
       simultaneousGroup?: string
       animateActor?: boolean
       message: string
-    }
-  | {
+    })
+  | (BattlePresentationEventBase & {
       type: 'hp-change'
       side: BattlePresentationSide
       pokemonIndex: number
@@ -306,27 +312,27 @@ export type BattlePresentationEvent =
       hpAfter: number
       simultaneousGroup?: string
       message: string
-    }
-  | {
+    })
+  | (BattlePresentationEventBase & {
       type: 'message'
       message: string
-    }
-  | {
+    })
+  | (BattlePresentationEventBase & {
       type: 'boost'
       side: BattlePresentationSide
       pokemonIndex: number
       kind: 'shout'
       message: string
-    }
-  | {
+    })
+  | (BattlePresentationEventBase & {
       type: 'faint'
       side: BattlePresentationSide
       pokemonIndex: number
       hpAfter: number
       formId?: string
       message: string
-    }
-  | {
+    })
+  | (BattlePresentationEventBase & {
       type: 'switch'
       side: BattlePresentationSide
       fromIndex: number
@@ -334,7 +340,7 @@ export type BattlePresentationEvent =
       hpOnEntry: number
       reason: 'voluntary' | 'replacement' | 'lead'
       message: string
-    }
+    })
 
 export interface BattlePresentation {
   sequenceId: string
@@ -507,6 +513,7 @@ export interface BattleState {
 
 export interface BattleLogEntry {
   turn: number
+  phase?: BattleTurnPhase
   playerStance: BattleStance
   enemyStance: BattleStance
   result: 'win' | 'loss' | 'tie'

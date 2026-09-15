@@ -12,7 +12,7 @@ import { INITIAL_ANIMATION_STATE } from '@/utilities/battle/engine/types'
 import { generateBattleEvents } from '@/utilities/battle/engine/event-generator'
 import { getDefaultDoublesTarget, stageDoublesAction } from '@/utilities/battle/doubles-state'
 import { canEnemyPokemonUseAiMove } from '@/utilities/battle/enemy-ai'
-import type { BattlePokemon, BattleState } from '@/utilities/battle/types'
+import type { BattlePokemon, BattlePresentationEvent, BattleState } from '@/utilities/battle/types'
 import { settleDoublesSketchAttempts } from '@/app/(frontend)/game/battles/helpers/doubles-sketch'
 
 function mon(id:string,side:'player'|'enemy',overrides:Partial<BattlePokemon>={}):BattlePokemon {
@@ -86,6 +86,51 @@ describe('double battles',()=>{
     expect(events.map(event=>event.type)).toEqual(['PLAY_SEQUENCE','SET_INITIAL_STATE'])
     expect(events[0].payload.type).toBe('PRESENTATION')
     expect(events[0].payload.presentation?.events.some((event: {type:string})=>event.type==='attack')).toBe(true)
+  })
+  test('splits each doubles turn into A and B log segments with phase-local impacts',()=>{
+    const before=state()
+    const after=resolveDoublesTurn(before,[hit(0,0),hit(1,1)],enemy,()=>0.1)
+    const turnLogs=after.history.filter((entry)=>entry.turn===1)
+    expect(turnLogs.map((entry)=>entry.phase)).toEqual(['B','A'])
+    expect(turnLogs[1].message).toContain('P0 uses Power Attack')
+    expect(turnLogs[0].message).toContain('P1 uses Power Attack')
+
+    const attacks=(after.presentation?.events ?? []).filter(
+      (event): event is Extract<BattlePresentationEvent, {type:'attack'}> => event.type==='attack',
+    )
+    expect(new Set(attacks.map((event)=>event.phase))).toEqual(new Set(['A','B']))
+    expect(attacks.every((event)=>event.simultaneousGroup?.includes('doubles-impact:1:'))).toBe(true)
+  })
+  test('doubles impact animation follows the winning stance for each phase',()=>{
+    const stanceHit=(slot:0|1,target:0|1,stance:'power'|'tech'):DoublesAction=>({slot,kind:'basic',stance,attackType:'normal',target:{side:'opponent',slot:target}})
+    const after=resolveDoublesTurn(
+      state(),
+      [stanceHit(0,0,'power'),stanceHit(1,1,'power')],
+      [stanceHit(0,0,'tech'),stanceHit(1,1,'tech')],
+      ()=>0.1,
+    )
+    const attacks=(after.presentation?.events ?? []).filter(
+      (event): event is Extract<BattlePresentationEvent, {type:'attack'}> => event.type==='attack',
+    )
+    expect(attacks.filter((event)=>event.phase==='A').map((event)=>[event.actorSide,event.animateActor])).toEqual([
+      ['player',true],
+      ['enemy',false],
+    ])
+    expect(attacks.filter((event)=>event.phase==='B').map((event)=>[event.actorSide,event.animateActor])).toEqual([
+      ['player',true],
+      ['enemy',false],
+    ])
+
+    const tie=resolveDoublesTurn(
+      state(),
+      [hit(0,0),hit(1,1)],
+      enemy,
+      ()=>0.1,
+    )
+    const tieAttacks=(tie.presentation?.events ?? []).filter(
+      (event): event is Extract<BattlePresentationEvent, {type:'attack'}> => event.type==='attack',
+    )
+    expect(tieAttacks.every((event)=>event.animateActor === true)).toBe(true)
   })
   test('spread moves deal full damage to each opponent and allies when authored',()=>{
     const spread=state()
@@ -302,7 +347,7 @@ describe('double battles',()=>{
     resolveDoublesTurn(battle,[{slot:0,kind:'move',moveId:'quick-attack',target:{side:'opponent',slot:0}},hit(1,1)],enemy,()=>0.1)
     expect(getMove('quick-attack')?.doublesPriority).toBe(1)
     expect(battle.enemyTeam[0].currentHp).toBe(999)
-    expect(battle.history[0].message).toContain('protected its ally')
+    expect(battle.history.some((entry)=>entry.message.includes('protected its ally'))).toBe(true)
   })
   test('four-lane scene labels Commander, retains a fainted HUD, and clears its sprite',()=>{
     const battle=state()
