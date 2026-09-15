@@ -1,81 +1,712 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Loader2 } from 'lucide-react'
+import Image from 'next/image'
+import { Loader2, RefreshCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from '@/components/ui/drawer'
+import { ItemSprite } from '@/components/ui/item-sprite'
+import { cn } from '@/lib/utils'
 import { getMove } from '@/data/moves'
-import type { BattlePokemon, BattleInventoryItem } from '@/utilities/battle/types'
-import { getDoublesPokemon, getDoublesSlots, type DoublesAction, type DoublesTarget } from '@/utilities/battle/doubles-state'
+import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
+import { getBattleItemUseLimit } from '@/utilities/battle/item-use-limits'
+import type {
+  BattlePokemon,
+  BattleInventoryItem,
+} from '@/utilities/battle/types'
+import {
+  getDoublesPokemon,
+  getDoublesSlots,
+  type DoublesAction,
+  type DoublesTarget,
+} from '@/utilities/battle/doubles-state'
+import { isDoublesCommanderInactive } from '@/utilities/battle/doubles-abilities'
 import { getBattleInventory, getBattlePowers } from '../actions'
 import type { BattlePowersData } from '../powers/powers-data'
-import { isDoublesCommanderInactive } from '@/utilities/battle/doubles-abilities'
 import { useBattleContext } from './battle-context'
+import { StanceSelector } from './stance-selector'
 
-type Draft = Partial<Record<0|1,DoublesAction>>
+type Slot = 0 | 1
+type Panel = 'moves' | 'items' | 'switch' | 'powers' | null
 
-function defaultTarget(enemy:BattlePokemon|undefined,other:BattlePokemon|undefined):DoublesTarget {
-  return {side:'opponent',slot:enemy?.currentHp&&!isDoublesCommanderInactive(enemy) ? 0 : other?.currentHp&&!isDoublesCommanderInactive(other) ? 1 : 0}
+const typeIdMap: Record<string, number> = {
+  normal: 1,
+  fighting: 2,
+  flying: 3,
+  poison: 4,
+  ground: 5,
+  rock: 6,
+  bug: 7,
+  ghost: 8,
+  steel: 9,
+  fire: 10,
+  water: 11,
+  grass: 12,
+  electric: 13,
+  psychic: 14,
+  ice: 15,
+  dragon: 16,
+  dark: 17,
+  fairy: 18,
 }
 
-function TargetPicker({action,onChange,enemy,ally}:{action:DoublesAction;onChange:(target:DoublesTarget)=>void;enemy:[BattlePokemon|undefined,BattlePokemon|undefined];ally:BattlePokemon|undefined}) {
-  if (action.kind!=='basic' && action.kind!=='move') return null
-  const move=action.kind==='move'?getMove(action.moveId):undefined
-  const pattern=move?.doublesTarget??(move?.target==='self'?'self':'opponent')
-  if (['self','both-opponents','both-allies','all-active'].includes(pattern)) return <p className="text-xs text-game-muted">{pattern==='self'?'Targets itself':pattern==='both-opponents'?'Hits both opponents':pattern==='both-allies'?'Affects both allies':'Hits every other active Pokemon'}</p>
-  const opponentCandidates=enemy.map((mon,slot)=>mon?.currentHp&&!isDoublesCommanderInactive(mon)?{side:'opponent' as const,slot:slot as 0|1,label:mon.name}:null).filter((value):value is {side:'opponent';slot:0|1;label:string}=>!!value)
-  const allyCandidates=ally?.currentHp&&!isDoublesCommanderInactive(ally)?[{side:'ally' as const,slot:(action.slot===0?1:0) as 0|1,label:ally.name}]:[]
-  const candidates=pattern==='ally'?allyCandidates:pattern==='any-single'?[...opponentCandidates,...allyCandidates]:opponentCandidates
-  return <div className="flex flex-wrap items-center gap-1.5"><span className="mr-1 text-xs text-game-muted">Target</span>{candidates.map(candidate=><Button key={`${candidate.side}:${candidate.slot}`} type="button" size="sm" variant={action.target?.side===candidate.side&&action.target?.slot===candidate.slot?'default':'outline'} className="h-8 rounded-full px-3 text-xs" onClick={()=>onChange({side:candidate.side,slot:candidate.slot})}>{candidate.label}</Button>)}</div>
+function defaultTarget(
+  enemy: BattlePokemon | undefined,
+  other: BattlePokemon | undefined,
+): DoublesTarget {
+  return {
+    side: 'opponent',
+    slot:
+      enemy?.currentHp && !isDoublesCommanderInactive(enemy)
+        ? 0
+        : other?.currentHp && !isDoublesCommanderInactive(other)
+          ? 1
+          : 0,
+  }
 }
 
-function CommandLane({slot,actor,state,draft,otherDraft,onChange,items,powerData,disabled}:{slot:0|1;actor:BattlePokemon;state:ReturnType<typeof useBattleContext>['battleState'];draft:DoublesAction|undefined;otherDraft:DoublesAction|undefined;onChange:(action:DoublesAction)=>void;items:BattleInventoryItem[];powerData?:BattlePowersData;disabled:boolean}) {
-  const enemies:[BattlePokemon|undefined,BattlePokemon|undefined]=[getDoublesPokemon(state,'enemy',0),getDoublesPokemon(state,'enemy',1)]
-  const ally=getDoublesPokemon(state,'player',slot===0?1:0)
-  const target=defaultTarget(...enemies)
-  const moves=(actor.battleMoveIds??[]).map(id=>getMove(id)).filter((move):move is NonNullable<typeof move>=>!!move&&!move.charged&&!move.recharge&&!move.continuous)
-  const usedIndexes=getDoublesSlots(state,'player')
-  const reserves=state.playerTeam.map((mon,index)=>({mon,index})).filter(({mon,index})=>mon.currentHp>0&&!usedIndexes.includes(index)&&!(otherDraft?.kind==='switch'&&otherDraft.pokemonIndex===index))
-  const availablePowers=state.powers
-  return <section className="min-w-0 rounded-2xl border border-game-border bg-game-surface-raised p-3 shadow-sm sm:p-4" aria-label={`Action for ${actor.name}`}>
-    <div className="mb-3 flex items-start justify-between gap-2"><div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-game-moss-strong">Lane {slot+1} · {actor.moveUsesRemaining??0} move uses</p><h3 className="text-base font-bold text-game-ink">{actor.name}</h3></div><span className="rounded-full border border-game-border bg-game-canvas px-2 py-1 text-[10px] font-bold text-game-muted">{draft?draft.kind.toUpperCase():'CHOOSE'}</span></div>
-    <div className="flex flex-wrap gap-1.5">
-      {(['power','speed','tech'] as const).map(stance=><Button key={stance} type="button" size="sm" variant={draft?.kind==='basic'&&draft.stance===stance?'default':'outline'} className="h-9 rounded-xl text-xs capitalize" disabled={disabled} onClick={()=>onChange({slot,kind:'basic',stance,attackType:actor.types[0]||'normal',target})}>{stance}</Button>)}
-      {moves.map(move=><Button key={move.id} type="button" size="sm" variant={draft?.kind==='move'&&draft.moveId===move.id?'default':'outline'} className="h-9 rounded-xl text-xs" disabled={disabled||(actor.moveUsesRemaining??0)<=0} title={move.description} onClick={()=>onChange({slot,kind:'move',moveId:move.id,target:move.doublesTarget==='ally'?{side:'ally',slot:slot===0?1:0}:move.doublesTarget==='self'||move.target==='self'||['both-opponents','both-allies','all-active'].includes(move.doublesTarget??'')?undefined:target})}>{move.name}</Button>)}
-    </div>
-    {draft?.kind==='basic'&&actor.types.length>1&&<div className="mt-3 flex flex-wrap items-center gap-1.5"><span className="mr-1 text-xs text-game-muted">Type</span>{actor.types.map(type=><Button key={type} type="button" size="sm" variant={draft.attackType===type?'default':'outline'} className="h-8 rounded-full px-3 text-xs capitalize" disabled={disabled} onClick={()=>onChange({...draft,attackType:type})}>{type}</Button>)}</div>}
-    {draft&&<div className="mt-3"><TargetPicker action={draft} enemy={enemies} ally={ally} onChange={selected=>{if(draft.kind==='basic'||draft.kind==='move') onChange({...draft,target:selected})}} /></div>}
-    {draft?.kind==='item'&&<div className="mt-3 flex flex-wrap items-center gap-1.5"><span className="mr-1 text-xs text-game-muted">Item target</span>{state.playerTeam.map((mon,index)=>({mon,index})).filter(({mon})=>{const item=items.find(candidate=>candidate.itemId===draft.itemId);return item?.battleEffect.type==='revive'?mon.currentHp<=0:mon.currentHp>0}).map(({mon,index})=><Button key={`target:${index}`} type="button" size="sm" variant={(draft.targetPokemonIndex??usedIndexes[slot])===index?'default':'outline'} className="h-8 rounded-full px-3 text-xs" disabled={disabled} onClick={()=>onChange({...draft,targetPokemonIndex:index})}>{mon.name}</Button>)}</div>}
-    <div className="mt-3 border-t border-game-border pt-3"><p className="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-game-muted">Other actions</p><div className="flex flex-wrap gap-1.5">
-      {reserves.map(({mon,index})=><Button key={`switch:${index}`} type="button" size="sm" variant={draft?.kind==='switch'&&draft.pokemonIndex===index?'default':'outline'} className="h-8 rounded-xl text-xs" disabled={disabled} onClick={()=>onChange({slot,kind:'switch',pokemonIndex:index})}>Switch · {mon.name}</Button>)}
-      {!state.isPvp&&items.filter(item=>item.battleEffect.type!=='revive'||state.playerTeam.some(mon=>mon.currentHp<=0)).map(item=><Button key={`item:${item.itemId}`} type="button" size="sm" variant={draft?.kind==='item'&&draft.itemId===item.itemId?'default':'outline'} className="h-8 rounded-xl text-xs" disabled={disabled} onClick={()=>onChange({slot,kind:'item',itemId:item.itemId,targetPokemonIndex:item.battleEffect.type==='revive'?state.playerTeam.findIndex(mon=>mon.currentHp<=0):undefined})}>Item · {item.name}</Button>)}
-      {availablePowers&&powerData?.hasTera&&availablePowers.teraUsesRemaining>0&&<Button type="button" size="sm" variant={draft?.kind==='power'&&draft.powerId==='tera'?'default':'outline'} className="h-8 rounded-xl text-xs" disabled={disabled} onClick={()=>onChange({slot,kind:'power',powerId:'tera'})}>Terastallize</Button>}
-      {availablePowers&&powerData?.hasDynamax&&availablePowers.dynamaxAvailable&&availablePowers.dynamaxUsesRemaining>0&&<Button type="button" size="sm" variant={draft?.kind==='power'&&draft.powerId==='dynamax'?'default':'outline'} className="h-8 rounded-xl text-xs" disabled={disabled} onClick={()=>onChange({slot,kind:'power',powerId:'dynamax'})}>Dynamax</Button>}
-      {availablePowers&&powerData?.hasZRing&&availablePowers.zMoveUsesRemaining>0&&<Button type="button" size="sm" variant={draft?.kind==='power'&&draft.powerId==='z-move'?'default':'outline'} className="h-8 rounded-xl text-xs" disabled={disabled} onClick={()=>onChange({slot,kind:'power',powerId:'z-move'})}>Z-Move</Button>}
-      {availablePowers&&powerData?.hasMega&&availablePowers.megaUsesRemaining>0&&powerData.megaStones.map(form=><Button key={form.megaFormId} type="button" size="sm" variant={draft?.kind==='power'&&draft.formId===form.megaFormId?'default':'outline'} className="h-8 rounded-xl text-xs" disabled={disabled} onClick={()=>onChange({slot,kind:'power',powerId:'mega',formId:form.megaFormId})}>Mega · {form.megaFormName}</Button>)}
-    </div></div>
-  </section>
+function moveTarget(
+  slot: Slot,
+  moveId: string,
+  fallback: DoublesTarget,
+): DoublesTarget | undefined {
+  const move = getMove(moveId)
+  if (move?.doublesTarget === 'ally')
+    return { side: 'ally', slot: slot === 0 ? 1 : 0 }
+  if (
+    move?.doublesTarget === 'self' ||
+    move?.target === 'self' ||
+    ['both-opponents', 'both-allies', 'all-active'].includes(
+      move?.doublesTarget ?? '',
+    )
+  )
+    return undefined
+  return fallback
+}
+
+function actionLabel(action: DoublesAction | undefined, team: BattlePokemon[]) {
+  if (!action) return 'Choose an action'
+  if (action.kind === 'basic')
+    return `${action.stance[0].toUpperCase()}${action.stance.slice(1)} Attack`
+  if (action.kind === 'move')
+    return getMove(action.moveId)?.name ?? action.moveId
+  if (action.kind === 'switch')
+    return `Switch to ${team[action.pokemonIndex]?.name ?? 'Pokemon'}`
+  if (action.kind === 'item') return 'Use item'
+  return action.powerId === 'z-move'
+    ? 'Z-Move'
+    : action.powerId === 'mega'
+      ? 'Mega Evolve'
+      : action.powerId === 'tera'
+        ? 'Terastallize'
+        : 'Dynamax'
 }
 
 export function DoubleActionMenu() {
-  const {battleState,isAnimating,isWaitingForServer,pendingBattleAction,handleDoublesSubmit,handleDoublesReplace}=useBattleContext()
-  const [draft,setDraft]=useState<Draft>({})
-  const [items,setItems]=useState<BattleInventoryItem[]>([])
-  const [powerData,setPowerData]=useState<Partial<Record<0|1,BattlePowersData>>>({})
-  const disabled=isAnimating||isWaitingForServer||battleState.status!=='ongoing'
-  const slots=getDoublesSlots(battleState,'player')
-  const active=([0,1] as const).filter(slot=>getDoublesPokemon(battleState,'player',slot)?.currentHp&&!isDoublesCommanderInactive(getDoublesPokemon(battleState,'player',slot)))
-  const replacementSlots=battleState.pendingPlayerReplacementSlots??[]
-  useEffect(()=>{setDraft({})},[battleState.turn,battleState.activePlayerSlots?.[0],battleState.activePlayerSlots?.[1]])
-  useEffect(()=>{if (battleState.isPvp) return;let cancelled=false;getBattleInventory().then(result=>{if(!cancelled&&result.success)setItems(result.items)});return()=>{cancelled=true}},[battleState.turn,battleState.isPvp])
-  const player0=getDoublesPokemon(battleState,'player',0),player1=getDoublesPokemon(battleState,'player',1)
-  useEffect(()=>{let cancelled=false;const entries=([0,1] as const).map(slot=>({slot,mon:slot===0?player0:player1})).filter(({mon})=>mon?.currentHp&&!isDoublesCommanderInactive(mon));void Promise.all(entries.map(async ({slot,mon})=>({slot,result:await getBattlePowers(mon!.formId,slot)}))).then(results=>{if(cancelled)return;const data:Partial<Record<0|1,BattlePowersData>>={};for(const {slot,result} of results)if(result.success)data[slot]=result.data;setPowerData(data)});return()=>{cancelled=true}},[player0?.id,player0?.formId,player1?.id,player1?.formId])
-  const complete=useMemo(()=>active.every(slot=>!!draft[slot]),[active,draft])
-  const submit=()=>{const actions=active.map(slot=>draft[slot]).filter((action):action is DoublesAction=>!!action);if(actions.length===active.length)void handleDoublesSubmit(actions)}
-  return <div className="game-paper-first game-paper-background relative flex min-h-[16rem] flex-[10] flex-col border-t border-game-border bg-game-canvas px-3 py-4 text-game-ink sm:px-5 xl:flex-none" aria-busy={disabled}>
-    {isWaitingForServer&&<div className="absolute inset-0 z-30 flex items-center justify-center bg-game-surface/85 backdrop-blur-[1px]"><Loader2 className="mr-2 h-7 w-7 animate-spin text-game-moss"/><span className="text-sm font-bold">{pendingBattleAction?.label||'Resolving actions'}</span></div>}
-    <div className="mx-auto w-full max-w-4xl"><div className="mb-3 flex items-center justify-between gap-3"><div><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-game-moss-strong">Battle commands</p><h2 className="text-lg font-bold">Choose both actions</h2></div><span className="rounded-full border border-game-border bg-game-surface-raised px-3 py-1 text-xs font-bold text-game-muted">{Object.keys(draft).length}/{active.length} ready</span></div>
-      {replacementSlots.length>0?<div className="rounded-2xl border border-game-ochre/40 bg-game-ochre/10 p-4"><p className="mb-3 text-sm font-bold">Choose your next Pokemon for each empty lane.</p>{replacementSlots.map(value=>{const slot=value as 0|1;const reserve=battleState.playerTeam.map((mon,index)=>({mon,index})).filter(({mon,index})=>mon.currentHp>0&&!slots.includes(index));return <div key={slot} className="mb-3"><p className="mb-1 text-xs font-bold text-game-muted">Lane {slot+1}</p><div className="flex flex-wrap gap-2">{reserve.map(({mon,index})=><Button key={`${slot}:${index}`} type="button" size="sm" disabled={disabled} onClick={()=>void handleDoublesReplace(slot,index)}>{mon.name}</Button>)}</div></div>})}</div>:
-      <><div className="grid gap-3 md:grid-cols-2">{active.map(slot=><CommandLane key={`${battleState.turn}:${slot}`} slot={slot} actor={getDoublesPokemon(battleState,'player',slot)!} state={battleState} draft={draft[slot]} otherDraft={draft[slot===0?1:0]} onChange={action=>setDraft(current=>({...current,[slot]:action}))} items={items} powerData={powerData[slot]} disabled={disabled} />)}</div><div className="mt-4 flex items-center justify-between gap-3"><p className="text-xs text-game-muted">Both commands resolve together by priority and Speed.</p><Button type="button" className="game-accent-button min-w-36" disabled={disabled||!complete||active.length===0} onClick={submit}>Confirm turn</Button></div></>}
+  const {
+    battleState,
+    isAnimating,
+    isWaitingForServer,
+    pendingBattleAction,
+    handleDoublesSubmit,
+    handleDoublesReplace,
+    selectedDoublesSlot: selectedSlot,
+    setSelectedDoublesSlot: setSelectedSlot,
+    doublesDraft: draft,
+    setDoublesDraft: setDraft,
+  } = useBattleContext()
+  const [typeBySlot, setTypeBySlot] = useState<Partial<Record<Slot, string>>>(
+    {},
+  )
+  const [panel, setPanel] = useState<Panel>(null)
+  const [items, setItems] = useState<BattleInventoryItem[]>([])
+  const [powerData, setPowerData] = useState<
+    Partial<Record<Slot, BattlePowersData>>
+  >({})
+  const disabled =
+    isAnimating || isWaitingForServer || battleState.status !== 'ongoing'
+  const slots = getDoublesSlots(battleState, 'player')
+  const active = ([0, 1] as const).filter(
+    (slot) =>
+      getDoublesPokemon(battleState, 'player', slot)?.currentHp &&
+      !isDoublesCommanderInactive(
+        getDoublesPokemon(battleState, 'player', slot),
+      ),
+  )
+  const replacementSlots = battleState.pendingPlayerReplacementSlots ?? []
+  const actor = getDoublesPokemon(battleState, 'player', selectedSlot)
+  const action = draft[selectedSlot]
+  const enemies: [BattlePokemon | undefined, BattlePokemon | undefined] = [
+    getDoublesPokemon(battleState, 'enemy', 0),
+    getDoublesPokemon(battleState, 'enemy', 1),
+  ]
+  const partner = getDoublesPokemon(
+    battleState,
+    'player',
+    selectedSlot === 0 ? 1 : 0,
+  )
+  const selectedType = typeBySlot[selectedSlot] ?? actor?.types[0] ?? 'normal'
+  const usedIndexes = getDoublesSlots(battleState, 'player')
+  const otherDraft = draft[selectedSlot === 0 ? 1 : 0]
+  const reserves = battleState.playerTeam
+    .map((mon, index) => ({ mon, index }))
+    .filter(
+      ({ mon, index }) =>
+        mon.currentHp > 0 &&
+        !usedIndexes.includes(index) &&
+        !(otherDraft?.kind === 'switch' && otherDraft.pokemonIndex === index),
+    )
+  const moves = (actor?.battleMoveIds ?? [])
+    .map((id) => getMove(id))
+    .filter(
+      (move): move is NonNullable<typeof move> =>
+        !!move &&
+        !move.charged &&
+        !move.recharge &&
+        !move.continuous &&
+        (move.doublesTarget !== 'ally' ||
+          !!(partner?.currentHp && !isDoublesCommanderInactive(partner))),
+    )
+  const complete = useMemo(
+    () => active.every((slot) => !!draft[slot]),
+    [active, draft],
+  )
+  const maxItems = getBattleItemUseLimit(battleState, 'player')
+  const remainingItems = Math.max(
+    0,
+    maxItems - (battleState.itemsUsedThisBattle?.length ?? 0),
+  )
+
+  useEffect(() => {
+    setDraft({})
+    setTypeBySlot({})
+    setPanel(null)
+    setSelectedSlot(active[0] ?? 0)
+  }, [
+    battleState.turn,
+    battleState.activePlayerSlots?.[0],
+    battleState.activePlayerSlots?.[1],
+    active[0],
+    setSelectedSlot,
+  ])
+
+  useEffect(() => {
+    if (battleState.isPvp) return
+    let cancelled = false
+    getBattleInventory().then((result) => {
+      if (!cancelled && result.success) setItems(result.items)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [battleState.turn, battleState.isPvp])
+
+  const player0 = getDoublesPokemon(battleState, 'player', 0)
+  const player1 = getDoublesPokemon(battleState, 'player', 1)
+  useEffect(() => {
+    let cancelled = false
+    const entries = ([0, 1] as const)
+      .map((slot) => ({ slot, mon: slot === 0 ? player0 : player1 }))
+      .filter(({ mon }) => mon?.currentHp && !isDoublesCommanderInactive(mon))
+    void Promise.all(
+      entries.map(async ({ slot, mon }) => ({
+        slot,
+        result: await getBattlePowers(mon!.formId, slot),
+      })),
+    ).then((results) => {
+      if (cancelled) return
+      const data: Partial<Record<Slot, BattlePowersData>> = {}
+      for (const { slot, result } of results)
+        if (result.success) data[slot] = result.data
+      setPowerData(data)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [player0?.id, player0?.formId, player1?.id, player1?.formId])
+
+  const choose = (next: DoublesAction) => {
+    setDraft((current) => ({ ...current, [selectedSlot]: next }))
+    setPanel(null)
+  }
+  const submit = () => {
+    const actions = active
+      .map((slot) => draft[slot])
+      .filter((value): value is DoublesAction => !!value)
+    if (actions.length === active.length) void handleDoublesSubmit(actions)
+  }
+  const changeType = (type: string) => {
+    setTypeBySlot((current) => ({ ...current, [selectedSlot]: type }))
+    if (action?.kind === 'basic') choose({ ...action, attackType: type })
+  }
+  const powerOptions: Array<{ label: string; command: DoublesAction }> = []
+  const powers = battleState.powers
+  const data = powerData[selectedSlot]
+  if (powers && data?.hasTera && powers.teraUsesRemaining > 0)
+    powerOptions.push({
+      label: 'Terastallize',
+      command: { slot: selectedSlot, kind: 'power', powerId: 'tera' },
+    })
+  if (
+    powers &&
+    data?.hasDynamax &&
+    powers.dynamaxAvailable &&
+    powers.dynamaxUsesRemaining > 0
+  )
+    powerOptions.push({
+      label: 'Dynamax',
+      command: { slot: selectedSlot, kind: 'power', powerId: 'dynamax' },
+    })
+  if (powers && data?.hasZRing && powers.zMoveUsesRemaining > 0)
+    powerOptions.push({
+      label: 'Z-Move',
+      command: { slot: selectedSlot, kind: 'power', powerId: 'z-move' },
+    })
+  if (powers && data?.hasMega && powers.megaUsesRemaining > 0)
+    for (const form of data.megaStones)
+      powerOptions.push({
+        label: `Mega · ${form.megaFormName}`,
+        command: {
+          slot: selectedSlot,
+          kind: 'power',
+          powerId: 'mega',
+          formId: form.megaFormId,
+        },
+      })
+
+  return (
+    <div
+      className="game-paper-first game-paper-background relative flex min-h-[13rem] flex-[10] flex-col border-t border-game-border bg-game-canvas px-3 py-3 text-game-ink sm:px-5 sm:py-4 xl:flex-none"
+      aria-busy={disabled}
+    >
+      {isWaitingForServer && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center bg-game-surface/85 backdrop-blur-[1px]">
+          <Loader2 className="mr-2 h-7 w-7 animate-spin text-game-moss motion-reduce:animate-none" />
+          <span className="text-sm font-bold">
+            {pendingBattleAction?.label || 'Resolving actions'}
+          </span>
+        </div>
+      )}
+      <div className="mx-auto w-full max-w-2xl">
+        {replacementSlots.length > 0 ? (
+          <div className="rounded-lg border border-game-ochre/40 bg-game-ochre/10 p-3">
+            <p className="mb-3 text-sm font-semibold">
+              Choose a Pokemon for each empty lane.
+            </p>
+            {replacementSlots.map((value) => {
+              const slot = value as Slot
+              const available = battleState.playerTeam
+                .map((mon, index) => ({ mon, index }))
+                .filter(
+                  ({ mon, index }) =>
+                    mon.currentHp > 0 && !slots.includes(index),
+                )
+              return (
+                <div key={slot} className="mb-3 last:mb-0">
+                  <p className="mb-2 text-xs font-semibold text-game-muted">
+                    Your Pokemon · {slot + 1}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {available.map(({ mon, index }) => (
+                      <Button
+                        key={`${slot}:${index}`}
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="h-11 rounded-lg border-game-border bg-game-surface-raised"
+                        disabled={disabled}
+                        onClick={() => void handleDoublesReplace(slot, index)}
+                      >
+                        {mon.name}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          <>
+            <p className="sr-only" aria-live="polite">
+              Choosing an action for {actor?.name ?? 'the active Pokemon'}
+            </p>
+
+            {actor && active.includes(selectedSlot) && (
+              <>
+                <fieldset
+                  className="mb-2 flex min-w-0 items-center justify-center gap-2"
+                  aria-label={`Attack type for ${actor.name}`}
+                >
+                  {actor.types.map((type) => {
+                    const typeId = typeIdMap[type.toLowerCase()]
+                    return (
+                      <Button
+                        key={type}
+                        type="button"
+                        variant="ghost"
+                        className={cn(
+                          'h-12 w-20 rounded-full border-0 bg-transparent p-0 hover:bg-transparent',
+                          selectedType === type
+                            ? 'opacity-100'
+                            : 'opacity-60 grayscale',
+                        )}
+                        aria-label={type}
+                        aria-pressed={selectedType === type}
+                        disabled={disabled}
+                        onClick={() => changeType(type)}
+                      >
+                        {typeId ? (
+                          <Image
+                            src={getPokemonTypeIconUrl(typeId)}
+                            alt={type}
+                            width={100}
+                            height={40}
+                            className="h-7 w-auto object-contain"
+                            unoptimized
+                          />
+                        ) : (
+                          <span className="text-xs font-semibold capitalize">
+                            {type}
+                          </span>
+                        )}
+                      </Button>
+                    )
+                  })}
+                </fieldset>
+                <StanceSelector
+                  onSelect={(stance) =>
+                    choose({
+                      slot: selectedSlot,
+                      kind: 'basic',
+                      stance,
+                      attackType: selectedType,
+                      target: defaultTarget(...enemies),
+                    })
+                  }
+                  stats={actor.stats}
+                  statStages={actor.statStages}
+                  zMoveReady={!!actor.zMoveReady}
+                  disabledStance={
+                    actor.disabledStance?.turnsRemaining
+                      ? actor.disabledStance.stance
+                      : undefined
+                  }
+                  pendingStance={
+                    action?.kind === 'basic' ? action.stance : undefined
+                  }
+                  disabled={disabled}
+                />
+
+                {action && action.kind !== 'basic' && (
+                  <div className="mt-2">
+                    <p className="mb-1 text-xs font-semibold text-game-moss-strong">
+                      {actionLabel(action, battleState.playerTeam)}
+                    </p>
+                    {action.kind === 'item' ? (
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-xs font-semibold text-game-muted">
+                          Item target
+                        </span>
+                        {battleState.playerTeam
+                          .map((mon, index) => ({ mon, index }))
+                          .filter(({ mon }) => {
+                            const item = items.find(
+                              (candidate) => candidate.itemId === action.itemId,
+                            )
+                            return item?.battleEffect.type === 'revive'
+                              ? mon.currentHp <= 0
+                              : mon.currentHp > 0
+                          })
+                          .map(({ mon, index }) => (
+                            <Button
+                              key={index}
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              className={cn(
+                                'h-10 rounded-lg border-game-border bg-game-surface-raised px-3 text-xs',
+                                (action.targetPokemonIndex ??
+                                  usedIndexes[selectedSlot]) === index &&
+                                  'border-game-moss bg-game-moss/10 text-game-moss-strong',
+                              )}
+                              disabled={disabled}
+                              aria-pressed={
+                                (action.targetPokemonIndex ??
+                                  usedIndexes[selectedSlot]) === index
+                              }
+                              onClick={() =>
+                                choose({ ...action, targetPokemonIndex: index })
+                              }
+                            >
+                              {mon.name}
+                            </Button>
+                          ))}
+                      </div>
+                    ) : null}
+                  </div>
+                )}
+
+                <div className="mt-3 flex w-full max-w-md gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-12 flex-1 gap-2 rounded-xl border-game-border bg-game-surface-raised text-game-ink shadow-sm"
+                    aria-label={`Items, ${remainingItems} of ${maxItems} uses remaining`}
+                    disabled={
+                      disabled ||
+                      battleState.isPvp ||
+                      remainingItems <= 0 ||
+                      items.length === 0
+                    }
+                    onClick={() => setPanel('items')}
+                  >
+                    <ItemSprite
+                      itemId="battle-potion"
+                      alt=""
+                      width={22}
+                      height={22}
+                      className="h-5 w-5 object-contain"
+                    />
+                    <span className="rounded-full border border-game-border bg-game-canvas/60 px-1.5 py-0.5 text-[10px] font-black">
+                      {remainingItems}/{maxItems}
+                    </span>
+                  </Button>
+                  {moves.length > 0 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-12 flex-1 gap-2 rounded-xl border-game-border bg-game-surface-raised text-game-ink shadow-sm"
+                      aria-label={`Moves, ${actor.moveUsesRemaining ?? 0} uses remaining`}
+                      disabled={disabled || (actor.moveUsesRemaining ?? 0) <= 0}
+                      onClick={() => setPanel('moves')}
+                    >
+                      <ItemSprite
+                        itemId={`tm-${actor.types[0] ?? 'normal'}`}
+                        alt=""
+                        width={22}
+                        height={22}
+                        className="h-5 w-5 object-contain"
+                      />
+                      <span className="rounded-full border border-game-border bg-game-canvas/60 px-1.5 py-0.5 text-[10px] font-black">
+                        {actor.moveUsesRemaining ?? 0}/
+                        {battleState.config?.movesPerBattle ??
+                          actor.moveUsesRemaining ??
+                          0}
+                      </span>
+                    </Button>
+                  )}
+                  {powerOptions.length > 0 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-12 flex-1 gap-2 rounded-xl border-game-border bg-game-surface-raised text-game-ink shadow-sm"
+                      aria-label={`Battle powers, ${powerOptions.length} choices`}
+                      disabled={disabled}
+                      onClick={() => setPanel('powers')}
+                    >
+                      <ItemSprite
+                        itemId="tera-orb"
+                        alt=""
+                        width={22}
+                        height={22}
+                        className="h-5 w-5 object-contain"
+                      />
+                      <span className="rounded-full border border-game-border bg-game-canvas/60 px-1.5 py-0.5 text-[10px] font-black">
+                        {powerOptions.length}
+                      </span>
+                    </Button>
+                  )}
+                  {battleState.playerTeam.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-12 w-12 shrink-0 rounded-xl border-game-border bg-game-surface-raised p-0 text-game-ink shadow-sm"
+                      aria-label="Switch Pokemon"
+                      disabled={disabled || reserves.length === 0}
+                      onClick={() => setPanel('switch')}
+                    >
+                      <RefreshCcw className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </>
+            )}
+            {(action || (active.length > 1 && selectedSlot !== active[0])) && (
+              <div className="mt-3 flex justify-end gap-2">
+                {active.length > 1 && selectedSlot !== active[0] && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-11 flex-1 rounded-xl border-game-border bg-game-surface-raised text-game-ink sm:flex-none"
+                    disabled={disabled}
+                    onClick={() => setSelectedSlot(active[0])}
+                  >
+                    Previous Pokemon
+                  </Button>
+                )}
+                {active.length > 1 && selectedSlot === active[0] && action && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-11 flex-1 rounded-xl border-game-moss bg-game-moss/10 text-game-moss-strong sm:flex-none"
+                    disabled={disabled}
+                    onClick={() => setSelectedSlot(active[1])}
+                  >
+                    Next Pokemon
+                  </Button>
+                )}
+                {complete && (
+                  <Button
+                    type="button"
+                    className="game-accent-button h-11 flex-1 sm:min-w-36 sm:flex-none"
+                    disabled={disabled || active.length === 0}
+                    onClick={submit}
+                  >
+                    Confirm turn
+                  </Button>
+                )}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      <Drawer
+        open={panel !== null}
+        onOpenChange={(open) => {
+          if (!open) setPanel(null)
+        }}
+      >
+        <DrawerContent className="max-h-[72dvh] border-game-border bg-game-surface-raised">
+          <DrawerHeader className="pb-2">
+            <DrawerTitle>
+              {panel === 'moves'
+                ? `Moves · ${actor?.name ?? ''}`
+                : panel === 'items'
+                  ? 'Battle items'
+                  : panel === 'switch'
+                    ? 'Switch Pokemon'
+                    : 'Battle powers'}
+            </DrawerTitle>
+          </DrawerHeader>
+          <div className="overflow-y-auto px-4 pb-6">
+            {panel === 'moves' &&
+              moves.map((move) => (
+                <Button
+                  key={move.id}
+                  type="button"
+                  variant="outline"
+                  className="mb-2 h-auto min-h-12 w-full justify-between gap-3 rounded-lg border-game-border bg-game-canvas px-3 py-2 text-left"
+                  disabled={disabled || (actor?.moveUsesRemaining ?? 0) <= 0}
+                  onClick={() =>
+                    choose({
+                      slot: selectedSlot,
+                      kind: 'move',
+                      moveId: move.id,
+                      target: moveTarget(
+                        selectedSlot,
+                        move.id,
+                        defaultTarget(...enemies),
+                      ),
+                    })
+                  }
+                >
+                  <span className="min-w-0">
+                    <span className="block text-sm font-semibold">
+                      {move.name}
+                    </span>
+                    <span className="block text-xs font-normal text-game-muted">
+                      {move.description}
+                    </span>
+                  </span>
+                  <span className="shrink-0 text-[10px] font-semibold text-game-moss-strong">
+                    Move
+                  </span>
+                </Button>
+              ))}
+            {panel === 'items' &&
+              items
+                .filter(
+                  (item) =>
+                    item.battleEffect.type !== 'revive' ||
+                    battleState.playerTeam.some((mon) => mon.currentHp <= 0),
+                )
+                .map((item) => (
+                  <Button
+                    key={item.itemId}
+                    type="button"
+                    variant="outline"
+                    className="mb-2 h-12 w-full justify-start gap-3 rounded-lg border-game-border bg-game-canvas px-3 text-left"
+                    disabled={disabled}
+                    onClick={() =>
+                      choose({
+                        slot: selectedSlot,
+                        kind: 'item',
+                        itemId: item.itemId,
+                        targetPokemonIndex:
+                          item.battleEffect.type === 'revive'
+                            ? battleState.playerTeam.findIndex(
+                                (mon) => mon.currentHp <= 0,
+                              )
+                            : undefined,
+                      })
+                    }
+                  >
+                    <ItemSprite
+                      itemId={item.itemId}
+                      alt=""
+                      width={24}
+                      height={24}
+                      className="h-6 w-6 object-contain"
+                    />
+                    <span className="text-sm font-semibold">{item.name}</span>
+                  </Button>
+                ))}
+            {panel === 'switch' &&
+              reserves.map(({ mon, index }) => (
+                <Button
+                  key={index}
+                  type="button"
+                  variant="outline"
+                  className="mb-2 h-12 w-full justify-between gap-3 rounded-lg border-game-border bg-game-canvas px-3 text-left"
+                  disabled={disabled}
+                  onClick={() =>
+                    choose({
+                      slot: selectedSlot,
+                      kind: 'switch',
+                      pokemonIndex: index,
+                    })
+                  }
+                >
+                  <span className="truncate text-sm font-semibold">
+                    {mon.name}
+                  </span>
+                  <span className="shrink-0 font-mono text-xs text-game-muted">
+                    {mon.currentHp}/{mon.maxHp} HP
+                  </span>
+                </Button>
+              ))}
+            {panel === 'powers' &&
+              powerOptions.map((option) => (
+                <Button
+                  key={`${option.command.kind === 'power' ? option.command.powerId : ''}:${option.label}`}
+                  type="button"
+                  variant="outline"
+                  className="mb-2 h-12 w-full justify-start rounded-lg border-game-border bg-game-canvas px-3 text-left text-sm font-semibold"
+                  disabled={disabled}
+                  onClick={() => choose(option.command)}
+                >
+                  {option.label}
+                </Button>
+              ))}
+          </div>
+        </DrawerContent>
+      </Drawer>
     </div>
-  </div>
+  )
 }

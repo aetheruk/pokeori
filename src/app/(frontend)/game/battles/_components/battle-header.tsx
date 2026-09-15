@@ -10,7 +10,7 @@ interface BattleHeaderProps {
   isWaitingForOpponent: boolean
 }
 
-function TeamBallGrid({
+export function TeamBallGrid({
   team,
   bottomUp = false,
 }: {

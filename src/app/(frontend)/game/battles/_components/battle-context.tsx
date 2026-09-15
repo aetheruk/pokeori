@@ -1,10 +1,17 @@
 'use client'
 
-import React, { createContext, useContext } from 'react'
+import React, {
+  createContext,
+  useContext,
+  type Dispatch,
+  type SetStateAction,
+} from 'react'
 import type { BattleState, BattleStance } from '@/utilities/battle/types'
 import type { BattlePowersData } from '../powers/powers-data'
 import type { MoveContinuousConfig, MoveStance } from '@/data/moves/types'
 import type { DoublesAction } from '@/utilities/battle/doubles-state'
+
+export type DoublesDraft = Partial<Record<0 | 1, DoublesAction>>
 
 interface BattleMoveOption {
   id: string
@@ -23,6 +30,10 @@ export interface BattleContextType {
   activeEnemyMon: any
   selectedType: string | null
   setSelectedType: (val: string) => void
+  selectedDoublesSlot: 0 | 1
+  setSelectedDoublesSlot: (slot: 0 | 1) => void
+  doublesDraft: DoublesDraft
+  setDoublesDraft: Dispatch<SetStateAction<DoublesDraft>>
   isAnimating: boolean
   isWaitingForServer: boolean
   pendingBattleAction: {
@@ -57,8 +68,11 @@ export interface BattleContextType {
   ) => void | Promise<void>
   handleSwapPokemon: (index: number) => void | Promise<void>
   handleSurrender: () => void | Promise<void>
-  handleDoublesSubmit: (actions:DoublesAction[]) => void | Promise<void>
-  handleDoublesReplace: (slot:0|1,pokemonIndex:number) => void | Promise<void>
+  handleDoublesSubmit: (actions: DoublesAction[]) => void | Promise<void>
+  handleDoublesReplace: (
+    slot: 0 | 1,
+    pokemonIndex: number,
+  ) => void | Promise<void>
 }
 
 const BattleContext = createContext<BattleContextType | undefined>(undefined)

@@ -1,12 +1,35 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import type { BattleState, BattleLogEntry } from '../types'
-import { BattleEvent, AnimationState, INITIAL_ANIMATION_STATE } from './types'
+import {
+  BattleEvent,
+  AnimationState,
+  DoublesPokemonAnimation,
+  INITIAL_ANIMATION_STATE,
+} from './types'
 import { generateBattleEvents } from './event-generator'
 import { getCombinedImpactDamage } from './impact-group'
 import { useAudio } from '@/context/AudioContext'
 import { tasks } from '@/data/tasks'
 import { prependBattleHistory, trimBattleHistory } from '../history'
 import type { BattlePresentationEvent } from '../types'
+
+type DoublesAnimationUpdate = {
+  side: 'player' | 'enemy'
+  index: number
+  patch: DoublesPokemonAnimation
+}
+
+const patchDoublesAnimation = (
+  previous: AnimationState,
+  updates: DoublesAnimationUpdate[],
+): AnimationState => {
+  const doublesPokemon = { ...previous.doublesPokemon }
+  for (const { side, index, patch } of updates) {
+    const key = `${side}:${index}`
+    doublesPokemon[key] = { ...doublesPokemon[key], ...patch }
+  }
+  return { ...previous, doublesPokemon }
+}
 
 // Helper for deep cloning battle state to prevent mutation side-effects
 const shallowCloneState = (state: BattleState): BattleState => ({
@@ -545,6 +568,10 @@ export function useBattleManager(initialState: BattleState) {
                 setVisualState(normalizedState)
                 setAnim((prev) => ({
                   ...prev,
+                  doublesPokemon:
+                    normalizedState.format === 'double'
+                      ? {}
+                      : prev.doublesPokemon,
                   playerFainting:
                     normalizedState.playerTeam[
                       normalizedState.activePlayerIndex
@@ -831,6 +858,12 @@ export function useBattleManager(initialState: BattleState) {
                 const presentationTargetState = cloneState(finalState)
                 const playedSimultaneousGroups = new Set<string>()
 
+                const setDoubles = (updates: DoublesAnimationUpdate[]) => {
+                  if (finalState.format === 'double' && updates.length > 0) {
+                    setAnim((prev) => patchDoublesAnimation(prev, updates))
+                  }
+                }
+
                 const revealMessage = (message: string) => {
                   if (!message.trim()) return
                   setVisualState((prev) => {
@@ -860,9 +893,11 @@ export function useBattleManager(initialState: BattleState) {
                         : 'enemyBoosting'
                     revealMessage(presentationEvent.message)
                     setAnim((prev) => ({ ...prev, [boostKey]: true }))
+                    setDoubles([{ side: presentationEvent.side, index: presentationEvent.pokemonIndex, patch: { boosting: true } }])
                     await delay(900)
                     if (shouldStop()) break
                     setAnim((prev) => ({ ...prev, [boostKey]: false }))
+                    setDoubles([{ side: presentationEvent.side, index: presentationEvent.pokemonIndex, patch: { boosting: false } }])
                     continue
                   }
 
@@ -933,6 +968,11 @@ export function useBattleManager(initialState: BattleState) {
                         playerAttacking: playerMoves,
                         enemyAttacking: enemyMoves,
                       }))
+                      setDoubles(simultaneousAttacks.filter((attack) => attack.animateActor !== false).map((attack) => ({
+                        side: attack.actorSide,
+                        index: attack.actorIndex,
+                        patch: { attacking: true },
+                      })))
                       await delay(300)
                       if (shouldStop()) break
                       setAnim((prev) => {
@@ -968,6 +1008,28 @@ export function useBattleManager(initialState: BattleState) {
                           combinedDamage.enemy > 0 ? combinedDamage.enemy : null
                         return next
                       })
+                      setDoubles([
+                        ...simultaneousAttacks.map((attack) => ({
+                          side: attack.actorSide,
+                          index: attack.actorIndex,
+                          patch: { attacking: false },
+                        })),
+                        ...simultaneousAttacks.map((attack) => ({
+                          side: attack.targetSide,
+                          index: attack.targetIndex,
+                          patch: {
+                            hit: attack.damage > 0,
+                            damageSplat: attack.damage > 0 ? attack.damage : null,
+                            impactType: attack.attackType || null,
+                            holdFaintedSprite: attack.hpAfter <= 0,
+                          },
+                        })),
+                        ...simultaneousHpChanges.filter((change) => change.kind === 'heal').map((change) => ({
+                          side: change.side,
+                          index: change.pokemonIndex,
+                          patch: { statusDamageSplat: -change.amount },
+                        })),
+                      ])
                       for (const simultaneousEvent of simultaneousEvents) {
                         revealMessage(simultaneousEvent.message)
                       }
@@ -1005,6 +1067,18 @@ export function useBattleManager(initialState: BattleState) {
                         playerImpactType: null,
                         enemyImpactType: null,
                       }))
+                      setDoubles([
+                        ...simultaneousAttacks.map((attack) => ({
+                          side: attack.targetSide,
+                          index: attack.targetIndex,
+                          patch: { hit: false, damageSplat: null, impactType: null },
+                        })),
+                        ...simultaneousHpChanges.map((change) => ({
+                          side: change.side,
+                          index: change.pokemonIndex,
+                          patch: { statusDamageSplat: null },
+                        })),
+                      ])
                       continue
                     }
 
@@ -1031,6 +1105,9 @@ export function useBattleManager(initialState: BattleState) {
                         : 'stance_loss',
                     )
                     setAnim((prev) => ({ ...prev, [actorKey]: true }))
+                    if (presentationEvent.animateActor !== false) {
+                      setDoubles([{ side: presentationEvent.actorSide, index: presentationEvent.actorIndex, patch: { attacking: true } }])
+                    }
                     await delay(300)
                     if (shouldStop()) break
 
@@ -1044,6 +1121,15 @@ export function useBattleManager(initialState: BattleState) {
                           : null,
                       [impactKey]: presentationEvent.attackType || null,
                     }))
+                    setDoubles([
+                      { side: presentationEvent.actorSide, index: presentationEvent.actorIndex, patch: { attacking: false } },
+                      { side: presentationEvent.targetSide, index: presentationEvent.targetIndex, patch: {
+                        hit: presentationEvent.damage > 0,
+                        damageSplat: presentationEvent.damage > 0 ? presentationEvent.damage : null,
+                        impactType: presentationEvent.attackType || null,
+                        holdFaintedSprite: presentationEvent.hpAfter <= 0,
+                      } },
+                    ])
                     revealMessage(presentationEvent.message)
                     setVisualState((prev) => {
                       const next = cloneState(prev)
@@ -1063,6 +1149,7 @@ export function useBattleManager(initialState: BattleState) {
                       [splatKey]: null,
                       [impactKey]: null,
                     }))
+                    setDoubles([{ side: presentationEvent.targetSide, index: presentationEvent.targetIndex, patch: { hit: false, damageSplat: null, impactType: null } }])
                     continue
                   }
 
@@ -1086,6 +1173,10 @@ export function useBattleManager(initialState: BattleState) {
                           ? -presentationEvent.amount
                           : presentationEvent.amount,
                     }))
+                    setDoubles([{ side: presentationEvent.side, index: presentationEvent.pokemonIndex, patch: {
+                      statusDamageSplat: presentationEvent.kind === 'heal' ? -presentationEvent.amount : presentationEvent.amount,
+                      holdFaintedSprite: presentationEvent.hpAfter <= 0,
+                    } }])
                     revealMessage(presentationEvent.message)
                     setVisualState((prev) => {
                       const next = cloneState(prev)
@@ -1100,6 +1191,7 @@ export function useBattleManager(initialState: BattleState) {
                     await delay(600)
                     if (shouldStop()) break
                     setAnim((prev) => ({ ...prev, [splatKey]: null }))
+                    setDoubles([{ side: presentationEvent.side, index: presentationEvent.pokemonIndex, patch: { statusDamageSplat: null } }])
                     continue
                   }
 
@@ -1142,6 +1234,7 @@ export function useBattleManager(initialState: BattleState) {
                     if (shouldStop()) break
                     safePlayPokemonCry(presentationEvent.formId)
                     setAnim((prev) => ({ ...prev, [faintKey]: true }))
+                    setDoubles([{ side: presentationEvent.side, index: presentationEvent.pokemonIndex, patch: { fainting: true, holdFaintedSprite: true } }])
                     await delay(1000)
                     if (shouldStop()) break
                     const keepHidden =
@@ -1158,6 +1251,7 @@ export function useBattleManager(initialState: BattleState) {
                       ...prev,
                       [faintKey]: keepHidden,
                     }))
+                    setDoubles([{ side: presentationEvent.side, index: presentationEvent.pokemonIndex, patch: { fainting: false, holdFaintedSprite: false } }])
                     continue
                   }
 
@@ -1172,6 +1266,7 @@ export function useBattleManager(initialState: BattleState) {
                   revealMessage(presentationEvent.message)
                   if (presentationEvent.reason === 'voluntary') {
                     setAnim((prev) => ({ ...prev, [outKey]: true }))
+                    setDoubles([{ side: presentationEvent.side, index: presentationEvent.fromIndex, patch: { switchingOut: true } }])
                     await delay(350)
                     if (shouldStop()) break
                   }
@@ -1202,6 +1297,22 @@ export function useBattleManager(initialState: BattleState) {
                       next.activeEnemyIndex = presentationEvent.toIndex
                       next.enemyTeam[presentationEvent.toIndex] = visualPokemon
                     }
+                    if (next.format === 'double') {
+                      const slotKey = presentationEvent.side === 'player'
+                        ? 'activePlayerSlots'
+                        : 'activeEnemySlots'
+                      const slots = next[slotKey]
+                      const finalSlots = presentationTargetState[slotKey]
+                      const laneIndex = slots?.indexOf(presentationEvent.fromIndex) ?? -1
+                      const replacementLane = laneIndex >= 0
+                        ? laneIndex
+                        : finalSlots?.indexOf(presentationEvent.toIndex) ?? -1
+                      if (slots && replacementLane >= 0) {
+                        const updatedSlots: [number | null, number | null] = [...slots]
+                        updatedSlots[replacementLane] = presentationEvent.toIndex
+                        next[slotKey] = updatedSlots
+                      }
+                    }
                     return next
                   })
                   setAnim((prev) => ({
@@ -1217,9 +1328,14 @@ export function useBattleManager(initialState: BattleState) {
                         ? false
                         : prev.enemyFainting,
                   }))
+                  setDoubles([
+                    { side: presentationEvent.side, index: presentationEvent.fromIndex, patch: { switchingOut: false, holdFaintedSprite: false } },
+                    { side: presentationEvent.side, index: presentationEvent.toIndex, patch: { switchingIn: true } },
+                  ])
                   await delay(50)
                   if (shouldStop()) break
                   setAnim((prev) => ({ ...prev, [inKey]: false }))
+                  setDoubles([{ side: presentationEvent.side, index: presentationEvent.toIndex, patch: { switchingIn: false } }])
                   await delay(300)
                 }
               }

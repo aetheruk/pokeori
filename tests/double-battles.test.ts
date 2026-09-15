@@ -8,6 +8,7 @@ import { getDoublesDamageMultiplier, isDoublesCommanderInactive, processDoublesP
 import { toPerspectivePvpState } from '@/app/(frontend)/game/battles/pvp/state-utils'
 import { resolvePvpTurn } from '@/app/(frontend)/game/battles/pvp/resolution'
 import { DoubleBattleScene } from '@/app/(frontend)/game/battles/_components/double-battle-scene'
+import { INITIAL_ANIMATION_STATE } from '@/utilities/battle/engine/types'
 import { canEnemyPokemonUseAiMove } from '@/utilities/battle/enemy-ai'
 import type { BattlePokemon, BattleState } from '@/utilities/battle/types'
 
@@ -166,15 +167,42 @@ describe('double battles',()=>{
     expect(battle.enemyTeam[0].currentHp).toBe(999)
     expect(battle.history[0].message).toContain('protected its ally')
   })
-  test('four-lane scene labels Commander and clears fainted sprites while preserving empty lanes',()=>{
+  test('four-lane scene labels Commander, retains a fainted HUD, and clears its sprite',()=>{
     const battle=state()
     battle.playerTeam[0].battleAbilityState={commanderLinkedTo:battle.playerTeam[1].id}
     battle.enemyTeam[1].currentHp=0
     const html=renderToStaticMarkup(createElement(DoubleBattleScene,{state:battle,isWaitingForOpponent:false}))
-    expect(html.match(/Opponent · [12]/g)).toHaveLength(2)
-    expect(html.match(/Your Pokemon · [12]/g)).toHaveLength(2)
+    expect(html.match(/Opponent Pokemon [12] health/g)).toHaveLength(2)
+    expect(html.match(/Your Pokemon [12] health/g)).toHaveLength(2)
     expect(html).toContain('Joined ally')
-    expect(html).toContain('Empty lane')
+    expect(html).toContain('E1')
+    expect(html).not.toContain('Opponent lane 2: E1')
+    battle.activeEnemySlots=[0,null]
+    const emptyLaneHtml=renderToStaticMarkup(createElement(DoubleBattleScene,{state:battle,isWaitingForOpponent:false}))
+    expect(emptyLaneHtml).toContain('Empty lane')
+  })
+  test('four-lane scene applies attack effects only to the acting Pokemon',()=>{
+    const html=renderToStaticMarkup(createElement(DoubleBattleScene,{
+      state:state(),isWaitingForOpponent:false,selectedSlot:1,
+      anim:{...INITIAL_ANIMATION_STATE,doublesPokemon:{'player:1':{attacking:true}}},
+    }))
+    expect(html.match(/translate-x-12 -translate-y-12/g)).toHaveLength(1)
+    expect(html.match(/selected-doubles-arrow/g)).toHaveLength(1)
+  })
+  test('single-target commands expose only living eligible sprites with a red target arrow',()=>{
+    const battle=state()
+    const html=renderToStaticMarkup(createElement(DoubleBattleScene,{
+      state:battle,isWaitingForOpponent:false,selectedAction:hit(0,1),onChooseTarget:()=>{},
+    }))
+    expect(html).toContain('aria-label="Target E0"')
+    expect(html).toContain('aria-label="Target E1"')
+    expect(html.match(/selected-doubles-target-arrow/g)).toHaveLength(1)
+    battle.enemyTeam[1].currentHp=0
+    const faintedHtml=renderToStaticMarkup(createElement(DoubleBattleScene,{
+      state:battle,isWaitingForOpponent:false,selectedAction:hit(0,1),onChooseTarget:()=>{},
+    }))
+    expect(faintedHtml).not.toContain('aria-label="Target E1"')
+    expect(faintedHtml).not.toContain('selected-doubles-target-arrow')
   })
   test('Hospitality heals an active partner on entry; Commander occupies its own lane until Dondozo faints',()=>{
     const battle=state()

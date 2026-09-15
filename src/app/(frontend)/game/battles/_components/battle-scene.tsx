@@ -1,5 +1,9 @@
 import type { BattleState } from '@/utilities/battle/types'
 import type { AnimationState } from '@/utilities/battle/engine/types'
+import type {
+  DoublesAction,
+  DoublesTarget,
+} from '@/utilities/battle/doubles-state'
 import { BattleHeader } from './battle-header'
 import { PokemonSpriteDisplay } from './pokemon-sprite-display'
 import { DoubleBattleScene } from './double-battle-scene'
@@ -8,6 +12,10 @@ interface BattleSceneProps {
   battleState: BattleState
   anim: AnimationState
   isWaitingForOpponent?: boolean
+  selectedDoublesSlot?: 0 | 1
+  selectedDoublesAction?: DoublesAction
+  onChooseDoublesTarget?: (target: DoublesTarget) => void
+  disableDoublesTargetSelection?: boolean
   hidePlayer?: boolean
   playerHasTeraEffect?: boolean
   playerHasZPowerEffect?: boolean
@@ -19,13 +27,28 @@ export function BattleScene({
   battleState,
   anim,
   isWaitingForOpponent = false,
+  selectedDoublesSlot = 0,
+  selectedDoublesAction,
+  onChooseDoublesTarget,
+  disableDoublesTargetSelection = false,
   hidePlayer = false,
   playerHasTeraEffect,
   playerHasZPowerEffect,
   enemyHasTeraEffect,
   enemyHasZPowerEffect,
 }: BattleSceneProps) {
-  if (battleState.format === 'double') return <DoubleBattleScene state={battleState} isWaitingForOpponent={isWaitingForOpponent} />
+  if (battleState.format === 'double')
+    return (
+      <DoubleBattleScene
+        state={battleState}
+        anim={anim}
+        isWaitingForOpponent={isWaitingForOpponent}
+        selectedSlot={selectedDoublesSlot}
+        selectedAction={selectedDoublesAction}
+        onChooseTarget={onChooseDoublesTarget}
+        disableTargetSelection={disableDoublesTargetSelection}
+      />
+    )
   const activePlayerMon = battleState.playerTeam[battleState.activePlayerIndex]
   const activeEnemyMon = battleState.enemyTeam[battleState.activeEnemyIndex]
 
