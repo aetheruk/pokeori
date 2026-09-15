@@ -790,6 +790,7 @@ export function queueDelayedMoveDamage(params: {
     id: `${state.turn}:${params.sourceSide}:${move.id}:${state.delayedDamage.length}`,
     sourceSide: params.sourceSide,
     targetSide: params.targetSide,
+    targetSlot: state.format==='double' ? ((params.targetSide==='player'?state.activePlayerSlots:state.activeEnemySlots)?.indexOf(params.targetSide==='player'?state.activePlayerIndex:state.activeEnemyIndex) as 0|1) : undefined,
     sourcePokemonId: params.attacker.id,
     moveId: move.id,
     moveName: move.name,
@@ -816,7 +817,9 @@ export function processDelayedMoveDamage(state: BattleState): string[] {
     }
 
     const targetIndex =
-      entry.targetSide === 'player'
+      state.format==='double' && entry.targetSlot!==undefined
+        ? ((entry.targetSide==='player'?state.activePlayerSlots:state.activeEnemySlots)?.[entry.targetSlot] ?? -1)
+        : entry.targetSide === 'player'
         ? state.activePlayerIndex
         : state.activeEnemyIndex
     const targetTeam =

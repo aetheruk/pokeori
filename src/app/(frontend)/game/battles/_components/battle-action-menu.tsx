@@ -15,6 +15,7 @@ import { ItemSelector } from './item-selector'
 import { PowerSelector } from './power-selector'
 import { StanceSelector } from './stance-selector'
 import { TeamSwapper } from './team-swapper'
+import { DoubleActionMenu } from './double-action-menu'
 
 const typeIdMap: Record<string, number> = {
   normal: 1,
@@ -41,6 +42,12 @@ const typeIdMap: Record<string, number> = {
 }
 
 export function BattleActionMenu() {
+  const {battleState:formatState}=useBattleContext()
+  if (formatState.format === 'double') return <DoubleActionMenu />
+  return <SingleBattleActionMenu />
+}
+
+function SingleBattleActionMenu() {
   const {
     battleState,
     activePlayerMon,

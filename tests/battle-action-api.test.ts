@@ -17,6 +17,8 @@ const useShoutMock = mock(async () => ({ success: true }))
 const useCircadianMock = mock(async () => ({ success: true }))
 const surrenderBattleMock = mock(async () => ({ success: true }))
 const getBattleStateMock = mock(async () => ({ turn: 4 }))
+const submitDoublesActionsMock = mock(async () => ({success:true,state:{turn:2,format:'double'}}))
+const replaceDoublesPokemonMock = mock(async () => ({success:true,state:{turn:2,format:'double'}}))
 
 mock.module('@/app/(frontend)/game/battles/actions', () => ({
   submitTurn: submitTurnMock,
@@ -33,6 +35,8 @@ mock.module('@/app/(frontend)/game/battles/actions', () => ({
   useCircadian: useCircadianMock,
   surrenderBattle: surrenderBattleMock,
   getBattleState: getBattleStateMock,
+  submitDoublesActions: submitDoublesActionsMock,
+  replaceDoublesPokemon: replaceDoublesPokemonMock,
 }))
 
 function makeRequest(body: unknown, headers: Record<string, string> = {}) {
@@ -56,6 +60,8 @@ describe('battle action API', () => {
     useShoutMock.mockClear()
     surrenderBattleMock.mockClear()
     getBattleStateMock.mockClear()
+    submitDoublesActionsMock.mockClear()
+    replaceDoublesPokemonMock.mockClear()
   })
 
   test('dispatches stance submissions without a Server Action response', async () => {
@@ -99,6 +105,24 @@ describe('battle action API', () => {
       'grass',
       'battle-action-2',
     )
+  })
+
+  test('dispatches the complete doubles bundle as one validated action', async()=>{
+    const {POST}=await import('@/app/api/game/battles/action/route')
+    const actions=[
+      {slot:0,kind:'basic',stance:'power',attackType:'normal',target:{side:'opponent',slot:0}},
+      {slot:1,kind:'move',moveId:'surf'},
+    ]
+    const response=await POST(makeRequest({kind:'doubles',actions,clientActionId:'double-turn-1'}))
+    expect(response.status).toBe(200)
+    expect(submitDoublesActionsMock).toHaveBeenCalledWith(actions,'double-turn-1')
+  })
+
+  test('dispatches per-lane double replacements',async()=>{
+    const {POST}=await import('@/app/api/game/battles/action/route')
+    const response=await POST(makeRequest({kind:'doubles-replace',slot:1,pokemonIndex:2,clientActionId:'double-replace-1'}))
+    expect(response.status).toBe(200)
+    expect(replaceDoublesPokemonMock).toHaveBeenCalledWith(1,2,'double-replace-1')
   })
 
   test('dispatches Battle Shout without a stance selection', async () => {

@@ -2,6 +2,7 @@ import type { BattleState } from '@/utilities/battle/types'
 import type { AnimationState } from '@/utilities/battle/engine/types'
 import { BattleHeader } from './battle-header'
 import { PokemonSpriteDisplay } from './pokemon-sprite-display'
+import { DoubleBattleScene } from './double-battle-scene'
 
 interface BattleSceneProps {
   battleState: BattleState
@@ -24,6 +25,7 @@ export function BattleScene({
   enemyHasTeraEffect,
   enemyHasZPowerEffect,
 }: BattleSceneProps) {
+  if (battleState.format === 'double') return <DoubleBattleScene state={battleState} isWaitingForOpponent={isWaitingForOpponent} />
   const activePlayerMon = battleState.playerTeam[battleState.activePlayerIndex]
   const activeEnemyMon = battleState.enemyTeam[battleState.activeEnemyIndex]
 

@@ -93,7 +93,11 @@ export function processBattleAbilitySuppressionForState(
   if (!state.playerTeam?.length || !state.enemyTeam?.length) return []
   const playerMon = state.playerTeam[state.activePlayerIndex]
   const enemyMon = state.enemyTeam[state.activeEnemyIndex]
-  const activePokemon = [playerMon, enemyMon].filter(
+  const extraActive=state.format==='double' ? [
+    ...(state.activePlayerSlots??[]).flatMap(index=>index===null||index===state.activePlayerIndex?[]:[state.playerTeam[index]]),
+    ...(state.activeEnemySlots??[]).flatMap(index=>index===null||index===state.activeEnemyIndex?[]:[state.enemyTeam[index]]),
+  ] : []
+  const activePokemon = [playerMon, enemyMon,...extraActive].filter(
     (pokemon): pokemon is BattlePokemon => Boolean(pokemon),
   )
   const previouslySuppressed = new Set(
@@ -108,16 +112,13 @@ export function processBattleAbilitySuppressionForState(
     }
   }
 
-  const playerSuppresses = hasActiveAbilitySuppression(playerMon)
-  const enemySuppresses = hasActiveAbilitySuppression(enemyMon)
-  if (!playerSuppresses && !enemySuppresses) return []
+  const suppressors=activePokemon.filter(hasActiveAbilitySuppression)
+  if (!suppressors.length) return []
 
   const messages: string[] = []
   let suppressionChanged = false
   for (const pokemon of activePokemon) {
-    const isSuppressor =
-      (pokemon === playerMon && playerSuppresses) ||
-      (pokemon === enemyMon && enemySuppresses)
+    const isSuppressor = suppressors.includes(pokemon)
     if (isSuppressor) continue
     pokemon.battleAbilityState ??= {}
     pokemon.battleAbilityState.suppressed = true
@@ -127,9 +128,7 @@ export function processBattleAbilitySuppressionForState(
 
   if (suppressionChanged) {
     for (const pokemon of activePokemon) {
-      const isSuppressor =
-        (pokemon === playerMon && playerSuppresses) ||
-        (pokemon === enemyMon && enemySuppresses)
+      const isSuppressor = suppressors.includes(pokemon)
       if (isSuppressor) {
         messages.push(`${pokemon.name}'s ${getAbilityName(pokemon)} neutralized abilities!`)
       }

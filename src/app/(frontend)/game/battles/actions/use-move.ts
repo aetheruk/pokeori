@@ -331,6 +331,7 @@ export async function useMove(
       getActiveBattleState(user),
     )
     if (!state) return { success: false, error: 'No active battle' }
+    if (state.format==='double') return {success:false,error:'Choose both Pokemon actions together.',state}
     beginBattlePresentation(state)
     if (state.status !== 'ongoing')
       return { success: false, error: 'Battle has ended', state }
@@ -366,6 +367,7 @@ export async function useMove(
       ? createBasicAttackMove(basicAttackStance)
       : getMove(moveId)
     if (!move) return { success: false, error: 'Invalid move' }
+    if (move.doublesOnly) return {success:false,error:'This move can only be used in a double battle.',state}
     const assignedMove = move
 
     const activeMoveLock = state.playerMoveLock

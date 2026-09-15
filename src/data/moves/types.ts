@@ -510,6 +510,10 @@ export type MoveCurseEffect = {
 }
 
 export interface MoveConfig {
+  /** Doubles target pattern. Omitted means the legacy self/enemy target. */
+  doublesTarget?: 'self' | 'ally' | 'opponent' | 'any-single' | 'both-opponents' | 'both-allies' | 'all-active'
+  doublesPriority?: number
+  doublesOnly?: boolean
   id: string
   name: string
   description: string

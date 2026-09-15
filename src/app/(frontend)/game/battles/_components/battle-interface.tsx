@@ -19,6 +19,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useAudio } from '@/context/AudioContext'
 import type { BattleStance, BattleState } from '@/utilities/battle/types'
+import type { DoublesAction } from '@/utilities/battle/doubles-state'
 import {
   clearBattleState,
   getBattlePanelData,
@@ -42,6 +43,7 @@ import { markExpeditionReturn } from '@/components/game/features/explore/expedit
 import { TaskExitDialog } from '@/components/game/task-exit-dialog'
 import { useUser } from '@/context/UserContext'
 import { battles } from '@/data/battles'
+import { getMove } from '@/data/moves'
 import { tasks } from '@/data/tasks'
 import type { TcgCard } from '@/data/tcg/types'
 import { getIcon } from '@/data/user/icons'
@@ -249,7 +251,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
 
         if (cancelled) return
 
-        setAvailableMoves(panel.moves || [])
+        setAvailableMoves((panel.moves||[]).filter(move=>battleState.format==='double'||!getMove(move.id)?.doublesOnly))
 
         if (panel.powers.success) {
           const d = panel.powers.data
@@ -689,6 +691,19 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
     [playSfx, wrapAction],
   )
 
+  const handleDoublesSubmit = useCallback(
+    (actions:DoublesAction[]) => wrapAction(
+      clientActionId => submitBattleActionRequest({kind:'doubles',actions,clientActionId}),
+      {kind:'doubles',label:'Resolving double turn'},
+    ),[wrapAction],
+  )
+  const handleDoublesReplace = useCallback(
+    (slot:0|1,pokemonIndex:number) => wrapAction(
+      clientActionId => submitBattleActionRequest({kind:'doubles-replace',slot,pokemonIndex,clientActionId}),
+      {kind:'swap',label:'Sending in a replacement',pokemonIndex},
+    ),[wrapAction],
+  )
+
   const playerHasTeraEffect = !!activePlayerMon?.teraTypeOverride
   const choosingLead = needsPlayerLeadSelection(battleState)
 
@@ -721,6 +736,8 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
       handleUseDimensionalShift,
       handleSwapPokemon,
       handleSurrender,
+      handleDoublesSubmit,
+      handleDoublesReplace,
     }),
     [
       battleState,
@@ -749,6 +766,8 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
       handleUseDimensionalShift,
       handleSwapPokemon,
       handleSurrender,
+      handleDoublesSubmit,
+      handleDoublesReplace,
     ],
   )
 

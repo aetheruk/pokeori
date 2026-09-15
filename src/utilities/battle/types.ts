@@ -102,6 +102,7 @@ export interface BattlePokemon extends Omit<Pokemon, 'stats'> {
   originalFormId?: string // Store original form for reference (e.g., for Mega/Dynamax revert)
   originalHeldItemId?: string | null
   battleAbilityState?: {
+    commanderLinkedTo?: string
     consumedShields?: string[]
     zeroToHeroActivated?: boolean
     battleBondActivated?: boolean
@@ -226,6 +227,7 @@ export interface BattleDelayedDamageEntry {
   id: string
   sourceSide: 'player' | 'enemy'
   targetSide: 'player' | 'enemy'
+  targetSlot?: 0 | 1
   sourcePokemonId?: string
   moveId: string
   moveName: string
@@ -355,6 +357,12 @@ export interface PendingBattleSketch {
 }
 
 export interface BattleState {
+  format?: 'single' | 'double'
+  /** Ordered active team indexes; null represents an unfilled doubles slot. */
+  activePlayerSlots?: [number | null, number | null]
+  activeEnemySlots?: [number | null, number | null]
+  pendingPlayerReplacementSlots?: number[]
+  pendingEnemyReplacementSlots?: number[]
   playerTeam: BattlePokemon[]
   enemyTeam: BattlePokemon[]
   activePlayerIndex: number

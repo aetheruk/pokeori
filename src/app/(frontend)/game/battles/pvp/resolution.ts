@@ -2,15 +2,19 @@ import { getPayload } from 'payload'
 import { settlePvpOutcome } from './outcome'
 import configPromise from '@payload-config'
 import { getMove } from '@/data/moves'
+import { resolveDoublesTurn, type DoublesAction } from '@/utilities/battle/doubles'
+import { applyDoublesPowerAction } from '../actions/doubles-special'
+import { recordPokemonKOForPokemon } from '../helpers/pokemon-ko-credit'
 import { useDimensionalShift as applyDimensionalShift } from '../powers/dimensional'
 import type {
   BattleState,
   BattlePokemon,
   BattleStance,
+  BattlePresentationEvent,
   PowersState,
 } from '@/utilities/battle/types'
 import { trimBattleHistory } from '@/utilities/battle/history'
-import { ensurePvpPowerStates, normalizeBattleUserId } from './state-utils'
+import { ensurePvpPowerStates, getSharedBattleUserIds, normalizeBattleUserId } from './state-utils'
 import {
   advancePvpPowerStateForTurn,
   applyDimensionalChargeForResult,
@@ -74,6 +78,7 @@ import {
 } from '@/utilities/pokemon/sketch'
 
 export interface PvpMove {
+  actions?: DoublesAction[]
   stance: BattleStance
   attackType?: string
   specialMoveId?: string
@@ -101,6 +106,25 @@ export async function resolvePvpTurn(
     random?: () => number
   } = {},
 ): Promise<BattleState> {
+  if (state.format === 'double') {
+    if (!p1Move.actions || !p2Move.actions) throw new Error('Both trainers must submit doubles actions')
+    ensurePvpPowerStates(state)
+    resolveDoublesTurn(state, p1Move.actions, p2Move.actions, options.random ?? Math.random,
+      ({state:next,side,actor,action}) => {
+        if (action.kind === 'item') throw new Error('Trainer items are not available in PvP.')
+        return applyDoublesPowerAction(next,side,actor,action)
+      })
+    for(const event of state.presentation?.events??[]) if(event.type==='faint') recordPokemonKOForPokemon(state,event.side,(event.side==='player'?state.playerTeam:state.enemyTeam)[event.pokemonIndex])
+    if(options.persist!==false) {
+      const faintEvents=(state.presentation?.events??[]).filter((event):event is Extract<BattlePresentationEvent,{type:'faint'}>=>event.type==='faint')
+      if(faintEvents.length) {
+        const payload=await getPayload({config:configPromise})
+        const {p1Id,p2Id}=getSharedBattleUserIds(state)
+        await Promise.all(faintEvents.map(event=>decrementFaintedPokemonFriendship({payload,pokemon:(event.side==='player'?state.playerTeam:state.enemyTeam)[event.pokemonIndex],userId:(event.side==='player'?p1Id:p2Id)??undefined,eventId:`${state.economyActionId||state.pvpBattleId||state.battleId}:${state.turn-1}:${event.side}:${event.pokemonIndex}:doubles-faint` })))
+      }
+    }
+    return options.persist === false ? state : settlePvpOutcome(state)
+  }
   beginBattlePresentation(state)
   const shouldPersist = options.persist !== false
   const random = options.random ?? Math.random

@@ -5,6 +5,7 @@ import { battles } from '@/data/battles'
 import { initializeBattlePokemon } from '@/utilities/battle/battle-logic'
 import { createInitialPowersState } from '@/data/powers'
 import type { BattleState } from '@/utilities/battle/types'
+import { processDoublesEntry } from '@/utilities/battle/doubles'
 import {
   getResearcherMoveSlotCount,
   getSkillLevel,
@@ -74,6 +75,7 @@ export async function initializeSharedPvpBattle(
 
   if (!p1Details || !p2Details || p1Docs.length === 0 || p2Docs.length === 0)
     return null
+  if (battleConfig.format === 'double' && (p1Docs.length < 2 || p2Docs.length < 2)) return null
   if (p1Details.kidMode === true || p2Details.kidMode === true) return null
 
   const p1TrainerLevel = getSkillLevel(p1Details.skills, 'battling')
@@ -135,9 +137,11 @@ export async function initializeSharedPvpBattle(
   if (p1Team[0]) {
     p1Team[0].activeTurnStarted = 1
   }
+  if (battleConfig.format === 'double' && p1Team[1]) p1Team[1].activeTurnStarted = 1
   if (p2Team[0]) {
     p2Team[0].activeTurnStarted = 1
   }
+  if (battleConfig.format === 'double' && p2Team[1]) p2Team[1].activeTurnStarted = 1
   const p1ResearcherMoveSlots = getResearcherMoveSlotCount(
     getSkillLevel(p1Details.skills, 'researching'),
   )
@@ -170,6 +174,9 @@ export async function initializeSharedPvpBattle(
   }
 
   const initialState: BattleState = {
+    format: battleConfig.format ?? 'single',
+    activePlayerSlots: battleConfig.format === 'double' ? [0, 1] : undefined,
+    activeEnemySlots: battleConfig.format === 'double' ? [0, 1] : undefined,
     playerTeam: p1Team,
     enemyTeam: p2Team,
     activePlayerIndex: 0,
@@ -218,7 +225,7 @@ export async function initializeSharedPvpBattle(
     },
   }
 
-  const rarityMessages = [
+  const rarityMessages = battleConfig.format==='double' ? (['player','enemy'] as const).flatMap(side=>([0,1] as const).flatMap(slot=>processDoublesEntry(initialState,side,slot))) : [
     ...applyBattleRarityEntryEffects(
       initialState.playerTeam[initialState.activePlayerIndex],
       Math.random,

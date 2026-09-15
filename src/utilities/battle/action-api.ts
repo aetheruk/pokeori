@@ -1,4 +1,5 @@
 import type { BattleStance, BattleState } from './types'
+import type { DoublesAction } from './doubles-state'
 
 const BATTLE_ACTION_ENDPOINT = '/api/game/battles/action'
 
@@ -7,6 +8,8 @@ type BattleActionBase = {
 }
 
 export type BattleActionRequest =
+  | (BattleActionBase & {kind:'doubles'; actions:DoublesAction[]})
+  | (BattleActionBase & {kind:'doubles-replace'; slot:0|1; pokemonIndex:number})
   | (BattleActionBase & {
       kind: 'stance'
       stance: BattleStance
