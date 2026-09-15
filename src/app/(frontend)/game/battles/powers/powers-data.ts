@@ -8,7 +8,7 @@ import configPromise from '@payload-config'
 import { getPokemonForm } from '@/utilities/pokemon/pokedex'
 import type { PokemonPowerId } from '@/utilities/pokemon/pokemon-powers'
 import { normalizeSelectedPokemonPower } from '@/utilities/pokemon/pokemon-powers'
-import { WEATHER_LABELS, WEATHER_TYPES, type WeatherType } from '@/data/weather'
+import type { WeatherType } from '@/data/weather'
 import {
   getSkillLevel,
   validateBattlePowerSkillRequirement,
@@ -108,7 +108,6 @@ export async function getBattlePowers(
   const { items } = await import('@/data/items')
   const {
     POWER_KEY_ITEMS,
-    WEATHER_POWER_ITEM_IDS,
     getMegaEvolutions,
     canGigantamax,
     getGigantamaxForm,
@@ -208,17 +207,6 @@ export async function getBattlePowers(
   }
 
   const weatherPowers: WeatherPowerData[] = []
-  if (hasWeather) {
-    for (const weather of WEATHER_TYPES) {
-      const itemId = WEATHER_POWER_ITEM_IDS[weather]
-      if (!hasKeyItem(itemId)) continue
-      weatherPowers.push({
-        itemId,
-        weather,
-        label: WEATHER_LABELS[weather],
-      })
-    }
-  }
 
   // Check Gigantamax capability
   const canGmax = canGigantamax(activeFormId)

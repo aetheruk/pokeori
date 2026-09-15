@@ -31,7 +31,6 @@ export type BattleActionRequest =
   | (BattleActionBase & {
       kind: 'weather'
       battleId: string
-      weather: string
     })
   | (BattleActionBase & { kind: 'shout' })
   | (BattleActionBase & { kind: 'circadian'; battleId: string })

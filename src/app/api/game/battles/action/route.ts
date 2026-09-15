@@ -60,7 +60,6 @@ const BattleActionSchema = z.discriminatedUnion('kind', [
   baseAction.extend({
     kind: z.literal('weather'),
     battleId: identifier,
-    weather: identifier,
   }),
   baseAction.extend({ kind: z.literal('shout') }),
   baseAction.extend({ kind: z.literal('circadian'), battleId: identifier }),
@@ -146,7 +145,6 @@ export async function POST(request: Request) {
       case 'weather':
         result = await applyWeatherPower(
           action.battleId,
-          action.weather,
           action.clientActionId,
         )
         break

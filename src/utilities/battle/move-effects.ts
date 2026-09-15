@@ -10,6 +10,7 @@ import type {
 import type { StatusEffectId } from '@/data/moves/types'
 import type { PokemonTypeName } from '@/data/items'
 import type { WeatherType } from '@/data/weather'
+import { WEATHER_LABELS } from '@/data/weather'
 import { TERRAIN_LABELS, type TerrainType } from '@/data/terrain'
 import type {
   BattleDamageHistoryEntry,
@@ -1546,6 +1547,25 @@ export function applyMoveRuntimeEffects(params: {
       messages.push(`${move.name} created ${TERRAIN_LABELS[terrain]}!`)
       messages.push(...processBattleAbilityWeatherTypeChangesForState(state))
     }
+  }
+
+  if (move.weatherEffect) {
+    const weather = move.weatherEffect.weather
+    const previousWeather = state.weather?.weather ?? 'clear'
+    state.weather = {
+      slot: state.weather?.slot ?? 1,
+      label: WEATHER_LABELS[weather],
+      updatedAt: state.weather?.updatedAt,
+      expiresAt: state.weather?.expiresAt,
+      subCategory: state.weather?.subCategory,
+      source: 'move',
+      originalWeather: state.weather?.originalWeather ?? previousWeather,
+      overriddenAtTurn: state.turn,
+      overriddenBy: move.name,
+      weather,
+    }
+    messages.push(`${move.name} made the weather ${WEATHER_LABELS[weather]}!`)
+    messages.push(...processBattleAbilityWeatherTypeChangesForState(state))
   }
 
   if (move.curseEffect) {

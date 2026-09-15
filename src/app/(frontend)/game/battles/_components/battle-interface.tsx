@@ -608,18 +608,17 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
     [wrapAction],
   )
   const handleUseWeather = useCallback(
-    (weather: string) =>
+    () =>
       wrapAction(
         (clientActionId) =>
           submitBattleActionRequest({
             kind: 'weather',
             battleId: battleState.battleId,
-            weather,
             clientActionId,
           }),
         {
           kind: 'power',
-          label: 'Weather Control',
+          label: 'Weather Power',
         },
       ),
     [battleState.battleId, wrapAction],

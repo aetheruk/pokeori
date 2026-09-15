@@ -3313,8 +3313,8 @@ describe('move damage helpers', () => {
       { type: 'user-previous-move-failed', multiplier: 2 },
     ])
 
-    expect(getMove('hail')).toBeUndefined()
-    expect(getMove('sandstorm')).toBeUndefined()
+    expect(getMove('hail')?.weatherEffect).toEqual({ weather: 'hail' })
+    expect(getMove('sandstorm')?.weatherEffect).toEqual({ weather: 'sandstorm' })
     expect(getMove('max-hailstorm')).toBeUndefined()
   })
 

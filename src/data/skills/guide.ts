@@ -328,7 +328,7 @@ export const authoredSkillGuideUnlocks: SkillGuideUnlock[] = [
     skillId: 'battling',
     level: BATTLE_POWER_UNLOCK_LEVELS.weather,
     category: 'powers',
-    label: 'Weather Control',
+    label: 'Weather Power',
     description: 'Call unlocked weather in battle.',
     source: 'authored',
     icon: itemIcon('weather-orb'),

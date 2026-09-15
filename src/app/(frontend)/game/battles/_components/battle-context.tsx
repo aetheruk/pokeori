@@ -48,7 +48,7 @@ export interface BattleContextType {
   handleUseDynamax: () => void | Promise<void>
   handleUseMove: (moveId: string) => void | Promise<void>
   handleUseVictory: (itemId: string) => void | Promise<void>
-  handleUseWeather: (weather: string) => void | Promise<void>
+  handleUseWeather: () => void | Promise<void>
   handleUseShout: () => void | Promise<void>
   handleUseCircadian: () => void | Promise<void>
   handleUseDimensionalShift: (

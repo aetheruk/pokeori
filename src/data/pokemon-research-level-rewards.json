@@ -1966,8 +1966,33 @@
   },
   {
     "formId": "351",
+    "level": 1,
+    "itemId": "tm-sunny-day"
+  },
+  {
+    "formId": "351",
+    "level": 2,
+    "itemId": "tm-rain-dance"
+  },
+  {
+    "formId": "351",
     "level": 2,
     "itemId": "tm-weather-ball"
+  },
+  {
+    "formId": "351",
+    "level": 3,
+    "itemId": "tm-sandstorm"
+  },
+  {
+    "formId": "351",
+    "level": 4,
+    "itemId": "tm-hail"
+  },
+  {
+    "formId": "351",
+    "level": 5,
+    "itemId": "tm-snowscape"
   },
   {
     "formId": "352",

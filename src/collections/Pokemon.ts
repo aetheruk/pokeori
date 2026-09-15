@@ -123,7 +123,7 @@ export const Pokemon: CollectionConfig = {
         { label: 'Z-Move', value: 'z-move' },
         { label: 'Dynamax', value: 'dynamax' },
         { label: 'Victory Power', value: 'victory' },
-        { label: 'Weather Control', value: 'weather' },
+        { label: 'Weather Power', value: 'weather' },
         { label: 'Battle Shout', value: 'shout' },
         { label: 'Circadian Power', value: 'circadian' },
         { label: 'Dimensional Shift', value: 'dimensional-shift' },

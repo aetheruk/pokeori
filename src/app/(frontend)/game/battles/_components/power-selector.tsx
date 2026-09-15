@@ -189,11 +189,11 @@ export function PowerSelector() {
     }
   }
 
-  const handleUseWeather = async (weather: string) => {
+  const handleUseWeather = async () => {
     if (using) return
-    setUsing(`weather-${weather}`)
+    setUsing('weather')
     try {
-      await onUseWeather(weather)
+      await onUseWeather()
       setPowerOpen(false)
     } finally {
       setUsing(null)
@@ -806,7 +806,7 @@ export function PowerSelector() {
                     </div>
                   )}
 
-                  {/* Weather Control */}
+                  {/* Weather Power */}
                   {powersData?.hasWeather && (
                     <div className="space-y-3">
                       <SectionDivider>
@@ -818,18 +818,14 @@ export function PowerSelector() {
                             height={18}
                             className="h-4 w-4 object-contain"
                           />
-                          Weather Control
+                          Weather Power
                         </span>
                       </SectionDivider>
                       {!canUseWeather ? (
                         <div className="text-sm text-game-muted py-2">
                           {powersState?.weatherUsesRemaining === 0
-                            ? 'No Weather Control uses remaining'
-                            : 'Cannot use Weather Control now'}
-                        </div>
-                      ) : powersData.weatherPowers.length === 0 ? (
-                        <div className="text-sm text-game-muted py-2">
-                          No Weather Cores available
+                            ? 'No Weather Power uses remaining'
+                            : 'Cannot use Weather Power now'}
                         </div>
                       ) : (
                         <div className="space-y-2">
@@ -838,35 +834,20 @@ export function PowerSelector() {
                               Current weather: {battleState.weather.label}
                             </div>
                           )}
-                          <div className="grid grid-cols-2 gap-2">
-                            {powersData.weatherPowers.map((weatherPower) => (
-                              <Button
-                                key={weatherPower.itemId}
-                                variant="outline"
-                                className="h-auto py-3 px-4 flex items-center gap-3 border-game-border hover:border-game-moss/60 hover:bg-game-moss/10"
-                                disabled={using !== null}
-                                onClick={() =>
-                                  handleUseWeather(weatherPower.weather)
-                                }
-                              >
-                                <ItemSprite
-                                  itemId={weatherPower.itemId}
-                                  alt={weatherPower.label}
-                                  width={32}
-                                  height={32}
-                                  className="w-8 h-8"
-                                />
-                                <div className="flex flex-col items-start">
-                                  <span className="text-sm text-game-ink">
-                                    {weatherPower.label}
-                                  </span>
-                                  <span className="text-[10px] text-game-muted">
-                                    Battle weather
-                                  </span>
-                                </div>
-                              </Button>
-                            ))}
-                          </div>
+                          <Button
+                            variant="outline"
+                            className="h-auto w-full rounded-xl border-game-border bg-game-surface-raised px-3 py-3 text-left shadow-sm transition-colors hover:border-game-moss/60 hover:bg-game-moss/10"
+                            disabled={using !== null}
+                            onClick={handleUseWeather}
+                          >
+                            <span className="flex items-center gap-3">
+                              <ItemSprite itemId="weather-orb" alt="Weather Power" width={32} height={32} className="h-8 w-8" />
+                              <span className="flex flex-col items-start gap-1">
+                                <span className="text-sm font-medium text-game-ink">Use weather technique</span>
+                                <span className="text-xs text-game-muted">Performs an effect based on the current weather</span>
+                              </span>
+                            </span>
+                          </Button>
                         </div>
                       )}
                     </div>
