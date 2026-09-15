@@ -72,9 +72,7 @@ function LaneHealth({
           preferredStance={isPlayer ? undefined : mon.observedPreferredStance}
           compact
         />
-      ) : (
-        <span className="text-xs text-game-night-muted">Empty lane</span>
-      )}
+      ) : null}
     </fieldset>
   )
 }
