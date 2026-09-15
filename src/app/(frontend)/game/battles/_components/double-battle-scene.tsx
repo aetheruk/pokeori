@@ -190,14 +190,19 @@ function LaneSprite({
     return (
       <button
         type="button"
-        data-testid={`doubles-actor-${side}-${slot}`}
+        data-testid={`doubles-sprite-${side}-${slot}`}
         className={`${wrapperClass} pointer-events-auto rounded-lg bg-transparent p-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-game-ochre`}
         aria-label={`Choose ${mon.name} to act next`}
         aria-pressed={isSelected}
         disabled={targetDisabled}
         onClick={onSelectActor}
       >
-        {content}
+        <span
+          data-testid={`doubles-actor-${side}-${slot}`}
+          className="contents"
+        >
+          {content}
+        </span>
       </button>
     )
   }
