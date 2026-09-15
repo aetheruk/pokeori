@@ -16,6 +16,7 @@ interface HealthDisplayProps {
   align?: 'left' | 'right' | 'center'
   status?: { id: string; counter: number }
   preferredStance?: BattleStance
+  compact?: boolean
 }
 
 export function HealthDisplay({
@@ -29,6 +30,7 @@ export function HealthDisplay({
   align,
   status,
   preferredStance,
+  compact = false,
 }: HealthDisplayProps) {
   const hpPercent = (currentHp / maxHp) * 100
   const resolvedAlign = align ?? (isPlayer || centered ? 'center' : 'left')
@@ -36,7 +38,7 @@ export function HealthDisplay({
   const isRight = resolvedAlign === 'right'
   const statusChip = status ? getBattleStatusChip(status.id) : null
   const identityChip = (
-    <span className="inline-flex min-w-0 items-center gap-1.5 rounded-full border border-game-border bg-game-surface-raised px-2.5 py-1 text-[11px] font-bold text-game-ink shadow-sm">
+    <span className="game-paper-first inline-flex min-w-0 items-center gap-1.5 rounded-full border border-game-border bg-game-surface-raised px-2.5 py-1 text-[11px] font-bold text-game-ink shadow-sm">
       <span className="truncate">{name}</span>
       <GenderBadge gender={gender} />
       {preferredStance && <StanceBadge stance={preferredStance} />}
@@ -47,7 +49,7 @@ export function HealthDisplay({
   return (
     <div
       className={cn(
-        'w-full space-y-2',
+        compact ? 'w-full space-y-1' : 'w-full space-y-2',
         isCentered && 'text-center',
         isRight && 'text-right',
         !isCentered && !isRight && 'text-left',

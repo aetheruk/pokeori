@@ -23,6 +23,8 @@ export interface BattleContextType {
   activeEnemyMon: any
   selectedType: string | null
   setSelectedType: (val: string) => void
+  selectedDoublesSlot: 0 | 1
+  setSelectedDoublesSlot: (slot: 0 | 1) => void
   isAnimating: boolean
   isWaitingForServer: boolean
   pendingBattleAction: {

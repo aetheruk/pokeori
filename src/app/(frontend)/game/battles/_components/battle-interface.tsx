@@ -161,6 +161,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
     initialState.turn === 1 && !!initialState.enemyTrainer,
   )
   const [selectedType, setSelectedType] = useState<string | null>(null)
+  const [selectedDoublesSlot, setSelectedDoublesSlot] = useState<0 | 1>(0)
   const [hasPowerKeyItems, setHasPowerKeyItems] = useState(false)
   const [currentResearchBreakthrough, setCurrentResearchBreakthrough] =
     useState<any | null>(null)
@@ -714,6 +715,8 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
       activeEnemyMon: activeEnemyMon as any,
       selectedType,
       setSelectedType,
+      selectedDoublesSlot,
+      setSelectedDoublesSlot,
       isAnimating: isProcessing,
       isWaitingForServer,
       pendingBattleAction,
@@ -744,6 +747,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
       activePlayerMon,
       activeEnemyMon,
       selectedType,
+      selectedDoublesSlot,
       isProcessing,
       isWaitingForServer,
       pendingBattleAction,
@@ -790,6 +794,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
         <BattleScene
           battleState={battleState}
           anim={anim}
+          selectedDoublesSlot={selectedDoublesSlot}
           isWaitingForOpponent={isWaitingForOpponent}
           hidePlayer={choosingLead}
           playerHasTeraEffect={contextValue.playerHasTeraEffect}

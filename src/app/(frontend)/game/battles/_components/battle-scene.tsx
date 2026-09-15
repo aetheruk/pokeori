@@ -8,6 +8,7 @@ interface BattleSceneProps {
   battleState: BattleState
   anim: AnimationState
   isWaitingForOpponent?: boolean
+  selectedDoublesSlot?: 0 | 1
   hidePlayer?: boolean
   playerHasTeraEffect?: boolean
   playerHasZPowerEffect?: boolean
@@ -19,13 +20,14 @@ export function BattleScene({
   battleState,
   anim,
   isWaitingForOpponent = false,
+  selectedDoublesSlot = 0,
   hidePlayer = false,
   playerHasTeraEffect,
   playerHasZPowerEffect,
   enemyHasTeraEffect,
   enemyHasZPowerEffect,
 }: BattleSceneProps) {
-  if (battleState.format === 'double') return <DoubleBattleScene state={battleState} isWaitingForOpponent={isWaitingForOpponent} />
+  if (battleState.format === 'double') return <DoubleBattleScene state={battleState} anim={anim} isWaitingForOpponent={isWaitingForOpponent} selectedSlot={selectedDoublesSlot} />
   const activePlayerMon = battleState.playerTeam[battleState.activePlayerIndex]
   const activeEnemyMon = battleState.enemyTeam[battleState.activeEnemyIndex]
 
