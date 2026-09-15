@@ -19,7 +19,9 @@ export function getBattleMovePresentation(
   state: BattleState,
   selectedType?: string | null,
 ): MovePresentation {
-  const fallbackType = selectedType?.toLowerCase() || pokemon.types?.[0]?.toLowerCase() || 'normal'
+  // The selected Pokémon type belongs to basic attacks. Authored moves use
+  // their own type, or Normal when no authored/dynamic type is configured.
+  const fallbackType = 'normal'
   const hiddenPowerType = move.id === 'hidden-power' ? resolveHiddenPower(pokemon).attackType : undefined
   const authoredType = move.forcedType === 'random' ? undefined : move.forcedType || fallbackType
   const baseType = hiddenPowerType || authoredType

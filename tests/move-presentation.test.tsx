@@ -92,6 +92,25 @@ describe('move presentation', () => {
     expect(presentation.battle?.availability?.reason).toBe('No uses remaining')
   })
 
+  test('makes single and spread targets explicit in the field note', () => {
+    const targets = [
+      ['opponent', 'Single foe'],
+      ['ally', 'Single ally'],
+      ['any-single', 'Any single target'],
+      ['both-opponents', 'All foes'],
+      ['both-allies', 'All allies'],
+      ['all-active', 'All active Pokémon'],
+    ] as const
+
+    for (const [doublesTarget, expected] of targets) {
+      expect(
+        getMovePresentation(move({ doublesTarget })).essentials.target.value,
+      ).toBe(expected)
+    }
+
+    expect(getMovePresentation(move({ target: 'self' })).essentials.target.value).toBe('User')
+  })
+
   test('describes fixed, delayed, dynamic, and target-stat power models truthfully', () => {
     const fixed = getMovePresentation(
       move({ damage: 0, damageRule: { type: 'flat', amount: 40 } }),

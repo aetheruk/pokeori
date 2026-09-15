@@ -28,7 +28,7 @@ import { clearZMoveCharge } from './z-move'
 import { DYNAMAX_UNLOCK_TURNS } from '@/data/powers'
 import { advanceTeraDuration, advanceBattleTypeChangeDuration } from './tera'
 import { clearDynamaxState } from './dynamax'
-import { preparePvpCombatAction, resolvePvpCombat, type PvpQueuedMoveForPowerUse } from './engine/pvp-turn'
+import { preparePvpCombatAction, resolvePvpCombat, resolvePvpMoveAttackType, type PvpQueuedMoveForPowerUse } from './engine/pvp-turn'
 import { getDoublesAccuracyMultiplier, getDoublesDamageMultiplier, getDoublesPartnerPriorityBlock, isDoublesCommanderInactive, processDoublesPartnerEntry, processDoublesPartnerItemTransfer, processDoublesPartnerProtection, processDoublesPartnerTurnEnd, releaseDoublesCommander } from './doubles-abilities'
 import { SKETCH_MOVE_ID } from '@/utilities/pokemon/sketch'
 
@@ -292,7 +292,7 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
     if (action.kind === 'move' && (!move || (actor.moveUsesRemaining ?? 0) <= 0)) continue
     if (move) actor.moveUsesRemaining = Math.max(0, (actor.moveUsesRemaining ?? 0) - 1)
     const stance = getActionStance(action) ?? 'tech'
-    const queued:PvpQueuedMoveForPowerUse = {stance,attackType:action.kind==='basic'?action.attackType:action.kind==='move'?action.selectedType:undefined,specialMoveId:move?.id,powers:actor.zMoveReady?{zMove:true}:undefined}
+    const queued:PvpQueuedMoveForPowerUse = {stance,attackType:action.kind==='basic'?action.attackType:undefined,specialMoveId:move?.id,powers:actor.zMoveReady?{zMove:true}:undefined}
     const eligibility=preparePvpCombatAction({state,attacker:actor,attackerSide:side,move:queued,currentTurn:state.turn,random})
     if (!eligibility.canMove) {
       messages.push(eligibility.message)
@@ -346,7 +346,13 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
     let targets = targetList(state, side, normalizedAction, move)
     if (targets.length===1 && targets[0].side!==side) {
       const defenderSide=targets[0].side
-      const attackType=move?.forcedType&&move.forcedType!=='random'?move.forcedType:queued.attackType
+      const attackType = move
+        ? resolvePvpMoveAttackType({
+            move: queued,
+            attacker: actor,
+            weather: state.weather?.weather,
+          }) ?? 'normal'
+        : queued.attackType
       const abilityRedirect=([0,1] as const).find(slot=>{
         const mon=getDoublesPokemon(state,defenderSide,slot)
         return mon?.currentHp && !mon.battleAbilityState?.suppressed && ((attackType==='electric'&&mon.ability==='lightning_rod')||(attackType==='water'&&mon.ability==='storm_drain'))
@@ -428,7 +434,14 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
         ? resolveStance(stance, targetDefensiveStance).damageMultiplier
         : 1
       let damage = 0
-      let type = move?.forcedType && move.forcedType !== 'random' ? move.forcedType : action.kind === 'basic' ? action.attackType : actor.types[0]
+      let type = action.kind === 'basic'
+        ? action.attackType
+        : resolvePvpMoveAttackType({
+            move: queued,
+            attacker: actor,
+            defender: target,
+            weather: state.weather?.weather,
+          }) ?? 'normal'
       if ((move?.damage ?? 1) > 0) {
         const multiplier = move ? resolveMoveDamageMultiplier(move, target.types, random, state.weather?.weather).damageMultiplier : 1
         const result = calculateDamage(actor, target, stance, stanceMultiplier * multiplier, type, undefined, undefined, move?.critChance, state.weather?.weather, undefined, { terrain: state.terrain?.terrain, moveId: move?.id, currentTurn: state.turn })

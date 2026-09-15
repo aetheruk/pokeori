@@ -135,6 +135,29 @@ function targetLabel(target: MoveConfig['target'] | 'ally-party'): string {
   return 'Foe'
 }
 
+function moveTargetLabel(
+  move: Pick<MoveConfig, 'target' | 'doublesTarget'>,
+): string {
+  switch (move.doublesTarget) {
+    case 'self':
+      return 'User'
+    case 'ally':
+      return 'Single ally'
+    case 'opponent':
+      return 'Single foe'
+    case 'any-single':
+      return 'Any single target'
+    case 'both-opponents':
+      return 'All foes'
+    case 'both-allies':
+      return 'All allies'
+    case 'all-active':
+      return 'All active Pokémon'
+    default:
+      return move.target === 'self' ? 'User' : 'Single foe'
+  }
+}
+
 function recipient(
   target: 'self' | 'enemy' | 'ally-party' | undefined,
 ): MovePresentationRecipient {
@@ -1264,7 +1287,7 @@ export function getMovePresentation(
             helpText: 'Bypasses normal accuracy checks.',
           }
         : { label: 'Accuracy', value: formatPercent(move.accuracy) },
-      target: { label: 'Target', value: targetLabel(move.target) },
+      target: { label: 'Target', value: moveTargetLabel(move) },
       offensiveValue,
     },
     summary,

@@ -98,6 +98,24 @@ describe('double battles',()=>{
     expect(next.playerTeam[1].currentHp).toBeLessThan(beforeAlly)
     expect(next.playerTeam[0].moveUsesRemaining).toBe(2)
   })
+  test('authored move types override the acting Pokemon type in doubles',()=>{
+    const battle=state()
+    battle.playerTeam[0].battleMoveIds=['heat-wave']
+    const next=resolveDoublesTurn(
+      battle,
+      [{slot:0,kind:'move',moveId:'heat-wave',selectedType:'normal'},hit(1,1)],
+      enemy,
+      ()=>0.1,
+    )
+    const heatWave=next.presentation?.events.find(
+      (event)=>event.type==='attack'&&event.actorSide==='player'&&event.actorIndex===0,
+    )
+    expect(heatWave?.type).toBe('attack')
+    if (heatWave?.type === 'attack') {
+      expect(heatWave.attackType).toBe('fire')
+      expect(heatWave.message).toContain('[icon:type:fire]')
+    }
+  })
   test('stance matchup applies only to the opposing actor in a spread phase',()=>{
     const stanceHit=(slot:0|1,target:0|1,stance:'power'|'tech'):DoublesAction=>({slot,kind:'basic',stance,attackType:'normal',target:{side:'opponent',slot:target}})
     const resolveSpread=(pairedStance:'power'|'tech')=>{
