@@ -521,6 +521,7 @@ describe('generated data integrity', () => {
               {
                 manualAssignment: true,
                 isWildBattle: battle.isWildBattle,
+                doubleBattle: battle.format === 'double',
               },
             ),
             `${battle.id}:${enemy.speciesId}:${moveId}`,

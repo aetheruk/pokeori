@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import {
   getBattleState,
+  submitDoublesActions,
+  replaceDoublesPokemon,
   submitTurn,
   surrenderBattle,
   swapPokemon,
@@ -28,8 +30,19 @@ const clientActionId = z.string().regex(/^[a-zA-Z0-9:_-]{1,120}$/)
 const identifier = z.string().min(1).max(120)
 const battleStance = z.enum(['power', 'speed', 'tech'])
 const baseAction = z.object({ clientActionId })
+const doublesSlot = z.union([z.literal(0),z.literal(1)])
+const doublesTarget = z.object({side:z.enum(['ally','opponent']),slot:doublesSlot})
+const doublesCommand = z.discriminatedUnion('kind',[
+  z.object({kind:z.literal('basic'),slot:doublesSlot,stance:battleStance,attackType:identifier,target:doublesTarget}),
+  z.object({kind:z.literal('move'),slot:doublesSlot,moveId:identifier,target:doublesTarget.optional(),selectedType:identifier.optional()}),
+  z.object({kind:z.literal('switch'),slot:doublesSlot,pokemonIndex:z.number().int().min(0).max(5)}),
+  z.object({kind:z.literal('item'),slot:doublesSlot,itemId:identifier,targetPokemonIndex:z.number().int().min(0).max(5).optional()}),
+  z.object({kind:z.literal('power'),slot:doublesSlot,powerId:z.enum(['tera','mega','dynamax','z-move']),formId:identifier.optional()}),
+])
 
 const BattleActionSchema = z.discriminatedUnion('kind', [
+  baseAction.extend({kind:z.literal('doubles'),actions:z.array(doublesCommand).min(1).max(2)}),
+  baseAction.extend({kind:z.literal('doubles-replace'),slot:doublesSlot,pokemonIndex:z.number().int().min(0).max(5)}),
   baseAction.extend({
     kind: z.literal('stance'),
     stance: battleStance,
@@ -101,8 +114,17 @@ export async function POST(request: Request) {
   }
 
   try {
+    if (!['doubles','doubles-replace','surrender'].includes(action.kind) && (await getBattleState())?.format==='double') {
+      return jsonResponse({success:false,error:'Choose both Pokemon actions together.'},{headers:{'cache-control':'no-store'}},requestId)
+    }
     let result
     switch (action.kind) {
+      case 'doubles':
+        result = await submitDoublesActions(action.actions,action.clientActionId)
+        break
+      case 'doubles-replace':
+        result = await replaceDoublesPokemon(action.slot,action.pokemonIndex,action.clientActionId)
+        break
       case 'stance':
         result = await submitTurn(
           action.stance,

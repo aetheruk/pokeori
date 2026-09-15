@@ -141,6 +141,12 @@ export function processTerrainTurnEffects(state: BattleState): string[] {
     { pokemon: state.playerTeam[state.activePlayerIndex], ownerName: state.playerName },
     { pokemon: state.enemyTeam[state.activeEnemyIndex], ownerName: state.enemyName },
   ]
+  if (state.format==='double') {
+    for(const side of ['player','enemy'] as const) for(const index of (side==='player'?state.activePlayerSlots:state.activeEnemySlots)??[]) {
+      if (index===null || index===(side==='player'?state.activePlayerIndex:state.activeEnemyIndex)) continue
+      activePokemon.push({pokemon:(side==='player'?state.playerTeam:state.enemyTeam)[index],ownerName:side==='player'?state.playerName:state.enemyName})
+    }
+  }
 
   for (const { pokemon, ownerName } of activePokemon) {
     if (

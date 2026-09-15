@@ -79,7 +79,7 @@ export interface BattlePowersData {
  */
 export async function getBattlePowers(
   activeFormId: string,
-  context?: { user: User; state: BattleState },
+  context?: { user?: User; state?: BattleState; slot?: 0|1 },
 ): Promise<{ success: boolean; data: BattlePowersData }> {
   const emptyData: BattlePowersData = {
     selectedPokemonPower: null,
@@ -121,7 +121,8 @@ export async function getBattlePowers(
     validateBattlePowerSkillRequirement(powerId, trainerLevel) === null
 
   const playerTeam = state.playerTeam || []
-  const activeMonIndex = state.activePlayerIndex ?? -1
+  const doublesIndex=state.format==='double' ? context?.slot!==undefined ? state.activePlayerSlots?.[context.slot] : state.activePlayerSlots?.find(index=>index!==null&&state.playerTeam[index]?.formId===activeFormId) : undefined
+  const activeMonIndex = doublesIndex ?? state.activePlayerIndex ?? -1
   const activeMon = playerTeam[activeMonIndex]
   const selectedPokemonPower = normalizeSelectedPokemonPower(
     activeMon?.selectedPokemonPower,

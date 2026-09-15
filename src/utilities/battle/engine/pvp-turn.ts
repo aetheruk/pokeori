@@ -502,6 +502,8 @@ export function resolvePvpCombat(params: {
   weather?: WeatherType
   eligibility?: PvpActionEligibility
   primaryHealingApplied?: number
+  doublesDamageModifier?: (damage:number,attackType:string,stance:BattleStance)=>number
+  doublesAccuracyMultiplier?: number
 }): PvpCombatResolution {
   const {
     state,
@@ -595,7 +597,7 @@ export function resolvePvpCombat(params: {
     : undefined
   let moveFailed =
     Boolean(battleConditionFailed) || contest.failMove || moveFailedFromStance
-  const accuracy = specialMove
+  const baseAccuracy = specialMove
     ? getEffectiveMoveAccuracy({
         move: specialMove,
         state,
@@ -612,6 +614,7 @@ export function resolvePvpCombat(params: {
         weather,
         stance: moveStance,
       })
+  const accuracy=Math.min(100,baseAccuracy*(params.doublesAccuracyMultiplier??1))
   const moveMissed = !doesBattleMoveHit(accuracy, chanceRandom)
   if (moveMissed) {
     moveFailed = true
@@ -835,6 +838,7 @@ export function resolvePvpCombat(params: {
     attackType: damageResult.usedType,
   })
   const nextDamage = applyNextDamageModifier(attacker, reductionResult.damage)
+  if (params.doublesDamageModifier && nextDamage.damage>0) nextDamage.damage=Math.max(0,Math.floor(params.doublesDamageModifier(nextDamage.damage,damageResult.usedType,moveStance)))
   const typeImmunityBypassAttackTypes =
     getSecondaryStatusTypeImmunityBypassAttackTypes({
       state,

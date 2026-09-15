@@ -1394,6 +1394,17 @@ export function useBattleManager(initialState: BattleState) {
 
       setIsWaitingForOpponent(false)
 
+      if (nextState.format === 'double') {
+        // Doubles uses the four-slot presentation instead of the single-active
+        // event diff, which otherwise switches or damages the wrong lane.
+        targetStateRef.current = cloneState(nextState)
+        setBattleState(nextState)
+        setVisualState(nextState)
+        setAnim(INITIAL_ANIMATION_STATE)
+        if (nextState.status !== 'ongoing') applyBattleEndState(nextState)
+        return
+      }
+
       // Diff against our current Target state
       const events = generateBattleEvents(targetStateRef.current, nextState)
       recordBattleDebug('turn-events-generated', {
@@ -1413,7 +1424,7 @@ export function useBattleManager(initialState: BattleState) {
       queueRef.current.push(...events)
       void processQueue()
     },
-    [processQueue],
+    [processQueue,applyBattleEndState],
   )
 
   return {

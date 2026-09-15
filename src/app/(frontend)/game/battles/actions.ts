@@ -1,6 +1,7 @@
 'use server'
 
 import type { BattleState, BattleStance } from '@/utilities/battle/types'
+import type { DoublesAction } from '@/utilities/battle/doubles'
 
 // Module Imports
 import { startBattle as startPveBattle } from './pve/start-battle'
@@ -34,8 +35,27 @@ import {
 } from '@/utilities/battle/switching'
 import { createBattleTurnTimer } from './helpers/timing'
 import { runBattleActionWithGuard } from './helpers/action-guard'
+import {
+  submitDoublesActions as submitDoublesActionsImpl,
+  replaceDoublesPokemon as replaceDoublesPokemonImpl,
+} from './actions/doubles'
 
 // --- Main Actions ---
+
+export async function submitDoublesActions(
+  actions: DoublesAction[],
+  clientActionId?: string,
+) {
+  return submitDoublesActionsImpl(actions, clientActionId)
+}
+
+export async function replaceDoublesPokemon(
+  slot: 0 | 1,
+  pokemonIndex: number,
+  clientActionId?: string,
+) {
+  return replaceDoublesPokemonImpl(slot, pokemonIndex, clientActionId)
+}
 
 export async function getUser() {
   return fetchUser()
@@ -215,8 +235,8 @@ export async function useZMove(clientActionId?: string) {
 
 // Additional Exported Actions
 
-export async function getBattlePowers(formId: string) {
-  return fetchPowers(formId)
+export async function getBattlePowers(formId: string, slot?:0|1) {
+  return fetchPowers(formId,slot===undefined?undefined:{slot})
 }
 
 export async function surrenderBattle() {

@@ -202,6 +202,8 @@ export interface TrainerBattleItemConfig {
 export type BattleAiProfileId = 'wild' | 'trainer' | 'advanced' | 'boss'
 
 export interface BattleConfig {
+  /** Singles remain the default for existing authored battles. */
+  format?: 'single' | 'double'
   rarityChances?: PokemonRarityChances
   id: string
   hide?: string

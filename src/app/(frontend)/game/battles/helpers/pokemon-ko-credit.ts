@@ -14,16 +14,17 @@ export function recordPokemonKO(
   state: BattleState,
   faintedSide: BattleSide,
 ): void {
+  const faintedIndex=faintedSide==='player'?state.activePlayerIndex:state.activeEnemyIndex
+  const faintedTeam=faintedSide==='player'?state.playerTeam:state.enemyTeam
+  recordPokemonKOForPokemon(state,faintedSide,faintedTeam[faintedIndex])
+}
+
+export function recordPokemonKOForPokemon(state:BattleState,faintedSide:BattleSide,faintedPokemon:BattlePokemon|undefined):void {
   if (state.chronicle) return
 
   const damage = state.moveHistory?.damage
   if (!damage) return
 
-  const faintedIndex =
-    faintedSide === 'player' ? state.activePlayerIndex : state.activeEnemyIndex
-  const faintedTeam =
-    faintedSide === 'player' ? state.playerTeam : state.enemyTeam
-  const faintedPokemon = faintedTeam[faintedIndex]
   const damageEntry =
     (faintedPokemon?.id
       ? damage.lastTakenByPokemon?.[faintedPokemon.id]

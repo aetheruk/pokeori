@@ -14,6 +14,7 @@ import { analyzeRequirements } from '@/utilities/requirements/analysis'
 import { getGameUserData } from '@/utilities/game-data'
 import { checkRequirement, isPokemonEligible } from '@/utilities/requirements'
 import type { BattleState } from '@/utilities/battle/types'
+import { processDoublesEntry } from '@/utilities/battle/doubles'
 import type { User, Pokemon } from '@/payload-types'
 import { getUser } from '../helpers/user'
 import { createInitialPowersState } from '@/data/powers'
@@ -371,6 +372,9 @@ export async function startBattleFromConfig(
         : 'You must have at least 1 Pokemon in your Battle Team to start.',
     }
   }
+  if (battleConfig.format === 'double' && battleTeamDocs.length < 2) {
+    return { success: false, error: 'Double battles need at least two Pokemon on your Battle Team.' }
+  }
 
   const trainerLevel = getSkillLevel(user.skills, 'battling')
   const chronicleBattleItems = chronicleContext?.chronicle.battleItems || {}
@@ -424,6 +428,7 @@ export async function startBattleFromConfig(
   if (playerTeam[0] && !battleConfig.isWildBattle) {
     playerTeam[0].activeTurnStarted = 1
   }
+  if (battleConfig.format === 'double' && playerTeam[1]) playerTeam[1].activeTurnStarted = 1
 
   // Enemy Team Init
   let enemyTeamConfig: BattleEnemy[] = []
@@ -501,6 +506,9 @@ export async function startBattleFromConfig(
           return initialized
         }),
       )
+  if (battleConfig.format === 'double' && enemyTeam.length < 2) {
+    return { success: false, error: 'Double battles need at least two opposing Pokemon.' }
+  }
   const enemyMoveUseLimit = resolveEnemyBattleMoveUseLimit(
     enemyTeam.map((enemy) => enemy.level),
     battleConfig.enemyMovesPerBattle,
@@ -541,6 +549,7 @@ export async function startBattleFromConfig(
   if (enemyTeam[0]) {
     enemyTeam[0].activeTurnStarted = 1
   }
+  if (battleConfig.format === 'double' && enemyTeam[1]) enemyTeam[1].activeTurnStarted = 1
   const aiProfile = resolveBattleAiProfile(battleConfig)
   const researcherMoveSlots = chronicleContext
     ? undefined
@@ -561,11 +570,14 @@ export async function startBattleFromConfig(
   }
 
   const initialState: BattleState = {
+    format: battleConfig.format ?? 'single',
+    activePlayerSlots: battleConfig.format === 'double' ? [0, 1] : undefined,
+    activeEnemySlots: battleConfig.format === 'double' ? [0, 1] : undefined,
     playerTeam,
     enemyTeam,
     activePlayerIndex: 0,
     activeEnemyIndex: 0,
-    playerParticipantIndexes: battleConfig.isWildBattle ? [] : [0],
+    playerParticipantIndexes: battleConfig.isWildBattle ? [] : battleConfig.format==='double' ? [0,1] : [0],
     turn: 1,
     history: [],
     status: 'ongoing',
@@ -684,6 +696,7 @@ export async function startBattleFromConfig(
       ownerName: initialState.enemyName,
     }),
   ]
+  if (battleConfig.format==='double') for (const side of ['player','enemy'] as const) initialFieldMessages.push(...processDoublesEntry(initialState,side,1))
   if (initialFieldMessages.length) {
     initialState.history.unshift({
       turn: initialState.turn,

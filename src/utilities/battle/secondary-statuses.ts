@@ -500,6 +500,21 @@ export function processSecondaryStatusesForTurnEnd(
   random: () => number = Math.random,
 ): string[] {
   const messages: string[] = []
+  if (state.format==='double') {
+    const active=(['player','enemy'] as const).flatMap(side=>
+      (side==='player'?state.activePlayerSlots:state.activeEnemySlots)?.map(index=>index===null?null:{pokemon:(side==='player'?state.playerTeam:state.enemyTeam)[index],side})??[]
+    ).filter((entry):entry is {pokemon:BattlePokemon;side:'player'|'enemy'}=>!!entry?.pokemon)
+    const sourceFor=(side:'player'|'enemy')=>active.find(entry=>entry.side===side&&entry.pokemon.currentHp>0)?.pokemon
+    for(const {pokemon,side} of active) {
+      const result=processStatusList({statuses:pokemon.secondaryStatuses,trigger:'turn-end',affectedForStatus:()=>[pokemon],sourceForStatus:status=>sourceFor(status.sourceSide),ownerNameForPokemon:()=>side==='player'?state.playerName:state.enemyName,random,terrain:state.terrain})
+      pokemon.secondaryStatuses=result.statuses
+      messages.push(...result.messages)
+    }
+    const field=processStatusList({statuses:state.secondaryStatuses,trigger:'turn-end',affectedForStatus:status=>active.filter(entry=>status.target==='field'||status.targetSide===entry.side).map(entry=>entry.pokemon),sourceForStatus:status=>sourceFor(status.sourceSide),ownerNameForPokemon:pokemon=>active.find(entry=>entry.pokemon===pokemon)?.side==='player'?state.playerName:state.enemyName,random,terrain:state.terrain})
+    state.secondaryStatuses=field.statuses
+    messages.push(...field.messages)
+    return messages
+  }
   const playerMon = activePokemonForSide(state, 'player')
   const enemyMon = activePokemonForSide(state, 'enemy')
 

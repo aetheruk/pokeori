@@ -5378,5 +5378,30 @@
     "formId": "10277",
     "level": 3,
     "itemId": "tm-tera-starstorm"
+  },
+  {
+    "formId": "311",
+    "level": 2,
+    "itemId": "tm-helping-hand"
+  },
+  {
+    "formId": "35",
+    "level": 3,
+    "itemId": "tm-follow-me"
+  },
+  {
+    "formId": "12",
+    "level": 3,
+    "itemId": "tm-rage-powder"
+  },
+  {
+    "formId": "280",
+    "level": 4,
+    "itemId": "tm-ally-switch"
+  },
+  {
+    "formId": "324",
+    "level": 3,
+    "itemId": "tm-after-you"
   }
 ]

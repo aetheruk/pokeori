@@ -119,6 +119,10 @@ export function flipPvpState(state: BattleState, battleId: string): BattleState 
     enemyTeam: state.playerTeam,
     activePlayerIndex: state.activeEnemyIndex,
     activeEnemyIndex: state.activePlayerIndex,
+    activePlayerSlots: state.activeEnemySlots,
+    activeEnemySlots: state.activePlayerSlots,
+    pendingPlayerReplacementSlots: state.pendingEnemyReplacementSlots,
+    pendingEnemyReplacementSlots: state.pendingPlayerReplacementSlots,
     playerName: state.enemyName,
     enemyName: state.playerName,
     history: state.history.map((entry: BattleLogEntry) => ({

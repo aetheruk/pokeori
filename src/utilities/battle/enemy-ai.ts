@@ -1496,11 +1496,15 @@ export function canEnemyPokemonUseAiMove(
   options: {
     manualAssignment?: boolean
     isWildBattle?: boolean
+    doubleBattle?: boolean
     profile?: BattleAiProfileId
   } = {},
 ): boolean {
   if (options.isWildBattle && move.trainerOnly) return false
-  if (move.manualOnly && !options.manualAssignment) return false
+  if (options.doubleBattle && (move.charged || move.recharge || move.continuous)) return false
+  if (move.doublesOnly && !options.doubleBattle) return false
+  if (move.doublesOnly && options.manualAssignment) return true
+  if ((move.manualOnly || move.doublesOnly) && !options.manualAssignment) return false
 
   const defaultTarget = move.target
   const statusTarget = move.status?.target ?? defaultTarget
@@ -1599,6 +1603,7 @@ export function getEnemyAiMoveIds(
   enemyMon: BattlePokemon,
   params: {
     isWildBattle?: boolean
+    doubleBattle?: boolean
     profile?: BattleAiProfileId
   } = {},
 ): string[] {
@@ -1615,6 +1620,7 @@ export function getEnemyAiMoveIds(
       !canEnemyPokemonUseAiMove(enemyMon, move, {
         manualAssignment: true,
         isWildBattle: params.isWildBattle,
+        doubleBattle: params.doubleBattle,
         profile: params.profile,
       })
     ) {
@@ -1630,6 +1636,7 @@ export function getEnemyAiMoveIds(
     if (
       !canEnemyPokemonUseAiMove(enemyMon, move, {
         isWildBattle: params.isWildBattle,
+        doubleBattle: params.doubleBattle,
         profile: params.profile,
       })
     ) {
@@ -1646,6 +1653,7 @@ export function selectEnemyAiMoveLoadout(params: {
   enemyMon: BattlePokemon
   profile?: BattleAiProfileId
   isWildBattle?: boolean
+  doubleBattle?: boolean
   maxMoves?: number
   random?: () => number
   weather?: WeatherType
@@ -1654,6 +1662,7 @@ export function selectEnemyAiMoveLoadout(params: {
   const random = params.random ?? Math.random
   const candidates = getEnemyAiMoveIds(enemyMon, {
     isWildBattle,
+    doubleBattle: params.doubleBattle,
     profile: params.profile,
   })
   if (!candidates.length || maxMoves <= 0) return []
@@ -1754,6 +1763,7 @@ export function initializeEnemyAiMoveLoadouts(params: {
       enemyMon,
       profile,
       isWildBattle: params.state.isWildBattle,
+      doubleBattle: params.state.format==='double',
       random: params.random,
       weather: params.state.weather?.weather,
     })
@@ -1903,6 +1913,7 @@ function selectEnemyAiMove(params: {
         enemyMon,
         profile,
         isWildBattle: state.isWildBattle,
+        doubleBattle: state.format==='double',
         random,
         weather: state.weather?.weather,
       })
@@ -1917,6 +1928,7 @@ function selectEnemyAiMove(params: {
       !canEnemyPokemonUseAiMove(enemyMon, move, {
         manualAssignment,
         isWildBattle: state.isWildBattle,
+        doubleBattle: state.format==='double',
       })
     ) {
       continue
@@ -2110,6 +2122,7 @@ function scorePokemonMatchup(params: {
         enemyMon: attacker,
         profile: state.ai?.profile,
         isWildBattle: state.isWildBattle,
+        doubleBattle: state.format==='double',
         weather: state.weather?.weather,
       })
 

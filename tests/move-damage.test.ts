@@ -3127,7 +3127,7 @@ describe('move damage helpers', () => {
     expect(defender.currentHp).toBe(90)
     expect(defender.secondaryStatuses).toBeUndefined()
 
-    expect(getMove('rage-powder')).toBeUndefined()
+    expect(getMove('rage-powder')?.doublesOnly).toBe(true)
   })
 
   test('remaining move authoring table adds recommended type libraries', () => {
