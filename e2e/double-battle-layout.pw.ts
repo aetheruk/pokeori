@@ -1,14 +1,22 @@
 import { expect, test } from '@playwright/test'
 
-for (const width of [390, 1280]) {
+for (const width of [320, 390, 1280]) {
   test(`double battle keeps the single-battle scene and repeats its controls at ${width}px`, async ({ page }) => {
-    await page.setViewportSize({ width, height: width === 390 ? 844 : 800 })
+    await page.setViewportSize({ width, height: width <= 390 ? 844 : 800 })
     await page.goto('/ui-test/doubles')
 
     await expect(page.getByRole('group', { name: 'Your Pokemon 1 health' })).toBeVisible()
     await expect(page.getByRole('group', { name: 'Your Pokemon 2 health' })).toBeVisible()
     await expect(page.getByRole('group', { name: 'Opponent Pokemon 1 health' })).toBeVisible()
     await expect(page.getByRole('group', { name: 'Opponent Pokemon 2 health' })).toBeVisible()
+    await expect(page.getByText('Choose an action for each Pokemon')).toHaveCount(0)
+    const firstHealth = await page.getByRole('group', { name: 'Your Pokemon 1 health' }).boundingBox()
+    const secondHealth = await page.getByRole('group', { name: 'Your Pokemon 2 health' }).boundingBox()
+    expect(secondHealth?.x).toBeGreaterThan(firstHealth?.x ?? 0)
+    expect(Math.abs((secondHealth?.y ?? 0) - (firstHealth?.y ?? 0))).toBeLessThan(10)
+    const playerSprite = await page.getByTestId('doubles-sprite-player-0').boundingBox()
+    const enemySprite = await page.getByTestId('doubles-sprite-enemy-0').boundingBox()
+    expect((playerSprite?.y ?? 0) - (enemySprite?.y ?? 0)).toBeGreaterThan(width <= 390 ? 30 : 60)
     await expect(page.getByTestId('selected-doubles-arrow')).toHaveCount(1)
     await expect(page.getByRole('button', { name: 'Items, 2 of 2 uses remaining' })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Moves, 4 uses remaining' })).toBeVisible()
@@ -20,7 +28,14 @@ for (const width of [390, 1280]) {
     await page.screenshot({ path: `test-results/doubles-${width}-first.png` })
     const firstArrow = await page.getByTestId('selected-doubles-arrow').boundingBox()
     await page.getByRole('button', { name: 'POWER' }).click()
+    await expect(page.getByRole('button', { name: 'Plusle' })).toHaveAttribute('aria-pressed', 'true')
+    await page.getByRole('button', { name: 'Minun' }).click()
+    await expect(page.getByRole('button', { name: 'Minun' })).toHaveAttribute('aria-pressed', 'true')
+    await expect(page.getByRole('button', { name: 'Minun' })).toHaveClass(/bg-game-moss\/15/)
+    await expect(page.getByRole('button', { name: 'Plusle' })).not.toHaveClass(/bg-game-moss\/15/)
+    await page.screenshot({ path: `test-results/doubles-${width}-target.png` })
     await page.getByRole('button', { name: 'Next Pokemon' }).click()
+    await expect(page.getByRole('button', { name: 'Previous Pokemon' })).toBeVisible()
     const secondArrow = await page.getByTestId('selected-doubles-arrow').boundingBox()
     expect(secondArrow?.x).toBeGreaterThan(firstArrow?.x ?? 0)
     await expect(page.getByRole('button', { name: 'Moves, 4 uses remaining' })).toBeVisible()

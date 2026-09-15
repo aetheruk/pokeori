@@ -38,18 +38,32 @@ export function HealthDisplay({
   const isRight = resolvedAlign === 'right'
   const statusChip = status ? getBattleStatusChip(status.id) : null
   const identityChip = (
-    <span className="game-paper-first inline-flex min-w-0 items-center gap-1.5 rounded-full border border-game-border bg-game-surface-raised px-2.5 py-1 text-[11px] font-bold text-game-ink shadow-sm">
-      <span className="truncate">{name}</span>
+    <span
+      className={cn(
+        'game-paper-first inline-flex min-w-0 max-w-full items-center rounded-full border border-game-border bg-game-surface-raised font-bold text-game-ink shadow-sm',
+        compact
+          ? 'gap-1 px-1.5 py-0.5 text-[10px]'
+          : 'gap-1.5 px-2.5 py-1 text-[11px]',
+      )}
+    >
+      <span className="min-w-0 truncate">{name}</span>
       <GenderBadge gender={gender} />
       {preferredStance && <StanceBadge stance={preferredStance} />}
-      <span className="font-mono text-[10px] text-game-muted">Lv. {level}</span>
+      <span
+        className={cn(
+          'shrink-0 font-mono text-game-muted',
+          compact ? 'text-[9px]' : 'text-[10px]',
+        )}
+      >
+        Lv. {level}
+      </span>
     </span>
   )
 
   return (
     <div
       className={cn(
-        compact ? 'w-full space-y-1' : 'w-full space-y-2',
+        compact ? 'w-full space-y-0.5' : 'w-full space-y-2',
         isCentered && 'text-center',
         isRight && 'text-right',
         !isCentered && !isRight && 'text-left',
@@ -57,14 +71,16 @@ export function HealthDisplay({
     >
       <div
         className={cn(
-          'flex items-end gap-2',
+          compact ? 'flex min-w-0 items-end gap-1' : 'flex items-end gap-2',
           isCentered && 'justify-center',
           isRight ? 'justify-end' : 'justify-start',
         )}
       >
         <div
           className={cn(
-            'flex min-w-0 flex-1 items-center gap-2',
+            compact
+              ? 'flex min-w-0 flex-1 items-center gap-1'
+              : 'flex min-w-0 flex-1 items-center gap-2',
             isRight && 'justify-end',
           )}
         >
@@ -86,7 +102,10 @@ export function HealthDisplay({
       <div className="relative">
         <Progress
           value={hpPercent}
-          className="h-4 border border-game-night-border bg-game-night-canvas"
+          className={cn(
+            'border border-game-night-border bg-game-night-canvas',
+            compact ? 'h-3' : 'h-4',
+          )}
           indicatorClassName={cn(
             'transition-all duration-500',
             hpPercent < 20
@@ -97,7 +116,12 @@ export function HealthDisplay({
           )}
         />
         {isPlayer && (
-          <div className="absolute top-0 left-0 flex h-full w-full items-center justify-center text-[10px] font-mono text-game-cream [text-shadow:0_1px_2px_rgb(16_31_38_/_0.95)]">
+          <div
+            className={cn(
+              'absolute top-0 left-0 flex h-full w-full items-center justify-center font-mono text-game-cream [text-shadow:0_1px_2px_rgb(16_31_38_/_0.95)]',
+              compact ? 'text-[9px]' : 'text-[10px]',
+            )}
+          >
             {currentHp} / {maxHp}
           </div>
         )}

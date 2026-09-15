@@ -161,7 +161,7 @@ function TargetPicker({
             'h-10 rounded-lg border-game-border bg-game-surface-raised px-3 text-xs',
             action.target?.side === candidate.side &&
               action.target?.slot === candidate.slot &&
-              'border-game-moss bg-game-moss/10 text-game-moss-strong',
+              'border-game-moss bg-game-moss/15 text-game-moss-strong hover:border-game-moss hover:bg-game-moss/15 hover:text-game-moss-strong',
           )}
           disabled={disabled}
           aria-pressed={
@@ -377,13 +377,6 @@ export function DoubleActionMenu() {
         </div>
       )}
       <div className="mx-auto w-full max-w-2xl">
-        <div className="mb-2 flex items-center justify-between gap-3">
-          <p className="text-sm font-bold">Choose an action for each Pokemon</p>
-          <span className="font-mono text-xs text-game-muted">
-            {Object.keys(draft).length}/{active.length} ready
-          </span>
-        </div>
-
         {replacementSlots.length > 0 ? (
           <div className="rounded-lg border border-game-ochre/40 bg-game-ochre/10 p-3">
             <p className="mb-3 text-sm font-semibold">
@@ -423,37 +416,9 @@ export function DoubleActionMenu() {
           </div>
         ) : (
           <>
-            <fieldset
-              className="mb-3 flex min-w-0 gap-2"
-              aria-label="Choose an active Pokemon"
-            >
-              {active.map((slot) => {
-                const mon = getDoublesPokemon(battleState, 'player', slot)!
-                const chosen = draft[slot]
-                return (
-                  <Button
-                    key={slot}
-                    type="button"
-                    variant="outline"
-                    className={cn(
-                      'h-9 min-w-0 flex-1 justify-between gap-2 rounded-lg border-game-border bg-game-surface-raised px-2 text-left text-game-ink',
-                      selectedSlot === slot &&
-                        'border-game-moss bg-game-moss/10 text-game-moss-strong',
-                    )}
-                    aria-pressed={selectedSlot === slot}
-                    disabled={disabled}
-                    onClick={() => setSelectedSlot(slot)}
-                  >
-                    <span className="min-w-0 truncate text-xs font-bold">
-                      {slot + 1} · {mon.name}
-                    </span>
-                    <span className="shrink-0 text-[10px] font-semibold">
-                      {chosen ? '✓' : ''}
-                    </span>
-                  </Button>
-                )
-              })}
-            </fieldset>
+            <p className="sr-only" aria-live="polite">
+              Choosing an action for {actor?.name ?? 'the active Pokemon'}
+            </p>
 
             {actor && active.includes(selectedSlot) && (
               <>
@@ -663,30 +628,40 @@ export function DoubleActionMenu() {
                 </div>
               </>
             )}
-            {action && (
-              <div className="mt-3 flex justify-end">
-                {complete ? (
+            {(action || (active.length > 1 && selectedSlot !== active[0])) && (
+              <div className="mt-3 flex justify-end gap-2">
+                {active.length > 1 && selectedSlot !== active[0] && (
                   <Button
                     type="button"
-                    className="game-accent-button h-11 w-full sm:w-auto sm:min-w-36"
+                    variant="outline"
+                    className="h-11 flex-1 rounded-xl border-game-border bg-game-surface-raised text-game-ink sm:flex-none"
+                    disabled={disabled}
+                    onClick={() => setSelectedSlot(active[0])}
+                  >
+                    Previous Pokemon
+                  </Button>
+                )}
+                {active.length > 1 && selectedSlot === active[0] && action && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-11 flex-1 rounded-xl border-game-moss bg-game-moss/10 text-game-moss-strong sm:flex-none"
+                    disabled={disabled}
+                    onClick={() => setSelectedSlot(active[1])}
+                  >
+                    Next Pokemon
+                  </Button>
+                )}
+                {complete && (
+                  <Button
+                    type="button"
+                    className="game-accent-button h-11 flex-1 sm:min-w-36 sm:flex-none"
                     disabled={disabled || active.length === 0}
                     onClick={submit}
                   >
                     Confirm turn
                   </Button>
-                ) : active.some(
-                    (slot) => slot !== selectedSlot && !draft[slot],
-                  ) ? (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="h-11 w-full rounded-xl border-game-moss bg-game-moss/10 text-game-moss-strong sm:w-auto"
-                    disabled={disabled}
-                    onClick={() => setSelectedSlot(selectedSlot === 0 ? 1 : 0)}
-                  >
-                    Next Pokemon
-                  </Button>
-                ) : null}
+                )}
               </div>
             )}
           </>

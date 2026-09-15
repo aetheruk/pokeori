@@ -30,7 +30,7 @@ function LaneHealth({
 
   return (
     <fieldset
-      className="min-h-[3.25rem]"
+      className="min-w-0 min-h-[2.75rem]"
       data-testid={`doubles-health-${side}-${slot}`}
       aria-label={`${isPlayer ? 'Your' : 'Opponent'} Pokemon ${slot + 1} health`}
     >
@@ -76,7 +76,10 @@ function LaneSprite({
   const isPlayer = side === 'player'
 
   return (
-    <div className="relative flex h-24 w-24 shrink-0 items-end justify-center sm:h-32 sm:w-32">
+    <div
+      data-testid={`doubles-sprite-${side}-${slot}`}
+      className="relative flex h-24 w-20 shrink-0 items-end justify-center sm:h-32 sm:w-28"
+    >
       {isSelected && (
         <span
           data-testid="selected-doubles-arrow"
@@ -87,7 +90,7 @@ function LaneSprite({
         </span>
       )}
       <div
-        className="absolute bottom-2 h-5 w-20 rounded-[50%] border border-white/5 bg-black/30 blur-[2px] sm:w-28"
+        className="absolute bottom-2 h-5 w-16 rounded-[50%] border border-white/5 bg-black/30 blur-[2px] sm:w-24"
         aria-hidden
       />
       <PokemonDisplay
@@ -163,21 +166,21 @@ export function DoubleBattleScene({
 
       <div className="pointer-events-none absolute inset-x-3 top-[max(0.75rem,calc(env(safe-area-inset-top)+0.5rem))] z-20 flex items-start justify-between gap-2 sm:inset-x-5">
         <TeamBallGrid team={state.enemyTeam} />
-        <div className="flex w-[min(74vw,20rem)] flex-col gap-1">
+        <div className="grid min-w-0 max-w-[32rem] flex-1 grid-cols-2 gap-2">
           <LaneHealth mon={lane('enemy', 0).mon} side="enemy" slot={0} />
           <LaneHealth mon={lane('enemy', 1).mon} side="enemy" slot={1} />
         </div>
       </div>
 
       <div className="pointer-events-none absolute inset-x-3 bottom-3 z-20 flex items-end justify-between gap-2 sm:inset-x-5 sm:bottom-4">
-        <div className="flex w-[min(74vw,20rem)] flex-col gap-1">
+        <div className="grid min-w-0 max-w-[32rem] flex-1 grid-cols-2 gap-2">
           <LaneHealth mon={lane('player', 0).mon} side="player" slot={0} />
           <LaneHealth mon={lane('player', 1).mon} side="player" slot={1} />
         </div>
         <TeamBallGrid team={state.playerTeam} bottomUp />
       </div>
 
-      <div className="pointer-events-none absolute right-[5%] top-[34%] z-10 flex items-end gap-0.5 sm:right-[12%] sm:top-[34%] sm:gap-2">
+      <div className="pointer-events-none absolute right-[12%] top-[31%] z-10 flex items-end gap-0 sm:right-[14%] sm:top-[32%]">
         <LaneSprite
           mon={lane('enemy', 0).mon}
           effect={lane('enemy', 0).effect}
@@ -191,7 +194,7 @@ export function DoubleBattleScene({
           slot={1}
         />
       </div>
-      <div className="pointer-events-none absolute bottom-[34%] left-[5%] z-10 flex items-end gap-0.5 sm:bottom-[30%] sm:left-[12%] sm:gap-2">
+      <div className="pointer-events-none absolute bottom-[25%] left-[9%] z-10 flex items-end gap-0 sm:bottom-[24%] sm:left-[13%]">
         <LaneSprite
           mon={lane('player', 0).mon}
           effect={lane('player', 0).effect}
