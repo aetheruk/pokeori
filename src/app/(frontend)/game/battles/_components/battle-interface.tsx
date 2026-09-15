@@ -830,7 +830,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
         <div className="xl:col-start-1 xl:row-start-2">
           <BattleActionMenu />
         </div>
-        <div className="relative min-h-0 flex-[24] border-t border-game-border bg-game-surface-raised xl:col-start-2 xl:row-start-1 xl:row-span-2 xl:border-l xl:border-t-0">
+        <div className="game-paper-first relative min-h-0 flex-[24] border-t border-game-border bg-game-surface-raised xl:col-start-2 xl:row-start-1 xl:row-span-2 xl:border-l xl:border-t-0">
           <div className="h-full overflow-hidden">
             <BattleLog logs={battleState.history} />
           </div>
