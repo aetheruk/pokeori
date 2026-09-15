@@ -30,8 +30,24 @@ import { advanceTeraDuration, advanceBattleTypeChangeDuration } from './tera'
 import { clearDynamaxState } from './dynamax'
 import { preparePvpCombatAction, resolvePvpCombat, type PvpQueuedMoveForPowerUse } from './engine/pvp-turn'
 import { getDoublesAccuracyMultiplier, getDoublesDamageMultiplier, getDoublesPartnerPriorityBlock, isDoublesCommanderInactive, processDoublesPartnerEntry, processDoublesPartnerItemTransfer, processDoublesPartnerProtection, processDoublesPartnerTurnEnd, releaseDoublesCommander } from './doubles-abilities'
+import { SKETCH_MOVE_ID } from '@/utilities/pokemon/sketch'
 
 export type DoublesSpecialAction = (params: { state: BattleState; side: DoublesSide; slot: DoublesSlot; actor: BattlePokemon; action: Extract<DoublesAction, {kind:'item'|'power'}> }) => string
+
+export type DoublesMoveResolution = {
+  state: BattleState
+  side: DoublesSide
+  slot: DoublesSlot
+  actor: BattlePokemon
+  action: Extract<DoublesAction, { kind: 'move' }>
+  move: MoveConfig
+  opponent?: BattlePokemon
+  succeeded: boolean
+}
+
+export type DoublesMoveResolved = (
+  resolution: DoublesMoveResolution,
+) => void
 
 function otherSide(side: DoublesSide): DoublesSide { return side === 'player' ? 'enemy' : 'player' }
 function absoluteTarget(side: DoublesSide, target: DoublesTarget): DoublesSide {
@@ -116,7 +132,7 @@ export function validateDoublesActions(state: BattleState, side: DoublesSide, ac
   if(side==='enemy' && actions.filter(action=>action.kind==='item').length>1) return 'A trainer can use only one item per turn.'
 }
 
-type Scheduled = { side: DoublesSide; action: DoublesAction; actorIndex:number; priority: number; speed: number; order: number }
+type Scheduled = { side: DoublesSide; action: DoublesAction; actorIndex:number; priority: number; speed: number; order: number; phase: number }
 
 function getDoublesActionPriority(state:BattleState,side:DoublesSide,action:DoublesAction,random:()=>number):number {
   if(action.kind==='switch') return 10
@@ -199,7 +215,7 @@ function applySimpleMoveEffects(state: BattleState, side: DoublesSide, actor: Ba
   }
 }
 
-export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAction[], enemyActions: DoublesAction[], random: () => number = Math.random, specialAction?: DoublesSpecialAction): BattleState {
+export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAction[], enemyActions: DoublesAction[], random: () => number = Math.random, specialAction?: DoublesSpecialAction, moveResolved?: DoublesMoveResolved): BattleState {
   const error = validateDoublesActions(state, 'player', playerActions) || validateDoublesActions(state, 'enemy', enemyActions)
   if (error) throw new Error(error)
   if (!specialAction && [...playerActions,...enemyActions].some(action=>action.kind==='item'||action.kind==='power')) throw new Error('Trainer action resolver is unavailable.')
@@ -209,21 +225,52 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
   let enemyDamage = 0
   const redirection:Partial<Record<DoublesSide,{index:number;kind:'follow-me'|'rage-powder'}>>={}
   const guards:Partial<Record<DoublesSide,Set<string>>>={}
-  const all: Scheduled[] = [...playerActions.map((action, order) => ({side:'player' as const, action, order})), ...enemyActions.map((action, order) => ({side:'enemy' as const, action, order: order + 2}))].map(entry => ({
+  const all: Scheduled[] = [...playerActions.map((action, phase) => ({side:'player' as const, action, phase, order: phase})), ...enemyActions.map((action, phase) => ({side:'enemy' as const, action, phase, order: phase + 2}))].map(entry => ({
     ...entry,
     actorIndex:getDoublesSlots(state,entry.side)[entry.action.slot]!,
     priority: getDoublesActionPriority(state,entry.side,entry.action,random),
     speed: getEffectiveBattleSpeed(getDoublesPokemon(state, entry.side, entry.action.slot)!, state.turn),
   }))
-  all.sort((a,b) => b.priority-a.priority || b.speed-a.speed || a.order-b.order)
+  all.sort((a,b) => a.phase-b.phase || b.priority-a.priority || b.speed-a.speed || a.order-b.order)
 
+  let activePhase = -1
+  let phaseActors = new Set<string>()
+  let phaseActions: Partial<Record<DoublesSide, DoublesAction>> = {}
+  let phaseActorIndices: Partial<Record<DoublesSide, number>> = {}
   for (let actionPosition=0;actionPosition<all.length;actionPosition++) {
-    const {side,action,actorIndex,priority}=all[actionPosition]
+    const {side,action,actorIndex,priority,phase}=all[actionPosition]
+    if (phase !== activePhase) {
+      activePhase = phase
+      phaseActions = {}
+      phaseActorIndices = {}
+      for (const entry of all) {
+        if (entry.phase === phase) {
+          phaseActions[entry.side] = entry.action
+          phaseActorIndices[entry.side] = entry.actorIndex
+        }
+      }
+      phaseActors = new Set(
+        all
+          .filter((entry) => entry.phase === phase)
+          .filter((entry) => {
+            const team = getDoublesTeam(state, entry.side)
+            return team[entry.actorIndex]?.currentHp > 0
+          })
+          .map((entry) => `${entry.side}:${entry.actorIndex}`),
+      )
+    }
     const slots = getDoublesSlots(state, side)
     const currentSlot=slots.indexOf(actorIndex) as DoublesSlot|-1
     const index=actorIndex
     const actor=getDoublesTeam(state,side)[actorIndex]
-    if (currentSlot===-1 || !actor || actor.currentHp <= 0) continue
+    const actorWasAliveAtPhaseStart = phaseActors.has(
+      `${side}:${actorIndex}`,
+    )
+    if (
+      currentSlot===-1 ||
+      !actor ||
+      (!actorWasAliveAtPhaseStart && actor.currentHp <= 0)
+    ) continue
     if (action.kind === 'switch') {
       const incoming = getDoublesTeam(state, side)[action.pokemonIndex]
       messages.push(...processDoublesExit(state,side,actor))
@@ -247,7 +294,21 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
     const stance = getActionStance(action) ?? 'tech'
     const queued:PvpQueuedMoveForPowerUse = {stance,attackType:action.kind==='basic'?action.attackType:action.kind==='move'?action.selectedType:undefined,specialMoveId:move?.id,powers:actor.zMoveReady?{zMove:true}:undefined}
     const eligibility=preparePvpCombatAction({state,attacker:actor,attackerSide:side,move:queued,currentTurn:state.turn,random})
-    if (!eligibility.canMove) { messages.push(eligibility.message); continue }
+    if (!eligibility.canMove) {
+      messages.push(eligibility.message)
+      if (move?.id === SKETCH_MOVE_ID) {
+        moveResolved?.({
+          state,
+          side,
+          slot: currentSlot,
+          actor,
+          action: action as Extract<DoublesAction, { kind: 'move' }>,
+          move,
+          succeeded: false,
+        })
+      }
+      continue
+    }
     if (move?.id==='helping-hand') {
       const partner=getDoublesPokemon(state,side,currentSlot===0?1:0)
       if(partner?.currentHp) {partner.nextDamageModifier={percent:50,remainingUses:1,sourceMoveName:'Helping Hand'};messages.push(`${actor.name} gave ${partner.name} a Helping Hand!`)}
@@ -261,7 +322,7 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
     }
     if (move?.id==='after-you') {
       const partnerIndex=getDoublesSlots(state,side)[action.target?.slot??(currentSlot===0?1:0)]
-      const nextPosition=all.findIndex((entry,position)=>position>actionPosition&&entry.side===side&&entry.actorIndex===partnerIndex)
+      const nextPosition=all.findIndex((entry,position)=>position>actionPosition&&entry.phase===phase&&entry.side===side&&entry.actorIndex===partnerIndex)
       if(nextPosition>actionPosition) {const [next]=all.splice(nextPosition,1);all.splice(actionPosition+1,0,next);messages.push(`${actor.name} let ${getDoublesTeam(state,side)[partnerIndex!]?.name} act next!`)}
       continue
     }
@@ -297,6 +358,8 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
       if(redirected!==undefined && getDoublesPokemon(state,defenderSide,redirected)?.currentHp) targets=[{side:defenderSide,slot:redirected}]
     }
     let resolvedAny = false
+    let sketchOpponent: BattlePokemon | undefined
+    let sketchSucceeded = false
     for (let targetPosition=0;targetPosition<targets.length;targetPosition++) {
       const t=targets[targetPosition]
       const targetIndex = getDoublesSlots(state, t.side)[t.slot]
@@ -312,8 +375,18 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
         if (!doesBattleMoveHit(accuracy, random)) { messages.push(`${actor.name}'s ${move.name} missed ${target.name}!`); continue }
       }
       resolvedAny = true
-      const defenseAction = all.find(candidate=>candidate.side===t.side&&candidate.actorIndex===targetIndex)?.action
+      const defenseAction = phaseActions[otherSide(side)]
       const defensiveStance = defenseAction && getActionStance(defenseAction)
+      // Stance is contested by the two Pokemon acting in this exchange. A
+      // spread move can hit additional active Pokemon, but those secondary
+      // targets do not have their own stance exchange and therefore take
+      // neutral stance damage. This also keeps ally splash damage neutral.
+      const isPairedOpponent =
+        t.side === otherSide(side) &&
+        phaseActorIndices[otherSide(side)] === targetIndex
+      const targetDefensiveStance = isPairedOpponent
+        ? defensiveStance ?? 'tech'
+        : stance
       if (t.side !== side) {
         const savedPlayerIndex=state.activePlayerIndex, savedEnemyIndex=state.activeEnemyIndex
         const previousStatus=target.status?{...target.status}:undefined
@@ -322,7 +395,11 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
         else {state.activeEnemyIndex=index;state.activePlayerIndex=targetIndex}
         try {
           if(move) messages.push(...applyBattleAbilityOpposingMoveUseDepletion({state,attackerSide:side,attacker:actor,defender:target,move}))
-          const combat=resolvePvpCombat({state,attacker:actor,defender:target,move:queued,attackerName:side==='player'?state.playerName:state.enemyName,attackerSide:side,playerMove:side==='player'?queued:{stance:defensiveStance??'tech'},enemyMove:side==='enemy'?queued:{stance:defensiveStance??'tech'},currentTurn:state.turn,random,weather:state.weather?.weather,eligibility,doublesAccuracyMultiplier:getDoublesAccuracyMultiplier(state,side,currentSlot),doublesDamageModifier:(damage,type,attackStance)=>damage*getDoublesDamageMultiplier(state,side,currentSlot,t.side,t.slot,attackStance,type)})
+          const combat=resolvePvpCombat({state,attacker:actor,defender:target,move:queued,attackerName:side==='player'?state.playerName:state.enemyName,attackerSide:side,playerMove:side==='player'?queued:{stance:targetDefensiveStance},enemyMove:side==='enemy'?queued:{stance:targetDefensiveStance},currentTurn:state.turn,random,weather:state.weather?.weather,eligibility,doublesAccuracyMultiplier:getDoublesAccuracyMultiplier(state,side,currentSlot),doublesDamageModifier:(damage,type,attackStance)=>damage*getDoublesDamageMultiplier(state,side,currentSlot,t.side,t.slot,attackStance,type)})
+          if (move?.id === SKETCH_MOVE_ID && !sketchOpponent) {
+            sketchOpponent = target
+            sketchSucceeded = combat.didAttack && !!combat.usedType
+          }
           messages.push(combat.message)
           messages.push(...processDoublesPartnerProtection(state,t.side,t.slot,previousStatus,previousStages))
           events.push({type:'attack',actorSide:side,targetSide:t.side,actorIndex:index,targetIndex,damage:combat.dmg,hpAfter:target.currentHp,attackType:combat.usedType??actor.types[0],message:combat.message})
@@ -347,7 +424,9 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
         events.push({type:'hp-change',side:t.side,pokemonIndex:targetIndex,amount:target.currentHp-before,hpAfter:target.currentHp,kind:'heal',message:`${target.name} was healed.`})
         continue
       }
-      const stanceMultiplier = defensiveStance ? resolveStance(stance, defensiveStance).damageMultiplier : 1
+      const stanceMultiplier = isPairedOpponent
+        ? resolveStance(stance, targetDefensiveStance).damageMultiplier
+        : 1
       let damage = 0
       let type = move?.forcedType && move.forcedType !== 'random' ? move.forcedType : action.kind === 'basic' ? action.attackType : actor.types[0]
       if ((move?.damage ?? 1) > 0) {
@@ -371,6 +450,18 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
         if (absorb.applied) messages.push(absorb.message)
       }
       if (target.currentHp <= 0) events.push({type:'faint', side:t.side, pokemonIndex:targetIndex, hpAfter:0, formId:target.formId, message:`${target.name} fainted!`})
+    }
+    if (move?.id === SKETCH_MOVE_ID) {
+      moveResolved?.({
+        state,
+        side,
+        slot: currentSlot,
+        actor,
+        action: action as Extract<DoublesAction, { kind: 'move' }>,
+        move,
+        opponent: sketchOpponent,
+        succeeded: sketchSucceeded,
+      })
     }
     if (!resolvedAny) messages.push(`${actor.name}'s ${move?.name ?? 'attack'} had no target.`)
     if (move?.selfDamage && resolvedAny && targets.every(t=>t.side===side)) {

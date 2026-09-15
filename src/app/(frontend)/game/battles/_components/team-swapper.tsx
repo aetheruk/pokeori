@@ -34,13 +34,24 @@ const typeIdMap: Record<string, number> = {
 
 import { useBattleContext } from './battle-context'
 
+type TeamSwapperProps = {
+  forced?: boolean
+  leadSelection?: boolean
+  doublesReplacementSlots?: number[]
+  doublesActiveSlots?: readonly (number | null)[]
+  onDoublesReplace?: (
+    slot: 0 | 1,
+    pokemonIndex: number,
+  ) => void | Promise<void>
+}
+
 export function TeamSwapper({
   forced = false,
   leadSelection = false,
-}: {
-  forced?: boolean
-  leadSelection?: boolean
-}) {
+  doublesReplacementSlots,
+  doublesActiveSlots,
+  onDoublesReplace,
+}: TeamSwapperProps) {
   const {
     battleState,
     activePlayerMon,
@@ -53,11 +64,17 @@ export function TeamSwapper({
 
   const team = battleState.playerTeam
   const activeIndex = battleState.activePlayerIndex
+  const isDoublesReplacement =
+    Array.isArray(doublesReplacementSlots) && !!onDoublesReplace
+  const replacementSlots = doublesReplacementSlots ?? []
+  const replacementSlot = replacementSlots[0]
+  const activeSlots = doublesActiveSlots ?? []
   const disabled =
     isAnimating ||
     isWaitingForServer ||
     battleState.status !== 'ongoing' ||
-    (!leadSelection &&
+    (!isDoublesReplacement &&
+      !leadSelection &&
       battleState.config?.allowSwapping === false &&
       activePlayerMon.currentHp > 0)
   const allowSwapping = true
@@ -66,21 +83,37 @@ export function TeamSwapper({
 
   // Count alive Pokemon that aren't active
   const availableSwaps = team.filter(
-    (p, i) => (leadSelection || i !== activeIndex) && p.currentHp > 0,
+    (p, i) =>
+      (isDoublesReplacement
+        ? !activeSlots.includes(i)
+        : leadSelection || i !== activeIndex) && p.currentHp > 0,
   ).length
 
   useEffect(() => {
-    if (forced && availableSwaps > 0) {
+    if (
+      forced &&
+      availableSwaps > 0 &&
+      (!isDoublesReplacement || replacementSlots.length > 0)
+    ) {
       setOpen(true)
     }
-  }, [availableSwaps, forced])
+  }, [
+    availableSwaps,
+    forced,
+    isDoublesReplacement,
+    replacementSlots.length,
+  ])
 
-  const handleSwap = async (index: number) => {
+  const handleSwap = async (index: number, doublesSlot?: number) => {
     if (swapping !== null) return
     setSwapping(index)
     try {
-      await onSwap(index)
-      if (!forced) {
+      if (doublesSlot !== undefined && onDoublesReplace) {
+        await onDoublesReplace(doublesSlot as 0 | 1, index)
+      } else {
+        await onSwap(index)
+      }
+      if (!forced && !isDoublesReplacement) {
         setOpen(false)
       }
     } finally {
@@ -129,11 +162,20 @@ export function TeamSwapper({
                 ? 'Choose Next Pokemon'
                 : 'Switch Pokémon'}
           </SectionDivider>
+          {isDoublesReplacement && replacementSlot !== undefined && (
+            <p className="mb-2 text-xs font-semibold text-game-muted">
+              Lane {replacementSlot + 1}
+            </p>
+          )}
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
             {team.map((pokemon, index) => {
-              const isActive = index === activeIndex
+              const isActive = isDoublesReplacement
+                ? activeSlots.includes(index)
+                : index === activeIndex
               const isFainted = pokemon.currentHp <= 0
-              const canSwitch = (leadSelection || !isActive) && !isFainted
+              const canSwitch = isDoublesReplacement
+                ? !isActive && !isFainted
+                : (leadSelection || !isActive) && !isFainted
               const hpPercent = Math.round(
                 (pokemon.currentHp / pokemon.maxHp) * 100,
               )
@@ -156,7 +198,9 @@ export function TeamSwapper({
                       pendingBattleAction?.pokemonIndex === index) &&
                       'opacity-50 pointer-events-none',
                   )}
-                  onClick={() => canSwitch && handleSwap(index)}
+                  onClick={() =>
+                    canSwitch && handleSwap(index, replacementSlot)
+                  }
                   disabled={
                     !canSwitch || swapping !== null || isWaitingForServer
                   }

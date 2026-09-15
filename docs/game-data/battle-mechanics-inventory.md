@@ -1,5 +1,7 @@
 # Battle Mechanics Inventory
 
+Double-battle update: Sketch now captures from the selected opposing lane rather than assuming a single active opponent. The existing Research Level chance, eligible TM-backed move filtering, and post-win Sketchbook persistence remain unchanged.
+
 Release `0.33.0` adds `rarityChances` to `BattleConfig`, `BattleEnemy`, `Location`, and `LocationEncounter`, using all registered special rarities. Thresholds are 0–1: omissions inherit and explicit zero disables. Capture/wild shiny defaults to 1/512; trainer battles default all thresholds to zero. Each generated enemy rolls independently: the smallest qualifying threshold wins, equal thresholds break ties uniformly, and normal occupies the remainder. Fixed rarity and explicit shiny/shadow/radiant flags take precedence. Selected rarity is persisted before applying existing entry effects, including Shadow and Radiant behavior. Player, copied rival, and scripted teams retain configured rarities. Events can temporarily modify standard battle teams, moves, items, limits, rewards, XP, and rarity thresholds without introducing new move or ability definitions.
 
 Last reviewed: 2026-09-15

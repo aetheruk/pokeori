@@ -84,6 +84,8 @@ function LaneSprite({
   side,
   slot,
   isSelected = false,
+  isActorSelectable = false,
+  onSelectActor,
   isTargetable = false,
   isTargetSelected = false,
   onSelectTarget,
@@ -94,6 +96,8 @@ function LaneSprite({
   side: Side
   slot: Slot
   isSelected?: boolean
+  isActorSelectable?: boolean
+  onSelectActor?: () => void
   isTargetable?: boolean
   isTargetSelected?: boolean
   onSelectTarget?: () => void
@@ -182,6 +186,26 @@ function LaneSprite({
       </button>
     )
   }
+  if (isActorSelectable && onSelectActor) {
+    return (
+      <button
+        type="button"
+        data-testid={`doubles-sprite-${side}-${slot}`}
+        className={`${wrapperClass} pointer-events-auto rounded-lg bg-transparent p-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-game-ochre`}
+        aria-label={`Choose ${mon.name} to act next`}
+        aria-pressed={isSelected}
+        disabled={targetDisabled}
+        onClick={onSelectActor}
+      >
+        <span
+          data-testid={`doubles-actor-${side}-${slot}`}
+          className="contents"
+        >
+          {content}
+        </span>
+      </button>
+    )
+  }
   return (
     <div
       data-testid={`doubles-sprite-${side}-${slot}`}
@@ -199,6 +223,8 @@ export function DoubleBattleScene({
   selectedSlot = 0,
   selectedTarget,
   onChooseTarget,
+  selectablePlayerSlots,
+  onChooseActor,
   disableTargetSelection = false,
 }: {
   state: BattleState
@@ -207,6 +233,8 @@ export function DoubleBattleScene({
   selectedSlot?: Slot
   selectedTarget?: DoublesTarget
   onChooseTarget?: (target: DoublesTarget) => void
+  selectablePlayerSlots?: Slot[]
+  onChooseActor?: (slot: Slot) => void
   disableTargetSelection?: boolean
 }) {
   const targetOptions = eligibleSpriteTargets(state, selectedSlot)
@@ -215,9 +243,16 @@ export function DoubleBattleScene({
       side: side === 'enemy' ? 'opponent' : 'ally',
       slot,
     }
-    const isTargetable = targetOptions.some(
+    const isActorSelectable =
+      side === 'player' &&
+      selectablePlayerSlots?.includes(slot) === true &&
+      !disableTargetSelection &&
+      !isWaitingForOpponent
+    const isTargetable =
+      !isActorSelectable &&
+      targetOptions.some(
       (candidate) => candidate.side === target.side && candidate.slot === slot,
-    )
+      )
     const isTargetSelected =
       !disableTargetSelection &&
       !isWaitingForOpponent &&
@@ -225,6 +260,11 @@ export function DoubleBattleScene({
       selectedTarget?.side === target.side &&
       selectedTarget.slot === slot
     return {
+      isActorSelectable,
+      onSelectActor:
+        isActorSelectable && onChooseActor
+          ? () => onChooseActor(slot)
+          : undefined,
       isTargetable,
       isTargetSelected,
       onSelectTarget:

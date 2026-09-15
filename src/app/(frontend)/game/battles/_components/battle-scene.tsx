@@ -12,6 +12,8 @@ interface BattleSceneProps {
   selectedDoublesSlot?: 0 | 1
   selectedDoublesTarget?: DoublesTarget
   onChooseDoublesTarget?: (target: DoublesTarget) => void
+  selectableDoublesSlots?: (0 | 1)[]
+  onChooseDoublesActor?: (slot: 0 | 1) => void
   disableDoublesTargetSelection?: boolean
   hidePlayer?: boolean
   playerHasTeraEffect?: boolean
@@ -27,6 +29,8 @@ export function BattleScene({
   selectedDoublesSlot = 0,
   selectedDoublesTarget,
   onChooseDoublesTarget,
+  selectableDoublesSlots,
+  onChooseDoublesActor,
   disableDoublesTargetSelection = false,
   hidePlayer = false,
   playerHasTeraEffect,
@@ -43,6 +47,8 @@ export function BattleScene({
         selectedSlot={selectedDoublesSlot}
         selectedTarget={selectedDoublesTarget}
         onChooseTarget={onChooseDoublesTarget}
+        selectablePlayerSlots={selectableDoublesSlots}
+        onChooseActor={onChooseDoublesActor}
         disableTargetSelection={disableDoublesTargetSelection}
       />
     )

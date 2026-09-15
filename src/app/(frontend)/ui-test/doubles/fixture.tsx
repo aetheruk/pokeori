@@ -195,6 +195,13 @@ export function DoubleBattleUiFixture() {
             selectedDoublesSlot={selectedDoublesSlot}
             selectedDoublesTarget={selectedDoublesTarget}
             onChooseDoublesTarget={setSelectedDoublesTarget}
+            selectableDoublesSlots={([0, 1] as const).filter(
+              (slot) => !doublesDraft[slot],
+            )}
+            onChooseDoublesActor={(slot) => {
+              setSelectedDoublesSlot(slot)
+              setSelectedDoublesTarget(getDefaultDoublesTarget(initialState))
+            }}
             disableDoublesTargetSelection={manager.isProcessing}
           />
           <div className="xl:col-start-1 xl:row-start-2">

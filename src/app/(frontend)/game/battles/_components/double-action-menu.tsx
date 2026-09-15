@@ -28,6 +28,7 @@ import type { BattlePowersData } from '../powers/powers-data'
 import { useBattleContext } from './battle-context'
 import { StanceSelector } from './stance-selector'
 import { ItemSelector } from './item-selector'
+import { TeamSwapper } from './team-swapper'
 import { BattleMovesContent, getBattleMovePresentation, MoveInfoDialog } from './battle-moves-content'
 
 type Slot = 0 | 1
@@ -238,41 +239,15 @@ export function DoubleActionMenu() {
       )}
       <div className="mx-auto w-full max-w-2xl">
         {replacementSlots.length > 0 ? (
-          <div className="rounded-lg border border-game-ochre/40 bg-game-ochre/10 p-3">
-            <p className="mb-3 text-sm font-semibold">
-              Choose a Pokemon for each empty lane.
-            </p>
-            {replacementSlots.map((value) => {
-              const slot = value as Slot
-              const available = battleState.playerTeam
-                .map((mon, index) => ({ mon, index }))
-                .filter(
-                  ({ mon, index }) =>
-                    mon.currentHp > 0 && !slots.includes(index),
-                )
-              return (
-                <div key={slot} className="mb-3 last:mb-0">
-                  <p className="mb-2 text-xs font-semibold text-game-muted">
-                    Your Pokemon · {slot + 1}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {available.map(({ mon, index }) => (
-                      <Button
-                        key={`${slot}:${index}`}
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        className="h-11 rounded-lg border-game-border bg-game-surface-raised"
-                        disabled={disabled}
-                        onClick={() => void handleDoublesReplace(slot, index)}
-                      >
-                        {mon.name}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              )
-            })}
+          <div className="flex w-full justify-center">
+            <TeamSwapper
+              forced
+              doublesReplacementSlots={replacementSlots}
+              doublesActiveSlots={slots}
+              onDoublesReplace={(slot, pokemonIndex) =>
+                handleDoublesReplace(slot, pokemonIndex)
+              }
+            />
           </div>
         ) : (
           <>

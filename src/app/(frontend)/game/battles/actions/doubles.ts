@@ -22,6 +22,10 @@ import { recordPokemonKOForPokemon } from '../helpers/pokemon-ko-credit'
 import { applyTrainerBattleItemById } from '@/utilities/battle/trainer-items'
 import { isDoublesCommanderInactive } from '@/utilities/battle/doubles-abilities'
 import { decrementFaintedPokemonFriendship } from '@/utilities/battle/friendship'
+import {
+  settleDoublesSketchAttempts,
+  type DoublesSketchAttempt,
+} from '../helpers/doubles-sketch'
 
 function chooseEnemyActions(state: BattleState): DoublesAction[] {
   const actions: DoublesAction[] = []
@@ -74,6 +78,7 @@ export async function submitDoublesActions(actions: DoublesAction[], clientActio
       return {success:true,state:result.state,waiting:result.waiting}
     }
     const enemyActions = chooseEnemyActions(state)
+    const sketchAttempts: DoublesSketchAttempt[] = []
     try { resolveDoublesTurn(state,actions,enemyActions,Math.random,({state:next,side,actor,action,...rest})=>{
       if(side==='enemy'&&action.kind==='item') {
         const saved=next.activeEnemyIndex
@@ -82,8 +87,28 @@ export async function submitDoublesActions(actions: DoublesAction[], clientActio
         finally {next.activeEnemyIndex=saved}
       }
       return prepared.callback({state:next,side,actor,action,...rest})
+    }, (attempt) => {
+      if (attempt.side === 'player') {
+        sketchAttempts.push({
+          attacker: attempt.actor,
+          opponent: attempt.opponent,
+          succeeded: attempt.succeeded,
+          userId: user.id,
+        })
+      }
     }) }
     catch (cause) { return {success:false,error:cause instanceof Error ? cause.message : 'Could not resolve turn.',state} }
+    if (sketchAttempts.length > 0) {
+      const payload = await getPayload({config: configPromise})
+      const sketchMessages = await settleDoublesSketchAttempts(
+        state,
+        sketchAttempts,
+        payload,
+      )
+      if (sketchMessages.length > 0 && state.history[0]) {
+        state.history[0].message += `\n${sketchMessages.join('\n')}`
+      }
+    }
     for(const event of state.presentation?.events??[]) if(event.type==='faint') recordPokemonKOForPokemon(state,event.side,(event.side==='player'?state.playerTeam:state.enemyTeam)[event.pokemonIndex])
     const faintedPlayerEvents=(state.presentation?.events??[]).filter((event):event is Extract<BattlePresentationEvent,{type:'faint'}>=>event.type==='faint'&&event.side==='player')
     if(faintedPlayerEvents.length) {
