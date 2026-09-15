@@ -1510,9 +1510,14 @@ export function useBattleManager(initialState: BattleState) {
 
       setIsWaitingForOpponent(false)
 
-      if (nextState.format === 'double') {
-        // Doubles uses the four-slot presentation instead of the single-active
-        // event diff, which otherwise switches or damages the wrong lane.
+      if (
+        nextState.format === 'double' &&
+        (!nextState.presentation ||
+          nextState.presentation.sequenceId ===
+            targetStateRef.current.presentation?.sequenceId)
+      ) {
+        // A doubles state without a fresh presentation (for example a PvP
+        // waiting snapshot) cannot be animated by the single-active diff.
         targetStateRef.current = cloneState(nextState)
         setBattleState(nextState)
         setVisualState(nextState)

@@ -9,12 +9,13 @@ import {
 import { BattleLog } from '@/app/(frontend)/game/battles/_components/battle-log'
 import { BattleScene } from '@/app/(frontend)/game/battles/_components/battle-scene'
 import { BattleSurrenderButton } from '@/app/(frontend)/game/battles/_components/battle-surrender-button'
-import { INITIAL_ANIMATION_STATE } from '@/utilities/battle/engine/types'
-import type { BattlePokemon, BattleState } from '@/utilities/battle/types'
+import { useBattleManager } from '@/utilities/battle/engine/useBattleManager'
+import type { BattleInventoryItem, BattlePokemon, BattleState } from '@/utilities/battle/types'
 import type {
   DoublesAction,
   DoublesTarget,
 } from '@/utilities/battle/doubles-state'
+import { getDefaultDoublesTarget, stageDoublesAction } from '@/utilities/battle/doubles-state'
 
 function pokemon(
   id: string,
@@ -105,34 +106,81 @@ const initialState: BattleState = {
   enemyName: 'Trial',
   itemsUsedThisBattle: [],
 }
+initialState.playerTeam[0].currentHp = 54
+
+const fixtureItems: BattleInventoryItem[] = [
+  { itemId: 'battle-potion', name: 'Potion', quantity: 3, battleEffect: { type: 'heal', healAmount: 20 } },
+  { itemId: 'revive', name: 'Revive', quantity: 1, battleEffect: { type: 'revive', reviveHpPercent: 50 } },
+]
 
 export function DoubleBattleUiFixture() {
+  const manager = useBattleManager(initialState)
   const [selectedDoublesSlot, setSelectedDoublesSlot] = useState<0 | 1>(0)
   const [doublesDraft, setDoublesDraft] = useState<
     Partial<Record<0 | 1, DoublesAction>>
   >({})
-  const chooseTarget = (target: DoublesTarget) => {
-    setDoublesDraft((current) => {
-      const action = current[selectedDoublesSlot]
-      if (!action || (action.kind !== 'basic' && action.kind !== 'move'))
-        return current
-      return { ...current, [selectedDoublesSlot]: { ...action, target } }
-    })
+  const [selectedDoublesTarget, setSelectedDoublesTarget] =
+    useState<DoublesTarget>(() => getDefaultDoublesTarget(initialState))
+  const [submittedActions, setSubmittedActions] = useState<DoublesAction[]>([])
+  const submitFixtureTurn = (actions: DoublesAction[]) => {
+    setSubmittedActions(actions)
+    const next: BattleState = {
+      ...initialState,
+      turn: 2,
+      enemyTeam: initialState.enemyTeam.map((mon, index) => ({
+        ...mon,
+        currentHp: index === 0 ? 37 : index === 1 ? 41 : mon.currentHp,
+      })),
+      history: [{
+        turn: 2,
+        playerStance: 'power',
+        enemyStance: 'tech',
+        result: 'win',
+        damageDealt: 36,
+        damageTaken: 0,
+        message: 'Smeargle attacked Minun. Skeledirge attacked Plusle.',
+      }, ...initialState.history],
+      presentation: {
+        sequenceId: 'fixture-double-turn-2',
+        turn: 2,
+        events: [
+          { type: 'attack', actorSide: 'player', targetSide: 'enemy', actorIndex: 0, targetIndex: 1, damage: 16, hpAfter: 41, attackType: 'normal', message: 'Smeargle attacked Minun.' },
+          { type: 'attack', actorSide: 'player', targetSide: 'enemy', actorIndex: 1, targetIndex: 0, damage: 20, hpAfter: 37, attackType: 'fire', message: 'Skeledirge attacked Plusle.' },
+        ],
+      },
+    }
+    manager.pushTurnResult({ success: true, state: next })
+  }
+  const chooseAction = (action: DoublesAction) => {
+    const staged = stageDoublesAction(manager.battleState, doublesDraft, action)
+    if (!staged) return
+    setDoublesDraft(staged.draft)
+    if (staged.nextSlot !== undefined) {
+      setSelectedDoublesSlot(staged.nextSlot)
+      setSelectedDoublesTarget(getDefaultDoublesTarget(initialState))
+    } else if (staged.actions) {
+      submitFixtureTurn(staged.actions)
+    }
   }
   const context = {
-    battleState: initialState,
-    activePlayerMon: initialState.playerTeam[0],
-    activeEnemyMon: initialState.enemyTeam[0],
+    battleState: manager.battleState,
+    activePlayerMon: manager.battleState.playerTeam[0],
+    activeEnemyMon: manager.battleState.enemyTeam[0],
     selectedType: 'normal',
     setSelectedType: () => {},
     selectedDoublesSlot,
     setSelectedDoublesSlot,
     doublesDraft,
     setDoublesDraft,
-    isAnimating: false,
+    battleInventoryItems: fixtureItems,
+    selectedDoublesTarget,
+    setSelectedDoublesTarget,
+    handleDoublesChooseAction: chooseAction,
+    isAnimating: manager.isProcessing,
     isWaitingForServer: false,
+    isWaitingForOpponent: manager.isWaitingForOpponent,
     pendingBattleAction: null,
-    handleDoublesSubmit: () => {},
+    handleDoublesSubmit: submitFixtureTurn,
     handleDoublesReplace: () => {},
     handleSurrender: () => {},
   } as unknown as BattleContextType
@@ -142,11 +190,12 @@ export function DoubleBattleUiFixture() {
       <div className="game-night h-dvh bg-game-night-canvas text-game-night-ink">
         <div className="game-desktop-activity-stage game-activity-chrome relative flex h-full flex-col overflow-hidden xl:my-4 xl:h-[calc(100%-2rem)] xl:grid xl:grid-cols-[minmax(0,1fr)_19rem] xl:grid-rows-[minmax(26rem,1fr)_auto]">
           <BattleScene
-            battleState={initialState}
-            anim={INITIAL_ANIMATION_STATE}
+            battleState={manager.battleState}
+            anim={manager.anim}
             selectedDoublesSlot={selectedDoublesSlot}
-            selectedDoublesAction={doublesDraft[selectedDoublesSlot]}
-            onChooseDoublesTarget={chooseTarget}
+            selectedDoublesTarget={selectedDoublesTarget}
+            onChooseDoublesTarget={setSelectedDoublesTarget}
+            disableDoublesTargetSelection={manager.isProcessing}
           />
           <div className="xl:col-start-1 xl:row-start-2">
             <BattleActionMenu />
@@ -156,13 +205,16 @@ export function DoubleBattleUiFixture() {
             className="game-paper-first relative min-h-0 flex-[24] border-t border-game-border bg-game-surface-raised xl:col-start-2 xl:row-start-1 xl:row-span-2 xl:border-l xl:border-t-0"
           >
             <div className="h-full overflow-hidden">
-              <BattleLog logs={initialState.history} />
+              <BattleLog logs={manager.battleState.history} />
             </div>
             <div className="absolute bottom-4 right-4 z-30">
               <BattleSurrenderButton />
             </div>
           </div>
         </div>
+        <output data-testid="submitted-doubles-actions" className="sr-only">{JSON.stringify(submittedActions)}</output>
+        <output data-testid="staged-doubles-actions" className="sr-only">{JSON.stringify(doublesDraft)}</output>
+        <output data-testid="doubles-animation-processing" className="sr-only">{String(manager.isProcessing)}</output>
       </div>
     </BattleProvider>
   )

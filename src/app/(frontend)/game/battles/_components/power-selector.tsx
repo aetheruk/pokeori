@@ -12,63 +12,21 @@ import {
   Zap,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { MoveBattleCommand, MoveFieldNote } from '@/components/game/moves'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { SectionDivider } from '@/components/ui/section-divider'
-import type { PokemonTypeName } from '@/data/items/types'
-import { getMove, type MoveConfig } from '@/data/moves'
+import { getMove } from '@/data/moves'
 import { DYNAMAX_UNLOCK_TURNS } from '@/data/powers'
 import { cn } from '@/lib/utils'
-import { resolveHiddenPower } from '@/utilities/battle/hidden-power'
-import { resolveDynamicMoveType } from '@/utilities/battle/move-effects'
 import { getPokemonMoveUsesRemaining } from '@/utilities/battle/move-uses'
-import type {
-  BattlePokemon,
-  BattleState,
-} from '@/utilities/battle/types'
-import {
-  getMovePresentation,
-  type MovePresentation,
-} from '@/utilities/pokemon/move-display'
 import {
   POKEMON_POWER_OPTIONS,
   type PokemonPowerId,
 } from '@/utilities/pokemon/pokemon-powers'
 
 import { useBattleContext } from './battle-context'
-
-function getBattleMovePresentation(
-  move: MoveConfig,
-  pokemon: BattlePokemon,
-  state: BattleState,
-  selectedType?: string | null,
-): MovePresentation {
-  const fallbackType =
-    selectedType?.toLowerCase() || pokemon.types?.[0]?.toLowerCase() || 'normal'
-  const hiddenPowerType =
-    move.id === 'hidden-power'
-      ? resolveHiddenPower(pokemon).attackType
-      : undefined
-  const authoredType =
-    move.forcedType === 'random' ? undefined : move.forcedType || fallbackType
-  const baseType = hiddenPowerType || authoredType
-  const opponent = state.enemyTeam[state.activeEnemyIndex]
-  const currentType = move.dynamicType
-    ? resolveDynamicMoveType({
-        move,
-        attacker: pokemon,
-        defender: opponent,
-        weather: state.weather?.weather,
-        fallbackType: baseType || fallbackType,
-      })
-    : baseType
-  return getMovePresentation(move, {
-    resolvedType: currentType as PokemonTypeName | undefined,
-  })
-}
+import { BattleMovesContent, getBattleMovePresentation, MoveInfoDialog } from './battle-moves-content'
 
 export function PowerSelector() {
   const {
@@ -336,68 +294,17 @@ export function PowerSelector() {
     isBattlePanelLoading || !!hasAnyPowers || !!powersData?.selectedPokemonPower
 
   const renderMovesContent = () => (
-    <div className="mx-auto w-full max-w-2xl px-4 pt-4 pb-6">
-      <div className="overflow-y-auto max-h-[calc(70dvh-120px)] space-y-6">
-        <div className="space-y-3">
-          <SectionDivider>
-            <span className="flex items-center gap-2 text-game-moss">
-              <ItemSprite
-                itemId={moveTriggerItemId}
-                alt="Moves"
-                width={20}
-                height={20}
-                className="h-5 w-5 object-contain"
-              />
-              Special Moves ({movesUsesRemaining})
-            </span>
-          </SectionDivider>
-          {!canUseMove ? (
-            <div
-              className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted"
-              role="status"
-              aria-live="polite"
-            >
-              No move uses remaining this battle
-            </div>
-          ) : (
-            <div className="grid gap-2 pb-1">
-              {availableMoves.map((move) => {
-                const moveConfig = getMove(move.id)
-                if (!moveConfig) return null
-                const presentation = getBattleMovePresentation(
-                  moveConfig,
-                  activePlayerMon,
-                  battleState,
-                  selectedType,
-                )
-
-                return (
-                  <MoveBattleCommand
-                    key={move.id}
-                    presentation={presentation}
-                    onDetails={() => setMoveInfoId(move.id)}
-                    primaryAction={
-                      <Button
-                        type="button"
-                        className="h-11 min-w-14 px-3"
-                        disabled={using !== null}
-                        onClick={() => void handleUseMove(move.id)}
-                        aria-label={`Use ${move.name}`}
-                      >
-                        {using === move.id ? (
-                          <Loader2 className="size-4 animate-spin" />
-                        ) : null}
-                        Use
-                      </Button>
-                    }
-                  />
-                )
-              })}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+    <BattleMovesContent
+      moves={availableMoves.map((move) => getMove(move.id)).filter((move): move is NonNullable<typeof move> => !!move)}
+      pokemon={activePlayerMon}
+      state={battleState}
+      selectedType={selectedType}
+      usesRemaining={movesUsesRemaining}
+      triggerItemId={moveTriggerItemId}
+      using={using}
+      onUseMove={(moveId) => void handleUseMove(moveId)}
+      onDetails={setMoveInfoId}
+    />
   )
 
   return (
@@ -1035,25 +942,6 @@ export function PowerSelector() {
         </Drawer>
       )}
     </>
-  )
-}
-
-function MoveInfoDialog({
-  presentation,
-  onOpenChange,
-}: {
-  presentation: MovePresentation | null
-  onOpenChange: (open: boolean) => void
-}) {
-  return (
-    <Dialog open={presentation !== null} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[88dvh] overflow-y-auto border-game-border bg-game-surface text-game-ink sm:max-w-lg">
-        <DialogTitle className="sr-only">
-          {presentation?.identity.name ?? 'Move details'}
-        </DialogTitle>
-        {presentation ? <MoveFieldNote presentation={presentation} /> : null}
-      </DialogContent>
-    </Dialog>
   )
 }
 

@@ -19,7 +19,12 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useAudio } from '@/context/AudioContext'
 import type { BattleStance, BattleState } from '@/utilities/battle/types'
-import type { DoublesAction, DoublesTarget } from '@/utilities/battle/doubles-state'
+import {
+  getDefaultDoublesTarget,
+  stageDoublesAction,
+  type DoublesAction,
+  type DoublesTarget,
+} from '@/utilities/battle/doubles-state'
 import {
   clearBattleState,
   getBattlePanelData,
@@ -162,6 +167,8 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
   )
   const [selectedType, setSelectedType] = useState<string | null>(null)
   const [selectedDoublesSlot, setSelectedDoublesSlot] = useState<0 | 1>(0)
+  const [selectedDoublesTarget, setSelectedDoublesTarget] =
+    useState<DoublesTarget>(() => getDefaultDoublesTarget(initialState))
   const [doublesDraft, setDoublesDraft] =
     useState<BattleContextType['doublesDraft']>({})
   const [hasPowerKeyItems, setHasPowerKeyItems] = useState(false)
@@ -695,10 +702,13 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
   )
 
   const handleDoublesSubmit = useCallback(
-    (actions:DoublesAction[]) => wrapAction(
-      clientActionId => submitBattleActionRequest({kind:'doubles',actions,clientActionId}),
-      {kind:'doubles',label:'Resolving double turn'},
-    ),[wrapAction],
+    (actions:DoublesAction[]) => {
+      if (isWaitingForOpponent) return
+      return wrapAction(
+        clientActionId => submitBattleActionRequest({kind:'doubles',actions,clientActionId}),
+        {kind:'doubles',label:'Resolving double turn'},
+      )
+    },[wrapAction,isWaitingForOpponent],
   )
   const handleDoublesReplace = useCallback(
     (slot:0|1,pokemonIndex:number) => wrapAction(
@@ -707,16 +717,21 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
     ),[wrapAction],
   )
 
-  const handleChooseDoublesTarget = useCallback(
-    (target: DoublesTarget) => {
-      setDoublesDraft((current) => {
-        const action = current[selectedDoublesSlot]
-        if (!action || (action.kind !== 'basic' && action.kind !== 'move'))
-          return current
-        return { ...current, [selectedDoublesSlot]: { ...action, target } }
-      })
+  const handleDoublesChooseAction = useCallback(
+    (action: DoublesAction) => {
+      if (isProcessing || isWaitingForServer || isWaitingForOpponent || battleState.status !== 'ongoing')
+        return
+      const staged = stageDoublesAction(battleState, doublesDraft, action)
+      if (!staged) return
+      setDoublesDraft(staged.draft)
+      if (staged.nextSlot !== undefined) {
+        setSelectedDoublesSlot(staged.nextSlot)
+        setSelectedDoublesTarget(getDefaultDoublesTarget(battleState))
+        return
+      }
+      if (staged.actions) void handleDoublesSubmit(staged.actions)
     },
-    [selectedDoublesSlot],
+    [battleState, doublesDraft, handleDoublesSubmit, isProcessing, isWaitingForServer, isWaitingForOpponent],
   )
 
   const playerHasTeraEffect = !!activePlayerMon?.teraTypeOverride
@@ -733,8 +748,12 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
       setSelectedDoublesSlot,
       doublesDraft,
       setDoublesDraft,
+      selectedDoublesTarget,
+      setSelectedDoublesTarget,
+      handleDoublesChooseAction,
       isAnimating: isProcessing,
       isWaitingForServer,
+      isWaitingForOpponent,
       pendingBattleAction,
       isBattlePanelLoading,
       hasPowerKeyItems,
@@ -765,8 +784,11 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
       selectedType,
       selectedDoublesSlot,
       doublesDraft,
+      selectedDoublesTarget,
+      handleDoublesChooseAction,
       isProcessing,
       isWaitingForServer,
+      isWaitingForOpponent,
       pendingBattleAction,
       isBattlePanelLoading,
       hasPowerKeyItems,
@@ -812,8 +834,8 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
           battleState={battleState}
           anim={anim}
           selectedDoublesSlot={selectedDoublesSlot}
-          selectedDoublesAction={doublesDraft[selectedDoublesSlot]}
-          onChooseDoublesTarget={handleChooseDoublesTarget}
+          selectedDoublesTarget={selectedDoublesTarget}
+          onChooseDoublesTarget={setSelectedDoublesTarget}
           disableDoublesTargetSelection={
             isProcessing ||
             isWaitingForServer ||

@@ -15,6 +15,7 @@ import { SectionDivider } from '@/components/ui/section-divider'
 import { cn } from '@/lib/utils'
 import { getBattleItemUseLimit } from '@/utilities/battle/item-use-limits'
 import type { BattleInventoryItem } from '@/utilities/battle/types'
+import { getDoublesPokemon, getDoublesSlots } from '@/utilities/battle/doubles-state'
 import { getBattleInventory } from '../actions'
 
 import { useBattleContext } from './battle-context'
@@ -22,11 +23,19 @@ import { useBattleContext } from './battle-context'
 export function ItemSelector() {
   const {
     battleState,
+    battleInventoryItems,
     activePlayerMon,
+    selectedDoublesSlot,
+    handleDoublesChooseAction,
     isAnimating,
     isWaitingForServer,
+    isWaitingForOpponent,
     handleUseItem: onUseItem,
   } = useBattleContext()
+  const isDouble = battleState.format === 'double'
+  const selectedMon = isDouble
+    ? getDoublesPokemon(battleState, 'player', selectedDoublesSlot)
+    : activePlayerMon
   const itemDrawerContentId = `battle-item-drawer-${battleState.battleId}`
 
   const itemsUsedThisBattle = battleState.itemsUsedThisBattle?.length || 0
@@ -34,6 +43,7 @@ export function ItemSelector() {
   const disabled =
     isAnimating ||
     isWaitingForServer ||
+    isWaitingForOpponent ||
     !!battleState.isPvp ||
     battleState.status !== 'ongoing' ||
     itemsUsedThisBattle >= maxItemsPerBattle
@@ -44,7 +54,7 @@ export function ItemSelector() {
   const [reviveItem, setReviveItem] = useState<BattleInventoryItem | null>(
     null,
   )
-  const activePokemonIsFainted =
+  const activePokemonIsFainted = !isDouble &&
     battleState.playerTeam[battleState.activePlayerIndex]?.currentHp <= 0
 
   const reviveTargets = battleState.playerTeam.filter(
@@ -58,6 +68,11 @@ export function ItemSelector() {
 
   useEffect(() => {
     if (open) {
+      if (battleInventoryItems) {
+        setItems(battleInventoryItems)
+        setLoading(false)
+        return
+      }
       setLoading(true)
       getBattleInventory()
         .then((result) => {
@@ -67,13 +82,25 @@ export function ItemSelector() {
         })
         .finally(() => setLoading(false))
     }
-  }, [open])
+  }, [open, battleInventoryItems])
 
   const handleUseItem = async (itemId: string, targetPokemonIndex?: number) => {
     if (using) return
     setUsing(itemId)
     try {
-      await onUseItem(itemId, targetPokemonIndex)
+      if (isDouble) {
+        handleDoublesChooseAction({
+          slot: selectedDoublesSlot,
+          kind: 'item',
+          itemId,
+          targetPokemonIndex:
+            targetPokemonIndex ??
+            getDoublesSlots(battleState, 'player')[selectedDoublesSlot] ??
+            undefined,
+        })
+      } else {
+        await onUseItem(itemId, targetPokemonIndex)
+      }
       setOpen(false)
       setReviveItem(null)
     } finally {
@@ -126,29 +153,29 @@ export function ItemSelector() {
   }
 
   const canItemApply = (item: BattleInventoryItem) => {
-    if (!activePlayerMon) return false
-    if (activePlayerMon.status?.id === 'vanished') return true
+    if (!selectedMon) return false
+    if (selectedMon.status?.id === 'vanished') return true
 
     const effect = item.battleEffect
     if (effect.type === 'revive') return reviveTargets.length > 0
     if (effect.type === 'heal') {
       const missingHp = Math.max(
         0,
-        activePlayerMon.maxHp - activePlayerMon.currentHp,
+        selectedMon.maxHp - selectedMon.currentHp,
       )
       if ((effect.healFull || effect.healAmount) && missingHp > 0) return true
       if (!effect.clearStatus) return false
 
-      if (!activePlayerMon.status) return false
+      if (!selectedMon.status) return false
       if (effect.clearStatus === 'all') return true
       if (Array.isArray(effect.clearStatus)) {
-        return effect.clearStatus.includes(activePlayerMon.status.id)
+        return effect.clearStatus.includes(selectedMon.status.id)
       }
-      return effect.clearStatus === activePlayerMon.status.id
+      return effect.clearStatus === selectedMon.status.id
     }
 
     if (effect.type === 'buff' && effect.buffStat) {
-      const currentStage = activePlayerMon.statStages?.[effect.buffStat] || 0
+      const currentStage = selectedMon.statStages?.[effect.buffStat] || 0
       const maxStage = effect.buffStat === 'crit' ? 3 : 6
       return currentStage < maxStage
     }

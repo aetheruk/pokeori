@@ -9,6 +9,8 @@ import { toPerspectivePvpState } from '@/app/(frontend)/game/battles/pvp/state-u
 import { resolvePvpTurn } from '@/app/(frontend)/game/battles/pvp/resolution'
 import { DoubleBattleScene } from '@/app/(frontend)/game/battles/_components/double-battle-scene'
 import { INITIAL_ANIMATION_STATE } from '@/utilities/battle/engine/types'
+import { generateBattleEvents } from '@/utilities/battle/engine/event-generator'
+import { getDefaultDoublesTarget, stageDoublesAction } from '@/utilities/battle/doubles-state'
 import { canEnemyPokemonUseAiMove } from '@/utilities/battle/enemy-ai'
 import type { BattlePokemon, BattleState } from '@/utilities/battle/types'
 
@@ -34,6 +36,21 @@ describe('double battles',()=>{
     expect(validateDoublesActions(battle,'player',[hit(0,0),hit(0,1)])).toContain('only once')
     expect(validateDoublesActions(battle,'player',[hit(0,0),hit(1,1)])).toBeUndefined()
   })
+  test('target selection precedes action and only the final eligible actor submits',()=>{
+    const battle=state()
+    expect(getDefaultDoublesTarget(battle)).toEqual({side:'opponent',slot:0})
+    battle.enemyTeam[0].currentHp=0
+    expect(getDefaultDoublesTarget(battle)).toEqual({side:'opponent',slot:1})
+    const first=stageDoublesAction(battle,{},hit(0,1))
+    expect(first?.nextSlot).toBe(1)
+    expect(first?.actions).toBeUndefined()
+    const second=stageDoublesAction(battle,first!.draft,hit(1,1))
+    expect(second?.nextSlot).toBeUndefined()
+    expect(second?.actions).toEqual([hit(0,1),hit(1,1)])
+    battle.playerTeam[1].currentHp=0
+    const lone=stageDoublesAction(battle,{},hit(0,1))
+    expect(lone?.actions).toEqual([hit(0,1)])
+  })
   test('resolves independent actions and records damage against both selected opponents',()=>{
     const battle=state()
     const next=resolveDoublesTurn(battle,[hit(0,0),hit(1,1)],enemy,()=>0.1)
@@ -41,6 +58,14 @@ describe('double battles',()=>{
     expect(next.enemyTeam[1].currentHp).toBeLessThan(999)
     expect(next.turn).toBe(2)
     expect(next.presentation?.events.filter(event=>event.type==='attack'&&event.actorSide==='player')).toHaveLength(2)
+  })
+  test('a fresh doubles presentation queues lane-specific playback before the final state',()=>{
+    const before=state()
+    const after=resolveDoublesTurn(structuredClone(before),[hit(0,0),hit(1,1)],enemy,()=>0.1)
+    const events=generateBattleEvents(before,after)
+    expect(events.map(event=>event.type)).toEqual(['PLAY_SEQUENCE','SET_INITIAL_STATE'])
+    expect(events[0].payload.type).toBe('PRESENTATION')
+    expect(events[0].payload.presentation?.events.some((event: {type:string})=>event.type==='attack')).toBe(true)
   })
   test('spread moves deal full damage to each opponent and allies when authored',()=>{
     const spread=state()
@@ -192,14 +217,14 @@ describe('double battles',()=>{
   test('single-target commands expose only living eligible sprites with a red target arrow',()=>{
     const battle=state()
     const html=renderToStaticMarkup(createElement(DoubleBattleScene,{
-      state:battle,isWaitingForOpponent:false,selectedAction:hit(0,1),onChooseTarget:()=>{},
+      state:battle,isWaitingForOpponent:false,selectedTarget:{side:'opponent',slot:1},onChooseTarget:()=>{},
     }))
     expect(html).toContain('aria-label="Target E0"')
     expect(html).toContain('aria-label="Target E1"')
     expect(html.match(/selected-doubles-target-arrow/g)).toHaveLength(1)
     battle.enemyTeam[1].currentHp=0
     const faintedHtml=renderToStaticMarkup(createElement(DoubleBattleScene,{
-      state:battle,isWaitingForOpponent:false,selectedAction:hit(0,1),onChooseTarget:()=>{},
+      state:battle,isWaitingForOpponent:false,selectedTarget:{side:'opponent',slot:1},onChooseTarget:()=>{},
     }))
     expect(faintedHtml).not.toContain('aria-label="Target E1"')
     expect(faintedHtml).not.toContain('selected-doubles-target-arrow')

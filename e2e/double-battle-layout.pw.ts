@@ -32,13 +32,11 @@ for (const width of [320, 390, 1280]) {
     await expect(page.getByRole('button', { name: 'POWER' })).toBeVisible()
     await expect(page.getByRole('button', { name: 'TECH' })).toBeVisible()
     await expect(page.getByTestId('battle-log-panel')).toHaveCSS('background-color', 'rgb(255, 248, 232)')
-    await expect(page.getByTestId('selected-doubles-target-arrow')).toHaveCount(0)
+    await expect(page.getByTestId('selected-doubles-target-arrow')).toHaveCount(1)
+    await expect(page.getByRole('button', { name: 'Target Plusle' })).toHaveAttribute('aria-pressed', 'true')
 
     await page.screenshot({ path: `test-results/doubles-${width}-first.png` })
     const firstArrow = await page.getByTestId('selected-doubles-arrow').boundingBox()
-    await page.getByRole('button', { name: 'POWER' }).click()
-    await expect(page.getByRole('button', { name: 'Target Plusle' })).toHaveAttribute('aria-pressed', 'true')
-    await expect(page.getByTestId('selected-doubles-target-arrow')).toHaveCount(1)
     const firstTargetArrow = await page.getByTestId('selected-doubles-target-arrow').boundingBox()
     await page.getByRole('button', { name: 'Target Minun' }).click()
     await expect(page.getByRole('button', { name: 'Target Minun' })).toHaveAttribute('aria-pressed', 'true')
@@ -50,13 +48,17 @@ for (const width of [320, 390, 1280]) {
     await page.getByRole('button', { name: 'Target Minun' }).click()
     await expect(page.getByText('Target', { exact: true })).toHaveCount(0)
     await page.screenshot({ path: `test-results/doubles-${width}-target.png` })
-    await page.getByRole('button', { name: 'Next Pokemon' }).click()
-    await expect(page.getByRole('button', { name: 'Previous Pokemon' })).toBeVisible()
+    await page.getByRole('button', { name: 'POWER' }).click()
     const secondArrow = await page.getByTestId('selected-doubles-arrow').boundingBox()
     expect(secondArrow?.x).toBeGreaterThan(firstArrow?.x ?? 0)
     await expect(page.getByRole('button', { name: 'Moves, 4 uses remaining' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Target Plusle' })).toHaveAttribute('aria-pressed', 'true')
     await page.getByRole('button', { name: 'TECH' }).click()
-    await expect(page.getByRole('button', { name: 'Confirm turn' })).toBeEnabled()
+    await expect(page.getByTestId('submitted-doubles-actions')).toContainText('"slot":1')
+    await expect(page.getByTestId('submitted-doubles-actions')).toContainText('"slot":0')
+    await expect(page.getByRole('button', { name: 'Confirm turn' })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Next Pokemon' })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Previous Pokemon' })).toHaveCount(0)
     await page.screenshot({ path: `test-results/doubles-${width}-second.png` })
 
     const overflows = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)
@@ -64,16 +66,67 @@ for (const width of [320, 390, 1280]) {
   })
 }
 
-test('ally targets use the partner sprite while spread moves need no target arrow', async ({ page }) => {
+test('move drawer matches singles and resolves ally/spread targeting automatically', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/ui-test/doubles')
   await page.getByRole('button', { name: 'Moves, 4 uses remaining' }).click()
-  await page.getByRole('button', { name: /Helping Hand/ }).click()
-  await expect(page.getByRole('button', { name: 'Target Skeledirge' })).toHaveAttribute('aria-pressed', 'true')
-  await expect(page.getByRole('button', { name: 'Target Plusle' })).toHaveCount(0)
+  await expect(page.getByText('Special Moves (4)')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'View Helping Hand details' })).toBeVisible()
+  await page.getByRole('button', { name: 'Use Helping Hand' }).click()
+  await expect(page.getByTestId('selected-doubles-arrow')).toHaveCount(1)
+  await expect(page.getByTestId('staged-doubles-actions')).toContainText('"side":"ally"')
   await expect(page.getByTestId('selected-doubles-target-arrow')).toHaveCount(1)
   await page.getByRole('button', { name: 'Moves, 4 uses remaining' }).click()
-  await page.getByRole('button', { name: /Heat Wave/ }).click()
-  await expect(page.getByRole('button', { name: 'Target Skeledirge' })).toHaveCount(0)
-  await expect(page.getByTestId('selected-doubles-target-arrow')).toHaveCount(0)
+  await page.getByRole('button', { name: 'Use Heat Wave' }).click()
+  await expect(page.getByTestId('submitted-doubles-actions')).toContainText('"moveId":"heat-wave"')
+  await expect(page.getByTestId('submitted-doubles-actions')).toContainText('"side":"ally"')
+  await expect(page.getByTestId('submitted-doubles-actions')).not.toContainText('"target":{"side":"opponent"')
+})
+
+test('a submitted double turn animates the acting lanes and delays enemy HP changes', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/ui-test/doubles')
+  const plusle = page.getByRole('group', { name: 'Opponent Pokemon 1 health' }).getByRole('progressbar')
+  const minun = page.getByRole('group', { name: 'Opponent Pokemon 2 health' }).getByRole('progressbar')
+  await page.evaluate(() => {
+    const browserWindow = window as typeof window & { doublesObservedActors?: string[] }
+    browserWindow.doublesObservedActors = []
+    const observer = new MutationObserver(() => {
+      for (const slot of [0, 1]) {
+        if (document.querySelector(`[data-testid="doubles-sprite-player-${slot}"] .translate-x-12`)) {
+          const label = `player-${slot}`
+          if (!browserWindow.doublesObservedActors?.includes(label)) browserWindow.doublesObservedActors?.push(label)
+        }
+      }
+    })
+    observer.observe(document.body, { attributes: true, childList: true, subtree: true })
+  })
+  await expect(plusle).toHaveAttribute('aria-valuenow', '100')
+  await expect(minun).toHaveAttribute('aria-valuenow', '100')
+  await page.getByRole('button', { name: 'Target Minun' }).click()
+  await page.getByRole('button', { name: 'POWER' }).click()
+  await page.getByRole('button', { name: 'TECH' }).click()
+  await expect(page.getByTestId('doubles-animation-processing')).toHaveText('true')
+  await expect(plusle).toHaveAttribute('aria-valuenow', '100')
+  await expect(page.getByTestId('doubles-sprite-player-0').locator('.translate-x-12')).toBeVisible()
+  await expect(minun).not.toHaveAttribute('aria-valuenow', '100')
+  await expect(plusle).not.toHaveAttribute('aria-valuenow', '100')
+  await expect(page.getByTestId('doubles-animation-processing')).toHaveText('false')
+  const observedActors = await page.evaluate(() => (window as typeof window & { doublesObservedActors?: string[] }).doublesObservedActors)
+  expect(observedActors).toEqual(['player-0', 'player-1'])
+})
+
+test('item drawer matches singles and chooses the next actor immediately', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/ui-test/doubles')
+  await page.getByRole('button', { name: 'Items, 2 of 2 uses remaining' }).click()
+  await expect(page.getByText('Battle Items')).toBeVisible()
+  await expect(page.getByText('Healing')).toBeVisible()
+  await expect(page.getByText('Heal 20 HP')).toBeVisible()
+  await expect(page.getByText('×3')).toBeVisible()
+  await page.getByRole('button', { name: /Potion/ }).click()
+  await expect(page.getByTestId('submitted-doubles-actions')).toHaveText('[]')
+  await expect(page.getByTestId('selected-doubles-arrow')).toHaveCount(1)
+  await page.getByRole('button', { name: 'POWER' }).click()
+  await expect(page.getByTestId('submitted-doubles-actions')).toContainText('"itemId":"battle-potion"')
 })
