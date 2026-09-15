@@ -20,6 +20,7 @@ import { getMove } from '@/data/moves'
 import { DYNAMAX_UNLOCK_TURNS } from '@/data/powers'
 import { cn } from '@/lib/utils'
 import { getPokemonMoveUsesRemaining } from '@/utilities/battle/move-uses'
+import { getBattleMoveTriggerItemId } from '@/utilities/battle/move-presentation'
 import {
   POKEMON_POWER_OPTIONS,
   type PokemonPowerId,
@@ -255,8 +256,7 @@ export function PowerSelector() {
   const maxMovesPerBattle =
     battleState.config?.movesPerBattle ?? movesUsesRemaining
   const canUseMove = movesUsesRemaining > 0
-  const primaryType = activePlayerMon.types?.[0]?.toLowerCase() || 'normal'
-  const moveTriggerItemId = `tm-${primaryType}`
+  const moveTriggerItemId = getBattleMoveTriggerItemId(activePlayerMon.types)
   const selectedPower = powersData?.selectedPokemonPower as
     | PokemonPowerId
     | null
