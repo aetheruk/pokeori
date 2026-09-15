@@ -6,12 +6,12 @@ import React, {
   type Dispatch,
   type SetStateAction,
 } from 'react'
-import type { BattleState, BattleStance } from '@/utilities/battle/types'
+import type { BattleInventoryItem, BattleState, BattleStance } from '@/utilities/battle/types'
 import type { BattlePowersData } from '../powers/powers-data'
 import type { MoveContinuousConfig, MoveStance } from '@/data/moves/types'
-import type { DoublesAction } from '@/utilities/battle/doubles-state'
+import type { DoublesAction, DoublesDraft, DoublesTarget } from '@/utilities/battle/doubles-state'
 
-export type DoublesDraft = Partial<Record<0 | 1, DoublesAction>>
+export type { DoublesDraft } from '@/utilities/battle/doubles-state'
 
 interface BattleMoveOption {
   id: string
@@ -34,8 +34,13 @@ export interface BattleContextType {
   setSelectedDoublesSlot: (slot: 0 | 1) => void
   doublesDraft: DoublesDraft
   setDoublesDraft: Dispatch<SetStateAction<DoublesDraft>>
+  battleInventoryItems?: BattleInventoryItem[]
+  selectedDoublesTarget: DoublesTarget
+  setSelectedDoublesTarget: (target: DoublesTarget) => void
+  handleDoublesChooseAction: (action: DoublesAction) => void
   isAnimating: boolean
   isWaitingForServer: boolean
+  isWaitingForOpponent: boolean
   pendingBattleAction: {
     kind: string
     label: string

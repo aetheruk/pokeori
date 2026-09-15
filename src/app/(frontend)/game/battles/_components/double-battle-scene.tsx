@@ -1,11 +1,7 @@
 import { MdCatchingPokemon } from 'react-icons/md'
 import { ArrowDown } from 'lucide-react'
-import { getMove } from '@/data/moves'
 import type { BattlePokemon, BattleState } from '@/utilities/battle/types'
-import type {
-  DoublesAction,
-  DoublesTarget,
-} from '@/utilities/battle/doubles-state'
+import type { DoublesTarget } from '@/utilities/battle/doubles-state'
 import type {
   AnimationState,
   DoublesPokemonAnimation,
@@ -24,33 +20,21 @@ type Slot = 0 | 1
 
 function eligibleSpriteTargets(
   state: BattleState,
-  action?: DoublesAction,
+  selectedSlot: Slot,
 ): DoublesTarget[] {
-  if (!action || (action.kind !== 'basic' && action.kind !== 'move')) return []
-  const move = action.kind === 'move' ? getMove(action.moveId) : undefined
-  const pattern =
-    action.kind === 'basic'
-      ? 'opponent'
-      : (move?.doublesTarget ?? (move?.target === 'self' ? 'self' : 'opponent'))
-  if (['self', 'both-opponents', 'both-allies', 'all-active'].includes(pattern))
-    return []
   const opponents = ([0, 1] as const)
     .filter((slot) => {
       const mon = getDoublesPokemon(state, 'enemy', slot)
       return mon && mon.currentHp > 0 && !isDoublesCommanderInactive(mon)
     })
     .map((slot): DoublesTarget => ({ side: 'opponent', slot }))
-  const partnerSlot = action.slot === 0 ? 1 : 0
+  const partnerSlot = selectedSlot === 0 ? 1 : 0
   const partner = getDoublesPokemon(state, 'player', partnerSlot)
   const allies: DoublesTarget[] =
     partner && partner.currentHp > 0 && !isDoublesCommanderInactive(partner)
       ? [{ side: 'ally', slot: partnerSlot }]
       : []
-  return pattern === 'ally'
-    ? allies
-    : pattern === 'any-single'
-      ? [...opponents, ...allies]
-      : opponents
+  return [...opponents, ...allies]
 }
 
 function LaneHealth({
@@ -213,7 +197,7 @@ export function DoubleBattleScene({
   anim,
   isWaitingForOpponent,
   selectedSlot = 0,
-  selectedAction,
+  selectedTarget,
   onChooseTarget,
   disableTargetSelection = false,
 }: {
@@ -221,11 +205,11 @@ export function DoubleBattleScene({
   anim?: AnimationState
   isWaitingForOpponent: boolean
   selectedSlot?: Slot
-  selectedAction?: DoublesAction
+  selectedTarget?: DoublesTarget
   onChooseTarget?: (target: DoublesTarget) => void
   disableTargetSelection?: boolean
 }) {
-  const targetOptions = eligibleSpriteTargets(state, selectedAction)
+  const targetOptions = eligibleSpriteTargets(state, selectedSlot)
   const targetProps = (side: Side, slot: Slot) => {
     const target: DoublesTarget = {
       side: side === 'enemy' ? 'opponent' : 'ally',
@@ -235,10 +219,11 @@ export function DoubleBattleScene({
       (candidate) => candidate.side === target.side && candidate.slot === slot,
     )
     const isTargetSelected =
+      !disableTargetSelection &&
+      !isWaitingForOpponent &&
       isTargetable &&
-      (selectedAction?.kind === 'basic' || selectedAction?.kind === 'move') &&
-      selectedAction.target?.side === target.side &&
-      selectedAction.target.slot === slot
+      selectedTarget?.side === target.side &&
+      selectedTarget.slot === slot
     return {
       isTargetable,
       isTargetSelected,
@@ -313,7 +298,7 @@ export function DoubleBattleScene({
           effect={lane('player', 0).effect}
           side="player"
           slot={0}
-          isSelected={selectedSlot === 0}
+          isSelected={!disableTargetSelection && !isWaitingForOpponent && selectedSlot === 0}
           {...targetProps('player', 0)}
         />
         <LaneSprite
@@ -321,7 +306,7 @@ export function DoubleBattleScene({
           effect={lane('player', 1).effect}
           side="player"
           slot={1}
-          isSelected={selectedSlot === 1}
+          isSelected={!disableTargetSelection && !isWaitingForOpponent && selectedSlot === 1}
           {...targetProps('player', 1)}
         />
       </div>
