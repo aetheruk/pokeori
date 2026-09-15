@@ -498,6 +498,9 @@ export type MoveUseEffect = {
 export type MoveTerrainEffect = {
   terrain: TerrainType
 }
+export type MoveWeatherEffect = {
+  weather: WeatherType
+}
 export type MoveCurseEffect = {
   ghostType: PokemonTypeName
   ghostHpFraction: number
@@ -589,6 +592,7 @@ export interface MoveConfig {
   moveLockEffect?: MoveLockEffect
   moveUseEffect?: MoveUseEffect
   terrainEffect?: MoveTerrainEffect
+  weatherEffect?: MoveWeatherEffect
   curseEffect?: MoveCurseEffect
   statusCure?: MoveStatusCure
   statusTransfer?: MoveStatusTransfer

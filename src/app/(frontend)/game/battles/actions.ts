@@ -272,10 +272,9 @@ export async function useVictoryPower(itemId: string, clientActionId?: string) {
 
 export async function useWeatherPower(
   battleId: string,
-  weather: string,
   clientActionId?: string,
 ) {
-  return useWeather(battleId, weather, clientActionId)
+  return useWeather(battleId, clientActionId)
 }
 
 export async function useShout(clientActionId?: string) {

@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
 import { format } from 'prettier'
-import ts from 'typescript'
+import ts from 'typescript6'
 import { allPokemon } from '@/data/pokemon'
 import type { MoveConfig } from '@/data/moves/types'
 
@@ -28,6 +28,7 @@ const MOVE_TYPE_BY_FILE = {
   dark: { filename: 'dark.ts', variableName: 'DARK_TM_MOVES' },
   steel: { filename: 'steel.ts', variableName: 'STEEL_TM_MOVES' },
   fairy: { filename: 'fairy.ts', variableName: 'FAIRY_TM_MOVES' },
+  weather: { filename: 'weather.ts', variableName: 'WEATHER_TM_MOVES' },
 } as const
 
 type MoveTypeFile = keyof typeof MOVE_TYPE_BY_FILE

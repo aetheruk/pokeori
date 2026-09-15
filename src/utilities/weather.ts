@@ -29,7 +29,7 @@ export interface WeatherSnapshot {
   updatedAt?: string
   expiresAt?: string
   subCategory?: string
-  source?: 'region' | 'power' | 'ability' | 'rarity'
+  source?: 'region' | 'move' | 'power' | 'ability' | 'rarity'
   originalWeather?: WeatherType
   overriddenAtTurn?: number
   overriddenBy?: string

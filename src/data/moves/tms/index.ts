@@ -17,6 +17,7 @@ import { DRAGON_TM_MOVES } from './dragon'
 import { DARK_TM_MOVES } from './dark'
 import { STEEL_TM_MOVES } from './steel'
 import { FAIRY_TM_MOVES } from './fairy'
+import { WEATHER_TM_MOVES } from './weather'
 
 export * from './normal'
 export * from './fire'
@@ -36,6 +37,7 @@ export * from './dragon'
 export * from './dark'
 export * from './steel'
 export * from './fairy'
+export * from './weather'
 
 export const TM_MOVES_BY_TYPE: Record<string, MoveConfig[]> = {
   normal: NORMAL_TM_MOVES,
@@ -56,6 +58,7 @@ export const TM_MOVES_BY_TYPE: Record<string, MoveConfig[]> = {
   dark: DARK_TM_MOVES,
   steel: STEEL_TM_MOVES,
   fairy: FAIRY_TM_MOVES,
+  weather: WEATHER_TM_MOVES,
 }
 
 export const ALL_TM_MOVES: MoveConfig[] = Object.values(TM_MOVES_BY_TYPE).flat()

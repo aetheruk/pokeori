@@ -61,8 +61,8 @@ export const POKEMON_POWER_OPTIONS: Record<PokemonPowerId, PokemonPowerOption> =
     },
     weather: {
       id: 'weather',
-      name: 'Weather Control',
-      description: 'Overwrite the active battle weather with an unlocked weather.',
+      name: 'Weather Power',
+      description: 'Perform a technique based on the current battle weather.',
       itemId: POWER_KEY_ITEMS.weather,
     },
     shout: {
@@ -140,8 +140,7 @@ export function getAvailablePokemonPowerOptions(params: {
 
   if (
     hasTrainerLevel('weather') &&
-    hasItem(POWER_KEY_ITEMS.weather) &&
-    items.some((item) => item.id.startsWith('weather-core-') && hasItem(item.id))
+    hasItem(POWER_KEY_ITEMS.weather)
   ) {
     options.push(POKEMON_POWER_OPTIONS.weather)
   }

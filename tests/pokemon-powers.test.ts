@@ -47,6 +47,16 @@ describe('pokemon power assignment helpers', () => {
     expect(options.map((option) => option.id)).toEqual(['weather'])
   })
 
+  test('returns Weather Control with only the Weather Orb', () => {
+    const options = getAvailablePokemonPowerOptions({
+      pokemonFormId: '351',
+      inventory: { 'weather-orb': 1 },
+      trainerLevel: 65,
+    })
+
+    expect(options.map((option) => option.id)).toEqual(['weather'])
+  })
+
   test('rejects using a power that is not selected', () => {
     expect(
       validateSelectedPokemonPower({
