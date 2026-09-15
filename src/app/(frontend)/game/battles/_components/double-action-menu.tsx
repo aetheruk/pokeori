@@ -32,7 +32,6 @@ import { useBattleContext } from './battle-context'
 import { StanceSelector } from './stance-selector'
 
 type Slot = 0 | 1
-type Draft = Partial<Record<Slot, DoublesAction>>
 type Panel = 'moves' | 'items' | 'switch' | 'powers' | null
 
 const typeIdMap: Record<string, number> = {
@@ -90,95 +89,6 @@ function moveTarget(
   return fallback
 }
 
-function TargetPicker({
-  action,
-  onChange,
-  enemy,
-  ally,
-  disabled,
-}: {
-  action: DoublesAction
-  onChange: (target: DoublesTarget) => void
-  enemy: [BattlePokemon | undefined, BattlePokemon | undefined]
-  ally?: BattlePokemon
-  disabled: boolean
-}) {
-  if (action.kind !== 'basic' && action.kind !== 'move') return null
-  const move = action.kind === 'move' ? getMove(action.moveId) : undefined
-  const pattern =
-    move?.doublesTarget ?? (move?.target === 'self' ? 'self' : 'opponent')
-  if (
-    ['self', 'both-opponents', 'both-allies', 'all-active'].includes(pattern)
-  ) {
-    return (
-      <p className="text-xs text-game-muted">
-        {pattern === 'self'
-          ? 'Targets itself'
-          : pattern === 'both-opponents'
-            ? 'Hits both opponents'
-            : pattern === 'both-allies'
-              ? 'Affects both allies'
-              : 'Hits every other active Pokemon'}
-      </p>
-    )
-  }
-  const opponents = enemy
-    .map((mon, slot) =>
-      mon?.currentHp && !isDoublesCommanderInactive(mon)
-        ? { side: 'opponent' as const, slot: slot as Slot, label: mon.name }
-        : null,
-    )
-    .filter(
-      (value): value is { side: 'opponent'; slot: Slot; label: string } =>
-        !!value,
-    )
-  const allies =
-    ally?.currentHp && !isDoublesCommanderInactive(ally)
-      ? [
-          {
-            side: 'ally' as const,
-            slot: (action.slot === 0 ? 1 : 0) as Slot,
-            label: ally.name,
-          },
-        ]
-      : []
-  const candidates =
-    pattern === 'ally'
-      ? allies
-      : pattern === 'any-single'
-        ? [...opponents, ...allies]
-        : opponents
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="text-xs font-semibold text-game-muted">Target</span>
-      {candidates.map((candidate) => (
-        <Button
-          key={`${candidate.side}:${candidate.slot}`}
-          type="button"
-          size="sm"
-          variant="outline"
-          className={cn(
-            'h-10 rounded-lg border-game-border bg-game-surface-raised px-3 text-xs',
-            action.target?.side === candidate.side &&
-              action.target?.slot === candidate.slot &&
-              'border-game-moss bg-game-moss/15 text-game-moss-strong hover:border-game-moss hover:bg-game-moss/15 hover:text-game-moss-strong',
-          )}
-          disabled={disabled}
-          aria-pressed={
-            action.target?.side === candidate.side &&
-            action.target?.slot === candidate.slot
-          }
-          onClick={() =>
-            onChange({ side: candidate.side, slot: candidate.slot })
-          }
-        >
-          {candidate.label}
-        </Button>
-      ))}
-    </div>
-  )
-}
-
 function actionLabel(action: DoublesAction | undefined, team: BattlePokemon[]) {
   if (!action) return 'Choose an action'
   if (action.kind === 'basic')
@@ -207,8 +117,9 @@ export function DoubleActionMenu() {
     handleDoublesReplace,
     selectedDoublesSlot: selectedSlot,
     setSelectedDoublesSlot: setSelectedSlot,
+    doublesDraft: draft,
+    setDoublesDraft: setDraft,
   } = useBattleContext()
-  const [draft, setDraft] = useState<Draft>({})
   const [typeBySlot, setTypeBySlot] = useState<Partial<Record<Slot, string>>>(
     {},
   )
@@ -234,7 +145,7 @@ export function DoubleActionMenu() {
     getDoublesPokemon(battleState, 'enemy', 0),
     getDoublesPokemon(battleState, 'enemy', 1),
   ]
-  const ally = getDoublesPokemon(
+  const partner = getDoublesPokemon(
     battleState,
     'player',
     selectedSlot === 0 ? 1 : 0,
@@ -254,7 +165,12 @@ export function DoubleActionMenu() {
     .map((id) => getMove(id))
     .filter(
       (move): move is NonNullable<typeof move> =>
-        !!move && !move.charged && !move.recharge && !move.continuous,
+        !!move &&
+        !move.charged &&
+        !move.recharge &&
+        !move.continuous &&
+        (move.doublesTarget !== 'ally' ||
+          !!(partner?.currentHp && !isDoublesCommanderInactive(partner))),
     )
   const complete = useMemo(
     () => active.every((slot) => !!draft[slot]),
@@ -486,20 +402,12 @@ export function DoubleActionMenu() {
                   disabled={disabled}
                 />
 
-                {action && (
+                {action && action.kind !== 'basic' && (
                   <div className="mt-2">
                     <p className="mb-1 text-xs font-semibold text-game-moss-strong">
                       {actionLabel(action, battleState.playerTeam)}
                     </p>
-                    {action.kind === 'basic' || action.kind === 'move' ? (
-                      <TargetPicker
-                        action={action}
-                        enemy={enemies}
-                        ally={ally}
-                        disabled={disabled}
-                        onChange={(target) => choose({ ...action, target })}
-                      />
-                    ) : action.kind === 'item' ? (
+                    {action.kind === 'item' ? (
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-xs font-semibold text-game-muted">
                           Item target

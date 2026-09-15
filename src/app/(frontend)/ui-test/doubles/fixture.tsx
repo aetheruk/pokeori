@@ -11,6 +11,10 @@ import { BattleScene } from '@/app/(frontend)/game/battles/_components/battle-sc
 import { BattleSurrenderButton } from '@/app/(frontend)/game/battles/_components/battle-surrender-button'
 import { INITIAL_ANIMATION_STATE } from '@/utilities/battle/engine/types'
 import type { BattlePokemon, BattleState } from '@/utilities/battle/types'
+import type {
+  DoublesAction,
+  DoublesTarget,
+} from '@/utilities/battle/doubles-state'
 
 function pokemon(
   id: string,
@@ -57,7 +61,7 @@ const initialState: BattleState = {
       'player',
       74,
       ['normal'],
-      ['giga-drain', 'sketch', 'heat-wave'],
+      ['giga-drain', 'sketch', 'heat-wave', 'helping-hand'],
     ),
     pokemon(
       'skeledirge',
@@ -104,6 +108,17 @@ const initialState: BattleState = {
 
 export function DoubleBattleUiFixture() {
   const [selectedDoublesSlot, setSelectedDoublesSlot] = useState<0 | 1>(0)
+  const [doublesDraft, setDoublesDraft] = useState<
+    Partial<Record<0 | 1, DoublesAction>>
+  >({})
+  const chooseTarget = (target: DoublesTarget) => {
+    setDoublesDraft((current) => {
+      const action = current[selectedDoublesSlot]
+      if (!action || (action.kind !== 'basic' && action.kind !== 'move'))
+        return current
+      return { ...current, [selectedDoublesSlot]: { ...action, target } }
+    })
+  }
   const context = {
     battleState: initialState,
     activePlayerMon: initialState.playerTeam[0],
@@ -112,6 +127,8 @@ export function DoubleBattleUiFixture() {
     setSelectedType: () => {},
     selectedDoublesSlot,
     setSelectedDoublesSlot,
+    doublesDraft,
+    setDoublesDraft,
     isAnimating: false,
     isWaitingForServer: false,
     pendingBattleAction: null,
@@ -122,17 +139,22 @@ export function DoubleBattleUiFixture() {
 
   return (
     <BattleProvider value={context}>
-      <div className="game-night h-dvh bg-game-night-canvas text-game-night-ink">
+      <div className="h-dvh bg-game-canvas text-game-ink">
         <div className="game-desktop-activity-stage game-activity-chrome relative flex h-full flex-col overflow-hidden xl:my-4 xl:h-[calc(100%-2rem)] xl:grid xl:grid-cols-[minmax(0,1fr)_19rem] xl:grid-rows-[minmax(26rem,1fr)_auto]">
           <BattleScene
             battleState={initialState}
             anim={INITIAL_ANIMATION_STATE}
             selectedDoublesSlot={selectedDoublesSlot}
+            selectedDoublesAction={doublesDraft[selectedDoublesSlot]}
+            onChooseDoublesTarget={chooseTarget}
           />
           <div className="xl:col-start-1 xl:row-start-2">
             <BattleActionMenu />
           </div>
-          <div className="relative min-h-0 flex-[24] border-t border-game-border bg-game-surface-raised xl:col-start-2 xl:row-start-1 xl:row-span-2 xl:border-l xl:border-t-0">
+          <div
+            data-testid="battle-log-panel"
+            className="relative min-h-0 flex-[24] border-t border-game-border bg-game-surface-raised xl:col-start-2 xl:row-start-1 xl:row-span-2 xl:border-l xl:border-t-0"
+          >
             <div className="h-full overflow-hidden">
               <BattleLog logs={initialState.history} />
             </div>

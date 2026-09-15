@@ -189,6 +189,21 @@ describe('double battles',()=>{
     expect(html.match(/translate-x-12 -translate-y-12/g)).toHaveLength(1)
     expect(html.match(/selected-doubles-arrow/g)).toHaveLength(1)
   })
+  test('single-target commands expose only living eligible sprites with a red target arrow',()=>{
+    const battle=state()
+    const html=renderToStaticMarkup(createElement(DoubleBattleScene,{
+      state:battle,isWaitingForOpponent:false,selectedAction:hit(0,1),onChooseTarget:()=>{},
+    }))
+    expect(html).toContain('aria-label="Target E0"')
+    expect(html).toContain('aria-label="Target E1"')
+    expect(html.match(/selected-doubles-target-arrow/g)).toHaveLength(1)
+    battle.enemyTeam[1].currentHp=0
+    const faintedHtml=renderToStaticMarkup(createElement(DoubleBattleScene,{
+      state:battle,isWaitingForOpponent:false,selectedAction:hit(0,1),onChooseTarget:()=>{},
+    }))
+    expect(faintedHtml).not.toContain('aria-label="Target E1"')
+    expect(faintedHtml).not.toContain('selected-doubles-target-arrow')
+  })
   test('Hospitality heals an active partner on entry; Commander occupies its own lane until Dondozo faints',()=>{
     const battle=state()
     battle.playerTeam[0].ability='hospitality'

@@ -19,7 +19,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useAudio } from '@/context/AudioContext'
 import type { BattleStance, BattleState } from '@/utilities/battle/types'
-import type { DoublesAction } from '@/utilities/battle/doubles-state'
+import type { DoublesAction, DoublesTarget } from '@/utilities/battle/doubles-state'
 import {
   clearBattleState,
   getBattlePanelData,
@@ -162,6 +162,8 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
   )
   const [selectedType, setSelectedType] = useState<string | null>(null)
   const [selectedDoublesSlot, setSelectedDoublesSlot] = useState<0 | 1>(0)
+  const [doublesDraft, setDoublesDraft] =
+    useState<BattleContextType['doublesDraft']>({})
   const [hasPowerKeyItems, setHasPowerKeyItems] = useState(false)
   const [currentResearchBreakthrough, setCurrentResearchBreakthrough] =
     useState<any | null>(null)
@@ -705,6 +707,18 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
     ),[wrapAction],
   )
 
+  const handleChooseDoublesTarget = useCallback(
+    (target: DoublesTarget) => {
+      setDoublesDraft((current) => {
+        const action = current[selectedDoublesSlot]
+        if (!action || (action.kind !== 'basic' && action.kind !== 'move'))
+          return current
+        return { ...current, [selectedDoublesSlot]: { ...action, target } }
+      })
+    },
+    [selectedDoublesSlot],
+  )
+
   const playerHasTeraEffect = !!activePlayerMon?.teraTypeOverride
   const choosingLead = needsPlayerLeadSelection(battleState)
 
@@ -717,6 +731,8 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
       setSelectedType,
       selectedDoublesSlot,
       setSelectedDoublesSlot,
+      doublesDraft,
+      setDoublesDraft,
       isAnimating: isProcessing,
       isWaitingForServer,
       pendingBattleAction,
@@ -748,6 +764,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
       activeEnemyMon,
       selectedType,
       selectedDoublesSlot,
+      doublesDraft,
       isProcessing,
       isWaitingForServer,
       pendingBattleAction,
@@ -795,6 +812,14 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
           battleState={battleState}
           anim={anim}
           selectedDoublesSlot={selectedDoublesSlot}
+          selectedDoublesAction={doublesDraft[selectedDoublesSlot]}
+          onChooseDoublesTarget={handleChooseDoublesTarget}
+          disableDoublesTargetSelection={
+            isProcessing ||
+            isWaitingForServer ||
+            battleState.status !== 'ongoing' ||
+            !!battleState.pendingPlayerReplacementSlots?.length
+          }
           isWaitingForOpponent={isWaitingForOpponent}
           hidePlayer={choosingLead}
           playerHasTeraEffect={contextValue.playerHasTeraEffect}
