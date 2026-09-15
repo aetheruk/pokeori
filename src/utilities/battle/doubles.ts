@@ -454,7 +454,7 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
         else {state.activeEnemyIndex=index;state.activePlayerIndex=targetIndex}
         try {
           if(move) messages.push(...applyBattleAbilityOpposingMoveUseDepletion({state,attackerSide:side,attacker:actor,defender:target,move}))
-          const combat=resolvePvpCombat({state,attacker:actor,defender:target,move:queued,attackerName:side==='player'?state.playerName:state.enemyName,attackerSide:side,playerMove:side==='player'?queued:{stance:targetDefensiveStance},enemyMove:side==='enemy'?queued:{stance:targetDefensiveStance},currentTurn:state.turn,random,weather:state.weather?.weather,eligibility,doublesAccuracyMultiplier:getDoublesAccuracyMultiplier(state,side,currentSlot),doublesDamageModifier:(damage,type,attackStance)=>damage*getDoublesDamageMultiplier(state,side,currentSlot,t.side,t.slot,attackStance,type)})
+          const combat=resolvePvpCombat({state,attacker:actor,defender:target,move:queued,attackerName:side==='player'?state.playerName:state.enemyName,attackerSide:side,playerMove:side==='player'?queued:{stance:targetDefensiveStance},enemyMove:side==='enemy'?queued:{stance:targetDefensiveStance},currentTurn:state.turn,random,weather:state.weather?.weather,eligibility,targetName:target.name,doublesAccuracyMultiplier:getDoublesAccuracyMultiplier(state,side,currentSlot),doublesDamageModifier:(damage,type,attackStance)=>damage*getDoublesDamageMultiplier(state,side,currentSlot,t.side,t.slot,attackStance,type)})
           if (move?.id === SKETCH_MOVE_ID && !sketchOpponent) {
             sketchOpponent = target
             sketchSucceeded = combat.didAttack && !!combat.usedType

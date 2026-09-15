@@ -534,6 +534,8 @@ export function resolvePvpCombat(params: {
   skipped?: boolean
   currentTurn?: number
   random?: () => number
+  /** Include the resolved target in the action text for multi-lane battles. */
+  targetName?: string
   weather?: WeatherType
   eligibility?: PvpActionEligibility
   primaryHealingApplied?: number
@@ -1572,7 +1574,8 @@ export function resolvePvpCombat(params: {
   const effectivenessMessage = formatTypeEffectivenessMessage(damageResult)
   if (isZMove) consumeZMoveCharge(attacker)
   const finalDamage = moveMissed ? 0 : totalDamage
-  const baseMessage = `${metronomeMessage}${attackerName}: ${attacker.name} uses ${attackLabel}! [icon:stance:${moveStance}] [icon:type:${damageResult.usedType}]`
+  const targetSuffix = params.targetName ? ` on ${params.targetName}` : ''
+  const baseMessage = `${metronomeMessage}${attackerName}: ${attacker.name} uses ${attackLabel}${targetSuffix}! [icon:stance:${moveStance}] [icon:type:${damageResult.usedType}]`
   return {
     didAttack: !moveFailed,
     dmg: finalDamage,

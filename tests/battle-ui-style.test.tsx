@@ -296,4 +296,40 @@ describe('battle move and status presentation', () => {
     expect(markup.indexOf('Turn 1 - A')).toBeLessThan(markup.indexOf('Turn 1 - B'))
     expect(markup.match(/STANCE (?:WIN|TIE)/g)).toHaveLength(2)
   })
+
+  test('renders doubles action targets without changing the singles action vocabulary', () => {
+    const markup = renderToStaticMarkup(
+      <BattleLog
+        logs={[
+          {
+            turn: 1,
+            phase: 'A',
+            playerStance: 'power',
+            enemyStance: 'tech',
+            result: 'win',
+            damageDealt: 20,
+            damageTaken: 0,
+            message:
+              'Player: Smeargle uses Heat Wave on Pikachu! [icon:stance:tech] [icon:type:fire]',
+          },
+          {
+            turn: 1,
+            phase: 'B',
+            playerStance: 'power',
+            enemyStance: 'tech',
+            result: 'win',
+            damageDealt: 20,
+            damageTaken: 0,
+            message:
+              'Player: Skeldirge uses Power Attack on Eevee! [icon:stance:power] [icon:type:fire]',
+          },
+        ]}
+      />,
+    )
+
+    expect(markup).toContain('Heat Wave')
+    expect(markup).toContain('on Pikachu')
+    expect(markup).toContain('attacks with')
+    expect(markup).toContain('against Eevee')
+  })
 })
