@@ -87,7 +87,12 @@ const normalizeState = (state: BattleState): BattleState => {
 
 const isSameLogEntry = (a?: BattleLogEntry, b?: BattleLogEntry) => {
   if (!a || !b) return false
-  return a.turn === b.turn && a.message === b.message
+  return a.turn === b.turn && a.phase === b.phase && a.message === b.message
+}
+
+const isSameLogSegment = (a?: BattleLogEntry, b?: BattleLogEntry) => {
+  if (!a || !b) return false
+  return a.turn === b.turn && a.phase === b.phase
 }
 
 const prependVisualLogEntry = (
@@ -107,17 +112,20 @@ const revealVisualLogMessage = (
   const trimmedMessage = message.trim()
   if (!entry || !trimmedMessage) return trimBattleHistory(history)
 
-  if (history[0]?.turn === entry.turn) {
-    const existingLines = history[0].message.split('\n')
+  const existingIndex = history.findIndex((candidate) =>
+    isSameLogSegment(candidate, entry),
+  )
+  if (existingIndex >= 0) {
+    const existingEntry = history[existingIndex]
+    const existingLines = existingEntry.message.split('\n')
     if (existingLines.includes(trimmedMessage))
       return trimBattleHistory(history)
-    return trimBattleHistory([
-      {
-        ...entry,
-        message: [...existingLines, trimmedMessage].join('\n'),
-      },
-      ...history.slice(1),
-    ])
+    const nextHistory = [...history]
+    nextHistory[existingIndex] = {
+      ...entry,
+      message: [...existingLines, trimmedMessage].join('\n'),
+    }
+    return trimBattleHistory(nextHistory)
   }
 
   return prependBattleHistory(history, {
@@ -857,6 +865,10 @@ export function useBattleManager(initialState: BattleState) {
                 const finalState = seq.newState as BattleState
                 const presentationTargetState = cloneState(finalState)
                 const playedSimultaneousGroups = new Set<string>()
+                const presentationLogEntries = finalState.history.filter(
+                  (entry) => entry.turn === seq.presentation?.turn,
+                )
+                let activePresentationPhase: BattleLogEntry['phase']
 
                 const setDoubles = (updates: DoublesAnimationUpdate[]) => {
                   if (finalState.format === 'double' && updates.length > 0) {
@@ -866,11 +878,16 @@ export function useBattleManager(initialState: BattleState) {
 
                 const revealMessage = (message: string) => {
                   if (!message.trim()) return
+                  const phaseLogEntry = activePresentationPhase
+                    ? presentationLogEntries.find(
+                        (entry) => entry.phase === activePresentationPhase,
+                      )
+                    : undefined
                   setVisualState((prev) => {
                     const next = cloneState(prev)
                     next.history = revealVisualLogMessage(
                       next.history,
-                      logEntry,
+                      phaseLogEntry ?? logEntry,
                       message,
                     )
                     return next
@@ -879,6 +896,7 @@ export function useBattleManager(initialState: BattleState) {
 
                 for (const presentationEvent of presentationEvents || []) {
                   if (shouldStop()) break
+                  activePresentationPhase = presentationEvent.phase
 
                   if (presentationEvent.type === 'message') {
                     revealMessage(presentationEvent.message)

@@ -262,4 +262,38 @@ describe('battle move and status presentation', () => {
     expect(secondTurnThreeAction).toBeLessThan(turnFour)
     expect(turnFour).toBeLessThan(turnFive)
   })
+
+  test('renders doubles exchanges as separate A and B turn sections', () => {
+    const markup = renderToStaticMarkup(
+      <BattleLog
+        logs={[
+          {
+            turn: 1,
+            phase: 'B',
+            playerStance: 'power',
+            enemyStance: 'tech',
+            result: 'win',
+            damageDealt: 20,
+            damageTaken: 0,
+            message: 'Player: Partner uses Attack. [icon:stance:power]',
+          },
+          {
+            turn: 1,
+            phase: 'A',
+            playerStance: 'speed',
+            enemyStance: 'speed',
+            result: 'tie',
+            damageDealt: 0,
+            damageTaken: 0,
+            message: 'Player: Lead uses Attack. [icon:stance:speed]',
+          },
+        ]}
+      />,
+    )
+
+    expect(markup).toContain('Turn 1 - A')
+    expect(markup).toContain('Turn 1 - B')
+    expect(markup.indexOf('Turn 1 - A')).toBeLessThan(markup.indexOf('Turn 1 - B'))
+    expect(markup.match(/STANCE (?:WIN|TIE)/g)).toHaveLength(2)
+  })
 })

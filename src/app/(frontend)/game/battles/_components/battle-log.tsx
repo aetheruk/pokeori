@@ -693,29 +693,50 @@ export function BattleLog({ logs }: BattleLogProps) {
     setShowAllTurns(false)
   }, [logs.length])
 
-  // Group logs by turn for better readability and deduplicate
+  // Group logs by ordered turn phase for better readability and deduplicate.
+  // Doubles stores the two single-style exchanges as Turn N - A/B entries;
+  // singles continue to use the phase-less Turn N heading.
   const groupedLogs = useMemo(() => {
-    const groups: Record<number, BattleLogEntry[]> = {}
+    const groups = new Map<
+      string,
+      { key: string; turn: number; phase: BattleLogEntry['phase']; logs: BattleLogEntry[] }
+    >()
     const seenMessages = new Set<string>()
 
     // Battle history is stored newest-first. Preserve that order while
     // deduplicating so the newest version of an overlapping entry wins.
     logs.forEach((log) => {
-      // Create a unique key for deduplication (Turn + Message)
-      const key = `${log.turn}-${log.message}`
+      // Create a unique key for deduplication (Turn + Phase + Message)
+      const key = `${log.turn}-${log.phase ?? 'single'}-${log.message}`
       if (seenMessages.has(key)) return
       seenMessages.add(key)
 
-      if (!groups[log.turn]) groups[log.turn] = []
-      groups[log.turn].push(log)
+      const groupKey = `${log.turn}-${log.phase ?? 'single'}`
+      const group = groups.get(groupKey) ?? {
+        key: groupKey,
+        turn: log.turn,
+        phase: log.phase,
+        logs: [],
+      }
+      group.logs.push(log)
+      groups.set(groupKey, group)
     })
 
-    return Object.entries(groups)
-      .sort(([a], [b]) => Number(a) - Number(b))
-      .map(
-        ([turn, turnLogs]) =>
-          [turn, [...turnLogs].reverse()] as [string, BattleLogEntry[]],
+    return [...groups.values()]
+      .sort(
+        (a, b) =>
+          a.turn - b.turn ||
+          (a.phase === b.phase
+            ? 0
+            : a.phase === undefined
+              ? -1
+              : b.phase === undefined
+                ? 1
+                : a.phase === 'A'
+                  ? -1
+                  : 1),
       )
+      .map((group) => ({ ...group, logs: [...group.logs].reverse() }))
   }, [logs])
 
   const DEFAULT_VISIBLE_TURNS = 4
@@ -755,20 +776,20 @@ export function BattleLog({ logs }: BattleLogProps) {
           </button>
         )}
 
-        {visibleGroups.map(([turn, turnLogs]) => (
-          <div key={turn} className="space-y-3">
+        {visibleGroups.map((group) => (
+          <div key={group.key} className="space-y-3">
             {/* Turn Header */}
             <div className="flex items-center gap-2">
               <div className="h-px flex-1 bg-game-border" />
               <span className="text-[11px] font-medium uppercase tracking-wide text-game-muted">
-                Turn {turn}
+                Turn {group.turn}{group.phase ? ` - ${group.phase}` : ''}
               </span>
               <div className="h-px flex-1 bg-game-border" />
             </div>
 
             {/* Turn Actions */}
             <div className="space-y-2">
-              {turnLogs.map((log, i) => {
+              {group.logs.map((log, i) => {
                 const parsedLog = parseBattleMessage(log.message || '', log)
                 const hasStanceOutcome = parsedLog.actions.some(
                   (action) => !!action.stance,
