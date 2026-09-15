@@ -143,7 +143,10 @@ function LaneSprite({
         </span>
       )}
       <div
-        className="absolute bottom-2 h-5 w-16 rounded-[50%] border border-white/5 bg-black/30 blur-[2px] sm:w-24"
+        data-testid={`doubles-ground-shadow-${side}-${slot}`}
+        className={`absolute h-5 w-20 rounded-[50%] border border-white/5 bg-black/30 blur-[2px] sm:h-6 sm:w-28 ${
+          isPlayer ? 'bottom-3 sm:bottom-4' : 'bottom-5 sm:bottom-7'
+        }`}
         aria-hidden
       />
       <PokemonDisplay
