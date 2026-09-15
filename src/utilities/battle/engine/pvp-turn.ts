@@ -91,6 +91,7 @@ import {
   recordStatLoweredThisTurn,
   recordSwitchingOutThisTurn,
   resolveDamageRuleDamage,
+  resolveDynamicMoveType,
 } from '@/utilities/battle/move-effects'
 import {
   applyBattleAbilityAfterKoStatStages,
@@ -228,6 +229,42 @@ export interface PvpQueuedMoveForPowerUse {
   powers?: PvpQueuedMovePowerFlags
 }
 
+/**
+ * Resolve the type for a queued action from the authored move first.
+ *
+ * Basic attacks carry their selected type in the queue. Authored moves must
+ * instead use their own type (including dynamic types); otherwise a queued
+ * Pokémon type can make a move such as Heat Wave render and calculate as
+ * Normal.
+ */
+export function resolvePvpMoveAttackType(params: {
+  move: PvpQueuedMoveForPowerUse
+  attacker: BattlePokemon
+  defender?: BattlePokemon
+  weather?: WeatherType
+  specialMove?: MoveConfig
+}): string | undefined {
+  const specialMove =
+    params.specialMove ??
+    (params.move.specialMoveId ? getMove(params.move.specialMoveId) : undefined)
+
+  if (!specialMove) return params.move.attackType
+  if (specialMove.id === 'hidden-power') {
+    return resolveHiddenPower(params.attacker).attackType
+  }
+
+  return resolveDynamicMoveType({
+    move: specialMove,
+    attacker: params.attacker,
+    defender: params.defender,
+    weather: params.weather,
+    fallbackType:
+      specialMove.forcedType && specialMove.forcedType !== 'random'
+        ? specialMove.forcedType
+        : 'normal',
+  })
+}
+
 export interface PvpSwapResolution {
   swapped: boolean
   name: string
@@ -264,14 +301,15 @@ export function preparePvpCombatAction(params: {
   const specialMove = params.move.specialMoveId
     ? getMove(params.move.specialMoveId)
     : undefined
-  const hiddenPower =
-    specialMove?.id === 'hidden-power'
-      ? resolveHiddenPower(params.attacker)
-      : undefined
   const beforeMoveStatus = resolveBeforeMoveStatus(params.attacker)
   const beforeMoveAbility = beforeMoveStatus.canMove
     ? resolveBattleAbilityBeforeMove(params.attacker, params.currentTurn)
     : { canMove: true, message: '' }
+  const resolvedMoveType = resolvePvpMoveAttackType({
+    move: params.move,
+    attacker: params.attacker,
+    specialMove,
+  })
   const beforeMoveSecondaryStatus =
     beforeMoveStatus.canMove && beforeMoveAbility.canMove
       ? processBeforeMoveSecondaryStatuses({
@@ -279,10 +317,7 @@ export function preparePvpCombatAction(params: {
           pokemon: params.attacker,
           side: params.attackerSide,
           move: specialMove,
-          attackType:
-            hiddenPower?.attackType ||
-            params.move.attackType ||
-            specialMove?.forcedType,
+          attackType: resolvedMoveType,
           random: params.random,
         })
       : { canMove: true, message: '' }
@@ -535,6 +570,13 @@ export function resolvePvpCombat(params: {
     specialMove?.id === 'hidden-power'
       ? resolveHiddenPower(attacker)
       : undefined
+  const resolvedMoveType = resolvePvpMoveAttackType({
+    move,
+    attacker,
+    defender,
+    weather,
+    specialMove,
+  })
   const prepared =
     eligibility ??
     preparePvpCombatAction({
@@ -568,8 +610,7 @@ export function resolvePvpCombat(params: {
     move: specialMove,
     attacker,
     defender,
-    attackType:
-      hiddenPower?.attackType || move.attackType || specialMove?.forcedType,
+    attackType: resolvedMoveType,
     terrain: state?.terrain?.terrain,
     random: chanceRandom,
   })
@@ -713,7 +754,7 @@ export function resolvePvpCombat(params: {
   )
   const beforeAttackTypeMessages = applyBattleAbilityBeforeAttackTypeChange({
     pokemon: attacker,
-    attackType: hiddenPower?.attackType || move.attackType,
+    attackType: resolvedMoveType,
     damage: moveFailed
       ? 0
       : multiplier *
@@ -733,9 +774,7 @@ export function resolvePvpCombat(params: {
           isNotVeryEffective: false,
           isImmune: false,
           usedType:
-            hiddenPower?.attackType ||
-            move.attackType ||
-            specialMove?.forcedType ||
+            resolvedMoveType ||
             attacker.types?.[0] ||
             'normal',
           isCrit: false,
@@ -751,7 +790,7 @@ export function resolvePvpCombat(params: {
           multiplier *
             recoilMoveDamageMultiplier *
             addedEffectMoveDamageMultiplier,
-          hiddenPower?.attackType || move.attackType,
+          resolvedMoveType,
           movePower,
           typeEffectivenessOverride,
           specialMove?.critChance,
