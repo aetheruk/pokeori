@@ -53,6 +53,8 @@ type ParsedBattleAction = {
   actor: string
   pokemon: string
   move: string
+  target?: string
+  targetPreposition?: 'on' | 'against'
   stance?: string
   type?: string
   damage?: number
@@ -293,7 +295,16 @@ function parseAttackLine(line: string): ParsedBattleAction | null {
   if (!match) return null
 
   const [, actor, pokemon, rawMove, remainder = ''] = match
-  const move = normalizeMoveLabel(rawMove)
+  const normalizedMove = normalizeMoveLabel(rawMove)
+  const targetMatch = normalizedMove.match(/^(.*)\s+(on|against)\s+(.+)$/i)
+  const move = targetMatch
+    ? targetMatch[1].trim()
+    : normalizedMove
+  const target = targetMatch?.[3].trim()
+  const targetPreposition = targetMatch?.[2].toLowerCase() as
+    | 'on'
+    | 'against'
+    | undefined
   const cleanedRemainder = stripAttackRemainder(remainder)
   const { critical, effectiveness, trailingText } =
     extractAttackLineTrailingMetadata(cleanedRemainder)
@@ -303,6 +314,8 @@ function parseAttackLine(line: string): ParsedBattleAction | null {
     actor: actor.trim(),
     pokemon: pokemon.trim(),
     move: move || 'Attack',
+    target,
+    targetPreposition,
     stance: getIconValue(line, 'stance'),
     type: getIconValue(line, 'type')?.toLowerCase(),
     damage: extractAttackDamage(line),
@@ -597,6 +610,11 @@ function BattleActionRow({ action }: { action: ParsedBattleAction }) {
         {!isGenericAttack && (
           <span className="font-semibold">{action.move}</span>
         )}
+        {!isGenericAttack && action.target && (
+          <span className="text-game-muted">
+            {action.targetPreposition ?? 'on'} {action.target}
+          </span>
+        )}
 
         {action.stance && (
           <span className="inline-flex items-center align-middle">
@@ -608,6 +626,9 @@ function BattleActionRow({ action }: { action: ParsedBattleAction }) {
           <span className="inline-flex items-center align-middle">
             <TypeIcon type={action.type} />
           </span>
+        )}
+        {isGenericAttack && action.target && (
+          <span className="text-game-muted">against {action.target}</span>
         )}
         {action.critical && (
           <span className="inline-flex items-center rounded-full border border-game-clay/35 bg-game-clay/10 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-game-clay-strong">

@@ -92,8 +92,8 @@ describe('double battles',()=>{
     const after=resolveDoublesTurn(before,[hit(0,0),hit(1,1)],enemy,()=>0.1)
     const turnLogs=after.history.filter((entry)=>entry.turn===1)
     expect(turnLogs.map((entry)=>entry.phase)).toEqual(['B','A'])
-    expect(turnLogs[1].message).toContain('P0 uses Power Attack')
-    expect(turnLogs[0].message).toContain('P1 uses Power Attack')
+    expect(turnLogs[1].message).toContain('P0 uses Power Attack on E0')
+    expect(turnLogs[0].message).toContain('P1 uses Power Attack on E1')
 
     const attacks=(after.presentation?.events ?? []).filter(
       (event): event is Extract<BattlePresentationEvent, {type:'attack'}> => event.type==='attack',
@@ -159,6 +159,7 @@ describe('double battles',()=>{
     if (heatWave?.type === 'attack') {
       expect(heatWave.attackType).toBe('fire')
       expect(heatWave.message).toContain('[icon:type:fire]')
+      expect(heatWave.message).toContain('on E0')
     }
   })
   test('stance matchup applies only to the opposing actor in a spread phase',()=>{
