@@ -66,7 +66,11 @@ import {
   setUserInventoryMap,
   setUserPokedexMap,
 } from '@/utilities/user-state'
-import { getActiveExpeditionForUser } from '@/utilities/expeditions/server'
+import {
+  getActiveExpeditionForUser,
+  getExpeditionActivityStepStatusForUser,
+} from '@/utilities/expeditions/server'
+import { isExpeditionActivity } from '@/utilities/expeditions/activity-catalog'
 import {
   ensureUserWeatherSlot,
   resolveSubRegionWeather,
@@ -93,6 +97,29 @@ export async function startBattle(
 
   const battleConfig = await getEffectiveContent('battle', battleId, user)
   if (!battleConfig) return { success: false, error: 'Battle not found' }
+
+  const payload = await getPayload({ config: configPromise })
+  const isExpeditionActivityContent =
+    (battleConfig as any).expeditionOnly === true ||
+    isExpeditionActivity('battle', battleConfig.id)
+  if (isExpeditionActivityContent) {
+    const expeditionStepStatus =
+      await getExpeditionActivityStepStatusForUser(
+        payload,
+        user.id,
+        'battle',
+        battleConfig.id,
+      )
+    if (expeditionStepStatus !== 'current') {
+      return {
+        success: false,
+        error:
+          expeditionStepStatus === 'stale'
+            ? 'This expedition battle is no longer the active step.'
+            : 'This battle is only available from its expedition.',
+      }
+    }
+  }
 
   // PVP Handling
   if (battleConfig.pvp) {
@@ -135,8 +162,6 @@ export async function startBattle(
     ...(battleConfig.requirements || []),
     ...(battleConfig.criteria || []),
   ]
-
-  const payload = await getPayload({ config: configPromise })
 
   // Handle Pokemon Consumption
   const pokemonCriteria = allReqsAndCriteria.filter(
@@ -279,6 +304,28 @@ export async function startBattleFromConfig(
   const playerTeamLoadLimit = battleConfig.isWildBattle ? 6 : maxPokemon
 
   const payload = await getPayload({ config: configPromise })
+  const isExpeditionActivityContent =
+    (battleConfig as any).expeditionOnly === true ||
+    isExpeditionActivity('battle', battleConfig.id)
+  if (isExpeditionActivityContent) {
+    const expeditionStepStatus =
+      await getExpeditionActivityStepStatusForUser(
+        payload,
+        user.id,
+        'battle',
+        battleConfig.id,
+      )
+    if (expeditionStepStatus !== 'current') {
+      return {
+        success: false,
+        error:
+          expeditionStepStatus === 'stale'
+            ? 'This expedition battle is no longer the active step.'
+            : 'This battle is only available from its expedition.',
+      }
+    }
+  }
+
   const weatherState = await ensureUserWeatherSlot(payload as any, user)
   const weatherSnapshot = {
     ...resolveSubRegionWeather(battleConfig.subCategory, weatherState.slot),

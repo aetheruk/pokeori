@@ -29,6 +29,10 @@ import {
   renumberSteps,
   resolveResultBranchAfterStep,
 } from '@/utilities/expeditions/path-builder'
+import {
+  getExpeditionActivityStepStatus,
+  type ExpeditionActivityStepStatus,
+} from '@/utilities/expeditions/step-status'
 import type { User } from '@/payload-types'
 import type { Reward } from '@/data/types'
 import { getEconomyActionErrorMessage, runEconomyAction } from '@/utilities/economy/transactions'
@@ -307,22 +311,42 @@ async function getActiveRunForUser(payload: any, userId: string): Promise<Expedi
   return runs.find((run) => run.status === 'active' || run.status === 'ready_to_claim') || null
 }
 
+export async function getExpeditionActivityStepStatusForUser(
+  payload: any,
+  userId: string,
+  activityType: ExpeditionActivityType,
+  activityId: string,
+): Promise<ExpeditionActivityStepStatus> {
+  const run = await getActiveRunForUser(payload, userId)
+  if (!run) return 'not-in-expedition'
+
+  return getExpeditionActivityStepStatus(
+    run.steps || [],
+    run.currentStepIndex,
+    activityType,
+    activityId,
+  )
+}
+
+export async function getExpeditionTaskStepStatusForUser(
+  payload: any,
+  userId: string,
+  taskId: string,
+): Promise<ExpeditionActivityStepStatus> {
+  return getExpeditionActivityStepStatusForUser(
+    payload,
+    userId,
+    'task',
+    taskId,
+  )
+}
+
 export async function isCurrentExpeditionTask(
   payload: any,
   userId: string,
   taskId: string,
 ): Promise<boolean> {
-  const run = await getActiveRunForUser(payload, userId)
-  if (!run || (run.status !== 'active' && run.status !== 'ready_to_claim')) {
-    return false
-  }
-
-  const completedStep = run.steps[run.currentStepIndex - 1]
-  const currentStep = run.steps[run.currentStepIndex]
-  return (
-    (completedStep?.activityType === 'task' && completedStep.activityId === taskId) ||
-    (currentStep?.activityType === 'task' && currentStep.activityId === taskId)
-  )
+  return (await getExpeditionTaskStepStatusForUser(payload, userId, taskId)) === 'current'
 }
 
 export async function grantExpeditionSafariBallsForTask(

@@ -22,10 +22,11 @@ import { analyzeRequirements } from '@/utilities/requirements/analysis'
 import {
   grantExpeditionLivesForTask,
   grantExpeditionSafariBallsForTask,
-  isCurrentExpeditionTask,
+  getExpeditionTaskStepStatusForUser,
   recordExpeditionActivityResult,
   type ExpeditionProgressSnapshot,
 } from '@/utilities/expeditions/server'
+import { isExpeditionTaskId } from '@/utilities/expeditions/activity-catalog'
 import { redis } from '@/utilities/redis'
 import { resolveTaskPokemonOrigin } from '@/utilities/pokemon/origin'
 import {
@@ -149,13 +150,21 @@ export async function completeTask(
     return { success: false, message: 'Solve this task’s password first' }
   }
 
-  if (
-    task.expeditionOnly &&
-    !(await isCurrentExpeditionTask(payload, user.id, taskId))
-  ) {
-    return {
-      success: false,
-      message: 'This task is only available in its expedition.',
+  const isExpeditionTask = task.expeditionOnly || isExpeditionTaskId(taskId)
+  if (isExpeditionTask) {
+    const expeditionTaskStatus = await getExpeditionTaskStepStatusForUser(
+      payload,
+      user.id,
+      taskId,
+    )
+    if (expeditionTaskStatus !== 'current') {
+      return {
+        success: false,
+        message:
+          expeditionTaskStatus === 'stale'
+            ? 'This expedition task is no longer the active step.'
+            : 'This task is only available in its expedition.',
+      }
     }
   }
 
