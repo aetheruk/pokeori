@@ -329,7 +329,9 @@ describe('battle move and status presentation', () => {
 
     expect(markup).toContain('Heat Wave')
     expect(markup).toContain('on Pikachu')
-    expect(markup).toContain('attacks with')
-    expect(markup).toContain('against Eevee')
+    expect(markup).toContain('attacks')
+    expect(markup).toContain('Eevee')
+    expect(markup).toContain('>with<')
+    expect(markup).not.toContain('against Eevee')
   })
 })
