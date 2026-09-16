@@ -473,7 +473,7 @@ export function UseItemDialog({
                             disabled={!!usingItem}
                           >
                             <div className="flex min-w-0 flex-1 items-center gap-3">
-                              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-canvas/70">
+                              <div className="game-icon-orb h-11 w-11 shrink-0">
                                 <ItemSprite
                                   itemId={item.itemId}
                                   alt={item.definition.name}

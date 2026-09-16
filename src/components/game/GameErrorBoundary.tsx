@@ -42,7 +42,7 @@ export class GameErrorBoundary extends Component<Props, State> {
           role="alert"
         >
           <div className="game-folio-section flex w-full max-w-md flex-col items-center gap-4 p-6">
-            <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-game-danger/25 bg-game-danger/10">
+          <div className="game-icon-orb h-14 w-14 border-game-danger/25 text-game-danger">
               <AlertTriangle
                 className="h-7 w-7 text-game-danger"
                 aria-hidden="true"

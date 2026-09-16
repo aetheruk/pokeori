@@ -175,7 +175,7 @@ export function RewardSummaryDisplay({
                   showMessage ? 'min-h-12' : 'h-12'
                 }`}
               >
-                <div className="w-8 h-8 rounded-lg bg-game-ochre/10 flex items-center justify-center flex-shrink-0">
+                <div className="game-icon-orb h-8 w-8 shrink-0 border-game-ochre/35 text-game-ochre">
                   {notice.icon ? (
                     <TaskIconDisplay icon={notice.icon} className="h-6 w-6" />
                   ) : (
@@ -264,7 +264,7 @@ export function RewardSummaryDisplay({
 
           {(summary.sketchedMoves || []).map((move, i) => (
             <Card key={`sketched-move-${i}`} className="h-12 flex-row items-center gap-3 border-game-ochre/40 bg-game-ochre/10 p-2">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-game-ochre/20 text-game-ochre">
+              <div className="game-icon-orb h-8 w-8 shrink-0 border-game-ochre/35 text-game-ochre">
                 <Image
                   src={getPokemonImageUrl('235', 'sprite')}
                   alt="Smeargle"
@@ -306,7 +306,7 @@ export function RewardSummaryDisplay({
               key={`banner-${i}`}
               className="p-2 bg-game-surface-raised border-game-border flex-row items-center gap-3 h-12"
             >
-              <div className="w-8 h-8 relative rounded-lg bg-game-canvas flex items-center justify-center flex-shrink-0 p-0.5">
+              <div className="game-icon-orb relative h-8 w-8 shrink-0 p-0.5">
                 <Image
                   src={BACKGROUND_REWARD_SPRITE}
                   alt="Background award"

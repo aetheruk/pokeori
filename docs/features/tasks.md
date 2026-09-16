@@ -42,7 +42,7 @@ The display text is context-aware: catch-location results are shown as catches, 
 results as defeated Pokemon, trainer battles as defeated trainers, and content prerequisites use
 the referenced task, battle, location, research, or expedition icon where one exists.
 Requirement cards show progress and completion in a fixed right-side status area: multi-count
-requirements use a filling circular counter, while completed requirements use a teal check mark.
+requirements use a filling circular counter, while completed requirements use a charcoal check mark.
 
 ## Rewards
 

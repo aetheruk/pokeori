@@ -67,8 +67,8 @@ export function AreaTabs({
                       className="object-cover"
                     />
                     {activeSubCategory === subCategory && (
-                      <div className="absolute top-2 right-2 bg-game-moss rounded-full p-1">
-                        <Check className="h-4 w-4 text-game-cream" />
+                      <div className="game-icon-orb absolute top-2 right-2 h-6 w-6 border-game-charcoal/60 text-game-charcoal-strong">
+                        <Check className="h-4 w-4" />
                       </div>
                     )}
                   </div>

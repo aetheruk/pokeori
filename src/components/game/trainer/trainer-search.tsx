@@ -92,8 +92,8 @@ export function TrainerSearch() {
             <div
               className={
                 error === 'No trainers found.'
-                  ? 'flex h-14 w-14 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised text-game-muted'
-                  : 'flex h-14 w-14 items-center justify-center rounded-lg border border-game-danger/25 bg-game-danger/10'
+                  ? 'game-icon-orb h-14 w-14 border-game-border text-game-muted'
+                  : 'game-icon-orb h-14 w-14 border-game-danger/25 text-game-danger'
               }
             >
               {error === 'No trainers found.' ? (

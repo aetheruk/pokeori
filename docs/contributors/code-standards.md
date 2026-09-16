@@ -16,7 +16,7 @@ Coding conventions for Pokeori.
 
 ## UI Buttons
 - Use `AppButton` from `src/components/ui/app-button.tsx` for new app UI buttons.
-- Button text should use the shared app style: bold, uppercase, italic text with the teal gradient default state.
+- Button text should use the shared app style: bold, uppercase, italic text with the clay default state. Do not introduce green, moss, or teal interface accents.
 - Use `variant="outline"`, `secondary`, `ghost`, or `destructive` only for clear semantic alternatives; avoid one-off button styling unless the control is icon-only or a specialised game input.
 
 ## Naming Conventions

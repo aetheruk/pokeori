@@ -9,20 +9,27 @@ interface SectionDividerProps {
 export function SectionDivider({
   children,
   className,
-  textColor = 'text-game-moss-strong',
+  textColor = 'text-game-ink',
 }: SectionDividerProps) {
+  if (!children) {
+    return (
+      <div className={cn('mb-3 flex min-h-5 min-w-0 flex-1 items-center', className)}>
+        <div className="h-px w-full bg-game-border" aria-hidden="true" />
+      </div>
+    )
+  }
+
   return (
-    <div className={cn('mb-3 flex min-h-5 items-center gap-2.5', className)}>
-      {children && (
-        <div
-          className={cn(
-            'flex min-w-0 items-center text-sm font-semibold uppercase tracking-[0.08em] before:mr-2 before:block before:size-1.5 before:shrink-0 before:rotate-45 before:rounded-[1px] before:bg-game-ochre',
-            textColor,
-          )}
-        >
-          {children}
-        </div>
-      )}
+    <div className={cn('mb-3 flex min-h-5 min-w-0 flex-1 items-center gap-3', className)}>
+      <div className="h-px min-w-5 flex-1 bg-game-border" aria-hidden="true" />
+      <div
+        className={cn(
+          'min-w-0 text-center text-sm font-semibold uppercase tracking-[0.08em]',
+          textColor,
+        )}
+      >
+        {children}
+      </div>
       <div className="h-px min-w-5 flex-1 bg-game-border" aria-hidden="true" />
     </div>
   )

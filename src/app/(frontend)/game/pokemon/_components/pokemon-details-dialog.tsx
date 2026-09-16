@@ -1533,7 +1533,7 @@ function MountedPokemonDetailsDialog({
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex min-w-0 items-center gap-3">
                         {currentHeldItem && (
-                          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-game-border bg-game-surface-raised">
+                          <div className="game-icon-orb h-10 w-10 flex-shrink-0">
                             <ItemSprite
                               itemId={currentHeldItem.id}
                               alt={currentHeldItem.name}

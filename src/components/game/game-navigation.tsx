@@ -104,7 +104,7 @@ export function GameNavigation() {
             href="/game"
             className="game-focus-ring relative flex items-center justify-center gap-3 overflow-hidden rounded-lg px-2 py-2 transition-colors hover:bg-game-surface lg:justify-start"
           >
-            <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-game-moss/30 bg-game-moss/10">
+            <div className="game-icon-orb relative h-8 w-8 shrink-0 overflow-hidden border-game-charcoal/30">
               {user ? (
                 <TaskIconDisplay
                   icon={
@@ -150,7 +150,7 @@ export function GameNavigation() {
               )}
             >
               {item.name === 'Trainer' && user ? (
-                <div className="flex h-6 w-6 items-center justify-center overflow-hidden rounded-full border border-game-moss/20 bg-game-moss/10">
+                <div className="game-icon-orb h-6 w-6 overflow-hidden border-game-charcoal/20">
                   <TaskIconDisplay
                     icon={
                       getIcon(user.icon || 'ditto')?.icon ||

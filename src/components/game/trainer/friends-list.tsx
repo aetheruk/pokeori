@@ -160,7 +160,7 @@ export function FriendsList() {
                         className="flex items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 transition-colors hover:bg-game-surface-raised"
                       >
                         <div>
-                          <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
+                          <div className="game-icon-orb h-12 w-12">
                             {iconData?.icon && (
                               <TaskIconDisplay
                                 icon={iconData.icon}
@@ -229,7 +229,7 @@ export function FriendsList() {
                   role="status"
                   aria-live="polite"
                 >
-                  <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
+                  <div className="game-icon-orb h-14 w-14">
                     <Users className="h-8 w-8 text-game-moss-strong" />
                   </div>
                   <p className="max-w-[200px]">

@@ -82,13 +82,6 @@ function ExploreCardComponent({
     }
     return getGameTypeLabel(modeItem)
   }
-  const getGroupedTypeLabel = () => {
-    if (item.type === 'vs-seeker') return 'TRAINER REMATCH'
-    if (!isGrouped) return getGameTypeLabel(item)
-    if (groupedItems.every((groupedItem) => groupedItem.type === 'game'))
-      return 'MINI GAME'
-    return 'LOCATION'
-  }
   const isInteractive = !isGrouped
   const selectItem = (targetItem: ExploreItem) => {
     playSelectSfx()
@@ -106,7 +99,7 @@ function ExploreCardComponent({
         isGrouped ? 'cursor-default' : 'cursor-pointer',
         isHighlighted
           ? 'border-game-ochre/45 bg-game-surface-raised'
-          : 'border-game-border bg-game-surface hover:border-game-moss/35 hover:bg-game-surface-raised',
+          : 'border-game-border bg-game-surface hover:border-game-charcoal/35 hover:bg-game-surface-raised',
         centered && 'justify-center',
       )}
       role={isInteractive ? 'button' : undefined}
@@ -128,21 +121,16 @@ function ExploreCardComponent({
         <div className="relative shrink-0">
           <div
             className={cn(
-              'relative z-10 flex h-14 w-14 items-center justify-center rounded-lg border transition-colors',
+              'game-icon-orb relative z-10 h-14 w-14 shrink-0 transition-colors',
               isHighlighted
-                ? 'border-game-ochre/45 bg-game-surface-raised'
-                : 'border-game-border bg-game-surface-raised group-hover:border-game-moss/35',
+                ? 'border-game-ochre/60 text-game-ochre'
+                : 'border-game-border text-game-ink group-hover:border-game-charcoal/45',
             )}
           >
-            <div className="">
-              <TaskIconDisplay
-                icon={displayIcon}
-                className={cn(
-                  'w-9 h-9',
-                  isHighlighted ? 'text-game-ochre' : 'text-game-ink',
-                )}
-              />
-            </div>
+            <TaskIconDisplay
+              icon={displayIcon}
+              className="h-9 w-9"
+            />
             {isLocationMastered && (
               <Star className="pointer-events-none absolute bottom-0 left-1/2 z-20 h-2 w-2 -translate-x-1/2 translate-y-1/2 fill-game-ochre text-game-ochre drop-shadow" />
             )}
@@ -157,24 +145,12 @@ function ExploreCardComponent({
           centered && 'items-center text-center',
         )}
       >
-        {!centered && (
-          <span
-            className={cn(
-              'mb-1 text-[11px] font-semibold uppercase tracking-wide transition-colors',
-              isHighlighted
-                ? 'text-game-ochre'
-                : 'text-game-moss-strong group-hover:text-game-moss',
-            )}
-          >
-            {getGroupedTypeLabel()}
-          </span>
-        )}
         <h3
           className={cn(
             'line-clamp-3 text-base font-semibold leading-tight transition-colors',
             isHighlighted
               ? 'text-game-ochre'
-              : 'text-game-ink group-hover:text-game-moss-strong',
+              : 'text-game-ink group-hover:text-game-charcoal-strong',
           )}
         >
           {parseText(displayName, trainerName)}
@@ -197,7 +173,7 @@ function ExploreCardComponent({
                   groupedItem.type === 'expedition' &&
                     activeExpedition?.expeditionId === groupedItem.id
                     ? 'border-game-ochre/60 text-game-ochre'
-                    : 'border-game-border text-game-muted hover:border-game-moss/60 hover:text-game-moss-strong',
+                    : 'border-game-border text-game-muted hover:border-game-charcoal/60 hover:text-game-charcoal-strong',
                 )}
                 onClick={(event) => {
                   event.stopPropagation()
@@ -286,7 +262,7 @@ function ExploreCardComponent({
           className={cn(
             isGrouped ? 'hidden' : 'ml-2 shrink-0 transition-colors',
             isHighlighted
-              ? 'text-game-moss-strong'
+              ? 'text-game-charcoal-strong'
               : 'text-game-muted group-hover:text-game-ink',
           )}
           title={item.type}

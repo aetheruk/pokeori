@@ -1281,7 +1281,7 @@ const InventoryItemCard = memo(function InventoryItemCard({
       className="game-focus-ring group relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-lg border border-game-border bg-game-surface p-3 transition-colors hover:border-game-moss/45 hover:bg-game-surface-raised"
     >
       <div className="relative shrink-0">
-        <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
+        <div className="game-icon-orb relative z-10 h-12 w-12">
           <ItemSprite
             itemId={item.itemId}
             alt={item.details.name}

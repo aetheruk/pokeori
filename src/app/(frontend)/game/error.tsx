@@ -16,7 +16,7 @@ export default function GameError({ error, reset }: GameErrorProps) {
       aria-live="assertive"
     >
       <section className="game-folio-section flex w-full max-w-lg flex-col items-center gap-5 p-6 text-center sm:p-8">
-        <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-game-danger/25 bg-game-danger/10">
+        <div className="game-icon-orb h-16 w-16 border-game-danger/25 text-game-danger">
           <AlertTriangle
             className="h-8 w-8 text-game-danger"
             aria-hidden="true"

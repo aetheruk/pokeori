@@ -286,7 +286,7 @@ function ExploreGridComponent({
       {eventsCard}
       {vsSeekerEvent && (
         <div>
-          <SectionDivider textColor="text-game-ochre">VS Seeker</SectionDivider>
+          <SectionDivider textColor="text-game-ochre">Tools</SectionDivider>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             <ExploreCard
               key={vsSeekerEvent.id}

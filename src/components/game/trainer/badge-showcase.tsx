@@ -163,10 +163,10 @@ export function BadgeShowcase() {
                         >
                           <div
                             className={cn(
-                              'relative flex h-14 w-14 items-center justify-center rounded-lg border transition-colors md:h-16 md:w-16',
+                              'relative flex h-14 w-14 items-center justify-center transition-transform md:h-16 md:w-16',
                               owned
-                                ? 'border-game-moss/35 bg-game-surface-raised group-hover/badge:border-game-moss'
-                                : 'border-game-border bg-game-canvas group-hover/badge:border-game-border-strong',
+                                ? 'group-hover/badge:scale-105'
+                                : 'opacity-45 grayscale group-hover/badge:opacity-65',
                             )}
                           >
                             <ItemSprite
@@ -178,17 +178,10 @@ export function BadgeShowcase() {
                                 'relative z-10 h-10 w-10 object-contain transition-opacity md:h-12 md:w-12',
                                 owned
                                   ? 'drop-shadow-sm'
-                                  : 'grayscale brightness-0 invert opacity-20',
+                                  : 'brightness-0 opacity-20',
                               )}
                             />
                           </div>
-
-                          <span
-                            className="mt-1.5 block max-w-16 truncate text-center text-[10px] font-semibold text-game-muted"
-                            title={badge.name}
-                          >
-                            {badge.name}
-                          </span>
                         </div>
                       )
                     })}

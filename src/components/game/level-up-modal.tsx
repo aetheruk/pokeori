@@ -134,7 +134,7 @@ export function LevelUpModal({
 
               {/* Icon Container with Orbital Glow */}
               <div className="relative mb-8 mt-4">
-                <div className="relative z-10 flex h-24 w-24 items-center justify-center rounded-lg border border-game-clay/40 bg-game-clay/10 md:h-28 md:w-28">
+                <div className="game-icon-orb relative z-10 h-24 w-24 border-game-clay/40 text-game-clay-strong md:h-28 md:w-28">
                   {skill?.iconId ? (
                     skill.iconId.match(/\.(?:avif|png|webp|jpe?g)$/) ? (
                       <Image
@@ -184,7 +184,7 @@ export function LevelUpModal({
                           key={`${unlock.source}:${unlock.level}:${unlock.label}:${unlock.itemId || ''}`}
                           className="flex min-h-16 items-center gap-3 rounded-lg border border-game-moss/35 bg-game-moss/10 px-3 py-2 text-game-ink"
                         >
-                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-game-border bg-game-surface">
+                          <div className="game-icon-orb h-11 w-11 shrink-0">
                             <SkillUnlockCategoryIcon unlock={unlock} />
                           </div>
                           <div className="min-w-0 flex-1">

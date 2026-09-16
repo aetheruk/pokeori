@@ -146,8 +146,10 @@ export function GameResult({
               <div className="relative mb-6">
                 <div
                   className={cn(
-                    'relative z-10 flex h-24 w-24 items-center justify-center rounded-lg border bg-game-surface md:h-28 md:w-28',
-                    success ? 'border-game-moss/50' : 'border-game-danger/45',
+                    'game-icon-orb relative z-10 h-24 w-24 md:h-28 md:w-28',
+                    success
+                      ? 'border-game-charcoal/50 text-game-charcoal-strong'
+                      : 'border-game-danger/45 text-game-danger',
                   )}
                 >
                   {/* If an icon is provided (string URL or ReactNode) render it inside, otherwise fall back to check/x */}

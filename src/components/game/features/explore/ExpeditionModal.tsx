@@ -477,7 +477,7 @@ function ExpeditionModalContent({
               <SectionDivider>Map Required</SectionDivider>
               <div className="group mt-4 flex items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 transition-colors hover:border-game-moss/35">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
+                  <div className="game-icon-orb h-9 w-9">
                     <ItemSprite
                       itemId={expedition.mapItemId}
                       alt="Map"
@@ -565,12 +565,12 @@ function ExpeditionModalContent({
 
                         <div
                           className={cn(
-                            'absolute left-0 top-2 flex h-11 w-11 items-center justify-center rounded-lg border bg-game-surface',
+                            'game-icon-orb absolute left-0 top-2 h-11 w-11',
                             isDone
-                              ? 'border-game-moss/70 bg-game-moss/10'
+                              ? 'border-game-charcoal/70 text-game-charcoal-strong'
                               : isCurrent
-                                ? 'border-game-ochre/70 bg-game-ochre/10'
-                                : 'border-game-border bg-game-surface-raised',
+                                ? 'border-game-ochre/70 text-game-ochre'
+                                : 'border-game-border text-game-muted',
                           )}
                         >
                           {shouldHideSecret ? (

@@ -23,7 +23,7 @@ export function DailyRefreshModal({ open, onOpenChange, onLetsGo }: DailyRefresh
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="border-game-border bg-game-surface text-game-ink sm:max-w-sm">
         <DialogHeader className="flex flex-col items-center justify-center space-y-3 pt-3">
-          <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-game-ochre/35 bg-game-ochre/10">
+          <div className="game-icon-orb h-14 w-14 border-game-ochre/35 text-game-ochre">
             <CalendarDays className="h-7 w-7 text-game-ochre" />
           </div>
           <DialogTitle className="text-center font-display text-xl font-black text-game-ink">
