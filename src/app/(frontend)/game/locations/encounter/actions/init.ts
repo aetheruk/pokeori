@@ -50,8 +50,10 @@ import { canApplyEncounterAbilityOverride } from '@/utilities/pokemon/encounter-
 import { getActiveChronicleContext } from '@/utilities/chronicles'
 import {
   getActiveExpeditionForUser,
+  getExpeditionActivityStepStatusForUser,
   setSafariBallsRemaining,
 } from '@/utilities/expeditions/server'
+import { isExpeditionActivity } from '@/utilities/expeditions/activity-catalog'
 import { rollPokemonGender } from '@/utilities/pokemon/gender'
 import { resolvePokemonRarity } from '@/utilities/pokemon/rarity-effects'
 import {
@@ -220,11 +222,29 @@ export async function startEncounter(
         : undefined
     const isSafariTestLocation =
       location.encounterMode === 'safari' && location.subCategory === 'Test'
+    const isExpeditionActivityContent =
+      (location as any).expeditionOnly === true ||
+      isExpeditionActivity('location', location.id)
+    const expeditionStepStatus = isExpeditionActivityContent
+      ? await getExpeditionActivityStepStatusForUser(
+          payload,
+          user.id,
+          'location',
+          location.id,
+        )
+      : 'not-in-expedition'
+    const isActiveExpeditionStep = expeditionStepStatus === 'current'
     const isActiveSafariStep =
       location.encounterMode === 'safari' &&
-      activeExpedition?.status === 'active' &&
-      activeExpeditionStep?.activityType === 'location' &&
-      activeExpeditionStep.activityId === location.id
+      isActiveExpeditionStep
+
+    if (isExpeditionActivityContent && !isActiveExpeditionStep) {
+      throw new Error(
+        expeditionStepStatus === 'stale'
+          ? 'This expedition activity is no longer active.'
+          : 'This activity is only available from an active expedition.',
+      )
+    }
 
     if (
       location.encounterMode === 'safari' &&

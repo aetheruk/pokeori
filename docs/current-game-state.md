@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased: Expedition activity entry and settlement are now bound to the server-owned current step for every activity authored in an expedition path or pool. Replaying a previous task with a new request identifier, or calling known expedition content outside a run, cannot grant its rewards or progress.
 - Release `0.36.9` refines the doubles stance log wording so generic actions read `Pokemon attacks Target with [stance]`, while special moves continue to read `Pokemon used Move on Target`.
 - Release `0.36.8` adds resolved targets to double-battle action logs. Special moves now read as `Pokemon used Move on Target`, generic stance attacks read as `Pokemon attacks with ... against Target`, and spread moves identify each affected Pokémon while singles retain their existing log wording.
 - Unreleased: Doubles now resolve as two ordered single-battle exchanges. The player can tap either active allied sprite to choose which Pokémon acts first; the submitted action arrays preserve that order, each phase resolves against the opposing side's same-ranked action, and a KO in the first phase prevents that lane from taking its later phase action. Both actions already alive at the start of a phase retain the singles simultaneous-resolution behavior.

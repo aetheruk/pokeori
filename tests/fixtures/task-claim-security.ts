@@ -38,6 +38,7 @@ mock.module('@/utilities/requirements/analysis', () => ({ analyzeRequirements: (
 mock.module('@/utilities/expeditions/server', () => ({
   grantExpeditionLivesForTask: async () => 0,
   grantExpeditionSafariBallsForTask: async () => 0,
+  getExpeditionTaskStepStatusForUser: async () => 'not-in-expedition',
   isCurrentExpeditionTask: async () => true,
   recordExpeditionActivityResult: async () => ({}),
 }))

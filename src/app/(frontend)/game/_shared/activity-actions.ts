@@ -28,11 +28,15 @@ import {
   setIdempotentResult,
   type ActionLock,
 } from '@/utilities/game-integrity'
-import { recordExpeditionActivityResult } from '@/utilities/expeditions/server'
+import {
+  getExpeditionActivityStepStatusForUser,
+  recordExpeditionActivityResult,
+  type ExpeditionProgressSnapshot,
+} from '@/utilities/expeditions/server'
+import { isExpeditionActivity } from '@/utilities/expeditions/activity-catalog'
 import { createEconomyRequestId, getEconomyActionResult, runEconomyAction } from '@/utilities/economy/transactions'
 import { isDailyExcludedGameType } from '@/utilities/tasks/daily-activity'
 import { recordDailyActivityProgress } from '@/utilities/tasks/daily-progress'
-import type { ExpeditionProgressSnapshot } from '@/utilities/expeditions/server'
 import { isActivityEligibleForReplay } from '@/utilities/activity-replay'
 import {
   getAchievedUnclaimedMilestones,
@@ -595,6 +599,28 @@ export async function startGameActivity(
         return {
           success: false,
           error: 'Activity belongs to a different game mode',
+        }
+      }
+
+      const isExpeditionActivityContent =
+        (encounter as any).expeditionOnly === true ||
+        isExpeditionActivity(domain, validatedEncounterId)
+      if (isExpeditionActivityContent) {
+        const expeditionStepStatus =
+          await getExpeditionActivityStepStatusForUser(
+            payload,
+            user.id,
+            domain,
+            validatedEncounterId,
+          )
+        if (expeditionStepStatus !== 'current') {
+          return {
+            success: false,
+            error:
+              expeditionStepStatus === 'stale'
+                ? 'This expedition activity is no longer the active step.'
+                : 'This activity is only available from its expedition.',
+          }
         }
       }
 
@@ -2222,6 +2248,29 @@ export async function completeGameActivity(
       if (state.encounterId !== validatedEncounterId) {
         return { success: false, error: 'Invalid encounter session' }
       }
+
+      const isExpeditionActivityContent =
+        (encounter as any).expeditionOnly === true ||
+        isExpeditionActivity(domain, validatedEncounterId)
+      if (isExpeditionActivityContent) {
+        const expeditionStepStatus =
+          await getExpeditionActivityStepStatusForUser(
+            payload,
+            user.id,
+            domain,
+            validatedEncounterId,
+          )
+        if (expeditionStepStatus !== 'current') {
+          return {
+            success: false,
+            error:
+              expeditionStepStatus === 'stale'
+                ? 'This expedition activity is no longer the active step.'
+                : 'This activity is only available from its expedition.',
+          }
+        }
+      }
+
       const rewardRequirementContext = {
         category: encounter.category,
         subCategory: encounter.subCategory,
