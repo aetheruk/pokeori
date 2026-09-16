@@ -233,7 +233,7 @@ export function VoyageSelectionModal({
           <div className="flex flex-col items-center justify-center py-10 gap-6 animate-in fade-in zoom-in duration-500">
             <div className="relative">
               <div className="absolute inset-0 rounded-full bg-game-moss/10 transition-opacity duration-1000" />
-              <div className="relative z-10 flex h-20 w-20 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
+              <div className="game-icon-orb relative z-10 h-20 w-20">
                 {isFinished ? (
                   <CheckCircle className="h-12 w-12 text-game-moss" />
                 ) : (

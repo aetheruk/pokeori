@@ -1766,7 +1766,7 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
                             : 'border-game-clay/25 text-game-muted',
                         )}
                       >
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-canvas">
+                        <div className="game-icon-orb h-9 w-9 shrink-0">
                           {requirement.icon}
                         </div>
                         <div className="min-w-0 flex-1">

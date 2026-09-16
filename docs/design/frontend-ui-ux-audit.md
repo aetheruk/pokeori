@@ -6,10 +6,10 @@ This document tracks the whole-application frontend redesign. It is a working QA
 
 Pokeori is a living expedition folio. Route artwork is the world outside the journal; management screens are annotated field records; focused gameplay is a contextual scene held inside readable field-journal chrome.
 
-- **Palette:** paper `#efe4cf`, cream `#fff8e8`, ink `#293532`, moss `#5f794f`, clay `#b86148`, ochre `#b58a43`.
+- **Palette:** paper `#efe4cf`, cream `#fff8e8`, ink/charcoal `#293532`, deep charcoal `#1d2522`, clay `#b86148`, ochre `#b58a43`. Green/moss/teal are not used in routine interface chrome.
 - **Type:** old-style serif for authored hierarchy, humanist sans for interface copy, monospace only for timers and quantities.
 - **Layout:** mobile remains touch-first; desktop uses a 224px journal rail, bounded workspaces, and contextual inspectors.
-- **Signature:** field marks encode real state—route stamps, specimen labels, map tabs, observation rules—not generic decoration.
+- **Signature:** field marks encode real state—route stamps, specimen labels, map tabs, observation rules—not generic decoration. Section headings use centered labels with rules on both sides, without a diamond marker.
 - **Restraint:** one memorable illustrated or structural moment per surface; routine rows remain quiet and fast to scan.
 
 ## Baseline findings
@@ -42,7 +42,8 @@ Pokeori is a living expedition folio. Route artwork is the world outside the jou
 ## Cross-application acceptance checks
 
 - No ordinary paper surface relies on white text, zinc-black cards, teal controls, or decorative glow.
-- Clay/destructive buttons use cream foregrounds; moss indicates selection/progress, not unrelated decoration.
+- Clay/destructive buttons use cream foregrounds; charcoal indicates selection/progress, not unrelated decoration.
+- Repeated icon holders use a centered, translucent glass orb rather than a solid rounded rectangle. Badge artwork is unframed and unlabeled in the collection grid.
 - Interactive targets are at least 40px, with primary mobile controls at least 44px.
 - Every icon-only control has an accessible name; selected navigation exposes `aria-current` or equivalent state.
 - Focus is visible, reduced motion is respected, and text inputs permit selection.

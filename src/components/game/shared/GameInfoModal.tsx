@@ -44,7 +44,7 @@ function GameInfoMetricCard({
       className="group flex h-[4.5rem] items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 transition-colors hover:border-game-moss/45"
       title={title || label}
     >
-      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised text-game-moss-strong [&>svg]:size-4">
+      <div className="game-icon-orb size-9 shrink-0 text-game-charcoal-strong [&>svg]:size-4">
         {icon}
       </div>
       <div className="flex min-w-0 flex-1 flex-col justify-center">
@@ -214,11 +214,11 @@ export function GameInfoModal({
               <div className="relative">
                 <div
                   className={cn(
-                    'group relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-game-border bg-game-surface-raised',
-                    isCaught && 'border-game-moss/60',
+                    'game-icon-orb group relative h-14 w-14 shrink-0 overflow-hidden border-game-border',
+                    isCaught && 'border-game-charcoal/60',
                   )}
                 >
-                  <div className="absolute inset-0 bg-game-moss/10 opacity-0 transition-opacity group-hover:opacity-100" />
+                  <div className="absolute inset-0 bg-game-charcoal/10 opacity-0 transition-opacity group-hover:opacity-100" />
                   <div className="scale-125">{icon}</div>
                 </div>
                 {isCaught && (

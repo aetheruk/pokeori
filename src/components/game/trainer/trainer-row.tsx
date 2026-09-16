@@ -25,7 +25,7 @@ export function TrainerRow({
   const content = (
     <>
       {prefix}
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
+      <span className="game-icon-orb h-11 w-11 shrink-0">
         {icon?.icon ? (
           <TaskIconDisplay icon={icon.icon} className="h-8 w-8" />
         ) : null}
@@ -34,7 +34,7 @@ export function TrainerRow({
         <span className="block truncate text-sm font-semibold text-game-ink">
           {trainer.trainerName}
         </span>
-        <span className="mt-0.5 block truncate text-xs text-game-moss-strong">
+        <span className="mt-0.5 block truncate text-xs text-game-charcoal-strong">
           {title?.name || 'Trainer'}
         </span>
       </span>
@@ -69,7 +69,7 @@ export function TrainerRow({
       aria-label={`View ${trainer.trainerName}'s trainer profile`}
       onClick={onSelect}
       className={cn(
-        'game-focus-ring flex min-h-16 w-full items-center gap-3 rounded-lg border border-game-border bg-game-surface px-3 py-2 text-left transition-colors hover:border-game-moss/40 hover:bg-game-surface-raised',
+        'game-focus-ring flex min-h-16 w-full items-center gap-3 rounded-lg border border-game-border bg-game-surface px-3 py-2 text-left transition-colors hover:border-game-charcoal/40 hover:bg-game-surface-raised',
         className,
       )}
     >

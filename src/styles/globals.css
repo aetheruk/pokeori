@@ -47,6 +47,9 @@
   --color-game-border-strong: var(--game-border-strong);
   --color-game-ink: var(--game-ink);
   --color-game-muted: var(--game-muted);
+  --color-game-charcoal: var(--game-charcoal);
+  --color-game-charcoal-strong: var(--game-charcoal-strong);
+  /* Legacy aliases kept while authored surfaces finish migrating. */
   --color-game-moss: var(--game-moss);
   --color-game-moss-strong: var(--game-moss-strong);
   --color-game-clay: var(--game-clay);
@@ -60,7 +63,7 @@
   --color-game-night-border: var(--game-night-border);
   --color-game-night-ink: var(--game-night-ink);
   --color-game-night-muted: var(--game-night-muted);
-  /* Fixed light foreground for controls on moss, clay, and danger fills. */
+  /* Fixed light foreground for controls on charcoal, clay, and danger fills. */
   --color-game-cream: #f7ecd6;
   --font-display: var(--font-sans);
   --font-sans: 'Nunito Sans', 'Avenir Next', Avenir, 'Segoe UI', ui-sans-serif, system-ui, sans-serif;
@@ -91,9 +94,11 @@
   --game-border: rgb(103 88 62 / 0.2);
   --game-border-strong: rgb(103 88 62 / 0.34);
   --game-ink: #293532;
-  --game-muted: #667269;
-  --game-moss: #5f794f;
-  --game-moss-strong: #405d3d;
+  --game-muted: #6b6f6d;
+  --game-charcoal: #293532;
+  --game-charcoal-strong: #1d2522;
+  --game-moss: var(--game-charcoal);
+  --game-moss-strong: var(--game-charcoal-strong);
   --game-clay: #b86148;
   --game-clay-strong: #974837;
   --game-stance-blue: #5d83ae;
@@ -104,26 +109,26 @@
   --game-night-surface: #22353d;
   --game-night-border: rgb(247 236 214 / 0.16);
   --game-night-ink: #f7ecd6;
-  --game-night-muted: #b2b6a8;
-  --game-accent: var(--game-moss);
+  --game-night-muted: #b8bbb5;
+  --game-accent: var(--game-charcoal);
   --background: #efe4cf;
   --foreground: #293532;
   --card: #f7efdf;
   --card-foreground: #293532;
   --popover: #fff8e8;
   --popover-foreground: #293532;
-  --primary: #5f794f;
+  --primary: var(--game-charcoal);
   --primary-foreground: #fff8e8;
   --secondary: #e4d7bd;
   --secondary-foreground: #293532;
   --muted: #e8dcc5;
-  --muted-foreground: #667269;
+  --muted-foreground: #6b6f6d;
   --accent: #e4d7bd;
   --accent-foreground: #293532;
   --destructive: #a9473c;
   --border: rgb(103 88 62 / 0.2);
   --input: rgb(103 88 62 / 0.26);
-  --ring: #5f794f;
+  --ring: var(--game-charcoal);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -131,12 +136,12 @@
   --chart-5: oklch(0.769 0.188 70.08);
   --sidebar: #e6d8bd;
   --sidebar-foreground: #293532;
-  --sidebar-primary: #5f794f;
+  --sidebar-primary: var(--game-charcoal);
   --sidebar-primary-foreground: #fff8e8;
   --sidebar-accent: #d7c8a9;
   --sidebar-accent-foreground: #293532;
   --sidebar-border: rgb(103 88 62 / 0.2);
-  --sidebar-ring: #5f794f;
+  --sidebar-ring: var(--game-charcoal);
 }
 
 @layer components {
@@ -153,6 +158,21 @@
     border-radius: 0.75rem;
     color: var(--game-ink);
     box-shadow: 0 12px 32px rgb(75 62 39 / 0.14);
+  }
+
+  /* Shared icon treatment for player-facing rows, cards, and drawer headers. */
+  .game-icon-orb {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid color-mix(in srgb, var(--game-ink) 22%, transparent);
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--game-surface-raised) 30%, transparent);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.34),
+      inset 0 -8px 16px rgb(24 35 39 / 0.06),
+      0 5px 16px rgb(24 35 39 / 0.08);
+    backdrop-filter: blur(10px);
   }
 
   .game-page-scroll {
@@ -244,20 +264,22 @@
     --game-border-strong: rgb(247 236 214 / 0.28);
     --game-ink: var(--game-night-ink);
     --game-muted: var(--game-night-muted);
-    --game-moss: #91a96b;
-    --game-moss-strong: #b8c894;
+    --game-charcoal: #4b5350;
+    --game-charcoal-strong: #d0d5ce;
+    --game-moss: var(--game-charcoal);
+    --game-moss-strong: var(--game-charcoal-strong);
     --game-clay: #d78467;
     --game-stance-blue: #8eb9e2;
     --game-stance-blue-strong: #b9d8f1;
     --game-ochre: #d3ad63;
-    --game-accent: #91a96b;
+    --game-accent: var(--game-charcoal);
     --background: var(--game-night-canvas);
     --foreground: var(--game-night-ink);
     --card: var(--game-night-surface);
     --card-foreground: var(--game-night-ink);
     --popover: #2b4248;
     --popover-foreground: var(--game-night-ink);
-    --primary: #91a96b;
+    --primary: var(--game-charcoal);
     --primary-foreground: #172733;
     --secondary: #30474b;
     --secondary-foreground: var(--game-night-ink);
@@ -267,7 +289,7 @@
     --accent-foreground: var(--game-night-ink);
     --border: var(--game-night-border);
     --input: rgb(247 236 214 / 0.22);
-    --ring: #91a96b;
+    --ring: var(--game-charcoal);
     background: var(--game-canvas);
     color: var(--game-ink);
   }
@@ -282,33 +304,35 @@
     --game-border: rgb(103 88 62 / 0.2);
     --game-border-strong: rgb(103 88 62 / 0.34);
     --game-ink: #293532;
-    --game-muted: #667269;
-    --game-moss: #5f794f;
-    --game-moss-strong: #405d3d;
+    --game-muted: #6b6f6d;
+    --game-charcoal: #293532;
+    --game-charcoal-strong: #1d2522;
+    --game-moss: var(--game-charcoal);
+    --game-moss-strong: var(--game-charcoal-strong);
     --game-clay: #b86148;
     --game-clay-strong: #974837;
     --game-stance-blue: #5d83ae;
     --game-stance-blue-strong: #345f8d;
     --game-ochre: #b58a43;
     --game-danger: #9a4337;
-    --game-accent: #5f794f;
+    --game-accent: var(--game-charcoal);
     --background: #efe4cf;
     --foreground: #293532;
     --card: #f7efdf;
     --card-foreground: #293532;
     --popover: #fff8e8;
     --popover-foreground: #293532;
-    --primary: #5f794f;
+    --primary: var(--game-charcoal);
     --primary-foreground: #fff8e8;
     --secondary: #e4d7bd;
     --secondary-foreground: #293532;
     --muted: #e8dcc5;
-    --muted-foreground: #667269;
+    --muted-foreground: #6b6f6d;
     --accent: #e4d7bd;
     --accent-foreground: #293532;
     --border: rgb(103 88 62 / 0.2);
     --input: rgb(103 88 62 / 0.26);
-    --ring: #5f794f;
+    --ring: var(--game-charcoal);
     background: var(--game-canvas);
     color: var(--game-ink);
   }
@@ -341,13 +365,15 @@
     --game-border-strong: rgb(247 236 214 / 0.28);
     --game-ink: var(--game-night-ink);
     --game-muted: var(--game-night-muted);
-    --game-moss: #91a96b;
-    --game-moss-strong: #b8c894;
+    --game-charcoal: #4b5350;
+    --game-charcoal-strong: #d0d5ce;
+    --game-moss: var(--game-charcoal);
+    --game-moss-strong: var(--game-charcoal-strong);
     --game-clay: #d78467;
     --game-stance-blue: #8eb9e2;
     --game-stance-blue-strong: #b9d8f1;
     --game-ochre: #d3ad63;
-    --game-accent: #91a96b;
+    --game-accent: var(--game-charcoal);
     --game-paper-background: var(--game-night-canvas);
     --background: var(--game-night-canvas);
     --foreground: var(--game-night-ink);
@@ -355,7 +381,7 @@
     --card-foreground: var(--game-night-ink);
     --popover: #2b4248;
     --popover-foreground: var(--game-night-ink);
-    --primary: #91a96b;
+    --primary: var(--game-charcoal);
     --primary-foreground: #172733;
     --secondary: #30474b;
     --secondary-foreground: var(--game-night-ink);
@@ -365,7 +391,7 @@
     --accent-foreground: var(--game-night-ink);
     --border: var(--game-night-border);
     --input: rgb(247 236 214 / 0.22);
-    --ring: #91a96b;
+    --ring: var(--game-charcoal);
     background: var(--game-canvas);
     color: var(--game-ink);
   }
@@ -380,13 +406,15 @@
     --game-border-strong: rgb(247 236 214 / 0.28);
     --game-ink: var(--game-night-ink);
     --game-muted: var(--game-night-muted);
-    --game-moss: #91a96b;
-    --game-moss-strong: #b8c894;
+    --game-charcoal: #4b5350;
+    --game-charcoal-strong: #d0d5ce;
+    --game-moss: var(--game-charcoal);
+    --game-moss-strong: var(--game-charcoal-strong);
     --game-clay: #d78467;
     --game-stance-blue: #8eb9e2;
     --game-stance-blue-strong: #b9d8f1;
     --game-ochre: #d3ad63;
-    --game-accent: #91a96b;
+    --game-accent: var(--game-charcoal);
     --game-paper-background: var(--game-night-canvas);
     background-color: var(--game-night-canvas) !important;
     color: var(--game-ink);
@@ -761,18 +789,18 @@
   --card-foreground: #293532;
   --popover: #fff8e8;
   --popover-foreground: #293532;
-  --primary: #5f794f;
+  --primary: var(--game-charcoal);
   --primary-foreground: #fff8e8;
   --secondary: #e4d7bd;
   --secondary-foreground: #293532;
   --muted: #e8dcc5;
-  --muted-foreground: #667269;
+  --muted-foreground: #6b6f6d;
   --accent: #e4d7bd;
   --accent-foreground: #293532;
   --destructive: #a9473c;
   --border: rgb(103 88 62 / 0.2);
   --input: rgb(103 88 62 / 0.26);
-  --ring: #5f794f;
+  --ring: var(--game-charcoal);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -780,12 +808,12 @@
   --chart-5: oklch(0.645 0.246 16.439);
   --sidebar: #e6d8bd;
   --sidebar-foreground: #293532;
-  --sidebar-primary: #5f794f;
+  --sidebar-primary: var(--game-charcoal);
   --sidebar-primary-foreground: #fff8e8;
   --sidebar-accent: #d7c8a9;
   --sidebar-accent-foreground: #293532;
   --sidebar-border: rgb(103 88 62 / 0.2);
-  --sidebar-ring: #5f794f;
+  --sidebar-ring: var(--game-charcoal);
 }
 
 @layer base {
@@ -2683,12 +2711,12 @@
     --game-border: rgb(103 88 62 / 0.2);
     --game-border-strong: rgb(103 88 62 / 0.34);
     --game-ink: #293532;
-    --game-muted: #667269;
+    --game-muted: #6b6f6d;
     --game-night-canvas: #efe4cf;
     --game-night-surface: #f7efdf;
     --game-night-border: rgb(103 88 62 / 0.2);
     --game-night-ink: #293532;
-    --game-night-muted: #667269;
+    --game-night-muted: #6b6f6d;
     background: var(--game-canvas);
     color: var(--game-ink);
   }

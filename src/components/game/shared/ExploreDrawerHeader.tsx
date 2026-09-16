@@ -71,7 +71,7 @@ export function ExploreDrawerHeader({
         <div className="relative">
           <div
             className={cn(
-              'relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-lg border border-game-border/60 bg-game-surface-raised/90 backdrop-blur-sm',
+              'game-icon-orb relative h-16 w-16 overflow-hidden border-game-border/60',
               iconClassName,
             )}
           >

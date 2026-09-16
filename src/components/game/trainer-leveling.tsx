@@ -165,7 +165,7 @@ const SkillUnlockList = memo(function SkillUnlockList({
                     : 'border-game-border bg-game-surface text-game-muted',
                 )}
               >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-game-border bg-game-surface-raised">
+                <div className="game-icon-orb h-11 w-11 shrink-0">
                   <SkillUnlockIcon unlock={unlock} />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -244,7 +244,7 @@ const SkillGuideTable = memo(function SkillGuideTable({
                     key={`${unlock.source}:${unlock.level}:${unlock.label}:${unlock.itemId || ''}`}
                     className="flex min-w-0 items-start gap-3 rounded-xl border border-game-border bg-game-surface-raised px-3 py-2"
                   >
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface">
+                    <div className="game-icon-orb h-9 w-9 shrink-0">
                       <SkillUnlockIcon unlock={unlock} />
                     </div>
                     <div className="min-w-0 flex-1">
@@ -489,16 +489,14 @@ export function TrainerLeveling({ saveCustomization = updateUserCustomization }:
             href="/game/inventory"
             className="game-focus-ring group flex min-h-16 w-full items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 text-left transition-colors hover:border-game-moss/35 hover:bg-game-surface-raised"
           >
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-game-moss/30 bg-game-moss/10 text-game-moss-strong">
-              <Image
-                src="/fallback/skills/inventory-v2.png"
-                alt=""
-                width={56}
-                height={56}
-                className="h-12 w-12 object-contain"
-                aria-hidden="true"
-              />
-            </div>
+            <Image
+              src="/fallback/skills/inventory-v2.png"
+              alt=""
+              width={56}
+              height={56}
+              className="h-12 w-12 shrink-0 object-contain"
+              aria-hidden="true"
+            />
             <div className="min-w-0 flex-1 space-y-1">
               <h3 className="text-sm font-semibold text-game-ink">Open Bag</h3>
               <p className="text-[11px] leading-snug text-game-muted">
@@ -682,8 +680,10 @@ export function TrainerLeveling({ saveCustomization = updateUserCustomization }:
                   aria-label={`Use ${icon.name} trainer avatar`}
                   title={icon.name}
                   className={cn(
-                    'game-focus-ring flex h-12 w-full items-center justify-center rounded-lg border bg-game-surface-raised',
-                    selectedIcon === icon.id ? 'border-game-moss bg-game-moss/10' : 'border-game-border hover:border-game-moss',
+                    'game-focus-ring game-icon-orb mx-auto h-12 w-12',
+                    selectedIcon === icon.id
+                      ? 'border-game-charcoal text-game-charcoal-strong'
+                      : 'border-game-border hover:border-game-charcoal',
                   )}
                 >
                   <TaskIconDisplay icon={icon.icon} className="h-9 w-9" />

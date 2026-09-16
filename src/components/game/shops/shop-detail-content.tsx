@@ -236,7 +236,7 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
                 )}
               >
                 <div className="relative shrink-0">
-                  <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised transition-colors group-hover:border-game-moss/45">
+                  <div className="game-icon-orb relative z-10 h-12 w-12 transition-colors group-hover:border-game-charcoal/45">
                     {item.icon ? (
                       <TaskIconDisplay
                         icon={item.icon}

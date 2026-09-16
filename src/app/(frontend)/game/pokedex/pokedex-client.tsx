@@ -1214,7 +1214,7 @@ function ObservedMoveRow({
   ) : (
     <div className="rounded-lg border border-game-border bg-game-canvas p-3">
       <div className="flex items-center gap-3">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface">
+        <div className="game-icon-orb h-11 w-11 shrink-0">
           <CircleHelp className="h-6 w-6 text-game-muted" />
         </div>
         <div className="min-w-0 flex-1">
@@ -1400,7 +1400,7 @@ function ResearchTmUnlockCard({
       )}
     >
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
+        <div className="game-icon-orb h-10 w-10 shrink-0">
           {isUnlocked && move ? (
             <ItemSprite
               itemId={getMoveTypeSpriteItemId(move)}

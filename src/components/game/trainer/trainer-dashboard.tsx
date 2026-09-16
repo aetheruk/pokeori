@@ -211,13 +211,13 @@ export function TrainerDashboard({
     <div className="game-paper-first game-paper-background flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
       {activeTab !== 'profile' && (
         <div className="relative shrink-0 overflow-hidden border-b border-game-border bg-game-canvas px-4 py-3 md:px-6">
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-1 bg-game-moss" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-1 bg-game-charcoal" />
           <div className="mx-auto flex w-full max-w-5xl items-center gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-game-moss/30 bg-game-moss/10 text-game-moss-strong">
+            <div className="game-icon-orb h-11 w-11 shrink-0 text-game-charcoal-strong">
               <ActiveIcon className="h-5 w-5" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-game-moss-strong">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-game-charcoal-strong">
                 Trainer hub
               </p>
               <h1 className="truncate font-display text-xl font-bold leading-tight text-game-ink">
@@ -359,7 +359,7 @@ export function TrainerDashboard({
             )}
             aria-label="Choose trainer section"
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-game-moss/10 text-game-moss-strong">
+            <div className="game-icon-orb h-8 w-8 text-game-charcoal-strong">
               <ActiveIcon className="h-4 w-4" />
             </div>
             <div

@@ -81,7 +81,7 @@ export function RewardCarousel({
 
               <div className="flex items-center gap-4 relative z-10">
                 <div className="shrink-0">
-                  <div className="relative z-10 flex h-14 w-14 items-center justify-center rounded-lg border border-game-border bg-game-surface">
+                  <div className="game-icon-orb relative z-10 h-14 w-14">
                     <div className="scale-125">{reward.icon}</div>
                   </div>
                 </div>
@@ -105,12 +105,12 @@ export function RewardCarousel({
                   <div className="shrink-0">
                     {showCompletedCheck ? (
                       <div
-                        className="flex h-10 w-10 items-center justify-center rounded-lg border border-game-moss/40 bg-game-moss/10"
+                        className="game-icon-orb h-10 w-10 border-game-charcoal/40 text-game-charcoal-strong"
                         role="img"
                         title="Complete"
                         aria-label="Complete"
                       >
-                        <Check className="h-5 w-5 text-game-moss-strong" strokeWidth={4} />
+                        <Check className="h-5 w-5" strokeWidth={4} />
                       </div>
                     ) : progress ? (
                       <div

@@ -188,7 +188,7 @@ export function TrainerCollection() {
                 aria-valuemin={0}
                 aria-valuemax={100}
                 aria-valuenow={overallCompletion}
-                className="h-full rounded-full bg-game-moss transition-[width] motion-reduce:transition-none"
+                className="h-full rounded-full bg-game-charcoal transition-[width] motion-reduce:transition-none"
                 style={{ width: `${overallCompletion}%` }}
               />
             </div>
@@ -222,7 +222,7 @@ export function TrainerCollection() {
             title="Pokedex"
             subtitle="Pokemon Records"
             iconItemId="poke-ball"
-            accent="moss"
+            accent="charcoal"
             completion={pokemonCompletion}
             stats={[
               {
@@ -273,7 +273,7 @@ export function TrainerCollection() {
             title="MoveDex"
             subtitle="TM / HM Moves"
             iconItemId="tm-normal"
-            accent="moss"
+            accent="charcoal"
             completion={moveDexCompletion}
             stats={[
               {
@@ -386,31 +386,31 @@ function CollectionPanel({
   title: string
   subtitle: string
   iconItemId: string
-  accent: 'moss' | 'ochre'
+  accent: 'charcoal' | 'ochre'
   completion: number
   stats: { label: string; value: string }[]
   railStats: { label: string; value: number }[]
 }) {
-  const isMoss = accent === 'moss'
+  const isCharcoal = accent === 'charcoal'
 
   return (
     <Link
       href={href}
-      className="game-focus-ring group relative overflow-hidden rounded-lg border border-game-border bg-game-surface p-4 transition-colors hover:border-game-moss/45 hover:bg-game-surface-raised"
+      className="game-focus-ring group relative overflow-hidden rounded-lg border border-game-border bg-game-surface p-4 transition-colors hover:border-game-charcoal/45 hover:bg-game-surface-raised"
     >
       <div
         className={cn(
           'absolute inset-y-0 left-0 w-1',
-          isMoss ? 'bg-game-moss' : 'bg-game-ochre',
+          isCharcoal ? 'bg-game-charcoal' : 'bg-game-ochre',
         )}
       />
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
           <div
             className={cn(
-              'flex h-11 w-11 shrink-0 items-center justify-center rounded-md border bg-game-surface-raised',
-              isMoss
-                ? 'border-game-moss/30 text-game-moss-strong'
+              'game-icon-orb h-11 w-11 shrink-0',
+              isCharcoal
+                ? 'border-game-charcoal/30 text-game-charcoal-strong'
                 : 'border-game-ochre/35 text-game-ochre',
             )}
           >
@@ -431,7 +431,7 @@ function CollectionPanel({
             </h2>
           </div>
         </div>
-        <ArrowRight className="h-5 w-5 shrink-0 text-game-muted transition-transform group-hover:translate-x-0.5 group-hover:text-game-moss-strong" />
+        <ArrowRight className="h-5 w-5 shrink-0 text-game-muted transition-transform group-hover:translate-x-0.5 group-hover:text-game-charcoal-strong" />
       </div>
 
       <div className="mt-5 grid grid-cols-[auto_1fr] gap-4">
@@ -442,7 +442,7 @@ function CollectionPanel({
               key={stat.label}
               label={stat.label}
               value={stat.value}
-              className={isMoss ? 'bg-game-moss' : 'bg-game-ochre'}
+              className={isCharcoal ? 'bg-game-charcoal' : 'bg-game-ochre'}
             />
           ))}
         </div>
@@ -467,7 +467,7 @@ function ProgressDial({ value, label }: { value: number; label: string }) {
       aria-valuenow={value}
       className="grid h-16 w-16 shrink-0 place-items-center rounded-full border border-game-border"
       style={{
-        background: `conic-gradient(var(--game-moss) ${value * 3.6}deg, var(--game-canvas) 0deg)`,
+        background: `conic-gradient(var(--game-charcoal) ${value * 3.6}deg, var(--game-canvas) 0deg)`,
       }}
     >
       <div className="grid h-12 w-12 place-items-center rounded-full bg-game-surface text-center">
@@ -542,7 +542,7 @@ function StatusRow({
   return (
     <div className="grid min-h-11 grid-cols-[minmax(0,1fr)_minmax(0,55%)] items-center gap-3 py-2">
       <div className="flex min-w-0 items-center gap-2">
-        <Icon className="h-4 w-4 shrink-0 text-game-moss-strong" />
+        <Icon className="h-4 w-4 shrink-0 text-game-charcoal-strong" />
         <span className="truncate text-sm text-game-muted">{label}</span>
       </div>
       <span className="min-w-0 break-words text-right font-mono text-sm font-bold leading-tight text-game-ink [overflow-wrap:anywhere]">

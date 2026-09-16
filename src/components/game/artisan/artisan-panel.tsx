@@ -327,7 +327,7 @@ function CraftDialogShell({
 
       <div className="relative p-5 sm:p-6">
         <div className="mb-5 flex items-center gap-3 pr-10 sm:gap-4">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-game-moss/40 bg-game-moss/10 sm:h-20 sm:w-20">
+          <div className="game-icon-orb h-16 w-16 shrink-0 border-game-charcoal/40 text-game-charcoal-strong sm:h-20 sm:w-20">
             <RecipeOutputIcon
               recipe={recipe}
               className="h-12 w-12 object-contain sm:h-14 sm:w-14"
@@ -2030,7 +2030,7 @@ export function ArtisanPanel() {
                       className="game-focus-ring group relative flex cursor-pointer items-center gap-4 overflow-hidden rounded-lg border border-game-border bg-game-surface p-4 text-left transition-colors hover:border-game-moss/45 hover:bg-game-surface-raised"
                     >
                       <div className="shrink-0">
-                        <div className="relative flex h-14 w-14 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised transition-colors group-hover:border-game-moss/35">
+                        <div className="game-icon-orb relative h-14 w-14 transition-colors group-hover:border-game-charcoal/35">
                           {previewRecipe ? (
                             <RecipeOutputIcon
                               recipe={previewRecipe}
@@ -2107,7 +2107,7 @@ export function ArtisanPanel() {
                     )}
                   >
                     <div className="shrink-0">
-                      <div className="relative flex h-14 w-14 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised transition-colors group-hover:border-game-moss/35">
+                      <div className="game-icon-orb relative h-14 w-14 transition-colors group-hover:border-game-charcoal/35">
                         {state.locked ? (
                           <Lock className="absolute right-0.5 top-0.5 h-3 w-3 text-game-muted" />
                         ) : null}
@@ -2282,7 +2282,7 @@ export function ArtisanPanel() {
                     )}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
+                      <div className="game-icon-orb h-12 w-12 shrink-0">
                         <RecipeOutputIcon
                           recipe={recipe}
                           className={cn(
@@ -2472,7 +2472,7 @@ export function ArtisanPanel() {
                         : 'border-game-danger/30 bg-game-danger/10',
                     )}
                   >
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
+                    <div className="game-icon-orb h-12 w-12 shrink-0">
                       {cost.type === 'currency' ? (
                         <CurrencySprite
                           currencyId={cost.id}

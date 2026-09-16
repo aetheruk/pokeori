@@ -52,7 +52,7 @@ export function MysteryGift() {
           <div className="w-full overflow-hidden rounded-xl border border-game-border bg-game-surface">
             <div className="border-b border-game-border bg-game-surface-raised px-5 py-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-game-clay/35 bg-game-clay/10">
+                <div className="game-icon-orb h-12 w-12 border-game-clay/35 text-game-clay-strong">
                   <Gift className="h-6 w-6 text-game-clay" />
                 </div>
                 <div>
