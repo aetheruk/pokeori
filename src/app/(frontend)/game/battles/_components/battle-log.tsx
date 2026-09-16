@@ -605,7 +605,13 @@ function BattleActionRow({ action }: { action: ParsedBattleAction }) {
       <span className="inline-flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
         <span className="font-semibold text-game-ink">{action.pokemon}</span>
         <span className="text-game-muted">
-          {isGenericAttack ? (hasBadges ? 'attacks with' : 'attacks') : 'used'}
+          {isGenericAttack
+            ? action.target
+              ? 'attacks'
+              : hasBadges
+                ? 'attacks with'
+                : 'attacks'
+            : 'used'}
         </span>
         {!isGenericAttack && (
           <span className="font-semibold">{action.move}</span>
@@ -614,6 +620,12 @@ function BattleActionRow({ action }: { action: ParsedBattleAction }) {
           <span className="text-game-muted">
             {action.targetPreposition ?? 'on'} {action.target}
           </span>
+        )}
+        {isGenericAttack && action.target && (
+          <span className="text-game-muted">{action.target}</span>
+        )}
+        {isGenericAttack && action.target && hasBadges && (
+          <span className="text-game-muted">with</span>
         )}
 
         {action.stance && (
@@ -626,9 +638,6 @@ function BattleActionRow({ action }: { action: ParsedBattleAction }) {
           <span className="inline-flex items-center align-middle">
             <TypeIcon type={action.type} />
           </span>
-        )}
-        {isGenericAttack && action.target && (
-          <span className="text-game-muted">against {action.target}</span>
         )}
         {action.critical && (
           <span className="inline-flex items-center rounded-full border border-game-clay/35 bg-game-clay/10 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-game-clay-strong">
