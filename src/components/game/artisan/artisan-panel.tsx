@@ -2027,7 +2027,7 @@ export function ArtisanPanel() {
                       tabIndex={0}
                       aria-label={`View ${group.name} recipe variants`}
                       aria-haspopup="dialog"
-                      className="game-focus-ring group relative flex cursor-pointer items-center gap-4 overflow-hidden rounded-lg border border-game-border bg-game-surface p-4 text-left transition-colors hover:border-game-moss/45 hover:bg-game-surface-raised"
+                      className="game-focus-ring group relative flex cursor-pointer items-center gap-4 overflow-hidden rounded-lg border border-game-card-border bg-game-surface p-4 text-left transition-colors hover:border-game-moss/45 hover:bg-game-surface-raised"
                     >
                       <div className="shrink-0">
                         <div className="game-icon-orb relative h-14 w-14 transition-colors group-hover:border-game-charcoal/35">
@@ -2102,8 +2102,8 @@ export function ArtisanPanel() {
                       state.canCraft
                         ? 'cursor-pointer border-game-moss/35 bg-game-surface hover:border-game-moss/60 hover:bg-game-surface-raised'
                         : state.locked
-                          ? 'cursor-pointer border-game-border bg-game-surface opacity-70'
-                          : 'cursor-pointer border-game-border bg-game-surface hover:border-game-moss/35',
+                          ? 'cursor-pointer border-game-card-border bg-game-surface opacity-70'
+                          : 'cursor-pointer border-game-card-border bg-game-surface hover:border-game-moss/35',
                     )}
                   >
                     <div className="shrink-0">
@@ -2277,8 +2277,8 @@ export function ArtisanPanel() {
                       state.canCraft
                         ? 'border-game-moss/35'
                         : state.locked
-                          ? 'border-game-border opacity-75'
-                          : 'border-game-border',
+                          ? 'border-game-card-border opacity-75'
+                          : 'border-game-card-border',
                     )}
                   >
                     <div className="flex items-center gap-3">

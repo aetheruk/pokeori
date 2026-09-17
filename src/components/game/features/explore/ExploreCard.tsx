@@ -99,7 +99,7 @@ function ExploreCardComponent({
         isGrouped ? 'cursor-default' : 'cursor-pointer',
         isHighlighted
           ? 'border-game-ochre/45 bg-game-surface-raised'
-          : 'border-game-border bg-game-surface hover:border-game-charcoal/35 hover:bg-game-surface-raised',
+          : 'border-game-card-border bg-game-surface hover:border-game-charcoal/35 hover:bg-game-surface-raised',
         centered && 'justify-center',
       )}
       role={isInteractive ? 'button' : undefined}

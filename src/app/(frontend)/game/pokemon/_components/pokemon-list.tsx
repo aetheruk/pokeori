@@ -849,7 +849,7 @@ export function PokemonList({
         tabIndex={isCardInteractive ? 0 : undefined}
         aria-label={isCardInteractive ? name : undefined}
         className={cn(
-          'game-focus-ring group relative aspect-square flex items-center justify-center border border-game-border bg-game-surface-raised p-1.5 transition-colors',
+          'game-focus-ring group relative aspect-square flex items-center justify-center border border-game-card-border bg-game-surface-raised p-1.5 transition-colors',
           pokemon.locked
             ? 'bg-game-danger/10'
             : 'hover:border-game-moss/45 hover:bg-game-surface',
@@ -1751,7 +1751,7 @@ function EggCard({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Card className="game-focus-ring group relative aspect-square h-full w-full cursor-pointer border border-game-border bg-game-surface-raised p-1.5 transition-colors hover:border-game-moss/45 hover:bg-game-surface">
+        <Card className="game-focus-ring group relative aspect-square h-full w-full cursor-pointer border border-game-card-border bg-game-surface-raised p-1.5 transition-colors hover:border-game-moss/45 hover:bg-game-surface">
           <PokemonRarityEggSprite
             rarity={rarity}
             alt={isVariantEgg ? `${rarityEffect.label} Pokemon Egg` : 'Pokemon Egg'}

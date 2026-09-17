@@ -1,6 +1,5 @@
 'use client'
 
-import { X } from 'lucide-react'
 import Image from 'next/image'
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
@@ -9,8 +8,6 @@ export interface ExploreDrawerHeaderProps {
   background?: string
   label?: ReactNode
   icon: ReactNode
-  onClose: () => void
-  closeAriaLabel?: string
   badge?: ReactNode
   iconClassName?: string
   children?: ReactNode
@@ -20,15 +17,14 @@ export interface ExploreDrawerHeaderProps {
  * The single drawer header used by every Explore-style panel (expeditions,
  * chronicles, locations, tasks, games, battles and field research). The
  * unstarted Chronicle drawer is the canonical look: tall art header with a
- * visible background, top-left label chip, top-right close button, and a
- * centered icon that clears the rounded top corners.
+ * visible background, lower-centered glass label, and a centered icon that
+ * clears the rounded top corners. Drawers retain their gesture dismissal so
+ * the scenic header stays focused on identity rather than controls.
  */
 export function ExploreDrawerHeader({
   background,
   label,
   icon,
-  onClose,
-  closeAriaLabel = 'Close',
   badge,
   iconClassName,
   children,
@@ -47,23 +43,14 @@ export function ExploreDrawerHeader({
       </div>
 
       {label && (
-        <div className="absolute left-7 top-7 z-20">
-          <span className="inline-flex items-center gap-2 rounded-full border border-game-ochre/45 bg-game-surface-raised/95 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-game-clay-strong backdrop-blur-md">
+        <div className="absolute bottom-4 left-1/2 z-20 -translate-x-1/2">
+          <span className="game-icon-orb inline-flex max-w-[80%] items-center gap-2 truncate px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-game-ink">
             {label}
           </span>
         </div>
       )}
 
       <div className="absolute left-1/2 top-3 z-20 h-1.5 w-20 -translate-x-1/2 rounded-full bg-game-cream/30" />
-
-      <button
-        type="button"
-        onClick={onClose}
-        className="game-focus-ring absolute right-7 top-7 z-20 rounded-md border border-game-border/60 bg-game-surface-raised/90 p-2 text-game-ink backdrop-blur-md transition-colors hover:bg-game-surface hover:text-game-clay-strong"
-        aria-label={closeAriaLabel}
-      >
-        <X className="h-6 w-6" />
-      </button>
 
       {children}
 

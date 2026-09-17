@@ -356,8 +356,6 @@ function ExpeditionModalContent({
           </>
         }
         icon={<TaskIconDisplay icon={item.icon} className="h-8 w-8" />}
-        onClose={() => onOpenChange(false)}
-        closeAriaLabel="Close expedition details"
       >
         {canAbandonExpedition && onRequestAbandonExpedition && (
           <Button
@@ -378,9 +376,8 @@ function ExpeditionModalContent({
       <div className="custom-scrollbar flex-1 overflow-y-auto bg-game-canvas p-5 md:p-8">
         <div className="max-w-4xl mx-auto space-y-8 pb-8">
           <div className="space-y-4">
-            <div>
-              <p className="game-field-label">{expeditionLabel}</p>
-              <h2 className="mt-2 font-display text-3xl font-semibold text-game-ink">
+            <div className="text-center">
+              <h2 className="font-display text-3xl font-semibold text-game-ink">
                 {item.name}
               </h2>
             </div>
@@ -781,7 +778,7 @@ function ExpeditionModalContent({
           {criteria && criteria.length > 0 && (
             <div>
               <SectionDivider>Requirements</SectionDivider>
-              <div className="mt-4 rounded-lg border border-game-border bg-game-surface p-2">
+              <div className="mt-4">
                 <RewardCarousel rewards={criteria} />
               </div>
             </div>
@@ -790,7 +787,7 @@ function ExpeditionModalContent({
           {rewards && rewards.length > 0 && (
             <div>
               <SectionDivider>Potential Rewards</SectionDivider>
-              <div className="mt-4 rounded-lg border border-game-border bg-game-surface p-2">
+              <div className="mt-4">
                 <RewardCarousel rewards={rewards} />
               </div>
             </div>
