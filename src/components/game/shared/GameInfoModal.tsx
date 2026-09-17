@@ -59,6 +59,30 @@ function GameInfoMetricCard({
   )
 }
 
+function GameInfoMetricRow({
+  icon,
+  label,
+  value,
+  title,
+}: GameInfoMetricCardProps) {
+  return (
+    <div
+      className="group flex min-h-14 items-center gap-3 py-3 transition-colors"
+      title={title || label}
+    >
+      <div className="game-icon-orb size-8 shrink-0 text-game-charcoal-strong [&>svg]:size-3.5">
+        {icon}
+      </div>
+      <span className="min-w-0 flex-1 truncate text-[10px] font-bold uppercase tracking-[0.12em] text-game-muted">
+        {label}
+      </span>
+      <span className="max-w-[58%] break-words text-right font-mono text-sm font-black text-game-ink">
+        {value}
+      </span>
+    </div>
+  )
+}
+
 interface GameInfoModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -118,6 +142,8 @@ export function GameInfoModal({
   desktopBreakpoint = 'xl',
 }: GameInfoModalProps) {
   const isDrawer = presentation === 'drawer'
+  const hasProperties = Boolean(properties && properties.length > 0)
+  const hasStats = Boolean(stats && stats.length > 0)
   const Header = ({
     className,
     children,
@@ -167,11 +193,11 @@ export function GameInfoModal({
   const content = (
     <>
       {isDrawer ? (
-          <ExploreDrawerHeader
-            background={background}
-            label={category}
-            icon={icon}
-            badge={
+        <ExploreDrawerHeader
+          background={background}
+          label={category}
+          icon={icon}
+          badge={
             isCaught ? (
               <span className="flex items-center gap-0.5 rounded-full border-2 border-game-surface bg-game-moss px-2 py-0.5 text-[10px] font-black text-game-cream">
                 CAUGHT
@@ -241,7 +267,14 @@ export function GameInfoModal({
           {description && (
             <div className="relative">
               <SectionDivider>OVERVIEW</SectionDivider>
-              <div className="mt-3 rounded-lg border border-game-border bg-game-surface-raised p-4 md:p-5">
+              <div
+                className={cn(
+                  'mt-3',
+                  isDrawer
+                    ? 'border-l-2 border-game-clay/50 pl-4 md:pl-5'
+                    : 'rounded-lg border border-game-border bg-game-surface-raised p-4 md:p-5',
+                )}
+              >
                 <p className="text-sm font-medium leading-relaxed text-game-ink md:text-base">
                   {description}
                 </p>
@@ -267,7 +300,13 @@ export function GameInfoModal({
           {taskProgress ? (
             <div className="space-y-4">
               <SectionDivider>TASK PROGRESS</SectionDivider>
-              <div className="rounded-lg border border-game-border bg-game-surface-raised p-4">
+              <div
+                className={cn(
+                  isDrawer
+                    ? 'border-y border-game-border/75 py-4'
+                    : 'rounded-lg border border-game-border bg-game-surface-raised p-4',
+                )}
+              >
                 <div className="flex justify-between items-end mb-3">
                   <span className="text-sm font-bold uppercase tracking-wider text-game-ink">
                     {taskProgress.label}
@@ -284,7 +323,12 @@ export function GameInfoModal({
                         taskProgress.max) *
                       100
                     }
-                    className="h-3 overflow-hidden rounded-full border border-game-border bg-game-canvas"
+                    className={cn(
+                      'overflow-hidden rounded-full bg-game-canvas',
+                      isDrawer
+                        ? 'h-2 border-0'
+                        : 'h-3 border border-game-border',
+                    )}
                     indicatorClassName="bg-game-ochre"
                   />
                 </div>
@@ -305,6 +349,7 @@ export function GameInfoModal({
                 <RewardCarousel
                   rewards={criteria}
                   autoScroll={autoScrollRewards}
+                  variant={isDrawer ? 'journal' : 'default'}
                 />
               </div>
             )
@@ -316,38 +361,70 @@ export function GameInfoModal({
             </div>
           )}
 
-          {(properties || stats) && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {properties && properties.length > 0 && (
+          {(hasProperties || hasStats) && (
+            <div className="grid grid-cols-1 gap-7 md:grid-cols-2 md:gap-x-8">
+              {hasProperties && (
                 <div className="space-y-4">
                   <SectionDivider>RULES</SectionDivider>
-                  <div className="grid grid-cols-2 gap-3">
-                    {properties.map((prop, idx) => (
-                      <GameInfoMetricCard
-                        key={idx}
-                        icon={prop.icon}
-                        label={prop.label}
-                        value={prop.value}
-                        title={prop.title || prop.label}
-                      />
-                    ))}
+                  <div
+                    className={cn(
+                      isDrawer
+                        ? 'divide-y border-y border-game-border/75'
+                        : 'grid grid-cols-2 gap-3',
+                    )}
+                  >
+                    {properties?.map((prop, idx) =>
+                      isDrawer ? (
+                        <GameInfoMetricRow
+                          key={idx}
+                          icon={prop.icon}
+                          label={prop.label}
+                          value={prop.value}
+                          title={prop.title || prop.label}
+                        />
+                      ) : (
+                        <GameInfoMetricCard
+                          key={idx}
+                          icon={prop.icon}
+                          label={prop.label}
+                          value={prop.value}
+                          title={prop.title || prop.label}
+                        />
+                      ),
+                    )}
                   </div>
                 </div>
               )}
 
-              {stats && stats.length > 0 && (
+              {hasStats && (
                 <div className="space-y-4">
                   <SectionDivider>STATS</SectionDivider>
-                  <div className="grid grid-cols-2 gap-3">
-                    {stats.map((stat, idx) => (
-                      <GameInfoMetricCard
-                        key={idx}
-                        icon={stat.icon}
-                        label={stat.label}
-                        value={stat.value}
-                        title={stat.label}
-                      />
-                    ))}
+                  <div
+                    className={cn(
+                      isDrawer
+                        ? 'divide-y border-y border-game-border/75'
+                        : 'grid grid-cols-2 gap-3',
+                    )}
+                  >
+                    {stats?.map((stat, idx) =>
+                      isDrawer ? (
+                        <GameInfoMetricRow
+                          key={idx}
+                          icon={stat.icon}
+                          label={stat.label}
+                          value={stat.value}
+                          title={stat.label}
+                        />
+                      ) : (
+                        <GameInfoMetricCard
+                          key={idx}
+                          icon={stat.icon}
+                          label={stat.label}
+                          value={stat.value}
+                          title={stat.label}
+                        />
+                      ),
+                    )}
                   </div>
                 </div>
               )}
@@ -367,6 +444,7 @@ export function GameInfoModal({
                 <RewardCarousel
                   rewards={rewards}
                   autoScroll={autoScrollRewards}
+                  variant={isDrawer ? 'journal' : 'default'}
                 />
               </div>
             )}
