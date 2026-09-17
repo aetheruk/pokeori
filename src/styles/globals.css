@@ -45,6 +45,7 @@
   --color-game-surface-raised: var(--game-surface-raised);
   --color-game-border: var(--game-border);
   --color-game-border-strong: var(--game-border-strong);
+  --color-game-card-border: var(--game-card-border);
   --color-game-ink: var(--game-ink);
   --color-game-muted: var(--game-muted);
   --color-game-charcoal: var(--game-charcoal);
@@ -93,6 +94,7 @@
   --game-surface-raised: #fff8e8;
   --game-border: rgb(103 88 62 / 0.2);
   --game-border-strong: rgb(103 88 62 / 0.34);
+  --game-card-border: color-mix(in srgb, var(--game-ink) 28%, transparent);
   --game-ink: #293532;
   --game-muted: #6b6f6d;
   --game-charcoal: #293532;
@@ -147,14 +149,14 @@
 @layer components {
   .game-panel {
     background: var(--game-surface);
-    border: 1px solid var(--game-border);
+    border: 1px solid var(--game-card-border);
     border-radius: 0.625rem;
     color: var(--game-ink);
   }
 
   .game-panel-raised {
     background: var(--game-surface-raised);
-    border: 1px solid var(--game-border);
+    border: 1px solid var(--game-card-border);
     border-radius: 0.75rem;
     color: var(--game-ink);
     box-shadow: 0 12px 32px rgb(75 62 39 / 0.14);
@@ -202,7 +204,7 @@
 
   .game-folio-section {
     position: relative;
-    border: 1px solid var(--game-border);
+    border: 1px solid var(--game-card-border);
     border-radius: 0.625rem;
     background: color-mix(in srgb, var(--game-surface) 94%, transparent);
     box-shadow: 0 8px 20px rgb(75 62 39 / 0.07);
@@ -254,6 +256,15 @@
   .game-focus-ring:focus-visible {
     outline: 2px solid color-mix(in srgb, var(--game-accent) 70%, transparent);
     outline-offset: 2px;
+  }
+
+  /* Raised paper cards use the slightly firmer edge from the Artisan folio.
+   * It follows the local ink colour so paper and night surfaces stay legible. */
+  :is(
+    [class~='bg-game-surface'][class~='border-game-border'],
+    [class~='bg-game-surface-raised'][class~='border-game-border']
+  ) {
+    border-color: var(--game-card-border);
   }
 
   .game-night {

@@ -36,6 +36,7 @@ Do not use green, moss, teal, or saturated emerald in routine interface chrome. 
 
 - Use 8px to 12px corner radii for cards and panels.
 - Use crisp 1px warm borders with low-contrast paper shadows; avoid black glow halos.
+- Raised white cards use the shared `game-card-border` edge, a slightly firmer charcoal-tinted line than ordinary paper rules. This is the card treatment used by Artisan, Explore, and collection chips; keep state borders such as clay, ochre, and charcoal accents on top where they communicate selection or progress.
 - Use clipped, ticket-like, or map-tab shapes for navigation and section selectors when they improve hierarchy.
 - Reserve pill shapes for statuses, filters, compact tags, and counts.
 - Keep touch targets at least 40px, with 44px preferred for primary mobile controls.
@@ -52,6 +53,7 @@ Do not use green, moss, teal, or saturated emerald in routine interface chrome. 
 - Explore list cards show the activity title and actionable status only; do not repeat the card title as a subtitle.
 - Badge collections show the badge artwork without a label or rounded-square frame. Inventory’s bag artwork follows the same unframed treatment as skill artwork.
 - Dialogs and drawers use paper surfaces across player-facing screens, while retaining the same padding and close/focus behavior.
+- Explore drawers use gesture dismissal and keep the scenic header free of a redundant close button. Their category chip sits below the centered icon as a glass orb treatment, and requirements/reward carousels render their own single card items without a second wrapper card.
 
 ## Activity and scene composition
 

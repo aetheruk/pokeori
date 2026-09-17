@@ -167,12 +167,11 @@ export function GameInfoModal({
   const content = (
     <>
       {isDrawer ? (
-        <ExploreDrawerHeader
-          background={background}
-          label={category}
-          icon={icon}
-          onClose={() => onOpenChange(false)}
-          badge={
+          <ExploreDrawerHeader
+            background={background}
+            label={category}
+            icon={icon}
+            badge={
             isCaught ? (
               <span className="flex items-center gap-0.5 rounded-full border-2 border-game-surface bg-game-moss px-2 py-0.5 text-[10px] font-black text-game-cream">
                 CAUGHT
@@ -234,7 +233,7 @@ export function GameInfoModal({
 
       <div className="custom-scrollbar flex-1 overflow-x-hidden overflow-y-auto bg-game-canvas p-5 md:p-6">
         <div className="mx-auto max-w-3xl space-y-7 pb-8">
-          <div className="border-b border-game-border pb-4 text-center">
+          <div className="text-center">
             <Title className="font-display text-2xl font-semibold text-game-ink md:text-3xl">
               {title}
             </Title>
@@ -303,12 +302,10 @@ export function GameInfoModal({
             criteria.length > 0 && (
               <div className="space-y-4">
                 <SectionDivider>REQUIREMENTS</SectionDivider>
-                <div className="rounded-lg border border-game-border bg-game-surface p-2">
-                  <RewardCarousel
-                    rewards={criteria}
-                    autoScroll={autoScrollRewards}
-                  />
-                </div>
+                <RewardCarousel
+                  rewards={criteria}
+                  autoScroll={autoScrollRewards}
+                />
               </div>
             )
           )}
@@ -367,12 +364,10 @@ export function GameInfoModal({
                 <SectionDivider className="mb-4 font-black tracking-widest text-[10px]">
                   REWARDS
                 </SectionDivider>
-                <div className="rounded-lg border border-game-border bg-game-surface-raised p-2">
-                  <RewardCarousel
-                    rewards={rewards}
-                    autoScroll={autoScrollRewards}
-                  />
-                </div>
+                <RewardCarousel
+                  rewards={rewards}
+                  autoScroll={autoScrollRewards}
+                />
               </div>
             )}
             {actionButton && (
