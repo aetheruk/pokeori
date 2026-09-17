@@ -18,6 +18,7 @@ import {
   getVsSeekerCooldownRemaining,
   getVsSeekerTrainerLevel,
   hasVsSeeker,
+  VS_SEEKER_BACKGROUND,
 } from '@/utilities/vs-seeker'
 import type { ExploreItem } from '../types'
 
@@ -76,6 +77,7 @@ const VS_SEEKER_EXPLORE_ITEM: ExploreItem = {
   originalData: {
     id: 'vs-seeker-dynamic-battle',
     isVsSeeker: true,
+    background: VS_SEEKER_BACKGROUND,
   },
   requirements: [],
 }

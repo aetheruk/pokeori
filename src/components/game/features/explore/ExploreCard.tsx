@@ -49,6 +49,7 @@ function ExploreCardComponent({
       ? entry.group.icon
       : getExploreItemIcon(item, userData)
   const cardBackground = getExploreItemBackground(item, userData)
+  const isEventCard = item.type === 'events'
   const isGrouped = groupedItems.length > 0
   const isActiveVoyage =
     item.type === 'voyage' && activeVoyages.some((v) => v.voyageId === item.id)
@@ -96,19 +97,29 @@ function ExploreCardComponent({
   }
 
   const getGroupedActionTone = (modeItem: ExploreItem) => {
+    const gameType = (modeItem.originalData as any).gameType
+
+    if (modeItem.type === 'game' && gameType === 'fishing') {
+      return {
+        button:
+          'border-game-stance-blue/55 bg-game-surface-raised text-game-ink hover:border-game-stance-blue-strong/75 hover:bg-game-surface',
+        icon: 'bg-game-stance-blue',
+      }
+    }
+
     if (modeItem.type === 'location') {
       return {
         button:
-          'border-game-clay/45 bg-game-surface-raised text-game-ink hover:border-game-clay/70 hover:bg-game-surface',
-        icon: 'bg-game-clay',
+          'border-game-charcoal/45 bg-game-surface-raised text-game-ink hover:border-game-charcoal/70 hover:bg-game-surface',
+        icon: 'bg-game-charcoal',
       }
     }
 
     if (modeItem.type === 'battle' || modeItem.type === 'vs-seeker') {
       return {
         button:
-          'border-game-charcoal/45 bg-game-surface-raised text-game-ink hover:border-game-charcoal/70 hover:bg-game-surface',
-        icon: 'bg-game-charcoal',
+          'border-game-clay/45 bg-game-surface-raised text-game-ink hover:border-game-clay/70 hover:bg-game-surface',
+        icon: 'bg-game-clay',
       }
     }
 
@@ -132,7 +143,9 @@ function ExploreCardComponent({
       className={cn(
         'game-focus-ring group relative flex flex-row items-center gap-4 overflow-hidden rounded-lg border p-4 transition-colors',
         isGrouped ? 'cursor-default' : 'cursor-pointer',
-        isHighlighted
+        isEventCard
+          ? 'border-game-ochre/60 bg-game-surface-raised hover:border-game-ochre/80'
+          : isHighlighted
           ? 'border-game-ochre/45 bg-game-surface-raised'
           : 'border-game-card-border bg-game-surface hover:border-game-charcoal/35 hover:bg-game-surface-raised',
         centered && 'justify-center',
@@ -161,7 +174,12 @@ function ExploreCardComponent({
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-gradient-to-l from-game-surface-raised/95 via-game-surface/78 to-game-surface/25"
+            className={cn(
+              'pointer-events-none absolute inset-0 bg-gradient-to-l',
+              isEventCard
+                ? 'from-game-surface-raised/96 via-game-surface/82 to-game-ochre/15'
+                : 'from-game-surface-raised/95 via-game-surface/78 to-game-surface/25',
+            )}
           />
         </>
       )}
@@ -171,7 +189,9 @@ function ExploreCardComponent({
           <div
             className={cn(
               'game-icon-orb relative z-10 h-14 w-14 shrink-0 transition-colors',
-              isHighlighted
+              isEventCard
+                ? 'border-game-ochre/70 text-game-ochre'
+                : isHighlighted
                 ? 'border-game-ochre/60 text-game-ochre'
                 : 'border-game-border text-game-ink group-hover:border-game-charcoal/45',
             )}
