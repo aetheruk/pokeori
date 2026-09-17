@@ -156,12 +156,12 @@ function ExploreCardComponent({
         <>
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-35"
+            className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-50"
             style={{ backgroundImage: `url(${cardBackground})` }}
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-game-surface/75"
+            className="pointer-events-none absolute inset-0 bg-gradient-to-l from-game-surface-raised/95 via-game-surface/78 to-game-surface/25"
           />
         </>
       )}
@@ -201,7 +201,7 @@ function ExploreCardComponent({
       >
         <h3
           className={cn(
-            'line-clamp-3 text-base font-semibold leading-tight transition-colors',
+            'line-clamp-3 text-pretty text-base font-semibold leading-tight transition-colors',
             isHighlighted
               ? 'text-game-ochre'
               : 'text-game-ink group-hover:text-game-charcoal-strong',
@@ -249,13 +249,7 @@ function ExploreCardComponent({
                       tone.icon,
                     )}
                   >
-                    {groupedItem.type === 'location' ? (
-                      getTypeIcon(groupedItem)
-                    ) : (
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full border border-game-cream/35 bg-game-cream/10">
-                        {getTypeIcon(groupedItem)}
-                      </span>
-                    )}
+                    {getTypeIcon(groupedItem)}
                   </span>
                   <span className="flex min-w-0 flex-1 items-center justify-end px-3 py-2 text-right leading-none">
                     {getModeLabel(groupedItem)}
