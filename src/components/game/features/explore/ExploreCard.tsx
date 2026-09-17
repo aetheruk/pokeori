@@ -8,7 +8,7 @@ import { memo } from 'react'
 import type { ExploreDisplayItem, ExploreItem } from './types'
 import { getGameTypeLabel, getTypeIcon, isChronicleExploreItem } from './utils'
 import type { RequirementData } from '@/utilities/requirements'
-import { getExploreItemIcon } from './rival-display'
+import { getExploreItemBackground, getExploreItemIcon } from './rival-display'
 import { isLocationEntryMastered } from './location-completion'
 
 interface ExploreCardProps {
@@ -48,6 +48,7 @@ function ExploreCardComponent({
     entry.kind === 'group'
       ? entry.group.icon
       : getExploreItemIcon(item, userData)
+  const cardBackground = getExploreItemBackground(item, userData)
   const isGrouped = groupedItems.length > 0
   const isActiveVoyage =
     item.type === 'voyage' && activeVoyages.some((v) => v.voyageId === item.id)
@@ -151,6 +152,20 @@ function ExploreCardComponent({
           : undefined
       }
     >
+      {cardBackground && (
+        <>
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-35"
+            style={{ backgroundImage: `url(${cardBackground})` }}
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-game-surface/75"
+          />
+        </>
+      )}
+
       {!centered && (
         <div className="relative shrink-0">
           <div
@@ -180,7 +195,7 @@ function ExploreCardComponent({
       {/* Content Details */}
       <div
         className={cn(
-          'flex-1 min-w-0 flex flex-col pt-1',
+          'relative z-10 flex-1 min-w-0 flex flex-col pt-1',
           centered ? 'items-center text-center' : 'items-end text-right',
         )}
       >
@@ -230,18 +245,17 @@ function ExploreCardComponent({
                 >
                   <span
                     className={cn(
-                      'flex w-10 shrink-0 items-center justify-center text-game-cream',
+                      'flex w-10 shrink-0 items-center justify-center text-game-cream [&_svg]:!text-game-cream',
                       tone.icon,
                     )}
                   >
-                    <span
-                      className={cn(
-                        'flex h-7 w-7 items-center justify-center rounded-full border border-game-cream/35 bg-game-cream/10',
-                        '[&_svg]:!text-game-cream',
-                      )}
-                    >
-                      {getTypeIcon(groupedItem)}
-                    </span>
+                    {groupedItem.type === 'location' ? (
+                      getTypeIcon(groupedItem)
+                    ) : (
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full border border-game-cream/35 bg-game-cream/10">
+                        {getTypeIcon(groupedItem)}
+                      </span>
+                    )}
                   </span>
                   <span className="flex min-w-0 flex-1 items-center justify-end px-3 py-2 text-right leading-none">
                     {getModeLabel(groupedItem)}
