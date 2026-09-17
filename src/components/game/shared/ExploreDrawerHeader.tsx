@@ -43,8 +43,8 @@ export function ExploreDrawerHeader({
       </div>
 
       {label && (
-        <div className="absolute bottom-4 left-1/2 z-20 -translate-x-1/2">
-          <span className="game-icon-orb inline-flex max-w-[80%] items-center gap-2 truncate px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-game-ink">
+        <div className="absolute bottom-4 left-1/2 z-20 max-w-[80%] -translate-x-1/2">
+          <span className="game-icon-orb inline-flex max-w-full items-center justify-center gap-2 px-4 py-1.5 text-center text-[10px] font-semibold uppercase leading-none tracking-[0.16em] text-game-ink">
             {label}
           </span>
         </div>
