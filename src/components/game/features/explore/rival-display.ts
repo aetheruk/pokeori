@@ -4,6 +4,11 @@ import type { TaskIcon } from '@/data/tasks'
 import type { RequirementData } from '@/utilities/requirements'
 import type { ExploreItem } from './types'
 
+const SPECIAL_EXPLORE_BACKGROUNDS: Partial<Record<ExploreItem['type'], string>> = {
+  'vs-seeker': '/backgrounds/battle.avif',
+  events: '/backgrounds/cosmos-gold.avif',
+}
+
 export function isRivalExploreBattle(item: ExploreItem) {
   return item.type === 'battle' && (item.originalData as any).dynamicOpponent === 'rival'
 }
@@ -47,7 +52,11 @@ export function getExploreItemIcon(item: ExploreItem, userData: RequirementData)
 }
 
 export function getExploreItemBackground(item: ExploreItem, userData: RequirementData) {
-  if (!isRivalExploreBattle(item)) return item.originalData.background
+  if (!isRivalExploreBattle(item)) {
+    return (
+      item.originalData.background || SPECIAL_EXPLORE_BACKGROUNDS[item.type]
+    )
+  }
 
   const rivalBannerId = userData.rivalTrainer?.banner
   return (rivalBannerId && getBanner(rivalBannerId)?.imagePath) || item.originalData.background

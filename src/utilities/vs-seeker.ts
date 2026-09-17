@@ -13,6 +13,7 @@ import { calculateKantoTrainerPayout } from '@/data/battles/trainer-payouts'
 import { getCandyIdsUpToLevel } from '@/utilities/rewards/candy-logic'
 
 export const VS_SEEKER_COOLDOWN_MS = 30 * 60 * 1000
+export const VS_SEEKER_BACKGROUND = '/backgrounds/battle.avif'
 export const VS_SEEKER_HELD_BERRY_CHANCE = 0.3
 export const VS_SEEKER_TRAINER_HEALING_ITEM_CHANCE = 0.5
 export const VS_SEEKER_TRAINER_POTION_CHANCE = VS_SEEKER_TRAINER_HEALING_ITEM_CHANCE
@@ -236,7 +237,7 @@ export function buildVsSeekerBattleConfig(params: {
       type: 'trainer',
       id: trainerClass.id,
     },
-    background: '/backgrounds/friend-stadium.avif',
+    background: VS_SEEKER_BACKGROUND,
     requirements: [],
     enemyTeam,
     trainerItems,

@@ -109,7 +109,10 @@ export function PlayerEventsCard({
     category: 'Events',
     type: 'events',
     icon: { type: 'lucide', id: 'CalendarDays' },
-    originalData: { summary },
+    originalData: {
+      summary,
+      background: '/backgrounds/cosmos-gold.avif',
+    },
   }
   return (
     <section aria-label="Game events">
