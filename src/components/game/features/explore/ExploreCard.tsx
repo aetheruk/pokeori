@@ -3,7 +3,7 @@ import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { VoyageCountdown } from '@/components/game/voyages/voyage-countdown'
 import { parseText } from '@/utilities/text-parsing'
 import { cn } from '@/lib/utils'
-import { Heart, Star } from 'lucide-react'
+import { Heart, Repeat, Star } from 'lucide-react'
 import { memo } from 'react'
 import type { ExploreDisplayItem, ExploreItem } from './types'
 import { getGameTypeLabel, getTypeIcon, isChronicleExploreItem } from './utils'
@@ -59,6 +59,8 @@ function ExploreCardComponent({
       activeExpedition.status === 'ready_to_claim')
   const isHighlighted = isActiveVoyage || isActiveExpedition
   const isLocationMastered = isLocationEntryMastered(entry, userData)
+  const isRepeatableTask =
+    item.type === 'task' && Boolean((item.originalData as any).repeatable)
   const getModeLabel = (modeItem: ExploreItem) => {
     if (modeItem.type === 'vs-seeker') return 'Battle'
     if (modeItem.type === 'location') return 'Catch'
@@ -89,6 +91,38 @@ function ExploreCardComponent({
       setActiveShop(targetItem.originalData)
     } else {
       setSelectedItem(targetItem)
+    }
+  }
+
+  const getGroupedActionTone = (modeItem: ExploreItem) => {
+    if (modeItem.type === 'location') {
+      return {
+        button:
+          'border-game-clay/45 bg-game-surface-raised text-game-ink hover:border-game-clay/70 hover:bg-game-surface',
+        icon: 'bg-game-clay',
+      }
+    }
+
+    if (modeItem.type === 'battle' || modeItem.type === 'vs-seeker') {
+      return {
+        button:
+          'border-game-charcoal/45 bg-game-surface-raised text-game-ink hover:border-game-charcoal/70 hover:bg-game-surface',
+        icon: 'bg-game-charcoal',
+      }
+    }
+
+    if (modeItem.type === 'field-research') {
+      return {
+        button:
+          'border-game-ochre/50 bg-game-surface-raised text-game-ink hover:border-game-ochre/75 hover:bg-game-surface',
+        icon: 'bg-game-ochre',
+      }
+    }
+
+    return {
+      button:
+        'border-game-border bg-game-surface-raised text-game-ink hover:border-game-charcoal/60 hover:bg-game-surface',
+      icon: 'bg-game-charcoal/80',
     }
   }
 
@@ -134,6 +168,11 @@ function ExploreCardComponent({
             {isLocationMastered && (
               <Star className="pointer-events-none absolute bottom-0 left-1/2 z-20 h-2 w-2 -translate-x-1/2 translate-y-1/2 fill-game-ochre text-game-ochre drop-shadow" />
             )}
+            {isRepeatableTask && (
+              <span className="pointer-events-none absolute bottom-0 left-1/2 z-20 flex h-5 w-5 -translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full border-2 border-game-surface bg-game-charcoal text-game-cream shadow-sm">
+                <Repeat className="h-3 w-3" aria-hidden="true" />
+              </span>
+            )}
           </div>
         </div>
       )}
@@ -142,7 +181,7 @@ function ExploreCardComponent({
       <div
         className={cn(
           'flex-1 min-w-0 flex flex-col pt-1',
-          centered && 'items-center text-center',
+          centered ? 'items-center text-center' : 'items-end text-right',
         )}
       >
         <h3
@@ -163,27 +202,53 @@ function ExploreCardComponent({
           </p>
         ))}
         {isGrouped && (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {groupedItems.map((groupedItem) => (
-              <button
-                key={groupedItem.id}
-                type="button"
-                className={cn(
-                  'relative z-20 inline-flex min-h-10 min-w-20 items-center justify-center gap-1.5 rounded-md border bg-game-surface-raised px-2.5 text-[10px] font-black uppercase tracking-wider transition-colors',
-                  groupedItem.type === 'expedition' &&
-                    activeExpedition?.expeditionId === groupedItem.id
-                    ? 'border-game-ochre/60 text-game-ochre'
-                    : 'border-game-border text-game-muted hover:border-game-charcoal/60 hover:text-game-charcoal-strong',
-                )}
-                onClick={(event) => {
-                  event.stopPropagation()
-                  selectItem(groupedItem)
-                }}
-              >
-                {getTypeIcon(groupedItem)}
-                {getModeLabel(groupedItem)}
-              </button>
-            ))}
+          <div
+            className={cn(
+              'mt-3 flex flex-wrap gap-2',
+              centered ? 'justify-center' : 'justify-end',
+            )}
+          >
+            {groupedItems.map((groupedItem) => {
+              const tone = getGroupedActionTone(groupedItem)
+              const isActive =
+                groupedItem.type === 'expedition' &&
+                activeExpedition?.expeditionId === groupedItem.id
+
+              return (
+                <button
+                  key={groupedItem.id}
+                  type="button"
+                  className={cn(
+                    'relative z-20 inline-flex min-h-10 min-w-32 items-stretch overflow-hidden rounded-lg border text-[10px] font-black uppercase tracking-wider shadow-sm transition-colors',
+                    tone.button,
+                    isActive && 'border-game-ochre/70',
+                  )}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    selectItem(groupedItem)
+                  }}
+                >
+                  <span
+                    className={cn(
+                      'flex w-10 shrink-0 items-center justify-center text-game-cream',
+                      tone.icon,
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        'flex h-7 w-7 items-center justify-center rounded-full border border-game-cream/35 bg-game-cream/10',
+                        '[&_svg]:!text-game-cream',
+                      )}
+                    >
+                      {getTypeIcon(groupedItem)}
+                    </span>
+                  </span>
+                  <span className="flex min-w-0 flex-1 items-center justify-end px-3 py-2 text-right leading-none">
+                    {getModeLabel(groupedItem)}
+                  </span>
+                </button>
+              )
+            })}
           </div>
         )}
         <div
@@ -201,7 +266,7 @@ function ExploreCardComponent({
               const active = activeVoyages.find((v) => v.voyageId === item.id)
               if (active) {
                 return (
-                  <div className="flex items-center gap-1.5 font-mono italic text-game-ochre">
+                  <div className="flex items-center justify-end gap-1.5 font-mono italic text-game-ochre">
                     <span className="h-1.5 w-1.5 rounded-full bg-game-ochre" />
                     <VoyageCountdown endTime={active.endTime} />
                   </div>
@@ -216,7 +281,7 @@ function ExploreCardComponent({
             ) {
               if (activeExpedition.status === 'ready_to_claim') {
                 return (
-                  <div className="flex items-center gap-1.5 font-mono italic text-game-ochre">
+                  <div className="flex items-center justify-end gap-1.5 font-mono italic text-game-ochre">
                     <span className="h-1.5 w-1.5 rounded-full bg-game-ochre" />
                     Ready to claim
                   </div>
@@ -224,7 +289,7 @@ function ExploreCardComponent({
               }
 
               return (
-                <div className="flex items-center gap-1.5 font-mono italic text-game-ochre">
+                <div className="flex items-center justify-end gap-1.5 font-mono italic text-game-ochre">
                   <span className="h-1.5 w-1.5 rounded-full bg-game-ochre" />
                   {(activeExpedition.steps?.[activeExpedition.currentStepIndex]
                     ?.type || 'activity') === 'branch_choice'
@@ -256,20 +321,6 @@ function ExploreCardComponent({
         </div>
       </div>
 
-      {/* Type Icon Accessory */}
-      {!centered && (
-        <div
-          className={cn(
-            isGrouped ? 'hidden' : 'ml-2 shrink-0 transition-colors',
-            isHighlighted
-              ? 'text-game-charcoal-strong'
-              : 'text-game-muted group-hover:text-game-ink',
-          )}
-          title={item.type}
-        >
-          {getTypeIcon(item)}
-        </div>
-      )}
     </Card>
   )
 }
