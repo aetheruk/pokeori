@@ -53,7 +53,7 @@ Do not use green, moss, teal, or saturated emerald in routine interface chrome. 
 - Explore list cards show the activity title and actionable status only; do not repeat the card title as a subtitle.
 - Badge collections show the badge artwork without a label or rounded-square frame. Inventory’s bag artwork follows the same unframed treatment as skill artwork.
 - Dialogs and drawers use paper surfaces across player-facing screens, while retaining the same padding and close/focus behavior.
-- Explore drawers use gesture dismissal and keep the scenic header free of a redundant close button. Their category chip sits below the centered icon as a glass orb treatment, and requirements/reward carousels render their own single card items without a second wrapper card.
+- Explore drawers use gesture dismissal and keep the scenic header free of a redundant close button. Their category chip sits below the centered icon as a glass orb treatment, with a centered icon/text row, tight line-height, and comfortable horizontal inset; requirements/reward carousels render their own single card items without a second wrapper card.
 
 ## Activity and scene composition
 
