@@ -24,6 +24,68 @@ interface ExploreCardProps {
   centered?: boolean
 }
 
+const getActivityTone = (modeItem: ExploreItem) => {
+  const gameType = (modeItem.originalData as any).gameType
+
+  if (modeItem.type === 'location') {
+    return {
+      orb: 'game-icon-orb-catch border-game-danger/70 text-game-danger',
+      button:
+        'border-game-danger/55 bg-game-surface-raised text-game-ink hover:border-game-danger/80 hover:bg-game-surface',
+      icon: 'bg-game-danger',
+      iconText: 'text-game-danger',
+    }
+  }
+
+  if (modeItem.type === 'game' && gameType === 'fishing') {
+    return {
+      orb: 'game-icon-orb-fishing border-game-stance-blue/70 text-game-stance-blue-strong',
+      button:
+        'border-game-stance-blue/55 bg-game-surface-raised text-game-ink hover:border-game-stance-blue-strong/80 hover:bg-game-surface',
+      icon: 'bg-game-stance-blue',
+      iconText: 'text-game-stance-blue-strong',
+    }
+  }
+
+  if (modeItem.type === 'battle' || modeItem.type === 'vs-seeker') {
+    return {
+      orb: 'game-icon-orb-battle border-game-battle-orange/70 text-game-battle-orange-strong',
+      button:
+        'border-game-battle-orange/55 bg-game-surface-raised text-game-ink hover:border-game-battle-orange-strong/80 hover:bg-game-surface',
+      icon: 'bg-game-battle-orange',
+      iconText: 'text-game-battle-orange-strong',
+    }
+  }
+
+  if (modeItem.type === 'field-research') {
+    return {
+      orb: 'game-icon-orb-research border-game-research/70 text-game-research-strong',
+      button:
+        'border-game-research/55 bg-game-surface-raised text-game-ink hover:border-game-research-strong/80 hover:bg-game-surface',
+      icon: 'bg-game-research',
+      iconText: 'text-game-research-strong',
+    }
+  }
+
+  if (modeItem.type === 'events' || modeItem.type === 'expedition') {
+    return {
+      orb: 'game-icon-orb-discovery border-game-ochre/70 text-game-ochre',
+      button:
+        'border-game-ochre/55 bg-game-surface-raised text-game-ink hover:border-game-ochre/80 hover:bg-game-surface',
+      icon: 'bg-game-ochre',
+      iconText: 'text-game-ochre',
+    }
+  }
+
+  return {
+    orb: 'game-icon-orb-neutral border-game-charcoal/45 text-game-charcoal-strong',
+    button:
+      'border-game-border bg-game-surface-raised text-game-ink hover:border-game-charcoal/60 hover:bg-game-surface',
+    icon: 'bg-game-charcoal',
+    iconText: 'text-game-charcoal-strong',
+  }
+}
+
 function ExploreCardComponent({
   entry,
   trainerName,
@@ -38,6 +100,12 @@ function ExploreCardComponent({
 }: ExploreCardProps) {
   const item = entry.kind === 'single' ? entry.item : entry.group.items[0]!
   const groupedItems = entry.kind === 'group' ? entry.group.items : []
+  const toneSource =
+    entry.kind === 'group'
+      ? groupedItems.find((groupedItem) => groupedItem.type === 'location') ||
+        item
+      : item
+  const cardIconTone = getActivityTone(toneSource)
   const expeditionItem =
     item.type === 'expedition'
       ? item
@@ -97,45 +165,7 @@ function ExploreCardComponent({
   }
 
   const getGroupedActionTone = (modeItem: ExploreItem) => {
-    const gameType = (modeItem.originalData as any).gameType
-
-    if (modeItem.type === 'game' && gameType === 'fishing') {
-      return {
-        button:
-          'border-game-stance-blue/55 bg-game-surface-raised text-game-ink hover:border-game-stance-blue-strong/75 hover:bg-game-surface',
-        icon: 'bg-game-stance-blue',
-      }
-    }
-
-    if (modeItem.type === 'location') {
-      return {
-        button:
-          'border-game-charcoal/45 bg-game-surface-raised text-game-ink hover:border-game-charcoal/70 hover:bg-game-surface',
-        icon: 'bg-game-charcoal',
-      }
-    }
-
-    if (modeItem.type === 'battle' || modeItem.type === 'vs-seeker') {
-      return {
-        button:
-          'border-game-clay/45 bg-game-surface-raised text-game-ink hover:border-game-clay/70 hover:bg-game-surface',
-        icon: 'bg-game-clay',
-      }
-    }
-
-    if (modeItem.type === 'field-research') {
-      return {
-        button:
-          'border-game-ochre/50 bg-game-surface-raised text-game-ink hover:border-game-ochre/75 hover:bg-game-surface',
-        icon: 'bg-game-ochre',
-      }
-    }
-
-    return {
-      button:
-        'border-game-border bg-game-surface-raised text-game-ink hover:border-game-charcoal/60 hover:bg-game-surface',
-      icon: 'bg-game-charcoal/80',
-    }
+    return getActivityTone(modeItem)
   }
 
   return (
@@ -190,15 +220,15 @@ function ExploreCardComponent({
             className={cn(
               'game-icon-orb relative z-10 h-14 w-14 shrink-0 transition-colors',
               isEventCard
-                ? 'border-game-ochre/70 text-game-ochre'
+                ? 'game-icon-orb-discovery border-game-ochre/70 text-game-ochre'
                 : isHighlighted
-                ? 'border-game-ochre/60 text-game-ochre'
-                : 'border-game-border text-game-ink group-hover:border-game-charcoal/45',
+                ? 'game-icon-orb-discovery border-game-ochre/70 text-game-ochre'
+                : cardIconTone.orb,
             )}
           >
             <TaskIconDisplay
               icon={displayIcon}
-              className="h-9 w-9"
+              className={cn('h-9 w-9', cardIconTone.iconText)}
             />
             {isLocationMastered && (
               <Star className="pointer-events-none absolute bottom-0 left-1/2 z-20 h-2 w-2 -translate-x-1/2 translate-y-1/2 fill-game-ochre text-game-ochre drop-shadow" />

@@ -57,6 +57,10 @@
   --color-game-clay-strong: var(--game-clay-strong);
   --color-game-stance-blue: var(--game-stance-blue);
   --color-game-stance-blue-strong: var(--game-stance-blue-strong);
+  --color-game-research: var(--game-research);
+  --color-game-research-strong: var(--game-research-strong);
+  --color-game-battle-orange: var(--game-battle-orange);
+  --color-game-battle-orange-strong: var(--game-battle-orange-strong);
   --color-game-ochre: var(--game-ochre);
   --color-game-danger: var(--game-danger);
   --color-game-night-canvas: var(--game-night-canvas);
@@ -105,6 +109,10 @@
   --game-clay-strong: #974837;
   --game-stance-blue: #5d83ae;
   --game-stance-blue-strong: #345f8d;
+  --game-research: #6f8d5c;
+  --game-research-strong: #4d6d43;
+  --game-battle-orange: #c4773c;
+  --game-battle-orange-strong: #a45d2d;
   --game-ochre: #b58a43;
   --game-danger: #9a4337;
   --game-night-canvas: #172733;
@@ -164,18 +172,87 @@
 
   /* Shared icon treatment for player-facing rows, cards, and drawer headers. */
   .game-icon-orb {
+    --game-icon-tint: var(--game-charcoal);
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid color-mix(in srgb, var(--game-ink) 28%, transparent);
+    border: 1px solid color-mix(in srgb, var(--game-icon-tint) 44%, transparent);
     border-radius: 9999px;
-    background: color-mix(in srgb, var(--game-surface-raised) 42%, transparent);
+    background:
+      linear-gradient(
+        145deg,
+        rgb(255 255 255 / 0.28) 0%,
+        rgb(255 255 255 / 0.08) 42%,
+        color-mix(in srgb, var(--game-icon-tint) 14%, transparent) 100%
+      ),
+      color-mix(in srgb, var(--game-icon-tint) 5%, transparent);
+    background-clip: padding-box;
     box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.48),
-      inset 0 -8px 16px rgb(24 35 39 / 0.08),
-      0 5px 16px rgb(24 35 39 / 0.1);
-    backdrop-filter: blur(12px) saturate(1.05);
-    -webkit-backdrop-filter: blur(12px) saturate(1.05);
+      inset 0 1px 0 rgb(255 255 255 / 0.9),
+      inset 0 -10px 18px color-mix(in srgb, var(--game-icon-tint) 18%, transparent),
+      0 6px 18px rgb(24 35 39 / 0.12);
+    backdrop-filter: blur(16px) saturate(1.3);
+    -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  }
+
+  .game-icon-orb::before,
+  .game-icon-orb::after {
+    position: absolute;
+    inset: 1px;
+    border-radius: inherit;
+    content: '';
+    pointer-events: none;
+  }
+
+  .game-icon-orb::before {
+    z-index: 0;
+    background: linear-gradient(
+      135deg,
+      rgb(255 255 255 / 0.58) 0%,
+      rgb(255 255 255 / 0.14) 24%,
+      transparent 52%
+    );
+  }
+
+  .game-icon-orb::after {
+    z-index: 0;
+    background: radial-gradient(
+      circle at 72% 82%,
+      color-mix(in srgb, var(--game-icon-tint) 24%, transparent),
+      transparent 58%
+    );
+  }
+
+  .game-icon-orb > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .game-icon-orb-neutral {
+    --game-icon-tint: var(--game-charcoal);
+  }
+
+  .game-icon-orb-catch {
+    --game-icon-tint: var(--game-danger);
+  }
+
+  .game-icon-orb-research {
+    --game-icon-tint: var(--game-research);
+  }
+
+  .game-icon-orb-battle {
+    --game-icon-tint: var(--game-battle-orange);
+  }
+
+  .game-icon-orb-fishing {
+    --game-icon-tint: var(--game-stance-blue);
+  }
+
+  .game-icon-orb-discovery {
+    --game-icon-tint: var(--game-ochre);
   }
 
   .game-page-scroll {
@@ -283,6 +360,10 @@
     --game-clay: #d78467;
     --game-stance-blue: #8eb9e2;
     --game-stance-blue-strong: #b9d8f1;
+    --game-research: #9bb789;
+    --game-research-strong: #c0d7b2;
+    --game-battle-orange: #e3a06e;
+    --game-battle-orange-strong: #f1bd94;
     --game-ochre: #d3ad63;
     --game-accent: var(--game-charcoal);
     --background: var(--game-night-canvas);
@@ -325,6 +406,10 @@
     --game-clay-strong: #974837;
     --game-stance-blue: #5d83ae;
     --game-stance-blue-strong: #345f8d;
+    --game-research: #6f8d5c;
+    --game-research-strong: #4d6d43;
+    --game-battle-orange: #c4773c;
+    --game-battle-orange-strong: #a45d2d;
     --game-ochre: #b58a43;
     --game-danger: #9a4337;
     --game-accent: var(--game-charcoal);
@@ -384,6 +469,10 @@
     --game-clay: #d78467;
     --game-stance-blue: #8eb9e2;
     --game-stance-blue-strong: #b9d8f1;
+    --game-research: #9bb789;
+    --game-research-strong: #c0d7b2;
+    --game-battle-orange: #e3a06e;
+    --game-battle-orange-strong: #f1bd94;
     --game-ochre: #d3ad63;
     --game-accent: var(--game-charcoal);
     --game-paper-background: var(--game-night-canvas);
@@ -425,6 +514,10 @@
     --game-clay: #d78467;
     --game-stance-blue: #8eb9e2;
     --game-stance-blue-strong: #b9d8f1;
+    --game-research: #9bb789;
+    --game-research-strong: #c0d7b2;
+    --game-battle-orange: #e3a06e;
+    --game-battle-orange-strong: #f1bd94;
     --game-ochre: #d3ad63;
     --game-accent: var(--game-charcoal);
     --game-paper-background: var(--game-night-canvas);
