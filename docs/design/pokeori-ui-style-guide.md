@@ -22,8 +22,12 @@ The exact CSS variables live in `src/styles/globals.css`. Use semantic roles ins
 | Deep charcoal | `#1d2522` | pressed/strong charcoal states |
 | Clay | `#b86148` | primary actions, rewards, urgent calls to action |
 | Ochre | `#b58a43` | discoveries, milestones, special progress |
+| Catch red | `#9a4337` | catch activities and location actions |
+| Research green | `#6f8d5c` | field research and study activities only |
+| Battle orange | `#c4773c` | battles and trainer rematches |
+| Fishing blue | `#5d83ae` | fishing activities |
 
-Do not use green, moss, teal, or saturated emerald in routine interface chrome. Avoid pure black, arbitrary gradient text, and decorative color that does not communicate state. Preserve Pokemon type colors and rarity colors only when they are gameplay semantics.
+Do not use green, moss, teal, or saturated emerald in routine interface chrome; the botanical green above is reserved for research activity semantics. Avoid pure black, arbitrary gradient text, and decorative color that does not communicate state. Preserve Pokemon type colors and rarity colors only when they are gameplay semantics.
 
 ## Typography
 
@@ -50,7 +54,7 @@ Do not use green, moss, teal, or saturated emerald in routine interface chrome. 
 - Page headers combine a small contextual label, a serif title, and an optional short description. Avoid repeated oversized headers above every subsection.
 - Lists use stable rows with a centered glass icon orb, clear title/metadata hierarchy, and visible keyboard focus. Hover should not move or enlarge the row.
 - Section headings use centered text with rules extending to both sides; do not add a decorative diamond before the heading.
-- Explore list cards keep the activity artwork on the left, remove redundant right-side type accessories, and right-align the title and status. When content provides a background, use it as a low-opacity scenic layer beneath a directional raised-paper fade so the scene remains visible on the art side while titles and statuses stay readable. Special Events use the cosmic-gold scene with an ochre bulletin treatment; trainer rematches use the battle scene. Repeatable tasks use a small repeat badge at the bottom center of their icon. When a card groups multiple activities, its actions stay right-aligned and use clean two-part buttons with semantic activity-colored icon wells: Fishing uses blue, Explore/catch uses charcoal, battles use clay, and study uses ochre. Every activity icon sits directly in its colored well without an extra icon orb.
+- Explore list cards keep the activity artwork on the left, remove redundant right-side type accessories, and right-align the title and status. When content provides a background, use it as a low-opacity scenic layer beneath a directional raised-paper fade so the scene remains visible on the art side while titles and statuses stay readable. Special Events use the cosmic-gold scene with an ochre bulletin treatment; trainer rematches use the battle scene. Repeatable tasks use a small repeat badge at the bottom center of their icon. Primary card icons use a visible frosted-glass orb with a restrained activity tint: catch red, research green, battles/rematches burnt orange, fishing blue, and events/expeditions ochre. When a card groups multiple activities, its actions stay right-aligned and use clean two-part buttons with matching semantic icon wells; grouped action icons sit directly in their colored wells without an extra circle.
 - Badge collections show the badge artwork without a label or rounded-square frame. Inventory’s bag artwork follows the same unframed treatment as skill artwork.
 - Dialogs and drawers use paper surfaces across player-facing screens, while retaining the same padding and close/focus behavior.
 - Explore drawers use gesture dismissal and keep the scenic header free of a redundant close button. Their category chip sits below the centered icon as a glass orb treatment, with a centered icon/text row, tight line-height, and comfortable horizontal inset; requirements/reward carousels render their own single card items without a second wrapper card.
