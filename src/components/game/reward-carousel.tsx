@@ -1,8 +1,14 @@
 'use client'
 
 import * as React from 'react'
-import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel'
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from '@/components/ui/carousel'
 import { Check } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 export interface RewardItem {
   icon: React.ReactNode
@@ -19,15 +25,18 @@ interface RewardCarouselProps {
   rewards: RewardItem[]
   autoScroll?: boolean
   autoScrollMaxItems?: number
+  variant?: 'default' | 'journal'
 }
 
 export function RewardCarousel({
   rewards,
   autoScroll = false,
   autoScrollMaxItems = 5,
+  variant = 'default',
 }: RewardCarouselProps) {
   const [api, setApi] = React.useState<CarouselApi>()
-  const shouldAutoScroll = autoScroll && rewards.length > 1 && rewards.length <= autoScrollMaxItems
+  const shouldAutoScroll =
+    autoScroll && rewards.length > 1 && rewards.length <= autoScrollMaxItems
 
   React.useEffect(() => {
     if (
@@ -73,67 +82,77 @@ export function RewardCarousel({
           <CarouselItem key={index} className="basis-full min-w-0">
             {(() => {
               const progress = getProgressValue(reward)
-              const showProgressCircle = !!progress && progress.max > 1 && !reward.completed
+              const showProgressCircle =
+                !!progress && progress.max > 1 && !reward.completed
               const showCompletedCheck = reward.completed
 
               return (
-            <div className="relative overflow-hidden rounded-lg border border-game-border bg-game-surface-raised p-4">
-
-              <div className="flex items-center gap-4 relative z-10">
-                <div className="shrink-0">
-                  <div className="game-icon-orb relative z-10 h-14 w-14">
-                    <div className="scale-125">{reward.icon}</div>
-                  </div>
-                </div>
-
-                {/* Reward Details */}
-                <div className="flex flex-1 flex-col min-w-0 w-full">
-                    <span className="mb-1 whitespace-normal break-words text-base font-semibold leading-tight text-game-ink md:text-lg">
-                    {reward.label}
-                  </span>
-                  {reward.subLabel && (
-                    <div className="flex items-start gap-1.5">
-                      <div className="mt-2 h-px w-3 shrink-0 bg-game-border-strong" />
-                      <span className="whitespace-normal break-words text-[10px] font-bold uppercase leading-snug text-game-muted">
-                        {reward.subLabel}
-                      </span>
-                    </div>
+                <div
+                  className={cn(
+                    'relative overflow-hidden rounded-lg border border-game-border bg-game-surface-raised p-4',
+                    variant === 'journal' &&
+                      'rounded-none border-x-0 border-y border-game-border/75 bg-transparent px-1 py-3 md:px-2',
                   )}
-                </div>
-
-                {(showProgressCircle || showCompletedCheck) && (
-                  <div className="shrink-0">
-                    {showCompletedCheck ? (
+                >
+                  <div className="flex items-center gap-4 relative z-10">
+                    <div className="shrink-0">
                       <div
-                        className="game-icon-orb h-10 w-10 border-game-charcoal/40 text-game-charcoal-strong"
-                        role="img"
-                        title="Complete"
-                        aria-label="Complete"
+                        className={cn(
+                          'game-icon-orb relative z-10 h-14 w-14',
+                          variant === 'journal' && 'h-12 w-12',
+                        )}
                       >
-                        <Check className="h-5 w-5" strokeWidth={4} />
+                        <div className="scale-125">{reward.icon}</div>
                       </div>
-                    ) : progress ? (
-                      <div
-                        className="w-11 h-11 rounded-full p-0.5"
-                        style={{
-                          background: `conic-gradient(var(--game-ochre) ${progress.percent}%, var(--game-border) ${progress.percent}% 100%)`,
-                        }}
-                        title={`${progress.current} of ${progress.max} complete`}
-                        role="img"
-                        aria-label={`${progress.current} of ${progress.max} complete`}
-                      >
-                        <div className="flex h-full w-full items-center justify-center rounded-full border border-game-border bg-game-surface">
-                          <span className="font-mono text-[10px] font-black text-game-ochre">
-                            {progress.current}/{progress.max}
+                    </div>
+
+                    {/* Reward Details */}
+                    <div className="flex flex-1 flex-col min-w-0 w-full">
+                      <span className="mb-1 whitespace-normal break-words text-base font-semibold leading-tight text-game-ink md:text-lg">
+                        {reward.label}
+                      </span>
+                      {reward.subLabel && (
+                        <div className="flex items-start gap-1.5">
+                          <div className="mt-2 h-px w-3 shrink-0 bg-game-border-strong" />
+                          <span className="whitespace-normal break-words text-[10px] font-bold uppercase leading-snug text-game-muted">
+                            {reward.subLabel}
                           </span>
                         </div>
-                      </div>
-                    ) : null}
-                  </div>
-                )}
-              </div>
+                      )}
+                    </div>
 
-            </div>
+                    {(showProgressCircle || showCompletedCheck) && (
+                      <div className="shrink-0">
+                        {showCompletedCheck ? (
+                          <div
+                            className="game-icon-orb h-10 w-10 border-game-charcoal/40 text-game-charcoal-strong"
+                            role="img"
+                            title="Complete"
+                            aria-label="Complete"
+                          >
+                            <Check className="h-5 w-5" strokeWidth={4} />
+                          </div>
+                        ) : progress ? (
+                          <div
+                            className="w-11 h-11 rounded-full p-0.5"
+                            style={{
+                              background: `conic-gradient(var(--game-ochre) ${progress.percent}%, var(--game-border) ${progress.percent}% 100%)`,
+                            }}
+                            title={`${progress.current} of ${progress.max} complete`}
+                            role="img"
+                            aria-label={`${progress.current} of ${progress.max} complete`}
+                          >
+                            <div className="flex h-full w-full items-center justify-center rounded-full border border-game-border bg-game-surface">
+                              <span className="font-mono text-[10px] font-black text-game-ochre">
+                                {progress.current}/{progress.max}
+                              </span>
+                            </div>
+                          </div>
+                        ) : null}
+                      </div>
+                    )}
+                  </div>
+                </div>
               )
             })()}
           </CarouselItem>

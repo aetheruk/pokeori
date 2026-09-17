@@ -176,8 +176,8 @@ function ExploreCardComponent({
         isEventCard
           ? 'border-game-ochre/60 bg-game-surface-raised hover:border-game-ochre/80'
           : isHighlighted
-          ? 'border-game-ochre/45 bg-game-surface-raised'
-          : 'border-game-card-border bg-game-surface hover:border-game-charcoal/35 hover:bg-game-surface-raised',
+            ? 'border-game-ochre/45 bg-game-surface-raised'
+            : 'border-game-card-border bg-game-surface hover:border-game-charcoal/35 hover:bg-game-surface-raised',
         centered && 'justify-center',
       )}
       role={isInteractive ? 'button' : undefined}
@@ -199,7 +199,7 @@ function ExploreCardComponent({
         <>
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-50"
+            className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-60"
             style={{ backgroundImage: `url(${cardBackground})` }}
           />
           <div
@@ -207,8 +207,8 @@ function ExploreCardComponent({
             className={cn(
               'pointer-events-none absolute inset-0 bg-gradient-to-l',
               isEventCard
-                ? 'from-game-surface-raised/96 via-game-surface/82 to-game-ochre/15'
-                : 'from-game-surface-raised/95 via-game-surface/78 to-game-surface/25',
+                ? 'from-game-surface-raised/96 via-game-surface/82 to-game-ochre/10'
+                : 'from-game-surface-raised/95 via-game-surface/78 to-game-surface/10',
             )}
           />
         </>
@@ -218,12 +218,12 @@ function ExploreCardComponent({
         <div className="relative shrink-0">
           <div
             className={cn(
-              'game-icon-orb relative z-10 h-14 w-14 shrink-0 transition-colors',
+              'game-icon-orb game-icon-orb-art relative z-10 h-14 w-14 shrink-0 transition-colors',
               isEventCard
                 ? 'game-icon-orb-discovery border-game-ochre/70 text-game-ochre'
                 : isHighlighted
-                ? 'game-icon-orb-discovery border-game-ochre/70 text-game-ochre'
-                : cardIconTone.orb,
+                  ? 'game-icon-orb-discovery border-game-ochre/70 text-game-ochre'
+                  : cardIconTone.orb,
             )}
           >
             <TaskIconDisplay
@@ -262,7 +262,8 @@ function ExploreCardComponent({
         {(item.originalData as any)?.eventContexts?.map((event: any) => (
           <p key={event.id} className="mt-1 text-xs text-game-ochre">
             {event.title}
-            {event.timingMode !== 'manual' && event.endAt &&
+            {event.timingMode !== 'manual' &&
+              event.endAt &&
               ` · Ends ${new Date(event.endAt).toLocaleString()}`}
           </p>
         ))}
@@ -378,7 +379,6 @@ function ExploreCardComponent({
           })()}
         </div>
       </div>
-
     </Card>
   )
 }

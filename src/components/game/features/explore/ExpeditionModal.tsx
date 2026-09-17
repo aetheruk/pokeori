@@ -71,6 +71,30 @@ type ExpeditionActivityDetail = {
   }>
 }
 
+function ExpeditionMetricRow({
+  icon,
+  label,
+  value,
+  tone,
+}: {
+  icon: ReactNode
+  label: string
+  value: string | number
+  tone: string
+}) {
+  return (
+    <div className="flex min-h-14 items-center gap-3 border-b border-game-border/70 py-3 last:border-b-0">
+      <div className={cn('game-icon-orb size-8 shrink-0', tone)}>{icon}</div>
+      <span className="min-w-0 flex-1 truncate text-[10px] font-bold uppercase tracking-[0.12em] text-game-muted">
+        {label}
+      </span>
+      <span className="font-mono text-sm font-black text-game-ink">
+        {value}
+      </span>
+    </div>
+  )
+}
+
 function getActivityMeta(
   activityType: string,
   activityId: string,
@@ -319,8 +343,7 @@ function ExpeditionModalContent({
     if (
       !open ||
       !activeRun ||
-      (activeRun.status !== 'active' &&
-        activeRun.status !== 'ready_to_claim')
+      (activeRun.status !== 'active' && activeRun.status !== 'ready_to_claim')
     )
       return
 
@@ -382,8 +405,8 @@ function ExpeditionModalContent({
               </h2>
             </div>
             <SectionDivider>Overview</SectionDivider>
-            <div className="game-panel p-4 md:p-5">
-              <p className="text-center text-sm font-medium italic leading-relaxed text-game-muted md:text-base">
+            <div className="border-l-2 border-game-clay/50 pl-4 md:pl-5">
+              <p className="text-sm font-medium leading-relaxed text-game-ink md:text-base">
                 {item.description}
               </p>
             </div>
@@ -392,77 +415,42 @@ function ExpeditionModalContent({
           {(activeRun || hasExpeditionStats) && (
             <div className="space-y-4">
               <SectionDivider>Rules &amp; Stats</SectionDivider>
-              <div
-                className={cn(
-                  'grid gap-3',
-                  activeRun && hasExpeditionStats
-                    ? 'grid-cols-2 md:grid-cols-4'
-                    : 'grid-cols-2',
-                )}
-              >
+              <div className="grid border-y border-game-border/75 md:grid-cols-2 md:gap-x-8">
                 {activeRun && (
                   <>
-                    <div className="group flex items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 transition-colors hover:border-game-moss/35">
-                      <div className="text-game-moss-strong">
-                        <Flag className="w-4 h-4" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-game-muted">
-                          Progress
-                        </span>
-                        <span className="font-mono text-sm font-bold text-game-ink">
-                          {progressCurrent}/{progressTotal}
-                        </span>
-                      </div>
-                    </div>
+                    <ExpeditionMetricRow
+                      icon={<Flag className="h-4 w-4" />}
+                      label="Progress"
+                      value={`${progressCurrent}/${progressTotal}`}
+                      tone="text-game-charcoal-strong"
+                    />
 
                     {canFail ? (
-                      <div className="group flex items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 transition-colors hover:border-game-clay/35">
-                        <div className="text-game-clay">
-                          <Heart className="w-4 h-4" />
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-[10px] font-semibold uppercase tracking-wider text-game-muted">
-                            Lives
-                          </span>
-                          <span className="font-mono text-sm font-bold text-game-ink">
-                            {livesLeft}/{maxLosses}
-                          </span>
-                        </div>
-                      </div>
+                      <ExpeditionMetricRow
+                        icon={<Heart className="h-4 w-4" />}
+                        label="Lives"
+                        value={`${livesLeft}/${maxLosses}`}
+                        tone="text-game-clay"
+                      />
                     ) : null}
                   </>
                 )}
 
                 {hasExpeditionStats && (
                   <>
-                    <div className="group flex items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 transition-colors hover:border-game-moss/35">
-                      <div className="text-game-moss-strong">
-                        <ThumbsUp className="w-4 h-4" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-game-muted">
-                          Success
-                        </span>
-                        <span className="font-mono text-sm font-bold text-game-ink">
-                          {expeditionResult?.wins || 0}
-                        </span>
-                      </div>
-                    </div>
+                    <ExpeditionMetricRow
+                      icon={<ThumbsUp className="h-4 w-4" />}
+                      label="Success"
+                      value={expeditionResult?.wins || 0}
+                      tone="text-game-charcoal-strong"
+                    />
 
-                    <div className="group flex items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 transition-colors hover:border-game-clay/35">
-                      <div className="text-game-danger">
-                        <ThumbsDown className="w-4 h-4" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-game-muted">
-                          Fail
-                        </span>
-                        <span className="font-mono text-sm font-bold text-game-ink">
-                          {expeditionResult?.losses || 0}
-                        </span>
-                      </div>
-                    </div>
+                    <ExpeditionMetricRow
+                      icon={<ThumbsDown className="h-4 w-4" />}
+                      label="Fail"
+                      value={expeditionResult?.losses || 0}
+                      tone="text-game-danger"
+                    />
                   </>
                 )}
               </div>
@@ -472,7 +460,7 @@ function ExpeditionModalContent({
           {expedition?.mapItemId && (
             <div>
               <SectionDivider>Map Required</SectionDivider>
-              <div className="group mt-4 flex items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 transition-colors hover:border-game-moss/35">
+              <div className="mt-4 flex items-center gap-3 border-y border-game-border/75 py-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="game-icon-orb h-9 w-9">
                     <ItemSprite
@@ -499,7 +487,7 @@ function ExpeditionModalContent({
             <div>
               <SectionDivider>{pathLabel} Path</SectionDivider>
               {steps.length === 0 ? (
-                <div className="mt-4 flex items-center gap-2 rounded-lg border border-game-border bg-game-surface p-4 text-sm text-game-muted">
+                <div className="mt-4 flex items-center gap-2 border-y border-game-border/75 py-4 text-sm text-game-muted">
                   <Clock3 className="h-4 w-4 text-game-moss-strong" />
                   {pathLabel} path will generate when you begin this{' '}
                   {expeditionLabelLower}.
@@ -590,13 +578,13 @@ function ExpeditionModalContent({
 
                         <div
                           className={cn(
-                            'rounded-lg border px-4 py-3 transition-colors',
+                            'border-l-2 px-4 py-3 transition-colors',
                             isDone
-                              ? 'border-game-moss/40 bg-game-moss/10'
+                              ? 'border-game-charcoal/65 bg-game-moss/10'
                               : isCurrent
-                                ? 'border-game-ochre/40 bg-game-ochre/10'
-                                : 'border-game-border bg-game-surface',
-                            canToggleDetails && 'hover:border-game-moss/40',
+                                ? 'border-game-ochre/70 bg-game-ochre/10'
+                                : 'border-game-border-strong bg-game-surface/55',
+                            canToggleDetails && 'hover:bg-game-surface-raised',
                           )}
                         >
                           <div className="flex items-start justify-between gap-3">
@@ -695,7 +683,7 @@ function ExpeditionModalContent({
                               {canToggleDetails &&
                                 isExpanded &&
                                 activityDetails && (
-                                  <div className="mt-3 rounded-lg border border-game-border bg-game-surface-raised p-3">
+                                  <div className="mt-3 border-t border-game-border/70 pt-3">
                                     <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-game-muted">
                                       {activityDetails.title}
                                     </div>
@@ -704,7 +692,11 @@ function ExpeditionModalContent({
                                       role="presentation"
                                       className="mt-2 flex gap-2 overflow-x-auto pb-1 pt-1 custom-scrollbar [touch-action:pan-x]"
                                       onKeyDown={(event) => {
-                                        if (event.key === 'Enter' || event.key === ' ') event.stopPropagation()
+                                        if (
+                                          event.key === 'Enter' ||
+                                          event.key === ' '
+                                        )
+                                          event.stopPropagation()
                                       }}
                                       onClick={(event) =>
                                         event.stopPropagation()
@@ -714,7 +706,7 @@ function ExpeditionModalContent({
                                         (entry, detailIndex) => (
                                           <div
                                             key={`${entry.name}-${detailIndex}`}
-                                            className="group relative flex min-w-[98px] shrink-0 flex-col items-center rounded-lg border border-game-border bg-game-surface p-2 transition-colors hover:border-game-moss/40"
+                                            className="group relative flex min-w-[98px] shrink-0 flex-col items-center border border-game-border bg-game-surface/70 p-2 transition-colors hover:border-game-moss/40"
                                           >
                                             <div className="relative w-14 h-14 flex items-center justify-center mb-1">
                                               {entry.formId ? (
@@ -779,7 +771,7 @@ function ExpeditionModalContent({
             <div>
               <SectionDivider>Requirements</SectionDivider>
               <div className="mt-4">
-                <RewardCarousel rewards={criteria} />
+                <RewardCarousel rewards={criteria} variant="journal" />
               </div>
             </div>
           )}
@@ -788,7 +780,7 @@ function ExpeditionModalContent({
             <div>
               <SectionDivider>Potential Rewards</SectionDivider>
               <div className="mt-4">
-                <RewardCarousel rewards={rewards} />
+                <RewardCarousel rewards={rewards} variant="journal" />
               </div>
             </div>
           )}
@@ -799,9 +791,7 @@ function ExpeditionModalContent({
         <div className="shrink-0 border-t border-game-border bg-game-surface p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:p-6 md:pb-[max(1.5rem,env(safe-area-inset-bottom))]">
           <div className="max-w-3xl mx-auto">
             {activeRun && (
-              <div
-                className="mx-auto mb-3 max-w-md space-y-1.5"
-              >
+              <div className="mx-auto mb-3 max-w-md space-y-1.5">
                 <div className="flex items-center justify-between gap-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-game-muted">
                   <span>
                     {activeRun.status === 'ready_to_claim'
