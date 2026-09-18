@@ -27,6 +27,7 @@ import {
 } from '@/utilities/pokemon/pokemon-powers'
 
 import { useBattleContext } from './battle-context'
+import { BattleActionTrigger } from './battle-action-trigger'
 import { BattleMovesContent, getBattleMovePresentation, MoveInfoDialog } from './battle-moves-content'
 
 export function PowerSelector() {
@@ -312,26 +313,13 @@ export function PowerSelector() {
       {hasAnyMoves && (
         <Drawer open={moveOpen} onOpenChange={setMoveOpen}>
           <DrawerTrigger asChild>
-            <Button
-              variant="outline"
+            <BattleActionTrigger
+              itemId={moveTriggerItemId}
+              label="Moves"
+              count={`${Math.max(0, movesUsesRemaining)}/${maxMovesPerBattle}`}
+              aria-label={`Moves, ${Math.max(0, movesUsesRemaining)} of ${maxMovesPerBattle} uses remaining`}
               disabled={disabled || !canUseMove}
-              className={cn(
-                'flex-1 h-12 gap-2 rounded-xl border border-game-border bg-game-surface-raised text-game-ink shadow-sm transition-colors',
-                'hover:border-game-moss/60 hover:bg-game-surface-raised hover:text-game-ink',
-                !canUseMove && 'opacity-50',
-              )}
-            >
-              <ItemSprite
-                itemId={moveTriggerItemId}
-                alt="Moves"
-                width={22}
-                height={22}
-                className="h-5 w-5 object-contain"
-              />
-              <span className="rounded-full border border-game-border bg-game-canvas/60 px-1.5 py-0.5 text-[10px] font-black text-game-ink">
-                {Math.max(0, movesUsesRemaining)}/{maxMovesPerBattle}
-              </span>
-            </Button>
+            />
           </DrawerTrigger>
           <DrawerContent
             id={moveDrawerContentId}
@@ -371,25 +359,13 @@ export function PowerSelector() {
       {shouldShowPowerTrigger && (
         <Drawer open={powerOpen} onOpenChange={setPowerOpen}>
           <DrawerTrigger asChild>
-            <Button
-              variant="outline"
+            <BattleActionTrigger
+              itemId={powerTriggerItemId}
+              label="Powers"
+              count={powerUsesChip}
+              aria-label={`Powers, ${powerUsesChip} uses remaining`}
               disabled={disabled || (!hasAnyPowers && !isBattlePanelLoading)}
-              className={cn(
-                'flex-1 h-12 gap-2 rounded-xl border border-game-border bg-game-surface-raised text-game-ink shadow-sm transition-colors',
-                'hover:border-game-moss/60 hover:bg-game-surface-raised hover:text-game-ink',
-              )}
-            >
-              <ItemSprite
-                itemId={powerTriggerItemId}
-                alt="Powers"
-                width={22}
-                height={22}
-                className="h-5 w-5 object-contain"
-              />
-              <span className="rounded-full border border-game-border bg-game-canvas/60 px-1.5 py-0.5 text-[10px] font-black text-game-ink">
-                {powerUsesChip}
-              </span>
-            </Button>
+            />
           </DrawerTrigger>
           <DrawerContent
             id={powerDrawerContentId}

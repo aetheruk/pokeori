@@ -88,16 +88,13 @@ function SingleBattleActionMenu() {
 
   return (
     <div
-      className={cn(
-        'game-paper-first game-paper-background relative flex min-h-[13rem] flex-[10] flex-col items-center border-t border-game-border bg-game-canvas px-4 pt-4 pb-6 text-game-ink transition-opacity',
-        isWaitingForServer && 'opacity-75',
-      )}
+      className="game-paper-first game-paper-background relative flex min-h-[13rem] flex-[10] flex-col items-center border-t border-game-border bg-game-canvas px-3 pt-2 pb-4 text-game-ink sm:px-4"
       aria-busy={isWaitingForServer || isAnimating}
     >
-      {isWaitingForServer && (
+      {isWaitingForServer && pendingBattleAction?.kind !== 'stance' && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-game-surface/80 backdrop-blur-[1px]">
           <div className="flex flex-col items-center gap-2 text-center">
-            <Loader2 className="h-8 w-8 animate-spin text-game-moss" />
+            <Loader2 className="h-8 w-8 animate-spin text-game-moss motion-reduce:animate-none" />
             <div className="rounded-full border border-game-moss/30 bg-game-surface-raised px-3 py-1 text-xs font-semibold text-game-moss-strong">
               {pendingBattleAction?.label || 'Resolving action'}
             </div>
@@ -130,11 +127,11 @@ function SingleBattleActionMenu() {
           </Button>
         </div>
       ) : (
-        <div className="flex h-full w-full flex-col items-center justify-between gap-4">
+        <div className="flex w-full max-w-2xl flex-col items-center gap-3">
           {/* Type Selector */}
           <div className="w-full max-w-md flex flex-col gap-2 items-center">
             {activePlayerMon.teraTypeOverride ? (
-              <div className="flex items-center gap-2">
+              <div className="flex min-h-11 items-center gap-2">
                 {(() => {
                   const typeId =
                     typeIdMap[activePlayerMon.teraTypeOverride.toLowerCase()]
@@ -172,7 +169,7 @@ function SingleBattleActionMenu() {
                         key={type}
                         value={type}
                         className={cn(
-                          'group relative flex h-14 w-20 items-center justify-center rounded-full border-0 bg-transparent p-0 transition-colors',
+                          'group relative flex h-11 w-20 items-center justify-center rounded-lg border-0 bg-transparent p-0 transition-colors',
                           'hover:bg-transparent',
                           'data-[state=on]:!bg-transparent data-[state=on]:!text-game-ink',
                           'disabled:cursor-not-allowed disabled:opacity-50',
@@ -185,7 +182,7 @@ function SingleBattleActionMenu() {
                             alt={type}
                             width={100}
                             height={40}
-                            className="h-7 w-auto object-contain opacity-70 grayscale transition-[filter,opacity,transform] duration-200 group-data-[state=on]:scale-[1.04] group-data-[state=on]:opacity-100 group-data-[state=on]:grayscale-0 group-data-[state=on]:drop-shadow-[0_0_2px_rgb(64_93_61_/_0.9)] group-hover:opacity-100 group-hover:grayscale-0"
+                            className="h-7 w-auto object-contain opacity-60 grayscale transition-[filter,opacity] duration-150 group-data-[state=on]:opacity-100 group-data-[state=on]:grayscale-0 group-hover:opacity-100 group-hover:grayscale-0 motion-reduce:transition-none"
                             unoptimized
                           />
                         ) : (
@@ -202,7 +199,7 @@ function SingleBattleActionMenu() {
           </div>
 
           {/* Stance Selector */}
-          <div className="w-full max-w-2xl min-h-[5.5rem]">
+          <div className="w-full">
             <StanceSelector
               onSelect={handleStanceSelect}
               stats={activePlayerMon.stats}
@@ -215,7 +212,7 @@ function SingleBattleActionMenu() {
           </div>
 
           {/* Battle Actions */}
-          <div className="w-full max-w-md flex gap-2">
+          <div className="flex w-full gap-2">
             <ItemSelector />
             {(hasPowerKeyItems || availableMoves.length > 0) && (
               <PowerSelector />

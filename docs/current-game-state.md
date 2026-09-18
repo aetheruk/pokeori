@@ -1,5 +1,6 @@
 # Current Game State
 
+- Release `0.36.30` refines the shared singles/doubles battle controls with paper stance buttons, visible stance names, labelled offensive stats, counter reminders, and brief stance-specific tap feedback. Existing type images and item/move/power sprites remain in use, with a compact labelled action tray and no redundant stance heading. A submitted stance keeps its own pending indicator visible without covering the press feedback; battle submissions and turn timing are unchanged.
 - Unreleased: Expedition activity entry and settlement are now bound to the server-owned current step for every activity authored in an expedition path or pool. Replaying a previous task with a new request identifier, or calling known expedition content outside a run, cannot grant its rewards or progress.
 - Release `0.36.9` refines the doubles stance log wording so generic actions read `Pokemon attacks Target with [stance]`, while special moves continue to read `Pokemon used Move on Target`.
 - Release `0.36.8` adds resolved targets to double-battle action logs. Special moves now read as `Pokemon used Move on Target`, generic stance attacks read as `Pokemon attacks with ... against Target`, and spread moves identify each affected Pokémon while singles retain their existing log wording.

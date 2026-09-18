@@ -14,6 +14,7 @@ import { getDoublesPokemon, getDoublesSlots } from '@/utilities/battle/doubles-s
 import { getBattleInventory } from '../actions'
 
 import { useBattleContext } from './battle-context'
+import { BattleActionTrigger } from './battle-action-trigger'
 
 export function ItemSelector() {
   const {
@@ -206,28 +207,14 @@ export function ItemSelector() {
       }}
     >
       <DrawerTrigger asChild>
-        <Button
-          variant="outline"
+        <BattleActionTrigger
+          itemId="battle-potion"
+          label="Items"
+          count={`${Math.max(0, remainingUses)}/${maxItemsPerBattle}`}
           disabled={disabled || !canUseItems}
           aria-label={`Items, ${Math.max(0, remainingUses)} of ${maxItemsPerBattle} uses remaining`}
           title="Open battle items"
-          className={cn(
-            'flex-1 h-12 gap-2 rounded-xl border border-game-border bg-game-surface-raised text-game-ink shadow-sm transition-colors',
-            'hover:border-game-ochre/60 hover:bg-game-surface-raised hover:text-game-ink',
-            !canUseItems && 'opacity-50',
-          )}
-        >
-          <ItemSprite
-            itemId="battle-potion"
-            alt="Items"
-            width={22}
-            height={22}
-            className="h-5 w-5 object-contain"
-          />
-          <span className="rounded-full border border-game-border bg-game-canvas/60 px-1.5 py-0.5 text-[10px] font-black text-game-ink">
-            {Math.max(0, remainingUses)}/{maxItemsPerBattle}
-          </span>
-        </Button>
+        />
       </DrawerTrigger>
       <DrawerContent
         id={itemDrawerContentId}
