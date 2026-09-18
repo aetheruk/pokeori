@@ -84,7 +84,9 @@ function ExpeditionMetricRow({
 }) {
   return (
     <div className="flex min-h-14 items-center gap-3 border-b border-game-border/70 py-3 last:border-b-0">
-      <div className={cn('game-icon-orb size-8 shrink-0', tone)}>{icon}</div>
+      <div className={cn('flex size-8 shrink-0 items-center justify-center', tone)}>
+        {icon}
+      </div>
       <span className="min-w-0 flex-1 truncate text-[10px] font-bold uppercase tracking-[0.12em] text-game-muted">
         {label}
       </span>
@@ -405,7 +407,7 @@ function ExpeditionModalContent({
               </h2>
             </div>
             <SectionDivider>Overview</SectionDivider>
-            <div className="border-l-2 border-game-clay/50 pl-4 md:pl-5">
+            <div className="text-left">
               <p className="text-sm font-medium leading-relaxed text-game-ink md:text-base">
                 {item.description}
               </p>
@@ -462,7 +464,7 @@ function ExpeditionModalContent({
               <SectionDivider>Map Required</SectionDivider>
               <div className="mt-4 flex items-center gap-3 border-y border-game-border/75 py-3">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="game-icon-orb h-9 w-9">
+                  <div className="flex h-9 w-9 items-center justify-center">
                     <ItemSprite
                       itemId={expedition.mapItemId}
                       alt="Map"

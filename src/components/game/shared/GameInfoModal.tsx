@@ -44,7 +44,7 @@ function GameInfoMetricCard({
       className="group flex h-[4.5rem] items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 transition-colors hover:border-game-moss/45"
       title={title || label}
     >
-      <div className="game-icon-orb size-9 shrink-0 text-game-charcoal-strong [&>svg]:size-4">
+      <div className="flex size-9 shrink-0 items-center justify-center text-game-charcoal-strong [&>svg]:size-4">
         {icon}
       </div>
       <div className="flex min-w-0 flex-1 flex-col justify-center">
@@ -70,7 +70,7 @@ function GameInfoMetricRow({
       className="group flex min-h-14 items-center gap-3 py-3 transition-colors"
       title={title || label}
     >
-      <div className="game-icon-orb size-8 shrink-0 text-game-charcoal-strong [&>svg]:size-3.5">
+      <div className="flex size-8 shrink-0 items-center justify-center text-game-charcoal-strong [&>svg]:size-3.5">
         {icon}
       </div>
       <span className="min-w-0 flex-1 truncate text-[10px] font-bold uppercase tracking-[0.12em] text-game-muted">
@@ -271,7 +271,7 @@ export function GameInfoModal({
                 className={cn(
                   'mt-3',
                   isDrawer
-                    ? 'border-l-2 border-game-clay/50 pl-4 md:pl-5'
+                    ? 'text-left'
                     : 'rounded-lg border border-game-border bg-game-surface-raised p-4 md:p-5',
                 )}
               >
