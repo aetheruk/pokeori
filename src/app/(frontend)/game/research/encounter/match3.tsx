@@ -454,6 +454,7 @@ export function Match3Game({ encounter, initialState }: Match3GameProps) {
       {result && (
         <RewardResultOverlay
           result={result}
+          background={encounter.background}
           onClose={() => {
             refreshUser(true, completionInvalidatesRef.current)
             router.push('/game/explore')

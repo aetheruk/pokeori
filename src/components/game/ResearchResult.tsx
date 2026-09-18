@@ -82,6 +82,8 @@ function getIconUrl(icon: TaskIcon | string): string | undefined {
 
 interface GameResultProps {
   success: boolean
+  /** Scenic artwork for the result hero. Falls back to the Lab when absent. */
+  background?: string
   title?: string
   message?: React.ReactNode
   rewardSummary?: RewardSummary | null
@@ -108,12 +110,12 @@ interface GameResultProps {
 
 export function GameResult({
   success,
+  background,
   title,
   message,
   rewardSummary,
   icon,
   iconAlt = '',
-  sectionTitle = 'Outcome',
   titleColor,
   returnPath = '/game',
   returnText = 'Continue',
@@ -123,6 +125,7 @@ export function GameResult({
   embedded = false,
 }: GameResultProps) {
   const router = useRouter()
+  const resultBackground = background || '/backgrounds/lab.avif'
 
   const handleReturn = () => {
     if (onReturn) {
@@ -141,15 +144,26 @@ export function GameResult({
     >
       <main className="h-full w-full flex flex-col relative z-10">
         <div className="w-full flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-game-border scrollbar-track-transparent">
-          <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col items-center justify-center px-4 py-8 pb-28 md:px-6">
-            <div className="relative flex w-full flex-col items-center p-3 text-center md:p-8">
-              <div className="relative mb-6">
+          <section className="relative flex min-h-[48dvh] w-full shrink-0 flex-col items-center justify-center overflow-hidden px-4 pb-10 pt-12 text-center text-white md:min-h-[52dvh] md:px-6">
+            <Image
+              src={resultBackground}
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
+            <div
+              className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(23,39,51,0.08),rgba(23,39,51,0.24)_42%,rgba(23,39,51,0.92)_100%)]"
+              aria-hidden="true"
+            />
+
+            <div className="relative z-10 flex w-full max-w-3xl flex-col items-center">
+              <div className="relative mb-3">
                 <div
                   className={cn(
-                    'game-icon-orb relative z-10 h-24 w-24 md:h-28 md:w-28',
-                    success
-                      ? 'border-game-charcoal/50 text-game-charcoal-strong'
-                      : 'border-game-danger/45 text-game-danger',
+                    'game-icon-orb relative z-10 h-24 w-24 border-white/55 !bg-white/10 text-white shadow-xl md:h-28 md:w-28',
+                    !success && 'border-game-danger/70',
                   )}
                 >
                   {/* If an icon is provided (string URL or ReactNode) render it inside, otherwise fall back to check/x */}
@@ -184,9 +198,9 @@ export function GameResult({
                         {icon}
                       </div>
                     ) : success ? (
-                      <Check className="h-16 w-16 text-game-moss md:h-20 md:w-20" />
+                      <Check className="h-16 w-16 text-white md:h-20 md:w-20" />
                     ) : (
-                      <X className="h-16 w-16 text-game-danger md:h-20 md:w-20" />
+                      <X className="h-16 w-16 text-white md:h-20 md:w-20" />
                     )
                   })()}
                 </div>
@@ -198,41 +212,36 @@ export function GameResult({
                 role="status"
                 aria-live="polite"
               >
-                <span className="mb-2 text-xs font-medium uppercase tracking-wide text-game-muted">
-                  {sectionTitle}
-                </span>
                 <h1
                   className={cn(
-                    'mb-4 text-3xl font-semibold leading-tight md:text-4xl',
-                    titleColor
-                      ? titleColor
-                      : success
-                        ? 'text-game-moss-strong'
-                        : 'text-game-danger',
+                    'mb-1 text-3xl font-semibold leading-tight !text-white md:text-4xl',
+                    titleColor,
                   )}
                 >
                   {title ?? (success ? 'SUCCESS' : 'FAILED')}
                 </h1>
 
                 {message && (
-                  <p className="max-w-2xl text-sm font-medium leading-relaxed text-game-muted md:text-base">
+                  <p className="max-w-2xl text-sm font-medium leading-relaxed text-white/90 md:text-base">
                     {message}
                   </p>
                 )}
               </div>
-
-              {additionalContent && (
-                <div className="game-folio-section relative z-10 mt-8 w-full p-4">
-                  {additionalContent}
-                </div>
-              )}
-
-              {rewardSummary && (
-                <div className="relative z-10 mt-8 w-full border-t border-game-border pt-2">
-                  <RewardSummaryDisplay summary={rewardSummary} />
-                </div>
-              )}
             </div>
+          </section>
+
+          <div className="mx-auto w-full max-w-3xl px-4 pb-28 pt-4 md:px-6 md:pt-6">
+            {additionalContent && (
+              <div className="game-folio-section relative z-10 w-full p-4">
+                {additionalContent}
+              </div>
+            )}
+
+            {rewardSummary && (
+              <div className="relative z-10 w-full">
+                <RewardSummaryDisplay summary={rewardSummary} />
+              </div>
+            )}
           </div>
         </div>
 

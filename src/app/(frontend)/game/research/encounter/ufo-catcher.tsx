@@ -880,6 +880,7 @@ export function UfoCatcherGame({
       {exitResult && (
         <RewardResultOverlay
           result={exitResult}
+          background={encounter.background}
           onClose={() => router.push('/game/explore')}
           icon={encounter.icon}
           iconAlt={encounter.name}

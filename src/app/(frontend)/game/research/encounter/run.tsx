@@ -107,6 +107,7 @@ export function RunGame({ encounter, actions }: RunGameProps) {
       {result && (
         <RewardResultOverlay
           result={result}
+          background={backdrop}
           onClose={session.close}
           icon={encounter.icon}
           iconAlt={encounter.name}

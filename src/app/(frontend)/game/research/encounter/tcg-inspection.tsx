@@ -444,6 +444,7 @@ export function TcgInspectionGame({
 
       <RewardResultOverlay
         result={result}
+        background={encounter.background}
         onClose={returnToExplore}
         icon={encounter.icon}
         iconAlt={encounter.name}
