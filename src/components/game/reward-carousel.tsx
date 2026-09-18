@@ -95,14 +95,16 @@ export function RewardCarousel({
                   )}
                 >
                   <div className="flex items-center gap-4 relative z-10">
-                    <div className="shrink-0">
-                      <div
-                        className={cn(
-                          'game-icon-orb relative z-10 h-14 w-14',
-                          variant === 'journal' && 'h-12 w-12',
-                        )}
-                      >
-                        <div className="scale-125">{reward.icon}</div>
+                    <div
+                      className={cn(
+                        'flex shrink-0 items-center justify-center',
+                        variant === 'journal'
+                          ? 'h-12 w-12'
+                          : 'game-icon-orb relative z-10 h-14 w-14',
+                      )}
+                    >
+                      <div className={cn(variant !== 'journal' && 'scale-125')}>
+                        {reward.icon}
                       </div>
                     </div>
 
@@ -124,14 +126,23 @@ export function RewardCarousel({
                     {(showProgressCircle || showCompletedCheck) && (
                       <div className="shrink-0">
                         {showCompletedCheck ? (
-                          <div
-                            className="game-icon-orb h-10 w-10 border-game-charcoal/40 text-game-charcoal-strong"
-                            role="img"
-                            title="Complete"
-                            aria-label="Complete"
-                          >
-                            <Check className="h-5 w-5" strokeWidth={4} />
-                          </div>
+                          variant === 'journal' ? (
+                            <Check
+                              className="h-5 w-5 text-game-charcoal-strong"
+                              strokeWidth={4}
+                              role="img"
+                              aria-label="Complete"
+                            />
+                          ) : (
+                            <div
+                              className="game-icon-orb h-10 w-10 border-game-charcoal/40 text-game-charcoal-strong"
+                              role="img"
+                              title="Complete"
+                              aria-label="Complete"
+                            >
+                              <Check className="h-5 w-5" strokeWidth={4} />
+                            </div>
+                          )
                         ) : progress ? (
                           <div
                             className="w-11 h-11 rounded-full p-0.5"

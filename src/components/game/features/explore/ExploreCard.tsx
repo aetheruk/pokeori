@@ -218,7 +218,7 @@ function ExploreCardComponent({
         <div className="relative shrink-0">
           <div
             className={cn(
-              'game-icon-orb game-icon-orb-art relative z-10 h-14 w-14 shrink-0 transition-colors',
+              'game-icon-orb game-icon-orb-art relative z-10 h-14 w-14 shrink-0 overflow-visible transition-colors',
               isEventCard
                 ? 'game-icon-orb-discovery border-game-ochre/70 text-game-ochre'
                 : isHighlighted

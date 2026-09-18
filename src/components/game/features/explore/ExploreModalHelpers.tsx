@@ -148,22 +148,80 @@ function hasSecretEncounterRequirement(encounter: {
   )
 }
 
-function formatLevelLabel(level: unknown): string | null {
-  if (typeof level === 'number') return `LVL ${level}`
-  if (
-    level &&
-    typeof level === 'object' &&
-    'min' in level &&
-    'max' in level &&
-    typeof level.min === 'number' &&
-    typeof level.max === 'number'
-  ) {
-    return level.min === level.max
-      ? `LVL ${level.min}`
-      : `LVL ${level.min}-${level.max}`
+interface LevelRange {
+  min: number
+  max: number
+}
+
+function collectLevelRange(...values: unknown[]): LevelRange | null {
+  const levels: number[] = []
+
+  const visit = (value: unknown) => {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      levels.push(value)
+      return
+    }
+
+    if (!value || typeof value !== 'object') return
+
+    const range = value as {
+      min?: unknown
+      max?: unknown
+      level?: unknown
+    }
+    if (
+      typeof range.min === 'number' &&
+      Number.isFinite(range.min) &&
+      typeof range.max === 'number' &&
+      Number.isFinite(range.max)
+    ) {
+      levels.push(range.min, range.max)
+      return
+    }
+
+    if (range.level !== undefined) visit(range.level)
   }
 
-  return null
+  values.forEach(visit)
+  if (levels.length === 0) return null
+
+  return {
+    min: Math.min(...levels),
+    max: Math.max(...levels),
+  }
+}
+
+function formatLevelRange(range: LevelRange): string {
+  return range.min === range.max
+    ? String(range.min)
+    : `${range.min}-${range.max}`
+}
+
+function PokemonSpritePreview({
+  formId,
+  isCaught,
+  isSeen,
+  alt = 'Pokemon',
+  size = 80,
+}: {
+  formId: string
+  isCaught?: boolean
+  isSeen?: boolean
+  alt?: string
+  size?: number
+}) {
+  return (
+    <Image
+      src={getPokemonImageUrl(formId, 'sprite')}
+      alt={alt}
+      width={size}
+      height={size}
+      className={cn(
+        'pixelated object-contain',
+        isCaught ? 'opacity-100' : isSeen ? 'opacity-50' : 'brightness-0',
+      )}
+    />
+  )
 }
 
 function formatSeconds(value: unknown): string | null {
@@ -407,6 +465,10 @@ export function getFormattedProperties(selectedItem: any) {
   const props = []
   if (selectedItem.type === 'location') {
     const loc = selectedItem.originalData
+    const levelRange = collectLevelRange(
+      loc.levelRange,
+      ...(loc.encounters || []).map((encounter: any) => encounter.level),
+    )
     if (loc.timer) {
       props.push({
         icon: <Timer className="w-4 h-4" />,
@@ -414,11 +476,11 @@ export function getFormattedProperties(selectedItem: any) {
         value: `${loc.timer}s`,
       })
     }
-    if (loc.levelRange) {
+    if (levelRange) {
       props.push({
         icon: <BarChart className="w-4 h-4" />,
-        label: 'Levels',
-        value: `${loc.levelRange.min}-${loc.levelRange.max}`,
+        label: 'Level Range',
+        value: formatLevelRange(levelRange),
       })
     }
   } else if (
@@ -426,6 +488,9 @@ export function getFormattedProperties(selectedItem: any) {
     selectedItem.type === 'vs-seeker'
   ) {
     const bat = selectedItem.originalData
+    const levelRange = collectLevelRange(
+      ...(bat.enemyTeam || []).map((member: any) => member.level),
+    )
     if (bat.settings?.timeLimit) {
       props.push({
         icon: <Timer className="w-4 h-4" />,
@@ -438,6 +503,13 @@ export function getFormattedProperties(selectedItem: any) {
         icon: <Users className="w-4 h-4" />,
         label: 'Max Pokemon',
         value: bat.maxPokemon,
+      })
+    }
+    if (levelRange) {
+      props.push({
+        icon: <BarChart className="w-4 h-4" />,
+        label: 'Level Range',
+        value: formatLevelRange(levelRange),
       })
     }
     if (bat.levelCap) {
@@ -473,6 +545,19 @@ export function getFormattedProperties(selectedItem: any) {
         icon: <Timer className="w-4 h-4" />,
         label: 'Answer Time',
         value: answerTimeLimit,
+      })
+    }
+    const levelRange = collectLevelRange(
+      res.settings?.levelRange,
+      ...Object.values(res.settings?.rods || {}).map(
+        (rod: any) => rod?.levelRange,
+      ),
+    )
+    if (levelRange) {
+      props.push({
+        icon: <BarChart className="w-4 h-4" />,
+        label: 'Level Range',
+        value: formatLevelRange(levelRange),
       })
     }
     if (milestoneRange) {
@@ -1399,82 +1484,25 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
                 const pokedexEntry = pokedexByFormId.get(formId)
                 const isCaught = pokedexEntry?.caught
                 const isSeen = pokedexEntry?.seen
-                const timeLabel = enc.time ? enc.time.toUpperCase() : null
-                const levelLabel = rodConfig!.levelRange
-                  ? `LVL ${rodConfig!.levelRange.min}-${rodConfig!.levelRange.max}`
-                  : null
 
                 return (
                   <div
                     key={`${rodType}-${formId}-${i}`}
-                    className={cn(
-                      'group relative flex min-w-[100px] flex-shrink-0 flex-col items-center rounded-lg border p-3 transition-colors',
+                    className="flex h-20 w-20 shrink-0 items-center justify-center"
+                    title={
                       isCaught
-                        ? 'border-game-moss/50 bg-game-moss/10'
+                        ? 'Caught Pokemon'
                         : isSeen
-                          ? 'border-game-border bg-game-surface-raised grayscale-[0.35]'
-                          : 'border-game-border/70 bg-game-canvas opacity-80',
-                    )}
+                          ? 'Seen Pokemon'
+                          : 'Unseen Pokemon'
+                    }
                   >
-                    <div
-                      className={cn(
-                        'absolute -right-1.5 -top-1.5 z-20 flex h-5 w-5 items-center justify-center rounded-full border',
-                        isCaught
-                          ? 'border-game-moss bg-game-moss text-game-cream'
-                          : isSeen
-                            ? 'border-game-border bg-game-surface-raised text-game-muted'
-                            : 'border-game-border bg-game-canvas text-game-muted',
-                      )}
-                    >
-                      {isCaught ? (
-                        <Check className="w-3 h-3 font-black" />
-                      ) : (
-                        <HelpCircle className="w-3 h-3" />
-                      )}
-                    </div>
-
-                    <div className="relative mb-1 flex h-16 w-16 items-center justify-center">
-                      {isCaught || isSeen ? (
-                        <Image
-                          src={getPokemonImageUrl(formId, 'sprite')}
-                          alt={'Pokemon'}
-                          width={64}
-                          height={64}
-                          className={cn(
-                            'w-16 h-16 object-contain pixelated relative z-10',
-                            !isCaught && 'opacity-50 grayscale contrast-125',
-                          )}
-                        />
-                      ) : (
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-dashed border-game-border bg-game-canvas">
-                          <span className="text-xl font-black text-game-muted">
-                            ?
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="w-full text-center flex flex-col gap-0.5">
-                      <span
-                        className={cn(
-                          'text-[10px] font-black uppercase tracking-[0.08em] transition-colors',
-                          isCaught
-                            ? 'text-game-moss-strong'
-                            : 'text-game-muted',
-                        )}
-                      >
-                        {isCaught
-                          ? 'Captured'
-                          : isSeen
-                            ? 'Discovered'
-                            : 'Unknown'}
-                      </span>
-                      {(levelLabel || timeLabel) && (
-                        <span className="font-mono text-[10px] font-bold text-game-muted">
-                          {[levelLabel, timeLabel].filter(Boolean).join(' · ')}
-                        </span>
-                      )}
-                    </div>
+                    <PokemonSpritePreview
+                      formId={formId}
+                      isCaught={isCaught}
+                      isSeen={isSeen}
+                      alt="Fishing encounter"
+                    />
                   </div>
                 )
               })}
@@ -1629,114 +1657,48 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
                 encounter.isLocked && !encounter.isSecret
               const isExpanded = expandedLockedEncounterKey === encounter.key
 
-              return (
-                <button
-                  key={encounter.key}
-                  type="button"
-                  disabled={!encounter.isLocked}
-                  aria-label={
-                    encounter.isLocked
-                      ? `${isExpanded ? 'Hide' : 'Show'} requirements for ${encounter.formId || 'unknown Pokémon'}`
-                      : `${encounter.isCaught ? 'Captured' : encounter.isSeen ? 'Discovered' : 'Unknown'} ${encounter.formId || 'Pokémon'}`
-                  }
-                  aria-expanded={encounter.isLocked ? isExpanded : undefined}
-                  onClick={() => {
-                    if (!encounter.isLocked) return
-                    setExpandedLockedEncounterKey(
-                      isExpanded ? null : encounter.key,
-                    )
-                  }}
-                  className={cn(
-                    'group relative flex min-w-[100px] flex-shrink-0 flex-col items-center rounded-lg border p-3 text-center transition-colors disabled:cursor-default',
-                    encounter.isLocked
-                      ? 'border-game-clay/45 bg-game-clay/10 hover:border-game-clay'
-                      : encounter.isCaught
-                        ? 'border-game-moss/50 bg-game-moss/10'
-                        : encounter.isSeen
-                          ? 'border-game-border bg-game-surface-raised grayscale-[0.35]'
-                          : 'border-game-border/70 bg-game-canvas opacity-80',
-                  )}
-                >
-                  {/* Status Indicator */}
-                  <div
-                    className={cn(
-                      'absolute -right-1.5 -top-1.5 z-20 flex h-5 w-5 items-center justify-center rounded-full border',
-                      encounter.isLocked
-                        ? 'border-game-danger bg-game-danger text-game-cream'
-                        : encounter.isCaught
-                          ? 'border-game-moss bg-game-moss text-game-cream'
-                          : encounter.isSeen
-                            ? 'border-game-border bg-game-surface-raised text-game-muted'
-                            : 'border-game-border bg-game-canvas text-game-muted',
-                    )}
+              const sprite = (
+                <PokemonSpritePreview
+                  formId={encounter.formId}
+                  isCaught={encounter.isCaught}
+                  isSeen={encounter.isSeen}
+                  alt="Inhabitant"
+                />
+              )
+
+              if (encounter.isLocked) {
+                return (
+                  <button
+                    key={encounter.key}
+                    type="button"
+                    aria-label={`${isExpanded ? 'Hide' : 'Show'} ${canShowRequirements ? 'requirements' : 'hidden requirements'} for inhabitant`}
+                    aria-expanded={isExpanded}
+                    onClick={() =>
+                      setExpandedLockedEncounterKey(
+                        isExpanded ? null : encounter.key,
+                      )
+                    }
+                    className="game-focus-ring flex h-20 w-20 shrink-0 items-center justify-center rounded-full transition-opacity hover:opacity-75"
                   >
-                    {encounter.isCaught ? (
-                      <Check className="w-3 h-3 font-black" />
-                    ) : (
-                      <HelpCircle className="w-3 h-3" />
-                    )}
-                  </div>
+                    {sprite}
+                  </button>
+                )
+              }
 
-                  {/* Pokemon Sprite Container */}
-                  <div className="relative mb-1 flex h-16 w-16 items-center justify-center">
-                    {encounter.isLocked ? (
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full border border-game-clay/50 bg-game-clay/10">
-                        <span className="text-xl font-black text-game-clay-strong">
-                          ?
-                        </span>
-                      </div>
-                    ) : encounter.isCaught || encounter.isSeen ? (
-                      <Image
-                        src={getPokemonImageUrl(encounter.formId, 'sprite')}
-                        alt={'Pokemon'}
-                        width={64}
-                        height={64}
-                        className={cn(
-                          'w-16 h-16 object-contain pixelated relative z-10',
-                          !encounter.isCaught &&
-                            'opacity-50 grayscale contrast-125',
-                        )}
-                      />
-                    ) : (
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full border border-dashed border-game-border bg-game-canvas">
-                        <span className="text-xl font-black text-game-muted">
-                          ?
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Caught Label Style */}
-                  <div className="w-full text-center">
-                    <span
-                      className={cn(
-                        'text-[10px] font-black uppercase tracking-[0.08em] transition-colors',
-                        encounter.isLocked
-                          ? 'text-game-danger'
-                          : encounter.isCaught
-                            ? 'text-game-moss-strong'
-                            : 'text-game-muted',
-                      )}
-                    >
-                      {encounter.isLocked
-                        ? canShowRequirements
-                          ? 'Locked'
-                          : 'Secret'
-                        : encounter.isCaught
-                          ? 'Captured'
-                          : encounter.isSeen
-                            ? 'Discovered'
-                            : 'Unknown'}
-                    </span>
-                    {encounter.isLocked && (
-                      <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.08em] text-game-danger">
-                        {canShowRequirements
-                          ? 'Tap for requirements'
-                          : 'Hidden requirements'}
-                      </div>
-                    )}
-                  </div>
-                </button>
+              return (
+                <div
+                  key={encounter.key}
+                  className="flex h-20 w-20 shrink-0 items-center justify-center"
+                  title={
+                    encounter.isCaught
+                      ? 'Caught Pokemon'
+                      : encounter.isSeen
+                        ? 'Seen Pokemon'
+                        : 'Unseen Pokemon'
+                  }
+                >
+                  {sprite}
+                </div>
               )
             })}
           </div>
@@ -1766,7 +1728,7 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
                             : 'border-game-clay/25 text-game-muted',
                         )}
                       >
-                        <div className="game-icon-orb h-9 w-9 shrink-0">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center text-game-clay-strong">
                           {requirement.icon}
                         </div>
                         <div className="min-w-0 flex-1">
@@ -1811,13 +1773,36 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
             if (!formId) return null
 
             const pokedexEntry = pokedexByFormId.get(formId)
+            const isCaught = pokedexEntry?.caught
             const isSeen = pokedexEntry?.seen
-            const levelLabel = formatLevelLabel(member.level)
             const pokemon =
               getPokemonForm(formId) || getPokemonSpecies(member.speciesId)
             const displayName = isSeen
               ? member.name || pokemon?.name || 'Pokemon'
               : '???'
+
+            if (isWildBattle) {
+              return (
+                <div
+                  key={i}
+                  className="flex h-20 w-20 shrink-0 items-center justify-center"
+                  title={
+                    isCaught
+                      ? 'Caught Pokemon'
+                      : isSeen
+                        ? 'Seen Pokemon'
+                        : 'Unseen Pokemon'
+                  }
+                >
+                  <PokemonSpritePreview
+                    formId={formId}
+                    isCaught={isCaught}
+                    isSeen={isSeen}
+                    alt="Wild encounter"
+                  />
+                </div>
+              )
+            }
 
             return (
               <div
@@ -1848,8 +1833,8 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
                   )}
                 </div>
 
-                {/* Details / Level */}
-                <div className="w-full text-center flex flex-col gap-0.5">
+                {/* Details */}
+                <div className="w-full text-center">
                   <span
                     className={cn(
                       'text-[10px] font-black uppercase tracking-[0.08em] transition-colors truncate',
@@ -1858,11 +1843,6 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
                   >
                     {displayName}
                   </span>
-                  {levelLabel && (
-                    <span className="font-mono text-[10px] font-bold text-game-muted">
-                      {levelLabel}
-                    </span>
-                  )}
                 </div>
               </div>
             )

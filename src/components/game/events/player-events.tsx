@@ -108,7 +108,7 @@ export function PlayerEventsCard({
     description: 'See what is happening around the world.',
     category: 'Events',
     type: 'events',
-    icon: { type: 'lucide', id: 'CalendarDays' },
+    icon: { type: 'item', id: 'master-ball' },
     originalData: {
       summary,
       background: '/backgrounds/cosmos-gold.avif',
@@ -134,7 +134,7 @@ export function PlayerEventsCard({
         open={open}
         onOpenChange={setOpen}
         title="Active Events"
-        description="Current events and upcoming adventures."
+        headerClassName="!items-center !text-center !pr-5"
         className="flex flex-col overflow-hidden"
       >
         <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-4 pb-8 md:p-6">
