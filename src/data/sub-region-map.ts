@@ -1,4 +1,4 @@
-import type { TaskCondition } from '@/data/tasks/types'
+import type { TaskCondition, TaskIcon } from '@/data/tasks/types'
 import type { WeatherSlotMap } from '@/data/weather'
 
 export interface RegionData {
@@ -12,6 +12,7 @@ export interface RegionData {
   unlockRequirements?: TaskCondition[]
   completeRequirements?: TaskCondition[]
   weatherSlots?: WeatherSlotMap
+  icon?: TaskIcon
 }
 
 // prettier-ignore
@@ -39,6 +40,7 @@ export const subCategories: Record<string, RegionData> = {
     order: 10,
     alwaysAvailable: true,
     image: '/backgrounds/town.avif',
+    icon: { type: 'trainer', id: 'oak' },
     description: 'A famous Pokemon professor lives here in this quiet seaside town.',
     music: '/music/pallet.mp3',
     weatherSlots: {
@@ -54,6 +56,7 @@ export const subCategories: Record<string, RegionData> = {
     region: 'Kanto',
     order: 20,
     image: '/backgrounds/virdian.avif',
+    icon: { type: 'trainer', id: 'gym-kanto-giovanni' },
     description: 'A small city on the edge of the Pokemon League.',
     music: '/music/viridian_city.mp3',
     weatherSlots: {
@@ -70,6 +73,7 @@ export const subCategories: Record<string, RegionData> = {
     region: 'Kanto',
     order: 30,
     image: '/backgrounds/forest.avif',
+    icon: { type: 'trainer', id: 'bug-catcher' },
     description: 'A dense forest filled with bug aficionados.',
     music: '/music/viridian_forest.mp3',
     weatherSlots: {
@@ -88,6 +92,7 @@ export const subCategories: Record<string, RegionData> = {
     region: 'Kanto',
     order: 40,
     image: '/backgrounds/pewter.avif',
+    icon: { type: 'trainer', id: 'gym-kanto-brock' },
     description: "Brock's Gym and the Pokemon Science Museum, can be found here.",
     music: '/music/pewter.mp3',
     unlockRequirements: [{ type: 'task_completed', targetId: 'viridian-exit' }],
@@ -105,6 +110,7 @@ export const subCategories: Record<string, RegionData> = {
     region: 'Kanto',
     order: 45,
     image: '/backgrounds/pewter-school.avif',
+    icon: { type: 'trainer', id: 'old-couple' },
     description: 'A dedicated school where trainers learn battle systems and core mechanics.',
     music: '/music/pewter.mp3',
     unlockRequirements: [{ type: 'task_completed', targetId: 'pewter-school-intro' }],
@@ -114,6 +120,7 @@ export const subCategories: Record<string, RegionData> = {
     region: 'Kanto',
     order: 50,
     image: '/backgrounds/mt-moon.avif',
+    icon: { type: 'item', id: 'moon-stone' },
     description: 'Pokemon from another world are said to dance under the moonlight here.',
     music: '/music/moon.mp3',
     weatherSlots: {
@@ -127,6 +134,7 @@ export const subCategories: Record<string, RegionData> = {
     region: 'Kanto',
     order: 60,
     image: '/backgrounds/cerulean.avif',
+    icon: { type: 'trainer', id: 'gym-kanto-misty' },
     description: 'A seaside city with a cool mist hanging in the air.',
     music: '/music/cerulean.mp3',
     weatherSlots: {
@@ -143,6 +151,7 @@ export const subCategories: Record<string, RegionData> = {
     region: 'Kanto',
     order: 70,
     image: '/backgrounds/vermillion.avif',
+    icon: { type: 'trainer', id: 'gym-kanto-ltsurge' },
     description: 'a small coastal city with a large development underway.',
     music: '/music/viridian_city.mp3',
     weatherSlots: {
@@ -161,6 +170,7 @@ export const subCategories: Record<string, RegionData> = {
     region: 'Kanto',
     order: 90,
     image: '/backgrounds/cave.avif',
+    icon: { type: 'pokemon', id: '95' },
     description: 'A long tunnel said to be carved out by Onix.',
     music: '/music/moon.mp3',
     weatherSlots: {
@@ -175,6 +185,7 @@ export const subCategories: Record<string, RegionData> = {
     region: 'Kanto',
     order: 100,
     image: '/backgrounds/lavender.avif',
+    icon: { type: 'pokemon', id: '92' },
     description: 'A town in the shadow of the Pokemon Tower.',
     music: '/music/pallet.mp3',
     unlockRequirements: [{ type: 'task_completed', targetId: 'rock-tunnel-exit' }],
@@ -199,6 +210,7 @@ export const subCategories: Record<string, RegionData> = {
     region: 'Kanto',
     order: 120,
     image: '/backgrounds/celadon.avif',
+    icon: { type: 'trainer', id: 'gym-kanto-erika' },
     description: 'A sprawling city with a huge department store.',
     music: '/music/viridian_city.mp3',
     unlockRequirements: [
@@ -216,6 +228,7 @@ export const subCategories: Record<string, RegionData> = {
     region: 'Kanto',
     order: 130,
     image: '/backgrounds/game-corner.avif',
+    icon: { type: 'item', id: 'fun-token' },
     description: 'A haven of games for those wanting to lose their money.',
     music: '/music/minigame.mp3',
     unlockRequirements: [
@@ -227,6 +240,7 @@ export const subCategories: Record<string, RegionData> = {
     region: 'Kanto',
     order: 140,
     image: '/backgrounds/saffron.avif',
+    icon: { type: 'trainer', id: 'gym-kanto-sabrina' },
     description: 'A city on the east coast, featuring the Pokemon League.',
     music: '/music/viridian_city.mp3',
     unlockRequirements: [
@@ -265,6 +279,7 @@ export const subCategories: Record<string, RegionData> = {
     region: 'Kanto',
     order: 170,
     image: '/backgrounds/fuchsia.avif',
+    icon: { type: 'trainer', id: 'gym-kanto-koga' },
     description: 'A city on the south coast, featuring the sprawling Safari Zone',
     music: '/music/viridian_city.mp3',
     unlockRequirements: [{ type: 'task_completed', targetId: 'on-to-fuchsia-city' }],
@@ -280,6 +295,7 @@ export const subCategories: Record<string, RegionData> = {
     region: 'Kanto',
     order: 180,
     image: '/backgrounds/safari-reserve.avif',
+    icon: { type: 'item', id: 'safari-ball' },
     description: 'A huge nature reserve packed with Rare Pokemon.',
     music: '/music/viridian_forest.mp3',
     unlockRequirements: [{ type: 'task_completed', targetId: 'fuchsia-gym-search-for-koga' }],
@@ -303,6 +319,7 @@ export const subCategories: Record<string, RegionData> = {
     region: 'Kanto',
     order: 200,
     image: '/backgrounds/cinnabar.avif',
+    icon: { type: 'trainer', id: 'gym-kanto-blaine' },
     description: 'A volcanic island town, with an advanced Pokemon Lab ',
     music: '/music/pewter.mp3',
             weatherSlots: {
@@ -357,6 +374,7 @@ export const subCategories: Record<string, RegionData> = {
     region: 'Kanto',
     order: 71,
     image: '/backgrounds/digletts-cave.avif',
+    icon: { type: 'pokemon', id: '50' },
     description: 'A small cave with rumours it connects to a secret underground area.',
     music: '/music/moon.mp3',
     unlockRequirements: [{ type: 'task_completed', targetId: 'vermilion-rumours' }],
@@ -366,6 +384,7 @@ export const subCategories: Record<string, RegionData> = {
     region: 'Underground',
     order: 10,
     image: '/backgrounds/kanto-underground.avif',
+    icon: { type: 'pokemon', id: '95' },
     description:
       'A hidden community of collectors buried much farther beneath Kanto than seems reasonable.',
     music: '/music/moon.mp3',

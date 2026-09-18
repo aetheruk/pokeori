@@ -1,4 +1,5 @@
 import { ScenicChoiceCard } from '@/components/game/shared/ScenicChoiceCard'
+import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { subCategories as subCategoryDataMap } from '@/data/sub-region-map'
 
@@ -51,6 +52,15 @@ export function AreaTabs({
                   key={subCategory}
                   background={subRegionData?.image || '/backgrounds/town.avif'}
                   title={subCategory}
+                  icon={
+                    subRegionData?.icon ? (
+                      <TaskIconDisplay
+                        icon={subRegionData.icon}
+                        className="h-8 w-8"
+                      />
+                    ) : undefined
+                  }
+                  iconPosition={subRegionData?.icon ? 'left' : 'right'}
                   selected={activeSubCategory === subCategory}
                   onClick={() => {
                     handleSubCategoryChange(subCategory)

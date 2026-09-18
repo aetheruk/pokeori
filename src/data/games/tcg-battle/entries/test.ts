@@ -9,6 +9,7 @@ export const testTcgBattleGames: TcgBattleGameConfig[] = [
     category: 'Kanto',
     subCategory: 'Test',
     icon: { type: 'lucide', id: 'CreditCard' },
+    background: '/backgrounds/tcg.avif',
     requirements: [],
     rewards: [],
     settings: {
@@ -42,6 +43,7 @@ export const testTcgBattleGames: TcgBattleGameConfig[] = [
     category: 'Kanto',
     subCategory: 'Test',
     icon: { type: 'lucide', id: 'CreditCard' },
+    background: '/backgrounds/tcg.avif',
     requirements: [],
     rewards: [],
     settings: {
@@ -75,6 +77,7 @@ export const testTcgBattleGames: TcgBattleGameConfig[] = [
     category: 'Kanto',
     subCategory: 'Test',
     icon: { type: 'lucide', id: 'CreditCard' },
+    background: '/backgrounds/tcg.avif',
     requirements: [],
     rewards: [],
     settings: {

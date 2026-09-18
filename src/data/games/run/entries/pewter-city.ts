@@ -9,6 +9,7 @@ export const pewterCitybasicEntries: RunGameConfig[] = [
     category: 'Kanto',
     subCategory: 'Pewter City',
     icon: { type: 'pokemon', id: '19' }, // Rattata
+    background: '/games/run/backgrounds/route-backdrop.avif',
     requirements: [
       {
         type: 'task_completed',
