@@ -278,7 +278,7 @@ function AbilityDexListItem({
   )
   const cardBackground = getPokemonPokedexBackground(
     representative
-      ? getPokemonSpecies(representative.speciesId)?.habitat
+      ? (getPokemonSpecies(representative.speciesId) ?? undefined)
       : undefined,
   )
 

@@ -608,7 +608,14 @@ function PokemonCard({
   const hasCaught = discoveryAccess.stats
   const hasGenderToggle = hasSeen && species.has_gender_differences
   const habitatBackground = getPokemonPokedexBackground(
-    hasSeen ? species.habitat : undefined,
+    hasSeen
+      ? {
+          habitat: species.habitat,
+          is_legendary: species.is_legendary,
+          is_mythical: species.is_mythical,
+          types: pokemon.types,
+        }
+      : undefined,
   )
   const [displayGender, setDisplayGender] = useState<'male' | 'female'>('male')
 
@@ -1511,7 +1518,7 @@ function PokedexGridCell({
       <PokedexGridItem
         speciesId={entry.id}
         baseForm={baseForm}
-        habitat={entry.habitat}
+        species={entry}
         baseProgress={entriesByForm[baseForm.id]}
         isSelected={selectedSpeciesId === entry.id}
         onSelect={onSelect}
@@ -1524,14 +1531,14 @@ function PokedexGridCell({
 const PokedexGridItem = memo(function PokedexGridItem({
   speciesId,
   baseForm,
-  habitat,
+  species,
   baseProgress,
   isSelected,
   onSelect,
 }: {
   speciesId: number
   baseForm: PokemonForm
-  habitat?: string
+  species: PokemonSpecies
   baseProgress?: {
     seen?: boolean | null
     caught?: boolean | null
@@ -1552,7 +1559,12 @@ const PokedexGridItem = memo(function PokedexGridItem({
   const isMaxLevel = researchLevel >= MAX_RESEARCH_LEVEL
   const canLevelUp =
     getMaxResearchLevelForXp(researchXp) > researchLevel && !isMaxLevel
-  const habitatBackground = getPokemonPokedexBackground(habitat)
+  const habitatBackground = getPokemonPokedexBackground({
+    habitat: species.habitat,
+    is_legendary: species.is_legendary,
+    is_mythical: species.is_mythical,
+    types: baseForm.types,
+  })
 
   return (
     <button
