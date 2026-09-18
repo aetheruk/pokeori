@@ -1,6 +1,6 @@
 'use client'
 
-import { BookOpen, CircleHelp, Search, Sparkles, X } from 'lucide-react'
+import { CircleHelp, Search, Sparkles, X } from 'lucide-react'
 import Image from 'next/image'
 import type { CSSProperties } from 'react'
 import { useMemo, useState } from 'react'
@@ -11,7 +11,6 @@ import {
   DexFilterBar,
   DexInspectorSection,
   DexPageShell,
-  DexStatusChip,
 } from '@/components/game/dex'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -32,7 +31,8 @@ import {
   type DisplayAbility,
   getAbilityDexDisplayEntries,
 } from '@/utilities/pokemon/abilitydex-view'
-import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
+import { getPokemonImageUrl, getPokemonSpecies } from '@/utilities/pokemon/pokedex'
+import { getPokemonPokedexBackground } from '@/utilities/pokemon/pokemon-background'
 
 type PokedexProgressByForm = Record<
   string,
@@ -273,6 +273,11 @@ function AbilityDexListItem({
     entriesByForm,
     isKnown,
   )
+  const cardBackground = getPokemonPokedexBackground(
+    representative
+      ? getPokemonSpecies(representative.speciesId)?.habitat
+      : undefined,
+  )
 
   return (
     <button
@@ -285,7 +290,7 @@ function AbilityDexListItem({
       aria-pressed={isSelected}
       onClick={onSelect}
       className={cn(
-        'game-focus-ring group flex h-full min-h-20 w-full items-center gap-3 overflow-hidden rounded-xl border px-3 py-2.5 text-left transition-colors sm:px-4',
+        'game-focus-ring group relative flex h-full min-h-20 w-full items-center gap-3 overflow-hidden rounded-xl border px-3 py-2.5 text-left transition-colors sm:px-4',
         isSelected
           ? 'border-game-moss bg-game-moss/10 ring-1 ring-game-moss/30'
           : isKnown
@@ -293,7 +298,14 @@ function AbilityDexListItem({
             : 'border-dashed border-game-border-strong bg-game-surface/55 hover:bg-game-surface',
       )}
     >
-      <div className="relative flex size-12 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-65"
+        style={{
+          backgroundImage: `linear-gradient(to left, rgba(239,228,207,0.97), rgba(239,228,207,0.68) 56%, rgba(23,39,51,0.12)), url(${cardBackground})`,
+        }}
+      />
+      <div className="game-icon-orb game-icon-orb-art relative z-10 flex size-12 shrink-0 items-center justify-center">
         {representative ? (
           <Image
             src={getPokemonImageUrl(representative.form.id, 'sprite')}
@@ -312,7 +324,7 @@ function AbilityDexListItem({
         )}
       </div>
 
-      <div className="min-w-0 flex-1">
+      <div className="relative z-10 min-w-0 flex-1 text-right">
         <h2
           className={cn(
             'truncate font-display text-base font-semibold',
@@ -328,11 +340,13 @@ function AbilityDexListItem({
         </p>
       </div>
 
-      <div className="flex shrink-0 flex-col items-end gap-1.5">
-        <DexStatusChip tone={isKnown ? 'registered' : 'unknown'}>
+      <div className="relative z-10 flex shrink-0 flex-col items-end gap-1.5 text-right">
+        <span className={cn(
+          'text-[10px] font-bold uppercase tracking-[0.08em]',
+          isKnown ? 'text-game-ochre-strong' : 'text-game-muted',
+        )}>
           {isKnown ? 'Registered' : 'Unknown'}
-        </DexStatusChip>
-        <BookOpen className="size-4 text-game-muted" aria-hidden="true" />
+        </span>
       </div>
     </button>
   )
@@ -364,7 +378,7 @@ function AbilityDexSummary({ entry }: { entry: AbilityDexEntry }) {
     <>
       <article className="game-panel-raised min-w-0 p-4 sm:p-5">
         <header className="flex items-start gap-4">
-          <div className="flex size-12 shrink-0 items-center justify-center rounded-lg border border-game-ochre/30 bg-game-ochre/10">
+          <div className="game-icon-orb game-icon-orb-art flex size-12 shrink-0 items-center justify-center">
             <Sparkles className="size-6 text-game-ochre" aria-hidden="true" />
           </div>
           <div className="min-w-0 flex-1">
@@ -442,7 +456,7 @@ function AbilityDexLearnerRow({
 
   return (
     <li className="game-panel flex min-h-16 items-center gap-3 p-2.5">
-      <div className="relative flex size-11 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised">
+      <div className="game-icon-orb game-icon-orb-art relative flex size-11 shrink-0 items-center justify-center">
         {hasSeen ? (
           <Image
             src={getPokemonImageUrl(learner.form.id, 'sprite')}

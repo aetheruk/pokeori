@@ -100,7 +100,7 @@ export function TrainerDashboard({
     rankings: { type: 'pokemon', id: '137' },
   }
   const renderSectionIcon = (section: TrainerSection) => (
-    <TaskIconDisplay icon={sectionIcons[section]} className="h-8 w-8" />
+    <TaskIconDisplay icon={sectionIcons[section]} className="h-10 w-10" />
   )
   const TABS = [
     ...(user?.isAdmin

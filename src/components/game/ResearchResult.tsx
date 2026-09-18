@@ -143,8 +143,7 @@ export function GameResult({
       )}
     >
       <main className="h-full w-full flex flex-col relative z-10">
-        <div className="w-full flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-game-border scrollbar-track-transparent">
-          <section className="relative flex min-h-[48dvh] w-full shrink-0 flex-col items-center justify-center overflow-hidden px-4 pb-10 pt-12 text-center text-white md:min-h-[52dvh] md:px-6">
+        <section className="relative flex min-h-[42dvh] w-full shrink-0 flex-col items-center justify-center overflow-hidden px-4 pb-8 pt-10 text-center text-white md:min-h-[46dvh] md:px-6">
             <Image
               src={resultBackground}
               alt=""
@@ -228,8 +227,9 @@ export function GameResult({
                 )}
               </div>
             </div>
-          </section>
+        </section>
 
+        <div className="min-h-0 w-full flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-game-border scrollbar-track-transparent">
           <div className="mx-auto w-full max-w-3xl px-4 pb-28 pt-4 md:px-6 md:pt-6">
             {additionalContent && (
               <div className="game-folio-section relative z-10 w-full p-4">

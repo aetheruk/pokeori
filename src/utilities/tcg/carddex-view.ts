@@ -186,8 +186,7 @@ export function resolveCarddexScope<T extends TcgSetSummary>({
     return { series, setId: 'all' }
   }
 
-  const newestSet = sortTcgSetsByReleaseDate(sets).at(-1)!
-  return { series: newestSet.series, setId: newestSet.id }
+  return { series: 'all', setId: 'all' }
 }
 
 export function getCarddexScopedSets<T extends TcgSetSummary>(

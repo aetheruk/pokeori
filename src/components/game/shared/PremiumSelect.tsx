@@ -14,6 +14,7 @@ interface PremiumOption {
   id: string
   label: string
   disabled?: boolean
+  icon?: React.ReactNode
 }
 
 interface PremiumSelectProps {
@@ -42,6 +43,7 @@ export function PremiumSelect({
       <Select value={value} onValueChange={onValueChange}>
         <SelectTrigger className="w-full font-medium">
           <div className="flex min-w-0 items-center gap-3">
+            {options.find((option) => option.id === value)?.icon}
             <SelectValue placeholder={placeholder} />
           </div>
         </SelectTrigger>
@@ -54,7 +56,10 @@ export function PremiumSelect({
               disabled={option.disabled}
               className="cursor-pointer"
             >
-              <span className="font-medium">{option.label}</span>
+              <span className="flex min-w-0 items-center gap-2">
+                {option.icon}
+                <span className="font-medium">{option.label}</span>
+              </span>
             </SelectItem>
           ))}
         </SelectContent>

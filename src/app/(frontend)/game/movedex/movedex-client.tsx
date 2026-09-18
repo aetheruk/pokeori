@@ -638,24 +638,20 @@ function MoveDexListItem({
     >
       <div
         className={cn(
-          'flex size-12 shrink-0 items-center justify-center rounded-lg border bg-game-surface-raised',
+          'game-icon-orb game-icon-orb-art relative flex size-12 shrink-0 items-center justify-center',
           isSketchbook
-            ? 'border-game-ochre/35 text-game-ochre-strong'
-            : 'border-game-border',
+            ? 'border-game-ochre/45 text-game-ochre-strong'
+            : 'text-game-charcoal-strong',
         )}
       >
         {isKnown ? (
-          isSketchbook ? (
-            <BookOpen className="size-6" aria-hidden="true" />
-          ) : (
-            <ItemSprite
-              itemId={getMoveTypeSpriteItemId(entry.move)}
-              alt=""
-              width={38}
-              height={38}
-              className="size-9 object-contain"
-            />
-          )
+          <ItemSprite
+            itemId={getMoveTypeSpriteItemId(entry.move)}
+            alt=""
+            width={38}
+            height={38}
+            className="size-9 object-contain"
+          />
         ) : (
           <CircleHelp className="size-6 text-game-ochre" aria-hidden="true" />
         )}

@@ -1,6 +1,7 @@
 'use client'
 
 import { Award } from 'lucide-react'
+import Image from 'next/image'
 import { useMemo } from 'react'
 import {
   Carousel,
@@ -40,6 +41,18 @@ const REGION_NAMES: Record<string, string> = {
   galar: 'Galar',
   sv: 'Paldea',
   orange: 'Orange Islands',
+}
+
+const REGION_BACKGROUNDS: Record<string, string> = {
+  kanto: '/backgrounds/kanto.avif',
+  johto: '/backgrounds/johto.avif',
+  hoenn: '/backgrounds/hoenn.avif',
+  sinnoh: '/backgrounds/sinnoh.avif',
+  unova: '/backgrounds/unova.avif',
+  kalos: '/backgrounds/kalos.avif',
+  galar: '/backgrounds/galar.avif',
+  sv: '/backgrounds/paldea.avif',
+  orange: '/backgrounds/orange.avif',
 }
 
 export function BadgeShowcase() {
@@ -126,6 +139,17 @@ export function BadgeShowcase() {
             return (
               <CarouselItem key={group.region} className="basis-full pl-4">
                 <div className="relative overflow-hidden rounded-lg border border-game-border bg-game-surface p-5 md:p-6">
+                  <Image
+                    src={REGION_BACKGROUNDS[group.region] || '/backgrounds/kanto.avif'}
+                    alt=""
+                    fill
+                    sizes="(max-width: 768px) 100vw, 720px"
+                    className="object-cover opacity-55"
+                  />
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 bg-[linear-gradient(to_left,rgba(239,228,207,0.98),rgba(239,228,207,0.82)_58%,rgba(23,39,51,0.2)),linear-gradient(to_bottom,rgba(23,39,51,0.05),rgba(239,228,207,0.35)_70%,rgba(23,39,51,0.2))]"
+                  />
                   {/* Card Header */}
                   <div className="relative z-10 mb-8 flex items-end justify-between border-b border-game-border pb-4">
                     <div className="flex flex-col">

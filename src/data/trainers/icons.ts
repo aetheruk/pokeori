@@ -6,4 +6,5 @@ export const trainerIconSprites = [
   { id: 'gb-red', name: 'Red', spriteId: '/sprites/trainers/icon/gb_red.avif', gender: 'm', kind: 'icon' },
   { id: 'gb-red-2', name: 'Red', spriteId: '/sprites/trainers/icon/gb_red_2.avif', gender: 'm', kind: 'icon' },
   { id: 'rocket', name: 'Team Rocket', spriteId: '/sprites/trainers/icon/rocket.avif', gender: 'm', kind: 'icon' },
+  { id: 'fuji', name: 'Fuji', spriteId: '/sprites/trainers/special/fuji.avif', gender: 'm', kind: 'icon' },
 ] as const satisfies readonly TrainerSpriteConfig[]
