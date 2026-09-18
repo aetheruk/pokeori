@@ -1,6 +1,5 @@
-import { Check } from 'lucide-react'
 import type { StaticImageData } from 'next/image'
-import Image from 'next/image'
+import { ScenicChoiceCard } from '@/components/game/shared/ScenicChoiceCard'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 
 interface CategoryTabsProps {
@@ -35,38 +34,20 @@ export function CategoryTabs({
       className="flex flex-col bg-game-surface"
     >
       <div className="min-h-0 overflow-y-auto px-4 pb-4 pt-4">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-3">
           {Object.entries(regionCategories)
             .filter(([regionKey]) => categories.includes(regionKey))
             .map(([regionKey, regionData]) => (
-              <button
+              <ScenicChoiceCard
                 key={regionKey}
-                type="button"
-                aria-pressed={activeCategory === regionKey}
+                background={regionData.image}
+                title={regionKey}
+                selected={activeCategory === regionKey}
                 onClick={() => {
                   handleCategoryChange(regionKey)
                   setRegionModalOpen(false)
                 }}
-                className="game-focus-ring relative w-full cursor-pointer overflow-hidden rounded-lg border border-game-border bg-game-surface-raised text-left transition-colors hover:border-game-moss/40"
-              >
-                <div className="relative aspect-[8/5] w-full">
-                  <Image
-                    src={regionData.image}
-                    alt={regionKey}
-                    fill
-                    sizes="(max-width: 768px) 50vw, 240px"
-                    className="object-cover"
-                  />
-                  {activeCategory === regionKey && (
-                      <div className="game-icon-orb absolute top-2 right-2 h-6 w-6 border-game-charcoal/60 text-game-charcoal-strong">
-                        <Check className="h-4 w-4" />
-                    </div>
-                  )}
-                </div>
-                <div className="px-3 py-2.5 text-sm font-medium text-game-ink">
-                  {regionKey}
-                </div>
-              </button>
+              />
             ))}
         </div>
       </div>

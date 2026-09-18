@@ -44,7 +44,7 @@ export function ExploreDrawerHeader({
 
       {label && (
         <div className="absolute bottom-4 left-1/2 z-20 max-w-[80%] -translate-x-1/2">
-          <span className="game-icon-orb inline-flex max-w-full items-center justify-center gap-2 px-4 py-1.5 text-center text-[10px] font-semibold uppercase leading-none tracking-[0.16em] text-game-ink">
+          <span className="game-icon-orb game-icon-orb-art inline-flex max-w-full items-center justify-center gap-2 px-4 py-1.5 text-center text-[10px] font-semibold uppercase leading-none tracking-[0.16em] text-game-ink">
             {label}
           </span>
         </div>
@@ -58,7 +58,7 @@ export function ExploreDrawerHeader({
         <div className="relative">
           <div
             className={cn(
-              'game-icon-orb relative h-16 w-16 overflow-hidden border-game-border/60',
+              'game-icon-orb game-icon-orb-art relative h-16 w-16 overflow-hidden border-game-border/60',
               iconClassName,
             )}
           >

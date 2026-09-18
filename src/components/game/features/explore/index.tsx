@@ -92,8 +92,6 @@ const getRegionData = (
 
   return {
     currentImage: currentSubCategoryData?.image || currentRegionData?.image,
-    currentDescription:
-      currentSubCategoryData?.description || currentRegionData?.description,
     currentTitle: activeSubCategory || activeCategory,
     currentMusic: currentSubCategoryData?.music,
   }
@@ -201,9 +199,6 @@ function ExploreListContent({
     ? '/backgrounds/chansey.avif'
     : regionData.currentImage
   const currentTitle = isDailies ? 'Tasks & Rewards' : regionData.currentTitle
-  const currentDescription = isDailies
-    ? 'A list of your daily tasks, trainer battles, locations, and research!'
-    : regionData.currentDescription
   const currentMusic = regionData.currentMusic
 
   const { changeMusic: updateMusic } = useAudio()
@@ -410,7 +405,6 @@ function ExploreListContent({
         <ExploreHeader
           currentImage={currentImage as any}
           currentTitle={currentTitle}
-          currentDescription={currentDescription}
           activeCategory={displayCategory}
           activeSubCategory={displaySubCategory}
           weatherSlot={

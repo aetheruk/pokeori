@@ -16,12 +16,6 @@ import {
 import Image from 'next/image'
 import { useEffect, useMemo, useState } from 'react'
 import { DesktopSectionEmblem } from '@/components/game/shared/DesktopSectionEmblem'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import type { WeatherType } from '@/data/weather'
 import {
   getRegionTimeZone,
@@ -32,7 +26,6 @@ import { resolveSubRegionWeather } from '@/utilities/weather'
 interface ExploreHeaderProps {
   currentImage?: string
   currentTitle: string
-  currentDescription?: string
   activeCategory: string
   activeSubCategory?: string
   weatherSlot?: number
@@ -72,12 +65,10 @@ function WeatherIcon({ weather }: { weather: WeatherType }) {
 export function ExploreHeader({
   currentImage,
   currentTitle,
-  currentDescription,
   activeCategory,
   activeSubCategory,
   weatherSlot,
 }: ExploreHeaderProps) {
-  const [isInfoOpen, setIsInfoOpen] = useState(false)
   const [now, setNow] = useState(() => new Date())
 
   const isDailies = activeCategory === 'Dailies'
@@ -126,19 +117,30 @@ export function ExploreHeader({
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#172733]/92 via-[#172733]/26 to-[#172733]/12" />
 
-        <div className="absolute inset-x-0 bottom-0 z-10 p-4 md:p-5">
+        <div className="absolute inset-x-0 bottom-0 z-10 flex justify-center p-4 text-center md:p-5">
           <div className="max-w-2xl">
-            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.15em] text-game-ochre">
-              {activeCategory || 'Explore'}
-            </p>
             <h1 className="font-display text-2xl font-bold text-game-cream [text-shadow:0_2px_8px_rgb(23_39_51_/_0.9)] md:text-3xl">
               {currentTitle}
             </h1>
-            <div className="mt-2 h-px w-16 bg-game-ochre/80" />
-            {currentDescription && (
-              <p className="mt-2 hidden max-w-2xl truncate text-sm text-game-cream [text-shadow:0_1px_5px_rgb(23_39_51_/_0.95)] md:block">
-                {currentDescription}
-              </p>
+            {!isDailies && (
+              <div className="mt-2 flex items-center justify-center gap-3 text-sm font-semibold text-game-cream [text-shadow:0_1px_5px_rgb(23_39_51_/_0.95)]">
+                <span className="inline-flex items-center gap-1.5">
+                  <WeatherIcon weather={weather.weather} />
+                  <span>{weather.label}</span>
+                </span>
+                <span
+                  className="h-4 w-px bg-game-cream/60"
+                  aria-hidden="true"
+                />
+                <span className="inline-flex items-center gap-1.5">
+                  {isDaytime ? (
+                    <Sun className="h-4 w-4" aria-hidden="true" />
+                  ) : (
+                    <Moon className="h-4 w-4" aria-hidden="true" />
+                  )}
+                  <span>{formattedRegionTime}</span>
+                </span>
+              </div>
             )}
           </div>
         </div>
@@ -148,43 +150,7 @@ export function ExploreHeader({
           className="absolute bottom-5 right-6 z-10 h-24 w-24 opacity-80 xl:h-28 xl:w-28"
         />
 
-        <div className="absolute top-3 left-3 flex items-center gap-2 z-20">
-          {!isDailies && (
-            <button
-              type="button"
-              onClick={() => setIsInfoOpen(true)}
-              className="game-focus-ring flex min-h-10 items-center gap-1.5 rounded-md border border-game-border/60 bg-game-surface-raised/90 px-2.5 py-1.5 text-xs font-medium text-game-ink backdrop-blur-md transition-colors hover:bg-game-surface"
-              title={isDaytime ? 'Daytime' : 'Nighttime'}
-            >
-              {isDaytime ? (
-                <Sun className="w-4 h-4" />
-              ) : (
-                <Moon className="w-4 h-4" />
-              )}
-              <span>{formattedRegionTime}</span>
-              <span className="h-3 w-px bg-game-ink/25" />
-              <WeatherIcon weather={weather.weather} />
-              <span>{weather.label}</span>
-            </button>
-          )}
-        </div>
       </div>
-
-      {/* Info Modal */}
-      <Dialog open={isInfoOpen} onOpenChange={setIsInfoOpen}>
-        <DialogContent className="rounded-lg border-game-border bg-game-surface text-game-ink sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="font-display text-xl font-bold text-game-ink">
-              {currentTitle}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="py-2">
-            <p className="leading-relaxed text-game-muted">
-              {currentDescription}
-            </p>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }
