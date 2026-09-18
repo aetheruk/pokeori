@@ -9,6 +9,7 @@ interface ScenicChoiceCardProps {
   title: ReactNode
   description?: ReactNode
   icon?: ReactNode
+  iconPosition?: 'left' | 'right'
   selected?: boolean
   onClick: () => void
   ariaPressed?: boolean
@@ -24,11 +25,14 @@ export function ScenicChoiceCard({
   title,
   description,
   icon,
+  iconPosition = 'right',
   selected = false,
   onClick,
   ariaPressed,
   className,
 }: ScenicChoiceCardProps) {
+  const iconOnLeft = iconPosition === 'left'
+
   return (
     <button
       type="button"
@@ -63,18 +67,33 @@ export function ScenicChoiceCard({
       />
 
       {selected && (
-        <span className="absolute left-3 top-3 z-10 flex size-7 items-center justify-center rounded-full border border-game-surface bg-game-charcoal text-game-cream shadow-sm">
+        <span
+          className={cn(
+            'absolute top-3 z-10 flex size-7 items-center justify-center rounded-full border border-game-surface bg-game-charcoal text-game-cream shadow-sm',
+            iconOnLeft ? 'right-3' : 'left-3',
+          )}
+        >
           <Check className="size-4" aria-hidden="true" />
         </span>
       )}
 
-      <span className="relative z-10 flex min-w-0 flex-1 items-center justify-end gap-3 p-4 md:p-5">
+      <span
+        className={cn(
+          'relative z-10 flex min-w-0 flex-1 items-center gap-3 p-4 md:p-5',
+          iconOnLeft ? 'justify-between' : 'justify-end',
+        )}
+      >
         {icon && (
           <span className="game-icon-orb game-icon-orb-art flex size-10 shrink-0 text-game-charcoal-strong md:size-11">
             {icon}
           </span>
         )}
-        <span className="min-w-0 max-w-[78%] text-right">
+        <span
+          className={cn(
+            'min-w-0 text-right',
+            iconOnLeft ? 'flex-1' : 'max-w-[78%]',
+          )}
+        >
           <span className="block truncate font-display text-base font-semibold leading-tight text-game-ink md:text-lg">
             {title}
           </span>

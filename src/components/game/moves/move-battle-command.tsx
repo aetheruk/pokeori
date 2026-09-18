@@ -1,8 +1,7 @@
 'use client'
 
-import { AlertTriangle, BookOpen } from 'lucide-react'
+import { AlertTriangle, Info, Loader2 } from 'lucide-react'
 import Image from 'next/image'
-import type { ReactNode } from 'react'
 
 import {
   STANCE_ICON_CONFIG,
@@ -40,14 +39,18 @@ const TYPE_IDS: Record<string, number> = {
 export interface MoveBattleCommandProps {
   presentation: MovePresentation
   onDetails: () => void
-  primaryAction: ReactNode
+  onSelect: () => void
+  disabled?: boolean
+  pending?: boolean
   className?: string
 }
 
 export function MoveBattleCommand({
   presentation,
   onDetails,
-  primaryAction,
+  onSelect,
+  disabled = false,
+  pending = false,
   className,
 }: MoveBattleCommandProps) {
   const { identity, essentials } = presentation
@@ -70,9 +73,10 @@ export function MoveBattleCommand({
     >
       <button
         type="button"
-        onClick={onDetails}
-        aria-label={`View ${identity.name} details`}
-        className="group min-h-[4.5rem] min-w-0 px-3 py-2.5 text-left outline-none transition-colors hover:bg-game-moss/5 focus-visible:bg-game-moss/10 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-game-moss/60"
+        onClick={onSelect}
+        disabled={disabled}
+        aria-label={`Use ${identity.name}`}
+        className="game-focus-ring group min-h-[4.5rem] min-w-0 px-3 py-2.5 text-left outline-none transition-colors hover:bg-game-charcoal/5 focus-visible:bg-game-charcoal/10 disabled:cursor-not-allowed disabled:opacity-60"
       >
         <span className="flex min-w-0 items-center gap-2">
           {typeId ? (
@@ -97,10 +101,7 @@ export function MoveBattleCommand({
           <strong className="min-w-0 flex-1 truncate font-display text-sm text-game-ink">
             {identity.name}
           </strong>
-          <BookOpen
-            className="size-4 shrink-0 text-game-muted transition-colors group-hover:text-game-moss-strong"
-            aria-hidden="true"
-          />
+          {pending ? <Loader2 className="size-4 shrink-0 animate-spin text-game-charcoal-strong" aria-hidden="true" /> : null}
         </span>
 
         <span className="mt-1.5 flex min-w-0 items-center gap-1.5 text-xs font-semibold text-game-muted">
@@ -125,8 +126,16 @@ export function MoveBattleCommand({
         ) : null}
       </button>
 
-      <div className="flex items-center border-l border-game-border bg-game-surface-raised/65 px-2">
-        {primaryAction}
+      <div className="flex items-center border-l border-game-border px-1.5">
+        <button
+          type="button"
+          onClick={onDetails}
+          aria-label={`View ${identity.name} details`}
+          title={`View ${identity.name} details`}
+          className="game-focus-ring flex size-10 items-center justify-center text-game-muted transition-colors hover:text-game-charcoal-strong"
+        >
+          <Info className="size-4" aria-hidden="true" />
+        </button>
       </div>
     </article>
   )

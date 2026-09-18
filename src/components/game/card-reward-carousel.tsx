@@ -1,7 +1,6 @@
 'use client'
 
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
-import { Card } from '@/components/ui/card'
 import Image from 'next/image'
 
 export interface CardReward {
@@ -32,12 +31,12 @@ export function CardRewardCarousel({ cards }: CardRewardCarouselProps) {
       <CarouselContent>
         {cards.map((card, index) => (
           <CarouselItem key={`card-${index}`} className="basis-full min-w-0">
-            <Card
-              className={`h-12 flex-row items-center gap-3 border-game-border bg-game-surface-raised p-2 ${
+            <div
+              className={`flex min-h-12 w-full items-center gap-3 border-b border-game-border/75 py-2 ${
                 card.discarded ? 'opacity-70' : ''
               }`}
             >
-              <div className="relative h-8 w-8 shrink-0 rounded-lg bg-game-canvas p-0.5">
+              <div className="relative flex h-8 w-8 shrink-0 items-center justify-center p-0.5">
                 <Image
                   src={card.images?.small || '/images/tcg-back.avif'}
                   alt={`${card.name} card`}
@@ -63,7 +62,7 @@ export function CardRewardCarousel({ cards }: CardRewardCarouselProps) {
                   <span className="text-xs font-bold text-game-muted">{card.rarity}</span>
                 )}
               </div>
-            </Card>
+            </div>
           </CarouselItem>
         ))}
       </CarouselContent>

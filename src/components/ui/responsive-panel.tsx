@@ -71,7 +71,7 @@ export function ResponsivePanel({
   mobileHeader = true,
   showHandle = true,
   showHeader = true,
-  showCloseButton = true,
+  showCloseButton = false,
   dismissible = true,
   headerClassName,
   className,

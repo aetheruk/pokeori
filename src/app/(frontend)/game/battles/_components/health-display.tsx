@@ -112,7 +112,7 @@ export function HealthDisplay({
               ? 'bg-game-danger'
               : hpPercent < 50
                 ? 'bg-game-ochre'
-                : 'bg-game-moss',
+                : 'bg-game-health',
           )}
         />
         {isPlayer && (
@@ -165,12 +165,12 @@ function StanceBadge({ stance }: { stance: BattleStance }) {
     },
     speed: {
       Icon: STANCE_ICON_CONFIG.speed.Icon,
-      className: 'text-game-moss-strong',
+      className: 'text-game-ochre',
       label: 'Speed',
     },
     tech: {
       Icon: STANCE_ICON_CONFIG.tech.Icon,
-      className: 'text-game-ochre',
+      className: 'text-game-stance-blue-strong',
       label: 'Tech',
     },
   }[stance]

@@ -44,19 +44,14 @@ function LazyWrapper({ children }: { children: React.ReactNode }) {
   )
 }
 
-import {
-  Gift,
-  Layers3,
-  Search,
-  Trophy,
-  UserRound,
-  UsersRound,
-} from 'lucide-react'
 import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
 import { ScenicChoiceCard } from '@/components/game/shared/ScenicChoiceCard'
 import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
+import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { useUser } from '@/context/UserContext'
+import { getIcon } from '@/data/user'
+import type { TaskIcon } from '@/data/tasks/types'
 import { skills } from '@/data/skills'
 import { tcgSetSummaries } from '@/data/tcg/summaries'
 import { cn } from '@/lib/utils'
@@ -94,6 +89,19 @@ export function TrainerDashboard({
   const deckGenerations = getTcgSeriesInReleaseOrder(tcgSetSummaries)
   const [deckGeneration, setDeckGeneration] = useState(deckGenerations[0] || '')
   const [deckFormat, setDeckFormat] = useState<DeckFormat>('baby')
+  const sectionIcons: Record<TrainerSection, TaskIcon> = {
+    profile:
+      getIcon(user?.icon || 'ditto')?.icon || { type: 'pokemon', id: '132' },
+    events: { type: 'item', id: 'master-ball' },
+    decks: { type: 'local', id: 'images/tcg-back.avif' },
+    trainers: { type: 'item', id: 'vs-seeker' },
+    friends: { type: 'pokemon', id: '133' },
+    gift: { type: 'item', id: 'relic-gold' },
+    rankings: { type: 'pokemon', id: '137' },
+  }
+  const renderSectionIcon = (section: TrainerSection) => (
+    <TaskIconDisplay icon={sectionIcons[section]} className="h-8 w-8" />
+  )
   const TABS = [
     ...(user?.isAdmin
       ? [
@@ -192,19 +200,6 @@ export function TrainerDashboard({
   ]
   const activeComponent =
     TABS.find((tab) => tab.id === activeTab)?.component || TABS[0].component
-  const tabIcons: Record<
-    TrainerSection,
-    React.ComponentType<{ className?: string }>
-  > = {
-    profile: UserRound,
-    decks: Layers3,
-    trainers: Search,
-    friends: UsersRound,
-    gift: Gift,
-    rankings: Trophy,
-    events: Gift,
-  }
-
   const selectSection = (section: TrainerSection) => {
     setActiveTab(section)
     router.push(getTrainerSectionHref(section), { scroll: false })
@@ -230,7 +225,6 @@ export function TrainerDashboard({
   }, [activeTab, hasDeckBox, isKidMode, router, user?.isAdmin])
 
   const activeSection = TABS.find((tab) => tab.id === activeTab) || TABS[0]
-  const ActiveIcon = tabIcons[activeSection.id]
 
   return (
     <div className="game-paper-first game-paper-background flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
@@ -238,7 +232,6 @@ export function TrainerDashboard({
         <aside className="hidden min-h-0 overflow-y-auto border-r border-game-border bg-game-surface/60 p-3 shadow-[10px_0_24px_rgb(75_62_39_/_0.05)] lg:block">
           <nav className="space-y-2" aria-label="Trainer sections">
             {TABS.map((tab) => {
-              const Icon = tabIcons[tab.id]
               const selected = tab.id === activeTab
               return (
                 <ScenicChoiceCard
@@ -246,7 +239,8 @@ export function TrainerDashboard({
                   background={tab.background}
                   title={tab.label}
                   description={tab.description}
-                  icon={<Icon className="size-4" />}
+                  icon={renderSectionIcon(tab.id)}
+                  iconPosition="left"
                   selected={selected}
                   onClick={() => selectSection(tab.id)}
                   className="min-h-20"
@@ -316,7 +310,8 @@ export function TrainerDashboard({
             background={activeSection.background}
             title={activeSection.label}
             description="Choose another trainer section"
-            icon={<ActiveIcon className="size-4" />}
+            icon={renderSectionIcon(activeSection.id)}
+            iconPosition="left"
             onClick={() => setSectionDrawerOpen(true)}
             className="min-h-20"
           />
@@ -376,7 +371,6 @@ export function TrainerDashboard({
       >
         <div className="min-h-0 overflow-y-auto space-y-3 p-3 pb-4">
           {TABS.map((tab) => {
-            const Icon = tabIcons[tab.id]
             const selected = tab.id === activeTab
             return (
               <ScenicChoiceCard
@@ -384,7 +378,8 @@ export function TrainerDashboard({
                 background={tab.background}
                 title={tab.label}
                 description={tab.description}
-                icon={<Icon className="size-4" />}
+                icon={renderSectionIcon(tab.id)}
+                iconPosition="left"
                 selected={selected}
                 onClick={() => {
                   selectSection(tab.id)

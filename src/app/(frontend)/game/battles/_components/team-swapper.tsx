@@ -248,7 +248,7 @@ export function TeamSwapper({
                         <div
                           className={cn(
                             'h-full transition-all duration-300',
-                            hpPercent > 50 && 'bg-game-moss',
+                            hpPercent > 50 && 'bg-game-health',
                             hpPercent <= 50 &&
                               hpPercent > 20 &&
                               'bg-game-ochre',

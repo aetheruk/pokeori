@@ -639,7 +639,6 @@ export function TrainerLeveling({ saveCustomization = updateUserCustomization }:
         className="flex flex-col overflow-hidden"
         headerClassName="shrink-0"
         dismissible={!isSaving}
-        showCloseButton={!isSaving}
       >
         <div className="min-h-0 flex-1 overflow-y-auto p-4">
           <fieldset disabled={isSaving} className="min-w-0 space-y-4">

@@ -3,11 +3,6 @@
 import { ArrowLeft, HeartOff, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from '@/components/ui/carousel'
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
@@ -347,66 +342,59 @@ export function ItemSelector() {
                     <SectionDivider className="mb-3">
                       {effectLabels[effectType]}
                     </SectionDivider>
-                    <Carousel opts={{ align: 'start' }} className="w-full">
-                      <CarouselContent className="-ml-2">
-                        {typeItems.map((item) => {
-                          const itemApplies = canItemApply(item)
+                    <div className="divide-y divide-game-border/75">
+                      {typeItems.map((item) => {
+                        const itemApplies = canItemApply(item)
 
-                          return (
-                            <CarouselItem
-                              key={item.itemId}
-                              className="pl-2 basis-full"
-                            >
-                              <Button
-                                variant="outline"
-                                className={cn(
-                                  'game-focus-ring relative w-full h-auto rounded-xl border border-game-border bg-game-surface-raised py-3 px-4 flex items-center gap-3',
-                                  'shadow-sm transition-colors hover:border-game-moss/60 hover:bg-game-moss/10',
-                                  !itemApplies &&
-                                    'opacity-50 hover:border-game-border',
-                                  using === item.itemId &&
-                                    'opacity-50 pointer-events-none',
-                                )}
-                                onClick={() => {
-                                  if (item.battleEffect.type === 'revive') {
-                                    setReviveItem(item)
-                                  } else {
-                                    void handleUseItem(item.itemId)
-                                  }
-                                }}
-                                disabled={using !== null || !itemApplies}
-                              >
-                                <ItemSprite
-                                  itemId={item.itemId}
-                                  alt={item.name}
-                                  width={32}
-                                  height={32}
-                                  className="h-8 w-8 flex-shrink-0 object-contain"
-                                />
-                                <div className="flex-1 text-left min-w-0">
-                                  <div className="flex items-center justify-between gap-2">
-                                    <span className="font-medium text-sm truncate">
-                                      {item.name}
-                                    </span>
-                                    <span className="text-xs text-game-muted flex-shrink-0">
-                                      ×{item.quantity}
-                                    </span>
-                                  </div>
-                                  <div className="text-xs text-game-muted truncate">
-                                    {itemApplies
-                                      ? getEffectDescription(item)
-                                      : 'No effect right now'}
-                                  </div>
-                                </div>
-                                {using === item.itemId && (
-                                  <Loader2 className="w-4 h-4 animate-spin absolute right-2 top-1/2 -translate-y-1/2" />
-                                )}
-                              </Button>
-                            </CarouselItem>
-                          )
-                        })}
-                      </CarouselContent>
-                    </Carousel>
+                        return (
+                          <Button
+                            key={item.itemId}
+                            variant="ghost"
+                            className={cn(
+                              'game-focus-ring relative flex h-auto min-h-14 w-full items-center gap-3 rounded-none px-1 py-3 text-left text-game-ink',
+                              'hover:bg-game-charcoal/5 hover:text-game-ink',
+                              !itemApplies && 'opacity-50 hover:bg-transparent',
+                              using === item.itemId &&
+                                'pointer-events-none opacity-50',
+                            )}
+                            onClick={() => {
+                              if (item.battleEffect.type === 'revive') {
+                                setReviveItem(item)
+                              } else {
+                                void handleUseItem(item.itemId)
+                              }
+                            }}
+                            disabled={using !== null || !itemApplies}
+                          >
+                            <ItemSprite
+                              itemId={item.itemId}
+                              alt={item.name}
+                              width={32}
+                              height={32}
+                              className="h-8 w-8 shrink-0 object-contain"
+                            />
+                            <span className="min-w-0 flex-1">
+                              <span className="flex items-center justify-between gap-2">
+                                <span className="truncate text-sm font-semibold">
+                                  {item.name}
+                                </span>
+                                <span className="shrink-0 text-xs text-game-muted">
+                                  ×{item.quantity}
+                                </span>
+                              </span>
+                              <span className="block truncate text-xs text-game-muted">
+                                {itemApplies
+                                  ? getEffectDescription(item)
+                                  : 'No effect right now'}
+                              </span>
+                            </span>
+                            {using === item.itemId && (
+                              <Loader2 className="size-4 shrink-0 animate-spin" />
+                            )}
+                          </Button>
+                        )
+                      })}
+                    </div>
                   </div>
                 )
               })}

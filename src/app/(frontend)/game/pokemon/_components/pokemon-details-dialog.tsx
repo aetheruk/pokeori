@@ -9,7 +9,6 @@ import {
   Clock,
   Diamond,
   Flag,
-  FlaskConical,
   Info,
   Loader2,
   Lock,
@@ -314,13 +313,12 @@ function PokemonTypeChips({ types }: { types: string[] }) {
             />
           </div>
         ) : (
-          <Badge
+          <span
             key={type}
-            variant="secondary"
-            className="border-game-border bg-game-surface-raised px-3 py-1 text-[10px] font-black uppercase tracking-widest text-game-muted"
+            className="text-[10px] font-black uppercase tracking-widest text-game-muted"
           >
             {type}
-          </Badge>
+          </span>
         )
       })}
     </div>
@@ -372,12 +370,8 @@ function ResearchSection({
         Research Progress
       </SectionDivider>
 
-      <div className="relative overflow-hidden rounded-2xl border border-game-border bg-game-surface-raised p-5 shadow-sm">
-        <div className="absolute right-0 top-0 p-3 opacity-[0.07]">
-          <FlaskConical className="h-16 w-16 -rotate-12 text-game-moss" />
-        </div>
-
-        <div className="relative z-10 space-y-4">
+      <div className="space-y-4 border-y border-game-border/75 py-4">
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="mb-1 text-[10px] font-bold uppercase leading-none tracking-widest text-game-muted">
@@ -441,7 +435,7 @@ function ResearchSection({
                       <CarouselContent>
                         {activeRewards.map(({ level, reward }) => (
                           <CarouselItem key={`${formId}-${level}`}>
-                            <div className="flex min-h-[60px] flex-col items-center justify-center rounded-xl border border-game-moss/35 bg-game-moss/10 p-3 text-center">
+                            <div className="flex min-h-[60px] flex-col items-center justify-center px-2 py-3 text-center">
                               <span className="mb-1 text-[10px] font-black uppercase tracking-[0.08em] text-game-moss-strong">
                                 Level {level}
                               </span>
@@ -988,10 +982,10 @@ function MountedPokemonDetailsDialog({
         desktopWidth="min(42vw, 620px)"
         mobileHeader={false}
         showHandle={false}
-        className="game-paper-first game-paper-background flex max-h-[92dvh] w-full flex-col gap-0 overflow-hidden bg-game-canvas p-0 text-game-ink"
+        className="game-paper-first game-paper-background relative flex max-h-[92dvh] w-full flex-col gap-0 overflow-hidden bg-game-canvas p-0 text-game-ink after:pointer-events-none after:absolute after:left-1/2 after:top-2 after:z-30 after:h-1.5 after:w-20 after:-translate-x-1/2 after:rounded-full after:bg-game-border-strong after:content-[''] lg:after:hidden"
       >
         {/* Fixed Image at Top */}
-        <div className="relative -mt-1 aspect-[2/1] w-full flex-shrink-0 overflow-hidden border-b border-game-border">
+        <div className="relative aspect-[2/1] w-full flex-shrink-0 overflow-hidden border-b border-game-border">
           {/* Background */}
           {isEvolving ? (
             <div className="absolute inset-0 overflow-hidden bg-[#172733]">
@@ -1288,12 +1282,9 @@ function MountedPokemonDetailsDialog({
                       return (
                         <div
                           key={evo.speciesId}
-                          className="relative overflow-hidden rounded-2xl border border-game-ochre/40 bg-game-surface-raised p-4 shadow-sm"
+                          className="relative overflow-hidden border-y border-game-ochre/40 py-4"
                         >
-                          <div className="absolute right-0 top-0 p-3 opacity-[0.08]">
-                            <Sparkles className="h-12 w-12 rotate-12 text-game-ochre" />
-                          </div>
-                          <div className="relative z-10 flex flex-col gap-3">
+                          <div className="flex flex-col gap-3">
                             <div className="flex items-center justify-between">
                               <span className="font-display text-base font-semibold text-game-ink">
                                 {evoName}
@@ -1340,7 +1331,7 @@ function MountedPokemonDetailsDialog({
             })()}
 
             <div className="w-full max-w-md space-y-4">
-              <div className="space-y-4 rounded-2xl border border-game-border bg-game-surface-raised p-4 shadow-sm">
+              <div className="space-y-4 border-y border-game-border/75 py-4">
                 <div className="space-y-1.5">
                   <span className="block px-1 text-[10px] font-bold uppercase tracking-widest text-game-muted">
                     Active Box
@@ -1373,7 +1364,7 @@ function MountedPokemonDetailsDialog({
                 </div>
 
                 {/* Markings */}
-                <div className="flex w-full justify-between gap-1 pt-2">
+                <div className="flex w-full justify-between gap-1 border-t border-game-border/75 pt-3">
                   <MarkingButton
                     active={pokemon.markingSquare || false}
                     onClick={() => handleToggleMarking('Square')}
@@ -1416,19 +1407,17 @@ function MountedPokemonDetailsDialog({
 
             {/* Status Board */}
             <div className="w-full max-w-md space-y-4">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-x-6 border-y border-game-border/75">
                 {[
                   {
                     label: 'Level',
                     value: pokemon.level,
                     icon: Swords,
-                    color: 'game-moss',
                   },
                   {
                     label: 'Variant',
                     value: rarityVariant.label,
                     icon: Info,
-                    color: 'game-moss',
                   },
                   {
                     label: 'Nature',
@@ -1436,19 +1425,16 @@ function MountedPokemonDetailsDialog({
                       ? capitalizeFirstLetter(pokemon.nature)
                       : '???',
                     icon: Info,
-                    color: 'game-moss',
                   },
                   {
                     label: 'Size',
                     value: hasPokeScales ? pokemon.size || '-' : '???',
                     icon: Info,
-                    color: 'game-moss',
                   },
                   {
                     label: 'Gender',
                     value: formatPokemonGenderLabel(pokemonGender),
                     icon: Info,
-                    color: 'game-moss',
                   },
                   {
                     label: 'Friendship',
@@ -1456,27 +1442,30 @@ function MountedPokemonDetailsDialog({
                       ? ((pokemon as any).friendship ?? 70)
                       : '???',
                     icon: Info,
-                    color: 'game-moss',
                   },
                 ].map((item, idx) => (
                   <div
                     key={idx}
-                    className="rounded-2xl border border-game-border bg-game-surface-raised p-4"
+                    className="flex min-h-14 items-center justify-between gap-3 border-b border-game-border/75 py-3"
                   >
-                    <span className="mb-1 block text-[10px] font-extrabold uppercase leading-none tracking-widest text-game-moss-strong">
-                      {item.label}
+                    <span className="flex min-w-0 items-center gap-2">
+                      <item.icon className="size-3.5 shrink-0 text-game-charcoal-strong" />
+                      <span className="truncate text-[10px] font-extrabold uppercase leading-none tracking-widest text-game-muted">
+                        {item.label}
+                      </span>
                     </span>
-                    <span className="font-display text-base font-semibold text-game-ink">
+                    <span className="shrink-0 text-right font-mono text-sm font-bold text-game-ink">
                       {item.value}
                     </span>
                   </div>
                 ))}
 
-                <div className="rounded-2xl border border-game-border bg-game-surface-raised p-4">
-                  <span className="mb-2 block text-[10px] font-extrabold uppercase leading-none tracking-widest text-game-moss-strong">
+                <div className="flex min-h-14 items-center justify-between gap-3 border-b border-game-border/75 py-3">
+                  <span className="flex items-center gap-2 text-[10px] font-extrabold uppercase leading-none tracking-widest text-game-muted">
+                    <Circle className="size-3.5 text-game-charcoal-strong" />
                     Ball
                   </span>
-                  <div className="flex items-center gap-2">
+                  <div className="flex min-w-0 items-center gap-2">
                     <ItemSprite
                       itemId={pokemon.ballType || 'poke-ball'}
                       alt={pokemon.ballType || 'Poke Ball'}
@@ -1484,17 +1473,18 @@ function MountedPokemonDetailsDialog({
                       height={20}
                       className="object-contain drop-shadow-md"
                     />
-                    <span className="truncate text-xs font-bold capitalize tracking-tight text-game-ink">
+                    <span className="truncate text-right text-xs font-bold capitalize tracking-tight text-game-ink">
                       {pokemon.ballType?.replace(/-/g, ' ') || 'Poke Ball'}
                     </span>
                   </div>
                 </div>
 
-                <div className="overflow-hidden rounded-2xl border border-game-border bg-game-surface-raised p-4">
-                  <span className="mb-1 block text-[10px] font-extrabold uppercase leading-none tracking-widest text-game-moss-strong">
+                <div className="flex min-h-14 items-center justify-between gap-3 border-b border-game-border/75 py-3">
+                  <span className="flex items-center gap-2 text-[10px] font-extrabold uppercase leading-none tracking-widest text-game-muted">
+                    <Info className="size-3.5 text-game-charcoal-strong" />
                     Trainer
                   </span>
-                  <span className="block truncate text-xs font-bold tracking-tight text-game-ink">
+                  <span className="block truncate text-right text-xs font-bold tracking-tight text-game-ink">
                     {typeof pokemon.originalTrainer === 'object'
                       ? pokemon.originalTrainer.trainerName || 'Unknown'
                       : pokemon.originalTrainer === user?.id
@@ -1503,18 +1493,21 @@ function MountedPokemonDetailsDialog({
                   </span>
                 </div>
 
-                <div className="col-span-2 overflow-hidden rounded-2xl border border-game-border bg-game-surface-raised p-4">
-                  <span className="mb-1 block text-[10px] font-extrabold uppercase leading-none tracking-widest text-game-moss-strong">
+                <div className="col-span-2 flex min-h-14 items-start justify-between gap-3 py-3">
+                  <span className="flex items-center gap-2 text-[10px] font-extrabold uppercase leading-none tracking-widest text-game-muted">
+                    <Flag className="size-3.5 text-game-charcoal-strong" />
                     Origin
                   </span>
-                  <span className="block truncate font-display text-sm font-semibold text-game-ink">
-                    {pokemonOrigin.title}
-                  </span>
-                  {pokemonOrigin.subtitle && (
-                    <span className="mt-1 block truncate text-xs font-bold tracking-tight text-game-muted">
-                      {pokemonOrigin.subtitle}
+                  <span className="min-w-0 text-right">
+                    <span className="block truncate font-display text-sm font-semibold text-game-ink">
+                      {pokemonOrigin.title}
                     </span>
-                  )}
+                    {pokemonOrigin.subtitle && (
+                      <span className="mt-1 block truncate text-xs font-bold tracking-tight text-game-muted">
+                        {pokemonOrigin.subtitle}
+                      </span>
+                    )}
+                  </span>
                 </div>
               </div>
             </div>
@@ -1523,17 +1516,17 @@ function MountedPokemonDetailsDialog({
               <SectionDivider className="uppercase tracking-[0.2em] font-black text-[10px]">
                 Held Item
               </SectionDivider>
-              <div className="space-y-4 rounded-2xl border border-game-border bg-game-surface-raised p-4 shadow-sm">
+              <div className="divide-y divide-game-border/75 border-y border-game-border/75">
                 {heldItemsUnlockMessage ? (
-                  <div className="rounded-xl border border-game-border bg-game-surface-raised px-4 py-3 text-xs text-game-muted">
+                  <div className="border-l-2 border-game-ochre/60 py-3 pl-3 text-xs text-game-muted">
                     {heldItemsUnlockMessage}
                   </div>
                 ) : (
                   <>
-                    <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center justify-between gap-3 py-3">
                       <div className="flex min-w-0 items-center gap-3">
                         {currentHeldItem && (
-                          <div className="game-icon-orb h-10 w-10 flex-shrink-0">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center">
                             <ItemSprite
                               itemId={currentHeldItem.id}
                               alt={currentHeldItem.name}
@@ -1581,14 +1574,14 @@ function MountedPokemonDetailsDialog({
 
                     {heldItemOptions.length === 0 ? (
                       <div
-                        className="rounded-xl border border-dashed border-game-border bg-game-surface-raised px-4 py-3 text-xs text-game-muted"
+                        className="border-l-2 border-game-border py-3 pl-3 text-xs text-game-muted"
                         role="status"
                         aria-live="polite"
                       >
                         No items available.
                       </div>
                     ) : (
-                      <div className="grid gap-2 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
+                      <div className="max-h-72 overflow-y-auto pr-1 custom-scrollbar">
                         {heldItemOptions.map((item) => {
                           const selected = heldItemId === item.id
                           const saving = isSavingHeldItem === item.id
@@ -1611,10 +1604,10 @@ function MountedPokemonDetailsDialog({
                                 itemLocked
                               }
                               className={cn(
-                                'min-h-16 w-full rounded-xl border px-3 py-2 text-left transition-all flex items-center gap-3',
+                                'flex min-h-16 w-full items-center gap-3 border-b border-game-border/75 px-1 py-2 text-left transition-colors last:border-b-0',
                                 selected
-                                  ? 'border-game-moss bg-game-moss/10 text-game-ink'
-                                  : 'border-game-border bg-game-surface-raised text-game-ink hover:border-game-moss',
+                                  ? 'bg-game-moss/10 text-game-ink'
+                                  : 'text-game-ink hover:bg-game-charcoal/5',
                                 isSavingHeldItem !== null &&
                                   'opacity-60 cursor-wait',
                                 (!canAssignHeldItems || itemLocked) &&
@@ -1640,7 +1633,7 @@ function MountedPokemonDetailsDialog({
                                   <span className="truncate text-sm font-black uppercase tracking-tight">
                                     {item.name}
                                   </span>
-                                  <span className="rounded-full border border-game-border bg-game-canvas px-2 py-0.5 text-[10px] font-bold text-game-muted">
+                                  <span className="text-[10px] font-bold text-game-muted">
                                     x{quantity}
                                   </span>
                                   {saving && (
@@ -1667,7 +1660,7 @@ function MountedPokemonDetailsDialog({
                 <SectionDivider className="uppercase tracking-[0.2em] font-black text-[10px]">
                   Pokemon Power
                 </SectionDivider>
-                <div className="space-y-4 rounded-2xl border border-game-border bg-game-surface-raised p-4 shadow-sm">
+                <div className="space-y-4 border-y border-game-border/75 py-4">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <div className="text-[10px] font-black uppercase tracking-widest text-game-ochre">
@@ -1692,7 +1685,7 @@ function MountedPokemonDetailsDialog({
                     )}
                   </div>
 
-                  <div className="grid gap-2">
+                  <div className="divide-y divide-game-border/75">
                     {availablePokemonPowers.map((power) => {
                       const selected = selectedPokemonPower === power.id
                       const saving = isSavingPower === power.id
@@ -1704,10 +1697,10 @@ function MountedPokemonDetailsDialog({
                           disabled={isSavingPower !== null || selected}
                           aria-pressed={selected}
                           className={cn(
-                            'min-h-16 w-full rounded-xl border px-3 py-2 text-left transition-all flex items-center gap-3',
+                            'flex min-h-16 w-full items-center gap-3 border-b border-game-border/75 px-1 py-2 text-left transition-colors last:border-b-0',
                             selected
-                              ? 'border-game-ochre bg-game-ochre/10 text-game-ink'
-                              : 'border-game-border bg-game-surface-raised text-game-ink hover:border-game-ochre',
+                              ? 'bg-game-ochre/10 text-game-ink'
+                              : 'text-game-ink hover:bg-game-charcoal/5',
                             isSavingPower !== null && 'opacity-60 cursor-wait',
                           )}
                         >
@@ -1744,7 +1737,7 @@ function MountedPokemonDetailsDialog({
               <SectionDivider className="uppercase tracking-[0.2em] font-black text-[10px]">
                 Battle Moves
               </SectionDivider>
-              <div className="space-y-3 rounded-2xl border border-game-border bg-game-surface-raised p-4 shadow-sm">
+              <div className="space-y-3 border-y border-game-border/75 py-4">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex min-w-0 items-start gap-2">
                     <Badge
@@ -1785,12 +1778,12 @@ function MountedPokemonDetailsDialog({
                 )}
 
                 {battleMovesUnlockMessage ? (
-                  <div className="rounded-xl border border-game-border bg-game-surface-raised px-4 py-3 text-xs text-game-muted">
+                  <div className="border-l-2 border-game-ochre/60 py-2 pl-3 text-xs text-game-muted">
                     {battleMovesUnlockMessage}
                   </div>
                 ) : assignableMoves.length === 0 ? (
                   <div
-                    className="rounded-xl border border-dashed border-game-border bg-game-surface-raised px-4 py-3 text-xs text-game-muted"
+                    className="border-l-2 border-game-border py-2 pl-3 text-xs text-game-muted"
                     role="status"
                     aria-live="polite"
                   >
@@ -1799,7 +1792,7 @@ function MountedPokemonDetailsDialog({
                 ) : (
                   <>
                     <ol
-                      className="grid grid-cols-2 gap-2"
+                      className="grid grid-cols-2 divide-x divide-game-border/75 border-y border-game-border/75"
                       aria-label="Assigned battle move slots"
                     >
                       {Array.from(
@@ -1811,10 +1804,10 @@ function MountedPokemonDetailsDialog({
                             <li
                               key={`summary-move-slot-${index + 1}`}
                               className={cn(
-                                'flex min-h-14 items-center gap-2 rounded-lg border px-2 py-2',
+                                'flex min-h-14 items-center gap-2 border-b border-game-border/75 px-2 py-2 last:border-b-0',
                                 move
-                                  ? 'border-game-moss/40 bg-game-moss/10'
-                                  : 'border-dashed border-game-border bg-game-canvas',
+                                  ? 'bg-game-moss/10'
+                                  : 'border-dashed bg-game-canvas',
                               )}
                             >
                               <span className="font-mono text-[9px] font-bold text-game-muted">
@@ -1928,11 +1921,8 @@ function MountedPokemonDetailsDialog({
                   <SectionDivider className="uppercase tracking-[0.2em] font-black text-[10px]">
                     Intrinsic Ability
                   </SectionDivider>
-                  <div className="relative overflow-hidden rounded-2xl border border-game-border bg-game-surface-raised p-5 shadow-sm">
-                    <div className="absolute right-0 top-0 p-4 opacity-[0.07]">
-                      <Info className="h-12 w-12 rotate-12 text-game-moss" />
-                    </div>
-                    <div className="relative z-10 space-y-2">
+                  <div className="space-y-3 border-y border-game-border/75 py-4">
+                    <div className="space-y-2">
                       <div className="font-display text-lg font-semibold text-game-ink">
                         {ability.name}
                       </div>
@@ -1965,7 +1955,7 @@ function MountedPokemonDetailsDialog({
             {/* Stats Carousel */}
             <div className="w-full max-w-md space-y-4">
               <div
-                className="relative overflow-hidden rounded-3xl border border-game-border bg-game-surface-raised p-6 shadow-sm"
+                className="relative overflow-hidden border-y border-game-border/75 py-4"
                 data-vaul-no-drag
               >
                 <Carousel className="w-full max-w-[280px] mx-auto">
@@ -2569,7 +2559,7 @@ function PokemonPowerIcon({
   powerId: PokemonPowerId
   className?: string
 }) {
-  const baseClass = cn('flex-shrink-0 rounded-xl border p-2', className)
+  const baseClass = cn('flex-shrink-0', className)
 
   if (powerId === 'tera') {
     return (

@@ -4015,14 +4015,6 @@ function BenchSheet({
                   : `${state.player.back.length} ready / ${state.player.discard.length} discarded`}
             </div>
           </div>
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={onClose}
-            aria-label="Close card selection"
-          >
-            <X className="h-4 w-4" />
-          </Button>
         </div>
         <div className="grid max-h-[48dvh] min-h-36 grid-cols-3 place-items-center gap-2 overflow-y-auto">
           {state.player.back.length === 0 ? (
