@@ -102,6 +102,17 @@ const POKEMON_BOX_PAGE_SIZE = 18
 const BOX_DROP_ZONE_ID = 'pokemon-box-drop-zone'
 const PARTNER_DRAG_PREFIX = 'partner:'
 
+function normalizePokemonBackgroundPath(path?: string | null) {
+  if (!path) return null
+
+  const filename = path.split('/').pop()
+  if (!filename) return null
+
+  return `/backgrounds/${filename
+    .replace(/\.(png|jpe?g|webp)$/i, '.avif')
+    .replaceAll('_', '-')}`
+}
+
 type RosterSelection =
   | { role: 'battle-team'; position: number }
   | { role: 'companion' }
@@ -789,6 +800,9 @@ export function PokemonList({
     )
     const form = species?.forms.find((f) => f.id === pokemon.formId)
     const name = pokemon.name || form?.name || 'Unknown'
+    const pokemonBackground = normalizePokemonBackgroundPath(
+      (pokemon as Pokemon & { background?: string | null }).background,
+    )
     const selectedItemUnavailableReason =
       itemToUse &&
       pokemon.identified &&
@@ -975,6 +989,21 @@ export function PokemonList({
               )}
             />
           ) : null,
+        )}
+        {pokemonBackground && (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-3 overflow-hidden rounded-lg border border-game-card-border/70 bg-game-surface shadow-md"
+          >
+            <Image
+              src={pokemonBackground}
+              alt=""
+              fill
+              sizes="(max-width: 768px) 16vw, 120px"
+              className="object-cover opacity-75"
+            />
+            <div className="absolute inset-0 bg-gradient-to-br from-game-surface/15 via-transparent to-game-ink/35" />
+          </div>
         )}
         <div className="absolute inset-0 flex items-center justify-center p-2">
           <PokemonRaritySprite

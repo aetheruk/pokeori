@@ -92,6 +92,7 @@ interface GameInfoModalProps {
   bonusLabel?: string
   category?: string | ReactNode
   icon: ReactNode
+  iconClassName?: string
   properties?: Array<{
     icon: ReactNode
     label: string
@@ -126,6 +127,7 @@ export function GameInfoModal({
   bonusLabel,
   category,
   icon,
+  iconClassName,
   properties,
   rewards,
   criteria,
@@ -197,6 +199,7 @@ export function GameInfoModal({
           background={background}
           label={category}
           icon={icon}
+          iconClassName={iconClassName}
           badge={
             isCaught ? (
               <span className="flex items-center gap-0.5 rounded-full border-2 border-game-surface bg-game-moss px-2 py-0.5 text-[10px] font-black text-game-cream">
@@ -369,7 +372,7 @@ export function GameInfoModal({
                   <div
                     className={cn(
                       isDrawer
-                        ? 'divide-y border-y border-game-border/75'
+                        ? 'divide-y divide-game-border/75'
                         : 'grid grid-cols-2 gap-3',
                     )}
                   >
@@ -402,7 +405,7 @@ export function GameInfoModal({
                   <div
                     className={cn(
                       isDrawer
-                        ? 'divide-y border-y border-game-border/75'
+                        ? 'divide-y divide-game-border/75'
                         : 'grid grid-cols-2 gap-3',
                     )}
                   >

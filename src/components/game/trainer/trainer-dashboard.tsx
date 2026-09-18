@@ -45,7 +45,6 @@ function LazyWrapper({ children }: { children: React.ReactNode }) {
 }
 
 import {
-  ChevronUp,
   Gift,
   Layers3,
   Search,
@@ -53,8 +52,8 @@ import {
   UserRound,
   UsersRound,
 } from 'lucide-react'
-import { DesktopSectionEmblem } from '@/components/game/shared/DesktopSectionEmblem'
 import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
+import { ScenicChoiceCard } from '@/components/game/shared/ScenicChoiceCard'
 import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { useUser } from '@/context/UserContext'
@@ -102,6 +101,7 @@ export function TrainerDashboard({
             id: 'events' as const,
             label: 'Events',
             description: 'Manage live event content',
+            background: '/backgrounds/cosmos-gold.avif',
             component: (
               <LazyWrapper>
                 <EventStudio />
@@ -114,6 +114,7 @@ export function TrainerDashboard({
       id: 'profile' as const,
       label: user?.trainerName || 'Trainer',
       description: 'Skills and trainer progress',
+      background: '/backgrounds/lab.avif',
       component: (
         <LazyWrapper>
           <TrainerLeveling />
@@ -126,6 +127,7 @@ export function TrainerDashboard({
             id: 'decks' as const,
             label: 'TCG Decks',
             description: 'Build and manage your decks',
+            background: '/backgrounds/tcg.avif',
             component: (
               <LazyWrapper>
                 <TcgDecksPanel
@@ -145,6 +147,7 @@ export function TrainerDashboard({
             id: 'trainers' as const,
             label: 'Trainers',
             description: 'Find other trainers',
+            background: '/backgrounds/friend-stadium.avif',
             component: (
               <LazyWrapper>
                 <TrainerSearch />
@@ -155,6 +158,7 @@ export function TrainerDashboard({
             id: 'friends' as const,
             label: 'Friends',
             description: 'Manage your connections',
+            background: '/backgrounds/past-small-city.avif',
             component: (
               <LazyWrapper>
                 <FriendsList />
@@ -165,6 +169,7 @@ export function TrainerDashboard({
             id: 'gift' as const,
             label: 'Mystery Gift',
             description: 'Redeem gifts and codes',
+            background: '/backgrounds/inventory.avif',
             component: (
               <LazyWrapper>
                 <MysteryGift />
@@ -175,6 +180,7 @@ export function TrainerDashboard({
             id: 'rankings' as const,
             label: 'Skill Rankings',
             description: 'Compare skill progress',
+            background: '/backgrounds/crystal-stadium.avif',
             component: (
               <LazyWrapper>
                 <HighScores activeSkill={rankingSkill} />
@@ -228,60 +234,23 @@ export function TrainerDashboard({
 
   return (
     <div className="game-paper-first game-paper-background flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
-      {activeTab !== 'profile' && (
-        <div className="relative shrink-0 overflow-hidden border-b border-game-border bg-game-canvas px-4 py-3 md:px-6">
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-1 bg-game-charcoal" />
-          <div className="mx-auto flex w-full max-w-5xl items-center gap-3">
-            <div className="game-icon-orb h-11 w-11 shrink-0 text-game-charcoal-strong">
-              <ActiveIcon className="h-5 w-5" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-game-charcoal-strong">
-                Trainer hub
-              </p>
-              <h1 className="truncate font-display text-xl font-bold leading-tight text-game-ink">
-                {activeSection.label}
-              </h1>
-            </div>
-          </div>
-        </div>
-      )}
       <div className="min-h-0 flex-1 overflow-hidden lg:grid lg:grid-cols-[16rem_minmax(0,1fr)]">
-        <aside className="hidden min-h-0 overflow-y-auto border-r border-game-border bg-game-surface/60 p-4 shadow-[10px_0_24px_rgb(75_62_39_/_0.05)] lg:block">
-          <div className="mb-4 flex items-center justify-between gap-3 border-b border-game-border pb-4">
-            <p className="px-2 text-[11px] font-bold uppercase tracking-[0.16em] text-game-muted">
-              Trainer journal
-            </p>
-            <DesktopSectionEmblem
-              section="trainer"
-              className="h-14 w-14 opacity-90"
-            />
-          </div>
-          <nav className="space-y-1" aria-label="Trainer sections">
+        <aside className="hidden min-h-0 overflow-y-auto border-r border-game-border bg-game-surface/60 p-3 shadow-[10px_0_24px_rgb(75_62_39_/_0.05)] lg:block">
+          <nav className="space-y-2" aria-label="Trainer sections">
             {TABS.map((tab) => {
               const Icon = tabIcons[tab.id]
               const selected = tab.id === activeTab
               return (
-                <button
+                <ScenicChoiceCard
                   key={tab.id}
-                  type="button"
-                  aria-current={selected ? 'page' : undefined}
+                  background={tab.background}
+                  title={tab.label}
+                  description={tab.description}
+                  icon={<Icon className="size-4" />}
+                  selected={selected}
                   onClick={() => selectSection(tab.id)}
-                  className={cn(
-                    'game-focus-ring flex min-h-11 w-full items-center gap-3 rounded-md border-l-2 border-r-0 border-y-0 px-3 text-left text-sm font-semibold transition-colors',
-                    selected
-                      ? 'border-game-charcoal bg-game-surface-raised text-game-ink'
-                      : 'border-transparent text-game-muted hover:border-game-border hover:bg-game-surface-raised hover:text-game-ink',
-                  )}
-                >
-                  <Icon
-                    className={cn(
-                      'h-4 w-4 shrink-0',
-                      selected ? 'text-game-charcoal-strong' : 'text-game-muted',
-                    )}
-                  />
-                  <span className="truncate">{tab.label}</span>
-                </button>
+                  className="min-h-20"
+                />
               )
             })}
           </nav>
@@ -343,26 +312,14 @@ export function TrainerDashboard({
 
       <SecondaryControlBar className="lg:hidden">
         <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="min-w-0 flex-1">
-              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-game-muted">
-                Trainer journal
-              </p>
-              <p className="truncate font-display text-base font-semibold text-game-ink">
-                {activeSection.label}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setSectionDrawerOpen(true)}
-              className="game-focus-ring inline-flex min-h-11 shrink-0 items-center gap-2 rounded-md border border-game-charcoal/35 bg-game-surface-raised px-3 text-xs font-bold uppercase tracking-[0.12em] text-game-charcoal-strong transition-colors hover:border-game-charcoal/60"
-              aria-label="Choose trainer section"
-            >
-              <ActiveIcon className="h-4 w-4" />
-              <span>Sections</span>
-              <ChevronUp className="h-4 w-4" />
-            </button>
-          </div>
+          <ScenicChoiceCard
+            background={activeSection.background}
+            title={activeSection.label}
+            description="Choose another trainer section"
+            icon={<ActiveIcon className="size-4" />}
+            onClick={() => setSectionDrawerOpen(true)}
+            className="min-h-20"
+          />
 
           {activeTab === 'rankings' && (
             <PremiumSelect
@@ -413,60 +370,29 @@ export function TrainerDashboard({
         open={sectionDrawerOpen}
         onOpenChange={setSectionDrawerOpen}
         title="Trainer sections"
-        description="Choose a page from your journal."
+        showHeader={false}
         desktopWidth="min(32vw, 420px)"
         className="pb-[env(safe-area-inset-bottom)]"
       >
-        <div className="min-h-0 overflow-y-auto px-3 pb-4">
-          <p className="px-2 pb-2 pt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-game-muted">
-            Browse sections
-          </p>
-          <div className="divide-y divide-game-border/75 border-y border-game-border/75">
-            {TABS.map((tab) => {
-              const Icon = tabIcons[tab.id]
-              const selected = tab.id === activeTab
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  aria-pressed={selected}
-                  onClick={() => {
-                    selectSection(tab.id)
-                    setSectionDrawerOpen(false)
-                  }}
-                  className={cn(
-                    'game-focus-ring flex min-h-16 w-full items-center gap-3 border-l-2 px-3 py-3 text-left transition-colors',
-                    selected
-                      ? 'border-game-charcoal bg-game-charcoal/8 text-game-ink'
-                      : 'border-transparent text-game-muted hover:bg-game-surface-raised hover:text-game-ink',
-                  )}
-                >
-                  <Icon
-                    className={cn(
-                      'h-5 w-5 shrink-0',
-                      selected
-                        ? 'text-game-charcoal-strong'
-                        : 'text-game-muted',
-                    )}
-                  />
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-bold">
-                      {tab.label}
-                    </span>
-                    <span className="mt-0.5 block truncate text-xs text-game-muted">
-                      {tab.description}
-                    </span>
-                  </span>
-                  {selected && (
-                    <span
-                      aria-hidden="true"
-                      className="size-2 shrink-0 rounded-full bg-game-charcoal"
-                    />
-                  )}
-                </button>
-              )
-            })}
-          </div>
+        <div className="min-h-0 overflow-y-auto space-y-3 p-3 pb-4">
+          {TABS.map((tab) => {
+            const Icon = tabIcons[tab.id]
+            const selected = tab.id === activeTab
+            return (
+              <ScenicChoiceCard
+                key={tab.id}
+                background={tab.background}
+                title={tab.label}
+                description={tab.description}
+                icon={<Icon className="size-4" />}
+                selected={selected}
+                onClick={() => {
+                  selectSection(tab.id)
+                  setSectionDrawerOpen(false)
+                }}
+              />
+            )
+          })}
         </div>
       </ResponsivePanel>
     </div>

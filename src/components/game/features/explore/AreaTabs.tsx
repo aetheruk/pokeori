@@ -1,5 +1,4 @@
-import { Check } from 'lucide-react'
-import Image from 'next/image'
+import { ScenicChoiceCard } from '@/components/game/shared/ScenicChoiceCard'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { subCategories as subCategoryDataMap } from '@/data/sub-region-map'
 
@@ -39,7 +38,7 @@ export function AreaTabs({
       className="flex flex-col bg-game-surface"
     >
       <div className="min-h-0 overflow-y-auto px-4 pb-4 pt-4">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-3">
           {subCategories
             .filter(
               (subCategory) =>
@@ -48,36 +47,16 @@ export function AreaTabs({
             .map((subCategory) => {
               const subRegionData = subCategoryDataMap[subCategory]
               return (
-                <button
+                <ScenicChoiceCard
                   key={subCategory}
-                  type="button"
-                  aria-pressed={activeSubCategory === subCategory}
+                  background={subRegionData?.image || '/backgrounds/town.avif'}
+                  title={subCategory}
+                  selected={activeSubCategory === subCategory}
                   onClick={() => {
                     handleSubCategoryChange(subCategory)
                     setAreaModalOpen(false)
                   }}
-                  className="game-focus-ring relative w-full cursor-pointer overflow-hidden rounded-lg border border-game-border bg-game-surface-raised text-left transition-colors hover:border-game-moss/40"
-                >
-                  <div className="relative aspect-[8/5] w-full">
-                    <Image
-                      src={subRegionData?.image || '/backgrounds/town.avif'}
-                      alt={subCategory}
-                      fill
-                      sizes="(max-width: 768px) 50vw, 384px"
-                      className="object-cover"
-                    />
-                    {activeSubCategory === subCategory && (
-                      <div className="game-icon-orb absolute top-2 right-2 h-6 w-6 border-game-charcoal/60 text-game-charcoal-strong">
-                        <Check className="h-4 w-4" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="px-3 py-2">
-                    <div className="text-sm font-medium text-game-ink">
-                      {subCategory}
-                    </div>
-                  </div>
-                </button>
+                />
               )
             })}
         </div>

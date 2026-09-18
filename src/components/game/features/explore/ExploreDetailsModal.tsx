@@ -47,6 +47,23 @@ function ExploreDetailSkeleton() {
   )
 }
 
+function getModalIconTone(item: ExploreItem) {
+  const gameType = (item.originalData as any).gameType
+
+  if (item.type === 'location') return 'game-icon-orb-catch'
+  if (item.type === 'game' && gameType === 'fishing') {
+    return 'game-icon-orb-fishing'
+  }
+  if (item.type === 'battle' || item.type === 'vs-seeker') {
+    return 'game-icon-orb-battle'
+  }
+  if (item.type === 'field-research') return 'game-icon-orb-research'
+  if (item.type === 'events' || item.type === 'expedition') {
+    return 'game-icon-orb-discovery'
+  }
+  return 'game-icon-orb-neutral'
+}
+
 interface ActiveVoyage {
   voyageId: string
   endTime: string
@@ -321,6 +338,7 @@ export function ExploreDetailsModal({
       sourceHint={sourceHint}
       bonusLabel={bonusLabel}
       background={modalBackground}
+      iconClassName={getModalIconTone(item)}
       icon={<TaskIconDisplay icon={modalIcon} className="w-8 h-8" />}
       rewards={rewards}
       criteria={criteria}

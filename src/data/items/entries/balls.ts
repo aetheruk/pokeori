@@ -195,7 +195,7 @@ export const ballItems: Item[] = [
   {
     id: 'rocket-ball',
     name: 'Rocket Ball',
-    description: 'A specialised ball that can capture Shadow Pokémon.',
+    description: 'A mysterious Pokeball that doesn’t seem to work very well.',
     category: 'ball',
     spriteId: '/balls/rocket-ball',
   },
