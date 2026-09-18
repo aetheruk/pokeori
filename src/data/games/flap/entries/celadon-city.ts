@@ -9,6 +9,7 @@ export const celadonCityFlapEntries: FlapGameConfig[] = [
     category: 'Kanto',
     subCategory: 'Celadon City',
     icon: { type: 'pokemon', id: '16' },
+    background: '/games/fly/backgrounds/sky-backdrop.avif',
     requirements: [
       { type: 'task_completed', targetId: 'nesting-season' },
     ],

@@ -1,13 +1,19 @@
 import type { StaticImageData } from 'next/image'
 import { ScenicChoiceCard } from '@/components/game/shared/ScenicChoiceCard'
+import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
+import type { TaskIcon } from '@/data/tasks/types'
 
 interface CategoryTabsProps {
   regionModalOpen: boolean
   setRegionModalOpen: (open: boolean) => void
   regionCategories: Record<
     string,
-    { image: string | StaticImageData; description?: string }
+    {
+      image: string | StaticImageData
+      description?: string
+      icon?: TaskIcon
+    }
   >
   categories: string[]
   activeCategory: string
@@ -42,6 +48,12 @@ export function CategoryTabs({
                 key={regionKey}
                 background={regionData.image}
                 title={regionKey}
+                icon={
+                  regionData.icon ? (
+                    <TaskIconDisplay icon={regionData.icon} className="h-8 w-8" />
+                  ) : undefined
+                }
+                iconPosition={regionData.icon ? 'left' : 'right'}
                 selected={activeCategory === regionKey}
                 onClick={() => {
                   handleCategoryChange(regionKey)

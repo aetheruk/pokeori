@@ -17,6 +17,7 @@ export const testbasicEntries: RockPushGameConfig[] = [
     category: 'Kanto',
     subCategory: 'Test',
     icon: { type: 'item', id: 'hard-stone' },
+    background: '/backgrounds/cave.avif',
     requirements: [],
     rewards: [],
     settings: {

@@ -1,9 +1,12 @@
+import type { TaskIcon } from '@/data/tasks/types'
+
 // prettier-ignore
 export interface RegionData {
   category: string
   image: string
   description?: string
   timeZone?: string
+  icon?: TaskIcon
 }
 
 // prettier-ignore
@@ -12,7 +15,8 @@ export const regionCategories: Record<string, RegionData> = {
         "category": "Kanto",
         "image": "/backgrounds/kanto.avif",
         "description": "A diverse mountains region filled with lush forests and plagued by Team Rocket",
-        "timeZone": "Asia/Tokyo"
+        "timeZone": "Asia/Tokyo",
+        "icon": { type: 'pokemon', id: '151' }
     },
         'Orange Isles': {
         "category": "Orange Isles",
@@ -32,7 +36,8 @@ export const regionCategories: Record<string, RegionData> = {
                     'Underground': {
         "category": "Underground",
         "image": "/backgrounds/kanto-underground.avif",
-        "timeZone": "Asia/Tokyo"
+        "timeZone": "Asia/Tokyo",
+        "icon": { type: 'pokemon', id: '95' }
     },
         'Johto': {
         "category": "Johto",
