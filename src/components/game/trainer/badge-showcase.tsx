@@ -148,15 +148,15 @@ export function BadgeShowcase() {
                   />
                   <div
                     aria-hidden="true"
-                    className="absolute inset-0 bg-[linear-gradient(to_left,rgba(239,228,207,0.98),rgba(239,228,207,0.82)_58%,rgba(23,39,51,0.2)),linear-gradient(to_bottom,rgba(23,39,51,0.05),rgba(239,228,207,0.35)_70%,rgba(23,39,51,0.2))]"
+                    className="absolute inset-0 bg-[linear-gradient(to_left,rgba(23,39,51,0.88),rgba(23,39,51,0.62)_58%,rgba(23,39,51,0.16)),linear-gradient(to_bottom,rgba(23,39,51,0.2),rgba(23,39,51,0.45)_70%,rgba(23,39,51,0.65))]"
                   />
                   {/* Card Header */}
                   <div className="relative z-10 mb-8 flex items-end justify-between border-b border-game-border pb-4">
                     <div className="flex flex-col">
-                      <span className="mb-1 text-[11px] font-medium uppercase tracking-[0.14em] text-game-moss-strong">
+                      <span className="mb-1 text-[11px] font-medium uppercase tracking-[0.14em] text-white/80">
                         Region Collection
                       </span>
-                      <h3 className="font-display text-2xl font-bold text-game-ink">
+                      <h3 className="font-display text-2xl font-bold text-white">
                         {REGION_NAMES[group.region] || group.region}
                       </h3>
                     </div>
@@ -166,8 +166,8 @@ export function BadgeShowcase() {
                         className={cn(
                           'flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-black tracking-widest',
                           isComplete
-                            ? 'border-game-moss/45 bg-game-moss/10 text-game-moss-strong'
-                            : 'border-game-border bg-game-surface-raised text-game-muted',
+                            ? 'border-white/45 bg-white/10 text-white'
+                            : 'border-white/35 bg-black/15 text-white/85',
                         )}
                       >
                         <Award className="h-3 w-3" />

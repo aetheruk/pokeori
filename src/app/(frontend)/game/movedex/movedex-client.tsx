@@ -11,8 +11,8 @@ import {
 import Image from 'next/image'
 import type { CSSProperties } from 'react'
 import { useCallback, useMemo, useState, useTransition } from 'react'
-import { toast } from 'sonner'
 import { List, type RowComponentProps, useDynamicRowHeight } from 'react-window'
+import { toast } from 'sonner'
 import { DexFilterBar, DexPageShell } from '@/components/game/dex'
 import { MoveFieldNote } from '@/components/game/moves/move-field-note'
 import { MoveLearnerList } from '@/components/game/moves/move-learner-list'
@@ -742,16 +742,14 @@ function MoveDexTypeChip({
       </Badge>
     )
   return (
-    <div className="flex h-6 items-center justify-center rounded-md border border-game-border bg-game-surface-raised px-2">
-      <Image
-        src={getPokemonTypeIconUrl(typeId)}
-        alt={`${getMoveTypeLabel(type)} type`}
-        width={64}
-        height={28}
-        className="h-4 w-auto object-contain"
-        unoptimized
-      />
-    </div>
+    <Image
+      src={getPokemonTypeIconUrl(typeId)}
+      alt={`${getMoveTypeLabel(type)} type`}
+      width={64}
+      height={28}
+      className="h-5 w-auto object-contain"
+      unoptimized
+    />
   )
 }
 

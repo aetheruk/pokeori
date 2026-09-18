@@ -43,7 +43,6 @@ export function PremiumSelect({
       <Select value={value} onValueChange={onValueChange}>
         <SelectTrigger className="w-full font-medium">
           <div className="flex min-w-0 items-center gap-3">
-            {options.find((option) => option.id === value)?.icon}
             <SelectValue placeholder={placeholder} />
           </div>
         </SelectTrigger>

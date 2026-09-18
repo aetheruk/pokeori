@@ -31,7 +31,10 @@ import {
   type DisplayAbility,
   getAbilityDexDisplayEntries,
 } from '@/utilities/pokemon/abilitydex-view'
-import { getPokemonImageUrl, getPokemonSpecies } from '@/utilities/pokemon/pokedex'
+import {
+  getPokemonImageUrl,
+  getPokemonSpecies,
+} from '@/utilities/pokemon/pokedex'
 import { getPokemonPokedexBackground } from '@/utilities/pokemon/pokemon-background'
 
 type PokedexProgressByForm = Record<
@@ -338,15 +341,6 @@ function AbilityDexListItem({
             ? entry.ability.description
             : 'Register this ability to reveal its field note.'}
         </p>
-      </div>
-
-      <div className="relative z-10 flex shrink-0 flex-col items-end gap-1.5 text-right">
-        <span className={cn(
-          'text-[10px] font-bold uppercase tracking-[0.08em]',
-          isKnown ? 'text-game-ochre-strong' : 'text-game-muted',
-        )}>
-          {isKnown ? 'Registered' : 'Unknown'}
-        </span>
       </div>
     </button>
   )

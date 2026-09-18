@@ -210,16 +210,24 @@ function PokemonSpritePreview({
   alt?: string
   size?: number
 }) {
+  const hasSeen = Boolean(isSeen || isCaught)
+
+  if (!hasSeen) {
+    return (
+      <span aria-hidden="true" className="text-2xl font-bold text-game-muted">
+        ?
+      </span>
+    )
+  }
+
   return (
     <Image
       src={getPokemonImageUrl(formId, 'sprite')}
       alt={alt}
       width={size}
       height={size}
-      className={cn(
-        'pixelated object-contain',
-        isCaught ? 'opacity-100' : isSeen ? 'opacity-50' : 'brightness-0',
-      )}
+      className="pixelated object-contain"
+      style={{ filter: isCaught ? undefined : 'brightness(0)' }}
     />
   )
 }
@@ -1777,7 +1785,8 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
             const isSeen = pokedexEntry?.seen
             const pokemon =
               getPokemonForm(formId) || getPokemonSpecies(member.speciesId)
-            const displayName = isSeen
+            const hasSeen = Boolean(isSeen || isCaught)
+            const displayName = hasSeen
               ? member.name || pokemon?.name || 'Pokemon'
               : '???'
 
@@ -1809,28 +1818,20 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
                 key={i}
                 className={cn(
                   'group relative flex min-w-[100px] flex-shrink-0 flex-col items-center rounded-lg border p-3 transition-colors',
-                  isSeen
+                  hasSeen
                     ? 'border-game-border bg-game-surface-raised'
                     : 'border-game-border/70 bg-game-canvas opacity-80',
                 )}
               >
                 {/* Pokemon Sprite Container */}
                 <div className="relative mb-1 flex h-16 w-16 items-center justify-center">
-                  {isSeen ? (
-                    <Image
-                      src={getPokemonImageUrl(formId, 'sprite')}
-                      alt={'Pokemon'}
-                      width={64}
-                      height={64}
-                      className="w-16 h-16 object-contain pixelated relative z-10"
-                    />
-                  ) : (
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full border border-dashed border-game-border bg-game-canvas">
-                      <span className="text-xl font-black text-game-muted">
-                        ?
-                      </span>
-                    </div>
-                  )}
+                  <PokemonSpritePreview
+                    formId={formId}
+                    isCaught={isCaught}
+                    isSeen={isSeen}
+                    alt="Pokemon"
+                    size={64}
+                  />
                 </div>
 
                 {/* Details */}
