@@ -941,6 +941,7 @@ export function VoltorbGridGame({
       {result && (
         <RewardResultOverlay
           result={result}
+          background={encounter.background}
           onClose={() => {
             refreshUser(true, completionInvalidatesRef.current)
             router.push('/game/explore')

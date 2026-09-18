@@ -241,6 +241,7 @@ export function EncounterResults({
       )}
       <GameResult
         success={captureResult.caught}
+        background={encounter?.background}
         title={captureResult.caught ? 'Caught!' : 'Escaped'}
         message={
           captureResult.caught

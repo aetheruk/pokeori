@@ -24,6 +24,8 @@ import type { CompleteTaskResult } from '@/utilities/tasks/actions'
 export interface GenericResult {
   success: boolean
   message?: string
+  /** Optional scenic artwork supplied by the activity that produced the result. */
+  background?: string
   expeditionProgress?: {
     expeditionId: string
     expeditionName: string
@@ -94,6 +96,8 @@ export function getRewardResultInitialStep(
 interface RewardResultOverlayProps {
   result: GenericResult | null
   onClose: () => void
+  /** Scenic artwork for the result hero; the shared renderer falls back to the Lab. */
+  background?: string
   icon?: TaskIcon // Or similar icon type
   iconAlt?: string // label for the icon
   title?: string
@@ -125,6 +129,7 @@ export function shouldShowRewardResultSecondaryAction(
 export function RewardResultOverlay({
   result,
   onClose,
+  background,
   icon,
   iconAlt,
   title,
@@ -359,6 +364,7 @@ export function RewardResultOverlay({
               <GameResult
                 embedded
                 success={result.success}
+                background={background || result.background}
                 title={title || (result.success ? 'COMPLETED!' : 'FAILED')}
                 message={
                   message ||

@@ -963,6 +963,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
           )}
           <GameResult
             success={battleState.status === 'won'}
+            background={battleState.background}
             title={
               battleState.status === 'won'
                 ? 'VICTORY!'

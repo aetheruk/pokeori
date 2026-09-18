@@ -341,6 +341,7 @@ export function ProcedureOrderGame({
       {result ? (
         <RewardResultOverlay
           result={result}
+          background={encounter.background}
           onClose={async () => {
             if (result.success) await refreshUser(true, completionInvalidatesRef.current)
             router.push('/game/explore')

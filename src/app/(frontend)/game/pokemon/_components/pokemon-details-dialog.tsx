@@ -4,21 +4,25 @@ import {
   ArrowDown,
   ArrowUp,
   Atom,
+  Brain,
   Check,
   Circle,
   Clock,
   Diamond,
   Flag,
+  Heart,
   Info,
   Loader2,
   Lock,
   Maximize2,
   Megaphone,
+  Ruler,
   SlidersHorizontal,
   Sparkles,
   Square,
-  Swords,
   Triangle,
+  UserRound,
+  VenusAndMars,
   X,
   Zap,
 } from 'lucide-react'
@@ -44,6 +48,7 @@ import {
   Dialog,
   DialogContent,
   DialogFooter,
+  DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
 import { ItemSprite } from '@/components/ui/item-sprite'
@@ -370,7 +375,7 @@ function ResearchSection({
         Research Progress
       </SectionDivider>
 
-      <div className="space-y-4 border-y border-game-border/75 py-4">
+      <div className="space-y-4 py-2">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
@@ -713,30 +718,6 @@ function MountedPokemonDetailsDialog({
       pokemon.level,
     ],
   )
-  const allMoveInventoryMap = useMemo(
-    () =>
-      Object.fromEntries(
-        items.filter((item) => item.moveId).map((item) => [item.id, 1]),
-      ),
-    [],
-  )
-  const maxPossibleMoves = useMemo(
-    () =>
-      getAvailableMoveOptions({
-        pokemonTypes: formInfo?.types || [],
-        pokemonFormId: pokemon.formId,
-        pokemonLevel: pokemon.level,
-        inventory: allMoveInventoryMap,
-        sketchedMoveIds: gameData?.sketchedMoves,
-      }).length,
-    [
-      allMoveInventoryMap,
-      formInfo?.types,
-      gameData?.sketchedMoves,
-      pokemon.formId,
-      pokemon.level,
-    ],
-  )
   const availablePokemonPowers = useMemo(
     () =>
       getAvailablePokemonPowerOptions({
@@ -758,6 +739,7 @@ function MountedPokemonDetailsDialog({
   )
   const [isSavingPower, setIsSavingPower] = useState<string | null>(null)
   const [isSavingHeldItem, setIsSavingHeldItem] = useState<string | null>(null)
+  const [heldItemPickerOpen, setHeldItemPickerOpen] = useState(false)
   const currentAssignedMoveIds = useMemo(
     () => normalizeAssignedMoveIds(pokemon.assignedMoves),
     [pokemon.assignedMoves],
@@ -841,6 +823,7 @@ function MountedPokemonDetailsDialog({
         toast.success(itemId ? 'Held item set' : 'Held item cleared')
         if (result.pokemon && onRename) onRename(result.pokemon)
         refreshUser()
+        setHeldItemPickerOpen(false)
       } else {
         toast.error(result.message || 'Could not set held item')
       }
@@ -883,7 +866,28 @@ function MountedPokemonDetailsDialog({
     [assignableMoves, effectiveInventoryMap, gameData?.sketchedMoves],
   )
 
-  const handleAutoPickAssignedMoves = () => {
+  const handleSaveAssignedMoves = async (
+    closeWorkspace = false,
+    moveIds = selectedMoveIds,
+    successMessage = 'Moves assigned',
+  ) => {
+    if (isSavingMoves) return
+    setIsSavingMoves(true)
+    try {
+      const result = await setAssignedMoves(pokemon.id, moveIds)
+      if (result.success) {
+        toast.success(successMessage)
+        if (result.pokemon && onRename) onRename(result.pokemon)
+        if (closeWorkspace) setMoveWorkspaceOpen(false)
+      } else {
+        toast.error(result.message || 'Could not assign moves')
+      }
+    } finally {
+      setIsSavingMoves(false)
+    }
+  }
+
+  const handleAutoPickAssignedMoves = async () => {
     if (battleMovesUnlockMessage) {
       toast.error(battleMovesUnlockMessage)
       return
@@ -910,26 +914,11 @@ function MountedPokemonDetailsDialog({
     })
 
     setSelectedMoveIds(filled)
-    toast.success(
-      `Auto-picked ${filled.length} balanced move${filled.length === 1 ? '' : 's'}. Review, then save.`,
+    await handleSaveAssignedMoves(
+      false,
+      filled,
+      `Auto-picked and saved ${filled.length} balanced move${filled.length === 1 ? '' : 's'}.`,
     )
-  }
-
-  const handleSaveAssignedMoves = async (closeWorkspace = false) => {
-    if (isSavingMoves) return
-    setIsSavingMoves(true)
-    try {
-      const result = await setAssignedMoves(pokemon.id, selectedMoveIds)
-      if (result.success) {
-        toast.success('Moves assigned')
-        if (result.pokemon && onRename) onRename(result.pokemon)
-        if (closeWorkspace) setMoveWorkspaceOpen(false)
-      } else {
-        toast.error(result.message || 'Could not assign moves')
-      }
-    } finally {
-      setIsSavingMoves(false)
-    }
   }
 
   const handleClearAssignedMoves = () => {
@@ -1041,17 +1030,19 @@ function MountedPokemonDetailsDialog({
         <div className="overflow-y-auto flex-1 min-h-0 custom-scrollbar">
           <div className="flex w-full flex-col items-center gap-6 p-5 md:p-6">
             {/* Name & Form under image */}
-            <div className="w-full text-center space-y-2">
-              <div className="flex flex-wrap items-center justify-center gap-3">
-                <h2 className="font-display text-3xl font-semibold text-game-ink">
-                  {pokemon.name}
-                </h2>
+            <div className="relative w-full space-y-2 text-center">
+              <div className="absolute right-0 top-0 z-10">
                 <RenameDialog
                   pokemonId={pokemon.id}
                   currentName={pokemon.name || ''}
                   canRename={canRenamePokemon}
                   onRename={onRename}
                 />
+              </div>
+              <div className="flex min-h-10 items-center justify-center px-12">
+                <h2 className="font-display text-3xl font-semibold text-game-ink">
+                  {pokemon.name}
+                </h2>
               </div>
 
               {/* Form name (small) - show if not base */}
@@ -1406,54 +1397,55 @@ function MountedPokemonDetailsDialog({
             </div>
 
             {/* Status Board */}
-            <div className="w-full max-w-md space-y-4">
-              <div className="grid grid-cols-2 gap-x-6 border-y border-game-border/75">
+            <div className="w-full max-w-xl space-y-4">
+              <div className="grid grid-cols-2 gap-x-8 border-y border-game-border/75">
                 {[
                   {
                     label: 'Level',
                     value: pokemon.level,
-                    icon: Swords,
+                    icon: ArrowUp,
                   },
                   {
                     label: 'Variant',
                     value: rarityVariant.label,
-                    icon: Info,
+                    icon: Sparkles,
                   },
                   {
                     label: 'Nature',
                     value: hasNatureScanner
                       ? capitalizeFirstLetter(pokemon.nature)
                       : '???',
-                    icon: Info,
+                    icon: Brain,
                   },
                   {
                     label: 'Size',
                     value: hasPokeScales ? pokemon.size || '-' : '???',
-                    icon: Info,
+                    icon: Ruler,
                   },
                   {
                     label: 'Gender',
                     value: formatPokemonGenderLabel(pokemonGender),
-                    icon: Info,
+                    icon: VenusAndMars,
                   },
                   {
                     label: 'Friendship',
                     value: hasStatsScanner
                       ? ((pokemon as any).friendship ?? 70)
                       : '???',
-                    icon: Info,
+                    icon: Heart,
                   },
                 ].map((item, idx) => (
                   <div
                     key={idx}
+                    title={item.label}
                     className="flex min-h-14 items-center justify-between gap-3 border-b border-game-border/75 py-3"
                   >
-                    <span className="flex min-w-0 items-center gap-2">
-                      <item.icon className="size-3.5 shrink-0 text-game-charcoal-strong" />
-                      <span className="truncate text-[10px] font-extrabold uppercase leading-none tracking-widest text-game-muted">
-                        {item.label}
-                      </span>
-                    </span>
+                    <span className="sr-only">{item.label}</span>
+                    <item.icon
+                      aria-hidden="true"
+                      className="size-5 shrink-0 text-game-charcoal-strong"
+                      strokeWidth={2.25}
+                    />
                     <span className="shrink-0 text-right font-mono text-sm font-bold text-game-ink">
                       {item.value}
                     </span>
@@ -1481,7 +1473,7 @@ function MountedPokemonDetailsDialog({
 
                 <div className="flex min-h-14 items-center justify-between gap-3 border-b border-game-border/75 py-3">
                   <span className="flex items-center gap-2 text-[10px] font-extrabold uppercase leading-none tracking-widest text-game-muted">
-                    <Info className="size-3.5 text-game-charcoal-strong" />
+                    <UserRound className="size-3.5 text-game-charcoal-strong" />
                     Trainer
                   </span>
                   <span className="block truncate text-right text-xs font-bold tracking-tight text-game-ink">
@@ -1493,21 +1485,15 @@ function MountedPokemonDetailsDialog({
                   </span>
                 </div>
 
-                <div className="col-span-2 flex min-h-14 items-start justify-between gap-3 py-3">
-                  <span className="flex items-center gap-2 text-[10px] font-extrabold uppercase leading-none tracking-widest text-game-muted">
-                    <Flag className="size-3.5 text-game-charcoal-strong" />
-                    Origin
+                <div className="col-span-2 flex min-h-14 flex-col items-center justify-center gap-1 py-3 text-center">
+                  <span className="block truncate font-display text-sm font-semibold text-game-ink">
+                    {pokemonOrigin.title}
                   </span>
-                  <span className="min-w-0 text-right">
-                    <span className="block truncate font-display text-sm font-semibold text-game-ink">
-                      {pokemonOrigin.title}
+                  {pokemonOrigin.subtitle && (
+                    <span className="block truncate text-xs font-bold tracking-tight text-game-muted">
+                      {pokemonOrigin.subtitle}
                     </span>
-                    {pokemonOrigin.subtitle && (
-                      <span className="mt-1 block truncate text-xs font-bold tracking-tight text-game-muted">
-                        {pokemonOrigin.subtitle}
-                      </span>
-                    )}
-                  </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -1516,143 +1502,173 @@ function MountedPokemonDetailsDialog({
               <SectionDivider className="uppercase tracking-[0.2em] font-black text-[10px]">
                 Held Item
               </SectionDivider>
-              <div className="divide-y divide-game-border/75 border-y border-game-border/75">
-                {heldItemsUnlockMessage ? (
-                  <div className="border-l-2 border-game-ochre/60 py-3 pl-3 text-xs text-game-muted">
-                    {heldItemsUnlockMessage}
-                  </div>
-                ) : (
-                  <>
-                    <div className="flex items-center justify-between gap-3 py-3">
-                      <div className="flex min-w-0 items-center gap-3">
-                        {currentHeldItem && (
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center">
-                            <ItemSprite
-                              itemId={currentHeldItem.id}
-                              alt={currentHeldItem.name}
-                              width={34}
-                              height={34}
-                              className="object-contain drop-shadow-md"
-                            />
-                          </div>
-                        )}
-                        <div className="min-w-0">
-                          <div className="truncate text-[10px] font-black uppercase tracking-widest text-game-moss-strong">
-                            {currentHeldItem
-                              ? currentHeldItem.name
-                              : 'No Held Item'}
-                          </div>
-                          <div className="text-[11px] font-medium text-game-muted">
-                            Reserved from your Bag while held
-                          </div>
-                        </div>
-                      </div>
-                      {currentHeldItem && (
-                        <Button
-                          type="button"
-                          onClick={() => handleSelectHeldItem(null)}
-                          disabled={isSavingHeldItem !== null}
-                          variant="outline"
-                          className="h-10 w-10 rounded-xl border-game-border bg-game-surface-raised p-0 text-game-muted hover:border-game-clay hover:text-game-clay-strong"
-                          title="Clear held item"
-                          aria-label="Clear held item"
-                        >
-                          {isSavingHeldItem === 'none' ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <ItemSprite
-                              itemId={currentHeldItem.id}
-                              alt={currentHeldItem.name}
-                              width={30}
-                              height={30}
-                              className="object-contain drop-shadow-md opacity-70"
-                            />
-                          )}
-                        </Button>
-                      )}
+              <div className="flex items-center justify-between gap-3 border-y border-game-border/75 py-4">
+                <div className="flex min-w-0 items-center gap-3">
+                  {currentHeldItem ? (
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center">
+                      <ItemSprite
+                        itemId={currentHeldItem.id}
+                        alt={currentHeldItem.name}
+                        width={38}
+                        height={38}
+                        className="object-contain drop-shadow-md"
+                      />
                     </div>
+                  ) : null}
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-display font-semibold text-game-ink">
+                      {currentHeldItem ? currentHeldItem.name : 'No Held Item'}
+                    </div>
+                    {heldItemsUnlockMessage ? (
+                      <div className="mt-1 text-[11px] leading-snug text-game-muted">
+                        {heldItemsUnlockMessage}
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setHeldItemPickerOpen(true)}
+                  disabled={Boolean(heldItemsUnlockMessage)}
+                  className="min-h-10 shrink-0 border-game-border bg-game-surface-raised text-[10px] font-black uppercase tracking-widest text-game-muted hover:border-game-moss hover:text-game-moss-strong"
+                >
+                  {currentHeldItem ? 'Change' : 'Choose'}
+                </Button>
+              </div>
 
-                    {heldItemOptions.length === 0 ? (
-                      <div
-                        className="border-l-2 border-game-border py-3 pl-3 text-xs text-game-muted"
-                        role="status"
-                        aria-live="polite"
-                      >
-                        No items available.
+              <Dialog
+                open={heldItemPickerOpen}
+                onOpenChange={setHeldItemPickerOpen}
+              >
+                <DialogContent className="flex max-h-[82dvh] flex-col gap-0 overflow-hidden border-game-border bg-game-surface p-0 text-game-ink sm:max-w-md">
+                  <DialogHeader className="shrink-0 border-b border-game-border bg-game-surface-raised px-5 py-4 text-left">
+                    <DialogTitle className="font-display text-xl font-semibold text-game-ink">
+                      Choose a held item
+                    </DialogTitle>
+                    <p className="text-sm text-game-muted">
+                      Select an item from your bag for {pokemon.name}.
+                    </p>
+                  </DialogHeader>
+                  <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto p-4">
+                    {heldItemsUnlockMessage ? (
+                      <div className="border-l-2 border-game-ochre/60 py-3 pl-3 text-xs text-game-muted">
+                        {heldItemsUnlockMessage}
                       </div>
                     ) : (
-                      <div className="max-h-72 overflow-y-auto pr-1 custom-scrollbar">
-                        {heldItemOptions.map((item) => {
-                          const selected = heldItemId === item.id
-                          const saving = isSavingHeldItem === item.id
-                          const quantity = effectiveInventoryMap[item.id] || 0
-                          const skillLockReason = getItemSkillLockReason(
-                            item,
-                            user?.skills,
-                          )
-                          const itemLocked = Boolean(skillLockReason)
-
-                          return (
-                            <button
-                              key={item.id}
-                              type="button"
-                              onClick={() => handleSelectHeldItem(item.id)}
-                              disabled={
-                                isSavingHeldItem !== null ||
-                                selected ||
-                                !canAssignHeldItems ||
-                                itemLocked
-                              }
-                              className={cn(
-                                'flex min-h-16 w-full items-center gap-3 border-b border-game-border/75 px-1 py-2 text-left transition-colors last:border-b-0',
-                                selected
-                                  ? 'bg-game-moss/10 text-game-ink'
-                                  : 'text-game-ink hover:bg-game-charcoal/5',
-                                isSavingHeldItem !== null &&
-                                  'opacity-60 cursor-wait',
-                                (!canAssignHeldItems || itemLocked) &&
-                                  'cursor-not-allowed opacity-45 hover:border-game-border',
-                              )}
-                            >
-                              <div className="relative flex h-10 w-10 flex-shrink-0 items-center justify-center">
+                      <div className="space-y-3">
+                        {currentHeldItem && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => handleSelectHeldItem(null)}
+                            disabled={isSavingHeldItem !== null}
+                            className="flex min-h-14 w-full items-center justify-between gap-3 border-game-clay/40 bg-game-clay/5 px-3 text-left text-game-ink hover:border-game-clay hover:bg-game-clay/10"
+                          >
+                            <span className="flex min-w-0 items-center gap-3">
+                              {isSavingHeldItem === 'none' ? (
+                                <Loader2 className="size-8 shrink-0 animate-spin text-game-muted" />
+                              ) : (
                                 <ItemSprite
-                                  itemId={item.id}
-                                  alt={item.name}
-                                  width={40}
-                                  height={40}
-                                  className="object-contain drop-shadow-md"
+                                  itemId={currentHeldItem.id}
+                                  alt={currentHeldItem.name}
+                                  width={32}
+                                  height={32}
+                                  className="size-8 shrink-0 object-contain drop-shadow-md opacity-70"
                                 />
-                                {selected && (
-                                  <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-game-moss text-game-cream">
-                                    <Check className="h-3 w-3" />
-                                  </span>
-                                )}
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-2">
-                                  <span className="truncate text-sm font-black uppercase tracking-tight">
-                                    {item.name}
-                                  </span>
-                                  <span className="text-[10px] font-bold text-game-muted">
-                                    x{quantity}
-                                  </span>
-                                  {saving && (
-                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              )}
+                              <span className="truncate text-sm font-semibold">
+                                {isSavingHeldItem === 'none'
+                                  ? 'Clearing held item…'
+                                  : `Remove ${currentHeldItem.name}`}
+                              </span>
+                            </span>
+                            <X className="size-4 shrink-0 text-game-muted" aria-hidden="true" />
+                          </Button>
+                        )}
+
+                        {heldItemOptions.length === 0 ? (
+                          <div
+                            className="border-l-2 border-game-border py-3 pl-3 text-xs text-game-muted"
+                            role="status"
+                            aria-live="polite"
+                          >
+                            No held items available.
+                          </div>
+                        ) : (
+                          <div className="divide-y divide-game-border/75 border-y border-game-border/75">
+                            {heldItemOptions.map((item) => {
+                              const selected = heldItemId === item.id
+                              const saving = isSavingHeldItem === item.id
+                              const quantity = effectiveInventoryMap[item.id] || 0
+                              const skillLockReason = getItemSkillLockReason(
+                                item,
+                                user?.skills,
+                              )
+                              const itemLocked = Boolean(skillLockReason)
+
+                              return (
+                                <button
+                                  key={item.id}
+                                  type="button"
+                                  onClick={() => handleSelectHeldItem(item.id)}
+                                  disabled={
+                                    isSavingHeldItem !== null ||
+                                    selected ||
+                                    !canAssignHeldItems ||
+                                    itemLocked
+                                  }
+                                  className={cn(
+                                    'flex min-h-16 w-full items-center gap-3 px-1 py-2 text-left transition-colors',
+                                    selected
+                                      ? 'bg-game-moss/10 text-game-ink'
+                                      : 'text-game-ink hover:bg-game-charcoal/5',
+                                    isSavingHeldItem !== null &&
+                                      'cursor-wait opacity-60',
+                                    (!canAssignHeldItems || itemLocked) &&
+                                      'cursor-not-allowed opacity-45 hover:bg-transparent',
                                   )}
-                                </div>
-                                <div className="mt-1 line-clamp-2 text-[11px] leading-snug text-game-muted">
-                                  {skillLockReason ||
-                                    formatHeldItemTrigger(item)}
-                                </div>
-                              </div>
-                            </button>
-                          )
-                        })}
+                                >
+                                  <div className="relative flex h-10 w-10 shrink-0 items-center justify-center">
+                                    <ItemSprite
+                                      itemId={item.id}
+                                      alt={item.name}
+                                      width={40}
+                                      height={40}
+                                      className="object-contain drop-shadow-md"
+                                    />
+                                    {selected && (
+                                      <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-game-moss text-game-cream">
+                                        <Check className="h-3 w-3" />
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-2">
+                                      <span className="truncate text-sm font-black uppercase tracking-tight">
+                                        {item.name}
+                                      </span>
+                                      <span className="text-[10px] font-bold text-game-muted">
+                                        x{quantity}
+                                      </span>
+                                      {saving && (
+                                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                      )}
+                                    </div>
+                                    <div className="mt-1 line-clamp-2 text-[11px] leading-snug text-game-muted">
+                                      {skillLockReason || formatHeldItemTrigger(item)}
+                                    </div>
+                                  </div>
+                                </button>
+                              )
+                            })}
+                          </div>
+                        )}
                       </div>
                     )}
-                  </>
-                )}
-              </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
 
             {availablePokemonPowers.length > 0 && (
@@ -1738,38 +1754,6 @@ function MountedPokemonDetailsDialog({
                 Battle Moves
               </SectionDivider>
               <div className="space-y-3 border-y border-game-border/75 py-4">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex min-w-0 items-start gap-2">
-                    <Badge
-                      variant="secondary"
-                      className="mt-0.5 shrink-0 border-game-border bg-game-canvas px-2 py-1 font-mono text-[10px] font-bold text-game-muted"
-                    >
-                      Moves {assignableMoves.length}/{maxPossibleMoves}
-                    </Badge>
-                    <div>
-                      <div className="text-[10px] font-black uppercase tracking-widest text-game-moss-strong">
-                        {battleMovesUnlockMessage
-                          ? 'Locked'
-                          : `Assigned ${selectedMoveIds.length}/${maxAssignableMoves}`}
-                      </div>
-                      <div className="text-[11px] font-medium text-game-muted">
-                        {battleMovesUnlockMessage
-                          ? 'Battle Moves unavailable'
-                          : maxAssignableMoves > 0
-                            ? `Researcher level allows ${maxAssignableMoves} assigned move${
-                                maxAssignableMoves === 1 ? '' : 's'
-                              }`
-                            : `Researcher Level ${RESEARCHER_MOVE_ASSIGN_LEVEL} required`}
-                      </div>
-                    </div>
-                  </div>
-                  {selectedMovesChanged ? (
-                    <Badge className="border-game-ochre/35 bg-game-ochre/10 text-game-ochre-strong">
-                      Unsaved
-                    </Badge>
-                  ) : null}
-                </div>
-
                 {evolutionMoveNames.length > 0 && (
                   <p className="text-xs text-game-muted">
                     Evolution move: {evolutionMoveNames.join(' or ')}. Equip and save
@@ -1792,7 +1776,7 @@ function MountedPokemonDetailsDialog({
                 ) : (
                   <>
                     <ol
-                      className="grid grid-cols-2 divide-x divide-game-border/75 border-y border-game-border/75"
+                      className="grid grid-cols-1 border-y border-game-border/75"
                       aria-label="Assigned battle move slots"
                     >
                       {Array.from(
@@ -1807,7 +1791,7 @@ function MountedPokemonDetailsDialog({
                                 'flex min-h-14 items-center gap-2 border-b border-game-border/75 px-2 py-2 last:border-b-0',
                                 move
                                   ? 'bg-game-moss/10'
-                                  : 'border-dashed bg-game-canvas',
+                                  : 'border-dashed',
                               )}
                             >
                               <span className="font-mono text-[9px] font-bold text-game-muted">
@@ -1878,33 +1862,6 @@ function MountedPokemonDetailsDialog({
                       </Button>
                     </div>
 
-                    {selectedMovesChanged ? (
-                      <div className="flex items-center gap-2 border-t border-game-border pt-3">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          onClick={() =>
-                            setSelectedMoveIds(currentAssignedMoveIds)
-                          }
-                          disabled={isSavingMoves}
-                          className="min-h-10 flex-1"
-                        >
-                          Undo
-                        </Button>
-                        <Button
-                          type="button"
-                          onClick={() => handleSaveAssignedMoves()}
-                          disabled={isSavingMoves}
-                          className="min-h-10 flex-1 bg-game-clay text-game-cream hover:bg-game-clay/90"
-                        >
-                          {isSavingMoves ? (
-                            <Loader2 className="size-4 animate-spin motion-reduce:animate-none" />
-                          ) : (
-                            'Save loadout'
-                          )}
-                        </Button>
-                      </div>
-                    ) : null}
                   </>
                 )}
               </div>
@@ -1921,7 +1878,7 @@ function MountedPokemonDetailsDialog({
                   <SectionDivider className="uppercase tracking-[0.2em] font-black text-[10px]">
                     Intrinsic Ability
                   </SectionDivider>
-                  <div className="space-y-3 border-y border-game-border/75 py-4">
+                  <div className="space-y-3 py-2">
                     <div className="space-y-2">
                       <div className="font-display text-lg font-semibold text-game-ink">
                         {ability.name}
@@ -1953,18 +1910,18 @@ function MountedPokemonDetailsDialog({
             })()}
 
             {/* Stats Carousel */}
-            <div className="w-full max-w-md space-y-4">
+            <div className="w-full max-w-xl space-y-4">
+              <SectionDivider className="uppercase tracking-[0.2em] font-black text-[10px]">
+                Pokemon Stats
+              </SectionDivider>
               <div
-                className="relative overflow-hidden border-y border-game-border/75 py-4"
+                className="relative overflow-hidden py-2"
                 data-vaul-no-drag
               >
-                <Carousel className="w-full max-w-[280px] mx-auto">
+                <Carousel className="mx-auto w-full max-w-lg">
                   <CarouselContent className="-ml-0">
                     {/* Base Stats */}
                     <CarouselItem className="pl-0">
-                      <div className="mb-6 text-center text-[10px] font-black uppercase tracking-[0.3em] text-game-moss-strong">
-                        Pokemon Stats
-                      </div>
                       <div className="space-y-3.5">
                         {hasStatsScanner ? (
                           <>
@@ -2079,7 +2036,7 @@ function MountedPokemonDetailsDialog({
 
                     {/* EVs */}
                     <CarouselItem className="pl-0">
-                      <div className="mb-6 text-center text-[10px] font-black uppercase tracking-[0.3em] text-game-moss-strong">
+                      <div className="mb-4 text-center text-[10px] font-black uppercase tracking-[0.3em] text-game-moss-strong">
                         Effort Values
                       </div>
                       <div className="space-y-3.5">
@@ -2155,7 +2112,7 @@ function MountedPokemonDetailsDialog({
 
                     {/* IVs */}
                     <CarouselItem className="pl-0">
-                      <div className="mb-6 text-center text-[10px] font-black uppercase tracking-[0.3em] text-game-moss-strong">
+                      <div className="mb-4 text-center text-[10px] font-black uppercase tracking-[0.3em] text-game-moss-strong">
                         Effective IVs (Cap {trainerIvCap})
                       </div>
                       <div className="space-y-3.5">
@@ -2247,7 +2204,7 @@ function MountedPokemonDetailsDialog({
         </div>
 
         {/* Fixed Use Item at Bottom */}
-        <div className="relative flex-shrink-0 border-t border-game-border bg-game-surface-raised p-6">
+        <div className="relative flex-shrink-0 border-t border-game-border bg-game-surface-raised px-6 pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-6">
           <div className="w-full max-w-md mx-auto">
             <UseItemDialog
               pokemon={pokemon}

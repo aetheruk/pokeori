@@ -428,6 +428,7 @@ export function SurfGame({ encounter, initialState }: SurfGameProps) {
       {result ? (
         <RewardResultOverlay
           result={result}
+          background={encounter.background || settings.scene.backdrop}
           onClose={session.close}
           icon={encounter.icon}
           iconAlt={encounter.name}

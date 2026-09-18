@@ -512,6 +512,7 @@ export function PrizeWheelGame({
       {result && (
         <RewardResultOverlay
           result={result}
+          background={encounter.background}
           onClose={handleExit}
           title={result.title}
           message={result.message}

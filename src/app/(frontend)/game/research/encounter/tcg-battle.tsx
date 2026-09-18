@@ -2097,6 +2097,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       {resultOverlay && (
         <RewardResultOverlay
           result={resultOverlay}
+          background={encounter.background}
           icon={encounter.icon}
           iconAlt={encounter.name}
           title={

@@ -1,7 +1,6 @@
 import Image from 'next/image'
 import type { StaticImageData } from 'next/image'
 import type { ReactNode } from 'react'
-import { Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface ScenicChoiceCardProps {
@@ -65,17 +64,6 @@ export function ScenicChoiceCard({
         aria-hidden="true"
         className="absolute inset-0 bg-gradient-to-t from-game-ink/18 via-transparent to-game-surface/10"
       />
-
-      {selected && (
-        <span
-          className={cn(
-            'absolute top-3 z-10 flex size-7 items-center justify-center rounded-full border border-game-surface bg-game-charcoal text-game-cream shadow-sm',
-            iconOnLeft ? 'right-3' : 'left-3',
-          )}
-        >
-          <Check className="size-4" aria-hidden="true" />
-        </span>
-      )}
 
       <span
         className={cn(

@@ -535,6 +535,7 @@ function BattleBetsBattle({
         <div className="fixed inset-0 z-[100] bg-game-canvas">
           <GameResult
             success={state.won === true}
+            background={serverBattle.background}
             title={state.won ? 'BET WON!' : 'BET LOST'}
             message={
               state.won

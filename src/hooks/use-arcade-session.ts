@@ -30,7 +30,7 @@ export interface ArcadeRenderFrame {
   alpha: number
 }
 
-export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: string; settings: any }, actions = defaultActions, controls?: { paused?: boolean; inputForTick?: (simulation: ArcadeSimulation) => Array<Omit<ArcadeInput, 'tick'>>; publishEveryTicks?: number }) {
+export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: string; settings: any; background?: string }, actions = defaultActions, controls?: { paused?: boolean; inputForTick?: (simulation: ArcadeSimulation) => Array<Omit<ArcadeInput, 'tick'>>; publishEveryTicks?: number }) {
   const router = useRouter()
   const { playSfx } = useAudio()
   const { refreshUser } = useUser()
@@ -79,7 +79,15 @@ export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: stri
         const completion = await actions.complete(encounter.id, Boolean(passed), Math.max(0, Math.floor(current.score)), undefined, current.collectedRewards, undefined, undefined, request)
         if (disposed) return
         invalidatesRef.current = completion.invalidates
-        setResult({ success: Boolean(passed) && completion.success, message: `Final score: ${Math.floor(current.score)}`, rewards: completion.summary })
+        setResult({
+          success: Boolean(passed) && completion.success,
+          message: `Final score: ${Math.floor(current.score)}`,
+          background:
+            encounter.background ||
+            encounter.settings.scene?.backdrop ||
+            settings.scene?.backdrop,
+          rewards: completion.summary,
+        })
         playSfxRef.current(passed && completion.success ? 'good' : 'bad')
       } else {
         const response = await recoverGameAction(

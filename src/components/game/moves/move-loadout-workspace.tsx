@@ -236,7 +236,7 @@ export function MoveLoadoutWorkspace({
               </Button>
             </div>
 
-            <ol className="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-1">
+            <ol className="mt-3 grid grid-cols-1 gap-2">
               {Array.from({ length: maxMoves }, (_, index) => {
                 const entry = selectedEntries[index]
                 return (
@@ -246,7 +246,7 @@ export function MoveLoadoutWorkspace({
                       'flex min-h-12 items-center gap-2 rounded-lg border px-2.5 py-2',
                       entry
                         ? 'border-game-moss/45 bg-game-moss/10'
-                        : 'border-dashed border-game-border bg-game-canvas',
+                        : 'border-dashed border-game-border',
                     )}
                   >
                     <span className="font-mono text-[10px] font-bold text-game-muted">

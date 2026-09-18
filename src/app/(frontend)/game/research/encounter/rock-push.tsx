@@ -1859,6 +1859,7 @@ export function RockPushGame({ encounter, initialState }: RockPushGameProps) {
       {result && (
         <RewardResultOverlay
           result={result}
+          background={encounter.background}
           onClose={() => {
             refreshUser(false, completionInvalidatesRef.current)
             router.push('/game/explore')

@@ -24,6 +24,8 @@ import { CardRewardCarousel } from './card-reward-carousel'
 
 const BACKGROUND_REWARD_SPRITE = '/sprites/items/forest-photo.avif'
 const TITLE_REWARD_SPRITE = '/sprites/items/certificate.avif'
+const REWARD_VALUE_CLASS =
+  'shrink-0 whitespace-nowrap font-mono text-sm font-semibold text-game-ink'
 
 interface RewardSummaryDisplayProps {
   summary: RewardSummary
@@ -75,7 +77,7 @@ export function RewardSummaryDisplay({
   if (!hasRewards) return null
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="w-full space-y-5 px-0 py-4 sm:px-1">
       <SectionDivider>{title}</SectionDivider>
 
       <div className="space-y-0">
@@ -136,7 +138,7 @@ export function RewardSummaryDisplay({
                   <span className="font-medium text-game-ink text-sm truncate">
                     {label}
                   </span>
-                  <span className="font-bold text-game-moss-strong text-sm">
+                  <span className={REWARD_VALUE_CLASS}>
                     +{amount} XP
                   </span>
                 </div>
@@ -170,9 +172,10 @@ export function RewardSummaryDisplay({
                     {currencyDef ? currencyDef.name : curr.type}
                   </span>
                   <span
-                    className={`font-bold text-sm ${
-                      curr.quantity < 0 ? 'text-game-danger' : 'text-game-muted'
-                    }`}
+                    className={cn(
+                      REWARD_VALUE_CLASS,
+                      curr.quantity < 0 && 'text-game-danger',
+                    )}
                   >
                     {curr.quantity > 0 ? `x${curr.quantity}` : curr.quantity}
                   </span>
@@ -234,7 +237,7 @@ export function RewardSummaryDisplay({
                   <span className="font-medium text-game-ink text-sm truncate">
                     {item.name}
                   </span>
-                  <span className="font-bold text-game-muted text-sm">
+                  <span className={REWARD_VALUE_CLASS}>
                     x{item.quantity}
                   </span>
                 </div>
@@ -272,7 +275,7 @@ export function RewardSummaryDisplay({
                     <span className="text-game-ochre text-xs">★</span>
                   )}
                 </div>
-                <span className="font-bold text-game-muted text-xs">
+                <span className={REWARD_VALUE_CLASS}>
                   Lvl {p.level}
                 </span>
               </div>
@@ -410,7 +413,7 @@ export function RewardSummaryDisplay({
                 <span className="font-medium text-game-ink text-sm truncate">
                   {upgrade.label}
                 </span>
-                <span className="font-bold text-game-moss-strong text-xs">
+                <span className={REWARD_VALUE_CLASS}>
                   +{upgrade.value}
                 </span>
               </div>
@@ -436,7 +439,7 @@ export function RewardSummaryDisplay({
                 <span className="truncate text-sm font-medium text-game-ink">
                   {res.formName} Research
                 </span>
-                <span className="shrink-0 whitespace-nowrap text-sm font-bold text-game-moss-strong">
+                <span className={REWARD_VALUE_CLASS}>
                   +{res.amount} XP
                 </span>
               </div>
@@ -462,7 +465,7 @@ export function RewardSummaryDisplay({
                 <span className="truncate text-sm font-medium text-game-ink">
                   {b.pokemonName} Research
                 </span>
-                <span className="shrink-0 whitespace-nowrap text-sm font-bold text-game-moss-strong">
+                <span className={REWARD_VALUE_CLASS}>
                   LVL {b.newLevel}
                 </span>
               </div>
@@ -509,10 +512,10 @@ export function RewardSummaryDisplay({
                       {skill?.name || 'New'} Level
                     </span>
                     <div className="flex items-center gap-1.5 pl-2">
-                      <span className="font-bold text-game-muted text-xs line-through">
+                      <span className="shrink-0 whitespace-nowrap font-mono text-xs font-semibold text-game-muted line-through">
                         {levelUp.oldLevel}
                       </span>
-                      <span className="font-black text-game-moss-strong text-sm">
+                      <span className={REWARD_VALUE_CLASS}>
                         Lvl {levelUp.newLevel}
                       </span>
                     </div>

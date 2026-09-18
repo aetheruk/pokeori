@@ -430,6 +430,7 @@ export function FieldObservationGame({
       {result && (
         <RewardResultOverlay
           result={result}
+          background={encounter.background}
           onClose={() => {
             refreshUser()
             router.push('/game/explore')

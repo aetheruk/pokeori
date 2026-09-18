@@ -123,6 +123,7 @@ export function FlapGame({ encounter, initialState, actions }: FlapGameProps) {
       {result && (
         <RewardResultOverlay
           result={result}
+          background={backdrop}
           onClose={session.close}
           icon={encounter.icon}
           iconAlt={encounter.name}

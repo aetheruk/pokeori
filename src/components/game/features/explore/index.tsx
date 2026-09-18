@@ -589,6 +589,7 @@ function ExploreListContent({
 
       <RewardResultOverlay
         result={actions.completionResult}
+        background={actions.lastCompletedTask?.background}
         onClose={() => {
           const expeditionId = actions.completionResult?.expeditionProgress?.expeditionId
           actions.setCompletionResult(null)
@@ -627,6 +628,7 @@ function ExploreListContent({
         return (
           <RewardResultOverlay
             result={actions.voyageRewardResult}
+            background={voyage?.background}
             onClose={() => actions.setVoyageRewardResult(null)}
             title="RESULTS"
             message={isSuccess ? 'Voyage Success' : 'Voyage Fail'}
@@ -652,6 +654,7 @@ function ExploreListContent({
         return (
           <RewardResultOverlay
             result={actions.expeditionRewardResult}
+            background={expedition?.background}
             onClose={() => {
               actions.setExpeditionRewardResult(null)
               actions.setSelectedItem(null)
