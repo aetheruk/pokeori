@@ -1438,45 +1438,42 @@ function MountedPokemonDetailsDialog({
                   <div
                     key={idx}
                     title={item.label}
-                    className="flex min-h-14 items-center justify-between gap-3 border-b border-game-border/75 py-3"
+                    className="flex min-h-12 items-center justify-between gap-2.5 border-b border-game-border/75 py-2.5"
                   >
                     <span className="sr-only">{item.label}</span>
                     <item.icon
                       aria-hidden="true"
-                      className="size-5 shrink-0 text-game-charcoal-strong"
+                      className="size-4 shrink-0 text-game-charcoal"
                       strokeWidth={2.25}
                     />
-                    <span className="shrink-0 text-right font-mono text-sm font-bold text-game-ink">
+                    <span className="shrink-0 text-right font-mono text-[13px] font-semibold text-game-charcoal">
                       {item.value}
                     </span>
                   </div>
                 ))}
 
-                <div className="flex min-h-14 items-center justify-between gap-3 border-b border-game-border/75 py-3">
-                  <span className="flex items-center gap-2 text-[10px] font-extrabold uppercase leading-none tracking-widest text-game-muted">
-                    <Circle className="size-3.5 text-game-charcoal-strong" />
-                    Ball
-                  </span>
+                <div className="flex min-h-12 items-center justify-between gap-2.5 border-b border-game-border/75 py-2.5">
+                  <ItemSprite
+                    itemId={pokemon.ballType || 'poke-ball'}
+                    alt=""
+                    width={18}
+                    height={18}
+                    className="size-[18px] shrink-0 object-contain drop-shadow-md"
+                  />
                   <div className="flex min-w-0 items-center gap-2">
-                    <ItemSprite
-                      itemId={pokemon.ballType || 'poke-ball'}
-                      alt={pokemon.ballType || 'Poke Ball'}
-                      width={20}
-                      height={20}
-                      className="object-contain drop-shadow-md"
-                    />
-                    <span className="truncate text-right text-xs font-bold capitalize tracking-tight text-game-ink">
+                    <span className="truncate text-right text-[13px] font-semibold capitalize tracking-tight text-game-charcoal">
                       {pokemon.ballType?.replace(/-/g, ' ') || 'Poke Ball'}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex min-h-14 items-center justify-between gap-3 border-b border-game-border/75 py-3">
-                  <span className="flex items-center gap-2 text-[10px] font-extrabold uppercase leading-none tracking-widest text-game-muted">
-                    <UserRound className="size-3.5 text-game-charcoal-strong" />
-                    Trainer
-                  </span>
-                  <span className="block truncate text-right text-xs font-bold tracking-tight text-game-ink">
+                <div className="flex min-h-12 items-center justify-between gap-2.5 border-b border-game-border/75 py-2.5">
+                  <UserRound
+                    aria-hidden="true"
+                    className="size-4 shrink-0 text-game-charcoal"
+                    strokeWidth={2.25}
+                  />
+                  <span className="block truncate text-right text-[13px] font-semibold tracking-tight text-game-charcoal">
                     {typeof pokemon.originalTrainer === 'object'
                       ? pokemon.originalTrainer.trainerName || 'Unknown'
                       : pokemon.originalTrainer === user?.id
