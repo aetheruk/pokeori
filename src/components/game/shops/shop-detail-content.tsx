@@ -186,11 +186,11 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
         <SectionDivider>AVAILABLE ITEMS</SectionDivider>
 
         {shopCurrencyBalances.length > 0 && (
-          <div className="game-panel flex flex-wrap items-center justify-end gap-2 px-3 py-2">
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 py-1 text-center">
             {shopCurrencyBalances.map(({ currency, id, amount }) => (
               <div
                 key={id}
-                className="flex items-center gap-1.5 rounded-full border border-game-border bg-game-surface-raised px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-game-muted"
+                className="flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.08em] text-game-muted"
               >
                 <CurrencySprite currencyId={currency!.id} width={16} height={16} />
                 <span className="text-game-ink">{amount.toLocaleString()}</span>
@@ -249,8 +249,8 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
                   </div>
                 </div>
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
+                <div className="min-w-0 flex-1 text-right">
+                  <div className="mb-1 flex items-center justify-end gap-2">
                     <h3 className="truncate text-sm font-black uppercase tracking-tight text-game-ink">
                       {item.name}
                     </h3>
@@ -299,19 +299,6 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
                       </div>
                     )}
                   </div>
-                </div>
-
-                <div className={cn(
-                  'relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border',
-                  canAfford && !outOfStock
-                    ? 'border-game-clay bg-game-clay text-game-cream'
-                    : 'border-game-border bg-game-surface-raised text-game-muted',
-                )}>
-                  {purchasingItem === item.id ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <ShoppingBag className="size-4" />
-                  )}
                 </div>
               </button>
             )

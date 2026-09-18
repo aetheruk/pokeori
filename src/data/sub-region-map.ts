@@ -56,7 +56,7 @@ export const subCategories: Record<string, RegionData> = {
     region: 'Kanto',
     order: 20,
     image: '/backgrounds/virdian.avif',
-    icon: { type: 'trainer', id: 'old-couple' },
+    icon: { type: 'trainer', id: 'expert-m' },
     description: 'A small city on the edge of the Pokemon League.',
     music: '/music/viridian_city.mp3',
     weatherSlots: {
