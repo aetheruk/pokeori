@@ -1446,7 +1446,7 @@ function MountedPokemonDetailsDialog({
                       className="size-4 shrink-0 text-game-charcoal"
                       strokeWidth={2.25}
                     />
-                    <span className="shrink-0 text-right font-mono text-[13px] font-semibold text-game-charcoal">
+                    <span className="shrink-0 text-right text-[13px] font-semibold tracking-tight text-game-charcoal">
                       {item.value}
                     </span>
                   </div>
@@ -1759,7 +1759,7 @@ function MountedPokemonDetailsDialog({
                 )}
 
                 {battleMovesUnlockMessage ? (
-                  <div className="border-l-2 border-game-ochre/60 py-2 pl-3 text-xs text-game-muted">
+                  <div className="py-2 text-xs text-game-muted">
                     {battleMovesUnlockMessage}
                   </div>
                 ) : assignableMoves.length === 0 ? (
