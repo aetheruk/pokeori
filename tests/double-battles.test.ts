@@ -188,12 +188,18 @@ describe('double battles',()=>{
         ally:damageAgainst('player',1),
       }
     }
-    const matchupWin=resolveSpread('tech')
-    const matchupTie=resolveSpread('power')
-    const relativeDifference=(first:number,second:number)=>Math.abs(first-second)/Math.max(first,second,1)
-    expect(matchupWin.pairedOpponent).toBeGreaterThan(matchupTie.pairedOpponent)
-    expect(relativeDifference(matchupWin.secondaryOpponent,matchupTie.secondaryOpponent)).toBeLessThan(0.2)
-    expect(relativeDifference(matchupWin.ally,matchupTie.ally)).toBeLessThan(0.2)
+    const originalRandom = Math.random
+    Math.random = () => 0.5
+    try {
+      const matchupWin=resolveSpread('tech')
+      const matchupTie=resolveSpread('power')
+      const relativeDifference=(first:number,second:number)=>Math.abs(first-second)/Math.max(first,second,1)
+      expect(matchupWin.pairedOpponent).toBeGreaterThan(matchupTie.pairedOpponent)
+      expect(relativeDifference(matchupWin.secondaryOpponent,matchupTie.secondaryOpponent)).toBeLessThan(0.2)
+      expect(relativeDifference(matchupWin.ally,matchupTie.ally)).toBeLessThan(0.2)
+    } finally {
+      Math.random = originalRandom
+    }
   })
   test('Sketch captures a move from the selected opposing lane',async()=>{
     const battle=state()
