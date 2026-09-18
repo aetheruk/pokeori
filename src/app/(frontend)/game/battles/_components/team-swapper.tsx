@@ -140,7 +140,7 @@ export function TeamSwapper({
           className={cn(
             forced
               ? 'flex-1 h-12 gap-2 rounded-xl border border-game-border bg-game-surface-raised text-game-ink shadow-sm transition-colors'
-              : 'h-12 w-12 rounded-xl border border-game-border bg-game-surface-raised p-0 text-game-ink shadow-sm transition-colors',
+              : 'size-11 rounded-lg border border-game-border bg-game-surface-raised p-0 text-game-ink shadow-none transition-colors',
             'hover:border-game-moss/60 hover:bg-game-surface-raised hover:text-game-ink',
             availableSwaps === 0 && 'opacity-50',
           )}

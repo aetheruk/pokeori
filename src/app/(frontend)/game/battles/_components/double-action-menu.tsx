@@ -10,7 +10,6 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer'
-import { ItemSprite } from '@/components/ui/item-sprite'
 import { cn } from '@/lib/utils'
 import { getMove } from '@/data/moves'
 import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
@@ -27,6 +26,7 @@ import { getBattlePowers } from '../actions'
 import type { BattlePowersData } from '../powers/powers-data'
 import { useBattleContext } from './battle-context'
 import { StanceSelector } from './stance-selector'
+import { BattleActionTrigger } from './battle-action-trigger'
 import { ItemSelector } from './item-selector'
 import { TeamSwapper } from './team-swapper'
 import { BattleMovesContent, getBattleMovePresentation, MoveInfoDialog } from './battle-moves-content'
@@ -226,10 +226,10 @@ export function DoubleActionMenu() {
 
   return (
     <div
-      className="game-paper-first game-paper-background relative flex min-h-[13rem] flex-[10] flex-col border-t border-game-border bg-game-canvas px-3 py-3 text-game-ink sm:px-5 sm:py-4 xl:flex-none"
+      className="game-paper-first game-paper-background relative flex min-h-[13rem] flex-[10] flex-col border-t border-game-border bg-game-canvas px-3 pt-2 pb-4 text-game-ink sm:px-4 xl:flex-none"
       aria-busy={disabled}
     >
-      {isWaitingForServer && (
+      {isWaitingForServer && action?.kind !== 'basic' && (
         <div className="absolute inset-0 z-30 flex items-center justify-center bg-game-surface/85 backdrop-blur-[1px]">
           <Loader2 className="mr-2 h-7 w-7 animate-spin text-game-moss motion-reduce:animate-none" />
           <span className="text-sm font-bold">
@@ -258,7 +258,7 @@ export function DoubleActionMenu() {
             {actor && active.includes(selectedSlot) && (
               <>
                 <fieldset
-                  className="mb-2 flex min-w-0 items-center justify-center gap-2"
+                  className="mb-3 flex min-w-0 items-center justify-center gap-2"
                   aria-label={`Attack type for ${actor.name}`}
                 >
                   {actor.types.map((type) => {
@@ -269,7 +269,7 @@ export function DoubleActionMenu() {
                         type="button"
                         variant="ghost"
                         className={cn(
-                          'h-12 w-20 rounded-full border-0 bg-transparent p-0 hover:bg-transparent',
+                          'h-11 w-20 rounded-lg border-0 bg-transparent p-0 hover:bg-transparent',
                           selectedType === type
                             ? 'opacity-100'
                             : 'opacity-60 grayscale',
@@ -319,63 +319,40 @@ export function DoubleActionMenu() {
                       : undefined
                   }
                   pendingStance={
-                    action?.kind === 'basic' ? action.stance : undefined
+                    isWaitingForServer && action?.kind === 'basic'
+                      ? action.stance
+                      : undefined
                   }
                   disabled={disabled}
                 />
 
-                <div className="mt-3 flex w-full max-w-md gap-2">
+                <div className="mt-3 flex w-full gap-2">
                   <ItemSelector />
                   {moves.length > 0 && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-12 flex-1 gap-2 rounded-xl border-game-border bg-game-surface-raised text-game-ink shadow-sm"
+                    <BattleActionTrigger
+                      itemId={moveTriggerItemId}
+                      label="Moves"
+                      count={`${actor.moveUsesRemaining ?? 0}/${battleState.config?.movesPerBattle ?? actor.moveUsesRemaining ?? 0}`}
                       aria-label={`Moves, ${actor.moveUsesRemaining ?? 0} uses remaining`}
                       disabled={disabled || (actor.moveUsesRemaining ?? 0) <= 0}
                       onClick={() => setPanel('moves')}
-                    >
-                      <ItemSprite
-                        itemId={moveTriggerItemId}
-                        alt=""
-                        width={22}
-                        height={22}
-                        className="h-5 w-5 object-contain"
-                      />
-                      <span className="rounded-full border border-game-border bg-game-canvas/60 px-1.5 py-0.5 text-[10px] font-black">
-                        {actor.moveUsesRemaining ?? 0}/
-                        {battleState.config?.movesPerBattle ??
-                          actor.moveUsesRemaining ??
-                          0}
-                      </span>
-                    </Button>
+                    />
                   )}
                   {powerOptions.length > 0 && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-12 flex-1 gap-2 rounded-xl border-game-border bg-game-surface-raised text-game-ink shadow-sm"
+                    <BattleActionTrigger
+                      itemId="tera-orb"
+                      label="Powers"
+                      count={powerOptions.length}
                       aria-label={`Battle powers, ${powerOptions.length} choices`}
                       disabled={disabled}
                       onClick={() => setPanel('powers')}
-                    >
-                      <ItemSprite
-                        itemId="tera-orb"
-                        alt=""
-                        width={22}
-                        height={22}
-                        className="h-5 w-5 object-contain"
-                      />
-                      <span className="rounded-full border border-game-border bg-game-canvas/60 px-1.5 py-0.5 text-[10px] font-black">
-                        {powerOptions.length}
-                      </span>
-                    </Button>
+                    />
                   )}
                   {battleState.playerTeam.length > 1 && (
                     <Button
                       type="button"
                       variant="outline"
-                      className="h-12 w-12 shrink-0 rounded-xl border-game-border bg-game-surface-raised p-0 text-game-ink shadow-sm"
+                      className="size-11 shrink-0 rounded-lg border-game-border bg-game-surface-raised p-0 text-game-ink shadow-none"
                       aria-label="Switch Pokemon"
                       disabled={disabled || reserves.length === 0}
                       onClick={() => setPanel('switch')}

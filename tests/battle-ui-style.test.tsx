@@ -16,7 +16,7 @@ describe('battle UI stance styling', () => {
     expect(STANCE_ICON_CONFIG.tech.tone).toBe('text-game-stance-blue-strong')
   })
 
-  test('renders accessible stance labels with icon-only visual cards', () => {
+  test('labels stance attacks with their offensive stats and counter matchups', () => {
     const markup = renderToStaticMarkup(
       <StanceSelector
         onSelect={() => undefined}
@@ -30,24 +30,15 @@ describe('battle UI stance styling', () => {
       />,
     )
 
-    expect(markup).toContain('aria-label="SPEED"')
-    expect(markup).toContain('aria-label="POWER"')
-    expect(markup).toContain('aria-label="TECH"')
-    expect(markup).not.toContain('>SPEED<')
-    expect(markup).not.toContain('>POWER<')
-    expect(markup).not.toContain('>TECH<')
-    expect(markup).toContain('font-black')
-    expect(markup).toContain('bg-game-ochre')
-    expect(markup).toContain('bg-game-clay-strong')
-    expect(markup).toContain('bg-game-stance-blue-strong')
-    expect(markup).toContain('text-game-stance-blue')
-    expect(markup).toContain('text-game-clay')
-    expect(markup).toContain('text-game-cream')
-    expect(markup).toContain('animate-pulse')
-    expect(markup).toContain('motion-reduce:animate-none')
-    expect(markup).toContain('-left-[14%]')
-    expect(markup).toContain('-bottom-1')
-    expect(markup).toContain('text-white')
+    expect(markup).toContain('aria-label="Speed attack, Speed 55. Beats Power"')
+    expect(markup).toContain('aria-label="Power attack, Attack 42. Beats Tech"')
+    expect(markup).toContain('aria-label="Tech attack, Sp. Atk 47. Beats Speed"')
+    expect(markup).toContain('>Speed<')
+    expect(markup).toContain('>Power<')
+    expect(markup).toContain('>Tech<')
+    expect(markup).toContain('>Attack<')
+    expect(markup).toContain('>Sp. Atk<')
+    expect(markup).not.toContain('animate-pulse')
   })
 })
 

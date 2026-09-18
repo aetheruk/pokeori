@@ -1,3 +1,6 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { STANCE_ICON_CONFIG } from '@/components/game/shared/stance-icon'
 import { Button } from '@/components/ui/button'
@@ -36,6 +39,17 @@ export function StanceSelector({
   disabledStance,
   pendingStance,
 }: StanceSelectorProps) {
+  const [feedback, setFeedback] = useState<{
+    stance: BattleStance
+    sequence: number
+  } | null>(null)
+
+  useEffect(() => {
+    if (!feedback) return
+    const timer = window.setTimeout(() => setFeedback(null), 600)
+    return () => window.clearTimeout(timer)
+  }, [feedback])
+
   const getMult = (stage?: number) => getStatStageMultiplier(stage || 0)
 
   // Show only the relevant offensive stat for each stance
@@ -48,102 +62,107 @@ export function StanceSelector({
   const stanceCards: Array<{
     stance: BattleStance
     label: string
+    statLabel: string
+    beats: string
     value: number
     icon: typeof STANCE_ICON_CONFIG.power.Icon
-    surfaceTone: string
-    iconTone: string
-    hoverTone: string
   }> = [
     {
       stance: 'speed',
-      label: 'SPEED',
+      label: 'Speed',
+      statLabel: 'Speed',
+      beats: 'Power',
       value: speedVal,
       icon: STANCE_ICON_CONFIG.speed.Icon,
-      surfaceTone: 'border-game-ochre bg-game-ochre',
-      iconTone: 'text-game-cream',
-      hoverTone:
-        'hover:border-game-ochre hover:bg-game-ochre',
     },
     {
       stance: 'power',
-      label: 'POWER',
+      label: 'Power',
+      statLabel: 'Attack',
+      beats: 'Tech',
       value: powerVal,
       icon: STANCE_ICON_CONFIG.power.Icon,
-      surfaceTone: 'border-game-clay-strong bg-game-clay-strong',
-      iconTone: 'text-game-clay',
-      hoverTone: 'hover:border-game-clay hover:bg-game-clay-strong',
     },
     {
       stance: 'tech',
-      label: 'TECH',
+      label: 'Tech',
+      statLabel: 'Sp. Atk',
+      beats: 'Speed',
       value: techVal,
       icon: STANCE_ICON_CONFIG.tech.Icon,
-      surfaceTone: 'border-game-stance-blue-strong bg-game-stance-blue-strong',
-      iconTone: 'text-game-stance-blue',
-      hoverTone:
-        'hover:border-game-stance-blue hover:bg-game-stance-blue-strong',
     },
   ]
 
   return (
-    <div className="grid w-full max-w-2xl grid-cols-3 gap-2 sm:gap-3 mx-auto">
+    <div className="mx-auto grid w-full max-w-2xl grid-cols-3 gap-2 sm:gap-3">
       {stanceCards.map((card) => {
         const Icon = card.icon
         const isZReady = !!zMoveReady
         const isStanceDisabled = disabledStance === card.stance
         const isPending = pendingStance === card.stance
+        const isFeedback = feedback?.stance === card.stance
 
         return (
           <Button
             key={card.stance}
             type="button"
             variant="outline"
+            data-stance={card.stance}
+            data-pending={isPending || undefined}
+            data-z-ready={isZReady || undefined}
             className={cn(
-              'group relative h-20 overflow-hidden rounded-lg border px-2.5 py-2.5 text-white transition-colors',
-              card.surfaceTone,
-              card.hoverTone,
-              isStanceDisabled &&
-                'border-game-border bg-game-canvas text-game-muted opacity-45',
-              isPending &&
-                'border-white/70 ring-2 ring-white/45 ring-offset-1 ring-offset-game-surface',
-              isZReady &&
-                'ring-2 ring-game-ochre/80 ring-offset-2 ring-offset-game-surface',
+              'game-battle-stance relative block h-auto min-w-0 rounded-[10px] border px-2.5 pt-2.5 pb-0 text-left sm:px-3 sm:pt-3',
+              (isPending || isFeedback) && !isStanceDisabled && 'disabled:opacity-100',
             )}
-            onClick={() => onSelect(card.stance)}
+            onClick={() => {
+              setFeedback((previous) => ({
+                stance: card.stance,
+                sequence: (previous?.sequence ?? 0) + 1,
+              }))
+              onSelect(card.stance)
+            }}
             disabled={disabled || isStanceDisabled}
-            aria-label={card.label}
-            aria-pressed={isPending}
+            aria-label={
+              isStanceDisabled
+                ? `${card.label} stance disabled`
+                : `${card.label} ${isZReady ? 'Z-Move' : `attack, ${card.statLabel} ${card.value}`}. Beats ${card.beats}`
+            }
             aria-busy={isPending}
           >
-            <Icon
-              aria-hidden
-              className={cn(
-                'pointer-events-none absolute -left-[14%] top-1/2 size-[76%] max-h-[76%] max-w-[76%] -translate-y-1/2 animate-pulse opacity-60 motion-reduce:animate-none [&_*]:stroke-[1.35]',
-                card.iconTone,
-              )}
-            />
-
-            <div className="relative z-10 h-full w-full">
-              <div className="absolute right-0 top-0 flex items-center gap-1">
-                {isPending && (
-                  <Loader2 className="h-4 w-4 animate-spin text-white" />
-                )}
-                {isZReady && (
-                  <span className="rounded border border-game-ochre/50 bg-game-surface-raised/90 px-1.5 py-0.5 text-[10px] font-black leading-none text-game-ochre">
-                    Z
-                  </span>
-                )}
-              </div>
-
-              <div
-                className={cn(
-                  'absolute -bottom-1 right-0 whitespace-nowrap text-right text-[2.75rem] font-black leading-none tracking-tight text-white sm:text-5xl',
-                  isStanceDisabled && 'text-game-muted',
-                )}
+            <span className="game-battle-stance-name flex items-center justify-between gap-1 text-sm font-extrabold sm:text-base">
+              {card.label}
+              <span
+                key={isFeedback ? feedback.sequence : 'idle'}
+                aria-hidden
+                className="game-battle-stance-icon relative inline-flex size-6 shrink-0 items-center justify-center sm:size-7"
+                data-feedback={isFeedback || undefined}
               >
+                <Icon className="relative z-10 size-6 sm:size-7 [&_*]:stroke-[1.7]" />
+              </span>
+            </span>
+            <span className="mt-2 mb-3 block">
+              <span className={cn(
+                'block font-mono leading-none font-bold tracking-tight text-game-ink sm:text-3xl',
+                card.value >= 1000 ? 'text-2xl' : 'text-[1.75rem]',
+              )}>
                 {isZReady ? 'Z' : card.value.toLocaleString()}
-              </div>
-            </div>
+              </span>
+              <span className="mt-1 block text-[11px] leading-tight font-medium text-game-muted">
+                {isZReady ? 'Z-Move ready' : card.statLabel}
+              </span>
+            </span>
+            <span className="game-battle-stance-hint flex min-h-8 items-center gap-1 border-t py-1.5 text-[11px] leading-tight font-medium text-game-muted">
+              {isStanceDisabled ? (
+                'Disabled'
+              ) : isPending ? (
+                <>
+                  <Loader2 aria-hidden className="size-3 animate-spin motion-reduce:animate-none" />
+                  <span role="status">Attacking…</span>
+                </>
+              ) : (
+                <>Beats <strong className="font-bold">{card.beats}</strong></>
+              )}
+            </span>
           </Button>
         )
       })}

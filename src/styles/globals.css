@@ -906,6 +906,104 @@
   }
 }
 
+/* Shared singles/doubles stance controls. Motion confirms a press once. */
+.game-battle-stance {
+  --battle-stance-accent: var(--game-ochre);
+  --battle-stance-ink: color-mix(in srgb, var(--battle-stance-accent) 74%, var(--game-ink));
+  border-color: color-mix(in srgb, var(--battle-stance-accent) 38%, var(--game-border-strong));
+  border-bottom: 3px solid var(--battle-stance-accent);
+  background-color: color-mix(in srgb, var(--battle-stance-accent) 5%, var(--game-surface-raised));
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--game-ink) 9%, transparent);
+}
+
+.game-battle-stance[data-stance='power'] {
+  --battle-stance-accent: var(--game-clay-strong);
+}
+
+.game-battle-stance[data-stance='tech'] {
+  --battle-stance-accent: var(--game-stance-blue-strong);
+}
+
+.game-battle-stance:hover:enabled {
+  background-color: color-mix(in srgb, var(--battle-stance-accent) 11%, var(--game-surface-raised));
+}
+
+.game-battle-stance:active:enabled,
+.game-battle-stance[data-pending='true'] {
+  box-shadow: 0 0 0 2px var(--battle-stance-accent);
+}
+
+.game-battle-stance[data-z-ready='true'] {
+  outline: 2px solid var(--game-ochre);
+  outline-offset: 2px;
+}
+
+.game-battle-stance:focus-visible {
+  outline: 2px solid var(--game-charcoal);
+  outline-offset: 4px;
+}
+
+.game-battle-stance-name,
+.game-battle-stance-hint strong {
+  color: var(--battle-stance-ink);
+}
+
+.game-battle-stance-hint {
+  border-color: color-mix(in srgb, var(--battle-stance-accent) 22%, transparent);
+}
+
+.game-battle-stance-icon::after {
+  position: absolute;
+  inset: -5px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: 0;
+  content: '';
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .game-battle-stance[data-stance='speed'] .game-battle-stance-icon[data-feedback='true'] {
+    animation: battle-stance-dash 440ms ease-out;
+  }
+
+  .game-battle-stance[data-stance='power'] .game-battle-stance-icon[data-feedback='true'] {
+    animation: battle-stance-impact 400ms ease-out;
+  }
+
+  .game-battle-stance[data-stance='tech'] .game-battle-stance-icon[data-feedback='true'] {
+    animation: battle-stance-orbit 550ms cubic-bezier(0.16, 0.8, 0.3, 1);
+  }
+
+  .game-battle-stance:is([data-stance='power'], [data-stance='tech']) .game-battle-stance-icon[data-feedback='true']::after {
+    animation: battle-stance-ring 480ms ease-out;
+  }
+}
+
+@keyframes battle-stance-dash {
+  0%, 100% { transform: translateX(0); opacity: 1; }
+  22% { transform: translateX(-5px); }
+  54% { transform: translateX(7px); opacity: 0.2; }
+  55% { transform: translateX(-7px); opacity: 0; }
+}
+
+@keyframes battle-stance-impact {
+  0%, 100% { transform: scale(1) rotate(0); }
+  25% { transform: scale(0.8) rotate(-14deg); }
+  48% { transform: scale(1.13) rotate(6deg); }
+}
+
+@keyframes battle-stance-orbit {
+  from { transform: rotate(0); }
+  to { transform: rotate(180deg); }
+}
+
+@keyframes battle-stance-ring {
+  0% { transform: scale(0.55); opacity: 0; }
+  30% { opacity: 0.6; }
+  100% { transform: scale(1.12); opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
