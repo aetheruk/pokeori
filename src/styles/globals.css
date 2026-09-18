@@ -59,6 +59,8 @@
   --color-game-stance-blue-strong: var(--game-stance-blue-strong);
   --color-game-research: var(--game-research);
   --color-game-research-strong: var(--game-research-strong);
+  --color-game-health: var(--game-health);
+  --color-game-health-strong: var(--game-health-strong);
   --color-game-battle-orange: var(--game-battle-orange);
   --color-game-battle-orange-strong: var(--game-battle-orange-strong);
   --color-game-ochre: var(--game-ochre);
@@ -111,6 +113,8 @@
   --game-stance-blue-strong: #345f8d;
   --game-research: #6f8d5c;
   --game-research-strong: #4d6d43;
+  --game-health: #6f9b63;
+  --game-health-strong: #4d7445;
   --game-battle-orange: #c4773c;
   --game-battle-orange-strong: #a45d2d;
   --game-ochre: #b58a43;
@@ -380,6 +384,8 @@
     --game-stance-blue-strong: #b9d8f1;
     --game-research: #9bb789;
     --game-research-strong: #c0d7b2;
+    --game-health: #9fca8d;
+    --game-health-strong: #c9e3b9;
     --game-battle-orange: #e3a06e;
     --game-battle-orange-strong: #f1bd94;
     --game-ochre: #d3ad63;
@@ -426,6 +432,8 @@
     --game-stance-blue-strong: #345f8d;
     --game-research: #6f8d5c;
     --game-research-strong: #4d6d43;
+    --game-health: #6f9b63;
+    --game-health-strong: #4d7445;
     --game-battle-orange: #c4773c;
     --game-battle-orange-strong: #a45d2d;
     --game-ochre: #b58a43;
@@ -489,6 +497,8 @@
     --game-stance-blue-strong: #b9d8f1;
     --game-research: #9bb789;
     --game-research-strong: #c0d7b2;
+    --game-health: #9fca8d;
+    --game-health-strong: #c9e3b9;
     --game-battle-orange: #e3a06e;
     --game-battle-orange-strong: #f1bd94;
     --game-ochre: #d3ad63;
@@ -534,6 +544,8 @@
     --game-stance-blue-strong: #b9d8f1;
     --game-research: #9bb789;
     --game-research-strong: #c0d7b2;
+    --game-health: #9fca8d;
+    --game-health-strong: #c9e3b9;
     --game-battle-orange: #e3a06e;
     --game-battle-orange-strong: #f1bd94;
     --game-ochre: #d3ad63;

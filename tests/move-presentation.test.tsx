@@ -218,7 +218,7 @@ describe('move presentation', () => {
       <MoveBattleCommand
         presentation={presentation}
         onDetails={() => undefined}
-        primaryAction={<button type="button">Use</button>}
+        onSelect={() => undefined}
       />,
     )
 
@@ -227,7 +227,9 @@ describe('move presentation', () => {
     expect(command).toContain('75 power')
     expect(command).toContain('90%')
     expect(command).toContain('Tech')
-    expect(command).toContain('Use')
+    expect(command).toContain('aria-label="Use Field Test"')
+    expect(command).toContain('lucide-info')
+    expect(command).not.toContain('lucide-book-open')
     expect(command).not.toContain('deliberately long summary')
     expect(command).not.toContain('Current offensive value')
   })
@@ -240,7 +242,7 @@ describe('move presentation', () => {
       <MoveBattleCommand
         presentation={presentation}
         onDetails={() => undefined}
-        primaryAction={<button type="button">Use</button>}
+        onSelect={() => undefined}
       />,
     )
 
@@ -256,7 +258,7 @@ describe('move presentation', () => {
       <MoveBattleCommand
         presentation={presentation}
         onDetails={() => undefined}
-        primaryAction={<button type="button">Use</button>}
+        onSelect={() => undefined}
       />,
     )
 

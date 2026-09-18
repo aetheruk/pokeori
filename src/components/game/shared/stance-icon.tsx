@@ -19,12 +19,12 @@ export const STANCE_ICON_CONFIG: Record<
   speed: {
     Icon: FastForward,
     label: 'Speed',
-    tone: 'text-game-stance-blue-strong',
+    tone: 'text-game-ochre',
   },
   tech: {
     Icon: Atom,
     label: 'Tech',
-    tone: 'text-game-moss-strong',
+    tone: 'text-game-stance-blue-strong',
   },
   random: {
     Icon: BadgeQuestionMark,

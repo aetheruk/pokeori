@@ -11,9 +11,9 @@ import type { BattleLogEntry } from '@/utilities/battle/types'
 
 describe('battle UI stance styling', () => {
   test('keeps the shared stance palette aligned with battle identity', () => {
-    expect(STANCE_ICON_CONFIG.speed.tone).toBe('text-game-stance-blue-strong')
+    expect(STANCE_ICON_CONFIG.speed.tone).toBe('text-game-ochre')
     expect(STANCE_ICON_CONFIG.power.tone).toBe('text-game-clay-strong')
-    expect(STANCE_ICON_CONFIG.tech.tone).toBe('text-game-moss-strong')
+    expect(STANCE_ICON_CONFIG.tech.tone).toBe('text-game-stance-blue-strong')
   })
 
   test('renders accessible stance labels with icon-only visual cards', () => {
@@ -37,12 +37,12 @@ describe('battle UI stance styling', () => {
     expect(markup).not.toContain('>POWER<')
     expect(markup).not.toContain('>TECH<')
     expect(markup).toContain('font-black')
-    expect(markup).toContain('bg-game-stance-blue-strong')
+    expect(markup).toContain('bg-game-ochre')
     expect(markup).toContain('bg-game-clay-strong')
-    expect(markup).toContain('bg-game-moss-strong')
+    expect(markup).toContain('bg-game-stance-blue-strong')
     expect(markup).toContain('text-game-stance-blue')
     expect(markup).toContain('text-game-clay')
-    expect(markup).toContain('text-game-moss')
+    expect(markup).toContain('text-game-cream')
     expect(markup).toContain('animate-pulse')
     expect(markup).toContain('motion-reduce:animate-none')
     expect(markup).toContain('-left-[14%]')
@@ -114,6 +114,16 @@ describe('battle move and status presentation', () => {
     expect(markup).toContain('bg-amber-300')
     expect(markup).toContain('text-slate-950')
     expect(markup).toContain('>Paralysis<')
+
+    const fullHpMarkup = renderToStaticMarkup(
+      <HealthDisplay
+        currentHp={50}
+        maxHp={50}
+        name="Pikachu"
+        level={20}
+      />,
+    )
+    expect(fullHpMarkup).toContain('bg-game-health')
   })
 
   test('shows gender symbols beside gendered Pokemon names', () => {

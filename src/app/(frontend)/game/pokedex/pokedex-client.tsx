@@ -501,7 +501,8 @@ export default function Pokedex() {
           desktopWidth="min(42vw, 620px)"
           desktopBreakpoint="lg"
           mobileHeader={false}
-          className="game-paper-first game-paper-background flex flex-col gap-0 overflow-x-hidden bg-game-canvas p-0 text-game-ink"
+          showHandle={false}
+          className="game-paper-first game-paper-background relative flex flex-col gap-0 overflow-hidden bg-game-canvas p-0 text-game-ink after:pointer-events-none after:absolute after:left-1/2 after:top-2 after:z-30 after:h-1.5 after:w-20 after:-translate-x-1/2 after:rounded-full after:bg-game-border-strong after:content-[''] lg:after:hidden"
         >
           {selectedSpecies &&
             selectedBaseForm &&
@@ -575,9 +576,9 @@ export default function Pokedex() {
 function UnknownPokemonFieldNote({ speciesId }: { speciesId: number }) {
   return (
     <div className="game-page-scroll min-h-0 flex-1 p-5 sm:p-6">
-      <section className="game-panel-raised mx-auto max-w-md p-5 text-center">
-        <div className="mx-auto flex size-24 items-center justify-center rounded-xl border border-dashed border-game-ochre/45 bg-game-ochre/10">
-          <CircleHelp className="size-10 text-game-ochre" aria-hidden="true" />
+      <section className="mx-auto max-w-md space-y-5 text-center">
+        <div className="mx-auto flex size-20 items-center justify-center border-y border-game-ochre/45 text-game-ochre">
+          <CircleHelp className="size-10" aria-hidden="true" />
         </div>
         <p className="game-field-label mt-5">Pokédex #{speciesId}</p>
         <h2 className="mt-2 font-display text-2xl font-semibold text-game-ink">
@@ -588,8 +589,8 @@ function UnknownPokemonFieldNote({ speciesId }: { speciesId: number }) {
           it to complete its measurements, base stats, research notes, and known
           variants.
         </p>
-        <div className="mt-5 grid grid-cols-2 gap-2 text-left">
-          <div className="rounded-lg border border-game-border bg-game-surface p-3">
+        <div className="grid grid-cols-2 divide-x border-y border-game-border/75 text-left">
+          <div className="py-3 pr-3">
             <span className="text-[10px] font-bold uppercase tracking-[0.08em] text-game-muted">
               First step
             </span>
@@ -597,7 +598,7 @@ function UnknownPokemonFieldNote({ speciesId }: { speciesId: number }) {
               Encounter
             </p>
           </div>
-          <div className="rounded-lg border border-game-border bg-game-surface p-3">
+          <div className="py-3 pl-3">
             <span className="text-[10px] font-bold uppercase tracking-[0.08em] text-game-muted">
               Full record
             </span>
@@ -687,7 +688,7 @@ function PokemonCard({
           )}
         </div>
 
-        <div className="text-center w-full space-y-2">
+        <div className="w-full space-y-2 text-center">
           <h3 className="font-display text-3xl font-semibold text-game-ink">
             {hasSeen ? pokemon.name : '???'}
           </h3>
@@ -714,30 +715,30 @@ function PokemonCard({
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="rounded-lg border border-game-border bg-game-surface p-4">
-            <SectionDivider className="mb-2">Seen</SectionDivider>
-            <div className="flex items-center justify-center gap-2">
-              <Eye className="h-3 w-3 text-game-moss-strong" />
-              <span className="font-mono font-bold text-game-ink">
-                {progress?.totalSeen || 0}
-              </span>
-            </div>
+        <div className="grid grid-cols-2 divide-x divide-game-border/75 border-y border-game-border/75 py-3">
+          <div className="flex items-center justify-center gap-2 px-3">
+            <Eye className="h-3.5 w-3.5 text-game-charcoal-strong" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-game-muted">
+              Seen
+            </span>
+            <span className="font-mono text-sm font-bold text-game-ink">
+              {progress?.totalSeen || 0}
+            </span>
           </div>
-          <div className="rounded-lg border border-game-border bg-game-surface p-4">
-            <SectionDivider className="mb-2">Caught</SectionDivider>
-            <div className="flex items-center justify-center gap-2">
-              <CircleDot className="h-3 w-3 text-game-ochre" />
-              <span className="font-mono font-bold text-game-ink">
-                {progress?.totalCaught || 0}
-              </span>
-            </div>
+          <div className="flex items-center justify-center gap-2 px-3">
+            <CircleDot className="h-3.5 w-3.5 text-game-ochre" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-game-muted">
+              Caught
+            </span>
+            <span className="font-mono text-sm font-bold text-game-ink">
+              {progress?.totalCaught || 0}
+            </span>
           </div>
         </div>
 
         {/* Types & Bio */}
-        <div className="space-y-6">
-          <div className="flex gap-3 justify-center">
+        <div className="space-y-4">
+          <div className="flex justify-center gap-3">
             {hasSeen ? (
               pokemon.types.map((type: string) => {
                 const typeId = typeIdMap[type.toLowerCase()]
@@ -753,48 +754,40 @@ function PokemonCard({
                     />
                   </div>
                 ) : (
-                  <Badge
+                  <span
                     key={type}
-                    variant="secondary"
-                    className="border-game-border bg-game-surface-raised px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-game-ink"
+                    className="text-[11px] font-semibold uppercase tracking-widest text-game-ink"
                   >
                     {type}
-                  </Badge>
+                  </span>
                 )
               })
             ) : (
-              <Badge
-                variant="secondary"
-                className="border-game-border bg-game-surface-raised px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-game-muted"
-              >
+              <span className="text-[11px] font-semibold uppercase tracking-widest text-game-muted">
                 ???
-              </Badge>
+              </span>
             )}
           </div>
 
           {hasCaught && (
-            <div className="flex items-center justify-center gap-12">
-              <div className="flex flex-col items-center gap-1">
-                <span className="text-[11px] font-bold uppercase tracking-widest text-game-muted">
+            <div className="grid grid-cols-2 divide-x divide-game-border/75 border-y border-game-border/75 py-3">
+              <div className="flex items-center justify-center gap-2 px-3">
+                <Ruler className="h-3.5 w-3.5 text-game-charcoal-strong" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-game-muted">
                   Height
                 </span>
-                <div className="flex items-center gap-2">
-                  <Ruler className="h-3 w-3 text-game-moss-strong" />
-                  <span className="font-mono font-bold text-game-ink">
-                    {(pokemon.height / 10).toFixed(1)}m
-                  </span>
-                </div>
+                <span className="font-mono text-sm font-bold text-game-ink">
+                  {(pokemon.height / 10).toFixed(1)}m
+                </span>
               </div>
-              <div className="flex flex-col items-center gap-1">
-                <span className="text-[11px] font-bold uppercase tracking-widest text-game-muted">
+              <div className="flex items-center justify-center gap-2 px-3">
+                <Weight className="h-3.5 w-3.5 text-game-charcoal-strong" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-game-muted">
                   Weight
                 </span>
-                <div className="flex items-center gap-2">
-                  <Weight className="h-3 w-3 text-game-moss-strong" />
-                  <span className="font-mono font-bold text-game-ink">
-                    {(pokemon.weight / 10).toFixed(1)}kg
-                  </span>
-                </div>
+                <span className="font-mono text-sm font-bold text-game-ink">
+                  {(pokemon.weight / 10).toFixed(1)}kg
+                </span>
               </div>
             </div>
           )}
@@ -802,7 +795,7 @@ function PokemonCard({
 
         {/* Capturing completes measurements and battle data. */}
         {!hasCaught && (
-          <div className="rounded-xl border border-game-ochre/35 bg-game-ochre/10 p-4 text-left">
+          <div className="border-l-2 border-game-ochre/60 py-1 pl-3 text-left">
             <p className="game-field-label">Seen in the field</p>
             <p className="mt-2 text-sm leading-relaxed text-game-muted">
               Catch this Pokémon to reveal its measurements, base stats,
@@ -815,7 +808,7 @@ function PokemonCard({
         {hasCaught && (
           <div className="space-y-4">
             <SectionDivider>Base stats</SectionDivider>
-            <div className="space-y-3 rounded-lg border border-game-border bg-game-surface p-4">
+            <div className="divide-y divide-game-border/75">
               {[
                 {
                   label: 'HP',
@@ -848,7 +841,7 @@ function PokemonCard({
                   color: 'bg-game-clay-strong',
                 },
               ].map((stat) => (
-                <div key={stat.label} className="group flex items-center gap-4">
+                <div key={stat.label} className="group flex items-center gap-4 py-2.5">
                   <span className="w-8 text-[11px] font-bold uppercase text-game-muted">
                     {stat.label}
                   </span>
@@ -941,17 +934,17 @@ function VariantSection({
       <p className="text-xs leading-relaxed text-game-muted">
         Rarity treatments obtained for this form.
       </p>
-      <div className="grid grid-cols-4 gap-2 sm:grid-cols-5">
+      <div className="grid grid-cols-4 divide-x divide-game-border/75 border-y border-game-border/75 py-3 sm:grid-cols-5">
         {POKEMON_RARITY_EFFECTS.map((effect) => {
           const obtained = obtainedRarities.has(effect.id)
           return (
             <div
               key={effect.id}
               className={cn(
-                'flex min-h-[76px] flex-col items-center justify-center gap-1 rounded-lg border p-1.5 text-center',
+                'flex min-h-[76px] flex-col items-center justify-center gap-1 px-1.5 text-center',
                 obtained
-                  ? 'border-game-ochre/35 bg-game-surface-raised'
-                  : 'border-game-border bg-game-canvas text-game-muted',
+                  ? 'text-game-ink'
+                  : 'text-game-muted',
               )}
               title={obtained ? effect.label : 'Undiscovered variant'}
             >
@@ -967,12 +960,10 @@ function VariantSection({
                     sizes="40px"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center rounded-md border border-dashed border-game-border bg-game-surface">
-                    <CircleHelp
-                      className="h-4 w-4"
-                      aria-label="Undiscovered variant"
-                    />
-                  </div>
+                  <CircleHelp
+                    className="h-4 w-4"
+                    aria-label="Undiscovered variant"
+                  />
                 )}
               </div>
               <span className="max-w-full truncate text-[9px] font-semibold leading-tight text-game-muted">
@@ -998,15 +989,15 @@ function getPreferredStanceConfig(stance: BattleStance) {
       Icon: STANCE_ICON_CONFIG.speed.Icon,
       label: 'Speed',
       className:
-        'border-game-stance-blue/35 bg-game-stance-blue/10 text-game-stance-blue-strong',
-      barClassName: 'bg-game-stance-blue',
+        'border-game-ochre/35 bg-game-ochre/10 text-game-ochre',
+      barClassName: 'bg-game-ochre',
     },
     tech: {
       Icon: STANCE_ICON_CONFIG.tech.Icon,
       label: 'Tech',
       className:
-        'border-game-moss-strong/30 bg-game-moss-strong/10 text-game-moss-strong',
-      barClassName: 'bg-game-moss-strong',
+        'border-game-stance-blue/35 bg-game-stance-blue/10 text-game-stance-blue-strong',
+      barClassName: 'bg-game-stance-blue',
     },
   }[stance]
 }

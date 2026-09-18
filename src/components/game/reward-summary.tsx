@@ -1,24 +1,23 @@
 import {
   CheckCircle2,
   Coins,
-  FlaskConical,
   Package,
   Search,
   Star,
 } from 'lucide-react'
 import Image from 'next/image'
+import type { HTMLAttributes } from 'react'
 import { PokemonRarityEggSprite } from '@/components/game/shared/PokemonRarityEggSprite'
 import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
-import { Card } from '@/components/ui/card'
 import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { getCurrency } from '@/data/currencies'
-import { items } from '@/data/items'
 import { getSkill } from '@/data/skills'
 import { getIcon } from '@/data/user'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import { getPokemonRarityEffect } from '@/utilities/pokemon/rarity-effects'
 import { RewardSummary } from '@/utilities/rewards/reward-logic'
+import { cn } from '@/lib/utils'
 import { ItemSprite } from '../ui/item-sprite'
 import { SectionDivider } from '../ui/section-divider'
 import { CardRewardCarousel } from './card-reward-carousel'
@@ -29,6 +28,25 @@ const TITLE_REWARD_SPRITE = '/sprites/items/certificate.avif'
 interface RewardSummaryDisplayProps {
   summary: RewardSummary
   title?: string
+}
+
+function RewardLedgerRow({
+  className,
+  children,
+  ...props
+}: HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      {...props}
+      className={cn(
+        'flex min-h-12 items-center gap-3 border-b border-game-border/75 py-2 last:border-b-0',
+        '!rounded-none !border-x-0 !border-t-0 !bg-transparent !shadow-none',
+        className,
+      )}
+    >
+      {children}
+    </div>
+  )
 }
 
 export function RewardSummaryDisplay({
@@ -60,13 +78,13 @@ export function RewardSummaryDisplay({
     <div className="space-y-6 p-4">
       <SectionDivider>{title}</SectionDivider>
 
-      <div className="space-y-4">
+      <div className="space-y-0">
         {/* Main Rewards Grid */}
-        <div className="grid grid-cols-1 gap-2">
+        <div className="grid grid-cols-1">
           {(summary.eggs || []).map((egg) => {
             const rarity = getPokemonRarityEffect(egg.rarity)
             return (
-              <Card key={egg.id} className="h-12 border-game-moss/35 bg-game-moss/10 p-2 flex-row items-center gap-3">
+              <RewardLedgerRow key={egg.id} className="flex-row">
                 <PokemonRarityEggSprite
                   rarity={egg.rarity}
                   alt={`${rarity.label} Pokemon Egg`}
@@ -75,7 +93,7 @@ export function RewardSummaryDisplay({
                   sizes="28px"
                 />
                 <div><p className="text-sm font-semibold text-game-ink">{egg.rarity === 'normal' ? 'Egg found' : `${rarity.label} Egg found`}</p><p className="text-xs text-game-muted">Ready to hatch in 12 hours</p></div>
-              </Card>
+              </RewardLedgerRow>
             )
           })}
           {/* XP */}
@@ -85,11 +103,11 @@ export function RewardSummaryDisplay({
             const iconId = skill?.iconId
 
             return (
-              <Card
+              <RewardLedgerRow
                 key={`xp-${skillId}`}
                 className="p-2 bg-game-surface-raised border-game-border flex-row items-center gap-3 h-12"
               >
-                <div className="w-8 h-8 rounded-lg bg-game-canvas flex items-center justify-center flex-shrink-0">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center">
                   {iconId ? (
                     iconId.match(/\.(?:avif|png|webp|jpe?g)$/) ? (
                       <div className="w-5 h-5 relative">
@@ -122,7 +140,7 @@ export function RewardSummaryDisplay({
                     +{amount} XP
                   </span>
                 </div>
-              </Card>
+              </RewardLedgerRow>
             )
           })}
 
@@ -130,11 +148,11 @@ export function RewardSummaryDisplay({
           {(summary.currency || []).map((curr, i) => {
             const currencyDef = getCurrency(curr.type)
             return (
-              <Card
+              <RewardLedgerRow
                 key={`curr-${i}`}
                 className="p-2 bg-game-surface-raised border-game-border flex-row items-center gap-3 h-12"
               >
-                <div className="w-8 h-8 rounded-lg bg-game-canvas flex items-center justify-center text-game-ochre flex-shrink-0">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center text-game-ochre">
                   {currencyDef ? (
                     <CurrencySprite
                       currencyId={curr.type}
@@ -159,7 +177,7 @@ export function RewardSummaryDisplay({
                     {curr.quantity > 0 ? `x${curr.quantity}` : curr.quantity}
                   </span>
                 </div>
-              </Card>
+              </RewardLedgerRow>
             )
           })}
 
@@ -169,13 +187,13 @@ export function RewardSummaryDisplay({
               notice.id !== 'random-event-spawned' && Boolean(notice.message)
 
             return (
-              <Card
+              <RewardLedgerRow
                 key={`notice-${notice.id}-${i}`}
                 className={`p-2 bg-game-surface-raised border-game-border flex-row items-center gap-3 ${
                   showMessage ? 'min-h-12' : 'h-12'
                 }`}
               >
-                <div className="game-icon-orb h-8 w-8 shrink-0 border-game-ochre/35 text-game-ochre">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center text-game-ochre">
                   {notice.icon ? (
                     <TaskIconDisplay icon={notice.icon} className="h-6 w-6" />
                   ) : (
@@ -192,19 +210,18 @@ export function RewardSummaryDisplay({
                     </div>
                   )}
                 </div>
-              </Card>
+              </RewardLedgerRow>
             )
           })}
 
           {/* Items */}
           {(summary.items || []).map((item, i) => {
-            const itemDef = items.find((def) => def.id === item.id)
             return (
-              <Card
+              <RewardLedgerRow
                 key={`item-${i}`}
                 className="p-2 bg-game-surface-raised border-game-border flex-row items-center gap-3 h-12"
               >
-                <div className="w-8 h-8 relative flex-shrink-0 bg-game-canvas rounded-lg p-0.5">
+                <div className="relative flex h-8 w-8 shrink-0 items-center justify-center">
                   <ItemSprite
                     itemId={item.id}
                     alt={item.name}
@@ -221,7 +238,7 @@ export function RewardSummaryDisplay({
                     x{item.quantity}
                   </span>
                 </div>
-              </Card>
+              </RewardLedgerRow>
             )
           })}
 
@@ -232,11 +249,11 @@ export function RewardSummaryDisplay({
 
           {/* Pokemon */}
           {(summary.pokemon || []).map((p, i) => (
-            <Card
+            <RewardLedgerRow
               key={`poke-${i}`}
               className="p-2 bg-game-surface-raised border-game-border flex-row items-center gap-3 h-12"
             >
-              <div className="w-8 h-8 relative flex-shrink-0 bg-game-canvas rounded-lg p-0.5">
+              <div className="relative flex h-8 w-8 shrink-0 items-center justify-center">
                 <PokemonRaritySprite
                   formId={p.speciesId}
                   view="front"
@@ -259,12 +276,12 @@ export function RewardSummaryDisplay({
                   Lvl {p.level}
                 </span>
               </div>
-            </Card>
+            </RewardLedgerRow>
           ))}
 
           {(summary.sketchedMoves || []).map((move, i) => (
-            <Card key={`sketched-move-${i}`} className="h-12 flex-row items-center gap-3 border-game-ochre/40 bg-game-ochre/10 p-2">
-              <div className="game-icon-orb h-8 w-8 shrink-0 border-game-ochre/35 text-game-ochre">
+            <RewardLedgerRow key={`sketched-move-${i}`} className="flex-row">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center text-game-ochre">
                 <Image
                   src={getPokemonImageUrl('235', 'sprite')}
                   alt="Smeargle"
@@ -277,16 +294,16 @@ export function RewardSummaryDisplay({
                 <span className="truncate text-sm font-medium text-game-ink">{move.name}</span>
                 <span className="text-xs font-bold text-game-ochre">Sketched</span>
               </div>
-            </Card>
+            </RewardLedgerRow>
           ))}
 
           {/* Tasks Completed */}
           {summary.tasksCompleted?.map((task, i) => (
-            <Card
+            <RewardLedgerRow
               key={`task-${i}`}
               className="p-2 bg-game-surface-raised border-game-border flex-row items-center gap-3 h-12"
             >
-              <div className="w-8 h-8 rounded-lg bg-game-canvas flex items-center justify-center text-game-moss-strong flex-shrink-0">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center text-game-moss-strong">
                 <CheckCircle2 className="w-4 h-4" />
               </div>
               <div className="flex-1 flex items-center justify-between min-w-0 pr-2">
@@ -297,16 +314,16 @@ export function RewardSummaryDisplay({
                   Completed
                 </span>
               </div>
-            </Card>
+            </RewardLedgerRow>
           ))}
 
           {/* Banners */}
           {summary.banners?.map((banner, i) => (
-            <Card
+            <RewardLedgerRow
               key={`banner-${i}`}
               className="p-2 bg-game-surface-raised border-game-border flex-row items-center gap-3 h-12"
             >
-              <div className="game-icon-orb relative h-8 w-8 shrink-0 p-0.5">
+              <div className="relative flex h-8 w-8 shrink-0 items-center justify-center p-0.5">
                 <Image
                   src={BACKGROUND_REWARD_SPRITE}
                   alt="Background award"
@@ -323,16 +340,16 @@ export function RewardSummaryDisplay({
                   Unlocked
                 </span>
               </div>
-            </Card>
+            </RewardLedgerRow>
           ))}
 
           {/* Icons */}
           {summary.icons?.map((icon, i) => (
-            <Card
+            <RewardLedgerRow
               key={`icon-${i}`}
               className="p-2 bg-game-surface-raised border-game-border flex-row items-center gap-3 h-12"
             >
-              <div className="w-8 h-8 relative rounded-lg bg-game-canvas flex items-center justify-center flex-shrink-0 p-0.5">
+              <div className="relative flex h-8 w-8 shrink-0 items-center justify-center p-0.5">
                 <TaskIconDisplay
                   icon={
                     getIcon(icon.id)?.icon || {
@@ -351,16 +368,16 @@ export function RewardSummaryDisplay({
                   Unlocked
                 </span>
               </div>
-            </Card>
+            </RewardLedgerRow>
           ))}
 
           {/* Titles */}
           {summary.titles?.map((titleItem, i) => (
-            <Card
+            <RewardLedgerRow
               key={`title-${i}`}
               className="p-2 bg-game-surface-raised border-game-border flex-row items-center gap-3 h-12"
             >
-              <div className="w-8 h-8 relative rounded-lg bg-game-canvas flex items-center justify-center flex-shrink-0 p-0.5">
+              <div className="relative flex h-8 w-8 shrink-0 items-center justify-center p-0.5">
                 <Image
                   src={TITLE_REWARD_SPRITE}
                   alt="Title certificate"
@@ -377,16 +394,16 @@ export function RewardSummaryDisplay({
                   Unlocked
                 </span>
               </div>
-            </Card>
+            </RewardLedgerRow>
           ))}
 
           {/* Upgrades */}
           {summary.upgrades?.map((upgrade, i) => (
-            <Card
+            <RewardLedgerRow
               key={`upgrade-${i}`}
               className="p-2 bg-game-surface-raised border-game-border flex-row items-center gap-3 h-12"
             >
-              <div className="w-8 h-8 rounded-lg bg-game-canvas flex items-center justify-center text-game-moss-strong flex-shrink-0">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center text-game-moss-strong">
                 <Package className="w-4 h-4" />
               </div>
               <div className="flex-1 flex items-center justify-between min-w-0 pr-2">
@@ -397,16 +414,16 @@ export function RewardSummaryDisplay({
                   +{upgrade.value}
                 </span>
               </div>
-            </Card>
+            </RewardLedgerRow>
           ))}
 
           {/* Research XP */}
           {(summary.researchXp || []).map((res, i) => (
-            <Card
+            <RewardLedgerRow
               key={`research-xp-${i}`}
               className="h-12 flex-row items-center gap-2 border-game-border bg-game-surface-raised p-2 sm:gap-3"
             >
-              <div className="w-8 h-8 relative flex-shrink-0 bg-game-canvas rounded-lg p-0.5">
+              <div className="relative flex h-8 w-8 shrink-0 items-center justify-center p-0.5">
                 <Image
                   src={getPokemonImageUrl(res.formId, 'sprite')}
                   alt={res.formName}
@@ -423,16 +440,16 @@ export function RewardSummaryDisplay({
                   +{res.amount} XP
                 </span>
               </div>
-            </Card>
+            </RewardLedgerRow>
           ))}
 
           {/* Research Breakthroughs */}
           {(summary.researchBreakthroughs || []).map((b, i) => (
-            <Card
+            <RewardLedgerRow
               key={`research-break-${i}`}
               className="p-2 bg-game-surface-raised border-game-moss/35 flex-row items-center gap-3 min-h-12"
             >
-              <div className="w-8 h-8 relative flex-shrink-0 bg-game-moss/10 rounded-lg p-0.5 border border-game-moss/30">
+              <div className="relative flex h-8 w-8 shrink-0 items-center justify-center p-0.5">
                 <Image
                   src={getPokemonImageUrl(b.formId, 'sprite')}
                   alt={b.pokemonName}
@@ -449,7 +466,7 @@ export function RewardSummaryDisplay({
                   LVL {b.newLevel}
                 </span>
               </div>
-            </Card>
+            </RewardLedgerRow>
           ))}
           {/* Level Up */}
           {summary.levelUp &&
@@ -459,8 +476,8 @@ export function RewardSummaryDisplay({
               const iconId = skill?.iconId
 
               return (
-                <Card className="p-2 bg-game-surface-raised border-game-border flex-row items-center gap-3 h-12 mt-2">
-                  <div className="w-8 h-8 rounded-lg bg-game-canvas flex items-center justify-center flex-shrink-0 border border-game-moss/30">
+                <RewardLedgerRow className="mt-2 flex-row">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center">
                     {iconId ? (
                       iconId.match(/\.(?:avif|png|webp|jpe?g)$/) ? (
                         <div className="w-5 h-5 relative">
@@ -500,7 +517,7 @@ export function RewardSummaryDisplay({
                       </span>
                     </div>
                   </div>
-                </Card>
+                </RewardLedgerRow>
               )
             })()}
         </div>

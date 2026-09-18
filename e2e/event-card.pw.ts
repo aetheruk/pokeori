@@ -17,11 +17,11 @@ for (const width of [390, 1280]) {
     await panel.getByText('Adventure 7', { exact: true }).scrollIntoViewIfNeeded()
     await expect(panel.getByText('Adventure 7', { exact: true })).toBeInViewport()
     await page.screenshot({ path: `/tmp/events-panel-${width}.png` })
-    await panel.getByRole('button', { name: 'Close', exact: true }).click()
+    await page.keyboard.press('Escape')
     await expect(panel).toHaveCount(0)
     await page.goto('/ui-test/event-card?event=event-7')
     await expect(page.getByRole('dialog').getByText('Adventure 7', { exact: true })).toBeInViewport()
-    await page.getByRole('dialog').getByRole('button', { name: 'Close', exact: true }).click()
+    await page.keyboard.press('Escape')
     await expect(page.getByRole('dialog')).toHaveCount(0)
   })
 }

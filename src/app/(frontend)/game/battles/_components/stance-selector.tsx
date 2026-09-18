@@ -59,10 +59,10 @@ export function StanceSelector({
       label: 'SPEED',
       value: speedVal,
       icon: STANCE_ICON_CONFIG.speed.Icon,
-      surfaceTone: 'border-game-stance-blue-strong bg-game-stance-blue-strong',
-      iconTone: 'text-game-stance-blue',
+      surfaceTone: 'border-game-ochre bg-game-ochre',
+      iconTone: 'text-game-cream',
       hoverTone:
-        'hover:border-game-stance-blue hover:bg-game-stance-blue-strong',
+        'hover:border-game-ochre hover:bg-game-ochre',
     },
     {
       stance: 'power',
@@ -78,9 +78,10 @@ export function StanceSelector({
       label: 'TECH',
       value: techVal,
       icon: STANCE_ICON_CONFIG.tech.Icon,
-      surfaceTone: 'border-game-moss-strong bg-game-moss-strong',
-      iconTone: 'text-game-moss',
-      hoverTone: 'hover:border-game-moss hover:bg-game-moss-strong',
+      surfaceTone: 'border-game-stance-blue-strong bg-game-stance-blue-strong',
+      iconTone: 'text-game-stance-blue',
+      hoverTone:
+        'hover:border-game-stance-blue hover:bg-game-stance-blue-strong',
     },
   ]
 

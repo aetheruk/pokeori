@@ -1,8 +1,6 @@
 'use client'
 
-import { Loader2 } from 'lucide-react'
 import { MoveBattleCommand, MoveFieldNote } from '@/components/game/moves'
-import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { SectionDivider } from '@/components/ui/section-divider'
@@ -82,18 +80,9 @@ export function BattleMovesContent({
                   key={move.id}
                   presentation={getBattleMovePresentation(move, pokemon, state, selectedType)}
                   onDetails={() => onDetails(move.id)}
-                  primaryAction={
-                    <Button
-                      type="button"
-                      className="h-11 min-w-14 px-3"
-                      disabled={disabled || !!using}
-                      onClick={() => onUseMove(move.id)}
-                      aria-label={`Use ${move.name}`}
-                    >
-                      {using === move.id ? <Loader2 className="size-4 animate-spin" /> : null}
-                      Use
-                    </Button>
-                  }
+                  onSelect={() => onUseMove(move.id)}
+                  disabled={disabled || !!using}
+                  pending={using === move.id}
                 />
               ))}
             </div>

@@ -863,7 +863,7 @@ export function PokemonList({
         tabIndex={isCardInteractive ? 0 : undefined}
         aria-label={isCardInteractive ? name : undefined}
         className={cn(
-          'game-focus-ring group relative aspect-square flex items-center justify-center border border-game-card-border bg-game-surface-raised p-1.5 transition-colors',
+          'game-focus-ring group relative aspect-square flex items-center justify-center overflow-hidden border border-game-card-border bg-game-surface-raised p-1.5 transition-colors',
           pokemon.locked
             ? 'bg-game-danger/10'
             : 'hover:border-game-moss/45 hover:bg-game-surface',
@@ -993,7 +993,7 @@ export function PokemonList({
         {pokemonBackground && (
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-3 overflow-hidden rounded-lg border border-game-card-border/70 bg-game-surface shadow-md"
+            className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-[inherit] bg-game-surface"
           >
             <Image
               src={pokemonBackground}
