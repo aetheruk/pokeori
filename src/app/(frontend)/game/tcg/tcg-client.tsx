@@ -21,7 +21,6 @@ import {
 } from 'react'
 import { useInView } from 'react-intersection-observer'
 import {
-  DexCountSummary,
   DexEmptyState,
   DexFilterBar,
   DexPageShell,
@@ -142,9 +141,6 @@ export default function TcgExplorerPage({
     initialCatalog?.items || [],
   )
   const [catalogTotal, setCatalogTotal] = useState(initialCatalog?.total || 0)
-  const [catalogOwnedTotal, setCatalogOwnedTotal] = useState(
-    initialCatalog?.ownedTotal || 0,
-  )
   const [nextCursor, setNextCursor] = useState<string | null>(
     initialCatalog?.nextCursor || null,
   )
@@ -292,7 +288,6 @@ export default function TcgExplorerPage({
     if (!catalogUrl) {
       setCatalogCards([])
       setCatalogTotal(0)
-      setCatalogOwnedTotal(0)
       setNextCursor(null)
       return
     }
@@ -307,7 +302,6 @@ export default function TcgExplorerPage({
       .then((result: CatalogResponse<CatalogCard>) => {
         setCatalogCards(result.items || [])
         setCatalogTotal(result.total || 0)
-        setCatalogOwnedTotal(result.ownedTotal || 0)
         setNextCursor(result.nextCursor)
       })
       .catch((error) => {
@@ -486,6 +480,7 @@ export default function TcgExplorerPage({
       id: 'all',
       label:
         scope.series === 'all' ? 'All unlocked sets' : `All ${scope.series}`,
+      icon: <Layers3 className="size-4 shrink-0 text-game-muted" aria-hidden="true" />,
     },
     ...sets
       .filter((set) => scope.series === 'all' || set.series === scope.series)
@@ -493,13 +488,15 @@ export default function TcgExplorerPage({
         id: set.id,
         label:
           scope.series === 'all' ? `${set.series} · ${set.name}` : set.name,
+        icon: <TcgSetMark setId={set.id} kind="symbol" className="size-7 shrink-0" />,
       })),
   ]
   const seriesOptions = [
-    { id: 'all', label: 'All series' },
+    { id: 'all', label: 'All series', icon: <Library className="size-4 shrink-0 text-game-muted" aria-hidden="true" /> },
     ...seriesGroups.map((group) => ({
       id: group.series,
       label: `${group.series} · ${group.sets.length}`,
+      icon: group.sets[0] ? <TcgSetMark setId={group.sets[0].id} kind="logo" className="h-7 w-10 shrink-0" /> : undefined,
     })),
   ]
   const selectedCardIndex = selectedCard
@@ -635,30 +632,9 @@ export default function TcgExplorerPage({
       </DexFilterBar>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 md:px-6">
-        {sets.length > 0 && (
-          <CarddexBinderShelf
-            seriesGroups={seriesGroups}
-            progressBySet={progressBySet}
-            scope={scope}
-            onSelectSeries={selectSeries}
-            onSelectSet={selectSet}
-          />
-        )}
-
         <div className="mb-4 mt-5">
           <SectionDivider className="mb-0 flex-1">
             {scopeTitle}
-            <DexCountSummary
-              className="ml-2 inline"
-              count={catalogTotal}
-              singular="card"
-              plural="cards"
-              detail={
-                collectionLoading || catalogLoading
-                  ? 'Checking collection…'
-                  : `${catalogOwnedTotal} collected in results`
-              }
-            />
           </SectionDivider>
           {scopeProgress.total > 0 && (
             <div className="mt-2 flex items-center gap-3 text-xs text-game-muted">

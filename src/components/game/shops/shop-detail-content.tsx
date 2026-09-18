@@ -3,7 +3,6 @@
 import { useState, useRef } from 'react'
 import { ShopConfig } from '@/data/shops/types'
 import { useUser } from '@/context/UserContext'
-import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -18,7 +17,6 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Loader2, ShoppingBag } from 'lucide-react'
 import { SectionDivider } from '@/components/ui/section-divider'
-import Image from 'next/image'
 import { toast } from 'sonner'
 import { purchaseShopItem, PurchaseItemResult } from '@/utilities/shops/actions'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
@@ -188,10 +186,7 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
         <SectionDivider>AVAILABLE ITEMS</SectionDivider>
 
         {shopCurrencyBalances.length > 0 && (
-          <div className="game-panel flex flex-wrap items-center gap-2 px-3 py-2">
-            <span className="text-[10px] font-black uppercase tracking-widest text-game-muted">
-              Owned
-            </span>
+          <div className="game-panel flex flex-wrap items-center justify-end gap-2 px-3 py-2">
             {shopCurrencyBalances.map(({ currency, id, amount }) => (
               <div
                 key={id}
@@ -199,7 +194,6 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
               >
                 <CurrencySprite currencyId={currency!.id} width={16} height={16} />
                 <span className="text-game-ink">{amount.toLocaleString()}</span>
-                <span className="text-game-muted">{currency!.name}</span>
               </div>
             ))}
           </div>
@@ -226,13 +220,20 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
             }
 
             return (
-              <div
+              <button
+                type="button"
                 key={item.id}
+                disabled={outOfStock || !canAfford || purchasingItem === item.id}
+                onClick={() => requestBuy(item)}
+                aria-label={`Buy ${item.name}`}
+                title={`Buy ${item.name}`}
                 className={cn(
-                  'group relative flex items-center gap-4 overflow-hidden rounded-lg border bg-game-surface p-3 transition-colors',
+                  'group relative flex items-center gap-4 overflow-hidden rounded-lg border bg-game-surface p-3 text-left transition-colors',
                   outOfStock
                     ? 'border-game-danger/30 bg-game-canvas grayscale'
-                    : 'border-game-border hover:border-game-moss/45 hover:bg-game-surface-raised',
+                    : canAfford
+                      ? 'border-game-border hover:border-game-moss/45 hover:bg-game-surface-raised'
+                      : 'border-game-border opacity-70',
                 )}
               >
                 <div className="relative shrink-0">
@@ -260,7 +261,7 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
                     )}
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-1.5">
+                  <div className="flex flex-wrap items-center justify-end gap-1.5">
                     {item.cost.map((c, idx) => (
                       <div
                         key={idx}
@@ -271,11 +272,17 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
                             : 'border-game-danger/20 bg-game-danger/5 text-game-danger',
                         )}
                       >
+                        {c.type === 'currency' ? (
+                          <CurrencySprite
+                            currencyId={c.id}
+                            width={16}
+                            height={16}
+                          />
+                        ) : (
+                          <ShoppingBag className="size-3.5" aria-hidden="true" />
+                        )}
                         <span className={cn(canAfford ? 'text-game-ink' : 'text-game-danger')}>
                           {c.amount}
-                        </span>
-                        <span>
-                          {c.type === 'currency' ? getCurrency(c.id)?.name || c.id : 'Items'}
                         </span>
                       </div>
                     ))}
@@ -294,27 +301,19 @@ export function ShopDetailContent({ shop }: ShopDetailContentProps) {
                   </div>
                 </div>
 
-                <Button
-                  disabled={outOfStock || !canAfford || purchasingItem === item.id}
-                  onClick={() => requestBuy(item)}
-                  aria-label={`Buy ${item.name}`}
-                  title={`Buy ${item.name}`}
-                  className={cn(
-                    'relative h-10 shrink-0 overflow-hidden rounded-lg px-4 text-xs font-black uppercase tracking-widest transition-colors',
-                    canAfford && !outOfStock
-                      ? 'bg-game-clay text-game-cream hover:bg-game-clay/90'
-                      : 'border border-game-border bg-game-surface-raised text-game-muted',
+                <div className={cn(
+                  'relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border',
+                  canAfford && !outOfStock
+                    ? 'border-game-clay bg-game-clay text-game-cream'
+                    : 'border-game-border bg-game-surface-raised text-game-muted',
+                )}>
+                  {purchasingItem === item.id ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <ShoppingBag className="size-4" />
                   )}
-                >
-                  <div className="relative z-10 flex items-center gap-2">
-                    {purchasingItem === item.id ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <ShoppingBag className="w-4 h-4" />
-                    )}
-                  </div>
-                </Button>
-              </div>
+                </div>
+              </button>
             )
           })}
 

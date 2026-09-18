@@ -81,6 +81,7 @@ import {
   getMoveTypeSpriteItemId,
 } from '@/utilities/pokemon/move-display'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
+import { getPokemonPokedexBackground } from '@/utilities/pokemon/pokemon-background'
 import {
   POKEMON_RARITY_EFFECTS,
   type PokemonRarityId,
@@ -124,28 +125,9 @@ const typeIdMap: Record<string, number> = {
   shadow: 10002,
 }
 
-const POKEDEX_HABITAT_BACKGROUNDS: Record<string, string> = {
-  cave: '/backgrounds/cave.avif',
-  forest: '/backgrounds/forest.avif',
-  grassland: '/backgrounds/grassy-route.avif',
-  mountain: '/backgrounds/mountain-sky.avif',
-  rare: '/backgrounds/crystal-stadium.avif',
-  'rough terrain': '/backgrounds/rocky-path.avif',
-  sea: '/backgrounds/epic-ocean.avif',
-  urban: '/backgrounds/modern-city.avif',
-  "water's edge": '/backgrounds/pond.avif',
-}
-
 const ALL_POKEDEX_MOVES_BY_ID = Object.fromEntries(
   getAllMoves().map((move) => [move.id, move]),
 )
-
-function getPokedexHabitatBackground(habitat?: string) {
-  const key = habitat?.toLowerCase().trim()
-  return key
-    ? POKEDEX_HABITAT_BACKGROUNDS[key] || '/backgrounds/pokedex.avif'
-    : '/backgrounds/pokedex.avif'
-}
 
 // Pre-compute all types at module level (static data)
 const ALL_POKEMON_TYPES = (() => {
@@ -625,7 +607,7 @@ function PokemonCard({
   const hasSeen = discoveryAccess.identity
   const hasCaught = discoveryAccess.stats
   const hasGenderToggle = hasSeen && species.has_gender_differences
-  const habitatBackground = getPokedexHabitatBackground(
+  const habitatBackground = getPokemonPokedexBackground(
     hasSeen ? species.habitat : undefined,
   )
   const [displayGender, setDisplayGender] = useState<'male' | 'female'>('male')
@@ -1529,6 +1511,7 @@ function PokedexGridCell({
       <PokedexGridItem
         speciesId={entry.id}
         baseForm={baseForm}
+        habitat={entry.habitat}
         baseProgress={entriesByForm[baseForm.id]}
         isSelected={selectedSpeciesId === entry.id}
         onSelect={onSelect}
@@ -1541,12 +1524,14 @@ function PokedexGridCell({
 const PokedexGridItem = memo(function PokedexGridItem({
   speciesId,
   baseForm,
+  habitat,
   baseProgress,
   isSelected,
   onSelect,
 }: {
   speciesId: number
   baseForm: PokemonForm
+  habitat?: string
   baseProgress?: {
     seen?: boolean | null
     caught?: boolean | null
@@ -1567,6 +1552,7 @@ const PokedexGridItem = memo(function PokedexGridItem({
   const isMaxLevel = researchLevel >= MAX_RESEARCH_LEVEL
   const canLevelUp =
     getMaxResearchLevelForXp(researchXp) > researchLevel && !isMaxLevel
+  const habitatBackground = getPokemonPokedexBackground(habitat)
 
   return (
     <button
@@ -1590,6 +1576,13 @@ const PokedexGridItem = memo(function PokedexGridItem({
             : 'border-game-border bg-game-surface hover:border-game-moss/40 hover:bg-game-surface-raised'
       } ${baseProgress?.caught && !canLevelUp && !isSelected ? 'border-game-moss/25 bg-game-moss/5' : ''}`}
     >
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-80"
+        style={{
+          backgroundImage: `linear-gradient(to bottom, rgba(23,39,51,0.06), rgba(239,228,207,0.34) 58%, var(--game-canvas) 100%), url(${habitatBackground})`,
+        }}
+      />
       <div className="relative w-full h-full p-1.5">
         {hasSeen ? (
           <Image

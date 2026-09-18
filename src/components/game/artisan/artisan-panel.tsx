@@ -3,7 +3,6 @@
 import {
   Gauge,
   Hammer,
-  Info,
   Loader2,
   Lock,
   MousePointer2,
@@ -2059,22 +2058,6 @@ export function ArtisanPanel() {
                         </div>
                       </div>
 
-                      <div className="relative z-10 flex shrink-0 items-center gap-1">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon-sm"
-                          onClick={(event) => {
-                            event.stopPropagation()
-                            setSelectedRecipeGroup(group)
-                          }}
-                          className="h-10 w-10 rounded-lg border border-game-border bg-game-surface-raised text-game-ink hover:bg-game-canvas hover:text-game-ink"
-                          aria-label={`View ${group.name}`}
-                          title={`View ${group.name}`}
-                        >
-                          <Info className="h-4 w-4 text-game-ink" />
-                        </Button>
-                      </div>
                     </div>
                   )
                 }
@@ -2135,20 +2118,6 @@ export function ArtisanPanel() {
                     </div>
 
                     <div className="relative z-10 flex shrink-0 items-center gap-1">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon-sm"
-                        onClick={(event) => {
-                          event.stopPropagation()
-                          setSelectedRecipe(recipe)
-                        }}
-                        className="h-10 w-10 rounded-lg border border-game-border bg-game-surface-raised text-game-ink hover:bg-game-canvas hover:text-game-ink"
-                        aria-label={`View ${recipe.name}`}
-                        title={`View ${recipe.name}`}
-                      >
-                        <Info className="h-4 w-4 text-game-ink" />
-                      </Button>
                       <Button
                         type="button"
                         size="icon-sm"

@@ -61,7 +61,7 @@ describe('Carddex view state', () => {
     })
   })
 
-  test('resolves set URLs, series URLs, and a newest-set fallback', () => {
+  test('resolves set URLs, series URLs, and an all-sets fallback', () => {
     expect(resolveCarddexScope({ sets: SETS, requestedSetId: 'new1' })).toEqual(
       { series: 'New Series', setId: 'new1' },
     )
@@ -69,8 +69,8 @@ describe('Carddex view state', () => {
       resolveCarddexScope({ sets: SETS, requestedSeries: 'Old Series' }),
     ).toEqual({ series: 'Old Series', setId: 'all' })
     expect(resolveCarddexScope({ sets: SETS })).toEqual({
-      series: 'New Series',
-      setId: 'new2',
+      series: 'all',
+      setId: 'all',
     })
     expect(
       getCarddexScopedSets(SETS, { series: 'New Series', setId: 'all' }).map(

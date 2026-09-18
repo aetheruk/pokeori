@@ -50,7 +50,7 @@ export function CategoryTabs({
                 title={regionKey}
                 icon={
                   regionData.icon ? (
-                    <TaskIconDisplay icon={regionData.icon} className="h-8 w-8" />
+                    <TaskIconDisplay icon={regionData.icon} className="h-10 w-10" />
                   ) : undefined
                 }
                 iconPosition={regionData.icon ? 'left' : 'right'}

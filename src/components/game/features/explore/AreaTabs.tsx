@@ -56,7 +56,7 @@ export function AreaTabs({
                     subRegionData?.icon ? (
                       <TaskIconDisplay
                         icon={subRegionData.icon}
-                        className="h-8 w-8"
+                        className="h-10 w-10"
                       />
                     ) : undefined
                   }

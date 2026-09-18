@@ -72,7 +72,7 @@ export function ScenicChoiceCard({
         )}
       >
         {icon && (
-          <span className="game-icon-orb game-icon-orb-art flex size-10 shrink-0 text-game-charcoal-strong md:size-11">
+          <span className="game-icon-orb game-icon-orb-art flex size-14 shrink-0 text-game-charcoal-strong">
             {icon}
           </span>
         )}
