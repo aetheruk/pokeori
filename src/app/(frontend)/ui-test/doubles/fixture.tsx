@@ -8,14 +8,20 @@ import {
 } from '@/app/(frontend)/game/battles/_components/battle-context'
 import { BattleLog } from '@/app/(frontend)/game/battles/_components/battle-log'
 import { BattleScene } from '@/app/(frontend)/game/battles/_components/battle-scene'
-import { BattleSurrenderButton } from '@/app/(frontend)/game/battles/_components/battle-surrender-button'
 import { useBattleManager } from '@/utilities/battle/engine/useBattleManager'
-import type { BattleInventoryItem, BattlePokemon, BattleState } from '@/utilities/battle/types'
+import type {
+  BattleInventoryItem,
+  BattlePokemon,
+  BattleState,
+} from '@/utilities/battle/types'
 import type {
   DoublesAction,
   DoublesTarget,
 } from '@/utilities/battle/doubles-state'
-import { getDefaultDoublesTarget, stageDoublesAction } from '@/utilities/battle/doubles-state'
+import {
+  getDefaultDoublesTarget,
+  stageDoublesAction,
+} from '@/utilities/battle/doubles-state'
 
 function pokemon(
   id: string,
@@ -109,8 +115,18 @@ const initialState: BattleState = {
 initialState.playerTeam[0].currentHp = 54
 
 const fixtureItems: BattleInventoryItem[] = [
-  { itemId: 'battle-potion', name: 'Potion', quantity: 3, battleEffect: { type: 'heal', healAmount: 20 } },
-  { itemId: 'revive', name: 'Revive', quantity: 1, battleEffect: { type: 'revive', reviveHpPercent: 50 } },
+  {
+    itemId: 'battle-potion',
+    name: 'Potion',
+    quantity: 3,
+    battleEffect: { type: 'heal', healAmount: 20 },
+  },
+  {
+    itemId: 'revive',
+    name: 'Revive',
+    quantity: 1,
+    battleEffect: { type: 'revive', reviveHpPercent: 50 },
+  },
 ]
 
 export function DoubleBattleUiFixture() {
@@ -131,21 +147,44 @@ export function DoubleBattleUiFixture() {
         ...mon,
         currentHp: index === 0 ? 37 : index === 1 ? 41 : mon.currentHp,
       })),
-      history: [{
-        turn: 2,
-        playerStance: 'power',
-        enemyStance: 'tech',
-        result: 'win',
-        damageDealt: 36,
-        damageTaken: 0,
-        message: 'Smeargle attacked Minun. Skeledirge attacked Plusle.',
-      }, ...initialState.history],
+      history: [
+        {
+          turn: 2,
+          playerStance: 'power',
+          enemyStance: 'tech',
+          result: 'win',
+          damageDealt: 36,
+          damageTaken: 0,
+          message: 'Smeargle attacked Minun. Skeledirge attacked Plusle.',
+        },
+        ...initialState.history,
+      ],
       presentation: {
         sequenceId: 'fixture-double-turn-2',
         turn: 2,
         events: [
-          { type: 'attack', actorSide: 'player', targetSide: 'enemy', actorIndex: 0, targetIndex: 1, damage: 16, hpAfter: 41, attackType: 'normal', message: 'Smeargle attacked Minun.' },
-          { type: 'attack', actorSide: 'player', targetSide: 'enemy', actorIndex: 1, targetIndex: 0, damage: 20, hpAfter: 37, attackType: 'fire', message: 'Skeledirge attacked Plusle.' },
+          {
+            type: 'attack',
+            actorSide: 'player',
+            targetSide: 'enemy',
+            actorIndex: 0,
+            targetIndex: 1,
+            damage: 16,
+            hpAfter: 41,
+            attackType: 'normal',
+            message: 'Smeargle attacked Minun.',
+          },
+          {
+            type: 'attack',
+            actorSide: 'player',
+            targetSide: 'enemy',
+            actorIndex: 1,
+            targetIndex: 0,
+            damage: 20,
+            hpAfter: 37,
+            attackType: 'fire',
+            message: 'Skeledirge attacked Plusle.',
+          },
         ],
       },
     }
@@ -214,14 +253,17 @@ export function DoubleBattleUiFixture() {
             <div className="h-full overflow-hidden">
               <BattleLog logs={manager.battleState.history} />
             </div>
-            <div className="absolute bottom-4 right-4 z-30">
-              <BattleSurrenderButton />
-            </div>
           </div>
         </div>
-        <output data-testid="submitted-doubles-actions" className="sr-only">{JSON.stringify(submittedActions)}</output>
-        <output data-testid="staged-doubles-actions" className="sr-only">{JSON.stringify(doublesDraft)}</output>
-        <output data-testid="doubles-animation-processing" className="sr-only">{String(manager.isProcessing)}</output>
+        <output data-testid="submitted-doubles-actions" className="sr-only">
+          {JSON.stringify(submittedActions)}
+        </output>
+        <output data-testid="staged-doubles-actions" className="sr-only">
+          {JSON.stringify(doublesDraft)}
+        </output>
+        <output data-testid="doubles-animation-processing" className="sr-only">
+          {String(manager.isProcessing)}
+        </output>
       </div>
     </BattleProvider>
   )

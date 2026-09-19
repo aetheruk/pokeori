@@ -33,21 +33,23 @@ const typeIdMap: Record<string, number> = {
 }
 
 import { useBattleContext } from './battle-context'
+import { BattleActionTrigger } from './battle-action-trigger'
 
 type TeamSwapperProps = {
   forced?: boolean
   leadSelection?: boolean
+  actionTrigger?: boolean
+  compact?: boolean
   doublesReplacementSlots?: number[]
   doublesActiveSlots?: readonly (number | null)[]
-  onDoublesReplace?: (
-    slot: 0 | 1,
-    pokemonIndex: number,
-  ) => void | Promise<void>
+  onDoublesReplace?: (slot: 0 | 1, pokemonIndex: number) => void | Promise<void>
 }
 
 export function TeamSwapper({
   forced = false,
   leadSelection = false,
+  actionTrigger = false,
+  compact = false,
   doublesReplacementSlots,
   doublesActiveSlots,
   onDoublesReplace,
@@ -97,12 +99,7 @@ export function TeamSwapper({
     ) {
       setOpen(true)
     }
-  }, [
-    availableSwaps,
-    forced,
-    isDoublesReplacement,
-    replacementSlots.length,
-  ])
+  }, [availableSwaps, forced, isDoublesReplacement, replacementSlots.length])
 
   const handleSwap = async (index: number, doublesSlot?: number) => {
     if (swapping !== null) return
@@ -121,7 +118,10 @@ export function TeamSwapper({
     }
   }
 
-  if (!allowSwapping || (!leadSelection && team.length <= 1)) {
+  if (
+    !allowSwapping ||
+    (!leadSelection && team.length <= 1 && !actionTrigger)
+  ) {
     return null
   }
 
@@ -134,21 +134,34 @@ export function TeamSwapper({
       }}
     >
       <DrawerTrigger asChild>
-        <Button
-          variant="outline"
-          disabled={disabled || availableSwaps === 0}
-          className={cn(
-            forced
-              ? 'flex-1 h-12 gap-2 rounded-xl border border-game-border bg-game-surface-raised text-game-ink shadow-sm transition-colors'
-              : 'size-11 rounded-lg border border-game-border bg-game-surface-raised p-0 text-game-ink shadow-none transition-colors',
-            'hover:border-game-moss/60 hover:bg-game-surface-raised hover:text-game-ink',
-            availableSwaps === 0 && 'opacity-50',
-          )}
-          aria-label={forced ? 'Choose next Pokemon' : 'Switch Pokemon'}
-        >
-          <RefreshCcw className="w-4 h-4" />
-          {forced && (leadSelection ? 'Choose Lead' : 'Choose Next')}
-        </Button>
+        {actionTrigger ? (
+          <BattleActionTrigger
+            icon={<RefreshCcw className="size-5" aria-hidden />}
+            label="Switch"
+            count={availableSwaps > 0 ? `${availableSwaps} ready` : '—'}
+            compact={compact}
+            data-action="switch"
+            data-empty={availableSwaps === 0 || undefined}
+            disabled={disabled || availableSwaps === 0}
+            aria-label="Switch Pokemon"
+          />
+        ) : (
+          <Button
+            variant="outline"
+            disabled={disabled || availableSwaps === 0}
+            className={cn(
+              forced
+                ? 'flex-1 h-12 gap-2 rounded-xl border border-game-border bg-game-surface-raised text-game-ink shadow-sm transition-colors'
+                : 'size-11 rounded-lg border border-game-border bg-game-surface-raised p-0 text-game-ink shadow-none transition-colors',
+              'hover:border-game-moss/60 hover:bg-game-surface-raised hover:text-game-ink',
+              availableSwaps === 0 && 'opacity-50',
+            )}
+            aria-label={forced ? 'Choose next Pokemon' : 'Switch Pokemon'}
+          >
+            <RefreshCcw className="w-4 h-4" />
+            {forced && (leadSelection ? 'Choose Lead' : 'Choose Next')}
+          </Button>
+        )}
       </DrawerTrigger>
       <DrawerContent
         id={swapDrawerContentId}

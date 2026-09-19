@@ -59,7 +59,6 @@ import type { BattlePowersData } from '../powers/powers-data'
 import { BattleActionMenu } from './battle-action-menu'
 import { type BattleContextType, BattleProvider } from './battle-context'
 import { BattleScene } from './battle-scene'
-import { BattleSurrenderButton } from './battle-surrender-button'
 
 interface BattleInterfaceProps {
   initialState: BattleState
@@ -170,8 +169,9 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
   const [selectedDoublesSlot, setSelectedDoublesSlot] = useState<0 | 1>(0)
   const [selectedDoublesTarget, setSelectedDoublesTarget] =
     useState<DoublesTarget>(() => getDefaultDoublesTarget(initialState))
-  const [doublesDraft, setDoublesDraft] =
-    useState<BattleContextType['doublesDraft']>({})
+  const [doublesDraft, setDoublesDraft] = useState<
+    BattleContextType['doublesDraft']
+  >({})
   const [hasPowerKeyItems, setHasPowerKeyItems] = useState(false)
   const [currentResearchBreakthrough, setCurrentResearchBreakthrough] =
     useState<any | null>(null)
@@ -262,7 +262,12 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
 
         if (cancelled) return
 
-        setAvailableMoves((panel.moves||[]).filter(move=>battleState.format==='double'||!getMove(move.id)?.doublesOnly))
+        setAvailableMoves(
+          (panel.moves || []).filter(
+            (move) =>
+              battleState.format === 'double' || !getMove(move.id)?.doublesOnly,
+          ),
+        )
 
         if (panel.powers.success) {
           const d = panel.powers.data
@@ -703,24 +708,43 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
   )
 
   const handleDoublesSubmit = useCallback(
-    (actions:DoublesAction[]) => {
+    (actions: DoublesAction[]) => {
       if (isWaitingForOpponent) return
       return wrapAction(
-        clientActionId => submitBattleActionRequest({kind:'doubles',actions,clientActionId}),
-        {kind:'doubles',label:'Resolving double turn'},
+        (clientActionId) =>
+          submitBattleActionRequest({
+            kind: 'doubles',
+            actions,
+            clientActionId,
+          }),
+        { kind: 'doubles', label: 'Resolving double turn' },
       )
-    },[wrapAction,isWaitingForOpponent],
+    },
+    [wrapAction, isWaitingForOpponent],
   )
   const handleDoublesReplace = useCallback(
-    (slot:0|1,pokemonIndex:number) => wrapAction(
-      clientActionId => submitBattleActionRequest({kind:'doubles-replace',slot,pokemonIndex,clientActionId}),
-      {kind:'swap',label:'Sending in a replacement',pokemonIndex},
-    ),[wrapAction],
+    (slot: 0 | 1, pokemonIndex: number) =>
+      wrapAction(
+        (clientActionId) =>
+          submitBattleActionRequest({
+            kind: 'doubles-replace',
+            slot,
+            pokemonIndex,
+            clientActionId,
+          }),
+        { kind: 'swap', label: 'Sending in a replacement', pokemonIndex },
+      ),
+    [wrapAction],
   )
 
   const handleDoublesChooseAction = useCallback(
     (action: DoublesAction) => {
-      if (isProcessing || isWaitingForServer || isWaitingForOpponent || battleState.status !== 'ongoing')
+      if (
+        isProcessing ||
+        isWaitingForServer ||
+        isWaitingForOpponent ||
+        battleState.status !== 'ongoing'
+      )
         return
       const staged = stageDoublesAction(battleState, doublesDraft, action)
       if (!staged) return
@@ -732,7 +756,14 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
       }
       if (staged.actions) void handleDoublesSubmit(staged.actions)
     },
-    [battleState, doublesDraft, handleDoublesSubmit, isProcessing, isWaitingForServer, isWaitingForOpponent],
+    [
+      battleState,
+      doublesDraft,
+      handleDoublesSubmit,
+      isProcessing,
+      isWaitingForServer,
+      isWaitingForOpponent,
+    ],
   )
 
   const handleDoublesChooseActor = useCallback(
@@ -887,9 +918,6 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
         <div className="game-paper-first relative min-h-0 flex-[24] border-t border-game-border bg-game-surface-raised xl:col-start-2 xl:row-start-1 xl:row-span-2 xl:border-l xl:border-t-0">
           <div className="h-full overflow-hidden">
             <BattleLog logs={battleState.history} />
-          </div>
-          <div className="absolute bottom-4 right-4 z-30">
-            <BattleSurrenderButton />
           </div>
         </div>
       </div>

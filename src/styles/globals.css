@@ -98,6 +98,7 @@
   --game-canvas: #efe4cf;
   --game-surface: #f7efdf;
   --game-surface-raised: #fff8e8;
+  --game-cream: #f7ecd6;
   --game-border: rgb(103 88 62 / 0.2);
   --game-border-strong: rgb(103 88 62 / 0.34);
   --game-card-border: color-mix(in srgb, var(--game-ink) 28%, transparent);
@@ -906,40 +907,128 @@
   }
 }
 
-/* Shared singles/doubles stance controls. Motion confirms a press once. */
+/* Shared singles/doubles stance controls. These are a command deck, not stat cards. */
+.game-battle-command-deck {
+  padding: 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--game-charcoal) 36%, transparent);
+  border-radius: 0.8rem;
+  background: var(--game-charcoal-strong);
+  box-shadow:
+    inset 0 1px 0 rgb(247 236 214 / 0.12),
+    0 5px 0 rgb(29 37 34 / 0.18);
+}
+
+.game-battle-command-header {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 1.35rem;
+  padding: 0 0.3rem 0.45rem;
+  color: var(--game-cream);
+}
+
+.game-battle-command-title,
+.game-battle-command-count {
+  font-size: 0.63rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.game-battle-command-title {
+  color: var(--game-cream);
+}
+
+.game-battle-command-count {
+  color: rgb(247 236 214 / 0.58);
+  letter-spacing: 0.1em;
+}
+
+.game-battle-command-line {
+  height: 1px;
+  flex: 1;
+  background: rgb(247 236 214 / 0.18);
+}
+
+.game-battle-command-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
 .game-battle-stance {
   --battle-stance-accent: var(--game-ochre);
-  --battle-stance-ink: color-mix(in srgb, var(--battle-stance-accent) 74%, var(--game-ink));
-  border-color: color-mix(in srgb, var(--battle-stance-accent) 38%, var(--game-border-strong));
-  border-bottom: 3px solid var(--battle-stance-accent);
-  background-color: color-mix(in srgb, var(--battle-stance-accent) 5%, var(--game-surface-raised));
-  box-shadow: 0 3px 0 color-mix(in srgb, var(--game-ink) 9%, transparent);
+  --battle-stance-fill: #b58a43;
+  --battle-stance-fill-strong: #8f672b;
+  --battle-stance-ink: var(--game-cream);
+  min-height: 8.6rem;
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--battle-stance-fill-strong) 74%, #1d2522);
+  border-radius: 0.55rem;
+  border-bottom: 4px solid var(--battle-stance-fill-strong);
+  background: var(--battle-stance-fill);
+  color: var(--battle-stance-ink);
+  box-shadow:
+    inset 0 1px 0 rgb(255 248 232 / 0.28),
+    0 2px 0 rgb(0 0 0 / 0.22);
+  transition:
+    background-color 140ms ease,
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.game-battle-stance::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 2.2rem;
+  height: 2.2rem;
+  background: rgb(255 248 232 / 0.13);
+  clip-path: polygon(100% 0, 100% 100%, 0 0);
+  content: '';
+  pointer-events: none;
 }
 
 .game-battle-stance[data-stance='power'] {
   --battle-stance-accent: var(--game-clay-strong);
+  --battle-stance-fill: #a94d3c;
+  --battle-stance-fill-strong: #7f332b;
 }
 
 .game-battle-stance[data-stance='tech'] {
   --battle-stance-accent: var(--game-stance-blue-strong);
+  --battle-stance-fill: #416f9d;
+  --battle-stance-fill-strong: #2e5278;
 }
 
 .game-battle-stance:hover:enabled {
-  background-color: color-mix(in srgb, var(--battle-stance-accent) 11%, var(--game-surface-raised));
+  background: color-mix(in srgb, var(--battle-stance-fill) 82%, white);
+  transform: translateY(-1px);
 }
 
 .game-battle-stance:active:enabled,
 .game-battle-stance[data-pending='true'] {
-  box-shadow: 0 0 0 2px var(--battle-stance-accent);
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 1px 0 rgb(255 248 232 / 0.16),
+    0 0 0 2px var(--battle-stance-accent);
+}
+
+.game-battle-stance[data-feedback='true'] {
+  box-shadow:
+    inset 0 1px 0 rgb(255 248 232 / 0.28),
+    0 0 0 2px var(--game-cream),
+    0 2px 0 rgb(0 0 0 / 0.22);
 }
 
 .game-battle-stance[data-z-ready='true'] {
   outline: 2px solid var(--game-ochre);
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
 .game-battle-stance:focus-visible {
-  outline: 2px solid var(--game-charcoal);
+  outline: 2px solid var(--game-cream);
   outline-offset: 4px;
 }
 
@@ -948,18 +1037,335 @@
   color: var(--battle-stance-ink);
 }
 
+.game-battle-stance-icon {
+  color: var(--battle-stance-ink);
+  border: 1px solid rgb(255 248 232 / 0.52);
+  border-radius: 50%;
+  background: rgb(29 37 34 / 0.18);
+  box-shadow: inset 0 1px 0 rgb(255 248 232 / 0.18);
+}
+
 .game-battle-stance-hint {
-  border-color: color-mix(in srgb, var(--battle-stance-accent) 22%, transparent);
+  border-color: rgb(255 248 232 / 0.27);
 }
 
 .game-battle-stance-icon::after {
   position: absolute;
   inset: -5px;
-  border: 1px solid currentColor;
+  border: 2px solid currentColor;
   border-radius: 50%;
   opacity: 0;
   content: '';
   pointer-events: none;
+}
+
+.game-battle-stance-stat {
+  color: var(--battle-stance-ink);
+}
+
+.game-battle-action-strip {
+  padding: 0.35rem;
+  border: 1px solid var(--game-border);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--game-surface-raised) 88%, var(--game-canvas));
+}
+
+.game-battle-utility-trigger {
+  position: relative;
+  overflow: hidden;
+  border-color: var(--game-border-strong);
+  background: linear-gradient(
+    135deg,
+    var(--game-surface-raised),
+    color-mix(in srgb, var(--game-surface-raised) 78%, var(--game-canvas))
+  );
+  color: var(--game-ink);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.7),
+    0 2px 0 rgb(75 62 39 / 0.1);
+  transition:
+    background-color 120ms ease,
+    transform 120ms ease,
+    border-color 120ms ease,
+    opacity 120ms ease;
+}
+
+.game-battle-utility-trigger::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0.2rem;
+  background: var(--game-ochre);
+  content: '';
+  opacity: 0.85;
+}
+
+.game-battle-utility-trigger[data-action='moves']::before {
+  background: var(--game-stance-blue-strong);
+}
+
+.game-battle-utility-trigger[data-action='items']::before,
+.game-battle-utility-trigger[data-action='stance']::before {
+  background: var(--game-ochre);
+}
+
+.game-battle-utility-trigger[data-action='powers']::before,
+.game-battle-utility-trigger[data-action='switch']::before {
+  background: var(--game-moss);
+}
+
+.game-battle-utility-trigger[data-action='flee']::before {
+  background: var(--game-clay);
+}
+
+.game-battle-utility-trigger:hover:enabled {
+  border-color: var(--game-charcoal);
+  background: var(--game-surface-raised);
+  color: var(--game-ink);
+  transform: translateY(-1px);
+}
+
+.game-battle-utility-trigger:active:enabled {
+  transform: translateY(1px);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.4);
+}
+
+.game-battle-utility-trigger:focus-visible {
+  outline: 2px solid var(--game-charcoal);
+  outline-offset: 3px;
+}
+
+.game-battle-utility-trigger[data-empty='true'] {
+  opacity: 0.42;
+  filter: grayscale(0.75);
+}
+
+.game-battle-action-icon {
+  display: inline-flex;
+  width: 1.85rem;
+  height: 1.85rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-battle-type-strip {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  min-height: 3.15rem;
+  width: calc(100% + 1.5rem);
+  margin-inline: -0.75rem;
+  align-items: center;
+  column-gap: 0.6rem;
+  padding: 0.35rem 0.75rem;
+  border-bottom: 1px solid var(--game-border-strong);
+  background: color-mix(in srgb, var(--game-surface-raised) 72%, var(--game-canvas));
+}
+
+.game-battle-type-strip > legend {
+  grid-column: 1;
+  margin: 0;
+  padding: 0;
+}
+
+.game-battle-type-strip .game-battle-type-picker-label {
+  grid-column: 1;
+  color: var(--game-muted);
+}
+
+.game-battle-type-selector {
+  grid-column: 2;
+  display: flex;
+  min-width: 0;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  overflow-x: auto;
+}
+
+.game-battle-type-actions {
+  grid-column: 3;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+}
+
+.game-battle-type-action {
+  position: relative;
+  display: inline-flex;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-color: var(--game-border-strong);
+  border-radius: 0.65rem;
+  background: color-mix(
+    in srgb,
+    var(--game-surface-raised) 86%,
+    var(--game-canvas)
+  );
+  color: var(--game-ink);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7), 0 1px 0 rgb(75 62 39 / 0.12);
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    transform 120ms ease,
+    opacity 120ms ease;
+}
+
+.game-battle-type-action[data-action='flee'] {
+  color: var(--game-clay-strong);
+}
+
+.game-battle-type-action:hover:enabled {
+  border-color: var(--game-charcoal);
+  background: var(--game-surface-raised);
+  color: var(--game-ink);
+  transform: translateY(-1px);
+}
+
+.game-battle-type-action[data-action='flee']:hover:enabled {
+  border-color: var(--game-clay);
+  color: var(--game-clay-strong);
+}
+
+.game-battle-type-action:active:enabled {
+  transform: translateY(1px);
+}
+
+.game-battle-type-action:focus-visible {
+  outline: 2px solid var(--game-charcoal);
+  outline-offset: 2px;
+}
+
+.game-battle-type-action[data-empty='true'] {
+  opacity: 0.42;
+  filter: grayscale(0.75);
+}
+
+.game-battle-type-option {
+  position: relative;
+}
+
+.game-battle-action-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.game-battle-action-strip > * {
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .game-battle-type-strip {
+    width: calc(100% + 2rem);
+    margin-inline: -1rem;
+    padding-inline: 1rem;
+  }
+}
+
+@media (max-width: 639px) {
+  .game-battle-action-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .game-battle-type-strip {
+    column-gap: 0.35rem;
+    padding-inline: 0.5rem;
+  }
+
+  .game-battle-type-option {
+    width: 4rem;
+  }
+
+  .game-battle-type-actions {
+    gap: 0.25rem;
+  }
+
+  .game-battle-type-action {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .game-battle-type-action .game-battle-action-icon {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+}
+
+@keyframes battle-type-active-pulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgb(41 53 50 / 0)); }
+  50% { transform: scale(1.06); filter: drop-shadow(0 2px 3px rgb(41 53 50 / 0.22)); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .game-battle-type-image--active,
+  .game-battle-type-option[data-state='on'] .game-battle-type-image,
+  .game-battle-type-option[aria-pressed='true'] .game-battle-type-image {
+    animation: battle-type-active-pulse 2.1s ease-in-out infinite;
+  }
+}
+
+.game-battle-type-picker-label {
+  flex: 0 0 auto;
+  color: var(--game-muted);
+  font-size: 0.6rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 380px) {
+  .game-battle-utility-trigger {
+    gap: 0.35rem;
+    padding-inline: 0.35rem;
+    white-space: normal;
+  }
+
+  .game-battle-utility-trigger > .game-battle-action-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .game-battle-utility-trigger > .game-battle-action-icon img {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+
+  .game-battle-utility-trigger > span:last-child {
+    gap: 0.15rem;
+  }
+
+  .game-battle-utility-trigger > span:last-child > span:first-child {
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+  }
+
+  .game-battle-utility-trigger > span:last-child > span:last-child {
+    font-size: 0.6rem;
+  }
+
+  .game-battle-command-deck {
+    padding: 0.4rem;
+  }
+
+  .game-battle-command-grid {
+    gap: 0.3rem;
+  }
+
+  .game-battle-stance {
+    min-height: 8rem;
+    padding-right: 0.4rem;
+    padding-left: 0.4rem;
+  }
+
+  .game-battle-stance-icon {
+    width: 1.8rem;
+    height: 1.8rem;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
