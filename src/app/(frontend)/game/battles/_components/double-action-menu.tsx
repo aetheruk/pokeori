@@ -8,6 +8,7 @@ import { MoveFieldNote } from '@/components/game/moves'
 import { cn } from '@/lib/utils'
 import { getMove } from '@/data/moves'
 import { getBattleMoveTriggerItemId } from '@/utilities/battle/move-presentation'
+import { getBattleItemUseLimit } from '@/utilities/battle/item-use-limits'
 import {
   getDefaultDoublesTarget,
   getDoublesPokemon,
@@ -219,6 +220,14 @@ export function DoubleActionMenu() {
     for (const kind of ['time','space','chaos'] as const)
       if (data.dimensionalShift[kind]) powerOptions.push({label:`Dimensional Shift · ${kind}`,command:{slot:selectedSlot,kind:'power',powerId:'dimensional-shift',formId:kind}})
 
+  const commandUses = panel === 'moves'
+    ? `${actor?.moveUsesRemaining ?? 0} left`
+    : panel === 'items'
+      ? `${Math.max(0, getBattleItemUseLimit(battleState, 'player') - (battleState.itemsUsedThisBattle?.length ?? 0))} left`
+      : panel === 'powers'
+        ? `${getStanceWinCharges(battleState.powers)}/${POWER_STANCE_WIN_COST} wins`
+        : undefined
+
   return (
     <BattleControlRegion
       state={battleState}
@@ -226,7 +235,7 @@ export function DoubleActionMenu() {
       onBack={() => { setMoveInfoId(null); setPanel(null) }}
       canGoBack={replacementSlots.length === 0}
       stanceType={selectedType}
-      uses={panel === 'moves' ? `${actor?.moveUsesRemaining ?? 0} left` : panel === 'powers' ? `${getStanceWinCharges(battleState.powers)}/${POWER_STANCE_WIN_COST} wins` : undefined}
+      uses={commandUses}
       commands={actor && active.includes(selectedSlot) && replacementSlots.length === 0 ? (
         <div className="game-battle-action-strip w-full">
           <BattleActionTrigger
