@@ -73,17 +73,24 @@ self.addEventListener('fetch', (event) => {
   // Only public artwork and the Next image endpoint are candidates.
   if (!optimized && !/\\.(avif|webp|png|jpe?g|gif|svg|ico)$/i.test(path)) return
   event.respondWith((async () => {
+    let cache
+    try {
+      cache = await caches.open(CACHE)
+      // Downloaded artwork is keyed with its revision query string. Ignore
+      // that query for the lookup so a cold PWA launch can serve cached bytes
+      // without first loading the full artwork manifest.
+      const cached = await cache.match(
+        new Request(new URL(path, self.location.origin)),
+        { ignoreSearch: true },
+      )
+      if (cached) return cached
+    } catch { /* Storage restrictions must not block online play. */ }
+
     let images
     try { images = await getImages() } catch { return fetch(event.request) }
     const revision = images.get(path)
     if (!revision) return fetch(event.request)
     const key = keyFor(path, revision)
-    let cache
-    try {
-      cache = await caches.open(CACHE)
-      const cached = await cache.match(key)
-      if (cached) return cached
-    } catch { /* Storage restrictions must not block online play. */ }
     // Share original bytes across CSS, sprites, and Next image variants.
     // The fingerprint bypasses stale HTTP/CDN entries after artwork changes.
     const response = await fetch(key, { cache: 'reload' })

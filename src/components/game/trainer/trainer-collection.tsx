@@ -14,6 +14,7 @@ import {
 import Link from 'next/link'
 import { type ComponentType, useMemo } from 'react'
 import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
+import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
@@ -22,6 +23,7 @@ import { fieldResearchGames, miniGames } from '@/data/games'
 import { locations } from '@/data/locations'
 import pokemonData from '@/data/pokemon-data'
 import { tcgSetSummaries } from '@/data/tcg/summaries'
+import { getIcon } from '@/data/user'
 import { usePokedex } from '@/hooks/usePokedex'
 import { useTCG } from '@/hooks/useTCG'
 import { cn } from '@/lib/utils'
@@ -156,7 +158,21 @@ export function TrainerCollection() {
       className="flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink"
       aria-busy={loading}
     >
-      <PremiumHeader title="Field index" subtitle="Collections" />
+      <PremiumHeader
+        title="Personal Progress"
+        subtitle="Collections"
+        icon={
+          <TaskIconDisplay
+            icon={
+              getIcon(user?.icon || 'ditto')?.icon || {
+                type: 'pokemon',
+                id: '132',
+              }
+            }
+            className="h-10 w-10"
+          />
+        }
+      />
       <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4 md:px-6 md:py-6">
         <section>
           <div className="game-folio-section relative overflow-hidden p-4 md:p-5">

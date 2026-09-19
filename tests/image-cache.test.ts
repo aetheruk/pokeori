@@ -21,8 +21,22 @@ class MemoryCache {
   async keys() {
     return [...this.entries.keys()].map((url) => new Request(url))
   }
-  async match(key: string | Request) {
-    return this.entries.get(this.url(key))?.clone()
+  async match(key: string | Request, options?: { ignoreSearch?: boolean }) {
+    const target = this.url(key)
+    if (options?.ignoreSearch) {
+      const targetUrl = new URL(target)
+      for (const [entryUrl, response] of this.entries) {
+        const candidateUrl = new URL(entryUrl)
+        if (
+          candidateUrl.origin === targetUrl.origin &&
+          candidateUrl.pathname === targetUrl.pathname
+        ) {
+          return response.clone()
+        }
+      }
+      return undefined
+    }
+    return this.entries.get(target)?.clone()
   }
   async put(key: string | Request, response: Response) {
     this.entries.set(this.url(key), response.clone())
@@ -35,6 +49,7 @@ class MemoryCache {
 function setup() {
   const stores = new Map<string, MemoryCache>()
   const requests: string[] = []
+  let manifestRequests = 0
   let content = 'first'
   const caches = {
     async open(name: string) {
@@ -61,12 +76,15 @@ function setup() {
       clients: { claim() {} },
       caches,
       URL,
+      Request,
       crypto,
       fetch: async (url: string) => {
-        if (url === '/api/game-images')
+        if (url === '/api/game-images') {
+          manifestRequests += 1
           return Response.json([
             { url: '/art.png', revision: hash(value), bytes: value.length },
           ])
+        }
         requests.push(url)
         return image(content)
       },
@@ -96,6 +114,9 @@ function setup() {
   return {
     caches,
     requests,
+    get manifestRequests() {
+      return manifestRequests
+    },
     worker,
     setContent: (value: string) => {
       content = value
@@ -117,6 +138,19 @@ describe('image downloads across releases', () => {
       )?.text(),
     ).toBe('first')
     expect(state.requests).toHaveLength(1)
+  })
+
+  test('serves downloaded artwork before loading the manifest', async () => {
+    const state = setup()
+    const cache = await state.caches.open(IMAGE_CACHE_NAME)
+    await cache.put('/art.png?revision=cached', image('cached'))
+    const first = state.worker('1.0.0')
+
+    const response = await first.fetch('/art.png')
+
+    expect(await response?.text()).toBe('cached')
+    expect(state.manifestRequests).toBe(0)
+    expect(state.requests).toHaveLength(0)
   })
 
   test('refreshes changed art and removes only outdated image entries', async () => {

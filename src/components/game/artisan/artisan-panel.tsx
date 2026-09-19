@@ -33,6 +33,7 @@ import {
   mapRewardToDisplayItem,
 } from '@/components/game/shared/reward-mapping'
 import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
+import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { AppButton, Button } from '@/components/ui/app-button'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { CurrencySprite } from '@/components/ui/currency-sprite'
@@ -1920,7 +1921,17 @@ export function ArtisanPanel() {
         />
       ) : null}
 
-      <PremiumHeader title="Artisan" subtitle="Workshop ledger" showEffects />
+      <PremiumHeader
+        title="Artisan"
+        subtitle="Craft Items"
+        icon={
+          <TaskIconDisplay
+            icon={{ type: 'local', id: '/fallback/skills/artisan-v2.png' }}
+            className="h-10 w-10"
+          />
+        }
+        showEffects
+      />
 
       <div className="hidden items-center gap-3 border-b border-game-border bg-game-surface/70 px-6 py-3 xl:flex">
         <div className="w-64 shrink-0">
