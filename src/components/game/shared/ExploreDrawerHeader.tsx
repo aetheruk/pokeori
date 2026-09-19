@@ -14,12 +14,9 @@ export interface ExploreDrawerHeaderProps {
 }
 
 /**
- * The single drawer header used by every Explore-style panel (expeditions,
- * chronicles, locations, tasks, games, battles and field research). The
- * unstarted Chronicle drawer is the canonical look: tall art header with a
- * visible background, lower-centered glass label, and a centered icon that
- * clears the rounded top corners. Drawers retain their gesture dismissal so
- * the scenic header stays focused on identity rather than controls.
+ * Legacy scenic header kept for embedded Explore content. Full-screen panels
+ * use the shared ResponsivePanel title frame so they have one close control
+ * and no bottom-sheet gesture.
  */
 export function ExploreDrawerHeader({
   background,

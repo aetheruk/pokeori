@@ -19,7 +19,13 @@ import { getBattleInventory } from '../actions'
 import { useBattleContext } from './battle-context'
 import { BattleActionTrigger } from './battle-action-trigger'
 
-export function ItemSelector({ embedded = false, onActionComplete }: { embedded?: boolean; onActionComplete?: () => void } = {}) {
+export function ItemSelector({
+  embedded = false,
+  onActionComplete,
+}: {
+  embedded?: boolean
+  onActionComplete?: () => void
+} = {}) {
   const Shell: ElementType = embedded ? Fragment : Drawer
   const Content: ElementType = embedded ? 'div' : DrawerContent
   const {
@@ -201,44 +207,62 @@ export function ItemSelector({ embedded = false, onActionComplete }: { embedded?
 
   return (
     <Shell
-      {...(!embedded ? { open,
-      onOpenChange: (nextOpen: boolean) => {
-        setOpen(nextOpen)
-        if (!nextOpen) setReviveItem(null)
-      } } : {})}
+      {...(!embedded
+        ? {
+            open,
+            onOpenChange: (nextOpen: boolean) => {
+              setOpen(nextOpen)
+              if (!nextOpen) setReviveItem(null)
+            },
+          }
+        : {})}
     >
-      {!embedded && <DrawerTrigger asChild>
-        <BattleActionTrigger
-          itemId="battle-potion"
-          label="Items"
-          count={`${Math.max(0, remainingUses)}/${maxItemsPerBattle}`}
-          data-action="items"
-          data-empty={!canUseItems || undefined}
-          disabled={disabled}
-          aria-label={`Items, ${Math.max(0, remainingUses)} of ${maxItemsPerBattle} uses remaining`}
-          title="Open battle items"
-        />
-      </DrawerTrigger>}
+      {!embedded && (
+        <DrawerTrigger asChild>
+          <BattleActionTrigger
+            itemId="battle-potion"
+            label="Items"
+            count={`${Math.max(0, remainingUses)}/${maxItemsPerBattle}`}
+            data-action="items"
+            data-empty={!canUseItems || undefined}
+            disabled={disabled}
+            aria-label={`Items, ${Math.max(0, remainingUses)} of ${maxItemsPerBattle} uses remaining`}
+            title="Open battle items"
+          />
+        </DrawerTrigger>
+      )}
       <Content
         id={itemDrawerContentId}
-        className={embedded ? 'min-h-0' : 'game-paper-modal game-paper-background max-h-[70dvh] border-game-border bg-game-surface-raised'}
+        className={
+          embedded
+            ? 'min-h-0'
+            : 'game-paper-modal game-paper-background max-h-[70dvh] border-game-border bg-game-surface-raised'
+        }
+        {...(!embedded
+          ? {
+              title: 'Battle Items',
+              description: `${Math.max(0, remainingUses)} item uses remaining this battle.`,
+              icon: (
+                <ItemSprite
+                  itemId="battle-potion"
+                  alt="Battle items"
+                  width={72}
+                  height={72}
+                  className="h-16 w-16 object-contain md:h-20 md:w-20"
+                />
+              ),
+              background: '/backgrounds/battle.avif',
+              heroLabel: 'Battle',
+            }
+          : {})}
       >
-        <div className="px-4 pt-4 pb-6">
-          {!embedded && <SectionDivider className="mb-4">
-            <span className="flex items-center gap-2 px-3">
-              <ItemSprite
-                itemId="battle-potion"
-                alt="Items"
-                width={20}
-                height={20}
-                className="h-5 w-5 object-contain"
-              />
-              Battle Items
-              <span className="text-game-muted ml-1">
-                ({remainingUses} left)
-              </span>
-            </span>
-          </SectionDivider>}
+        <div
+          className={
+            embedded
+              ? 'px-4 pt-4 pb-6'
+              : 'min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-6'
+          }
+        >
           {!canUseItems && (
             <div
               className="mb-4 rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-3 text-center text-sm text-game-muted"
@@ -331,7 +355,7 @@ export function ItemSelector({ embedded = false, onActionComplete }: { embedded?
               <p className="text-sm">Get items from rewards or the shop!</p>
             </div>
           ) : (
-            <div className={embedded ? 'space-y-4' : 'overflow-y-auto max-h-[calc(70dvh-150px)] space-y-4'}>
+              <div className="space-y-4">
               {effectOrder.map((effectType) => {
                 const typeItems = groupedItems[effectType]
                 if (!typeItems || typeItems.length === 0) return null

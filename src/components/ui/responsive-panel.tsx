@@ -1,23 +1,17 @@
 'use client'
 
-import { XIcon } from 'lucide-react'
+import { Info, XIcon } from 'lucide-react'
+import Image from 'next/image'
 import * as React from 'react'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from '@/components/ui/drawer'
 import { cn } from '@/lib/utils'
 
 export interface ResponsivePanelProps {
@@ -27,36 +21,42 @@ export interface ResponsivePanelProps {
   description?: React.ReactNode
   children: React.ReactNode
   trigger?: React.ReactElement
+  /** Retained for call-site compatibility. Panels now use the full activity frame at every viewport. */
   desktopWidth?: string
+  /** Retained for call-site compatibility. */
   desktopBreakpoint?: 'lg' | 'xl'
+  /** Retained for call-site compatibility. */
   mobileMaxHeight?: string
+  /** Retained for call-site compatibility. */
   mobileHeader?: boolean
+  /** Retained for call-site compatibility. Full-screen panels never expose a drag handle. */
   showHandle?: boolean
+  /** Retained for call-site compatibility. Use showHero to opt out of the scenic title frame. */
   showHeader?: boolean
   showCloseButton?: boolean
   dismissible?: boolean
   headerClassName?: string
   className?: string
-}
-
-function useMediaQuery(query: string) {
-  const [matches, setMatches] = React.useState(false)
-
-  React.useEffect(() => {
-    const media = window.matchMedia(query)
-    const update = () => setMatches(media.matches)
-    update()
-    media.addEventListener('change', update)
-    return () => media.removeEventListener('change', update)
-  }, [query])
-
-  return matches
+  /** Scenic artwork for the full-screen title frame. */
+  background?: string
+  /** Icon rendered in the large result-style orb. */
+  icon?: React.ReactNode
+  /** Additional classes for the result-style orb. */
+  iconClassName?: string
+  /** Small label shown in the upper-left of the title frame. */
+  heroLabel?: React.ReactNode
+  /** Optional badge attached to the title icon. */
+  heroBadge?: React.ReactNode
+  /** Additional classes for the title frame. */
+  heroClassName?: string
+  /** Opt out only when a caller supplies its own full-screen header. */
+  showHero?: boolean
 }
 
 /**
- * A shared inspector primitive: bottom sheet on touch layouts, right-side
- * field-note panel on wide screens. The server-safe mobile default prevents a
- * hydration mismatch and the panel re-homes itself as the viewport changes.
+ * Shared activity frame for field notes, selectors, details, and result-style
+ * overlays. Every panel is full screen so touch and desktop layouts share one
+ * visual language and there is no bottom-sheet drag gesture to discover.
  */
 export function ResponsivePanel({
   open,
@@ -65,28 +65,19 @@ export function ResponsivePanel({
   description,
   children,
   trigger,
-  desktopWidth = 'min(38vw, 560px)',
-  desktopBreakpoint = 'lg',
-  mobileMaxHeight = '92dvh',
-  mobileHeader = true,
-  showHandle = true,
   showHeader = true,
-  showCloseButton = false,
+  showCloseButton = true,
   dismissible = true,
   headerClassName,
   className,
+  background = '/backgrounds/lab.avif',
+  icon,
+  iconClassName,
+  heroLabel,
+  heroBadge,
+  heroClassName,
+  showHero = true,
 }: ResponsivePanelProps) {
-  // Keep the journal navigation and inspector on the same desktop breakpoint.
-  const isDesktop = useMediaQuery(
-    desktopBreakpoint === 'lg' ? '(min-width: 1024px)' : '(min-width: 1280px)',
-  )
-  const header =
-    title || description ? (
-      <>
-        {title && <DialogTitle>{title}</DialogTitle>}
-        {description && <DialogDescription>{description}</DialogDescription>}
-      </>
-    ) : null
   const triggerElement = trigger
     ? React.cloneElement(
         trigger as React.ReactElement<{
@@ -104,101 +95,117 @@ export function ResponsivePanel({
       )
     : null
 
-  if (isDesktop) {
-    return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-          {triggerElement && <DialogTrigger asChild>{triggerElement}</DialogTrigger>}
-          <DialogContent
-            onInteractOutside={(event) => {
-              if (!dismissible) event.preventDefault()
-            }}
-            onEscapeKeyDown={(event) => {
-              if (!dismissible) event.preventDefault()
-            }}
-            className={cn(
-              'game-paper-modal game-paper-background !left-auto !right-0 !top-0 h-dvh !max-h-none !w-[var(--responsive-panel-width)] !max-w-none !translate-x-0 !translate-y-0 rounded-l-xl rounded-r-none border-y-0 border-r-0 p-0 sm:p-0',
-              'data-[state=open]:slide-in-from-right data-[state=closed]:slide-out-to-right',
-              className,
-            )}
-            style={
-              {
-                '--responsive-panel-width': desktopWidth,
-              } as React.CSSProperties
-            }
-            showCloseButton={showCloseButton}
-          >
-            {header && showHeader ? (
-              <DialogHeader
-                className={cn(
-                  'border-b border-game-border p-5',
-                  headerClassName,
-                )}
-              >
-                {header}
-              </DialogHeader>
-            ) : (
-              header && (
-                <div className="sr-only">
-                  {title && <DialogTitle>{title}</DialogTitle>}
-                  {description && (
-                    <DialogDescription>{description}</DialogDescription>
-                  )}
-                </div>
-              )
-            )}
-            {children}
-          </DialogContent>
-        </Dialog>
-    )
-  }
+  const accessibleTitle = title || 'Details'
+  const closeButton = showCloseButton ? (
+    <DialogClose
+      aria-label="Close"
+      title="Close"
+      className={cn(
+        'game-focus-ring absolute right-4 top-[max(1rem,env(safe-area-inset-top))] z-50 flex size-11 items-center justify-center rounded-full border border-white/55 bg-game-night-canvas/55 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-game-night-canvas/75 focus-visible:ring-white/80',
+        !showHero &&
+          'border-game-border/60 bg-game-night-surface/80 text-white hover:bg-game-night-surface',
+      )}
+    >
+      <XIcon className="size-5" aria-hidden="true" />
+      <span className="sr-only">Close</span>
+    </DialogClose>
+  ) : null
 
   return (
-      <Drawer open={open} onOpenChange={onOpenChange} dismissible={dismissible}>
-        {triggerElement && <DrawerTrigger asChild>{triggerElement}</DrawerTrigger>}
-        <DrawerContent
-          showHandle={showHandle}
-          className={cn('game-paper-modal game-paper-background', className)}
-          style={{ maxHeight: mobileMaxHeight }}
-        >
-          {showCloseButton && (
-            <button
-              type="button"
-              aria-label="Close"
-              onPointerDown={(event) => {
-                event.stopPropagation()
-                onOpenChange(false)
-              }}
-              onClick={() => onOpenChange(false)}
-              className="absolute right-3 top-3 z-30 flex size-10 items-center justify-center rounded-md border border-transparent text-game-muted transition-colors hover:border-game-border hover:bg-game-surface hover:text-game-moss-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-game-moss/50"
-            >
-              <XIcon className="size-4" aria-hidden="true" />
-              <span className="sr-only">Close</span>
-            </button>
-          )}
-          {header && showHeader && (
-            <DrawerHeader
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {triggerElement && (
+        <DialogTrigger asChild>{triggerElement}</DialogTrigger>
+      )}
+      <DialogContent
+        onInteractOutside={(event) => {
+          if (!dismissible) event.preventDefault()
+        }}
+        onEscapeKeyDown={(event) => {
+          if (!dismissible) event.preventDefault()
+        }}
+        className={cn(
+          '!inset-0 !h-[100dvh] !max-h-none !w-screen !max-w-none !translate-x-0 !translate-y-0 m-0 flex flex-col gap-0 overflow-hidden rounded-none border-0 bg-game-canvas p-0 text-game-ink sm:p-0',
+          className,
+        )}
+        showCloseButton={false}
+      >
+        {showHero ? (
+          <DialogHeader
+            className={cn(
+              'relative shrink-0 space-y-0 overflow-hidden p-0 text-center',
+              headerClassName,
+            )}
+          >
+            <section
               className={cn(
-                'border-b border-game-border text-left',
-                !mobileHeader && 'sr-only',
-                headerClassName,
+                'relative flex min-h-[38dvh] w-full shrink-0 flex-col items-center justify-center overflow-hidden px-5 pb-8 pt-[max(3.5rem,env(safe-area-inset-top))] text-center text-white md:min-h-[42dvh] md:px-6',
+                heroClassName,
               )}
             >
-              {title && <DrawerTitle>{title}</DrawerTitle>}
-              {description && (
-                <DrawerDescription>{description}</DrawerDescription>
+              <Image
+                src={background}
+                alt=""
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover"
+              />
+              <div
+                className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(23,39,51,0.08),rgba(23,39,51,0.24)_42%,rgba(23,39,51,0.92)_100%)]"
+                aria-hidden="true"
+              />
+
+              {heroLabel && (
+                <div className="absolute left-5 top-[max(1rem,env(safe-area-inset-top))] z-20 max-w-[65%] text-left md:left-7">
+                  <span className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/35 bg-game-night-canvas/45 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.14em] text-white backdrop-blur-md">
+                    {heroLabel}
+                  </span>
+                </div>
               )}
-            </DrawerHeader>
-          )}
-          {header && !showHeader && (
+
+              {closeButton}
+
+              <div className="relative z-10 flex w-full max-w-3xl flex-col items-center gap-3">
+                <div className="relative">
+                  <div
+                    className={cn(
+                      'game-icon-orb relative z-10 flex h-24 w-24 items-center justify-center border-white/55 !bg-white/10 text-white shadow-xl md:h-28 md:w-28',
+                      iconClassName,
+                    )}
+                  >
+                    {icon || <Info className="h-14 w-14" aria-hidden="true" />}
+                  </div>
+                  {heroBadge && (
+                    <div className="absolute -bottom-2 -right-2 z-20">
+                      {heroBadge}
+                    </div>
+                  )}
+                </div>
+                <DialogTitle className="max-w-3xl text-3xl font-semibold leading-tight !text-white md:text-4xl">
+                  {accessibleTitle}
+                </DialogTitle>
+                {description && (
+                  <DialogDescription className="max-w-2xl text-sm font-medium leading-relaxed !text-white/90 md:text-base">
+                    {description}
+                  </DialogDescription>
+                )}
+              </div>
+            </section>
+          </DialogHeader>
+        ) : (
+          <>
+            {closeButton}
             <div className="sr-only">
-              {title && <DrawerTitle>{title}</DrawerTitle>}
+              {showHeader && <DialogTitle>{accessibleTitle}</DialogTitle>}
               {description && (
-                <DrawerDescription>{description}</DrawerDescription>
+                <DialogDescription>{description}</DialogDescription>
               )}
             </div>
-          )}
-          {children}
-        </DrawerContent>
-      </Drawer>
+          </>
+        )}
+
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</div>
+      </DialogContent>
+    </Dialog>
   )
 }

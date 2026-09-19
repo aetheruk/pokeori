@@ -20,7 +20,6 @@ import {
   RewardCarousel,
   type RewardItem,
 } from '@/components/game/reward-carousel'
-import { ExploreDrawerHeader } from '@/components/game/shared/ExploreDrawerHeader'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { Button } from '@/components/ui/button'
 import { ItemSprite } from '@/components/ui/item-sprite'
@@ -84,7 +83,9 @@ function ExpeditionMetricRow({
 }) {
   return (
     <div className="flex min-h-14 items-center gap-3 border-b border-game-border/70 py-3 last:border-b-0">
-      <div className={cn('flex size-8 shrink-0 items-center justify-center', tone)}>
+      <div
+        className={cn('flex size-8 shrink-0 items-center justify-center', tone)}
+      >
         {icon}
       </div>
       <span className="min-w-0 flex-1 truncate text-[10px] font-bold uppercase tracking-[0.12em] text-game-muted">
@@ -365,41 +366,40 @@ function ExpeditionModalContent({
       onOpenChange={onOpenChange}
       title={item.name}
       description={item.description}
-      showHeader={false}
-      showHandle={false}
-      showCloseButton={false}
+      background={expedition?.background || '/backgrounds/forest.avif'}
+      icon={
+        <TaskIconDisplay
+          icon={item.icon}
+          className="h-20 w-20 md:h-24 md:w-24"
+        />
+      }
+      heroLabel={
+        <>
+          <MapIcon className="h-3.5 w-3.5" />
+          {expeditionLabel.toUpperCase()}
+        </>
+      }
       desktopWidth="min(44vw, 680px)"
-      mobileMaxHeight="calc(100dvh - 6rem)"
-      className="flex h-[calc(100dvh-6rem)] w-screen max-w-none flex-col gap-0 overflow-hidden rounded-t-2xl border-x-0 border-b-0 border-t border-game-border bg-game-surface p-0 text-game-ink md:max-w-none lg:h-dvh lg:rounded-l-xl lg:rounded-t-none lg:border-y-0 lg:border-r-0"
+      className="flex w-screen max-w-none flex-col gap-0 overflow-hidden border-0 bg-game-surface p-0 text-game-ink md:max-w-none"
     >
-      <ExploreDrawerHeader
-        background={expedition?.background}
-        label={
-          <>
-            <MapIcon className="h-3.5 w-3.5" />
-            {expeditionLabel.toUpperCase()}
-          </>
-        }
-        icon={<TaskIconDisplay icon={item.icon} className="h-8 w-8" />}
-      >
-        {canAbandonExpedition && onRequestAbandonExpedition && (
-          <Button
-            type="button"
-            size="icon"
-            variant="outline"
-            onClick={onRequestAbandonExpedition}
-            disabled={loadingId === item.id}
-            className="absolute bottom-5 left-6 z-20 h-11 w-11 rounded-full border-game-clay/45 bg-game-surface-raised/90 text-game-clay-strong hover:border-game-clay hover:bg-game-clay hover:text-game-cream"
-            aria-label={`Abandon ${expeditionLabel}`}
-            title={`Abandon ${expeditionLabel}`}
-          >
-            <DoorOpen className="h-5 w-5" />
-          </Button>
-        )}
-      </ExploreDrawerHeader>
-
       <div className="custom-scrollbar flex-1 overflow-y-auto bg-game-canvas p-5 md:p-8">
         <div className="max-w-4xl mx-auto space-y-8 pb-8">
+          {canAbandonExpedition && onRequestAbandonExpedition && (
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onRequestAbandonExpedition}
+                disabled={loadingId === item.id}
+                className="gap-2 rounded-full border-game-clay/45 bg-game-surface-raised/90 text-game-clay-strong hover:border-game-clay hover:bg-game-clay hover:text-game-cream"
+                aria-label={`Abandon ${expeditionLabel}`}
+                title={`Abandon ${expeditionLabel}`}
+              >
+                <DoorOpen className="h-4 w-4" />
+                Abandon
+              </Button>
+            </div>
+          )}
           <div className="space-y-4">
             <div className="text-center">
               <h2 className="font-display text-3xl font-semibold text-game-ink">

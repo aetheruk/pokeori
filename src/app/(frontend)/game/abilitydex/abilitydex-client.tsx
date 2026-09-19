@@ -204,6 +204,9 @@ export default function AbilityDexPage() {
             ? 'Ability field note and compatible Pokémon forms.'
             : 'Find a Pokémon with this ability to complete the record.'
         }
+        icon={<Sparkles className="h-14 w-14" aria-hidden="true" />}
+        background="/backgrounds/pokedex.avif"
+        heroLabel="AbilityDex"
         desktopBreakpoint="lg"
         desktopWidth="min(42vw, 620px)"
         className="overflow-hidden"

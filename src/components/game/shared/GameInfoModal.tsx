@@ -7,7 +7,6 @@ import {
   RewardCarousel,
   type RewardItem,
 } from '@/components/game/reward-carousel'
-import { ExploreDrawerHeader } from '@/components/game/shared/ExploreDrawerHeader'
 import {
   Dialog,
   DialogClose,
@@ -197,26 +196,14 @@ export function GameInfoModal({
     )
   const content = (
     <>
-      {isDrawer ? (
-        <ExploreDrawerHeader
-          background={background}
-          label={category}
-          icon={icon}
-          iconClassName={iconClassName}
-          badge={
-            isCaught ? (
-              <span className="flex items-center gap-0.5 rounded-full border-2 border-game-surface bg-game-moss px-2 py-0.5 text-[10px] font-black text-game-cream">
-                CAUGHT
-              </span>
-            ) : undefined
-          }
-        />
-      ) : (
+      {!isDrawer && (
         <Header className="p-0 space-y-0 shrink-0">
-          <div className={cn(
-            'relative w-full overflow-hidden border-b border-game-border bg-game-surface',
-            isResultLayout ? 'h-[42dvh] md:h-[46dvh]' : 'h-40 md:h-52',
-          )}>
+          <div
+            className={cn(
+              'relative w-full overflow-hidden border-b border-game-border bg-game-surface',
+              isResultLayout ? 'h-[42dvh] md:h-[46dvh]' : 'h-40 md:h-52',
+            )}
+          >
             {/* Background Image with Overlay */}
             <div className="absolute inset-0 z-0">
               <Image
@@ -225,14 +212,19 @@ export function GameInfoModal({
                 fill
                 priority
                 sizes="100vw"
-                className={cn('object-cover', !isResultLayout && 'opacity-80 brightness-90')}
+                className={cn(
+                  'object-cover',
+                  !isResultLayout && 'opacity-80 brightness-90',
+                )}
               />
-              <div className={cn(
-                'absolute inset-0',
-                isResultLayout
-                  ? 'bg-[linear-gradient(to_bottom,rgba(23,39,51,0.08),rgba(23,39,51,0.24)_42%,rgba(23,39,51,0.92)_100%)]'
-                  : 'bg-gradient-to-b from-game-night-surface/5 via-game-night-surface/25 to-game-surface',
-              )} />
+              <div
+                className={cn(
+                  'absolute inset-0',
+                  isResultLayout
+                    ? 'bg-[linear-gradient(to_bottom,rgba(23,39,51,0.08),rgba(23,39,51,0.24)_42%,rgba(23,39,51,0.92)_100%)]'
+                    : 'bg-gradient-to-b from-game-night-surface/5 via-game-night-surface/25 to-game-surface',
+                )}
+              />
             </div>
 
             {category && (
@@ -244,20 +236,24 @@ export function GameInfoModal({
             )}
 
             {/* Close Button */}
-            <Close className={cn(
-              'game-focus-ring absolute right-7 top-[max(1.75rem,env(safe-area-inset-top))] z-50 flex size-10 items-center justify-center rounded-md border transition-colors',
-              isResultLayout
-                ? 'border-white/55 bg-game-night-canvas/55 text-white hover:bg-game-night-canvas/75'
-                : 'border-game-border/60 bg-game-surface-raised/90 text-game-ink hover:bg-game-surface hover:text-game-clay-strong',
-            )}>
+            <Close
+              className={cn(
+                'game-focus-ring absolute right-7 top-[max(1.75rem,env(safe-area-inset-top))] z-50 flex size-10 items-center justify-center rounded-md border transition-colors',
+                isResultLayout
+                  ? 'border-white/55 bg-game-night-canvas/55 text-white hover:bg-game-night-canvas/75'
+                  : 'border-game-border/60 bg-game-surface-raised/90 text-game-ink hover:bg-game-surface hover:text-game-clay-strong',
+              )}
+            >
               <X className="h-4 w-4" aria-hidden="true" />
             </Close>
 
             {/* Header Content */}
-            <div className={cn(
-              'absolute inset-0 z-10 flex items-center justify-center p-5',
-              isResultLayout && 'flex-col gap-3 text-center',
-            )}>
+            <div
+              className={cn(
+                'absolute inset-0 z-10 flex items-center justify-center p-5',
+                isResultLayout && 'flex-col gap-3 text-center',
+              )}
+            >
               <div className="relative">
                 <div
                   className={cn(
@@ -269,7 +265,9 @@ export function GameInfoModal({
                   )}
                 >
                   <div className="absolute inset-0 bg-game-charcoal/10 opacity-0 transition-opacity group-hover:opacity-100" />
-                  <div className={cn(!isResultLayout && 'scale-125')}>{icon}</div>
+                  <div className={cn(!isResultLayout && 'scale-125')}>
+                    {icon}
+                  </div>
                 </div>
                 {isCaught && (
                   <div className="absolute -bottom-2 -right-2 flex items-center gap-0.5 rounded-full border-2 border-game-surface bg-game-moss px-2 py-0.5 text-[10px] font-black text-game-cream">
@@ -289,49 +287,50 @@ export function GameInfoModal({
 
       <div className="custom-scrollbar min-h-0 flex-1 overflow-x-hidden overflow-y-auto bg-game-canvas p-5 md:p-6">
         <div className="mx-auto max-w-3xl space-y-7 pb-8">
-          {!isResultLayout && (
+          {!isResultLayout && !isDrawer && (
             <div className="text-center">
               <Title className="font-display text-2xl font-semibold text-game-ink md:text-3xl">
                 {title}
               </Title>
             </div>
           )}
-          {description && (isResultLayout ? (
-            <div className="mx-auto max-w-2xl px-2 py-5 text-center text-base font-medium leading-relaxed text-game-ink md:text-lg">
-              {description}
-            </div>
-          ) : (
-            <div className="relative">
-              <SectionDivider>OVERVIEW</SectionDivider>
-              <div
-                className={cn(
-                  'mt-3',
-                  isDrawer
-                    ? 'text-left'
-                    : 'rounded-lg border border-game-border bg-game-surface-raised p-4 md:p-5',
-                )}
-              >
-                <p className="text-sm font-medium leading-relaxed text-game-ink md:text-base">
-                  {description}
-                </p>
-                {bonusLabel && (
-                  <div className="mt-3 inline-flex rounded-full border border-game-ochre/35 bg-game-ochre/10 px-2.5 py-1 text-xs font-bold text-game-ochre">
-                    {bonusLabel}
-                  </div>
-                )}
-                {sourceHint && (
-                  <div className="mt-3 flex items-start gap-2 border-t border-game-border pt-3 text-sm">
-                    <span className="shrink-0 font-bold uppercase tracking-wide text-game-moss-strong">
-                      Available at
-                    </span>
-                    <span className="text-game-muted">
-                      {sourceHint.replace(/^Available (at|from)\s+/i, '')}
-                    </span>
-                  </div>
-                )}
+          {description &&
+            (isResultLayout ? (
+              <div className="mx-auto max-w-2xl px-2 py-5 text-center text-base font-medium leading-relaxed text-game-ink md:text-lg">
+                {description}
               </div>
-            </div>
-          ))}
+            ) : (
+              <div className="relative">
+                <SectionDivider>OVERVIEW</SectionDivider>
+                <div
+                  className={cn(
+                    'mt-3',
+                    isDrawer
+                      ? 'text-left'
+                      : 'rounded-lg border border-game-border bg-game-surface-raised p-4 md:p-5',
+                  )}
+                >
+                  <p className="text-sm font-medium leading-relaxed text-game-ink md:text-base">
+                    {description}
+                  </p>
+                  {bonusLabel && (
+                    <div className="mt-3 inline-flex rounded-full border border-game-ochre/35 bg-game-ochre/10 px-2.5 py-1 text-xs font-bold text-game-ochre">
+                      {bonusLabel}
+                    </div>
+                  )}
+                  {sourceHint && (
+                    <div className="mt-3 flex items-start gap-2 border-t border-game-border pt-3 text-sm">
+                      <span className="shrink-0 font-bold uppercase tracking-wide text-game-moss-strong">
+                        Available at
+                      </span>
+                      <span className="text-game-muted">
+                        {sourceHint.replace(/^Available (at|from)\s+/i, '')}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
 
           {taskProgress ? (
             <div className="space-y-4">
@@ -508,13 +507,20 @@ export function GameInfoModal({
         desktopBreakpoint={desktopBreakpoint}
         title={title}
         description={description}
-        showHeader={false}
-        showHandle={false}
-        showCloseButton={false}
+        background={background || '/backgrounds/forest.avif'}
+        icon={icon}
+        iconClassName={iconClassName}
+        heroLabel={category}
+        heroBadge={
+          isCaught ? (
+            <span className="flex items-center gap-0.5 rounded-full border-2 border-game-surface bg-game-moss px-2 py-0.5 text-[10px] font-black text-game-cream">
+              CAUGHT
+            </span>
+          ) : undefined
+        }
         desktopWidth="min(42vw, 620px)"
-        mobileMaxHeight="calc(100dvh - 6rem)"
         className={cn(
-          'flex h-[calc(100dvh-6rem)] w-screen max-w-none flex-col gap-0 overflow-hidden rounded-t-[1rem] border-x-0 border-b-0 border-t border-game-border bg-game-surface p-0 md:max-w-none lg:h-dvh lg:rounded-l-xl lg:rounded-t-none lg:border-y-0 lg:border-r-0',
+          'flex w-screen max-w-none flex-col gap-0 overflow-hidden border-0 bg-game-surface p-0 md:max-w-none',
           className,
         )}
       >

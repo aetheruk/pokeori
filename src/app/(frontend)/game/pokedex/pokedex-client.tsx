@@ -480,11 +480,26 @@ export default function Pokedex() {
               ? `Details for ${selectedBaseForm?.name}`
               : 'Record details are not yet available.'
           }
+          icon={
+            isBaseSeen && selectedBaseForm ? (
+              <Image
+                src={getPokemonImageUrl(selectedBaseForm.id, 'sprite')}
+                alt=""
+                width={88}
+                height={88}
+                className="h-20 w-20 object-contain pixelated md:h-24 md:w-24"
+              />
+            ) : (
+              <CircleHelp className="h-14 w-14" aria-hidden="true" />
+            )
+          }
+          background="/backgrounds/pokedex.avif"
+          heroLabel="Pokédex"
           desktopWidth="min(42vw, 620px)"
           desktopBreakpoint="lg"
           mobileHeader={false}
           showHandle={false}
-          className="game-paper-first game-paper-background relative flex flex-col gap-0 overflow-hidden bg-game-canvas p-0 text-game-ink after:pointer-events-none after:absolute after:left-1/2 after:top-2 after:z-30 after:h-1.5 after:w-20 after:-translate-x-1/2 after:rounded-full after:bg-game-border-strong after:content-[''] lg:after:hidden"
+          className="game-paper-first game-paper-background relative flex flex-col gap-0 overflow-hidden bg-game-canvas p-0 text-game-ink"
         >
           {selectedSpecies &&
             selectedBaseForm &&
@@ -1158,6 +1173,9 @@ function ObservedMoveListButton({
         onOpenChange={(open) => !open && setSelectedMove(null)}
         title={selectedMove?.name || 'Move details'}
         description="Battle Observer field note"
+        icon={<FlaskConical className="h-14 w-14" aria-hidden="true" />}
+        background="/backgrounds/pokedex.avif"
+        heroLabel="Pokédex"
         desktopBreakpoint="lg"
       >
         <div className="h-full overflow-y-auto p-4 custom-scrollbar">
