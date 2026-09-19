@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Loader2, RefreshCcw } from 'lucide-react'
+import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { Button } from '@/components/ui/button'
 import {
   Drawer,
@@ -25,11 +26,16 @@ import { isDoublesCommanderInactive } from '@/utilities/battle/doubles-abilities
 import { getBattlePowers } from '../actions'
 import type { BattlePowersData } from '../powers/powers-data'
 import { useBattleContext } from './battle-context'
-import { StanceSelector } from './stance-selector'
+import { StanceSelectorDrawer } from './stance-selector'
 import { BattleActionTrigger } from './battle-action-trigger'
 import { ItemSelector } from './item-selector'
 import { TeamSwapper } from './team-swapper'
-import { BattleMovesContent, getBattleMovePresentation, MoveInfoDialog } from './battle-moves-content'
+import { BattleSurrenderButton } from './battle-surrender-button'
+import {
+  BattleMovesContent,
+  getBattleMovePresentation,
+  MoveInfoDialog,
+} from './battle-moves-content'
 
 type Slot = 0 | 1
 type Panel = 'moves' | 'switch' | 'powers' | null
@@ -102,7 +108,10 @@ export function DoubleActionMenu() {
     Partial<Record<Slot, BattlePowersData>>
   >({})
   const disabled =
-    isAnimating || isWaitingForServer || isWaitingForOpponent || battleState.status !== 'ongoing'
+    isAnimating ||
+    isWaitingForServer ||
+    isWaitingForOpponent ||
+    battleState.status !== 'ongoing'
   const slots = getDoublesSlots(battleState, 'player')
   const active = ([0, 1] as const).filter(
     (slot) =>
@@ -226,7 +235,7 @@ export function DoubleActionMenu() {
 
   return (
     <div
-      className="game-paper-first game-paper-background relative flex min-h-[13rem] flex-[10] flex-col border-t border-game-border bg-game-canvas px-3 pt-2 pb-4 text-game-ink sm:px-4 xl:flex-none"
+      className="game-paper-first game-paper-background relative flex min-h-[13rem] flex-[10] flex-col border-t border-game-border bg-game-canvas px-3 pt-0 pb-4 text-game-ink sm:px-4 xl:flex-none"
       aria-busy={disabled}
     >
       {isWaitingForServer && action?.kind !== 'basic' && (
@@ -237,7 +246,7 @@ export function DoubleActionMenu() {
           </span>
         </div>
       )}
-      <div className="mx-auto w-full max-w-2xl">
+      <div className="w-full">
         {replacementSlots.length > 0 ? (
           <div className="flex w-full justify-center">
             <TeamSwapper
@@ -258,108 +267,125 @@ export function DoubleActionMenu() {
             {actor && active.includes(selectedSlot) && (
               <>
                 <fieldset
-                  className="mb-3 flex min-w-0 items-center justify-center gap-2"
+                  className="game-battle-type-strip min-w-0"
                   aria-label={`Attack type for ${actor.name}`}
                 >
-                  {actor.types.map((type) => {
-                    const typeId = typeIdMap[type.toLowerCase()]
-                    return (
-                      <Button
-                        key={type}
-                        type="button"
-                        variant="ghost"
-                        className={cn(
-                          'h-11 w-20 rounded-lg border-0 bg-transparent p-0 hover:bg-transparent',
-                          selectedType === type
-                            ? 'opacity-100'
-                            : 'opacity-60 grayscale',
-                        )}
-                        aria-label={type}
-                        aria-pressed={selectedType === type}
-                        disabled={disabled}
-                        onClick={() => changeType(type)}
-                      >
-                        {typeId ? (
-                          <Image
-                            src={getPokemonTypeIconUrl(typeId)}
-                            alt={type}
-                            width={100}
-                            height={40}
-                            className="h-7 w-auto object-contain"
-                            unoptimized
-                          />
-                        ) : (
-                          <span className="text-xs font-semibold capitalize">
-                            {type}
-                          </span>
-                        )}
-                      </Button>
-                    )
-                  })}
-                </fieldset>
-                <StanceSelector
-                  onSelect={(stance) =>
-                    choose({
-                      slot: selectedSlot,
-                      kind: 'basic',
-                      stance,
-                      attackType: selectedType,
-                      target:
-                        selectedTarget.side === 'opponent'
-                          ? selectedTarget
-                          : getDefaultDoublesTarget(battleState),
-                    })
-                  }
-                  stats={actor.stats}
-                  statStages={actor.statStages}
-                  zMoveReady={!!actor.zMoveReady}
-                  disabledStance={
-                    actor.disabledStance?.turnsRemaining
-                      ? actor.disabledStance.stance
-                      : undefined
-                  }
-                  pendingStance={
-                    isWaitingForServer && action?.kind === 'basic'
-                      ? action.stance
-                      : undefined
-                  }
-                  disabled={disabled}
-                />
-
-                <div className="mt-3 flex w-full gap-2">
-                  <ItemSelector />
-                  {moves.length > 0 && (
+                  <legend className="game-battle-type-picker-label">
+                    Type
+                  </legend>
+                  <div className="game-battle-type-selector">
+                    {actor.types.map((type) => {
+                      const typeId = typeIdMap[type.toLowerCase()]
+                      return (
+                        <Button
+                          key={type}
+                          type="button"
+                          variant="ghost"
+                          className={cn(
+                            'game-battle-type-option h-11 w-20 rounded-lg border-0 bg-transparent p-0 hover:bg-transparent',
+                            selectedType === type
+                              ? 'opacity-100'
+                              : 'opacity-60 grayscale',
+                          )}
+                          aria-label={type}
+                          aria-pressed={selectedType === type}
+                          disabled={disabled}
+                          onClick={() => changeType(type)}
+                        >
+                          {typeId ? (
+                            <Image
+                              src={getPokemonTypeIconUrl(typeId)}
+                              alt={type}
+                              width={100}
+                              height={40}
+                              className="game-battle-type-image h-7 w-auto object-contain"
+                              unoptimized
+                            />
+                          ) : (
+                            <span className="text-xs font-semibold capitalize">
+                              {type}
+                            </span>
+                          )}
+                        </Button>
+                      )
+                    })}
+                  </div>
+                  <div className="game-battle-type-actions">
                     <BattleActionTrigger
-                      itemId={moveTriggerItemId}
-                      label="Moves"
-                      count={`${actor.moveUsesRemaining ?? 0}/${battleState.config?.movesPerBattle ?? actor.moveUsesRemaining ?? 0}`}
-                      aria-label={`Moves, ${actor.moveUsesRemaining ?? 0} uses remaining`}
-                      disabled={disabled || (actor.moveUsesRemaining ?? 0) <= 0}
-                      onClick={() => setPanel('moves')}
-                    />
-                  )}
-                  {powerOptions.length > 0 && (
-                    <BattleActionTrigger
-                      itemId="tera-orb"
-                      label="Powers"
-                      count={powerOptions.length}
-                      aria-label={`Battle powers, ${powerOptions.length} choices`}
-                      disabled={disabled}
-                      onClick={() => setPanel('powers')}
-                    />
-                  )}
-                  {battleState.playerTeam.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="size-11 shrink-0 rounded-lg border-game-border bg-game-surface-raised p-0 text-game-ink shadow-none"
-                      aria-label="Switch Pokemon"
+                      compact
+                      icon={<RefreshCcw className="size-5" aria-hidden />}
+                      label="Switch"
+                      data-action="switch"
+                      data-empty={reserves.length === 0 || undefined}
                       disabled={disabled || reserves.length === 0}
+                      aria-label="Switch Pokemon"
                       onClick={() => setPanel('switch')}
-                    >
-                      <RefreshCcw className="h-4 w-4" />
-                    </Button>
-                  )}
+                    />
+                    <BattleSurrenderButton actionTrigger compact />
+                  </div>
+                </fieldset>
+                <div className="game-battle-action-strip flex w-full gap-2">
+                  <StanceSelectorDrawer
+                    triggerIcon={
+                      <PokemonRaritySprite
+                        formId={actor.formId}
+                        view="front"
+                        rarity={actor.rarity}
+                        shiny={actor.shiny}
+                        isShadow={actor.isShadow}
+                        isRadiant={actor.isRadiant}
+                        female={actor.gender === 'female'}
+                        alt=""
+                        sizes="32px"
+                        className="h-8 w-8 object-contain"
+                      />
+                    }
+                    onSelect={(stance) =>
+                      choose({
+                        slot: selectedSlot,
+                        kind: 'basic',
+                        stance,
+                        attackType: selectedType,
+                        target:
+                          selectedTarget.side === 'opponent'
+                            ? selectedTarget
+                            : getDefaultDoublesTarget(battleState),
+                      })
+                    }
+                    stats={actor.stats}
+                    statStages={actor.statStages}
+                    zMoveReady={!!actor.zMoveReady}
+                    disabledStance={
+                      actor.disabledStance?.turnsRemaining
+                        ? actor.disabledStance.stance
+                        : undefined
+                    }
+                    pendingStance={
+                      isWaitingForServer && action?.kind === 'basic'
+                        ? action.stance
+                        : undefined
+                    }
+                    disabled={disabled}
+                  />
+                  <BattleActionTrigger
+                    itemId={moveTriggerItemId}
+                    label="Moves"
+                    count={`${actor.moveUsesRemaining ?? 0}/${battleState.config?.movesPerBattle ?? actor.moveUsesRemaining ?? 0}`}
+                    aria-label={`Moves, ${actor.moveUsesRemaining ?? 0} uses remaining`}
+                    data-empty={moves.length === 0 || undefined}
+                    disabled={disabled}
+                    onClick={() => setPanel('moves')}
+                  />
+                  <ItemSelector />
+                  <BattleActionTrigger
+                    itemId="tera-orb"
+                    label="Powers"
+                    count={powerOptions.length > 0 ? powerOptions.length : '—'}
+                    aria-label={`Battle powers, ${powerOptions.length} choices`}
+                    data-empty={powerOptions.length === 0 || undefined}
+                    disabled={disabled}
+                    onClick={() => setPanel('powers')}
+                  />
                 </div>
               </>
             )}
@@ -384,67 +410,85 @@ export function DoubleActionMenu() {
               triggerItemId={moveTriggerItemId}
               disabled={disabled}
               onDetails={setMoveInfoId}
-              onUseMove={(moveId) => commit({
-                slot: selectedSlot,
-                kind: 'move',
-                moveId,
-                selectedType,
-                target: moveTarget(selectedSlot, moveId, selectedTarget, getDefaultDoublesTarget(battleState)),
-              })}
+              onUseMove={(moveId) =>
+                commit({
+                  slot: selectedSlot,
+                  kind: 'move',
+                  moveId,
+                  selectedType,
+                  target: moveTarget(
+                    selectedSlot,
+                    moveId,
+                    selectedTarget,
+                    getDefaultDoublesTarget(battleState),
+                  ),
+                })
+              }
             />
           ) : (
             <>
               <DrawerHeader className="pb-2">
-                <DrawerTitle>{panel === 'switch' ? 'Switch Pokemon' : 'Battle powers'}</DrawerTitle>
+                <DrawerTitle>
+                  {panel === 'switch' ? 'Switch Pokemon' : 'Battle powers'}
+                </DrawerTitle>
               </DrawerHeader>
               <div className="overflow-y-auto px-4 pb-6">
-            {panel === 'switch' &&
-              reserves.map(({ mon, index }) => (
-                <Button
-                  key={index}
-                  type="button"
-                  variant="outline"
-                  className="mb-2 h-12 w-full justify-between gap-3 rounded-lg border-game-border bg-game-canvas px-3 text-left"
-                  disabled={disabled}
-                  onClick={() =>
-                    commit({
-                      slot: selectedSlot,
-                      kind: 'switch',
-                      pokemonIndex: index,
-                    })
-                  }
-                >
-                  <span className="truncate text-sm font-semibold">
-                    {mon.name}
-                  </span>
-                  <span className="shrink-0 font-mono text-xs text-game-muted">
-                    {mon.currentHp}/{mon.maxHp} HP
-                  </span>
-                </Button>
-              ))}
-            {panel === 'powers' &&
-              powerOptions.map((option) => (
-                <Button
-                  key={`${option.command.kind === 'power' ? option.command.powerId : ''}:${option.label}`}
-                  type="button"
-                  variant="outline"
-                  className="mb-2 h-12 w-full justify-start rounded-lg border-game-border bg-game-canvas px-3 text-left text-sm font-semibold"
-                  disabled={disabled}
-                  onClick={() => commit(option.command)}
-                >
-                  {option.label}
-                </Button>
-              ))}
+                {panel === 'switch' &&
+                  reserves.map(({ mon, index }) => (
+                    <Button
+                      key={index}
+                      type="button"
+                      variant="outline"
+                      className="mb-2 h-12 w-full justify-between gap-3 rounded-lg border-game-border bg-game-canvas px-3 text-left"
+                      disabled={disabled}
+                      onClick={() =>
+                        commit({
+                          slot: selectedSlot,
+                          kind: 'switch',
+                          pokemonIndex: index,
+                        })
+                      }
+                    >
+                      <span className="truncate text-sm font-semibold">
+                        {mon.name}
+                      </span>
+                      <span className="shrink-0 font-mono text-xs text-game-muted">
+                        {mon.currentHp}/{mon.maxHp} HP
+                      </span>
+                    </Button>
+                  ))}
+                {panel === 'powers' &&
+                  powerOptions.map((option) => (
+                    <Button
+                      key={`${option.command.kind === 'power' ? option.command.powerId : ''}:${option.label}`}
+                      type="button"
+                      variant="outline"
+                      className="mb-2 h-12 w-full justify-start rounded-lg border-game-border bg-game-canvas px-3 text-left text-sm font-semibold"
+                      disabled={disabled}
+                      onClick={() => commit(option.command)}
+                    >
+                      {option.label}
+                    </Button>
+                  ))}
               </div>
             </>
           )}
         </DrawerContent>
       </Drawer>
       <MoveInfoDialog
-        presentation={moveInfoId && actor && moves.find((move) => move.id === moveInfoId)
-          ? getBattleMovePresentation(moves.find((move) => move.id === moveInfoId)!, actor, battleState, selectedType)
-          : null}
-        onOpenChange={(open) => { if (!open) setMoveInfoId(null) }}
+        presentation={
+          moveInfoId && actor && moves.find((move) => move.id === moveInfoId)
+            ? getBattleMovePresentation(
+                moves.find((move) => move.id === moveInfoId)!,
+                actor,
+                battleState,
+                selectedType,
+              )
+            : null
+        }
+        onOpenChange={(open) => {
+          if (!open) setMoveInfoId(null)
+        }}
       />
     </div>
   )

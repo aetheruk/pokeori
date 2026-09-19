@@ -28,9 +28,17 @@ import {
 
 import { useBattleContext } from './battle-context'
 import { BattleActionTrigger } from './battle-action-trigger'
-import { BattleMovesContent, getBattleMovePresentation, MoveInfoDialog } from './battle-moves-content'
+import {
+  BattleMovesContent,
+  getBattleMovePresentation,
+  MoveInfoDialog,
+} from './battle-moves-content'
 
-export function PowerSelector() {
+export function PowerSelector({
+  mode = 'all',
+}: {
+  mode?: 'all' | 'moves' | 'powers'
+}) {
   const {
     battleState,
     activePlayerMon,
@@ -256,7 +264,6 @@ export function PowerSelector() {
   )
   const maxMovesPerBattle =
     battleState.config?.movesPerBattle ?? movesUsesRemaining
-  const canUseMove = movesUsesRemaining > 0
   const moveTriggerItemId = getBattleMoveTriggerItemId(activePlayerMon.types)
   const selectedPower = powersData?.selectedPokemonPower as
     | PokemonPowerId
@@ -291,12 +298,11 @@ export function PowerSelector() {
     selectedPower === 'dimensional-shift'
       ? `${Math.min(3, powerUsesRemaining)}/3`
       : String(Math.max(0, powerUsesRemaining))
-  const shouldShowPowerTrigger =
-    isBattlePanelLoading || !!hasAnyPowers || !!powersData?.selectedPokemonPower
-
   const renderMovesContent = () => (
     <BattleMovesContent
-      moves={availableMoves.map((move) => getMove(move.id)).filter((move): move is NonNullable<typeof move> => !!move)}
+      moves={availableMoves
+        .map((move) => getMove(move.id))
+        .filter((move): move is NonNullable<typeof move> => !!move)}
       pokemon={activePlayerMon}
       state={battleState}
       selectedType={selectedType}
@@ -310,15 +316,17 @@ export function PowerSelector() {
 
   return (
     <>
-      {hasAnyMoves && (
+      {mode !== 'powers' && (
         <Drawer open={moveOpen} onOpenChange={setMoveOpen}>
           <DrawerTrigger asChild>
             <BattleActionTrigger
               itemId={moveTriggerItemId}
               label="Moves"
               count={`${Math.max(0, movesUsesRemaining)}/${maxMovesPerBattle}`}
+              data-action="moves"
               aria-label={`Moves, ${Math.max(0, movesUsesRemaining)} of ${maxMovesPerBattle} uses remaining`}
-              disabled={disabled || !canUseMove}
+              data-empty={!hasAnyMoves || undefined}
+              disabled={disabled}
             />
           </DrawerTrigger>
           <DrawerContent
@@ -356,15 +364,17 @@ export function PowerSelector() {
         }}
       />
 
-      {shouldShowPowerTrigger && (
+      {mode !== 'moves' && (
         <Drawer open={powerOpen} onOpenChange={setPowerOpen}>
           <DrawerTrigger asChild>
             <BattleActionTrigger
               itemId={powerTriggerItemId}
               label="Powers"
-              count={powerUsesChip}
+              count={hasAnyPowers ? powerUsesChip : '—'}
+              data-action="powers"
               aria-label={`Powers, ${powerUsesChip} uses remaining`}
-              disabled={disabled || (!hasAnyPowers && !isBattlePanelLoading)}
+              data-empty={(!hasAnyPowers && !isBattlePanelLoading) || undefined}
+              disabled={disabled}
             />
           </DrawerTrigger>
           <DrawerContent
@@ -724,10 +734,21 @@ export function PowerSelector() {
                             onClick={handleUseWeather}
                           >
                             <span className="flex items-center gap-3">
-                              <ItemSprite itemId="weather-orb" alt="Weather Power" width={32} height={32} className="h-8 w-8" />
+                              <ItemSprite
+                                itemId="weather-orb"
+                                alt="Weather Power"
+                                width={32}
+                                height={32}
+                                className="h-8 w-8"
+                              />
                               <span className="flex flex-col items-start gap-1">
-                                <span className="text-sm font-medium text-game-ink">Use weather technique</span>
-                                <span className="text-xs text-game-muted">Performs an effect based on the current weather</span>
+                                <span className="text-sm font-medium text-game-ink">
+                                  Use weather technique
+                                </span>
+                                <span className="text-xs text-game-muted">
+                                  Performs an effect based on the current
+                                  weather
+                                </span>
                               </span>
                             </span>
                           </Button>
@@ -776,7 +797,8 @@ export function PowerSelector() {
                                   Raise all core stats
                                 </span>
                                 <span className="text-xs text-game-muted">
-                                  +1 Attack, Defense, Special Attack, Special Defense, and Speed for 3 turns
+                                  +1 Attack, Defense, Special Attack, Special
+                                  Defense, and Speed for 3 turns
                                 </span>
                               </span>
                             </span>

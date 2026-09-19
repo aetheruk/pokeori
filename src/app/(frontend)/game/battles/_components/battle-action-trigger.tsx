@@ -3,29 +3,29 @@ import { Button } from '@/components/ui/button'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { cn } from '@/lib/utils'
 
-type BattleActionTriggerProps = Omit<ComponentProps<typeof Button>, 'children'> & {
-  itemId: string
+type BattleActionTriggerProps = Omit<
+  ComponentProps<typeof Button>,
+  'children'
+> & {
+  itemId?: string
+  icon?: ReactNode
   label: string
-  count: ReactNode
+  count?: ReactNode
+  compact?: boolean
 }
 
 export function BattleActionTrigger({
   itemId,
+  icon,
   label,
   count,
+  compact = false,
   className,
   ...props
 }: BattleActionTriggerProps) {
-  return (
-    <Button
-      type="button"
-      variant="outline"
-      className={cn(
-        'h-11 min-w-0 flex-1 gap-1 rounded-lg border-game-border bg-game-surface-raised px-1.5 text-game-ink shadow-none hover:border-game-charcoal/50 hover:bg-game-surface-raised sm:gap-2 sm:px-3',
-        className,
-      )}
-      {...props}
-    >
+  const actionIcon =
+    icon ??
+    (itemId ? (
       <ItemSprite
         itemId={itemId}
         alt=""
@@ -33,9 +33,42 @@ export function BattleActionTrigger({
         height={22}
         className="size-5 shrink-0 object-contain"
       />
-      <span className="flex min-w-0 flex-col items-start gap-0.5 leading-none">
-        <span className="text-[11px] font-bold sm:text-xs">{label}</span>
-        <span className="font-mono text-[11px] font-medium text-game-muted">{count}</span>
+    ) : null)
+
+  if (compact) {
+    return (
+      <Button
+        type="button"
+        variant="outline"
+        className={cn('game-battle-type-action', className)}
+        {...props}
+      >
+        <span className="game-battle-action-icon">{actionIcon}</span>
+        <span className="sr-only">{label}</span>
+      </Button>
+    )
+  }
+
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      className={cn(
+        'game-battle-utility-trigger h-12 min-w-0 flex-1 justify-between gap-2 rounded-lg border px-2 text-right shadow-none sm:px-3',
+        className,
+      )}
+      {...props}
+    >
+      <span className="game-battle-action-icon">{actionIcon}</span>
+      <span className="flex min-w-0 flex-col items-end gap-0.5 leading-none text-right">
+        <span className="text-[11px] font-black uppercase tracking-[0.08em] sm:text-xs">
+          {label}
+        </span>
+        {count !== undefined && (
+          <span className="font-mono text-[11px] font-medium opacity-75">
+            {count}
+          </span>
+        )}
       </span>
     </Button>
   )

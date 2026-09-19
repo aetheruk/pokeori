@@ -4,7 +4,10 @@ import { BattleLog } from '@/app/(frontend)/game/battles/_components/battle-log'
 import { HealthDisplay } from '@/app/(frontend)/game/battles/_components/health-display'
 import { StanceSelector } from '@/app/(frontend)/game/battles/_components/stance-selector'
 import { STANCE_ICON_CONFIG } from '@/components/game/shared/stance-icon'
-import { getBattleMoveTriggerItemId, getMoveEffectivePower } from '@/utilities/battle/move-presentation'
+import {
+  getBattleMoveTriggerItemId,
+  getMoveEffectivePower,
+} from '@/utilities/battle/move-presentation'
 import { getItemSpriteUrl } from '@/data/items'
 import { getBattleStatusChip } from '@/utilities/battle/status-presentation'
 import type { BattleLogEntry } from '@/utilities/battle/types'
@@ -32,12 +35,17 @@ describe('battle UI stance styling', () => {
 
     expect(markup).toContain('aria-label="Speed attack, Speed 55. Beats Power"')
     expect(markup).toContain('aria-label="Power attack, Attack 42. Beats Tech"')
-    expect(markup).toContain('aria-label="Tech attack, Sp. Atk 47. Beats Speed"')
+    expect(markup).toContain(
+      'aria-label="Tech attack, Sp. Atk 47. Beats Speed"',
+    )
     expect(markup).toContain('>Speed<')
     expect(markup).toContain('>Power<')
     expect(markup).toContain('>Tech<')
     expect(markup).toContain('>Attack<')
     expect(markup).toContain('>Sp. Atk<')
+    expect(markup).toContain('game-battle-command-deck')
+    expect(markup).toContain('Quick strike')
+    expect(markup).toContain('Heavy hit')
     expect(markup).not.toContain('animate-pulse')
   })
 })
@@ -107,12 +115,7 @@ describe('battle move and status presentation', () => {
     expect(markup).toContain('>Paralysis<')
 
     const fullHpMarkup = renderToStaticMarkup(
-      <HealthDisplay
-        currentHp={50}
-        maxHp={50}
-        name="Pikachu"
-        level={20}
-      />,
+      <HealthDisplay currentHp={50} maxHp={50} name="Pikachu" level={20} />,
     )
     expect(fullHpMarkup).toContain('bg-game-health')
   })
@@ -294,7 +297,9 @@ describe('battle move and status presentation', () => {
 
     expect(markup).toContain('Turn 1 - A')
     expect(markup).toContain('Turn 1 - B')
-    expect(markup.indexOf('Turn 1 - A')).toBeLessThan(markup.indexOf('Turn 1 - B'))
+    expect(markup.indexOf('Turn 1 - A')).toBeLessThan(
+      markup.indexOf('Turn 1 - B'),
+    )
     expect(markup.match(/STANCE (?:WIN|TIE)/g)).toHaveLength(2)
   })
 

@@ -10,7 +10,10 @@ import { SectionDivider } from '@/components/ui/section-divider'
 import { cn } from '@/lib/utils'
 import { getBattleItemUseLimit } from '@/utilities/battle/item-use-limits'
 import type { BattleInventoryItem } from '@/utilities/battle/types'
-import { getDoublesPokemon, getDoublesSlots } from '@/utilities/battle/doubles-state'
+import {
+  getDoublesPokemon,
+  getDoublesSlots,
+} from '@/utilities/battle/doubles-state'
 import { getBattleInventory } from '../actions'
 
 import { useBattleContext } from './battle-context'
@@ -41,16 +44,14 @@ export function ItemSelector() {
     isWaitingForServer ||
     isWaitingForOpponent ||
     !!battleState.isPvp ||
-    battleState.status !== 'ongoing' ||
-    itemsUsedThisBattle >= maxItemsPerBattle
+    battleState.status !== 'ongoing'
   const [open, setOpen] = useState(false)
   const [items, setItems] = useState<BattleInventoryItem[]>([])
   const [loading, setLoading] = useState(false)
   const [using, setUsing] = useState<string | null>(null)
-  const [reviveItem, setReviveItem] = useState<BattleInventoryItem | null>(
-    null,
-  )
-  const activePokemonIsFainted = !isDouble &&
+  const [reviveItem, setReviveItem] = useState<BattleInventoryItem | null>(null)
+  const activePokemonIsFainted =
+    !isDouble &&
     battleState.playerTeam[battleState.activePlayerIndex]?.currentHp <= 0
 
   const reviveTargets = battleState.playerTeam.filter(
@@ -155,10 +156,7 @@ export function ItemSelector() {
     const effect = item.battleEffect
     if (effect.type === 'revive') return reviveTargets.length > 0
     if (effect.type === 'heal') {
-      const missingHp = Math.max(
-        0,
-        selectedMon.maxHp - selectedMon.currentHp,
-      )
+      const missingHp = Math.max(0, selectedMon.maxHp - selectedMon.currentHp)
       if ((effect.healFull || effect.healAmount) && missingHp > 0) return true
       if (!effect.clearStatus) return false
 
@@ -211,7 +209,9 @@ export function ItemSelector() {
           itemId="battle-potion"
           label="Items"
           count={`${Math.max(0, remainingUses)}/${maxItemsPerBattle}`}
-          disabled={disabled || !canUseItems}
+          data-action="items"
+          data-empty={!canUseItems || undefined}
+          disabled={disabled}
           aria-label={`Items, ${Math.max(0, remainingUses)} of ${maxItemsPerBattle} uses remaining`}
           title="Open battle items"
         />
@@ -236,6 +236,15 @@ export function ItemSelector() {
               </span>
             </span>
           </SectionDivider>
+          {!canUseItems && (
+            <div
+              className="mb-4 rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-3 text-center text-sm text-game-muted"
+              role="status"
+              aria-live="polite"
+            >
+              No item uses remaining this battle
+            </div>
+          )}
           {reviveItem ? (
             <div className="space-y-3">
               <Button
@@ -273,7 +282,7 @@ export function ItemSelector() {
                         onClick={() =>
                           void handleUseItem(reviveItem.itemId, index)
                         }
-                        disabled={using !== null || isWaitingForServer}
+                        disabled={disabled || using !== null || !canUseItems}
                       >
                         <div className="relative h-12 w-12 flex-shrink-0">
                           <PokemonRaritySprite
@@ -351,7 +360,12 @@ export function ItemSelector() {
                                 void handleUseItem(item.itemId)
                               }
                             }}
-                            disabled={using !== null || !itemApplies}
+                            disabled={
+                              disabled ||
+                              using !== null ||
+                              !itemApplies ||
+                              !canUseItems
+                            }
                           >
                             <ItemSprite
                               itemId={item.itemId}

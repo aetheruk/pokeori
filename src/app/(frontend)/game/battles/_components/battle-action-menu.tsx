@@ -1,6 +1,7 @@
 'use client'
 import { Loader2 } from 'lucide-react'
 import Image from 'next/image'
+import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { Button } from '@/components/ui/button'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { cn } from '@/lib/utils'
@@ -13,9 +14,10 @@ import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
 import { useBattleContext } from './battle-context'
 import { ItemSelector } from './item-selector'
 import { PowerSelector } from './power-selector'
-import { StanceSelector } from './stance-selector'
+import { StanceSelectorDrawer } from './stance-selector'
 import { TeamSwapper } from './team-swapper'
 import { DoubleActionMenu } from './double-action-menu'
+import { BattleSurrenderButton } from './battle-surrender-button'
 
 const typeIdMap: Record<string, number> = {
   normal: 1,
@@ -42,7 +44,7 @@ const typeIdMap: Record<string, number> = {
 }
 
 export function BattleActionMenu() {
-  const {battleState:formatState}=useBattleContext()
+  const { battleState: formatState } = useBattleContext()
   if (formatState.format === 'double') return <DoubleActionMenu />
   return <SingleBattleActionMenu />
 }
@@ -57,7 +59,6 @@ function SingleBattleActionMenu() {
     isAnimating,
     isWaitingForServer,
     pendingBattleAction,
-    hasPowerKeyItems,
     availableMoves,
     handleStanceSelect,
     handleUseMove,
@@ -88,7 +89,7 @@ function SingleBattleActionMenu() {
 
   return (
     <div
-      className="game-paper-first game-paper-background relative flex min-h-[13rem] flex-[10] flex-col items-center border-t border-game-border bg-game-canvas px-3 pt-2 pb-4 text-game-ink sm:px-4"
+      className="game-paper-first game-paper-background relative flex min-h-[13rem] flex-[10] flex-col items-center border-t border-game-border bg-game-canvas px-3 pt-0 pb-4 text-game-ink sm:px-4"
       aria-busy={isWaitingForServer || isAnimating}
     >
       {isWaitingForServer && pendingBattleAction?.kind !== 'stance' && (
@@ -127,39 +128,40 @@ function SingleBattleActionMenu() {
           </Button>
         </div>
       ) : (
-        <div className="flex w-full max-w-2xl flex-col items-center gap-3">
+        <div className="flex w-full flex-col items-center gap-0">
           {/* Type Selector */}
-          <div className="w-full max-w-md flex flex-col gap-2 items-center">
-            {activePlayerMon.teraTypeOverride ? (
-              <div className="flex min-h-11 items-center gap-2">
-                {(() => {
-                  const typeId =
-                    typeIdMap[activePlayerMon.teraTypeOverride.toLowerCase()]
-                  return typeId ? (
-                    <Image
-                      src={getPokemonTypeIconUrl(typeId, true)}
-                      alt={`Tera ${activePlayerMon.teraTypeOverride}`}
-                      width={100}
-                      height={40}
-                      className="h-5 w-auto object-contain"
-                      unoptimized
-                    />
-                  ) : (
-                    <span className="font-medium capitalize text-game-moss-strong">
-                      Tera {activePlayerMon.teraTypeOverride}
-                    </span>
-                  )
-                })()}
-              </div>
-            ) : (
-              <div className="flex gap-4 items-center">
+          <div className="game-battle-type-strip">
+            <span className="game-battle-type-picker-label">Type</span>
+            <div className="game-battle-type-selector">
+              {activePlayerMon.teraTypeOverride ? (
+                <div className="flex min-h-11 items-center justify-center gap-2">
+                  {(() => {
+                    const typeId =
+                      typeIdMap[activePlayerMon.teraTypeOverride.toLowerCase()]
+                    return typeId ? (
+                      <Image
+                        src={getPokemonTypeIconUrl(typeId, true)}
+                        alt={`Tera ${activePlayerMon.teraTypeOverride}`}
+                        width={100}
+                        height={40}
+                        className="game-battle-type-image game-battle-type-image--active h-5 w-auto object-contain"
+                        unoptimized
+                      />
+                    ) : (
+                      <span className="font-medium capitalize text-game-moss-strong">
+                        Tera {activePlayerMon.teraTypeOverride}
+                      </span>
+                    )
+                  })()}
+                </div>
+              ) : (
                 <ToggleGroup
                   type="single"
                   value={selectedType || ''}
                   onValueChange={(val: string) =>
                     !isDisabled && val && setSelectedType(val)
                   }
-                  className="flex justify-center gap-2"
+                  className="flex min-w-0 justify-center gap-2"
                   disabled={isDisabled}
                 >
                   {activePlayerMon.types.map((type: string) => {
@@ -169,7 +171,7 @@ function SingleBattleActionMenu() {
                         key={type}
                         value={type}
                         className={cn(
-                          'group relative flex h-11 w-20 items-center justify-center rounded-lg border-0 bg-transparent p-0 transition-colors',
+                          'game-battle-type-option group relative flex h-11 w-20 items-center justify-center rounded-lg border-0 bg-transparent p-0 transition-colors',
                           'hover:bg-transparent',
                           'data-[state=on]:!bg-transparent data-[state=on]:!text-game-ink',
                           'disabled:cursor-not-allowed disabled:opacity-50',
@@ -182,7 +184,7 @@ function SingleBattleActionMenu() {
                             alt={type}
                             width={100}
                             height={40}
-                            className="h-7 w-auto object-contain opacity-60 grayscale transition-[filter,opacity] duration-150 group-data-[state=on]:opacity-100 group-data-[state=on]:grayscale-0 group-hover:opacity-100 group-hover:grayscale-0 motion-reduce:transition-none"
+                            className="game-battle-type-image h-7 w-auto object-contain opacity-60 grayscale transition-[filter,opacity] duration-150 group-data-[state=on]:opacity-100 group-data-[state=on]:grayscale-0 group-hover:opacity-100 group-hover:grayscale-0 motion-reduce:transition-none"
                             unoptimized
                           />
                         ) : (
@@ -194,13 +196,31 @@ function SingleBattleActionMenu() {
                     )
                   })}
                 </ToggleGroup>
-              </div>
-            )}
+              )}
+            </div>
+            <div className="game-battle-type-actions">
+              <TeamSwapper actionTrigger compact />
+              <BattleSurrenderButton actionTrigger compact />
+            </div>
           </div>
 
-          {/* Stance Selector */}
-          <div className="w-full">
-            <StanceSelector
+          {/* Battle Commands */}
+          <div className="game-battle-action-strip flex w-full gap-2">
+            <StanceSelectorDrawer
+              triggerIcon={
+                <PokemonRaritySprite
+                  formId={activePlayerMon.formId}
+                  view="front"
+                  rarity={activePlayerMon.rarity}
+                  shiny={activePlayerMon.shiny}
+                  isShadow={activePlayerMon.isShadow}
+                  isRadiant={activePlayerMon.isRadiant}
+                  female={activePlayerMon.gender === 'female'}
+                  alt=""
+                  sizes="32px"
+                  className="h-8 w-8 object-contain"
+                />
+              }
               onSelect={handleStanceSelect}
               stats={activePlayerMon.stats}
               statStages={activePlayerMon.statStages}
@@ -209,15 +229,9 @@ function SingleBattleActionMenu() {
               pendingStance={pendingBattleAction?.stance}
               disabled={isDisabled || !selectedType}
             />
-          </div>
-
-          {/* Battle Actions */}
-          <div className="flex w-full gap-2">
+            <PowerSelector mode="moves" />
             <ItemSelector />
-            {(hasPowerKeyItems || availableMoves.length > 0) && (
-              <PowerSelector />
-            )}
-            {battleState.playerTeam.length > 1 && <TeamSwapper />}
+            <PowerSelector mode="powers" />
           </div>
         </div>
       )}
