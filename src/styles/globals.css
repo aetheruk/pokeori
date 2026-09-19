@@ -946,7 +946,8 @@
   border-color: color-mix(in srgb, var(--battle-stance-fill-strong) 74%, #1d2522);
   border-radius: 0.55rem;
   border-bottom: 3px solid var(--battle-stance-fill-strong);
-  background: var(--battle-stance-fill);
+  background-color: var(--battle-stance-fill);
+  background-image: linear-gradient(90deg, transparent 34%, rgb(12 24 29 / .16) 58%, rgb(12 24 29 / .62) 100%);
   color: var(--battle-stance-ink);
   box-shadow:
     inset 0 1px 0 rgb(255 248 232 / 0.55),
@@ -1003,12 +1004,12 @@
 }
 
 .game-battle-stance:hover:enabled {
-  background: color-mix(in srgb, var(--battle-stance-fill) 97%, white);
+  background-color: color-mix(in srgb, var(--battle-stance-fill) 97%, white);
   transform: translateY(-1px);
 }
 
 .game-battle-stance.game-battle-move[aria-disabled='true']:hover {
-  background: var(--battle-stance-fill);
+  background-color: var(--battle-stance-fill);
   transform: none;
 }
 
@@ -1038,7 +1039,8 @@
 }
 
 .game-battle-stance-name {
-  color: var(--battle-stance-ink);
+  color: #fff;
+  text-shadow: 0 1px 2px rgb(8 19 24 / .85), 0 0 5px rgb(8 19 24 / .6);
 }
 
 .game-battle-stance-icon {
@@ -1084,32 +1086,73 @@
 
 .battle-stance-win-glow {
   position: absolute;
-  inset: -12%;
-  z-index: -1;
+  inset: -35%;
+  z-index: 0;
   border-radius: 50%;
-  background: radial-gradient(circle, rgb(255 242 145 / .72), rgb(255 199 71 / .25) 45%, transparent 70%);
-  filter: blur(5px);
-  animation: battle-stance-win-pulse .55s ease-out both;
+  animation: battle-stance-win-pulse .65s ease-out both;
   pointer-events: none;
 }
 
+.battle-stance-win-glow::before,
+.battle-stance-win-glow::after {
+  position: absolute;
+  border-radius: 50%;
+  content: '';
+}
+
+.battle-stance-win-glow::before {
+  inset: 0;
+  background: radial-gradient(circle, rgb(255 251 214 / .95) 12%, rgb(255 219 89 / .82) 34%, rgb(255 171 44 / .5) 58%, transparent 80%);
+  filter: blur(9px);
+}
+
+.battle-stance-win-glow::after {
+  inset: 18%;
+  border: 2px solid rgb(255 238 142 / .9);
+  box-shadow: 0 0 15px 4px rgb(255 193 62 / .72), inset 0 0 13px rgb(255 237 150 / .65);
+}
+
 .battle-stance-win-sprite {
-  animation: battle-stance-win-sprite .55s ease-out both;
+  filter: drop-shadow(0 0 13px rgb(255 224 104 / .8)) drop-shadow(0 0 27px rgb(255 175 48 / .62));
+  animation: battle-stance-win-sprite .65s ease-out both;
 }
 
 @keyframes battle-stance-win-pulse {
-  0% { transform: scale(.7); opacity: 0; }
-  35% { transform: scale(1.25); opacity: 1; }
-  100% { transform: scale(1.05); opacity: .45; }
+  0% { transform: scale(.65); opacity: 0; }
+  38% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: .85; }
 }
 
 @keyframes battle-stance-win-sprite {
-  45% { filter: drop-shadow(0 0 15px #ffe688); }
+  0% { filter: drop-shadow(0 0 0 transparent); }
+  40% { filter: drop-shadow(0 0 17px #fff3a6) drop-shadow(0 0 34px #ffb33a); }
+  100% { filter: drop-shadow(0 0 13px rgb(255 224 104 / .8)) drop-shadow(0 0 27px rgb(255 175 48 / .62)); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .battle-stance-win-glow,
   .battle-stance-win-sprite { animation: none; }
+}
+
+.battle-log-stance-result {
+  box-shadow: inset 0 1px rgb(255 255 255 / .35), 0 2px 7px rgb(30 42 35 / .16);
+  color: #fff;
+  text-shadow: 0 1px 2px rgb(13 31 25 / .8), 0 0 3px rgb(13 31 25 / .55);
+}
+
+.battle-log-stance-result[data-result='win'] {
+  border-color: #0b7739;
+  background: linear-gradient(180deg, #35c86c, #14984b);
+}
+
+.battle-log-stance-result[data-result='tie'] {
+  border-color: #195b9e;
+  background: linear-gradient(180deg, #49a5f0, #2476c4);
+}
+
+.battle-log-stance-result[data-result='loss'] {
+  border-color: #aa2036;
+  background: linear-gradient(180deg, #f36970, #cf3042);
 }
 
 .game-battle-utility-trigger {

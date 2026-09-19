@@ -64,7 +64,7 @@ export function CaptureScene({
 
       {balls.length > 0 ? (
         <div className="relative flex flex-col items-center justify-end gap-6 w-full max-w-sm h-full max-h-[60vh] pb-6">
-          <div className="relative flex w-full items-center justify-between rounded-lg border border-game-border bg-game-surface-raised px-2 py-5 text-game-ink shadow-sm backdrop-blur-xl">
+          <div className="relative flex w-full items-center justify-between px-2 py-5 text-game-ink">
             <Button
               type="button"
               variant="ghost"

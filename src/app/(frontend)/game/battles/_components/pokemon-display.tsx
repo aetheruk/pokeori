@@ -137,7 +137,7 @@ export function PokemonDisplay({
         isRadiant={isRadiant}
         female={gender === 'female'}
         alt="Pokemon"
-        className="!absolute inset-0"
+        className={cn('!absolute inset-0', isStanceWinner && 'z-10')}
         imageClassName={cn(
           'drop-shadow-xl',
           isBoosting && 'battle-boost-sprite',

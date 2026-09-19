@@ -27,7 +27,9 @@ The exact CSS variables live in `src/styles/globals.css`. Use semantic roles ins
 | Battle orange | `#c4773c` | battles and trainer rematches |
 | Fishing blue | `#5d83ae` | fishing activities |
 
-Battle state is a semantic exception to the routine interface palette: live/full HP and recovery may use health green (`game-health`), while the rest of the interface remains charcoal-led. Battle stance and move bars use the type sprite palette to identify the attack type, with Speed, Power, and Tech shown as three shades in the Stance section.
+Battle state is a semantic exception to the routine interface palette: live/full HP and recovery may use health green (`game-health`), while the rest of the interface remains charcoal-led. Battle stance and move bars use the type sprite palette to identify the attack type, with Speed, Power, and Tech shown as three shades in the Stance section. Attack names remain white over a darkened trailing edge, including on silver Normal bars and other light types.
+Battle log stance-result chips use bright green for a win, blue for a draw, and red for a loss. These colors indicate the resolved matchup rather than a routine action or status.
+Catch encounters place the question directly on the paper above the answer cards. Their partner sprite uses the translucent catch orb; answer symbols and throw-quality chips use charcoal for legibility. Caught results show a titled Capture Notes card with the Pokémon icon, while the Poké Ball selector sits directly on the paper without a second card frame.
 
 Do not use green, moss, teal, or saturated emerald in routine interface chrome; the botanical green above is reserved for research activity semantics. Avoid pure black, arbitrary gradient text, and decorative color that does not communicate state. Preserve Pokemon type colors and rarity colors only when they are gameplay semantics.
 

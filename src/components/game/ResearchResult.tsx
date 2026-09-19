@@ -102,6 +102,8 @@ interface GameResultProps {
   secondaryAction?: React.ReactNode
   /** additional content to render before rewards */
   additionalContent?: React.ReactNode
+  /** Keep the shared folio frame around additional content. */
+  additionalContentFrame?: boolean
   /** callback for return button instead of navigation */
   onReturn?: () => void
   /** Render inside an existing dialog without creating a second activity frame. */
@@ -121,6 +123,7 @@ export function GameResult({
   returnText = 'Continue',
   secondaryAction,
   additionalContent,
+  additionalContentFrame = true,
   onReturn,
   embedded = false,
 }: GameResultProps) {
@@ -138,7 +141,7 @@ export function GameResult({
   return (
     <div
       className={cn(
-        'game-paper-first game-paper-background relative h-full w-full overflow-hidden pt-[env(safe-area-inset-top)] text-game-ink',
+        'game-paper-first game-paper-background relative h-full w-full overflow-hidden text-game-ink',
         !embedded && 'bg-game-canvas',
       )}
     >
@@ -173,6 +176,7 @@ export function GameResult({
                         <TaskIconDisplay
                           icon={icon}
                           className="h-20 w-20 md:h-24 md:w-24"
+                          priority
                         />
                       )
                     }
@@ -232,7 +236,7 @@ export function GameResult({
         <div className="min-h-0 w-full flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-game-border scrollbar-track-transparent">
           <div className="mx-auto w-full max-w-3xl px-4 pb-28 pt-4 md:px-6 md:pt-6">
             {additionalContent && (
-              <div className="game-folio-section relative z-10 w-full p-4">
+              <div className={cn('relative z-10 w-full', additionalContentFrame && 'game-folio-section p-4')}>
                 {additionalContent}
               </div>
             )}

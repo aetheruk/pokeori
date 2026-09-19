@@ -884,6 +884,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
             battleState.playerTrainer &&
             battleState.enemyTrainer && (
               <VSAnimation
+                background={battleState.background}
                 player={battleState.playerTrainer}
                 enemy={battleState.enemyTrainer}
                 onComplete={() => setShowVsAnimation(false)}

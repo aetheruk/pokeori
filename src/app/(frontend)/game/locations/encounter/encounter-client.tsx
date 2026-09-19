@@ -1754,7 +1754,7 @@ export default function EncounterPage() {
         {/* Pokemon Sprite + Name reveal */}
         <div className="flex flex-col items-center gap-1">
           {encounter.companionFormId && !isSilphScopeGhostLocked && (
-            <div className="absolute bottom-2 left-2 z-10 flex h-12 w-12 items-center justify-center rounded-xl border border-game-night-border/60 bg-game-night-surface/80 p-1 shadow-lg backdrop-blur-md md:h-16 md:w-16">
+            <div className="game-icon-orb game-icon-orb-catch game-icon-orb-art absolute bottom-2 left-2 z-10 h-12 w-12 border-game-danger/70 p-1 md:h-16 md:w-16">
               <Image
                 src={getPokemonImageUrl(
                   encounter.companionFormId,
@@ -1805,7 +1805,7 @@ export default function EncounterPage() {
               {throwFeedback && phase === 'capture' && (
                 <motion.div
                   key={throwFeedback.id}
-                  className="pointer-events-none absolute left-1/2 top-2 z-30 -translate-x-1/2 rounded-full border border-teal-300/55 bg-teal-950/90 px-3 py-1 text-xs font-black uppercase tracking-wider text-teal-100 shadow-[0_0_18px_rgba(20,184,166,0.35)]"
+                  className="pointer-events-none absolute left-1/2 top-2 z-30 -translate-x-1/2 rounded-full border border-game-charcoal/35 bg-game-surface-raised/95 px-3 py-1 text-xs font-black uppercase tracking-wider text-game-charcoal-strong shadow-lg"
                   initial={{ opacity: 0, y: 8, scale: 0.9 }}
                   animate={{ opacity: 1, y: -10, scale: 1 }}
                   exit={{ opacity: 0, y: -22, scale: 0.94 }}
@@ -1813,7 +1813,7 @@ export default function EncounterPage() {
                 >
                   {throwFeedback.quality}
                   {throwDisplayStageBonus !== 0 && (
-                    <span className="ml-1 text-teal-300">
+                    <span className="ml-1 text-game-charcoal-strong">
                       {throwDisplayStageBonus > 0 ? '+' : ''}
                       {throwDisplayStageBonus}
                     </span>
@@ -1933,6 +1933,7 @@ export default function EncounterPage() {
                 selectedOptionIndex={selectedOptionIndex}
                 submittingAnswer={submittingAnswer}
                 kidMode={encounter.kidMode}
+                appearance="catch"
                 handleAnswer={handleAnswer as any}
               />
             ))}

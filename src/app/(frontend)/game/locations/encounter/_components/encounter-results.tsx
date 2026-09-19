@@ -4,9 +4,11 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { GameResult } from '@/components/game/ResearchResult'
 import { markExpeditionReturn } from '@/components/game/features/explore/expedition-return'
+import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { TaskExitDialog } from '@/components/game/task-exit-dialog'
 import { Button } from '@/components/ui/button'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { SectionDivider } from '@/components/ui/section-divider'
 import type { TaskExitModal } from '@/data/tasks'
 import type { TcgCard } from '@/data/tcg/types'
 import type { RewardSummary } from '@/utilities/rewards/reward-logic'
@@ -112,6 +114,10 @@ export function EncounterResults({
   if (!captureResult) return null
 
   const expeditionProgress = captureResult.expeditionProgress
+  const capturePokemonFormId =
+    captureResult.formId ||
+    captureResult.pokemonId?.toString() ||
+    encounter.pokemonId.toString()
 
   const expeditionUpdateContent = expeditionProgress ? (
     <div className="rounded-lg border border-game-moss/30 bg-game-moss/10 p-3 text-center">
@@ -149,12 +155,20 @@ export function EncounterResults({
 
   const messagesContent =
     captureResult.messages && captureResult.messages.length > 0 ? (
-      <div className="flex flex-col gap-2">
-        {captureResult.messages.map((msg, i) => (
-          <p key={i} className="font-medium text-game-ochre">
-            {msg}
-          </p>
-        ))}
+      <div>
+        <SectionDivider>Capture Notes</SectionDivider>
+        <div className="flex items-start gap-3 rounded-lg border border-game-border bg-game-surface-raised p-4 shadow-sm">
+          <div className="game-icon-orb game-icon-orb-catch h-12 w-12 shrink-0 border-game-danger/55">
+            <TaskIconDisplay icon={{ type: 'pokemon', id: capturePokemonFormId }} className="h-10 w-10" />
+          </div>
+          <div className="flex min-h-12 flex-col justify-center gap-2">
+            {captureResult.messages.map((msg, i) => (
+              <p key={i} className="font-medium leading-relaxed text-game-charcoal-strong">
+                {msg}
+              </p>
+            ))}
+          </div>
+        </div>
       </div>
     ) : null
 
@@ -251,13 +265,7 @@ export function EncounterResults({
               'The wild Pokemon fled.'
         }
         rewardSummary={captureResult.rewards}
-        icon={{
-          type: 'pokemon',
-          id:
-            captureResult.formId ||
-            captureResult.pokemonId?.toString() ||
-            encounter.pokemonId.toString(),
-        }}
+        icon={{ type: 'pokemon', id: capturePokemonFormId }}
         iconAlt={locationName}
         sectionTitle="Encounter Result"
         titleColor={
@@ -313,6 +321,7 @@ export function EncounterResults({
             </div>
           ) : undefined
         }
+        additionalContentFrame={!messagesContent}
       />
     </>
   )

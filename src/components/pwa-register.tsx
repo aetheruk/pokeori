@@ -7,6 +7,10 @@ import { ACTIVITY_STARTED_EVENT, ACTIVITY_SETTLED_EVENT, isActivityUpdateDeferre
 
 const UPDATE_CHECK_INTERVAL_MS = 60_000
 const RELOADED_VERSION_KEY = 'pokeori:last-reloaded-version'
+const RELOADED_AT_KEY = 'pokeori:last-reloaded-at'
+const RELOAD_ATTEMPTS_KEY = 'pokeori:reload-attempts'
+const RELOAD_RETRY_DELAY_MS = 30_000
+const MAX_RELOAD_RETRY_DELAY_MS = 5 * 60_000
 
 type AppVersionResponse = {
   version?: unknown
@@ -25,15 +29,35 @@ export function PwaRegister() {
     let settled = false
     let deferredVersion: string | null = null
     let reloadTimer: ReturnType<typeof setInterval> | undefined
+    let reloadResetTimer: ReturnType<typeof setTimeout> | undefined
+
+    if (sessionStorage.getItem(RELOADED_VERSION_KEY) === APP_VERSION) {
+      sessionStorage.removeItem(RELOADED_VERSION_KEY)
+      sessionStorage.removeItem(RELOADED_AT_KEY)
+      sessionStorage.removeItem(RELOAD_ATTEMPTS_KEY)
+    }
 
     const reload = (version: string) => {
       // The URL changes synchronously; React's pathname effect cleanup may not
       // have run yet when an old fetch or countdown resolves in this same turn.
       if (window.location.pathname !== pathname) return
-      if (disposed || reloading || sessionStorage.getItem(RELOADED_VERSION_KEY) === version) return
+      if (disposed || reloading) return
+      const lastVersion = sessionStorage.getItem(RELOADED_VERSION_KEY)
+      const storedAttempts = Number(sessionStorage.getItem(RELOAD_ATTEMPTS_KEY))
+      const attempts = lastVersion === version && Number.isFinite(storedAttempts)
+        ? Math.max(0, storedAttempts)
+        : 0
+      const lastReloadAt = Number(sessionStorage.getItem(RELOADED_AT_KEY)) || 0
+      const retryDelay = Math.min(MAX_RELOAD_RETRY_DELAY_MS, RELOAD_RETRY_DELAY_MS * 2 ** Math.max(0, attempts - 1))
+      if (lastVersion === version && Date.now() - lastReloadAt < retryDelay) return
       reloading = true
       sessionStorage.setItem(RELOADED_VERSION_KEY, version)
+      sessionStorage.setItem(RELOADED_AT_KEY, String(Date.now()))
+      sessionStorage.setItem(RELOAD_ATTEMPTS_KEY, String(attempts + 1))
       window.location.reload()
+      // If the browser suppresses a background reload, let the next version
+      // check retry instead of leaving this mounted client stuck forever.
+      reloadResetTimer = setTimeout(() => { reloading = false }, 5_000)
     }
 
     const refreshForUpdate = (version: string) => {
@@ -56,7 +80,7 @@ export function PwaRegister() {
         }
         return
       }
-      if (reloading || sessionStorage.getItem(RELOADED_VERSION_KEY) === version) {
+      if (reloading) {
         return
       }
 
@@ -135,6 +159,7 @@ export function PwaRegister() {
       requests.abort()
       window.clearInterval(interval)
       clearInterval(reloadTimer)
+      clearTimeout(reloadResetTimer)
       window.removeEventListener(ACTIVITY_STARTED_EVENT, markStarted)
       window.removeEventListener(ACTIVITY_SETTLED_EVENT, markSettled)
       window.removeEventListener('focus', checkForUpdate)

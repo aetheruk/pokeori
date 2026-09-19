@@ -60,3 +60,32 @@ test('a delayed version response from a safe route cannot reload a newly entered
   await expect(page).toHaveURL(/\/game\/games\/ui-test$/)
   await expect(page.getByRole('button', { name: 'Test dropped result' })).toBeVisible()
 })
+
+test('an older client retries when its first update reload still serves the old page', async ({ page }) => {
+  let newer = false
+  let reloads = 0
+  await page.route('**/api/app-version', async (route) => {
+    if (newer) await route.fulfill({ json: { version: '99.0.3-ui-test' } })
+    else await route.continue()
+  })
+  await page.goto('/auth')
+  await page.route('**/auth', async (route) => {
+    if (!route.request().isNavigationRequest()) {
+      await route.continue()
+      return
+    }
+    reloads += 1
+    if (reloads === 1) await route.continue()
+    else await route.fulfill({ contentType: 'text/html', body: '<p>Updated test page</p>' })
+  })
+  await page.clock.install()
+  newer = true
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+  await expect.poll(() => reloads).toBe(1)
+  await expect(page.getByRole('tab', { name: 'Log in' })).toBeVisible()
+
+  await page.clock.runFor(31_000)
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+  await expect(page.getByText('Updated test page')).toBeVisible()
+  expect(reloads).toBe(2)
+})
