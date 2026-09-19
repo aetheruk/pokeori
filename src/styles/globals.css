@@ -912,7 +912,7 @@
 }
 
 .game-battle-move {
-  --battle-type-color: #a8a77a;
+  --battle-type-color: #b6bdc5;
   touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
@@ -922,11 +922,6 @@
 .game-battle-move[aria-disabled='true'] {
   cursor: not-allowed;
   opacity: 0.6;
-}
-
-.game-battle-move[aria-disabled='true']:hover {
-  background: var(--battle-stance-fill);
-  transform: none;
 }
 
 .game-battle-stance-list {
@@ -939,6 +934,8 @@
   --battle-stance-fill: color-mix(in srgb, var(--battle-type-color) 36%, var(--game-ink));
   --battle-stance-fill-strong: color-mix(in srgb, var(--battle-type-color) 22%, var(--game-ink));
   --battle-stance-ink: var(--game-cream);
+  --battle-stance-wedge: color-mix(in srgb, var(--battle-type-color) 52%, var(--game-ink));
+  --battle-stance-fold: color-mix(in srgb, var(--battle-type-color) 75%, var(--game-ink));
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   min-height: 4.75rem;
@@ -966,7 +963,7 @@
   right: 0;
   width: 2.2rem;
   height: 2.2rem;
-  background: color-mix(in srgb, var(--battle-type-color) 75%, var(--game-ink));
+  background: var(--battle-stance-fold);
   clip-path: polygon(100% 0, 100% 100%, 0 0);
   opacity: 0.38;
   content: '';
@@ -977,7 +974,7 @@
   position: absolute;
   inset: 0 auto 0 0;
   width: 4.25rem;
-  background: color-mix(in srgb, var(--battle-type-color) 52%, var(--game-ink));
+  background: var(--battle-stance-wedge);
   clip-path: polygon(0 0, 100% 0, calc(100% - 0.75rem) 100%, 0 100%);
   content: '';
   pointer-events: none;
@@ -993,9 +990,34 @@
   --battle-stance-fill-strong: color-mix(in srgb, var(--battle-type-color) 14%, var(--game-ink));
 }
 
+.game-battle-stance.game-battle-move {
+  /* Type strength varies to keep the cream move name legible on every hue. */
+  --battle-stance-fill: color-mix(in srgb, var(--battle-type-color) var(--battle-move-type-strength, 50%), #23272b);
+  --battle-stance-fill-strong: color-mix(in srgb, var(--battle-stance-fill) 80%, #171b1f);
+  --battle-stance-wedge: color-mix(in srgb, var(--battle-stance-fill) 85%, var(--battle-type-color));
+  --battle-stance-fold: color-mix(in srgb, var(--battle-type-color) 55%, #23272b);
+}
+
+.game-battle-stance.game-battle-move[data-type='normal'] {
+  --battle-stance-fill: #cbd2d9;
+  --battle-stance-fill-strong: #8c99a4;
+  --battle-stance-ink: #28333b;
+  --battle-stance-wedge: #64737e;
+  --battle-stance-fold: #aebac4;
+}
+
 .game-battle-stance:hover:enabled {
   background: color-mix(in srgb, var(--battle-stance-fill) 82%, white);
   transform: translateY(-1px);
+}
+
+.game-battle-stance.game-battle-move:hover {
+  background: color-mix(in srgb, var(--battle-stance-fill) 97%, white);
+}
+
+.game-battle-stance.game-battle-move[aria-disabled='true']:hover {
+  background: var(--battle-stance-fill);
+  transform: none;
 }
 
 .game-battle-stance:active:enabled,
@@ -1203,75 +1225,93 @@ body.pokeori-blackout .game-battle-stance-drawer[data-type],
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='normal'] {
-  --battle-type-color: #a8a77a;
+  --battle-type-color: #b6bdc5;
+  --battle-move-type-strength: 43%;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='fighting'] {
   --battle-type-color: #c22e28;
+  --battle-move-type-strength: 100%;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='flying'] {
   --battle-type-color: #a98ff3;
+  --battle-move-type-strength: 54%;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='poison'] {
   --battle-type-color: #a33ea1;
+  --battle-move-type-strength: 99%;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='ground'] {
   --battle-type-color: #e2bf65;
+  --battle-move-type-strength: 41%;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='rock'] {
   --battle-type-color: #b6a136;
+  --battle-move-type-strength: 53%;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='bug'] {
   --battle-type-color: #a6b91a;
+  --battle-move-type-strength: 48%;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='ghost'] {
   --battle-type-color: #735797;
+  --battle-move-type-strength: 100%;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='steel'] {
   --battle-type-color: #b7b7ce;
+  --battle-move-type-strength: 44%;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='fire'] {
   --battle-type-color: #ee8130;
+  --battle-move-type-strength: 55%;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='water'] {
   --battle-type-color: #6390f0;
+  --battle-move-type-strength: 60%;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='grass'] {
   --battle-type-color: #7ac74c;
+  --battle-move-type-strength: 46%;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='electric'] {
   --battle-type-color: #f7d02c;
+  --battle-move-type-strength: 38%;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='psychic'] {
   --battle-type-color: #f95587;
+  --battle-move-type-strength: 63%;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='ice'] {
   --battle-type-color: #96d9d6;
+  --battle-move-type-strength: 39%;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='dragon'] {
   --battle-type-color: #6f35fc;
+  --battle-move-type-strength: 100%;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='dark'] {
   --battle-type-color: #705746;
+  --battle-move-type-strength: 100%;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='fairy'] {
   --battle-type-color: #d685ad;
+  --battle-move-type-strength: 54%;
 }
 
 .game-battle-type-selector {
