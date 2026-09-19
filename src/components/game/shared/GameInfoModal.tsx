@@ -111,6 +111,8 @@ interface GameInfoModalProps {
     icon?: ReactNode
   }>
   background?: string
+  /** Render the description in the full-screen hero instead of an Overview section. */
+  descriptionInHero?: boolean
   autoScrollRewards?: boolean
   presentation?: 'dialog' | 'drawer'
   resultLayout?: boolean
@@ -138,6 +140,7 @@ export function GameInfoModal({
   isCaught,
   stats,
   background,
+  descriptionInHero = false,
   autoScrollRewards = false,
   presentation = 'dialog',
   resultLayout = false,
@@ -295,6 +298,7 @@ export function GameInfoModal({
             </div>
           )}
           {description &&
+            !descriptionInHero &&
             (isResultLayout ? (
               <div className="mx-auto max-w-2xl px-2 py-5 text-center text-base font-medium leading-relaxed text-game-ink md:text-lg">
                 {description}
@@ -506,6 +510,7 @@ export function GameInfoModal({
         onOpenChange={onOpenChange}
         desktopBreakpoint={desktopBreakpoint}
         title={title}
+        description={descriptionInHero ? description : undefined}
         background={background || '/backgrounds/forest.avif'}
         icon={icon}
         iconClassName={iconClassName}
