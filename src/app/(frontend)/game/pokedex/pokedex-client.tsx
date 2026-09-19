@@ -2,6 +2,7 @@
 
 import {
   ArrowUp,
+  ArrowLeftRight,
   CircleDot,
   CircleHelp,
   Eye,
@@ -160,6 +161,7 @@ export default function Pokedex() {
     null,
   )
   const [selectedGender, setSelectedGender] = useState<'male' | 'female'>('male')
+  const [selectedFormIndex, setSelectedFormIndex] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedType, setSelectedType] = useState<string>('all')
   const [discoveryFilter, setDiscoveryFilter] = useState<DiscoveryFilter>('all')
@@ -217,6 +219,7 @@ export default function Pokedex() {
 
   useEffect(() => {
     setSelectedGender('male')
+    setSelectedFormIndex(0)
   }, [selectedSpeciesId])
 
   const speciesProgressSummary = useMemo(() => {
@@ -297,12 +300,28 @@ export default function Pokedex() {
     ? entriesByForm[selectedBaseForm.id]
     : undefined
   const isBaseSeen = getPokedexDiscoveryAccess(baseProgress).identity
-  const selectedPokemonBackground = selectedSpecies && selectedBaseForm
+  const visibleForms = useMemo(
+    () =>
+      selectedSpecies?.forms.filter((form) => {
+        const progress = entriesByForm[form.id]
+        const isSeen = !!(progress?.seen || progress?.caught)
+        return form.form === 'base' || isSeen
+      }) || [],
+    [entriesByForm, selectedSpecies],
+  )
+  const selectedForm = visibleForms[selectedFormIndex] || selectedBaseForm
+  const selectedFormProgress = selectedForm
+    ? entriesByForm[selectedForm.id]
+    : undefined
+  const isSelectedFormSeen = getPokedexDiscoveryAccess(
+    selectedFormProgress,
+  ).identity
+  const selectedPokemonBackground = selectedSpecies && selectedForm && isSelectedFormSeen
     ? getPokemonPokedexBackground({
         habitat: selectedSpecies.habitat,
         is_legendary: selectedSpecies.is_legendary,
         is_mythical: selectedSpecies.is_mythical,
-        types: selectedBaseForm.types,
+        types: selectedForm.types,
       })
     : '/backgrounds/pokedex.avif'
 
@@ -487,13 +506,13 @@ export default function Pokedex() {
         <ResponsivePanel
           open={!!selectedSpeciesId}
           onOpenChange={(open) => !open && handleCloseDrawer(false)}
-          title={isBaseSeen ? selectedBaseForm?.name : 'Unknown Pokémon'}
+          title={isSelectedFormSeen ? selectedForm?.name : 'Unknown Pokémon'}
           icon={
-            isBaseSeen && selectedBaseForm ? (
+            isSelectedFormSeen && selectedForm ? (
               <PokemonImage
-                formId={selectedBaseForm.id}
-                pokemonName={selectedBaseForm.name}
-                progress={baseProgress}
+                formId={selectedForm.id}
+                pokemonName={selectedForm.name}
+                progress={selectedFormProgress}
                 gender={selectedGender}
               />
             ) : (
@@ -502,6 +521,24 @@ export default function Pokedex() {
           }
           background={selectedPokemonBackground}
           heroLabel="Pokédex"
+          heroAction={
+            visibleForms.length > 1 ? (
+              <button
+                type="button"
+                aria-label="Switch Pokémon form"
+                title="Switch Pokémon form"
+                onClick={() =>
+                  setSelectedFormIndex((currentIndex) =>
+                    (currentIndex + 1) % visibleForms.length,
+                  )
+                }
+                className="game-focus-ring flex size-11 items-center justify-center rounded-full border border-white/60 bg-game-night-canvas/55 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-game-night-canvas/75 focus-visible:ring-white/80"
+              >
+                <ArrowLeftRight className="size-5" aria-hidden="true" />
+                <span className="sr-only">Switch Pokémon form</span>
+              </button>
+            ) : undefined
+          }
           desktopWidth="min(42vw, 620px)"
           desktopBreakpoint="lg"
           mobileHeader={false}
@@ -510,66 +547,18 @@ export default function Pokedex() {
         >
           {selectedSpecies &&
             selectedBaseForm &&
+            selectedForm &&
             (isBaseSeen ? (
               <div className="w-full overflow-y-auto flex-1 min-h-0 custom-scrollbar">
-                {/* Forms Carousel */}
                 <div className="w-full">
-                  {(() => {
-                    const visibleForms = selectedSpecies.forms.filter(
-                      (form) => {
-                        const progress = entriesByForm[form.id]
-                        const isSeen = !!(progress?.seen || progress?.caught)
-                        return form.form === 'base' || isSeen
-                      },
-                    )
-
-                    if (visibleForms.length === 1) {
-                      const form = visibleForms[0]
-                      return (
-                        <div className="w-full">
-                          <PokemonCard
-                            pokemon={form}
-                            species={selectedSpecies}
-                            progress={entriesByForm[form.id]}
-                            inventoryMap={inventoryMap}
-                            gender={selectedGender}
-                            onGenderChange={setSelectedGender}
-                          />
-                        </div>
-                      )
-                    }
-
-                    return (
-                      <div className="w-full relative">
-                        <Carousel
-                          className="w-full"
-                          opts={{ align: 'start', loop: true }}
-                        >
-                          <CarouselContent>
-                            {visibleForms.map((form) => (
-                              <CarouselItem
-                                key={form.id}
-                                className="basis-full"
-                              >
-                                <PokemonCard
-                                  pokemon={form}
-                                  species={selectedSpecies}
-                                  progress={entriesByForm[form.id]}
-                                  inventoryMap={inventoryMap}
-                                  gender={selectedGender}
-                                  onGenderChange={setSelectedGender}
-                                />
-                              </CarouselItem>
-                            ))}
-                          </CarouselContent>
-                          <div className="hidden sm:block">
-                            <CarouselPrevious className="left-4 border-game-border bg-game-surface/90 text-game-ink backdrop-blur-md hover:bg-game-surface-raised hover:text-game-moss-strong" />
-                            <CarouselNext className="right-4 border-game-border bg-game-surface/90 text-game-ink backdrop-blur-md hover:bg-game-surface-raised hover:text-game-moss-strong" />
-                          </div>
-                        </Carousel>
-                      </div>
-                    )
-                  })()}
+                  <PokemonCard
+                    pokemon={selectedForm}
+                    species={selectedSpecies}
+                    progress={selectedFormProgress}
+                    inventoryMap={inventoryMap}
+                    gender={selectedGender}
+                    onGenderChange={setSelectedGender}
+                  />
                 </div>
               </div>
             ) : (
