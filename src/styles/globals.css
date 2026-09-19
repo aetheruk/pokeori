@@ -236,6 +236,64 @@
     z-index: 1;
   }
 
+  /* Keep icons visually consistent when a caller still supplies a compact
+   * row-sized asset to a full-screen hero frame. */
+  .game-hero-icon-content,
+  .game-compact-icon-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .game-hero-icon-content > div {
+    width: 5rem !important;
+    height: 5rem !important;
+  }
+
+  .game-hero-icon-content > svg {
+    width: 3.5rem !important;
+    height: 3.5rem !important;
+  }
+
+  .game-hero-icon-content > img:not([data-nimg='fill']) {
+    width: 4rem !important;
+    height: 4rem !important;
+  }
+
+  .game-compact-icon-content > div {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+  }
+
+  .game-compact-icon-content > svg {
+    width: 2rem !important;
+    height: 2rem !important;
+  }
+
+  .game-compact-icon-content > img:not([data-nimg='fill']) {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+  }
+
+  @media (min-width: 48rem) {
+    .game-hero-icon-content > div {
+      width: 6rem !important;
+      height: 6rem !important;
+    }
+
+    .game-hero-icon-content > svg {
+      width: 4rem !important;
+      height: 4rem !important;
+    }
+
+    .game-hero-icon-content > img:not([data-nimg='fill']) {
+      width: 5rem !important;
+      height: 5rem !important;
+    }
+  }
+
   .game-icon-orb-neutral {
     --game-icon-tint: var(--game-charcoal);
   }

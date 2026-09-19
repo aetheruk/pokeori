@@ -47,7 +47,9 @@ export interface ResponsivePanelProps {
   heroLabel?: React.ReactNode
   /** Optional badge attached to the title icon. */
   heroBadge?: React.ReactNode
-  /** Optional action anchored to the lower corner of the title frame. */
+  /** Optional action anchored to the lower-left corner of the title frame. */
+  heroLeftAction?: React.ReactNode
+  /** Optional action anchored to the lower-right corner of the title frame. */
   heroAction?: React.ReactNode
   /** Additional classes for the title frame. */
   heroClassName?: string
@@ -77,6 +79,7 @@ export function ResponsivePanel({
   iconClassName,
   heroLabel,
   heroBadge,
+  heroLeftAction,
   heroAction,
   heroClassName,
   showHero = true,
@@ -176,20 +179,16 @@ export function ResponsivePanel({
                       iconClassName,
                     )}
                   >
-                    {icon || <Info className="h-14 w-14" aria-hidden="true" />}
+                    <div className="game-hero-icon-content">
+                      {icon || <Info className="h-14 w-14" aria-hidden="true" />}
+                    </div>
                   </div>
-              {heroBadge && (
-                <div className="absolute -bottom-2 -right-2 z-20">
-                  {heroBadge}
+                  {heroBadge && (
+                    <div className="absolute -bottom-2 -right-2 z-20">
+                      {heroBadge}
+                    </div>
+                  )}
                 </div>
-              )}
-
-              {heroAction && (
-                <div className="absolute bottom-[max(1rem,env(safe-area-inset-bottom))] right-5 z-20 md:right-7">
-                  {heroAction}
-                </div>
-              )}
-            </div>
                 <DialogTitle className="max-w-3xl text-3xl font-semibold leading-tight !text-white md:text-4xl">
                   {accessibleTitle}
                 </DialogTitle>
@@ -199,6 +198,18 @@ export function ResponsivePanel({
                   </DialogDescription>
                 )}
               </div>
+
+              {heroAction && (
+                <div className="absolute bottom-[max(1rem,env(safe-area-inset-bottom))] right-5 z-20 md:right-7">
+                  {heroAction}
+                </div>
+              )}
+
+              {heroLeftAction && (
+                <div className="absolute bottom-[max(1rem,env(safe-area-inset-bottom))] left-5 z-20 md:left-7">
+                  {heroLeftAction}
+                </div>
+              )}
             </section>
           </DialogHeader>
         ) : (

@@ -411,18 +411,7 @@ function AbilityDexSummary({ entry }: { entry: AbilityDexEntry }) {
   return (
     <>
       <article className="game-panel-raised min-w-0 p-4 sm:p-5">
-        <header className="flex items-start gap-4">
-          <div className="game-icon-orb game-icon-orb-art flex size-12 shrink-0 items-center justify-center">
-            <Sparkles className="size-6 text-game-ochre" aria-hidden="true" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="game-field-label mb-1.5">Ability field note</p>
-            <h2 className="font-display text-xl font-semibold text-game-ink">
-              {ability.name}
-            </h2>
-          </div>
-        </header>
-        <p className="mt-4 border-t border-game-border pt-4 text-sm leading-relaxed text-game-ink">
+        <p className="text-sm leading-relaxed text-game-ink">
           {ability.description}
         </p>
       </article>

@@ -11,7 +11,6 @@ import { GameProgressChip } from '@/components/game/shared/game-progress-chip'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
-import { SectionDivider } from '@/components/ui/section-divider'
 import { useAudio } from '@/context/AudioContext'
 import type { GameItem } from '@/data/games'
 import pokemonData from '@/data/pokemon-data'
@@ -677,24 +676,43 @@ export function PokemonSnapGame({
           </div>
 
           {/* Answer Area (Bottom 70%) */}
-          <div className="game-paper-background h-[70%] overflow-y-auto border-t border-game-border bg-game-surface p-6 text-game-ink">
-            <div className="h-full flex flex-col">
-              <SectionDivider>Take a Photo of</SectionDivider>
-              <div className="flex items-center justify-center mb-6">
-                <h2 className="break-words text-center font-display text-3xl font-semibold leading-tight text-game-ink sm:text-4xl">
-                  {requestedName}
-                </h2>
+          <div className="game-paper-background h-[70%] overflow-y-auto border-t border-game-border bg-game-surface px-4 py-4 text-game-ink sm:px-6 sm:py-5">
+            <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col">
+              {/* The subject and progress stay together so the panel has one clear
+                  starting point instead of a title, rule, and second divider. */}
+              <div className="flex items-end justify-between gap-4 border-b border-game-border pb-4">
+                <div className="min-w-0">
+                  <p className="mb-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-game-muted">
+                    Find
+                  </p>
+                  <h2 className="truncate font-display text-2xl font-semibold leading-tight text-game-ink sm:text-3xl">
+                    {requestedName}
+                  </h2>
+                </div>
+                <div className="flex shrink-0 items-baseline gap-1 rounded-full border border-game-border bg-game-surface-raised px-3 py-1.5 shadow-sm">
+                  <span className="font-display text-lg font-semibold text-game-ink">
+                    {correctSnaps}
+                  </span>
+                  <span className="text-xs font-semibold text-game-muted">
+                    / {winRateNum}
+                  </span>
+                </div>
               </div>
 
-              {/* Horizontal Rule */}
-              <hr className="mb-6 border-game-border" />
+              <div className="mb-3 flex items-center justify-between gap-3 pt-4">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-game-ink">
+                  Photo log
+                </h3>
+                <span className="text-xs text-game-muted">
+                  {photographedPokemon.length}{' '}
+                  {photographedPokemon.length === 1 ? 'photo' : 'photos'}
+                </span>
+              </div>
 
-              {/* Your Photos Section */}
-              <SectionDivider>Your Photos</SectionDivider>
-              <div className="flex-1 mb-6">
+              <div className="min-h-0 flex-1">
                 {photographedPokemon.length > 0 ? (
-                  <div className="grid grid-cols-4 gap-4 max-h-48 overflow-y-auto px-2 pt-2 pb-6">
-                    <AnimatePresence>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                    <AnimatePresence initial={false}>
                       {photographedPokemon.map((photo, index) => {
                         const pokemon = pokemonData.find(
                           (p) => p.id === photo.id,
@@ -703,73 +721,106 @@ export function PokemonSnapGame({
                           pokemon?.forms.find((f) => f.form === 'base')?.name ||
                           pokemon?.forms[0]?.name ||
                           '???'
-                        // Generate a deterministic rotation so it stays the same
-                        const rot = (index % 5) * 5 - 10
                         return (
                           <motion.div
                             key={`${photo.id}-${index}`}
-                            initial={{
-                              scale: 2,
-                              y: -200,
-                              rotate: Math.random() * 40 - 20,
-                              opacity: 0,
-                            }}
-                            animate={{
-                              scale: 1,
-                              y: 0,
-                              rotate: rot,
-                              opacity: 1,
-                            }}
+                            initial={{ opacity: 0, y: 10, scale: 0.97 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
                             transition={{
                               type: 'spring',
-                              damping: 14,
-                              stiffness: 100,
+                              damping: 18,
+                              stiffness: 220,
                             }}
-                            className="flex flex-col items-center rounded-sm border border-game-border bg-game-surface-raised p-2 pb-6 shadow-md"
+                            className={`game-panel relative overflow-hidden bg-game-surface-raised p-2.5 shadow-sm ${
+                              photo.correct
+                                ? 'border-game-moss/55'
+                                : 'border-game-clay/55'
+                            }`}
                           >
-                            <div
-                              className={`w-16 h-16 border-2 flex items-center justify-center overflow-hidden bg-white ${
-                                photo.correct
-                                  ? 'border-green-500'
-                                  : 'border-red-500'
-                              }`}
-                            >
+                            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-md border border-game-border bg-game-surface">
+                              <div
+                                className={`absolute inset-x-3 top-0 h-1 rounded-b-full ${
+                                  photo.correct
+                                    ? 'bg-game-moss'
+                                    : 'bg-game-clay'
+                                }`}
+                                aria-hidden="true"
+                              />
                               <Image
                                 src={getPokemonImageUrl(
                                   photo.id.toString(),
                                   'sprite',
                                 )}
                                 alt={pokemonName}
-                                width={48}
-                                height={48}
+                                width={72}
+                                height={72}
                                 unoptimized
                                 className="object-contain"
                               />
+                              <span
+                                role="img"
+                                className={`absolute right-1.5 top-1.5 flex size-5 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm ${
+                                  photo.correct
+                                    ? 'bg-game-moss'
+                                    : 'bg-game-clay'
+                                }`}
+                                aria-label={
+                                  photo.correct ? 'Correct photo' : 'Missed photo'
+                                }
+                              >
+                                {photo.correct ? '✓' : '×'}
+                              </span>
                             </div>
-                            <span className="mt-2 w-full truncate text-center text-[10px] font-bold tracking-tight text-game-ink">
+                            <p className="mt-2 truncate text-sm font-semibold text-game-ink">
                               {pokemonName}
-                            </span>
+                            </p>
                           </motion.div>
                         )
                       })}
                     </AnimatePresence>
                   </div>
                 ) : (
-                  <div className="text-center text-game-muted" />
+                  <div className="flex min-h-36 items-center justify-center rounded-xl border border-dashed border-game-border bg-game-surface/60 px-5 text-center">
+                    <div>
+                      <Camera className="mx-auto mb-2 size-6 text-game-muted" />
+                      <p className="text-sm font-semibold text-game-ink">
+                        No photos yet
+                      </p>
+                      <p className="mt-1 text-xs text-game-muted">
+                        Your snapshots will appear here.
+                      </p>
+                    </div>
+                  </div>
                 )}
               </div>
 
-              <div className="flex items-center justify-center pb-8">
+              <div className="mt-5 border-t border-game-border pt-4">
                 <Button
                   onClick={handleSnap}
                   disabled={!pokemonVisible || isProcessing || !roundActive}
                   size="lg"
                   variant="default"
-                  className="mt-auto flex h-24 w-48 flex-col items-center justify-center gap-1 rounded-xl border-none bg-game-clay text-game-cream opacity-100 shadow-md transition-colors hover:bg-game-clay/90 disabled:opacity-40"
+                  className="mx-auto flex h-16 w-full max-w-md items-center justify-between rounded-xl border border-game-clay/70 bg-game-clay px-3 text-left text-game-cream shadow-md transition-colors hover:bg-game-clay-strong disabled:opacity-40"
                 >
-                  <Camera className="size-10 text-game-cream" />
-                  <span className="text-xs font-bold tracking-widest uppercase">
-                    Snap
+                  <span className="flex min-w-0 items-center gap-3">
+                    <span className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-white/[0.12]">
+                      <Camera className="size-6" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-sm font-semibold">
+                        {isProcessing
+                          ? 'Saving photo…'
+                          : pokemonVisible
+                            ? 'Snap photo'
+                            : 'Waiting for a Pokémon'}
+                      </span>
+                      <span className="block text-[0.68rem] text-game-cream/70">
+                        {pokemonVisible ? 'Subject in frame' : 'Watch the viewfinder'}
+                      </span>
+                    </span>
+                  </span>
+                  <span className="hidden shrink-0 rounded-md border border-white/20 px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-game-cream/75 sm:inline-flex">
+                    Space
                   </span>
                 </Button>
               </div>
