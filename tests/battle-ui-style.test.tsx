@@ -195,13 +195,13 @@ describe('battle move and status presentation', () => {
     )
 
     expect(markup).toContain('justify-center')
-    expect(markup).toContain('bg-game-moss-strong')
-    expect(markup).toContain('bg-game-danger')
-    expect(markup).toContain('bg-game-ochre')
+    expect(markup).toContain('data-result="win"')
+    expect(markup).toContain('data-result="loss"')
+    expect(markup).toContain('data-result="tie"')
     expect(markup).toContain('>STANCE WIN<')
     expect(markup).toContain('>STANCE LOSS<')
-    expect(markup).toContain('>STANCE TIE<')
-    expect(markup).toContain('font-semibold')
+    expect(markup).toContain('>STANCE DRAW<')
+    expect(markup).toContain('font-bold')
   })
 
   test('does not label opening send-out setup as a draw', () => {
@@ -222,7 +222,7 @@ describe('battle move and status presentation', () => {
     )
 
     expect(markup).toContain('Player sent out Pikachu!')
-    expect(markup).not.toContain('>STANCE TIE<')
+    expect(markup).not.toContain('>STANCE DRAW<')
   })
 
   test('reads turns and entries within each turn from top to bottom', () => {
@@ -297,7 +297,7 @@ describe('battle move and status presentation', () => {
     expect(markup.indexOf('Turn 1 - A')).toBeLessThan(
       markup.indexOf('Turn 1 - B'),
     )
-    expect(markup.match(/STANCE (?:WIN|TIE)/g)).toHaveLength(2)
+    expect(markup.match(/STANCE (?:WIN|DRAW)/g)).toHaveLength(2)
   })
 
   test('renders doubles action targets without changing the singles action vocabulary', () => {

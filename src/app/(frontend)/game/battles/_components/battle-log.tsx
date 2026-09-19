@@ -824,15 +824,6 @@ export function BattleLog({ logs }: BattleLogProps) {
                 const hasStanceOutcome = parsedLog.actions.some(
                   (action) => !!action.stance,
                 )
-                const resultTone = !hasStanceOutcome
-                  ? undefined
-                  : log.result === 'win'
-                    ? 'border-game-moss-strong bg-game-moss-strong text-white'
-                    : log.result === 'loss'
-                      ? 'border-game-danger bg-game-danger text-white'
-                      : log.result === 'tie'
-                        ? 'border-game-ochre bg-game-ochre text-game-night-canvas'
-                        : undefined
                 const resultLabel = !hasStanceOutcome
                   ? undefined
                   : log.result === 'win'
@@ -840,7 +831,7 @@ export function BattleLog({ logs }: BattleLogProps) {
                     : log.result === 'loss'
                       ? 'STANCE LOSS'
                       : log.result === 'tie'
-                        ? 'STANCE TIE'
+                        ? 'STANCE DRAW'
                         : undefined
 
                 return (
@@ -848,10 +839,8 @@ export function BattleLog({ logs }: BattleLogProps) {
                     {resultLabel && (
                       <div className="flex justify-center">
                         <span
-                          className={cn(
-                            'inline-flex min-w-24 items-center justify-center rounded-full border px-3 py-1 text-center text-xs font-semibold tracking-[0.06em] shadow-sm',
-                            resultTone,
-                          )}
+                          className="battle-log-stance-result inline-flex min-w-24 items-center justify-center rounded-full border px-3 py-1 text-center text-xs font-bold tracking-[0.06em]"
+                          data-result={log.result}
                         >
                           {resultLabel}
                         </span>
