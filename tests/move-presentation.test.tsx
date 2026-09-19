@@ -204,7 +204,7 @@ describe('move presentation', () => {
     expect(note).toContain('Always hits')
   })
 
-  test('keeps battle commands brief while making details explicit', () => {
+  test('keeps battle move buttons visual while preserving detail access', () => {
     const presentation = getMovePresentation(
       move({
         description:
@@ -222,19 +222,18 @@ describe('move presentation', () => {
       />,
     )
 
-    expect(command).toContain('View Field Test details')
-    expect(command).toContain('Grass type')
-    expect(command).toContain('75 power')
-    expect(command).toContain('90%')
-    expect(command).toContain('Tech')
+    expect(command).toContain('data-type="grass"')
+    expect(command).toContain('data-stance="tech"')
+    expect(command).toContain('grass type')
+    expect(command).toContain('press I for move details')
     expect(command).toContain('aria-label="Use Field Test"')
-    expect(command).toContain('lucide-info')
-    expect(command).not.toContain('lucide-book-open')
+    expect(command).not.toContain('75 power')
+    expect(command).not.toContain('90%')
     expect(command).not.toContain('deliberately long summary')
     expect(command).not.toContain('Current offensive value')
   })
 
-  test('surfaces only a move condition as a compact battle warning', () => {
+  test('keeps move conditions in the field note', () => {
     const presentation = getMovePresentation(
       move({ battleCondition: { type: 'first-active-turn' } }),
     )
@@ -246,11 +245,11 @@ describe('move presentation', () => {
       />,
     )
 
-    expect(command).toContain('first active turn')
+    expect(command).not.toContain('first active turn')
     expect(command).not.toContain('A precise test move')
   })
 
-  test('condenses battle self-damage warnings', () => {
+  test('keeps battle self-damage warnings in the field note', () => {
     const presentation = getMovePresentation(
       move({ selfDamage: { fraction: 2, trigger: 'on-miss' } }),
     )
@@ -262,7 +261,7 @@ describe('move presentation', () => {
       />,
     )
 
-    expect(command).toContain('Miss: lose 1/2 max HP')
+    expect(command).not.toContain('Miss: lose 1/2 max HP')
     expect(command).not.toContain('If this move misses')
   })
 })

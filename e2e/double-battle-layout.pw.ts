@@ -82,7 +82,16 @@ test('move section matches singles and resolves ally/spread targeting automatica
   await page.getByRole('button', { name: 'Moves' }).click()
   await expect(page.getByText('4 left', { exact: true })).toBeVisible()
   await expect(page.getByText('Special Moves (4)')).toBeVisible()
-  await expect(page.getByRole('button', { name: 'View Helping Hand details' })).toBeVisible()
+  const helpingHand = page.getByRole('button', { name: 'Use Helping Hand' })
+  const buttonBox = await helpingHand.boundingBox()
+  expect(buttonBox).not.toBeNull()
+  await page.mouse.move(buttonBox!.x + buttonBox!.width / 2, buttonBox!.y + buttonBox!.height / 2)
+  await page.mouse.down()
+  await page.waitForTimeout(650)
+  await expect(page.getByText('Move field note')).toBeVisible()
+  await expect(page.getByTestId('staged-doubles-actions')).toHaveText('{}')
+  await page.mouse.up()
+  await page.getByRole('button', { name: 'Back to moves' }).click()
   await page.getByRole('button', { name: 'Use Helping Hand' }).click()
   await expect(page.getByTestId('selected-doubles-arrow')).toHaveCount(1)
   await expect(page.getByTestId('staged-doubles-actions')).toContainText('"side":"ally"')
@@ -92,6 +101,39 @@ test('move section matches singles and resolves ally/spread targeting automatica
   await expect(page.getByTestId('submitted-doubles-actions')).toContainText('"moveId":"heat-wave"')
   await expect(page.getByTestId('submitted-doubles-actions')).toContainText('"side":"ally"')
   await expect(page.getByTestId('submitted-doubles-actions')).not.toContainText('"target":{"side":"opponent"')
+})
+
+test.describe('touch move details', () => {
+  test.use({ hasTouch: true, isMobile: true })
+
+  test('a long hold opens the field note without choosing the move', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.goto('/ui-test/doubles')
+    await page.getByRole('button', { name: 'Moves' }).click()
+
+    const move = page.getByRole('button', { name: 'Use Helping Hand' })
+    const box = await move.boundingBox()
+    expect(box).not.toBeNull()
+    const touchPoint = { x: box!.x + box!.width / 2, y: box!.y + box!.height / 2 }
+    const cdp = await page.context().newCDPSession(page)
+    await cdp.send('Input.dispatchTouchEvent', {
+      type: 'touchStart',
+      touchPoints: [{ ...touchPoint, id: 1 }],
+    })
+    await expect(page.getByText('Move field note')).toBeVisible()
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
+    await expect(page.getByTestId('staged-doubles-actions')).toHaveText('{}')
+    await page.getByRole('button', { name: 'Back to moves' }).click()
+
+    await move.focus()
+    await page.keyboard.press('i')
+    await expect(page.getByText('Move field note')).toBeVisible()
+    await expect(page.getByTestId('staged-doubles-actions')).toHaveText('{}')
+    await page.getByRole('button', { name: 'Back to moves' }).click()
+    await move.focus()
+    await page.keyboard.press('Enter')
+    await expect(page.getByTestId('staged-doubles-actions')).toContainText('"moveId":"helping-hand"')
+  })
 })
 
 test('a submitted double turn animates the acting lanes and delays enemy HP changes', async ({ page }) => {

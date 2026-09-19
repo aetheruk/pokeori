@@ -1,40 +1,14 @@
 'use client'
 
-import { AlertTriangle, Info, Loader2 } from 'lucide-react'
-import Image from 'next/image'
+import { useEffect, useId, useRef, type PointerEvent } from 'react'
+import { Loader2 } from 'lucide-react'
 
-import {
-  STANCE_ICON_CONFIG,
-  StanceIcon,
-} from '@/components/game/shared/stance-icon'
-import { Badge } from '@/components/ui/badge'
+import { STANCE_ICON_CONFIG } from '@/components/game/shared/stance-icon'
 import { cn } from '@/lib/utils'
-import type {
-  MovePresentation,
-  MovePresentationDetail,
-} from '@/utilities/pokemon/move-display'
-import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
+import type { MovePresentation } from '@/utilities/pokemon/move-display'
 
-const TYPE_IDS: Record<string, number> = {
-  normal: 1,
-  fighting: 2,
-  flying: 3,
-  poison: 4,
-  ground: 5,
-  rock: 6,
-  bug: 7,
-  ghost: 8,
-  steel: 9,
-  fire: 10,
-  water: 11,
-  grass: 12,
-  electric: 13,
-  psychic: 14,
-  ice: 15,
-  dragon: 16,
-  dark: 17,
-  fairy: 18,
-}
+const DETAILS_HOLD_MS = 550
+const HOLD_MOVE_TOLERANCE_PX = 12
 
 export interface MoveBattleCommandProps {
   presentation: MovePresentation
@@ -53,128 +27,97 @@ export function MoveBattleCommand({
   pending = false,
   className,
 }: MoveBattleCommandProps) {
-  const { identity, essentials } = presentation
-  const typeId = TYPE_IDS[identity.type]
-  const stance = STANCE_ICON_CONFIG[identity.stance]
-  const caution =
-    presentation.conditions[0] ??
-    presentation.risks[0] ??
-    presentation.timing[0]
-  const power = /^\d/.test(essentials.power.value)
-    ? `${essentials.power.value} power`
-    : essentials.power.value
+  const { identity } = presentation
+  const Icon = STANCE_ICON_CONFIG[identity.stance]?.Icon
+  const detailsHintId = useId()
+  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const holdOrigin = useRef<{ x: number; y: number } | null>(null)
+  const suppressClick = useRef(false)
+
+  const cancelHold = () => {
+    if (holdTimer.current !== null) clearTimeout(holdTimer.current)
+    holdTimer.current = null
+    holdOrigin.current = null
+  }
+
+  useEffect(() => cancelHold, [])
+
+  const openDetails = (suppressNextClick: boolean) => {
+    cancelHold()
+    suppressClick.current = suppressNextClick
+    onDetails()
+  }
+
+  const startHold = (event: PointerEvent<HTMLButtonElement>) => {
+    if (event.button !== 0) return
+    cancelHold()
+    suppressClick.current = false
+    holdOrigin.current = { x: event.clientX, y: event.clientY }
+    holdTimer.current = setTimeout(() => openDetails(true), DETAILS_HOLD_MS)
+  }
+
+  const checkHoldMovement = (event: PointerEvent<HTMLButtonElement>) => {
+    if (!holdOrigin.current) return
+    const distance = Math.hypot(
+      event.clientX - holdOrigin.current.x,
+      event.clientY - holdOrigin.current.y,
+    )
+    if (distance > HOLD_MOVE_TOLERANCE_PX) cancelHold()
+  }
 
   return (
-    <article
+    <button
+      type="button"
+      data-type={identity.type.toLowerCase()}
+      data-stance={identity.stance}
+      data-pending={pending || undefined}
+      aria-label={`Use ${identity.name}`}
+      aria-describedby={detailsHintId}
+      aria-keyshortcuts="I"
+      aria-disabled={disabled}
+      aria-busy={pending}
+      title="Hold for move details"
       className={cn(
-        'game-panel grid min-w-0 grid-cols-[minmax(0,1fr)_auto] overflow-hidden p-0',
+        'game-battle-stance game-battle-move relative w-full min-w-0 border text-left',
         className,
       )}
+      onPointerDown={startHold}
+      onPointerMove={checkHoldMovement}
+      onPointerUp={cancelHold}
+      onPointerCancel={cancelHold}
+      onPointerLeave={cancelHold}
+      onContextMenu={(event) => {
+        event.preventDefault()
+        if (event.button === 2 || !suppressClick.current) {
+          openDetails(event.button !== 2)
+        }
+      }}
+      onKeyDown={(event) => {
+        if (event.key.toLowerCase() !== 'i' || event.altKey || event.ctrlKey || event.metaKey || event.repeat) return
+        event.preventDefault()
+        openDetails(false)
+      }}
+      onClick={(event) => {
+        if (suppressClick.current && event.detail !== 0) {
+          suppressClick.current = false
+          event.preventDefault()
+          return
+        }
+        if (!disabled) onSelect()
+      }}
     >
-      <button
-        type="button"
-        onClick={onSelect}
-        disabled={disabled}
-        aria-label={`Use ${identity.name}`}
-        className="game-focus-ring group min-h-[4.5rem] min-w-0 px-3 py-2.5 text-left outline-none transition-colors hover:bg-game-charcoal/5 focus-visible:bg-game-charcoal/10 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        <span className="flex min-w-0 items-center gap-2">
-          {typeId ? (
-            <span className="flex h-6 shrink-0 items-center rounded-md border border-game-border bg-game-surface-raised px-1.5">
-              <Image
-                src={getPokemonTypeIconUrl(typeId)}
-                alt={`${titleCase(identity.type)} type`}
-                width={64}
-                height={28}
-                className="h-3.5 w-auto object-contain"
-                unoptimized
-              />
-            </span>
-          ) : (
-            <Badge
-              variant="outline"
-              className="border-game-border bg-game-surface-raised px-1.5 text-[10px] text-game-ink"
-            >
-              {titleCase(identity.type)}
-            </Badge>
-          )}
-          <strong className="min-w-0 flex-1 truncate font-display text-sm text-game-ink">
-            {identity.name}
-          </strong>
-          {pending ? <Loader2 className="size-4 shrink-0 animate-spin text-game-charcoal-strong" aria-hidden="true" /> : null}
-        </span>
-
-        <span className="mt-1.5 flex min-w-0 items-center gap-1.5 text-xs font-semibold text-game-muted">
-          <span className="font-mono text-game-ink">{power}</span>
-          <span aria-hidden="true">·</span>
-          <span className="font-mono">{essentials.accuracy.value}</span>
-          <span aria-hidden="true">·</span>
-          <span className="inline-flex min-w-0 items-center gap-1">
-            <StanceIcon
-              stance={identity.stance}
-              className={cn('size-3.5 shrink-0', stance?.tone)}
-            />
-            <span>{stance?.label ?? titleCase(identity.stance)}</span>
-          </span>
-        </span>
-
-        {caution ? (
-          <span className="mt-1 flex min-w-0 items-center gap-1 text-[11px] leading-tight text-game-clay-strong">
-            <AlertTriangle className="size-3 shrink-0" aria-hidden="true" />
-            <span className="truncate">{compactWarning(caution)}</span>
-          </span>
-        ) : null}
-      </button>
-
-      <div className="flex items-center border-l border-game-border px-1.5">
-        <button
-          type="button"
-          onClick={onDetails}
-          aria-label={`View ${identity.name} details`}
-          title={`View ${identity.name} details`}
-          className="game-focus-ring flex size-10 items-center justify-center text-game-muted transition-colors hover:text-game-charcoal-strong"
-        >
-          <Info className="size-4" aria-hidden="true" />
-        </button>
-      </div>
-    </article>
+      <span className="game-battle-stance-icon relative inline-flex size-10 shrink-0 items-center justify-center" aria-hidden="true">
+        {Icon ? <Icon className="relative z-10 size-7 [&_*]:stroke-[1.8]" /> : null}
+      </span>
+      <span className="game-battle-stance-name min-w-0 text-right">
+        <strong className="block truncate font-display text-lg font-black leading-tight sm:text-xl">
+          {identity.name}
+        </strong>
+      </span>
+      {pending ? <Loader2 className="absolute top-2 right-2 z-10 size-4 animate-spin text-game-cream" aria-hidden="true" /> : null}
+      <span id={detailsHintId} className="sr-only">
+        {identity.type} type, {identity.stance} stance. Press and hold, right click, or press I for move details.
+      </span>
+    </button>
   )
-}
-
-function titleCase(value: string): string {
-  return value
-    .replace(/-/g, ' ')
-    .replace(/\b\w/g, (letter) => letter.toUpperCase())
-}
-
-function compactWarning(detail: MovePresentationDetail): string {
-  const sentence = detail.value.replace(/\.$/, '')
-
-  if (detail.id === 'self-damage') {
-    const trigger = sentence.startsWith('If this move misses')
-      ? 'Miss'
-      : sentence.startsWith('When this move is used')
-        ? 'Use'
-        : 'Hit'
-    const loss = sentence.match(/lose (.+?)(?: of maximum HP)?$/)?.[1] ?? 'HP'
-    const chance = detail.chance && detail.chance < 100 ? `${detail.chance}% ` : ''
-    return `${trigger}: ${chance}lose ${loss.replace(' of maximum HP', '')} max HP`
-  }
-
-  if (detail.id === 'charge') {
-    return sentence.replace(/^Charges for /, 'Charge: ').replace(/ before attacking$/, '')
-  }
-  if (detail.id === 'recharge') {
-    return sentence
-      .replace(/^The user must recharge for /, 'Recharge: ')
-      .replace(/ afterward$/, '')
-  }
-  if (detail.id === 'continuous') {
-    return sentence.replace(/^Continues for /, 'Repeat: ')
-  }
-
-  return sentence
-    .replace(/^Only works on /, 'Only on ')
-    .replace(/^Only works while /, 'Only while ')
-    .replace(/^Only works /, 'Only ')
 }
