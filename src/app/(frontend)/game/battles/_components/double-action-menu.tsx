@@ -307,14 +307,13 @@ export function DoubleActionMenu() {
           />
         )
       ) : panel === 'switch' ? (
-        <div className="mx-auto grid max-w-xl gap-2 sm:grid-cols-2">
-          {reserves.map(({ mon, index }) => (
-            <Button key={index} type="button" variant="outline" className="h-14 w-full justify-between gap-3 rounded-lg border-game-border bg-game-canvas px-3 text-left" disabled={disabled} onClick={() => commit({slot:selectedSlot, kind:'switch', pokemonIndex:index})}>
-              <span className="truncate text-sm font-semibold">{mon.name}</span>
-              <span className="shrink-0 font-mono text-xs text-game-muted">{mon.currentHp}/{mon.maxHp} HP</span>
-            </Button>
-          ))}
-        </div>
+        <TeamSwapper
+          embedded
+          doublesReplacementSlots={[selectedSlot]}
+          doublesActiveSlots={slots}
+          unavailablePokemonIndices={otherDraft?.kind === 'switch' ? [otherDraft.pokemonIndex] : []}
+          onDoublesReplace={(_, pokemonIndex) => commit({ slot: selectedSlot, kind: 'switch', pokemonIndex })}
+        />
       ) : panel === 'powers' ? (
         <div className="mx-auto max-w-xl space-y-2">
           {getStanceWinCharges(battleState.powers) < POWER_STANCE_WIN_COST && <p className="rounded-lg border border-game-border bg-game-canvas/70 p-3 text-sm text-game-muted">Win {POWER_STANCE_WIN_COST - getStanceWinCharges(battleState.powers)} more stance matchups to use a Power.</p>}

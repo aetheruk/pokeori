@@ -165,7 +165,10 @@ export function StanceSelector({
   ]
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-3">
+    <div
+      className="game-battle-stance-panel mx-auto w-full max-w-2xl space-y-3"
+      data-type={stanceType.toLowerCase()}
+    >
       {types && types.length > 0 && (
         <div
           className="game-battle-type-strip game-battle-type-strip--drawer"

@@ -42,6 +42,7 @@ type TeamSwapperProps = {
   compact?: boolean
   doublesReplacementSlots?: number[]
   doublesActiveSlots?: readonly (number | null)[]
+  unavailablePokemonIndices?: readonly number[]
   onDoublesReplace?: (slot: 0 | 1, pokemonIndex: number) => void | Promise<void>
   embedded?: boolean
   onActionComplete?: () => void
@@ -54,6 +55,7 @@ export function TeamSwapper({
   compact = false,
   doublesReplacementSlots,
   doublesActiveSlots,
+  unavailablePokemonIndices,
   onDoublesReplace,
   embedded = false,
   onActionComplete,
@@ -65,6 +67,7 @@ export function TeamSwapper({
     activePlayerMon,
     isAnimating,
     isWaitingForServer,
+    isWaitingForOpponent,
     pendingBattleAction,
     handleSwapPokemon: onSwap,
   } = useBattleContext()
@@ -77,9 +80,11 @@ export function TeamSwapper({
   const replacementSlots = doublesReplacementSlots ?? []
   const replacementSlot = replacementSlots[0]
   const activeSlots = doublesActiveSlots ?? []
+  const unavailableIndices = unavailablePokemonIndices ?? []
   const disabled =
     isAnimating ||
     isWaitingForServer ||
+    isWaitingForOpponent ||
     battleState.status !== 'ongoing' ||
     (!isDoublesReplacement &&
       !leadSelection &&
@@ -94,7 +99,9 @@ export function TeamSwapper({
     (p, i) =>
       (isDoublesReplacement
         ? !activeSlots.includes(i)
-        : leadSelection || i !== activeIndex) && p.currentHp > 0,
+        : leadSelection || i !== activeIndex) &&
+      !unavailableIndices.includes(i) &&
+      p.currentHp > 0,
   ).length
 
   useEffect(() => {
@@ -187,15 +194,16 @@ export function TeamSwapper({
               Lane {replacementSlot + 1}
             </p>
           )}
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             {team.map((pokemon, index) => {
               const isActive = isDoublesReplacement
                 ? activeSlots.includes(index)
                 : index === activeIndex
               const isFainted = pokemon.currentHp <= 0
+              const isUnavailable = unavailableIndices.includes(index)
               const canSwitch = isDoublesReplacement
-                ? !isActive && !isFainted
-                : (leadSelection || !isActive) && !isFainted
+                ? !isActive && !isFainted && !isUnavailable
+                : (leadSelection || !isActive) && !isFainted && !isUnavailable
               const hpPercent = Math.round(
                 (pokemon.currentHp / pokemon.maxHp) * 100,
               )
@@ -205,7 +213,7 @@ export function TeamSwapper({
                   key={index}
                   variant="outline"
                   className={cn(
-                    'game-focus-ring relative h-auto min-h-[6.5rem] rounded-xl border border-game-border bg-game-canvas/55 px-2 py-2 flex items-center gap-2 sm:px-3 sm:py-2.5 sm:gap-3',
+                    'game-focus-ring relative h-auto min-h-[6.5rem] min-w-0 rounded-xl border border-game-border bg-game-canvas/55 px-2 py-2 flex flex-col items-stretch gap-1.5 text-left sm:flex-row sm:items-center sm:gap-3 sm:px-3 sm:py-2.5',
                     'shadow-sm transition-colors',
                     isActive &&
                       !leadSelection &&
@@ -221,12 +229,10 @@ export function TeamSwapper({
                   onClick={() =>
                     canSwitch && handleSwap(index, replacementSlot)
                   }
-                  disabled={
-                    !canSwitch || swapping !== null || isWaitingForServer
-                  }
+                  disabled={!canSwitch || swapping !== null || disabled}
                 >
                   {/* Pokemon Sprite */}
-                  <div className="relative h-12 w-12 flex-shrink-0 sm:h-14 sm:w-14">
+                  <div className="relative mx-auto h-12 w-12 flex-shrink-0 sm:mx-0 sm:h-14 sm:w-14">
                     <PokemonRaritySprite
                       formId={pokemon.formId}
                       view="front"
@@ -247,19 +253,26 @@ export function TeamSwapper({
                   </div>
 
                   {/* Pokemon Info */}
-                  <div className="min-w-0 flex-1 text-left">
-                    <div className="flex min-w-0 items-center gap-1.5">
-                      <span className="truncate text-xs font-semibold sm:text-sm">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex min-w-0 flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-1.5">
+                      <span className="min-w-0 truncate text-xs font-semibold sm:flex-1 sm:text-sm">
                         {pokemon.name}
                       </span>
-                      <span className="shrink-0 text-[10px] text-game-muted sm:text-xs">
-                        Lv.{pokemon.level}
-                      </span>
-                      {isActive && !leadSelection && (
-                        <span className="shrink-0 text-[10px] font-medium text-game-moss">
-                          Active
+                      <span className="flex flex-wrap items-center gap-1.5">
+                        <span className="shrink-0 text-[10px] text-game-muted sm:text-xs">
+                          Lv.{pokemon.level}
                         </span>
-                      )}
+                        {isActive && !leadSelection && (
+                          <span className="shrink-0 text-[10px] font-medium text-game-moss">
+                            Active
+                          </span>
+                        )}
+                        {isUnavailable && (
+                          <span className="shrink-0 text-[10px] font-medium text-game-muted">
+                            Chosen
+                          </span>
+                        )}
+                      </span>
                     </div>
 
                     {/* HP Bar */}
