@@ -488,11 +488,6 @@ export default function Pokedex() {
           open={!!selectedSpeciesId}
           onOpenChange={(open) => !open && handleCloseDrawer(false)}
           title={isBaseSeen ? selectedBaseForm?.name : 'Unknown Pokémon'}
-          description={
-            isBaseSeen
-              ? `Details for ${selectedBaseForm?.name}`
-              : 'Record details are not yet available.'
-          }
           icon={
             isBaseSeen && selectedBaseForm ? (
               <PokemonImage
