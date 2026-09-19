@@ -812,6 +812,7 @@ export function InventoryList() {
         onOpenChange={(open) => !open && setSelectedItem(null)}
         title={selectedItem?.name || ''}
         description={isTmOrHmItem ? undefined : selectedItemDescription}
+        descriptionInHero
         category={
           selectedItemDisplayPlacement
             ? selectedItemDisplayPlacement.group === 'tms' &&
