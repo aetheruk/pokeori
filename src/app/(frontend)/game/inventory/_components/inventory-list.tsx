@@ -813,6 +813,7 @@ export function InventoryList() {
         title={selectedItem?.name || ''}
         description={isTmOrHmItem ? undefined : selectedItemDescription}
         descriptionInHero
+        background="/backgrounds/artisan-workshop.avif"
         category={
           selectedItemDisplayPlacement
             ? selectedItemDisplayPlacement.group === 'tms' &&
