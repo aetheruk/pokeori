@@ -1070,8 +1070,16 @@
   pointer-events: none;
 }
 
-.game-battle-section[data-type] .game-battle-section-body {
+.game-battle-section[data-panel='stance'] .game-battle-section-body {
   color: var(--game-cream);
+}
+
+.game-battle-section[data-panel='moves'] .game-battle-section-body {
+  color: var(--game-cream);
+}
+
+.game-battle-section[data-panel='powers'] {
+  --game-muted: #4e5752;
 }
 
 .battle-stance-win-glow {

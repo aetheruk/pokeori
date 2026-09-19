@@ -87,6 +87,7 @@ function SingleBattleActionMenu() {
       canGoBack={!forceSwitch}
       uses={commandUses}
       stanceType={activePlayerMon.teraTypeOverride ?? selectedType ?? activePlayerMon.types[0]}
+      primaryType={activePlayerMon.types[0]}
       commands={activeMoveLock ? (
         <Button type="button" size="lg" className="h-14 w-full text-base font-semibold" disabled={isDisabled} onClick={() => handleUseMove(activeMoveLock.moveId)}>{lockedMoveLabel}</Button>
       ) : (
@@ -115,7 +116,7 @@ function SingleBattleActionMenu() {
       )}
 
       {forceSwitch ? (
-        <div className="mx-auto flex w-full max-w-xl flex-col items-center gap-3">
+        <div className="flex w-full flex-col items-stretch gap-3">
           <div className="w-full rounded-lg border border-game-ochre/40 bg-game-ochre/10 px-4 py-3 text-center text-sm font-semibold text-game-ink">
             {requiresLeadSelection
               ? `A wild ${activeEnemyMon.battleAbilityState?.illusionMask?.name || activeEnemyMon.name} appeared. Choose your Pokemon.`
@@ -149,7 +150,7 @@ function SingleBattleActionMenu() {
       ) : panel === 'switch' ? (
         <TeamSwapper embedded onActionComplete={() => setPanel(null)} />
       ) : panel === 'flee' ? (
-        <div className="mx-auto flex max-w-sm flex-col items-center gap-4 py-8 text-center">
+        <div className="flex w-full max-w-sm flex-col items-center gap-4 text-center">
           <p className="text-sm text-game-muted">Leave this battle? This counts as a loss.</p>
           <Button type="button" className="game-accent-button w-full bg-game-clay" disabled={fleeing || isDisabled} onClick={async () => { setFleeing(true); try { await handleSurrender() } finally { setFleeing(false) } }}>Confirm flee</Button>
         </div>
