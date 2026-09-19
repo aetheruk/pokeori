@@ -908,11 +908,11 @@
 }
 
 .game-battle-stance-panel {
-  --battle-type-color: #a8a77a;
+  --battle-type-color: #9fa19e;
 }
 
 .game-battle-move {
-  --battle-type-color: #b6bdc5;
+  --battle-type-color: #9fa19e;
   touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
@@ -931,11 +931,11 @@
 }
 
 .game-battle-stance {
-  --battle-stance-fill: color-mix(in srgb, var(--battle-type-color) 36%, var(--game-ink));
-  --battle-stance-fill-strong: color-mix(in srgb, var(--battle-type-color) 22%, var(--game-ink));
-  --battle-stance-ink: var(--game-cream);
-  --battle-stance-wedge: color-mix(in srgb, var(--battle-type-color) 52%, var(--game-ink));
-  --battle-stance-fold: color-mix(in srgb, var(--battle-type-color) 75%, var(--game-ink));
+  --battle-stance-fill: color-mix(in srgb, var(--battle-type-color) var(--battle-stance-speed-strength, 100%), #1a1b20);
+  --battle-stance-fill-strong: color-mix(in srgb, var(--battle-stance-fill) 85%, #1a1b20);
+  --battle-stance-ink: var(--battle-type-stance-ink, #fff);
+  --battle-stance-wedge: color-mix(in srgb, var(--battle-type-color) 55%, #172026);
+  --battle-stance-fold: color-mix(in srgb, var(--battle-type-color) 80%, #172026);
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   min-height: 4.75rem;
@@ -981,21 +981,17 @@
 }
 
 .game-battle-stance[data-stance='power'] {
-  --battle-stance-fill: color-mix(in srgb, var(--battle-type-color) 28%, var(--game-ink));
-  --battle-stance-fill-strong: color-mix(in srgb, var(--battle-type-color) 18%, var(--game-ink));
+  --battle-stance-fill: color-mix(in srgb, var(--battle-type-color) calc(var(--battle-stance-speed-strength, 100%) - 8%), #1a1b20);
 }
 
 .game-battle-stance[data-stance='tech'] {
-  --battle-stance-fill: color-mix(in srgb, var(--battle-type-color) 20%, var(--game-ink));
-  --battle-stance-fill-strong: color-mix(in srgb, var(--battle-type-color) 14%, var(--game-ink));
+  --battle-stance-fill: color-mix(in srgb, var(--battle-type-color) calc(var(--battle-stance-speed-strength, 100%) - 16%), #1a1b20);
 }
 
 .game-battle-stance.game-battle-move {
-  /* Type strength varies to keep the cream move name legible on every hue. */
-  --battle-stance-fill: color-mix(in srgb, var(--battle-type-color) var(--battle-move-type-strength, 50%), #23272b);
+  --battle-stance-fill: var(--battle-type-color);
   --battle-stance-fill-strong: color-mix(in srgb, var(--battle-stance-fill) 80%, #171b1f);
-  --battle-stance-wedge: color-mix(in srgb, var(--battle-stance-fill) 85%, var(--battle-type-color));
-  --battle-stance-fold: color-mix(in srgb, var(--battle-type-color) 55%, #23272b);
+  --battle-stance-ink: var(--battle-type-move-ink, #fff);
 }
 
 .game-battle-stance.game-battle-move[data-type='normal'] {
@@ -1007,12 +1003,8 @@
 }
 
 .game-battle-stance:hover:enabled {
-  background: color-mix(in srgb, var(--battle-stance-fill) 82%, white);
-  transform: translateY(-1px);
-}
-
-.game-battle-stance.game-battle-move:hover {
   background: color-mix(in srgb, var(--battle-stance-fill) 97%, white);
+  transform: translateY(-1px);
 }
 
 .game-battle-stance.game-battle-move[aria-disabled='true']:hover {
@@ -1224,94 +1216,103 @@ body.pokeori-blackout .game-battle-stance-drawer[data-type],
   transition: background-color 160ms ease;
 }
 
+/* These hues follow the fill colors of public/sprites/types/default/*.avif. */
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='normal'] {
-  --battle-type-color: #b6bdc5;
-  --battle-move-type-strength: 43%;
+  --battle-type-color: #9fa19e;
+  --battle-type-stance-ink: #0f171a;
+  --battle-type-move-ink: #0f171a;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='fighting'] {
-  --battle-type-color: #c22e28;
-  --battle-move-type-strength: 100%;
+  --battle-type-color: #ff7f01;
+  --battle-type-stance-ink: #0f171a;
+  --battle-type-move-ink: #0f171a;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='flying'] {
-  --battle-type-color: #a98ff3;
-  --battle-move-type-strength: 54%;
+  --battle-type-color: #81b9ee;
+  --battle-type-stance-ink: #0f171a;
+  --battle-type-move-ink: #0f171a;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='poison'] {
-  --battle-type-color: #a33ea1;
-  --battle-move-type-strength: 99%;
+  --battle-type-color: #9140cd;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='ground'] {
-  --battle-type-color: #e2bf65;
-  --battle-move-type-strength: 41%;
+  --battle-type-color: #925121;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='rock'] {
-  --battle-type-color: #b6a136;
-  --battle-move-type-strength: 53%;
+  --battle-type-color: #aea981;
+  --battle-type-stance-ink: #0f171a;
+  --battle-type-move-ink: #0f171a;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='bug'] {
-  --battle-type-color: #a6b91a;
-  --battle-move-type-strength: 48%;
+  --battle-type-color: #91a11a;
+  --battle-type-stance-ink: #0f171a;
+  --battle-type-move-ink: #0f171a;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='ghost'] {
-  --battle-type-color: #735797;
-  --battle-move-type-strength: 100%;
+  --battle-type-color: #704070;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='steel'] {
-  --battle-type-color: #b7b7ce;
-  --battle-move-type-strength: 44%;
+  --battle-type-color: #60a1b7;
+  --battle-type-stance-ink: #0f171a;
+  --battle-type-move-ink: #0f171a;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='fire'] {
-  --battle-type-color: #ee8130;
-  --battle-move-type-strength: 55%;
+  /* A slight darkening of the sprite red keeps white move text readable. */
+  --battle-type-color: #df2626;
+  --battle-stance-speed-strength: 98%;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='water'] {
-  --battle-type-color: #6390f0;
-  --battle-move-type-strength: 60%;
+  --battle-type-color: #2881ef;
+  --battle-stance-speed-strength: 84%;
+  --battle-type-move-ink: #0f171a;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='grass'] {
-  --battle-type-color: #7ac74c;
-  --battle-move-type-strength: 46%;
+  --battle-type-color: #3fa12a;
+  --battle-stance-speed-strength: 76%;
+  --battle-type-move-ink: #0f171a;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='electric'] {
-  --battle-type-color: #f7d02c;
-  --battle-move-type-strength: 38%;
+  --battle-type-color: #fabf00;
+  --battle-type-stance-ink: #0f171a;
+  --battle-type-move-ink: #0f171a;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='psychic'] {
-  --battle-type-color: #f95587;
-  --battle-move-type-strength: 63%;
+  --battle-type-color: #ee4079;
+  --battle-stance-speed-strength: 83%;
+  --battle-type-move-ink: #0f171a;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='ice'] {
-  --battle-type-color: #96d9d6;
-  --battle-move-type-strength: 39%;
+  --battle-type-color: #3ed9fe;
+  --battle-type-stance-ink: #0f171a;
+  --battle-type-move-ink: #0f171a;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='dragon'] {
-  --battle-type-color: #6f35fc;
-  --battle-move-type-strength: 100%;
+  --battle-type-color: #5062e1;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='dark'] {
-  --battle-type-color: #705746;
-  --battle-move-type-strength: 100%;
+  --battle-type-color: #50413e;
 }
 
 :is(.game-battle-type-strip, .game-battle-stance-drawer, .game-battle-stance-panel, .game-battle-move)[data-type='fairy'] {
-  --battle-type-color: #d685ad;
-  --battle-move-type-strength: 54%;
+  --battle-type-color: #f16ff1;
+  --battle-type-stance-ink: #0f171a;
+  --battle-type-move-ink: #0f171a;
 }
 
 .game-battle-type-selector {
