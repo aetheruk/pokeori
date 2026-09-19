@@ -31,6 +31,7 @@ import { PremiumSearch } from '@/components/game/shared/PremiumSearch'
 import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
+import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -675,7 +676,13 @@ export function InventoryList() {
       <PremiumHeader
         title="INVENTORY"
         subtitle="Storage"
-        icon={<PackageOpen className="h-7 w-7" aria-hidden="true" />}
+        icon={
+          <TaskIconDisplay
+            icon={{ type: 'local', id: '/fallback/skills/inventory-v2.png' }}
+            className="h-10 w-10"
+            priority
+          />
+        }
       />
 
       <div className="hidden items-center gap-3 border-b border-game-border bg-game-surface/70 px-6 py-3 lg:flex">
