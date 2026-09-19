@@ -2183,6 +2183,7 @@ export function ArtisanPanel() {
         onOpenChange={(open) => !open && setSelectedRecipeGroup(null)}
         title={selectedRecipeGroup?.name || ''}
         description={selectedRecipeGroup?.description}
+        descriptionInHero
         category={
           selectedRecipeGroup
             ? `Artisan · ${selectedRecipeGroup.categoryLabel}`
@@ -2342,6 +2343,7 @@ export function ArtisanPanel() {
         onOpenChange={(open) => !open && setSelectedRecipe(null)}
         title={selectedRecipe?.name || ''}
         description={selectedRecipe?.description}
+        descriptionInHero
         category={
           selectedRecipe
             ? `Artisan · ${categoryLabels[selectedRecipe.category]}`

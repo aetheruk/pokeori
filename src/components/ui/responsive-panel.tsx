@@ -47,6 +47,8 @@ export interface ResponsivePanelProps {
   heroLabel?: React.ReactNode
   /** Optional badge attached to the title icon. */
   heroBadge?: React.ReactNode
+  /** Optional action anchored to the lower corner of the title frame. */
+  heroAction?: React.ReactNode
   /** Additional classes for the title frame. */
   heroClassName?: string
   /** Opt out only when a caller supplies its own full-screen header. */
@@ -75,6 +77,7 @@ export function ResponsivePanel({
   iconClassName,
   heroLabel,
   heroBadge,
+  heroAction,
   heroClassName,
   showHero = true,
 }: ResponsivePanelProps) {
@@ -175,12 +178,18 @@ export function ResponsivePanel({
                   >
                     {icon || <Info className="h-14 w-14" aria-hidden="true" />}
                   </div>
-                  {heroBadge && (
-                    <div className="absolute -bottom-2 -right-2 z-20">
-                      {heroBadge}
-                    </div>
-                  )}
+              {heroBadge && (
+                <div className="absolute -bottom-2 -right-2 z-20">
+                  {heroBadge}
                 </div>
+              )}
+
+              {heroAction && (
+                <div className="absolute bottom-[max(1rem,env(safe-area-inset-bottom))] right-5 z-20 md:right-7">
+                  {heroAction}
+                </div>
+              )}
+            </div>
                 <DialogTitle className="max-w-3xl text-3xl font-semibold leading-tight !text-white md:text-4xl">
                   {accessibleTitle}
                 </DialogTitle>

@@ -86,6 +86,24 @@ export default function AbilityDexPage() {
     defaultRowHeight: 88,
     key: `${selectedView}:${query}`,
   })
+  const selectedAbilityRepresentative = useMemo(
+    () =>
+      selectedAbility
+        ? getAbilityDexRepresentativeLearner(
+            selectedAbility.entry,
+            entriesByForm,
+            selectedAbility.isKnown,
+          )
+        : null,
+    [entriesByForm, selectedAbility],
+  )
+  const selectedAbilitySpecies = useMemo(
+    () =>
+      selectedAbilityRepresentative
+        ? getPokemonSpecies(selectedAbilityRepresentative.speciesId)
+        : undefined,
+    [selectedAbilityRepresentative],
+  )
 
   return (
     <DexPageShell
@@ -204,8 +222,27 @@ export default function AbilityDexPage() {
             ? 'Ability field note and compatible Pokémon forms.'
             : 'Find a Pokémon with this ability to complete the record.'
         }
-        icon={<Sparkles className="h-14 w-14" aria-hidden="true" />}
-        background="/backgrounds/pokedex.avif"
+        icon={
+          selectedAbilityRepresentative ? (
+            <Image
+              src={getPokemonImageUrl(
+                selectedAbilityRepresentative.form.id,
+                'sprite',
+              )}
+              alt=""
+              fill
+              sizes="96px"
+              className="object-contain p-2"
+            />
+          ) : (
+            <CircleHelp className="h-14 w-14" aria-hidden="true" />
+          )
+        }
+        background={
+          selectedAbilitySpecies
+            ? getPokemonPokedexBackground(selectedAbilitySpecies)
+            : '/backgrounds/pokedex.avif'
+        }
         heroLabel="AbilityDex"
         desktopBreakpoint="lg"
         desktopWidth="min(42vw, 620px)"

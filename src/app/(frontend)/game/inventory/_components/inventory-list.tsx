@@ -812,6 +812,8 @@ export function InventoryList() {
         onOpenChange={(open) => !open && setSelectedItem(null)}
         title={selectedItem?.name || ''}
         description={isTmOrHmItem ? undefined : selectedItemDescription}
+        descriptionInHero
+        background="/backgrounds/artisan-workshop.avif"
         category={
           selectedItemDisplayPlacement
             ? selectedItemDisplayPlacement.group === 'tms' &&
