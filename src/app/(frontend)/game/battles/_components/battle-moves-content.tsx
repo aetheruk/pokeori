@@ -71,8 +71,14 @@ export function BattleMovesContent({
   embedded?: boolean
 }) {
   return (
-    <div className={embedded ? 'mx-auto w-full max-w-2xl pb-4' : 'mx-auto w-full max-w-2xl px-4 pt-4 pb-6'}>
-      <div className={embedded ? 'space-y-6' : 'max-h-[calc(70dvh-120px)] space-y-6 overflow-y-auto'}>
+    <div
+      className={
+        embedded
+          ? 'mx-auto w-full max-w-2xl pb-4'
+          : 'mx-auto min-h-0 flex-1 w-full max-w-2xl overflow-y-auto px-4 pt-4 pb-6'
+      }
+    >
+      <div className="space-y-6">
         <div className="space-y-3">
           {!embedded && <SectionDivider>
             <span className="flex items-center gap-2 text-game-moss">

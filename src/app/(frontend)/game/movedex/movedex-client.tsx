@@ -534,6 +534,9 @@ export default function MoveDexPage() {
               : selectedMove.entry.item.name
             : 'A field clue points towards this move.'
         }
+        icon={<BookOpen className="h-14 w-14" aria-hidden="true" />}
+        background="/backgrounds/pokedex.avif"
+        heroLabel="MoveDex"
         desktopWidth="min(42vw, 620px)"
         desktopBreakpoint="lg"
         className="overflow-hidden"

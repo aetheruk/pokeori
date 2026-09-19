@@ -5,12 +5,7 @@ import Image from 'next/image'
 import { Swords } from 'lucide-react'
 import { STANCE_ICON_CONFIG } from '@/components/game/shared/stance-icon'
 import { Button } from '@/components/ui/button'
-import {
-  Drawer,
-  DrawerContent,
-  DrawerTitle,
-  DrawerTrigger,
-} from '@/components/ui/drawer'
+import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import { cn } from '@/lib/utils'
 import { getStatStageMultiplier } from '@/utilities/battle/battle-logic'
 import type { BattleStance } from '@/utilities/battle/types'
@@ -284,7 +279,9 @@ export function StanceSelector({
               </span>
               <span className="game-battle-stance-name min-w-0 text-right">
                 <strong className="block truncate font-display text-lg font-black leading-tight sm:text-xl">
-                  {zMoveReady ? '' : isDynamaxed ? 'MAX ' : ''}{stanceTypeLabel} {card.actionName}{zMoveReady ? ' Z' : ''}
+                  {zMoveReady ? '' : isDynamaxed ? 'MAX ' : ''}
+                  {stanceTypeLabel} {card.actionName}
+                  {zMoveReady ? ' Z' : ''}
                 </strong>
               </span>
             </Button>
@@ -321,6 +318,11 @@ export function StanceSelectorDrawer({
       </DrawerTrigger>
       <DrawerContent
         className="game-battle-stance-drawer game-paper-modal game-paper-background max-h-[82dvh] border-game-border bg-game-surface-raised"
+        title="Choose Stance"
+        description="Read the field and choose your next battle stance."
+        icon={<Swords className="h-14 w-14" aria-hidden="true" />}
+        background="/backgrounds/battle.avif"
+        heroLabel="Battle"
         data-type={drawerType}
         style={
           {
@@ -329,8 +331,7 @@ export function StanceSelectorDrawer({
           } as CSSProperties
         }
       >
-        <DrawerTitle className="sr-only">Stance choices</DrawerTitle>
-        <div className="overflow-y-auto px-4 pb-6">
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-6">
           <StanceSelector
             {...props}
             onSelect={(stance) => {

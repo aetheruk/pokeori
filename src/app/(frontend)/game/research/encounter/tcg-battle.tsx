@@ -35,6 +35,7 @@ import { toast } from 'sonner'
 import { TrainerCard } from '@/components/game/battles/TrainerCard'
 import { VSAnimation } from '@/components/game/battles/VSAnimation'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
+import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { Button } from '@/components/ui/button'
 import {
   AlertDialog,
@@ -46,14 +47,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from '@/components/ui/drawer'
+import { Drawer, DrawerContent, DrawerFooter } from '@/components/ui/drawer'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
@@ -2691,16 +2685,15 @@ function AttackChoiceDrawer({
 
   return (
     <Drawer open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
-      <DrawerContent className="border-game-night-border bg-game-night-surface text-game-night-ink md:max-w-2xl">
-        <DrawerHeader className="border-b border-game-night-border text-left">
-          <DrawerTitle className="font-display text-game-night-ink">
-            Choose {attack.name}
-          </DrawerTitle>
-          <DrawerDescription className="text-game-night-muted">
-            Complete the card’s extra choice before committing the attack.
-          </DrawerDescription>
-        </DrawerHeader>
-        <div className="max-h-[60dvh] space-y-4 overflow-y-auto p-4">
+      <DrawerContent
+        title={`Choose ${attack.name}`}
+        description="Complete the card’s extra choice before committing the attack."
+        icon={<Crosshair className="h-14 w-14" aria-hidden="true" />}
+        background="/backgrounds/tcg.avif"
+        heroLabel="Card battle"
+        className="border-game-night-border bg-game-night-surface text-game-night-ink"
+      >
+        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
           {(effect.targetScope === 'bench' || effect.targetScope === 'any') && (
             <section className="space-y-2">
               <h3 className="text-sm font-semibold text-game-night-ink">
@@ -3982,45 +3975,42 @@ function BenchSheet({
 }) {
   const isPromotion = mode === 'promote'
   const isRetreat = mode === 'retreat'
+  const title = isPromotion
+    ? 'Promote from Bench'
+    : isRetreat
+      ? 'Choose Replacement'
+      : 'Your Bench'
+  const description = isPromotion
+    ? 'Fill the open front slot.'
+    : isRetreat
+      ? `${attacker?.name || 'Selected card'} retreat cost ${attacker?.convertedRetreatCost ?? 0}.`
+      : `${state.player.back.length} ready / ${state.player.discard.length} discarded.`
+  const icon = isPromotion ? (
+    <ChevronsUp className="h-14 w-14" aria-hidden="true" />
+  ) : isRetreat ? (
+    <ArrowDownUp className="h-14 w-14" aria-hidden="true" />
+  ) : (
+    <Layers className="h-14 w-14" aria-hidden="true" />
+  )
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#081014]/76 backdrop-blur-sm">
-      <button
-        type="button"
-        className="absolute inset-0 cursor-default"
-        onClick={onClose}
-        aria-label="Close bench"
-      />
-      <div className="game-paper-background absolute inset-x-0 bottom-0 mx-auto max-w-5xl rounded-t-xl border border-game-border bg-game-surface p-4 text-game-ink shadow-2xl">
-        <div className="mb-3 grid grid-cols-[1fr_auto] items-center gap-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 text-sm font-black uppercase text-game-ink">
-              {isPromotion ? (
-                <ChevronsUp className="h-4 w-4 text-amber-200" />
-              ) : isRetreat ? (
-                <ArrowDownUp className="h-4 w-4 text-amber-200" />
-              ) : (
-                <Layers className="h-4 w-4 text-cyan-200" />
-              )}
-              {isPromotion
-                ? 'Promote from Bench'
-                : isRetreat
-                  ? 'Choose Replacement'
-                  : 'Your Bench'}
-            </div>
-            <div className="truncate text-xs text-game-muted">
-              {isPromotion
-                ? 'Fill the open front slot'
-                : isRetreat
-                  ? `${attacker?.name || 'Selected card'} retreat cost ${attacker?.convertedRetreatCost ?? 0}`
-                  : `${state.player.back.length} ready / ${state.player.discard.length} discarded`}
-            </div>
-          </div>
-        </div>
-        <div className="grid max-h-[48dvh] min-h-36 grid-cols-3 place-items-center gap-2 overflow-y-auto">
+    <ResponsivePanel
+      open
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) onClose()
+      }}
+      title={title}
+      description={description}
+      icon={icon}
+      background="/backgrounds/tcg.avif"
+      heroLabel="Card battle"
+      className="bg-game-night-surface text-game-night-ink"
+    >
+      <div className="min-h-0 flex-1 overflow-y-auto p-4">
+        <div className="mx-auto grid max-w-5xl grid-cols-3 place-items-center gap-2">
           {state.player.back.length === 0 ? (
             <div
-              className="col-span-3 flex h-32 w-full items-center justify-center rounded-lg border border-dashed border-game-border bg-game-surface-raised text-sm font-bold text-game-muted"
+              className="col-span-3 flex h-32 w-full items-center justify-center rounded-lg border border-dashed border-game-night-border bg-game-night-surface-raised text-sm font-bold text-game-night-muted"
               role="status"
               aria-live="polite"
             >
@@ -4041,7 +4031,7 @@ function BenchSheet({
           )}
         </div>
       </div>
-    </div>
+    </ResponsivePanel>
   )
 }
 

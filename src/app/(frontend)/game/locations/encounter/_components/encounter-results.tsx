@@ -1,4 +1,4 @@
-import { Heart } from 'lucide-react'
+import { Heart, MapIcon } from 'lucide-react'
 import nextDynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -120,36 +120,41 @@ export function EncounterResults({
     encounter.pokemonId.toString()
 
   const expeditionUpdateContent = expeditionProgress ? (
-    <div className="rounded-lg border border-game-moss/30 bg-game-moss/10 p-3 text-center">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-game-moss-strong">
-        {expeditionProgress.expeditionName || 'Expedition'}
-      </p>
-      {expeditionProgress.progressed ? (
-        expeditionProgress.status === 'ready_to_claim' ? (
+    <div className="flex items-start gap-3 rounded-lg border border-game-border bg-game-surface p-4 text-left shadow-sm">
+      <div className="game-icon-orb game-icon-orb-discovery flex h-12 w-12 shrink-0 items-center justify-center border-game-ochre/45 text-game-ochre">
+        <MapIcon className="h-6 w-6" aria-hidden="true" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-game-moss-strong">
+          {expeditionProgress.expeditionName || 'Expedition'}
+        </p>
+        {expeditionProgress.progressed ? (
+          expeditionProgress.status === 'ready_to_claim' ? (
+            <p className="mt-1 text-sm text-game-ink">
+              You completed the expedition. Your rewards are ready to claim.
+            </p>
+          ) : (
+            <p className="mt-1 text-sm text-game-ink">Progress recorded.</p>
+          )
+        ) : expeditionProgress.status === 'failed' ? (
+          <p className="mt-1 text-sm text-game-danger">
+            The expedition ended here.
+          </p>
+        ) : expeditionProgress.canFail === false ? (
           <p className="mt-1 text-sm text-game-ink">
-            You completed the expedition. Your rewards are ready to claim.
+            Try this step again to continue.
           </p>
         ) : (
-          <p className="mt-1 text-sm text-game-ink">Progress recorded.</p>
-        )
-      ) : expeditionProgress.status === 'failed' ? (
-        <p className="mt-1 text-sm text-game-danger">
-          The expedition ended here.
-        </p>
-      ) : expeditionProgress.canFail === false ? (
-        <p className="mt-1 text-sm text-game-ink">
-          Try this step again to continue.
-        </p>
-      ) : (
-        <>
-          <p className="mt-1 text-sm text-game-ink">One life was lost.</p>
-          <p className="mt-1 inline-flex w-full items-center justify-center gap-1.5 text-sm text-game-ink">
-            <Heart className="h-4 w-4 text-game-clay" />
-            Lives left: {expeditionProgress.livesLeft}/
-            {expeditionProgress.maxLosses}.
-          </p>
-        </>
-      )}
+          <>
+            <p className="mt-1 text-sm text-game-ink">One life was lost.</p>
+            <p className="mt-1 inline-flex items-center gap-1.5 text-sm text-game-ink">
+              <Heart className="h-4 w-4 text-game-clay" />
+              Lives left: {expeditionProgress.livesLeft}/
+              {expeditionProgress.maxLosses}.
+            </p>
+          </>
+        )}
+      </div>
     </div>
   ) : null
 
@@ -159,11 +164,17 @@ export function EncounterResults({
         <SectionDivider>Capture Notes</SectionDivider>
         <div className="flex items-start gap-3 rounded-lg border border-game-border bg-game-surface-raised p-4 shadow-sm">
           <div className="game-icon-orb game-icon-orb-catch h-12 w-12 shrink-0 border-game-danger/55">
-            <TaskIconDisplay icon={{ type: 'pokemon', id: capturePokemonFormId }} className="h-10 w-10" />
+            <TaskIconDisplay
+              icon={{ type: 'pokemon', id: capturePokemonFormId }}
+              className="h-10 w-10"
+            />
           </div>
           <div className="flex min-h-12 flex-col justify-center gap-2">
             {captureResult.messages.map((msg, i) => (
-              <p key={i} className="font-medium leading-relaxed text-game-charcoal-strong">
+              <p
+                key={i}
+                className="font-medium leading-relaxed text-game-charcoal-strong"
+              >
                 {msg}
               </p>
             ))}
@@ -321,7 +332,7 @@ export function EncounterResults({
             </div>
           ) : undefined
         }
-        additionalContentFrame={!messagesContent}
+        additionalContentFrame={false}
       />
     </>
   )

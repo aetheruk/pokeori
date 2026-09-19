@@ -705,7 +705,7 @@ export function TrainerLeveling({ saveCustomization = updateUserCustomization }:
             </div>
           </fieldset>
         </div>
-        <div className="flex shrink-0 gap-2 border-t border-game-border p-4">
+        <div className="flex shrink-0 gap-2 border-t border-game-border p-4 pl-[max(4rem,env(safe-area-inset-left))]">
           <Button variant="outline" disabled={isSaving} onClick={() => setIsCustomizeModalOpen(false)} className="min-h-11">Cancel</Button>
           <Button
             disabled={isSaving}

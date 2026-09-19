@@ -6,7 +6,6 @@ import { Fragment, useEffect, useState, type ElementType } from 'react'
 import { Button } from '@/components/ui/button'
 import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
-import { SectionDivider } from '@/components/ui/section-divider'
 import { cn } from '@/lib/utils'
 import type { BattlePokemon } from '@/utilities/battle/types'
 import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
@@ -141,54 +140,77 @@ export function TeamSwapper({
 
   return (
     <Shell
-      {...(!embedded ? { open,
-      onOpenChange: (nextOpen: boolean) => {
-        if (forced && !nextOpen) return
-        setOpen(nextOpen)
-      } } : {})}
+      {...(!embedded
+        ? {
+            open,
+            onOpenChange: (nextOpen: boolean) => {
+              if (forced && !nextOpen) return
+              setOpen(nextOpen)
+            },
+          }
+        : {})}
     >
-      {!embedded && <DrawerTrigger asChild>
-        {actionTrigger ? (
-          <BattleActionTrigger
-            itemId="poke-ball"
-            label="Switch"
-            count={availableSwaps > 0 ? `${availableSwaps} ready` : '—'}
-            compact={compact}
-            data-action="switch"
-            data-empty={availableSwaps === 0 || undefined}
-            disabled={disabled || availableSwaps === 0}
-            aria-label="Switch Pokemon"
-          />
-        ) : (
-          <Button
-            variant="outline"
-            disabled={disabled || availableSwaps === 0}
-            className={cn(
-              forced
-                ? 'flex-1 h-12 gap-2 rounded-xl border border-game-border bg-game-surface-raised text-game-ink shadow-sm transition-colors'
-                : 'size-11 rounded-lg border border-game-border bg-game-surface-raised p-0 text-game-ink shadow-none transition-colors',
-              'hover:border-game-moss/60 hover:bg-game-surface-raised hover:text-game-ink',
-              availableSwaps === 0 && 'opacity-50',
-            )}
-            aria-label={forced ? 'Choose next Pokemon' : 'Switch Pokemon'}
-          >
-            <RefreshCcw className="w-4 h-4" />
-            {forced && (leadSelection ? 'Choose Lead' : 'Choose Next')}
-          </Button>
-        )}
-      </DrawerTrigger>}
+      {!embedded && (
+        <DrawerTrigger asChild>
+          {actionTrigger ? (
+            <BattleActionTrigger
+              itemId="poke-ball"
+              label="Switch"
+              count={availableSwaps > 0 ? `${availableSwaps} ready` : '—'}
+              compact={compact}
+              data-action="switch"
+              data-empty={availableSwaps === 0 || undefined}
+              disabled={disabled || availableSwaps === 0}
+              aria-label="Switch Pokemon"
+            />
+          ) : (
+            <Button
+              variant="outline"
+              disabled={disabled || availableSwaps === 0}
+              className={cn(
+                forced
+                  ? 'flex-1 h-12 gap-2 rounded-xl border border-game-border bg-game-surface-raised text-game-ink shadow-sm transition-colors'
+                  : 'size-11 rounded-lg border border-game-border bg-game-surface-raised p-0 text-game-ink shadow-none transition-colors',
+                'hover:border-game-moss/60 hover:bg-game-surface-raised hover:text-game-ink',
+                availableSwaps === 0 && 'opacity-50',
+              )}
+              aria-label={forced ? 'Choose next Pokemon' : 'Switch Pokemon'}
+            >
+              <RefreshCcw className="w-4 h-4" />
+              {forced && (leadSelection ? 'Choose Lead' : 'Choose Next')}
+            </Button>
+          )}
+        </DrawerTrigger>
+      )}
       <Content
         id={swapDrawerContentId}
-        className={embedded ? 'min-h-0' : 'game-paper-modal game-paper-background max-h-[60dvh] border-game-border bg-game-surface-raised'}
+        className={
+          embedded
+            ? 'min-h-0'
+            : 'game-paper-modal game-paper-background max-h-[60dvh] border-game-border bg-game-surface-raised'
+        }
+        {...(!embedded ? { showCloseButton: !forced } : {})}
+        {...(!embedded
+          ? {
+              title: leadSelection
+                ? 'Choose Your Pokémon'
+                : forced
+                  ? 'Choose Next Pokémon'
+                  : 'Switch Pokémon',
+              description: `${availableSwaps} Pokémon ready to choose.`,
+              icon: <RefreshCcw className="h-14 w-14" aria-hidden="true" />,
+              background: '/backgrounds/battle.avif',
+              heroLabel: 'Battle',
+            }
+          : {})}
       >
-        <div className={embedded ? 'min-h-0 w-full pt-3 pb-5' : 'mx-auto min-h-0 w-full max-w-xl overflow-y-auto px-3 pt-3 pb-5 sm:px-4'}>
-          {!embedded && <SectionDivider className="mb-3">
-            {leadSelection
-              ? 'Choose Your Pokemon'
-              : forced
-                ? 'Choose Next Pokemon'
-                : 'Switch Pokémon'}
-          </SectionDivider>}
+        <div
+          className={
+            embedded
+              ? 'min-h-0 w-full pt-3 pb-5'
+              : 'mx-auto min-h-0 flex-1 w-full max-w-xl overflow-y-auto px-3 pt-3 pb-5 sm:px-4'
+          }
+        >
           {isDoublesReplacement && replacementSlot !== undefined && (
             <p className="mb-2 text-xs font-semibold text-game-muted">
               Lane {replacementSlot + 1}

@@ -4,6 +4,7 @@ import {
   ArrowDown,
   ArrowUp,
   Atom,
+  BookOpen,
   Brain,
   Check,
   Circle,
@@ -971,7 +972,8 @@ function MountedPokemonDetailsDialog({
         desktopWidth="min(42vw, 620px)"
         mobileHeader={false}
         showHandle={false}
-        className="game-paper-first game-paper-background relative flex max-h-[92dvh] w-full flex-col gap-0 overflow-hidden bg-game-canvas p-0 text-game-ink after:pointer-events-none after:absolute after:left-1/2 after:top-2 after:z-30 after:h-1.5 after:w-20 after:-translate-x-1/2 after:rounded-full after:bg-game-border-strong after:content-[''] lg:after:hidden"
+        showHero={false}
+        className="game-paper-first game-paper-background relative flex max-h-[92dvh] w-full flex-col gap-0 overflow-hidden bg-game-canvas p-0 text-game-ink"
       >
         {/* Fixed Image at Top */}
         <div className="relative aspect-[2/1] w-full flex-shrink-0 overflow-hidden border-b border-game-border">
@@ -2235,6 +2237,9 @@ function MountedPokemonDetailsDialog({
         onOpenChange={(open) => !open && setMoveDetail(null)}
         title={moveDetail?.name || 'Move details'}
         description="Battle move field note"
+        icon={<BookOpen className="h-14 w-14" aria-hidden="true" />}
+        background="/backgrounds/lab.avif"
+        heroLabel="Battle move"
       >
         <div className="h-full overflow-y-auto p-4 custom-scrollbar">
           {moveDetail ? (

@@ -1570,6 +1570,23 @@ export function PokemonList({
         onOpenChange={(open) => !open && setQuickMenuPokemon(null)}
         title={quickMenuPokemon?.name || 'Pokemon options'}
         description="Choose where this Pokemon belongs."
+        icon={
+          quickMenuPokemon ? (
+            <PokemonRaritySprite
+              formId={quickMenuPokemon.formId}
+              view="home"
+              rarity={quickMenuPokemon.rarity}
+              shiny={quickMenuPokemon.shiny}
+              isShadow={quickMenuPokemon.isShadow}
+              isRadiant={quickMenuPokemon.isRadiant}
+              alt=""
+              sizes="96px"
+              className="h-20 w-20 md:h-24 md:w-24"
+            />
+          ) : undefined
+        }
+        background="/backgrounds/forest.avif"
+        heroLabel="Pokémon"
         desktopWidth="360px"
         mobileMaxHeight="60dvh"
         className="bg-game-surface text-game-ink"
