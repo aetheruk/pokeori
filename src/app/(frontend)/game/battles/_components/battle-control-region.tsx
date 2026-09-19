@@ -53,8 +53,8 @@ export function BattleControlRegion({
           {panel === 'powers' && <div className="pointer-events-none absolute inset-0 z-[1] bg-game-surface-raised/70" aria-hidden="true" />}
           {panel === 'items' && (
             <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
-              <div className="absolute inset-0 bg-cover bg-center opacity-80" style={{ backgroundImage: "url('/backgrounds/artisan-workshop.avif')" }} />
-              <div className="absolute inset-0 bg-game-surface-raised/70" />
+              <div className="absolute inset-0 bg-cover bg-center opacity-60" style={{ backgroundImage: "url('/backgrounds/artisan-workshop.avif')" }} />
+              <div className="absolute inset-0 bg-game-surface-raised/90" />
             </div>
           )}
           <div className="game-battle-section-header relative z-10 flex h-12 shrink-0 items-center justify-between gap-3 border-b border-game-border/60 bg-game-surface-raised px-3 text-game-ink sm:px-4">

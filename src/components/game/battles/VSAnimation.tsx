@@ -6,6 +6,7 @@ import { motion, AnimatePresence, MotionConfig } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 interface VSAnimationProps {
+  background?: string
   player: {
     name: string
     icon?: string
@@ -21,7 +22,7 @@ interface VSAnimationProps {
   onComplete: () => void
 }
 
-export function VSAnimation({ player, enemy, onComplete }: VSAnimationProps) {
+export function VSAnimation({ background, player, enemy, onComplete }: VSAnimationProps) {
   const [showVS, setShowVS] = useState(false)
 
   useEffect(() => {
@@ -44,7 +45,14 @@ export function VSAnimation({ player, enemy, onComplete }: VSAnimationProps) {
 
   return (
     <MotionConfig reducedMotion="user">
-    <div className="absolute inset-0 z-50 overflow-hidden bg-black/90 backdrop-blur-md flex flex-col justify-center items-center pointer-events-auto p-6 gap-8">
+    <div className="absolute inset-0 z-50 overflow-hidden bg-game-night-canvas flex flex-col justify-center items-center pointer-events-auto p-6 gap-8">
+      <div
+        className="pointer-events-none absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${background || '/backgrounds/battle.avif'})` }}
+        aria-hidden="true"
+        data-testid="vs-animation-backdrop"
+      />
+      <div className="pointer-events-none absolute inset-0 bg-game-night-canvas/70" aria-hidden="true" />
       {/* Player Card (Slide Down) */}
       <motion.div
         initial={{ y: '-100vh' }}

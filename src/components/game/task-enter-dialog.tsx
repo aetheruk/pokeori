@@ -101,7 +101,7 @@ export function TaskEnterDialog({
   }
 
   const iconElement = currentStep.icon ? (
-    <TaskIconDisplay icon={currentStep.icon} className="w-8 h-8 text-game-moss-strong" />
+    <TaskIconDisplay icon={currentStep.icon} className="h-20 w-20 text-white md:h-24 md:w-24" priority />
   ) : null
 
   return (
@@ -120,6 +120,7 @@ export function TaskEnterDialog({
       description={parseText(currentStep.message, trainerName)}
       icon={iconElement}
       background={currentStep.background}
+      resultLayout
       actionButton={
         <div className="w-full space-y-3">
           {/* Password Input (when active) */}

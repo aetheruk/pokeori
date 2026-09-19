@@ -70,7 +70,7 @@ export function ResearchLevelUpModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="max-w-none w-screen h-[100dvh] flex flex-col gap-0 overflow-hidden border-0 bg-game-canvas p-0 text-game-ink focus:outline-none z-[200]"
+        className="!inset-0 !h-[100dvh] !max-h-none !w-screen !max-w-none !translate-x-0 !translate-y-0 z-[200] m-0 flex flex-col gap-0 overflow-hidden rounded-none border-0 bg-game-canvas p-0 text-game-ink shadow-none focus:outline-none sm:p-0"
       >
         <DialogTitle className="sr-only">
           {pokemonName} Research Level Up

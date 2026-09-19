@@ -138,7 +138,7 @@ export function GameResult({
   return (
     <div
       className={cn(
-        'game-paper-first game-paper-background relative h-full w-full overflow-hidden pt-[env(safe-area-inset-top)] text-game-ink',
+        'game-paper-first game-paper-background relative h-full w-full overflow-hidden text-game-ink',
         !embedded && 'bg-game-canvas',
       )}
     >
@@ -173,6 +173,7 @@ export function GameResult({
                         <TaskIconDisplay
                           icon={icon}
                           className="h-20 w-20 md:h-24 md:w-24"
+                          priority
                         />
                       )
                     }

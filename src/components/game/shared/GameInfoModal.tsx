@@ -114,6 +114,7 @@ interface GameInfoModalProps {
   background?: string
   autoScrollRewards?: boolean
   presentation?: 'dialog' | 'drawer'
+  resultLayout?: boolean
   modal?: boolean
   desktopBreakpoint?: 'lg' | 'xl'
 }
@@ -140,10 +141,12 @@ export function GameInfoModal({
   background,
   autoScrollRewards = false,
   presentation = 'dialog',
+  resultLayout = false,
   modal = true,
   desktopBreakpoint = 'xl',
 }: GameInfoModalProps) {
   const isDrawer = presentation === 'drawer'
+  const isResultLayout = resultLayout && !isDrawer
   const hasProperties = Boolean(properties && properties.length > 0)
   const hasStats = Boolean(stats && stats.length > 0)
   const Header = ({
@@ -210,7 +213,10 @@ export function GameInfoModal({
         />
       ) : (
         <Header className="p-0 space-y-0 shrink-0">
-          <div className="relative h-40 w-full overflow-hidden border-b border-game-border bg-game-surface md:h-52">
+          <div className={cn(
+            'relative w-full overflow-hidden border-b border-game-border bg-game-surface',
+            isResultLayout ? 'h-[42dvh] md:h-[46dvh]' : 'h-40 md:h-52',
+          )}>
             {/* Background Image with Overlay */}
             <div className="absolute inset-0 z-0">
               <Image
@@ -219,9 +225,14 @@ export function GameInfoModal({
                 fill
                 priority
                 sizes="100vw"
-                className="object-cover opacity-80 brightness-90"
+                className={cn('object-cover', !isResultLayout && 'opacity-80 brightness-90')}
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-game-night-surface/5 via-game-night-surface/25 to-game-surface" />
+              <div className={cn(
+                'absolute inset-0',
+                isResultLayout
+                  ? 'bg-[linear-gradient(to_bottom,rgba(23,39,51,0.08),rgba(23,39,51,0.24)_42%,rgba(23,39,51,0.92)_100%)]'
+                  : 'bg-gradient-to-b from-game-night-surface/5 via-game-night-surface/25 to-game-surface',
+              )} />
             </div>
 
             {category && (
@@ -233,21 +244,32 @@ export function GameInfoModal({
             )}
 
             {/* Close Button */}
-            <Close className="game-focus-ring absolute right-7 top-7 z-50 flex size-10 items-center justify-center rounded-md border border-game-border/60 bg-game-surface-raised/90 text-game-ink transition-colors hover:bg-game-surface hover:text-game-clay-strong">
+            <Close className={cn(
+              'game-focus-ring absolute right-7 top-[max(1.75rem,env(safe-area-inset-top))] z-50 flex size-10 items-center justify-center rounded-md border transition-colors',
+              isResultLayout
+                ? 'border-white/55 bg-game-night-canvas/55 text-white hover:bg-game-night-canvas/75'
+                : 'border-game-border/60 bg-game-surface-raised/90 text-game-ink hover:bg-game-surface hover:text-game-clay-strong',
+            )}>
               <X className="h-4 w-4" aria-hidden="true" />
             </Close>
 
             {/* Header Content */}
-            <div className="absolute inset-0 z-10 flex items-center justify-center p-5">
+            <div className={cn(
+              'absolute inset-0 z-10 flex items-center justify-center p-5',
+              isResultLayout && 'flex-col gap-3 text-center',
+            )}>
               <div className="relative">
                 <div
                   className={cn(
-                    'game-icon-orb group relative h-14 w-14 shrink-0 overflow-hidden border-game-border',
+                    'game-icon-orb group relative shrink-0 overflow-hidden',
+                    isResultLayout
+                      ? 'h-24 w-24 border-white/55 !bg-white/10 shadow-xl md:h-28 md:w-28'
+                      : 'h-14 w-14 border-game-border',
                     isCaught && 'border-game-charcoal/60',
                   )}
                 >
                   <div className="absolute inset-0 bg-game-charcoal/10 opacity-0 transition-opacity group-hover:opacity-100" />
-                  <div className="scale-125">{icon}</div>
+                  <div className={cn(!isResultLayout && 'scale-125')}>{icon}</div>
                 </div>
                 {isCaught && (
                   <div className="absolute -bottom-2 -right-2 flex items-center gap-0.5 rounded-full border-2 border-game-surface bg-game-moss px-2 py-0.5 text-[10px] font-black text-game-cream">
@@ -255,19 +277,30 @@ export function GameInfoModal({
                   </div>
                 )}
               </div>
+              {isResultLayout && (
+                <Title className="max-w-2xl font-display text-3xl font-semibold leading-tight !text-white md:text-4xl">
+                  {title}
+                </Title>
+              )}
             </div>
           </div>
         </Header>
       )}
 
-      <div className="custom-scrollbar flex-1 overflow-x-hidden overflow-y-auto bg-game-canvas p-5 md:p-6">
+      <div className="custom-scrollbar min-h-0 flex-1 overflow-x-hidden overflow-y-auto bg-game-canvas p-5 md:p-6">
         <div className="mx-auto max-w-3xl space-y-7 pb-8">
-          <div className="text-center">
-            <Title className="font-display text-2xl font-semibold text-game-ink md:text-3xl">
-              {title}
-            </Title>
-          </div>
-          {description && (
+          {!isResultLayout && (
+            <div className="text-center">
+              <Title className="font-display text-2xl font-semibold text-game-ink md:text-3xl">
+                {title}
+              </Title>
+            </div>
+          )}
+          {description && (isResultLayout ? (
+            <div className="mx-auto max-w-2xl px-2 py-5 text-center text-base font-medium leading-relaxed text-game-ink md:text-lg">
+              {description}
+            </div>
+          ) : (
             <div className="relative">
               <SectionDivider>OVERVIEW</SectionDivider>
               <div
@@ -298,7 +331,7 @@ export function GameInfoModal({
                 )}
               </div>
             </div>
-          )}
+          ))}
 
           {taskProgress ? (
             <div className="space-y-4">
@@ -502,7 +535,7 @@ export function GameInfoModal({
           if (!modal) event.preventDefault()
         }}
         className={cn(
-          '!inset-0 !h-[100dvh] !max-h-none !w-screen !max-w-none !translate-x-0 !translate-y-0 m-0 flex flex-col gap-0 overflow-hidden rounded-none border-0 bg-game-surface p-0',
+          '!inset-0 !h-[100dvh] !max-h-none !w-screen !max-w-none !translate-x-0 !translate-y-0 m-0 flex flex-col gap-0 overflow-hidden rounded-none border-0 bg-game-surface p-0 sm:p-0',
           className,
         )}
       >
