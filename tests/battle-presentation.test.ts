@@ -102,7 +102,7 @@ describe('battle presentation timeline', () => {
     ])
   })
 
-  test('groups Shadow pain with both attack impacts while moving only the stance winner', () => {
+  test('groups Shadow pain with both successful attackers and pulses the stance winner', () => {
     const state = makePvpBattleState()
     beginBattlePresentation(state)
 
@@ -110,6 +110,8 @@ describe('battle presentation timeline', () => {
     state.enemyTeam[0].currentHp = 80
     state.history.unshift({
       turn: 1,
+      playerExecutedAttack: true,
+      enemyExecutedAttack: true,
       playerStance: 'power',
       enemyStance: 'tech',
       result: 'win',
@@ -141,9 +143,10 @@ describe('battle presentation timeline', () => {
         ?.filter((event) => event.type === 'attack')
         .map((event) => [event.actorSide, event.animateActor]),
     ).toEqual([
-      ['enemy', false],
+      ['enemy', true],
       ['player', true],
     ])
+    expect(impactEvents?.filter((event) => event.type === 'attack').map((event) => event.stanceWinner)).toEqual([false,true])
     expect(impactEvents?.at(-1)).toMatchObject({
       type: 'attack',
       targetSide: 'enemy',
@@ -169,6 +172,26 @@ describe('battle presentation timeline', () => {
       player: 40,
       enemy: 40,
     })
+  })
+
+  test('does not pulse a nominal winner when the opposing attack was blocked', () => {
+    const state = makePvpBattleState()
+    beginBattlePresentation(state)
+    state.enemyTeam[0].currentHp = 90
+    state.history.unshift({
+      turn: 1,
+      playerExecutedAttack: true,
+      enemyExecutedAttack: false,
+      playerStance: 'power',
+      enemyStance: 'tech',
+      result: 'win',
+      damageDealt: 10,
+      damageTaken: 0,
+      message: 'Player 1: P1 Mon uses Power Attack! [icon:stance:power] [icon:type:grass] Dealt 10.',
+    })
+    finalizeBattlePresentation(state)
+    const attack = state.presentation?.events.find((event) => event.type === 'attack')
+    expect(attack).toMatchObject({actorSide:'player',animateActor:true,stanceWinner:false})
   })
 
   test('folds an authoritative damage correction into the impact HP target', () => {

@@ -673,45 +673,27 @@ export function useBattleManager(initialState: BattleState) {
                   logEntry,
                 } = seq
 
-                // 1. Attack Movement
+                // Move only actors whose attacks actually executed; the result controls the glow.
                 if (shouldStop()) break
-                if (result === 'win') {
-                  safePlaySfx('stance_win')
-                  setAnim((prev) => ({ ...prev, playerAttacking: true }))
-                  await delay(300)
-                  if (shouldStop()) break
-                  setAnim((prev) => ({
-                    ...prev,
-                    playerAttacking: false,
-                    enemyHit: true,
-                  }))
-                } else if (result === 'loss') {
-                  safePlaySfx('stance_loss')
-                  setAnim((prev) => ({ ...prev, enemyAttacking: true }))
-                  await delay(300)
-                  if (shouldStop()) break
-                  setAnim((prev) => ({
-                    ...prev,
-                    enemyAttacking: false,
-                    playerHit: true,
-                  }))
-                } else {
-                  safePlaySfx('stance_tie')
-                  setAnim((prev) => ({
-                    ...prev,
-                    playerAttacking: true,
-                    enemyAttacking: true,
-                  }))
-                  await delay(300)
-                  if (shouldStop()) break
-                  setAnim((prev) => ({
-                    ...prev,
-                    playerAttacking: false,
-                    enemyAttacking: false,
-                    playerHit: true,
-                    enemyHit: true,
-                  }))
-                }
+                const playerMoves = logEntry?.playerExecutedAttack ?? result !== 'loss'
+                const enemyMoves = logEntry?.enemyExecutedAttack ?? result !== 'win'
+                safePlaySfx(result === 'win' ? 'stance_win' : result === 'loss' ? 'stance_loss' : 'stance_tie')
+                setAnim((prev) => ({
+                  ...prev,
+                  playerAttacking: playerMoves,
+                  enemyAttacking: enemyMoves,
+                  playerStanceWinner: playerMoves && enemyMoves && result === 'win',
+                  enemyStanceWinner: playerMoves && enemyMoves && result === 'loss',
+                }))
+                await delay(300)
+                if (shouldStop()) break
+                setAnim((prev) => ({
+                  ...prev,
+                  playerAttacking: false,
+                  enemyAttacking: false,
+                  playerHit: damageTaken > 0,
+                  enemyHit: damageDealt > 0,
+                }))
 
                 // 2. IMPACT: Splat + HP Drop + Log sync
                 if (shouldStop()) break
@@ -769,6 +751,8 @@ export function useBattleManager(initialState: BattleState) {
                   ...prev,
                   playerHit: false,
                   enemyHit: false,
+                  playerStanceWinner: false,
+                  enemyStanceWinner: false,
                 }))
                 setTrackedTimeout(
                   () =>
@@ -985,11 +969,13 @@ export function useBattleManager(initialState: BattleState) {
                         ...prev,
                         playerAttacking: playerMoves,
                         enemyAttacking: enemyMoves,
+                        playerStanceWinner: simultaneousAttacks.some((attack) => attack.actorSide === 'player' && attack.stanceWinner),
+                        enemyStanceWinner: simultaneousAttacks.some((attack) => attack.actorSide === 'enemy' && attack.stanceWinner),
                       }))
                       setDoubles(simultaneousAttacks.filter((attack) => attack.animateActor !== false).map((attack) => ({
                         side: attack.actorSide,
                         index: attack.actorIndex,
-                        patch: { attacking: true },
+                        patch: { attacking: true, stanceWinner: attack.stanceWinner },
                       })))
                       await delay(300)
                       if (shouldStop()) break
@@ -1084,8 +1070,11 @@ export function useBattleManager(initialState: BattleState) {
                         enemyStatusDamageSplat: null,
                         playerImpactType: null,
                         enemyImpactType: null,
+                        playerStanceWinner: false,
+                        enemyStanceWinner: false,
                       }))
                       setDoubles([
+                        ...simultaneousAttacks.map((attack) => ({side: attack.actorSide, index: attack.actorIndex, patch: {stanceWinner: false}})),
                         ...simultaneousAttacks.map((attack) => ({
                           side: attack.targetSide,
                           index: attack.targetIndex,
@@ -1122,9 +1111,9 @@ export function useBattleManager(initialState: BattleState) {
                         ? 'stance_win'
                         : 'stance_loss',
                     )
-                    setAnim((prev) => ({ ...prev, [actorKey]: true }))
+                    setAnim((prev) => ({ ...prev, [actorKey]: presentationEvent.animateActor !== false, [presentationEvent.actorSide === 'player' ? 'playerStanceWinner' : 'enemyStanceWinner']: !!presentationEvent.stanceWinner }))
                     if (presentationEvent.animateActor !== false) {
-                      setDoubles([{ side: presentationEvent.actorSide, index: presentationEvent.actorIndex, patch: { attacking: true } }])
+                      setDoubles([{ side: presentationEvent.actorSide, index: presentationEvent.actorIndex, patch: { attacking: true, stanceWinner: presentationEvent.stanceWinner } }])
                     }
                     await delay(300)
                     if (shouldStop()) break
@@ -1166,8 +1155,9 @@ export function useBattleManager(initialState: BattleState) {
                       [hitKey]: false,
                       [splatKey]: null,
                       [impactKey]: null,
+                      [presentationEvent.actorSide === 'player' ? 'playerStanceWinner' : 'enemyStanceWinner']: false,
                     }))
-                    setDoubles([{ side: presentationEvent.targetSide, index: presentationEvent.targetIndex, patch: { hit: false, damageSplat: null, impactType: null } }])
+                    setDoubles([{ side: presentationEvent.targetSide, index: presentationEvent.targetIndex, patch: { hit: false, damageSplat: null, impactType: null } }, {side: presentationEvent.actorSide, index: presentationEvent.actorIndex, patch: { stanceWinner: false }}])
                     continue
                   }
 

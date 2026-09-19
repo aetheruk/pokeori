@@ -14,6 +14,7 @@ import type {
   PowersState,
 } from '@/utilities/battle/types'
 import { trimBattleHistory } from '@/utilities/battle/history'
+import { awardStanceWin, getStanceWinCharges, POWER_STANCE_WIN_COST, spendPowerCharge } from '@/utilities/battle/power-charges'
 import { ensurePvpPowerStates, getSharedBattleUserIds, normalizeBattleUserId } from './state-utils'
 import {
   advancePvpPowerStateForTurn,
@@ -53,8 +54,6 @@ import {
 } from '@/utilities/user-state'
 import { getEffectiveBattleSpeed } from '@/utilities/battle/battle-logic'
 import {
-  activateZMoveCharge,
-  clearZMoveCharge,
 } from '@/utilities/battle/z-move'
 import {
   processDelayedMoveDamage,
@@ -116,9 +115,9 @@ export async function resolvePvpTurn(
     const { p1Id, p2Id } = getSharedBattleUserIds(state)
     const sketchAttempts: DoublesSketchAttempt[] = []
     resolveDoublesTurn(state, p1Move.actions, p2Move.actions, options.random ?? Math.random,
-      ({state:next,side,actor,action}) => {
+      ({state:next,side,slot,actor,action,emitEvent,random}) => {
         if (action.kind === 'item') throw new Error('Trainer items are not available in PvP.')
-        return applyDoublesPowerAction(next,side,actor,action)
+        return applyDoublesPowerAction(next,side,actor,action,{slot,emitEvent,random})
       },
       (attempt) => {
         const userId = attempt.side === 'player' ? p1Id : p2Id
@@ -157,6 +156,9 @@ export async function resolvePvpTurn(
     }
     return options.persist === false ? state : settlePvpOutcome(state)
   }
+  if (p1Move.attackType === 'power:z-move' || p2Move.attackType === 'power:z-move' || p1Move.powers?.zMoveCharge || p2Move.powers?.zMoveCharge) {
+    throw new Error('Arm Z-Move before submitting a turn.')
+  }
   beginBattlePresentation(state)
   const shouldPersist = options.persist !== false
   const random = options.random ?? Math.random
@@ -176,10 +178,12 @@ export async function resolvePvpTurn(
       !mon.isMega &&
       pendingPowers.megaFormId &&
       powerState.megaUsesRemaining > 0 &&
+      getStanceWinCharges(powerState) >= POWER_STANCE_WIN_COST &&
       !powerState.megaEvolved
     ) {
       const { activateMegaEvolution } = await import('../powers/mega')
       if (activateMegaEvolution(mon, pendingPowers.megaFormId, scopedState)) {
+        spendPowerCharge(powerState)
         powerState.megaUsesRemaining -= 1
         powerState.megaEvolved = true
       }
@@ -189,12 +193,13 @@ export async function resolvePvpTurn(
     if (
       pendingPowers.dynamax &&
       !mon.isDynamaxed &&
-      powerState.dynamaxAvailable &&
+      getStanceWinCharges(powerState) >= POWER_STANCE_WIN_COST &&
       powerState.dynamaxUsesRemaining > 0 &&
       !powerState.dynamaxActive
     ) {
       const { activateDynamax } = await import('../powers/dynamax')
       if (activateDynamax(mon, pendingPowers.dynamaxFormId, scopedState)) {
+        spendPowerCharge(powerState)
         powerState.dynamaxUsesRemaining -= 1
         powerState.dynamaxActive = true
       }
@@ -203,11 +208,13 @@ export async function resolvePvpTurn(
     // Tera
     if (
       pendingPowers.tera &&
+      getStanceWinCharges(powerState) >= POWER_STANCE_WIN_COST &&
       powerState.teraUsesRemaining > 0 &&
       !mon.teraUsed
     ) {
       const { activateTera } = await import('../powers/tera')
       if (activateTera(mon, state.turn)) {
+        spendPowerCharge(powerState)
         powerState.teraUsesRemaining -= 1
         const teraAbility = processBattleAbilityTeraActivation({
           state,
@@ -218,17 +225,6 @@ export async function resolvePvpTurn(
       }
     }
 
-    if (
-      pendingPowers.zMoveCharge &&
-      powerState.zMoveUsesRemaining > 0 &&
-      !powerState.zMoveUsed &&
-      !mon.zMoveReady
-    ) {
-      if (activateZMoveCharge(mon)) {
-        powerState.zMoveUsesRemaining -= 1
-        powerState.zMoveUsed = powerState.zMoveUsesRemaining <= 0
-      }
-    }
     return messages
   }
 
@@ -263,6 +259,7 @@ export async function resolvePvpTurn(
         type,
       )
       if (res.success) {
+        spendPowerCharge(powerState)
         state.powers = p1Powers
         if (type === 'time') {
           if (isP1) p2Skipped = true
@@ -307,16 +304,20 @@ export async function resolvePvpTurn(
     p2UsedPower = true
   }
 
-  const p1UsedZMovePower =
-    p1Move.attackType === 'power:z-move' || !!p1Move.powers?.zMoveCharge
-  const p2UsedZMovePower =
-    p2Move.attackType === 'power:z-move' || !!p2Move.powers?.zMoveCharge
-
   // --- APPLY POWERS (Mega/Gmax) ---
   const p1PowerMessages = await applyPowers(p1Mon, p1Move.powers, p1Powers)
   const p2PowerMessages = await applyPowers(p2Mon, p2Move.powers, p2Powers)
-  p1UsedPower = p1UsedPower || p1UsedZMovePower
-  p2UsedPower = p2UsedPower || p2UsedZMovePower
+  const queuedSimplePower = (move:PvpMove, side:'player'|'enemy', mon:BattlePokemon) => {
+    const powerId = move.attackType?.slice('power:'.length)
+    if (powerId !== 'weather' && powerId !== 'shout' && powerId !== 'circadian') return null
+    const effects: BattlePresentationEvent[] = []
+    const message = applyDoublesPowerAction(state,side,mon,{slot:0,kind:'power',powerId},{slot:0,emitEvent:(event)=>effects.push(event),random})
+    return {message,effects}
+  }
+  const p1SimplePower = queuedSimplePower(p1Move,'player',p1Mon)
+  const p2SimplePower = queuedSimplePower(p2Move,'enemy',p2Mon)
+  if (p1SimplePower) { p1UsedPower = true; p1PowerMessages.push(p1SimplePower.message) }
+  if (p2SimplePower) { p2UsedPower = true; p2PowerMessages.push(p2SimplePower.message) }
 
   let logMessage = ``
   if (p1Move.spectatorMessage) logMessage += `${p1Move.spectatorMessage}\n`
@@ -325,26 +326,6 @@ export async function resolvePvpTurn(
   if (p2PowerMessages.length) logMessage += `${p2PowerMessages.join('\n')}\n`
   if (state.history[0]?.message.includes('Dimensional Shift')) {
     // Already logged
-  }
-
-  if (p1UsedZMovePower) {
-    logMessage += `${p1Mon.name} prepares to launch a Z-Move! `
-  } else if (
-    p1Move.specialMoveId ||
-    p1Move.attackType?.startsWith('swap:') ||
-    p1Move.attackType?.startsWith('power:')
-  ) {
-    clearZMoveCharge(p1Mon)
-  }
-
-  if (p2UsedZMovePower) {
-    logMessage += `${p2Mon.name} prepares to launch a Z-Move! `
-  } else if (
-    p2Move.specialMoveId ||
-    p2Move.attackType?.startsWith('swap:') ||
-    p2Move.attackType?.startsWith('power:')
-  ) {
-    clearZMoveCharge(p2Mon)
   }
 
   consumeQueuedMovePowerUses(p1Move, p1Powers, p1Mon)
@@ -397,6 +378,14 @@ export async function resolvePvpTurn(
     dmg: 0,
     result: 'tie',
     message: '',
+  }
+  if (p1SimplePower) {
+    const hit = p1SimplePower.effects.find((event):event is Extract<BattlePresentationEvent,{type:'attack'}> => event.type === 'attack')
+    if (hit) { p1Resolution.dmg = hit.damage; p1Resolution.usedType = hit.attackType }
+  }
+  if (p2SimplePower) {
+    const hit = p2SimplePower.effects.find((event):event is Extract<BattlePresentationEvent,{type:'attack'}> => event.type === 'attack')
+    if (hit) { p2Resolution.dmg = hit.damage; p2Resolution.usedType = hit.attackType }
   }
   const p1Committed = !p1Swap.swapped && !p1UsedPower && !p1Skipped
   const p2Committed = !p2Swap.swapped && !p2UsedPower && !p2Skipped
@@ -825,6 +814,8 @@ export async function resolvePvpTurn(
   if (logMessage.trim()) {
     state.history.unshift({
       turn: state.turn,
+      playerExecutedAttack: p1Resolution.didAttack || !!p1SimplePower?.effects.some((event) => event.type === 'attack'),
+      enemyExecutedAttack: p2Resolution.didAttack || !!p2SimplePower?.effects.some((event) => event.type === 'attack'),
       playerStance: p1Move.stance,
       enemyStance: p2Move.stance,
       result: turnResult,
@@ -840,6 +831,8 @@ export async function resolvePvpTurn(
   const p2TurnResult = invertBattleResult(turnResult)
   applyDimensionalChargeForResult(p1Powers, turnResult)
   applyDimensionalChargeForResult(p2Powers, p2TurnResult)
+  if (p1Resolution.didAttack && turnResult === 'win') awardStanceWin(p1Powers)
+  if (p2Resolution.didAttack && p2TurnResult === 'win') awardStanceWin(p2Powers)
 
   advancePvpPowerStateForTurn(
     state.playerTeam[state.activePlayerIndex],

@@ -24,6 +24,7 @@ COPY --from=deps /app/node_modules ./node_modules
 # not need to invalidate the compiler layer.
 COPY package.json next.config.mjs tsconfig.json postcss.config.mjs ./
 COPY src ./src
+COPY icons-new ./icons-new
 COPY scripts/reset-gym-chronicles-v2.ts ./scripts/reset-gym-chronicles-v2.ts
 
 ENV NEXT_TELEMETRY_DISABLED=1

@@ -20,7 +20,9 @@ import {
   canApplyPokemonResearchEndure,
 } from '@/utilities/battle/research-survival'
 import { getUserInventoryMap } from '@/utilities/user-state'
+import { getStanceWinCharges, POWER_STANCE_WIN_COST, spendPowerCharge } from '@/utilities/battle/power-charges'
 import { runBattleActionWithGuard } from '../helpers/action-guard'
+import { queuePvpMoveAndResolveTurn } from '../pvp/turn-sync'
 
 /**
  * Use Circadian Power based on current time of day.
@@ -39,6 +41,7 @@ export async function useCircadian(
   error?: string
   state?: BattleState
   message?: string
+  waiting?: boolean
 }> {
   const user = await getUser()
   if (!user) return { success: false, error: 'Not authenticated' }
@@ -71,11 +74,10 @@ export async function useCircadian(
     if (skillRequirementError)
       return { success: false, error: skillRequirementError }
 
-    const turnsPlayed = state.powers?.turnsPlayedThisBattle ?? 0
-    if (turnsPlayed < 3) {
+    if (getStanceWinCharges(state.powers) < POWER_STANCE_WIN_COST) {
       return {
         success: false,
-        error: 'Circadian Power requires 3 turns to charge',
+        error: 'Win 3 stance matchups to use a Power',
       }
     }
 
@@ -97,6 +99,11 @@ export async function useCircadian(
     })
     if (selectedPowerError) {
       return { success: false, error: selectedPowerError }
+    }
+
+    if (state.isPvp) {
+      const result = await queuePvpMoveAndResolveTurn({viewerId:user.id,battleState:state,move:{stance:'tech',attackType:'power:circadian'}})
+      return {success:true,state:result.state,waiting:result.waiting}
     }
 
     const enemyMon = state.enemyTeam[state.activeEnemyIndex]
@@ -125,6 +132,8 @@ export async function useCircadian(
     let playerStance: BattleStance = 'power'
     let playerDamage = 0
     let isAttack = true
+    let playerExecutedAttack = false
+    let enemyExecutedAttack = false
     let log = ''
 
     // Apply phase-specific effects
@@ -232,8 +241,8 @@ export async function useCircadian(
         playerDamage = 0
         log += shield.message
       } else {
-        const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
-        log += `\n${state.playerName}: ${playerMon.name} uses a ${cap(playerStance)} ${cap(dmgResult.usedType)} Attack dealing ${playerDamage} damage!`
+        playerExecutedAttack = true
+        log += `\n${state.playerName}: ${playerMon.name} uses [icon:stance:${playerStance}] [icon:type:${dmgResult.usedType}] ${playerMoveName}, dealing ${playerDamage} damage!`
         if (dmgResult.isRadiantBoost)
           log += `\n${playerMon.name}'s aura burns bright.`
         if (dmgResult.weatherMessage) log += `\n${dmgResult.weatherMessage}`
@@ -270,8 +279,9 @@ export async function useCircadian(
       enemyDamage = 0
       log += playerShield.message
     } else {
+      enemyExecutedAttack = true
       const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
-      log += `\n${state.enemyName}: ${enemyMon.name} uses a ${cap(enemyStance)} ${cap(enemyDmgResult.usedType)} Attack dealing ${enemyDamage} damage!`
+      log += `\n${state.enemyName}: ${enemyMon.name} uses [icon:stance:${enemyStance}] [icon:type:${enemyDmgResult.usedType}] ${cap(enemyStance)} Attack, dealing ${enemyDamage} damage!`
       if (enemyDmgResult.isRadiantBoost)
         log += `\n${enemyMon.name}'s aura burns bright.`
       if (enemyDmgResult.weatherMessage)
@@ -301,6 +311,7 @@ export async function useCircadian(
 
     // Decrement usage
     if (state.powers) {
+      spendPowerCharge(state.powers)
       state.powers.circadianUsesRemaining =
         (state.powers.circadianUsesRemaining ?? 0) - 1
     }
@@ -308,6 +319,8 @@ export async function useCircadian(
     // Update history
     state.history.unshift({
       turn: state.turn,
+      playerExecutedAttack,
+      enemyExecutedAttack,
       playerStance: playerStance,
       enemyStance: enemyStance,
       result,

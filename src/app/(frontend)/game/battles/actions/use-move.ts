@@ -169,9 +169,9 @@ import {
 import { applyBattleFormChange } from '@/utilities/battle/stats-calc'
 import { getTerrainMoveBlockMessage } from '@/utilities/battle/terrain-effects'
 import {
-  clearZMoveCharge,
   consumeZMoveCharge,
-  Z_MOVE_DAMAGE_MULTIPLIER,
+  getStanceAttackName,
+  getStanceBasePower,
 } from '@/utilities/battle/z-move'
 import {
   createBasicAttackMove,
@@ -619,12 +619,7 @@ export async function useMove(
     }
 
     // --- PVE LOGIC ---
-    const isZMove = isBasicAttack ? consumeZMoveCharge(playerMon) : false
-    if (isZMove) {
-      move = { ...move, damage: Z_MOVE_DAMAGE_MULTIPLIER }
-    } else if (!isBasicAttack) {
-      clearZMoveCharge(playerMon)
-    }
+    const isZMove = isBasicAttack && !!playerMon.zMoveReady
 
     if (shouldShadowScream(playerMon)) {
       const screamDamage = applyShadowScreamDamage(playerMon)
@@ -1191,7 +1186,7 @@ export async function useMove(
         playerAttackTypeForLog = moveType
         message = appendBattleLogLine(
           message,
-          `${playerName}: ${playerMon.name} uses [icon:stance:${resolvedMoveStance}] [icon:type:${moveType}] ${move.name}!`,
+          `${playerName}: ${playerMon.name} uses [icon:stance:${resolvedMoveStance}] [icon:type:${moveType}] ${isBasicAttack ? getStanceAttackName(moveType, resolvedMoveStance, playerMon, isZMove) : move.name}!`,
         )
         if (isZMove) message += ' (Z-MOVE!)'
         if (contest.message) message += ` ${contest.message}`
@@ -1238,7 +1233,7 @@ export async function useMove(
           !hiddenPower && !move.delayedDamage
             ? (resolvedMoveDamage?.hitCount ?? 1)
             : 1
-        const basePower = Math.max(
+        const basePower = isBasicAttack ? getStanceBasePower(playerMon, isZMove) : Math.max(
           1,
           Math.round(BASE_BATTLE_POWER * moveDamage),
         )
@@ -1530,7 +1525,7 @@ export async function useMove(
         playerAttackTypeForLog = moveType
         message = appendBattleLogLine(
           message,
-          `${playerName}: ${playerMon.name} uses [icon:stance:${resolvedMoveStance}] [icon:type:${moveType}] ${move.name}!${typeEffectivenessMsg}`,
+          `${playerName}: ${playerMon.name} uses [icon:stance:${resolvedMoveStance}] [icon:type:${moveType}] ${isBasicAttack ? getStanceAttackName(moveType, resolvedMoveStance, playerMon, isZMove) : move.name}!${typeEffectivenessMsg}`,
         )
         if (isZMove) message += ' (Z-MOVE!)'
         if (contest.message) message += ` ${contest.message}`
@@ -1543,7 +1538,7 @@ export async function useMove(
         playerAttackTypeForLog = moveType
         message = appendBattleLogLine(
           message,
-          `${playerName}: ${playerMon.name} uses [icon:stance:${resolvedMoveStance}] [icon:type:${moveType}] ${move.name}!`,
+          `${playerName}: ${playerMon.name} uses [icon:stance:${resolvedMoveStance}] [icon:type:${moveType}] ${isBasicAttack ? getStanceAttackName(moveType, resolvedMoveStance, playerMon, isZMove) : move.name}!`,
         )
         if (isZMove) message += ' (Z-MOVE!)'
       }
@@ -2411,6 +2406,7 @@ export async function useMove(
     }
 
     const moveSucceeded = !moveMissed && !moveFailed && !continuousInterrupted
+    if (isZMove && moveSucceeded) consumeZMoveCharge(playerMon)
     if (move.id === SKETCH_MOVE_ID) {
       if (!moveSucceeded) {
         message += `\n${playerMon.name}'s Sketch failed.`
@@ -2554,6 +2550,8 @@ export async function useMove(
 
     state.history.unshift({
       turn: state.turn,
+      playerExecutedAttack: moveSucceeded,
+      enemyExecutedAttack: enemyCanMove && !enemySwapped && !trainerItemResult.skipsEnemyAction && !enemyMoveInterrupted && !enemyMoveMissed && !enemyMoveFailed,
       playerStance: resolvedMoveStance,
       enemyStance: enemyStanceForLog,
       result: contest.configured
@@ -2567,6 +2565,11 @@ export async function useMove(
       enemyAttackType: enemyAttackTypeForLog,
       message,
     })
+
+    if (moveSucceeded && stanceOutcome === 'win' && enemyCanMove && !enemySwapped && !trainerItemResult.skipsEnemyAction) {
+      const { awardStanceWin } = await import('@/utilities/battle/power-charges')
+      awardStanceWin(state.powers)
+    }
 
     if (moveSucceeded && playerAttackTypeForLog) {
       if (isBasicAttack) {

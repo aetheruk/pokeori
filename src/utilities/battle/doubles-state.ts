@@ -8,7 +8,7 @@ export type DoublesAction =
   | {slot:DoublesSlot;kind:'move';moveId:string;target?:DoublesTarget;selectedType?:string}
   | {slot:DoublesSlot;kind:'switch';pokemonIndex:number}
   | {slot:DoublesSlot;kind:'item';itemId:string;targetPokemonIndex?:number}
-  | {slot:DoublesSlot;kind:'power';powerId:'tera'|'mega'|'dynamax'|'z-move';formId?:string}
+  | {slot:DoublesSlot;kind:'power';powerId:'tera'|'mega'|'dynamax'|'z-move'|'victory'|'weather'|'shout'|'circadian'|'dimensional-shift';formId?:string;target?:DoublesTarget}
 export type DoublesDraft = Partial<Record<DoublesSlot, DoublesAction>> & {
   selectionOrder?: DoublesSlot[]
 }

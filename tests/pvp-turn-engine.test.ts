@@ -342,6 +342,26 @@ describe('PVP turn engine helpers', () => {
     expect(attacker.zMoveReady).toBeUndefined()
   })
 
+  test('a missed stance leaves an armed Z-Move available', () => {
+    const attacker = makePokemon({
+      zMoveReady: true,
+      statStages: { attack: 0, defense: 0, specialAttack: 0, specialDefense: 0, speed: 0, accuracy: -6, evasion: 0, crit: 0 },
+    })
+    const defender = makePokemon({ id: 'defender' })
+    const result = resolvePvpCombat({
+      attacker,
+      defender,
+      move: { stance: 'power', attackType: 'grass', powers: { zMove: true } },
+      attackerName: 'Player',
+      attackerSide: 'player',
+      playerMove: { stance: 'power' },
+      enemyMove: { stance: 'tech' },
+      random: () => 0.9999,
+    })
+    expect(result.didAttack).toBe(false)
+    expect(attacker.zMoveReady).toBe(true)
+  })
+
   test('fused Necrozma becomes Ultra Necrozma when using a prepared Z-Move', () => {
     const attacker = makePokemon({
       name: 'Necrozma',
@@ -468,6 +488,7 @@ describe('PVP turn engine helpers', () => {
     const state = makeBattleState()
     const playerPowers = state.pvpPowers!.player
     const enemyPowers = state.pvpPowers!.enemy
+    playerPowers.stanceWinCharges = 3
 
     const result = resolvePvpSwap({
       state,
@@ -482,6 +503,8 @@ describe('PVP turn engine helpers', () => {
     expect(state.activePlayerIndex).toBe(1)
     expect(state.playerTeam[1].activeTurnStarted).toBe(state.turn + 1)
     expect(state.playerTeam[1].status).toEqual({ id: 'victory', counter: 0 })
+    expect(playerPowers.stanceWinCharges).toBe(0)
+    expect(playerPowers.victoryUsesRemaining).toBe(0)
   })
 
   test('PVP swaps process switch-out battle abilities', () => {
@@ -606,7 +629,7 @@ describe('PVP turn engine helpers', () => {
     expect(result.result).toBe('win')
     expect(result.dmg).toBeGreaterThan(0)
     expect(defender.currentHp).toBeLessThan(100)
-    expect(result.message).toContain('Player: Attacker uses Power Attack!')
+    expect(result.message).toContain('Player: Attacker uses Grass Tackle!')
   })
 
   test('Parental Bond applies a second PVP hit and retriggers on-damaged hooks', () => {

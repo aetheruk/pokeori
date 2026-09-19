@@ -35,6 +35,17 @@ import {
 } from '@/utilities/battle/switching'
 import { createBattleTurnTimer } from './helpers/timing'
 import { runBattleActionWithGuard } from './helpers/action-guard'
+import { getPayload } from 'payload'
+import configPromise from '@payload-config'
+import { redis } from '@/utilities/redis'
+import { getUserInventoryMap } from '@/utilities/user-state'
+import { getSkillLevel } from '@/utilities/skills/unlocks'
+import { validateCommonPowerRequirements } from '@/utilities/battle/action-validation'
+import { activateZMoveCharge } from '@/utilities/battle/z-move'
+import { spendPowerCharge } from '@/utilities/battle/power-charges'
+import { BATTLE_TTL, PVP_BATTLE_PREFIX, PVP_TURN_PREFIX } from './helpers/state-management'
+import { ensurePvpPowerStates, getSharedBattleUserIds, toPerspectivePvpState } from './pvp/state-utils'
+import { getDoublesPokemon } from '@/utilities/battle/doubles-state'
 import {
   submitDoublesActions as submitDoublesActionsImpl,
   replaceDoublesPokemon as replaceDoublesPokemonImpl,
@@ -229,8 +240,46 @@ export async function useDynamax(formId?: string, clientActionId?: string) {
   )
 }
 
-export async function useZMove(clientActionId?: string) {
-  return submitTurn('power', 'power:z-move', clientActionId)
+export async function useZMove(clientActionId?: string, slot?: 0 | 1) {
+  const user = await fetchUser()
+  if (!user) return { success: false, error: 'Not authenticated' }
+  return runBattleActionWithGuard(user.id, clientActionId, async () => {
+    const perspective = await fetchState(user)
+    if (perspective?.status !== 'ongoing') return { success: false, error: 'No active battle' }
+    if (needsPlayerLeadSelection(perspective) || needsPlayerReplacement(perspective)) return { success: false, error: 'Choose your Pokémon first' }
+    if (perspective.playerMoveLock) return { success: false, error: 'Finish the current move first' }
+    if (perspective.format === 'double' && slot === undefined) return { success: false, error: 'Choose a Pokémon lane' }
+    if (perspective.format !== 'double' && slot !== undefined) return { success: false, error: 'Invalid Pokémon lane' }
+    const battleId = perspective.pvpBattleId
+    const key = battleId ? `${PVP_BATTLE_PREFIX}${battleId}` : `battle:${user.id}`
+    const state = battleId ? await redis.get<BattleState>(key) : perspective
+    if (state?.status !== 'ongoing') return { success: false, error: 'Battle changed; try again' }
+    if (battleId && await redis.get(`${PVP_TURN_PREFIX}${battleId}:${state.turn}:${user.id}`)) return { success: false, error: 'Your turn is already queued' }
+    const before = structuredClone(state)
+    const { p1Id, p2Id } = battleId ? getSharedBattleUserIds(state) : { p1Id: user.id, p2Id: null }
+    const side = user.id === p1Id ? 'player' : user.id === p2Id ? 'enemy' : null
+    if (!side) return { success: false, error: 'Not in this battle' }
+    const powers = battleId ? ensurePvpPowerStates(state)[user.id] : state.powers
+    const pokemon = state.format === 'double'
+      ? getDoublesPokemon(state, side, slot!)
+      : side === 'player' ? state.playerTeam[state.activePlayerIndex] : state.enemyTeam[state.activeEnemyIndex]
+    if (!powers || !pokemon || pokemon.currentHp <= 0) return { success: false, error: 'No active Pokémon' }
+    const payload = await getPayload({ config: configPromise })
+    const inventory = await getUserInventoryMap(payload as any, user.id)
+    const error = validateCommonPowerRequirements({ command: { kind: 'z-move' }, inventory, pokemon, powers, trainerLevel: getSkillLevel(user.skills, 'battling') })
+    if (error) return { success: false, error }
+    if (!activateZMoveCharge(pokemon)) return { success: false, error: 'Z-Move is already prepared' }
+    spendPowerCharge(powers)
+    powers.zMoveUsesRemaining -= 1
+    powers.zMoveUsed = powers.zMoveUsesRemaining <= 0
+    if (battleId) {
+      const saved = await redis.setManyIfValue(key, before, [{ key, value: state, ttlSeconds: BATTLE_TTL }])
+      if (!saved) return { success: false, error: 'Battle changed; try again' }
+      return { success: true, state: toPerspectivePvpState(state, user.id, battleId) }
+    }
+    await redis.set(key, state, { ex: BATTLE_TTL })
+    return { success: true, state }
+  })
 }
 
 // Additional Exported Actions

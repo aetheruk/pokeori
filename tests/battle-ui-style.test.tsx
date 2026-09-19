@@ -33,19 +33,16 @@ describe('battle UI stance styling', () => {
       />,
     )
 
-    expect(markup).toContain('aria-label="Speed attack, Speed 55. Beats Power"')
-    expect(markup).toContain('aria-label="Power attack, Attack 42. Beats Tech"')
+    expect(markup).toContain('aria-label="Use Normal Strike. Speed stance, Speed 55. Beats Power"')
+    expect(markup).toContain('aria-label="Use Normal Tackle. Power stance, Attack 42. Beats Tech"')
     expect(markup).toContain(
-      'aria-label="Tech attack, Sp. Atk 47. Beats Speed"',
+      'aria-label="Use Normal Gambit. Tech stance, Sp. Atk 47. Beats Speed"',
     )
-    expect(markup).toContain('>Speed<')
-    expect(markup).toContain('>Power<')
-    expect(markup).toContain('>Tech<')
-    expect(markup).toContain('>Attack<')
-    expect(markup).toContain('>Sp. Atk<')
-    expect(markup).toContain('game-battle-command-deck')
-    expect(markup).toContain('Quick strike')
-    expect(markup).toContain('Heavy hit')
+    expect(markup).toContain('>Normal Strike<')
+    expect(markup).toContain('>Normal Tackle<')
+    expect(markup).toContain('>Normal Gambit<')
+    expect(markup).not.toContain('>Attack<')
+    expect(markup).not.toContain('>Sp. Atk<')
     expect(markup).not.toContain('animate-pulse')
   })
 })

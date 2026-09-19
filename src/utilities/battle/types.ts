@@ -240,6 +240,7 @@ export interface BattleDelayedDamageEntry {
 
 // Powers state for tracking special battle mechanics
 export interface PowersState {
+  stanceWinCharges?: number
   // Moves
   moveUsesRemaining: number // Default 2, configurable
   // Tera
@@ -301,6 +302,7 @@ export type BattlePresentationEvent =
       attackType?: string
       simultaneousGroup?: string
       animateActor?: boolean
+      stanceWinner?: boolean
       message: string
     })
   | (BattlePresentationEventBase & {
@@ -512,6 +514,8 @@ export interface BattleState {
 }
 
 export interface BattleLogEntry {
+  playerExecutedAttack?: boolean
+  enemyExecutedAttack?: boolean
   turn: number
   phase?: BattleTurnPhase
   playerStance: BattleStance

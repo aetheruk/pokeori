@@ -231,6 +231,7 @@ export function getGigantamaxForm(baseFormId: string): string | undefined {
  * Powers State for tracking in battle
  */
 export interface PowersState {
+  stanceWinCharges?: number // Shared, spendable wins; optional for active legacy battles
   // Moves
   moveUsesRemaining: number // Default 3 (or from config)
   // Tera
@@ -287,6 +288,7 @@ export function createInitialPowersState(config?: {
   circadianUses?: number
 }): PowersState {
   return {
+    stanceWinCharges: 0,
     moveUsesRemaining: config?.movesPerBattle ?? 2,
     teraUsesRemaining: config?.teraUsesPerBattle ?? 1,
     megaUsesRemaining: config?.megaEvolutionsPerBattle ?? 1,

@@ -907,53 +907,9 @@
   }
 }
 
-/* Shared singles/doubles stance controls. These are a command deck, not stat cards. */
-.game-battle-command-deck {
-  padding: 0.55rem;
-  border: 1px solid color-mix(in srgb, var(--game-charcoal) 36%, transparent);
-  border-radius: 0.8rem;
-  background: var(--game-charcoal-strong);
-  box-shadow:
-    inset 0 1px 0 rgb(247 236 214 / 0.12),
-    0 5px 0 rgb(29 37 34 / 0.18);
-}
-
-.game-battle-command-header {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  min-height: 1.35rem;
-  padding: 0 0.3rem 0.45rem;
-  color: var(--game-cream);
-}
-
-.game-battle-command-title,
-.game-battle-command-count {
-  font-size: 0.63rem;
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.game-battle-command-title {
-  color: var(--game-cream);
-}
-
-.game-battle-command-count {
-  color: rgb(247 236 214 / 0.58);
-  letter-spacing: 0.1em;
-}
-
-.game-battle-command-line {
-  height: 1px;
-  flex: 1;
-  background: rgb(247 236 214 / 0.18);
-}
-
-.game-battle-command-grid {
+.game-battle-stance-list {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.45rem;
 }
 
@@ -962,11 +918,16 @@
   --battle-stance-fill: #b58a43;
   --battle-stance-fill-strong: #8f672b;
   --battle-stance-ink: var(--game-cream);
-  min-height: 8.6rem;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  min-height: 4.75rem;
+  align-items: center;
+  gap: 0.75rem;
   overflow: hidden;
+  padding: 0.65rem 0.75rem;
   border-color: color-mix(in srgb, var(--battle-stance-fill-strong) 74%, #1d2522);
   border-radius: 0.55rem;
-  border-bottom: 4px solid var(--battle-stance-fill-strong);
+  border-bottom: 3px solid var(--battle-stance-fill-strong);
   background: var(--battle-stance-fill);
   color: var(--battle-stance-ink);
   box-shadow:
@@ -1032,8 +993,7 @@
   outline-offset: 4px;
 }
 
-.game-battle-stance-name,
-.game-battle-stance-hint strong {
+.game-battle-stance-name {
   color: var(--battle-stance-ink);
 }
 
@@ -1043,10 +1003,6 @@
   border-radius: 50%;
   background: rgb(29 37 34 / 0.18);
   box-shadow: inset 0 1px 0 rgb(255 248 232 / 0.18);
-}
-
-.game-battle-stance-hint {
-  border-color: rgb(255 248 232 / 0.27);
 }
 
 .game-battle-stance-icon::after {
@@ -1059,15 +1015,63 @@
   pointer-events: none;
 }
 
-.game-battle-stance-stat {
-  color: var(--battle-stance-ink);
+.game-battle-action-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
 }
 
-.game-battle-action-strip {
-  padding: 0.35rem;
-  border: 1px solid var(--game-border);
-  border-radius: 0.75rem;
-  background: color-mix(in srgb, var(--game-surface-raised) 88%, var(--game-canvas));
+.game-battle-control-region {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.game-battle-section[data-type] {
+  isolation: isolate;
+  background: #202622;
+}
+
+.game-battle-type-atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.game-battle-section[data-type] .game-battle-section-body {
+  color: var(--game-cream);
+}
+
+.battle-stance-win-glow {
+  position: absolute;
+  inset: -12%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 242 145 / .72), rgb(255 199 71 / .25) 45%, transparent 70%);
+  filter: blur(5px);
+  animation: battle-stance-win-pulse .55s ease-out both;
+  pointer-events: none;
+}
+
+.battle-stance-win-sprite {
+  animation: battle-stance-win-sprite .55s ease-out both;
+}
+
+@keyframes battle-stance-win-pulse {
+  0% { transform: scale(.7); opacity: 0; }
+  35% { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(1.05); opacity: .45; }
+}
+
+@keyframes battle-stance-win-sprite {
+  45% { filter: drop-shadow(0 0 15px #ffe688); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .battle-stance-win-glow,
+  .battle-stance-win-sprite { animation: none; }
 }
 
 .game-battle-utility-trigger {
@@ -1149,46 +1153,137 @@
 }
 
 .game-battle-type-strip {
+  --battle-type-color: var(--game-surface-raised);
   position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  min-height: 3.15rem;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 2.75rem;
   width: calc(100% + 1.5rem);
   margin-inline: -0.75rem;
   align-items: center;
   column-gap: 0.6rem;
-  padding: 0.35rem 0.75rem;
-  border-bottom: 1px solid var(--game-border-strong);
-  background: color-mix(in srgb, var(--game-surface-raised) 72%, var(--game-canvas));
+  padding: 0.15rem 0.75rem;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--battle-type-color) 48%, var(--game-border-strong));
+  background: color-mix(
+    in srgb,
+    var(--battle-type-color) 26%,
+    var(--game-surface-raised)
+  );
 }
 
-.game-battle-type-strip > legend {
-  grid-column: 1;
-  margin: 0;
+.game-battle-type-strip--drawer {
+  width: 100%;
+  margin-inline: 0;
+  min-height: 2.25rem;
   padding: 0;
+  border: 0;
+  background: transparent;
 }
 
-.game-battle-type-strip .game-battle-type-picker-label {
-  grid-column: 1;
-  color: var(--game-muted);
+body.pokeori-blackout .game-battle-stance-drawer[data-type],
+.game-battle-stance-drawer[data-type] {
+  transition: background-color 160ms ease;
+}
+
+.game-battle-type-strip[data-type='normal'],
+.game-battle-stance-drawer[data-type='normal'] {
+  --battle-type-color: #a8a77a;
+}
+
+.game-battle-type-strip[data-type='fighting'],
+.game-battle-stance-drawer[data-type='fighting'] {
+  --battle-type-color: #c22e28;
+}
+
+.game-battle-type-strip[data-type='flying'],
+.game-battle-stance-drawer[data-type='flying'] {
+  --battle-type-color: #a98ff3;
+}
+
+.game-battle-type-strip[data-type='poison'],
+.game-battle-stance-drawer[data-type='poison'] {
+  --battle-type-color: #a33ea1;
+}
+
+.game-battle-type-strip[data-type='ground'],
+.game-battle-stance-drawer[data-type='ground'] {
+  --battle-type-color: #e2bf65;
+}
+
+.game-battle-type-strip[data-type='rock'],
+.game-battle-stance-drawer[data-type='rock'] {
+  --battle-type-color: #b6a136;
+}
+
+.game-battle-type-strip[data-type='bug'],
+.game-battle-stance-drawer[data-type='bug'] {
+  --battle-type-color: #a6b91a;
+}
+
+.game-battle-type-strip[data-type='ghost'],
+.game-battle-stance-drawer[data-type='ghost'] {
+  --battle-type-color: #735797;
+}
+
+.game-battle-type-strip[data-type='steel'],
+.game-battle-stance-drawer[data-type='steel'] {
+  --battle-type-color: #b7b7ce;
+}
+
+.game-battle-type-strip[data-type='fire'],
+.game-battle-stance-drawer[data-type='fire'] {
+  --battle-type-color: #ee8130;
+}
+
+.game-battle-type-strip[data-type='water'],
+.game-battle-stance-drawer[data-type='water'] {
+  --battle-type-color: #6390f0;
+}
+
+.game-battle-type-strip[data-type='grass'],
+.game-battle-stance-drawer[data-type='grass'] {
+  --battle-type-color: #7ac74c;
+}
+
+.game-battle-type-strip[data-type='electric'],
+.game-battle-stance-drawer[data-type='electric'] {
+  --battle-type-color: #f7d02c;
+}
+
+.game-battle-type-strip[data-type='psychic'],
+.game-battle-stance-drawer[data-type='psychic'] {
+  --battle-type-color: #f95587;
+}
+
+.game-battle-type-strip[data-type='ice'],
+.game-battle-stance-drawer[data-type='ice'] {
+  --battle-type-color: #96d9d6;
+}
+
+.game-battle-type-strip[data-type='dragon'],
+.game-battle-stance-drawer[data-type='dragon'] {
+  --battle-type-color: #6f35fc;
+}
+
+.game-battle-type-strip[data-type='dark'],
+.game-battle-stance-drawer[data-type='dark'] {
+  --battle-type-color: #705746;
+}
+
+.game-battle-type-strip[data-type='fairy'],
+.game-battle-stance-drawer[data-type='fairy'] {
+  --battle-type-color: #d685ad;
 }
 
 .game-battle-type-selector {
-  grid-column: 2;
+  grid-column: 1;
   display: flex;
   min-width: 0;
-  min-height: 2.75rem;
+  min-height: 2.5rem;
   align-items: center;
   justify-content: center;
   overflow-x: auto;
-}
-
-.game-battle-type-actions {
-  grid-column: 3;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.35rem;
 }
 
 .game-battle-type-action {
@@ -1250,11 +1345,6 @@
   position: relative;
 }
 
-.game-battle-action-strip {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
 .game-battle-action-strip > * {
   min-width: 0;
 }
@@ -1270,6 +1360,7 @@
 @media (max-width: 639px) {
   .game-battle-action-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
   }
 
   .game-battle-type-strip {
@@ -1279,10 +1370,6 @@
 
   .game-battle-type-option {
     width: 4rem;
-  }
-
-  .game-battle-type-actions {
-    gap: 0.25rem;
   }
 
   .game-battle-type-action {
@@ -1307,15 +1394,6 @@
   .game-battle-type-option[aria-pressed='true'] .game-battle-type-image {
     animation: battle-type-active-pulse 2.1s ease-in-out infinite;
   }
-}
-
-.game-battle-type-picker-label {
-  flex: 0 0 auto;
-  color: var(--game-muted);
-  font-size: 0.6rem;
-  font-weight: 900;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
 }
 
 @media (max-width: 380px) {
@@ -1348,23 +1426,16 @@
     font-size: 0.6rem;
   }
 
-  .game-battle-command-deck {
-    padding: 0.4rem;
-  }
-
-  .game-battle-command-grid {
-    gap: 0.3rem;
-  }
-
   .game-battle-stance {
-    min-height: 8rem;
-    padding-right: 0.4rem;
-    padding-left: 0.4rem;
+    min-height: 4.5rem;
+    gap: 0.55rem;
+    padding-right: 0.55rem;
+    padding-left: 0.55rem;
   }
 
   .game-battle-stance-icon {
-    width: 1.8rem;
-    height: 1.8rem;
+    width: 2.25rem;
+    height: 2.25rem;
   }
 }
 

@@ -19,40 +19,17 @@ export async function useDimensionalShift(
   const payload = await getPayload({ config: configPromise })
   const inventory = await getUserInventoryMap(payload as any, userId)
   let requiredItem = ''
-  let requiredChargeType: 'wins' | 'losses' | 'draws' = 'draws'
 
   if (type === 'time') {
     requiredItem = 'adamant-orb'
-    requiredChargeType = 'losses'
   } else if (type === 'space') {
     requiredItem = 'lustrous-orb'
-    requiredChargeType = 'wins'
   } else if (type === 'chaos') {
     requiredItem = 'griseous-orb' // "Chaos"
-    requiredChargeType = 'draws'
   }
 
   if (!inventory[requiredItem]) {
     return { success: false, error: `Missing Key Item: ${requiredItem}` }
-  }
-
-  const charges = state.powers?.dimensionalShift.charges || {
-    wins: 0,
-    losses: 0,
-    draws: 0,
-  }
-  const currentCharge = charges[requiredChargeType]
-
-  if (currentCharge < 3) {
-    return {
-      success: false,
-      error: `Not enough charges! Need 3 ${requiredChargeType}, have ${currentCharge}.`,
-    }
-  }
-
-  // Deduct Charges
-  if (state.powers?.dimensionalShift) {
-    state.powers.dimensionalShift.charges[requiredChargeType] = Math.max(0, currentCharge - 3)
   }
 
   // Apply Effect

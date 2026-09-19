@@ -9,10 +9,12 @@ import { validateSelectedPokemonPower } from '@/utilities/pokemon/pokemon-powers
 import { getSkillLevel, validateBattlePowerSkillRequirement } from '@/utilities/skills/unlocks'
 import { needsPlayerReplacement } from '@/utilities/battle/switching'
 import { getUserInventoryMap } from '@/utilities/user-state'
+import { getStanceWinCharges, POWER_STANCE_WIN_COST, spendPowerCharge } from '@/utilities/battle/power-charges'
 import { getUser } from '../helpers/user'
 import { getActiveBattleState } from '../helpers/state-management'
 import { finalizeTurn } from '../helpers/turn-finalization'
 import { runBattleActionWithGuard } from '../helpers/action-guard'
+import { queuePvpMoveAndResolveTurn } from '../pvp/turn-sync'
 import { applyPokemonResearchEndure, canApplyPokemonResearchEndure } from '@/utilities/battle/research-survival'
 
 type WeatherPowerEffect = {
@@ -45,6 +47,7 @@ export async function useWeatherPower(battleId: string, clientActionId?: string)
   error?: string
   state?: BattleState
   message?: string
+  waiting?: boolean
 }> {
   const user = await getUser()
   if (!user) return { success: false, error: 'Not authenticated' }
@@ -52,7 +55,6 @@ export async function useWeatherPower(battleId: string, clientActionId?: string)
   return runBattleActionWithGuard(user.id, clientActionId, async () => {
     const state = await getActiveBattleState(user)
     if (!state || state.battleId !== battleId) return { success: false, error: 'Battle not found' }
-    if (state.isPvp) return { success: false, error: 'Weather Power is not available in PVP battles yet' }
     if (state.status !== 'ongoing') return { success: false, error: 'Battle has ended' }
     if (needsPlayerReplacement(state)) return { success: false, error: 'Choose your next Pokemon before using Weather Power', state }
 
@@ -72,7 +74,12 @@ export async function useWeatherPower(battleId: string, clientActionId?: string)
     if (skillError) return { success: false, error: skillError }
     if (!state.powers) state.powers = createInitialPowersState()
     if ((state.powers.weatherUsesRemaining ?? 0) <= 0) return { success: false, error: 'No Weather Power uses remaining' }
-    if ((state.powers.turnsPlayedThisBattle ?? 0) < 3) return { success: false, error: 'Weather Power requires 3 turns to charge' }
+    if (getStanceWinCharges(state.powers) < POWER_STANCE_WIN_COST) return { success: false, error: 'Win 3 stance matchups to use a Power' }
+
+    if (state.isPvp) {
+      const result = await queuePvpMoveAndResolveTurn({viewerId:user.id,battleState:state,move:{stance:'tech',attackType:'power:weather'}})
+      return {success:true,state:result.state,waiting:result.waiting}
+    }
 
     const weather = state.weather?.weather ?? 'clear'
     const effect = WEATHER_POWER_EFFECTS[weather]
@@ -81,6 +88,8 @@ export async function useWeatherPower(battleId: string, clientActionId?: string)
     let log = `${playerMon.name} used ${effect.name} during ${WEATHER_LABELS[weather]}!`
     let playerDamage = 0
     let playerAttackType: string | undefined
+    let playerExecutedAttack = false
+    let enemyExecutedAttack = false
     let result: 'win' | 'loss' | 'tie' = 'tie'
 
     if (effect.healPercent) {
@@ -106,7 +115,8 @@ export async function useWeatherPower(battleId: string, clientActionId?: string)
         playerDamage = 0
         log += shield.message
       } else {
-        log += `\n${state.playerName}: ${playerMon.name} dealt ${playerDamage} ${damageResult.usedType} damage!`
+        playerExecutedAttack = true
+        log += `\n${state.playerName}: ${playerMon.name} used [icon:stance:${effect.stance}] [icon:type:${damageResult.usedType}] ${effect.name}, dealing ${playerDamage} damage!`
         if (damageResult.weatherMessage) log += `\n${damageResult.weatherMessage}`
         if (damageResult.isCrit) log += ' (Critical Hit!)'
         log += formatTypeEffectivenessMessage(damageResult)
@@ -117,7 +127,10 @@ export async function useWeatherPower(battleId: string, clientActionId?: string)
     let enemyDamage = enemyDamageResult.damage
     const playerShield = handleShieldInteraction(playerMon, enemyDamageResult.isSuperEffective, result === 'loss')
     if (playerShield.damageMultiplier === 0) enemyDamage = 0
-    else log += `\n${state.enemyName}: ${enemyMon.name} dealt ${enemyDamage} damage!`
+    else {
+      enemyExecutedAttack = true
+      log += `\n${state.enemyName}: ${enemyMon.name} used [icon:stance:${enemyStance}] [icon:type:${enemyDamageResult.usedType}] ${enemyStance} attack, dealing ${enemyDamage} damage!`
+    }
 
     const playerEndure = applyPokemonResearchEndure(enemyMon, playerDamage, Math.random, canApplyPokemonResearchEndure(state, 'enemy'))
     const enemyEndure = applyPokemonResearchEndure(playerMon, enemyDamage, Math.random, canApplyPokemonResearchEndure(state, 'player'))
@@ -128,8 +141,9 @@ export async function useWeatherPower(battleId: string, clientActionId?: string)
     if (playerEndure.message) log += `\n${playerEndure.message}`
     if (enemyEndure.message) log += `\n${enemyEndure.message}`
 
+    spendPowerCharge(state.powers)
     state.powers.weatherUsesRemaining -= 1
-    state.history.unshift({ turn: state.turn, playerStance: effect.stance, enemyStance, result, damageDealt: playerDamage, damageTaken: enemyDamage, playerAttackType, enemyAttackType: enemyDamageResult.usedType, message: log })
+    state.history.unshift({ turn: state.turn, playerExecutedAttack, enemyExecutedAttack, playerStance: effect.stance, enemyStance, result, damageDealt: playerDamage, damageTaken: enemyDamage, playerAttackType, enemyAttackType: enemyDamageResult.usedType, message: log })
     const powerUsage = ((user as any).powerUsage as Record<string, number> | undefined) || {}
     await payload.update({ collection: 'users', id: user.id, data: { powerUsage: { ...powerUsage, weatherUses: (powerUsage.weatherUses || 0) + 1 } } })
     await finalizeTurn(state, user.id, user)

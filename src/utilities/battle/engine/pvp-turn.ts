@@ -54,11 +54,8 @@ import {
 } from '@/utilities/battle/rarity-effects'
 import { BASE_BATTLE_POWER } from '@/utilities/battle/constants'
 import { formatBattleStatName } from '@/utilities/battle/stat-labels'
-import {
-  Z_MOVE_DAMAGE_MULTIPLIER,
-  clearZMoveCharge,
-  consumeZMoveCharge,
-} from '@/utilities/battle/z-move'
+import { clearZMoveCharge, consumeZMoveCharge, getStanceAttackName, getStanceBasePower } from '@/utilities/battle/z-move'
+import { getStanceWinCharges, POWER_STANCE_WIN_COST, spendPowerCharge } from '@/utilities/battle/power-charges'
 import {
   getSecondaryStatusSwitchPreventionMessage,
   processBeforeMoveSecondaryStatuses,
@@ -420,6 +417,9 @@ export function resolvePvpSwap(params: {
   const newIndex = Number.parseInt(move.attackType.split(':')[1], 10)
   if (Number.isNaN(newIndex) || !team[newIndex])
     return { swapped: false, name: '', messages: [] }
+  const victoryPowers = side === 'player' ? playerPowers : enemyPowers
+  if (move.attackType.startsWith('victory-swap:') && (victoryPowers.victoryUsesRemaining <= 0 || getStanceWinCharges(victoryPowers) < POWER_STANCE_WIN_COST))
+    return { swapped: false, name: '', messages: [] }
 
   const oldIndex =
     side === 'player' ? state.activePlayerIndex : state.activeEnemyIndex
@@ -493,6 +493,7 @@ export function resolvePvpSwap(params: {
     sourcePokemon: team[oldIndex],
   })
   clearPokemonSecondaryStatuses(team[oldIndex])
+  clearZMoveCharge(team[oldIndex])
   resetBattleTypeChange(team[oldIndex])
   const abilitySwitchOutMessages = processBattleAbilitySwitchOut(team[oldIndex])
   if (side === 'player') state.activePlayerIndex = newIndex
@@ -500,6 +501,8 @@ export function resolvePvpSwap(params: {
   team[newIndex].activeTurnStarted = state.turn + 1
 
   if (move.attackType.startsWith('victory-swap:')) {
+    spendPowerCharge(victoryPowers)
+    victoryPowers.victoryUsesRemaining -= 1
     team[newIndex].status = { id: 'victory', counter: 0 }
   }
   const suppressionMessages = processBattleAbilitySuppressionForState(state)
@@ -561,7 +564,6 @@ export function resolvePvpCombat(params: {
   const chanceRandom = random ?? Math.random
 
   if (skipped) {
-    if (move.powers?.zMove) clearZMoveCharge(attacker)
     return { didAttack: false, dmg: 0, result: 'tie', message: '' }
   }
 
@@ -596,7 +598,6 @@ export function resolvePvpCombat(params: {
   } = prepared
   const beforeMoveCheck = prepared
   if (!beforeMoveCheck.canMove) {
-    if (move.powers?.zMove) clearZMoveCharge(attacker)
     return {
       didAttack: false,
       dmg: 0,
@@ -682,10 +683,8 @@ export function resolvePvpCombat(params: {
     })
   }
 
-  const isZMove = !!move.powers?.zMove && !!attacker.zMoveReady
-  const multiplier = isZMove
-    ? Z_MOVE_DAMAGE_MULTIPLIER
-    : outcome.damageMultiplier
+  const isZMove = !specialMove && !!move.powers?.zMove && !!attacker.zMoveReady
+  const multiplier = outcome.damageMultiplier
   const addedEffectMoveDamageMultiplier = specialMove
     ? getBattleAbilityAddedEffectMoveDamageMultiplier(attacker, specialMove)
     : 1
@@ -723,7 +722,7 @@ export function resolvePvpCombat(params: {
                 specialMove.damage),
           ),
         )
-    : BASE_BATTLE_POWER
+    : getStanceBasePower(attacker, isZMove)
   const moveHitCount =
     specialMove && !hiddenPower && !specialMove.delayedDamage
       ? (resolvedMoveDamage?.hitCount ?? 1)
@@ -1544,7 +1543,7 @@ export function resolvePvpCombat(params: {
   }
 
   const label = moveStance.charAt(0).toUpperCase() + moveStance.slice(1)
-  const attackLabel = specialMove?.name || `${label} Attack`
+  const attackLabel = specialMove?.name || getStanceAttackName(resolvedMoveType || attacker.types[0] || 'normal', moveStance, attacker, isZMove)
   const metronomeMessage =
     move.calledByMetronome && specialMove
       ? `${attacker.name}'s Metronome called ${specialMove.name}! `
@@ -1572,7 +1571,7 @@ export function resolvePvpCombat(params: {
     ? ` ${damageResult.weatherMessage}`
     : ''
   const effectivenessMessage = formatTypeEffectivenessMessage(damageResult)
-  if (isZMove) consumeZMoveCharge(attacker)
+  if (isZMove && !moveFailed && !moveMissed) consumeZMoveCharge(attacker)
   const finalDamage = moveMissed ? 0 : totalDamage
   const targetSuffix = params.targetName ? ` on ${params.targetName}` : ''
   const baseMessage = `${metronomeMessage}${attackerName}: ${attacker.name} uses ${attackLabel}${targetSuffix}! [icon:stance:${moveStance}] [icon:type:${damageResult.usedType}]`
@@ -1615,6 +1614,7 @@ export function resolvePvpFaint(
 
   if (!activeMon || activeMon.currentHp > 0) return messages
 
+  clearZMoveCharge(activeMon)
   resetBattleStatStages(activeMon)
   messages.push(`${activeMon.name} fainted!`)
 

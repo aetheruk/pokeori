@@ -61,7 +61,7 @@ export interface BattleContextType {
   ) => void | Promise<void>
   handleUseTera: () => void | Promise<void>
   handleUseMega: (megaStoneId: string) => void | Promise<void>
-  handleUseZMove: () => void | Promise<void>
+  handleUseZMove: (slot?: 0 | 1) => void | Promise<void>
   handleUseDynamax: () => void | Promise<void>
   handleUseMove: (moveId: string) => void | Promise<void>
   handleUseVictory: (itemId: string) => void | Promise<void>

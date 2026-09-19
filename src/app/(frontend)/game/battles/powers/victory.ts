@@ -11,6 +11,7 @@ import { getUser } from '../helpers/user'
 import { getActiveBattleState } from '../helpers/state-management'
 import { queuePvpMoveAndResolveTurn } from '../pvp/turn-sync'
 import { validateSelectedPokemonPower } from '@/utilities/pokemon/pokemon-powers'
+import { getStanceWinCharges, POWER_STANCE_WIN_COST, spendPowerCharge } from '@/utilities/battle/power-charges'
 import { needsPlayerReplacement } from '@/utilities/battle/switching'
 import { markPlayerPokemonInvolved } from '@/utilities/battle/participants'
 import {
@@ -66,6 +67,7 @@ export async function useVictoryPower(
     if (state.powers.victoryUsesRemaining <= 0) {
       return { success: false, error: 'No Victory Power uses remaining' }
     }
+    if (getStanceWinCharges(state.powers) < POWER_STANCE_WIN_COST) return { success: false, error: 'Win 3 stance matchups to use a Power' }
 
     // Validate item ownership
     const payload = await getPayload({ config: configPromise })
@@ -185,6 +187,7 @@ async function handlePveVictoryPower(
   newPokemon.status = { id: 'victory', counter: 0 }
 
   // Decrement usage
+  spendPowerCharge(state.powers)
   state.powers!.victoryUsesRemaining -= 1
 
   const payload = await getPayload({ config: configPromise })

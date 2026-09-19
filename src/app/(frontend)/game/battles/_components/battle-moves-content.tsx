@@ -56,6 +56,7 @@ export function BattleMovesContent({
   disabled = false,
   onUseMove,
   onDetails,
+  embedded = false,
 }: {
   moves: MoveConfig[]
   pokemon: BattlePokemon
@@ -67,10 +68,11 @@ export function BattleMovesContent({
   disabled?: boolean
   onUseMove: (moveId: string) => void
   onDetails: (moveId: string) => void
+  embedded?: boolean
 }) {
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 pt-4 pb-6">
-      <div className="max-h-[calc(70dvh-120px)] space-y-6 overflow-y-auto">
+    <div className={embedded ? 'mx-auto w-full max-w-2xl pb-4' : 'mx-auto w-full max-w-2xl px-4 pt-4 pb-6'}>
+      <div className={embedded ? 'space-y-6' : 'max-h-[calc(70dvh-120px)] space-y-6 overflow-y-auto'}>
         <div className="space-y-3">
           <SectionDivider>
             <span className="flex items-center gap-2 text-game-moss">

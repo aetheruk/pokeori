@@ -25,6 +25,7 @@ import { processBattleRarityTurnEnd } from './rarity-effects'
 import { markPlayerPokemonInvolved } from './participants'
 import { resetBattleTypeChange } from './tera'
 import { clearZMoveCharge } from './z-move'
+import { awardStanceWin } from './power-charges'
 import { DYNAMAX_UNLOCK_TURNS } from '@/data/powers'
 import { advanceTeraDuration, advanceBattleTypeChangeDuration } from './tera'
 import { clearDynamaxState } from './dynamax'
@@ -32,7 +33,7 @@ import { preparePvpCombatAction, resolvePvpCombat, resolvePvpMoveAttackType, typ
 import { getDoublesAccuracyMultiplier, getDoublesDamageMultiplier, getDoublesPartnerPriorityBlock, isDoublesCommanderInactive, processDoublesPartnerEntry, processDoublesPartnerItemTransfer, processDoublesPartnerProtection, processDoublesPartnerTurnEnd, releaseDoublesCommander } from './doubles-abilities'
 import { SKETCH_MOVE_ID } from '@/utilities/pokemon/sketch'
 
-export type DoublesSpecialAction = (params: { state: BattleState; side: DoublesSide; slot: DoublesSlot; actor: BattlePokemon; action: Extract<DoublesAction, {kind:'item'|'power'}> }) => string
+export type DoublesSpecialAction = (params: { state: BattleState; side: DoublesSide; slot: DoublesSlot; actor: BattlePokemon; action: Extract<DoublesAction, {kind:'item'|'power'}>; emitEvent: (event: BattlePresentationEvent) => void; random: () => number }) => string
 
 export type DoublesMoveResolution = {
   state: BattleState
@@ -75,7 +76,7 @@ export function processDoublesEntry(state:BattleState,side:DoublesSide,slot:Doub
   } finally {state.activePlayerIndex=savedPlayer;state.activeEnemyIndex=savedEnemy}
 }
 
-function processDoublesExit(state:BattleState,side:DoublesSide,mon:BattlePokemon):string[] {
+export function processDoublesExit(state:BattleState,side:DoublesSide,mon:BattlePokemon):string[] {
   clearZMoveCharge(mon)
   clearSourceLinkedTrapSecondaryStatuses({state,sourceSide:side,sourcePokemon:mon})
   clearPokemonSecondaryStatuses(mon)
@@ -122,7 +123,7 @@ export function validateDoublesActions(state: BattleState, side: DoublesSide, ac
       if(side==='enemy' && !state.trainerItems?.some(entry=>entry.itemId===action.itemId&&(entry.quantity??0)>0)) return 'The trainer does not have that item.'
     } else if (action.kind === 'power') {
       if (side === 'enemy' && !state.isPvp) return 'Trainer powers are not available for wild opponents.'
-      if (!['tera','mega','dynamax','z-move'].includes(action.powerId)) return 'Unknown trainer power.'
+      if (!['tera','mega','dynamax','victory','weather','shout','circadian','dimensional-shift'].includes(action.powerId)) return 'Unknown trainer power.'
     }
   }
   for (const slot of [0, 1] as const) {
@@ -258,6 +259,9 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
     },
   }
   const pushEvent = (event: BattlePresentationEvent) => {
+    if (event.type === 'faint') {
+      clearZMoveCharge((event.side === 'player' ? state.playerTeam : state.enemyTeam)[event.pokemonIndex])
+    }
     const currentPhase = phaseKey(activePhase)
     if (!currentPhase) {
       events.push(event)
@@ -267,10 +271,12 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
     const phaseEvent = { ...event, phase: currentPhase } as BattlePresentationEvent
     if (phaseEvent.type === 'attack') {
       phaseEvent.simultaneousGroup ??= `doubles-impact:${state.turn}:${currentPhase}`
-      phaseEvent.animateActor =
-        phaseResults[currentPhase] === 'tie' ||
-        (phaseResults[currentPhase] === 'win' && phaseEvent.actorSide === 'player') ||
-        (phaseResults[currentPhase] === 'loss' && phaseEvent.actorSide === 'enemy')
+      phaseEvent.animateActor = true
+      const bothAttacking = ['player', 'enemy'].every((side) => {
+        const action = phaseActions[side as DoublesSide]
+        return action?.kind === 'basic' || action?.kind === 'move'
+      })
+      phaseEvent.stanceWinner = bothAttacking && (phaseResults[currentPhase] === 'win' && phaseEvent.actorSide === 'player' || phaseResults[currentPhase] === 'loss' && phaseEvent.actorSide === 'enemy')
     } else if (phaseEvent.type === 'hp-change') {
       phaseEvent.simultaneousGroup ??= `doubles-impact:${state.turn}:${currentPhase}`
     }
@@ -338,7 +344,7 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
     }
     if (action.kind === 'item' || action.kind === 'power') {
       if (!specialAction) throw new Error('Trainer action resolver is unavailable.')
-      messages.push(specialAction({state,side,slot:currentSlot,actor,action}))
+      messages.push(specialAction({state,side,slot:currentSlot,actor,action,emitEvent:pushEvent,random}))
       continue
     }
     const move = action.kind === 'move' ? getMove(action.moveId) : undefined
@@ -643,6 +649,18 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
       (event): event is Extract<BattlePresentationEvent, { type: 'attack' }> =>
         event.phase === phase && event.type === 'attack',
     )
+    const phaseIsContest = ['player', 'enemy'].every((side) => all.some((entry) =>
+      phaseKey(entry.phase) === phase && entry.side === side && (entry.action.kind === 'basic' || entry.action.kind === 'move')))
+    if (phaseIsContest) {
+      const winner = phaseResults[phase] === 'win' ? 'player' : phaseResults[phase] === 'loss' ? 'enemy' : null
+      if (winner && phaseAttackEvents.some((event) => event.actorSide === winner)) {
+        const team = winner === 'player' ? state.playerTeam : state.enemyTeam
+        const userRef = team[0]?.user
+        const userId = typeof userRef === 'string' ? userRef : userRef?.id
+        const powers = state.isPvp ? userId ? state.pvpPowers?.[userId] : undefined : winner === 'player' ? state.powers : undefined
+        awardStanceWin(powers)
+      }
+    }
     return {
       turn: state.turn,
       phase,

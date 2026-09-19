@@ -356,7 +356,7 @@ export function RewardResultOverlay({
           container={container}
           onEscapeKeyDown={(event) => event.preventDefault()}
           onInteractOutside={(event) => event.preventDefault()}
-          className="max-w-none h-[100dvh] w-screen gap-0 border-0 bg-game-surface p-0 focus:outline-none"
+          className="max-w-none h-[100dvh] w-screen gap-0 border-0 bg-game-surface p-0 focus:outline-none sm:max-h-none sm:max-w-none sm:p-0"
         >
           <DialogTitle className="sr-only">Reward Result</DialogTitle>
           <div className="flex-1 w-full h-full flex flex-col overflow-hidden relative">

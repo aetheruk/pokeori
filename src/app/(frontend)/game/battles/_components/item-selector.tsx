@@ -1,7 +1,7 @@
 'use client'
 
 import { ArrowLeft, HeartOff, Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState, type ElementType } from 'react'
 import { Button } from '@/components/ui/button'
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import { ItemSprite } from '@/components/ui/item-sprite'
@@ -19,7 +19,9 @@ import { getBattleInventory } from '../actions'
 import { useBattleContext } from './battle-context'
 import { BattleActionTrigger } from './battle-action-trigger'
 
-export function ItemSelector() {
+export function ItemSelector({ embedded = false, onActionComplete }: { embedded?: boolean; onActionComplete?: () => void } = {}) {
+  const Shell: ElementType = embedded ? Fragment : Drawer
+  const Content: ElementType = embedded ? 'div' : DrawerContent
   const {
     battleState,
     battleInventoryItems,
@@ -64,7 +66,7 @@ export function ItemSelector() {
   const canUseItems = remainingUses > 0
 
   useEffect(() => {
-    if (open) {
+    if (open || embedded) {
       if (battleInventoryItems) {
         setItems(battleInventoryItems)
         setLoading(false)
@@ -79,7 +81,7 @@ export function ItemSelector() {
         })
         .finally(() => setLoading(false))
     }
-  }, [open, battleInventoryItems])
+  }, [open, embedded, battleInventoryItems])
 
   const handleUseItem = async (itemId: string, targetPokemonIndex?: number) => {
     if (using) return
@@ -100,6 +102,7 @@ export function ItemSelector() {
       }
       setOpen(false)
       setReviveItem(null)
+      onActionComplete?.()
     } finally {
       setUsing(null)
     }
@@ -197,14 +200,14 @@ export function ItemSelector() {
   }
 
   return (
-    <Drawer
-      open={open}
-      onOpenChange={(nextOpen) => {
+    <Shell
+      {...(!embedded ? { open,
+      onOpenChange: (nextOpen: boolean) => {
         setOpen(nextOpen)
         if (!nextOpen) setReviveItem(null)
-      }}
+      } } : {})}
     >
-      <DrawerTrigger asChild>
+      {!embedded && <DrawerTrigger asChild>
         <BattleActionTrigger
           itemId="battle-potion"
           label="Items"
@@ -215,10 +218,10 @@ export function ItemSelector() {
           aria-label={`Items, ${Math.max(0, remainingUses)} of ${maxItemsPerBattle} uses remaining`}
           title="Open battle items"
         />
-      </DrawerTrigger>
-      <DrawerContent
+      </DrawerTrigger>}
+      <Content
         id={itemDrawerContentId}
-        className="game-paper-modal game-paper-background max-h-[70dvh] border-game-border bg-game-surface-raised"
+        className={embedded ? 'min-h-0' : 'game-paper-modal game-paper-background max-h-[70dvh] border-game-border bg-game-surface-raised'}
       >
         <div className="px-4 pt-4 pb-6">
           <SectionDivider className="mb-4">
@@ -328,7 +331,7 @@ export function ItemSelector() {
               <p className="text-sm">Get items from rewards or the shop!</p>
             </div>
           ) : (
-            <div className="overflow-y-auto max-h-[calc(70dvh-150px)] space-y-4">
+            <div className={embedded ? 'space-y-4' : 'overflow-y-auto max-h-[calc(70dvh-150px)] space-y-4'}>
               {effectOrder.map((effectType) => {
                 const typeItems = groupedItems[effectType]
                 if (!typeItems || typeItems.length === 0) return null
@@ -402,7 +405,7 @@ export function ItemSelector() {
             </div>
           )}
         </div>
-      </DrawerContent>
-    </Drawer>
+      </Content>
+    </Shell>
   )
 }

@@ -24,7 +24,6 @@ import {
   setUserInventoryMap,
   setUserPokedexMap,
 } from '@/utilities/user-state'
-import { clearZMoveCharge } from '@/utilities/battle/z-move'
 import { getBattleItemUseLimit } from '@/utilities/battle/item-use-limits'
 import { runBattleActionWithGuard } from '../helpers/action-guard'
 import { getChronicleBattleItemUseLimit } from '@/utilities/battle/chronicle-budgets'
@@ -236,7 +235,6 @@ export async function useBattleItem(
     }
 
     const message = effectResult.message
-    clearZMoveCharge(playerMon)
 
     if (
       battleEffect.type === 'revive' &&

@@ -11,13 +11,14 @@ import {
   Sparkles,
   Zap,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState, type ElementType } from 'react'
 import { Button } from '@/components/ui/button'
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { getMove } from '@/data/moves'
-import { DYNAMAX_UNLOCK_TURNS } from '@/data/powers'
+import { MoveFieldNote } from '@/components/game/moves'
+import { getStanceWinCharges, POWER_STANCE_WIN_COST } from '@/utilities/battle/power-charges'
 import { cn } from '@/lib/utils'
 import { getPokemonMoveUsesRemaining } from '@/utilities/battle/move-uses'
 import { getBattleMoveTriggerItemId } from '@/utilities/battle/move-presentation'
@@ -36,9 +37,15 @@ import {
 
 export function PowerSelector({
   mode = 'all',
+  embedded = false,
+  onActionComplete,
 }: {
   mode?: 'all' | 'moves' | 'powers'
+  embedded?: boolean
+  onActionComplete?: () => void
 }) {
+  const Shell: ElementType = embedded ? Fragment : Drawer
+  const Content: ElementType = embedded ? 'div' : DrawerContent
   const {
     battleState,
     activePlayerMon,
@@ -97,6 +104,7 @@ export function PowerSelector({
     try {
       await onUseTera()
       setPowerOpen(false)
+      onActionComplete?.()
     } finally {
       setUsing(null)
     }
@@ -108,6 +116,7 @@ export function PowerSelector({
     try {
       await onUseMega(megaStoneId)
       setPowerOpen(false)
+      onActionComplete?.()
     } finally {
       setUsing(null)
     }
@@ -119,6 +128,7 @@ export function PowerSelector({
     try {
       await onUseZMove()
       setPowerOpen(false)
+      onActionComplete?.()
     } finally {
       setUsing(null)
     }
@@ -130,6 +140,7 @@ export function PowerSelector({
     try {
       await onUseDynamax()
       setPowerOpen(false)
+      onActionComplete?.()
     } finally {
       setUsing(null)
     }
@@ -141,6 +152,7 @@ export function PowerSelector({
     try {
       await onUseMove(moveId)
       setMoveOpen(false)
+      onActionComplete?.()
     } finally {
       setUsing(null)
     }
@@ -152,6 +164,7 @@ export function PowerSelector({
     try {
       await onUseVictory(itemId)
       setPowerOpen(false)
+      onActionComplete?.()
     } finally {
       setUsing(null)
     }
@@ -163,6 +176,7 @@ export function PowerSelector({
     try {
       await onUseWeather()
       setPowerOpen(false)
+      onActionComplete?.()
     } finally {
       setUsing(null)
     }
@@ -174,6 +188,7 @@ export function PowerSelector({
     try {
       await onUseShout()
       setPowerOpen(false)
+      onActionComplete?.()
     } finally {
       setUsing(null)
     }
@@ -185,6 +200,7 @@ export function PowerSelector({
     try {
       await onUseCircadian()
       setPowerOpen(false)
+      onActionComplete?.()
     } finally {
       setUsing(null)
     }
@@ -198,6 +214,7 @@ export function PowerSelector({
     try {
       await onUseDimensionalShift(type)
       setPowerOpen(false)
+      onActionComplete?.()
     } finally {
       setUsing(null)
     }
@@ -233,29 +250,31 @@ export function PowerSelector({
   const canUseTera =
     powersState &&
     powersState.teraUsesRemaining > 0 &&
+    getStanceWinCharges(powersState) >= POWER_STANCE_WIN_COST &&
     !teraUsed &&
     !isAnyPowerActive
   const canUseMega =
-    powersState && powersState.megaUsesRemaining > 0 && !isAnyPowerActive
+    powersState && powersState.megaUsesRemaining > 0 && getStanceWinCharges(powersState) >= POWER_STANCE_WIN_COST && !isAnyPowerActive
   const canUseZMove =
-    powersState && powersState.zMoveUsesRemaining > 0 && !isAnyPowerActive
+    powersState && powersState.zMoveUsesRemaining > 0 && getStanceWinCharges(powersState) >= POWER_STANCE_WIN_COST && !isAnyPowerActive
   const canUseDynamax =
-    powersState?.dynamaxAvailable &&
+    powersState && getStanceWinCharges(powersState) >= POWER_STANCE_WIN_COST &&
     powersState.dynamaxUsesRemaining > 0 &&
     !powersState.dynamaxActive &&
     !isAnyPowerActive
 
   const canUseVictory =
-    powersState && powersState.victoryUsesRemaining > 0 && !isAnyPowerActive
+    powersState && powersState.victoryUsesRemaining > 0 && getStanceWinCharges(powersState) >= POWER_STANCE_WIN_COST && !isAnyPowerActive
   const canUseWeather =
-    powersState && powersState.weatherUsesRemaining > 0 && !isAnyPowerActive
+    powersState && powersState.weatherUsesRemaining > 0 && getStanceWinCharges(powersState) >= POWER_STANCE_WIN_COST && !isAnyPowerActive
   const canUseShout =
     powersState &&
     powersState.shoutUsesRemaining > 0 &&
+    getStanceWinCharges(powersState) >= POWER_STANCE_WIN_COST &&
     !isAnyPowerActive &&
     !activePlayerMon.shoutBoost
   const canUseCircadian =
-    powersState && powersState.circadianUsesRemaining > 0 && !isAnyPowerActive
+    powersState && powersState.circadianUsesRemaining > 0 && getStanceWinCharges(powersState) >= POWER_STANCE_WIN_COST && !isAnyPowerActive
 
   // Check move limits
   const movesUsesRemaining = getPokemonMoveUsesRemaining(
@@ -284,14 +303,7 @@ export function PowerSelector({
     if (selectedPower === 'weather') return powersState.weatherUsesRemaining
     if (selectedPower === 'shout') return powersState.shoutUsesRemaining
     if (selectedPower === 'circadian') return powersState.circadianUsesRemaining
-    if (selectedPower === 'dimensional-shift') {
-      const charges = powersState.dimensionalShift?.charges
-      return Math.max(
-        charges?.wins ?? 0,
-        charges?.losses ?? 0,
-        charges?.draws ?? 0,
-      )
-    }
+    if (selectedPower === 'dimensional-shift') return getStanceWinCharges(powersState)
     return 0
   })()
   const powerUsesChip =
@@ -311,14 +323,15 @@ export function PowerSelector({
       using={using}
       onUseMove={(moveId) => void handleUseMove(moveId)}
       onDetails={setMoveInfoId}
+      embedded={embedded}
     />
   )
 
   return (
     <>
       {mode !== 'powers' && (
-        <Drawer open={moveOpen} onOpenChange={setMoveOpen}>
-          <DrawerTrigger asChild>
+        <Shell {...(!embedded ? { open: moveOpen, onOpenChange: setMoveOpen } : {})}>
+          {!embedded && <DrawerTrigger asChild>
             <BattleActionTrigger
               itemId={moveTriggerItemId}
               label="Moves"
@@ -328,17 +341,26 @@ export function PowerSelector({
               data-empty={!hasAnyMoves || undefined}
               disabled={disabled}
             />
-          </DrawerTrigger>
-          <DrawerContent
+          </DrawerTrigger>}
+          <Content
             id={moveDrawerContentId}
-            className="game-paper-modal game-paper-background max-h-[70dvh] border-game-border bg-game-surface-raised"
+            className={embedded ? 'min-h-0' : 'game-paper-modal game-paper-background max-h-[70dvh] border-game-border bg-game-surface-raised'}
           >
-            {renderMovesContent()}
-          </DrawerContent>
-        </Drawer>
+            {embedded && moveInfoId ? (
+              <div className="mx-auto max-w-2xl pb-4">
+                <Button type="button" variant="ghost" className="mb-3" onClick={() => setMoveInfoId(null)}>← Back to moves</Button>
+                {(() => {
+                  const moveOption = availableMoves.find((candidate) => candidate.id === moveInfoId)
+                  const move = moveOption ? getMove(moveOption.id) : undefined
+                  return move ? <MoveFieldNote presentation={getBattleMovePresentation(move, activePlayerMon, battleState, selectedType)} /> : null
+                })()}
+              </div>
+            ) : renderMovesContent()}
+          </Content>
+        </Shell>
       )}
 
-      <MoveInfoDialog
+      {!embedded && <MoveInfoDialog
         presentation={
           moveInfoId
             ? (() => {
@@ -362,11 +384,11 @@ export function PowerSelector({
             setMoveInfoId(null)
           }
         }}
-      />
+      />}
 
       {mode !== 'moves' && (
-        <Drawer open={powerOpen} onOpenChange={setPowerOpen}>
-          <DrawerTrigger asChild>
+        <Shell {...(!embedded ? { open: powerOpen, onOpenChange: setPowerOpen } : {})}>
+          {!embedded && <DrawerTrigger asChild>
             <BattleActionTrigger
               itemId={powerTriggerItemId}
               label="Powers"
@@ -376,10 +398,10 @@ export function PowerSelector({
               data-empty={(!hasAnyPowers && !isBattlePanelLoading) || undefined}
               disabled={disabled}
             />
-          </DrawerTrigger>
-          <DrawerContent
+          </DrawerTrigger>}
+          <Content
             id={powerDrawerContentId}
-            className="game-paper-modal game-paper-background max-h-[80dvh] border-game-border bg-game-surface-raised"
+            className={embedded ? 'min-h-0' : 'game-paper-modal game-paper-background max-h-[80dvh] border-game-border bg-game-surface-raised'}
           >
             <div className="px-4 pt-4 pb-6 max-w-md mx-auto">
               {isBattlePanelLoading && !powersData ? (
@@ -401,7 +423,7 @@ export function PowerSelector({
                   </p>
                 </div>
               ) : (
-                <div className="overflow-y-auto max-h-[calc(80dvh-150px)] space-y-6">
+                <div className={embedded ? 'space-y-6' : 'overflow-y-auto max-h-[calc(80dvh-150px)] space-y-6'}>
                   {/* Terastallization */}
                   {powersData?.hasTera && (
                     <div className="space-y-3">
@@ -495,6 +517,8 @@ export function PowerSelector({
                           {disabledReason ||
                             'Cannot Evolve while another power is active'}
                         </div>
+                      ) : !canUseMega ? (
+                        <p className="py-2 text-sm text-game-muted">Win {POWER_STANCE_WIN_COST - getStanceWinCharges(powersState)} more stance matchups.</p>
                       ) : powersData.megaStones.length === 0 ? (
                         <div
                           className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted"
@@ -564,6 +588,8 @@ export function PowerSelector({
                           {disabledReason ||
                             'Cannot use Z-Move while another power is active'}
                         </div>
+                      ) : !canUseZMove ? (
+                        <p className="py-2 text-sm text-game-muted">Win {POWER_STANCE_WIN_COST - getStanceWinCharges(powersState)} more stance matchups.</p>
                       ) : (
                         <Button
                           variant="outline"
@@ -582,7 +608,7 @@ export function PowerSelector({
                             Prepare Z-Move
                           </span>
                           <span className="text-xs text-game-muted">
-                            5x next stance
+                            Next successful stance · base 250
                           </span>
                         </Button>
                       )}
@@ -618,13 +644,10 @@ export function PowerSelector({
                           {disabledReason ||
                             'Cannot Dynamax while another power is active'}
                         </div>
-                      ) : !powersState?.dynamaxAvailable ? (
+                      ) : getStanceWinCharges(powersState) < POWER_STANCE_WIN_COST ? (
                         <div className="flex items-center gap-2 text-sm text-game-muted py-2">
                           <Lock className="w-4 h-4" />
-                          Win{' '}
-                          {DYNAMAX_UNLOCK_TURNS -
-                            (powersState?.turnsPlayedThisBattle || 0)}{' '}
-                          more stance matchups to unlock
+                          Win {POWER_STANCE_WIN_COST - getStanceWinCharges(powersState)} more stance matchups
                         </div>
                       ) : (
                         <Button
@@ -823,13 +846,6 @@ export function PowerSelector({
                             ? 'No uses remaining'
                             : 'Cannot use Circadian Power now'}
                         </div>
-                      ) : (powersState?.turnsPlayedThisBattle ?? 0) < 3 ? (
-                        <div className="flex items-center gap-2 text-sm text-game-muted py-2">
-                          <Lock className="w-4 h-4" />
-                          Charge for{' '}
-                          {3 - (powersState?.turnsPlayedThisBattle ?? 0)} more
-                          turns
-                        </div>
                       ) : (
                         <CircadianButton
                           onClick={handleUseCircadian}
@@ -865,8 +881,7 @@ export function PowerSelector({
                               className="h-auto py-3 px-2 flex flex-col items-center gap-1 border-game-border hover:border-game-moss/60 hover:bg-game-moss/10"
                               disabled={
                                 using !== null ||
-                                (powersState?.dimensionalShift?.charges
-                                  .losses || 0) < 3
+                                getStanceWinCharges(powersState) < POWER_STANCE_WIN_COST
                               }
                               onClick={() => handleUseDimensionalShift('time')}
                             >
@@ -875,9 +890,7 @@ export function PowerSelector({
                                 Rewind
                               </span>
                               <span className="text-[10px] text-game-muted">
-                                {powersState?.dimensionalShift?.charges
-                                  .losses || 0}
-                                /3 Losses
+                                3 wins
                               </span>
                             </Button>
                           )}
@@ -889,8 +902,7 @@ export function PowerSelector({
                               className="h-auto py-3 px-2 flex flex-col items-center gap-1 border-game-border hover:border-game-moss/60 hover:bg-game-moss/10"
                               disabled={
                                 using !== null ||
-                                (powersState?.dimensionalShift?.charges.wins ||
-                                  0) < 3
+                                getStanceWinCharges(powersState) < POWER_STANCE_WIN_COST
                               }
                               onClick={() => handleUseDimensionalShift('space')}
                             >
@@ -899,9 +911,7 @@ export function PowerSelector({
                                 Lock
                               </span>
                               <span className="text-[10px] text-game-muted">
-                                {powersState?.dimensionalShift?.charges.wins ||
-                                  0}
-                                /3 Wins
+                                3 wins
                               </span>
                             </Button>
                           )}
@@ -913,8 +923,7 @@ export function PowerSelector({
                               className="h-auto py-3 px-2 flex flex-col items-center gap-1 border-game-border hover:border-game-moss/60 hover:bg-game-moss/10"
                               disabled={
                                 using !== null ||
-                                (powersState?.dimensionalShift?.charges.draws ||
-                                  0) < 3
+                                getStanceWinCharges(powersState) < POWER_STANCE_WIN_COST
                               }
                               onClick={() => handleUseDimensionalShift('chaos')}
                             >
@@ -923,9 +932,7 @@ export function PowerSelector({
                                 Oblivion
                               </span>
                               <span className="text-[10px] text-game-muted">
-                                {powersState?.dimensionalShift?.charges.draws ||
-                                  0}
-                                /3 Draws
+                                3 wins
                               </span>
                             </Button>
                           )}
@@ -936,8 +943,8 @@ export function PowerSelector({
                 </div>
               )}
             </div>
-          </DrawerContent>
-        </Drawer>
+          </Content>
+        </Shell>
       )}
     </>
   )
