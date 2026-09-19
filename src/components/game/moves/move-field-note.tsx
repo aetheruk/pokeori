@@ -13,12 +13,14 @@ export interface MoveFieldNoteProps {
   presentation: MovePresentation
   className?: string
   children?: ReactNode
+  showIdentity?: boolean
 }
 
 export function MoveFieldNote({
   presentation,
   className,
   children,
+  showIdentity = true,
 }: MoveFieldNoteProps) {
   const advanced = [...presentation.rules, ...presentation.risks]
 
@@ -29,10 +31,12 @@ export function MoveFieldNote({
         className,
       )}
     >
-      <header className="border-b border-game-border pb-4">
-        <p className="game-field-label mb-2">Move field note</p>
-        <MoveIdentity presentation={presentation} />
-      </header>
+      {showIdentity && (
+        <header className="border-b border-game-border pb-4">
+          <p className="game-field-label mb-2">Move field note</p>
+          <MoveIdentity presentation={presentation} />
+        </header>
+      )}
 
       <MoveMetrics presentation={presentation} />
       <BattleContext presentation={presentation} />

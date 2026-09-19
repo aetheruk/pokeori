@@ -528,13 +528,20 @@ export default function MoveDexPage() {
             : 'Undiscovered TM'
         }
         description={
-          selectedMove?.isKnown
-            ? selectedMove.isSketched && selectedView === 'sketchbook'
-              ? 'Sketchbook record · Smeargle only'
-              : selectedMove.entry.item.name
-            : 'A field clue points towards this move.'
+          selectedMove ? <MoveDexHeroMetadata displayMove={selectedMove} /> : undefined
         }
-        icon={<BookOpen className="h-14 w-14" aria-hidden="true" />}
+        icon={
+          selectedMove ? (
+            <ItemSprite
+              itemId={selectedMove.entry.item.id}
+              alt=""
+              width={72}
+              height={72}
+              className="size-16 object-contain"
+              priority
+            />
+          ) : undefined
+        }
         background="/backgrounds/pokedex.avif"
         heroLabel="MoveDex"
         desktopWidth="min(42vw, 620px)"
@@ -545,6 +552,7 @@ export default function MoveDexPage() {
           {selectedMove?.isKnown ? (
             <>
               <MoveFieldNote
+                showIdentity={false}
                 presentation={getMovePresentation(selectedMove.entry.move, {
                   source: {
                     kind: selectedView === 'sketchbook' ? 'sketch' : 'tm',
@@ -580,6 +588,41 @@ export default function MoveDexPage() {
         </div>
       </ResponsivePanel>
     </DexPageShell>
+  )
+}
+
+function MoveDexHeroMetadata({
+  displayMove,
+}: {
+  displayMove: DisplayMove
+}) {
+  const stanceConfig = STANCE_ICON_CONFIG[displayMove.entry.move.stance]
+  const typeId =
+    displayMove.entry.moveType === 'random'
+      ? null
+      : typeIdMap[displayMove.entry.moveType]
+
+  return (
+    <span className="inline-flex items-center justify-center gap-2">
+      {stanceConfig && (
+        <StanceIcon
+          stance={displayMove.entry.move.stance}
+          className="size-4 text-white"
+          aria-hidden="true"
+        />
+      )}
+      {typeId ? (
+        <Image
+          src={getPokemonTypeIconUrl(typeId)}
+          alt=""
+          width={48}
+          height={22}
+          className="h-4 w-auto object-contain"
+          unoptimized
+        />
+      ) : null}
+      <span>{getMoveTypeLabel(displayMove.entry.moveType)}</span>
+    </span>
   )
 }
 
