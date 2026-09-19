@@ -506,7 +506,6 @@ export function GameInfoModal({
         onOpenChange={onOpenChange}
         desktopBreakpoint={desktopBreakpoint}
         title={title}
-        description={description}
         background={background || '/backgrounds/forest.avif'}
         icon={icon}
         iconClassName={iconClassName}

@@ -365,7 +365,6 @@ function ExpeditionModalContent({
       open={open}
       onOpenChange={onOpenChange}
       title={item.name}
-      description={item.description}
       background={expedition?.background || '/backgrounds/forest.avif'}
       icon={
         <TaskIconDisplay
@@ -401,11 +400,6 @@ function ExpeditionModalContent({
             </div>
           )}
           <div className="space-y-4">
-            <div className="text-center">
-              <h2 className="font-display text-3xl font-semibold text-game-ink">
-                {item.name}
-              </h2>
-            </div>
             <SectionDivider>Overview</SectionDivider>
             <div className="text-left">
               <p className="text-sm font-medium leading-relaxed text-game-ink md:text-base">
