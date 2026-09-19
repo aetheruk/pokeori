@@ -79,6 +79,13 @@ const DECK_FORMATS: { id: DeckFormat; label: string }[] = [
   { id: 'masters', label: 'Masters' },
 ]
 
+function getTcgCardHeroDescription(card: TcgCard) {
+  const stage =
+    card.subtypes.find((subtype) => /^(basic|stage \d+)$/i.test(subtype)) ||
+    card.subtypes[0]
+  return [card.types?.join(', '), stage].filter(Boolean).join(' / ') || card.supertype
+}
+
 type CatalogCard = { card: TcgCard; set: TcgSet }
 interface TcgExplorerActions {
   redistributeDuplicateCards: typeof redistributeDuplicateCards
@@ -841,8 +848,19 @@ export default function TcgExplorerPage({
         }}
         title={selectedCard?.card.name}
         description={
-          selectedCard ? `Details for ${selectedCard.card.name}` : undefined
+          selectedCard ? getTcgCardHeroDescription(selectedCard.card) : undefined
         }
+        icon={
+          selectedCard ? (
+            <TcgSetMark
+              setId={selectedCard.set.id}
+              kind="symbol"
+              className="size-20 border-0 bg-transparent p-0 md:size-24"
+            />
+          ) : undefined
+        }
+        background="/backgrounds/tcg.avif"
+        heroLabel="Carddex"
         desktopWidth="min(42vw, 620px)"
         desktopBreakpoint="lg"
         mobileHeader={false}
@@ -897,26 +915,6 @@ export default function TcgExplorerPage({
 
               {/* Card Details */}
               <div className="w-full min-w-0 space-y-5">
-                <div className="space-y-2 text-center lg:text-left">
-                  <div className="game-field-label">Card record</div>
-                  <h2 className="font-display text-2xl font-semibold text-game-ink">
-                    {selectedCard.card.name}
-                  </h2>
-                  <div className="flex items-center justify-center gap-3 lg:justify-start">
-                    <p className="text-xs font-medium text-game-moss-strong">
-                      {selectedCard.card.supertype}
-                      {selectedCard.card.supertype &&
-                        selectedCard.card.subtypes &&
-                        selectedCard.card.subtypes.length > 0 && (
-                          <span className="mx-2 text-game-border-strong">
-                            /
-                          </span>
-                        )}
-                      {selectedCard.card.subtypes?.join(', ')}
-                    </p>
-                  </div>
-                </div>
-
                 <div className="divide-y divide-game-border rounded-lg border border-game-border bg-game-surface-raised px-4">
                   <div className="grid min-h-12 grid-cols-[5rem_1fr] items-center gap-3 py-2">
                     <span className="text-xs font-semibold text-game-muted">
