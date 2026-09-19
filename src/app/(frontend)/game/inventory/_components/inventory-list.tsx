@@ -19,7 +19,6 @@ import {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react'
 import { toast } from 'sonner'
@@ -99,12 +98,6 @@ type InventoryListItem = {
   canChannel: boolean
 }
 
-type RecentInventoryItem = {
-  itemId: string
-  quantity: number
-  seenAt: number
-}
-
 type PokedexProgressByForm = Record<
   string,
   {
@@ -112,8 +105,6 @@ type PokedexProgressByForm = Record<
     caught?: boolean | null
   }
 >
-
-const RECENT_INVENTORY_STORAGE_KEY = 'pokemon-app:recent-inventory-items'
 
 function getItemActionLabel(
   item: (typeof items)[number],
@@ -265,8 +256,6 @@ export function InventoryList() {
   const [isSelling, setIsSelling] = useState(false)
   const [isUsing, setIsUsing] = useState(false)
   const [sellQuantity, setSellQuantity] = useState(1)
-  const [recentItems, setRecentItems] = useState<RecentInventoryItem[]>([])
-  const previousInventoryRef = useRef<Record<string, number> | null>(null)
   const [scratchData, setScratchData] = useState<{
     open: boolean
     background: string
@@ -363,59 +352,6 @@ export function InventoryList() {
         .filter((item): item is InventoryListItem => item !== null),
     [gameData?.gameResults, inventory, inventoryMap],
   )
-
-  useEffect(() => {
-    try {
-      const storedRecent = window.localStorage.getItem(
-        RECENT_INVENTORY_STORAGE_KEY,
-      )
-      if (storedRecent) {
-        setRecentItems(JSON.parse(storedRecent) as RecentInventoryItem[])
-      }
-    } catch {
-      setRecentItems([])
-    }
-  }, [])
-
-  useEffect(() => {
-    const previousInventory = previousInventoryRef.current
-    previousInventoryRef.current = inventoryMap
-
-    if (!previousInventory) return
-
-    const gainedItems = Object.entries(inventoryMap)
-      .filter(
-        ([itemId, quantity]) => quantity > (previousInventory[itemId] || 0),
-      )
-      .map(([itemId, quantity]) => ({
-        itemId,
-        quantity: quantity - (previousInventory[itemId] || 0),
-        seenAt: Date.now(),
-      }))
-
-    if (gainedItems.length === 0) return
-
-    setRecentItems((current) => {
-      const next = [...gainedItems, ...current]
-        .filter(
-          (item, index, all) =>
-            all.findIndex((candidate) => candidate.itemId === item.itemId) ===
-            index,
-        )
-        .slice(0, 6)
-
-      try {
-        window.localStorage.setItem(
-          RECENT_INVENTORY_STORAGE_KEY,
-          JSON.stringify(next),
-        )
-      } catch {
-        // Local storage is only used for a best-effort recent session rail.
-      }
-
-      return next
-    })
-  }, [inventoryMap])
 
   const groupCounts = useMemo(() => {
     return inventoryWithDetails.reduce(
@@ -523,18 +459,6 @@ export function InventoryList() {
       })
       .sort((a, b) => a.details.name.localeCompare(b.details.name))
   }, [inventoryWithDetails, activeGroup, activeSubCategory, searchQuery])
-
-  const recentInventory = useMemo(() => {
-    return recentItems
-      .map((recent) => {
-        const item = inventoryWithDetails.find(
-          (entry) => entry.itemId === recent.itemId,
-        )
-        if (!item) return null
-        return item
-      })
-      .filter((item): item is InventoryListItem => item !== null)
-  }, [inventoryWithDetails, recentItems])
 
   const selectedItemDisplayPlacement = useMemo(
     () => (selectedItem ? getInventoryDisplayPlacement(selectedItem) : null),
@@ -748,19 +672,14 @@ export function InventoryList() {
 
   return (
     <div className="game-paper-first game-paper-background flex flex-col h-full overflow-hidden bg-game-canvas text-game-ink">
-      <PremiumHeader title="INVENTORY" subtitle="Storage" />
+      <PremiumHeader
+        title="INVENTORY"
+        subtitle="Storage"
+        icon={<PackageOpen className="h-7 w-7" aria-hidden="true" />}
+      />
 
       <div className="hidden items-center gap-3 border-b border-game-border bg-game-surface/70 px-6 py-3 lg:flex">
         <div className="min-w-0 flex-1">
-          <PremiumSearch
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            onClear={() => setSearchQuery('')}
-            showClear={searchQuery.length > 0}
-            placeholder="Search items"
-          />
-        </div>
-        <div className="w-52 shrink-0 xl:w-64">
           <PremiumSelect
             value={activeGroup || ''}
             onValueChange={(value) =>
@@ -800,38 +719,15 @@ export function InventoryList() {
           </div>
         )}
 
-        {recentInventory.length > 0 && !searchQuery && (
-          <div className="mb-6">
-            <SectionDivider>Recently Acquired</SectionDivider>
-            <div className="mt-3 flex gap-3 overflow-x-auto pb-1">
-              {recentInventory.map((item) => (
-                <button
-                  key={`recent-${item.id}`}
-                  type="button"
-                  onClick={() => setSelectedItem(item.details)}
-                  aria-label={`View ${item.details.name}`}
-                  className="flex min-w-[180px] items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 text-left transition-colors hover:border-game-moss/40 hover:bg-game-surface-raised"
-                >
-                  <ItemSprite
-                    itemId={item.itemId}
-                    alt={item.details.name}
-                    width={36}
-                    height={36}
-                    className="w-9 h-9 object-contain"
-                  />
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm font-semibold italic text-game-ink">
-                      {item.details.name}
-                    </span>
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-game-moss-strong">
-                      Owned {item.quantity}
-                    </span>
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+        <div className="mb-5">
+          <PremiumSearch
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            onClear={() => setSearchQuery('')}
+            showClear={searchQuery.length > 0}
+            placeholder="Search items"
+          />
+        </div>
 
         <SectionDivider>
           {searchQuery.trim() ? 'Search Results' : activeDisplayLabel}
@@ -873,14 +769,7 @@ export function InventoryList() {
       </div>
 
       <SecondaryControlBar className="lg:hidden">
-        <div className="grid grid-cols-[minmax(0,1fr)_minmax(8rem,0.55fr)] gap-2">
-          <PremiumSearch
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            onClear={() => setSearchQuery('')}
-            showClear={searchQuery.length > 0}
-            placeholder="Search items"
-          />
+        <div className="w-full">
           <PremiumSelect
             value={activeGroup || ''}
             onValueChange={(value) =>

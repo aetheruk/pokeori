@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import { PremiumHeader } from './PremiumHeader'
 import { cn } from '@/lib/utils'
 
 // Static paper placeholders: no spinner, shimmer, fake counts or controls.
@@ -19,9 +18,20 @@ function Frame({
   return (
     <div className="game-paper-background flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-game-canvas">
       <span role="status" className="sr-only">
-        Loading {title}…
+        Loading {title}
+        {subtitle ? ` — ${subtitle}` : ''}…
       </span>
-      <PremiumHeader title={title} subtitle={subtitle} />
+      <div className="game-rule relative flex min-h-[5.25rem] w-full shrink-0 items-end overflow-hidden bg-game-canvas px-4 pb-4 pt-3 md:min-h-24 md:px-6 md:pb-5">
+        <div className="pointer-events-none absolute bottom-4 left-0 top-4 w-1 rounded-r-sm bg-game-moss" />
+        <div
+          className="relative min-w-0 flex-1 space-y-2 pl-3 md:pl-4"
+        >
+          <Block className="h-2.5 w-24" />
+          <h1 className="h-7 max-w-full truncate font-display text-2xl font-semibold leading-none text-transparent md:text-3xl">
+            {title}
+          </h1>
+        </div>
+      </div>
       <div
         aria-hidden="true"
         className="game-desktop-workspace min-h-0 w-full min-w-0 flex-1 overflow-hidden p-4 md:p-6"
@@ -168,7 +178,7 @@ export function PokemonSkeleton() {
 
 export function ArtisanSkeleton() {
   return (
-    <Frame title="Artisan" subtitle="Workshop ledger">
+    <Frame title="Artisan" subtitle="Craft Items">
       <Filters tabs />
       <div className="grid gap-5 sm:grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
         {Array.from({ length: 6 }, (_, i) => (

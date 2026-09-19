@@ -15,7 +15,7 @@ const VARIANT_LABELS: Record<GamePageSkeletonVariant, string> = {
   trainer: 'Loading trainer journal',
   explore: 'Loading field activities',
   pokemon: 'Loading Pokemon Box',
-  artisan: 'Loading workshop ledger',
+  artisan: 'Loading craft items',
   collection: 'Loading collection journal',
   inventory: 'Loading inventory',
   dex: 'Loading specimen index',
