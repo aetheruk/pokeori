@@ -621,7 +621,6 @@ function MoveDexHeroMetadata({
           unoptimized
         />
       ) : null}
-      <span>{getMoveTypeLabel(displayMove.entry.moveType)}</span>
     </span>
   )
 }

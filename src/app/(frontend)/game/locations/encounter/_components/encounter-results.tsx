@@ -67,6 +67,7 @@ interface EncounterResultsProps {
   } | null
   encounter: any
   locationName: string
+  background?: string
   refreshUser: () => void
   taskExitModalData?: TaskExitModal | null
   showTaskExitModal: boolean
@@ -90,6 +91,7 @@ export function EncounterResults({
   captureResult,
   encounter,
   locationName,
+  background,
   refreshUser,
   taskExitModalData,
   showTaskExitModal,
@@ -266,7 +268,11 @@ export function EncounterResults({
       )}
       <GameResult
         success={captureResult.caught}
-        background={encounter?.background}
+        background={
+          background ||
+          encounter?.background ||
+          encounter?.locationSnapshot?.background
+        }
         title={captureResult.caught ? 'Caught!' : 'Escaped'}
         message={
           captureResult.caught

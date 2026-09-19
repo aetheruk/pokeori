@@ -521,6 +521,39 @@ export default function Pokedex() {
           }
           background={selectedPokemonBackground}
           heroLabel="Pokédex"
+          heroLeftAction={
+            isSelectedFormSeen && selectedSpecies?.has_gender_differences ? (
+              <fieldset className="flex items-center gap-1 rounded-full border border-white/60 bg-game-night-canvas/55 p-1 text-white shadow-lg backdrop-blur-md">
+                <legend className="sr-only">Choose Pokémon gender</legend>
+                <button
+                  type="button"
+                  aria-label="Show male form"
+                  aria-pressed={selectedGender === 'male'}
+                  title="Male"
+                  onClick={() => setSelectedGender('male')}
+                  className={cn(
+                    'game-focus-ring flex size-9 items-center justify-center rounded-full text-white/75 transition-colors hover:bg-white/15 hover:text-white',
+                    selectedGender === 'male' && 'bg-white/25 text-white',
+                  )}
+                >
+                  <Mars className="size-4" aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Show female form"
+                  aria-pressed={selectedGender === 'female'}
+                  title="Female"
+                  onClick={() => setSelectedGender('female')}
+                  className={cn(
+                    'game-focus-ring flex size-9 items-center justify-center rounded-full text-white/75 transition-colors hover:bg-white/15 hover:text-white',
+                    selectedGender === 'female' && 'bg-white/25 text-white',
+                  )}
+                >
+                  <Venus className="size-4" aria-hidden="true" />
+                </button>
+              </fieldset>
+            ) : undefined
+          }
           heroAction={
             visibleForms.length > 1 ? (
               <button
@@ -556,8 +589,6 @@ export default function Pokedex() {
                     species={selectedSpecies}
                     progress={selectedFormProgress}
                     inventoryMap={inventoryMap}
-                    gender={selectedGender}
-                    onGenderChange={setSelectedGender}
                   />
                 </div>
               </div>
@@ -612,28 +643,20 @@ function PokemonCard({
   species,
   progress,
   inventoryMap,
-  gender,
-  onGenderChange,
 }: {
   pokemon: PokemonForm
   species: PokemonSpecies
   progress?: PokedexEntry
   inventoryMap: Record<string, number>
-  gender: 'male' | 'female'
-  onGenderChange: (gender: 'male' | 'female') => void
 }) {
   const discoveryAccess = getPokedexDiscoveryAccess(progress)
   const hasSeen = discoveryAccess.identity
   const hasCaught = discoveryAccess.stats
-  const hasGenderToggle = hasSeen && species.has_gender_differences
 
   return (
     <div className="relative h-full overflow-hidden bg-game-canvas text-game-ink">
       <div className="relative z-10 space-y-6 p-5 md:p-6">
         <div className="w-full space-y-2 text-center">
-          <h3 className="font-display text-3xl font-semibold text-game-ink">
-            {hasSeen ? pokemon.name : '???'}
-          </h3>
           {hasSeen && pokemon.form !== 'base' && (
             <div className="flex items-center justify-center gap-2">
               <span className="h-px w-3 bg-game-ochre/45" />
@@ -641,36 +664,6 @@ function PokemonCard({
                 {pokemon.form.replace(/-/g, ' ')}
               </p>
               <span className="h-px w-3 bg-game-ochre/45" />
-            </div>
-          )}
-          {hasGenderToggle && (
-            <div className="flex justify-center gap-1">
-              <button
-                type="button"
-                aria-label="Show male form"
-                aria-pressed={gender === 'male'}
-                title="Male"
-                onClick={() => onGenderChange('male')}
-                className={cn(
-                  'game-focus-ring flex h-9 w-9 items-center justify-center rounded-full text-game-muted transition-colors hover:text-game-moss-strong',
-                  gender === 'male' && 'bg-game-moss/12 text-game-moss-strong',
-                )}
-              >
-                <Mars className="h-4 w-4" />
-              </button>
-              <button
-                type="button"
-                aria-label="Show female form"
-                aria-pressed={gender === 'female'}
-                title="Female"
-                onClick={() => onGenderChange('female')}
-                className={cn(
-                  'game-focus-ring flex h-9 w-9 items-center justify-center rounded-full text-game-muted transition-colors hover:text-game-clay-strong',
-                  gender === 'female' && 'bg-game-clay/12 text-game-clay-strong',
-                )}
-              >
-                <Venus className="h-4 w-4" />
-              </button>
             </div>
           )}
           {hasSeen && progress?.preferredBattleStance && (

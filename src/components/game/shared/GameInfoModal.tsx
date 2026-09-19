@@ -268,7 +268,13 @@ export function GameInfoModal({
                   )}
                 >
                   <div className="absolute inset-0 bg-game-charcoal/10 opacity-0 transition-opacity group-hover:opacity-100" />
-                  <div className={cn(!isResultLayout && 'scale-125')}>
+                  <div
+                    className={cn(
+                      isResultLayout
+                        ? 'game-hero-icon-content'
+                        : 'game-compact-icon-content scale-125',
+                    )}
+                  >
                     {icon}
                   </div>
                 </div>

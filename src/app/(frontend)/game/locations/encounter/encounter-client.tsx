@@ -6,6 +6,7 @@ import nextDynamic from 'next/dynamic'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 import { AiOutlineLoading3Quarters as Loader2 } from 'react-icons/ai'
 import { FaRunning } from 'react-icons/fa'
 import { toast } from 'sonner'
@@ -339,41 +340,117 @@ function CatchRateRing({ percentage }: { percentage: number }) {
   )
 }
 
+function getSafariChanceTone(percentage: number) {
+  if (percentage >= 67) {
+    return {
+      accent: '#5f794f',
+      track: 'rgb(95 121 79 / 0.18)',
+    }
+  }
+  if (percentage >= 34) {
+    return {
+      accent: '#c4773c',
+      track: 'rgb(196 119 60 / 0.18)',
+    }
+  }
+  return {
+    accent: '#b86148',
+    track: 'rgb(184 97 72 / 0.18)',
+  }
+}
+
+function SafariChanceCircle({
+  percentage,
+  label,
+  icon,
+}: {
+  percentage: number
+  label: string
+  icon: ReactNode
+}) {
+  const safePercentage = Math.max(0, Math.min(100, percentage))
+  const tone = getSafariChanceTone(safePercentage)
+
+  return (
+    <div className="flex min-w-0 flex-col items-center gap-2">
+      <div
+        className="relative flex size-36 items-center justify-center rounded-full p-1.5 shadow-[0_10px_24px_rgba(75,62,39,0.14)] sm:size-44"
+        style={{
+          background: `conic-gradient(from -90deg, ${tone.accent} 0 ${safePercentage}%, ${tone.track} ${safePercentage}% 100%)`,
+        }}
+      >
+        <div className="flex size-full flex-col items-center justify-center rounded-full border border-game-border/50 bg-game-canvas/90 text-game-ink backdrop-blur-sm">
+          <div className="flex size-16 items-center justify-center sm:size-20">
+            {icon}
+          </div>
+          <span
+            className="font-mono text-sm font-black tabular-nums sm:text-base"
+            style={{ color: tone.accent }}
+          >
+            {safePercentage}%
+          </span>
+        </div>
+      </div>
+      <span className="text-center text-[10px] font-black uppercase tracking-[0.14em] text-game-muted sm:text-xs">
+        {label}
+      </span>
+    </div>
+  )
+}
+
 function SafariOdds({
   catchChance,
   fleeChance,
+  formId,
+  pokemonName,
+  rarity,
+  shiny,
+  gender,
 }: {
   catchChance: number
   fleeChance: number
+  formId: string
+  pokemonName: string
+  rarity?: PokemonRarityId
+  shiny?: boolean
+  gender?: 'male' | 'female' | 'genderless'
 }) {
   return (
     <section
-      className="mb-3 grid w-full max-w-xs grid-cols-2 gap-2"
+      className="flex min-h-0 w-full flex-1 items-center justify-center px-2 py-4 sm:px-4"
       aria-label={`Catch chance ${catchChance} percent. Flee chance ${fleeChance} percent.`}
     >
-      <div className="rounded-lg border border-game-moss/35 bg-game-surface-raised px-3 py-2 shadow-sm">
-        <div className="flex items-center justify-between gap-2 text-xs font-bold text-game-moss-strong">
-          <span>Catch chance</span>
-          <span className="font-mono tabular-nums">{catchChance}%</span>
-        </div>
-        <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-game-moss/15">
-          <div
-            className="h-full rounded-full bg-game-moss transition-[width] duration-300"
-            style={{ width: `${catchChance}%` }}
-          />
-        </div>
-      </div>
-      <div className="rounded-lg border border-game-clay/35 bg-game-surface-raised px-3 py-2 shadow-sm">
-        <div className="flex items-center justify-between gap-2 text-xs font-bold text-game-clay">
-          <span>Flee chance</span>
-          <span className="font-mono tabular-nums">{fleeChance}%</span>
-        </div>
-        <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-game-clay/15">
-          <div
-            className="h-full rounded-full bg-game-clay transition-[width] duration-300"
-            style={{ width: `${fleeChance}%` }}
-          />
-        </div>
+      <div className="grid w-full max-w-md grid-cols-2 gap-4 sm:gap-8">
+        <SafariChanceCircle
+          percentage={catchChance}
+          label="Catch chance"
+          icon={
+            <ItemSprite
+              itemId="safari-ball"
+              alt=""
+              width={72}
+              height={72}
+              className="size-14 object-contain pixelated sm:size-16"
+            />
+          }
+        />
+        <SafariChanceCircle
+          percentage={fleeChance}
+          label="Flee chance"
+          icon={
+            <PokemonRaritySprite
+              formId={formId}
+              view="home"
+              rarity={rarity}
+              shiny={shiny}
+              female={gender === 'female'}
+              alt={pokemonName}
+              className="size-16 sm:size-20"
+              imageClassName="drop-shadow-xl"
+              sizes="80px"
+            />
+          }
+        />
       </div>
     </section>
   )
@@ -1633,6 +1710,11 @@ export default function EncounterPage() {
         captureResult={captureResult as any}
         encounter={encounter}
         locationName={location?.name || 'Location'}
+        background={
+          encounter?.background ||
+          encounter?.locationSnapshot?.background ||
+          location?.background
+        }
         refreshUser={refreshUser}
         taskExitModalData={taskExitModalData}
         showTaskExitModal={showTaskExitModal}
@@ -1947,10 +2029,15 @@ export default function EncounterPage() {
             className="mx-auto flex h-full w-full max-w-xl flex-col items-center justify-end"
           >
             {(encounter.safari?.ballsRemaining || 0) > 0 ? (
-              <div className="flex w-full flex-col items-center justify-end">
+              <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-end">
                 <SafariOdds
                   catchChance={catchPercentage}
                   fleeChance={safariFleePercentage}
+                  formId={encounter.formId}
+                  pokemonName={encounter.pokemonName}
+                  rarity={encounter.rarity}
+                  shiny={encounter.isShiny}
+                  gender={encounter.gender}
                 />
                 <ItemFlickQte
                   compact

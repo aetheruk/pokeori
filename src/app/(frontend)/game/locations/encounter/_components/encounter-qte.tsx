@@ -260,10 +260,10 @@ export function EncounterQte({
             setFocusLoopProgress(0)
           }}
         >
-          <div className="absolute h-44 w-44 rounded-full border-2 border-dashed border-game-moss/60" />
-          <div className="absolute h-28 w-28 rounded-full bg-game-moss/10" />
+          <div className="pointer-events-none absolute left-1/2 top-1/2 h-44 w-44 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-dashed border-game-moss/60" />
+          <div className="pointer-events-none absolute left-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full bg-game-moss/10" />
           <svg
-            className="absolute h-48 w-48 -rotate-90"
+            className="pointer-events-none absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 -rotate-90"
             viewBox="0 0 100 100"
             aria-hidden="true"
           >
@@ -324,7 +324,7 @@ export function EncounterQte({
               imageClassName="drop-shadow-2xl"
             />
           </div>
-          <div className="absolute bottom-5 flex gap-2">
+          <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 gap-2">
             {[0, 1, 2].map((index) => (
               <span
                 key={index}
@@ -398,10 +398,10 @@ export function EncounterQte({
       )}
 
       {qte.type === 'chase' && (
-        <div className="relative flex flex-1 items-center justify-center overflow-hidden p-5">
+        <div className="relative flex flex-1 flex-col items-center justify-center gap-4 overflow-hidden p-5 pb-14">
           <motion.div
-            className="absolute top-10 h-24 w-24 pointer-events-none"
-            animate={{ x: [-72, 72, -72], y: [8, -12, 8] }}
+            className="pointer-events-none relative z-0 h-24 w-24"
+            animate={{ x: [-72, 72, -72], y: [0, -8, 0] }}
             transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
           >
             <PokemonRaritySprite
@@ -416,7 +416,7 @@ export function EncounterQte({
           </motion.div>
           <button
             type="button"
-            className="game-focus-ring group relative flex h-32 w-32 touch-manipulation select-none flex-col items-center justify-center gap-2 rounded-full border-2 border-game-clay bg-game-clay text-game-cream shadow-md transition active:translate-y-0.5"
+            className="game-focus-ring group relative z-10 flex h-32 w-32 touch-manipulation select-none flex-col items-center justify-center gap-2 rounded-full border-2 border-game-clay bg-game-clay text-game-cream shadow-md transition active:translate-y-0.5"
             aria-label={`Chase after ${pokemonName}`}
             onClick={() => {
               if (completedRef.current) return
@@ -436,7 +436,7 @@ export function EncounterQte({
               {chaseTaps}/{qte.tapTarget || 12}
             </span>
           </button>
-          <div className="absolute bottom-6 h-3 w-52 overflow-hidden rounded-full border border-game-border bg-game-canvas">
+          <div className="absolute bottom-6 left-1/2 h-3 w-52 -translate-x-1/2 overflow-hidden rounded-full border border-game-border bg-game-canvas">
             <motion.div
               className="h-full rounded-full bg-game-moss"
               animate={{
