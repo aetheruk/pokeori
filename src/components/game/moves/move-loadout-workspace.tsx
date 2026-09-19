@@ -254,6 +254,13 @@ export function MoveLoadoutWorkspace({
                     </span>
                     {entry ? (
                       <>
+                        <ItemSprite
+                          itemId={getMoveTypeSpriteItemId(entry.move)}
+                          alt=""
+                          width={24}
+                          height={24}
+                          className="size-6 shrink-0 object-contain"
+                        />
                         <span className="min-w-0 flex-1 truncate text-xs font-bold text-game-ink">
                           {entry.move.name}
                         </span>
@@ -549,7 +556,7 @@ function LoadoutMoveRow({
         aria-label={`View ${entry.move.name} details`}
         className="group flex min-w-0 items-center gap-3 px-3 py-2 text-left outline-none hover:bg-game-moss/5 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-game-moss/60"
       >
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-game-border bg-game-canvas">
+        <span className="game-icon-orb game-icon-orb-art relative flex size-10 shrink-0 items-center justify-center">
           <ItemSprite
             itemId={getMoveTypeSpriteItemId(entry.move)}
             alt=""

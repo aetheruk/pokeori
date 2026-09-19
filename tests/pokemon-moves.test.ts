@@ -554,6 +554,46 @@ describe('pokemon move assignment helpers', () => {
     expect(rattataAvailable.map((move) => move.id)).not.toContain('wave-breaker')
   })
 
+  test('Zippy Zap is restricted to Pikachu forms', () => {
+    const pikachuAvailable = getAvailableMoveOptions({
+      pokemonTypes: ['electric'],
+      pokemonFormId: '25',
+      pokemonLevel: 15,
+      inventory: {
+        'tm-zippy-zap': 1,
+      },
+    })
+    const capPikachuAvailable = getAvailableMoveOptions({
+      pokemonTypes: ['electric'],
+      pokemonFormId: '10148',
+      pokemonLevel: 15,
+      inventory: {
+        'tm-zippy-zap': 1,
+      },
+    })
+    const raichuAvailable = getAvailableMoveOptions({
+      pokemonTypes: ['electric'],
+      pokemonFormId: '26',
+      pokemonLevel: 15,
+      inventory: {
+        'tm-zippy-zap': 1,
+      },
+    })
+    const rattataAvailable = getAvailableMoveOptions({
+      pokemonTypes: ['normal'],
+      pokemonFormId: '19',
+      pokemonLevel: 15,
+      inventory: {
+        'tm-zippy-zap': 1,
+      },
+    })
+
+    expect(pikachuAvailable.map((move) => move.id)).toContain('zippy-zap')
+    expect(capPikachuAvailable.map((move) => move.id)).toContain('zippy-zap')
+    expect(raichuAvailable.map((move) => move.id)).not.toContain('zippy-zap')
+    expect(rattataAvailable.map((move) => move.id)).not.toContain('zippy-zap')
+  })
+
   test('Harden is restricted to Caterpie line forms', () => {
     const metapodAvailable = getAvailableMoveOptions({
       pokemonTypes: ['bug'],
