@@ -91,7 +91,7 @@ After Coolify reports success:
 1. Confirm the deployed commit matches the merged release and the container is healthy.
 2. Confirm `/api/health` returns 200 and healthy database/transaction/Redis results.
 3. Confirm `/api/app-version` returns the new package version with `Cache-Control: no-store`. Keep this endpoint and `/sw.js` outside CDN caching.
-4. Keep an older PWA open and verify it reloads to the new version.
+4. Keep an older PWA open and verify it reloads to the new version. If its first reload still lands on the prior client during rollout, the open client retries with a bounded delay on later version checks until the new bundle loads.
 5. Smoke login, Explore, Pokemon box, a battle, a location encounter, and a mini-game.
 
 A successful Dockerfile syntax check does not establish that the application compiles or that production services are reachable. Treat the first Coolify build and runtime smoke checks as required verification.
