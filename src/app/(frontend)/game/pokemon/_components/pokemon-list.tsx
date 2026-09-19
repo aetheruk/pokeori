@@ -40,10 +40,10 @@ import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { type CSSProperties, type PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
-import { TbPokeball } from 'react-icons/tb'
 import { toast } from 'sonner'
 import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
 import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
+import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { PokemonRarityEggSprite } from '@/components/game/shared/PokemonRarityEggSprite'
 import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
@@ -1098,7 +1098,13 @@ export function PokemonList({
       <PremiumHeader
         title="POKEMON BOX"
         subtitle={`${totalPokemonCount} / ${user?.maxPokemon || 50}`}
-        icon={<TbPokeball className="h-8 w-8" aria-hidden="true" />}
+        icon={
+          <TaskIconDisplay
+            icon={{ type: 'item', id: 'poke-ball' }}
+            className="h-10 w-10"
+            priority
+          />
+        }
       />
       {!itemToUse && !isBulkReleaseMode && (
         <div className="mx-auto mt-3 flex w-[calc(100%-2rem)] max-w-7xl items-center justify-between gap-3 border-b border-game-border pb-3">
