@@ -223,7 +223,7 @@ Status effects used by moves and battle logic include paralysis, sleep, poison, 
 
 Battle weather uses the encounter's saved weather snapshot. The shared damage engine applies Fire/Water weather multipliers, primal weather attack blocking, sandstorm Rock Sp. Def, snow Ice Defense, strong-winds Flying weakness mitigation, fog accuracy reduction for non-perfect-accuracy moves, and end-turn sandstorm/hail/snowstorm/shadowy-aura chip damage.
 
-Seismic Toss uses the user-level damage rule and therefore deals damage equal to the user's level. Flower Trick, Frost Breath, Storm Throw, Surging Strikes, Wicked Blow, and Zippy Zap use deterministic 100% critical-hit authoring, while Battle Armor and Shell Armor retain their intended critical-hit immunity.
+Seismic Toss uses the user-level damage rule and therefore deals damage equal to the user's level. Flower Trick, Frost Breath, Storm Throw, Surging Strikes, Wicked Blow, and Zippy Zap use deterministic 100% critical-hit authoring, while Battle Armor and Shell Armor retain their intended critical-hit immunity. Zippy Zap is restricted to Pikachu forms, including cap and Gigantamax forms.
 
 ## Special Pokemon Flags
 
