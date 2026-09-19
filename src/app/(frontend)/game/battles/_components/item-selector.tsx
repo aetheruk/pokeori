@@ -224,7 +224,7 @@ export function ItemSelector({ embedded = false, onActionComplete }: { embedded?
         className={embedded ? 'min-h-0' : 'game-paper-modal game-paper-background max-h-[70dvh] border-game-border bg-game-surface-raised'}
       >
         <div className="px-4 pt-4 pb-6">
-          <SectionDivider className="mb-4">
+          {!embedded && <SectionDivider className="mb-4">
             <span className="flex items-center gap-2 px-3">
               <ItemSprite
                 itemId="battle-potion"
@@ -238,7 +238,7 @@ export function ItemSelector({ embedded = false, onActionComplete }: { embedded?
                 ({remainingUses} left)
               </span>
             </span>
-          </SectionDivider>
+          </SectionDivider>}
           {!canUseItems && (
             <div
               className="mb-4 rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-3 text-center text-sm text-game-muted"

@@ -348,7 +348,7 @@ export function PowerSelector({
           >
             {embedded && moveInfoId ? (
               <div className="mx-auto max-w-2xl pb-4">
-                <Button type="button" variant="ghost" className="mb-3" onClick={() => setMoveInfoId(null)}>← Back to moves</Button>
+                <Button type="button" variant="ghost" className="mb-3 text-game-cream hover:text-game-cream" onClick={() => setMoveInfoId(null)}>← Back to moves</Button>
                 {(() => {
                   const moveOption = availableMoves.find((candidate) => candidate.id === moveInfoId)
                   const move = moveOption ? getMove(moveOption.id) : undefined

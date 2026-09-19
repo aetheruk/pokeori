@@ -74,7 +74,7 @@ export function BattleMovesContent({
     <div className={embedded ? 'mx-auto w-full max-w-2xl pb-4' : 'mx-auto w-full max-w-2xl px-4 pt-4 pb-6'}>
       <div className={embedded ? 'space-y-6' : 'max-h-[calc(70dvh-120px)] space-y-6 overflow-y-auto'}>
         <div className="space-y-3">
-          <SectionDivider>
+          {!embedded && <SectionDivider>
             <span className="flex items-center gap-2 text-game-moss">
               <ItemSprite
                 itemId={triggerItemId}
@@ -85,10 +85,10 @@ export function BattleMovesContent({
               />
               Special Moves ({usesRemaining})
             </span>
-          </SectionDivider>
+          </SectionDivider>}
           {moves.length === 0 ? (
             <div
-              className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted"
+              className={`rounded-md border border-dashed border-game-border px-3 py-4 text-center text-sm text-game-muted ${embedded ? 'bg-game-surface-raised/90' : 'bg-game-canvas/45'}`}
               role="status"
               aria-live="polite"
             >
@@ -96,7 +96,7 @@ export function BattleMovesContent({
             </div>
           ) : usesRemaining <= 0 ? (
             <div
-              className="rounded-md border border-dashed border-game-border bg-game-canvas/45 px-3 py-4 text-center text-sm text-game-muted"
+              className={`rounded-md border border-dashed border-game-border px-3 py-4 text-center text-sm text-game-muted ${embedded ? 'bg-game-surface-raised/90' : 'bg-game-canvas/45'}`}
               role="status"
               aria-live="polite"
             >

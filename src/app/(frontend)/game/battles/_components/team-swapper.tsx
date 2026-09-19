@@ -181,14 +181,14 @@ export function TeamSwapper({
         id={swapDrawerContentId}
         className={embedded ? 'min-h-0' : 'game-paper-modal game-paper-background max-h-[60dvh] border-game-border bg-game-surface-raised'}
       >
-        <div className={embedded ? 'mx-auto min-h-0 w-full max-w-xl px-3 pt-3 pb-5 sm:px-4' : 'mx-auto min-h-0 w-full max-w-xl overflow-y-auto px-3 pt-3 pb-5 sm:px-4'}>
-          <SectionDivider className="mb-3">
+        <div className={embedded ? 'min-h-0 w-full pt-3 pb-5' : 'mx-auto min-h-0 w-full max-w-xl overflow-y-auto px-3 pt-3 pb-5 sm:px-4'}>
+          {!embedded && <SectionDivider className="mb-3">
             {leadSelection
               ? 'Choose Your Pokemon'
               : forced
                 ? 'Choose Next Pokemon'
                 : 'Switch Pokémon'}
-          </SectionDivider>
+          </SectionDivider>}
           {isDoublesReplacement && replacementSlot !== undefined && (
             <p className="mb-2 text-xs font-semibold text-game-muted">
               Lane {replacementSlot + 1}

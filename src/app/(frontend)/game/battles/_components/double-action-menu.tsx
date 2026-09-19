@@ -235,6 +235,7 @@ export function DoubleActionMenu() {
       onBack={() => { setMoveInfoId(null); setPanel(null) }}
       canGoBack={replacementSlots.length === 0}
       stanceType={selectedType}
+      primaryType={actor?.types[0]}
       uses={commandUses}
       commands={actor && active.includes(selectedSlot) && replacementSlots.length === 0 ? (
         <div className="game-battle-action-strip w-full">
@@ -283,7 +284,7 @@ export function DoubleActionMenu() {
       ) : panel === 'moves' && actor ? (
         moveInfoId && moves.some((move) => move.id === moveInfoId) ? (
           <div className="mx-auto max-w-2xl px-3 py-2">
-            <Button type="button" variant="ghost" className="mb-3" onClick={() => setMoveInfoId(null)}>Back to moves</Button>
+            <Button type="button" variant="ghost" className="mb-3 text-game-cream hover:text-game-cream" onClick={() => setMoveInfoId(null)}>Back to moves</Button>
             <MoveFieldNote presentation={getBattleMovePresentation(moves.find((move) => move.id === moveInfoId)!, actor, battleState, selectedType)} />
           </div>
         ) : (
@@ -323,7 +324,7 @@ export function DoubleActionMenu() {
           {powerOptions.length === 0 && <p className="p-4 text-sm text-game-muted">No assigned power is available for this Pokémon.</p>}
         </div>
       ) : panel === 'flee' ? (
-        <div className="mx-auto flex max-w-sm flex-col items-center gap-4 py-8 text-center">
+        <div className="flex w-full max-w-sm flex-col items-center gap-4 text-center">
           <p className="text-sm text-game-muted">Leave this battle? This counts as a loss.</p>
           <Button type="button" className="game-accent-button w-full bg-game-clay" disabled={fleeing || disabled} onClick={async () => { setFleeing(true); try { await handleSurrender() } finally { setFleeing(false) } }}>Confirm flee</Button>
         </div>
