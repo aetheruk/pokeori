@@ -32,7 +32,6 @@ import {
   getBattleState,
 } from '../actions'
 import { submitBattleActionRequest } from '@/utilities/battle/action-api'
-import { BattleLog } from './battle-log'
 
 const CardDrawReveal = lazy(() =>
   import('@/components/tcg/CardDrawReveal').then((module) => ({
@@ -585,10 +584,10 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
     [wrapAction],
   )
   const handleUseZMove = useCallback(
-    () =>
+    (slot?: 0 | 1) =>
       wrapAction(
         (clientActionId) =>
-          submitBattleActionRequest({ kind: 'z-move', clientActionId }),
+          submitBattleActionRequest({ kind: 'z-move', slot, clientActionId }),
         {
           kind: 'power',
           label: 'Preparing Z-Move',
@@ -879,7 +878,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
 
   return (
     <BattleProvider value={contextValue}>
-      <div className="game-desktop-activity-stage game-activity-chrome relative flex h-full flex-col overflow-hidden xl:my-4 xl:h-[calc(100%-2rem)] xl:grid xl:grid-cols-[minmax(0,1fr)_19rem] xl:grid-rows-[minmax(26rem,1fr)_auto]">
+      <div className="game-desktop-activity-stage game-activity-chrome relative flex h-full min-h-0 flex-col overflow-hidden xl:my-4 xl:h-[calc(100%-2rem)]">
         <AnimatePresence>
           {showVsAnimation &&
             battleState.playerTrainer &&
@@ -912,14 +911,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
           enemyHasTeraEffect={!!activeEnemyMon.teraTypeOverride}
           enemyHasZPowerEffect={false}
         />
-        <div className="xl:col-start-1 xl:row-start-2">
-          <BattleActionMenu />
-        </div>
-        <div className="game-paper-first relative min-h-0 flex-[24] border-t border-game-border bg-game-surface-raised xl:col-start-2 xl:row-start-1 xl:row-span-2 xl:border-l xl:border-t-0">
-          <div className="h-full overflow-hidden">
-            <BattleLog logs={battleState.history} />
-          </div>
-        </div>
+        <BattleActionMenu />
       </div>
 
       {showResultScreen && (

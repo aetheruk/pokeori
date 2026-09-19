@@ -55,6 +55,7 @@ describe('battle action validation', () => {
   test('requires inventory and remaining power uses for battle powers', () => {
     const command = parseBattlePowerCommand('power:mega:10034', pokemon)
     const powers = createInitialPowersState({ megaEvolutionsPerBattle: 1 })
+    powers.stanceWinCharges = 3
 
     expect(
       validateCommonPowerRequirements({
@@ -110,6 +111,7 @@ describe('battle action validation', () => {
   test('validates Tera Orb commands against stored Pokemon Tera type', () => {
     const command = parseBattlePowerCommand('power:tera', pokemon)
     const powers = createInitialPowersState()
+    powers.stanceWinCharges = 3
 
     expect(command).toEqual({ kind: 'tera' })
     expect(
@@ -140,6 +142,7 @@ describe('battle action validation', () => {
   test('validates Z-Ring commands without Z-Crystals', () => {
     const command = parseBattlePowerCommand('power:z-move', pokemon)
     const powers = createInitialPowersState()
+    powers.stanceWinCharges = 3
 
     expect(command).toEqual({ kind: 'z-move' })
     expect(
@@ -166,5 +169,14 @@ describe('battle action validation', () => {
       kind: 'unknown',
       error: 'Invalid Z-Move selection',
     })
+  })
+
+  test('requires three unspent stance wins for every power', () => {
+    const powers = createInitialPowersState()
+    const command = parseBattlePowerCommand('power:z-move', pokemon)
+    const params = { command, inventory: { 'z-ring': 1 }, pokemon: { ...pokemon, selectedPokemonPower: 'z-move' as const }, powers, trainerLevel: 100 }
+    expect(validateCommonPowerRequirements(params)).toBe('Win 3 stance matchups to use a Power')
+    powers.stanceWinCharges = 3
+    expect(validateCommonPowerRequirements(params)).toBeNull()
   })
 })

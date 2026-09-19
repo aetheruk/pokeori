@@ -68,27 +68,37 @@ function makePvpState(): BattleState {
 }
 
 describe('PVP power state', () => {
-  test('charges Z-Move per player without attacking', async () => {
+  test('credits stance wins to the winning participant only', async () => {
     const state = makePvpState()
-
-    const resolved = await resolvePvpTurn(
-      state,
-      { stance: 'power', attackType: 'power:z-move', powers: { zMoveCharge: true } },
-      { stance: 'tech', attackType: 'power:z-move', powers: { zMoveCharge: true } },
+    await resolvePvpTurn(state,
+      {stance:'power',attackType:'grass'},
+      {stance:'tech',attackType:'grass'},
+      {persist:false,random:()=>0.5},
     )
-
-    expect(resolved.pvpPowers?.['player-1'].moveUsesRemaining).toBe(2)
-    expect(resolved.pvpPowers?.['player-2'].moveUsesRemaining).toBe(2)
-    expect(resolved.pvpPowers?.['player-1'].zMoveUsesRemaining).toBe(0)
-    expect(resolved.pvpPowers?.['player-2'].zMoveUsesRemaining).toBe(0)
-    expect(resolved.pvpPowers?.['player-1'].zMoveUsed).toBe(true)
-    expect(resolved.pvpPowers?.['player-2'].zMoveUsed).toBe(true)
-    expect(resolved.playerTeam[0].zMoveReady).toBe(true)
-    expect(resolved.enemyTeam[0].zMoveReady).toBe(true)
-    expect(resolved.history[0]?.message).toContain('prepares to launch a Z-Move')
+    expect(state.pvpPowers?.['player-1'].stanceWinCharges).toBe(1)
+    expect(state.pvpPowers?.['player-2'].stanceWinCharges).toBe(0)
+    await resolvePvpTurn(state,
+      {stance:'tech',attackType:'grass'},
+      {stance:'power',attackType:'grass'},
+      {persist:false,random:()=>0.5},
+    )
+    expect(state.pvpPowers?.['player-1'].stanceWinCharges).toBe(1)
+    expect(state.pvpPowers?.['player-2'].stanceWinCharges).toBe(1)
   })
 
-  test('special moves consume move uses and fade prepared Z-Move charge', async () => {
+  test('rejects the old turn-queued Z-Move activation path', async () => {
+    const state = makePvpState()
+    state.pvpPowers!['player-1'].stanceWinCharges = 3
+    await expect(resolvePvpTurn(
+      state,
+      { stance: 'power', attackType: 'power:z-move', powers: { zMoveCharge: true } },
+      { stance: 'tech', attackType: 'grass' },
+    )).rejects.toThrow('Arm Z-Move before submitting a turn.')
+    expect(state.pvpPowers?.['player-1'].stanceWinCharges).toBe(3)
+    expect(state.playerTeam[0].zMoveReady).toBeUndefined()
+  })
+
+  test('special moves consume move uses without fading the prepared Z-Move', async () => {
     const state = makePvpState()
     state.playerTeam[0].zMoveReady = true
     state.enemyTeam[0].zMoveReady = true
@@ -101,8 +111,55 @@ describe('PVP power state', () => {
 
     expect(resolved.pvpPowers?.['player-1'].moveUsesRemaining).toBe(1)
     expect(resolved.pvpPowers?.['player-2'].moveUsesRemaining).toBe(1)
-    expect(resolved.playerTeam[0].zMoveReady).toBeUndefined()
-    expect(resolved.enemyTeam[0].zMoveReady).toBeUndefined()
+    expect(resolved.playerTeam[0].zMoveReady).toBe(true)
+    expect(resolved.enemyTeam[0].zMoveReady).toBe(true)
+  })
+
+  test('PvP Weather Power spends the shared win pool but preserves an armed Z-Move', async () => {
+    const state = makePvpState()
+    state.pvpPowers!['player-1'].stanceWinCharges = 3
+    state.playerTeam[0].currentHp = 700
+    state.playerTeam[0].zMoveReady = true
+
+    await resolvePvpTurn(state,
+      {stance:'power',attackType:'power:weather'},
+      {stance:'tech',attackType:'grass'},
+      {persist:false,random:()=>0.5},
+    )
+
+    expect(state.pvpPowers?.['player-1'].stanceWinCharges).toBe(0)
+    expect(state.pvpPowers?.['player-1'].weatherUsesRemaining).toBe(0)
+    expect(state.pvpPowers?.['player-1'].moveUsesRemaining).toBe(2)
+    expect(state.playerTeam[0].zMoveReady).toBe(true)
+    expect(state.history[0]?.message).toContain('Clear Skies')
+  })
+
+  test('PvP doubles powers spend only the acting trainer’s three wins', async () => {
+    const state = makePvpState()
+    state.format = 'double'
+    state.playerTeam.push(makePokemon('p1-partner', 'player-1', 55))
+    state.enemyTeam.push(makePokemon('p2-partner', 'player-2', 45))
+    state.activePlayerSlots = [0, 1]
+    state.activeEnemySlots = [0, 1]
+    state.pvpPowers!['player-1'].stanceWinCharges = 3
+    state.pvpPowers!['player-2'].stanceWinCharges = 1
+
+    await resolvePvpTurn(state,
+      {stance:'power',actions:[
+        {slot:0,kind:'power',powerId:'shout'},
+        {slot:1,kind:'basic',stance:'power',attackType:'Grass',target:{side:'opponent',slot:1}},
+      ]},
+      {stance:'tech',actions:[
+        {slot:0,kind:'basic',stance:'tech',attackType:'Grass',target:{side:'opponent',slot:0}},
+        {slot:1,kind:'basic',stance:'tech',attackType:'Grass',target:{side:'opponent',slot:1}},
+      ]},
+      {persist:false,random:()=>0.5},
+    )
+
+    expect(state.pvpPowers?.['player-1'].stanceWinCharges).toBe(1)
+    expect(state.pvpPowers?.['player-1'].shoutUsesRemaining).toBe(0)
+    expect(state.pvpPowers?.['player-2'].stanceWinCharges).toBeGreaterThanOrEqual(1)
+    expect(state.playerTeam[0].shoutBoost).toBeDefined()
   })
 
   test('exposes viewer-specific powers in perspective state', () => {

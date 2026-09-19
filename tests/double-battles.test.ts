@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { battles } from '@/data/battles'
+import { createInitialPowersState } from '@/data/powers'
 import { getMove } from '@/data/moves'
 import { resolveDoublesTurn, validateDoublesActions, type DoublesAction } from '@/utilities/battle/doubles'
 import { getDoublesDamageMultiplier, isDoublesCommanderInactive, processDoublesPartnerEntry, processDoublesPartnerProtection } from '@/utilities/battle/doubles-abilities'
@@ -92,8 +93,8 @@ describe('double battles',()=>{
     const after=resolveDoublesTurn(before,[hit(0,0),hit(1,1)],enemy,()=>0.1)
     const turnLogs=after.history.filter((entry)=>entry.turn===1)
     expect(turnLogs.map((entry)=>entry.phase)).toEqual(['B','A'])
-    expect(turnLogs[1].message).toContain('P0 uses Power Attack on E0')
-    expect(turnLogs[0].message).toContain('P1 uses Power Attack on E1')
+    expect(turnLogs[1].message).toContain('P0 uses Normal Tackle on E0')
+    expect(turnLogs[0].message).toContain('P1 uses Normal Tackle on E1')
 
     const attacks=(after.presentation?.events ?? []).filter(
       (event): event is Extract<BattlePresentationEvent, {type:'attack'}> => event.type==='attack',
@@ -101,7 +102,7 @@ describe('double battles',()=>{
     expect(new Set(attacks.map((event)=>event.phase))).toEqual(new Set(['A','B']))
     expect(attacks.every((event)=>event.simultaneousGroup?.includes('doubles-impact:1:'))).toBe(true)
   })
-  test('doubles impact animation follows the winning stance for each phase',()=>{
+  test('both doubles attackers advance and only each successful winner pulses',()=>{
     const stanceHit=(slot:0|1,target:0|1,stance:'power'|'tech'):DoublesAction=>({slot,kind:'basic',stance,attackType:'normal',target:{side:'opponent',slot:target}})
     const after=resolveDoublesTurn(
       state(),
@@ -112,13 +113,13 @@ describe('double battles',()=>{
     const attacks=(after.presentation?.events ?? []).filter(
       (event): event is Extract<BattlePresentationEvent, {type:'attack'}> => event.type==='attack',
     )
-    expect(attacks.filter((event)=>event.phase==='A').map((event)=>[event.actorSide,event.animateActor])).toEqual([
-      ['player',true],
-      ['enemy',false],
+    expect(attacks.filter((event)=>event.phase==='A').map((event)=>[event.actorSide,event.animateActor,event.stanceWinner])).toEqual([
+      ['player',true,true],
+      ['enemy',true,false],
     ])
-    expect(attacks.filter((event)=>event.phase==='B').map((event)=>[event.actorSide,event.animateActor])).toEqual([
-      ['player',true],
-      ['enemy',false],
+    expect(attacks.filter((event)=>event.phase==='B').map((event)=>[event.actorSide,event.animateActor,event.stanceWinner])).toEqual([
+      ['player',true,true],
+      ['enemy',true,false],
     ])
 
     const tie=resolveDoublesTurn(
@@ -131,6 +132,14 @@ describe('double battles',()=>{
       (event): event is Extract<BattlePresentationEvent, {type:'attack'}> => event.type==='attack',
     )
     expect(tieAttacks.every((event)=>event.animateActor === true)).toBe(true)
+  })
+  test('each won doubles lane contributes one shared power charge',()=>{
+    const battle=state()
+    battle.powers=createInitialPowersState()
+    const stanceHit=(slot:0|1):DoublesAction=>({slot,kind:'basic',stance:'power',attackType:'normal',target:{side:'opponent',slot}})
+    const enemyHit=(slot:0|1):DoublesAction=>({slot,kind:'basic',stance:'tech',attackType:'normal',target:{side:'opponent',slot}})
+    resolveDoublesTurn(battle,[stanceHit(0),stanceHit(1)],[enemyHit(0),enemyHit(1)],()=>0.1)
+    expect(battle.powers.stanceWinCharges).toBe(2)
   })
   test('spread moves deal full damage to each opponent and allies when authored',()=>{
     const spread=state()
@@ -247,7 +256,7 @@ describe('double battles',()=>{
     battle.playerTeam[0].battleMoveIds=['ally-switch']
     resolveDoublesTurn(battle,[{slot:0,kind:'move',moveId:'ally-switch'},hit(1,1)],enemy,()=>0.1)
     expect(battle.activePlayerSlots).toEqual([1,0])
-    expect(battle.history[0].message).toContain('P1 uses Power Attack')
+    expect(battle.history[0].message).toContain('P1 uses Normal Tackle')
   })
   test('Follow Me remains attached to its Pokemon after the partner uses Ally Switch',()=>{
     const battle=state()

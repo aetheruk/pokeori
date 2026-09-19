@@ -11,6 +11,7 @@ import {
   validateSelectedPokemonPower,
 } from '@/utilities/pokemon/pokemon-powers'
 import { validateBattlePowerSkillRequirement } from '@/utilities/skills/unlocks'
+import { POWER_STANCE_WIN_COST, getStanceWinCharges } from './power-charges'
 
 export const VALID_BATTLE_STANCES: BattleStance[] = ['power', 'speed', 'tech']
 
@@ -21,6 +22,10 @@ export type BattlePowerCommand =
   | { kind: 'dynamax'; formId?: string }
   | { kind: 'tera' }
   | { kind: 'z-move' }
+  | { kind: 'victory'; itemId: string }
+  | { kind: 'weather' }
+  | { kind: 'shout' }
+  | { kind: 'circadian' }
   | { kind: 'unknown'; error: string }
 
 export function isValidBattleStance(value: unknown): value is BattleStance {
@@ -102,6 +107,15 @@ export function parseBattlePowerCommand(
     return { kind: 'z-move' }
   }
 
+  if (parts[1] === 'victory') {
+    const itemId = parts[2]
+    if (parts.length !== 3 || !itemId?.startsWith('victory-')) return { kind: 'unknown', error: 'Invalid Victory Power item' }
+    return { kind: 'victory', itemId }
+  }
+  if (parts[1] === 'weather' && parts.length === 2) return { kind: 'weather' }
+  if (parts[1] === 'shout' && parts.length === 2) return { kind: 'shout' }
+  if (parts[1] === 'circadian' && parts.length === 2) return { kind: 'circadian' }
+
   return { kind: 'unknown', error: 'Invalid battle power' }
 }
 
@@ -163,7 +177,6 @@ export function validateCommonPowerRequirements(params: {
   if (command.kind === 'dynamax') {
     if (!hasInventoryItem(inventory, POWER_KEY_ITEMS.dynamax))
       return 'Dynamax Band is required'
-    if (!powers.dynamaxAvailable) return 'Dynamax is not unlocked yet'
     if (powers.dynamaxUsesRemaining <= 0) return 'No Dynamax uses remaining'
     if (powers.dynamaxActive || pokemon.isDynamaxed)
       return 'Dynamax is already active'
@@ -185,6 +198,31 @@ export function validateCommonPowerRequirements(params: {
       return 'No Z-Move uses remaining'
     if (pokemon.zMoveReady) return 'Z-Move is already prepared'
   }
+
+  if (command.kind === 'victory') {
+    if (!hasInventoryItem(inventory, POWER_KEY_ITEMS.victory) || !hasInventoryItem(inventory, command.itemId)) return 'Victory Symbol is required'
+    if (powers.victoryUsesRemaining <= 0) return 'No Victory Power uses remaining'
+  }
+  if (command.kind === 'weather') {
+    if (!hasInventoryItem(inventory, POWER_KEY_ITEMS.weather)) return 'Weather Orb is required'
+    if (powers.weatherUsesRemaining <= 0) return 'No Weather Power uses remaining'
+  }
+  if (command.kind === 'shout') {
+    if (!hasInventoryItem(inventory, 'book-of-shouts')) return 'Book of Shouts is required'
+    if (powers.shoutUsesRemaining <= 0) return 'No Battle Shouts remaining'
+    if (pokemon.shoutBoost) return 'Battle Shout is already active'
+  }
+  if (command.kind === 'circadian') {
+    if (!hasInventoryItem(inventory, 'circadian-stone')) return 'Circadian Stone is required'
+    if (powers.circadianUsesRemaining <= 0) return 'No Circadian uses remaining'
+  }
+  if (command.kind === 'dimensional-shift') {
+    const itemId = command.shiftType === 'time' ? 'adamant-orb' : command.shiftType === 'space' ? 'lustrous-orb' : 'griseous-orb'
+    if (!hasInventoryItem(inventory, itemId)) return `${itemId} is required`
+  }
+
+  if (getStanceWinCharges(powers) < POWER_STANCE_WIN_COST)
+    return `Win ${POWER_STANCE_WIN_COST} stance matchups to use a Power`
 
   return null
 }

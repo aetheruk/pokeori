@@ -28,7 +28,7 @@ export type BattleActionRequest =
   | (BattleActionBase & { kind: 'swap'; pokemonIndex: number })
   | (BattleActionBase & { kind: 'tera' })
   | (BattleActionBase & { kind: 'mega'; formId: string })
-  | (BattleActionBase & { kind: 'z-move' })
+  | (BattleActionBase & { kind: 'z-move'; slot?: 0 | 1 })
   | (BattleActionBase & { kind: 'dynamax'; formId?: string })
   | (BattleActionBase & { kind: 'victory'; itemId: string })
   | (BattleActionBase & {

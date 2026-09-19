@@ -10,6 +10,7 @@ interface PokemonDisplayProps {
   isAttacking?: boolean
   isHit?: boolean
   isBoosting?: boolean
+  isStanceWinner?: boolean
   isFainting?: boolean
   isSwitchingOut?: boolean
   isSwitchingIn?: boolean
@@ -64,6 +65,7 @@ export function PokemonDisplay({
   isAttacking,
   isHit,
   isBoosting,
+  isStanceWinner,
   isFainting,
   isSwitchingOut,
   isSwitchingIn,
@@ -97,7 +99,7 @@ export function PokemonDisplay({
         isAttacking &&
           (isPlayer ? 'translate-x-12 -translate-y-12' : '-translate-x-12 translate-y-12'),
         isHit && 'animate-shake opacity-80 grayscale-[0.5]',
-        isBoosting && 'z-20',
+        (isBoosting || isStanceWinner) && 'z-20',
         isFainting &&
           'translate-y-20 opacity-0 grayscale transition-all duration-1000 ease-in',
         isSwitchingOut &&
@@ -123,6 +125,7 @@ export function PokemonDisplay({
           <span className="battle-boost-spark battle-boost-spark--three" />
         </div>
       )}
+      {isStanceWinner && <span className="battle-stance-win-glow" aria-hidden="true" />}
 
       <PokemonRaritySprite
         key={formId} // Force re-render when formId changes
@@ -138,6 +141,7 @@ export function PokemonDisplay({
         imageClassName={cn(
           'drop-shadow-xl',
           isBoosting && 'battle-boost-sprite',
+          isStanceWinner && 'battle-stance-win-sprite',
         )}
       />
 

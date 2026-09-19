@@ -7,6 +7,7 @@ interface PokemonSpriteDisplayProps {
   playerAttacking: boolean
   playerHit: boolean
   playerBoosting: boolean
+  playerStanceWinner: boolean
   playerFainting: boolean
   playerSwitchingOut: boolean
   playerSwitchingIn: boolean
@@ -21,6 +22,7 @@ interface PokemonSpriteDisplayProps {
   enemyAttacking: boolean
   enemyHit: boolean
   enemyBoosting: boolean
+  enemyStanceWinner: boolean
   enemyFainting: boolean
   enemySwitchingOut: boolean
   enemySwitchingIn: boolean
@@ -38,6 +40,7 @@ export function PokemonSpriteDisplay({
   playerAttacking,
   playerHit,
   playerBoosting,
+  playerStanceWinner,
   playerFainting,
   playerSwitchingOut,
   playerSwitchingIn,
@@ -51,6 +54,7 @@ export function PokemonSpriteDisplay({
   enemyAttacking,
   enemyHit,
   enemyBoosting,
+  enemyStanceWinner,
   enemyFainting,
   enemySwitchingOut,
   enemySwitchingIn,
@@ -74,6 +78,7 @@ export function PokemonSpriteDisplay({
               isAttacking={playerAttacking}
               isHit={playerHit}
               isBoosting={playerBoosting}
+              isStanceWinner={playerStanceWinner}
               isFainting={playerFainting}
               isSwitchingOut={playerSwitchingOut}
               isSwitchingIn={playerSwitchingIn}
@@ -106,6 +111,7 @@ export function PokemonSpriteDisplay({
           isAttacking={enemyAttacking}
           isHit={enemyHit}
           isBoosting={enemyBoosting}
+          isStanceWinner={enemyStanceWinner}
           isFainting={enemyFainting}
           isSwitchingOut={enemySwitchingOut}
           isSwitchingIn={enemySwitchingIn}

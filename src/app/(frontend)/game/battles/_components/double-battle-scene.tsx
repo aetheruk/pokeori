@@ -142,6 +142,7 @@ function LaneSprite({
         isAttacking={effect?.attacking}
         isHit={effect?.hit}
         isBoosting={effect?.boosting}
+        isStanceWinner={effect?.stanceWinner}
         isFainting={effect?.fainting}
         isSwitchingOut={effect?.switchingOut}
         isSwitchingIn={effect?.switchingIn}
@@ -281,7 +282,7 @@ export function DoubleBattleScene({
   }
 
   return (
-    <div className="relative flex min-h-[21rem] flex-[36] flex-col items-center justify-center overflow-hidden bg-game-night-surface text-game-night-ink xl:col-start-1 xl:row-start-1 xl:min-h-0 xl:flex-none">
+    <div className="relative flex min-h-[21rem] flex-[36] flex-col items-center justify-center overflow-hidden bg-game-night-surface text-game-night-ink xl:min-h-0">
       <div
         className="absolute inset-x-0 top-0 z-10 h-[env(safe-area-inset-top)] bg-game-night-canvas"
         aria-hidden

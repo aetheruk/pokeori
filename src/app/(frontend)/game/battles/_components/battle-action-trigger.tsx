@@ -18,7 +18,7 @@ export function BattleActionTrigger({
   itemId,
   icon,
   label,
-  count,
+  count: _count,
   compact = false,
   className,
   ...props
@@ -64,11 +64,6 @@ export function BattleActionTrigger({
         <span className="text-[11px] font-black uppercase tracking-[0.08em] sm:text-xs">
           {label}
         </span>
-        {count !== undefined && (
-          <span className="font-mono text-[11px] font-medium opacity-75">
-            {count}
-          </span>
-        )}
       </span>
     </Button>
   )

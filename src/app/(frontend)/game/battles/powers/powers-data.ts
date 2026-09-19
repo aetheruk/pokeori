@@ -145,8 +145,7 @@ export async function getBattlePowers(
     hasPowerLevel('victory') && hasKeyItem(POWER_KEY_ITEMS.victory)
   const hasWeather =
     hasPowerLevel('weather') &&
-    hasKeyItem(POWER_KEY_ITEMS.weather) &&
-    !state.isPvp
+    hasKeyItem(POWER_KEY_ITEMS.weather)
   const hasShouts = hasPowerLevel('shout') && hasKeyItem('book-of-shouts')
   const hasCircadian =
     hasPowerLevel('circadian') && hasKeyItem('circadian-stone')
@@ -192,7 +191,7 @@ export async function getBattlePowers(
       if ((userInventory[vItem.id] || 0) > 0) {
         const type = vItem.id.replace('victory-', '')
         const validTarget = playerTeam.some((p, index) => {
-          if (index === activeMonIndex) return false
+          if (index === activeMonIndex || (state.format === 'double' && state.activePlayerSlots?.includes(index))) return false
           if (p.currentHp <= 0) return false
           return p.types.some((t) => t.toLowerCase() === type.toLowerCase())
         })

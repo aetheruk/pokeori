@@ -11,6 +11,7 @@ import { SHOUT_DURATION } from '@/data/powers'
 import { getUser } from '../helpers/user'
 import { getActiveBattleState } from '../helpers/state-management'
 import { validateSelectedPokemonPower } from '@/utilities/pokemon/pokemon-powers'
+import { getStanceWinCharges, POWER_STANCE_WIN_COST, spendPowerCharge } from '@/utilities/battle/power-charges'
 import { needsPlayerReplacement } from '@/utilities/battle/switching'
 import {
   getSkillLevel,
@@ -18,6 +19,7 @@ import {
 } from '@/utilities/skills/unlocks'
 import { getUserInventoryMap } from '@/utilities/user-state'
 import { runBattleActionWithGuard } from '../helpers/action-guard'
+import { queuePvpMoveAndResolveTurn } from '../pvp/turn-sync'
 import {
   applyShoutStatBoost,
   getBattleShoutMessage,
@@ -34,6 +36,7 @@ export async function useShout(
   error?: string
   state?: BattleState
   message?: string
+  waiting?: boolean
 }> {
   const user = await getUser()
   if (!user) return { success: false, error: 'Not authenticated' }
@@ -42,9 +45,6 @@ export async function useShout(
     const state = await getActiveBattleState(user)
     if (!state) return { success: false, error: 'No active battle' }
 
-    if (state.isPvp) {
-      return { success: false, error: 'Shouts cannot be used in PVP' }
-    }
     if (state.status !== 'ongoing') {
       return { success: false, error: 'Battle has ended' }
     }
@@ -102,10 +102,17 @@ export async function useShout(
     if (state.powers.shoutUsesRemaining <= 0) {
       return { success: false, error: 'No Shout uses remaining' }
     }
+    if (getStanceWinCharges(state.powers) < POWER_STANCE_WIN_COST) return { success: false, error: 'Win 3 stance matchups to use a Power' }
+
+    if (state.isPvp) {
+      const result = await queuePvpMoveAndResolveTurn({viewerId:user.id,battleState:state,move:{stance:'tech',attackType:'power:shout'}})
+      return {success:true,state:result.state,waiting:result.waiting}
+    }
 
     const boost = applyShoutStatBoost(playerMon, state.turn)
     if (!boost.applied) return { success: false, error: boost.message, state }
 
+    spendPowerCharge(state.powers)
     state.powers.shoutUsesRemaining -= 1
 
     const powerUsage =

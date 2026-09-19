@@ -2,7 +2,7 @@
 
 import { HeartOff, Loader2, RefreshCcw } from 'lucide-react'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState, type ElementType } from 'react'
 import { Button } from '@/components/ui/button'
 import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
@@ -43,6 +43,8 @@ type TeamSwapperProps = {
   doublesReplacementSlots?: number[]
   doublesActiveSlots?: readonly (number | null)[]
   onDoublesReplace?: (slot: 0 | 1, pokemonIndex: number) => void | Promise<void>
+  embedded?: boolean
+  onActionComplete?: () => void
 }
 
 export function TeamSwapper({
@@ -53,7 +55,11 @@ export function TeamSwapper({
   doublesReplacementSlots,
   doublesActiveSlots,
   onDoublesReplace,
+  embedded = false,
+  onActionComplete,
 }: TeamSwapperProps) {
+  const Shell: ElementType = embedded ? Fragment : Drawer
+  const Content: ElementType = embedded ? 'div' : DrawerContent
   const {
     battleState,
     activePlayerMon,
@@ -113,6 +119,7 @@ export function TeamSwapper({
       if (!forced && !isDoublesReplacement) {
         setOpen(false)
       }
+      onActionComplete?.()
     } finally {
       setSwapping(null)
     }
@@ -120,23 +127,23 @@ export function TeamSwapper({
 
   if (
     !allowSwapping ||
-    (!leadSelection && team.length <= 1 && !actionTrigger)
+    (!embedded && !leadSelection && team.length <= 1 && !actionTrigger)
   ) {
     return null
   }
 
   return (
-    <Drawer
-      open={open}
-      onOpenChange={(nextOpen) => {
+    <Shell
+      {...(!embedded ? { open,
+      onOpenChange: (nextOpen: boolean) => {
         if (forced && !nextOpen) return
         setOpen(nextOpen)
-      }}
+      } } : {})}
     >
-      <DrawerTrigger asChild>
+      {!embedded && <DrawerTrigger asChild>
         {actionTrigger ? (
           <BattleActionTrigger
-            icon={<RefreshCcw className="size-5" aria-hidden />}
+            itemId="poke-ball"
             label="Switch"
             count={availableSwaps > 0 ? `${availableSwaps} ready` : '—'}
             compact={compact}
@@ -162,12 +169,12 @@ export function TeamSwapper({
             {forced && (leadSelection ? 'Choose Lead' : 'Choose Next')}
           </Button>
         )}
-      </DrawerTrigger>
-      <DrawerContent
+      </DrawerTrigger>}
+      <Content
         id={swapDrawerContentId}
-        className="game-paper-modal game-paper-background max-h-[60dvh] border-game-border bg-game-surface-raised"
+        className={embedded ? 'min-h-0' : 'game-paper-modal game-paper-background max-h-[60dvh] border-game-border bg-game-surface-raised'}
       >
-        <div className="mx-auto min-h-0 w-full max-w-xl overflow-y-auto px-3 pt-3 pb-5 sm:px-4">
+        <div className={embedded ? 'mx-auto min-h-0 w-full max-w-xl px-3 pt-3 pb-5 sm:px-4' : 'mx-auto min-h-0 w-full max-w-xl overflow-y-auto px-3 pt-3 pb-5 sm:px-4'}>
           <SectionDivider className="mb-3">
             {leadSelection
               ? 'Choose Your Pokemon'
@@ -310,7 +317,7 @@ export function TeamSwapper({
             })}
           </div>
         </div>
-      </DrawerContent>
-    </Drawer>
+      </Content>
+    </Shell>
   )
 }

@@ -1,20 +1,63 @@
 'use client'
 
-import { useEffect, useState, type ReactNode } from 'react'
-import { Loader2, Swords } from 'lucide-react'
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
+import Image from 'next/image'
+import { Swords } from 'lucide-react'
 import { STANCE_ICON_CONFIG } from '@/components/game/shared/stance-icon'
 import { Button } from '@/components/ui/button'
 import {
   Drawer,
   DrawerContent,
-  DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer'
 import { cn } from '@/lib/utils'
 import { getStatStageMultiplier } from '@/utilities/battle/battle-logic'
 import type { BattleStance } from '@/utilities/battle/types'
+import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
 import { BattleActionTrigger } from './battle-action-trigger'
+
+const TYPE_SURFACE_COLORS: Record<string, string> = {
+  normal: '#e4e3d2',
+  fighting: '#edc9c4',
+  flying: '#ded8f5',
+  poison: '#e8d1e5',
+  ground: '#f2e5c5',
+  rock: '#e9e4bd',
+  bug: '#e4edbd',
+  ghost: '#d7cce8',
+  steel: '#e1e1ea',
+  fire: '#f8dcc7',
+  water: '#d9e3f8',
+  grass: '#dcebc7',
+  electric: '#faefbd',
+  psychic: '#f8cedb',
+  ice: '#d8efee',
+  dragon: '#d9cdf8',
+  dark: '#ded5cf',
+  fairy: '#f0d9e7',
+}
+
+const TYPE_IDS: Record<string, number> = {
+  normal: 1,
+  fighting: 2,
+  flying: 3,
+  poison: 4,
+  ground: 5,
+  rock: 6,
+  bug: 7,
+  ghost: 8,
+  steel: 9,
+  fire: 10,
+  water: 11,
+  grass: 12,
+  electric: 13,
+  psychic: 14,
+  ice: 15,
+  dragon: 16,
+  dark: 17,
+  fairy: 18,
+}
 
 export interface StanceSelectorProps {
   onSelect: (stance: BattleStance) => void
@@ -34,8 +77,13 @@ export interface StanceSelectorProps {
     specialDefense: number
   } // Can be partial or full StatStages
   zMoveReady?: boolean
+  isDynamaxed?: boolean
   disabledStance?: BattleStance
   pendingStance?: BattleStance
+  types?: readonly string[]
+  selectedType?: string | null
+  onTypeSelect?: (type: string) => void
+  typeOverride?: string | null
 }
 
 type StanceSelectorDrawerProps = StanceSelectorProps & {
@@ -48,8 +96,13 @@ export function StanceSelector({
   stats,
   statStages,
   zMoveReady,
+  isDynamaxed,
   disabledStance,
   pendingStance,
+  types,
+  selectedType,
+  onTypeSelect,
+  typeOverride,
 }: StanceSelectorProps) {
   const [feedback, setFeedback] = useState<{
     stance: BattleStance
@@ -70,11 +123,13 @@ export function StanceSelector({
   const techVal = Math.floor(
     stats.specialAttack * getMult(statStages?.specialAttack),
   )
+  const stanceType = typeOverride ?? selectedType ?? types?.[0] ?? 'normal'
+  const stanceTypeLabel = titleCase(stanceType)
 
   const stanceCards: Array<{
     stance: BattleStance
     label: string
-    actionLabel: string
+    actionName: string
     statLabel: string
     beats: string
     value: number
@@ -83,7 +138,7 @@ export function StanceSelector({
     {
       stance: 'speed',
       label: 'Speed',
-      actionLabel: 'Quick strike',
+      actionName: 'Strike',
       statLabel: 'Speed',
       beats: 'Power',
       value: speedVal,
@@ -92,7 +147,7 @@ export function StanceSelector({
     {
       stance: 'power',
       label: 'Power',
-      actionLabel: 'Heavy hit',
+      actionName: 'Tackle',
       statLabel: 'Attack',
       beats: 'Tech',
       value: powerVal,
@@ -101,7 +156,7 @@ export function StanceSelector({
     {
       stance: 'tech',
       label: 'Tech',
-      actionLabel: 'Special move',
+      actionName: 'Gambit',
       statLabel: 'Sp. Atk',
       beats: 'Speed',
       value: techVal,
@@ -110,13 +165,75 @@ export function StanceSelector({
   ]
 
   return (
-    <div className="game-battle-command-deck mx-auto w-full max-w-2xl">
-      <div className="game-battle-command-header" aria-hidden="true">
-        <span className="game-battle-command-title">Attack</span>
-        <span className="game-battle-command-line" />
-        <span className="game-battle-command-count">3 styles</span>
-      </div>
-      <div className="game-battle-command-grid">
+    <div className="mx-auto w-full max-w-2xl space-y-3">
+      {types && types.length > 0 && (
+        <div
+          className="game-battle-type-strip game-battle-type-strip--drawer"
+          data-type={stanceType.toLowerCase()}
+        >
+          <div className="game-battle-type-selector">
+            {typeOverride ? (
+              (() => {
+                const typeId = TYPE_IDS[typeOverride.toLowerCase()]
+                return typeId ? (
+                  <Image
+                    src={getPokemonTypeIconUrl(typeId, true)}
+                    alt={`Tera ${stanceTypeLabel} type`}
+                    width={100}
+                    height={40}
+                    className="game-battle-type-image game-battle-type-image--active h-6 w-auto object-contain"
+                    unoptimized
+                  />
+                ) : (
+                  <span className="font-medium capitalize text-game-ink">
+                    {stanceTypeLabel}
+                  </span>
+                )
+              })()
+            ) : (
+              <div className="flex min-w-0 justify-center gap-2">
+                {types.map((type) => {
+                  const typeId = TYPE_IDS[type.toLowerCase()]
+                  const isSelected = selectedType === type
+
+                  return (
+                    <Button
+                      key={type}
+                      type="button"
+                      variant="ghost"
+                      className={cn(
+                        'game-battle-type-option group relative flex h-10 w-20 items-center justify-center rounded-lg border-0 bg-transparent p-0 hover:bg-transparent',
+                        isSelected ? 'opacity-100' : 'opacity-60 grayscale',
+                      )}
+                      aria-label={type}
+                      aria-pressed={isSelected}
+                      disabled={disabled || !onTypeSelect}
+                      onClick={() => onTypeSelect?.(type)}
+                    >
+                      {typeId ? (
+                        <Image
+                          src={getPokemonTypeIconUrl(typeId)}
+                          alt={`${titleCase(type)} type`}
+                          width={100}
+                          height={40}
+                          className="game-battle-type-image h-7 w-auto object-contain transition-[filter,opacity] duration-150 group-hover:opacity-100 group-hover:grayscale-0 motion-reduce:transition-none"
+                          unoptimized
+                        />
+                      ) : (
+                        <span className="text-xs font-semibold capitalize text-game-ink">
+                          {type}
+                        </span>
+                      )}
+                    </Button>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className="game-battle-stance-list w-full">
         {stanceCards.map((card) => {
           const Icon = card.icon
           const isZReady = !!zMoveReady
@@ -134,7 +251,7 @@ export function StanceSelector({
               data-z-ready={isZReady || undefined}
               data-feedback={isFeedback || undefined}
               className={cn(
-                'game-battle-stance relative block h-auto min-w-0 border px-2.5 pt-2.5 pb-0 text-left sm:px-3 sm:pt-3',
+                'game-battle-stance relative min-w-0 border text-left',
                 (isPending || isFeedback) &&
                   !isStanceDisabled &&
                   'disabled:opacity-100',
@@ -150,58 +267,22 @@ export function StanceSelector({
               aria-label={
                 isStanceDisabled
                   ? `${card.label} stance disabled`
-                  : `${card.label} ${isZReady ? 'Z-Move' : `attack, ${card.statLabel} ${card.value}`}. Beats ${card.beats}`
+                  : `Use ${stanceTypeLabel} ${card.actionName}. ${card.label} stance, ${isZReady ? 'Z-Move ready' : `${card.statLabel} ${card.value}`}. Beats ${card.beats}`
               }
               aria-busy={isPending}
             >
-              <span className="game-battle-stance-topline flex items-start justify-between gap-1">
-                <span className="game-battle-stance-name flex min-w-0 flex-col items-start">
-                  <span className="text-[10px] font-black uppercase tracking-[0.16em] opacity-75">
-                    {card.actionLabel}
-                  </span>
-                  <span className="text-base font-black leading-tight sm:text-lg">
-                    {card.label}
-                  </span>
-                </span>
-                <span
-                  key={isFeedback ? feedback.sequence : 'idle'}
-                  aria-hidden
-                  className="game-battle-stance-icon relative inline-flex size-8 shrink-0 items-center justify-center sm:size-9"
-                  data-feedback={isFeedback || undefined}
-                >
-                  <Icon className="relative z-10 size-7 sm:size-8 [&_*]:stroke-[1.8]" />
-                </span>
+              <span
+                key={isFeedback ? feedback.sequence : 'idle'}
+                aria-hidden
+                className="game-battle-stance-icon relative inline-flex size-10 shrink-0 items-center justify-center"
+                data-feedback={isFeedback || undefined}
+              >
+                <Icon className="relative z-10 size-7 [&_*]:stroke-[1.8]" />
               </span>
-              <span className="game-battle-stance-stat mt-2 mb-3 flex items-end gap-2">
-                <span
-                  className={cn(
-                    'block font-mono leading-none font-black tracking-tight sm:text-4xl',
-                    card.value >= 1000 ? 'text-2xl' : 'text-3xl',
-                  )}
-                >
-                  {isZReady ? 'Z' : card.value.toLocaleString()}
-                </span>
-                <span className="mb-0.5 block text-[10px] font-bold uppercase tracking-[0.12em] opacity-75">
-                  {isZReady ? 'Z-Move ready' : card.statLabel}
-                </span>
-              </span>
-              <span className="game-battle-stance-hint flex min-h-8 items-center justify-between gap-1 border-t py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] leading-tight">
-                {isStanceDisabled ? (
-                  'Disabled'
-                ) : isPending ? (
-                  <>
-                    <Loader2
-                      aria-hidden
-                      className="size-3 animate-spin motion-reduce:animate-none"
-                    />
-                    <span role="status">Attacking…</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="opacity-75">Beats</span>
-                    <strong className="font-black">{card.beats}</strong>
-                  </>
-                )}
+              <span className="game-battle-stance-name min-w-0 text-right">
+                <strong className="block truncate font-display text-lg font-black leading-tight sm:text-xl">
+                  {zMoveReady ? '' : isDynamaxed ? 'MAX ' : ''}{stanceTypeLabel} {card.actionName}{zMoveReady ? ' Z' : ''}
+                </strong>
               </span>
             </Button>
           )
@@ -216,6 +297,12 @@ export function StanceSelectorDrawer({
   ...props
 }: StanceSelectorDrawerProps) {
   const [open, setOpen] = useState(false)
+  const drawerType = (
+    props.typeOverride ??
+    props.selectedType ??
+    props.types?.[0] ??
+    'normal'
+  ).toLowerCase()
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
@@ -229,10 +316,17 @@ export function StanceSelectorDrawer({
           disabled={props.disabled}
         />
       </DrawerTrigger>
-      <DrawerContent className="game-paper-modal game-paper-background max-h-[82dvh] border-game-border bg-game-surface-raised">
-        <DrawerHeader className="pb-2">
-          <DrawerTitle>Stance</DrawerTitle>
-        </DrawerHeader>
+      <DrawerContent
+        className="game-battle-stance-drawer game-paper-modal game-paper-background max-h-[82dvh] border-game-border bg-game-surface-raised"
+        data-type={drawerType}
+        style={
+          {
+            '--game-paper-background':
+              TYPE_SURFACE_COLORS[drawerType] ?? TYPE_SURFACE_COLORS.normal,
+          } as CSSProperties
+        }
+      >
+        <DrawerTitle className="sr-only">Stance choices</DrawerTitle>
         <div className="overflow-y-auto px-4 pb-6">
           <StanceSelector
             {...props}
@@ -245,4 +339,10 @@ export function StanceSelectorDrawer({
       </DrawerContent>
     </Drawer>
   )
+}
+
+function titleCase(value: string): string {
+  return value
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, (letter) => letter.toUpperCase())
 }

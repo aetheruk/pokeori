@@ -416,6 +416,11 @@ function buildPresentation(
         damage,
         hpAfter,
         attackType: line.match(/\[icon:type:([^\]]+)\]/i)?.[1],
+        animateActor: actorSide === 'player'
+          ? (log.playerExecutedAttack ?? (log.result !== 'loss'))
+          : (log.enemyExecutedAttack ?? (log.result !== 'win')),
+        stanceWinner: (log.playerExecutedAttack ?? true) && (log.enemyExecutedAttack ?? true) &&
+          (actorSide === 'player' ? log.result === 'win' : log.result === 'loss'),
         message: line,
       })
       // Stance lines can also contain authored recoil, drain, or healing
@@ -555,10 +560,6 @@ function buildPresentation(
     const simultaneousGroup = `impact:${log.turn}`
     for (const attack of attacks) {
       attack.simultaneousGroup = simultaneousGroup
-      attack.animateActor =
-        log.result === 'tie' ||
-        (log.result === 'win' && attack.actorSide === 'player') ||
-        (log.result === 'loss' && attack.actorSide === 'enemy')
     }
     for (const shadowPainEvent of shadowPainEvents) {
       shadowPainEvent.simultaneousGroup = simultaneousGroup

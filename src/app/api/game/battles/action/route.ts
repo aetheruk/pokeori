@@ -37,7 +37,7 @@ const doublesCommand = z.discriminatedUnion('kind',[
   z.object({kind:z.literal('move'),slot:doublesSlot,moveId:identifier,target:doublesTarget.optional(),selectedType:identifier.optional()}),
   z.object({kind:z.literal('switch'),slot:doublesSlot,pokemonIndex:z.number().int().min(0).max(5)}),
   z.object({kind:z.literal('item'),slot:doublesSlot,itemId:identifier,targetPokemonIndex:z.number().int().min(0).max(5).optional()}),
-  z.object({kind:z.literal('power'),slot:doublesSlot,powerId:z.enum(['tera','mega','dynamax','z-move']),formId:identifier.optional()}),
+  z.object({kind:z.literal('power'),slot:doublesSlot,powerId:z.enum(['tera','mega','dynamax','z-move','victory','weather','shout','circadian','dimensional-shift']),formId:identifier.optional(),target:doublesTarget.optional()}),
 ])
 
 const BattleActionSchema = z.discriminatedUnion('kind', [
@@ -64,7 +64,7 @@ const BattleActionSchema = z.discriminatedUnion('kind', [
   }),
   baseAction.extend({ kind: z.literal('tera') }),
   baseAction.extend({ kind: z.literal('mega'), formId: identifier }),
-  baseAction.extend({ kind: z.literal('z-move') }),
+  baseAction.extend({ kind: z.literal('z-move'), slot: doublesSlot.optional() }),
   baseAction.extend({
     kind: z.literal('dynamax'),
     formId: identifier.optional(),
@@ -114,7 +114,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    if (!['doubles','doubles-replace','surrender'].includes(action.kind) && (await getBattleState())?.format==='double') {
+    if (!['doubles','doubles-replace','surrender','z-move'].includes(action.kind) && (await getBattleState())?.format==='double') {
       return jsonResponse({success:false,error:'Choose both Pokemon actions together.'},{headers:{'cache-control':'no-store'}},requestId)
     }
     let result
@@ -156,7 +156,7 @@ export async function POST(request: Request) {
         result = await applyMegaEvolution(action.formId, action.clientActionId)
         break
       case 'z-move':
-        result = await applyZMove(action.clientActionId)
+        result = await applyZMove(action.clientActionId, action.slot)
         break
       case 'dynamax':
         result = await applyDynamax(action.formId, action.clientActionId)

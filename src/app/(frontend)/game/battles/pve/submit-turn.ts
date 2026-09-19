@@ -19,7 +19,6 @@ import { getUserInventoryMap } from '@/utilities/user-state'
 import { getSkillLevel } from '@/utilities/skills/unlocks'
 import { processBattleAbilityTeraActivation } from '@/utilities/battle/abilities'
 import { applyBattleFormChange } from '@/utilities/battle/stats-calc'
-import { clearZMoveCharge } from '@/utilities/battle/z-move'
 import { createBattleTurnTimer } from '../helpers/timing'
 
 export async function submitPveTurn(
@@ -98,9 +97,8 @@ export async function submitPveTurn(
       trainerLevel: getSkillLevel(user.skills, 'battling'),
     })
     if (requirementError) return { success: false, error: requirementError }
-
-    if (powerCommand.kind !== 'z-move') {
-      clearZMoveCharge(playerMon)
+    if (powerCommand.kind === 'z-move') {
+      return { success: false, error: 'Arm Z-Move from the Powers section' }
     }
 
     // Dimensional Shift
@@ -112,6 +110,8 @@ export async function submitPveTurn(
         powerCommand.shiftType,
       )
       if (!result.success) return result
+      const { spendPowerCharge } = await import('@/utilities/battle/power-charges')
+      spendPowerCharge(state.powers)
 
       if (powerCommand.shiftType === 'time') {
         // Time shift skips enemy action, but still finalizes the turn lifecycle.
@@ -137,6 +137,8 @@ export async function submitPveTurn(
     if (powerCommand.kind === 'mega') {
       const { activateMegaEvolution } = await import('../powers/mega')
       if (activateMegaEvolution(playerMon, powerCommand.megaFormId, state)) {
+        const { spendPowerCharge } = await import('@/utilities/battle/power-charges')
+        spendPowerCharge(state.powers)
         state.powers.megaUsesRemaining -= 1
         state.powers.megaEvolved = true
         state.powers.megaTurnsRemaining = 0
@@ -167,6 +169,8 @@ export async function submitPveTurn(
 
       const { activateDynamax } = await import('../powers/dynamax')
       if (activateDynamax(playerMon, formId, state)) {
+        const { spendPowerCharge } = await import('@/utilities/battle/power-charges')
+        spendPowerCharge(state.powers)
         state.powers.dynamaxUsesRemaining -= 1
         state.powers.dynamaxActive = true
         state.powers.dynamaxTurnsRemaining =
@@ -192,6 +196,8 @@ export async function submitPveTurn(
     if (powerCommand.kind === 'tera') {
       const { activateTera } = await import('../powers/tera')
       if (activateTera(playerMon, state.turn)) {
+        const { spendPowerCharge } = await import('@/utilities/battle/power-charges')
+        spendPowerCharge(state.powers)
         state.powers.teraUsesRemaining -= 1
         const teraAbility = processBattleAbilityTeraActivation({
           state,
@@ -220,28 +226,6 @@ export async function submitPveTurn(
       return { success: false, error: 'Terastallization failed' }
     }
 
-    // Z-Move (Stance only)
-    if (powerCommand.kind === 'z-move') {
-      const { activateZMove } = await import('../powers/z-move')
-      if (!activateZMove(playerMon)) {
-        return { success: false, error: 'Z-Move is already prepared' }
-      }
-
-      state.powers.zMoveUsesRemaining -= 1
-      state.powers.zMoveUsed = state.powers.zMoveUsesRemaining <= 0
-
-      const activeEnemy = state.enemyTeam[state.activeEnemyIndex]
-      await processEnemyAttackOnly(
-        state,
-        playerMon,
-        activeEnemy,
-        user,
-        `${playerMon.name} prepares to launch a Z-Move!`,
-        playerStance,
-        { playerInventory: userInventory },
-      )
-      return { success: true, state }
-    }
   }
 
   return {

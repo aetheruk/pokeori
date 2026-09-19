@@ -41,7 +41,7 @@ export async function submitPvpTurn(
     }
   }
 
-  // Capture Pending Powers (Mega, Dynamax, Tera, Z-Move)
+  // Capture turn-consuming power activations. Z-Moves arm through their immediate action.
   const playerMon = state.playerTeam[state.activePlayerIndex]
   const disabledStanceError = getDisabledStanceMessage(playerMon, playerStance)
   if (disabledStanceError) return { success: false, error: disabledStanceError }
@@ -84,6 +84,9 @@ export async function submitPvpTurn(
       trainerLevel: getSkillLevel(user.skills, 'battling'),
     })
     if (requirementError) return { success: false, error: requirementError }
+    if (powerCommand.kind === 'z-move') {
+      return { success: false, error: 'Arm Z-Move from the Powers section' }
+    }
 
     normalizedAttackType = undefined
 
@@ -97,10 +100,6 @@ export async function submitPvpTurn(
       if (powerCommand.formId) pendingPowers.dynamaxFormId = powerCommand.formId
     } else if (powerCommand.kind === 'tera') {
       pendingPowers.tera = true
-    } else if (powerCommand.kind === 'z-move') {
-      pendingPowers.zMove = false
-      pendingPowers.zMoveCharge = true
-      normalizedAttackType = 'power:z-move'
     }
   }
 

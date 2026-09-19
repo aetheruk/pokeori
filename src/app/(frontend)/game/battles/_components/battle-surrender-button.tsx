@@ -35,7 +35,7 @@ export function BattleSurrenderButton({
       <DialogTrigger asChild>
         {actionTrigger ? (
           <BattleActionTrigger
-            icon={<Flag className="size-5 text-game-clay-strong" aria-hidden />}
+            itemId="escape-rope"
             label="Flee"
             compact={compact}
             data-action="flee"

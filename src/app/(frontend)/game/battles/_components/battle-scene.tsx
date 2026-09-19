@@ -58,7 +58,7 @@ export function BattleScene({
   if (!activePlayerMon || !activeEnemyMon) return null
 
   return (
-    <div className="relative flex flex-[36] flex-col items-center justify-center bg-game-night-surface p-4 xl:col-start-1 xl:row-start-1 xl:min-h-0 xl:flex-none">
+    <div className="relative flex min-h-0 flex-[36] flex-col items-center justify-center bg-game-night-surface p-4">
       <BattleHeader
         battleState={battleState}
         activePlayerMon={activePlayerMon}

@@ -20,6 +20,8 @@ export interface AnimationState {
   doublesPokemon: Record<string, DoublesPokemonAnimation>
   playerAttacking: boolean
   enemyAttacking: boolean
+  playerStanceWinner: boolean
+  enemyStanceWinner: boolean
   playerHit: boolean
   enemyHit: boolean
   playerBoosting: boolean
@@ -40,6 +42,7 @@ export interface AnimationState {
 
 export interface DoublesPokemonAnimation {
   attacking?: boolean
+  stanceWinner?: boolean
   hit?: boolean
   boosting?: boolean
   fainting?: boolean
@@ -55,6 +58,8 @@ export const INITIAL_ANIMATION_STATE: AnimationState = {
   doublesPokemon: {},
   playerAttacking: false,
   enemyAttacking: false,
+  playerStanceWinner: false,
+  enemyStanceWinner: false,
   playerHit: false,
   enemyHit: false,
   playerBoosting: false,

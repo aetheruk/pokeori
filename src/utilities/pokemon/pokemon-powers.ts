@@ -173,6 +173,10 @@ export function getPokemonPowerForCommand(
   if (command.kind === 'z-move') return 'z-move'
   if (command.kind === 'dynamax') return 'dynamax'
   if (command.kind === 'dimensional-shift') return 'dimensional-shift'
+  if (command.kind === 'victory') return 'victory'
+  if (command.kind === 'weather') return 'weather'
+  if (command.kind === 'shout') return 'shout'
+  if (command.kind === 'circadian') return 'circadian'
   return null
 }
 
