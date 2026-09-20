@@ -42,7 +42,14 @@ import {
   type SkillGuideUnlock,
 } from '@/data/skills/guide'
 import { getTotalExpForLevel } from '@/data/skills/xp'
-import { banners, icons, titles } from '@/data/user'
+import {
+  banners,
+  getBanner,
+  getIcon,
+  getTitle,
+  icons,
+  titles,
+} from '@/data/user'
 import { getTrainerGender, type TrainerGender } from '@/utilities/trainer-appearance'
 import { cn } from '@/lib/utils'
 import {
@@ -439,6 +446,9 @@ export function TrainerLeveling({ saveCustomization = updateUserCustomization }:
   const availableIcons = icons.filter((icon) =>
     ((user as any)?.unlockedIcons || ['ditto', 'trainer-red', 'trainer-leaf']).includes(icon.id),
   )
+  const editorBanner = getBanner(selectedBanner || 'lab')
+  const editorIcon = getIcon(selectedIcon || 'ditto')
+  const editorTitle = getTitle(selectedTitle || 'new-beginnings')
 
   if (!user) return null
 
@@ -633,7 +643,17 @@ export function TrainerLeveling({ saveCustomization = updateUserCustomization }:
       <ResponsivePanel
         open={isCustomizeModalOpen}
         onOpenChange={(open) => { if (!isSaving) setIsCustomizeModalOpen(open) }}
-        title="Edit trainer card"
+        title={user.trainerName || 'Trainer'}
+        description={editorTitle?.name || 'New Beginnings'}
+        icon={
+          <TaskIconDisplay
+            icon={editorIcon?.icon || { type: 'pokemon', id: '132' }}
+            className="h-20 w-20 md:h-24 md:w-24"
+            priority
+          />
+        }
+        background={editorBanner?.imagePath || '/backgrounds/lab.avif'}
+        heroLabel="Edit trainer card"
         desktopBreakpoint="lg"
         desktopWidth="min(44vw, 560px)"
         className="flex flex-col overflow-hidden"
@@ -642,14 +662,6 @@ export function TrainerLeveling({ saveCustomization = updateUserCustomization }:
       >
         <div className="min-h-0 flex-1 overflow-y-auto p-4">
           <fieldset disabled={isSaving} className="min-w-0 space-y-4">
-            <TrainerCard
-              name={user.trainerName}
-              icon={selectedIcon || 'ditto'}
-              banner={selectedBanner || 'lab'}
-              title={selectedTitle || 'new-beginnings'}
-              className="h-48 w-full"
-            />
-
             <TrainerGenderPicker value={selectedGender} onChange={setSelectedGender} />
 
             <div className="space-y-2">

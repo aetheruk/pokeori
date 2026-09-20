@@ -95,7 +95,7 @@ for (const width of [390, 1280]) {
     await page.getByRole('button', { name: 'Test trainer settings', exact: true }).click()
     const edit = page.getByRole('button', { name: 'Customize trainer card', exact: true })
     await edit.click()
-    const editor = page.getByRole('dialog', { name: 'Edit trainer card', exact: true })
+    const editor = page.getByRole('dialog', { name: 'Test trainer', exact: true })
     await expect(editor.getByRole('radio', { name: 'Neither', exact: true })).toBeChecked()
     await editor.getByRole('radio', { name: 'Female', exact: true }).check()
     await editor.getByRole('button', { name: 'Cancel', exact: true }).click()
