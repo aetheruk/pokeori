@@ -50,7 +50,7 @@ import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBa
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { useUser } from '@/context/UserContext'
-import { getIcon } from '@/data/user'
+import { getBanner, getIcon } from '@/data/user'
 import type { TaskIcon } from '@/data/tasks/types'
 import { skills } from '@/data/skills'
 import { tcgSetSummaries } from '@/data/tcg/summaries'
@@ -122,7 +122,8 @@ export function TrainerDashboard({
       id: 'profile' as const,
       label: user?.trainerName || 'Trainer',
       description: 'Skills and trainer progress',
-      background: '/backgrounds/lab.avif',
+      background:
+        getBanner(user?.banner || 'lab')?.imagePath || '/backgrounds/lab.avif',
       component: (
         <LazyWrapper>
           <TrainerLeveling />

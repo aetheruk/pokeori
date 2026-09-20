@@ -10,7 +10,6 @@ import {
   Sparkles,
   Target,
   Timer,
-  X,
 } from 'lucide-react'
 import {
   type ReactNode,
@@ -35,9 +34,9 @@ import {
 import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { AppButton, Button } from '@/components/ui/app-button'
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { ItemSprite } from '@/components/ui/item-sprite'
+import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
 import {
@@ -301,6 +300,7 @@ function CraftDialogShell({
   title,
   subtitle,
   status,
+  open,
   onClose,
   completing,
   children,
@@ -309,42 +309,31 @@ function CraftDialogShell({
   title: string
   subtitle: string
   status: string
+  open: boolean
   onClose: () => void
   completing: boolean
   children: ReactNode
 }) {
   return (
-    <div className="game-paper-background relative overflow-hidden rounded-xl border border-game-border bg-game-surface text-game-ink shadow-sm">
-      <button
-        type="button"
-        onClick={onClose}
-        className="game-focus-ring absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-lg border border-game-border bg-game-surface-raised text-game-muted transition-colors hover:border-game-clay/45 hover:text-game-ink sm:right-4 sm:top-4"
-        disabled={completing}
-        aria-label="Close craft check"
-      >
-        <X className="h-4 w-4" />
-      </button>
-
-      <div className="relative p-5 sm:p-6">
-        <div className="mb-5 flex items-center gap-3 pr-10 sm:gap-4">
-          <div className="game-icon-orb h-16 w-16 shrink-0 border-game-charcoal/40 text-game-charcoal-strong sm:h-20 sm:w-20">
-            <RecipeOutputIcon
-              recipe={recipe}
-              className="h-12 w-12 object-contain sm:h-14 sm:w-14"
-            />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-game-ochre">
-              {title}
-            </div>
-            <h2 className="truncate font-display text-xl font-bold tracking-tight text-game-ink sm:text-2xl">
-              {recipe.name}
-            </h2>
-            <p className="mt-1 text-xs font-bold text-game-muted">{subtitle}</p>
-          </div>
-        </div>
-
-        <div className="mb-4 rounded-lg border border-game-border bg-game-surface-raised px-4 py-3">
+    <ResponsivePanel
+      open={open}
+      onOpenChange={(next) => !next && onClose()}
+      title={recipe.name}
+      description={subtitle}
+      background="/backgrounds/artisan-workshop.avif"
+      icon={
+        <RecipeOutputIcon
+          recipe={recipe}
+          className="h-16 w-16 object-contain md:h-20 md:w-20"
+        />
+      }
+      heroLabel={title}
+      showCloseButton={!completing}
+      dismissible={false}
+      className="game-paper-first game-paper-background bg-game-canvas text-game-ink"
+    >
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 p-4 pb-8 md:p-8">
+        <div className="border-y border-game-border/75 py-3">
           <div className="flex items-center justify-between gap-3 text-[10px] font-black uppercase tracking-widest">
             <span className="text-game-muted">Craft Check</span>
             <span className="text-game-ochre">{status}</span>
@@ -356,7 +345,7 @@ function CraftDialogShell({
 
         {children}
       </div>
-    </div>
+    </ResponsivePanel>
   )
 }
 
@@ -606,17 +595,11 @@ function HoldReleaseDialog({
   }).length
 
   return (
-    <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
-      <DialogContent
-        showCloseButton={false}
-        onInteractOutside={(event) => event.preventDefault()}
-        className="max-w-lg border-0 bg-transparent p-0 text-game-ink shadow-none"
-      >
-        <DialogTitle className="sr-only">Craft {recipe.name}</DialogTitle>
-        <CraftDialogShell
+    <CraftDialogShell
           recipe={recipe}
           title="Precise Craft"
           subtitle="Hit the target three times."
+          open={open}
           status={
             holding
               ? `Release · ${liveQuality}`
@@ -625,8 +608,8 @@ function HoldReleaseDialog({
           onClose={onClose}
           completing={completing}
         >
-          <div className="rounded-xl border border-game-border bg-game-surface-raised p-4 sm:p-5">
-            <div className="mb-4 flex items-center justify-between gap-3">
+          <div className="space-y-5">
+            <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-game-muted">
                 <Gauge className="h-4 w-4 text-game-ochre" />
                 Pressure
@@ -679,7 +662,7 @@ function HoldReleaseDialog({
                 if (event.key === ' ' || event.key === 'Enter') release()
               }}
               className={cn(
-                'game-focus-ring mt-5 flex h-28 w-full items-center justify-center rounded-xl border text-sm font-black uppercase tracking-[0.2em] transition-colors disabled:opacity-70',
+                'game-focus-ring flex h-28 w-full items-center justify-center rounded-xl border text-sm font-black uppercase tracking-[0.2em] transition-colors disabled:opacity-70',
                 holding
                   ? 'border-game-ochre bg-game-ochre/20 text-game-ink shadow-inner'
                   : 'border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90',
@@ -704,7 +687,7 @@ function HoldReleaseDialog({
                 </span>
               )}
             </button>
-            <div className="mt-4 flex justify-center gap-2">
+            <div className="flex justify-center gap-2">
               {[0, 1, 2].map((index) => {
                 const attempt = attempts[index]
                 const attemptTarget =
@@ -729,8 +712,6 @@ function HoldReleaseDialog({
             </div>
           </div>
         </CraftDialogShell>
-      </DialogContent>
-    </Dialog>
   )
 }
 
@@ -807,23 +788,17 @@ function CrushDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
-      <DialogContent
-        showCloseButton={false}
-        onInteractOutside={(event) => event.preventDefault()}
-        className="max-w-lg border-0 bg-transparent p-0 text-game-ink shadow-none"
-      >
-        <DialogTitle className="sr-only">Crush {recipe.name}</DialogTitle>
-        <CraftDialogShell
+    <CraftDialogShell
           recipe={recipe}
           title="Berry Crush"
           subtitle="Rapidly tap the press before the timer runs out."
+          open={open}
           status={started ? 'Tap fast' : 'Get ready'}
           onClose={onClose}
           completing={completing}
         >
-          <div className="rounded-xl border border-game-border bg-game-surface-raised p-4 sm:p-5">
-            <div className="mb-4 flex items-center justify-between gap-3">
+          <div className="space-y-5">
+            <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-game-muted">
                 <Timer className="h-4 w-4 text-game-ochre" />
                 Timer
@@ -847,7 +822,7 @@ function CrushDialog({
 
             <div
               className={cn(
-                'mt-4 rounded-2xl border p-4 text-center transition-colors',
+                'border-y py-4 text-center transition-colors',
                 quality === 'Perfect'
                   ? 'border-game-moss/45 bg-game-moss/10'
                   : quality === 'Good'
@@ -880,7 +855,7 @@ function CrushDialog({
               disabled={!started || finished || completing}
               onPointerDown={tap}
               className={cn(
-                'game-focus-ring mt-5 h-24 w-full rounded-xl border text-sm font-black uppercase tracking-[0.2em] transition-colors',
+                'game-focus-ring h-24 w-full rounded-xl border text-sm font-black uppercase tracking-[0.2em] transition-colors',
                 started
                   ? 'border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90'
                   : 'border-game-border bg-game-canvas text-game-muted',
@@ -897,8 +872,6 @@ function CrushDialog({
             </Button>
           </div>
         </CraftDialogShell>
-      </DialogContent>
-    </Dialog>
   )
 }
 
@@ -1021,23 +994,17 @@ function ScatterDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
-      <DialogContent
-        showCloseButton={false}
-        onInteractOutside={(event) => event.preventDefault()}
-        className="max-w-lg border-0 bg-transparent p-0 text-game-ink shadow-none"
-      >
-        <DialogTitle className="sr-only">Scatter {recipe.name}</DialogTitle>
-        <CraftDialogShell
+    <CraftDialogShell
           recipe={recipe}
           title="Scatter Craft"
           subtitle="Tap the scattered recipe parts before the timer runs out."
+          open={open}
           status={started ? 'Clear the parts' : 'Get ready'}
           onClose={onClose}
           completing={completing}
         >
-          <div className="rounded-xl border border-game-border bg-game-surface-raised p-4 sm:p-5">
-            <div className="mb-4 flex items-center justify-between gap-3">
+          <div className="space-y-5">
+            <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-game-muted">
                 <Timer className="h-4 w-4 text-game-ochre" />
                 Timer
@@ -1059,7 +1026,7 @@ function ScatterDialog({
               />
             </div>
 
-            <div className="relative mt-5 h-72 overflow-hidden rounded-xl border border-game-border bg-game-canvas">
+            <div className="relative h-72 overflow-hidden rounded-xl border border-game-border bg-game-canvas">
               {targets.map((target) => (
                 <button
                   key={target.id}
@@ -1098,7 +1065,7 @@ function ScatterDialog({
 
             <div
               className={cn(
-                'mt-4 rounded-2xl border p-4 text-center transition-colors',
+                'border-y py-4 text-center transition-colors',
                 quality === 'Perfect'
                   ? 'border-game-moss/45 bg-game-moss/10'
                   : quality === 'Good'
@@ -1127,14 +1094,12 @@ function ScatterDialog({
             </div>
 
             {completing || completedRef.current ? (
-              <div className="mt-4 flex h-10 items-center justify-center text-game-moss-strong">
+              <div className="flex h-10 items-center justify-center text-game-moss-strong">
                 <Loader2 className="h-5 w-5 animate-spin" />
               </div>
             ) : null}
           </div>
         </CraftDialogShell>
-      </DialogContent>
-    </Dialog>
   )
 }
 
@@ -1236,23 +1201,17 @@ export function BalanceDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
-      <DialogContent
-        showCloseButton={false}
-        onInteractOutside={(event) => event.preventDefault()}
-        className="max-w-lg border-0 bg-transparent p-0 text-game-ink shadow-none"
-      >
-        <DialogTitle className="sr-only">Balance {recipe.name}</DialogTitle>
-        <CraftDialogShell
+    <CraftDialogShell
           recipe={recipe}
           title="Scent Balance"
           subtitle="Lock each component when its meter enters the target zone."
+          open={open}
           status={started ? 'Lock in' : 'Get ready'}
           onClose={onClose}
           completing={completing}
         >
-          <div className="rounded-xl border border-game-border bg-game-surface-raised p-5">
-            <div className="mb-4 flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-game-muted">
+          <div className="space-y-5">
+            <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-game-muted">
               <span>Balance</span>
               <span
                 className={
@@ -1282,8 +1241,10 @@ export function BalanceDialog({
                   <div
                     key={`${stage}-${index}`}
                     className={cn(
-                      'rounded-lg border bg-game-surface p-3',
-                      isActive ? 'border-game-ochre' : 'border-game-border',
+                      'rounded-xl p-2',
+                      isActive
+                        ? 'bg-game-ochre/10 ring-1 ring-game-ochre'
+                        : 'ring-1 ring-transparent',
                     )}
                   >
                     <div className="relative h-36 overflow-hidden rounded-full border border-game-border bg-game-canvas">
@@ -1330,7 +1291,7 @@ export function BalanceDialog({
                 if (event.detail === 0) lockCurrent()
               }}
               className={cn(
-                'game-focus-ring mt-5 h-14 w-full touch-manipulation select-none rounded-xl border text-sm font-black uppercase tracking-[0.2em] transition-colors',
+                'game-focus-ring h-14 w-full touch-manipulation select-none rounded-xl border text-sm font-black uppercase tracking-[0.2em] transition-colors',
                 started
                   ? 'border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90'
                   : 'border-game-border bg-game-canvas text-game-muted',
@@ -1347,8 +1308,6 @@ export function BalanceDialog({
             </Button>
           </div>
         </CraftDialogShell>
-      </DialogContent>
-    </Dialog>
   )
 }
 
@@ -1489,23 +1448,17 @@ function MixDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
-      <DialogContent
-        showCloseButton={false}
-        onInteractOutside={(event) => event.preventDefault()}
-        className="max-w-lg border-0 bg-transparent p-0 text-game-ink shadow-none"
-      >
-        <DialogTitle className="sr-only">Mix {recipe.name}</DialogTitle>
-        <CraftDialogShell
+    <CraftDialogShell
           recipe={recipe}
           title="Potion Mix"
           subtitle="Spin the dial quickly until the mixture comes together."
+          open={open}
           status={started ? 'Spin the dial' : 'Get ready'}
           onClose={onClose}
           completing={completing}
         >
-          <div className="rounded-xl border border-game-border bg-game-surface-raised p-4 sm:p-5">
-            <div className="mb-4 flex items-center justify-between gap-3">
+          <div className="space-y-5">
+            <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-game-muted">
                 <Timer className="h-4 w-4 text-game-ochre" />
                 Timer
@@ -1531,7 +1484,7 @@ function MixDialog({
               ref={dialRef}
               onPointerDown={startMix}
               className={cn(
-                'mx-auto mt-5 flex aspect-square w-full max-w-64 touch-none items-center justify-center rounded-full border bg-game-canvas shadow-inner',
+                'mx-auto flex aspect-square w-full max-w-64 touch-none items-center justify-center rounded-full border bg-game-canvas shadow-inner',
                 started && !finished
                   ? 'cursor-grab border-game-ochre active:cursor-grabbing'
                   : 'border-game-border opacity-70',
@@ -1548,7 +1501,7 @@ function MixDialog({
 
             <div
               className={cn(
-                'mt-4 rounded-2xl border p-4 text-center transition-colors',
+                'border-y py-4 text-center transition-colors',
                 quality === 'Perfect'
                   ? 'border-game-moss/45 bg-game-moss/10'
                   : quality === 'Good'
@@ -1577,14 +1530,12 @@ function MixDialog({
             </div>
 
             {completing || completedRef.current ? (
-              <div className="mt-4 flex h-10 items-center justify-center text-game-moss-strong">
+              <div className="flex h-10 items-center justify-center text-game-moss-strong">
                 <Loader2 className="h-5 w-5 animate-spin" />
               </div>
             ) : null}
           </div>
         </CraftDialogShell>
-      </DialogContent>
-    </Dialog>
   )
 }
 
@@ -2075,6 +2026,22 @@ export function ArtisanPanel() {
 
                 const recipe = entry.recipe
                 const state = recipeStates.get(recipe.id)!
+                const bulkMultiplier = recipe.bulk
+                const bulkVisible =
+                  typeof bulkMultiplier === 'number' &&
+                  bulkMultiplier > 1 &&
+                  artisanLevel >=
+                    getArtisanCraftRequiredLevel(recipe, bulkMultiplier)
+                const bulkState = bulkVisible
+                  ? getRecipeState(
+                      recipe,
+                      artisanLevel,
+                      inventory,
+                      currency,
+                      gameData,
+                      bulkMultiplier,
+                    )
+                  : undefined
                 return (
                   // biome-ignore lint/a11y/useSemanticElements: The keyboard-accessible card contains separate crafting controls that cannot be nested in a button.
                   <div
@@ -2156,6 +2123,29 @@ export function ArtisanPanel() {
                           <Hammer className="h-4 w-4" />
                         )}
                       </Button>
+                      {bulkVisible && bulkMultiplier ? (
+                        <Button
+                          type="button"
+                          size="icon-sm"
+                          variant={
+                            bulkState?.canCraft ? 'secondary' : 'outline'
+                          }
+                          disabled={
+                            !bulkState?.canCraft ||
+                            loadingRecipe === recipe.id ||
+                            completingCraft
+                          }
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            startCraft(recipe, bulkMultiplier)
+                          }}
+                          className="h-10 w-10 rounded-lg px-0 text-[11px] font-black"
+                          aria-label={`Craft ${recipe.name} x${bulkMultiplier}`}
+                          title={`Craft ${recipe.name} x${bulkMultiplier}`}
+                        >
+                          x{bulkMultiplier}
+                        </Button>
+                      ) : null}
                     </div>
                   </div>
                 )
