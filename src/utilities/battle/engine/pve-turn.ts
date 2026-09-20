@@ -52,6 +52,7 @@ import {
 import { applyBattleFormChange } from '@/utilities/battle/stats-calc'
 import { processBattleAbilityLowHpSelfSwitch } from '@/utilities/battle/switching'
 import { applyRepeatedHitDamage } from '@/utilities/battle/multi-hit'
+import { recordPokemonSuperEffectiveHit } from '@/utilities/battle/pokemon-metrics'
 
 export interface PveTurnMultipliers {
   resolution: StanceResult
@@ -515,6 +516,12 @@ export function applyPveDamageExchange(params: {
     : { damage: 0, messages: [] }
   const playerTotalDamage = playerDamageResult.damage + playerExtraHit.damage
   const enemyTotalDamage = enemyDamageResult.damage + enemyExtraHit.damage
+  if (params.state && playerTotalDamage > 0 && (playerTypeEffectiveness ?? 1) > 1) {
+    recordPokemonSuperEffectiveHit(params.state, playerMon)
+  }
+  if (params.state && enemyTotalDamage > 0 && (enemyTypeEffectiveness ?? 1) > 1) {
+    recordPokemonSuperEffectiveHit(params.state, enemyMon)
+  }
   const enemyLowHpSwitch = params.state
     ? processBattleAbilityLowHpSelfSwitch({
         state: params.state,
@@ -833,6 +840,9 @@ export function applyPveEnemyDamage(params: {
       })
     : { damage: 0, messages: [] }
   const totalDamage = enemyDamageResult.damage + extraHit.damage
+  if (params.state && totalDamage > 0 && (enemyTypeEffectiveness ?? 1) > 1) {
+    recordPokemonSuperEffectiveHit(params.state, enemyMon)
+  }
   const playerLowHpSwitch = params.state
     ? processBattleAbilityLowHpSelfSwitch({
         state: params.state,

@@ -79,6 +79,10 @@ import {
   getSketchableOpponentMoveIds,
   SKETCH_MOVE_ID,
 } from '@/utilities/pokemon/sketch'
+import {
+  recordPokemonMoveUse,
+  recordPokemonStanceResult,
+} from '@/utilities/battle/pokemon-metrics'
 
 export interface PvpMove {
   actions?: DoublesAction[]
@@ -535,6 +539,21 @@ export async function resolvePvpTurn(
     }
   }
 
+  if (p1Resolution.stanceResult) {
+    recordPokemonMoveUse(state, p1Mon)
+    recordPokemonStanceResult(state, p1Mon, p1Resolution.stanceResult)
+  } else if (
+    p1Committed &&
+    p2Resolution.stanceResult &&
+    p2Resolution.preventsOpponentDamage
+  ) {
+    recordPokemonStanceResult(
+      state,
+      p1Mon,
+      invertBattleResult(p2Resolution.stanceResult),
+    )
+  }
+
   if (p2Resolution.didAttack && p2Resolution.usedType) {
     const specialMove = p2Move.specialMoveId
       ? getMove(p2Move.specialMoveId)
@@ -555,6 +574,22 @@ export async function resolvePvpTurn(
         attackType: p2Resolution.usedType,
       })
     }
+  }
+
+  if (p2Resolution.stanceResult) {
+    recordPokemonMoveUse(state, p2Mon)
+    recordPokemonStanceResult(state, p2Mon, p2Resolution.stanceResult)
+  } else if (
+    p2Committed &&
+    p1Resolution.stanceResult &&
+    p1Resolution.preventsOpponentDamage
+  ) {
+    // A stance-losing counter can be prevented before its attack resolver runs.
+    recordPokemonStanceResult(
+      state,
+      p2Mon,
+      invertBattleResult(p1Resolution.stanceResult),
+    )
   }
 
   const sketchFailures = [

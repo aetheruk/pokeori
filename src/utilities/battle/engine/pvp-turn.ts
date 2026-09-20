@@ -131,6 +131,7 @@ import {
 } from '@/utilities/battle/switching'
 import { getTerrainMoveBlockMessage } from '@/utilities/battle/terrain-effects'
 import { applyRepeatedHitDamage } from '@/utilities/battle/multi-hit'
+import { recordPokemonSuperEffectiveHit } from '@/utilities/battle/pokemon-metrics'
 
 type MoveSecondaryStatus = NonNullable<MoveConfig['secondaryStatuses']>[number]
 
@@ -272,6 +273,8 @@ export interface PvpCombatResolution {
   didAttack: boolean
   dmg: number
   result: BattleTurnResult
+  /** Stance contest result when the action reached the combat resolver. */
+  stanceResult?: BattleTurnResult
   message: string
   usedType?: string
   preventsOpponentDamage?: boolean
@@ -909,6 +912,7 @@ export function resolvePvpCombat(params: {
           attacker,
           damage: delayedAbilityResult?.damage ?? nextDamage.damage,
           attackType: damageResult.usedType,
+          isSuperEffective: damageResult.isSuperEffective,
         })
       : undefined
   const repeatedHitResult = delayedDamageMessage
@@ -1573,12 +1577,16 @@ export function resolvePvpCombat(params: {
   const effectivenessMessage = formatTypeEffectivenessMessage(damageResult)
   if (isZMove && !moveFailed && !moveMissed) consumeZMoveCharge(attacker)
   const finalDamage = moveMissed ? 0 : totalDamage
+  if (state && finalDamage > 0 && damageResult.isSuperEffective) {
+    recordPokemonSuperEffectiveHit(state, attacker)
+  }
   const targetSuffix = params.targetName ? ` on ${params.targetName}` : ''
   const baseMessage = `${metronomeMessage}${attackerName}: ${attacker.name} uses ${attackLabel}${targetSuffix}! [icon:stance:${moveStance}] [icon:type:${damageResult.usedType}]`
   return {
     didAttack: !moveFailed,
     dmg: finalDamage,
     result: outcome.result,
+    stanceResult: outcome.result,
     usedType: moveMissed ? undefined : damageResult.usedType,
     message: moveMissed
       ? `${baseMessage} missed!${effectMessage}`

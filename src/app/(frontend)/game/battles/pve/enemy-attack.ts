@@ -2,6 +2,7 @@ import {
   resolveBeforeMoveStatus,
   applyStatus,
   formatTypeEffectivenessMessage,
+  resolveStance,
 } from '@/utilities/battle/battle-logic'
 import { getMove, type MoveConfig } from '@/data/moves'
 import type {
@@ -64,6 +65,10 @@ import {
 import { resolveMoveContest } from '@/utilities/battle/move-contest'
 import { createBattleTurnTimer } from '../helpers/timing'
 import { normalizeResolvedBattleAction } from '@/utilities/battle/engine/battle-action'
+import {
+  recordPokemonMoveUse,
+  recordPokemonStanceResult,
+} from '@/utilities/battle/pokemon-metrics'
 
 function rollEnemyContinuousTurnCount(
   continuous: MoveConfig['continuous'] | undefined,
@@ -169,6 +174,11 @@ export async function processEnemyAttackOnly(
   let enemyStance: BattleStance = 'tech'
   let enemyChargeMsg = ''
   let enemyLockedMoveAction = false
+  const playerStanceForMetrics =
+    playerStanceOverride ??
+    (state.history[0]?.turn === state.turn
+      ? state.history[0]?.playerStance
+      : undefined)
 
   if (activeEnemyMoveLock?.type === 'charge' && activeEnemyMoveLock.remainingTurns > 0) {
     activeEnemyMoveLock.remainingTurns = Math.max(0, activeEnemyMoveLock.remainingTurns - 1)
@@ -339,6 +349,14 @@ export async function processEnemyAttackOnly(
     }
 
     if (enemyCanMove && enemyAiMove) {
+      recordPokemonMoveUse(state, activeEnemy)
+      if (playerStanceForMetrics) {
+        recordPokemonStanceResult(
+          state,
+          activeEnemy,
+          resolveStance(enemyStance, playerStanceForMetrics).result,
+        )
+      }
       const chargedTurns = enemyAiMove.move.charged ?? 0
       consumePokemonMoveUse(activeEnemy, {
         moveUsesRemaining: state.enemyMoveUsesRemaining ?? 0,
@@ -400,6 +418,17 @@ export async function processEnemyAttackOnly(
     moveChoice: enemyAiMove,
     isLockedMoveAction: enemyLockedMoveAction,
   })
+
+  if (enemyCanMove && !enemySwapped && !trainerItemResult.used) {
+    recordPokemonMoveUse(state, activeEnemy)
+    if (playerStanceForMetrics) {
+      recordPokemonStanceResult(
+        state,
+        activeEnemy,
+        resolveStance(enemyStance, playerStanceForMetrics).result,
+      )
+    }
+  }
 
   let { enemyDamage, shieldMessage, enemyDamageResult } =
     resolvePveEnemyOnlyAttack({
@@ -515,6 +544,7 @@ export async function processEnemyAttackOnly(
             attacker: activeEnemy,
             damage: enemyDamage,
             attackType: enemyDamageResult.usedType,
+            isSuperEffective: enemyDamageResult.isSuperEffective,
           }) || ''
         enemyDamage = 0
       }

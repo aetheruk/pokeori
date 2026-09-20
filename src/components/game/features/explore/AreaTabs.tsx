@@ -2,10 +2,13 @@ import { ScenicChoiceCard } from '@/components/game/shared/ScenicChoiceCard'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { subCategories as subCategoryDataMap } from '@/data/sub-region-map'
+import type { TaskIcon } from '@/data/tasks/types'
 
 interface AreaTabsProps {
   areaModalOpen: boolean
   setAreaModalOpen: (open: boolean) => void
+  trainerBackground: string
+  trainerIcon: TaskIcon
   activeCategory: string
   activeSubCategory: string
   subCategories: string[]
@@ -19,6 +22,8 @@ interface AreaTabsProps {
 export function AreaTabs({
   areaModalOpen,
   setAreaModalOpen,
+  trainerBackground,
+  trainerIcon,
   activeCategory,
   activeSubCategory,
   subCategories,
@@ -32,7 +37,14 @@ export function AreaTabs({
       open={areaModalOpen}
       onOpenChange={setAreaModalOpen}
       title="Choose an area"
-      description="Select a local route or landmark."
+      background={trainerBackground}
+      icon={
+        <TaskIconDisplay
+          icon={trainerIcon}
+          className="h-20 w-20 text-white md:h-24 md:w-24"
+          priority
+        />
+      }
       desktopWidth="min(38vw, 520px)"
       mobileHeader={false}
       headerClassName="pr-0 text-center sm:text-center"

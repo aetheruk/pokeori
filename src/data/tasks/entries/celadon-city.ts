@@ -1817,7 +1817,7 @@ export const celadonCityTasks: Task[] = [
       {
         "type": "currency_owned",
         "targetId": "pokedollars",
-        "count": 1000,
+        "count": 2000,
         "consume": true
       }
     ],
@@ -1867,7 +1867,7 @@ export const celadonCityTasks: Task[] = [
       {
         "type": "currency_owned",
         "targetId": "pokedollars",
-        "count": 5000,
+        "count": 10000,
         "consume": true
       }
     ],

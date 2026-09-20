@@ -236,6 +236,7 @@ export interface BattleDelayedDamageEntry {
   turnsRemaining: number
   damage: number
   attackType?: string
+  isSuperEffective?: boolean
 }
 
 // Powers state for tracking special battle mechanics
@@ -452,6 +453,21 @@ export interface BattleState {
   }
   pokemonBattleKOs?: Record<string, number>
   pokemonBattleKOsPersisted?: boolean
+  /** Battle-local counters for each persistent owned Pokémon involved. */
+  pokemonBattleMetrics?: Record<
+    string,
+    Partial<{
+      superEffectiveHitsLanded: number
+      stanceVictories: number
+      stanceLosses: number
+      battleKOs: number
+      timesKOd: number
+      movesUsed: number
+    }>
+  >
+  /** Idempotency keys for faint metrics emitted more than once by a turn. */
+  pokemonBattleMetricEvents?: Record<string, true>
+  pokemonBattleMetricsPersisted?: boolean
   heldItemsSettled?: boolean
   heldItemChargeRewards?: {
     ownerId: string

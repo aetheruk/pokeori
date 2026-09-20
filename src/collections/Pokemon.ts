@@ -239,6 +239,57 @@ export const Pokemon: CollectionConfig = {
       },
     },
     {
+      name: 'superEffectiveHitsLanded',
+      type: 'number',
+      label: 'Super Effective Hits Landed',
+      defaultValue: 0,
+      min: 0,
+      admin: {
+        description:
+          'Number of damaging super effective hits this Pokemon has landed in battles.',
+      },
+    },
+    {
+      name: 'stanceVictories',
+      type: 'number',
+      label: 'Stance Victories',
+      defaultValue: 0,
+      min: 0,
+      admin: {
+        description: 'Number of stance decisions this Pokemon has won.',
+      },
+    },
+    {
+      name: 'stanceLosses',
+      type: 'number',
+      label: 'Stance Losses',
+      defaultValue: 0,
+      min: 0,
+      admin: {
+        description: 'Number of stance decisions this Pokemon has lost.',
+      },
+    },
+    {
+      name: 'timesKOd',
+      type: 'number',
+      label: 'Times Knocked Out',
+      defaultValue: 0,
+      min: 0,
+      admin: {
+        description: 'Number of times this Pokemon has been knocked out in battle.',
+      },
+    },
+    {
+      name: 'movesUsed',
+      type: 'number',
+      label: 'Moves Used',
+      defaultValue: 0,
+      min: 0,
+      admin: {
+        description: 'Number of battle move actions used by this Pokemon.',
+      },
+    },
+    {
       name: 'stats',
       type: 'group',
       fields: [
