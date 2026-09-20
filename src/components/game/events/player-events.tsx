@@ -1,12 +1,13 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { getPlayerEvents } from '@/utilities/events/actions'
 import { ExploreCard } from '@/components/game/features/explore/ExploreCard'
+import type { ExploreItem } from '@/components/game/features/explore/types'
+import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { SectionDivider } from '@/components/ui/section-divider'
+import { getPlayerEvents } from '@/utilities/events/actions'
 import type { RequirementData } from '@/utilities/requirements'
-import type { ExploreItem } from '@/components/game/features/explore/types'
 
 export function usePlayerEvents() {
   const [data, setData] = useState<Awaited<
@@ -134,7 +135,16 @@ export function PlayerEventsCard({
         open={open}
         onOpenChange={setOpen}
         title="Active Events"
-        headerClassName="!items-center !text-center !pr-5"
+        background={item.originalData.background}
+        icon={
+          <TaskIconDisplay
+            icon={item.icon}
+            className="h-20 w-20 md:h-24 md:w-24"
+            priority
+          />
+        }
+        heroLabel="Events"
+        headerClassName="pr-0 text-center sm:text-center"
         className="flex flex-col overflow-hidden"
       >
         <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-4 pb-8 md:p-6">
