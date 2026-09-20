@@ -32,6 +32,10 @@ import { clearDynamaxState } from './dynamax'
 import { preparePvpCombatAction, resolvePvpCombat, resolvePvpMoveAttackType, type PvpQueuedMoveForPowerUse } from './engine/pvp-turn'
 import { getDoublesAccuracyMultiplier, getDoublesDamageMultiplier, getDoublesPartnerPriorityBlock, isDoublesCommanderInactive, processDoublesPartnerEntry, processDoublesPartnerItemTransfer, processDoublesPartnerProtection, processDoublesPartnerTurnEnd, releaseDoublesCommander } from './doubles-abilities'
 import { SKETCH_MOVE_ID } from '@/utilities/pokemon/sketch'
+import {
+  recordPokemonMoveUse,
+  recordPokemonStanceResult,
+} from '@/utilities/battle/pokemon-metrics'
 
 export type DoublesSpecialAction = (params: { state: BattleState; side: DoublesSide; slot: DoublesSlot; actor: BattlePokemon; action: Extract<DoublesAction, {kind:'item'|'power'}>; emitEvent: (event: BattlePresentationEvent) => void; random: () => number }) => string
 
@@ -283,6 +287,7 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
     events.push(phaseEvent)
   }
   let phaseActors = new Set<string>()
+  const stanceRecorded = new Set<string>()
   let phaseActions: Partial<Record<DoublesSide, DoublesAction>> = {}
   let phaseActorIndices: Partial<Record<DoublesSide, number>> = {}
   for (let actionPosition=0;actionPosition<all.length;actionPosition++) {
@@ -368,6 +373,9 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
       }
       continue
     }
+    // Count one move action for the actor even when it is an effect-only move
+    // or has no valid target. A doubles action is still one use.
+    recordPokemonMoveUse(state, actor)
     if (move?.id==='helping-hand') {
       const partner=getDoublesPokemon(state,side,currentSlot===0?1:0)
       if(partner?.currentHp) {partner.nextDamageModifier={percent:50,remainingUses:1,sourceMoveName:'Helping Hand'};messages.push(`${actor.name} gave ${partner.name} a Helping Hand!`)}
@@ -461,6 +469,11 @@ export function resolveDoublesTurn(state: BattleState, playerActions: DoublesAct
         try {
           if(move) messages.push(...applyBattleAbilityOpposingMoveUseDepletion({state,attackerSide:side,attacker:actor,defender:target,move}))
           const combat=resolvePvpCombat({state,attacker:actor,defender:target,move:queued,attackerName:side==='player'?state.playerName:state.enemyName,attackerSide:side,playerMove:side==='player'?queued:{stance:targetDefensiveStance},enemyMove:side==='enemy'?queued:{stance:targetDefensiveStance},currentTurn:state.turn,random,weather:state.weather?.weather,eligibility,targetName:target.name,doublesAccuracyMultiplier:getDoublesAccuracyMultiplier(state,side,currentSlot),doublesDamageModifier:(damage,type,attackStance)=>damage*getDoublesDamageMultiplier(state,side,currentSlot,t.side,t.slot,attackStance,type)})
+          const stanceMetricKey = `${side}:${index}`
+          if (combat.stanceResult && !stanceRecorded.has(stanceMetricKey)) {
+            stanceRecorded.add(stanceMetricKey)
+            recordPokemonStanceResult(state, actor, combat.stanceResult)
+          }
           if (move?.id === SKETCH_MOVE_ID && !sketchOpponent) {
             sketchOpponent = target
             sketchSucceeded = combat.didAttack && !!combat.usedType

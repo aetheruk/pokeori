@@ -174,6 +174,11 @@ import {
   getStanceBasePower,
 } from '@/utilities/battle/z-move'
 import {
+  recordPokemonMoveUse,
+  recordPokemonStanceResult,
+  recordPokemonSuperEffectiveHit,
+} from '@/utilities/battle/pokemon-metrics'
+import {
   createBasicAttackMove,
   getBasicAttackMoveId,
   normalizeBattleAction,
@@ -704,6 +709,10 @@ export async function useMove(
       return { success: true, state }
     }
 
+    // A move action counts once it passes the pre-move status/ability checks,
+    // including charged, missed, and otherwise unsuccessful attacks.
+    recordPokemonMoveUse(state, playerMon)
+
     if (
       !isLockedMoveAction &&
       typeof move.charged === 'number' &&
@@ -1163,6 +1172,7 @@ export async function useMove(
     let moveMissed = false
     let playerDamage = 0
     let playerAttackTypeForLog: string | undefined
+    let playerSuperEffective = false
 
     if (!doesBattleMoveHit(accuracy)) {
       moveMissed = true
@@ -1302,6 +1312,7 @@ export async function useMove(
             terrain: state.terrain?.terrain,
           },
         )
+        playerSuperEffective = result.isSuperEffective
 
         const shieldResult = handleShieldInteraction(
           enemyMon,
@@ -1399,6 +1410,7 @@ export async function useMove(
             attacker: playerMon,
             damage: playerDamage,
             attackType: result.usedType,
+            isSuperEffective: result.isSuperEffective,
           })
           if (delayedMessage) message += `\n${delayedMessage}`
           playerDamage = 0
@@ -1438,6 +1450,9 @@ export async function useMove(
           playerDamage += playerExtraHit.damage
           if (playerExtraHit.messages.length) {
             message += `\n${playerExtraHit.messages.join('\n')}`
+          }
+          if (playerDamage > 0 && playerSuperEffective) {
+            recordPokemonSuperEffectiveHit(state, playerMon)
           }
           const enemyLowHpSwitch = processBattleAbilityLowHpSelfSwitch({
             state,
@@ -1856,6 +1871,7 @@ export async function useMove(
     let enemyDamage = 0
     let enemyAttackTypeForLog: string | undefined
     let enemyStanceForLog = enemyStance
+    let enemySuperEffective = false
     let continuousInterrupted = false
     let enemyMoveInterrupted = false
     let enemyMoveMissed = false
@@ -1873,6 +1889,16 @@ export async function useMove(
       !enemyRechargeMsg &&
       !trainerItemResult.skipsEnemyAction
     let enemyStatusMsg = ''
+
+    if (preventEnemyCounter && !enemySwapped && !trainerItemResult.used) {
+      const enemyStanceOutcome =
+        resolution.result === 'win'
+          ? 'loss'
+          : resolution.result === 'loss'
+            ? 'win'
+            : 'tie'
+      recordPokemonStanceResult(state, enemyMon, enemyStanceOutcome)
+    }
 
     logger.debug(
       `Enemy Check: Status=${enemyMon.status?.id}, Counter=${enemyMon.status?.counter}`,
@@ -1907,6 +1933,26 @@ export async function useMove(
       } else if (enemySecondaryStatusCheck.message) {
         enemyStatusMsg = `\n${enemySecondaryStatusCheck.message}`
       }
+    }
+
+    if (
+      (enemyCanMove || preventEnemyCounter) &&
+      !enemySwapped &&
+      !trainerItemResult.used
+    ) {
+      recordPokemonStanceResult(state, playerMon, stanceOutcome)
+    }
+
+    if (enemyCanMove && !enemySwapped && !trainerItemResult.used) {
+      const enemyStanceOutcome = enemyContest?.configured
+        ? enemyContest.result
+        : resolution.result === 'win'
+          ? 'loss'
+          : resolution.result === 'loss'
+            ? 'win'
+            : 'tie'
+      recordPokemonMoveUse(state, enemyMon)
+      recordPokemonStanceResult(state, enemyMon, enemyStanceOutcome)
     }
 
     if (enemyCanMove && !enemyBattleAction.isBasicAttack) {
@@ -1976,6 +2022,7 @@ export async function useMove(
         }),
         { currentTurn: state.turn, terrain: state.terrain?.terrain },
       )
+      enemySuperEffective = enemyDamageResult.isSuperEffective
 
       let enemyAiEffectMessages: string[] = []
       enemyMoveMissed = false
@@ -2117,6 +2164,7 @@ export async function useMove(
               terrain: state.terrain?.terrain,
             },
           )
+          enemySuperEffective = enemyDamageResult.isSuperEffective
           if (enemyBattleAction.fixedDamage !== undefined) {
             enemyDamageResult = {
               ...enemyDamageResult,
@@ -2238,6 +2286,9 @@ export async function useMove(
         enemyDamage += enemyExtraHit.damage
         if (enemyExtraHit.messages.length) {
           message += `\n${enemyExtraHit.messages.join('\n')}`
+        }
+        if (enemyDamage > 0 && enemySuperEffective) {
+          recordPokemonSuperEffectiveHit(state, enemyMon)
         }
         const playerLowHpSwitch = processBattleAbilityLowHpSelfSwitch({
           state,

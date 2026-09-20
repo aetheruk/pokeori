@@ -4917,6 +4917,18 @@ describe('static data references', () => {
         label: 'Set an active companion',
       })
     }
+    expect(massage?.criteria).toContainEqual({
+      type: 'currency_owned',
+      targetId: 'pokedollars',
+      count: 2000,
+      consume: true,
+    })
+    expect(analysis?.criteria).toContainEqual({
+      type: 'currency_owned',
+      targetId: 'pokedollars',
+      count: 10000,
+      consume: true,
+    })
 
     for (const item of recipeCounter?.items || []) {
       expect(item.stock).toBe(1)

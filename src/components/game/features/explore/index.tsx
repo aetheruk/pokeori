@@ -7,6 +7,8 @@ import { useAudio } from '@/context/AudioContext'
 import { GamePageSkeleton } from '@/components/game/shared/GamePageSkeleton'
 import { useStoryStateStore } from '@/app/(frontend)/store/story-state-store'
 import { cn } from '@/lib/utils'
+import { getBanner, getIcon } from '@/data/user'
+import type { TaskIcon } from '@/data/tasks/types'
 
 // Hooks
 import { useExploreState } from './hooks/useExploreState'
@@ -209,6 +211,13 @@ function ExploreListContent({
   }, [currentMusic, updateMusic, isSubCategoryLoaded])
 
   const extendedUser = userData.user as unknown as ExtendedUser
+  const trainerBackground =
+    getBanner(extendedUser.banner || 'lab')?.imagePath || '/backgrounds/lab.avif'
+  const trainerIcon: TaskIcon =
+    getIcon(extendedUser.icon || 'ditto')?.icon || {
+      type: 'pokemon',
+      id: '132',
+    }
   const activeVoyages = ((userData.user as any).activeVoyages || []) as {
     voyageId: string
     endTime: string
@@ -420,6 +429,8 @@ function ExploreListContent({
         <CategoryTabs
           regionModalOpen={regionModalOpen}
           setRegionModalOpen={setRegionModalOpen}
+          trainerBackground={trainerBackground}
+          trainerIcon={trainerIcon}
           regionCategories={regionCategories}
           categories={categories}
           activeCategory={activeCategory}
@@ -430,6 +441,8 @@ function ExploreListContent({
         <AreaTabs
           areaModalOpen={areaModalOpen}
           setAreaModalOpen={setAreaModalOpen}
+          trainerBackground={trainerBackground}
+          trainerIcon={trainerIcon}
           activeCategory={areaSelectorLocation.category}
           activeSubCategory={areaSelectorLocation.subCategory}
           subCategories={areaSelectorSubCategories}

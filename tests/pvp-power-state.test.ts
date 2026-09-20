@@ -84,6 +84,16 @@ describe('PVP power state', () => {
     )
     expect(state.pvpPowers?.['player-1'].stanceWinCharges).toBe(1)
     expect(state.pvpPowers?.['player-2'].stanceWinCharges).toBe(1)
+    expect(state.pokemonBattleMetrics?.['p1-mon']).toMatchObject({
+      movesUsed: 2,
+      stanceVictories: 1,
+      stanceLosses: 1,
+    })
+    expect(state.pokemonBattleMetrics?.['p2-mon']).toMatchObject({
+      movesUsed: 2,
+      stanceVictories: 1,
+      stanceLosses: 1,
+    })
   })
 
   test('rejects the old turn-queued Z-Move activation path', async () => {

@@ -538,6 +538,26 @@ export interface Pokemon {
    * Number of opposing Pokemon this Pokemon has knocked out in battles.
    */
   battleKOs?: number | null;
+  /**
+   * Number of damaging super effective hits this Pokemon has landed in battles.
+   */
+  superEffectiveHitsLanded?: number | null;
+  /**
+   * Number of stance decisions this Pokemon has won.
+   */
+  stanceVictories?: number | null;
+  /**
+   * Number of stance decisions this Pokemon has lost.
+   */
+  stanceLosses?: number | null;
+  /**
+   * Number of times this Pokemon has been knocked out in battle.
+   */
+  timesKOd?: number | null;
+  /**
+   * Number of battle move actions used by this Pokemon.
+   */
+  movesUsed?: number | null;
   stats?: {
     hp?: number | null;
     attack?: number | null;
@@ -1364,6 +1384,11 @@ export interface PokemonSelect<T extends boolean = true> {
   fusedIntoPokemonId?: T;
   level?: T;
   battleKOs?: T;
+  superEffectiveHitsLanded?: T;
+  stanceVictories?: T;
+  stanceLosses?: T;
+  timesKOd?: T;
+  movesUsed?: T;
   stats?:
     | T
     | {

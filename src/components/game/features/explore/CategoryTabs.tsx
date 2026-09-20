@@ -7,6 +7,8 @@ import type { TaskIcon } from '@/data/tasks/types'
 interface CategoryTabsProps {
   regionModalOpen: boolean
   setRegionModalOpen: (open: boolean) => void
+  trainerBackground: string
+  trainerIcon: TaskIcon
   regionCategories: Record<
     string,
     {
@@ -23,6 +25,8 @@ interface CategoryTabsProps {
 export function CategoryTabs({
   regionModalOpen,
   setRegionModalOpen,
+  trainerBackground,
+  trainerIcon,
   regionCategories,
   categories,
   activeCategory,
@@ -33,7 +37,14 @@ export function CategoryTabs({
       open={regionModalOpen}
       onOpenChange={setRegionModalOpen}
       title="Choose a region"
-      description="Open a field journal section to explore."
+      background={trainerBackground}
+      icon={
+        <TaskIconDisplay
+          icon={trainerIcon}
+          className="h-20 w-20 text-white md:h-24 md:w-24"
+          priority
+        />
+      }
       desktopWidth="min(38vw, 520px)"
       mobileHeader={false}
       headerClassName="pr-0 text-center sm:text-center"

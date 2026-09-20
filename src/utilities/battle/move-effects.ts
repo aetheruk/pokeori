@@ -69,6 +69,7 @@ import {
 } from './abilities'
 import { processBattleAbilitySwitchOut } from './switching'
 import { removeShoutBoostFromStatStages } from './shout-effects'
+import { recordPokemonSuperEffectiveHit } from './pokemon-metrics'
 
 const CALLABLE_MOVE_EXCLUSIONS = new Set(['metronome'])
 
@@ -698,6 +699,23 @@ export function recordSwitchingOutThisTurn(params: {
   }
 }
 
+/**
+ * Return a stable per-battle key for a target, including generated doubles
+ * projections that do not have a persisted Pokemon id.
+ */
+export function getBattleDamagePokemonKey(
+  state: BattleState | undefined,
+  side: BattleSide,
+  pokemon: BattlePokemon | undefined,
+): string | undefined {
+  if (!pokemon) return undefined
+  if (pokemon.id) return pokemon.id
+  if (!state) return undefined
+  const team = side === 'player' ? state.playerTeam : state.enemyTeam
+  const index = team.indexOf(pokemon)
+  return index >= 0 ? `${side}:${index}` : undefined
+}
+
 export function recordBattleDamage(params: {
   state?: BattleState
   sourceSide: BattleSide
@@ -717,8 +735,14 @@ export function recordBattleDamage(params: {
   state.moveHistory.damage.lastTakenByPokemon ??= {}
   state.moveHistory.damage.lastTakenBySide ??= {}
 
+  const targetPokemonKey = getBattleDamagePokemonKey(
+    state,
+    params.targetSide,
+    targetPokemon,
+  )
+
   const entry: BattleDamageHistoryEntry = {
-    id: `${state.turn}:${params.sourceSide}:${params.targetSide}:${params.move?.id ?? 'attack'}:${params.sourcePokemon?.id ?? params.sourcePokemonId ?? 'unknown'}:${targetPokemon.id ?? params.targetSide}`,
+    id: `${state.turn}:${params.sourceSide}:${params.targetSide}:${params.move?.id ?? 'attack'}:${params.sourcePokemon?.id ?? params.sourcePokemonId ?? 'unknown'}:${targetPokemonKey ?? params.targetSide}`,
     sourceSide: params.sourceSide,
     targetSide: params.targetSide,
     sourcePokemonId: params.sourcePokemon?.id ?? params.sourcePokemonId,
@@ -730,8 +754,8 @@ export function recordBattleDamage(params: {
     attackType: params.attackType,
   }
 
-  if (targetPokemon.id) {
-    state.moveHistory.damage.lastTakenByPokemon[targetPokemon.id] = entry
+  if (targetPokemonKey) {
+    state.moveHistory.damage.lastTakenByPokemon[targetPokemonKey] = entry
   }
   state.moveHistory.damage.lastTakenBySide[params.targetSide] = entry
 }
@@ -742,8 +766,11 @@ function getLastDamageTakenByPokemon(
   side?: BattleSide,
 ): BattleDamageHistoryEntry | undefined {
   if (!state) return undefined
-  const byPokemon = pokemon.id
-    ? state.moveHistory?.damage?.lastTakenByPokemon?.[pokemon.id]
+  const pokemonKey = side
+    ? getBattleDamagePokemonKey(state, side, pokemon)
+    : pokemon.id
+  const byPokemon = pokemonKey
+    ? state.moveHistory?.damage?.lastTakenByPokemon?.[pokemonKey]
     : undefined
   return (
     byPokemon ??
@@ -758,11 +785,14 @@ function consumeLastDamageTakenByPokemon(
   entry: BattleDamageHistoryEntry,
 ): void {
   if (!state?.moveHistory?.damage) return
+  const pokemonKey = side
+    ? getBattleDamagePokemonKey(state, side, pokemon)
+    : pokemon.id
   if (
-    pokemon.id &&
-    state.moveHistory.damage.lastTakenByPokemon?.[pokemon.id]?.id === entry.id
+    pokemonKey &&
+    state.moveHistory.damage.lastTakenByPokemon?.[pokemonKey]?.id === entry.id
   ) {
-    delete state.moveHistory.damage.lastTakenByPokemon[pokemon.id]
+    delete state.moveHistory.damage.lastTakenByPokemon[pokemonKey]
   }
   if (
     side &&
@@ -780,6 +810,7 @@ export function queueDelayedMoveDamage(params: {
   attacker: BattlePokemon
   damage: number
   attackType?: string
+  isSuperEffective?: boolean
 }): string | undefined {
   const { state, move, damage } = params
   if (!state || !move.delayedDamage || damage <= 0) return undefined
@@ -797,6 +828,7 @@ export function queueDelayedMoveDamage(params: {
     turnsRemaining,
     damage,
     attackType: params.attackType,
+    isSuperEffective: params.isSuperEffective,
   })
 
   return `${move.name} will strike in ${turnsRemaining} turn${turnsRemaining === 1 ? '' : 's'}.`
@@ -845,6 +877,14 @@ export function processDelayedMoveDamage(state: BattleState): string[] {
       damage: endureResult.damage,
       attackType: entry.attackType,
     })
+    if (endureResult.damage > 0 && entry.isSuperEffective) {
+      const sourceTeam =
+        entry.sourceSide === 'player' ? state.playerTeam : state.enemyTeam
+      recordPokemonSuperEffectiveHit(
+        state,
+        sourceTeam.find((pokemon) => pokemon.id === entry.sourcePokemonId),
+      )
+    }
 
     const ownerName =
       entry.targetSide === 'player' ? state.playerName : state.enemyName

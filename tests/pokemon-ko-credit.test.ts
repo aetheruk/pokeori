@@ -101,8 +101,12 @@ describe('pokemon battle KO credits', () => {
     })
 
     recordPokemonKO(state, 'enemy')
+    recordPokemonKO(state, 'enemy')
 
     expect(state.pokemonBattleKOs).toEqual({ 'pokemon-1': 1 })
+    expect(state.pokemonBattleMetrics).toEqual({
+      'pokemon-1': { battleKOs: 1 },
+    })
   })
 
   test('records a PVP KO against the owned Pokemon on the enemy side', async () => {
@@ -134,6 +138,10 @@ describe('pokemon battle KO credits', () => {
     recordPokemonKO(state, 'player')
 
     expect(state.pokemonBattleKOs).toEqual({ 'pokemon-2': 1 })
+    expect(state.pokemonBattleMetrics).toEqual({
+      'pokemon-1': { timesKOd: 1 },
+      'pokemon-2': { battleKOs: 1 },
+    })
   })
 
   test('persists KO credits to Pokemon documents once', async () => {
@@ -160,5 +168,38 @@ describe('pokemon battle KO credits', () => {
 
     await persistPokemonBattleKOs(state)
     expect(updates).toHaveLength(1)
+  })
+
+  test('persists all individual battle metrics on the owned Pokemon document', async () => {
+    const { persistPokemonBattleKOs } = await import(
+      '@/app/(frontend)/game/battles/helpers/pokemon-ko-credit'
+    )
+    const state = makeState({
+      pokemonBattleMetrics: {
+        'pokemon-1': {
+          superEffectiveHitsLanded: 4,
+          stanceVictories: 3,
+          stanceLosses: 2,
+          battleKOs: 1,
+          timesKOd: 1,
+          movesUsed: 9,
+        },
+      },
+    })
+
+    await persistPokemonBattleKOs(state)
+
+    expect(updates[0]).toMatchObject({
+      collection: 'pokemon',
+      id: 'pokemon-1',
+      data: {
+        superEffectiveHitsLanded: 4,
+        stanceVictories: 3,
+        stanceLosses: 2,
+        battleKOs: 1,
+        timesKOd: 1,
+        movesUsed: 9,
+      },
+    })
   })
 })
