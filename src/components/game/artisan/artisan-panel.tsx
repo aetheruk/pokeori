@@ -1,7 +1,6 @@
 'use client'
 
 import {
-  Gauge,
   Hammer,
   Loader2,
   Lock,
@@ -9,7 +8,6 @@ import {
   RotateCw,
   Sparkles,
   Target,
-  Timer,
 } from 'lucide-react'
 import {
   type ReactNode,
@@ -24,6 +22,7 @@ import { toast } from 'sonner'
 import type { RewardItem } from '@/components/game/reward-carousel'
 import { mapCriteriaToDisplayItem } from '@/components/game/shared/criteria-mapping'
 import { GameInfoModal } from '@/components/game/shared/GameInfoModal'
+import { GameTimer } from '@/components/game/shared/game-timer'
 import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
 import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
@@ -263,55 +262,36 @@ function createEvolutionStoneGroup(
   }
 }
 
-function getCraftQualityGuide(recipe: ArtisanRecipe) {
-  if (recipe.craftType === 'precise') return '2 hits Good · 3 hits Perfect'
-  if (recipe.craftType === 'balance') return '2 green Good · 3 green Perfect'
+type CraftQualityLabel = 'Bad' | 'Good' | 'Perfect'
 
-  if (recipe.minimumQuality === 'perfect') {
-    const costsOnBad = recipe.materialFailQualities
-      ? recipe.materialFailQualities.includes('bad')
-      : recipe.materialFail === true
-    const costsOnGood = recipe.materialFailQualities
-      ? recipe.materialFailQualities.includes('good')
-      : recipe.materialFail === true
-    const badLabel = costsOnBad ? 'Bad fails + costs' : 'Bad fails'
-    return `${badLabel} · Good fails${costsOnGood ? ' + costs' : ''} · Perfect x${recipe.outputQuantity.max}`
+function getCraftTimer(session: ArtisanCraftSession, now: number) {
+  return {
+    timeLeft: Math.ceil(
+      Math.max(0, session.endAt - Math.max(now, session.startAt)) / 1000,
+    ),
+    totalTime: Math.max(1, Math.ceil((session.endAt - session.startAt) / 1000)),
   }
-
-  const badLabel = recipe.fail
-    ? recipe.materialFail
-      ? 'Bad fails + costs'
-      : 'Bad fails'
-    : hasPrimaryOutput(recipe)
-      ? `Bad x${recipe.outputQuantity.min}`
-      : 'Bad'
-
-  if (!hasPrimaryOutput(recipe)) return `${badLabel} · Good · Perfect`
-
-  const goodQuantity = Math.max(
-    recipe.outputQuantity.min,
-    Math.round((recipe.outputQuantity.min + recipe.outputQuantity.max) / 2),
-  )
-  return `${badLabel} · Good x${goodQuantity} · Perfect x${recipe.outputQuantity.max}`
 }
 
 function CraftDialogShell({
   recipe,
-  title,
-  subtitle,
-  status,
+  timeLeft,
+  totalTime,
+  quality,
   open,
   onClose,
   completing,
+  footer,
   children,
 }: {
   recipe: ArtisanRecipe
-  title: string
-  subtitle: string
-  status: string
+  timeLeft: number
+  totalTime: number
+  quality: CraftQualityLabel
   open: boolean
   onClose: () => void
   completing: boolean
+  footer?: ReactNode
   children: ReactNode
 }) {
   return (
@@ -319,7 +299,6 @@ function CraftDialogShell({
       open={open}
       onOpenChange={(next) => !next && onClose()}
       title={recipe.name}
-      description={subtitle}
       background="/backgrounds/artisan-workshop.avif"
       icon={
         <RecipeOutputIcon
@@ -327,42 +306,47 @@ function CraftDialogShell({
           className="h-16 w-16 object-contain md:h-20 md:w-20"
         />
       }
-      heroLabel={title}
+      heroTopLeft={
+        <GameTimer
+          timeLeft={timeLeft}
+          totalTime={totalTime}
+          size="md"
+          tone="scene"
+        />
+      }
+      heroAction={<QualityCircle quality={quality} />}
       showCloseButton={!completing}
       dismissible={false}
       className="game-paper-first game-paper-background bg-game-canvas text-game-ink"
     >
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 p-4 pb-8 md:p-8">
-        <div className="border-y border-game-border/75 py-3">
-          <div className="flex items-center justify-between gap-3 text-[10px] font-black uppercase tracking-widest">
-            <span className="text-game-muted">Craft Check</span>
-            <span className="text-game-ochre">{status}</span>
+      <div className="mx-auto flex min-h-full w-full max-w-3xl flex-1 flex-col p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:p-8">
+        <div className="flex min-h-0 flex-1 flex-col gap-5">{children}</div>
+        {footer ? (
+          <div className="sticky bottom-0 z-10 mt-5 border-t border-game-border/75 bg-game-canvas/95 pt-4 backdrop-blur-sm">
+            {footer}
           </div>
-          <p className="mt-1 truncate text-[10px] font-bold uppercase tracking-widest text-game-muted">
-            {getCraftQualityGuide(recipe)}
-          </p>
-        </div>
-
-        {children}
+        ) : null}
       </div>
     </ResponsivePanel>
   )
 }
 
-function QualityBadge({ label }: { label: string }) {
+function QualityCircle({ quality }: { quality: CraftQualityLabel }) {
   return (
-    <span
+    <div
+      role="status"
       className={cn(
-        'rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-widest',
-        label === 'Perfect'
-          ? 'border-game-moss/40 bg-game-moss/10 text-game-moss-strong'
-          : label === 'Good'
-            ? 'border-game-ochre/40 bg-game-ochre/10 text-game-ochre-strong'
-            : 'border-game-border bg-game-canvas text-game-muted',
+        'flex size-16 items-center justify-center rounded-full border-2 bg-game-night-canvas/70 px-2 text-center text-[10px] font-black uppercase tracking-[0.12em] text-white shadow-lg backdrop-blur-md',
+        quality === 'Perfect'
+          ? 'border-game-moss bg-game-moss/35'
+          : quality === 'Good'
+            ? 'border-game-ochre bg-game-ochre/35'
+            : 'border-game-danger bg-game-danger/35',
       )}
+      aria-label={`Craft quality: ${quality}`}
     >
-      {label}
-    </span>
+      {quality}
+    </div>
   )
 }
 
@@ -497,6 +481,7 @@ function HoldReleaseDialog({
 }: HoldReleaseDialogProps) {
   const [holding, setHolding] = useState(false)
   const [progress, setProgress] = useState(0)
+  const [now, setNow] = useState(Date.now())
   const [attempts, setAttempts] = useState<number[]>([])
   const holdStartedAtRef = useRef<number | null>(null)
 
@@ -548,6 +533,17 @@ function HoldReleaseDialog({
   }, [holding, open, release, session])
 
   useEffect(() => {
+    if (!open || !session) {
+      setNow(Date.now())
+      return
+    }
+
+    setNow(Date.now())
+    const interval = window.setInterval(() => setNow(Date.now()), 250)
+    return () => window.clearInterval(interval)
+  }, [open, session])
+
+  useEffect(() => {
     if (!holding) return
     window.addEventListener('pointerup', release)
     window.addEventListener('blur', release)
@@ -583,49 +579,60 @@ function HoldReleaseDialog({
     session.perfectWindowMs,
     duration,
   )
-  const progressPercent = progress * 100
-  const liveQuality =
-    progressPercent >= targetWindow.left &&
-    progressPercent <= targetWindow.right
-      ? 'Hit'
-      : 'Miss'
   const hitCount = attempts.filter((heldDuration, index) => {
     const attemptTarget = holdTargetOffsets[index] ?? fallbackTargetElapsed
     return Math.abs(heldDuration - attemptTarget) <= session.perfectWindowMs
   }).length
+  const { timeLeft, totalTime } = getCraftTimer(session, now)
+  const quality: CraftQualityLabel =
+    hitCount >= 3 ? 'Perfect' : hitCount >= 2 ? 'Good' : 'Bad'
 
   return (
     <CraftDialogShell
-          recipe={recipe}
-          title="Precise Craft"
-          subtitle="Hit the target three times."
-          open={open}
-          status={
+      recipe={recipe}
+      timeLeft={timeLeft}
+      totalTime={totalTime}
+      quality={quality}
+      open={open}
+      onClose={onClose}
+      completing={completing}
+      footer={
+        <button
+          type="button"
+          disabled={completing}
+          onPointerDown={startHold}
+          onPointerCancel={() => {
+            holdStartedAtRef.current = null
+            setHolding(false)
+            setProgress(0)
+          }}
+          onKeyDown={(event) => {
+            if ((event.key === ' ' || event.key === 'Enter') && !holding) {
+              startHold()
+            }
+          }}
+          onKeyUp={(event) => {
+            if (event.key === ' ' || event.key === 'Enter') release()
+          }}
+          className={cn(
+            'game-focus-ring flex h-16 w-full items-center justify-center rounded-xl border text-sm font-black uppercase tracking-[0.2em] transition-colors disabled:opacity-70',
             holding
-              ? `Release · ${liveQuality}`
-              : `Attempt ${Math.min(attempts.length + 1, 3)}/3 · ${hitCount} hits`
-          }
-          onClose={onClose}
-          completing={completing}
+              ? 'border-game-ochre bg-game-ochre/20 text-game-ink shadow-inner'
+              : 'border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90',
+          )}
         >
-          <div className="space-y-5">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-game-muted">
-                <Gauge className="h-4 w-4 text-game-ochre" />
-                Pressure
-              </div>
-              <QualityBadge
-                label={
-                  holding
-                    ? liveQuality
-                    : hitCount >= 3
-                      ? 'Perfect'
-                      : hitCount >= 2
-                        ? 'Good'
-                        : 'Bad'
-                }
-              />
-            </div>
+          {completing ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <span className="flex items-center gap-2">
+              <MousePointer2 className="h-4 w-4" />
+              {holding ? 'Release' : 'Hold'}
+            </span>
+          )}
+        </button>
+      }
+    >
+      <div className="flex min-h-0 flex-1 flex-col justify-center gap-5">
             <div className="relative h-10 overflow-hidden rounded-full border border-game-border bg-game-canvas shadow-inner">
               <div
                 className="absolute top-0 h-full border-x border-game-moss bg-game-moss/25"
@@ -644,49 +651,6 @@ function HoldReleaseDialog({
               />
             </div>
 
-            <button
-              type="button"
-              disabled={completing}
-              onPointerDown={startHold}
-              onPointerCancel={() => {
-                holdStartedAtRef.current = null
-                setHolding(false)
-                setProgress(0)
-              }}
-              onKeyDown={(event) => {
-                if ((event.key === ' ' || event.key === 'Enter') && !holding) {
-                  startHold()
-                }
-              }}
-              onKeyUp={(event) => {
-                if (event.key === ' ' || event.key === 'Enter') release()
-              }}
-              className={cn(
-                'game-focus-ring flex h-28 w-full items-center justify-center rounded-xl border text-sm font-black uppercase tracking-[0.2em] transition-colors disabled:opacity-70',
-                holding
-                  ? 'border-game-ochre bg-game-ochre/20 text-game-ink shadow-inner'
-                  : 'border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90',
-              )}
-            >
-              {completing ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                <span className="flex flex-col items-center gap-2">
-                  <MousePointer2 className="h-4 w-4" />
-                  <span>{holding ? 'Release Now' : 'Hold Plate'}</span>
-                  <span
-                    className={cn(
-                      'text-[10px] tracking-widest',
-                      holding ? 'text-game-ink' : 'text-game-cream',
-                    )}
-                  >
-                    {holding
-                      ? 'release anywhere'
-                      : `${attempts.length}/3 attempts`}
-                  </span>
-                </span>
-              )}
-            </button>
             <div className="flex justify-center gap-2">
               {[0, 1, 2].map((index) => {
                 const attempt = attempts[index]
@@ -710,8 +674,8 @@ function HoldReleaseDialog({
                 )
               })}
             </div>
-          </div>
-        </CraftDialogShell>
+      </div>
+    </CraftDialogShell>
   )
 }
 
@@ -763,20 +727,15 @@ function CrushDialog({
 
   const started = now >= session.startAt
   const finished = now >= session.endAt
-  const duration = session.endAt - session.startAt
-  const remainingMs = Math.max(
-    0,
-    session.endAt - Math.max(now, session.startAt),
-  )
-  const progress = started ? 1 - remainingMs / duration : 0
   const goodTapCount = session.goodTapCount || 13
   const perfectTapCount = session.perfectTapCount || 16
-  const quality =
+  const quality: CraftQualityLabel =
     tapCount >= perfectTapCount
       ? 'Perfect'
       : tapCount >= goodTapCount
         ? 'Good'
         : 'Bad'
+  const { timeLeft, totalTime } = getCraftTimer(session, now)
 
   const tap = () => {
     if (!started || finished || completing || completedRef.current) return
@@ -789,89 +748,42 @@ function CrushDialog({
 
   return (
     <CraftDialogShell
-          recipe={recipe}
-          title="Berry Crush"
-          subtitle="Rapidly tap the press before the timer runs out."
-          open={open}
-          status={started ? 'Tap fast' : 'Get ready'}
-          onClose={onClose}
-          completing={completing}
+      recipe={recipe}
+      timeLeft={timeLeft}
+      totalTime={totalTime}
+      quality={quality}
+      open={open}
+      onClose={onClose}
+      completing={completing}
+      footer={
+        <Button
+          type="button"
+          disabled={!started || finished || completing}
+          onPointerDown={tap}
+          className={cn(
+            'game-focus-ring h-16 w-full rounded-xl border text-sm font-black uppercase tracking-[0.2em] transition-colors',
+            started
+              ? 'border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90'
+              : 'border-game-border bg-game-canvas text-game-muted',
+          )}
         >
-          <div className="space-y-5">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-game-muted">
-                <Timer className="h-4 w-4 text-game-ochre" />
-                Timer
-              </div>
-              <span
-                className={cn(
-                  'text-[10px] font-black uppercase tracking-widest',
-                  started ? 'text-game-ochre-strong' : 'text-game-muted',
-                )}
-              >
-                {started ? `${(remainingMs / 1000).toFixed(1)}s` : 'Ready'}
-              </span>
-            </div>
-
-            <div className="relative h-10 overflow-hidden rounded-full border border-game-border bg-game-canvas shadow-inner">
-              <div
-                className="h-full bg-game-moss transition-[width]"
-                style={{ width: `${progress * 100}%` }}
-              />
-            </div>
-
-            <div
-              className={cn(
-                'border-y py-4 text-center transition-colors',
-                quality === 'Perfect'
-                  ? 'border-game-moss/45 bg-game-moss/10'
-                  : quality === 'Good'
-                    ? 'border-game-ochre/45 bg-game-ochre/10'
-                    : 'border-game-border bg-game-canvas',
-              )}
-            >
-              <div
-                className={cn(
-                  'text-[10px] font-black uppercase tracking-[0.24em]',
-                  quality === 'Perfect'
-                    ? 'text-game-moss-strong'
-                    : quality === 'Good'
-                      ? 'text-game-ochre-strong'
-                      : 'text-game-muted',
-                )}
-              >
-                {quality}
-              </div>
-              <div className="mt-1 font-display text-4xl font-bold tracking-tight text-game-ink">
-                {tapCount}
-              </div>
-              <div className="mt-1 text-[10px] font-bold uppercase tracking-widest text-game-muted">
-                Good {goodTapCount} · Perfect {perfectTapCount}
-              </div>
-            </div>
-
-            <Button
-              type="button"
-              disabled={!started || finished || completing}
-              onPointerDown={tap}
-              className={cn(
-                'game-focus-ring h-24 w-full rounded-xl border text-sm font-black uppercase tracking-[0.2em] transition-colors',
-                started
-                  ? 'border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90'
-                  : 'border-game-border bg-game-canvas text-game-muted',
-              )}
-            >
-              {completing || completedRef.current ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                <span className="flex items-center gap-2">
-                  <MousePointer2 className="h-4 w-4" />
-                  {started ? 'Tap Fast' : 'Get Ready'}
-                </span>
-              )}
-            </Button>
-          </div>
-        </CraftDialogShell>
+          {completing || completedRef.current ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <span className="flex items-center gap-2">
+              <MousePointer2 className="h-4 w-4" />
+              Tap
+            </span>
+          )}
+        </Button>
+      }
+    >
+      <div className="flex min-h-0 flex-1 items-center justify-center">
+        <div className="font-display text-7xl font-bold tracking-tight text-game-ink">
+          {tapCount}
+        </div>
+      </div>
+    </CraftDialogShell>
   )
 }
 
@@ -968,20 +880,13 @@ function ScatterDialog({
 
   const started = now >= session.startAt
   const finished = now >= session.endAt
-  const duration = session.endAt - session.startAt
-  const remainingMs = Math.max(
-    0,
-    session.endAt - Math.max(now, session.startAt),
-  )
-  const progress = started ? 1 - remainingMs / duration : 0
-  const goodTapCount = session.goodTapCount || 12
-  const perfectTapCount = session.perfectTapCount || 20
-  const quality =
-    tapCount >= perfectTapCount
+  const quality: CraftQualityLabel =
+    tapCount >= (session.perfectTapCount || 20)
       ? 'Perfect'
-      : tapCount >= goodTapCount
+      : tapCount >= (session.goodTapCount || 12)
         ? 'Good'
         : 'Bad'
+  const { timeLeft, totalTime } = getCraftTimer(session, now)
 
   const tapTarget = (targetId: string) => {
     if (!started || finished || completing || completedRef.current) return
@@ -995,38 +900,19 @@ function ScatterDialog({
 
   return (
     <CraftDialogShell
-          recipe={recipe}
-          title="Scatter Craft"
-          subtitle="Tap the scattered recipe parts before the timer runs out."
-          open={open}
-          status={started ? 'Clear the parts' : 'Get ready'}
-          onClose={onClose}
-          completing={completing}
-        >
-          <div className="space-y-5">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-game-muted">
-                <Timer className="h-4 w-4 text-game-ochre" />
-                Timer
-              </div>
-              <span
-                className={cn(
-                  'text-[10px] font-black uppercase tracking-widest',
-                  started ? 'text-game-ochre-strong' : 'text-game-muted',
-                )}
-              >
-                {started ? `${(remainingMs / 1000).toFixed(1)}s` : 'Ready'}
-              </span>
-            </div>
-
-            <div className="relative h-9 overflow-hidden rounded-full border border-game-border bg-game-canvas shadow-inner">
-              <div
-                className="h-full bg-game-moss transition-[width]"
-                style={{ width: `${progress * 100}%` }}
-              />
-            </div>
-
-            <div className="relative h-72 overflow-hidden rounded-xl border border-game-border bg-game-canvas">
+      recipe={recipe}
+      timeLeft={timeLeft}
+      totalTime={totalTime}
+      quality={quality}
+      open={open}
+      onClose={onClose}
+      completing={completing}
+    >
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
+        <div className="flex items-center justify-end text-sm font-black text-game-ink">
+          {tapCount}
+        </div>
+        <div className="relative min-h-[16rem] flex-1 overflow-hidden rounded-xl border border-game-border bg-game-canvas">
               {targets.map((target) => (
                 <button
                   key={target.id}
@@ -1063,43 +949,13 @@ function ScatterDialog({
               ) : null}
             </div>
 
-            <div
-              className={cn(
-                'border-y py-4 text-center transition-colors',
-                quality === 'Perfect'
-                  ? 'border-game-moss/45 bg-game-moss/10'
-                  : quality === 'Good'
-                    ? 'border-game-ochre/45 bg-game-ochre/10'
-                    : 'border-game-border bg-game-canvas',
-              )}
-            >
-              <div
-                className={cn(
-                  'text-[10px] font-black uppercase tracking-[0.24em]',
-                  quality === 'Perfect'
-                    ? 'text-game-moss-strong'
-                    : quality === 'Good'
-                      ? 'text-game-ochre-strong'
-                      : 'text-game-muted',
-                )}
-              >
-                {quality}
-              </div>
-              <div className="mt-1 font-display text-4xl font-bold tracking-tight text-game-ink">
-                {tapCount}
-              </div>
-              <div className="mt-1 text-[10px] font-bold uppercase tracking-widest text-game-muted">
-                Good {goodTapCount} · Perfect {perfectTapCount}
-              </div>
-            </div>
-
-            {completing || completedRef.current ? (
-              <div className="flex h-10 items-center justify-center text-game-moss-strong">
-                <Loader2 className="h-5 w-5 animate-spin" />
-              </div>
-            ) : null}
+        {completing || completedRef.current ? (
+          <div className="flex h-10 items-center justify-center text-game-moss-strong">
+            <Loader2 className="h-5 w-5 animate-spin" />
           </div>
-        </CraftDialogShell>
+        ) : null}
+      </div>
+    </CraftDialogShell>
   )
 }
 
@@ -1156,10 +1012,6 @@ export function BalanceDialog({
   const finished = now >= session.endAt
   const duration = session.endAt - session.startAt
   const elapsedMs = Math.min(duration, Math.max(0, now - session.startAt))
-  const remainingMs = Math.max(
-    0,
-    session.endAt - Math.max(now, session.startAt),
-  )
   const targets = session.balanceTargets || [0.45, 0.55, 0.5]
   const perfectWindow = session.balancePerfectWindow || 0.07
   const position = getArtisanBalancePosition(elapsedMs, session.balancePeriodMs)
@@ -1199,30 +1051,54 @@ export function BalanceDialog({
     if (delta <= perfectWindow) return 'Good'
     return 'Bad'
   }
+  const goodLocks = locks.filter((_, index) => getLockQuality(index) === 'Good').length
+  const quality: CraftQualityLabel =
+    goodLocks >= 3 ? 'Perfect' : goodLocks >= 2 ? 'Good' : 'Bad'
+  const { timeLeft, totalTime } = getCraftTimer(session, now)
 
   return (
     <CraftDialogShell
-          recipe={recipe}
-          title="Scent Balance"
-          subtitle="Lock each component when its meter enters the target zone."
-          open={open}
-          status={started ? 'Lock in' : 'Get ready'}
-          onClose={onClose}
-          completing={completing}
+      recipe={recipe}
+      timeLeft={timeLeft}
+      totalTime={totalTime}
+      quality={quality}
+      open={open}
+      onClose={onClose}
+      completing={completing}
+      footer={
+        <Button
+          type="button"
+          disabled={!started || finished || completing || completedRef.current}
+          onPointerDown={(event) => {
+            if (!event.isPrimary || event.button !== 0) return
+            lockCurrent()
+          }}
+          onClick={(event) => {
+            // Pointer input is scored above at press time. Detail 0 keeps
+            // keyboard and assistive-technology activation available
+            // without counting the synthetic post-touch click twice.
+            if (event.detail === 0) lockCurrent()
+          }}
+          className={cn(
+            'game-focus-ring h-16 w-full touch-manipulation select-none rounded-xl border text-sm font-black uppercase tracking-[0.2em] transition-colors',
+            started
+              ? 'border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90'
+              : 'border-game-border bg-game-canvas text-game-muted',
+          )}
         >
-          <div className="space-y-5">
-            <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-game-muted">
-              <span>Balance</span>
-              <span
-                className={
-                  started ? 'text-game-ochre-strong' : 'text-game-muted'
-                }
-              >
-                {started ? `${(remainingMs / 1000).toFixed(1)}s` : 'Ready'}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3">
+          {completing || completedRef.current ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <span className="flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              Lock in
+            </span>
+          )}
+        </Button>
+      }
+    >
+      <div className="flex min-h-0 flex-1 flex-col justify-center gap-4">
+        <div className="grid grid-cols-3 gap-3">
               {balanceStages.map((stage, index) => {
                 const target = targets[index] || 0.5
                 const isActive = started && locks.length === index && !finished
@@ -1275,39 +1151,8 @@ export function BalanceDialog({
               })}
             </div>
 
-            <Button
-              type="button"
-              disabled={
-                !started || finished || completing || completedRef.current
-              }
-              onPointerDown={(event) => {
-                if (!event.isPrimary || event.button !== 0) return
-                lockCurrent()
-              }}
-              onClick={(event) => {
-                // Pointer input is scored above at press time. Detail 0 keeps
-                // keyboard and assistive-technology activation available
-                // without counting the synthetic post-touch click twice.
-                if (event.detail === 0) lockCurrent()
-              }}
-              className={cn(
-                'game-focus-ring h-14 w-full touch-manipulation select-none rounded-xl border text-sm font-black uppercase tracking-[0.2em] transition-colors',
-                started
-                  ? 'border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90'
-                  : 'border-game-border bg-game-canvas text-game-muted',
-              )}
-            >
-              {completing || completedRef.current ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                <span className="flex items-center gap-2">
-                  <Target className="h-4 w-4" />
-                  Lock in
-                </span>
-              )}
-            </Button>
-          </div>
-        </CraftDialogShell>
+      </div>
+    </CraftDialogShell>
   )
 }
 
@@ -1418,20 +1263,15 @@ function MixDialog({
 
   const started = now >= session.startAt
   const finished = now >= session.endAt
-  const duration = session.endAt - session.startAt
-  const remainingMs = Math.max(
-    0,
-    session.endAt - Math.max(now, session.startAt),
-  )
-  const progress = started ? 1 - remainingMs / duration : 0
   const goodRotations = session.mixGoodRotations || 2.25
   const perfectRotations = session.mixPerfectRotations || 3.5
-  const quality =
+  const quality: CraftQualityLabel =
     rotations >= perfectRotations
       ? 'Perfect'
       : rotations >= goodRotations
         ? 'Good'
         : 'Bad'
+  const { timeLeft, totalTime } = getCraftTimer(session, now)
 
   const startMix = (event: React.PointerEvent<HTMLDivElement>) => {
     if (
@@ -1449,93 +1289,43 @@ function MixDialog({
 
   return (
     <CraftDialogShell
-          recipe={recipe}
-          title="Potion Mix"
-          subtitle="Spin the dial quickly until the mixture comes together."
-          open={open}
-          status={started ? 'Spin the dial' : 'Get ready'}
-          onClose={onClose}
-          completing={completing}
+      recipe={recipe}
+      timeLeft={timeLeft}
+      totalTime={totalTime}
+      quality={quality}
+      open={open}
+      onClose={onClose}
+      completing={completing}
+    >
+      <div className="flex min-h-0 flex-1 items-center justify-center">
+        <div
+          ref={dialRef}
+          onPointerDown={startMix}
+          className={cn(
+            'mx-auto flex aspect-square w-full max-w-64 touch-none items-center justify-center rounded-full border bg-game-canvas shadow-inner',
+            started && !finished
+              ? 'cursor-grab border-game-ochre active:cursor-grabbing'
+              : 'border-game-border opacity-70',
+          )}
         >
-          <div className="space-y-5">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-game-muted">
-                <Timer className="h-4 w-4 text-game-ochre" />
-                Timer
-              </div>
-              <span
-                className={cn(
-                  'text-[10px] font-black uppercase tracking-widest',
-                  started ? 'text-game-ochre-strong' : 'text-game-muted',
-                )}
-              >
-                {started ? `${(remainingMs / 1000).toFixed(1)}s` : 'Ready'}
-              </span>
-            </div>
-
-            <div className="relative h-9 overflow-hidden rounded-full border border-game-border bg-game-canvas shadow-inner">
-              <div
-                className="h-full bg-game-moss transition-[width]"
-                style={{ width: `${progress * 100}%` }}
-              />
-            </div>
-
-            <div
-              ref={dialRef}
-              onPointerDown={startMix}
-              className={cn(
-                'mx-auto flex aspect-square w-full max-w-64 touch-none items-center justify-center rounded-full border bg-game-canvas shadow-inner',
-                started && !finished
-                  ? 'cursor-grab border-game-ochre active:cursor-grabbing'
-                  : 'border-game-border opacity-70',
-              )}
-            >
-              <div
-                className="relative flex h-32 w-32 items-center justify-center rounded-full border border-game-border bg-game-surface shadow-sm"
-                style={{ transform: `rotate(${angle}rad)` }}
-              >
-                <div className="absolute left-1/2 top-3 h-10 w-2 -translate-x-1/2 rounded-full bg-game-ochre" />
-                <RotateCw className="h-10 w-10 text-game-clay" />
-              </div>
-            </div>
-
-            <div
-              className={cn(
-                'border-y py-4 text-center transition-colors',
-                quality === 'Perfect'
-                  ? 'border-game-moss/45 bg-game-moss/10'
-                  : quality === 'Good'
-                    ? 'border-game-ochre/45 bg-game-ochre/10'
-                    : 'border-game-border bg-game-canvas',
-              )}
-            >
-              <div
-                className={cn(
-                  'text-[10px] font-black uppercase tracking-[0.24em]',
-                  quality === 'Perfect'
-                    ? 'text-game-moss-strong'
-                    : quality === 'Good'
-                      ? 'text-game-ochre-strong'
-                      : 'text-game-muted',
-                )}
-              >
-                {quality}
-              </div>
-              <div className="mt-1 font-display text-4xl font-bold tracking-tight text-game-ink">
-                {rotations.toFixed(1)}
-              </div>
-              <div className="mt-1 text-[10px] font-bold uppercase tracking-widest text-game-muted">
-                Good {goodRotations} · Perfect {perfectRotations}
-              </div>
-            </div>
-
-            {completing || completedRef.current ? (
-              <div className="flex h-10 items-center justify-center text-game-moss-strong">
-                <Loader2 className="h-5 w-5 animate-spin" />
-              </div>
-            ) : null}
+          <div
+            className="relative flex h-32 w-32 items-center justify-center rounded-full border border-game-border bg-game-surface shadow-sm"
+            style={{ transform: `rotate(${angle}rad)` }}
+          >
+            <div className="absolute left-1/2 top-3 h-10 w-2 -translate-x-1/2 rounded-full bg-game-ochre" />
+            <RotateCw className="h-10 w-10 text-game-clay" />
+            <span className="absolute bottom-3 font-mono text-xs font-black text-game-muted">
+              {rotations.toFixed(1)}×
+            </span>
           </div>
-        </CraftDialogShell>
+        </div>
+      </div>
+      {completing || completedRef.current ? (
+        <div className="flex h-10 items-center justify-center text-game-moss-strong">
+          <Loader2 className="h-5 w-5 animate-spin" />
+        </div>
+      ) : null}
+    </CraftDialogShell>
   )
 }
 
