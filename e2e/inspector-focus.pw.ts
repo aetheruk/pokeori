@@ -6,12 +6,13 @@ for (const width of [390, 1280]) {
     await page.goto('/ui-test')
     await page.getByRole('button', { name: 'Test Pokemon inspector', exact: true }).click()
     const trigger = page.getByRole('button', { name: 'Open fixture inspector', exact: true })
+    const inspector = page.getByRole('dialog', { name: 'Inspector fixture', exact: true })
     for (let attempt = 0; attempt < 2; attempt++) {
       await trigger.focus()
       await page.keyboard.press('Enter')
-      await expect(page.getByRole('dialog', { name: 'Details', exact: true })).toBeVisible()
+      await expect(inspector).toBeVisible()
       await page.keyboard.press('Escape')
-      await expect(page.getByRole('dialog', { name: 'Details', exact: true })).toBeHidden()
+      await expect(inspector).toBeHidden()
       await expect(trigger).toBeFocused()
     }
   })
