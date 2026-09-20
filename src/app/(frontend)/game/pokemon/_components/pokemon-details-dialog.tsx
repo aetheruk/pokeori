@@ -4,7 +4,6 @@ import {
   ArrowDown,
   ArrowUp,
   Atom,
-  BookOpen,
   Brain,
   Check,
   Circle,
@@ -611,6 +610,10 @@ function MountedPokemonDetailsDialog({
   const [isOpen, setIsOpen] = useState(initialOpen)
 
   const formInfo = getPokemonForm(pokemon.formId)
+  const formLabel =
+    formInfo?.form && formInfo.form !== 'base'
+      ? capitalizeFirstLetter(formInfo.form.replaceAll('-', ' '))
+      : 'Standard Form'
   const baseStats = formInfo?.stats
   const trainerLevel = getSkillLevel(user?.skills, 'battling')
   const researcherLevel = getSkillLevel(user?.skills, 'researching')
@@ -967,111 +970,40 @@ function MountedPokemonDetailsDialog({
           if (!open) setMoveWorkspaceOpen(false)
         }}
         trigger={panelTrigger}
-        title="Details"
-        description={`Pokemon details for ${pokemon.name}`}
+        title={pokemon.name || formInfo?.name || 'Pokemon'}
+        description={formLabel}
+        icon={
+          <PokemonRaritySprite
+            formId={pokemon.formId}
+            view="home"
+            rarity={pokemon.rarity}
+            shiny={pokemon.shiny}
+            isShadow={pokemon.isShadow}
+            isRadiant={pokemon.isRadiant}
+            female={pokemonGender === 'female'}
+            alt=""
+            sizes="112px"
+            className="h-20 w-20 md:h-24 md:w-24"
+            imageClassName="drop-shadow-[0_10px_16px_rgba(0,0,0,0.4)]"
+          />
+        }
+        background={backgroundUrl}
+        heroLabel="Pokémon"
         desktopWidth="min(42vw, 620px)"
-        mobileHeader={false}
-        showHandle={false}
-        showHero={false}
-        className="game-paper-first game-paper-background relative flex max-h-[92dvh] w-full flex-col gap-0 overflow-hidden bg-game-canvas p-0 text-game-ink"
+        className="game-paper-first game-paper-background relative flex w-full flex-col gap-0 overflow-hidden bg-game-canvas p-0 text-game-ink"
       >
-        {/* Fixed Image at Top */}
-        <div className="relative aspect-[2/1] w-full flex-shrink-0 overflow-hidden border-b border-game-border">
-          {/* Background */}
-          {isEvolving ? (
-            <div className="absolute inset-0 overflow-hidden bg-[#172733]">
-              <Vortex
-                backgroundColor="transparent"
-                rangeY={800}
-                particleCount={500}
-                baseHue={170}
-                baseSpeed={0.5}
-                rangeSpeed={2}
-                className="flex items-center justify-center w-full h-full"
-              />
-            </div>
-          ) : (
-            <div className="absolute inset-0">
-              <Image
-                src={backgroundUrl}
-                alt="Background"
-                fill
-                sizes="100vw"
-                className={cn(
-                  'object-cover opacity-55',
-                  pokemon.isShadow &&
-                    'shadow-aura grayscale scale-110 opacity-40',
-                  pokemon.isRadiant && 'radiant-aura scale-110 opacity-45',
-                )}
-              />
-              <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(23,39,51,0.04),rgba(239,228,207,0.2)_55%,var(--game-surface)_100%)]" />
-            </div>
-          )}
-
-          {/* Pokemon Image */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="relative w-44 h-44 group/sprite">
-              <PokemonRaritySprite
-                formId={pokemon.formId}
-                view="home"
-                rarity={pokemon.rarity}
-                shiny={pokemon.shiny}
-                isShadow={pokemon.isShadow}
-                isRadiant={pokemon.isRadiant}
-                female={pokemonGender === 'female'}
-                alt={pokemon.name || 'Pokemon'}
-                sizes="(max-width: 768px) 100vw, 176px"
-                className="h-full w-full"
-                imageClassName="relative z-10 drop-shadow-[0_16px_24px_rgba(0,0,0,0.45)]"
-              />
-            </div>
-          </div>
-        </div>
-
         {/* Scrollable Content Area */}
         <div className="overflow-y-auto flex-1 min-h-0 custom-scrollbar">
           <div className="flex w-full flex-col items-center gap-6 p-5 md:p-6">
-            {/* Name & Form under image */}
-            <div className="relative w-full space-y-2 text-center">
-              <div className="absolute right-0 top-0 z-10">
+            <div className="flex w-full max-w-md items-center justify-center gap-3">
+              <PokemonTypeChips types={formInfo?.types || []} />
+              <div className="shrink-0">
                 <RenameDialog
                   pokemonId={pokemon.id}
                   currentName={pokemon.name || ''}
                   canRename={canRenamePokemon}
                   onRename={onRename}
                 />
-              </div>
-              <div className="flex min-h-10 items-center justify-center px-12">
-                <h2 className="font-display text-3xl font-semibold text-game-ink">
-                  {pokemon.name}
-                </h2>
-              </div>
-
-              {/* Form name (small) - show if not base */}
-              <div className="flex items-center justify-center gap-3">
-                <span className="h-px w-4 bg-game-border" />
-                <div className="flex items-center gap-2">
-                  {(() => {
-                    const formInfo = getPokemonForm(pokemon.formId || '')
-                    if (formInfo?.form && formInfo.form !== 'base') {
-                      return (
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-game-moss-strong">
-                          {formInfo.form}
-                        </span>
-                      )
-                    }
-                    return (
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-game-muted">
-                        Standard Form
-                      </span>
-                    )
-                  })()}
-                </div>
-                <span className="h-px w-4 bg-game-border" />
-              </div>
-
-              <div className="flex flex-col items-center gap-3 pt-2">
-                <PokemonTypeChips types={formInfo?.types || []} />
               </div>
             </div>
 
@@ -2237,7 +2169,18 @@ function MountedPokemonDetailsDialog({
         onOpenChange={(open) => !open && setMoveDetail(null)}
         title={moveDetail?.name || 'Move details'}
         description="Battle move field note"
-        icon={<BookOpen className="h-14 w-14" aria-hidden="true" />}
+        icon={
+          moveDetail ? (
+            <ItemSprite
+              itemId={getMoveTypeSpriteItemId(moveDetail)}
+              alt=""
+              width={72}
+              height={72}
+              className="h-16 w-16 object-contain md:h-20 md:w-20"
+              priority
+            />
+          ) : undefined
+        }
         background="/backgrounds/lab.avif"
         heroLabel="Battle move"
       >
