@@ -15,6 +15,7 @@ interface RenameDialogProps {
   currentName: string
   canRename?: boolean
   onRename?: (updatedPokemon: Pokemon) => void
+  className?: string
 }
 
 export function RenameDialog({
@@ -22,6 +23,7 @@ export function RenameDialog({
   currentName,
   canRename = true,
   onRename,
+  className,
 }: RenameDialogProps) {
   const { refreshUser } = useUser()
   const [isEditing, setIsEditing] = useState(false)
@@ -89,6 +91,7 @@ export function RenameDialog({
         size="icon"
         className={cn(
           'h-10 w-10 text-game-muted hover:bg-game-moss/10 hover:text-game-moss-strong',
+          className,
           !canRename && 'cursor-not-allowed opacity-35 hover:text-game-muted',
         )}
         disabled={!canRename}

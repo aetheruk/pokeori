@@ -50,7 +50,7 @@ for (const width of [390, 1280]) {
     await expect(edit).toHaveCSS('top', '8px')
     await expect(edit).toHaveCSS('right', '8px')
     await edit.click()
-    await expect(page.getByRole('dialog', { name: 'Edit trainer card', exact: true })).toBeVisible()
+    await expect(page.getByRole('dialog', { name: 'Test trainer', exact: true })).toBeVisible()
     await page.keyboard.press('Escape')
     const panel = page.getByRole('region', { name: 'Settings', exact: true })
     await expect(panel).toBeVisible()

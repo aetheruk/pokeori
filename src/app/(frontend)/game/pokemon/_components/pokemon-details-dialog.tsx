@@ -989,22 +989,23 @@ function MountedPokemonDetailsDialog({
         }
         background={backgroundUrl}
         heroLabel="Pokémon"
+        heroAction={
+          <RenameDialog
+            pokemonId={pokemon.id}
+            currentName={pokemon.name || ''}
+            canRename={canRenamePokemon}
+            onRename={onRename}
+            className="h-11 w-11 rounded-full border border-white/55 bg-game-night-canvas/55 text-white shadow-lg backdrop-blur-md hover:bg-game-night-canvas/75 hover:text-white"
+          />
+        }
         desktopWidth="min(42vw, 620px)"
         className="game-paper-first game-paper-background relative flex w-full flex-col gap-0 overflow-hidden bg-game-canvas p-0 text-game-ink"
       >
         {/* Scrollable Content Area */}
         <div className="overflow-y-auto flex-1 min-h-0 custom-scrollbar">
           <div className="flex w-full flex-col items-center gap-6 p-5 md:p-6">
-            <div className="flex w-full max-w-md items-center justify-center gap-3">
+            <div className="flex w-full max-w-md items-center justify-center">
               <PokemonTypeChips types={formInfo?.types || []} />
-              <div className="shrink-0">
-                <RenameDialog
-                  pokemonId={pokemon.id}
-                  currentName={pokemon.name || ''}
-                  canRename={canRenamePokemon}
-                  onRename={onRename}
-                />
-              </div>
             </div>
 
             {/* Evolution Section */}
