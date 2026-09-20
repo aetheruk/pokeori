@@ -45,6 +45,8 @@ export interface ResponsivePanelProps {
   iconClassName?: string
   /** Small label shown in the upper-left of the title frame. */
   heroLabel?: React.ReactNode
+  /** Optional content anchored to the upper-left of the title frame. */
+  heroTopLeft?: React.ReactNode
   /** Optional badge attached to the title icon. */
   heroBadge?: React.ReactNode
   /** Optional action anchored to the lower-left corner of the title frame. */
@@ -79,6 +81,7 @@ export function ResponsivePanel({
   iconClassName,
   heroLabel,
   heroBadge,
+  heroTopLeft,
   heroLeftAction,
   heroAction,
   heroClassName,
@@ -160,6 +163,12 @@ export function ResponsivePanel({
                 className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(23,39,51,0.08),rgba(23,39,51,0.24)_42%,rgba(23,39,51,0.92)_100%)]"
                 aria-hidden="true"
               />
+
+              {heroTopLeft && (
+                <div className="pointer-events-none absolute left-5 top-[max(1rem,env(safe-area-inset-top))] z-20 md:left-7">
+                  {heroTopLeft}
+                </div>
+              )}
 
               {heroLabel && (
                 <div className="absolute left-5 top-[max(1rem,env(safe-area-inset-top))] z-20 max-w-[65%] text-left md:left-7">
