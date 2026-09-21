@@ -56,6 +56,7 @@ import {
   getTypeIcon,
   isChronicleExploreItem,
 } from './utils'
+import { getVsSeekerDifficultyMultiplier } from '@/utilities/vs-seeker'
 
 // Types for props
 interface ModalHelperProps {
@@ -1308,6 +1309,34 @@ export function ActionButton({
     )
   }
 
+  if (item.type === 'vs-seeker') {
+    const selectedLevel = item.vsSeekerLevel || item.originalData.levelCap || 20
+    const selectedDifficulty = item.vsSeekerDifficulty || 1
+
+    return (
+      <Button
+        onClick={() =>
+          handleAction({
+            ...item,
+            vsSeekerLevel: selectedLevel,
+            vsSeekerDifficulty: selectedDifficulty,
+          })
+        }
+        disabled={loadingId === item.id}
+        aria-busy={loadingId === item.id}
+        aria-label={`Start level ${selectedLevel}, difficulty ${selectedDifficulty} VS Seeker rematch`}
+        className="min-h-11 w-full border border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90 [&_svg]:!text-game-cream"
+      >
+        {loadingId === item.id ? (
+          <Loader2 className="mr-2 h-4 w-4 animate-spin text-game-cream" />
+        ) : (
+          getTypeIcon(item)
+        )}
+        Start Level {selectedLevel} Rematch
+      </Button>
+    )
+  }
+
   const isBoxFull = userData.pokemon.length >= (userData.user.maxPokemon || 50)
   const isEncounterType =
     item.type === 'location' ||
@@ -1468,6 +1497,93 @@ export function ExploreModalContent({ item, userData }: ModalHelperProps) {
             })}
           </div>
         )}
+      </div>
+    )
+  }
+
+  if (item.type === 'vs-seeker') {
+    const levels = item.vsSeekerLevelOptions || [item.originalData.levelCap || 20]
+    const difficulties = item.vsSeekerDifficultyOptions || [1, 2, 3, 4, 5]
+    const selectedLevel = item.vsSeekerLevel || levels[levels.length - 1]
+    const selectedDifficulty = item.vsSeekerDifficulty || difficulties[0]
+    const difficultyLabels: Record<number, string> = {
+      1: 'Casual',
+      2: 'Skilled',
+      3: 'Tough',
+      4: 'Expert',
+      5: 'Master',
+    }
+
+    return (
+      <div className="mt-6 space-y-5">
+        <SectionDivider>Rematch Setup</SectionDivider>
+
+        <div className="space-y-3 rounded-lg border border-game-border bg-game-surface-raised p-4">
+          <div className="flex items-center justify-between gap-3">
+            <label
+              htmlFor="vs-seeker-level"
+              className="text-sm font-bold text-game-ink"
+            >
+              Trainer level
+            </label>
+            <span className="font-mono text-sm font-bold text-game-clay-strong">
+              {selectedLevel}
+            </span>
+          </div>
+          <input
+            id="vs-seeker-level"
+            type="range"
+            min={levels[0]}
+            max={levels[levels.length - 1]}
+            step={5}
+            value={selectedLevel}
+            onChange={(event) =>
+              item.setVsSeekerLevel(Number(event.target.value))
+            }
+            aria-label="VS Seeker trainer level"
+            aria-valuetext={`Level ${selectedLevel}`}
+            className="w-full accent-game-charcoal"
+          />
+          <div className="flex justify-between text-xs text-game-muted">
+            <span>Level {levels[0]}</span>
+            <span>Level {levels[levels.length - 1]}</span>
+          </div>
+        </div>
+
+        <div className="space-y-3 rounded-lg border border-game-border bg-game-surface-raised p-4">
+          <div className="flex items-center justify-between gap-3">
+            <label
+              htmlFor="vs-seeker-difficulty"
+              className="text-sm font-bold text-game-ink"
+            >
+              Difficulty
+            </label>
+            <span className="text-right text-sm font-bold text-game-clay-strong">
+              {difficultyLabels[selectedDifficulty] || `Level ${selectedDifficulty}`}
+              <span className="ml-2 font-mono text-xs text-game-muted">
+                ×{getVsSeekerDifficultyMultiplier(selectedDifficulty).toFixed(1)} payout
+              </span>
+            </span>
+          </div>
+          <input
+            id="vs-seeker-difficulty"
+            type="range"
+            min={difficulties[0]}
+            max={difficulties[difficulties.length - 1]}
+            step={1}
+            value={selectedDifficulty}
+            onChange={(event) =>
+              item.setVsSeekerDifficulty(Number(event.target.value))
+            }
+            aria-label="VS Seeker difficulty"
+            aria-valuetext={difficultyLabels[selectedDifficulty] || `Difficulty ${selectedDifficulty}`}
+            className="w-full accent-game-charcoal"
+          />
+          <div className="flex justify-between text-xs text-game-muted">
+            <span>{difficultyLabels[difficulties[0]] || 'Casual'}</span>
+            <span>{difficultyLabels[difficulties[difficulties.length - 1]] || 'Master'}</span>
+          </div>
+        </div>
       </div>
     )
   }

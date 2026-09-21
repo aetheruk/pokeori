@@ -675,7 +675,10 @@ export function useExploreActions(
     if (item.type === 'vs-seeker') {
       setLoadingId(item.id)
       try {
-        const result = await startVsSeekerBattle()
+        const result = await startVsSeekerBattle(
+          item.vsSeekerLevel,
+          item.vsSeekerDifficulty,
+        )
         if (result.success) {
           router.push(result.redirect || '/game/battles/encounter')
         } else {

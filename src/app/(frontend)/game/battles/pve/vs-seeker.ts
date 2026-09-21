@@ -7,12 +7,17 @@ import {
   buildVsSeekerBattleConfig,
   formatVsSeekerCooldown,
   getVsSeekerCooldownRemaining,
+  getVsSeekerTrainerLevel,
   hasVsSeeker,
+  isVsSeekerDifficultyAllowed,
+  isVsSeekerLevelAllowed,
 } from '@/utilities/vs-seeker'
 import { getUserInventoryMap, getUserPokedexMap, getUserProfileStats } from '@/utilities/user-state'
 
 export async function startVsSeekerBattle(
   user: User,
+  requestedLevel?: number,
+  requestedDifficulty?: number,
 ): Promise<{ success: boolean; error?: string; redirect?: string }> {
   const activeBattle = await getActiveBattleState(user)
   if (activeBattle?.status === 'ongoing') {
@@ -52,9 +57,31 @@ export async function startVsSeekerBattle(
     }
   }
 
+  const levelCap = getVsSeekerTrainerLevel(inventory)
+  if (
+    requestedLevel !== undefined &&
+    !isVsSeekerLevelAllowed(requestedLevel, inventory)
+  ) {
+    return {
+      success: false,
+      error: `Choose a VS Seeker level between 20 and ${levelCap} in steps of 5.`,
+    }
+  }
+  if (
+    requestedDifficulty !== undefined &&
+    !isVsSeekerDifficultyAllowed(requestedDifficulty)
+  ) {
+    return {
+      success: false,
+      error: 'Choose a VS Seeker difficulty between 1 and 5.',
+    }
+  }
+
   const battleConfig = buildVsSeekerBattleConfig({
     pokedex,
     inventory,
+    requestedLevel,
+    requestedDifficulty,
     now: new Date(),
   })
 

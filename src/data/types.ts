@@ -235,6 +235,8 @@ export interface BattleConfig {
   allowedItems?: string[] // Item IDs allowed in battle, empty = all battle items
   allowSwapping?: boolean // Whether Pokemon swapping is allowed (default: true)
   aiProfile?: BattleAiProfileId // Optional enemy AI difficulty override
+  /** Optional 1-5 multiplier for random enemy IV/EV quality. */
+  enemyDifficulty?: number
   enemyAttackTelegraphChance?: number // 1-100 chance to prepare the next enemy stance when the player ends a turn below half HP
   isWildBattle?: boolean // Whether this is a random encounter (pick one Pokemon from enemyTeam)
   // Limit Overrides

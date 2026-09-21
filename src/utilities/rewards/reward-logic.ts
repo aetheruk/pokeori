@@ -125,6 +125,7 @@ export interface RewardSummary {
     newLevel: number
     skillXpGranted: number
   }[]
+  skillExperience?: SkillExperienceReward[]
   pokemonExperience?: PokemonExperienceReward[]
   eggs?: { id: string; hatchAt: string; rarity: PokemonRarityId }[]
   levelUp?: {
@@ -151,6 +152,15 @@ export interface PokemonExperienceReward {
   isShadow?: boolean | null
   isRadiant?: boolean | null
   female?: boolean
+}
+
+export interface SkillExperienceReward {
+  skillId: string
+  amount: number
+  oldLevel?: number
+  newLevel?: number
+  oldExperience?: number
+  newExperience?: number
 }
 
 type RandomEventEntry = {
@@ -361,6 +371,7 @@ export async function grantRewards(
     notices: [],
     researchXp: [],
     researchBreakthroughs: [],
+    skillExperience: [],
     pokemonExperience: [],
     eggs: [],
   }
@@ -943,10 +954,20 @@ export async function grantRewards(
     if (!skillsDict[skillId]) skillsDict[skillId] = { level: 1, exp: 0 }
 
     const currentSkill = skillsDict[skillId]
-    const newTotalExp = currentSkill.exp + amount
-    const currentLevel = currentSkill.level
+    const currentExperience = Math.max(0, currentSkill.exp || 0)
+    const newTotalExp = currentExperience + amount
+    const currentLevel = Math.max(1, currentSkill.level || 1)
     const calculatedLevel = getLevelFromExp(newTotalExp)
     const newLevel = Math.min(calculatedLevel, currentLevel + 1) // Cap at 1 levelup per batch?? No, logic was loops.
+
+    summary.skillExperience?.push({
+      skillId,
+      amount,
+      oldLevel: currentLevel,
+      newLevel,
+      oldExperience: currentExperience,
+      newExperience: newTotalExp,
+    })
 
     if (newLevel > currentLevel) {
       // ... Recurse rewards for level up

@@ -18,6 +18,8 @@ import {
   getVsSeekerCooldownRemaining,
   getVsSeekerTrainerLevel,
   hasVsSeeker,
+  VS_SEEKER_MIN_DIFFICULTY,
+  VS_SEEKER_MAX_DIFFICULTY,
   VS_SEEKER_BACKGROUND,
 } from '@/utilities/vs-seeker'
 import type { ExploreItem } from '../types'
@@ -337,11 +339,13 @@ export function useExploreData(
       originalData: {
         ...VS_SEEKER_EXPLORE_ITEM.originalData,
         rewards: [
-          ...getVsSeekerCurrencyRewards(),
+          ...getVsSeekerCurrencyRewards(trainerLevel),
           ...getVsSeekerCandyRewards(trainerLevel),
         ],
         maxPokemon: 3,
         levelCap: trainerLevel,
+        difficulty: VS_SEEKER_MIN_DIFFICULTY,
+        maxDifficulty: VS_SEEKER_MAX_DIFFICULTY,
       },
     }
   }, [userData])

@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useMemo } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { GameInfoModal } from '@/components/game/shared/GameInfoModal'
 import { CurrencySprite } from '@/components/ui/currency-sprite'
@@ -16,6 +16,12 @@ import { getCurrency } from '@/data/currencies'
 import { getGameTypeLabel } from './utils'
 import type { ExploreItem } from './types'
 import { getExploreItemBackground, getExploreItemIcon } from './rival-display'
+import {
+  getVsSeekerCandyRewards,
+  getVsSeekerCurrencyRewards,
+  getVsSeekerDifficultyOptions,
+  getVsSeekerLevelOptions,
+} from '@/utilities/vs-seeker'
 import {
   ActionButton,
   ExploreModalContent,
@@ -122,9 +128,67 @@ export function ExploreDetailsModal({
   onChooseBranch,
   onRequestAbandonExpedition,
 }: ExploreDetailsModalProps) {
+  const vsSeekerLevelOptions = useMemo(() => {
+    if (item.type !== 'vs-seeker') return []
+
+    const inventoryMap = Object.fromEntries(
+      (userData.inventory || []).map((entry: any) => [
+        entry.itemId,
+        entry.quantity,
+      ]),
+    )
+    return getVsSeekerLevelOptions(inventoryMap)
+  }, [item.type, userData.inventory])
+  const vsSeekerMaxLevel =
+    vsSeekerLevelOptions[vsSeekerLevelOptions.length - 1] || 20
+  const [vsSeekerLevel, setVsSeekerLevel] = useState(vsSeekerMaxLevel)
+  const vsSeekerDifficultyOptions = useMemo(
+    () => (item.type === 'vs-seeker' ? getVsSeekerDifficultyOptions() : []),
+    [item.type],
+  )
+  const [vsSeekerDifficulty, setVsSeekerDifficulty] = useState(1)
+
+  useEffect(() => {
+    if (item.type === 'vs-seeker') {
+      setVsSeekerLevel(vsSeekerMaxLevel)
+      setVsSeekerDifficulty(1)
+    }
+  }, [item.id, item.type, vsSeekerMaxLevel])
+
+  const selectedVsSeekerLevel =
+    item.type === 'vs-seeker'
+      ? Math.min(
+          vsSeekerMaxLevel,
+          Math.max(20, vsSeekerLevel || vsSeekerMaxLevel),
+        )
+      : undefined
+  const selectedVsSeekerDifficulty =
+    item.type === 'vs-seeker' ? vsSeekerDifficulty : undefined
+
   const itemForModal = useMemo(
     () => ({
       ...item,
+      ...(item.type === 'vs-seeker'
+        ? {
+            vsSeekerLevel: selectedVsSeekerLevel,
+            vsSeekerLevelOptions,
+            setVsSeekerLevel,
+            vsSeekerDifficulty: selectedVsSeekerDifficulty,
+            vsSeekerDifficultyOptions,
+            setVsSeekerDifficulty,
+            originalData: {
+              ...item.originalData,
+              levelCap: vsSeekerMaxLevel,
+              rewards: [
+                ...getVsSeekerCurrencyRewards(
+                  selectedVsSeekerLevel || 20,
+                  selectedVsSeekerDifficulty || 1,
+                ),
+                ...getVsSeekerCandyRewards(selectedVsSeekerLevel || 20),
+              ],
+            },
+          }
+        : {}),
       selectedPokemonIds,
       togglePokemonSelection,
       selectedRepelItemId,
@@ -140,6 +204,11 @@ export function ExploreDetailsModal({
     }),
     [
       item,
+      selectedVsSeekerLevel,
+      vsSeekerLevelOptions,
+      vsSeekerMaxLevel,
+      selectedVsSeekerDifficulty,
+      vsSeekerDifficultyOptions,
       selectedPokemonIds,
       togglePokemonSelection,
       selectedRepelItemId,

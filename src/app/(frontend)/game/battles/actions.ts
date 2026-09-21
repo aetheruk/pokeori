@@ -83,14 +83,17 @@ export async function startBattle(
   return startPveBattle(battleId, consumedPokemonIds)
 }
 
-export async function startVsSeekerBattle(): Promise<{
+export async function startVsSeekerBattle(
+  requestedLevel?: number,
+  requestedDifficulty?: number,
+): Promise<{
   success: boolean
   error?: string
   redirect?: string
 }> {
   const user = await fetchUser()
   if (!user) return { success: false, error: 'Not authenticated' }
-  return startVsSeekerPveBattle(user)
+  return startVsSeekerPveBattle(user, requestedLevel, requestedDifficulty)
 }
 
 export async function submitTurn(

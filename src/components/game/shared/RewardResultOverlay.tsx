@@ -17,6 +17,7 @@ import { markExpeditionReturn } from '@/components/game/features/explore/expedit
 import { TaskExitDialog } from '@/components/game/task-exit-dialog'
 import type { TaskExitModal, TaskIcon } from '@/data/tasks'
 import type { CompleteTaskResult } from '@/utilities/tasks/actions'
+import type { SkillExperienceReward } from '@/utilities/rewards/reward-logic'
 
 // We can define a generic result interface that covers tasks, battles, etc.
 // But mostly they will differ slightly.
@@ -60,6 +61,7 @@ export interface GenericResult {
       newLevel: number
       skillXpGranted: number
     }[]
+    skillExperience?: SkillExperienceReward[]
   }
   exitModal?: TaskExitModal
 }

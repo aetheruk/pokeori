@@ -6,6 +6,10 @@ import {
   getVsSeekerBadgeCount,
   getVsSeekerCandyRewards,
   getVsSeekerCooldownRemaining,
+  getVsSeekerDifficultyMultiplier,
+  getVsSeekerDifficultyOptions,
+  getVsSeekerLeagueTicketReward,
+  getVsSeekerPayout,
   getVsSeekerTrainerHealingItemId,
   getVsSeekerTrainerLevel,
   hasVsSeeker,
@@ -16,9 +20,44 @@ import {
 
 describe('VS Seeker battle generation', () => {
   test('scales trainer level from Kanto badges', () => {
-    expect(getVsSeekerTrainerLevel({})).toBe(10)
-    expect(getVsSeekerTrainerLevel({ 'badge-kanto-cascade': 1 })).toBe(20)
-    expect(getVsSeekerTrainerLevel({ 'badge-kanto-earth': 1 })).toBe(50)
+    expect(getVsSeekerTrainerLevel({})).toBe(20)
+    expect(getVsSeekerTrainerLevel({ 'badge-kanto-cascade': 1 })).toBe(25)
+    expect(getVsSeekerTrainerLevel({ 'badge-kanto-earth': 1 })).toBe(25)
+    expect(
+      getVsSeekerTrainerLevel({
+        ...Object.fromEntries(
+          [
+            'badge-kanto-boulder',
+            'badge-kanto-cascade',
+            'badge-kanto-thunder',
+            'badge-kanto-rainbow',
+            'badge-kanto-soul',
+            'badge-kanto-marsh',
+            'badge-kanto-volcano',
+            'badge-kanto-earth',
+            'badge-johto-zephyr',
+            'badge-johto-hive',
+            'badge-johto-plain',
+            'badge-johto-fog',
+            'badge-johto-storm',
+            'badge-johto-mineral',
+            'badge-johto-glacier',
+            'badge-johto-rising',
+          ].map((badgeId) => [badgeId, 1]),
+        ),
+      }),
+    ).toBe(100)
+  })
+
+  test('offers five-point rematch levels and five difficulty settings', () => {
+    expect(getVsSeekerDifficultyOptions()).toEqual([1, 2, 3, 4, 5])
+    expect(getVsSeekerDifficultyMultiplier(1)).toBe(1)
+    expect(getVsSeekerDifficultyMultiplier(5)).toBe(3)
+    expect(getVsSeekerLeagueTicketReward(1)).toBe(1)
+    expect(getVsSeekerLeagueTicketReward(5)).toBe(5)
+    expect(getVsSeekerPayout(20)).toBe(350)
+    expect(getVsSeekerPayout(30)).toBe(650)
+    expect(getVsSeekerPayout(30, 5)).toBe(1950)
   })
 
   test('scales trainer healing item pool from Kanto badge count', () => {
@@ -133,9 +172,10 @@ describe('VS Seeker battle generation', () => {
     expect(config?.name).toBe('Beauty Mira')
     expect(config?.icon).toEqual({ type: 'trainer', id: 'beauty' })
     expect(config?.aiProfile).toBe('trainer')
-    expect(config?.levelCap).toBe(20)
+    expect(config?.levelCap).toBe(25)
+    expect(config?.enemyTeam.every((enemy) => enemy.level === 25)).toBe(true)
+    expect(config?.enemyDifficulty).toBe(1)
     expect(config?.enemyTeam).toHaveLength(3)
-    expect(config?.enemyTeam.every((enemy) => enemy.level === 20)).toBe(true)
     expect(config?.enemyTeam.every((enemy) => enemy.heldItemId)).toBe(true)
     expect(config?.trainerItems).toEqual([
       {
@@ -146,7 +186,7 @@ describe('VS Seeker battle generation', () => {
     expect(config?.rewards).toContainEqual({
       type: 'currency',
       targetId: 'pokedollars',
-      quantity: 1000,
+      quantity: 500,
       dropChance: 100,
     })
     expect(config?.rewards).toContainEqual({
@@ -157,17 +197,85 @@ describe('VS Seeker battle generation', () => {
     })
     expect(config?.disableCandyRewards).toBe(true)
     expect(config?.disableLossPayout).toBe(true)
-    expect(config?.rewards).not.toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ type: 'item', targetId: 'rare-candy-xs' }),
-        expect.objectContaining({ type: 'item', targetId: 'rare-candy-s' }),
-      ]),
-    )
+    expect(config?.rewards).toContainEqual({
+      type: 'item',
+      targetId: 'rare-candy-m',
+      quantity: 1,
+      dropChance: 100,
+    })
+    expect(config?.rewards).toContainEqual({
+      type: 'item',
+      targetId: 'candy-dust',
+      quantity: 5,
+      dropChance: 100,
+    })
   })
 
-  test('does not return a guaranteed candy bundle', () => {
-    expect(getVsSeekerCandyRewards(10)).toEqual([])
-    expect(getVsSeekerCandyRewards(25)).toEqual([])
+  test('returns one level-matched candy and five Candy Dust', () => {
+    expect(getVsSeekerCandyRewards(30)).toEqual([
+      {
+        type: 'item',
+        targetId: 'rare-candy-m',
+        quantity: 1,
+        dropChance: 100,
+      },
+      {
+        type: 'item',
+        targetId: 'candy-dust',
+        quantity: 5,
+        dropChance: 100,
+      },
+    ])
+  })
+
+  test('accepts a badge-capped level and difficulty selection', () => {
+    const config = buildVsSeekerBattleConfig({
+      inventory: {
+        'badge-kanto-boulder': 1,
+        'badge-kanto-cascade': 1,
+      },
+      requestedLevel: 35,
+      requestedDifficulty: 5,
+      pokedex: {
+        '1': { '1': { seen: true } },
+        '4': { '4': { seen: true } },
+        '7': { '7': { seen: true } },
+      },
+      rng: () => 0,
+    })
+
+    expect(config).toBeNull()
+
+    const allowedConfig = buildVsSeekerBattleConfig({
+      inventory: {
+        'badge-kanto-boulder': 1,
+        'badge-kanto-cascade': 1,
+      },
+      requestedLevel: 30,
+      requestedDifficulty: 5,
+      pokedex: {
+        '1': { '1': { seen: true } },
+        '4': { '4': { seen: true } },
+        '7': { '7': { seen: true } },
+      },
+      rng: () => 0,
+    })
+
+    expect(allowedConfig).not.toBeNull()
+    expect(allowedConfig?.levelCap).toBe(30)
+    expect(allowedConfig?.enemyDifficulty).toBe(5)
+    expect(allowedConfig?.rewards).toContainEqual({
+      type: 'currency',
+      targetId: 'pokedollars',
+      quantity: 1950,
+      dropChance: 100,
+    })
+    expect(allowedConfig?.rewards).toContainEqual({
+      type: 'currency',
+      targetId: 'league-ticket',
+      quantity: 5,
+      dropChance: 100,
+    })
   })
 
   test('requires at least 3 seen Pokemon', () => {
