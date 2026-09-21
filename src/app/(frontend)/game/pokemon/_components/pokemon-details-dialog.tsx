@@ -123,6 +123,10 @@ import {
 } from '@/utilities/pokemon/rarity-effects'
 import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
 import {
+  getPokemonExperienceProgress,
+  getPokemonLevelCap,
+} from '@/utilities/pokemon/experience'
+import {
   getPokemonResearchLevelTmUnlocks,
   MAX_RESEARCH_LEVEL,
   RESEARCH_LEVEL_REWARDS,
@@ -478,6 +482,74 @@ function ResearchSection({
             </div>
           )}
         </div>
+      </div>
+    </div>
+  )
+}
+
+function PokemonExperienceBar({
+  growthRate,
+  level,
+  experience,
+  levelCap,
+}: {
+  growthRate: string | null | undefined
+  level: number
+  experience: number | null | undefined
+  levelCap: number
+}) {
+  const currentLevel = Math.max(1, Math.floor(level || 1))
+  const totalExperience = Math.max(0, Math.floor(experience || 0))
+  const progress = getPokemonExperienceProgress(
+    growthRate,
+    currentLevel,
+    totalExperience,
+    levelCap,
+  )
+  const isAtLevelCap = currentLevel >= levelCap
+  const nextLevelLabel = isAtLevelCap
+    ? `Level cap ${levelCap}`
+    : `Level ${currentLevel + 1}`
+
+  return (
+    <div className="w-full max-w-xl border-b border-game-border/75 pb-4">
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2">
+          <ArrowUp
+            aria-hidden="true"
+            className="size-4 shrink-0 text-game-ochre"
+            strokeWidth={2.25}
+          />
+          <span className="text-[10px] font-black uppercase tracking-widest text-game-muted">
+            Experience
+          </span>
+        </div>
+        <span className="shrink-0 font-mono text-[11px] font-bold text-game-ink">
+          {totalExperience.toLocaleString()} XP total
+        </span>
+      </div>
+
+      <div
+        className="relative h-2.5 w-full overflow-hidden rounded-full border border-game-border bg-game-canvas"
+        role="progressbar"
+        aria-label={`Level ${currentLevel} experience progress`}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={progress.percent}
+        aria-valuetext={`${progress.current.toLocaleString()} of ${progress.required.toLocaleString()} XP toward ${nextLevelLabel}`}
+      >
+        <div
+          className="h-full bg-game-ochre transition-[width] duration-500 motion-reduce:transition-none"
+          style={{ width: `${progress.percent}%` }}
+        />
+      </div>
+
+      <div className="mt-1.5 flex items-center justify-between gap-3 text-[10px] font-bold tracking-tight text-game-muted">
+        <span>Level {currentLevel}</span>
+        <span className="font-mono text-game-ink">
+          {progress.current.toLocaleString()} /{' '}
+          {progress.required.toLocaleString()} XP · {nextLevelLabel}
+        </span>
       </div>
     </div>
   )
@@ -1429,6 +1501,13 @@ function MountedPokemonDetailsDialog({
                 </div>
               </div>
             </div>
+
+            <PokemonExperienceBar
+              growthRate={formInfo?.growth_rate}
+              level={pokemon.level}
+              experience={pokemon.experience}
+              levelCap={getPokemonLevelCap(effectiveInventoryMap)}
+            />
 
             <div className="w-full max-w-md space-y-4">
               <SectionDivider className="uppercase tracking-[0.2em] font-black text-[10px]">
