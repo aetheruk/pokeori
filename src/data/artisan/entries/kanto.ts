@@ -1146,7 +1146,7 @@ const HELD_RECIPES: ArtisanRecipeDraft[] = TYPE_HELD_ITEM_FAMILIES.flatMap((fami
   }): ArtisanRecipeDraft => ({
     id: `craft-${params.itemId}`,
     name: params.itemName,
-    description: `Craft ${params.itemName} from ${family.type}-aligned materials and candy dust.`,
+    description: `Craft ${params.itemName} from ${family.type}-aligned materials and PokePowder.`,
     artisanLevel: params.artisanLevel,
     costs: [
       { id: materialId, amount: params.materialAmount },

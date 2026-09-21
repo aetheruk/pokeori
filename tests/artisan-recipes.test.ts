@@ -560,7 +560,7 @@ describe('artisan recipes', () => {
     expect(shouldConsumeCraftCosts(recipe!, 'good')).toBe(true)
   })
 
-  test('status remedy recipes unlock together and use berries, candy dust, and typed materials', () => {
+  test('status remedy recipes unlock together and use PokePowder, berries, and typed materials', () => {
     const expectedRecipes = [
       {
         id: 'mix-antidote',

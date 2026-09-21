@@ -15,9 +15,22 @@ const LEVEL_TO_CANDY_MAP = [
 
 export const WILD_BATTLE_CANDY_DUST_DROP_CHANCE = 30
 
+const LEVEL_TO_POKE_POWDER_MAP = [
+  { maxLevel: 20, id: 'poke-powder-xs' },
+  { maxLevel: 40, id: 'poke-powder-s' },
+  { maxLevel: 60, id: 'poke-powder-m' },
+  { maxLevel: 80, id: 'poke-powder-l' },
+  { maxLevel: 100, id: 'poke-powder-xl' },
+]
+
 export function getCandyIdForLevel(level: number): string {
   const match = LEVEL_TO_CANDY_MAP.find((m) => level <= m.maxLevel)
   return match?.id || 'rare-candy-max'
+}
+
+export function getPokePowderIdForLevel(level: number): string {
+  const match = LEVEL_TO_POKE_POWDER_MAP.find((m) => level <= m.maxLevel)
+  return match?.id || 'poke-powder-xl'
 }
 
 export function getCandyIdsUpToLevel(level: number): string[] {
@@ -37,8 +50,9 @@ export function getWildBattleCandyDropChance(level: number): number {
 }
 
 /**
- * Candy Dust is a small consolation drop for wild battles. Higher level
- * encounters increase the quantity without making the drop itself common.
+ * Level-matched PokePowder is a small consolation drop for wild battles.
+ * Higher level encounters increase the quantity without making the drop
+ * itself common.
  */
 export function getWildBattleCandyDustQuantity(level: number): {
   min: number
@@ -83,7 +97,7 @@ export function calculateCandyRewards(
 
   rewards.push({
     type: 'item',
-    targetId: 'candy-dust',
+    targetId: getPokePowderIdForLevel(maxLevel),
     quantity: getWildBattleCandyDustQuantity(maxLevel),
     dropChance: WILD_BATTLE_CANDY_DUST_DROP_CHANCE,
   })

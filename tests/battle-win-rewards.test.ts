@@ -547,7 +547,8 @@ describe('battle win rewards', () => {
 
     expect(
       rewards.some(
-        (reward) => reward.type === 'item' && reward.targetId === 'candy-dust',
+        (reward) =>
+          reward.type === 'item' && reward.targetId === 'poke-powder-xs',
       ),
     ).toBe(true)
   })

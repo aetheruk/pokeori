@@ -205,13 +205,13 @@ describe('VS Seeker battle generation', () => {
     })
     expect(config?.rewards).toContainEqual({
       type: 'item',
-      targetId: 'candy-dust',
+      targetId: 'poke-powder-s',
       quantity: 5,
       dropChance: 100,
     })
   })
 
-  test('returns one level-matched candy and five Candy Dust', () => {
+  test('returns one level-matched candy and five level-matched PokePowder', () => {
     expect(getVsSeekerCandyRewards(30)).toEqual([
       {
         type: 'item',
@@ -221,7 +221,7 @@ describe('VS Seeker battle generation', () => {
       },
       {
         type: 'item',
-        targetId: 'candy-dust',
+        targetId: 'poke-powder-s',
         quantity: 5,
         dropChance: 100,
       },

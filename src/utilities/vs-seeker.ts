@@ -8,7 +8,10 @@ import {
   vsSeekerTrainerNames,
   type TrainerClassId,
 } from '@/data/trainers'
-import { getCandyIdForLevel } from '@/utilities/rewards/candy-logic'
+import {
+  getCandyIdForLevel,
+  getPokePowderIdForLevel,
+} from '@/utilities/rewards/candy-logic'
 import { getPokemonLevelCap } from '@/utilities/pokemon/experience'
 
 export const VS_SEEKER_COOLDOWN_MS = 30 * 60 * 1000
@@ -21,7 +24,7 @@ export const VS_SEEKER_LEVEL_STEP = 5
 export const VS_SEEKER_BASE_POKEDOLLAR_REWARD = 350
 export const VS_SEEKER_POKEDOLLAR_PER_LEVEL_STEP = 150
 export const VS_SEEKER_LEAGUE_TICKET_REWARD = 1
-export const VS_SEEKER_CANDY_DUST_REWARD = 5
+export const VS_SEEKER_POKE_POWDER_REWARD = 5
 export const VS_SEEKER_MIN_DIFFICULTY = 1
 export const VS_SEEKER_MAX_DIFFICULTY = 5
 
@@ -253,8 +256,8 @@ export function getVsSeekerCandyRewards(level: number) {
     },
     {
       type: 'item' as const,
-      targetId: 'candy-dust',
-      quantity: VS_SEEKER_CANDY_DUST_REWARD,
+      targetId: getPokePowderIdForLevel(level),
+      quantity: VS_SEEKER_POKE_POWDER_REWARD,
       dropChance: 100,
     },
   ]

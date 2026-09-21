@@ -379,7 +379,6 @@ const ARTISAN_MATERIAL_PREFIXES = [
   'shadow-fiber-',
   'pixie-powder-',
   'poke-powder-',
-  'candy-dust',
   'paint-',
   'nut-',
 ] as const
