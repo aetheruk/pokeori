@@ -43,7 +43,7 @@ import {
 } from '@/utilities/tasks/task-logic'
 import type { RequirementEvaluationContext } from '@/utilities/requirements'
 import { calculateStats } from '@/utilities/pokemon/pokemon-mechanics'
-import { rollPokemonGender } from '@/utilities/pokemon/gender'
+import { getOwnedPokemonGender, rollPokemonGender } from '@/utilities/pokemon/gender'
 import type { ExtendedUser, SkillsData, CurrencyData } from '@/types/user-data'
 import { UserDataConverters } from '@/types/user-data'
 import {
@@ -125,14 +125,7 @@ export interface RewardSummary {
     newLevel: number
     skillXpGranted: number
   }[]
-  pokemonExperience?: {
-    pokemonId: string
-    pokemonName: string
-    amount: number
-    oldLevel: number
-    newLevel: number
-    levelCap: number
-  }[]
+  pokemonExperience?: PokemonExperienceReward[]
   eggs?: { id: string; hatchAt: string; rarity: PokemonRarityId }[]
   levelUp?: {
     newLevel: number
@@ -140,6 +133,24 @@ export interface RewardSummary {
     skillId: string
     rewards: (SkillLevelReward & { level: number })[]
   }
+}
+
+export interface PokemonExperienceReward {
+  pokemonId: string
+  pokemonName: string
+  amount: number
+  oldLevel: number
+  newLevel: number
+  levelCap: number
+  oldExperience?: number
+  newExperience?: number
+  growthRate?: string
+  formId?: string
+  rarity?: string | null
+  shiny?: boolean | null
+  isShadow?: boolean | null
+  isRadiant?: boolean | null
+  female?: boolean
 }
 
 type RandomEventEntry = {
@@ -685,6 +696,17 @@ export async function grantRewards(
         oldLevel: currentLevel,
         newLevel,
         levelCap,
+        oldExperience: currentExperience,
+        newExperience: nextExperience,
+        growthRate: growthRate || undefined,
+        formId: currentPokemon.formId
+          ? String(currentPokemon.formId)
+          : undefined,
+        rarity: currentPokemon.rarity,
+        shiny: currentPokemon.shiny,
+        isShadow: currentPokemon.isShadow,
+        isRadiant: currentPokemon.isRadiant,
+        female: getOwnedPokemonGender(currentPokemon) === 'female',
       })
     } else if (reward.type === 'egg') {
       if (activeEggCount === null) {

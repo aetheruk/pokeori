@@ -102,7 +102,7 @@ describe('battle win rewards', () => {
     })
   })
 
-  test('adds PvE experience to each involved Pokemon from enemy base experience', () => {
+  test('adds PvE experience to each involved Pokemon using its persisted level', () => {
     const state = makePveBattleState({
       enemyTeam: [
         makeBattlePokemon({
@@ -124,7 +124,41 @@ describe('battle win rewards', () => {
     expect(rewards).toContainEqual({
       type: 'pokemon_experience',
       targetId: 'pokemon-1',
-      quantity: 508,
+      quantity: 1271,
+      dropChance: 100,
+    })
+  })
+
+  test('uses the persisted level when a battle level cap syncs the combat level', () => {
+    const state = makePveBattleState({
+      playerTeam: [
+        makeBattlePokemon({
+          id: 'pokemon-synced',
+          level: 20,
+          actualLevel: 60,
+        }),
+      ],
+      enemyTeam: [
+        makeBattlePokemon({
+          id: 'enemy-butterfree',
+          user: 'enemy',
+          speciesId: 12,
+          formId: '12',
+          level: 20,
+          name: 'Butterfree',
+        }),
+      ],
+    })
+
+    const rewards = buildBattleWinRewards(state, user, {
+      isWildBattle: false,
+      rewards: [],
+    })
+
+    expect(rewards).toContainEqual({
+      type: 'pokemon_experience',
+      targetId: 'pokemon-synced',
+      quantity: 1525,
       dropChance: 100,
     })
   })
