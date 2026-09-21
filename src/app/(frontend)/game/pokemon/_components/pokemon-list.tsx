@@ -85,6 +85,7 @@ import {
   getPokemonItemUnavailableReason,
   isPokemonTargetedInventoryItem,
 } from '@/utilities/pokemon/item-usability'
+import { getPokemonLevelCap } from '@/utilities/pokemon/experience'
 import {
   applyItemToPokemon,
   createBox,
@@ -827,6 +828,7 @@ export function PokemonList({
               fusionBaseFormId: pokemon.fusionBaseFormId,
               fusedWithPokemonId: pokemon.fusedWithPokemonId,
               fusedIntoPokemonId: pokemon.fusedIntoPokemonId,
+              levelCap: getPokemonLevelCap(inventoryMap),
             },
             user?.skills,
           )

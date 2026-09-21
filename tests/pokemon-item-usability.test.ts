@@ -49,6 +49,33 @@ describe('Pokemon item usability', () => {
     ).toBeNull()
   })
 
+  test('respects badge level caps for regular candies and candy bags', () => {
+    expect(
+      getPokemonItemUnavailableReason(item('rare-candy-s'), {
+        level: 19,
+        levelCap: 20,
+      }),
+    ).toBeNull()
+    expect(
+      getPokemonItemUnavailableReason(item('rare-candy-s'), {
+        level: 19,
+        levelCap: 19,
+      }),
+    ).toBe('This Pokemon cannot exceed level 19 until more badges are earned.')
+    expect(
+      getPokemonItemUnavailableReason(item('rare-candy-s-bag'), {
+        level: 19,
+        levelCap: 20,
+      }),
+    ).toBeNull()
+    expect(
+      getPokemonItemUnavailableReason(item('rare-candy-s-bag'), {
+        level: 19,
+        levelCap: 19,
+      }),
+    ).toBe('This Pokemon cannot exceed level 19 until more badges are earned.')
+  })
+
   test('hides stat items, ability patches, and research kits when they cannot apply', () => {
     expect(
       getPokemonItemUnavailableReason(item('hp-up'), {

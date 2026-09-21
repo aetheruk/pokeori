@@ -102,12 +102,22 @@ describe('Pokemon battle experience', () => {
   })
 
   test('holds capped experience just below the next threshold', () => {
-    expect(getPokemonExperienceCap('medium-slow', 20)).toBe(
+    const experienceCap = getPokemonExperienceCap('medium-slow', 20)
+    expect(experienceCap).toBe(
       getTotalPokemonExperienceForLevel('medium-slow', 21) - 1,
     )
-    const progress = getPokemonExperienceProgress('medium-slow', 20, 5459, 20)
-    expect(progress.current).toBe(0)
+    expect(getPokemonLevelFromExperience('medium-slow', experienceCap)).toBe(20)
+    expect(
+      getPokemonLevelFromExperience('medium-slow', experienceCap + 1),
+    ).toBe(21)
+    const progress = getPokemonExperienceProgress(
+      'medium-slow',
+      20,
+      experienceCap,
+      20,
+    )
+    expect(progress.current).toBe(progress.required)
     expect(progress.required).toBeGreaterThan(0)
-    expect(progress.percent).toBe(0)
+    expect(progress.percent).toBe(100)
   })
 })
