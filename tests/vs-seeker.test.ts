@@ -157,23 +157,17 @@ describe('VS Seeker battle generation', () => {
     })
     expect(config?.disableCandyRewards).toBe(true)
     expect(config?.disableLossPayout).toBe(true)
-    expect(config?.rewards).toEqual(
+    expect(config?.rewards).not.toEqual(
       expect.arrayContaining([
-        { type: 'item', targetId: 'rare-candy-xs', quantity: 3, dropChance: 100 },
-        { type: 'item', targetId: 'rare-candy-s', quantity: 3, dropChance: 100 },
+        expect.objectContaining({ type: 'item', targetId: 'rare-candy-xs' }),
+        expect.objectContaining({ type: 'item', targetId: 'rare-candy-s' }),
       ]),
     )
   })
 
-  test('rewards three of each candy tier up to the generated trainer level', () => {
-    expect(getVsSeekerCandyRewards(10)).toEqual([
-      { type: 'item', targetId: 'rare-candy-xs', quantity: 3, dropChance: 100 },
-    ])
-    expect(getVsSeekerCandyRewards(25)).toEqual([
-      { type: 'item', targetId: 'rare-candy-xs', quantity: 3, dropChance: 100 },
-      { type: 'item', targetId: 'rare-candy-s', quantity: 3, dropChance: 100 },
-      { type: 'item', targetId: 'rare-candy-m', quantity: 3, dropChance: 100 },
-    ])
+  test('does not return a guaranteed candy bundle', () => {
+    expect(getVsSeekerCandyRewards(10)).toEqual([])
+    expect(getVsSeekerCandyRewards(25)).toEqual([])
   })
 
   test('requires at least 3 seen Pokemon', () => {

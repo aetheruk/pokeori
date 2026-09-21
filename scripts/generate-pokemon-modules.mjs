@@ -61,6 +61,7 @@ function generatePokemonModule() {
 
   // Load all required data files
   const pokemonSpecies = loadJsonFile('pokemon_species.json')
+  const growthRates = loadJsonFile('growth_rates.json')
   const pokemon = loadJsonFile('pokemon.json')
   const pokemonStats = loadJsonFile('pokemon_stats.json')
   const pokemonTypes = loadJsonFile('pokemon_types.json')
@@ -81,6 +82,9 @@ function generatePokemonModule() {
   )
   const speciesNamesMap = new Map(
     pokemonSpeciesNames.map((s) => [`${s.pokemon_species_id}_${s.local_language_id}`, s.name]),
+  )
+  const growthRatesMap = new Map(
+    growthRates.map((growthRate) => [String(growthRate.id), growthRate.identifier]),
   )
   const colorNamesMap = new Map(
     pokemonColorNames.map((c) => [`${c.pokemon_color_id}_${c.local_language_id}`, c.name]),
@@ -207,6 +211,7 @@ function generatePokemonModule() {
     const speciesId = parseInt(species.id)
     const speciesData = {
       id: speciesId,
+      growth_rate: growthRatesMap.get(String(species.growth_rate_id)) || 'medium-slow',
       capture_rate: parseInt(species.capture_rate),
       gender_rate: parseInt(species.gender_rate),
       has_gender_differences: species.has_gender_differences === '1',
@@ -494,8 +499,17 @@ export interface PokemonForm {
   stats: PokemonStats;
 }
 
+export type PokemonGrowthRate =
+  | 'slow'
+  | 'medium'
+  | 'fast'
+  | 'medium-slow'
+  | 'slow-then-very-fast'
+  | 'fast-then-very-slow';
+
 export interface PokemonSpecies {
   id: number;
+  growth_rate: PokemonGrowthRate;
   capture_rate: number;
   gender_rate: number; // -1 = genderless, 0 = all male, 8 = all female, otherwise female eighths
   has_gender_differences: boolean;

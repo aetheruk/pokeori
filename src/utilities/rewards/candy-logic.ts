@@ -1,44 +1,19 @@
 import { BattleConfig, LocationReward } from '@/data/types'
 
 const LEVEL_TO_CANDY_MAP = [
-  { maxLevel: 10, id: 'rare-candy-xs', wildDropChance: 65 },
-  { maxLevel: 20, id: 'rare-candy-s', wildDropChance: 65 },
-  { maxLevel: 30, id: 'rare-candy-m', wildDropChance: 45 },
-  { maxLevel: 40, id: 'rare-candy-l', wildDropChance: 45 },
-  { maxLevel: 50, id: 'rare-candy-xl', wildDropChance: 30 },
-  { maxLevel: 60, id: 'rare-candy-xxl', wildDropChance: 30 },
-  { maxLevel: 70, id: 'rare-candy-mega', wildDropChance: 25 },
-  { maxLevel: 80, id: 'rare-candy-giga', wildDropChance: 25 },
-  { maxLevel: 90, id: 'rare-candy-tera', wildDropChance: 15 },
-  { maxLevel: 100, id: 'rare-candy-max', wildDropChance: 15 },
+  { maxLevel: 10, id: 'rare-candy-xs', wildDropChance: 8 },
+  { maxLevel: 20, id: 'rare-candy-s', wildDropChance: 8 },
+  { maxLevel: 30, id: 'rare-candy-m', wildDropChance: 8 },
+  { maxLevel: 40, id: 'rare-candy-l', wildDropChance: 8 },
+  { maxLevel: 50, id: 'rare-candy-xl', wildDropChance: 8 },
+  { maxLevel: 60, id: 'rare-candy-xxl', wildDropChance: 8 },
+  { maxLevel: 70, id: 'rare-candy-mega', wildDropChance: 8 },
+  { maxLevel: 80, id: 'rare-candy-giga', wildDropChance: 8 },
+  { maxLevel: 90, id: 'rare-candy-tera', wildDropChance: 8 },
+  { maxLevel: 100, id: 'rare-candy-max', wildDropChance: 8 },
 ]
 
-const BADGE_SUPPORT_CANDY_DROPS = [
-  {
-    badgeId: 'badge-kanto-cascade',
-    minEnemyLevel: 15,
-    candyId: 'rare-candy-m',
-    dropChance: 20,
-  },
-  {
-    badgeId: 'badge-kanto-rainbow',
-    minEnemyLevel: 25,
-    candyId: 'rare-candy-l',
-    dropChance: 20,
-  },
-  {
-    badgeId: 'badge-kanto-soul',
-    minEnemyLevel: 30,
-    candyId: 'rare-candy-xl',
-    dropChance: 20,
-  },
-  {
-    badgeId: 'badge-kanto-earth',
-    minEnemyLevel: 40,
-    candyId: 'rare-candy-xxl',
-    dropChance: 20,
-  },
-]
+export const WILD_BATTLE_CANDY_DUST_DROP_CHANCE = 30
 
 export function getCandyIdForLevel(level: number): string {
   const match = LEVEL_TO_CANDY_MAP.find((m) => level <= m.maxLevel)
@@ -58,7 +33,25 @@ export function getCandyIdsUpToLevel(level: number): string[] {
 
 export function getWildBattleCandyDropChance(level: number): number {
   const match = LEVEL_TO_CANDY_MAP.find((m) => level <= m.maxLevel)
-  return match?.wildDropChance || 15
+  return match?.wildDropChance || 8
+}
+
+/**
+ * Candy Dust is a small consolation drop for wild battles. Higher level
+ * encounters increase the quantity without making the drop itself common.
+ */
+export function getWildBattleCandyDustQuantity(level: number): {
+  min: number
+  max: number
+} {
+  const normalizedLevel = Number.isFinite(level)
+    ? Math.max(1, Math.min(100, Math.floor(level)))
+    : 1
+  if (normalizedLevel <= 20) return { min: 1, max: 1 }
+  if (normalizedLevel <= 40) return { min: 1, max: 2 }
+  if (normalizedLevel <= 60) return { min: 1, max: 3 }
+  if (normalizedLevel <= 80) return { min: 2, max: 3 }
+  return { min: 3, max: 3 }
 }
 
 export function calculateCandyRewards(
@@ -72,16 +65,7 @@ export function calculateCandyRewards(
   const maxLevel = Math.max(...enemyLevels)
   const candyId = getCandyIdForLevel(maxLevel)
 
-  if (!battleConfig.isWildBattle) {
-    return [
-      {
-        type: 'item',
-        targetId: candyId,
-        quantity: 1,
-        dropChance: 100,
-      },
-    ]
-  }
+  if (!battleConfig.isWildBattle) return []
 
   const dropRate = getWildBattleCandyDropChance(maxLevel)
   const quantity = {
@@ -97,23 +81,12 @@ export function calculateCandyRewards(
     dropChance: dropRate,
   })
 
-  for (const badgeDrop of BADGE_SUPPORT_CANDY_DROPS) {
-    if (maxLevel <= badgeDrop.minEnemyLevel) continue
-
-    rewards.push({
-      type: 'item',
-      targetId: badgeDrop.candyId,
-      quantity,
-      dropChance: badgeDrop.dropChance,
-      requirements: [
-        {
-          type: 'item_owned',
-          targetId: badgeDrop.badgeId,
-          count: 1,
-        },
-      ],
-    })
-  }
+  rewards.push({
+    type: 'item',
+    targetId: 'candy-dust',
+    quantity: getWildBattleCandyDustQuantity(maxLevel),
+    dropChance: WILD_BATTLE_CANDY_DUST_DROP_CHANCE,
+  })
 
   return rewards
 }

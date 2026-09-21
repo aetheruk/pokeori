@@ -892,11 +892,9 @@ describe('static data references', () => {
     ).not.toContain('aqua-solvent-t3')
   })
 
-  test('trainer battles do not author manual candy rewards outside Route 13', () => {
+  test('trainer battles do not author manual candy rewards', () => {
     const candyRewardOwners = battles
-      .filter(
-        (battle) => !battle.isWildBattle && !battle.id.startsWith('route-13-'),
-      )
+      .filter((battle) => !battle.isWildBattle)
       .filter((battle) =>
         battle.rewards.some(
           (reward) =>
@@ -907,25 +905,6 @@ describe('static data references', () => {
       .map((battle) => battle.id)
 
     expect(candyRewardOwners).toEqual([])
-  })
-
-  test('Route 13 trainer battles add one S Candy EX drop to every trainer', () => {
-    const route13TrainerBattles = battles.filter(
-      (battle) => !battle.isWildBattle && battle.id.startsWith('route-13-'),
-    )
-
-    expect(route13TrainerBattles.length).toBeGreaterThan(0)
-
-    for (const battle of route13TrainerBattles) {
-      const candyDrops = battle.rewards.filter(
-        (reward) =>
-          reward.type === 'item' &&
-          String(reward.targetId) === 'rare-candy-l',
-      )
-      expect(candyDrops).toHaveLength(1)
-      expect(candyDrops[0].quantity).toBe(1)
-      expect(candyDrops[0].dropChance).toBe(100)
-    }
   })
 
   test('Route 14 standard content gates on the final Route 13 trainer', () => {
@@ -4246,6 +4225,12 @@ describe('static data references', () => {
       quantity: 200,
       dropChance: 100,
     })
+    expect(bugGauntlet?.rewards).toContainEqual({
+      type: 'item',
+      targetId: 'rare-candy-xs',
+      quantity: 1,
+      dropChance: 100,
+    })
 
     const featheredGauntlet = expeditions.find(
       (entry) => entry.id === 'route-14-bird-gauntlet-expedition',
@@ -4253,7 +4238,7 @@ describe('static data references', () => {
     expect(featheredGauntlet?.rewards).toContainEqual({
       type: 'item',
       targetId: 'rare-candy-l',
-      quantity: 3,
+      quantity: 1,
       dropChance: 100,
     })
 

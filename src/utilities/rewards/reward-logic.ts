@@ -70,6 +70,12 @@ import {
   type PokemonRarityId,
 } from '@/utilities/pokemon/rarity-effects'
 import {
+  getPokemonExperienceCap,
+  getPokemonLevelCap,
+  getPokemonLevelFromExperience,
+  getTotalPokemonExperienceForLevel,
+} from '@/utilities/pokemon/experience'
+import {
   createUserEgg,
   DAY_CARE_EGG_MAX_OWNED,
   getActiveEggCount,
@@ -118,6 +124,14 @@ export interface RewardSummary {
     pokemonName: string
     newLevel: number
     skillXpGranted: number
+  }[]
+  pokemonExperience?: {
+    pokemonId: string
+    pokemonName: string
+    amount: number
+    oldLevel: number
+    newLevel: number
+    levelCap: number
   }[]
   eggs?: { id: string; hatchAt: string; rarity: PokemonRarityId }[]
   levelUp?: {
@@ -336,6 +350,7 @@ export async function grantRewards(
     notices: [],
     researchXp: [],
     researchBreakthroughs: [],
+    pokemonExperience: [],
     eggs: [],
   }
 
@@ -537,6 +552,10 @@ export async function grantRewards(
             formId: speciesData.id,
             name: speciesData.name,
             level: level,
+            experience: getTotalPokemonExperienceForLevel(
+              speciesData.growth_rate,
+              level,
+            ),
             rarity,
             ability: rewardAbilityId,
             gender: reward.pokemonData?.gender || rollPokemonGender(speciesId),
@@ -603,6 +622,70 @@ export async function grantRewards(
         }
         pokedexChanged = true
       }
+    } else if (reward.type === 'pokemon_experience' && reward.targetId) {
+      const pokemonId = reward.targetId.toString()
+      const ownedPokemon = pokemonList.find((entry) => entry.id === pokemonId)
+      if (!ownedPokemon) return
+
+      const currentPokemon = await payload.findByID({
+        collection: 'pokemon',
+        id: pokemonId,
+        depth: 0,
+        ...requestOptions,
+      })
+      const currentLevel = Math.max(1, currentPokemon.level || 1)
+      const growthRate =
+        getPokemonForm(currentPokemon.formId)?.growth_rate ||
+        getPokemonSpecies(currentPokemon.speciesId)?.growth_rate
+      const currentExperience = Math.max(
+        getTotalPokemonExperienceForLevel(growthRate, currentLevel),
+        typeof currentPokemon.experience === 'number'
+          ? currentPokemon.experience
+          : 0,
+      )
+      const requestedExperience = Math.max(0, Math.floor(quantity))
+      if (requestedExperience <= 0) return
+
+      const levelCap = getPokemonLevelCap(inventory)
+      const experienceCap = getPokemonExperienceCap(growthRate, levelCap)
+      const nextExperience =
+        currentLevel > levelCap
+          ? currentExperience + requestedExperience
+          : Math.min(experienceCap, currentExperience + requestedExperience)
+      const amountGranted = Math.max(0, nextExperience - currentExperience)
+      if (amountGranted <= 0) return
+
+      const uncappedLevel = getPokemonLevelFromExperience(
+        growthRate,
+        nextExperience,
+      )
+      const newLevel =
+        currentLevel > levelCap
+          ? currentLevel
+          : Math.max(currentLevel, Math.min(levelCap, uncappedLevel))
+      const updatedPokemon = calculateStats({
+        ...currentPokemon,
+        level: newLevel,
+      } as any)
+
+      await payload.update({
+        collection: 'pokemon',
+        id: pokemonId,
+        data: {
+          experience: nextExperience,
+          level: newLevel,
+          stats: updatedPokemon.stats,
+        },
+        ...requestOptions,
+      })
+      summary.pokemonExperience?.push({
+        pokemonId,
+        pokemonName: currentPokemon.name || 'Pokémon',
+        amount: amountGranted,
+        oldLevel: currentLevel,
+        newLevel,
+        levelCap,
+      })
     } else if (reward.type === 'egg') {
       if (activeEggCount === null) {
         activeEggCount = await getActiveEggCount(payload as any, userId)

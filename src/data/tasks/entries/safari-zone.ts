@@ -1239,12 +1239,7 @@ export const safariZoneTasks: Task[] = ([
     completionTrigger: 'manual',
     completeButtonText: 'Listen to the trainer',
     requirements: [{ type: 'task_completed', targetId: 'fuchsia-crudely-drawn-flyer' }],
-    criteria: [
-      { type: 'item_owned', targetId: 'rare-candy-xs', count: 20, consume: true },
-      { type: 'item_owned', targetId: 'rare-candy-s', count: 20, consume: true },
-      { type: 'item_owned', targetId: 'rare-candy-m', count: 20, consume: true },
-      { type: 'item_owned', targetId: 'rare-candy-l', count: 20, consume: true },
-    ],
+    criteria: [{ type: 'item_owned', targetId: 'rare-candy-m', count: 10, consume: true }],
     rewards: [],
     enterModal: [
       {
@@ -1271,7 +1266,7 @@ export const safariZoneTasks: Task[] = ([
         title: 'Candy Trainer',
         icon: billiamIcon,
         message:
-          'The trainer slowly looks at the candy you gave him and 1 by 1 sorts them by colour into neat piles of 10, before placing the piles in a little bag.',
+          'The trainer slowly looks at the candy you gave him and counts out a neat pile of 10 before placing it in a little bag.',
         buttons: [{ text: 'Continue', type: 'navigate', id: 4 }],
       },
       {

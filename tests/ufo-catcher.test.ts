@@ -93,12 +93,16 @@ describe('UFO Catcher authored balance', () => {
     }
     expect(getItemReward('xs-candy')).toMatchObject({
       targetId: 'rare-candy-xs',
-      quantity: 2,
+      quantity: 1,
     })
     expect(getItemReward('s-candy')).toMatchObject({
       targetId: 'rare-candy-m',
-      quantity: 2,
+      quantity: 1,
     })
+    for (const candyId of ['xs-candy', 's-candy']) {
+      const candy = standard.settings.tiers.find((tier) => tier.id === candyId)
+      expect(candy).toMatchObject({ rarity: 'uncommon', weight: 1 })
+    }
 
     for (const type of [
       'normal',

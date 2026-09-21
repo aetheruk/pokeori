@@ -535,6 +535,10 @@ export interface Pokemon {
   fusedIntoPokemonId?: string | null;
   level: number;
   /**
+   * Cumulative experience earned through player-versus-environment battles. Candy level-ups advance this value to the new level threshold.
+   */
+  experience?: number | null;
+  /**
    * Number of opposing Pokemon this Pokemon has knocked out in battles.
    */
   battleKOs?: number | null;
@@ -1383,6 +1387,7 @@ export interface PokemonSelect<T extends boolean = true> {
   fusedWithPokemonId?: T;
   fusedIntoPokemonId?: T;
   level?: T;
+  experience?: T;
   battleKOs?: T;
   superEffectiveHitsLanded?: T;
   stanceVictories?: T;

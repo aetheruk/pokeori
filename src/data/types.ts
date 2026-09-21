@@ -41,6 +41,7 @@ export interface Reward {
     | 'increase_max_pokemon'
     | 'increase_max_boxes'
     | 'pokemon_research_xp'
+    | 'pokemon_experience'
     | 'active_companion_friendship'
     | 'active_companion_research_xp'
     | 'expedition_safari_balls'

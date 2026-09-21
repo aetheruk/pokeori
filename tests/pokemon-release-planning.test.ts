@@ -37,7 +37,7 @@ describe('pokemon release planning', () => {
         type: 'item',
         targetId: 'rare-candy-xs',
         quantity: 1,
-        dropChance: 80,
+        dropChance: 10,
       },
       {
         type: 'item',

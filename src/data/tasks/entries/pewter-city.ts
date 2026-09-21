@@ -690,7 +690,7 @@ export const pewterCityTasks: Task[] = [
         id: 'expert-m',
       },
       message:
-        'When battling Wild Pokemon, sometimes their sheer willpower crystalises into a sweet candy, and eating it makes your Pokemon stronger... or something? I actually have no idea where the candy comes from. Some Gym Badges seem to have an effect too. Once a trainer has proven themself, stronger wild Pokemon may occasionally leave behind more powerful candy.',
+        'When battling Wild Pokemon, sometimes their sheer willpower crystalises into a sweet candy, and eating it makes your Pokemon stronger... or something? I actually have no idea where the candy comes from. Once a trainer has proven themself, stronger wild Pokemon may occasionally leave behind more powerful candy.',
       closeButtonText: 'Finish Candy Lesson',
     },
   },

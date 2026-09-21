@@ -73,7 +73,7 @@ export const viridianForestExpeditions: ExpeditionConfig[] = [
       {
         type: 'item',
         targetId: 'rare-candy-xs',
-        quantity: 5,
+        quantity: 1,
         dropChance: 100,
       },
       {

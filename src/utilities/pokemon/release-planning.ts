@@ -78,7 +78,7 @@ export function buildPokemonReleaseRewards({
     type: 'item',
     targetId: itemId,
     quantity: 1,
-    dropChance: 80,
+    dropChance: 10,
   })
 
   rewards.push(buildReleaseBrokenBallReward({ level: pokemonLevel }))

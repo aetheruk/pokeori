@@ -228,6 +228,17 @@ export const Pokemon: CollectionConfig = {
       defaultValue: 0,
     },
     {
+      name: 'experience',
+      type: 'number',
+      label: 'Pokémon Experience',
+      min: 0,
+      defaultValue: 0,
+      admin: {
+        description:
+          'Cumulative experience earned through player-versus-environment battles. Candy level-ups advance this value to the new level threshold.',
+      },
+    },
+    {
       name: 'battleKOs',
       type: 'number',
       label: 'Battle KOs',

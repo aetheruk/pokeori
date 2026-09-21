@@ -55,6 +55,7 @@ const eventRewardSchema = rewardSchema.extend({
     'increase_max_pokemon',
     'increase_max_boxes',
     'pokemon_research_xp',
+    'pokemon_experience',
     'active_companion_friendship',
     'active_companion_research_xp',
     'egg',

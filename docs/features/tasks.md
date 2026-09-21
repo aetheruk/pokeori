@@ -10,7 +10,7 @@ Generated daily rewards require an uncompleted task from the current daily gener
 - Data: `src/data/tasks/`
 - Utilities: `src/utilities/tasks/`
 
-Fuchsia's `Build in bulk` task appears alongside the Billiam storage side task after the Crudely Drawn Flyer. It consumes 20 each of XS Candy, XS Candy EX, S Candy, and S Candy EX, then unlocks all ten Candy Bag Artisan recipes.
+Fuchsia's `Build in bulk` task appears alongside the Billiam storage side task after the Crudely Drawn Flyer. It consumes 10 S Candy (`rare-candy-m`), then unlocks all ten Candy Bag Artisan recipes.
 
 ## Task Types
 

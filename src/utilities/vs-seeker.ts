@@ -10,14 +10,12 @@ import {
   type TrainerClassId,
 } from '@/data/trainers'
 import { calculateKantoTrainerPayout } from '@/data/battles/trainer-payouts'
-import { getCandyIdsUpToLevel } from '@/utilities/rewards/candy-logic'
 
 export const VS_SEEKER_COOLDOWN_MS = 30 * 60 * 1000
 export const VS_SEEKER_BACKGROUND = '/backgrounds/battle.avif'
 export const VS_SEEKER_HELD_BERRY_CHANCE = 0.3
 export const VS_SEEKER_TRAINER_HEALING_ITEM_CHANCE = 0.5
 export const VS_SEEKER_TRAINER_POTION_CHANCE = VS_SEEKER_TRAINER_HEALING_ITEM_CHANCE
-export const VS_SEEKER_CANDY_REWARD_QUANTITY = 3
 export const VS_SEEKER_POKEDOLLAR_REWARD = 1000
 export const VS_SEEKER_LEAGUE_TICKET_REWARD = 1
 
@@ -129,12 +127,10 @@ export function getVsSeekerPayout(level: number, trainerClass: TrainerClass): nu
 }
 
 export function getVsSeekerCandyRewards(level: number) {
-  return getCandyIdsUpToLevel(level).map((candyId) => ({
-    type: 'item' as const,
-    targetId: candyId,
-    quantity: VS_SEEKER_CANDY_REWARD_QUANTITY,
-    dropChance: 100,
-  }))
+  // VS Seeker rematches no longer bypass the wild Candy rarity. Keep the
+  // helper for callers that still import it, but return no automatic Candy.
+  void level
+  return []
 }
 
 export function getVsSeekerCurrencyRewards() {
