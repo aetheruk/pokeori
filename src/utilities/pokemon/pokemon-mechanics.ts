@@ -3,6 +3,8 @@ import { NATURES, NatureName } from '@/data/natures'
 import pokemonData from '@/data/pokemon-data'
 import type { PokemonData, PokemonStats as BasePokemonStats } from '@/data/pokemon-data'
 import type { Payload } from 'payload'
+import { getPokemonForm } from '@/utilities/pokemon/pokedex'
+import { getTotalPokemonExperienceForLevel } from '@/utilities/pokemon/experience'
 
 export interface PokemonIVs {
   hp: number
@@ -46,6 +48,12 @@ function getBaseData(speciesId: number, formId: string) {
   if (!form) throw new Error(`Form ${formId} not found`)
 
   return form
+}
+
+function getPokemonGrowthRate(speciesId: number, formId: string) {
+  return getPokemonForm(formId)?.growth_rate ||
+    (pokemonData as PokemonData).find((species) => species.id === speciesId)?.growth_rate ||
+    'medium-slow'
 }
 
 // --- Core Logic Functions (operate on the object) ---
@@ -315,6 +323,13 @@ export async function identifyPokemon(
     ...pokemon,
     identified: true,
     level,
+    experience: Math.max(
+      pokemon.experience || 0,
+      getTotalPokemonExperienceForLevel(
+        getPokemonGrowthRate(pokemon.speciesId, pokemon.formId),
+        level,
+      ),
+    ),
     nature,
     height,
     weight,
@@ -332,6 +347,7 @@ export async function identifyPokemon(
     data: {
       identified: true,
       level: updatedPokemon.level,
+      experience: updatedPokemon.experience,
       nature: updatedPokemon.nature,
       ivs: updatedPokemon.ivs,
       stats: updatedPokemon.stats,
@@ -496,6 +512,13 @@ export async function levelUp(
   let updatedPokemon: Pokemon = {
     ...pokemon,
     level: newLevel,
+    experience: Math.max(
+      pokemon.experience || 0,
+      getTotalPokemonExperienceForLevel(
+        getPokemonGrowthRate(pokemon.speciesId, pokemon.formId),
+        newLevel,
+      ),
+    ),
   }
 
   updatedPokemon = calculateStats(updatedPokemon)
@@ -505,6 +528,7 @@ export async function levelUp(
     id: pokemonId,
     data: {
       level: updatedPokemon.level,
+      experience: updatedPokemon.experience,
       stats: updatedPokemon.stats,
     },
   })

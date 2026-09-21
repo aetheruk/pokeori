@@ -102,7 +102,7 @@ describe('battle win rewards', () => {
     })
   })
 
-  test('adds guaranteed trainer candy from the highest enemy level', () => {
+  test('adds PvE experience to each involved Pokemon from enemy base experience', () => {
     const state = makePveBattleState({
       enemyTeam: [
         makeBattlePokemon({
@@ -122,11 +122,44 @@ describe('battle win rewards', () => {
     })
 
     expect(rewards).toContainEqual({
-      type: 'item',
-      targetId: 'rare-candy-s',
-      quantity: 1,
+      type: 'pokemon_experience',
+      targetId: 'pokemon-1',
+      quantity: 508,
       dropChance: 100,
     })
+  })
+
+  test('does not add Pokemon experience to PvP rewards', () => {
+    const state = makePveBattleState({
+      isPvp: true,
+      playerTeam: [
+        makeBattlePokemon({
+          id: 'player-pikachu',
+          user: 'player-1',
+          speciesId: 25,
+          formId: '25',
+        }),
+      ],
+      enemyTeam: [
+        makeBattlePokemon({
+          id: 'enemy-bulbasaur',
+          user: 'enemy',
+          speciesId: 1,
+          formId: '1',
+          level: 20,
+        }),
+      ],
+    })
+
+    const rewards = buildBattleWinRewards(state, user, {
+      pvp: true,
+      isWildBattle: false,
+      rewards: [],
+    })
+
+    expect(rewards.some((reward) => reward.type === 'pokemon_experience')).toBe(
+      false,
+    )
   })
 
   test('can suppress automatic candy from battle win rewards', () => {
@@ -398,12 +431,9 @@ describe('battle win rewards', () => {
 
     expect(
       rewards.some(
-        (reward) =>
-          reward.type === 'item' &&
-          reward.targetId === 'rare-candy-s' &&
-          reward.dropChance === 20,
+        (reward) => reward.type === 'item' && reward.targetId === 'candy-dust',
       ),
-    ).toBe(false)
+    ).toBe(true)
   })
 
   test('wild battles grant one primary material from the enemy Pokemon types instead of a gem', () => {

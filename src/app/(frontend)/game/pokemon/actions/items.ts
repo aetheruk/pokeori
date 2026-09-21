@@ -33,6 +33,7 @@ import { getUser, serializePokemon, type StatName } from './utils'
 import { cache } from 'react'
 import { getItemSkillLockReason } from '@/utilities/skills/unlocks'
 import { shouldCandyIncreaseLevel } from '@/utilities/pokemon/candy-leveling'
+import { getPokemonLevelCap } from '@/utilities/pokemon/experience'
 import {
   getPokemonItemUnavailableReason,
   isPokemonTargetedInventoryItem,
@@ -200,6 +201,7 @@ export async function applyItemToPokemon(
           { req },
         )
         const currentQuantity = userInventory[itemId] || 0
+        const pokemonLevelCap = getPokemonLevelCap(userInventory)
 
         if (currentQuantity <= 0) {
           throw new Error('Item not found in inventory')
@@ -303,6 +305,12 @@ export async function applyItemToPokemon(
           const { setLevel } = itemDef.effects
           const currentLevel = pokemon.level || 1
 
+          if (setLevel > pokemonLevelCap) {
+            throw new Error(
+              `This Pokemon cannot exceed level ${pokemonLevelCap} until more badges are earned.`,
+            )
+          }
+
           if (setLevel <= currentLevel) {
             throw new Error("This item would not raise this Pokemon's level.")
           }
@@ -320,6 +328,12 @@ export async function applyItemToPokemon(
         } else if (itemDef.effects.increaseLevel) {
           const { increaseLevel, maxLevel, minLevel } = itemDef.effects
           const currentLevel = pokemon.level || 1
+
+          if (currentLevel + increaseLevel > pokemonLevelCap) {
+            throw new Error(
+              `This Pokemon cannot exceed level ${pokemonLevelCap} until more badges are earned.`,
+            )
+          }
 
           if (currentLevel >= 100) {
             throw new Error('Pokemon is already at max level!')

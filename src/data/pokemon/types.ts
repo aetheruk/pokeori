@@ -18,8 +18,17 @@ export interface PokemonForm {
   stats: PokemonStats;
 }
 
+export type PokemonGrowthRate =
+  | 'slow'
+  | 'medium'
+  | 'fast'
+  | 'medium-slow'
+  | 'slow-then-very-fast'
+  | 'fast-then-very-slow';
+
 export interface PokemonSpecies {
   id: number;
+  growth_rate: PokemonGrowthRate;
   capture_rate: number;
   gender_rate: number; // -1 = genderless, 0 = all male, 8 = all female, otherwise female eighths
   has_gender_differences: boolean;

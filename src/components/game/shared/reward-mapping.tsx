@@ -420,6 +420,13 @@ export function mapRewardToDisplayItem(
       }
       break
     }
+    case 'pokemon_experience': {
+      const qty = typeof reward.quantity === 'number' ? reward.quantity : 1
+      label = `Pokémon Experience +${qty}`
+      icon = <Star className="h-6 w-6 text-game-moss-strong" />
+      subLabel = 'PvE battle reward'
+      break
+    }
     case 'active_companion_friendship': {
       const qty = typeof reward.quantity === 'number' ? reward.quantity : 1
       label = `Companion Friendship +${qty}`

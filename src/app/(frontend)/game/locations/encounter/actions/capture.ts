@@ -82,6 +82,7 @@ import {
   getPokemonRarityLegacyFields,
   resolvePokemonRarity,
 } from '@/utilities/pokemon/rarity-effects'
+import { getTotalPokemonExperienceForLevel } from '@/utilities/pokemon/experience'
 import { replayCaptureSettlement, runCaptureSettlement, type CaptureSettlementContext } from './capture-settlement'
 import { getEncounterMechanicsLockKey } from './lock'
 import { verifyCaptureRingScale } from '@/utilities/pokemon/capture-timing'
@@ -804,6 +805,10 @@ export async function attemptCapture(
         formId: state.formId,
         name: formData?.name || 'Unknown',
         level: level,
+        experience: getTotalPokemonExperienceForLevel(
+          formData?.growth_rate,
+          level,
+        ),
         rarity,
         gender: state.gender || rollPokemonGender(state.pokemonId),
         identified: true,

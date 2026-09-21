@@ -2267,26 +2267,8 @@ describe('Fuchsia Gym and Safari progression', () => {
       criteria: [
         {
           type: 'item_owned',
-          targetId: 'rare-candy-xs',
-          count: 20,
-          consume: true,
-        },
-        {
-          type: 'item_owned',
-          targetId: 'rare-candy-s',
-          count: 20,
-          consume: true,
-        },
-        {
-          type: 'item_owned',
           targetId: 'rare-candy-m',
-          count: 20,
-          consume: true,
-        },
-        {
-          type: 'item_owned',
-          targetId: 'rare-candy-l',
-          count: 20,
+          count: 10,
           consume: true,
         },
       ],

@@ -1,9 +1,13 @@
-import pokemonData, { type PokemonData, type PokemonForm } from '@/data/pokemon-data'
+import pokemonData, {
+  type PokemonData,
+  type PokemonForm,
+  type PokemonGrowthRate,
+} from '@/data/pokemon-data'
 import { getBundledPokemonSpriteUrl } from './local-sprites'
 
 export type PokemonGender = 'male' | 'female' | 'genderless'
 
-export type { PokemonData, PokemonForm } from '@/data/pokemon-data'
+export type { PokemonData, PokemonForm, PokemonGrowthRate } from '@/data/pokemon-data'
 
 export type PokemonImageType = 'home' | 'sprite'
 
@@ -25,6 +29,7 @@ export function getPokemonImageUrl(
  * Flattened Pokemon object with species data moved to top level
  */
 export interface FlattenedPokemon extends PokemonForm {
+  growth_rate: PokemonGrowthRate
   capture_rate: number
   gender_rate: number
   has_gender_differences: boolean
@@ -59,6 +64,7 @@ export function getPokemonSpecies(id: string | number, formName?: string): Flatt
       // Flatten the structure by moving species-level properties to top level
       return {
         id: form.id,
+        growth_rate: species.growth_rate,
         height: form.height,
         weight: form.weight,
         base_experience: form.base_experience,
@@ -96,6 +102,7 @@ export function getPokemonForm(id: string | number): FlattenedPokemon | null {
       // Flatten the structure by moving species-level properties to top level
       return {
         id: form.id,
+        growth_rate: species.growth_rate,
         height: form.height,
         weight: form.weight,
         base_experience: form.base_experience,

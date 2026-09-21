@@ -175,6 +175,7 @@ export const rewardSchema = z
       'increase_max_pokemon',
       'increase_max_boxes',
       'pokemon_research_xp',
+      'pokemon_experience',
     ]),
     targetId: z.union([z.string(), z.number()]).optional(),
     skill: z.string().optional(),

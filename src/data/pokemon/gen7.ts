@@ -8,6 +8,7 @@ import type { PokemonData } from './types';
 const gen7Data: PokemonData = [
   {
     "id": 722,
+    "growth_rate": "medium-slow",
     "capture_rate": 45,
     "gender_rate": 1,
     "has_gender_differences": false,
@@ -41,6 +42,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 723,
+    "growth_rate": "medium-slow",
     "capture_rate": 45,
     "gender_rate": 1,
     "has_gender_differences": false,
@@ -74,6 +76,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 724,
+    "growth_rate": "medium-slow",
     "capture_rate": 45,
     "gender_rate": 1,
     "has_gender_differences": false,
@@ -127,6 +130,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 725,
+    "growth_rate": "medium-slow",
     "capture_rate": 45,
     "gender_rate": 1,
     "has_gender_differences": false,
@@ -159,6 +163,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 726,
+    "growth_rate": "medium-slow",
     "capture_rate": 45,
     "gender_rate": 1,
     "has_gender_differences": false,
@@ -191,6 +196,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 727,
+    "growth_rate": "medium-slow",
     "capture_rate": 45,
     "gender_rate": 1,
     "has_gender_differences": false,
@@ -224,6 +230,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 728,
+    "growth_rate": "medium-slow",
     "capture_rate": 45,
     "gender_rate": 1,
     "has_gender_differences": false,
@@ -256,6 +263,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 729,
+    "growth_rate": "medium-slow",
     "capture_rate": 45,
     "gender_rate": 1,
     "has_gender_differences": false,
@@ -288,6 +296,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 730,
+    "growth_rate": "medium-slow",
     "capture_rate": 45,
     "gender_rate": 1,
     "has_gender_differences": false,
@@ -321,6 +330,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 731,
+    "growth_rate": "medium",
     "capture_rate": 255,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -354,6 +364,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 732,
+    "growth_rate": "medium",
     "capture_rate": 120,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -387,6 +398,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 733,
+    "growth_rate": "medium",
     "capture_rate": 45,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -420,6 +432,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 734,
+    "growth_rate": "medium",
     "capture_rate": 255,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -452,6 +465,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 735,
+    "growth_rate": "medium",
     "capture_rate": 127,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -484,6 +498,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 736,
+    "growth_rate": "medium",
     "capture_rate": 255,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -516,6 +531,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 737,
+    "growth_rate": "medium",
     "capture_rate": 120,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -549,6 +565,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 738,
+    "growth_rate": "medium",
     "capture_rate": 45,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -582,6 +599,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 739,
+    "growth_rate": "medium",
     "capture_rate": 225,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -614,6 +632,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 740,
+    "growth_rate": "medium",
     "capture_rate": 60,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -667,6 +686,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 741,
+    "growth_rate": "medium",
     "capture_rate": 45,
     "gender_rate": 6,
     "has_gender_differences": false,
@@ -760,6 +780,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 742,
+    "growth_rate": "medium",
     "capture_rate": 190,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -793,6 +814,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 743,
+    "growth_rate": "medium",
     "capture_rate": 75,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -826,6 +848,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 744,
+    "growth_rate": "medium",
     "capture_rate": 190,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -858,6 +881,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 745,
+    "growth_rate": "medium",
     "capture_rate": 90,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -928,6 +952,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 746,
+    "growth_rate": "fast",
     "capture_rate": 60,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -979,6 +1004,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 747,
+    "growth_rate": "medium",
     "capture_rate": 190,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -1012,6 +1038,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 748,
+    "growth_rate": "medium",
     "capture_rate": 75,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -1045,6 +1072,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 749,
+    "growth_rate": "medium",
     "capture_rate": 190,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -1077,6 +1105,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 750,
+    "growth_rate": "medium",
     "capture_rate": 60,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -1109,6 +1138,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 751,
+    "growth_rate": "medium",
     "capture_rate": 200,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -1142,6 +1172,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 752,
+    "growth_rate": "medium",
     "capture_rate": 100,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -1175,6 +1206,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 753,
+    "growth_rate": "medium",
     "capture_rate": 190,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -1207,6 +1239,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 754,
+    "growth_rate": "medium",
     "capture_rate": 75,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -1239,6 +1272,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 755,
+    "growth_rate": "medium",
     "capture_rate": 190,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -1272,6 +1306,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 756,
+    "growth_rate": "medium",
     "capture_rate": 75,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -1305,6 +1340,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 757,
+    "growth_rate": "medium",
     "capture_rate": 120,
     "gender_rate": 1,
     "has_gender_differences": false,
@@ -1338,6 +1374,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 758,
+    "growth_rate": "medium",
     "capture_rate": 45,
     "gender_rate": 8,
     "has_gender_differences": false,
@@ -1371,6 +1408,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 759,
+    "growth_rate": "medium",
     "capture_rate": 140,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -1404,6 +1442,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 760,
+    "growth_rate": "medium",
     "capture_rate": 70,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -1437,6 +1476,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 761,
+    "growth_rate": "medium-slow",
     "capture_rate": 235,
     "gender_rate": 8,
     "has_gender_differences": false,
@@ -1469,6 +1509,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 762,
+    "growth_rate": "medium-slow",
     "capture_rate": 120,
     "gender_rate": 8,
     "has_gender_differences": false,
@@ -1501,6 +1542,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 763,
+    "growth_rate": "medium-slow",
     "capture_rate": 45,
     "gender_rate": 8,
     "has_gender_differences": false,
@@ -1533,6 +1575,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 764,
+    "growth_rate": "fast",
     "capture_rate": 60,
     "gender_rate": 6,
     "has_gender_differences": false,
@@ -1565,6 +1608,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 765,
+    "growth_rate": "slow",
     "capture_rate": 45,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -1598,6 +1642,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 766,
+    "growth_rate": "slow",
     "capture_rate": 45,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -1630,6 +1675,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 767,
+    "growth_rate": "medium",
     "capture_rate": 90,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -1663,6 +1709,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 768,
+    "growth_rate": "medium",
     "capture_rate": 45,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -1716,6 +1763,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 769,
+    "growth_rate": "medium",
     "capture_rate": 140,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -1749,6 +1797,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 770,
+    "growth_rate": "medium",
     "capture_rate": 60,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -1782,6 +1831,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 771,
+    "growth_rate": "fast",
     "capture_rate": 60,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -1814,6 +1864,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 772,
+    "growth_rate": "slow",
     "capture_rate": 3,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -1846,6 +1897,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 773,
+    "growth_rate": "slow",
     "capture_rate": 3,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -2201,6 +2253,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 774,
+    "growth_rate": "medium-slow",
     "capture_rate": 30,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -2374,6 +2427,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 775,
+    "growth_rate": "slow",
     "capture_rate": 45,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -2406,6 +2460,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 776,
+    "growth_rate": "medium",
     "capture_rate": 70,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -2439,6 +2494,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 777,
+    "growth_rate": "medium",
     "capture_rate": 180,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -2472,6 +2528,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 778,
+    "growth_rate": "medium",
     "capture_rate": 45,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -2505,6 +2562,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 779,
+    "growth_rate": "medium",
     "capture_rate": 80,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -2538,6 +2596,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 780,
+    "growth_rate": "medium",
     "capture_rate": 70,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -2591,6 +2650,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 781,
+    "growth_rate": "medium",
     "capture_rate": 25,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -2624,6 +2684,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 782,
+    "growth_rate": "slow",
     "capture_rate": 45,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -2656,6 +2717,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 783,
+    "growth_rate": "slow",
     "capture_rate": 45,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -2689,6 +2751,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 784,
+    "growth_rate": "slow",
     "capture_rate": 45,
     "gender_rate": 4,
     "has_gender_differences": false,
@@ -2722,6 +2785,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 785,
+    "growth_rate": "slow",
     "capture_rate": 3,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -2755,6 +2819,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 786,
+    "growth_rate": "slow",
     "capture_rate": 3,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -2788,6 +2853,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 787,
+    "growth_rate": "slow",
     "capture_rate": 3,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -2821,6 +2887,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 788,
+    "growth_rate": "slow",
     "capture_rate": 3,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -2854,6 +2921,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 789,
+    "growth_rate": "slow",
     "capture_rate": 45,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -2886,6 +2954,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 790,
+    "growth_rate": "slow",
     "capture_rate": 45,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -2918,6 +2987,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 791,
+    "growth_rate": "slow",
     "capture_rate": 45,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -2951,6 +3021,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 792,
+    "growth_rate": "slow",
     "capture_rate": 45,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -2984,6 +3055,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 793,
+    "growth_rate": "slow",
     "capture_rate": 45,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -3017,6 +3089,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 794,
+    "growth_rate": "slow",
     "capture_rate": 45,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -3050,6 +3123,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 795,
+    "growth_rate": "slow",
     "capture_rate": 45,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -3083,6 +3157,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 796,
+    "growth_rate": "slow",
     "capture_rate": 45,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -3115,6 +3190,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 797,
+    "growth_rate": "slow",
     "capture_rate": 45,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -3148,6 +3224,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 798,
+    "growth_rate": "slow",
     "capture_rate": 45,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -3181,6 +3258,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 799,
+    "growth_rate": "slow",
     "capture_rate": 45,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -3214,6 +3292,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 800,
+    "growth_rate": "slow",
     "capture_rate": 255,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -3306,6 +3385,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 801,
+    "growth_rate": "slow",
     "capture_rate": 3,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -3399,6 +3479,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 802,
+    "growth_rate": "slow",
     "capture_rate": 3,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -3432,6 +3513,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 803,
+    "growth_rate": "slow",
     "capture_rate": 45,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -3464,6 +3546,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 804,
+    "growth_rate": "slow",
     "capture_rate": 45,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -3497,6 +3580,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 805,
+    "growth_rate": "slow",
     "capture_rate": 30,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -3530,6 +3614,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 806,
+    "growth_rate": "slow",
     "capture_rate": 30,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -3563,6 +3648,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 807,
+    "growth_rate": "slow",
     "capture_rate": 3,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -3614,6 +3700,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 808,
+    "growth_rate": "slow",
     "capture_rate": 3,
     "gender_rate": -1,
     "has_gender_differences": false,
@@ -3646,6 +3733,7 @@ const gen7Data: PokemonData = [
   },
   {
     "id": 809,
+    "growth_rate": "slow",
     "capture_rate": 3,
     "gender_rate": -1,
     "has_gender_differences": false,
