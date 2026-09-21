@@ -85,20 +85,70 @@ export function getPokemonLevelFromExperience(
   return level
 }
 
+export interface PokemonBattleExperienceOptions {
+  /** Level of the defeated Pokémon. */
+  opponentLevel: number
+  /** Persisted level of the Pokémon receiving experience. */
+  participantLevel: number
+  /** Trainer-owned opponents receive the Generation V 1.5× bonus. */
+  isTrainerBattle?: boolean
+  /** Lucky Egg's standard 1.5× battle experience multiplier. */
+  luckyEgg?: boolean
+  /** A non-participating Pokémon receiving the default Exp. Share half. */
+  expShare?: boolean
+  /** Future point-power or partner ability multiplier. */
+  pointPowerMultiplier?: number
+}
+
 /**
- * Calculate the battle experience awarded for one opposing Pokémon.
+ * Calculate battle experience with the Generation V scaled formula.
  *
- * PokeOri uses the classic base-experience yield scaled by the receiving
- * Pokémon's level. Callers must pass the owned Pokémon's persisted level,
- * rather than a temporary battle-synced level.
+ * The level gap is deliberate: defeating a higher-level opponent pays more,
+ * while defeating a much lower-level opponent pays very little. The square
+ * roots use the game's 1/4096 precision before the integer divisions.
  */
 export function getPokemonBattleExperience(
   baseExperience: number | null | undefined,
-  pokemonLevel: number,
+  options: PokemonBattleExperienceOptions,
 ): number {
   const base = Number.isFinite(baseExperience) ? Math.max(0, Number(baseExperience)) : 0
-  const level = Number.isFinite(pokemonLevel) ? Math.max(1, Math.floor(pokemonLevel)) : 1
-  return Math.max(1, Math.floor((base * level) / 7))
+  const opponentLevel = Number.isFinite(options.opponentLevel)
+    ? Math.max(1, Math.floor(options.opponentLevel))
+    : 1
+  const participantLevel = Number.isFinite(options.participantLevel)
+    ? Math.max(1, Math.floor(options.participantLevel))
+    : 1
+
+  const opponentScale = opponentLevel * 2 + 10
+  const participantScale = opponentLevel + participantLevel + 10
+  const numerator = getGenerationVExperienceScale(opponentScale)
+  const denominator = getGenerationVExperienceScale(participantScale)
+
+  // The base yield is an integer division before the level-gap scale. Trainer
+  // battles apply their 1.5× bonus at this stage in the main-series formula.
+  let scaledBase = Math.floor((base * opponentLevel) / 5)
+  if (options.isTrainerBattle) scaledBase = Math.floor(scaledBase * 1.5)
+
+  const scaledExperience = Math.floor((numerator * scaledBase) / denominator) + 1
+  const multipliers = [
+    options.luckyEgg ? 1.5 : 1,
+    options.expShare ? 0.5 : 1,
+    Number.isFinite(options.pointPowerMultiplier)
+      ? Math.max(0, Number(options.pointPowerMultiplier))
+      : 1,
+  ]
+  const experience = multipliers.reduce(
+    (value, multiplier) => Math.floor(value * multiplier),
+    scaledExperience,
+  )
+
+  return Math.max(1, experience)
+}
+
+function getGenerationVExperienceScale(value: number): number {
+  const preciseSquareRoot = Math.sqrt(value)
+  const roundedSquareRoot = Math.round(preciseSquareRoot * 4096) / 4096
+  return Math.floor(roundedSquareRoot * value * value)
 }
 
 /** Return the persistent level cap implied by the badges currently owned. */

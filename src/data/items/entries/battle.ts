@@ -430,7 +430,7 @@ const specialHeldItems: Item[] = [
     id: 'lucky-egg',
     name: 'Lucky Egg',
     description:
-      'An egg-shaped held item with a 20% chance to double candy drops from wild battles.',
+      'An egg-shaped held item that grants 1.5× battle experience and has a 20% chance to double candy drops from wild battles.',
     category: 'battle',
     spriteId: 'lucky-egg',
     heldConfig: {

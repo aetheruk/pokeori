@@ -133,7 +133,7 @@ export function formatHeldItemTrigger(item: HeldItemDefinition): string {
   }
 
   if (effect.type === 'reward-multiplier' && effect.rewardType === 'wild-battle-candy') {
-    return `${effect.rewardChance || 100}% chance to double wild battle candy drops`
+    return `1.5x battle experience; ${effect.rewardChance || 100}% chance to double wild battle candy drops`
   }
 
   if (effect.type === 'stance-damage-multiplier') {

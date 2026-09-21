@@ -100,10 +100,28 @@ export function buildBattleWinRewards(
   const involvedPlayerPokemon = getInvolvedPlayerPokemon(state)
   const isPlayerVersusPlayer = state.isPvp === true || battleConfig.pvp === true
   if (!isPlayerVersusPlayer && !state.chronicle) {
-    for (const pokemon of involvedPlayerPokemon) {
+    const participantIndexes = new Set(state.playerParticipantIndexes || [])
+    const involvedIds = new Set(
+      involvedPlayerPokemon
+        .map((pokemon) => getPersistentPokemonId(pokemon))
+        .filter((id): id is string => Boolean(id)),
+    )
+    const experienceRecipients = state.playerTeam.flatMap((pokemon, index) => {
       const pokemonId = getPersistentPokemonId(pokemon)
-      if (!pokemonId) continue
+      if (!pokemonId) return []
 
+      const participated = participantIndexes.size > 0
+        ? participantIndexes.has(index)
+        : involvedIds.has(pokemonId)
+
+      // Exp. Share is enabled from the start of the game. Healthy team
+      // members that did not enter receive the half-share; participants keep
+      // the full award. A participant remains eligible even if it fainted.
+      if (!participated && pokemon.currentHp <= 0) return []
+      return [{ pokemon, pokemonId, participated }]
+    })
+
+    for (const { pokemon, pokemonId, participated } of experienceRecipients) {
       // `level` is the battle-projected level and may be capped for a gym or
       // VS Seeker fight. PvE experience must use the owned Pokémon's real
       // persisted level instead.
@@ -116,7 +134,14 @@ export function buildBattleWinRewards(
           getPokemonForm(enemy.formId) || getPokemonSpecies(enemy.speciesId)
         return total + getPokemonBattleExperience(
           formData?.base_experience,
-          actualPokemonLevel,
+          {
+            opponentLevel:
+              typeof enemy.level === 'number' ? enemy.level : 1,
+            participantLevel: actualPokemonLevel,
+            isTrainerBattle: battleConfig.isWildBattle !== true,
+            luckyEgg: pokemon.heldItem?.id === 'lucky-egg',
+            expShare: !participated,
+          },
         )
       }, 0)
 

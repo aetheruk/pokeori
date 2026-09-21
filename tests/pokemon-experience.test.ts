@@ -25,10 +25,48 @@ describe('Pokemon battle experience', () => {
     expect(getPokemonLevelFromExperience('medium-slow', 1_059_860)).toBe(100)
   })
 
-  test('awards base experience multiplied by the receiving level and divided by seven', () => {
-    expect(getPokemonBattleExperience(178, 20)).toBe(508)
-    expect(getPokemonBattleExperience(50, 10)).toBe(71)
-    expect(getPokemonBattleExperience(0, 1)).toBe(1)
+  test('uses the Generation V level-scaled battle formula', () => {
+    expect(
+      getPokemonBattleExperience(51, {
+        opponentLevel: 5,
+        participantLevel: 41,
+      }),
+    ).toBe(4)
+    expect(
+      getPokemonBattleExperience(51, {
+        opponentLevel: 5,
+        participantLevel: 7,
+      }),
+    ).toBe(41)
+    expect(
+      getPokemonBattleExperience(178, {
+        opponentLevel: 20,
+        participantLevel: 50,
+        isTrainerBattle: true,
+      }),
+    ).toBe(330)
+    expect(
+      getPokemonBattleExperience(0, {
+        opponentLevel: 1,
+        participantLevel: 1,
+      }),
+    ).toBe(1)
+  })
+
+  test('applies Lucky Egg, Exp. Share, and point-power multipliers', () => {
+    const options = {
+      opponentLevel: 20,
+      participantLevel: 50,
+      isTrainerBattle: true,
+    }
+    expect(getPokemonBattleExperience(178, { ...options, luckyEgg: true })).toBe(495)
+    expect(getPokemonBattleExperience(178, { ...options, expShare: true })).toBe(165)
+    expect(
+      getPokemonBattleExperience(178, {
+        ...options,
+        pointPowerMultiplier: 1.2,
+      }),
+    ).toBe(396)
   })
 
   test('raises the persistent cap by five for each Kanto or Johto badge', () => {
