@@ -63,13 +63,12 @@ const baseCandyItems: Item[] = [
     id: 'rare-candy-xl',
     name: 'M Candy',
     description:
-      'A candy that is packed with energy. It has a 90% chance to raise the level of a single Pokémon by one, up to level 50.',
+      'A candy that is packed with energy. It raises the level of a single Pokémon by one, up to level 50.',
     category: 'candy',
     spriteId: 'materials/candy-m',
     hueRotate: 0,
     effects: {
       increaseLevel: 1,
-      increaseLevelChance: 90,
       maxLevel: 49,
       minLevel: 40,
     },
@@ -78,13 +77,12 @@ const baseCandyItems: Item[] = [
     id: 'rare-candy-xxl',
     name: 'M Candy EX',
     description:
-      'A candy that is packed with energy. It has an 80% chance to raise the level of a single Pokémon by one, up to level 60.',
+      'A candy that is packed with energy. It raises the level of a single Pokémon by one, up to level 60.',
     category: 'candy',
     spriteId: 'materials/candy-m',
     hueRotate: EX_CANDY_HUE_ROTATE,
     effects: {
       increaseLevel: 1,
-      increaseLevelChance: 80,
       maxLevel: 59,
       minLevel: 50,
     },
@@ -93,13 +91,12 @@ const baseCandyItems: Item[] = [
     id: 'rare-candy-mega',
     name: 'L Candy',
     description:
-      'A candy that is packed with energy. It has a 70% chance to raise the level of a single Pokémon by one, up to level 70.',
+      'A candy that is packed with energy. It raises the level of a single Pokémon by one, up to level 70.',
     category: 'candy',
     spriteId: 'materials/candy-l',
     hueRotate: 0,
     effects: {
       increaseLevel: 1,
-      increaseLevelChance: 70,
       maxLevel: 69,
       minLevel: 60,
     },
@@ -108,13 +105,12 @@ const baseCandyItems: Item[] = [
     id: 'rare-candy-giga',
     name: 'L Candy EX',
     description:
-      'A candy that is packed with energy. It has a 60% chance to raise the level of a single Pokémon by one, up to level 80.',
+      'A candy that is packed with energy. It raises the level of a single Pokémon by one, up to level 80.',
     category: 'candy',
     spriteId: 'materials/candy-l',
     hueRotate: EX_CANDY_HUE_ROTATE,
     effects: {
       increaseLevel: 1,
-      increaseLevelChance: 60,
       maxLevel: 79,
       minLevel: 70,
     },
@@ -123,13 +119,12 @@ const baseCandyItems: Item[] = [
     id: 'rare-candy-tera',
     name: 'XL Candy',
     description:
-      'A candy that is packed with energy. It has a 50% chance to raise the level of a single Pokémon by one, up to level 90.',
+      'A candy that is packed with energy. It raises the level of a single Pokémon by one, up to level 90.',
     category: 'candy',
     spriteId: 'materials/candy-xl',
     hueRotate: 0,
     effects: {
       increaseLevel: 1,
-      increaseLevelChance: 50,
       maxLevel: 89,
       minLevel: 80,
     },
@@ -138,13 +133,12 @@ const baseCandyItems: Item[] = [
     id: 'rare-candy-max',
     name: 'XL Candy EX',
     description:
-      'A candy that is packed with energy. It has a 25% chance to raise the level of a single Pokémon by one, up to level 100.',
+      'A candy that is packed with energy. It raises the level of a single Pokémon by one, up to level 100.',
     category: 'candy',
     spriteId: 'materials/candy-xl',
     hueRotate: EX_CANDY_HUE_ROTATE,
     effects: {
       increaseLevel: 1,
-      increaseLevelChance: 25,
       maxLevel: 99,
       minLevel: 90,
     },
@@ -169,7 +163,6 @@ export const candyBagItems: Item[] = baseCandyItems.map((candy) => {
     hueRotate: candy.hueRotate,
     effects: {
       setLevel: targetLevel,
-      setLevelChance: candy.effects?.increaseLevelChance,
       maxLevel,
       minLevel,
     },

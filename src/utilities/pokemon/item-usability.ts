@@ -93,6 +93,7 @@ export type PokemonItemUseTarget = {
   fusionBaseFormId?: string | null
   fusedWithPokemonId?: string | null
   fusedIntoPokemonId?: string | null
+  levelCap?: number | null
 }
 
 export function getPokemonItemPickerGroup(item: Item): PokemonItemPickerGroup {
@@ -165,15 +166,11 @@ export function getPokemonItemEffectLabel(item: Item): string {
   if (!effects) return 'Pokemon effect'
 
   if (effects.increaseLevel) {
-    return effects.increaseLevelChance === undefined
-      ? `Level +${effects.increaseLevel}`
-      : `Level +${effects.increaseLevel} (${effects.increaseLevelChance}% chance)`
+    return `Level +${effects.increaseLevel}`
   }
 
   if (effects.setLevel !== undefined) {
-    return effects.setLevelChance === undefined
-      ? `Level → ${effects.setLevel}`
-      : `Level → ${effects.setLevel} (${effects.setLevelChance}% chance)`
+    return `Level → ${effects.setLevel}`
   }
 
   if (effects.increaseEv) {
@@ -247,6 +244,17 @@ export function getPokemonItemUnavailableReason(
 
   if (effects.increaseLevel || effects.setLevel !== undefined) {
     if (level >= 100) return 'Pokemon is already at max level.'
+    const targetLevel =
+      effects.setLevel !== undefined
+        ? effects.setLevel
+        : level + (effects.increaseLevel || 0)
+    if (
+      pokemon.levelCap !== undefined &&
+      pokemon.levelCap !== null &&
+      targetLevel > pokemon.levelCap
+    ) {
+      return `This Pokemon cannot exceed level ${pokemon.levelCap} until more badges are earned.`
+    }
     if (effects.minLevel !== undefined && level < effects.minLevel) {
       return `This candy can only be used from level ${effects.minLevel}.`
     }

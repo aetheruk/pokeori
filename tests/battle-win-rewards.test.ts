@@ -124,7 +124,7 @@ describe('battle win rewards', () => {
     expect(rewards).toContainEqual({
       type: 'pokemon_experience',
       targetId: 'pokemon-1',
-      quantity: 1271,
+      quantity: 330,
       dropChance: 100,
     })
   })
@@ -158,7 +158,89 @@ describe('battle win rewards', () => {
     expect(rewards).toContainEqual({
       type: 'pokemon_experience',
       targetId: 'pokemon-synced',
-      quantity: 1525,
+      quantity: 246,
+      dropChance: 100,
+    })
+  })
+
+  test('uses the level gap when a level 5 wild Rattata rewards a level 41 Pokemon', () => {
+    const state = makePveBattleState({
+      playerTeam: [
+        makeBattlePokemon({
+          id: 'paldean-taurus',
+          speciesId: 128,
+          formId: '10250',
+          level: 7,
+          actualLevel: 41,
+        }),
+      ],
+      enemyTeam: [
+        makeBattlePokemon({
+          id: 'wild-rattata',
+          user: undefined,
+          speciesId: 19,
+          formId: '19',
+          level: 5,
+          name: 'Rattata',
+        }),
+      ],
+    })
+
+    const rewards = buildBattleWinRewards(state, user, {
+      isWildBattle: true,
+      rewards: [],
+    })
+
+    expect(rewards).toContainEqual({
+      type: 'pokemon_experience',
+      targetId: 'paldean-taurus',
+      quantity: 4,
+      dropChance: 100,
+    })
+  })
+
+  test('gives healthy non-participants the default Exp. Share half', () => {
+    const state = makePveBattleState({
+      playerTeam: [
+        makeBattlePokemon({
+          id: 'active-pokemon',
+          level: 10,
+          actualLevel: 10,
+        }),
+        makeBattlePokemon({
+          id: 'shared-pokemon',
+          level: 10,
+          actualLevel: 10,
+        }),
+      ],
+      playerParticipantIndexes: [0],
+      enemyTeam: [
+        makeBattlePokemon({
+          id: 'wild-rattata',
+          user: undefined,
+          speciesId: 19,
+          formId: '19',
+          level: 5,
+          name: 'Rattata',
+        }),
+      ],
+    })
+
+    const rewards = buildBattleWinRewards(state, user, {
+      isWildBattle: true,
+      rewards: [],
+    })
+
+    expect(rewards).toContainEqual({
+      type: 'pokemon_experience',
+      targetId: 'active-pokemon',
+      quantity: 30,
+      dropChance: 100,
+    })
+    expect(rewards).toContainEqual({
+      type: 'pokemon_experience',
+      targetId: 'shared-pokemon',
+      quantity: 15,
       dropChance: 100,
     })
   })
