@@ -85,13 +85,19 @@ export function getPokemonLevelFromExperience(
   return level
 }
 
-/** Calculate the battle experience awarded for one opposing Pokémon. */
+/**
+ * Calculate the battle experience awarded for one opposing Pokémon.
+ *
+ * PokeOri uses the classic base-experience yield scaled by the receiving
+ * Pokémon's level. Callers must pass the owned Pokémon's persisted level,
+ * rather than a temporary battle-synced level.
+ */
 export function getPokemonBattleExperience(
   baseExperience: number | null | undefined,
-  enemyLevel: number,
+  pokemonLevel: number,
 ): number {
   const base = Number.isFinite(baseExperience) ? Math.max(0, Number(baseExperience)) : 0
-  const level = Number.isFinite(enemyLevel) ? Math.max(1, Math.floor(enemyLevel)) : 1
+  const level = Number.isFinite(pokemonLevel) ? Math.max(1, Math.floor(pokemonLevel)) : 1
   return Math.max(1, Math.floor((base * level) / 7))
 }
 

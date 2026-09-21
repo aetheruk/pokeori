@@ -76,6 +76,12 @@ export interface BattlePokemon extends Omit<Pokemon, 'stats'> {
   }
   currentHp: number
   maxHp: number
+  /**
+   * The owned Pokémon's persisted level before a battle level cap is applied.
+   * Battle `level` remains the effective combat level for stat and damage
+   * calculations, while rewards use this value for PvE experience.
+   */
+  actualLevel?: number
   /** Battle-instance-only multiplier applied after normal stat modifiers. */
   battleStatMultiplier?: number
   name: string // Ensure name is always present

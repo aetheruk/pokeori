@@ -13,9 +13,7 @@ import {
 } from '@/data/skills/xp'
 import { getBattleAbilityWinRewards } from '@/utilities/battle/abilities'
 import { getWildBattleCandyMultiplier } from '@/utilities/battle/held-items'
-import {
-  getPokemonBattleExperience,
-} from '@/utilities/pokemon/experience'
+import { getPokemonBattleExperience } from '@/utilities/pokemon/experience'
 import { getPersistentPokemonId } from '@/utilities/battle/pokemon-metrics'
 
 export const BATTLE_PARTICIPANT_RESEARCH_XP = 1
@@ -102,17 +100,27 @@ export function buildBattleWinRewards(
   const involvedPlayerPokemon = getInvolvedPlayerPokemon(state)
   const isPlayerVersusPlayer = state.isPvp === true || battleConfig.pvp === true
   if (!isPlayerVersusPlayer && !state.chronicle) {
-    const totalPokemonExperience = state.enemyTeam.reduce((total, enemy) => {
-      const enemyLevel = typeof enemy.level === 'number' ? enemy.level : 1
-      const formData =
-        getPokemonForm(enemy.formId) || getPokemonSpecies(enemy.speciesId)
-      return total + getPokemonBattleExperience(formData?.base_experience, enemyLevel)
-    }, 0)
+    for (const pokemon of involvedPlayerPokemon) {
+      const pokemonId = getPersistentPokemonId(pokemon)
+      if (!pokemonId) continue
 
-    if (totalPokemonExperience > 0) {
-      for (const pokemon of involvedPlayerPokemon) {
-        const pokemonId = getPersistentPokemonId(pokemon)
-        if (!pokemonId) continue
+      // `level` is the battle-projected level and may be capped for a gym or
+      // VS Seeker fight. PvE experience must use the owned Pokémon's real
+      // persisted level instead.
+      const actualPokemonLevel =
+        typeof pokemon.actualLevel === 'number' && pokemon.actualLevel > 0
+          ? pokemon.actualLevel
+          : pokemon.level
+      const totalPokemonExperience = state.enemyTeam.reduce((total, enemy) => {
+        const formData =
+          getPokemonForm(enemy.formId) || getPokemonSpecies(enemy.speciesId)
+        return total + getPokemonBattleExperience(
+          formData?.base_experience,
+          actualPokemonLevel,
+        )
+      }, 0)
+
+      if (totalPokemonExperience > 0) {
         rewardsToGrant.push({
           type: 'pokemon_experience',
           targetId: pokemonId,

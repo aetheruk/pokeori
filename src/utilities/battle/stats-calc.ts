@@ -423,6 +423,7 @@ export function initializeBattlePokemon(
   const battleIvs = trainerLevel
     ? getEffectivePokemonIvs(pokemon.ivs, trainerLevel)
     : pokemon.ivs
+  const actualLevel = Math.max(1, Math.floor(pokemon.level || 5))
 
   // Determine effective level for display
   let level = pokemon.level || 5
@@ -469,6 +470,7 @@ export function initializeBattlePokemon(
     createdAt: toISOString(pokemon.createdAt),
     updatedAt: toISOString(pokemon.updatedAt),
     level, // Override level for battle instance
+    actualLevel,
     name: pokemon.name || 'Unknown',
     ivs: battleIvs,
     stats, // Ensure we use the calculated stats

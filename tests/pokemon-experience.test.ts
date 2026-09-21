@@ -25,7 +25,7 @@ describe('Pokemon battle experience', () => {
     expect(getPokemonLevelFromExperience('medium-slow', 1_059_860)).toBe(100)
   })
 
-  test('awards enemy base experience multiplied by level and divided by seven', () => {
+  test('awards base experience multiplied by the receiving level and divided by seven', () => {
     expect(getPokemonBattleExperience(178, 20)).toBe(508)
     expect(getPokemonBattleExperience(50, 10)).toBe(71)
     expect(getPokemonBattleExperience(0, 1)).toBe(1)

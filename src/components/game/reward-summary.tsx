@@ -9,6 +9,7 @@ import Image from 'next/image'
 import type { HTMLAttributes } from 'react'
 import { PokemonRarityEggSprite } from '@/components/game/shared/PokemonRarityEggSprite'
 import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
+import { PokemonExperienceRewardList } from '@/components/game/shared/pokemon-experience-reward-list'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { getCurrency } from '@/data/currencies'
@@ -16,7 +17,7 @@ import { getSkill } from '@/data/skills'
 import { getIcon } from '@/data/user'
 import { getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import { getPokemonRarityEffect } from '@/utilities/pokemon/rarity-effects'
-import { RewardSummary } from '@/utilities/rewards/reward-logic'
+import type { RewardSummary } from '@/utilities/rewards/reward-logic'
 import { cn } from '@/lib/utils'
 import { ItemSprite } from '../ui/item-sprite'
 import { SectionDivider } from '../ui/section-divider'
@@ -79,6 +80,13 @@ export function RewardSummaryDisplay({
 
   return (
     <div className="w-full space-y-5 px-0 py-4 sm:px-1">
+      {(summary.pokemonExperience || []).length > 0 && (
+        <>
+          <SectionDivider>EXP</SectionDivider>
+          <PokemonExperienceRewardList entries={summary.pokemonExperience || []} />
+        </>
+      )}
+
       <SectionDivider>{title}</SectionDivider>
 
       <div className="space-y-0">
@@ -146,26 +154,6 @@ export function RewardSummaryDisplay({
               </RewardLedgerRow>
             )
           })}
-
-          {/* Pokémon battle experience */}
-          {(summary.pokemonExperience || []).map((entry, index) => (
-            <RewardLedgerRow
-              key={`pokemon-experience-${entry.pokemonId}-${index}`}
-              className="h-12 flex-row items-center gap-3 border-game-border bg-game-surface-raised p-2"
-            >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center text-game-moss-strong">
-                <Star className="h-4 w-4" />
-              </div>
-              <div className="flex min-w-0 flex-1 items-center justify-between gap-2 pr-2">
-                <span className="truncate text-sm font-medium text-game-ink">
-                  {entry.pokemonName} Experience
-                </span>
-                <span className={REWARD_VALUE_CLASS}>
-                  +{entry.amount} XP{entry.newLevel > entry.oldLevel ? ` · L${entry.newLevel}` : ''}
-                </span>
-              </div>
-            </RewardLedgerRow>
-          ))}
 
           {/* Currency */}
           {(summary.currency || []).map((curr, i) => {
