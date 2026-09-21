@@ -34,10 +34,11 @@ import { secretBattles } from './entries/secret'
 import { specialEventBattles } from './entries/special-events'
 import { gymLeaderChronicleBattles } from './entries/gym-leader-chronicles'
 import { testBattles } from './entries/test'
+import { BATTLE_LEVEL_CAP_OVERRIDES } from './level-cap-overrides'
 
 export * from '../types'
 
-export const battles: BattleConfig[] = [
+const authoredBattles: BattleConfig[] = [
   ...palletTownBattles,
   ...viridianCityBattles,
   ...viridianForestBattles,
@@ -74,3 +75,13 @@ export const battles: BattleConfig[] = [
   ...gymLeaderChronicleBattles,
   ...testBattles,
 ]
+
+/**
+ * Apply the small set of fixed caps after the ordinary content has been
+ * authored without per-entry level-sync values. New route content therefore
+ * receives the shared dynamic rule automatically.
+ */
+export const battles: BattleConfig[] = authoredBattles.map((battle) => {
+  const levelCap = BATTLE_LEVEL_CAP_OVERRIDES[battle.id]
+  return typeof levelCap === 'number' ? { ...battle, levelCap } : battle
+})

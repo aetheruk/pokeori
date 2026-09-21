@@ -1421,15 +1421,15 @@ describe('static data references', () => {
     ).toEqual([])
   })
 
-  test('Route 11 trainer battles cap player Pokemon at level 25', () => {
+  test('Route 11 trainer battles use the shared dynamic cap', () => {
     const route11TrainerBattles = battles.filter(
       (battle) => !battle.isWildBattle && battle.id.startsWith('route-11-'),
     )
 
     expect(route11TrainerBattles.length).toBeGreaterThan(0)
-    expect(
-      route11TrainerBattles.map((battle) => [battle.id, battle.levelCap]),
-    ).toEqual(route11TrainerBattles.map((battle) => [battle.id, 25]))
+    expect(route11TrainerBattles.every((battle) => battle.levelCap === undefined)).toBe(
+      true,
+    )
   })
 
   test('Route 11 Vermilion side tasks use criteria for their Route 11 progress gates', () => {
@@ -1637,31 +1637,28 @@ describe('static data references', () => {
     )
   })
 
-  test('pre-Brock battle level caps ramp before the Boulder Badge check', () => {
-    const expectedCaps = new Map([
-      ['rival-pallet-town', 7],
-      ['route-1-battle', 7],
-      ['battle-grumpy-man', 7],
-      ['route-22-battle', 7],
-      ['rival-route-22', 8],
-      ['viridian-forest-battle', 8],
-      ['buggy-4-battle-1', 7],
-      ['buggy-4-battle-2', 8],
-      ['buggy-4-battle-3', 9],
-      ['buggy-4-battle-4', 9],
-      ['route-2-battle', 10],
-      ['pewter-gym-jerry', 10],
-      ['pewter-gym-brock', 15],
-    ])
+  test('ordinary pre-Brock battles use dynamic caps while gym battles keep overrides', () => {
+    const ordinaryIds = [
+      'rival-pallet-town',
+      'route-1-battle',
+      'battle-grumpy-man',
+      'route-22-battle',
+      'rival-route-22',
+      'viridian-forest-battle',
+      'buggy-4-battle-1',
+      'buggy-4-battle-2',
+      'buggy-4-battle-3',
+      'buggy-4-battle-4',
+      'route-2-battle',
+    ]
 
-    const authoredCaps = battles
-      .filter((battle) => expectedCaps.has(battle.id))
-      .map((battle) => [battle.id, battle.levelCap])
-      .sort(([a], [b]) => String(a).localeCompare(String(b)))
-
-    expect(authoredCaps).toEqual(
-      [...expectedCaps.entries()].sort(([a], [b]) => a.localeCompare(b)),
-    )
+    expect(
+      ordinaryIds.every(
+        (id) => battles.find((battle) => battle.id === id)?.levelCap === undefined,
+      ),
+    ).toBe(true)
+    expect(battles.find((battle) => battle.id === 'pewter-gym-jerry')?.levelCap).toBe(10)
+    expect(battles.find((battle) => battle.id === 'pewter-gym-brock')?.levelCap).toBe(15)
   })
 
   test('battle attack warning chances are authored by early-region band', () => {
@@ -1710,16 +1707,16 @@ describe('static data references', () => {
     expect(new Set(answerPositions).size).toBeGreaterThan(1)
   })
 
-  test('S.S. Anne trainer battles cap player Pokemon at level 20', () => {
+  test('S.S. Anne trainer battles use the shared dynamic cap', () => {
     const ssAnneTrainerBattles = battles.filter(
       (battle) =>
         battle.id.startsWith('ss-anne-') || battle.id === 'rival-ss-anne',
     )
 
     expect(ssAnneTrainerBattles.length).toBeGreaterThan(0)
-    expect(
-      ssAnneTrainerBattles.map((battle) => [battle.id, battle.levelCap]),
-    ).toEqual(ssAnneTrainerBattles.map((battle) => [battle.id, 20]))
+    expect(ssAnneTrainerBattles.every((battle) => battle.levelCap === undefined)).toBe(
+      true,
+    )
   })
 
   test("Captain's Credit shop items are one-time purchases", () => {
@@ -3725,7 +3722,7 @@ describe('static data references', () => {
         type: 'task_completed',
         targetId: 'route-9-assemble-hiker-outfit',
       })
-      expect(battle?.levelCap).toBe(25)
+      expect(battle?.levelCap).toBeUndefined()
       expect(battle?.category).toBe('Secret')
       expect(battle?.enemyTeam.map((enemy) => enemy.speciesId)).toEqual(
         expectedTeams.get(battleId),

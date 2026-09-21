@@ -16,7 +16,6 @@ export const viridianCityBattles: BattleConfig[] = [
     },
     background: '/backgrounds/town.avif',
     maxPokemon: 3,
-    levelCap: 7,
     requirements: [
       {
         type: 'battle_result',
@@ -51,7 +50,6 @@ export const viridianCityBattles: BattleConfig[] = [
     },
     background: '/backgrounds/rocky-path.avif',
     maxPokemon: 1,
-    levelCap: 7,
     requirements: [
       {
         type: 'task_completed',
@@ -102,7 +100,6 @@ export const viridianCityBattles: BattleConfig[] = [
     dynamicOpponent: 'rival',
     rivalLevel: 8,
     maxPokemon: 3,
-    levelCap: 8,
     enemyAttackTelegraphChance: 50,
     requirements: [
       {

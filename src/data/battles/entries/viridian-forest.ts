@@ -17,7 +17,6 @@ export const viridianForestBattles: BattleConfig[] = [
     },
     background: '/backgrounds/forest.avif',
     maxPokemon: 3,
-    levelCap: 7,
     requirements: [
       {
         type: 'battle_result',
@@ -52,7 +51,6 @@ export const viridianForestBattles: BattleConfig[] = [
     },
     background: '/backgrounds/forest.avif',
     maxPokemon: 3,
-    levelCap: 8,
     requirements: [
       {
         type: 'battle_result',
@@ -88,7 +86,6 @@ export const viridianForestBattles: BattleConfig[] = [
     },
     background: '/backgrounds/forest.avif',
     maxPokemon: 2,
-    levelCap: 9,
     requirements: [
       {
         type: 'battle_result',
@@ -123,7 +120,6 @@ export const viridianForestBattles: BattleConfig[] = [
     },
     background: '/backgrounds/forest.avif',
     maxPokemon: 2,
-    levelCap: 9,
     requirements: [
       {
         type: 'battle_result',
@@ -178,7 +174,6 @@ export const viridianForestBattles: BattleConfig[] = [
     },
     background: '/backgrounds/forest.avif',
     maxPokemon: 3,
-    levelCap: 12,
     requirements: [
       {
         type: 'battle_result',
@@ -222,7 +217,6 @@ export const viridianForestBattles: BattleConfig[] = [
     },
     background: '/backgrounds/forest.avif',
     maxPokemon: 3,
-    levelCap: 7,
     requirements: [
       {
         type: 'battle_result',
@@ -252,7 +246,6 @@ export const viridianForestBattles: BattleConfig[] = [
     },
     background: '/backgrounds/forest.avif',
     maxPokemon: 3,
-    levelCap: 8,
     requirements: [
       {
         type: 'battle_result',
@@ -282,7 +275,6 @@ export const viridianForestBattles: BattleConfig[] = [
     },
     background: '/backgrounds/forest.avif',
     maxPokemon: 2,
-    levelCap: 9,
     requirements: [
       {
         type: 'battle_result',
@@ -309,7 +301,6 @@ export const viridianForestBattles: BattleConfig[] = [
     },
     background: '/backgrounds/forest.avif',
     maxPokemon: 2,
-    levelCap: 9,
     requirements: [
       {
         type: 'battle_result',
@@ -336,7 +327,6 @@ export const viridianForestBattles: BattleConfig[] = [
     },
     background: '/backgrounds/forest.avif',
     maxPokemon: 3,
-    levelCap: 12,
     requirements: [
       {
         type: 'battle_result',
@@ -367,7 +357,6 @@ export const viridianForestBattles: BattleConfig[] = [
     },
     background: '/backgrounds/forest.avif',
     maxPokemon: 1,
-    levelCap: 8,
     requirements: [
       {
         type: 'battle_result',

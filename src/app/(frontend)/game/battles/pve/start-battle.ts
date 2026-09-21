@@ -47,6 +47,8 @@ import {
   normalizeChronicleBattleBudgets,
 } from '@/utilities/battle/chronicle-budgets'
 import { getPokemonResearchLevel } from '@/utilities/research/research-levels'
+import { getPokemonLevelCap } from '@/utilities/pokemon/experience'
+import { getBattleLevelCap } from '@/utilities/battle/level-cap'
 import {
   getPokemonRarityLegacyFields,
   resolvePokemonRarity,
@@ -441,42 +443,13 @@ export async function startBattleFromConfig(
         battleConfig.movesPerBattle,
       )
   const playerTrainerLevel = chronicleContext ? 100 : trainerLevel
-  const [pokedex, playerMoveInventory, sketchedMoveIds] = await Promise.all([
+  const [pokedex, playerInventory, sketchedMoveIds] = await Promise.all([
     getUserPokedexMap(payload as any, user.id),
     chronicleContext
       ? Promise.resolve(chronicleBattleItems)
       : getUserInventoryMap(payload as any, user.id),
     getUserSketchedMoveIds(payload as any, user.id),
   ])
-  const playerTeam = initializeTeamMoveUses(
-    battleTeamDocs.map((p) =>
-      initializeBattlePokemon(
-        p,
-        battleConfig.levelCap,
-        false,
-        playerTrainerLevel,
-        getPokemonResearchLevel(pokedex as any, p.speciesId, p.formId),
-        user.kidMode === true ? KID_MODE_PVE_STAT_MULTIPLIER : undefined,
-      ),
-    ),
-    moveUseLimit,
-  )
-  const playerStartingStatusMessages = battleConfig.playerTeamInitialStatus
-    ? playerTeam.flatMap((pokemon) => {
-        const result = applyStatus(
-          pokemon,
-          battleConfig.playerTeamInitialStatus!,
-          undefined,
-          { force: true },
-        )
-        return result.applied ? [result.message] : []
-      })
-    : []
-  if (playerTeam[0] && !battleConfig.isWildBattle) {
-    playerTeam[0].activeTurnStarted = 1
-  }
-  if (battleConfig.format === 'double' && playerTeam[1]) playerTeam[1].activeTurnStarted = 1
-
   // Enemy Team Init
   let enemyTeamConfig: BattleEnemy[] = []
   if (!rivalContext?.team) {
@@ -564,6 +537,43 @@ export async function startBattleFromConfig(
   )
   initializeTeamMoveUses(enemyTeam, enemyMoveUseLimit)
 
+  const badgeLevelCap = chronicleContext
+    ? undefined
+    : getPokemonLevelCap(playerInventory)
+  const effectiveLevelCap = getBattleLevelCap(
+    battleConfig,
+    enemyTeam.map((enemy) => enemy.level),
+    badgeLevelCap,
+  )
+  const playerTeam = initializeTeamMoveUses(
+    battleTeamDocs.map((p) =>
+      initializeBattlePokemon(
+        p,
+        effectiveLevelCap,
+        false,
+        playerTrainerLevel,
+        getPokemonResearchLevel(pokedex as any, p.speciesId, p.formId),
+        user.kidMode === true ? KID_MODE_PVE_STAT_MULTIPLIER : undefined,
+      ),
+    ),
+    moveUseLimit,
+  )
+  const playerStartingStatusMessages = battleConfig.playerTeamInitialStatus
+    ? playerTeam.flatMap((pokemon) => {
+        const result = applyStatus(
+          pokemon,
+          battleConfig.playerTeamInitialStatus!,
+          undefined,
+          { force: true },
+        )
+        return result.applied ? [result.message] : []
+      })
+    : []
+  if (playerTeam[0] && !battleConfig.isWildBattle) {
+    playerTeam[0].activeTurnStarted = 1
+  }
+  if (battleConfig.format === 'double' && playerTeam[1]) playerTeam[1].activeTurnStarted = 1
+
   // Register seen Pokemon in Pokedex
   const pokedexUpdate: Record<string, any> = pokedex
   let pokedexUpdated = false
@@ -609,7 +619,7 @@ export async function startBattleFromConfig(
       pokemonTypes: pokemon.types || [],
       pokemonFormId: pokemon.formId,
       pokemonLevel: pokemon.level,
-      inventory: playerMoveInventory,
+      inventory: playerInventory,
       sketchedMoveIds,
       maxAssignedMoves: researcherMoveSlots,
       allowUnavailableAssignedMoves: !!chronicleContext,
@@ -678,6 +688,7 @@ export async function startBattleFromConfig(
         : battleConfig.allowedItems,
       allowSwapping: battleConfig.allowSwapping !== false,
       maxPokemon,
+      levelCap: effectiveLevelCap,
       enemyAttackTelegraphChance: battleConfig.enemyAttackTelegraphChance,
       music: battleConfig.music,
     },

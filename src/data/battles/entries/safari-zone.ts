@@ -22,7 +22,6 @@ export const safariZoneBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('rocket-grunt', 28)],
     maxPokemon: 2,
-    levelCap: 40,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -43,7 +42,6 @@ export const safariZoneBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('rocket-grunt', 29)],
     maxPokemon: 2,
-    levelCap: 40,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -64,7 +62,6 @@ export const safariZoneBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('rocket-grunt', 30)],
     maxPokemon: 2,
-    levelCap: 40,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -85,7 +82,6 @@ export const safariZoneBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('rocket-grunt', 31)],
     maxPokemon: 2,
-    levelCap: 40,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -107,7 +103,6 @@ export const safariZoneBattles: BattleConfig[] = [
     rewards: [],
     disableRewards: true,
     maxPokemon: 2,
-    levelCap: 40,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -130,7 +125,6 @@ export const safariZoneBattles: BattleConfig[] = [
     rewards: [],
     disableRewards: true,
     maxPokemon: 3,
-    levelCap: 40,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -153,7 +147,6 @@ export const safariZoneBattles: BattleConfig[] = [
     rewards: [],
     disableRewards: true,
     maxPokemon: 3,
-    levelCap: 40,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -176,7 +169,6 @@ export const safariZoneBattles: BattleConfig[] = [
     rewards: [],
     disableRewards: true,
     maxPokemon: 3,
-    levelCap: 40,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -199,7 +191,6 @@ export const safariZoneBattles: BattleConfig[] = [
     rewards: [],
     disableRewards: true,
     maxPokemon: 3,
-    levelCap: 40,
     enemyAttackTelegraphChance: 2,
   },
 ]

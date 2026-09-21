@@ -21,7 +21,6 @@ const mtMoonCoreBattles: BattleConfig[] = [
     },
     background: '/backgrounds/cave.avif',
     maxPokemon: 1,
-    levelCap: 12,
     requirements: [
       {
         type: 'task_completed',
@@ -68,7 +67,6 @@ const mtMoonCoreBattles: BattleConfig[] = [
     },
     background: '/backgrounds/cave.avif',
     maxPokemon: 1,
-    levelCap: 12,
     requirements: [
       {
         type: 'task_completed',
@@ -114,7 +112,6 @@ const mtMoonCoreBattles: BattleConfig[] = [
     },
     background: '/backgrounds/cave.avif',
     maxPokemon: 1,
-    levelCap: 12,
     requirements: [
       {
         type: 'task_completed',
@@ -161,7 +158,6 @@ const mtMoonCoreBattles: BattleConfig[] = [
     },
     background: '/backgrounds/cave.avif',
     maxPokemon: 2,
-    levelCap: 12,
     requirements: [
       {
         type: 'battle_result',
@@ -203,7 +199,6 @@ const mtMoonCoreBattles: BattleConfig[] = [
     },
     background: '/backgrounds/cave.avif',
     maxPokemon: 3,
-    levelCap: 12,
     requirements: [
       {
         type: 'battle_result',
@@ -252,7 +247,6 @@ const mtMoonCoreBattles: BattleConfig[] = [
     },
     background: '/backgrounds/cave.avif',
     maxPokemon: 3,
-    levelCap: 12,
     requirements: [
       {
         type: 'battle_result',
@@ -294,7 +288,6 @@ const mtMoonCoreBattles: BattleConfig[] = [
     },
     background: '/backgrounds/cave.avif',
     maxPokemon: 2,
-    levelCap: 12,
     requirements: [
       {
         type: 'battle_result',
@@ -336,7 +329,6 @@ const mtMoonCoreBattles: BattleConfig[] = [
     },
     background: '/backgrounds/cave.avif',
     maxPokemon: 2,
-    levelCap: 12,
     requirements: [
       {
         type: 'battle_result',
@@ -381,7 +373,6 @@ const mtMoonCoreBattles: BattleConfig[] = [
     },
     background: '/backgrounds/cave.avif',
     maxPokemon: 2,
-    levelCap: 12,
     requirements: [
       {
         type: 'battle_result',
@@ -431,7 +422,6 @@ const mtMoonCoreBattles: BattleConfig[] = [
     },
     background: '/backgrounds/cave.avif',
     maxPokemon: 2,
-    levelCap: 12,
     requirements: [
       {
         type: 'battle_result',
@@ -465,7 +455,6 @@ const mtMoonCoreBattles: BattleConfig[] = [
     },
     background: '/backgrounds/cave.avif',
     maxPokemon: 2,
-    levelCap: 12,
     requirements: [
       {
         type: 'battle_result',
@@ -500,7 +489,6 @@ const mtMoonCoreBattles: BattleConfig[] = [
     },
     background: '/backgrounds/cave.avif',
     maxPokemon: 2,
-    levelCap: 13,
     requirements: [
       {
         type: 'battle_result',
@@ -535,7 +523,6 @@ const mtMoonCoreBattles: BattleConfig[] = [
     },
     background: '/backgrounds/cave.avif',
     maxPokemon: 2,
-    levelCap: 13,
     requirements: [
       {
         type: 'battle_result',
@@ -583,7 +570,6 @@ const mtMoonCoreBattles: BattleConfig[] = [
     },
     background: '/backgrounds/cave.avif',
     maxPokemon: 2,
-    levelCap: 13,
     requirements: [
       {
         type: 'battle_result',
@@ -634,7 +620,6 @@ const mtMoonCoreBattles: BattleConfig[] = [
     },
     background: '/backgrounds/cave.avif',
     maxPokemon: 2,
-    levelCap: 12,
     disableCandyRewards: true,
     generatedXpMultiplier: 0.5,
     requirements: [
@@ -711,7 +696,6 @@ const mtMoonExpeditionSpecialBattles: BattleConfig[] = [
     },
     background: '/backgrounds/cave.avif',
     maxPokemon: 1,
-    levelCap: 18,
     enemyAttackTelegraphChance: 2,
     title: 'Team Rocket Agent',
     requirements: [
@@ -736,7 +720,6 @@ const mtMoonExpeditionSpecialBattles: BattleConfig[] = [
     },
     background: '/backgrounds/cave.avif',
     maxPokemon: 1,
-    levelCap: 18,
     enemyAttackTelegraphChance: 2,
     title: 'Team Rocket Agent',
     requirements: [

@@ -4,11 +4,10 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { revalidatePath } from 'next/cache'
 import { randomUUID } from 'node:crypto'
-import { battles } from '@/data/battles'
 import { redis } from '@/utilities/redis'
 import type { BattlePresentationEvent, BattleState } from '@/utilities/battle/types'
 import { getDoublesPokemon, getDoublesSlots, processDoublesEntry, resolveDoublesTurn, validateDoublesActions, type DoublesAction } from '@/utilities/battle/doubles'
-import { getActiveBattleState, BATTLE_TTL, PVP_BATTLE_PREFIX } from '../helpers/state-management'
+import { getActiveBattleState, BATTLE_TTL, PVP_BATTLE_PREFIX, getBattleConfigForState } from '../helpers/state-management'
 import { getUser } from '../helpers/user'
 import { runBattleActionWithGuard } from '../helpers/action-guard'
 import { queuePvpMoveAndResolveTurn } from '../pvp/turn-sync'
@@ -116,7 +115,7 @@ export async function submitDoublesActions(actions: DoublesAction[], clientActio
       await Promise.all(faintedPlayerEvents.map(event=>decrementFaintedPokemonFriendship({payload,pokemon:state.playerTeam[event.pokemonIndex],userId:user.id,eventId:`${state.economyActionId||state.battleId}:${state.turn-1}:player:${event.pokemonIndex}:doubles-faint`})))
     }
     await prepared.commit()
-    const config = state.dynamicBattleConfig ?? battles.find(entry => entry.id === state.battleId)
+    const config = getBattleConfigForState(state)
     if ((state.status as string) === 'won' && config) await handleWin(state,user,config)
     if ((state.status as string) === 'lost') await handleBattleLoss(state,user,config)
     if (state.status !== 'ongoing') state.isEligibleForReplay = false

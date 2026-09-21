@@ -37,7 +37,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     icon: { type: 'pokemon', id: '92' },
     background: towerBackground,
     maxPokemon: 1,
-    levelCap: 30,
     isWildBattle: true,
     enemyAttackTelegraphChance: 2,
     requirements: [
@@ -84,7 +83,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     enemyTeam: [{ speciesId: 92, formId: '92', level: 22 }],
     rewards: [trainerPokeDollarReward('channeler', 22)],
     maxPokemon: 3,
-    levelCap: 30,
   },
   {
     id: 'pokemon-tower-channeler-patricia',
@@ -101,7 +99,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     enemyTeam: [{ speciesId: 92, formId: '92', level: 22 }],
     rewards: [trainerPokeDollarReward('channeler', 22)],
     maxPokemon: 3,
-    levelCap: 30,
   },
   {
     id: 'pokemon-tower-channeler-carly',
@@ -118,7 +115,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     enemyTeam: [{ speciesId: 92, formId: '92', level: 24 }],
     rewards: [trainerPokeDollarReward('channeler', 24)],
     maxPokemon: 3,
-    levelCap: 30,
   },
 
   // --- 4F ---
@@ -131,7 +127,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     icon: { type: 'pokemon', id: '104' },
     background: towerBackground,
     maxPokemon: 1,
-    levelCap: 30,
     isWildBattle: true,
     enemyAttackTelegraphChance: 2,
     requirements: [beatenBattle('pokemon-tower-channeler-carly')],
@@ -166,7 +161,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('channeler', 23)],
     maxPokemon: 3,
-    levelCap: 32,
   },
   {
     id: 'pokemon-tower-channeler-jody',
@@ -183,7 +177,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     enemyTeam: [{ speciesId: 92, formId: '92', level: 22 }],
     rewards: [trainerPokeDollarReward('channeler', 22)],
     maxPokemon: 3,
-    levelCap: 32,
   },
   {
     id: 'pokemon-tower-channeler-paula',
@@ -200,7 +193,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     enemyTeam: [{ speciesId: 92, formId: '92', level: 24 }],
     rewards: [trainerPokeDollarReward('channeler', 24)],
     maxPokemon: 3,
-    levelCap: 32,
   },
 
   // --- 5F ---
@@ -213,7 +205,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     icon: { type: 'pokemon', id: '93' },
     background: towerBackground,
     maxPokemon: 1,
-    levelCap: 33,
     isWildBattle: true,
     enemyAttackTelegraphChance: 2,
     requirements: [beatenBattle('pokemon-tower-channeler-paula')],
@@ -253,7 +244,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     enemyTeam: [{ speciesId: 92, formId: '92', level: 22 }],
     rewards: [trainerPokeDollarReward('channeler', 22)],
     maxPokemon: 3,
-    levelCap: 33,
   },
   {
     id: 'pokemon-tower-channeler-karina',
@@ -270,7 +260,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     enemyTeam: [{ speciesId: 93, formId: '93', level: 23 }],
     rewards: [trainerPokeDollarReward('channeler', 23)],
     maxPokemon: 3,
-    levelCap: 33,
   },
   {
     id: 'pokemon-tower-channeler-tammy',
@@ -287,7 +276,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     enemyTeam: [{ speciesId: 93, formId: '93', level: 24 }],
     rewards: [trainerPokeDollarReward('channeler', 24)],
     maxPokemon: 3,
-    levelCap: 33,
   },
   {
     id: 'pokemon-tower-channeler-janae',
@@ -304,7 +292,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     enemyTeam: [{ speciesId: 92, formId: '92', level: 24 }],
     rewards: [trainerPokeDollarReward('channeler', 24)],
     maxPokemon: 3,
-    levelCap: 33,
   },
 
   // --- 6F ---
@@ -317,7 +304,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     icon: { type: 'pokemon', id: '93' },
     background: towerBackground,
     maxPokemon: 1,
-    levelCap: 34,
     isWildBattle: true,
     enemyAttackTelegraphChance: 2,
     requirements: [beatenBattle('pokemon-tower-channeler-janae')],
@@ -353,7 +339,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('channeler', 22)],
     maxPokemon: 3,
-    levelCap: 35,
   },
   {
     id: 'pokemon-tower-channeler-jennifer',
@@ -370,7 +355,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     enemyTeam: [{ speciesId: 92, formId: '92', level: 24 }],
     rewards: [trainerPokeDollarReward('channeler', 24)],
     maxPokemon: 3,
-    levelCap: 35,
   },
   {
     id: 'pokemon-tower-channeler-emilia',
@@ -387,7 +371,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     enemyTeam: [{ speciesId: 92, formId: '92', level: 24 }],
     rewards: [trainerPokeDollarReward('channeler', 24)],
     maxPokemon: 3,
-    levelCap: 35,
   },
 
   // --- Upper Floors Shadow Gauntlet ---
@@ -400,7 +383,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     icon: { type: 'pokemon', id: '20' },
     background: towerBackground,
     maxPokemon: 3,
-    levelCap: 36,
     enemyAttackTelegraphChance: 2,
     requirements: [
       beatenBattle('pokemon-tower-channeler-emilia'),
@@ -421,7 +403,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     icon: { type: 'pokemon', id: '17' },
     background: towerBackground,
     maxPokemon: 3,
-    levelCap: 36,
     enemyAttackTelegraphChance: 2,
     requirements: [
       beatenBattle('pokemon-tower-shadow-surge-1'),
@@ -442,7 +423,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     icon: { type: 'pokemon', id: '93' },
     background: towerBackground,
     maxPokemon: 3,
-    levelCap: 38,
     enemyAttackTelegraphChance: 2,
     requirements: [
       beatenBattle('pokemon-tower-shadow-surge-2'),
@@ -466,7 +446,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     icon: { type: 'pokemon', id: '105' },
     background: towerBackground,
     maxPokemon: 2,
-    levelCap: 40,
     enemyAttackTelegraphChance: 2,
     requirements: [
       {
@@ -516,7 +495,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     enemyTeam: [{ speciesId: 20, formId: '20', level: 24 }],
     rewards: [],
     maxPokemon: 4,
-    levelCap: 40,
     enemyAttackTelegraphChance: 2,
     allowedItems: ['battle-potion', 'battle-super-potion'],
   },
@@ -545,7 +523,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 4,
-    levelCap: 40,
     enemyAttackTelegraphChance: 2,
     allowedItems: ['battle-potion', 'battle-super-potion'],
   },
@@ -574,7 +551,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 4,
-    levelCap: 40,
     enemyAttackTelegraphChance: 2,
     allowedItems: ['battle-potion', 'battle-super-potion'],
   },
@@ -604,7 +580,6 @@ export const pokemonTowerBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 4,
-    levelCap: 40,
     enemyAttackTelegraphChance: 2,
     allowedItems: ['battle-potion', 'battle-super-potion'],
   },

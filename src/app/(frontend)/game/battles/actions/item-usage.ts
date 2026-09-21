@@ -3,9 +3,8 @@ import configPromise from '@payload-config'
 import { revalidatePath } from 'next/cache'
 import type { BattleState } from '@/utilities/battle/types'
 import { getUser } from '../helpers/user'
-import { getActiveBattleState, BATTLE_TTL } from '../helpers/state-management'
+import { getActiveBattleState, BATTLE_TTL, getBattleConfigForState } from '../helpers/state-management'
 import { redis } from '@/utilities/redis'
-import { battles } from '@/data/battles'
 import { applyBattleItemEffect } from '@/utilities/battle/item-effects'
 import {
   needsPlayerLeadSelection,
@@ -72,8 +71,7 @@ export async function useBattleItem(
       }
     }
 
-    const battleConfig =
-      state.dynamicBattleConfig || battles.find((b) => b.id === state.battleId)
+    const battleConfig = getBattleConfigForState(state)
     const trainerLevel = getSkillLevel(user.skills, 'battling')
     const maxItems = state.chronicle
       ? getChronicleBattleItemUseLimit({

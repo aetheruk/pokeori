@@ -37,7 +37,6 @@ export const palletTownBattles: BattleConfig[] = [
     },
     background: '/backgrounds/lab.avif',
     maxPokemon: 1,
-    levelCap: 5,
     requirements: palletOrientationRequirements,
     isWildBattle: true,
     enemyAttackTelegraphChance: 80,
@@ -82,7 +81,6 @@ export const palletTownBattles: BattleConfig[] = [
     dynamicOpponent: 'rival',
     rivalLevel: 5,
     maxPokemon: 3,
-    levelCap: 7,
     enemyAttackTelegraphChance: 80,
     requirements: [
       {
@@ -122,7 +120,6 @@ export const palletTownBattles: BattleConfig[] = [
     },
     background: '/backgrounds/cave.avif',
     maxPokemon: 6,
-    levelCap: 50,
     requirements: [
       {
         type: 'battle_result',
@@ -185,7 +182,6 @@ export const palletTownBattles: BattleConfig[] = [
     },
     background: '/backgrounds/grassy-route.avif',
     maxPokemon: 1,
-    levelCap: 7,
     requirements: [
       {
         type: 'task_completed',
@@ -260,7 +256,6 @@ export const palletTownBattles: BattleConfig[] = [
     },
     background: '/backgrounds/cave.avif',
     maxPokemon: 3,
-    levelCap: 5,
     requirements: [
       {
         type: 'battle_result',
@@ -300,7 +295,6 @@ export const palletTownBattles: BattleConfig[] = [
     },
     background: '/backgrounds/cave.avif',
     maxPokemon: 3,
-    levelCap: 7,
     requirements: [
       {
         type: 'task_completed',
@@ -398,7 +392,6 @@ export const palletTownBattles: BattleConfig[] = [
     },
     background: '/backgrounds/lab.avif',
     maxPokemon: 1,
-    levelCap: 5,
     requirements: [
       {
         type: 'battle_result',
@@ -455,7 +448,6 @@ export const palletTownBattles: BattleConfig[] = [
     background: '/backgrounds/grassy-route.avif',
     title: 'Savage Raticate',
     maxPokemon: 1,
-    levelCap: 50,
     isRandomEvent: true,
     enemyAttackTelegraphChance: 80,
     requirements: [

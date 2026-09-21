@@ -29,7 +29,6 @@ export const ssAnneBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('youngster', 18)],
     maxPokemon: 2,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -57,7 +56,6 @@ export const ssAnneBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('gentleman', 18)],
     maxPokemon: 2,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -85,7 +83,6 @@ export const ssAnneBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('lass', 18)],
     maxPokemon: 2,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -113,7 +110,6 @@ export const ssAnneBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('beauty', 18)],
     maxPokemon: 2,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -141,7 +137,6 @@ export const ssAnneBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('gentleman', 19)],
     maxPokemon: 2,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -169,7 +164,6 @@ export const ssAnneBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('sailor', 18)],
     maxPokemon: 2,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -198,7 +192,6 @@ export const ssAnneBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('fisherman', 17)],
     maxPokemon: 2,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -226,7 +219,6 @@ export const ssAnneBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('sailor', 17)],
     maxPokemon: 2,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -254,7 +246,6 @@ export const ssAnneBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('engineer', 18)],
     maxPokemon: 2,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -282,7 +273,6 @@ export const ssAnneBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('gentleman', 17)],
     maxPokemon: 2,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -310,7 +300,6 @@ export const ssAnneBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('lass', 18)],
     maxPokemon: 2,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -338,7 +327,6 @@ export const ssAnneBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('sailor', 18)],
     maxPokemon: 2,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -366,7 +354,6 @@ export const ssAnneBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('picnicker', 19)],
     maxPokemon: 2,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -394,7 +381,6 @@ export const ssAnneBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('camper', 20)],
     maxPokemon: 2,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -412,7 +398,6 @@ export const ssAnneBattles: BattleConfig[] = [
     dynamicOpponent: 'rival',
     rivalLevel: 20,
     maxPokemon: 3,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
     requirements: [
       {

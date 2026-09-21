@@ -69,7 +69,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 1,
-    levelCap: 35,
   },
   {
     id: 'route-13-picnicker-alma',
@@ -92,7 +91,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('picnicker', 28)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -124,7 +122,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('bird-keeper', 29)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -159,7 +156,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('picnicker', 24)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -192,7 +188,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('beauty', 27)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -224,7 +219,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('beauty', 29)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -256,7 +250,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('picnicker', 30)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -290,7 +283,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('picnicker', 27)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -325,7 +317,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('bird-keeper', 25)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -358,7 +349,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('biker', 28)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -392,7 +382,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('bird-keeper', 26)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -474,7 +463,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 1,
-    levelCap: 35,
   },
   // Feathered Gauntlet story battles (one-time)
   {
@@ -505,7 +493,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('bird-keeper', 28)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -539,7 +526,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('bird-keeper', 26)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -572,7 +558,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('bird-keeper', 28)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -604,7 +589,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('bird-keeper', 29)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -636,7 +620,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('bird-keeper', 29)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -668,7 +651,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('bird-keeper', 31)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   // Repeatable Feathered Gauntlet rematches (expedition-only)
@@ -701,7 +683,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     rewards: [],
     disableRewards: true,
     maxPokemon: 2,
-    levelCap: 35,
   },
   {
     id: 'route-14-gauntlet-mitch',
@@ -733,7 +714,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     rewards: [],
     disableRewards: true,
     maxPokemon: 2,
-    levelCap: 35,
   },
   {
     id: 'route-14-gauntlet-marlon',
@@ -764,7 +744,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     rewards: [],
     disableRewards: true,
     maxPokemon: 2,
-    levelCap: 35,
   },
   {
     id: 'route-14-gauntlet-beck',
@@ -794,7 +773,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     rewards: [],
     disableRewards: true,
     maxPokemon: 2,
-    levelCap: 35,
   },
   {
     id: 'route-14-gauntlet-benny',
@@ -824,7 +802,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     rewards: [],
     disableRewards: true,
     maxPokemon: 2,
-    levelCap: 35,
   },
   {
     id: 'route-14-gauntlet-donald',
@@ -854,7 +831,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     rewards: [],
     disableRewards: true,
     maxPokemon: 2,
-    levelCap: 35,
   },
   // Junkyard Crew
   {
@@ -884,7 +860,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('biker', 29)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -914,7 +889,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('biker', 29)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -945,7 +919,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('biker', 28)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -977,7 +950,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('biker', 26)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -1006,7 +978,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 1,
-    levelCap: 35,
   },
   // Route 15 chained trainer roster (FRLG order)
   {
@@ -1029,7 +1000,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('picnicker', 29)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -1061,7 +1031,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('old-couple', 29)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -1090,7 +1059,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     enemyTeam: [{ speciesId: 35, formId: '35', level: 33 }],
     rewards: [trainerPokeDollarReward('picnicker', 33)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -1125,7 +1093,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('biker', 25)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -1158,7 +1125,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('biker', 28)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -1190,7 +1156,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('beauty', 29)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -1222,7 +1187,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('beauty', 29)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -1255,7 +1219,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('picnicker', 28)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -1288,7 +1251,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('bird-keeper', 28)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -1322,7 +1284,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('bird-keeper', 26)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -1355,7 +1316,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('picnicker', 29)],
     maxPokemon: 2,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -1376,7 +1336,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 2,
-    levelCap: 40,
     aiProfile: 'advanced',
     playerTeamInitialStatus: 'poison',
     enemyAttackTelegraphChance: 2,
@@ -1398,7 +1357,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 1,
-    levelCap: 40,
     aiProfile: 'advanced',
     playerTeamInitialStatus: 'poison',
     enemyAttackTelegraphChance: 2,
@@ -1423,7 +1381,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 4,
-    levelCap: 40,
     aiProfile: 'advanced',
     playerTeamInitialStatus: 'poison',
     enemyAttackTelegraphChance: 2,
@@ -1447,7 +1404,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 3,
-    levelCap: 40,
     aiProfile: 'advanced',
     playerTeamInitialStatus: 'poison',
     enemyAttackTelegraphChance: 2,
@@ -1470,7 +1426,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 2,
-    levelCap: 40,
     aiProfile: 'advanced',
     playerTeamInitialStatus: 'poison',
     enemyAttackTelegraphChance: 2,
@@ -1493,7 +1448,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 2,
-    levelCap: 40,
     aiProfile: 'advanced',
     playerTeamInitialStatus: 'poison',
     enemyAttackTelegraphChance: 2,
@@ -1520,7 +1474,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
     trainerItems: [{ itemId: 'battle-hyper-potion', quantity: 2 }],
     rewards: [],
     maxPokemon: 4,
-    levelCap: 40,
     aiProfile: 'boss',
     playerTeamInitialStatus: 'poison',
     enemyAttackTelegraphChance: 2,

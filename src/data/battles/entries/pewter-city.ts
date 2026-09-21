@@ -14,7 +14,6 @@ export const pewterCityBattles: BattleConfig[] = [
     },
     background: '/backgrounds/rocky-path.avif',
     maxPokemon: 1,
-    levelCap: 10,
     requirements: [
       {
         type: 'task_completed',
@@ -77,7 +76,6 @@ export const pewterCityBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 1,
-    levelCap: 10,
     enemyAttackTelegraphChance: 2,
     enemyTeam: [
       { speciesId: 50, level: 11, formId: '50' }, // Diglett
@@ -124,7 +122,6 @@ export const pewterCityBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 3,
-    levelCap: 15,
     enemyAttackTelegraphChance: 2,
     enemyTeam: [
       { speciesId: 74, level: 12, formId: '74' }, // Geodude
@@ -172,7 +169,6 @@ export const pewterCityBattles: BattleConfig[] = [
     ],
     maxPokemon: 1,
     isWildBattle: true,
-    levelCap: 12,
     enemyTeam: [
       { speciesId: 16, level: { min: 6, max: 9 }, formId: '16' }, // Pidgey
       { speciesId: 21, level: { min: 6, max: 9 }, formId: '21' }, // Spearow
@@ -210,7 +206,6 @@ export const pewterCityBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 1,
-    levelCap: 12,
     enemyAttackTelegraphChance: 2,
     enemyTeam: [
       { speciesId: 16, level: 9, formId: '16' }, // Pidgey
@@ -246,7 +241,6 @@ export const pewterCityBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 2,
-    levelCap: 12,
     enemyAttackTelegraphChance: 2,
     enemyTeam: [
       { speciesId: 10, level: 10, formId: '10' }, // Caterpie
@@ -283,7 +277,6 @@ export const pewterCityBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 1,
-    levelCap: 12,
     enemyAttackTelegraphChance: 2,
     enemyTeam: [
       { speciesId: 19, level: 11, formId: '19' }, // Rattata
@@ -319,7 +312,6 @@ export const pewterCityBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 2,
-    levelCap: 12,
     enemyAttackTelegraphChance: 2,
     enemyTeam: [
       { speciesId: 13, level: 9, formId: '13' }, // Weedle
@@ -357,7 +349,6 @@ export const pewterCityBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 1,
-    levelCap: 12,
     enemyAttackTelegraphChance: 2,
     enemyTeam: [
       { speciesId: 21, level: 14, formId: '21' }, // Spearow
@@ -392,7 +383,6 @@ export const pewterCityBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 1,
-    levelCap: 12,
     enemyAttackTelegraphChance: 2,
     enemyTeam: [
       { speciesId: 19, level: 10, formId: '19' }, // Rattata
@@ -428,7 +418,6 @@ export const pewterCityBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 1,
-    levelCap: 12,
     enemyAttackTelegraphChance: 2,
     enemyTeam: [
       { speciesId: 10, level: 11, formId: '10' }, // Caterpie
@@ -464,7 +453,6 @@ export const pewterCityBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 2,
-    levelCap: 12,
     enemyAttackTelegraphChance: 2,
     enemyTeam: [
       { speciesId: 39, level: 14, formId: '39' }, // Jigglypuff

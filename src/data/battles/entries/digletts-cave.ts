@@ -48,6 +48,5 @@ export const diglettsCaveBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 1,
-    levelCap: 25,
   },
 ]
