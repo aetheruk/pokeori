@@ -4,6 +4,7 @@ import {
   calculateCandyRewards,
   getWildBattleCandyDropChance,
   getWildBattleCandyDustQuantity,
+  getPokePowderIdForLevel,
   WILD_BATTLE_CANDY_DUST_DROP_CHANCE,
 } from '@/utilities/rewards/candy-logic'
 
@@ -38,14 +39,24 @@ describe('candy reward logic', () => {
     }
   })
 
-  test('adds a level-scaled Candy Dust roll to wild battles', () => {
+  test('adds a level-matched PokePowder roll to wild battles', () => {
     const rewards = calculateCandyRewards(wildBattle, [41])
     expect(rewards).toContainEqual({
       type: 'item',
-      targetId: 'candy-dust',
+      targetId: 'poke-powder-m',
       quantity: { min: 1, max: 3 },
       dropChance: WILD_BATTLE_CANDY_DUST_DROP_CHANCE,
     })
+  })
+
+  test('uses the crafted PokePowder tier for the encounter level', () => {
+    expect(getPokePowderIdForLevel(1)).toBe('poke-powder-xs')
+    expect(getPokePowderIdForLevel(20)).toBe('poke-powder-xs')
+    expect(getPokePowderIdForLevel(21)).toBe('poke-powder-s')
+    expect(getPokePowderIdForLevel(41)).toBe('poke-powder-m')
+    expect(getPokePowderIdForLevel(61)).toBe('poke-powder-l')
+    expect(getPokePowderIdForLevel(81)).toBe('poke-powder-xl')
+    expect(getPokePowderIdForLevel(100)).toBe('poke-powder-xl')
   })
 
   test('scales Candy Dust quantity by level', () => {

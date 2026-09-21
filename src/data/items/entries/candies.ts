@@ -170,15 +170,3 @@ export const candyBagItems: Item[] = baseCandyItems.map((candy) => {
 })
 
 export const candyItems: Item[] = baseCandyItems
-
-export const candyDustItems: Item[] = [
-  {
-    id: 'candy-dust',
-    name: 'Candy Dust',
-    description:
-      'Fine residue left behind when a wild Pokémon releases growth energy. It can be collected for future crafting and training.',
-    category: 'misc',
-    spriteId: 'rare-candy',
-    sellValue: 10,
-  },
-]
