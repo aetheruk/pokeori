@@ -518,11 +518,13 @@ export async function startBattleFromConfig(
               enemy,
               level,
               isWildBattle: battleConfig.isWildBattle,
+              difficulty: battleConfig.enemyDifficulty,
             }),
             evs: resolveEnemyBattleEvs({
               enemy,
               level,
               isWildBattle: battleConfig.isWildBattle,
+              difficulty: battleConfig.enemyDifficulty,
             }),
             rarity,
             ...rarityLegacyFields,

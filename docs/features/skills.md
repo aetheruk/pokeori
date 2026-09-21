@@ -18,6 +18,9 @@ Core skill progression for Trainer, Explorer, and Researcher.
 The Trainer journal shows compact skill rows for Trainer, Explorer, Researcher, and Artisan with level, XP progress, and the next unlock. The complete level-by-level guide opens as a responsive field note and combines fixed authored milestones with dynamic item unlock rows from item `skillRequirements`. All four core skill guides list Mystery of the Branches at level 50. The Trainer guide includes Gym Challenge milestones at Trainer 5 for Brock, 10 for Misty, and 15 for Lt. Surge. Ranked battling remains tracked separately where needed, but it is not part of the core guide grid.
 
 ## Skill XP
+
+Shared activity result screens show a dedicated animated Skill EXP section for earned player skill experience, alongside the existing Pokemon EXP section. Pokemon research XP, newly unlocked research TMs, research breakthroughs, and Sketch learned moves are grouped under Research, leaving ordinary inventory items and currency in the main Rewards section.
+
 - Generated core skill XP uses `20 + 2 * (contentLevel - 1)`, clamped to content levels 1-100.
 - Skill modifiers are Explorer/catching 1.8, Researcher/researching 1.45, Trainer/battling 1, and Artisan 1.
 - Pokemon-driven Battle, Catching, and Field Observation XP also applies a bounded Pokemon base-experience modifier around baseline 160, capped to a 15% decrease or increase. Missing or zero base experience is neutral.

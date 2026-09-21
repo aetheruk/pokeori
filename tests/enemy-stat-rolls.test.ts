@@ -136,4 +136,36 @@ describe('enemy battle stat rolling', () => {
     expect(elite.hp).toBe(100)
     expect(elite.speed).toBe(252)
   })
+
+  test('VS Seeker difficulty improves random trainer IV and EV quality', () => {
+    const lowDifficultyIvs = resolveEnemyBattleIvs({
+      enemy: enemy({}),
+      level: 20,
+      difficulty: 1,
+      random: () => 0.5,
+    })
+    const highDifficultyIvs = resolveEnemyBattleIvs({
+      enemy: enemy({}),
+      level: 20,
+      difficulty: 5,
+      random: () => 0.5,
+    })
+    const lowDifficultyEvs = resolveEnemyBattleEvs({
+      enemy: enemy({}),
+      level: 20,
+      difficulty: 1,
+      random: () => 0,
+    })
+    const highDifficultyEvs = resolveEnemyBattleEvs({
+      enemy: enemy({}),
+      level: 20,
+      difficulty: 5,
+      random: () => 0,
+    })
+
+    expect(highDifficultyIvs.hp).toBeGreaterThanOrEqual(lowDifficultyIvs.hp)
+    expect(highDifficultyIvs.speed).toBeGreaterThanOrEqual(lowDifficultyIvs.speed)
+    expect(highDifficultyEvs.hp).toBeGreaterThan(lowDifficultyEvs.hp)
+    expect(highDifficultyEvs.speed).toBeGreaterThan(lowDifficultyEvs.speed)
+  })
 })

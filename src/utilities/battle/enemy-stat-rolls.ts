@@ -42,6 +42,15 @@ function getTrainerEvRange(level: number): { min: number; max: number } {
   return { min: 1, max: 70 }
 }
 
+function getDifficultyMultiplier(difficulty: number | undefined): number {
+  const normalizedDifficulty = Math.min(
+    5,
+    Math.max(1, Math.floor(Number.isFinite(difficulty) ? difficulty! : 1)),
+  )
+
+  return 1 + (normalizedDifficulty - 1) * 0.5
+}
+
 function resolveStatBlock(
   overrides: PartialStatBlock | undefined,
   rollStat: (stat: BattleStatKey) => number,
@@ -55,10 +64,19 @@ export function resolveEnemyBattleIvs(params: {
   enemy: Pick<BattleEnemy, 'ivs'>
   level: number
   isWildBattle?: boolean
+  difficulty?: number
   random?: () => number
 }): StatBlock {
   const random = params.random ?? Math.random
-  const rolls = params.isWildBattle ? 1 : getTrainerIvRolls(params.level)
+  const rolls = params.isWildBattle
+    ? 1
+    : Math.max(
+        1,
+        Math.ceil(
+          getTrainerIvRolls(params.level) *
+            getDifficultyMultiplier(params.difficulty),
+        ),
+      )
   return resolveStatBlock(params.enemy.ivs, () => rollIv(rolls, random))
 }
 
@@ -66,6 +84,7 @@ export function resolveEnemyBattleEvs(params: {
   enemy: Pick<BattleEnemy, 'evs'>
   level: number
   isWildBattle?: boolean
+  difficulty?: number
   random?: () => number
 }): StatBlock {
   const random = params.random ?? Math.random
@@ -73,9 +92,20 @@ export function resolveEnemyBattleEvs(params: {
     return resolveStatBlock(params.enemy.evs, () => 0)
   }
 
-  const range = params.isWildBattle
+  const baseRange = params.isWildBattle
     ? { min: 1, max: 100 }
     : getTrainerEvRange(params.level)
+  const difficultyMultiplier = getDifficultyMultiplier(params.difficulty)
+  const range = {
+    min: Math.min(252, Math.ceil(baseRange.min * difficultyMultiplier)),
+    max: Math.min(
+      252,
+      Math.max(
+        Math.ceil(baseRange.min * difficultyMultiplier),
+        Math.ceil(baseRange.max * difficultyMultiplier),
+      ),
+    ),
+  }
 
   return resolveStatBlock(params.enemy.evs, () =>
     randomIntInclusive(range.min, range.max, random),

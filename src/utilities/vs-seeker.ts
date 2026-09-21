@@ -6,18 +6,24 @@ import {
   buildTrainerDisplayName,
   getVsSeekerTrainerClasses,
   vsSeekerTrainerNames,
-  type TrainerClass,
   type TrainerClassId,
 } from '@/data/trainers'
-import { calculateKantoTrainerPayout } from '@/data/battles/trainer-payouts'
+import { getCandyIdForLevel } from '@/utilities/rewards/candy-logic'
+import { getPokemonLevelCap } from '@/utilities/pokemon/experience'
 
 export const VS_SEEKER_COOLDOWN_MS = 30 * 60 * 1000
 export const VS_SEEKER_BACKGROUND = '/backgrounds/battle.avif'
 export const VS_SEEKER_HELD_BERRY_CHANCE = 0.3
 export const VS_SEEKER_TRAINER_HEALING_ITEM_CHANCE = 0.5
 export const VS_SEEKER_TRAINER_POTION_CHANCE = VS_SEEKER_TRAINER_HEALING_ITEM_CHANCE
-export const VS_SEEKER_POKEDOLLAR_REWARD = 1000
+export const VS_SEEKER_MIN_LEVEL = 20
+export const VS_SEEKER_LEVEL_STEP = 5
+export const VS_SEEKER_BASE_POKEDOLLAR_REWARD = 350
+export const VS_SEEKER_POKEDOLLAR_PER_LEVEL_STEP = 150
 export const VS_SEEKER_LEAGUE_TICKET_REWARD = 1
+export const VS_SEEKER_CANDY_DUST_REWARD = 5
+export const VS_SEEKER_MIN_DIFFICULTY = 1
+export const VS_SEEKER_MAX_DIFFICULTY = 5
 
 export const VS_SEEKER_BADGE_LEVELS = [
   { badgeId: 'badge-kanto-boulder', level: 15 },
@@ -62,17 +68,47 @@ function pickRandom<T>(items: T[], rng: () => number): T {
   return items[Math.floor(rng() * items.length)]
 }
 
-function pickRandomUnique<T>(
-  items: T[],
+function getPokemonBaseStatTotal(option: SeenPokemonOption): number {
+  const form = getPokemonForm(option.formId)
+  if (!form?.stats) return 0
+
+  return Object.values(form.stats).reduce(
+    (total, value) => total + (Number.isFinite(value) ? value : 0),
+    0,
+  )
+}
+
+function pickDifficultyWeightedUnique(
+  items: SeenPokemonOption[],
   count: number,
+  difficulty: number,
   rng: () => number,
-): T[] {
+): SeenPokemonOption[] {
   const pool = [...items]
-  const picks: T[] = []
+  const picks: SeenPokemonOption[] = []
+  const exponent = 0.35 + (difficulty - VS_SEEKER_MIN_DIFFICULTY) * 0.7
 
   while (pool.length > 0 && picks.length < count) {
-    const index = Math.floor(rng() * pool.length)
-    picks.push(pool.splice(index, 1)[0])
+    const weights = pool.map((option) => {
+      const normalizedBaseStatTotal = Math.max(
+        0.1,
+        getPokemonBaseStatTotal(option) / 600,
+      )
+      return normalizedBaseStatTotal ** exponent
+    })
+    const totalWeight = weights.reduce((total, weight) => total + weight, 0)
+    let roll = rng() * totalWeight
+    let selectedIndex = pool.length - 1
+
+    for (let index = 0; index < weights.length; index += 1) {
+      roll -= weights[index]
+      if (roll <= 0) {
+        selectedIndex = index
+        break
+      }
+    }
+
+    picks.push(pool.splice(selectedIndex, 1)[0])
   }
 
   return picks
@@ -81,11 +117,80 @@ function pickRandomUnique<T>(
 export function getVsSeekerTrainerLevel(
   inventory: Record<string, number>,
 ): number {
-  return VS_SEEKER_BADGE_LEVELS.reduce((level, badgeLevel) => {
-    return (inventory[badgeLevel.badgeId] || 0) > 0
-      ? Math.max(level, badgeLevel.level)
-      : level
-  }, 10)
+  return getPokemonLevelCap(inventory)
+}
+
+export function getVsSeekerLevelOptions(
+  inventory: Record<string, number>,
+): number[] {
+  const levelCap = getVsSeekerTrainerLevel(inventory)
+  const options: number[] = []
+
+  for (
+    let level = VS_SEEKER_MIN_LEVEL;
+    level <= levelCap;
+    level += VS_SEEKER_LEVEL_STEP
+  ) {
+    options.push(level)
+  }
+
+  return options
+}
+
+export function isVsSeekerLevelAllowed(
+  level: number,
+  inventory: Record<string, number>,
+): boolean {
+  return getVsSeekerLevelOptions(inventory).includes(level)
+}
+
+export function getVsSeekerDifficultyOptions(): number[] {
+  return Array.from(
+    {
+      length: VS_SEEKER_MAX_DIFFICULTY - VS_SEEKER_MIN_DIFFICULTY + 1,
+    },
+    (_, index) => VS_SEEKER_MIN_DIFFICULTY + index,
+  )
+}
+
+export function isVsSeekerDifficultyAllowed(difficulty: number): boolean {
+  return (
+    Number.isInteger(difficulty) &&
+    difficulty >= VS_SEEKER_MIN_DIFFICULTY &&
+    difficulty <= VS_SEEKER_MAX_DIFFICULTY
+  )
+}
+
+export function getVsSeekerDifficultyMultiplier(difficulty = 1): number {
+  const normalizedDifficulty = Math.min(
+    VS_SEEKER_MAX_DIFFICULTY,
+    Math.max(
+      VS_SEEKER_MIN_DIFFICULTY,
+      Math.floor(
+        Number.isFinite(difficulty) ? difficulty : VS_SEEKER_MIN_DIFFICULTY,
+      ),
+    ),
+  )
+
+  return 1 + (normalizedDifficulty - 1) * 0.5
+}
+
+export function getVsSeekerLeagueTicketReward(difficulty = 1): number {
+  const normalizedDifficulty = Math.min(
+    VS_SEEKER_MAX_DIFFICULTY,
+    Math.max(
+      VS_SEEKER_MIN_DIFFICULTY,
+      Math.floor(
+        Number.isFinite(difficulty) ? difficulty : VS_SEEKER_MIN_DIFFICULTY,
+      ),
+    ),
+  )
+
+  return (
+    VS_SEEKER_LEAGUE_TICKET_REWARD +
+    normalizedDifficulty -
+    VS_SEEKER_MIN_DIFFICULTY
+  )
 }
 
 export function getVsSeekerBadgeCount(
@@ -122,29 +227,54 @@ export function hasVsSeeker(inventory: Record<string, number>): boolean {
   return (inventory['vs-seeker'] || 0) > 0
 }
 
-export function getVsSeekerPayout(level: number, trainerClass: TrainerClass): number {
-  return calculateKantoTrainerPayout(trainerClass.id as TrainerClassId, level)
+export function getVsSeekerPayout(level: number, difficulty = 1): number {
+  const normalizedLevel = Math.max(
+    VS_SEEKER_MIN_LEVEL,
+    Math.floor(Number.isFinite(level) ? level : VS_SEEKER_MIN_LEVEL),
+  )
+  const levelSteps = Math.floor(
+    (normalizedLevel - VS_SEEKER_MIN_LEVEL) / VS_SEEKER_LEVEL_STEP,
+  )
+
+  return Math.floor(
+    (VS_SEEKER_BASE_POKEDOLLAR_REWARD +
+      levelSteps * VS_SEEKER_POKEDOLLAR_PER_LEVEL_STEP) *
+      getVsSeekerDifficultyMultiplier(difficulty),
+  )
 }
 
 export function getVsSeekerCandyRewards(level: number) {
-  // VS Seeker rematches no longer bypass the wild Candy rarity. Keep the
-  // helper for callers that still import it, but return no automatic Candy.
-  void level
-  return []
+  return [
+    {
+      type: 'item' as const,
+      targetId: getCandyIdForLevel(level),
+      quantity: 1,
+      dropChance: 100,
+    },
+    {
+      type: 'item' as const,
+      targetId: 'candy-dust',
+      quantity: VS_SEEKER_CANDY_DUST_REWARD,
+      dropChance: 100,
+    },
+  ]
 }
 
-export function getVsSeekerCurrencyRewards() {
+export function getVsSeekerCurrencyRewards(
+  level = VS_SEEKER_MIN_LEVEL,
+  difficulty = VS_SEEKER_MIN_DIFFICULTY,
+) {
   return [
     {
       type: 'currency' as const,
       targetId: 'pokedollars',
-      quantity: VS_SEEKER_POKEDOLLAR_REWARD,
+      quantity: getVsSeekerPayout(level, difficulty),
       dropChance: 100,
     },
     {
       type: 'currency' as const,
       targetId: 'league-ticket',
-      quantity: VS_SEEKER_LEAGUE_TICKET_REWARD,
+      quantity: getVsSeekerLeagueTicketReward(difficulty),
       dropChance: 100,
     },
   ]
@@ -178,6 +308,8 @@ export function getSeenPokemonOptions(
 export function buildVsSeekerBattleConfig(params: {
   pokedex: PokedexData
   inventory: Record<string, number>
+  requestedLevel?: number
+  requestedDifficulty?: number
   rng?: () => number
   now?: Date
 }): BattleConfig | null {
@@ -185,10 +317,21 @@ export function buildVsSeekerBattleConfig(params: {
   const seenPokemon = getSeenPokemonOptions(params.pokedex)
   if (seenPokemon.length < 3) return null
 
-  const level = getVsSeekerTrainerLevel(params.inventory)
+  const levelCap = getVsSeekerTrainerLevel(params.inventory)
+  const level = params.requestedLevel ?? levelCap
+  if (!isVsSeekerLevelAllowed(level, params.inventory)) return null
+  const difficulty =
+    params.requestedDifficulty ?? VS_SEEKER_MIN_DIFFICULTY
+  if (!isVsSeekerDifficultyAllowed(difficulty)) return null
+
   const trainerClass = pickRandom(VS_SEEKER_TRAINER_CLASSES, rng)
   const trainerName = pickRandom(vsSeekerTrainerNames[trainerClass.gender], rng)
-  const pickedPokemon = pickRandomUnique(seenPokemon, 3, rng)
+  const pickedPokemon = pickDifficultyWeightedUnique(
+    seenPokemon,
+    3,
+    difficulty,
+    rng,
+  )
   const enemyTeam: BattleEnemy[] = pickedPokemon.map((pokemon) => {
     const enemy: BattleEnemy = {
       ...pokemon,
@@ -238,13 +381,14 @@ export function buildVsSeekerBattleConfig(params: {
     enemyTeam,
     trainerItems,
     rewards: [
-      ...getVsSeekerCurrencyRewards(),
+      ...getVsSeekerCurrencyRewards(level, difficulty),
       ...getVsSeekerCandyRewards(level),
     ],
     disableLossPayout: true,
     disableCandyRewards: true,
     maxPokemon: 3,
     levelCap: level,
+    enemyDifficulty: difficulty,
     allowSwapping: true,
     aiProfile: getVsSeekerAiProfile(params.inventory),
   }
