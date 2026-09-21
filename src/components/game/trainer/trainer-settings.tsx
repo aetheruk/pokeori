@@ -1,7 +1,8 @@
 'use client'
 
-import { Download, Trash2, Volume2, VolumeX } from 'lucide-react'
+import { Download, LogOut, Trash2, Volume2, VolumeX } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useAudio } from '@/context/AudioContext'
@@ -15,12 +16,14 @@ import {
 
 export function TrainerSettings() {
   const { isAudioEnabled, toggleAudioEnabled } = useAudio()
+  const router = useRouter()
   const [images, setImages] = useState<DownloadImage[]>([])
   const [completed, setCompleted] = useState(0)
   const [busy, setBusy] = useState(false)
   const [loading, setLoading] = useState(true)
   const [message, setMessage] = useState('')
   const [supported, setSupported] = useState(false)
+  const [loggingOut, setLoggingOut] = useState(false)
   const download = useRef<AbortController | null>(null)
 
   useEffect(() => () => download.current?.abort(), [])
@@ -125,6 +128,27 @@ export function TrainerSettings() {
   )
   const ready = images.length > 0 && completed === images.length
 
+  const logout = async () => {
+    if (loggingOut) return
+    setLoggingOut(true)
+    download.current?.abort()
+    try {
+      const response = await fetch('/api/users/logout', {
+        method: 'POST',
+        credentials: 'include',
+      })
+      if (!response.ok) throw new Error('Could not log out. Please try again.')
+      router.replace('/auth')
+    } catch (error) {
+      setLoggingOut(false)
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : 'Could not log out. Please try again.',
+      )
+    }
+  }
+
   return (
     <section aria-label="Settings" className="space-y-4 text-game-ink">
       <SectionDivider>
@@ -217,6 +241,15 @@ export function TrainerSettings() {
             {message}
           </p>
         </section>
+        <Button
+          variant="destructive"
+          onClick={logout}
+          disabled={loggingOut}
+          className="min-h-11 w-full justify-start"
+        >
+          <LogOut className="h-4 w-4" />
+          {loggingOut ? 'Logging out…' : 'Log out'}
+        </Button>
       </div>
     </section>
   )
