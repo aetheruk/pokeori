@@ -60,7 +60,6 @@ const route8TrainerBattle = ({
   enemyTeam,
   rewards: [trainerPokeDollarReward(payoutClassId, payoutLevel)],
   maxPokemon,
-  levelCap: 30,
   enemyAttackTelegraphChance: 2,
 })
 
@@ -91,7 +90,6 @@ const route8Battles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 1,
-    levelCap: 30,
   },
   route8TrainerBattle({
     id: 'route-8-lass-julia',
@@ -274,7 +272,6 @@ export const lavenderTownBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('picnicker', 21)],
     maxPokemon: 3,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -297,7 +294,6 @@ export const lavenderTownBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('hiker', 21)],
     maxPokemon: 3,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -320,7 +316,6 @@ export const lavenderTownBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('hiker', 19)],
     maxPokemon: 3,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -343,7 +338,6 @@ export const lavenderTownBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('pokemaniac', 20)],
     maxPokemon: 3,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -373,7 +367,6 @@ export const lavenderTownBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('fisherman', 22)],
     maxPokemon: 3,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -404,7 +397,6 @@ export const lavenderTownBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('fisherman', 24)],
     maxPokemon: 3,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -432,7 +424,6 @@ export const lavenderTownBattles: BattleConfig[] = [
     enemyTeam: [{ speciesId: 118, formId: '118', level: 27 }],
     rewards: [trainerPokeDollarReward('fisherman', 27)],
     maxPokemon: 3,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -465,7 +456,6 @@ export const lavenderTownBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('fisherman', 21)],
     maxPokemon: 3,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -495,7 +485,6 @@ export const lavenderTownBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('old-couple', 35)],
     maxPokemon: 3,
-    levelCap: 35,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -527,7 +516,6 @@ export const lavenderTownBattles: BattleConfig[] = [
     enemyTeam: [{ speciesId: 143, formId: '143', level: 30 }],
     rewards: [],
     maxPokemon: 1,
-    levelCap: 30,
   },
   {
     id: 'route-12-battle',
@@ -559,6 +547,5 @@ export const lavenderTownBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 1,
-    levelCap: 30,
   },
 ]

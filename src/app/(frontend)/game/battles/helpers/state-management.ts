@@ -10,10 +10,24 @@ import { isActivityEligibleForReplay } from '@/utilities/activity-replay'
 import { getUser } from './user'
 import { sanitizeBattleMoveState } from '@/utilities/battle/state-sanitization'
 import { normalizeChronicleBattleBudgets } from '@/utilities/battle/chronicle-budgets'
+import { battles } from '@/data/battles'
 
 export const BATTLE_TTL = 3600 // 1 hour
 export const PVP_BATTLE_PREFIX = 'pvp:battle:'
 export const PVP_TURN_PREFIX = 'pvp:turn:'
+
+/**
+ * Return the battle definition with the start-time resolved level cap. The
+ * dynamic cap is stored in state.config so ordinary battles keep the same
+ * sync level when a later action loads the static authored definition.
+ */
+export function getBattleConfigForState(state: BattleState) {
+  const base =
+    state.dynamicBattleConfig ?? battles.find((battle) => battle.id === state.battleId)
+  if (!base || typeof state.config?.levelCap !== 'number') return base
+  if (base.levelCap === state.config.levelCap) return base
+  return { ...base, levelCap: state.config.levelCap }
+}
 
 // Internal Helper: Get Active Battle State (Handles PVP vs PVE)
 export async function getActiveBattleState(
@@ -73,7 +87,6 @@ export async function getActiveBattleState(
   const sanitized = sanitizeBattleMoveState(battleState)
   let chronicleBudgetsChanged = false
   if (sanitized.state.chronicle) {
-    const { battles } = await import('@/data/battles')
     const battleConfig = battles.find(
       (battle) => battle.id === sanitized.state.battleId,
     )
@@ -97,7 +110,6 @@ export async function getActiveBattleState(
       return sanitized.state
     }
 
-    const { battles } = await import('@/data/battles')
     const battleConfig = eventBattle ? await (await import('@/utilities/events/server')).getEffectiveContent('battle', sanitized.state.battleId, user as User) : battles.find((b) => b.id === sanitized.state.battleId)
     if (battleConfig) {
       sanitized.state.isEligibleForReplay = await isActivityEligibleForReplay(

@@ -509,6 +509,8 @@ export interface BattleState {
     allowedItems?: string[]
     allowSwapping?: boolean
     maxPokemon?: number
+    /** Effective player-side combat cap resolved when the battle started. */
+    levelCap?: number
     enemyAttackTelegraphChance?: number
     music?: string // Custom background music URL
   }

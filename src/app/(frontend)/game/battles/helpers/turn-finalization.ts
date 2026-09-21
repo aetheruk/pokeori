@@ -12,7 +12,6 @@ import {
   clearSourceLinkedTrapSecondaryStatuses,
   processSecondaryStatusesForSwitch,
 } from '@/utilities/battle/secondary-statuses'
-import { battles } from '@/data/battles'
 import { DYNAMAX_UNLOCK_TURNS } from '@/data/powers'
 import { handleWin } from './win-handler'
 import { handleBattleLoss } from './loss-handler'
@@ -37,12 +36,7 @@ import { finalizeBattlePresentation } from '@/utilities/battle/presentation'
 import { resolvePendingMoveSwitches } from '@/utilities/battle/move-effects'
 import { advanceShoutStatBoostForTurn } from '@/utilities/battle/shout-effects'
 import { resetBattleStatStages } from '@/utilities/battle/stats-calc'
-
-function getBattleConfigForState(state: BattleState) {
-  return (
-    state.dynamicBattleConfig ?? battles.find((b) => b.id === state.battleId)
-  )
-}
+import { getBattleConfigForState } from './state-management'
 
 function advancePowerStateForTurn(state: BattleState) {
   if (!state.powers) return

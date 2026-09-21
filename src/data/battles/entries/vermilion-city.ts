@@ -65,7 +65,6 @@ export const vermilionCityBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 1,
-    levelCap: 20,
   },
   {
     id: 'route-6-bug-catcher-keigo',
@@ -100,7 +99,6 @@ export const vermilionCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('bug-catcher', 16)],
     maxPokemon: 2,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -131,7 +129,6 @@ export const vermilionCityBattles: BattleConfig[] = [
     enemyTeam: [{ speciesId: 7, formId: '7', level: 20 }],
     rewards: [trainerPokeDollarReward('camper', 20)],
     maxPokemon: 1,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -165,7 +162,6 @@ export const vermilionCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('picnicker', 16)],
     maxPokemon: 1,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -196,7 +192,6 @@ export const vermilionCityBattles: BattleConfig[] = [
     enemyTeam: [{ speciesId: 12, formId: '12', level: 20 }],
     rewards: [trainerPokeDollarReward('bug-catcher', 20)],
     maxPokemon: 1,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -231,7 +226,6 @@ export const vermilionCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('picnicker', 16)],
     maxPokemon: 2,
-    levelCap: 18,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -265,7 +259,6 @@ export const vermilionCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('camper', 16)],
     maxPokemon: 2,
-    levelCap: 18,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -333,7 +326,6 @@ export const vermilionCityBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 1,
-    levelCap: 25,
   },
   {
     id: 'route-11-youngster-eddie',
@@ -367,7 +359,6 @@ export const vermilionCityBattles: BattleConfig[] = [
       trainerPokeDollarReward('youngster', 21),
     ],
     maxPokemon: 1,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -405,7 +396,6 @@ export const vermilionCityBattles: BattleConfig[] = [
       trainerPokeDollarReward('gamer', 18),
     ],
     maxPokemon: 2,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -444,7 +434,6 @@ export const vermilionCityBattles: BattleConfig[] = [
       trainerPokeDollarReward('engineer', 18),
     ],
     maxPokemon: 2,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -482,7 +471,6 @@ export const vermilionCityBattles: BattleConfig[] = [
       trainerPokeDollarReward('youngster', 18),
     ],
     maxPokemon: 2,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -520,7 +508,6 @@ export const vermilionCityBattles: BattleConfig[] = [
       trainerPokeDollarReward('youngster', 19),
     ],
     maxPokemon: 2,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -558,7 +545,6 @@ export const vermilionCityBattles: BattleConfig[] = [
       trainerPokeDollarReward('gamer', 18),
     ],
     maxPokemon: 2,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -595,7 +581,6 @@ export const vermilionCityBattles: BattleConfig[] = [
       trainerPokeDollarReward('engineer', 21),
     ],
     maxPokemon: 1,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -633,7 +618,6 @@ export const vermilionCityBattles: BattleConfig[] = [
       trainerPokeDollarReward('gamer', 18),
     ],
     maxPokemon: 2,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -672,7 +656,6 @@ export const vermilionCityBattles: BattleConfig[] = [
       trainerPokeDollarReward('youngster', 17),
     ],
     maxPokemon: 2,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -710,7 +693,6 @@ export const vermilionCityBattles: BattleConfig[] = [
       trainerPokeDollarReward('gamer', 18),
     ],
     maxPokemon: 2,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -738,7 +720,6 @@ export const vermilionCityBattles: BattleConfig[] = [
     rewards: [],
     disableRewards: true,
     maxPokemon: 2,
-    levelCap: 26,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -766,7 +747,6 @@ export const vermilionCityBattles: BattleConfig[] = [
     rewards: [],
     disableRewards: true,
     maxPokemon: 2,
-    levelCap: 26,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -791,7 +771,6 @@ export const vermilionCityBattles: BattleConfig[] = [
     rewards: [],
     disableRewards: true,
     maxPokemon: 2,
-    levelCap: 27,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -847,7 +826,6 @@ export const vermilionCityBattles: BattleConfig[] = [
     rewards: [],
     disableRewards: true,
     maxPokemon: 3,
-    levelCap: 28,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -874,7 +852,6 @@ export const vermilionCityBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 2,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -901,7 +878,6 @@ export const vermilionCityBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 2,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -928,7 +904,6 @@ export const vermilionCityBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 2,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -955,7 +930,6 @@ export const vermilionCityBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 3,
-    levelCap: 16,
     enemyAttackTelegraphChance: 2,
     allowedItems: ['oran-berry', 'sitrus-berry'],
   },
@@ -983,7 +957,6 @@ export const vermilionCityBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 3,
-    levelCap: 16,
     enemyAttackTelegraphChance: 2,
     allowedItems: ['oran-berry', 'sitrus-berry'],
   },
@@ -1011,7 +984,6 @@ export const vermilionCityBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 3,
-    levelCap: 16,
     enemyAttackTelegraphChance: 2,
     allowedItems: ['oran-berry', 'sitrus-berry'],
   },
@@ -1040,7 +1012,6 @@ export const vermilionCityBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 3,
-    levelCap: 16,
     enemyAttackTelegraphChance: 2,
     allowedItems: ['oran-berry', 'sitrus-berry'],
   },

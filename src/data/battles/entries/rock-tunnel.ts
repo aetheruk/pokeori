@@ -94,7 +94,6 @@ export const rockTunnelBattles: BattleConfig[] = [
     icon: { type: 'pokemon', id: '74' },
     background: caveBackground,
     maxPokemon: 1,
-    levelCap: 25,
     requirements: [echoMapWin('rock-tunnel-echo-map-entrance')],
     isWildBattle: true,
     enemyTeam: oneFWildTeam,
@@ -110,7 +109,6 @@ export const rockTunnelBattles: BattleConfig[] = [
     icon: { type: 'pokemon', id: '95' },
     background: caveBackground,
     maxPokemon: 1,
-    levelCap: 25,
     requirements: [echoMapWin('rock-tunnel-echo-map-southeast')],
     isWildBattle: true,
     enemyTeam: b1fWildTeam,
@@ -126,7 +124,6 @@ export const rockTunnelBattles: BattleConfig[] = [
     icon: { type: 'pokemon', id: '66' },
     background: caveBackground,
     maxPokemon: 1,
-    levelCap: 25,
     requirements: [echoMapWin('rock-tunnel-echo-map-west')],
     isWildBattle: true,
     enemyTeam: oneFWildTeam,
@@ -142,7 +139,6 @@ export const rockTunnelBattles: BattleConfig[] = [
     icon: { type: 'pokemon', id: '41' },
     background: caveBackground,
     maxPokemon: 1,
-    levelCap: 25,
     requirements: [echoMapWin('rock-tunnel-echo-map-northwest')],
     isWildBattle: true,
     enemyTeam: b1fWildTeam,
@@ -158,7 +154,6 @@ export const rockTunnelBattles: BattleConfig[] = [
     icon: { type: 'pokemon', id: '56' },
     background: caveBackground,
     maxPokemon: 1,
-    levelCap: 25,
     requirements: [echoMapWin('rock-tunnel-echo-map-final-corridor')],
     isWildBattle: true,
     enemyTeam: oneFWildTeam,
@@ -176,7 +171,6 @@ export const rockTunnelBattles: BattleConfig[] = [
     icon: { type: 'trainer', id: 'pokemaniac' },
     background: caveBackground,
     maxPokemon: 2,
-    levelCap: 25,
     requirements: [
       unbeatenBattle('rock-tunnel-pokemaniac-ashton'),
       echoMapWin('rock-tunnel-echo-map-entrance'),
@@ -199,7 +193,6 @@ export const rockTunnelBattles: BattleConfig[] = [
     icon: { type: 'trainer', id: 'pokemaniac' },
     background: caveBackground,
     maxPokemon: 2,
-    levelCap: 25,
     requirements: [
       unbeatenBattle('rock-tunnel-pokemaniac-winston'),
       echoMapWin('rock-tunnel-echo-map-southeast'),
@@ -219,7 +212,6 @@ export const rockTunnelBattles: BattleConfig[] = [
     icon: { type: 'trainer', id: 'picnicker' },
     background: caveBackground,
     maxPokemon: 2,
-    levelCap: 25,
     requirements: [
       unbeatenBattle('rock-tunnel-picnicker-martha'),
       wildBattleWins('rock-tunnel-pokemaniac-winston', 1),
@@ -243,7 +235,6 @@ export const rockTunnelBattles: BattleConfig[] = [
     icon: { type: 'trainer', id: 'pokemaniac' },
     background: caveBackground,
     maxPokemon: 2,
-    levelCap: 25,
     requirements: [
       unbeatenBattle('rock-tunnel-pokemaniac-steve'),
       wildBattleWins('rock-tunnel-picnicker-martha', 1),
@@ -267,7 +258,6 @@ export const rockTunnelBattles: BattleConfig[] = [
     icon: { type: 'trainer', id: 'hiker' },
     background: caveBackground,
     maxPokemon: 2,
-    levelCap: 25,
     requirements: [
       unbeatenBattle('rock-tunnel-hiker-allen'),
       wildBattleWins('rock-tunnel-pokemaniac-steve', 1),
@@ -288,7 +278,6 @@ export const rockTunnelBattles: BattleConfig[] = [
     icon: { type: 'trainer', id: 'hiker' },
     background: caveBackground,
     maxPokemon: 2,
-    levelCap: 25,
     requirements: [
       unbeatenBattle('rock-tunnel-hiker-eric'),
       wildBattleWins('rock-tunnel-hiker-allen', 1),
@@ -312,7 +301,6 @@ export const rockTunnelBattles: BattleConfig[] = [
     icon: { type: 'trainer', id: 'hiker' },
     background: caveBackground,
     maxPokemon: 3,
-    levelCap: 25,
     requirements: [
       unbeatenBattle('rock-tunnel-hiker-lenny'),
       echoMapWin('rock-tunnel-echo-map-west'),
@@ -337,7 +325,6 @@ export const rockTunnelBattles: BattleConfig[] = [
     icon: { type: 'trainer', id: 'hiker' },
     background: caveBackground,
     maxPokemon: 3,
-    levelCap: 25,
     requirements: [
       unbeatenBattle('rock-tunnel-hiker-oliver'),
       wildBattleWins('rock-tunnel-hiker-lenny', 1),
@@ -362,7 +349,6 @@ export const rockTunnelBattles: BattleConfig[] = [
     icon: { type: 'trainer', id: 'hiker' },
     background: caveBackground,
     maxPokemon: 3,
-    levelCap: 25,
     requirements: [
       unbeatenBattle('rock-tunnel-hiker-lucas'),
       wildBattleWins('rock-tunnel-hiker-oliver', 1),
@@ -386,7 +372,6 @@ export const rockTunnelBattles: BattleConfig[] = [
     icon: { type: 'trainer', id: 'picnicker' },
     background: caveBackground,
     maxPokemon: 3,
-    levelCap: 25,
     requirements: [
       unbeatenBattle('rock-tunnel-picnicker-sofia'),
       echoMapWin('rock-tunnel-echo-map-northwest'),
@@ -410,7 +395,6 @@ export const rockTunnelBattles: BattleConfig[] = [
     icon: { type: 'trainer', id: 'hiker' },
     background: caveBackground,
     maxPokemon: 3,
-    levelCap: 25,
     requirements: [
       unbeatenBattle('rock-tunnel-hiker-dudley'),
       wildBattleWins('rock-tunnel-picnicker-sofia', 1),
@@ -435,7 +419,6 @@ export const rockTunnelBattles: BattleConfig[] = [
     icon: { type: 'trainer', id: 'pokemaniac' },
     background: caveBackground,
     maxPokemon: 3,
-    levelCap: 25,
     requirements: [
       unbeatenBattle('rock-tunnel-pokemaniac-cooper'),
       wildBattleWins('rock-tunnel-hiker-dudley', 1),
@@ -460,7 +443,6 @@ export const rockTunnelBattles: BattleConfig[] = [
     icon: { type: 'trainer', id: 'picnicker' },
     background: caveBackground,
     maxPokemon: 3,
-    levelCap: 25,
     requirements: [
       unbeatenBattle('rock-tunnel-picnicker-leah'),
       echoMapWin('rock-tunnel-echo-map-final-corridor'),
@@ -483,7 +465,6 @@ export const rockTunnelBattles: BattleConfig[] = [
     icon: { type: 'trainer', id: 'picnicker' },
     background: caveBackground,
     maxPokemon: 3,
-    levelCap: 25,
     requirements: [
       unbeatenBattle('rock-tunnel-picnicker-ariana'),
       wildBattleWins('rock-tunnel-picnicker-leah', 1),
@@ -509,7 +490,6 @@ export const rockTunnelBattles: BattleConfig[] = [
     icon: { type: 'trainer', id: 'picnicker' },
     background: caveBackground,
     maxPokemon: 3,
-    levelCap: 25,
     requirements: [
       unbeatenBattle('rock-tunnel-picnicker-dana'),
       wildBattleWins('rock-tunnel-picnicker-ariana', 1),
@@ -532,7 +512,6 @@ export const rockTunnelBattles: BattleConfig[] = [
     icon: { type: 'pokemon', id: '208' },
     background: caveBackground,
     maxPokemon: 3,
-    levelCap: 25,
     requirements: [
       unbeatenBattle('rock-tunnel-the-beast-below'),
       { type: 'task_completed', targetId: 'rock-tunnel-mysterious-shrine' },

@@ -1,8 +1,7 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { getUser } from '../helpers/user'
-import { getActiveBattleState } from '../helpers/state-management'
-import { battles } from '@/data/battles'
+import { getActiveBattleState, getBattleConfigForState } from '../helpers/state-management'
 import type { BattleInventoryItem } from '@/utilities/battle/types'
 import { canUseItemWithSkillRequirements } from '@/utilities/skills/unlocks'
 import { getUserInventoryMap } from '@/utilities/user-state'
@@ -28,7 +27,7 @@ export async function getBattleInventory(): Promise<{
         (await getPayload({ config: configPromise })) as any,
         user.id,
       )
-  const battleConfig = state.dynamicBattleConfig || battles.find((battle) => battle.id === state.battleId)
+  const battleConfig = getBattleConfigForState(state)
   const configuredAllowedItems =
     state.config?.allowedItems || battleConfig?.allowedItems
   const allowedItems = configuredAllowedItems?.length

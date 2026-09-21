@@ -65,7 +65,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 1,
-    levelCap: 20,
   },
   {
     id: 'route-9-battle',
@@ -122,7 +121,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 1,
-    levelCap: 25,
   },
   {
     id: 'route-9-pass-picnicker-alicia',
@@ -151,7 +149,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('picnicker', 18)],
     maxPokemon: 4,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -179,7 +176,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('hiker', 20)],
     maxPokemon: 3,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -207,7 +203,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('camper', 21)],
     maxPokemon: 3,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -235,7 +230,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('bug-catcher', 19)],
     maxPokemon: 3,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -263,7 +257,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('hiker', 21)],
     maxPokemon: 3,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -292,7 +285,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('bug-catcher', 20)],
     maxPokemon: 3,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -322,7 +314,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('camper', 19)],
     maxPokemon: 4,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -351,7 +342,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('hiker', 20)],
     maxPokemon: 3,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -376,7 +366,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     enemyTeam: [{ speciesId: 52, formId: '52', level: 23 }],
     rewards: [trainerPokeDollarReward('picnicker', 23)],
     maxPokemon: 2,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -436,7 +425,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 1,
-    levelCap: 15,
     rewards: [],
   },
   {
@@ -484,7 +472,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('bug-catcher', 10)],
     maxPokemon: 1,
-    levelCap: 15,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -502,7 +489,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     dynamicOpponent: 'rival',
     rivalLevel: 18,
     maxPokemon: 3,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
     requirements: [
       {
@@ -573,7 +559,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('lass', 12)],
     maxPokemon: 2,
-    levelCap: 15,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -616,7 +601,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('youngster', 13)],
     maxPokemon: 1,
-    levelCap: 15,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -658,7 +642,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('lass', 16)],
     maxPokemon: 2,
-    levelCap: 16,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -706,7 +689,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('camper', 18)],
     maxPokemon: 1,
-    levelCap: 18,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -765,7 +747,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 2,
-    levelCap: 18,
     enemyAttackTelegraphChance: 2,
     title: 'Creepy Weirdo',
   },
@@ -781,7 +762,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
       id: '63',
     },
     maxPokemon: 1,
-    levelCap: 15,
     allowSwapping: false,
     enemyAttackTelegraphChance: 2,
     isWildBattle: true,
@@ -868,7 +848,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
       id: '43',
     },
     maxPokemon: 1,
-    levelCap: 15,
     allowSwapping: false,
     enemyAttackTelegraphChance: 2,
     isWildBattle: true,
@@ -976,7 +955,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 3,
-    levelCap: 15,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -1019,7 +997,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 1,
-    levelCap: 17,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -1055,7 +1032,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('youngster', 20)],
     maxPokemon: 1,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
     criteria: [
       {
@@ -1103,7 +1079,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('youngster', 17)],
     maxPokemon: 1,
-    levelCap: 17,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -1143,7 +1118,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('picnicker', 15)],
     maxPokemon: 2,
-    levelCap: 16,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -1199,7 +1173,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 3,
-    levelCap: 15,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -1239,7 +1212,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('camper', 14)],
     maxPokemon: 1,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -1279,7 +1251,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('youngster', 14)],
     maxPokemon: 2,
-    levelCap: 15,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -1323,7 +1294,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('lass', 13)],
     maxPokemon: 2,
-    levelCap: 15,
     enemyAttackTelegraphChance: 2,
   },
   {
@@ -1373,7 +1343,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 2,
-    levelCap: 20,
     enemyAttackTelegraphChance: 2,
     title: 'Gym Trainer',
   },
@@ -1451,7 +1420,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 2,
-    levelCap: 22,
     enemyAttackTelegraphChance: 2,
     title: 'Cascade Badge',
   },
@@ -1513,7 +1481,6 @@ export const ceruleanCityBattles: BattleConfig[] = [
       },
     ],
     maxPokemon: 2,
-    levelCap: 22,
     enemyAttackTelegraphChance: 2,
     title: 'Rocket Thief',
   },

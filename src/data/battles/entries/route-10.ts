@@ -31,7 +31,6 @@ export const route10Battles: BattleConfig[] = [
     ],
     rewards: [],
     maxPokemon: 1,
-    levelCap: 25,
   },
   {
     id: 'route-10-picknicker-heidi',
@@ -66,7 +65,6 @@ export const route10Battles: BattleConfig[] = [
     ],
     rewards: [trainerPokeDollarReward('picnicker', 21)],
     maxPokemon: 3,
-    levelCap: 25,
     enemyAttackTelegraphChance: 2,
   },
 ]

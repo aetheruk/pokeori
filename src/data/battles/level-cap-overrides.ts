@@ -1,0 +1,53 @@
+/**
+ * Deliberate combat sync exceptions for the ordinary enemy-level rule.
+ *
+ * Route trainers and regular wild battles derive their cap at battle start.
+ * These entries retain a fixed cap because they are tutorials, gym content,
+ * bosses, or special set pieces whose difficulty is authored as part of the
+ * encounter.
+ */
+export const BATTLE_LEVEL_CAP_OVERRIDES: Readonly<Record<string, number>> = {
+  'pallet-orientation-lab-rattata': 5,
+  'tutorial-battle-5': 50,
+  'tutorial-battle-4': 5,
+  'tutorial-battle-3': 7,
+  'tutorial-battle': 5,
+  'pallet-town-savage-raticate': 50,
+  'buggy-champion': 12,
+  'bug-gauntlet-champion': 12,
+  'pewter-gym-jerry': 10,
+  'pewter-gym-brock': 15,
+  'exp-mt-moon-clefairy-boss': 18,
+  'exp-mt-moon-clefable-boss': 18,
+  'cerulean-gym-swimmer': 20,
+  'cerulean-gym-misty': 22,
+  'vermilion-gym-sailor-dwayne': 26,
+  'vermilion-gym-engineer-baily': 26,
+  'vermilion-gym-gentleman-tucker': 27,
+  'vermilion-gym-lt-surge': 28,
+  'rock-tunnel-the-beast-below': 25,
+  'route-12-furious-snorlax': 30,
+  'celadon-hq-rocket-ambush': 35,
+  'det-ray-choo-skill-test': 30,
+  'celadon-gym-lass-kay': 30,
+  'celadon-gym-beauty-bridget': 30,
+  'celadon-gym-picnicker-tina': 30,
+  'celadon-gym-lass-lisa': 30,
+  'celadon-gym-cooltrainer-mary': 30,
+  'celadon-gym-beauty-lori': 30,
+  'celadon-gym-beauty-tamia': 30,
+  'celadon-gym-erika': 30,
+  'route-16-furious-snorlax': 30,
+  'pokemon-tower-shadow-surge-1': 36,
+  'pokemon-tower-shadow-surge-2': 36,
+  'pokemon-tower-shadow-surge-3': 38,
+  'pokemon-tower-kita-boss': 40,
+  'route-14-bird-champion-donald': 35,
+  'fuchsia-gym-juggler-nate': 40,
+  'fuchsia-gym-juggler-kayden': 40,
+  'fuchsia-gym-juggler-kirk': 40,
+  'fuchsia-gym-tamer-edgar': 40,
+  'fuchsia-gym-tamer-phil': 40,
+  'fuchsia-gym-juggler-shawn': 40,
+  'fuchsia-gym-leader-koga': 40,
+} as const

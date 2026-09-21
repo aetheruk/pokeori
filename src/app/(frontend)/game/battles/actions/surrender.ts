@@ -3,10 +3,9 @@ import { redis } from '@/utilities/redis'
 import { revalidatePath } from 'next/cache'
 import type { BattleState } from '@/utilities/battle/types'
 import { getUser } from '../helpers/user'
-import { getActiveBattleState } from '../helpers/state-management'
+import { getActiveBattleState, getBattleConfigForState } from '../helpers/state-management'
 import { trimBattleHistory } from '@/utilities/battle/history'
 import { isBattleUser } from '../pvp/state-utils'
-import { battles } from '@/data/battles'
 import { handleBattleLoss } from '../helpers/loss-handler'
 import { settlePvpOutcome } from '../pvp/outcome'
 import { acquireActionLock, releaseActionLock } from '@/utilities/game-integrity'
@@ -46,7 +45,7 @@ export async function surrenderBattle(): Promise<{success: boolean; message?: st
       if (state.isPvp) settled = await settlePvpOutcome(state)
       else {
         state.pendingSketchedMoves = undefined
-        const config = state.dynamicBattleConfig ?? battles.find((entry) => entry.id === state.battleId)
+        const config = getBattleConfigForState(state)
         await handleBattleLoss(state, user, config)
       }
       const published = await redis.setManyIfValue(key, previous, [{key, value: settled, ttlSeconds: BATTLE_TTL}])

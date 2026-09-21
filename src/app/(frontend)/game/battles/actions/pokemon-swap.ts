@@ -1,8 +1,7 @@
 import { revalidatePath } from 'next/cache'
 import type { BattleState, BattleStance } from '@/utilities/battle/types'
 import { getUser } from '../helpers/user'
-import { BATTLE_TTL, getActiveBattleState } from '../helpers/state-management'
-import { battles } from '@/data/battles'
+import { BATTLE_TTL, getActiveBattleState, getBattleConfigForState } from '../helpers/state-management'
 import { processEnemyAttackOnly } from '../pve/enemy-attack'
 import { recalculateBattlePokemonStats } from '@/utilities/battle/battle-logic'
 import { queuePvpMoveAndResolveTurn } from '../pvp/turn-sync'
@@ -58,7 +57,7 @@ export async function swapPokemon(
     if (state.status !== 'ongoing')
       return { success: false, error: 'Battle has ended' }
 
-    const battleConfig = state.dynamicBattleConfig || battles.find((b) => b.id === state.battleId)
+    const battleConfig = getBattleConfigForState(state)
     const isLeadSelection = !state.isPvp && needsPlayerLeadSelection(state)
     const isForcedReplacement = !state.isPvp && needsPlayerReplacement(state)
     const isMoveSwitch = !state.isPvp && needsPlayerMoveSwitch(state)
