@@ -1,9 +1,10 @@
 import { fuchsiaResearchGuild } from './fuchsia-research'
+import { undergroundSocietyGuild } from './underground-society'
 import type { GuildDefinition } from './types'
 
 export * from './types'
 
-export const guilds: GuildDefinition[] = [fuchsiaResearchGuild]
+export const guilds: GuildDefinition[] = [fuchsiaResearchGuild, undergroundSocietyGuild]
 
 export function getGuild(id: string): GuildDefinition | undefined {
   return guilds.find((guild) => guild.id === id)

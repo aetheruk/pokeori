@@ -961,6 +961,13 @@ These are authored requirements or intended handoffs beyond the current Fuchsia 
 
 ## Current Working Summary
 
+### Underground Society Guild
+
+- The Underground Society is a separate ten-rank guild attached to the Kanto Underground TCG route. Existing recruits receive Rank 1 with 0 XP through the idempotent `migrate:underground-society` migration. The migration does not award historical XP and does not complete any set showcase tasks, so players with completed collections can still claim those tasks.
+- Guild XP thresholds are 0, 10,000, 25,000, 50,000, 100,000, 180,000, 300,000, 480,000, 720,000, and 1,000,000. Rank names run from New Recruit through Lord of the Pit.
+- Each authored TCG set has a one-time `Showcase <set>` task in Kanto Underground. Presenting a completed set grants 1,000 Society XP. Booster box delivery grants 20 Society XP, and repeatable Underground rematch wins grant 1 XP.
+- Rank 2 opens a one-stock promo counter selling `basep-24`, `basep-25`, and `basep-28` for 50,000 Crystals each. Rank 3 enables the one-click Carddex action that sends every duplicate card to HQ while retaining one copy per card and paying the normal rarity-based Pokédollar value. Individual duplicate transfers remain available at all ranks.
+
 ### Interface Shell
 
 - Release `0.4.0` expands Kid Mode into a signup-selectable, admin-managed solo play mode. Catch questions use sprites; Field Observation always asks `Who appeared the most?` through tappable Pokemon tiles; player Pokemon receive +20% to all six stats in PvE; and rivals, PvP, Trainer social pages, Mystery Gift, and High Scores are hidden and server-blocked. Kid Mode accounts are omitted from trainer searches, friend/rival surfaces, and leaderboard results without deleting existing records. Pallet Orientation skips rival selection and repairs older active runs automatically. VS Seeker losses and surrenders no longer deduct PokeDollars. Explore's region and area drawers now omit locked destinations instead of rendering disabled cards.

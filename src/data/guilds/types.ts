@@ -29,6 +29,7 @@ export interface GuildProgressData {
   rewardedThroughRank?: number | null
   legacyImportedAt?: string | null
   instituteBalanceV2MigratedAt?: string | null
+  undergroundSocietyMigratedAt?: string | null
 }
 
 export type GuildsData = Record<string, GuildProgressData | undefined>

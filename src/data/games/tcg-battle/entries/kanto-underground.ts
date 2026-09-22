@@ -1,5 +1,6 @@
 import type { TcgBattleGameConfig } from '../types'
 import type { TcgBattleEnergyType } from '@/utilities/tcg/tcg-battle'
+import { UNDERGROUND_SOCIETY_GUILD_ID } from '@/data/guilds/underground-society'
 
 const undergroundBattleRequirements = (id: string, taskId: string) => [
   { type: 'task_completed' as const, targetId: taskId },
@@ -34,7 +35,12 @@ const battle = (input: {
   },
   background: '/backgrounds/kanto-underground.avif',
   requirements: input.requirements,
-  rewards: [{ type: 'currency', targetId: 'pokedollars', quantity: input.reward }],
+  rewards: [
+    { type: 'currency', targetId: 'pokedollars', quantity: input.reward },
+    ...(input.replayable
+      ? [{ type: 'guild_xp' as const, targetId: UNDERGROUND_SOCIETY_GUILD_ID, quantity: 1, dropChance: 100 }]
+      : []),
+  ],
   isEligibleForReplay: input.replayable,
   settings: {
     deckFormat: 'baby',

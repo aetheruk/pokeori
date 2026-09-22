@@ -1,5 +1,6 @@
 import { tcgSetSummaries } from '@/data/tcg/summaries'
 import type { Task } from '../../types'
+import { UNDERGROUND_SOCIETY_GUILD_ID } from '@/data/guilds/underground-society'
 
 export const TCG_BOOSTER_BOX_PACK_COUNT = 36
 export const TCG_BOOSTER_BOX_REWARD = 8000
@@ -56,6 +57,12 @@ export const tcgBoosterBoxDeliveryTasks: Task[] = tcgSetSummaries.map((set) => (
       type: 'currency',
       targetId: 'pokedollars',
       quantity: TCG_BOOSTER_BOX_REWARD,
+    },
+    {
+      type: 'guild_xp',
+      targetId: UNDERGROUND_SOCIETY_GUILD_ID,
+      quantity: 20,
+      dropChance: 100,
     },
   ],
 }))
