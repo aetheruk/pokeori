@@ -474,6 +474,7 @@ export interface BattleState {
   /** Idempotency keys for faint metrics emitted more than once by a turn. */
   pokemonBattleMetricEvents?: Record<string, true>
   pokemonBattleMetricsPersisted?: boolean
+  pokemonBattleEvsPersisted?: boolean
   heldItemsSettled?: boolean
   heldItemChargeRewards?: {
     ownerId: string

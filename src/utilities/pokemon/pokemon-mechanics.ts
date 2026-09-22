@@ -5,6 +5,7 @@ import type { PokemonData, PokemonStats as BasePokemonStats } from '@/data/pokem
 import type { Payload } from 'payload'
 import { getPokemonForm } from '@/utilities/pokemon/pokedex'
 import { getTotalPokemonExperienceForLevel } from '@/utilities/pokemon/experience'
+import { addPokemonEvs, normalizePokemonEvs } from '@/utilities/pokemon/evs'
 
 export interface PokemonIVs {
   hp: number
@@ -369,17 +370,15 @@ export async function increaseEV(
   const pokemon = await payload.findByID({ collection: 'pokemon', id: pokemonId })
   if (!pokemon) throw new Error('Pokemon not found')
 
-  const currentVal = pokemon.evs?.[stat] ?? 0
-  const newVal = Math.min(255, currentVal + amount)
+  const { evs: updatedEvs, awarded } = addPokemonEvs(pokemon.evs, {
+    [stat]: amount,
+  })
 
-  if (newVal === currentVal) return pokemon
+  if (awarded[stat] <= 0) return pokemon
 
   let updatedPokemon: Pokemon = {
     ...pokemon,
-    evs: {
-      ...pokemon.evs,
-      [stat]: newVal,
-    },
+    evs: updatedEvs,
   }
 
   updatedPokemon = calculateStats(updatedPokemon)
@@ -403,7 +402,8 @@ export async function decreaseEV(
   const pokemon = await payload.findByID({ collection: 'pokemon', id: pokemonId })
   if (!pokemon) throw new Error('Pokemon not found')
 
-  const currentVal = pokemon.evs?.[stat] ?? 0
+  const currentEvs = normalizePokemonEvs(pokemon.evs)
+  const currentVal = currentEvs[stat]
   const newVal = Math.max(0, currentVal - amount)
 
   if (newVal === currentVal) return pokemon
@@ -411,7 +411,7 @@ export async function decreaseEV(
   let updatedPokemon: Pokemon = {
     ...pokemon,
     evs: {
-      ...pokemon.evs,
+      ...currentEvs,
       [stat]: newVal,
     },
   }

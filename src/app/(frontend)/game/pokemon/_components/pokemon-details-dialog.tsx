@@ -126,6 +126,7 @@ import {
   getPokemonExperienceProgress,
   getPokemonLevelCap,
 } from '@/utilities/pokemon/experience'
+import { POKEMON_EV_CAPS } from '@/utilities/pokemon/evs'
 import {
   getPokemonResearchLevelTmUnlocks,
   MAX_RESEARCH_LEVEL,
@@ -2056,37 +2057,37 @@ function MountedPokemonDetailsDialog({
                             <StatBar
                               label="HP"
                               value={pokemon.evs?.hp ?? 0}
-                              max={255}
+                              max={POKEMON_EV_CAPS.perStat}
                               color="bg-game-danger"
                             />
                             <StatBar
                               label="ATK"
                               value={pokemon.evs?.attack ?? 0}
-                              max={255}
+                              max={POKEMON_EV_CAPS.perStat}
                               color="bg-game-clay"
                             />
                             <StatBar
                               label="DEF"
                               value={pokemon.evs?.defense ?? 0}
-                              max={255}
+                              max={POKEMON_EV_CAPS.perStat}
                               color="bg-game-ochre"
                             />
                             <StatBar
                               label="SPA"
                               value={pokemon.evs?.specialAttack ?? 0}
-                              max={255}
+                              max={POKEMON_EV_CAPS.perStat}
                               color="bg-game-moss"
                             />
                             <StatBar
                               label="SPD"
                               value={pokemon.evs?.specialDefense ?? 0}
-                              max={255}
+                              max={POKEMON_EV_CAPS.perStat}
                               color="bg-game-moss-strong"
                             />
                             <StatBar
                               label="SPE"
                               value={pokemon.evs?.speed ?? 0}
-                              max={255}
+                              max={POKEMON_EV_CAPS.perStat}
                               color="bg-game-clay-strong"
                             />
                           </>

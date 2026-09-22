@@ -36,6 +36,14 @@ const gen3Data: PokemonData = [
           "special-attack": 65,
           "special-defense": 55,
           "speed": 70
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 1
         }
       }
     ]
@@ -70,6 +78,14 @@ const gen3Data: PokemonData = [
           "special-attack": 85,
           "special-defense": 65,
           "speed": 95
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 2
         }
       }
     ]
@@ -104,6 +120,14 @@ const gen3Data: PokemonData = [
           "special-attack": 105,
           "special-defense": 85,
           "speed": 120
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 3
         }
       },
       {
@@ -124,6 +148,14 @@ const gen3Data: PokemonData = [
           "special-attack": 145,
           "special-defense": 85,
           "speed": 145
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 3
         }
       }
     ]
@@ -158,6 +190,14 @@ const gen3Data: PokemonData = [
           "special-attack": 70,
           "special-defense": 50,
           "speed": 45
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 1,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -193,6 +233,14 @@ const gen3Data: PokemonData = [
           "special-attack": 85,
           "special-defense": 60,
           "speed": 55
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 1,
+          "defense": 0,
+          "specialAttack": 1,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -228,6 +276,14 @@ const gen3Data: PokemonData = [
           "special-attack": 110,
           "special-defense": 70,
           "speed": 80
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 3,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -248,6 +304,14 @@ const gen3Data: PokemonData = [
           "special-attack": 130,
           "special-defense": 80,
           "speed": 100
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 3,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -282,6 +346,14 @@ const gen3Data: PokemonData = [
           "special-attack": 50,
           "special-defense": 50,
           "speed": 40
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 1,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -317,6 +389,14 @@ const gen3Data: PokemonData = [
           "special-attack": 60,
           "special-defense": 70,
           "speed": 50
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 2,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -352,6 +432,14 @@ const gen3Data: PokemonData = [
           "special-attack": 85,
           "special-defense": 90,
           "speed": 60
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 3,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -372,6 +460,14 @@ const gen3Data: PokemonData = [
           "special-attack": 95,
           "special-defense": 110,
           "speed": 70
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 3,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -406,6 +502,14 @@ const gen3Data: PokemonData = [
           "special-attack": 30,
           "special-defense": 30,
           "speed": 35
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 1,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -440,6 +544,14 @@ const gen3Data: PokemonData = [
           "special-attack": 60,
           "special-defense": 60,
           "speed": 70
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 2,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -474,6 +586,14 @@ const gen3Data: PokemonData = [
           "special-attack": 30,
           "special-defense": 41,
           "speed": 60
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 1
         }
       },
       {
@@ -494,6 +614,14 @@ const gen3Data: PokemonData = [
           "special-attack": 30,
           "special-defense": 41,
           "speed": 60
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 1
         }
       }
     ]
@@ -528,6 +656,14 @@ const gen3Data: PokemonData = [
           "special-attack": 50,
           "special-defense": 61,
           "speed": 100
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 2
         }
       },
       {
@@ -548,6 +684,14 @@ const gen3Data: PokemonData = [
           "special-attack": 50,
           "special-defense": 61,
           "speed": 100
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 2
         }
       }
     ]
@@ -582,6 +726,14 @@ const gen3Data: PokemonData = [
           "special-attack": 20,
           "special-defense": 30,
           "speed": 20
+        },
+        "evYield": {
+          "hp": 1,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -616,6 +768,14 @@ const gen3Data: PokemonData = [
           "special-attack": 25,
           "special-defense": 25,
           "speed": 15
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 2,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -651,6 +811,14 @@ const gen3Data: PokemonData = [
           "special-attack": 100,
           "special-defense": 50,
           "speed": 65
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 3,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -685,6 +853,14 @@ const gen3Data: PokemonData = [
           "special-attack": 25,
           "special-defense": 25,
           "speed": 15
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 2,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -720,6 +896,14 @@ const gen3Data: PokemonData = [
           "special-attack": 50,
           "special-defense": 90,
           "speed": 65
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 3,
+          "speed": 0
         }
       }
     ]
@@ -755,6 +939,14 @@ const gen3Data: PokemonData = [
           "special-attack": 40,
           "special-defense": 50,
           "speed": 30
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 1,
+          "speed": 0
         }
       }
     ]
@@ -790,6 +982,14 @@ const gen3Data: PokemonData = [
           "special-attack": 60,
           "special-defense": 70,
           "speed": 50
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 2,
+          "speed": 0
         }
       }
     ]
@@ -825,6 +1025,14 @@ const gen3Data: PokemonData = [
           "special-attack": 90,
           "special-defense": 100,
           "speed": 70
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 3,
+          "speed": 0
         }
       }
     ]
@@ -859,6 +1067,14 @@ const gen3Data: PokemonData = [
           "special-attack": 30,
           "special-defense": 30,
           "speed": 30
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 1,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -894,6 +1110,14 @@ const gen3Data: PokemonData = [
           "special-attack": 60,
           "special-defense": 40,
           "speed": 60
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 2,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -929,6 +1153,14 @@ const gen3Data: PokemonData = [
           "special-attack": 90,
           "special-defense": 60,
           "speed": 80
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 3,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -964,6 +1196,14 @@ const gen3Data: PokemonData = [
           "special-attack": 30,
           "special-defense": 30,
           "speed": 85
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 1
         }
       }
     ]
@@ -999,6 +1239,14 @@ const gen3Data: PokemonData = [
           "special-attack": 75,
           "special-defense": 50,
           "speed": 125
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 2
         }
       }
     ]
@@ -1034,6 +1282,14 @@ const gen3Data: PokemonData = [
           "special-attack": 55,
           "special-defense": 30,
           "speed": 85
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 1
         }
       }
     ]
@@ -1069,6 +1325,14 @@ const gen3Data: PokemonData = [
           "special-attack": 95,
           "special-defense": 70,
           "speed": 65
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 2,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -1104,6 +1368,14 @@ const gen3Data: PokemonData = [
           "special-attack": 45,
           "special-defense": 35,
           "speed": 40
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 1,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -1139,6 +1411,14 @@ const gen3Data: PokemonData = [
           "special-attack": 65,
           "special-defense": 55,
           "speed": 50
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 2,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -1174,6 +1454,14 @@ const gen3Data: PokemonData = [
           "special-attack": 125,
           "special-defense": 115,
           "speed": 80
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 3,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -1194,6 +1482,14 @@ const gen3Data: PokemonData = [
           "special-attack": 165,
           "special-defense": 135,
           "speed": 100
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 3,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -1229,6 +1525,14 @@ const gen3Data: PokemonData = [
           "special-attack": 50,
           "special-defense": 52,
           "speed": 65
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 1
         }
       }
     ]
@@ -1264,6 +1568,14 @@ const gen3Data: PokemonData = [
           "special-attack": 100,
           "special-defense": 82,
           "speed": 80
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 1,
+          "specialDefense": 1,
+          "speed": 0
         }
       }
     ]
@@ -1298,6 +1610,14 @@ const gen3Data: PokemonData = [
           "special-attack": 40,
           "special-defense": 60,
           "speed": 35
+        },
+        "evYield": {
+          "hp": 1,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -1333,6 +1653,14 @@ const gen3Data: PokemonData = [
           "special-attack": 60,
           "special-defense": 60,
           "speed": 70
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 2,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -1367,6 +1695,14 @@ const gen3Data: PokemonData = [
           "special-attack": 35,
           "special-defense": 35,
           "speed": 30
+        },
+        "evYield": {
+          "hp": 1,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -1401,6 +1737,14 @@ const gen3Data: PokemonData = [
           "special-attack": 55,
           "special-defense": 55,
           "speed": 90
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 2
         }
       }
     ]
@@ -1435,6 +1779,14 @@ const gen3Data: PokemonData = [
           "special-attack": 95,
           "special-defense": 65,
           "speed": 100
+        },
+        "evYield": {
+          "hp": 3,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -1470,6 +1822,14 @@ const gen3Data: PokemonData = [
           "special-attack": 30,
           "special-defense": 30,
           "speed": 40
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 1,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -1505,6 +1865,14 @@ const gen3Data: PokemonData = [
           "special-attack": 50,
           "special-defense": 50,
           "speed": 160
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 2
         }
       }
     ]
@@ -1540,6 +1908,14 @@ const gen3Data: PokemonData = [
           "special-attack": 30,
           "special-defense": 30,
           "speed": 40
+        },
+        "evYield": {
+          "hp": 2,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -1574,6 +1950,14 @@ const gen3Data: PokemonData = [
           "special-attack": 51,
           "special-defense": 23,
           "speed": 28
+        },
+        "evYield": {
+          "hp": 1,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -1608,6 +1992,14 @@ const gen3Data: PokemonData = [
           "special-attack": 71,
           "special-defense": 43,
           "speed": 48
+        },
+        "evYield": {
+          "hp": 2,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -1642,6 +2034,14 @@ const gen3Data: PokemonData = [
           "special-attack": 91,
           "special-defense": 73,
           "speed": 68
+        },
+        "evYield": {
+          "hp": 3,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -1676,6 +2076,14 @@ const gen3Data: PokemonData = [
           "special-attack": 20,
           "special-defense": 30,
           "speed": 25
+        },
+        "evYield": {
+          "hp": 1,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -1710,6 +2118,14 @@ const gen3Data: PokemonData = [
           "special-attack": 40,
           "special-defense": 60,
           "speed": 50
+        },
+        "evYield": {
+          "hp": 2,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -1745,6 +2161,14 @@ const gen3Data: PokemonData = [
           "special-attack": 20,
           "special-defense": 40,
           "speed": 20
+        },
+        "evYield": {
+          "hp": 1,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -1779,6 +2203,14 @@ const gen3Data: PokemonData = [
           "special-attack": 45,
           "special-defense": 90,
           "speed": 30
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 1,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -1813,6 +2245,14 @@ const gen3Data: PokemonData = [
           "special-attack": 35,
           "special-defense": 35,
           "speed": 50
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 1
         }
       }
     ]
@@ -1847,6 +2287,14 @@ const gen3Data: PokemonData = [
           "special-attack": 55,
           "special-defense": 55,
           "speed": 90
+        },
+        "evYield": {
+          "hp": 1,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 1
         }
       }
     ]
@@ -1882,6 +2330,14 @@ const gen3Data: PokemonData = [
           "special-attack": 65,
           "special-defense": 65,
           "speed": 50
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 1,
+          "defense": 1,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -1902,6 +2358,14 @@ const gen3Data: PokemonData = [
           "special-attack": 85,
           "special-defense": 115,
           "speed": 20
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 1,
+          "defense": 1,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -1937,6 +2401,14 @@ const gen3Data: PokemonData = [
           "special-attack": 55,
           "special-defense": 55,
           "speed": 50
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 1,
+          "defense": 1,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -1957,6 +2429,14 @@ const gen3Data: PokemonData = [
           "special-attack": 55,
           "special-defense": 95,
           "speed": 50
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 1,
+          "defense": 1,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -1992,6 +2472,14 @@ const gen3Data: PokemonData = [
           "special-attack": 40,
           "special-defense": 40,
           "speed": 30
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 1,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -2027,6 +2515,14 @@ const gen3Data: PokemonData = [
           "special-attack": 50,
           "special-defense": 50,
           "speed": 40
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 2,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -2062,6 +2558,14 @@ const gen3Data: PokemonData = [
           "special-attack": 60,
           "special-defense": 60,
           "speed": 50
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 3,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -2081,6 +2585,14 @@ const gen3Data: PokemonData = [
           "special-attack": 60,
           "special-defense": 80,
           "speed": 50
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 3,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -2116,6 +2628,14 @@ const gen3Data: PokemonData = [
           "special-attack": 40,
           "special-defense": 55,
           "speed": 60
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 1
         }
       }
     ]
@@ -2151,6 +2671,14 @@ const gen3Data: PokemonData = [
           "special-attack": 60,
           "special-defense": 75,
           "speed": 80
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 2
         }
       },
       {
@@ -2171,6 +2699,14 @@ const gen3Data: PokemonData = [
           "special-attack": 80,
           "special-defense": 85,
           "speed": 100
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 2
         }
       }
     ]
@@ -2205,6 +2741,14 @@ const gen3Data: PokemonData = [
           "special-attack": 65,
           "special-defense": 40,
           "speed": 65
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 1
         }
       }
     ]
@@ -2239,6 +2783,14 @@ const gen3Data: PokemonData = [
           "special-attack": 105,
           "special-defense": 60,
           "speed": 105
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 2
         }
       },
       {
@@ -2258,6 +2810,14 @@ const gen3Data: PokemonData = [
           "special-attack": 135,
           "special-defense": 80,
           "speed": 135
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 2
         }
       }
     ]
@@ -2292,6 +2852,14 @@ const gen3Data: PokemonData = [
           "special-attack": 85,
           "special-defense": 75,
           "speed": 95
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 1
         }
       }
     ]
@@ -2326,6 +2894,14 @@ const gen3Data: PokemonData = [
           "special-attack": 75,
           "special-defense": 85,
           "speed": 95
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 1
         }
       }
     ]
@@ -2360,6 +2936,14 @@ const gen3Data: PokemonData = [
           "special-attack": 47,
           "special-defense": 85,
           "speed": 85
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 1
         }
       }
     ]
@@ -2394,6 +2978,14 @@ const gen3Data: PokemonData = [
           "special-attack": 73,
           "special-defense": 85,
           "speed": 85
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 1
         }
       }
     ]
@@ -2429,6 +3021,14 @@ const gen3Data: PokemonData = [
           "special-attack": 100,
           "special-defense": 80,
           "speed": 65
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 2,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -2463,6 +3063,14 @@ const gen3Data: PokemonData = [
           "special-attack": 43,
           "special-defense": 53,
           "speed": 40
+        },
+        "evYield": {
+          "hp": 1,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -2497,6 +3105,14 @@ const gen3Data: PokemonData = [
           "special-attack": 73,
           "special-defense": 83,
           "speed": 55
+        },
+        "evYield": {
+          "hp": 2,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -2532,6 +3148,14 @@ const gen3Data: PokemonData = [
           "special-attack": 65,
           "special-defense": 20,
           "speed": 65
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 1,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -2567,6 +3191,14 @@ const gen3Data: PokemonData = [
           "special-attack": 95,
           "special-defense": 40,
           "speed": 95
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 2,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -2587,6 +3219,14 @@ const gen3Data: PokemonData = [
           "special-attack": 110,
           "special-defense": 65,
           "speed": 105
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 2,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -2621,6 +3261,14 @@ const gen3Data: PokemonData = [
           "special-attack": 70,
           "special-defense": 35,
           "speed": 60
+        },
+        "evYield": {
+          "hp": 1,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -2655,6 +3303,14 @@ const gen3Data: PokemonData = [
           "special-attack": 90,
           "special-defense": 45,
           "speed": 60
+        },
+        "evYield": {
+          "hp": 2,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -2690,6 +3346,14 @@ const gen3Data: PokemonData = [
           "special-attack": 65,
           "special-defense": 45,
           "speed": 35
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 1,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -2725,6 +3389,14 @@ const gen3Data: PokemonData = [
           "special-attack": 105,
           "special-defense": 75,
           "speed": 40
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 1,
+          "defense": 0,
+          "specialAttack": 1,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -2745,6 +3417,14 @@ const gen3Data: PokemonData = [
           "special-attack": 145,
           "special-defense": 105,
           "speed": 20
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 1,
+          "defense": 0,
+          "specialAttack": 1,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -2779,6 +3459,14 @@ const gen3Data: PokemonData = [
           "special-attack": 85,
           "special-defense": 70,
           "speed": 20
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 2,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -2813,6 +3501,14 @@ const gen3Data: PokemonData = [
           "special-attack": 70,
           "special-defense": 80,
           "speed": 60
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 1,
+          "speed": 0
         }
       }
     ]
@@ -2847,6 +3543,14 @@ const gen3Data: PokemonData = [
           "special-attack": 90,
           "special-defense": 110,
           "speed": 80
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 2,
+          "speed": 0
         }
       }
     ]
@@ -2881,6 +3585,14 @@ const gen3Data: PokemonData = [
           "special-attack": 60,
           "special-defense": 60,
           "speed": 60
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 1,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -2915,6 +3627,14 @@ const gen3Data: PokemonData = [
           "special-attack": 45,
           "special-defense": 45,
           "speed": 10
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 1,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -2950,6 +3670,14 @@ const gen3Data: PokemonData = [
           "special-attack": 50,
           "special-defense": 50,
           "speed": 70
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 1,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 1
         }
       }
     ]
@@ -2985,6 +3713,14 @@ const gen3Data: PokemonData = [
           "special-attack": 80,
           "special-defense": 80,
           "speed": 100
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 1,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 2
         }
       }
     ]
@@ -3019,6 +3755,14 @@ const gen3Data: PokemonData = [
           "special-attack": 85,
           "special-defense": 40,
           "speed": 35
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 1,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -3054,6 +3798,14 @@ const gen3Data: PokemonData = [
           "special-attack": 115,
           "special-defense": 60,
           "speed": 55
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 1,
+          "defense": 0,
+          "specialAttack": 1,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -3089,6 +3841,14 @@ const gen3Data: PokemonData = [
           "special-attack": 40,
           "special-defense": 75,
           "speed": 50
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 1,
+          "speed": 0
         }
       }
     ]
@@ -3124,6 +3884,14 @@ const gen3Data: PokemonData = [
           "special-attack": 70,
           "special-defense": 105,
           "speed": 80
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 2,
+          "speed": 0
         }
       },
       {
@@ -3144,6 +3912,14 @@ const gen3Data: PokemonData = [
           "special-attack": 110,
           "special-defense": 105,
           "speed": 80
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 2,
+          "speed": 0
         }
       }
     ]
@@ -3178,6 +3954,14 @@ const gen3Data: PokemonData = [
           "special-attack": 60,
           "special-defense": 60,
           "speed": 90
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 2,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -3212,6 +3996,14 @@ const gen3Data: PokemonData = [
           "special-attack": 100,
           "special-defense": 60,
           "speed": 65
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 1,
+          "defense": 0,
+          "specialAttack": 1,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -3247,6 +4039,14 @@ const gen3Data: PokemonData = [
           "special-attack": 95,
           "special-defense": 85,
           "speed": 70
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 2,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -3282,6 +4082,14 @@ const gen3Data: PokemonData = [
           "special-attack": 55,
           "special-defense": 65,
           "speed": 70
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 2,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -3317,6 +4125,14 @@ const gen3Data: PokemonData = [
           "special-attack": 46,
           "special-defense": 41,
           "speed": 60
+        },
+        "evYield": {
+          "hp": 1,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -3352,6 +4168,14 @@ const gen3Data: PokemonData = [
           "special-attack": 76,
           "special-defense": 71,
           "speed": 60
+        },
+        "evYield": {
+          "hp": 2,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -3386,6 +4210,14 @@ const gen3Data: PokemonData = [
           "special-attack": 50,
           "special-defense": 35,
           "speed": 35
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 1,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -3421,6 +4253,14 @@ const gen3Data: PokemonData = [
           "special-attack": 90,
           "special-defense": 55,
           "speed": 55
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 2,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -3456,6 +4296,14 @@ const gen3Data: PokemonData = [
           "special-attack": 40,
           "special-defense": 70,
           "speed": 55
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 1,
+          "speed": 0
         }
       }
     ]
@@ -3491,6 +4339,14 @@ const gen3Data: PokemonData = [
           "special-attack": 70,
           "special-defense": 120,
           "speed": 75
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 2,
+          "speed": 0
         }
       }
     ]
@@ -3526,6 +4382,14 @@ const gen3Data: PokemonData = [
           "special-attack": 61,
           "special-defense": 87,
           "speed": 23
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 1,
+          "speed": 0
         }
       }
     ]
@@ -3561,6 +4425,14 @@ const gen3Data: PokemonData = [
           "special-attack": 81,
           "special-defense": 107,
           "speed": 43
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 2,
+          "speed": 0
         }
       }
     ]
@@ -3596,6 +4468,14 @@ const gen3Data: PokemonData = [
           "special-attack": 40,
           "special-defense": 50,
           "speed": 75
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 1,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -3631,6 +4511,14 @@ const gen3Data: PokemonData = [
           "special-attack": 70,
           "special-defense": 80,
           "speed": 45
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 2,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -3665,6 +4553,14 @@ const gen3Data: PokemonData = [
           "special-attack": 10,
           "special-defense": 55,
           "speed": 80
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 1
         }
       }
     ]
@@ -3699,6 +4595,14 @@ const gen3Data: PokemonData = [
           "special-attack": 100,
           "special-defense": 125,
           "speed": 81
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 2,
+          "speed": 0
         }
       }
     ]
@@ -3733,6 +4637,14 @@ const gen3Data: PokemonData = [
           "special-attack": 70,
           "special-defense": 70,
           "speed": 70
+        },
+        "evYield": {
+          "hp": 1,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -3752,6 +4664,14 @@ const gen3Data: PokemonData = [
           "special-attack": 70,
           "special-defense": 70,
           "speed": 70
+        },
+        "evYield": {
+          "hp": 1,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -3771,6 +4691,14 @@ const gen3Data: PokemonData = [
           "special-attack": 70,
           "special-defense": 70,
           "speed": 70
+        },
+        "evYield": {
+          "hp": 1,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -3790,6 +4718,14 @@ const gen3Data: PokemonData = [
           "special-attack": 70,
           "special-defense": 70,
           "speed": 70
+        },
+        "evYield": {
+          "hp": 1,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -3824,6 +4760,14 @@ const gen3Data: PokemonData = [
           "special-attack": 60,
           "special-defense": 120,
           "speed": 40
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 1,
+          "speed": 0
         }
       }
     ]
@@ -3858,6 +4802,14 @@ const gen3Data: PokemonData = [
           "special-attack": 63,
           "special-defense": 33,
           "speed": 45
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 1,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -3892,6 +4844,14 @@ const gen3Data: PokemonData = [
           "special-attack": 83,
           "special-defense": 63,
           "speed": 65
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 2,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -3911,6 +4871,14 @@ const gen3Data: PokemonData = [
           "special-attack": 93,
           "special-defense": 83,
           "speed": 75
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 2,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -3945,6 +4913,14 @@ const gen3Data: PokemonData = [
           "special-attack": 30,
           "special-defense": 90,
           "speed": 25
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 1,
+          "speed": 0
         }
       }
     ]
@@ -3979,6 +4955,14 @@ const gen3Data: PokemonData = [
           "special-attack": 60,
           "special-defense": 130,
           "speed": 25
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 1,
+          "specialAttack": 0,
+          "specialDefense": 1,
+          "speed": 0
         }
       }
     ]
@@ -4014,6 +4998,14 @@ const gen3Data: PokemonData = [
           "special-attack": 72,
           "special-defense": 87,
           "speed": 51
+        },
+        "evYield": {
+          "hp": 2,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -4048,6 +5040,14 @@ const gen3Data: PokemonData = [
           "special-attack": 95,
           "special-defense": 90,
           "speed": 65
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 1,
+          "specialDefense": 1,
+          "speed": 0
         }
       },
       {
@@ -4068,6 +5068,14 @@ const gen3Data: PokemonData = [
           "special-attack": 135,
           "special-defense": 120,
           "speed": 65
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -4102,6 +5110,14 @@ const gen3Data: PokemonData = [
           "special-attack": 75,
           "special-defense": 60,
           "speed": 75
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 2,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -4121,6 +5137,14 @@ const gen3Data: PokemonData = [
           "special-attack": 115,
           "special-defense": 60,
           "speed": 115
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 2,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -4141,6 +5165,14 @@ const gen3Data: PokemonData = [
           "special-attack": 75,
           "special-defense": 60,
           "speed": 151
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -4175,6 +5207,14 @@ const gen3Data: PokemonData = [
           "special-attack": 23,
           "special-defense": 48,
           "speed": 23
+        },
+        "evYield": {
+          "hp": 1,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -4209,6 +5249,14 @@ const gen3Data: PokemonData = [
           "special-attack": 50,
           "special-defense": 50,
           "speed": 50
+        },
+        "evYield": {
+          "hp": 1,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -4243,6 +5291,14 @@ const gen3Data: PokemonData = [
           "special-attack": 80,
           "special-defense": 80,
           "speed": 80
+        },
+        "evYield": {
+          "hp": 2,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -4262,6 +5318,14 @@ const gen3Data: PokemonData = [
           "special-attack": 120,
           "special-defense": 80,
           "speed": 100
+        },
+        "evYield": {
+          "hp": 2,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -4297,6 +5361,14 @@ const gen3Data: PokemonData = [
           "special-attack": 55,
           "special-defense": 50,
           "speed": 25
+        },
+        "evYield": {
+          "hp": 1,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -4332,6 +5404,14 @@ const gen3Data: PokemonData = [
           "special-attack": 75,
           "special-defense": 70,
           "speed": 45
+        },
+        "evYield": {
+          "hp": 2,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -4367,6 +5447,14 @@ const gen3Data: PokemonData = [
           "special-attack": 95,
           "special-defense": 90,
           "speed": 65
+        },
+        "evYield": {
+          "hp": 3,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -4401,6 +5489,14 @@ const gen3Data: PokemonData = [
           "special-attack": 74,
           "special-defense": 55,
           "speed": 32
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 1,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -4435,6 +5531,14 @@ const gen3Data: PokemonData = [
           "special-attack": 94,
           "special-defense": 75,
           "speed": 52
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 1,
+          "defense": 1,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -4469,6 +5573,14 @@ const gen3Data: PokemonData = [
           "special-attack": 114,
           "special-defense": 75,
           "speed": 52
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 2,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -4504,6 +5616,14 @@ const gen3Data: PokemonData = [
           "special-attack": 45,
           "special-defense": 65,
           "speed": 55
+        },
+        "evYield": {
+          "hp": 1,
+          "attack": 0,
+          "defense": 1,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -4538,6 +5658,14 @@ const gen3Data: PokemonData = [
           "special-attack": 40,
           "special-defense": 65,
           "speed": 97
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 1
         }
       }
     ]
@@ -4572,6 +5700,14 @@ const gen3Data: PokemonData = [
           "special-attack": 40,
           "special-defense": 30,
           "speed": 50
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 1,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -4606,6 +5742,14 @@ const gen3Data: PokemonData = [
           "special-attack": 60,
           "special-defense": 50,
           "speed": 50
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 2,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -4641,6 +5785,14 @@ const gen3Data: PokemonData = [
           "special-attack": 110,
           "special-defense": 80,
           "speed": 100
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 3,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -4661,6 +5813,14 @@ const gen3Data: PokemonData = [
           "special-attack": 120,
           "special-defense": 90,
           "speed": 120
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 3,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -4696,6 +5856,14 @@ const gen3Data: PokemonData = [
           "special-attack": 35,
           "special-defense": 60,
           "speed": 30
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 1,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -4731,6 +5899,14 @@ const gen3Data: PokemonData = [
           "special-attack": 55,
           "special-defense": 80,
           "speed": 50
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 2,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -4766,6 +5942,14 @@ const gen3Data: PokemonData = [
           "special-attack": 95,
           "special-defense": 90,
           "speed": 70
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 3,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -4786,6 +5970,14 @@ const gen3Data: PokemonData = [
           "special-attack": 105,
           "special-defense": 110,
           "speed": 110
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 3,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -4820,6 +6012,14 @@ const gen3Data: PokemonData = [
           "special-attack": 50,
           "special-defense": 100,
           "speed": 50
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 3,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -4854,6 +6054,14 @@ const gen3Data: PokemonData = [
           "special-attack": 100,
           "special-defense": 200,
           "speed": 50
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 3,
+          "speed": 0
         }
       }
     ]
@@ -4888,6 +6096,14 @@ const gen3Data: PokemonData = [
           "special-attack": 75,
           "special-defense": 150,
           "speed": 50
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 2,
+          "specialAttack": 0,
+          "specialDefense": 1,
+          "speed": 0
         }
       }
     ]
@@ -4923,6 +6139,14 @@ const gen3Data: PokemonData = [
           "special-attack": 110,
           "special-defense": 130,
           "speed": 110
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 3,
+          "speed": 0
         }
       },
       {
@@ -4943,6 +6167,14 @@ const gen3Data: PokemonData = [
           "special-attack": 140,
           "special-defense": 150,
           "speed": 110
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 3,
+          "speed": 0
         }
       }
     ]
@@ -4978,6 +6210,14 @@ const gen3Data: PokemonData = [
           "special-attack": 130,
           "special-defense": 110,
           "speed": 110
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 3,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -4998,6 +6238,14 @@ const gen3Data: PokemonData = [
           "special-attack": 160,
           "special-defense": 120,
           "speed": 110
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 3,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -5032,6 +6280,14 @@ const gen3Data: PokemonData = [
           "special-attack": 150,
           "special-defense": 140,
           "speed": 90
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 3,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -5051,6 +6307,14 @@ const gen3Data: PokemonData = [
           "special-attack": 180,
           "special-defense": 160,
           "speed": 90
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 3,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -5085,6 +6349,14 @@ const gen3Data: PokemonData = [
           "special-attack": 100,
           "special-defense": 90,
           "speed": 90
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 3,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -5105,6 +6377,14 @@ const gen3Data: PokemonData = [
           "special-attack": 150,
           "special-defense": 90,
           "speed": 90
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 3,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -5140,6 +6420,14 @@ const gen3Data: PokemonData = [
           "special-attack": 150,
           "special-defense": 90,
           "speed": 95
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 2,
+          "defense": 0,
+          "specialAttack": 1,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -5160,6 +6448,14 @@ const gen3Data: PokemonData = [
           "special-attack": 180,
           "special-defense": 100,
           "speed": 115
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 2,
+          "defense": 0,
+          "specialAttack": 1,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -5195,6 +6491,14 @@ const gen3Data: PokemonData = [
           "special-attack": 100,
           "special-defense": 100,
           "speed": 100
+        },
+        "evYield": {
+          "hp": 3,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 0
         }
       }
     ]
@@ -5229,6 +6533,14 @@ const gen3Data: PokemonData = [
           "special-attack": 150,
           "special-defense": 50,
           "speed": 150
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 1,
+          "defense": 0,
+          "specialAttack": 1,
+          "specialDefense": 0,
+          "speed": 1
         }
       },
       {
@@ -5248,6 +6560,14 @@ const gen3Data: PokemonData = [
           "special-attack": 180,
           "special-defense": 20,
           "speed": 150
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 2,
+          "defense": 0,
+          "specialAttack": 1,
+          "specialDefense": 0,
+          "speed": 0
         }
       },
       {
@@ -5267,6 +6587,14 @@ const gen3Data: PokemonData = [
           "special-attack": 70,
           "special-defense": 160,
           "speed": 90
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 2,
+          "specialAttack": 0,
+          "specialDefense": 1,
+          "speed": 0
         }
       },
       {
@@ -5286,6 +6614,14 @@ const gen3Data: PokemonData = [
           "special-attack": 95,
           "special-defense": 90,
           "speed": 180
+        },
+        "evYield": {
+          "hp": 0,
+          "attack": 0,
+          "defense": 0,
+          "specialAttack": 0,
+          "specialDefense": 0,
+          "speed": 3
         }
       }
     ]

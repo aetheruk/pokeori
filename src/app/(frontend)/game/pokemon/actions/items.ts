@@ -25,6 +25,7 @@ import {
   type RewardSummary,
 } from '@/utilities/rewards/reward-logic'
 import { getPokemonForm, getPokemonSpecies } from '@/utilities/pokemon/pokedex'
+import { POKEMON_EV_CAPS, getPokemonEvTotal } from '@/utilities/pokemon/evs'
 import { items } from '@/data/items'
 import { ABILITIES } from '@/data/abilities'
 import { rollResearchXp } from '@/utilities/research/research-levels'
@@ -242,26 +243,23 @@ export async function applyItemToPokemon(
           const currentEv = pokemon.evs?.[stat] || 0
 
           // Calculate total EVs
-          const totalEvs = Object.values(pokemon.evs || {}).reduce(
-            (a: number, b) => a + (b || 0),
-            0,
-          )
+          const totalEvs = getPokemonEvTotal(pokemon.evs)
 
-          if (currentEv >= 255) {
+          if (currentEv >= POKEMON_EV_CAPS.perStat) {
             throw new Error(`${stat} is already maxed out!`)
           }
 
-          if (totalEvs >= 510) {
+          if (totalEvs >= POKEMON_EV_CAPS.total) {
             throw new Error(`Total EVs are maxed out!`)
           }
 
-          // Cap increase to not exceed 255 or 510 total
+          // Cap increase to not exceed the configurable mainline limits.
           let actualAmount = amount
-          if (currentEv + actualAmount > 255) {
-            actualAmount = 255 - currentEv
+          if (currentEv + actualAmount > POKEMON_EV_CAPS.perStat) {
+            actualAmount = POKEMON_EV_CAPS.perStat - currentEv
           }
-          if (totalEvs + actualAmount > 510) {
-            actualAmount = 510 - totalEvs
+          if (totalEvs + actualAmount > POKEMON_EV_CAPS.total) {
+            actualAmount = POKEMON_EV_CAPS.total - totalEvs
           }
 
           if (actualAmount <= 0) {

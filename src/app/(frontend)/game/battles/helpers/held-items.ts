@@ -8,8 +8,14 @@ import {
 } from '@/utilities/pokemon/held-items'
 import { getUserInventoryMap, setUserInventoryMap } from '@/utilities/user-state'
 import { createEconomyRequestId, runEconomyAction } from '@/utilities/economy/transactions'
+import {
+  addPokemonEvs,
+  getPokemonEvTotal,
+  normalizePokemonEvs,
+  POKEMON_EV_CAPS,
+} from '@/utilities/pokemon/evs'
 
-const EV_CAP = 255
+const EV_CAP = POKEMON_EV_CAPS.perStat
 
 function getPersistentPokemonId(pokemon: BattlePokemon): string | null {
   if (!pokemon.id || pokemon.id.startsWith('enemy-')) return null
@@ -124,10 +130,16 @@ export function collectHeldItemBattleWinEffects(
     const trainingEffect = getHeldItemTrainingEffect(getRuntimeHeldItemId(pokemon))
     if (!trainingEffect) continue
 
-    const currentEv = pokemon.evs?.[trainingEffect.stat] ?? 0
-    if (currentEv >= EV_CAP) continue
+    const currentEvs = normalizePokemonEvs(pokemon.evs)
+    const currentEv = currentEvs[trainingEffect.stat]
+    const totalEvs = getPokemonEvTotal(currentEvs)
+    if (currentEv >= EV_CAP || totalEvs >= POKEMON_EV_CAPS.total) continue
 
-    const amount = Math.min(trainingEffect.evAmount, EV_CAP - currentEv)
+    const amount = Math.min(
+      trainingEffect.evAmount,
+      EV_CAP - currentEv,
+      POKEMON_EV_CAPS.total - totalEvs,
+    )
     if (amount <= 0) continue
 
     const consumed = shouldConsumeHeldItemOnWin(trainingEffect.item, random)
@@ -163,14 +175,10 @@ export async function persistHeldItemBattleWinEffects(
         depth: 0,
       })
 
-      const currentEv = pokemon.evs?.[effect.stat] ?? 0
-      const nextEv = Math.min(EV_CAP, currentEv + effect.amount)
-      if (nextEv === currentEv) return
-
-      const updatedEvs = {
-        ...pokemon.evs,
-        [effect.stat]: nextEv,
-      }
+      const { evs: updatedEvs, awarded } = addPokemonEvs(pokemon.evs, {
+        [effect.stat]: effect.amount,
+      })
+      if (awarded[effect.stat] <= 0) return
       const stats = calculateStats({
         ...pokemon,
         evs: updatedEvs,

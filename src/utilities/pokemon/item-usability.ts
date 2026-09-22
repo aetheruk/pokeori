@@ -2,6 +2,10 @@ import type { Item } from '@/data/items/types'
 import { ABILITIES } from '@/data/abilities'
 import { getPokemonForm, getPokemonSpecies } from '@/utilities/pokemon/pokedex'
 import {
+  getPokemonEvTotal,
+  POKEMON_EV_CAPS,
+} from '@/utilities/pokemon/evs'
+import {
   getItemSkillLockReason,
   type SkillDataMap,
 } from '@/utilities/skills/unlocks'
@@ -266,13 +270,14 @@ export function getPokemonItemUnavailableReason(
   if (effects.increaseEv) {
     const stat = effects.increaseEv.stat
     const currentEv = pokemon.evs?.[stat] || 0
-    const totalEvs = Object.values(pokemon.evs || {}).reduce<number>(
-      (total, value) => total + (value || 0),
-      0,
-    )
+    const totalEvs = getPokemonEvTotal(pokemon.evs)
 
-    if (currentEv >= 255) return `${stat} is already maxed out.`
-    if (totalEvs >= 510) return 'Total EVs are already maxed out.'
+    if (currentEv >= POKEMON_EV_CAPS.perStat) {
+      return `${stat} is already maxed out.`
+    }
+    if (totalEvs >= POKEMON_EV_CAPS.total) {
+      return 'Total EVs are already maxed out.'
+    }
   }
 
   if (effects.decreaseEv) {

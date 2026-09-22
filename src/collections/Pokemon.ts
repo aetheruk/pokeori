@@ -5,6 +5,7 @@ import {
   POKEMON_RARITY_OPTIONS,
   resolvePokemonRarity,
 } from '@/utilities/pokemon/rarity-effects'
+import { POKEMON_EV_CAPS } from '@/utilities/pokemon/evs'
 
 function hasOwnField(value: Record<string, unknown>, key: string) {
   return Object.hasOwn(value, key)
@@ -342,24 +343,48 @@ export const Pokemon: CollectionConfig = {
       type: 'group',
       label: 'Effort Values (EVs)',
       fields: [
-        { name: 'hp', type: 'number', min: 0, max: 255, defaultValue: 0 },
-        { name: 'attack', type: 'number', min: 0, max: 255, defaultValue: 0 },
-        { name: 'defense', type: 'number', min: 0, max: 255, defaultValue: 0 },
+        {
+          name: 'hp',
+          type: 'number',
+          min: 0,
+          max: POKEMON_EV_CAPS.perStat,
+          defaultValue: 0,
+        },
+        {
+          name: 'attack',
+          type: 'number',
+          min: 0,
+          max: POKEMON_EV_CAPS.perStat,
+          defaultValue: 0,
+        },
+        {
+          name: 'defense',
+          type: 'number',
+          min: 0,
+          max: POKEMON_EV_CAPS.perStat,
+          defaultValue: 0,
+        },
         {
           name: 'specialAttack',
           type: 'number',
           min: 0,
-          max: 255,
+          max: POKEMON_EV_CAPS.perStat,
           defaultValue: 0,
         },
         {
           name: 'specialDefense',
           type: 'number',
           min: 0,
-          max: 255,
+          max: POKEMON_EV_CAPS.perStat,
           defaultValue: 0,
         },
-        { name: 'speed', type: 'number', min: 0, max: 255, defaultValue: 0 },
+        {
+          name: 'speed',
+          type: 'number',
+          min: 0,
+          max: POKEMON_EV_CAPS.perStat,
+          defaultValue: 0,
+        },
       ],
     },
     {
