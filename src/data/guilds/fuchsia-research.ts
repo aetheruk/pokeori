@@ -24,6 +24,7 @@ export const fuchsiaResearchGuild: GuildDefinition = {
       totalXp: 0,
       name: 'Chartered Researcher',
       description: 'A registered Institute member trusted to enter protected surveys.',
+      icon: { type: 'item', id: 'researchers-journal-page' },
       unlocks: ['Institute membership and Researcher’s Pass'],
     },
     {
@@ -31,6 +32,7 @@ export const fuchsiaResearchGuild: GuildDefinition = {
       totalXp: 100,
       name: 'Field Researcher',
       description: 'A permitted field researcher trusted with full-reserve survey work.',
+      icon: { type: 'pokemon', id: '113' },
       unlocks: ['Safari Zone Grand Expedition eligibility'],
     },
     {
@@ -38,6 +40,7 @@ export const fuchsiaResearchGuild: GuildDefinition = {
       totalXp: 250,
       name: 'Surveyor',
       description: 'A dependable recorder of habitat conditions.',
+      icon: { type: 'pokemon', id: '127' },
       unlocks: ['Four short habitat surveys', 'Extra Habitat Field Notes', 'Stamina Notes I'],
       rewards: [
         marker('safari-extra-habitat-field-notes'),
@@ -49,6 +52,7 @@ export const fuchsiaResearchGuild: GuildDefinition = {
       totalXp: 500,
       name: 'Habitat Specialist',
       description: 'A researcher trusted with the reserve archive.',
+      icon: { type: 'item', id: 'metal-scrap-t1' },
       unlocks: ['Material Deposit Reports', 'Safari Ball Cache Info', 'Stamina Notes II'],
       rewards: [
         marker('safari-material-deposit-reports'),
@@ -61,6 +65,7 @@ export const fuchsiaResearchGuild: GuildDefinition = {
       totalXp: 900,
       name: 'Senior Researcher',
       description: 'A specialist able to support rangers in sensitive habitats.',
+      icon: { type: 'trainer', id: 'rocket-grunt-m' },
       unlocks: ['Unusual Pokémon Sightings', 'Security Permit and Poacher Watch', 'Stamina Notes III'],
       rewards: [
         marker('safari-unusual-pokemon-sightings'),
@@ -73,6 +78,7 @@ export const fuchsiaResearchGuild: GuildDefinition = {
       totalXp: 1550,
       name: 'Research Fellow',
       description: 'A senior member entrusted with specialist field records.',
+      icon: { type: 'pokemon', id: '147' },
       unlocks: ['Fishing Permit', 'Rare Item Rumours', 'Stamina Notes IV'],
       rewards: [
         marker('safari-fishing-research-notes'),
@@ -85,6 +91,7 @@ export const fuchsiaResearchGuild: GuildDefinition = {
       totalXp: 2550,
       name: 'Lead Researcher',
       description: 'An experienced fellow licensed for focused catching studies.',
+      icon: { type: 'pokemon', id: '123' },
       unlocks: ['Catching Permit', 'Stamina Notes V'],
       rewards: [
         marker('safari-wardens-permit'),
@@ -96,6 +103,7 @@ export const fuchsiaResearchGuild: GuildDefinition = {
       totalXp: 4150,
       name: 'Principal Researcher',
       description: 'A lead researcher briefed on the reserve’s strangest sightings.',
+      icon: { type: 'pokemon', id: '128' },
       unlocks: ['Strange Sightings'],
       rewards: [marker('safari-strange-sightings')],
     },
@@ -104,14 +112,8 @@ export const fuchsiaResearchGuild: GuildDefinition = {
       totalXp: 6500,
       name: 'Deputy Warden',
       description: 'A principal researcher recognized as a trusted deputy of the reserve.',
-      unlocks: ['Deputy Warden recognition'],
-    },
-    {
-      rank: 10,
-      totalXp: 10000,
-      name: 'Warden',
-      description: 'The Institute’s highest field honour.',
-      unlocks: ['Safari Ball profile icon', 'The Warden title', 'Completed Institute status'],
+      icon: { type: 'item', id: 'safari-ball' },
+      unlocks: ['Safari Ball profile icon', 'Deputy Warden recognition'],
       rewards: [
         {
           type: 'icon',
@@ -119,6 +121,16 @@ export const fuchsiaResearchGuild: GuildDefinition = {
           quantity: 1,
           dropChance: 100,
         },
+      ],
+    },
+    {
+      rank: 10,
+      totalXp: 10000,
+      name: 'Warden',
+      description: 'The Institute’s highest field honour.',
+      icon: { type: 'item', id: 'researchers-journal-page' },
+      unlocks: ['The Warden title', 'Completed Institute status'],
+      rewards: [
         {
           type: 'title',
           targetId: 'the-warden',

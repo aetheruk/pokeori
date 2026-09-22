@@ -1,6 +1,5 @@
 'use client'
 
-import { Check, LockKeyhole, Trophy } from 'lucide-react'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { getGuild } from '@/data/guilds'
@@ -101,13 +100,13 @@ export function GuildProgressContent({
                     : 'border-game-border text-game-muted',
                 )}
               >
-                {definition.rank === 10 ? (
-                  <Trophy className="h-5 w-5" />
-                ) : unlocked ? (
-                  <Check className="h-5 w-5" />
-                ) : (
-                  <LockKeyhole className="h-4 w-4" />
-                )}
+                <TaskIconDisplay
+                  icon={definition.icon || guild.icon}
+                  className={cn(
+                    'h-8 w-8',
+                    !unlocked && 'grayscale opacity-40',
+                  )}
+                />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-3">
@@ -127,14 +126,5 @@ export function GuildProgressContent({
         })}
       </div>
     </div>
-  )
-}
-
-export function GuildJournalIcon({ className }: { className?: string }) {
-  return (
-    <TaskIconDisplay
-      icon={{ type: 'item', id: 'researchers-journal-page' }}
-      className={className || 'h-10 w-10'}
-    />
   )
 }

@@ -4,6 +4,16 @@ import type { GuildProgressData } from '@/types/user-data'
 
 export const FUCHSIA_GUILD_ID = 'fuchsia-research-guild'
 
+export function needsFuchsiaSafariBallBackfill({
+  progress,
+  unlockedIcons,
+}: {
+  progress: GuildProgressData
+  unlockedIcons?: string[] | null
+}) {
+  return Math.floor(progress.rank || 0) >= 9 && !unlockedIcons?.includes('safari-ball')
+}
+
 export function calculateFuchsiaInstituteBalanceV2({
   progress,
   hasCatchingPermit,

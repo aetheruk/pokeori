@@ -2,10 +2,8 @@
 
 import { useState } from 'react'
 import { GameInfoModal } from '@/components/game/shared/GameInfoModal'
-import {
-  GuildJournalIcon,
-  GuildProgressContent,
-} from '@/components/game/guilds/guild-progress'
+import { GuildProgressContent } from '@/components/game/guilds/guild-progress'
+import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
 import { getGuild, guilds as guildDefinitions } from '@/data/guilds'
@@ -37,7 +35,7 @@ export function TrainerGuilds() {
               aria-label={`View ${guild.name} details`}
             >
               <div className="game-icon-orb h-12 w-12 shrink-0 border-game-ochre/45">
-                <GuildJournalIcon className="h-9 w-9" />
+                <TaskIconDisplay icon={guild.icon} className="h-9 w-9" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="truncate text-sm font-semibold text-game-ink">
@@ -63,10 +61,13 @@ export function TrainerGuilds() {
         onOpenChange={(open) => !open && setSelectedGuildId(null)}
         presentation="drawer"
         title={selectedGuild?.name || 'Guild'}
-        description={selectedGuild?.description}
         category="Guild charter"
         background={selectedGuild?.background}
-        icon={<GuildJournalIcon className="h-12 w-12" />}
+        icon={
+          selectedGuild ? (
+            <TaskIconDisplay icon={selectedGuild.icon} className="h-12 w-12" />
+          ) : null
+        }
       >
         {selectedGuild ? (
           <GuildProgressContent guildId={selectedGuild.id} guilds={userGuilds} />

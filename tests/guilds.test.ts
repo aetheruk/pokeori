@@ -8,6 +8,7 @@ import { getRequirementProgress } from '@/utilities/requirements'
 import {
   calculateFuchsiaInstituteBalanceV2,
   calculateLegacyFuchsiaGuildXp,
+  needsFuchsiaSafariBallBackfill,
 } from '@/utilities/guilds/legacy-fuchsia'
 
 describe('guild progression', () => {
@@ -35,6 +36,33 @@ describe('guild progression', () => {
       ),
     )
     expect(staminaRanks.map((rank) => rank.rank)).toEqual([3, 4, 5, 6, 7])
+  })
+
+  test('uses authored artwork for every Institute rank', () => {
+    expect(guild.ranks.map((rank) => rank.icon)).toEqual([
+      { type: 'item', id: 'researchers-journal-page' },
+      { type: 'pokemon', id: '113' },
+      { type: 'pokemon', id: '127' },
+      { type: 'item', id: 'metal-scrap-t1' },
+      { type: 'trainer', id: 'rocket-grunt-m' },
+      { type: 'pokemon', id: '147' },
+      { type: 'pokemon', id: '123' },
+      { type: 'pokemon', id: '128' },
+      { type: 'item', id: 'safari-ball' },
+      { type: 'item', id: 'researchers-journal-page' },
+    ])
+  })
+
+  test('grants the Safari Ball profile icon at Rank 9', () => {
+    const iconRewardRanks = guild.ranks
+      .filter((rank) =>
+        rank.rewards?.some(
+          (reward) => reward.type === 'icon' && reward.targetId === 'safari-ball',
+        ),
+      )
+      .map((rank) => rank.rank)
+
+    expect(iconRewardRanks).toEqual([9])
   })
 
   test('reports rank zero for a player who has not joined', () => {
@@ -85,6 +113,27 @@ describe('guild progression', () => {
 })
 
 describe('Fuchsia Institute balance v2 conversion', () => {
+  test('backfills the Safari Ball only for qualifying Rank 9 members', () => {
+    expect(
+      needsFuchsiaSafariBallBackfill({
+        progress: { rank: 9, xp: 6500 },
+        unlockedIcons: [],
+      }),
+    ).toBe(true)
+    expect(
+      needsFuchsiaSafariBallBackfill({
+        progress: { rank: 8, xp: 6499 },
+        unlockedIcons: [],
+      }),
+    ).toBe(false)
+    expect(
+      needsFuchsiaSafariBallBackfill({
+        progress: { rank: 9, xp: 6500 },
+        unlockedIcons: ['safari-ball'],
+      }),
+    ).toBe(false)
+  })
+
   test('adds the Catching Permit award and preserves shifted legacy rewards', () => {
     expect(
       calculateFuchsiaInstituteBalanceV2({
