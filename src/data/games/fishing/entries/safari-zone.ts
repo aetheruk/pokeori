@@ -74,7 +74,7 @@ const safariFishingItems = (): FishingItemEntry[] => [
     appearTime: { min: 2000, max: 5000 },
   },
   {
-    currencyId: 'safari-notes',
+    guildId: 'fuchsia-research-guild',
     weight: 20,
     symbol: '!',
     reactionTime: 850,

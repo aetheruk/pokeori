@@ -24,6 +24,7 @@ import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { BadgeShowcase } from '@/components/game/trainer/badge-showcase'
 import { TrainerSettings } from '@/components/game/trainer/trainer-settings'
 import { TrainerGenderPicker } from '@/components/game/trainer/trainer-gender-picker'
+import { TrainerGuilds } from '@/components/game/guilds/trainer-guilds'
 import { Button } from '@/components/ui/button'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { SectionDivider } from '@/components/ui/section-divider'
@@ -612,6 +613,8 @@ export function TrainerLeveling({
             })}
           </div>
         </div>
+
+        <TrainerGuilds />
 
         {/* Ranked PvP Section */}
         <div className="space-y-4">

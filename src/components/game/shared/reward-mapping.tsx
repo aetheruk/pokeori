@@ -272,6 +272,21 @@ export function mapRewardToDisplayItem(
       }
       break
     }
+    case 'guild_xp': {
+      label = `Fuchsia Guild XP${quantityStr ? ` ${quantityStr}` : ''}`
+      icon = (
+        <div className="relative h-8 w-8">
+          <ItemSprite
+            itemId="researchers-journal-page"
+            alt="Guild XP"
+            className="object-contain pixelated"
+            width={32}
+            height={32}
+          />
+        </div>
+      )
+      break
+    }
     case 'card': {
       label = `TCG Card${(typeof reward.quantity === 'number' && reward.quantity > 1) || typeof reward.quantity === 'object' ? '(s)' : ''}`
       if (quantityStr) label += ` ${quantityStr}`

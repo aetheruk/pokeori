@@ -117,6 +117,7 @@ function buildHookedResponse(fishingState: FishingState) {
       type: 'item' as const,
       itemId: itemEntry.itemId,
       currencyId: itemEntry.currencyId,
+      guildId: itemEntry.guildId,
       symbol: itemEntry.symbol,
     }
   }
@@ -611,9 +612,11 @@ export async function claimFishingItem() {
 
       const itemEntry = result.entry as FishingItemEntry
 
-      const reward: Reward = itemEntry.currencyId
-        ? { type: 'currency', targetId: itemEntry.currencyId, quantity: 1 }
-        : itemEntry.itemId
+      const reward: Reward = itemEntry.guildId
+        ? { type: 'guild_xp', targetId: itemEntry.guildId, quantity: 1 }
+        : itemEntry.currencyId
+          ? { type: 'currency', targetId: itemEntry.currencyId, quantity: 1 }
+          : itemEntry.itemId
           ? { type: 'item', targetId: itemEntry.itemId, quantity: 1 }
           : (() => {
               throw new Error('Fishing item has no reward target')
@@ -645,6 +648,7 @@ export async function claimFishingItem() {
         claimed: true,
         itemId: itemEntry.itemId,
         currencyId: itemEntry.currencyId,
+        guildId: itemEntry.guildId,
         summary,
       }
 

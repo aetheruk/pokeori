@@ -26,6 +26,7 @@ export type TaskRequirementType =
   | 'total_evolutions'
   | 'voyage_completed'
   | 'skill_level'
+  | 'guild_rank'
   | 'user_banner'
   | 'user_icon'
   | 'user_title'

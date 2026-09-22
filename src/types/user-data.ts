@@ -131,6 +131,16 @@ export interface SkillsData {
   [key: string]: SkillData | undefined
 }
 
+export interface GuildProgressData {
+  rank?: number | null
+  xp?: number | null
+  joinedAt?: string | null
+  rewardedThroughRank?: number | null
+  legacyImportedAt?: string | null
+}
+
+export type GuildsData = Record<string, GuildProgressData | undefined>
+
 /** Competitive player rankings, independent of progression skills. */
 export interface PvpRankingData {
   rating?: number
@@ -208,6 +218,7 @@ export interface ExtendedUser {
   tcgDecks?: TcgDecksData
   currency?: CurrencyData
   skills?: SkillsData
+  guilds?: GuildsData
   rankings?: RankingsData
   inventory?: InventoryData
   shopPurchases?: ShopPurchase[]

@@ -4,8 +4,8 @@ import type { Task } from '../../types'
 const background = '/backgrounds/safari-reserve.avif'
 
 const safariNoteReward = {
-  type: 'currency' as const,
-  targetId: 'safari-notes',
+  type: 'guild_xp' as const,
+  targetId: 'fuchsia-research-guild',
   quantity: 1,
   dropChance: 100,
 }
@@ -266,7 +266,7 @@ const flavorTasks = flavorDefinitions.map(([area, name, description, completeBut
     icon,
     rewards: [
       { type: 'xp', skill: 'researching', quantity: 50, dropChance: 100 },
-      { type: 'currency', targetId: 'safari-notes', quantity: 1, dropChance: 100 },
+      { type: 'guild_xp', targetId: 'fuchsia-research-guild', quantity: 1, dropChance: 100 },
     ],
     completeButtonText,
   }),
@@ -317,7 +317,7 @@ const extraFlavorTasks = extraFlavorDefinitions.map(([area, name, description, c
     requirements: [extraHabitatRequirement],
     rewards: [
       { type: 'xp', skill: 'researching', quantity: 50, dropChance: 100 },
-      { type: 'currency', targetId: 'safari-notes', quantity: 1, dropChance: 100 },
+      { type: 'guild_xp', targetId: 'fuchsia-research-guild', quantity: 1, dropChance: 100 },
     ],
     completeButtonText,
   }),

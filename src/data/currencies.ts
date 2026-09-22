@@ -46,11 +46,6 @@ export const currencies: Currency[] = [
     name: 'League Tickets',
     iconId: 'league-ticket',
   },
-  {
-    id: 'safari-notes',
-    name: 'Safari Notes',
-    iconId: 'researchers-journal-page',
-  },
 ]
 
 export function getCurrency(id: string): Currency | undefined {

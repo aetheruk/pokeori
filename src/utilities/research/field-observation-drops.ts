@@ -174,7 +174,9 @@ export function buildFieldObservationCollectibleDrops({
   ].filter(
     ({ reward }) =>
       reward.type === 'egg' ||
-      ((reward.type === 'item' || reward.type === 'currency') &&
+      ((reward.type === 'item' ||
+        reward.type === 'currency' ||
+        reward.type === 'guild_xp') &&
         typeof reward.targetId === 'string'),
   )
 

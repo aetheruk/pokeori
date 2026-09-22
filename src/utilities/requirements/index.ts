@@ -12,6 +12,7 @@ import { getPokemonForm } from '@/utilities/pokemon/pokedex'
 import {
   ExtendedUser,
   SkillsData,
+  GuildsData,
   CurrencyData,
   UserStats,
   PowerUsageData,
@@ -345,6 +346,15 @@ export function getRequirementProgress(
       const extendedUser = user as ExtendedUser
       const userSkills: SkillsData = extendedUser.skills || {}
       current = userSkills[skillId]?.level || 1
+      break
+    }
+
+    case 'guild_rank': {
+      const guildId =
+        typeof condition.targetId === 'string' ? condition.targetId : ''
+      const extendedUser = user as ExtendedUser
+      const userGuilds: GuildsData = extendedUser.guilds || {}
+      current = Math.max(0, Math.floor(userGuilds[guildId]?.rank || 0))
       break
     }
 

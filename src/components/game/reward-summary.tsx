@@ -4,6 +4,7 @@ import {
   Package,
   Search,
   Star,
+  Trophy,
 } from 'lucide-react'
 import Image from 'next/image'
 import type { HTMLAttributes } from 'react'
@@ -77,7 +78,9 @@ export function RewardSummaryDisplay({
   const hasSkillExperience =
     skillExperienceEntries.length > 0 || Boolean(summary.levelUp)
   const hasMainRewards =
-    rewardItems.length > 0 || (summary.currency || []).length > 0
+    rewardItems.length > 0 ||
+    (summary.currency || []).length > 0 ||
+    (summary.guildExperience || []).length > 0
   const hasAdditionalRewards =
     (summary.pokemon || []).length > 0 ||
     (summary.cards || []).length > 0 ||
@@ -155,6 +158,44 @@ export function RewardSummaryDisplay({
               </div>
             </RewardLedgerRow>
           )}
+        </>
+      )}
+
+      {(summary.guildExperience || []).length > 0 && (
+        <>
+          <SectionDivider>Guild progress</SectionDivider>
+          <div className="space-y-0">
+            {(summary.guildExperience || []).map((entry) => (
+              <RewardLedgerRow key={`${entry.guildId}-${entry.newExperience}`}>
+                <TaskIconDisplay
+                  icon={{ type: 'item', id: 'researchers-journal-page' }}
+                  className="h-8 w-8"
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-sm font-semibold text-game-ink">
+                    {entry.guildName}
+                  </div>
+                  <div className="text-xs text-game-muted">
+                    {entry.newExperience.toLocaleString()} total Guild XP
+                  </div>
+                </div>
+                <span className={REWARD_VALUE_CLASS}>+{entry.amount} XP</span>
+              </RewardLedgerRow>
+            ))}
+            {(summary.guildRankUps || []).map((entry) => (
+              <RewardLedgerRow key={`${entry.guildId}-rank-${entry.newRank}`}>
+                <Trophy className="h-5 w-5 shrink-0 text-game-ochre" />
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-semibold text-game-ink">
+                    Rank {entry.newRank}: {entry.rankName}
+                  </div>
+                  <div className="text-xs text-game-muted">
+                    {entry.unlocks.join(' · ')}
+                  </div>
+                </div>
+              </RewardLedgerRow>
+            ))}
+          </div>
         </>
       )}
 

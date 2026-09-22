@@ -215,4 +215,40 @@ describe('task_complete reward cascading', () => {
       expect.objectContaining({ rarity: 'galactic' }),
     )
   })
+
+  test('guild XP crosses ranks and applies every automatic unlock silently', async () => {
+    const { grantRewards } = await import('@/utilities/rewards/reward-logic')
+
+    const { summary } = await grantRewards('user-1', [
+      {
+        type: 'guild_membership',
+        targetId: 'fuchsia-research-guild',
+      },
+      {
+        type: 'guild_xp',
+        targetId: 'fuchsia-research-guild',
+        quantity: 100,
+      },
+    ], transactionOptions)
+
+    expect(summary.guildExperience).toContainEqual(
+      expect.objectContaining({
+        guildId: 'fuchsia-research-guild',
+        amount: 100,
+        oldRank: 1,
+        newRank: 2,
+      }),
+    )
+    expect(summary.guildRankUps?.map((entry) => entry.newRank)).toEqual([1, 2])
+    expect(completedTasksState['safari-extra-habitat-field-notes']?.count).toBe(1)
+    expect(completedTasksState['safari-stamina-notes']?.count).toBe(1)
+    expect(summary.taskExitModals).toEqual([])
+    expect(payloadMock.update.mock.calls.at(-1)?.[0].data.guilds).toMatchObject({
+      'fuchsia-research-guild': {
+        rank: 2,
+        xp: 100,
+        rewardedThroughRank: 2,
+      },
+    })
+  })
 })

@@ -27,6 +27,12 @@ const grandExpeditionRequirement = {
   count: 1,
 }
 
+const guildRankRequirement = (count: number) => ({
+  type: 'guild_rank' as const,
+  targetId: 'fuchsia-research-guild',
+  count,
+})
+
 const safariEntranceFee = {
   type: 'currency_owned' as const,
   targetId: 'pokedollars',
@@ -226,7 +232,11 @@ const safariHabitatExpedition = ({
     staminaNoteLimit: 5,
     safariBallAllowance: 8,
     canAbandon: true,
-    requirements: [permitRequirement, grandExpeditionRequirement],
+    requirements: [
+      permitRequirement,
+      grandExpeditionRequirement,
+      guildRankRequirement(2),
+    ],
     criteria: [safariHabitatFee],
     activityPool: {
       task: rewardTaskPool.map((entry) => entry.id),
@@ -266,7 +276,7 @@ const safariHabitatExpedition = ({
     rewards: [
       { type: 'xp', skill: 'researching', quantity: 150, dropChance: 100 },
       { type: 'xp', skill: 'catching', quantity: 150, dropChance: 100 },
-      { type: 'currency', targetId: 'safari-notes', quantity: 10, dropChance: 100 },
+      { type: 'guild_xp', targetId: 'fuchsia-research-guild', quantity: 20, dropChance: 100 },
     ],
   }
 }
@@ -333,7 +343,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
     staminaNoteLimit: 5,
     safariBallAllowance: 30,
     canAbandon: true,
-    requirements: [permitRequirement],
+    requirements: [permitRequirement, guildRankRequirement(1)],
     criteria: [
       safariEntranceFee,
     ],
@@ -513,7 +523,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
     rewards: [
       { type: 'xp', skill: 'researching', quantity: 1000, dropChance: 100 },
       { type: 'xp', skill: 'catching', quantity: 1000, dropChance: 100 },
-      { type: 'currency', targetId: 'safari-notes', quantity: 50, dropChance: 100 },
+      { type: 'guild_xp', targetId: 'fuchsia-research-guild', quantity: 100, dropChance: 100 },
       {
         type: 'item',
         targetId: 'tm-strength',
@@ -559,7 +569,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
     ],
     rewards: [
       { type: 'currency', targetId: 'pokedollars', quantity: 500, dropChance: 100 },
-      { type: 'currency', targetId: 'safari-notes', quantity: 10, dropChance: 100 },
+      { type: 'guild_xp', targetId: 'fuchsia-research-guild', quantity: 20, dropChance: 100 },
       {
         type: 'item',
         targetId: 'pack-base5',
