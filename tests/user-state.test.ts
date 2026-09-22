@@ -367,6 +367,9 @@ describe('user state storage compatibility', () => {
       friends: ['user-2'],
       activeDailyTasks: [{ id: 'daily-1' }],
       activeVoyages: [{ voyageId: 'v1' }],
+      guilds: {
+        'fuchsia-research-guild': { rank: 7, xp: 2661, rewardedThroughRank: 7 },
+      },
       currency: { pokedollars: 100 },
     } as unknown as User
 
@@ -376,6 +379,9 @@ describe('user state storage compatibility', () => {
     expect(slimUser.currency).toEqual({ pokedollars: 100 })
     expect(slimUser.activeDailyTasks).toEqual([{ id: 'daily-1' }])
     expect(slimUser.activeVoyages).toEqual([{ voyageId: 'v1' }])
+    expect(slimUser.guilds).toEqual({
+      'fuchsia-research-guild': { rank: 7, xp: 2661, rewardedThroughRank: 7 },
+    })
     expect(slimUser.stats).toEqual({
       totalEvolutions: 3,
       vsSeeker: { lastUsedAt: '2026-06-01T00:00:00.000Z' },
