@@ -24,6 +24,7 @@ import {
   setUserTcgMap,
 } from '@/utilities/user-state'
 import { getEconomyActionErrorMessage, runEconomyAction } from '@/utilities/economy/transactions'
+import { UNDERGROUND_SOCIETY_GUILD_ID } from '@/data/guilds/underground-society'
 
 export interface DrawActionState {
   ok: boolean
@@ -518,6 +519,83 @@ export async function redistributeDuplicateCards(
     return result
   } catch (error) {
     console.error('[Duplicate Redistribution Action] Error:', error)
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : getEconomyActionErrorMessage(error),
+    }
+  }
+}
+
+export async function redistributeAllDuplicateCards(
+  clientActionId: string,
+): Promise<DuplicateRedistributionResult> {
+  const { tcgRarityPokedollarValues } = await import('@/data/tcg-rarity')
+  const { getTcgCardById } = await import('@/utilities/tcg/tcg')
+
+  try {
+    const payload = await getPayload({ config })
+    const { user } = await payload.auth({ headers: await headers() })
+    if (!user) return { ok: false, error: 'You must be logged in.' }
+    if (!clientActionId) return { ok: false, error: 'Missing action identifier' }
+
+    return await runEconomyAction<DuplicateRedistributionResult>(
+      { userId: user.id, action: 'redistribute-all-tcg-duplicates', requestId: clientActionId, payload },
+      async ({ req }) => {
+        const freshUser = await payload.findByID({ collection: 'users', id: user.id, req })
+        const guildProgress = (freshUser as any).guilds?.[UNDERGROUND_SOCIETY_GUILD_ID]
+        if ((guildProgress?.rank || 0) < 3) {
+          return { ok: false, error: 'Bulk HQ transfers require Underground Society Rank 3.' }
+        }
+        const inventory = await getUserInventoryMap(payload as any, user.id, { req })
+        if (!hasCardCrystalizer(inventory)) {
+          return { ok: false, error: 'Card Redistribution Box required.' }
+        }
+        const cardsMap = await getUserTcgMap(payload as any, user.id, { req })
+        let cardsRemoved = 0
+        let totalPokedollars = 0
+        for (const [cardId, currentQty] of Object.entries(cardsMap)) {
+          if (currentQty <= 1) continue
+          const cardDef = getTcgCardById(cardId)
+          if (!cardDef) continue
+          const removeQty = currentQty - 1
+          const rarity = cardDef.rarity || 'Common'
+          cardsMap[cardId] = 1
+          cardsRemoved += removeQty
+          totalPokedollars += removeQty * (tcgRarityPokedollarValues[rarity] || 5)
+        }
+        if (cardsRemoved === 0) return { ok: false, error: 'No duplicate copies to send to HQ.' }
+
+        await setUserTcgMap(payload as any, user.id, cardsMap, { req })
+        await payload.update({
+          collection: 'users',
+          id: user.id,
+          data: {
+            currency: {
+              ...(freshUser.currency || {}),
+              pokedollars: (freshUser.currency?.pokedollars || 0) + totalPokedollars,
+            },
+          },
+          req,
+        })
+        const { incrementDailyTaskProgress } = await import('@/utilities/tasks/daily-progress')
+        await incrementDailyTaskProgress(user.id, 'daily_crystalize', cardsRemoved, undefined, { payload, req })
+        return {
+          ok: true,
+          pokedollarsAdded: totalPokedollars,
+          cardsRemoved,
+          summary: {
+            xp: 0,
+            items: [],
+            pokemon: [],
+            currency: [{ type: 'pokedollars', quantity: totalPokedollars }],
+            cards: [],
+            tasksCompleted: [],
+          },
+        }
+      },
+    )
+  } catch (error) {
+    console.error('[Bulk Duplicate Redistribution Action] Error:', error)
     return {
       ok: false,
       error: error instanceof Error ? error.message : getEconomyActionErrorMessage(error),

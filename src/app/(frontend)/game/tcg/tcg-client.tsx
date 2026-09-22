@@ -65,7 +65,12 @@ import {
   TCG_BATTLE_FORMATS,
   type TcgBattleEnergyType,
 } from '@/utilities/tcg/tcg-battle'
-import { getTcgDecks, redistributeDuplicateCards, saveTcgDeck } from './actions'
+import {
+  getTcgDecks,
+  redistributeAllDuplicateCards,
+  redistributeDuplicateCards,
+  saveTcgDeck,
+} from './actions'
 
 const CARD_BATCH_SIZE = 80
 const CARD_CRYSTALIZER_ITEM_ID = 'card-crystalizer'
@@ -89,9 +94,13 @@ function getTcgCardHeroDescription(card: TcgCard) {
 type CatalogCard = { card: TcgCard; set: TcgSet }
 interface TcgExplorerActions {
   redistributeDuplicateCards: typeof redistributeDuplicateCards
+  redistributeAllDuplicateCards?: typeof redistributeAllDuplicateCards
 }
 
-const defaultActions: TcgExplorerActions = { redistributeDuplicateCards }
+const defaultActions: TcgExplorerActions = {
+  redistributeDuplicateCards,
+  redistributeAllDuplicateCards,
+}
 
 type CatalogResponse<T> = {
   items: T[]
@@ -128,6 +137,7 @@ export default function TcgExplorerPage({
     set: TcgSet
   } | null>(null)
   const [redistributing, setRedistributing] = useState(false)
+  const [bulkRedistributing, setBulkRedistributing] = useState(false)
   const [rewardSummary, setRewardSummary] = useState<RewardSummary | null>(null)
   const [generationDecks, setGenerationDecks] = useState<
     Record<
@@ -167,6 +177,13 @@ export default function TcgExplorerPage({
   )
   const hasDeckBox = (inventory['deck-box'] || 0) > 0
   const hasCardCrystalizer = (inventory[CARD_CRYSTALIZER_ITEM_ID] || 0) > 0
+  const undergroundSocietyRank = Number(
+    (gameData?.user as any)?.guilds?.['underground-society']?.rank || 0,
+  )
+  const duplicateCardCount = useMemo(
+    () => Object.values(entriesByCard).reduce((total, entry) => total + Math.max(0, (entry.quantity || 0) - 1), 0),
+    [entriesByCard],
+  )
   const { ref: loadMoreRef, inView } = useInView({
     threshold: 0,
     rootMargin: '200px',
@@ -663,6 +680,31 @@ export default function TcgExplorerPage({
               <span className="shrink-0 font-mono">
                 {scopeProgress.unique}/{scopeProgress.total} recorded
               </span>
+            </div>
+          )}
+          {hasCardCrystalizer && undergroundSocietyRank >= 3 && (
+            <div className="mt-3 flex justify-end">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                disabled={bulkRedistributing || duplicateCardCount === 0}
+                onClick={async () => {
+                  if (bulkRedistributing || duplicateCardCount === 0) return
+                  setBulkRedistributing(true)
+                  try {
+                    const result = await (actions.redistributeAllDuplicateCards || redistributeAllDuplicateCards)(crypto.randomUUID())
+                    if (result.ok && result.summary) {
+                      setRewardSummary(result.summary)
+                      void refreshCollection()
+                    }
+                  } finally {
+                    setBulkRedistributing(false)
+                  }
+                }}
+              >
+                {bulkRedistributing ? 'Sending to HQ…' : `Send ${duplicateCardCount} duplicates to HQ`}
+              </Button>
             </div>
           )}
         </div>

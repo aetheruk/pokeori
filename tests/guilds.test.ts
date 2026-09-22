@@ -10,6 +10,7 @@ import {
   calculateLegacyFuchsiaGuildXp,
   needsFuchsiaSafariBallBackfill,
 } from '@/utilities/guilds/legacy-fuchsia'
+import { undergroundSocietyGuild } from '@/data/guilds/underground-society'
 
 describe('guild progression', () => {
   const guild = getGuild('fuchsia-research-guild')!
@@ -109,6 +110,19 @@ describe('guild progression', () => {
         count: 5,
       }),
     ).toEqual({ current: 4, target: 5, completed: false })
+  })
+
+  test('supports the Underground Society curve and rank names', () => {
+    expect(undergroundSocietyGuild.ranks.map((rank) => rank.totalXp)).toEqual([
+      0, 10000, 25000, 50000, 100000, 180000, 300000, 480000, 720000, 1000000,
+    ])
+    expect(undergroundSocietyGuild.ranks.map((rank) => rank.name)).toEqual([
+      'New Recruit', 'TCG Maniac', 'TCG Influencer', 'TCG Operative', 'Supervisor',
+      'Operations Manager', 'Regional Lead', 'Global Lead', 'Pits Favoured', 'Lord of the Pit',
+    ])
+    expect(getGuildRankForXp(undergroundSocietyGuild, 24999)).toBe(2)
+    expect(getGuildRankForXp(undergroundSocietyGuild, 25000)).toBe(3)
+    expect(getGuildRankForXp(undergroundSocietyGuild, 1000000)).toBe(10)
   })
 })
 

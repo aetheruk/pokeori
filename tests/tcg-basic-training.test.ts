@@ -220,13 +220,17 @@ describe('TCG Basic Training content', () => {
         name: `${set.name} Booster Box Delivery`,
         repeatable: true,
         completeButtonText: 'Deliver Booster Box',
-        rewards: [
-          {
-            type: 'currency',
-            targetId: 'pokedollars',
-            quantity: TCG_BOOSTER_BOX_REWARD,
-          },
-        ],
+      })
+      expect(task?.rewards).toContainEqual({
+        type: 'currency',
+        targetId: 'pokedollars',
+        quantity: TCG_BOOSTER_BOX_REWARD,
+      })
+      expect(task?.rewards).toContainEqual({
+        type: 'guild_xp',
+        targetId: 'underground-society',
+        quantity: 20,
+        dropChance: 100,
       })
       expect(task?.requirements).toContainEqual({
         type: 'task_completed',

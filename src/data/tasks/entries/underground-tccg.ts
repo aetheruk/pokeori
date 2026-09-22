@@ -1,4 +1,6 @@
 import { Task } from '../../types'
+import { tcgSetSummaries } from '@/data/tcg/summaries'
+import { UNDERGROUND_SOCIETY_GUILD_ID } from '@/data/guilds/underground-society'
 
 const undergroundBackground = '/backgrounds/kanto-underground.avif'
 const maniacMale = { type: 'trainer' as const, id: 'tcg-maniac-m' }
@@ -115,7 +117,10 @@ export const undergroundTccgTasks: Task[] = [
     completionTrigger: 'manual',
     completeButtonText: 'Throw Crystals',
     chat: true,
-    requirements: [{ type: 'task_completed', targetId: 'underground-tcg-basic-training' }],
+    requirements: [
+      { type: 'task_completed', targetId: 'underground-tcg-basic-training' },
+      { type: 'guild_rank', targetId: UNDERGROUND_SOCIETY_GUILD_ID, count: 1 },
+    ],
     criteria: [{ type: 'currency_owned', targetId: 'crystals', count: 500, consume: true }],
     rewards: [{ type: 'item', targetId: 'card-crystalizer', quantity: 1, dropChance: 100 }],
     enterModal: [
@@ -229,7 +234,10 @@ export const undergroundTccgTasks: Task[] = [
     completionTrigger: 'manual',
     completeButtonText: 'Register a Deck',
     chat: true,
-    requirements: [{ type: 'task_completed', targetId: 'underground-tcg-card-memory' }],
+    requirements: [
+      { type: 'task_completed', targetId: 'underground-tcg-card-memory' },
+      { type: 'guild_rank', targetId: UNDERGROUND_SOCIETY_GUILD_ID, count: 1 },
+    ],
     criteria: [],
     rewards: [{ type: 'item', targetId: 'deck-box', quantity: 1, dropChance: 100 }],
     enterModal: [
@@ -915,4 +923,41 @@ export const undergroundTccgTasks: Task[] = [
       closeButtonText: 'Return to the Presses',
     },
   },
-]
+] as Task[]
+
+// One claimable Society archive task is authored for every set. The task is
+// intentionally not auto-completed so a player with a finished set can still
+// choose when to present it and claim the XP.
+undergroundTccgTasks.push(
+  ...tcgSetSummaries.map((set): Task => ({
+    id: `underground-tcg-set-showcase-${set.id}`,
+    name: `Showcase ${set.name}`,
+    description: `Present a completed ${set.name} collection to the Society’s archive.`,
+    category: 'Underground',
+    subCategory: 'Kanto Underground',
+    icon: { type: 'item', id: `pack-${set.id}` },
+    background: undergroundBackground,
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Show Collection',
+    requirements: [
+      { type: 'task_completed', targetId: 'underground-tcg-basic-training' },
+      {
+        type: 'card_collected_set',
+        targetId: set.id,
+        count: set.total,
+        unique: true,
+      },
+    ],
+    criteria: [],
+    rewards: [
+      {
+        type: 'guild_xp',
+        targetId: UNDERGROUND_SOCIETY_GUILD_ID,
+        quantity: 1000,
+        dropChance: 100,
+      },
+    ],
+  })),
+)
