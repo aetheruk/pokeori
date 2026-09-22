@@ -1,12 +1,12 @@
 import { Loader2, Medal, Star, Trophy } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { getHighScores } from '@/app/(frontend)/game/trainer/actions'
+import { getPvpRankings } from '@/app/(frontend)/game/trainer/actions'
 import { cn } from '@/lib/utils'
 import { TrainerModal } from './trainer-modal'
 import { TrainerRow } from './trainer-row'
 import type { PublicTrainerSummary } from './types'
 
-export function HighScores({ activeSkill }: { activeSkill: string }) {
+export function HighScores() {
   const [scores, setScores] = useState<PublicTrainerSummary[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [loadError, setLoadError] = useState('')
@@ -19,7 +19,7 @@ export function HighScores({ activeSkill }: { activeSkill: string }) {
       setIsLoading(true)
       setLoadError('')
       try {
-        const result = await getHighScores(activeSkill as any)
+        const result = await getPvpRankings()
         if (mounted && result.success && result.data) {
           setScores(result.data)
         } else if (mounted) {
@@ -42,7 +42,7 @@ export function HighScores({ activeSkill }: { activeSkill: string }) {
     return () => {
       mounted = false
     }
-  }, [activeSkill])
+  }, [])
 
   return (
     <div className="game-paper-first game-paper-background flex flex-col h-full overflow-hidden bg-game-canvas text-game-ink">
@@ -56,7 +56,7 @@ export function HighScores({ activeSkill }: { activeSkill: string }) {
           >
             <Loader2 className="h-7 w-7 animate-spin text-game-moss" />
             <p className="text-sm font-medium text-game-muted">
-              Opening the skill rankings…
+              Opening the PvP rankings…
             </p>
           </div>
         ) : loadError ? (
@@ -73,7 +73,7 @@ export function HighScores({ activeSkill }: { activeSkill: string }) {
             role="status"
             aria-live="polite"
           >
-            No trainers have reached these skill rankings yet.
+            No ranked PvP battles have been recorded yet.
           </div>
         ) : (
           <div className="grid gap-3">
@@ -136,10 +136,10 @@ export function HighScores({ activeSkill }: { activeSkill: string }) {
                   meta={
                     <>
                       <span className="block font-mono text-xs font-bold text-game-moss-strong">
-                        Rank {score.level || 1}
+                        Rating {(score.rating || 1000).toLocaleString()}
                       </span>
                       <span className="block font-mono text-[11px] text-game-muted">
-                        {(score.exp || 0).toLocaleString()} XP
+                        {score.wins || 0}W · {score.losses || 0}L · {score.draws || 0}D
                       </span>
                     </>
                   }

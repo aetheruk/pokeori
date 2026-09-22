@@ -133,6 +133,45 @@ export const Users: CollectionConfig = {
       })),
     },
     {
+      name: 'rankings',
+      type: 'group',
+      fields: [
+        {
+          name: 'pvp',
+          type: 'group',
+          fields: [
+            {
+              name: 'rating',
+              type: 'number',
+              defaultValue: 1000,
+              admin: {
+                description: 'Elo-style PvP rating. New trainers start at 1000.',
+              },
+            },
+            {
+              name: 'wins',
+              type: 'number',
+              defaultValue: 0,
+            },
+            {
+              name: 'losses',
+              type: 'number',
+              defaultValue: 0,
+            },
+            {
+              name: 'draws',
+              type: 'number',
+              defaultValue: 0,
+            },
+            {
+              name: 'lastBattleAt',
+              type: 'date',
+            },
+          ],
+        },
+      ],
+    },
+    {
       name: 'currency',
       type: 'group',
       fields: [
@@ -220,7 +259,7 @@ export const Users: CollectionConfig = {
       },
       admin: {
         description:
-          'Simplifies research, boosts solo battle stats, and disables rivals, PvP, social Trainer pages, Mystery Gift, and High Scores.',
+          'Simplifies research, boosts solo battle stats, and disables rivals, PvP, social Trainer pages, Mystery Gift, and Rankings.',
       },
     },
     {

@@ -1,6 +1,6 @@
 'use client'
 
-import { Heart, Loader2, MapIcon, RefreshCw } from 'lucide-react'
+import { Heart, Loader2, MapIcon, RefreshCw, Trophy } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Component,
@@ -1010,49 +1010,70 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
                   : 'text-game-danger'
             }
             additionalContent={
-              expeditionProgress ? (
-                <div className="flex items-start gap-3 rounded-lg border border-game-border bg-game-surface p-4 text-left shadow-sm">
-                  <div className="game-icon-orb game-icon-orb-discovery flex h-12 w-12 shrink-0 items-center justify-center border-game-ochre/45 text-game-ochre">
-                    <MapIcon className="h-6 w-6" aria-hidden="true" />
+              <div className="space-y-3">
+                {battleState.pvpRatingChange && (
+                  <div className="flex items-center gap-3 rounded-lg border border-game-border bg-game-surface p-4 text-left shadow-sm">
+                    <div className="game-icon-orb game-icon-orb-discovery flex h-12 w-12 shrink-0 items-center justify-center border-game-ochre/45 text-game-ochre">
+                      <Trophy className="h-6 w-6" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[11px] font-black uppercase tracking-wide text-game-moss-strong">
+                        Ranked PvP rating
+                      </p>
+                      <p className="mt-1 text-sm text-game-ink">
+                        <span className="font-bold">
+                          {battleState.pvpRatingChange.change >= 0 ? '+' : ''}
+                          {battleState.pvpRatingChange.change} rating
+                        </span>{' '}
+                        · now {battleState.pvpRatingChange.after.toLocaleString()}
+                      </p>
+                    </div>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[11px] font-black uppercase tracking-wide text-game-moss-strong">
-                      {expeditionProgress.expeditionName || 'Expedition'}
-                    </p>
-                    {expeditionProgress.progressed ? (
-                      expeditionProgress.status === 'ready_to_claim' ? (
+                )}
+                {expeditionProgress && (
+                  <div className="flex items-start gap-3 rounded-lg border border-game-border bg-game-surface p-4 text-left shadow-sm">
+                    <div className="game-icon-orb game-icon-orb-discovery flex h-12 w-12 shrink-0 items-center justify-center border-game-ochre/45 text-game-ochre">
+                      <MapIcon className="h-6 w-6" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[11px] font-black uppercase tracking-wide text-game-moss-strong">
+                        {expeditionProgress.expeditionName || 'Expedition'}
+                      </p>
+                      {expeditionProgress.progressed ? (
+                        expeditionProgress.status === 'ready_to_claim' ? (
+                          <p className="mt-1 text-sm text-game-ink">
+                            You've Completed the Expedition! Time to claim your
+                            rewards.
+                          </p>
+                        ) : (
+                          <p className="mt-1 text-sm text-game-ink">
+                            You've Made Progress.
+                          </p>
+                        )
+                      ) : expeditionProgress.status === 'failed' ? (
+                        <p className="mt-1 text-sm text-game-danger">
+                          You've Failed the Expedition.
+                        </p>
+                      ) : expeditionProgress.canFail === false ? (
                         <p className="mt-1 text-sm text-game-ink">
-                          You've Completed the Expedition! Time to claim your
-                          rewards.
+                          Try the step again to continue.
                         </p>
                       ) : (
-                        <p className="mt-1 text-sm text-game-ink">
-                          You've Made Progress.
-                        </p>
-                      )
-                    ) : expeditionProgress.status === 'failed' ? (
-                      <p className="mt-1 text-sm text-game-danger">
-                        You've Failed the Expedition.
-                      </p>
-                    ) : expeditionProgress.canFail === false ? (
-                      <p className="mt-1 text-sm text-game-ink">
-                        Try the step again to continue.
-                      </p>
-                    ) : (
-                      <>
-                        <p className="mt-1 text-sm text-game-ink">
-                          You've Lost a Life.
-                        </p>
-                        <p className="mt-1 inline-flex items-center gap-1.5 text-sm text-game-ink">
-                          <Heart className="h-4 w-4 text-game-danger" />
-                          Lives left: {expeditionProgress.livesLeft}/
-                          {expeditionProgress.maxLosses}.
-                        </p>
-                      </>
-                    )}
+                        <>
+                          <p className="mt-1 text-sm text-game-ink">
+                            You've Lost a Life.
+                          </p>
+                          <p className="mt-1 inline-flex items-center gap-1.5 text-sm text-game-ink">
+                            <Heart className="h-4 w-4 text-game-danger" />
+                            Lives left: {expeditionProgress.livesLeft}/
+                            {expeditionProgress.maxLosses}.
+                          </p>
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ) : undefined
+                )}
+              </div>
             }
             additionalContentFrame={false}
             onReturn={async () => {

@@ -1,7 +1,7 @@
 import { NatureName } from '../natures'
 import type { BattleAiUseConfig } from '../battle-ai'
 
-export type ItemSkillId = 'catching' | 'battling' | 'researching' | 'artisan' | 'ranked-battling'
+export type ItemSkillId = 'catching' | 'battling' | 'researching' | 'artisan'
 export type ItemSkillRequirements = Partial<Record<ItemSkillId, number>>
 
 export type PokemonStatType =
@@ -183,7 +183,7 @@ export interface Item {
     encounterSecondChanceModifier?: number // Adds percentage points to capture second-chance rolls
     grantSkillXp?: {
       // Grants experience in a specific skill
-      skill: 'catching' | 'battling' | 'researching' | 'artisan' | 'ranked-battling'
+      skill: 'catching' | 'battling' | 'researching' | 'artisan'
       amount: number
     }
     startBattle?: {

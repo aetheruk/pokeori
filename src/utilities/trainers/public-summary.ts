@@ -17,7 +17,7 @@ type FriendRequestLike = {
 
 type PublicTrainerSource = Pick<
   User,
-  'id' | 'trainerName' | 'icon' | 'banner' | 'title' | 'skills'
+  'id' | 'trainerName' | 'icon' | 'banner' | 'title' | 'skills' | 'rankings'
 >
 
 function relationId(value: unknown): string {
@@ -142,6 +142,7 @@ export async function buildPublicTrainerSummaries({
       banner: (trainer as any).banner || 'lab',
       title: (trainer as any).title || 'new-beginnings',
       skills: trainer.skills,
+      rankings: trainer.rankings,
       battleTeam: (teamByTrainer.get(id) || []).sort(
         (a, b) => a.position - b.position,
       ),
