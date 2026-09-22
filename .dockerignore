@@ -51,6 +51,8 @@ scripts/*
 !scripts/build-fuchsia-guild-migration.ts
 !scripts/run-fuchsia-guild-migration.ts
 !scripts/run-fuchsia-institute-balance-v2.ts
+!scripts/migrate-underground-society.ts
+!scripts/run-underground-society-migration.ts
 
 # Tools (dev only)
 tools/
