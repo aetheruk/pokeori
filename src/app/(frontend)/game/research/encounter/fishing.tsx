@@ -274,6 +274,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
     isShiny?: boolean
     itemId?: string
     currencyId?: string
+    guildId?: string
     symbol: string
   } | null>(null)
   const [isClaimingItem, setIsClaimingItem] = useState(false)
@@ -400,6 +401,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
           isShiny: res.isShiny,
           itemId: res.itemId,
           currencyId: res.currencyId,
+          guildId: res.guildId,
           symbol: res.symbol || '?',
         })
       } else {
@@ -437,7 +439,13 @@ export function FishingGame({ encounter }: FishingGameProps) {
       setAppearTime(null)
       setTimeUntilAppear(null)
       setNibbleSymbol(null)
-      toast.success(res.currencyId ? 'Safari Notes added.' : 'Item added to bag.')
+      toast.success(
+        res.guildId
+          ? 'Guild XP recorded.'
+          : res.currencyId
+            ? 'Currency added.'
+            : 'Item added to bag.',
+      )
     } finally {
       setIsClaimingItem(false)
     }
@@ -758,7 +766,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
               )}
 
               {hookedData.type === 'item' &&
-                (hookedData.itemId || hookedData.currencyId) && (
+                (hookedData.itemId || hookedData.currencyId || hookedData.guildId) && (
                 <>
                   <div className="w-full">
                     <SectionDivider>Item Found!</SectionDivider>
@@ -766,10 +774,14 @@ export function FishingGame({ encounter }: FishingGameProps) {
 
                   <div className="relative flex h-[150px] w-[150px] items-center justify-center rounded-xl border border-game-border bg-game-surface-raised">
                     <div className="w-3/4 h-3/4 relative">
-                      {hookedData.itemId ? (
+                      {hookedData.itemId || hookedData.guildId ? (
                         <ItemSprite
-                          itemId={hookedData.itemId}
-                          alt="Item"
+                          itemId={
+                            hookedData.guildId
+                              ? 'researchers-journal-page'
+                              : hookedData.itemId!
+                          }
+                          alt={hookedData.guildId ? 'Guild XP' : 'Item'}
                           className="w-full h-full object-contain drop-shadow-lg"
                           width={96}
                           height={96}
@@ -788,7 +800,9 @@ export function FishingGame({ encounter }: FishingGameProps) {
 
                   <div className="flex flex-col items-center gap-1">
                     <h3 className="line-clamp-1 font-display text-lg font-semibold capitalize tracking-wide text-game-ink">
-                      {hookedData.currencyId
+                      {hookedData.guildId
+                        ? 'Fuchsia Guild XP'
+                        : hookedData.currencyId
                         ? getCurrency(hookedData.currencyId)?.name || 'Currency'
                         : itemNames.get(hookedData.itemId!) ||
                           hookedData.itemId!.replace(/-/g, ' ')}

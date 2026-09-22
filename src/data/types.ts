@@ -46,6 +46,8 @@ export interface Reward {
     | 'active_companion_research_xp'
     | 'expedition_safari_balls'
     | 'expedition_lives'
+    | 'guild_membership'
+    | 'guild_xp'
     | 'egg'
   targetId?: string | number // Changed: Now used for currency type (e.g. 'crystals')
   skill?: string
@@ -55,6 +57,7 @@ export interface Reward {
   dropChance?: number // 0-100 percentage, defaults to 100 if not specified
   guaranteed?: boolean // If true, reward selection logic should not roll this reward out
   secret?: boolean // If true, shows as "???" in the UI
+  suppressExitModal?: boolean // If true, a task_complete reward applies silently.
   label?: string
   icon?: TaskIcon
   isCompanion?: boolean

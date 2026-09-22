@@ -37,6 +37,7 @@ import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { battles } from '@/data/battles'
 import { getCurrency } from '@/data/currencies'
+import { getGuild } from '@/data/guilds'
 import { expeditions } from '@/data/expeditions'
 import { fieldResearchGames, miniGames } from '@/data/games'
 import { items } from '@/data/items'
@@ -258,6 +259,19 @@ export function mapCriteriaToDisplayItem(
         ),
         label: `Reach Level ${count} ${skillId ? `in ${skillName}` : skillName}`,
         subLabel: 'Skill Requirement',
+      }
+    }
+    case 'guild_rank': {
+      const guild = getGuild(String(condition.targetId || ''))
+      return {
+        icon: (
+          <TaskIconDisplay
+            icon={guild?.icon || { type: 'item', id: 'researchers-journal-page' }}
+            className="h-5 w-5"
+          />
+        ),
+        label: `${guild?.name || 'Guild'} Rank ${count}`,
+        subLabel: 'Guild rank requirement',
       }
     }
     case 'item_owned': {

@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { battles } from '@/data/battles'
 import { currencies } from '@/data/currencies'
+import { getGuild } from '@/data/guilds'
 import { gridPuzzleGames, silhouetteGames, snapGames } from '@/data/games'
 import { expeditions } from '@/data/expeditions'
 import { fishingGames } from '@/data/games/fishing'
@@ -741,9 +742,9 @@ describe('Fuchsia Gym and Safari progression', () => {
             dropChance: 100,
           },
           {
-            type: 'currency',
-            targetId: 'safari-notes',
-            quantity: 10,
+            type: 'guild_xp',
+            targetId: 'fuchsia-research-guild',
+            quantity: 20,
             dropChance: 100,
           },
         ],
@@ -755,6 +756,11 @@ describe('Fuchsia Gym and Safari progression', () => {
           targetId: 'safari-zone-grand-expedition',
           expeditionStatus: 'completed',
           count: 1,
+        },
+        {
+          type: 'guild_rank',
+          targetId: 'fuchsia-research-guild',
+          count: 2,
         },
       ])
       expect(
@@ -829,9 +835,9 @@ describe('Fuchsia Gym and Safari progression', () => {
           dropChance: 100,
         },
         {
-          type: 'currency',
-          targetId: 'safari-notes',
-          quantity: 10,
+          type: 'guild_xp',
+          targetId: 'fuchsia-research-guild',
+          quantity: 20,
           dropChance: 100,
         },
         {
@@ -905,8 +911,8 @@ describe('Fuchsia Gym and Safari progression', () => {
       researchTasks.every((task) =>
         task.rewards.some(
           (reward) =>
-            reward.type === 'currency' &&
-            reward.targetId === 'safari-notes' &&
+            reward.type === 'guild_xp' &&
+            reward.targetId === 'fuchsia-research-guild' &&
             reward.quantity === 1 &&
             reward.dropChance === 100,
         ),
@@ -932,8 +938,8 @@ describe('Fuchsia Gym and Safari progression', () => {
       flavorTasks.every((task) =>
         task.rewards.some(
           (reward) =>
-            reward.type === 'currency' &&
-            reward.targetId === 'safari-notes' &&
+            reward.type === 'guild_xp' &&
+            reward.targetId === 'fuchsia-research-guild' &&
             reward.quantity === 1 &&
             reward.dropChance === 100,
         ),
@@ -977,8 +983,8 @@ describe('Fuchsia Gym and Safari progression', () => {
       itemTasks.every((task) =>
         task.rewards.some(
           (reward) =>
-            reward.type === 'currency' &&
-            reward.targetId === 'safari-notes' &&
+            reward.type === 'guild_xp' &&
+            reward.targetId === 'fuchsia-research-guild' &&
             reward.quantity === 1 &&
             reward.dropChance === 100,
         ),
@@ -1047,8 +1053,8 @@ describe('Fuchsia Gym and Safari progression', () => {
       rewards: [
         { type: 'item', targetId: 'ultra-ball', quantity: 1, dropChance: 100 },
         {
-          type: 'currency',
-          targetId: 'safari-notes',
+          type: 'guild_xp',
+          targetId: 'fuchsia-research-guild',
           quantity: 1,
           dropChance: 100,
         },
@@ -1150,241 +1156,73 @@ describe('Fuchsia Gym and Safari progression', () => {
     )
   })
 
-  test('Safari Notes progression and Research Exchange are authored', () => {
-    expect(currencies).toContainEqual({
-      id: 'safari-notes',
-      name: 'Safari Notes',
-      iconId: 'researchers-journal-page',
+  test("Fuchsia Guild progression replaces Safari Notes and the Exchange", () => {
+    expect(currencies.some((currency) => currency.id === "safari-notes")).toBe(false)
+    expect(getIcon("safari-ball")).toBeDefined()
+    expect(getTitle("the-warden")?.name).toBe("The Warden")
+
+    const guild = getGuild("fuchsia-research-guild")
+    expect(guild?.ranks.map((rank) => rank.totalXp)).toEqual([
+      0, 100, 250, 500, 900, 1550, 2550, 4150, 6500, 10000,
+    ])
+
+    const hall = safariZoneShops[0]
+    expect(hall).toMatchObject({
+      id: "fuchsia-research-guild-hall",
+      guildId: "fuchsia-research-guild",
+      items: [],
+      requirements: [
+        { type: "guild_rank", targetId: "fuchsia-research-guild", count: 1 },
+      ],
     })
-    expect(
-      currencies.some((currency) => currency.id === 'shadow-crystals'),
-    ).toBe(false)
-    expect(items).toContainEqual(
+
+    const membership = tasks.find(
+      (task) => task.id === "fuchsia-research-institute-membership",
+    )
+    expect(membership?.rewards).toContainEqual(
       expect.objectContaining({
-        id: 'shadow-crystal',
-        name: 'Shadow Crystal',
+        type: "guild_membership",
+        targetId: "fuchsia-research-guild",
       }),
     )
-    expect(getIcon('safari-ball')).toBeDefined()
-    expect(getTitle('the-warden')?.name).toBe('The Warden')
 
     const safariFieldResearch = fieldObservationGames.filter(
-      (entry) => entry.subCategory === 'Safari Zone',
+      (entry) => entry.subCategory === "Safari Zone",
     )
     expect(safariFieldResearch).toHaveLength(8)
     expect(
       safariFieldResearch.every((entry) =>
         entry.settings.itemDrops?.some(
           (drop) =>
-            drop.itemId === 'researchers-journal-page' &&
-            drop.dropChance === 100 &&
-            drop.guaranteed === true &&
-            drop.secret === true &&
-            drop.reward?.type === 'currency' &&
-            drop.reward.targetId === 'safari-notes' &&
-            drop.reward.guaranteed === true &&
-            drop.reward.secret === true,
+            drop.reward?.type === "guild_xp" &&
+            drop.reward.targetId === "fuchsia-research-guild" &&
+            drop.reward.quantity === 1,
         ),
       ),
     ).toBe(true)
 
-    const strangeSightings = safariZoneShops[0]?.items.find(
-      (item) => item.id === 'safari-credit-strange-sightings',
-    )
-    expect(strangeSightings?.icon).toEqual({ type: 'pokemon', id: '128' })
-    expect(
-      tasks.find((task) => task.id === 'safari-strange-sightings')?.icon,
-    ).toEqual({ type: 'pokemon', id: '128' })
-
     const grandExpedition = expeditions.find(
-      (entry) => entry.id === 'safari-zone-grand-expedition',
+      (entry) => entry.id === "safari-zone-grand-expedition",
     )
+    expect(grandExpedition?.requirements).toContainEqual({
+      type: "guild_rank",
+      targetId: "fuchsia-research-guild",
+      count: 1,
+    })
     expect(grandExpedition?.rewards).toContainEqual({
-      type: 'currency',
-      targetId: 'safari-notes',
-      quantity: 50,
+      type: "guild_xp",
+      targetId: "fuchsia-research-guild",
+      quantity: 100,
       dropChance: 100,
     })
 
-    const responsibility = tasks.find(
-      (task) => task.id === 'safari-researcher-responsibility',
-    )
-    expect(responsibility).toMatchObject({
-      name: "A Researcher's Responsibility",
-      secret: false,
-      requirements: [
-        {
-          type: 'expedition_result',
-          targetId: 'safari-zone-grand-expedition',
-          expeditionStatus: 'completed',
-          count: 1,
-        },
-      ],
-    })
-    expect(responsibility?.exitModal?.message).toContain(
-      'jotting down my notes',
-    )
-
-    const rewilding = tasks.find((task) => task.id === 'safari-rewilding')
-    expect(rewilding?.criteria).toContainEqual(
-      expect.objectContaining({
-        type: 'pokemon_owned',
-        count: 10,
-        consume: true,
-        pokemonCriteria: { ballType: 'safari-ball' },
-      }),
-    )
+    const rewilding = tasks.find((task) => task.id === "safari-rewilding")
     expect(rewilding?.rewards).toContainEqual({
-      type: 'currency',
-      targetId: 'safari-notes',
+      type: "guild_xp",
+      targetId: "fuchsia-research-guild",
       quantity: 10,
       dropChance: 100,
     })
-
-    const store = safariZoneShops.find(
-      (shop) => shop.id === 'safari-zone-research-credit-store',
-    )
-    expect(store?.requirements).toContainEqual({
-      type: 'task_completed',
-      targetId: 'safari-researcher-responsibility',
-    })
-    expect(
-      store?.items.map((item) => [item.name, item.cost, item.stock]),
-    ).toEqual([
-      [
-        'Fishing Permit',
-        [{ type: 'currency', id: 'safari-notes', amount: 200 }],
-        1,
-      ],
-      [
-        'Extra Habitat Field Notes',
-        [{ type: 'currency', id: 'safari-notes', amount: 35 }],
-        1,
-      ],
-      [
-        'Material Deposit Reports',
-        [{ type: 'currency', id: 'safari-notes', amount: 45 }],
-        1,
-      ],
-      [
-        'Safari Ball Cache Info',
-        [{ type: 'currency', id: 'safari-notes', amount: 55 }],
-        1,
-      ],
-      [
-        'Unusual Pokémon Sightings',
-        [{ type: 'currency', id: 'safari-notes', amount: 65 }],
-        1,
-      ],
-      [
-        'Rare Item Rumours',
-        [{ type: 'currency', id: 'safari-notes', amount: 200 }],
-        1,
-      ],
-      [
-        'Strange Sightings',
-        [{ type: 'currency', id: 'safari-notes', amount: 1000 }],
-        1,
-      ],
-      [
-        'Security Permit',
-        [{ type: 'currency', id: 'safari-notes', amount: 100 }],
-        1,
-      ],
-      [
-        'Catching Permit',
-        [{ type: 'currency', id: 'safari-notes', amount: 500 }],
-        1,
-      ],
-      [
-        'Stamina Notes',
-        [{ type: 'currency', id: 'safari-notes', amount: 50 }],
-        5,
-      ],
-      [
-        'Safari Ball Icon',
-        [{ type: 'currency', id: 'safari-notes', amount: 1000 }],
-        1,
-      ],
-      [
-        'Warden Title',
-        [{ type: 'currency', id: 'safari-notes', amount: 2500 }],
-        1,
-      ],
-    ])
-
-    const taskUnlockItems = store?.items.filter((item) =>
-      item.rewards.some((reward) => reward.type === 'task_complete'),
-    )
-    expect(taskUnlockItems).toHaveLength(10)
-    for (const item of taskUnlockItems || []) {
-      const taskReward = item.rewards.find(
-        (reward) => reward.type === 'task_complete',
-      )
-      const unlockTask = tasks.find(
-        (task) => task.id === String(taskReward?.targetId),
-      )
-      expect(unlockTask?.exitModal?.title, item.id).toBe(item.name)
-      expect(unlockTask?.exitModal?.message, item.id).toMatch(/\b(?:I|me|my)\b/)
-      expect(unlockTask?.exitModal?.closeButtonText, item.id).toBeTruthy()
-    }
-
-    const wardenPermit = tasks.find(
-      (task) => task.id === 'safari-wardens-permit',
-    )
-    expect(wardenPermit).toMatchObject({
-      name: 'Catching Permit',
-      category: 'Secret',
-      secret: true,
-      requirements: [],
-      criteria: [],
-    })
-
-    for (const area of ['central', 'east', 'west', 'north']) {
-      const study = fieldObservationGames.find(
-        (entry) => entry.id === `safari-${area}-field-observation`,
-      )
-      expect(study?.settings.itemDrops).toContainEqual(
-        expect.objectContaining({
-          dropChance: 100,
-          reward: expect.objectContaining({
-            type: 'currency',
-            targetId: 'safari-notes',
-            quantity: 1,
-          }),
-        }),
-      )
-    }
-
-    const corner = celadonGameCornerShops.find(
-      (shop) => shop.id === 'celadon-game-corner-prize-exchange',
-    )
-    expect(
-      corner?.items
-        .filter((item) => item.name.startsWith('Shadow '))
-        .map((item) => [item.name, item.cost, item.rewards[0]?.targetId]),
-    ).toEqual([
-      [
-        'Shadow Mr. Mime',
-        [{ type: 'currency', id: 'fun-tokens', amount: 7000 }],
-        122,
-      ],
-      [
-        'Shadow Lickitung',
-        [{ type: 'currency', id: 'fun-tokens', amount: 7000 }],
-        108,
-      ],
-      [
-        "Shadow Farfetch'd",
-        [{ type: 'currency', id: 'fun-tokens', amount: 7000 }],
-        83,
-      ],
-      [
-        'Shadow Jynx',
-        [{ type: 'currency', id: 'fun-tokens', amount: 7000 }],
-        124,
-      ],
-    ])
   })
 
   test('field research is available after the pass and expedition copies stay hidden', () => {
@@ -1569,8 +1407,8 @@ describe('Fuchsia Gym and Safari progression', () => {
         dropChance: 100,
       },
       {
-        type: 'currency',
-        targetId: 'safari-notes',
+        type: 'guild_xp',
+        targetId: 'fuchsia-research-guild',
         quantity: 1,
         dropChance: 100,
       },
@@ -1727,7 +1565,9 @@ describe('Fuchsia Gym and Safari progression', () => {
     ).toBe(false)
     expect(
       centralFishing?.settings.rods.old?.items?.entries.map((entry) =>
-        entry.currencyId
+        entry.guildId
+          ? [entry.guildId, entry.weight]
+          : entry.currencyId
           ? [entry.currencyId, entry.weight]
           : [entry.itemId, entry.weight],
       ),
@@ -1735,7 +1575,7 @@ describe('Fuchsia Gym and Safari progression', () => {
       ['water-gem', 40],
       ['aqua-solvent-t1', 20],
       ['drake-scale-t1', 20],
-      ['safari-notes', 20],
+      ['fuchsia-research-guild', 20],
     ])
 
     const legacyFishing = fishingGames.find(
@@ -1761,7 +1601,9 @@ describe('Fuchsia Gym and Safari progression', () => {
     ])
     expect(
       legacyFishing?.settings.rods.super?.items?.entries.map((entry) =>
-        entry.currencyId
+        entry.guildId
+          ? [entry.guildId, entry.weight]
+          : entry.currencyId
           ? [entry.currencyId, entry.weight]
           : [entry.itemId, entry.weight],
       ),
@@ -1769,7 +1611,7 @@ describe('Fuchsia Gym and Safari progression', () => {
       ['water-gem', 40],
       ['aqua-solvent-t1', 20],
       ['drake-scale-t1', 20],
-      ['safari-notes', 20],
+      ['fuchsia-research-guild', 20],
     ])
 
     const paldeanTaurosByArea = {

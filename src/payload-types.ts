@@ -228,6 +228,18 @@ export interface User {
       exp?: number | null;
     };
   };
+  /**
+   * Guild membership, cumulative XP, rank, and reward checkpoint data
+   */
+  guilds?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   rankings?: {
     pvp?: {
       /**
@@ -266,7 +278,7 @@ export interface User {
       }[]
     | null;
   /**
-   * Simplifies research, boosts solo battle stats, and disables rivals, PvP, social Trainer pages, Mystery Gift, and High Scores.
+   * Simplifies research, boosts solo battle stats, and disables rivals, PvP, social Trainer pages, Mystery Gift, and Rankings.
    */
   kidMode?: boolean | null;
   powerUsage?: {
@@ -1206,6 +1218,7 @@ export interface UsersSelect<T extends boolean = true> {
               exp?: T;
             };
       };
+  guilds?: T;
   rankings?:
     | T
     | {

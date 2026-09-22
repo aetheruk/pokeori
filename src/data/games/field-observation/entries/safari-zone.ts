@@ -130,8 +130,8 @@ const safariNoteBubble = {
   guaranteed: true,
   secret: true,
   reward: {
-    type: 'currency' as const,
-    targetId: 'safari-notes',
+    type: 'guild_xp' as const,
+    targetId: 'fuchsia-research-guild',
     quantity: 1,
     dropChance: 100,
     guaranteed: true,

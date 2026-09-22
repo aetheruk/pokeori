@@ -133,6 +133,14 @@ export const Users: CollectionConfig = {
       })),
     },
     {
+      name: 'guilds',
+      type: 'json',
+      defaultValue: {},
+      admin: {
+        description: 'Guild membership, cumulative XP, rank, and reward checkpoint data',
+      },
+    },
+    {
       name: 'rankings',
       type: 'group',
       fields: [

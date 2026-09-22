@@ -317,16 +317,16 @@ describe('field observation research mode', () => {
       itemId: 'charred-wood',
       dropChance: 100,
     }))
-    const safariNoteDrop = {
-      id: 'safari-note-bubble',
+    const guildNoteDrop = {
+      id: 'guild-note-bubble',
       itemId: 'researchers-journal-page',
-      label: 'Safari Note',
+      label: 'Guild XP',
       dropChance: 100,
       guaranteed: true,
       secret: true,
       reward: {
-        type: 'currency' as const,
-        targetId: 'safari-notes',
+        type: 'guild_xp' as const,
+        targetId: 'fuchsia-research-guild',
         quantity: 1,
         dropChance: 100,
         guaranteed: true,
@@ -340,7 +340,7 @@ describe('field observation research mode', () => {
       researchingLevel: 1,
       surveyFocus: 'standard',
       observationDurationMs: 20_000,
-      globalItemEvents: [...ordinaryDrops, safariNoteDrop],
+      globalItemEvents: [...ordinaryDrops, guildNoteDrop],
       random: () => 0.99,
     })
 
@@ -348,10 +348,10 @@ describe('field observation research mode', () => {
     expect(drops).toContainEqual(
       expect.objectContaining({
         itemId: 'researchers-journal-page',
-        label: 'Safari Note',
+        label: 'Guild XP',
         reward: expect.objectContaining({
-          type: 'currency',
-          targetId: 'safari-notes',
+          type: 'guild_xp',
+          targetId: 'fuchsia-research-guild',
           guaranteed: true,
         }),
       }),

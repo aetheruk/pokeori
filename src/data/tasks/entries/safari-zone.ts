@@ -9,8 +9,8 @@ const billiamIcon = { type: 'trainer' as const, id: 'gamer' }
 const researcherIcon = { type: 'trainer' as const, id: 'researcher-f' }
 
 const safariNoteReward = {
-  type: 'currency' as const,
-  targetId: 'safari-notes',
+  type: 'guild_xp' as const,
+  targetId: 'fuchsia-research-guild',
   quantity: 1,
   dropChance: 100,
 }
@@ -184,17 +184,17 @@ const safariCreditTasks: Task[] = [
         title: 'Safari Zone Researcher',
         icon: researcherIcon,
         message:
-          "Sorry you left in such a rush before we didn't get to explain the institute's share-and-share-alike policy. Basically, any notes you make while researching the Safari Zone are invaluable to the institute, and we look after our top researchers.",
+          "Sorry you left in such a rush before we explained the Guild charter. Every Safari field note you submit builds your standing with the Institute. Higher ranks open new surveys, permits, archive records, and honours automatically.",
         buttons: [{ text: 'Sounds Good!', type: 'success' }],
       },
     ],
     exitModal: {
       background: '/backgrounds/safari-reserve.avif',
-      title: 'Research Credit',
+      title: 'Guild Field Notes',
       icon: researcherIcon,
       message:
-        'Apparently just by jotting down my notes I can get rewarded, excellent!',
-      closeButtonText: 'Visit the Research Exchange',
+        'Every useful observation adds to my Guild XP. I should check the Guild Hall to see what each rank opens.',
+      closeButtonText: 'Review the Guild Charter',
     },
   },
   {
@@ -222,7 +222,7 @@ const safariCreditTasks: Task[] = [
       },
     ],
     rewards: [
-      { type: 'currency', targetId: 'safari-notes', quantity: 10, dropChance: 100 },
+      { type: 'guild_xp', targetId: 'fuchsia-research-guild', quantity: 10, dropChance: 100 },
     ],
   },
   {
@@ -628,7 +628,15 @@ export const safariZoneTasks: Task[] = ([
     completeButtonText: 'Register for Membership',
     requirements: [{ type: 'task_completed', targetId: 'fuchsia-research-institute-exam-results' }],
     criteria: [{ type: 'currency_owned', targetId: 'pokedollars', count: 2000, consume: true }],
-    rewards: [{ type: 'item', targetId: 'safari-research-pass', quantity: 1, dropChance: 100 }],
+    rewards: [
+      { type: 'item', targetId: 'safari-research-pass', quantity: 1, dropChance: 100 },
+      {
+        type: 'guild_membership',
+        targetId: 'fuchsia-research-guild',
+        quantity: 1,
+        dropChance: 100,
+      },
+    ],
     enterModal: [
       {
         id: 1,

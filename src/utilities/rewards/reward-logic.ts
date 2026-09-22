@@ -44,6 +44,12 @@ import type { RequirementEvaluationContext } from '@/utilities/requirements'
 import { calculateStats } from '@/utilities/pokemon/pokemon-mechanics'
 import { getOwnedPokemonGender, rollPokemonGender } from '@/utilities/pokemon/gender'
 import type { ExtendedUser, SkillsData, CurrencyData } from '@/types/user-data'
+import type { GuildsData } from '@/types/user-data'
+import {
+  getGuild,
+  getGuildMaxXp,
+  getGuildRankForXp,
+} from '@/data/guilds'
 import { UserDataConverters } from '@/types/user-data'
 import {
   addPokedexCaughtRarity,
@@ -129,6 +135,8 @@ export interface RewardSummary {
     skillXpGranted: number
   }[]
   skillExperience?: SkillExperienceReward[]
+  guildExperience?: GuildExperienceReward[]
+  guildRankUps?: GuildRankUpReward[]
   pokemonExperience?: PokemonExperienceReward[]
   eggs?: { id: string; hatchAt: string; rarity: PokemonRarityId }[]
   levelUp?: {
@@ -137,6 +145,25 @@ export interface RewardSummary {
     skillId: string
     rewards: (SkillLevelReward & { level: number })[]
   }
+}
+
+export interface GuildExperienceReward {
+  guildId: string
+  guildName: string
+  amount: number
+  oldExperience: number
+  newExperience: number
+  oldRank: number
+  newRank: number
+}
+
+export interface GuildRankUpReward {
+  guildId: string
+  guildName: string
+  oldRank: number
+  newRank: number
+  rankName: string
+  unlocks: string[]
 }
 
 export interface PokemonExperienceReward {
@@ -320,6 +347,7 @@ export async function grantRewards(
 
   const extendedUser = user as ExtendedUser
   const userSkills: SkillsData = extendedUser.skills || {}
+  const userGuilds: GuildsData = extendedUser.guilds || {}
 
   // Re-roll lastRoll for the user
   const newRoll = Math.floor(Math.random() * 1000000) + 1
@@ -375,6 +403,8 @@ export async function grantRewards(
     researchXp: [],
     researchBreakthroughs: [],
     skillExperience: [],
+    guildExperience: [],
+    guildRankUps: [],
     pokemonExperience: [],
     eggs: [],
   }
@@ -755,6 +785,79 @@ export async function grantRewards(
       ).toLowerCase()
       xpUpdates[skill] = (xpUpdates[skill] || 0) + quantity
       summary.xp[skill] = (summary.xp[skill] || 0) + quantity
+    } else if (reward.type === 'guild_membership' && reward.targetId) {
+      const guildId = String(reward.targetId)
+      const guild = getGuild(guildId)
+      if (!guild || userGuilds[guildId]?.rank) return
+
+      const joinedAt = new Date().toISOString()
+      userGuilds[guildId] = {
+        rank: 1,
+        xp: 0,
+        joinedAt,
+        rewardedThroughRank: 1,
+      }
+      summary.guildRankUps?.push({
+        guildId,
+        guildName: guild.name,
+        oldRank: 0,
+        newRank: 1,
+        rankName: guild.ranks[0]?.name || 'Member',
+        unlocks: guild.ranks[0]?.unlocks || [],
+      })
+    } else if (reward.type === 'guild_xp' && reward.targetId) {
+      const guildId = String(reward.targetId)
+      const guild = getGuild(guildId)
+      const current = userGuilds[guildId]
+      if (!guild || !current?.rank) return
+
+      const oldExperience = Math.max(0, Math.floor(current.xp || 0))
+      const oldRank = Math.max(1, Math.floor(current.rank || 1))
+      const newExperience = Math.min(
+        getGuildMaxXp(guild),
+        oldExperience + Math.max(0, Math.floor(quantity)),
+      )
+      const newRank = getGuildRankForXp(guild, newExperience)
+      const amount = newExperience - oldExperience
+      current.xp = newExperience
+      current.rank = newRank
+      current.rewardedThroughRank = Math.max(
+        1,
+        Math.floor(current.rewardedThroughRank || 1),
+      )
+
+      if (amount > 0) {
+        summary.guildExperience?.push({
+          guildId,
+          guildName: guild.name,
+          amount,
+          oldExperience,
+          newExperience,
+          oldRank,
+          newRank,
+        })
+      }
+
+      for (
+        let rank = (current.rewardedThroughRank || 1) + 1;
+        rank <= newRank;
+        rank += 1
+      ) {
+        const definition = guild.ranks.find((entry) => entry.rank === rank)
+        if (!definition) continue
+        for (const rankReward of definition.rewards || []) {
+          await processReward(rankReward)
+        }
+        current.rewardedThroughRank = rank
+        summary.guildRankUps?.push({
+          guildId,
+          guildName: guild.name,
+          oldRank: rank - 1,
+          newRank: rank,
+          rankName: definition.name,
+          unlocks: definition.unlocks,
+        })
+      }
     } else if (reward.type === 'currency') {
       const type = (reward.targetId as string) || 'crystals'
       currencyUpdates[type] = (currencyUpdates[type] || 0) + quantity
@@ -802,7 +905,7 @@ export async function grantRewards(
       )
       tasksChanged = true
 
-      if (taskDef.exitModal) {
+      if (taskDef.exitModal && !reward.suppressExitModal) {
         summary.taskExitModals?.push(taskDef.exitModal)
       }
 
@@ -1050,6 +1153,7 @@ export async function grantRewards(
   // Note: Using 'as any' because Payload expects flexible JSON field types
   const updateData: any = {
     skills: userSkills,
+    guilds: userGuilds,
     currency: currency,
     lastRoll: newRoll,
   }

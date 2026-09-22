@@ -13,7 +13,6 @@ const currencyTypeSchema = z.enum([
   'berry-powder',
   'prof-scrip',
   'league-ticket',
-  'safari-notes',
 ])
 
 const taskIconSchema = z.object({
@@ -99,6 +98,7 @@ export const taskConditionSchema: z.ZodType<any> = z.lazy(() =>
         'total_evolutions',
         'voyage_completed',
         'skill_level',
+        'guild_rank',
         'user_banner',
         'user_icon',
         'user_title',
@@ -176,6 +176,8 @@ export const rewardSchema = z
       'increase_max_boxes',
       'pokemon_research_xp',
       'pokemon_experience',
+      'guild_membership',
+      'guild_xp',
     ]),
     targetId: z.union([z.string(), z.number()]).optional(),
     skill: z.string().optional(),
@@ -185,6 +187,7 @@ export const rewardSchema = z
     dropChance: z.number().min(0).max(100).optional(),
     guaranteed: z.boolean().optional(),
     secret: z.boolean().optional(),
+    suppressExitModal: z.boolean().optional(),
     label: z.string().optional(),
     icon: taskIconSchema.optional(),
     pokemonData: z.record(z.string(), z.unknown()).optional(),

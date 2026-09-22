@@ -33,6 +33,7 @@ export interface FishingPokemonEntry {
 export interface FishingItemEntry {
   itemId?: string
   currencyId?: string
+  guildId?: string
   weight: number
   symbol: string
   reactionTime: number

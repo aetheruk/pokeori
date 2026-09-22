@@ -51,6 +51,7 @@ function ExploreGridComponent({
       location: 'Locations',
       battle: 'Trainer Battles',
       game: 'Mini Games',
+      guild: 'Guilds',
       shop: 'Shops',
       voyage: 'Voyages',
       expedition: 'Expeditions',
@@ -68,6 +69,7 @@ function ExploreGridComponent({
       'location',
       'battle',
       'game',
+      'guild',
       'shop',
       'voyage',
       'chronicle',
@@ -83,6 +85,9 @@ function ExploreGridComponent({
       }
       if (item.type === 'task' && item.isChallenge) {
         groupType = 'challenge'
+      }
+      if (item.type === 'shop' && (item.originalData as any).guildId) {
+        groupType = 'guild'
       }
       if (
         item.type === 'task' &&

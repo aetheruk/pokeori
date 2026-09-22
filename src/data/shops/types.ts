@@ -21,6 +21,7 @@ export interface ShopItem {
 
 export interface ShopConfig {
   id: string
+  guildId?: string
   hide?: string
   name: string
   description: string

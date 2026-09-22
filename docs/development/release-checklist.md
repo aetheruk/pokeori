@@ -43,6 +43,7 @@ changes.
 - For 0.1.1, run `migrate:performance-indexes` prepare and finalize phases using the performance runbook; never let production Payload auto-build these indexes at startup.
 - For the 0.1.0 activity split, run `bun run migrate:game-activity-domains --dry-run`, review the counts, then run `bun run migrate:game-activity-domains`.
 - For the 0.13.0 Gym Chronicle rebuild, run `bun scripts/reset-gym-chronicles-v2.js --dry-run` inside the deployed production container, review the counts, then run `bun scripts/reset-gym-chronicles-v2.js`. The command is bundled in the image and must not be run before the v2 image is live.
+- For the 0.38.0 Fuchsia Guild release, back up MongoDB, run `bun run migrate:fuchsia-guild --dry-run`, review eligible-user XP and rank totals, then run `bun run migrate:fuchsia-guild`. The idempotent migration must run before reopening Safari progression to players.
 - Confirm Redis is reachable and TLS settings match the deployment environment.
 - Confirm `/api/health` checks MongoDB, replica-set transaction support, and Dragonfly, and Coolify reports one healthy application replica.
 - Deploy to staging first when available.

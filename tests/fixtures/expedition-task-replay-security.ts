@@ -7,14 +7,14 @@ const safariTask: any = {
   expeditionOnly: true,
   requirements: [],
   criteria: [],
-  rewards: [{ type: 'currency', targetId: 'safari-notes', quantity: 1 }],
+  rewards: [{ type: 'currency', targetId: 'pokedollars', quantity: 1 }],
 }
 const fixedExpeditionTask: any = {
   id: 'fuchsia-gym-koga-rewards',
   repeatable: true,
   requirements: [],
   criteria: [],
-  rewards: [{ type: 'currency', targetId: 'safari-notes', quantity: 1 }],
+  rewards: [{ type: 'currency', targetId: 'pokedollars', quantity: 1 }],
 }
 const user: any = { id: 'expedition-audit-user', currency: {} }
 const completedTasks: Record<string, any> = {}

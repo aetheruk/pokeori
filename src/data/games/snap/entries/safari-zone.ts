@@ -22,8 +22,8 @@ const safariExpeditionSnapEntries: SnapConfig[] =
         dropChance: 100,
       },
       {
-        type: 'currency',
-        targetId: 'safari-notes',
+        type: 'guild_xp',
+        targetId: 'fuchsia-research-guild',
         quantity: 1,
         dropChance: 100,
       },

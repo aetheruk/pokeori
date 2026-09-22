@@ -15,6 +15,7 @@ import { expeditions } from '@/data/expeditions'
 import { artisanRecipes } from '@/data/artisan'
 import { items } from '@/data/items/all-items'
 import { currencies } from '@/data/currencies'
+import { guilds } from '@/data/guilds'
 import { getAllMoves } from '@/data/moves'
 import { ALL_TM_MOVES } from '@/data/moves/tms'
 import { ABILITIES, rollNaturalFormAbility } from '@/data/abilities'
@@ -54,6 +55,7 @@ const ids = {
   expedition: new Set(expeditions.map((entry) => entry.id)),
   item: new Set(items.map((entry) => entry.id)),
   currency: new Set(currencies.map((entry) => entry.id)),
+  guild: new Set(guilds.map((entry) => entry.id)),
   move: new Set(getAllMoves().map((entry) => entry.id)),
 }
 
@@ -277,6 +279,8 @@ describe('static data references', () => {
             ? ids.item
             : condition.type === 'currency_owned'
               ? ids.currency
+              : condition.type === 'guild_rank'
+                ? ids.guild
               : condition.type === 'task_completed'
                 ? ids.task
                 : condition.type === 'daily_not_completed'
@@ -311,7 +315,7 @@ describe('static data references', () => {
     expect(broken).toEqual([])
   })
 
-  test('reward targets resolve for item, currency, and task rewards', () => {
+  test('reward targets resolve for item, currency, guild, and task rewards', () => {
     const broken: Array<{ owner: string; type: string; targetId: unknown }> = []
 
     eachReward((reward, owner) => {
@@ -323,6 +327,8 @@ describe('static data references', () => {
           ? ids.item
           : reward.type === 'currency'
             ? ids.currency
+            : reward.type === 'guild_membership' || reward.type === 'guild_xp'
+              ? ids.guild
             : reward.type === 'task_complete'
               ? ids.task
               : null
@@ -784,8 +790,13 @@ describe('static data references', () => {
       )) {
         for (const entry of rodConfig?.items?.entries || []) {
           if (!entry.itemId) {
-            expect(entry.currencyId).toBeDefined()
-            expect(ids.currency.has(entry.currencyId!)).toBe(true)
+            expect(entry.currencyId || entry.guildId).toBeDefined()
+            if (entry.currencyId) {
+              expect(ids.currency.has(entry.currencyId)).toBe(true)
+            }
+            if (entry.guildId) {
+              expect(ids.guild.has(entry.guildId)).toBe(true)
+            }
             continue
           }
           if (!ids.item.has(entry.itemId)) {
