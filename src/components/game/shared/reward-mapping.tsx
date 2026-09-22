@@ -273,7 +273,7 @@ export function mapRewardToDisplayItem(
       break
     }
     case 'guild_xp': {
-      label = `Fuchsia Guild XP${quantityStr ? ` ${quantityStr}` : ''}`
+      label = `Fuchsia Research Institute XP${quantityStr ? ` ${quantityStr}` : ''}`
       icon = (
         <div className="relative h-8 w-8">
           <ItemSprite

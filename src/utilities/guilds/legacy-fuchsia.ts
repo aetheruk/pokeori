@@ -1,7 +1,33 @@
 import { getGuildMaxXp, getGuildRankForXp } from '@/data/guilds'
 import { fuchsiaResearchGuild } from '@/data/guilds/fuchsia-research'
+import type { GuildProgressData } from '@/types/user-data'
 
 export const FUCHSIA_GUILD_ID = 'fuchsia-research-guild'
+
+export function calculateFuchsiaInstituteBalanceV2({
+  progress,
+  hasCatchingPermit,
+}: {
+  progress: GuildProgressData
+  hasCatchingPermit: boolean
+}) {
+  const currentXp = Math.max(0, Math.floor(progress.xp || 0))
+  const xp = hasCatchingPermit
+    ? Math.min(getGuildMaxXp(fuchsiaResearchGuild), currentXp + 100)
+    : 0
+  const rank = getGuildRankForXp(fuchsiaResearchGuild, xp)
+  const rewardedThroughRank = Math.max(
+    rank,
+    Math.min(
+      10,
+      Math.floor(progress.rewardedThroughRank || progress.rank || 1) < 9
+        ? Math.floor(progress.rewardedThroughRank || progress.rank || 1) + 1
+        : Math.floor(progress.rewardedThroughRank || progress.rank || 1),
+    ),
+  )
+
+  return { xp, rank, rewardedThroughRank }
+}
 
 export const LEGACY_SAFARI_PURCHASE_COSTS: Record<string, number> = {
   'safari-credit-fishing-research-notes': 200,

@@ -227,27 +227,27 @@ describe('task_complete reward cascading', () => {
       {
         type: 'guild_xp',
         targetId: 'fuchsia-research-guild',
-        quantity: 100,
+        quantity: 250,
       },
     ], transactionOptions)
 
     expect(summary.guildExperience).toContainEqual(
       expect.objectContaining({
         guildId: 'fuchsia-research-guild',
-        amount: 100,
+        amount: 250,
         oldRank: 1,
-        newRank: 2,
+        newRank: 3,
       }),
     )
-    expect(summary.guildRankUps?.map((entry) => entry.newRank)).toEqual([1, 2])
+    expect(summary.guildRankUps?.map((entry) => entry.newRank)).toEqual([1, 2, 3])
     expect(completedTasksState['safari-extra-habitat-field-notes']?.count).toBe(1)
     expect(completedTasksState['safari-stamina-notes']?.count).toBe(1)
     expect(summary.taskExitModals).toEqual([])
     expect(payloadMock.update.mock.calls.at(-1)?.[0].data.guilds).toMatchObject({
       'fuchsia-research-guild': {
-        rank: 2,
-        xp: 100,
-        rewardedThroughRank: 2,
+        rank: 3,
+        xp: 250,
+        rewardedThroughRank: 3,
       },
     })
   })

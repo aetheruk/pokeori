@@ -137,6 +137,7 @@ export interface GuildProgressData {
   joinedAt?: string | null
   rewardedThroughRank?: number | null
   legacyImportedAt?: string | null
+  instituteBalanceV2MigratedAt?: string | null
 }
 
 export type GuildsData = Record<string, GuildProgressData | undefined>

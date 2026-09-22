@@ -20,7 +20,7 @@ function usage() {
   console.log(`Usage: bun run migrate:fuchsia-guild [--dry-run]
 
 Converts legacy Safari Notes plus recorded Research Exchange spending into
-cumulative Fuchsia Research Guild XP. The migration is idempotent.`)
+cumulative Fuchsia Research Institute XP. The migration is idempotent.`)
 }
 
 async function main() {

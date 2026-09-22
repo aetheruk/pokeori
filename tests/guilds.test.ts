@@ -5,7 +5,10 @@ import {
   getGuildRankForXp,
 } from '@/data/guilds'
 import { getRequirementProgress } from '@/utilities/requirements'
-import { calculateLegacyFuchsiaGuildXp } from '@/utilities/guilds/legacy-fuchsia'
+import {
+  calculateFuchsiaInstituteBalanceV2,
+  calculateLegacyFuchsiaGuildXp,
+} from '@/utilities/guilds/legacy-fuchsia'
 
 describe('guild progression', () => {
   const guild = getGuild('fuchsia-research-guild')!
@@ -31,7 +34,7 @@ describe('guild progression', () => {
           reward.targetId === 'safari-stamina-notes',
       ),
     )
-    expect(staminaRanks.map((rank) => rank.rank)).toEqual([2, 4, 6, 7, 8])
+    expect(staminaRanks.map((rank) => rank.rank)).toEqual([3, 4, 5, 6, 7])
   })
 
   test('reports rank zero for a player who has not joined', () => {
@@ -78,6 +81,35 @@ describe('guild progression', () => {
         count: 5,
       }),
     ).toEqual({ current: 4, target: 5, completed: false })
+  })
+})
+
+describe('Fuchsia Institute balance v2 conversion', () => {
+  test('adds the Catching Permit award and preserves shifted legacy rewards', () => {
+    expect(
+      calculateFuchsiaInstituteBalanceV2({
+        progress: { rank: 7, xp: 2661, rewardedThroughRank: 7 },
+        hasCatchingPermit: true,
+      }),
+    ).toEqual({ rank: 7, xp: 2761, rewardedThroughRank: 8 })
+  })
+
+  test('removes pre-permit Institute XP without forgetting grandfathered rewards', () => {
+    expect(
+      calculateFuchsiaInstituteBalanceV2({
+        progress: { rank: 2, xp: 120, rewardedThroughRank: 2 },
+        hasCatchingPermit: false,
+      }),
+    ).toEqual({ rank: 1, xp: 0, rewardedThroughRank: 3 })
+  })
+
+  test('leaves the capstone available to legacy Deputy Wardens', () => {
+    expect(
+      calculateFuchsiaInstituteBalanceV2({
+        progress: { rank: 9, xp: 7000, rewardedThroughRank: 9 },
+        hasCatchingPermit: true,
+      }),
+    ).toEqual({ rank: 9, xp: 7100, rewardedThroughRank: 9 })
   })
 })
 

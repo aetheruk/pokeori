@@ -136,6 +136,12 @@ const safariNoteBubble = {
     dropChance: 100,
     guaranteed: true,
     secret: true,
+    requirements: [
+      {
+        type: 'item_owned' as const,
+        targetId: 'safari-catching-permit',
+      },
+    ],
   },
 }
 

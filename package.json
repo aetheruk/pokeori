@@ -1,6 +1,6 @@
 {
   "name": "pokeori",
-  "version": "0.38.3",
+  "version": "0.39.0",
   "description": "Pokeori field-journal adventure game",
   "license": "MIT",
   "type": "module",
@@ -40,6 +40,7 @@
     "migrate:performance-indexes": "bun scripts/migrate-performance-indexes.ts",
     "migrate:pokemon-experience": "bun scripts/migrate-pokemon-experience.ts",
     "migrate:fuchsia-guild": "bun scripts/run-fuchsia-guild-migration.ts",
+    "migrate:fuchsia-institute-v2": "bun scripts/run-fuchsia-institute-balance-v2.ts",
     "sync:tcg-sprites": "bun scripts/sync-tcg-set-sprites.mjs",
     "fetch:pokemon": "bun scripts/fetch-pokemon-data.mjs",
     "generate:pokemon": "bun scripts/generate-pokemon-modules.mjs",
