@@ -13,6 +13,7 @@ import {
 import { buildBattleWinRewards } from './win-rewards'
 import { persistConsumedHeldItems, persistHeldItemBattleWinEffects } from './held-items'
 import { persistPokemonBattleKOs } from './pokemon-ko-credit'
+import { persistPokemonBattleEvs } from './pokemon-ev-rewards'
 
 async function settlePendingSketchedMoves(
   state: BattleState,
@@ -126,6 +127,8 @@ async function settleBattleWin(
     }, { payload, req })
     return
   }
+
+  await persistPokemonBattleEvs(state, payload)
 
   const rewardsToGrant = buildBattleWinRewards(state, user, battleConfig)
   const { summary } = await grantRewards(user.id, rewardsToGrant, {

@@ -10,6 +10,7 @@ import type { HTMLAttributes } from 'react'
 import { PokemonRarityEggSprite } from '@/components/game/shared/PokemonRarityEggSprite'
 import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { PokemonExperienceRewardList } from '@/components/game/shared/pokemon-experience-reward-list'
+import { PokemonResearchExperienceRewardList } from '@/components/game/shared/pokemon-research-experience-reward-list'
 import { SkillExperienceRewardList } from '@/components/game/shared/skill-experience-reward-list'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { CurrencySprite } from '@/components/ui/currency-sprite'
@@ -161,28 +162,7 @@ export function RewardSummaryDisplay({
         <>
           <SectionDivider>Research</SectionDivider>
           <div className="space-y-0">
-            {(summary.researchXp || []).map((res, i) => (
-              <RewardLedgerRow
-                key={`research-xp-${i}`}
-                className="h-12 flex-row items-center gap-2 border-game-border bg-game-surface-raised p-2 sm:gap-3"
-              >
-                <div className="relative flex h-8 w-8 shrink-0 items-center justify-center p-0.5">
-                  <Image
-                    src={getPokemonImageUrl(res.formId, 'sprite')}
-                    alt={res.formName}
-                    width={28}
-                    height={28}
-                    className="h-full w-full object-contain pixelated"
-                  />
-                </div>
-                <div className="flex min-w-0 flex-1 items-center justify-between gap-2 sm:pr-2">
-                  <span className="truncate text-sm font-medium text-game-ink">
-                    {res.formName} Research
-                  </span>
-                  <span className={REWARD_VALUE_CLASS}>+{res.amount} XP</span>
-                </div>
-              </RewardLedgerRow>
-            ))}
+            <PokemonResearchExperienceRewardList entries={summary.researchXp || []} />
 
             {researchItems.map((item, i) => (
               <RewardLedgerRow

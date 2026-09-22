@@ -885,7 +885,7 @@ describe('battle item effects', () => {
   test('training bands grant one matching EV on battle wins and roll consumption', () => {
     const pokemon = makeBattlePokemon({
       heldItem: { id: 'speed-band', name: 'Speed Band' },
-      evs: { speed: 254 },
+      evs: { speed: 251 },
     })
 
     const effects = collectHeldItemBattleWinEffects([pokemon], () => 0.01)
@@ -931,10 +931,10 @@ describe('battle item effects', () => {
     expect(pokemon.consumedHeldItems).toBeUndefined()
   })
 
-  test('training bands do not award EVs past the 255 stat cap', () => {
+  test('training bands do not award EVs past the 252 stat cap', () => {
     const pokemon = makeBattlePokemon({
       heldItem: { id: 'attack-band', name: 'Attack Band' },
-      evs: { attack: 255 },
+      evs: { attack: 252 },
     })
 
     const effects = collectHeldItemBattleWinEffects([pokemon], () => 0)

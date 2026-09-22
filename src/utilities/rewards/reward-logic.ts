@@ -118,6 +118,10 @@ export interface RewardSummary {
     formName: string
     amount: number
     isCompanion?: boolean
+    oldExperience?: number
+    newExperience?: number
+    oldLevel?: number
+    newLevel?: number
   }[]
   researchBreakthroughs?: {
     formId: string
@@ -906,6 +910,10 @@ export async function grantRewards(
           formName: pokemonName,
           amount: quantity,
           isCompanion: reward.isCompanion === true,
+          oldExperience: oldXp,
+          newExperience: newXp,
+          oldLevel,
+          newLevel: maxAchievableLevel,
         })
 
         if (hasBreakthrough) {

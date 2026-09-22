@@ -7,6 +7,15 @@ export interface PokemonStats {
   speed: number;
 }
 
+export interface PokemonEVYield {
+  hp: number;
+  attack: number;
+  defense: number;
+  specialAttack: number;
+  specialDefense: number;
+  speed: number;
+}
+
 export interface PokemonForm {
   id: string;
   height: number;
@@ -16,6 +25,7 @@ export interface PokemonForm {
   form: string;
   types: string[];
   stats: PokemonStats;
+  evYield: PokemonEVYield;
 }
 
 export type PokemonGrowthRate =

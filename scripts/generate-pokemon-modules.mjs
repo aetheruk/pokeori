@@ -77,6 +77,9 @@ function generatePokemonModule() {
   const statsMap = new Map(
     pokemonStats.map((s) => [`${s.pokemon_id}_${s.stat_id}`, parseInt(s.base_stat)]),
   )
+  const effortYieldMap = new Map(
+    pokemonStats.map((s) => [`${s.pokemon_id}_${s.stat_id}`, parseInt(s.effort || 0)]),
+  )
   const typeNamesMap = new Map(
     typeNames.map((t) => [`${t.type_id}_${t.local_language_id}`, t.name]),
   )
@@ -204,6 +207,15 @@ function generatePokemonModule() {
     speed: statsMap.get(`${pokemonId}_6`) || 0,
   })
 
+  const getEffortYieldForPokemon = (pokemonId) => ({
+    hp: effortYieldMap.get(`${pokemonId}_1`) || 0,
+    attack: effortYieldMap.get(`${pokemonId}_2`) || 0,
+    defense: effortYieldMap.get(`${pokemonId}_3`) || 0,
+    specialAttack: effortYieldMap.get(`${pokemonId}_4`) || 0,
+    specialDefense: effortYieldMap.get(`${pokemonId}_5`) || 0,
+    speed: effortYieldMap.get(`${pokemonId}_6`) || 0,
+  })
+
   console.log('Generating Pokemon data...')
 
   // Build the final Pokemon data structure
@@ -280,6 +292,7 @@ function generatePokemonModule() {
 
       const types = getTypesForPokemon(pokemonId)
       const stats = getStatsForPokemon(pokemonId)
+      const evYield = getEffortYieldForPokemon(pokemonId)
 
       speciesData.forms.push({
         id: formId,
@@ -290,6 +303,7 @@ function generatePokemonModule() {
         form,
         types,
         stats,
+        evYield,
       })
 
       const syntheticForms = formGroup.filter(
@@ -323,6 +337,7 @@ function generatePokemonModule() {
           form: syntheticFormLabel,
           types: [...types],
           stats: { ...stats },
+          evYield: { ...evYield },
         })
       })
     })
@@ -488,6 +503,15 @@ function exportPokemonData(pokemonData) {
   speed: number;
 }
 
+export interface PokemonEVYield {
+  hp: number;
+  attack: number;
+  defense: number;
+  specialAttack: number;
+  specialDefense: number;
+  speed: number;
+}
+
 export interface PokemonForm {
   id: string;
   height: number;
@@ -497,6 +521,7 @@ export interface PokemonForm {
   form: string;
   types: string[];
   stats: PokemonStats;
+  evYield: PokemonEVYield;
 }
 
 export type PokemonGrowthRate =
