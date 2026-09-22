@@ -15,6 +15,7 @@ import { celadonGameCornerShops } from '@/data/shops/entries/celadon-game-corner
 import { safariZoneShops } from '@/data/shops/entries/safari-zone'
 import { subCategories } from '@/data/sub-region-map'
 import { tasks } from '@/data/tasks'
+import type { TaskCondition } from '@/data/tasks/types'
 import { getIcon } from '@/data/user/icons'
 import { getTitle } from '@/data/user/titles'
 import {
@@ -1258,7 +1259,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     })
   })
 
-  test('Institute rank chats explain Ranks 3 through 10 without gating rewards', () => {
+  test('Institute rank chats explain Ranks 3 through 10 in order without gating rewards', () => {
     const rankChats = tasks
       .filter((task) => task.id.startsWith('fuchsia-institute-rank-'))
       .sort((left, right) => {
@@ -1276,13 +1277,22 @@ describe('Fuchsia Gym and Safari progression', () => {
       expect(task.chat, task.id).toBe(true)
       expect(task.subCategory, task.id).toBe('Fuchsia City')
       expect(task.background, task.id).toBe('/backgrounds/lab.avif')
-      expect(task.requirements, task.id).toEqual([
+      const expectedRequirements: TaskCondition[] = [
         {
           type: 'guild_rank',
           targetId: 'fuchsia-research-guild',
           count: index + 3,
         },
-      ])
+      ]
+
+      if (index > 0) {
+        expectedRequirements.push({
+          type: 'task_completed',
+          targetId: rankChats[index - 1]!.id,
+        })
+      }
+
+      expect(task.requirements, task.id).toEqual(expectedRequirements)
       expect(task.criteria, task.id).toEqual([])
       expect(task.rewards, task.id).toEqual([])
 
