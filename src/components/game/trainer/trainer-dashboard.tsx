@@ -3,7 +3,11 @@
 import { useRouter } from 'next/navigation'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { GamePageSkeleton } from '@/components/game/shared/GamePageSkeleton'
-const EventStudio = lazy(() => import('@/components/game/events/event-studio').then(module => ({ default: module.EventStudio })))
+const EventStudio = lazy(() =>
+  import('@/components/game/events/event-studio').then((module) => ({
+    default: module.EventStudio,
+  })),
+)
 
 const TrainerLeveling = lazy(() =>
   import('@/components/game/trainer-leveling').then((module) => ({
@@ -50,7 +54,7 @@ import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBa
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { useUser } from '@/context/UserContext'
-import { getBanner, getIcon } from '@/data/user'
+import { getBanner, getIcon, getTitle } from '@/data/user'
 import type { TaskIcon } from '@/data/tasks/types'
 import { tcgSetSummaries } from '@/data/tcg/summaries'
 import { cn } from '@/lib/utils'
@@ -87,9 +91,16 @@ export function TrainerDashboard({
   const deckGenerations = getTcgSeriesInReleaseOrder(tcgSetSummaries)
   const [deckGeneration, setDeckGeneration] = useState(deckGenerations[0] || '')
   const [deckFormat, setDeckFormat] = useState<DeckFormat>('baby')
+  const trainerBanner =
+    getBanner(user?.banner || 'lab')?.imagePath || '/backgrounds/lab.avif'
+  const trainerIcon = getIcon(user?.icon || 'ditto')?.icon || {
+    type: 'pokemon',
+    id: '132',
+  }
+  const trainerTitle =
+    getTitle(user?.title || 'new-beginnings')?.name || 'Trainer'
   const sectionIcons: Record<TrainerSection, TaskIcon> = {
-    profile:
-      getIcon(user?.icon || 'ditto')?.icon || { type: 'pokemon', id: '132' },
+    profile: trainerIcon,
     events: { type: 'item', id: 'master-ball' },
     decks: { type: 'local', id: 'images/tcg-back.avif' },
     trainers: { type: 'item', id: 'vs-seeker' },
@@ -120,8 +131,7 @@ export function TrainerDashboard({
       id: 'profile' as const,
       label: user?.trainerName || 'Trainer',
       description: 'Skills and trainer progress',
-      background:
-        getBanner(user?.banner || 'lab')?.imagePath || '/backgrounds/lab.avif',
+      background: trainerBanner,
       component: (
         <LazyWrapper>
           <TrainerLeveling />
@@ -223,8 +233,6 @@ export function TrainerDashboard({
     }
   }, [activeTab, hasDeckBox, isKidMode, router, user?.isAdmin])
 
-  const activeSection = TABS.find((tab) => tab.id === activeTab) || TABS[0]
-
   return (
     <div className="game-paper-first game-paper-background flex h-full flex-col overflow-hidden bg-game-canvas text-game-ink">
       <div className="min-h-0 flex-1 overflow-hidden lg:grid lg:grid-cols-[16rem_minmax(0,1fr)]">
@@ -291,10 +299,10 @@ export function TrainerDashboard({
       <SecondaryControlBar className="lg:hidden">
         <div className="space-y-3">
           <ScenicChoiceCard
-            background={activeSection.background}
-            title={activeSection.label}
-            description="Choose another trainer section"
-            icon={renderSectionIcon(activeSection.id)}
+            background={trainerBanner}
+            title={user?.trainerName || 'Trainer'}
+            description={trainerTitle}
+            icon={<TaskIconDisplay icon={trainerIcon} className="h-10 w-10" />}
             iconPosition="left"
             onClick={() => setSectionDrawerOpen(true)}
             className="min-h-20"
@@ -337,8 +345,17 @@ export function TrainerDashboard({
       <ResponsivePanel
         open={sectionDrawerOpen}
         onOpenChange={setSectionDrawerOpen}
-        title="Trainer sections"
-        showHeader={false}
+        title={user?.trainerName || 'Trainer'}
+        description={trainerTitle}
+        background={trainerBanner}
+        icon={
+          <TaskIconDisplay
+            icon={trainerIcon}
+            className="h-20 w-20 md:h-24 md:w-24"
+            priority
+          />
+        }
+        heroLabel="Trainer sections"
         desktopWidth="min(32vw, 420px)"
         className="pb-[env(safe-area-inset-bottom)]"
       >
