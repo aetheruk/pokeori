@@ -760,7 +760,7 @@ describe('Fuchsia Gym and Safari progression', () => {
         {
           type: 'guild_rank',
           targetId: 'fuchsia-research-guild',
-          count: 2,
+          count: 3,
         },
       ])
       expect(
@@ -1156,12 +1156,16 @@ describe('Fuchsia Gym and Safari progression', () => {
     )
   })
 
-  test("Fuchsia Guild progression replaces Safari Notes and the Exchange", () => {
+  test("Fuchsia Research Institute progression replaces Safari Notes and the Exchange", () => {
     expect(currencies.some((currency) => currency.id === "safari-notes")).toBe(false)
     expect(getIcon("safari-ball")).toBeDefined()
     expect(getTitle("the-warden")?.name).toBe("The Warden")
 
     const guild = getGuild("fuchsia-research-guild")
+    expect(guild?.name).toBe('Fuchsia Research Institute')
+    expect(guild?.subCategory).toBe('Fuchsia City')
+    expect(guild?.background).toBe('/backgrounds/lab.avif')
+    expect(guild?.icon).toEqual({ type: 'item', id: 'safari-ball' })
     expect(guild?.ranks.map((rank) => rank.totalXp)).toEqual([
       0, 100, 250, 500, 900, 1550, 2550, 4150, 6500, 10000,
     ])
@@ -1170,6 +1174,9 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(hall).toMatchObject({
       id: "fuchsia-research-guild-hall",
       guildId: "fuchsia-research-guild",
+      subCategory: 'Fuchsia City',
+      background: '/backgrounds/lab.avif',
+      icon: { type: 'item', id: 'safari-ball' },
       items: [],
       requirements: [
         { type: "guild_rank", targetId: "fuchsia-research-guild", count: 1 },
@@ -1186,6 +1193,16 @@ describe('Fuchsia Gym and Safari progression', () => {
       }),
     )
 
+    const catchingPermit = tasks.find(
+      (task) => task.id === 'fuchsia-koga-study-toxin',
+    )
+    expect(catchingPermit?.rewards).toContainEqual({
+      type: 'guild_xp',
+      targetId: 'fuchsia-research-guild',
+      quantity: 100,
+      dropChance: 100,
+    })
+
     const safariFieldResearch = fieldObservationGames.filter(
       (entry) => entry.subCategory === "Safari Zone",
     )
@@ -1196,7 +1213,12 @@ describe('Fuchsia Gym and Safari progression', () => {
           (drop) =>
             drop.reward?.type === "guild_xp" &&
             drop.reward.targetId === "fuchsia-research-guild" &&
-            drop.reward.quantity === 1,
+            drop.reward.quantity === 1 &&
+            drop.reward.requirements?.some(
+              (requirement) =>
+                requirement.type === 'item_owned' &&
+                requirement.targetId === 'safari-catching-permit',
+            ),
         ),
       ),
     ).toBe(true)
@@ -1207,7 +1229,7 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(grandExpedition?.requirements).toContainEqual({
       type: "guild_rank",
       targetId: "fuchsia-research-guild",
-      count: 1,
+      count: 2,
     })
     expect(grandExpedition?.rewards).toContainEqual({
       type: "guild_xp",
@@ -1223,6 +1245,55 @@ describe('Fuchsia Gym and Safari progression', () => {
       quantity: 10,
       dropChance: 100,
     })
+  })
+
+  test('Institute rank chats explain Ranks 3 through 10 without gating rewards', () => {
+    const rankChats = tasks
+      .filter((task) => task.id.startsWith('fuchsia-institute-rank-'))
+      .sort((left, right) => {
+        const leftRank = left.requirements[0]?.count ?? 0
+        const rightRank = right.requirements[0]?.count ?? 0
+        return leftRank - rightRank
+      })
+
+    expect(rankChats).toHaveLength(8)
+    expect(rankChats.map((task) => task.requirements[0]?.count)).toEqual([
+      3, 4, 5, 6, 7, 8, 9, 10,
+    ])
+
+    for (const [index, task] of rankChats.entries()) {
+      expect(task.chat, task.id).toBe(true)
+      expect(task.subCategory, task.id).toBe('Fuchsia City')
+      expect(task.background, task.id).toBe('/backgrounds/lab.avif')
+      expect(task.requirements, task.id).toEqual([
+        {
+          type: 'guild_rank',
+          targetId: 'fuchsia-research-guild',
+          count: index + 3,
+        },
+      ])
+      expect(task.criteria, task.id).toEqual([])
+      expect(task.rewards, task.id).toEqual([])
+
+      const copy = [
+        task.name,
+        task.description,
+        task.completeButtonText,
+        ...(task.enterModal ?? []).flatMap((modal) => [
+          modal.title,
+          modal.message,
+          ...modal.buttons.map((button) => button.text),
+        ]),
+      ].join(' ')
+      expect(copy, task.id).not.toContain('—')
+
+      for (const modal of task.enterModal ?? []) {
+        expect(modal.background, task.id).toBe('/backgrounds/lab.avif')
+        for (const button of modal.buttons) {
+          expect(button.text.length, `${task.id}: ${button.text}`).toBeLessThanOrEqual(20)
+        }
+      }
+    }
   })
 
   test('field research is available after the pass and expedition copies stay hidden', () => {

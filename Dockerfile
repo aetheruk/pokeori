@@ -27,8 +27,10 @@ COPY src ./src
 COPY icons-new ./icons-new
 COPY scripts/reset-gym-chronicles-v2.ts ./scripts/reset-gym-chronicles-v2.ts
 COPY scripts/migrate-fuchsia-guild.ts ./scripts/migrate-fuchsia-guild.ts
+COPY scripts/migrate-fuchsia-institute-balance-v2.ts ./scripts/migrate-fuchsia-institute-balance-v2.ts
 COPY scripts/build-fuchsia-guild-migration.ts ./scripts/build-fuchsia-guild-migration.ts
 COPY scripts/run-fuchsia-guild-migration.ts ./scripts/run-fuchsia-guild-migration.ts
+COPY scripts/run-fuchsia-institute-balance-v2.ts ./scripts/run-fuchsia-institute-balance-v2.ts
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_IGNORE_TYPECHECK=true
@@ -65,7 +67,9 @@ COPY --from=builder --chown=pokeori:pokeori /app/.next/standalone ./
 COPY --from=builder --chown=pokeori:pokeori /app/.next/static ./.next/static
 COPY --from=builder --chown=pokeori:pokeori /tmp/reset-gym-chronicles-v2.js ./scripts/reset-gym-chronicles-v2.js
 COPY --from=builder --chown=pokeori:pokeori /tmp/migrate-fuchsia-guild.js ./scripts/migrate-fuchsia-guild.js
+COPY --from=builder --chown=pokeori:pokeori /tmp/migrate-fuchsia-institute-balance-v2.js ./scripts/migrate-fuchsia-institute-balance-v2.js
 COPY --from=builder --chown=pokeori:pokeori /app/scripts/run-fuchsia-guild-migration.ts ./scripts/run-fuchsia-guild-migration.ts
+COPY --from=builder --chown=pokeori:pokeori /app/scripts/run-fuchsia-institute-balance-v2.ts ./scripts/run-fuchsia-institute-balance-v2.ts
 
 USER pokeori
 

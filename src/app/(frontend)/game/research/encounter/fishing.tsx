@@ -801,7 +801,7 @@ export function FishingGame({ encounter }: FishingGameProps) {
                   <div className="flex flex-col items-center gap-1">
                     <h3 className="line-clamp-1 font-display text-lg font-semibold capitalize tracking-wide text-game-ink">
                       {hookedData.guildId
-                        ? 'Fuchsia Guild XP'
+                        ? 'Fuchsia Research Institute XP'
                         : hookedData.currencyId
                         ? getCurrency(hookedData.currencyId)?.name || 'Currency'
                         : itemNames.get(hookedData.itemId!) ||

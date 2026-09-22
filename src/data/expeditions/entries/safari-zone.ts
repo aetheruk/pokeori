@@ -235,7 +235,7 @@ const safariHabitatExpedition = ({
     requirements: [
       permitRequirement,
       grandExpeditionRequirement,
-      guildRankRequirement(2),
+      guildRankRequirement(3),
     ],
     criteria: [safariHabitatFee],
     activityPool: {
@@ -343,7 +343,7 @@ export const safariZoneExpeditions: ExpeditionConfig[] = [
     staminaNoteLimit: 5,
     safariBallAllowance: 30,
     canAbandon: true,
-    requirements: [permitRequirement, guildRankRequirement(1)],
+    requirements: [permitRequirement, guildRankRequirement(2)],
     criteria: [
       safariEntranceFee,
     ],

@@ -1,7 +1,10 @@
 const result = await Bun.build({
-  entrypoints: ['./scripts/migrate-fuchsia-guild.ts'],
+  entrypoints: [
+    './scripts/migrate-fuchsia-guild.ts',
+    './scripts/migrate-fuchsia-institute-balance-v2.ts',
+  ],
   outdir: '/tmp',
-  naming: 'migrate-fuchsia-guild.js',
+  naming: '[name].js',
   target: 'bun',
   plugins: [
     {
