@@ -148,6 +148,7 @@ const safariCreditMarkerTask = ({
 
 const instituteRankChat = ({
   rank,
+  previousTaskId,
   id,
   name,
   description,
@@ -155,6 +156,7 @@ const instituteRankChat = ({
   enterModal,
 }: {
   rank: number
+  previousTaskId?: string
   id: string
   name: string
   description: string
@@ -173,7 +175,12 @@ const instituteRankChat = ({
   completionTrigger: 'manual',
   chat: true,
   completeButtonText,
-  requirements: [{ type: 'guild_rank', targetId: 'fuchsia-research-guild', count: rank }],
+  requirements: [
+    { type: 'guild_rank', targetId: 'fuchsia-research-guild', count: rank },
+    ...(previousTaskId
+      ? ([{ type: 'task_completed', targetId: previousTaskId }] as const)
+      : []),
+  ],
   criteria: [],
   rewards: [],
   enterModal: enterModal.map((step) => ({
@@ -234,6 +241,7 @@ const instituteRankChats: Task[] = [
   }),
   instituteRankChat({
     rank: 4,
+    previousTaskId: 'fuchsia-institute-rank-3-surveyor',
     id: 'fuchsia-institute-rank-4-habitat-specialist',
     name: 'The Reserve Archive',
     description: 'The Institute has finished adding my habitat reports to the reserve archive.',
@@ -267,6 +275,7 @@ const instituteRankChats: Task[] = [
   }),
   instituteRankChat({
     rank: 5,
+    previousTaskId: 'fuchsia-institute-rank-4-habitat-specialist',
     id: 'fuchsia-institute-rank-5-senior-researcher',
     name: 'Reserve Security',
     description: 'The Institute has asked me to review new field and security reports.',
@@ -308,6 +317,7 @@ const instituteRankChats: Task[] = [
   }),
   instituteRankChat({
     rank: 6,
+    previousTaskId: 'fuchsia-institute-rank-5-senior-researcher',
     id: 'fuchsia-institute-rank-6-research-fellow',
     name: 'Reports from the Water',
     description: 'The Institute has new research permissions and field reports for me to review.',
@@ -349,6 +359,7 @@ const instituteRankChats: Task[] = [
   }),
   instituteRankChat({
     rank: 7,
+    previousTaskId: 'fuchsia-institute-rank-6-research-fellow',
     id: 'fuchsia-institute-rank-7-lead-researcher',
     name: 'Independent Fieldwork',
     description: 'The Institute has completed another review of my reserve work.',
@@ -382,6 +393,7 @@ const instituteRankChats: Task[] = [
   }),
   instituteRankChat({
     rank: 8,
+    previousTaskId: 'fuchsia-institute-rank-7-lead-researcher',
     id: 'fuchsia-institute-rank-8-principal-researcher',
     name: 'Strange Sightings',
     description: 'The Institute is ready to share a set of unusual reserve sightings.',
@@ -415,6 +427,7 @@ const instituteRankChats: Task[] = [
   }),
   instituteRankChat({
     rank: 9,
+    previousTaskId: 'fuchsia-institute-rank-8-principal-researcher',
     id: 'fuchsia-institute-rank-9-deputy-warden',
     name: 'Deputy Warden',
     description: 'The Institute and the wardens have completed their review of my field record.',
@@ -448,6 +461,7 @@ const instituteRankChats: Task[] = [
   }),
   instituteRankChat({
     rank: 10,
+    previousTaskId: 'fuchsia-institute-rank-9-deputy-warden',
     id: 'fuchsia-institute-rank-10-warden',
     name: 'The Warden',
     description: 'The senior wardens have asked me to return to the Institute.',
