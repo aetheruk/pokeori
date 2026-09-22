@@ -16,6 +16,7 @@ export interface PublicTrainerSummary {
   banner: string
   title: string
   skills: User['skills']
+  rankings: User['rankings']
   battleTeam: PublicTrainerTeamMember[]
   stats: {
     uniqueCards: number
@@ -26,4 +27,8 @@ export interface PublicTrainerSummary {
   hasPendingRequest: boolean
   level?: number
   exp?: number
+  rating?: number
+  wins?: number
+  losses?: number
+  draws?: number
 }

@@ -18,6 +18,9 @@ describe('trainer journal sections', () => {
     expect(
       resolveTrainerSection('rankings', { hasDeckBox: true, isKidMode: false }),
     ).toBe('rankings')
+    expect(
+      resolveTrainerSection('rankings', { hasDeckBox: false, isKidMode: false }),
+    ).toBe('rankings')
   })
 
   test('uses a clean profile URL and stable query values for other sections', () => {

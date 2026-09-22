@@ -227,9 +227,17 @@ export interface User {
       level?: number | null;
       exp?: number | null;
     };
-    'ranked-battling'?: {
-      level?: number | null;
-      exp?: number | null;
+  };
+  rankings?: {
+    pvp?: {
+      /**
+       * Elo-style PvP rating. New trainers start at 1000.
+       */
+      rating?: number | null;
+      wins?: number | null;
+      losses?: number | null;
+      draws?: number | null;
+      lastBattleAt?: string | null;
     };
   };
   currency?: {
@@ -1197,11 +1205,18 @@ export interface UsersSelect<T extends boolean = true> {
               level?: T;
               exp?: T;
             };
-        'ranked-battling'?:
+      };
+  rankings?:
+    | T
+    | {
+        pvp?:
           | T
           | {
-              level?: T;
-              exp?: T;
+              rating?: T;
+              wins?: T;
+              losses?: T;
+              draws?: T;
+              lastBattleAt?: T;
             };
       };
   currency?:

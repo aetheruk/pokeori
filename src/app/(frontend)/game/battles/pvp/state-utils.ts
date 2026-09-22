@@ -141,6 +141,9 @@ export function flipPvpState(state: BattleState, battleId: string): BattleState 
     isPvp: true,
     pvpBattleId: battleId,
     pendingSketchedMoves: undefined,
+    pvpRatingChange: p2Id
+      ? state.pvpRatingChanges?.[p2Id]
+      : state.pvpRatingChange,
     status:
       state.status === 'won'
         ? 'lost'
@@ -165,6 +168,7 @@ export function toPerspectivePvpState(
       isPvp: true,
       pvpBattleId: battleId,
       pendingSketchedMoves: undefined,
+      pvpRatingChange: state.pvpRatingChanges?.[p1Id] || state.pvpRatingChange,
     }
   }
 

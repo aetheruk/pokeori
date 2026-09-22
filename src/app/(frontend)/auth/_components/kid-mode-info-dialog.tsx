@@ -14,7 +14,7 @@ const kidModeFeatures = [
   'Picture-based questions when catching Pokemon.',
   'Field Research always asks “Who appeared the most?” with tappable Pokemon tiles.',
   'Your Pokemon receive 20% more HP and battle stats in PvE battles.',
-  'Rivals, player-versus-player battles, social Trainer pages, Mystery Gift, and High Scores are unavailable.',
+  'Rivals, player-versus-player battles, social Trainer pages, Mystery Gift, and Rankings are unavailable.',
 ]
 
 export function KidModeInfoDialog() {

@@ -128,8 +128,20 @@ export interface SkillsData {
   battling?: SkillData
   researching?: SkillData
   artisan?: SkillData
-  'ranked-battling'?: SkillData
   [key: string]: SkillData | undefined
+}
+
+/** Competitive player rankings, independent of progression skills. */
+export interface PvpRankingData {
+  rating?: number
+  wins?: number
+  losses?: number
+  draws?: number
+  lastBattleAt?: string
+}
+
+export interface RankingsData {
+  pvp?: PvpRankingData
 }
 
 /**
@@ -196,6 +208,7 @@ export interface ExtendedUser {
   tcgDecks?: TcgDecksData
   currency?: CurrencyData
   skills?: SkillsData
+  rankings?: RankingsData
   inventory?: InventoryData
   shopPurchases?: ShopPurchase[]
   powerUsage?: PowerUsageData

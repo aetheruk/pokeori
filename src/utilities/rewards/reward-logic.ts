@@ -17,7 +17,6 @@ import { getBattlingLevel, type SkillLevelReward } from '@/data/skills/battling'
 import { getCatchingLevel } from '@/data/skills/catching'
 import { getResearchingLevel } from '@/data/skills/researching'
 import { getArtisanLevel } from '@/data/skills/artisan'
-import { getRankedBattlingLevel } from '@/data/skills/ranked-battling'
 import { drawRandomTcgCard } from '@/utilities/tcg/tcg-card-draw'
 import type { LocationReward } from '@/data/locations'
 import { NATURES } from '@/data/natures'
@@ -990,8 +989,7 @@ export async function grantRewards(
         skillId === 'battling' ||
         skillId === 'catching' ||
         skillId === 'researching' ||
-        skillId === 'artisan' ||
-        skillId === 'ranked-battling'
+        skillId === 'artisan'
       ) {
         for (let l = currentLevel + 1; l <= newLevel; l++) {
           let levelData: { rewards?: SkillLevelReward[] } | undefined
@@ -999,8 +997,6 @@ export async function grantRewards(
           if (skillId === 'catching') levelData = getCatchingLevel(l)
           if (skillId === 'researching') levelData = getResearchingLevel(l)
           if (skillId === 'artisan') levelData = getArtisanLevel(l)
-          if (skillId === 'ranked-battling')
-            levelData = getRankedBattlingLevel(l)
 
           if (levelData?.rewards) {
             for (const r of levelData.rewards) {

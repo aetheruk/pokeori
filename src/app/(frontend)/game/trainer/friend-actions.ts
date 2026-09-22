@@ -182,6 +182,7 @@ export async function getFriendsList(): Promise<{
         banner: true,
         title: true,
         skills: true,
+        rankings: true,
       },
     })
 

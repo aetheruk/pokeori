@@ -30,12 +30,6 @@ export const skills: Skill[] = [
     description: 'Gather materials and craft useful items.',
     iconId: 'artisan-v2.png',
   },
-  {
-    id: 'ranked-battling',
-    name: 'PVP Rank',
-    description: 'Dominate the Competitive Arena.',
-    iconId: 'ranked-v2.png',
-  },
 ]
 
 export function getSkill(id: string): Skill | undefined {

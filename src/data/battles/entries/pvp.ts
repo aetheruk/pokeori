@@ -50,7 +50,6 @@ export const pvpBattles: BattleConfig[] = [
     rewards: [
       { type: 'currency', targetId: 'pokedollars', quantity: 100 },
       { type: 'currency', targetId: 'battle-points', quantity: 5 },
-      { type: 'xp', skill: 'ranked-battling', quantity: 50 },
     ],
     maxPokemon: 3,
     levelCap: 20,
@@ -83,7 +82,6 @@ export const pvpBattles: BattleConfig[] = [
     rewards: [
       {type:'currency',targetId:'pokedollars',quantity:100},
       {type:'currency',targetId:'battle-points',quantity:5},
-      {type:'xp',skill:'ranked-battling',quantity:50},
     ],
     maxPokemon: 4, levelCap: 20, enemyAttackTelegraphChance: 2,
     pvp: true, pvp_type: 'ranked', format: 'double',

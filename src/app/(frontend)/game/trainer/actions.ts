@@ -12,6 +12,7 @@ import {
 } from '@/utilities/economy/transactions'
 import { isKidModeUser, KID_MODE_ACCESS_ERROR } from '@/utilities/kid-mode'
 import { buildPublicTrainerSummaries } from '@/utilities/trainers/public-summary'
+import { getPvpRecord } from '@/utilities/battle/pvp-rating'
 
 async function getFreshAuthenticatedUser(payload: any): Promise<User | null> {
   const { user } = await payload.auth({ headers: await headers() })
@@ -57,6 +58,7 @@ export async function searchTrainers(query: string) {
         banner: true,
         title: true,
         skills: true,
+        rankings: true,
       },
     })
 
@@ -75,14 +77,7 @@ export async function searchTrainers(query: string) {
 
 // --- High Scores ---
 
-export async function getHighScores(
-  skill:
-    | 'catching'
-    | 'battling'
-    | 'researching'
-    | 'artisan'
-    | 'ranked-battling',
-) {
+export async function getPvpRankings() {
   const payload = await getPayload({ config: configPromise })
   const currentUser = await getFreshAuthenticatedUser(payload)
 
@@ -101,7 +96,7 @@ export async function getHighScores(
           not_equals: true,
         },
       },
-      sort: `-skills.${skill}.level`,
+      sort: '-rankings.pvp.rating',
       limit: 20,
       depth: 0,
       select: {
@@ -110,6 +105,7 @@ export async function getHighScores(
         banner: true,
         title: true,
         skills: true,
+        rankings: true,
       },
     })
 
@@ -118,21 +114,29 @@ export async function getHighScores(
       trainers: sortedUsers.docs,
       viewer: currentUser,
     })
-    const results = summaries.map((summary) => ({
-      ...summary,
-      level: currentSkill(summary.skills, skill)?.level || 1,
-      exp: currentSkill(summary.skills, skill)?.exp || 0,
-    }))
+    const results = summaries
+      .map((summary) => {
+        const record = getPvpRecord(summary.rankings?.pvp)
+        return {
+          ...summary,
+          rating: record.rating,
+          wins: record.wins,
+          losses: record.losses,
+          draws: record.draws,
+        }
+      })
+      .sort((a, b) => (b.rating || 0) - (a.rating || 0))
 
     return { success: true, data: results }
   } catch (error) {
-    console.error('High scores error:', error)
-    return { success: false, error: 'Failed to get high scores' }
+    console.error('PvP rankings error:', error)
+    return { success: false, error: 'Failed to get PvP rankings' }
   }
 }
 
-function currentSkill(skills: User['skills'], skill: string) {
-  return skills?.[skill as keyof NonNullable<User['skills']>]
+/** Backwards-compatible server action name for any cached client bundles. */
+export async function getHighScores(_legacySkill?: string) {
+  return getPvpRankings()
 }
 
 // --- Mystery Gift ---

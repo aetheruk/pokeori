@@ -9,6 +9,7 @@ import type {
 } from '@/data/types'
 import type { WeatherSnapshot } from '@/utilities/weather'
 import type { TerrainType } from '@/data/terrain'
+import type { PvpRatingChange } from '@/utilities/battle/pvp-rating'
 import type {
   SecondaryStatusEffect,
   SecondaryStatusTrigger,
@@ -523,6 +524,10 @@ export interface BattleState {
   // PVP
   pvpBattleId?: string
   isPvp?: boolean
+  /** Viewer-specific rating change from the terminal ranked PvP result. */
+  pvpRatingChange?: PvpRatingChange
+  /** Canonical terminal rating changes keyed by participant id. */
+  pvpRatingChanges?: Record<string, PvpRatingChange>
   // Trainer Data for VS Screen
   playerTrainer?: {
     name: string

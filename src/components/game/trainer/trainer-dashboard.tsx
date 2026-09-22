@@ -52,7 +52,6 @@ import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { useUser } from '@/context/UserContext'
 import { getBanner, getIcon } from '@/data/user'
 import type { TaskIcon } from '@/data/tasks/types'
-import { skills } from '@/data/skills'
 import { tcgSetSummaries } from '@/data/tcg/summaries'
 import { cn } from '@/lib/utils'
 import { getTcgSeriesInReleaseOrder } from '@/utilities/tcg/set-order'
@@ -85,7 +84,6 @@ export function TrainerDashboard({
     normalizedInitialSection,
   )
   const [sectionDrawerOpen, setSectionDrawerOpen] = useState(false)
-  const [rankingSkill, setRankingSkill] = useState(skills[0].id)
   const deckGenerations = getTcgSeriesInReleaseOrder(tcgSetSummaries)
   const [deckGeneration, setDeckGeneration] = useState(deckGenerations[0] || '')
   const [deckFormat, setDeckFormat] = useState<DeckFormat>('baby')
@@ -97,7 +95,7 @@ export function TrainerDashboard({
     trainers: { type: 'item', id: 'vs-seeker' },
     friends: { type: 'pokemon', id: '133' },
     gift: { type: 'item', id: 'relic-gold' },
-    rankings: { type: 'pokemon', id: '137' },
+    rankings: { type: 'local', id: 'fallback/skills/ranked-v2.png' },
   }
   const renderSectionIcon = (section: TrainerSection) => (
     <TaskIconDisplay icon={sectionIcons[section]} className="h-10 w-10" />
@@ -187,12 +185,12 @@ export function TrainerDashboard({
           },
           {
             id: 'rankings' as const,
-            label: 'Skill Rankings',
-            description: 'Compare skill progress',
+            label: 'Rankings',
+            description: 'Elo ratings from ranked PvP',
             background: '/backgrounds/crystal-stadium.avif',
             component: (
               <LazyWrapper>
-                <HighScores activeSkill={rankingSkill} />
+                <HighScores />
               </LazyWrapper>
             ),
           },
@@ -249,21 +247,6 @@ export function TrainerDashboard({
               )
             })}
           </nav>
-          {activeTab === 'rankings' && (
-            <div className="mt-6 border-t border-game-border pt-4">
-              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-game-muted">
-                Ranking skill
-              </p>
-              <PremiumSelect
-                value={rankingSkill}
-                onValueChange={setRankingSkill}
-                options={skills.map((skill) => ({
-                  id: skill.id,
-                  label: skill.name,
-                }))}
-              />
-            </div>
-          )}
           {activeTab === 'decks' && (
             <div className="mt-6 space-y-3 border-t border-game-border pt-4">
               <div>
@@ -317,17 +300,6 @@ export function TrainerDashboard({
             className="min-h-20"
           />
 
-          {activeTab === 'rankings' && (
-            <PremiumSelect
-              label="Ranking skill"
-              value={rankingSkill}
-              onValueChange={setRankingSkill}
-              options={skills.map((skill) => ({
-                id: skill.id,
-                label: skill.name,
-              }))}
-            />
-          )}
           {activeTab === 'decks' && (
             <PremiumSelect
               label="Deck generation"
