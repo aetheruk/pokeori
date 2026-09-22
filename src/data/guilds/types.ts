@@ -6,6 +6,7 @@ export interface GuildRankDefinition {
   totalXp: number
   name: string
   description: string
+  icon?: TaskIcon
   unlocks: string[]
   rewards?: Reward[]
 }

@@ -1166,6 +1166,17 @@ describe('Fuchsia Gym and Safari progression', () => {
     expect(guild?.subCategory).toBe('Fuchsia City')
     expect(guild?.background).toBe('/backgrounds/lab.avif')
     expect(guild?.icon).toEqual({ type: 'item', id: 'safari-ball' })
+    expect(
+      guild?.ranks.find((rank) => rank.rank === 9)?.rewards,
+    ).toContainEqual({
+      type: 'icon',
+      targetId: 'safari-ball',
+      quantity: 1,
+      dropChance: 100,
+    })
+    expect(
+      guild?.ranks.find((rank) => rank.rank === 10)?.rewards,
+    ).not.toContainEqual(expect.objectContaining({ type: 'icon' }))
     expect(guild?.ranks.map((rank) => rank.totalXp)).toEqual([
       0, 100, 250, 500, 900, 1550, 2550, 4150, 6500, 10000,
     ])
