@@ -50,7 +50,11 @@ import {
   icons,
   titles,
 } from '@/data/user'
-import { getTrainerGender, type TrainerGender } from '@/utilities/trainer-appearance'
+import {
+  getTrainerGender,
+  type TrainerGender,
+} from '@/utilities/trainer-appearance'
+import { getPvpRecord } from '@/utilities/battle/pvp-rating'
 import { cn } from '@/lib/utils'
 import {
   type CoreSkillId,
@@ -419,8 +423,9 @@ function getSkillUnlockCategoryLabel(category: SkillGuideUnlock['category']) {
   }
 }
 
-
-export function TrainerLeveling({ saveCustomization = updateUserCustomization }: {
+export function TrainerLeveling({
+  saveCustomization = updateUserCustomization,
+}: {
   saveCustomization?: typeof updateUserCustomization
 } = {}) {
   const { user, refreshUser, updateUserContext } = useUser()
@@ -444,13 +449,16 @@ export function TrainerLeveling({ saveCustomization = updateUserCustomization }:
     ((user as any)?.unlockedBanners || ['lab']).includes(banner.id),
   )
   const availableIcons = icons.filter((icon) =>
-    ((user as any)?.unlockedIcons || ['ditto', 'trainer-red', 'trainer-leaf']).includes(icon.id),
+    (
+      (user as any)?.unlockedIcons || ['ditto', 'trainer-red', 'trainer-leaf']
+    ).includes(icon.id),
   )
   const editorBanner = getBanner(selectedBanner || 'lab')
   const editorIcon = getIcon(selectedIcon || 'ditto')
   const editorTitle = getTitle(selectedTitle || 'new-beginnings')
 
   if (!user) return null
+  const pvpRecord = getPvpRecord(user.rankings?.pvp)
 
   return (
     <div className="game-paper-background relative flex h-full min-h-0 flex-col overflow-hidden bg-game-canvas text-game-ink">
@@ -485,7 +493,11 @@ export function TrainerLeveling({ saveCustomization = updateUserCustomization }:
                 title="Customize trainer card"
                 className="game-focus-ring absolute right-2 top-2 z-20 flex h-11 w-11 items-center justify-center rounded-md text-game-cream/85 transition-colors hover:text-game-cream"
               >
-                <Pencil className="h-5 w-5 drop-shadow-sm" strokeWidth={1.5} aria-hidden="true" />
+                <Pencil
+                  className="h-5 w-5 drop-shadow-sm"
+                  strokeWidth={1.5}
+                  aria-hidden="true"
+                />
               </button>
             </TrainerCard>
           </div>
@@ -601,6 +613,41 @@ export function TrainerLeveling({ saveCustomization = updateUserCustomization }:
           </div>
         </div>
 
+        {/* Ranked PvP Section */}
+        <div className="space-y-4">
+          <SectionDivider>Ranking</SectionDivider>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="flex min-h-16 w-full items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 text-left">
+              <Image
+                src="/fallback/skills/ranked-v2.png"
+                alt=""
+                width={56}
+                height={56}
+                className="h-12 w-12 shrink-0 object-contain"
+                aria-hidden="true"
+              />
+
+              <div className="min-w-0 flex-1 space-y-1">
+                <h3 className="truncate text-sm font-semibold text-game-ink">
+                  Ranked PvP
+                </h3>
+                <div className="text-[11px] leading-none text-game-muted">
+                  {pvpRecord.wins}W · {pvpRecord.losses}L · {pvpRecord.draws}D
+                </div>
+              </div>
+
+              <div className="shrink-0 text-right">
+                <div className="mb-0.5 text-[10px] font-black uppercase leading-none text-game-moss-strong">
+                  Rating
+                </div>
+                <div className="text-xl font-semibold leading-none text-game-moss-strong">
+                  {pvpRecord.rating.toLocaleString()}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Badges Section */}
         <div className="space-y-4">
           <SectionDivider>Gym Badges</SectionDivider>
@@ -642,7 +689,9 @@ export function TrainerLeveling({ saveCustomization = updateUserCustomization }:
 
       <ResponsivePanel
         open={isCustomizeModalOpen}
-        onOpenChange={(open) => { if (!isSaving) setIsCustomizeModalOpen(open) }}
+        onOpenChange={(open) => {
+          if (!isSaving) setIsCustomizeModalOpen(open)
+        }}
         title={user.trainerName || 'Trainer'}
         description={editorTitle?.name || 'New Beginnings'}
         icon={
@@ -662,63 +711,95 @@ export function TrainerLeveling({ saveCustomization = updateUserCustomization }:
       >
         <div className="min-h-0 flex-1 overflow-y-auto p-4">
           <fieldset disabled={isSaving} className="min-w-0 space-y-4">
-            <TrainerGenderPicker value={selectedGender} onChange={setSelectedGender} />
+            <TrainerGenderPicker
+              value={selectedGender}
+              onChange={setSelectedGender}
+            />
 
             <div className="space-y-2">
-              <label htmlFor="trainer-banner" className="text-sm font-semibold">Background</label>
-              <Select value={selectedBanner || 'lab'} onValueChange={setSelectedBanner} disabled={isSaving}>
+              <label htmlFor="trainer-banner" className="text-sm font-semibold">
+                Background
+              </label>
+              <Select
+                value={selectedBanner || 'lab'}
+                onValueChange={setSelectedBanner}
+                disabled={isSaving}
+              >
                 <SelectTrigger id="trainer-banner" className="min-h-11 w-full">
                   <SelectValue placeholder="Choose a background" />
                 </SelectTrigger>
                 <SelectContent>
-                  {availableBanners.map((banner) => <SelectItem key={banner.id} value={banner.id}>
-                    {banner.name}
-                  </SelectItem>)}
+                  {availableBanners.map((banner) => (
+                    <SelectItem key={banner.id} value={banner.id}>
+                      {banner.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
 
             <details className="rounded-lg border border-game-border bg-game-surface">
               <summary className="game-focus-ring cursor-pointer rounded-lg p-3 text-sm font-semibold">
-                Avatar · {availableIcons.find((icon) => icon.id === selectedIcon)?.name || 'Ditto'}
+                Avatar ·{' '}
+                {availableIcons.find((icon) => icon.id === selectedIcon)
+                  ?.name || 'Ditto'}
               </summary>
               <div className="grid max-h-48 grid-cols-5 gap-2 overflow-y-auto px-3 pb-3">
-                {availableIcons.map((icon) => <button
-                  key={icon.id}
-                  type="button"
-                  onClick={() => setSelectedIcon(icon.id)}
-                  aria-pressed={selectedIcon === icon.id}
-                  aria-label={`Use ${icon.name} trainer avatar`}
-                  title={icon.name}
-                  className={cn(
-                    'game-focus-ring game-icon-orb mx-auto h-12 w-12',
-                    selectedIcon === icon.id
-                      ? 'border-game-charcoal text-game-charcoal-strong'
-                      : 'border-game-border hover:border-game-charcoal',
-                  )}
-                >
-                  <TaskIconDisplay icon={icon.icon} className="h-9 w-9" />
-                </button>)}
+                {availableIcons.map((icon) => (
+                  <button
+                    key={icon.id}
+                    type="button"
+                    onClick={() => setSelectedIcon(icon.id)}
+                    aria-pressed={selectedIcon === icon.id}
+                    aria-label={`Use ${icon.name} trainer avatar`}
+                    title={icon.name}
+                    className={cn(
+                      'game-focus-ring game-icon-orb mx-auto h-12 w-12',
+                      selectedIcon === icon.id
+                        ? 'border-game-charcoal text-game-charcoal-strong'
+                        : 'border-game-border hover:border-game-charcoal',
+                    )}
+                  >
+                    <TaskIconDisplay icon={icon.icon} className="h-9 w-9" />
+                  </button>
+                ))}
               </div>
             </details>
 
             <div className="space-y-2">
-              <label htmlFor="trainer-title" className="text-sm font-semibold">Title</label>
-              <Select value={selectedTitle || 'new-beginnings'} onValueChange={setSelectedTitle} disabled={isSaving}>
+              <label htmlFor="trainer-title" className="text-sm font-semibold">
+                Title
+              </label>
+              <Select
+                value={selectedTitle || 'new-beginnings'}
+                onValueChange={setSelectedTitle}
+                disabled={isSaving}
+              >
                 <SelectTrigger id="trainer-title" className="min-h-11 w-full">
                   <SelectValue placeholder="Choose a title" />
                 </SelectTrigger>
                 <SelectContent>
-                  {titles.filter((title) => equipableTitleIdSet.has(title.id)).map((title) => <SelectItem key={title.id} value={title.id}>
-                    {title.name}
-                  </SelectItem>)}
+                  {titles
+                    .filter((title) => equipableTitleIdSet.has(title.id))
+                    .map((title) => (
+                      <SelectItem key={title.id} value={title.id}>
+                        {title.name}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>
           </fieldset>
         </div>
         <div className="flex shrink-0 gap-2 border-t border-game-border p-4 pl-[max(4rem,env(safe-area-inset-left))]">
-          <Button variant="outline" disabled={isSaving} onClick={() => setIsCustomizeModalOpen(false)} className="min-h-11">Cancel</Button>
+          <Button
+            variant="outline"
+            disabled={isSaving}
+            onClick={() => setIsCustomizeModalOpen(false)}
+            className="min-h-11"
+          >
+            Cancel
+          </Button>
           <Button
             disabled={isSaving}
             className="min-h-11 flex-1"
@@ -747,7 +828,14 @@ export function TrainerLeveling({ saveCustomization = updateUserCustomization }:
               }
             }}
           >
-            {isSaving ? <><Loader2 className="h-4 w-4 animate-spin" />Saving…</> : 'Save changes'}
+            {isSaving ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Saving…
+              </>
+            ) : (
+              'Save changes'
+            )}
           </Button>
         </div>
       </ResponsivePanel>

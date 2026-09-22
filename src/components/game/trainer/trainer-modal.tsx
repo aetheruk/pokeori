@@ -8,8 +8,8 @@ import {
   removeFriend,
   sendFriendRequest,
 } from '@/app/(frontend)/game/trainer/friend-actions'
-import { TrainerCard } from '@/components/game/battles/TrainerCard'
 import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
+import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,6 +25,7 @@ import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
 import { getTotalExpForLevel, skills } from '@/data/skills'
+import { getBanner, getIcon, getTitle } from '@/data/user'
 import { cn } from '@/lib/utils'
 import type { PublicTrainerSummary } from './types'
 
@@ -60,6 +61,9 @@ export function TrainerModal({
 
   if (!trainer) return null
   const isSelf = user?.id === trainer.id
+  const trainerBanner = getBanner(trainer.banner || 'lab')
+  const trainerIcon = getIcon(trainer.icon || 'ditto')
+  const trainerTitle = getTitle(trainer.title || 'new-beginnings')
 
   const handleFriendAction = async () => {
     if (friendStatus === 'friend') {
@@ -113,21 +117,22 @@ export function TrainerModal({
       <ResponsivePanel
         open={open}
         onOpenChange={onOpenChange}
-        title={`${trainer.trainerName}'s field note`}
-        description="Public trainer profile"
+        title={trainer.trainerName}
+        description={trainerTitle?.name || 'Trainer'}
+        background={trainerBanner?.imagePath || '/backgrounds/lab.avif'}
+        icon={
+          <TaskIconDisplay
+            icon={trainerIcon?.icon || { type: 'pokemon', id: '132' }}
+            className="h-20 w-20 md:h-24 md:w-24"
+            priority
+          />
+        }
+        heroLabel="Trainer profile"
         desktopWidth="min(40vw, 560px)"
         desktopBreakpoint="lg"
         className="overflow-hidden"
       >
         <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-5 pt-4 sm:px-5">
-          <TrainerCard
-            name={trainer.trainerName}
-            icon={trainer.icon}
-            banner={trainer.banner}
-            title={trainer.title}
-            className="h-44 w-full rounded-lg"
-          />
-
           <SectionDivider className="my-5">Trainer record</SectionDivider>
           <div className="grid grid-cols-3 divide-x divide-game-border rounded-lg border border-game-border bg-game-surface">
             <ProfileMetric label="Cards" value={trainer.stats.uniqueCards} />
