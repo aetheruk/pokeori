@@ -31,6 +31,8 @@ COPY scripts/migrate-fuchsia-institute-balance-v2.ts ./scripts/migrate-fuchsia-i
 COPY scripts/build-fuchsia-guild-migration.ts ./scripts/build-fuchsia-guild-migration.ts
 COPY scripts/run-fuchsia-guild-migration.ts ./scripts/run-fuchsia-guild-migration.ts
 COPY scripts/run-fuchsia-institute-balance-v2.ts ./scripts/run-fuchsia-institute-balance-v2.ts
+COPY scripts/migrate-underground-society.ts ./scripts/migrate-underground-society.ts
+COPY scripts/run-underground-society-migration.ts ./scripts/run-underground-society-migration.ts
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_IGNORE_TYPECHECK=true
@@ -48,6 +50,7 @@ RUN --mount=type=secret,id=NEXT_SERVER_ACTIONS_ENCRYPTION_KEY,required=false \
     export NEXT_SERVER_ACTIONS_ENCRYPTION_KEY="${NEXT_SERVER_ACTIONS_ENCRYPTION_KEY:-$(cat /run/secrets/NEXT_SERVER_ACTIONS_ENCRYPTION_KEY 2>/dev/null)}" && \
     { test -n "$NEXT_SERVER_ACTIONS_ENCRYPTION_KEY" || { echo 'Set NEXT_SERVER_ACTIONS_ENCRYPTION_KEY as a Coolify build secret.' >&2; exit 1; }; } && \
     bun build scripts/reset-gym-chronicles-v2.ts --target=bun --outfile /tmp/reset-gym-chronicles-v2.js && \
+    bun build scripts/migrate-underground-society.ts --target=bun --outfile /tmp/migrate-underground-society.js && \
     bun scripts/build-fuchsia-guild-migration.ts && \
     bun --bun next build --turbopack
 
@@ -68,8 +71,10 @@ COPY --from=builder --chown=pokeori:pokeori /app/.next/static ./.next/static
 COPY --from=builder --chown=pokeori:pokeori /tmp/reset-gym-chronicles-v2.js ./scripts/reset-gym-chronicles-v2.js
 COPY --from=builder --chown=pokeori:pokeori /tmp/migrate-fuchsia-guild.js ./scripts/migrate-fuchsia-guild.js
 COPY --from=builder --chown=pokeori:pokeori /tmp/migrate-fuchsia-institute-balance-v2.js ./scripts/migrate-fuchsia-institute-balance-v2.js
+COPY --from=builder --chown=pokeori:pokeori /tmp/migrate-underground-society.js ./scripts/migrate-underground-society.js
 COPY --from=builder --chown=pokeori:pokeori /app/scripts/run-fuchsia-guild-migration.ts ./scripts/run-fuchsia-guild-migration.ts
 COPY --from=builder --chown=pokeori:pokeori /app/scripts/run-fuchsia-institute-balance-v2.ts ./scripts/run-fuchsia-institute-balance-v2.ts
+COPY --from=builder --chown=pokeori:pokeori /app/scripts/run-underground-society-migration.ts ./scripts/run-underground-society-migration.ts
 
 USER pokeori
 
