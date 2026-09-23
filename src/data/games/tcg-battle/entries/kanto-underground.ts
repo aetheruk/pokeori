@@ -38,7 +38,7 @@ const battle = (input: {
   rewards: [
     { type: 'currency', targetId: 'pokedollars', quantity: input.reward },
     ...(input.replayable
-      ? [{ type: 'guild_xp' as const, targetId: UNDERGROUND_SOCIETY_GUILD_ID, quantity: 1, dropChance: 100 }]
+      ? [{ type: 'guild_xp' as const, targetId: UNDERGROUND_SOCIETY_GUILD_ID, quantity: 5, dropChance: 100 }]
       : []),
   ],
   isEligibleForReplay: input.replayable,

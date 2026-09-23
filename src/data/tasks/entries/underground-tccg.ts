@@ -932,7 +932,7 @@ undergroundTccgTasks.push(
   ...tcgSetSummaries.map((set): Task => ({
     id: `underground-tcg-set-showcase-${set.id}`,
     name: `Showcase ${set.name}`,
-    description: `Present a completed ${set.name} collection to the Society’s archive.`,
+    description: `I've completed a full set of ${set.name}. I can't help but show it off around the Pit.`,
     category: 'Underground',
     subCategory: 'Kanto Underground',
     icon: { type: 'item', id: `pack-${set.id}` },
@@ -959,5 +959,12 @@ undergroundTccgTasks.push(
         dropChance: 100,
       },
     ],
+    exitModal: {
+      background: undergroundBackground,
+      title: 'A Little Respect',
+      icon: { type: 'item', id: `pack-${set.id}` },
+      message: "I think I'm starting to earn a bit of respect around here.",
+      closeButtonText: 'Keep Collecting',
+    },
   })),
 )

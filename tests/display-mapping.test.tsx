@@ -136,6 +136,16 @@ describe('display mapping copy', () => {
     expect((reward?.icon as any)?.props.children.props.itemId).toBe('safari-ball')
   })
 
+  test('guild XP rewards use the target guild name', () => {
+    const reward = mapRewardToDisplayItem({
+      type: 'guild_xp',
+      targetId: 'underground-society',
+      quantity: 5,
+    })
+
+    expect(reward?.label).toBe('Underground Society XP x5')
+  })
+
   test('set collection criteria use set names without duplicating progress counts', () => {
     const requirement = mapCriteriaToDisplayItem({
       type: 'card_collected_set',
