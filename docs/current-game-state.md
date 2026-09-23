@@ -1,5 +1,7 @@
 # Current Game State
 
+- Unreleased: The first-completion Base Set 2 showcase now awards 1,500 Underground Society XP alongside its 20,000 Pokédollar payment and guaranteed Promo Porygon (`basep-15`).
+
 - Unreleased: Underground Society set showcase tasks now use the Pit-facing description and a short respect-themed exit note. TCG rematch deck wins award 5 Underground Society XP, and Guild XP reward labels resolve from the target guild instead of always naming the Fuchsia Research Institute. Guild charter previews show completed ranks plus only the next rank in full; later rank names, thresholds, icons, and unlocks remain `???`.
 
 - Release `0.39.1`: Guild ranks can now define their own item, Pokémon, or Trainer artwork instead of using generic status symbols. The Fuchsia Research Institute charter uses, in order, the Research Journal, Chansey, Pinsir, Metal Scrap, a Rocket Grunt, Dratini, Scyther, Tauros, Safari Ball, and Research Journal. The Trainer Guild card now reads the Institute's authored Safari Ball icon instead of hard-coding the journal, and its drawer shows the Guild overview once inside the shared charter content. Deputy Warden at Rank 9 grants the Safari Ball profile icon; Rank 10 grants The Warden title.

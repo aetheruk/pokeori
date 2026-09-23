@@ -123,6 +123,12 @@ describe('TCG Basic Training content', () => {
       targetId: 'pokedollars',
       quantity: 20000,
     })
+    expect(base4Complete?.rewards).toContainEqual({
+      type: 'guild_xp',
+      targetId: 'underground-society',
+      quantity: 1500,
+      dropChance: 100,
+    })
     expect(boosterBoxManufacturing).toMatchObject({
       name: 'Profit Time!',
       repeatable: false,
