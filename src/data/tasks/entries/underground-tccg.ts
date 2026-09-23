@@ -828,6 +828,12 @@ export const undergroundTccgTasks: Task[] = [
     rewards: [
       { type: 'currency', targetId: 'pokedollars', quantity: 20000 },
       {
+        type: 'guild_xp',
+        targetId: UNDERGROUND_SOCIETY_GUILD_ID,
+        quantity: 1500,
+        dropChance: 100,
+      },
+      {
         type: 'card',
         quantity: 1,
         dropChance: 100,
