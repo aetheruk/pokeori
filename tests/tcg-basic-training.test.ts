@@ -262,6 +262,26 @@ describe('TCG Basic Training content', () => {
     }
   })
 
+  test('keeps set showcases claimable with the requested Pit copy', () => {
+    const set = tcgSetSummaries[0]!
+    const task = tasks.find(
+      (entry) => entry.id === `underground-tcg-set-showcase-${set.id}`,
+    )
+
+    expect(task?.description).toBe(
+      `I've completed a full set of ${set.name}. I can't help but show it off around the Pit.`,
+    )
+    expect(task?.exitModal?.message).toBe(
+      "I think I'm starting to earn a bit of respect around here.",
+    )
+    expect(task?.rewards).toContainEqual({
+      type: 'guild_xp',
+      targetId: 'underground-society',
+      quantity: 1000,
+      dropChance: 100,
+    })
+  })
+
   test('authors the inspection, battle, and art tutorial games with one-time gates', async () => {
     const inspection = allGames.find(
       (game) => game.id === 'underground-tcg-card-memory-game',
@@ -277,6 +297,9 @@ describe('TCG Basic Training content', () => {
     )
     const grass = allGames.find(
       (game) => game.id === 'underground-tcg-battle-grass',
+    )
+    const fireRematch = allGames.find(
+      (game) => game.id === 'underground-tcg-rematch-fire',
     )
     const pvp = allGames.find((game) => game.id === 'underground-tcg-pvp')
     const artAcademy = allGames.find(
@@ -346,6 +369,12 @@ describe('TCG Basic Training content', () => {
     expect(fire?.icon).toEqual({ type: 'pokemon', id: '6' })
     expect(water?.icon).toEqual({ type: 'pokemon', id: '9' })
     expect(grass?.icon).toEqual({ type: 'pokemon', id: '3' })
+    expect(fireRematch?.rewards).toContainEqual({
+      type: 'guild_xp',
+      targetId: 'underground-society',
+      quantity: 5,
+      dropChance: 100,
+    })
     expect(pvp).toMatchObject({
       gameType: 'tcg-battle',
       name: 'Underground TCG PVP',

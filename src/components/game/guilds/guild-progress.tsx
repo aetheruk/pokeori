@@ -84,6 +84,8 @@ export function GuildProgressContent({
       <div className="space-y-1">
         {guild.ranks.map((definition) => {
           const unlocked = rank >= definition.rank
+          const revealed = unlocked || definition.rank === rank + 1
+          const masked = !revealed
           return (
             <div
               key={definition.rank}
@@ -101,24 +103,24 @@ export function GuildProgressContent({
                 )}
               >
                 <TaskIconDisplay
-                  icon={definition.icon || guild.icon}
+                  icon={revealed ? definition.icon || guild.icon : { type: 'item', id: 'researchers-journal-page' }}
                   className={cn(
                     'h-8 w-8',
-                    !unlocked && 'grayscale opacity-40',
+                    (!unlocked || masked) && 'grayscale opacity-40',
                   )}
                 />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-3">
                   <h3 className="text-sm font-semibold text-game-ink">
-                    Rank {definition.rank}: {definition.name}
+                    Rank {definition.rank}: {revealed ? definition.name : '???'}
                   </h3>
                   <span className="shrink-0 font-mono text-xs text-game-muted">
-                    {definition.totalXp.toLocaleString()} XP
+                    {revealed ? `${definition.totalXp.toLocaleString()} XP` : '???'}
                   </span>
                 </div>
                 <p className="mt-1 text-xs leading-relaxed text-game-muted">
-                  {definition.unlocks.join(' · ')}
+                  {revealed ? definition.unlocks.join(' · ') : '???'}
                 </p>
               </div>
             </div>

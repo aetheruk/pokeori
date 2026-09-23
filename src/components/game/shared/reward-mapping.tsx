@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge'
 import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { getCurrency } from '@/data/currencies'
+import { getGuild } from '@/data/guilds'
 import { items } from '@/data/items'
 import { getSkill } from '@/data/skills'
 import { tasks } from '@/data/tasks'
@@ -273,7 +274,8 @@ export function mapRewardToDisplayItem(
       break
     }
     case 'guild_xp': {
-      label = `Fuchsia Research Institute XP${quantityStr ? ` ${quantityStr}` : ''}`
+      const guild = reward.targetId ? getGuild(String(reward.targetId)) : undefined
+      label = `${guild?.name || 'Guild'} XP${quantityStr ? ` ${quantityStr}` : ''}`
       icon = (
         <div className="relative h-8 w-8">
           <ItemSprite
