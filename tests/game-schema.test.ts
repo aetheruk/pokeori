@@ -25,10 +25,9 @@ import {
   createArtAcademyRound,
   scoreSerializedArtAcademyDrawing,
 } from '@/utilities/research/art-academy-server'
+import { authoredGamesSnapshot } from './setup'
 
 type Direction = 'up' | 'right' | 'down' | 'left'
-
-const authoredGamesSnapshot = structuredClone(allGames)
 
 const directionDeltas: Record<Direction, VoltorbGridPosition> = {
   up: { x: 0, y: -1 },
