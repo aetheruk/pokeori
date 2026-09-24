@@ -426,8 +426,10 @@ function getSkillUnlockCategoryLabel(category: SkillGuideUnlock['category']) {
 
 export function TrainerLeveling({
   saveCustomization = updateUserCustomization,
+  deferImageChecks = true,
 }: {
   saveCustomization?: typeof updateUserCustomization
+  deferImageChecks?: boolean
 } = {}) {
   const { user, refreshUser, updateUserContext } = useUser()
   const [selectedSkill, setSelectedSkill] = useState<CoreSkill | null>(null)
@@ -656,7 +658,7 @@ export function TrainerLeveling({
           <SectionDivider>Gym Badges</SectionDivider>
           <BadgeShowcase />
         </div>
-        <TrainerSettings />
+        <TrainerSettings deferImageChecks={deferImageChecks} />
       </div>
 
       <GameInfoModal

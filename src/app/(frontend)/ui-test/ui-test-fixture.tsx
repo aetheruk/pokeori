@@ -117,7 +117,7 @@ export function UiTestFixture() {
       <p role="status">{status}</p>
     </div>
     {gridAppearance && <GridAppearanceFixture />}
-    {settings && <SWRConfig value={{ isPaused: () => true }}><UserProvider initialGameData={{ snapshotAt: '2026-01-01T00:00:00.000Z', user: { id: 'ui-test', trainerName: 'Test trainer' }, inventory: [], pokemon: [] } as unknown as RequirementData}><AudioProvider><div className="h-[850px] w-full"><TrainerLeveling saveCustomization={async () => ({ success: true })} /></div></AudioProvider></UserProvider></SWRConfig>}
+    {settings && <SWRConfig value={{ isPaused: () => true }}><UserProvider initialGameData={{ snapshotAt: '2026-01-01T00:00:00.000Z', user: { id: 'ui-test', trainerName: 'Test trainer' }, inventory: [], pokemon: [] } as unknown as RequirementData}><AudioProvider><div className="h-[850px] w-full"><TrainerLeveling deferImageChecks={false} saveCustomization={async () => ({ success: true })} /></div></AudioProvider></UserProvider></SWRConfig>}
     {art ? <SWRConfig value={{ isPaused: () => true }}><UserProvider initialGameData={{ user: { id: 'ui-test', trainerName: 'Test trainer' }, inventory: [], pokemon: [] } as unknown as RequirementData}><AudioProvider>
       <ArtAcademyGame encounter={{ id: 'ui-test-art', name: 'Art Academy test', description: 'Local drawing fixture', category: 'game', icon: { type: 'item', id: 'poke-ball' }, requirements: [], rewards: [], settings: { formId: '1', timeLimit: 3600, successThreshold: 50 } }} initialState={artState} actions={artActions} />
     </AudioProvider></UserProvider></SWRConfig> : <AuthForm />}

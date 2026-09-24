@@ -14,7 +14,11 @@ import {
   imageCacheKey,
 } from '@/utilities/image-cache'
 
-export function TrainerSettings() {
+export function TrainerSettings({
+  deferImageChecks = true,
+}: {
+  deferImageChecks?: boolean
+}) {
   const { isAudioEnabled, toggleAudioEnabled } = useAudio()
   const router = useRouter()
   const [images, setImages] = useState<DownloadImage[]>([])
@@ -24,11 +28,34 @@ export function TrainerSettings() {
   const [message, setMessage] = useState('')
   const [supported, setSupported] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
+  const [shouldCheckImages, setShouldCheckImages] = useState(false)
+  const settingsRef = useRef<HTMLElement | null>(null)
   const download = useRef<AbortController | null>(null)
 
   useEffect(() => () => download.current?.abort(), [])
 
   useEffect(() => {
+    if (!deferImageChecks) {
+      setShouldCheckImages(true)
+      return
+    }
+    const element = settingsRef.current
+    if (!element || shouldCheckImages) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setShouldCheckImages(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '1000px' },
+    )
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [deferImageChecks, shouldCheckImages])
+
+  useEffect(() => {
+    if (!shouldCheckImages) return
     const request = new AbortController()
     setLoading(true)
     setImages([])
@@ -75,7 +102,7 @@ export function TrainerSettings() {
       }
     })()
     return () => request.abort()
-  }, [])
+  }, [shouldCheckImages])
 
   const start = async () => {
     if (download.current) return
@@ -150,7 +177,7 @@ export function TrainerSettings() {
   }
 
   return (
-    <section aria-label="Settings" className="space-y-4 text-game-ink">
+    <section ref={settingsRef} aria-label="Settings" className="space-y-4 text-game-ink">
       <SectionDivider>
         <h2>Settings</h2>
       </SectionDivider>
@@ -176,7 +203,9 @@ export function TrainerSettings() {
           <h3 className="text-sm font-semibold">
             Image downloads
           </h3>
-          {!supported && !loading ? (
+          {!shouldCheckImages ? (
+            <p className="text-sm">Image storage will be checked when you reach this section.</p>
+          ) : !supported && !loading ? (
             <p className="text-sm">
               Image downloads are unavailable in this browser.
             </p>

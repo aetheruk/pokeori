@@ -36,6 +36,7 @@ interface ExplicitHpEvent {
   amount: number
   kind: 'damage' | 'heal'
   lineIndex: number
+  selfDamage?: boolean
   target: HpEventTarget
 }
 
@@ -75,12 +76,17 @@ const extractExplicitHpEvents = (
     for (const match of line.matchAll(/\[icon:(damage|heal):(\d+)\]/g)) {
       const amount = Number.parseInt(match[2], 10)
       if (!Number.isFinite(amount) || amount <= 0) continue
-      events.push({
+      const event: ExplicitHpEvent = {
         amount,
         kind: match[1] === 'heal' ? 'heal' : 'damage',
         lineIndex,
         target,
+      }
+      Object.defineProperty(event, 'selfDamage', {
+        value: /hurt itself|recoil/i.test(line),
+        enumerable: false,
       })
+      events.push(event)
     }
   })
 
@@ -109,7 +115,10 @@ const getNetExplicitHpChange = (
 ) => {
   return events
     .filter(
-      (event) => event.target === target && event.lineIndex > afterLineIndex,
+      (event) =>
+        event.target === target &&
+        event.lineIndex > afterLineIndex &&
+        !event.selfDamage,
     )
     .reduce(
       (total, event) =>
