@@ -22,7 +22,7 @@ function PokemonExperienceRewardRow({
   const leveledUp = entry.newLevel > entry.oldLevel
   const oldExperience =
     entry.oldExperience ??
-    getTotalPokemonExperienceForLevel(entry.growthRate, entry.oldLevel)
+    Math.max(0, (entry.newExperience ?? entry.amount) - entry.amount)
   const newExperience = entry.newExperience ?? oldExperience + entry.amount
   const previousProgress = useMemo(
     () =>
@@ -102,7 +102,7 @@ function PokemonExperienceRewardRow({
           aria-valuenow={progress.percent}
         >
           <div
-            className="motion-safe:transition-[width] motion-safe:duration-1000 motion-safe:ease-out h-full rounded-full bg-game-moss"
+            className="motion-safe:transition-[width] motion-safe:duration-1000 motion-safe:ease-out h-full rounded-full bg-game-ochre"
             style={{ width: `${animatedPercent}%` }}
           />
         </div>
