@@ -124,7 +124,7 @@ function PokemonResearchExperienceRewardRow({
           aria-valuenow={progress.percent}
         >
           <div
-            className="motion-safe:transition-[width] motion-safe:duration-1000 motion-safe:ease-out h-full rounded-full bg-game-moss"
+            className="motion-safe:transition-[width] motion-safe:duration-1000 motion-safe:ease-out h-full rounded-full bg-game-ochre"
             style={{ width: `${animatedPercent}%` }}
           />
         </div>
