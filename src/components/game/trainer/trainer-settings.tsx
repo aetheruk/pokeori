@@ -14,7 +14,11 @@ import {
   imageCacheKey,
 } from '@/utilities/image-cache'
 
-export function TrainerSettings() {
+export function TrainerSettings({
+  deferImageChecks = true,
+}: {
+  deferImageChecks?: boolean
+}) {
   const { isAudioEnabled, toggleAudioEnabled } = useAudio()
   const router = useRouter()
   const [images, setImages] = useState<DownloadImage[]>([])
@@ -31,6 +35,10 @@ export function TrainerSettings() {
   useEffect(() => () => download.current?.abort(), [])
 
   useEffect(() => {
+    if (!deferImageChecks) {
+      setShouldCheckImages(true)
+      return
+    }
     const element = settingsRef.current
     if (!element || shouldCheckImages) return
     const observer = new IntersectionObserver(
@@ -44,7 +52,7 @@ export function TrainerSettings() {
     )
     observer.observe(element)
     return () => observer.disconnect()
-  }, [shouldCheckImages])
+  }, [deferImageChecks, shouldCheckImages])
 
   useEffect(() => {
     if (!shouldCheckImages) return
