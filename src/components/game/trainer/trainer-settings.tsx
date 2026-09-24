@@ -40,7 +40,7 @@ export function TrainerSettings() {
           observer.disconnect()
         }
       },
-      { rootMargin: '200px' },
+      { rootMargin: '1000px' },
     )
     observer.observe(element)
     return () => observer.disconnect()
