@@ -17,8 +17,15 @@ const undergroundBattleRequirements = (
   },
 ]
 
-const rematchRequirements = [
+const rematchRequirements = (id: string) => [
   { type: 'task_completed' as const, targetId: 'underground-tcg-wrapup' },
+  {
+    type: 'game_result' as const,
+    targetId: id,
+    battleStatus: 'win' as const,
+    count: 3,
+    inverse: true,
+  },
 ]
 
 const battle = (input: {
@@ -29,7 +36,9 @@ const battle = (input: {
   iconId: string
   colour: string
   cards: string[]
-  requirements: ReturnType<typeof undergroundBattleRequirements> | typeof rematchRequirements
+  requirements:
+    | ReturnType<typeof undergroundBattleRequirements>
+    | ReturnType<typeof rematchRequirements>
   reward: number
   replayable: boolean
 }): TcgBattleGameConfig => ({
@@ -136,10 +145,9 @@ export const kantoUndergroundTcgBattleEntries: TcgBattleGameConfig[] = [
     requirements: undergroundBattleRequirements(
       'underground-tcg-battle-fire',
       'underground-tcg-cal-outreach',
-      3,
     ),
     reward: 1000,
-    replayable: true,
+    replayable: false,
   }),
   battle({
     id: 'underground-tcg-battle-water',
@@ -152,10 +160,9 @@ export const kantoUndergroundTcgBattleEntries: TcgBattleGameConfig[] = [
     requirements: undergroundBattleRequirements(
       'underground-tcg-battle-water',
       'underground-tcg-marina-outreach',
-      3,
     ),
     reward: 1000,
-    replayable: true,
+    replayable: false,
   }),
   battle({
     id: 'underground-tcg-battle-grass',
@@ -168,10 +175,9 @@ export const kantoUndergroundTcgBattleEntries: TcgBattleGameConfig[] = [
     requirements: undergroundBattleRequirements(
       'underground-tcg-battle-grass',
       'underground-tcg-fern-outreach',
-      3,
     ),
     reward: 1000,
-    replayable: true,
+    replayable: false,
   }),
   battle({
     id: 'underground-tcg-rematch-fire',
@@ -181,9 +187,9 @@ export const kantoUndergroundTcgBattleEntries: TcgBattleGameConfig[] = [
     iconId: '6',
     colour: '#b86148',
     cards: fireCards,
-    requirements: rematchRequirements,
+    requirements: rematchRequirements('underground-tcg-rematch-fire'),
     reward: 350,
-    replayable: false,
+    replayable: true,
   }),
   battle({
     id: 'underground-tcg-rematch-water',
@@ -193,9 +199,9 @@ export const kantoUndergroundTcgBattleEntries: TcgBattleGameConfig[] = [
     iconId: '9',
     colour: '#4d7c8a',
     cards: waterCards,
-    requirements: rematchRequirements,
+    requirements: rematchRequirements('underground-tcg-rematch-water'),
     reward: 350,
-    replayable: false,
+    replayable: true,
   }),
   battle({
     id: 'underground-tcg-rematch-grass',
@@ -205,8 +211,8 @@ export const kantoUndergroundTcgBattleEntries: TcgBattleGameConfig[] = [
     iconId: '3',
     colour: '#5f794f',
     cards: grassCards,
-    requirements: rematchRequirements,
+    requirements: rematchRequirements('underground-tcg-rematch-grass'),
     reward: 350,
-    replayable: false,
+    replayable: true,
   }),
 ]
