@@ -44,7 +44,24 @@ function SkillExperienceRewardRow({
       required: span,
     }
   }, [entry.newExperience, entry.newLevel, hasProgress])
-  const [animatedPercent, setAnimatedPercent] = useState(0)
+  const previousProgress = useMemo(() => {
+    if (!hasProgress) return null
+
+    const level = Math.max(1, Math.min(100, entry.oldLevel || 1))
+    if (level >= 100) return { percent: 100 }
+
+    const levelStart = getTotalExpForLevel(level)
+    const nextLevelStart = getTotalExpForLevel(level + 1)
+    const span = Math.max(1, nextLevelStart - levelStart)
+    const current = Math.max(0, (entry.oldExperience || 0) - levelStart)
+
+    return {
+      percent: Math.min(100, Math.max(0, (current / span) * 100)),
+    }
+  }, [entry.oldExperience, entry.oldLevel, hasProgress])
+  const [animatedPercent, setAnimatedPercent] = useState(
+    previousProgress?.percent ?? 0,
+  )
 
   useEffect(() => {
     if (!progress) return
@@ -106,7 +123,7 @@ function SkillExperienceRewardRow({
               aria-valuenow={progress.percent}
             >
               <div
-                className="motion-safe:transition-[width] motion-safe:duration-1000 motion-safe:ease-out h-full rounded-full bg-game-ochre"
+                className="motion-safe:transition-[width] motion-safe:duration-1000 motion-safe:ease-out h-full rounded-full bg-game-moss"
                 style={{ width: `${animatedPercent}%` }}
               />
             </div>

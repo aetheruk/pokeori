@@ -24,6 +24,16 @@ function PokemonExperienceRewardRow({
     entry.oldExperience ??
     getTotalPokemonExperienceForLevel(entry.growthRate, entry.oldLevel)
   const newExperience = entry.newExperience ?? oldExperience + entry.amount
+  const previousProgress = useMemo(
+    () =>
+      getPokemonExperienceProgress(
+        entry.growthRate,
+        entry.oldLevel,
+        oldExperience,
+        entry.levelCap,
+      ),
+    [entry.growthRate, entry.levelCap, entry.oldLevel, oldExperience],
+  )
   const progress = useMemo(
     () =>
       getPokemonExperienceProgress(
@@ -34,7 +44,9 @@ function PokemonExperienceRewardRow({
       ),
     [entry.growthRate, entry.levelCap, entry.newLevel, newExperience],
   )
-  const [animatedPercent, setAnimatedPercent] = useState(0)
+  const [animatedPercent, setAnimatedPercent] = useState(
+    previousProgress.percent,
+  )
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -90,7 +102,7 @@ function PokemonExperienceRewardRow({
           aria-valuenow={progress.percent}
         >
           <div
-            className="motion-safe:transition-[width] motion-safe:duration-1000 motion-safe:ease-out h-full rounded-full bg-game-ochre"
+            className="motion-safe:transition-[width] motion-safe:duration-1000 motion-safe:ease-out h-full rounded-full bg-game-moss"
             style={{ width: `${animatedPercent}%` }}
           />
         </div>
