@@ -36,7 +36,7 @@ interface ExplicitHpEvent {
   amount: number
   kind: 'damage' | 'heal'
   lineIndex: number
-  selfDamage: boolean
+  selfDamage?: boolean
   target: HpEventTarget
 }
 
