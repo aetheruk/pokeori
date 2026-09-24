@@ -25,6 +25,7 @@ import {
   createArtAcademyRound,
   scoreSerializedArtAcademyDrawing,
 } from '@/utilities/research/art-academy-server'
+import { authoredGamesSnapshot } from './setup'
 
 type Direction = 'up' | 'right' | 'down' | 'left'
 
@@ -376,7 +377,7 @@ describe('generated game data schemas', () => {
   })
 
   test('all game entries satisfy the canonical schema', () => {
-    const failures = allGames
+    const failures = authoredGamesSnapshot
       .map((game) => ({ game, result: validateGameItem(game) }))
       .filter(({ result }) => !result.success)
 
