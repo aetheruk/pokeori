@@ -23,7 +23,36 @@ function clampResearchLevel(level: number) {
   return Math.max(0, Math.min(MAX_RESEARCH_LEVEL, Math.floor(level)))
 }
 
-function getResearchProgress(entry: PokemonResearchExperienceReward) {
+function getResearchProgress(
+  level: number,
+  experience: number,
+) {
+  const currentLevel = clampResearchLevel(level)
+  const isComplete = currentLevel >= MAX_RESEARCH_LEVEL
+  const levelStart = getResearchXpForLevel(currentLevel)
+  const nextThreshold = isComplete
+    ? levelStart
+    : getResearchXpForLevel(currentLevel + 1)
+  const required = isComplete ? 0 : Math.max(1, nextThreshold - levelStart)
+  const current = isComplete
+    ? experience
+    : Math.max(0, experience - levelStart)
+
+  return {
+    level: currentLevel,
+    percent: isComplete
+      ? 100
+      : Math.min(100, Math.max(0, (current / required) * 100)),
+    current,
+    required,
+  }
+}
+
+function PokemonResearchExperienceRewardRow({
+  entry,
+}: {
+  entry: PokemonResearchExperienceReward
+}) {
   const oldExperience = Math.max(
     0,
     entry.oldExperience ??
@@ -39,35 +68,18 @@ function getResearchProgress(entry: PokemonResearchExperienceReward) {
   const newLevel = clampResearchLevel(
     entry.newLevel ?? getMaxResearchLevelForXp(newExperience),
   )
-  const isComplete = newLevel >= MAX_RESEARCH_LEVEL
-  const levelStart = getResearchXpForLevel(newLevel)
-  const nextThreshold = isComplete
-    ? levelStart
-    : getResearchXpForLevel(newLevel + 1)
-  const required = isComplete ? 0 : Math.max(1, nextThreshold - levelStart)
-  const current = isComplete
-    ? newExperience
-    : Math.max(0, newExperience - levelStart)
-
-  return {
-    oldLevel,
-    newLevel,
-    percent: isComplete
-      ? 100
-      : Math.min(100, Math.max(0, (current / required) * 100)),
-    current,
-    required,
-  }
-}
-
-function PokemonResearchExperienceRewardRow({
-  entry,
-}: {
-  entry: PokemonResearchExperienceReward
-}) {
-  const progress = useMemo(() => getResearchProgress(entry), [entry])
-  const leveledUp = progress.newLevel > progress.oldLevel
-  const [animatedPercent, setAnimatedPercent] = useState(0)
+  const previousProgress = useMemo(
+    () => getResearchProgress(oldLevel, oldExperience),
+    [oldExperience, oldLevel],
+  )
+  const progress = useMemo(
+    () => getResearchProgress(newLevel, newExperience),
+    [newExperience, newLevel],
+  )
+  const leveledUp = newLevel > oldLevel
+  const [animatedPercent, setAnimatedPercent] = useState(
+    previousProgress.percent,
+  )
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -112,13 +124,13 @@ function PokemonResearchExperienceRewardRow({
           aria-valuenow={progress.percent}
         >
           <div
-            className="motion-safe:transition-[width] motion-safe:duration-1000 motion-safe:ease-out h-full rounded-full bg-game-moss"
+            className="motion-safe:transition-[width] motion-safe:duration-1000 motion-safe:ease-out h-full rounded-full bg-game-ochre"
             style={{ width: `${animatedPercent}%` }}
           />
         </div>
 
         <div className="mt-1 flex items-center justify-between gap-2 text-[11px] text-game-muted">
-          <span>Research Lv {progress.newLevel}</span>
+          <span>Research Lv {progress.level}</span>
           <span>
             {progress.required === 0
               ? 'Complete'

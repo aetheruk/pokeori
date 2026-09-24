@@ -22,8 +22,18 @@ function PokemonExperienceRewardRow({
   const leveledUp = entry.newLevel > entry.oldLevel
   const oldExperience =
     entry.oldExperience ??
-    getTotalPokemonExperienceForLevel(entry.growthRate, entry.oldLevel)
+    Math.max(0, (entry.newExperience ?? entry.amount) - entry.amount)
   const newExperience = entry.newExperience ?? oldExperience + entry.amount
+  const previousProgress = useMemo(
+    () =>
+      getPokemonExperienceProgress(
+        entry.growthRate,
+        entry.oldLevel,
+        oldExperience,
+        entry.levelCap,
+      ),
+    [entry.growthRate, entry.levelCap, entry.oldLevel, oldExperience],
+  )
   const progress = useMemo(
     () =>
       getPokemonExperienceProgress(
@@ -34,7 +44,9 @@ function PokemonExperienceRewardRow({
       ),
     [entry.growthRate, entry.levelCap, entry.newLevel, newExperience],
   )
-  const [animatedPercent, setAnimatedPercent] = useState(0)
+  const [animatedPercent, setAnimatedPercent] = useState(
+    previousProgress.percent,
+  )
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
