@@ -152,19 +152,19 @@ describe('TCG Basic Training content', () => {
         type: 'game_result',
         targetId: 'underground-tcg-battle-fire',
         battleStatus: 'win',
-        count: 1,
+        count: 3,
       },
       {
         type: 'game_result',
         targetId: 'underground-tcg-battle-water',
         battleStatus: 'win',
-        count: 1,
+        count: 3,
       },
       {
         type: 'game_result',
         targetId: 'underground-tcg-battle-grass',
         battleStatus: 'win',
-        count: 1,
+        count: 3,
       },
     ])
     expect(taskDialogue(battleWrapup)).toContain('LESS PLAYING. MORE CRYSTALS.')
@@ -193,13 +193,13 @@ describe('TCG Basic Training content', () => {
       type: 'game_result',
       targetId: 'underground-tcg-battle-fire',
       battleStatus: 'win',
-      count: 1,
+      count: 3,
     })
     expect(fernOutreach?.requirements).toContainEqual({
       type: 'game_result',
       targetId: 'underground-tcg-battle-water',
       battleStatus: 'win',
-      count: 1,
+      count: 3,
     })
     for (const leadIn of [calOutreach, marinaOutreach, fernOutreach]) {
       expect(leadIn?.requirements).toContainEqual({
@@ -235,7 +235,7 @@ describe('TCG Basic Training content', () => {
       expect(task?.rewards).toContainEqual({
         type: 'guild_xp',
         targetId: 'underground-society',
-        quantity: 20,
+        quantity: 250,
         dropChance: 100,
       })
       expect(task?.requirements).toContainEqual({
@@ -375,12 +375,13 @@ describe('TCG Basic Training content', () => {
     expect(fire?.icon).toEqual({ type: 'pokemon', id: '6' })
     expect(water?.icon).toEqual({ type: 'pokemon', id: '9' })
     expect(grass?.icon).toEqual({ type: 'pokemon', id: '3' })
-    expect(fireRematch?.rewards).toContainEqual({
+    expect(fire?.rewards).toContainEqual({
       type: 'guild_xp',
       targetId: 'underground-society',
-      quantity: 5,
+      quantity: 50,
       dropChance: 100,
     })
+    expect(fireRematch?.isEligibleForReplay).toBe(false)
     expect(pvp).toMatchObject({
       gameType: 'tcg-battle',
       name: 'Underground TCG PVP',

@@ -61,7 +61,7 @@ export const tcgBoosterBoxDeliveryTasks: Task[] = tcgSetSummaries.map((set) => (
     {
       type: 'guild_xp',
       targetId: UNDERGROUND_SOCIETY_GUILD_ID,
-      quantity: 20,
+      quantity: 250,
       dropChance: 100,
     },
   ],

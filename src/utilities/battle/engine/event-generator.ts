@@ -36,6 +36,7 @@ interface ExplicitHpEvent {
   amount: number
   kind: 'damage' | 'heal'
   lineIndex: number
+  selfDamage: boolean
   target: HpEventTarget
 }
 
@@ -79,6 +80,7 @@ const extractExplicitHpEvents = (
         amount,
         kind: match[1] === 'heal' ? 'heal' : 'damage',
         lineIndex,
+        selfDamage: /hurt itself|recoil/i.test(line),
         target,
       })
     }
@@ -109,7 +111,10 @@ const getNetExplicitHpChange = (
 ) => {
   return events
     .filter(
-      (event) => event.target === target && event.lineIndex > afterLineIndex,
+      (event) =>
+        event.target === target &&
+        event.lineIndex > afterLineIndex &&
+        !event.selfDamage,
     )
     .reduce(
       (total, event) =>
