@@ -1,8 +1,8 @@
 # Current Game State
 
-- Unreleased: Underground Society booster box deliveries now award 250 XP. Cal, Marina, and Fern's three training battles can each be won up to three times for 50 XP per win, then their follow-up conversations close the training loop. The repeatable Feed the Pit task consumes 5,000 crystals for 100 Society XP.
+- Unreleased: Underground Society booster box deliveries now award 250 XP. Cal, Marina, and Fern's rematch battles can each be won up to three times for 50 XP per win, while their original training battles remain one-time wins. The repeatable Feed the Pit task consumes 5,000 crystals for 100 Society XP.
 
-- Unreleased: Underground Society set showcase tasks now use the Pit-facing description and a short respect-themed exit note. TCG rematch deck wins award 5 Underground Society XP, and Guild XP reward labels resolve from the target guild instead of always naming the Fuchsia Research Institute. Guild charter previews show completed ranks plus only the next rank in full; later rank names, thresholds, icons, and unlocks remain `???`.
+- Unreleased: Underground Society set showcase tasks now use the Pit-facing description and a short respect-themed exit note. TCG rematch deck wins award 50 Underground Society XP, and Guild XP reward labels resolve from the target guild instead of always naming the Fuchsia Research Institute. Guild charter previews show completed ranks plus only the next rank in full; later rank names, thresholds, icons, and unlocks remain `???`.
 
 - Release `0.39.1`: Guild ranks can now define their own item, Pokémon, or Trainer artwork instead of using generic status symbols. The Fuchsia Research Institute charter uses, in order, the Research Journal, Chansey, Pinsir, Metal Scrap, a Rocket Grunt, Dratini, Scyther, Tauros, Safari Ball, and Research Journal. The Trainer Guild card now reads the Institute's authored Safari Ball icon instead of hard-coding the journal, and its drawer shows the Guild overview once inside the shared charter content. Deputy Warden at Rank 9 grants the Safari Ball profile icon; Rank 10 grants The Warden title.
 
@@ -969,7 +969,7 @@ These are authored requirements or intended handoffs beyond the current Fuchsia 
 
 - The Underground Society is a separate ten-rank guild attached to the Kanto Underground TCG route. Existing recruits receive Rank 1 with 0 XP through the idempotent `migrate:underground-society` migration. The migration does not award historical XP and does not complete any set showcase tasks, so players with completed collections can still claim those tasks.
 - Guild XP thresholds are 0, 10,000, 25,000, 50,000, 100,000, 180,000, 300,000, 480,000, 720,000, and 1,000,000. Rank names run from New Recruit through Lord of the Pit.
-- Each authored TCG set has a one-time `Showcase <set>` task in Kanto Underground. Presenting a completed set grants 1,000 Society XP. Booster box delivery grants 250 Society XP, and the bounded training wins plus Feed the Pit task provide the repeatable Society XP routes.
+- Each authored TCG set has a one-time `Showcase <set>` task in Kanto Underground. Presenting a completed set grants 1,000 Society XP. Booster box delivery grants 250 Society XP, and bounded rematch wins plus the Feed the Pit task provide the repeatable Society XP routes.
 - Rank 2 opens a one-stock promo counter selling `basep-24`, `basep-25`, and `basep-28` for 50,000 Crystals each. Rank 3 enables the one-click Carddex action that sends every duplicate card to HQ while retaining one copy per card and paying the normal rarity-based Pokédollar value. Individual duplicate transfers remain available at all ranks.
 
 ### Interface Shell

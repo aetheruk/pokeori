@@ -152,19 +152,19 @@ describe('TCG Basic Training content', () => {
         type: 'game_result',
         targetId: 'underground-tcg-battle-fire',
         battleStatus: 'win',
-        count: 3,
+        count: 1,
       },
       {
         type: 'game_result',
         targetId: 'underground-tcg-battle-water',
         battleStatus: 'win',
-        count: 3,
+        count: 1,
       },
       {
         type: 'game_result',
         targetId: 'underground-tcg-battle-grass',
         battleStatus: 'win',
-        count: 3,
+        count: 1,
       },
     ])
     expect(taskDialogue(battleWrapup)).toContain('LESS PLAYING. MORE CRYSTALS.')
@@ -193,13 +193,13 @@ describe('TCG Basic Training content', () => {
       type: 'game_result',
       targetId: 'underground-tcg-battle-fire',
       battleStatus: 'win',
-      count: 3,
+      count: 1,
     })
     expect(fernOutreach?.requirements).toContainEqual({
       type: 'game_result',
       targetId: 'underground-tcg-battle-water',
       battleStatus: 'win',
-      count: 3,
+      count: 1,
     })
     for (const leadIn of [calOutreach, marinaOutreach, fernOutreach]) {
       expect(leadIn?.requirements).toContainEqual({
@@ -375,13 +375,14 @@ describe('TCG Basic Training content', () => {
     expect(fire?.icon).toEqual({ type: 'pokemon', id: '6' })
     expect(water?.icon).toEqual({ type: 'pokemon', id: '9' })
     expect(grass?.icon).toEqual({ type: 'pokemon', id: '3' })
-    expect(fire?.rewards).toContainEqual({
+    expect(fireRematch?.rewards).toContainEqual({
       type: 'guild_xp',
       targetId: 'underground-society',
       quantity: 50,
       dropChance: 100,
     })
-    expect(fireRematch?.isEligibleForReplay).toBe(false)
+    expect(fire?.isEligibleForReplay).toBe(false)
+    expect(fireRematch?.isEligibleForReplay).toBe(true)
     expect(pvp).toMatchObject({
       gameType: 'tcg-battle',
       name: 'Underground TCG PVP',
