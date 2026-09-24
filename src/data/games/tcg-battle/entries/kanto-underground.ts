@@ -2,9 +2,19 @@ import type { TcgBattleGameConfig } from '../types'
 import type { TcgBattleEnergyType } from '@/utilities/tcg/tcg-battle'
 import { UNDERGROUND_SOCIETY_GUILD_ID } from '@/data/guilds/underground-society'
 
-const undergroundBattleRequirements = (id: string, taskId: string) => [
+const undergroundBattleRequirements = (
+  id: string,
+  taskId: string,
+  maxWins = 1,
+) => [
   { type: 'task_completed' as const, targetId: taskId },
-  { type: 'game_result' as const, targetId: id, battleStatus: 'win' as const, count: 3, inverse: true },
+  {
+    type: 'game_result' as const,
+    targetId: id,
+    battleStatus: 'win' as const,
+    count: maxWins,
+    inverse: true,
+  },
 ]
 
 const rematchRequirements = [
@@ -126,9 +136,10 @@ export const kantoUndergroundTcgBattleEntries: TcgBattleGameConfig[] = [
     requirements: undergroundBattleRequirements(
       'underground-tcg-battle-fire',
       'underground-tcg-cal-outreach',
+      3,
     ),
     reward: 1000,
-    replayable: false,
+    replayable: true,
   }),
   battle({
     id: 'underground-tcg-battle-water',
@@ -141,6 +152,7 @@ export const kantoUndergroundTcgBattleEntries: TcgBattleGameConfig[] = [
     requirements: undergroundBattleRequirements(
       'underground-tcg-battle-water',
       'underground-tcg-marina-outreach',
+      3,
     ),
     reward: 1000,
     replayable: true,
@@ -156,6 +168,7 @@ export const kantoUndergroundTcgBattleEntries: TcgBattleGameConfig[] = [
     requirements: undergroundBattleRequirements(
       'underground-tcg-battle-grass',
       'underground-tcg-fern-outreach',
+      3,
     ),
     reward: 1000,
     replayable: true,
