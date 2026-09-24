@@ -28,6 +28,8 @@ import {
 
 type Direction = 'up' | 'right' | 'down' | 'left'
 
+const authoredGamesSnapshot = structuredClone(allGames)
+
 const directionDeltas: Record<Direction, VoltorbGridPosition> = {
   up: { x: 0, y: -1 },
   right: { x: 1, y: 0 },
@@ -376,7 +378,7 @@ describe('generated game data schemas', () => {
   })
 
   test('all game entries satisfy the canonical schema', () => {
-    const failures = allGames
+    const failures = authoredGamesSnapshot
       .map((game) => ({ game, result: validateGameItem(game) }))
       .filter(({ result }) => !result.success)
 
