@@ -89,4 +89,79 @@ describe('TCG battle completion navigation', () => {
       source.indexOf('function BattleCommandControls('),
     )
   })
+
+  test('does not render the result overlay before the finished state is settled', () => {
+    const source = readFileSync(
+      join(
+        process.cwd(),
+        'src/app/(frontend)/game/research/encounter/tcg-battle.tsx',
+      ),
+      'utf8',
+    )
+    const resultOverlayStart = source.indexOf('const resultOverlay = useMemo')
+    const finishedGuard = source.indexOf(
+      "if (!result || state?.phase !== 'finished') return null",
+      resultOverlayStart,
+    )
+
+    expect(resultOverlayStart).toBeGreaterThan(-1)
+    expect(finishedGuard).toBeGreaterThan(resultOverlayStart)
+  })
+
+  test('allows failed automatic claims to retry but stops after success', () => {
+    const source = readFileSync(
+      join(
+        process.cwd(),
+        'src/app/(frontend)/game/research/encounter/tcg-battle.tsx',
+      ),
+      'utf8',
+    )
+    const controlsStart = source.indexOf('function BattleCommandControls(')
+    const resultShownGuard = source.indexOf(
+      'if (resultShown) {',
+      controlsStart,
+    )
+    const autoClaimTimer = source.indexOf(
+      'const timer = window.setTimeout',
+      controlsStart,
+    )
+    const autoClaimMark = source.indexOf(
+      'autoClaimedResultRef.current = resultKey',
+      controlsStart,
+    )
+
+    expect(resultShownGuard).toBeGreaterThan(controlsStart)
+    expect(autoClaimTimer).toBeGreaterThan(resultShownGuard)
+    expect(autoClaimMark).toBeGreaterThan(resultShownGuard)
+    expect(autoClaimMark).toBeLessThan(autoClaimTimer)
+  })
+
+  test('claims PVP results from durable match status without requiring game session state', () => {
+    const source = readFileSync(
+      join(
+        process.cwd(),
+        'src/app/(frontend)/game/research/games/tcg-battle.ts',
+      ),
+      'utf8',
+    )
+    const claimStart = source.indexOf(
+      'export async function claimTcgBattleResult()',
+    )
+    const statusLoad = source.indexOf(
+      'const status = await loadTcgPvpStatus(user.id)',
+      claimStart,
+    )
+    const pvpLock = source.indexOf(
+      'return await withTcgPvpLock(status.matchId',
+      statusLoad,
+    )
+    const pveFallback = source.indexOf(
+      'const state = await loadState(user.id)',
+      pvpLock,
+    )
+
+    expect(statusLoad).toBeGreaterThan(claimStart)
+    expect(pvpLock).toBeGreaterThan(statusLoad)
+    expect(pveFallback).toBeGreaterThan(pvpLock)
+  })
 })

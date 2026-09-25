@@ -2495,11 +2495,16 @@ export async function claimTcgBattleResult(): Promise<TcgBattleActionResult> {
     const user = await getUser()
     if (!user) return { success: false, error: 'Not authenticated' }
 
-    const encounter = await getActiveTcgBattleEncounter(user.id)
-    if (isTcgPvpEncounter(encounter)) {
-      const status = await loadTcgPvpStatus(user.id)
-      if (!status?.matchId) {
+    const status = await loadTcgPvpStatus(user.id)
+    if (status?.matchId) {
+      if (!status.encounterId) {
         return { success: false, error: 'No finished TCG PVP match.' }
+      }
+      const pvpEncounter = allGames.find(
+        (game) => game.id === status.encounterId,
+      ) as TcgBattleGameConfig | undefined
+      if (!pvpEncounter || !isTcgPvpEncounter(pvpEncounter)) {
+        return { success: false, error: 'Invalid TCG PVP encounter.' }
       }
       return await withTcgPvpLock(status.matchId, async () => {
         const shared = await loadTcgPvpSharedState(status.matchId as string)

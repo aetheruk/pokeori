@@ -1761,8 +1761,10 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
   )
 
   const resultOverlay = useMemo(() => {
-    if (!result) return null
-    if (state?.phase !== 'finished') return result
+    // Keep the result screen hidden until the claimed state is settled. A
+    // completion response can arrive before the finished battle state is
+    // committed locally, which would briefly mount an empty result screen.
+    if (!result || state?.phase !== 'finished') return null
 
     return {
       ...result,
@@ -3010,6 +3012,10 @@ function BattleCommandControls({
     if (state.phase !== 'finished' || isPending) return
 
     const resultKey = `${state.encounterId}:${state.winner || 'unknown'}`
+    if (resultShown) {
+      autoClaimedResultRef.current = resultKey
+      return
+    }
     if (autoClaimedResultRef.current === resultKey) return
 
     const loserSide =
@@ -3020,7 +3026,6 @@ function BattleCommandControls({
           : null
     const animationDurationMs = loserSide ? 1650 : 820
     const timer = window.setTimeout(() => {
-      autoClaimedResultRef.current = resultKey
       claimHandlerRef.current()
     }, animationDurationMs + 350)
 
