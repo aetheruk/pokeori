@@ -688,6 +688,12 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       setIsActionBusy(false)
       if (completion) setResult(completion)
       if (nextState.phase === 'finished') {
+        if (!completion) {
+          setResult({
+            success: nextState.winner === 'player',
+            message: getWinnerMessage(nextState.winner, nextState.noContest),
+          })
+        }
         if (nextState.winner === 'player') playSfx('stance_win')
         else if (nextState.winner === 'opponent') playSfx('stance_loss')
         else playSfx('stance_tie')
@@ -3007,7 +3013,7 @@ function BattleCommandControls({
   }, [onClaim])
 
   useEffect(() => {
-    if (state.phase !== 'finished' || resultShown || isPending) return
+    if (state.phase !== 'finished' || isPending) return
 
     const resultKey = `${state.encounterId}:${state.winner || 'unknown'}`
     if (autoClaimedResultRef.current === resultKey) return
