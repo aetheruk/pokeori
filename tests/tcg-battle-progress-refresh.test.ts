@@ -155,13 +155,13 @@ describe('TCG battle completion navigation', () => {
       'return await withTcgPvpLock(status.matchId',
       statusLoad,
     )
-    const activeEncounter = source.indexOf(
-      'const encounter = await getActiveTcgBattleEncounter(user.id)',
-      claimStart,
+    const pveFallback = source.indexOf(
+      'const state = await loadState(user.id)',
+      pvpLock,
     )
 
     expect(statusLoad).toBeGreaterThan(claimStart)
     expect(pvpLock).toBeGreaterThan(statusLoad)
-    expect(activeEncounter).toBeGreaterThan(pvpLock)
+    expect(pveFallback).toBeGreaterThan(pvpLock)
   })
 })
