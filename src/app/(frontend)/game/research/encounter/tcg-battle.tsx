@@ -688,12 +688,6 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       setIsActionBusy(false)
       if (completion) setResult(completion)
       if (nextState.phase === 'finished') {
-        if (!completion) {
-          setResult({
-            success: nextState.winner === 'player',
-            message: getWinnerMessage(nextState.winner, nextState.noContest),
-          })
-        }
         if (nextState.winner === 'player') playSfx('stance_win')
         else if (nextState.winner === 'opponent') playSfx('stance_loss')
         else playSfx('stance_tie')
