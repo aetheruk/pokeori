@@ -3012,6 +3012,10 @@ function BattleCommandControls({
     if (state.phase !== 'finished' || isPending) return
 
     const resultKey = `${state.encounterId}:${state.winner || 'unknown'}`
+    if (resultShown) {
+      autoClaimedResultRef.current = resultKey
+      return
+    }
     if (autoClaimedResultRef.current === resultKey) return
 
     const loserSide =
@@ -3022,7 +3026,6 @@ function BattleCommandControls({
           : null
     const animationDurationMs = loserSide ? 1650 : 820
     const timer = window.setTimeout(() => {
-      autoClaimedResultRef.current = resultKey
       claimHandlerRef.current()
     }, animationDurationMs + 350)
 
