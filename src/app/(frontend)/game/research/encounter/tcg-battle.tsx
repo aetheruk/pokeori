@@ -1761,8 +1761,10 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
   )
 
   const resultOverlay = useMemo(() => {
-    if (!result) return null
-    if (state?.phase !== 'finished') return result
+    // Keep the result screen hidden until the claimed state is settled. A
+    // completion response can arrive before the finished battle state is
+    // committed locally, which would briefly mount an empty result screen.
+    if (!result || state?.phase !== 'finished') return null
 
     return {
       ...result,

@@ -89,4 +89,22 @@ describe('TCG battle completion navigation', () => {
       source.indexOf('function BattleCommandControls('),
     )
   })
+
+  test('does not render the result overlay before the finished state is settled', () => {
+    const source = readFileSync(
+      join(
+        process.cwd(),
+        'src/app/(frontend)/game/research/encounter/tcg-battle.tsx',
+      ),
+      'utf8',
+    )
+    const resultOverlayStart = source.indexOf('const resultOverlay = useMemo')
+    const finishedGuard = source.indexOf(
+      "if (!result || state?.phase !== 'finished') return null",
+      resultOverlayStart,
+    )
+
+    expect(resultOverlayStart).toBeGreaterThan(-1)
+    expect(finishedGuard).toBeGreaterThan(resultOverlayStart)
+  })
 })
