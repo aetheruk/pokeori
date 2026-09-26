@@ -96,6 +96,7 @@ describe('Brick Breaker mechanics', () => {
       0.12,
     )
     expect(result.hits).toBe(1)
+    expect(result.hitBrickIds).toEqual(['brick'])
     expect(result.bricks[0].durability).toBe(1)
     expect(getBrickBreakerBallSpeed(result.ball)).toBeGreaterThan(300)
   })
@@ -179,6 +180,9 @@ describe('Brick Breaker presentation', () => {
     expect(source).toContain('crystalColor} 70%, white)')
     expect(source).not.toContain('clipPath:')
     expect(source).toContain('!brick.indestructible &&')
+    expect(source).toContain('specimen ? (')
+    expect(source).toContain('rgba(255,220,112,0.95)')
+    expect(source).toContain('pickup.brickId === brick.id')
     expect(source).toContain('width={64}')
     expect(source).toContain('height={64}')
     expect(source).toContain('h-[78%] w-[78%] object-contain')

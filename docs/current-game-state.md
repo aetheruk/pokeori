@@ -1,5 +1,7 @@
 # Current Game State
 
+- Unreleased: Brick Breaker reward drops now replace a random destructible brick's Pokémon icon, glow, and grant the reward only when that brick is hit before expiration. Surf hazards spread farther into the playable edge lanes as they approach, making side-camping less reliable.
+
 - Unreleased: Underground Society booster box deliveries now award 250 XP. Cal, Marina, and Fern's rematch battles can each be won up to three times for 50 XP per win, while their original training battles remain one-time wins. The repeatable Feed the Pit task consumes 5,000 crystals for 100 Society XP.
 
 - Unreleased: Underground Society set showcase tasks now use the Pit-facing description and a short respect-themed exit note. TCG rematch deck wins award 50 Underground Society XP, and Guild XP reward labels resolve from the target guild instead of always naming the Fuchsia Research Institute. Guild charter previews show completed ranks plus only the next rank in full; later rank names, thresholds, icons, and unlocks remain `???`.
