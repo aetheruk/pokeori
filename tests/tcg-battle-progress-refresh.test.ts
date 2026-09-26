@@ -76,7 +76,7 @@ describe('TCG battle completion navigation', () => {
     expect(navigate).toBeGreaterThan(refresh)
   })
 
-  test('claims the finished result automatically after the winner animation', () => {
+  test('claims terminal results automatically without a winner-card animation', () => {
     const source = readFileSync(
       join(
         process.cwd(),
@@ -85,18 +85,6 @@ describe('TCG battle completion navigation', () => {
       'utf8',
     )
     const controlsStart = source.indexOf('function BattleCommandControls(')
-    const finishedBranch = source.indexOf(
-      "if (state.phase === 'finished')",
-      controlsStart,
-    )
-    const animationCompleteHandler = source.indexOf(
-      'const handleResultAnimationComplete',
-      controlsStart,
-    )
-    const claimCall = source.indexOf(
-      'claimHandlerRef.current()',
-      animationCompleteHandler,
-    )
     const controlsEnd = source.indexOf(
       'function LabeledCommandButton(',
       controlsStart,
@@ -104,12 +92,11 @@ describe('TCG battle completion navigation', () => {
     const controlsSource = source.slice(controlsStart, controlsEnd)
 
     expect(controlsStart).toBeGreaterThan(-1)
-    expect(finishedBranch).toBeGreaterThan(controlsStart)
-    expect(animationCompleteHandler).toBeGreaterThan(controlsStart)
-    expect(claimCall).toBeGreaterThan(animationCompleteHandler)
-    expect(controlsSource.match(/onAnimationComplete=\{/g)).toHaveLength(2)
-    expect(controlsSource).toContain("loserSide === 'player'")
-    expect(controlsSource).toContain("loserSide !== 'player'")
+    expect(controlsSource).toContain("state.phase !== 'finished'")
+    expect(controlsSource).toContain('hasAutoClaimedResultRef.current = true')
+    expect(controlsSource).toContain('onClaim()')
+    expect(controlsSource).not.toContain('TrainerCard')
+    expect(controlsSource).not.toContain('onAnimationComplete')
   })
 
   test('removes the finished battle overlay once the shared result is shown', () => {
@@ -150,7 +137,7 @@ describe('TCG battle completion navigation', () => {
     expect(finishedGuard).toBeGreaterThan(resultOverlayStart)
   })
 
-  test('only exposes a manual claim retry after the animation if auto-claim fails', () => {
+  test('waits for the automatic claim without rendering a manual retry', () => {
     const source = readFileSync(
       join(
         process.cwd(),
@@ -164,32 +151,9 @@ describe('TCG battle completion navigation', () => {
       controlsStart,
     )
     const controlsSource = source.slice(controlsStart, controlsEnd)
-    const animationCompleteHandler = source.indexOf(
-      'const handleResultAnimationComplete',
-      controlsStart,
-    )
-    const claimGuard = source.indexOf(
-      'if (hasAutoClaimedResultRef.current) return',
-      animationCompleteHandler,
-    )
-    const animationCompleteFlag = source.indexOf(
-      'setHasResultAnimationCompleted(true)',
-      animationCompleteHandler,
-    )
-    const retryButton = source.indexOf(
-      'onClick={onClaim}',
-      controlsStart,
-    )
-    const retryVisibilityGuard = source.indexOf(
-      '{hasResultAnimationCompleted && (',
-      controlsStart,
-    )
-
-    expect(animationCompleteHandler).toBeGreaterThan(controlsStart)
-    expect(claimGuard).toBeGreaterThan(animationCompleteHandler)
-    expect(animationCompleteFlag).toBeGreaterThan(animationCompleteHandler)
-    expect(retryVisibilityGuard).toBeGreaterThan(animationCompleteHandler)
-    expect(retryButton).toBeGreaterThan(retryVisibilityGuard)
+    expect(controlsSource).toContain('Preparing your results')
+    expect(controlsSource).not.toContain('Show Results')
+    expect(controlsSource).not.toContain('onClick={onClaim}')
     expect(controlsSource).not.toContain('window.setTimeout')
   })
 
