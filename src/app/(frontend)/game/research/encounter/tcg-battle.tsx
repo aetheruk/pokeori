@@ -559,6 +559,8 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
   )
   const [showOpeningVs, setShowOpeningVs] = useState(false)
   const [result, setResult] = useState<GameCompletionResult | null>(null)
+  const [completionState, setCompletionState] =
+    useState<TcgBattleState | null>(null)
   const [resolution, setResolution] = useState<BattleResolution | null>(null)
   const [isActionBusy, setIsActionBusy] = useState(false)
   const [attackCapPulse, setAttackCapPulse] = useState(false)
@@ -686,7 +688,10 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
       setState(nextState)
       setResolution(null)
       setIsActionBusy(false)
-      if (completion) setResult(completion)
+      if (completion) {
+        setResult(completion)
+        setCompletionState(nextState)
+      }
       if (nextState.phase === 'finished') {
         if (nextState.winner === 'player') playSfx('stance_win')
         else if (nextState.winner === 'opponent') playSfx('stance_loss')
@@ -1761,17 +1766,17 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
   )
 
   const resultOverlay = useMemo(() => {
-    // Keep the result screen hidden until the claimed state is settled. A
-    // completion response can arrive before the finished battle state is
-    // committed locally, which would briefly mount an empty result screen.
-    if (!result || state?.phase !== 'finished') return null
+    if (!result || completionState?.phase !== 'finished') return null
 
     return {
       ...result,
-      success: result.success && state.winner === 'player',
-      message: getWinnerMessage(state.winner, state.noContest),
+      success: result.success && completionState.winner === 'player',
+      message: getWinnerMessage(
+        completionState.winner,
+        completionState.noContest,
+      ),
     }
-  }, [result, state?.noContest, state?.phase, state?.winner])
+  }, [completionState, result])
 
   if (!state) {
     return (
@@ -2008,7 +2013,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           state={state}
           selectedAttacker={selectedAttacker}
           isPending={isBusy}
-          resultShown={Boolean(result)}
+          resultShown={Boolean(resultOverlay)}
           resolution={resolution}
           onCharge={() =>
             callAction(() => tcgBattleCharge(state.revision), {
@@ -2097,13 +2102,16 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           icon={encounter.icon}
           iconAlt={encounter.name}
           title={
-            state.phase === 'finished'
-              ? getWinnerLabel(state.winner)
+            completionState
+              ? getWinnerLabel(completionState.winner)
               : undefined
           }
           message={
-            state.phase === 'finished'
-              ? getWinnerMessage(state.winner, state.noContest)
+            completionState
+              ? getWinnerMessage(
+                  completionState.winner,
+                  completionState.noContest,
+                )
               : undefined
           }
           onClose={returnToExplore}
@@ -3002,35 +3010,20 @@ function BattleCommandControls({
   onRetreat: () => void
 }) {
   const claimHandlerRef = useRef(onClaim)
-  const autoClaimedResultRef = useRef<string | null>(null)
+  const hasAutoClaimedResultRef = useRef(false)
+  const [hasResultAnimationCompleted, setHasResultAnimationCompleted] =
+    useState(false)
 
   useEffect(() => {
     claimHandlerRef.current = onClaim
   }, [onClaim])
 
-  useEffect(() => {
-    if (state.phase !== 'finished' || isPending) return
-
-    const resultKey = `${state.encounterId}:${state.winner || 'unknown'}`
-    if (resultShown) {
-      autoClaimedResultRef.current = resultKey
-      return
-    }
-    if (autoClaimedResultRef.current === resultKey) return
-
-    const loserSide =
-      state.winner === 'player'
-        ? 'opponent'
-        : state.winner === 'opponent'
-          ? 'player'
-          : null
-    const animationDurationMs = loserSide ? 1650 : 820
-    const timer = window.setTimeout(() => {
-      claimHandlerRef.current()
-    }, animationDurationMs + 350)
-
-    return () => window.clearTimeout(timer)
-  }, [isPending, resultShown, state.encounterId, state.phase, state.winner])
+  const handleResultAnimationComplete = useCallback(() => {
+    setHasResultAnimationCompleted(true)
+    if (hasAutoClaimedResultRef.current) return
+    hasAutoClaimedResultRef.current = true
+    claimHandlerRef.current()
+  }, [])
 
   const canAct =
     state.phase === 'battle' && state.activeSide === 'player' && !resolution
@@ -3075,7 +3068,6 @@ function BattleCommandControls({
         : state.winner === 'opponent'
           ? 'player'
           : null
-    const buttonDelay = loserSide ? 1.3 : 0.9
 
     return (
       <div className="fixed inset-0 z-[80] flex items-center justify-center overflow-hidden bg-[#081014]/90 p-4 backdrop-blur-md sm:p-6">
@@ -3103,6 +3095,11 @@ function BattleCommandControls({
                   ? [0, 0.45, 0.62, 0.78, 1]
                   : [0, 0.7, 0.85, 1],
             }}
+            onAnimationComplete={
+              loserSide === 'player'
+                ? handleResultAnimationComplete
+                : undefined
+            }
             className="z-20 w-full overflow-hidden rounded-lg border border-[#f7ecd6]/15"
           >
             <TrainerCard
@@ -3154,6 +3151,11 @@ function BattleCommandControls({
                   ? [0, 0.45, 0.62, 0.78, 1]
                   : [0, 0.7, 0.85, 1],
             }}
+            onAnimationComplete={
+              loserSide !== 'player'
+                ? handleResultAnimationComplete
+                : undefined
+            }
             className="z-20 w-full overflow-hidden rounded-lg border border-[#f7ecd6]/15"
           >
             <TrainerCard
@@ -3165,20 +3167,22 @@ function BattleCommandControls({
             />
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 36 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.32, delay: buttonDelay, ease: 'easeOut' }}
-            className="absolute bottom-0 left-1/2 z-40 -translate-x-1/2 translate-y-[calc(100%+0.5rem)] sm:translate-y-[calc(100%+0.75rem)]"
-          >
-            <Button
-              className="h-11 px-5"
-              disabled={isPending}
-              onClick={onClaim}
+          {hasResultAnimationCompleted && (
+            <motion.div
+              initial={{ opacity: 0, y: 36 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.32, ease: 'easeOut' }}
+              className="absolute bottom-0 left-1/2 z-40 -translate-x-1/2 translate-y-[calc(100%+0.5rem)] sm:translate-y-[calc(100%+0.75rem)]"
             >
-              Show Results
-            </Button>
-          </motion.div>
+              <Button
+                className="h-11 px-5"
+                disabled={isPending}
+                onClick={onClaim}
+              >
+                Show Results
+              </Button>
+            </motion.div>
+          )}
         </div>
       </div>
     )
