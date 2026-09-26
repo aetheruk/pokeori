@@ -131,6 +131,7 @@ export function BrickBreakerGame({ encounter, initialState }: BrickBreakerGamePr
       >
         {bricks.map((brick) => {
           const [row, column] = brick.id.split(':').map(Number)
+          const specimen = specimens.find((pickup) => pickup.brickId === brick.id)
           const pokemonId =
             settings.brickPokemonIds[
               (row * settings.layout[0].length + column) %
@@ -146,7 +147,7 @@ export function BrickBreakerGame({ encounter, initialState }: BrickBreakerGamePr
             <div
               key={brick.id}
               aria-hidden
-              className="absolute flex items-center justify-center rounded-lg"
+              className={`absolute flex items-center justify-center rounded-lg ${specimen ? 'motion-safe:animate-pulse' : ''}`}
               style={{
                 left: `${(brick.x / width) * 100}%`,
                 top: `${(brick.y / height) * 100}%`,
@@ -160,26 +161,39 @@ export function BrickBreakerGame({ encounter, initialState }: BrickBreakerGamePr
                       color-mix(in srgb, ${crystalColor} 60%, black) 70%,
                       color-mix(in srgb, ${crystalColor} 40%, black) 100%)`,
                 boxShadow:
-                  'inset 2px 2px 4px rgba(255,255,255,0.3), inset -2px -2px 4px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.3)',
+                  specimen
+                    ? 'inset 2px 2px 4px rgba(255,255,255,0.45), 0 0 10px rgba(255,220,112,0.95), 0 0 22px rgba(255,174,45,0.75)'
+                    : 'inset 2px 2px 4px rgba(255,255,255,0.3), inset -2px -2px 4px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.3)',
                 border: brick.indestructible
                   ? '1px solid #8a857b'
-                  : `1px solid color-mix(in srgb, ${crystalColor} 80%, white)`,
+                  : specimen
+                    ? '1px solid #ffe28a'
+                    : `1px solid color-mix(in srgb, ${crystalColor} 80%, white)`,
               }}
             >
               {!brick.indestructible && (
-                <Image
-                  src={getPokemonImageUrl(pokemonId, 'sprite')}
-                  alt=""
-                  width={64}
-                  height={64}
-                  className="pixelated relative z-10 h-[78%] w-[78%] object-contain opacity-90 drop-shadow-[0_1px_1px_rgba(255,255,255,0.45)]"
-                />
+                specimen ? (
+                  <span className="relative z-10 block h-[78%] w-[78%] drop-shadow-[0_0_8px_rgba(255,226,138,0.95)]">
+                    <EndlessCollectibleSprite
+                      reward={specimen.reward}
+                      size={Math.round(brick.width * 0.78)}
+                    />
+                  </span>
+                ) : (
+                  <Image
+                    src={getPokemonImageUrl(pokemonId, 'sprite')}
+                    alt=""
+                    width={64}
+                    height={64}
+                    className="pixelated relative z-10 h-[78%] w-[78%] object-contain opacity-90 drop-shadow-[0_1px_1px_rgba(255,255,255,0.45)]"
+                  />
+                )
               )}
               <span className="absolute left-[14%] top-[10%] h-[10%] w-[42%] -rotate-12 rounded-full bg-white/35" />
             </div>
           )
         })}
-        {specimens.map((specimen) => (
+        {specimens.filter((specimen) => !specimen.brickId).map((specimen) => (
           <div
             key={specimen.id}
             className="absolute flex items-center justify-center rounded-full border border-game-ochre/70 bg-game-ochre/20 shadow-[0_0_18px_rgba(181,138,67,0.55)]"

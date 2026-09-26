@@ -32,6 +32,7 @@ export interface BrickBreakerStepResult {
   ball: BrickBreakerBall
   bricks: BrickBreakerBrick[]
   hits: number
+  hitBrickIds: string[]
   lost: boolean
   cleared: boolean
 }
@@ -152,6 +153,7 @@ export function stepBrickBreaker(
   let ball = { ...initialBall }
   const bricks = initialBricks.map((brick) => ({ ...brick }))
   let hits = 0
+  const hitBrickIds: string[] = []
   const travel = getBrickBreakerBallSpeed(ball) * Math.max(0, deltaSeconds)
   const steps = Math.max(1, Math.ceil(travel / Math.max(2, ball.radius * 0.65)))
   const stepSeconds = Math.max(0, deltaSeconds) / steps
@@ -202,6 +204,7 @@ export function stepBrickBreaker(
         hits += 1
         if (brick.durability <= 1) bricks.splice(brickIndex, 1)
         else bricks[brickIndex] = { ...brick, durability: brick.durability - 1 }
+        hitBrickIds.push(brick.id)
       }
     }
 
@@ -210,6 +213,7 @@ export function stepBrickBreaker(
         ball,
         bricks,
         hits,
+        hitBrickIds,
         lost: true,
         cleared: !bricks.some((brick) => !brick.indestructible),
       }
@@ -220,6 +224,7 @@ export function stepBrickBreaker(
     ball,
     bricks,
     hits,
+    hitBrickIds,
     lost: false,
     cleared: !bricks.some((brick) => !brick.indestructible),
   }

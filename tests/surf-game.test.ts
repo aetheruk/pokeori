@@ -58,7 +58,15 @@ describe('Surf game mechanics', () => {
   test('keeps new hazards and prizes away from occupied horizon lanes', () => {
     const rolls = [0.5, 0, 1]
     let index = 0
-    expect(pickSurfSpawnX([0.5], () => rolls[index++], 0.2)).toBe(0.13)
+    expect(pickSurfSpawnX([0.5], () => rolls[index++], 0.2)).toBe(0.08)
+  })
+
+  test('spreads approaching hazards across the playable edge lanes', () => {
+    const leftEdge = getSurfCoursePosition(0.08, 0.68)
+    const rightEdge = getSurfCoursePosition(0.92, 0.68)
+
+    expect(leftEdge.x).toBeLessThan(0.15)
+    expect(rightEdge.x).toBeGreaterThan(0.85)
   })
 
   test('introduces course objects at the waterline with distant scale and fade', () => {

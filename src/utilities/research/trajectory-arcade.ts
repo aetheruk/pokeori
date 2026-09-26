@@ -4,7 +4,7 @@ import { advanceContinuousSnake, createInitialSnake, findSafeSnakePosition, getS
 import { brickBreakerBallOverlapsRect, clampBrickBreakerPaddleX, createBrickBreakerBoard, getBrickBreakerLaunchBall, stepBrickBreaker, type BrickBreakerBall, type BrickBreakerBrick } from './brick-breaker'
 import { getEndlessScoreIntervalMinimum, getNextRandomRepeatingRewardScore } from './endless-milestones'
 
-export interface TrajectoryPickup { id: number; rewardKey: string; reward: LocationReward; x: number; y: number; size: number; expiresAt: number }
+export interface TrajectoryPickup { id: number; rewardKey: string; reward: LocationReward; x: number; y: number; size: number; expiresAt: number; brickId?: string }
 export interface TrajectoryState {
   tick: number; rng: number; status: 'playing' | 'won' | 'lost'; score: number; collectedRewards: Record<string, number>
   snake: SnakePosition[]; heading: number; targetHeading: number; food: SnakePosition | null; foodEaten: number
@@ -44,13 +44,31 @@ export function createTrajectoryState(type: 'snake' | 'brick-breaker', settings:
   return state
 }
 
-function spawnPickups(state: TrajectoryState, settings: any, type: 'snake' | 'brick-breaker') {
+function spawnPickups(
+  state: TrajectoryState,
+  settings: any,
+  type: 'snake' | 'brick-breaker',
+  excludedBrickIds: string[] = [],
+) {
   for (const config of configs(settings)) {
     let target = state.schedules[config.key]
     while (target !== undefined && state.score >= target) {
       const position = type === 'snake'
         ? findSafeSnakePosition(settings.playfield, settings.rewardRadius, occupied(state, settings, true), settings.minimumSpawnDistance, state.snake[0], () => random(state))
-        : { x: 42 + random(state) * (settings.playfield.width - 84), y: settings.boardTop + 40 + random(state) * Math.min(210, settings.playfield.height * 0.35) }
+        : (() => {
+            const availableBricks = state.bricks.filter((brick) =>
+              !brick.indestructible &&
+              !excludedBrickIds.includes(brick.id) &&
+              !state.pickups.some((pickup) => pickup.brickId === brick.id),
+            )
+            if (availableBricks.length === 0) return null
+            const brick = availableBricks[Math.floor(random(state) * availableBricks.length)]
+            return {
+              brickId: brick.id,
+              x: brick.x + brick.width / 2,
+              y: brick.y + brick.height / 2,
+            }
+          })()
       if (position) {
         const index = Math.floor(random(state) * config.rewards.length)
         state.pickups.push({ id: state.nextId++, rewardKey: `${config.key}:${index}`, reward: config.rewards[index], ...position,
@@ -105,8 +123,13 @@ export function stepTrajectoryState(type: 'snake' | 'brick-breaker', settings: a
       state.ball = step.ball
       state.bricks = step.bricks
       state.score += step.hits * settings.pointsPerHit
-      spawnPickups(state, settings, type)
+      spawnPickups(state, settings, type, step.hitBrickIds)
       state.pickups = state.pickups.filter((pickup) => {
+        if (pickup.brickId) {
+          if (!step.hitBrickIds.includes(pickup.brickId)) return true
+          state.collectedRewards[pickup.rewardKey] = (state.collectedRewards[pickup.rewardKey] || 0) + 1
+          return false
+        }
         if (!brickBreakerBallOverlapsRect(state.ball!, { x: pickup.x - pickup.size / 2, y: pickup.y - pickup.size / 2, width: pickup.size, height: pickup.size })) return true
         state.collectedRewards[pickup.rewardKey] = (state.collectedRewards[pickup.rewardKey] || 0) + 1
         return false

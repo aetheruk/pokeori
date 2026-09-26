@@ -15,7 +15,7 @@ export function getSurfCoursePosition(x: number, progress: number) {
   const depth = Math.max(0, progress)
   const perspectiveDepth = depth ** 1.15
   const travelDepth = depth ** SURF_TRAVEL_DEPTH_EXPONENT
-  const perspectiveSpread = 0.08 + perspectiveDepth * 0.92
+  const perspectiveSpread = 0.08 + Math.min(1, perspectiveDepth * 1.45) * 0.92
 
   return {
     x: 0.5 + (x - 0.5) * perspectiveSpread,
@@ -99,7 +99,7 @@ export function pickSurfSpawnX(
   let bestCandidate = 0.5
   let bestDistance = -1
   for (let attempt = 0; attempt < 8; attempt += 1) {
-    const candidate = 0.13 + random() * 0.74
+    const candidate = 0.08 + random() * 0.84
     const nearestDistance = occupiedXs.length
       ? Math.min(...occupiedXs.map((x) => Math.abs(x - candidate)))
       : 1
