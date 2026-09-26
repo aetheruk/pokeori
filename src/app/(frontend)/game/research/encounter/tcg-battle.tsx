@@ -3071,13 +3071,6 @@ function BattleCommandControls({
               Preparing your results…
             </p>
           </div>
-          <Button
-            className="h-11 px-5"
-            disabled={isPending}
-            onClick={onClaim}
-          >
-            Show Results
-          </Button>
         </div>
       </div>
     )

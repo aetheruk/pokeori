@@ -137,7 +137,7 @@ describe('TCG battle completion navigation', () => {
     expect(finishedGuard).toBeGreaterThan(resultOverlayStart)
   })
 
-  test('keeps a manual claim retry available while results are being claimed', () => {
+  test('waits for the automatic claim without rendering a manual retry', () => {
     const source = readFileSync(
       join(
         process.cwd(),
@@ -151,14 +151,9 @@ describe('TCG battle completion navigation', () => {
       controlsStart,
     )
     const controlsSource = source.slice(controlsStart, controlsEnd)
-    const retryButton = source.indexOf(
-      'onClick={onClaim}',
-      controlsStart,
-    )
-
-    expect(retryButton).toBeGreaterThan(controlsStart)
     expect(controlsSource).toContain('Preparing your results')
-    expect(controlsSource).toContain('Show Results')
+    expect(controlsSource).not.toContain('Show Results')
+    expect(controlsSource).not.toContain('onClick={onClaim}')
     expect(controlsSource).not.toContain('window.setTimeout')
   })
 
