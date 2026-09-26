@@ -3,6 +3,37 @@ import { join } from 'node:path'
 import { describe, expect, test } from 'bun:test'
 
 describe('TCG battle completion navigation', () => {
+  test('defers app updates until the TCG result has been acknowledged', () => {
+    const source = readFileSync(
+      join(
+        process.cwd(),
+        'src/app/(frontend)/game/research/encounter/tcg-battle.tsx',
+      ),
+      'utf8',
+    )
+    const startEvent = source.indexOf(
+      'window.dispatchEvent(new Event(ACTIVITY_STARTED_EVENT))',
+    )
+    const startAction = source.indexOf(
+      'startTcgBattle(encounter.id)',
+      startEvent,
+    )
+    const returnHandler = source.indexOf('const returnToExplore = async () =>')
+    const settledEvent = source.indexOf(
+      'window.dispatchEvent(new Event(ACTIVITY_SETTLED_EVENT))',
+      returnHandler,
+    )
+    const navigate = source.indexOf(
+      "router.push('/game/explore')",
+      returnHandler,
+    )
+
+    expect(startEvent).toBeGreaterThan(-1)
+    expect(startAction).toBeGreaterThan(startEvent)
+    expect(settledEvent).toBeGreaterThan(returnHandler)
+    expect(navigate).toBeGreaterThan(settledEvent)
+  })
+
   test('invalidates cached Explore route data after a successful claim', () => {
     const source = readFileSync(
       join(
