@@ -83,6 +83,7 @@ test('Brick Breaker rewards attach to a random brick and require hitting it befo
   const spawned = stepTrajectoryState('brick-breaker', settings, state, [])
   expect(spawned.pickups).toHaveLength(1)
   expect(spawned.pickups[0].brickId).toBe(targetBrick.id)
+  spawned.schedules['0'] = 1000
 
   const unrelatedHit = structuredClone(spawned)
   unrelatedHit.ball = {
