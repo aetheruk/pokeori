@@ -3261,7 +3261,7 @@ export const palletTownTasks: Task[] = [
       id: '128',
     },
     repeatable: false,
-    secret: true,
+    secret: false,
     completionTrigger: 'manual',
     completeButtonText: 'Hand Over the Tauros',
     requirements: [
