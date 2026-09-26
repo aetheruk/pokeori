@@ -58,16 +58,27 @@ describe('TCG battle completion navigation', () => {
       "if (state.phase === 'finished')",
       controlsStart,
     )
-    const autoClaimTimer = source.indexOf(
-      'const timer = window.setTimeout',
+    const animationCompleteHandler = source.indexOf(
+      'const handleResultAnimationComplete',
       controlsStart,
     )
-    const claimCall = source.indexOf('claimHandlerRef.current()', controlsStart)
+    const claimCall = source.indexOf(
+      'claimHandlerRef.current()',
+      animationCompleteHandler,
+    )
+    const controlsEnd = source.indexOf(
+      'function LabeledCommandButton(',
+      controlsStart,
+    )
+    const controlsSource = source.slice(controlsStart, controlsEnd)
 
     expect(controlsStart).toBeGreaterThan(-1)
     expect(finishedBranch).toBeGreaterThan(controlsStart)
-    expect(autoClaimTimer).toBeGreaterThan(controlsStart)
-    expect(claimCall).toBeGreaterThan(autoClaimTimer)
+    expect(animationCompleteHandler).toBeGreaterThan(controlsStart)
+    expect(claimCall).toBeGreaterThan(animationCompleteHandler)
+    expect(controlsSource.match(/onAnimationComplete=\{/g)).toHaveLength(2)
+    expect(controlsSource).toContain("loserSide === 'player'")
+    expect(controlsSource).toContain("loserSide !== 'player'")
   })
 
   test('removes the finished battle overlay once the shared result is shown', () => {
@@ -100,7 +111,7 @@ describe('TCG battle completion navigation', () => {
     )
     const resultOverlayStart = source.indexOf('const resultOverlay = useMemo')
     const finishedGuard = source.indexOf(
-      "if (!result || state?.phase !== 'finished') return null",
+      "if (!result || completionState?.phase !== 'finished') return null",
       resultOverlayStart,
     )
 
@@ -108,7 +119,7 @@ describe('TCG battle completion navigation', () => {
     expect(finishedGuard).toBeGreaterThan(resultOverlayStart)
   })
 
-  test('allows failed automatic claims to retry but stops after success', () => {
+  test('only exposes a manual claim retry after the animation if auto-claim fails', () => {
     const source = readFileSync(
       join(
         process.cwd(),
@@ -117,23 +128,57 @@ describe('TCG battle completion navigation', () => {
       'utf8',
     )
     const controlsStart = source.indexOf('function BattleCommandControls(')
-    const resultShownGuard = source.indexOf(
-      'if (resultShown) {',
+    const controlsEnd = source.indexOf(
+      'function LabeledCommandButton(',
       controlsStart,
     )
-    const autoClaimTimer = source.indexOf(
-      'const timer = window.setTimeout',
+    const controlsSource = source.slice(controlsStart, controlsEnd)
+    const animationCompleteHandler = source.indexOf(
+      'const handleResultAnimationComplete',
       controlsStart,
     )
-    const autoClaimMark = source.indexOf(
-      'autoClaimedResultRef.current = resultKey',
+    const claimGuard = source.indexOf(
+      'if (hasAutoClaimedResultRef.current) return',
+      animationCompleteHandler,
+    )
+    const animationCompleteFlag = source.indexOf(
+      'setHasResultAnimationCompleted(true)',
+      animationCompleteHandler,
+    )
+    const retryButton = source.indexOf(
+      'onClick={onClaim}',
+      controlsStart,
+    )
+    const retryVisibilityGuard = source.indexOf(
+      '{hasResultAnimationCompleted && (',
       controlsStart,
     )
 
-    expect(resultShownGuard).toBeGreaterThan(controlsStart)
-    expect(autoClaimTimer).toBeGreaterThan(resultShownGuard)
-    expect(autoClaimMark).toBeGreaterThan(resultShownGuard)
-    expect(autoClaimMark).toBeLessThan(autoClaimTimer)
+    expect(animationCompleteHandler).toBeGreaterThan(controlsStart)
+    expect(claimGuard).toBeGreaterThan(animationCompleteHandler)
+    expect(animationCompleteFlag).toBeGreaterThan(animationCompleteHandler)
+    expect(retryVisibilityGuard).toBeGreaterThan(animationCompleteHandler)
+    expect(retryButton).toBeGreaterThan(retryVisibilityGuard)
+    expect(controlsSource).not.toContain('window.setTimeout')
+  })
+
+  test('keeps the claimed results screen bound to its settled battle state', () => {
+    const source = readFileSync(
+      join(
+        process.cwd(),
+        'src/app/(frontend)/game/research/encounter/tcg-battle.tsx',
+      ),
+      'utf8',
+    )
+    const resultOverlayStart = source.indexOf('const resultOverlay = useMemo')
+    const completionGuard = source.indexOf(
+      "if (!result || completionState?.phase !== 'finished') return null",
+      resultOverlayStart,
+    )
+    const memoEnd = source.indexOf('}, [completionState, result])', completionGuard)
+
+    expect(completionGuard).toBeGreaterThan(resultOverlayStart)
+    expect(memoEnd).toBeGreaterThan(completionGuard)
   })
 
   test('claims PVP results from durable match status without requiring game session state', () => {
