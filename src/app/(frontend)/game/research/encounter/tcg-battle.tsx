@@ -32,7 +32,6 @@ import {
   useTransition,
 } from 'react'
 import { toast } from 'sonner'
-import { TrainerCard } from '@/components/game/battles/TrainerCard'
 import { VSAnimation } from '@/components/game/battles/VSAnimation'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
@@ -3021,21 +3020,19 @@ function BattleCommandControls({
   onPromote: () => void
   onRetreat: () => void
 }) {
-  const claimHandlerRef = useRef(onClaim)
   const hasAutoClaimedResultRef = useRef(false)
-  const [hasResultAnimationCompleted, setHasResultAnimationCompleted] =
-    useState(false)
 
   useEffect(() => {
-    claimHandlerRef.current = onClaim
-  }, [onClaim])
-
-  const handleResultAnimationComplete = useCallback(() => {
-    setHasResultAnimationCompleted(true)
-    if (hasAutoClaimedResultRef.current) return
+    if (
+      state.phase !== 'finished' ||
+      resultShown ||
+      hasAutoClaimedResultRef.current
+    ) {
+      return
+    }
     hasAutoClaimedResultRef.current = true
-    claimHandlerRef.current()
-  }, [])
+    onClaim()
+  }, [onClaim, resultShown, state.phase])
 
   const canAct =
     state.phase === 'battle' && state.activeSide === 'player' && !resolution
@@ -3062,139 +3059,25 @@ function BattleCommandControls({
   if (state.phase === 'finished' && resultShown) return null
 
   if (state.phase === 'finished') {
-    const playerTrainer = state.playerTrainer || {
-      name: 'Player',
-      icon: 'ditto',
-      banner: '/backgrounds/tcg.avif',
-      title: 'Trainer',
-    }
-    const enemyTrainer = state.enemyTrainer || {
-      name: 'Opponent',
-      icon: 'ditto',
-      banner: '/backgrounds/tcg.avif',
-      title: 'Trainer',
-    }
-    const loserSide =
-      state.winner === 'player'
-        ? 'opponent'
-        : state.winner === 'opponent'
-          ? 'player'
-          : null
-
     return (
-      <div className="fixed inset-0 z-[80] flex items-center justify-center overflow-hidden bg-[#081014]/90 p-4 backdrop-blur-md sm:p-6">
-        <div className="relative flex w-full max-w-3xl flex-col items-center justify-center gap-8">
-          <motion.div
-            initial={{ y: '-120vh', scale: 1 }}
-            animate={
-              loserSide === 'player'
-                ? {
-                    y: ['-120vh', '-6vh', '0vh', '10vh', '120vh'],
-                    scale: [1, 1, 1.02, 1, 0.96],
-                    rotate: [0, 0, 1, 3, 9],
-                  }
-                : {
-                    y: ['-120vh', '-6vh', '0vh', '0vh'],
-                    scale: [1, 1, 1.02, 1],
-                    rotate: [0, 0, -1, 0],
-                  }
-            }
-            transition={{
-              duration: loserSide === 'player' ? 1.65 : 0.82,
-              ease: loserSide === 'player' ? [0.2, 0.95, 0.22, 1] : 'easeInOut',
-              times:
-                loserSide === 'player'
-                  ? [0, 0.45, 0.62, 0.78, 1]
-                  : [0, 0.7, 0.85, 1],
-            }}
-            onAnimationComplete={
-              loserSide === 'player'
-                ? handleResultAnimationComplete
-                : undefined
-            }
-            className="z-20 w-full overflow-hidden rounded-lg border border-[#f7ecd6]/15"
+      <div className="fixed inset-0 z-[80] flex items-center justify-center bg-[#081014]/90 p-4 backdrop-blur-md sm:p-6">
+        <div className="flex flex-col items-center gap-5 text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-amber-200" />
+          <div>
+            <p className="font-display text-2xl font-semibold text-[#f7ecd6]">
+              {getWinnerLabel(state.winner)}
+            </p>
+            <p className="mt-2 text-sm text-[#f7ecd6]/75">
+              Preparing your results…
+            </p>
+          </div>
+          <Button
+            className="h-11 px-5"
+            disabled={isPending}
+            onClick={onClaim}
           >
-            <TrainerCard
-              name={playerTrainer.name}
-              icon={playerTrainer.icon}
-              banner={playerTrainer.banner}
-              title={playerTrainer.title}
-              className="h-[170px] rounded-none border-none sm:h-[210px]"
-            />
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 4 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{
-              duration: 0.45,
-              delay: 0.5,
-              type: 'spring',
-              bounce: 0.4,
-            }}
-            className="pointer-events-none absolute left-1/2 top-1/2 z-30 -translate-x-1/2 -translate-y-1/2"
-          >
-            <span className="font-display text-4xl font-semibold text-[#e8b85b] sm:text-5xl">
-              {getWinnerLabel(state.winner).toUpperCase()}
-            </span>
-          </motion.div>
-
-          <motion.div
-            initial={{ y: '120vh', scale: 1 }}
-            animate={
-              loserSide === 'opponent'
-                ? {
-                    y: ['120vh', '6vh', '0vh', '-10vh', '120vh'],
-                    scale: [1, 1, 1.02, 1, 0.96],
-                    rotate: [0, 0, -1, -3, -9],
-                  }
-                : {
-                    y: ['120vh', '6vh', '0vh', '0vh'],
-                    scale: [1, 1, 1.02, 1],
-                    rotate: [0, 0, 1, 0],
-                  }
-            }
-            transition={{
-              duration: loserSide === 'opponent' ? 1.65 : 0.82,
-              ease:
-                loserSide === 'opponent' ? [0.2, 0.95, 0.22, 1] : 'easeInOut',
-              times:
-                loserSide === 'opponent'
-                  ? [0, 0.45, 0.62, 0.78, 1]
-                  : [0, 0.7, 0.85, 1],
-            }}
-            onAnimationComplete={
-              loserSide !== 'player'
-                ? handleResultAnimationComplete
-                : undefined
-            }
-            className="z-20 w-full overflow-hidden rounded-lg border border-[#f7ecd6]/15"
-          >
-            <TrainerCard
-              name={enemyTrainer.name}
-              icon={enemyTrainer.icon}
-              banner={enemyTrainer.banner}
-              title={enemyTrainer.title}
-              className="h-[170px] rounded-none border-none sm:h-[210px]"
-            />
-          </motion.div>
-
-          {hasResultAnimationCompleted && (
-            <motion.div
-              initial={{ opacity: 0, y: 36 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.32, ease: 'easeOut' }}
-              className="absolute bottom-0 left-1/2 z-40 -translate-x-1/2 translate-y-[calc(100%+0.5rem)] sm:translate-y-[calc(100%+0.75rem)]"
-            >
-              <Button
-                className="h-11 px-5"
-                disabled={isPending}
-                onClick={onClaim}
-              >
-                Show Results
-              </Button>
-            </motion.div>
-          )}
+            Show Results
+          </Button>
         </div>
       </div>
     )
