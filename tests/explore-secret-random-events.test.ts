@@ -29,4 +29,11 @@ describe('Explore secret random events', () => {
     expect(item.originalData.isRandomEvent).not.toBe(true)
     expect(shouldHideIncompleteSecretTask(item, new Set())).toBe(true)
   })
+
+  test('Tauros parking is visible as a non-secret task', () => {
+    const item = taskExploreItem('pallet-town-taurus-parking')
+
+    expect(item.originalData.secret).toBe(false)
+    expect(shouldHideIncompleteSecretTask(item, new Set())).toBe(false)
+  })
 })
