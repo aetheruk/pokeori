@@ -54,6 +54,10 @@ import { useUser } from '@/context/UserContext'
 import type { TcgBattleGameConfig } from '@/data/games'
 import { useGameMusic } from '@/hooks/useGameMusic'
 import { cn } from '@/lib/utils'
+import {
+  ACTIVITY_SETTLED_EVENT,
+  ACTIVITY_STARTED_EVENT,
+} from '@/utilities/games/update-safety'
 import { getTcgEnergySymbol } from '@/utilities/tcg/energy-symbols'
 import type {
   TcgBattleAttackChoice,
@@ -589,9 +593,13 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
   )
 
   useEffect(() => {
+    let cancelled = false
+    window.dispatchEvent(new Event(ACTIVITY_STARTED_EVENT))
     startTransition(async () => {
       const response = await startTcgBattle(encounter.id)
+      if (cancelled) return
       if (!response.success) {
+        window.dispatchEvent(new Event(ACTIVITY_SETTLED_EVENT))
         toast.error(response.error)
         router.replace('/game/explore')
         return
@@ -603,6 +611,9 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           : response.state.player.front.map((card) => card.instanceId),
       )
     })
+    return () => {
+      cancelled = true
+    }
   }, [encounter.id, router])
 
   useEffect(() => {
@@ -1720,6 +1731,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     } catch (refreshError) {
       console.error('Failed to refresh TCG battle progress', refreshError)
     }
+    window.dispatchEvent(new Event(ACTIVITY_SETTLED_EVENT))
     router.push('/game/explore')
   }
 
