@@ -562,8 +562,9 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
   )
   const [showOpeningVs, setShowOpeningVs] = useState(false)
   const [result, setResult] = useState<GameCompletionResult | null>(null)
-  const [completionState, setCompletionState] =
-    useState<TcgBattleState | null>(null)
+  const [completionState, setCompletionState] = useState<TcgBattleState | null>(
+    null,
+  )
   const [claimError, setClaimError] = useState<string | null>(null)
   const [resolution, setResolution] = useState<BattleResolution | null>(null)
   const [isActionBusy, setIsActionBusy] = useState(false)
@@ -1750,7 +1751,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
 
   const returnToExplore = async () => {
     try {
-      await refreshUser(false)
+      await refreshUser(false, result?.invalidates)
     } catch (refreshError) {
       console.error('Failed to refresh TCG battle progress', refreshError)
     }
@@ -2138,9 +2139,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           icon={encounter.icon}
           iconAlt={encounter.name}
           title={
-            completionState
-              ? getWinnerLabel(completionState.winner)
-              : undefined
+            completionState ? getWinnerLabel(completionState.winner) : undefined
           }
           message={
             completionState
@@ -3069,6 +3068,43 @@ function BattleCommandControls({
   const canAttack = canPlayerTakeAnyAttack(state)
   const forceAttack = atCap && canAttack
 
+  if (state.phase === 'finished' && resultShown) return null
+
+  if (state.phase === 'finished' && !claimError) {
+    return (
+      <span className="sr-only" role="status">
+        Loading results…
+      </span>
+    )
+  }
+
+  if (state.phase === 'finished') {
+    return (
+      <div className="fixed inset-0 z-[80] flex items-center justify-center bg-[#081014]/90 p-4 backdrop-blur-md sm:p-6">
+        <div className="flex flex-col items-center gap-5 text-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full border border-game-danger/40 bg-game-danger/10 text-game-danger">
+            <X className="h-6 w-6" aria-hidden="true" />
+          </div>
+          <div>
+            <p className="font-display text-2xl font-semibold text-[#f7ecd6]">
+              {getWinnerLabel(state.winner)}
+            </p>
+            <p role="alert" className="mt-2 max-w-sm text-sm text-[#f7ecd6]/75">
+              {claimError}
+            </p>
+            <Button
+              className="mt-4 h-11 rounded-lg bg-game-clay px-5 text-sm font-bold text-game-cream hover:bg-game-clay/90"
+              disabled={isPending}
+              onClick={onClaim}
+            >
+              Retry results
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (state.pendingPromotion === 'player') {
     return (
       <div className="absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+1.25rem)] z-30 flex justify-center">
@@ -3080,50 +3116,6 @@ function BattleCommandControls({
         >
           <ChevronsUp className="h-[22px] w-[22px]" />
         </IconCommandButton>
-      </div>
-    )
-  }
-
-  if (state.phase === 'finished' && resultShown) return null
-
-  if (state.phase === 'finished') {
-    return (
-      <div className="fixed inset-0 z-[80] flex items-center justify-center bg-[#081014]/90 p-4 backdrop-blur-md sm:p-6">
-        <div className="flex flex-col items-center gap-5 text-center">
-          {claimError ? (
-            <div className="flex h-12 w-12 items-center justify-center rounded-full border border-game-danger/40 bg-game-danger/10 text-game-danger">
-              <X className="h-6 w-6" aria-hidden="true" />
-            </div>
-          ) : (
-            <Loader2 className="h-8 w-8 animate-spin text-amber-200" />
-          )}
-          <div>
-            <p className="font-display text-2xl font-semibold text-[#f7ecd6]">
-              {getWinnerLabel(state.winner)}
-            </p>
-            {claimError ? (
-              <>
-                <p
-                  role="alert"
-                  className="mt-2 max-w-sm text-sm text-[#f7ecd6]/75"
-                >
-                  {claimError}
-                </p>
-                <Button
-                  className="mt-4 h-11 rounded-lg bg-game-clay px-5 text-sm font-bold text-game-cream hover:bg-game-clay/90"
-                  disabled={isPending}
-                  onClick={onClaim}
-                >
-                  Retry results
-                </Button>
-              </>
-            ) : (
-              <p className="mt-2 text-sm text-[#f7ecd6]/75">
-                Preparing your results…
-              </p>
-            )}
-          </div>
-        </div>
       </div>
     )
   }

@@ -64,6 +64,7 @@ The Carddex preserves an artwork-first index and organizes unlocked expansions a
 - PVP has no stake, payout, reward, or ranking. Decisive outcomes record one win and one loss against the PVP Explore entry; exact draws and setup no-contests record neither. All outcomes flow through the shared results screen.
 - Celadon Game Corner adds repeatable low- and high-stakes TCG tables. The public Rocket TCG Table requires the `deck-box`, a Base Baby deck, and 50 Fun Tokens for a 120-token win payout; the High Stakes Rocket TCG table additionally requires `high-roller`, a Base Champions deck, and 200 Fun Tokens for a 350-token win payout. Both opponent decks are neutral mixed-type 15-card Base-series decks with broad type coverage, so neither table presents a simple elemental counter-pick, and both are validated with the same battle rules as player decks.
 - The three TCG Test battles award 100 Pokédollars each on a win.
+- After a TCG battle ends, the finished board remains visible while the result is claimed. Claiming does not refresh the game route after its session is cleared; the shared Results screen stays open until the player returns to Explore. A failed claim offers a retry.
 - Format deck-cost caps are Baby 30, Champions 55, and Masters 85.
 - Format energy pacing uses low starts and charge turns: Baby 4 start / 12 cap / +2 charge, Champions 5 / 16 / +2, Masters 6 / 22 / +2.
 - Manual pass is replaced by Charge/End Turn. When at cap and a legal attack exists, the player must attack before ending turn.

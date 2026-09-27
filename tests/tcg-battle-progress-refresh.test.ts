@@ -34,31 +34,6 @@ describe('TCG battle completion navigation', () => {
     expect(navigate).toBeGreaterThan(settledEvent)
   })
 
-  test('invalidates cached Explore route data after a successful claim', () => {
-    const source = readFileSync(
-      join(
-        process.cwd(),
-        'src/app/(frontend)/game/research/games/tcg-battle.ts',
-      ),
-      'utf8',
-    )
-    const claimStart = source.indexOf(
-      'export async function claimTcgBattleResult()',
-    )
-    const completionSuccess = source.indexOf(
-      'if (completion.success)',
-      claimStart,
-    )
-    const invalidate = source.indexOf(
-      "revalidatePath('/game/explore')",
-      completionSuccess,
-    )
-
-    expect(claimStart).toBeGreaterThan(-1)
-    expect(completionSuccess).toBeGreaterThan(claimStart)
-    expect(invalidate).toBeGreaterThan(completionSuccess)
-  })
-
   test('refreshes game progress before returning to Explore', () => {
     const source = readFileSync(
       join(
@@ -68,8 +43,14 @@ describe('TCG battle completion navigation', () => {
       'utf8',
     )
     const handlerStart = source.indexOf('const returnToExplore = async () =>')
-    const refresh = source.indexOf('await refreshUser(false)', handlerStart)
-    const navigate = source.indexOf("router.push('/game/explore')", handlerStart)
+    const refresh = source.indexOf(
+      'await refreshUser(false, result?.invalidates)',
+      handlerStart,
+    )
+    const navigate = source.indexOf(
+      "router.push('/game/explore')",
+      handlerStart,
+    )
 
     expect(handlerStart).toBeGreaterThan(-1)
     expect(refresh).toBeGreaterThan(handlerStart)
@@ -154,7 +135,6 @@ describe('TCG battle completion navigation', () => {
 
     expect(controlsSource).toContain('resultShown ||')
     expect(controlsSource).toContain('isPending ||')
-    expect(controlsSource).toContain('Preparing your results')
   })
 
   test('offers a retry if the result claim cannot be completed', () => {
@@ -172,7 +152,9 @@ describe('TCG battle completion navigation', () => {
     )
     const controlsSource = source.slice(controlsStart, controlsEnd)
 
-    expect(controlsSource).toContain('claimError ?')
+    expect(controlsSource).toContain(
+      "if (state.phase === 'finished' && !claimError)",
+    )
     expect(controlsSource).toContain('onClick={onClaim}')
     expect(controlsSource).toContain('Retry results')
     expect(source).toContain("meta.kind === 'claim' && !response.completion")
@@ -191,7 +173,10 @@ describe('TCG battle completion navigation', () => {
       "if (!result || completionState?.phase !== 'finished') return null",
       resultOverlayStart,
     )
-    const memoEnd = source.indexOf('}, [completionState, result])', completionGuard)
+    const memoEnd = source.indexOf(
+      '}, [completionState, result])',
+      completionGuard,
+    )
 
     expect(completionGuard).toBeGreaterThan(resultOverlayStart)
     expect(memoEnd).toBeGreaterThan(completionGuard)
