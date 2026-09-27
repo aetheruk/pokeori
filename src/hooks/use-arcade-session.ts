@@ -6,9 +6,10 @@ import { checkpointArcade } from '@/app/(frontend)/game/research/games/arcade'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
 import { recoverGameAction } from '@/utilities/games/action-recovery'
-import { completeGame, startGame } from '@/utilities/games/client-action-recovery'
+import { completeGame, getGameState, startGame } from '@/utilities/games/client-action-recovery'
 import {
   ARCADE_TICK_RATE,
+  MAX_ARCADE_CHECKPOINT_INPUTS,
   MAX_ARCADE_CHECKPOINT_TICKS,
   type ArcadeGameType,
   type ArcadeInput,
@@ -90,17 +91,54 @@ export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: stri
         })
         playSfxRef.current(passed && completion.success ? 'good' : 'bad')
       } else {
+        let restoreOnRetry = false
         const response = await recoverGameAction(
-          () => actions.checkpoint(request),
+          async () => {
+            if (restoreOnRetry) {
+              const state = await getGameState()
+              const saved = state?.roundData as ArcadeRound | undefined
+              if (state?.encounterId === encounter.id && state.expiry > Date.now() && saved?.kind === 'arcade' && saved.version === 1 && saved.gameType === gameType && saved.sessionId === request.sessionId) {
+                return { success: true as const, roundData: saved, restored: true }
+              }
+              return { success: false as const, error: 'The saved run is no longer available. Return to Explore.' }
+            }
+            const checkpoint = await actions.checkpoint(request)
+            if (!checkpoint.success && checkpoint.error === 'Invalid arcade checkpoint') {
+              restoreOnRetry = true
+              return { success: false as const, error: 'The latest checkpoint could not be verified. Retry to resume from the last saved point.' }
+            }
+            return checkpoint
+          },
           'Progress could not be saved. Retry to continue this same run.',
           (response) => response.success ? undefined : response.error,
           {
             onFailure: () => { checkpointPaused = true },
-            onRetry: () => { checkpointPaused = false },
+            onRetry: () => { if (!restoreOnRetry) checkpointPaused = false },
           },
         )
         if (disposed || !response.success) return
         const acknowledged = response.roundData
+        if ('restored' in response && response.restored) {
+          roundRef.current = acknowledged
+          settings = acknowledged.settings
+          checkpointTickRef.current = acknowledged.simulation.tick
+          inputsRef.current = []
+          readyAt = performance.now() + 3000
+          countdownRef.current = 3
+          setCountdown(3)
+          lastTime = 0
+          accumulator = 0
+          renderFrameRef.current = {
+            previous: acknowledged.simulation,
+            current: acknowledged.simulation,
+            alpha: 1,
+          }
+          setSimulation(acknowledged.simulation)
+          checkpointPaused = false
+          busyRef.current = false
+          setSaving(false)
+          return
+        }
         const localRound = roundRef.current
         const localSimulation = localRound?.simulation
         const hasUnacknowledgedPlay = Boolean(localSimulation && localSimulation.tick > acknowledged.simulation.tick)
@@ -133,7 +171,10 @@ export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: stri
         countdownRef.current = remaining
         setCountdown(remaining)
       }
-      const checkpointWindowFull = busyRef.current && round.simulation.tick - checkpointTickRef.current >= MAX_ARCADE_CHECKPOINT_TICKS
+      const checkpointWindowFull = busyRef.current && (
+        round.simulation.tick - checkpointTickRef.current >= MAX_ARCADE_CHECKPOINT_TICKS ||
+        inputsRef.current.length >= MAX_ARCADE_CHECKPOINT_INPUTS
+      )
       if (remaining || checkpointPaused || checkpointWindowFull || completionStarted || controlsRef.current?.paused || document.visibilityState === 'hidden') {
         lastTime = 0
         accumulator = 0
@@ -149,11 +190,20 @@ export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: stri
       let interpolationStart = previous
       const tickMs = 1000 / ARCADE_TICK_RATE
       while (accumulator >= tickMs && next.status === 'playing') {
+        const tick = next.tick + 1
+        let queuedInputs = inputsRef.current
         for (const input of controlsRef.current?.inputForTick?.(next) || []) {
-          const tick = next.tick + 1
-          inputsRef.current = inputsRef.current.filter((queued) => queued.tick !== tick || queued.kind !== input.kind)
-          inputsRef.current.push(normalizeArcadeInput({ ...input, tick }))
+          queuedInputs = queuedInputs.filter((queued) => queued.tick !== tick || queued.kind !== input.kind)
+          queuedInputs.push(normalizeArcadeInput({ ...input, tick }))
         }
+        // The pending request still owns its inputs. Stop local prediction
+        // before a delayed response can leave more inputs than the server accepts.
+        if (busyRef.current && queuedInputs.length > MAX_ARCADE_CHECKPOINT_INPUTS) {
+          lastTime = 0
+          accumulator = 0
+          break
+        }
+        inputsRef.current = queuedInputs
         interpolationStart = next
         next = stepArcadeSimulation(gameType, settings, next, inputsRef.current.filter((input) => input.tick === next.tick + 1))
         accumulator -= tickMs
@@ -214,11 +264,12 @@ export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: stri
   const sendInput = useCallback((kind: ArcadeInput['kind'], value?: number) => {
     const round = roundRef.current
     if (!round || countdownRef.current || round.simulation.status !== 'playing') return
+    if ((kind === 'paddle' || kind === 'steer' || kind === 'heading') && !Number.isFinite(value)) return
     const tick = round.simulation.tick + 1
     // Pointer motion can deliver multiple targets before one simulation frame.
     if (kind === 'steer' || kind === 'heading' || kind === 'paddle') inputsRef.current = inputsRef.current.filter((input) => input.tick !== tick || input.kind !== kind)
     else if (inputsRef.current.some((input) => input.tick === tick && input.kind === kind)) return
-    if (inputsRef.current.length >= 300) return
+    if (inputsRef.current.length >= MAX_ARCADE_CHECKPOINT_INPUTS) return
     inputsRef.current.push(normalizeArcadeInput({ tick, kind, ...(value === undefined ? {} : { value }) }))
   }, [])
 
