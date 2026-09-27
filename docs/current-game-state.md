@@ -1,5 +1,7 @@
 # Current Game State
 
+- Unreleased (`0.40.21`): Brick Breaker and other continuously steered arcade runs pause local prediction when a slow checkpoint has filled the server's 300-input proof window. This prevents long paddle sessions from submitting an invalid checkpoint. If a proof is rejected, Retry resumes from the last server-accepted checkpoint with a three-second countdown instead of resending the same rejected proof. Non-finite steering inputs are discarded before they enter a proof.
+
 - Unreleased: The three TCG Test battles award 100 Pokédollars for a win. Their result claim waits for in-progress battle actions to settle, then keeps the shared Results screen open until the player returns to Explore. The finished battle stays visible while rewards are claimed; failed claims offer a retry. The claim no longer invalidates the current game route after clearing its session.
 
 - Unreleased: Mt. Moon's normal Explore encounters retain their existing IDs and task progress, while the expedition path uses separate expedition-only copies. Research XP stops at 1,000 XP (Research Level 5) and no longer appears as a reward after that cap; correct catch answers use the semantic health-green feedback token.
