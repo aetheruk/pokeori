@@ -13,6 +13,7 @@ Explore locations, mine for items, and discover Pokemon.
 - Route cards can expose the three core route gameplay pillars: Catch, Battle, and Study. Study is powered by Field Observation entries and appears beside Catch/Battle when the route has matching authored data.
 - Mine for items (berries, evolution stones)
 - Random Pokemon encounters
+- Mt. Moon's regular Explore encounters retain their existing result IDs for story requirements. Mt. Moon Expedition steps use separate expedition-only copies so the expedition server guard does not prevent normal Explore encounters from starting.
 - Per-player weather rolls persist for 30 minutes. The stored 1-20 weather slot is resolved through each active sub-region's `weatherSlots` map in `src/data/sub-region-map.ts`, defaulting to Clear when a slot is not authored.
 - Requirements and criteria can use `{ type: 'weather', targetId: 'rain' }` or a `targetId` array to gate or hide content by the active sub-region weather. Explore, battle starts, catch starts, catch encounter pools, research starts, and Field Observation internal pools validate the same weather server-side.
 - The Explore header shows the active sub-region weather beside the region-local time chip.

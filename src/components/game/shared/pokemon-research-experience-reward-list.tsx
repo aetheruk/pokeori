@@ -145,11 +145,24 @@ function PokemonResearchExperienceRewardRow({
 export function PokemonResearchExperienceRewardList({
   entries,
 }: PokemonResearchExperienceRewardListProps) {
-  if (entries.length === 0) return null
+  const visibleEntries = entries.filter((entry) => {
+    const oldExperience = Math.max(
+      0,
+      entry.oldExperience ??
+        Math.max(0, (entry.newExperience ?? entry.amount) - entry.amount),
+    )
+    const oldLevel = clampResearchLevel(
+      entry.oldLevel ?? getMaxResearchLevelForXp(oldExperience),
+    )
+
+    return oldLevel < MAX_RESEARCH_LEVEL && entry.amount > 0
+  })
+
+  if (visibleEntries.length === 0) return null
 
   return (
     <div className="space-y-0">
-      {entries.map((entry, index) => (
+      {visibleEntries.map((entry, index) => (
         <PokemonResearchExperienceRewardRow
           key={`pokemon-research-experience-${entry.formId}-${index}`}
           entry={entry}
