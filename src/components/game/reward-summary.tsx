@@ -32,7 +32,10 @@ const REWARD_VALUE_CLASS =
   'shrink-0 whitespace-nowrap font-mono text-sm font-semibold text-game-ink'
 
 function isResearchItem(item: { id: string; name: string }) {
-  return item.id.startsWith('tm-') || item.name.trim().toLowerCase().startsWith('tm:')
+  return (
+    item.id.startsWith('tm-') ||
+    item.name.trim().toLowerCase().startsWith('tm:')
+  )
 }
 
 interface RewardSummaryDisplayProps {
@@ -64,11 +67,12 @@ export function RewardSummaryDisplay({
   title = 'Rewards',
 }: RewardSummaryDisplayProps) {
   const xpEntries = Object.entries(summary.xp || {})
-  const skillExperienceEntries =
-    summary.skillExperience?.length
-      ? summary.skillExperience
-      : xpEntries.map(([skillId, amount]) => ({ skillId, amount }))
-  const rewardItems = (summary.items || []).filter((item) => !isResearchItem(item))
+  const skillExperienceEntries = summary.skillExperience?.length
+    ? summary.skillExperience
+    : xpEntries.map(([skillId, amount]) => ({ skillId, amount }))
+  const rewardItems = (summary.items || []).filter(
+    (item) => !isResearchItem(item),
+  )
   const researchItems = (summary.items || []).filter(isResearchItem)
   const hasResearchRewards =
     researchItems.length > 0 ||
@@ -77,10 +81,11 @@ export function RewardSummaryDisplay({
     (summary.researchBreakthroughs || []).length > 0
   const hasSkillExperience =
     skillExperienceEntries.length > 0 || Boolean(summary.levelUp)
+  const hasGuildExperience =
+    (summary.guildExperience || []).length > 0 ||
+    (summary.guildRankUps || []).length > 0
   const hasMainRewards =
-    rewardItems.length > 0 ||
-    (summary.currency || []).length > 0 ||
-    (summary.guildExperience || []).length > 0
+    rewardItems.length > 0 || (summary.currency || []).length > 0
   const hasAdditionalRewards =
     (summary.pokemon || []).length > 0 ||
     (summary.cards || []).length > 0 ||
@@ -93,6 +98,7 @@ export function RewardSummaryDisplay({
     (summary.eggs || []).length > 0
   const hasRewards =
     hasSkillExperience ||
+    hasGuildExperience ||
     hasResearchRewards ||
     hasMainRewards ||
     hasAdditionalRewards ||
@@ -102,252 +108,9 @@ export function RewardSummaryDisplay({
 
   return (
     <div className="w-full space-y-5 px-0 py-4 sm:px-1">
-      {(summary.pokemonExperience || []).length > 0 && (
-        <>
-          <SectionDivider>EXP</SectionDivider>
-          <PokemonExperienceRewardList entries={summary.pokemonExperience || []} />
-        </>
-      )}
-
-      {hasSkillExperience && (
-        <>
-          <SectionDivider>Skill EXP</SectionDivider>
-          <SkillExperienceRewardList entries={skillExperienceEntries} />
-          {summary.levelUp && (
-            <RewardLedgerRow className="mt-2 flex-row">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center">
-                {(() => {
-                  const skill = getSkill(summary.levelUp.skillId)
-                  const iconId = skill?.iconId
-                  if (!iconId) {
-                    return (
-                      <Star className="h-4 w-4 animate-pulse text-game-moss-strong" />
-                    )
-                  }
-                  return iconId.match(/\.(?:avif|png|webp|jpe?g)$/) ? (
-                    <Image
-                      src={`/fallback/skills/${iconId}`}
-                      alt={skill?.name || 'Skill'}
-                      width={20}
-                      height={20}
-                      className="h-5 w-5 object-contain"
-                    />
-                  ) : (
-                    <ItemSprite
-                      itemId={iconId}
-                      alt={skill?.name || 'Skill'}
-                      width={20}
-                      height={20}
-                      className="h-5 w-5 object-contain"
-                    />
-                  )
-                })()}
-              </div>
-              <div className="flex min-w-0 flex-1 items-center justify-between pr-2">
-                <span className="truncate text-sm font-medium uppercase tracking-wide text-game-ink">
-                  {getSkill(summary.levelUp.skillId)?.name || 'New'} Level
-                </span>
-                <div className="flex items-center gap-1.5 pl-2">
-                  <span className="shrink-0 whitespace-nowrap font-mono text-xs font-semibold text-game-muted line-through">
-                    {summary.levelUp.oldLevel}
-                  </span>
-                  <span className={REWARD_VALUE_CLASS}>
-                    Lvl {summary.levelUp.newLevel}
-                  </span>
-                </div>
-              </div>
-            </RewardLedgerRow>
-          )}
-        </>
-      )}
-
-      {(summary.guildExperience || []).length > 0 && (
-        <>
-          <SectionDivider>Guild progress</SectionDivider>
-          <div className="space-y-0">
-            {(summary.guildExperience || []).map((entry) => (
-              <RewardLedgerRow key={`${entry.guildId}-${entry.newExperience}`}>
-                <TaskIconDisplay
-                  icon={{ type: 'item', id: 'researchers-journal-page' }}
-                  className="h-8 w-8"
-                />
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm font-semibold text-game-ink">
-                    {entry.guildName}
-                  </div>
-                  <div className="text-xs text-game-muted">
-                    {entry.newExperience.toLocaleString()} total Guild XP
-                  </div>
-                </div>
-                <span className={REWARD_VALUE_CLASS}>+{entry.amount} XP</span>
-              </RewardLedgerRow>
-            ))}
-            {(summary.guildRankUps || []).map((entry) => (
-              <RewardLedgerRow key={`${entry.guildId}-rank-${entry.newRank}`}>
-                <Trophy className="h-5 w-5 shrink-0 text-game-ochre" />
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm font-semibold text-game-ink">
-                    Rank {entry.newRank}: {entry.rankName}
-                  </div>
-                  <div className="text-xs text-game-muted">
-                    {entry.unlocks.join(' · ')}
-                  </div>
-                </div>
-              </RewardLedgerRow>
-            ))}
-          </div>
-        </>
-      )}
-
-      {hasResearchRewards && (
-        <>
-          <SectionDivider>Research</SectionDivider>
-          <div className="space-y-0">
-            <PokemonResearchExperienceRewardList entries={summary.researchXp || []} />
-
-            {researchItems.map((item, i) => (
-              <RewardLedgerRow
-                key={`research-item-${item.id}-${i}`}
-                className="h-12 flex-row items-center gap-3 border-game-border bg-game-surface-raised p-2"
-              >
-                <div className="relative flex h-8 w-8 shrink-0 items-center justify-center">
-                  <ItemSprite
-                    itemId={item.id}
-                    alt={item.name}
-                    width={28}
-                    height={28}
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-                <div className="flex min-w-0 flex-1 items-center justify-between pr-2">
-                  <span className="truncate text-sm font-medium text-game-ink">
-                    {item.name}
-                  </span>
-                  <span className={REWARD_VALUE_CLASS}>
-                    {item.quantity > 1 ? `x${item.quantity}` : 'Unlocked'}
-                  </span>
-                </div>
-              </RewardLedgerRow>
-            ))}
-
-            {(summary.sketchedMoves || []).map((move, i) => (
-              <RewardLedgerRow key={`sketched-move-${i}`} className="flex-row">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center text-game-ochre">
-                  <Image
-                    src={getPokemonImageUrl('235', 'sprite')}
-                    alt="Smeargle"
-                    width={28}
-                    height={28}
-                    className="h-7 w-7 object-contain pixelated"
-                  />
-                </div>
-                <div className="flex min-w-0 flex-1 items-center justify-between pr-2">
-                  <span className="truncate text-sm font-medium text-game-ink">
-                    {move.name}
-                  </span>
-                  <span className="text-xs font-bold text-game-ochre">
-                    Sketched
-                  </span>
-                </div>
-              </RewardLedgerRow>
-            ))}
-
-            {(summary.researchBreakthroughs || []).map((b, i) => (
-              <RewardLedgerRow
-                key={`research-break-${i}`}
-                className="min-h-12 flex-row items-center gap-3 border-game-moss/35 bg-game-surface-raised p-2"
-              >
-                <div className="relative flex h-8 w-8 shrink-0 items-center justify-center p-0.5">
-                  <Image
-                    src={getPokemonImageUrl(b.formId, 'sprite')}
-                    alt={b.pokemonName}
-                    width={28}
-                    height={28}
-                    className="h-full w-full object-contain pixelated"
-                  />
-                </div>
-                <div className="flex min-w-0 flex-1 items-center justify-between gap-2 sm:pr-2">
-                  <span className="truncate text-sm font-medium text-game-ink">
-                    {b.pokemonName} Research
-                  </span>
-                  <span className={REWARD_VALUE_CLASS}>LVL {b.newLevel}</span>
-                </div>
-              </RewardLedgerRow>
-            ))}
-          </div>
-        </>
-      )}
-
-      {hasMainRewards && (
-        <>
-          <SectionDivider>{title}</SectionDivider>
-          <div className="space-y-0">
-            {(summary.currency || []).map((curr, i) => {
-              const currencyDef = getCurrency(curr.type)
-              return (
-                <RewardLedgerRow
-                  key={`curr-${i}`}
-                  className="h-12 flex-row items-center gap-3 border-game-border bg-game-surface-raised p-2"
-                >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center text-game-ochre">
-                    {currencyDef ? (
-                      <CurrencySprite
-                        currencyId={curr.type}
-                        alt={currencyDef.name}
-                        width={20}
-                        height={20}
-                        className="h-5 w-5 object-contain"
-                      />
-                    ) : (
-                      <Coins className="h-4 w-4" />
-                    )}
-                  </div>
-                  <div className="flex min-w-0 flex-1 items-center justify-between pr-2">
-                    <span className="truncate text-sm font-medium text-game-ink">
-                      {currencyDef ? currencyDef.name : curr.type}
-                    </span>
-                    <span
-                      className={cn(
-                        REWARD_VALUE_CLASS,
-                        curr.quantity < 0 && 'text-game-danger',
-                      )}
-                    >
-                      {curr.quantity > 0 ? `x${curr.quantity}` : curr.quantity}
-                    </span>
-                  </div>
-                </RewardLedgerRow>
-              )
-            })}
-
-            {rewardItems.map((item, i) => (
-              <RewardLedgerRow
-                key={`item-${item.id}-${i}`}
-                className="h-12 flex-row items-center gap-3 border-game-border bg-game-surface-raised p-2"
-              >
-                <div className="relative flex h-8 w-8 shrink-0 items-center justify-center">
-                  <ItemSprite
-                    itemId={item.id}
-                    alt={item.name}
-                    width={28}
-                    height={28}
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-                <div className="flex min-w-0 flex-1 items-center justify-between pr-2">
-                  <span className="truncate text-sm font-medium text-game-ink">
-                    {item.name}
-                  </span>
-                  <span className={REWARD_VALUE_CLASS}>x{item.quantity}</span>
-                </div>
-              </RewardLedgerRow>
-            ))}
-          </div>
-        </>
-      )}
-
       {hasAdditionalRewards && (
         <>
-          <SectionDivider>Additional</SectionDivider>
+          <SectionDivider>Other</SectionDivider>
           <div className="space-y-0">
             {(summary.eggs || []).map((egg) => {
               const rarity = getPokemonRarityEffect(egg.rarity)
@@ -430,7 +193,9 @@ export function RewardSummaryDisplay({
                     <span className="truncate text-sm font-medium text-game-ink">
                       {p.name}
                     </span>
-                    {p.shiny && <span className="text-xs text-game-ochre">★</span>}
+                    {p.shiny && (
+                      <span className="text-xs text-game-ochre">★</span>
+                    )}
                   </div>
                   <span className={REWARD_VALUE_CLASS}>Lvl {p.level}</span>
                 </div>
@@ -546,6 +311,253 @@ export function RewardSummaryDisplay({
                     {upgrade.label}
                   </span>
                   <span className={REWARD_VALUE_CLASS}>+{upgrade.value}</span>
+                </div>
+              </RewardLedgerRow>
+            ))}
+          </div>
+        </>
+      )}
+
+      {hasMainRewards && (
+        <>
+          <SectionDivider>{title}</SectionDivider>
+          <div className="space-y-0">
+            {(summary.currency || []).map((curr, i) => {
+              const currencyDef = getCurrency(curr.type)
+              return (
+                <RewardLedgerRow
+                  key={`curr-${i}`}
+                  className="h-12 flex-row items-center gap-3 border-game-border bg-game-surface-raised p-2"
+                >
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center text-game-ochre">
+                    {currencyDef ? (
+                      <CurrencySprite
+                        currencyId={curr.type}
+                        alt={currencyDef.name}
+                        width={20}
+                        height={20}
+                        className="h-5 w-5 object-contain"
+                      />
+                    ) : (
+                      <Coins className="h-4 w-4" />
+                    )}
+                  </div>
+                  <div className="flex min-w-0 flex-1 items-center justify-between pr-2">
+                    <span className="truncate text-sm font-medium text-game-ink">
+                      {currencyDef ? currencyDef.name : curr.type}
+                    </span>
+                    <span
+                      className={cn(
+                        REWARD_VALUE_CLASS,
+                        curr.quantity < 0 && 'text-game-danger',
+                      )}
+                    >
+                      {curr.quantity > 0 ? `x${curr.quantity}` : curr.quantity}
+                    </span>
+                  </div>
+                </RewardLedgerRow>
+              )
+            })}
+
+            {rewardItems.map((item, i) => (
+              <RewardLedgerRow
+                key={`item-${item.id}-${i}`}
+                className="h-12 flex-row items-center gap-3 border-game-border bg-game-surface-raised p-2"
+              >
+                <div className="relative flex h-8 w-8 shrink-0 items-center justify-center">
+                  <ItemSprite
+                    itemId={item.id}
+                    alt={item.name}
+                    width={28}
+                    height={28}
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+                <div className="flex min-w-0 flex-1 items-center justify-between pr-2">
+                  <span className="truncate text-sm font-medium text-game-ink">
+                    {item.name}
+                  </span>
+                  <span className={REWARD_VALUE_CLASS}>x{item.quantity}</span>
+                </div>
+              </RewardLedgerRow>
+            ))}
+          </div>
+        </>
+      )}
+
+      {(summary.pokemonExperience || []).length > 0 && (
+        <>
+          <SectionDivider>EXP</SectionDivider>
+          <PokemonExperienceRewardList
+            entries={summary.pokemonExperience || []}
+          />
+        </>
+      )}
+
+      {hasSkillExperience && (
+        <>
+          <SectionDivider>Skill EXP</SectionDivider>
+          <SkillExperienceRewardList entries={skillExperienceEntries} />
+          {summary.levelUp && (
+            <RewardLedgerRow className="mt-2 flex-row">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center">
+                {(() => {
+                  const skill = getSkill(summary.levelUp.skillId)
+                  const iconId = skill?.iconId
+                  if (!iconId) {
+                    return (
+                      <Star className="h-4 w-4 animate-pulse text-game-moss-strong" />
+                    )
+                  }
+                  return iconId.match(/\.(?:avif|png|webp|jpe?g)$/) ? (
+                    <Image
+                      src={`/fallback/skills/${iconId}`}
+                      alt={skill?.name || 'Skill'}
+                      width={20}
+                      height={20}
+                      className="h-5 w-5 object-contain"
+                    />
+                  ) : (
+                    <ItemSprite
+                      itemId={iconId}
+                      alt={skill?.name || 'Skill'}
+                      width={20}
+                      height={20}
+                      className="h-5 w-5 object-contain"
+                    />
+                  )
+                })()}
+              </div>
+              <div className="flex min-w-0 flex-1 items-center justify-between pr-2">
+                <span className="truncate text-sm font-medium uppercase tracking-wide text-game-ink">
+                  {getSkill(summary.levelUp.skillId)?.name || 'New'} Level
+                </span>
+                <div className="flex items-center gap-1.5 pl-2">
+                  <span className="shrink-0 whitespace-nowrap font-mono text-xs font-semibold text-game-muted line-through">
+                    {summary.levelUp.oldLevel}
+                  </span>
+                  <span className={REWARD_VALUE_CLASS}>
+                    Lvl {summary.levelUp.newLevel}
+                  </span>
+                </div>
+              </div>
+            </RewardLedgerRow>
+          )}
+        </>
+      )}
+
+      {hasGuildExperience && (
+        <>
+          <SectionDivider>Guild progress</SectionDivider>
+          <div className="space-y-0">
+            {(summary.guildExperience || []).map((entry) => (
+              <RewardLedgerRow key={`${entry.guildId}-${entry.newExperience}`}>
+                <TaskIconDisplay
+                  icon={{ type: 'item', id: 'researchers-journal-page' }}
+                  className="h-8 w-8"
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-sm font-semibold text-game-ink">
+                    {entry.guildName}
+                  </div>
+                  <div className="text-xs text-game-muted">
+                    {entry.newExperience.toLocaleString()} total Guild XP
+                  </div>
+                </div>
+                <span className={REWARD_VALUE_CLASS}>+{entry.amount} XP</span>
+              </RewardLedgerRow>
+            ))}
+            {(summary.guildRankUps || []).map((entry) => (
+              <RewardLedgerRow key={`${entry.guildId}-rank-${entry.newRank}`}>
+                <Trophy className="h-5 w-5 shrink-0 text-game-ochre" />
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-semibold text-game-ink">
+                    Rank {entry.newRank}: {entry.rankName}
+                  </div>
+                  <div className="text-xs text-game-muted">
+                    {entry.unlocks.join(' · ')}
+                  </div>
+                </div>
+              </RewardLedgerRow>
+            ))}
+          </div>
+        </>
+      )}
+
+      {hasResearchRewards && (
+        <>
+          <SectionDivider>Research</SectionDivider>
+          <div className="space-y-0">
+            <PokemonResearchExperienceRewardList
+              entries={summary.researchXp || []}
+            />
+
+            {researchItems.map((item, i) => (
+              <RewardLedgerRow
+                key={`research-item-${item.id}-${i}`}
+                className="h-12 flex-row items-center gap-3 border-game-border bg-game-surface-raised p-2"
+              >
+                <div className="relative flex h-8 w-8 shrink-0 items-center justify-center">
+                  <ItemSprite
+                    itemId={item.id}
+                    alt={item.name}
+                    width={28}
+                    height={28}
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+                <div className="flex min-w-0 flex-1 items-center justify-between pr-2">
+                  <span className="truncate text-sm font-medium text-game-ink">
+                    {item.name}
+                  </span>
+                  <span className={REWARD_VALUE_CLASS}>
+                    {item.quantity > 1 ? `x${item.quantity}` : 'Unlocked'}
+                  </span>
+                </div>
+              </RewardLedgerRow>
+            ))}
+
+            {(summary.sketchedMoves || []).map((move, i) => (
+              <RewardLedgerRow key={`sketched-move-${i}`} className="flex-row">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center text-game-ochre">
+                  <Image
+                    src={getPokemonImageUrl('235', 'sprite')}
+                    alt="Smeargle"
+                    width={28}
+                    height={28}
+                    className="h-7 w-7 object-contain pixelated"
+                  />
+                </div>
+                <div className="flex min-w-0 flex-1 items-center justify-between pr-2">
+                  <span className="truncate text-sm font-medium text-game-ink">
+                    {move.name}
+                  </span>
+                  <span className="text-xs font-bold text-game-ochre">
+                    Sketched
+                  </span>
+                </div>
+              </RewardLedgerRow>
+            ))}
+
+            {(summary.researchBreakthroughs || []).map((b, i) => (
+              <RewardLedgerRow
+                key={`research-break-${i}`}
+                className="min-h-12 flex-row items-center gap-3 border-game-moss/35 bg-game-surface-raised p-2"
+              >
+                <div className="relative flex h-8 w-8 shrink-0 items-center justify-center p-0.5">
+                  <Image
+                    src={getPokemonImageUrl(b.formId, 'sprite')}
+                    alt={b.pokemonName}
+                    width={28}
+                    height={28}
+                    className="h-full w-full object-contain pixelated"
+                  />
+                </div>
+                <div className="flex min-w-0 flex-1 items-center justify-between gap-2 sm:pr-2">
+                  <span className="truncate text-sm font-medium text-game-ink">
+                    {b.pokemonName} Research
+                  </span>
+                  <span className={REWARD_VALUE_CLASS}>LVL {b.newLevel}</span>
                 </div>
               </RewardLedgerRow>
             ))}
