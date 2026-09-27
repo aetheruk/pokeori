@@ -1,7 +1,6 @@
 'use server'
 
 import { randomInt, randomUUID } from 'node:crypto'
-import { revalidatePath } from 'next/cache'
 import { allGames, type TcgBattleGameConfig } from '@/data/games'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
@@ -1329,7 +1328,12 @@ async function finalizeTcgPvpResult(state: TcgPvpSharedBattleState) {
               ? 'You surrendered the TCG battle.'
               : 'You lost the TCG battle.'
           : 'The TCG battle ended in a draw.'
-    return { success: true, summary: makeEmptyTcgPvpSummary(), message }
+    return {
+      success: true,
+      summary: makeEmptyTcgPvpSummary(),
+      message,
+      invalidates: ['gameResults'],
+    }
   }
 
   state.statsFinalized = true
@@ -2495,6 +2499,9 @@ export async function claimTcgBattleResult(): Promise<TcgBattleActionResult> {
     const user = await getUser()
     if (!user) return { success: false, error: 'Not authenticated' }
 
+    // Revalidating here rerenders the active game route after its session is
+    // cleared, which redirects to Explore before the client can show results.
+
     const status = await loadTcgPvpStatus(user.id)
     if (status?.matchId) {
       if (!status.encounterId) {
@@ -2540,7 +2547,6 @@ export async function claimTcgBattleResult(): Promise<TcgBattleActionResult> {
         } else {
           await saveTcgPvpSharedState(shared)
         }
-        revalidatePath('/game/explore')
         return { success: true, state: perspective, completion }
       })
     }
@@ -2562,10 +2568,7 @@ export async function claimTcgBattleResult(): Promise<TcgBattleActionResult> {
       }
     }
 
-    if (completion.success) {
-      await redis.del(battleKey(user.id))
-      revalidatePath('/game/explore')
-    }
+    if (completion.success) await redis.del(battleKey(user.id))
     return { success: true, state, completion }
   } catch (error) {
     return {
