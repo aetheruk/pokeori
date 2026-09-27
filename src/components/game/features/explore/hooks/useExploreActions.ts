@@ -736,8 +736,10 @@ export function useExploreActions(
             toast.error('Failed to start encounter')
             setLoadingId(null)
           }
-        } catch (e) {
-          toast.error('An error occurred')
+        } catch (error) {
+          toast.error(
+            error instanceof Error ? error.message : 'An error occurred',
+          )
           setLoadingId(null)
         }
         break
@@ -994,8 +996,12 @@ export function useExploreActions(
           toast.error(result.error || 'Failed to start encounter')
         }
       }
-    } catch (e) {
-      toast.error('An error occurred')
+    } catch (error) {
+      toast.error(
+        type === 'location' && error instanceof Error
+          ? error.message
+          : 'An error occurred',
+      )
     } finally {
       setLoadingId(null)
     }
