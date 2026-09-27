@@ -32,6 +32,23 @@ const readJson = (filename) => {
 const getGenerationId = (speciesId) =>
   GEN_RANGES.find((gen) => gen.start <= speciesId && speciesId <= gen.end)?.id || 'gen9'
 
+const getEvolutionIdentity = (evolution) =>
+  JSON.stringify([
+    evolution.speciesId,
+    evolution.name,
+    evolution.targetForm || 'base',
+    evolution.trigger,
+    Object.entries(evolution.conditions).sort(([left], [right]) =>
+      left.localeCompare(right),
+    ),
+  ])
+
+const deduplicateEvolutions = (evolutions) => [
+  ...new Map(
+    evolutions.map((evolution) => [getEvolutionIdentity(evolution), evolution]),
+  ).values(),
+]
+
 const writeEvolutionModules = (evolutionMap) => {
   fs.mkdirSync(OUTPUT_DIR, { recursive: true })
 
@@ -39,7 +56,7 @@ const writeEvolutionModules = (evolutionMap) => {
 
   for (const [sourceSpeciesId, evolutions] of evolutionMap.entries()) {
     const genId = getGenerationId(Number(sourceSpeciesId))
-    byGeneration.get(genId)[sourceSpeciesId] = evolutions
+    byGeneration.get(genId)[sourceSpeciesId] = deduplicateEvolutions(evolutions)
   }
 
   const typesContent = `export interface EvolutionCondition {
@@ -102,6 +119,23 @@ const rawEvolutions: Record<number, Evolution[]> = {
 ${spreads}
 }
 
+const getEvolutionIdentity = (evolution: Evolution) =>
+  JSON.stringify([
+    evolution.speciesId,
+    evolution.name,
+    evolution.targetForm || 'base',
+    evolution.trigger,
+    Object.entries(evolution.conditions).sort(([left], [right]) =>
+      left.localeCompare(right),
+    ),
+  ])
+
+const deduplicateEvolutions = (evolutions: Evolution[]) => [
+  ...new Map(
+    evolutions.map((evolution) => [getEvolutionIdentity(evolution), evolution]),
+  ).values(),
+]
+
 const hasUsableCondition = (evolution: Evolution) =>
   Object.keys(evolution.conditions).length > 0
 
@@ -118,7 +152,7 @@ const sourceFormsOverlap = (left: Evolution, right: Evolution) =>
  * that fallback only when the target does not already have an authored route.
  */
 const normalizeEvolutions = (evolutions: Evolution[]) =>
-  evolutions.filter((evolution) => {
+  deduplicateEvolutions(evolutions).filter((evolution) => {
     // Unsupported special level-up mechanics have no actionable condition.
     if (!hasUsableCondition(evolution)) return false
 

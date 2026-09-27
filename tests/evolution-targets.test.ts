@@ -59,6 +59,10 @@ if (!alolanRattataToRaticate) {
 }
 
 describe('evolution target form resolution', () => {
+  test('deduplicates Pikachu Thunder Stone evolution options', () => {
+    expect(EVOLUTIONS[25]).toHaveLength(1)
+  })
+
   test('evolves Alola-origin Pikachu into Alolan Raichu with a Thunder Stone', () => {
     expect(
       resolveEvolutionTargetForm(
