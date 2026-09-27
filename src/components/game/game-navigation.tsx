@@ -75,7 +75,7 @@ export function GameNavigation() {
                 className={cn(
                   'game-focus-ring relative flex h-11 items-center justify-center gap-3 overflow-hidden rounded-lg border px-3 text-sm font-medium transition-colors lg:justify-start',
                   isActive
-                    ? 'border-game-moss/35 bg-game-surface-raised text-game-moss-strong shadow-[0_4px_12px_rgb(75_62_39_/_0.08)] before:absolute before:bottom-2 before:left-0 before:top-2 before:w-1 before:rounded-r-sm before:bg-game-moss'
+                    ? 'border-game-charcoal/35 bg-game-surface-raised text-game-charcoal-strong shadow-[0_4px_12px_rgb(75_62_39_/_0.08)] before:absolute before:bottom-2 before:left-0 before:top-2 before:w-1 before:rounded-r-sm before:bg-game-charcoal'
                     : 'border-transparent text-game-muted hover:bg-game-surface hover:text-game-ink',
                 )}
                 title={item.name}
@@ -145,7 +145,7 @@ export function GameNavigation() {
               className={cn(
                 'game-focus-ring relative flex h-[3.75rem] min-w-[60px] flex-1 flex-col items-center justify-end gap-1 rounded-t-lg border border-transparent px-1 pb-1.5 transition-colors',
                 isActive
-                  ? 'border-game-border border-b-transparent bg-game-surface-raised text-game-moss-strong shadow-[0_-5px_12px_rgb(75_62_39_/_0.08)]'
+                  ? 'border-game-border border-b-transparent bg-game-surface-raised text-game-charcoal-strong shadow-[0_-5px_12px_rgb(75_62_39_/_0.08)]'
                   : 'text-game-muted hover:text-game-ink',
               )}
             >
@@ -163,7 +163,7 @@ export function GameNavigation() {
                 <item.icon className="h-5 w-5" />
               )}
               {isActive && (
-                <span className="absolute top-0 h-0.5 w-7 rounded-b-full bg-game-moss" />
+                <span className="absolute top-0 h-0.5 w-7 rounded-b-full bg-game-charcoal" />
               )}
               <span className="max-w-[58px] truncate text-center text-[11px] font-medium leading-none">
                 {item.name === 'Trainer'

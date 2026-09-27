@@ -182,7 +182,7 @@ export function TrainerCollection() {
             />
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <div className="game-field-label flex items-center gap-2">
+                <div className="game-field-label before:hidden flex items-center gap-2">
                   <Layers className="h-3.5 w-3.5" />
                   {trainerName}'s Collection
                 </div>
@@ -333,7 +333,7 @@ export function TrainerCollection() {
 
         <section className="game-folio-section min-w-0 overflow-hidden p-4 md:p-5">
           <div className="flex items-center justify-between gap-3">
-            <div className="game-field-label flex items-center gap-2">
+            <div className="game-field-label before:hidden flex items-center gap-2">
               <Sparkles className="h-3.5 w-3.5 text-game-ochre" />
               Recent fieldwork
             </div>

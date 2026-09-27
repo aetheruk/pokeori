@@ -159,7 +159,7 @@ export function QuestionPrompt({
                     'border-game-moss bg-game-moss/12 ring-1 ring-game-moss/35',
                   selected &&
                     answerStatus === 'correct' &&
-                    'border-game-moss bg-game-moss/15 ring-1 ring-game-moss/35',
+                    'border-green-400 bg-green-400/25 ring-1 ring-green-400/50',
                   selected &&
                     answerStatus === 'incorrect' &&
                     'border-game-danger bg-game-danger/10 ring-1 ring-game-danger/30',

@@ -778,32 +778,26 @@ function PokemonCard({
                 {
                   label: 'HP',
                   value: pokemon.stats.hp,
-                  color: 'bg-game-danger',
                 },
                 {
                   label: 'ATK',
                   value: pokemon.stats.attack,
-                  color: 'bg-game-clay',
                 },
                 {
                   label: 'DEF',
                   value: pokemon.stats.defense,
-                  color: 'bg-game-ochre',
                 },
                 {
                   label: 'SPA',
                   value: pokemon.stats['special-attack'],
-                  color: 'bg-game-moss',
                 },
                 {
                   label: 'SPD',
                   value: pokemon.stats['special-defense'],
-                  color: 'bg-game-moss-strong',
                 },
                 {
                   label: 'SPE',
                   value: pokemon.stats.speed,
-                  color: 'bg-game-clay-strong',
                 },
               ].map((stat) => (
                 <div key={stat.label} className="group flex items-center gap-4 py-2.5">
@@ -812,10 +806,7 @@ function PokemonCard({
                   </span>
                   <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-game-canvas">
                     <div
-                      className={cn(
-                        'h-full rounded-full transition-all duration-700 opacity-75 motion-reduce:transition-none',
-                        stat.color,
-                      )}
+                      className="h-full rounded-full bg-game-charcoal opacity-75 transition-all duration-700 motion-reduce:transition-none"
                       style={{
                         width: `${Math.min((stat.value / 255) * 100, 100)}%`,
                       }}
@@ -948,21 +939,21 @@ function getPreferredStanceConfig(stance: BattleStance) {
       Icon: STANCE_ICON_CONFIG.power.Icon,
       label: 'Power',
       className: 'border-game-clay/30 bg-game-clay/10 text-game-clay-strong',
-      barClassName: 'bg-game-clay',
+      barClassName: 'bg-game-charcoal',
     },
     speed: {
       Icon: STANCE_ICON_CONFIG.speed.Icon,
       label: 'Speed',
       className:
         'border-game-ochre/35 bg-game-ochre/10 text-game-ochre',
-      barClassName: 'bg-game-ochre',
+      barClassName: 'bg-game-charcoal',
     },
     tech: {
       Icon: STANCE_ICON_CONFIG.tech.Icon,
       label: 'Tech',
       className:
         'border-game-stance-blue/35 bg-game-stance-blue/10 text-game-stance-blue-strong',
-      barClassName: 'bg-game-stance-blue',
+      barClassName: 'bg-game-charcoal',
     },
   }[stance]
 }
@@ -1036,7 +1027,7 @@ function PreferredStanceBadge({
               max={100}
               value={level}
               onChange={(event) => setLevel(Number(event.target.value))}
-              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-game-canvas accent-game-moss"
+              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-game-canvas accent-game-charcoal"
             />
             <div className="flex justify-between text-[10px] font-bold uppercase tracking-[0.08em] text-game-muted">
               <span>1</span>
@@ -1264,7 +1255,7 @@ function ResearchSection({
           <div className="space-y-2">
             <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-game-muted">
               <div className="flex items-center gap-1.5">
-                <div className="h-1 w-1 rounded-full bg-game-ochre" />
+                <div className="h-1 w-1 rounded-full bg-game-charcoal" />
                 <span>Experience</span>
               </div>
               <span className="font-mono text-game-ink">
@@ -1273,7 +1264,7 @@ function ResearchSection({
             </div>
             <div className="relative h-2 w-full overflow-hidden rounded-full border border-game-border bg-game-canvas">
               <div
-                className="relative h-full overflow-hidden bg-game-moss transition-all duration-700"
+                className="relative h-full overflow-hidden bg-game-charcoal transition-all duration-700"
                 style={{ width: `${xpProgress}%` }}
               />
             </div>
