@@ -2246,6 +2246,15 @@ export default function EncounterPage() {
         onOpenChange={setShowItemsModal}
         title="Use Item"
         description="Choose a field tool for this encounter."
+        icon={
+          <ItemSprite
+            itemId={`${(species?.types?.[0] || 'normal').toLowerCase()}-gem`}
+            alt={`${species?.types?.[0] || 'Normal'} type gem`}
+            width={56}
+            height={56}
+            className="size-14 object-contain"
+          />
+        }
         desktopWidth="min(34vw, 420px)"
         mobileMaxHeight="76dvh"
         className="bg-game-surface text-game-ink"

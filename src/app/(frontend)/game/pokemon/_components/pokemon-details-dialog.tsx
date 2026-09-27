@@ -32,7 +32,7 @@ import * as React from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { MoveFieldNote, MoveLoadoutWorkspace } from '@/components/game/moves'
-import { RewardSummaryDisplay } from '@/components/game/reward-summary'
+import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { PokemonRaritySprite } from '@/components/game/shared/PokemonRaritySprite'
 import { StanceIcon } from '@/components/game/shared/stance-icon'
 import { Badge } from '@/components/ui/badge'
@@ -47,7 +47,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -2276,33 +2275,29 @@ function MountedPokemonDetailsDialog({
         </div>
       </ResponsivePanel>
 
-      {/* Evolution Rewards Dialog */}
-      <Dialog
-        open={!!evolutionRewards && !evolutionTarget}
-        onOpenChange={(open) => !open && setEvolutionRewards(null)}
-      >
-        <DialogContent className="max-w-sm overflow-hidden rounded-xl border-game-border bg-game-surface p-0 text-game-ink">
-          <DialogTitle className="sr-only">Research Progress</DialogTitle>
-          <div className="p-6 pb-0">
-            <h2 className="text-center font-display text-2xl font-bold tracking-tight text-game-ink">
-              Research Progress
-            </h2>
-          </div>
-          <div className="max-h-[60vh] overflow-y-auto custom-scrollbar">
-            {evolutionRewards && (
-              <RewardSummaryDisplay summary={evolutionRewards} title="" />
-            )}
-          </div>
-          <DialogFooter className="p-6 pt-2">
-            <Button
-              onClick={() => setEvolutionRewards(null)}
-              className="w-full bg-game-clay font-bold uppercase tracking-widest text-game-cream hover:bg-game-clay/90"
-            >
-              Continue
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <RewardResultOverlay
+        result={
+          evolutionRewards && !evolutionTarget
+            ? {
+                success: true,
+                message: `${pokemon.name || 'Pokemon'} evolved into ${evolvedPokemon?.name || 'a new form'}!`,
+                rewards: evolutionRewards as any,
+              }
+            : null
+        }
+        onClose={() => setEvolutionRewards(null)}
+        background={normalizePokemonBackgroundPath(
+          (evolvedPokemon as any)?.background,
+        )}
+        icon={{
+          type: 'pokemon',
+          id:
+            evolvedPokemon?.formId ||
+            String(evolvedPokemon?.speciesId || pokemon.speciesId),
+        }}
+        iconAlt={evolvedPokemon?.name || 'Evolved Pokemon'}
+        title="EVOLUTION COMPLETE!"
+      />
 
       {/* Evolution Overlay */}
       {evolutionTarget &&
