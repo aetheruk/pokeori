@@ -137,7 +137,7 @@ describe('TCG battle completion navigation', () => {
     expect(finishedGuard).toBeGreaterThan(resultOverlayStart)
   })
 
-  test('waits for the automatic claim without rendering a manual retry', () => {
+  test('waits for the battle action to settle before claiming terminal results', () => {
     const source = readFileSync(
       join(
         process.cwd(),
@@ -151,10 +151,31 @@ describe('TCG battle completion navigation', () => {
       controlsStart,
     )
     const controlsSource = source.slice(controlsStart, controlsEnd)
+
+    expect(controlsSource).toContain('resultShown ||')
+    expect(controlsSource).toContain('isPending ||')
     expect(controlsSource).toContain('Preparing your results')
-    expect(controlsSource).not.toContain('Show Results')
-    expect(controlsSource).not.toContain('onClick={onClaim}')
-    expect(controlsSource).not.toContain('window.setTimeout')
+  })
+
+  test('offers a retry if the result claim cannot be completed', () => {
+    const source = readFileSync(
+      join(
+        process.cwd(),
+        'src/app/(frontend)/game/research/encounter/tcg-battle.tsx',
+      ),
+      'utf8',
+    )
+    const controlsStart = source.indexOf('function BattleCommandControls(')
+    const controlsEnd = source.indexOf(
+      'function LabeledCommandButton(',
+      controlsStart,
+    )
+    const controlsSource = source.slice(controlsStart, controlsEnd)
+
+    expect(controlsSource).toContain('claimError ?')
+    expect(controlsSource).toContain('onClick={onClaim}')
+    expect(controlsSource).toContain('Retry results')
+    expect(source).toContain("meta.kind === 'claim' && !response.completion")
   })
 
   test('keeps the claimed results screen bound to its settled battle state', () => {

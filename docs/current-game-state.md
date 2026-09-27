@@ -1,5 +1,7 @@
 # Current Game State
 
+- Unreleased: The three TCG Test battles award 100 Pokédollars for a win. Their result claim waits for in-progress battle actions to settle; if a claim fails, the battle offers a retry instead of remaining indefinitely on the preparation screen.
+
 - Unreleased: Mt. Moon's normal Explore encounters retain their existing IDs and task progress, while the expedition path uses separate expedition-only copies. Research XP stops at 1,000 XP (Research Level 5) and no longer appears as a reward after that cap; correct catch answers use the semantic health-green feedback token.
 
 - Unreleased: Brick Breaker reward drops now replace a random destructible brick's Pokémon icon, glow, and grant the reward only when that brick is hit before expiration. Surf hazards spread farther into the playable edge lanes as they approach, making side-camping less reliable.
