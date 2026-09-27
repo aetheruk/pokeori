@@ -948,6 +948,22 @@ describe('TCG battle utilities', () => {
     }
   })
 
+  test('awards 100 Pokédollars for each test battle win', () => {
+    const testBattles = allGames.filter(
+      (game): game is TcgBattleGameConfig =>
+        game.gameType === 'tcg-battle' && game.subCategory === 'Test',
+    )
+
+    expect(testBattles).toHaveLength(3)
+    for (const battle of testBattles) {
+      expect(battle.rewards).toContainEqual({
+        type: 'currency',
+        targetId: 'pokedollars',
+        quantity: 100,
+      })
+    }
+  })
+
   test('rejects decks over the format cost cap', async () => {
     const cardIds = [
       'base1-4',

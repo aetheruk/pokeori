@@ -11,7 +11,7 @@ export const testTcgBattleGames: TcgBattleGameConfig[] = [
     icon: { type: 'lucide', id: 'CreditCard' },
     background: '/backgrounds/tcg.avif',
     requirements: [],
-    rewards: [],
+    rewards: [{ type: 'currency', targetId: 'pokedollars', quantity: 100 }],
     settings: {
       deckFormat: 'baby',
       requiredSeries: 'Base',
@@ -45,7 +45,7 @@ export const testTcgBattleGames: TcgBattleGameConfig[] = [
     icon: { type: 'lucide', id: 'CreditCard' },
     background: '/backgrounds/tcg.avif',
     requirements: [],
-    rewards: [],
+    rewards: [{ type: 'currency', targetId: 'pokedollars', quantity: 100 }],
     settings: {
       deckFormat: 'champions',
       requiredSeries: 'Base',
@@ -79,7 +79,7 @@ export const testTcgBattleGames: TcgBattleGameConfig[] = [
     icon: { type: 'lucide', id: 'CreditCard' },
     background: '/backgrounds/tcg.avif',
     requirements: [],
-    rewards: [],
+    rewards: [{ type: 'currency', targetId: 'pokedollars', quantity: 100 }],
     settings: {
       deckFormat: 'masters',
       requiredSeries: 'Base',

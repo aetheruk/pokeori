@@ -564,6 +564,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
   const [result, setResult] = useState<GameCompletionResult | null>(null)
   const [completionState, setCompletionState] =
     useState<TcgBattleState | null>(null)
+  const [claimError, setClaimError] = useState<string | null>(null)
   const [resolution, setResolution] = useState<BattleResolution | null>(null)
   const [isActionBusy, setIsActionBusy] = useState(false)
   const [attackCapPulse, setAttackCapPulse] = useState(false)
@@ -1614,26 +1615,49 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
     if (isBusy) return
     const previousState = state
     setIsActionBusy(true)
+    if (meta.kind === 'claim') setClaimError(null)
     primeActionResolution(previousState, meta)
     startTransition(async () => {
-      const response = await action()
-      if (!response.success) {
+      try {
+        const response = await action()
+        if (!response.success) {
+          setIsActionBusy(false)
+          setResolution(null)
+          const errorMessage =
+            response.error || 'Unable to complete the TCG battle action.'
+          if (meta.kind === 'claim') setClaimError(errorMessage)
+          toast.error(errorMessage)
+          return
+        }
+        if (meta.kind === 'claim' && !response.completion) {
+          setIsActionBusy(false)
+          setResolution(null)
+          setClaimError(
+            'The battle finished, but its rewards could not be loaded.',
+          )
+          return
+        }
+        setBenchMode(null)
+        if (!previousState) {
+          commitActionResult(response.state, response.completion)
+          return
+        }
+        animateActionResult(
+          previousState,
+          response.state,
+          meta,
+          response.completion,
+        )
+      } catch (error) {
         setIsActionBusy(false)
         setResolution(null)
-        toast.error(response.error)
-        return
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : 'Unable to complete the TCG battle action.'
+        if (meta.kind === 'claim') setClaimError(errorMessage)
+        toast.error(errorMessage)
       }
-      setBenchMode(null)
-      if (!previousState) {
-        commitActionResult(response.state, response.completion)
-        return
-      }
-      animateActionResult(
-        previousState,
-        response.state,
-        meta,
-        response.completion,
-      )
     })
   }
 
@@ -2024,6 +2048,7 @@ export function TcgBattleGame({ encounter }: TcgBattleGameProps) {
           state={state}
           selectedAttacker={selectedAttacker}
           isPending={isBusy}
+          claimError={claimError}
           resultShown={Boolean(resultOverlay)}
           resolution={resolution}
           onCharge={() =>
@@ -3003,6 +3028,7 @@ function BattleCommandControls({
   state,
   selectedAttacker,
   isPending,
+  claimError,
   resultShown,
   resolution,
   onCharge,
@@ -3013,6 +3039,7 @@ function BattleCommandControls({
   state: TcgBattleState
   selectedAttacker?: TcgBattleCardState
   isPending: boolean
+  claimError: string | null
   resultShown: boolean
   resolution?: BattleResolution | null
   onCharge: () => void
@@ -3026,13 +3053,14 @@ function BattleCommandControls({
     if (
       state.phase !== 'finished' ||
       resultShown ||
+      isPending ||
       hasAutoClaimedResultRef.current
     ) {
       return
     }
     hasAutoClaimedResultRef.current = true
     onClaim()
-  }, [onClaim, resultShown, state.phase])
+  }, [isPending, onClaim, resultShown, state.phase])
 
   const canAct =
     state.phase === 'battle' && state.activeSide === 'player' && !resolution
@@ -3062,14 +3090,38 @@ function BattleCommandControls({
     return (
       <div className="fixed inset-0 z-[80] flex items-center justify-center bg-[#081014]/90 p-4 backdrop-blur-md sm:p-6">
         <div className="flex flex-col items-center gap-5 text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-amber-200" />
+          {claimError ? (
+            <div className="flex h-12 w-12 items-center justify-center rounded-full border border-game-danger/40 bg-game-danger/10 text-game-danger">
+              <X className="h-6 w-6" aria-hidden="true" />
+            </div>
+          ) : (
+            <Loader2 className="h-8 w-8 animate-spin text-amber-200" />
+          )}
           <div>
             <p className="font-display text-2xl font-semibold text-[#f7ecd6]">
               {getWinnerLabel(state.winner)}
             </p>
-            <p className="mt-2 text-sm text-[#f7ecd6]/75">
-              Preparing your results…
-            </p>
+            {claimError ? (
+              <>
+                <p
+                  role="alert"
+                  className="mt-2 max-w-sm text-sm text-[#f7ecd6]/75"
+                >
+                  {claimError}
+                </p>
+                <Button
+                  className="mt-4 h-11 rounded-lg bg-game-clay px-5 text-sm font-bold text-game-cream hover:bg-game-clay/90"
+                  disabled={isPending}
+                  onClick={onClaim}
+                >
+                  Retry results
+                </Button>
+              </>
+            ) : (
+              <p className="mt-2 text-sm text-[#f7ecd6]/75">
+                Preparing your results…
+              </p>
+            )}
           </div>
         </div>
       </div>
