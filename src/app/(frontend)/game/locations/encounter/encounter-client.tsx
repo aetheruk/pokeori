@@ -1822,7 +1822,7 @@ export default function EncounterPage() {
               className={cn(
                 'absolute inset-0 z-10 pointer-events-none',
                 answerStatus === 'correct'
-                  ? 'bg-green-400/50'
+                  ? 'bg-game-health/50'
                   : 'bg-red-500/20',
               )}
               initial={{ opacity: 0 }}

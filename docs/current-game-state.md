@@ -1,5 +1,7 @@
 # Current Game State
 
+- Unreleased: Mt. Moon's normal Explore encounters retain their existing IDs and task progress, while the expedition path uses separate expedition-only copies. Research XP stops at 1,000 XP (Research Level 5) and no longer appears as a reward after that cap; correct catch answers use the semantic health-green feedback token.
+
 - Unreleased: Brick Breaker reward drops now replace a random destructible brick's Pokémon icon, glow, and grant the reward only when that brick is hit before expiration. Surf hazards spread farther into the playable edge lanes as they approach, making side-camping less reliable.
 
 - Unreleased: Underground Society booster box deliveries now award 250 XP. Cal, Marina, and Fern's rematch battles can each be won up to three times for 50 XP per win, while their original training battles remain one-time wins. The repeatable Feed the Pit task consumes 5,000 crystals for 100 Society XP.

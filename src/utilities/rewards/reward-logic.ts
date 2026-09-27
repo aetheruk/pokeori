@@ -23,6 +23,8 @@ import { NATURES } from '@/data/natures'
 import { getBanner, getIcon, getTitle } from '@/data/user'
 import {
   getMaxResearchLevelForXp,
+  getResearchXpForLevel,
+  MAX_RESEARCH_LEVEL,
   getPokemonResearchLevelItemRewards,
 } from '@/utilities/research/research-levels'
 
@@ -987,22 +989,53 @@ export async function grantRewards(
           researchLevel: 0,
         }
 
-        const oldXp = existing.researchXp || 0
-        const oldLevel = existing.researchLevel || 0
-        const newXp = oldXp + quantity
+        const maxResearchXp = getResearchXpForLevel(MAX_RESEARCH_LEVEL)
+        const storedXp = Number(existing.researchXp || 0)
+        const oldXp = Number.isFinite(storedXp)
+          ? Math.max(0, Math.floor(storedXp))
+          : 0
+        const storedLevel = Number(existing.researchLevel || 0)
+        const oldLevel = Number.isFinite(storedLevel)
+          ? Math.max(
+              0,
+              Math.min(MAX_RESEARCH_LEVEL, Math.floor(storedLevel)),
+            )
+          : 0
+        const effectiveQuantity =
+          oldLevel >= MAX_RESEARCH_LEVEL
+            ? 0
+            : Math.max(
+                0,
+                Math.min(
+                  Number.isFinite(quantity) ? quantity : 0,
+                  maxResearchXp - oldXp,
+                ),
+              )
+        const newXp = Math.min(maxResearchXp, oldXp + effectiveQuantity)
 
         // AUTOMATIC LEVEL UP LOGIC
-        const maxAchievableLevel = getMaxResearchLevelForXp(newXp)
+        const maxAchievableLevel = Math.max(
+          oldLevel,
+          getMaxResearchLevelForXp(newXp),
+        )
         const hasBreakthrough = maxAchievableLevel > oldLevel
 
-        pokedex[speciesKey][formKey] = {
-          ...existing,
-          seen: true,
-          totalSeen: Math.max(existing.totalSeen || 0, 1),
-          researchXp: newXp,
-          researchLevel: maxAchievableLevel,
+        if (
+          effectiveQuantity > 0 ||
+          newXp !== oldXp ||
+          maxAchievableLevel !== oldLevel
+        ) {
+          pokedex[speciesKey][formKey] = {
+            ...existing,
+            seen: true,
+            totalSeen: Math.max(existing.totalSeen || 0, 1),
+            researchXp: newXp,
+            researchLevel: maxAchievableLevel,
+          }
+          pokedexChanged = true
         }
-        pokedexChanged = true
+
+        if (effectiveQuantity <= 0) return
 
         const speciesForm = getPokemonForm(formId)
         const pokemonName = speciesForm?.name || formId
@@ -1010,7 +1043,7 @@ export async function grantRewards(
         summary.researchXp?.push({
           formId,
           formName: pokemonName,
-          amount: quantity,
+          amount: effectiveQuantity,
           isCompanion: reward.isCompanion === true,
           oldExperience: oldXp,
           newExperience: newXp,

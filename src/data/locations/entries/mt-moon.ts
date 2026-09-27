@@ -1,6 +1,6 @@
 import { Location } from '../../types'
 
-export const mtMoonLocations: Location[] = [
+const mtMoonExploreLocations: Location[] = [
   {
     id: 'exp-mt-moon-1f',
     name: 'Mt. Moon 1F',
@@ -194,4 +194,25 @@ export const mtMoonLocations: Location[] = [
       },
     ],
   },
+]
+
+// Keep the Explore location IDs stable for Mt. Moon task and battle progress.
+// Expedition encounters use separate IDs so the expedition step guard does not
+// block the same content when a player starts it from normal Explore.
+const mtMoonExpeditionLocationIds: Record<string, string> = {
+  'exp-mt-moon-1f': 'mt-moon-expedition-1f',
+  'exp-mt-moon-b1f': 'mt-moon-expedition-b1f',
+  'exp-mt-moon-b2f': 'mt-moon-expedition-b2f',
+}
+
+const mtMoonExpeditionLocations: Location[] = mtMoonExploreLocations.flatMap(
+  (location) => {
+    const id = mtMoonExpeditionLocationIds[location.id]
+    return id ? [{ ...location, id, expeditionOnly: true }] : []
+  },
+)
+
+export const mtMoonLocations: Location[] = [
+  ...mtMoonExploreLocations,
+  ...mtMoonExpeditionLocations,
 ]

@@ -152,14 +152,18 @@ export function QuestionPrompt({
                 aria-pressed={selected}
                 className={cn(
                   'game-focus-ring group relative flex w-full items-center gap-3 overflow-hidden rounded-lg border border-game-border bg-game-surface-raised px-3 py-3 text-left text-game-ink shadow-sm backdrop-blur-xl transition-colors hover:border-game-moss/35 hover:bg-game-surface disabled:pointer-events-none',
-                  isCatchAppearance ? 'disabled:opacity-75' : 'disabled:opacity-50',
+                  selected && answerStatus
+                    ? 'disabled:opacity-100'
+                    : isCatchAppearance
+                      ? 'disabled:opacity-75'
+                      : 'disabled:opacity-50',
                   highlighted && 'border-game-ochre/60 bg-game-ochre/10',
                   selected &&
                     !answerStatus &&
                     'border-game-moss bg-game-moss/12 ring-1 ring-game-moss/35',
                   selected &&
                     answerStatus === 'correct' &&
-                    'border-green-400 bg-green-400/25 ring-1 ring-green-400/50',
+                    'border-game-health bg-game-health/25 ring-1 ring-game-health/50',
                   selected &&
                     answerStatus === 'incorrect' &&
                     'border-game-danger bg-game-danger/10 ring-1 ring-game-danger/30',

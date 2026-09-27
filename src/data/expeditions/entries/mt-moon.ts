@@ -39,7 +39,11 @@ export const mtMoonExpeditions: ExpeditionConfig[] = [
         'exp-mt-moon-grunt-4',
         'exp-researcher-miguel',
       ],
-      location: ['exp-mt-moon-1f', 'exp-mt-moon-b1f', 'exp-mt-moon-b2f'],
+      location: [
+        'mt-moon-expedition-1f',
+        'mt-moon-expedition-b1f',
+        'mt-moon-expedition-b2f',
+      ],
     },
     path: [
       {
