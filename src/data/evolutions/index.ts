@@ -38,6 +38,23 @@ const rawEvolutions: Record<number, Evolution[]> = {
   ...gen9Evolutions,
 }
 
+const getEvolutionIdentity = (evolution: Evolution) =>
+  JSON.stringify([
+    evolution.speciesId,
+    evolution.name,
+    evolution.targetForm || 'base',
+    evolution.trigger,
+    Object.entries(evolution.conditions).sort(([left], [right]) =>
+      left.localeCompare(right),
+    ),
+  ])
+
+const deduplicateEvolutions = (evolutions: Evolution[]) => [
+  ...new Map(
+    evolutions.map((evolution) => [getEvolutionIdentity(evolution), evolution]),
+  ).values(),
+]
+
 const hasUsableCondition = (evolution: Evolution) =>
   Object.keys(evolution.conditions).length > 0
 
@@ -54,7 +71,7 @@ const sourceFormsOverlap = (left: Evolution, right: Evolution) =>
  * that fallback only when the target does not already have an authored route.
  */
 const normalizeEvolutions = (evolutions: Evolution[]) =>
-  evolutions.filter((evolution) => {
+  deduplicateEvolutions(evolutions).filter((evolution) => {
     // Unsupported special level-up mechanics have no actionable condition.
     if (!hasUsableCondition(evolution)) return false
 
