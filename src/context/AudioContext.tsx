@@ -370,6 +370,26 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     (url: string, options?: { loop?: boolean; volume?: number }) => {
       if (!isAudioEnabled) return
       clearStopMusicTimer()
+
+      const activeAudio = musicRef.current
+      if (
+        activeAudio &&
+        (activeAudio.src === url || activeAudio.src.endsWith(url)) &&
+        !activeAudio.paused
+      ) {
+        clearFadeInterval()
+        if (options?.loop !== undefined) activeAudio.loop = options.loop
+        if (options?.volume !== undefined) activeAudio.volume = options.volume
+        return
+      }
+
+      if (
+        currentMusicUrlRef.current === url &&
+        midiMusicRef.current?.isRunning()
+      ) {
+        return
+      }
+
       musicGenerationRef.current += 1
       const musicGeneration = musicGenerationRef.current
       pendingMusicRef.current = null
