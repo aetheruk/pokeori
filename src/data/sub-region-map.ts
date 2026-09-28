@@ -180,6 +180,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/lavender.avif',
     icon: { type: 'trainer', id: 'fuji' },
     description: 'A town in the shadow of the Pokemon Tower.',
+    music: '/music/lavender.m4a',
     unlockRequirements: [{ type: 'task_completed', targetId: 'rock-tunnel-exit' }],
         weatherSlots: {
       1: 'rain',
@@ -195,6 +196,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/pkmn-tower.avif',
     icon: { type: 'pokemon', id: '92' },
     description: 'Souls of Pokemon are laid to rest here.',
+    music: '/music/pokemon-tower.m4a',
         unlockRequirements: [{ type: 'task_completed', targetId: 'lavender-missing-mountain' }],
   },
   'Celadon City': {
