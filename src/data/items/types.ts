@@ -316,13 +316,12 @@ export const INVENTORY_SUBCATEGORY_ORDER: Record<
   InventoryDisplaySubCategory[]
 > = {
   encounter: ['capture-tools', 'battle-kit', 'encounter-tools'],
-  crafting: ['materials', 'dyes', 'gems', 'powder'],
+  crafting: ['materials', 'dyes', 'gems', 'powder', 'berries'],
   tcg: ['binders', 'booster-packs'],
   'key-items': ['key-items', 'badges', 'books', 'scratch-cards'],
   tms: ['tms'],
   training: [
     'candies',
-    'berries',
     'evolution-items',
     'vitamins',
     'ability-patches',
@@ -529,7 +528,7 @@ export function getInventoryDisplayPlacement(item: Item): {
     case 'candy':
       return { group: 'training', subCategory: 'candies' }
     case 'berry':
-      return { group: 'training', subCategory: 'berries' }
+      return { group: 'crafting', subCategory: 'berries' }
     case 'Binder':
       return { group: 'tcg', subCategory: 'binders' }
     case 'booster-pack':
