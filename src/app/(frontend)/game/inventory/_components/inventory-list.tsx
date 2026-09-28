@@ -28,7 +28,6 @@ import { RewardCarousel } from '@/components/game/reward-carousel'
 import { GameInfoModal } from '@/components/game/shared/GameInfoModal'
 import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
 import { PremiumSearch } from '@/components/game/shared/PremiumSearch'
-import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
@@ -106,6 +105,47 @@ type PokedexProgressByForm = Record<
     caught?: boolean | null
   }
 >
+
+const INVENTORY_GROUP_ICON_PREFERENCES: Partial<
+  Record<InventoryDisplayGroup, string[]>
+> = {
+  encounter: ['poke-ball'],
+  crafting: ['fire-gem'],
+  'key-items': ['kanto-badge-case'],
+  training: ['rare-candy-xs'],
+  misc: ['rocket-scratch'],
+}
+
+const INVENTORY_SUBCATEGORY_ICON_PREFERENCES: Partial<
+  Record<InventoryDisplaySubCategory, string[]>
+> = {
+  'capture-tools': ['poke-ball'],
+  'battle-kit': ['battle-potion'],
+  'encounter-tools': ['escape-rope'],
+  candies: ['rare-candy-xs'],
+  berries: ['oran-berry'],
+  materials: ['fire-gem'],
+  'key-items': ['kanto-badge-case'],
+  badges: ['badge-kanto-boulder'],
+  'evolution-items': ['fire-stone'],
+  vitamins: ['hp-up'],
+  'scratch-cards': ['rocket-scratch'],
+  books: ['book-of-shouts'],
+}
+
+function getRepresentativeInventoryItem(
+  inventoryItems: InventoryListItem[],
+  preferredItemIds: string[] = [],
+) {
+  for (const preferredItemId of preferredItemIds) {
+    const preferredItem = inventoryItems.find(
+      (item) => item.itemId === preferredItemId,
+    )
+    if (preferredItem) return preferredItem
+  }
+
+  return inventoryItems[0]
+}
 
 function getItemActionLabel(
   item: (typeof items)[number],
@@ -408,6 +448,51 @@ export function InventoryList() {
     })
   }, [inventoryWithDetails, activeGroup])
 
+  const groupNavOptions = useMemo(
+    () =>
+      groups.map((group) => {
+        const groupItems = inventoryWithDetails.filter(
+          (item) => item.displayGroup === group,
+        )
+        const representative = getRepresentativeInventoryItem(
+          groupItems,
+          INVENTORY_GROUP_ICON_PREFERENCES[group],
+        )
+
+        return {
+          group,
+          itemId: representative?.itemId,
+          quantity: groupCounts[group] || 0,
+        }
+      }),
+    [groups, groupCounts, inventoryWithDetails],
+  )
+
+  const subCategoryNavOptions = useMemo(
+    () =>
+      subCategories.map((subCategory) => {
+        const subCategoryItems = inventoryWithDetails.filter(
+          (item) =>
+            item.displayGroup === activeGroup &&
+            item.displaySubCategory === subCategory,
+        )
+        const representative = getRepresentativeInventoryItem(
+          subCategoryItems,
+          INVENTORY_SUBCATEGORY_ICON_PREFERENCES[subCategory],
+        )
+
+        return {
+          subCategory,
+          itemId: representative?.itemId,
+          quantity: subCategoryItems.reduce(
+            (total, item) => total + item.quantity,
+            0,
+          ),
+        }
+      }),
+    [activeGroup, inventoryWithDetails, subCategories],
+  )
+
   useEffect(() => {
     if (groups.length === 0) {
       setActiveGroup(null)
@@ -685,35 +770,142 @@ export function InventoryList() {
         }
       />
 
-      <div className="hidden items-center gap-3 border-b border-game-border bg-game-surface/70 px-6 py-3 lg:flex">
-        <div className="min-w-0 flex-1">
-          <PremiumSelect
-            value={activeGroup || ''}
-            onValueChange={(value) =>
-              setActiveGroup(value as InventoryDisplayGroup)
-            }
-            options={groups.map((group) => ({
-              id: group,
-              label: `${INVENTORY_GROUP_LABELS[group] || group} (${groupCounts[group] || 0})`,
-            }))}
-          />
-        </div>
-        {subCategories.length > 1 && (
-          <div className="w-52 shrink-0 xl:w-64">
-            <PremiumSelect
-              value={activeSubCategory || ''}
-              onValueChange={(value) =>
-                setActiveSubCategory(value as InventoryDisplaySubCategory)
-              }
-              placeholder="Select subcategory"
-              options={subCategories.map((subCategory) => ({
-                id: subCategory,
-                label: getInventorySubCategoryLabel(subCategory),
-              }))}
-            />
+      {groupNavOptions.length > 0 && (
+        <SecondaryControlBar className="order-last py-2 lg:order-none lg:border-b lg:border-t-0 lg:bg-game-surface/60 lg:shadow-none lg:backdrop-blur-none">
+          <div className="mb-1 flex items-center justify-between gap-3 px-1">
+            <p className="game-field-label">Bag Pockets</p>
+            <span className="text-xs text-game-muted">
+              {groups.length} {groups.length === 1 ? 'pocket' : 'pockets'}
+            </span>
           </div>
-        )}
-      </div>
+          <fieldset
+            aria-label="Inventory pockets"
+            className="flex snap-x snap-proximity gap-2 overflow-x-auto overscroll-x-contain py-1 [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-game-border-strong [&::-webkit-scrollbar-track]:bg-transparent"
+          >
+            {groupNavOptions.map(({ group, itemId, quantity }) => {
+              const isSelected = activeGroup === group
+              const label = INVENTORY_GROUP_LABELS[group] || group
+
+              return (
+                <button
+                  key={group}
+                  type="button"
+                  aria-label={`${label}, ${quantity} ${quantity === 1 ? 'item' : 'items'}`}
+                  aria-pressed={isSelected}
+                  onClick={() => setActiveGroup(group)}
+                  className={cn(
+                    'game-focus-ring flex h-[4.25rem] min-w-[8.25rem] snap-start items-center gap-2 rounded-xl border px-2.5 text-left transition-colors',
+                    isSelected
+                      ? 'border-game-charcoal bg-game-charcoal text-game-canvas'
+                      : 'border-game-border bg-game-surface text-game-ink hover:bg-game-surface-raised',
+                  )}
+                >
+                  <span
+                    aria-hidden="true"
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-game-border/80 bg-game-canvas/90"
+                  >
+                    {itemId && (
+                      <ItemSprite
+                        itemId={itemId}
+                        alt=""
+                        width={36}
+                        height={36}
+                        className="h-9 w-9 object-contain"
+                      />
+                    )}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-semibold">
+                      {label}
+                    </span>
+                    <span
+                      className={cn(
+                        'mt-0.5 block text-[11px]',
+                        isSelected ? 'text-game-canvas/75' : 'text-game-muted',
+                      )}
+                    >
+                      {quantity.toLocaleString()}{' '}
+                      {quantity === 1 ? 'item' : 'items'}
+                    </span>
+                  </span>
+                </button>
+              )
+            })}
+          </fieldset>
+
+          {subCategoryNavOptions.length > 0 && (
+            <div className="mt-1.5">
+              <div className="mb-1 flex items-center justify-between gap-3 px-1">
+                <p className="game-field-label">
+                  In {activeGroup ? INVENTORY_GROUP_LABELS[activeGroup] : 'Pocket'}
+                </p>
+                <span className="text-xs text-game-muted">
+                  {subCategoryNavOptions.length}{' '}
+                  {subCategoryNavOptions.length === 1 ? 'section' : 'sections'}
+                </span>
+              </div>
+              <fieldset
+                aria-label="Inventory sections"
+                className="flex snap-x snap-proximity gap-2 overflow-x-auto overscroll-x-contain py-1 [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-game-border-strong [&::-webkit-scrollbar-track]:bg-transparent"
+              >
+                {subCategoryNavOptions.map(
+                  ({ subCategory, itemId, quantity }) => {
+                    const isSelected = activeSubCategory === subCategory
+                    const label = getInventorySubCategoryLabel(subCategory)
+
+                    return (
+                      <button
+                        key={subCategory}
+                        type="button"
+                        aria-label={`${label}, ${quantity} ${quantity === 1 ? 'item' : 'items'}`}
+                        aria-pressed={isSelected}
+                        onClick={() => setActiveSubCategory(subCategory)}
+                        className={cn(
+                          'game-focus-ring flex h-11 min-w-[9.75rem] max-w-[12rem] snap-start items-center gap-2 rounded-xl border px-2 text-left transition-colors',
+                          isSelected
+                            ? 'border-game-charcoal bg-game-charcoal text-game-canvas'
+                            : 'border-game-border bg-game-surface text-game-ink hover:bg-game-surface-raised',
+                        )}
+                      >
+                        <span
+                          aria-hidden="true"
+                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-game-border/80 bg-game-canvas/90"
+                        >
+                          {itemId && (
+                            <ItemSprite
+                              itemId={itemId}
+                              alt=""
+                              width={28}
+                              height={28}
+                              className="h-7 w-7 object-contain"
+                            />
+                          )}
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-xs font-semibold">
+                            {label}
+                          </span>
+                          <span
+                            className={cn(
+                              'mt-0.5 block text-[10px]',
+                              isSelected
+                                ? 'text-game-canvas/75'
+                                : 'text-game-muted',
+                            )}
+                          >
+                            {quantity.toLocaleString()}{' '}
+                            {quantity === 1 ? 'item' : 'items'}
+                          </span>
+                        </span>
+                      </button>
+                    )
+                  },
+                )}
+              </fieldset>
+            </div>
+          )}
+        </SecondaryControlBar>
+      )}
 
       {/* Main Content - Scrollable with padding */}
       <div className="flex-1 min-h-0 overflow-y-auto px-4 md:px-6 pt-4 pb-4">
@@ -774,38 +966,6 @@ export function InventoryList() {
           </div>
         )}
       </div>
-
-      <SecondaryControlBar className="lg:hidden">
-        <div className="w-full">
-          <PremiumSelect
-            value={activeGroup || ''}
-            onValueChange={(value) =>
-              setActiveGroup(value as InventoryDisplayGroup)
-            }
-            options={groups.map((group) => ({
-              id: group,
-              label: `${INVENTORY_GROUP_LABELS[group] || group} (${groupCounts[group] || 0})`,
-            }))}
-          />
-        </div>
-        {subCategories.length > 1 && (
-          <div className="mt-2 flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {subCategories.map((subCategory) => (
-              <Button
-                key={subCategory}
-                size="sm"
-                variant={
-                  activeSubCategory === subCategory ? 'default' : 'outline'
-                }
-                className="shrink-0 whitespace-nowrap"
-                onClick={() => setActiveSubCategory(subCategory)}
-              >
-                {getInventorySubCategoryLabel(subCategory)}
-              </Button>
-            ))}
-          </div>
-        )}
-      </SecondaryControlBar>
 
       <GameInfoModal
         open={!!selectedItem}
