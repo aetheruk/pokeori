@@ -100,6 +100,17 @@ import {
   SAFARI_BASE_FLEE_RATE,
 } from '@/utilities/pokemon/safari-catch'
 
+function getLocationMusicUrl(location: {
+  music?: string
+  subCategory?: string
+}) {
+  return (
+    location.music ||
+    subCategories[location.subCategory || '']?.music ||
+    '/music/battle.m4a'
+  )
+}
+
 // Dynamic import for LevelUpModal to avoid bundling canvas-confetti in initial load
 const LevelUpModal = nextDynamic(
   () =>
@@ -553,6 +564,15 @@ function SilphScopeGhostSequence({ stage }: { stage: 'glitch' | 'black' }) {
 }
 
 export default function EncounterPage() {
+  const [sessionKey, setSessionKey] = useState(0)
+  const replayEncounter = useCallback(() => {
+    setSessionKey((key) => key + 1)
+  }, [])
+
+  return <EncounterPageSession key={sessionKey} onReplay={replayEncounter} />
+}
+
+function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const returnPathParam = searchParams.get('returnTo')
@@ -717,6 +737,13 @@ export default function EncounterPage() {
 
   // Audio from context
   const { playSfx, playMusic, stopMusic } = useAudio()
+  const startLocationMusic = useCallback(() => {
+    if (!currentLocation) return
+    playMusic(getLocationMusicUrl(currentLocation), {
+      loop: true,
+      volume: 0.3,
+    })
+  }, [currentLocation, playMusic])
 
   const exitExpiredEncounter = useCallback(
     (result?: any) => {
@@ -768,19 +795,13 @@ export default function EncounterPage() {
 
   // Start music on mount
   useEffect(() => {
-    if (!currentLocation || phase === 'result') return
-    const musicUrl =
-      currentLocation.music ||
-      subCategories[currentLocation.subCategory || '']?.music ||
-      '/music/battle.m4a'
-    playMusic(musicUrl, { loop: true, volume: 0.3 })
+    if (!currentLocation) return
+    startLocationMusic()
   }, [
     currentLocation?.id,
     currentLocation?.music,
     currentLocation?.subCategory,
-    phase,
-    playMusic,
-    stopMusic,
+    startLocationMusic,
   ])
 
   // Stop music when encounter ends
@@ -1742,6 +1763,8 @@ export default function EncounterPage() {
         cardsToReveal={cardsToReveal}
         setCardsToReveal={setCardsToReveal}
         setPhase={setPhase as any}
+        onReplayStart={startLocationMusic}
+        onReplay={onReplay}
         returnPath={returnPath}
       />
     )

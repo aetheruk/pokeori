@@ -29,4 +29,4 @@ ffmpeg -i "original music/saffron.m4a" -map_metadata -1 -vn -c:a aac -profile:a 
 ffmpeg -i "original music/vermilion.m4a" -map_metadata -1 -vn -c:a aac -profile:a aac_low -b:a 48k -ac 2 -ar 48000 -movflags +faststart public/music/vermilion.m4a
 ```
 
-Keep stereo unless the source is intentionally mono. Music loops, fades, mute state, and autoplay-resume behavior are managed by `AudioProvider`.
+Keep stereo unless the source is intentionally mono. Location encounter retries keep the shared audio provider mounted and restart the active location track from the Play Again action. Music loops, fades, mute state, and autoplay-resume behavior are managed by `AudioProvider`.

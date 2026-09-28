@@ -84,6 +84,8 @@ interface EncounterResultsProps {
   cardsToReveal: TcgCard[]
   setCardsToReveal: (cards: TcgCard[]) => void
   setPhase: (phase: 'quiz' | 'capture' | 'result') => void
+  onReplayStart: () => void
+  onReplay: () => void
   returnPath?: string | null
 }
 
@@ -108,6 +110,8 @@ export function EncounterResults({
   cardsToReveal,
   setCardsToReveal,
   setPhase,
+  onReplayStart,
+  onReplay,
   returnPath,
 }: EncounterResultsProps) {
   const router = useRouter()
@@ -310,17 +314,18 @@ export function EncounterResults({
               aria-busy={replayLoading}
               onClick={async () => {
                 setReplayLoading(true)
+                onReplayStart()
                 try {
                   const res = await startEncounter(encounter.locationId)
                   if (res?.success) {
-                    window.location.reload()
+                    onReplay()
                   } else {
+                    setReplayLoading(false)
                     router.push('/game/explore')
                   }
                 } catch (e) {
-                  router.push('/game/explore')
-                } finally {
                   setReplayLoading(false)
+                  router.push('/game/explore')
                 }
               }}
               variant="outline"
