@@ -247,7 +247,6 @@ export type InventoryDisplayGroup =
   | 'key-items'
   | 'tms'
   | 'training'
-  | 'misc'
 
 export type InventoryDisplaySubCategory =
   | 'capture-tools'
@@ -256,6 +255,9 @@ export type InventoryDisplaySubCategory =
   | 'candies'
   | 'berries'
   | 'materials'
+  | 'dyes'
+  | 'gems'
+  | 'powder'
   | 'binders'
   | 'booster-packs'
   | 'key-items'
@@ -264,9 +266,9 @@ export type InventoryDisplaySubCategory =
   | 'tms'
   | 'vitamins'
   | 'ability-patches'
+  | 'research-kits'
   | 'scratch-cards'
   | 'books'
-  | 'other'
 
 export const INVENTORY_GROUP_LABELS: Record<InventoryDisplayGroup, string> = {
   encounter: 'Encounter',
@@ -275,7 +277,6 @@ export const INVENTORY_GROUP_LABELS: Record<InventoryDisplayGroup, string> = {
   'key-items': 'Key Items',
   tms: 'TMs/HMs',
   training: 'Training',
-  misc: 'Misc',
 }
 
 export const INVENTORY_SUBCATEGORY_LABELS: Record<InventoryDisplaySubCategory, string> = {
@@ -285,6 +286,9 @@ export const INVENTORY_SUBCATEGORY_LABELS: Record<InventoryDisplaySubCategory, s
   candies: 'Candies',
   berries: 'Berries',
   materials: 'Materials',
+  dyes: 'Dyes',
+  gems: 'Gems',
+  powder: 'Powder',
   binders: 'Binders',
   'booster-packs': 'Booster Packs',
   'key-items': 'Key Items',
@@ -293,9 +297,9 @@ export const INVENTORY_SUBCATEGORY_LABELS: Record<InventoryDisplaySubCategory, s
   tms: 'TMs',
   vitamins: 'Vitamins',
   'ability-patches': 'Ability Patches',
+  'research-kits': 'Research Kits',
   'scratch-cards': 'Scratch Cards',
   books: 'Books',
-  other: 'Other',
 }
 
 export const INVENTORY_GROUP_ORDER: InventoryDisplayGroup[] = [
@@ -305,7 +309,6 @@ export const INVENTORY_GROUP_ORDER: InventoryDisplayGroup[] = [
   'key-items',
   'tms',
   'training',
-  'misc',
 ]
 
 export const INVENTORY_SUBCATEGORY_ORDER: Record<
@@ -313,12 +316,18 @@ export const INVENTORY_SUBCATEGORY_ORDER: Record<
   InventoryDisplaySubCategory[]
 > = {
   encounter: ['capture-tools', 'battle-kit', 'encounter-tools'],
-  crafting: ['materials'],
+  crafting: ['materials', 'dyes', 'gems', 'powder'],
   tcg: ['binders', 'booster-packs'],
-  'key-items': ['key-items', 'badges', 'books'],
+  'key-items': ['key-items', 'badges', 'books', 'scratch-cards'],
   tms: ['tms'],
-  training: ['candies', 'berries', 'evolution-items', 'vitamins', 'ability-patches'],
-  misc: ['scratch-cards', 'other'],
+  training: [
+    'candies',
+    'berries',
+    'evolution-items',
+    'vitamins',
+    'ability-patches',
+    'research-kits',
+  ],
 }
 
 const POKEMON_TYPE_NAMES = new Set<PokemonTypeName>([
@@ -462,7 +471,52 @@ export function getInventoryDisplayPlacement(item: Item): {
   group: InventoryDisplayGroup
   subCategory: InventoryDisplaySubCategory
 } {
+  if (item.id === 'research-kit') {
+    return { group: 'training', subCategory: 'research-kits' }
+  }
+
+  if (item.id.includes('journal') || item.id === 'mt-moon-expedition-map') {
+    return { group: 'key-items', subCategory: 'books' }
+  }
+
+  if (item.category === 'scratch-card') {
+    return { group: 'key-items', subCategory: 'scratch-cards' }
+  }
+
+  if (
+    item.id === 'day-care-fence-wood' ||
+    item.id === 'day-care-clay-brick' ||
+    item.id === 'hiker-boots' ||
+    item.id === 'hiker-clothes' ||
+    item.id === 'hiker-gloves' ||
+    item.id === 'tiny-bug-armour' ||
+    item.id === 'sweet-flower' ||
+    item.id === 'scrip'
+  ) {
+    return { group: 'key-items', subCategory: 'key-items' }
+  }
+
+  if (item.id === 'neutral-stone' || item.id === 'empty-foil-pack') {
+    return { group: 'crafting', subCategory: 'materials' }
+  }
+
+  if (item.id.startsWith('dried-')) {
+    return { group: 'crafting', subCategory: 'dyes' }
+  }
+
   if (isCraftingMaterialItem(item)) {
+    if (item.id.endsWith('-gem')) {
+      return { group: 'crafting', subCategory: 'gems' }
+    }
+    if (
+      item.id.startsWith('nut-') ||
+      item.id.startsWith('paint-')
+    ) {
+      return { group: 'crafting', subCategory: 'dyes' }
+    }
+    if (item.id.startsWith('poke-powder-')) {
+      return { group: 'crafting', subCategory: 'powder' }
+    }
     return { group: 'crafting', subCategory: 'materials' }
   }
 
@@ -490,24 +544,22 @@ export function getInventoryDisplayPlacement(item: Item): {
     case 'tm':
       return { group: 'tms', subCategory: 'tms' }
     case 'valuable':
-      return { group: 'misc', subCategory: 'other' }
+      return { group: 'crafting', subCategory: 'materials' }
     case 'vitamin':
       return { group: 'training', subCategory: 'vitamins' }
     case 'ability-patch':
       return { group: 'training', subCategory: 'ability-patches' }
-    case 'scratch-card':
-      return { group: 'misc', subCategory: 'scratch-cards' }
     case 'books':
       return { group: 'key-items', subCategory: 'books' }
     case 'misc':
       return isEncounterUtilityItem(item)
         ? { group: 'encounter', subCategory: 'encounter-tools' }
-        : { group: 'misc', subCategory: 'other' }
+        : { group: 'key-items', subCategory: 'key-items' }
     default:
-      return { group: 'misc', subCategory: 'other' }
+      return { group: 'key-items', subCategory: 'key-items' }
   }
 }
 
 export function getInventorySubCategoryLabel(subCategory: string): string {
-  return INVENTORY_SUBCATEGORY_LABELS[subCategory as InventoryDisplaySubCategory] || 'Other'
+  return INVENTORY_SUBCATEGORY_LABELS[subCategory as InventoryDisplaySubCategory] || 'Items'
 }
