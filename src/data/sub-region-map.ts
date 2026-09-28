@@ -75,6 +75,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/forest.avif',
     icon: { type: 'trainer', id: 'bug-catcher' },
     description: 'A dense forest filled with bug aficionados.',
+    music: '/music/viridian-forest.m4a',
     weatherSlots: {
       1: 'rain',
       2: 'rain',
@@ -93,6 +94,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/pewter.avif',
     icon: { type: 'trainer', id: 'gym-kanto-brock' },
     description: "Brock's Gym and the Pokemon Science Museum, can be found here.",
+    music: '/music/pewter.m4a',
     unlockRequirements: [{ type: 'task_completed', targetId: 'viridian-exit' }],
     completeRequirements: [{ type: 'item_owned', targetId: 'badge-kanto-boulder', count: 1 }],
         weatherSlots: {
@@ -119,6 +121,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/mt-moon.avif',
     icon: { type: 'item', id: 'moon-stone' },
     description: 'Pokemon from another world are said to dance under the moonlight here.',
+    music: '/music/cave.m4a',
     weatherSlots: {
       6: 'fog',
     },
@@ -132,6 +135,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/cerulean.avif',
     icon: { type: 'trainer', id: 'gym-kanto-misty' },
     description: 'A seaside city with a cool mist hanging in the air.',
+    music: '/music/cerulean.m4a',
     weatherSlots: {
       1: 'rain',
       2: 'rain',
@@ -166,6 +170,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/cave.avif',
     icon: { type: 'pokemon', id: '95' },
     description: 'A long tunnel said to be carved out by Onix.',
+    music: '/music/cave.m4a',
     weatherSlots: {
       7: 'fog',
       19: 'sandstorm',
@@ -206,6 +211,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/celadon.avif',
     icon: { type: 'trainer', id: 'gym-kanto-erika' },
     description: 'A sprawling city with a huge department store.',
+    music: '/music/celadon.m4a',
     unlockRequirements: [
       { type: 'task_completed', targetId: 'underground-path-route-8' },
     ],
@@ -223,7 +229,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/game-corner.avif',
     icon: { type: 'item', id: 'fun-token' },
     description: 'A haven of games for those wanting to lose their money.',
-    music: '/music/minigame.m4a',
+    music: '/music/game-corner.m4a',
     unlockRequirements: [
       { type: 'task_completed', targetId: 'when-the-fun-stops' },
     ],
@@ -357,6 +363,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/digletts-cave.avif',
     icon: { type: 'pokemon', id: '50' },
     description: 'A small cave with rumours it connects to a secret underground area.',
+    music: '/music/cave.m4a',
     unlockRequirements: [{ type: 'task_completed', targetId: 'vermilion-rumours' }],
   },
   'Kanto Underground': {
@@ -367,6 +374,7 @@ export const subCategories: Record<string, RegionData> = {
     icon: { type: 'pokemon', id: '95' },
     description:
       'A hidden community of collectors buried much farther beneath Kanto than seems reasonable.',
+    music: '/music/cave.m4a',
     unlockRequirements: [
       {
         type: 'task_completed',
