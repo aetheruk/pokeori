@@ -148,7 +148,7 @@ export interface Location {
     requiredItemId: string
     failMessage?: string
   }
-  music?: string // Custom background music URL (default: '/music/battle.mp3')
+  music?: string // Optional custom background music URL
   skillXp?: SkillXpConfig
 }
 
@@ -263,7 +263,7 @@ export interface BattleConfig {
   disableLossPayout?: boolean
   disableCandyRewards?: boolean
   generatedXpMultiplier?: number
-  music?: string // Custom background music URL (default: '/music/battle.mp3')
+  music?: string // Optional custom background music URL
   skillXp?: SkillXpConfig
 }
 

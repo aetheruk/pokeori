@@ -768,9 +768,13 @@ export default function EncounterPage() {
   // Start music on mount
   useEffect(() => {
     if (!currentLocation || phase === 'result') return
-    const musicUrl = currentLocation.music || '/music/battle.mp3'
-    playMusic(musicUrl, { loop: true, volume: 0.3 })
-  }, [currentLocation, playMusic]) // eslint-disable-line react-hooks/exhaustive-deps
+    const musicUrl = currentLocation.music
+    if (musicUrl) {
+      playMusic(musicUrl, { loop: true, volume: 0.3 })
+    } else {
+      stopMusic()
+    }
+  }, [currentLocation?.id, currentLocation?.music, phase, playMusic, stopMusic])
 
   // Stop music when encounter ends
   useEffect(() => {
