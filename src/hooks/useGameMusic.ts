@@ -6,14 +6,14 @@ import type { BaseGameConfig } from '@/data/games/shared'
 
 /**
  * Hook to play music for research games.
- * Plays the game's configured music or falls back to '/music/minigame.midi'.
+ * Plays the game's configured music or falls back to '/music/minigame.m4a'.
  * Automatically stops music when unmounting.
  */
 export function useGameMusic(encounter: BaseGameConfig | { music?: string }) {
   const { changeMusic, stopMusic } = useAudio()
 
   useEffect(() => {
-    const musicUrl = encounter.music || '/music/minigame.midi'
+    const musicUrl = encounter.music || '/music/minigame.m4a'
     changeMusic(musicUrl, { fade: true })
 
     return () => {

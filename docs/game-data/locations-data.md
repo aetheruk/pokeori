@@ -15,7 +15,7 @@ export const kantoLocations = [
     type: "town",
     encounters: ["pokemon-1", "pokemon-4"], // Wild Pokemon
     background: "/backgrounds/town.avif",
-    music: "/music/seaside.midi"
+    music: "/music/seaside.m4a"
   }
 ]
 ```

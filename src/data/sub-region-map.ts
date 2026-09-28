@@ -24,7 +24,7 @@ export const subCategories: Record<string, RegionData> = {
     alwaysAvailable: true,
     image: '/backgrounds/cave.avif',
     description: 'Debug-only test encounters for development.',
-    music: '/music/minigame.midi',
+    music: '/music/minigame.m4a',
   },
   '???': {
     category: '???',
@@ -42,7 +42,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/town.avif',
     icon: { type: 'trainer', id: 'oak' },
     description: 'A famous Pokemon professor lives here in this quiet seaside town.',
-    music: '/music/seaside.midi',
+    music: '/music/seaside.m4a',
     weatherSlots: {
       1: 'rain',
       2: 'rain',
@@ -220,7 +220,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/game-corner.avif',
     icon: { type: 'item', id: 'fun-token' },
     description: 'A haven of games for those wanting to lose their money.',
-    music: '/music/minigame.midi',
+    music: '/music/minigame.m4a',
     unlockRequirements: [
       { type: 'task_completed', targetId: 'when-the-fun-stops' },
     ],
