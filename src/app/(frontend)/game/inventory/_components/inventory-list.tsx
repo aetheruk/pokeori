@@ -110,10 +110,9 @@ const INVENTORY_GROUP_ICON_PREFERENCES: Partial<
   Record<InventoryDisplayGroup, string[]>
 > = {
   encounter: ['poke-ball'],
-  crafting: ['fire-gem'],
+  crafting: ['wood-scraps-t1'],
   'key-items': ['kanto-badge-case'],
   training: ['rare-candy-xs'],
-  misc: ['rocket-scratch'],
 }
 
 const INVENTORY_SUBCATEGORY_ICON_PREFERENCES: Partial<
@@ -124,11 +123,15 @@ const INVENTORY_SUBCATEGORY_ICON_PREFERENCES: Partial<
   'encounter-tools': ['escape-rope'],
   candies: ['rare-candy-xs'],
   berries: ['oran-berry'],
-  materials: ['fire-gem'],
+  materials: ['wood-scraps-t1'],
+  dyes: ['paint-red'],
+  gems: ['fire-gem'],
+  powder: ['poke-powder-xs'],
   'key-items': ['kanto-badge-case'],
   badges: ['badge-kanto-boulder'],
   'evolution-items': ['fire-stone'],
   vitamins: ['hp-up'],
+  'research-kits': ['research-kit'],
   'scratch-cards': ['rocket-scratch'],
   books: ['book-of-shouts'],
 }
@@ -299,7 +302,13 @@ function getEmptyMessage(
       return 'No training treats yet. Research, battles, and rewards can add candies or berries.'
     case 'materials':
     case 'crafting':
-      return 'No crafting materials yet. Gather materials and gems from catches and field studies.'
+      return 'No crafting materials yet. Gather ingredients from catches and field studies.'
+    case 'dyes':
+      return 'No dyes yet. Craft them from matching berries or find them in field rewards.'
+    case 'gems':
+      return 'No gems yet. Gather them from catches and field studies.'
+    case 'powder':
+      return 'No PokePowder yet. Craft it from matching Pokémon candies.'
     case 'tcg':
     case 'booster-packs':
     case 'binders':
@@ -309,8 +318,14 @@ function getEmptyMessage(
     case 'vitamins':
     case 'ability-patches':
       return 'No training items yet. These usually come from tougher shops and rewards.'
+    case 'research-kits':
+      return 'No Research Kits yet. Craft one from the Artisan menu.'
     case 'key-items':
+      return 'No key items yet. Complete tasks and explore to find useful keepsakes.'
+    case 'scratch-cards':
+      return 'No scratch cards yet. Find them in shops and rewards.'
     case 'books':
+      return 'No books yet. Complete research and exploration tasks to collect them.'
     case 'tms':
       return 'No TMs/HMs in this pocket yet.'
     default:

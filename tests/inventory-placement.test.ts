@@ -23,7 +23,6 @@ describe('inventory placement', () => {
       'key-items',
       'tms',
       'training',
-      'misc',
     ])
     expect(INVENTORY_GROUP_LABELS['key-items']).toBe('Key Items')
     expect(INVENTORY_SUBCATEGORY_ORDER.training).toEqual([
@@ -32,25 +31,35 @@ describe('inventory placement', () => {
       'evolution-items',
       'vitamins',
       'ability-patches',
+      'research-kits',
     ])
     expect(INVENTORY_SUBCATEGORY_ORDER['key-items']).toEqual([
       'key-items',
       'badges',
       'books',
+      'scratch-cards',
     ])
     expect(INVENTORY_SUBCATEGORY_ORDER.tms).toEqual(['tms'])
-    expect(INVENTORY_SUBCATEGORY_ORDER.misc).toEqual(['scratch-cards', 'other'])
   })
 
-  test('crafting materials and gems use the materials pocket', () => {
+  test('crafting ingredients use their dedicated crafting pockets', () => {
     const craftingMaterials = items.filter(isCraftingMaterialItem)
     expect(craftingMaterials.length).toBeGreaterThan(0)
 
     for (const definition of craftingMaterials) {
       expect(isCraftingMaterialItem(definition)).toBe(true)
+      const subCategory = definition.id.endsWith('-gem')
+        ? 'gems'
+        : definition.id.startsWith('nut-') ||
+            definition.id.startsWith('paint-') ||
+            definition.id.startsWith('dried-')
+          ? 'dyes'
+          : definition.id.startsWith('poke-powder-')
+            ? 'powder'
+            : 'materials'
       expect(getInventoryDisplayPlacement(definition)).toEqual({
         group: 'crafting',
-        subCategory: 'materials',
+        subCategory,
       })
       if (definition.id.startsWith('nut-')) {
         expect(definition.sellValue).toBeUndefined()
@@ -74,7 +83,7 @@ describe('inventory placement', () => {
       expect(definition.sellValue).toBeUndefined()
       expect(getInventoryDisplayPlacement(definition)).toEqual({
         group: 'crafting',
-        subCategory: 'materials',
+        subCategory: 'dyes',
       })
     }
   })
@@ -103,11 +112,11 @@ describe('inventory placement', () => {
     expect(item('broken-ball-t3').name).toBe('Broken Ball EX')
   })
 
-  test('poke powder uses the materials pocket', () => {
+  test('poke powder uses the powder pocket', () => {
     expect(item('poke-powder-xs').name).toBe('XS PokePowder')
     expect(getInventoryDisplayPlacement(item('poke-powder-xs'))).toEqual({
       group: 'crafting',
-      subCategory: 'materials',
+      subCategory: 'powder',
     })
   })
 
@@ -157,6 +166,28 @@ describe('inventory placement', () => {
         subCategory: 'books',
       },
     )
+    expect(getInventoryDisplayPlacement(item('researchers-journal-page'))).toEqual({
+      group: 'key-items',
+      subCategory: 'books',
+    })
+    expect(getInventoryDisplayPlacement(item('mt-moon-expedition-map'))).toEqual({
+      group: 'key-items',
+      subCategory: 'books',
+    })
+  })
+
+  test('research kits display under training', () => {
+    expect(getInventoryDisplayPlacement(item('research-kit'))).toEqual({
+      group: 'training',
+      subCategory: 'research-kits',
+    })
+  })
+
+  test('scratch cards display under key items', () => {
+    expect(getInventoryDisplayPlacement(item('rocket-scratch'))).toEqual({
+      group: 'key-items',
+      subCategory: 'scratch-cards',
+    })
   })
 
   test('badges display under key items', () => {
@@ -206,10 +237,42 @@ describe('inventory placement', () => {
     }
   })
 
-  test('dedicated valuables pocket is not used for sellable valuables', () => {
-    expect(getInventoryDisplayPlacement(item('nugget'))).toEqual({
-      group: 'misc',
-      subCategory: 'other',
+  test('legacy utility and quest items are placed in their new pockets', () => {
+    for (const itemId of [
+      'day-care-fence-wood',
+      'day-care-clay-brick',
+      'hiker-boots',
+      'hiker-clothes',
+      'hiker-gloves',
+      'tiny-bug-armour',
+      'sweet-flower',
+      'scrip',
+    ]) {
+      expect(getInventoryDisplayPlacement(item(itemId))).toEqual({
+        group: 'key-items',
+        subCategory: 'key-items',
+      })
+    }
+
+    for (const itemId of ['neutral-stone', 'empty-foil-pack', 'nugget']) {
+      expect(getInventoryDisplayPlacement(item(itemId))).toEqual({
+        group: 'crafting',
+        subCategory: 'materials',
+      })
+    }
+
+    expect(
+      items.every(
+        (definition) =>
+          INVENTORY_GROUP_ORDER.includes(
+            getInventoryDisplayPlacement(definition).group,
+          ),
+      ),
+    ).toBe(true)
+
+    expect(getInventoryDisplayPlacement(item('dried-red'))).toEqual({
+      group: 'crafting',
+      subCategory: 'dyes',
     })
   })
 })
