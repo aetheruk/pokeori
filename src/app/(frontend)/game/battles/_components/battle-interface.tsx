@@ -1103,7 +1103,7 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
                       const { startBattle } = await import('../actions')
                       const res = await startBattle(battleState.battleId)
                       if (res?.success) {
-                        window.location.reload()
+                        router.refresh()
                       } else {
                         router.push('/game/explore')
                       }

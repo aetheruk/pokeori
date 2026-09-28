@@ -444,7 +444,7 @@ export function FieldObservationGame({
                 size="lg"
                 onClick={async () => {
                   const replay = await startFieldResearch(encounter.id, true)
-                  if (replay?.success) window.location.reload()
+                  if (replay?.success) router.refresh()
                   else router.push('/game/explore')
                 }}
               >

@@ -461,7 +461,7 @@ export function MagnemiteCircuitGame({
                 size="lg"
                 onClick={async () => {
                   const replay = await startGame(encounter.id, true)
-                  if (replay.success) window.location.reload()
+                  if (replay.success) router.refresh()
                   else router.push('/game/explore')
                 }}
                 className="w-full"

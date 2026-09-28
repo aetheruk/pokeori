@@ -477,7 +477,7 @@ export function SpellingGame({ encounter, initialState }: SpellingGameProps) {
                       true,
                     )
                     if (res?.success) {
-                      window.location.reload()
+                      router.refresh()
                     } else {
                       window.location.href = '/game/explore'
                     }

@@ -18,6 +18,7 @@ export default async function FieldResearchPage() {
 
   return (
     <FieldObservationGame
+      key={state.startTime}
       encounter={state.encounter}
       initialState={state as FieldResearchStateWithEncounter}
     />

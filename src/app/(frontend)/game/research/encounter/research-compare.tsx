@@ -740,7 +740,7 @@ export function ResearchCompareGame({
                       true,
                     )
                     if (res?.success) {
-                      window.location.reload()
+                      router.refresh()
                     } else {
                       window.location.href = '/game/explore'
                     }
