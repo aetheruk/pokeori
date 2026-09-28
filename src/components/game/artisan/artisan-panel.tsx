@@ -25,6 +25,7 @@ import { GameInfoModal } from '@/components/game/shared/GameInfoModal'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
+import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
 import {
   type DisplayableReward,
   mapRewardToDisplayItem,
@@ -80,10 +81,8 @@ const categoryLabels: Record<ArtisanRecipeCategory | 'all', string> = {
 type RecipeSubcategoryId =
   | 'dyes'
   | 'powder'
-  | 'everyday-balls'
-  | 'field-balls'
-  | 'apricorn-balls'
-  | 'rare-balls'
+  | 'standard-balls'
+  | 'special-balls'
   | 'base-lures'
   | 'advanced-lures'
   | 'master-lures'
@@ -129,28 +128,16 @@ const RECIPE_SUBCATEGORIES: RecipeSubcategoryDefinition[] = [
     iconItemId: 'poke-powder-xs',
   },
   {
-    id: 'everyday-balls',
+    id: 'standard-balls',
     category: 'balls',
-    label: 'Everyday Balls',
+    label: 'Standard',
     iconItemId: 'poke-ball',
   },
   {
-    id: 'field-balls',
+    id: 'special-balls',
     category: 'balls',
-    label: 'Field Balls',
-    iconItemId: 'nest-ball',
-  },
-  {
-    id: 'apricorn-balls',
-    category: 'balls',
-    label: 'Apricorn Balls',
+    label: 'Special',
     iconItemId: 'moon-ball',
-  },
-  {
-    id: 'rare-balls',
-    category: 'balls',
-    label: 'Rare Balls',
-    iconItemId: 'rocket-ball',
   },
   {
     id: 'base-lures',
@@ -238,22 +225,7 @@ const RECIPE_SUBCATEGORIES: RecipeSubcategoryDefinition[] = [
   },
 ]
 
-const EVERYDAY_BALL_ITEM_IDS = new Set(['poke-ball', 'great-ball', 'ultra-ball'])
-const APRICORN_BALL_ITEM_IDS = new Set([
-  'friend-ball',
-  'lure-ball',
-  'level-ball',
-  'fast-ball',
-  'heavy-ball',
-  'moon-ball',
-  'love-ball',
-])
-const RARE_BALL_ITEM_IDS = new Set([
-  'rocket-ball',
-  'dream-ball',
-  'cherish-ball',
-  'beast-ball',
-])
+const STANDARD_BALL_ITEM_IDS = new Set(['poke-ball', 'great-ball', 'ultra-ball'])
 
 function getItemName(itemId: string) {
   return items.find((item) => item.id === itemId)?.name || itemId
@@ -291,10 +263,9 @@ function getRecipeSubcategoryId(recipe: ArtisanRecipe): RecipeSubcategoryId {
       const itemId = recipe.rewards
         .find((reward) => reward.type === 'item')
         ?.targetId?.toString()
-      if (itemId && EVERYDAY_BALL_ITEM_IDS.has(itemId)) return 'everyday-balls'
-      if (itemId && APRICORN_BALL_ITEM_IDS.has(itemId)) return 'apricorn-balls'
-      if (itemId && RARE_BALL_ITEM_IDS.has(itemId)) return 'rare-balls'
-      return 'field-balls'
+      return itemId && STANDARD_BALL_ITEM_IDS.has(itemId)
+        ? 'standard-balls'
+        : 'special-balls'
     }
     case 'lures':
       if (recipe.id.startsWith('craft-master-')) return 'master-lures'
@@ -414,33 +385,37 @@ function RecipeNavigation({
   onSubcategorySelect: (subcategory: RecipeSubcategoryId | 'all') => void
 }) {
   return (
-    <nav className="w-full min-w-0 border-b border-game-border bg-game-surface/70 px-4 py-2 md:px-6" aria-label="Recipe navigation">
-      <div className="flex min-w-0 flex-col gap-1.5">
-        <fieldset className="m-0 flex w-full min-w-0 max-w-full snap-x snap-proximity gap-2 overflow-x-auto overflow-y-hidden border-0 p-0 py-1 touch-pan-x [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-game-border-strong [&::-webkit-scrollbar-track]:bg-transparent">
+    <nav className="w-full min-w-0" aria-label="Recipe navigation">
+      <div className="flex min-w-0 flex-col">
+        <fieldset className="block w-full min-w-0">
           <legend className="sr-only">Recipe categories</legend>
-          {categoryOptions.map((category) => (
-            <RecipeNavigationChip
-              key={category.id}
-              label={category.label}
-              iconItemId={category.iconItemId}
-              count={category.count}
-              isSelected={activeCategory === category.id}
-              onSelect={() => onCategorySelect(category.id)}
-            />
-          ))}
+          <div className="flex w-full min-w-0 max-w-full snap-x snap-proximity gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain py-1 touch-pan-x [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-game-border-strong [&::-webkit-scrollbar-track]:bg-transparent">
+            {categoryOptions.map((category) => (
+              <RecipeNavigationChip
+                key={category.id}
+                label={category.label}
+                iconItemId={category.iconItemId}
+                count={category.count}
+                isSelected={activeCategory === category.id}
+                onSelect={() => onCategorySelect(category.id)}
+              />
+            ))}
+          </div>
         </fieldset>
-        <fieldset className="m-0 flex w-full min-w-0 max-w-full snap-x snap-proximity gap-2 overflow-x-auto overflow-y-hidden border-0 p-0 py-1 touch-pan-x [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-game-border-strong [&::-webkit-scrollbar-track]:bg-transparent">
+        <fieldset className="mt-1 block w-full min-w-0">
           <legend className="sr-only">Recipe subcategories</legend>
-          {subcategoryOptions.map((subcategory) => (
-            <RecipeNavigationChip
-              key={subcategory.id}
-              label={subcategory.label}
-              iconItemId={subcategory.iconItemId}
-              count={subcategory.count}
-              isSelected={activeSubcategory === subcategory.id}
-              onSelect={() => onSubcategorySelect(subcategory.id)}
-            />
-          ))}
+          <div className="flex w-full min-w-0 max-w-full snap-x snap-proximity gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain py-1 touch-pan-x [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-game-border-strong [&::-webkit-scrollbar-track]:bg-transparent">
+            {subcategoryOptions.map((subcategory) => (
+              <RecipeNavigationChip
+                key={subcategory.id}
+                label={subcategory.label}
+                iconItemId={subcategory.iconItemId}
+                count={subcategory.count}
+                isSelected={activeSubcategory === subcategory.id}
+                onSelect={() => onSubcategorySelect(subcategory.id)}
+              />
+            ))}
+          </div>
         </fieldset>
       </div>
     </nav>
@@ -1935,17 +1910,19 @@ export function ArtisanPanel() {
         showEffects
       />
 
-      <RecipeNavigation
-        categoryOptions={categoryOptions}
-        subcategoryOptions={subcategoryOptions}
-        activeCategory={activeCategory}
-        activeSubcategory={activeSubcategory}
-        onCategorySelect={(category) => {
-          setActiveCategory(category)
-          setActiveSubcategory('all')
-        }}
-        onSubcategorySelect={setActiveSubcategory}
-      />
+      <SecondaryControlBar className="order-last py-2 lg:order-none lg:border-b lg:border-t-0 lg:bg-game-surface/60 lg:shadow-none lg:backdrop-blur-none">
+        <RecipeNavigation
+          categoryOptions={categoryOptions}
+          subcategoryOptions={subcategoryOptions}
+          activeCategory={activeCategory}
+          activeSubcategory={activeSubcategory}
+          onCategorySelect={(category) => {
+            setActiveCategory(category)
+            setActiveSubcategory('all')
+          }}
+          onSubcategorySelect={setActiveSubcategory}
+        />
+      </SecondaryControlBar>
 
       <RewardResultOverlay
         result={craftResult}
