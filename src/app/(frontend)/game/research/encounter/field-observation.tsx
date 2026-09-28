@@ -192,7 +192,7 @@ export function FieldObservationGame({
       '(prefers-reduced-motion: reduce)',
     ).matches
       ? 120
-      : 600
+      : 360
     const remainingPopMs = Math.max(
       0,
       feedbackDurationMs - (Date.now() - startedAt),
@@ -879,11 +879,10 @@ function FieldDropButton({
     <button
       type="button"
       aria-label={`Collect ${drop.label}`}
-      title={drop.label}
       onClick={onCollect}
       disabled={collecting}
       className={cn(
-        'game-focus-ring absolute z-[220] flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-game-ochre/80 bg-game-surface-raised shadow-md transition-[background-color,transform,opacity] hover:border-game-ochre hover:bg-game-cream active:scale-90',
+        'game-focus-ring absolute z-[220] flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-transparent bg-transparent transition-transform active:scale-90',
         collecting && 'field-observation-drop-collect pointer-events-none',
       )}
       aria-busy={collecting}
@@ -892,15 +891,6 @@ function FieldDropButton({
         top: `${drop.y}%`,
       }}
     >
-      <span className="absolute inset-1 rounded-full border border-game-ochre/45" />
-      {collecting && (
-        <span
-          aria-hidden="true"
-          className="field-observation-drop-label absolute bottom-[calc(100%+0.2rem)] left-1/2 z-20 max-w-40 -translate-x-1/2 truncate rounded-md border border-game-ochre/60 bg-game-surface-raised px-2 py-1 text-[10px] font-bold text-game-ink shadow-md"
-        >
-          + {drop.label}
-        </span>
-      )}
       {drop.kind === 'egg' ? (
         <PokemonRarityEggSprite
           rarity={drop.rarity}

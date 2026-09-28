@@ -94,35 +94,16 @@
 
 @keyframes field-observation-drop-collect {
   0% {
-    opacity: 1;
     transform: translate(-50%, -50%) scale(1);
   }
-  22% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.22);
+  45% {
+    transform: translate(-50%, -50%) scale(1.28);
+  }
+  75% {
+    transform: translate(-50%, -50%) scale(0.94);
   }
   100% {
-    opacity: 0;
-    transform: translate(-50%, -68%) scale(0.58);
-  }
-}
-
-@keyframes field-observation-drop-label {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, 5px) scale(0.92);
-  }
-  18% {
-    opacity: 1;
-    transform: translate(-50%, 0) scale(1);
-  }
-  68% {
-    opacity: 1;
-    transform: translate(-50%, -8px) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -17px) scale(0.96);
+    transform: translate(-50%, -50%) scale(1);
   }
 }
 
@@ -139,11 +120,7 @@
 }
 
 .field-observation-drop-collect {
-  animation: field-observation-drop-collect 520ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-
-.field-observation-drop-label {
-  animation: field-observation-drop-label 600ms ease-out forwards;
+  animation: field-observation-drop-collect 360ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .field-observation-count-pop {
@@ -152,7 +129,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .field-observation-drop-collect,
-  .field-observation-drop-label,
   .field-observation-count-pop {
     animation: none;
   }
