@@ -277,7 +277,10 @@ export function useArcadeSession(gameType: ArcadeGameType, encounter: { id: stri
     void refreshUser(true, invalidatesRef.current)
     router.push('/game/explore')
   }
-  const replay = async () => { await actions.start(encounter.id, true); window.location.reload() }
+  const replay = async () => {
+    await actions.start(encounter.id, true)
+    router.refresh()
+  }
   return { simulation, renderFrameRef, countdown, saving, result, sendInput, close, replay, abandon: () => abandonRef.current(),
     timeLeft: Math.max(0, (roundRef.current?.settings.timeLimit || encounter.settings.timeLimit || 0) - Math.floor((simulation?.tick || 0) / ARCADE_TICK_RATE)),
   }
