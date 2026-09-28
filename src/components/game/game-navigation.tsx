@@ -1,12 +1,13 @@
 'use client'
 
-import { BookOpen, Compass, Hammer, User } from 'lucide-react'
+import { BookOpen, Compass, Hammer, PackageOpen, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import { TbPokeball } from 'react-icons/tb'
 import { BrandLockup } from '@/components/game/shared/BrandLockup'
 import { NavigationPending } from '@/components/game/navigation-pending'
+import { GridPlayerSprite } from '@/components/game/shared/grid-player-sprite'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
@@ -19,15 +20,41 @@ interface NavItem {
   name: string
   href: string
   icon: any
-  mobileName?: string
+  mobileSkillIcon?: string
 }
 
 const navItems: NavItem[] = [
   { name: 'Trainer', href: '/game', icon: User },
-  { name: 'Explore', href: '/game/explore', icon: Compass },
-  { name: 'Pokemon', href: '/game/pokemon', icon: TbPokeball },
-  { name: 'Artisan', href: '/game/artisan', icon: Hammer, mobileName: 'Craft' },
-  { name: 'Dex', href: '/game/dex', icon: BookOpen },
+  {
+    name: 'Inventory',
+    href: '/game/inventory',
+    icon: PackageOpen,
+    mobileSkillIcon: 'inventory-v2.png',
+  },
+  {
+    name: 'Explore',
+    href: '/game/explore',
+    icon: Compass,
+    mobileSkillIcon: 'explorer-v2.png',
+  },
+  {
+    name: 'Pokemon',
+    href: '/game/pokemon',
+    icon: TbPokeball,
+    mobileSkillIcon: 'trainer-v2.png',
+  },
+  {
+    name: 'Artisan',
+    href: '/game/artisan',
+    icon: Hammer,
+    mobileSkillIcon: 'artisan-v2.png',
+  },
+  {
+    name: 'Dex',
+    href: '/game/dex',
+    icon: BookOpen,
+    mobileSkillIcon: 'researcher-v2.png',
+  },
 ]
 
 export function GameNavigation() {
@@ -131,10 +158,14 @@ export function GameNavigation() {
       {/* Mobile Bottom Nav */}
       <nav
         aria-label="Game sections"
-        className="fixed inset-x-0 bottom-0 z-50 flex h-[4.5rem] items-end justify-around border-t border-game-border bg-game-surface/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-50 flex h-[4.5rem] items-center justify-around border-t border-game-border bg-game-surface/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden"
       >
         {navItems.map((item) => {
           const isActive = isItemActive(item)
+          const mobileLabel =
+            item.name === 'Trainer'
+              ? `${user?.trainerName || 'Trainer'} profile`
+              : item.name
 
           return (
             <Link
@@ -142,34 +173,34 @@ export function GameNavigation() {
               href={item.href}
               onClick={playSelectSfx}
               aria-current={isActive ? 'page' : undefined}
+              aria-label={mobileLabel}
+              title={mobileLabel}
               className={cn(
-                'game-focus-ring relative flex h-[3.75rem] min-w-[60px] flex-1 flex-col items-center justify-end gap-1 rounded-t-lg border border-transparent px-1 pb-1.5 transition-colors',
+                'game-focus-ring relative flex h-[3.75rem] min-w-0 flex-1 items-center justify-center border border-transparent px-0 transition-colors',
                 isActive
-                  ? 'border-game-border border-b-transparent bg-game-surface-raised text-game-charcoal-strong shadow-[0_-5px_12px_rgb(75_62_39_/_0.08)]'
+                  ? 'text-game-charcoal-strong'
                   : 'text-game-muted hover:text-game-ink',
               )}
             >
-              {item.name === 'Trainer' && user ? (
-                <div className="game-icon-orb h-6 w-6 overflow-hidden border-game-charcoal/20">
-                  <TaskIconDisplay
-                    icon={
-                      getIcon(user.icon || 'ditto')?.icon ||
-                      ({ type: 'pokemon', id: '132' } as any)
-                    }
-                    className="w-full h-full object-cover scale-110"
-                  />
-                </div>
+              {item.name === 'Trainer' ? (
+                <GridPlayerSprite
+                  gender={user?.trainerGender}
+                  className="h-11 w-11"
+                />
+              ) : item.mobileSkillIcon ? (
+                <TaskIconDisplay
+                  icon={{
+                    type: 'local',
+                    id: `/fallback/skills/${item.mobileSkillIcon}`,
+                  }}
+                  className="h-11 w-11"
+                />
               ) : (
-                <item.icon className="h-5 w-5" />
+                <item.icon className="h-11 w-11" />
               )}
               {isActive && (
                 <span className="absolute top-0 h-0.5 w-7 rounded-b-full bg-game-charcoal" />
               )}
-              <span className="max-w-[58px] truncate text-center text-[11px] font-medium leading-none">
-                {item.name === 'Trainer'
-                  ? user?.trainerName || 'Trainer'
-                  : item.mobileName || item.name}
-              </span>
               <NavigationPending />
             </Link>
           )
