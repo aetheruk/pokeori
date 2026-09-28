@@ -24,13 +24,11 @@ import { mapCriteriaToDisplayItem } from '@/components/game/shared/criteria-mapp
 import { GameInfoModal } from '@/components/game/shared/GameInfoModal'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
-import { PremiumSelect } from '@/components/game/shared/PremiumSelect'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import {
   type DisplayableReward,
   mapRewardToDisplayItem,
 } from '@/components/game/shared/reward-mapping'
-import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { AppButton, Button } from '@/components/ui/app-button'
 import { CurrencySprite } from '@/components/ui/currency-sprite'
@@ -73,26 +71,189 @@ const categoryLabels: Record<ArtisanRecipeCategory | 'all', string> = {
   materials: 'Materials',
   balls: 'Balls',
   lures: 'Lures',
-  held: 'Held',
+  held: 'Held Items',
   items: 'Items',
   quests: 'Special',
   tcg: 'TCG',
 }
 
-type RecipeVariantGroup = {
-  type: 'lureGroup' | 'heldGroup'
-  id: string
-  name: string
-  description: string
+type RecipeSubcategoryId =
+  | 'dyes'
+  | 'powder'
+  | 'everyday-balls'
+  | 'field-balls'
+  | 'apricorn-balls'
+  | 'rare-balls'
+  | 'base-lures'
+  | 'advanced-lures'
+  | 'master-lures'
+  | 'held-type-boosts'
+  | 'elemental-stones'
+  | 'training'
+  | 'evolution-items'
+  | 'field-tools'
+  | 'battle-supplies'
+  | 'medicine'
+  | 'relic-fusions'
+  | 'quest-gear'
+  | 'foil-packs'
+  | 'booster-packs'
+
+type RecipeSubcategoryDefinition = {
+  id: RecipeSubcategoryId
   category: ArtisanRecipeCategory
-  categoryLabel: string
-  artisanLevel: number
-  recipes: ArtisanRecipe[]
+  label: string
+  iconItemId: string
 }
 
-type RecipeIndexEntry =
-  | { type: 'recipe'; recipe: ArtisanRecipe }
-  | RecipeVariantGroup
+type RecipeCategoryOption = {
+  id: ArtisanRecipeCategory | 'all'
+  label: string
+  count: number
+  iconItemId?: string
+}
+
+type RecipeSubcategoryOption = {
+  id: RecipeSubcategoryId | 'all'
+  label: string
+  count: number
+  iconItemId?: string
+}
+
+const RECIPE_SUBCATEGORIES: RecipeSubcategoryDefinition[] = [
+  { id: 'dyes', category: 'materials', label: 'Dyes', iconItemId: 'paint-red' },
+  {
+    id: 'powder',
+    category: 'materials',
+    label: 'PokePowder',
+    iconItemId: 'poke-powder-xs',
+  },
+  {
+    id: 'everyday-balls',
+    category: 'balls',
+    label: 'Everyday Balls',
+    iconItemId: 'poke-ball',
+  },
+  {
+    id: 'field-balls',
+    category: 'balls',
+    label: 'Field Balls',
+    iconItemId: 'nest-ball',
+  },
+  {
+    id: 'apricorn-balls',
+    category: 'balls',
+    label: 'Apricorn Balls',
+    iconItemId: 'moon-ball',
+  },
+  {
+    id: 'rare-balls',
+    category: 'balls',
+    label: 'Rare Balls',
+    iconItemId: 'rocket-ball',
+  },
+  {
+    id: 'base-lures',
+    category: 'lures',
+    label: 'Base Lures',
+    iconItemId: 'normal-lure',
+  },
+  {
+    id: 'advanced-lures',
+    category: 'lures',
+    label: 'Advanced Lures',
+    iconItemId: 'advanced-normal-lure',
+  },
+  {
+    id: 'master-lures',
+    category: 'lures',
+    label: 'Master Lures',
+    iconItemId: 'master-normal-lure',
+  },
+  {
+    id: 'held-type-boosts',
+    category: 'held',
+    label: 'Type Boosts',
+    iconItemId: 'cotton-scarf',
+  },
+  {
+    id: 'elemental-stones',
+    category: 'held',
+    label: 'Elemental Stones',
+    iconItemId: 'inferior-fire-stone',
+  },
+  {
+    id: 'training',
+    category: 'items',
+    label: 'Training',
+    iconItemId: 'rare-candy-xs-bag',
+  },
+  {
+    id: 'evolution-items',
+    category: 'items',
+    label: 'Evolution Items',
+    iconItemId: 'evolution-catalyst',
+  },
+  {
+    id: 'field-tools',
+    category: 'items',
+    label: 'Field Tools',
+    iconItemId: 'good-rod',
+  },
+  {
+    id: 'battle-supplies',
+    category: 'items',
+    label: 'Battle Supplies',
+    iconItemId: 'battle-observer',
+  },
+  {
+    id: 'medicine',
+    category: 'items',
+    label: 'Medicine',
+    iconItemId: 'battle-potion',
+  },
+  {
+    id: 'relic-fusions',
+    category: 'quests',
+    label: 'Relic Fusions',
+    iconItemId: 'concentrated-fire',
+  },
+  {
+    id: 'quest-gear',
+    category: 'quests',
+    label: 'Quest Gear',
+    iconItemId: 'tiny-bug-armour',
+  },
+  {
+    id: 'foil-packs',
+    category: 'tcg',
+    label: 'Foil Packs',
+    iconItemId: 'empty-foil-pack',
+  },
+  {
+    id: 'booster-packs',
+    category: 'tcg',
+    label: 'Booster Packs',
+    iconItemId: 'pack-base1',
+  },
+]
+
+const EVERYDAY_BALL_ITEM_IDS = new Set(['poke-ball', 'great-ball', 'ultra-ball'])
+const APRICORN_BALL_ITEM_IDS = new Set([
+  'friend-ball',
+  'lure-ball',
+  'level-ball',
+  'fast-ball',
+  'heavy-ball',
+  'moon-ball',
+  'love-ball',
+])
+const RARE_BALL_ITEM_IDS = new Set([
+  'rocket-ball',
+  'dream-ball',
+  'cherish-ball',
+  'beast-ball',
+])
 
 function getItemName(itemId: string) {
   return items.find((item) => item.id === itemId)?.name || itemId
@@ -119,6 +280,170 @@ function getOutputItemId(recipe: ArtisanRecipe) {
     reward?.targetId?.toString() ||
     recipe.costs[0]?.id ||
     'poke-ball'
+  )
+}
+
+function getRecipeSubcategoryId(recipe: ArtisanRecipe): RecipeSubcategoryId {
+  switch (recipe.category) {
+    case 'materials':
+      return recipe.id.startsWith('craft-poke-powder-') ? 'powder' : 'dyes'
+    case 'balls': {
+      const itemId = recipe.rewards
+        .find((reward) => reward.type === 'item')
+        ?.targetId?.toString()
+      if (itemId && EVERYDAY_BALL_ITEM_IDS.has(itemId)) return 'everyday-balls'
+      if (itemId && APRICORN_BALL_ITEM_IDS.has(itemId)) return 'apricorn-balls'
+      if (itemId && RARE_BALL_ITEM_IDS.has(itemId)) return 'rare-balls'
+      return 'field-balls'
+    }
+    case 'lures':
+      if (recipe.id.startsWith('craft-master-')) return 'master-lures'
+      if (recipe.id.startsWith('craft-advanced-')) return 'advanced-lures'
+      return 'base-lures'
+    case 'held':
+      return recipe.id.startsWith('craft-inferior-')
+        ? 'elemental-stones'
+        : 'held-type-boosts'
+    case 'items':
+      if (
+        recipe.id.startsWith('craft-rare-candy-') ||
+        recipe.id.endsWith('-berry-candy') ||
+        recipe.id === 'craft-research-kit'
+      ) {
+        return 'training'
+      }
+      if (recipe.id.startsWith('craft-evolution-catalyst')) {
+        return 'evolution-items'
+      }
+      if (recipe.id === 'craft-good-rod') return 'field-tools'
+      if (recipe.id.startsWith('mix-')) return 'medicine'
+      return 'battle-supplies'
+    case 'quests':
+      return recipe.id.startsWith('craft-concentrated-')
+        ? 'relic-fusions'
+        : 'quest-gear'
+    case 'tcg':
+      return recipe.id === 'craft-tcg-foil-pack' ? 'foil-packs' : 'booster-packs'
+    default: {
+      const category: never = recipe.category
+      return category
+    }
+  }
+}
+
+function getRecipeSubcategoryLabel(recipe: ArtisanRecipe) {
+  return (
+    RECIPE_SUBCATEGORIES.find(
+      (subcategory) => subcategory.id === getRecipeSubcategoryId(recipe),
+    )?.label || categoryLabels[recipe.category]
+  )
+}
+
+function RecipeNavigationChip({
+  label,
+  iconItemId,
+  count,
+  isSelected,
+  onSelect,
+}: {
+  label: string
+  iconItemId?: string
+  count: number
+  isSelected: boolean
+  onSelect: () => void
+}) {
+  const recipeCountLabel = `${count} ${count === 1 ? 'recipe' : 'recipes'}`
+
+  return (
+    <button
+      type="button"
+      aria-label={`${label}, ${recipeCountLabel}`}
+      aria-pressed={isSelected}
+      onClick={onSelect}
+      className={cn(
+        'game-focus-ring flex h-11 min-w-[9.75rem] max-w-[12rem] shrink-0 snap-start items-center gap-2 rounded-xl border px-2 text-left transition-colors',
+        isSelected
+          ? 'border-game-charcoal bg-game-charcoal text-game-canvas'
+          : 'border-game-border bg-game-surface text-game-ink hover:bg-game-surface-raised',
+      )}
+    >
+      <span
+        aria-hidden="true"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-game-border/80 bg-game-canvas/90"
+      >
+        {iconItemId ? (
+          <ItemSprite
+            itemId={iconItemId}
+            alt=""
+            width={28}
+            height={28}
+            className="h-7 w-7 object-contain"
+          />
+        ) : (
+          <Hammer className="h-4 w-4 text-game-moss-strong" />
+        )}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-xs font-semibold">{label}</span>
+        <span
+          className={cn(
+            'mt-0.5 block text-[10px]',
+            isSelected ? 'text-game-canvas/75' : 'text-game-muted',
+          )}
+        >
+          {recipeCountLabel}
+        </span>
+      </span>
+    </button>
+  )
+}
+
+function RecipeNavigation({
+  categoryOptions,
+  subcategoryOptions,
+  activeCategory,
+  activeSubcategory,
+  onCategorySelect,
+  onSubcategorySelect,
+}: {
+  categoryOptions: RecipeCategoryOption[]
+  subcategoryOptions: RecipeSubcategoryOption[]
+  activeCategory: ArtisanRecipeCategory | 'all'
+  activeSubcategory: RecipeSubcategoryId | 'all'
+  onCategorySelect: (category: ArtisanRecipeCategory | 'all') => void
+  onSubcategorySelect: (subcategory: RecipeSubcategoryId | 'all') => void
+}) {
+  return (
+    <nav className="w-full min-w-0 border-b border-game-border bg-game-surface/70 px-4 py-2 md:px-6" aria-label="Recipe navigation">
+      <div className="flex min-w-0 flex-col gap-1.5">
+        <fieldset className="m-0 flex w-full min-w-0 max-w-full snap-x snap-proximity gap-2 overflow-x-auto overflow-y-hidden border-0 p-0 py-1 touch-pan-x [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-game-border-strong [&::-webkit-scrollbar-track]:bg-transparent">
+          <legend className="sr-only">Recipe categories</legend>
+          {categoryOptions.map((category) => (
+            <RecipeNavigationChip
+              key={category.id}
+              label={category.label}
+              iconItemId={category.iconItemId}
+              count={category.count}
+              isSelected={activeCategory === category.id}
+              onSelect={() => onCategorySelect(category.id)}
+            />
+          ))}
+        </fieldset>
+        <fieldset className="m-0 flex w-full min-w-0 max-w-full snap-x snap-proximity gap-2 overflow-x-auto overflow-y-hidden border-0 p-0 py-1 touch-pan-x [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-game-border-strong [&::-webkit-scrollbar-track]:bg-transparent">
+          <legend className="sr-only">Recipe subcategories</legend>
+          {subcategoryOptions.map((subcategory) => (
+            <RecipeNavigationChip
+              key={subcategory.id}
+              label={subcategory.label}
+              iconItemId={subcategory.iconItemId}
+              count={subcategory.count}
+              isSelected={activeSubcategory === subcategory.id}
+              onSelect={() => onSubcategorySelect(subcategory.id)}
+            />
+          ))}
+        </fieldset>
+      </div>
+    </nav>
   )
 }
 
@@ -168,98 +493,6 @@ function getCraftTypeLabel(recipe: ArtisanRecipe) {
   if (recipe.craftType === 'mix') return 'Mix'
   if (recipe.craftType === 'scatter') return 'Scatter'
   return 'Precise'
-}
-
-function getLureGroupName(level: number) {
-  if (level >= 70) return 'Master Lures'
-  if (level >= 40) return 'Advanced Lures'
-  return 'Base Lures'
-}
-
-function getLureGroupDescription(level: number) {
-  if (level >= 70) return 'Choose a Master type lure variant to craft.'
-  if (level >= 40) return 'Choose an Advanced type lure variant to craft.'
-  return 'Choose a base type lure variant to craft.'
-}
-
-function createLureGroups(recipes: ArtisanRecipe[]): RecipeVariantGroup[] {
-  const grouped = new Map<number, ArtisanRecipe[]>()
-
-  for (const recipe of recipes) {
-    if (recipe.category !== 'lures') continue
-    const current = grouped.get(recipe.artisanLevel) || []
-    current.push(recipe)
-    grouped.set(recipe.artisanLevel, current)
-  }
-
-  return [...grouped.entries()]
-    .sort(([a], [b]) => a - b)
-    .map(([artisanLevel, groupRecipes]) => ({
-      type: 'lureGroup' as const,
-      id: `lure-group-${artisanLevel}`,
-      name: getLureGroupName(artisanLevel),
-      description: getLureGroupDescription(artisanLevel),
-      category: 'lures',
-      categoryLabel: 'Lures',
-      artisanLevel,
-      recipes: groupRecipes.sort(
-        (a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id),
-      ),
-    }))
-}
-
-function createHeldTypeBoostGroup(
-  recipes: ArtisanRecipe[],
-): RecipeVariantGroup | null {
-  const heldRecipes = recipes
-    .filter(
-      (recipe) =>
-        recipe.category === 'held' &&
-        !recipe.id.startsWith('craft-inferior-'),
-    )
-    .sort(
-      (a, b) =>
-        a.artisanLevel - b.artisanLevel ||
-        a.name.localeCompare(b.name) ||
-        a.id.localeCompare(b.id),
-    )
-
-  if (heldRecipes.length === 0) return null
-
-  return {
-    type: 'heldGroup',
-    id: 'held-type-boost-group',
-    name: 'Held Type Boost',
-    description: 'Choose a type boost held item variant to craft.',
-    category: 'held',
-    categoryLabel: 'Held',
-    artisanLevel: heldRecipes[0].artisanLevel,
-    recipes: heldRecipes,
-  }
-}
-
-function createEvolutionStoneGroup(
-  recipes: ArtisanRecipe[],
-): RecipeVariantGroup | null {
-  const stoneRecipes = recipes
-    .filter(
-      (recipe) =>
-        recipe.category === 'held' && recipe.id.startsWith('craft-inferior-'),
-    )
-    .sort((a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id))
-
-  if (stoneRecipes.length === 0) return null
-
-  return {
-    type: 'heldGroup',
-    id: 'evolution-stones-group',
-    name: 'Evolution Stones',
-    description: 'Choose an elemental stone variant to craft and charge.',
-    category: 'held',
-    categoryLabel: 'Held',
-    artisanLevel: stoneRecipes[0].artisanLevel,
-    recipes: stoneRecipes,
-  }
 }
 
 type CraftQualityLabel = 'Bad' | 'Good' | 'Perfect'
@@ -1335,10 +1568,11 @@ export function ArtisanPanel() {
   const [selectedRecipe, setSelectedRecipe] = useState<ArtisanRecipe | null>(
     null,
   )
-  const [selectedRecipeGroup, setSelectedRecipeGroup] =
-    useState<RecipeVariantGroup | null>(null)
   const [activeCategory, setActiveCategory] = useState<
     ArtisanRecipeCategory | 'all'
+  >('all')
+  const [activeSubcategory, setActiveSubcategory] = useState<
+    RecipeSubcategoryId | 'all'
   >('all')
   const [qteRecipe, setQteRecipe] = useState<ArtisanRecipe | null>(null)
   const [craftSession, setCraftSession] = useState<ArtisanCraftSession | null>(
@@ -1407,17 +1641,86 @@ export function ArtisanPanel() {
     return next
   }, [visibleRecipePool])
 
-  const categoryOptions = useMemo(() => {
-    return (
-      ['all', 'materials', 'balls', 'lures', 'held', 'items', 'quests', 'tcg'] as const
-    ).filter((category) => category === 'all' || counts[category] > 0)
-  }, [counts])
+  const categoryOptions = useMemo<RecipeCategoryOption[]>(() => {
+    const categories = [
+      'all',
+      'materials',
+      'balls',
+      'lures',
+      'held',
+      'items',
+      'quests',
+      'tcg',
+    ] as const
+
+    return categories
+      .filter((category) => category === 'all' || counts[category] > 0)
+      .map((category) => ({
+        id: category,
+        label: categoryLabels[category],
+        count: counts[category],
+        iconItemId:
+          category === 'all'
+            ? undefined
+            : getOutputItemId(
+                visibleRecipePool.find((recipe) => recipe.category === category)!,
+              ),
+      }))
+  }, [counts, visibleRecipePool])
+
+  const subcategoryCounts = useMemo(() => {
+    const next = Object.fromEntries(
+      RECIPE_SUBCATEGORIES.map(({ id }) => [id, 0]),
+    ) as Record<RecipeSubcategoryId, number>
+
+    for (const recipe of visibleRecipePool) {
+      next[getRecipeSubcategoryId(recipe)] += 1
+    }
+    return next
+  }, [visibleRecipePool])
+
+  const subcategoryOptions = useMemo<RecipeSubcategoryOption[]>(() => {
+    const definitions = RECIPE_SUBCATEGORIES.filter(
+      (subcategory) =>
+        activeCategory === 'all' || subcategory.category === activeCategory,
+    )
+    const total =
+      activeCategory === 'all' ? counts.all : counts[activeCategory]
+
+    return [
+      {
+        id: 'all',
+        label:
+          activeCategory === 'all'
+            ? 'All Recipes'
+            : `All ${categoryLabels[activeCategory]}`,
+        count: total,
+      },
+      ...definitions
+        .filter((subcategory) => subcategoryCounts[subcategory.id] > 0)
+        .map((subcategory) => ({
+          id: subcategory.id,
+          label: subcategory.label,
+          iconItemId: subcategory.iconItemId,
+          count: subcategoryCounts[subcategory.id],
+        })),
+    ]
+  }, [activeCategory, counts, subcategoryCounts])
 
   useEffect(() => {
     if (activeCategory !== 'all' && counts[activeCategory] === 0) {
       setActiveCategory('all')
     }
   }, [activeCategory, counts])
+
+  useEffect(() => {
+    if (
+      activeSubcategory !== 'all' &&
+      !subcategoryOptions.some((subcategory) => subcategory.id === activeSubcategory)
+    ) {
+      setActiveSubcategory('all')
+    }
+  }, [activeSubcategory, subcategoryOptions])
 
   useEffect(() => {
     if (craftDialogOpen || (!qteRecipe && !craftSession)) return
@@ -1435,6 +1738,12 @@ export function ArtisanPanel() {
       .filter((recipe: ArtisanRecipe) => {
         if (activeCategory !== 'all' && recipe.category !== activeCategory)
           return false
+        if (
+          activeSubcategory !== 'all' &&
+          getRecipeSubcategoryId(recipe) !== activeSubcategory
+        ) {
+          return false
+        }
         return true
       })
       .sort(
@@ -1443,54 +1752,7 @@ export function ArtisanPanel() {
           a.name.localeCompare(b.name) ||
           a.id.localeCompare(b.id),
       )
-  }, [activeCategory, visibleRecipePool])
-
-  const visibleIndexEntries = useMemo<RecipeIndexEntry[]>(() => {
-    if (
-      activeCategory !== 'all' &&
-      activeCategory !== 'lures' &&
-      activeCategory !== 'held'
-    ) {
-      return visibleRecipes.map((recipe) => ({ type: 'recipe', recipe }))
-    }
-
-    const lureGroups = createLureGroups(visibleRecipePool)
-    const lureGroupEntries = lureGroups.map(
-      (group) => group as RecipeIndexEntry,
-    )
-    const heldGroup = createHeldTypeBoostGroup(visibleRecipePool)
-    const heldGroupEntries = heldGroup ? [heldGroup as RecipeIndexEntry] : []
-    const evolutionStoneGroup = createEvolutionStoneGroup(visibleRecipePool)
-    const evolutionStoneGroupEntries = evolutionStoneGroup
-      ? [evolutionStoneGroup as RecipeIndexEntry]
-      : []
-
-    if (activeCategory === 'lures') return lureGroupEntries
-    if (activeCategory === 'held') {
-      return [...evolutionStoneGroupEntries, ...heldGroupEntries]
-    }
-
-    const nonGroupedRecipes = visibleRecipes
-      .filter(
-        (recipe) => recipe.category !== 'lures' && recipe.category !== 'held',
-      )
-      .map((recipe) => ({ type: 'recipe' as const, recipe }))
-
-    return [
-      ...nonGroupedRecipes,
-      ...lureGroupEntries,
-      ...evolutionStoneGroupEntries,
-      ...heldGroupEntries,
-    ].sort((a, b) => {
-      const aLevel =
-        a.type === 'recipe' ? a.recipe.artisanLevel : a.artisanLevel
-      const bLevel =
-        b.type === 'recipe' ? b.recipe.artisanLevel : b.artisanLevel
-      const aName = a.type === 'recipe' ? a.recipe.name : a.name
-      const bName = b.type === 'recipe' ? b.recipe.name : b.name
-      return aLevel - bLevel || aName.localeCompare(bName)
-    })
-  }, [activeCategory, visibleRecipePool, visibleRecipes])
+  }, [activeCategory, activeSubcategory, visibleRecipePool])
 
   const startCraft = useCallback(
     async (recipe: ArtisanRecipe, craftMultiplier = 1) => {
@@ -1505,7 +1767,6 @@ export function ArtisanPanel() {
       }
 
       setSelectedRecipe(null)
-      setSelectedRecipeGroup(null)
       setQteRecipe(recipe)
       setCraftSession(response.session as ArtisanCraftSession)
       setCraftDialogOpen(true)
@@ -1674,23 +1935,17 @@ export function ArtisanPanel() {
         showEffects
       />
 
-      <div className="hidden items-center gap-3 border-b border-game-border bg-game-surface/70 px-6 py-3 xl:flex">
-        <div className="w-64 shrink-0">
-          <PremiumSelect
-            value={activeCategory}
-            onValueChange={(value) =>
-              setActiveCategory(value as ArtisanRecipeCategory | 'all')
-            }
-            options={categoryOptions.map((category) => ({
-              id: category,
-              label: `${categoryLabels[category]} (${counts[category]})`,
-            }))}
-          />
-        </div>
-        <p className="text-xs text-game-muted">
-          Browse recipes by workshop category.
-        </p>
-      </div>
+      <RecipeNavigation
+        categoryOptions={categoryOptions}
+        subcategoryOptions={subcategoryOptions}
+        activeCategory={activeCategory}
+        activeSubcategory={activeSubcategory}
+        onCategorySelect={(category) => {
+          setActiveCategory(category)
+          setActiveSubcategory('all')
+        }}
+        onSubcategorySelect={setActiveSubcategory}
+      />
 
       <RewardResultOverlay
         result={craftResult}
@@ -1731,13 +1986,9 @@ export function ArtisanPanel() {
         }
       />
 
-      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-6 md:px-6">
-        <div className="space-y-8">
-          <SectionDivider textColor="text-game-moss-strong">
-            Recipe index
-          </SectionDivider>
-
-          {visibleIndexEntries.length === 0 ? (
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-6 md:px-6">
+        <div>
+          {visibleRecipes.length === 0 ? (
             <div
               className="rounded-lg border border-dashed border-game-border bg-game-surface py-16 text-center text-sm font-medium text-game-muted"
               role="status"
@@ -1747,74 +1998,7 @@ export function ArtisanPanel() {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
-              {visibleIndexEntries.map((entry) => {
-                if (entry.type !== 'recipe') {
-                  const group = entry
-                  const readyCount = group.recipes.filter(
-                    (recipe) => recipeStates.get(recipe.id)?.canCraft,
-                  ).length
-                  const lockedCount = group.recipes.filter(
-                    (recipe) => recipeStates.get(recipe.id)?.locked,
-                  ).length
-                  const previewRecipe = group.recipes[0]
-                  const levelLabel =
-                    group.type === 'heldGroup'
-                      ? `Lv ${group.artisanLevel}+`
-                      : `Lv ${group.artisanLevel}`
-
-                  return (
-                    // biome-ignore lint/a11y/useSemanticElements: The keyboard-accessible card includes its own separate recipe action button.
-                    <div
-                      key={group.id}
-                      onClick={() => setSelectedRecipeGroup(group)}
-                      onKeyDown={(event) => {
-                        if (event.target !== event.currentTarget) return
-                        if (event.key === 'Enter' || event.key === ' ') {
-                          event.preventDefault()
-                          setSelectedRecipeGroup(group)
-                        }
-                      }}
-                      role="button"
-                      tabIndex={0}
-                      aria-label={`View ${group.name} recipe variants`}
-                      aria-haspopup="dialog"
-                      className="game-focus-ring group relative flex cursor-pointer items-center gap-4 overflow-hidden rounded-lg border border-game-card-border bg-game-surface p-4 text-left transition-colors hover:border-game-moss/45 hover:bg-game-surface-raised"
-                    >
-                      <div className="shrink-0">
-                        <div className="game-icon-orb relative h-14 w-14 transition-colors group-hover:border-game-charcoal/35">
-                          {previewRecipe ? (
-                            <RecipeOutputIcon
-                              recipe={previewRecipe}
-                              className="h-9 w-9 object-contain"
-                            />
-                          ) : (
-                            <Sparkles className="h-8 w-8 text-game-ochre" />
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="relative min-w-0 flex-1">
-                        <span className="mb-1 block truncate text-[11px] font-medium text-game-moss-strong">
-                          {group.categoryLabel} · {levelLabel} ·{' '}
-                          {group.recipes.length} variants
-                        </span>
-                        <h3 className="truncate text-sm font-semibold text-game-ink">
-                          {group.name}
-                        </h3>
-                        <div className="mt-1 truncate text-[11px] font-semibold uppercase tracking-[0.1em] text-game-muted">
-                          {readyCount > 0
-                            ? `${readyCount} ready`
-                            : lockedCount === group.recipes.length
-                              ? 'Locked'
-                              : 'Choose variant'}
-                        </div>
-                      </div>
-
-                    </div>
-                  )
-                }
-
-                const recipe = entry.recipe
+              {visibleRecipes.map((recipe) => {
                 const state = recipeStates.get(recipe.id)!
                 const bulkMultiplier = recipe.bulk
                 const bulkVisible =
@@ -1874,7 +2058,8 @@ export function ArtisanPanel() {
 
                     <div className="relative min-w-0 flex-1">
                       <span className="mb-1 block truncate text-[11px] font-medium text-game-moss-strong">
-                        {categoryLabels[recipe.category]} · Lv{' '}
+                        {categoryLabels[recipe.category]} ·{' '}
+                        {getRecipeSubcategoryLabel(recipe)} · Lv{' '}
                         {recipe.artisanLevel} · {formatOutputRange(recipe)}
                       </span>
                       <h3 className="truncate text-sm font-semibold text-game-ink">
@@ -1945,179 +2130,6 @@ export function ArtisanPanel() {
         </div>
       </div>
 
-      <SecondaryControlBar className="xl:hidden">
-        <PremiumSelect
-          value={activeCategory}
-          onValueChange={(value) =>
-            setActiveCategory(value as ArtisanRecipeCategory | 'all')
-          }
-          options={categoryOptions.map((category) => ({
-            id: category,
-            label: `${categoryLabels[category]} (${counts[category]})`,
-          }))}
-        />
-      </SecondaryControlBar>
-
-      <GameInfoModal
-        open={!!selectedRecipeGroup}
-        onOpenChange={(open) => !open && setSelectedRecipeGroup(null)}
-        title={selectedRecipeGroup?.name || ''}
-        description={selectedRecipeGroup?.description}
-        descriptionInHero
-        category={
-          selectedRecipeGroup
-            ? `Artisan · ${selectedRecipeGroup.categoryLabel}`
-            : undefined
-        }
-        icon={
-          selectedRecipeGroup?.recipes[0] ? (
-            <RecipeOutputIcon
-              recipe={selectedRecipeGroup.recipes[0]}
-              className="h-12 w-12 object-contain"
-            />
-          ) : null
-        }
-        properties={
-          selectedRecipeGroup
-            ? [
-                {
-                  icon: <Hammer className="h-4 w-4" />,
-                  label: 'Level',
-                  value:
-                    selectedRecipeGroup.type === 'heldGroup'
-                      ? `${selectedRecipeGroup.artisanLevel}+`
-                      : selectedRecipeGroup.artisanLevel,
-                },
-                {
-                  icon: <Sparkles className="h-4 w-4" />,
-                  label: 'Craft',
-                  value:
-                    selectedRecipeGroup.type === 'heldGroup'
-                      ? 'Precise'
-                      : 'Balance',
-                },
-                {
-                  icon: <Target className="h-4 w-4" />,
-                  label: 'Variants',
-                  value: selectedRecipeGroup.recipes.length,
-                },
-              ]
-            : undefined
-        }
-        background="/backgrounds/artisan-workshop.avif"
-        presentation="drawer"
-      >
-        {selectedRecipeGroup ? (
-          <div className="space-y-4">
-            <SectionDivider>Variants</SectionDivider>
-            <div className="grid grid-cols-1 gap-3">
-              {selectedRecipeGroup.recipes.map((recipe) => {
-                const state = recipeStates.get(recipe.id)!
-                const bulkVisible =
-                  !!recipe.bulk &&
-                  recipe.bulk > 1 &&
-                  artisanLevel >=
-                    getArtisanCraftRequiredLevel(recipe, recipe.bulk)
-                const bulkState =
-                  bulkVisible && recipe.bulk
-                    ? getRecipeState(
-                        recipe,
-                        artisanLevel,
-                        inventory,
-                        currency,
-                        gameData,
-                        recipe.bulk,
-                      )
-                    : undefined
-
-                return (
-                  <div
-                    key={recipe.id}
-                    className={cn(
-                      'rounded-lg border bg-game-surface p-3',
-                      state.canCraft
-                        ? 'border-game-moss/35'
-                        : state.locked
-                          ? 'border-game-card-border opacity-75'
-                          : 'border-game-card-border',
-                    )}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="game-icon-orb h-12 w-12 shrink-0">
-                        <RecipeOutputIcon
-                          recipe={recipe}
-                          className={cn(
-                            'h-9 w-9 object-contain',
-                            state.locked && 'grayscale',
-                          )}
-                        />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm font-semibold text-game-ink">
-                          {recipe.name}
-                        </div>
-                        <div className="mt-1 truncate text-[11px] font-semibold uppercase tracking-[0.1em] text-game-muted">
-                          {formatOutputRange(recipe)} ·{' '}
-                          {state.canCraft ? 'Ready' : state.lockReason}
-                        </div>
-                      </div>
-                      <div className="flex shrink-0 items-center gap-2">
-                        <AppButton
-                          disabled={
-                            !state.canCraft ||
-                            loadingRecipe === recipe.id ||
-                            completingCraft
-                          }
-                          onClick={() => startCraft(recipe)}
-                          className="h-10 px-3"
-                          size="sm"
-                          variant={state.canCraft ? 'default' : 'outline'}
-                        >
-                          {loadingRecipe === recipe.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : state.canCraft ? (
-                            'Craft'
-                          ) : (
-                            'Locked'
-                          )}
-                        </AppButton>
-                        {bulkVisible && recipe.bulk ? (
-                          <AppButton
-                            disabled={
-                              !bulkState?.canCraft ||
-                              loadingRecipe === recipe.id ||
-                              completingCraft
-                            }
-                            onClick={() => startCraft(recipe, recipe.bulk)}
-                            className="h-10 px-2.5"
-                            size="sm"
-                            variant={
-                              bulkState?.canCraft ? 'secondary' : 'outline'
-                            }
-                            title={`Craft x${recipe.bulk}`}
-                          >
-                            x{recipe.bulk}
-                          </AppButton>
-                        ) : null}
-                      </div>
-                    </div>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {recipe.costs.map((cost) => (
-                        <RecipeCostChip
-                          key={cost.id}
-                          cost={cost}
-                          owned={getCostOwned(cost, inventory, currency)}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        ) : null}
-      </GameInfoModal>
-
       <GameInfoModal
         open={!!selectedRecipe}
         onOpenChange={(open) => !open && setSelectedRecipe(null)}
@@ -2126,7 +2138,7 @@ export function ArtisanPanel() {
         descriptionInHero
         category={
           selectedRecipe
-            ? `Artisan · ${categoryLabels[selectedRecipe.category]}`
+            ? `Artisan · ${categoryLabels[selectedRecipe.category]} · ${getRecipeSubcategoryLabel(selectedRecipe)}`
             : undefined
         }
         icon={

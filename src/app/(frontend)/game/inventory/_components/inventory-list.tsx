@@ -298,8 +298,9 @@ function getEmptyMessage(
     case 'encounter-tools':
       return 'No lures or escape tools yet. Explore and check specialty shops.'
     case 'candies':
+      return 'No training treats yet. Research, battles, and rewards can add candies.'
     case 'berries':
-      return 'No training treats yet. Research, battles, and rewards can add candies or berries.'
+      return 'No berries yet. Research and field rewards can add berries.'
     case 'materials':
     case 'crafting':
       return 'No crafting materials yet. Gather ingredients from catches and field studies.'

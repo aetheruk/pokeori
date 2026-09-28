@@ -27,12 +27,12 @@ describe('inventory placement', () => {
     expect(INVENTORY_GROUP_LABELS['key-items']).toBe('Key Items')
     expect(INVENTORY_SUBCATEGORY_ORDER.training).toEqual([
       'candies',
-      'berries',
       'evolution-items',
       'vitamins',
       'ability-patches',
       'research-kits',
     ])
+    expect(INVENTORY_SUBCATEGORY_ORDER.crafting).toContain('berries')
     expect(INVENTORY_SUBCATEGORY_ORDER['key-items']).toEqual([
       'key-items',
       'badges',
@@ -144,18 +144,18 @@ describe('inventory placement', () => {
     })
   })
 
-  test('candies, berries, and evolution items display under training', () => {
+  test('training items and berries display in their inventory sections', () => {
     expect(getInventoryDisplayPlacement(item('rare-candy-s'))).toEqual({
       group: 'training',
       subCategory: 'candies',
     })
-    expect(getInventoryDisplayPlacement(item('oran-berry'))).toEqual({
-      group: 'training',
-      subCategory: 'berries',
-    })
     expect(getInventoryDisplayPlacement(item('moon-stone'))).toEqual({
       group: 'training',
       subCategory: 'evolution-items',
+    })
+    expect(getInventoryDisplayPlacement(item('oran-berry'))).toEqual({
+      group: 'crafting',
+      subCategory: 'berries',
     })
   })
 
