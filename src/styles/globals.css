@@ -92,6 +92,72 @@
   }
 }
 
+@keyframes field-observation-drop-collect {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  22% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.22);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -68%) scale(0.58);
+  }
+}
+
+@keyframes field-observation-drop-label {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 5px) scale(0.92);
+  }
+  18% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+  68% {
+    opacity: 1;
+    transform: translate(-50%, -8px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -17px) scale(0.96);
+  }
+}
+
+@keyframes field-observation-count-pop {
+  0% {
+    transform: scale(0.82);
+  }
+  55% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.field-observation-drop-collect {
+  animation: field-observation-drop-collect 520ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.field-observation-drop-label {
+  animation: field-observation-drop-label 600ms ease-out forwards;
+}
+
+.field-observation-count-pop {
+  animation: field-observation-count-pop 240ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field-observation-drop-collect,
+  .field-observation-drop-label,
+  .field-observation-count-pop {
+    animation: none;
+  }
+}
+
 :root {
   --radius: 0.625rem;
   --game-paper-background: #f4eacf;

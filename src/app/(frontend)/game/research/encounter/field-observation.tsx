@@ -18,16 +18,23 @@ import {
   useRef,
   useState,
 } from 'react'
+import { toast } from 'sonner'
+import {
+  collectFieldResearchDrop,
+  completeFieldResearch,
+  startFieldResearch,
+  submitFieldResearchAnswer,
+} from '@/app/(frontend)/game/field-research/actions'
 import { GameTimer } from '@/components/game/shared/game-timer'
+import { PokemonRarityEggSprite } from '@/components/game/shared/PokemonRarityEggSprite'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
 import { ItemSprite } from '@/components/ui/item-sprite'
-import { PokemonRarityEggSprite } from '@/components/game/shared/PokemonRarityEggSprite'
 import { useAudio } from '@/context/AudioContext'
-import { cn } from '@/lib/utils'
 import { useUser } from '@/context/UserContext'
 import type { GameItem } from '@/data/games'
 import { useGameMusic } from '@/hooks/useGameMusic'
+import { cn } from '@/lib/utils'
 import { getFieldObservationPokemonSpriteSources } from '@/utilities/pokemon/local-sprites'
 import type {
   FieldObservationAvailablePokemon,
@@ -36,12 +43,6 @@ import type {
   FieldObservationQuestionOption,
   FieldObservationSpawn,
 } from '@/utilities/research/field-observation'
-import {
-  collectFieldResearchDrop,
-  completeFieldResearch,
-  startFieldResearch,
-  submitFieldResearchAnswer,
-} from '@/app/(frontend)/game/field-research/actions'
 
 const PROFESSOR_OAK_SPRITE = '/sprites/trainers/special/oak.avif'
 
@@ -73,6 +74,8 @@ export function FieldObservationGame({
   const [collectingDropIds, setCollectingDropIds] = useState<Set<string>>(
     () => new Set(),
   )
+  const pendingDropClaimsRef = useRef(new Set<Promise<unknown>>())
+  const dropClaimQueueRef = useRef<Promise<unknown>>(Promise.resolve())
 
   const isCountSurvey = roundData?.surveyFocus === 'count-survey'
   const isKidModeQuestion =
@@ -108,6 +111,7 @@ export function FieldObservationGame({
     async (didWin: boolean, message: string) => {
       if (result) return
       playSfx(didWin ? 'good' : 'bad')
+      await Promise.allSettled(Array.from(pendingDropClaimsRef.current))
       const completeResult = await completeFieldResearch(encounter.id, didWin)
       const accepted = didWin && completeResult.success
       setResult({
@@ -145,11 +149,11 @@ export function FieldObservationGame({
     const elapsed = now - startTime
     return (roundData.collectibleDrops || []).filter(
       (drop) =>
-        !collectedDropIds.has(drop.id) &&
+        (!collectedDropIds.has(drop.id) || collectingDropIds.has(drop.id)) &&
         elapsed >= drop.startMs &&
         elapsed <= drop.startMs + drop.durationMs,
     )
-  }, [collectedDropIds, now, phase, roundData, startTime])
+  }, [collectedDropIds, collectingDropIds, now, phase, roundData, startTime])
 
   const handleCollectDrop = async (
     drop: FieldObservationPublicCollectibleDrop,
@@ -164,8 +168,35 @@ export function FieldObservationGame({
     playSfx('good')
     const startedAt = Date.now()
     setCollectingDropIds((previous) => new Set(previous).add(drop.id))
-    const result = await collectFieldResearchDrop(drop.id)
-    const remainingPopMs = Math.max(0, 180 - (Date.now() - startedAt))
+    setCollectedDropIds((previous) => new Set(previous).add(drop.id))
+
+    const claimRequest = dropClaimQueueRef.current.then(() =>
+      collectFieldResearchDrop(drop.id),
+    )
+    dropClaimQueueRef.current = claimRequest.catch(() => undefined)
+    pendingDropClaimsRef.current.add(claimRequest)
+    let claimSucceeded = false
+    let claimError: string | undefined
+    try {
+      const claimResult = await claimRequest
+      claimSucceeded = claimResult.success
+      claimError = 'error' in claimResult ? claimResult.error : undefined
+    } catch {
+      claimError =
+        'Could not confirm that pickup. Try again while it is visible.'
+    } finally {
+      pendingDropClaimsRef.current.delete(claimRequest)
+    }
+
+    const feedbackDurationMs = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches
+      ? 120
+      : 600
+    const remainingPopMs = Math.max(
+      0,
+      feedbackDurationMs - (Date.now() - startedAt),
+    )
     if (remainingPopMs > 0) {
       await new Promise((resolve) => window.setTimeout(resolve, remainingPopMs))
     }
@@ -176,15 +207,19 @@ export function FieldObservationGame({
       return next
     })
 
-    if (result.success) {
-      setCollectedDropIds((previous) => new Set(previous).add(drop.id))
-    } else {
+    if (!claimSucceeded) {
+      setCollectedDropIds((previous) => {
+        const next = new Set(previous)
+        next.delete(drop.id)
+        return next
+      })
+
       const elapsed = Date.now() - startTime
       if (
         elapsed >= drop.startMs &&
         elapsed <= drop.startMs + drop.durationMs
       ) {
-        return
+        toast.error(claimError || 'Could not collect that drop. Tap to retry.')
       }
     }
   }
@@ -194,6 +229,7 @@ export function FieldObservationGame({
     setSelectedOption(optionId)
     setIsSubmitting(true)
 
+    await Promise.allSettled(Array.from(pendingDropClaimsRef.current))
     const submitResult = await submitFieldResearchAnswer(optionId)
     if (!submitResult.success && submitResult.error) {
       setIsSubmitting(false)
@@ -213,6 +249,7 @@ export function FieldObservationGame({
     setSelectedOption('count-survey')
     setIsSubmitting(true)
 
+    await Promise.allSettled(Array.from(pendingDropClaimsRef.current))
     const submitResult = await submitFieldResearchAnswer({
       type: 'count-survey',
       counts: countReport,
@@ -258,7 +295,11 @@ export function FieldObservationGame({
     <div className="relative flex h-dvh flex-col overflow-hidden game-night bg-game-night-canvas text-game-night-ink">
       <div className="pointer-events-none absolute left-3 right-3 top-3 z-20 flex items-center justify-between gap-3">
         <div className="flex min-w-0 flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-wide">
-          <span className="game-paper-first inline-flex items-center gap-1.5 rounded-full border border-game-ochre/45 bg-game-surface-raised px-2.5 py-1 text-[#293532]">
+          <span
+            role="status"
+            aria-label={`${collectedDropIds.size} drops collected`}
+            className="game-paper-first inline-flex items-center gap-1.5 rounded-full border border-game-ochre/45 bg-game-surface-raised px-2.5 py-1 text-[#293532]"
+          >
             <Image
               src="/sprites/items/materials/material.avif"
               alt=""
@@ -266,7 +307,12 @@ export function FieldObservationGame({
               height={18}
               className="object-contain"
             />
-            <span className="text-game-ink">{collectedDropIds.size}</span>
+            <span
+              key={collectedDropIds.size}
+              className="field-observation-count-pop text-game-ink"
+            >
+              {collectedDropIds.size}
+            </span>
           </span>
         </div>
         <div className="pointer-events-auto">
@@ -837,16 +883,24 @@ function FieldDropButton({
       onClick={onCollect}
       disabled={collecting}
       className={cn(
-        'game-focus-ring absolute z-[220] flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-game-ochre/70 bg-game-ochre/20 shadow-[0_0_18px_rgba(181,138,67,0.55)] transition-colors hover:bg-game-ochre/30',
-        collecting &&
-          'pointer-events-none animate-out zoom-out-75 fade-out-0 duration-200 motion-reduce:animate-none',
+        'game-focus-ring absolute z-[220] flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-game-ochre/80 bg-game-surface-raised shadow-md transition-[background-color,transform,opacity] hover:border-game-ochre hover:bg-game-cream active:scale-90',
+        collecting && 'field-observation-drop-collect pointer-events-none',
       )}
+      aria-busy={collecting}
       style={{
         left: `${drop.x}%`,
         top: `${drop.y}%`,
       }}
     >
-      <span className="absolute inset-1 rounded-full border border-amber-200/35 animate-ping" />
+      <span className="absolute inset-1 rounded-full border border-game-ochre/45" />
+      {collecting && (
+        <span
+          aria-hidden="true"
+          className="field-observation-drop-label absolute bottom-[calc(100%+0.2rem)] left-1/2 z-20 max-w-40 -translate-x-1/2 truncate rounded-md border border-game-ochre/60 bg-game-surface-raised px-2 py-1 text-[10px] font-bold text-game-ink shadow-md"
+        >
+          + {drop.label}
+        </span>
+      )}
       {drop.kind === 'egg' ? (
         <PokemonRarityEggSprite
           rarity={drop.rarity}
