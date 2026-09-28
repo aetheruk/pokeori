@@ -411,12 +411,8 @@ function BattleBetsBattle({
     serverFingerprint === visualFingerprint && !isProcessing
 
   useEffect(() => {
-    const musicUrl = serverBattle.config?.music
-    if (musicUrl) {
-      playMusic(musicUrl, { loop: true, volume: 0.3 })
-    } else {
-      stopMusic()
-    }
+    const musicUrl = serverBattle.config?.music || '/music/battle.m4a'
+    playMusic(musicUrl, { loop: true, volume: 0.3 })
     return () => stopMusic({ delayMs: 500 })
   }, [playMusic, serverBattle.battleId, serverBattle.config?.music, stopMusic])
 

@@ -58,6 +58,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/virdian.avif',
     icon: { type: 'trainer', id: 'expert-m' },
     description: 'A small city on the edge of the Pokemon League.',
+    music: '/music/viridian.m4a',
     weatherSlots: {
       1: 'rain',
       2: 'rain',
