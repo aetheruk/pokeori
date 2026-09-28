@@ -4,6 +4,8 @@
 
 Repeated requests for the currently playing music URL reuse the active player instead of seeking back to the beginning, so entering a battle or catch encounter on the same area track preserves playback position.
 
+Activity replays refresh their session in-app and remount only the activity UI, keeping the shared audio provider alive so replay does not interrupt its music.
+
 The local originals in `original music/` report Opus audio streams, so transcode them instead of renaming them or converting them to MIDI. That source folder is ignored by Git; only the compressed runtime assets are committed. MIDI playback remains available for explicit `.mid`/`.midi` URLs, but its lightweight synthesized voice cannot reproduce the original recording or instrument timbres.
 
 The mini-game and seaside tracks use 64 kbps AAC-LC and are about 198 KiB and 482 KiB. The longer battle and Viridian tracks use 48 kbps and are approximately 852 KiB and 1.06 MiB. Lavender Town and Pokemon Tower also use 48 kbps and are about 1.24 MiB each. The cave, Celadon, Cerulean, Game Corner, Pewter, and Viridian Forest tracks use 48 kbps and range from 0.96 MiB to 1.19 MiB. Fuchsia is about 1.19 MiB; Safari Zone 0.81 MiB; Saffron 0.83 MiB; and Vermilion 0.74 MiB, all at 48 kbps. Convert local originals with FFmpeg:

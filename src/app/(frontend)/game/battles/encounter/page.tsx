@@ -27,7 +27,10 @@ export default async function BattleEncounterPage() {
       return (
         <div className="h-full game-night bg-game-night-canvas text-game-night-ink">
           <BattleErrorBoundary>
-            <BattleInterface initialState={battleState} />
+            <BattleInterface
+              key={battleState.economyActionId || battleState.battleId}
+              initialState={battleState}
+            />
           </BattleErrorBoundary>
         </div>
       )
@@ -39,7 +42,10 @@ export default async function BattleEncounterPage() {
   return (
     <div className="game-night h-full bg-game-night-canvas text-game-night-ink">
       <BattleErrorBoundary>
-        <BattleInterface initialState={battleState} />
+        <BattleInterface
+          key={battleState.economyActionId || battleState.battleId}
+          initialState={battleState}
+        />
       </BattleErrorBoundary>
     </div>
   )

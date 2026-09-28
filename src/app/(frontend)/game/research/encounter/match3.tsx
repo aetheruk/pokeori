@@ -474,7 +474,7 @@ export function Match3Game({ encounter, initialState }: Match3GameProps) {
                       true,
                     )
                     if (res?.success) {
-                      window.location.reload()
+                      router.refresh()
                     } else {
                       window.location.href = '/game/explore'
                     }

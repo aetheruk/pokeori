@@ -679,7 +679,7 @@ export function ArtAcademyGame({
                 className="w-full"
                 onClick={async () => {
                   const replay = await startGame(encounter.id, true)
-                  if (replay.success) window.location.reload()
+                  if (replay.success) router.refresh()
                 }}
               >
                 Try again

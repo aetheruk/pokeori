@@ -60,6 +60,7 @@ export default async function GamePage({
       allowDuringTakeover
     >
       <GameClient
+        key={`${encounter.id}:${gameState.startTime}`}
         encounter={encounter}
         initialState={gameState}
         state={gameState}

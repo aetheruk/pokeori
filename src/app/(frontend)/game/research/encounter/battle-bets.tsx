@@ -146,6 +146,7 @@ export function BattleBetsGame({
   if (state.phase !== 'inspect' && state.battle) {
     return (
       <BattleBetsBattle
+        key={state.sessionId}
         state={state}
         busy={busy}
         onStateChange={setState}
@@ -414,7 +415,13 @@ function BattleBetsBattle({
     const musicUrl = serverBattle.config?.music || '/music/battle.m4a'
     playMusic(musicUrl, { loop: true, volume: 0.3 })
     return () => stopMusic({ delayMs: 500 })
-  }, [playMusic, serverBattle.battleId, serverBattle.config?.music, stopMusic])
+  }, [
+    playMusic,
+    serverBattle.battleId,
+    serverBattle.config?.music,
+    state.sessionId,
+    stopMusic,
+  ])
 
   useEffect(() => {
     if (serverFingerprint === visualFingerprint || isProcessing) return
