@@ -4,7 +4,7 @@
 
 Repeated requests for the currently playing music URL reuse the active player instead of seeking back to the beginning, so entering a battle or catch encounter on the same area track preserves playback position.
 
-Activity replays refresh their session in-app and remount only the activity UI, keeping the shared audio provider alive so replay does not interrupt its music.
+Activity replays refresh their session in-app and remount only the activity UI, keeping the shared audio provider alive so replay does not interrupt its music. Arcade mini-games use the same in-app refresh rather than a full browser reload.
 
 The local originals in `original music/` report Opus audio streams, so transcode them instead of renaming them or converting them to MIDI. That source folder is ignored by Git; only the compressed runtime assets are committed. MIDI playback remains available for explicit `.mid`/`.midi` URLs, but its lightweight synthesized voice cannot reproduce the original recording or instrument timbres.
 
