@@ -147,6 +147,61 @@ function getRepresentativeInventoryItem(
   return inventoryItems[0]
 }
 
+function InventoryNavChip({
+  label,
+  itemId,
+  quantity,
+  isSelected,
+  onSelect,
+}: {
+  label: string
+  itemId?: string
+  quantity: number
+  isSelected: boolean
+  onSelect: () => void
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={`${label}, ${quantity} ${quantity === 1 ? 'item' : 'items'}`}
+      aria-pressed={isSelected}
+      onClick={onSelect}
+      className={cn(
+        'game-focus-ring flex h-11 min-w-[9.75rem] max-w-[12rem] shrink-0 snap-start items-center gap-2 rounded-xl border px-2 text-left transition-colors',
+        isSelected
+          ? 'border-game-charcoal bg-game-charcoal text-game-canvas'
+          : 'border-game-border bg-game-surface text-game-ink hover:bg-game-surface-raised',
+      )}
+    >
+      <span
+        aria-hidden="true"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-game-border/80 bg-game-canvas/90"
+      >
+        {itemId && (
+          <ItemSprite
+            itemId={itemId}
+            alt=""
+            width={28}
+            height={28}
+            className="h-7 w-7 object-contain"
+          />
+        )}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-xs font-semibold">{label}</span>
+        <span
+          className={cn(
+            'mt-0.5 block text-[10px]',
+            isSelected ? 'text-game-canvas/75' : 'text-game-muted',
+          )}
+        >
+          {quantity.toLocaleString()} {quantity === 1 ? 'item' : 'items'}
+        </span>
+      </span>
+    </button>
+  )
+}
+
 function getItemActionLabel(
   item: (typeof items)[number],
   canChannel = false,
@@ -772,137 +827,44 @@ export function InventoryList() {
 
       {groupNavOptions.length > 0 && (
         <SecondaryControlBar className="order-last py-2 lg:order-none lg:border-b lg:border-t-0 lg:bg-game-surface/60 lg:shadow-none lg:backdrop-blur-none">
-          <div className="mb-1 flex items-center justify-between gap-3 px-1">
-            <p className="game-field-label">Bag Pockets</p>
-            <span className="text-xs text-game-muted">
-              {groups.length} {groups.length === 1 ? 'pocket' : 'pockets'}
-            </span>
-          </div>
           <fieldset
             aria-label="Inventory pockets"
-            className="flex snap-x snap-proximity gap-2 overflow-x-auto overscroll-x-contain py-1 [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-game-border-strong [&::-webkit-scrollbar-track]:bg-transparent"
+            className="block w-full min-w-0"
           >
-            {groupNavOptions.map(({ group, itemId, quantity }) => {
-              const isSelected = activeGroup === group
-              const label = INVENTORY_GROUP_LABELS[group] || group
-
-              return (
-                <button
+            <div className="flex w-full min-w-0 max-w-full snap-x snap-proximity gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain py-1 touch-pan-x [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-game-border-strong [&::-webkit-scrollbar-track]:bg-transparent">
+              {groupNavOptions.map(({ group, itemId, quantity }) => (
+                <InventoryNavChip
                   key={group}
-                  type="button"
-                  aria-label={`${label}, ${quantity} ${quantity === 1 ? 'item' : 'items'}`}
-                  aria-pressed={isSelected}
-                  onClick={() => setActiveGroup(group)}
-                  className={cn(
-                    'game-focus-ring flex h-[4.25rem] min-w-[8.25rem] snap-start items-center gap-2 rounded-xl border px-2.5 text-left transition-colors',
-                    isSelected
-                      ? 'border-game-charcoal bg-game-charcoal text-game-canvas'
-                      : 'border-game-border bg-game-surface text-game-ink hover:bg-game-surface-raised',
-                  )}
-                >
-                  <span
-                    aria-hidden="true"
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-game-border/80 bg-game-canvas/90"
-                  >
-                    {itemId && (
-                      <ItemSprite
-                        itemId={itemId}
-                        alt=""
-                        width={36}
-                        height={36}
-                        className="h-9 w-9 object-contain"
-                      />
-                    )}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-semibold">
-                      {label}
-                    </span>
-                    <span
-                      className={cn(
-                        'mt-0.5 block text-[11px]',
-                        isSelected ? 'text-game-canvas/75' : 'text-game-muted',
-                      )}
-                    >
-                      {quantity.toLocaleString()}{' '}
-                      {quantity === 1 ? 'item' : 'items'}
-                    </span>
-                  </span>
-                </button>
-              )
-            })}
+                  label={INVENTORY_GROUP_LABELS[group] || group}
+                  itemId={itemId}
+                  quantity={quantity}
+                  isSelected={activeGroup === group}
+                  onSelect={() => setActiveGroup(group)}
+                />
+              ))}
+            </div>
           </fieldset>
 
           {subCategoryNavOptions.length > 0 && (
-            <div className="mt-1.5">
-              <div className="mb-1 flex items-center justify-between gap-3 px-1">
-                <p className="game-field-label">
-                  In {activeGroup ? INVENTORY_GROUP_LABELS[activeGroup] : 'Pocket'}
-                </p>
-                <span className="text-xs text-game-muted">
-                  {subCategoryNavOptions.length}{' '}
-                  {subCategoryNavOptions.length === 1 ? 'section' : 'sections'}
-                </span>
-              </div>
-              <fieldset
-                aria-label="Inventory sections"
-                className="flex snap-x snap-proximity gap-2 overflow-x-auto overscroll-x-contain py-1 [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-game-border-strong [&::-webkit-scrollbar-track]:bg-transparent"
-              >
+            <fieldset
+              aria-label="Inventory sections"
+              className="mt-1 block w-full min-w-0"
+            >
+              <div className="flex w-full min-w-0 max-w-full snap-x snap-proximity gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain py-1 touch-pan-x [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-game-border-strong [&::-webkit-scrollbar-track]:bg-transparent">
                 {subCategoryNavOptions.map(
-                  ({ subCategory, itemId, quantity }) => {
-                    const isSelected = activeSubCategory === subCategory
-                    const label = getInventorySubCategoryLabel(subCategory)
-
-                    return (
-                      <button
-                        key={subCategory}
-                        type="button"
-                        aria-label={`${label}, ${quantity} ${quantity === 1 ? 'item' : 'items'}`}
-                        aria-pressed={isSelected}
-                        onClick={() => setActiveSubCategory(subCategory)}
-                        className={cn(
-                          'game-focus-ring flex h-11 min-w-[9.75rem] max-w-[12rem] snap-start items-center gap-2 rounded-xl border px-2 text-left transition-colors',
-                          isSelected
-                            ? 'border-game-charcoal bg-game-charcoal text-game-canvas'
-                            : 'border-game-border bg-game-surface text-game-ink hover:bg-game-surface-raised',
-                        )}
-                      >
-                        <span
-                          aria-hidden="true"
-                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-game-border/80 bg-game-canvas/90"
-                        >
-                          {itemId && (
-                            <ItemSprite
-                              itemId={itemId}
-                              alt=""
-                              width={28}
-                              height={28}
-                              className="h-7 w-7 object-contain"
-                            />
-                          )}
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate text-xs font-semibold">
-                            {label}
-                          </span>
-                          <span
-                            className={cn(
-                              'mt-0.5 block text-[10px]',
-                              isSelected
-                                ? 'text-game-canvas/75'
-                                : 'text-game-muted',
-                            )}
-                          >
-                            {quantity.toLocaleString()}{' '}
-                            {quantity === 1 ? 'item' : 'items'}
-                          </span>
-                        </span>
-                      </button>
-                    )
-                  },
+                  ({ subCategory, itemId, quantity }) => (
+                    <InventoryNavChip
+                      key={subCategory}
+                      label={getInventorySubCategoryLabel(subCategory)}
+                      itemId={itemId}
+                      quantity={quantity}
+                      isSelected={activeSubCategory === subCategory}
+                      onSelect={() => setActiveSubCategory(subCategory)}
+                    />
+                  ),
                 )}
-              </fieldset>
-            </div>
+              </div>
+            </fieldset>
           )}
         </SecondaryControlBar>
       )}
