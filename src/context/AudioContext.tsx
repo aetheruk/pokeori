@@ -112,6 +112,12 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const [isAudioEnabled, setIsAudioEnabledState] = useState(true)
   const [isMusicPlaying, setIsMusicPlaying] = useState(false)
   const [currentMusicUrl, setCurrentMusicUrl] = useState<string | null>(null)
+  const currentMusicUrlRef = useRef<string | null>(null)
+
+  const updateCurrentMusicUrl = useCallback((url: string | null) => {
+    currentMusicUrlRef.current = url
+    setCurrentMusicUrl(url)
+  }, [])
 
   const releaseAudio = useCallback((audio: HTMLAudioElement | null) => {
     if (!audio) return
@@ -216,7 +222,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       musicGenerationRef.current += 1
       pendingMusicRef.current = null
       setIsMusicPlaying(false)
-      setCurrentMusicUrl(null)
+      updateCurrentMusicUrl(null)
 
       if (musicRef.current) {
         releaseAudio(musicRef.current)
@@ -238,7 +244,12 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         }
       }
     },
-    [clearFadeInterval, clearStopMusicTimer, releaseAudio],
+    [
+      clearFadeInterval,
+      clearStopMusicTimer,
+      releaseAudio,
+      updateCurrentMusicUrl,
+    ],
   )
 
   const toggleAudioEnabled = useCallback(() => {
@@ -296,7 +307,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       if (!audioToStop && !midiToStop) {
         clearFadeInterval()
         setIsMusicPlaying(false)
-        setCurrentMusicUrl(null)
+        updateCurrentMusicUrl(null)
         return
       }
 
@@ -306,7 +317,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
             if (musicRef.current === audioToStop) {
               musicRef.current = null
               setIsMusicPlaying(false)
-              setCurrentMusicUrl(null)
+              updateCurrentMusicUrl(null)
             }
           })
         }
@@ -314,7 +325,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
           if (midiMusicRef.current === midiToStop) {
             midiMusicRef.current = null
             setIsMusicPlaying(false)
-            setCurrentMusicUrl(null)
+            updateCurrentMusicUrl(null)
           }
         })
       } else {
@@ -324,10 +335,16 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         midiToStop?.stop()
         midiMusicRef.current = null
         setIsMusicPlaying(false)
-        setCurrentMusicUrl(null)
+        updateCurrentMusicUrl(null)
       }
     },
-    [fadeOutMusic, clearFadeInterval, releaseAudio, clearStopMusicTimer],
+    [
+      fadeOutMusic,
+      clearFadeInterval,
+      releaseAudio,
+      clearStopMusicTimer,
+      updateCurrentMusicUrl,
+    ],
   )
 
   // Stop music
@@ -370,7 +387,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       if (/\.(?:mid|midi)(?:[?#]|$)/i.test(url)) {
         const volume = options?.volume ?? 0.5
         setIsMusicPlaying(false)
-        setCurrentMusicUrl(url)
+        updateCurrentMusicUrl(url)
         pendingMusicRef.current = url
 
         void createMidiMusicPlayer(url, {
@@ -398,7 +415,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
               }
               pendingMusicRef.current = null
               setIsMusicPlaying(true)
-              setCurrentMusicUrl(url)
+              updateCurrentMusicUrl(url)
             })
           })
           .catch(() => {
@@ -412,7 +429,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
             midiMusicRef.current = null
             pendingMusicRef.current = null
             setIsMusicPlaying(false)
-            setCurrentMusicUrl(null)
+            updateCurrentMusicUrl(null)
           })
         return
       }
@@ -430,7 +447,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
             return
           }
           setIsMusicPlaying(true)
-          setCurrentMusicUrl(url)
+          updateCurrentMusicUrl(url)
           pendingMusicRef.current = null // Clear pending on success
         })
         .catch(() => {
@@ -441,11 +458,17 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
           // Autoplay blocked - will start on user interaction
           if (process.env.NODE_ENV === 'development')
             console.log('Music autoplay blocked, waiting for user interaction')
-          setCurrentMusicUrl(url)
+          updateCurrentMusicUrl(url)
           pendingMusicRef.current = url // Track as pending for mobile
         })
     },
-    [isAudioEnabled, clearFadeInterval, releaseAudio, clearStopMusicTimer],
+    [
+      isAudioEnabled,
+      clearFadeInterval,
+      releaseAudio,
+      clearStopMusicTimer,
+      updateCurrentMusicUrl,
+    ],
   )
 
   // Change music (with optional fade)
@@ -464,18 +487,23 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
       // If same URL and music IS actively playing, keep it as-is
       // Use musicRef.current directly to avoid dependency on volatile state
+      const activeAudio = musicRef.current
+      const activeAudioMatches =
+        activeAudio &&
+        (activeAudio.src === url || activeAudio.src.endsWith(url))
       if (
-        musicRef.current &&
-        !musicRef.current.paused &&
-        (musicRef.current.src === url || musicRef.current.src.endsWith(url))
+        activeAudioMatches &&
+        (!activeAudio.paused || pendingMusicRef.current === url)
       ) {
+        clearStopMusicTimer()
         return
       }
 
       if (
-        currentMusicUrl === url &&
+        currentMusicUrlRef.current === url &&
         (midiMusicRef.current?.isRunning() || pendingMusicRef.current === url)
       ) {
+        clearStopMusicTimer()
         return
       }
 
@@ -483,7 +511,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       // playMusic already handles stopping current music (including canceling fades)
       playMusic(url)
     },
-    [currentMusicUrl, isAudioEnabled, stopMusic, playMusic],
+    [isAudioEnabled, stopMusic, playMusic, clearStopMusicTimer],
   )
 
   // Resume music on user interaction (for mobile autoplay policy)
@@ -500,7 +528,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
             if (midiMusicRef.current !== midiPlayer) return
             pendingMusicRef.current = null
             setIsMusicPlaying(true)
-            if (url) setCurrentMusicUrl(url)
+            if (url) updateCurrentMusicUrl(url)
           })
           .catch(() => {
             if (midiMusicRef.current === midiPlayer && url) {
@@ -526,7 +554,13 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         .then(() => setIsMusicPlaying(true))
         .catch(() => {})
     }
-  }, [isAudioEnabled, isMusicPlaying, currentMusicUrl, playMusic])
+  }, [
+    isAudioEnabled,
+    isMusicPlaying,
+    currentMusicUrl,
+    playMusic,
+    updateCurrentMusicUrl,
+  ])
 
   // Play Pokemon cry
   const playPokemonCry = useCallback(
