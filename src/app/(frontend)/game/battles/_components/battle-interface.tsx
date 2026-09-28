@@ -219,12 +219,8 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
   useEffect(() => {
     if (initialState.status !== 'ongoing') return
 
-    const musicUrl = initialState.config?.music
-    if (musicUrl) {
-      playMusic(musicUrl, { loop: true, volume: 0.3 })
-    } else {
-      stopMusic()
-    }
+    const musicUrl = initialState.config?.music || '/music/battle.m4a'
+    playMusic(musicUrl, { loop: true, volume: 0.3 })
 
     return () => {
       stopMusic({ delayMs: 750 })

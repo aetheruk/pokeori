@@ -768,12 +768,8 @@ export default function EncounterPage() {
   // Start music on mount
   useEffect(() => {
     if (!currentLocation || phase === 'result') return
-    const musicUrl = currentLocation.music
-    if (musicUrl) {
-      playMusic(musicUrl, { loop: true, volume: 0.3 })
-    } else {
-      stopMusic()
-    }
+    const musicUrl = currentLocation.music || '/music/battle.m4a'
+    playMusic(musicUrl, { loop: true, volume: 0.3 })
   }, [currentLocation?.id, currentLocation?.music, phase, playMusic, stopMusic])
 
   // Stop music when encounter ends
