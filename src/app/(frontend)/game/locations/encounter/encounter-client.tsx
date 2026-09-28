@@ -19,6 +19,7 @@ import { useAudio } from '@/context/AudioContext'
 import { useUser } from '@/context/UserContext'
 import type { AbilityConfig } from '@/data/abilities'
 import { items } from '@/data/items'
+import { subCategories } from '@/data/sub-region-map'
 import {
   getEncounterSecondChanceModifier,
   getTypeLureAnswerEquivalent,
@@ -768,9 +769,19 @@ export default function EncounterPage() {
   // Start music on mount
   useEffect(() => {
     if (!currentLocation || phase === 'result') return
-    const musicUrl = currentLocation.music || '/music/battle.m4a'
+    const musicUrl =
+      currentLocation.music ||
+      subCategories[currentLocation.subCategory || '']?.music ||
+      '/music/battle.m4a'
     playMusic(musicUrl, { loop: true, volume: 0.3 })
-  }, [currentLocation?.id, currentLocation?.music, phase, playMusic, stopMusic])
+  }, [
+    currentLocation?.id,
+    currentLocation?.music,
+    currentLocation?.subCategory,
+    phase,
+    playMusic,
+    stopMusic,
+  ])
 
   // Stop music when encounter ends
   useEffect(() => {

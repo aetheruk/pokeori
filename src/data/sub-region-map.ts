@@ -152,6 +152,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/vermillion.avif',
     icon: { type: 'trainer', id: 'gym-kanto-ltsurge' },
     description: 'a small coastal city with a large development underway.',
+    music: '/music/vermilion.m4a',
     weatherSlots: {
       1: 'rain',
       2: 'rain',
@@ -241,6 +242,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/saffron.avif',
     icon: { type: 'trainer', id: 'gym-kanto-sabrina' },
     description: 'A city on the east coast, featuring the Pokemon League.',
+    music: '/music/saffron.m4a',
     unlockRequirements: [
       { type: 'task_completed', targetId: 'a-stone-for-a-friend' },
     ],
@@ -277,6 +279,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/fuchsia.avif',
     icon: { type: 'trainer', id: 'gym-kanto-koga' },
     description: 'A city on the south coast, featuring the sprawling Safari Zone',
+    music: '/music/fuchsia.m4a',
     unlockRequirements: [{ type: 'task_completed', targetId: 'on-to-fuchsia-city' }],
             weatherSlots: {
       1: 'rain',
@@ -292,6 +295,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/safari-reserve.avif',
     icon: { type: 'item', id: 'safari-ball' },
     description: 'A huge nature reserve packed with Rare Pokemon.',
+    music: '/music/safari-zone.m4a',
     unlockRequirements: [{ type: 'task_completed', targetId: 'fuchsia-gym-search-for-koga' }],
             weatherSlots: {
       1: 'rain',

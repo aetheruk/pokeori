@@ -4,6 +4,7 @@ import configPromise from '@payload-config'
 import { redis } from '@/utilities/redis'
 import { revalidatePath } from 'next/cache'
 import { battles } from '@/data/battles'
+import { subCategories } from '@/data/sub-region-map'
 import { getEffectiveContent } from '@/utilities/events/server'
 import { getPokemonForm } from '@/utilities/pokemon/pokedex'
 import {
@@ -690,7 +691,12 @@ export async function startBattleFromConfig(
       maxPokemon,
       levelCap: effectiveLevelCap,
       enemyAttackTelegraphChance: battleConfig.enemyAttackTelegraphChance,
-      music: battleConfig.music,
+      music:
+        battleConfig.music ||
+        (battleConfig.subCategory
+          ? subCategories[battleConfig.subCategory]?.music
+          : undefined) ||
+        '/music/battle.m4a',
     },
     playerTrainer: {
       name:

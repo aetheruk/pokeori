@@ -19,7 +19,7 @@ export interface BaseGameConfig {
   rewards: LocationReward[]
   overrides?: string
   background?: string
-  /** Music track to play during the game. Defaults to '/music/minigame.m4a' if not specified. */
+  /** Music track to play during the game. Defaults to sub-region music, then '/music/minigame.m4a'. */
   music?: string
   daily?: boolean
   isRandomEvent?: boolean
