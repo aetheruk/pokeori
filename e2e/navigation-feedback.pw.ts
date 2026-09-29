@@ -24,6 +24,7 @@ for (const width of [390, 1280]) {
       await expect(pokemon.getByRole('status')).toHaveCSS('opacity', '1')
       expect(await pokemon.boundingBox()).toEqual(before)
       await expect(nav.getByRole('link', { name: 'Explore', exact: true })).toBeEnabled()
+      await expect(page.getByRole('button', { name: 'Test game navigation', exact: true })).toBeVisible()
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
     } finally {
       release()

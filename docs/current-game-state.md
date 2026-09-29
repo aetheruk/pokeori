@@ -2,6 +2,8 @@
 
 - Unreleased (`0.42.20`): Rocket Factory's background now shows the dark industrial interior manufacturing Rocket Balls, matching the in-game Rocket Ball design. The area stays locked until its actual access requirement is authored; completing `fuchsia-what-now` alone no longer exposes this unfinished sub-region.
 
+- Unreleased (`0.42.21`): Trainer, Explore, Pokémon, Artisan, Dex, and Inventory navigation prefetches complete dashboard pages. These routes retain the outgoing screen on a cold transition instead of flashing a skeleton. Scoped player data and the Pokémon box reconcile in the background on entry; box reconciliation does not overwrite local edits or pagination. Encounter and secondary collection loading states remain in place. See [navigation performance](features/navigation-performance.md).
+
 - Release `0.42.18`: The repeatable Underground Society `Feed the Pit` task consumes 1,000 Crystals per contribution instead of 5,000, still awarding 100 Society XP.
 
 - Release `0.42.17`: The final Kanto soundtrack batch adds dedicated music for Pewter School, Power Plant, Cycling Road, Rocket Factory, Silph Co, Seafoam Islands, Cinnabar Island, Pokémon Mansion, Cerulean Cave, Victory Road, and Indigo Plateau, and refreshes Viridian City. Rocket opponents use a dedicated battle theme, including Battle Bets; the Saffron takeover blackout uses its own track. Rocket Factory is registered as a Kanto sub-region, unlocked after `fuchsia-what-now`, and uses the Cycling Road scene artwork.

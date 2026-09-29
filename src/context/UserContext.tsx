@@ -97,7 +97,9 @@ export function UserProvider({
               requirements: { skills: {}, currencies: {}, pokedex: {} },
             } as unknown as RequirementData)
           : undefined),
-      revalidateOnMount: initialGameData ? false : undefined,
+      // A fully prefetched route may carry an older server snapshot. Render it
+      // immediately, then reconcile in the background (also on cached revisits).
+      revalidateOnMount: true,
     },
   )
 
@@ -229,9 +231,9 @@ export function UserProvider({
       setUser,
       refreshUser,
       updateUserContext,
-      isLoading,
+      isLoading: isLoading && !resolvedData,
     }),
-    [user, gameData, setUser, refreshUser, updateUserContext, isLoading],
+    [user, gameData, setUser, refreshUser, updateUserContext, isLoading, resolvedData],
   )
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>
