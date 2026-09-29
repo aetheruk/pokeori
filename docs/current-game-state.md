@@ -1,6 +1,8 @@
 # Current Game State
 
-- Unreleased (`0.42.17`): The final Kanto soundtrack batch adds dedicated music for Pewter School, Power Plant, Cycling Road, Rocket Factory, Silph Co, Seafoam Islands, Cinnabar Island, Pokémon Mansion, Cerulean Cave, Victory Road, and Indigo Plateau, and refreshes Viridian City. Rocket opponents use a dedicated battle theme, including Battle Bets; the Saffron takeover blackout uses its own track. Rocket Factory is registered as a Kanto sub-region, unlocked after `fuchsia-what-now`, and uses the Cycling Road scene artwork.
+- Unreleased (`0.42.18`): The repeatable Underground Society `Feed the Pit` task now consumes 1,000 Crystals per contribution instead of 5,000, still awarding 100 Society XP.
+
+- Release `0.42.17`: The final Kanto soundtrack batch adds dedicated music for Pewter School, Power Plant, Cycling Road, Rocket Factory, Silph Co, Seafoam Islands, Cinnabar Island, Pokémon Mansion, Cerulean Cave, Victory Road, and Indigo Plateau, and refreshes Viridian City. Rocket opponents use a dedicated battle theme, including Battle Bets; the Saffron takeover blackout uses its own track. Rocket Factory is registered as a Kanto sub-region, unlocked after `fuchsia-what-now`, and uses the Cycling Road scene artwork.
 
 - Unreleased (`0.40.21`): Brick Breaker and other continuously steered arcade runs pause local prediction when a slow checkpoint has filled the server's 300-input proof window. This prevents long paddle sessions from submitting an invalid checkpoint. If a proof is rejected, Retry resumes from the last server-accepted checkpoint with a three-second countdown instead of resending the same rejected proof. Non-finite steering inputs are discarded before they enter a proof.
 
@@ -10,7 +12,7 @@
 
 - Unreleased: Brick Breaker reward drops now replace a random destructible brick's Pokémon icon, glow, and grant the reward only when that brick is hit before expiration. Surf hazards spread farther into the playable edge lanes as they approach, making side-camping less reliable.
 
-- Unreleased: Underground Society booster box deliveries now award 250 XP. Cal, Marina, and Fern's rematch battles can each be won up to three times for 50 XP per win, while their original training battles remain one-time wins. The repeatable Feed the Pit task consumes 5,000 crystals for 100 Society XP.
+- Unreleased: Underground Society booster box deliveries now award 250 XP. Cal, Marina, and Fern's rematch battles can each be won up to three times for 50 XP per win, while their original training battles remain one-time wins. The repeatable Feed the Pit task awards 100 Society XP.
 
 - Unreleased: Underground Society set showcase tasks now use the Pit-facing description and a short respect-themed exit note. TCG rematch deck wins award 50 Underground Society XP, and Guild XP reward labels resolve from the target guild instead of always naming the Fuchsia Research Institute. Guild charter previews show completed ranks plus only the next rank in full; later rank names, thresholds, icons, and unlocks remain `???`.
 
