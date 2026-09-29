@@ -1,5 +1,6 @@
 'use client'
 
+import { useHaptics } from '@haptics/react'
 import {
   Hammer,
   Loader2,
@@ -329,6 +330,7 @@ function RecipeNavigationChip({
   return (
     <button
       type="button"
+      data-haptic-manual="true"
       aria-label={`${label}, ${recipeCountLabel}`}
       aria-pressed={isSelected}
       onClick={onSelect}
@@ -1541,6 +1543,7 @@ function MixDialog({
 }
 
 export function ArtisanPanel() {
+  const { trigger: triggerHaptic } = useHaptics()
   const scrollClickGuard = useScrollClickGuard()
   const { user, gameData, refreshUser } = useUser()
   const [loadingRecipe, setLoadingRecipe] = useState<string | null>(null)
@@ -1921,10 +1924,14 @@ export function ArtisanPanel() {
           activeCategory={activeCategory}
           activeSubcategory={activeSubcategory}
           onCategorySelect={(category) => {
+            triggerHaptic('selection')
             setActiveCategory(category)
             setActiveSubcategory('all')
           }}
-          onSubcategorySelect={setActiveSubcategory}
+          onSubcategorySelect={(subcategory) => {
+            triggerHaptic('selection')
+            setActiveSubcategory(subcategory)
+          }}
         />
       </SecondaryControlBar>
 
@@ -2004,11 +2011,15 @@ export function ArtisanPanel() {
                   // biome-ignore lint/a11y/useSemanticElements: The keyboard-accessible card contains separate crafting controls that cannot be nested in a button.
                   <div
                     key={recipe.id}
-                    onClick={() => setSelectedRecipe(recipe)}
+                    onClick={() => {
+                      triggerHaptic('selection')
+                      setSelectedRecipe(recipe)
+                    }}
                     onKeyDown={(event) => {
                       if (event.target !== event.currentTarget) return
                       if (event.key === 'Enter' || event.key === ' ') {
                         event.preventDefault()
+                        triggerHaptic('selection')
                         setSelectedRecipe(recipe)
                       }
                     }}
@@ -2016,7 +2027,7 @@ export function ArtisanPanel() {
                     tabIndex={0}
                     aria-label={`View ${recipe.name} recipe`}
                     aria-haspopup="dialog"
-                    data-haptic="selection"
+                    data-haptic-manual="true"
                     className={cn(
                       'game-focus-ring group relative flex items-center gap-4 overflow-hidden rounded-lg border p-4 text-left transition-colors',
                       state.canCraft
@@ -2059,6 +2070,7 @@ export function ArtisanPanel() {
                       <Button
                         type="button"
                         size="icon-sm"
+                        data-haptic-manual="true"
                         disabled={
                           !state.canCraft ||
                           loadingRecipe === recipe.id ||
@@ -2066,6 +2078,7 @@ export function ArtisanPanel() {
                         }
                         onClick={(event) => {
                           event.stopPropagation()
+                          triggerHaptic('selection')
                           startCraft(recipe)
                         }}
                         className={cn(
@@ -2087,6 +2100,7 @@ export function ArtisanPanel() {
                         <Button
                           type="button"
                           size="icon-sm"
+                          data-haptic-manual="true"
                           variant={
                             bulkState?.canCraft ? 'secondary' : 'outline'
                           }
@@ -2097,6 +2111,7 @@ export function ArtisanPanel() {
                           }
                           onClick={(event) => {
                             event.stopPropagation()
+                            triggerHaptic('selection')
                             startCraft(recipe, bulkMultiplier)
                           }}
                           className="h-10 w-10 rounded-lg px-0 text-[11px] font-black"

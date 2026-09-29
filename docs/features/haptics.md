@@ -14,8 +14,9 @@ On iOS, haptic overlays allow native horizontal and vertical panning and pinch
 gestures, so scrollable lists remain usable across Explore, inventory, Artisan,
 crafting, and other app surfaces. Explore activity cards, region and area
 selectors, and scenic choice cards set their targets explicitly. Inventory item
-cards and Artisan recipe cards also receive a target for their card area, while
-their action buttons stay above it. Continuous pointer surfaces
+cards and Artisan recipe cards trigger selection haptics from their click
+handlers so a drag across a card remains a scroll gesture; their nested action
+buttons trigger haptics manually as well. Continuous pointer surfaces
 such as drawing canvases, steering stages, and swipe gestures keep their existing
 pointer behavior instead of receiving a full-size overlay. Flap's outside-
 playfield tap target remains explicitly haptic-enabled.

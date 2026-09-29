@@ -1,5 +1,6 @@
 'use client'
 
+import { useHaptics } from '@haptics/react'
 import {
   Coins,
   Flame,
@@ -167,6 +168,7 @@ function InventoryNavChip({
   return (
     <button
       type="button"
+      data-haptic-manual="true"
       aria-label={`${label}, ${quantity} ${quantity === 1 ? 'item' : 'items'}`}
       aria-pressed={isSelected}
       onClick={onSelect}
@@ -351,6 +353,7 @@ function getInventoryDisplayLabel(
 }
 
 export function InventoryList() {
+  const { trigger: triggerHaptic } = useHaptics()
   const scrollClickGuard = useScrollClickGuard()
   const { user, gameData, refreshUser } = useUser()
   const router = useRouter()
@@ -857,7 +860,10 @@ export function InventoryList() {
                   itemId={itemId}
                   quantity={quantity}
                   isSelected={activeGroup === group}
-                  onSelect={() => setActiveGroup(group)}
+                  onSelect={() => {
+                    triggerHaptic('selection')
+                    setActiveGroup(group)
+                  }}
                 />
               ))}
             </div>
@@ -877,7 +883,10 @@ export function InventoryList() {
                       itemId={itemId}
                       quantity={quantity}
                       isSelected={activeSubCategory === subCategory}
-                      onSelect={() => setActiveSubCategory(subCategory)}
+                      onSelect={() => {
+                        triggerHaptic('selection')
+                        setActiveSubCategory(subCategory)
+                      }}
                     />
                   ),
                 )}
@@ -933,8 +942,12 @@ export function InventoryList() {
               <InventoryItemCard
                 key={item.id}
                 item={item}
-                onClick={(details) => setSelectedItem(details)}
+                onClick={(details) => {
+                  triggerHaptic('selection')
+                  setSelectedItem(details)
+                }}
                 onAction={(details) => {
+                  triggerHaptic('selection')
                   if (details.sellValue) {
                     requestSellItem(details, 1)
                     return
@@ -942,7 +955,10 @@ export function InventoryList() {
 
                   handleUseInventoryItem(details)
                 }}
-                onBulkAction={(details) => handleOpenAllBoosterPacks(details)}
+                onBulkAction={(details) => {
+                  triggerHaptic('selection')
+                  handleOpenAllBoosterPacks(details)
+                }}
                 disabledAction={isUsing || isSelling}
               />
             ))}
@@ -1304,22 +1320,26 @@ const InventoryItemCard = memo(function InventoryItemCard({
     item.quantity > 1 &&
     !!onBulkAction
 
+  const openItem = () => {
+    onClick(item.details)
+  }
+
   return (
     // biome-ignore lint/a11y/useSemanticElements: The card contains separate item-action buttons; a native outer button would nest interactive controls.
     <div
-      onClick={() => onClick(item.details)}
+      onClick={openItem}
       onKeyDown={(event) => {
         if (event.target !== event.currentTarget) return
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault()
-          onClick(item.details)
+          openItem()
         }
       }}
       role="button"
       tabIndex={0}
       aria-label={`View ${item.details.name}`}
       aria-haspopup="dialog"
-      data-haptic="selection"
+      data-haptic-manual="true"
       className="game-focus-ring group relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-lg border border-game-border bg-game-surface p-3 transition-colors hover:border-game-moss/45 hover:bg-game-surface-raised"
     >
       <div className="relative shrink-0">
@@ -1365,6 +1385,7 @@ const InventoryItemCard = memo(function InventoryItemCard({
             <Button
               type="button"
               size="icon-sm"
+              data-haptic-manual="true"
               disabled={disabledAction}
               className="h-10 w-10 rounded-lg bg-game-clay text-game-cream hover:bg-game-clay-strong"
               onClick={(event) => {
@@ -1380,6 +1401,7 @@ const InventoryItemCard = memo(function InventoryItemCard({
               <Button
                 type="button"
                 size="icon-sm"
+                data-haptic-manual="true"
                 disabled={disabledAction}
                 className="h-10 w-10 rounded-lg bg-game-clay text-game-cream hover:bg-game-clay/90"
                 onClick={(event) => {
