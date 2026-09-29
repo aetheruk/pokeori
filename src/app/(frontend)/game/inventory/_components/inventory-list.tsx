@@ -655,6 +655,7 @@ export function InventoryList() {
     ? canChannelItem(selectedItem.id, inventoryMap, gameData?.gameResults)
     : false
   const hasChannelingBook = (inventoryMap[BOOK_OF_CHANNELING_ITEM_ID] || 0) > 0
+  const selectedItemIsBook = selectedItem?.category === 'books'
   const selectedItemDescription = getInventoryItemDescription(
     selectedItem,
     hasChannelingBook,
@@ -967,9 +968,26 @@ export function InventoryList() {
         open={!!selectedItem}
         onOpenChange={(open) => !open && setSelectedItem(null)}
         title={selectedItem?.name || ''}
-        description={isTmOrHmItem ? undefined : selectedItemDescription}
-        descriptionInHero
+        description={
+          isTmOrHmItem || selectedItemIsBook
+            ? undefined
+            : selectedItemDescription
+        }
+        descriptionInHero={!selectedItemIsBook}
         background="/backgrounds/artisan-workshop.avif"
+        propertiesSectionTitle="INFO"
+        afterProperties={
+          selectedItemIsBook && selectedItemDescription ? (
+            <div className="space-y-4">
+              <SectionDivider>BOOK CONTENT</SectionDivider>
+              <div className="border-y border-game-border/75 py-4">
+                <p className="whitespace-pre-wrap text-left text-sm font-medium leading-relaxed text-game-ink md:text-base">
+                  {selectedItemDescription}
+                </p>
+              </div>
+            </div>
+          ) : undefined
+        }
         category={
           selectedItemDisplayPlacement
             ? selectedItemDisplayPlacement.group === 'tms' &&

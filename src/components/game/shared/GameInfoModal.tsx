@@ -102,6 +102,8 @@ interface GameInfoModalProps {
   criteria?: RewardItem[]
   taskProgress?: TaskProgressData
   children?: ReactNode
+  afterProperties?: ReactNode
+  propertiesSectionTitle?: string
   actionButton?: ReactNode
   className?: string
   isCaught?: boolean
@@ -135,6 +137,8 @@ export function GameInfoModal({
   criteria,
   taskProgress,
   children,
+  afterProperties,
+  propertiesSectionTitle = 'RULES',
   actionButton,
   className,
   isCaught,
@@ -410,7 +414,7 @@ export function GameInfoModal({
             <div className="grid grid-cols-1 gap-7 md:grid-cols-2 md:gap-x-8">
               {hasProperties && (
                 <div className="space-y-4">
-                  <SectionDivider>RULES</SectionDivider>
+                  <SectionDivider>{propertiesSectionTitle}</SectionDivider>
                   <div
                     className={cn(
                       isDrawer
@@ -475,6 +479,8 @@ export function GameInfoModal({
               )}
             </div>
           )}
+
+          {afterProperties}
         </div>
       </div>
 
