@@ -1,5 +1,7 @@
 # Current Game State
 
+- Unreleased (`0.42.25`): Spirit Channeling lets players try any owned Pokemon without revealing hidden channeler requirements in the picker. Ritual answers stay in the server config; incompatible attempts fail without consuming offerings and return an indirect clue. Field Observation pickups now update immediately on the client. Every drop gets a fresh random ID per round, and one completion request submits collected IDs and elapsed times for checking against that session's private Redis drop list and spawn windows before rewards are granted.
+
 - Unreleased (`0.42.22`): Explore preloads the eligible Active Events snapshot with the page data so Active Events and the player-data-derived VS Seeker card appear with the first rendered list, avoiding late insertions that shift content. The grid now updates when the events card changes independently of its other items.
 
 - Unreleased (`0.42.20`): Rocket Factory's background now shows the dark industrial interior manufacturing Rocket Balls, matching the in-game Rocket Ball design. The area stays locked until its actual access requirement is authored; completing `fuchsia-what-now` alone no longer exposes this unfinished sub-region.

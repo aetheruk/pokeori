@@ -1,7 +1,6 @@
 'use server'
 
 import {
-  collectFieldObservationDrop,
   completeGameActivity,
   getGameActivityState,
   startGameActivity,
@@ -24,20 +23,22 @@ export async function submitFieldResearchAnswer(answer: unknown) {
   return submitGameActivityAnswer('field-research', answer)
 }
 
-export async function collectFieldResearchDrop(dropId: string) {
-  return collectFieldObservationDrop(dropId)
-}
-
 export async function completeFieldResearch(
   fieldResearchId: string,
   success: boolean,
-  finalScore?: number,
+  collectedDropClaims: { id: string; elapsedMs: number }[] = [],
 ) {
   return completeGameActivity(
     'field-research',
     fieldResearchId,
     success,
-    finalScore,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    collectedDropClaims,
   )
 }
 

@@ -63,10 +63,9 @@ import { getMove } from '@/data/moves'
 import type { MoveConfig } from '@/data/moves/types'
 import {
   BOOK_OF_CHANNELING_ITEM_ID,
-  getSpiritChannelingActivityId,
-  getSpiritChannelingConfigForMemento,
+  getSpiritChannelingActivityIdForMemento,
   isSpiritChannelingMementoItem,
-} from '@/data/spirit-channeling'
+} from '@/data/spirit-channeling-public'
 import { TaskIcon } from '@/data/types'
 import { cn } from '@/lib/utils'
 import { isPokemonTargetedInventoryItem } from '@/utilities/pokemon/item-usability'
@@ -264,9 +263,7 @@ function canChannelItem(
 ) {
   if (!isSpiritChannelingMementoItem(itemId)) return false
   if ((inventoryMap[BOOK_OF_CHANNELING_ITEM_ID] || 0) <= 0) return false
-  const config = getSpiritChannelingConfigForMemento(itemId)
-  if (!config) return false
-  const activityId = getSpiritChannelingActivityId(config)
+  const activityId = getSpiritChannelingActivityIdForMemento(itemId)
   return !(gameResults || []).some(
     (entry) => entry.gameId === activityId && (entry.wins || 0) > 0,
   )

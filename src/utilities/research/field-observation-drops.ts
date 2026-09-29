@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { items } from '@/data/items'
 import pokemonData from '@/data/pokemon-data'
 import type { Reward } from '@/data/types'
@@ -186,14 +187,13 @@ export function buildFieldObservationCollectibleDrops({
   const durationMultiplier = getDurationMultiplier(collectibleModifiers)
 
   return selectedRewards.map(
-    ({ reward, kind, displayItemId, displayLabel, displayRarity }, index) =>
+    ({ reward, kind, displayItemId, displayLabel, displayRarity }) =>
     scheduleCollectibleDrop({
       reward: { ...applyQuantityBonus(reward, collectibleModifiers), dropChance: 100 },
       kind,
       displayItemId,
       displayLabel,
       displayRarity,
-      index,
       spawns,
       observationDurationMs,
       durationMultiplier,
@@ -278,7 +278,6 @@ function scheduleCollectibleDrop({
   displayItemId,
   displayLabel,
   displayRarity,
-  index,
   spawns,
   observationDurationMs,
   durationMultiplier,
@@ -289,7 +288,6 @@ function scheduleCollectibleDrop({
   displayItemId?: string
   displayLabel?: string
   displayRarity?: string | null
-  index: number
   spawns: FieldObservationSpawn[]
   observationDurationMs: number
   durationMultiplier: number
@@ -311,7 +309,7 @@ function scheduleCollectibleDrop({
     : Math.round(randomRange(500, latestStart, random))
 
   return {
-    id: `drop-${index}-${itemId}`,
+    id: randomUUID(),
     itemId,
     label: displayLabel || getItemName(itemId),
     kind,

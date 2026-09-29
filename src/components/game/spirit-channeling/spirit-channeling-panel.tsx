@@ -23,25 +23,18 @@ import { useUser } from '@/context/UserContext'
 import { items } from '@/data/items'
 import {
   BOOK_OF_CHANNELING_ITEM_ID,
-  getSpiritChannelingActivityId,
-  getSpiritChannelingConfigForMemento,
+  getSpiritChannelingActivityIdForMemento,
   getSpiritChannelingOfferedEnergy,
-  SPIRIT_CHANNELING_CONFIGS,
   SPIRIT_CHANNELING_INCENSE_ITEMS,
+  SPIRIT_CHANNELING_MEMENTO_ITEM_IDS,
   SPIRIT_CHANNELING_OFFERING_ITEMS,
-  type SpiritChannelingConfig,
   type SpiritChannelingOfferingItem,
-} from '@/data/spirit-channeling'
+} from '@/data/spirit-channeling-public'
 import { cn } from '@/lib/utils'
 import type { Pokemon } from '@/payload-types'
 import { getOwnedPokemonGender } from '@/utilities/pokemon/gender'
 import { getPokemonForm, getPokemonImageUrl } from '@/utilities/pokemon/pokedex'
 import { beginSpiritChanneling } from '@/utilities/spirit-channeling/actions'
-import {
-  canPokemonSpiritChannel,
-  getSpiritChannelerIneligibilityReason,
-  getSpiritChannelerRequirementLabel,
-} from '@/utilities/spirit-channeling/eligibility'
 
 type OfferingSlot = {
   itemId: string
@@ -108,19 +101,18 @@ export function SpiritChannelingPanel() {
   )
 
   const hasBook = (inventoryMap[BOOK_OF_CHANNELING_ITEM_ID] || 0) > 0
-  const availableConfigs = useMemo(
+  const availableMementoIds = useMemo(
     () =>
-      SPIRIT_CHANNELING_CONFIGS.filter((config) => {
-        if ((inventoryMap[config.mementoItemId] || 0) <= 0) return false
+      SPIRIT_CHANNELING_MEMENTO_ITEM_IDS.filter((mementoItemId) => {
+        if ((inventoryMap[mementoItemId] || 0) <= 0) return false
         return !isChannelingComplete(
           gameData?.gameResults,
-          getSpiritChannelingActivityId(config),
+          getSpiritChannelingActivityIdForMemento(mementoItemId),
         )
       }),
     [gameData?.gameResults, inventoryMap],
   )
 
-  const selectedConfig = getSpiritChannelingConfigForMemento(selectedMementoId)
   const headerTitle = selectedMementoId
     ? itemName(selectedMementoId)
     : 'Channeling'
@@ -149,28 +141,26 @@ export function SpiritChannelingPanel() {
   const selectedPokemon = ownedPokemon.find(
     (pokemon) => pokemon.id === selectedPokemonId,
   )
-  const selectedPokemonEligible = Boolean(
-    selectedConfig && canPokemonSpiritChannel(selectedPokemon, selectedConfig),
-  )
+  const hasSelectedPokemon = Boolean(selectedPokemon)
 
   useEffect(() => {
-    if (!hasBook || availableConfigs.length === 0) {
+    if (!hasBook || availableMementoIds.length === 0) {
       setSelectedMementoId('')
       return
     }
 
-    const requestedConfig = availableConfigs.find(
-      (config) => config.mementoItemId === requestedMemento,
+    const requestedMementoId = availableMementoIds.find(
+      (mementoItemId) => mementoItemId === requestedMemento,
     )
-    const currentConfig = availableConfigs.find(
-      (config) => config.mementoItemId === selectedMementoId,
+    const currentMementoIsAvailable = availableMementoIds.includes(
+      selectedMementoId as (typeof SPIRIT_CHANNELING_MEMENTO_ITEM_IDS)[number],
     )
-    if (requestedConfig) {
-      setSelectedMementoId(requestedConfig.mementoItemId)
-    } else if (!currentConfig) {
-      setSelectedMementoId(availableConfigs[0].mementoItemId)
+    if (requestedMementoId) {
+      setSelectedMementoId(requestedMementoId)
+    } else if (!currentMementoIsAvailable) {
+      setSelectedMementoId(availableMementoIds[0])
     }
-  }, [availableConfigs, hasBook, requestedMemento, selectedMementoId])
+  }, [availableMementoIds, hasBook, requestedMemento, selectedMementoId])
 
   useEffect(() => {
     if (
@@ -270,14 +260,14 @@ export function SpiritChannelingPanel() {
 
   const canSubmit =
     hasBook &&
-    !!selectedConfig &&
+    !!selectedMementoId &&
     !!selectedIncenseId &&
-    selectedPokemonEligible &&
+    hasSelectedPokemon &&
     offeringSlots.some((slot) => slot.itemId) &&
     !submitting
 
   const handleBegin = useCallback(async () => {
-    if (!selectedConfig || !canSubmit) return
+    if (!selectedMementoId || !canSubmit) return
 
     setSubmitting(true)
     setCeremonyMessage('')
@@ -292,7 +282,7 @@ export function SpiritChannelingPanel() {
     try {
       const [result] = await Promise.all([
         beginSpiritChanneling({
-          mementoItemId: selectedConfig.mementoItemId,
+          mementoItemId: selectedMementoId,
           incenseItemId: selectedIncenseId,
           pokemonId: selectedPokemonId,
           offerings: offeringSlots
@@ -335,7 +325,7 @@ export function SpiritChannelingPanel() {
     canSubmit,
     offeringSlots,
     refreshUser,
-    selectedConfig,
+    selectedMementoId,
     selectedIncenseId,
     selectedPokemonId,
   ])
@@ -354,7 +344,7 @@ export function SpiritChannelingPanel() {
           </div>
         ) : !hasBook ? (
           <EmptyState itemId={BOOK_OF_CHANNELING_ITEM_ID} title="Locked" />
-        ) : availableConfigs.length === 0 ? (
+        ) : availableMementoIds.length === 0 ? (
           <EmptyState itemId="incense-memory" title="No Mementos" />
         ) : (
           <div className="mx-auto w-full max-w-3xl overflow-x-hidden px-4 pb-5 pt-4 md:px-6">
@@ -369,7 +359,6 @@ export function SpiritChannelingPanel() {
                   />
                   <ChannelerSelector
                     pokemon={selectedPokemon}
-                    requirement={selectedConfig}
                     disabled={ownedPokemon.length === 0}
                     onOpen={() => setIsPokemonModalOpen(true)}
                   />
@@ -434,7 +423,7 @@ export function SpiritChannelingPanel() {
         )}
       </div>
 
-      {!isLoading && hasBook && availableConfigs.length > 0 && (
+      {!isLoading && hasBook && availableMementoIds.length > 0 && (
         <div className="shrink-0 border-t border-game-border bg-game-surface/95 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 backdrop-blur md:hidden">
           <ChannelingButton
             canSubmit={canSubmit}
@@ -473,7 +462,6 @@ export function SpiritChannelingPanel() {
         onOpenChange={setIsPokemonModalOpen}
         pokemon={ownedPokemon}
         selectedPokemonId={selectedPokemonId}
-        requirement={selectedConfig}
         onSelect={(pokemonId) => {
           setSelectedPokemonId(pokemonId)
           setIsPokemonModalOpen(false)
@@ -692,12 +680,10 @@ function OfferingPickerDialog({
 
 function ChannelerSelector({
   pokemon,
-  requirement,
   disabled,
   onOpen,
 }: {
   pokemon: Pokemon | undefined
-  requirement: SpiritChannelingConfig | undefined
   disabled: boolean
   onOpen: () => void
 }) {
@@ -709,11 +695,6 @@ function ChannelerSelector({
         getOwnedPokemonGender(pokemon),
       )
     : ''
-  const ineligibilityReason = requirement
-    ? getSpiritChannelerIneligibilityReason(pokemon, requirement)
-    : null
-  const isIneligible = Boolean(pokemon && ineligibilityReason)
-
   return (
     <div className="flex min-w-0 flex-col items-center">
       <button
@@ -723,9 +704,7 @@ function ChannelerSelector({
         className={cn(
           'game-focus-ring relative flex h-[72px] w-[72px] items-center justify-center rounded-lg border transition-colors disabled:opacity-50',
           pokemon
-            ? isIneligible
-              ? 'border-game-ochre bg-game-ochre/10'
-              : 'border-game-moss/60 bg-game-moss/10'
+            ? 'border-game-moss/60 bg-game-moss/10'
             : 'border-game-border bg-game-surface/55 hover:border-game-moss/45',
         )}
         aria-label="Select channeler"
@@ -745,10 +724,8 @@ function ChannelerSelector({
       </button>
       <div
         className={cn(
-          'mt-2 min-h-4 max-w-28 truncate px-1 text-center text-xs font-medium',
-          isIneligible ? 'text-game-ochre' : 'text-game-ink',
+          'mt-2 min-h-4 max-w-28 truncate px-1 text-center text-xs font-medium text-game-ink',
         )}
-        title={ineligibilityReason || undefined}
       >
         {disabled
           ? 'No Pokemon'
@@ -765,14 +742,12 @@ function PokemonPickerDialog({
   onOpenChange,
   pokemon,
   selectedPokemonId,
-  requirement,
   onSelect,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
   pokemon: Pokemon[]
   selectedPokemonId: string
-  requirement: SpiritChannelingConfig | undefined
   onSelect: (pokemonId: string) => void
 }) {
   const [query, setQuery] = useState('')
@@ -790,10 +765,6 @@ function PokemonPickerDialog({
       }),
     [normalizedQuery, pokemon],
   )
-  const requirementLabel = requirement
-    ? getSpiritChannelerRequirementLabel(requirement)
-    : 'Choose a Pokemon'
-
   useEffect(() => {
     if (!open) setQuery('')
   }, [open])
@@ -806,7 +777,7 @@ function PokemonPickerDialog({
             Channeler
           </DialogTitle>
           <DialogDescription className="mt-1 pr-8 text-left text-xs text-game-muted">
-            {requirementLabel}
+            Choose a Pokemon to channel this memory.
           </DialogDescription>
 
           <div className="relative mt-4 shrink-0">
@@ -841,21 +812,14 @@ function PokemonPickerDialog({
                   !!entry.shiny,
                   getOwnedPokemonGender(entry),
                 )
-                const ineligibilityReason = requirement
-                  ? getSpiritChannelerIneligibilityReason(entry, requirement)
-                  : null
-                const eligible = !ineligibilityReason
-
                 return (
                   <button
                     key={entry.id}
                     type="button"
                     onClick={() => onSelect(entry.id)}
-                    disabled={!eligible}
                     aria-pressed={selectedPokemonId === entry.id}
-                    title={ineligibilityReason || undefined}
                     className={cn(
-                      'flex min-h-16 w-full min-w-0 items-center gap-3 rounded-lg border p-2 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-55',
+                      'flex min-h-16 w-full min-w-0 items-center gap-3 rounded-lg border p-2 text-left transition-colors',
                       selectedPokemonId === entry.id
                         ? 'border-game-moss bg-game-moss/10 text-game-ink'
                         : 'border-game-border bg-game-surface-raised/55 text-game-ink hover:border-game-moss/45',
@@ -874,14 +838,8 @@ function PokemonPickerDialog({
                       <span className="block truncate text-xs font-black uppercase text-game-ink">
                         {pokemonDisplayName(entry)}
                       </span>
-                      <span
-                        className={cn(
-                          'mt-1 block font-mono text-xs font-bold',
-                          eligible ? 'text-game-muted' : 'text-game-ochre',
-                        )}
-                      >
+                      <span className="mt-1 block font-mono text-xs font-bold text-game-muted">
                         LVL {entry.level}
-                        {ineligibilityReason ? ` · ${ineligibilityReason}` : ''}
                       </span>
                     </span>
                   </button>

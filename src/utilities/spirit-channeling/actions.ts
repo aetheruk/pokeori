@@ -29,6 +29,7 @@ import {
   type RewardSummary,
 } from '@/utilities/rewards/reward-logic'
 import {
+  getSpiritChannelerIneligibilityClue,
   getSpiritChannelerIneligibilityReason,
   type SpiritChannelerCandidate,
 } from '@/utilities/spirit-channeling/eligibility'
@@ -253,7 +254,7 @@ export async function beginSpiritChanneling(
           return {
             success: false,
             outcome: 'weak-pokemon',
-            message: channelerError,
+            message: getSpiritChannelerIneligibilityClue(pokemon, config),
           }
         }
 
