@@ -1285,7 +1285,9 @@ export function BalanceDialog({
             // Pointer input is scored above at press time. Detail 0 keeps
             // keyboard and assistive-technology activation available
             // without counting the synthetic post-touch click twice.
-            if (event.detail === 0) lockCurrent()
+            if (event.detail === 0 && event.nativeEvent.isTrusted) {
+              lockCurrent()
+            }
           }}
           className={cn(
             'game-focus-ring h-16 w-full touch-manipulation select-none rounded-xl border text-sm font-black uppercase tracking-[0.2em] transition-colors',
@@ -2009,6 +2011,7 @@ export function ArtisanPanel() {
                     tabIndex={0}
                     aria-label={`View ${recipe.name} recipe`}
                     aria-haspopup="dialog"
+                    data-haptic="selection"
                     className={cn(
                       'game-focus-ring group relative flex items-center gap-4 overflow-hidden rounded-lg border p-4 text-left transition-colors',
                       state.canCraft

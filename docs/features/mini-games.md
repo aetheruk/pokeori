@@ -2,6 +2,13 @@
 
 28 mini-game types plus the separate Field Research activity are available in Pokeori.
 
+The frontend shares one `@haptics/react` provider. Buttons, links, and accessible
+custom controls use the selection haptic on supported devices, including battle,
+catch, Field Research, inventory, and mini-game controls. Flap keeps its direct
+outside-playfield tap haptic. Drawing canvases and full continuous-steering
+playfields keep their existing pointer handling, while their surrounding controls
+use the shared feedback. Haptics respect the device's reduced-motion setting.
+
 Game results now use server-held answers, validated puzzle transcripts, server simulation, or server-scored artwork according to the mode. Match 3 owns its board, swaps, cascades, score and revision on the server; Pachinko settles the server-simulated launch before returning playback. TCG Inspection and Diglett use server-issued rounds and stored scores. The [authority inventory](../audit/game-authority-verification-2026-09-07.md) records the contract for every authored game type, including separate Field Research.
 
 Shared result summaries display Other first, ordinary item and currency Rewards next, then Pokemon EXP, Skill EXP, Guild progress, and Research.

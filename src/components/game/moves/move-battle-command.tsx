@@ -98,7 +98,9 @@ export function MoveBattleCommand({
         openDetails(false)
       }}
       onClick={(event) => {
-        if (suppressClick.current && event.detail !== 0) {
+        const isTrustedKeyboardActivation =
+          event.detail === 0 && event.nativeEvent.isTrusted
+        if (suppressClick.current && !isTrustedKeyboardActivation) {
           suppressClick.current = false
           event.preventDefault()
           return

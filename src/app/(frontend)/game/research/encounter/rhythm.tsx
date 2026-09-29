@@ -197,7 +197,10 @@ export function RhythmGame({ encounter, initialState }: RhythmGameProps) {
                         e.preventDefault()
                         handleIconClick(icon.id)
                       }}
-                      onClick={(event) => { if (event.detail === 0) handleIconClick(icon.id) }}
+                      onClick={(event) => {
+                        if (event.detail === 0 && event.nativeEvent.isTrusted)
+                          handleIconClick(icon.id)
+                      }}
                       aria-label={icon.label || `Play ${icon.id}`}
                       disabled={gameEnded || countdown > 0}
                     >

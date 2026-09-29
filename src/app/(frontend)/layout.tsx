@@ -6,6 +6,7 @@ import type { Metadata, Viewport } from 'next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 import { headers } from 'next/headers'
+import { FrontendHapticsProvider } from '@/components/haptics/frontend-haptics-provider'
 
 export const metadata: Metadata = {
   title: 'Pokeori',
@@ -45,8 +46,10 @@ export default async function RootLayout({
         >
           <PwaRegister />
           <PwaEdgeNavigationGuard />
-          {children}
-          <Toaster position="top-center" />
+          <FrontendHapticsProvider>
+            {children}
+            <Toaster position="top-center" />
+          </FrontendHapticsProvider>
         </ThemeProvider>
       </body>
     </html>

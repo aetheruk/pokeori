@@ -371,6 +371,7 @@ function ExploreListContent({
     // biome-ignore lint/a11y/noStaticElementInteractions: Delegated pointer taps have an equivalent native Struggle button for keyboard users.
     <div
       role="presentation"
+      data-haptic={isTakeover ? 'selection' : undefined}
       onClick={handleBlackoutTap}
       onKeyDown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') event.stopPropagation()
