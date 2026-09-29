@@ -26,6 +26,7 @@ export function FilterBar({
       <div className="grid grid-cols-[1fr_1fr_auto] gap-3">
         <button
           type="button"
+          data-haptic="selection"
           onClick={onOpenRegionModal}
           className="game-focus-ring flex h-12 min-w-0 items-center gap-2 rounded-lg border border-game-border bg-game-surface px-3 text-left text-sm font-medium text-game-ink transition-colors hover:border-game-moss/40"
         >
@@ -37,6 +38,7 @@ export function FilterBar({
         </button>
         <button
           type="button"
+          data-haptic="selection"
           onClick={onOpenAreaModal}
           className="game-focus-ring flex h-12 min-w-0 items-center gap-2 rounded-lg border border-game-border bg-game-surface px-3 text-left text-sm font-medium text-game-ink transition-colors hover:border-game-moss/40 disabled:opacity-50"
           disabled={isDailies}
@@ -49,6 +51,7 @@ export function FilterBar({
         </button>
         <button
           type="button"
+          data-haptic="selection"
           onClick={isDailies ? onReturnFromDailies : onOpenDailies}
           aria-label={isDailies ? 'Return to Area' : 'Open Active Dailies'}
           className="game-focus-ring h-12 w-12 rounded-lg border border-game-border bg-game-surface text-game-moss-strong transition-colors hover:border-game-moss/40"

@@ -180,6 +180,8 @@ function ExploreCardComponent({
             : 'border-game-card-border bg-game-surface hover:border-game-charcoal/35 hover:bg-game-surface-raised',
         centered && 'justify-center',
       )}
+      data-haptic-scroll-axis="y"
+      data-haptic={isInteractive ? 'selection' : undefined}
       role={isInteractive ? 'button' : undefined}
       tabIndex={isInteractive ? 0 : undefined}
       aria-label={isInteractive ? `Open ${displayName}` : undefined}
