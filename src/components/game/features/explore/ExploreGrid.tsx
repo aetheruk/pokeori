@@ -384,6 +384,7 @@ export const ExploreGrid = memo(
     prev.filteredItems === next.filteredItems &&
     prev.randomEvent === next.randomEvent &&
     prev.vsSeekerEvent === next.vsSeekerEvent &&
+    prev.eventsCard === next.eventsCard &&
     prev.activeCategory === next.activeCategory &&
     prev.activeVoyages === next.activeVoyages &&
     prev.activeExpedition === next.activeExpedition &&
