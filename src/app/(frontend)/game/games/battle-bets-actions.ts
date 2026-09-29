@@ -49,6 +49,7 @@ import {
   getBattleBetsFallbackWinner,
   mirrorBattleBetsBattleState,
 } from '@/utilities/battle-bets'
+import { ROCKET_BATTLE_MUSIC } from '@/utilities/battle/music'
 import { getGameUserData } from '@/utilities/game-data'
 import {
   acquireActionLock,
@@ -442,6 +443,7 @@ function createBattleBetsFixture(params: {
       itemsPerBattle: 0,
       allowSwapping: true,
       maxPokemon: 3,
+      music: ROCKET_BATTLE_MUSIC,
     },
     ai: { version: 1, profile: 'advanced' },
     playerTrainer: {

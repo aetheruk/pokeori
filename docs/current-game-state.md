@@ -1,5 +1,7 @@
 # Current Game State
 
+- Unreleased (`0.42.17`): The final Kanto soundtrack batch adds dedicated music for Pewter School, Power Plant, Cycling Road, Rocket Factory, Silph Co, Seafoam Islands, Cinnabar Island, Pokémon Mansion, Cerulean Cave, Victory Road, and Indigo Plateau, and refreshes Viridian City. Rocket opponents use a dedicated battle theme, including Battle Bets; the Saffron takeover blackout uses its own track. Rocket Factory is registered as a Kanto sub-region, unlocked after `fuchsia-what-now`, and uses the Cycling Road scene artwork.
+
 - Unreleased (`0.40.21`): Brick Breaker and other continuously steered arcade runs pause local prediction when a slow checkpoint has filled the server's 300-input proof window. This prevents long paddle sessions from submitting an invalid checkpoint. If a proof is rejected, Retry resumes from the last server-accepted checkpoint with a three-second countdown instead of resending the same rejected proof. Non-finite steering inputs are discarded before they enter a proof.
 
 - Unreleased: The three TCG Test battles award 100 Pokédollars for a win. Their result claim waits for in-progress battle actions to settle, then keeps the shared Results screen open until the player returns to Explore. The finished battle stays visible while rewards are claimed; failed claims offer a retry. The claim no longer invalidates the current game route after clearing its session.

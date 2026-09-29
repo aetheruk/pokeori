@@ -63,6 +63,7 @@ describe('Saffron blackout region', () => {
     expect(subCategories['???']?.region).toBe('???')
     expect(subCategories['???']?.alwaysAvailable).toBe(true)
     expect(subCategories['???']?.image).toBe('/backgrounds/saffron.avif')
+    expect(subCategories['???']?.music).toBe('/music/saffron-takeover.m4a')
     expect(regionCategories['???']?.image).toBe('/backgrounds/saffron.avif')
   })
 })
