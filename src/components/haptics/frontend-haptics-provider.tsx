@@ -29,6 +29,9 @@ function markHapticControls(root: HTMLElement) {
   let markedControl = false
 
   for (const control of controls) {
+    // Scrollable collection cards trigger haptics from their click handlers so
+    // an iOS switch overlay cannot intercept a vertical pan across the card.
+    if (control.hasAttribute('data-haptic-manual')) continue
     if (control.hasAttribute('data-haptic')) continue
 
     // A full-size iOS switch overlay on a compound control could cover its

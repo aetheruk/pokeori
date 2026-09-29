@@ -8,6 +8,7 @@ import {
   SlidersHorizontal,
   X,
 } from 'lucide-react'
+import { useHaptics } from '@haptics/react'
 import Image from 'next/image'
 import type { CSSProperties } from 'react'
 import { useCallback, useMemo, useState, useTransition } from 'react'
@@ -661,6 +662,7 @@ function MoveDexListItem({
   isSketchbook: boolean
   onSelect: () => void
 }) {
+  const { trigger: triggerHaptic } = useHaptics()
   const { entry, isKnown, isOwned, isSketched, roles } = displayMove
   const stanceConfig = STANCE_ICON_CONFIG[entry.move.stance]
   const moveTypeId =
@@ -668,12 +670,16 @@ function MoveDexListItem({
   return (
     <button
       type="button"
+      data-haptic-manual="true"
       aria-label={
         isKnown
           ? `View ${entry.move.name} details`
           : `View discovery clue: ${entry.unlockClue}`
       }
-      onClick={onSelect}
+      onClick={() => {
+        triggerHaptic('selection')
+        onSelect()
+      }}
       className={cn(
         'group flex h-full min-h-24 w-full items-center gap-3 overflow-hidden rounded-xl border px-3 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-game-moss/45 sm:px-4',
         isKnown

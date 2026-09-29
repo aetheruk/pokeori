@@ -470,6 +470,12 @@
     outline-offset: 2px;
   }
 
+  /* The iOS haptic switch focuses its host after a tap. Keep the keyboard
+   * focus ring, but don't leave a dark rectangle around a pointer-selected tab. */
+  .game-mobile-nav-link[data-pointer-focus='true']:focus-visible {
+    outline: none;
+  }
+
   /* Raised paper cards use the slightly firmer edge from the Artisan folio.
    * It follows the local ink colour so paper and night surfaces stay legible. */
   :is(

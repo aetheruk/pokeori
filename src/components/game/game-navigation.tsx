@@ -172,11 +172,17 @@ export function GameNavigation() {
               key={item.href}
               href={item.href}
               onClick={playSelectSfx}
+              onPointerDownCapture={(event) => {
+                event.currentTarget.setAttribute('data-pointer-focus', 'true')
+              }}
+              onBlur={(event) => {
+                event.currentTarget.removeAttribute('data-pointer-focus')
+              }}
               aria-current={isActive ? 'page' : undefined}
               aria-label={mobileLabel}
               title={mobileLabel}
               className={cn(
-                'game-focus-ring relative flex h-full min-w-0 flex-1 items-center justify-center border border-transparent px-0 transition-colors',
+                'game-focus-ring game-mobile-nav-link relative flex h-full min-w-0 flex-1 items-center justify-center border border-transparent px-0 transition-colors',
                 isActive
                   ? 'bg-game-surface-raised text-game-charcoal-strong shadow-[0_-5px_12px_rgb(75_62_39_/_0.08)]'
                   : 'text-game-muted hover:text-game-ink',
