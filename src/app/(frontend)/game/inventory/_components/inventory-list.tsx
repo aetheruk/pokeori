@@ -46,6 +46,7 @@ import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { ItemSprite } from '@/components/ui/item-sprite'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
+import { useScrollClickGuard } from '@/hooks/useScrollClickGuard'
 import { currencies } from '@/data/currencies'
 import { items } from '@/data/items'
 import {
@@ -350,6 +351,7 @@ function getInventoryDisplayLabel(
 }
 
 export function InventoryList() {
+  const scrollClickGuard = useScrollClickGuard()
   const { user, gameData, refreshUser } = useUser()
   const router = useRouter()
   const [activeGroup, setActiveGroup] = useState<InventoryDisplayGroup | null>(
@@ -886,7 +888,10 @@ export function InventoryList() {
       )}
 
       {/* Main Content - Scrollable with padding */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-4 md:px-6 pt-4 pb-4">
+      <div
+        className="flex-1 min-h-0 touch-pan-y overflow-y-auto px-4 pt-4 pb-4 md:px-6"
+        {...scrollClickGuard}
+      >
         {walletRewards.length > 0 && (
           <div className="mb-6">
             <SectionDivider>Wallet</SectionDivider>

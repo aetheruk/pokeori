@@ -37,6 +37,7 @@ import { ItemSprite } from '@/components/ui/item-sprite'
 import { ResponsivePanel } from '@/components/ui/responsive-panel'
 import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
+import { useScrollClickGuard } from '@/hooks/useScrollClickGuard'
 import {
   type ArtisanRecipe,
   type ArtisanRecipeCategory,
@@ -1540,6 +1541,7 @@ function MixDialog({
 }
 
 export function ArtisanPanel() {
+  const scrollClickGuard = useScrollClickGuard()
   const { user, gameData, refreshUser } = useUser()
   const [loadingRecipe, setLoadingRecipe] = useState<string | null>(null)
   const [selectedRecipe, setSelectedRecipe] = useState<ArtisanRecipe | null>(
@@ -1965,7 +1967,10 @@ export function ArtisanPanel() {
         }
       />
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-6 md:px-6">
+      <div
+        className="min-h-0 flex-1 touch-pan-y overflow-y-auto px-4 pt-4 pb-6 md:px-6"
+        {...scrollClickGuard}
+      >
         <div>
           {visibleRecipes.length === 0 ? (
             <div
