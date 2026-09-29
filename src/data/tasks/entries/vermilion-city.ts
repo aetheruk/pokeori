@@ -1553,4 +1553,55 @@ export const vermilionCityTasks: Task[] = [
       },
     },
   },
+  {
+    id: 'a-suspicious-character',
+    name: 'A Suspicious Character',
+    description:
+      'Why is it every time I take my Magikarp for an early-morning walk, I get bothered by weirdos?',
+    category: 'Kanto',
+    subCategory: 'Vermilion City',
+    icon: {
+      type: 'trainer',
+      id: 'fisherman',
+    },
+    background: '/backgrounds/vermillion.avif',
+    repeatable: false,
+    secret: true,
+    completionTrigger: 'manual',
+    completeButtonText: 'Hello?',
+    requirements: [
+      {
+        type: 'companion',
+        count: 1,
+        companionCheck: {
+          speciesId: 129,
+          formId: '129',
+        },
+      },
+      ...Array.from({ length: 8 }, (_, index) => ({
+        type: 'item_owned' as const,
+        targetId: `golden-scale-${index + 1}`,
+        count: 1,
+      })),
+      {
+        type: 'time_range',
+        timeRange: {
+          start: '05:00',
+          end: '05:05',
+        },
+      },
+    ],
+    criteria: [],
+    rewards: [],
+    exitModal: {
+      background: '/backgrounds/vermillion.avif',
+      title: 'Fisherman Fred',
+      icon: {
+        type: 'trainer',
+        id: 'fisherman',
+      },
+      message: 'Wow Frank was right! Follow me.',
+      closeButtonText: 'Follow Fred',
+    },
+  },
 ]

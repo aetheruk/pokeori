@@ -63,6 +63,55 @@ export type SpiritChannelingIncenseItemId = (typeof SPIRIT_CHANNELING_INCENSE_IT
 
 export type SpiritChannelingEnergy = Partial<Record<PokemonTypeName, number>>
 
+export const FISHER_SECRET_BOOKS = [
+  {
+    itemId: 'fishers-secret-1',
+    name: "Fisher's Secret 1",
+    description:
+      "Hey Frank, I'm not sure this is a great idea. Shouldn't we be more inclusive? How many of those things did you make anyway?",
+  },
+  {
+    itemId: 'fishers-secret-2',
+    name: "Fisher's Secret 2",
+    description:
+      'Dont worry about that Fred, I have it all under control. Besides we need to attract the right crowd we dont want just everyone turning up.',
+  },
+  {
+    itemId: 'fishers-secret-3',
+    name: "Fisher's Secret 3",
+    description:
+      'So were just going to wait around on the off chance we bump into someone with 8 golden scales?',
+  },
+  {
+    itemId: 'fishers-secret-4',
+    name: "Fisher's Secret 4",
+    description:
+      'Dont be ridiculous Fred Ive got better things to be doing with my time, youre going to wait around 5 minutes each day on your way in.',
+  },
+  {
+    itemId: 'fishers-secret-5',
+    name: "Fisher's Secret 5",
+    description:
+      'You expect me to loiter around Vermilion Harbor at 5am every day?... I suppose it cant be helped, but how will i know the difference between a candidate and a potential mugger?',
+  },
+  {
+    itemId: 'fishers-secret-6',
+    name: "Fisher's Secret 6",
+    description:
+      'Hells bells Fred do I have to think of everything myself? I imagine theyll probably be traveling with a strong solid partner',
+  },
+  {
+    itemId: 'fishers-secret-7',
+    name: "Fisher's Secret 7",
+    description: 'Like a Magikarp?',
+  },
+  {
+    itemId: 'fishers-secret-8',
+    name: "Fisher's Secret 8",
+    description: 'Exactly! now give me a hand dumping these scales in the sea! Right-o Frank',
+  },
+] as const
+
 export type SpiritChannelerRequirement = {
   channelerMinLevel: number
 } & (
@@ -167,6 +216,29 @@ export const SPIRIT_CHANNELING_CONFIGS: SpiritChannelingConfig[] = [
       },
     ],
   })),
+  ...Array.from({ length: 8 }, (_, index) => {
+    const scaleNumber = index + 1
+    const book = FISHER_SECRET_BOOKS[index]
+
+    return {
+      id: `golden-scale-${scaleNumber}-memory`,
+      name: `Golden Scale (${scaleNumber}) Memory`,
+      description: `A memory held in Golden Scale (${scaleNumber}), found while fishing.`,
+      mementoItemId: `golden-scale-${scaleNumber}`,
+      correctIncenseItemId: 'incense-fishers' as const,
+      requiredEnergy: { water: 77 },
+      channelerMinLevel: 1,
+      channelerFormId: '129',
+      rewards: [
+        {
+          type: 'item' as const,
+          targetId: book.itemId,
+          quantity: 1,
+          dropChance: 100,
+        },
+      ],
+    }
+  }),
 ]
 
 export const SPIRIT_CHANNELING_CONFIG_BY_MEMENTO = new Map(
@@ -233,8 +305,7 @@ export function getSpiritChannelingOfferedEnergy(
     if (!offering || !Number.isInteger(selection.quantity) || selection.quantity < 1) {
       return null
     }
-    energy[offering.type] =
-      (energy[offering.type] || 0) + offering.energy * selection.quantity
+    energy[offering.type] = (energy[offering.type] || 0) + offering.energy * selection.quantity
   }
 
   return energy
