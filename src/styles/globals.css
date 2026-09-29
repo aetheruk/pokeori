@@ -7,9 +7,9 @@
   pointer-events: none !important;
 }
 
-/* Let touch drags starting on a haptic overlay continue scrolling vertical lists. */
-[data-haptic-scroll-axis='y'] [data-haptic-overlay] {
-  touch-action: pan-y;
+/* Keep iOS haptic overlays from swallowing native scroll and zoom gestures. */
+[data-haptic-overlay] {
+  touch-action: pan-x pan-y pinch-zoom;
 }
 
 @custom-variant dark (&:is(.dark *));
