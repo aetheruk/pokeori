@@ -223,7 +223,7 @@ export const undergroundTccgTasks: Task[] = [
   {
     id: 'underground-tcg-feed-the-pit',
     name: 'Feed the Pit',
-    description: 'The pit has made its expectations clear. Bring it 5,000 crystals.',
+    description: 'The pit has made its expectations clear. Bring it 1,000 crystals.',
     category: 'Underground',
     subCategory: 'Kanto Underground',
     icon: { type: 'item', id: 'card-crystalizer' },
@@ -236,7 +236,7 @@ export const undergroundTccgTasks: Task[] = [
       { type: 'task_completed', targetId: 'underground-tcg-basic-training' },
       { type: 'guild_rank', targetId: UNDERGROUND_SOCIETY_GUILD_ID, count: 1 },
     ],
-    criteria: [{ type: 'currency_owned', targetId: 'crystals', count: 5000, consume: true }],
+    criteria: [{ type: 'currency_owned', targetId: 'crystals', count: 1000, consume: true }],
     rewards: [
       { type: 'guild_xp', targetId: UNDERGROUND_SOCIETY_GUILD_ID, quantity: 100, dropChance: 100 },
     ],

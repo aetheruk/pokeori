@@ -25,6 +25,35 @@ function taskDialogue(task: (typeof tasks)[number] | undefined) {
 }
 
 describe('TCG Basic Training content', () => {
+  test('lowers the repeatable Feed the Pit contribution to 1,000 crystals', () => {
+    const feedThePit = tasks.find(
+      (task) => task.id === 'underground-tcg-feed-the-pit',
+    )
+
+    expect(feedThePit).toMatchObject({
+      name: 'Feed the Pit',
+      repeatable: true,
+      description:
+        'The pit has made its expectations clear. Bring it 1,000 crystals.',
+      criteria: [
+        {
+          type: 'currency_owned',
+          targetId: 'crystals',
+          count: 1000,
+          consume: true,
+        },
+      ],
+      rewards: [
+        {
+          type: 'guild_xp',
+          targetId: 'underground-society',
+          quantity: 100,
+          dropChance: 100,
+        },
+      ],
+    })
+  })
+
   test('keeps the complete TCG Underground storyline dialogue free of em dashes', () => {
     const storylinePrefixes = [
       'digletts-cave-',
