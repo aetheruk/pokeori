@@ -121,7 +121,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/mt-moon.avif',
     icon: { type: 'item', id: 'moon-stone' },
     description: 'Pokemon from another world are said to dance under the moonlight here.',
-    music: '/music/cave.m4a',
+    music: '/music/mt-moon.m4a',
     weatherSlots: {
       6: 'fog',
     },
@@ -338,6 +338,7 @@ export const subCategories: Record<string, RegionData> = {
     order: 171,
     image: '/backgrounds/seafoam.avif',
     description: 'A group of islands said to be the home of a legendary Pokemon.',
+    music: '/music/cave.m4a',
   },
   'Victory Road': {
     category: 'Victory Road',
@@ -345,6 +346,7 @@ export const subCategories: Record<string, RegionData> = {
     order: 240,
     image: '/backgrounds/victory-road.avif',
     description: 'A huge cave system and the final challenge before the Pokemon League.',
+    music: '/music/cave.m4a',
   },
   'Indigo Plateau': {
     category: 'Indigo Plateau',
@@ -359,6 +361,7 @@ export const subCategories: Record<string, RegionData> = {
     order: 61,
     image: '/backgrounds/cerulean-cave.avif',
     description: 'A secret cave that only the most powerful of trainers may enter.',
+    music: '/music/cave.m4a',
   },
   'Digletts Cave': {
     category: 'Digletts Cave',
@@ -378,7 +381,7 @@ export const subCategories: Record<string, RegionData> = {
     icon: { type: 'pokemon', id: '95' },
     description:
       'A hidden community of collectors buried much farther beneath Kanto than seems reasonable.',
-    music: '/music/cave.m4a',
+    music: '/music/kanto-underground.m4a',
     unlockRequirements: [
       {
         type: 'task_completed',
