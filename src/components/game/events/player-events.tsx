@@ -9,10 +9,12 @@ import { SectionDivider } from '@/components/ui/section-divider'
 import { getPlayerEvents } from '@/utilities/events/actions'
 import type { RequirementData } from '@/utilities/requirements'
 
-export function usePlayerEvents() {
+export type PlayerEventsSnapshot = Awaited<ReturnType<typeof getPlayerEvents>>
+
+export function usePlayerEvents(initialData: PlayerEventsSnapshot | null = null) {
   const [data, setData] = useState<Awaited<
     ReturnType<typeof getPlayerEvents>
-  > | null>(null)
+  > | null>(initialData)
   const [error, setError] = useState('')
   useEffect(() => {
     let disposed = false

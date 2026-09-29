@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef, Suspense, lazy } from 'react'
+import React, { useState, useEffect, useRef, useMemo, Suspense, lazy } from 'react'
 import { useGameUserData } from '@/hooks/useGameUserData'
 import { useUser } from '@/context/UserContext'
 import { useAudio } from '@/context/AudioContext'
@@ -13,7 +13,11 @@ import type { TaskIcon } from '@/data/tasks/types'
 // Hooks
 import { useExploreState } from './hooks/useExploreState'
 import { useExploreData } from './hooks/useExploreData'
-import { PlayerEventsCard, usePlayerEvents } from '@/components/game/events/player-events'
+import {
+  PlayerEventsCard,
+  usePlayerEvents,
+  type PlayerEventsSnapshot,
+} from '@/components/game/events/player-events'
 import type { ExploreItem } from './types'
 import { useExploreActions } from './hooks/useExploreActions'
 
@@ -99,7 +103,11 @@ const getRegionData = (
   }
 }
 
-export function ExploreList() {
+export function ExploreList({
+  initialPlayerEvents = null,
+}: {
+  initialPlayerEvents?: PlayerEventsSnapshot | null
+}) {
   const userData = useGameUserData()
   const { refreshUser } = useUser()
 
@@ -107,17 +115,25 @@ export function ExploreList() {
     return <GamePageSkeleton variant="explore" />
   }
 
-  return <ExploreListContent userData={userData} refreshUser={refreshUser} />
+  return (
+    <ExploreListContent
+      userData={userData}
+      refreshUser={refreshUser}
+      initialPlayerEvents={initialPlayerEvents}
+    />
+  )
 }
 
 function ExploreListContent({
   userData,
   refreshUser,
+  initialPlayerEvents,
 }: {
   userData: RequirementData
   refreshUser: () => Promise<RequirementData | undefined>
+  initialPlayerEvents: PlayerEventsSnapshot | null
 }) {
-  const playerEvents = usePlayerEvents()
+  const playerEvents = usePlayerEvents(initialPlayerEvents)
   const eventItems = (playerEvents.data?.content || []) as ExploreItem[]
   const { availableItems: allUnlockedItems } = useExploreData(userData, '', '', eventItems)
   const [showDailyRefresh, setShowDailyRefresh] = useState(false)
@@ -367,6 +383,27 @@ function ExploreListContent({
     }
   }
 
+  const eventsCard = useMemo(
+    () =>
+      !isTakeover &&
+      (playerEvents.data?.announcements.length || playerEvents.error) ? (
+        <PlayerEventsCard
+          {...playerEvents}
+          userData={userData}
+          trainerName={trainerName}
+          playSelectSfx={actions.playSelectSfx}
+        />
+      ) : null,
+    [
+      actions.playSelectSfx,
+      isTakeover,
+      playerEvents.data,
+      playerEvents.error,
+      trainerName,
+      userData,
+    ],
+  )
+
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: Delegated pointer taps have an equivalent native Struggle button for keyboard users.
     <div
@@ -471,9 +508,7 @@ function ExploreListContent({
           filteredItems={filteredItems}
           randomEvent={isTakeover ? null : randomEvent}
           vsSeekerEvent={isTakeover ? null : vsSeekerEvent}
-          eventsCard={!isTakeover && (playerEvents.data?.announcements.length || playerEvents.error) ? (
-            <PlayerEventsCard {...playerEvents} userData={userData} trainerName={trainerName} playSelectSfx={actions.playSelectSfx} />
-          ) : null}
+          eventsCard={eventsCard}
           activeCategory={displayCategory}
           takeoverStyle={isTakeover}
           activeVoyages={activeVoyages}

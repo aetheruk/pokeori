@@ -1,5 +1,7 @@
 # Current Game State
 
+- Unreleased (`0.42.22`): Explore preloads the eligible Active Events snapshot with the page data so Active Events and the player-data-derived VS Seeker card appear with the first rendered list, avoiding late insertions that shift content. The grid now updates when the events card changes independently of its other items.
+
 - Unreleased (`0.42.20`): Rocket Factory's background now shows the dark industrial interior manufacturing Rocket Balls, matching the in-game Rocket Ball design. The area stays locked until its actual access requirement is authored; completing `fuchsia-what-now` alone no longer exposes this unfinished sub-region.
 
 - Unreleased (`0.42.21`): Trainer, Explore, Pokémon, Artisan, Dex, and Inventory navigation prefetches complete dashboard pages. These routes retain the outgoing screen on a cold transition instead of flashing a skeleton. Scoped player data and the Pokémon box reconcile in the background on entry; box reconciliation does not overwrite local edits or pagination. Encounter and secondary collection loading states remain in place. See [navigation performance](features/navigation-performance.md).
