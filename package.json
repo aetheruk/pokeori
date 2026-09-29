@@ -1,6 +1,6 @@
 {
   "name": "pokeori",
-  "version": "0.42.8",
+  "version": "0.42.9",
   "description": "Pokeori field-journal adventure game",
   "license": "MIT",
   "type": "module",
@@ -61,6 +61,7 @@
     "@dnd-kit/modifiers": "9.0.0",
     "@dnd-kit/sortable": "10.0.0",
     "@dnd-kit/utilities": "3.2.2",
+    "@haptics/react": "2.1.1",
     "@hookform/resolvers": "5.9.1",
     "@payloadcms/db-mongodb": "3.88.0",
     "@payloadcms/email-resend": "3.88.0",
@@ -114,7 +115,6 @@
     "swr": "2.5.1",
     "tailwind-merge": "3.6.0",
     "tailwindcss": "4.3.3",
-    "use-haptic": "^1.1.13",
     "use-sound": "5.0.0",
     "uuid": "14.0.2",
     "vaul": "1.1.2",

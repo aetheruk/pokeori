@@ -65,6 +65,7 @@ interface SideScrollerStageProps {
   stageRef: React.RefObject<HTMLDivElement | null>
   score: ReactNode
   timer?: ReactNode
+  hapticOutsideTaps?: boolean
   onOutsideTap?: () => void
   onOutsideSwipe?: (swipe: OutsideStageSwipe) => void
   overlay?: ReactNode
@@ -78,6 +79,7 @@ export function SideScrollerStage({
   stageRef,
   score,
   timer,
+  hapticOutsideTaps = false,
   onOutsideTap,
   onOutsideSwipe,
   overlay,
@@ -186,6 +188,7 @@ export function SideScrollerStage({
 
       <div
         className="relative z-10 flex min-h-dvh w-full flex-col items-center justify-start gap-3 px-3 py-[max(0.75rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]"
+        data-haptic={hapticOutsideTaps ? 'selection' : undefined}
         onPointerDown={handleOutsidePointerDown}
         onPointerUp={handleOutsidePointerUp}
         onPointerCancel={handleOutsidePointerCancel}
@@ -200,7 +203,10 @@ export function SideScrollerStage({
 
         <div
           ref={wrapperRef}
-          className="relative aspect-square max-w-[600px] overflow-hidden rounded-lg border border-[#f7ecd6]/18 bg-game-night-surface"
+          className={cn(
+            'relative aspect-square max-w-[600px] overflow-hidden rounded-lg border border-[#f7ecd6]/18 bg-game-night-surface',
+            hapticOutsideTaps && 'z-10',
+          )}
           style={{ width: 'min(94vw, calc(100dvh - 12.25rem), 600px)' }}
         >
           <div
