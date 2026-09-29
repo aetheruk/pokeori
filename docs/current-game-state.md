@@ -1,6 +1,8 @@
 # Current Game State
 
-- Unreleased (`0.42.18`): The repeatable Underground Society `Feed the Pit` task now consumes 1,000 Crystals per contribution instead of 5,000, still awarding 100 Society XP.
+- Unreleased (`0.42.19`): Rocket Factory now has dedicated background artwork and stays locked until its actual access requirement is authored; completing `fuchsia-what-now` alone no longer exposes this unfinished sub-region.
+
+- Release `0.42.18`: The repeatable Underground Society `Feed the Pit` task consumes 1,000 Crystals per contribution instead of 5,000, still awarding 100 Society XP.
 
 - Release `0.42.17`: The final Kanto soundtrack batch adds dedicated music for Pewter School, Power Plant, Cycling Road, Rocket Factory, Silph Co, Seafoam Islands, Cinnabar Island, Pokémon Mansion, Cerulean Cave, Victory Road, and Indigo Plateau, and refreshes Viridian City. Rocket opponents use a dedicated battle theme, including Battle Bets; the Saffron takeover blackout uses its own track. Rocket Factory is registered as a Kanto sub-region, unlocked after `fuchsia-what-now`, and uses the Cycling Road scene artwork.
 
