@@ -1987,7 +1987,7 @@ export async function collectFieldObservationDrop(dropId: string) {
     }
 
     const normalizedDropId = typeof dropId === 'string' ? dropId.trim() : ''
-    if (!/^drop-\d+-[a-z0-9-]+$/i.test(normalizedDropId)) {
+    if (!normalizedDropId || normalizedDropId.length > 160) {
       return { success: false, error: 'Invalid drop' }
     }
 
@@ -2084,6 +2084,65 @@ function getCollectedFieldObservationRewards(
     .map((drop) => ({ ...drop.reward, dropChance: 100 }))
 }
 
+function verifyFieldObservationDropClaims(
+  state: GameActivityState,
+  submittedDropClaims: unknown,
+): { success: true; dropIds: string[] } | { success: false } {
+  const privateRound = state.fieldObservationPrivate
+  if (!privateRound) return { success: false }
+
+  const drops = privateRound.collectibleDrops || []
+  const dropsById = new Map(drops.map((drop) => [drop.id, drop]))
+  const existingDropIds = new Set(privateRound.collectedDropIds || [])
+  if (Array.from(existingDropIds).some((dropId) => !dropsById.has(dropId))) {
+    return { success: false }
+  }
+
+  if (submittedDropClaims === undefined) {
+    return { success: true, dropIds: Array.from(existingDropIds) }
+  }
+
+  if (
+    !Array.isArray(submittedDropClaims) ||
+    submittedDropClaims.length > drops.length ||
+    submittedDropClaims.some((claim) => {
+      if (!claim || typeof claim !== 'object') return true
+      const entry = claim as { id?: unknown; elapsedMs?: unknown }
+      if (
+        typeof entry.id !== 'string' ||
+        entry.id.length > 160 ||
+        typeof entry.elapsedMs !== 'number' ||
+        !Number.isInteger(entry.elapsedMs)
+      ) {
+        return true
+      }
+
+      const drop = dropsById.get(entry.id)
+      if (!drop) return true
+
+      return (
+        entry.elapsedMs < Math.max(0, drop.startMs - 300) ||
+        entry.elapsedMs > drop.startMs + drop.durationMs + 750
+      )
+    })
+  ) {
+    return { success: false }
+  }
+
+  const submittedIds = (
+    submittedDropClaims as { id: string; elapsedMs: number }[]
+  ).map((claim) => claim.id)
+  const uniqueSubmittedIds = new Set(submittedIds)
+  if (uniqueSubmittedIds.size !== submittedIds.length) {
+    return { success: false }
+  }
+
+  return {
+    success: true,
+    dropIds: Array.from(new Set([...existingDropIds, ...uniqueSubmittedIds])),
+  }
+}
+
 function getCollectedRockPushRewards(
   encounter: (typeof allGames)[number],
   collectedPrizeIds?: string[],
@@ -2134,6 +2193,7 @@ export async function completeGameActivity(
   collectedRockPushRewardIds?: string[],
   artAcademyDrawing?: string,
   gameplayProof?: unknown,
+  submittedFieldObservationDropClaims?: unknown,
 ): Promise<GameActivityCompletionResult> {
   try {
     const user = await getUser()
@@ -2247,6 +2307,27 @@ export async function completeGameActivity(
 
       if (state.encounterId !== validatedEncounterId) {
         return { success: false, error: 'Invalid encounter session' }
+      }
+
+      if (encounter.gameType === 'field-observation') {
+        const verifiedDropClaims = verifyFieldObservationDropClaims(
+          state,
+          submittedFieldObservationDropClaims,
+        )
+        if (!verifiedDropClaims.success) {
+          return { success: false, error: 'Invalid collected field items' }
+        }
+
+        state.fieldObservationPrivate!.collectedDropIds =
+          verifiedDropClaims.dropIds
+        if (state.roundData?.gameType === 'field-observation') {
+          state.roundData.collectedDropIds = verifiedDropClaims.dropIds
+        }
+        const ttlSeconds = Math.max(
+          60,
+          Math.ceil((state.expiry - Date.now()) / 1000) + 120,
+        )
+        await setGameActivityStateForUser(user.id, domain, state, ttlSeconds)
       }
 
       const isExpeditionActivityContent =

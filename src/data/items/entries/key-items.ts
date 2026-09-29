@@ -4,7 +4,7 @@ import {
   BOOK_OF_CHANNELING_ITEM_ID,
   FISHER_SECRET_BOOKS,
   SPIRIT_CHANNELING_INCENSE_ITEMS,
-} from '@/data/spirit-channeling'
+} from '@/data/spirit-channeling-public'
 
 const ROTOM_FORM_IDS = ['479', '10008', '10009', '10010', '10011', '10012']
 const OGERPON_FORM_IDS = ['1017', '10273', '10274', '10275']

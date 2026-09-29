@@ -18,9 +18,7 @@ import {
   useRef,
   useState,
 } from 'react'
-import { toast } from 'sonner'
 import {
-  collectFieldResearchDrop,
   completeFieldResearch,
   startFieldResearch,
   submitFieldResearchAnswer,
@@ -74,8 +72,7 @@ export function FieldObservationGame({
   const [collectingDropIds, setCollectingDropIds] = useState<Set<string>>(
     () => new Set(),
   )
-  const pendingDropClaimsRef = useRef(new Set<Promise<unknown>>())
-  const dropClaimQueueRef = useRef<Promise<unknown>>(Promise.resolve())
+  const collectedDropClaimsRef = useRef(new Map<string, number>())
 
   const isCountSurvey = roundData?.surveyFocus === 'count-survey'
   const isKidModeQuestion =
@@ -111,8 +108,14 @@ export function FieldObservationGame({
     async (didWin: boolean, message: string) => {
       if (result) return
       playSfx(didWin ? 'good' : 'bad')
-      await Promise.allSettled(Array.from(pendingDropClaimsRef.current))
-      const completeResult = await completeFieldResearch(encounter.id, didWin)
+      const completeResult = await completeFieldResearch(
+        encounter.id,
+        didWin,
+        Array.from(collectedDropClaimsRef.current, ([id, elapsedMs]) => ({
+          id,
+          elapsedMs,
+        })),
+      )
       const accepted = didWin && completeResult.success
       setResult({
         success: accepted,
@@ -155,73 +158,31 @@ export function FieldObservationGame({
     )
   }, [collectedDropIds, collectingDropIds, now, phase, roundData, startTime])
 
-  const handleCollectDrop = async (
-    drop: FieldObservationPublicCollectibleDrop,
-  ) => {
+  const handleCollectDrop = (drop: FieldObservationPublicCollectibleDrop) => {
     if (
       collectedDropIds.has(drop.id) ||
+      collectedDropClaimsRef.current.has(drop.id) ||
       collectingDropIds.has(drop.id) ||
       phase !== 'observing'
     ) {
       return
     }
     playSfx('good')
-    const startedAt = Date.now()
-    setCollectingDropIds((previous) => new Set(previous).add(drop.id))
+    collectedDropClaimsRef.current.set(drop.id, Date.now() - startTime)
     setCollectedDropIds((previous) => new Set(previous).add(drop.id))
-
-    const claimRequest = dropClaimQueueRef.current.then(() =>
-      collectFieldResearchDrop(drop.id),
-    )
-    dropClaimQueueRef.current = claimRequest.catch(() => undefined)
-    pendingDropClaimsRef.current.add(claimRequest)
-    let claimSucceeded = false
-    let claimError: string | undefined
-    try {
-      const claimResult = await claimRequest
-      claimSucceeded = claimResult.success
-      claimError = 'error' in claimResult ? claimResult.error : undefined
-    } catch {
-      claimError =
-        'Could not confirm that pickup. Try again while it is visible.'
-    } finally {
-      pendingDropClaimsRef.current.delete(claimRequest)
-    }
-
+    setCollectingDropIds((previous) => new Set(previous).add(drop.id))
     const feedbackDurationMs = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches
       ? 120
       : 360
-    const remainingPopMs = Math.max(
-      0,
-      feedbackDurationMs - (Date.now() - startedAt),
-    )
-    if (remainingPopMs > 0) {
-      await new Promise((resolve) => window.setTimeout(resolve, remainingPopMs))
-    }
-
-    setCollectingDropIds((previous) => {
-      const next = new Set(previous)
-      next.delete(drop.id)
-      return next
-    })
-
-    if (!claimSucceeded) {
-      setCollectedDropIds((previous) => {
+    window.setTimeout(() => {
+      setCollectingDropIds((previous) => {
         const next = new Set(previous)
         next.delete(drop.id)
         return next
       })
-
-      const elapsed = Date.now() - startTime
-      if (
-        elapsed >= drop.startMs &&
-        elapsed <= drop.startMs + drop.durationMs
-      ) {
-        toast.error(claimError || 'Could not collect that drop. Tap to retry.')
-      }
-    }
+    }, feedbackDurationMs)
   }
 
   const handleAnswer = async (optionId: string) => {
@@ -229,7 +190,6 @@ export function FieldObservationGame({
     setSelectedOption(optionId)
     setIsSubmitting(true)
 
-    await Promise.allSettled(Array.from(pendingDropClaimsRef.current))
     const submitResult = await submitFieldResearchAnswer(optionId)
     if (!submitResult.success && submitResult.error) {
       setIsSubmitting(false)
@@ -249,7 +209,6 @@ export function FieldObservationGame({
     setSelectedOption('count-survey')
     setIsSubmitting(true)
 
-    await Promise.allSettled(Array.from(pendingDropClaimsRef.current))
     const submitResult = await submitFieldResearchAnswer({
       type: 'count-survey',
       counts: countReport,
