@@ -1,8 +1,9 @@
 'use client'
 
 import { Heart, MapIcon } from 'lucide-react'
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { useAudio } from '@/context/AudioContext'
 
 const CardDrawReveal = lazy(() =>
   import('@/components/tcg/CardDrawReveal').then((module) => ({
@@ -146,6 +147,9 @@ export function RewardResultOverlay({
   container,
   secondaryAction,
 }: RewardResultOverlayProps) {
+  const { playSfx } = useAudio()
+  const lastPlayedResultRef = useRef<GenericResult | null>(null)
+
   // State for sequential flow
   const [currentStep, setCurrentStep] = useState<RewardResultStep>(() =>
     getRewardResultInitialStep(result),
@@ -159,6 +163,17 @@ export function RewardResultOverlay({
   )
   const [exitModalData, setExitModalData] = useState<TaskExitModal | null>(null)
   const [exitModalQueue, setExitModalQueue] = useState<TaskExitModal[]>([])
+
+  useEffect(() => {
+    if (!result) {
+      lastPlayedResultRef.current = null
+      return
+    }
+    if (lastPlayedResultRef.current === result) return
+
+    lastPlayedResultRef.current = result
+    playSfx('flower_pickup')
+  }, [playSfx, result])
 
   // Initialize the flow when a new result comes in
   useEffect(() => {

@@ -16,6 +16,7 @@ import {
 // Typed SFX names for type safety
 export type SfxName =
   | 'select'
+  | 'flower_pickup'
   | 'good'
   | 'bad'
   | 'catch'
@@ -28,6 +29,7 @@ export type SfxName =
 // SFX file paths mapping
 const SFX_PATHS: Record<SfxName, string> = {
   select: '/sfx/select.mp3',
+  flower_pickup: '/sfx/flower_pickup.mp3',
   good: '/sfx/good.mp3',
   bad: '/sfx/bad.mp3',
   catch: '/sfx/catch.mp3',
@@ -41,6 +43,7 @@ const SFX_PATHS: Record<SfxName, string> = {
 // Default volumes for each SFX
 const SFX_VOLUMES: Record<SfxName, number> = {
   select: 0.9,
+  flower_pickup: 0.9,
   good: 0.9,
   bad: 0.9,
   catch: 0.9,
