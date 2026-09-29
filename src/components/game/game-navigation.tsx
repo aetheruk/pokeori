@@ -97,6 +97,7 @@ export function GameNavigation() {
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={true}
                 onClick={playSelectSfx}
                 aria-current={isActive ? 'page' : undefined}
                 className={cn(
@@ -129,6 +130,7 @@ export function GameNavigation() {
           </div>
           <Link
             href="/game"
+            prefetch={true}
             className="game-focus-ring relative flex items-center justify-center gap-3 overflow-hidden rounded-lg px-2 py-2 transition-colors hover:bg-game-surface lg:justify-start"
           >
             <div className="game-icon-orb relative h-8 w-8 shrink-0 overflow-hidden border-game-charcoal/30">
@@ -171,6 +173,7 @@ export function GameNavigation() {
             <Link
               key={item.href}
               href={item.href}
+              prefetch={true}
               onClick={playSelectSfx}
               onPointerDownCapture={(event) => {
                 event.currentTarget.setAttribute('data-pointer-focus', 'true')

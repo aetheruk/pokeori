@@ -45,6 +45,7 @@ import {
   type PropsWithChildren,
   useCallback,
   useEffect,
+  useEffectEvent,
   useMemo,
   useRef,
   useState,
@@ -109,6 +110,7 @@ import {
   setPokemonRosterRole,
 } from '../actions'
 import { PokemonDetailsDialog } from './pokemon-details-dialog'
+import { getPokemonBoxInitialState } from '../actions/box'
 
 const POKEMON_BOX_PAGE_SIZE = 18
 const BOX_DROP_ZONE_ID = 'pokemon-box-drop-zone'
@@ -225,6 +227,38 @@ export function PokemonList({
   const longPressTriggeredRef = useRef(false)
   const longPressStartRef = useRef<{ x: number; y: number } | null>(null)
   const [totalPokemonCount, setTotalPokemonCount] = useState(initialBoxState.totalPokemonCount)
+
+  // The box is separate from the scoped user snapshot. Reconcile a prefetched
+  // box on entry without clearing the grid or overwriting edits/pagination that
+  // the player has made while the request was in flight.
+  const reconcileInitialBox = useEffectEvent((fresh: InitialPokemonBoxState) => {
+    if (
+      selectedBoxId !== null || loading ||
+      pokemonList !== initialBoxState.docs ||
+      eggs !== initialBoxState.eggs ||
+      battleTeam !== initialBoxState.battleTeam ||
+      companion !== initialBoxState.companion ||
+      totalPokemonCount !== initialBoxState.totalPokemonCount
+    ) return
+
+    setPokemonList(fresh.docs)
+    setEggs(fresh.eggs)
+    setBattleTeam(fresh.battleTeam)
+    setCompanion(fresh.companion)
+    setHasNextPage(fresh.hasNextPage)
+    setNextPage(fresh.nextPage ?? null)
+    setTotalPokemonCount(fresh.totalPokemonCount)
+  })
+
+  useEffect(() => {
+    let cancelled = false
+    void getPokemonBoxInitialState().then((fresh) => {
+      if (!cancelled) reconcileInitialBox(fresh)
+    }).catch((error) => {
+      console.error('Unable to refresh the Pokemon box on entry', error)
+    })
+    return () => { cancelled = true }
+  }, [])
 
   const canBulkReleasePokemon = useCallback(
     (pokemon: Pokemon) =>

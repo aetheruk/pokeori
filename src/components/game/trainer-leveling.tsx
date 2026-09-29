@@ -14,10 +14,12 @@ import {
   Zap,
 } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { memo, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { updateUserCustomization } from '@/app/(frontend)/game/actions'
 import { TrainerCard } from '@/components/game/battles/TrainerCard'
+import { NavigationPending } from '@/components/game/navigation-pending'
 import { GameInfoModal } from '@/components/game/shared/GameInfoModal'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { BadgeShowcase } from '@/components/game/trainer/badge-showcase'
@@ -507,6 +509,31 @@ export function TrainerLeveling({
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col space-y-6 overflow-y-auto px-4 pb-20 pt-5 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-game-border md:px-6">
+        <div className="space-y-4">
+          <SectionDivider>Inventory</SectionDivider>
+          <Link
+            href="/game/inventory"
+            prefetch={true}
+            className="game-focus-ring relative group flex min-h-16 w-full items-center gap-3 rounded-lg border border-game-border bg-game-surface p-3 text-left transition-colors hover:border-game-moss/35 hover:bg-game-surface-raised"
+          >
+            <Image
+              src="/fallback/skills/inventory-v2.png"
+              alt=""
+              width={56}
+              height={56}
+              className="h-12 w-12 shrink-0 object-contain"
+              aria-hidden="true"
+            />
+            <div className="min-w-0 flex-1 space-y-1">
+              <h3 className="text-sm font-semibold text-game-ink">Open Bag</h3>
+              <p className="text-[11px] leading-snug text-game-muted">
+                Manage items, key tools, and materials.
+              </p>
+            </div>
+            <NavigationPending />
+          </Link>
+        </div>
+
         {/* Skills Section */}
         <div className="space-y-4">
           <SectionDivider>Skills</SectionDivider>
