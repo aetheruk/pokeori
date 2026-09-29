@@ -5,6 +5,7 @@ Complete documentation for all game features in Pokeori.
 ## Core Features
 - [Trainer settings](/docs/features/trainer-settings.md) - Device audio and persistent image downloads
 - [Music playback](/docs/features/music-playback.md) - Compressed AAC music playback
+- [Sound effects](/docs/features/sound-effects.md) - Shared UI and reward sounds
 - [Battle System](/docs/features/battle-system.md) - Turn-based battles with advanced mechanics
 - [Skills](/docs/features/skills.md) - Trainer, Explorer, and Researcher unlock guides
 - [Pokedex](/docs/features/pokedex.md) - Track seen/caught Pokemon with research levels
