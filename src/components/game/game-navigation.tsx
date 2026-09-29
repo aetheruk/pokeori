@@ -176,7 +176,7 @@ export function GameNavigation() {
               aria-label={mobileLabel}
               title={mobileLabel}
               className={cn(
-                'game-focus-ring relative flex h-full min-w-0 flex-1 items-center justify-center rounded-t-lg border border-transparent px-0 transition-colors',
+                'game-focus-ring relative flex h-full min-w-0 flex-1 items-center justify-center border border-transparent px-0 transition-colors',
                 isActive
                   ? 'border-game-border border-b-transparent bg-game-surface-raised text-game-charcoal-strong shadow-[0_-5px_12px_rgb(75_62_39_/_0.08)]'
                   : 'text-game-muted hover:text-game-ink',
@@ -186,7 +186,7 @@ export function GameNavigation() {
                 <GridPlayerSprite
                   gender={user?.trainerGender}
                   className={cn(
-                    'h-10 w-10',
+                    'h-8 w-8',
                     user?.trainerGender === 'male' ||
                       user?.trainerGender === 'female'
                       ? '-translate-y-[3px]'
@@ -199,10 +199,10 @@ export function GameNavigation() {
                     type: 'local',
                     id: `/fallback/skills/${item.mobileSkillIcon}`,
                   }}
-                  className="h-10 w-10"
+                  className="h-8 w-8"
                 />
               ) : (
-                <item.icon className="h-10 w-10" />
+                <item.icon className="h-8 w-8" />
               )}
               <NavigationPending />
             </Link>
