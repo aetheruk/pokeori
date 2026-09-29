@@ -158,7 +158,7 @@ export function GameNavigation() {
       {/* Mobile Bottom Nav */}
       <nav
         aria-label="Game sections"
-        className="fixed inset-x-0 bottom-0 z-50 flex h-[4.5rem] items-center justify-around border-t border-game-border bg-game-surface/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-50 flex h-[4.5rem] items-center justify-around bg-game-surface/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden"
       >
         {navItems.map((item) => {
           const isActive = isItemActive(item)
@@ -176,7 +176,7 @@ export function GameNavigation() {
               aria-label={mobileLabel}
               title={mobileLabel}
               className={cn(
-                'game-focus-ring relative flex h-full min-w-0 flex-1 items-center justify-center border border-transparent px-0 transition-colors',
+                'game-focus-ring relative flex h-full min-w-0 flex-1 items-center justify-center border border-transparent border-t-game-border px-0 transition-colors',
                 isActive
                   ? 'border-game-border border-b-transparent bg-game-surface-raised text-game-charcoal-strong shadow-[0_-5px_12px_rgb(75_62_39_/_0.08)]'
                   : 'text-game-muted hover:text-game-ink',
