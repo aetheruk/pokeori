@@ -280,13 +280,11 @@ export const subCategories: Record<string, RegionData> = {
     category: 'Rocket Factory',
     region: 'Kanto',
     order: 165,
-    image: '/backgrounds/cycling-road.avif',
+    image: '/backgrounds/rocket-factory.avif',
     icon: { type: 'trainer', id: 'rocket-grunt-m' },
     description: 'A Team Rocket facility built into Cycling Road.',
     music: '/music/rocket-factory.m4a',
-    unlockRequirements: [
-      { type: 'task_completed', targetId: 'fuchsia-what-now' },
-    ],
+    unlockRequirements: [],
   },
   'Fuchsia City': {
     category: 'Fuchsia City',

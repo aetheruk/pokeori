@@ -24,16 +24,15 @@ describe('area music', () => {
     }
   })
 
-  it('registers Rocket Factory after the Fuchsia conclusion', () => {
+  it('keeps Rocket Factory locked until its content is authored', () => {
     expect(subCategories['Rocket Factory']).toMatchObject({
       category: 'Rocket Factory',
       region: 'Kanto',
-      image: '/backgrounds/cycling-road.avif',
+      image: '/backgrounds/rocket-factory.avif',
       music: '/music/rocket-factory.m4a',
-      unlockRequirements: [
-        { type: 'task_completed', targetId: 'fuchsia-what-now' },
-      ],
+      unlockRequirements: [],
     })
+    expect(existsSync('public/backgrounds/rocket-factory.avif')).toBe(true)
   })
 
   it('replaces the Viridian City recording', () => {
