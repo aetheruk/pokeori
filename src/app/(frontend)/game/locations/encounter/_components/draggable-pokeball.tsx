@@ -60,7 +60,13 @@ function DraggableBallInner({
       onClick={(event) => {
         // Native keyboard/assistive activation only. Touch and mouse users
         // still throw by swiping upward, never by tapping the ball.
-        if (event.detail === 0 && !disabled) onKeyboardThrow()
+        if (
+          event.detail === 0 &&
+          event.nativeEvent.isTrusted &&
+          !disabled
+        ) {
+          onKeyboardThrow()
+        }
       }}
       className="game-focus-ring cursor-grab active:cursor-grabbing w-full h-full rounded-full border-0 bg-transparent p-0"
     >

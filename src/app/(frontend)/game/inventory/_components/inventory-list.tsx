@@ -1314,6 +1314,7 @@ const InventoryItemCard = memo(function InventoryItemCard({
       tabIndex={0}
       aria-label={`View ${item.details.name}`}
       aria-haspopup="dialog"
+      data-haptic="selection"
       className="game-focus-ring group relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-lg border border-game-border bg-game-surface p-3 transition-colors hover:border-game-moss/45 hover:bg-game-surface-raised"
     >
       <div className="relative shrink-0">

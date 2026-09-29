@@ -240,7 +240,10 @@ export function MiningGame({ encounter, initialState }: MiningGameProps) {
                 e.preventDefault()
                 handleSwing()
               }}
-              onClick={(event) => { if (event.detail === 0) handleSwing() }}
+              onClick={(event) => {
+                if (event.detail === 0 && event.nativeEvent.isTrusted)
+                  handleSwing()
+              }}
               aria-label="Swing pickaxe"
               disabled={gameEnded || countdown > 0}
             >

@@ -59,7 +59,9 @@ export function SnakeJoystick({ disabled, onDirection, onRelease }: {
       onPointerCancel={release}
       onLostPointerCapture={release}
       onBlur={release}
-      onClick={(event) => { if (event.detail === 0) release() }}
+      onClick={(event) => {
+        if (event.detail === 0 && event.nativeEvent.isTrusted) release()
+      }}
     >
       <span aria-hidden className="pointer-events-none absolute inset-3 rounded-full border border-game-border bg-game-canvas" />
       <span aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 size-12 rounded-full border border-game-moss bg-game-moss shadow-sm" style={{ transform: `translate(calc(-50% + ${thumb.x * 30}px), calc(-50% + ${thumb.y * 30}px))` }} />

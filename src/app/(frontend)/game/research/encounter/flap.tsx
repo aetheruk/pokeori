@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { HapticsProvider } from '@haptics/react'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
@@ -60,8 +59,7 @@ export function FlapGame({ encounter, initialState, actions }: FlapGameProps) {
 
   return (
     <div className="game-night relative min-h-dvh overflow-hidden bg-game-night-canvas">
-      <HapticsProvider respectReducedMotion>
-        <SideScrollerStage
+      <SideScrollerStage
           category={encounter.category}
           scene={encounter.settings.scene}
           fallbackBackdrop="/games/run/backgrounds/sky.avif"
@@ -115,7 +113,7 @@ export function FlapGame({ encounter, initialState, actions }: FlapGameProps) {
               </div>
             ) : undefined
           }
-        >
+      >
           <SideScrollerCanvas
             gameType="flap"
             settings={encounter.settings}
@@ -124,8 +122,7 @@ export function FlapGame({ encounter, initialState, actions }: FlapGameProps) {
             label={`${encounter.name} playfield`}
             active={countdown <= 0}
           />
-        </SideScrollerStage>
-      </HapticsProvider>
+      </SideScrollerStage>
 
       {result && (
         <RewardResultOverlay

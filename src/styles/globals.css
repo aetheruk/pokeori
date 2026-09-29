@@ -1,6 +1,12 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
+/* Disabled controls should not leave an active iOS haptic switch on top. */
+:where(button:disabled, [aria-disabled='true']) > [data-haptic-overlay],
+[aria-disabled='true'] [data-haptic-overlay] {
+  pointer-events: none !important;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
