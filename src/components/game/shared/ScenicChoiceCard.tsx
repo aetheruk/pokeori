@@ -35,6 +35,8 @@ export function ScenicChoiceCard({
   return (
     <button
       type="button"
+      data-haptic="selection"
+      data-haptic-scroll-axis="y"
       aria-pressed={ariaPressed ?? selected}
       onClick={onClick}
       className={cn(

@@ -7,6 +7,11 @@
   pointer-events: none !important;
 }
 
+/* Let touch drags starting on a haptic overlay continue scrolling vertical lists. */
+[data-haptic-scroll-axis='y'] [data-haptic-overlay] {
+  touch-action: pan-y;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
