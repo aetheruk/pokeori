@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 
 interface PremiumHeaderProps {
   title: string
-  subtitle?: string
+  subtitle?: ReactNode
   icon?: ReactNode
   className?: string
   titleClassName?: string

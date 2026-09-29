@@ -33,6 +33,7 @@ export const subCategories: Record<string, RegionData> = {
     alwaysAvailable: true,
     image: '/backgrounds/saffron.avif',
     description: '???',
+    music: '/music/saffron-takeover.m4a',
   },
   'Pallet Town': {
     category: 'Pallet Town',
@@ -112,6 +113,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/pewter-school.avif',
     icon: { type: 'trainer', id: 'old-couple' },
     description: 'A dedicated school where trainers learn battle systems and core mechanics.',
+    music: '/music/pewter-school.m4a',
     unlockRequirements: [{ type: 'task_completed', targetId: 'pewter-school-intro' }],
   },
   'Mt. Moon': {
@@ -259,6 +261,7 @@ export const subCategories: Record<string, RegionData> = {
     order: 150,
     image: '/backgrounds/silph.avif',
     description: 'The office buildings of the powerful Silph Co.',
+    music: '/music/silph-co.m4a',
   },
   'Cycling Road': {
     category: 'Cycling Road',
@@ -266,11 +269,24 @@ export const subCategories: Record<string, RegionData> = {
     order: 160,
     image: '/backgrounds/cycling-road.avif',
     description: 'The perfect place for trainers to practice their cycling skills.',
-        weatherSlots: {
+    music: '/music/cycling-road.m4a',
+    weatherSlots: {
       1: 'rain',
       3: 'rain',
       5: 'fog',
     },
+  },
+  'Rocket Factory': {
+    category: 'Rocket Factory',
+    region: 'Kanto',
+    order: 165,
+    image: '/backgrounds/cycling-road.avif',
+    icon: { type: 'trainer', id: 'rocket-grunt-m' },
+    description: 'A Team Rocket facility built into Cycling Road.',
+    music: '/music/rocket-factory.m4a',
+    unlockRequirements: [
+      { type: 'task_completed', targetId: 'fuchsia-what-now' },
+    ],
   },
   'Fuchsia City': {
     category: 'Fuchsia City',
@@ -281,7 +297,7 @@ export const subCategories: Record<string, RegionData> = {
     description: 'A city on the south coast, featuring the sprawling Safari Zone',
     music: '/music/fuchsia.m4a',
     unlockRequirements: [{ type: 'task_completed', targetId: 'on-to-fuchsia-city' }],
-            weatherSlots: {
+    weatherSlots: {
       1: 'rain',
       2: 'rain',
       3: 'rain',
@@ -297,11 +313,11 @@ export const subCategories: Record<string, RegionData> = {
     description: 'A huge nature reserve packed with Rare Pokemon.',
     music: '/music/safari-zone.m4a',
     unlockRequirements: [{ type: 'task_completed', targetId: 'fuchsia-gym-search-for-koga' }],
-            weatherSlots: {
+    weatherSlots: {
       1: 'rain',
       2: 'rain',
       3: 'rain',
-      5: 'fog'
+      5: 'fog',
     },
   },
   'Power Plant': {
@@ -310,6 +326,7 @@ export const subCategories: Record<string, RegionData> = {
     order: 95,
     image: '/backgrounds/power-plant.avif',
     description: "Kanto's main power plant supplying energy to the whole region.",
+    music: '/music/power-plant.m4a',
   },
   'Cinnabar Island': {
     category: 'Cinnabar Island',
@@ -318,6 +335,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/cinnabar.avif',
     icon: { type: 'trainer', id: 'gym-kanto-blaine' },
     description: 'A volcanic island town, with an advanced Pokemon Lab ',
+    music: '/music/cinnabar.m4a',
             weatherSlots: {
       1: 'rain',
       2: 'rain',
@@ -331,6 +349,7 @@ export const subCategories: Record<string, RegionData> = {
     order: 210,
     image: '/backgrounds/mansion.avif',
     description: 'An abandoned mansion with a sad history.',
+    music: '/music/pokemon-mansion.m4a',
   },
   'Seafoam Islands': {
     category: 'Seafoam Islands',
@@ -338,7 +357,7 @@ export const subCategories: Record<string, RegionData> = {
     order: 171,
     image: '/backgrounds/seafoam.avif',
     description: 'A group of islands said to be the home of a legendary Pokemon.',
-    music: '/music/cave.m4a',
+    music: '/music/seafoam.m4a',
   },
   'Victory Road': {
     category: 'Victory Road',
@@ -346,7 +365,7 @@ export const subCategories: Record<string, RegionData> = {
     order: 240,
     image: '/backgrounds/victory-road.avif',
     description: 'A huge cave system and the final challenge before the Pokemon League.',
-    music: '/music/cave.m4a',
+    music: '/music/victory-road.m4a',
   },
   'Indigo Plateau': {
     category: 'Indigo Plateau',
@@ -354,6 +373,7 @@ export const subCategories: Record<string, RegionData> = {
     order: 250,
     image: '/backgrounds/indigo-plateau.avif',
     description: 'The home of the Pokemon League.',
+    music: '/music/indigo-plateau.m4a',
   },
   'Cerulean Cave': {
     category: 'Cerulean Cave',
@@ -361,7 +381,7 @@ export const subCategories: Record<string, RegionData> = {
     order: 61,
     image: '/backgrounds/cerulean-cave.avif',
     description: 'A secret cave that only the most powerful of trainers may enter.',
-    music: '/music/cave.m4a',
+    music: '/music/cerulean-cave.m4a',
   },
   'Digletts Cave': {
     category: 'Digletts Cave',

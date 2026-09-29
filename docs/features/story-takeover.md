@@ -17,6 +17,10 @@ suppressed so only authored `???` content appears. Content for the blackout is
 authored exactly like any other area, and the empty-state card is hidden when
 the list has nothing to show:
 
+The `???` sub-region plays `/music/saffron-takeover.m4a` while this blackout is
+active. Returning to the normal Explore state lets its selected area's music
+resume through the shared audio provider.
+
 - Tasks, locations, battles, games, shops, voyages, and expeditions with
   `category: '???'` and `subCategory: '???'` appear in the list.
 - The `???` region is registered in `src/data/region-map.ts` and
