@@ -1,6 +1,6 @@
 # Current Game State
 
-- Unreleased (`0.42.19`): Rocket Factory now has dedicated background artwork and stays locked until its actual access requirement is authored; completing `fuchsia-what-now` alone no longer exposes this unfinished sub-region.
+- Unreleased (`0.42.20`): Rocket Factory's background now shows the dark industrial interior manufacturing Rocket Balls, matching the in-game Rocket Ball design. The area stays locked until its actual access requirement is authored; completing `fuchsia-what-now` alone no longer exposes this unfinished sub-region.
 
 - Release `0.42.18`: The repeatable Underground Society `Feed the Pit` task consumes 1,000 Crystals per contribution instead of 5,000, still awarding 100 Society XP.
 
