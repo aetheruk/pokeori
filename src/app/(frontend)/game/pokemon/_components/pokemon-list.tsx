@@ -36,9 +36,19 @@ import {
   useSortable,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { useHaptics } from '@haptics/react'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { type CSSProperties, type PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
+  type PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
 import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
@@ -144,6 +154,7 @@ export function PokemonList({
   initialBoxState: InitialPokemonBoxState
 }) {
   const { user, gameData, refreshUser } = useUser()
+  const { trigger: triggerHaptic } = useHaptics()
   const router = useRouter()
   const searchParams = useSearchParams()
   const selectForItem = searchParams.get('selectFor')
@@ -212,6 +223,7 @@ export function PokemonList({
 
   const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const longPressTriggeredRef = useRef(false)
+  const longPressStartRef = useRef<{ x: number; y: number } | null>(null)
   const [totalPokemonCount, setTotalPokemonCount] = useState(initialBoxState.totalPokemonCount)
 
   const canBulkReleasePokemon = useCallback(
@@ -515,13 +527,18 @@ export function PokemonList({
     )
   }
 
-  const startLongPress = (pokemon: Pokemon) => {
+  const startLongPress = (
+    pokemon: Pokemon,
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
     if (isBulkReleaseMode || isSelectingPokemonForItem || rosterSelection)
       return
     longPressTriggeredRef.current = false
+    longPressStartRef.current = { x: event.clientX, y: event.clientY }
     if (holdTimerRef.current) clearTimeout(holdTimerRef.current)
     holdTimerRef.current = setTimeout(() => {
       longPressTriggeredRef.current = true
+      longPressStartRef.current = null
       setQuickMenuPokemon(pokemon)
     }, 520)
   }
@@ -529,6 +546,18 @@ export function PokemonList({
   const cancelLongPress = () => {
     if (holdTimerRef.current) clearTimeout(holdTimerRef.current)
     holdTimerRef.current = null
+    longPressStartRef.current = null
+  }
+
+  const handleLongPressPointerMove = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    const start = longPressStartRef.current
+    if (!start) return
+
+    if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > 8) {
+      cancelLongPress()
+    }
   }
 
   const handleConfirmBulkRelease = async () => {
@@ -862,6 +891,7 @@ export function PokemonList({
     const cardContent = (
       <Card
         title={name}
+        data-haptic-manual="true"
         role={isCardInteractive ? 'button' : undefined}
         tabIndex={isCardInteractive ? 0 : undefined}
         aria-label={isCardInteractive ? name : undefined}
@@ -899,6 +929,8 @@ export function PokemonList({
             longPressTriggeredRef.current = false
             return
           }
+
+          if (isCardInteractive) triggerHaptic('selection')
 
           if (rosterSelection) {
             event.preventDefault()
@@ -947,9 +979,13 @@ export function PokemonList({
         onPointerDown={
           options?.disableHoldMenu
             ? undefined
-            : () => startLongPress(pokemon)
+            : (event) => startLongPress(pokemon, event)
         }
-        onPointerUp={cancelLongPress}
+        onPointerMove={handleLongPressPointerMove}
+        onPointerUp={() => {
+          if (longPressTriggeredRef.current) triggerHaptic('selection')
+          cancelLongPress()
+        }}
         onPointerCancel={cancelLongPress}
         onPointerLeave={cancelLongPress}
         onContextMenu={(event) => {
@@ -1029,8 +1065,10 @@ export function PokemonList({
           <div className="absolute bottom-0 z-20 flex w-full justify-center bg-game-ink/70 p-1">
             <Button
               size="sm"
+              data-haptic-manual="true"
               className="h-10 w-full max-w-[90%] bg-game-ochre text-[10px] font-bold !text-game-cream hover:bg-game-ochre/90"
               onClick={(e) => {
+                triggerHaptic('selection')
                 e.preventDefault()
                 e.stopPropagation()
                 handleIdentify(pokemon.id)

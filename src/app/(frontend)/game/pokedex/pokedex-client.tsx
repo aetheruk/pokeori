@@ -13,6 +13,7 @@ import {
   Venus,
   Weight,
 } from 'lucide-react'
+import { useHaptics } from '@haptics/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -157,6 +158,7 @@ const TYPE_FILTER_OPTIONS = [
 ]
 
 export default function Pokedex() {
+  const { trigger: triggerHaptic } = useHaptics()
   const [selectedSpeciesId, setSelectedSpeciesId] = useState<number | null>(
     null,
   )
@@ -213,9 +215,13 @@ export default function Pokedex() {
   }, [discoveryFilter, gridRef, searchQuery, selectedType])
 
   // Memoized handler for selecting species
-  const handleSelectSpecies = useCallback((id: number) => {
-    setSelectedSpeciesId(id)
-  }, [])
+  const handleSelectSpecies = useCallback(
+    (id: number) => {
+      triggerHaptic('selection')
+      setSelectedSpeciesId(id)
+    },
+    [triggerHaptic],
+  )
 
   useEffect(() => {
     setSelectedGender('male')
@@ -1540,6 +1546,7 @@ const PokedexGridItem = memo(function PokedexGridItem({
     <button
       id={`pokedex-entry-${speciesId}`}
       type="button"
+      data-haptic-manual="true"
       aria-pressed={isSelected}
       aria-label={
         hasCaught

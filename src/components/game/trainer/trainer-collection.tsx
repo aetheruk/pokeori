@@ -12,6 +12,7 @@ import {
   Trophy,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useHaptics } from '@haptics/react'
 import { type ComponentType, useMemo } from 'react'
 import { PremiumHeader } from '@/components/game/shared/PremiumHeader'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
@@ -407,11 +408,14 @@ function CollectionPanel({
   stats: { label: string; value: string }[]
   railStats: { label: string; value: number }[]
 }) {
+  const { trigger: triggerHaptic } = useHaptics()
   const isCharcoal = accent === 'charcoal'
 
   return (
     <Link
       href={href}
+      data-haptic-manual="true"
+      onClick={() => triggerHaptic('selection')}
       className="game-focus-ring group relative overflow-hidden rounded-lg border border-game-border bg-game-surface p-4 transition-colors hover:border-game-charcoal/45 hover:bg-game-surface-raised"
     >
       <div

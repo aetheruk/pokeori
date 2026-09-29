@@ -19,3 +19,8 @@ their action buttons stay above it. Continuous pointer surfaces
 such as drawing canvases, steering stages, and swipe gestures keep their existing
 pointer behavior instead of receiving a full-size overlay. Flap's outside-
 playfield tap target remains explicitly haptic-enabled.
+
+Pokémon roster tiles, Pokédex/MoveDex/AbilityDex records, and Trainer collection
+cards call the shared selection haptic from their click handlers. This lets a
+drag across a large tile or virtualized record grid remain a scroll gesture
+without placing an iOS switch overlay over the scroll target.
