@@ -1,6 +1,6 @@
 {
   "name": "pokeori",
-  "version": "0.42.6",
+  "version": "0.42.7",
   "description": "Pokeori field-journal adventure game",
   "license": "MIT",
   "type": "module",
@@ -114,6 +114,7 @@
     "swr": "2.5.1",
     "tailwind-merge": "3.6.0",
     "tailwindcss": "4.3.3",
+    "use-haptic": "^1.1.13",
     "use-sound": "5.0.0",
     "uuid": "14.0.2",
     "vaul": "1.1.2",

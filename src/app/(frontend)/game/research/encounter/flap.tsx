@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { useHaptic } from 'use-haptic'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
@@ -28,7 +29,15 @@ export function FlapGame({ encounter, initialState, actions }: FlapGameProps) {
   const score = simulation?.score || 0
   const isEndlessMode = encounter.settings.endless?.enabled || false
   const startError: string | null = null
-  const flap = useCallback(() => session.sendInput('flap'), [session.sendInput])
+  const { triggerHaptic } = useHaptic()
+  const sendFlap = useCallback(
+    () => session.sendInput('flap'),
+    [session.sendInput],
+  )
+  const flapFromTouch = useCallback(() => {
+    triggerHaptic()
+    sendFlap()
+  }, [sendFlap, triggerHaptic])
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -44,12 +53,12 @@ export function FlapGame({ encounter, initialState, actions }: FlapGameProps) {
         event.key === 'w'
       ) {
         event.preventDefault()
-        flap()
+        sendFlap()
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [flap])
+  }, [sendFlap])
 
   const backdrop =
     encounter.settings.scene?.backdrop || '/games/run/backgrounds/sky.avif'
@@ -80,7 +89,7 @@ export function FlapGame({ encounter, initialState, actions }: FlapGameProps) {
             />
           ) : undefined
         }
-        onOutsideTap={flap}
+        onOutsideTap={flapFromTouch}
         overlay={
           startError ? (
             <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#081014]/60 p-6 backdrop-blur-sm">
