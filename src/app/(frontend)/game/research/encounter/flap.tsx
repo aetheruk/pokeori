@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { useHaptic } from 'use-haptic'
+import { HapticsProvider } from '@haptics/react'
 import { GameTimer } from '@/components/game/shared/game-timer'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { Button } from '@/components/ui/button'
@@ -29,15 +29,10 @@ export function FlapGame({ encounter, initialState, actions }: FlapGameProps) {
   const score = simulation?.score || 0
   const isEndlessMode = encounter.settings.endless?.enabled || false
   const startError: string | null = null
-  const { triggerHaptic } = useHaptic()
-  const sendFlap = useCallback(
+  const flap = useCallback(
     () => session.sendInput('flap'),
     [session.sendInput],
   )
-  const flapFromTouch = useCallback(() => {
-    triggerHaptic()
-    sendFlap()
-  }, [sendFlap, triggerHaptic])
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -53,81 +48,84 @@ export function FlapGame({ encounter, initialState, actions }: FlapGameProps) {
         event.key === 'w'
       ) {
         event.preventDefault()
-        sendFlap()
+        flap()
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [sendFlap])
+  }, [flap])
 
   const backdrop =
     encounter.settings.scene?.backdrop || '/games/run/backgrounds/sky.avif'
 
   return (
     <div className="game-night relative min-h-dvh overflow-hidden bg-game-night-canvas">
-      <SideScrollerStage
-        category={encounter.category}
-        scene={encounter.settings.scene}
-        fallbackBackdrop="/games/run/backgrounds/sky.avif"
-        stageRef={stageRef}
-        score={
-          <span className="text-sm">
-            {isEndlessMode ? (
-              <>Score: {Math.floor(score)}</>
-            ) : (
-              <>
-                Score: {Math.floor(score)} / {encounter.settings.winScore}
-              </>
-            )}
-          </span>
-        }
-        timer={
-          encounter.settings.timeLimit ? (
-            <GameTimer
-              timeLeft={timeLeft}
-              totalTime={encounter.settings.timeLimit}
-            />
-          ) : undefined
-        }
-        onOutsideTap={flapFromTouch}
-        overlay={
-          startError ? (
-            <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#081014]/60 p-6 backdrop-blur-sm">
-              <div className="max-w-sm rounded-xl border border-game-border bg-game-surface p-5 text-center text-game-ink shadow-xl">
-                <p className="font-semibold">Unable to start</p>
-                <p className="mt-2 text-sm text-game-ink-muted">{startError}</p>
-                <Button
-                  className="mt-4"
-                  onClick={() => router.push('/game/explore')}
-                >
-                  Back to Explore
-                </Button>
+      <HapticsProvider respectReducedMotion>
+        <SideScrollerStage
+          category={encounter.category}
+          scene={encounter.settings.scene}
+          fallbackBackdrop="/games/run/backgrounds/sky.avif"
+          stageRef={stageRef}
+          score={
+            <span className="text-sm">
+              {isEndlessMode ? (
+                <>Score: {Math.floor(score)}</>
+              ) : (
+                <>
+                  Score: {Math.floor(score)} / {encounter.settings.winScore}
+                </>
+              )}
+            </span>
+          }
+          timer={
+            encounter.settings.timeLimit ? (
+              <GameTimer
+                timeLeft={timeLeft}
+                totalTime={encounter.settings.timeLimit}
+              />
+            ) : undefined
+          }
+          hapticOutsideTaps
+          onOutsideTap={flap}
+          overlay={
+            startError ? (
+              <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#081014]/60 p-6 backdrop-blur-sm">
+                <div className="max-w-sm rounded-xl border border-game-border bg-game-surface p-5 text-center text-game-ink shadow-xl">
+                  <p className="font-semibold">Unable to start</p>
+                  <p className="mt-2 text-sm text-game-ink-muted">{startError}</p>
+                  <Button
+                    className="mt-4"
+                    onClick={() => router.push('/game/explore')}
+                  >
+                    Back to Explore
+                  </Button>
+                </div>
               </div>
-            </div>
-          ) : countdown > 0 ? (
-            <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#081014]/50 backdrop-blur-sm">
-              <div className="animate-pulse">
-                <GameTimer
-                  timeLeft={countdown}
-                  totalTime={3}
-                  size="xl"
-                  className="text-[#f7ecd6] drop-shadow-2xl"
-                  colorOverride="text-[#d3ad63]"
-                />
+            ) : countdown > 0 ? (
+              <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#081014]/50 backdrop-blur-sm">
+                <div className="animate-pulse">
+                  <GameTimer
+                    timeLeft={countdown}
+                    totalTime={3}
+                    size="xl"
+                    className="text-[#f7ecd6] drop-shadow-2xl"
+                    colorOverride="text-[#d3ad63]"
+                  />
+                </div>
               </div>
-            </div>
-          ) : undefined
-        }
-      >
-        <SideScrollerCanvas
-          gameType="flap"
-          settings={encounter.settings}
-          renderFrameRef={renderFrameRef}
-          backdrop={backdrop}
-          label={`${encounter.name} playfield`}
-          active={countdown <= 0}
-        />
-      </SideScrollerStage>
+            ) : undefined
+          }
+        >
+          <SideScrollerCanvas
+            gameType="flap"
+            settings={encounter.settings}
+            renderFrameRef={renderFrameRef}
+            backdrop={backdrop}
+            label={`${encounter.name} playfield`}
+            active={countdown <= 0}
+          />
+        </SideScrollerStage>
+      </HapticsProvider>
 
       {result && (
         <RewardResultOverlay
