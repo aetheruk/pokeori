@@ -3,7 +3,7 @@
 import type { GameDataKeys } from '@/utilities/requirements/analysis'
 
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { Camera, Check, Crosshair, ImageIcon, X } from 'lucide-react'
+import { Camera, Check, Crosshair } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -116,7 +116,7 @@ export function PokemonSnapGame({
   const [success, setSuccess] = useState(false)
   const [nextRoundDelay, setNextRoundDelay] = useState(!!initialState) // Start round immediately if hydrated
   const [cameraFlash, setCameraFlash] = useState(false)
-  const [wrongSnapToast, setWrongSnapToast] = useState(false)
+  const [wrongPhotoId, setWrongPhotoId] = useState<number | null>(null)
   const [photographedPokemon, setPhotographedPokemon] = useState<
     { id: number; correct: boolean }[]
   >([])
@@ -127,6 +127,7 @@ export function PokemonSnapGame({
     initialState?.startTime || null,
   )
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const wrongPhotoTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const targetMissTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const targetGameEndedRef = useRef(false)
   const router = useRouter()
@@ -135,6 +136,8 @@ export function PokemonSnapGame({
   useEffect(() => {
     return () => {
       if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current)
+      if (wrongPhotoTimeoutRef.current)
+        clearTimeout(wrongPhotoTimeoutRef.current)
       if (targetMissTimeoutRef.current)
         clearTimeout(targetMissTimeoutRef.current)
     }
@@ -295,15 +298,21 @@ export function PokemonSnapGame({
     if (isCorrect) playSfx('good')
     else {
       playSfx('bad')
-      // Show wrong-snap toast briefly
-      setWrongSnapToast(true)
-      setTimeout(() => setWrongSnapToast(false), 900)
+      setWrongPhotoId(snappedId)
+      if (wrongPhotoTimeoutRef.current)
+        clearTimeout(wrongPhotoTimeoutRef.current)
+      wrongPhotoTimeoutRef.current = setTimeout(() => {
+        setWrongPhotoId(null)
+        wrongPhotoTimeoutRef.current = null
+      }, 700)
     }
     setCorrectSnaps(result.wins || 0)
-    setPhotographedPokemon((prev) => [
-      ...prev,
-      { id: snappedId, correct: isCorrect },
-    ])
+    if (isCorrect) {
+      setPhotographedPokemon((prev) => [
+        ...prev,
+        { id: snappedId, correct: true },
+      ])
+    }
 
     // Update target for next round
     if (result.nextPokemonId) {
@@ -635,15 +644,6 @@ export function PokemonSnapGame({
               <GameProgressChip wins={correctSnaps} required={winRateNum} />
             </div>
 
-            {/* Wrong snap toast */}
-            {wrongSnapToast && (
-              <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
-                <div className="bg-red-500/90 text-game-cream text-sm font-bold px-4 py-2 rounded-full shadow-lg animate-in zoom-in-75 duration-200">
-                  Wrong Pokémon!
-                </div>
-              </div>
-            )}
-
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               {!pokemonVisible && (
                 <div className="text-center flex flex-col items-center gap-2">
@@ -677,79 +677,73 @@ export function PokemonSnapGame({
           </div>
 
           {/* Field desk */}
-          <div className="game-paper-background flex min-h-0 flex-1 flex-col border-t border-game-border bg-game-surface text-game-ink">
+          <div className="game-paper-background relative flex min-h-0 flex-1 flex-col border-t border-game-border bg-game-surface text-game-ink">
             <div className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col px-4 sm:px-6">
-              <div className="grid shrink-0 grid-cols-[1fr_auto] items-center gap-3 border-b border-game-border py-4 sm:gap-6 sm:py-5">
-                <div className="flex min-w-0 items-center gap-3 sm:gap-5">
-                  <div className="relative flex size-24 shrink-0 items-center justify-center rounded-lg border border-game-card-border bg-game-surface-raised sm:size-32">
-                    <Crosshair
-                      aria-hidden="true"
-                      className="absolute inset-3 size-[calc(100%-1.5rem)] stroke-[0.5] text-game-border"
+              <div className="flex shrink-0 items-center justify-center border-b border-game-border py-2 sm:py-3">
+                <div className="relative flex size-24 shrink-0 items-center justify-center rounded-lg border border-game-card-border bg-game-surface-raised sm:size-32">
+                  <Crosshair
+                    aria-hidden="true"
+                    className="absolute inset-3 size-[calc(100%-1.5rem)] stroke-[0.5] text-game-border"
+                  />
+                  {requestedPokemon ? (
+                    <Image
+                      src={getPokemonImageUrl(
+                        requestedPokemon.toString(),
+                        'sprite',
+                      )}
+                      alt={requestedName}
+                      width={192}
+                      height={192}
+                      unoptimized
+                      className="relative size-36 max-w-none object-contain [image-rendering:pixelated] sm:size-48"
                     />
-                    {requestedPokemon ? (
-                      <Image
-                        src={getPokemonImageUrl(
-                          requestedPokemon.toString(),
-                          'sprite',
-                        )}
-                        alt={requestedName}
-                        width={192}
-                        height={192}
-                        unoptimized
-                        className="relative size-36 max-w-none object-contain [image-rendering:pixelated] sm:size-48"
-                      />
-                    ) : (
-                      <Camera
-                        className="size-8 text-game-muted"
-                        aria-hidden="true"
-                      />
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-game-muted">
-                      <Crosshair className="size-3.5" aria-hidden="true" /> Find
-                      & photograph
-                    </p>
-                    <h2 className="break-words text-xl font-bold leading-tight sm:text-2xl">
-                      {requestedName}
-                    </h2>
-                    <p className="mt-2 text-xs text-game-muted">
-                      Wait for it in the viewfinder.
-                    </p>
-                  </div>
+                  ) : (
+                    <Camera
+                      className="size-8 text-game-muted"
+                      aria-hidden="true"
+                    />
+                  )}
                 </div>
-                <Button
-                  onClick={handleSnap}
-                  disabled={!pokemonVisible || isProcessing || !roundActive}
-                  aria-label={isProcessing ? 'Saving photo' : 'Snap photo'}
-                  className="flex h-auto min-h-24 w-24 flex-col gap-2 rounded-xl bg-game-clay px-2 py-3 text-game-cream hover:bg-game-clay-strong disabled:opacity-50 sm:min-h-32 sm:w-32"
-                >
-                  <span className="flex size-12 items-center justify-center rounded-full border-2 border-current sm:size-14">
-                    <Camera className="size-6" aria-hidden="true" />
-                  </span>
-                  <span className="text-xs font-bold">
-                    {isProcessing ? 'Saving…' : 'Snap photo'}
-                  </span>
-                  <kbd className="hidden text-[10px] font-normal opacity-75 sm:block">
-                    Space
-                  </kbd>
-                </Button>
               </div>
 
-              <div className="flex shrink-0 items-center justify-between gap-3 py-3">
-                <h3 className="flex items-center gap-2 text-sm font-bold">
-                  <ImageIcon
-                    className="size-4 text-game-muted"
-                    aria-hidden="true"
-                  />{' '}
-                  Contact sheet
-                </h3>
-                <span className="font-mono text-xs text-game-muted">
-                  {photographedPokemon.length} photos
-                </span>
-              </div>
-              <div className="min-h-0 flex-1 overflow-y-auto pb-5 [scrollbar-width:thin]">
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+              {wrongPhotoId !== null && (
+                <motion.div
+                  role="status"
+                  aria-label="Wrong Pokémon photographed"
+                  initial={reduceMotion ? false : { opacity: 0, scale: 0.92 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center p-6"
+                >
+                  <div className="relative flex aspect-square w-full max-w-[min(70vw,24rem)] items-center justify-center overflow-hidden rounded-xl border-4 border-game-surface-raised bg-game-charcoal shadow-xl">
+                    {encounter.background && (
+                      <Image
+                        src={encounter.background}
+                        alt=""
+                        fill
+                        sizes="(max-width: 640px) 70vw, 384px"
+                        className="object-cover opacity-80"
+                      />
+                    )}
+                    <Image
+                      src={getPokemonImageUrl(
+                        wrongPhotoId.toString(),
+                        'sprite',
+                      )}
+                      alt=""
+                      width={240}
+                      height={240}
+                      unoptimized
+                      className="relative size-4/5 object-contain [image-rendering:pixelated]"
+                    />
+                    <span className="absolute bottom-3 right-3 rounded bg-game-charcoal px-2 py-1 font-mono text-xs font-bold text-game-cream">
+                      MISSED
+                    </span>
+                  </div>
+                </motion.div>
+              )}
+
+              <div className="min-h-0 flex-1 overflow-y-auto pb-3 [scrollbar-width:thin]">
+                <div className="grid grid-cols-3 gap-2 sm:gap-4">
                   <AnimatePresence initial={false}>
                     {photographedPokemon.map((photo, index) => {
                       const pokemon = pokemonData.find((p) => p.id === photo.id)
@@ -796,54 +790,26 @@ export function PokemonSnapGame({
                             </span>
                             <span
                               role="img"
-                              aria-label={
-                                photo.correct
-                                  ? 'Correct photo'
-                                  : 'Wrong Pokémon'
-                              }
+                              aria-label="Correct photo"
                               className={`flex size-6 shrink-0 items-center justify-center rounded-full border ${photo.correct ? 'border-game-ochre text-game-ochre' : 'border-game-clay text-game-clay'}`}
                             >
-                              {photo.correct ? (
-                                <Check className="size-4" />
-                              ) : (
-                                <X className="size-4" />
-                              )}
+                              <Check className="size-4" />
                             </span>
                           </figcaption>
                         </motion.figure>
                       )
                     })}
                   </AnimatePresence>
-                  {Array.from(
-                    {
-                      length: Math.max(
-                        0,
-                        Math.min(winRateNum, 3) - photographedPokemon.length,
-                      ),
-                    },
-                    (_, index) => (
-                      <div
-                        key={`empty-${index}`}
-                        aria-hidden="true"
-                        className="rounded-lg border border-dashed border-game-border p-2"
-                      >
-                        <div className="flex aspect-square items-center justify-center rounded-sm bg-game-surface-raised/40">
-                          <Camera className="size-7 stroke-1 text-game-border" />
-                        </div>
-                        <div className="flex items-center justify-between px-0.5 pt-2.5 pb-0.5 text-game-muted">
-                          <span className="font-mono text-[10px]">— —</span>
-                          <span className="size-6 rounded-full border border-dashed border-game-border" />
-                        </div>
-                      </div>
-                    ),
-                  )}
                 </div>
-                {photographedPokemon.length === 0 && (
-                  <p className="mt-3 text-center text-xs text-game-muted">
-                    Your first photo goes here.
-                  </p>
-                )}
               </div>
+              <Button
+                onClick={handleSnap}
+                disabled={!pokemonVisible || isProcessing || !roundActive}
+                aria-label={isProcessing ? 'Saving photo' : 'Snap photo'}
+                className="my-2 flex h-14 w-full shrink-0 items-center justify-center rounded-xl bg-game-clay text-game-cream hover:bg-game-clay-strong disabled:opacity-50 sm:my-4 sm:h-16"
+              >
+                <Camera className="size-7" aria-hidden="true" />
+              </Button>
             </div>
           </div>
         </div>
