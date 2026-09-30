@@ -1239,6 +1239,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '1',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -1301,6 +1302,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '4',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -1363,6 +1365,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '7',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -1426,6 +1429,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '152',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -1487,6 +1491,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '155',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -1548,6 +1553,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '158',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -1610,6 +1616,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '252',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -1671,6 +1678,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '255',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -1732,6 +1740,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '258',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -1794,6 +1803,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '387',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -1856,6 +1866,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '390',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -1917,6 +1928,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '393',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -1980,6 +1992,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '495',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -2041,6 +2054,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '498',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -2103,6 +2117,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '501',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -2166,6 +2181,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '650',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -2227,6 +2243,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '653',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -2289,6 +2306,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '656',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -2352,6 +2370,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '722',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -2414,6 +2433,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '725',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -2476,6 +2496,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '728',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -2539,6 +2560,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '810',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -2601,6 +2623,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '813',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -2663,6 +2686,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '816',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -2726,6 +2750,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '906',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -2788,6 +2813,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '909',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
@@ -2850,6 +2876,7 @@ export const palletTownTasks: Task[] = [
         pokemonData: {
           level: 5,
           formId: '912',
+          background: '/backgrounds/lab.avif',
           ballType: 'cherish-ball',
           partner: true,
         },
