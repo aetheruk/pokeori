@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.43.5`: Pokémon Snap's field desk shows the requested Pokémon as a large, crisp pixel sprite beside the shutter. The scrollable contact sheet displays scenic photo prints with correct/wrong stamps and empty print slots; the shutter stays visible while browsing photos. Session timing, scoring, rewards, and target selection are unchanged.
+
 ## Production runtime (2026-09-30)
 
 The N150 is retired; the production target is now the Hetzner `pokeori-server`.
