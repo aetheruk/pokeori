@@ -15,6 +15,15 @@ The available environment also had no usable `RESEND_API_KEY` and no
 `BETA_INVITATION_SECRET`. Configure a valid mail key and a new stable invitation
 signing secret before enabling registration and transactional email.
 
+Coolify is installed on `pokeori-server` and reachable at
+`https://coolify.pokeori.app`. Its `Pokeori` production project now contains a
+private `pokeori-dragonfly` database on the same destination network, with a
+generated password, persistent `/data` volume, and 768 MiB memory limit. The
+Dragonfly container is healthy. Coolify does not schedule Dragonfly backups;
+Dragonfly snapshot persistence is not enabled yet. The app and its runtime
+environment have not been deployed while the MongoDB, mail, and GitHub source
+setup blockers remain unresolved.
+
 The Hetzner Cloud firewall allows inbound SSH, HTTP, and HTTPS; Coolify's direct
 port `8000` stays closed. Cloudflare proxies `pokeori.app` and
 `coolify.pokeori.app` to the Hetzner origin. The current origin firewall permits
