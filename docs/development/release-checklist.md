@@ -7,7 +7,7 @@ changes.
 - Run `bun run security:audit`. It checks the actual admin-only unlock policy before accepting Payload's one named upstream advisory and rejects new advisories.
 - Rotate credentials known to have been exposed to unauthorized parties.
 - Confirm production has `DATABASE_URI`, `PAYLOAD_SECRET`, and `RESEND_API_KEY`.
-- Confirm Coolify has the same stable `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` enabled for build and runtime, with Docker Build Secrets enabled.
+- Confirm GitHub Actions has `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` as a build secret and Coolify has the same stable value at runtime. Keep the unlinked `pokeori-production` GHCR package and its registry build cache private.
 - Confirm `.env` is ignored and no real secrets are committed.
 - Configure `BETA_INVITATION_SECRET` and use the signed, expiring, single-use invitation workflow for registration.
 - Confirm the main app contains no `/dev` authoring routes. The local Content Studio is not part of the production image, and its direct file-writing actions require its local opt-in.
@@ -46,7 +46,7 @@ changes.
 - Confirm Redis is reachable and TLS settings match the deployment environment.
 - Confirm `/api/health` checks MongoDB, replica-set transaction support, and Dragonfly, and Coolify reports one healthy application replica.
 - Deploy to staging first when available.
-- After GitHub auto-deployment is configured, merge the validated release PR to protected `main`; Coolify will build the Dockerfile and deploy. No local production build or publish step is required. Preserve the Hetzner host's build caches.
+- After GitHub Actions and the Coolify Docker Image resource are configured, merge the validated release PR to protected `main`; GitHub builds and publishes `ghcr.io/aetheruk/pokeori-production` and then calls Coolify's authenticated deploy webhook. Coolify pulls the image and does not build the Dockerfile. No local production build or publish step is required.
 - Check server logs for request IDs on API failures.
 - Verify login, Explore, Pokemon box, one battle, one location encounter, one Mini Game, and one Field Research study.
 - With an already-open PWA session, confirm it detects the new `/api/app-version` response and reloads to the latest client bundle.

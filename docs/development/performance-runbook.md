@@ -11,13 +11,18 @@ the current migration state.
 - Run one Pokeori replica. In-process Next.js state is not required for
   correctness, but a second replica on the same host adds memory pressure
   without adding host redundancy.
-- Configure Pokeori as a public Git repository Application using the root Dockerfile and automatic deployment from `main`. Do not publish a
-  host port; route only through Coolify's proxy.
-- Coolify builds natively on the Hetzner CX23. Preserve BuildKit caches and run one build at a time; see the [deployment guide](/docs/development/deployment.md).
+- Configure Pokeori as a Docker Image application for private
+  `ghcr.io/aetheruk/pokeori-production:latest`. Keep GHCR pull credentials on the Coolify
+  deployment server. Do not publish a host port; route only through Coolify's
+  proxy.
+- GitHub Actions builds and publishes the image, then calls Coolify's
+  authenticated deploy webhook. The CX23 runs Coolify, MongoDB, Dragonfly, and
+  Pokeori; it does not compile the application. See the
+  [deployment guide](/docs/development/deployment.md).
 - Use `/api/health` as the health endpoint with a 30 second interval, 10 second
   timeout, 60 second start period, and 3 retries. The image includes the same
   health check.
-- Size resource limits from the host's installed RAM and observed peak use. Leave headroom for the OS, Coolify, the compiler, and briefly overlapping app containers during rollout. Do not allocate all four cores or all memory to steady-state services.
+- Size resource limits from the host's installed RAM and observed peak use. Leave headroom for the OS, Coolify, and briefly overlapping app containers during rollout. GitHub's build runner handles compiler RAM, so a Coolify app memory cap does not limit image compilation. Do not allocate all four cores or all memory to steady-state services.
 - Keep Dragonfly eviction disabled because battle, encounter, action-lock, and
   idempotency keys are correctness state. Alert before it approaches its memory
   limit.
@@ -174,9 +179,11 @@ User-state reads use per-user filters, route scopes, and field projections. The 
 
 As of the 0.29.11 preparation, the public health/version URLs returned 404 and the available Coolify token returned 403 for application/deployment reads. Host metrics, live image scanning, authenticated flow timings, and PWA refresh therefore remain unverified; use a Coolify session with read access and an authenticated player session to complete these checks.
 
-Run the release checklist before merging. Coolify builds and deploys from
-protected `main` automatically. Inspect its build logs and deployed commit,
-then verify the running image; see the [deployment guide](/docs/development/deployment.md).
+Run the release checklist before merging. A push to protected `main` runs the
+GitHub Actions image release and triggers Coolify after the image is published.
+Inspect the Actions build/publish logs and Coolify's image-pull deployment log,
+then verify the running image; see the
+[deployment guide](/docs/development/deployment.md).
 
 After rollout:
 
