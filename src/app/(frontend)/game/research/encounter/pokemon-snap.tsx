@@ -2,8 +2,8 @@
 
 import type { GameDataKeys } from '@/utilities/requirements/analysis'
 
-import { AnimatePresence, motion } from 'framer-motion'
-import { Camera } from 'lucide-react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { Camera, Check, Crosshair, ImageIcon, X } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -74,6 +74,7 @@ export function PokemonSnapGame({
   initialState,
 }: PokemonSnapGameProps) {
   useGameMusic(encounter)
+  const reduceMotion = useReducedMotion()
   const { playSfx } = useAudio()
   const { refreshUser } = useUser()
   const completionInvalidatesRef = useRef<GameDataKeys[] | undefined>(undefined)
@@ -583,11 +584,11 @@ export function PokemonSnapGame({
   })
 
   return (
-    <div className="min-h-dvh game-night bg-game-night-canvas text-game-night-ink">
+    <div className="min-h-dvh bg-game-surface text-game-ink">
       <main className="h-dvh w-full">
         <div className="h-full flex flex-col">
           {/* Game Area (Top 30%) */}
-          <div className="relative h-[30%] overflow-hidden bg-game-night-surface">
+          <div className="relative h-[30%] shrink-0 overflow-hidden bg-game-night-surface">
             {/* Background Image if set on encounter - no fallback, no overlay */}
             {encounter.background ? (
               <motion.div
@@ -675,154 +676,173 @@ export function PokemonSnapGame({
             </div>
           </div>
 
-          {/* Answer Area (Bottom 70%) */}
-          <div className="game-paper-background h-[70%] overflow-y-auto border-t border-game-border bg-game-surface px-4 py-4 text-game-ink sm:px-6 sm:py-5">
-            <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col">
-              {/* The subject and progress stay together so the panel has one clear
-                  starting point instead of a title, rule, and second divider. */}
-              <div className="flex items-end justify-between gap-4 border-b border-game-border pb-4">
-                <div className="min-w-0">
-                  <p className="mb-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-game-muted">
-                    Find
-                  </p>
-                  <h2 className="truncate font-display text-2xl font-semibold leading-tight text-game-ink sm:text-3xl">
-                    {requestedName}
-                  </h2>
-                </div>
-                <div className="flex shrink-0 items-baseline gap-1 rounded-full border border-game-border bg-game-surface-raised px-3 py-1.5 shadow-sm">
-                  <span className="font-display text-lg font-semibold text-game-ink">
-                    {correctSnaps}
-                  </span>
-                  <span className="text-xs font-semibold text-game-muted">
-                    / {winRateNum}
-                  </span>
-                </div>
-              </div>
-
-              <div className="mb-3 flex items-center justify-between gap-3 pt-4">
-                <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-game-ink">
-                  Photo log
-                </h3>
-                <span className="text-xs text-game-muted">
-                  {photographedPokemon.length}{' '}
-                  {photographedPokemon.length === 1 ? 'photo' : 'photos'}
-                </span>
-              </div>
-
-              <div className="min-h-0 flex-1">
-                {photographedPokemon.length > 0 ? (
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-                    <AnimatePresence initial={false}>
-                      {photographedPokemon.map((photo, index) => {
-                        const pokemon = pokemonData.find(
-                          (p) => p.id === photo.id,
-                        )
-                        const pokemonName =
-                          pokemon?.forms.find((f) => f.form === 'base')?.name ||
-                          pokemon?.forms[0]?.name ||
-                          '???'
-                        return (
-                          <motion.div
-                            key={`${photo.id}-${index}`}
-                            initial={{ opacity: 0, y: 10, scale: 0.97 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            transition={{
-                              type: 'spring',
-                              damping: 18,
-                              stiffness: 220,
-                            }}
-                            className={`game-panel relative overflow-hidden bg-game-surface-raised p-2.5 shadow-sm ${
-                              photo.correct
-                                ? 'border-game-moss/55'
-                                : 'border-game-clay/55'
-                            }`}
-                          >
-                            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-md border border-game-border bg-game-surface">
-                              <div
-                                className={`absolute inset-x-3 top-0 h-1 rounded-b-full ${
-                                  photo.correct
-                                    ? 'bg-game-moss'
-                                    : 'bg-game-clay'
-                                }`}
-                                aria-hidden="true"
-                              />
-                              <Image
-                                src={getPokemonImageUrl(
-                                  photo.id.toString(),
-                                  'sprite',
-                                )}
-                                alt={pokemonName}
-                                width={72}
-                                height={72}
-                                unoptimized
-                                className="object-contain"
-                              />
-                              <span
-                                role="img"
-                                className={`absolute right-1.5 top-1.5 flex size-5 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm ${
-                                  photo.correct
-                                    ? 'bg-game-moss'
-                                    : 'bg-game-clay'
-                                }`}
-                                aria-label={
-                                  photo.correct ? 'Correct photo' : 'Missed photo'
-                                }
-                              >
-                                {photo.correct ? '✓' : '×'}
-                              </span>
-                            </div>
-                            <p className="mt-2 truncate text-sm font-semibold text-game-ink">
-                              {pokemonName}
-                            </p>
-                          </motion.div>
-                        )
-                      })}
-                    </AnimatePresence>
+          {/* Field desk */}
+          <div className="game-paper-background flex min-h-0 flex-1 flex-col border-t border-game-border bg-game-surface text-game-ink">
+            <div className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col px-4 sm:px-6">
+              <div className="grid shrink-0 grid-cols-[1fr_auto] items-center gap-3 border-b border-game-border py-4 sm:gap-6 sm:py-5">
+                <div className="flex min-w-0 items-center gap-3 sm:gap-5">
+                  <div className="relative flex size-24 shrink-0 items-center justify-center rounded-lg border border-game-card-border bg-game-surface-raised sm:size-32">
+                    <Crosshair
+                      aria-hidden="true"
+                      className="absolute inset-3 size-[calc(100%-1.5rem)] stroke-[0.5] text-game-border"
+                    />
+                    {requestedPokemon ? (
+                      <Image
+                        src={getPokemonImageUrl(
+                          requestedPokemon.toString(),
+                          'sprite',
+                        )}
+                        alt={requestedName}
+                        width={192}
+                        height={192}
+                        unoptimized
+                        className="relative size-36 max-w-none object-contain [image-rendering:pixelated] sm:size-48"
+                      />
+                    ) : (
+                      <Camera
+                        className="size-8 text-game-muted"
+                        aria-hidden="true"
+                      />
+                    )}
                   </div>
-                ) : (
-                  <div className="flex min-h-36 items-center justify-center rounded-xl border border-dashed border-game-border bg-game-surface/60 px-5 text-center">
-                    <div>
-                      <Camera className="mx-auto mb-2 size-6 text-game-muted" />
-                      <p className="text-sm font-semibold text-game-ink">
-                        No photos yet
-                      </p>
-                      <p className="mt-1 text-xs text-game-muted">
-                        Your snapshots will appear here.
-                      </p>
-                    </div>
+                  <div className="min-w-0">
+                    <p className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-game-muted">
+                      <Crosshair className="size-3.5" aria-hidden="true" /> Find
+                      & photograph
+                    </p>
+                    <h2 className="break-words text-xl font-bold leading-tight sm:text-2xl">
+                      {requestedName}
+                    </h2>
+                    <p className="mt-2 text-xs text-game-muted">
+                      Wait for it in the viewfinder.
+                    </p>
                   </div>
-                )}
-              </div>
-
-              <div className="mt-5 border-t border-game-border pt-4">
+                </div>
                 <Button
                   onClick={handleSnap}
                   disabled={!pokemonVisible || isProcessing || !roundActive}
-                  size="lg"
-                  variant="default"
-                  className="mx-auto flex h-16 w-full max-w-md items-center justify-between rounded-xl border border-game-clay/70 bg-game-clay px-3 text-left text-game-cream shadow-md transition-colors hover:bg-game-clay-strong disabled:opacity-40"
+                  aria-label={isProcessing ? 'Saving photo' : 'Snap photo'}
+                  className="flex h-auto min-h-24 w-24 flex-col gap-2 rounded-xl bg-game-clay px-2 py-3 text-game-cream hover:bg-game-clay-strong disabled:opacity-50 sm:min-h-32 sm:w-32"
                 >
-                  <span className="flex min-w-0 items-center gap-3">
-                    <span className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-white/[0.12]">
-                      <Camera className="size-6" />
-                    </span>
-                    <span className="min-w-0">
-                      <span className="block text-sm font-semibold">
-                        {isProcessing
-                          ? 'Saving photo…'
-                          : pokemonVisible
-                            ? 'Snap photo'
-                            : 'Waiting for a Pokémon'}
-                      </span>
-                      <span className="block text-[0.68rem] text-game-cream/70">
-                        {pokemonVisible ? 'Subject in frame' : 'Watch the viewfinder'}
-                      </span>
-                    </span>
+                  <span className="flex size-12 items-center justify-center rounded-full border-2 border-current sm:size-14">
+                    <Camera className="size-6" aria-hidden="true" />
                   </span>
-                  <span className="hidden shrink-0 rounded-md border border-white/20 px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-game-cream/75 sm:inline-flex">
+                  <span className="text-xs font-bold">
+                    {isProcessing ? 'Saving…' : 'Snap photo'}
+                  </span>
+                  <kbd className="hidden text-[10px] font-normal opacity-75 sm:block">
                     Space
-                  </span>
+                  </kbd>
                 </Button>
+              </div>
+
+              <div className="flex shrink-0 items-center justify-between gap-3 py-3">
+                <h3 className="flex items-center gap-2 text-sm font-bold">
+                  <ImageIcon
+                    className="size-4 text-game-muted"
+                    aria-hidden="true"
+                  />{' '}
+                  Contact sheet
+                </h3>
+                <span className="font-mono text-xs text-game-muted">
+                  {photographedPokemon.length} photos
+                </span>
+              </div>
+              <div className="min-h-0 flex-1 overflow-y-auto pb-5 [scrollbar-width:thin]">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+                  <AnimatePresence initial={false}>
+                    {photographedPokemon.map((photo, index) => {
+                      const pokemon = pokemonData.find((p) => p.id === photo.id)
+                      const name =
+                        pokemon?.forms.find((f) => f.form === 'base')?.name ||
+                        pokemon?.forms[0]?.name ||
+                        '???'
+                      return (
+                        <motion.figure
+                          key={`${photo.id}-${index}`}
+                          initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="relative rounded-lg border border-game-card-border bg-game-surface-raised p-2 shadow-sm"
+                        >
+                          <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-sm bg-game-surface">
+                            {encounter.background && (
+                              <Image
+                                src={encounter.background}
+                                alt=""
+                                fill
+                                sizes="(max-width: 640px) 50vw, 240px"
+                                className="object-cover"
+                              />
+                            )}
+                            <Image
+                              src={getPokemonImageUrl(
+                                photo.id.toString(),
+                                'sprite',
+                              )}
+                              alt={name}
+                              width={144}
+                              height={144}
+                              unoptimized
+                              className="relative size-full object-contain p-2 [image-rendering:pixelated]"
+                            />
+                            <span className="absolute bottom-1.5 left-1.5 rounded bg-game-charcoal px-1.5 py-0.5 font-mono text-[10px] text-game-cream">
+                              {String(index + 1).padStart(2, '0')}
+                            </span>
+                          </div>
+                          <figcaption className="flex items-center justify-between gap-2 px-0.5 pb-0.5 pt-2.5">
+                            <span className="truncate text-xs font-bold sm:text-sm">
+                              {name}
+                            </span>
+                            <span
+                              role="img"
+                              aria-label={
+                                photo.correct
+                                  ? 'Correct photo'
+                                  : 'Wrong Pokémon'
+                              }
+                              className={`flex size-6 shrink-0 items-center justify-center rounded-full border ${photo.correct ? 'border-game-ochre text-game-ochre' : 'border-game-clay text-game-clay'}`}
+                            >
+                              {photo.correct ? (
+                                <Check className="size-4" />
+                              ) : (
+                                <X className="size-4" />
+                              )}
+                            </span>
+                          </figcaption>
+                        </motion.figure>
+                      )
+                    })}
+                  </AnimatePresence>
+                  {Array.from(
+                    {
+                      length: Math.max(
+                        0,
+                        Math.min(winRateNum, 3) - photographedPokemon.length,
+                      ),
+                    },
+                    (_, index) => (
+                      <div
+                        key={`empty-${index}`}
+                        aria-hidden="true"
+                        className="rounded-lg border border-dashed border-game-border p-2"
+                      >
+                        <div className="flex aspect-square items-center justify-center rounded-sm bg-game-surface-raised/40">
+                          <Camera className="size-7 stroke-1 text-game-border" />
+                        </div>
+                        <div className="flex items-center justify-between px-0.5 pt-2.5 pb-0.5 text-game-muted">
+                          <span className="font-mono text-[10px]">— —</span>
+                          <span className="size-6 rounded-full border border-dashed border-game-border" />
+                        </div>
+                      </div>
+                    ),
+                  )}
+                </div>
+                {photographedPokemon.length === 0 && (
+                  <p className="mt-3 text-center text-xs text-game-muted">
+                    Your first photo goes here.
+                  </p>
+                )}
               </div>
             </div>
           </div>
