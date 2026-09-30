@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.43.7`: Pokémon comparison now presents draggable Pokémon sprites in the shared glass orb treatment, with a larger rounded drop zone and restrained correct/incorrect feedback. Reduced-motion preferences disable the feedback movement.
+
 - Release `0.43.6`: Pokémon Snap's field desk removes the target instructions, contact-sheet heading, and photo count. The target sprite remains, the camera icon becomes a full-width bottom shutter, and the photo grid shows three cards per row on mobile. Incorrect photos briefly appear centered as a flash and are discarded without affecting the photo list or game scoring.
 
 - Release `0.43.5`: Pokémon Snap's field desk shows the requested Pokémon as a large, crisp pixel sprite beside the shutter. The scrollable contact sheet displays scenic photo prints with correct/wrong stamps and empty print slots; the shutter stays visible while browsing photos. Session timing, scoring, rewards, and target selection are unchanged.

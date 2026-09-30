@@ -21,7 +21,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Check, X } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -187,7 +187,7 @@ function PokemonCardOverlay({ pokemon }: { pokemon: any }) {
     <div className="flex flex-col items-center gap-1">
       <PokemonAnswerTile
         pokemon={pokemon}
-        className="rotate-3 scale-110 cursor-grabbing border-game-moss shadow-xl"
+        className="cursor-grabbing border-game-charcoal shadow-md"
       />
       <span className="max-w-[7rem] truncate text-center text-[10px] font-medium leading-tight text-game-muted sm:text-xs">
         {pokemon.name}
@@ -206,7 +206,7 @@ function PokemonAnswerTile({
   return (
     <div
       className={cn(
-        'relative flex h-24 w-24 items-center justify-center rounded-xl border-2 border-game-border bg-game-surface-raised p-2 shadow-sm sm:h-32 sm:w-32',
+        'game-icon-orb game-icon-orb-art relative h-24 w-24 shrink-0 overflow-hidden border-game-charcoal/35 p-1.5 sm:h-32 sm:w-32',
         className,
       )}
     >
@@ -214,7 +214,7 @@ function PokemonAnswerTile({
         src={getPokemonImageUrl(pokemon.id.toString(), 'home')}
         alt={pokemon.name}
         fill
-        className="object-contain p-2"
+        className="object-contain p-1"
       />
     </div>
   )
@@ -230,6 +230,7 @@ function DropZone({
   isOver: boolean
   feedback?: 'correct' | 'incorrect' | null
 }) {
+  const reduceMotion = useReducedMotion()
   const { setNodeRef } = useDroppable({
     id: 'answer-zone',
   })
@@ -237,48 +238,27 @@ function DropZone({
   return (
     <motion.div
       ref={setNodeRef}
-      animate={
-        isOver && !feedback
-          ? {
-              scale: 1.02,
-              backgroundColor: 'rgba(95, 121, 79, 0.1)',
-              borderColor: '#5f794f',
-            }
-          : feedback === 'correct'
-            ? {
-                scale: 1.05,
-                backgroundColor: 'rgba(95, 121, 79, 0.18)',
-                borderColor: '#5f794f',
-              }
-            : feedback === 'incorrect'
-              ? {
-                  scale: [1, 1.05, 0.95, 1.05, 0.95, 1],
-                  backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                  borderColor: '#ef4444',
-                }
-              : {
-                  scale: 1,
-                  backgroundColor: 'rgba(255, 248, 232, 0.72)',
-                  borderColor: '#b58a43',
-                }
-      }
-      transition={{ duration: 0.3 }}
+      animate={{ scale: isOver && !feedback && !reduceMotion ? 1.025 : 1 }}
+      transition={{ duration: reduceMotion ? 0 : 0.18, ease: 'easeOut' }}
       className={cn(
-        'relative flex h-24 w-24 items-center justify-center overflow-visible rounded-xl border-4 border-dashed sm:h-32 sm:w-32',
+        'relative flex h-36 w-36 items-center justify-center overflow-visible rounded-full border-2 border-dashed bg-game-surface-raised/40 transition-colors sm:h-40 sm:w-40',
+        feedback === 'correct'
+          ? 'border-game-charcoal bg-game-charcoal/10'
+          : feedback === 'incorrect'
+            ? 'border-game-danger bg-game-danger/10'
+            : isOver
+              ? 'border-game-charcoal bg-game-charcoal/10'
+              : 'border-game-ochre/70',
       )}
     >
       {children ? (
         children
       ) : (
         <motion.div
-          animate={
-            isOver
-              ? { scale: 1.1, color: '#405d3d' }
-              : { scale: 1, color: '#667269' }
-          }
-          className="px-2 text-center text-[10px] sm:text-xs font-black pointer-events-none uppercase tracking-widest relative z-10"
+          animate={{ scale: isOver && !reduceMotion ? 1.04 : 1 }}
+          className="pointer-events-none relative z-10 px-2 text-center text-xs font-semibold text-game-muted sm:text-sm"
         >
-          Drop
+          Drop here
         </motion.div>
       )}
     </motion.div>
@@ -295,6 +275,7 @@ export function ResearchCompareGame({
   initialState?: any
 }) {
   useGameMusic(encounter)
+  const reduceMotion = useReducedMotion()
   const { playSfx } = useAudio()
   const router = useRouter()
   const { refreshUser } = useUser()
@@ -571,44 +552,41 @@ export function ResearchCompareGame({
               {droppedPokemon && (
                 <motion.div
                   className="relative"
-                  initial={{ scale: 0.92, opacity: 0.85, y: 0 }}
+                  initial={reduceMotion ? false : { scale: 0.96, opacity: 0.9 }}
                   animate={
                     feedback === 'correct'
                       ? {
-                          scale: [1, 1.12, 1, 1.08, 1],
+                          scale: reduceMotion ? 1 : [1, 1.04, 1],
                           opacity: 1,
                           y: 0,
                         }
                       : feedback === 'incorrect'
                         ? {
-                            scale: [1, 0.96, 0.9],
-                            opacity: [1, 1, 0],
-                            y: [0, 10, 120],
-                            rotate: [0, -5, 10],
+                            scale: 0.94,
+                            opacity: 0.45,
+                            y: reduceMotion ? 0 : -8,
                           }
                         : { scale: 1, opacity: 1, y: 0, rotate: 0 }
                   }
                   transition={{
-                    duration: feedback === 'incorrect' ? 0.75 : 0.9,
+                    duration: reduceMotion ? 0 : 0.24,
                     ease: 'easeOut',
                   }}
                 >
                   <PokemonAnswerTile
                     pokemon={droppedPokemon}
                     className={cn(
-                      feedback === 'correct' &&
-                        'border-game-moss bg-game-moss/10 shadow-md',
-                      feedback === 'incorrect' &&
-                        'border-red-400 shadow-[0_0_28px_rgba(239,68,68,0.55)]',
+                      feedback === 'correct' && 'border-game-charcoal/55',
+                      feedback === 'incorrect' && 'border-game-danger/55',
                     )}
                   />
                   {feedback && (
                     <div
                       className={cn(
-                        'absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full border-2 bg-[#0d1820] shadow-lg',
+                        'absolute -right-1 -top-1 flex h-8 w-8 items-center justify-center rounded-full border bg-game-surface-raised shadow-sm',
                         feedback === 'correct'
-                          ? 'border-game-moss bg-game-surface-raised text-game-moss-strong'
-                          : 'border-red-400 text-red-300',
+                          ? 'border-game-charcoal/45 text-game-charcoal'
+                          : 'border-game-danger/45 text-game-danger',
                       )}
                     >
                       {feedback === 'correct' ? (
@@ -623,13 +601,13 @@ export function ResearchCompareGame({
             </DropZone>
             {feedback && (
               <motion.span
-                initial={{ opacity: 0, y: -4 }}
+                initial={reduceMotion ? false : { opacity: 0, y: -3 }}
                 animate={{ opacity: 1, y: 0 }}
                 className={cn(
                   'text-sm font-black uppercase tracking-widest',
                   feedback === 'correct'
-                    ? 'text-game-moss-strong'
-                    : 'text-red-300',
+                    ? 'text-game-charcoal'
+                    : 'text-game-danger',
                 )}
               >
                 {feedback === 'correct' ? 'Correct!' : 'Incorrect'}
