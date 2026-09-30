@@ -1,5 +1,7 @@
 # Current Game State
 
+- Release `0.43.9`: The comparison answer orb's animation wrapper now fills the drop target so the dropped Pokémon remains full sized.
+
 - Release `0.43.8`: When a Pokémon is dropped in comparison, its glass orb expands to fill the circular target so the result no longer appears inside a second bubble.
 
 - Release `0.43.7`: Pokémon comparison now presents draggable Pokémon sprites in the shared glass orb treatment, with a larger rounded drop zone and restrained correct/incorrect feedback. Reduced-motion preferences disable the feedback movement.
