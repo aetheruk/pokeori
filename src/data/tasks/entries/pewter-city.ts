@@ -1617,7 +1617,7 @@ export const pewterCityTasks: Task[] = [
   {
     name: 'A Small Shrub',
     description:
-      'For whatever reason, this incredidibly small shrub looks impossible to get by, maybe if your pokemon knew a move to get through it.',
+      'This tiny shrub is somehow impossible to get past. If only my Pokémon knew Cut, maybe my life would finally have some meaning.',
     category: 'Kanto',
     subCategory: 'Pewter City',
     icon: {

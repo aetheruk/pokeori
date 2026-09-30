@@ -230,7 +230,7 @@ export const vermilionCityTasks: Task[] = [
     id: 'vermilion-gym-shrub',
     name: 'A Small Shrub',
     description:
-      'A small shrub blocks the path to Vermilion Gym. A Pokemon that knows Cut could clear the way.',
+      'This tiny shrub is blocking my way to Vermilion Gym. If only my Pokémon knew Cut, maybe my life would finally have some meaning.',
     category: 'Kanto',
     subCategory: 'Vermilion City',
     icon: {
