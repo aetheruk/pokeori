@@ -285,11 +285,30 @@ export function getUserProfileStats(
   return getSlimStats((user as any)?.stats) || {}
 }
 
+const RETIRED_CANDY_INVENTORY_IDS: Record<string, string> = {
+  'rare-candy-s': 'rare-candy-xs',
+  'rare-candy-l': 'rare-candy-m',
+  'rare-candy-xxl': 'rare-candy-xl',
+  'rare-candy-giga': 'rare-candy-mega',
+  'rare-candy-max': 'rare-candy-tera',
+  'rare-candy-s-bag': 'rare-candy-xs-bag',
+  'rare-candy-l-bag': 'rare-candy-m-bag',
+  'rare-candy-xxl-bag': 'rare-candy-xl-bag',
+  'rare-candy-giga-bag': 'rare-candy-mega-bag',
+  'rare-candy-max-bag': 'rare-candy-tera-bag',
+}
+
+function currentCandyInventoryId(itemId: string) {
+  return RETIRED_CANDY_INVENTORY_IDS[itemId] || itemId
+}
+
 export function inventoryRowsToArray(rows: any[]): InventoryEntry[] {
-  return rows.map((row) => ({
-    itemId: String(row.itemId),
-    quantity: toNumber(row.quantity),
-  }))
+  const quantities = new Map<string, number>()
+  for (const row of rows) {
+    const itemId = currentCandyInventoryId(String(row.itemId))
+    quantities.set(itemId, (quantities.get(itemId) || 0) + toNumber(row.quantity))
+  }
+  return Array.from(quantities, ([itemId, quantity]) => ({ itemId, quantity }))
 }
 
 export function inventoryArrayToMap(
@@ -297,11 +316,13 @@ export function inventoryArrayToMap(
 ): InventoryMap {
   if (!Array.isArray(entries)) return {}
 
-  return Object.fromEntries(
-    entries
-      .filter((entry) => entry.itemId)
-      .map((entry) => [entry.itemId, toNumber(entry.quantity)]),
-  )
+  const inventory: InventoryMap = {}
+  for (const entry of entries) {
+    if (!entry.itemId) continue
+    const itemId = currentCandyInventoryId(entry.itemId)
+    inventory[itemId] = (inventory[itemId] || 0) + toNumber(entry.quantity)
+  }
+  return inventory
 }
 
 function inventoryMapToRows(

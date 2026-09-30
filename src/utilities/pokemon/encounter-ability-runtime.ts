@@ -153,16 +153,11 @@ function getFieldObservationPoolEntryTypes(entry: { speciesId: number; formId?: 
 }
 
 function candyForLevel(level: number) {
-  if (level < 10) return 'rare-candy-xs'
-  if (level < 20) return 'rare-candy-s'
-  if (level < 30) return 'rare-candy-m'
-  if (level < 40) return 'rare-candy-l'
-  if (level < 50) return 'rare-candy-xl'
-  if (level < 60) return 'rare-candy-xxl'
-  if (level < 70) return 'rare-candy-mega'
-  if (level < 80) return 'rare-candy-giga'
-  if (level < 90) return 'rare-candy-tera'
-  return 'rare-candy-max'
+  if (level <= 20) return 'rare-candy-xs'
+  if (level <= 40) return 'rare-candy-m'
+  if (level <= 60) return 'rare-candy-xl'
+  if (level <= 80) return 'rare-candy-mega'
+  return 'rare-candy-tera'
 }
 
 export function getStoredEncounterAbility(state: EncounterState): AbilityConfig | undefined {

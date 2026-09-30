@@ -1,19 +1,14 @@
 import { BattleConfig, LocationReward } from '@/data/types'
 
 const LEVEL_TO_CANDY_MAP = [
-  { maxLevel: 10, id: 'rare-candy-xs', wildDropChance: 8 },
-  { maxLevel: 20, id: 'rare-candy-s', wildDropChance: 8 },
-  { maxLevel: 30, id: 'rare-candy-m', wildDropChance: 8 },
-  { maxLevel: 40, id: 'rare-candy-l', wildDropChance: 8 },
-  { maxLevel: 50, id: 'rare-candy-xl', wildDropChance: 8 },
-  { maxLevel: 60, id: 'rare-candy-xxl', wildDropChance: 8 },
-  { maxLevel: 70, id: 'rare-candy-mega', wildDropChance: 8 },
-  { maxLevel: 80, id: 'rare-candy-giga', wildDropChance: 8 },
-  { maxLevel: 90, id: 'rare-candy-tera', wildDropChance: 8 },
-  { maxLevel: 100, id: 'rare-candy-max', wildDropChance: 8 },
+  { maxLevel: 20, id: 'rare-candy-xs', wildDropChance: 5 },
+  { maxLevel: 40, id: 'rare-candy-m', wildDropChance: 4 },
+  { maxLevel: 60, id: 'rare-candy-xl', wildDropChance: 3 },
+  { maxLevel: 80, id: 'rare-candy-mega', wildDropChance: 2 },
+  { maxLevel: 100, id: 'rare-candy-tera', wildDropChance: 1 },
 ]
 
-export const WILD_BATTLE_CANDY_DUST_DROP_CHANCE = 30
+export const WILD_BATTLE_CANDY_DUST_DROP_CHANCE = 35
 
 const LEVEL_TO_POKE_POWDER_MAP = [
   { maxLevel: 20, id: 'poke-powder-xs' },
@@ -25,7 +20,7 @@ const LEVEL_TO_POKE_POWDER_MAP = [
 
 export function getCandyIdForLevel(level: number): string {
   const match = LEVEL_TO_CANDY_MAP.find((m) => level <= m.maxLevel)
-  return match?.id || 'rare-candy-max'
+  return match?.id || 'rare-candy-tera'
 }
 
 export function getPokePowderIdForLevel(level: number): string {
@@ -46,26 +41,18 @@ export function getCandyIdsUpToLevel(level: number): string[] {
 
 export function getWildBattleCandyDropChance(level: number): number {
   const match = LEVEL_TO_CANDY_MAP.find((m) => level <= m.maxLevel)
-  return match?.wildDropChance || 8
+  return match?.wildDropChance ?? 1
 }
 
 /**
  * Level-matched PokePowder is a small consolation drop for wild battles.
- * Higher level encounters increase the quantity without making the drop
- * itself common.
+ * Every wild level tier can drop one to three units.
  */
-export function getWildBattleCandyDustQuantity(level: number): {
+export function getWildBattleCandyDustQuantity(_level: number): {
   min: number
   max: number
 } {
-  const normalizedLevel = Number.isFinite(level)
-    ? Math.max(1, Math.min(100, Math.floor(level)))
-    : 1
-  if (normalizedLevel <= 20) return { min: 1, max: 1 }
-  if (normalizedLevel <= 40) return { min: 1, max: 2 }
-  if (normalizedLevel <= 60) return { min: 1, max: 3 }
-  if (normalizedLevel <= 80) return { min: 2, max: 3 }
-  return { min: 3, max: 3 }
+  return { min: 1, max: 3 }
 }
 
 export function calculateCandyRewards(

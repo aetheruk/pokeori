@@ -4245,7 +4245,7 @@ describe('static data references', () => {
     )
     expect(featheredGauntlet?.rewards).toContainEqual({
       type: 'item',
-      targetId: 'rare-candy-l',
+      targetId: 'rare-candy-m',
       quantity: 1,
       dropChance: 100,
     })

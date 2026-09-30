@@ -12,16 +12,11 @@ import {
 } from '@/utilities/artisan/rewards'
 
 const BAG_CONFIGS = [
-  ['rare-candy-xs-bag', 10, 1, 9, 2, 'rare-candy-xs'],
-  ['rare-candy-s-bag', 20, 10, 19, 10, 'rare-candy-s'],
-  ['rare-candy-m-bag', 30, 20, 29, 20, 'rare-candy-m'],
-  ['rare-candy-l-bag', 40, 30, 39, 30, 'rare-candy-l'],
-  ['rare-candy-xl-bag', 50, 40, 49, 40, 'rare-candy-xl'],
-  ['rare-candy-xxl-bag', 60, 50, 59, 50, 'rare-candy-xxl'],
-  ['rare-candy-mega-bag', 70, 60, 69, 60, 'rare-candy-mega'],
-  ['rare-candy-giga-bag', 80, 70, 79, 70, 'rare-candy-giga'],
-  ['rare-candy-tera-bag', 90, 80, 89, 80, 'rare-candy-tera'],
-  ['rare-candy-max-bag', 100, 90, 99, 90, 'rare-candy-max'],
+  ['rare-candy-xs-bag', 20, 1, 19, 2, 'rare-candy-xs'],
+  ['rare-candy-m-bag', 40, 20, 39, 20, 'rare-candy-m'],
+  ['rare-candy-xl-bag', 60, 40, 59, 40, 'rare-candy-xl'],
+  ['rare-candy-mega-bag', 80, 60, 79, 60, 'rare-candy-mega'],
+  ['rare-candy-tera-bag', 100, 80, 99, 80, 'rare-candy-tera'],
 ] as const
 
 describe('Candy Bags', () => {
@@ -91,11 +86,11 @@ describe('Candy Bags', () => {
     expect(bag).toBeDefined()
     if (!bag) return
 
-    expect(getPokemonItemEffectLabel(bag)).toBe('Level → 10')
+    expect(getPokemonItemEffectLabel(bag)).toBe('Level → 20')
     expect(getPokemonItemUnavailableReason(bag, { level: 1 })).toBeNull()
-    expect(getPokemonItemUnavailableReason(bag, { level: 9 })).toBeNull()
-    expect(getPokemonItemUnavailableReason(bag, { level: 10 })).toContain(
-      'up to level 9',
+    expect(getPokemonItemUnavailableReason(bag, { level: 19 })).toBeNull()
+    expect(getPokemonItemUnavailableReason(bag, { level: 20 })).toContain(
+      'up to level 19',
     )
   })
 })

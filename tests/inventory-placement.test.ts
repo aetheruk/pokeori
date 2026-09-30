@@ -145,7 +145,7 @@ describe('inventory placement', () => {
   })
 
   test('training items and berries display in their inventory sections', () => {
-    expect(getInventoryDisplayPlacement(item('rare-candy-s'))).toEqual({
+    expect(getInventoryDisplayPlacement(item('rare-candy-m'))).toEqual({
       group: 'training',
       subCategory: 'candies',
     })
