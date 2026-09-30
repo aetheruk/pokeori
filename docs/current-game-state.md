@@ -13,8 +13,10 @@ is configured. GitHub Actions now builds and publishes to the private GHCR
 package. Coolify's `pokeori-ghcr` Docker Image resource targets that image on
 port 3000, serves `pokeori.app` and `www.pokeori.app`, and has the production
 health check configured. Its authenticated deploy webhook is saved in GitHub.
-The app is still stopped while private-registry pull access, the stable build
-key, and required runtime secrets are configured. See the
+The private-registry pull was verified from Hetzner, and the stable build key
+now exists in GitHub. The app is still stopped while Coolify's runtime values
+are saved, required mail configuration is supplied, and the former database
+data-recovery versus fresh-start decision is resolved. See the
 [deployment runbook](development/deployment.md) and
 [performance runbook](development/performance-runbook.md) for service details.
 

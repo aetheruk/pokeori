@@ -69,16 +69,16 @@ and the `/api/health` check configured. `NEXT_PUBLIC_APP_URL` is set. The
 resource is not deployed yet.
 
 The GitHub Actions workflow, private GHCR package, push token, and authenticated
-Coolify webhook target are configured. The remaining release blockers are the
-stable Server Actions key in GitHub and Coolify, and read-only GHCR pull
-authentication on the Coolify deployment host. `COOLIFY_TOKEN` already exists
-as a GitHub secret; verify that it has Coolify's deploy permission for this
-instance. Configure the app's runtime variables in `pokeori-ghcr`: the rotated
-MongoDB `DATABASE_URI`, Dragonfly `REDIS_URL`, `PAYLOAD_SECRET`, matching
-`NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`, valid `RESEND_API_KEY`, and stable
-`BETA_INVITATION_SECRET`. The old MongoDB credential was exposed during setup;
-rotate it before adding the new URI. A usable mail key and invitation secret
-were not available during migration. Keep all secret values out of the repo.
+Coolify webhook target are configured. The GHCR read-only login was verified
+on Hetzner by pulling the private `bootstrap` tag. The stable Server Actions
+key now exists in GitHub; set the same rotated value in Coolify at runtime.
+`COOLIFY_TOKEN` already exists as a GitHub secret; verify that it has Coolify's
+deploy permission for this instance. The `pokeori-ghcr` variable editor has
+runtime entries pending save. Before saving, rotate the MongoDB and Dragonfly
+credentials, Payload secret, beta invitation secret, and Server Actions key;
+then re-enter them in Coolify. Use a beta invitation secret of at least 32
+characters. Add a valid `RESEND_API_KEY`. The old MongoDB credential was also
+exposed during setup. Keep all secret values out of the repo.
 
 The Hetzner Cloud firewall allows inbound SSH, HTTP, and HTTPS; Coolify's direct
 port `8000` stays closed. Cloudflare proxies `pokeori.app` and
@@ -112,7 +112,7 @@ Actions**:
 
 | Secret | Purpose |
 | --- | --- |
-| `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` | **Still required.** BuildKit secret used by the Dockerfile; use the same stable value in Coolify at runtime. |
+| `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` | **Configured in GitHub.** BuildKit secret used by the Dockerfile; set the same rotated value in Coolify at runtime. |
 | `COOLIFY_WEBHOOK` | **Configured.** Authenticated deploy webhook URL for `pokeori-ghcr`. |
 | `COOLIFY_TOKEN` | **Present; verify scope.** Coolify API token with the `Deploy` permission. |
 | `GHCR_PUSH_TOKEN` | **Configured.** GitHub classic PAT with `read:packages` and `write:packages`, used only by the main-branch release workflow. |
@@ -121,7 +121,8 @@ Actions**:
 unlinked from `aetheruk/pokeori`; do not enable permission inheritance from the
 public repository. Coolify still needs a separate GHCR PAT with only
 `read:packages`, authenticated on the Hetzner deployment server as the Docker
-user configured in Coolify. The workflow uses a PAT instead of `GITHUB_TOKEN` so a
+user configured in Coolify. This login was verified with a pull of the private
+`bootstrap` tag. The workflow uses a PAT instead of `GITHUB_TOKEN` so a
 public-repository Actions grant does not expose the private image to fork
 workflows. Keep the image and `buildcache` tag private: Next embeds the Server
 Actions key in the compiled app. Give Coolify a separate GHCR credential with
@@ -132,7 +133,7 @@ targets the `pokeori-ghcr` authenticated deploy webhook. The existing
 `COOLIFY_TOKEN` secret must have the instance's deploy permission. This is an
 API deploy request from CI; the old repository push webhook is not used by the
 Docker Image application. Do not use the manual Git webhook URL here. After
-the required secrets and registry login are configured, confirm the deploy
+the remaining runtime values are saved, confirm the deploy
 webhook queues an image pull.
 
 ## Coolify application settings
