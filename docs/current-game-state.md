@@ -10,8 +10,8 @@ decided and the MongoDB credential is rotated. Daily MongoDB and Coolify
 instance backup schedules are enabled locally. The private R2 bucket exists,
 but no off-host backups are verified until a replacement bucket-scoped token
 is configured. Release builds are moving to GitHub Actions and a separate,
-private GHCR package; the package exists, while Coolify's Docker Image
-conversion and registry/build secrets still need setup.
+private GHCR package; the package and push credential exist, while Coolify's
+Docker Image conversion, build key, and pull credential still need setup.
 See the [deployment runbook](development/deployment.md) and
 [performance runbook](development/performance-runbook.md) for service details.
 

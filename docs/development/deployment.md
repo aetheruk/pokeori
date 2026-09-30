@@ -66,7 +66,8 @@ replaced with a Docker Image application before release deployment. The target
 image is `ghcr.io/aetheruk/pokeori-production:latest`, exposed on port `3000`, with
 `https://pokeori.app` and `https://www.pokeori.app` configured in Coolify. The
 new GitHub Actions workflow and this resource conversion still need the
-Server Actions build key, GHCR push/pull credentials, and Coolify image setup.
+Server Actions build key, Coolify pull credential, and image resource
+conversion. The GHCR push token and deploy webhook secrets are configured.
 The production app environment contains `NEXT_PUBLIC_APP_URL`, the private
 internal `REDIS_URL` for Dragonfly, and the runtime-only `DATABASE_URI`. It is
 not deployed. Configure the stable Server Actions key and Payload secret in
