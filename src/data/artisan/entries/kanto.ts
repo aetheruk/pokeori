@@ -726,33 +726,28 @@ const paintRecipes = PAINT_RECIPES.map((recipe) => ({
   outputQuantity: { min: 0, max: 2 },
 }))
 
-const POKE_POWDER_BY_CANDY_ID: Record<string, { id: string; name: string; isEx: boolean }> = {
-  'rare-candy-xs': { id: 'poke-powder-xs', name: 'XS PokePowder', isEx: false },
-  'rare-candy-s': { id: 'poke-powder-xs', name: 'XS PokePowder', isEx: true },
-  'rare-candy-m': { id: 'poke-powder-s', name: 'S PokePowder', isEx: false },
-  'rare-candy-l': { id: 'poke-powder-s', name: 'S PokePowder', isEx: true },
-  'rare-candy-xl': { id: 'poke-powder-m', name: 'M PokePowder', isEx: false },
-  'rare-candy-xxl': { id: 'poke-powder-m', name: 'M PokePowder', isEx: true },
-  'rare-candy-mega': { id: 'poke-powder-l', name: 'L PokePowder', isEx: false },
-  'rare-candy-giga': { id: 'poke-powder-l', name: 'L PokePowder', isEx: true },
-  'rare-candy-tera': { id: 'poke-powder-xl', name: 'XL PokePowder', isEx: false },
-  'rare-candy-max': { id: 'poke-powder-xl', name: 'XL PokePowder', isEx: true },
+const POKE_POWDER_BY_CANDY_ID: Record<string, { id: string; name: string }> = {
+  'rare-candy-xs': { id: 'poke-powder-xs', name: 'XS PokePowder' },
+  'rare-candy-m': { id: 'poke-powder-s', name: 'S PokePowder' },
+  'rare-candy-xl': { id: 'poke-powder-m', name: 'M PokePowder' },
+  'rare-candy-mega': { id: 'poke-powder-l', name: 'L PokePowder' },
+  'rare-candy-tera': { id: 'poke-powder-xl', name: 'XL PokePowder' },
 }
 
 const POKE_POWDER_RECIPES: ArtisanRecipeDraft[] = candyItems.map((candy, index) => {
   const powder = POKE_POWDER_BY_CANDY_ID[candy.id]
   const tier = candy.id.replace('rare-candy-', '')
-  const artisanLevel = index === 0 ? 2 : index * 10
+  const artisanLevel = index === 0 ? 2 : index * 20
 
   return {
     id: `craft-poke-powder-${tier}`,
-    name: powder.isEx ? `${powder.name} EX` : powder.name,
+    name: powder.name,
     description: `Crush ${candy.name} into concentrated ${powder.name}.`,
     artisanLevel,
     costs: [{ id: candy.id, amount: 1 }],
     rewards: [{ type: 'item', targetId: powder.id, quantity: 1, dropChance: 100 }],
     craftType: 'crush',
-    outputQuantity: powder.isEx ? { min: 1, max: 5 } : { min: 1, max: 3 },
+    outputQuantity: { min: 1, max: 3 },
     bulk: 5,
   }
 })

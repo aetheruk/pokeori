@@ -50,23 +50,11 @@ const expectedPowderByCandyId: Record<
     recipeName: 'XS PokePowder',
     outputQuantity: { min: 1, max: 3 },
   },
-  'rare-candy-s': {
-    id: 'poke-powder-xs',
-    name: 'XS PokePowder',
-    recipeName: 'XS PokePowder EX',
-    outputQuantity: { min: 1, max: 5 },
-  },
   'rare-candy-m': {
     id: 'poke-powder-s',
     name: 'S PokePowder',
     recipeName: 'S PokePowder',
     outputQuantity: { min: 1, max: 3 },
-  },
-  'rare-candy-l': {
-    id: 'poke-powder-s',
-    name: 'S PokePowder',
-    recipeName: 'S PokePowder EX',
-    outputQuantity: { min: 1, max: 5 },
   },
   'rare-candy-xl': {
     id: 'poke-powder-m',
@@ -74,35 +62,17 @@ const expectedPowderByCandyId: Record<
     recipeName: 'M PokePowder',
     outputQuantity: { min: 1, max: 3 },
   },
-  'rare-candy-xxl': {
-    id: 'poke-powder-m',
-    name: 'M PokePowder',
-    recipeName: 'M PokePowder EX',
-    outputQuantity: { min: 1, max: 5 },
-  },
   'rare-candy-mega': {
     id: 'poke-powder-l',
     name: 'L PokePowder',
     recipeName: 'L PokePowder',
     outputQuantity: { min: 1, max: 3 },
   },
-  'rare-candy-giga': {
-    id: 'poke-powder-l',
-    name: 'L PokePowder',
-    recipeName: 'L PokePowder EX',
-    outputQuantity: { min: 1, max: 5 },
-  },
   'rare-candy-tera': {
     id: 'poke-powder-xl',
     name: 'XL PokePowder',
     recipeName: 'XL PokePowder',
     outputQuantity: { min: 1, max: 3 },
-  },
-  'rare-candy-max': {
-    id: 'poke-powder-xl',
-    name: 'XL PokePowder',
-    recipeName: 'XL PokePowder EX',
-    outputQuantity: { min: 1, max: 5 },
   },
 }
 
@@ -712,7 +682,7 @@ describe('artisan recipes', () => {
     }
   })
 
-  test('poke powder material recipes crush two matching candies', () => {
+  test('poke powder material recipes crush one matching candy per tier', () => {
     const itemById = new Map(items.map((item) => [item.id, item]))
     const powderRecipes = artisanRecipes.filter((recipe) =>
       recipe.id.startsWith('craft-poke-powder-'),
@@ -737,14 +707,14 @@ describe('artisan recipes', () => {
       const recipe = artisanRecipes.find(
         (entry) => entry.id === `craft-poke-powder-${tier}`,
       )
-      const expectedLevel = index === 0 ? 2 : index * 10
+      const expectedLevel = index === 0 ? 2 : index * 20
 
       expect(powder).toBeDefined()
       expect(powder?.name).toBe(expectedPowder.name)
       expect(powder?.spriteId).toBe('silver-powder')
       expect(powder?.hueRotate).toBe(0)
       expect(recipe?.name).toBe(expectedPowder.recipeName)
-      expect(recipe?.costs).toEqual([{ id: candy.id, amount: 2 }])
+      expect(recipe?.costs).toEqual([{ id: candy.id, amount: 1 }])
       expect(recipe?.rewards).toEqual([
         {
           type: 'item',

@@ -539,7 +539,6 @@ function shortGuideDescription(description: string): string {
 }
 
 function getRecipeGuideLabel(recipeName: string, itemName?: string): string {
-  if (recipeName.includes('PokePowder EX')) return recipeName
   return itemName || recipeName.replace(/^Craft /, '')
 }
 

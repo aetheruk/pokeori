@@ -43,7 +43,7 @@ describe('Pokemon item usability', () => {
     ).toBe('This candy can only be used from level 20.')
     expect(
       getPokemonItemUnavailableReason(item('rare-candy-m'), { level: 30 }),
-    ).toBe('This candy can only be used up to level 29.')
+    ).toBe('This candy can only be used up to level 39.')
     expect(
       getPokemonItemUnavailableReason(item('rare-candy-m'), { level: 20 }),
     ).toBeNull()
@@ -51,25 +51,25 @@ describe('Pokemon item usability', () => {
 
   test('respects badge level caps for regular candies and candy bags', () => {
     expect(
-      getPokemonItemUnavailableReason(item('rare-candy-s'), {
+      getPokemonItemUnavailableReason(item('rare-candy-xs'), {
         level: 19,
         levelCap: 20,
       }),
     ).toBeNull()
     expect(
-      getPokemonItemUnavailableReason(item('rare-candy-s'), {
+      getPokemonItemUnavailableReason(item('rare-candy-xs'), {
         level: 19,
         levelCap: 19,
       }),
     ).toBe('This Pokemon cannot exceed level 19 until more badges are earned.')
     expect(
-      getPokemonItemUnavailableReason(item('rare-candy-s-bag'), {
+      getPokemonItemUnavailableReason(item('rare-candy-xs-bag'), {
         level: 19,
         levelCap: 20,
       }),
     ).toBeNull()
     expect(
-      getPokemonItemUnavailableReason(item('rare-candy-s-bag'), {
+      getPokemonItemUnavailableReason(item('rare-candy-xs-bag'), {
         level: 19,
         levelCap: 19,
       }),
