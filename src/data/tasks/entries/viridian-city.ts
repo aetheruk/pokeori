@@ -80,7 +80,7 @@ export const viridianCityTasks: Task[] = [
     subCategory: 'Viridian City',
     icon: {
       type: 'trainer',
-      id: 'old-couple',
+      id: 'expert-m',
     },
     background: '/backgrounds/town.avif',
     repeatable: false,
@@ -114,7 +114,7 @@ export const viridianCityTasks: Task[] = [
 
       icon: {
         type: 'trainer',
-        id: 'old-couple',
+        id: 'expert-m',
       },
     },
     id: 'find-daughter',
@@ -241,7 +241,7 @@ export const viridianCityTasks: Task[] = [
     subCategory: 'Viridian City',
     icon: {
       type: 'trainer',
-      id: 'old-couple',
+      id: 'expert-m',
     },
     background: '/backgrounds/town.avif',
     repeatable: false,
@@ -266,7 +266,7 @@ export const viridianCityTasks: Task[] = [
       closeButtonText: 'Lets Battle!',
       icon: {
         type: 'trainer',
-        id: 'old-couple',
+        id: 'expert-m',
       },
     },
   },

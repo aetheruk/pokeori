@@ -12,7 +12,7 @@ export const viridianCityBattles: BattleConfig[] = [
     subCategory: 'Viridian City',
     icon: {
       type: 'trainer',
-      id: 'old-couple',
+      id: 'expert-m',
     },
     background: '/backgrounds/town.avif',
     maxPokemon: 3,
