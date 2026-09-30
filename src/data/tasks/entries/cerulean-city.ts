@@ -714,8 +714,8 @@ export const ceruleanCityTasks: Task[] = [
   },
   {
     id: 'rival-cerulean-win-chat',
-    name: 'Rival Battle',
-    description: 'Your rival has one last word before Nugget Bridge.',
+    name: 'Proof Before the Bridge',
+    description: 'Your rival has to admit you are ready for Nugget Bridge—but the race is far from over.',
     category: 'Kanto',
     subCategory: 'Cerulean City',
     icon: {
@@ -726,7 +726,7 @@ export const ceruleanCityTasks: Task[] = [
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Continue',
+    completeButtonText: 'Cross Nugget Bridge',
     requirements: [
       {
         type: 'kid_mode',
@@ -745,9 +745,9 @@ export const ceruleanCityTasks: Task[] = [
     exitModal: {
       background: '/backgrounds/cerulean.avif',
       dynamicOpponent: 'rival',
-      title: 'Rival Battle',
+      title: 'Proof Before the Bridge',
       message:
-        'You made it this far? Fine. Nugget Bridge will tell us if it sticks.',
+        "All right, you earned the first step. Those five trainers won't care who won here, so keep that focus when you cross. And don't expect me to stay behind for long.",
       closeButtonText: 'Cross the Bridge',
       icon: {
         type: 'trainer',
@@ -757,8 +757,8 @@ export const ceruleanCityTasks: Task[] = [
   },
   {
     id: 'rival-cerulean-loss-chat',
-    name: 'Rival Battle',
-    description: 'Your rival has one last word before Nugget Bridge.',
+    name: 'Bridge Warning',
+    description: 'Your rival warns you not to rely on the Cascade Badge to carry you over Nugget Bridge.',
     category: 'Kanto',
     subCategory: 'Cerulean City',
     icon: {
@@ -769,7 +769,7 @@ export const ceruleanCityTasks: Task[] = [
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Continue',
+    completeButtonText: 'Prepare for the Bridge',
     requirements: [
       {
         type: 'kid_mode',
@@ -788,10 +788,10 @@ export const ceruleanCityTasks: Task[] = [
     exitModal: {
       background: '/backgrounds/cerulean.avif',
       dynamicOpponent: 'rival',
-      title: 'Rival Battle',
+      title: 'Bridge Warning',
       message:
-        'Still rushing in. Sort your team out before Nugget Bridge eats you alive.',
-      closeButtonText: 'Cross the Bridge',
+        "Misty's badge is proof you can win, not armor. Slow down, check your team, and be ready to switch plans—the five trainers on Nugget Bridge won't give you a second to catch your breath.",
+      closeButtonText: 'Prepare for the Bridge',
       icon: {
         type: 'trainer',
         id: 'youngster',

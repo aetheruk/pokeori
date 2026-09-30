@@ -68,8 +68,9 @@ export const palletTownBattles: BattleConfig[] = [
   },
   {
     id: 'rival-pallet-town',
-    name: 'Rival Battle',
-    description: "A familiar face waits outside Oak's lab for one first battle.",
+    name: 'First Lap',
+    description:
+      "You and your rival have barely left Professor Oak's lab before they turn your first stretch of road into a race. They want to see what your new partner can do.",
     category: 'Kanto',
     subCategory: 'Pallet Town',
     icon: {
@@ -77,7 +78,7 @@ export const palletTownBattles: BattleConfig[] = [
       id: 'youngster',
     },
     background: '/backgrounds/grassy-route.avif',
-    title: 'Rival Battle',
+    title: 'First Lap',
     dynamicOpponent: 'rival',
     rivalLevel: 5,
     maxPokemon: 3,

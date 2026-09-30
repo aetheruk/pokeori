@@ -682,8 +682,8 @@ export const ssAnneTasks: Task[] = [
   },
   {
     id: 'rival-ss-anne-win-chat',
-    name: 'Rival Battle',
-    description: 'Your rival has one last word on the Vermilion dock.',
+    name: 'The Rival’s Measure',
+    description: 'After a long day helping repair the ship, you still have enough in you to surprise your rival.',
     category: 'Kanto',
     subCategory: 'Vermilion City',
     icon: {
@@ -694,7 +694,7 @@ export const ssAnneTasks: Task[] = [
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Continue',
+    completeButtonText: 'Head Ashore',
     requirements: [
       {
         type: 'kid_mode',
@@ -713,9 +713,10 @@ export const ssAnneTasks: Task[] = [
     exitModal: {
       background: ssAnneBackground,
       dynamicOpponent: 'rival',
-      title: 'Rival Battle',
-      message: "You handled the ship and still had enough left. I'll see you on the next road.",
-      closeButtonText: 'Head Out',
+      title: 'The Rival’s Measure',
+      message:
+        "You spent the day hauling tools and still came out sharper. Fine, I'll give you that one. The ship's fixed; I'll be on the next road before you can claim a victory lap.",
+      closeButtonText: 'Head Ashore',
       icon: {
         type: 'trainer',
         id: 'youngster',
@@ -724,8 +725,8 @@ export const ssAnneTasks: Task[] = [
   },
   {
     id: 'rival-ss-anne-loss-chat',
-    name: 'Rival Battle',
-    description: 'Your rival has one last word on the Vermilion dock.',
+    name: 'A Long Day at Sea',
+    description: 'Your rival can tell the repair shift took its toll, but still expects you at the next checkpoint.',
     category: 'Kanto',
     subCategory: 'Vermilion City',
     icon: {
@@ -736,7 +737,7 @@ export const ssAnneTasks: Task[] = [
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Continue',
+    completeButtonText: 'Head Ashore',
     requirements: [
       {
         type: 'kid_mode',
@@ -755,9 +756,10 @@ export const ssAnneTasks: Task[] = [
     exitModal: {
       background: ssAnneBackground,
       dynamicOpponent: 'rival',
-      title: 'Rival Battle',
-      message: 'Long day? Same for me. Rest up before you try that again.',
-      closeButtonText: 'Head Out',
+      title: 'A Long Day at Sea',
+      message:
+        "Long shift? I could see your legs giving out after all that work on deck. Get some rest. I'll be ready when we're both back on solid ground.",
+      closeButtonText: 'Head Ashore',
       icon: {
         type: 'trainer',
         id: 'youngster',

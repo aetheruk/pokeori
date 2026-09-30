@@ -121,8 +121,8 @@ export const viridianCityTasks: Task[] = [
   },
   {
     id: 'rival-route-22-win-chat',
-    name: 'Rival Battle',
-    description: 'Your rival has one last word on Route 22.',
+    name: 'No Easy Points',
+    description: 'Route 22 gives your rival a reason to take you seriously. Neither of you is calling the race yet.',
     category: 'Kanto',
     subCategory: 'Viridian City',
     icon: {
@@ -133,7 +133,7 @@ export const viridianCityTasks: Task[] = [
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Continue',
+    completeButtonText: 'Race to Cerulean',
     requirements: [
       {
         type: 'kid_mode',
@@ -152,10 +152,10 @@ export const viridianCityTasks: Task[] = [
     exitModal: {
       background: '/backgrounds/rocky-path.avif',
       dynamicOpponent: 'rival',
-      title: 'Rival Battle',
+      title: 'No Easy Points',
       message:
-        "You have been training. Good. I won't be waiting around Viridian forever.",
-      closeButtonText: 'Head On',
+        "That was close. You've started reading my team, so I'll have to change things up. Nugget Bridge is our next checkpoint. Don't get too comfortable in front.",
+      closeButtonText: 'Race to Cerulean',
       icon: {
         type: 'trainer',
         id: 'youngster',
@@ -164,8 +164,8 @@ export const viridianCityTasks: Task[] = [
   },
   {
     id: 'rival-route-22-loss-chat',
-    name: 'Rival Battle',
-    description: 'Your rival has one last word on Route 22.',
+    name: 'A Point for the Rival',
+    description: 'Your rival takes this round on Route 22 and points you toward the next test.',
     category: 'Kanto',
     subCategory: 'Viridian City',
     icon: {
@@ -176,7 +176,7 @@ export const viridianCityTasks: Task[] = [
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Continue',
+    completeButtonText: 'Head for Cerulean',
     requirements: [
       {
         type: 'kid_mode',
@@ -195,10 +195,10 @@ export const viridianCityTasks: Task[] = [
     exitModal: {
       background: '/backgrounds/rocky-path.avif',
       dynamicOpponent: 'rival',
-      title: 'Rival Battle',
+      title: 'A Point for the Rival',
       message:
-        'Route 22 is not just a shortcut. Train up before you chase me again.',
-      closeButtonText: 'Head On',
+        "A point for me this round. Route 22 was a warm-up; Nugget Bridge has five trainers waiting, and they won't give either of us time to regroup. Tune up your team, then meet me there.",
+      closeButtonText: 'Head for Cerulean',
       icon: {
         type: 'trainer',
         id: 'youngster',
