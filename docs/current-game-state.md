@@ -9,10 +9,13 @@ stopped while the former production data is recovered or a fresh start is
 decided and the MongoDB credential is rotated. Daily MongoDB and Coolify
 instance backup schedules are enabled locally. The private R2 bucket exists,
 but no off-host backups are verified until a replacement bucket-scoped token
-is configured. Release builds are moving to GitHub Actions and a separate,
-private GHCR package; the package and push credential exist, while Coolify's
-Docker Image conversion, build key, and pull credential still need setup.
-See the [deployment runbook](development/deployment.md) and
+is configured. GitHub Actions now builds and publishes to the private GHCR
+package. Coolify's `pokeori-ghcr` Docker Image resource targets that image on
+port 3000, serves `pokeori.app` and `www.pokeori.app`, and has the production
+health check configured. Its authenticated deploy webhook is saved in GitHub.
+The app is still stopped while private-registry pull access, the stable build
+key, and required runtime secrets are configured. See the
+[deployment runbook](development/deployment.md) and
 [performance runbook](development/performance-runbook.md) for service details.
 
 - Unreleased (`0.42.25`): Spirit Channeling lets players try any owned Pokemon without revealing hidden channeler requirements in the picker. Ritual answers stay in the server config; incompatible attempts fail without consuming offerings and return an indirect clue. Field Observation pickups now update immediately on the client. Every drop gets a fresh random ID per round, and one completion request submits collected IDs and elapsed times for checking against that session's private Redis drop list and spawn windows before rewards are granted.
@@ -129,7 +132,7 @@ See the [deployment runbook](development/deployment.md) and
 
 - Release `0.29.11`: Generic user API writes can no longer set admin privileges, currency, skills, unlocks, or other authored game state; trusted validated game actions retain their Local API write path. Account unlocking is admin-only, mitigating Payload's current unlock-access advisory. Game sync authenticates once, reuses the Payload client, and exposes private server timing for profiling. Bun is pinned to stable 1.4.2, dependencies are updated, and Alpine tracing excludes unused glibc Sharp binaries. Full progression snapshots remain complete because reward diffs and unlock checks depend on them.
 
-- At the time of release `0.29.10`, Coolify built the Dockerfile automatically from public `main` on the N150 host. The Dockerfile accepted Coolify secret environment mounts, required a private Server Actions build key, retained build caches, and gave dependency health checks enough startup/response time. Build page workers were capped at four. The package-version endpoint and PWA refresh remain the release verification path.
+- At the time of release `0.29.10`, Coolify built the Dockerfile automatically from public `main` on the N150 host. The Dockerfile accepted Coolify secret environment mounts, required a private Server Actions build key, retained build caches, and gave dependency health checks enough startup/response time. Build page workers were capped at four. This host-build flow is superseded: GitHub Actions now validates and builds the private GHCR image, and Coolify pulls and runs it. The package-version endpoint and PWA refresh remain the release verification path.
 
 - Release `0.29.6`: After the Chansey egg and antidote conclusion, the one-time `fuchsia-what-now` task opens in Fuchsia City. Ray Choo takes stock of Fuji, Operation Shadow Force, the dud Poké Ball factory, and the Saffron/Silph Co. connection before sending the player to Professor Oak in Pallet Town. The task uses Ray’s detective portrait throughout its enter dialogue and Oak’s portrait for the completion note.
 
