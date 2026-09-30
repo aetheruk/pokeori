@@ -242,13 +242,15 @@ function DropZone({
       transition={{ duration: reduceMotion ? 0 : 0.18, ease: 'easeOut' }}
       className={cn(
         'relative flex h-36 w-36 items-center justify-center overflow-visible rounded-full border-2 border-dashed bg-game-surface-raised/40 transition-colors sm:h-40 sm:w-40',
-        feedback === 'correct'
-          ? 'border-game-charcoal bg-game-charcoal/10'
-          : feedback === 'incorrect'
-            ? 'border-game-danger bg-game-danger/10'
-            : isOver
-              ? 'border-game-charcoal bg-game-charcoal/10'
-              : 'border-game-ochre/70',
+        children
+          ? 'border-transparent bg-transparent'
+          : feedback === 'correct'
+            ? 'border-game-charcoal bg-game-charcoal/10'
+            : feedback === 'incorrect'
+              ? 'border-game-danger bg-game-danger/10'
+              : isOver
+                ? 'border-game-charcoal bg-game-charcoal/10'
+                : 'border-game-ochre/70',
       )}
     >
       {children ? (
@@ -552,7 +554,7 @@ export function ResearchCompareGame({
               {droppedPokemon && (
                 <motion.div
                   className="relative"
-                  initial={reduceMotion ? false : { scale: 0.96, opacity: 0.9 }}
+                  initial={reduceMotion ? false : { scale: 0.82, opacity: 0.9 }}
                   animate={
                     feedback === 'correct'
                       ? {
@@ -576,6 +578,7 @@ export function ResearchCompareGame({
                   <PokemonAnswerTile
                     pokemon={droppedPokemon}
                     className={cn(
+                      'h-full w-full sm:h-full sm:w-full',
                       feedback === 'correct' && 'border-game-charcoal/55',
                       feedback === 'incorrect' && 'border-game-danger/55',
                     )}
