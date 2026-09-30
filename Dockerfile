@@ -29,10 +29,9 @@ COPY icons-new ./icons-new
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_IGNORE_TYPECHECK=true
 ENV POKEORI_BUILD_LIBC=musl
-# Coolify injects build secrets as environment mounts on RUN instructions.
-# Local Docker diagnostics can supply the same key using the file mount below;
-# prefer Coolify's environment value when present. Never compile a production
-# image with a public placeholder Server Actions key (Next embeds it in output).
+# GitHub Actions supplies the production build key through the BuildKit file
+# mount below. Local Docker builds can provide the same key. Never compile a
+# production image with a public placeholder key (Next embeds it in output).
 RUN --mount=type=secret,id=NEXT_SERVER_ACTIONS_ENCRYPTION_KEY,required=false \
     --mount=type=cache,id=pokeori-next-cache,target=/app/.next/cache,sharing=locked \
     export DATABASE_URI="${DATABASE_URI:-mongodb://127.0.0.1:27017/pokeori}" && \
@@ -40,7 +39,7 @@ RUN --mount=type=secret,id=NEXT_SERVER_ACTIONS_ENCRYPTION_KEY,required=false \
     export RESEND_API_KEY="${RESEND_API_KEY:-re_pokeori-build-only-placeholder}" && \
     export REDIS_URL="${REDIS_URL:-redis://127.0.0.1:6379}" && \
     export NEXT_SERVER_ACTIONS_ENCRYPTION_KEY="${NEXT_SERVER_ACTIONS_ENCRYPTION_KEY:-$(cat /run/secrets/NEXT_SERVER_ACTIONS_ENCRYPTION_KEY 2>/dev/null)}" && \
-    { test -n "$NEXT_SERVER_ACTIONS_ENCRYPTION_KEY" || { echo 'Set NEXT_SERVER_ACTIONS_ENCRYPTION_KEY as a Coolify build secret.' >&2; exit 1; }; } && \
+    { test -n "$NEXT_SERVER_ACTIONS_ENCRYPTION_KEY" || { echo 'Set NEXT_SERVER_ACTIONS_ENCRYPTION_KEY as a GitHub Actions secret.' >&2; exit 1; }; } && \
     bun --bun next build --turbopack
 
 # Production image: Bun runs the generated standalone Next.js server.

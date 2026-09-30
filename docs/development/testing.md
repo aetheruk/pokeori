@@ -79,8 +79,10 @@ bun run test:security:integration # Real isolated API/transaction security tests
 
 ## Release validation
 Before merging a release PR, run lint, typecheck, data validation, and the full
-Bun test suite. Coolify builds the Dockerfile and deploys automatically from
-`main`; the image build skips typechecking, so pre-merge validation is required.
+Bun test suite. After a merge, the GitHub Actions release workflow validates,
+builds, and publishes the Docker image; Coolify pulls and deploys it from
+GHCR. The image build skips typechecking, so the workflow validates before
+compilation.
 Verify the deployed `/api/health`, `/api/app-version`, and an already-open PWA
 using the [deployment guide](/docs/development/deployment.md).
 

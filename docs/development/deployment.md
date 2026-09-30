@@ -1,6 +1,6 @@
 # Coolify deployment
 
-The production target is the Hetzner `pokeori-server` (CX23, 2 vCPU, 4 GiB RAM). Once GitHub auto-deployment is connected to the Pokeori app in Coolify, merging a validated release PR to protected `main` will make Coolify build the checked-in Dockerfile and start the new container. No local production build or registry publish is required. Keep one build active at a time and monitor host memory during the first cold build.
+The production target is the Hetzner `pokeori-server` (CX23, 2 vCPU, 4 GiB RAM). A merge to protected `main` runs the GitHub Actions release workflow: it validates the revision, builds a `linux/amd64` image on GitHub, pushes tagged images to private GHCR, then asks Coolify to pull and start the image. Coolify does not compile the application. This keeps Next.js compilation off the memory-constrained host; the CX23 still needs enough headroom for Coolify, MongoDB, Dragonfly, and the running app.
 
 ## Hetzner migration status (2026-09-30)
 
@@ -60,12 +60,14 @@ volumes or MongoDB. Save the Coolify `APP_KEY` from
 `/data/coolify/source/.env` separately in a secure location; without the same
 key, credentials encrypted in an instance backup cannot be restored.
 
-The production `pokeori-app` resource reads the public `aetheruk/pokeori` Git
-repository on `main`, uses `/Dockerfile`, exposes port `3000`, and has
-`https://pokeori.app` and `https://www.pokeori.app` configured in Coolify.
-Docker BuildKit secret handling and the app's deploy-on-push setting are
-selected, but no GitHub push webhook or GitHub App source is connected yet.
-The production app environment contains `NEXT_PUBLIC_APP_URL`, the private
+The existing `pokeori-app` Coolify resource is still configured to read the
+public `aetheruk/pokeori` Git repository and build `/Dockerfile`. It must be
+replaced with a Docker Image application before release deployment. The target
+image is `ghcr.io/aetheruk/pokeori:latest`, exposed on port `3000`, with
+`https://pokeori.app` and `https://www.pokeori.app` configured in Coolify. The
+new GitHub Actions workflow and this resource conversion still need their
+GitHub/Coolify secrets and private GHCR pull credential configured. The
+production app environment contains `NEXT_PUBLIC_APP_URL`, the private
 internal `REDIS_URL` for Dragonfly, and the runtime-only `DATABASE_URI`. It is
 not deployed. Configure the stable Server Actions key and Payload secret in
 Coolify, rotate the MongoDB credential as described above, and supply a valid
@@ -82,41 +84,57 @@ current origin firewall permits direct HTTP/HTTPS access as well, so leave
 `TRUST_CLOUDFLARE_PROXY` unset until the origin is restricted to Cloudflare's
 published IP ranges.
 
-## GitHub push webhook
+## GitHub Actions image release
 
-The Coolify dashboard and manual Git webhook use `coolify.pokeori.app` through
-the Coolify proxy. Set the Coolify public URL to `https://coolify.pokeori.app`
-and use
-`https://coolify.pokeori.app/webhooks/source/github/events/manual` as the
-repository webhook URL. The existing GitHub webhook is push-only. Keep JSON
-content, SSL verification, and the same private signing secret in Coolify and
-GitHub. Do not publish the secret or replace this with the token-based deploy
-API URL.
+`.github/workflows/build-and-deploy.yml` runs on pushes to `main` and can be
+manually dispatched from `main`. It runs typecheck, lint, tests, and the
+security audit; then it builds for `linux/amd64`, pushes the private GHCR image,
+and triggers Coolify only after the push succeeds. Each image is tagged
+`latest`, `v<package-version>`, and `sha-<12-character-commit>`. Coolify tracks
+`latest`; the version and commit tags identify rollback candidates.
 
-GitHub must reach the webhook hostname over HTTPS. Verify a push delivery and
-confirm Coolify records a webhook deployment for the merged SHA. Coolify returns
-HTTP 200 even for invalid signatures, so inspect the response body rather than
-treating the status alone as authentication success. Do not add a throwaway
-`main` commit or disable caches to test the hook.
+Add these repository secrets under **Settings → Secrets and variables →
+Actions**:
+
+| Secret | Purpose |
+| --- | --- |
+| `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` | BuildKit secret used by the Dockerfile. It must be identical to the stable runtime key in Coolify. |
+| `COOLIFY_WEBHOOK` | The Pokeori app's authenticated deploy webhook URL. |
+| `COOLIFY_TOKEN` | Coolify API token with the `Deploy` permission. |
+
+GitHub provides `GITHUB_TOKEN` to publish to GHCR; grant the workflow package
+write permission if repository package settings require it. Keep
+`ghcr.io/aetheruk/pokeori` private. The Next build embeds the Server Actions key
+in its output, and the registry cache is also private. Do not publish either
+the image or its `buildcache` tag publicly. Configure a GHCR credential with
+`read:packages` for the Coolify deployment server so it can pull the private
+image.
+
+Set the Coolify public URL to `https://coolify.pokeori.app`, enable API access,
+create the deploy-scoped API token, and copy the application's authenticated
+Deploy Webhook URL to `COOLIFY_WEBHOOK`. This is an API deploy request from CI;
+the old repository push webhook is not used by the Docker Image application.
+Do not use the manual Git webhook URL here. Confirm the deploy webhook can
+queue a deployment after the image has been published.
 
 ## Coolify application settings
 
-- Source: the public Git repository, branch `main`, automatic deployment enabled. Confirm the repository push webhook targets this application.
-- Build pack: Dockerfile. Base directory: `/`. Dockerfile: `/Dockerfile`. Build target: final stage (leave unset).
+- Application type: Docker Image, configured with private registry credentials for GHCR.
+- Image: `ghcr.io/aetheruk/pokeori`; tag: `latest`. Use a `v<version>` or `sha-<12-character-commit>` tag for a deliberate rollback.
+- Do not configure a Git source, Dockerfile build, or repository auto-deploy webhook. GitHub Actions publishes the image and triggers the authenticated Coolify deploy webhook.
 - Exposed container port: `3000`; route the domain through Coolify's proxy. Leave build/start command overrides empty.
-- Enable **Use Docker Build Secrets**. Keep build cache enabled and **Include Source Commit in Build** disabled; package version supplies the deployment identifier.
 - Run one application replica. Allow 30 seconds for graceful shutdown.
 - Health check: GET `/api/health` on port 3000, interval 30 seconds, timeout 10 seconds, start period 60 seconds, 3 retries. Apply these values in Coolify if its health check overrides the Dockerfile.
 
-Dockerfile syntax tracks stable `docker/dockerfile:1`. Coolify's injected `RUN --mount=type=secret,...,env=...` needs frontend 1.10 or newer; pinning 1.7 causes `unexpected key 'env'` before the application is compiled. See [Docker's secret mount reference](https://docs.docker.com/reference/dockerfile/#run---mounttypesecret) and [Coolify environment variables](https://coolify.io/docs/knowledge-base/environment-variables).
+Dockerfile syntax tracks stable `docker/dockerfile:1` and reads the build key through a BuildKit secret file mount. See [Docker's secret mount reference](https://docs.docker.com/reference/dockerfile/#run---mounttypesecret).
 
 ## Environment variables
 
-Configure values in Coolify, never in committed environment files.
+Configure runtime values in Coolify and the build key in GitHub Actions, never in committed environment files.
 
 | Variable | Build | Runtime |
 | --- | --- | --- |
-| `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` | Required, stable private base64 AES key (32 bytes recommended) | Same value |
+| `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` | Required as a GitHub Actions secret for the image build | Same stable value in Coolify at runtime |
 | `DATABASE_URI` | Disabled; compiler uses a local placeholder | Required, MongoDB replica-set URI |
 | `REDIS_URL` | Disabled; compiler uses a local placeholder | Required, private Redis/Dragonfly URI |
 | `PAYLOAD_SECRET` | Disabled; compiler uses a placeholder | Required, stable private secret |
@@ -131,15 +149,15 @@ Configure values in Coolify, never in committed environment files.
 | `WEB_PUSH_SUBJECT` | Disabled | VAPID contact (`mailto:` or HTTPS URL) |
 | `TRUST_CLOUDFLARE_PROXY` | Disabled | `true` only when direct origin access is firewalled |
 
-The Dockerfile preserves injected environment values. It rejects a missing Server Actions key; Next embeds this key in server build output, so generated images must remain private even though the source repository is public. For an intentional local Docker diagnostic, the key can also be supplied with `--secret id=NEXT_SERVER_ACTIONS_ENCRYPTION_KEY,env=NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` from an exported variable. Do not print the key.
+The Dockerfile preserves injected environment values. It rejects a missing Server Actions key; Next embeds this key in server build output, so generated images and build cache must remain private even though the source repository is public. GitHub Actions passes the key through BuildKit's secret mechanism. Do not put it in a build argument, print it, or use a public build cache.
 
 MongoDB must support replica-set transactions, and the application must reach MongoDB and Dragonfly on the private network. The health endpoint checks both services and transaction support.
 
 For the 0.32.0 notification feature, follow [device notification setup](../features/notifications.md). Add the `push-subscriptions` due-time and user indexes through the existing prepare migration before enabling production dispatch. The dispatcher runs in the persistent Next process; no additional cron provider or paid push account is needed. Without the three runtime VAPID values, notifications remain unavailable and no dispatcher starts.
 
-## Hetzner build performance
+## Build and host resources
 
-The image pins Bun 1.4.2 for installation, Turbopack compilation, and the standalone server, matching `packageManager`. Frozen installs include build dependencies even if Coolify injects production mode. Package downloads and `.next/cache` persist in BuildKit cache mounts, with locking to prevent concurrent writers. Next 16.3 enables Turbopack's filesystem build cache by default.
+The image pins Bun 1.4.2 for installation, Turbopack compilation, and the standalone server, matching `packageManager`. Frozen installs include build dependencies. GitHub Actions builds the image and reads/writes the private GHCR `buildcache` tag; Coolify only pulls and runs the published image. Next 16.3 enables Turbopack's filesystem build cache by default.
 
 The Alpine builder sets `POKEORI_BUILD_LIBC=musl` so tracing excludes unused glibc Sharp packages while retaining linuxmusl Sharp/libvips. Remove/change this setting if switching to a glibc base. Broad Payload runtime includes remain: earlier runtime tracing fixes required them, so further narrowing needs a complete image smoke test. The inspected 0.29.9 image contained approximately 18 MiB of unused glibc libvips; this is not a measured final-image size for the new release.
 
@@ -147,15 +165,15 @@ The base stage updates Alpine packages before installing compatibility libraries
 
 On 2026-09-07, the rebuilt linux/amd64 base stage (Alpine 3.22.5, 21 OS packages) passed Trivy 0.74.0's HIGH/CRITICAL scan with zero findings after the OpenSSL update. This covers the base's OS packages, not the compiled Bun binary or the final application image.
 
-Page-generation workers are capped at four and respect smaller available CPU allocations; per-worker page concurrency is eight. This has not been benchmarked on the current CX23 and does not limit every Turbopack thread. Keep one build active at a time and measure build duration, peak RAM, swap, and live request latency before further tuning. Installed RAM and competing workloads determine the safe build memory budget.
+The CX23 no longer needs build-time RAM, but its 4 GiB still serves Coolify, MongoDB, Dragonfly, and the app at runtime. A Coolify container memory limit only constrains that running container; it does not tune GitHub's build runner. If runtime memory pressure appears, inspect actual service usage before increasing host RAM or limiting a service.
 
 Only compiler inputs enter the builder stage. Public assets are copied directly into the runner, so their contents do not invalidate the compiler layer (the required package-version bump still does). The final image includes standalone server dependencies, static files, and public assets. One-off data migration utilities remain available in the repository but are no longer built or shipped in the production image. The non-root runtime owns its files and can write Next caches.
 
-Keep the Docker builder/cache on persistent host storage. Do not run routine builder/system pruning or no-cache deployments. Configure cleanup based on disk pressure while retaining recent successful images for rollback. The first build after migration is cold; evaluate subsequent builds separately.
+Keep the registry package and cache private. Configure Coolify cleanup based on disk pressure while retaining recent successful images for rollback.
 
 ## Validation and rollout
 
-Before merging, increment the semantic package version and run `bun run lint`, `bun run typecheck`, `bun run validate:data`, and `bun test`. Typechecking is skipped in the Docker build to keep compilation work on the host lower.
+Before merging, increment the semantic package version and run the release checklist. The GitHub Actions release workflow repeats typecheck, lint, tests, and security audit before publishing. Typechecking is not part of the Docker build.
 
 After Coolify reports success:
 
@@ -165,10 +183,10 @@ After Coolify reports success:
 4. Keep an older PWA open and verify it reloads to the new version. If its first reload still lands on the prior client during rollout, the open client retries with a bounded delay on later version checks until the new bundle loads.
 5. Smoke login, Explore, Pokemon box, a battle, a location encounter, and a mini-game.
 
-A successful Dockerfile syntax check does not establish that the application compiles or that production services are reachable. Treat the first Coolify build and runtime smoke checks as required verification.
+GitHub Actions logs establish whether compilation and image publication completed. Coolify logs establish whether it pulled the new image and started it; runtime health and smoke checks remain required.
 
 ## Recovery
 
-For urgent recovery, use Coolify's rollback to a retained compatible deployment if available and verify health. From 0.29.12, economy receipts can contain compressed responses: rollback code must retain that decoder and semantic receipt identities. An older image without the decoder is not a safe rollback once compressed receipts exist. Reconcile `main` through a revert PR with a new package version so a subsequent automatic deployment preserves the correction. If no compatible prior image remains, revert the faulty behavior while preserving receipt compatibility through a PR and let Coolify rebuild. Do not reset or force-push main.
+For urgent recovery, use Coolify's rollback to a retained compatible deployment if available and verify health. From 0.29.12, economy receipts can contain compressed responses: rollback code must retain that decoder and semantic receipt identities. An older image without the decoder is not a safe rollback once compressed receipts exist. Reconcile `main` through a revert PR with a new package version so a subsequent GitHub image build and Coolify deployment preserve the correction. If no compatible prior image remains, revert the faulty behavior while preserving receipt compatibility through a PR and let GitHub Actions build the replacement. Do not reset or force-push main.
 
 Follow the [release checklist](/docs/development/release-checklist.md) for release validation and required migrations, and the [performance runbook](/docs/development/performance-runbook.md) for database/index and proxy setup.
