@@ -553,7 +553,7 @@ export function ResearchCompareGame({
             <DropZone isOver={isOverAnswerZone} feedback={feedback}>
               {droppedPokemon && (
                 <motion.div
-                  className="relative"
+                  className="relative h-full w-full"
                   initial={reduceMotion ? false : { scale: 0.82, opacity: 0.9 }}
                   animate={
                     feedback === 'correct'
