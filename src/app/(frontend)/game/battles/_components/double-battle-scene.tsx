@@ -70,6 +70,7 @@ function LaneHealth({
           align={isPlayer ? 'left' : 'right'}
           status={mon.status}
           preferredStance={isPlayer ? undefined : mon.observedPreferredStance}
+          showHpValues={!isPlayer && !!mon.observedPreferredStance}
           compact
         />
       ) : null}
