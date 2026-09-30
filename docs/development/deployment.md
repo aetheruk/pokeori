@@ -1,6 +1,6 @@
 # Coolify deployment
 
-Production builds and deploy automatically from the public repository's protected `main` branch on the Hetzner `pokeori-server` (CX23, 2 vCPU, 4 GiB RAM). Validate and merge a release PR; Coolify compiles the checked-in Dockerfile and starts the new container. No local production build or registry publish is required. Keep one build active at a time and monitor host memory during the first cold build.
+The production target is the Hetzner `pokeori-server` (CX23, 2 vCPU, 4 GiB RAM). Once GitHub auto-deployment is connected to the Pokeori app in Coolify, merging a validated release PR to protected `main` will make Coolify build the checked-in Dockerfile and start the new container. No local production build or registry publish is required. Keep one build active at a time and monitor host memory during the first cold build.
 
 ## Hetzner migration status (2026-09-30)
 

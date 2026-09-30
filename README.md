@@ -92,7 +92,7 @@ Issues, documentation improvements, tests, accessibility fixes, and code contrib
 
 ## Deployment
 
-After a pull request is merged to protected `main`, Coolify automatically builds the root Dockerfile from the public repository and deploys it on the Hetzner `pokeori-server`. See the [deployment guide](./docs/development/deployment.md).
+After GitHub auto-deployment is connected, a pull request merged to protected `main` will trigger Coolify to build the root Dockerfile and deploy it on the Hetzner `pokeori-server`. See the [deployment guide](./docs/development/deployment.md) for current migration readiness; production activation remains gated on database recovery and required secrets.
 
 ## Versioning
 
