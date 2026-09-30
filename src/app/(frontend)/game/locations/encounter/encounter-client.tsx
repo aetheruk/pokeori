@@ -2236,7 +2236,14 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
                           : 'No Escape Ropes!'
                   }
                 >
-                  <div className="w-5 h-5 shrink-0 relative flex items-center justify-center">
+                  <div
+                    className={cn(
+                      'shrink-0 relative flex items-center justify-center',
+                      hasEscapeAbility && !canFreeRun
+                        ? 'h-7 w-7'
+                        : 'h-5 w-5',
+                    )}
+                  >
                     {canFreeRun ? (
                       <FaRunning className="h-full w-full text-game-moss-strong" />
                     ) : hasEscapeAbility ? (
@@ -2248,9 +2255,9 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
                             !!encounter.companionShiny,
                           )}
                           alt={`${encounter.activeAbility?.name} ability`}
-                          width={24}
-                          height={24}
-                          className="h-full w-full object-contain pixelated"
+                          width={32}
+                          height={32}
+                          className="h-8 w-8 max-w-none object-contain pixelated"
                         />
                       ) : (
                         <Sparkles className="h-full w-full text-game-ochre" />
