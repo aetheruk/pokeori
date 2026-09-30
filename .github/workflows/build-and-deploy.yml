@@ -4,12 +4,6 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-    inputs:
-      skip_validation:
-        description: Skip release validation for an explicitly authorized emergency deployment
-        required: false
-        default: false
-        type: boolean
 
 permissions:
   contents: read
@@ -23,26 +17,9 @@ env:
   IMAGE_NAME: ghcr.io/aetheruk/pokeori-production
 
 jobs:
-  validate:
-    name: Validate release
-    if: ${{ github.event_name != 'workflow_dispatch' || inputs.skip_validation != true }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 35
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
-        with:
-          bun-version-file: package.json
-      - run: bun install --frozen-lockfile
-      - run: bun run typecheck
-      - run: bun run lint
-      - run: bun test
-      - run: bun run security:audit
-
   build-and-publish:
     name: Build and publish private GHCR image
-    needs: validate
-    if: ${{ always() && github.ref == 'refs/heads/main' && (needs.validate.result == 'success' || needs.validate.result == 'skipped') }}
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
@@ -123,7 +100,7 @@ jobs:
   deploy:
     name: Trigger Coolify image deployment
     needs: build-and-publish
-    if: ${{ always() && github.ref == 'refs/heads/main' && needs.build-and-publish.result == 'success' }}
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

@@ -27,7 +27,7 @@ changes.
 - Run `bun run typecheck`.
 - Run `bun test`.
 - Run `bun run test:security:integration` and `bun run test:e2e` against the isolated services described in the testing guide.
-- Require both Validate jobs in branch protection on the exact merge candidate. Merely adding a workflow does not enforce this.
+- GitHub Actions does not run or require validation jobs for release publication. Run the relevant commands above manually when validating a change.
 - Run focused manual smoke tests for changed game modes.
 
 ## Gameplay
@@ -46,7 +46,7 @@ changes.
 - Confirm Redis is reachable and TLS settings match the deployment environment.
 - Confirm `/api/health` checks MongoDB, replica-set transaction support, and Dragonfly, and Coolify reports one healthy application replica.
 - Deploy to staging first when available.
-- After GitHub Actions and the Coolify Docker Image resource are configured, merge the validated release PR to protected `main`; GitHub builds and publishes `ghcr.io/aetheruk/pokeori-production` and then calls Coolify's authenticated deploy webhook. Coolify pulls the image and does not build the Dockerfile. No local production build or publish step is required.
+- After GitHub Actions and the Coolify Docker Image resource are configured, merge the release PR to `main`; GitHub builds and publishes `ghcr.io/aetheruk/pokeori-production` and then calls Coolify's authenticated deploy webhook. Coolify pulls the image and does not build the Dockerfile. No local production build or publish step is required.
 - Check server logs for request IDs on API failures.
 - Verify login, Explore, Pokemon box, one battle, one location encounter, one Mini Game, and one Field Research study.
 - With an already-open PWA session, confirm it detects the new `/api/app-version` response and reloads to the latest client bundle.

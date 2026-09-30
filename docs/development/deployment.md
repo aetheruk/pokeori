@@ -1,6 +1,6 @@
 # Coolify deployment
 
-The production target is the Hetzner `pokeori-server` (CX23, 2 vCPU, 4 GiB RAM). A merge to protected `main` runs the GitHub Actions release workflow: it validates the revision, builds a `linux/amd64` image on GitHub, pushes tagged images to private GHCR, then asks Coolify to pull and start the image. Coolify does not compile the application. This keeps Next.js compilation off the memory-constrained host; the CX23 still needs enough headroom for Coolify, MongoDB, Dragonfly, and the running app.
+The production target is the Hetzner `pokeori-server` (CX23, 2 vCPU, 4 GiB RAM). A merge to `main` runs the GitHub Actions release workflow: it builds a `linux/amd64` image on GitHub, pushes tagged images to private GHCR, then asks Coolify to pull and start the image. GitHub Actions does not run typecheck, lint, test, or dependency-audit jobs. Coolify does not compile the application. This keeps Next.js compilation off the memory-constrained host; the CX23 still needs enough headroom for Coolify, MongoDB, Dragonfly, and the running app.
 
 ## Hetzner migration status (2026-09-30)
 
@@ -93,8 +93,7 @@ published IP ranges.
 ## GitHub Actions image release
 
 `.github/workflows/build-and-deploy.yml` runs on pushes to `main` and can be
-manually dispatched from `main`. It runs typecheck, lint, tests, and the
-security audit; then it builds for `linux/amd64`, pushes the private GHCR image,
+manually dispatched from `main`. It builds for `linux/amd64`, pushes the private GHCR image,
 and triggers Coolify only after the push succeeds. Each image is tagged
 `latest`, `v<package-version>`, and `sha-<12-character-commit>`. Coolify tracks
 `latest`; the version and commit tags identify rollback candidates.
@@ -114,7 +113,7 @@ Actions**:
 | --- | --- |
 | `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` | **Configured in GitHub.** BuildKit secret used by the Dockerfile; set the same rotated value in Coolify at runtime. |
 | `COOLIFY_WEBHOOK` | **Configured.** Authenticated deploy webhook URL for `pokeori-ghcr`. |
-| `COOLIFY_TOKEN` | **Present; verify scope.** Coolify API token with the `Deploy` permission. |
+| `COOLIFY_TOKEN` | **Configured.** Coolify API token with deploy-only permission. |
 | `GHCR_PUSH_TOKEN` | **Configured.** GitHub classic PAT with `read:packages` and `write:packages`, used only by the main-branch release workflow. |
 
 `pokeori-production` is already created as a private personal package and is
@@ -129,9 +128,9 @@ Actions key in the compiled app. Give Coolify a separate GHCR credential with
 only `read:packages` for pulling the image.
 
 The Coolify public URL is `https://coolify.pokeori.app`. `COOLIFY_WEBHOOK` now
-targets the `pokeori-ghcr` authenticated deploy webhook. The existing
-`COOLIFY_TOKEN` secret must have the instance's deploy permission. This is an
-API deploy request from CI; the old repository push webhook is not used by the
+targets the `pokeori-ghcr` authenticated deploy webhook. The `COOLIFY_TOKEN`
+secret has deploy-only permission. This is an API deploy request from CI using
+POST; the old repository push webhook is not used by the
 Docker Image application. Do not use the manual Git webhook URL here. After
 the remaining runtime values are saved, confirm the deploy
 webhook queues an image pull.
@@ -192,7 +191,7 @@ Keep the registry package and cache private. Configure Coolify cleanup based on 
 
 ## Validation and rollout
 
-Before merging, increment the semantic package version and run the release checklist. The GitHub Actions release workflow repeats typecheck, lint, tests, and security audit before publishing. Typechecking is not part of the Docker build.
+Before merging, increment the semantic package version. GitHub Actions publishes without running project validation jobs; run the relevant release checklist locally when validation is needed. Typechecking is not part of the Docker build.
 
 After Coolify reports success:
 

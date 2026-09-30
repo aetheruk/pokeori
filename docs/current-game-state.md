@@ -14,9 +14,11 @@ package. Coolify's `pokeori-ghcr` Docker Image resource targets that image on
 port 3000, serves `pokeori.app` and `www.pokeori.app`, and has the production
 health check configured. Its authenticated deploy webhook is saved in GitHub.
 The private-registry pull was verified from Hetzner, and the stable build key
-now exists in GitHub. The app is still stopped while Coolify's runtime values
-are saved, required mail configuration is supplied, and the former database
-data-recovery versus fresh-start decision is resolved. See the
+exists in GitHub. The latest app rollout failed because `RESEND_API_KEY` is
+missing; Coolify's health probe also needs to use `127.0.0.1` rather than
+`localhost` on this host. Save the required runtime values directly in Coolify
+before retrying deployment. The former database data-recovery versus
+fresh-start decision is also unresolved. See the
 [deployment runbook](development/deployment.md) and
 [performance runbook](development/performance-runbook.md) for service details.
 
@@ -134,7 +136,7 @@ data-recovery versus fresh-start decision is resolved. See the
 
 - Release `0.29.11`: Generic user API writes can no longer set admin privileges, currency, skills, unlocks, or other authored game state; trusted validated game actions retain their Local API write path. Account unlocking is admin-only, mitigating Payload's current unlock-access advisory. Game sync authenticates once, reuses the Payload client, and exposes private server timing for profiling. Bun is pinned to stable 1.4.2, dependencies are updated, and Alpine tracing excludes unused glibc Sharp binaries. Full progression snapshots remain complete because reward diffs and unlock checks depend on them.
 
-- At the time of release `0.29.10`, Coolify built the Dockerfile automatically from public `main` on the N150 host. The Dockerfile accepted Coolify secret environment mounts, required a private Server Actions build key, retained build caches, and gave dependency health checks enough startup/response time. Build page workers were capped at four. This host-build flow is superseded: GitHub Actions now validates and builds the private GHCR image, and Coolify pulls and runs it. The package-version endpoint and PWA refresh remain the release verification path.
+- At the time of release `0.29.10`, Coolify built the Dockerfile automatically from public `main` on the N150 host. The Dockerfile accepted Coolify secret environment mounts, required a private Server Actions build key, retained build caches, and gave dependency health checks enough startup/response time. Build page workers were capped at four. This host-build flow is superseded: GitHub Actions builds the private GHCR image without running validation jobs, and Coolify pulls and runs it. The package-version endpoint and PWA refresh remain the release verification path.
 
 - Release `0.29.6`: After the Chansey egg and antidote conclusion, the one-time `fuchsia-what-now` task opens in Fuchsia City. Ray Choo takes stock of Fuji, Operation Shadow Force, the dud Poké Ball factory, and the Saffron/Silph Co. connection before sending the player to Professor Oak in Pallet Town. The task uses Ray’s detective portrait throughout its enter dialogue and Oak’s portrait for the completion note.
 
