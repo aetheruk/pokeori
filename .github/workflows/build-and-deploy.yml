@@ -4,6 +4,12 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      skip_validation:
+        description: Skip release validation for an explicitly authorized emergency deployment
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -19,6 +25,7 @@ env:
 jobs:
   validate:
     name: Validate release
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.skip_validation != true }}
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
@@ -35,7 +42,7 @@ jobs:
   build-and-publish:
     name: Build and publish private GHCR image
     needs: validate
-    if: github.ref == 'refs/heads/main'
+    if: ${{ always() && github.ref == 'refs/heads/main' && (needs.validate.result == 'success' || needs.validate.result == 'skipped') }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
