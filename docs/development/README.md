@@ -14,8 +14,8 @@ game app and edits authored files without starting Payload, MongoDB, or Redis.
 - [Testing](/docs/development/testing.md) - Testing strategy and current checks
 - [Linting](/docs/development/linting.md) - ESLint/Prettier setup
 - [Deployment](/docs/development/deployment.md) - Build and deploy guide
-- [Coolify deployment](/docs/development/deployment.md) - Automatic Dockerfile builds from public main on the N150 host
-- [Production Performance Runbook](/docs/development/performance-runbook.md) - CX33, MongoDB, Dragonfly, Coolify, and Cloudflare production baseline
+- [Coolify deployment](/docs/development/deployment.md) - Automatic Dockerfile builds from protected main on Hetzner
+- [Production Performance Runbook](/docs/development/performance-runbook.md) - Hetzner CX23, MongoDB, Dragonfly, Coolify, and Cloudflare production baseline
 - [Release Checklist](/docs/development/release-checklist.md) - Pre-deploy validation checklist
 
 ## Prerequisites

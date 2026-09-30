@@ -1,16 +1,20 @@
 # Production Performance Runbook
 
-This is the production baseline for the single Intel N150 host running Pokeori,
-MongoDB, and Dragonfly through Coolify.
+This is the production baseline for the Hetzner CX23 `pokeori-server` (2 vCPU,
+4 GiB RAM) running Coolify, Pokeori, and Dragonfly. MongoDB must be reachable as
+a separate replica-set service. During the 2026-09-30 migration, the configured
+MongoDB endpoint timed out and the Hetzner project had no backups or snapshots;
+restore or verify the existing database before sending production traffic to
+the new app.
 
-## Coolify and N150
+## Coolify and Hetzner
 
 - Run one Pokeori replica. In-process Next.js state is not required for
   correctness, but a second replica on the same host adds memory pressure
   without adding host redundancy.
 - Configure Pokeori as a public Git repository Application using the root Dockerfile and automatic deployment from `main`. Do not publish a
   host port; route only through Coolify's proxy.
-- Coolify builds natively on the N150. Preserve BuildKit caches and run one build at a time; see the [deployment guide](/docs/development/deployment.md).
+- Coolify builds natively on the Hetzner CX23. Preserve BuildKit caches and run one build at a time; see the [deployment guide](/docs/development/deployment.md).
 - Use `/api/health` as the health endpoint with a 30 second interval, 10 second
   timeout, 60 second start period, and 3 retries. The image includes the same
   health check.
@@ -130,7 +134,7 @@ releases. Verify a second request with `curl -I` shows the intended
 
 Game sync authenticates once and reuses the same Payload instance through its data loader. Successful authenticated `/api/game/sync` responses include `Server-Timing` entries for `game-data`, `auth`, `serialize`, and `total`, plus `Cache-Control: private, no-store`. `game-data` measures only scoped data loading; `total` measures server work up to response construction, including rate limiting, but excludes response transmission and browser rendering. Opt-in logs also include serialized response bytes. Compare these with browser Network timings; do not label either one as end-to-end interaction latency.
 
-For N150 profiling, record representative Explore, box, battle, and research flows on both small and large player accounts. Collect response size and p50/p95 latency, host CPU/RAM/swap during idle and deployment, and MongoDB connection checkout wait/failure counts. Check the actual container's `bun --version`, base OS, and image digest rather than inferring the running version from the Dockerfile. Scan that image's OS packages as well as running the dependency audit. Change connection-pool limits only after checking wait times and database utilization.
+For production profiling, record representative Explore, box, battle, and research flows on both small and large player accounts. Collect response size and p50/p95 latency, host CPU/RAM/swap during idle and deployment, and MongoDB connection checkout wait/failure counts. Check the actual container's `bun --version`, base OS, and image digest rather than inferring the running version from the Dockerfile. Scan that image's OS packages as well as running the dependency audit. Change connection-pool limits only after checking wait times and database utilization.
 
 User-state reads use per-user filters, route scopes, and field projections. The complete snapshots also feed trusted write diffs and requirement checks; adding a limit to `findRows` can silently remove progress or corrupt updates. Separate paginated browsing reads from complete mechanics snapshots if profiling shows large accounts are slow. Do not claim those snapshots have been optimized solely by adding a row cap.
 
@@ -161,4 +165,4 @@ Use the same revision, fixture account, viewport, runtime, and cache state when 
 
 `GAME_PERFORMANCE_LOGS=true` also emits JSON `game-action` events with bounded `operation` (`economy`, `lock-acquire`, `lock-release`), `outcome`, `durationMs`, `attempts`, `retries`, and `rollbackErrors`. Count busy acquisition outcomes for contention; these locks fail immediately instead of waiting. Economy duration includes receipt reads, transaction attempts and release; replay events distinguish retry traffic from new writes. Aggregate duration distributions and outcome/retry rates at the log collector. Events deliberately omit action names, account IDs, lock keys, request IDs, arguments, results and exception details. A failed telemetry sink does not change action results. Logs are disabled by default.
 
-Local evidence and its limits are recorded in [performance audit status](../audit/performance.md). Required checks on protected main were verified through the remote API. Live N150 measurements, deployed index state, and origin firewall rules remain deployment-environment verification rather than conclusions from local fixtures.
+Local evidence and its limits are recorded in [performance audit status](../audit/performance.md). Required checks on protected main were verified through the remote API. Post-migration live measurements, deployed index state, and the Cloudflare-to-origin firewall path remain deployment-environment verification rather than conclusions from local fixtures.

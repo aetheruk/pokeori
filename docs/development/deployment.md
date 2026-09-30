@@ -1,32 +1,42 @@
 # Coolify deployment
 
-Production builds and deploys automatically from the public repository's protected `main` branch on the Intel N150 host. Validate and merge a release PR; Coolify compiles the checked-in Dockerfile and starts the new container. No local production build or registry publish is required.
+Production builds and deploy automatically from the public repository's protected `main` branch on the Hetzner `pokeori-server` (CX23, 2 vCPU, 4 GiB RAM). Validate and merge a release PR; Coolify compiles the checked-in Dockerfile and starts the new container. No local production build or registry publish is required. Keep one build active at a time and monitor host memory during the first cold build.
 
-## GitHub webhook through the local server's tunnel
+## Hetzner migration status (2026-09-30)
 
-The Pokeori Cloudflare Tunnel publishes `deploy.pokeori.app` with the exact path
-rule `^/webhooks/source/github/events/manual$`, forwarding to
-`http://localhost:8000`. Its catch-all returns 404, so the Coolify dashboard,
-login and other API paths are not exposed through this hostname. The existing
-`pokeori.app` route continues forwarding to port 80.
+The fresh Hetzner server is the new production target. The production MongoDB
+endpoint did not answer from the host during migration, and this Hetzner project
+has no server backups or snapshots. Restore or verify the existing MongoDB
+replica set and transaction support before routing players to the new app. Do
+not point production at an empty replacement database as a substitute for data
+recovery.
 
-The repository's GitHub push webhook uses
-`https://deploy.pokeori.app/webhooks/source/github/events/manual`, JSON content
-and SSL verification. The same private signing secret must be saved in Coolify's
-GitHub manual-webhook field and GitHub's webhook configuration. Do not publish
-the secret or replace this with the token-based deploy API URL.
+The available environment also had no usable `RESEND_API_KEY` and no
+`BETA_INVITATION_SECRET`. Configure a valid mail key and a new stable invitation
+signing secret before enabling registration and transactional email.
 
-GitHub's initial ping returned HTTP 200. Signature checks with a matching
-repository/main payload and a `[skip ci]` commit rejected absent/wrong signatures;
-the correctly signed request reached the skip response without queuing a build.
-Coolify returns HTTP 200 even for invalid signatures, so inspect its response
-body rather than treating the status alone as authentication success.
+The Hetzner Cloud firewall allows inbound SSH, HTTP, and HTTPS; Coolify's direct
+port `8000` stays closed. Cloudflare proxies `pokeori.app` and
+`coolify.pokeori.app` to the Hetzner origin. The current origin firewall permits
+direct HTTP/HTTPS access as well, so leave `TRUST_CLOUDFLARE_PROXY` unset until
+the origin is restricted to Cloudflare's published IP ranges.
 
-Verify actual automatic deployment using
-the next validated main merge: check the GitHub push delivery response and confirm
-Coolify records a webhook deployment for the merged SHA. Do not add a throwaway
-main commit or disable caches merely to test the hook. The previous 0.29.12 merge
-needed a cached manual Redeploy because no GitHub webhook existed at that time.
+## GitHub push webhook
+
+The Coolify dashboard and manual Git webhook use `coolify.pokeori.app` through
+the Coolify proxy. Set the Coolify public URL to `https://coolify.pokeori.app`
+and use
+`https://coolify.pokeori.app/webhooks/source/github/events/manual` as the
+repository webhook URL. The existing GitHub webhook is push-only. Keep JSON
+content, SSL verification, and the same private signing secret in Coolify and
+GitHub. Do not publish the secret or replace this with the token-based deploy
+API URL.
+
+GitHub must reach the webhook hostname over HTTPS. Verify a push delivery and
+confirm Coolify records a webhook deployment for the merged SHA. Coolify returns
+HTTP 200 even for invalid signatures, so inspect the response body rather than
+treating the status alone as authentication success. Do not add a throwaway
+`main` commit or disable caches to test the hook.
 
 ## Coolify application settings
 
@@ -66,7 +76,7 @@ MongoDB must support replica-set transactions, and the application must reach Mo
 
 For the 0.32.0 notification feature, follow [device notification setup](../features/notifications.md). Add the `push-subscriptions` due-time and user indexes through the existing prepare migration before enabling production dispatch. The dispatcher runs in the persistent Next process; no additional cron provider or paid push account is needed. Without the three runtime VAPID values, notifications remain unavailable and no dispatcher starts.
 
-## N150 build performance
+## Hetzner build performance
 
 The image pins Bun 1.4.2 for installation, Turbopack compilation, and the standalone server, matching `packageManager`. Frozen installs include build dependencies even if Coolify injects production mode. Package downloads and `.next/cache` persist in BuildKit cache mounts, with locking to prevent concurrent writers. Next 16.3 enables Turbopack's filesystem build cache by default.
 
@@ -76,7 +86,7 @@ The base stage updates Alpine packages before installing compatibility libraries
 
 On 2026-09-07, the rebuilt linux/amd64 base stage (Alpine 3.22.5, 21 OS packages) passed Trivy 0.74.0's HIGH/CRITICAL scan with zero findings after the OpenSSL update. This covers the base's OS packages, not the compiled Bun binary or the final application image.
 
-Page-generation workers are capped at four and respect smaller available CPU allocations; per-worker page concurrency is eight. This is a starting point for the N150, not a measured optimum, and does not limit every Turbopack thread. Keep one build active at a time and measure build duration, peak RAM, swap, and live request latency before further tuning. Installed RAM and competing workloads determine the safe build memory budget.
+Page-generation workers are capped at four and respect smaller available CPU allocations; per-worker page concurrency is eight. This has not been benchmarked on the current CX23 and does not limit every Turbopack thread. Keep one build active at a time and measure build duration, peak RAM, swap, and live request latency before further tuning. Installed RAM and competing workloads determine the safe build memory budget.
 
 Only compiler inputs enter the builder stage. Public assets are copied directly into the runner, so their contents do not invalidate the compiler layer (the required package-version bump still does). The final image includes standalone server dependencies, static files, public assets, and the bundled Chronicle migration. The non-root runtime owns its files and can write Next caches.
 
