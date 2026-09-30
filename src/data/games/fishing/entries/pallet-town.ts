@@ -3,8 +3,8 @@ import { FishingGameConfig } from '../types'
 export const palletTownFishing: FishingGameConfig[] = [
   {
     id: 'pallet-town-seafront',
-    name: 'Pallet Town',
-    description: 'A quiet fishing spot along the southern coast of Pallet Town.',
+    name: 'Pallet Town Coastline',
+    description: 'Cast a line along Pallet Town’s quiet southern shoreline.',
     category: 'Kanto',
     subCategory: 'Pallet Town',
     background: '/backgrounds/beach.avif',
@@ -33,13 +33,14 @@ export const palletTownFishing: FishingGameConfig[] = [
       },
       rods: {
         old: {
-          levelRange: { min: 5, max: 5 },
+          levelRange: { min: 5, max: 10 },
           catchRateModifier: 0,
           timer: 30,
           encounters: {
             entries: [
               {
                 speciesId: 129, // Magikarp
+                formId: '129',
                 weight: 100,
                 symbol: '!',
                 reactionTime: 900,
@@ -49,21 +50,31 @@ export const palletTownFishing: FishingGameConfig[] = [
           },
         },
         good: {
-          levelRange: { min: 10, max: 10 },
+          levelRange: { min: 5, max: 15 },
           catchRateModifier: 0,
           timer: 30,
           encounters: {
             entries: [
               {
-                speciesId: 60, // Poliwag
-                weight: 50,
+                speciesId: 129, // Magikarp
+                formId: '129',
+                weight: 20,
                 symbol: '!',
                 reactionTime: 800,
                 appearTime: { min: 2000, max: 5000 },
               },
               {
-                speciesId: 118, // Goldeen
-                weight: 50,
+                speciesId: 98, // Krabby
+                formId: '98',
+                weight: 40,
+                symbol: '!',
+                reactionTime: 800,
+                appearTime: { min: 2000, max: 5000 },
+              },
+              {
+                speciesId: 116, // Horsea
+                formId: '116',
+                weight: 40,
                 symbol: '!',
                 reactionTime: 800,
                 appearTime: { min: 2000, max: 5000 },
@@ -72,30 +83,81 @@ export const palletTownFishing: FishingGameConfig[] = [
           },
         },
         super: {
-          levelRange: { min: 5, max: 20 },
+          levelRange: { min: 15, max: 35 },
           catchRateModifier: 0,
           timer: 30,
           encounters: {
             entries: [
               {
-                speciesId: 60, // Poliwag
-                weight: 35,
-                symbol: '!',
-                reactionTime: 700,
-                appearTime: { min: 1500, max: 4000 },
-              },
-              {
-                speciesId: 72, // Tentacool
+                speciesId: 116, // Horsea (FireRed)
+                formId: '116',
                 weight: 40,
                 symbol: '!',
                 reactionTime: 700,
                 appearTime: { min: 1500, max: 4000 },
               },
               {
-                speciesId: 120, // Staryu
-                weight: 25,
+                speciesId: 98, // Krabby (LeafGreen)
+                formId: '98',
+                weight: 40,
                 symbol: '!',
-                reactionTime: 600,
+                reactionTime: 700,
+                appearTime: { min: 1500, max: 4000 },
+              },
+              {
+                speciesId: 90, // Shellder (FireRed)
+                formId: '90',
+                weight: 40,
+                symbol: '!',
+                reactionTime: 700,
+                appearTime: { min: 1500, max: 4000 },
+              },
+              {
+                speciesId: 120, // Staryu (LeafGreen)
+                formId: '120',
+                weight: 40,
+                symbol: '!',
+                reactionTime: 700,
+                appearTime: { min: 1500, max: 4000 },
+              },
+              {
+                speciesId: 130, // Gyarados
+                formId: '130',
+                weight: 30,
+                symbol: '!',
+                reactionTime: 700,
+                appearTime: { min: 1500, max: 4000 },
+              },
+              {
+                speciesId: 117, // Seadra (FireRed)
+                formId: '117',
+                weight: 4,
+                symbol: '!',
+                reactionTime: 700,
+                appearTime: { min: 1500, max: 4000 },
+              },
+              {
+                speciesId: 99, // Kingler (LeafGreen)
+                formId: '99',
+                weight: 4,
+                symbol: '!',
+                reactionTime: 700,
+                appearTime: { min: 1500, max: 4000 },
+              },
+              {
+                speciesId: 54, // Psyduck (FireRed)
+                formId: '54',
+                weight: 1,
+                symbol: '!',
+                reactionTime: 700,
+                appearTime: { min: 1500, max: 4000 },
+              },
+              {
+                speciesId: 79, // Slowpoke (LeafGreen)
+                formId: '79',
+                weight: 1,
+                symbol: '!',
+                reactionTime: 700,
                 appearTime: { min: 1500, max: 4000 },
               },
             ],
