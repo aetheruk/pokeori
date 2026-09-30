@@ -10,6 +10,7 @@ interface HealthDisplayProps {
   maxHp: number
   name: string
   level: number
+  showHpValues?: boolean
   gender?: string | null
   isPlayer?: boolean
   centered?: boolean
@@ -24,6 +25,7 @@ export function HealthDisplay({
   maxHp,
   name,
   level,
+  showHpValues = false,
   gender,
   isPlayer,
   centered,
@@ -115,7 +117,7 @@ export function HealthDisplay({
                 : 'bg-game-health',
           )}
         />
-        {isPlayer && (
+        {(isPlayer || showHpValues) && (
           <div
             className={cn(
               'absolute top-0 left-0 flex h-full w-full items-center justify-center font-mono text-game-cream [text-shadow:0_1px_2px_rgb(16_31_38_/_0.95)]',

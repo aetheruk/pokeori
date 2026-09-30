@@ -104,6 +104,7 @@ export function BattleHeader({
             align="right"
             status={activeEnemyMon.status}
             preferredStance={activeEnemyMon.observedPreferredStance}
+            showHpValues={!!activeEnemyMon.observedPreferredStance}
           />
         </div>
       </div>
