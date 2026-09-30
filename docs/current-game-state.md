@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased: Small Shrub task descriptions use the player's first-person voice and joke about needing Cut to give their life meaning.
 - Unreleased: The Grumpy Old Man battle, related Viridian tasks, and their modals use the Expert Male trainer sprite.
 - Unreleased: Candy now has five 20-level tiers from 1–20 through 81–100. Wild battles drop the matching tier at 5%, 4%, 3%, 2%, or 1% by encounter level, and award 1–3 level-matched PokePowder at a flat 35%. The five EX Candy items and their bags are retired; their stored quantities convert to the corresponding standard tier. Candy crushing recipes consume one Candy, and each tier has one powder recipe.
 
