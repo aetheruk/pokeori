@@ -749,7 +749,7 @@ const POKE_POWDER_RECIPES: ArtisanRecipeDraft[] = candyItems.map((candy, index) 
     name: powder.isEx ? `${powder.name} EX` : powder.name,
     description: `Crush ${candy.name} into concentrated ${powder.name}.`,
     artisanLevel,
-    costs: [{ id: candy.id, amount: 2 }],
+    costs: [{ id: candy.id, amount: 1 }],
     rewards: [{ type: 'item', targetId: powder.id, quantity: 1, dropChance: 100 }],
     craftType: 'crush',
     outputQuantity: powder.isEx ? { min: 1, max: 5 } : { min: 1, max: 3 },
