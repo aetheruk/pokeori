@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased: All 27 Oak starter gifts assign the lab background to the gifted Pokémon. The four Shadow Pokémon sold at the Celadon Game Corner Prize Exchange use its scene background; the remaining authored Pokémon rewards already specify their background.
 - Unreleased: Rival battles now read as four connected checkpoints—from the first match outside Oak's lab to Route 22, Nugget Bridge, and the S.S. Anne dock—with distinct names, context, and win/loss conversations. The rival starts cocky, notices the player's growth, and treats each match as part of an ongoing race.
 - Unreleased: Pallet Town's Pallet Town Coastline fishing spot uses the merged FireRed/LeafGreen shoreline pools: Old Rod Magikarp; Good Rod Magikarp, Krabby, and Horsea; Super Rod Horsea, Krabby, Shellder, Staryu, Gyarados, Seadra, Kingler, Psyduck, and Slowpoke.
 - Unreleased: Small Shrub task descriptions use the player's first-person voice and joke about needing Cut to give their life meaning.

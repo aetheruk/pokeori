@@ -107,7 +107,7 @@ export const celadonGameCornerShops: ShopConfig[] = [
         description: 'A level 20 Shadow Mr. Mime kept in a Rocket Ball.',
         icon: { type: 'pokemon', id: '122' },
         cost: [{ type: 'currency', id: 'fun-tokens', amount: 7000 }],
-        rewards: [{ type: 'pokemon', targetId: 122, quantity: 1, dropChance: 100, pokemonData: { formId: '122', level: 20, ballType: 'rocket-ball', isShadow: true, rarity: 'shadow' } }],
+        rewards: [{ type: 'pokemon', targetId: 122, quantity: 1, dropChance: 100, pokemonData: { formId: '122', level: 20, ballType: 'rocket-ball', background: '/backgrounds/celadon-game-corner-prize-exchange.avif', isShadow: true, rarity: 'shadow' } }],
       },
       {
         id: 'game-corner-backup-ability-patch',
@@ -123,7 +123,7 @@ export const celadonGameCornerShops: ShopConfig[] = [
         description: 'A level 20 Shadow Lickitung kept in a Rocket Ball.',
         icon: { type: 'pokemon', id: '108' },
         cost: [{ type: 'currency', id: 'fun-tokens', amount: 7000 }],
-        rewards: [{ type: 'pokemon', targetId: 108, quantity: 1, dropChance: 100, pokemonData: { formId: '108', level: 20, ballType: 'rocket-ball', isShadow: true, rarity: 'shadow' } }],
+        rewards: [{ type: 'pokemon', targetId: 108, quantity: 1, dropChance: 100, pokemonData: { formId: '108', level: 20, ballType: 'rocket-ball', background: '/backgrounds/celadon-game-corner-prize-exchange.avif', isShadow: true, rarity: 'shadow' } }],
       },
       {
         id: 'game-corner-shadow-farfetchd',
@@ -131,7 +131,7 @@ export const celadonGameCornerShops: ShopConfig[] = [
         description: "A level 20 Shadow Farfetch'd kept in a Rocket Ball.",
         icon: { type: 'pokemon', id: '83' },
         cost: [{ type: 'currency', id: 'fun-tokens', amount: 7000 }],
-        rewards: [{ type: 'pokemon', targetId: 83, quantity: 1, dropChance: 100, pokemonData: { formId: '83', level: 20, ballType: 'rocket-ball', isShadow: true, rarity: 'shadow' } }],
+        rewards: [{ type: 'pokemon', targetId: 83, quantity: 1, dropChance: 100, pokemonData: { formId: '83', level: 20, ballType: 'rocket-ball', background: '/backgrounds/celadon-game-corner-prize-exchange.avif', isShadow: true, rarity: 'shadow' } }],
       },
       {
         id: 'game-corner-shadow-jynx',
@@ -139,7 +139,7 @@ export const celadonGameCornerShops: ShopConfig[] = [
         description: 'A level 20 Shadow Jynx kept in a Rocket Ball.',
         icon: { type: 'pokemon', id: '124' },
         cost: [{ type: 'currency', id: 'fun-tokens', amount: 7000 }],
-        rewards: [{ type: 'pokemon', targetId: 124, quantity: 1, dropChance: 100, pokemonData: { formId: '124', level: 20, ballType: 'rocket-ball', isShadow: true, rarity: 'shadow' } }],
+        rewards: [{ type: 'pokemon', targetId: 124, quantity: 1, dropChance: 100, pokemonData: { formId: '124', level: 20, ballType: 'rocket-ball', background: '/backgrounds/celadon-game-corner-prize-exchange.avif', isShadow: true, rarity: 'shadow' } }],
       },
       {
         id: 'game-corner-porygon',
