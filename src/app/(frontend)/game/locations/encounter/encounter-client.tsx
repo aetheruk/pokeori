@@ -2185,7 +2185,9 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
               const hasRope = ropeCount > 0
               const hasEscapeAbility =
                 encounter.activeAbility &&
-                encounter.activeAbility.type === 'escape' &&
+                encounter.activeAbility.effects?.some(
+                  (effect) => effect.type === 'active-escape',
+                ) &&
                 !encounter.abilityEscapeAttempted
 
               const canEscape = canFreeRun || hasRope || hasEscapeAbility
@@ -2238,7 +2240,21 @@ function EncounterPageSession({ onReplay }: { onReplay: () => void }) {
                     {canFreeRun ? (
                       <FaRunning className="h-full w-full text-game-moss-strong" />
                     ) : hasEscapeAbility ? (
-                      <Sparkles className="h-full w-full text-game-ochre" />
+                      encounter.companionFormId ? (
+                        <Image
+                          src={getPokemonImageUrl(
+                            encounter.companionFormId,
+                            'sprite',
+                            !!encounter.companionShiny,
+                          )}
+                          alt={`${encounter.activeAbility?.name} ability`}
+                          width={24}
+                          height={24}
+                          className="h-full w-full object-contain pixelated"
+                        />
+                      ) : (
+                        <Sparkles className="h-full w-full text-game-ochre" />
+                      )
                     ) : (
                       <ItemSprite
                         itemId="escape-rope"
