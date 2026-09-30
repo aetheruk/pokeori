@@ -24,11 +24,26 @@ Dragonfly snapshot persistence is not enabled yet. The app and its runtime
 environment have not been deployed while the MongoDB, mail, and GitHub source
 setup blockers remain unresolved.
 
+The production `pokeori-app` resource reads the public `aetheruk/pokeori` Git
+repository on `main`, uses `/Dockerfile`, exposes port `3000`, and has
+`https://pokeori.app` and `https://www.pokeori.app` configured in Coolify.
+Docker BuildKit secret handling and the app's deploy-on-push setting are
+selected, but no GitHub push webhook or GitHub App source is connected yet.
+The production app environment currently contains `NEXT_PUBLIC_APP_URL` and
+the private internal `REDIS_URL` for Dragonfly. It is not deployed. Configure
+the stable Server Actions key and Payload secret in Coolify, restore the
+production `DATABASE_URI`, and supply a valid mail key and stable invitation
+secret before starting the public app. Never put these values in the repo.
+
 The Hetzner Cloud firewall allows inbound SSH, HTTP, and HTTPS; Coolify's direct
 port `8000` stays closed. Cloudflare proxies `pokeori.app` and
-`coolify.pokeori.app` to the Hetzner origin. The current origin firewall permits
-direct HTTP/HTTPS access as well, so leave `TRUST_CLOUDFLARE_PROXY` unset until
-the origin is restricted to Cloudflare's published IP ranges.
+`www.pokeori.app` and `coolify.pokeori.app` to the Hetzner origin. The `www`
+record resolves through Cloudflare, although Coolify's DNS check currently
+reports a mismatch for that alias. Cloudflare SSL mode is Full; wait for the
+app's origin certificates before switching the zone to Full (strict). The
+current origin firewall permits direct HTTP/HTTPS access as well, so leave
+`TRUST_CLOUDFLARE_PROXY` unset until the origin is restricted to Cloudflare's
+published IP ranges.
 
 ## GitHub push webhook
 
