@@ -476,8 +476,9 @@ export const ceruleanCityBattles: BattleConfig[] = [
   },
   {
     id: 'rival-cerulean',
-    name: 'Rival Battle',
-    description: 'Your rival stops you before Nugget Bridge.',
+    name: 'Nugget Bridge Checkpoint',
+    description:
+      'After your clash with Misty, your rival catches you at the entrance to Nugget Bridge. Five trainers are waiting ahead, and they want proof you are ready to face them.',
     category: 'Kanto',
     subCategory: 'Cerulean City',
     icon: {
@@ -485,7 +486,7 @@ export const ceruleanCityBattles: BattleConfig[] = [
       id: 'youngster',
     },
     background: '/backgrounds/cerulean.avif',
-    title: 'Rival Battle',
+    title: 'Nugget Bridge Checkpoint',
     dynamicOpponent: 'rival',
     rivalLevel: 18,
     maxPokemon: 3,

@@ -165,8 +165,8 @@ export const palletTownTasks: Task[] = [
   },
   {
     id: 'pallet-orientation-rival-selection',
-    name: 'A Friendly Rival',
-    description: 'Professor Oak asks who you expect to keep running into on the road ahead.',
+    name: 'Choose Your Rival',
+    description: 'Professor Oak asks who you expect to keep pace with you on the road ahead.',
     category: 'Secret',
     subCategory: 'Pallet Town',
     background: '/backgrounds/lab.avif',
@@ -191,7 +191,7 @@ export const palletTownTasks: Task[] = [
       background: '/backgrounds/lab.avif',
       title: 'The Professor',
       message:
-        'One more thing before you go. Every good journey has someone who keeps turning up at exactly the right, or wrong, time. Who do you expect to be racing you out there?',
+        'One more thing before you go. Every good journey needs someone who keeps turning up one step ahead—or right at your heels. Who do you expect to race to the next checkpoint?',
       closeButtonText: 'Choose Rival',
       icon: {
         type: 'trainer',
@@ -349,8 +349,8 @@ export const palletTownTasks: Task[] = [
   },
   {
     id: 'pallet-rival-selection-catch-up',
-    name: 'A Friendly Rival',
-    description: 'Professor Oak has one more question about your journey.',
+    name: 'Choose Your Rival',
+    description: 'Professor Oak wants to know who will keep turning your journey into a race.',
     category: 'Kanto',
     subCategory: 'Pallet Town',
     background: '/backgrounds/lab.avif',
@@ -401,8 +401,8 @@ export const palletTownTasks: Task[] = [
   },
   {
     id: 'rival-pallet-town-win-chat',
-    name: 'Rival Battle',
-    description: 'Your rival has one last word outside the lab.',
+    name: 'A Point on the Board',
+    description: 'Your first match is over, but your rival is already looking toward the next checkpoint.',
     category: 'Kanto',
     subCategory: 'Pallet Town',
     icon: {
@@ -413,7 +413,7 @@ export const palletTownTasks: Task[] = [
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Continue',
+    completeButtonText: 'Race to Viridian',
     requirements: [
       {
         type: 'kid_mode',
@@ -432,10 +432,10 @@ export const palletTownTasks: Task[] = [
     exitModal: {
       background: '/backgrounds/grassy-route.avif',
       dynamicOpponent: 'rival',
-      title: 'Rival Battle',
+      title: 'A Point on the Board',
       message:
-        "Not bad for the first battle. Don't get comfortable though, the road north is just getting started.",
-      closeButtonText: 'Head Out',
+        "All right, that point is yours. Don't start posing for the trophy, though—Viridian is only the first checkpoint. I'll be there before you know it.",
+      closeButtonText: 'Race to Viridian',
       icon: {
         type: 'trainer',
         id: 'youngster',
@@ -444,8 +444,8 @@ export const palletTownTasks: Task[] = [
   },
   {
     id: 'rival-pallet-town-loss-chat',
-    name: 'Rival Battle',
-    description: 'Your rival has one last word outside the lab.',
+    name: 'The Rival Takes the Lead',
+    description: 'Your rival leaves the lab with the first win and a plan to keep the lead.',
     category: 'Kanto',
     subCategory: 'Pallet Town',
     icon: {
@@ -456,7 +456,7 @@ export const palletTownTasks: Task[] = [
     repeatable: false,
     secret: false,
     completionTrigger: 'manual',
-    completeButtonText: 'Continue',
+    completeButtonText: 'Take the Lead Back',
     requirements: [
       {
         type: 'kid_mode',
@@ -475,10 +475,10 @@ export const palletTownTasks: Task[] = [
     exitModal: {
       background: '/backgrounds/grassy-route.avif',
       dynamicOpponent: 'rival',
-      title: 'Rival Battle',
+      title: 'The Rival Takes the Lead',
       message:
-        "Looks like I got the better start. Catch up before the road north gets serious.",
-      closeButtonText: 'Head Out',
+        "One point to me. No excuses—there's another match on Route 22. Get your team ready and try to catch up.",
+      closeButtonText: 'Take the Lead Back',
       icon: {
         type: 'trainer',
         id: 'youngster',

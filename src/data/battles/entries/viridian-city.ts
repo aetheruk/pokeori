@@ -87,8 +87,9 @@ export const viridianCityBattles: BattleConfig[] = [
   },
   {
     id: 'rival-route-22',
-    name: 'Rival Battle',
-    description: 'Your rival is training on Route 22.',
+    name: 'Route 22 Rematch',
+    description:
+      'Your rival has been testing their team against Route 22’s tougher wild Pokémon. Before either of you heads toward Cerulean, they want to see if you have caught up since the lab.',
     category: 'Kanto',
     subCategory: 'Viridian City',
     icon: {
@@ -96,7 +97,7 @@ export const viridianCityBattles: BattleConfig[] = [
       id: 'youngster',
     },
     background: '/backgrounds/rocky-path.avif',
-    title: 'Rival Battle',
+    title: 'Route 22 Rematch',
     dynamicOpponent: 'rival',
     rivalLevel: 8,
     maxPokemon: 3,

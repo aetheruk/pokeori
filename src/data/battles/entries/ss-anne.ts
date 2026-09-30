@@ -385,8 +385,9 @@ export const ssAnneBattles: BattleConfig[] = [
   },
   {
     id: 'rival-ss-anne',
-    name: 'Rival Battle',
-    description: 'Your rival waits on the Vermilion dock after the S.S. Anne repairs.',
+    name: 'Dockside Tune-Up',
+    description:
+      'While you helped repair the S.S. Anne, your rival kept training between the passenger decks. They are waiting on the Vermilion dock for one match before the next leg of your journey.',
     category: 'Kanto',
     subCategory: 'Vermilion City',
     icon: {
@@ -394,7 +395,7 @@ export const ssAnneBattles: BattleConfig[] = [
       id: 'youngster',
     },
     background: ssAnneBackground,
-    title: 'Rival Battle',
+    title: 'Dockside Tune-Up',
     dynamicOpponent: 'rival',
     rivalLevel: 20,
     maxPokemon: 3,
