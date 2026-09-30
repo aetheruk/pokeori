@@ -1,11 +1,11 @@
 ---
 name: deploy-pokeori
-description: Prepare and verify Pokeori releases automatically built from public main by Coolify on the N150 host. Use for release PRs, Dockerfile deployment troubleshooting, rollout verification, rollback, and deployment workflow changes.
+description: Prepare and verify Pokeori releases automatically built from public main by Coolify on the Hetzner host. Use for release PRs, Dockerfile deployment troubleshooting, rollout verification, rollback, and deployment workflow changes.
 ---
 
 # Deploy Pokeori
 
-Coolify builds the root Dockerfile from the public repository's protected `main` branch and deploys automatically after a merge. A local production build, package publish, and manual webhook are not release steps.
+Coolify builds the root Dockerfile from the public repository's protected `main` branch and deploys automatically after a merge. A local production build, package publish, and manual deployment trigger are not release steps.
 
 ## Release workflow
 
@@ -20,7 +20,7 @@ Coolify builds the root Dockerfile from the public repository's protected `main`
 - Keep the Dockerfile frontend on stable `:1` (at least 1.10); Coolify injects secret mounts with `env=`.
 - Enable Docker Build Secrets. The stable `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` must be available during build and runtime. Never replace it with a public placeholder or print it. Next embeds this key in server build output, so keep images private.
 - Prefer runtime-only settings for database, Redis, Payload, and email credentials. Build placeholders allow compilation without connecting to production services.
-- Preserve Docker layers and the Bun/Next cache mounts on the Coolify host. Avoid routine cache pruning and no-cache builds; they make N150 deployments slower.
+- Preserve Docker layers and the Bun/Next cache mounts on the Hetzner Coolify host. Avoid routine cache pruning and no-cache builds; they make deployments slower.
 - Keep one application replica and leave build-time CPU/memory headroom for the running app and databases. Tune from measured timings and memory, not assumed speedups.
 - Preserve main branch protection and require PRs; no force pushes or direct-push exceptions.
 

@@ -1,16 +1,19 @@
 # Production Performance Runbook
 
-This is the production baseline for the single Intel N150 host running Pokeori,
-MongoDB, and Dragonfly through Coolify.
+This is the production baseline for the Hetzner CX23 `pokeori-server` (2 vCPU,
+4 GiB RAM) running Coolify, MongoDB, and Dragonfly. The Pokeori app remains
+stopped while the previous production data-recovery versus fresh-start decision
+is unresolved. See the [deployment guide](/docs/development/deployment.md) for
+the current migration state.
 
-## Coolify and N150
+## Coolify and Hetzner
 
 - Run one Pokeori replica. In-process Next.js state is not required for
   correctness, but a second replica on the same host adds memory pressure
   without adding host redundancy.
 - Configure Pokeori as a public Git repository Application using the root Dockerfile and automatic deployment from `main`. Do not publish a
   host port; route only through Coolify's proxy.
-- Coolify builds natively on the N150. Preserve BuildKit caches and run one build at a time; see the [deployment guide](/docs/development/deployment.md).
+- Coolify builds natively on the Hetzner CX23. Preserve BuildKit caches and run one build at a time; see the [deployment guide](/docs/development/deployment.md).
 - Use `/api/health` as the health endpoint with a 30 second interval, 10 second
   timeout, 60 second start period, and 3 retries. The image includes the same
   health check.
@@ -28,6 +31,36 @@ runaway query or key family; if traffic is legitimate and the working set no
 longer fits, resize the server before raising all container limits.
 
 ## MongoDB rollout
+
+Production uses the private Coolify `pokeori-mongodb` resource (`mongo:7`) with
+authorization and a single-member `rs0` replica set. Its member is `PRIMARY`,
+so Payload transactions are supported, but this is not a failover topology.
+MongoDB has persistent `/data/configdb` and `/data/db` volumes, a one-CPU limit,
+512 MiB memory reservation, and 1 GiB memory limit. The Pokeori production
+`DATABASE_URI` is runtime-only and targets the private resource alias with
+`replicaSet=rs0&authSource=admin`; Preview has no database URI. Rotate the
+generated credential exposed during setup, then replace the production URI
+before starting the app. The database has not been restored from the former
+production host.
+
+The enabled database backup schedule runs daily at 02:00 UTC. It has a
+3,600-second timeout, alerts after two missed days, and keeps seven local
+archives / 14 days under `/data/coolify/backups`. The first manual dump
+completed successfully against the new database, but the dump is not evidence
+of restored historical player data. The private Cloudflare R2 bucket
+`pokeori-backups` exists in Western Europe, but Coolify has no validated S3
+destination yet. The token created during setup was exposed in a browser
+response; revoke it and create a replacement scoped to Object Read & Write on
+this bucket only. Verify a database execution shows S3 availability before
+relying on an off-host copy.
+
+Coolify's own instance database backup is enabled daily at 00:00 UTC, with a
+3,600-second timeout, a two-day missed-backup alert, and local retention of
+seven copies / 14 days. It has no verified execution or S3 copy yet. This
+backup protects Coolify's projects, resources, settings, and deployment
+history; it does not include workload volumes or application databases. Store
+the Coolify instance `APP_KEY` separately and securely: the key is required to
+decrypt saved credentials during restore, and is not in the database dump.
 
 Production disables Payload's automatic index creation. Back up MongoDB, then
 run the index migration from a release container or a machine with production
@@ -67,6 +100,11 @@ keepalive/no-delay, a 3-second command/connect timeout, and at most two retries
 per request. HTTP and gameplay rate counters use atomic increment-and-expire
 scripts. `/api/game/sync` is limited in Dragonfly to 30 requests/minute per
 authenticated user and 120/minute per client IP.
+
+Dragonfly persistence and backups are not enabled on the current host. Its
+keys include gameplay coordination and idempotency state; configure a separate
+persistence/backup strategy before treating Redis as recoverable after host
+loss.
 
 Set `TRUST_CLOUDFLARE_PROXY=true` only when the origin firewall prevents direct
 public access that could spoof `CF-Connecting-IP`. Use
@@ -130,7 +168,7 @@ releases. Verify a second request with `curl -I` shows the intended
 
 Game sync authenticates once and reuses the same Payload instance through its data loader. Successful authenticated `/api/game/sync` responses include `Server-Timing` entries for `game-data`, `auth`, `serialize`, and `total`, plus `Cache-Control: private, no-store`. `game-data` measures only scoped data loading; `total` measures server work up to response construction, including rate limiting, but excludes response transmission and browser rendering. Opt-in logs also include serialized response bytes. Compare these with browser Network timings; do not label either one as end-to-end interaction latency.
 
-For N150 profiling, record representative Explore, box, battle, and research flows on both small and large player accounts. Collect response size and p50/p95 latency, host CPU/RAM/swap during idle and deployment, and MongoDB connection checkout wait/failure counts. Check the actual container's `bun --version`, base OS, and image digest rather than inferring the running version from the Dockerfile. Scan that image's OS packages as well as running the dependency audit. Change connection-pool limits only after checking wait times and database utilization.
+For production profiling, record representative Explore, box, battle, and research flows on both small and large player accounts. Collect response size and p50/p95 latency, host CPU/RAM/swap during idle and deployment, and MongoDB connection checkout wait/failure counts. Check the actual container's `bun --version`, base OS, and image digest rather than inferring the running version from the Dockerfile. Scan that image's OS packages as well as running the dependency audit. Change connection-pool limits only after checking wait times and database utilization.
 
 User-state reads use per-user filters, route scopes, and field projections. The complete snapshots also feed trusted write diffs and requirement checks; adding a limit to `findRows` can silently remove progress or corrupt updates. Separate paginated browsing reads from complete mechanics snapshots if profiling shows large accounts are slow. Do not claim those snapshots have been optimized solely by adding a row cap.
 
@@ -161,4 +199,4 @@ Use the same revision, fixture account, viewport, runtime, and cache state when 
 
 `GAME_PERFORMANCE_LOGS=true` also emits JSON `game-action` events with bounded `operation` (`economy`, `lock-acquire`, `lock-release`), `outcome`, `durationMs`, `attempts`, `retries`, and `rollbackErrors`. Count busy acquisition outcomes for contention; these locks fail immediately instead of waiting. Economy duration includes receipt reads, transaction attempts and release; replay events distinguish retry traffic from new writes. Aggregate duration distributions and outcome/retry rates at the log collector. Events deliberately omit action names, account IDs, lock keys, request IDs, arguments, results and exception details. A failed telemetry sink does not change action results. Logs are disabled by default.
 
-Local evidence and its limits are recorded in [performance audit status](../audit/performance.md). Required checks on protected main were verified through the remote API. Live N150 measurements, deployed index state, and origin firewall rules remain deployment-environment verification rather than conclusions from local fixtures.
+Local evidence and its limits are recorded in [performance audit status](../audit/performance.md). Required checks on protected main were verified through the remote API. Post-migration live measurements, deployed index state, and the Cloudflare-to-origin firewall path remain deployment-environment verification rather than conclusions from local fixtures.

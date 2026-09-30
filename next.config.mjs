@@ -98,7 +98,7 @@ const nextConfig = {
   // Optimize package imports to reduce bundle size
   experimental: {
     useTypeScriptCli: true,
-    // Cap page workers at the N150's four cores; respect smaller CPU allocations.
+    // Cap page workers at four and respect the host's available CPU allocation.
     cpus: Math.min(4, availableParallelism()),
     staticGenerationRetryCount: 1,
     staticGenerationMaxConcurrency: 8,
