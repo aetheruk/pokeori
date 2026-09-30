@@ -1,5 +1,7 @@
 # Current Game State
 
+- Unreleased: All ten Candy-to-PokePowder Artisan recipes now require one matching Candy instead of two.
+
 - Release `0.43.9`: The comparison answer orb's animation wrapper now fills the drop target so the dropped Pokémon remains full sized.
 
 - Release `0.43.8`: When a Pokémon is dropped in comparison, its glass orb expands to fill the circular target so the result no longer appears inside a second bubble.
