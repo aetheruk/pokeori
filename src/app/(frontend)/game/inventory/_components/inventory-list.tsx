@@ -2,11 +2,9 @@
 
 import { useHaptics } from '@haptics/react'
 import {
-  Coins,
   Flame,
-  Minus,
+  Hammer,
   PackageOpen,
-  Plus,
   Sparkles,
   Wand2,
   Zap,
@@ -32,16 +30,6 @@ import { PremiumSearch } from '@/components/game/shared/PremiumSearch'
 import { RewardResultOverlay } from '@/components/game/shared/RewardResultOverlay'
 import { SecondaryControlBar } from '@/components/game/shared/SecondaryControlBar'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { ItemSprite } from '@/components/ui/item-sprite'
@@ -73,7 +61,6 @@ import { getMovePresentation } from '@/utilities/pokemon/move-display'
 import { RewardSummary } from '@/utilities/rewards/reward-logic'
 import { getItemSkillLockReason } from '@/utilities/skills/unlocks'
 import {
-  sellItem,
   useAllBoosterPacks as applyAllBoosterPacks,
   useBoosterPack as applyBoosterPack,
   useConsumable as applyConsumable,
@@ -212,7 +199,7 @@ function getItemActionLabel(
   canChannel = false,
 ): string | null {
   if (canChannel) return 'Channel'
-  if (item.sellValue) return 'Sell'
+  if (isArtisanIngredientItem(item)) return 'Craft'
   if (item.category === 'booster-pack') return 'Open'
   if (item.category === 'scratch-card') return 'Scratch'
   if (
@@ -243,10 +230,14 @@ function getItemActionLabel(
 
 function getItemActionIcon(item: (typeof items)[number], canChannel = false) {
   if (canChannel) return Flame
-  if (item.sellValue) return Coins
+  if (isArtisanIngredientItem(item)) return Hammer
   if (item.category === 'booster-pack') return PackageOpen
   if (item.category === 'scratch-card') return Sparkles
   return Wand2
+}
+
+function isArtisanIngredientItem(item: (typeof items)[number]) {
+  return getInventoryDisplayPlacement(item).group === 'crafting'
 }
 
 function canChannelItem(
@@ -363,13 +354,7 @@ export function InventoryList() {
   const [selectedItem, setSelectedItem] = useState<
     (typeof items)[number] | null
   >(null)
-  const [pendingSale, setPendingSale] = useState<{
-    item: (typeof items)[number]
-    quantity: number
-  } | null>(null)
-  const [isSelling, setIsSelling] = useState(false)
   const [isUsing, setIsUsing] = useState(false)
-  const [sellQuantity, setSellQuantity] = useState(1)
   const [scratchData, setScratchData] = useState<{
     open: boolean
     background: string
@@ -644,9 +629,6 @@ export function InventoryList() {
   const selectedItemQuantity = selectedItem
     ? inventoryMap[selectedItem.id] || 0
     : 0
-  const selectedSellTotal = selectedItem
-    ? (selectedItem.sellValue || 0) * sellQuantity
-    : 0
   const selectedPokemonItemLockReason =
     selectedItem && isPokemonTargetedInventoryItem(selectedItem)
       ? getItemSkillLockReason(selectedItem, user?.skills)
@@ -661,45 +643,12 @@ export function InventoryList() {
     hasChannelingBook,
   )
 
-  useEffect(() => {
-    if (!selectedItem) return
-    const quantity = inventoryMap[selectedItem.id] || 1
-    setSellQuantity((current) => Math.min(Math.max(current, 1), quantity))
-  }, [selectedItem, inventoryMap])
-
-  const executeSellItem = useCallback(
-    async (item: (typeof items)[number], quantity: number) => {
-      if (isSelling || !item.sellValue) return
-      setIsSelling(true)
-      try {
-        const result = await sellItem(item.id, quantity, crypto.randomUUID())
-        if (result.success) {
-          const totalValue = item.sellValue * quantity
-          toast.success(
-            `Sold ${quantity} ${item.name} for ${totalValue} ${item.sellCurrency || 'Pokedollars'}!`,
-          )
-          const newQty =
-            (result.newInventory as Record<string, number>)?.[item.id] || 0
-          if (newQty <= 0 || selectedItem?.id === item.id) setSelectedItem(null)
-          refreshUser()
-        } else {
-          toast.error(result.error || 'Failed to sell item')
-        }
-      } catch {
-        toast.error('An error occurred')
-      } finally {
-        setIsSelling(false)
-      }
+  const openArtisanForItem = useCallback(
+    (item: (typeof items)[number]) => {
+      setSelectedItem(null)
+      router.push(`/game/artisan?ingredient=${encodeURIComponent(item.id)}`)
     },
-    [isSelling, refreshUser, selectedItem?.id],
-  )
-
-  const requestSellItem = useCallback(
-    (item: (typeof items)[number], quantity: number) => {
-      if (isSelling || !item.sellValue) return
-      setPendingSale({ item, quantity })
-    },
-    [isSelling],
+    [router],
   )
 
   const handleUseInventoryItem = useCallback(
@@ -946,8 +895,8 @@ export function InventoryList() {
                 }}
                 onAction={(details) => {
                   triggerHaptic('selection')
-                  if (details.sellValue) {
-                    requestSellItem(details, 1)
+                  if (isArtisanIngredientItem(details)) {
+                    openArtisanForItem(details)
                     return
                   }
 
@@ -957,7 +906,7 @@ export function InventoryList() {
                   triggerHaptic('selection')
                   handleOpenAllBoosterPacks(details)
                 }}
-                disabledAction={isUsing || isSelling}
+                disabledAction={isUsing}
               />
             ))}
           </div>
@@ -1015,15 +964,6 @@ export function InventoryList() {
                   value: selectedItemQuantity,
                   icon: <PackageOpen className="w-4 h-4" />,
                 },
-                ...(selectedItem.sellValue
-                  ? [
-                      {
-                        label: 'Sell',
-                        value: `${selectedItem.sellValue} ${selectedItem.sellCurrency || 'Pokedollars'}`,
-                        icon: <Coins className="w-4 h-4" />,
-                      },
-                    ]
-                  : []),
                 ...(selectedItem.consume === false
                   ? [
                       {
@@ -1059,84 +999,16 @@ export function InventoryList() {
                 Channel
               </span>
             </Button>
-          ) : selectedItem?.sellValue ? (
-            <div className="w-full space-y-3">
-              <div className="flex items-center justify-between rounded-lg border border-game-border bg-game-surface-raised p-2">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  className="h-10 w-10 text-game-muted hover:bg-game-surface hover:text-game-ink"
-                  disabled={sellQuantity <= 1 || isSelling}
-                  onClick={() =>
-                    setSellQuantity((quantity) => Math.max(1, quantity - 1))
-                  }
-                  aria-label="Decrease sell quantity"
-                >
-                  <Minus className="w-4 h-4" />
-                </Button>
-                <div className="text-center">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-game-muted">
-                    Sell quantity
-                  </div>
-                  <div className="font-mono text-lg font-black text-game-ink">
-                    {sellQuantity}
-                  </div>
-                </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  className="h-10 w-10 text-game-muted hover:bg-game-surface hover:text-game-ink"
-                  disabled={sellQuantity >= selectedItemQuantity || isSelling}
-                  onClick={() =>
-                    setSellQuantity((quantity) =>
-                      Math.min(selectedItemQuantity, quantity + 1),
-                    )
-                  }
-                  aria-label="Increase sell quantity"
-                >
-                  <Plus className="w-4 h-4" />
-                </Button>
-              </div>
-              <div className="flex gap-3 w-full">
-                <Button
-                  variant="secondary"
-                  className="flex-1 border-2 border-game-border font-bold hover:bg-game-surface"
-                  disabled={isSelling}
-                  onClick={() => requestSellItem(selectedItem, sellQuantity)}
-                >
-                  {isSelling ? (
-                    '...'
-                  ) : (
-                    <span className="flex items-center gap-2">
-                      Sell {sellQuantity}{' '}
-                      <span className="text-game-muted">
-                        ({selectedSellTotal})
-                      </span>
-                    </span>
-                  )}
-                </Button>
-                <Button
-                  className="flex-1 bg-game-clay font-bold text-game-cream hover:bg-game-clay-strong"
-                  disabled={isSelling}
-                  onClick={() =>
-                    requestSellItem(selectedItem, selectedItemQuantity)
-                  }
-                >
-                  {isSelling ? (
-                    'Selling…'
-                  ) : (
-                    <span className="flex items-center gap-2">
-                      Sell All{' '}
-                      <span className="text-game-cream">
-                        ({(selectedItem.sellValue || 0) * selectedItemQuantity})
-                      </span>
-                    </span>
-                  )}
-                </Button>
-              </div>
-            </div>
+          ) : selectedItem && isArtisanIngredientItem(selectedItem) ? (
+            <Button
+              className="w-full bg-game-clay font-bold text-game-cream hover:bg-game-clay-strong"
+              onClick={() => openArtisanForItem(selectedItem)}
+            >
+              <span className="flex items-center gap-2">
+                <Hammer className="h-4 w-4" />
+                Find recipes
+              </span>
+            </Button>
           ) : selectedItem?.category === 'booster-pack' ? (
             <div className="flex w-full items-center gap-2">
               <Button
@@ -1202,39 +1074,6 @@ export function InventoryList() {
           />
         )}
       </GameInfoModal>
-      <AlertDialog
-        open={!!pendingSale}
-        onOpenChange={(open) => !open && setPendingSale(null)}
-      >
-        <AlertDialogContent className="w-[calc(100%-2rem)] max-w-lg border-game-border bg-game-surface text-game-ink">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="font-display text-xl text-game-ink">
-              Confirm sale
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-game-muted">
-              {pendingSale
-                ? `Sell ${pendingSale.quantity} ${pendingSale.item.name} for ${(pendingSale.item.sellValue || 0) * pendingSale.quantity} ${pendingSale.item.sellCurrency || 'Pokedollars'}? This cannot be undone.`
-                : 'Choose whether to sell this item.'}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-col-reverse gap-2 sm:flex-row sm:gap-3">
-            <AlertDialogCancel className="min-h-11 w-full border-game-border text-game-ink hover:bg-game-surface-raised sm:w-auto">
-              Keep item
-            </AlertDialogCancel>
-            <AlertDialogAction
-              className="min-h-11 w-full bg-game-clay text-game-cream hover:bg-game-clay-strong sm:w-auto"
-              onClick={() => {
-                if (!pendingSale) return
-                const sale = pendingSale
-                setPendingSale(null)
-                void executeSellItem(sale.item, sale.quantity)
-              }}
-            >
-              Confirm sale
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
       <ScratchCardModal
         open={!!scratchData?.open}
         onOpenChange={(open) => !open && setScratchData(null)}
@@ -1355,7 +1194,7 @@ const InventoryItemCard = memo(function InventoryItemCard({
       aria-label={`View ${item.details.name}`}
       aria-haspopup="dialog"
       data-haptic-manual="true"
-      className="game-focus-ring group relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-lg border border-game-border bg-game-surface p-3 transition-colors hover:border-game-moss/45 hover:bg-game-surface-raised"
+      className="game-focus-ring group relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-lg border border-game-border bg-game-surface p-3 transition-colors hover:border-game-charcoal/45 hover:bg-game-surface-raised"
     >
       <div className="relative shrink-0">
         <div className="game-icon-orb relative z-10 h-12 w-12">
@@ -1371,14 +1210,14 @@ const InventoryItemCard = memo(function InventoryItemCard({
 
       {/* Details */}
       <div className="flex-1 min-w-0 flex flex-col pt-1">
-        <span className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-game-muted transition-colors group-hover:text-game-moss-strong">
+        <span className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-game-muted transition-colors group-hover:text-game-charcoal">
           {getInventorySubCategoryLabel(item.displaySubCategory)}
         </span>
         <h3 className="font-semibold italic tracking-tighter text-base truncate text-game-ink leading-none">
           {item.details.name}
         </h3>
         {actionLabel && (
-          <span className="mt-2 inline-flex w-fit items-center gap-1 rounded-md border border-game-moss/25 bg-game-moss/8 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-game-moss-strong">
+          <span className="mt-2 inline-flex w-fit items-center gap-1 rounded-md border border-game-charcoal/15 bg-game-charcoal/5 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-game-charcoal">
             <ActionIcon className="w-3 h-3" />
             {actionLabel}
           </span>

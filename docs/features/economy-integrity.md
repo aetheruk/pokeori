@@ -35,7 +35,7 @@ so retries can recover committed results.
 - MongoDB replica-set transaction support is mandatory. The application does
   not fall back to non-transactional economy writes.
 
-The shared boundary covers shop purchases; item selling, scratch cards,
+The shared boundary covers shop purchases; scratch cards,
 boosters, consumables, and event-item compensation; task completion; Pokemon
 release, evolution, hatching, held items, and targeted item use; Mystery Gift;
 voyages and expeditions; Spirit Channeling; Artisan settlement; TCG duplicate

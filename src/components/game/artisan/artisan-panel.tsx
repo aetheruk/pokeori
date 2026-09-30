@@ -10,6 +10,7 @@ import {
   Sparkles,
   Target,
 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import {
   type ReactNode,
   type PointerEvent as ReactPointerEvent,
@@ -1542,7 +1543,12 @@ function MixDialog({
   )
 }
 
-export function ArtisanPanel() {
+export function ArtisanPanel({
+  initialIngredientId = null,
+}: {
+  initialIngredientId?: string | null
+}) {
+  const router = useRouter()
   const { trigger: triggerHaptic } = useHaptics()
   const scrollClickGuard = useScrollClickGuard()
   const { user, gameData, refreshUser } = useUser()
@@ -1556,6 +1562,7 @@ export function ArtisanPanel() {
   const [activeSubcategory, setActiveSubcategory] = useState<
     RecipeSubcategoryId | 'all'
   >('all')
+  const ingredientId = initialIngredientId
   const [qteRecipe, setQteRecipe] = useState<ArtisanRecipe | null>(null)
   const [craftSession, setCraftSession] = useState<ArtisanCraftSession | null>(
     null,
@@ -1587,6 +1594,9 @@ export function ArtisanPanel() {
     [user?.currency],
   )
   const artisanLevel = getSkillLevel(user?.skills as any, 'artisan')
+  const ingredientItem = ingredientId
+    ? items.find((item) => item.id === ingredientId)
+    : undefined
 
   const recipeStates = useMemo(
     () =>
@@ -1600,10 +1610,19 @@ export function ArtisanPanel() {
   )
 
   const visibleRecipePool = useMemo(() => {
-    return artisanRecipes.filter(
-      (recipe) => !recipeStates.get(recipe.id)?.requirementsHidden,
-    )
-  }, [recipeStates])
+    return artisanRecipes.filter((recipe) => {
+      if (recipeStates.get(recipe.id)?.requirementsHidden) return false
+      if (
+        ingredientId &&
+        !recipe.costs.some(
+          (cost) => cost.type !== 'currency' && cost.id === ingredientId,
+        )
+      ) {
+        return false
+      }
+      return true
+    })
+  }, [ingredientId, recipeStates])
 
   const counts = useMemo(() => {
     const next: Record<ArtisanRecipeCategory | 'all', number> = {
@@ -1735,6 +1754,10 @@ export function ArtisanPanel() {
           a.id.localeCompare(b.id),
       )
   }, [activeCategory, activeSubcategory, visibleRecipePool])
+
+  const clearIngredientFilter = useCallback(() => {
+    router.replace('/game/artisan', { scroll: false })
+  }, [router])
 
   const startCraft = useCallback(
     async (recipe: ArtisanRecipe, craftMultiplier = 1) => {
@@ -1979,13 +2002,43 @@ export function ArtisanPanel() {
         {...scrollClickGuard}
       >
         <div>
+          {ingredientId && (
+            <div className="mb-4 flex min-h-14 items-center justify-between gap-3 rounded-lg border border-game-border bg-game-surface px-3 py-2">
+              <div className="flex min-w-0 items-center gap-2">
+                <ItemSprite
+                  itemId={ingredientId}
+                  alt=""
+                  width={32}
+                  height={32}
+                  className="h-8 w-8 shrink-0 object-contain"
+                />
+                <div className="min-w-0">
+                  <div className="text-[10px] font-bold uppercase tracking-[0.12em] text-game-muted">
+                    Recipes using
+                  </div>
+                  <div className="truncate text-sm font-semibold text-game-ink">
+                    {ingredientItem?.name || ingredientId}
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={clearIngredientFilter}
+                className="game-focus-ring flex min-h-10 shrink-0 items-center rounded-md border border-game-border bg-game-surface-raised px-3 text-xs font-bold text-game-ink hover:bg-game-canvas"
+              >
+                Clear filter
+              </button>
+            </div>
+          )}
           {visibleRecipes.length === 0 ? (
             <div
               className="rounded-lg border border-dashed border-game-border bg-game-surface py-16 text-center text-sm font-medium text-game-muted"
               role="status"
               aria-live="polite"
             >
-              No recipes in this category.
+              {ingredientId
+                ? `No available recipes include ${ingredientItem?.name || ingredientId}.`
+                : 'No recipes in this category.'}
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
