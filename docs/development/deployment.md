@@ -63,11 +63,11 @@ key, credentials encrypted in an instance backup cannot be restored.
 The existing `pokeori-app` Coolify resource is still configured to read the
 public `aetheruk/pokeori` Git repository and build `/Dockerfile`. It must be
 replaced with a Docker Image application before release deployment. The target
-image is `ghcr.io/aetheruk/pokeori:latest`, exposed on port `3000`, with
+image is `ghcr.io/aetheruk/pokeori-production:latest`, exposed on port `3000`, with
 `https://pokeori.app` and `https://www.pokeori.app` configured in Coolify. The
-new GitHub Actions workflow and this resource conversion still need their
-GitHub/Coolify secrets and private GHCR pull credential configured. The
-production app environment contains `NEXT_PUBLIC_APP_URL`, the private
+new GitHub Actions workflow and this resource conversion still need the
+Server Actions build key, GHCR push/pull credentials, and Coolify image setup.
+The production app environment contains `NEXT_PUBLIC_APP_URL`, the private
 internal `REDIS_URL` for Dragonfly, and the runtime-only `DATABASE_URI`. It is
 not deployed. Configure the stable Server Actions key and Payload secret in
 Coolify, rotate the MongoDB credential as described above, and supply a valid
@@ -93,6 +93,14 @@ and triggers Coolify only after the push succeeds. Each image is tagged
 `latest`, `v<package-version>`, and `sha-<12-character-commit>`. Coolify tracks
 `latest`; the version and commit tags identify rollback candidates.
 
+The existing `ghcr.io/aetheruk/pokeori` package is public and currently holds
+the old `v0.29.9` image. GitHub does not allow a published public personal
+package to be made private. Use the separate, private, unlinked package named
+`pokeori-production` for all new images. It has been seeded with an empty
+`bootstrap` image; the workflow refuses to publish if the package is public or
+linked to the public repository. Do not reuse or publish future key-bearing
+images to `pokeori`.
+
 Add these repository secrets under **Settings → Secrets and variables →
 Actions**:
 
@@ -101,14 +109,15 @@ Actions**:
 | `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` | BuildKit secret used by the Dockerfile. It must be identical to the stable runtime key in Coolify. |
 | `COOLIFY_WEBHOOK` | The Pokeori app's authenticated deploy webhook URL. |
 | `COOLIFY_TOKEN` | Coolify API token with the `Deploy` permission. |
+| `GHCR_PUSH_TOKEN` | GitHub classic PAT with `read:packages` and `write:packages`, used only by the main-branch release workflow. |
 
-GitHub provides `GITHUB_TOKEN` to publish to GHCR; grant the workflow package
-write permission if repository package settings require it. Keep
-`ghcr.io/aetheruk/pokeori` private. The Next build embeds the Server Actions key
-in its output, and the registry cache is also private. Do not publish either
-the image or its `buildcache` tag publicly. Configure a GHCR credential with
-`read:packages` for the Coolify deployment server so it can pull the private
-image.
+`pokeori-production` is already created as a private personal package and is
+unlinked from `aetheruk/pokeori`; do not enable permission inheritance from the
+public repository. The workflow uses a PAT instead of `GITHUB_TOKEN` so a
+public-repository Actions grant does not expose the private image to fork
+workflows. Keep the image and `buildcache` tag private: Next embeds the Server
+Actions key in the compiled app. Give Coolify a separate GHCR credential with
+only `read:packages` for pulling the image.
 
 Set the Coolify public URL to `https://coolify.pokeori.app`, enable API access,
 create the deploy-scoped API token, and copy the application's authenticated
@@ -120,7 +129,7 @@ queue a deployment after the image has been published.
 ## Coolify application settings
 
 - Application type: Docker Image, configured with private registry credentials for GHCR.
-- Image: `ghcr.io/aetheruk/pokeori`; tag: `latest`. Use a `v<version>` or `sha-<12-character-commit>` tag for a deliberate rollback.
+- Image: `ghcr.io/aetheruk/pokeori-production`; tag: `latest`. Use a `v<version>` or `sha-<12-character-commit>` tag for a deliberate rollback.
 - Do not configure a Git source, Dockerfile build, or repository auto-deploy webhook. GitHub Actions publishes the image and triggers the authenticated Coolify deploy webhook.
 - Exposed container port: `3000`; route the domain through Coolify's proxy. Leave build/start command overrides empty.
 - Run one application replica. Allow 30 seconds for graceful shutdown.

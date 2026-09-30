@@ -12,7 +12,7 @@ the current migration state.
   correctness, but a second replica on the same host adds memory pressure
   without adding host redundancy.
 - Configure Pokeori as a Docker Image application for private
-  `ghcr.io/aetheruk/pokeori:latest`. Keep GHCR pull credentials on the Coolify
+  `ghcr.io/aetheruk/pokeori-production:latest`. Keep GHCR pull credentials on the Coolify
   deployment server. Do not publish a host port; route only through Coolify's
   proxy.
 - GitHub Actions builds and publishes the image, then calls Coolify's
