@@ -4,12 +4,11 @@ The production target is the Hetzner `pokeori-server` (CX23, 2 vCPU, 4 GiB RAM).
 
 ## Hetzner migration status (2026-09-30)
 
-The fresh Hetzner server is the new production target. The production MongoDB
-endpoint did not answer from the host during migration, and this Hetzner project
-has no server backups or snapshots. Restore or verify the existing MongoDB
-replica set and transaction support before routing players to the new app. Do
-not point production at an empty replacement database as a substitute for data
-recovery.
+The N150 is retired. The Hetzner `pokeori-server` is the current production
+target. No Hetzner server snapshot schedule is configured. The MongoDB resource
+described below is a new database; the previous production data has not been
+restored. Keep the Pokeori app stopped until the data-recovery versus fresh
+start decision is resolved.
 
 The available environment also had no usable `RESEND_API_KEY` and no
 `BETA_INVITATION_SECRET`. Configure a valid mail key and a new stable invitation
@@ -19,21 +18,59 @@ Coolify is installed on `pokeori-server` and reachable at
 `https://coolify.pokeori.app`. Its `Pokeori` production project now contains a
 private `pokeori-dragonfly` database on the same destination network, with a
 generated password, persistent `/data` volume, and 768 MiB memory limit. The
-Dragonfly container is healthy. Coolify does not schedule Dragonfly backups;
-Dragonfly snapshot persistence is not enabled yet. The app and its runtime
-environment have not been deployed while the MongoDB, mail, and GitHub source
-setup blockers remain unresolved.
+Dragonfly container is healthy. Dragonfly snapshot persistence is not enabled;
+its gameplay coordination state currently has no backup. The app is stopped.
+
+The private `pokeori-mongodb` resource runs `mongo:7` with authorization and a
+keyfile-enabled, single-member `rs0` replica set. The member is `PRIMARY`, which
+provides the transaction support Payload requires; a single member does not
+provide node or host failover. MongoDB listens only on the private Coolify
+network, uses persistent `/data/configdb` and `/data/db` volumes, and has a
+one-CPU limit, a 512 MiB memory reservation, and a 1 GiB memory limit. The
+keyfile is managed on the host at `/data/coolify/mongodb/pokeori/replica.key`
+with mode `0400` and mounted read-only by file permissions into the container.
+
+The production app's `DATABASE_URI` is configured as a runtime-only literal
+environment value and Preview has no database URI. It connects to the internal
+MongoDB alias with `replicaSet=rs0` and `authSource=admin`. The generated MongoDB
+credential was exposed in a setup response; rotate it and update the production
+`DATABASE_URI` before starting the app. Never put connection strings or keys in
+the repository.
+
+MongoDB has an enabled daily backup at 02:00 UTC, a 3,600-second timeout, a
+two-day missed-backup alert, and local retention of seven copies / 14 days. The
+first manual dump completed successfully on the new, unrestored database. It
+proves the dump path works but does not prove that historical player data is
+present. Local backups remain on the database host until the R2 destination is
+configured and verified.
+
+The private Cloudflare R2 bucket `pokeori-backups` has been created in the
+automatically selected Western Europe location. Coolify does not yet have a
+validated S3 destination, so no backup has reached R2. A bucket-scoped token was
+issued during setup but appeared in a browser response; revoke it before use.
+Create a replacement with Object Read & Write limited to this bucket, then
+store its S3 credentials in Coolify. Confirm both MongoDB and Coolify backup
+executions show S3 availability before relying on off-host copies.
+
+The Coolify instance database backup schedule is enabled daily at 00:00 UTC
+with a 3,600-second timeout, a two-day missed-backup alert, and local retention
+of seven copies / 14 days. No instance backup execution has been verified yet.
+An instance backup contains Coolify's configuration database, not application
+volumes or MongoDB. Save the Coolify `APP_KEY` from
+`/data/coolify/source/.env` separately in a secure location; without the same
+key, credentials encrypted in an instance backup cannot be restored.
 
 The production `pokeori-app` resource reads the public `aetheruk/pokeori` Git
 repository on `main`, uses `/Dockerfile`, exposes port `3000`, and has
 `https://pokeori.app` and `https://www.pokeori.app` configured in Coolify.
 Docker BuildKit secret handling and the app's deploy-on-push setting are
 selected, but no GitHub push webhook or GitHub App source is connected yet.
-The production app environment currently contains `NEXT_PUBLIC_APP_URL` and
-the private internal `REDIS_URL` for Dragonfly. It is not deployed. Configure
-the stable Server Actions key and Payload secret in Coolify, restore the
-production `DATABASE_URI`, and supply a valid mail key and stable invitation
-secret before starting the public app. Never put these values in the repo.
+The production app environment contains `NEXT_PUBLIC_APP_URL`, the private
+internal `REDIS_URL` for Dragonfly, and the runtime-only `DATABASE_URI`. It is
+not deployed. Configure the stable Server Actions key and Payload secret in
+Coolify, rotate the MongoDB credential as described above, and supply a valid
+mail key and stable invitation secret before starting the public app. Never put
+these values in the repo.
 
 The Hetzner Cloud firewall allows inbound SSH, HTTP, and HTTPS; Coolify's direct
 port `8000` stays closed. Cloudflare proxies `pokeori.app` and
@@ -112,7 +149,7 @@ On 2026-09-07, the rebuilt linux/amd64 base stage (Alpine 3.22.5, 21 OS packages
 
 Page-generation workers are capped at four and respect smaller available CPU allocations; per-worker page concurrency is eight. This has not been benchmarked on the current CX23 and does not limit every Turbopack thread. Keep one build active at a time and measure build duration, peak RAM, swap, and live request latency before further tuning. Installed RAM and competing workloads determine the safe build memory budget.
 
-Only compiler inputs enter the builder stage. Public assets are copied directly into the runner, so their contents do not invalidate the compiler layer (the required package-version bump still does). The final image includes standalone server dependencies, static files, public assets, and the bundled Chronicle migration. The non-root runtime owns its files and can write Next caches.
+Only compiler inputs enter the builder stage. Public assets are copied directly into the runner, so their contents do not invalidate the compiler layer (the required package-version bump still does). The final image includes standalone server dependencies, static files, and public assets. One-off data migration utilities remain available in the repository but are no longer built or shipped in the production image. The non-root runtime owns its files and can write Next caches.
 
 Keep the Docker builder/cache on persistent host storage. Do not run routine builder/system pruning or no-cache deployments. Configure cleanup based on disk pressure while retaining recent successful images for rollback. The first build after migration is cold; evaluate subsequent builds separately.
 
@@ -134,4 +171,4 @@ A successful Dockerfile syntax check does not establish that the application com
 
 For urgent recovery, use Coolify's rollback to a retained compatible deployment if available and verify health. From 0.29.12, economy receipts can contain compressed responses: rollback code must retain that decoder and semantic receipt identities. An older image without the decoder is not a safe rollback once compressed receipts exist. Reconcile `main` through a revert PR with a new package version so a subsequent automatic deployment preserves the correction. If no compatible prior image remains, revert the faulty behavior while preserving receipt compatibility through a PR and let Coolify rebuild. Do not reset or force-push main.
 
-Follow the [release checklist](/docs/development/release-checklist.md) for migrations and the [performance runbook](/docs/development/performance-runbook.md) for database/index and proxy setup.
+Follow the [release checklist](/docs/development/release-checklist.md) for release validation and required migrations, and the [performance runbook](/docs/development/performance-runbook.md) for database/index and proxy setup.

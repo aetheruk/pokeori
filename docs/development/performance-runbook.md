@@ -1,11 +1,10 @@
 # Production Performance Runbook
 
 This is the production baseline for the Hetzner CX23 `pokeori-server` (2 vCPU,
-4 GiB RAM) running Coolify, Pokeori, and Dragonfly. MongoDB must be reachable as
-a separate replica-set service. During the 2026-09-30 migration, the configured
-MongoDB endpoint timed out and the Hetzner project had no backups or snapshots;
-restore or verify the existing database before sending production traffic to
-the new app.
+4 GiB RAM) running Coolify, MongoDB, and Dragonfly. The Pokeori app remains
+stopped while the previous production data-recovery versus fresh-start decision
+is unresolved. See the [deployment guide](/docs/development/deployment.md) for
+the current migration state.
 
 ## Coolify and Hetzner
 
@@ -32,6 +31,36 @@ runaway query or key family; if traffic is legitimate and the working set no
 longer fits, resize the server before raising all container limits.
 
 ## MongoDB rollout
+
+Production uses the private Coolify `pokeori-mongodb` resource (`mongo:7`) with
+authorization and a single-member `rs0` replica set. Its member is `PRIMARY`,
+so Payload transactions are supported, but this is not a failover topology.
+MongoDB has persistent `/data/configdb` and `/data/db` volumes, a one-CPU limit,
+512 MiB memory reservation, and 1 GiB memory limit. The Pokeori production
+`DATABASE_URI` is runtime-only and targets the private resource alias with
+`replicaSet=rs0&authSource=admin`; Preview has no database URI. Rotate the
+generated credential exposed during setup, then replace the production URI
+before starting the app. The database has not been restored from the former
+production host.
+
+The enabled database backup schedule runs daily at 02:00 UTC. It has a
+3,600-second timeout, alerts after two missed days, and keeps seven local
+archives / 14 days under `/data/coolify/backups`. The first manual dump
+completed successfully against the new database, but the dump is not evidence
+of restored historical player data. The private Cloudflare R2 bucket
+`pokeori-backups` exists in Western Europe, but Coolify has no validated S3
+destination yet. The token created during setup was exposed in a browser
+response; revoke it and create a replacement scoped to Object Read & Write on
+this bucket only. Verify a database execution shows S3 availability before
+relying on an off-host copy.
+
+Coolify's own instance database backup is enabled daily at 00:00 UTC, with a
+3,600-second timeout, a two-day missed-backup alert, and local retention of
+seven copies / 14 days. It has no verified execution or S3 copy yet. This
+backup protects Coolify's projects, resources, settings, and deployment
+history; it does not include workload volumes or application databases. Store
+the Coolify instance `APP_KEY` separately and securely: the key is required to
+decrypt saved credentials during restore, and is not in the database dump.
 
 Production disables Payload's automatic index creation. Back up MongoDB, then
 run the index migration from a release container or a machine with production
@@ -71,6 +100,11 @@ keepalive/no-delay, a 3-second command/connect timeout, and at most two retries
 per request. HTTP and gameplay rate counters use atomic increment-and-expire
 scripts. `/api/game/sync` is limited in Dragonfly to 30 requests/minute per
 authenticated user and 120/minute per client IP.
+
+Dragonfly persistence and backups are not enabled on the current host. Its
+keys include gameplay coordination and idempotency state; configure a separate
+persistence/backup strategy before treating Redis as recoverable after host
+loss.
 
 Set `TRUST_CLOUDFLARE_PROXY=true` only when the origin firewall prevents direct
 public access that could spoof `CF-Connecting-IP`. Use

@@ -1,5 +1,17 @@
 # Current Game State
 
+## Production runtime (2026-09-30)
+
+The N150 is retired; the production target is now the Hetzner `pokeori-server`.
+Coolify and Dragonfly are running there. MongoDB is a private, single-member
+`rs0` replica set for Payload transaction support. The Pokeori app remains
+stopped while the former production data is recovered or a fresh start is
+decided and the MongoDB credential is rotated. Daily MongoDB and Coolify
+instance backup schedules are enabled locally. The private R2 bucket exists,
+but no off-host backups are verified until a replacement bucket-scoped token
+is configured. See the [deployment runbook](development/deployment.md) and
+[performance runbook](development/performance-runbook.md) for service details.
+
 - Unreleased (`0.42.25`): Spirit Channeling lets players try any owned Pokemon without revealing hidden channeler requirements in the picker. Ritual answers stay in the server config; incompatible attempts fail without consuming offerings and return an indirect clue. Field Observation pickups now update immediately on the client. Every drop gets a fresh random ID per round, and one completion request submits collected IDs and elapsed times for checking against that session's private Redis drop list and spawn windows before rewards are granted.
 
 - Unreleased (`0.42.22`): Explore preloads the eligible Active Events snapshot with the page data so Active Events and the player-data-derived VS Seeker card appear with the first rendered list, avoiding late insertions that shift content. The grid now updates when the events card changes independently of its other items.

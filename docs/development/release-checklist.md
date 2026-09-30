@@ -42,9 +42,7 @@ changes.
 - Keep durable receipt keys and responses indefinitely; compressed responses require a compatible reader during rollback. Run the receipt storage report before optional bounded compaction.
 - For 0.1.1, run `migrate:performance-indexes` prepare and finalize phases using the performance runbook; never let production Payload auto-build these indexes at startup.
 - For the 0.1.0 activity split, run `bun run migrate:game-activity-domains --dry-run`, review the counts, then run `bun run migrate:game-activity-domains`.
-- For the 0.13.0 Gym Chronicle rebuild, run `bun scripts/reset-gym-chronicles-v2.js --dry-run` inside the deployed production container, review the counts, then run `bun scripts/reset-gym-chronicles-v2.js`. The command is bundled in the image and must not be run before the v2 image is live.
-- For the 0.38.0 Fuchsia Guild release, back up MongoDB, run `bun run migrate:fuchsia-guild --dry-run`, review eligible-user XP and rank totals, then run `bun run migrate:fuchsia-guild`. The idempotent migration must run before reopening Safari progression to players.
-- For the Fuchsia Research Institute rank rebalance, run `bun run migrate:fuchsia-institute-v2 --dry-run` after the new image is live, review the Catching Permit XP and grandfathered reward ranks, then run `bun run migrate:fuchsia-institute-v2`. The idempotent migration also reconciles the consecutive Rank 3-7 stamina progression and the Rank 9 Safari Ball profile icon.
+- The Gym Chronicle reset, Fuchsia Guild conversions, and Underground Society initialization were one-off data migrations for earlier releases. They are not part of the current release workflow and their utilities are not bundled into the production image. Keep any future data migration as an explicit, separately reviewed operation with a fresh backup and dry run.
 - Confirm Redis is reachable and TLS settings match the deployment environment.
 - Confirm `/api/health` checks MongoDB, replica-set transaction support, and Dragonfly, and Coolify reports one healthy application replica.
 - Deploy to staging first when available.
