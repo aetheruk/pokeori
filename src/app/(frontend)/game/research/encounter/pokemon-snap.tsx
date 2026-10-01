@@ -742,7 +742,7 @@ export function PokemonSnapGame({
                 </motion.div>
               )}
 
-              <div className="min-h-0 flex-1 overflow-y-auto pb-3 [scrollbar-width:thin]">
+              <div className="min-h-0 flex-1 overflow-y-auto pt-2 pb-3 sm:pt-3 [scrollbar-width:thin]">
                 <div className="grid grid-cols-3 gap-2 sm:gap-4">
                   <AnimatePresence initial={false}>
                     {photographedPokemon.map((photo, index) => {
