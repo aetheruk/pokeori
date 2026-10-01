@@ -30,7 +30,8 @@ export const gen2Evolutions: Record<number, Evolution[]> = {
       "name": "quilava",
       "trigger": "level-up",
       "conditions": {
-        "minLevel": 14
+        "minLevel": 14,
+        "excludedRegions": ["Hisui"]
       }
     },
     {
@@ -38,7 +39,8 @@ export const gen2Evolutions: Record<number, Evolution[]> = {
       "name": "quilava",
       "trigger": "level-up",
       "conditions": {
-        "minLevel": 17
+        "minLevel": 17,
+        "requiredRegion": "Hisui"
       }
     }
   ],
@@ -48,7 +50,8 @@ export const gen2Evolutions: Record<number, Evolution[]> = {
       "name": "typhlosion",
       "trigger": "level-up",
       "conditions": {
-        "minLevel": 36
+        "minLevel": 36,
+        "excludedRegions": ["Hisui"]
       }
     },
     {
@@ -56,8 +59,10 @@ export const gen2Evolutions: Record<number, Evolution[]> = {
       "name": "typhlosion",
       "trigger": "level-up",
       "conditions": {
-        "minLevel": 36
-      }
+        "minLevel": 36,
+        "requiredRegion": "Hisui"
+      },
+      "targetForm": "Hisuian Form"
     }
   ],
   "158": [

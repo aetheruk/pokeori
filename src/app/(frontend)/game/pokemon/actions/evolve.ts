@@ -35,6 +35,7 @@ import { resolveEvolutionTargetForm } from '@/utilities/pokemon/evolution-target
 import {
   getEvolutionTimeOfDayLabel,
   getRequiredEvolutionItem,
+  matchesEvolutionRegion,
   getEvolutionTimeRegionLabel,
   matchesEvolutionGender,
   matchesEvolutionTimeOfDayForRegion,
@@ -111,6 +112,7 @@ export async function evolvePokemon(
     (e) =>
       e.speciesId === targetSpeciesId &&
       matchesSourceForm(e.conditions, currentFormName) &&
+      matchesEvolutionRegion(e.conditions, pokemon) &&
       matchesEvolutionGender(e.conditions, pokemonGender) &&
       matchesTriggerItem(e.conditions, triggerItemId),
   )

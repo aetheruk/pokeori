@@ -83,6 +83,7 @@ import {
   getEvolutionTimeOfDayLabel,
   getRequiredEvolutionItem,
   getEvolutionTimeRegionLabel,
+  matchesEvolutionRegion,
   matchesEvolutionGender,
   matchesEvolutionTimeOfDayForRegion,
   resolveEvolutionTimeRegion,
@@ -829,6 +830,7 @@ function MountedPokemonDetailsDialog({
       (EVOLUTIONS[pokemon.speciesId] || []).flatMap(({ conditions }) => {
         if (
           !conditions.knownMoveId ||
+          !matchesEvolutionRegion(conditions, pokemon) ||
           (conditions.requiredSourceForm &&
             conditions.requiredSourceForm !== (formInfo?.form || 'base'))
         ) return []
@@ -1093,6 +1095,7 @@ function MountedPokemonDetailsDialog({
                   conditions.requiredSourceForm !== currentFormName
                 )
                   return false
+                if (!matchesEvolutionRegion(conditions, pokemon)) return false
                 if (!matchesEvolutionGender(conditions, pokemonGender))
                   return false
                 if (
@@ -1158,6 +1161,7 @@ function MountedPokemonDetailsDialog({
                         conditions.requiredSourceForm !== currentFormName
                       )
                         return null
+                      if (!matchesEvolutionRegion(conditions, pokemon)) return null
                       if (!matchesEvolutionGender(conditions, pokemonGender))
                         return null
                       const timeConditionMet =
