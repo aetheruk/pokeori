@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased: Pidgey's “Shares species name with?” quiz question uses Pidgeotto instead of Spearow as a distractor, leaving Natu as the only Tiny Bird answer.
 - Unreleased: Viridian Forest's non-secret `Battle Hardened` task appears only while a Metapod is set as the partner. Completing its greeting requires Metapod in battle-team slot 1 and unlocks `Samurai Showdown`, a one-on-one Metapod battle with both sides synced to level 20. Winning unlocks the Metapod Trainer Icon.
 - Unreleased: All 27 Oak starter gifts assign the lab background to the gifted Pokémon. The four Shadow Pokémon sold at the Celadon Game Corner Prize Exchange use its scene background; the remaining authored Pokémon rewards already specify their background.
 - Unreleased: Rival battles now read as four connected checkpoints—from the first match outside Oak's lab to Route 22, Nugget Bridge, and the S.S. Anne dock—with distinct names, context, and win/loss conversations. The rival starts cocky, notices the player's growth, and treats each match as part of an ongoing race.

@@ -127,7 +127,7 @@ const questions: QuizQuestion[] = [
     "question": "Shares species name with?",
     "options": [
       "Natu",
-      "Spearow",
+      "Pidgeotto",
       "Hoothoot",
       "Taillow"
     ],
