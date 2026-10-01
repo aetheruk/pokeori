@@ -19,7 +19,7 @@ The Trainer journal shows compact skill rows for Trainer, Explorer, Researcher, 
 
 ## Skill XP
 
-Shared activity result screens show a dedicated animated Skill EXP section for earned player skill experience, alongside the existing Pokemon EXP section. Pokemon research XP, newly unlocked research TMs, research breakthroughs, and Sketch learned moves are grouped under Research, leaving ordinary inventory items and currency in the main Rewards section.
+Shared activity result screens show a dedicated animated Skill EXP section for earned player skill experience, alongside the existing Pokemon EXP section. Pokemon research XP, research breakthroughs, and Sketch learned moves are grouped under Research. TMs granted by a Pokemon's Research level-up appear in the main Rewards section so the newly earned item is prominent; other TM rewards remain grouped under Research. Ordinary inventory items and currency also appear in the main Rewards section.
 
 - Generated core skill XP uses `20 + 2 * (contentLevel - 1)`, clamped to content levels 1-100.
 - Skill modifiers are Explorer/catching 1.8, Researcher/researching 1.45, Trainer/battling 1, and Artisan 1.

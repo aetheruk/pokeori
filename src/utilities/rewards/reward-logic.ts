@@ -91,9 +91,16 @@ import {
 
 export type Reward = LocationReward
 
+export type RewardSummaryItemSection = 'rewards' | 'research'
+
 export interface RewardSummary {
   xp: Record<string, number>
-  items: { id: string; name: string; quantity: number }[]
+  items: {
+    id: string
+    name: string
+    quantity: number
+    displaySection?: RewardSummaryItemSection
+  }[]
   pokemon: {
     speciesId: number
     name: string
@@ -435,7 +442,10 @@ export async function grantRewards(
   // cardsToAdd array removed, updating tcg map directly
 
   // Helper to process a single reward
-  const processReward = async (reward: Reward) => {
+  const processReward = async (
+    reward: Reward,
+    displaySection?: RewardSummaryItemSection,
+  ) => {
     // Check reward-specific requirements
     if (reward.requirements && reward.requirements.length > 0) {
       const requirementsMet = reward.requirements.every((req) =>
@@ -479,8 +489,14 @@ export async function grantRewards(
       const existingSummaryItem = summary.items.find((i) => i.id === itemId)
       if (existingSummaryItem) {
         existingSummaryItem.quantity += quantity
+        if (displaySection) existingSummaryItem.displaySection = displaySection
       } else {
-        summary.items.push({ id: itemId, name: itemName, quantity })
+        summary.items.push({
+          id: itemId,
+          name: itemName,
+          quantity,
+          ...(displaySection ? { displaySection } : {}),
+        })
       }
     } else if (reward.type === 'card') {
       let params = reward.cardDrawParams
@@ -1064,7 +1080,7 @@ export async function grantRewards(
             oldLevel,
             maxAchievableLevel,
           )) {
-            await processReward(levelReward)
+            await processReward(levelReward, 'rewards')
           }
         }
       }

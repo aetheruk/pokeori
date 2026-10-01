@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased: TMs granted by Pokémon Research level-ups now appear in the main Rewards section of activity results instead of being grouped under Research with the research progress and level-up entry.
 - Unreleased: Brock's Pewter Gym TM reward now describes Wave Breaker as the perfect move for a Rock trainer dealing with pesky Water types, replacing the inaccurate defence-boosting description.
 - Unreleased: Cyndaquil-line evolution rules now distinguish Hisui-origin Pokémon: Cyndaquil evolves at level 17 there and Quilava becomes Hisuian Typhlosion at level 36. Other origins use the standard level 14 and level 36 path. Evolution choices are filtered by obtained region in both the Pokémon screen and server action, and the generator preserves these overrides.
 - Unreleased: Route 5 Field Research can reveal a secret talking Alolan Meowth at a 15% chance. Its `Kitty KONtraBANd` conversation unlocks repeatable `Konban Kash` turn-ins for one Shiny Konban and 500 Pokédollars; the Alolan Meowth profile icon unlocks on the tenth turn-in.
