@@ -54,16 +54,7 @@ export const viridianForestTasks: Task[] = [
         },
       },
     ],
-    criteria: [
-      {
-        type: 'battle_team',
-        battleTeamCheck: {
-          position: 1,
-          speciesId: 11,
-          formId: '11',
-        },
-      },
-    ],
+    criteria: [],
     rewards: [],
     enterModal: [
       {
