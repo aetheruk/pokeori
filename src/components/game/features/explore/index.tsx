@@ -776,12 +776,12 @@ function ExploreListContent({
             }
           }}
           onSuccess={async () => {
-            actions.setIsEnterModalOpen(false)
             const task = actions.enterModalTask
             const isExpeditionTaskFlow =
               !!task && actions.expeditionEnterModalTaskId === task.id
-            actions.setEnterModalTask(null)
             if (!task) {
+              actions.setIsEnterModalOpen(false)
+              actions.setEnterModalTask(null)
               actions.setExpeditionEnterModalTaskId(null)
               return
             }
@@ -796,6 +796,8 @@ function ExploreListContent({
               needsSelection &&
               !(isExpeditionTaskFlow && isAlreadyCompleted)
             ) {
+              actions.setIsEnterModalOpen(false)
+              actions.setEnterModalTask(null)
               actions.setSelectedPokemonIds([])
               actions.setSelectedTaskForCompletion(task)
               actions.setIsSelectionModalOpen(true)
@@ -834,16 +836,24 @@ function ExploreListContent({
                   actions.setExitModalData(task.exitModal)
                   actions.setIsExitModalOpen(true)
                   actions.setCompletionResult(null)
+                  actions.setIsEnterModalOpen(false)
+                  actions.setEnterModalTask(null)
                   await refreshUser()
                   return
                 }
                 actions.setCompletionResult(result)
+                actions.setIsEnterModalOpen(false)
+                actions.setEnterModalTask(null)
                 await refreshUser()
               } else {
+                actions.setIsEnterModalOpen(false)
+                actions.setEnterModalTask(null)
                 const { toast } = require('sonner')
                 toast.error(result.message || 'Failed to complete task')
               }
             } catch (e) {
+              actions.setIsEnterModalOpen(false)
+              actions.setEnterModalTask(null)
               const { toast } = require('sonner')
               toast.error('Error completing task')
             } finally {

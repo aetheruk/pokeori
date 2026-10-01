@@ -163,6 +163,14 @@ export function RewardResultOverlay({
   )
   const [exitModalData, setExitModalData] = useState<TaskExitModal | null>(null)
   const [exitModalQueue, setExitModalQueue] = useState<TaskExitModal[]>([])
+  // The overlay stays mounted while result is null. Use the incoming result's
+  // first step immediately so the explore screen cannot flash before the
+  // initialization effect updates currentStep.
+  const visibleStep = result
+    ? currentStep === 'idle'
+      ? getRewardResultInitialStep(result)
+      : currentStep
+    : 'idle'
 
   useEffect(() => {
     if (!result) {
@@ -352,8 +360,15 @@ export function RewardResultOverlay({
 
   return (
     <>
+      {/* Keep the Explore page covered for the complete result sequence,
+          including the close/open animation when switching to an exit scene. */}
+      <div
+        aria-hidden="true"
+        className="fixed inset-0 z-[49] bg-game-surface"
+      />
+
       {/* Card rewards use the same full-screen reveal surface as booster packs. */}
-      {currentStep === 'cards' && (
+      {visibleStep === 'cards' && (
         <Suspense
           fallback={
             <div
@@ -375,7 +390,7 @@ export function RewardResultOverlay({
       {/* Summary remains a dialog so it can preserve the result-flow focus trap. */}
 
       <Dialog
-        open={currentStep === 'summary'}
+        open={visibleStep === 'summary'}
         // The result flow is deliberately closed by its action buttons. A
         // parent Drawer/Dialog teardown must not dismiss it mid-transition.
         onOpenChange={() => undefined}
@@ -389,7 +404,7 @@ export function RewardResultOverlay({
         >
           <DialogTitle className="sr-only">Reward Result</DialogTitle>
           <div className="flex-1 w-full h-full flex flex-col overflow-hidden relative">
-            {currentStep === 'summary' && (
+            {visibleStep === 'summary' && (
               <GameResult
                 embedded
                 success={result.success}
@@ -423,7 +438,7 @@ export function RewardResultOverlay({
       </Dialog>
 
       {/* 1. Level Up Modal (Self-managed Portal) */}
-      {currentStep === 'level-up' && levelUpData && (
+      {visibleStep === 'level-up' && levelUpData && (
         <LevelUpModal
           open={true}
           onOpenChange={(open) => {
@@ -438,12 +453,12 @@ export function RewardResultOverlay({
       {/* 2. Task Exit Dialog (Self-managed Portal) */}
       <TaskExitDialog
         data={exitModalData}
-        open={currentStep === 'exit-modal'}
+        open={visibleStep === 'exit-modal'}
         onOpenChange={handleExitModalClose}
       />
 
       {/* 4. Research Breakthrough Modal (Self-managed Portal) */}
-      {currentStep === 'research-breakthrough' && currentBreakthrough && (
+      {visibleStep === 'research-breakthrough' && currentBreakthrough && (
         <ResearchLevelUpModal
           open={true}
           onOpenChange={(open) => {

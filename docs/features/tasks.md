@@ -47,6 +47,7 @@ requirements use a filling circular counter, while completed requirements use a 
 ## Rewards
 
 - Successful task completions use the shared ordered result flow. For chat tasks, the authored exit scene is shown first and the reward summary follows; a failed server completion does not show the success scene.
+- When a task has an entry dialogue, it stays visible while completion is processing and closes as the result screen opens. The result overlay renders its first step immediately and keeps a paper backdrop through the entire result sequence, avoiding a brief flash of the Explore cards between dialogue, results, and exit scenes.
 - Reward summaries, level-up results, and research breakthroughs fill the viewport. Task enter and exit scenes use the same large scenic hero and icon as result screens, with their narrative text below and the existing choices fixed at the bottom.
 - Gems
 - Pokedollars
