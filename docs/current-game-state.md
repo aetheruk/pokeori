@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased: Route 5 Field Research can reveal a secret talking Alolan Meowth at a 15% chance. Its `Kitty KONtraBANd` conversation unlocks repeatable `Konban Kash` turn-ins for one Shiny Konban and 500 Pokédollars; the Alolan Meowth profile icon unlocks on the tenth turn-in.
 - Unreleased: Non-expedition `chat: true` tasks with exit dialogue now grant their rewards without an intermediate reward/results screen, then open the exit dialogue directly. Expedition chat steps keep their progress result screen.
 - Unreleased: Task entry dialogue stays visible until the reward result or chat exit dialogue is ready, and result/exit surfaces cover Explore cards throughout their transitions.
 - Unreleased: The Pewter School task description now correctly says the player could learn “a thing or two.”
