@@ -1,6 +1,7 @@
 # Current Game State
 
-- Unreleased: Task entry dialogue stays visible until the task result is ready, and the result overlay shows its first screen immediately while keeping a paper backdrop through the results and exit dialogue so Explore cards do not flash during transitions.
+- Unreleased: Non-expedition `chat: true` tasks with exit dialogue now grant their rewards without an intermediate reward/results screen, then open the exit dialogue directly. Expedition chat steps keep their progress result screen.
+- Unreleased: Task entry dialogue stays visible until the reward result or chat exit dialogue is ready, and result/exit surfaces cover Explore cards throughout their transitions.
 - Unreleased: The Pewter School task description now correctly says the player could learn “a thing or two.”
 - Unreleased: Route 22 now has a 15% chance to complete the secret `discovering-victory-road` discovery, which introduces the powerful trainers heading north. It unlocks `viridian-victory-road` in Viridian City; a Gentleman checks all eight Kanto Badges before the player is cleared for the future Victory Road challenge.
 - Unreleased: Viridian Forest's `tree-top-tyke` conversation starts immediately and leads to `tree-top-tyke-build`, which consumes 200 `wood-scraps-t1` and 25 Escape Ropes at Artisan 30. Finishing the tree house unlocks Pinsir and Scyther in both forest catches and wild battles.

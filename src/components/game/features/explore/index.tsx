@@ -725,6 +725,7 @@ function ExploreListContent({
         onOpenChange={(open) => {
           actions.setIsExitModalOpen(open)
           if (!open) {
+            actions.setIsChatExitBackdropOpen(false)
             const expeditionId = getExpeditionReturn()
             if (expeditionId) {
               void actions.reopenExpeditionPanel(expeditionId)
@@ -734,6 +735,13 @@ function ExploreListContent({
           }
         }}
       />
+
+      {actions.isChatExitBackdropOpen && (
+        <div
+          aria-hidden="true"
+          className="fixed inset-0 z-[49] bg-game-surface"
+        />
+      )}
 
       <AlertDialog
         open={actions.isAbandonExpeditionConfirmOpen}
@@ -836,6 +844,19 @@ function ExploreListContent({
                   actions.setExitModalData(task.exitModal)
                   actions.setIsExitModalOpen(true)
                   actions.setCompletionResult(null)
+                  actions.setIsEnterModalOpen(false)
+                  actions.setEnterModalTask(null)
+                  await refreshUser()
+                  return
+                }
+                if (
+                  !isExpeditionTaskFlow &&
+                  task.chat &&
+                  task.exitModal
+                ) {
+                  actions.setExitModalData(task.exitModal)
+                  actions.setIsChatExitBackdropOpen(true)
+                  actions.setIsExitModalOpen(true)
                   actions.setIsEnterModalOpen(false)
                   actions.setEnterModalTask(null)
                   await refreshUser()
