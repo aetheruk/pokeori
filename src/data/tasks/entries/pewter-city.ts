@@ -1812,7 +1812,7 @@ export const pewterCityTasks: Task[] = [
         id: 'gym-kanto-brock',
       },
       message:
-        'Nice work future Champ, here take this TM. It can be assigned as a battle move to supercharge defence!',
+        'Nice work, future Champ! Here, take this TM. It’s the perfect move for dealing with pesky Water types as a Rock trainer.',
       closeButtonText: 'Receive TM',
     },
     id: 'pewter-gym-tm-reward',
