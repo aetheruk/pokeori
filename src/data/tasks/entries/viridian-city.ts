@@ -296,6 +296,10 @@ export const viridianCityTasks: Task[] = [
     exitModal: {
       background: '/backgrounds/gym.avif',
       title: 'Abandoned Gym',
+      icon: {
+        type: 'local',
+        id: 'sprites/items/badges/badge-kanto-earth.avif',
+      },
       message:
         'Your voice rings out, but nobody answers. It looks like nobody’s been here for a long time.',
       closeButtonText: 'Leave the Gym',
@@ -321,7 +325,7 @@ export const viridianCityTasks: Task[] = [
         id: 1,
         title: 'Viridian Local',
         message:
-          'You won’t have much luck there, I’m afraid, Trainer. This Gym’s been vacant for quite some time.',
+          'You won’t have much luck there, I’m afraid. This Gym’s been vacant for quite some time.',
         buttons: [{ text: 'What happened?', type: 'navigate', id: 2 }],
         background: '/backgrounds/town.avif',
         icon: { type: 'trainer', id: 'expert-f' },
