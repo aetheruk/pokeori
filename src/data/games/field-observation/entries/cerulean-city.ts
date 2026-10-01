@@ -54,7 +54,22 @@ export const ceruleanCityFieldObservationEntries: FieldObservationConfig[] = [
         targetId: 'cerulean-city-complete',
       },
     ],
-    rewards: [],
+    rewards: [
+      {
+        type: 'task_complete',
+        targetId: 'route-5-talking-meowth',
+        dropChance: 15,
+        secret: true,
+        requirements: [
+          {
+            type: 'field_research_result',
+            targetId: 'route-5-field-observation',
+            battleStatus: 'win',
+            count: 1,
+          },
+        ],
+      },
+    ],
     settings: {
       pokemonPool: [
         { speciesId: 16, formId: '16', weight: 25 },

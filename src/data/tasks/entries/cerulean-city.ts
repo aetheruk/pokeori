@@ -2434,6 +2434,166 @@ export const ceruleanCityTasks: Task[] = [
     },
   },
   {
+    id: 'route-5-talking-meowth',
+    name: 'Meowth?',
+    description: 'Hey kid, psst. Get yourself over here.',
+    category: 'Kanto',
+    subCategory: 'Cerulean City',
+    background: '/backgrounds/grassy-route.avif',
+    icon: {
+      type: 'pokemon',
+      id: '10107',
+    },
+    repeatable: false,
+    secret: true,
+    completionTrigger: 'auto',
+    requirements: [],
+    criteria: [],
+    rewards: [],
+    exitModal: {
+      background: '/backgrounds/grassy-route.avif',
+      title: 'Meowth?',
+      icon: {
+        type: 'pokemon',
+        id: '10107',
+      },
+      message: 'Hey kid, psst. Get yourself over here.',
+      closeButtonText: 'A talking Meowth!',
+    },
+  },
+  {
+    id: 'kitty-kontraband',
+    name: 'Kitty KONtraBANd',
+    description: "I don't believe it, a talking Meowth!",
+    category: 'Kanto',
+    subCategory: 'Cerulean City',
+    background: '/backgrounds/grassy-route.avif',
+    icon: {
+      type: 'pokemon',
+      id: '10107',
+    },
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Meow?',
+    requirements: [
+      {
+        type: 'task_completed',
+        targetId: 'route-5-talking-meowth',
+      },
+    ],
+    criteria: [],
+    rewards: [],
+    chat: true,
+    enterModal: [
+      {
+        id: 1,
+        title: 'Alolan Meowth',
+        message:
+          "None of that. Kid, look, you're a trainer, right? I got an offer for you, a kinda Kid Pro Quo, if you get my drift?",
+        background: '/backgrounds/grassy-route.avif',
+        icon: {
+          type: 'pokemon',
+          id: '10107',
+        },
+        buttons: [{ text: 'No?', type: 'navigate', id: 2 }],
+      },
+      {
+        id: 2,
+        title: 'Alolan Meowth',
+        message:
+          "Listen, it's simple. You scratch my back, I scratch yours. I got cash if you got Konban.",
+        background: '/backgrounds/grassy-route.avif',
+        icon: {
+          type: 'pokemon',
+          id: '10107',
+        },
+        buttons: [{ text: 'Konban?', type: 'navigate', id: 3 }],
+      },
+      {
+        id: 3,
+        title: 'Alolan Meowth',
+        message:
+          "Keep up, kid. Konban! The shiny coins of my people. Anyway, no more questions. I'll be around. Konban. Kash. Got it?",
+        background: '/backgrounds/grassy-route.avif',
+        icon: {
+          type: 'pokemon',
+          id: '10107',
+        },
+        buttons: [{ text: 'Got it', type: 'success' }],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/grassy-route.avif',
+      title: 'Konbans?',
+      icon: {
+        type: 'pokemon',
+        id: '10107',
+      },
+      message: 'Was that fine? It felt like it might not have been fine.',
+      closeButtonText: 'I Guess So',
+    },
+  },
+  {
+    id: 'konban-kash',
+    name: 'Konban Kash',
+    description: "I'm not entirely sure I'm comfortable with this, but I need the money.",
+    category: 'Kanto',
+    subCategory: 'Cerulean City',
+    background: '/backgrounds/grassy-route.avif',
+    icon: {
+      type: 'pokemon',
+      id: '10107',
+    },
+    repeatable: true,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Hand Over a Konban',
+    requirements: [
+      {
+        type: 'task_completed',
+        targetId: 'kitty-kontraband',
+      },
+    ],
+    criteria: [
+      {
+        type: 'item_owned',
+        targetId: 'shiny-konban',
+        count: 1,
+        consume: true,
+      },
+    ],
+    rewards: [
+      {
+        type: 'currency',
+        targetId: 'pokedollars',
+        quantity: 500,
+      },
+      {
+        type: 'icon',
+        targetId: 'alolan-meowth',
+        dropChance: 100,
+        requirements: [
+          {
+            type: 'task_completed',
+            targetId: 'konban-kash',
+            count: 9,
+          },
+        ],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/grassy-route.avif',
+      title: 'Meowth',
+      icon: {
+        type: 'pokemon',
+        id: '10107',
+      },
+      message: "Nice work, kid. I'll be here if you get more.",
+      closeButtonText: 'See You Later',
+    },
+  },
+  {
     id: 'day-care-intro',
     name: 'Is That a Day Care?',
     description: "It's hard to tell because the building and yard have been completely smashed up.",
