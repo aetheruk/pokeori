@@ -886,8 +886,8 @@ const ITEM_RECIPES: ArtisanRecipeDraft[] = [
     description: 'Snap conductive parts into a compact lens for reading battle habits.',
     artisanLevel: 3,
     costs: [
-      { id: 'electric-component-t1', amount: 2 },
-      { id: 'metal-scrap-t1', amount: 2 },
+      { id: 'electric-component-t1', amount: 1 },
+      { id: 'metal-scrap-t1', amount: 1 },
     ],
     rewards: [{ type: 'item', targetId: 'battle-observer', quantity: 1, dropChance: 100 }],
     craftType: 'scatter',
