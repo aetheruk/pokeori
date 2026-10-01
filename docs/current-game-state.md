@@ -22,6 +22,7 @@
 - Unreleased: Feathered Gauntlet rematches, Safari Zone's Poacher Watch expedition, and the Vermilion Gym Challenge now grant normal Pokémon, Research, and Battling XP after trainer wins. Their battles have no individual cash rewards; expedition payouts remain at completion.
 - Unreleased: Kanto Meowth can drop the non-unique Shiny Konban key item at a 20% chance. Its new gold coin sprite is at `public/sprites/items/key/shiny-konban.avif`.
 - Unreleased: After the Pallet Town tutorial chain, the one-time `pallet-pokemon-power-pitch` conversation introduces a Lass pitching a crystallised Pokémon energy scheme. The player can walk away without buying in.
+- Unreleased: After completing the Pallet Town orientation, the one-time `pallet-show-me-your-moves` conversation gives an overview of stance attacks, move teaching, and Pokémon research. The Researcher awards 300 Researching XP.
 
 - Release `0.43.9`: The comparison answer orb's animation wrapper now fills the drop target so the dropped Pokémon remains full sized.
 

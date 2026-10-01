@@ -3222,6 +3222,60 @@ export const palletTownTasks: Task[] = [
     },
   },
   {
+    id: 'pallet-show-me-your-moves',
+    name: 'Show Me Your Moves!',
+    description: 'I wonder if any of these researchers have got any good tips for me?',
+    category: 'Kanto',
+    subCategory: 'Pallet Town',
+    background: '/backgrounds/lab.avif',
+    icon: { type: 'trainer', id: 'researcher' },
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Got any tips?',
+    chat: true,
+    requirements: [{ type: 'task_completed', targetId: 'tutorial-16' }],
+    criteria: [],
+    rewards: [{ type: 'xp', skill: 'researching', quantity: 300 }],
+    enterModal: [
+      {
+        id: 1,
+        title: 'Researcher',
+        message:
+          'Haha, I like your confidence! Here’s one for you: all Pokémon can use a basic attack from each stance—Speed, Power, and Tech—matching one of their own types. For dual-type Pokémon, you can choose which type the attack uses before you issue your command.',
+        buttons: [{ text: 'Interesting!', type: 'navigate', id: 2 }],
+        background: '/backgrounds/lab.avif',
+        icon: { type: 'trainer', id: 'researcher' },
+      },
+      {
+        id: 2,
+        title: 'Researcher',
+        message:
+          'Wait, I’m not done yet! Stance attacks are great, but a Pokémon’s real power is in its moves. Learning moves for your Pokémon is all research! The better you become as a researcher, the more moves you’ll be able to teach your Pokémon at the same time.',
+        buttons: [{ text: 'Uhuh.', type: 'navigate', id: 3 }],
+        background: '/backgrounds/lab.avif',
+        icon: { type: 'trainer', id: 'researcher' },
+      },
+      {
+        id: 3,
+        title: 'Researcher',
+        message:
+          'For starters, after you get the basics down, you’ll be able to teach a Pokémon one move. But you’ve got to know what to teach them, right? That only comes from studying individual Pokémon. For example, if you study a Nidoran enough, I’m sure you’ll learn a move that can take down even the strongest Rock Pokémon.',
+        buttons: [{ text: 'Thanks!', type: 'success' }],
+        background: '/backgrounds/lab.avif',
+        icon: { type: 'trainer', id: 'researcher' },
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/lab.avif',
+      title: 'Researcher',
+      icon: { type: 'trainer', id: 'researcher' },
+      message:
+        'Wow, that researcher was way more helpful than I expected. He was almost like a personal tutor. In fact, I’d go as far as to say I feel like I’ve been tutorialised. Wait, is that a word?',
+      closeButtonText: 'Thanks for the Tips',
+    },
+  },
+  {
     name: "Rattata's Nest",
     description: 'You discovered a rattata nest on Route 1 [Voyage Unlocked]',
     category: 'Kanto',
