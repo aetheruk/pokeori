@@ -4,13 +4,13 @@ import { trainerPokeDollarReward } from '../trainer-payouts'
 export const viridianForestBattles: BattleConfig[] = [
   {
     id: 'samurai-showdown',
-    trainerClassId: 'black-belt',
+    trainerClassId: 'bug-catcher',
     trainerName: 'Samurai',
     name: 'Samurai Showdown',
     description: 'This may take a while…',
     category: 'Kanto',
     subCategory: 'Viridian Forest',
-    icon: { type: 'trainer', id: 'black-belt' },
+    icon: { type: 'trainer', id: 'bug-catcher' },
     background: '/backgrounds/forest.avif',
     title: 'Samurai Showdown',
     maxPokemon: 1,
