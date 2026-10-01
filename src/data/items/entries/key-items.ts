@@ -1127,6 +1127,14 @@ export const keyItems: Item[] = [
     unique: false,
   },
   {
+    id: 'shiny-konban',
+    name: 'Shiny Konban',
+    description: 'A gleaming gold konban a Meowth seems to have left behind.',
+    category: 'key',
+    spriteId: 'key/shiny-konban',
+    unique: false,
+  },
+  {
     id: 'mark-of-fire',
     name: 'Mark of Fire',
     description: 'A Gift bestowed to me by the legendary beast Entei',
