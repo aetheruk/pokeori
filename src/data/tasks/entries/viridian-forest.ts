@@ -47,12 +47,10 @@ export const viridianForestTasks: Task[] = [
     completeButtonText: 'Hello!',
     requirements: [
       {
-        type: 'pokemon_owned',
-        count: 1,
-        pokemonCriteria: {
+        type: 'companion',
+        companionCheck: {
           speciesId: 11,
           formId: '11',
-          partner: true,
         },
       },
     ],
