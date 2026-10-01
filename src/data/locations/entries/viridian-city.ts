@@ -56,7 +56,7 @@ export const viridianCityLocations: Location[] = [
       {
         type: 'task_complete',
         targetId: 'discovering-victory-road',
-        dropChance: 100,
+        dropChance: 15,
       },
       {
         type: 'task_complete',

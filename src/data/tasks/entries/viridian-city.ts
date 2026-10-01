@@ -2,29 +2,21 @@ import { Task } from '../../types'
 
 export const viridianCityTasks: Task[] = [
   {
-    name: 'Victory Road',
-    description: 'You proved your worth and found the entrance to Victory Road!',
+    name: 'Trainers on the Move',
+    description:
+      'A stream of powerful Trainers is heading down Route 22. I wonder where they’re going.',
     category: 'Kanto',
     subCategory: 'Viridian City',
     icon: {
-      type: 'item',
-      id: 'badge-kanto-earth',
+      type: 'local',
+      id: '/sprites/tall_grass-v2.avif',
     },
     background: '/backgrounds/rocky-path.avif',
     repeatable: false,
     secret: true,
     completionTrigger: 'auto',
-    completeButtonText: 'Approach Gate',
-    requirements: [
-      { type: 'item_owned', targetId: 'badge-kanto-boulder' },
-      { type: 'item_owned', targetId: 'badge-kanto-cascade' },
-      { type: 'item_owned', targetId: 'badge-kanto-thunder' },
-      { type: 'item_owned', targetId: 'badge-kanto-rainbow' },
-      { type: 'item_owned', targetId: 'badge-kanto-soul' },
-      { type: 'item_owned', targetId: 'badge-kanto-marsh' },
-      { type: 'item_owned', targetId: 'badge-kanto-volcano' },
-      { type: 'item_owned', targetId: 'badge-kanto-earth' },
-    ],
+    completeButtonText: 'Follow the Trainers',
+    requirements: [],
     criteria: [],
     rewards: [
       {
@@ -34,6 +26,71 @@ export const viridianCityTasks: Task[] = [
       },
     ],
     id: 'discovering-victory-road',
+    exitModal: {
+      background: '/backgrounds/rocky-path.avif',
+      title: 'Victory Road',
+      icon: { type: 'local', id: '/sprites/tall_grass-v2.avif' },
+      message:
+        'Wow, everyone here has such strong Pokémon. I wonder what’s going on!',
+      closeButtonText: 'Keep Watching',
+    },
+  },
+  {
+    id: 'viridian-victory-road',
+    name: 'Victory Road',
+    description:
+      'Huh, it seems like I’m going to have to come back when I’ve collected 8 Gym Badges.',
+    category: 'Kanto',
+    subCategory: 'Viridian City',
+    icon: { type: 'trainer', id: 'gentleman' },
+    background: '/backgrounds/rocky-path.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Speak to the Gentleman',
+    chat: true,
+    requirements: [
+      { type: 'task_completed', targetId: 'discovering-victory-road' },
+    ],
+    criteria: [
+      { type: 'item_owned', targetId: 'badge-kanto-boulder' },
+      { type: 'item_owned', targetId: 'badge-kanto-cascade' },
+      { type: 'item_owned', targetId: 'badge-kanto-thunder' },
+      { type: 'item_owned', targetId: 'badge-kanto-rainbow' },
+      { type: 'item_owned', targetId: 'badge-kanto-soul' },
+      { type: 'item_owned', targetId: 'badge-kanto-marsh' },
+      { type: 'item_owned', targetId: 'badge-kanto-volcano' },
+      { type: 'item_owned', targetId: 'badge-kanto-earth' },
+    ],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        title: 'Gentleman',
+        message:
+          'You look like you’re ready to face Victory Road, but I’m still going to need to see those badges.',
+        buttons: [{ text: 'Show Badges', type: 'navigate', id: 2 }],
+        background: '/backgrounds/rocky-path.avif',
+        icon: { type: 'trainer', id: 'gentleman' },
+      },
+      {
+        id: 2,
+        title: 'Gentleman',
+        message:
+          'Well, everything seems to be in order here! I hope you’re ready for the challenge ahead. Most Trainers give up long before they reach the Indigo Plateau.',
+        buttons: [{ text: 'I’m ready.', type: 'success' }],
+        background: '/backgrounds/rocky-path.avif',
+        icon: { type: 'trainer', id: 'gentleman' },
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/rocky-path.avif',
+      title: 'Victory Road',
+      icon: { type: 'trainer', id: 'gentleman' },
+      message:
+        'I’ve been through a lot. How hard can some caves and a mountain be…',
+      closeButtonText: 'Set Out',
+    },
   },
   {
     name: 'Explore Viridian City',
