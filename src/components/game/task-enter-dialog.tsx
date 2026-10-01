@@ -16,7 +16,7 @@ interface TaskEnterDialogProps {
   steps: TaskEnterModalStep[]
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSuccess: () => void
+  onSuccess: () => void | Promise<void>
   onFail: () => void
 }
 
@@ -34,6 +34,7 @@ export function TaskEnterDialog({
   const [currentStepId, setCurrentStepId] = useState(1)
   const [passwordInput, setPasswordInput] = useState('')
   const [isValidating, setIsValidating] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [activePasswordButton, setActivePasswordButton] = useState<TaskEnterModalButton | null>(
     null,
   )
@@ -53,11 +54,15 @@ export function TaskEnterDialog({
         break
 
       case 'success':
-        onSuccess()
-        // Reset state for next time
-        setCurrentStepId(1)
-        setPasswordInput('')
-        setActivePasswordButton(null)
+        setIsSubmitting(true)
+        try {
+          await onSuccess()
+        } finally {
+          // Successful actions close and unmount this task's dialog. Keep its
+          // final line in place during that handoff instead of flashing back
+          // to the opening dialogue.
+          setIsSubmitting(false)
+        }
         break
 
       case 'password':
@@ -166,9 +171,17 @@ export function TaskEnterDialog({
                 <Button
                   key={idx}
                   onClick={() => handleButtonClick(button)}
+                  disabled={isSubmitting}
                   className="min-h-11 w-full border border-game-clay bg-game-clay text-game-cream hover:bg-game-clay/90"
                 >
-                  {parseText(button.text, trainerName)}
+                  {isSubmitting && button.type === 'success' ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Completing…
+                    </>
+                  ) : (
+                    parseText(button.text, trainerName)
+                  )}
                 </Button>
               ))}
             </div>
