@@ -71,6 +71,8 @@ const writeEvolutionModules = (evolutionMap) => {
   heldItem?: string
   trade?: boolean
   requiredSourceForm?: string
+  requiredRegion?: string
+  excludedRegions?: string[]
 }
 
 export interface Evolution {
@@ -243,6 +245,36 @@ async function generate() {
   // Manual Overrides for Regional Forms
   // Uses PokeAPI standard form names: "base", "Alolan Form", "Galarian Form"
   const REGIONAL_OVERRIDES = {
+    // Cyndaquil's Hisui-origin evolution follows the Legends: Arceus level path.
+    155: [
+      {
+        speciesId: 156,
+        name: 'quilava',
+        trigger: 'level-up',
+        conditions: { minLevel: 14, excludedRegions: ['Hisui'] },
+      },
+      {
+        speciesId: 156,
+        name: 'quilava',
+        trigger: 'level-up',
+        conditions: { minLevel: 17, requiredRegion: 'Hisui' },
+      },
+    ],
+    156: [
+      {
+        speciesId: 157,
+        name: 'typhlosion',
+        trigger: 'level-up',
+        conditions: { minLevel: 36, excludedRegions: ['Hisui'] },
+      },
+      {
+        speciesId: 157,
+        name: 'typhlosion',
+        trigger: 'level-up',
+        conditions: { minLevel: 36, requiredRegion: 'Hisui' },
+        targetForm: 'Hisuian Form',
+      },
+    ],
     // Rattata (19)
     19: [
       {

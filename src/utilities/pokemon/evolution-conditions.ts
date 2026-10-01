@@ -19,6 +19,24 @@ export function getRequiredEvolutionItem(
   return conditions.itemId || (conditions.trade ? 'link-cable' : null)
 }
 
+export function matchesEvolutionRegion(
+  conditions: Pick<EvolutionCondition, 'requiredRegion' | 'excludedRegions'>,
+  source?: Pick<Pokemon, 'obtainedRegion'> | string | null,
+): boolean {
+  const sourceRegion =
+    typeof source === 'string'
+      ? source.trim().toLowerCase()
+      : source?.obtainedRegion?.trim().toLowerCase()
+  const requiredRegion = conditions.requiredRegion?.trim().toLowerCase()
+  const excludedRegions = conditions.excludedRegions?.map((region) =>
+    region.trim().toLowerCase(),
+  )
+
+  if (requiredRegion && sourceRegion !== requiredRegion) return false
+  if (sourceRegion && excludedRegions?.includes(sourceRegion)) return false
+  return true
+}
+
 type EvolutionTimeRegionSource = Pick<Pokemon, 'obtainedRegion'>
 
 export function getEvolutionConditionGender(

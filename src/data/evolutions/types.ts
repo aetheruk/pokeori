@@ -10,6 +10,8 @@ export interface EvolutionCondition {
   heldItem?: string
   trade?: boolean
   requiredSourceForm?: string
+  requiredRegion?: string
+  excludedRegions?: string[]
 }
 
 export interface Evolution {
