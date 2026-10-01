@@ -248,7 +248,7 @@ export const viridianForestBattles: BattleConfig[] = [
       },
     ],
   },
-  // Expedition-only Bug Gauntlet rematches (no direct battle rewards)
+  // Expedition-only Bug Gauntlet rematches (XP and research still apply; no trainer payout)
   {
     id: 'bug-gauntlet-barry',
     name: 'Bug Gauntlet: Barry',
@@ -276,7 +276,6 @@ export const viridianForestBattles: BattleConfig[] = [
       { speciesId: 10, level: 5, formId: '13' },
     ],
     rewards: [],
-    disableRewards: true,
   },
   {
     id: 'bug-gauntlet-billy',
@@ -305,7 +304,6 @@ export const viridianForestBattles: BattleConfig[] = [
       { speciesId: 14, level: 7, formId: '14' },
     ],
     rewards: [],
-    disableRewards: true,
   },
   {
     id: 'bug-gauntlet-berry',
@@ -331,7 +329,6 @@ export const viridianForestBattles: BattleConfig[] = [
     enemyAttackTelegraphChance: 30,
     enemyTeam: [{ speciesId: 15, level: 10, formId: '15' }],
     rewards: [],
-    disableRewards: true,
   },
   {
     id: 'bug-gauntlet-benny',
@@ -357,7 +354,6 @@ export const viridianForestBattles: BattleConfig[] = [
     enemyAttackTelegraphChance: 30,
     enemyTeam: [{ speciesId: 123, level: 10, formId: '123' }],
     rewards: [],
-    disableRewards: true,
   },
   {
     id: 'bug-gauntlet-champion',
@@ -387,7 +383,6 @@ export const viridianForestBattles: BattleConfig[] = [
       { speciesId: 123, level: 13, formId: '123' },
     ],
     rewards: [],
-    disableRewards: true,
   },
   {
     id: 'viridian-forest-battle',
