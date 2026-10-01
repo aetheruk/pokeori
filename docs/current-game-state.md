@@ -15,6 +15,7 @@
 - Unreleased: Candy now has five 20-level tiers from 1–20 through 81–100. Wild battles drop the matching tier at 5%, 4%, 3%, 2%, or 1% by encounter level, and award 1–3 level-matched PokePowder at a flat 35%. The five EX Candy items and their bags are retired; their stored quantities convert to the corresponding standard tier. Candy crushing recipes consume one Candy, and each tier has one powder recipe.
 
 - Unreleased: All five Candy-to-PokePowder Artisan recipes now require one matching Candy instead of two.
+- Unreleased: After the Pallet Town tutorial chain, the one-time `pallet-pokemon-power-pitch` conversation introduces a Lass pitching a crystallised Pokémon energy scheme. The player can walk away without buying in.
 
 - Release `0.43.9`: The comparison answer orb's animation wrapper now fills the drop target so the dropped Pokémon remains full sized.
 
