@@ -282,8 +282,8 @@ export const viridianCityTasks: Task[] = [
     background: '/backgrounds/gym.avif',
     repeatable: false,
     secret: false,
-    completionTrigger: 'auto',
-    completeButtonText: 'Check Doors',
+    completionTrigger: 'manual',
+    completeButtonText: 'Anyone here?',
     requirements: [
       {
         type: 'task_completed',
@@ -293,6 +293,65 @@ export const viridianCityTasks: Task[] = [
     criteria: [],
     rewards: [],
     id: 'abandoned-gym',
+    exitModal: {
+      background: '/backgrounds/gym.avif',
+      title: 'Abandoned Gym',
+      message:
+        'Your voice rings out, but nobody answers. It looks like nobody’s been here for a long time.',
+      closeButtonText: 'Leave the Gym',
+    },
+  },
+  {
+    id: 'the-lost-leader',
+    name: 'The Lost Leader',
+    description: 'As I leave the gym, a local approaches me.',
+    category: 'Kanto',
+    subCategory: 'Viridian City',
+    icon: { type: 'trainer', id: 'expert-f' },
+    background: '/backgrounds/town.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Talk to the Local',
+    requirements: [{ type: 'task_completed', targetId: 'abandoned-gym' }],
+    criteria: [],
+    rewards: [{ type: 'xp', skill: 'catching', quantity: 150 }],
+    enterModal: [
+      {
+        id: 1,
+        title: 'Viridian Local',
+        message:
+          'You won’t have much luck there, I’m afraid, Trainer. This Gym’s been vacant for quite some time.',
+        buttons: [{ text: 'What happened?', type: 'navigate', id: 2 }],
+        background: '/backgrounds/town.avif',
+        icon: { type: 'trainer', id: 'expert-f' },
+      },
+      {
+        id: 2,
+        title: 'Viridian Local',
+        message:
+          'The Gym used to be run by a local businessman, a real salt-of-the-earth kind of guy. But over time, he had less and less time for the locals and moved on to bigger and bigger projects.',
+        buttons: [{ text: 'That’s a shame', type: 'navigate', id: 3 }],
+        background: '/backgrounds/town.avif',
+        icon: { type: 'trainer', id: 'expert-f' },
+      },
+      {
+        id: 3,
+        title: 'Viridian Local',
+        message:
+          'It truly is. Giovanni was his name. I say “was” because nobody’s heard from him in quite a few years now. I wonder if he’s doing all right.',
+        buttons: [{ text: 'I hope so.', type: 'success' }],
+        background: '/backgrounds/town.avif',
+        icon: { type: 'trainer', id: 'expert-f' },
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/town.avif',
+      title: 'Giovanni',
+      icon: { type: 'trainer', id: 'gym-kanto-giovanni' },
+      message: 'I guess I’ll have to continue on for now to earn my first badge.',
+      closeButtonText: 'Continue On',
+    },
   },
   {
     name: 'A Small Shrub',

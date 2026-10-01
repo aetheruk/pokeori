@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased: The `abandoned-gym` task in Viridian City can now be completed by calling out inside. This unlocks `the-lost-leader`, where a local explains Giovanni’s long absence; completing the conversation awards 150 Explorer XP.
 - Unreleased: Pidgey's “Shares species name with?” quiz question uses Pidgeotto instead of Spearow as a distractor, leaving Natu as the only Tiny Bird answer.
 - Unreleased: Viridian Forest's non-secret `Battle Hardened` task appears only while a Metapod is set as the partner. Completing its greeting requires Metapod in battle-team slot 1 and unlocks `Samurai Showdown`, a one-on-one Metapod battle with both sides synced to level 20. Winning unlocks the Metapod Trainer Icon.
 - Unreleased: All 27 Oak starter gifts assign the lab background to the gifted Pokémon. The four Shadow Pokémon sold at the Celadon Game Corner Prize Exchange use its scene background; the remaining authored Pokémon rewards already specify their background.
@@ -668,7 +669,7 @@ Main Viridian beats:
 - `find-daughter` opens after exploring Viridian.
 - `found-daughter-trigger` is a secret completion trigger.
 - `grumpy-man-viridian` follows the missing granddaughter beat.
-- `abandoned-gym` is available after exploring Viridian.
+- `abandoned-gym` is available after exploring Viridian and can be completed by calling into the empty Gym. Its completion unlocks `the-lost-leader`, a conversation with a local about Giovanni's disappearance that awards 150 Explorer XP.
 - `chansey-wheel-viridian` is an anytime Pokemon Center prize wheel after exploring Viridian, costs 2 League Tickets, and has evenly weighted Poke Ball, Broken Ball, Spelon Berry, and Soft Fluff rewards.
 - `viridian-general` opens after `explore-viridian` and sells the permanent early basics: Poke Balls, the 10x Poke Ball bundle, and Potions. It also owns the local daily Potion bundle: 5 Potions for 1800 Pokedollars, 1 stock per day.
 - `rival-route-22` is an optional live-rival battle after `explore-viridian`, using up to three Pokemon from the selected rival's current Battle Team scaled to level 8. Winning or losing hides the battle and unlocks a short rival follow-up task.
