@@ -4,6 +4,7 @@
 - Unreleased: Viridian Forest's `tree-top-tyke` conversation starts immediately and leads to `tree-top-tyke-build`, which consumes 200 `wood-scraps-t1` and 25 Escape Ropes at Artisan 30. Finishing the tree house unlocks Pinsir and Scyther in both forest catches and wild battles.
 - Unreleased: Pewter City's `pewter-bickering-kids` conversation unlocks after `explore-pewter`. The player overhears two kids arguing about a strange purple Rattata and earns 100 Explorer XP.
 - Unreleased: The `abandoned-gym` task in Viridian City can now be completed by calling out inside. This unlocks `the-lost-leader`, where a local explains Giovanni’s long absence; completing the conversation awards 150 Explorer XP.
+- Unreleased: `viridian-back-in-my-day` is a one-time Gentleman conversation that unlocks after `explore-viridian`, with the player reflecting on the cost and reuse of Poké Balls.
 - Unreleased: Pidgey's “Shares species name with?” quiz question uses Pidgeotto instead of Spearow as a distractor, leaving Natu as the only Tiny Bird answer.
 - Unreleased: Viridian Forest's non-secret `Battle Hardened` task appears only while Metapod is the active companion. Completing its greeting unlocks `Samurai Showdown`, a one-on-one Metapod battle with both sides synced to level 20. The battle requires Metapod in battle-team slot 1. The Samurai uses the Bug Catcher sprite in the task and battle. Winning unlocks the Metapod Trainer Icon.
 - Unreleased: All 27 Oak starter gifts assign the lab background to the gifted Pokémon. The four Shadow Pokémon sold at the Celadon Game Corner Prize Exchange use its scene background; the remaining authored Pokémon rewards already specify their background.
@@ -670,6 +671,7 @@ Viridian City unlocks through `explore-viridian`, which requires `explore-1`.
 Main Viridian beats:
 
 - `find-daughter` opens after exploring Viridian.
+- `viridian-back-in-my-day` is a one-time conversation with a Gentleman grumbling about Poké Ball prices and Premier Ball promotions; the player reflects that discarded Broken Balls can be repaired and reused.
 - `found-daughter-trigger` is a secret completion trigger.
 - `grumpy-man-viridian` follows the missing granddaughter beat.
 - `abandoned-gym` is available after exploring Viridian and can be completed by calling into the empty Gym. Its completion unlocks `the-lost-leader`, a conversation with a local about Giovanni's disappearance that awards 150 Explorer XP.
@@ -728,6 +730,7 @@ Main beats:
 - Pewter Gym's junior trainer uses the pre-Brock level 10 player cap; Brock remains the badge fight that unlocks onward travel, grants 10 League Tickets, and has a Trainer level 5 battle criterion.
 - Brock's gym win is tracked by `battle_result: pewter-gym-brock`; the fight caps player Pokemon at level 15.
 - `pewter-roadblock` blocks onward travel until the Boulder Badge is owned.
+- `singing-in-the-rain` is a one-time, rain-only 1v1 battle against a level 35 Jigglypuff. It unlocks after `pewter-roadblock` (the same progression gate that opens Route 3, where wild Jigglypuff can be found) and awards the Jigglypuff icon plus 50 Jigglypuff Research XP.
 - `tm-sing` is now developed by reaching Pokemon Research level 1 with Jigglypuff form `39`.
 - Route 3 catching can now drop the hidden Cotton Scarf recipe manual at 12%.
 - `pewter-museum` costs 100 Pokédollars and is hidden after `pewter-museum-unlock`.

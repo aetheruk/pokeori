@@ -24,6 +24,7 @@ jobs:
     timeout-minutes: 45
     permissions:
       contents: read
+      packages: write
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
@@ -96,6 +97,55 @@ jobs:
           cache-to: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache,mode=max
           secrets: |
             NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
+
+      - name: Retain the three newest release images
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PACKAGE_NAME: pokeori-production
+        run: |
+          gh api --paginate --slurp \
+            "users/${GITHUB_REPOSITORY_OWNER}/packages/container/${PACKAGE_NAME}/versions?per_page=100" \
+            > "$RUNNER_TEMP/ghcr-package-versions.json"
+
+          node <<'NODE'
+          const fs = require('node:fs')
+          const { execFileSync } = require('node:child_process')
+
+          const versions = JSON.parse(
+            fs.readFileSync(`${process.env.RUNNER_TEMP}/ghcr-package-versions.json`, 'utf8'),
+          ).flat()
+          const releaseTag = /^v(\d+)\.(\d+)\.(\d+)$/
+          const releases = versions
+            .flatMap((version) => {
+              const tag = version.metadata?.container?.tags?.find((value) => releaseTag.test(value))
+              if (!tag) return []
+              const [, major, minor, patch] = tag.match(releaseTag)
+              return [{ version, tag, semver: [Number(major), Number(minor), Number(patch)] }]
+            })
+            .sort((left, right) => {
+              for (let index = 0; index < 3; index += 1) {
+                const difference = right.semver[index] - left.semver[index]
+                if (difference !== 0) return difference
+              }
+              return right.version.created_at.localeCompare(left.version.created_at)
+            })
+
+          for (const { version, tag } of releases.slice(3)) {
+            execFileSync(
+              'gh',
+              [
+                'api',
+                '--method',
+                'DELETE',
+                `users/${process.env.GITHUB_REPOSITORY_OWNER}/packages/container/${process.env.PACKAGE_NAME}/versions/${version.id}`,
+              ],
+              { stdio: 'inherit' },
+            )
+            console.log(`Deleted old GHCR release ${tag}`)
+          }
+
+          console.log(`Retained ${Math.min(releases.length, 3)} release image version(s)`)
+          NODE
 
   deploy:
     name: Trigger Coolify image deployment
