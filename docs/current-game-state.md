@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased: Pewter City's `pewter-bickering-kids` conversation unlocks after `explore-pewter`. The player overhears two kids arguing about a strange purple Rattata and earns 100 Explorer XP.
 - Unreleased: The `abandoned-gym` task in Viridian City can now be completed by calling out inside. This unlocks `the-lost-leader`, where a local explains Giovanni’s long absence; completing the conversation awards 150 Explorer XP.
 - Unreleased: Pidgey's “Shares species name with?” quiz question uses Pidgeotto instead of Spearow as a distractor, leaving Natu as the only Tiny Bird answer.
 - Unreleased: Viridian Forest's non-secret `Battle Hardened` task appears only while a Metapod is set as the partner. Completing its greeting requires Metapod in battle-team slot 1 and unlocks `Samurai Showdown`, a one-on-one Metapod battle with both sides synced to level 20. The Samurai uses the Bug Catcher sprite in the task and battle. Winning unlocks the Metapod Trainer Icon.
@@ -709,6 +710,7 @@ Pewter unlocks with `explore-pewter`, which requires `viridian-exit`.
 
 Main beats:
 
+- `pewter-bickering-kids` unlocks after `explore-pewter`; eavesdropping on two kids arguing about a strange purple Rattata awards 100 Explorer XP.
 - Route 2 catching uses the normal early Kanto pool: Caterpie, Weedle, Pidgey, Rattata, Nidoran female, and Nidoran male.
 - `pewter-messy-mart` introduces a shop-side task.
 - `pewter-item-identify` / "Cleaning the Pokemart" rewards 65 Pokedollars with no Poke Ball roll.
