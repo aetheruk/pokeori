@@ -16,6 +16,7 @@ export interface SpecialPokemonDrop {
  * selection or quantity rolls.
  */
 export const SPECIAL_POKEMON_DROPS: Record<string, SpecialPokemonDrop[]> = {
+  '52': [{ itemId: 'shiny-konban', dropChance: 20 }],
   '25': [{ itemId: 'light-ball', dropChance: 1 }],
   '83': [{ itemId: 'leek', dropChance: 1 }],
   '10166': [{ itemId: 'leek', dropChance: 1 }],
