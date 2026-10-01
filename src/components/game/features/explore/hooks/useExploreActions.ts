@@ -69,6 +69,7 @@ export function useExploreActions(
   >(null)
   const [exitModalData, setExitModalData] = useState<any | null>(null)
   const [isExitModalOpen, setIsExitModalOpen] = useState(false)
+  const [isChatExitBackdropOpen, setIsChatExitBackdropOpen] = useState(false)
   const [completingTaskId, setCompletingTaskId] = useState<string | null>(null)
   const [enterModalTask, setEnterModalTask] = useState<any | null>(null)
   const [isEnterModalOpen, setIsEnterModalOpen] = useState(false)
@@ -530,8 +531,9 @@ export function useExploreActions(
             : await completeTask(task.id, undefined, crypto.randomUUID())
           if (result.success) {
             setSelectedItem(null)
-            setCompletionResult(result)
-            setLastCompletedTask(task)
+            setExitModalData(task.exitModal)
+            setIsChatExitBackdropOpen(true)
+            setIsExitModalOpen(true)
             await refreshUser()
           } else toast.error(result.message || 'Failed to complete task')
         } catch (e) {
@@ -547,6 +549,7 @@ export function useExploreActions(
 
       if (isDoneForModalFlow && !task.repeatable && task.exitModal) {
         setExitModalData(task.exitModal)
+        if (task.chat) setIsChatExitBackdropOpen(true)
         setIsExitModalOpen(true)
         if (isExpeditionTaskFlow) {
           setExpeditionEnterModalTaskId(null)
@@ -590,13 +593,15 @@ export function useExploreActions(
           } else {
             setSelectedItem(null)
           }
-          setCompletionResult(result)
-          setLastCompletedTask(task) // Store task object
-          await refreshUser()
           if (!isExpeditionTaskFlow && task.chat && task.exitModal) {
             setExitModalData(task.exitModal)
+            setIsChatExitBackdropOpen(true)
             setIsExitModalOpen(true)
+          } else {
+            setCompletionResult(result)
+            setLastCompletedTask(task) // Store task object
           }
+          await refreshUser()
         } else {
           toast.error(result.message || 'Failed to complete task')
         }
@@ -924,8 +929,14 @@ export function useExploreActions(
         } else {
           setSelectedItem(null)
         }
-        setCompletionResult(result)
-        setLastCompletedTask(task)
+        if (task.chat && task.exitModal && !shouldClearExpeditionContext) {
+          setExitModalData(task.exitModal)
+          setIsChatExitBackdropOpen(true)
+          setIsExitModalOpen(true)
+        } else {
+          setCompletionResult(result)
+          setLastCompletedTask(task)
+        }
         setSelectedTaskForCompletion(null)
         setIsSelectionModalOpen(false)
         await refreshUser()
@@ -1053,6 +1064,8 @@ export function useExploreActions(
     setExitModalData,
     isExitModalOpen,
     setIsExitModalOpen,
+    isChatExitBackdropOpen,
+    setIsChatExitBackdropOpen,
     completingTaskId,
     setCompletingTaskId,
     enterModalTask,
