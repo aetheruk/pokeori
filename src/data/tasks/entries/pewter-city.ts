@@ -402,7 +402,7 @@ export const pewterCityTasks: Task[] = [
   {
     id: 'pewter-school-intro',
     name: 'Pewter Pokemon School',
-    description: 'Hmm a dedicated Pokemon school, maybe I could learn a thing or too',
+    description: 'Hmm a dedicated Pokemon school, maybe I could learn a thing or two',
     category: 'Kanto',
     subCategory: 'Pewter City',
     icon: {

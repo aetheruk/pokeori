@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased: The Pewter School task description now correctly says the player could learn “a thing or two.”
 - Unreleased: Route 22 now has a 15% chance to complete the secret `discovering-victory-road` discovery, which introduces the powerful trainers heading north. It unlocks `viridian-victory-road` in Viridian City; a Gentleman checks all eight Kanto Badges before the player is cleared for the future Victory Road challenge.
 - Unreleased: Viridian Forest's `tree-top-tyke` conversation starts immediately and leads to `tree-top-tyke-build`, which consumes 200 `wood-scraps-t1` and 25 Escape Ropes at Artisan 30. Finishing the tree house unlocks Pinsir and Scyther in both forest catches and wild battles.
 - Unreleased: Pewter City's `pewter-bickering-kids` conversation unlocks after `explore-pewter`. The player overhears two kids arguing about a strange purple Rattata and earns 100 Explorer XP.
