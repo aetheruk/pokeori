@@ -257,7 +257,9 @@ export function mapCriteriaToDisplayItem(
         ) : (
           <Star className="w-5 h-5 text-game-moss-strong" />
         ),
-        label: `Reach Level ${count} ${skillId ? `in ${skillName}` : skillName}`,
+        label: skillId
+          ? `Reach level ${count} as a ${skillName}`
+          : `Reach Level ${count} ${skillName}`,
         subLabel: 'Skill Requirement',
       }
     }
