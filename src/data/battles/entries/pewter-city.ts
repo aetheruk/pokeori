@@ -181,6 +181,33 @@ export const pewterCityBattles: BattleConfig[] = [
     enemyAttackTelegraphChance: 2,
   },
   {
+    id: 'singing-in-the-rain',
+    name: 'Singing in the Rain',
+    description: 'Wow, that’s a mean-looking Jigglypuff. Wait, is that a marker pen in its hand?',
+    category: 'Kanto',
+    subCategory: 'Pewter City',
+    icon: { type: 'pokemon', id: '39' },
+    background: '/backgrounds/rocky-path.avif',
+    maxPokemon: 1,
+    requirements: [
+      { type: 'task_completed', targetId: 'pewter-roadblock' },
+      { type: 'weather', targetId: 'rain' },
+      {
+        type: 'battle_result',
+        targetId: 'singing-in-the-rain',
+        battleStatus: 'win',
+        count: 1,
+        inverse: true,
+      },
+    ],
+    enemyTeam: [{ speciesId: 39, level: 35, formId: '39' }],
+    rewards: [
+      { type: 'icon', targetId: '39', quantity: 1, dropChance: 100 },
+      { type: 'pokemon_research_xp', targetId: '39', quantity: 50, dropChance: 100 },
+    ],
+    enemyAttackTelegraphChance: 2,
+  },
+  {
     id: 'route-3-trainer-1',
     trainerClassId: 'lass',
     name: 'Lass Janice',

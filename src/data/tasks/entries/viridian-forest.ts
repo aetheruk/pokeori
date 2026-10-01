@@ -62,7 +62,6 @@ export const viridianForestTasks: Task[] = [
     secret: false,
     completionTrigger: 'manual',
     completeButtonText: 'Build the Tree House',
-    chat: true,
     requirements: [{ type: 'task_completed', targetId: 'tree-top-tyke' }],
     criteria: [
       {

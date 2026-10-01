@@ -130,6 +130,42 @@ export const viridianCityTasks: Task[] = [
     id: 'explore-viridian',
   },
   {
+    id: 'viridian-back-in-my-day',
+    name: 'Back in my day!',
+    description: 'Wait, is this guy talking to me?',
+    category: 'Kanto',
+    subCategory: 'Viridian City',
+    icon: { type: 'trainer', id: 'gentleman' },
+    background: '/backgrounds/town.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Hello!',
+    chat: true,
+    requirements: [{ type: 'task_completed', targetId: 'explore-viridian' }],
+    criteria: [],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        title: 'Gentleman',
+        message:
+          'You can’t make this up! 350 Pokédollars for a Poké Ball! Back in my day, they were 200, and they’d even throw in a Premier Ball. Honestly, the world’s gone to pot!',
+        buttons: [{ text: 'Uhuh', type: 'success' }],
+        background: '/backgrounds/town.avif',
+        icon: { type: 'trainer', id: 'gentleman' },
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/town.avif',
+      title: 'Back in my day!',
+      icon: { type: 'trainer', id: 'gentleman' },
+      message:
+        'Wow, he sure was fired up. I mean, I guess it is a lot, but it takes like five seconds to make your own. The ground is literally littered with other people’s failed capture attempts. A spot of paint and a tightening up, and they’re good to go!',
+      closeButtonText: 'Move Along',
+    },
+  },
+  {
     name: 'Find my Granddaughter',
     description:
       'A grumpy old man is looking for his granddaughter and wont let me pass. I should try looking on Route 22.',

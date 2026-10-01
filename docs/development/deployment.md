@@ -95,8 +95,9 @@ published IP ranges.
 `.github/workflows/build-and-deploy.yml` runs on pushes to `main` and can be
 manually dispatched from `main`. It builds for `linux/amd64`, pushes the private GHCR image,
 and triggers Coolify only after the push succeeds. Each image is tagged
-`latest`, `v<package-version>`, and `sha-<12-character-commit>`. Coolify tracks
-`latest`; the version and commit tags identify rollback candidates.
+`latest`, `v<package-version>`, and `sha-<12-character-commit>`. The workflow
+retains the three newest release image versions in GHCR. Coolify tracks
+`latest`; the retained version and commit tags identify rollback candidates.
 
 The existing `ghcr.io/aetheruk/pokeori` package is public and currently holds
 the old `v0.29.9` image. GitHub does not allow a published public personal
@@ -123,9 +124,12 @@ public repository. Coolify still needs a separate GHCR PAT with only
 user configured in Coolify. This login was verified with a pull of the private
 `bootstrap` tag. The workflow uses a PAT instead of `GITHUB_TOKEN` so a
 public-repository Actions grant does not expose the private image to fork
-workflows. Keep the image and `buildcache` tag private: Next embeds the Server
-Actions key in the compiled app. Give Coolify a separate GHCR credential with
-only `read:packages` for pulling the image.
+workflows. Keep the image private: Next embeds the Server Actions key in the
+compiled app. Give Coolify a separate GHCR credential with only `read:packages`
+for pulling the image. BuildKit caching uses GitHub Actions cache rather than an
+additional GHCR image version.
+
+Before publishing, the workflow reduces GHCR to the two newest release images; afterward it keeps only the three newest release images, each tagged `latest` (for the current version), `v<major>.<minor>.<patch>`, and `sha-<commit>`. It deletes old releases, untagged manifests, and cache manifests so the package contains no more than three image versions. Grant the `aetheruk/pokeori` repository **Admin** under the package's **Manage Actions access** settings so the workflow's `GITHUB_TOKEN` can prune the package. This is separate from linking the package to the public repository: keep the package private and unlinked.
 
 The Coolify public URL is `https://coolify.pokeori.app`. `COOLIFY_WEBHOOK` now
 targets the `pokeori-ghcr` authenticated deploy webhook. The `COOLIFY_TOKEN`
