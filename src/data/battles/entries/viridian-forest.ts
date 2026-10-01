@@ -2,6 +2,50 @@ import { BattleConfig } from '../../types'
 import { trainerPokeDollarReward } from '../trainer-payouts'
 
 export const viridianForestBattles: BattleConfig[] = [
+  {
+    id: 'samurai-showdown',
+    trainerClassId: 'black-belt',
+    trainerName: 'Samurai',
+    name: 'Samurai Showdown',
+    description: 'This may take a while…',
+    category: 'Kanto',
+    subCategory: 'Viridian Forest',
+    icon: { type: 'trainer', id: 'black-belt' },
+    background: '/backgrounds/forest.avif',
+    title: 'Samurai Showdown',
+    maxPokemon: 1,
+    levelCap: 20,
+    enemyAttackTelegraphChance: 30,
+    requirements: [
+      { type: 'task_completed', targetId: 'battle-hardened' },
+      {
+        type: 'battle_result',
+        targetId: 'samurai-showdown',
+        battleStatus: 'win',
+        count: 1,
+        inverse: true,
+      },
+    ],
+    criteria: [
+      {
+        type: 'battle_team',
+        battleTeamCheck: {
+          position: 1,
+          speciesId: 11,
+          formId: '11',
+        },
+      },
+    ],
+    enemyTeam: [{ speciesId: 11, level: 20, formId: '11' }],
+    rewards: [
+      {
+        type: 'icon',
+        targetId: 'metapod',
+        quantity: 1,
+        dropChance: 100,
+      },
+    ],
+  },
   // The Buggy 4 Battles
   {
     id: 'buggy-4-battle-1',

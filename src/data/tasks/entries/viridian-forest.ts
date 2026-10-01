@@ -34,6 +34,58 @@ export const viridianForestTasks: Task[] = [
     },
   },
   {
+    id: 'battle-hardened',
+    name: 'Battle Hardened',
+    description: 'Oh a Trainer is approaching… Wait is that a sword?!',
+    category: 'Kanto',
+    subCategory: 'Viridian Forest',
+    icon: { type: 'trainer', id: 'black-belt' },
+    background: '/backgrounds/forest.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Hello!',
+    requirements: [
+      {
+        type: 'pokemon_owned',
+        count: 1,
+        pokemonCriteria: {
+          speciesId: 11,
+          formId: '11',
+          partner: true,
+        },
+      },
+    ],
+    criteria: [
+      {
+        type: 'battle_team',
+        battleTeamCheck: {
+          position: 1,
+          speciesId: 11,
+          formId: '11',
+        },
+      },
+    ],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        title: 'Samurai',
+        message: 'Ahh I see you too are a veteran of the pod?',
+        background: '/backgrounds/forest.avif',
+        icon: { type: 'trainer', id: 'black-belt' },
+        buttons: [{ text: 'A what?', type: 'success' }],
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/forest.avif',
+      title: 'Samurai',
+      message: 'Play coy all you want, I accept your challenge!',
+      closeButtonText: 'Face the Samurai',
+      icon: { type: 'trainer', id: 'black-belt' },
+    },
+  },
+  {
     id: 'evolution-catalyst-tutorial',
     name: 'A Little Help Growing',
     description:
