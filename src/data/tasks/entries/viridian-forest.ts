@@ -5,6 +5,102 @@ const JUNGLE_SET_UNIQUE_CARD_COUNT = 64
 
 export const viridianForestTasks: Task[] = [
   {
+    id: 'tree-top-tyke',
+    name: 'Tree Top Tyke',
+    description: 'This small child seems to have very big dreams!',
+    category: 'Kanto',
+    subCategory: 'Viridian Forest',
+    icon: { type: 'trainer', id: 'poke-kid' },
+    background: '/backgrounds/forest.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Talk to the Kid',
+    chat: true,
+    requirements: [],
+    criteria: [],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        title: 'Poke Kid',
+        message:
+          'Hey, mister, can you help me? I really, really want to get to the top of that tree so I can see all of Viridian Forest, but it’s so high up!',
+        buttons: [{ text: 'How can I help?', type: 'navigate', id: 2 }],
+        background: '/backgrounds/forest.avif',
+        icon: { type: 'trainer', id: 'poke-kid' },
+      },
+      {
+        id: 2,
+        title: 'Poke Kid',
+        message:
+          'So you will help! Yay! If we get lots of wood and ropes, we can build a tree house right at the top. Then I’ll be able to climb up whenever I want!',
+        buttons: [{ text: 'Sounds dangerous.', type: 'success' }],
+        background: '/backgrounds/forest.avif',
+        icon: { type: 'trainer', id: 'poke-kid' },
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/forest.avif',
+      title: 'Tree Top Tyke',
+      icon: { type: 'trainer', id: 'poke-kid' },
+      message:
+        'Against my better judgement, I’m going to build a tree house fifty feet in the air for this small child. It’s good to do nice things.',
+      closeButtonText: 'Get Building',
+    },
+  },
+  {
+    id: 'tree-top-tyke-build',
+    name: '50ft Up in the Forest',
+    description:
+      'How hard can this be? A few materials, a hammer, and I’ll have this done in no time!',
+    category: 'Kanto',
+    subCategory: 'Viridian Forest',
+    icon: { type: 'trainer', id: 'poke-kid' },
+    background: '/backgrounds/forest.avif',
+    repeatable: false,
+    secret: false,
+    completionTrigger: 'manual',
+    completeButtonText: 'Build the Tree House',
+    chat: true,
+    requirements: [{ type: 'task_completed', targetId: 'tree-top-tyke' }],
+    criteria: [
+      {
+        type: 'item_owned',
+        targetId: 'wood-scraps-t1',
+        count: 200,
+        consume: true,
+      },
+      {
+        type: 'item_owned',
+        targetId: 'escape-rope',
+        count: 25,
+        consume: true,
+      },
+      { type: 'skill_level', targetId: 'artisan', count: 30 },
+    ],
+    rewards: [],
+    enterModal: [
+      {
+        id: 1,
+        title: 'Poke Kid',
+        message:
+          'Yay, thanks so much, mister! Now I can see every single part of the forest! My daddy said it was way too dangerous, so I’m glad you helped!',
+        buttons: [{ text: 'Erm…', type: 'success' }],
+        background: '/backgrounds/forest.avif',
+        icon: { type: 'trainer', id: 'poke-kid' },
+      },
+    ],
+    exitModal: {
+      background: '/backgrounds/forest.avif',
+      title: 'A New View',
+      icon: { type: 'pokemon', id: '123' },
+      message:
+        'Wow, it’s quite the view up here! Wait, what’s that over there? I’ve not seen those Pokémon around here before. I should investigate!',
+      closeButtonText: 'Take a Closer Look',
+    },
+  },
+  {
     name: 'The Bug Maniac!',
     description: 'You found a strange man obsessed with bugs...',
     category: 'Kanto',
