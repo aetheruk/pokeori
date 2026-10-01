@@ -52,6 +52,22 @@ export const viridianForestLocations: Location[] = [
         chance: 10,
       },
       {
+        speciesId: 127,
+        formId: '127',
+        chance: 1,
+        requirements: [
+          { type: 'task_completed', targetId: 'tree-top-tyke-build' },
+        ],
+      },
+      {
+        speciesId: 123,
+        formId: '123',
+        chance: 1,
+        requirements: [
+          { type: 'task_completed', targetId: 'tree-top-tyke-build' },
+        ],
+      },
+      {
         speciesId: 12,
         formId: '12',
         chance: 5,

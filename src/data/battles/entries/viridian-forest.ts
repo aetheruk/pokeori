@@ -417,6 +417,22 @@ export const viridianForestBattles: BattleConfig[] = [
       { speciesId: 14, level: { min: 3, max: 6 } }, // Kakuna
       { speciesId: 25, level: { min: 3, max: 6 } }, // Pikachu
       {
+        speciesId: 127,
+        level: { min: 3, max: 6 },
+        formId: '127',
+        requirements: [
+          { type: 'task_completed', targetId: 'tree-top-tyke-build' },
+        ],
+      }, // Pinsir
+      {
+        speciesId: 123,
+        level: { min: 3, max: 6 },
+        formId: '123',
+        requirements: [
+          { type: 'task_completed', targetId: 'tree-top-tyke-build' },
+        ],
+      }, // Scyther
+      {
         speciesId: 12,
         level: { min: 3, max: 6 },
         formId: '12',

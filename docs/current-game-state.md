@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased: Viridian Forest's `tree-top-tyke` conversation starts immediately and leads to `tree-top-tyke-build`, which consumes 200 `wood-scraps-t1` and 25 Escape Ropes at Artisan 30. Finishing the tree house unlocks Pinsir and Scyther in both forest catches and wild battles.
 - Unreleased: Pewter City's `pewter-bickering-kids` conversation unlocks after `explore-pewter`. The player overhears two kids arguing about a strange purple Rattata and earns 100 Explorer XP.
 - Unreleased: The `abandoned-gym` task in Viridian City can now be completed by calling out inside. This unlocks `the-lost-leader`, where a local explains Giovanni’s long absence; completing the conversation awards 150 Explorer XP.
 - Unreleased: Pidgey's “Shares species name with?” quiz question uses Pidgeotto instead of Spearow as a distractor, leaving Natu as the only Tiny Bird answer.
@@ -688,6 +689,7 @@ Viridian Forest contains the next exploration segment and side progression.
 
 Main beats:
 
+- `tree-top-tyke` introduces a Poke Kid who wants a tree house in the canopy. Completing `tree-top-tyke-build` consumes 200 `wood-scraps-t1` and 25 Escape Ropes, requires Artisan level 30, and unlocks Pinsir and Scyther in Viridian Forest catch and wild battle pools.
 - Forest encounters and trainer battles move the player toward the exit.
 - Viridian Forest catch, battle, and field observation no longer drop TMs.
 - `bug-maniac-discovery` is a secret task discovered from the main Viridian Forest catch entry at 14%.
