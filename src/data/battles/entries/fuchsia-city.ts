@@ -681,7 +681,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
       { speciesId: 17, formId: '17', level: 28 },
     ],
     rewards: [],
-    disableRewards: true,
     maxPokemon: 2,
   },
   {
@@ -712,7 +711,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
       { speciesId: 22, formId: '22', level: 26 },
     ],
     rewards: [],
-    disableRewards: true,
     maxPokemon: 2,
   },
   {
@@ -742,7 +740,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
       { speciesId: 22, formId: '22', level: 28 },
     ],
     rewards: [],
-    disableRewards: true,
     maxPokemon: 2,
   },
   {
@@ -771,7 +768,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
       { speciesId: 22, formId: '22', level: 29 },
     ],
     rewards: [],
-    disableRewards: true,
     maxPokemon: 2,
   },
   {
@@ -800,7 +796,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
       { speciesId: 22, formId: '22', level: 29 },
     ],
     rewards: [],
-    disableRewards: true,
     maxPokemon: 2,
   },
   {
@@ -829,7 +824,6 @@ export const fuchsiaCityBattles: BattleConfig[] = [
       { speciesId: 17, formId: '17', level: 31 },
     ],
     rewards: [],
-    disableRewards: true,
     maxPokemon: 2,
   },
   // Junkyard Crew
