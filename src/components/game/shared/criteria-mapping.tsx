@@ -281,7 +281,7 @@ export function mapCriteriaToDisplayItem(
         ? condition.targetId[0]
         : condition.targetId?.toString() || ''
       const item = items.find((i) => i.id === itemId)
-      const verb = condition.consume ? 'Spend' : 'Have'
+      const verb = condition.consume ? 'Hand Over' : 'Own'
       return {
         icon: itemId ? (
           <ItemSprite
@@ -309,14 +309,14 @@ export function mapCriteriaToDisplayItem(
         ) : (
           <div className="w-5 h-5 rounded-full bg-game-ochre" />
         ),
-        label: `${condition.consume ? 'Pay' : 'Have'} ${countLabel(count)}${currency?.name || condition.targetId || 'Currency'}`,
+        label: `${condition.consume ? 'Hand Over' : 'Own'} ${countLabel(count)}${currency?.name || condition.targetId || 'Currency'}`,
         subLabel: 'Funds Required',
       }
     }
     case 'pokemon_owned': {
       const traitLabel = getPokemonTraitLabel(condition.pokemonCriteria)
       const originLabel = getPokemonOriginLabel(condition.pokemonCriteria)
-      const verb = condition.consume ? 'Trade' : 'Have'
+      const verb = condition.consume ? 'Trade' : 'Own'
       // 1. Check for specific species requirement
       if (condition.pokemonCriteria?.speciesId || condition.targetId) {
         const speciesId =

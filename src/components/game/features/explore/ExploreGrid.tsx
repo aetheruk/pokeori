@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { memo, useMemo, type ReactNode } from 'react'
 import {
   getLocationCardGroupName,
+  isGymChallengeExploreItem,
   isLocationCardMode,
 } from './grouping'
 
@@ -50,6 +51,7 @@ function ExploreGridComponent({
       chat: 'Conversations',
       location: 'Locations',
       battle: 'Trainer Battles',
+      'gym-challenge': 'Gym Challenges',
       game: 'Mini Games',
       guild: 'Guilds',
       shop: 'Shops',
@@ -67,6 +69,7 @@ function ExploreGridComponent({
       'chat',
       'task',
       'location',
+      'gym-challenge',
       'battle',
       'game',
       'guild',
@@ -98,6 +101,9 @@ function ExploreGridComponent({
       }
       if (item.type === 'expedition' && (item.originalData as any).chronicle) {
         groupType = 'chronicle'
+      }
+      if (isGymChallengeExploreItem(item)) {
+        groupType = 'gym-challenge'
       }
       if (!groups[groupType]) groups[groupType] = []
       groups[groupType]!.push(item)
@@ -339,7 +345,13 @@ function ExploreGridComponent({
             )}
           >
             {!takeoverStyle && (
-              <SectionDivider textColor="text-game-moss-strong">
+              <SectionDivider
+                textColor={
+                  type === 'gym-challenge'
+                    ? 'text-game-battle-orange-strong'
+                    : 'text-game-moss-strong'
+                }
+              >
                 {typeDisplayNames[type]}
               </SectionDivider>
             )}

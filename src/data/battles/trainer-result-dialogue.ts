@@ -10,9 +10,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'I thought my little battlers had one more trick in them. Never mind, we’ll learn from this and try again.',
     ],
     loss: [
-      'Wow, your team is strong! I’m going to tell everyone on the route about that battle.',
-      'That was amazing! My Pokémon learned loads just by facing a trainer like you.',
-      'A clean win! I’ll keep working with my team until we can give you an even better match.',
+      'That was a good match, but my little battlers held their ground. I’ll tell everyone on the route how hard you made us work.',
+      'My Pokémon kept their nerve when it counted. You’ll have to bring an even trickier plan next time!',
+      'We held on for the win! Keep practising out there, and we’ll see if you can turn the tables next time.',
     ],
   },
   youngster: {
@@ -22,9 +22,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'Okay, that was a great battle. I’m still going to tell everyone I almost won, though.',
     ],
     loss: [
-      'That was brilliant! I knew my Pokémon would learn something by taking on a real challenge.',
-      'You’re really good! I’m going to practise with my team and challenge you again someday.',
-      'What a battle! I can’t wait to tell my friends how strong your Pokémon are.',
+      'Yes! My Pokémon came through! Maybe next time you’ll make me sweat a little more.',
+      'That was close, but I got you this time! I’m going to train even harder before our rematch.',
+      'I won! I can’t wait to tell my friends about that battle. You gave me a real challenge!',
     ],
   },
   lass: {
@@ -34,9 +34,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'That was a lovely battle, even if the result wasn’t what I wanted. We’ll practise and try again.',
     ],
     loss: [
-      'What a lovely battle! Your Pokémon and mine both gave it their all.',
-      'You were wonderful out there. I’ll remember that strategy next time I train.',
-      'A beautiful win! I’m proud of my team, and they’ll be even better after this.',
+      'What a lovely battle! My Pokémon held their own, and I’m so proud of them.',
+      'You nearly had us, but my team found its rhythm in time. Let’s battle again sometime.',
+      'A beautiful match, and a win for my team! I hope you’ll come back for a rematch.',
     ],
   },
   camper: {
@@ -46,9 +46,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'That was a tough match! We’ll catch our breath, learn from it, and be ready for the next hike.',
     ],
     loss: [
-      'That was a great match! Nothing beats a day outside with Pokémon and a good challenge.',
-      'You earned that win. I’ll remember your tactics on the next leg of the trail.',
-      'My team had a brilliant time out there. We’ll celebrate with a rest stop and a snack.',
+      'That was a great match, but my team held the trail today. We’ll be ready if you want another go.',
+      'Good effort, but I know these trails better than you know my tactics. Let’s see how you do next time.',
+      'My team had a brilliant time out there, and we came away with the win. Time for a rest stop and a snack!',
     ],
   },
   picnicker: {
@@ -58,9 +58,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'What a surprise! I’ll cheer my team up with a treat and get them ready for next time.',
     ],
     loss: [
-      'What a refreshing battle! My Pokémon deserve an extra treat after keeping up with yours.',
-      'You’ve earned that win. Come by our picnic sometime; I’d love to hear how your journey is going.',
-      'That was such fun! A good battle makes even the walk home feel shorter.',
+      'What a refreshing battle! My Pokémon earned an extra treat for pulling through.',
+      'You put up quite a fight, but this picnic belongs to my team today. Come by again sometime!',
+      'That was such fun! A good battle makes even the walk home feel shorter, especially after a win.',
     ],
   },
   picknicker: {
@@ -69,8 +69,8 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'You’ve won this round. I suppose my Pokémon and I should take a little break and rethink our strategy.',
     ],
     loss: [
-      'What a refreshing battle! My Pokémon deserve an extra treat after keeping up with yours.',
-      'That was such fun! A good battle makes even the walk home feel shorter.',
+      'What a refreshing battle! My Pokémon earned an extra treat for pulling through.',
+      'That was such fun! A good battle makes even the walk home feel shorter, especially after a win.',
     ],
   },
   hiker: {
@@ -80,9 +80,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'That was a solid battle. My Pokémon and I will keep climbing until we’re ready for you next time.',
     ],
     loss: [
-      'Good footing and good tactics. You’ve earned the path ahead, trainer.',
-      'That was a proper mountain battle! My team can rest easy knowing we gave it everything.',
-      'You’ve got a steady hand in a fight. I’ll remember that as I carry on up the trail.',
+      'Good footing and good tactics from my team. The path is ours today, trainer.',
+      'That was a proper mountain battle! We gave it everything, and it paid off.',
+      'You’ve got a steady hand in a fight, but my team knows this mountain. Come back after more training.',
     ],
   },
   'rocket-grunt': {
@@ -92,9 +92,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'You think this changes anything? We got what we came for. Move along before you make things worse for yourself.',
     ],
     loss: [
-      'You got lucky. Team Rocket has bigger things to worry about than one trainer getting in the way.',
-      'Fine, you win this round. Don’t mistake that for the end of our business here.',
-      'The boss said not to waste time, and I’ve wasted enough. You haven’t seen the last of us.',
+      'That’s more like it. Stay out of Team Rocket’s way next time, or you’ll regret it.',
+      'You’re no match for Team Rocket. Now keep moving before I change my mind about letting you go.',
+      'The boss said not to waste time, and this is over. You haven’t seen the last of us.',
     ],
   },
   fisherman: {
@@ -104,9 +104,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'A strong current can turn a fight in a blink. I’ll remember that next time I cast a challenge.',
     ],
     loss: [
-      'Now that was a catch of a battle! My Pokémon fought like champions out there.',
-      'You’ve landed a fine win. I’ll tell the other anglers about your team.',
-      'That was worth getting up early for. My Pokémon and I enjoyed every turn.',
+      'Now that was a battle worth getting up early for! My Pokémon reeled in the win.',
+      'You fought hard, but my team landed the catch today. I’ll tell the other anglers about it.',
+      'My Pokémon and I enjoyed every turn, especially the last one. That’s a fine win!',
     ],
   },
   'bird-keeper': {
@@ -116,9 +116,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'That was a hard landing, but my Pokémon are all right. We’ll fly again soon.',
     ],
     loss: [
-      'A fine flight from your team! My Pokémon gave you a worthy chase.',
-      'You read the wind perfectly. I’ll remember that battle the next time we take off.',
-      'My flock couldn’t keep pace today, but they loved the challenge. Safe travels!',
+      'My flock took the lead and held it. You gave us a worthy chase, though!',
+      'The wind was with my team today. I’ll remember this flight next time we take off.',
+      'My flock held pace and took the win. Safe travels, trainer!',
     ],
   },
   pokemaniac: {
@@ -128,9 +128,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'I was so busy admiring your team that I missed my opening. A valuable lesson for next time!',
     ],
     loss: [
-      'Remarkable! Your team showed exactly why Pokémon battles never get old.',
-      'That was a rare treat. I’ll be talking about this match for weeks.',
-      'A decisive win, and a fascinating one. I hope you don’t mind if I make a few notes.',
+      'Remarkable! My observations paid off, and my team secured the win. A fascinating result indeed.',
+      'That was a rare treat. My Pokémon and I will be talking about this match for weeks.',
+      'A decisive result for my team, and a fascinating one. I hope you don’t mind if I make a few notes.',
     ],
   },
   'super-nerd': {
@@ -140,9 +140,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'A defeat, then. I’ll review every turn and identify precisely where the experiment went wrong.',
     ],
     loss: [
-      'An excellent result. Your decisions were consistent, efficient, and rather difficult to counter.',
-      'The data supports the obvious conclusion: your team was better prepared. Nicely done.',
-      'A compelling battle. I may have to update my entire theory of what makes a good trainer.',
+      'An excellent result. My decisions were consistent, efficient, and difficult to counter.',
+      'The data supports the obvious conclusion: my team was better prepared. A useful confirmation.',
+      'A compelling battle. I may have to update my theory of what makes a good trainer, but the result stands.',
     ],
   },
   gamer: {
@@ -152,9 +152,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'You win this round. I’ll study the odds, tune up my team, and come back for a rematch.',
     ],
     loss: [
-      'Jackpot! That battle had everything. I knew my team had a winning hand.',
+      'Jackpot! That battle had everything. My team had the winning hand all along.',
       'A clean win! Sometimes the best bet is trusting your Pokémon.',
-      'What a finish! I’m calling that a lucky streak, but my team did the hard work.',
+      'What a finish! Call it a lucky streak if you like; my team did the hard work.',
     ],
   },
   biker: {
@@ -164,9 +164,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'Fine, you’ve got the road this time. My team and I aren’t done riding yet.',
     ],
     loss: [
-      'Now that’s how you take a corner! Your team can keep up with the fastest riders.',
-      'A clean finish. My Pokémon loved a good race, even if they came in second.',
-      'You’ve earned the road ahead. Ride safe, and give your team a breather.',
+      'Now that’s how you take a corner! My team left yours in the dust.',
+      'A clean finish. My Pokémon loved a good race, especially one we won.',
+      'The road ahead is ours today. Ride safe, and give your team a breather.',
     ],
   },
   sailor: {
@@ -176,9 +176,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'You’ve taken this round. I’ll keep my crew practising before the next port.',
     ],
     loss: [
-      'Steady as she goes! Your team fought a fine battle, and mine held its course.',
-      'That was a good voyage of a match. You’ve earned safe passage, trainer.',
-      'A strong finish! My Pokémon and I will remember this one when we’re back at sea.',
+      'Steady as she goes! My team held its course and brought us safely to a win.',
+      'That was a fine voyage of a match. My crew earned safe passage today, trainer.',
+      'A strong finish! My Pokémon and I will remember this victory when we’re back at sea.',
     ],
   },
   swimmer: {
@@ -188,9 +188,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'A strong current pulled that match your way. I’ll train and try again after a swim.',
     ],
     loss: [
-      'That was a splash of a battle! Your Pokémon kept a cool head in the water.',
-      'You earned that win. My team and I will do another lap before we call it a day.',
-      'What a finish! I’ll remember your tactics next time we meet by the shore.',
+      'That was a splash of a battle! My Pokémon kept a cool head in the water and brought us the win.',
+      'A strong finish and a win for my team! We’ll do another lap before we call it a day.',
+      'What a finish! I’ll remember this win next time we meet by the shore.',
     ],
   },
   beauty: {
@@ -200,9 +200,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'You’ve won today. My Pokémon are still wonderful, and we’ll come back stronger.',
     ],
     loss: [
-      'What a beautiful performance from your team! Mine were thrilled to be part of it.',
-      'You won with real poise. My Pokémon and I will remember the match fondly.',
-      'An elegant victory. I’ll give my team a little praise before we practise again.',
+      'What a beautiful performance from my team! We kept our poise right to the end.',
+      'My Pokémon and I will remember that elegant victory fondly.',
+      'An elegant victory for us. I’ll give my team a little praise before we practise again.',
     ],
   },
   gentleman: {
@@ -212,9 +212,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'A most irritatingly well-fought battle. You have my respect, though I reserve the right to grumble.',
     ],
     loss: [
-      'An admirable performance. You may proceed, though I trust you’ll remember that good manners still matter.',
-      'Quite right. My team and I were clearly outmatched. Do try not to let it go to your head.',
-      'Well played. I had hoped to make a stronger impression, but one must acknowledge a sound victory.',
+      'An admirable effort, but I must ask you to try again another day. My team has won this bout.',
+      'A spirited challenge, but my team and I were prepared. Do try not to let the result go to your head.',
+      'Well played, though the victory is mine. One must acknowledge a sound contest.',
     ],
   },
   channeler: {
@@ -224,9 +224,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'You have broken my focus without breaking my composure. I will return to my prayers and prepare again.',
     ],
     loss: [
-      'Your Pokémon carry a calm and steady spirit. This victory was earned with care.',
-      'The tower has witnessed many battles, but your kindness to your team is what I will remember.',
-      'A peaceful heart can still be a powerful one. You have shown me that today.',
+      'Your Pokémon carry a calm and steady spirit, but my team’s resolve carried the day.',
+      'The tower has witnessed many battles, and today my team emerged victorious.',
+      'A peaceful heart can still be a powerful one. My Pokémon have shown me that today.',
     ],
   },
   'pokefan-m': {
@@ -236,9 +236,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'You’ve won, but I’m already planning what my Pokémon and I will try next.',
     ],
     loss: [
-      'Amazing! You and your Pokémon make a terrific team. I’ll tell the Fan Club all about this battle.',
+      'Amazing! My Pokémon and I make a terrific team. I’ll tell the Fan Club all about our win.',
       'What a match! My Pokémon had the best time showing you what they can do.',
-      'A lovely victory. You clearly adore your Pokémon as much as I adore mine.',
+      'A lovely victory for my team. You clearly adore your Pokémon as much as I adore mine.',
     ],
   },
   'pokefan-f': {
@@ -248,9 +248,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'A close match! We’ll come back stronger, and just as adorable.',
     ],
     loss: [
-      'That was lovely! Your Pokémon are wonderful, and it’s clear they trust you completely.',
-      'My Pokémon and I enjoyed that so much. You must tell me how you trained such a close-knit team.',
-      'A beautiful win. I’ll be cheering for you and your Pokémon on the rest of your journey.',
+      'That was lovely! My Pokémon are wonderful, and it’s clear they trust me completely.',
+      'My Pokémon and I enjoyed that so much. You must tell me how you trained your team after a rematch.',
+      'A beautiful win for us. I’ll still be cheering for you and your Pokémon on the rest of your journey.',
     ],
   },
   'poke-kid': {
@@ -260,9 +260,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'You’re strong! I’m not giving up, though. My Pokémon and I are going to get even better!',
     ],
     loss: [
-      'Wow! Your Pokémon are amazing! I’m going to train until my team can battle just like yours.',
-      'That was the best battle ever! Can we do it again after I practise a little more?',
-      'You won! My Pokémon had so much fun. I can’t wait to tell everyone about your team.',
+      'Wow! My Pokémon are amazing! We won! I’m going to train even harder before we battle again.',
+      'That was the best battle ever! Can we do it again after you practise a little more?',
+      'I won! My Pokémon had so much fun. I can’t wait to tell everyone about our battle.',
     ],
   },
   twins: {
@@ -272,9 +272,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'That was fun! We’re going to work out where we went wrong on the walk home.',
     ],
     loss: [
-      'That was great! We both learned something, and our Pokémon had a wonderful time.',
-      'You won fair and square. We’ll tell everyone about your clever strategy!',
-      'What a match! We’ll practise our teamwork and see you again sometime.',
+      'That was great! We learned something, and our Pokémon had a wonderful time winning together.',
+      'We won fair and square. We’ll tell everyone about our teamwork!',
+      'What a match! We’ll practise our teamwork and see if you can beat us next time.',
     ],
   },
   'old-couple': {
@@ -283,8 +283,8 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'A fine match, young trainer. We’ll have to practise before our next stroll.',
     ],
     loss: [
-      'Well done, dear. You’ve given these old Pokémon trainers something to smile about.',
-      'That was a lovely battle. We may be slower these days, but we still enjoy a good match.',
+      'Well done, dear. We’ve still got a little spark left in these old trainers!',
+      'That was a lovely battle. We may be slower these days, but we can still win a good match.',
     ],
   },
   engineer: {
@@ -294,9 +294,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'That result wasn’t in the design. I’ll find the fault and bring a better team next time.',
     ],
     loss: [
-      'Test complete: your team performed brilliantly. I’ll have to improve my own design.',
-      'A clean result. Your Pokémon adapted faster than anything I had on the board.',
-      'Impressive work. I’m taking your battle plan back to the workshop for study.',
+      'Test complete: my team performed brilliantly. I’ll record the successful setup at the workshop.',
+      'A clean result. My Pokémon adapted faster than anything you had on the board.',
+      'Impressive work from my team. I’m taking your battle plan back to the workshop for study before our rematch.',
     ],
   },
   'expert-f': {
@@ -306,9 +306,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'I accept the result. There is always more to learn, and today you were the teacher.',
     ],
     loss: [
-      'You’ve earned this victory. Keep sharpening your instincts; they’ll carry you far.',
-      'A thoughtful battle. Your Pokémon are fortunate to have a trainer who listens to them.',
-      'Well fought. I hope you carry this confidence into the challenges ahead.',
+      'A worthy challenge, but my experience carried the day. Keep sharpening your instincts and come back stronger.',
+      'A thoughtful battle. My Pokémon responded well to every instruction.',
+      'Well fought. I hope you learn from this match and carry that resolve into the challenges ahead.',
     ],
   },
   detective: {
@@ -317,8 +317,8 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'You had the better alibi for every turn. Case closed for today, trainer.',
     ],
     loss: [
-      'A decisive result. I’ll have to revise my theory about your team.',
-      'You’ve proved your case. I’ll be keeping an eye on your progress, trainer.',
+      'A decisive result for my team. I’ll have to revise my theory about your strategy.',
+      'Case closed in my favour. I’ll be keeping an eye on your progress, trainer.',
     ],
   },
   rival: {
@@ -340,9 +340,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'That was a tough lesson in trust. We’ll keep at it until we move as one.',
     ],
     loss: [
-      'That was teamwork at its best. Your Pokémon trust you, and it showed in every turn.',
-      'A fine match! My team and I enjoyed testing our bond against yours.',
-      'You’ve earned that win together. Keep looking after your Pokémon, trainer.',
+      'That was teamwork at its best. My Pokémon trust me, and it showed in every turn.',
+      'A fine match! My team and I enjoyed testing our bond, and it carried us through.',
+      'We earned that win together. Keep looking after your Pokémon, trainer, and we’ll meet again.',
     ],
   },
   juggler: {
@@ -352,9 +352,9 @@ const CLASS_DIALOGUE: Record<string, DialoguePair> = {
       'That was quite a tumble. My Pokémon and I will rehearse and try again.',
     ],
     loss: [
-      'And that’s the show! Your team kept the audience on its toes right to the end.',
+      'And that’s the show! My team kept the audience on its toes right to the end.',
       'What a performance! I couldn’t have choreographed a better finish myself.',
-      'You stole the spotlight, trainer. My Pokémon and I loved every minute of it.',
+      'We took the spotlight, trainer. My Pokémon and I loved every minute of it.',
     ],
   },
   'chronicle-mara': {

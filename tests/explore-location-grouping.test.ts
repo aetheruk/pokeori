@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { expeditions } from '@/data/expeditions'
 import {
   getLocationCardGroupName,
+  isGymChallengeExploreItem,
   isLocationCardMode,
 } from '@/components/game/features/explore/grouping'
 import type { ExploreItem } from '@/components/game/features/explore/types'
@@ -43,5 +44,37 @@ describe('Explore location-card grouping', () => {
     expect(getLocationCardGroupName(item)).toBe(
       'Safari Zone Grand Expedition',
     )
+  })
+
+  test('groups Gym battles and Gym-named tasks apart from regular trainers', () => {
+    const gymTrainer = {
+      id: 'cerulean-gym-swimmer',
+      name: 'Gym Trainer Luis',
+      type: 'battle',
+      originalData: { title: 'Gym Trainer', trainerClassId: 'swimmer' },
+    } as ExploreItem
+    const gymLeader = {
+      id: 'leader-battle',
+      name: 'Gym Leader',
+      type: 'battle',
+      originalData: { trainerClassId: 'gym-leader' },
+    } as ExploreItem
+    const gymTask = {
+      id: 'cerulean-gym-trial',
+      name: 'Gym Trial',
+      type: 'task',
+      originalData: {},
+    } as ExploreItem
+    const regularTrainer = {
+      id: 'route-swimmer',
+      name: 'Swimmer Luis',
+      type: 'battle',
+      originalData: { trainerClassId: 'swimmer' },
+    } as ExploreItem
+
+    expect(isGymChallengeExploreItem(gymTrainer)).toBe(true)
+    expect(isGymChallengeExploreItem(gymLeader)).toBe(true)
+    expect(isGymChallengeExploreItem(gymTask)).toBe(true)
+    expect(isGymChallengeExploreItem(regularTrainer)).toBe(false)
   })
 })
