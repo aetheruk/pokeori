@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 1780)
-Total output lines: 157
-
 {
   "name": "pokeori",
   "version": "0.43.52",
@@ -40,7 +37,22 @@ Total output lines: 157
     "generate:item-sprite-index": "bun scripts/generate-item-sprite-index.ts",
     "migrate:user-state": "bun scripts/migrate-user-state-collections.ts",
     "migrate:game-activity-domains": "bun scripts/migrate-game-activity-domains.ts",
-    "migrate:performance-inde…280 tokens truncated…
+    "migrate:performance-indexes": "bun scripts/migrate-performance-indexes.ts",
+    "migrate:pokemon-experience": "bun scripts/migrate-pokemon-experience.ts",
+    "migrate:fuchsia-guild": "bun scripts/run-fuchsia-guild-migration.ts",
+    "migrate:fuchsia-institute-v2": "bun scripts/run-fuchsia-institute-balance-v2.ts",
+    "migrate:underground-society": "bun scripts/run-underground-society-migration.ts",
+    "sync:tcg-sprites": "bun scripts/sync-tcg-set-sprites.mjs",
+    "fetch:pokemon": "bun scripts/fetch-pokemon-data.mjs",
+    "generate:pokemon": "bun scripts/generate-pokemon-modules.mjs",
+    "generate:evolutions": "bun scripts/generate-evolutions.mjs",
+    "generate:mega-stones": "bun scripts/generate-mega-stones.mjs",
+    "sync:pokemon-sprites": "bun scripts/sync-pokemon-sprites.mjs",
+    "sync:item-sprites": "bun scripts/sync-item-sprites.mjs",
+    "download:sprites": "bun scripts/sync-pokemon-sprites.mjs",
+    "generate:data": "bun scripts/generate-data-entries.mjs",
+    "generate:quizzes": "bun scripts/generate-quizzes.ts --start=256 --limit=10000",
+    "review:chronicles": "bun scripts/preview-gym-leader-chronicles.ts",
     "clone:sprites": "bun scripts/sync-pokemon-sprites.mjs --prepare-source-only",
     "moves:assign-recommended-forms": "bun scripts/assign-tm-recommended-form-ids.ts"
   },
