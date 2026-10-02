@@ -159,6 +159,8 @@ const mtMoonExploreLocations: Location[] = [
         type: 'task_completed',
         targetId: 'mt-moon-wall-weakness',
       },
+    ],
+    criteria: [
       {
         type: 'skill_level',
         targetId: 'catching',

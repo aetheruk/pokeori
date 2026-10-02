@@ -216,6 +216,10 @@ export interface BattleConfig {
   rivalLevel?: number
   trainerClassId?: TrainerClassId
   trainerName?: string
+  /** Optional authored dialogue shown on the result screen after a win. */
+  winMessage?: string
+  /** Optional authored dialogue shown on the result screen after a loss. */
+  loseMessage?: string
   name: string
   description: string
   category: string

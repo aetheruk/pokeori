@@ -130,6 +130,13 @@ export function getRewardResultExitModalQueue(
   ]
 }
 
+export function getRewardResultFirstStep(
+  result: GenericResult | null,
+): RewardResultStep {
+  if (getRewardResultExitModalQueue(result).length > 0) return 'exit-modal'
+  return getRewardResultInitialStep(result)
+}
+
 export function shouldShowRewardResultSecondaryAction(
   result: GenericResult | null,
 ): boolean {
@@ -168,7 +175,7 @@ export function RewardResultOverlay({
   // initialization effect updates currentStep.
   const visibleStep = result
     ? currentStep === 'idle'
-      ? getRewardResultInitialStep(result)
+      ? getRewardResultFirstStep(result)
       : currentStep
     : 'idle'
 
@@ -235,7 +242,7 @@ export function RewardResultOverlay({
       setCurrentBreakthrough(breakthroughs[0])
       setResearchBreakthroughs(breakthroughs.slice(1))
     }
-    setCurrentStep(initialStep)
+    setCurrentStep(getRewardResultFirstStep(result))
   }, [result])
 
   // --- Step Handlers ---
@@ -273,7 +280,7 @@ export function RewardResultOverlay({
   }
 
   const handleSummaryReturn = () => {
-    // Summary -> Exit Modal (if any) -> Close
+    // Summary -> Close. Exit dialogue is shown before the reward sequence.
     if (exitModalData) {
       setCurrentStep('exit-modal')
     } else {
@@ -289,7 +296,8 @@ export function RewardResultOverlay({
         setExitModalQueue(remainingModals)
         return
       }
-      handleFinalClose()
+      setExitModalData(null)
+      setCurrentStep(getRewardResultInitialStep(result))
     }
   }
 
@@ -360,8 +368,7 @@ export function RewardResultOverlay({
 
   return (
     <>
-      {/* Keep the Explore page covered for the complete result sequence,
-          including the close/open animation when switching to an exit scene. */}
+      {/* Keep Explore covered for the exit dialogue and complete reward sequence. */}
       <div
         aria-hidden="true"
         className="fixed inset-0 z-[49] bg-game-surface"
