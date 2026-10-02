@@ -311,7 +311,7 @@ export async function attemptAbilityEscape() {
       response = {
         success: true,
         escaped: false,
-        message: `${activeAbility.name} failed to escape.`,
+        message: `Unable to escape using “${activeAbility.name}”.`,
       }
     }
 
