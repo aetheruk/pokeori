@@ -173,7 +173,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/cave.avif',
     icon: { type: 'pokemon', id: '95' },
     description: 'A long tunnel said to be carved out by Onix.',
-    music: '/music/cave.m4a',
+    music: '/music/rock-tunnel.m4a',
     weatherSlots: {
       7: 'fog',
       19: 'sandstorm',
@@ -388,7 +388,7 @@ export const subCategories: Record<string, RegionData> = {
     image: '/backgrounds/digletts-cave.avif',
     icon: { type: 'pokemon', id: '50' },
     description: 'A small cave with rumours it connects to a secret underground area.',
-    music: '/music/cave.m4a',
+    music: '/music/digletts-cave.m4a',
     unlockRequirements: [{ type: 'task_completed', targetId: 'vermilion-rumours' }],
   },
   'Kanto Underground': {

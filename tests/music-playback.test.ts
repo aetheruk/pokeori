@@ -40,6 +40,15 @@ describe('area music', () => {
     expect(existsSync('public/music/viridian.m4a')).toBe(true)
   })
 
+  it('uses separate new recordings for Rock Tunnel and Digletts Cave', () => {
+    expect(subCategories['Rock Tunnel']?.music).toBe('/music/rock-tunnel.m4a')
+    expect(subCategories['Digletts Cave']?.music).toBe(
+      '/music/digletts-cave.m4a',
+    )
+    expect(existsSync('public/music/rock-tunnel.m4a')).toBe(true)
+    expect(existsSync('public/music/digletts-cave.m4a')).toBe(true)
+  })
+
   it('points every authored area track to an existing audio file', () => {
     const missing = Object.entries(subCategories)
       .filter(([, area]) => area.music && !existsSync(`public${area.music}`))

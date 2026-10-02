@@ -36,7 +36,7 @@ describe('battle music resolution', () => {
         trainerName: 'Ariana',
         subCategory: 'Rock Tunnel',
       }),
-    ).toBe('/music/cave.m4a')
+    ).toBe('/music/rock-tunnel.m4a')
   })
 
   it('preserves authored music and then falls back to area music for other trainers', () => {
