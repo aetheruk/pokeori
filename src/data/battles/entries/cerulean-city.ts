@@ -488,6 +488,10 @@ export const ceruleanCityBattles: BattleConfig[] = [
     background: '/backgrounds/cerulean.avif',
     title: 'Nugget Bridge Checkpoint',
     dynamicOpponent: 'rival',
+    winMessage:
+      "All right, you earned the first step. Those five trainers won't care who won here, so keep that focus when you cross. And don't expect me to stay behind for long.",
+    loseMessage:
+      "Misty's badge is proof you can win, not armor. Slow down, check your team, and be ready to switch plans—the five trainers on Nugget Bridge won't give you a second to catch your breath.",
     rivalLevel: 18,
     maxPokemon: 3,
     enemyAttackTelegraphChance: 2,

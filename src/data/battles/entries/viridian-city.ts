@@ -99,6 +99,10 @@ export const viridianCityBattles: BattleConfig[] = [
     background: '/backgrounds/rocky-path.avif',
     title: 'Route 22 Rematch',
     dynamicOpponent: 'rival',
+    winMessage:
+      "That was close. You've started reading my team, so I'll have to change things up. Nugget Bridge is our next checkpoint. Don't get too comfortable in front.",
+    loseMessage:
+      "A point for me this round. Route 22 was a warm-up; Nugget Bridge has five trainers waiting, and they won't give either of us time to regroup. Tune up your team, then meet me there.",
     rivalLevel: 8,
     maxPokemon: 3,
     enemyAttackTelegraphChance: 50,

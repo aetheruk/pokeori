@@ -1,6 +1,6 @@
 'use client'
 
-import { Heart, Loader2, MapIcon, RefreshCw, Trophy } from 'lucide-react'
+import { Heart, Loader2, MapIcon, RefreshCw, Swords, Trophy } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Component,
@@ -45,13 +45,16 @@ import { VSAnimation } from '@/components/game/battles/VSAnimation'
 import { LevelUpModal } from '@/components/game/level-up-modal'
 import { GameResult } from '@/components/game/ResearchResult'
 import { markExpeditionReturn } from '@/components/game/features/explore/expedition-return'
+import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 import { TaskExitDialog } from '@/components/game/task-exit-dialog'
+import { SectionDivider } from '@/components/ui/section-divider'
 import { useUser } from '@/context/UserContext'
 import { battles } from '@/data/battles'
 import { getMove } from '@/data/moves'
 import { tasks } from '@/data/tasks'
 import type { TcgCard } from '@/data/tcg/types'
 import { getIcon } from '@/data/user/icons'
+import { getTrainerBattleResultDialogue } from '@/data/battles/trainer-result-dialogue'
 import { useBattleManager } from '@/utilities/battle/engine/useBattleManager'
 import { needsPlayerLeadSelection } from '@/utilities/battle/switching'
 import type { BattlePowersData } from '../powers/powers-data'
@@ -204,6 +207,20 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
 
     return resultBattleConfig?.icon
   }, [battleState.enemyTrainer?.icon, resultBattleConfig])
+  const trainerResultDialogue = useMemo(
+    () =>
+      getTrainerBattleResultDialogue(
+        resultBattleConfig,
+        battleState.enemyName,
+      ),
+    [battleState.enemyName, resultBattleConfig],
+  )
+  const trainerResultMessage =
+    battleState.status === 'won'
+      ? trainerResultDialogue.winMessage
+      : battleState.status === 'lost'
+        ? trainerResultDialogue.loseMessage
+        : undefined
 
   const { playSfx, playMusic, stopMusic } = useAudio()
 
@@ -1011,6 +1028,26 @@ export function BattleInterface({ initialState }: BattleInterfaceProps) {
             }
             additionalContent={
               <div className="space-y-3">
+                {trainerResultMessage && (
+                  <div>
+                    <SectionDivider>Trainer's Words</SectionDivider>
+                    <div className="flex items-start gap-3 rounded-lg border border-game-card-border bg-game-surface-raised p-4 text-left shadow-sm">
+                      <div className="game-icon-orb game-icon-orb-battle h-12 w-12 shrink-0 border-game-battle-orange/55">
+                        {resultIcon ? (
+                          <TaskIconDisplay
+                            icon={resultIcon}
+                            className="h-10 w-10"
+                          />
+                        ) : (
+                          <Swords className="h-6 w-6" aria-hidden="true" />
+                        )}
+                      </div>
+                      <p className="min-w-0 flex-1 self-center font-medium leading-relaxed text-game-charcoal-strong">
+                        {trainerResultMessage}
+                      </p>
+                    </div>
+                  </div>
+                )}
                 {battleState.pvpRatingChange && (
                   <div className="flex items-center gap-3 rounded-lg border border-game-border bg-game-surface p-4 text-left shadow-sm">
                     <div className="game-icon-orb game-icon-orb-discovery flex h-12 w-12 shrink-0 items-center justify-center border-game-ochre/45 text-game-ochre">

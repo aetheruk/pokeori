@@ -1,13 +1,14 @@
 import { describe, expect, test } from 'bun:test'
 import {
   getRewardResultInitialStep,
+  getRewardResultFirstStep,
   getRewardResultExitModalQueue,
   shouldShowRewardResultSecondaryAction,
   type GenericResult,
 } from '@/components/game/shared/RewardResultOverlay'
 
 describe('reward result exit modal ordering', () => {
-  test('successful chat tasks retain their completion result for the ordered reward flow', async () => {
+  test('chat tasks with exit dialogue keep their direct dialogue flow', async () => {
     const source = await Bun.file(
       'src/components/game/features/explore/hooks/useExploreActions.ts',
     ).text()
@@ -22,9 +23,8 @@ describe('reward result exit modal ordering', () => {
 
     expect(chatFlowStart).toBeGreaterThan(-1)
     expect(completedReplayStart).toBeGreaterThan(chatFlowStart)
-    expect(chatFlow).toContain('setCompletionResult(result)')
-    expect(chatFlow).toContain('setLastCompletedTask(task)')
-    expect(chatFlow).not.toContain('setIsExitModalOpen(true)')
+    expect(chatFlow).toContain('setExitModalData(task.exitModal)')
+    expect(chatFlow).toContain('setIsExitModalOpen(true)')
   })
 
   test('opens currency-only results directly on the summary step', () => {
@@ -91,6 +91,27 @@ describe('reward result exit modal ordering', () => {
         },
       }),
     ).toBe('research-breakthrough')
+  })
+
+  test('shows exit dialogue before level-ups and other reward results', () => {
+    expect(
+      getRewardResultFirstStep({
+        success: true,
+        exitModal: {
+          title: 'A local trainer',
+          message: 'Good battle.',
+          closeButtonText: 'Continue',
+        },
+        rewards: {
+          xp: {},
+          items: [],
+          pokemon: [],
+          currency: [],
+          cards: [],
+          levelUp: { newLevel: 2 },
+        },
+      }),
+    ).toBe('exit-modal')
   })
 
   test('shows the completed task modal before task-complete reward modals', () => {

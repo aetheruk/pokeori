@@ -397,6 +397,10 @@ export const ssAnneBattles: BattleConfig[] = [
     background: ssAnneBackground,
     title: 'Dockside Tune-Up',
     dynamicOpponent: 'rival',
+    winMessage:
+      "You spent the day hauling tools and still came out sharper. Fine, I'll give you that one. The ship's fixed; I'll be on the next road before you can claim a victory lap.",
+    loseMessage:
+      "Long shift? I could see your legs giving out after all that work on deck. Get some rest. I'll be ready when we're both back on solid ground.",
     rivalLevel: 20,
     maxPokemon: 3,
     enemyAttackTelegraphChance: 2,

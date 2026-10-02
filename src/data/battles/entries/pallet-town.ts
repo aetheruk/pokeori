@@ -80,6 +80,10 @@ export const palletTownBattles: BattleConfig[] = [
     background: '/backgrounds/grassy-route.avif',
     title: 'First Lap',
     dynamicOpponent: 'rival',
+    winMessage:
+      "All right, that point is yours. Don't start posing for the trophy, though—Viridian is only the first checkpoint. I'll be there before you know it.",
+    loseMessage:
+      "One point to me. No excuses—there's another match on Route 22. Get your team ready and try to catch up.",
     rivalLevel: 5,
     maxPokemon: 3,
     enemyAttackTelegraphChance: 80,

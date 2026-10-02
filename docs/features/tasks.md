@@ -47,6 +47,7 @@ requirements use a filling circular counter, while completed requirements use a 
 ## Rewards
 
 - Successful task completions grant rewards server-side. Non-expedition tasks marked `chat: true` with an exit scene open that scene directly and skip the reward/results screen; expedition chat steps retain the ordered result flow so their progress is shown. A failed server completion does not show the success scene.
+- For other task result flows, queued exit dialogue appears first; after the player dismisses it, level-ups, card reveals, research breakthroughs, and the reward summary continue in their usual order.
 - When a task has an entry dialogue, it stays visible while completion is processing and closes as the reward result or chat exit dialogue opens. Result and chat exit surfaces cover the Explore cards throughout their transitions.
 - Reward summaries, level-up results, and research breakthroughs fill the viewport. Task enter and exit scenes use the same large scenic hero and icon as result screens, with their narrative text below and the existing choices fixed at the bottom.
 - Gems
