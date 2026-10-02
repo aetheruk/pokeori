@@ -531,7 +531,7 @@ export function CryRecognitionGame({
               </div>
 
               {/* Horizontal Rule */}
-              <hr className="mb-auto" />
+              <hr className="mt-auto mb-6" />
 
               <div className="space-y-6 pb-8">
                 <div className="space-y-4">
@@ -539,7 +539,10 @@ export function CryRecognitionGame({
                     <SelectTrigger className="w-full h-12 text-sm">
                       <SelectValue placeholder="Select a Pokémon..." />
                     </SelectTrigger>
-                    <SelectContent className="max-h-60">
+                    <SelectContent
+                      position="item-aligned"
+                      className="max-h-[min(var(--radix-select-content-available-height),60dvh,24rem)] touch-pan-y overscroll-contain"
+                    >
                       <div className="px-2 py-2">
                         <input
                           value={searchTerm}
