@@ -110,14 +110,6 @@ export const celadonGameCornerShops: ShopConfig[] = [
         rewards: [{ type: 'pokemon', targetId: 122, quantity: 1, dropChance: 100, pokemonData: { formId: '122', level: 20, ballType: 'rocket-ball', background: '/backgrounds/celadon-game-corner-prize-exchange.avif', isShadow: true, rarity: 'shadow' } }],
       },
       {
-        id: 'game-corner-backup-ability-patch',
-        name: 'Backup Ability Patch',
-        description: 'Teaches Porygon the Backup companion ability.',
-        icon: { type: 'item', id: 'ability-patch' },
-        cost: [{ type: 'currency', id: 'fun-tokens', amount: 2000 }],
-        rewards: [{ type: 'item', targetId: 'backup-ability-patch', quantity: 1, dropChance: 100 }],
-      },
-      {
         id: 'game-corner-shadow-lickitung',
         name: 'Shadow Lickitung',
         description: 'A level 20 Shadow Lickitung kept in a Rocket Ball.',

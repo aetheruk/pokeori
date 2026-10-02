@@ -140,12 +140,6 @@ export const vermilionCityExpeditions: ExpeditionConfig[] = [
         dropChance: 100,
       },
       {
-        type: 'item',
-        targetId: 'lightning-rod-ability-patch',
-        quantity: 1,
-        dropChance: 100,
-      },
-      {
         type: 'title',
         targetId: 'lightning-lieutenant',
       },

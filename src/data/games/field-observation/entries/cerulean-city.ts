@@ -59,15 +59,6 @@ export const ceruleanCityFieldObservationEntries: FieldObservationConfig[] = [
         type: 'task_complete',
         targetId: 'route-5-talking-meowth',
         dropChance: 15,
-        secret: true,
-        requirements: [
-          {
-            type: 'field_research_result',
-            targetId: 'route-5-field-observation',
-            battleStatus: 'win',
-            count: 1,
-          },
-        ],
       },
     ],
     settings: {

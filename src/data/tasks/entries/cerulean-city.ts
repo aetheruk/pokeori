@@ -2011,12 +2011,6 @@ export const ceruleanCityTasks: Task[] = [
         dropChance: 100,
       },
       {
-        type: 'item',
-        targetId: 'water-absorb-ability-patch',
-        quantity: 1,
-        dropChance: 100,
-      },
-      {
         type: 'title',
         targetId: 'cascade-caller',
       },
@@ -2351,7 +2345,7 @@ export const ceruleanCityTasks: Task[] = [
     id: 'route-5-talking-meowth',
     name: 'Meowth?',
     description: 'Hey kid, psst. Get yourself over here.',
-    category: 'Kanto',
+    category: 'Secret',
     subCategory: 'Cerulean City',
     background: '/backgrounds/grassy-route.avif',
     icon: {
