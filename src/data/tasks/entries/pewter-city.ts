@@ -1790,12 +1790,6 @@ export const pewterCityTasks: Task[] = [
         dropChance: 100,
       },
       {
-        type: 'item',
-        targetId: 'sturdy-ability-patch',
-        quantity: 1,
-        dropChance: 100,
-      },
-      {
         type: 'title',
         targetId: 'boulder-breaker',
       },

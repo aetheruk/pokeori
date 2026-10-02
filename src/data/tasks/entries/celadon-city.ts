@@ -1029,13 +1029,7 @@ export const celadonCityTasks: Task[] = [
       }
     ],
     "criteria": [],
-    "rewards": [
-      {
-        "type": "item",
-        "targetId": "lets-go-ability-patch",
-        "quantity": 1
-      }
-    ],
+    "rewards": [],
     "enterModal": [
       {
         "id": 1,
@@ -1057,7 +1051,7 @@ export const celadonCityTasks: Task[] = [
       {
         "id": 2,
         "title": "Gentleman",
-        "message": "Oh yes, yes, sorry. You want in? It's simple really: just come back with an Eevee, and you'll fit right in. Here, take this. If you give it to a Pikachu, it will make them much easier to find. And if you need any more, I believe they sell them in Viridian City. I'm surprised you never picked one up earlier. Eevee are quite popular these days.",
+        "message": "Oh yes, yes, sorry. You want in? It's simple really: just come back with an Eevee, and you'll fit right in. If you ever decide to give a Pikachu a Let's Go Ability Patch, it will make Eevee much easier to find. The Poké Mart in Viridian City sells them. I'm surprised you never picked one up earlier. Eevee are quite popular these days.",
         "background": "/backgrounds/celadon-mansion-lounge.avif",
         "icon": {
           "type": "trainer",
@@ -1073,12 +1067,12 @@ export const celadonCityTasks: Task[] = [
     ],
     "exitModal": {
       "background": "/backgrounds/celadon-mansion-lounge.avif",
-      "title": "Let's Go Ability Patch",
-      "message": "The gentleman hands you an Ability Patch. It can teach Pikachu the Let's Go ability. For some reason Eevee are drawn to Pikachu with this ability.",
-      "closeButtonText": "Take Ability Patch",
+      "title": "A Classy Guy",
+      "message": "The gentleman points me toward the Poké Mart in Viridian City if I decide I need a Let's Go Ability Patch.",
+      "closeButtonText": "Thanks for the tip",
       "icon": {
-        "type": "item",
-        "id": "lets-go-ability-patch"
+        "type": "trainer",
+        "id": "gentleman"
       }
     }
   },
