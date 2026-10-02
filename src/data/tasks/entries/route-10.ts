@@ -111,7 +111,7 @@ export const route10Tasks: Task[] = [
         id: 'hiker',
       },
       message:
-        "Now, kid, watch this! BOOOOOM! The hard part is getting them set up juuuuust right. Also, don't get yourself or other Pokemon caught in the blast. I don't want to answer to Nurse Joy or the Kanto Rangers.",
+        "Now, kid, watch this! BOOOOOM! The hard part is getting them set up juuuuust right. Also, don't get yourself or other Pokemon caught in the blast. I don't want to answer to the nurse or the Kanto Rangers.",
       closeButtonText: 'Start Clearing',
     },
   },
