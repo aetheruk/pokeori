@@ -1048,7 +1048,7 @@ export const pewterCityTasks: Task[] = [
         id: 'expert-m',
       },
       message:
-        'The League funds Pokemon Centers with sponsored prize wheels. Nurse Joy calls it preventative care: trainers who win supplies need fewer emergency rescues.',
+        'The League funds Pokemon Centers with sponsored prize wheels. The nurse calls it preventative care: trainers who win supplies need fewer emergency rescues.',
       closeButtonText: 'Finish Center Lesson',
     },
   },
@@ -1564,8 +1564,8 @@ export const pewterCityTasks: Task[] = [
         id: 'hiker',
       },
       message:
-        'Oh you have the Boulder Badge? That proves you are strong enough, I can help you clear this rubble!',
-      closeButtonText: 'Clear Rubble',
+        'Whoa-ho-ho, a big shot with a Boulder Badge! Kid, I’m impressed. As you can see, there’s no landslide. I was just feeling a little devious today. On your way, then.',
+      closeButtonText: 'Weirdo',
     },
     id: 'pewter-roadblock',
   },

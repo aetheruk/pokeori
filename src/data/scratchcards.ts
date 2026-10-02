@@ -244,6 +244,12 @@ export const scratchCards: Record<string, ScratchCardConfig> = {
             targetId: 'mt-moon-expedition-map',
             quantity: 1,
             label: 'Mt. Moon Expedition Map',
+            requirements: [
+              {
+                type: 'task_completed',
+                targetId: 'mt-moon-exit',
+              },
+            ],
           },
         ],
         icon: { type: 'item', id: 'mt-moon-expedition-map' },

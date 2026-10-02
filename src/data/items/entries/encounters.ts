@@ -105,7 +105,7 @@ encounterItems.push({
   category: 'misc',
   spriteId: 'guide-book',
   hueRotate: 80,
-  unique: false,
+  unique: true,
 })
 
 encounterItems.push({

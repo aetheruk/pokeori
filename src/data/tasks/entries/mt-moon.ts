@@ -32,7 +32,7 @@ export const mtMoonTasks: Task[] = [
         id: 1,
         title: 'Mt Moon Pokemon Center',
         message:
-          'The lobby is busier than expected. Hikers are buying Escape Ropes, a few trainers are whispering about fossils, and two people in black uniforms go quiet as soon as Nurse Joy looks their way.',
+          'The lobby is busier than expected. Hikers are buying Escape Ropes, a few trainers are whispering about fossils, and two people in black uniforms go quiet as soon as the nurse looks their way.',
         background: '/backgrounds/pokemon-center.avif',
         icon: {
           type: 'local',
@@ -40,7 +40,7 @@ export const mtMoonTasks: Task[] = [
         },
         buttons: [
           {
-            text: 'Ask Nurse Joy',
+            text: 'Ask the Nurse',
             type: 'navigate',
             id: 2,
           },
@@ -48,9 +48,9 @@ export const mtMoonTasks: Task[] = [
       },
       {
         id: 2,
-        title: 'Nurse Joy',
+        title: 'The Nurse',
         message:
-          'Please be careful in Mt. Moon. Researcher Miguel from Pewter Museum went inside to record the fossil beds, but he has not checked back in. Those suspicious trainers have been asking about dig sites all morning.',
+          'If you’re heading through Mt. Moon, please be careful. We’re at capacity at the moment; there’s been a huge surge of activity and a lot of suspicious characters in the area.',
         background: '/backgrounds/pokemon-center.avif',
         icon: {
           type: 'trainer',
@@ -58,7 +58,7 @@ export const mtMoonTasks: Task[] = [
         },
         buttons: [
           {
-            text: 'Ask About Rocket',
+            text: 'Thanks',
             type: 'navigate',
             id: 3,
           },
@@ -66,9 +66,9 @@ export const mtMoonTasks: Task[] = [
       },
       {
         id: 3,
-        title: 'Nurse Joy',
+        title: 'The Nurse',
         message:
-          'I cannot prove anything, but they were selling scratch cards, bragging about rare Pokemon, and buying supplies with dirty coins. If Miguel found something important, he may need help.',
+          'Team Rocket is nothing but trouble. They’ve practically taken over my Pokémon Center; they’re even selling Scratch Cards.',
         background: '/backgrounds/pokemon-center.avif',
         icon: {
           type: 'trainer',
@@ -90,7 +90,7 @@ export const mtMoonTasks: Task[] = [
         id: '/sprites/center.avif',
       },
       message:
-        'If Team Rocket are really chasing fossils in Mt. Moon, Miguel and the Pewter Museum research could be in trouble.',
+        'Well, this doesn’t sound promising. I should probably try to stay clear of those guys. Then again, I do enjoy gambling…',
       closeButtonText: 'Enter Mt. Moon',
     },
   },
@@ -154,7 +154,7 @@ export const mtMoonTasks: Task[] = [
     id: 'mt-moon-ladder-a',
     name: 'A Ladder to the Next Floor',
     description:
-      'Fresh survey tape has been tied around this ladder. Someone was marking a route toward the fossil beds.',
+      'Someone’s attempted to destroy this ladder but done a very poor job of it.',
     category: 'Kanto',
     subCategory: 'Mt. Moon',
     icon: {
@@ -191,8 +191,8 @@ export const mtMoonTasks: Task[] = [
         id: '/sprites/ladder.avif',
       },
       message:
-        'Empty sample crates are stacked beside the ladder. The labels say Pewter Museum, but the fresh boot prints around them look much less official.',
-      closeButtonText: 'Follow the Trail',
+        'There’s piles of boxes at the bottom of the ladder, I should probably leave them be.',
+      closeButtonText: 'Onwards',
     },
   },
   {
@@ -213,6 +213,12 @@ export const mtMoonTasks: Task[] = [
     chat: true,
     requirements: [
       {
+        type: 'task_completed',
+        targetId: 'mt-moon-ladder-a',
+      },
+    ],
+    criteria: [
+      {
         type: 'location_encounter_result',
         targetId: 'exp-mt-moon-b1f',
         count: 2,
@@ -224,7 +230,6 @@ export const mtMoonTasks: Task[] = [
         count: 2,
       },
     ],
-    criteria: [],
     rewards: [],
     exitModal: {
       background: '/backgrounds/cave.avif',
@@ -242,7 +247,7 @@ export const mtMoonTasks: Task[] = [
     id: 'mt-moon-ladder-c',
     name: 'A Ladder to the Next Floor',
     description:
-      "A notebook page near the ladder is covered in fossil sketches and Miguel's initials.",
+      "A notebook page near the ladder is covered in fossil sketches, with Miguel's name written on the front.",
     category: 'Kanto',
     subCategory: 'Mt. Moon',
     icon: {
@@ -274,13 +279,13 @@ export const mtMoonTasks: Task[] = [
       },
       message:
         "Miguel's field notes warn that careless digging could destroy the fossil bed. The page is torn like someone grabbed it in a hurry.",
-      closeButtonText: 'Track Miguel',
+      closeButtonText: 'Onward',
     },
   },
   {
     id: 'mt-moon-ladder-d',
     name: 'A Ladder to the Next Floor',
-    description: 'Dust shakes loose from below. Rocket must be blasting through the lower tunnels.',
+    description: 'What a wonderful ladder, you can really tell someone took time crafting this steelwork.',
     category: 'Kanto',
     subCategory: 'Mt. Moon',
     icon: {
@@ -298,6 +303,8 @@ export const mtMoonTasks: Task[] = [
         type: 'task_completed',
         targetId: 'mt-moon-ladder-c',
       },
+    ],
+    criteria: [
       {
         type: 'battle_result',
         targetId: 'mt-moon-b1f',
@@ -311,7 +318,6 @@ export const mtMoonTasks: Task[] = [
         count: 5,
       },
     ],
-    criteria: [],
     rewards: [],
     exitModal: {
       background: '/backgrounds/cave.avif',
@@ -321,8 +327,8 @@ export const mtMoonTasks: Task[] = [
         id: 'rocket-grunt-f',
       },
       message:
-        'Another Rocket blocks the ladder with a sack of fossil fragments at her feet. She looks more worried about the missing boss than about you.',
-      closeButtonText: 'Face Rocket',
+        'Another member of Team Rocket blocks the ladder. She’s muttering something under her breath.',
+      closeButtonText: 'Challenge',
     },
   },
   {
@@ -359,14 +365,14 @@ export const mtMoonTasks: Task[] = [
         id: 'rocket-grunt-m',
       },
       message:
-        'The Grunt blurts out that Rocket is collecting every fossil Miguel marked for the museum. Then he realizes he has said too much.',
+        'Whatever these guys are up to, it seems important. They’re clearly under some pressure.',
       closeButtonText: 'Climb Back Up',
     },
   },
   {
     id: 'mt-moon-dead-end-2',
     name: 'Rocket Grunt',
-    description: 'Hopefully the others have Miguel and the fossils packed up by now...',
+    description: 'These guys don’t seem too tough at all.',
     category: 'Kanto',
     subCategory: 'Mt. Moon',
     icon: {
@@ -397,7 +403,7 @@ export const mtMoonTasks: Task[] = [
         id: 'rocket-grunt-f',
       },
       message:
-        'The defeated Grunt complains that the fossil chamber is just past the blocked ladder, if the blasting has not collapsed it already.',
+        'You overhear the Grunt on the radio telling them to wrap up; they got what they needed.',
       closeButtonText: 'Climb Back Up',
     },
   },
@@ -508,7 +514,7 @@ export const mtMoonTasks: Task[] = [
   {
     id: 'mt-moon-ladder-e',
     name: 'A Ladder to the Next Floor',
-    description: 'Voices echo up from B2F. Miguel is arguing with someone about the fossils.',
+    description: 'Voices echo up from B2F. Miguel is arguing with someone about fossils.',
     category: 'Kanto',
     subCategory: 'Mt. Moon',
     icon: {
@@ -547,7 +553,7 @@ export const mtMoonTasks: Task[] = [
     id: 'mt-moon-fossils',
     name: 'Researcher Miguel',
     description:
-      'Thanks so much for helping protect the fossils from those Rocket people! Miguel saved his research notes, but the fossils need proper cataloguing.',
+      'Hey, this guy doesn’t look like he’s part of Team Rocket. I wonder if he’s okay.',
     category: 'Kanto',
     subCategory: 'Mt. Moon',
     icon: {
@@ -583,7 +589,7 @@ export const mtMoonTasks: Task[] = [
         id: 'researcher',
       },
       message:
-        'Miguel says the actual fossils need to stay protected until Pewter Museum can move them safely. For now, he gives you the binder he used to track the Fossil collection.',
+        'You dealt with those grunts single-handedly? Thank you so much! I’m here on behalf of the Pewter Museum to research the local fossils. Those guys were trashing the place, looking for who knows what.',
       closeButtonText: 'Take Binder',
     },
   },
@@ -778,7 +784,7 @@ export const mtMoonTasks: Task[] = [
         id: 'lass',
       },
       message:
-        'Hah! You actually made it all the way down here. You cost us the fossil shipment, but the moon stones and Clefairy data were always the better prize. Lets stop kidding around. Let me show you the true power of our organization.',
+        'Hah! You actually made it all the way down here. You’re a thorn, that’s for sure, but not a particularly painful one. We got everything we needed. Better to be safe than sorry!',
       closeButtonText: 'Bring it on!',
     },
   },

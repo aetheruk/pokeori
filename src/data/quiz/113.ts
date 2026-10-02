@@ -71,12 +71,12 @@ const questions: QuizQuestion[] = [
     "id": "q7",
     "question": "Classic anime partner?",
     "options": [
-      "Nurse Joy",
+      "The Nurse",
       "Officer Jenny",
       "Brock",
       "Misty"
     ],
-    "correctAnswer": "Nurse Joy"
+    "correctAnswer": "The Nurse"
   },
   {
     "id": "q8",

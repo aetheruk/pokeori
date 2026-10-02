@@ -757,23 +757,23 @@ Current role in flow: Pewter is the first gym milestone and the gate to Route 3/
 
 ### 5. Mt. Moon
 
-Mt. Moon progression begins after the Route 3 trainer chain. `mt-moon-pokemon-center` requires a win over `route-3-trainer-8` but appears in Pewter City as the road-side Pokemon Center setup before the cave. The Center scene now frames Mt. Moon around Researcher Miguel's missing Pewter Museum fossil survey and suspicious Rocket activity around dig sites.
+Mt. Moon progression begins after the Route 3 trainer chain. `mt-moon-pokemon-center` requires a win over `route-3-trainer-8` but appears in Pewter City as the road-side Pokemon Center setup before the cave. The Center warns about suspicious Rocket activity and overcrowding. The nurse is identified only as “The Nurse”; she says Team Rocket has taken over the Center and is selling Scratch Cards.
 
 Main beats:
 
 - `magikarp-secret-deal` requires the Pokémon Center and 50,000 Pokédollars, and is framed as a suspicious Rocket-side fundraising scam near the fossil expedition.
 - Mt. Moon main-path wild battles and early trainers use a level 12 player cap floor, late fossil-room Rocket fights use level 13, and the Clefairy side bosses remain level 18.
 - Progress-gated Mt. Moon trainers now reveal the next local catch/wild-battle target as battle criteria instead of hiding the trainer until the target is already met. The trainer itself still waits for the prior route beat or previous trainer so the cave does not show the whole chain at once.
-- Ladder tasks advance floors and now carry fossil-theft story breadcrumbs through survey tape, stolen tools, Miguel's field notes, Rocket blasting damage, and the final approach to the fossil chamber:
+- Ladder tasks advance floors and carry story details from damaged ladders and abandoned boxes to Miguel's field notes, Rocket activity, and the final approach to the fossil chamber:
   - `mt-moon-ladder-a` after `bug-catcher-kent` and `lass-iris`.
-  - `mt-moon-ladder-b` after 2 B1F location wins and 2 B1F battle wins.
+  - `mt-moon-ladder-b` appears after `mt-moon-ladder-a`; its visible completion criteria ask for 2 B1F location encounters and 2 B1F battle wins.
   - `mt-moon-ladder-c` after `lass-miriam`.
-  - `mt-moon-ladder-d` after `mt-moon-ladder-c`, 5 B1F battle wins, and 5 B1F encounter wins.
+  - `mt-moon-ladder-d` appears after `mt-moon-ladder-c`; its visible completion criteria ask for 5 B1F battle wins and 5 B1F location encounters.
   - `mt-moon-ladder-e` after `hiker-marcos`.
-- Rocket dead-end tasks follow wins over `mt-moon-grunt-1` and `mt-moon-grunt-2`, revealing that Rocket is stealing the fossil records and trying to move crates before Miguel can protect the dig.
+- Rocket dead-end tasks follow wins over `mt-moon-grunt-1` and `mt-moon-grunt-2`, with defeated grunts hinting at urgency and reporting over the radio that Rocket has what they came for.
 - `mt-moon-zubat-trade` requires 2 Zubat and rewards one Moon Scratch card plus Zubat research XP, without PokeDollars.
 - `mt-moon-hiker-block` requires `youngster-josh` and a battle team condition, and is now caused by reckless Rocket blasting near the fossil chamber.
-- `mt-moon-fossils` follows `mt-moon-grunt-4`, resolves Miguel's rescue, and rewards the Fossil binder as his preserved research record while the actual fossils remain protected for Pewter Museum.
+- `mt-moon-fossils` follows `mt-moon-grunt-4`, introduces Miguel as a Pewter Museum researcher, and rewards the Fossil binder as his preserved research record while the actual fossils remain protected for Pewter Museum.
 - `mt-moon-exit` requires `mt-moon-fossils`, notes Rocket escaping toward Route 4/Cerulean, and is the gate to Route 4 East/Cerulean.
 
 Important side content:
@@ -784,6 +784,7 @@ Important side content:
 - Clefairy Cavern unlocks after `mt-moon-wall-weakness` and Explorer level 15; Clefable is an encounter-level catch spawn at 30% once the player has Explorer level 20.
 - `exp-mt-moon-lass-warning` and the hidden Clefairy/Clefable boss battles now identify Agent Mira as the Rocket supervisor behind the fossil operation, while preserving the post-exit secret expedition reveal.
 - `researcher-miguel` is the repeat Fossil binder battle after `mt-moon-fossils` while the player has not collected all 62 unique Fossil (`base3`) cards; each attempt costs 20 Crystals, rewards one Fossil booster pack plus 100 Pokédollars, suppresses the automatic trainer-battle candy reward, and applies a 0.5x generated Trainer XP multiplier. Once all 62 Fossil cards are complete, that battle disappears and the one-off `mt-moon-expert-advice` task becomes available. Completing Expert Advice doubles Dome Fossil and Helix Fossil drop rates from both Mt. Moon mining and the Fossil Hunting voyage. `mt-moon-fossil-hunter` appears after owning the `binder-base3` Fossil binder, then shows the 40 unique collected `base3` card goal and 5000 Pokédollar fee as completion criteria. Completing it unlocks Mt. Moon mining and the repeatable Geodude fossil-hunt voyage. Mt. Moon mining no longer pays Crystals and instead guarantees 2-6 Small Stone; the fossil-hunt voyage guarantees 5-15 Small Stone.
+- `mt-moon-expedition-map` is a unique Mt. Moon Scratchie prize available only after `mt-moon-exit`. The map stays in inventory after use, while `mt-moon-expedition` can be completed only once.
 - `mt-moon-expedition` rewards 350 Explorer XP, 550 Pokédollars, 100 Crystals, guaranteed 2 Escape Ropes, guaranteed 10 Fairy Charms, and a 15% Moon Stone roll.
 
 Current role in flow: Mt. Moon is the largest authored dungeon segment and the direct gate to Cerulean City.

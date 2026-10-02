@@ -69,7 +69,7 @@ const questions: QuizQuestion[] = [
   },
   {
     "id": "q7",
-    "question": "Nurse Joy's Kalos assistant?",
+    "question": "The Kalos nurse's assistant?",
     "options": [
       "Wigglytuff",
       "Chansey",
