@@ -12,7 +12,6 @@ export const mtMoonExpeditions: ExpeditionConfig[] = [
       id: 'mt-moon-expedition-map',
     },
     background: '/backgrounds/cave.avif',
-    mapItemId: 'mt-moon-expedition-map',
     maxLosses: 3,
     requirements: [
       {
@@ -22,6 +21,13 @@ export const mtMoonExpeditions: ExpeditionConfig[] = [
       {
         type: 'item_owned',
         targetId: 'mt-moon-expedition-map',
+      },
+      {
+        type: 'expedition_result',
+        targetId: 'mt-moon-expedition',
+        expeditionStatus: 'completed',
+        count: 1,
+        inverse: true,
       },
     ],
     activityPool: {
