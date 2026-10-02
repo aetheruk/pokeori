@@ -31,17 +31,8 @@ const TITLE_REWARD_SPRITE = '/sprites/items/certificate.avif'
 const REWARD_VALUE_CLASS =
   'shrink-0 whitespace-nowrap font-mono text-sm font-semibold text-game-ink'
 
-function isResearchItem(item: {
-  id: string
-  name: string
-  displaySection?: 'rewards' | 'research'
-}) {
-  if (item.displaySection) return item.displaySection === 'research'
-
-  return (
-    item.id.startsWith('tm-') ||
-    item.name.trim().toLowerCase().startsWith('tm:')
-  )
+function isResearchItem(item: { displaySection?: 'rewards' | 'research' }) {
+  return item.displaySection === 'research'
 }
 
 interface RewardSummaryDisplayProps {
