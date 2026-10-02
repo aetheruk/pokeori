@@ -676,7 +676,7 @@ const PAINT_RECIPES: ArtisanRecipeDraft[] = [
     id: 'paint-purple',
     name: 'Purple Dye',
     description: 'Crush purple nuts into crafting dye.',
-    artisanLevel: 7,
+    artisanLevel: 5,
     costs: [{ id: 'nut-purple', amount: 1 }],
     rewards: [{ type: 'item', targetId: 'paint-purple', quantity: 1, dropChance: 100 }],
     craftType: 'crush',
@@ -913,7 +913,7 @@ const ITEM_RECIPES: ArtisanRecipeDraft[] = [
     id: 'craft-red-berry-candy',
     name: 'Red Berry Candy',
     description: 'Tap berry candy pieces into a soft red friendship treat.',
-    artisanLevel: 5,
+    artisanLevel: 7,
     costs: [
       { id: 'paint-red', amount: 1 },
       { id: 'poke-powder-xs', amount: 2 },
