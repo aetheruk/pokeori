@@ -5,7 +5,7 @@ export const ceruleanCitymatch3gamesEntries: Match3GameConfig[] = [
     id: 'bill-evolution-stone-study',
     name: "Bill's Evolution Stone Study",
     description:
-      "Use Bill's resonance machine to align evolution stones and prove the pattern is stable.",
+      'Bill has asked me to perform some very sensitive work on an elaborate machine he built, He must really trust me already!',
     category: 'Kanto',
     subCategory: 'Cerulean City',
     icon: { type: 'item', id: 'water-stone' },

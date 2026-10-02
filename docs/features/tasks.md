@@ -29,6 +29,7 @@ Fuchsia's `Build in bulk` task appears alongside the Billiam storage side task a
 
 ## Requirements
 Tasks use requirement system in `src/utilities/requirements/`:
+- Item, currency, and Pokémon requirements that consume inventory use “Hand Over” or “Trade” copy; non-consuming ownership requirements say “Own.”
 - Catch X Pokemon of type Y
 - Win X battles
 - Explore X locations

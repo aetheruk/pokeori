@@ -9,6 +9,7 @@ Explore locations, mine for items, and discover Pokemon.
 
 ## Features
 - Region-based location maps
+- Gym trainer battles, Gym Leader battles, and explicitly Gym-named tasks appear together under a dedicated Gym Challenges Explore heading, separate from ordinary Trainer Battles and tasks.
 - Region and area drawers list only destinations the player has unlocked; locked regions and sub-regions are omitted rather than shown as disabled cards.
 - Route cards can expose the three core route gameplay pillars: Catch, Battle, and Study. Study is powered by Field Observation entries and appears beside Catch/Battle when the route has matching authored data.
 - Mine for items (berries, evolution stones)

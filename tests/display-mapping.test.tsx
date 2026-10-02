@@ -5,6 +5,46 @@ import { mapRewardToDisplayItem } from '@/components/game/shared/reward-mapping'
 import { ItemSprite } from '@/components/ui/item-sprite'
 
 describe('display mapping copy', () => {
+  test('consumed item and currency criteria say Hand Over', () => {
+    const itemRequirement = mapCriteriaToDisplayItem({
+      type: 'item_owned',
+      targetId: 'battle-potion',
+      count: 2,
+      consume: true,
+    })
+    const currencyRequirement = mapCriteriaToDisplayItem({
+      type: 'currency_owned',
+      targetId: 'pokedollars',
+      count: 2,
+      consume: true,
+    })
+
+    expect(itemRequirement.label).toBe('Hand Over 2x Potion')
+    expect(currencyRequirement.label).toBe('Hand Over 2x PokeDollars')
+  })
+
+  test('non-consuming item and currency requirements say Own', () => {
+    const itemRequirement = mapCriteriaToDisplayItem({
+      type: 'item_owned',
+      targetId: 'battle-potion',
+      count: 2,
+    })
+    const currencyRequirement = mapCriteriaToDisplayItem({
+      type: 'currency_owned',
+      targetId: 'pokedollars',
+      count: 2,
+    })
+    const pokemonRequirement = mapCriteriaToDisplayItem({
+      type: 'pokemon_owned',
+      targetId: 25,
+      count: 1,
+    })
+
+    expect(itemRequirement.label).toBe('Own 2x Potion')
+    expect(currencyRequirement.label).toBe('Own 2x PokeDollars')
+    expect(pokemonRequirement.label).toBe('Own Pikachu')
+  })
+
   test('location and wild battle result criteria use activity-specific language', () => {
     const catchRequirement = mapCriteriaToDisplayItem({
       type: 'location_encounter_result',

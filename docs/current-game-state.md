@@ -1,11 +1,18 @@
 # Current Game State
 
+- Unreleased: Consumed item and currency requirements now say “Hand Over” instead of “Spend” or “Pay”; non-consuming item, currency, and Pokémon ownership requirements say “Own.”
+- Unreleased: Bill's Evolution Stone Study now describes the machine as sensitive work Bill trusts the player with.
+- Unreleased: Purple Dye now unlocks at Artisan 5, and Red Berry Candy unlocks at Artisan 7.
+- Unreleased: Every authored trainer battle shows deterministic, trainer-class-voiced win and loss dialogue in a raised-paper results note with its battle icon; key story characters have bespoke lines. Optional `winMessage` and `loseMessage` fields override defaults. Wild Pokémon encounters and PvP matches have no trainer note.
+- Unreleased: Generic trainer-class loss dialogue now consistently speaks from the trainer's winning perspective, including Gym Trainer Luis's Swimmer dialogue.
+- Unreleased: Gym Trainer and Gym Leader battles, plus Gym-named tasks, appear together under a dedicated Gym Challenges heading in Explore.
+- Unreleased: The win/loss follow-up chat tasks after the Pallet Town, Route 22, Cerulean, and S.S. Anne rival battles are removed. Their checkpoint and character dialogue now appears directly in the rival battle result note; the rival battles' one-time win/loss gates remain in place.
 - Unreleased: Failed active-ability escape attempts now say `Unable to escape using {ability}.` instead of phrasing the ability as failing to escape.
 - Unreleased: TM items appear in the main Rewards section of activity results, including TMs granted by Pokémon Research level-ups. Research XP, breakthroughs, and Sketch learned moves remain grouped under Research.
 - Unreleased: Brock's Pewter Gym TM reward now describes Wave Breaker as the perfect move for a Rock trainer dealing with pesky Water types, replacing the inaccurate defence-boosting description.
 - Unreleased: Cyndaquil-line evolution rules now distinguish Hisui-origin Pokémon: Cyndaquil evolves at level 17 there and Quilava becomes Hisuian Typhlosion at level 36. Other origins use the standard level 14 and level 36 path. Evolution choices are filtered by obtained region in both the Pokémon screen and server action, and the generator preserves these overrides.
 - Unreleased: Route 5 Field Research can reveal a secret talking Alolan Meowth at a 15% chance. Its `Kitty KONtraBANd` conversation unlocks repeatable `Konban Kash` turn-ins for one Shiny Konban and 500 Pokédollars; the Alolan Meowth profile icon unlocks on the tenth turn-in.
-- Unreleased: Non-expedition `chat: true` tasks with exit dialogue now grant their rewards without an intermediate reward/results screen, then open the exit dialogue directly. Expedition chat steps keep their progress result screen.
+- Unreleased: Non-chat task result flows show queued exit dialogue before level-ups, card reveals, research breakthroughs, and the reward summary. After the dialogue closes, the existing reward sequence continues. Non-expedition `chat: true` tasks with exit dialogue skip the result screen and open the dialogue directly; expedition chat steps keep their progress result screen.
 - Unreleased: Task entry dialogue stays visible until the reward result or chat exit dialogue is ready, and result/exit surfaces cover Explore cards throughout their transitions.
 - Unreleased: The Pewter School task description now correctly says the player could learn “a thing or two.”
 - Unreleased: Route 22 now has a 15% chance to complete the secret `discovering-victory-road` discovery, which introduces the powerful trainers heading north. It unlocks `viridian-victory-road` in Viridian City; a Gentleman checks all eight Kanto Badges before the player is cleared for the future Victory Road challenge.
@@ -37,28 +44,6 @@
 - Release `0.43.6`: Pokémon Snap's field desk removes the target instructions, contact-sheet heading, and photo count. The target sprite remains, the camera icon becomes a full-width bottom shutter, and the photo grid shows three cards per row on mobile. Incorrect photos briefly appear centered as a flash and are discarded without affecting the photo list or game scoring.
 
 - Release `0.43.5`: Pokémon Snap's field desk shows the requested Pokémon as a large, crisp pixel sprite beside the shutter. The scrollable contact sheet displays scenic photo prints with correct/wrong stamps and empty print slots; the shutter stays visible while browsing photos. Session timing, scoring, rewards, and target selection are unchanged.
-
-## Production runtime (2026-09-30)
-
-The N150 is retired; the production target is now the Hetzner `pokeori-server`.
-Coolify and Dragonfly are running there. MongoDB is a private, single-member
-`rs0` replica set for Payload transaction support. The Pokeori app remains
-stopped while the former production data is recovered or a fresh start is
-decided and the MongoDB credential is rotated. Daily MongoDB and Coolify
-instance backup schedules are enabled locally. The private R2 bucket exists,
-but no off-host backups are verified until a replacement bucket-scoped token
-is configured. GitHub Actions now builds and publishes to the private GHCR
-package. Coolify's `pokeori-ghcr` Docker Image resource targets that image on
-port 3000, serves `pokeori.app` and `www.pokeori.app`, and has the production
-health check configured. Its authenticated deploy webhook is saved in GitHub.
-The private-registry pull was verified from Hetzner, and the stable build key
-exists in GitHub. The latest app rollout failed because `RESEND_API_KEY` is
-missing; Coolify's health probe also needs to use `127.0.0.1` rather than
-`localhost` on this host. Save the required runtime values directly in Coolify
-before retrying deployment. The former database data-recovery versus
-fresh-start decision is also unresolved. See the
-[deployment runbook](development/deployment.md) and
-[performance runbook](development/performance-runbook.md) for service details.
 
 - Unreleased (`0.42.25`): Spirit Channeling lets players try any owned Pokemon without revealing hidden channeler requirements in the picker. Ritual answers stay in the server config; incompatible attempts fail without consuming offerings and return an indirect clue. Field Observation pickups now update immediately on the client. Every drop gets a fresh random ID per round, and one completion request submits collected IDs and elapsed times for checking against that session's private Redis drop list and spawn windows before rewards are granted.
 
@@ -780,8 +765,7 @@ Important side content:
 
 - `mt-moon-strange-wall` is secret and drops at 5% from successful `exp-mt-moon-b2f` location encounters.
 - Mt. Moon 1F, B1F, and B2F catching can now drop the hidden Brittle Hard Stone recipe manual at 12%, and Clefairy Cavern catching can drop the hidden Fairy Down recipe manual at 12%. Rock Shield TM can drop from normal Mt. Moon battles at 1%, Mt. Moon Field Observation item drops at 2%, and Mt. Moon 1F/B1F/B2F catches at 3%.
-- `mt-moon-wall-weakness` follows that secret and requires a battle team condition.
-- Clefairy Cavern unlocks after `mt-moon-wall-weakness` and Explorer level 15; Clefable is an encounter-level catch spawn at 30% once the player has Explorer level 20.
+- `mt-moon-wall-weakness` follows that secret and requires six Geodude on the battle team. Dismissing its completion result opens the exit dialogue and reveals Clefairy Cavern; entering requires Catching level 15. Clefable is an encounter-level catch spawn at 30% once the player has Catching level 20.
 - `exp-mt-moon-lass-warning` and the hidden Clefairy/Clefable boss battles now identify Agent Mira as the Rocket supervisor behind the fossil operation, while preserving the post-exit secret expedition reveal.
 - `researcher-miguel` is the repeat Fossil binder battle after `mt-moon-fossils` while the player has not collected all 62 unique Fossil (`base3`) cards; each attempt costs 20 Crystals, rewards one Fossil booster pack plus 100 Pokédollars, suppresses the automatic trainer-battle candy reward, and applies a 0.5x generated Trainer XP multiplier. Once all 62 Fossil cards are complete, that battle disappears and the one-off `mt-moon-expert-advice` task becomes available. Completing Expert Advice doubles Dome Fossil and Helix Fossil drop rates from both Mt. Moon mining and the Fossil Hunting voyage. `mt-moon-fossil-hunter` appears after owning the `binder-base3` Fossil binder, then shows the 40 unique collected `base3` card goal and 5000 Pokédollar fee as completion criteria. Completing it unlocks Mt. Moon mining and the repeatable Geodude fossil-hunt voyage. Mt. Moon mining no longer pays Crystals and instead guarantees 2-6 Small Stone; the fossil-hunt voyage guarantees 5-15 Small Stone.
 - `mt-moon-expedition-map` is a unique Mt. Moon Scratchie prize available only after `mt-moon-exit`. The map stays in inventory after use, while `mt-moon-expedition` can be completed only once.
