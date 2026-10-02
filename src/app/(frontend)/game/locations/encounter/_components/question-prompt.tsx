@@ -53,12 +53,14 @@ export function QuestionPrompt({
       className="flex flex-col max-w-3xl mx-auto w-full h-full justify-center relative z-10"
     >
       {/* Question text — slide per question */}
-      <div className={cn(
-        'relative flex flex-none shrink-0 justify-center text-game-ink',
-        isCatchAppearance
-          ? 'mb-3 min-h-14 items-end px-3 pb-1'
-          : 'mb-4 min-h-[5rem] items-center overflow-hidden rounded-lg border border-game-border bg-game-surface-raised px-4 py-5 shadow-sm backdrop-blur-xl',
-      )}>
+      <div
+        className={cn(
+          'relative flex flex-none shrink-0 justify-center text-game-ink',
+          isCatchAppearance
+            ? 'mb-4 min-h-14 items-center px-3 py-2'
+            : 'mb-4 min-h-[5rem] items-center overflow-hidden rounded-lg border border-game-border bg-game-surface-raised px-4 py-5 shadow-sm backdrop-blur-xl',
+        )}
+      >
         <AnimatePresence mode="wait">
           <motion.h2
             key={currentQuestion?.attemptId ?? currentQuestion?.id ?? 'loading'}
@@ -66,7 +68,12 @@ export function QuestionPrompt({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
             transition={{ duration: 0.1, ease: 'easeOut' }}
-            className="relative z-10 line-clamp-3 text-center text-lg font-semibold leading-relaxed text-game-ink md:text-xl"
+            className={cn(
+              'relative z-10 line-clamp-3 text-center font-semibold text-game-ink',
+              isCatchAppearance
+                ? 'text-base leading-snug md:text-lg'
+                : 'text-lg leading-relaxed md:text-xl',
+            )}
           >
             {questionLoading ? (
               <span className="font-sans not-italic tracking-normal text-game-muted">
@@ -80,7 +87,12 @@ export function QuestionPrompt({
       </div>
 
       {/* Answer rows — full width with shape icon on left */}
-      <div className="flex flex-col gap-2.5 pb-4">
+      <div
+        className={cn(
+          'flex flex-col pb-4',
+          isCatchAppearance ? 'gap-3' : 'gap-2.5',
+        )}
+      >
         {!questionLoading &&
           currentQuestion?.options.map((option, idx) => {
             const optionValue =
@@ -151,7 +163,10 @@ export function QuestionPrompt({
                 disabled={disabled}
                 aria-pressed={selected}
                 className={cn(
-                  'game-focus-ring group relative flex w-full items-center gap-3 overflow-hidden rounded-lg border border-game-border bg-game-surface-raised px-3 py-3 text-left text-game-ink shadow-sm backdrop-blur-xl transition-colors hover:border-game-moss/35 hover:bg-game-surface disabled:pointer-events-none',
+                  'game-focus-ring group relative flex min-h-16 w-full items-center gap-3 overflow-hidden rounded-lg border px-3 py-3 text-left text-game-ink transition-[border-color,background-color,box-shadow] duration-150 disabled:pointer-events-none',
+                  isCatchAppearance
+                    ? 'border-game-card-border bg-game-surface-raised shadow-[0_2px_6px_rgb(75_62_39_/_0.08)] hover:border-game-charcoal/40 hover:bg-game-surface hover:shadow-[0_3px_9px_rgb(75_62_39_/_0.11)] active:bg-game-canvas'
+                    : 'border-game-border bg-game-surface-raised shadow-sm backdrop-blur-xl hover:border-game-moss/35 hover:bg-game-surface',
                   selected && answerStatus
                     ? 'disabled:opacity-100'
                     : isCatchAppearance
@@ -160,7 +175,9 @@ export function QuestionPrompt({
                   highlighted && 'border-game-ochre/60 bg-game-ochre/10',
                   selected &&
                     !answerStatus &&
-                    'border-game-moss bg-game-moss/12 ring-1 ring-game-moss/35',
+                    (isCatchAppearance
+                      ? 'border-game-charcoal bg-game-charcoal/8 ring-1 ring-game-charcoal/25'
+                      : 'border-game-moss bg-game-moss/12 ring-1 ring-game-moss/35'),
                   selected &&
                     answerStatus === 'correct' &&
                     'border-game-health bg-game-health/25 ring-1 ring-game-health/50',
@@ -173,10 +190,10 @@ export function QuestionPrompt({
                 <div className="relative shrink-0">
                   <div
                     className={cn(
-                      'relative z-10 flex h-10 w-10 items-center justify-center rounded-lg border bg-game-canvas',
+                      'relative z-10 flex h-10 w-10 items-center justify-center rounded-lg border',
                       isCatchAppearance
-                        ? 'border-game-charcoal/25 text-game-charcoal-strong'
-                        : 'border-game-moss/25 text-game-moss-strong',
+                        ? 'border-game-charcoal/35 bg-game-canvas/80 text-game-charcoal-strong shadow-inner'
+                        : 'border-game-moss/25 bg-game-canvas text-game-moss-strong',
                     )}
                   >
                     {shapes[idx]}
@@ -207,7 +224,14 @@ export function QuestionPrompt({
                   </AnimatePresence>
                 )}
                 {selected && submittingAnswer && (
-                  <Loader2 className="relative z-10 ml-auto h-4 w-4 shrink-0 animate-spin text-game-moss" />
+                  <Loader2
+                    className={cn(
+                      'relative z-10 ml-auto h-4 w-4 shrink-0 animate-spin',
+                      isCatchAppearance
+                        ? 'text-game-charcoal-strong'
+                        : 'text-game-moss',
+                    )}
+                  />
                 )}
               </button>
             )

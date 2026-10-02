@@ -77,8 +77,8 @@ export function CaptureScene({
               <ChevronLeft className="h-8 w-8" />
             </Button>
 
-            <div className="flex flex-col items-center gap-4">
-              <div className="relative w-20 h-20">
+            <div className="flex flex-col items-center gap-3">
+              <div className="relative h-24 w-24">
                 <DraggablePokeball
                   onThrow={handleCapture}
                   ringScale={ringScale}
@@ -87,26 +87,26 @@ export function CaptureScene({
                 >
                   <div
                     className={cn(
-                      'w-full h-full',
+                      'h-full w-full',
                       isCapturing && 'animate-ping opacity-75',
                     )}
                   >
                     <ItemSprite
                       itemId={balls[selectedBallIndex].id}
                       alt={balls[selectedBallIndex].name}
-                      width={80}
-                      height={80}
-                      className="w-full h-full object-contain pixelated drop-shadow-2xl animate-pulse cursor-grab active:cursor-grabbing"
+                      width={96}
+                      height={96}
+                      className="h-full w-full cursor-grab object-contain drop-shadow-xl active:cursor-grabbing"
                     />
                   </div>
                 </DraggablePokeball>
               </div>
-              <div className="text-center pointer-events-none select-none mt-2">
-                <div className="text-lg font-semibold text-game-ink">
+              <div className="pointer-events-none mt-2 select-none text-center">
+                <div className="text-lg font-bold text-game-ink">
                   {balls[selectedBallIndex].name}
                 </div>
-                <div className="mt-1 inline-flex min-w-[3rem] items-center justify-center rounded-full border border-game-border bg-game-canvas px-2.5 py-1">
-                  <span className="translate-y-[0.5px] text-xs font-bold uppercase tracking-widest text-game-muted">
+                <div className="mt-2 inline-flex min-w-[3.25rem] items-center justify-center rounded-md border border-game-border bg-game-surface-raised px-3 py-1 shadow-sm">
+                  <span className="tabular-nums text-xs font-bold uppercase tracking-wider text-game-muted">
                     x
                     {inventory.find(
                       (i) => i.itemId === balls[selectedBallIndex].id,
@@ -115,9 +115,9 @@ export function CaptureScene({
                 </div>
               </div>
 
-              <div className="pointer-events-none mt-4 flex select-none flex-col items-center gap-1 text-game-moss-strong">
-                <ChevronUp className="h-6 w-6" />
-                <span className="text-xs font-black uppercase tracking-[0.08em]">
+              <div className="pointer-events-none mt-3 flex select-none flex-col items-center gap-1 text-game-charcoal-strong">
+                <ChevronUp className="h-6 w-6" aria-hidden="true" />
+                <span className="text-xs font-bold uppercase tracking-[0.08em]">
                   Swipe up
                 </span>
               </div>
