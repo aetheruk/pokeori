@@ -1,14 +1,7 @@
 'use client'
 
 import { useHaptics } from '@haptics/react'
-import {
-  Flame,
-  Hammer,
-  PackageOpen,
-  Sparkles,
-  Wand2,
-  Zap,
-} from 'lucide-react'
+import { Flame, Hammer, PackageOpen, Sparkles, Wand2, Zap } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import {
@@ -1194,54 +1187,51 @@ const InventoryItemCard = memo(function InventoryItemCard({
       aria-label={`View ${item.details.name}`}
       aria-haspopup="dialog"
       data-haptic-manual="true"
-      className="game-focus-ring group relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-lg border border-game-border bg-game-surface p-3 transition-colors hover:border-game-charcoal/45 hover:bg-game-surface-raised"
+      className="game-focus-ring group relative flex cursor-pointer items-center gap-4 overflow-hidden rounded-md rounded-tr-none border border-game-card-border bg-game-surface p-4 transition-colors hover:border-game-charcoal/45"
     >
-      <div className="relative shrink-0">
-        <div className="game-icon-orb relative z-10 h-12 w-12">
-          <ItemSprite
-            itemId={item.itemId}
-            alt={item.details.name}
-            width={48}
-            height={48}
-            className="h-9 w-9 object-contain"
-          />
-        </div>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-70"
+        style={{ backgroundImage: 'url(/backgrounds/inventory.avif)' }}
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-game-surface-raised/76 via-game-surface/56 to-game-surface/10"
+      />
+      <div className="relative z-10 flex h-14 w-14 shrink-0 items-center justify-center">
+        <TaskIconDisplay
+          icon={{ type: 'item', id: item.itemId }}
+          normalizeVisibleBounds
+          outlineVisiblePixels
+          className="h-9 w-9"
+        />
       </div>
 
       {/* Details */}
-      <div className="flex-1 min-w-0 flex flex-col pt-1">
-        <span className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-game-muted transition-colors group-hover:text-game-charcoal">
-          {getInventorySubCategoryLabel(item.displaySubCategory)}
-        </span>
-        <h3 className="font-semibold italic tracking-tighter text-base truncate text-game-ink leading-none">
+      <div className="relative z-10 flex min-w-0 flex-1 flex-col items-end self-stretch text-right">
+        <h3 className="-mr-4 -mt-4 line-clamp-2 w-fit max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-xs font-bold leading-tight tracking-[0.12em] text-white">
           {item.details.name}
         </h3>
-        {actionLabel && (
-          <span className="mt-2 inline-flex w-fit items-center gap-1 rounded-md border border-game-charcoal/15 bg-game-charcoal/5 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] text-game-charcoal">
-            <ActionIcon className="w-3 h-3" />
-            {actionLabel}
-          </span>
-        )}
-      </div>
-
-      {/* Quantity Badge */}
-      <div className="shrink-0 flex flex-col items-end gap-2">
-        <div className="flex items-center gap-1.5 rounded-lg border border-game-border bg-game-surface-raised px-2 py-1">
-          <span className="text-[11px] font-black uppercase tracking-widest text-game-muted">
-            Qty
-          </span>
-          <span className="text-sm font-black text-game-ink font-mono leading-none">
+        <span className="mt-2 text-[11px] font-semibold text-game-ink">
+          {getInventorySubCategoryLabel(item.displaySubCategory)}
+        </span>
+        <div className="mt-1 flex max-w-full flex-wrap items-center justify-end gap-x-2 gap-y-1 text-[11px] font-semibold text-game-ink">
+          {actionLabel && <span>{actionLabel}</span>}
+          <span className="font-mono">
+            <span className="sr-only">Quantity: </span>
+            <span aria-hidden="true">×</span>
             {item.quantity}
           </span>
         </div>
         {actionLabel && actionLabel !== 'Battle Only' && (
-          <div className="relative z-10 flex items-center gap-1">
+          <div className="relative z-20 mt-auto flex max-w-full flex-wrap justify-end gap-2 pt-3">
             <Button
               type="button"
-              size="icon-sm"
+              variant="ghost"
+              size="icon"
               data-haptic-manual="true"
               disabled={disabledAction}
-              className="h-10 w-10 rounded-lg bg-game-clay text-game-cream hover:bg-game-clay-strong"
+              className="size-11 rounded-lg border border-game-charcoal/15 bg-game-surface-raised/50 p-0 text-game-charcoal shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90"
               onClick={(event) => {
                 event.stopPropagation()
                 onAction(item.details)
@@ -1254,10 +1244,11 @@ const InventoryItemCard = memo(function InventoryItemCard({
             {showBulkOpen && (
               <Button
                 type="button"
-                size="icon-sm"
+                variant="ghost"
+                size="icon"
                 data-haptic-manual="true"
                 disabled={disabledAction}
-                className="h-10 w-10 rounded-lg bg-game-clay text-game-cream hover:bg-game-clay/90"
+                className="size-11 rounded-lg border border-game-charcoal/15 bg-game-surface-raised/50 p-0 text-game-charcoal shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90"
                 onClick={(event) => {
                   event.stopPropagation()
                   onBulkAction(item.details)

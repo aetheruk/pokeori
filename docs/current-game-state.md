@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased (`0.43.61`): Inventory and Artisan list cards now match Explore's scenic card treatment: bare outlined item artwork, charcoal title tabs, right-aligned details, and translucent action buttons. Inventory quantities, recipe locks, craft readiness, and bulk actions remain visible with their existing behavior.
 - Unreleased: The one-time Mt. Moon Expedition now guarantees one Moon Stone.
 - Unreleased: The `singing-in-the-rain` battle now awards the registered Jigglypuff trainer icon instead of an unresolved species ID.
 - Unreleased: Ability Patches no longer appear as authored item drops or task, battle, expedition, or Game Corner prize rewards. The Let's Go Ability Patch remains purchasable at the Viridian City Poké Mart. Celadon's `a-classy-guy` task now points players to that shop instead of granting a patch.
