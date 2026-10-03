@@ -1,15 +1,20 @@
 import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { CurrencySprite } from '@/components/ui/currency-sprite'
 import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
+import { GridPlayerSprite } from '@/components/game/shared/grid-player-sprite'
 import { VoyageCountdown } from '@/components/game/voyages/voyage-countdown'
 import { parseText } from '@/utilities/text-parsing'
 import { cn } from '@/lib/utils'
-import { Heart, Repeat, Star } from 'lucide-react'
+import { Repeat } from 'lucide-react'
 import { memo } from 'react'
 import type { ExploreDisplayItem, ExploreItem } from './types'
-import { getGameTypeLabel, getTypeIcon, isChronicleExploreItem } from './utils'
+import { getGameTypeLabel } from './utils'
 import type { RequirementData } from '@/utilities/requirements'
+import { getSkill } from '@/data/skills/definitions'
+import { getCurrency } from '@/data/currencies'
+import type { TaskIcon } from '@/data/tasks/types'
 import { getExploreItemBackground, getExploreItemIcon } from './rival-display'
-import { isLocationEntryMastered } from './location-completion'
 
 interface ExploreCardProps {
   entry: ExploreDisplayItem
@@ -29,61 +34,115 @@ const getActivityTone = (modeItem: ExploreItem) => {
 
   if (modeItem.type === 'location') {
     return {
-      orb: 'game-icon-orb-catch border-game-danger/70 text-game-danger',
-      button:
-        'border-game-danger/55 bg-game-surface-raised text-game-ink hover:border-game-danger/80 hover:bg-game-surface',
-      icon: 'bg-game-danger',
       iconText: 'text-game-danger',
     }
   }
 
   if (modeItem.type === 'game' && gameType === 'fishing') {
     return {
-      orb: 'game-icon-orb-fishing border-game-stance-blue/70 text-game-stance-blue-strong',
-      button:
-        'border-game-stance-blue/55 bg-game-surface-raised text-game-ink hover:border-game-stance-blue-strong/80 hover:bg-game-surface',
-      icon: 'bg-game-stance-blue',
       iconText: 'text-game-stance-blue-strong',
     }
   }
 
   if (modeItem.type === 'battle' || modeItem.type === 'vs-seeker') {
     return {
-      orb: 'game-icon-orb-battle border-game-battle-orange/70 text-game-battle-orange-strong',
-      button:
-        'border-game-battle-orange/55 bg-game-surface-raised text-game-ink hover:border-game-battle-orange-strong/80 hover:bg-game-surface',
-      icon: 'bg-game-battle-orange',
       iconText: 'text-game-battle-orange-strong',
     }
   }
 
   if (modeItem.type === 'field-research') {
     return {
-      orb: 'game-icon-orb-research border-game-research/70 text-game-research-strong',
-      button:
-        'border-game-research/55 bg-game-surface-raised text-game-ink hover:border-game-research-strong/80 hover:bg-game-surface',
-      icon: 'bg-game-research',
       iconText: 'text-game-research-strong',
     }
   }
 
   if (modeItem.type === 'events' || modeItem.type === 'expedition') {
     return {
-      orb: 'game-icon-orb-discovery border-game-ochre/70 text-game-ochre',
-      button:
-        'border-game-ochre/55 bg-game-surface-raised text-game-ink hover:border-game-ochre/80 hover:bg-game-surface',
-      icon: 'bg-game-ochre',
       iconText: 'text-game-ochre',
     }
   }
 
   return {
-    orb: 'game-icon-orb-neutral border-game-charcoal/45 text-game-charcoal-strong',
-    button:
-      'border-game-border bg-game-surface-raised text-game-ink hover:border-game-charcoal/60 hover:bg-game-surface',
-    icon: 'bg-game-charcoal',
     iconText: 'text-game-charcoal-strong',
   }
+}
+
+const getActionIcon = (modeItem: ExploreItem): TaskIcon => {
+  if (modeItem.type === 'voyage' || modeItem.type === 'expedition') {
+    return { type: 'item', id: 'escape-rope' }
+  }
+  if (modeItem.type === 'task') {
+    return { type: 'item', id: 'explorers-journal' }
+  }
+  if (modeItem.type === 'location') {
+    return { type: 'item', id: 'poke-ball' }
+  }
+  if (modeItem.type === 'field-research') {
+    return { type: 'item', id: 'eject-pack' }
+  }
+  if (modeItem.type === 'vs-seeker') {
+    return { type: 'item', id: 'vs-seeker' }
+  }
+  if (modeItem.type === 'battle') {
+    return modeItem.originalData.isWildBattle
+      ? { type: 'item', id: 'battle-potion' }
+      : { type: 'item', id: 'vs-seeker' }
+  }
+  if (modeItem.type === 'shop') {
+    return {
+      type: 'local',
+      id: '/fallback/skills/inventory-v2.png',
+    }
+  }
+  if (modeItem.type === 'game') {
+    return {
+      type: 'item' as const,
+      id:
+        modeItem.originalData.gameType === 'tcg-inspection'
+          ? 'empty-foil-pack'
+          : modeItem.originalData.gameType === 'tcg-battle'
+            ? 'deck-box'
+            : modeItem.originalData.gameType === 'fishing'
+              ? 'super-rod'
+              : /\s+EX$/i.test(modeItem.name)
+                ? 'master-ball'
+                : 'rotom-light-bulb-manual',
+    }
+  }
+
+  return {
+    type: 'local',
+    id: `/fallback/skills/${getSkill('catching')?.iconId || 'explorer-v2.png'}`,
+  }
+}
+
+const EXPLORE_CONTENT_ICON_OVERRIDES: Record<string, TaskIcon> = {
+  'tutorial-1': { type: 'pokemon', id: '16' },
+  'viridian-outskirts': { type: 'pokemon', id: '32' },
+  'route-2': { type: 'pokemon', id: '19' },
+  'route-3': { type: 'pokemon', id: '21' },
+  'exp-mt-moon-b2f': { type: 'pokemon', id: '74' },
+  'mt-moon-expedition-b2f': { type: 'pokemon', id: '74' },
+  'mt-moon-expedition': { type: 'item', id: 'moon-stone' },
+  'cerulean-gym-pool': { type: 'item', id: 'badge-kanto-cascade' },
+  'cerulean-gym-pool-daily': { type: 'item', id: 'badge-kanto-cascade' },
+  'retro-trainer-cards': { type: 'trainer', id: 'oak' },
+}
+
+const getShopCurrencyId = (shop: any) => {
+  const currencyIds = [
+    ...new Set<string>(
+      (shop.items || []).flatMap((item: any) =>
+        (item.cost || [])
+          .filter((cost: any) => cost.type === 'currency')
+          .map((cost: any) => cost.id),
+      ),
+    ),
+  ]
+
+  return currencyIds.length === 1 && getCurrency(currencyIds[0]!)
+    ? currencyIds[0]
+    : undefined
 }
 
 function ExploreCardComponent({
@@ -110,15 +169,19 @@ function ExploreCardComponent({
     item.type === 'expedition'
       ? item
       : groupedItems.find((groupedItem) => groupedItem.type === 'expedition')
-  const isChronicle = isChronicleExploreItem(expeditionItem || item)
   const displayName = entry.kind === 'group' ? entry.group.name : item.name
-  const displayIcon =
-    entry.kind === 'group'
+  const contentIconOverride = [item, ...groupedItems].find(
+    (cardItem) => EXPLORE_CONTENT_ICON_OVERRIDES[cardItem.id],
+  )
+  const displayIcon = contentIconOverride
+    ? EXPLORE_CONTENT_ICON_OVERRIDES[contentIconOverride.id]!
+    : entry.kind === 'group'
       ? entry.group.icon
       : getExploreItemIcon(item, userData)
   const cardBackground = getExploreItemBackground(item, userData)
   const isEventCard = item.type === 'events'
   const isGrouped = groupedItems.length > 0
+  const actionItems = isGrouped ? groupedItems : [item]
   const isActiveVoyage =
     item.type === 'voyage' && activeVoyages.some((v) => v.voyageId === item.id)
   const isActiveExpedition =
@@ -128,10 +191,15 @@ function ExploreCardComponent({
     (activeExpedition.status === 'active' ||
       activeExpedition.status === 'ready_to_claim')
   const isHighlighted = isActiveVoyage || isActiveExpedition
-  const isLocationMastered = isLocationEntryMastered(entry, userData)
   const isRepeatableTask =
     item.type === 'task' && Boolean((item.originalData as any).repeatable)
   const getModeLabel = (modeItem: ExploreItem) => {
+    if (modeItem.type === 'events') return 'View events'
+    if (modeItem.type === 'shop') return 'Browse shop'
+    if (modeItem.type === 'voyage') return 'View voyage'
+    if (modeItem.type === 'task') {
+      return (modeItem.originalData as any).chat ? 'Talk' : 'View task'
+    }
     if (modeItem.type === 'vs-seeker') return 'Battle'
     if (modeItem.type === 'location') return 'Catch'
     if (
@@ -152,9 +220,18 @@ function ExploreCardComponent({
     if (isGrouped && modeItem.type === 'game') {
       return /\s+EX$/i.test(modeItem.name) ? 'EX' : 'Normal'
     }
-    return getGameTypeLabel(modeItem)
+    const label = getGameTypeLabel(modeItem)
+    return label === 'TCG'
+      ? label
+      : label.charAt(0).toUpperCase() + label.slice(1).toLowerCase()
   }
-  const isInteractive = !isGrouped
+  const activeExpeditionProgress =
+    isActiveExpedition && activeExpedition
+      ? `${Math.min(
+          (activeExpedition.currentStepIndex || 0) + 1,
+          activeExpedition.totalSteps || 1,
+        )}/${activeExpedition.totalSteps || 1}`
+      : null
   const selectItem = (targetItem: ExploreItem) => {
     playSelectSfx()
     if (targetItem.type === 'shop') {
@@ -164,101 +241,70 @@ function ExploreCardComponent({
     }
   }
 
-  const getGroupedActionTone = (modeItem: ExploreItem) => {
-    return getActivityTone(modeItem)
-  }
-
   return (
     <Card
       className={cn(
-        'game-focus-ring group relative flex flex-row items-center gap-4 overflow-hidden rounded-lg border p-4 transition-colors',
-        isGrouped ? 'cursor-default' : 'cursor-pointer',
+        'relative flex flex-row items-center gap-4 overflow-hidden rounded-md rounded-tr-none border p-4',
         isEventCard
-          ? 'border-game-ochre/60 bg-game-surface-raised hover:border-game-ochre/80'
+          ? 'border-game-ochre/60 bg-game-surface-raised'
           : isHighlighted
             ? 'border-game-ochre/45 bg-game-surface-raised'
-            : 'border-game-card-border bg-game-surface hover:border-game-charcoal/35 hover:bg-game-surface-raised',
+            : 'border-game-card-border bg-game-surface',
         centered && 'justify-center',
       )}
-      data-haptic={isInteractive ? 'selection' : undefined}
-      role={isInteractive ? 'button' : undefined}
-      tabIndex={isInteractive ? 0 : undefined}
-      aria-label={isInteractive ? `Open ${displayName}` : undefined}
-      onClick={isInteractive ? () => selectItem(item) : undefined}
-      onKeyDown={
-        isInteractive
-          ? (event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault()
-                selectItem(item)
-              }
-            }
-          : undefined
-      }
     >
       {cardBackground && (
         <>
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-60"
+            className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-70"
             style={{ backgroundImage: `url(${cardBackground})` }}
           />
           <div
             aria-hidden="true"
             className={cn(
-              'pointer-events-none absolute inset-0 bg-gradient-to-l',
+              'pointer-events-none absolute inset-0 bg-gradient-to-r',
               isEventCard
-                ? 'from-game-surface-raised/96 via-game-surface/82 to-game-ochre/10'
-                : 'from-game-surface-raised/95 via-game-surface/78 to-game-surface/10',
+                ? 'from-game-surface-raised/78 via-game-surface/58 to-game-ochre/10'
+                : 'from-game-surface-raised/76 via-game-surface/56 to-game-surface/10',
             )}
           />
         </>
       )}
 
       {!centered && (
-        <div className="relative shrink-0">
-          <div
-            className={cn(
-              'game-icon-orb game-icon-orb-art relative z-10 h-14 w-14 shrink-0 overflow-visible transition-colors',
-              isEventCard
-                ? 'game-icon-orb-discovery border-game-ochre/70 text-game-ochre'
-                : isHighlighted
-                  ? 'game-icon-orb-discovery border-game-ochre/70 text-game-ochre'
-                  : cardIconTone.orb,
-            )}
-          >
-            <TaskIconDisplay
-              icon={displayIcon}
-              className={cn('h-9 w-9', cardIconTone.iconText)}
-            />
-            {isLocationMastered && (
-              <Star className="pointer-events-none absolute bottom-0 left-1/2 z-20 h-2 w-2 -translate-x-1/2 translate-y-1/2 fill-game-ochre text-game-ochre drop-shadow" />
-            )}
-            {isRepeatableTask && (
-              <span className="pointer-events-none absolute bottom-0 left-1/2 z-20 flex h-5 w-5 -translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full border-2 border-game-surface bg-game-charcoal text-game-cream shadow-sm">
-                <Repeat className="h-3 w-3" aria-hidden="true" />
-              </span>
-            )}
-          </div>
+        <div className="relative z-10 flex h-14 w-14 shrink-0 items-center justify-center">
+          <TaskIconDisplay
+            icon={displayIcon}
+            normalizeVisibleBounds
+            outlineVisiblePixels
+            className={cn('relative z-10 h-9 w-9', cardIconTone.iconText)}
+          />
         </div>
       )}
 
       {/* Content Details */}
       <div
         className={cn(
-          'relative z-10 flex-1 min-w-0 flex flex-col pt-1',
-          centered ? 'items-center text-center' : 'items-end text-right',
+          'relative z-10 flex min-w-0 flex-1 flex-col self-stretch',
+          centered
+            ? 'items-center justify-center text-center'
+            : 'items-end text-right',
         )}
       >
-        <h3
-          className={cn(
-            'line-clamp-3 text-pretty text-base font-semibold leading-tight transition-colors',
-            isHighlighted
-              ? 'text-game-ochre'
-              : 'text-game-ink group-hover:text-game-charcoal-strong',
-          )}
-        >
+        <h3 className="-mr-4 -mt-4 line-clamp-2 w-fit max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-right text-xs font-bold leading-tight tracking-[0.12em] text-white">
           {parseText(displayName, trainerName)}
+          {activeExpeditionProgress && (
+            <span className="ml-1 text-game-battle-orange">
+              {activeExpeditionProgress}
+            </span>
+          )}
+          {isRepeatableTask && (
+            <Repeat
+              className="ml-1 inline-block h-3 w-3 align-[-2px] text-game-battle-orange"
+              aria-hidden="true"
+            />
+          )}
         </h3>
         {(item.originalData as any)?.eventContexts?.map((event: any) => (
           <p key={event.id} className="mt-1 text-xs text-game-ochre">
@@ -268,117 +314,112 @@ function ExploreCardComponent({
               ` · Ends ${new Date(event.endAt).toLocaleString()}`}
           </p>
         ))}
-        {isGrouped && (
+        {actionItems.length > 0 && (
           <div
             className={cn(
-              'mt-3 flex flex-wrap gap-2',
+              'order-last mt-auto flex max-w-full flex-wrap gap-2 pt-3',
               centered ? 'justify-center' : 'justify-end',
             )}
           >
-            {groupedItems.map((groupedItem) => {
-              const tone = getGroupedActionTone(groupedItem)
+            {actionItems.map((groupedItem) => {
+              const isConversation =
+                groupedItem.type === 'task' && groupedItem.originalData.chat
+              const shopCurrencyId =
+                groupedItem.type === 'shop'
+                  ? getShopCurrencyId(groupedItem.originalData)
+                  : undefined
               const isActive =
                 groupedItem.type === 'expedition' &&
                 activeExpedition?.expeditionId === groupedItem.id
 
               return (
-                <button
+                <Button
                   key={groupedItem.id}
                   type="button"
+                  variant="ghost"
+                  size="icon"
+                  title={getModeLabel(groupedItem)}
                   className={cn(
-                    'relative z-20 inline-flex min-h-10 min-w-32 items-stretch overflow-hidden rounded-lg border text-[10px] font-black uppercase tracking-wider shadow-sm transition-colors',
-                    tone.button,
-                    isActive && 'border-game-ochre/70',
+                    'relative z-20 size-11 rounded-lg border border-game-charcoal/15 bg-game-surface-raised/50 p-0 shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90',
+                    isActive && 'border-game-ochre/60',
                   )}
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    selectItem(groupedItem)
-                  }}
+                  onClick={() => selectItem(groupedItem)}
                 >
-                  <span
-                    className={cn(
-                      'flex w-10 shrink-0 items-center justify-center text-game-cream [&_svg]:!text-game-cream',
-                      tone.icon,
+                  <span className="sr-only">
+                    {getModeLabel(groupedItem)}:{' '}
+                    {parseText(groupedItem.name, trainerName)}
+                  </span>
+                  <span aria-hidden="true" className="pointer-events-none">
+                    {isConversation ? (
+                      <GridPlayerSprite
+                        gender={userData.user.trainerGender}
+                        className="h-7 w-7"
+                      />
+                    ) : shopCurrencyId ? (
+                      <CurrencySprite
+                        currencyId={shopCurrencyId}
+                        width={28}
+                        height={28}
+                        className="h-7 w-7 object-contain pixelated"
+                      />
+                    ) : (
+                      <TaskIconDisplay
+                        icon={getActionIcon(groupedItem)}
+                        normalizeVisibleBounds
+                        className="h-7 w-7"
+                      />
                     )}
-                  >
-                    {getTypeIcon(groupedItem)}
                   </span>
-                  <span className="flex min-w-0 flex-1 items-center justify-end px-3 py-2 text-right leading-none">
-                    {getModeLabel(groupedItem)}
-                  </span>
-                </button>
+                </Button>
               )
             })}
           </div>
         )}
-        <div
-          className={cn(
-            isGrouped
-              ? 'mt-2 text-[10px] font-bold uppercase tracking-wider truncate'
-              : 'mt-1.5 text-[10px] font-bold uppercase tracking-wider truncate',
-            isHighlighted
-              ? 'text-game-ochre'
-              : 'text-game-muted group-hover:text-game-ink',
-          )}
-        >
-          {(() => {
-            if (item.type === 'voyage') {
-              const active = activeVoyages.find((v) => v.voyageId === item.id)
-              if (active) {
-                return (
-                  <div className="flex items-center justify-end gap-1.5 font-mono italic text-game-ochre">
-                    <span className="h-1.5 w-1.5 rounded-full bg-game-ochre" />
-                    <VoyageCountdown endTime={active.endTime} />
-                  </div>
-                )
-              }
-            }
-
-            if (
-              expeditionItem &&
-              activeExpedition &&
-              activeExpedition.expeditionId === expeditionItem.id
-            ) {
-              if (activeExpedition.status === 'ready_to_claim') {
-                return (
-                  <div className="flex items-center justify-end gap-1.5 font-mono italic text-game-ochre">
-                    <span className="h-1.5 w-1.5 rounded-full bg-game-ochre" />
-                    Ready to claim
-                  </div>
-                )
+        {(isActiveVoyage ||
+          (isActiveExpedition &&
+            activeExpedition?.status === 'ready_to_claim')) && (
+          <div
+            className={cn(
+              isGrouped
+                ? 'mt-2 text-[10px] font-bold uppercase tracking-wider truncate'
+                : 'mt-1.5 text-[10px] font-bold uppercase tracking-wider truncate',
+              isHighlighted ? 'text-game-ochre' : 'text-game-muted',
+            )}
+          >
+            {(() => {
+              if (item.type === 'voyage') {
+                const active = activeVoyages.find((v) => v.voyageId === item.id)
+                if (active) {
+                  return (
+                    <div className="flex items-center justify-end gap-1.5 font-mono italic text-game-ochre">
+                      <span className="h-1.5 w-1.5 rounded-full bg-game-ochre" />
+                      <VoyageCountdown endTime={active.endTime} />
+                    </div>
+                  )
+                }
               }
 
-              return (
-                <div className="flex items-center justify-end gap-1.5 font-mono italic text-game-ochre">
-                  <span className="h-1.5 w-1.5 rounded-full bg-game-ochre" />
-                  {(activeExpedition.steps?.[activeExpedition.currentStepIndex]
-                    ?.type || 'activity') === 'branch_choice'
-                    ? 'Choose Branch'
-                    : (activeExpedition.steps?.[
-                          activeExpedition.currentStepIndex
-                        ]?.type || 'activity') === 'result_branch'
-                      ? isChronicle
-                        ? 'Resolving Chronicle'
-                        : 'Resolving Route'
-                      : `Step ${Math.min((activeExpedition.currentStepIndex || 0) + 1, activeExpedition.totalSteps || 1)}/${activeExpedition.totalSteps || 1}`}{' '}
-                  ·
-                  <span className="inline-flex items-center gap-1">
-                    <Heart className="w-3.5 h-3.5 text-game-danger" />
-                    Lives{' '}
-                    {Math.max(
-                      0,
-                      (activeExpedition.maxLosses || 0) -
-                        (activeExpedition.losses || 0),
-                    )}
-                    /{activeExpedition.maxLosses || 0}
-                  </span>
-                </div>
-              )
-            }
+              if (
+                expeditionItem &&
+                activeExpedition &&
+                activeExpedition.expeditionId === expeditionItem.id
+              ) {
+                if (activeExpedition.status === 'ready_to_claim') {
+                  return (
+                    <div className="flex items-center justify-end gap-1.5 font-mono italic text-game-ochre">
+                      <span className="h-1.5 w-1.5 rounded-full bg-game-ochre" />
+                      Ready to claim
+                    </div>
+                  )
+                }
 
-            return null
-          })()}
-        </div>
+                return null
+              }
+
+              return null
+            })()}
+          </div>
+        )}
       </div>
     </Card>
   )

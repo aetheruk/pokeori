@@ -454,6 +454,15 @@ function ExploreListContent({
           currentTitle={currentTitle}
           activeCategory={displayCategory}
           activeSubCategory={displaySubCategory}
+          onOpenDailies={openDailyChallenges}
+          onReturnFromDailies={() => {
+            const previousLocation = getFallbackLocation(
+              previousCategory,
+              previousSubCategory,
+            )
+            setActiveCategory(previousLocation.category)
+            setActiveSubCategory(previousLocation.subCategory)
+          }}
           weatherSlot={
             userData.weatherSlot ||
             (userData.user as any).weatherSlot ||
@@ -530,15 +539,6 @@ function ExploreListContent({
           activeSubCategory={activeSubCategory}
           onOpenRegionModal={() => setRegionModalOpen(true)}
           onOpenAreaModal={() => setAreaModalOpen(true)}
-          onOpenDailies={openDailyChallenges}
-          onReturnFromDailies={() => {
-            const previousLocation = getFallbackLocation(
-              previousCategory,
-              previousSubCategory,
-            )
-            setActiveCategory(previousLocation.category)
-            setActiveSubCategory(previousLocation.subCategory)
-          }}
         />
       )}
 
