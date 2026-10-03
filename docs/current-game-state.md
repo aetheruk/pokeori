@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased (`0.43.63`): Inventory and Artisan use Explore's outlined section titles and icon-only card controls. Inventory quantities and Artisan levels appear in orange after the name; card categories, output quantities, and ready/missing-material chips are removed. Inventory book/Poké Ball controls open item details, material controls open Artisan, and recipe cards provide book, Artisan, and bulk controls. Card backgrounds no longer open drawers; craft eligibility and details remain available in the recipe drawer.
 - Unreleased (`0.43.62`): Explore's region and area lists now use the same scenic card styling as Explore, Inventory, and Artisan: charcoal title tabs, bare outlined artwork, and translucent selection indicators. Selected cards retain a clear checkmark and label; region availability, locked-area filtering, and navigation behavior are unchanged.
 - Unreleased (`0.43.61`): Inventory and Artisan list cards now match Explore's scenic card treatment: bare outlined item artwork, charcoal title tabs, right-aligned details, and translucent action buttons. Inventory quantities, recipe locks, craft readiness, and bulk actions remain visible with their existing behavior.
 - Unreleased: The one-time Mt. Moon Expedition now guarantees one Moon Stone.

@@ -843,7 +843,13 @@ export function InventoryList() {
       >
         {walletRewards.length > 0 && (
           <div className="mb-6">
-            <SectionDivider>Wallet</SectionDivider>
+            <SectionDivider
+              className="mb-6"
+              textColor="text-game-moss-strong"
+              textClassName="rounded-full border border-current/30 px-3 py-0.5 text-xs font-extrabold tracking-[0.14em]"
+            >
+              Wallet
+            </SectionDivider>
             <div className="mt-3">
               <RewardCarousel rewards={walletRewards} />
             </div>
@@ -860,7 +866,11 @@ export function InventoryList() {
           />
         </div>
 
-        <SectionDivider>
+        <SectionDivider
+          className="mb-6"
+          textColor="text-game-moss-strong"
+          textClassName="rounded-full border border-current/30 px-3 py-0.5 text-xs font-extrabold tracking-[0.14em]"
+        >
           {searchQuery.trim() ? 'Search Results' : activeDisplayLabel}
         </SectionDivider>
 
@@ -1161,34 +1171,20 @@ const InventoryItemCard = memo(function InventoryItemCard({
   disabledAction: boolean
 }) {
   const actionLabel = getItemActionLabel(item.details, item.canChannel)
-  const ActionIcon = getItemActionIcon(item.details, item.canChannel)
+  const isCrafting = isArtisanIngredientItem(item.details)
+  const isUsable = !!actionLabel && actionLabel !== 'Battle Only'
+  const controlIcon: TaskIcon = isCrafting
+    ? { type: 'local', id: '/fallback/skills/artisan-v2.png' }
+    : isUsable
+      ? { type: 'item', id: 'poke-ball' }
+      : { type: 'item', id: 'explorers-journal' }
   const showBulkOpen =
     item.details.category === 'booster-pack' &&
     item.quantity > 1 &&
     !!onBulkAction
 
-  const openItem = () => {
-    onClick(item.details)
-  }
-
   return (
-    // biome-ignore lint/a11y/useSemanticElements: The card contains separate item-action buttons; a native outer button would nest interactive controls.
-    <div
-      onClick={openItem}
-      onKeyDown={(event) => {
-        if (event.target !== event.currentTarget) return
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault()
-          openItem()
-        }
-      }}
-      role="button"
-      tabIndex={0}
-      aria-label={`View ${item.details.name}`}
-      aria-haspopup="dialog"
-      data-haptic-manual="true"
-      className="game-focus-ring group relative flex cursor-pointer items-center gap-4 overflow-hidden rounded-md rounded-tr-none border border-game-card-border bg-game-surface p-4 transition-colors hover:border-game-charcoal/45"
-    >
+    <div className="relative flex items-center gap-4 overflow-hidden rounded-md rounded-tr-none border border-game-card-border bg-game-surface p-4">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-70"
@@ -1211,20 +1207,41 @@ const InventoryItemCard = memo(function InventoryItemCard({
       <div className="relative z-10 flex min-w-0 flex-1 flex-col items-end self-stretch text-right">
         <h3 className="-mr-4 -mt-4 line-clamp-2 w-fit max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-xs font-bold leading-tight tracking-[0.12em] text-white">
           {item.details.name}
-        </h3>
-        <span className="mt-2 text-[11px] font-semibold text-game-ink">
-          {getInventorySubCategoryLabel(item.displaySubCategory)}
-        </span>
-        <div className="mt-1 flex max-w-full flex-wrap items-center justify-end gap-x-2 gap-y-1 text-[11px] font-semibold text-game-ink">
-          {actionLabel && <span>{actionLabel}</span>}
-          <span className="font-mono">
+          <span className="ml-1 font-mono text-game-battle-orange">
             <span className="sr-only">Quantity: </span>
             <span aria-hidden="true">×</span>
             {item.quantity}
           </span>
-        </div>
-        {actionLabel && actionLabel !== 'Battle Only' && (
-          <div className="relative z-20 mt-auto flex max-w-full flex-wrap justify-end gap-2 pt-3">
+        </h3>
+        <div className="relative z-20 mt-auto flex max-w-full flex-wrap justify-end gap-2 pt-3">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            data-haptic-manual="true"
+            className="size-11 rounded-lg border border-game-charcoal/15 bg-game-surface-raised/50 p-0 text-game-charcoal shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90"
+            onClick={() =>
+              isCrafting ? onAction(item.details) : onClick(item.details)
+            }
+            aria-haspopup={isCrafting ? undefined : 'dialog'}
+            aria-label={
+              isCrafting
+                ? `Craft with ${item.details.name}`
+                : `View ${item.details.name}`
+            }
+            title={
+              isCrafting
+                ? `Craft with ${item.details.name}`
+                : `View ${item.details.name}`
+            }
+          >
+            <TaskIconDisplay
+              icon={controlIcon}
+              normalizeVisibleBounds
+              className="h-7 w-7"
+            />
+          </Button>
+          {showBulkOpen && (
             <Button
               type="button"
               variant="ghost"
@@ -1234,33 +1251,15 @@ const InventoryItemCard = memo(function InventoryItemCard({
               className="size-11 rounded-lg border border-game-charcoal/15 bg-game-surface-raised/50 p-0 text-game-charcoal shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90"
               onClick={(event) => {
                 event.stopPropagation()
-                onAction(item.details)
+                onBulkAction(item.details)
               }}
-              aria-label={`${actionLabel} ${item.details.name}`}
-              title={`${actionLabel} ${item.details.name}`}
+              aria-label={`Open all ${item.details.name}`}
+              title={`Open all ${item.details.name}`}
             >
-              <ActionIcon className="w-4 h-4" />
+              <Zap className="w-4 h-4" />
             </Button>
-            {showBulkOpen && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                data-haptic-manual="true"
-                disabled={disabledAction}
-                className="size-11 rounded-lg border border-game-charcoal/15 bg-game-surface-raised/50 p-0 text-game-charcoal shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90"
-                onClick={(event) => {
-                  event.stopPropagation()
-                  onBulkAction(item.details)
-                }}
-                aria-label={`Open all ${item.details.name}`}
-                title={`Open all ${item.details.name}`}
-              >
-                <Zap className="w-4 h-4" />
-              </Button>
-            )}
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )
