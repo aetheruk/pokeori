@@ -9,6 +9,7 @@ import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import { cn } from '@/lib/utils'
 import type { BattlePokemon } from '@/utilities/battle/types'
 import { getPokemonTypeIconUrl } from '@/utilities/pokemon/sprite-proxy'
+import { BattleLevelSyncIndicator } from './battle-level-sync-indicator'
 
 const typeIdMap: Record<string, number> = {
   normal: 1,
@@ -284,6 +285,10 @@ export function TeamSwapper({
                         <span className="shrink-0 text-[10px] text-game-muted sm:text-xs">
                           Lv.{pokemon.level}
                         </span>
+                        <BattleLevelSyncIndicator
+                          actualLevel={pokemon.actualLevel}
+                          battleLevel={pokemon.level}
+                        />
                         {isActive && !leadSelection && (
                           <span className="shrink-0 text-[10px] font-medium text-game-moss">
                             Active
