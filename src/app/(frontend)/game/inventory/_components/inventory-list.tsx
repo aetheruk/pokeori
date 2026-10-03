@@ -221,14 +221,6 @@ function getItemActionLabel(
   return null
 }
 
-function getItemActionIcon(item: (typeof items)[number], canChannel = false) {
-  if (canChannel) return Flame
-  if (isArtisanIngredientItem(item)) return Hammer
-  if (item.category === 'booster-pack') return PackageOpen
-  if (item.category === 'scratch-card') return Sparkles
-  return Wand2
-}
-
 function isArtisanIngredientItem(item: (typeof items)[number]) {
   return getInventoryDisplayPlacement(item).group === 'crafting'
 }
