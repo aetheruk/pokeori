@@ -65,6 +65,7 @@ function LaneHealth({
           maxHp={mon.maxHp}
           name={mon.battleAbilityState?.illusionMask?.name || mon.name}
           level={mon.level}
+          actualLevel={mon.actualLevel}
           gender={mon.gender}
           isPlayer={isPlayer}
           align={isPlayer ? 'left' : 'right'}
