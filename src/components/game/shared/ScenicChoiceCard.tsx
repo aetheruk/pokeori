@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { Check, ChevronRight } from 'lucide-react'
 import type { StaticImageData } from 'next/image'
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
@@ -13,6 +14,7 @@ interface ScenicChoiceCardProps {
   onClick: () => void
   ariaPressed?: boolean
   className?: string
+  appearance?: 'default' | 'explore'
 }
 
 /**
@@ -29,8 +31,73 @@ export function ScenicChoiceCard({
   onClick,
   ariaPressed,
   className,
+  appearance = 'default',
 }: ScenicChoiceCardProps) {
   const iconOnLeft = iconPosition === 'left'
+
+  if (appearance === 'explore') {
+    return (
+      <button
+        type="button"
+        data-haptic="selection"
+        aria-pressed={ariaPressed ?? selected}
+        onClick={onClick}
+        className={cn(
+          'game-focus-ring group relative flex min-h-24 w-full items-center gap-4 overflow-hidden rounded-md rounded-tr-none border bg-game-surface p-4 text-right transition-colors',
+          selected
+            ? 'border-game-charcoal/65 ring-1 ring-game-charcoal/15'
+            : 'border-game-card-border hover:border-game-charcoal/40',
+          className,
+        )}
+      >
+        {background && (
+          <Image
+            src={background}
+            alt=""
+            fill
+            sizes="(max-width: 768px) 100vw, 520px"
+            className="pointer-events-none object-cover opacity-70"
+          />
+        )}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-game-surface-raised/76 via-game-surface/56 to-game-surface/10"
+        />
+        {icon && (
+          <span className="relative z-10 flex size-14 shrink-0 items-center justify-center text-game-charcoal-strong">
+            {icon}
+          </span>
+        )}
+        <span className="relative z-10 flex min-w-0 flex-1 flex-col items-end self-stretch">
+          <span className="-mr-4 -mt-4 line-clamp-2 w-fit max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-xs font-bold leading-tight tracking-[0.12em] text-white">
+            {title}
+          </span>
+          {description && (
+            <span className="mt-2 text-xs font-medium text-game-ink">
+              {description}
+            </span>
+          )}
+          <span
+            aria-hidden="true"
+            className="mt-auto flex items-center justify-end gap-2 pt-3"
+          >
+            {selected && (
+              <span className="rounded-sm bg-game-surface-raised/75 px-1.5 py-0.5 text-[11px] font-semibold text-game-ink">
+                Selected
+              </span>
+            )}
+            <span className="flex size-11 items-center justify-center rounded-lg border border-game-charcoal/15 bg-game-surface-raised/50 text-game-charcoal backdrop-blur-[2px] group-hover:border-game-charcoal/30 group-hover:bg-game-surface-raised/75 group-active:bg-game-surface-raised/90">
+              {selected ? (
+                <Check className="size-4" />
+              ) : (
+                <ChevronRight className="size-4" />
+              )}
+            </span>
+          </span>
+        </span>
+      </button>
+    )
+  }
 
   return (
     <button

@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased (`0.43.62`): Explore's region and area lists now use the same scenic card styling as Explore, Inventory, and Artisan: charcoal title tabs, bare outlined artwork, and translucent selection indicators. Selected cards retain a clear checkmark and label; region availability, locked-area filtering, and navigation behavior are unchanged.
 - Unreleased (`0.43.61`): Inventory and Artisan list cards now match Explore's scenic card treatment: bare outlined item artwork, charcoal title tabs, right-aligned details, and translucent action buttons. Inventory quantities, recipe locks, craft readiness, and bulk actions remain visible with their existing behavior.
 - Unreleased: The one-time Mt. Moon Expedition now guarantees one Moon Stone.
 - Unreleased: The `singing-in-the-rain` battle now awards the registered Jigglypuff trainer icon instead of an unresolved species ID.
