@@ -282,13 +282,13 @@ export function TeamSwapper({
                         {pokemon.name}
                       </span>
                       <span className="flex flex-wrap items-center gap-1.5">
-                        <span className="shrink-0 text-[10px] text-game-muted sm:text-xs">
-                          Lv.{pokemon.level}
+                        <span className="inline-flex shrink-0 items-center gap-1 text-[10px] text-game-muted sm:text-xs">
+                          <span>Lv.{pokemon.level}</span>
+                          <BattleLevelSyncIndicator
+                            actualLevel={pokemon.actualLevel}
+                            battleLevel={pokemon.level}
+                          />
                         </span>
-                        <BattleLevelSyncIndicator
-                          actualLevel={pokemon.actualLevel}
-                          battleLevel={pokemon.level}
-                        />
                         {isActive && !leadSelection && (
                           <span className="shrink-0 text-[10px] font-medium text-game-moss">
                             Active

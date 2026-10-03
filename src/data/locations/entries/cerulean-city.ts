@@ -285,7 +285,7 @@ export const ceruleanCityLocations: Location[] = [
   {
     id: 'charmander-den',
     name: "Charmander's Den",
-    description: "A secret den inside (Not) Cerulean Cave. A Hiker's Growlithe lead me here.",
+    description: "A secret den inside (Not) Cerulean Cave. A Hiker's Growlithe led me here.",
     category: 'Kanto',
     subCategory: 'Cerulean City',
     icon: {
