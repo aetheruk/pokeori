@@ -12,6 +12,7 @@ interface ItemSpriteProps {
   className?: string
   priority?: boolean
   style?: React.CSSProperties
+  onLoad?: React.ReactEventHandler<HTMLImageElement>
 }
 
 export function ItemSprite({
@@ -22,6 +23,7 @@ export function ItemSprite({
   className = '',
   priority = false,
   style,
+  onLoad,
 }: ItemSpriteProps) {
   const hueRotate = getItemHueRotate(itemId)
   const hueRotateFilter = hueRotate ? `hue-rotate(${hueRotate}deg)` : ''
@@ -55,6 +57,7 @@ export function ItemSprite({
       className={`pixelated ${className}`}
       style={mergedStyle}
       priority={priority}
+      onLoad={onLoad}
       onError={() => setHasError(true)}
     />
   )

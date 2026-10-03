@@ -147,7 +147,7 @@ export const mtMoonExpeditions: ExpeditionConfig[] = [
         type: 'item',
         targetId: 'moon-stone',
         quantity: 1,
-        dropChance: 15,
+        dropChance: 100,
       },
     ],
   },

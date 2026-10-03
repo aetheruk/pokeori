@@ -4,12 +4,14 @@ interface SectionDividerProps {
   children?: React.ReactNode
   className?: string
   textColor?: string
+  textClassName?: string
 }
 
 export function SectionDivider({
   children,
   className,
   textColor = 'text-game-ink',
+  textClassName,
 }: SectionDividerProps) {
   if (!children) {
     return (
@@ -26,6 +28,7 @@ export function SectionDivider({
         className={cn(
           'min-w-0 text-center text-sm font-semibold uppercase tracking-[0.08em]',
           textColor,
+          textClassName,
         )}
       >
         {children}

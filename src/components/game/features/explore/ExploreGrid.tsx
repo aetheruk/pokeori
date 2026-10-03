@@ -290,14 +290,20 @@ function ExploreGridComponent({
   return (
     <div
       className={cn(
-        'space-y-8',
+        'space-y-6',
         takeoverStyle && 'flex w-full flex-col items-center pb-8 md:pb-10',
       )}
     >
       {eventsCard}
       {vsSeekerEvent && (
         <div>
-          <SectionDivider textColor="text-game-ochre">Tools</SectionDivider>
+          <SectionDivider
+            className="mb-6"
+            textColor="text-game-ochre"
+            textClassName="rounded-full border border-current/30 px-3 py-0.5 text-xs font-extrabold tracking-[0.14em]"
+          >
+            Tools
+          </SectionDivider>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             <ExploreCard
               key={vsSeekerEvent.id}
@@ -316,7 +322,11 @@ function ExploreGridComponent({
       )}
       {randomEvent && (
         <div>
-          <SectionDivider textColor="text-game-ochre">
+          <SectionDivider
+            className="mb-6"
+            textColor="text-game-ochre"
+            textClassName="rounded-full border border-current/30 px-3 py-0.5 text-xs font-extrabold tracking-[0.14em]"
+          >
             Random Event
           </SectionDivider>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
@@ -346,6 +356,8 @@ function ExploreGridComponent({
           >
             {!takeoverStyle && (
               <SectionDivider
+                className="mb-6"
+                textClassName="rounded-full border border-current/30 px-3 py-0.5 text-xs font-extrabold tracking-[0.14em]"
                 textColor={
                   type === 'gym-challenge'
                     ? 'text-game-battle-orange-strong'

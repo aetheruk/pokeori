@@ -10,6 +10,7 @@ import {
   MapPin,
   Moon,
   Sun,
+  Timer,
   ThermometerSun,
   Wind,
 } from 'lucide-react'
@@ -29,6 +30,8 @@ interface ExploreHeaderProps {
   activeCategory: string
   activeSubCategory?: string
   weatherSlot?: number
+  onOpenDailies: () => void
+  onReturnFromDailies: () => void
 }
 
 function WeatherIcon({ weather }: { weather: WeatherType }) {
@@ -68,6 +71,8 @@ export function ExploreHeader({
   activeCategory,
   activeSubCategory,
   weatherSlot,
+  onOpenDailies,
+  onReturnFromDailies,
 }: ExploreHeaderProps) {
   const [now, setNow] = useState(() => new Date())
 
@@ -116,6 +121,21 @@ export function ExploreHeader({
           aria-hidden="true"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#172733]/92 via-[#172733]/26 to-[#172733]/12" />
+
+        <button
+          type="button"
+          data-haptic="selection"
+          onClick={isDailies ? onReturnFromDailies : onOpenDailies}
+          aria-label={isDailies ? 'Return to Area' : 'Open Active Dailies'}
+          title={isDailies ? 'Return to Area' : 'Active Dailies'}
+          className="game-focus-ring absolute left-3 top-3 z-20 flex h-11 w-11 items-center justify-center text-white drop-shadow-[0_1px_4px_rgb(0_0_0_/_0.85)] transition-opacity hover:opacity-75 md:left-4 md:top-4"
+        >
+          {isDailies ? (
+            <MapPin className="h-6 w-6" />
+          ) : (
+            <Timer className="h-6 w-6" />
+          )}
+        </button>
 
         <div className="absolute inset-x-0 bottom-0 z-10 flex justify-center p-4 text-center md:p-5">
           <div className="max-w-2xl">
