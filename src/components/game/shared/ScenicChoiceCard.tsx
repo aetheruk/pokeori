@@ -1,8 +1,8 @@
 import Image from 'next/image'
-import { Check, ChevronRight } from 'lucide-react'
 import type { StaticImageData } from 'next/image'
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
+import { TaskIconDisplay } from '@/components/game/shared/TaskIconDisplay'
 
 interface ScenicChoiceCardProps {
   background?: string | StaticImageData
@@ -34,19 +34,36 @@ export function ScenicChoiceCard({
   appearance = 'default',
 }: ScenicChoiceCardProps) {
   const iconOnLeft = iconPosition === 'left'
+  const selectionButton = (
+    <button
+      type="button"
+      data-haptic="selection"
+      aria-pressed={ariaPressed ?? selected}
+      onClick={onClick}
+      className={cn(
+        'game-focus-ring flex size-11 shrink-0 items-center justify-center rounded-lg border bg-game-surface-raised/50 p-0 text-game-charcoal backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90',
+        selected ? 'border-game-charcoal/45' : 'border-game-charcoal/15',
+      )}
+    >
+      <span className="sr-only">{title}</span>
+      <span aria-hidden="true">
+        <TaskIconDisplay
+          icon={{ type: 'item', id: 'poke-ball' }}
+          normalizeVisibleBounds
+          className="h-7 w-7"
+        />
+      </span>
+    </button>
+  )
 
   if (appearance === 'explore') {
     return (
-      <button
-        type="button"
-        data-haptic="selection"
-        aria-pressed={ariaPressed ?? selected}
-        onClick={onClick}
+      <div
         className={cn(
-          'game-focus-ring group relative flex min-h-24 w-full items-center gap-4 overflow-hidden rounded-md rounded-tr-none border bg-game-surface p-4 text-right transition-colors',
+          'relative flex min-h-24 w-full items-center gap-4 overflow-hidden rounded-md rounded-tr-none border bg-game-surface p-4 text-right',
           selected
             ? 'border-game-charcoal/65 ring-1 ring-game-charcoal/15'
-            : 'border-game-card-border hover:border-game-charcoal/40',
+            : 'border-game-card-border',
           className,
         )}
       >
@@ -77,39 +94,21 @@ export function ScenicChoiceCard({
               {description}
             </span>
           )}
-          <span
-            aria-hidden="true"
-            className="mt-auto flex items-center justify-end gap-2 pt-3"
-          >
-            {selected && (
-              <span className="rounded-sm bg-game-surface-raised/75 px-1.5 py-0.5 text-[11px] font-semibold text-game-ink">
-                Selected
-              </span>
-            )}
-            <span className="flex size-11 items-center justify-center rounded-lg border border-game-charcoal/15 bg-game-surface-raised/50 text-game-charcoal backdrop-blur-[2px] group-hover:border-game-charcoal/30 group-hover:bg-game-surface-raised/75 group-active:bg-game-surface-raised/90">
-              {selected ? (
-                <Check className="size-4" />
-              ) : (
-                <ChevronRight className="size-4" />
-              )}
-            </span>
+          <span className="mt-auto flex items-center justify-end pt-3">
+            {selectionButton}
           </span>
         </span>
-      </button>
+      </div>
     )
   }
 
   return (
-    <button
-      type="button"
-      data-haptic="selection"
-      aria-pressed={ariaPressed ?? selected}
-      onClick={onClick}
+    <div
       className={cn(
-        'game-focus-ring group relative flex min-h-24 w-full items-stretch overflow-hidden rounded-lg border text-left transition-colors md:min-h-28',
+        'relative flex min-h-24 w-full items-stretch overflow-hidden rounded-lg border text-left md:min-h-28',
         selected
           ? 'border-game-charcoal/65 ring-1 ring-game-charcoal/15'
-          : 'border-game-card-border hover:border-game-charcoal/40',
+          : 'border-game-card-border',
         className,
       )}
     >
@@ -119,7 +118,7 @@ export function ScenicChoiceCard({
           alt=""
           fill
           sizes="(max-width: 768px) 100vw, 520px"
-          className="object-cover opacity-75 transition-opacity group-hover:opacity-85"
+          className="pointer-events-none object-cover opacity-75"
         />
       ) : (
         <div className="absolute inset-0 bg-game-surface-raised" />
@@ -158,8 +157,9 @@ export function ScenicChoiceCard({
               {description}
             </span>
           )}
+          <span className="mt-3 flex justify-end">{selectionButton}</span>
         </span>
       </span>
-    </button>
+    </div>
   )
 }

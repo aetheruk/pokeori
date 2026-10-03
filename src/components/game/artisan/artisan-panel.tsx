@@ -4,7 +4,6 @@ import { useHaptics } from '@haptics/react'
 import {
   Hammer,
   Loader2,
-  Lock,
   MousePointer2,
   RotateCw,
   Sparkles,
@@ -2002,6 +2001,15 @@ export function ArtisanPanel({
         {...scrollClickGuard}
       >
         <div>
+          <SectionDivider
+            className="mb-6"
+            textColor="text-game-moss-strong"
+            textClassName="rounded-full border border-current/30 px-3 py-0.5 text-xs font-extrabold tracking-[0.14em]"
+          >
+            {subcategoryOptions.find(
+              (option) => option.id === activeSubcategory,
+            )?.label || categoryLabels[activeCategory]}
+          </SectionDivider>
           {ingredientId && (
             <div className="mb-4 flex min-h-14 items-center justify-between gap-3 rounded-lg border border-game-border bg-game-surface px-3 py-2">
               <div className="flex min-w-0 items-center gap-2">
@@ -2061,31 +2069,13 @@ export function ArtisanPanel({
                     )
                   : undefined
                 return (
-                  // biome-ignore lint/a11y/useSemanticElements: The keyboard-accessible card contains separate crafting controls that cannot be nested in a button.
                   <div
                     key={recipe.id}
-                    onClick={() => {
-                      triggerHaptic('selection')
-                      setSelectedRecipe(recipe)
-                    }}
-                    onKeyDown={(event) => {
-                      if (event.target !== event.currentTarget) return
-                      if (event.key === 'Enter' || event.key === ' ') {
-                        event.preventDefault()
-                        triggerHaptic('selection')
-                        setSelectedRecipe(recipe)
-                      }
-                    }}
-                    role="button"
-                    tabIndex={0}
-                    aria-label={`View ${recipe.name} recipe`}
-                    aria-haspopup="dialog"
-                    data-haptic-manual="true"
                     className={cn(
-                      'game-focus-ring group relative flex cursor-pointer items-center gap-4 overflow-hidden rounded-md rounded-tr-none border bg-game-surface p-4 transition-colors',
+                      'relative flex items-center gap-4 overflow-hidden rounded-md rounded-tr-none border bg-game-surface p-4',
                       state.canCraft
-                        ? 'border-game-clay/45 hover:border-game-clay/70'
-                        : 'border-game-card-border hover:border-game-charcoal/45',
+                        ? 'border-game-clay/45'
+                        : 'border-game-card-border',
                     )}
                   >
                     <div
@@ -2112,35 +2102,32 @@ export function ArtisanPanel({
                     <div className="relative z-10 flex min-w-0 flex-1 flex-col items-end self-stretch text-right">
                       <h3 className="-mr-4 -mt-4 line-clamp-2 w-fit max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-xs font-bold leading-tight tracking-[0.12em] text-white">
                         {recipe.name}
-                      </h3>
-                      <span className="mt-2 text-[11px] font-semibold text-game-ink">
-                        {categoryLabels[recipe.category]} ·{' '}
-                        {getRecipeSubcategoryLabel(recipe)}
-                      </span>
-                      <span className="mt-1 text-[11px] font-semibold text-game-ink">
-                        <span className="font-mono">
+                        <span className="ml-1 font-mono text-game-battle-orange">
                           Lv {recipe.artisanLevel}
-                        </span>{' '}
-                        · {formatOutputRange(recipe)}
-                      </span>
-                      <div
-                        className={cn(
-                          'mt-1 flex max-w-full items-start justify-end gap-1 rounded-sm bg-game-surface-raised/75 px-1.5 py-0.5 text-[11px] font-semibold',
-                          state.canCraft
-                            ? 'text-game-clay-strong'
-                            : 'text-game-ink',
-                        )}
-                      >
-                        {state.locked && (
-                          <Lock
-                            aria-hidden="true"
-                            className="mt-0.5 h-3 w-3 shrink-0"
-                          />
-                        )}
-                        {state.canCraft ? 'Ready' : state.lockReason}
-                      </div>
+                        </span>
+                      </h3>
 
                       <div className="relative z-20 mt-auto flex max-w-full flex-wrap justify-end gap-2 pt-3">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          data-haptic-manual="true"
+                          aria-label={`View ${recipe.name} recipe`}
+                          aria-haspopup="dialog"
+                          title={`View ${recipe.name} recipe`}
+                          onClick={() => {
+                            triggerHaptic('selection')
+                            setSelectedRecipe(recipe)
+                          }}
+                          className="size-11 rounded-lg border border-game-charcoal/15 bg-game-surface-raised/50 p-0 shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75"
+                        >
+                          <TaskIconDisplay
+                            icon={{ type: 'item', id: 'explorers-journal' }}
+                            normalizeVisibleBounds
+                            className="h-7 w-7"
+                          />
+                        </Button>
                         <Button
                           type="button"
                           variant="ghost"
@@ -2168,7 +2155,14 @@ export function ArtisanPanel({
                           {loadingRecipe === recipe.id ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
                           ) : (
-                            <Hammer className="h-4 w-4" />
+                            <TaskIconDisplay
+                              icon={{
+                                type: 'local',
+                                id: '/fallback/skills/artisan-v2.png',
+                              }}
+                              normalizeVisibleBounds
+                              className="h-7 w-7"
+                            />
                           )}
                         </Button>
                         {bulkVisible && bulkMultiplier ? (
