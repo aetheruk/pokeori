@@ -202,7 +202,7 @@ export const pewterCityBattles: BattleConfig[] = [
     ],
     enemyTeam: [{ speciesId: 39, level: 35, formId: '39' }],
     rewards: [
-      { type: 'icon', targetId: '39', quantity: 1, dropChance: 100 },
+      { type: 'icon', targetId: 'jigglypuff', quantity: 1, dropChance: 100 },
       { type: 'pokemon_research_xp', targetId: '39', quantity: 50, dropChance: 100 },
     ],
     enemyAttackTelegraphChance: 2,

@@ -1,5 +1,6 @@
 # Current Game State
 
+- Unreleased: The `singing-in-the-rain` battle now awards the registered Jigglypuff trainer icon instead of an unresolved species ID.
 - Unreleased: Ability Patches no longer appear as authored item drops or task, battle, expedition, or Game Corner prize rewards. The Let's Go Ability Patch remains purchasable at the Viridian City Poké Mart. Celadon's `a-classy-guy` task now points players to that shop instead of granting a patch.
 - Unreleased: Route 5 Field Research now shows the “Secret to Unlock” Meowth task in the Explore preview. Its 15% unlock chance is still rolled only when Field Research succeeds.
 - Unreleased: Consumed item and currency requirements now say “Hand Over” instead of “Spend” or “Pay”; non-consuming item, currency, and Pokémon ownership requirements say “Own.”

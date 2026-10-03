@@ -121,6 +121,7 @@ export function BattleHeader({
                 activePlayerMon.name
               }
               level={activePlayerMon.level}
+              actualLevel={activePlayerMon.actualLevel}
               gender={activePlayerMon.gender}
               isPlayer
               align="left"

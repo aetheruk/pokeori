@@ -4,12 +4,14 @@ import { cn } from '@/lib/utils'
 import { getBattleStatusChip } from '@/utilities/battle/status-presentation'
 import type { BattleStance } from '@/utilities/battle/types'
 import { Mars, Venus } from 'lucide-react'
+import { BattleLevelSyncIndicator } from './battle-level-sync-indicator'
 
 interface HealthDisplayProps {
   currentHp: number
   maxHp: number
   name: string
   level: number
+  actualLevel?: number
   showHpValues?: boolean
   gender?: string | null
   isPlayer?: boolean
@@ -25,6 +27,7 @@ export function HealthDisplay({
   maxHp,
   name,
   level,
+  actualLevel,
   showHpValues = false,
   gender,
   isPlayer,
@@ -58,6 +61,12 @@ export function HealthDisplay({
         )}
       >
         Lv. {level}
+        {isPlayer && (
+          <BattleLevelSyncIndicator
+            actualLevel={actualLevel}
+            battleLevel={level}
+          />
+        )}
       </span>
     </span>
   )
