@@ -56,7 +56,7 @@ export function HealthDisplay({
       {preferredStance && <StanceBadge stance={preferredStance} />}
       <span
         className={cn(
-          'shrink-0 font-mono text-game-muted',
+          'inline-flex shrink-0 items-center gap-1 font-mono text-game-muted',
           compact ? 'text-[9px]' : 'text-[10px]',
         )}
       >

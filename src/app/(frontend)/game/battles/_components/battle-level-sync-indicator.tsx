@@ -18,7 +18,7 @@ export function BattleLevelSyncIndicator({
       title={description}
       className="inline-flex shrink-0 items-center text-game-danger"
     >
-      <RefreshCw aria-hidden="true" className="h-3 w-3" />
+      <RefreshCw aria-hidden="true" className="h-2 w-2" />
     </span>
   )
 }
