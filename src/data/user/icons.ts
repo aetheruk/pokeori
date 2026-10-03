@@ -10,6 +10,7 @@ export const icons: IconConfig[] = [
   { id: 'ditto', name: 'Ditto', icon: { type: 'pokemon', id: '132' } },
   { id: 'raticate', name: 'Raticate', icon: { type: 'pokemon', id: '20' } },
   { id: 'metapod', name: 'Metapod', icon: { type: 'pokemon', id: '11' } },
+  { id: 'jigglypuff', name: 'Jigglypuff', icon: { type: 'pokemon', id: '39' } },
   {
     id: 'alolan-meowth',
     name: 'Alolan Meowth',
