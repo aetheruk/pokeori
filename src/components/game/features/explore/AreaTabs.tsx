@@ -62,13 +62,16 @@ export function AreaTabs({
               return (
                 <ScenicChoiceCard
                   key={subCategory}
+                  appearance="explore"
                   background={subRegionData?.image || '/backgrounds/town.avif'}
                   title={subCategory}
                   icon={
                     subRegionData?.icon ? (
                       <TaskIconDisplay
                         icon={subRegionData.icon}
-                        className="h-10 w-10"
+                        normalizeVisibleBounds
+                        outlineVisiblePixels
+                        className="h-9 w-9"
                       />
                     ) : undefined
                   }

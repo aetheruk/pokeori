@@ -57,11 +57,17 @@ export function CategoryTabs({
             .map(([regionKey, regionData]) => (
               <ScenicChoiceCard
                 key={regionKey}
+                appearance="explore"
                 background={regionData.image}
                 title={regionKey}
                 icon={
                   regionData.icon ? (
-                    <TaskIconDisplay icon={regionData.icon} className="h-10 w-10" />
+                    <TaskIconDisplay
+                      icon={regionData.icon}
+                      normalizeVisibleBounds
+                      outlineVisiblePixels
+                      className="h-9 w-9"
+                    />
                   ) : undefined
                 }
                 iconPosition={regionData.icon ? 'left' : 'right'}
