@@ -233,8 +233,8 @@ export function CryRecognitionGame({
   }, [currentPokemon, isPlaying])
 
   // Make guess
-  const makeGuess = useCallback(async () => {
-    if (!currentPokemon || !guess || isProcessing) return
+  const makeGuess = useCallback(async (selectedGuess = guess) => {
+    if (!currentPokemon || !selectedGuess || isProcessing) return
     setIsProcessing(true)
 
     // Find the ID of the guess (which is a name)
@@ -243,11 +243,11 @@ export function CryRecognitionGame({
         p.forms.find((f) => f.form === 'base')?.name ||
         p.forms[0]?.name ||
         '???'
-      return name === guess
+      return name === selectedGuess
     })
 
     // We send the ID of the guessed pokemon as the answer
-    const answerId = guessedPokemon ? guessedPokemon.id : guess
+    const answerId = guessedPokemon ? guessedPokemon.id : selectedGuess
 
     const result = await submitGameAnswer(answerId)
 
@@ -363,6 +363,7 @@ export function CryRecognitionGame({
       })
       .sort((a, b) => a.label.localeCompare(b.label))
   }, [pokemonPool])
+  const useIconChoices = pokemonOptions.length < 8
 
   const pokemon = currentPokemon
     ? pokemonData.find((p) => p.id === currentPokemon)
@@ -507,80 +508,111 @@ export function CryRecognitionGame({
           <div className="game-paper-background h-[70%] overflow-y-auto border-t border-game-border bg-game-surface px-4 py-5 text-game-ink">
             <div className="mx-auto flex h-full max-w-md flex-col lg:max-w-2xl">
               <SectionDivider>Identify the Pokemon</SectionDivider>
-              <div className="flex items-center justify-center mb-6">
-                {/* Play Cry Button */}
-                <div className="text-center mb-0">
-                  <Button
-                    type="button"
-                    onClick={playCry}
-                    disabled={isPlaying}
-                    aria-pressed={isPlaying}
-                    aria-busy={isPlaying}
-                    size="lg"
-                    variant="outline"
-                    className="w-auto px-6"
-                  >
-                    {isPlaying ? (
-                      <VolumeX className="w-6 h-6 mr-2" />
-                    ) : (
-                      <Volume2 className="w-6 h-6 mr-2" />
-                    )}
-                    {isPlaying ? 'Listen...' : 'Play Cry'}
-                  </Button>
-                </div>
-              </div>
-
               {/* Horizontal Rule */}
               <hr className="mt-auto mb-6" />
 
               <div className="space-y-6 pb-8">
                 <div className="space-y-4">
-                  <Select value={guess} onValueChange={setGuess}>
-                    <SelectTrigger className="w-full h-12 text-sm">
-                      <SelectValue placeholder="Select a Pokémon..." />
-                    </SelectTrigger>
-                    <SelectContent
-                      position="item-aligned"
-                      className="max-h-[min(var(--radix-select-content-available-height),60dvh,24rem)] touch-pan-y overscroll-contain"
+                  {useIconChoices ? (
+                    <div
+                      className={cn(
+                        'mx-auto grid w-full max-w-sm gap-3',
+                        pokemonOptions.length <= 4
+                          ? 'grid-cols-2'
+                          : 'grid-cols-3',
+                      )}
                     >
-                      <div className="px-2 py-2">
-                        <input
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          onKeyDown={(e) => e.stopPropagation()}
-                          placeholder="Search Pokémon..."
-                          className="game-focus-ring mb-2 w-full rounded-md border border-game-border bg-game-surface-raised px-3 py-2 text-sm text-game-ink placeholder:text-game-muted"
-                        />
-                      </div>
-                      {pokemonOptions
-                        .filter((o) =>
-                          o.label
-                            .toLowerCase()
-                            .includes(searchTerm.trim().toLowerCase()),
-                        )
-                        .map((option) => (
-                          <SelectItem
-                            key={option.id}
-                            value={option.value}
-                            className="text-lg"
-                          >
+                      {pokemonOptions.map((option) => (
+                        <Button
+                          key={option.id}
+                          type="button"
+                          variant="outline"
+                          aria-label={`Guess ${option.label}`}
+                          onClick={() => {
+                            void makeGuess(option.value)
+                          }}
+                          disabled={isProcessing || isPlaying}
+                          aria-busy={isProcessing}
+                          className="aspect-square h-auto flex-col gap-1 p-2"
+                        >
+                          <span className="relative h-16 w-16 shrink-0 sm:h-20 sm:w-20">
+                            <Image
+                              src={getPokemonImageUrl(
+                                option.id.toString(),
+                                'sprite',
+                              )}
+                              alt=""
+                              fill
+                              className="object-contain"
+                            />
+                          </span>
+                          <span className="max-w-full truncate text-xs font-semibold">
                             {option.label}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
+                          </span>
+                        </Button>
+                      ))}
+                    </div>
+                  ) : (
+                    <Select value={guess} onValueChange={setGuess}>
+                      <SelectTrigger
+                        data-haptic-manual="true"
+                        className="w-full h-12 text-sm"
+                      >
+                        <SelectValue placeholder="Select a Pokémon..." />
+                      </SelectTrigger>
+                      <SelectContent
+                        position="item-aligned"
+                        className="max-h-[min(var(--radix-select-content-available-height),60dvh,24rem)] touch-pan-y overscroll-contain"
+                      >
+                        <div className="px-2 py-2">
+                          <input
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onKeyDown={(e) => e.stopPropagation()}
+                            placeholder="Search Pokémon..."
+                            className="game-focus-ring mb-2 w-full rounded-md border border-game-border bg-game-surface-raised px-3 py-2 text-sm text-game-ink placeholder:text-game-muted"
+                          />
+                        </div>
+                        {pokemonOptions
+                          .filter((o) =>
+                            o.label
+                              .toLowerCase()
+                              .includes(searchTerm.trim().toLowerCase()),
+                          )
+                          .map((option) => (
+                            <SelectItem
+                              key={option.id}
+                              value={option.value}
+                              data-haptic-manual="true"
+                              className="text-lg"
+                            >
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                   <Button
                     variant="default"
                     type="button"
-                    onClick={makeGuess}
-                    disabled={!guess || isProcessing}
+                    onClick={useIconChoices || !guess ? playCry : () => makeGuess()}
+                    disabled={isPlaying || isProcessing}
+                    aria-pressed={isPlaying}
                     aria-busy={isProcessing}
                     className="h-12 w-full bg-game-clay text-base font-bold tracking-wide text-game-cream shadow-sm hover:bg-game-clay/90"
                   >
                     {isProcessing ? (
                       <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : isPlaying ? (
+                      <>
+                        <VolumeX className="w-5 h-5" />
+                        Listen...
+                      </>
                     ) : (
-                      'Guess'
+                      <>
+                        <Volume2 className="w-5 h-5" />
+                        {useIconChoices || !guess ? 'Play Cry' : 'Guess'}
+                      </>
                     )}
                   </Button>
                 </div>
