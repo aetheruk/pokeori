@@ -2082,98 +2082,119 @@ export function ArtisanPanel({
                     aria-haspopup="dialog"
                     data-haptic-manual="true"
                     className={cn(
-                      'game-focus-ring group relative flex items-center gap-4 overflow-hidden rounded-lg border p-4 text-left transition-colors',
+                      'game-focus-ring group relative flex cursor-pointer items-center gap-4 overflow-hidden rounded-md rounded-tr-none border bg-game-surface p-4 transition-colors',
                       state.canCraft
-                        ? 'cursor-pointer border-game-moss/35 bg-game-surface hover:border-game-moss/60 hover:bg-game-surface-raised'
-                        : state.locked
-                          ? 'cursor-pointer border-game-card-border bg-game-surface opacity-70'
-                          : 'cursor-pointer border-game-card-border bg-game-surface hover:border-game-moss/35',
+                        ? 'border-game-clay/45 hover:border-game-clay/70'
+                        : 'border-game-card-border hover:border-game-charcoal/45',
                     )}
                   >
-                    <div className="shrink-0">
-                      <div className="game-icon-orb relative h-14 w-14 transition-colors group-hover:border-game-charcoal/35">
-                        {state.locked ? (
-                          <Lock className="absolute right-0.5 top-0.5 h-3 w-3 text-game-muted" />
-                        ) : null}
-                        <RecipeOutputIcon
-                          recipe={recipe}
-                          className={cn(
-                            'h-9 w-9 object-contain',
-                            state.locked && 'grayscale',
-                          )}
-                        />
-                      </div>
+                    <div
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-70"
+                      style={{
+                        backgroundImage:
+                          'url(/backgrounds/artisan-workshop.avif)',
+                      }}
+                    />
+                    <div
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-0 bg-gradient-to-r from-game-surface-raised/76 via-game-surface/56 to-game-surface/10"
+                    />
+                    <div className="relative z-10 flex h-14 w-14 shrink-0 items-center justify-center">
+                      <TaskIconDisplay
+                        icon={{ type: 'item', id: getOutputItemId(recipe) }}
+                        normalizeVisibleBounds
+                        outlineVisiblePixels
+                        className={cn('h-9 w-9', state.locked && 'grayscale')}
+                      />
                     </div>
 
-                    <div className="relative min-w-0 flex-1">
-                      <span className="mb-1 block truncate text-[11px] font-medium text-game-moss-strong">
-                        {categoryLabels[recipe.category]} ·{' '}
-                        {getRecipeSubcategoryLabel(recipe)} · Lv{' '}
-                        {recipe.artisanLevel} · {formatOutputRange(recipe)}
-                      </span>
-                      <h3 className="truncate text-sm font-semibold text-game-ink">
+                    <div className="relative z-10 flex min-w-0 flex-1 flex-col items-end self-stretch text-right">
+                      <h3 className="-mr-4 -mt-4 line-clamp-2 w-fit max-w-full rounded-md rounded-tl-none rounded-tr-none rounded-br-none bg-game-charcoal px-2 py-1 text-xs font-bold leading-tight tracking-[0.12em] text-white">
                         {recipe.name}
                       </h3>
-                      <div className="mt-1 truncate text-[11px] font-semibold uppercase tracking-[0.1em] text-game-muted">
+                      <span className="mt-2 text-[11px] font-semibold text-game-ink">
+                        {categoryLabels[recipe.category]} ·{' '}
+                        {getRecipeSubcategoryLabel(recipe)}
+                      </span>
+                      <span className="mt-1 text-[11px] font-semibold text-game-ink">
+                        <span className="font-mono">
+                          Lv {recipe.artisanLevel}
+                        </span>{' '}
+                        · {formatOutputRange(recipe)}
+                      </span>
+                      <div
+                        className={cn(
+                          'mt-1 flex max-w-full items-start justify-end gap-1 rounded-sm bg-game-surface-raised/75 px-1.5 py-0.5 text-[11px] font-semibold',
+                          state.canCraft
+                            ? 'text-game-clay-strong'
+                            : 'text-game-ink',
+                        )}
+                      >
+                        {state.locked && (
+                          <Lock
+                            aria-hidden="true"
+                            className="mt-0.5 h-3 w-3 shrink-0"
+                          />
+                        )}
                         {state.canCraft ? 'Ready' : state.lockReason}
                       </div>
-                    </div>
 
-                    <div className="relative z-10 flex shrink-0 items-center gap-1">
-                      <Button
-                        type="button"
-                        size="icon-sm"
-                        data-haptic-manual="true"
-                        disabled={
-                          !state.canCraft ||
-                          loadingRecipe === recipe.id ||
-                          completingCraft
-                        }
-                        onClick={(event) => {
-                          event.stopPropagation()
-                          triggerHaptic('selection')
-                          startCraft(recipe)
-                        }}
-                        className={cn(
-                          'h-10 w-10 rounded-lg',
-                          state.canCraft
-                            ? 'bg-game-clay text-game-cream hover:bg-game-clay-strong'
-                            : 'border border-game-border bg-game-surface-raised text-game-muted',
-                        )}
-                        aria-label={`Craft ${recipe.name}`}
-                        title={`Craft ${recipe.name}`}
-                      >
-                        {loadingRecipe === recipe.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Hammer className="h-4 w-4" />
-                        )}
-                      </Button>
-                      {bulkVisible && bulkMultiplier ? (
+                      <div className="relative z-20 mt-auto flex max-w-full flex-wrap justify-end gap-2 pt-3">
                         <Button
                           type="button"
-                          size="icon-sm"
+                          variant="ghost"
+                          size="icon"
                           data-haptic-manual="true"
-                          variant={
-                            bulkState?.canCraft ? 'secondary' : 'outline'
-                          }
                           disabled={
-                            !bulkState?.canCraft ||
+                            !state.canCraft ||
                             loadingRecipe === recipe.id ||
                             completingCraft
                           }
                           onClick={(event) => {
                             event.stopPropagation()
                             triggerHaptic('selection')
-                            startCraft(recipe, bulkMultiplier)
+                            startCraft(recipe)
                           }}
-                          className="h-10 w-10 rounded-lg px-0 text-[11px] font-black"
-                          aria-label={`Craft ${recipe.name} x${bulkMultiplier}`}
-                          title={`Craft ${recipe.name} x${bulkMultiplier}`}
+                          className={cn(
+                            'size-11 rounded-lg border bg-game-surface-raised/50 p-0 shadow-none backdrop-blur-[2px] hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90',
+                            state.canCraft
+                              ? 'border-game-clay/35 text-game-clay-strong hover:border-game-clay/60'
+                              : 'border-game-charcoal/15 text-game-muted',
+                          )}
+                          aria-label={`Craft ${recipe.name}`}
+                          title={`Craft ${recipe.name}`}
                         >
-                          x{bulkMultiplier}
+                          {loadingRecipe === recipe.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Hammer className="h-4 w-4" />
+                          )}
                         </Button>
-                      ) : null}
+                        {bulkVisible && bulkMultiplier ? (
+                          <Button
+                            type="button"
+                            size="icon"
+                            data-haptic-manual="true"
+                            variant="ghost"
+                            disabled={
+                              !bulkState?.canCraft ||
+                              loadingRecipe === recipe.id ||
+                              completingCraft
+                            }
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              triggerHaptic('selection')
+                              startCraft(recipe, bulkMultiplier)
+                            }}
+                            className="size-11 rounded-lg border border-game-charcoal/15 bg-game-surface-raised/50 p-0 font-mono text-[11px] font-bold text-game-charcoal shadow-none backdrop-blur-[2px] hover:border-game-charcoal/30 hover:bg-game-surface-raised/75 active:bg-game-surface-raised/90"
+                            aria-label={`Craft ${recipe.name} x${bulkMultiplier}`}
+                            title={`Craft ${recipe.name} x${bulkMultiplier}`}
+                          >
+                            x{bulkMultiplier}
+                          </Button>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
                 )
