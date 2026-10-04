@@ -58,6 +58,15 @@ export function CategoryTabs({
               <ScenicChoiceCard
                 key={regionKey}
                 appearance="explore"
+                selectionIcon={
+                  <TaskIconDisplay
+                    icon={{
+                      type: 'local',
+                      id: '/fallback/skills/explorer-v2.png',
+                    }}
+                    className="h-7 w-7"
+                  />
+                }
                 background={regionData.image}
                 title={regionKey}
                 icon={

@@ -63,6 +63,15 @@ export function AreaTabs({
                 <ScenicChoiceCard
                   key={subCategory}
                   appearance="explore"
+                  selectionIcon={
+                    <TaskIconDisplay
+                      icon={{
+                        type: 'local',
+                        id: '/fallback/skills/explorer-v2.png',
+                      }}
+                      className="h-7 w-7"
+                    />
+                  }
                   background={subRegionData?.image || '/backgrounds/town.avif'}
                   title={subCategory}
                   icon={
