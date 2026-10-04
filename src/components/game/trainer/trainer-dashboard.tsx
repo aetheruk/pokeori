@@ -316,6 +316,15 @@ export function TrainerDashboard({
             background={trainerBanner}
             title={user?.trainerName || 'Trainer'}
             appearance="explore"
+            icon={
+              <TaskIconDisplay
+                icon={trainerIcon}
+                normalizeVisibleBounds
+                outlineVisiblePixels
+                className="h-10 w-10"
+              />
+            }
+            iconPosition="left"
             selectionIcon={trainerGenderIcon}
             onClick={() => setSectionDrawerOpen(true)}
             className="min-h-20"
